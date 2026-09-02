@@ -3,15 +3,10 @@
 The list replaces the old namespace filter + searchable selectbox. Picking an MDim out of a dropdown
 only works if you already know which one your PR touched — which is exactly what a reviewer doesn't.
 
-One level, deliberately. The list used to be an entry point into three deep pages (Blast radius, View
-diff, Review & PR brief), and those pages formed a closed loop: the author's scope decision was read only
-by the Review page, the Approve/Flag sign-off was read by nothing, and neither is consulted at merge —
-metadata ships through ETL, unlike chart-diff approvals, which gate `etl chart-sync`. They also carried a
-second review vocabulary, stored apart from this list's ticks so the two could not collide, which meant a
-change could read Reviewed here and Pending there forever.
-
-What they contributed that nothing else does is kept: the **PR brief** is a download on each card, and the
-dimension grid lives in the **Blast radius** section, which every card links into.
+Two readings of the same MDims. **View by view** is one MDim at a time, one changed view at a time, with a
+tick and a note on each view. **By edit** is one card per authored edit, however many views word it — the
+per-MDim cards it replaces repeated a shared edit once per MDim. Both record on their own surface, so the
+section bar can count either as progress.
 """
 
 import pandas as pd
@@ -19,11 +14,9 @@ import streamlit as st
 from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
-from apps.wizard.app_pages.metadata_diff import cached, datapage, discovery, view_nav
-from apps.wizard.app_pages.metadata_diff.blast_section import GROUP_KEY, TREE_MDIM_KEY
+from apps.wizard.app_pages.metadata_diff import cached, datapage, edits_view, view_nav
 from apps.wizard.app_pages.metadata_diff.core import (
     dims_str,
-    field_label,
     view_label,
     view_url,
 )
@@ -32,35 +25,22 @@ from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
     DIFF_CSS,
     st_layout_switcher,
-    st_origin_caption,
 )
 from apps.wizard.app_pages.metadata_diff.review_state import (
     item_marker,
     resolve_item_mark,
-    resolve_marks,
     st_review_strip,
     surface_key,
     surface_progress,
 )
-from apps.wizard.utils.components import Pagination
 
-MDIMS_PER_PAGE = 4
 # The URL key that opens one MDim's views. A route, not a filter: the page shows that MDim's changed views
 # and nothing else, and the link survives a reload so it can be pasted to somebody else.
 VIEWS_KEY = "mdim-views"
-VIEWS_PER_PAGE = 5
-# Changed views drawn inline on an MDim's card before the rest fold away. A card is one item in a list of
-# MDims, so it shows enough to judge the MDim and hands the rest to the focused page.
-VIEWS_IN_CARD = 3
 # The ⚡ jump's widget key, and the prefix for the MDim menu's per-dimension keys. Both are URL-visible:
 # a link to one view of one MDim is `?mdim-views=<path>&dim-<slug>=<choice>…`, which is shareable.
 JUMP_KEY = "mdim-view-jump"
 DIM_PARAM_PREFIX = "dim-"
-
-# Changes shown open per MDim. There is no detail page to defer the rest to any more, so the cap is the
-# point at which a card stops being readable — a fold, not a cut: the remainder renders inside an
-# expander rather than being dropped, so the card's own count and what it shows can never disagree.
-MAX_INLINE_CHANGES = 12
 
 
 def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) -> None:
@@ -98,18 +78,20 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
             "branch** — it will include MDims that master has rebuilt since this server was created."
         )
 
-    if not flagged:
-        message = f"**No published MDim's texts changed on this branch** (against {BASELINE_NAME})."
-        if drafts:
-            st.info(message + f" {len(drafts)} unpublished one(s) did — see below.")
-        else:
-            st.success(message)
+    if not flagged and not drafts:
+        st.success(f"**No published MDim's texts changed on this branch** (against {BASELINE_NAME}).")
     else:
         # Drafts counted here as well as in the picker below: the header said "1 MDim" while the picker
         # said "1 of 2", because one of them was unpublished. Two numbers for the same set read as a bug.
-        head = f"**{len(flagged)} MDim{'s' if len(flagged) != 1 else ''}** changed by this branch"
-        if drafts:
-            head += f", plus **{len(drafts)}** not published yet"
+        if flagged:
+            head = f"**{len(flagged)} MDim{'s' if len(flagged) != 1 else ''}** changed by this branch"
+            if drafts:
+                head += f", plus **{len(drafts)}** not published yet"
+        else:
+            head = (
+                f"**No published MDim's texts changed on this branch** (against {BASELINE_NAME}), but "
+                f"**{len(drafts)}** unpublished one{'s' if len(drafts) != 1 else ''} did"
+            )
         st.markdown(
             head + ".",
             help="Either the metadata of an indicator they use changed, or their own export recipe did — "
@@ -123,16 +105,10 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
         if layout == "items":
             _views_browser(source_engine, target_engine, df, flagged + drafts)
             return
+        # One card per authored edit, however many views word it. The per-MDim cards this replaces showed
+        # a shared edit once per MDim, and an unpublished MDim's cards sat in an expander of their own.
+        edits_view.st_edit_cards(source_engine, cached.summary(source_engine, target_engine), "mdims")
 
-        pagination = Pagination(flagged, items_per_page=MDIMS_PER_PAGE, pagination_key="mdd-mdims-pagination")
-        if len(flagged) > MDIMS_PER_PAGE:
-            pagination.show_controls()
-        for catalog_path in pagination.get_page_items():
-            _render_card(source_engine, target_engine, df, catalog_path)
-        if len(flagged) > MDIMS_PER_PAGE:
-            pagination.show_controls(position="bottom")
-
-    _render_drafts(source_engine, target_engine, df, drafts)
     _render_other(others)
 
 
@@ -332,39 +308,6 @@ def _render_view(
         )
 
 
-def _clear_views() -> None:
-    """Leave the view-by-view page."""
-    st.session_state[VIEWS_KEY] = ""
-    st.query_params.pop(VIEWS_KEY, None)
-
-
-def _render_drafts(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, drafts: list[str]) -> None:
-    """MDims this branch changed that no reader can see yet, because they are unpublished.
-
-    Kept out of the count above — the badge answers "what changes for readers" — but not out of the
-    review: this is the text that goes live the moment `published` flips, so the PR that publishes an
-    MDim is exactly the one whose reviewer needs to read it.
-
-    Paginated like the published list, and for the same reason: there is no MDim lookup anywhere in this
-    section, so a card left off the first page could not be opened at all — its diff and its Reviewed
-    toggles were counted and then put out of reach.
-    """
-    if not drafts:
-        return
-    with st.expander(f"📝 {len(drafts)} unpublished MDim(s) this branch changed — no reader sees them yet"):
-        st.caption(
-            "Their `published` flag is false, so they are not counted above. They are still worth reading "
-            "if this PR is the one that publishes them."
-        )
-        pagination = Pagination(drafts, items_per_page=MDIMS_PER_PAGE, pagination_key="mdd-drafts-pagination")
-        if len(drafts) > MDIMS_PER_PAGE:
-            pagination.show_controls()
-        for catalog_path in pagination.get_page_items():
-            _render_card(source_engine, target_engine, df, catalog_path)
-        if len(drafts) > MDIMS_PER_PAGE:
-            pagination.show_controls(position="bottom")
-
-
 def _render_other(others: list[str]) -> None:
     """MDims whose config differs from the baseline without this branch touching them.
 
@@ -384,91 +327,3 @@ def _render_other(others: list[str]) -> None:
 def _cache_key(row: pd.Series) -> str:
     """Bust the per-MDim diff cache when either side's config moves."""
     return f"{row.get('configMd5_source')}-{row.get('configMd5_target')}"
-
-
-def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, catalog_path: str) -> None:
-    """One MDim: what changed in its views, inline, with a PR brief and a way into its dimension grid."""
-    row = df.loc[catalog_path]
-    _title, dimensions, view_diffs = cached.mdim_view_diffs(
-        catalog_path, source_engine, target_engine, cache_key=_cache_key(row)
-    )
-    changed_views = [v for v in view_diffs if v.changed]
-    groups, other_groups = discovery.split_mdim_groups(catalog_path, changed_views)
-    paths = tuple(sorted({p for g in groups for p in (g.catalog_paths or set())}))
-    attribution = cached.indicator_attribution(source_engine, target_engine, paths) if paths else {}
-
-    with st.container(border=True):
-        badge = "🆕 new" if row["is_new"] else f"{len(groups)} change{'s' if len(groups) != 1 else ''}"
-        n_views = len(changed_views)
-        head = f"**`{catalog_path}`** :gray-badge[{badge}]"
-        if row["is_draft"]:
-            # Which expander a card sits in is not something you can see once you are reading the card.
-            head += " :orange-badge[📝 unpublished]"
-
-        if n_views:
-            head += f" :small[:gray[{n_views} of {len(view_diffs)} views]]"
-        st.markdown(head)
-
-        if not groups:
-            st.caption(
-                "Nothing this branch changed in the texts readers see. "
-                "(Chart Diff's MDIMs section shows the config diff.)"
-            )
-        else:
-            marks = resolve_marks(source_engine, surface_key("mdim", catalog_path), groups)
-            for mark in marks[:MAX_INLINE_CHANGES]:
-                _render_change(source_engine, catalog_path, mark, attribution)
-            folded = marks[MAX_INLINE_CHANGES:]
-            if folded:
-                with st.expander(f"… {len(folded)} more of this MDim's changes"):
-                    for mark in folded:
-                        _render_change(source_engine, catalog_path, mark, attribution)
-
-        # Two unlike reasons a difference is not attributable, and only one of them is master's doing.
-        repointed = [g for g in other_groups if g.indicator_replaced]
-        lagging = [g for g in other_groups if not g.indicator_replaced]
-        if lagging:
-            st.caption(
-                f"🕓 {len(lagging)} further difference(s) in this MDim's view configs are not from this "
-                "branch (its recipe is untouched) — see Chart Diff's MDIMs section."
-            )
-        if repointed:
-            st.caption(
-                f"🔀 {len(repointed)} difference(s) are on views that render a **different indicator "
-                f"variant** here than on `{BASELINE_NAME}` — a replacement, not an edit. Their text "
-                "differs for that reason too, so a rewording of yours cannot be told apart from the swap."
-            )
-
-
-def _open_dimension_tree(catalog_path: str) -> None:
-    """Send the reader to the Blast radius section with this MDim's grid drawn first.
-
-    The catalogPath goes in the URL as well as in session state: the section reads it from there, which is
-    what makes the destination survive a reload and be worth pasting to somebody else.
-    """
-    st.query_params["diff-type"] = "blast"
-    st.query_params[GROUP_KEY] = "dimensions"
-    st.query_params[TREE_MDIM_KEY] = catalog_path
-    st.session_state["metadata-diff-section"] = "blast"
-    st.session_state[GROUP_KEY] = "dimensions"
-    st.session_state[TREE_MDIM_KEY] = catalog_path
-
-
-def _render_change(source_engine: Engine, catalog_path: str, mark, attribution: dict[str, str]) -> None:
-    """One distinct text change of an MDim, in data-page layout, with its reviewed toggle."""
-    g = mark.group
-    # Views only, here — the charts this same indicator reaches are the Charts section's business, and it
-    # lists them there. What still belongs on an MDim card is *whether* the change is shared, because that
-    # is what makes the edit's spread a question at all; the Blast radius section answers it across
-    # surfaces, and the PR brief above carries it per change.
-    reach = f"{len(g.view_dims)} view{'s' if len(g.view_dims) != 1 else ''}"
-    scope = "🔗 shared indicator metadata" if g.affects_indicator else "🔒 MDim override"
-
-    st.markdown(f"**{field_label(g.field)}** :small[:gray[{reach} · {scope}]]")
-    st_origin_caption(g.catalog_paths or set(), attribution)
-    datapage.st_datapage_diff(
-        {g.field: {"old": g.old, "new": g.new}},
-        baseline_label=BASELINE_NAME.capitalize(),
-        staging_label="This staging server",
-        show_unchanged_slots=False,
-    )

@@ -32,6 +32,7 @@ from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import cached
 from apps.wizard.app_pages.metadata_diff.core import ViewDiff, diff_window_html, field_label, view_url
 from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, EditGroup, group_by_edit, reach_by_surface
+from apps.wizard.app_pages.metadata_diff.edits_view import CONTEXT_CSS, st_edit_body
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
     DIFF_CSS,
@@ -47,13 +48,6 @@ GROUP_KEY = "blast-group"
 # carried by `_mdim_tree_url`. Read from the URL so the link is shareable, and drawn first so
 # MAX_TREE_MDIMS can never be what drops the one MDim somebody asked for.
 TREE_MDIM_KEY = "blast-tree-mdim"
-_CONTEXT_CSS = """
-<style>
-.mdd-context {{ color: #555; }}
-.mdd-context-label {{ color: #999; font-size: 12px; text-transform: uppercase;
-  letter-spacing: .04em; margin-right: 6px; }}
-</style>
-""".replace("{{", "{").replace("}}", "}")
 MAX_ROWS = 60
 # MDims drawn on the grid at once. Each costs a view diff against the baseline, and past a handful the
 # canvas is unreadable anyway; the rest are named rather than silently dropped.
@@ -65,7 +59,7 @@ MAX_TREE_EXPLORERS = 4
 
 def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
     """Everywhere the branch's metadata changes land: by edit, by surface, or on an MDim's dimension grid."""
-    st.markdown(DIFF_CSS + _CONTEXT_CSS, unsafe_allow_html=True)
+    st.markdown(DIFF_CSS + CONTEXT_CSS, unsafe_allow_html=True)
     summary = cached.summary(source_engine, target_engine)
     reach = summary.reach
 
@@ -150,7 +144,7 @@ def _tree(edits: list[EditGroup]) -> None:
                 f"**{group.n_texts} rendered text{'s' if group.n_texts != 1 else ''}** → "
                 f"**{group.n_reader_facing} page{'s' if group.n_reader_facing != 1 else ''}** a reader can reach"
             )
-            _edit_body(group)
+            st_edit_body(group)
             st.markdown(f"_{_surface_summary(group)}_")
 
             with st.expander("Everywhere this edit lands", expanded=False):
@@ -262,38 +256,6 @@ def _mdim_lines(entries: list[dict[str, Any]]) -> list[str]:
     that inference is exactly what should not be left to them.
     """
     return [f"- **{e['n_views']} view{'s' if e['n_views'] != 1 else ''}** in the MDim *{e['title']}*" for e in entries]
-
-
-def _edit_body(group: EditGroup) -> None:
-    """The edit itself: the words as one diff line, then the same edit in context.
-
-    A rewording is one change, so it reads as one line — `old` struck through, `new` highlighted — rather
-    than as an "added" statement and a "removed" statement that the reader has to pair up. The context
-    line below shows where it lands, windowed on the change inside the first text carrying it: every text
-    in the group shares this edit by construction, so one is a fair exemplar, labelled as one.
-    """
-    deleted = f'<del class="mdd-del">{html.escape(group.deleted)}</del>' if group.deleted else ""
-    inserted = f'<ins class="mdd-ins">{html.escape(group.inserted)}</ins>' if group.inserted else ""
-
-    if deleted and inserted:
-        st.markdown(f'<div class="mdd-diff">{deleted} &#8594; {inserted}</div>', unsafe_allow_html=True)
-    elif inserted:
-        st.markdown(f'<div class="mdd-diff">added {inserted}</div>', unsafe_allow_html=True)
-    elif deleted:
-        st.markdown(f'<div class="mdd-diff">removed {deleted}</div>', unsafe_allow_html=True)
-    else:
-        # No words either way — a whitespace-only edit. A reordered list is not this case: its moved
-        # bullets do read as an insertion and a deletion.
-        st.caption("No words added or removed — whitespace only. The texts below show both sides.")
-
-    if group.changes:
-        exemplar = group.changes[0]
-        where = "in context" if group.n_texts == 1 else f"in context, in the first of {group.n_texts} texts"
-        st.markdown(
-            f'<div class="mdd-diff mdd-context"><span class="mdd-context-label">{where}</span> '
-            f"{diff_window_html(exemplar.old, exemplar.new, max_chars=300)}</div>",
-            unsafe_allow_html=True,
-        )
 
 
 def _surface_summary(group: EditGroup) -> str:

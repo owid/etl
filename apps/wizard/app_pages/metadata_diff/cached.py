@@ -27,8 +27,10 @@ from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
 from apps.wizard.app_pages.metadata_diff import data, discovery
 from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELD_PREFIX,
+    LAYOUT_QUERY_KEY,
     ViewDiff,
     dims_str,
+    field_label,
     group_changes,
     group_usage,
     item_identity,
@@ -269,6 +271,26 @@ def item_index(
             "name": f"{chart_slug} ({n_changes} change{'s' if n_changes != 1 else ''})",
             "url": f"{SOURCE.site}/grapher/{chart_slug}",
         }
+
+    # --- Edits, per section: what the By-edit layouts tick ---
+    try:
+        facts = summary(_source_engine, _target_engine, cache_key=cache_key)
+    except Exception:  # noqa: BLE001
+        facts = None
+    if facts is not None:
+        wizard = SOURCE.wizard_url.rstrip("/")
+        for section in ("charts", "mdims", "explorers"):
+            surface = surface_key("item", f"edit:{section}")
+            edits = discovery.edits_for(facts, section)
+            totals[surface] = len(edits)
+            for edit in edits:
+                key, _ = item_identity(surface, discovery.edit_key(edit), {})
+                words = " ".join((edit.inserted or edit.deleted or "").split())
+                words = words if len(words) <= 60 else words[:57].rstrip() + "…"
+                index[key] = {
+                    "name": f"{field_label(edit.field)} — “{words}” ({edit.n_texts} text{'s' if edit.n_texts != 1 else ''})",
+                    "url": f"{wizard}/metadata-diff?diff-type={section}&{LAYOUT_QUERY_KEY}=changes",
+                }
     return index, totals
 
 
@@ -351,6 +373,9 @@ def clear_discovery_caches() -> None:
         indicator_changes,
         indicator_attribution,
         explorer_changes,
+        explorer_titles,
         usage_for_indicators,
+        changed_charts,
+        item_index,
     ):
         cached_fn.clear()

@@ -1455,6 +1455,41 @@ def group_by_edit(reach: list[ChangeReach]) -> list[EditGroup]:
     return sorted(groups.values(), key=lambda g: (-g.n_reader_facing, -g.n_texts, g.field))
 
 
+def edits_for(summary: "Summary", section: str) -> list[EditGroup]:
+    """The authored edits that land on one section's surface, widest first.
+
+    Scoped before grouping, not after: an edit reaching both a chart and an MDim is one card in each
+    section, and each card describes only the pages on its own surface — so a section never counts the
+    other's pages, and a reviewer working through one surface never meets the other's.
+    """
+
+    def lands(r: ChangeReach) -> bool:
+        if section == "mdims":
+            return bool(r.mdims)
+        if section == "explorers":
+            return bool(r.explorers)
+        return bool(r.charts or r.draft_charts)
+
+    return group_by_edit([r for r in summary.reach if lands(r)])
+
+
+def edit_key(edit: EditGroup) -> str:
+    """The slot a tick on an edit is stored in: the field, the words taken out, and where it was authored.
+
+    Anchored on what the *baseline* carried, so it survives the author rewording their own insertion: the
+    slot stays, the content hash below moves, and the tick reopens as stale — the same behaviour a view's
+    tick has when its text is edited again. It also survives a new text picking the edit up, which is why
+    it is not the count of texts.
+    """
+    paths = sorted({p for change in edit.changes for p in (change.catalog_paths or set())})
+    return json.dumps([edit.field, edit.deleted, paths], ensure_ascii=False)
+
+
+def edit_fields(edit: EditGroup) -> dict[str, dict[str, Any]]:
+    """What a tick on an edit binds to — the words themselves. Reword the insertion and the tick goes stale."""
+    return {edit.field: {"old": edit.deleted, "new": edit.inserted}}
+
+
 def reach_by_surface(reach: list[ChangeReach]) -> list[dict[str, Any]]:
     """Invert the blast radius: one row per affected surface, naming the changes that land on it.
 

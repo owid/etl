@@ -19,26 +19,18 @@ import streamlit as st
 from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
-from apps.wizard.app_pages.metadata_diff import cached, datapage, view_nav
-from apps.wizard.app_pages.metadata_diff.core import ViewDiff, dims_str, field_label, group_changes
+from apps.wizard.app_pages.metadata_diff import cached, datapage, edits_view, view_nav
+from apps.wizard.app_pages.metadata_diff.core import ViewDiff, dims_str
 from apps.wizard.app_pages.metadata_diff.data import load_item_notes, load_reviews
 from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, st_layout_switcher
 from apps.wizard.app_pages.metadata_diff.review_state import (
     item_marker,
     resolve_item_mark,
-    resolve_marks,
     st_review_strip,
     surface_key,
     surface_progress,
 )
-from apps.wizard.utils.components import Pagination
 
-EXPLORERS_PER_PAGE = 4
-# Changes shown open per explorer. Past this the card stops being readable, so the rest fold into an
-# expander — with their Reviewed toggles, because the `n/N reviewed` counter above counts every change and
-# one without a toggle is a counter that can never reach completion. Chart Diff's TSV can show the text of
-# the folded ones but cannot tick them here, so it was never the hand-off it looked like.
-MAX_INLINE_CHANGES = 4
 # Which explorer the item view is showing, and the keys its ⚡ jump and menu use. Distinct from the MDims
 # section's prefix on purpose: the two must never read each other's dimension selections.
 EXPLORER_KEY = "explorer-views"
@@ -84,14 +76,9 @@ def st_show_explorer_metadata_diffs(source_engine: Engine, target_engine: Engine
             _render_other(other)
             return
 
-        slugs = sorted(branch)
-        pagination = Pagination(slugs, items_per_page=EXPLORERS_PER_PAGE, pagination_key="mdd-explorers-pagination")
-        if len(slugs) > EXPLORERS_PER_PAGE:
-            pagination.show_controls()
-        for slug in pagination.get_page_items():
-            _render_explorer(source_engine, slug, branch[slug])
-        if len(slugs) > EXPLORERS_PER_PAGE:
-            pagination.show_controls(position="bottom")
+        # One card per authored edit. Cards keyed on the exact text showed one reworded subtitle 348
+        # times, because each of the explorer's views words it a little differently.
+        edits_view.st_edit_cards(source_engine, cached.summary(source_engine, target_engine), "explorers")
 
     _render_other(other)
 
@@ -255,45 +242,4 @@ def _scope_caption() -> None:
         "included. Two things this cannot show: explorer views have **no data page**, so a WYSK edit never "
         "reaches their readers; and a view's stored text only refreshes when the explorer's export step "
         "re-runs on this server. Legacy CSV-backed explorers have no view rows at all."
-    )
-
-
-def _render_explorer(source_engine: Engine, slug: str, diffs: list[ViewDiff]) -> None:
-    """One explorer: its changed views, grouped by distinct text change."""
-    groups = group_changes(diffs)
-    surface = surface_key("explorer", slug)
-    marks = resolve_marks(source_engine, surface, groups)
-
-    with st.container(border=True):
-        st.markdown(f"**`{slug}`** :gray-badge[{len(diffs)} view{'s' if len(diffs) != 1 else ''}] ")
-        st.markdown(
-            f"[{BASELINE_NAME} ↗]({TARGET.site}/explorers/{slug}) · "
-            f"[this staging server ↗]({SOURCE.site}/admin/explorers/preview/{slug})"
-        )
-
-        for mark in marks[:MAX_INLINE_CHANGES]:
-            _render_change(source_engine, surface, mark)
-
-        folded = marks[MAX_INLINE_CHANGES:]
-        if folded:
-            with st.expander(f"… {len(folded)} more change(s) in this explorer"):
-                for mark in folded:
-                    _render_change(source_engine, surface, mark)
-
-
-def _render_change(source_engine: Engine, surface: str, mark) -> None:
-    """One distinct text change of an explorer, with the views it lands on and its reviewed toggle."""
-    g = mark.group
-    st.markdown(
-        f"**{field_label(g.field)}** :small[:gray[{len(g.view_dims)} view{'s' if len(g.view_dims) != 1 else ''}]]"
-    )
-    with st.popover(f"Views ({len(g.view_dims)})", width="content"):
-        st.markdown("\n".join(f"- {dims_str(d)}" for d in g.view_dims[:40]))
-        if len(g.view_dims) > 40:
-            st.caption(f"… and {len(g.view_dims) - 40} more.")
-    datapage.st_datapage_diff(
-        {g.field: {"old": g.old, "new": g.new}},
-        baseline_label=BASELINE_NAME.capitalize(),
-        staging_label="This staging server",
-        show_unchanged_slots=False,
     )

@@ -16,41 +16,25 @@ from typing import Any
 import streamlit as st
 from sqlalchemy.engine.base import Engine
 
-from apps.wizard.app_pages.metadata_diff import cached, datapage, mdim_pages
+from apps.wizard.app_pages.metadata_diff import cached, edits_view, mdim_pages
 from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELD_PREFIX,
     ChangeGroup,
-    affected_drafts,
-    distinct_garden_datasets,
-    distinct_indicator_short_names,
-    field_label,
     group_changes,
     group_usage,
-    parse_catalog_path,
     requested_chart,
 )
 from apps.wizard.app_pages.metadata_diff.data import load_reviews
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
     DIFF_CSS,
-    render_chart_list,
     st_layout_switcher,
     st_note,
-    st_origin_caption,
 )
 from apps.wizard.app_pages.metadata_diff.review_state import (
     item_marker,
-    resolve_marks,
     surface_key,
 )
-from apps.wizard.utils.components import Pagination
-
-# All chart-side changes share one reviewed-state surface: a change is a change to an indicator's text,
-# wherever it surfaces.
-SURFACE = surface_key("charts", "indicators")
-
-CHANGES_PER_PAGE = 5
-CHARTS_PER_PAGE = 25
 
 
 def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -> None:
@@ -68,7 +52,6 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
     # carry their affected charts differently, then reviewed as one list.
     groups = group_changes(changed.view_diffs()) + group_changes(chart_text.view_diffs())
     usage = cached.usage_for_indicators(tuple(changed.ids_list), "", source_engine)
-    attribution = cached.indicator_attribution(source_engine, target_engine, tuple(changed.paths))
 
     if not changed.narrowed:
         st.warning(
@@ -82,7 +65,6 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
         _extra_notes(changed)
         return
 
-    marks = resolve_marks(source_engine, SURFACE, groups)
     reached = {c["chartId"] for g in groups for c in _group_charts(g, usage, chart_text)}
     n_charts = len(reached)
     authored = f"**{len(changed.diffs)} indicator{'s' if len(changed.diffs) != 1 else ''}**"
@@ -105,15 +87,9 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
         _chart_browser(source_engine, target_engine, groups, usage, chart_text)
         return
 
-    pagination = Pagination(marks, items_per_page=CHANGES_PER_PAGE, pagination_key="mdd-charts-pagination")
-    if len(marks) > CHANGES_PER_PAGE:
-        pagination.show_controls()
-
-    for mark in pagination.get_page_items():
-        _render_change(source_engine, mark, usage, attribution, chart_text)
-
-    if len(marks) > CHANGES_PER_PAGE:
-        pagination.show_controls(position="bottom")
+    # One card per authored edit, every chart it reaches counted once. The per-text cards this replaces
+    # showed a shared edit once per wording it rendered into.
+    edits_view.st_edit_cards(source_engine, cached.summary(source_engine, target_engine), "charts")
 
 
 def _chart_browser(source_engine: Engine, target_engine: Engine, groups, usage: dict, chart_text) -> None:
@@ -231,100 +207,3 @@ def _group_charts(g: ChangeGroup, usage: dict, chart_text) -> list[dict[str, Any
     if g.field.startswith(CHART_FIELD_PREFIX):
         return [chart_text.charts[d["chart"]] for d in g.view_dims if d.get("chart") in chart_text.charts]
     return group_usage(g, usage)["charts"]
-
-
-def _render_change(
-    source_engine: Engine,
-    mark,
-    usage: dict[int, dict[str, list[dict[str, Any]]]],
-    attribution: dict[str, str],
-    chart_text=None,
-) -> None:
-    """One distinct text change: what changed, where it appears, and what it reaches."""
-    g: ChangeGroup = mark.group
-    # Charts only, here. An MDim rendering the same indicator appears in the MDims section on its own
-    # card — its indicator text changed, which is what puts it there — so naming it in both places
-    # doubles every shared change and leaves neither section answering its own question.
-    # Every chart using the indicator counts: its readers see the new text either on the chart's data page
-    # or through "Learn more about this data". The list below groups them; neither group is deducted.
-    charts = _group_charts(g, usage, chart_text) if chart_text is not None else group_usage(g, usage)["charts"]
-    drafts = [] if g.field.startswith(CHART_FIELD_PREFIX) else affected_drafts(g, usage)
-
-    plural = "s" if len(charts) != 1 else ""
-    # Drafts sit outside the reach count and are named in the label, so "10 charts" keeps meaning
-    # "10 charts a reader can open" wherever it appears.
-    draft_note = f" · {len(drafts)} draft{'s' if len(drafts) != 1 else ''}" if drafts else ""
-    with st.container(border=True):
-        # The header carries the reach and the list behind it: "10 charts" is a claim, and the charts are
-        # what lets an author check it, so the count itself opens them rather than sending the reader to
-        # the foot of the card. Review sits alongside, the way the MDim cards lead with their actions.
-        col_head, col_review = st.columns([3, 1], vertical_alignment="center")
-        with col_head:
-            with st.container(border=False, horizontal=True, vertical_alignment="center"):
-                st.markdown(f"**{field_label(g.field)}** ·")
-                with st.popover(f"📊 {len(charts)} chart{plural}{draft_note}"):
-                    render_chart_list(charts, fields={g.field}, drafts=drafts)
-
-        st_note(_where_line(g))
-        st_origin_caption(_group_paths(g), attribution)
-
-        datapage.st_datapage_diff(
-            {g.field: {"old": g.old, "new": g.new}},
-            baseline_label=BASELINE_NAME.capitalize(),
-            staging_label="This staging server",
-            show_unchanged_slots=False,
-        )
-
-
-def _group_paths(g: ChangeGroup) -> set[str]:
-    """The indicator catalogPaths carrying this change (a shared definition reaches several)."""
-    return g.catalog_paths or ({g.catalog_path} if g.catalog_path else set())
-
-
-def _where_line(g: ChangeGroup) -> str:
-    """Why this card is one change and not several: the same text, written once, shared.
-
-    Returns HTML for `st_note`. It says what is true — these indicators carry the identical text, all of
-    it — rather than which YAML construct produced it. Naming `definitions.*` or a variable key here was
-    both jargon and a trap: on a dimensional indicator the variable's own field holds a template
-    reference, so pointing at it sends the author to edit the wrong line. The exact field to edit is the
-    PR brief's job, and it still does it.
-
-    One case is not sharing at all: the group is keyed on the text, so the same wording edited in two
-    garden datasets arrives as one card. Nothing is shared across datasets, so that is as many edits as
-    there are datasets, and saying otherwise would send someone to fix half of it.
-    """
-    garden_dirs = distinct_garden_datasets(g.catalog_paths)
-    if len(garden_dirs) > 1:
-        files = ", ".join(f"<code>{d}.meta.yml</code>" for d in garden_dirs[:4]) + (
-            " …" if len(garden_dirs) > 4 else ""
-        )
-        return (
-            f"✂️ Grouped by their text, but <b>edited in {len(garden_dirs)} separate garden datasets</b> "
-            f"({files}) — nothing is shared between datasets, so this is {len(garden_dirs)} edits, not one. "
-            "Each one has to be changed on its own."
-        )
-    label = field_label(g.field)
-    shared_names = distinct_indicator_short_names(g.catalog_paths)
-    if len(shared_names) > 1:
-        preview = ", ".join(f"<code>{n}</code>" for n in shared_names[:5]) + (" …" if len(shared_names) > 5 else "")
-        return (
-            f"🔗 Grouped because these {len(shared_names)} indicators ({preview}) have <b>exactly the same "
-            f"{label}</b> — the whole text, word for word. It is written once and shared between them, so "
-            "this is one edit."
-        )
-    parsed = parse_catalog_path(g.catalog_path)
-    if len(g.catalog_paths) > 1:
-        name = f"<code>{parsed[2]}</code>" if parsed else "this indicator"
-        return (
-            f"🔗 Grouped because {len(g.catalog_paths)} versions of {name} have <b>exactly the same "
-            f"{label}</b> — the whole text, word for word. It is written once and shared between them, so "
-            "this is one edit."
-        )
-    return f"This {label} belongs to one indicator only — nothing else shares it."
-
-
-def _clear_chart() -> None:
-    """Leave the per-chart page: clear the widget and the URL it is routed by."""
-    st.session_state["chart"] = ""
-    st.query_params.pop("chart", None)

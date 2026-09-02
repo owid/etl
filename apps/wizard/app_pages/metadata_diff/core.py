@@ -1018,3 +1018,105 @@ def coerce_section(value: object, fallback: str = DEFAULT_SECTION) -> str:
         if value.startswith(f"{icon} {name}"):
             return section
     return fallback
+
+
+def where_note(field_name: str, catalog_paths: Iterable[str], n_texts: int = 1) -> str:
+    """Why one card is one edit and not several: the same words, written once, shared. HTML for `st_note`.
+
+    `n_texts` is how many distinct texts the card spans. One text on several indicators is the whole text
+    shared word for word; several texts sharing an edit share the words that moved, and nothing more may
+    be claimed — an edit card saying its ten indicators carry identical WYSK, over nine different texts,
+    was wrong on its face.
+
+    It says what is true — these indicators carry the identical text, all of it — rather than which YAML
+    construct produced it. Naming `definitions.*` or a variable key here was both jargon and a trap: on a
+    dimensional indicator the variable's own field holds a template reference, so pointing at it sends the
+    author to edit the wrong line.
+
+    One case is not sharing at all: cards are keyed on the words, so the same wording edited in two garden
+    datasets arrives as one card. Nothing is shared across datasets, so that is as many edits as there are
+    datasets, and saying otherwise would send someone to fix half of it. Empty when nothing is known about
+    where the text was authored, rather than claiming it belongs to one indicator.
+    """
+    paths = sorted({p for p in catalog_paths if p})
+    if not paths:
+        return ""
+    garden_dirs = distinct_garden_datasets(paths)
+    if len(garden_dirs) > 1:
+        files = ", ".join(f"<code>{d}.meta.yml</code>" for d in garden_dirs[:4]) + (
+            " …" if len(garden_dirs) > 4 else ""
+        )
+        return (
+            f"✂️ Grouped by their text, but <b>edited in {len(garden_dirs)} separate garden datasets</b> "
+            f"({files}) — nothing is shared between datasets, so this is {len(garden_dirs)} edits, not one. "
+            "Each one has to be changed on its own."
+        )
+    label = field_label(field_name)
+    shared = (
+        f"have <b>exactly the same {label}</b> — the whole text, word for word. It is written once and "
+        "shared between them, so this is one edit."
+        if n_texts <= 1
+        else f"all carry <b>this same edit to their {label}</b> — {n_texts} different texts, the same words "
+        "changed in each. It is written once and shared between them, so this is one edit."
+    )
+    shared_names = distinct_indicator_short_names(paths)
+    if len(shared_names) > 1:
+        preview = ", ".join(f"<code>{n}</code>" for n in shared_names[:5]) + (" …" if len(shared_names) > 5 else "")
+        return f"🔗 Grouped because these {len(shared_names)} indicators ({preview}) {shared}"
+    if len(paths) > 1:
+        parsed = parse_catalog_path(paths[0])
+        name = f"<code>{parsed[2]}</code>" if parsed else "this indicator"
+        return f"🔗 Grouped because {len(paths)} versions of {name} {shared}"
+    if n_texts > 1:
+        return f"This edit to the {label} of one indicator renders into {n_texts} texts — nothing else shares it."
+    return f"This {label} belongs to one indicator only — nothing else shares it."
+
+
+# Which section, and which of its two layouts, a per-item review surface records for. Edit surfaces are
+# listed first only for clarity: no other prefix matches them.
+SURFACE_PLACEMENT = (
+    ("item:edit:charts", "charts", "edits"),
+    ("item:edit:mdims", "mdims", "edits"),
+    ("item:edit:explorers", "explorers", "edits"),
+    ("item:mdim:", "mdims", "items"),
+    ("item:explorer:", "explorers", "items"),
+    ("item:chart", "charts", "items"),
+)
+
+
+def place_surface(surface: str) -> tuple[str, str] | None:
+    """(section, layout) a review surface records for, or None for one no section counts."""
+    for prefix, section, layout in SURFACE_PLACEMENT:
+        if prefix in surface:
+            return section, layout
+    return None
+
+
+def section_progress(ticked: dict[str, int], totals: dict[str, int]) -> dict[str, tuple[int, int]]:
+    """(ticked, total) per counted section, along the layout the reviewer is furthest through.
+
+    A section is reviewed view by view *or* edit by edit — two ways through the same changes, not two
+    halves of one job — so their counts are never added. Each layout's progress is a ratio, the higher one
+    stands for the section (the larger list on a tie), and done means that layout is done. The section bar
+    and the Review tab both read this, so they cannot disagree about whether a section is finished.
+    """
+    done: dict[tuple[str, str], int] = {}
+    total: dict[tuple[str, str], int] = {}
+    for surface, n in totals.items():
+        placed = place_surface(surface)
+        if placed is not None:
+            total[placed] = total.get(placed, 0) + n
+    for surface, n in ticked.items():
+        placed = place_surface(surface)
+        if placed is not None:
+            done[placed] = done.get(placed, 0) + n
+
+    progress: dict[str, tuple[int, int]] = {}
+    for section in sorted(COUNTED_SECTIONS):
+        candidates = []
+        for layout in ("items", "edits"):
+            d, t = done.get((section, layout), 0), total.get((section, layout), 0)
+            candidates.append((d / t if t else 0.0, t, d))
+        _ratio, t, d = max(candidates)
+        progress[section] = (d, t)
+    return progress

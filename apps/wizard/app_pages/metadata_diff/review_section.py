@@ -17,7 +17,13 @@ from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import cached
-from apps.wizard.app_pages.metadata_diff.core import distinct_garden_datasets, field_label, view_url
+from apps.wizard.app_pages.metadata_diff.core import (
+    SECTIONS,
+    distinct_garden_datasets,
+    field_label,
+    section_progress,
+    view_url,
+)
 from apps.wizard.app_pages.metadata_diff.data import REVIEWED, load_item_notes
 from apps.wizard.app_pages.metadata_diff.discovery import group_by_edit, reach_by_surface
 from apps.wizard.app_pages.metadata_diff.render import (
@@ -33,9 +39,17 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
     """What this pass produced: ticks and notes, named and linked, against the number of items there are."""
     rows = load_item_notes(source_engine)
     index, totals = cached.item_index(source_engine, target_engine)
-    total = sum(totals.values())
     ticked = [r for r in rows if r.get("status") == REVIEWED]
     noted = [r for r in rows if r.get("comment")]
+    # Counted along whichever layout each section was reviewed in — view by view or by edit — never both
+    # added, or a section finished view by view would read as unfinished for its untouched edit cards.
+    by_surface: dict[str, int] = {}
+    for row in ticked:
+        surface = str(row.get("catalogPath") or "")
+        by_surface[surface] = by_surface.get(surface, 0) + 1
+    progress = section_progress(by_surface, totals)
+    total = sum(t for _done, t in progress.values())
+    n_done = sum(done for done, _t in progress.values())
 
     if not rows:
         if total:
@@ -53,7 +67,7 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
         return
 
     st.markdown(
-        f"**{len(ticked)} of {total} item{'s' if total != 1 else ''} ticked** · "
+        f"**{n_done} of {total} item{'s' if total != 1 else ''} ticked** · "
         f"**{len(noted)} with a note** · against `{BASELINE_NAME}`"
     )
     # The denominator is the point: a list of what you ticked, with no total, reads as a finished job.
@@ -62,8 +76,8 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
             f"**Nothing ticked yet** — {len(noted)} note{'s' if len(noted) != 1 else ''} recorded, but no "
             "item marked reviewed."
         )
-    elif len(ticked) < total:
-        left = total - len(ticked)
+    elif n_done < total:
+        left = total - n_done
         st.warning(
             f"**Review unfinished** — {left} item{'s' if left != 1 else ''} still to look at. The three "
             "surface sections open on the ones you have not reached."
@@ -201,6 +215,9 @@ def _by_surface(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
 def _surface_title(surface: str) -> str:
     """A surface key as something to read: `list:item:mdim:grapher/x#y` -> "MDim grapher/x#y"."""
     body = surface.removeprefix("list:item:")
+    if body.startswith("edit:"):
+        section = body.removeprefix("edit:")
+        return f"{SECTIONS[section][1] if section in SECTIONS else section} — by edit"
     for prefix, name in (("mdim:", "MDim"), ("explorer:", "Explorer"), ("chart", "Charts")):
         if body.startswith(prefix):
             rest = body.removeprefix(prefix)

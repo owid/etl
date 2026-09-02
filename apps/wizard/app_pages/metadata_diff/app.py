@@ -30,7 +30,7 @@ from apps.wizard.app_pages.metadata_diff import (
     mdims_section,
     review_section,
 )
-from apps.wizard.app_pages.metadata_diff.core import empty_sections
+from apps.wizard.app_pages.metadata_diff.core import empty_sections, section_progress
 from apps.wizard.app_pages.metadata_diff.data import REVIEWED, load_item_notes
 from apps.wizard.app_pages.metadata_diff.discovery import keep_sections
 from apps.wizard.app_pages.metadata_diff.render import (
@@ -51,41 +51,31 @@ st.set_page_config(
 )
 
 
-# Which section a recorded row belongs to, from the surface it was written under.
-_SECTION_OF_SURFACE = (("item:mdim:", "mdims"), ("item:explorer:", "explorers"), ("item:chart", "charts"))
-
-
 def _review_marks(source_engine, target_engine) -> dict[str, str]:
-    """Per section: nothing recorded, started, or every item ticked.
+    """Per section: nothing recorded, started, or done.
+
+    Done is along whichever layout the reviewer took — every view ticked view by view, *or* every edit
+    ticked by edit. A section is reviewed one way or the other, so the bar has to agree with the way that
+    was picked rather than demand both; `section_progress` makes that call, and the Review tab reads it too.
 
     Lazy on purpose. With nothing ticked there is no "done" to establish, so a fresh page shows 👀 without
     enumerating — and enumerating means diffing every changed view of every changed MDim. The totals are
     asked for only once something has been recorded, by which point those caches are warm from the reading.
     """
-    ticked: dict[str, int] = {"charts": 0, "mdims": 0, "explorers": 0}
+    ticked: dict[str, int] = {}
     for row in load_item_notes(source_engine):
-        if row.get("status") != REVIEWED:
-            continue
-        surface = str(row.get("catalogPath") or "")
-        for prefix, section in _SECTION_OF_SURFACE:
-            if prefix in surface:
-                ticked[section] += 1
-                break
+        if row.get("status") == REVIEWED:
+            surface = str(row.get("catalogPath") or "")
+            ticked[surface] = ticked.get(surface, 0) + 1
 
-    marks = {section: "none" for section in ticked}
-    if not any(ticked.values()):
+    marks = {section: "none" for section in ("charts", "mdims", "explorers")}
+    if not ticked:
         return marks
 
     _index, totals = cached.item_index(source_engine, target_engine)
-    per_section: dict[str, int] = {"charts": 0, "mdims": 0, "explorers": 0}
-    for surface, total in totals.items():
-        for prefix, section in _SECTION_OF_SURFACE:
-            if prefix in surface:
-                per_section[section] += total
-                break
-    for section, done in ticked.items():
-        total = per_section.get(section, 0)
-        marks[section] = "none" if not done else ("done" if total and done >= total else "partial")
+    for section, (done, total) in section_progress(ticked, totals).items():
+        if done:
+            marks[section] = "done" if total and done >= total else "partial"
     return marks
 
 

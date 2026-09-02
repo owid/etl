@@ -11,7 +11,6 @@ import pandas as pd
 
 from apps.owidbot.metadata_diff import format_metadata_diff, status_icon
 from apps.wizard.app_pages.metadata_diff.brief import changed_text_lines, decision, garden_location_lines, ship_section
-from apps.wizard.app_pages.metadata_diff.charts_section import _where_line
 from apps.wizard.app_pages.metadata_diff.core import (
     ChangeGroup,
     ViewDiff,
@@ -23,6 +22,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     group_changes,
     override_snippet,
     parse_catalog_path,
+    where_note,
     yaml_field_snippet,
 )
 from apps.wizard.app_pages.metadata_diff.datapage import ordered_slots
@@ -733,7 +733,7 @@ def test_group_spanning_two_datasets_names_both_files_and_rebuilds():
     assert "garden/ns_a/2026-01-01/ds_a" in ship and "garden/ns_b/2026-01-01/ds_b" in ship
 
     # The Charts section's "where to edit" caption says the same thing.
-    where_caption = _where_line(g)
+    where_caption = where_note(g.field, g.catalog_paths)
     assert "2 separate garden datasets" in where_caption
     assert "ds_a.meta.yml" in where_caption and "ds_b.meta.yml" in where_caption
 
@@ -2477,49 +2477,32 @@ def test_a_draft_only_branch_can_still_open_its_mdims_section():
     assert len(published.review_keys["mdims"]) == 1
 
 
-def test_every_unpublished_mdim_is_reachable(monkeypatch):
-    """The drafts expander rendered the first four cards and pointed at a route that does not exist.
+def test_an_edit_landing_only_on_an_unpublished_mdim_still_gets_a_card():
+    """The drafts used to sit in a paginated expander of their own, and its fifth card had no route to it.
 
-    There is no MDim lookup in this section, so a fifth unpublished MDim's diff and its Reviewed toggles
-    could not be opened at all.
+    An unpublished MDim is in the same picker as the published ones now, and its edits are cards like any
+    other — badged unpublished, never filtered: the PR that publishes an MDim is the one whose reviewer has
+    to read it.
     """
-    from streamlit.testing.v1 import AppTest
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, edits_for
+    from apps.wizard.app_pages.metadata_diff.edits_view import _reach_line
 
-    from apps.wizard.app_pages.metadata_diff import cached, discovery, mdims_section, review_state
-    from apps.wizard.app_pages.metadata_diff.core import ViewDiff, group_changes
-
-    monkeypatch.setattr(review_state, "load_reviews", lambda engine, surface: {})
-    views = [ViewDiff(dimensions={"metric": "mean"}, fields={"descriptionShort": {"old": "Old.", "new": "New."}})]
-    monkeypatch.setattr(cached, "mdim_view_diffs", lambda *args, **kwargs: ("Incomes", [], views))
-    monkeypatch.setattr(discovery, "split_mdim_groups", lambda _path, changed: (group_changes(changed), []))
-
-    paths = [f"grapher/a/latest/draft_{i}#draft_{i}" for i in range(mdims_section.MDIMS_PER_PAGE + 2)]
-
-    def app() -> None:
-        import pandas as pd
-
-        from apps.wizard.app_pages.metadata_diff.mdims_section import MDIMS_PER_PAGE, _render_drafts
-
-        drafts = [f"grapher/a/latest/draft_{i}#draft_{i}" for i in range(MDIMS_PER_PAGE + 2)]
-        df = pd.DataFrame(
-            [{"is_new": False, "is_draft": True, "configMd5_source": "a", "configMd5_target": "b"} for _ in drafts],
-            index=drafts,
-        )
-        _render_drafts(None, None, df, drafts)
-
-    def rendered(at) -> set[str]:
-        return {path for path in paths if any(path in element.value for element in at.markdown)}
-
-    at = AppTest.from_function(app, default_timeout=30)
-    at.run()
-    assert not at.exception
-    first_page = rendered(at)
-    assert len(first_page) == mdims_section.MDIMS_PER_PAGE
-
-    at.session_state["mdd-drafts-pagination"] = 2
-    at.run()
-    assert not at.exception
-    assert rendered(at) == set(paths) - first_page, "the rest have to be reachable, not merely counted"
+    draft_only = ChangeReach(
+        field="descriptionShort",
+        old="Old.",
+        new="New.",
+        mdims=[
+            {
+                "catalogPath": "grapher/a/latest/draft#draft",
+                "title": "Draft",
+                "n_views": 1,
+                "is_draft": True,
+                "views": [{"metric": "mean"}],
+            }
+        ],
+    )
+    (edit,) = edits_for(Summary(reach=[draft_only]), "mdims")
+    assert "1 view in Draft (unpublished)" in _reach_line(edit, "mdims")
 
 
 def test_a_value_that_cannot_be_dumped_says_so_instead_of_passing_off_a_repr(monkeypatch):
@@ -2622,54 +2605,97 @@ def test_chart_text_looks_for_variables_in_the_channel_variables_live_in(monkeyp
     ], "every dataset in scope has to be asked for in the grapher channel, exactly once"
 
 
-def test_the_display_cap_folds_changes_away_but_never_drops_them(monkeypatch):
-    """Past the cap, an MDim card must still render every change — folded, not cut.
+def test_by_edit_is_one_card_per_authored_edit_however_many_texts_word_it():
+    """One reworded subtitle reached 348 explorer views, each wording it a little differently: 348 cards.
 
-    Codex found the original: changes beyond the cap were counted and then rendered as a caption, so they
-    could not be acted on at all. The controls that made it visible (a Reviewed toggle each) are parked,
-    but the invariant behind it is not — a card that says it holds N changes has to show N changes.
+    Cards keyed on the exact text repeat the same decision once per wording. Grouping by the words that
+    moved makes it one card — and scoping to the section first means an edit landing on both a chart and
+    an MDim is one card in each section, describing only that surface.
     """
-    from streamlit.testing.v1 import AppTest
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, edit_key, edits_for
 
-    from apps.wizard.app_pages.metadata_diff import cached, discovery, mdims_section, review_state
-    from apps.wizard.app_pages.metadata_diff.core import ViewDiff, group_changes
-
-    # The card still resolves marks to iterate the changes — the toggles are gone, the grouping is not.
-    monkeypatch.setattr(review_state, "load_reviews", lambda engine, surface: {})
-    n_changes = mdims_section.MAX_INLINE_CHANGES + 3
-    views = [
-        ViewDiff(
-            dimensions={"metric": f"m{i}"},
-            # One inserted token per change, and nothing else different: the diff is rendered word by
-            # word, so a whole rewritten sentence comes back split across <ins>/<del> tags and cannot be
-            # searched for as a string.
-            fields={"descriptionShort": {"old": "Mean income per day.", "new": f"Mean income marker{i} per day."}},
+    wordings = [
+        ChangeReach(
+            field="descriptionShort",
+            old=f"Mean income per {unit}.",
+            new=f"Mean income per {unit}. Measured in 2021 prices.",
+            explorers=[{"slug": "lis", "n_views": 1, "views": [{"unit": unit}]}],
+            catalog_paths={"grapher/lis/latest/lis#mean"},
         )
-        for i in range(n_changes)
+        for unit in ("day", "month", "year")
     ]
-    monkeypatch.setattr(cached, "mdim_view_diffs", lambda *args, **kwargs: ("Incomes", [], views))
-    monkeypatch.setattr(discovery, "split_mdim_groups", lambda _path, changed: (group_changes(changed), []))
-
-    def app() -> None:
-        import pandas as pd
-
-        from apps.wizard.app_pages.metadata_diff.mdims_section import _render_card
-
-        catalog_path = "grapher/a/latest/incomes#incomes"
-        df = pd.DataFrame(
-            [{"is_new": False, "is_draft": False, "configMd5_source": "a", "configMd5_target": "b"}],
-            index=[catalog_path],
-        )
-        _render_card(None, None, df, catalog_path)
-
-    at = AppTest.from_function(app, default_timeout=60).run()
-    assert not at.exception
-
-    rendered = " ".join(str(getattr(el, "value", "") or "") for el in at.markdown) + " ".join(
-        str(getattr(el, "body", "") or "") for el in at.markdown
+    both = ChangeReach(
+        field="titlePublic",
+        old="GDP",
+        new="GDP per capita",
+        charts=[{"chartId": 1, "slug": "gdp", "has_data_page": True}],
+        mdims=[{"catalogPath": "grapher/a/latest/x#x", "title": "X", "n_views": 2, "is_draft": False}],
     )
-    missing = [i for i in range(n_changes) if f"marker{i}" not in rendered]
-    assert not missing, f"changes dropped past the cap: {missing}"
+    summary = Summary(reach=wordings + [both])
+
+    explorers = edits_for(summary, "explorers")
+    assert [e.n_texts for e in explorers] == [3], "three wordings of one edit are one card"
+    assert len({edit_key(e) for e in explorers}) == 1
+    assert [e.field for e in edits_for(summary, "charts")] == ["titlePublic"]
+    assert [e.field for e in edits_for(summary, "mdims")] == ["titlePublic"]
+
+
+def test_an_edit_tick_outlives_a_new_text_but_not_a_rewording():
+    """The slot is anchored on what the baseline carried; the content is what was written.
+
+    A new text picking the edit up (another indicator now shares the definition) must not reopen a tick
+    that was made against the very same words. Rewording the insertion must: the slot stays and the hash
+    moves, so the tick reads as stale — exactly what a view's tick does when its text is edited again.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, edit_fields, edit_key, group_by_edit
+
+    where = {"grapher/a/latest/x#x"}
+    first = ChangeReach(
+        field="descriptionShort", old="Mean income.", new="Mean income. In 2021 prices.", catalog_paths=where
+    )
+    second = ChangeReach(
+        field="descriptionShort", old="Median income.", new="Median income. In 2021 prices.", catalog_paths=where
+    )
+    reworded = ChangeReach(
+        field="descriptionShort", old="Mean income.", new="Mean income. In 2017 prices.", catalog_paths=where
+    )
+
+    (one,) = group_by_edit([first])
+    (two,) = group_by_edit([first, second])
+    assert two.n_texts == 2
+    assert edit_key(one) == edit_key(two) and edit_fields(one) == edit_fields(two)
+
+    (again,) = group_by_edit([reworded])
+    assert edit_key(again) == edit_key(one), "same field, same words taken out, same dataset: the same slot"
+    assert edit_fields(again) != edit_fields(one), "different words put in: the tick goes stale"
+
+
+def test_a_section_is_done_along_whichever_layout_the_reviewer_took():
+    """Ticking every view, or every edit, finishes a section; the two are never added up.
+
+    The bar's emoji and the Review tab's "unfinished" warning both read this, so a reviewer who went view
+    by view is not told the edit cards are still waiting for them.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import section_progress
+
+    totals = {
+        surface_key("item", "mdim:grapher/a/latest/x#x"): 3,
+        surface_key("item", "edit:mdims"): 1,
+        surface_key("item", "chart"): 2,
+        surface_key("item", "edit:charts"): 1,
+        surface_key("item", "explorer:lis"): 400,
+        surface_key("item", "edit:explorers"): 1,
+    }
+    ticked = {
+        surface_key("item", "mdim:grapher/a/latest/x#x"): 3,  # view by view, complete
+        surface_key("item", "edit:charts"): 1,  # by edit, complete
+        surface_key("item", "explorer:lis"): 10,  # view by view, barely started
+    }
+    progress = section_progress(ticked, totals)
+    assert progress["mdims"] == (3, 3)
+    assert progress["charts"] == (1, 1)
+    assert progress["explorers"] == (10, 400), "the layout with more progress stands for the section"
+    assert section_progress({}, totals)["explorers"] == (0, 400), "untouched, the longer list is the one to do"
 
 
 def test_a_layout_label_never_survives_as_a_value():
