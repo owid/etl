@@ -1,0 +1,22 @@
+chart_config_id: 01a061a0-e423-79ce-840c-50bcb9c31c26
+topic_tags:
+  - "Migration"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "us_foreign_born_population/annual_change_by_decade#annual_change"
+    config:
+      title: "Average annual change in the foreign-born population of the United States"
+      # No subtitle: the chart inherits the indicator's description_short, which the garden step
+      # generates with the years the current partial decade covers.
+      originUrl: "/migration"
+      tab: "chart"
+      chartTypes:
+        - "StackedBar"
+      addCountryMode: "disabled"
+      hideAnnotationFieldsInTitle:
+        entity: true
+      selectedEntityNames:
+        - "United States"
