@@ -598,12 +598,15 @@ re-derive from what's actually on the canvas now. Any two marks whose underlying
 know — two bars, two *interior* ticks (never the first and last axis labels: grapher insets those by
 ~17px, see GOTCHAS.md → "the plot's edge is where the gridlines stop") — pin a linear scale exactly:
 solve for slope and origin from those two, then check a third known point against the prediction
-before trusting either. Agreement (within
-rounding) confirms the scale is still the simple linear one you assumed; a mismatch means something
-*besides* the scale changed — a mark moved by hand, a non-uniform rescale — and the size of the
-mismatch tells you where to go looking. This costs one extra query against the alternative: silently
-drawing new geometry (a threshold line, a rescaled bar, a repositioned label) against constants that
-no longer describe the frame.
+before trusting either. That is the recipe for a **linear axis**. On a logarithmic one
+(per-chart-type/misc.md's arrow chart is one) pixel position is linear in `log(value)`, not in the
+value, so run the same two-point pin and third-point check on `log(value)` — fed raw values, an
+untouched log-axis chart fails the third point every time and sends you hunting for a hand-edit that
+never happened. Agreement (within rounding) confirms the scale is still the one you assumed; a
+mismatch on the right transform means something *besides* the scale changed — a mark moved by hand,
+a non-uniform rescale — and the size of the mismatch tells you where to go looking. This costs one
+extra query against the alternative: silently drawing new geometry (a threshold line, a rescaled
+bar, a repositioned label) against constants that no longer describe the frame.
 
 ### Checking the words, not just the geometry
 
