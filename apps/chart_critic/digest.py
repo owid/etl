@@ -23,10 +23,21 @@ import re
 from datetime import datetime, timezone
 from typing import Any
 
+from structlog import get_logger
+
+from apps.chart_critic.critic import format_views
 from etl.paths import CACHE_DIR
+
+log = get_logger()
 
 STATE_PATH = CACHE_DIR / "chart_critic" / "digest_state.json"
 SLACK_CHANNEL = "C03NV9Z3YSV"  # #we-need-to-correct-it
+ADMIN_URL = "https://admin.owid.io"
+
+# Matches #analytics-bites, the other daily owidbot post in this workspace: a severity dot, then
+# facts separated by wide middots. Consistency is worth more than a bespoke shape — people learn
+# one scanning pattern.
+SEVERITY_DOT = {"high": ":red_circle:", "medium": ":large_orange_circle:", "low": ":large_yellow_circle:"}
 
 # What a person reads over coffee. If the sweep found more, the ranking is the deliverable.
 MAX_FINDINGS = 5
@@ -77,10 +88,69 @@ def changed_slugs(days: int = 1, include_data_updates: bool = False) -> list[str
     return sorted(slugs)
 
 
-def _fingerprint(slug: str, issue: dict[str, Any]) -> str:
-    """Identify a finding across days, loosely enough to survive the model's rewording."""
+def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """``{slug: {"chart_id": int | None, "indicators": str}}`` for the charts that were flagged.
+
+    A data-level defect lives in an indicator, not in a chart, so the same claim surfaces on
+    every chart sharing that column. This already happened: the UK coal share above 100% was
+    found three times on three charts, all from one column of one ETL step. With a per-chart
+    fingerprint those are three separate findings, and with only five digest slots they crowd
+    out everything else — which is precisely what makes ``--include-data-updates`` unusable
+    today, since one dataset refresh touches thousands of charts.
+
+    The same query yields the numeric chart id, which is what the admin edit URL needs — the
+    public slug will not do. A multi-dim view has no row here, so it has no id and gets no edit
+    link; that is correct rather than missing, since there is no single chart to edit.
+
+    Only flagged charts are looked up, so this is one small query. It fails soft: without a
+    database the fingerprint falls back to the slug (which over-reports rather than dropping a
+    finding) and the message simply carries no edit link.
+    """
+    slugs = sorted({r["slug"] for r in results if r.get("issues")})
+    if not slugs:
+        return {}
+    from etl.db import read_sql
+
+    try:
+        df = read_sql(
+            """
+            SELECT cc.slug AS slug, c.id AS chartId, v.catalogPath AS catalogPath
+            FROM chart_configs cc
+            JOIN charts c            ON c.configId = cc.id
+            JOIN chart_dimensions cd ON cd.chartId = c.id
+            JOIN variables v         ON v.id = cd.variableId
+            WHERE cc.slug IN %(slugs)s
+            """,
+            params={"slugs": tuple(slugs)},
+        )
+    except Exception as e:  # noqa: BLE001 — dedup quality and a link, not correctness
+        log.warning("chart_critic.chart_facts_failed", error=str(e))
+        return {}
+    out: dict[str, dict[str, Any]] = {}
+    for slug, group in df.groupby("slug"):
+        # The whole indicator set, so two charts collapse only when they read the same columns.
+        # Keyed on the step path without its version, so tomorrow's re-run of the same step does
+        # not re-post yesterday's finding under a new name.
+        paths = sorted({re.sub(r"/\d{4}-\d{2}-\d{2}/", "/", p) for p in group["catalogPath"] if isinstance(p, str)})
+        out[str(slug)] = {"chart_id": int(group["chartId"].iloc[0]), "indicators": "|".join(paths)}
+    return out
+
+
+def _indicators(facts: dict[str, dict[str, Any]] | None, slug: str) -> str:
+    return str((facts or {}).get(slug, {}).get("indicators") or "") or slug
+
+
+def _fingerprint(slug: str, issue: dict[str, Any], facts: dict[str, dict[str, Any]] | None = None) -> str:
+    """Identify a finding across days and across charts, loosely enough to survive rewording.
+
+    Data-level findings are keyed by the chart's indicators where those are known, so one
+    defective column reported on five charts is one finding. Chart-level findings stay keyed by
+    slug: a wrong subtitle really is specific to that chart even when the data is shared.
+    """
     words = sorted({w.rstrip("s") for w in re.findall(r"[a-z0-9]{5,}", issue.get("claim", "").lower())})
-    return f"{slug}:{issue.get('kind', '')}:{'-'.join(words[:8])}"
+    kind = issue.get("kind", "")
+    subject = _indicators(facts, slug) if kind == "data" else slug
+    return f"{subject}:{kind}:{'-'.join(words[:8])}"
 
 
 def load_state() -> dict[str, str]:
@@ -97,8 +167,15 @@ def save_state(state: dict[str, str]) -> None:
     STATE_PATH.write_text(json.dumps(state, indent=1, sort_keys=True))
 
 
-def new_findings(results: list[dict[str, Any]], state: dict[str, str]) -> list[tuple[dict[str, Any], dict[str, Any]]]:
-    """Findings not posted before, deduplicated by indicator-shaped fingerprint, best first."""
+def new_findings(
+    results: list[dict[str, Any]], state: dict[str, str], facts: dict[str, dict[str, Any]] | None = None
+) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    """Findings not posted before, best first.
+
+    Deduplicated by indicator for data-level findings and by chart for chart-level ones — pass
+    ``facts`` from :func:`chart_facts` to get the former; without it everything falls back to
+    per-chart, which over-reports.
+    """
     out: list[tuple[dict[str, Any], dict[str, Any]]] = []
     seen: set[str] = set()
     order = {"high": 0, "medium": 1, "low": 2}
@@ -107,12 +184,24 @@ def new_findings(results: list[dict[str, Any]], state: dict[str, str]) -> list[t
         key=lambda ri: (order.get(ri[1].get("severity", "low"), 3), -ri[0].get("views", 0)),
     )
     for result, issue in ranked:
-        key = _fingerprint(result["slug"], issue)
+        key = _fingerprint(result["slug"], issue, facts)
         if key in state or key in seen:
             continue
         seen.add(key)
         out.append((result, issue))
     return out
+
+
+def _chart_title(result: dict[str, Any]) -> str:
+    """The chart's display title, taken from the bundle summary the model was shown.
+
+    Read out of the summary rather than plumbed through as its own field, so it works for a
+    cached bundle too without changing the cache format. Falls back to the slug.
+    """
+    for line in (result.get("summary") or "").splitlines():
+        if line.startswith("title: "):
+            return line[len("title: ") :].strip()
+    return result["slug"]
 
 
 def format_slack(
@@ -121,8 +210,14 @@ def format_slack(
     candidates: int,
     incomplete: int = 0,
     window_days: int | None = None,
+    facts: dict[str, dict[str, Any]] | None = None,
 ) -> str:
-    """Slack mrkdwn — single asterisks for bold, and the channel's own one-line-per-chart shape."""
+    """Slack mrkdwn — single asterisks for bold, in the shape #analytics-bites uses.
+
+    Each finding is a linked bold title, the claim in a sentence, and a footer of severity,
+    readership and an admin edit link. Matching the other daily owidbot post is deliberate: it
+    is one scanning pattern to learn, and the edit link is what turns a report into an action.
+    """
     if not findings:
         return ""
 
@@ -144,22 +239,36 @@ def format_slack(
 
     lines = [header]
     for result, issue in shown:
-        title = result["slug"]
         url = issue.get("url") or f"https://ourworldindata.org/grapher/{result['slug']}"
-        views = f" · {result['views']:,} views/yr" if result.get("views") else ""
-        lines.append(f"\n• *{title}*{views}\n  {issue.get('claim', '').rstrip('.')}.\n  {url}")
+        dot = SEVERITY_DOT.get(issue.get("severity", "low"), ":large_yellow_circle:")
+        footer = [f"{dot} {issue.get('severity', 'low')} · {issue.get('kind', 'chart')}-level"]
+        if views := format_views(result.get("views")):
+            footer.append(views)
+        chart_id = (facts or {}).get(result["slug"], {}).get("chart_id")
+        if chart_id:
+            footer.append(f"<{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit chart>")
+        lines.append(
+            f"\n*<{url}|{_chart_title(result)}>*\n{issue.get('claim', '').rstrip('.')}.\n{'   ·   '.join(footer)}"
+        )
     lines.append("")
     lines.append(
-        "_Each of these is a claim to check rather than a confirmed error — the review is an LLM "
-        "reading the chart, its metadata and its values._"
+        "_Posted by `etl chart-critic` — an LLM reading each chart, its metadata and its values. "
+        "Each of these is a claim to check rather than a confirmed error._"
     )
     if incomplete:
         lines.append(f"_{incomplete} chart(s) could not be reviewed, so treat this as incomplete._")
     return "\n".join(lines)
 
 
-def stamp(findings: list[tuple[dict[str, Any], dict[str, Any]]], state: dict[str, str]) -> dict[str, str]:
+def stamp(
+    findings: list[tuple[dict[str, Any], dict[str, Any]]],
+    state: dict[str, str],
+    facts: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, str]:
+    """Record what was posted. ``facts`` must be the same mapping :func:`new_findings` used —
+    a key written per-chart and looked up per-indicator matches nothing, and the digest would
+    re-post every finding every day."""
     today = datetime.now(timezone.utc).date().isoformat()
     for result, issue in findings[:MAX_FINDINGS]:
-        state[_fingerprint(result["slug"], issue)] = today
+        state[_fingerprint(result["slug"], issue, facts)] = today
     return state

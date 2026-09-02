@@ -41,6 +41,7 @@ from apps.chart_critic.critic import (
     DEFAULT_MODEL,
     FALLBACK_PRICES,
     build_agent,
+    format_views,
     issue_params,
     prompt_parts,
 )
@@ -54,6 +55,10 @@ SEVERITY_COLOR = {"high": "red", "medium": "yellow", "low": "cyan"}
 # Grapher query parameters the model is allowed to put in a link. Anything else it invents is
 # dropped rather than passed through into a URL a reviewer will click.
 ALLOWED_PARAMS = {"country", "time", "tab", "region", "stackMode", "mapSelect", "facet", "yScale", "xScale"}
+# Values are percent-encoded (mdim dimension slugs are not promised to be URL-safe), so "%" and
+# "+" have to survive the filter or the encoded parameter is dropped and the link lands on the
+# default view — the exact wrong-chart problem the extra keys exist to prevent.
+SAFE_VALUE = re.compile(r"[A-Za-z0-9_~.\-+%]+")
 
 # Charts below this get little enough traffic that a finding is rarely worth a ticket.
 DEFAULT_MIN_VIEWS = 2000
@@ -182,9 +187,28 @@ def chart_link(slug: str, params: str = "", extra_keys: set[str] | None = None) 
     for pair in (params or "").lstrip("?").split("&"):
         key, _, value = pair.partition("=")
         key, value = key.strip(), value.strip()
-        if key in allowed and value and re.fullmatch(r"[A-Za-z0-9_~.\-]+", value):
+        if key in allowed and value and SAFE_VALUE.fullmatch(value):
             clean.append(f"{key}={value}")
     return f"{GRAPHER_URL}/{slug}" + ("?" + "&".join(clean) if clean else "")
+
+
+def _link_keys(slug: str, params: str) -> set[str]:
+    """Extra query keys a finding's link may carry, for a chart that may be a multi-dim.
+
+    Two sources, and the order matters. The keys already present on the reviewed target need no
+    lookup: they were either enumerated from the mdim config or typed by the user, so they are
+    trusted by construction. The registry is then consulted only as a bonus, for a dimension the
+    model names that the target did not — and its failure is tolerated here, unlike in selection.
+
+    That asymmetry is the point. ``--slugs`` is documented to work without a database, and a
+    lookup that raises at *link* time would abort the command after every review had been paid
+    for — so a run would succeed only when it found nothing.
+    """
+    keys = {pair.partition("=")[0].strip() for pair in (params or "").lstrip("?").split("&") if pair}
+    try:
+        return keys | mdim.dimension_keys(slug)
+    except mdim.MdimLookupError:
+        return keys
 
 
 def _claim_tokens(claim: str) -> set[str]:
@@ -531,7 +555,7 @@ def cli(
                     # Keep the parameters that select the reviewed view, merged with whatever the
                     # model asked for, so an mdim finding links to the view it is about.
                     merged = issue_params(r.get("params", ""), i)
-                    i["url"] = chart_link(r["slug"], merged, mdim.dimension_keys(r["slug"]))
+                    i["url"] = chart_link(r["slug"], merged, _link_keys(r["slug"], r.get("params", "")))
                     colour = SEVERITY_COLOR.get(i["severity"], "white")
                     seen = f" [dim]({i['passes']}/{r['passes']} passes)[/dim]" if r.get("passes", 1) > 1 else ""
                     console.print(f"      [{colour}]{i['severity']}/{i['kind']}[/{colour}] {i['claim']}{seen}")
@@ -555,7 +579,9 @@ def cli(
 
     if digest_out:
         state = digest.load_state()
-        fresh = digest.new_findings(results, state)
+        # Resolved once and used for both the lookup and the record — see digest.stamp().
+        facts = digest.chart_facts(results)
+        fresh = digest.new_findings(results, state, facts)
         incomplete = sum(1 for r in results if r["status"].startswith(("bundle failed", "review failed")))
         message = digest.format_slack(
             fresh,
@@ -563,6 +589,7 @@ def cli(
             candidates=len(targets),
             incomplete=incomplete,
             window_days=changed_since,
+            facts=facts,
         )
         digest_out.write_text(message)
         if message:
@@ -572,7 +599,7 @@ def cli(
                 # Post before recording, so a failed post is re-attempted tomorrow rather than
                 # marked delivered. Duplicating a finding is a smaller harm than dropping one.
                 _post_digest(message)
-            digest.save_state(digest.stamp(fresh, state))
+            digest.save_state(digest.stamp(fresh, state, facts))
         else:
             already = sum(len(r["issues"]) for r in results)
             console.print(
@@ -685,15 +712,17 @@ def _print_summary(results: list[dict[str, Any]], model: str) -> bool:
 
     table = Table(title="Charts with issues", show_lines=False)
     table.add_column("chart")
-    table.add_column("views/yr", justify="right")
+    table.add_column("views/day", justify="right")
     table.add_column("severity")
     table.add_column("kind")
     table.add_column("claim", max_width=70)
     for r in flagged:
         for i in r["issues"]:
             colour = SEVERITY_COLOR.get(i["severity"], "white")
-            views = f"{r['views']:,}" if r["views"] else "—"
-            url = i.get("url") or chart_link(r["slug"], issue_params(r.get("params", ""), i))
+            views = format_views(r["views"]).removesuffix(" views/day") or "—"
+            url = i.get("url") or chart_link(
+                r["slug"], issue_params(r.get("params", ""), i), _link_keys(r["slug"], r.get("params", ""))
+            )
             table.add_row(
                 f"[link={url}]{r['slug']}[/link]", views, f"[{colour}]{i['severity']}[/{colour}]", i["kind"], i["claim"]
             )

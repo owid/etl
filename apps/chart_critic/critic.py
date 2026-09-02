@@ -50,7 +50,20 @@ FALLBACK_PRICES = {
 class Issue(BaseModel):
     """One thing wrong with a chart."""
 
-    severity: Literal["high", "medium", "low"]
+    severity: Literal["high", "medium", "low"] = Field(
+        description=(
+            "How much this misleads a reader who is actually looking at the chart. "
+            "'high': it changes what someone concludes about a country or region people care "
+            "about, in a period people look at — a wrong unit, an impossible value, a series "
+            "that contradicts the chart's own text. "
+            "'medium': real and visible, but narrower — one minor series, an old period nobody "
+            "revisits, or text that disagrees with the data without changing the headline reading. "
+            "'low': technically true but nobody acts on it — a typo that misleads no one, a "
+            "naming inconsistency, or a defect confined to a micro-territory or a range that "
+            "ends decades ago. Judge the reader's loss, not how odd the defect looks: a "
+            "correct observation about Tuvalu in 1965 is 'low', not 'high'."
+        )
+    )
     kind: Literal["data", "chart"] = Field(
         description=(
             "'data' if the indicator's values or metadata are wrong — which also affects every "
@@ -61,7 +74,14 @@ class Issue(BaseModel):
     claim: str = Field(description="One sentence: what is wrong.")
     evidence: str = Field(description="The specific numbers or strings relied on.")
     reader_impact: str = Field(description="What a reader would wrongly conclude.")
-    confidence: Literal["high", "medium", "low"]
+    confidence: Literal["high", "medium", "low"] = Field(
+        description=(
+            "How sure you are that this is actually wrong — a separate question from how much it "
+            "matters. 'high' when what you were shown is enough to establish it, 'low' when it "
+            "would need checking against the source or an expert. Say 'low' rather than dropping "
+            "a suspicion, and never inflate it to make a finding look stronger."
+        )
+    )
     found_in: Literal[
         "rendered_chart",
         "chart_text",
@@ -136,6 +156,18 @@ def issue_params(target_params: str, issue: dict) -> str:
     a different chart than the one the claim is about.
     """
     return "&".join(x for x in (target_params, issue.get("chart_params", "")) if x)
+
+
+def format_views(views_365d: int | float | None) -> str:
+    """Readership as views per day, which is how OWID states it.
+
+    A decimal below ten, because "0 views/day" reads as "nobody looks at this" when the real
+    figure is a few hundred a year.
+    """
+    if not views_365d:
+        return ""
+    per_day = views_365d / 365
+    return f"{per_day:,.0f} views/day" if per_day >= 10 else f"{per_day:,.1f} views/day"
 
 
 def build_agent(model: str = DEFAULT_MODEL) -> Agent[None, Review]:
