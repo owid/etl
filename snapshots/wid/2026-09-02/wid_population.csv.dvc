@@ -17,3 +17,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://wid.world/
+outs:
+  - md5: 0ab6078d3b13d6fd2b5038b7e60b61f4
+    size: 5330785
+    path: wid_population.csv
