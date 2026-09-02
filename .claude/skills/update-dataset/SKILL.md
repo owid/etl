@@ -686,15 +686,22 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      insight holds its chart in front matter (`content->>'$."grapher-url"'`), and a featured metric lives in
      `featured_metrics`. A join on `posts_gdocs_links` will report "2 references" where the script reports 6,
      and the one it silently drops is the data insight whose title carries the headline number. For each
-     gdoc-backed row, read the text from `posts_gdocs.markdown` by the row's `surface_id` (the Google Doc id),
-     then re-derive every quantitative claim against the new data.
+     gdoc-backed row, fetch the doc by the row's `surface_id` (the Google Doc id) and read **both**
+     `posts_gdocs.markdown` (the body) **and** `posts_gdocs.content->>'$.title'` — the title is stored in the
+     content JSON, not in `markdown`, so a body-only read misses the headline. Then re-derive every
+     quantitative claim against the new data.
      The distinction that decides whether there is anything to do:
-     - **Time-bounded claims don't go stale.** "In early 2023 it was around $4 billion; by late 2025 it had
-       grown to $62 billion" stays true forever, because it names the quarters it compares. Leave it alone.
+     - **Time-bounded claims survive appended periods — but not revisions of the periods they name.** "In
+       early 2023 it was around $4 billion; by late 2025 it had grown to $62 billion" is untouched by a new
+       quarter, because it names the quarters it compares. It is *not* untouched by a revision: if this update
+       changed the value or the date of a named period (a restatement, a corrected label — this update moved
+       four quarter dates), recompute it like any other claim. The exemption is for append-only updates; check
+       the diff for touched periods before granting it.
      - **Unbounded or "latest-implied" claims do.** "has grown 1,300-fold", "now accounts for over 90%",
        "the biggest single segment" all silently re-point at whatever the newest data is. Recompute each one.
-     Check the **title separately from the body** — a body can be correctly hedged while the title states the
-     bare multiple, and the title is what readers see in feeds and social cards.
+     Check the **title separately from the body** (it comes from a different field, see above) — a body can be
+     correctly hedged while the title states the bare multiple, and the title is what readers see in feeds and
+     social cards.
      **A static image changes the remedy, not the finding — and the sweep's `kind` cannot tell you which you
      have.** `kind=embed` means the surface *holds* the chart by slug (a data insight's front-matter
      `grapher-url`, an announcement's `cta` button); it says nothing about what the reader sees, and both of

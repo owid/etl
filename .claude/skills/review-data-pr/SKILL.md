@@ -240,9 +240,12 @@ Two ways this goes wrong, both worth a 🟡:
 
 - **Nothing recorded at all** on a dataset with articles or data insights citing it. The sweep is cheap once
   `find-chart-references` has run, and a headline multiple is the most-read number we publish.
-- **A time-bounded claim reported as stale.** "By late 2025 it had reached $62 billion" does not go stale; only
-  unbounded claims ("has grown 1,300-fold", "now accounts for over 90%") do. Flagging the former suggests the
-  claims were compared against the latest value rather than read.
+- **A time-bounded claim reported as stale on an append-only update.** "By late 2025 it had reached $62
+  billion" is untouched by a newly added quarter; only unbounded claims ("has grown 1,300-fold", "now accounts
+  for over 90%") re-point at the newest data. Flagging the former on an update that only appended periods
+  suggests the claims were compared against the latest value rather than read. The exemption does not apply
+  when the update *revised* a named period (a restatement, a corrected date) — then a bounded claim can be
+  genuinely stale, and reporting it is correct.
 
 A claim deliberately left unchanged is a perfectly good outcome — a data insight whose chart is a static image
 cannot have its text updated alone without desyncing it from the picture. Look for the reason, not for a fix.
