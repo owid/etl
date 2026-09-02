@@ -479,13 +479,15 @@ def make_share_by_origin_group(
         mask = (tb["country"] == group) & tb["year"].isin(turkey_in_europe.index)
         tb.loc[mask, "foreign_born_population"] += sign * tb.loc[mask, "year"].map(turkey_in_europe)
 
-    # Divide by the total population of the same census or survey.
-    population = pr.concat(
+    # Divide by the total population of the same census or survey. Merging the population in and
+    # dividing column by column keeps the origins of both the numerator (census and survey
+    # by-country tables) and the denominator on the resulting indicator.
+    tb_population = pr.concat(
         [tb_census[["year", "total_population"]], tb_acs[["year", "total_population"]]], ignore_index=True
-    ).set_index("year")["total_population"]
-    tb["share_of_population"] = tb["foreign_born_population"] / tb["year"].map(population) * 100
-    tb = tb.drop(columns=["foreign_born_population"])
-    tb["share_of_population"] = tb["share_of_population"].copy_metadata(tb_census_by_country["foreign_born_population"])
+    )
+    tb = pr.merge(tb, tb_population, on="year", how="left")
+    tb["share_of_population"] = tb["foreign_born_population"] / tb["total_population"] * 100
+    tb = tb.drop(columns=["foreign_born_population", "total_population"])
 
     assert (tb.groupby("year")["share_of_population"].sum() < 17).all(), "Group shares exceed the plausible range."
     return tb
