@@ -524,6 +524,10 @@ steps:
     - data://garden/cancer/2025-02-17/gco_cancer_survival:
         - data://meadow/cancer/2025-02-17/gco_cancer_survival:
             - snapshot://cancer/2025-02-17/gco_cancer_survival.csv
+  data://grapher/cancer/2026-09-02/gco_cancer_survival:
+    - data://garden/cancer/2026-09-02/gco_cancer_survival:
+        - data://meadow/cancer/2026-09-02/gco_cancer_survival:
+            - snapshot://cancer/2026-09-02/gco_cancer_survival.csv
 
   # Measles deaths long run
   data://grapher/health/2025-02-20/measles_deaths_long_run:
