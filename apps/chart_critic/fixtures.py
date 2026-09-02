@@ -61,12 +61,14 @@ CASES: list[Case] = [
         why="CAR's life expectancy oscillates 52.3 → 31.5 → 50.6 → 40.3 → 18.8 → 57.4 (2018-2023). "
         "Filed as owid/etl#6779. The indicator sits behind 6 charts and ~199k views/yr.",
     ),
+    # ---------- fixed since it was filed, kept as a clean case ----------
     Case(
         slug="share-elec-by-source",
-        expect_keywords=["coal", "100"],
-        views=2,
-        why="The UK's coal share of electricity exceeds 100% for eight consecutive years, 1951-1958, "
-        "peaking at 119%. Found from the summary's max line, not from the default view.",
+        why="Was the UK-coal-above-100% case: 119.1% in 1951, above 100% for eight consecutive years, "
+        "filed as owid/etl#6779. Re-measured 2026-09-02 at 95.5% for 1951 and below 100% throughout, so "
+        "the data has been corrected and this is now a clean chart. Kept rather than deleted: it is the "
+        "one case in the set that has been through the whole cycle, and the fixture flipping to FAIL is "
+        "how the fix was noticed at all.",
     ),
     Case(
         slug="suicide-rate-in-1980-vs-2023",

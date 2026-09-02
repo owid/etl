@@ -111,7 +111,6 @@ def write_bundle(
     png: bytes | None,
     notes: list[str],
     data_available: bool,
-    extremes_params: str = "",
     render_failed: bool = False,
     other_tab_params: str = "",
 ) -> None:
@@ -123,7 +122,6 @@ def write_bundle(
                 "summary": summary,
                 "notes": notes,
                 "data_available": data_available,
-                "extremes_params": extremes_params,
                 "render_failed": render_failed,
                 "other_tab_params": other_tab_params,
             },

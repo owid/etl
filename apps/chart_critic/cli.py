@@ -236,33 +236,26 @@ def _review_one(
         result["status"] = "not reviewed (dry run)"
         return result
 
-    # The view ladder. Rung 2 is the chart's other tab, because a map-default chart hides the
-    # time dimension entirely and a series misbehaving over time is where problems usually show.
-    # Rung 3 is the entities at the extremes of the data, which the default view rarely includes.
+    # A second view: the chart's other tab. A map-default chart hides the time dimension
+    # entirely, and a series misbehaving over time is where problems are most often noticed.
+    #
+    # An earlier rung that picked out the entities holding the extreme values was dropped. Three
+    # different rules for choosing which entities to show all failed to include the country the
+    # one finding it ever produced was about, and that finding turned out to come from the max
+    # line in the numeric summary rather than from any view. A view selector that needs a tuned
+    # score to decide what to look at is a threshold in disguise.
     extra_views: list[tuple[str, bytes]] = []
-    if with_image:
-        rungs = []
-        if views > 1 and bundle.other_tab_params:
-            rungs.append(
+    if with_image and views > 1 and bundle.other_tab_params:
+        try:
+            extra_views.append(
                 (
                     f"the same chart's other tab, at ?{bundle.other_tab_params} — the default view "
                     "hides what this one shows",
-                    bundle.other_tab_params,
+                    render(slug, bundle.other_tab_params),
                 )
             )
-        if views > 2 and bundle.extremes_params:
-            rungs.append(
-                (
-                    f"the same chart at ?{bundle.extremes_params} — the entities holding the highest "
-                    "and lowest values in the series, which the default view does not show",
-                    bundle.extremes_params,
-                )
-            )
-        for label, view_params in rungs:
-            try:
-                extra_views.append((label, render(slug, view_params)))
-            except Exception:  # noqa: BLE001 — an extra view is a bonus, not a requirement
-                pass
+        except Exception:  # noqa: BLE001 — an extra view is a bonus, not a requirement
+            pass
 
     agent = build_agent(model)
     parts = prompt_parts(bundle, extra_views)
@@ -305,7 +298,6 @@ def _review_one(
     result["passes"] = max(max(repeat, 1), len(already))
     result["bundle_cached"] = bundle.from_cache
     result["views_reviewed"] = 1 + len(extra_views)
-    result["extremes_params"] = bundle.extremes_params
     result["input_tokens"], result["output_tokens"] = in_tokens, out_tokens
     result["cost"] = _cost(model, in_tokens, out_tokens)
     return result
@@ -351,9 +343,8 @@ def _review_one(
     default=1,
     show_default=True,
     help=(
-        "How many views of each chart to show. 1 is the default view; 2 adds the chart's other tab "
-        "(a map-default chart hides time, which is where problems usually show); 3 adds the entities "
-        "holding the highest and lowest values."
+        "How many views of each chart to show: 1 is the default view, 2 adds the chart's other tab "
+        "where it has one (a map-default chart hides time, which is where problems usually show)."
     ),
 )
 @click.option(
