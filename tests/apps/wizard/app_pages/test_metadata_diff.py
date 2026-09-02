@@ -2374,6 +2374,31 @@ def test_tree_draws_a_branch_per_flat_surface():
     assert html_out.count('data-target="mdd-section-') == 2
 
 
+def test_a_flat_branch_of_the_grid_opens_expanded_and_is_sized_for_it():
+    """A list of chart names answers "is my chart here" only when it is open, so it renders open.
+
+    And the frame it renders in does not scroll: its leaves have to be in the height estimate, or the
+    tree is cut off until the component's own resize fires.
+    """
+    from apps.wizard.app_pages.metadata_diff.tree import render_multi_tree_html
+
+    leaves = [
+        {"label": f"chart-{i}", "href": f"http://x/grapher/chart-{i}", "preview": "", "badged": False}
+        for i in range(12)
+    ]
+    branch = {"id": "charts", "label": "Charts", "groups": [{"name": "Data pages", "note": "", "leaves": leaves}]}
+    html_out, height = render_multi_tree_html([], branches=[branch])
+
+    group_box = html_out[: html_out.index("Data pages")]
+    assert "mdd-collapsed" not in group_box.rsplit('<div class="mdd-node', 1)[-1], "the group renders open"
+    assert all(f"chart-{i}" in html_out for i in range(12))
+
+    _empty_html, empty_height = render_multi_tree_html(
+        [], branches=[{"id": "charts", "label": "Charts", "groups": [{"name": "Data pages", "leaves": leaves[:1]}]}]
+    )
+    assert height > empty_height, "every drawn leaf has to raise the frame's initial height"
+
+
 def test_explorer_grid_columns_are_inferred_narrowest_first():
     """An explorer publishes no dimension list, so the grid's columns come from the views themselves.
 

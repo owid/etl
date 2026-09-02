@@ -309,9 +309,13 @@ def _render_leaf_branch(branch: dict[str, Any], preview_offset: int) -> tuple[st
                 f"</div>"
             )
         title = html.escape(group.get("name") or "")
-        # Collapsed by default: with the root pill gone, this is what keeps the section's closed footprint.
+        # Expanded by default. A flat branch *is* its list — "is my chart in here" is the question it
+        # exists to answer, and a closed box answers it only after a click. The grids above stay folded
+        # where they are folded because a dimension grid is readable as a shape with its leaves closed;
+        # a list of chart names is not. The cost is a taller page, which the jump index and the
+        # still-one-click collapse are there for, and which `initial_height` below now accounts for.
         group_html.append(
-            f'<div class="mdd-node mdd-n-changed mdd-collapsed">'
+            f'<div class="mdd-node mdd-n-changed">'
             f'<div class="mdd-box mdd-branch mdd-changed" role="button" title="{html.escape(group.get("note") or "")}">'
             f'<span class="mdd-caret">&#9662;</span>{title}'
             f'<span class="mdd-count">{len(items)}</span></div>'
@@ -549,6 +553,7 @@ def render_multi_tree_html(
     # Each flat surface that has anything in it becomes a branch beside the MDims, in the order given.
     # An empty one is not drawn at all: a "Explorers — 0 affected" heading is a heading about nothing.
     drawn_branches = 0
+    branch_leaves = 0
     for branch in branches or []:
         branch_html, branch_previews = _render_leaf_branch(branch, len(previews))
         if branch_html:
@@ -557,6 +562,7 @@ def render_multi_tree_html(
             index_entries.append((anchor, str(branch.get("label") or "Charts"), f"{n_leaves} affected", False))
             body += f'<div id="{anchor}" class="mdd-section">{branch_html}</div>'
             drawn_branches += 1
+            branch_leaves += n_leaves
         previews = previews + branch_previews
 
     # The index only earns its place when there is more than one place to jump to. A panel of rows, one
@@ -581,8 +587,11 @@ def render_multi_tree_html(
         index_html = f'<div class="mdd-index"><div class="mdd-index-title">Jump to a section</div>{"".join(rows)}</div>'
 
     visible_leaves = total_changed if total_changed else len(all_views)
-    # One row per section header, one per hierarchy heading, one per collapsed flat branch.
-    extra_rows = len(section_nodes) + drawn_groups + drawn_branches
+    # One row per section header, one per hierarchy heading, one per flat-branch heading — plus every leaf
+    # a flat branch draws, since those render expanded and are in the initial layout. The frame does not
+    # scroll, so an under-estimate shows a cut-off tree until `fit()` runs; the cap keeps the overshoot
+    # bounded on a branch reaching hundreds of charts.
+    extra_rows = len(section_nodes) + drawn_groups + drawn_branches + branch_leaves
     initial_height = min(INITIAL_HEIGHT_CAP_PX, 170 + (visible_leaves + extra_rows) * 38)
     return (
         f"""
