@@ -47,16 +47,24 @@ steps:
         - snapshot://wid/2026-06-18/world_inequality_database_with_extrapolations.csv
         - snapshot://wid/2026-06-18/wid_population.csv
         - data://garden/regions/2023-01-01/regions
+  data://grapher/wid/2026-09-02/world_inequality_database:
+    - data://garden/wid/2026-09-02/world_inequality_database:
+      - data://meadow/wid/2026-09-02/world_inequality_database:
+        - snapshot://wid/2026-09-02/world_inequality_database.csv
+        - snapshot://wid/2026-09-02/world_inequality_database_distribution.csv
+        - snapshot://wid/2026-09-02/world_inequality_database_fiscal.csv
+        - snapshot://wid/2026-09-02/wid_population.csv
+        - data://garden/regions/2023-01-01/regions
   export://multidim/wid/latest/incomes_wid:
     - data://grapher/demography/2024-07-15/population
     - data://grapher/regions/2023-01-01/regions
-    - data://grapher/wid/2026-06-18/world_inequality_database
+    - data://grapher/wid/2026-09-02/world_inequality_database
   export://multidim/wid/latest/gini_wid:
-    - data://grapher/wid/2026-06-18/world_inequality_database
+    - data://grapher/wid/2026-09-02/world_inequality_database
   export://multidim/wid/latest/palma_ratio_wid:
-    - data://grapher/wid/2026-06-18/world_inequality_database
+    - data://grapher/wid/2026-09-02/world_inequality_database
   export://multidim/wid/latest/wealth_wid:
-    - data://grapher/wid/2026-06-18/world_inequality_database
+    - data://grapher/wid/2026-09-02/world_inequality_database
 
   # Harmonized PIP + WID income distributions (109 bins), bridging series and MLD decomposition
   data://garden/poverty_inequality/2026-08-25/harmonized_income_distributions:
