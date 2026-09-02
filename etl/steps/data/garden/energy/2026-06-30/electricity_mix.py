@@ -359,12 +359,31 @@ def add_per_capita_variables(combined: Table) -> Table:
     return combined
 
 
+def sanity_check_shares(tb: Table) -> None:
+    """Check that no source's share of total generation is negative or above 100%.
+
+    A share above 100% means that a source's generation and the total generation are inconsistent for
+    that country-year (e.g. they cover different sets of generators, or one of them is not truly
+    electricity generation). A small tolerance above 100% is allowed for rounding errors.
+    """
+    for variable in SHARE_VARIABLES:
+        if variable == "total_generation__twh":
+            continue
+        column = variable.replace("_generation__twh", "_share_of_electricity__pct")
+        invalid = tb[tb[column].notna() & ~tb[column].between(0, 101)]
+        error = f"Column '{column}' has shares outside the range [0, 101]% for: {sorted(set(invalid['country']))}."
+        assert invalid.empty, error
+
+
 def add_share_variables(combined: Table) -> Table:
     """Share-of-electricity (%), share of electricity in primary energy, and net-imports-share variables."""
     # Each source's generation as a share of total generation (shared with the monthly builder).
     for variable in SHARE_VARIABLES:
         new_column = variable.replace("_generation__twh", "_share_of_electricity__pct")
         combined[new_column] = 100 * combined[variable] / combined["total_generation__twh"]
+
+    # Check that no source's share is negative or above 100%.
+    sanity_check_shares(tb=combined)
 
     # Share of primary energy that is generated as electricity, where primary energy is total energy
     # supply (the same quantity we report as primary energy everywhere else).
@@ -574,64 +593,61 @@ def add_historical_electricity(combined: Table, tb_historical: Table) -> Table:
     return combined
 
 
-# Mapping from the UK BEIS historical electricity columns to the electricity mix columns.
-UK_BEIS_COLUMNS = {
-    "coal": "coal_generation__twh",
-    "oil": "oil_generation__twh",
-    "gas": "gas_generation__twh",
-    "hydro": "hydro_generation__twh",
-    "nuclear": "nuclear_generation__twh",
-    "electricity_generation": "total_generation__twh",
-    "net_imports": "total_net_imports__twh",
+# Mapping from DESNZ's estimated UK generation-by-fuel columns to the electricity mix columns.
+# NOTE: DESNZ's "wind, wave, solar and hydro" is mapped to hydro; it only fills years before the
+# modern data begins (1965), when wind and solar generation were zero (checked below). DESNZ's
+# "coke and breeze" and "other fuels" have no equivalent column here, so in the filled years the
+# source columns add up to slightly less than total generation.
+UK_DESNZ_COLUMNS = {
+    "total_generation": "total_generation__twh",
+    "coal_generation": "coal_generation__twh",
+    "oil_generation": "oil_generation__twh",
+    "gas_generation": "gas_generation__twh",
+    "nuclear_generation": "nuclear_generation__twh",
+    "wind_wave_solar_and_hydro_generation": "hydro_generation__twh",
 }
 
 
-def add_uk_historical_electricity(combined: Table, tb_beis: Table) -> Table:
-    """Extend the United Kingdom's electricity series back to ~1920 with BEIS historical data.
+def add_uk_historical_electricity(combined: Table, tb_desnz: Table, tb_beis: Table) -> Table:
+    """Extend the United Kingdom's electricity series back to 1920.
 
-    BEIS has the lowest priority: it only fills UK years before the modern data (Ember and the Statistical
-    Review) begins, around 1985. BEIS reports fuel *input* for fossil fuels, so their generation is
-    estimated with BEIS's implied efficiency. Wind, solar and other renewables were negligible in that
-    period, so they are set to zero to complete the historical mix.
-
-    The generation columns and net imports get BEIS as an origin (last, since it is the lowest-priority
-    source); demand, emissions and carbon intensity are not in BEIS, so those stay on the modern period.
+    Generation comes from DESNZ's estimated generation by fuel. It has the lowest priority, so it only
+    fills UK years before the modern data (Ember and the Statistical Review) begins: 1985 for total,
+    coal, oil, gas and fossil generation, and 1965 for nuclear and hydro. Net imports, which DESNZ does
+    not report, come from BEIS's historical electricity data (filling years before 2000, when Ember's
+    data begins).
     """
-    tb_beis = tb_beis.reset_index()[
-        ["country", "year"] + list(UK_BEIS_COLUMNS) + ["implied_efficiency", "wind_and_solar"]
-    ].rename(columns=UK_BEIS_COLUMNS, errors="raise")
-    tb_beis = tb_beis[tb_beis["country"] == "United Kingdom"].reset_index(drop=True)
-
-    # BEIS reports fuel input for fossil fuels; convert to electricity generation via its implied efficiency.
-    for column in ["coal_generation__twh", "oil_generation__twh", "gas_generation__twh"]:
-        tb_beis[column] *= tb_beis["implied_efficiency"]
+    tb_desnz = tb_desnz[["country", "year"] + list(UK_DESNZ_COLUMNS)].rename(columns=UK_DESNZ_COLUMNS, errors="raise")
 
     # First year the modern UK data reports solar or wind generation.
     modern_first_year = combined[
         (combined["country"] == "United Kingdom")
         & (combined["solar_generation__twh"].notna() | combined["wind_generation__twh"].notna())
     ]["year"].min()
-    # BEIS gives wind and solar combined; confirm it is negligible before the modern data begins.
+    # BEIS reports wind and solar fuel input combined; confirm it is zero before the modern data begins.
+    # This justifies mapping DESNZ's combined "wind, wave, solar and hydro" to hydro, and setting wind
+    # and solar to zero, for those years.
+    tb_beis = tb_beis[tb_beis["country"] == "United Kingdom"].reset_index(drop=True)
     assert tb_beis[tb_beis["year"] < modern_first_year]["wind_and_solar"].fillna(0).max() == 0, (
         "BEIS wind+solar is no longer negligible before the modern data begins; revisit this assumption."
     )
+
     # Set solar, wind and other renewables to zero for the historical period, and leave the modern years
-    # to the higher-priority sources.
+    # (where DESNZ's combined column is no longer all hydro) to the higher-priority sources.
     zero_columns = [
         "solar_generation__twh",
         "wind_generation__twh",
         "other_renewables_including_bioenergy_generation__twh",
     ]
     for column in zero_columns:
-        tb_beis[column] = 0.0
-    tb_beis.loc[tb_beis["year"] >= modern_first_year, zero_columns] = np.nan
-    tb_beis = tb_beis.drop(columns=["implied_efficiency", "wind_and_solar"], errors="raise")
+        tb_desnz[column] = 0.0
+    tb_desnz.loc[tb_desnz["year"] >= modern_first_year, zero_columns + ["hydro_generation__twh"]] = np.nan
 
-    # Recompute the aggregate generation columns from the base sources for the historical period.
-    tb_beis["fossil_generation__twh"] = tb_beis[
+    # Compute the aggregate generation columns for the historical period.
+    tb_desnz["fossil_generation__twh"] = tb_desnz[
         ["coal_generation__twh", "oil_generation__twh", "gas_generation__twh"]
     ].sum(axis=1, min_count=3)
-    tb_beis["renewable_generation__twh"] = tb_beis[
+    tb_desnz["renewable_generation__twh"] = tb_desnz[
         [
             "hydro_generation__twh",
             "solar_generation__twh",
@@ -639,15 +655,21 @@ def add_uk_historical_electricity(combined: Table, tb_beis: Table) -> Table:
             "other_renewables_including_bioenergy_generation__twh",
         ]
     ].sum(axis=1, min_count=4)
-    tb_beis["low_carbon_generation__twh"] = tb_beis[["renewable_generation__twh", "nuclear_generation__twh"]].sum(
+    tb_desnz["low_carbon_generation__twh"] = tb_desnz[["renewable_generation__twh", "nuclear_generation__twh"]].sum(
         axis=1, min_count=2
     )
-    tb_beis["solar_and_wind_generation__twh"] = tb_beis[["solar_generation__twh", "wind_generation__twh"]].sum(
+    tb_desnz["solar_and_wind_generation__twh"] = tb_desnz[["solar_generation__twh", "wind_generation__twh"]].sum(
         axis=1, min_count=2
     )
 
-    # Combine, prioritizing the modern data; BEIS only fills earlier UK years.
-    combined = combine_two_overlapping_dataframes(df1=combined, df2=tb_beis, index_columns=["country", "year"])
+    # Combine, prioritizing the modern data; DESNZ only fills earlier UK years.
+    combined = combine_two_overlapping_dataframes(df1=combined, df2=tb_desnz, index_columns=["country", "year"])
+
+    # Add UK net imports from BEIS (Ember's net imports begin in 2000).
+    tb_net_imports = tb_beis[["country", "year", "net_imports"]].rename(
+        columns={"net_imports": "total_net_imports__twh"}, errors="raise"
+    )
+    combined = combine_two_overlapping_dataframes(df1=combined, df2=tb_net_imports, index_columns=["country", "year"])
 
     return combined
 
@@ -675,6 +697,10 @@ def add_share_variables_monthly(tb: Table) -> Table:
     for variable in SHARE_VARIABLES:
         new_column = variable.replace("_generation__twh", "_share_of_electricity__pct")
         tb[new_column] = 100 * tb[variable] / tb["total_generation__twh"]
+
+    # Check that no source's share is negative or above 100%.
+    sanity_check_shares(tb=tb)
+
     tb["net_imports_share_of_demand__pct"] = 100 * tb["total_net_imports__twh"] / tb["total_demand__twh"]
     error = "Total electricity share does not add up to 100%."
     assert all(abs(tb["total_share_of_electricity__pct"].dropna() - 100) < 0.01), error
@@ -716,9 +742,14 @@ def run() -> None:
     ds_historical = paths.load_dataset("global_historical_electricity")
     tb_historical = ds_historical.read("global_historical_electricity")
 
-    # Load the UK BEIS historical electricity dataset, used to extend the UK series back to ~1920.
+    # Load the UK BEIS historical electricity dataset, used for the UK's net imports before 2000.
     ds_beis = paths.load_dataset("uk_historical_electricity")
     tb_beis = ds_beis.read("uk_historical_electricity")
+
+    # Load the DESNZ dataset of estimated UK electricity generation by fuel, used to extend the UK series
+    # back to 1920.
+    ds_desnz = paths.load_dataset("uk_electricity_capacity_and_generation")
+    tb_desnz = ds_desnz.read("uk_electricity_capacity_and_generation")
 
     # Load population dataset.
 
@@ -788,7 +819,7 @@ def run() -> None:
     combined = fix_discrepancies_in_aggregate_regions(tb_review=tb_review, tb_ember=tb_ember, combined=combined)
 
     # Extend the United Kingdom series back to ~1920 with BEIS historical data (lowest priority).
-    combined = add_uk_historical_electricity(combined=combined, tb_beis=tb_beis)
+    combined = add_uk_historical_electricity(combined=combined, tb_desnz=tb_desnz, tb_beis=tb_beis)
 
     # Check if carbon intensity needs to be recalculated.
     check_carbon_intensity(combined=combined)
