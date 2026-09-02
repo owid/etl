@@ -81,7 +81,7 @@ tables:
       population:
         title: Population in the latest year
         unit: people
-        description_short: Country population in the latest year (WID total population), used as the weight in aggregations.
+        description_short: Country population in the latest year, from Our World in Data's population series (the yardstick the harmonized distributions are weighted by), used as the weight in aggregations.
 
   inequality_change_by_reference_year:
     title: Countries with rising, falling and stable inequality, by reference year
@@ -125,7 +125,7 @@ tables:
       population_covered:
         title: Population covered
         unit: people
-        description_short: Total population of the common sample at the latest year (WID total population).
+        description_short: Total population of the common sample at the latest year, from Our World in Data's population series.
       average_change:
         title: Average change since the reference year
         unit: ""

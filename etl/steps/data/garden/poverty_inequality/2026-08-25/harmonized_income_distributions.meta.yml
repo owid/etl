@@ -56,7 +56,8 @@ tables:
         unit: people
         description_short: Number of people (or adults, for per-adult series) in the bin, matching the series' population basis.
         description_key:
-          - WID-side bin populations use WID's own population counts (adults aged 20+ for per-adult series, total population for per-capita series), spread over bins by bin width.
+          - WID-side bin populations use an independent demographic yardstick — UN World Population Prospects adults aged 20+ for per-adult series, Our World in Data's population series for per-capita series — spread over bins by bin width. PIP-side bin populations are PIP's own.
+          - This column is therefore not one consistent population across series. To aggregate countries, use `population_weight` in the `inequality_decomposition_by_country` table, which is the yardstick applied to every series alike.
       share:
         title: Income share of the quantile bin
         unit: ""
@@ -116,7 +117,7 @@ tables:
     description: |-
       Mean log deviation (MLD) of the global income distribution over the common sample of countries covered by both PIP and WID, decomposed exactly into a between-country and a within-country component, per year and series. Comparing the decomposition across the series shows how much of the disagreement between PIP and WID comes from each methodological difference (population basis, tax concept, consumption vs income, top-of-distribution corrections).
 
-      Conventions: every series — including PIP and the derived series — weights countries by WID's demography, matched to the series' basis (adults for per-adult series, total population otherwise), so the sources' demographic disagreements never enter the comparison; zero incomes are replaced by $0.01/day inside the MLD calculation only.
+      Conventions: every series — including PIP and the derived series — weights countries by one demographic yardstick independent of both sources (UN World Population Prospects adults aged 20+ for per-adult series, Our World in Data's population series otherwise), so the sources' demographic disagreements never enter the comparison; zero incomes are replaced by $0.01/day inside the MLD calculation only.
     variables:
       mld_total:
         title: Total MLD
@@ -150,7 +151,7 @@ tables:
       population:
         title: Population covered
         unit: people
-        description_short: Total population (or adults, for per-adult series) of the common sample under the WID demographic yardstick.
+        description_short: Total population (or adults aged 20+, for per-adult series) of the common sample, from Our World in Data's population series and UN World Population Prospects respectively.
 
   inequality_decomposition_by_country:
     title: Country-level components of the MLD decomposition
@@ -167,4 +168,4 @@ tables:
       population_weight:
         title: Population weight
         unit: people
-        description_short: Country weight in the global decomposition (WID demography, matched to the series' basis).
+        description_short: Country weight in the global decomposition, matched to the series' basis — UN World Population Prospects adults aged 20+ for per-adult series, Our World in Data's population series otherwise. The same yardstick for every series, PIP included.

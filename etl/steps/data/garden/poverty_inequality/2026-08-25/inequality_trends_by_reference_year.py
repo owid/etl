@@ -137,10 +137,13 @@ def compute_metrics(tb_distributions: Table) -> Table:
 
 
 def latest_year_population(tb_distributions: Table) -> Table:
-    """Country population at the latest year: WID total population (the common demographic
-    yardstick), recovered as the per-capita WID series' bin-population sum."""
+    """Country population at the latest year — the common demographic yardstick the harmonized step
+    weights every series by (OWID's population series, UN WPP for these years) — recovered as the
+    per-capita WID series' bin-population sum."""
     # Any per-capita WID series carries the same total population, so the choice of series here is
-    # arbitrary — the bins of one of them sum back to the country's population.
+    # arbitrary — the bins of one of them sum back to the country's population. Recovering it from
+    # `pop` rather than loading a population dataset keeps this step on exactly the yardstick the
+    # harmonized step used, whatever that is.
     latest_year = int(tb_distributions["year"].max())
     d = tb_distributions[
         (tb_distributions["series"] == "wid_before_tax_per_capita") & (tb_distributions["year"] == latest_year)

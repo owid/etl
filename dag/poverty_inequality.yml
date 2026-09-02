@@ -63,6 +63,9 @@ steps:
     - data://garden/wb/2026-03-25/thousand_bins_distribution
     - data://garden/wb/2026-06-26/world_bank_pip
     - data://garden/wid/2026-06-18/world_inequality_database
+    # Demographic yardstick for the country weights: OWID population (totals) and UN WPP (adults 20+).
+    - data://garden/demography/2024-07-15/population
+    - data://garden/un/2024-07-12/un_wpp
 
   # Varying-reference-year inequality trend analysis (PIP vs WID)
   data://garden/poverty_inequality/2026-08-25/inequality_trends_by_reference_year:

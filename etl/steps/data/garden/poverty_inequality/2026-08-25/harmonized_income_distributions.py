@@ -5,8 +5,8 @@ This step began as a port of the data pipeline behind Joe Hasell's PIP-vs-WID tr
 (github.com/JoeHasell/prague-pip-wid, `data/scripts/`), extended from a single year to the full panel
 of years both sources cover, so the exercise re-runs on every PIP/WID data update.
 
-It is no longer a faithful port: three corrections make the output differ from that project by
-design, each documented where it happens and in
+It is no longer a faithful port: four deliberate departures make the output differ from that
+project, each documented where it happens and in
 ai/adversarial-review-harmonized_income_distributions-2026-08-26.md.
 
   - The welfare basis of a country-year follows PIP's own decision tree. The source project
@@ -14,9 +14,12 @@ ai/adversarial-review-harmonized_income_distributions-2026-08-26.md.
     whose PIP distribution is in fact consumption (see build_welfare_basis).
   - Fitted income profiles are made monotone (see ENFORCE_MONOTONE_INCOME_BASIS).
   - WID is converted at the PPP year WID prices its series in, not a fixed one (in the snapshot).
+  - Countries are weighted by an independent demographic yardstick — OWID's population dataset and
+    UN WPP's adults aged 20+ — rather than by WID's own counts (see load_reference_population).
+    Measured to move every 2023 between share by at most 0.015pp, since WID's counts are UN WPP too.
 
 Exactly reproducing the source project is therefore no longer possible from a switch, and is not
-meant to be: two of the three departures fix errors in its numbers.
+meant to be: two of the four departures fix errors in its numbers.
 
 What it builds, in order:
 
@@ -37,10 +40,11 @@ What it builds, in order:
      `pip_income_basis_top_adjusted` means — so the two ladders meet at identical country means
      (and, by construction, identical between-country components).
 3. The between/within MLD (mean log deviation) decomposition of global inequality, per year and
-   series, over the common sample of countries. Two conventions are baked in (decided in the
-   source project): country weights come from WID's demography MATCHED TO THE SERIES' BASIS
-   (adults for per-adult series, total population otherwise — including for PIP), so the sources'
-   demographic disagreements never enter the comparison; and zero incomes are replaced by
+   series, over the common sample of countries. Two conventions are baked in: country weights come
+   from one demographic yardstick independent of both sources (OWID population, UN WPP adults 20+),
+   MATCHED TO THE SERIES' BASIS (adults for per-adult series, total population otherwise —
+   including for PIP), so the sources' demographic disagreements never enter the comparison; and
+   zero incomes are replaced by
    $0.01/day inside the MLD only (log of zero is undefined) — they are RETAINED in the
    distributions table.
 """
@@ -146,6 +150,12 @@ SERIES_BASIS = {
     "pip_income_basis": "total",
     "pip": "total",
 }
+# WID's "adults" are ages 20+. UN WPP publishes no 20+ group, so it is the sum of these 17 groups —
+# NOT "15+ minus 15-19": the open-ended 15+/18+/65+ groups omit the 100+ bucket.
+ADULT_AGE_GROUPS = [
+    "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64",
+    "65-69", "70-74", "75-79", "80-84", "85-89", "90-94", "95-99", "100+",
+]  # fmt: skip
 TOP_TAIL_SHAPE_SERIES = "wid_after_tax_per_capita"
 TOP_ADJUSTMENT_BASE_SERIES = "pip_income_basis"
 RESCALE_MEAN_SERIES = "pip_income_basis_top_adjusted"
@@ -165,14 +175,13 @@ def run() -> None:
     tb_dist = ds_wid.read("distribution", safe_types=False)
     tb_incomes_wid = ds_wid.read("incomes", safe_types=False)
 
-    tb_pop = ds_wid.read("population", safe_types=False)
+    # WID's own counts, kept for one job: converting its per-adult series to per capita.
+    tb_pop_wid = ds_wid.read("population", safe_types=False)
 
-    origins = {
-        "pip_bins": tb_bins["avg"].metadata.origins,
-        "pip_percentiles": tb_percentiles["avg"].metadata.origins,
-        "wid": tb_dist["avg"].metadata.origins,
-        "wid_population": tb_pop["adult_population"].metadata.origins,
-    }
+    # UN WPP population by age, the source of the adult (20+) yardstick; total population comes
+    # from OWID's population dataset through paths.regions inside load_reference_population.
+    ds_un_wpp = paths.load_dataset("un_wpp")
+    tb_un_wpp = ds_un_wpp.read("population", safe_types=False)
 
     #
     # Process data.
@@ -187,14 +196,31 @@ def run() -> None:
     )
     log.info(f"Common year range: {FIRST_YEAR}-{last_year}")
 
-    tb_wid = process_wid_distributions(tb_dist, tb_pop, bins_lookup, last_year)
+    # The demographic yardstick every series is weighted by (WID's column names, so consumers do
+    # not care which source it came from). The 12.9M-row UN table is released right after.
+    candidates = sorted(set(tb_dist["country"].astype(str)) | set(tb_bins["country"].astype(str)))
+    tb_pop = load_reference_population(tb_un_wpp, candidates, FIRST_YEAR, last_year)
+    un_wpp_origins = unique_origins(tb_un_wpp["population"].metadata.origins)
+    del tb_un_wpp
+
+    origins = {
+        "pip_bins": tb_bins["avg"].metadata.origins,
+        "pip_percentiles": tb_percentiles["avg"].metadata.origins,
+        "wid": tb_dist["avg"].metadata.origins,
+        "wid_population": tb_pop_wid["adult_population"].metadata.origins,
+        "population": tb_pop["total_population"].metadata.origins,
+        "un_wpp": un_wpp_origins,
+    }
+
+    tb_wid = process_wid_distributions(tb_dist, tb_pop, tb_pop_wid, bins_lookup, last_year)
     tb_pip = aggregate_pip_bins(tb_bins, bins_lookup, last_year)
 
-    sanity_check_raw_series(tb_wid, tb_pip, tb_dist, tb_pop, tb_incomes_wid)
+    sanity_check_raw_series(tb_wid, tb_pip, tb_dist, tb_pop, tb_pop_wid, tb_incomes_wid)
 
     # The common sample: countries present in PIP and every raw WID series in every common year
     # (both sources are complete panels over the range, so balancing costs ~nothing — asserted).
     countries = common_sample(tb_wid, tb_pip)
+    assert set(countries) <= set(tb_pop["country"]), "A common-sample country has no reference population."
     tb_wid = tb_wid[tb_wid["country"].isin(countries)].reset_index(drop=True)
     tb_pip = tb_pip[tb_pip["country"].isin(countries)].reset_index(drop=True)
 
@@ -220,8 +246,12 @@ def run() -> None:
     #
     # Save outputs.
     #
+    # One origin per (producer, title, date): WID's three tables would otherwise cite WID three times.
     all_origins = sorted(
-        {o for key in ["pip_bins", "wid", "wid_population"] for o in origins[key]}, key=lambda o: o.producer
+        unique_origins(
+            [o for key in ["pip_bins", "wid", "wid_population", "population", "un_wpp"] for o in origins[key]]
+        ),
+        key=lambda o: o.producer,
     )
     tables = [
         format_with_origins(
@@ -281,9 +311,105 @@ def wid_bin_labels() -> list:
     return labels
 
 
-def process_wid_distributions(tb_dist: Table, tb_pop: Table, bins_lookup: Table, last_year: int) -> Table:
+def load_reference_population(tb_un_wpp: Table, countries: list, first_year: int, last_year: int) -> Table:
+    """The demographic yardstick every series is weighted by: for each country and panel year, adults
+    aged 20+ from UN World Population Prospects and total population from OWID's population dataset
+    (itself UN WPP for these years), returned as `adult_population` and `total_population` — WID's
+    column names, so the consumers do not care which source they got.
+
+    Why a yardstick independent of both sources: the MLD decomposition weights countries by
+    population for EVERY series, PIP's included, so that the sources' demographic disagreements stay
+    out of the PIP-vs-WID comparison; taking that yardstick from neither source makes the point
+    cleanly. WID's per-adult series are still converted to per capita with WID's OWN adult share
+    (see process_wid_distributions): their incomes are defined against WID's adult counts, so only
+    WID's ratio keeps the per-capita series consistent with WID's national income.
+
+    In practice WID's own counts are UN WPP too: across the 211-country panel the ratio of these
+    counts to WID's has a median of 1.0000 and a 99th percentile of 1.002. Two differences are
+    material. Togo's count UN cut by 12-14% in a January-2026 interim update that WID's vintage
+    predates. And WID's France is 3.2% larger, by exactly the population of the five overseas
+    departments (Réunion, Guadeloupe, Martinique, French Guiana, Mayotte), which WID folds into
+    France and UN WPP lists separately. Switching the weights moved every between share in the
+    panel by at most 0.02pp.
+    """
+    # STEP 1 — the UN slice: both sexes, estimates (to 2023) then the medium projection (2024 on,
+    # no overlapping year), the panel years, and only the ages needed. Compare the categoricals
+    # directly (casting them to str first costs seconds); cast keys and counts afterwards.
+    un = tb_un_wpp[
+        (tb_un_wpp["sex"] == "all")
+        & tb_un_wpp["variant"].isin(["estimates", "medium"])
+        & tb_un_wpp["year"].between(first_year, last_year)
+        & tb_un_wpp["age"].isin(ADULT_AGE_GROUPS + ["all"])
+    ]
+    un = pd.DataFrame(
+        {
+            "country": un["country"].astype(str),
+            "year": un["year"].astype(int),
+            "age": un["age"].astype(str),
+            "population": un["population"].astype(np.float64),
+        }
+    )
+
+    # Countries only. UN WPP and OWID both carry aggregates (UN development groups, World Bank income
+    # groups, OWID regions) whose compositions differ between the two, so they would fail the totals
+    # check below; none is needed, since the yardstick is only ever joined onto country rows.
+    un = un[un["country"].isin(countries)]
+
+    # STEP 2 — adults 20+: the 17 groups summed, and every country-year must have all 17.
+    adults = (
+        un[un["age"] != "all"]
+        .groupby(["country", "year"])["population"]
+        .agg(n="size", adult_population="sum")
+        .reset_index()
+    )
+    assert (adults["n"] == 17).all(), "UN WPP is missing an adult age group for some country-year."
+    assert not adults.duplicated(["country", "year"]).any(), "UN WPP adults are not unique on (country, year)."
+
+    # STEP 3 — total population from OWID's population dataset, through the standard helper (a left
+    # join on country and year that also attaches the dataset's collapsed origin). UN aggregates
+    # and entities OWID does not track come back empty and are dropped, by name.
+    tb = paths.regions.add_population(
+        Table(adults[["country", "year", "adult_population"]]),
+        population_col="total_population",
+        warn_on_missing_countries=False,
+    )
+    missing = sorted(tb.loc[tb["total_population"].isna(), "country"].unique())
+    if missing:
+        log.info(f"UN WPP entities without OWID population (dropped from the yardstick): {missing}")
+        tb = tb[tb["total_population"].notna()].reset_index(drop=True)
+
+    # STEP 4 — the two sources must agree on totals, or the adult share below mixes demographies.
+    un_total = un[un["age"] == "all"].set_index(["country", "year"])["population"]
+    matched = un_total.reindex(pd.MultiIndex.from_frame(tb[["country", "year"]])).to_numpy()
+    total = tb["total_population"].to_numpy(dtype=float)
+    assert np.isfinite(matched).all(), "A yardstick country-year has no UN WPP total."
+    assert (np.abs(total / matched - 1) < 1e-3).all(), "OWID population and UN WPP totals disagree by >0.1%."
+
+    # STEP 5 — plausibility: the adult share of a population sits between roughly 0.36 (Rwanda in
+    # the mid-1990s) and 0.92 (the Vatican).
+    adult_share = tb["adult_population"].to_numpy(dtype=float) / total
+    assert ((adult_share > 0.3) & (adult_share < 0.95)).all(), "Implausible adult share in the reference population."
+
+    # STEP 6 — float64 counts, keeping the metadata the helper attached to total_population.
+    for col in ("adult_population", "total_population"):
+        meta = tb[col].metadata
+        tb[col] = tb[col].astype(np.float64)
+        tb[col].metadata = meta
+    return tb[["country", "year", "adult_population", "total_population"]]
+
+
+def unique_origins(origins: list) -> list:
+    """One origin per (producer, title, date_published): a column built from several snapshot files
+    carries one origin per file, identical in everything a reader sees."""
+    return list({(o.producer, o.title, o.date_published): o for o in origins}.values())
+
+
+def process_wid_distributions(
+    tb_dist: Table, tb_pop: Table, tb_pop_wid: Table, bins_lookup: Table, last_year: int
+) -> Table:
     """The four raw WID series: filter to the 109-bin structure, convert annual -> daily and
-    per-adult -> per-capita, and attach bin populations from WID's own counts."""
+    per-adult -> per-capita (with WID's own adult share), and attach bin populations from the
+    reference yardstick (`tb_pop`)."""
     d = tb_dist[
         (tb_dist["extrapolated"] == EXTRAPOLATED_CHOICE)
         & tb_dist["welfare_type"].isin([w for _, w, _ in SERIES_WID_RAW])
@@ -306,13 +432,24 @@ def process_wid_distributions(tb_dist: Table, tb_pop: Table, bins_lookup: Table,
         d = d[d["_drop"].isna()].drop(columns="_drop")
 
     d = d.merge(bins_lookup, on="percentile", how="left")
+    # Two populations per country-year: the reference yardstick (for bin populations, i.e. the
+    # weights) and WID's own counts (for the per-adult -> per-capita conversion only).
     d = d.merge(tb_pop, on=["country", "year"], how="left")
-    # Countries in the WID distribution but without WID population cannot be used at all; they are
-    # excluded from the common sample later, so only log them here.
-    no_population = sorted(d.loc[d["total_population"].isna(), "country"].unique())
+    d = d.merge(
+        tb_pop_wid.rename(
+            columns={"adult_population": "wid_adult_population", "total_population": "wid_total_population"}
+        ),
+        on=["country", "year"],
+        how="left",
+    )
+    # Countries in the WID distribution but missing either population cannot be used at all (WID's
+    # regions, historical states, and a few territories); none is in PIP, so the common sample is
+    # unaffected — logged, not asserted.
+    unusable = d["total_population"].isna() | d["wid_total_population"].isna()
+    no_population = sorted(d.loc[unusable, "country"].unique())
     if no_population:
-        log.info(f"WID distribution countries without WID population (excluded): {no_population}")
-        d = d[d["total_population"].notna()]
+        log.info(f"WID distribution countries without reference or WID population (excluded): {no_population}")
+        d = d[~unusable]
 
     # Provenance flag: a WID country-year counts as extrapolated unless it also appears in WID's
     # non-extrapolated series (i.e. it is anchored in observed data).
@@ -331,13 +468,16 @@ def process_wid_distributions(tb_dist: Table, tb_pop: Table, bins_lookup: Table,
 
     # Per adult -> per capita. The same total income spread over everyone rather than over adults
     # only, so the per-capita figure is SMALLER by exactly the adult share (~0.76 US, ~0.47 Nigeria).
-    # The float64 cast matters: these arrive as nullable dtypes, whose masked arithmetic is orders
-    # of magnitude slower on a table this size.
-    adult_share = (d["adult_population"] / d["total_population"]).astype(np.float64)
+    # WID's OWN adult share, deliberately: WID's per-adult incomes are defined against WID's adult
+    # counts, so only WID's ratio keeps the per-capita series consistent with WID's national income
+    # ("apples to apples"). The float64 cast matters: these arrive as nullable dtypes, whose masked
+    # arithmetic is orders of magnitude slower on a table this size.
+    adult_share = (d["wid_adult_population"] / d["wid_total_population"]).astype(np.float64)
     d["avg_daily_per_capita"] = d["avg_daily_per_adult"] * adult_share
 
     # Bin populations: each bin covers a known slice of the distribution, so it holds that share of
-    # the country. Both bases are built because SERIES_BASIS picks one per series below.
+    # the country — counted with the REFERENCE yardstick, since these become the weights. Both bases
+    # are built because SERIES_BASIS picks one per series below.
     bin_width = d["p_high"] - d["p_low"]
     d["bin_adult_population"] = d["adult_population"].astype(np.float64) * bin_width
     d["bin_total_population"] = d["total_population"].astype(np.float64) * bin_width
@@ -1127,14 +1267,16 @@ def mld_decomposition(tb_distributions: Table, tb_pop: Table):
     the same); the 109-bin structure with 0.1% bins across the top limits the loss where incomes are
     most dispersed.
 
-    TWO CONVENTIONS, INHERITED FROM THE SOURCE PROJECT AND NOT TO BE CHANGED HERE.
+    TWO CONVENTIONS.
 
-    - Country weights come from WID's demography for EVERY series, matched to the series' basis:
-      adult population for per-adult series, total population otherwise — including for PIP and the
-      derived series, whose own `pop` column is deliberately NOT used. This keeps the sources'
-      demographic disagreements out of the comparison, so a PIP-vs-WID gap in the between share is
-      about incomes, not headcounts. (It is also why `income_distributions.pop` and the
-      `population_weight` published here differ for PIP countries.)
+    - Country weights come from ONE demographic yardstick for EVERY series, matched to the series'
+      basis: UN WPP adults aged 20+ for per-adult series, OWID's population otherwise — including
+      for PIP and the derived series, whose own `pop` column is deliberately NOT used. This keeps
+      the sources' demographic disagreements out of the comparison, so a PIP-vs-WID gap in the
+      between share is about incomes, not headcounts. (It is also why `income_distributions.pop`
+      and the `population_weight` published here differ for PIP countries.) The source project
+      used WID's own counts for this; the yardstick is now independent of both sources, which
+      moved every 2023 between share by at most 0.015pp (see load_reference_population).
     - ln(0) is undefined, so zero incomes take ZERO_INCOME_REPLACEMENT ($0.01/day) inside this
       calculation only; the stored distributions keep their zeros. The floor also enters the means,
       which lifts them by at most 0.0008% (WID pre-tax per capita, 2023, the worst case) — negligible,
@@ -1148,15 +1290,19 @@ def mld_decomposition(tb_distributions: Table, tb_pop: Table):
     # STEP 1 — attach the reference population to every bin row. Both guards matter for the weights:
     # a duplicate (country, year) in the population table would double a country through the left
     # join, and an unmapped series would silently fall back to total population.
-    assert not tb_pop.duplicated(subset=["country", "year"]).any(), "WID population is not unique on (country, year)."
+    assert not tb_pop.duplicated(subset=["country", "year"]).any(), (
+        "Reference population is not unique on (country, year)."
+    )
     unmapped = set(tb_distributions["series"].unique()) - set(SERIES_BASIS)
     assert not unmapped, f"Series without a declared population basis: {sorted(unmapped)}"
     d = tb_distributions[["country", "year", "series", "p_low", "p_high", "avg"]].copy()
     d = d.merge(tb_pop, on=["country", "year"], how="left")
-    assert d["total_population"].notna().all(), "Missing WID population for some country-year in the common sample."
+    assert d["total_population"].notna().all(), (
+        "Missing reference population for some country-year in the common sample."
+    )
 
     # STEP 2 — the weight of a bin is the number of people in it: the series' basis population
-    # (adults or everyone, from WID) times the bin's width. Widths sum to exactly 1 per country-year,
+    # (adults or everyone, from the reference yardstick) times the bin's width. Widths sum to exactly 1 per country-year,
     # so a country's weights sum to its basis population.
     basis_is_adult = d["series"].map(SERIES_BASIS).eq("adult").to_numpy()
     ref_pop = np.where(
@@ -1226,7 +1372,7 @@ def mld_decomposition(tb_distributions: Table, tb_pop: Table):
 
     # STEP 10 — two tables: the decomposition per (year, series), and the per-country pieces behind
     # it. `population_weight` is the country's basis population — the weight actually used — which
-    # for PIP countries is WID's count, not PIP's.
+    # for PIP countries is the reference yardstick's count, not PIP's.
     tb_decomposition = Table(
         tb_decomposition[
             [
@@ -1254,7 +1400,9 @@ def mld_decomposition(tb_distributions: Table, tb_pop: Table):
     return tb_decomposition, tb_by_country
 
 
-def sanity_check_raw_series(tb_wid: Table, tb_pip: Table, tb_dist: Table, tb_pop: Table, tb_incomes_wid: Table) -> None:
+def sanity_check_raw_series(
+    tb_wid: Table, tb_pip: Table, tb_dist: Table, tb_pop: Table, tb_pop_wid: Table, tb_incomes_wid: Table
+) -> None:
     labels = set(wid_bin_labels())
 
     for tb, name in [(tb_wid, "WID"), (tb_pip, "PIP")]:
@@ -1281,12 +1429,41 @@ def sanity_check_raw_series(tb_wid: Table, tb_pip: Table, tb_dist: Table, tb_pop
     top = tb_wid[tb_wid["percentile"] == "p99.9p100"]
     assert top["avg"].max() < 500_000, f"Implausibly high WID top incomes: max {top['avg'].max():,.0f} $/day."
 
-    # Per-adult -> per-capita conversion: the ratio must equal the adult share of population.
+    # Per-adult -> per-capita conversion: the ratio must equal WID's OWN adult share of population.
     pa = tb_wid[tb_wid["series"] == "wid_before_tax_per_adult"].set_index(["country", "year", "percentile"])["avg"]
     pc = tb_wid[tb_wid["series"] == "wid_before_tax_per_capita"].set_index(["country", "year", "percentile"])["avg"]
-    ratio = (pc / pa).dropna().reset_index().merge(tb_pop, on=["country", "year"])
+    ratio = (pc / pa).dropna().reset_index().merge(tb_pop_wid, on=["country", "year"])
     adult_share = ratio["adult_population"] / ratio["total_population"]
-    assert np.allclose(ratio["avg"], adult_share, rtol=1e-6), "Per-capita conversion does not match the adult share."
+    assert np.allclose(ratio["avg"], adult_share, rtol=1e-6), "Per-capita conversion does not match WID's adult share."
+
+    # Bin populations are the weights, so per country-year they must sum to the reference population
+    # of the series' basis — exactly, since widths sum to 1.
+    pop_sums = tb_wid.groupby(["series", "country", "year"], observed=True)["pop"].sum().reset_index()
+    pop_sums = pop_sums.merge(tb_pop, on=["country", "year"], how="left")
+    expected = np.where(
+        pop_sums["series"].map(SERIES_BASIS).eq("adult"), pop_sums["adult_population"], pop_sums["total_population"]
+    )
+    assert np.allclose(pop_sums["pop"], expected, rtol=1e-9), (
+        "WID bin populations do not sum to the reference population."
+    )
+
+    # Cross-source agreement: the reference yardstick's adult share against WID's own, over the WID
+    # panel. They are the same UN WPP vintage in all but a handful of country-years, so the median
+    # ratio must be 1; anything off by more than 2% is named (expected: Togo, revised by UN in 2026).
+    both = tb_pop.merge(
+        tb_pop_wid.rename(columns={"adult_population": "wid_adult", "total_population": "wid_total"}),
+        on=["country", "year"],
+        how="inner",
+    )
+    both = both[both["country"].isin(tb_wid["country"].unique())]
+    share_ratio = (both["adult_population"] / both["total_population"]) / (both["wid_adult"] / both["wid_total"])
+    assert abs(share_ratio.median() - 1) < 1e-3, "Reference and WID adult shares disagree systematically."
+    off = both.loc[(share_ratio - 1).abs() > 0.02, ["country", "year"]]
+    if len(off):
+        log.warning(
+            f"Reference and WID demographies differ by >2% in {len(off)} country-years: "
+            f"{sorted(off['country'].unique())}"
+        )
 
     # DINA identity: post-tax national income redistributes everything, so country totals match
     # pre-tax totals. Over a long extrapolated panel small gaps exist; only their share is capped.
