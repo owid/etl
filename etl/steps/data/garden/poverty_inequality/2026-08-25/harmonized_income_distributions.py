@@ -247,8 +247,8 @@ def run() -> None:
     # Save outputs.
     #
     # Every input, PIP's percentiles included: the income-basis series are built on their regression
-    # and welfare labels. One origin per (producer, title, date), or WID's three tables would cite WID
-    # three times.
+    # and welfare labels. One origin per snapshot (see unique_origins) — WID's distributional and
+    # population snapshots are different inputs and both stay cited.
     all_origins = sorted(
         unique_origins([o for key in origins for o in origins[key]]),
         key=lambda o: o.producer,
@@ -399,9 +399,14 @@ def load_reference_population(tb_un_wpp: Table, countries: list, first_year: int
 
 
 def unique_origins(origins: list) -> list:
-    """One origin per (producer, title, date_published): a column built from several snapshot files
-    carries one origin per file, identical in everything a reader sees."""
-    return list({(o.producer, o.title, o.date_published): o for o in origins}.values())
+    """One origin per snapshot: (producer, title, title_snapshot, date_published).
+
+    A column assembled from several inputs can carry the same snapshot's origin several times (UN
+    WPP's population table lists its "Estimates 1950-2023" file twice), which this collapses. It
+    must NOT collapse different snapshots of one product: WID's distributional data and WID's
+    population counts share producer, title and date and differ only in title_snapshot, and both
+    are inputs here, so both stay cited."""
+    return list({(o.producer, o.title, o.title_snapshot, o.date_published): o for o in origins}.values())
 
 
 def process_wid_distributions(
