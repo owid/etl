@@ -9,7 +9,8 @@ views:
         - catalogPath: "us_foreign_born_population/annual_change_by_decade#annual_change"
     config:
       title: "Average annual change in the foreign-born population of the United States"
-      subtitle: "Average change per year in the number of people living in the United States who were not US citizens at birth. The value for the 2020s covers 2021 to 2024."
+      # No subtitle: the chart inherits the indicator's description_short, which the garden step
+      # generates with the years the current partial decade covers.
       originUrl: "/migration"
       tab: "chart"
       chartTypes:

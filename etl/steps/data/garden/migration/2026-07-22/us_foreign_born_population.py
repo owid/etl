@@ -343,6 +343,20 @@ def make_changes(tb_census: Table, tb_acs: Table) -> tuple[Table, Table]:
     for t in (tb_stepped, tb_decade):
         t["country"] = "United States"
 
+    # Charts built on the decade table inherit this text as their subtitle, so the years covered
+    # by the current, partial decade must follow the data on every update.
+    last_year = int(tb_stepped["year"].max())
+    decade_label = (last_year - 1) // 10 * 10
+    covers = f" The value for the {decade_label}s covers {decade_label + 1} to {last_year}."
+    tb_decade["annual_change"].m.description_short = (
+        "Average change per year in the number of people living in the United States who were not "
+        "US citizens at birth." + covers
+    )
+    tb_decade["annual_change_share_of_population"].m.description_short = (
+        "Average change per year in the number of people living in the United States who were not "
+        "US citizens at birth, as a share of the total US population." + covers
+    )
+
     sanity_check_changes(tb, tb_stepped, tb_decade)
     return tb_stepped, tb_decade
 

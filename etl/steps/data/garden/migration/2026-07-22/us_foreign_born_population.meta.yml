@@ -34,6 +34,8 @@ definitions:
     Before 2005, the data comes from censuses taken every ten years (and a first survey estimate in 2005), so the change cannot be calculated for single years. Over those periods, we divide the measured change evenly across the years: for example, each year of the 1850s shows one tenth of the change between the 1850 and 1860 censuses. There is no estimate for 2020, so the values for 2020 and 2021 each show half of the change between 2019 and 2021.
   change_comparability: |-
     The change between 2000 and 2005 compares a census count with a survey estimate, so part of it may reflect the switch in method rather than a real change in the population. From 2006 onward, the change compares two survey estimates; small year-to-year changes can be within the survey's margin of error.
+  change_comparability_decade: |-
+    The value for the 2000s mixes the two sources: it combines census counts (used up to 2000) with survey estimates (used from 2005 onward), so part of the measured change may reflect the switch in method rather than a real change in the population.
   change_footnote: The change combines arrivals, departures, and deaths, so it is not a count of new immigrants.
 
 dataset:
@@ -142,7 +144,7 @@ tables:
 
           Each value is the average annual change during one decade: the 1850s value covers the change between the 1850 and 1860 censuses. The value for the current decade only averages the years available so far.
 
-          {definitions.change_comparability}
+          {definitions.change_comparability_decade}
 
           {definitions.who_counts}
 
@@ -169,7 +171,7 @@ tables:
 
           Each value is the average annual change during one decade: the 1850s value covers the change between the 1850 and 1860 censuses. The value for the current decade only averages the years available so far.
 
-          {definitions.change_comparability}
+          {definitions.change_comparability_decade}
 
           {definitions.who_counts}
 
