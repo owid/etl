@@ -267,7 +267,7 @@ These texts also arrive **render-ready**: the endpoint unwraps grapher's detail-
 
 ## Step 2 — Ask the run options, all at once
 
-One `AskUserQuestion` batch — don't drip-feed or assume an answer while asking (GOTCHAS.md):
+One `AskUserQuestion` batch — don't drip-feed or assume an answer while asking (Gotchas):
 
 1. **Output format(s)** (multi-select — several deliverables from one run are normal). Constraint from the design team: **Instagram and DI images are always square/mobile**; a static chart (for the OWID website) can be desktop and/or mobile:
    - Instagram post (square 540×540) or portrait (560×700)
