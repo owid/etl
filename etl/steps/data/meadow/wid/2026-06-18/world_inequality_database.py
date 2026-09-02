@@ -32,6 +32,13 @@ NA_VALUES = [
 # List of countries/regions not included in the ISO2 standard, but added by WID
 # NOTE: I am excluding subnational data from China and "Other" regions, because they have issues
 CODES_MISSING = {
+    # The population snapshot reaches further back than the income one, so it returns historical
+    # entities the other snapshots never contain. Harmless for those tables, which have no rows
+    # with these codes.
+    "CS": "Czechoslovakia",
+    "SU": "USSR",
+    "XI": "Channel Islands",
+    "YU": "Yugoslavia",
     "DD": "East Germany",
     "KS": "Kosovo",
     "QE-PPP": "Europe (WID)",
@@ -183,6 +190,15 @@ SNAPSHOTS_DICT = {
     "world_inequality_database_distribution": ["country", "year", "welfare", "p", "percentile"],
 }
 
+# WID variable codes in the population snapshot, renamed to descriptive column names. Unit `i`
+# (individuals) is the only one WID publishes for population series; the `j` (equal-split adults)
+# dimension exists for distributed series only, so `aptinc992j / npopul992i` is the right pairing.
+# See snapshots/wid/<version>/wid_population.do for the evidence.
+POPULATION_VARIABLE_NAMES = {
+    "npopul992i": "adult_population",
+    "npopul999i": "total_population",
+}
+
 
 def run() -> None:
     # Keep snapshot info for the main snapshot
@@ -238,13 +254,39 @@ def run() -> None:
     )
     tb_fiscal = tb_fiscal.format(short_name="world_inequality_database_fiscal")
 
+    # Add population (adults aged 20+ and all ages), the demographic base for converting WID's
+    # per-adult series to per capita and for weighting countries in cross-source comparisons.
+    snap_population = paths.load_snapshot("wid_population.csv")
+    tb_population = snap_population.read(keep_default_na=False, na_values=NA_VALUES)
+    tb_population = reshape_population(tb=tb_population)
+    tb_population = harmonize_countries(
+        tb=tb_population, tb_regions=tb_regions, codes_missing=CODES_MISSING, codes_excluded=CODES_EXCLUDED
+    )
+    tb_population = tb_population.format(["country", "year"], short_name="population")
+
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = paths.create_dataset(
-        tables=tables + [tb_fiscal], check_variables_metadata=True, default_metadata=snap_main.metadata, repack=False
+        tables=tables + [tb_fiscal, tb_population],
+        check_variables_metadata=True,
+        default_metadata=snap_main.metadata,
+        repack=False,
     )
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
+
+
+def reshape_population(tb: Table) -> Table:
+    """Reshape the raw long population response to one column per WID variable."""
+    unexpected = sorted(set(tb["variable"]) - set(POPULATION_VARIABLE_NAMES))
+    assert not unexpected, f"Unexpected WID variables in the population snapshot: {unexpected}"
+    assert (tb["percentile"] == "p0p100").all(), "Population rows must all cover the full distribution (p0p100)."
+    assert not tb.duplicated(subset=["country", "year", "variable"]).any(), "Duplicate (country, year, variable) rows."
+
+    tb = tb.pivot(index=["country", "year"], columns="variable", values="value", join_column_levels_with="_")
+    tb = tb.rename(columns=POPULATION_VARIABLE_NAMES)
+
+    return tb
 
 
 # Country harmonization function, using both the reference country/regional OWID dataset and WID's `iso2_missing` list

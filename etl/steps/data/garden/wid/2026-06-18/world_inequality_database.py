@@ -104,6 +104,7 @@ def run() -> None:
     tb_distribution = ds_meadow.read("world_inequality_database_distribution")
     tb_distribution_extrapolated = ds_meadow.read("world_inequality_database_distribution_with_extrapolations")
     tb_fiscal = ds_meadow.read("world_inequality_database_fiscal")
+    tb_population = ds_meadow.read("population")
 
     #
     # Process data.
@@ -158,6 +159,7 @@ def run() -> None:
         ["country", "year", "welfare_type", "p", "percentile", "extrapolated"], short_name="distribution"
     )
     tb_fiscal = tb_fiscal.format(["country", "year"], short_name="fiscal_income")
+    tb_population = tb_population.format(["country", "year"], short_name="population")
 
     #
     # Save outputs.
@@ -170,6 +172,7 @@ def run() -> None:
             tb_relative_poverty,
             tb_distribution,
             tb_fiscal,
+            tb_population,
         ],
         default_metadata=ds_meadow.metadata,
         repack=False,
