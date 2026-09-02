@@ -36,11 +36,11 @@ from apps.wizard.app_pages.metadata_diff.review_state import (
 
 # The URL key that opens one MDim's views. A route, not a filter: the page shows that MDim's changed views
 # and nothing else, and the link survives a reload so it can be pasted to somebody else.
-VIEWS_KEY = "mdim-views"
+VIEWS_KEY = view_nav.MDIM_VIEWS_KEY
 # The ⚡ jump's widget key, and the prefix for the MDim menu's per-dimension keys. Both are URL-visible:
 # a link to one view of one MDim is `?mdim-views=<path>&dim-<slug>=<choice>…`, which is shareable.
 JUMP_KEY = "mdim-view-jump"
-DIM_PARAM_PREFIX = "dim-"
+DIM_PARAM_PREFIX = view_nav.MDIM_DIM_PREFIX
 
 
 def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) -> None:
@@ -107,7 +107,7 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
             return
         # One card per authored edit, however many views word it. The per-MDim cards this replaces showed
         # a shared edit once per MDim, and an unpublished MDim's cards sat in an expander of their own.
-        edits_view.st_edit_cards(source_engine, cached.summary(source_engine, target_engine), "mdims")
+        edits_view.st_edit_cards(source_engine, target_engine, cached.summary(source_engine, target_engine), "mdims")
 
     _render_other(others)
 

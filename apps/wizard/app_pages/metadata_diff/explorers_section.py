@@ -33,9 +33,9 @@ from apps.wizard.app_pages.metadata_diff.review_state import (
 
 # Which explorer the item view is showing, and the keys its ⚡ jump and menu use. Distinct from the MDims
 # section's prefix on purpose: the two must never read each other's dimension selections.
-EXPLORER_KEY = "explorer-views"
+EXPLORER_KEY = view_nav.EXPLORER_VIEWS_KEY
 JUMP_KEY = "explorer-view-jump"
-DIM_PARAM_PREFIX = "edim-"
+DIM_PARAM_PREFIX = view_nav.EXPLORER_DIM_PREFIX
 
 
 def st_show_explorer_metadata_diffs(source_engine: Engine, target_engine: Engine) -> None:
@@ -78,7 +78,9 @@ def st_show_explorer_metadata_diffs(source_engine: Engine, target_engine: Engine
 
         # One card per authored edit. Cards keyed on the exact text showed one reworded subtitle 348
         # times, because each of the explorer's views words it a little differently.
-        edits_view.st_edit_cards(source_engine, cached.summary(source_engine, target_engine), "explorers")
+        edits_view.st_edit_cards(
+            source_engine, target_engine, cached.summary(source_engine, target_engine), "explorers"
+        )
 
     _render_other(other)
 

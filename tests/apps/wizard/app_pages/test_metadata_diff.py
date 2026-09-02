@@ -2685,6 +2685,53 @@ def test_an_edit_tick_outlives_a_new_text_but_not_a_rewording():
     assert edit_fields(again) != edit_fields(one), "different words put in: the tick goes stale"
 
 
+def test_a_view_link_from_an_edit_card_opens_the_view_by_view_page_on_that_view():
+    """The list under an edit is for getting to one place it lands, so each link has to route exactly.
+
+    The keys are the ones the browsers read, and the catalogPath's `#` is encoded — a bare one would be a
+    fragment, dropping every parameter after it and truncating the path.
+    """
+    from apps.wizard.app_pages.metadata_diff import explorers_section, mdims_section, view_nav
+
+    link = view_nav.mdim_view_link("grapher/wb/latest/incomes_pip#incomes_pip", {"metric": "mean", "period": "day"})
+    assert link.startswith("?diff-type=mdims&")
+    assert "#" not in link and "%23incomes_pip" in link
+    assert f"&{mdims_section.DIM_PARAM_PREFIX}metric=mean&{mdims_section.DIM_PARAM_PREFIX}period=day" in link
+    assert f"{mdims_section.VIEWS_KEY}=" in link
+
+    link = view_nav.explorer_view_link("incomes-across-distribution-lis", {"Indicator": "Mean income"})
+    assert f"{explorers_section.EXPLORER_KEY}=incomes-across-distribution-lis" in link
+    assert f"{explorers_section.DIM_PARAM_PREFIX}Indicator=Mean+income" in link
+
+
+def test_the_coverage_line_says_how_much_of_the_mdim_an_edit_reaches():
+    """Fifty-one links do not say whether every metric is covered; the coverage line does, in choice names."""
+    from apps.wizard.app_pages.metadata_diff.edits_view import coverage_line
+
+    dimensions = [
+        {
+            "slug": "metric",
+            "name": "Metric",
+            "choices": [{"slug": m, "name": m.title()} for m in ("mean", "median", "gini")],
+        },
+        {
+            "slug": "period",
+            "name": "Period",
+            "choices": [{"slug": "day", "name": "Day"}, {"slug": "month", "name": "Month"}],
+        },
+        {"slug": "welfare", "name": "Welfare", "choices": [{"slug": "income", "name": "Income"}]},
+    ]
+    views = [
+        {"metric": "mean", "period": "day", "welfare": "income"},
+        {"metric": "median", "period": "month", "welfare": "income"},
+        {"metric": "mean", "period": "month", "welfare": "income"},
+    ]
+    assert coverage_line(views, dimensions) == "Metric: Mean, Median (2 of 3) · Period: all 2 · Welfare: Income"
+    # An explorer's dimensions are inferred from the affected views, so a total would always equal the count.
+    inferred = [{"slug": "metric", "name": "metric", "choices": [{"slug": "mean", "name": "mean"}]}]
+    assert coverage_line(views[:1], inferred, known_universe=False) == "metric: mean (1)"
+
+
 def test_a_section_is_done_along_whichever_layout_the_reviewer_took():
     """Ticking every view, or every edit, finishes a section; the two are never added up.
 

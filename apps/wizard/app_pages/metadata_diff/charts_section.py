@@ -89,7 +89,7 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
 
     # One card per authored edit, every chart it reaches counted once. The per-text cards this replaces
     # showed a shared edit once per wording it rendered into.
-    edits_view.st_edit_cards(source_engine, cached.summary(source_engine, target_engine), "charts")
+    edits_view.st_edit_cards(source_engine, target_engine, cached.summary(source_engine, target_engine), "charts")
 
 
 def _chart_browser(source_engine: Engine, target_engine: Engine, groups, usage: dict, chart_text) -> None:

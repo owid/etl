@@ -6,11 +6,39 @@ to the URL as well as to session state so a single view stays a link somebody el
 """
 
 from typing import Any
+from urllib.parse import urlencode
 
 import streamlit as st
 
 from apps.wizard.app_pages.metadata_diff.core import ViewDiff
 from apps.wizard.utils.components import url_persist
+
+# The URL keys the two browsers route on: which MDim or explorer is open, and the per-dimension selection
+# within it. Kept here rather than in the sections so a card anywhere in the tool can build a link to one
+# view without importing the section that renders it. The two prefixes differ on purpose: the sections
+# must never read each other's dimension selections.
+MDIM_VIEWS_KEY = "mdim-views"
+MDIM_DIM_PREFIX = "dim-"
+EXPLORER_VIEWS_KEY = "explorer-views"
+EXPLORER_DIM_PREFIX = "edim-"
+
+
+def mdim_view_link(catalog_path: str, dims: dict[str, str] | None = None) -> str:
+    """This tool's View-by-view page, opened on one MDim — and on one of its views when `dims` is given.
+
+    Relative, like `chart_review_url`: a query-only href keeps whatever host the reader is on. The
+    catalogPath's `#` is percent-encoded by `urlencode`, or the browser would read it as a fragment.
+    """
+    params = {"diff-type": "mdims", MDIM_VIEWS_KEY: catalog_path}
+    params.update({MDIM_DIM_PREFIX + slug: choice for slug, choice in (dims or {}).items()})
+    return "?" + urlencode(params)
+
+
+def explorer_view_link(slug: str, dims: dict[str, str] | None = None) -> str:
+    """This tool's View-by-view page, opened on one explorer — and on one of its views when `dims` is given."""
+    params = {"diff-type": "explorers", EXPLORER_VIEWS_KEY: slug}
+    params.update({EXPLORER_DIM_PREFIX + key: value for key, value in (dims or {}).items()})
+    return "?" + urlencode(params)
 
 
 def matches(view: ViewDiff, selection: dict[str, str]) -> bool:
