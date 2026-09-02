@@ -1,9 +1,13 @@
 """Combine census (1850-2000, decennial) and American Community Survey (2005-, annual) data on
 the foreign-born population of the United States.
 
-Outputs four tables:
+Outputs six tables:
 - us_foreign_born_population: total foreign-born population and its share of the total
   population, 1850-2024.
+- annual_change: annual change in the foreign-born population, in people and as a share of the
+  total population. Observations before 2005 are 5-10 years apart, so the change is divided
+  evenly across the years of each interval.
+- annual_change_by_decade: the same, averaged by decade (shown with grapher's decade support).
 - by_country_of_birth: foreign-born population by country of birth — at each census from 1850
   to 1930 and from 1960 to 2000, then annually from 2005 from the American Community Survey.
 - by_region_of_birth: the same, aggregated to continents using OWID region definitions
@@ -273,6 +277,76 @@ def make_annual(tb_census: Table, tb_acs: Table) -> Table:
     return tb
 
 
+def sanity_check_changes(tb_stock: Table, tb_stepped: Table, tb_decade: Table) -> None:
+    stock = tb_stock.set_index("year")["foreign_born_population"]
+
+    years = tb_stepped["year"]
+    assert set(years) == set(range(int(stock.index.min()) + 1, int(stock.index.max()) + 1)), (
+        "The stepped series must cover every year from the first observation + 1 to the last."
+    )
+    # Each interval contributes its full change, so the sum of the annual values must equal the
+    # total change over the whole series.
+    total = tb_stepped["annual_change"].sum()
+    assert abs(total - (stock.iloc[-1] - stock.iloc[0])) < 1, "Annual changes do not add up to the total change."
+    assert tb_stepped["annual_change"].abs().max() < 3_000_000, "Annual change outside the plausible range."
+    assert tb_stepped["annual_change_share_of_population"].abs().max() < 1.5, "Share outside the plausible range."
+
+    decades = tb_decade.set_index("year")["annual_change"]
+    assert set(decades.index) == set(range(1850, 2021, 10)), "Unexpected set of decades."
+    # Decades fully covered by two censuses must match the direct calculation between them.
+    for decade in range(1850, 2000, 10):
+        direct = (stock.loc[decade + 10] - stock.loc[decade]) / 10
+        assert abs(decades.loc[decade] - direct) < 1, f"{decade}s value does not match the censuses."
+
+
+def make_changes(tb_census: Table, tb_acs: Table) -> tuple[Table, Table]:
+    """Annual change in the foreign-born population, from consecutive observations.
+
+    Observations before 2005 are 5 or 10 years apart, so the change between two observations is
+    divided evenly across the years in between (like the long-run Ireland net migration series).
+    Returns two tables:
+    - stepped: one value per year, 1851 to the latest year. The value for year Y is the average
+      annual change over the interval that ends in or contains Y.
+    - by decade: the average of the stepped values over each decade, where the 1850s cover the
+      change from 1850 to 1860. The current decade is a partial average of the years so far.
+    The share versions divide by the average of the total population reported at the two ends of
+    each interval.
+    """
+    tb = pr.concat([tb_census, tb_acs], ignore_index=True).sort_values("year").reset_index(drop=True)
+
+    rows = []
+    for i in range(1, len(tb)):
+        start, end = int(tb["year"].iloc[i - 1]), int(tb["year"].iloc[i])
+        change = (tb["foreign_born_population"].iloc[i] - tb["foreign_born_population"].iloc[i - 1]) / (end - start)
+        population = (tb["total_population"].iloc[i] + tb["total_population"].iloc[i - 1]) / 2
+        for year in range(start + 1, end + 1):
+            rows.append(
+                {
+                    "year": year,
+                    "annual_change": change,
+                    "annual_change_share_of_population": change / population * 100,
+                }
+            )
+    tb_stepped = Table(pd.DataFrame(rows))
+    for col in ["annual_change", "annual_change_share_of_population"]:
+        tb_stepped[col] = tb_stepped[col].copy_metadata(tb["foreign_born_population"])
+
+    # The change during year Y (from Y-1 to Y) belongs to the decade that starts at Y-1 rounded
+    # down: the 1850s cover the changes from 1850 to 1860, i.e. the years 1851 to 1860.
+    tb_decade = tb_stepped.copy()
+    tb_decade["year"] = (tb_decade["year"] - 1) // 10 * 10
+    tb_decade = tb_decade.groupby("year", as_index=False)[["annual_change", "annual_change_share_of_population"]].mean()
+    tb_decade = Table(tb_decade)
+    for col in ["annual_change", "annual_change_share_of_population"]:
+        tb_decade[col] = tb_decade[col].copy_metadata(tb["foreign_born_population"])
+
+    for t in (tb_stepped, tb_decade):
+        t["country"] = "United States"
+
+    sanity_check_changes(tb, tb_stepped, tb_decade)
+    return tb_stepped, tb_decade
+
+
 # Continents following OWID region definitions, built from the source's own aggregate rows.
 # The source groups the Americas as "Latin America" + "Northern America"; OWID counts the
 # Caribbean and Central America (incl. Mexico) as part of North America.
@@ -439,8 +513,12 @@ def run() -> None:
 
     tb_share_by_group = make_share_by_origin_group(tb_by_country, tb_acs_by_country, tb_census, tb_acs)
 
+    tb_change, tb_change_by_decade = make_changes(tb_census, tb_acs)
+
     tables = [
         make_annual(tb_census, tb_acs).format(["country", "year"], short_name="us_foreign_born_population"),
+        tb_change.format(["country", "year"], short_name="annual_change"),
+        tb_change_by_decade.format(["country", "year"], short_name="annual_change_by_decade"),
         tb_countries.format(["country", "year"], short_name="by_country_of_birth"),
         tb_regions.format(["country", "year"], short_name="by_region_of_birth"),
         tb_share_by_group.format(["country", "year"], short_name="share_by_origin_group"),

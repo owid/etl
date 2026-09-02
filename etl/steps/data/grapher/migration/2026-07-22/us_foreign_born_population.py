@@ -12,6 +12,8 @@ def run() -> None:
     ds_garden = paths.load_dataset("us_foreign_born_population")
     tables = [
         ds_garden.read("us_foreign_born_population", reset_index=False),
+        ds_garden.read("annual_change", reset_index=False),
+        ds_garden.read("annual_change_by_decade", reset_index=False),
         ds_garden.read("by_country_of_birth", reset_index=False),
         ds_garden.read("by_region_of_birth", reset_index=False),
         ds_garden.read("share_by_origin_group", reset_index=False),
