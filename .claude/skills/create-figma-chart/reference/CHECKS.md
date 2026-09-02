@@ -136,9 +136,13 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > `--rows` group that covers what you touched — not the whole three-call pass for that one edit (that
 > still runs once, after the last change), and never a hand-rolled substitute.** Moved a tick or added
 > a gridline? That's `series` (furniture weight and dash) plus `geometry` (box alignment, gap,
-> margins). Nudged an annotation or its label? That's `annotations` **plus `geometry`** — `margins`
-> and `within-frame` live there, not under `annotations`, and both judge annotation nodes (`margins`
-> takes `annotation__*` by name, `within-frame` takes every visible node), so a nudge that pushes an
+> margins) — and `annotations` as well whenever an annotation sits on the plot, because
+> `annotation-overlap` and `annotation-knockout` compute their crossings against furniture, so a
+> gridline that now runs under an annotation changes the knockout tier it must carry (the very
+> failure the next paragraph describes) while `series` and `geometry` stay silent. Nudged an
+> annotation or its label? That's `annotations` **plus `geometry`** — `margins` and `within-frame`
+> live there, not under `annotations`, and both judge annotation nodes (`margins` takes
+> `annotation__*` by name, `within-frame` takes every visible node), so a nudge that pushes an
 > annotation past the content box or off the artboard passes `annotations` alone. Each is sized in
 > seconds. The temptation to write a quick inline equivalent instead grows with how small the edit
 > feels — which is exactly backwards, since the row group costs the same whether the edit was one
