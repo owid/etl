@@ -594,11 +594,16 @@ were trades nobody actually chose, and put those back to the author.
 simply picking the work back up a session later) can leave you unsure whether a chart's current
 scale or origin still matches what you last computed — a note that grew a line and pushed the
 footer, a rebuilt template, a colleague's drag. Don't re-derive by re-reading your own old numbers;
-re-derive from what's actually on the canvas now. Any two marks whose underlying data *value* you
-know — two bars, two *interior* ticks (never the first and last axis labels: grapher insets those by
-~17px, see GOTCHAS.md → "the plot's edge is where the gridlines stop") — pin a linear scale exactly:
-solve for slope and origin from those two, then check a third known point against the prediction
-before trusting either. That is the recipe for a **linear axis**. On a logarithmic one
+re-derive from what's actually on the canvas now. Any two marks whose *position* encodes a data
+value you know — two bars' ends, two *interior* ticks (never the first and last axis labels: grapher
+insets those by ~17px, see GOTCHAS.md → "the plot's edge is where the gridlines stop") — pin a
+linear scale exactly: solve for slope and origin from those two, then check a third known point
+against the prediction before trusting either. Mind what the position encodes: on a stacked bar,
+a stacked area or a Marimekko's segments, a segment's far edge is the running total up to it, not
+the segment's own value — that is a *length*, the difference between its two edges — so pair each
+edge with the cumulative value (or use the stack's outer edge); segment values fed in as positions
+fail the third point on an untouched chart just as surely as a hand-edit would. That is the recipe
+for a **linear axis**. On a logarithmic one
 (per-chart-type/misc.md's arrow chart is one) pixel position is linear in `log(value)`, not in the
 value, so run the same two-point pin and third-point check on `log(value)` — fed raw values, an
 untouched log-axis chart fails the third point every time and sends you hunting for a hand-edit that
