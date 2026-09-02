@@ -62,6 +62,23 @@ class Issue(BaseModel):
     evidence: str = Field(description="The specific numbers or strings relied on.")
     reader_impact: str = Field(description="What a reader would wrongly conclude.")
     confidence: Literal["high", "medium", "low"]
+    found_in: Literal[
+        "rendered_chart",
+        "chart_text",
+        "indicator_metadata",
+        "data_summary",
+        "chart_config",
+        "contradiction_between_fields",
+    ] = Field(
+        default="data_summary",
+        description=(
+            "Which part of what you were shown carried this finding. 'rendered_chart' for something "
+            "only the picture shows; 'chart_text' for the title, subtitle or note; "
+            "'indicator_metadata' for a unit, description or column name; 'data_summary' for the "
+            "numbers; 'chart_config' for the configuration; "
+            "'contradiction_between_fields' when two of them disagree with each other."
+        ),
+    )
     chart_params: str = Field(
         default="",
         description=(

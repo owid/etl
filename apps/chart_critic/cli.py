@@ -39,7 +39,6 @@ from apps.chart_critic.critic import (
     CHEAP_MODEL,
     DEFAULT_MODEL,
     FALLBACK_PRICES,
-    Issue,
     build_agent,
     prompt_parts,
 )
@@ -470,6 +469,7 @@ def cli(
                     colour = SEVERITY_COLOR.get(i["severity"], "white")
                     seen = f" [dim]({i['passes']}/{r['passes']} passes)[/dim]" if r.get("passes", 1) > 1 else ""
                     console.print(f"      [{colour}]{i['severity']}/{i['kind']}[/{colour}] {i['claim']}{seen}")
+                    console.print(f"      [dim]found in: {i.get('found_in', '?')}[/dim]")
                     console.print(f"      [link={i['url']}][blue underline]{i['url']}[/blue underline][/link]")
             elif r["status"] != "ok":
                 console.print(f"  [dim]○ {r['slug']} — {r['status']}[/dim]")
@@ -542,7 +542,7 @@ def _evaluate(model: str, with_image: bool, repeat: int, use_cache: bool, ttl_ho
 
 def _print_summary(results: list[dict[str, Any]], model: str) -> None:
     flagged = [r for r in results if r["issues"]]
-    issues: list[Issue] = [i for r in flagged for i in r["issues"]]
+    issues: list[dict[str, Any]] = [i for r in flagged for i in r["issues"]]
     cost = sum(r["cost"] for r in results)
 
     table = Table(title="Charts with issues", show_lines=False)
@@ -606,6 +606,15 @@ def _print_summary(results: list[dict[str, Any]], model: str) -> None:
         for cause, slugs in sorted(by_cause.items(), key=lambda kv: -len(kv[1])):
             shown = ", ".join(slugs[:4]) + (f" … +{len(slugs) - 4}" if len(slugs) > 4 else "")
             console.print(f"  [red]{len(slugs):>3}[/red]  {cause}\n       {shown}")
+    # Where a run's findings came from. Self-reported by the model, so it is a hypothesis about
+    # which channels are earning their place — the answer comes from ablation, not from this.
+    mechanisms: dict[str, int] = {}
+    for issue in issues:
+        mechanisms[issue.get("found_in", "?")] = mechanisms.get(issue.get("found_in", "?"), 0) + 1
+    if mechanisms:
+        breakdown = ", ".join(f"{k} {v}" for k, v in sorted(mechanisms.items(), key=lambda kv: -kv[1]))
+        console.print(f"[dim]found in (self-reported): {breakdown}[/dim]")
+
     if cost:
         console.print(f"[dim]cost: ${cost:.4f} (${cost / max(len(results), 1):.4f}/chart) on {model}[/dim]")
 

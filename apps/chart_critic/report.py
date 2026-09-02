@@ -63,6 +63,7 @@ def _finding(result: dict[str, Any], issue: dict[str, Any], png: bytes | None) -
         f'<span class="tag {SEV_CLASS.get(issue.get("confidence", "low"), "lo")}">'
         f"{html.escape(issue.get('confidence', '?'))} confidence</span>",
         f'<span class="tag bl">{html.escape(issue.get("kind", "?"))}-level</span>',
+        f'<span class="tag lo">found in: {html.escape(issue.get("found_in", "?"))}</span>',
         f'<span class="tag lo">{result["views"]:,} views/yr</span>' if result["views"] else "",
         "</div>",
         f'<h3><a href="{url}">{html.escape(issue.get("claim", ""))}</a></h3>',
