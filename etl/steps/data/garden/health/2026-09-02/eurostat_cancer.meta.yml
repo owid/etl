@@ -1,0 +1,52 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: "%"
+    short_unit: "%"
+    processing_level: minor
+    description_key:
+      - Values come from the administrative records of national organized screening programs, not from population surveys. Screening done outside these programs, for example by general practitioners, is not counted.
+      - Coverage is the share of people in a program's target population who were screened within the recommended interval. Several countries use age ranges or screening intervals that differ from the standard ones described here, and Eurostat flags such values as following a different definition.
+      - Countries without an organized program for a given cancer, or that cannot compile program data, are not shown.
+    presentation:
+      topic_tags:
+        - Cancer
+      attribution_short: Eurostat
+    display:
+      numDecimalPlaces: 1
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  owners:
+    - Tuna Acisu
+    - Lucas Rodés-Guirao
+
+tables:
+  eurostat_cancer:
+    variables:
+      cervical_cancer_f:
+        title: Cervical cancer screening coverage among women aged 20 to 69 years
+        description_short: Share of women aged 20 to 69 years who have been screened for cervical cancer within the previous 3 years.
+        description_from_producer: The indicator covering cervical cancer screening is defined in line with the 2003 Council Recommendation on cancer screening (2003/878/EC). It concerns the population of women aged 20 to 69 years having been screened for cervical cancer within the previous 3 years (or according to the specific screening frequency recommended in each country). The data presented are administrative data from cervical cancer screening programs; in practice, some countries use different age ranges.
+
+      colon_and_rectum_cancer_f:
+        title: Colon and rectum cancer screening coverage among women aged 50 to 74 years
+        description_short: Share of women aged 50 to 74 years who have been screened for colon and rectum cancer within the previous 2 years.
+        description_from_producer: &description_producer_colorectal Administrative data on colorectal screening are based on screening programs. The indicator covering colorectal screening is defined in line with the 2003 Council Recommendation on cancer screening (2003/878/EC). It concerns the proportion of the target population who have undergone colorectal cancer screening based on the country's colorectal cancer screening policy, which defines, among others, the target age range and the screening method and interval. The recommended age range is 50 to 74 years and the recommended frequency is every 2 years; however, most countries define their own age range and frequency.
+
+      colon_and_rectum_cancer_m:
+        title: Colon and rectum cancer screening coverage among men aged 50 to 74 years
+        description_short: Share of men aged 50 to 74 years who have been screened for colon and rectum cancer within the previous 2 years.
+        description_from_producer: *description_producer_colorectal
+
+      colon_and_rectum_cancer_t:
+        title: Colon and rectum cancer screening coverage among people aged 50 to 74 years
+        description_short: Share of people aged 50 to 74 years who have been screened for colon and rectum cancer within the previous 2 years.
+        description_from_producer: *description_producer_colorectal
+
+      breast_cancer_f:
+        title: Breast cancer screening coverage among women aged 50 to 69 years
+        description_short: Share of women aged 50 to 69 years who have been screened for breast cancer within the previous 2 years.
+        description_from_producer: The indicator covering breast cancer screening is defined in line with the 2003 Council Recommendation on cancer screening (2003/878/EC). The data presented are administrative data from breast cancer screening programs. The standard analysis is the proportion of women (eligible for screening) that have been screened. This is based on the number of women aged 50 to 69 years who had received a bilateral mammography within the 2 years prior to the reference date (or according to the specific screening frequency recommended in each country) as a share of women eligible for an organized screening program; in practice, some countries use different age ranges.
