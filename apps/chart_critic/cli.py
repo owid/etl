@@ -26,6 +26,7 @@ from __future__ import annotations
 import concurrent.futures as cf
 import json
 import re
+import time
 from pathlib import Path
 from typing import Any
 
@@ -33,7 +34,7 @@ import rich_click as click
 from rich.console import Console
 from rich.table import Table
 
-from apps.chart_critic import cache, fixtures, mdim, report
+from apps.chart_critic import cache, digest, fixtures, mdim, report
 from apps.chart_critic.bundle import GRAPHER_URL, Bundle, ChartGone, build, render
 from apps.chart_critic.critic import (
     CHEAP_MODEL,
@@ -279,10 +280,18 @@ def _review_one(
 
     next_index = (max(already) + 1) if already else 0
     for offset in range(max(max(repeat, 1) - len(already), 0)):
-        try:
-            run = agent.run_sync(parts)
-        except Exception as e:  # noqa: BLE001 — one pass failing should not end the sweep
-            result["status"] = f"review failed: {str(e)[:90]}"
+        # The model answers 503 often enough that a pass lost to one is a chart nobody reviewed.
+        run = None
+        for attempt in range(3):
+            try:
+                run = agent.run_sync(parts)
+                break
+            except Exception as e:  # noqa: BLE001 — one pass failing should not end the sweep
+                if "503" not in str(e) and "overloaded" not in str(e).lower() or attempt == 2:
+                    result["status"] = f"review failed: {str(e)[:90]}"
+                    break
+                time.sleep(3 * (attempt + 1))
+        if run is None:
             break
         issues = [i.model_dump() for i in run.output.issues]
         for issue in issues:
@@ -329,6 +338,27 @@ def _review_one(
         "recall dial: on charts with known errors a single pass catches roughly half of them and five "
         "catches all. Use 1 for a cheap first look, knowing it will miss things."
     ),
+)
+@click.option(
+    "--changed-since",
+    type=int,
+    default=None,
+    help="Review the published charts whose configuration changed in the last N days, most-read first.",
+)
+@click.option(
+    "--include-data-updates",
+    is_flag=True,
+    help=(
+        "With --changed-since, also include charts whose underlying dataset was re-run. An order of "
+        "magnitude more charts and very uneven day to day, because one dataset update touches thousands."
+    ),
+)
+@click.option(
+    "--digest",
+    "digest_out",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Write a Slack-ready digest of the new findings here, and record them as posted.",
 )
 @click.option(
     "--eval",
@@ -406,6 +436,9 @@ def cli(
     clear_cache: bool,
     cache_ttl: float,
     run_eval: bool,
+    changed_since: int | None,
+    include_data_updates: bool,
+    digest_out: Path | None,
 ) -> None:
     if clear_cache:
         removed, freed = cache.clear()
@@ -424,7 +457,20 @@ def cli(
 
     use_cache = not no_cache
     charts_cached, reviews_cached, cache_mb = cache.stats()
-    targets = _expand_mdims(_select(slugs, sample, top, min_views, seed, params), mdim_views, seed)
+
+    if changed_since is not None:
+        changed = digest.changed_slugs(changed_since, include_data_updates)
+        if not changed:
+            console.print(f"No published charts changed in the last {changed_since} day(s).")
+            return
+        # Order by readership so a cap keeps the charts that matter.
+        ranked = _pageviews(0)
+        by_views = dict(zip(ranked.slug, ranked.views_365d))
+        changed.sort(key=lambda s: -by_views.get(s, 0))
+        console.print(f"[bold]{len(changed)} published charts changed in the last {changed_since} day(s)[/bold]")
+        targets = [(s, int(by_views.get(s, 0)), params) for s in changed[: top or len(changed)]]
+    else:
+        targets = _expand_mdims(_select(slugs, sample, top, min_views, seed, params), mdim_views, seed)
     console.print(
         f"[bold]Reviewing {len(targets)} charts[/bold] with {model}"
         f"{' (no renders)' if no_image else ''}"
@@ -475,7 +521,7 @@ def cli(
                 console.print(f"  [dim]○ {r['slug']} — {r['status']}[/dim]")
 
     results.sort(key=lambda r: (-len(r["issues"]), -r["views"]))
-    _print_summary(results, model)
+    incomplete_run = _print_summary(results, model)
 
     if json_out:
         json_out.write_text(json.dumps(results, indent=1))
@@ -483,6 +529,35 @@ def cli(
     if output:
         report.write(results, output, model=model)
         console.print(f"report → {output}")
+
+    if digest_out:
+        state = digest.load_state()
+        fresh = digest.new_findings(results, state)
+        incomplete = sum(1 for r in results if r["status"].startswith(("bundle failed", "review failed")))
+        message = digest.format_slack(
+            fresh,
+            reviewed=len(results),
+            candidates=len(targets),
+            incomplete=incomplete,
+            window_days=changed_since,
+        )
+        digest_out.write_text(message)
+        if message:
+            digest.save_state(digest.stamp(fresh, state))
+            console.print(f"\n[bold]digest ({len(fresh)} new finding(s)) → {digest_out}[/bold]")
+            console.print(message)
+        else:
+            already = sum(len(r["issues"]) for r in results)
+            console.print(
+                f"\n[dim]nothing new to post — {already} finding(s), all previously reported[/dim]"
+                if already
+                else "\n[dim]nothing new to post — no findings[/dim]"
+            )
+
+    # Exit non-zero only once every output exists. Exiting inside the summary meant a single
+    # failed chart suppressed the digest and its state, so the next run re-posted everything.
+    if incomplete_run:
+        raise SystemExit(2)
 
 
 def _evaluate(model: str, with_image: bool, repeat: int, use_cache: bool, ttl_hours: float) -> None:
@@ -540,7 +615,8 @@ def _evaluate(model: str, with_image: bool, repeat: int, use_cache: bool, ttl_ho
         raise SystemExit(1)
 
 
-def _print_summary(results: list[dict[str, Any]], model: str) -> None:
+def _print_summary(results: list[dict[str, Any]], model: str) -> bool:
+    """Print the run summary. Returns True when charts were left unreviewed."""
     flagged = [r for r in results if r["issues"]]
     issues: list[dict[str, Any]] = [i for r in flagged for i in r["issues"]]
     cost = sum(r["cost"] for r in results)
@@ -622,5 +698,4 @@ def _print_summary(results: list[dict[str, Any]], model: str) -> None:
         "\n[dim]Every finding is a claim to check, not a verdict: confirm it against the data before "
         "filing anything, and remember an error in an indicator affects every chart using it.[/dim]"
     )
-    if failed:
-        raise SystemExit(2)
+    return bool(failed)
