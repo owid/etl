@@ -1,0 +1,32 @@
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Animal Welfare
+
+tables:
+  chick_culling_laws:
+    variables:
+      status:
+        title: Banning of chick culling
+        unit: ""
+        short_unit: ""
+        processing_level: major
+        description_short: Legal status of the culling of male chicks in the egg industry.
+        description_key:
+          - Chick culling is the killing of newly hatched male chicks, which cannot lay eggs.
+          - Hens that lay eggs come from different breeds than chickens raised for meat (called "broilers"). The male chicks of egg-laying breeds grow more slowly and give less meat than broilers, so raising them is not profitable.
+          - Billions of male baby chicks are estimated to be killed around the world every year.
+          - This data shows the legal status of chick culling, not how widely it is practiced.
+          - Bans in Austria and France still allow the killing of baby chicks that are used as animal feed.
+          - Bans prohibit killing chicks within the country, but not exporting them. After Germany's ban, male chicks have reportedly been transported to other countries where culling remains legal.
+          - There is no EU-wide ban on chick culling. The European Commission has committed to proposing EU-wide rules to end the systematic killing of male chicks by the end of 2026.
+          - The main alternative to chick culling is "in-ovo sexing", a technology that determines the sex of the embryo inside the egg, so that eggs with male embryos can be discarded well before hatching.
+          - Ducklings are also killed soon after hatching in major duck-egg producing countries like China. No law specifically bans the culling of ducklings.
+          - France's ban on chick culling explicitly excludes ducklings. In foie gras production it is the female ducklings that are killed, as their livers are less profitable.
+        description_processing: |-
+          Countries for which we found no law on chick culling are shown as "Not banned". Chick culling bans are notable legislative events that animal advocacy organizations track closely, so a country with no known law can safely be assumed to have no ban.

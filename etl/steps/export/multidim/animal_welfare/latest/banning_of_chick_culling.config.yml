@@ -12,8 +12,8 @@ views:
         - "chick_culling_laws#status"
     config:
       title: "Which countries have banned chick culling?"
-      subtitle: "Chick culling is the process of separating and killing unwanted male and unhealthy female chicks that cannot produce eggs in industrialized egg facilities."
-      note: "In Switzerland grinding is banned but gassing is still allowed. Belgium has only a regional ban."
+      subtitle: "Chick culling is the routine killing of newly hatched male chicks, which cannot lay eggs and are of no commercial value to the egg industry."
+      note: "In Switzerland grinding is banned but gassing is still allowed. Belgium has only regional measures."
       originUrl: "/animal-welfare"
       tab: "map"
       hasMapTab: true
@@ -25,9 +25,10 @@ views:
         colorScale:
           baseColorScheme: "BinaryMapPaletteA"
           customNumericColorsActive: true
+          # Colors per plain status; the accompanying .py step expands them into one entry per
+          # status-year value found in the data (e.g. "Banned (2023)"), relabeled back to the plain status.
           customCategoryColors:
-            Banned: "#4881c6"
-            "No laws": "#b6a28c"
-            "Not banned": "#ad9882"
-            "Partially banned": "#a084c1"
-            "Banned but not yet effective": "#3e94a1"
+            Banned: "#759ac8"
+            "Not banned": "#ae2e3f"
+            "Partially banned": "#a46f49"
+            "Banned but not yet in effect": "#058580"
