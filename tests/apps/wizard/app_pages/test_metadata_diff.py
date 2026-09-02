@@ -2732,6 +2732,54 @@ def test_the_coverage_line_says_how_much_of_the_mdim_an_edit_reaches():
     assert coverage_line(views[:1], inferred, known_universe=False) == "metric: mean (1)"
 
 
+def test_a_blast_radius_link_focuses_one_edit_and_greys_the_rest():
+    """A card's grid link opens Blast radius on that edit alone: its views changed, the others still drawn.
+
+    Greyed, not dropped — what sits beside an edit on the grid is half of what the grid is for. The handle
+    in the link is short and stable, so the link can be pasted and still resolve on the next rerun.
+    """
+    from apps.wizard.app_pages.metadata_diff import view_nav
+    from apps.wizard.app_pages.metadata_diff.blast_section import _only_these_views, _view_keys
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, edit_slot, group_by_edit
+
+    views = [
+        ViewDiff(dimensions={"m": "mean"}, fields={"titlePublic": {"old": "a", "new": "b"}}),
+        ViewDiff(dimensions={"m": "median"}, fields={"titlePublic": {"old": "a", "new": "c"}}, is_new=True),
+    ]
+    reach = ChangeReach(
+        field="titlePublic",
+        old="a",
+        new="b",
+        mdims=[{"catalogPath": "grapher/a/latest/x#x", "n_views": 1, "is_draft": False, "views": [{"m": "mean"}]}],
+    )
+    keep = _view_keys([reach], "mdims", "catalogPath")["grapher/a/latest/x#x"]
+    kept = _only_these_views(views, keep)
+    assert [v.changed for v in kept] == [True, False]
+    assert kept[1].dimensions == {"m": "median"}, "still on the grid, just not highlighted"
+    assert views[1].changed, "the cached diffs themselves are untouched"
+
+    (edit,) = group_by_edit([reach])
+    slot = edit_slot(edit)
+    assert len(slot) == 12 and slot == edit_slot(edit)
+    assert view_nav.blast_edit_link(slot) == f"?diff-type=blast&blast-group=dimensions&blast-edit={slot}"
+
+    # The MDims card holds the edit scoped to MDims; Blast radius holds it whole, with the chart text too.
+    # The link from one has to find the other, so the handle cannot depend on which texts came along.
+    from apps.wizard.app_pages.metadata_diff.discovery import edits_for
+
+    on_a_chart = ChangeReach(
+        field="titlePublic",
+        old="x a",
+        new="x b",
+        charts=[{"chartId": 1, "slug": "gdp", "has_data_page": True}],
+        catalog_paths={"grapher/b/latest/y#y"},
+    )
+    whole = group_by_edit([reach, on_a_chart])
+    (scoped,) = edits_for(Summary(reach=[reach, on_a_chart]), "mdims")
+    assert len(whole) == 1 and scoped.n_texts == 1 and whole[0].n_texts == 2
+    assert edit_slot(scoped) == edit_slot(whole[0])
+
+
 def test_a_section_is_done_along_whichever_layout_the_reviewer_took():
     """Ticking every view, or every edit, finishes a section; the two are never added up.
 

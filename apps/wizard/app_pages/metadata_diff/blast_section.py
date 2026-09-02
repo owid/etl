@@ -21,6 +21,7 @@ each MDim's views, which is why it stops at `MAX_TREE_MDIMS`.
 """
 
 import html
+from dataclasses import replace
 from typing import Any
 from urllib.parse import quote, urlencode
 
@@ -29,9 +30,15 @@ import streamlit.components.v1 as components
 from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
-from apps.wizard.app_pages.metadata_diff import cached
+from apps.wizard.app_pages.metadata_diff import cached, view_nav
 from apps.wizard.app_pages.metadata_diff.core import ViewDiff, diff_window_html, field_label, view_url
-from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, EditGroup, group_by_edit, reach_by_surface
+from apps.wizard.app_pages.metadata_diff.discovery import (
+    ChangeReach,
+    EditGroup,
+    edit_slot,
+    group_by_edit,
+    reach_by_surface,
+)
 from apps.wizard.app_pages.metadata_diff.edits_view import CONTEXT_CSS, st_edit_body
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
@@ -43,7 +50,10 @@ from apps.wizard.app_pages.metadata_diff.render import (
 from apps.wizard.app_pages.metadata_diff.tree import render_multi_tree_html
 from apps.wizard.utils.components import url_persist
 
-GROUP_KEY = "blast-group"
+GROUP_KEY = view_nav.BLAST_GROUP_KEY
+# One edit to focus on, set by a By-edit card's grid link: its views are highlighted and every other view
+# is drawn as unchanged, so the grid answers "where does *this* land" rather than "where does the branch".
+EDIT_KEY = view_nav.BLAST_EDIT_KEY
 # The MDim a reader arrived here to see — set by the MDim cards' "🌳 Dimension tree" button and
 # carried by `_mdim_tree_url`. Read from the URL so the link is shareable, and drawn first so
 # MAX_TREE_MDIMS can never be what drops the one MDim somebody asked for.
@@ -74,6 +84,11 @@ def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
         return
 
     edits = group_by_edit(reach)
+    focus = _requested_edit(edits)
+    if focus is not None:
+        # One edit only, at the request of a card elsewhere: its texts, its pages, its views highlighted.
+        edits, reach = [focus], focus.changes
+        _st_focus_banner(focus)
     # Pages are counted from the inverted view, so a page rendering two of these texts counts once.
     # Summing each text's reach gave a larger number for the same data, which is what made "11 changes"
     # read as eleven things to review when one sentence had been written.
@@ -126,7 +141,7 @@ def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
     if grouping == "dimensions":
         # Last thing on the page, deliberately: the component resizes its own iframe to fit its content,
         # and Streamlit-rendered siblings below it overlap while that happens.
-        _dimension_tree(source_engine, target_engine, reach)
+        _dimension_tree(source_engine, target_engine, reach, focused=focus is not None)
     else:
         _tree(edits)
 
@@ -305,14 +320,23 @@ def _requested_first(affected: list[str]) -> list[str]:
     return [requested] + [cp for cp in affected if cp != requested]
 
 
-def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[ChangeReach]) -> None:
+def _dimension_tree(
+    source_engine: Engine, target_engine: Engine, reach: list[ChangeReach], focused: bool = False
+) -> None:
     """Every affected MDim on its dimension grid, with the charts as one more branch.
 
     One component holding all of them rather than one component each: a component sizes its own iframe and
     would overlap whatever Streamlit renders after it, so they cannot be stacked. Its cost is one view
     diff per MDim, which is why it stops at MAX_TREE_MDIMS and says so instead of drawing forever.
+
+    `focused` means `reach` is one edit's texts: only the views those land on are drawn as changed. The
+    other changed views of the same MDim are still on the grid, greyed, because what sits beside an edit is
+    half of what the grid is for.
     """
-    explorer_hierarchy = _explorer_hierarchy(source_engine, target_engine)
+    focus_mdims = _view_keys(reach, "mdims", "catalogPath") if focused else None
+    explorer_hierarchy = _explorer_hierarchy(
+        source_engine, target_engine, _view_keys(reach, "explorers", "slug") if focused else None
+    )
     affected = _requested_first(sorted({str(m["catalogPath"]) for r in reach for m in r.mdims}))
     if not affected:
         st.caption("No MDim renders any of these changes, so there is no MDim grid to draw.")
@@ -343,6 +367,8 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
         )
         if not view_diffs:
             continue
+        if focus_mdims is not None:
+            view_diffs = _only_these_views(view_diffs, focus_mdims.get(catalog_path, set()))
 
         ids = sorted({v.indicator_id for v in view_diffs if v.affects_indicator and v.indicator_id is not None})
         usage = cached.usage_for_indicators(tuple(ids), catalog_path, source_engine, cache_key=cache_key)
@@ -395,7 +421,9 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
     components.html(tree_html, height=height, scrolling=False)
 
 
-def _explorer_hierarchy(source_engine: Engine, target_engine: Engine) -> dict[str, Any] | None:
+def _explorer_hierarchy(
+    source_engine: Engine, target_engine: Engine, focus: dict[str, set[tuple]] | None = None
+) -> dict[str, Any] | None:
     """The affected explorers as dimension grids, a hierarchy beside the MDims — or nothing, when none are.
 
     An explorer view is addressed by dimensions exactly as an MDim view is, so the same grid answers the
@@ -413,8 +441,15 @@ def _explorer_hierarchy(source_engine: Engine, target_engine: Engine) -> dict[st
 
     titles = cached.explorer_titles(source_engine)
     sections = []
-    for slug in sorted(branch)[:MAX_TREE_EXPLORERS]:
+    # Focused on one edit, only the explorers it reaches are drawn, and only the views it lands on: an
+    # explorer grid has no unchanged views to grey, so the views of other edits are left out instead.
+    slugs = sorted(branch) if focus is None else sorted(s for s in branch if s in focus)
+    for slug in slugs[:MAX_TREE_EXPLORERS]:
         diffs = [d for d in branch[slug] if d.changed] or branch[slug]
+        if focus is not None:
+            diffs = [d for d in diffs if _key(d.dimensions) in focus[slug]]
+            if not diffs:
+                continue
         dimensions = _explorer_dimensions(diffs)
         if not dimensions:
             continue
@@ -431,7 +466,7 @@ def _explorer_hierarchy(source_engine: Engine, target_engine: Engine) -> dict[st
     if not sections:
         return None
 
-    dropped = sorted(branch)[MAX_TREE_EXPLORERS:]
+    dropped = slugs[MAX_TREE_EXPLORERS:]
     label = f"{len(sections)} explorer{'s' if len(sections) != 1 else ''}"
     if dropped:
         label += f" · not drawn: {', '.join(dropped)}"
@@ -637,6 +672,63 @@ def _chart_reach(reach: list[ChangeReach], badged: set) -> None:
                 "a view whose shared metadata changed."
             )
             render_chart_list(in_grid, verb="share an indicator with a changed view")
+
+
+def _requested_edit(edits: list[EditGroup]) -> EditGroup | None:
+    """The one edit a By-edit card sent the reader here to see, or None for the whole branch.
+
+    A handle that matches nothing — the edit was reverted, or the link is from another branch — is dropped
+    with a caption rather than left to show an empty grid under a focus banner.
+    """
+    slot = str(st.query_params.get(EDIT_KEY) or st.session_state.get(EDIT_KEY) or "").strip()
+    if not slot:
+        return None
+    focus = next((e for e in edits if edit_slot(e) == slot), None)
+    if focus is None:
+        _clear_focus()
+        st.caption("The edit this link pointed at is no longer in the diff, so this shows every edit.")
+    return focus
+
+
+def _st_focus_banner(edit: EditGroup) -> None:
+    """Say that the page is about one edit, and offer the way back to all of them."""
+    words = edit.inserted or edit.deleted or "whitespace only"
+    words = words if len(words) <= 90 else words[:87].rstrip() + "…"
+    col_text, col_button = st.columns([5, 1], vertical_alignment="center")
+    with col_text:
+        st.info(
+            f"Showing **one edit**: **{field_label(edit.field)}** — “{words}”. Only the views it lands on count "
+            "as changed; the other changed views of the same MDims are greyed, behind each grid's *Show all views*."
+        )
+    with col_button:
+        st.button("Show every edit", key="mdd-blast-unfocus", on_click=_clear_focus, width="stretch")
+
+
+def _clear_focus() -> None:
+    st.query_params.pop(EDIT_KEY, None)
+    st.session_state.pop(EDIT_KEY, None)
+
+
+def _key(dims: dict[str, str]) -> tuple:
+    return tuple(sorted(dims.items()))
+
+
+def _view_keys(reach: list[ChangeReach], kind: str, name: str) -> dict[str, set[tuple]]:
+    """Per MDim (or explorer), the dimension keys of every view these texts land on."""
+    out: dict[str, set[tuple]] = {}
+    for r in reach:
+        for entry in getattr(r, kind):
+            out.setdefault(str(entry[name]), set()).update(_key(v) for v in entry.get("views") or [])
+    return out
+
+
+def _only_these_views(view_diffs: list[ViewDiff], keep: set[tuple]) -> list[ViewDiff]:
+    """The same grid, with only `keep` drawn as changed — the rest greyed, not dropped.
+
+    A view outside the focus loses its fields for display, so the grid's counters and highlights count
+    only the edit in focus, while the view itself stays on the grid where it belongs.
+    """
+    return [v if _key(v.dimensions) in keep else replace(v, fields={}, is_new=False) for v in view_diffs]
 
 
 def _truncation_note(total: int) -> None:

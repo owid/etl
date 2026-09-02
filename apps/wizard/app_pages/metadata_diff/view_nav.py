@@ -21,6 +21,9 @@ MDIM_VIEWS_KEY = "mdim-views"
 MDIM_DIM_PREFIX = "dim-"
 EXPLORER_VIEWS_KEY = "explorer-views"
 EXPLORER_DIM_PREFIX = "edim-"
+# Blast radius: how it groups, and — set by a By-edit card — the one edit to focus on.
+BLAST_GROUP_KEY = "blast-group"
+BLAST_EDIT_KEY = "blast-edit"
 
 
 def mdim_view_link(catalog_path: str, dims: dict[str, str] | None = None) -> str:
@@ -39,6 +42,11 @@ def explorer_view_link(slug: str, dims: dict[str, str] | None = None) -> str:
     params = {"diff-type": "explorers", EXPLORER_VIEWS_KEY: slug}
     params.update({EXPLORER_DIM_PREFIX + key: value for key, value in (dims or {}).items()})
     return "?" + urlencode(params)
+
+
+def blast_edit_link(slot: str) -> str:
+    """Blast radius, on the dimension grid, showing one edit: its views highlighted, everything else greyed."""
+    return "?" + urlencode({"diff-type": "blast", BLAST_GROUP_KEY: "dimensions", BLAST_EDIT_KEY: slot})
 
 
 def matches(view: ViewDiff, selection: dict[str, str]) -> bool:

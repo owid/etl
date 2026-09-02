@@ -15,6 +15,7 @@ Indicators are matched across environments by **catalogPath, not id**: a version
 mints fresh ids on staging, so id-matching would report every indicator of that dataset as changed.
 """
 
+import hashlib
 import json
 import re
 from collections.abc import Callable
@@ -1485,6 +1486,16 @@ def edit_key(edit: EditGroup) -> str:
     """
     paths = sorted({p for change in edit.changes for p in (change.catalog_paths or set())})
     return json.dumps([edit.field, edit.deleted, paths], ensure_ascii=False)
+
+
+def edit_slot(edit: EditGroup) -> str:
+    """A short, URL-safe handle for one edit — the same on every rerun, so a link to it can be pasted.
+
+    Hashed from the words alone, not from `edit_key`: a section's card holds the edit scoped to its own
+    surface, while Blast radius holds it whole, and the two carry different texts and datasets. The words
+    inserted and deleted are what `group_by_edit` keys on, so they are the one thing both agree about.
+    """
+    return hashlib.sha1(json.dumps([edit.field, edit.inserted, edit.deleted]).encode()).hexdigest()[:12]
 
 
 def edit_fields(edit: EditGroup) -> dict[str, dict[str, Any]]:

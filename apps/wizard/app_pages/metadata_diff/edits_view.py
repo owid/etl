@@ -31,7 +31,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     where_note,
 )
 from apps.wizard.app_pages.metadata_diff.data import load_reviews
-from apps.wizard.app_pages.metadata_diff.discovery import EditGroup, edit_fields, edit_key, edits_for
+from apps.wizard.app_pages.metadata_diff.discovery import EditGroup, edit_fields, edit_key, edit_slot, edits_for
 from apps.wizard.app_pages.metadata_diff.render import render_chart_list, st_note
 from apps.wizard.app_pages.metadata_diff.review_state import resolve_item_mark, st_review_strip, surface_key
 
@@ -86,6 +86,7 @@ def st_edit_cards(source_engine: Engine, target_engine: Engine, summary: Any, se
             mark = resolve_item_mark(recorded, surface, edit_key(edit), edit_fields(edit))
             st_review_strip(source_engine, surface, mark)
             st_edit_body(edit)
+            st.markdown(_grid_link(edit), unsafe_allow_html=True)
             paths = {p for change in edit.changes for p in (change.catalog_paths or set())}
             note = where_note(edit.field, paths, edit.n_texts)
             if note:
@@ -128,6 +129,20 @@ def st_edit_body(group: EditGroup) -> None:
             f"{diff_window_html(exemplar.old, exemplar.new, max_chars=300)}</div>",
             unsafe_allow_html=True,
         )
+
+
+def _grid_link(edit: EditGroup) -> str:
+    """The diagram for this one edit: Blast radius focused on it. In this tab, like every review link."""
+    href = html.escape(view_nav.blast_edit_link(edit_slot(edit)))
+    if any(change.mdims or change.explorers for change in edit.changes):
+        return (
+            f'<span class="mdd-note">🌳 <a href="{href}" target="_self">See this edit on the dimension grid</a> '
+            "— its views highlighted on every MDim and explorer it reaches, with the charts beside them.</span>"
+        )
+    return (
+        f'<span class="mdd-note">💥 <a href="{href}" target="_self">See this edit in Blast radius</a> '
+        "— every chart it reaches, on its own.</span>"
+    )
 
 
 def _st_landing(source_engine: Engine, target_engine: Engine, edit: EditGroup, section: str) -> None:
