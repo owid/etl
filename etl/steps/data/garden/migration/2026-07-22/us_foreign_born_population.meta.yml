@@ -144,11 +144,11 @@ tables:
 
           Each value is the average annual change during one decade: the 1850s value covers the change between the 1850 and 1860 censuses. The value for the current decade only averages the years available so far.
 
-          {definitions.change_comparability_decade}
-
           {definitions.who_counts}
 
           {definitions.sources}
+
+          {definitions.change_comparability_decade}
 
           {definitions.caveats}
 
@@ -171,11 +171,11 @@ tables:
 
           Each value is the average annual change during one decade: the 1850s value covers the change between the 1850 and 1860 censuses. The value for the current decade only averages the years available so far.
 
-          {definitions.change_comparability_decade}
-
           {definitions.who_counts}
 
           {definitions.sources}
+
+          {definitions.change_comparability_decade}
 
           {definitions.caveats}
 
