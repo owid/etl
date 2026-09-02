@@ -12,13 +12,12 @@ This step harmonises that input into a single tidy time series for grapher:
   Enterprise) are dropped — they're a sub-split of Data Center, not separate
   top-level segments.
 - The quarter label (e.g. "Q4 FY26") is converted to NVIDIA's reported
-  fiscal-quarter end date (the last Sunday of Apr/Jul/Oct/Jan). For example,
+  fiscal-quarter end date, using their 52/53-week fiscal calendar. For example,
   Q4 FY26 -> 2026-01-25.
 - When a quarter appears in more than one source PDF, the most recent PDF wins.
 - Revenue is converted from millions to dollars.
 """
 
-import calendar
 import re
 from datetime import date, timedelta
 
@@ -54,6 +53,19 @@ DATA_CENTER_SUB_ROWS = {"Hyperscale", "AI Clouds, Industrial, & Enterprise"}
 
 EXPECTED_MEADOW_COLUMNS = {"source_pdf", "quarter", "segment", "revenue_millions"}
 
+# Quarter-end dates quoted verbatim from NVIDIA's own earnings releases, used to pin the
+# fiscal-calendar derivation below. The four Q1/Q2 entries are the cases where the naive
+# "last Sunday of the month" rule was wrong by a week.
+PUBLISHED_QUARTER_ENDS = {
+    (2017, 1): date(2016, 5, 1),
+    (2022, 1): date(2021, 5, 2),
+    (2022, 2): date(2021, 8, 1),
+    (2023, 1): date(2022, 5, 1),
+    (2026, 4): date(2026, 1, 25),
+    (2027, 1): date(2026, 4, 26),
+    (2027, 2): date(2026, 7, 26),
+}
+
 
 def _parse_quarter(label: str) -> tuple[int, int]:
     """Parse 'Q4 FY26' or 'Q4FY26' into (fiscal_quarter, fiscal_year_4digit)."""
@@ -63,22 +75,32 @@ def _parse_quarter(label: str) -> tuple[int, int]:
     return int(m.group(1)), 2000 + int(m.group(2))
 
 
-def _fiscal_quarter_end(fiscal_year: int, fiscal_quarter: int) -> date:
-    """Last Sunday of NVIDIA's fiscal quarter end month (Apr/Jul/Oct/Jan)."""
-    quarter_end_month = {1: 4, 2: 7, 3: 10, 4: 1}
-    month = quarter_end_month[fiscal_quarter]
-    cal_year = fiscal_year if fiscal_quarter == 4 else fiscal_year - 1
-    last_day = calendar.monthrange(cal_year, month)[1]
-    d = date(cal_year, month, last_day)
+def _last_sunday_of_january(year: int) -> date:
+    """NVIDIA's fiscal year end: the last Sunday in January of that fiscal year."""
+    d = date(year, 1, 31)
     while d.weekday() != 6:  # 6 = Sunday
         d -= timedelta(days=1)
     return d
+
+
+def _fiscal_quarter_end(fiscal_year: int, fiscal_quarter: int) -> date:
+    """NVIDIA's reported fiscal-quarter end date.
+
+    Quarters are 13-week blocks counted from the previous fiscal year end, *not* simply the last
+    Sunday of Apr/Jul/Oct/Jan. The two rules diverge by a week in the year after a 53-week fiscal
+    year: NVIDIA reported Q2 FY2022 as ending 2021-08-01, where the last-Sunday-of-July rule gives
+    2021-07-25. Q4 absorbs the 53rd week, so it always ends on the fiscal year end itself.
+    """
+    if fiscal_quarter == 4:
+        return _last_sunday_of_january(fiscal_year)
+    return _last_sunday_of_january(fiscal_year - 1) + timedelta(weeks=13 * fiscal_quarter)
 
 
 def run() -> None:
     ds_meadow = paths.load_dataset("nvidia_revenue")
     tb = ds_meadow.read("nvidia_revenue")
 
+    sanity_check_quarter_dates()
     sanity_check_inputs(tb)
 
     # Map each raw segment to its unified bucket; drop sub-segments not in the
@@ -116,6 +138,15 @@ def run() -> None:
 
     ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
     ds_garden.save()
+
+
+def sanity_check_quarter_dates() -> None:
+    """Pin the fiscal-calendar derivation to quarter ends NVIDIA actually published."""
+    for (fiscal_year, fiscal_quarter), published in PUBLISHED_QUARTER_ENDS.items():
+        derived = _fiscal_quarter_end(fiscal_year, fiscal_quarter)
+        assert derived == published, (
+            f"Q{fiscal_quarter} FY{fiscal_year}: derived {derived}, but NVIDIA reported {published}"
+        )
 
 
 def sanity_check_inputs(tb) -> None:
