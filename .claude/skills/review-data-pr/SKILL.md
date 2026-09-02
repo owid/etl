@@ -233,12 +233,15 @@ When the PR body (or `workbench/<short_name>/update-context.yml`) does reference
 
 `/update-dataset` step 7 asks the author to read the prose of every surface citing the dataset — articles, data
 insights, and especially titles — for quantitative claims the update invalidates. As reviewer, check the PR body
-records an outcome for it: either "no referencing prose makes an unbounded claim" **scoped to the surfaces swept,
-with the sweep's coverage gaps named** (`find-chart-references` prints them and writes them with `--gaps-json`; a
+records an outcome for it: either a clean verdict, or a named list of claims with what was decided (handed to
+content, or deliberately left with a reason). A clean verdict has to say three things to be acceptable: **what was
+checked** — no unbounded claim, and, on an update that revised any named period (a restatement, a corrected date),
+no bounded claim touching a revised observation; the outcome must state which kind of update it was, since on an
+append-only update bounded claims are out of scope; **what was swept** — the surfaces from `find-chart-references`;
+and **what was not** — the sweep's coverage gaps (the script prints them and writes them with `--gaps-json`; a
 chart nested in an article layout container, or a data insight holding its chart outside `grapher-url`, can be
-missing from its list), or a named list of claims with what was decided (handed to content, or deliberately left
-with a reason). A blanket "nothing stale" with no scope is the first failure mode below in mild form — ask what
-was swept.
+missing from its list). A blanket "nothing stale" with none of that is the first failure mode below in mild form —
+ask what was checked and swept.
 
 Two ways this goes wrong, both worth a 🟡:
 
