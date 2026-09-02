@@ -279,6 +279,20 @@ def adjust_dimensions(tb):
     return tb
 
 
+def _description_key_as_list(description_key) -> list[str]:
+    # `description_key` may be the new free-form markdown string or a legacy list of bullets
+    # (see owid.catalog.core.meta.description_key_to_string). Normalize to a list of bullets so
+    # the list-based logic below keeps working.
+    if description_key is None:
+        return []
+    if isinstance(description_key, list):
+        return description_key
+    text = description_key.strip()
+    if text.startswith("- "):
+        return [item.strip() for item in text[2:].split("\n- ")]
+    return [text]
+
+
 def _set_description_key(view, tb):
     if view.d.conflict_type in ("all", "all_stacked"):
         column = "number_deaths_ongoing_conflicts__conflict_type_all"
@@ -290,11 +304,11 @@ def _set_description_key(view, tb):
         column = "number_deaths_ongoing_conflicts__conflict_type_non_state_conflict"
     else:
         return []
-    keys = tb[column].m.description_key
+    keys = _description_key_as_list(tb[column].m.description_key)
 
     if (view.d.estimate == "best_ci") or (view.d.indicator == "num_conflicts"):
         assert keys[-1].startswith('We show here the "best" death')
-        keys = keys[:-1] + [None]
+        keys = keys[:-1]
 
     return keys
 
@@ -355,7 +369,7 @@ def _set_subtitle(view):
                 # NOTE: update this on every stable/quarterly UCDP update — it must
                 # describe exactly which years are preliminary/incomplete in the
                 # preview dataset (see the checklist in the owid-issues template).
-                subtitle += " Data for 2026 is incomplete and includes deaths within the first quarter."
+                subtitle += " Data for 2026 is incomplete and includes deaths within the first half of the year."
             return subtitle
         elif view.d.indicator == "death_rate":
             return subtitle_template.format(placeholder=f", per 100,000 people. Included are {dod}")

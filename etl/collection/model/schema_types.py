@@ -6,7 +6,7 @@ Run `python scripts/generate_schema_types.py` to regenerate.
 
 Provides strongly-typed interfaces for:
 - View configuration (based on multidim-schema.json, resolving $refs against the
-  vendored schemas/grapher-schema.010.json — refresh it with --refresh)
+  vendored schemas/grapher-schema.011.json — refresh it with --refresh)
 - View metadata (based on dataset-schema.json)
 """
 
@@ -303,6 +303,7 @@ class _ViewConfigBase(TypedDict, total=False):
     hideSeriesLabels: bool
     hideTimeline: bool
     hideTotalValueLabel: bool
+    inapplicableEntityNames: list[str]
     includedEntityNames: list[str]
     internalNotes: str
     invertColorScheme: bool

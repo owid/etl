@@ -1,13 +1,16 @@
 ---
 name: map-explorer-to-mdim
 description: >-
-  Suggest a redirect mapping from a (soon-to-sunset) OWID explorer's views to the
-  views of one or more replacement MDIMs. Pulls explorer views and MDIM views from
-  the grapher DB, writes a CSV per source/target plus a wide joint proposal that
-  routes each explorer view to a target MDIM view, and flags when several explorer
-  views land on the same MDIM view. Trigger when the user says "map explorer <slug>
-  to mdim(s) <...>", "suggest explorer->MDIM redirects", "we're sunsetting the
-  <slug> explorer, map its views to the new multidims", or similar.
+  Take (soon-to-sunset) OWID explorers to redirected MDIMs, end to end. Maps each
+  explorer's views to the views of one or more replacement MDIMs, writes ONE
+  apply-ready JSON payload per explorer for the admin bulk-redirect endpoint, audits
+  every article that links or embeds each explorer (with the view each link will land
+  on) plus the featured metrics pointing at it, preflights every validation the endpoint
+  performs — including site redirects that would block it — and covers retiring the
+  explorer's ETL step afterwards.
+  Trigger when the user says "map explorer <slug> to mdim(s) <...>", "suggest
+  explorer->MDIM redirects", "we're sunsetting the <slug> explorer, map its views to
+  the new multidims", "redirect these explorers to MDIMs", or similar.
 metadata:
   internal: true
 ---
@@ -41,26 +44,26 @@ applies before running, and don't assume `.env.prod` exists:**
 
 1. **Staging branch** (often easiest): if you're on a `staging-site-<branch>` branch,
    `OWID_ENV` already points at that prod-clone DB — run the commands as-is, no prefix.
-2. **Production, read-only, via `.env.prod`**: prefix commands with
-   `ENV_FILE=.env.prod DATA_API_ENV=production`. **Only if `.env.prod` is present.**
+2. **Production, read-only, via an env file**: prefix commands with
+   `ENV_FILE=<prod creds> DATA_API_ENV=production`. Don't assume the file name — check
+   what exists (`ls -la .env*`); on some machines it is `.env.prod`, on others `.env.live`.
 3. **Some other credentials file**: the user may keep prod (or other) DB creds in a
    different env file — run with `ENV_FILE=<their file> [DATA_API_ENV=production]`.
 
 **Preflight — check, then ask if needed:**
 
 ```bash
-# Is .env.prod available?
-ls -la .env.prod 2>/dev/null && echo "found .env.prod" || echo "NO .env.prod"
+ls -la .env* 2>/dev/null          # which credentials files exist?
 
 # Connectivity test (swap the ENV_FILE prefix for whatever applies; drop it on a staging branch):
-ENV_FILE=.env.prod DATA_API_ENV=production .venv/bin/python -c \
+ENV_FILE=<prod creds> DATA_API_ENV=production .venv/bin/python -c \
   "from etl.config import OWID_ENV; print('DB OK:', OWID_ENV.read_sql('SELECT 1 AS x').iloc[0,0])"
 ```
 
-If `.env.prod` is missing **and** you're not on a staging branch with the data, **stop
-and ask the user which credentials / env file to use** (e.g. "I don't see `.env.prod` —
-which env file holds DB credentials that can reach the explorer + MDIMs? Or should I run
-this from a staging branch?"). Then use that file as the `ENV_FILE=` prefix for both
+If no prod credentials file exists **and** you're not on a staging branch with the data,
+**stop and ask the user which credentials / env file to use** (e.g. "which env file holds DB
+credentials that can reach the explorer + MDIMs? Or should I run this from a staging
+branch?"). Then use that file as the `ENV_FILE=` prefix for both
 script invocations below. Don't hardcode credentials.
 
 If the connection works but a query returns nothing, the scripts stop with a clear
@@ -87,6 +90,9 @@ Writes into the out folder:
   the distinct values per dimension, each MDIM's dims/choices, auto-suggested value
   matches (where a slugified explorer value equals a real MDIM choice slug), and a
   ready-to-edit `mapping_rules.py` template.
+- `_sources.json` — machine-readable record of the explorer slug + dimension names and
+  each MDIM's short/prefix/catalogPath/dim-slugs. Consumed by `build_mapping.py` to emit
+  `mapping.json` (below); don't hand-edit it.
 
 ### 2. Write `mapping_rules.py`
 
@@ -101,6 +107,10 @@ Open `_scaffold.md`, then write `ai/<slug>-mdim-mapping/mapping_rules.py` defini
 - `translate(dims, mdim) -> dict` — return `{mdim_dim_slug: choice_slug}` for the target
   MDIM view, built from the `*_MAP` dicts. Only include slugs the MDIM actually has
   (e.g. economic_damages has no `metric` — single-choice dims are pruned from MDIM views).
+- *(optional)* `DEFAULT_MDIM = "<short>"` — the catch-all target for the bare explorer URL
+  (see `mapping.json` → `catchAll`). Omit it and the best-fitting MDIM is chosen automatically
+  (the one receiving the most resolved views; tie-break = earliest in `MDIMS`). Set it only
+  when the automatic pick isn't the MDIM you'd want a param-less explorer link to land on.
 
 The scaffold seeds the `*_MAP` dicts with `slugify(value)` guesses. **Verify every entry** —
 slugify won't catch label↔slug differences like `Decadal average`→`decadal`, `Injuries`→`injured`,
@@ -121,6 +131,84 @@ Writes `mapping_proposal.csv`, one row per explorer view:
 | `<mdim>_<dimslug>` … | wide block; only the **target** MDIM's columns are filled with the translated slugs |
 | `shared_target_explorer_ids` | when >1 explorer view lands on the same MDIM view, the comma-joined list of all those explorer ids (e.g. `1,12`); empty when the target is unique |
 
+It also writes **`mapping.json`** — the machine record — and
+**`admin_bulk_payload.json`**, which is what you actually apply. The API exists:
+`POST {admin}/api/multi-dim-redirects/bulk` (`handleBulkCreateMultiDimRedirects`), also
+reachable from the *Bulk-create redirects from JSON* button on `/admin/multi-dim-redirects`.
+This endpoint is the **only** way to apply an explorer redirect: the CSV CLI that
+`map-charts-to-mdim` hands over (`createMultiDimRedirectsFromCsv`) accepts an
+`/explorers/` source, but it writes no `sourceQueryParams` — so the row bakes as one
+unconditional rule and every view of the explorer 302s to a single MDIM view,
+per-view routing gone.
+Its Zod schema deliberately mirrors this file's `catchAll` + `redirects` shape, ignores keys
+it doesn't know (`sourceViewId`, `viewId`, `mdim`, `stats`, `targets`), and reports
+`target: null` entries as `skipped`.
+
+> **Post `admin_bulk_payload.json`, never `mapping.json`.** The payload has empty-valued
+> source dimensions stripped out. That is mandatory, not cosmetic: a condition is matched
+> against the incoming URL's params, and an absent param is not an empty string — so a
+> condition of `{"Period": ""}` can never match, and every view carrying one silently falls
+> through to the catch-all instead of its intended target. `mapping.json` keeps them because
+> it is the faithful record of the view grid.
+
+Unlike the CSV (positional `dimension_N` columns, meant for a spreadsheet), the JSON carries
+every identifier a redirect needs:
+
+```jsonc
+{
+  "explorer": { "slug": "...", "dimensions": ["<name>", ...] },
+  "targets":  [ { "mdim": "...", "catalogPath": "ns/v/short#short", "dimensions": ["<slug>", ...] } ],
+  "stats":    { "total": N, "resolved": N, "unresolved": N },
+  "catchAll": {                        // bare explorer URL (no query params) fallback
+    "source": { "explorerSlug": "..." },
+    "target": { "mdim": "...", "catalogPath": "ns/v/short#short",
+                "viewId": null, "dimensions": {} }   // no params → the MDIM's default view
+  },
+  "redirects": [
+    {
+      "sourceViewId": 1,
+      "source": { "explorerSlug": "...", "dimensions": { "<name>": "<value>", ... } },
+      "target": {                       // null when unresolved
+        "mdim": "...", "catalogPath": "ns/v/short#short",
+        "viewId": "A2",                 // internal id, cross-references the CSVs
+        "dimensions": { "<slug>": "<choiceSlug>", ... }
+      },
+      "sharedTargetSourceIds": [1, 29, 57],   // present only when >1 source shares this target
+      "unresolvedReason": "..."               // present only when target is null
+    }
+  ]
+}
+```
+
+The **source** view is identified by the explorer slug + dimension **name→display-value**
+(the explorer URL query params); the **target** view by the MDIM catalogPath + dimension
+**slug→choice-slug** (the MDIM URL query params). Unresolved views are kept with
+`target: null` so the API can see the full picture; a consumer typically skips them.
+
+> **An unresolved view is not a view left alone.** The endpoint reports `target: null` entries
+> as `skipped`, so they get no rule of their own — and the catch-all constrains no params, so
+> it matches them instead. Those URLs land on the target MDIM's **default** view, carrying the
+> explorer's own params into the grapher URL, rather than on anything equivalent to the view
+> that was asked for. Leaving views unresolved is a deliberate call (they may genuinely have no
+> MDIM counterpart), never a no-op; preflight reports the count so it gets made on purpose.
+
+**`catchAll` is always present**: it redirects the bare explorer URL (no query params) — and
+serves as the sensible fallback for any view a consumer doesn't route individually — to the
+best-fitting MDIM with **no query params**, which grapher renders as that MDIM's default view
+(hence `viewId: null`, `dimensions: {}`). The best-fitting MDIM is the one most views resolve
+to, or whatever `DEFAULT_MDIM` in `mapping_rules.py` overrides it to.
+
+> **The catch-all's destination is the only one nothing pins.** Its row stores
+> `viewConfigId = NULL`, so it resolves at request time to whichever view the MDIM renders for
+> an empty selection — the **first view in config order** (grapher's `filterToAvailableChoices`
+> takes the first available view's choice at every dimension). Rebuilding the MDIM can reorder
+> its views, or edit that view's config in place, and the bare explorer URL then lands somewhere
+> nobody reviewed. Extraction records that view in `_sources.json` (not in the payload, which
+> must stay byte-reproducible) and preflight **warns** when it moves. A warning, not a blocker:
+> the destination is a moving reference by construction, so blocking would flip an approved
+> catch-all to NOT READY on any unrelated MDIM rebuild. To pin it, give the catch-all an
+> explicit target view instead.
+
 The script prints a validation report: how many explorer views resolved, distinct MDIM
 views hit per MDIM, how many rows share a target, and **FLAGS** for any explorer view that
 didn't resolve to a real MDIM view (fix the rules and re-run until there are no flags).
@@ -128,8 +216,180 @@ didn't resolve to a real MDIM view (fix the rules and re-run until there are no 
 ### 4. Review
 
 Sanity-check the flagged rows and the judgment calls (approximate type matches, aggregate
-collapses, MDIM choices with no explorer source). The CSVs are typically pasted into a
-spreadsheet for a human reviewer / topic owner to confirm before redirects are created.
+collapses, MDIM choices with no explorer source). `/review-explorer-mdim-mapping` renders the
+pairs side by side with approve/flag controls for a topic owner; corrections go through
+`mapping_rules.py` and a rebuild, not the HTML.
+
+### 5. Audit what references the explorers (ALWAYS offer; run when the user says yes)
+
+```bash
+ENV_FILE=<prod creds> DATA_API_ENV=production .venv/bin/python \
+  .claude/skills/map-explorer-to-mdim/scripts/audit_references.py \
+  --mapping ai/<a>-mdim-mapping --mapping ai/<b>-mdim-mapping \
+  --out ai/<combined>-redirects
+```
+
+Writes `references.csv` + `references.md` across all the explorers in one pass. It resolves
+each referencing URL through the rules the payload would create, so every row says which view
+the reader lands on — and separates *the link had no params* from *the link names a choice the
+explorer has since dropped*, which lands on the MDIM's default view and needs authoring
+attention rather than a URL swap.
+
+**The timeline differs from the chart skill's, and this is the thing to say out loud:** an
+embedded explorer breaks the moment the redirect is **created**, not later at unpublish,
+because the embed renders by fetching the explorer page and parsing it. So the 🔴 rows are
+migrated *before* step 7, not after.
+
+The report also carries a **⭐ Featured metrics** section — the one surface where this skill's
+usual "a link survives the 302" reasoning inverts. A featured metric is a topic-page slot held by
+URL, resolved only when Algolia indexes, matching pathname *and* exact params against published
+records. So it does not survive: it empties silently, and cannot be re-added once the explorer is
+gone. Hence step 5b.
+
+### 5b. Swap the featured metrics (before the redirect — it cannot be undone after)
+
+Work the ⭐ section of `references.md`, by hand at `/admin/featured-metrics`. These are editorial
+slots, so ask whoever owns the topic before repointing their rail.
+
+Per row — add the MDIM view under the **same tag and income group**, drag it to the old ranking,
+delete the old row, then re-apply *boost in search* if it was on. One explorer view can hold
+several rows: the key is (URL, tag, income group). Full procedure:
+`docs/guides/data-work/redirect-to-mdims.md`.
+
+**Why here and not after step 7:** creating the redirect darkens the explorer on the spot, and
+adding a featured metric requires a *published* slug. Once the redirect exists, no replacement is
+accepted and no record of the ranking survives. Unlike an embed, which breaks visibly, this fails
+quietly. The replacement is the **bare MDIM view**, not the redirect target — the admin strips
+reader params on paste and never validates the dimension params.
+
+### 6. Preflight (read-only, gated)
+
+```bash
+ENV_FILE=<prod creds> DATA_API_ENV=production .venv/bin/python \
+  .claude/skills/map-explorer-to-mdim/scripts/preflight.py \
+  --mapping ai/<a>-mdim-mapping --mapping ai/<b>-mdim-mapping \
+  --out ai/<combined>-redirects [--record ai/<combined>-redirects/bulk_redirects.json]
+```
+
+Mirrors every validation the endpoint performs, per explorer — because it memoizes its
+source-side checks and re-throws the cached rejection, so **one source-level problem fails
+every entry for that explorer**. Blockers: the explorer path is already a site-redirect
+source, or the *target* of one (the chain case); the slug collides with a chart's old slug; a
+target MDIM is missing or unpublished; the target `/grapher/<slug>` is itself a redirect
+source; two views share a source condition; the view fingerprint no longer matches the live
+explorer; the payload was not built from the extraction sitting beside it; redirects already
+exist that differ from the payload; or embedded references are outstanding. A **missing**
+`references.csv` is a blocker too — "never looked" must not read like "looked and found
+nothing".
+
+Two of those checks exist because **nothing else ties the payload to the run that produced it**,
+and an aborted or skipped rebuild leaves a stale one in place. `build_mapping.py` writes
+`mapping_proposal.csv` and `mapping.json` *before* `admin_bulk_payload.json`, and aborts between
+them on duplicate conditions — so the artifacts a human reviews can describe one build while the
+payload about to be posted comes from another, with the fingerprint check none the wiser (it
+validates the extraction, not the rules). Preflight therefore checks both ends:
+
+- the payload's **source conditions** against `explorer_views.csv` + `_sources.json`, which
+  catches an extraction re-run with no rebuild at all;
+- the payload **as a whole** against the transform of the `mapping.json` beside it, which is
+  what catches a rebuild that aborted in between — including one where only the *targets*
+  changed, invisible to any source-side check.
+
+The reference gate is bound to live state the same way. `audit_references.py` records a
+`referenceDigests` entry per explorer in `references_manifest.json`; preflight re-runs the sweep
+and compares. Without that, the gate reads a CSV from an earlier run and cannot see a page that
+added an embed since, or an audit folder carried over from another migration — both of which
+would read as a clean audit while the redirect is about to break something live.
+
+It also records `mappingDigests`, binding the audit to the mapping its **advice** came from.
+Every replacement URL in `references.md` is derived from the mapping, so rebuilding the mapping
+with different targets invalidates that advice while the explorer's own references — and so the
+reference digest — stay identical. This is the one staleness with no second chance: an operator
+who repoints an embed at the wrong view leaves it no longer naming the explorer, so no later
+sweep can ever surface the mistake. Preflight blocks on it before the reference gate reports.
+
+!!! note "An audit folder predating a surface reads as drifted, and should"
+    The digest hashes the findings, so **adding a surface to `find-chart-references` invalidates
+    every recorded `referenceDigests`** — most recently when featured metrics were added.
+    Preflight blocks on an audit folder from before that, which is correct: it really is missing
+    rows. Re-run `audit_references.py` rather than reading it as a bug.
+
+**Unverifiable is a blocker, not a warning**, in all three cases — no extraction pair, no
+`mapping.json`, no reference digest. A warning does not reach the exit code, so `Ready` would
+print over a report stating in plain words that the payload's provenance is unknown. Re-running
+`extract_views.py` / `build_mapping.py` / `audit_references.py` is the cheap way to clear any of
+them; posting an artifact nothing backs is not.
+
+A retired explorer whose redirects are all live reports `DONE` and exits 0. That is the
+finished state, not an error. But retirement does not retire the **target** side: an MDIM that
+has since been unpublished, rebuilt, re-slugged or edited in place breaks redirects that are
+already in the DB, and no explorer row is left to notice it. So every target check runs for a
+retired explorer too, and a slug carrying any blocker is never reported `DONE`.
+
+Non-zero exit means **do not post anything**.
+
+### 7. Apply — the admin bulk endpoint (GATED, production)
+
+> [!WARNING]
+> **Creating the redirect darkens the explorer immediately.** It is checked on *every*
+> `/explorers/*` request, ahead of `env.ASSETS.fetch`, so it beats the baked explorer page and
+> any `_redirects` entry, and fires while the explorer is still published. There is no staged
+> rollout and no bulk undo — removal is one row at a time.
+
+Paste each `admin_bulk_payload.json` into *Bulk-create redirects from JSON* at
+`{admin}/multi-dim-redirects`, **one explorer at a time**. Read the response
+**positionally**: every `results[i].source` is the same `/explorers/<slug>` string, so index 0
+is the catch-all when present and index `i` is `redirects[i-1]`. Expect
+`created + skipped + errors == entries`.
+
+Then wait for the bake **plus ~2 minutes** (the redirect map is fetched with a 2-minute edge
+TTL) and verify:
+
+```bash
+curl -sI "https://ourworldindata.org/explorers/<slug>?<one view's params>" | grep -i "^HTTP/\|^location:"
+# expect 302 + location: /grapher/<mdim>?<view dims>
+```
+
+### 8. Retire the explorer, then its ETL step
+
+**The explorer is unpublished or deleted BY HAND in the admin.** Removing the ETL step does
+not unpublish it — the `explorers` row survives, so it keeps showing up in listings and
+search. Do not flip `isPublished` in the step's `.config.yml` and re-run hoping to achieve it;
+that is not the route (and no explorer config in the repo carries `isPublished: false`).
+
+Then remove the explorer's ETL footprint — and **never delete a step without archiving it**
+(see `CLAUDE.md`). Delete the step's `.py` **and its sibling `.config.yml`** (the periodic archive sweep only knows `.py`, which is why orphaned configs
+exist on disk today), remove the `dag/*.yml` entry, `make check`, **commit**; then run
+`.venv/bin/etl archive-dag` and commit `dag/archive/*.yml` separately, since it reads *committed*
+history. `git checkout` anything unrelated it sweeps in. Archive anything now orphaned
+upstream — a garden step that existed only to feed this explorer — in a second round. If any of
+those is a **migrated/backport dataset**, delete its now-orphaned
+`snapshots/backport/latest/dataset_<id>_*` mirror files too: archiving the DAG entry leaves them
+on disk, and nothing will point at them again.
+
+> **Grep before deleting a shared explorer data step.** Some are consumed **off-DAG**, by
+> scripts fetching their published catalog CSVs by URL. Those consumers are invisible to
+> `.venv/bin/etl archive-dag`, so the step looks like a safe leaf when it is not. Search for its catalog
+> URL first and keep it until every consumer is retired.
+
+Track these steps with `TodoWrite` in the chat. **Do not generate a checklist file**, and
+there is no `HANDOFF.md` for this skill — unlike the chart path there is no cross-team
+handoff, since the same operator pastes the payload.
+
+## What each run writes
+
+| file | written by | contents |
+|---|---|---|
+| `explorer_views.csv` | extract | `id` 1..N + `dimension_1..M` (display values) |
+| `multidim_<short>_views.csv` | extract | one per MDIM, ids `A1…`/`B1…` |
+| `_scaffold.md` | extract | dimension legend, distinct values, auto-matches, `mapping_rules.py` template |
+| `_sources.json` | extract | slugs, catalogPaths, MDIM ids/slugs/published, **`viewsFingerprint`**, `configMd5` — don't hand-edit |
+| `mapping_rules.py` | **you** | routing + value translation |
+| `mapping_proposal.csv` | build | one row per explorer view, wide target block |
+| `mapping.json` | build | faithful machine record (empty source dims **kept**) |
+| **`admin_bulk_payload.json`** | build | **the apply unit** — one per explorer, paste into the admin modal |
+| `references.csv` / `references.md` | audit | combined across explorers, in `--out` |
+| `bulk_redirects.json` | preflight `--record` | combined record; **not postable** |
 
 ## Notes & gotchas
 
@@ -144,4 +404,26 @@ spreadsheet for a human reviewer / topic owner to confirm before redirects are c
   aggregate). Nothing redirects to those — fine, just confirm.
 - Explorer dimension columns stay `dimension_1..N` (compact, and joinable to the explorer CSV);
   the name legend lives in `_scaffold.md` and in `EXPLORER_DIMENSIONS`.
-- Re-running `extract_views.py` overwrites the CSVs but **not** your `mapping_rules.py`.
+- Re-running `extract_views.py` overwrites the CSVs and `_sources.json` but **not** your `mapping_rules.py`.
+- `mapping.json` needs `_sources.json`; if you extracted before this output existed, just
+  re-run `extract_views.py` once (it preserves `mapping_rules.py`), then `build_mapping.py`.
+- **One payload per explorer is a correctness requirement**, not a convention: the endpoint's
+  schema has a single `catchAll`, so a merged file would silently drop all but one.
+- **There is no bulk delete** — only `DELETE /api/multi-dims/:id/redirects/:redirectId`, one
+  row at a time. A 460-row batch posted wrongly is expensive to undo, which is why the
+  preflight exists.
+- **Explorer redirects never reach `_redirects`** (`getRecentMultiDimRedirects` excludes
+  non-`/grapher/` sources), so there is no static-redirect fallback and no one-week window —
+  they live only in the baked redirect map.
+- **Matched source params are deleted from the outgoing URL and unmatched ones leak through.**
+  The target view's params win; `country=`, `time=`, `tab=` ride through untouched, which is
+  what a reader following an old link wants.
+- **An explorer view's id is positional row order** — a re-saved TSV renumbers every id that
+  `mapping_proposal.csv`, the review HTML and `sourceViewId` key on. That is what
+  `viewsFingerprint` detects; `configMd5` is only a secondary signal, since it flips on any
+  FAUST edit and gating on it would force a needless re-review.
+- **Algolia keeps indexing the explorer** until the next index build, so it can still appear
+  in site search after the redirect exists.
+- **Retiring the explorer row itself is separate** from the redirect: deleting it makes
+  `linkedChart` unresolvable, so `Chart` blocks render nothing and tiles vanish. The five
+  WB/WID inequality explorers migrated in July are the worked example.

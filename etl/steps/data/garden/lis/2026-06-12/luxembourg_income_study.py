@@ -122,6 +122,7 @@ def run() -> None:
     tb_incomes = ds_meadow.read("incomes")
     tb_inequality = ds_meadow.read("inequality")
     tb_relative_poverty = ds_meadow.read("relative_poverty")
+    tb_percentiles = ds_meadow.read("percentiles")
 
     #
     # Process data.
@@ -131,11 +132,13 @@ def run() -> None:
     tb_incomes = paths.regions.harmonize_names(tb=tb_incomes, warn_on_unused_countries=False)
     tb_inequality = paths.regions.harmonize_names(tb=tb_inequality)
     tb_relative_poverty = paths.regions.harmonize_names(tb=tb_relative_poverty)
+    tb_percentiles = paths.regions.harmonize_names(tb=tb_percentiles, warn_on_unused_countries=False)
 
     tb_absolute_poverty = process_poverty(tb=tb_absolute_poverty, absolute=True)
     tb_relative_poverty = process_poverty(tb=tb_relative_poverty, absolute=False)
     tb_inequality = process_inequality(tb=tb_inequality)
     tb_incomes = process_incomes(tb=tb_incomes)
+    tb_percentiles = process_percentiles(tb=tb_percentiles)
 
     tb_incomes = add_period_dimension(tb=tb_incomes)
 
@@ -152,6 +155,10 @@ def run() -> None:
         tb_incomes=tb_incomes,
         tb_poverty=tb_poverty,
     )
+    sanity_check_percentiles(tb_percentiles)
+
+    # Add the period dimension (day, month, year) to the annual thresholds, after the sanity check.
+    tb_percentiles = add_period_dimension_percentiles(tb=tb_percentiles)
 
     # Improve table format.
     tb_poverty = tb_poverty.format(
@@ -161,16 +168,22 @@ def run() -> None:
         ["country", "year", "welfare_type", "equivalence_scale", "decile", "period"], short_name="incomes"
     )
     tb_inequality = tb_inequality.format(["country", "year", "welfare_type", "equivalence_scale"])
+    tb_percentiles = tb_percentiles.format(
+        ["country", "year", "welfare_type", "equivalence_scale", "percentile", "period"], short_name="percentiles"
+    )
 
     #
     # Save outputs.
     #
     # Initialize a new garden dataset.
+    # NOTE: tb_percentiles is intentionally NOT propagated to grapher (see the grapher step, which reads
+    # poverty/incomes/inequality by name). It is a garden-only table.
     ds_garden = paths.create_dataset(
         tables=[
             tb_poverty,
             tb_incomes,
             tb_inequality,
+            tb_percentiles,
         ],
         default_metadata=ds_meadow.metadata,
     )
@@ -348,6 +361,61 @@ def add_period_dimension(tb: Table) -> Table:
     return tb
 
 
+def process_percentiles(tb: Table) -> Table:
+    """
+    Process percentiles table.
+    Extract the percentile number from the indicator and rename the value to `thr` (the income
+    threshold below which that percentile of the population falls). Kept in long form, one row per
+    percentile — this table is garden-only and is not pushed to grapher.
+    """
+    # Assert that all indicators follow the expected `p_<n>` pattern.
+    is_percentile = tb["indicator"].str.fullmatch(r"p_\d+")
+    assert is_percentile.all(), f"Unexpected percentile indicators: {sorted(set(tb['indicator'][~is_percentile]))}"
+
+    # Extract percentile number from the indicator name (e.g. "p_50" -> 50).
+    tb["percentile"] = tb["indicator"].str.split("_").str[-1].astype(int)
+
+    # Hard-fail on percentile numbers outside the valid 1–99 range: an indicator like `p_0` or
+    # `p_100` matches the pattern above but is not a valid percentile threshold, and it would slip
+    # past the warn-only completeness check (a group could still total 99 rows). This is a schema
+    # surprise, so it fails the build (unlike the warn-only distribution checks downstream).
+    out_of_range = ~tb["percentile"].between(1, 99)
+    assert not out_of_range.any(), f"Percentile numbers outside 1–99: {sorted(set(tb['percentile'][out_of_range]))}"
+
+    # Rename value to threshold (renaming preserves the Variable's origins).
+    tb = tb.rename(columns={"value": "thr"})
+
+    # Drop the original indicator column.
+    tb = tb.drop(columns=["indicator"])
+
+    return tb
+
+
+def add_period_dimension_percentiles(tb: Table) -> Table:
+    """
+    Add period dimension to the percentiles table (day, month, year).
+
+    The source thresholds are annual, so — the same way as the incomes table (see
+    `add_period_dimension`) — the daily value is the annual one divided by 365 and the monthly value
+    by 12. Dividing the Variable by a scalar preserves its origins.
+    """
+    tb_year = tb.copy()
+    tb_day = tb.copy()
+    tb_month = tb.copy()
+
+    tb_day["thr"] = tb_day["thr"] / 365
+    tb_month["thr"] = tb_month["thr"] / 12
+
+    tb_year["period"] = "year"
+    tb_day["period"] = "day"
+    tb_month["period"] = "month"
+
+    # Concatenate all the tables
+    tb = pr.concat([tb_year, tb_day, tb_month], ignore_index=True, sort=False)
+
+    return tb
+
+
 def sanity_checks(tb_inequality: Table, tb_incomes: Table, tb_poverty: Table) -> None:
     """
     Perform sanity checks on the data
@@ -363,6 +431,39 @@ def sanity_checks(tb_inequality: Table, tb_incomes: Table, tb_poverty: Table) ->
     check_avg_between_thr(tb_incomes)
     check_poverty_range(tb_poverty)
     check_poverty_monotonicity(tb_poverty)
+
+
+def sanity_check_percentiles(tb: Table) -> None:
+    """
+    Warn-only checks on the percentiles table. Runs unconditionally (not gated behind DEBUG) so
+    anomalies surface on normal builds, but only logs warnings — it never fails the build.
+
+    - Completeness: expect 99 populated thresholds per (country, year, welfare_type, equivalence_scale) group.
+    - Monotonicity: thresholds must be non-decreasing across percentiles within each such group.
+      equivalence_scale is part of the grouping (not just welfare-country-year): the two scales are
+      separate distributions, so grouping without it would interleave them into false violations.
+    """
+    tb = tb.copy()
+    group_cols = ["country", "year", "welfare_type", "equivalence_scale"]
+
+    # Completeness: expect 99 populated thresholds per distribution. Count non-null `thr` (not the
+    # always-populated `percentile` key), so a group with all 99 rows but blank threshold values is
+    # flagged too — not just groups that are missing rows entirely.
+    populated = tb.groupby(group_cols, observed=True)["thr"].transform("count")
+    if (populated != 99).any():
+        n = int((populated != 99).sum())
+        paths.log.warning(
+            f"{n} percentile rows belong to groups without 99 populated thresholds (missing rows or null values)."
+        )
+
+    # Monotonicity: thresholds must be non-decreasing across percentiles within each group.
+    tb = tb.sort_values(group_cols + ["percentile"])
+    decreases = tb.groupby(group_cols, observed=True)["thr"].diff() < 0
+    if decreases.any():
+        paths.log.warning(
+            f"""{int(decreases.sum())} non-monotonic percentile thresholds (by welfare_type-country-year-equivalence_scale):
+            {_tabulate(tb.loc[decreases, group_cols + ["percentile", "thr"]])}"""
+        )
 
 
 def check_between_0_and_1(tb_inequality: Table) -> None:

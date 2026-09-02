@@ -40,7 +40,7 @@ def test_map_column_slug_is_updated_when_stored_as_string():
     }
 
     config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
         "id": 755,
         "hasMapTab": True,
         "map": {"columnSlug": "100"},  # stored as a string, as it is in real configs
@@ -87,7 +87,7 @@ def test_dimension_display_stripped_against_variable_baseline():
     }
 
     config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
         "id": 755,
         "dimensions": [
             {
@@ -116,7 +116,7 @@ def test_dimension_display_stripped_against_variable_baseline():
 
 def test_inheritance_pruning_uses_patch_not_full_config():
     """Regression test (Codex-flagged): `config` passed to update_chart_config is normally
-    `chart.config`, which is built from `chart_configs.full` -- the fully *resolved* config,
+    `chart.config`, which is the resolved config from `chart_configs` -- the config named by
     with every value the chart inherits from its old indicator already merged in. If
     explicit-field tracking were based on that (rather than the actual stored patch), an
     inherited title the chart never touched would look "explicit" and get compared against
@@ -129,7 +129,7 @@ def test_inheritance_pruning_uses_patch_not_full_config():
     # `full`: the resolved config as chart.config would present it -- title is present only
     # because it's inherited from the *old* indicator, never set by the chart itself.
     full_config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
         "id": 755,
         "isInheritanceEnabled": True,
         "title": "Old indicator title",
@@ -137,13 +137,13 @@ def test_inheritance_pruning_uses_patch_not_full_config():
     }
     # The chart's *actual* stored patch never touched title at all.
     original_patch = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
         "id": 755,
         "dimensions": [{"variableId": 100, "property": "y"}],
     }
     # The new indicator has since renamed its title.
     indicator_config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
         "title": "New indicator title",
     }
 
@@ -193,7 +193,7 @@ def test_inheritance_preserves_schema_default_overrides():
     # Chart has inheritance enabled; user disabled map (hasMapTab=false)
     # even though the indicator's ETL config has hasMapTab=true.
     config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
         "id": 7742,
         "version": 1,
         "isInheritanceEnabled": True,
@@ -257,7 +257,7 @@ def test_inheritance_with_indicator_config_preserves_real_overrides():
     schema = _inheritance_schema()
 
     config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
         "id": 7742,
         "version": 1,
         "isInheritanceEnabled": True,
@@ -265,7 +265,7 @@ def test_inheritance_with_indicator_config_preserves_real_overrides():
         "dimensions": [{"variableId": 100, "property": "y"}],
     }
     indicator_config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
         "hasMapTab": True,
     }
 
@@ -283,7 +283,7 @@ def test_inheritance_with_indicator_config_strips_untouched_fields():
     schema = _inheritance_schema()
 
     config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
         "id": 7742,
         "version": 1,
         "isInheritanceEnabled": True,
@@ -293,7 +293,7 @@ def test_inheritance_with_indicator_config_strips_untouched_fields():
     # Indicator never sets hideLogo or map.colorScale.midpoint either -- both should
     # resolve to their schema defaults on both sides and therefore get stripped.
     indicator_config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
         "hasMapTab": True,
     }
 
@@ -315,7 +315,7 @@ def test_inheritance_with_indicator_config_strips_redundant_explicit_match():
     schema = _inheritance_schema()
 
     config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
         "id": 7742,
         "version": 1,
         "isInheritanceEnabled": True,
@@ -323,7 +323,7 @@ def test_inheritance_with_indicator_config_strips_redundant_explicit_match():
         "dimensions": [{"variableId": 100, "property": "y"}],
     }
     indicator_config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
         "hasMapTab": True,
     }
 
@@ -345,7 +345,7 @@ def test_inheritance_with_empty_indicator_config_does_not_crash():
     schema["required"] = ["$schema", "dimensions"]
 
     config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
         "id": 7742,
         "version": 1,
         "isInheritanceEnabled": True,
@@ -386,7 +386,7 @@ def test_no_inheritance_strips_schema_defaults():
     }
 
     config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.010.json",
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
         "id": 7742,
         "version": 1,
         "hasMapTab": False,
@@ -427,7 +427,7 @@ def test_fetch_single_indicator_config_uses_y_dimension_and_empty_baseline(monke
         if params["vid"] == 900801:
             raise AssertionError("should query the y-dimension's variable, not the color one")
         if params["vid"] == 1292289:
-            return pd.DataFrame([{"full": '{"title": "GDP per capita"}'}])
+            return pd.DataFrame([{"config": '{"title": "GDP per capita"}'}])
         return pd.DataFrame()  # no grapherConfigETL for this variable
 
     monkeypatch.setattr(upgrade_module, "read_sql", fake_read_sql)

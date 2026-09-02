@@ -630,6 +630,19 @@ def load_single_dag_file(filename: str | Path) -> Graph:
     return _parse_dag_yaml(_load_dag_yaml(str(filename)))
 
 
+def parse_dag_yaml_text(text: str) -> Graph:
+    """Flatten the ``steps:`` of a DAG YAML document given as text.
+
+    Same output shape as :func:`load_single_dag_file`, for callers that hold the
+    document's content rather than a file on disk (e.g. a historical version of a
+    DAG file read from git).
+    """
+    dag_yml = yaml.safe_load(text) or {}
+    if not dag_yml.get("steps"):
+        return {}
+    return _parse_dag_yaml(dag_yml)
+
+
 def _load_dag(filename: str | Path, prev_dag: dict[str, Any]):
     """
     Recursive helper to 1) load a dag itself, and 2) load any sub-dags
@@ -753,6 +766,12 @@ def get_active_snapshots() -> set[str]:
 
 
 def get_active_steps() -> set[str]:
+    """Return the full path of every non-snapshot step in the active DAG.
+
+    Paths keep the dataset name (``garden/who/2026-05-22/gho``). They used to be truncated at
+    the version, which made callers unable to tell an active dataset from an archived one
+    sitting in the same directory — see the regression in #6572.
+    """
     DAG = load_dag()
 
     active_steps = set()
@@ -761,5 +780,4 @@ def get_active_steps() -> set[str]:
         if not s.startswith("snapshot"):
             active_steps.add(s.split("://")[1])
 
-    # Strip dataset name after version
-    return {s.rsplit("/", 1)[0] for s in active_steps}
+    return active_steps

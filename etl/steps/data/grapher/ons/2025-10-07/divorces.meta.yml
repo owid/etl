@@ -20,7 +20,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The cumulative percentage of marriages that have ended in divorce by the anniversary year of marriage.
+          Cumulative percentage of marriages that have ended in divorce by the anniversary year of marriage.
         description_key:
           - Data covers divorces legally registered in England and Wales, including marriages that took place abroad if one party had a permanent home in England and Wales.
           - Divorce statistics do not include married couples who separate but do not divorce.
@@ -31,7 +31,7 @@ tables:
 
           Divorce statistics do not include married couples who separate, but do not divorce.
 
-          Divorces where the marriage took place abroad are included provided the marriage was legally recognised in England and Wales and one of the parties had a permanent home in England and Wales.
+          Divorces where the marriage took place abroad are included provided the marriage was legally recognized in England and Wales and one of the parties had a permanent home in England and Wales.
 
           Marriages of same-sex couples first took place on 29 March 2014, the first divorces recorded between same-sex couples were in 2015.
 

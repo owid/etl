@@ -2628,3 +2628,277 @@ steps:
   # archived; last active in e4939299b108 on 2026-07-10
   data://garden/climate/2026-06-19/surface_temperature:
     - data://meadow/climate/2026-06-19/surface_temperature
+  # archived; last active in f46ee351db40 on 2026-07-27
+  data://grapher/climate/2026-07-10/weekly_wildfires:
+    - data://garden/climate/2026-07-10/weekly_wildfires
+  # archived; last active in f46ee351db40 on 2026-07-27
+  data://garden/climate/2026-07-10/weekly_wildfires:
+    - data://meadow/climate/2026-07-10/weekly_wildfires
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/faostat/2026-02-25/faostat_rl
+  # archived; last active in f46ee351db40 on 2026-07-27
+  data://grapher/climate/2026-07-10/wildfires_by_week_average:
+    - data://grapher/climate/2026-07-10/wildfires_by_week
+  # archived; last active in f46ee351db40 on 2026-07-27
+  data://meadow/climate/2026-07-10/weekly_wildfires:
+    - snapshot://climate/2026-07-10/weekly_wildfires.csv
+  # archived; last active in f46ee351db40 on 2026-07-27
+  data://grapher/climate/2026-07-10/wildfires_by_week:
+    - data://garden/climate/2026-07-10/weekly_wildfires
+  # archived; last active in f46ee351db40 on 2026-07-27
+  data://grapher/climate/2026-07-10/wildfires_by_year:
+    - data://garden/climate/2026-07-10/weekly_wildfires
+  # archived; last active in a61f59d8f563 on 2026-08-01
+  data://grapher/climate/2026-07-27/wildfires_by_week_average:
+    - data://grapher/climate/2026-07-27/wildfires_by_week
+  # archived; last active in a61f59d8f563 on 2026-08-01
+  data://garden/climate/2026-07-27/weekly_wildfires:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/climate/2026-07-27/weekly_wildfires
+    - data://garden/faostat/2026-02-25/faostat_rl
+  # archived; last active in a61f59d8f563 on 2026-08-01
+  data://meadow/climate/2026-07-27/weekly_wildfires:
+    - snapshot://climate/2026-07-27/weekly_wildfires.csv
+  # archived; last active in a61f59d8f563 on 2026-08-01
+  data://grapher/climate/2026-07-27/wildfires_by_week:
+    - data://garden/climate/2026-07-27/weekly_wildfires
+  # archived; last active in a61f59d8f563 on 2026-08-01
+  data://grapher/climate/2026-07-27/wildfires_by_year:
+    - data://garden/climate/2026-07-27/weekly_wildfires
+  # archived; last active in a61f59d8f563 on 2026-08-01
+  data://grapher/climate/2026-07-27/weekly_wildfires:
+    - data://garden/climate/2026-07-27/weekly_wildfires
+  # archived; last active in f30989546af9 on 2026-08-07
+  data://garden/climate/2026-08-01/weekly_wildfires:
+    - data://meadow/climate/2026-08-01/weekly_wildfires
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/faostat/2026-02-25/faostat_rl
+  # archived; last active in f30989546af9 on 2026-08-07
+  data://grapher/climate/2026-08-01/wildfires_by_week:
+    - data://garden/climate/2026-08-01/weekly_wildfires
+  # archived; last active in f30989546af9 on 2026-08-07
+  data://grapher/climate/2026-08-01/weekly_wildfires:
+    - data://garden/climate/2026-08-01/weekly_wildfires
+  # archived; last active in f30989546af9 on 2026-08-07
+  data://meadow/climate/2026-08-01/weekly_wildfires:
+    - snapshot://climate/2026-08-01/weekly_wildfires.csv
+  # archived; last active in f30989546af9 on 2026-08-07
+  data://grapher/climate/2026-08-01/wildfires_by_week_average:
+    - data://grapher/climate/2026-08-01/wildfires_by_week
+  # archived; last active in f30989546af9 on 2026-08-07
+  data://grapher/climate/2026-08-01/wildfires_by_year:
+    - data://garden/climate/2026-08-01/weekly_wildfires
+  # archived; last active in f78d589dbc9e on 2026-08-14
+  data://grapher/climate/2026-08-07/weekly_wildfires:
+    - data://garden/climate/2026-08-07/weekly_wildfires
+  # archived; last active in f78d589dbc9e on 2026-08-14
+  data://garden/climate/2026-08-07/weekly_wildfires:
+    - data://garden/faostat/2026-02-25/faostat_rl
+    - data://meadow/climate/2026-08-07/weekly_wildfires
+    - data://garden/regions/2023-01-01/regions
+  # archived; last active in f78d589dbc9e on 2026-08-14
+  data://grapher/climate/2026-08-07/wildfires_by_year:
+    - data://garden/climate/2026-08-07/weekly_wildfires
+  # archived; last active in f78d589dbc9e on 2026-08-14
+  data://grapher/climate/2026-08-07/wildfires_by_week_average:
+    - data://grapher/climate/2026-08-07/wildfires_by_week
+  # archived; last active in f78d589dbc9e on 2026-08-14
+  data://meadow/climate/2026-08-07/weekly_wildfires:
+    - snapshot://climate/2026-08-07/weekly_wildfires.csv
+  # archived; last active in f78d589dbc9e on 2026-08-14
+  data://grapher/climate/2026-08-07/wildfires_by_week:
+    - data://garden/climate/2026-08-07/weekly_wildfires
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/sst_by_month:
+    - data://garden/climate/2026-07-10/sst
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/sea_ice_anomalies_by_month:
+    - data://garden/climate/2026-07-10/sea_ice_index
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-07-10/sst:
+    - data://meadow/climate/2026-07-10/sst
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-07-10/ghg_concentration:
+    - data://meadow/climate/2026-07-10/ghg_concentration
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://meadow/climate/2026-07-10/sea_surface_temperature:
+    - snapshot://climate/2026-07-10/sea_surface_temperature_southern_hemisphere.csv
+    - snapshot://climate/2026-07-10/sea_surface_temperature_world.csv
+    - snapshot://climate/2026-07-10/sea_surface_temperature_northern_hemisphere.csv
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-07-10/snow_cover_extent:
+    - data://meadow/climate/2026-07-10/snow_cover_extent
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-07-10/total_precipitation:
+    - data://meadow/climate/2026-07-10/total_precipitation
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-08-14/weekly_wildfires:
+    - data://garden/climate/2026-08-14/weekly_wildfires
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/sea_ice_extent_by_year:
+    - data://garden/climate/2026-07-10/sea_ice_index
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://meadow/climate/2026-07-10/snow_cover_extent:
+    - snapshot://climate/2026-07-10/snow_cover_extent_northern_hemisphere.csv
+    - snapshot://climate/2026-07-10/snow_cover_extent_north_america.csv
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://meadow/climate/2026-07-10/sst:
+    - snapshot://climate/2026-07-10/sst.csv
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-07-10/climate_change_impacts:
+    - data://garden/climate/2026-07-10/near_surface_temperature
+    - data://garden/epa/2024-04-17/ice_sheet_mass_balance
+    - data://garden/climate/2026-07-10/ghg_concentration
+    - data://garden/climate/2026-07-10/snow_cover_extent
+    - data://garden/climate/2024-01-28/global_sea_level
+    - data://garden/epa/2024-04-17/ocean_heat_content
+    - data://garden/epa/2024-04-17/mass_balance_us_glaciers
+    - data://garden/climate/2026-07-10/sea_surface_temperature
+    - data://garden/climate/2026-07-10/ocean_ph_levels
+    - data://garden/climate/2026-07-10/sea_ice_index
+    - data://garden/climate/2026-07-10/ocean_heat_content
+    - data://garden/climate/2026-07-10/long_run_ghg_concentration
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/surface_temperature_annual_average:
+    - data://garden/climate/2026-07-10/surface_temperature
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-07-10/sea_ice_index:
+    - data://meadow/climate/2026-07-10/sea_ice_index
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-08-14/wildfires_by_week:
+    - data://garden/climate/2026-08-14/weekly_wildfires
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-07-10/surface_temperature:
+    - data://meadow/climate/2026-07-10/surface_temperature
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/sea_ice_extent_by_decade:
+    - data://garden/climate/2026-07-10/sea_ice_index
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://meadow/climate/2026-07-10/sea_ice_index:
+    - snapshot://climate/2026-07-10/sea_ice_index.xlsx
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://meadow/climate/2026-08-14/weekly_wildfires:
+    - snapshot://climate/2026-08-14/weekly_wildfires.csv
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-07-10/ocean_ph_levels:
+    - data://meadow/climate/2026-07-10/hawaii_ocean_time_series
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-07-10/yearly_burned_area:
+    - data://meadow/climate/2026-07-10/yearly_burned_area
+    - data://garden/wb/2026-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-07-10/ocean_heat_content:
+    - data://meadow/climate/2026-07-10/ocean_heat_content
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-08-14/weekly_wildfires:
+    - data://meadow/climate/2026-08-14/weekly_wildfires
+    - data://garden/faostat/2026-02-25/faostat_rl
+    - data://garden/regions/2023-01-01/regions
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://meadow/climate/2026-07-10/total_precipitation:
+    - snapshot://countries/2023-12-27/world_bank.zip
+    - snapshot://climate/2026-07-10/total_precipitation.zip
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://meadow/climate/2026-07-10/hawaii_ocean_time_series:
+    - snapshot://climate/2026-07-10/hawaii_ocean_time_series.csv
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-08-14/wildfires_by_year:
+    - data://garden/climate/2026-08-14/weekly_wildfires
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-08-14/wildfires_by_week_average:
+    - data://grapher/climate/2026-08-14/wildfires_by_week
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-07-10/near_surface_temperature:
+    - data://meadow/climate/2026-07-10/near_surface_temperature
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/climate_change_impacts_annual:
+    - data://garden/climate/2026-07-10/climate_change_impacts
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/surface_temperature_anomalies:
+    - data://garden/climate/2026-07-10/surface_temperature
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/yearly_burned_area:
+    - data://garden/climate/2026-07-10/yearly_burned_area
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/surface_country_level_monthly_anomaly:
+    - data://garden/climate/2026-07-10/surface_temperature
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://meadow/climate/2026-07-10/surface_temperature:
+    - snapshot://climate/2026-07-10/surface_temperature.zip
+    - snapshot://countries/2023-12-27/world_bank.zip
+    - snapshot://countries/2025-03-22/continents_oceans.zip
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://meadow/climate/2026-07-10/ghg_concentration:
+    - snapshot://climate/2026-07-10/ch4_concentration_monthly.csv
+    - snapshot://climate/2026-07-10/n2o_concentration_monthly.csv
+    - snapshot://climate/2026-07-10/co2_concentration_monthly.csv
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://meadow/climate/2026-07-10/ocean_heat_content:
+    - snapshot://climate/2026-07-10/ocean_heat_content_monthly_world_2000m.csv
+    - snapshot://climate/2026-07-10/ocean_heat_content_annual_world_2000m.csv
+    - snapshot://climate/2026-07-10/ocean_heat_content_monthly_world_700m.csv
+    - snapshot://climate/2026-07-10/ocean_heat_content_annual_world_700m.csv
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-07-10/nasa_ozone_hole:
+    - data://meadow/climate/2026-07-10/nasa_ozone_hole
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/surface_temperature:
+    - data://garden/climate/2026-07-10/surface_temperature
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-07-10/long_run_ghg_concentration:
+    - data://garden/epa/2024-04-17/ghg_concentration
+    - data://garden/climate/2026-07-10/ghg_concentration
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/climate_change_impacts_monthly:
+    - data://garden/climate/2026-07-10/climate_change_impacts
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://meadow/climate/2026-07-10/yearly_burned_area:
+    - snapshot://climate/2026-07-10/yearly_burned_area.csv
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/sst:
+    - data://garden/climate/2026-07-10/sst
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/surface_temperature_monthly:
+    - data://garden/climate/2026-07-10/surface_temperature
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://meadow/climate/2026-07-10/nasa_ozone_hole:
+    - snapshot://climate/2026-07-10/nasa_ozone_hole_annual.txt
+    - snapshot://climate/2026-07-10/nasa_ozone_hole_extremes.txt
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://garden/climate/2026-07-10/sea_surface_temperature:
+    - data://meadow/climate/2026-07-10/sea_surface_temperature
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://meadow/climate/2026-07-10/near_surface_temperature:
+    - snapshot://climate/2026-07-10/near_surface_temperature_global.csv
+    - snapshot://climate/2026-07-10/near_surface_temperature_northern_hemisphere.csv
+    - snapshot://climate/2026-07-10/near_surface_temperature_southern_hemisphere.csv
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/total_precipitation_annual:
+    - data://garden/climate/2026-07-10/total_precipitation
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/surface_global_monthly_anomaly_all_countries:
+    - data://garden/climate/2026-07-10/surface_temperature
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/climate/2026-07-10/nasa_ozone_hole:
+    - data://garden/climate/2026-07-10/nasa_ozone_hole
+  # archived; last active in 5f13da3a11d6 on 2026-08-28
+  data://grapher/climate/2026-08-21/wildfires_by_week:
+    - data://garden/climate/2026-08-21/weekly_wildfires
+  # archived; last active in 5f13da3a11d6 on 2026-08-28
+  data://grapher/climate/2026-08-21/wildfires_by_week_average:
+    - data://grapher/climate/2026-08-21/wildfires_by_week
+  # archived; last active in 5f13da3a11d6 on 2026-08-28
+  data://grapher/climate/2026-08-21/wildfires_by_year:
+    - data://garden/climate/2026-08-21/weekly_wildfires
+  # archived; last active in 5f13da3a11d6 on 2026-08-28
+  data://garden/climate/2026-08-21/weekly_wildfires:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/faostat/2026-02-25/faostat_rl
+    - data://meadow/climate/2026-08-21/weekly_wildfires
+  # archived; last active in 5f13da3a11d6 on 2026-08-28
+  data://meadow/climate/2026-08-21/weekly_wildfires:
+    - snapshot://climate/2026-08-21/weekly_wildfires.csv
+  # archived; last active in 5f13da3a11d6 on 2026-08-28
+  data://grapher/climate/2026-08-21/weekly_wildfires:
+    - data://garden/climate/2026-08-21/weekly_wildfires

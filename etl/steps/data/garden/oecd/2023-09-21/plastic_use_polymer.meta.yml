@@ -26,15 +26,15 @@ tables:
         display:
           numDecimalPlaces: 0
       elastomers__tyres:
-        title: Elastomers tyres
+        title: Elastomers tires
         description_short: Elastomers, known for their elasticity and resilience, are utilized in a diverse range of applications including tires, medical devices, footwear, seals and gaskets, sporting goods, adhesives, industrial hoses and belts, and various consumer products.
         unit: 'tonnes'
         short_unit: 't'
         display:
           numDecimalPlaces: 0
       fibres:
-        title: Fibres
-        description_short: Fibres are elongated pieces or threads, having a length many times their diameter. They can be spun into yarn or made into fabric.
+        title: Fibers
+        description_short: Fibers are elongated pieces or threads, having a length many times their diameter. They can be spun into yarn or made into fabric.
         unit: 'tonnes'
         short_unit: 't'
         display:
@@ -42,7 +42,7 @@ tables:
       hdpe:
         title: HDPE
         unit: 'tonnes'
-        description_short: HDPE (High-Density Polyethylene) is a durable, chemical-resistant thermoplastic, widely used in containers, pipes, and outdoor furniture. It is lightweight, has high tensile strength, and is recyclable,
+        description_short: HDPE (High-Density Polyethylene) is a durable, chemical-resistant thermoplastic, widely used in containers, pipes, and outdoor furniture. It is lightweight, has high tensile strength, and is recyclable.
         short_unit: 't'
         display:
           numDecimalPlaces: 0

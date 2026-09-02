@@ -16,6 +16,16 @@ interface OutdatedPattern {
     scope?: string | string[];
 }
 
+// The wizard's cookiecutter templates generate the files the scopes below cover, so a stale
+// practice in a template propagates to every step or snapshot created from it — and is invisible
+// to a check that only looks at the generated output. Scoping the templates in as well means
+// drift surfaces when someone opens the template. One glob covers both template trees
+// (apps/wizard/etl_steps/cookiecutter/** and apps/wizard/app_pages/fasttrack/cookiecutter/**),
+// since ** spans path separators.
+const COOKIECUTTER_SCOPE = 'apps/wizard/**/cookiecutter/**';
+const STEP_SCOPE = ['etl/steps/data/**', COOKIECUTTER_SCOPE];
+const SNAPSHOT_SCOPE = ['snapshots/**', COOKIECUTTER_SCOPE];
+
 const OUTDATED_PATTERNS: OutdatedPattern[] = [
     {
         // Matches dest_dir in various contexts:
@@ -27,7 +37,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /dest_dir(?=[,):\s]|["'])/g,
         message: 'Use of `dest_dir` is outdated. Use paths.create_dataset, which does not need dest_dir.',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches geo.harmonize_countries (from etl.data_helpers import geo)
@@ -37,7 +47,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /geo\.harmonize_countries\(/g,
         message: '`geo.harmonize_countries` is outdated. Use `paths.regions.harmonize_names(tb)` instead.',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches geo.add_population_to_table (deprecated per its own docstring).
@@ -47,7 +57,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /geo\.add_population_to_table\(/g,
         message: '`geo.add_population_to_table` is outdated. Use `paths.regions.add_population(tb)` instead (auto-resolves the population dataset from the DAG; for per-capita indicators, prefer `paths.regions.add_per_capita(tb)`).',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches geo.add_regions_to_table (deprecated per its own docstring).
@@ -57,41 +67,41 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /geo\.add_regions_to_table\(/g,
         message: '`geo.add_regions_to_table` is outdated. Use `paths.regions.add_aggregates(tb, ...)` instead (auto-resolves regions and income_groups from the DAG).',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches geo.add_region_aggregates (older sibling of add_regions_to_table).
-        // The docstring at etl/data_helpers/geo.py:286 says: "use the add_aggregates() method of the Regions class".
+        // Its docstring in `etl/data_helpers/geo.py` says: "use the add_aggregates() method of the Regions class".
         pattern: /geo\.add_region_aggregates\(/g,
         message: '`geo.add_region_aggregates` is outdated. Use `paths.regions.add_aggregates(tb, ...)` instead (auto-resolves regions and income_groups from the DAG).',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches geo.list_countries_in_region.
-        // The docstring at etl/data_helpers/geo.py:121 says: "use the get_region() method of the Regions class".
+        // Its docstring in `etl/data_helpers/geo.py` says: "use the get_region() method of the Regions class".
         // The negative lookahead skips list_countries_in_region_that_must_have_data, which has its own warning below.
         pattern: /geo\.list_countries_in_region(?!_that_must_have_data)\(/g,
         message: '`geo.list_countries_in_region` is outdated. Use `paths.regions.get_region(<name>)` instead (auto-resolves regions from the DAG).',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches geo.list_countries_in_region_that_must_have_data.
-        // The docstring at etl/data_helpers/geo.py:178 says: "Currently no alternative is implemented." Flag anyway so the
+        // Its docstring in `etl/data_helpers/geo.py` says: "Currently no alternative is implemented." Flag anyway so the
         // call site is visible — users may need to inline the logic or wait for a replacement.
         pattern: /geo\.list_countries_in_region_that_must_have_data\(/g,
         message: '`geo.list_countries_in_region_that_must_have_data` is deprecated and no replacement is currently implemented. Inline the country-selection logic locally and flag this for follow-up.',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches geo.interpolate_table.
-        // The docstring at etl/data_helpers/geo.py:695 says: "Use `etl.data_helpers.misc.interpolate_table` instead".
+        // Its docstring in `etl/data_helpers/geo.py` says: "Use `etl.data_helpers.misc.interpolate_table` instead".
         pattern: /geo\.interpolate_table\(/g,
         message: '`geo.interpolate_table` is outdated. Use `etl.data_helpers.misc.interpolate_table` instead.',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches paths.load_dependency
@@ -101,7 +111,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /paths\.load_dependency\(/g,
         message: '`paths.load_dependency` is outdated. Use `paths.load_dataset` or `paths.load_snapshot` instead.',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches if __name__ == "__main__" in snapshot files
@@ -112,7 +122,27 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /if\s+(__name__|["']__main__["'])\s*==\s*(["']__main__["']|__name__)/g,
         message: '`if __name__ == "__main__"` blocks are outdated in snapshot files. Remove it, as you no longer need it. You can now run snapshots directly with `etls` (or `etl snapshot`) command.',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'snapshots/**'
+        scope: SNAPSHOT_SCOPE
+    },
+    {
+        // Matches the @click.command decorator on a snapshot script's entry point.
+        //
+        // Anchored on the command decorator, not `@click.` generally: one warning per script
+        // instead of one per decorator line, and nothing is missed, since a click-using snapshot
+        // script always declares a command. The message asks for the whole decorator stack,
+        // because removing the command alone leaves orphaned `@click.option` lines behind.
+        //
+        // Options beyond the two `_call_snapshot_function` supplies already run at their click
+        // defaults, so the message says to carry them over as keyword parameters. Options
+        // declared `prompt=True` with no default are the exception the message calls out: click
+        // collects those interactively and `etls` has no way to feed them to a plain function.
+        //
+        // SNAPSHOT_SCOPE covers the snapshot cookiecutter too — click-free today, so that is
+        // drift protection rather than a current gap.
+        pattern: /@click\.command/g,
+        message: '`@click` decorators are outdated in snapshot files. The `etls` CLI imports the module and calls `run()` itself, so the CLI wrapper is redundant. Remove the whole decorator stack — `@click.command(...)` and every `@click.option(...)` above the function — and leave a plain `def run(upload: bool = True) -> None:` (add `path_to_file: str | None = None` for a manual import). If the command carries any other options, keep each one as a keyword parameter with the same default it had — `etls` only ever passes `--skip-upload` and `--path-to-file`, so those defaults are already what runs today, and carrying them over keeps behaviour identical rather than dropping the control. The one exception is an option declared with `prompt=True` and no default, which click collects interactively — a few manual multi-file importers depend on that, and `etls` has no way to feed it to a plain function, so leave those scripts on click. Existing click-decorated scripts still work, because the runner also accepts a click command, so this is a cleanup rather than a break.',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: SNAPSHOT_SCOPE
     },
     {
         // Matches .set_index(...) used to finalize a table before create_dataset.
@@ -131,9 +161,40 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /\.set_index\([^()]*\)(?!\s*[.\[])/g,
         message: '`set_index` is outdated for finalizing a table. Use `tb.format()` instead, which sets the index and also sorts rows, checks the key is unique, and normalizes column names/types. `format()` expects `country` and `year` by default; pass custom keys with `tb.format(["disease", "year"])`. For year-less tables use `set_index("country")` plus `tb.metadata.short_name`.',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     }
 ];
+
+// Message for the Dataset table-read rule (implemented as a stateful pass in updateDiagnostics,
+// not a per-line regex, because it needs to know which variables are live Dataset objects).
+const DATASET_READ_MESSAGE =
+    'Reading a table via `ds["table"]` subscript is outdated; use `ds.read("table")`. '
+    + 'If the read is chained with `.reset_index()`, replace the whole `ds["table"].reset_index()` '
+    + 'expression with `ds.read("table")` — it already resets the index, so keeping the trailing '
+    + '`.reset_index()` would add a spurious `index` column. Where you need to preserve the index '
+    + '(e.g. feeding a grapher step), use `ds.read("table", reset_index=False)`.';
+
+// Strip a trailing `#` comment from a line, respecting quoted strings, so the Dataset-read detector
+// never flags commented-out code (e.g. `# ds_garden["population"]`). Returns a prefix of the line,
+// so match offsets computed on the result still line up with the original line.
+function stripInlineComment(line: string): string {
+    let inString = false;
+    let quote = '';
+    for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inString) {
+            if (ch === quote && line[i - 1] !== '\\') {
+                inString = false;
+            }
+        } else if (ch === '"' || ch === "'") {
+            inString = true;
+            quote = ch;
+        } else if (ch === '#') {
+            return line.slice(0, i);
+        }
+    }
+    return line;
+}
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Detect Outdated Practices extension activated.');
@@ -229,6 +290,78 @@ export function activate(context: vscode.ExtensionContext) {
 
                     diagnostic.source = 'outdated-practices';
                     diagnostics.push(diagnostic);
+                }
+            }
+        }
+
+        // Dataset table reads via subscript, e.g. `tb = ds_meadow["table"]`. Flagged only when the
+        // variable is a *live* Dataset — assigned from `load_dataset(...)` and not since rebound to a
+        // Table. This `load_dataset` signal is more reliable than a name heuristic: it flags genuine
+        // reads (including in non-assignment positions) while never flagging Table/DataFrame column
+        // access (e.g. after `ds_x = ds_x["t"].reset_index()`, a later `ds_x["col"]` is not flagged).
+        if (matchesScope(document.uri.fsPath, STEP_SCOPE)) {
+            const datasetVars = new Set<string>();
+            const assignRe = /^\s*(\w+)\s*=\s*(.*)$/;
+            for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+                // Strip trailing comments so commented-out code (e.g. `# ds_garden["x"]`) is not flagged.
+                const code = stripInlineComment(lines[lineIndex]);
+
+                // 1a. Flag subscript reads on variables currently known to be live Datasets. Runs before
+                //     this line's assignment, so `ds = ds["t"]...` is flagged (the read is on a Dataset).
+                const readRe = /(\w+)\[\s*f?["'][^"']+["']\s*\]/g;
+                let readMatch: RegExpExecArray | null;
+                while ((readMatch = readRe.exec(code)) !== null) {
+                    if (!datasetVars.has(readMatch[1])) {
+                        continue;
+                    }
+                    const startPos = new vscode.Position(lineIndex, readMatch.index);
+                    const endPos = new vscode.Position(lineIndex, readMatch.index + readMatch[0].length);
+                    const diagnostic = new vscode.Diagnostic(
+                        new vscode.Range(startPos, endPos),
+                        DATASET_READ_MESSAGE,
+                        vscode.DiagnosticSeverity.Warning
+                    );
+                    diagnostic.source = 'outdated-practices';
+                    diagnostics.push(diagnostic);
+                }
+
+                // 1b. Flag inline reads directly on a load_dataset(...) result, e.g.
+                //     `codes = paths.load_dataset("x")["country_codes"]` (subscript on the loader itself).
+                const inlineReadRe = /load_dataset\s*\([^)]*\)\s*\[\s*f?["'][^"']+["']\s*\]/g;
+                let inlineMatch: RegExpExecArray | null;
+                while ((inlineMatch = inlineReadRe.exec(code)) !== null) {
+                    const startPos = new vscode.Position(lineIndex, inlineMatch.index);
+                    const endPos = new vscode.Position(lineIndex, inlineMatch.index + inlineMatch[0].length);
+                    const diagnostic = new vscode.Diagnostic(
+                        new vscode.Range(startPos, endPos),
+                        DATASET_READ_MESSAGE,
+                        vscode.DiagnosticSeverity.Warning
+                    );
+                    diagnostic.source = 'outdated-practices';
+                    diagnostics.push(diagnostic);
+                }
+
+                // 2a. Names annotated as a Dataset are live Datasets too — most importantly
+                //     Dataset-typed function parameters, e.g. `def _sanity_checks(ds: Dataset)`, whose
+                //     `ds["table"]` reads would otherwise be missed (the name is never assigned locally).
+                //     Matches `name: Dataset`, `name: catalog.Dataset`, `name: "Dataset"` (not DatasetMeta).
+                const annotationRe = /(\w+)\s*:\s*"?(?:\w+\.)?Dataset\b/g;
+                let annotationMatch: RegExpExecArray | null;
+                while ((annotationMatch = annotationRe.exec(code)) !== null) {
+                    datasetVars.add(annotationMatch[1]);
+                }
+
+                // 2b. Track Dataset variables: add X on a *bare* `X = ...load_dataset(...)` assignment; drop
+                //    X when reassigned to anything else. `X = load_dataset(...)[...]` / `.reset_index()`
+                //    extract a Table, so X is not a Dataset (its subscripts are column access).
+                const assignMatch = code.match(assignRe);
+                if (assignMatch) {
+                    const rhs = assignMatch[2];
+                    if (/^[\w.]*load_dataset\s*\([^)]*\)\s*$/.test(rhs)) {
+                        datasetVars.add(assignMatch[1]);
+                    } else if (datasetVars.has(assignMatch[1])) {
+                        datasetVars.delete(assignMatch[1]);
+                    }
                 }
             }
         }

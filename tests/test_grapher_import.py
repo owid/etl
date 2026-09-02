@@ -1,4 +1,8 @@
+from types import SimpleNamespace
+
 import pandas as pd
+import pytest
+import requests
 from owid.catalog import Origin, VariableMeta, VariablePresentationMeta
 
 import etl.grapher.to_db as db
@@ -24,20 +28,44 @@ def test_calculate_checksum_data():
     assert db.calculate_checksum_data(df.iloc[::-1]) == "3523058000783533578"
 
 
+def _get_dataset_metadata():
+    return {"datasetName": "Dataset", "datasetVersion": "2024-12-31", "updatePeriodDays": 365}
+
+
 def test_calculate_checksum_metadata():
     meta = _get_metadata()
     df = _get_data()
+    ds_meta = _get_dataset_metadata()
 
     # Checksum should be deterministic
-    checksum = db.calculate_checksum_metadata(meta, df)
-    assert checksum == db.calculate_checksum_metadata(meta, df)
+    checksum = db.calculate_checksum_metadata(meta, df, ds_meta)
+    assert checksum == db.calculate_checksum_metadata(meta, df, ds_meta)
 
     # Different metadata should produce different checksums
     meta2 = VariableMeta(
         origins=[Origin(title="Different", producer="Producer")],
         presentation=VariablePresentationMeta(title_public="Title public"),
     )
-    assert checksum != db.calculate_checksum_metadata(meta2, df)
+    assert checksum != db.calculate_checksum_metadata(meta2, df, ds_meta)
+
+
+def test_calculate_checksum_metadata_depends_on_dataset_fields():
+    """Dataset-level fields are embedded in the indicator JSON, so they must flip the checksum.
+
+    Regression: they used to be invisible to the checksum, so clearing e.g. `update_period_days`
+    updated MySQL but never re-uploaded the JSON files in R2, which stayed stale indefinitely.
+    """
+    meta = _get_metadata()
+    df = _get_data()
+    checksum = db.calculate_checksum_metadata(meta, df, _get_dataset_metadata())
+
+    # Clearing update_period_days drops it from the JSON (and from the hashed dict).
+    cleared = {k: v for k, v in _get_dataset_metadata().items() if k != "updatePeriodDays"}
+    assert checksum != db.calculate_checksum_metadata(meta, df, cleared)
+
+    # Same for the other fields the JSON embeds.
+    for field, value in [("datasetName", "Renamed"), ("datasetVersion", "2025-01-01"), ("nonRedistributable", True)]:
+        assert checksum != db.calculate_checksum_metadata(meta, df, {**_get_dataset_metadata(), field: value})
 
 
 def test_calculate_checksum_metadata_invariant_to_empty_field_shapes():
@@ -57,8 +85,9 @@ def test_calculate_checksum_metadata_invariant_to_empty_field_shapes():
         sort=[],
     )
     meta_without_empties = VariableMeta(origins=[Origin(title="T", producer="P")])
-    assert db.calculate_checksum_metadata(meta_with_empties, df) == db.calculate_checksum_metadata(
-        meta_without_empties, df
+    ds_meta = _get_dataset_metadata()
+    assert db.calculate_checksum_metadata(meta_with_empties, df, ds_meta) == db.calculate_checksum_metadata(
+        meta_without_empties, df, ds_meta
     )
 
 
@@ -79,3 +108,108 @@ def test_get_timespan_subyearly_is_empty():
     df = pd.DataFrame({"year": [0, 28, 59]})
     for interval in ("day", "week", "month", "quarter"):
         assert db._get_timespan(df, VariableMeta(display={"timeInterval": interval})) == ""
+
+
+class _FakeAdminAPI:
+    """Records the calls a cleanup makes and replays canned Admin API responses.
+
+    A response may be an exception instance, which is raised instead of returned.
+    """
+
+    owid_env = SimpleNamespace(admin_api="http://localhost:3030/admin/api", env_remote="dev")
+
+    def __init__(self, responses: list[dict | Exception]) -> None:
+        self._responses = list(responses)
+        self.calls: list[dict] = []
+
+    def delete_variables(self, variable_ids: list[int]) -> dict:
+        self.calls.append({"variable_ids": variable_ids})
+        response = self._responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+
+def _blocked(variable_id: int, ref: str, used_by: str = "chart") -> dict:
+    return {
+        "variableId": variable_id,
+        "variableName": f"Variable {variable_id}",
+        "usedBy": used_by,
+        "ref": ref,
+    }
+
+
+def _response(deleted=(), blocked=()) -> dict:
+    return {"deleted": list(deleted), "blocked": list(blocked)}
+
+
+def test_delete_ghost_variables_sends_the_ids_to_remove():
+    admin_api = _FakeAdminAPI([_response(deleted=[7])])
+
+    assert db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
+
+    assert admin_api.calls == [{"variable_ids": [7]}]
+
+
+def test_delete_ghost_variables_does_not_call_out_when_there_are_no_ghosts():
+    admin_api = _FakeAdminAPI([])
+
+    assert db.delete_ghost_variables(admin_api, ghost_variable_ids=[])  # ty: ignore[invalid-argument-type]
+
+    assert admin_api.calls == []
+
+
+def test_delete_ghost_variables_warns_in_production_when_a_chart_still_uses_one(monkeypatch):
+    monkeypatch.setattr(db.config, "ENV", "production")
+    admin_api = _FakeAdminAPI([_response(deleted=[7], blocked=[_blocked(8, "chart-100"), _blocked(8, "chart-101")])])
+
+    # Not successful, so the checksum stays unset and the next run tries again.
+    assert not db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
+
+
+def test_blocked_by_a_published_explorer_raises_on_staging(monkeypatch):
+    """chart-sync can't remap an explorer or a live mdim view, so there's nothing to wait for."""
+    monkeypatch.setattr(db.config, "ENV", "staging")
+    rows = pd.DataFrame(
+        [_blocked(8, "energy", used_by="explorer")],
+        columns=["variableId", "variableName", "usedBy", "ref"],
+    )
+
+    # No chart-diff lookup should be needed to reach this answer.
+    assert db._raise_error_for_deleted_variables(rows)
+
+
+def test_delete_ghost_variables_raises_outside_production(monkeypatch):
+    monkeypatch.setattr(db.config, "ENV", "dev")
+    admin_api = _FakeAdminAPI([_response(blocked=[_blocked(8, "chart-100")])])
+
+    with pytest.raises(ValueError, match="chart-100"):
+        db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
+
+
+def test_delete_ghost_variables_warns_when_a_local_admin_is_unreachable():
+    """Working locally without a running admin: warn and let a later run clean up."""
+    admin_api = _FakeAdminAPI([requests.exceptions.ConnectionError("connection refused")])
+
+    assert not db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
+
+
+@pytest.mark.parametrize("env_remote", ["staging", "production", "unknown"])
+def test_delete_ghost_variables_raises_when_a_remote_admin_is_unreachable(env_remote):
+    """A remote admin always exists, so failing to reach one is an outage.
+
+    The target decides this, not `config.ENV`: a local run with STAGING=1 keeps ENV as "dev"
+    while pointing at a remote staging admin.
+    """
+    admin_api = _FakeAdminAPI([requests.exceptions.ConnectionError("connection refused")])
+    admin_api.owid_env = SimpleNamespace(admin_api="http://staging/admin/api", env_remote=env_remote)
+
+    with pytest.raises(requests.exceptions.ConnectionError):
+        db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
+
+
+def test_delete_ghost_variables_does_not_swallow_other_admin_api_errors():
+    admin_api = _FakeAdminAPI([requests.exceptions.HTTPError("500 Server Error")])
+
+    with pytest.raises(requests.exceptions.HTTPError):
+        db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]

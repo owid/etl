@@ -17,13 +17,14 @@ from dataclasses import dataclass
 from typing import Any, cast
 
 import pandas as pd
+import requests
 import structlog
 from owid import catalog
 from owid.catalog import Table, Variable, VariableMeta, utils
 from owid.catalog.core.meta import update_variable_metadata
 from owid.catalog.core.paths import CatalogPath
 from owid.catalog.core.utils import hash_any
-from sqlalchemy import select, text, update
+from sqlalchemy import select, update
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 
@@ -45,6 +46,30 @@ CURRENT_DIR = os.path.dirname(__file__)
 @dataclass
 class DatasetUpsertResult:
     dataset_id: int
+    # Dataset-level fields that end up in every indicator's metadata JSON (see
+    # `_dataset_metadata_fields`). They take part in the metadata checksum, so that editing one
+    # of them re-uploads the affected files.
+    metadata_fields: dict[str, Any]
+
+
+def _dataset_metadata_fields(ds: gm.Dataset) -> dict[str, Any]:
+    """Dataset-level fields that `_load_variable` joins into every indicator's metadata JSON.
+
+    Kept in sync with the SELECT in `apps/backport/datasync/data_metadata.py`. `sourceName` and
+    `sourceDescription` are deliberately left out: ETL upserts variables with `sourceId=None`, so
+    the legacy `sources` join only ever contributes to backported datasets.
+
+    None values are dropped, mirroring `_omit_nullable_values` before upload - a field that is
+    null (and therefore absent from the JSON) must not take part in the hash, otherwise adding a
+    field here would flip the checksum of every variable that doesn't set it.
+    """
+    fields = {
+        "datasetName": ds.name,
+        "datasetVersion": ds.version,
+        "updatePeriodDays": ds.updatePeriodDays,
+        "nonRedistributable": bool(ds.nonRedistributable),
+    }
+    return {k: v for k, v in fields.items() if v is not None}
 
 
 def upsert_dataset(engine: Engine, dataset: catalog.Dataset, namespace: str) -> DatasetUpsertResult:
@@ -97,7 +122,7 @@ def upsert_dataset(engine: Engine, dataset: catalog.Dataset, namespace: str) -> 
 
         session.commit()
 
-        return DatasetUpsertResult(ds.id)
+        return DatasetUpsertResult(ds.id, _dataset_metadata_fields(ds))
 
 
 def check_table(table: Table) -> None:
@@ -183,7 +208,7 @@ def upsert_table(
     df["value"] = df["value"].astype("string")
 
     checksum_data = calculate_checksum_data(df)
-    checksum_metadata = calculate_checksum_metadata(variable_meta, df)
+    checksum_metadata = calculate_checksum_metadata(variable_meta, df, dataset_upsert_result.metadata_fields)
 
     if config.FORCE_UPLOAD:
         checksums["dataChecksum"] = None
@@ -312,13 +337,13 @@ def upsert_metadata(
     if grapher_config:
         admin_api.put_grapher_config(db_variable_id, grapher_config)
     # grapher_config does not exist, but it's still in the database -> delete it
-    elif not grapher_config and db_variable.grapherConfigIdETL:
+    elif not grapher_config and db_variable.patchConfigIdETL:
         admin_api.delete_grapher_config(db_variable_id)
 
     return db_variable
 
 
-def calculate_checksum_metadata(variable_meta: VariableMeta, df: pd.DataFrame) -> str:
+def calculate_checksum_metadata(variable_meta: VariableMeta, df: pd.DataFrame, dataset_metadata: dict[str, Any]) -> str:
     # Hash the canonical (pruned) dict representation, not the dataclass itself.
     # Dataclass-shape changes (a field renamed, added, or removed — even when the
     # default is None / [] and the JSON output is unchanged) used to spuriously
@@ -334,12 +359,18 @@ def calculate_checksum_metadata(variable_meta: VariableMeta, df: pd.DataFrame) -
     # that prunes inline, same trick `dataclass_from_dict` uses in core/utils.py.
     #
     # entities and years are also part of the metadata checksum.
+    #
+    # So are the dataset-level fields the JSON embeds (`_dataset_metadata_fields`): they live on
+    # the dataset, not on the variable, so without them clearing e.g. `update_period_days` left
+    # every variable's checksum untouched, every upload was skipped, and the file in R2 stayed
+    # stale forever while MySQL was correct.
     return str(
         hash_any(
             (
                 hash_any(sorted(df.entityId.unique())),
                 hash_any(sorted(df.year.unique())),
                 hash_any(variable_meta.to_dict()),
+                hash_any(dataset_metadata),
             )
         )
     )
@@ -383,136 +414,96 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
         session.commit()
 
 
-def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_ids: list[int]) -> bool:
-    """Remove all leftover variables that didn't get upserted into DB during grapher step.
-    This could happen when you rename or delete a variable in ETL.
-    Raise an error if we try to delete variable used by any chart.
+def delete_ghost_variables(admin_api: AdminAPI, ghost_variable_ids: list[int]) -> bool:
+    """Remove the leftover variables a grapher step no longer produces.
 
-    :param dataset_id: ID of the dataset
-    :param upserted_variable_ids: variables upserted in grapher step
-    :param workers: delete variables in parallel
+    This happens when a variable is renamed or dropped in ETL. Working out *which* variables
+    those are is a set difference we can do ourselves — the dataset's variables minus the ones
+    we just upserted. What hangs off them is not: the tables carrying a `variableId` foreign
+    key, and the chart configs a variable leaves behind in MySQL and R2, are Grapher's schema.
+    So Grapher does the delete and hands back anything a chart still uses.
+
+    We send the variables to remove rather than the ones to keep, deliberately. If our view of
+    the dataset is ever incomplete, a ghost we failed to spot just lingers until the next run;
+    the other way round, a variable we failed to mention would be destroyed.
+
+    :param admin_api: Grapher admin API client
+    :param ghost_variable_ids: variables in the dataset that this run didn't upsert
 
     :return: True if successful
     """
-    with engine.connect() as con:
-        # get all those variables first
-        rows = con.execute(
-            text(
-                """
-            SELECT id FROM variables WHERE datasetId = :dataset_id AND id NOT IN :variable_ids
-        """
-            ),
-            {"dataset_id": dataset_id, "variable_ids": upserted_variable_ids or [-1]},
-        ).fetchall()
-
-        variable_ids_to_delete = [row[0] for row in rows]
-
-        # nothing to delete, quit
-        if not variable_ids_to_delete:
-            return True
-
-        log.info("cleanup_ghost_variables.start", size=len(variable_ids_to_delete))
-
-        # raise an exception if they're used in any charts
-        rows = con.execute(
-            text(
-                """
-            SELECT chartId, variableId FROM chart_dimensions WHERE variableId IN :variable_ids
-        """
-            ),
-            {"dataset_id": dataset_id, "variable_ids": variable_ids_to_delete},
-        ).fetchall()
-        if rows:
-            rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
-
-            message = "Variables used in charts will not be deleted automatically. Ignore this if your PR doesn't affect the problematic variables."
-
-            if _raise_error_for_deleted_variables(rows):
-                raise ValueError(f"{message}:\n{rows}")
-            else:
-                # otherwise show a warning
-                log.warning(
-                    message,
-                    rows=rows,
-                    variables=variable_ids_to_delete,
-                )
-                return False
-
-        # then variables themselves with related data in other tables
-        # delete relationships
-        con.execute(
-            text(
-                """
-            DELETE FROM origins_variables WHERE variableId IN :variable_ids
-        """
-            ),
-            {"variable_ids": variable_ids_to_delete},
-        )
-        con.execute(
-            text(
-                """
-            DELETE FROM tags_variables_topic_tags WHERE variableId IN :variable_ids
-        """
-            ),
-            {"variable_ids": variable_ids_to_delete},
-        )
-        con.execute(
-            text(
-                """
-            DELETE FROM posts_gdocs_variables_faqs WHERE variableId IN :variable_ids
-        """
-            ),
-            {"variable_ids": variable_ids_to_delete},
-        )
-
-        # delete them from explorers
-        con.execute(
-            text(
-                """
-            DELETE FROM explorer_variables WHERE variableId IN :variable_ids
-        """
-            ),
-            {"variable_ids": variable_ids_to_delete},
-        )
-
-        # NOTE: deleting mdim variables form grapher:// step could be a bit unexpected and could
-        # lead to side effects. If this causes problems, we should clean up ghost variables after
-        # the entire ETL & chart-sync is finished.
-        # delete from dependent multi_dim_x_chart_configs to avoid foreign key constraint
-        con.execute(
-            text(
-                """
-            DELETE FROM multi_dim_x_chart_configs WHERE variableId IN :variable_ids
-        """
-            ),
-            {"variable_ids": variable_ids_to_delete},
-        )
-
-        # finally delete variables
-        result = con.execute(
-            text(
-                """
-            DELETE FROM variables WHERE datasetId = :dataset_id AND id IN :variable_ids
-        """
-            ),
-            {"dataset_id": dataset_id, "variable_ids": variable_ids_to_delete},
-        )
-
-        con.commit()
-
-        log.warning(
-            "cleanup_ghost_variables.end",
-            size=result.rowcount,
-            variables=variable_ids_to_delete,
-        )
-
+    if not ghost_variable_ids:
         return True
+
+    try:
+        result = admin_api.delete_variables(ghost_variable_ids)
+    except requests.exceptions.ConnectionError:
+        # Only a genuinely local admin is allowed to be missing. Decide from the server we're
+        # talking to, not from `config.ENV`: a local run with STAGING=1 keeps ENV as "dev"
+        # while pointing at a remote staging admin, and failing to reach *that* is an outage,
+        # not a workflow.
+        if admin_api.owid_env.env_remote != "dev":
+            raise
+        # Working locally without a running Grapher admin. Leaving the ghost variables behind
+        # is harmless there, so warn instead of failing the step — but report the cleanup as
+        # unsuccessful, so the checksum stays unset and a later run against a reachable admin
+        # picks them up rather than recording a sweep that never happened.
+        log.warning(
+            "delete_ghost_variables.admin_api_unreachable",
+            admin_api=admin_api.owid_env.admin_api,
+        )
+        return False
+
+    if result["deleted"]:
+        log.warning(
+            "delete_ghost_variables.end",
+            size=len(result["deleted"]),
+            variables=result["deleted"],
+        )
+
+    if not result["blocked"]:
+        return True
+
+    rows = pd.DataFrame(result["blocked"], columns=["variableId", "variableName", "usedBy", "ref"])
+
+    message = "Variables used in charts, published explorers or live multi-dim views will not be deleted automatically. Ignore this if your PR doesn't affect the problematic variables."
+
+    if _raise_error_for_deleted_variables(rows):
+        raise ValueError(f"{message}:\n{rows}")
+
+    # otherwise show a warning
+    log.warning(message, rows=rows)
+    return False
+
+
+def _chart_ids_for_refs(refs: list[str]) -> set[int]:
+    """Resolve the chart references Grapher reports back to chart ids.
+
+    Grapher sends the chart's slug, falling back to its id when the config has no slug, so we
+    match on either.
+    """
+    if not refs:
+        return set()
+
+    q = """
+    SELECT c.id
+    FROM charts c
+    JOIN chart_configs cc ON cc.id = c.configId
+    WHERE cc.slug IN %(refs)s OR c.id IN %(refs)s
+    """
+    df = read_sql(q, params={"refs": tuple(str(ref) for ref in refs)})
+    return set(df["id"])
 
 
 def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
-    """If we run into ghost variables that are still used in charts, should we raise an error?"""
+    """If we run into ghost variables that are still in use, should we raise an error?"""
     # raise an error if on staging server
     if config.ENV == "staging":
+        # A published explorer or a live multi-dim view isn't something chart-sync can remap, so
+        # there's nothing to wait for — surface it now.
+        if (rows.usedBy != "chart").any():
+            return True
+
         # It's possible that we merged changes to ETL, but the staging server still uses old charts. In
         # that case, we first check that the charts were really modified on our staging server.
 
@@ -520,10 +511,11 @@ def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
         from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
 
         modified_charts = ChartDiffsLoader(config.OWID_ENV.get_engine(), production_or_master_engine()).df
-        return bool(set(modified_charts.index) & set(rows.chartId))
+        blocking_chart_ids = _chart_ids_for_refs(rows.loc[rows.usedBy == "chart", "ref"].dropna().tolist())
+        return bool(set(modified_charts.index) & blocking_chart_ids)
     # Only show a warning in production. We can't raise an error because if someone merges changes to ETL
     # with renamed variables and valid chart-sync, the ETL deploy would fail. It would fail because ETL (and this part) runs
-    # before chart-sync. If we only show a warning, the function `cleanup_ghost_variables` returns False, and ETL will
+    # before chart-sync. If we only show a warning, `delete_ghost_variables` returns False, and ETL will
     # re-run the step on the next deploy and delete those ghost variables.
     # See https://github.com/owid/etl/issues/4099 for more details.
     elif config.ENV == "production":
@@ -537,7 +529,7 @@ def _get_timespan(table: pd.DataFrame, variable_meta: VariableMeta) -> str:
     display = variable_meta.display or {}
 
     # Timespan does not work for sub-yearly data.
-    if display.get("yearIsDay") or display.get("timeInterval") in {"day", "week", "month", "quarter"}:
+    if display.get("timeInterval") in gh.SUB_YEARLY_TIME_INTERVALS:
         return ""
 
     years = table.year.unique()

@@ -34,7 +34,6 @@ from owid import catalog
 from owid.catalog import s3_utils
 from owid.catalog.api.utils import DEFAULT_CATALOG_URL
 from owid.catalog.core.datasets import DEFAULT_FORMATS
-from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 from tqdm import tqdm
 
@@ -43,7 +42,6 @@ from etl import config, files, git_helpers, paths
 from etl.config import OWID_ENV, TLS_VERIFY
 from etl.db import get_engine
 from etl.grapher import helpers as gh
-from etl.grapher import model as gm
 from etl.helpers import get_metadata_path
 from etl.snapshot import Snapshot
 
@@ -53,6 +51,19 @@ DAG = dict[str, set[str]]
 
 # Dictionary to store metadata changes for each dataset if INSTANT flag is set
 INSTANT_METADATA_DIFF = {}
+
+
+class StepFailedError(Exception):
+    """A step's code raised in the child process (fork or subprocess) that ran it.
+
+    The message carries the child's traceback, since the exception itself has none worth printing:
+    its own frames are the runner's, and across a process pool they arrive wrapped in
+    `_RemoteTraceback` plumbing.
+
+    This must be a regular Exception rather than a `sys.exit(exit_code)`: the runners catch
+    `Exception` to log which step failed and to honour `--continue-on-failure`, and a `SystemExit`
+    would sail past those handlers and end the run without naming the step or printing anything.
+    """
 
 
 def compile_steps(
@@ -682,9 +693,18 @@ class DataStep(Step):
         else:
             self._run_py_subprocess()
 
+    def _child_failure_message(self, traceback_path: Path, exit_code: int) -> str:
+        """Describe a failed child: the traceback it left behind, if it got that far, and the step."""
+        try:
+            child_traceback = traceback_path.read_text().rstrip() + "\n"
+        except OSError:
+            child_traceback = ""
+        return f"{child_traceback}Step {self} failed with exit code {exit_code}"
+
     def _run_py_fork(self) -> None:
         """Run the step in a forked child process (Linux only)."""
         import resource
+        import tempfile
         import traceback
 
         # Apply the same virtual-memory limit that prlimit would enforce
@@ -695,6 +715,12 @@ class DataStep(Step):
                 )
             except ValueError:
                 pass  # not all systems support RLIMIT_AS
+
+        # Somewhere for the child to leave its traceback; see the child branch below. Created here
+        # so the name is unique per run and both processes know it.
+        traceback_fd, traceback_file = tempfile.mkstemp(prefix="etl-step-traceback-", suffix=".txt")
+        os.close(traceback_fd)
+        traceback_path = Path(traceback_file)
 
         # Flush before forking to prevent the child from inheriting (and
         # potentially re-flushing) buffered output from the parent, which
@@ -730,18 +756,31 @@ class DataStep(Step):
                 run_module_run(step_module, self._dest_dir.as_posix())
                 os._exit(0)
             except BaseException:
-                traceback.print_exc()
+                # Hand the traceback to the parent through a file rather than writing it to the
+                # stdout this child shares with its siblings. A traceback easily exceeds PIPE_BUF,
+                # above which a write is neither atomic nor guaranteed to complete in one call, so
+                # concurrent children would interleave into an unreadable mix. The parent puts it in
+                # StepFailedError's message, and the runners print one failure at a time, labelled
+                # with the step it belongs to.
+                try:
+                    traceback_path.write_text(traceback.format_exc())
+                except OSError:
+                    # Last resort, interleaved or not: never lose the traceback.
+                    traceback.print_exc()
                 os._exit(1)
         else:
             # ---------- parent process ----------
-            _, status = os.waitpid(pid, 0)
-            if os.WIFEXITED(status):
-                exit_code = os.WEXITSTATUS(status)
-                if exit_code != 0:
-                    sys.exit(exit_code)
-            elif os.WIFSIGNALED(status):
-                sig = os.WTERMSIG(status)
-                raise Exception(f"Step {self} was killed by signal {sig}")
+            try:
+                _, status = os.waitpid(pid, 0)
+                if os.WIFEXITED(status):
+                    exit_code = os.WEXITSTATUS(status)
+                    if exit_code != 0:
+                        raise StepFailedError(self._child_failure_message(traceback_path, exit_code))
+                elif os.WIFSIGNALED(status):
+                    sig = os.WTERMSIG(status)
+                    raise Exception(f"Step {self} was killed by signal {sig}")
+            finally:
+                traceback_path.unlink(missing_ok=True)
 
     def _run_py_subprocess(self) -> None:
         """Run the step in a new subprocess (fallback for non-Linux or debug mode)."""
@@ -769,7 +808,7 @@ class DataStep(Step):
         try:
             subprocess.check_call(args, env=env)
         except subprocess.CalledProcessError as e:
-            sys.exit(e.returncode)
+            raise StepFailedError(f"Step {self} failed with exit code {e.returncode} (traceback above)") from e
 
     def _download_dataset_from_catalog(self) -> bool:
         """Download the dataset from the catalog if the checksums match. Return True if successful."""
@@ -1076,7 +1115,7 @@ class GrapherStep(Step):
             # cleaning up ghost resources could be unsuccessful if someone renamed short_name of a variable
             # and remapped it in chart-sync. In that case, we cannot delete old variables because they are still
             # needed for remapping. However, we can delete it on next ETL run
-            success = self._cleanup_ghost_resources(engine, dataset_upsert_results, catalog_paths)
+            success = self._delete_ghost_variables(admin_api, preloaded_checksums, catalog_paths)
 
             # set checksum and updatedAt timestamps after all data got inserted
             if success:
@@ -1094,33 +1133,31 @@ class GrapherStep(Step):
         """Checksum of a grapher step is the same as checksum of the underyling data://grapher step."""
         return self.data_step.checksum_input()
 
-    @classmethod
-    def _cleanup_ghost_resources(
-        cls,
-        engine: Engine,
-        dataset_upsert_results,
+    @staticmethod
+    def _delete_ghost_variables(
+        admin_api: AdminAPI,
+        preloaded_checksums: dict,
         catalog_paths: list[str],
     ) -> bool:
         """
-        Cleanup all ghost variables that weren't upserted
+        Remove the dataset's variables that this run didn't upsert.
+
         NOTE: we can't just remove all dataset variables before starting this step because
         there could be charts that use them and we can't remove and recreate with a new ID
 
-        Return True if cleanup was successfull, False otherwise.
+        `preloaded_checksums` was read before the upserts, so it holds exactly the variables
+        that already existed; anything created during this run isn't in it and can't be
+        mistaken for a ghost.
+
+        Return True if cleanup was successful, False otherwise.
         """
         import etl.grapher.to_db as db
 
-        # convert catalog_paths to variable_ids
-        with Session(engine) as session:
-            upserted_variable_ids = list(gm.Variable.catalog_paths_to_variable_ids(session, catalog_paths).values())
+        upserted = set(catalog_paths)
+        ghost_variable_ids = [row["id"] for path, row in preloaded_checksums.items() if path not in upserted]
 
-        # Try to cleanup ghost variables, but make sure to raise an error if they are used
-        # in any chart
-        success = db.cleanup_ghost_variables(
-            engine,
-            dataset_upsert_results.dataset_id,
-            upserted_variable_ids,
-        )
+        # Try to delete them, but make sure to raise an error if they are used in any chart
+        success = db.delete_ghost_variables(admin_api, ghost_variable_ids)
 
         # TODO: cleanup origins that are not used by any variable. We can do it in batch
         return success
@@ -1142,6 +1179,13 @@ class ExportStep(DataStep):
     def __str__(self) -> str:
         return f"export://{self.path}"
 
+    def can_execute(self, archive_ok: bool = True) -> bool:
+        sp = self._search_path
+        if not archive_ok and "/archive/" in sp.as_posix():
+            return False
+
+        return super().can_execute(archive_ok=archive_ok) or self._is_multidim_yaml_only()
+
     def run(self) -> None:
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
@@ -1157,11 +1201,30 @@ class ExportStep(DataStep):
                 DataStep._run_py_isolated(self)  # ty: ignore
             else:
                 DataStep._run_py(self)  # ty: ignore
+        elif self._is_multidim_yaml_only():
+            # YAML-only multidim: no .py, just a .config.yml. Run the default
+            # boilerplate (load_collection_config → create_collection → save).
+            self._run_multidim_yaml_only(sp)
 
         # save checksum (only update index.json, don't call ds.save() which iterates
         # table_names and would pick up custom JSON files written by the export script)
         ds.metadata.source_checksum = self.checksum_input()
         ds.metadata.save(ds._index_file)
+
+    def _is_multidim_yaml_only(self) -> bool:
+        """True if this is an `export://multidim/...` step backed only by a `.config.yml`."""
+        if not self.path.startswith("multidim/"):
+            return False
+        return self._search_path.with_suffix(".config.yml").exists()
+
+    def _run_multidim_yaml_only(self, search_path: Path) -> None:
+        from etl.helpers import PathFinder
+
+        # Synthesise the `.py` path PathFinder expects; the file doesn't need to exist,
+        # PathFinder only parses namespace/version/short_name out of the path components.
+        paths_ = PathFinder(str(search_path.with_suffix(".py")))
+        collection = paths_.create_collection(config=paths_.load_collection_config())
+        collection.save()
 
     def checksum_output(self) -> str:
         # output checksum is checksum of all ingredients

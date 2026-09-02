@@ -45,9 +45,13 @@
     "typescript": "^5.6.2"
   },
   "overrides": {
-    "serialize-javascript": "^7.0.5"
+    "brace-expansion@1": "^1.1.16",
+    "brace-expansion@2": "^2.1.2",
+    "brace-expansion@5": "^5.0.7",
+    "serialize-javascript": "^7.0.5",
+    "shell-quote": "^1.10.0"
   },
   "dependencies": {
-    "js-yaml": "^4.2.0"
+    "js-yaml": "^4.3.1"
   }
 }

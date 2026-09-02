@@ -1,13 +1,13 @@
 [project]
 name = "owid-owl"
-version = "0.1.0"
+version = "0.1.1"
 description = "A lightweight OWID data pipeline framework that can run alongside the main ETL."
 authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},
 ]
 license = "MIT"
 readme = "owl/README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11, <3.15"
 dependencies = [
     "click>=8.0",
     "graphviz>=0.21",

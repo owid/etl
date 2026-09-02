@@ -26,6 +26,7 @@ from owid.catalog.core.meta import (
     PROCESSING_LEVELS,
     PROCESSING_LEVELS_ORDER,
     License,
+    Markdown,
     Origin,
     VariableMeta,
     VariablePresentationMeta,
@@ -681,12 +682,17 @@ def get_unique_description_key_points_from_indicators(indicators: list[Indicator
     if not uniques:
         return None
     if len(uniques) == 1:
-        return uniques[0]
+        unique = uniques[0]
+        return Markdown(unique) if isinstance(unique, str) else unique
     texts = [
         description_key_to_string(description_key) if isinstance(description_key, list) else description_key
         for description_key in uniques
     ]
-    return "\n\n".join(text for text in texts if text) or None
+    # `str.join` returns a plain str even when every part is a `Markdown`, and the result is
+    # assigned to metadata after construction, where `__post_init__` cannot re-wrap it. Wrap it
+    # here so the combined value is as iteration-proof as the ones it was built from.
+    combined = "\n\n".join(text for text in texts if text)
+    return Markdown(combined) if combined else None
 
 
 def _get_dict_from_list_if_all_identical(list_of_objects: list[dict[str, Any] | None]) -> dict[str, Any] | None:
