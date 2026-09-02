@@ -923,42 +923,87 @@ def adjust_consumption_to_income(tb_pip: Table, tb_model: Table, tb_welfare: Tab
 
 
 def enforce_monotone(tb: Table, mask: np.ndarray) -> Table:
-    """Make bin averages non-decreasing across percentiles, for the masked rows only.
+    """Make each masked country-year's bin averages non-decreasing across its 109 bins, changing
+    as little as possible and leaving its mean exactly where it was.
 
-    Isotonic regression (pool-adjacent-violators): the least-squares projection of the fitted
-    profile onto the monotone cone, weighted by bin population. A run of violating bins is replaced
-    by its weighted average, so the mean is preserved and every non-violating bin keeps its fitted
-    value.
+    THE PROBLEM. A bin's average can never sit below the bin beneath it: bin p1p2 is by definition
+    the 1st-2nd percentile, so its mean cannot exceed p2p3's. The raw PIP series respects this
+    everywhere. The consumption -> income mapping can break it, because every percentile has its
+    own (alpha, beta) and those are not monotone in the percentile: at the sub-$1 consumption
+    levels found at the bottom of poor countries, p1's coefficients imply a HIGHER income than
+    p2's, so the mapped profile dips where the consumption profile did not. 495 country-years are
+    affected, almost all in their bottom five bins.
 
-    A cumulative maximum would be simpler but is the wrong choice here. The inversion comes from the
-    model's own coefficients: p1 is the only percentile with beta below 1 (0.776 against 1.09-1.22
-    above it) and it has the worst fit (R^2 0.28), so at the sub-$1 consumption levels where this
-    bites it implies a HIGHER income than p2 does. A running maximum would broadcast that single
-    least-reliable estimate across the whole violating run; measured over the affected country-years
-    it shifts the mean by +0.11% and the within-country MLD by -0.011, against +0.000% and -0.00035
-    here. Averaging the violators instead down-weights the outlier, which is what it deserves.
+    WHAT IT DOES. For each violating country-year, replace its 109 values with the closest
+    non-decreasing sequence — closest in the least-squares sense, each bin weighted by its
+    population. That is isotonic regression, and the algorithm behind it (pool-adjacent-violators)
+    is easy to picture: walk the bins from the bottom up; whenever a bin sits below the one before
+    it, merge the two into a pool and give both the pool's population-weighted average; keep
+    merging the pool backwards while it is still lower than its predecessor. Only bins inside such
+    a pool change.
+
+    Three properties follow, and they are why this method was chosen:
+
+      - the result is non-decreasing by construction (the caller re-checks and asserts it);
+      - the country-year's total income, and so its mean, is preserved exactly — a pool's weighted
+        average carries precisely the income of the bins it replaces;
+      - every bin outside a pool keeps its fitted value to the last digit.
+
+    WORKED EXAMPLE — Benin 2015, the worst case in the panel. PIP reports its bottom three
+    percentiles at an identical $0.28/day, so the mapped values there are set purely by the
+    coefficients, and they fall as the percentile rises:
+
+        bin      fitted    after
+        p0p1     0.2096    0.1523
+        p1p2     0.1438    0.1523
+        p2p3     0.1322    0.1523
+        p3p4     0.1295    0.1523
+        p4p5     0.1463    0.1523
+        p5p6     0.1661    0.1661   (unchanged: already above the pool)
+
+    0.1523 is the plain average of the five fitted values — these bins hold equal population — so
+    the bottom 5% keep exactly the income the model gave them, now spread evenly across the five.
+
+    WHY NOT A CUMULATIVE MAXIMUM. Lifting each bin to the highest value seen so far is simpler, but
+    here it would set all five bins to p0p1's 0.2096 — broadcasting the single least reliable
+    estimate in the model (percentile 1 has the only beta below 1, 0.776, and the worst fit, R^2
+    0.28) across the run, and adding income that was never there. Measured over the 495 affected
+    country-years, a cumulative maximum shifts the mean by +0.11% and the within-country MLD by
+    -0.011; isotonic regression shifts them by +0.000% and -0.00035.
     """
-    # `mask` is positional against `tb` as passed, so reset the index (which preserves order) and
-    # carry the sort permutation explicitly rather than reordering the table under the mask.
+    # STEP 1 — work positionally. `mask` is aligned with tb's rows as passed, so drop any index
+    # labels (reset_index keeps the row order) and compute the permutation that sorts rows into
+    # (country, year, bin_index). It is applied to the arrays, never to the table, so the mask stays
+    # aligned and the result can be written back in the caller's row order.
     tb = tb.reset_index(drop=True)
     order = tb.sort_values(["country", "year", "bin_index"]).index.to_numpy()
 
+    # STEP 2 — one matrix row per country-year, one column per bin in ascending order. Every
+    # country-year has exactly 109 bins, which is what lets the sorted arrays reshape cleanly.
     avg = tb["avg"].to_numpy(dtype=float)
     pop = tb["pop"].to_numpy(dtype=float)
     n_groups = len(avg) // 109
     assert n_groups * 109 == len(avg), "Rows do not divide into 109-bin country-years."
+    grid = avg[order].reshape(n_groups, 109)  # the values to make monotone
+    weights = pop[order].reshape(n_groups, 109)  # bin populations: a 0.1% bin counts a tenth of a 1% bin
+    rows = np.asarray(mask, dtype=bool)[order].reshape(n_groups, 109).any(axis=1)  # country-years in the mask
 
-    grid = avg[order].reshape(n_groups, 109)
-    weights = pop[order].reshape(n_groups, 109)
-    rows = np.asarray(mask, dtype=bool)[order].reshape(n_groups, 109).any(axis=1)
-
-    # Only the country-years that actually violate need fitting; the rest are already monotone.
+    # STEP 3 — fit only where needed: masked country-years with at least one decrease. The 1e-9
+    # tolerance keeps float noise from counting as a violation. Everything else is already monotone
+    # and is left exactly as it is.
     violating = rows & (np.diff(grid, axis=1) < -1e-9).any(axis=1)
+
+    # STEP 4 — the isotonic fit, one country-year at a time. x is just the bin position: the fit
+    # constrains y to be non-decreasing in x, so only the ORDER of x matters. sample_weight is the
+    # bin population, which makes each pool's replacement value a population-weighted average and
+    # so conserves the country-year's total income.
     percentiles = np.arange(109)
     fitter = IsotonicRegression(increasing=True)
     for i in np.flatnonzero(violating):
         grid[i] = fitter.fit_transform(percentiles, grid[i], sample_weight=weights[i])
 
+    # STEP 5 — write back through the same permutation, so every value lands on the row it came
+    # from and the caller's row order (and mask alignment) is untouched.
     out = avg.copy()
     out[order] = grid.reshape(-1)
     tb["avg"] = out
