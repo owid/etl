@@ -89,7 +89,7 @@ def changed_slugs(days: int = 1, include_data_updates: bool = False) -> list[str
 
 
 def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
-    """``{slug: {"chart_id": int | None, "indicators": str}}`` for the charts that were flagged.
+    """``{slug: {"chart_id": int | None, "indicators": [catalog paths]}}`` for the flagged charts.
 
     A data-level defect lives in an indicator, not in a chart, so the same claim surfaces on
     every chart sharing that column. This already happened: the UK coal share above 100% was
@@ -132,25 +132,34 @@ def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
         # Keyed on the step path without its version, so tomorrow's re-run of the same step does
         # not re-post yesterday's finding under a new name.
         paths = sorted({re.sub(r"/\d{4}-\d{2}-\d{2}/", "/", p) for p in group["catalogPath"] if isinstance(p, str)})
-        out[str(slug)] = {"chart_id": int(group["chartId"].iloc[0]), "indicators": "|".join(paths)}
+        out[str(slug)] = {"chart_id": int(group["chartId"].iloc[0]), "indicators": paths}
     return out
 
 
-def _indicators(facts: dict[str, dict[str, Any]] | None, slug: str) -> str:
-    return str((facts or {}).get(slug, {}).get("indicators") or "") or slug
+def _indicators(facts: dict[str, dict[str, Any]] | None, slug: str) -> list[str]:
+    got = (facts or {}).get(slug, {}).get("indicators") or []
+    return [str(path) for path in got]
 
 
-def _fingerprint(slug: str, issue: dict[str, Any], facts: dict[str, dict[str, Any]] | None = None) -> str:
-    """Identify a finding across days and across charts, loosely enough to survive rewording.
+def _fingerprint_keys(slug: str, issue: dict[str, Any], facts: dict[str, dict[str, Any]] | None = None) -> list[str]:
+    """Every identity under which this finding should be recognised, across days and charts.
 
-    Data-level findings are keyed by the chart's indicators where those are known, so one
-    defective column reported on five charts is one finding. Chart-level findings stay keyed by
-    slug: a wrong subtitle really is specific to that chart even when the data is shared.
+    One key per indicator for a data-level finding, rather than one key for the chart's whole
+    indicator set. The set was the obvious thing to hash and it does not work: a defective column
+    read alone by chart A and alongside another column by chart B yields ``A`` and ``A|B``, so the
+    identical finding still takes two of the five digest slots. Matching on *any* shared indicator
+    is what "one defective column is one finding" actually requires.
+
+    The claim's own significant words are in every key, so two different problems on charts that
+    happen to share an indicator do not collapse into each other.
+
+    Chart-level findings stay keyed by slug: a wrong subtitle really is specific to that chart
+    even when the data behind it is shared.
     """
     words = sorted({w.rstrip("s") for w in re.findall(r"[a-z0-9]{5,}", issue.get("claim", "").lower())})
-    kind = issue.get("kind", "")
-    subject = _indicators(facts, slug) if kind == "data" else slug
-    return f"{subject}:{kind}:{'-'.join(words[:8])}"
+    tail = f"{issue.get('kind', '')}:{'-'.join(words[:8])}"
+    indicators = _indicators(facts, slug) if issue.get("kind") == "data" else []
+    return [f"{i}:{tail}" for i in indicators] or [f"{slug}:{tail}"]
 
 
 def load_state() -> dict[str, str]:
@@ -184,10 +193,12 @@ def new_findings(
         key=lambda ri: (order.get(ri[1].get("severity", "low"), 3), -ri[0].get("views", 0)),
     )
     for result, issue in ranked:
-        key = _fingerprint(result["slug"], issue, facts)
-        if key in state or key in seen:
+        keys = _fingerprint_keys(result["slug"], issue, facts)
+        # Any overlap counts as already-known: the same defect on a second chart sharing one
+        # indicator is not news, even though the two charts are not the same chart.
+        if any(k in state or k in seen for k in keys):
             continue
-        seen.add(key)
+        seen.update(keys)
         out.append((result, issue))
     return out
 
@@ -276,5 +287,6 @@ def stamp(
     re-post every finding every day."""
     today = datetime.now(timezone.utc).date().isoformat()
     for result, issue in findings[:MAX_FINDINGS]:
-        state[_fingerprint(result["slug"], issue, facts)] = today
+        for key in _fingerprint_keys(result["slug"], issue, facts):
+            state[key] = today
     return state

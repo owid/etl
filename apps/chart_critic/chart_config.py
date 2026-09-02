@@ -30,8 +30,23 @@ KEYS = (
 )
 
 
+class ConfigUnavailable(Exception):
+    """The config lookup itself failed, as opposed to the slug having no chart config.
+
+    The two were indistinguishable, and the consequence was quiet: in ``--sample`` and
+    ``--changed-since`` — which have a database by definition — a permissions problem or a schema
+    change would remove the whole chart-config channel from every review while the run still
+    reported success. That channel is what catches stale time bounds, empty entity selections and
+    a broken default tab, so losing it silently loses a class of findings, not a detail.
+    """
+
+
 def fetch(slug: str) -> dict[str, Any] | None:
-    """The live config for a slug, or None if the database is unreachable or the slug is unknown."""
+    """The live config for a slug, or None if the slug has no chart config.
+
+    Raises:
+        ConfigUnavailable: the lookup could not be performed at all.
+    """
     try:
         from etl.db import read_sql
 
@@ -45,8 +60,8 @@ def fetch(slug: str) -> dict[str, Any] | None:
             """,
             params={"slug": slug},
         )
-    except Exception:  # noqa: BLE001 — no database is a normal way to run this
-        return None
+    except Exception as e:
+        raise ConfigUnavailable(str(e)) from e
     if df.empty:
         return None
     raw = df.config.iloc[0]

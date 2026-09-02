@@ -21,6 +21,7 @@ import io
 import json
 import time
 from dataclasses import dataclass, field
+from typing import Any
 
 import pandas as pd
 from requests import HTTPError
@@ -38,6 +39,15 @@ CHART_FIELDS = ("title", "subtitle", "note", "xAxisLabel", "yAxisLabel")
 # Cap how many indicators of a wide chart get summarised, so a 100-column chart cannot blow up
 # the prompt.
 MAX_COLUMNS = 10
+
+
+class DataFetchFailed(Exception):
+    """The values could not be fetched for an operational reason, as opposed to a policy one.
+
+    Kept distinct from the non-redistributable case on purpose. A chart whose data we are not
+    allowed to serve is still reviewable on its metadata and its image; a chart whose CSV 503s
+    is a chart nobody reviewed, and the difference has to reach the exit code.
+    """
 
 
 class ChartGone(Exception):
@@ -64,6 +74,23 @@ class Bundle:
     @property
     def url(self) -> str:
         return f"{GRAPHER_URL}/{self.slug}"
+
+
+def _declined_reason(response: Any) -> str | None:
+    """The endpoint's own explanation for refusing the data, or None if it did not give one.
+
+    Keyed on the body rather than the status, because the same refusal has been seen as a 403
+    and as a 200 carrying an error document. A 403 with no such body is a different animal — a
+    CDN block, say — and must not be mistaken for "we are not allowed to share this".
+    """
+    if response is None or response.status_code != 403:
+        return None
+    try:
+        payload = response.json()
+    except ValueError:
+        return None
+    reason = payload.get("error") if isinstance(payload, dict) else None
+    return str(reason) if reason else None
 
 
 def _fetch(url: str, attempts: int = 3) -> bytes:
@@ -193,13 +220,43 @@ def build(
             columns={c: c.capitalize() for c in df.columns if c.lower() in ("entity", "code", "year", "day")}
         )
         lines += _numeric_summary(df)
-    except (HTTPError, ValueError) as e:
+    except ValueError as e:
+        # The endpoint's own "we may not redistribute this" answer. A real and permanent
+        # condition (IHME/GBD and a few others), so the chart is still worth reviewing on its
+        # metadata and image — this is the one case that degrades rather than fails.
         bundle.data_available = False
         reason = str(e)[:120]
         bundle.notes.append(f"values unavailable: {reason}")
         lines.append(f"\ndata: not available to this reviewer ({reason})")
+    except HTTPError as e:
+        # Two different 403s live here, and telling them apart is the whole point.
+        #
+        # The endpoint answers 403 with a JSON body — {"status":403,"error":"This chart contains
+        # non-redistributable data…"} — for the IHME/GBD family and a handful of others. That is
+        # policy, permanent, and the chart is still worth reviewing on its metadata and image:
+        # the "aumber" subtitle typo in the fixture set is on exactly such a chart, and failing
+        # it outright cost that fixture its finding.
+        #
+        # Anything else — a 5xx that outlived its retries, a rate limit, a bare 403 from the CDN,
+        # a 404 on the CSV alone — is operational. Treating that as "no data" would let the report
+        # and the digest call the chart clean when the model never saw a single value, so the
+        # chart fails and the caller marks the run incomplete and exits 2.
+        detail = _declined_reason(e.response)
+        if detail is None:
+            code = e.response.status_code if e.response is not None else "?"
+            raise DataFetchFailed(f"CSV endpoint returned HTTP {code}") from e
+        bundle.data_available = False
+        bundle.notes.append(f"values unavailable: {detail[:120]}")
+        lines.append(f"\ndata: not available to this reviewer ({detail[:120]})")
 
-    config = chart_config.fetch(slug) if with_config else None
+    # Not fatal: ``--slugs`` is documented to work without a database, and the config is one
+    # channel of several. But it goes in the notes, so a review that could not see the chart's
+    # configuration says so instead of looking like a review that saw everything.
+    try:
+        config = chart_config.fetch(slug) if with_config else None
+    except chart_config.ConfigUnavailable as e:
+        config = None
+        bundle.notes.append(f"chart configuration unavailable ({str(e)[:80]}) — reviewed without it")
     if config:
         lines += chart_config.summarize(config)
         if not params:
