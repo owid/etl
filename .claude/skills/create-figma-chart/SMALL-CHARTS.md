@@ -412,8 +412,10 @@ missing, add it:
 
 - **Dot:** clone the same series' *other* dot, so size, fill and shape match exactly, then seat it on
   the line's first path point. Never draw a fresh ellipse.
-- **Value:** take the number from `.csv?…&csvType=filtered` — never read it off the chart or infer it
-  from the other end. The median's 1990 threshold was `3.551` → `$3.55`, which is what the reference
+- **Value:** take the number from the `.csv` — never read it off the chart or infer it from the other
+  end. **Filter to that series' own `Code`/`Entity` first**: the CSV arrives carrying every entity
+  whatever params you pass (GOTCHAS.md), so an unfiltered lookup on the year returns whichever country
+  happened to come last. The median's 1990 threshold was `3.551` → `$3.55`, which is what the reference
   shows.
 
 ### The margins are 12px sides, 10px top and bottom — and the plot must reach them
@@ -630,9 +632,12 @@ reason. Three honest options, in order of preference:
 3. **Ship them as two separate small charts.** A `chart-rows` block has several rows; two charts each
    labeled with their own series is often clearer at 302px than one crowded composite.
 
-Whichever you pick, `.csv?...&csvType=filtered` is how you check the values — and note the CSV returns
-**every entity** unless `csvType=filtered` is present, so a naive `df[df.year == 1913]` silently reads
-some other country.
+Whichever you pick, the `.csv` is how you check the values — but **filter it yourself**. It returns
+**every entity** whatever you pass: `country=` and `time=` are ignored outright, and `csvType=filtered`
+does not narrow it to the chart's selection either (measured: 217 entities with `country=CHL`, still
+174 with `csvType=filtered`). So a naive `df[df.year == 1913]` silently reads some other country.
+Select on `Code`/`Entity` and assert the row count — GOTCHAS.md → "`<slug>.csv` IGNORES `country=` and
+`time=`".
 
 ### `imFontSize` is in rendered pixels, at 0.75×
 
@@ -740,12 +745,19 @@ SVG is rejected.
    site-wide, and Figma uses the frame name as the export filename. Don't add a `-<W>x<H>` suffix:
    `appendImageSizeSuffix` reserves the `-{n}w` form for archival srcsets, and `htmlToEnriched.ts`
    strips `-1280x840`-style suffixes.
-2. **Export at 3×.** The admin already has a Figma path —
-   `GET /api/figma/image?fileId=<key>&nodeId=<node>` (`adminSiteServer/apiRoutes/figma.ts`) calls the
-   Figma API at `scale: 3`, giving **906 × 3H**. This matters: `getSizes(302)` yields
-   `[48, 100, 302]`, so the largest srcset candidate at 1× is 302w and a 2× display upscales it.
-   Note `get_screenshot` **cannot** do this — `maxDimension` only ever downscales, and clamps at the
-   node's natural size.
+2. **Export at 2×** — the scale for this family
+   ([NODE-MAP.md](reference/NODE-MAP.md) → Export scale per family), giving **604 × 2H**.
+   `get_screenshot` **cannot** do it: `maxDimension` only ever downscales and clamps at the node's
+   natural size, so clone, `rescale(2)`, and screenshot the clone.
+
+   > **Unreconciled, and worth knowing before you use the admin route:**
+   > `GET /api/figma/image?fileId=<key>&nodeId=<node>` (`adminSiteServer/apiRoutes/figma.ts`)
+   > hardcodes `scale: 3`, i.e. **906 × 3H** — it cannot deliver 2×. Its stated reason is that
+   > `getSizes(302)` yields `[48, 100, 302]`, so the largest srcset candidate at 1× is 302w and a 2×
+   > display would upscale it. That reasoning argues for 3×; the scale we ship is 2×. Both are
+   > recorded because neither can be verified from inside this skill — the constant is code, and the
+   > 2× is the team's stated practice. **Export 2× by hand rather than assuming the endpoint agrees
+   > with the table**, and flag the discrepancy to whoever owns that route.
 3. **Upload** via the admin (`POST /api/images`), then reference the filename in the block's `image:`
    field. **From a cloud session steps 2 and 3 are both Access-blocked** — hand them to the user, with
    the frame's node id and the target filename, rather than reporting the chart as delivered.

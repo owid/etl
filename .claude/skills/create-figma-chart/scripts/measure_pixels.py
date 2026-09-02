@@ -335,8 +335,9 @@ def cmd_contrast(args: argparse.Namespace) -> int:
     if not passed:
         result["reason"] = (
             f"darkest ink reaches only {peak:.2f}:1 against {result['background']} — a sub-pixel "
-            "stroke spreads its color over neighbouring pixels, so re-measure on a 4x render "
-            "before calling it a defect (GOTCHAS.md)"
+            "stroke spreads its color over neighbouring pixels, so re-measure at the frame's "
+            "export scale — 3x for the 540/560/616 families — before calling it a defect "
+            "(GOTCHAS.md, NODE-MAP.md)"
         )
     emit(result, args.json)
     return 0 if passed else 1

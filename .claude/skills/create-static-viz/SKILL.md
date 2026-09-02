@@ -351,6 +351,24 @@ The one adaptation: its Steps 7–8 look up grapher's node names (`connectors`,
 `horizontal-grid-lines`, `datapoints__<Entity>`). Ours are the `gid`s from Step 4 — hand over the
 naming scheme along with the file.
 
+**Use grapher's OWN names for the data layers wherever the shape matches, because that skill's Step 8c
+checks key off them and skip when they are absent.** Measured on a real DI frame drawn by a local
+generator — nine panels, nine series lines, 27 direct labels, all correct — **seven rows skipped for
+want of a name**: `series-weight`, `furniture-weight`, `polylines`, `label-contrast-on-background`,
+`colour-vision` and `grayscale-seams`, and the palette read the chart as a **single-colour** palette
+of the panel fill, never seeing the series colour. Nothing failed and nothing was silently passed —
+each row named what it could not find — but the coverage behind "no mechanical row failed" was far
+thinner than the same sentence on a grapher import. So emit `gid="line__<Entity>"` for a series line,
+`label__<Entity>` for a direct label, and `horizontal-grid-lines` for the gridline group, rather than
+inventing a scheme. Renaming in Figma afterwards works but does not survive a re-import; the `gid`
+does.
+
+Note what a `gid` actually produces: matplotlib writes `<g id="label__Ghana"><text/></g>`, so Figma
+imports a GROUP named `label__Ghana` holding a TEXT named `Ghana` — the name lands on the wrapper,
+never on the painted node, and a series arrives with Figma's own "Clip path group" wrappers between
+the named group and the vector. That is fine and expected; `/create-figma-chart`'s rows resolve
+through the naming ancestor. Set the `gid` on the artist and don't try to name the glyph itself.
+
 ## Step 8 — Record the Figma handoff in the step's docstring
 
 Once the Figma page exists, write the handoff back into the step's module docstring. **The bar is that a

@@ -103,3 +103,8 @@ steps:
   #
   data://grapher/animal_welfare/2026-03-03/land_animals_killed_for_food:
     - data://garden/faostat/2026-02-25/faostat_qcl
+  #
+  # Banning of chick culling — chart authored in ETL.
+  #
+  export://multidim/animal_welfare/latest/banning_of_chick_culling:
+    - data://grapher/animal_welfare/2026-04-16/chick_culling_laws
