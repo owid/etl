@@ -246,11 +246,11 @@ def run() -> None:
     #
     # Save outputs.
     #
-    # One origin per (producer, title, date): WID's three tables would otherwise cite WID three times.
+    # Every input, PIP's percentiles included: the income-basis series are built on their regression
+    # and welfare labels. One origin per (producer, title, date), or WID's three tables would cite WID
+    # three times.
     all_origins = sorted(
-        unique_origins(
-            [o for key in ["pip_bins", "wid", "wid_population", "population", "un_wpp"] for o in origins[key]]
-        ),
+        unique_origins([o for key in origins for o in origins[key]]),
         key=lambda o: o.producer,
     )
     tables = [
