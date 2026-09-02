@@ -132,6 +132,23 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > after the last change.
 > `diff_against_template.js` (~12,000 stripped) needs none of this.
 >
+> **This generalizes past the fitting step: after any small incremental edit, re-run the smallest
+> `--rows` group that covers what you touched rather than the whole three-call pass, and never a
+> hand-rolled substitute.** (The whole pass still runs once, after the last change.) Look the groups
+> up rather than guessing them — the rows are grouped by what they measure, not by what you moved:
+>
+> | Edit | Groups to re-run |
+> |---|---|
+> | Moved a tick, added a gridline | `series` (furniture weight, dash) + `geometry` (box alignment, gap, margins) |
+> | …the same, with an annotation anywhere on the plot | those **plus `annotations`**: `annotation-overlap` and `annotation-knockout` compute their crossings against furniture, so a gridline that comes to run under an annotation changes the knockout tier it must carry — the failure the next paragraph describes — while the other two groups stay silent |
+> | Nudged an annotation or its label | `annotations` **plus `geometry`**: `margins` and `within-frame` live there and both judge annotation nodes (`margins` by the `annotation__*` name, `within-frame` every visible node), so a nudge that pushes an annotation past the content box or off the artboard passes `annotations` alone |
+>
+> That middle row spans all three documented calls, and that is the right answer rather than a hole
+> in the rule: on an annotated plot there is no cheap furniture edit. Everywhere else the slice is
+> real and sized in seconds. The temptation to write a quick inline equivalent instead grows with how
+> small the edit feels — exactly backwards, since the row group costs the same whether the edit was
+> one line or twenty, and the paragraph below is why the hand-rolled option is never cheaper.
+>
 > **Do NOT substitute a hand-rolled subset. It is worse than skipping the pass, and this is
 > measured.** A run that could not relay the script wrote its own seven rows instead, reported six
 > `PASS` and shipped three defects a reviewer caught by eye within minutes: a series line left at
@@ -576,6 +593,29 @@ different losses come out of that, and only one is mechanical:
 
 Keep the improvements — the point is not to revert a colleague's edits, but to notice which of them
 were trades nobody actually chose, and put those back to the author.
+
+**Recovering geometry after a hand-edit, without trusting what you remember.** A hand-edit (or
+simply picking the work back up a session later) can leave you unsure whether a chart's current
+scale or origin still matches what you last computed — a note that grew a line and pushed the
+footer, a rebuilt template, a colleague's drag. Don't re-derive by re-reading your own old numbers;
+re-derive from what's actually on the canvas now. Any two marks whose *position* encodes a data
+value you know — two bars' ends, two *interior* ticks (never the first and last axis labels: grapher
+insets those by ~17px, see GOTCHAS.md → "the plot's edge is where the gridlines stop") — pin a
+linear scale exactly: solve for slope and origin from those two, then check a third known point
+against the prediction before trusting either. Mind what the position encodes: on a stacked bar,
+a stacked area or a Marimekko's segments, a segment's far edge is the running total up to it, not
+the segment's own value — that is a *length*, the difference between its two edges — so pair each
+edge with the cumulative value (or use the stack's outer edge); segment values fed in as positions
+fail the third point on an untouched chart just as surely as a hand-edit would. That is the recipe
+for a **linear axis**. On a logarithmic one (per-chart-type/misc.md's arrow chart is one) pixel
+position is linear in `log(value)`, not in the value, so run the same two-point pin and third-point
+check on `log(value)` — fed raw values, an untouched log-axis chart fails the third point every time
+and sends you hunting for a hand-edit that never happened. Agreement (within rounding) confirms the
+scale is still the one you assumed; a mismatch on the right transform means something *besides* the
+scale changed — a mark moved by hand, a non-uniform rescale — and the size of the mismatch tells you
+where to go looking. This costs one extra query against the alternative: silently drawing new
+geometry (a threshold line, a rescaled bar, a repositioned label) against constants that no longer
+describe the frame.
 
 ### Checking the words, not just the geometry
 
