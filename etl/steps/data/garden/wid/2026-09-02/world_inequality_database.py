@@ -35,6 +35,10 @@ LONG_FORMAT = False
 #   "no"  = income values with a score >= DATA_QUALITY_MIN, plus wealth and WID's regional aggregates
 #           in full (both are model- and imputation-based by construction, so WID scores them low
 #           regardless of extrapolation and a plain cut would delete them).
+# A row is dropped only when WID actually scored it below the threshold: an absent score is not a low
+# score, so unscored values are kept (a handful of series carry values with no score at all, e.g.
+# France's post-tax disposable income). Do not write this as `score >= MIN`, which yields pd.NA on
+# these nullable columns and silently drops them in row selection but keeps them in .loc assignment.
 # NOTE: re-check the threshold against WID's documentation of the score at every update.
 DATA_QUALITY_MIN = 3
 QUALITY_FILTERED_WELFARE = ["pretax", "posttax_nat", "posttax_dis"]
@@ -228,9 +232,13 @@ def add_extrapolated_dimension_wide(tb: Table) -> Table:
 
     tb_observed = tb.copy()
     exempt = tb_observed["country"].isin(WID_AGGREGATES)
+    unscored = 0
     for welfare in QUALITY_FILTERED_WELFARE:
-        keep = exempt | (tb_observed[f"data_quality_{welfare}"] >= DATA_QUALITY_MIN)
-        tb_observed.loc[~keep, by_welfare[welfare]] = np.nan
+        score = tb_observed[f"data_quality_{welfare}"]
+        drop = ~exempt & score.notna() & (score < DATA_QUALITY_MIN)
+        tb_observed.loc[drop.fillna(False).astype(bool), by_welfare[welfare]] = np.nan
+        unscored += int((~exempt & score.isna() & tb_observed[by_welfare[welfare]].notna().any(axis=1)).sum())
+    paths.log.info(f"key indicators: kept {unscored} unscored country-year values in extrapolated='no'")
     tb_observed = tb_observed.drop(columns=quality_cols)
     tb_observed["extrapolated"] = "no"
 
@@ -253,12 +261,12 @@ def add_extrapolated_dimension_long(tb: Table) -> Table:
     `extrapolated == "no"` drops the income rows scored below DATA_QUALITY_MIN (wealth and WID aggregates exempt).
     """
     exempt = tb["country"].isin(WID_AGGREGATES) | ~tb["welfare"].isin(QUALITY_FILTERED_WELFARE)
-    keep = exempt | (tb["data_quality"] >= DATA_QUALITY_MIN)
+    score = tb["data_quality"]
+    drop = ~exempt & score.notna() & (score < DATA_QUALITY_MIN)
+    keep = ~drop.fillna(False).astype(bool)
 
-    unscored = int((tb["data_quality"].isna() & ~exempt).sum())
-    paths.log.info(
-        f"distribution: {unscored} income rows have no data quality score and are left out of extrapolated='no'"
-    )
+    unscored = int((score.isna() & ~exempt).sum())
+    paths.log.info(f"distribution: kept {unscored} unscored income rows in extrapolated='no'")
 
     tb_all = tb.drop(columns=["data_quality"])
     tb_all["extrapolated"] = "yes"
