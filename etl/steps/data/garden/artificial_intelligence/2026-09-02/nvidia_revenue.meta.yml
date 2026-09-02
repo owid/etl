@@ -34,6 +34,9 @@ tables:
         presentation:
           title_public: NVIDIA’s quarterly revenue by market segment
           grapher_config:
+            # NOTE: chart titles inherit from grapher_config only — title_public does not reach the
+            # chart config — so the title lives here to keep the chart in sync with this file.
+            title: NVIDIA’s quarterly revenue by market segment
             note: '"Data centers and AI" includes GPUs, networking, server CPUs, software, and services sold to data-center customers. "Gaming, devices, automotive" includes revenue from gaming, professional visualization, automotive tech, and chips and technology sold or licensed to other companies.'
         display:
           name: NVIDIA’s quarterly revenue
