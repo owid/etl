@@ -603,15 +603,15 @@ a stacked area or a Marimekko's segments, a segment's far edge is the running to
 the segment's own value — that is a *length*, the difference between its two edges — so pair each
 edge with the cumulative value (or use the stack's outer edge); segment values fed in as positions
 fail the third point on an untouched chart just as surely as a hand-edit would. That is the recipe
-for a **linear axis**. On a logarithmic one
-(per-chart-type/misc.md's arrow chart is one) pixel position is linear in `log(value)`, not in the
-value, so run the same two-point pin and third-point check on `log(value)` — fed raw values, an
-untouched log-axis chart fails the third point every time and sends you hunting for a hand-edit that
-never happened. Agreement (within rounding) confirms the scale is still the one you assumed; a
-mismatch on the right transform means something *besides* the scale changed — a mark moved by hand,
-a non-uniform rescale — and the size of the mismatch tells you where to go looking. This costs one
-extra query against the alternative: silently drawing new geometry (a threshold line, a rescaled
-bar, a repositioned label) against constants that no longer describe the frame.
+for a **linear axis**. On a logarithmic one (per-chart-type/misc.md's arrow chart is one) pixel
+position is linear in `log(value)`, not in the value, so run the same two-point pin and third-point
+check on `log(value)` — fed raw values, an untouched log-axis chart fails the third point every time
+and sends you hunting for a hand-edit that never happened. Agreement (within rounding) confirms the
+scale is still the one you assumed; a mismatch on the right transform means something *besides* the
+scale changed — a mark moved by hand, a non-uniform rescale — and the size of the mismatch tells you
+where to go looking. This costs one extra query against the alternative: silently drawing new
+geometry (a threshold line, a rescaled bar, a repositioned label) against constants that no longer
+describe the frame.
 
 ### Checking the words, not just the geometry
 
