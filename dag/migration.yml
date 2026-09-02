@@ -111,6 +111,12 @@ steps:
             - data://garden/demography/2024-07-15/population
 
 
+  #
+  # Average annual change in the US foreign-born population, by decade — chart authored in ETL.
+  #
+  export://multidim/migration/latest/us_foreign_born_annual_change_by_decade:
+    - data://grapher/migration/2026-07-22/us_foreign_born_population
+
   # UN DESA migration flows S3 JSON export (2024)
   export://s3/un_migration/latest/migration_stock_flows_json:
     - data://garden/demography/2024-07-15/population
