@@ -2805,6 +2805,26 @@ def test_a_blast_radius_link_focuses_one_edit_and_greys_the_rest():
     assert edit_slot(scoped) == edit_slot(whole[0])
 
 
+def test_the_bar_says_a_section_can_be_read_either_way():
+    """The two ways through a section are what the badges count, so the bar has to name them.
+
+    A reviewer who never notices the layout switcher reads the tool as view-by-view only, and then the
+    By-edit cards' ticks look like a second, unfinished job rather than the same one.
+    """
+    from streamlit.testing.v1 import AppTest
+
+    def app() -> None:
+        from apps.wizard.app_pages.metadata_diff.render import st_section_switcher
+
+        st_section_switcher({"charts": (0, 3)}, empty=(), marks={"charts": "partial"})
+
+    at = AppTest.from_function(app, default_timeout=60).run()
+    assert not at.exception
+    said = " ".join(str(getattr(el, "value", "") or "") for el in at.caption)
+    assert "view by view" in said and "by edit" in said
+    assert "finishes the section" in said
+
+
 def test_a_section_is_done_along_whichever_layout_the_reviewer_took():
     """Ticking every view, or every edit, finishes a section; the two are never added up.
 

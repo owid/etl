@@ -165,7 +165,8 @@ def st_layout_switcher(items_label: str, items_help: str) -> str:
     st.session_state[LAST_LAYOUT_KEY] = layout
     st.caption(
         f"{items_help} · **By edit** groups them the way Blast radius does — one reworded sentence listed "
-        "once, with everywhere it lands underneath."
+        "once, with everywhere it lands underneath. Both take a tick and a note, and the section's badge "
+        "above follows whichever you work through."
     )
     return layout
 
@@ -708,8 +709,9 @@ def st_section_switcher(
 
     st.caption(
         "Left to right: **Blast radius** for how far this branch's edits reach, then **Charts**, **MDims** "
-        "and **Explorers** to read and tick them off one at a time, then **Review** to collect what you "
-        "wrote down."
+        "and **Explorers** to read and tick off, then **Review** to collect what you wrote down. Each of "
+        "those three reads two ways — **view by view**, one page at a time, or **by edit**, one authored "
+        "change with everywhere it lands — and working through either one finishes the section."
     )
 
     # Keep the default out of the URL, as url_persist does, so a plain link stays plain. Written only on

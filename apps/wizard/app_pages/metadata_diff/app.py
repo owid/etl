@@ -10,8 +10,14 @@ so you can see at a glance where this branch landed:
 - **Blast radius** — everywhere the branch's edits land, across all three surfaces, by change or by
   affected page. The one view that crosses surfaces on purpose.
 - **Charts** — indicator texts that changed, and the published charts that render them.
-- **MDims** — MDims whose view texts changed, each with its changes inline and a PR brief to download.
+- **MDims** — MDims whose view texts changed, view by view or by the edit that changed them.
 - **Explorers** — published explorer views whose resolved text changed.
+- **Review** — the ticks and notes of a pass, and two markdown documents to paste elsewhere.
+
+Each of the three surface sections reads **view by view** — one chart, MDim view or explorer view at a
+time, with its own tick and note — or **by edit**, one authored change per card with everywhere it lands
+under it. They are two ways through the same changes, not two halves of a job: ticking through either
+finishes the section, and its badge in the bar follows whichever one is being used.
 
 There is one baseline, resolved the way every other diff in the wizard resolves it (production where this
 server has production credentials, `staging-site-master` otherwise). The old "Compare against" choice is
@@ -103,6 +109,9 @@ def main() -> None:
 
 It resolves the text the way the site does, so it catches changes coming from **garden step metadata**
 (including Jinja templates and shared `definitions`), which a config diff cannot see.
+
+Each surface section reads **view by view** or **by edit** — one page at a time, or one authored change
+with everywhere it lands. Either way takes a tick and a note, and either one finishes the section.
 
 Nothing here is synced on merge: metadata ships through ETL when your PR merges. Use this to check that
 what ships is what you meant, and to see how far each change reaches.
