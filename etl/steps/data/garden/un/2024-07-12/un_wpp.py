@@ -126,7 +126,6 @@ def run() -> None:
     # DEATHS #
     tb_deaths = process_deaths(tb_deaths, tb_death_rate)
     del tb_death_rate
-    tb_deaths = paths.apply_corrections(tb_deaths, audit=False)
     tb_deaths = tb_deaths.format(COLUMNS_INDEX, short_name="deaths")
 
     # BIRTHS #
@@ -153,17 +152,11 @@ def run() -> None:
     # LIFE EXPECTANCY #
     tb_le = process_le(tb_le)
     tb_le = set_variant_to_estimates(tb_le)
-    # Known upstream data errors (see un_wpp.corrections.yml). The single entry there drops whole
-    # country-year rows, so it is applied to each mortality-derived table in turn. Only this call
-    # writes the audit: the entry declares `indicator: life_expectancy`, which is the column this
-    # table carries, and the audit is keyed by corrections file rather than by table.
-    tb_le = paths.apply_corrections(tb_le)
     tb_le = tb_le.format(COLUMNS_INDEX)
 
     # MORTALITY #
     tb_mortality = process_mortality(tb_mortality)
     tb_mortality = set_variant_to_estimates(tb_mortality)
-    tb_mortality = paths.apply_corrections(tb_mortality, audit=False)
     tb_mortality = tb_mortality.format(COLUMNS_INDEX)
 
     # MEAN AGE AT CHILDBEARING #

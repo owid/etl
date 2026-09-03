@@ -351,28 +351,19 @@ class PathFinder:
     def corrections_path(self) -> Path:
         return self.directory / (self.short_name + ".corrections.yml")
 
-    def apply_corrections(
-        self, tb: Table, *, country_col: str = "country", year_col: str = "year", audit: bool = True
-    ) -> Table:
+    def apply_corrections(self, tb: Table, *, country_col: str = "country", year_col: str = "year") -> Table:
         """Apply the step's `.corrections.yml` (known upstream data errors) to a table.
 
         Mirrors the `.excluded_countries.json` ergonomics: a sibling file next to the step, applied in
         one line. If no corrections file exists, the table is returned unchanged. See
         `etl.data_corrections` for the file format.
-
-        `audit=False` applies the corrections without writing the audit JSON. The audit is keyed by
-        corrections file, not by table, so a step that applies one file to several tables would have
-        each call overwrite the last — and `build_audit` records nothing for a table that lacks the
-        correction's declared `indicator` column, so the final call can replace a good audit with an
-        empty one. Pass `audit=False` on the calls whose table doesn't carry that indicator.
         """
         if not self.corrections_path.exists():
             return tb
         corrections = load_corrections(self.corrections_path)
         # Record the affected rows (before/after) so `etl corrections --charts` can visualise the
         # problematic values, which are gone from the published data once the correction is applied.
-        if audit:
-            write_audit(self.corrections_path, build_audit(tb, corrections, country_col=country_col, year_col=year_col))
+        write_audit(self.corrections_path, build_audit(tb, corrections, country_col=country_col, year_col=year_col))
         return apply_corrections(tb, corrections, country_col=country_col, year_col=year_col)
 
     @property
