@@ -1537,6 +1537,47 @@ def test_a_tick_only_counts_while_the_text_it_was_made_against_stands(monkeypatc
     assert count_ticked("engine", []) == 0
 
 
+def test_a_chart_redirected_to_an_mdim_is_left_off_the_grid():
+    """Its chart row is still published, so the usage lookup calls it live — but nobody can open it.
+
+    Following `/grapher/<slug>` lands on the MDim, which the grid already draws with its own views, so
+    listing the chart counted one reader-facing page twice. Left out, and the branch says how many and
+    where they went; if every chart goes this way, the branch reports nothing rather than a bare heading.
+    """
+    from apps.wizard.app_pages.metadata_diff.blast_section import _chart_branch
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach
+
+    reach = [
+        ChangeReach(
+            field="descriptionKey",
+            old="a",
+            new="b",
+            charts=[
+                {"chartId": 1, "slug": "still-a-chart", "title": "Still a chart", "has_data_page": True},
+                {"chartId": 2, "slug": "now-an-mdim", "title": "Now an MDim", "has_data_page": True},
+            ],
+            draft_charts=[{"chartId": 3, "slug": "draft-now-an-mdim"}],
+        )
+    ]
+    redirected = {
+        "now-an-mdim": "incomes-across-distribution-wb",
+        "draft-now-an-mdim": "incomes-across-distribution-wb",
+    }
+
+    branch = _chart_branch(reach, {1: 10}, redirected)
+    drawn = [leaf["label"] for group in branch["groups"] for leaf in group["leaves"]]
+    assert drawn == ["Still a chart"], "a redirected chart is not a chart page a reader reaches"
+    assert "Another 2 charts are not listed" in branch["note"]
+    assert "incomes-across-distribution-wb" in branch["note"]
+
+    # Without the lookup nothing is hidden: an unavailable table must not silently shrink the list.
+    assert len([leaf for g in _chart_branch(reach, {1: 10}, {})["groups"] for leaf in g["leaves"]]) == 3
+
+    # Every chart redirected: no leaves at all, and `_chart_branches` then draws no branch.
+    empty = _chart_branch(reach[:1], {}, {s: "mdim" for s in ("still-a-chart", "now-an-mdim", "draft-now-an-mdim")})
+    assert not any(group["leaves"] for group in empty["groups"])
+
+
 def test_the_grids_chart_leaves_are_listed_busiest_first():
     """Which of seventy charts matters is the question an author has, and a name cannot answer it.
 
@@ -3099,9 +3140,9 @@ def test_the_grid_only_offers_a_filter_for_surfaces_the_branch_reaches():
     assert set(SURFACE_LABELS) >= set(surface_options([on_mdim, on_chart, on_explorer]))
 
     # The charts branch is built only when charts are wanted and there is one to draw.
-    assert _chart_branches([on_chart], "charts") and _chart_branches([on_chart], "all")
-    assert _chart_branches([on_chart], "mdims") == []
-    assert _chart_branches([on_mdim], "charts") == [], "no chart reached, so no empty branch"
+    # The engine is only touched for the lookups a drawn branch needs, so None is safe where none is.
+    assert _chart_branches(None, [on_chart], "mdims") == []
+    assert _chart_branches(None, [on_mdim], "charts") == [], "no chart reached, so no empty branch"
 
 
 def test_a_section_badge_says_finished_or_not_and_nothing_else():

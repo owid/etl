@@ -445,3 +445,28 @@ def build_env_bundles(engine: Engine, config: dict[str, Any]) -> list[ViewBundle
             )
         )
     return bundles
+
+
+def fetch_mdim_redirected_charts(engine: Engine) -> dict[str, str]:
+    """Chart slug -> the MDim its URL redirects to, for charts superseded by an MDim.
+
+    The chart→MDim migration leaves the chart row published and redirects its URL, so `charts` alone still
+    calls it a live chart while `/grapher/<slug>` serves an MDim view. Measured on production: 267 such
+    redirects, every one of them unconditional.
+
+    Only unconditional redirects count. A row carrying `sourceQueryParams` redirects one parameterised URL
+    and leaves the plain one serving the chart — that is how the explorer view redirects are written (981
+    of them), and treating one as "this chart is gone" would hide a page readers can still open.
+    """
+    df = read_sql(
+        """
+        select r.source as source, coalesce(m.slug, m.catalogPath) as mdim
+        from multi_dim_redirects r
+        left join multi_dim_data_pages m on m.id = r.multiDimId
+        where r.sourceQueryParams is null and r.source like '/grapher/%%'
+        """,
+        engine=engine,
+    )
+    return {
+        str(row["source"]).removeprefix("/grapher/"): str(row["mdim"] or "an MDim") for row in df.to_dict("records")
+    }

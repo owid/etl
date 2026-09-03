@@ -351,6 +351,16 @@ def chart_views(chart_ids: tuple[int, ...], n_days: int = 365, cache_key: str = 
 
 
 @st.cache_data(ttl=CACHE_TTL, show_spinner=False)
+def mdim_redirected_charts(_source_engine: Engine, cache_key: str = "") -> dict[str, str]:
+    """Chart slug -> the MDim its URL redirects to. Empty when the lookup fails, which lists them all."""
+    try:
+        return data.fetch_mdim_redirected_charts(_source_engine)
+    except Exception as e:  # noqa: BLE001 — an older server may not have the table; list the charts then
+        log.warning("metadata_diff.mdim_redirects_unavailable", error=str(e))
+        return {}
+
+
+@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
 def explorer_titles(_source_engine: Engine, cache_key: str = "") -> dict[str, str]:
     """Published explorers' reader-facing names, by slug."""
     return data.fetch_explorer_titles(_source_engine)

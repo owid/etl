@@ -363,7 +363,7 @@ def _dimension_tree(
         if _wants(surface, "mdims"):
             st.caption("No MDim renders any of these changes, so there is no MDim grid to draw.")
         hierarchies = [explorer_hierarchy] if explorer_hierarchy else []
-        branches = _chart_branches(reach, surface)
+        branches = _chart_branches(source_engine, reach, surface)
         if not hierarchies and not branches:
             # Filtered to a surface these edits do not reach at all. Said plainly, rather than drawn as an
             # empty shell — and only reachable by choosing it, since a surface with nothing on it is not
@@ -439,7 +439,7 @@ def _dimension_tree(
 
     tree_html, height = render_multi_tree_html(
         [],
-        branches=_chart_branches(reach, surface),
+        branches=_chart_branches(source_engine, reach, surface),
         # The explorers are a hierarchy of grids now, not a flat branch: their views have dimensions.
         hierarchies=[h for h in ({"id": "mdims", "label": "MDims", "sections": sections}, explorer_hierarchy) if h],
         self_url=f"{SOURCE.wizard_url.rstrip('/')}/metadata-diff",
@@ -456,17 +456,24 @@ def _wants(surface: str, kind: str) -> bool:
     return surface in ("all", kind)
 
 
-def _chart_branches(reach: list[ChangeReach], surface: str) -> list[dict[str, Any]]:
+def _chart_branches(source_engine: Engine, reach: list[ChangeReach], surface: str) -> list[dict[str, Any]]:
     """The charts branch, when the filter draws charts and these edits reach one.
 
-    The views lookup happens here rather than inside `_chart_branch` so it is paid only when the branch is
-    actually drawn — under "MDims only" it is not, and it is the one reading that leaves OWID's own
-    databases.
+    The lookups happen here rather than inside `_chart_branch` so they are paid only when the branch is
+    actually drawn — under "MDims only" it is not, and the views one leaves OWID's own databases.
+
+    An empty list when every chart it would have drawn is redirected away: the caller then says the
+    surface holds nothing rather than drawing a heading over no leaves.
     """
     if not _wants(surface, "charts") or not any(r.charts or r.draft_charts for r in reach):
         return []
     ids = sorted({int(c["chartId"]) for r in reach for c in (*r.charts, *r.draft_charts)})
-    return [_chart_branch(reach, cached.chart_views(tuple(ids)))]
+    branch = _chart_branch(
+        reach,
+        cached.chart_views(tuple(ids)),
+        cached.mdim_redirected_charts(source_engine),
+    )
+    return [branch] if any(group["leaves"] for group in branch["groups"]) else []
 
 
 def surface_options(reach: list[ChangeReach]) -> list[str]:
@@ -659,8 +666,19 @@ def _explorer_branch(reach: list[ChangeReach]) -> dict[str, Any] | None:
     }
 
 
-def _chart_branch(reach: list[ChangeReach], views: dict[int, int] | None = None) -> dict[str, Any]:
+def _chart_branch(
+    reach: list[ChangeReach],
+    views: dict[int, int] | None = None,
+    redirected: dict[str, str] | None = None,
+) -> dict[str, Any]:
     """The charts these edits reach, as a branch of the grid: grouped by how a reader meets the text.
+
+    `redirected` names the charts whose URL now serves an MDim view instead (see
+    `data.fetch_mdim_redirected_charts`). They are left out: the chart row is still published, so the
+    usage lookup still calls them live charts, but nobody can open one — following the link lands on the
+    MDim, which is already drawn on this grid with its own views. Listing them made the same
+    reader-facing page appear twice, once as a chart nobody reaches. How many were left out, and where
+    they went, is said in the branch's note rather than dropped in silence.
 
     Grouped the way the chart lists elsewhere group: a data page lays the text out, a multi-indicator
     chart keeps it behind "Learn more about this data", and a draft shows nobody anything.
@@ -676,11 +694,18 @@ def _chart_branch(reach: list[ChangeReach], views: dict[int, int] | None = None)
     these 76 have none, drafts among them — and with no view data at all the order falls back to the name.
     """
     charts, drafts = {}, {}
+    gone: dict[str, str] = {}
     for r in reach:
+        for c in (*r.charts, *r.draft_charts):
+            target = (redirected or {}).get(str(c.get("slug") or ""))
+            if target:
+                gone[str(c["slug"])] = target
         for c in r.charts:
-            charts.setdefault(c["chartId"], (c, r))
+            if str(c.get("slug") or "") not in gone:
+                charts.setdefault(c["chartId"], (c, r))
         for c in r.draft_charts:
-            drafts.setdefault(c["chartId"], (c, r))
+            if str(c.get("slug") or "") not in gone:
+                drafts.setdefault(c["chartId"], (c, r))
 
     def leaf(chart: dict[str, Any], change: ChangeReach, published: bool = True) -> dict[str, Any]:
         slug = str(chart.get("slug") or f"chart {chart.get('chartId')}")
@@ -717,16 +742,24 @@ def _chart_branch(reach: list[ChangeReach], views: dict[int, int] | None = None)
     drawer = by_reach([leaf(c, r) for c, r in charts.values() if not c.get("has_data_page", True)])
     draft_leaves = by_reach([leaf(c, r, published=False) for c, r in drafts.values()])
     measured = sum(1 for leaf in (*on_page, *drawer, *draft_leaves) if leaf["views"])
+    # Which order this is, said rather than left to be inferred from the numbers — and the honest answer
+    # when the warehouse could not be reached is that it is alphabetical.
+    note = (
+        f"Most viewed first — page views over the last year, known for {measured} of these charts."
+        if measured
+        else "In name order: this server could not read how much these charts are viewed."
+    )
+    if gone:
+        where = ", ".join(sorted(set(gone.values()))[:3])
+        note += (
+            f" Another {len(gone)} {'chart is' if len(gone) == 1 else 'charts are'} not listed: their URL "
+            f"redirects to an MDim ({where}), so those readers meet the edit in the MDim's views above "
+            "rather than on a chart page."
+        )
     return {
         "id": "charts",
         "label": "Charts",
-        # Which order this is, said rather than left to be inferred from the numbers — and the honest
-        # answer when the warehouse could not be reached is that it is alphabetical.
-        "note": (
-            f"Most viewed first — page views over the last year, known for {measured} of these charts."
-            if measured
-            else "In name order: this server could not read how much these charts are viewed."
-        ),
+        "note": note,
         "groups": [
             {"name": "Data pages", "note": "The text is laid out on the chart's data page.", "leaves": on_page},
             {
