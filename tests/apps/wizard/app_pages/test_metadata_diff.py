@@ -3593,6 +3593,57 @@ def test_the_grouping_note_explains_itself_without_naming_variables():
     assert "Not shared" in two
 
 
+def test_a_charts_subtitle_is_credited_to_the_indicator_that_carries_it():
+    """ "Edited in 2 separate garden datasets (…population.meta.yml, …world_bank_pip.meta.yml)" — on a
+    branch that never touched population.
+
+    A chart rendering both series had its subtitle credited to whichever of its indicators sorted first,
+    and `demography` sorts before `wb`. Attribution now asks which indicator's own `grapher_config`
+    differs from the baseline, and a chart where none does keeps none — "we do not know" rather than a
+    dataset nobody edited.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import distinct_garden_datasets
+    from apps.wizard.app_pages.metadata_diff.discovery import (
+        ChartTextChanges,
+        attribute_chart_texts,
+        compare_chart_texts,
+    )
+
+    population = "grapher/demography/2024-07-15/population/historical#population_historical"
+    pip = "grapher/wb/2026-06-26/world_bank_pip/incomes#mean"
+
+    source = {
+        "mixed": {"chartId": 1, "slug": "mixed", "title": "T", "subtitle": "New wording", "note": None},
+        "pip-only": {"chartId": 2, "slug": "pip-only", "title": "T", "subtitle": "New wording", "note": None},
+    }
+    target = {
+        "mixed": {"slug": "mixed", "title": "T", "subtitle": "Old wording", "note": None},
+        "pip-only": {"slug": "pip-only", "title": "T", "subtitle": "Old wording", "note": None},
+    }
+    changes = compare_chart_texts(source, target)
+    assert sorted(changes.diffs) == ["mixed", "pip-only"]
+
+    # The mixed chart renders population first alphabetically; only the PIP indicator's config changed.
+    paths_by_slug = {"mixed": [population, pip], "pip-only": [pip]}
+    attribute_chart_texts(changes, paths_by_slug, {pip})
+    assert changes.diffs["mixed"].catalog_path == pip, "credited to the indicator that carries the text"
+    assert changes.diffs["pip-only"].catalog_path == pip
+    # And the note built from those paths names one dataset, not two.
+    assert distinct_garden_datasets({d.catalog_path for d in changes.diffs.values() if d.catalog_path}) == [
+        "etl/steps/data/garden/wb/2026-06-26/world_bank_pip"
+    ]
+
+    # No indicator's own config changed — the text came from somewhere else. Attribute nothing.
+    empty = compare_chart_texts(source, target)
+    attribute_chart_texts(empty, paths_by_slug, set())
+    assert all(diff.catalog_path is None for diff in empty.diffs.values())
+
+    # A chart the caller knows no indicators for is left alone rather than guessed at.
+    stray = ChartTextChanges()
+    attribute_chart_texts(stray, {}, {pip})
+    assert not stray.diffs
+
+
 def test_the_bar_says_a_section_can_be_read_either_way():
     """The two ways through a section are what the badges count, so the bar has to name them.
 

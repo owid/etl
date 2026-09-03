@@ -676,18 +676,20 @@ def chart_text_rows(engine: Engine, dataset_paths: list[str]) -> dict[str, dict[
             params[f"p{i}_{j}"] = pattern
             alternatives.append(f"v.catalogPath like %(p{i}_{j})s")
         clauses.append("(" + " or ".join(alternatives) + ")")
-    # Grouped rather than `distinct`, so one row per chart even when several of its indicators match, and
-    # so `catalogPath` can come back with it: a chart-config edit is authored in a garden step, and naming
-    # it is what lets the shared summary say where to go. Every selected column is aggregated because the
-    # group key is the chart and the rest live on other tables (ONLY_FULL_GROUP_BY).
+    # One row per (chart, matching indicator), collapsed in Python. It used to group in SQL and take
+    # `min(v.catalogPath)` as the indicator that authored the text, which is alphabetical order dressed up
+    # as attribution: a chart rendering both a `demography/…/population` series and a `wb/…` one had its
+    # subtitle credited to population, and the note then told a reviewer they had edited a dataset they
+    # had not touched. Which indicator actually carries the text is decided by
+    # `changed_indicator_configs`, on these candidates.
     df = read_sql(
         f"""
         select c.id as chartId,
-               min(cc.slug) as slug,
-               min(cc.{cfg} ->> '$.title') as title,
-               min(cc.{cfg} ->> '$.subtitle') as subtitle,
-               min(cc.{cfg} ->> '$.note') as note,
-               min(v.catalogPath) as catalogPath
+               cc.slug as slug,
+               cc.{cfg} ->> '$.title' as title,
+               cc.{cfg} ->> '$.subtitle' as subtitle,
+               cc.{cfg} ->> '$.note' as note,
+               v.catalogPath as catalogPath
         from charts c
         join chart_configs cc on cc.id = c.configId
         join chart_dimensions cd on cd.chartId = c.id
@@ -695,12 +697,28 @@ def chart_text_rows(engine: Engine, dataset_paths: list[str]) -> dict[str, dict[
         where c.publishedAt is not null
           and cc.slug is not null
           and ({" or ".join(clauses)})
-        group by c.id
         """,
         engine=engine,
         params=params,
     )
-    return {str(r["slug"]): {str(k): v for k, v in r.items()} for r in df.to_dict("records")}
+    rows: dict[str, dict[str, Any]] = {}
+    for record in df.to_dict("records"):
+        slug = str(record["slug"])
+        entry = rows.setdefault(
+            slug,
+            {
+                "chartId": record["chartId"],
+                "slug": slug,
+                "title": record["title"],
+                "subtitle": record["subtitle"],
+                "note": record["note"],
+                "paths": [],
+            },
+        )
+        path = record.get("catalogPath")
+        if path and str(path) not in entry["paths"]:
+            entry["paths"].append(str(path))
+    return rows
 
 
 def chart_text_rows_by_slug(engine: Engine, slugs: list[str]) -> dict[str, dict[str, Any]]:
@@ -802,7 +820,16 @@ def changed_chart_texts(
 
     source_rows = chart_text_rows(source_engine, in_play)
     target_rows = chart_text_rows_by_slug(target_engine, list(source_rows))
-    return compare_chart_texts(source_rows, target_rows)
+    out = compare_chart_texts(source_rows, target_rows)
+
+    # Which indicator authored the text, asked rather than assumed: the one whose own
+    # `presentation.grapher_config` differs from the baseline. A chart with none — its text inherited from
+    # elsewhere, or typed in the admin — is attributed to nothing, which reads as "we do not know" rather
+    # than as a dataset somebody did not edit.
+    candidates = sorted({path for slug in out.diffs for path in (source_rows.get(slug, {}).get("paths") or [])})
+    authored = changed_indicator_configs(source_engine, target_engine, candidates) if candidates else set()
+    attribute_chart_texts(out, {slug: row.get("paths") or [] for slug, row in source_rows.items()}, authored)
+    return out
 
 
 def dataset_edit_times(engine: Engine) -> dict[str, Any]:
@@ -1219,6 +1246,19 @@ def compare_explorer_views(
     for (slug, _), diff in compare_explorer_views_detailed(source_rows, target_rows).items():
         out.setdefault(slug, []).append(diff)
     return out
+
+
+def attribute_chart_texts(changes: "ChartTextChanges", paths_by_slug: dict[str, list[str]], authored: set[str]) -> None:
+    """Credit each changed chart's text to an indicator that actually carries the change.
+
+    Pure, and separate from the queries, because getting it wrong is invisible: the old code took the
+    alphabetically first of a chart's indicators, which named the wrong garden dataset without ever
+    looking wrong. `authored` is the set whose own ETL config text differs from the baseline; a chart with
+    none of those keeps no attribution at all.
+    """
+    for slug, diff in changes.diffs.items():
+        mine = [path for path in paths_by_slug.get(slug, []) if path in authored]
+        diff.catalog_path = mine[0] if mine else None
 
 
 def changed_indicator_configs(source_engine: Engine, target_engine: Engine, paths: list[str]) -> set[str]:
