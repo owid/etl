@@ -256,6 +256,8 @@ def item_index(
             flagged = []
     except Exception:  # noqa: BLE001
         flagged, df = [], None
+    mdim_surfaces: list[str] = []
+    mdim_unread = False
     for catalog_path in flagged:
         assert df is not None
         row = df.loc[catalog_path]
@@ -267,8 +269,11 @@ def item_index(
                 _target_engine,
                 cache_key=f"{row['configMd5_source']}::{row['configMd5_target']}",
             )
-        except Exception:  # noqa: BLE001
+        except Exception as e:  # noqa: BLE001 — see the totals below: this makes the denominator unusable
+            log.warning("metadata_diff.mdim_index_unavailable", catalog_path=catalog_path, error=str(e))
+            mdim_unread = True
             continue
+        mdim_surfaces.append(surface)
         slug = str(row["slug_source"]) if row.get("slug_source") else ""
         # This branch's views only — the same split the badge and the By-edit cards apply. A view that
         # differs because master rebuilt the MDim is not an item to review, and counting it made the
@@ -282,6 +287,15 @@ def item_index(
                 "url": view_url(SOURCE, catalog_path, None if row["is_draft"] else slug, view.dimensions),
                 "hash": content_hash,
             }
+    if mdim_unread:
+        # One MDim unread makes the whole view-by-view denominator unusable: the views that *were*
+        # enumerated would all be decided and the section would badge itself finished over an MDim nothing
+        # looked at — a completion mark is the one thing this page must never award on a partial count.
+        # The layout is dropped whole rather than reported short. The index entries stay, so verdicts
+        # already recorded still resolve and reopen; only the total they would be measured against goes,
+        # and the section is then judged along By-edit, which was read in full.
+        for surface in mdim_surfaces:
+            totals.pop(surface, None)
 
     # --- Explorer views ---
     try:

@@ -4428,6 +4428,56 @@ def test_item_index_gives_a_changed_chart_a_current_hash(monkeypatch):
     assert index[key]["hash"] == expected, "a changed chart must carry the hash its verdict is checked against"
 
 
+def test_one_unread_mdim_takes_the_whole_view_by_view_denominator_with_it(monkeypatch):
+    """A dropped denominator is how a partial count badges itself finished.
+
+    Skipping the MDim that failed left the ones that succeeded as the section's whole total, so deciding
+    those earned a completion mark over an MDim nothing had looked at. The entries stay — verdicts
+    already recorded still resolve and reopen — but the total they would be measured against goes.
+    """
+    import pandas as pd
+
+    from apps.wizard.app_pages.metadata_diff import cached, discovery
+    from apps.wizard.app_pages.metadata_diff.core import ViewDiff, dims_str, item_identity, surface_key
+
+    read = "grapher/a/latest/read#read"
+    unread = "grapher/b/latest/unread#unread"
+    df = pd.DataFrame(
+        [
+            {"in_branch": True, "has_changes": True, "is_draft": False, "slug_source": "read"},
+            {"in_branch": True, "has_changes": True, "is_draft": False, "slug_source": "unread"},
+        ],
+        index=[read, unread],
+    )
+    df["configMd5_source"], df["configMd5_target"] = "a", "b"
+
+    view = ViewDiff(dimensions={"metric": "mean"}, fields={"descriptionShort": {"old": "a", "new": "b"}})
+    view.indicator_changed_fields.add("descriptionShort")
+
+    def view_diffs(catalog_path, *_a, **_k):
+        if catalog_path == unread:
+            raise RuntimeError("transient read failure")
+        return "Read", [], [view]
+
+    def unavailable(*_a, **_k):
+        raise RuntimeError("not part of this test")
+
+    monkeypatch.setattr(cached, "shared_facts", lambda *_a, **_k: (discovery.BranchScope(available=False), set()))
+    monkeypatch.setattr(cached, "mdim_changes", lambda *_a, **_k: df)
+    monkeypatch.setattr(cached, "mdim_view_diffs", view_diffs)
+    monkeypatch.setattr(cached, "changed_charts", unavailable)
+    monkeypatch.setattr(cached, "explorer_changes", unavailable)
+    monkeypatch.setattr(cached, "summary", unavailable)
+
+    cached.item_index.clear()
+    index, totals = cached.item_index("src", "tgt")
+
+    surface = surface_key("item", f"mdim:{read}")
+    key, _hash = item_identity(surface, dims_str(view.dimensions), view.fields)
+    assert surface not in totals, "no total while one MDim went unread"
+    assert key in index, "the views that were read stay listed, so verdicts on them still resolve"
+
+
 def test_item_index_omits_the_hash_it_could_not_compute(monkeypatch):
     """A failed comparison leaves the slot hashless rather than guessing at it.
 
@@ -4679,6 +4729,30 @@ def test_view_by_view_lists_only_the_views_this_branch_is_answerable_for():
     # Where the branch changed the MDim's own recipe, config-level edits are exactly what it does.
     mine = discovery.BranchScope(export_products={(MDIM_EXPORT_KIND, "pip")})
     assert len(discovery.mdim_branch_views("grapher/wb/2026-09-02/pip#pip", [ours, lag], mine)) == 2
+
+
+def test_a_mixed_view_is_reviewed_on_this_branchs_fields_alone():
+    """One view can carry both a branch-owned indicator edit and a config difference master produced.
+
+    Dropping it whole would hide a real edit; keeping it whole put master's text on screen as something
+    to sign off, and into the hash the verdict is bound to — so rejecting the edit read as rejecting
+    both. The group-level split has always cut at this granularity.
+    """
+    from apps.wizard.app_pages.metadata_diff import discovery
+    from apps.wizard.app_pages.metadata_diff.core import ViewDiff
+
+    mixed = ViewDiff(
+        dimensions={"metric": "mean"},
+        fields={
+            "descriptionShort": {"old": "a", "new": "b"},
+            "chart.subtitle": {"old": "master's", "new": "master's newer"},
+        },
+    )
+    mixed.indicator_changed_fields.add("descriptionShort")
+
+    kept = discovery.mdim_branch_views("grapher/wb/2026-09-02/pip#pip", [mixed], discovery.BranchScope())
+    assert list(kept[0].fields) == ["descriptionShort"], "master's config text is not ours to sign off"
+    assert list(mixed.fields) == ["descriptionShort", "chart.subtitle"], "and the diff itself is untouched"
 
 
 def test_a_wysk_only_edit_does_not_claim_an_explorer_views_text():

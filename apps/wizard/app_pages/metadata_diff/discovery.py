@@ -20,7 +20,7 @@ import json
 import re
 from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, TypeVar
 
@@ -1148,12 +1148,23 @@ def mdim_branch_views(
     Views rather than groups because that is the unit those two surfaces work in: a view is a page, and
     its tick is the page's. Where the branch changed the MDim's own recipe every difference is ours, since
     config-level edits are exactly what that does.
+
+    A view carrying both keeps only the branch's fields. Dropping the view whole would hide a real edit,
+    and keeping it whole would put master's config text on screen as something to sign off — and into the
+    hash the verdict is bound to, so rejecting the edit would read as rejecting both. The group-level
+    split has always worked at this granularity; this is the same cut, per view.
     """
     scope = scope if scope is not None else branch_scope()
     changed = [v for v in view_diffs if v.changed]
     if not scope.available or scope.covers_mdim(catalog_path):
         return changed
-    return [v for v in changed if v.affects_indicator]
+    ours = []
+    for view in changed:
+        if not view.affects_indicator:
+            continue
+        owned = {key: value for key, value in view.fields.items() if key in view.indicator_changed_fields}
+        ours.append(view if len(owned) == len(view.fields) else replace(view, fields=owned))
+    return ours
 
 
 def mdim_text_changes(source_engine: Engine, target_engine: Engine, catalog_path: str) -> list[ViewDiff]:
