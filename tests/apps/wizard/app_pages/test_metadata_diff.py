@@ -3054,7 +3054,9 @@ def test_rejecting_everything_is_offered_and_approving_everything_is_not():
     assert "REJECTED" in source
     assert "REVIEWED" not in source, "there is no bulk approve, on purpose"
     # It says that nothing is changed, and where to go next — a red ❌ invites the opposite belief.
-    assert "changes nothing" in source and "Review" in source
+    assert "Nothing is changed by this" in source and "Review" in source
+    # It is scoped to one surface, which is what makes any combination of the three sayable.
+    assert "not on this surface" in source
     # And it is reversible, keeping what the reviewer wrote.
     assert "clear_status" in source
 
@@ -3096,12 +3098,14 @@ def test_the_rejection_document_says_what_to_undo_and_where():
 
     doc = _rejections_markdown(rows, {}, summary)
     assert "## Metadata changes to revert" in doc
-    assert doc.count("← remove this") == 1
     assert "Nothing has been reverted" in doc
+    # Refused on the only surface it reaches, so the instruction is to change it at source.
+    assert "Revert these — refused everywhere they land" in doc
+    assert "Keep these" not in doc
     assert "Description" in doc and "Charts" in doc
     # The words to undo, and the file to undo them in.
     assert "In 2021 prices." in doc
-    assert "`etl/steps/data/garden/wb/2026-06-26/world_bank_pip.meta.yml`" in doc
+    assert "`etl/steps/data/garden/wb/2026-06-26/world_bank_pip.meta.yml` — change it there" in doc
     # A multi-line note survives as one nested bullet rather than breaking the list.
     assert "Use the footnote." in doc
     assert "\n\nUse the footnote." not in doc
@@ -3152,10 +3156,69 @@ def test_one_authored_edit_is_one_instruction_however_many_surfaces_refused_it()
 
     doc = _rejections_markdown(rows, {}, summary)
     # One bullet for the edit, naming both surfaces, and both notes kept.
-    assert doc.count("← remove this") == 1
+    assert doc.count("- **WYSK**") == 1
     assert "in Charts" in doc and "in MDims" in doc
     assert "Belongs in the footnote." in doc and "Same here." in doc
     assert doc.count("world_bank_pip.meta.yml") == 1
+    # Refused on both surfaces it reaches, so this is a revert and not an override.
+    assert "Revert these" in doc and "Keep these" not in doc
+
+
+def test_refusing_one_surface_asks_for_an_override_not_a_revert():
+    """ "These changes are right for charts but not for the MDims" is the normal shape of the judgement.
+
+    One sentence usually reaches all three surfaces, so a rejection in one section is not a rejection of
+    the edit. Reverting the garden text would take it away from the surface that asked to keep it, so the
+    document says to override it on the refused surface and to leave the file alone — and it names the
+    lever, which is a different file for each surface.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import item_identity
+    from apps.wizard.app_pages.metadata_diff.data import REJECTED
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, edit_fields, edit_key, edits_for
+    from apps.wizard.app_pages.metadata_diff.review_section import _rejections_markdown
+
+    where = {"grapher/wb/2026-06-26/world_bank_pip/world_bank_pip#mean"}
+    # The same authored words, reaching a chart and an MDim view — one edit, two surfaces.
+    on_chart = ChangeReach(
+        field="descriptionKey",
+        old="A.",
+        new="A. Adjusted.",
+        charts=[{"chartId": 1, "slug": "gdp", "has_data_page": True}],
+        catalog_paths=where,
+    )
+    on_view = ChangeReach(
+        field="descriptionKey",
+        old="B.",
+        new="B. Adjusted.",
+        mdims=[{"catalogPath": "grapher/a/latest/x#x", "title": "X", "n_views": 4, "is_draft": False}],
+        catalog_paths=where,
+    )
+    summary = Summary(reach=[on_chart, on_view])
+
+    # Refused on MDims only. Charts keeps it.
+    surface = surface_key("item", "edit:mdims")
+    (edit,) = edits_for(summary, "mdims")
+    change_key, content_hash = item_identity(surface, edit_key(edit), edit_fields(edit))
+    rows = [
+        {
+            "catalogPath": surface,
+            "changeKey": change_key,
+            "contentHash": content_hash,
+            "status": REJECTED,
+            "comment": "Fine on the charts, too long for a view.",
+        }
+    ]
+
+    doc = _rejections_markdown(rows, {}, summary)
+    assert "Keep these, but not everywhere" in doc
+    assert "Revert these" not in doc, "reverting would take the text from Charts, which kept it"
+    assert "keep on 1 text in Charts" in doc
+    assert "not wanted on 1 text in MDims" in doc
+    # The file stays as it is, and the lever named is the MDim one.
+    assert "leave `etl/steps/data/garden/wb/2026-06-26/world_bank_pip.meta.yml` as it is" in doc
+    assert "to keep it off MDims:" in doc and "view.metadata" in doc
+    assert "etl/steps/export/explorers/" not in doc, "only the refused surface's lever is named"
+    assert "Fine on the charts, too long for a view." in doc
 
 
 def test_the_bar_says_a_section_can_be_read_either_way():

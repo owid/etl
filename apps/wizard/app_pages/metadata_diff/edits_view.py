@@ -23,6 +23,7 @@ from sqlalchemy.engine.base import Engine
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import cached, view_nav
 from apps.wizard.app_pages.metadata_diff.core import (
+    SECTIONS,
     ViewDiff,
     diff_window_html,
     field_label,
@@ -58,7 +59,13 @@ CONTEXT_CSS = """
 
 
 def st_reject_all(engine: Engine, summary: Any, section: str) -> None:
-    """Reject every edit in one section, behind a popover — and no way to approve them all.
+    """Reject every edit that lands on this one surface, behind a popover — and no way to approve them all.
+
+    Scoped to the surface on purpose, because that is the shape of the judgement: "these changes are right
+    for charts but not for the MDims" is a normal thing to conclude, and one sentence usually reaches all
+    three surfaces at once. Rejecting per section, in any combination, is how that is said — and the Review
+    tab reads the combination back, since an edit refused on every surface it reaches is reverted at source
+    while one refused on some is overridden on those.
 
     Deliberately one-sided. "None of this should ship" is a judgement somebody can hold about a branch,
     and acting on it saves them ticking through eighty views to say so. "All of this is fine" is not the
@@ -108,20 +115,27 @@ def st_reject_all(engine: Engine, summary: Any, section: str) -> None:
         clear_status(engine, [surface], REJECTED)
 
     n = len(edits)
-    label = f"❌ {already} of {n} edits rejected" if already else f"❌ Reject all {n} edit{'s' if n != 1 else ''}"
+    what = SECTIONS[section][1]
+    label = f"❌ {already} of {n} rejected in {what}" if already else f"❌ Reject all {n} in {what}"
     with st.popover(label, width="content"):
         st.markdown(
-            f"**Reject every edit in this section** — all {n} of them, however many views or charts they render into."
+            f"**Reject every edit that lands on {what}** — all {n} of them, however many views or charts "
+            "they render into."
         )
         st.caption(
-            "This changes nothing: no text is reverted, no step re-runs, and nothing here is read at "
-            "merge. It records that these edits should not ship. Open **Review** afterwards — it turns "
-            "the rejections into instructions you can paste back to whoever is editing, this assistant "
-            "included. There is no *approve all*, on purpose: a branch can be wrong wholesale, but it "
+            f"Scoped to {what}. The same sentence often reaches charts, MDim views and explorer views at "
+            "once, so rejecting it here says *not on this surface* and leaves the others as they are — "
+            "reject each surface you do not want it on, and leave the ones you do. **Review** then knows "
+            "the difference: an edit refused everywhere it lands is one to revert at source, while one "
+            "refused on some surfaces is one to override on those, keeping the text where it is wanted."
+        )
+        st.caption(
+            "Nothing is changed by this: no text is reverted, no step re-runs, and nothing here is read "
+            "at merge. There is no *approve all*, on purpose — a branch can be wrong wholesale, but it "
             "cannot be right wholesale without somebody reading it."
         )
         st.button(
-            f"Reject all {n}",
+            f"Reject all {n} in {what}",
             key=f"mdd-reject-all-{section}",
             on_click=_reject,
             type="primary",

@@ -31,6 +31,7 @@ from apps.wizard.app_pages.metadata_diff.data import DECIDED, REJECTED, REVIEWED
 from apps.wizard.app_pages.metadata_diff.discovery import (
     edit_fields,
     edit_key,
+    edit_slot,
     edits_for,
     group_by_edit,
     reach_by_surface,
@@ -416,27 +417,53 @@ def _notes_markdown(rows: list[dict[str, Any]], index: dict[str, dict[str, str]]
     return "\n".join(lines)
 
 
-def _edit_lookup(summary: Any) -> dict[str, dict[str, Any]]:
-    """change key -> the edit it stands for, for every section's By-edit surface.
+# How to stop one authored edit reaching one surface without reverting it at source. A partial rejection
+# asks for an override, not a revert, and each surface is overridden in a different place.
+_OVERRIDE_LEVER = {
+    "mdims": (
+        "override the field on those views in the MDim's export step (`view.metadata[...]` under "
+        "`etl/steps/export/multidim/`), which leaves the garden text alone for everything else"
+    ),
+    "explorers": (
+        "set the text on those views in the explorer's own export step (under "
+        "`etl/steps/export/explorers/`), which leaves the garden text alone for everything else"
+    ),
+    "charts": (
+        "give those charts their own text — `presentation.grapher_config` in the garden step for a chart "
+        "ETL owns, or the chart itself in the admin"
+    ),
+}
+
+
+def _edit_lookup(summary: Any) -> tuple[dict[str, dict[str, Any]], dict[str, dict[str, int]]]:
+    """(change key -> the edit it stands for, edit slot -> the surfaces it reaches and how many texts each).
 
     A stored row carries a hash, not an edit, so describing a rejection means re-deriving the edits and
     hashing each the way its card did. Cheap: the reach it reads is the cached summary every section uses.
+
+    The second half is what makes a partial rejection legible. `edit_slot` identifies one authored edit
+    across sections — it hashes the words, not the surface — so comparing the surfaces an edit *reaches*
+    with the ones a reviewer *refused* says whether they want the text gone or only kept off one surface.
     """
     out: dict[str, dict[str, Any]] = {}
+    reach: dict[str, dict[str, int]] = {}
     for section in sorted(COUNTED_SECTIONS):
         surface = surface_key("item", f"edit:{section}")
         for edit in edits_for(summary, section):
             change_key, _hash = item_identity(surface, edit_key(edit), edit_fields(edit))
             paths = {p for change in edit.changes for p in (change.catalog_paths or set())}
+            slot = edit_slot(edit)
             out[change_key] = {
-                "section": SECTIONS[section][1],
+                "slot": slot,
+                "section": section,
                 "field": field_label(edit.field),
                 "inserted": edit.inserted,
                 "deleted": edit.deleted,
                 "n_texts": edit.n_texts,
                 "datasets": distinct_garden_datasets(paths),
             }
-    return out
+            reach.setdefault(slot, {})[section] = edit.n_texts
+    return out, reach
 
 
 def _rejections_markdown(rejected: list[dict[str, Any]], index: dict[str, dict[str, str]], summary: Any) -> str:
@@ -451,34 +478,44 @@ def _rejections_markdown(rejected: list[dict[str, Any]], index: dict[str, dict[s
     lines += [
         f"A reviewer rejected {len(rejected)} of this branch's metadata "
         f"{'change' if len(rejected) == 1 else 'changes'} on the staging server above. Nothing has been "
-        "reverted — these are the edits to undo or rework, with where each one was authored.",
+        "reverted. Rejections are per surface, so some of these ask for the text to go and others only "
+        "for it to be kept off one surface — each entry says which.",
         "",
     ]
-    edits = _edit_lookup(summary)
+    edits, reach = _edit_lookup(summary)
     by_edit = [row for row in rejected if str(row.get("changeKey")) in edits]
     by_item = [row for row in rejected if str(row.get("changeKey")) not in edits]
 
-    if by_edit:
-        lines += ["### Edits to revert", ""]
-        for edit, notes in _merged_edits(by_edit, edits):
-            where = ", ".join(f"{n} rendered text{'s' if n != 1 else ''} in {section}" for section, n in edit["reach"])
-            lines.append(f"- **{edit['field']}** — {where}")
-            if edit["deleted"] and edit["inserted"]:
-                lines.append(f"  - was: {_quoted_inline(edit['deleted'])}")
-                lines.append(f"  - now: {_quoted_inline(edit['inserted'])} ← revert this")
-            elif edit["inserted"]:
-                lines.append(f"  - added: {_quoted_inline(edit['inserted'])} ← remove this")
-            elif edit["deleted"]:
-                lines.append(f"  - removed: {_quoted_inline(edit['deleted'])} ← put this back")
+    merged = _merged_edits(by_edit, edits, reach)
+    whole = [(edit, notes) for edit, notes in merged if not edit["kept"]]
+    partial = [(edit, notes) for edit, notes in merged if edit["kept"]]
+
+    if whole:
+        lines += ["### Revert these — refused everywhere they land", ""]
+        for edit, notes in whole:
+            lines.append(f"- **{edit['field']}** — {_texts_in(edit['refused'])}")
+            lines.extend(_words_lines(edit))
             for dataset in edit["datasets"]:
-                lines.append(f"  - authored in `{dataset}.meta.yml`")
-            for note in notes:
-                lines.append("  - reviewer's note:")
-                lines.extend(f"  {line}" for line in _bullet_lines(note))
+                lines.append(f"  - authored in `{dataset}.meta.yml` — change it there")
+            lines.extend(_note_lines(notes))
+        lines.append("")
+
+    if partial:
+        lines += ["### Keep these, but not everywhere — refused on some surfaces only", ""]
+        for edit, notes in partial:
+            lines.append(
+                f"- **{edit['field']}** — keep on {_texts_in(edit['kept'])}; not wanted on {_texts_in(edit['refused'])}"
+            )
+            lines.extend(_words_lines(edit))
+            for dataset in edit["datasets"]:
+                lines.append(f"  - leave `{dataset}.meta.yml` as it is — the text is wanted elsewhere")
+            for section, _n in edit["refused"]:
+                lines.append(f"  - to keep it off {SECTIONS[section][1]}: {_OVERRIDE_LEVER[section]}")
+            lines.extend(_note_lines(notes))
         lines.append("")
 
     if by_item:
-        lines += ["### Pages rejected", ""]
+        lines += ["### Pages rejected, one at a time", ""]
         for row in by_item:
             known = index.get(str(row.get("changeKey")))
             name = f"[{known['name']}]({known['url']})" if known else "an item no longer in this diff"
@@ -495,32 +532,71 @@ def _rejections_markdown(rejected: list[dict[str, Any]], index: dict[str, dict[s
 
 
 def _merged_edits(
-    rows: list[dict[str, Any]], edits: dict[str, dict[str, Any]]
+    rows: list[dict[str, Any]], edits: dict[str, dict[str, Any]], reach: dict[str, dict[str, int]]
 ) -> list[tuple[dict[str, Any], list[str]]]:
-    """One instruction per authored edit, however many surfaces it was rejected on.
+    """One instruction per authored edit, with the surfaces refused and the surfaces kept.
 
     The same sentence reaches charts and MDim views, and it is one card in each section — so rejecting it
     in both records two verdicts about one edit in one file. As an instruction that is a single change,
-    and printing it twice invites somebody to look for a second place to make it. Merged on the words and
-    the file; the surfaces are then listed together, each with its own text count, and both reviewers'
-    notes are kept.
+    and printing it twice invites somebody to look for a second place to make it.
+
+    What the merge decides is *which* instruction. `refused` are the surfaces with a rejection; `kept` are
+    the surfaces the edit reaches that nobody refused. An empty `kept` means the text is unwanted outright
+    and the garden edit goes. A non-empty one means the reviewer wants the text — just not there — and
+    reverting at source would take it away from a surface that asked to keep it, so the refused surfaces
+    need an override instead. Different job, different file.
     """
-    merged: dict[tuple, tuple[dict[str, Any], list[str]]] = {}
+    merged: dict[str, tuple[dict[str, Any], list[str]]] = {}
     for row in rows:
         edit = edits[str(row["changeKey"])]
-        key = (edit["field"], edit["deleted"], edit["inserted"], tuple(edit["datasets"]))
-        if key not in merged:
-            merged[key] = ({**edit, "reach": []}, [])
-        entry, notes = merged[key]
+        slot = str(edit["slot"])
+        if slot not in merged:
+            merged[slot] = ({**edit, "refused": [], "kept": []}, [])
+        entry, notes = merged[slot]
         pair = (edit["section"], edit["n_texts"])
-        if pair not in entry["reach"]:
-            entry["reach"].append(pair)
+        if pair not in entry["refused"]:
+            entry["refused"].append(pair)
         note = str(row.get("comment") or "").strip()
         if note and note not in notes:
             notes.append(note)
-    for entry, _notes in merged.values():
-        entry["reach"].sort(key=lambda pair: (-pair[1], pair[0]))
+
+    for slot, (entry, _notes) in merged.items():
+        refused_sections = {section for section, _n in entry["refused"]}
+        entry["kept"] = [(section, n) for section, n in reach.get(slot, {}).items() if section not in refused_sections]
+        for bucket in ("refused", "kept"):
+            entry[bucket].sort(key=lambda pair: (-pair[1], pair[0]))
     return list(merged.values())
+
+
+def _texts_in(pairs: list[tuple[str, int]]) -> str:
+    """ "16 texts in MDims, 9 in Charts" — the surfaces of one edit, widest first."""
+    if not pairs:
+        return "nothing"
+    lead = f"{pairs[0][1]} text{'s' if pairs[0][1] != 1 else ''} in {SECTIONS[pairs[0][0]][1]}"
+    return ", ".join([lead] + [f"{n} in {SECTIONS[section][1]}" for section, n in pairs[1:]])
+
+
+def _words_lines(edit: dict[str, Any]) -> list[str]:
+    """The words that moved — the one thing somebody has to find in the file."""
+    if edit["deleted"] and edit["inserted"]:
+        return [
+            f"  - was: {_quoted_inline(edit['deleted'])}",
+            f"  - now: {_quoted_inline(edit['inserted'])}",
+        ]
+    if edit["inserted"]:
+        return [f"  - added: {_quoted_inline(edit['inserted'])}"]
+    if edit["deleted"]:
+        return [f"  - removed: {_quoted_inline(edit['deleted'])}"]
+    return ["  - whitespace only"]
+
+
+def _note_lines(notes: list[str]) -> list[str]:
+    """What the reviewer wrote, as a nested bullet that survives its own newlines."""
+    out: list[str] = []
+    for note in notes:
+        out.append("  - reviewer's note:")
+        out.extend(f"  {line}" for line in _bullet_lines(note))
+    return out
 
 
 def _quoted_inline(text: str) -> str:
