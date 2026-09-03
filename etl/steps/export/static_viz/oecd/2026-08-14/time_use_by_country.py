@@ -76,8 +76,19 @@ page, and sweep the landing page afterwards. It arrives as a FRAME sized to the 
 prefix — `title`, `subtitle`, `note`, `data-source`, `tagline`, `license-*` — because the clone's
 wrappers carry those, and a slot emitted as runs is `license-0 ... license-5`.
 
-**Text slots.** Setting `characters` flattens the mixed weights the templates ship, so re-apply every
-bold range afterwards:
+Then **delete matplotlib's figure patch** (`figure_1/patch_1`), which is frame-sized and carries
+`fills: []`. It paints nothing, so the skill's restyle pass leaves it alone by design and no screenshot
+can show it — but its bounding box is the whole canvas, which makes every box- and band-based check in
+`verify_page.js` measure the artboard instead of the plot and report three failures that are not there.
+Keep the guard the skill's pass uses: strip it only when nothing under it is painted.
+
+**Text slots.** Setting `characters` gives the WHOLE string the face of the old first character, so
+re-apply **every** run's face, not only the bold ones — the runs that silently go wrong are the
+*non-bold* ones. Three of the four footer rows shipped entirely bold from a pass that re-applied the
+bold ranges and trusted the rest, and a screenshot does not show it; `/create-figma-chart`'s
+`diff_against_template.js` does. The template's own faces are Bold(0-5) + Medium(5-6) + Regular for the
+Note, Bold(0-12) + Regular for the source, Bold(0-18) + Medium for the tagline, and Medium with Bold on
+`CC-BY` and each name for the licence:
 
 | Slot | Fills with | Bold |
 |---|---|---|
@@ -752,10 +763,18 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     )
     deepest = max(len(block["lines"]) for block in bracketed_blocks)
     bracketed_px = deepest * line_px(layout["header_fontsize"])
-    category_base_px = CATEGORY_GAP + LEADER_GAP + bracketed_px
+    category_base_px = LEADER_GAP + bracketed_px
 
     def band_px(side: str) -> float:
-        """The room the header needs on one side of the bars."""
+        """The room the header needs on one side of the bars.
+
+        This has to be what the header *draws*, term for term, or the difference is air: measured in the
+        frame, the topmost ink sat 29.35px inside a band inset by 14, because this still reserved the
+        `CATEGORY_GAP`, `LEADER_GAP` and `CATEGORY_TICK` that the bracket rule needed — and the rule went
+        when each category became a single segment. The terms below are exactly the ones
+        `draw_bracketed_names` and `draw_category_name` use: the deepest member list, then the gap under
+        the heading, then the tallest name.
+        """
         room = 0.0
         if category_at == side and category_placements is not None:
             # The tallest name decides the band: its row, plus however many lines it wrapped onto.
@@ -768,7 +787,7 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
                 if layout.get("names_bottom_aligned")
                 else 0.0
             )
-            room = max(room, category_base_px + CATEGORY_TICK + CATEGORY_LABEL_GAP + name_gap + tallest)
+            room = max(room, category_base_px + CATEGORY_LABEL_GAP + name_gap + tallest)
         return room
 
     header_px = band_px("above")
