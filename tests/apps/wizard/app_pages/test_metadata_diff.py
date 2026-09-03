@@ -4657,6 +4657,53 @@ def test_a_chart_superseded_by_an_mdim_is_not_counted_as_a_page(monkeypatch):
     assert discovery._without_mdim_redirected("src", usage) == usage
 
 
+def test_view_by_view_lists_only_the_views_this_branch_is_answerable_for():
+    """An MDim this branch did not author is rebuilt whenever master rebuilds it.
+
+    Its view configs then differ wholesale on a staging server behind the baseline. The badge and the
+    By-edit cards already excluded those (`split_mdim_groups`); View by view and the review index did
+    not, so a reviewer was asked to sign off text nobody in this PR wrote — and the verdict was bound
+    to it.
+    """
+    from apps.wizard.app_pages.metadata_diff import discovery
+    from apps.wizard.app_pages.metadata_diff.core import ViewDiff
+
+    ours = ViewDiff(dimensions={"metric": "mean"}, fields={"descriptionShort": {"old": "a", "new": "b"}})
+    ours.indicator_changed_fields.add("descriptionShort")
+    lag = ViewDiff(dimensions={"metric": "median"}, fields={"chart.subtitle": {"old": "a", "new": "b"}})
+    scope = discovery.BranchScope(available=True)
+
+    kept = discovery.mdim_branch_views("grapher/wb/2026-09-02/pip#pip", [ours, lag], scope)
+    assert [v.dimensions for v in kept] == [{"metric": "mean"}], "the lagging view is not this branch's"
+
+    # Where the branch changed the MDim's own recipe, config-level edits are exactly what it does.
+    mine = discovery.BranchScope(export_products={(MDIM_EXPORT_KIND, "pip")})
+    assert len(discovery.mdim_branch_views("grapher/wb/2026-09-02/pip#pip", [ours, lag], mine)) == 2
+
+
+def test_a_wysk_only_edit_does_not_claim_an_explorer_views_text():
+    """An explorer view's stored text is a chart config, and explorers render no data page.
+
+    So an indicator edit confined to the fields only a data page lays out cannot account for a view's
+    title, subtitle or footnote differing — but it still put every lagging view rendering that indicator
+    in the branch bucket, on a branch whose one change was a WYSK bullet the section says no explorer
+    reader ever sees.
+    """
+    from apps.wizard.app_pages.metadata_diff import discovery
+    from apps.wizard.app_pages.metadata_diff.core import ViewDiff
+
+    wysk = ViewDiff(dimensions={}, fields={"descriptionKey": {"old": ["a"], "new": ["a", "b"]}})
+    subtitle = ViewDiff(dimensions={}, fields={"descriptionShort": {"old": "a", "new": "b"}})
+    both = ViewDiff(
+        dimensions={},
+        fields={"descriptionKey": {"old": ["a"], "new": []}, "titlePublic": {"old": "A", "new": "B"}},
+    )
+
+    assert not discovery._moves_chart_text(wysk)
+    assert discovery._moves_chart_text(subtitle), "grapher falls back to it for a chart's subtitle"
+    assert discovery._moves_chart_text(both), "one field that can reach the text is enough"
+
+
 def test_every_edit_card_keeps_its_verdict_however_many_there_are():
     """The By-edit denominator counts every edit, so no card can be dropped.
 

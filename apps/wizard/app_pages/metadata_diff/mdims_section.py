@@ -14,7 +14,7 @@ import streamlit as st
 from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
-from apps.wizard.app_pages.metadata_diff import cached, datapage, edits_view, view_nav
+from apps.wizard.app_pages.metadata_diff import cached, datapage, discovery, edits_view, view_nav
 from apps.wizard.app_pages.metadata_diff.core import (
     dims_str,
     view_label,
@@ -229,7 +229,11 @@ def _views_page(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, 
     title, dimensions, view_diffs = cached.mdim_view_diffs(
         catalog_path, source_engine, target_engine, cache_key=_cache_key(row)
     )
-    changed = [v for v in view_diffs if v.changed]
+    # This branch's views, not every view that differs: an MDim it did not author is rebuilt whenever
+    # master rebuilds it, so on a staging server behind the baseline its view configs differ wholesale.
+    # The badge and the By-edit cards already excluded those; listing them here asked a reviewer to sign
+    # off text nobody in this PR wrote, and bound the verdict to it.
+    changed = discovery.mdim_branch_views(catalog_path, view_diffs)
 
     draft = " :orange-badge[📝 unpublished]" if row["is_draft"] else ""
     st.markdown(f"### {title or catalog_path}{draft}")

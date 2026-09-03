@@ -615,6 +615,11 @@ def group_usage(g: "ChangeGroup", usage: dict[int, dict[str, list[Any]]]) -> dic
 # single-indicator chart; a chart combining several has none, and its readers reach the same text through
 # "Learn more about this data", per indicator. Both audiences can see the change — one has to open a
 # drawer first — so this distinction is about prominence, never about whether a chart counts.
+#
+# On a surface with no data page and no drawer, though, it is about whether the change can be seen at all:
+# an explorer view renders a chart config, and grapher falls back to `titlePublic` and `descriptionShort`
+# for a chart's title and subtitle but never to these. An edit confined to them cannot account for a
+# difference in an explorer view's text — see `_moves_chart_text`.
 DATA_PAGE_ONLY_FIELDS = {"descriptionKey", "descriptionProcessing", "descriptionFromProducer"}
 
 

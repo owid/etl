@@ -242,8 +242,18 @@ def item_index(
 
     # --- MDim views ---
     try:
+        scope, _built = shared_facts(_source_engine, cache_key=cache_key)
+    except Exception:  # noqa: BLE001
+        scope = None
+    try:
         df = mdim_changes(_source_engine, _target_engine, cache_key=cache_key)
         flagged = [str(cp) for cp in df.index[df["in_branch"] & df["has_changes"]]]
+        # The same budget `summarize` enforces, for the same reason: each MDim's view diff is two reads of
+        # two environments, and this runs on any rerun that records a verdict. Past the budget it enumerates
+        # nothing rather than the first 25 — a truncated total presented as exact is the silent
+        # under-report this page exists to catch, and the sections already report the ceiling.
+        if len(flagged) > discovery.MAX_MDIMS_RESOLVED:
+            flagged = []
     except Exception:  # noqa: BLE001
         flagged, df = [], None
     for catalog_path in flagged:
@@ -260,7 +270,10 @@ def item_index(
         except Exception:  # noqa: BLE001
             continue
         slug = str(row["slug_source"]) if row.get("slug_source") else ""
-        changed = [v for v in view_diffs if v.changed]
+        # This branch's views only — the same split the badge and the By-edit cards apply. A view that
+        # differs because master rebuilt the MDim is not an item to review, and counting it made the
+        # section's denominator larger than the work it describes.
+        changed = discovery.mdim_branch_views(catalog_path, view_diffs, scope)
         totals[surface] = len(changed)
         for view in changed:
             key, content_hash = item_identity(surface, dims_str(view.dimensions), view.fields)

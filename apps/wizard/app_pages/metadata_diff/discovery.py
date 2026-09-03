@@ -34,6 +34,7 @@ from structlog import get_logger
 from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELDS,
     COUNTED_SECTIONS,
+    DATA_PAGE_ONLY_FIELDS,
     ChangeGroup,
     ViewDiff,
     build_view_bundle,
@@ -1133,6 +1134,28 @@ def split_mdim_groups(
     return [g for g in groups if g.affects_indicator], [g for g in groups if not g.affects_indicator]
 
 
+def mdim_branch_views(
+    catalog_path: str, view_diffs: list["ViewDiff"], scope: BranchScope | None = None
+) -> list["ViewDiff"]:
+    """The changed views of one MDim this branch is answerable for — `split_mdim_groups`, per view.
+
+    Same rule, same reason, and the two layouts have to agree: an MDim's view configs are rebuilt
+    whenever master rebuilds it, so on a staging server behind the baseline they differ wholesale.
+    Counting those as ours was what the group-level split already prevented for the badge and the By-edit
+    cards, while View by view listed them as this branch's changes and asked a reviewer to sign each one
+    off — a verdict recorded against text nobody here wrote.
+
+    Views rather than groups because that is the unit those two surfaces work in: a view is a page, and
+    its tick is the page's. Where the branch changed the MDim's own recipe every difference is ours, since
+    config-level edits are exactly what that does.
+    """
+    scope = scope if scope is not None else branch_scope()
+    changed = [v for v in view_diffs if v.changed]
+    if not scope.available or scope.covers_mdim(catalog_path):
+        return changed
+    return [v for v in changed if v.affects_indicator]
+
+
 def mdim_text_changes(source_engine: Engine, target_engine: Engine, catalog_path: str) -> list[ViewDiff]:
     """Per-view text diff of one MDim against the baseline (cached for the app in `cached.py`)."""
     source_config, target_config = _both(load_mdim_config, source_engine, target_engine, catalog_path)
@@ -1362,6 +1385,19 @@ class ExplorerChanges:
         return {slug: diffs for slug, diffs in self.views.items() if slug not in self.in_branch}
 
 
+def _moves_chart_text(diff: ViewDiff) -> bool:
+    """Could this indicator's edit have moved a title, subtitle or footnote?
+
+    `titlePublic` and `descriptionShort` are what grapher falls back to for a chart's title and subtitle,
+    so an edit touching either can. The rest of the indicator text is laid out on a data page and nowhere
+    else — and an explorer view has no data page, which is a limit this tool states in the section itself.
+    Attributing a view to an edit that could not have reached it is claiming a change nobody made.
+
+    True for a diff with no fields (a new view), which is not this function's question to answer.
+    """
+    return not diff.fields or any(key not in DATA_PAGE_ONLY_FIELDS for key in diff.fields)
+
+
 def changed_explorer_views(
     source_engine: Engine,
     target_engine: Engine,
@@ -1410,7 +1446,13 @@ def changed_explorer_views(
         # this branch's: the exact-path pass matches nothing, every indicator reads as new, and the union
         # below then vouches for views whose difference is only master's lag.
         result = compare_indicators_across_versions(source_engine, target_engine, candidates)
-        changed_paths = set(result.diffs) | result.new_paths
+        # Only edits that could have moved the text an explorer view shows. Its stored text is a chart
+        # config — title, subtitle, note — with no data page behind it, so an indicator whose diff is
+        # confined to `DATA_PAGE_ONLY_FIELDS` cannot account for a difference here. Without this, a branch
+        # whose one edit was a WYSK bullet had every lagging view rendering that indicator filed as its
+        # own — while the section says, correctly, that no reader of an explorer ever sees that bullet.
+        # A brand-new indicator keeps vouching: there is no old text to say which field moved.
+        changed_paths = {p for p, d in result.diffs.items() if _moves_chart_text(d)} | result.new_paths
         # An explorer view's text is a chart config, and a garden step can author that text directly
         # through `presentation.grapher_config`. That edit changes no column of the `variables` row, so
         # asking only `compare_indicator_texts` credited the branch with none of it: a reworded shared
