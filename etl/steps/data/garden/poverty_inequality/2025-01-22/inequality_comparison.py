@@ -79,6 +79,10 @@ WID_WELFARE = {
     "after tax": ("posttaxNational", "Post-tax national income"),
 }
 # WID dimensional extrapolated flag -> (series_code source code, human-readable source label).
+# Since wid/2026-09-02 the "no" slice is defined by WID's own data-quality score (income scored >= 3)
+# rather than by WID's retired extrapolation flag, so it covers a different set of country-years than
+# it did before, at the same values. The codes and labels are kept as they are: they are stable
+# identifiers that downstream consumers key on.
 WID_SOURCE = {
     "no": ("wid", "WID"),
     "yes": ("widExtrapolated", "WID (including extrapolated datapoints)"),
@@ -664,7 +668,7 @@ def create_analysis_and_grapher_tables(tb: Table) -> list[Table]:
     )
 
     # Keep the data in unique rows using this index [ "country", "year", "ref_year", "reference_years", "only_all_series"]
-    # I need to do this because the pipwelfare and pipreportinglevel dublicate the data
+    # I need to do this because the pipwelfare and pipreportinglevel duplicate the data
     tb = tb.groupby(["country", "year", "ref_year", "reference_years", "only_all_series"], as_index=False).first()
 
     # Format the table
