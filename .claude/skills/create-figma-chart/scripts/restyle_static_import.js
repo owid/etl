@@ -338,19 +338,27 @@ for (const job of CONFIG.jobs) {
   // Take each leaf's box THROUGH its clipping ancestors first. A path running past a clip frame
   // renders no pixels there, so it must not widen the box: matplotlib clips its axes artists, Figma
   // imports that clip as a `clipsContent` frame, and a line leaving the axes therefore arrives here
-  // at its full unclipped width. Intersecting is a no-op wherever nothing clips, and drops a leaf
-  // clipped away to nothing rather than letting invisible geometry set the crop.
+  // at its full unclipped width. Intersecting is a no-op wherever nothing clips.
+  //
+  // Stop BELOW `styled`. Only a clip still in force after the crop may shrink these bounds, and
+  // `styled`'s own is not: it is switched off a few lines down so the new edge cuts nothing. Count its
+  // overflow as ink and the frame grows to contain it, which is what keeps the fill, the hit target
+  // and the geometry rows bounding everything visible. Intersect with it instead and that overflow is
+  // first excluded from the box and then un-hidden, landing outside the frame meant to bound it.
   const throughClips = (node) => {
     let box = node.absoluteBoundingBox;
-    for (let a = node.parent; a && box; a = a.parent) {
+    for (let a = node.parent; a && box && a !== styled; a = a.parent) {
       const clip = "clipsContent" in a && a.clipsContent ? a.absoluteBoundingBox : null;
       if (clip) {
         const x = Math.max(box.x, clip.x), y = Math.max(box.y, clip.y);
         const right = Math.min(box.x + box.width, clip.x + clip.width);
         const bottom = Math.min(box.y + box.height, clip.y + clip.height);
-        box = right > x && bottom > y ? { x, y, width: right - x, height: bottom - y } : null;
+        // `>=`, not `>`: an open path has a DEGENERATE box. `absoluteBoundingBox` excludes the stroke,
+        // so a horizontal gridline measures 123.75x0 and a spine 0xN — visible ink whose box has no
+        // area. A strict test calls every one of them fully clipped and drops it, which loses the axes
+        // and lets labels set the plot edge. Only a box lying OUTSIDE its clip becomes null.
+        box = right >= x && bottom >= y ? { x, y, width: right - x, height: bottom - y } : null;
       }
-      if (a === styled) break;
     }
     return box;
   };
