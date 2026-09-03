@@ -249,6 +249,11 @@ vsce-sync:
 #
 # `$GIT_DIR/hooks` is git's own default, so the symlink needs no config at all, and
 # a machine-wide hooks directory that forwards to `$GIT_DIR/hooks` still finds it.
+# A pre-commit that is already a symlink somewhere else is left alone: `ln -sfn` would
+# happily replace it, which would be this target hijacking someone's hook — the very
+# thing it stopped doing. Only our own link (into a `scripts/hooks/pre-commit`) is
+# re-pointed, so a moved checkout still gets repaired.
+#
 # `--git-common-dir` resolves to the primary `.git` from a linked worktree, so one
 # install covers every worktree, and the link points at the primary checkout's copy
 # of the script so it survives that worktree being removed.
@@ -259,9 +264,14 @@ install-hooks:
 		TARGET="$$(dirname "$$COMMON")/scripts/hooks/pre-commit"; \
 		chmod +x scripts/hooks/pre-commit; \
 		mkdir -p "$$COMMON/hooks"; \
+		LINK="$$(readlink "$$HOOK" 2>/dev/null)"; \
 		if [ -e "$$HOOK" ] && [ ! -L "$$HOOK" ]; then \
 			echo "⚠️ $$HOOK already exists and is not a symlink — leaving it alone."; \
-		elif [ "$$(readlink "$$HOOK" 2>/dev/null)" != "$$TARGET" ]; then \
+		elif [ -n "$$LINK" ] && [ "$$LINK" != "$$TARGET" ] && \
+		     [ "$${LINK%/scripts/hooks/pre-commit}" = "$$LINK" ]; then \
+			echo "⚠️ $$HOOK is a symlink to $$LINK, which isn't ours — leaving it alone."; \
+			echo "   Remove it and re-run 'make install-hooks' if you want this repo's hook."; \
+		elif [ "$$LINK" != "$$TARGET" ]; then \
 			ln -sfn "$$TARGET" "$$HOOK"; \
 			echo "==> pre-commit hook active ($$HOOK)"; \
 		fi; \
@@ -312,7 +322,8 @@ setup.config:
 			[ -e "$$SRC" ] || continue; \
 			NAME="$$(basename "$$SRC")"; \
 			[ -e "$$NAME" ] && continue; \
-			cp -p "$$SRC" "$$NAME" && echo "==> copied $$NAME from the main checkout"; \
+			cp -p "$$SRC" "$$NAME" || { echo "ERROR: could not copy $$NAME into $$PWD"; exit 1; }; \
+			echo "==> copied $$NAME from the main checkout"; \
 		done; \
 		SRC_DEV="$$(df -P "$$PRIMARY" | awk 'NR==2{print $$1}')"; \
 		DST_DEV="$$(df -P . | awk 'NR==2{print $$1}')"; \

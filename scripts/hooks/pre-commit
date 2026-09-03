@@ -13,12 +13,14 @@
 # and it is worth not printing on every single commit.
 set -e
 
-# The files this commit is about, as the index has them, NUL-delimited so paths
-# with spaces survive. Nothing else is ever re-staged: `git add`-ing a file this
+# The files this commit is about, as the index has them, NUL-delimited so paths with
+# spaces survive. `R` in the filter matters: a rename carrying a small edit stays a
+# rename (`R098 old.py new.py`), so with only `ACM` such a commit yields an empty list
+# and skips every check. `--name-only` reports the destination, which is what we want. Nothing else is ever re-staged: `git add`-ing a file this
 # commit didn't stage would quietly widen it.
 STAGED=$(mktemp)
 trap 'rm -f "$STAGED"' EXIT
-git diff --cached --name-only --diff-filter=ACM -z >"$STAGED"
+git diff --cached --name-only --diff-filter=ACMR -z >"$STAGED"
 [ -s "$STAGED" ] || exit 0
 
 # A staged file carrying further unstaged edits can't be fixed in place: re-staging
