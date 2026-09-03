@@ -4944,3 +4944,146 @@ def test_every_edit_card_keeps_its_verdict_however_many_there_are():
 
     assert [edit for page in pages for edit in page] == edits, "every edit is on some page"
     assert all(len(page) <= MAX_CARDS for page in pages), "and no page renders more than the cap"
+
+
+def test_an_mdim_sees_the_chart_text_its_garden_step_authored(monkeypatch):
+    """A `presentation.grapher_config` edit moves no column of the `variables` row.
+
+    So the MDim's indicator signal — which read only that row — stayed false for a branch whose whole
+    change was a chart title, subtitle or note. A staging server rebuilds master's MDims too, so the
+    MDim's own config differs anyway; with the recipe untouched by this PR, that difference was filed as
+    somebody else's, and the MDim's views left the review and the blast radius entirely. The explorer
+    attribution has always read both layers.
+    """
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    mdim = "grapher/ns/latest/an_mdim#an_mdim"
+    path = "grapher/ns/2026-01-01/ds/tb#indicator"
+
+    def fake_mdim_list(engine):
+        return pd.DataFrame(
+            {
+                "catalogPath": [mdim],
+                # Rebuilt here, as every MDim on a staging server is — which is the whole difficulty.
+                "configMd5": ["here" if engine == "source" else "there"],
+                "published": [1],
+                "slug": ["an-mdim"],
+            }
+        )
+
+    monkeypatch.setattr(discovery, "mdim_list", fake_mdim_list)
+    monkeypatch.setattr(discovery, "_load_configs", lambda engine: {mdim: {}})
+    monkeypatch.setattr(discovery, "mdim_indicator_paths", lambda engine, configs: {mdim: {path}})
+    monkeypatch.setattr(discovery, "candidate_paths", lambda engine, paths, scope, built: (list(paths), True))
+    # The `variables` row is untouched: this branch's edit is not on that layer.
+    monkeypatch.setattr(
+        discovery, "compare_indicators_across_versions", lambda s, t, paths: discovery.IndicatorChanges()
+    )
+    # The branch edited the garden step, not the MDim recipe — so nothing vouches for the config change.
+    scope = BranchScope(dataset_paths={"grapher/ns/2026-01-01/ds"}, available=True)
+    monkeypatch.setattr(discovery, "branch_scope", lambda: scope)
+
+    monkeypatch.setattr(discovery, "changed_indicator_configs", lambda s, t, paths: {path})
+    df = discovery.mdim_changes_df("source", "target")
+    assert bool(df.loc[mdim, "indicator_changed"]), "the garden step authored the text, so the edit is ours"
+    assert bool(df.loc[mdim, "in_branch"]), "and the MDim belongs in this branch's review"
+
+    # The boundary: with neither layer moved, the rebuilt config is exactly the baseline lag it looks
+    # like, and the MDim stays in the "other differences" bucket rather than being credited to this PR.
+    monkeypatch.setattr(discovery, "changed_indicator_configs", lambda s, t, paths: set())
+    df = discovery.mdim_changes_df("source", "target")
+    assert not bool(df.loc[mdim, "indicator_changed"])
+    assert not bool(df.loc[mdim, "in_branch"]) and bool(df.loc[mdim, "has_changes"])
+
+
+def test_a_config_edit_vouches_only_for_the_explorer_text_it_moved(monkeypatch):
+    """`presentation.grapher_config` names the field it changed, so granting all three over-claims.
+
+    A subtitle edit and a footnote master rebuilt land on the same explorer view often enough: the view
+    differs in the footnote, the branch's edit could not have moved it, and answering "yes, something
+    changed on this indicator" handed the reviewer master's rebuild as their own work. The `variables`
+    side already answers this per field (`_chart_text_reached`); the config side did not.
+    """
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    path = "grapher/ns/2026-01-01/ds/tb#indicator"
+    rows = {
+        "source": {
+            ("an-explorer", "v1"): {"dimensions": {"metric": "a"}, "indicator_ids": {1}, "subtitle": "New wording"},
+            ("an-explorer", "v2"): {"dimensions": {"metric": "b"}, "indicator_ids": {1}, "note": "Rebuilt footnote"},
+        },
+        "target": {
+            ("an-explorer", "v1"): {"dimensions": {"metric": "a"}, "indicator_ids": {1}, "subtitle": "Old wording"},
+            ("an-explorer", "v2"): {"dimensions": {"metric": "b"}, "indicator_ids": {1}, "note": "Old footnote"},
+        },
+    }
+
+    monkeypatch.setattr(discovery, "explorer_view_hashes", lambda engine: {key: engine for key in rows["source"]})
+    monkeypatch.setattr(discovery, "explorer_view_rows", lambda engine, keys: rows[engine])
+    monkeypatch.setattr(discovery, "fetch_variable_paths", lambda engine, ids: {1: path})
+    monkeypatch.setattr(discovery, "candidate_paths", lambda engine, paths, scope, built: (list(paths), True))
+    # Nothing on the `variables` layer moved: the edit is written straight into the chart config.
+    monkeypatch.setattr(
+        discovery, "compare_indicators_across_versions", lambda s, t, paths: discovery.IndicatorChanges()
+    )
+    monkeypatch.setattr(discovery, "changed_indicator_config_fields", lambda s, t, paths: {path: {"subtitle"}})
+    # The coarser question this used to ask, answered too, so the test tells the two answers apart rather
+    # than an answer from a missing call: "this indicator's config moved" is true of both views' sole
+    # indicator, and on its own it vouches for the lagging footnote as readily as for the subtitle.
+    monkeypatch.setattr(discovery, "changed_indicator_configs", lambda s, t, paths: {path})
+
+    scope = BranchScope(dataset_paths={"grapher/ns/2026-01-01/ds"}, available=True)
+    out = discovery.changed_explorer_views("source", "target", scope, {"ns/2026-01-01/ds"})
+
+    assert [d.dimensions for d in out.branch_views()["an-explorer"]] == [{"metric": "a"}], "the subtitle view"
+    assert [d.dimensions for d in out.other_views()["an-explorer"]] == [{"metric": "b"}], "the footnote lags"
+
+
+def test_a_chart_text_master_already_says_is_not_this_branchs(monkeypatch):
+    """Being in scope and rebuilt here is necessary, and not sufficient, for a chart's own config text.
+
+    Master edits a chart's title after this staging server is created; the branch then rebuilds any
+    dataset that chart renders, which is enough to put it in scope. The comparison against the baseline
+    alone then reports the *older* wording this server still serves as the branch's own — in the review,
+    in the counts, and in the rejection document a reviewer signs. Master's server answers it, per field,
+    the same way it does for the indicator layer.
+    """
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    def text(title, subtitle):
+        return {"title": title, "subtitle": subtitle, "note": "N"}
+
+    source = {
+        "ours": {"chartId": 1, "slug": "ours", **text("T", "Our wording"), "paths": []},
+        "masters": {"chartId": 2, "slug": "masters", **text("Master's title", "S"), "paths": []},
+        "mixed": {"chartId": 3, "slug": "mixed", **text("Master's title", "Our wording"), "paths": []},
+    }
+    baseline = {slug: text("T", "S") for slug in source}
+    master = {
+        "ours": text("T", "S"),
+        "masters": text("Master's title", "S"),
+        "mixed": text("Master's title", "S"),
+    }
+
+    def fake_rows_by_slug(engine, slugs):
+        rows = master if engine == "master" else baseline
+        return {slug: row for slug, row in rows.items() if slug in set(slugs)}
+
+    monkeypatch.setattr(discovery, "chart_text_rows", lambda engine, dataset_paths: source)
+    monkeypatch.setattr(discovery, "chart_text_rows_by_slug", fake_rows_by_slug)
+    monkeypatch.setattr(discovery, "changed_indicator_configs", lambda s, t, paths: set())
+
+    scope = BranchScope(dataset_paths={"grapher/ns/2026-01-01/ds"}, available=True)
+    built = {"ns/2026-01-01/ds"}
+
+    out = discovery.changed_chart_texts("src", "tgt", scope, built, "master")  # type: ignore[arg-type]
+    assert sorted(out.diffs) == ["mixed", "ours"], "the chart saying only what master says is not ours"
+    assert "masters" not in out.charts, "and it is gone from the charts the counts read too"
+    # Per field: master's title on a chart whose subtitle this branch reworded must not drag the title in.
+    assert set(out.diffs["mixed"].fields) == {"chart.subtitle"}
+    assert set(out.diffs["ours"].fields) == {"chart.subtitle"}
+
+    # With master unreachable nothing is dropped, which is the same "cannot tell" the indicator layer
+    # reports as UNKNOWN — a conservative list beats a silently short one.
+    unchecked = discovery.changed_chart_texts("src", "tgt", scope, built)  # type: ignore[arg-type]
+    assert sorted(unchecked.diffs) == ["masters", "mixed", "ours"]

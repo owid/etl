@@ -38,6 +38,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     INDICATOR_FIELD_REACHES,
     ChangeGroup,
     ViewDiff,
+    _normalize,
     build_view_bundle,
     dataset_shape,
     diff_views,
@@ -825,16 +826,54 @@ def compare_chart_texts(
     return out
 
 
+def drop_master_chart_texts(changes: ChartTextChanges, master_rows: dict[str, dict[str, Any]]) -> None:
+    """Drop the chart texts that master's own environment already says, field by field.
+
+    Pure, and the chart-level counterpart of `classify_origins`' MASTER verdict: text identical to
+    master's cannot be this branch's invention, so the difference is the baseline not having rebuilt yet.
+
+    It is needed because the scope/build filter cannot see this case. Master edits a chart's config after
+    this staging server was created; the branch then rebuilds any dataset that chart renders, which is
+    enough to put the chart in scope — and the comparison against the baseline alone then reports the
+    *older* wording this server still serves as though the branch had written it, in the review, in the
+    counts and in the rejection document a reviewer signs.
+
+    Per field rather than per chart, for the same reason the explorer attribution is: a title master
+    reworded must not drag along a subtitle this branch did. A chart left with nothing of its own is
+    removed entirely, charts row included, so no count keeps it. A slug master does not publish is left
+    alone: that is a question master cannot answer, not an answer of no.
+    """
+    for slug in list(changes.diffs):
+        master_row = master_rows.get(slug)
+        if master_row is None:
+            continue
+        diff = changes.diffs[slug]
+        for key in list(diff.fields):
+            if not key.startswith(CHART_FIELD_PREFIX):
+                continue
+            if diff.fields[key]["new"] == _normalize(master_row.get(key.removeprefix(CHART_FIELD_PREFIX))):
+                del diff.fields[key]
+        if not diff.changed:
+            del changes.diffs[slug]
+            changes.charts.pop(slug, None)
+
+
 def changed_chart_texts(
     source_engine: Engine,
     target_engine: Engine,
     scope: BranchScope | None = None,
     built: set[str] | None = None,
+    master_engine: Engine | None = None,
 ) -> ChartTextChanges:
     """Charts whose own config text this branch changed.
 
     Restricted the same way indicator changes are: the chart must render a dataset in the branch's git
     scope that this server rebuilt. Without both, a chart master rebuilt would read as this branch's work.
+
+    Those two are necessary and not sufficient, so `master_engine` — master's own staging server — is the
+    third: it is what separates the branch's wording from wording master authored after this server was
+    created, exactly as it does for the indicator layer. Optional, and without it nothing is dropped,
+    which is the same "cannot tell" this module reports as UNKNOWN elsewhere.
     """
     scope = scope if scope is not None else branch_scope()
     built = built if built is not None else datasets_built_here(source_engine)
@@ -852,6 +891,14 @@ def changed_chart_texts(
     source_rows = chart_text_rows(source_engine, in_play)
     target_rows = chart_text_rows_by_slug(target_engine, list(source_rows))
     out = compare_chart_texts(source_rows, target_rows)
+
+    # Baseline drift removed before anything is attributed or counted — see `drop_master_chart_texts`.
+    # Only the slugs that already differ are asked about, so this is one query on a handful of rows.
+    if master_engine is not None and master_engine is not target_engine and out.diffs:
+        try:
+            drop_master_chart_texts(out, chart_text_rows_by_slug(master_engine, sorted(out.diffs)))
+        except Exception as e:  # noqa: BLE001 — an unreachable master is "cannot tell", not a failure
+            log.warning("metadata_diff.master_chart_text_comparison_failed", error=str(e))
 
     # Which indicator authored the text, asked rather than assumed: the one whose own
     # `presentation.grapher_config` differs from the baseline. A chart with none — its text inherited from
@@ -1060,6 +1107,13 @@ def mdim_changes_df(
             # or not.
             result = compare_indicators_across_versions(source_engine, target_engine, narrowed_paths)
             changed_paths = set(result.diffs) | result.new_paths
+            # And the other layer a garden step authors an MDim view's text on: `presentation.
+            # grapher_config`, which moves no column of the `variables` row. Without it, a branch whose
+            # only edit is a chart title, subtitle or note left `indicator_changed` false, and unless the
+            # PR also touched the MDim's own recipe the rebuilt config was filed as somebody else's
+            # difference — dropping the MDim's views out of the review and out of the blast radius. The
+            # explorer attribution has always read both layers; this one read one.
+            changed_paths |= changed_indicator_configs(source_engine, target_engine, narrowed_paths)
         changed_mdims = {cp for cp, paths in paths_by_mdim.items() if paths & changed_paths}
     except Exception as e:  # noqa: BLE001 — never let the flag break the page; degrade and say so
         log.warning("metadata_diff.indicator_change_check_failed", error=str(e))
@@ -1335,8 +1389,10 @@ def attribute_chart_texts(changes: "ChartTextChanges", paths_by_slug: dict[str, 
         diff.catalog_path = mine[0] if mine else None
 
 
-def changed_indicator_configs(source_engine: Engine, target_engine: Engine, paths: list[str]) -> set[str]:
-    """Indicators whose garden-authored chart text (`presentation.grapher_config`) differs from the baseline.
+def changed_indicator_config_fields(
+    source_engine: Engine, target_engine: Engine, paths: list[str]
+) -> dict[str, set[str]]:
+    """Per indicator, which of its garden-authored chart texts (`presentation.grapher_config`) moved.
 
     An indicator absent from the baseline is not reported here: it has no old text to differ from, and the
     new-indicator case is already carried by `compare_indicator_texts`.
@@ -1346,6 +1402,10 @@ def changed_indicator_configs(source_engine: Engine, target_engine: Engine, path
     credited to nothing on exactly the workflow this tool exists for, and the rejection document unable to
     name the garden dataset, its file or its owner. The same version-insensitive pairing the indicator
     comparison uses fills that in, off the config table rather than `variables`.
+
+    *Which* field moved, not merely that one did, for the reason `_chart_text_reached` exists: an edit to
+    a subtitle cannot account for a view whose only difference is a footnote master rebuilt, and answering
+    the coarser question put that rebuild in the branch's bucket.
     """
     src, tgt = _both(fetch_indicator_config_texts, source_engine, target_engine, paths)
 
@@ -1360,14 +1420,25 @@ def changed_indicator_configs(source_engine: Engine, target_engine: Engine, path
         except Exception as e:  # noqa: BLE001 — without it those indicators are unattributed, as before
             log.warning("metadata_diff.config_counterparts_unavailable", error=str(e))
 
-    changed = set()
+    changed: dict[str, set[str]] = {}
     for path, fields in src.items():
         before = tgt.get(path)
         if before is None:
             continue
-        if any((fields.get(key) or "") != (before.get(key) or "") for key in ("title", "subtitle", "note")):
-            changed.add(path)
+        moved = {key for key in CHART_FIELDS if (fields.get(key) or "") != (before.get(key) or "")}
+        if moved:
+            changed[path] = moved
     return changed
+
+
+def changed_indicator_configs(source_engine: Engine, target_engine: Engine, paths: list[str]) -> set[str]:
+    """Which indicators' garden-authored chart text differs from the baseline, without saying which field.
+
+    For callers that only need "did this indicator author the change" — chart-text attribution names one
+    indicator, and the MDim signal is per MDim. Where the field matters, use
+    `changed_indicator_config_fields` instead.
+    """
+    return set(changed_indicator_config_fields(source_engine, target_engine, paths))
 
 
 @dataclass
@@ -1500,10 +1571,14 @@ def changed_explorer_views(
         # An explorer view's text is a chart config, and a garden step can author that text directly
         # through `presentation.grapher_config`. That edit changes no column of the `variables` row, so
         # asking only `compare_indicator_texts` credited the branch with none of it: a reworded shared
-        # subtitle moved 402 LIS explorer views and every one was filed as master's lag. It is written
-        # straight into the config, so it can reach any of the three.
-        for path in changed_indicator_configs(source_engine, target_engine, candidates):
-            reaches[path] = set(CHART_FIELDS)
+        # subtitle moved 402 LIS explorer views and every one was filed as master's lag.
+        #
+        # Only the fields that actually moved, though — the config names them, so there is no reason to
+        # grant all three. Vouching for the whole config let a subtitle edit account for a view whose only
+        # difference is a lagging footnote, which is the same over-claim `_chart_text_reached` fixes on
+        # the `variables` side. Unioned rather than assigned: an indicator can move on both layers at once.
+        for path, moved in changed_indicator_config_fields(source_engine, target_engine, candidates).items():
+            reaches[path] = reaches.get(path, set()) | moved
 
     ours_keys = {key for key in detailed if key[0] in own_recipe}
     for key, ids in ids_by_view.items():
@@ -2070,7 +2145,7 @@ def summarize(
             if explorers is None
             else None
         )
-        pending_chart_text = pool.submit(changed_chart_texts, source_engine, target_engine, scope, built)
+        pending_chart_text = pool.submit(changed_chart_texts, source_engine, target_engine, scope, built, master_engine)
 
     # --- Charts (indicator layer) ---
     try:

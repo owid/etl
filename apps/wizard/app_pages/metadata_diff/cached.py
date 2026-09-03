@@ -212,9 +212,13 @@ def chart_text_changes(
 
     A `presentation.grapher_config` edit in a garden step lands in the chart's resolved config and never
     touches the `variables` row, so it needs its own comparison — the indicator-layer one cannot see it.
+
+    Master's server is read inside the body, not taken as an argument: an Engine is not a cache key, and
+    the section and the badges have to be looking at the same comparison. Without it, a chart master
+    reworded after this server was created reads as this branch's edit.
     """
     scope, built = shared_facts(_source_engine, cache_key=cache_key)
-    return discovery.changed_chart_texts(_source_engine, _target_engine, scope, built)
+    return discovery.changed_chart_texts(_source_engine, _target_engine, scope, built, master_engine())
 
 
 @_read_cache(show_spinner="Listing the items to review…")
