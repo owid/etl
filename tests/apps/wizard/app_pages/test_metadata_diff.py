@@ -3279,6 +3279,36 @@ def test_the_instructions_say_who_to_give_them_to():
     )
 
 
+def test_a_sections_parameters_do_not_follow_the_reviewer_to_the_next_one():
+    """The URL grew a trail: `?blast-surface=charts&diff-type=review&mdim-views=…` on the Review tab.
+
+    None of it means anything on the page being looked at, and a stale value is checked strictly the
+    moment somebody navigates back — so it is a raise waiting to happen, not only noise. The section and
+    the layout survive everywhere, because the layout is deliberately shared across the three surfaces.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import foreign_params
+
+    trail = ["diff-type", "layout", "blast-surface", "mdim-views", "dim-metric", "chart", "explorer-views"]
+
+    # On Review nothing but the globals belongs.
+    assert set(foreign_params("review", trail)) == {
+        "blast-surface",
+        "mdim-views",
+        "dim-metric",
+        "chart",
+        "explorer-views",
+    }
+    # On MDims its own route and its dimension menu stay; the others go.
+    assert set(foreign_params("mdims", trail)) == {"blast-surface", "chart", "explorer-views"}
+    # On Blast its four keys stay.
+    assert "blast-surface" not in foreign_params("blast", trail)
+    # An explorer's dimension prefix belongs to Explorers and not to MDims.
+    assert "edim-Period" in foreign_params("mdims", ["edim-Period"])
+    assert "edim-Period" not in foreign_params("explorers", ["edim-Period"])
+    # Parameters this app does not own are left alone, whoever they belong to.
+    assert foreign_params("review", ["embed", "utm_source"]) == []
+
+
 def test_the_bar_says_a_section_can_be_read_either_way():
     """The two ways through a section are what the badges count, so the bar has to name them.
 

@@ -99,6 +99,8 @@ def _explorer_browser(source_engine: Engine, branch: dict[str, list[ViewDiff]]) 
     slugs = sorted(branch)
     current = str(st.session_state.get(EXPLORER_KEY) or st.query_params.get(EXPLORER_KEY) or "").strip()
     if current not in slugs:
+        # As in the MDims browser: a route that names nothing on this branch does not stay in the URL.
+        st.query_params.pop(EXPLORER_KEY, None)
         current = slugs[0]
     st.session_state[EXPLORER_KEY] = current
     position = slugs.index(current)

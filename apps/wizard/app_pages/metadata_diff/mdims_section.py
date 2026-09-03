@@ -141,6 +141,9 @@ def _views_browser(source_engine: Engine, target_engine: Engine, df: pd.DataFram
     known.sort(key=sort_key)
     current = str(st.session_state.get(VIEWS_KEY) or st.query_params.get(VIEWS_KEY) or "").strip()
     if current not in known:
+        # A route naming an MDim this branch does not change — a stale link, or one hand-edited. Falling
+        # back silently left the bad value in the URL to be pasted on to somebody else, so it goes.
+        st.query_params.pop(VIEWS_KEY, None)
         current = known[0]
     st.session_state[VIEWS_KEY] = current
     position = known.index(current)

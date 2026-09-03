@@ -36,7 +36,7 @@ from apps.wizard.app_pages.metadata_diff import (
     mdims_section,
     review_section,
 )
-from apps.wizard.app_pages.metadata_diff.core import empty_sections, section_progress
+from apps.wizard.app_pages.metadata_diff.core import empty_sections, foreign_params, section_progress
 from apps.wizard.app_pages.metadata_diff.data import DECIDED, load_item_notes
 from apps.wizard.app_pages.metadata_diff.discovery import keep_sections
 from apps.wizard.app_pages.metadata_diff.render import (
@@ -142,6 +142,11 @@ what ships is what you meant, and to see how far each change reaches.
         empty_sections(progress, keep_sections(summary)),
         _review_marks(source_engine, target_engine),
     )
+
+    # The trail a reviewer leaves behind them. Pruned after the section is resolved and before it renders,
+    # so the page's own widgets write theirs back on the same run and only the other sections' go.
+    for stale in foreign_params(section, list(st.query_params.keys())):
+        st.query_params.pop(stale, None)
 
     if section == "review":
         review_section.st_show_review(source_engine, target_engine)

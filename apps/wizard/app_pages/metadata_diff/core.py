@@ -1143,3 +1143,46 @@ def section_progress(ticked: dict[str, int], totals: dict[str, int]) -> dict[str
         _ratio, t, d = max(candidates)
         progress[section] = (d, t)
     return progress
+
+
+# Which section each URL parameter belongs to. Exact names, and prefixes for the per-dimension menus,
+# whose keys are `dim-<slug>` / `edim-<slug>` and therefore cannot be listed.
+SECTION_PARAMS: dict[str, tuple[str, ...]] = {
+    "blast": ("blast-group", "blast-edit", "blast-tree-mdim", "blast-surface"),
+    "charts": ("chart",),
+    "mdims": ("mdim-views",),
+    "explorers": ("explorer-views",),
+    "review": (),
+}
+SECTION_PARAM_PREFIXES: dict[str, tuple[str, ...]] = {
+    "mdims": ("dim-",),
+    "explorers": ("edim-",),
+}
+# Parameters that belong to no one section: the section itself, and the layout, which is shared across the
+# three surfaces on purpose. Left alone wherever the reader goes. The section key is spelled out rather
+# than imported from `render`, which imports this module — and it is the name Chart Diff uses too.
+GLOBAL_PARAMS = ("diff-type", LAYOUT_QUERY_KEY)
+
+
+def foreign_params(section: str, keys: Iterable[str]) -> list[str]:
+    """Which of these URL parameters belong to a section other than the one on screen.
+
+    A reviewer who opens an MDim, then a chart, then Review carries the whole trail with them: the URL
+    grows `mdim-views`, `chart`, `blast-surface`… and none of it means anything on the page they are
+    looking at. Worse, a stale value is checked strictly the moment they navigate back, so a parameter
+    left from a branch state that no longer exists is a raise waiting to happen rather than mere noise.
+
+    Only parameters this app knows are pruned. Anything else in the URL — Streamlit's own, or something a
+    future section adds — is somebody else's business and is left where it is.
+    """
+    owned = set(SECTION_PARAMS.get(section, ())) | set(GLOBAL_PARAMS)
+    prefixes = SECTION_PARAM_PREFIXES.get(section, ())
+    known = {name for names in SECTION_PARAMS.values() for name in names}
+    known_prefixes = tuple(p for ps in SECTION_PARAM_PREFIXES.values() for p in ps)
+    out = []
+    for key in keys:
+        if key in owned or (prefixes and key.startswith(prefixes)):
+            continue
+        if key in known or key.startswith(known_prefixes):
+            out.append(key)
+    return out
