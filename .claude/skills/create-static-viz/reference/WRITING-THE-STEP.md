@@ -121,24 +121,47 @@ MEASURED_FONT_STACK = ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans", "
 
 matplotlib.rcParams["font.family"] = "sans-serif"
 matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
-# Nothing to silence here — see below before adding a filter or a setLevel.
+# Drop the per-face misses for faces you deliberately list as alternatives, and NOTHING else.
+_OPTIONAL_FACES = tuple({*EMITTED_FONT_STACK, *MEASURED_FONT_STACK})
+logging.getLogger("matplotlib.font_manager").addFilter(
+    lambda record: "Falling back" in record.getMessage()
+    or not any(f"Font family '{face}' not found" in record.getMessage() for face in _OPTIONAL_FACES)
+)
 ```
 
-**Leave `matplotlib.font_manager`'s logger alone**, however tempting it is to quieten a stack that
-names a font the machine does not have. Measured (matplotlib 3.10.9, Lato absent, Arial installed):
-resolving *either* stack emits **zero** WARNING records. A face that is skipped costs nothing —
-matplotlib scores every candidate at **DEBUG** (1,056 records for two lookups), which never surfaces,
-and it warns only when a whole family list resolves to nothing:
+**`font_manager` has two warning sites, and only one of them is reachable from a `findfont()` probe.**
+This matters because probing the wrong one leads to both available wrong answers:
 
-```
-findfont: Font family ['Lato', 'Nonexistent Face'] not found. Falling back to DejaVu Sans.
+| Site | Message | Fires when |
+|---|---|---|
+| `_findfont_cached` | `... not found. Falling back to DejaVu Sans.` | a family list resolves to **nothing**, via `findfont()` |
+| `_find_fonts_by_props` | `Font family 'X' not found.` | text is **drawn** with an explicit family list — once per missing face, even when a later face answers |
+
+Measured on macOS (matplotlib 3.10.9, Lato absent, Arial installed): `findfont()` on either stack
+emits **zero** warnings, and rendering with the rcParams stack emits zero as well — but rendering text
+through `FontProperties(family=MEASURED_FONT_STACK)`, which is what a step's own measurements do,
+emits one per missing face. A real run of the OECD time-use step produced **724** of them, all
+`Liberation Sans` — a face that earns its place, being the metric-compatible Arial substitute on Linux
+and absent on a Mac. So the noise is real; a blanket `setLevel(logging.ERROR)` is still wrong, because
+it takes `Falling back to DejaVu Sans` with it, and that one says a stack failed and every measurement
+just moved ~15% against what gets drawn.
+
+**Then assert the invariant, because no filter can protect it.** Silence a declared face and you have
+also silenced the case where *every* face of a stack is declared and missing; and Lato-first has its
+own trap — a machine that HAS Lato installed draws Lato while the measured stack still resolves Arial,
+and nothing warns at all. What the allowances actually depend on is one line:
+
+```python
+_DRAWN_FACE, _MEASURED_FACE = (
+    findfont(FontProperties(family=EMITTED_FONT_STACK)),
+    findfont(FontProperties(family=MEASURED_FONT_STACK)),
+)
+assert _DRAWN_FACE == _MEASURED_FACE, f"draws {Path(_DRAWN_FACE).name}, measures {Path(_MEASURED_FACE).name}"
 ```
 
-That is the *only* warning this logger emits, and it is the one you cannot afford to lose: it says a
-stack failed and every measurement in the step just moved ~15% against what gets drawn, which is the
-exact failure this section exists to prevent. So `setLevel(logging.ERROR)` — or a filter over "not
-found" — suppresses nothing you actually have, in exchange for the single notice that matters. If you
-inherit either, delete it rather than narrow it.
+It passes on a Mac without Lato (Arial/Arial) and on a Linux box with neither Arial nor Lato
+(DejaVu/DejaVu — different face, still self-consistent), and fails loudly on the two drifting machines
+above. Prefer it to reading logs: a warning nobody reads is not a check.
 
 Pass the measured stack to every measurement, so measuring and drawing cannot drift whatever a
 machine has installed:

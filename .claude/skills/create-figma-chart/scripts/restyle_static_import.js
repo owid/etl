@@ -354,9 +354,34 @@ for (const job of CONFIG.jobs) {
     }
     return box;
   };
+  //
+  // And let only what RENDERS set the crop. `painted` reads a node's own fill switches, which is not
+  // the same question: `visible` and `opacity` are INHERITED, so a leaf under a hidden or zero-opacity
+  // group still answers yes while painting nothing. Climb to `styled` and test the opacity PRODUCT for
+  // exactly zero, the way `verify_page.js`'s `collect` does — zero is no pixels, and a factor of 0
+  // anywhere zeroes the product.
+  const rendersInTree = (n) => {
+    for (let a = n; a; a = a.parent) {
+      if ("visible" in a && !a.visible) return false;
+      if ("opacity" in a && typeof a.opacity === "number" && a.opacity <= 0) return false;
+      if (a === styled) break;
+    }
+    return true;
+  };
+  // A VECTOR whose every subpath is `windingRule: "NONE"` has no fillable area, but Figma imports it
+  // with a default VISIBLE fill — so `painted` says yes and its box counts, while it paints no pixels.
+  // That is exactly what an imported clip path becomes, and it arrives as a rectangle the size of the
+  // thing it clipped, so it is a prime candidate to set a phantom crop. `verify_page.js` reports these
+  // as dead fills for the same reason. A NONE-winding path that is STROKED is still real ink — an open
+  // path like a gridline — so it stays, on its stroke.
+  const fillPaints = (n) =>
+    n.type === "VECTOR" && Array.isArray(n.vectorPaths) && n.vectorPaths.length &&
+    n.vectorPaths.every((vp) => vp && vp.windingRule === "NONE")
+      ? false
+      : painted(n);
   const inkBoxes = styled
     .findAll((n) => n.type !== "GROUP" && n.type !== "FRAME" &&
-      (painted(n) || strokedAnywhere(n)))
+      (fillPaints(n) || strokedAnywhere(n)) && rendersInTree(n))
     .map(throughClips)
     .filter(Boolean);
   if (inkBoxes.length) {
