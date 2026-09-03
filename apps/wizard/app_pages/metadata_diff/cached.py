@@ -281,7 +281,12 @@ def item_index(
     # one every chart verdict would read as reopened forever.
     try:
         chart_fields = chart_diff_fields(_source_engine, _target_engine, cache_key=cache_key)
-    except Exception:  # noqa: BLE001
+    except Exception as e:  # noqa: BLE001 — see below: the fallback is the old behaviour, not a worse one
+        # Said out loud rather than swallowed, so a server where this keeps failing is diagnosable. The
+        # verdicts themselves are still reported as recorded: withholding them instead would drop a
+        # reviewer's rejection out of the hand-off document, which is the one thing this page exists to
+        # deliver, and would do it over a transient read of a table nobody edited.
+        log.warning("metadata_diff.chart_hashes_unavailable", error=str(e))
         chart_fields = {}
     for chart_slug, n_changes in counts.items():
         fields = chart_fields.get(chart_slug)
@@ -332,7 +337,13 @@ def chart_diff_fields(_source_engine: Engine, _target_engine: Engine, cache_key:
     if not slugs:
         return {}
     changed = indicator_changes(_source_engine, _target_engine, cache_key=cache_key)
-    comparisons = data.compare_charts(_source_engine, _target_engine, slugs, changed_paths=changed.diffs)
+    comparisons = data.compare_charts(
+        _source_engine,
+        _target_engine,
+        slugs,
+        changed_paths=changed.diffs,
+        baseline_paths=changed.across_versions,
+    )
     return {ref: cmp.diff.fields for ref, cmp in comparisons.items()}
 
 

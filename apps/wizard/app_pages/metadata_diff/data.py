@@ -21,6 +21,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     ViewDiff,
     build_view_bundle,
     diff_views,
+    indicator_identity,
     parse_chart_ref,
 )
 from etl.db import read_sql
@@ -596,8 +597,9 @@ def build_chart_bundles(
     used, which is the one a data page renders. That is the right default and the wrong answer for a
     multi-series chart in the changed list: it is there because *some* indicator of it moved, and the
     caller may know which. Read by catalogPath rather than by id, the only identifier that means the same
-    thing in both environments — and where this environment does not hold that path (a version bump moves
-    it), the primary y stands in.
+    thing in both environments — and where this environment does not hold that path, the primary y stands
+    in. That substitution is a different indicator, so a caller comparing two environments has to check
+    the bundle's `catalog_path` before trusting the result; `compare_charts` does.
 
     Four queries for any number of charts, whatever the mix of pins: charts, their dimensions, the pinned
     variables by path, the rest by id.
@@ -662,6 +664,7 @@ def compare_charts(
     target_engine: Engine,
     refs: list[str],
     changed_paths: Any = frozenset(),
+    baseline_paths: dict[str, str] | None = None,
     include_drafts: bool = False,
 ) -> dict[str, ChartComparison]:
     """Compare each chart's current text against the baseline's — in bulk, in a fixed number of queries.
@@ -675,6 +678,12 @@ def compare_charts(
     It is only consulted for the second pass: a multi-series chart whose primary y shows nothing is in the
     changed list because some *other* indicator of it moved, so the comparison is rebuilt on the first of
     those. Passed in rather than fetched here, to keep this free of the app's caching layer.
+
+    `baseline_paths` is `indicator_changes().across_versions` — source path -> the path the baseline holds
+    the same indicator at. A pin names an indicator on *this branch*, and a version bump moves it, so the
+    baseline resolves nothing under that path and would read the chart's primary y instead. Reusing the
+    pairing the indicator comparison already made keeps the two surfaces saying the same thing about which
+    baseline indicator a branch's one corresponds to.
     """
     src = build_chart_bundles(source_engine, refs, include_drafts=include_drafts)
     tgt = build_chart_bundles(target_engine, list(src), include_drafts=include_drafts)
@@ -705,10 +714,22 @@ def compare_charts(
     if not pinned:
         return out
 
+    # The baseline is pinned to its own path for the same indicator, not to the branch's: a version bump
+    # moves `grapher/wb/2026-09-02/…#mean` to what the baseline still serves as `…/2026-06-26/…#mean`.
+    target_pins = {ref: (baseline_paths or {}).get(path, path) for ref, path in pinned.items()}
     src2 = build_chart_bundles(source_engine, list(pinned), pinned, include_drafts=include_drafts)
-    tgt2 = build_chart_bundles(target_engine, list(src2), pinned, include_drafts=include_drafts)
+    tgt2 = build_chart_bundles(target_engine, list(src2), target_pins, include_drafts=include_drafts)
     for ref, (source, chart) in src2.items():
         target = tgt2[ref][0] if ref in tgt2 else None
+        # Only where the baseline resolved the pin to the same indicator, whatever version it holds it at.
+        # Where it did not — a renamed table, an indicator this branch introduced — `build_chart_bundles`
+        # stands the chart's primary y in, and this pass would compare the changed series against a
+        # different indicator: fields nobody edited, and a hash binding the chart's verdict to a pairing
+        # nobody made. Those keep the first pass's like-for-like comparison instead.
+        if target is not None and (
+            not target.catalog_path or indicator_identity(target.catalog_path) != indicator_identity(pinned[ref])
+        ):
+            continue
         out[ref] = ChartComparison(
             chart=chart,
             source=source,

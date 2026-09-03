@@ -118,7 +118,12 @@ def render_chart_by_ref(source_engine: Engine, target_engine: Engine, ref: str, 
     # comparison to show even though nothing counts it.
     changed = cached.indicator_changes(source_engine, target_engine)
     comparison = data.compare_charts(
-        source_engine, target_engine, [ref], changed_paths=changed.diffs, include_drafts=True
+        source_engine,
+        target_engine,
+        [ref],
+        changed_paths=changed.diffs,
+        baseline_paths=changed.across_versions,
+        include_drafts=True,
     ).get(ref)
     if comparison is None:
         st.warning(f"No chart found for “{ref}”. Check the slug/id.")

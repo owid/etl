@@ -3707,7 +3707,9 @@ def test_a_chart_with_no_data_page_is_not_linked_to_one(monkeypatch):
         mdim_pages.render_chart_by_ref("src", "tgt", "some-chart", {})
 
     monkeypatch.setattr(cached, "usage_for_indicators", lambda *args, **kwargs: {})
-    monkeypatch.setattr(cached, "indicator_changes", lambda *_a, **_k: SimpleNamespace(diffs={}, ids={}))
+    monkeypatch.setattr(
+        cached, "indicator_changes", lambda *_a, **_k: SimpleNamespace(diffs={}, ids={}, across_versions={})
+    )
 
     def rendered(n_indicators: int) -> str:
         # The bulk builder, not the comparison: `compare_charts` itself stays under test.
@@ -3888,7 +3890,11 @@ def test_a_multi_series_chart_is_reviewed_on_the_indicator_that_moved(monkeypatc
     monkeypatch.setattr(
         data, "fetch_chart_indicator_paths_bulk", lambda _engine, ids: {i: [moved, first_y] for i in ids}
     )
-    monkeypatch.setattr(cached, "indicator_changes", lambda *_a, **_k: SimpleNamespace(diffs={moved: object()}, ids={}))
+    monkeypatch.setattr(
+        cached,
+        "indicator_changes",
+        lambda *_a, **_k: SimpleNamespace(diffs={moved: object()}, ids={}, across_versions={}),
+    )
     monkeypatch.setattr(cached, "usage_for_indicators", lambda *_a, **_k: {})
 
     def app() -> None:
@@ -4471,3 +4477,103 @@ def test_one_chart_is_hashed_the_same_alone_as_in_bulk(monkeypatch):
     assert item_identity(surface, "some-chart", in_bulk["some-chart"].diff.fields) == item_identity(
         surface, "some-chart", alone["some-chart"].diff.fields
     )
+
+
+def _pinned_bundles_stub(held_by_engine: dict[str, list[str]]):
+    """A `build_chart_bundles` where each environment holds only the paths listed for it.
+
+    A pin the environment does not hold falls back to the chart's primary y, exactly as the real builder
+    does — which is the substitution the pinned second pass has to notice.
+    """
+    primary_y = {"src": "grapher/wb/2026-09-02/pip/pip#headcount", "tgt": "grapher/wb/2026-06-26/pip/pip#headcount"}
+
+    def bundles(engine, refs, pinned=None, include_drafts=False):
+        pinned = pinned or {}
+        out = {}
+        for ref in refs:
+            path = pinned.get(ref)
+            if path not in held_by_engine[engine]:
+                # Stood in for, exactly as the real builder does when this environment lacks the pin.
+                path, description = primary_y[engine], "The primary y says the same thing on both."
+            else:
+                description = f"{engine} wording of the pinned series."
+            out[ref] = (
+                build_view_bundle(
+                    view={"dimensions": {}},
+                    config_metadata=None,
+                    variable_row={"id": 1, "name": "x", "catalogPath": path, "descriptionShort": description},
+                    chart_config={"title": "T", "subtitle": "Same.", "note": None},
+                ),
+                {"chartId": 7, "slug": ref, "title": "T", "n_indicators": 2, "has_data_page": False},
+            )
+        return out
+
+    return bundles
+
+
+def test_a_pinned_series_is_compared_against_the_baselines_own_version_of_it(monkeypatch):
+    """A pin names an indicator on this branch, and a version bump moves it.
+
+    Left as it is, the baseline resolves nothing under that path and reads the chart's primary y instead
+    — so the changed secondary series would be diffed against a different indicator, reporting fields
+    nobody edited and hashing the chart's verdict on a pairing nobody made.
+    """
+    from apps.wizard.app_pages.metadata_diff import data
+
+    branch_path = "grapher/wb/2026-09-02/pip/pip#mean"
+    baseline_path = "grapher/wb/2026-06-26/pip/pip#mean"
+    monkeypatch.setattr(
+        data, "build_chart_bundles", _pinned_bundles_stub({"src": [branch_path], "tgt": [baseline_path]})
+    )
+    monkeypatch.setattr(data, "fetch_chart_indicator_paths_bulk", lambda _e, ids: {i: [branch_path] for i in ids})
+
+    comparison = data.compare_charts(
+        "src",
+        "tgt",
+        ["poverty"],
+        changed_paths={branch_path},
+        baseline_paths={branch_path: baseline_path},
+    )["poverty"]
+
+    assert comparison.pinned_path == branch_path, "the second pass ran"
+    assert comparison.target is not None
+    assert comparison.target.catalog_path == baseline_path, "compared against the baseline's own version"
+
+
+def test_an_unresolvable_pin_does_not_compare_two_different_indicators(monkeypatch):
+    """No pairing on the baseline — a renamed table, or an indicator this branch introduced.
+
+    The builder stands the chart's primary y in, which is a different indicator. Rather than publish that
+    as the chart's diff, the second pass is dropped and the first pass's like-for-like comparison stands.
+    """
+    from apps.wizard.app_pages.metadata_diff import data
+    from apps.wizard.app_pages.metadata_diff.core import indicator_identity
+
+    branch_path = "grapher/wb/2026-09-02/pip/pip#mean"
+    monkeypatch.setattr(data, "build_chart_bundles", _pinned_bundles_stub({"src": [branch_path], "tgt": []}))
+    monkeypatch.setattr(data, "fetch_chart_indicator_paths_bulk", lambda _e, ids: {i: [branch_path] for i in ids})
+
+    comparison = data.compare_charts("src", "tgt", ["poverty"], changed_paths={branch_path})["poverty"]
+
+    assert comparison.pinned_path is None, "the second pass was dropped"
+    # Both sides read their own primary y, which is the same indicator across the bump.
+    assert comparison.target is not None
+    assert indicator_identity(comparison.source.catalog_path or "") == indicator_identity(
+        comparison.target.catalog_path or ""
+    )
+
+
+def test_every_edit_card_keeps_its_verdict_however_many_there_are():
+    """The By-edit denominator counts every edit, so no card can be dropped.
+
+    Truncating the list at the render cap left the cards past it with no decision control, and Blast
+    radius — which the caption pointed at — has none either. A section reviewed edit by edit could
+    therefore never finish on exactly the branches big enough to want that layout.
+    """
+    from apps.wizard.app_pages.metadata_diff.edits_view import MAX_CARDS, card_pages
+
+    edits = list(range(MAX_CARDS * 2 + 3))
+    pages = card_pages(edits)  # type: ignore[arg-type]
+
+    assert [edit for page in pages for edit in page] == edits, "every edit is on some page"
+    assert all(len(page) <= MAX_CARDS for page in pages), "and no page renders more than the cap"

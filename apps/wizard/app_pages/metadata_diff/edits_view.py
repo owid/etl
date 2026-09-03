@@ -42,8 +42,10 @@ from apps.wizard.app_pages.metadata_diff.review_state import (
     surface_key,
 )
 
-# Cards drawn before the list says how many more there are. Sixty edits is not a branch anyone reviews
-# edit by edit; the number exists so a pathological branch cannot render for a minute.
+# Cards drawn at once. A page size, not a ceiling: every card carries the verdict its section is counted
+# by, so dropping the ones past it left a By-edit review that could never finish — the denominator counts
+# every edit. Sixty edits is not a branch anyone reviews in one sitting; the number exists so a
+# pathological branch cannot render for a minute.
 MAX_CARDS = 60
 # Views listed under one MDim or explorer before the rest are handed to View by view, whose ⚡ jump
 # enumerates them all. A hundred links is already past what anyone reads; four hundred is a wall.
@@ -179,7 +181,7 @@ def st_edit_cards(source_engine: Engine, target_engine: Engine, summary: Any, se
         "however many texts it renders into."
     )
 
-    for edit in edits[:MAX_CARDS]:
+    for edit in _page_of_cards(edits, section):
         reach = _reach_line(edit, section)
         with st.container(border=True):
             st.markdown(
@@ -198,8 +200,32 @@ def st_edit_cards(source_engine: Engine, target_engine: Engine, summary: Any, se
             with st.expander(f"Where it lands · {reach}", expanded=False):
                 _st_landing(source_engine, target_engine, edit, section)
 
-    if len(edits) > MAX_CARDS:
-        st.caption(f"Showing the first {MAX_CARDS} of {len(edits)} edits. Blast radius lists them all.")
+
+def card_pages(edits: list[EditGroup]) -> list[list[EditGroup]]:
+    """The edits split into pages of `MAX_CARDS`, in order. One page when there are few enough."""
+    return [edits[i : i + MAX_CARDS] for i in range(0, len(edits), MAX_CARDS)] or [[]]
+
+
+def _page_of_cards(edits: list[EditGroup], section: str) -> list[EditGroup]:
+    """The page of cards to draw, with a picker above them when there is more than one.
+
+    Paged rather than truncated. The cards are where a By-edit verdict is given, and the section bar
+    counts that review against *every* edit the section carries — so cutting the list at the cap left a
+    section that could never be finished edit by edit, on exactly the branches where reading it that way
+    is the point. Blast radius lists them all, but it has no verdicts, so it is not the way out either.
+    """
+    pages = card_pages(edits)
+    if len(pages) == 1:
+        return pages[0]
+    labels = [f"{i * MAX_CARDS + 1}–{i * MAX_CARDS + len(page)}" for i, page in enumerate(pages)]
+    picked = st.selectbox(
+        f"Cards 1–{len(edits)}, {MAX_CARDS} at a time",
+        options=labels,
+        key=f"mdd-edit-page-{section}",
+        help="Every card carries its own verdict, on every page — the section is finished when all of "
+        "them are decided.",
+    )
+    return pages[labels.index(picked)] if picked in labels else pages[0]
 
 
 def st_edit_body(group: EditGroup) -> None:
