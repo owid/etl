@@ -12,6 +12,12 @@
 //
 //     node .claude/skills/create-figma-chart/scripts/test_restyle_static_import.js
 //
+// That runs TWO phases. The scenarios come first; then every guarantee they claim is re-broken in a
+// copy of the script and the scenarios are re-run, which must FAIL. A harness that passes on the
+// broken code is decoration, and this is the only way to know it is not: the first version of these
+// scenarios missed the zero-area clip bug outright, because the case it asserted had no clipping
+// ancestor and the comparison it guards never ran. Add a scenario, add its mutation.
+//
 // It is a MOCK: it validates control flow and arithmetic against the Plugin API's documented shapes,
 // never Figma's actual behaviour. Keep it honest —
 //   - `absoluteBoundingBox` is a GETTER that walks the parent chain, because the script reads absolute
@@ -237,9 +243,11 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
     const s = scene({ inkNodes: [hidden, dimmed, clipArtifact, strokedNone, bar] });
     await run(s);
     check("hidden, zero-opacity and clip-path artifacts excluded", box(s.styled).l, 40);
-    check("a stroked zero-winding path still counts", box(s.styled).w, near(560));
-    // 100..300: the bar's top to the zero-height rule. Nulling the rule would leave 30.
-    check("... and its zero HEIGHT does not null it", box(s.styled).h, near(200));
+    // 560.5 and 200.5, not 560 and 200: the rule's 1px CENTER stroke paints half a pixel past the
+    // box on every side, and the crop has to take in the ink rather than the centreline.
+    check("a stroked zero-winding path still counts", box(s.styled).w, near(560.5));
+    // 100..300.5: the bar's top to the far side of the rule's stroke. Nulling the rule would leave 30.
+    check("... and its zero HEIGHT does not null it", box(s.styled).h, near(200.5));
   }
 
   console.log("\nclips: an inner clip trims, the frame's own clip does not");
@@ -257,12 +265,34 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
                                clipsContent: true, children: [rule("gridline", 0, 700, 818, 0)] });
     const s3 = scene({ inkNodes: [leaf("bar", 40, 100, 400, 30), clippedRule] });
     await run(s3);
-    check("a zero-height gridline inside a clip survives the intersection", box(s3.styled).h, near(688));
+    // 688.5 = 100..788.5, the bar's top to the far side of the gridline's stroke. Its outset is
+    // trimmed sideways by the clip (15.5 -> 16) but not vertically, which is the clip doing its job.
+    check("a zero-height gridline inside a clip survives the intersection", box(s3.styled).h, near(688.5));
 
     const overflow = leaf("past-the-canvas", 800, 100, 200, 30);
     const s2 = scene({ inkNodes: [leaf("bar", 40, 100, 400, 30), overflow], styledExtra: { clipsContent: true } });
     await run(s2);
     check("overflow past the FRAME's own clip is kept", box(s2.styled).w, near(960));
+  }
+
+  console.log("\nthe crop takes in the painted stroke, not the centreline");
+  {
+    // `absoluteBoundingBox` is geometry and excludes the stroke, so a 4px rule standing at the plot's
+    // right edge paints up to 4px past its own box, depending on how the stroke is aligned.
+    const edge = (extra) => node(Object.assign(
+      { type: "VECTOR", name: "edge", x: 400, y: 100, width: 0, height: 200,
+        fills: [], strokes: solid(), strokeWeight: 4 }, extra || {}));
+    const widthWith = async (extra) => {
+      const s = scene({ inkNodes: [leaf("bar", 40, 100, 300, 30), edge(extra)] });
+      await run(s);
+      return box(s.styled).w;
+    };
+    // 40..402, 40..404, 40..400: the bar's left edge to the painted far side of the rule.
+    check("a CENTER-aligned stroke outsets by half its weight", await widthWith(), near(362));
+    check("an OUTSIDE-aligned stroke outsets by all of it", await widthWith({ strokeAlign: "OUTSIDE" }), near(364));
+    check("an INSIDE-aligned stroke does not outset", await widthWith({ strokeAlign: "INSIDE" }), near(360));
+    check("a stroke that paints nothing does not outset",
+          await widthWith({ strokes: solid(false), fills: solid() }), near(360));
   }
 
   console.log("\nsnap to the content column");
@@ -306,8 +336,68 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
     check("the old chart is gone", s.page.children[0].children.filter((c) => c.name === "chart").length, 1);
     check("the landing page is named for the sweep", out.landingPages, ["cover Cover"]);
     check("the frame's own fill style is copied onto the chart", s.page.children[0].children[0].fillStyleId, "cream-style");
+    // An import's fill arrives switched OFF, and a frame with no visible fill is not a hit target over
+    // its own empty area — which is the whole reason the script paints it. Asserting the style id alone
+    // let a mutation that leaves the fill invisible pass the suite.
+    check("and that fill is switched ON", s.page.children[0].children[0].fills[0].visible, true);
   }
 
   console.log("\n" + (checks - failures) + "/" + checks + " checks passed");
+  if (failures) process.exit(1);
+  if (process.env.RESTYLE_MUTANT) return; // a mutated child runs the scenarios only
+
+  // ---------------------------------------------------------------------------------------------
+  // Phase 2 — re-break each guarantee and require the scenarios to notice.
+  const OUTSET = ["let box = b && o ? { x: b.x - o, y: b.y - o, width: b.width + 2 * o, height: b.height + 2 * o } : b;", "let box = b;"];
+  const MUTATIONS = [
+    // F4 alone is SUBSUMED by F7: with the stroke outset in place a stroked leaf never has a
+    // degenerate box, so `>` and `>=` agree and the mutation is invisible. Reverting BOTH reproduces
+    // the pre-outset code in which the zero-area bug was found, and that must still fail — which is
+    // what keeps the `>=` honest rather than something a later reader simplifies away.
+    ["clip walk nulls zero-area boxes, pre-outset", [["box = right >= x && bottom >= y ?", "box = right > x && bottom > y ?"], OUTSET]],
+    ["clip walk includes the frame's own clip", [["for (let a = node.parent; a && box && a !== styled; a = a.parent) {", "for (let a = node.parent; a && box; a = a.parent) {"]]],
+    ["ink union counts nodes that never render", [["(fillPaints(n) || strokedAnywhere(n)) && rendersInTree(n))", "(fillPaints(n) || strokedAnywhere(n)))"]]],
+    ["crop uses the centreline, not the painted stroke", [OUTSET]],
+    ["stroke alignment ignored (always half the weight)", [['return n.strokeAlign === "INSIDE" ? 0 : n.strokeAlign === "OUTSIDE" ? weight : weight / 2;', "return weight / 2;"]]],
+    ["patch strip back to fills-only (unpainted patches survive)", [["if (!first || first.removed || strokedAnywhere(first)) continue;", "if (!first || first.removed || !painted(first)) continue;"]]],
+    ["import appended on TOP of the header and footer", [["frame.insertChild(0, styled);", "frame.appendChild(styled);"]]],
+    ["frame fill left switched off (not a hit target)", [["styled.fills = [{ ...canvasPaint, visible: true }];", "styled.fills = [{ ...canvasPaint, visible: false }];"]]],
+    ["snap tolerance widened past a real misalignment", [["const SNAP = 1;", "const SNAP = 20;"]]],
+  ];
+
+  const os = require("os");
+  const cp = require("child_process");
+  const SRC_PATH = path.join(__dirname, "restyle_static_import.js");
+  const original = fs.readFileSync(SRC_PATH, "utf8");
+  let caught = 0;
+  console.log("\nre-breaking each guarantee — every one must FAIL the scenarios above");
+  for (const [label, edits] of MUTATIONS) {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "restyle-mutant-"));
+    let src = original;
+    let applied = true;
+    for (const [find, replace] of edits) {
+      if (!src.includes(find)) { applied = false; break; }
+      src = src.replace(find, replace);
+    }
+    if (!applied) {
+      console.log("  STALE  " + label + " — the mutation no longer matches the script; update it");
+      failures++;
+      continue;
+    }
+    fs.writeFileSync(path.join(dir, "restyle_static_import.js"), src);
+    fs.copyFileSync(__filename, path.join(dir, path.basename(__filename)));
+    const done = cp.spawnSync("node", [path.join(dir, path.basename(__filename))], {
+      encoding: "utf8", env: Object.assign({}, process.env, { RESTYLE_MUTANT: "1" }),
+    });
+    fs.rmSync(dir, { recursive: true, force: true });
+    if (done.status === 0) {
+      console.log("  MISSED " + label + " — the scenarios still pass with this broken");
+      failures++;
+    } else {
+      caught++;
+      console.log("  caught " + label);
+    }
+  }
+  console.log("\n" + caught + "/" + MUTATIONS.length + " re-introduced defects caught");
   process.exit(failures ? 1 : 0);
 })();

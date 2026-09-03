@@ -345,8 +345,26 @@ for (const job of CONFIG.jobs) {
   // overflow as ink and the frame grows to contain it, which is what keeps the fill, the hit target
   // and the geometry rows bounding everything visible. Intersect with it instead and that overflow is
   // first excluded from the box and then un-hidden, landing outside the frame meant to bound it.
+  //
+  // Start from the PAINTED extent, not the geometry. Figma documents `absoluteBoundingBox` as
+  // excluding the stroke, so a CENTER-aligned stroke paints half its width outside the box and an
+  // OUTSIDE-aligned one all of it — and the plot's outermost edge is normally a stroked axis, gridline
+  // or line series. Cropping to the centreline cuts that half off ink the frame is supposed to bound,
+  // and `clipsContent = false` below then leaves it hanging outside the frame. Only a stroke that
+  // PAINTS counts, the same test `verify_page.js` applies for the same reason; the outset is taken on
+  // all four sides rather than resolved per segment, because over-reporting an overhang costs a
+  // fraction of a pixel of frame and missing one is the bug.
+  const strokeOutset = (n) => {
+    const paints = Array.isArray(n.strokes) &&
+      n.strokes.some((s) => s.visible !== false && (s.opacity === undefined || s.opacity > 0));
+    const weight = typeof n.strokeWeight === "number" ? n.strokeWeight : 0;
+    if (!paints || !(weight > 0)) return 0;
+    return n.strokeAlign === "INSIDE" ? 0 : n.strokeAlign === "OUTSIDE" ? weight : weight / 2;
+  };
   const throughClips = (node) => {
-    let box = node.absoluteBoundingBox;
+    const o = strokeOutset(node);
+    const b = node.absoluteBoundingBox;
+    let box = b && o ? { x: b.x - o, y: b.y - o, width: b.width + 2 * o, height: b.height + 2 * o } : b;
     for (let a = node.parent; a && box && a !== styled; a = a.parent) {
       const clip = "clipsContent" in a && a.clipsContent ? a.absoluteBoundingBox : null;
       if (clip) {
@@ -356,7 +374,9 @@ for (const job of CONFIG.jobs) {
         // `>=`, not `>`: an open path has a DEGENERATE box. `absoluteBoundingBox` excludes the stroke,
         // so a horizontal gridline measures 123.75x0 and a spine 0xN — visible ink whose box has no
         // area. A strict test calls every one of them fully clipped and drops it, which loses the axes
-        // and lets labels set the plot edge. Only a box lying OUTSIDE its clip becomes null.
+        // and lets labels set the plot edge. Only a box lying OUTSIDE its clip becomes null. The stroke
+        // outset above now keeps a painting leaf non-degenerate on its own, so this is the belt to that
+        // braces — narrow the outset and it goes back to load-bearing.
         box = right >= x && bottom >= y ? { x, y, width: right - x, height: bottom - y } : null;
       }
     }
