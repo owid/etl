@@ -112,8 +112,11 @@ def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
     pages = sum(1 for r in rows if r["published"])
     hidden_pages = len(rows) - pages
 
+    # `n_edits`, not one per card: a card is keyed on the words, and the same text written in two garden
+    # datasets is one card and two edits. The cards below count it the same way, so the two agree.
+    n_edits = sum(group.n_edits for group in edits)
     head = (
-        f"**{len(edits)} edit{'s' if len(edits) != 1 else ''}** authored here, rendering "
+        f"**{n_edits} edit{'s' if n_edits != 1 else ''}** authored here, rendering "
         f"**{len(reach)} distinct text{'s' if len(reach) != 1 else ''}**, on "
         f"**{pages} page{'s' if pages != 1 else ''}** a reader can reach"
     )
