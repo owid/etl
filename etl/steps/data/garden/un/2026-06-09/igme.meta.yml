@@ -18,7 +18,9 @@ definitions:
     short_unit: <% if 'rate' in indicator  %>%<% else %><%- endif -%>
     description_key:
       - |-
-        In countries hit by a humanitarian crisis — a conflict, famine, natural disaster or epidemic — the UN IGME adds crisis-related deaths on top of its underlying trend estimate, for the specific years affected, using figures compiled by the World Health Organization. This is why a few countries show a sharp one-year spike against an otherwise smooth series: Rwanda in 1994, Somalia in 2011, the Bahamas in 2019, and the Central African Republic in 2009, 2019 and 2022, among others. These spikes are intentional, not data errors.
+        In countries hit by a humanitarian crisis — conflict, famine, natural disaster or epidemic — the UN IGME estimates the underlying trend with crisis years set aside, then adds the crisis deaths back for those specific years. This is why a few countries show a sharp one-year spike against an otherwise smooth series: Rwanda in 1994, Somalia in 2011, the Bahamas in 2019, and the Central African Republic in 2009, 2019 and 2022. These spikes are deliberate, not data errors.
+      - |-
+        The size of the adjustment can be very large. For the Central African Republic, the crisis deaths added in 2009, 2010, 2012, 2018, 2019, 2020 and 2022 come from national household mortality surveys compiled by [Gang et al. (2023)](https://doi.org/10.1186/s13031-023-00514-z), which found death rates several times higher than the UN's previous estimates. The UN converted each survey's measured death rate into a count of excess deaths for that year and recorded it as crisis mortality — 264,762 deaths for 2009, for example. Those are all-cause excess deaths, not battle deaths.
       - |-
         <% if indicator == "Stillbirths per 100 births" %>
         - **Definition threshold varies**: A stillbirth generally refers to the birth of a baby showing no signs of life after a certain number of weeks of gestation, with the [ICD-11](https://icd.who.int/en) setting the cutoff at 22 weeks.
