@@ -2100,6 +2100,59 @@ def test_one_authored_sentence_is_one_edit_across_many_texts():
     assert edit_fingerprint("one  two", "one   two") == ("", "")
 
 
+def test_one_text_written_in_two_garden_datasets_counts_as_two_edits():
+    """Grouping on the words is right for review and wrong for the work: two files, two rebuilds.
+
+    Two unrelated garden datasets can make the identical field transition — the same sentence appended to
+    the same boilerplate. `change_identity` merges their sightings, which is what keeps one reworded
+    definition from being reported once per surface. But nothing about that merge makes it one edit: no
+    `definitions.*` block spans files, so reporting "1 edit" sent the author to fix half the change.
+    """
+    from apps.owidbot.metadata_diff import _reach_line
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, Summary, group_by_edit
+
+    added = "Values before 1990 are estimates."
+    both_datasets = ChangeReach(
+        field="descriptionShort",
+        old="Share of people in poverty.",
+        new=f"Share of people in poverty. {added}",
+        charts=[{"chartId": 1, "slug": "poverty", "has_data_page": True, "is_published": True}],
+        catalog_paths={
+            "grapher/wb/2026-06-26/world_bank_pip/world_bank_pip#headcount",
+            "grapher/lis/2026-06-12/luxembourg_income_study/luxembourg_income_study#headcount",
+        },
+    )
+
+    (group,) = group_by_edit([both_datasets])
+    assert group.n_texts == 1, "one rendered text — the two datasets say exactly the same thing"
+    assert group.n_edits == 2, "but two files to change and two datasets to rebuild"
+    assert group.authored_in == [
+        "etl/steps/data/garden/lis/2026-06-12/luxembourg_income_study",
+        "etl/steps/data/garden/wb/2026-06-26/world_bank_pip",
+    ], "both named, so neither is silently dropped"
+
+    # The PR comment counts them the same way the page's cards do.
+    assert "2 edits" in _reach_line(Summary(reach=[both_datasets]))
+
+
+def test_an_edit_with_no_garden_dataset_still_counts_as_one():
+    """A chart's text typed in the admin carries no catalogPath, and "0 edits" would read as a bug."""
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, group_by_edit
+
+    (group,) = group_by_edit(
+        [
+            ChangeReach(
+                field="subtitle",
+                old="Old subtitle.",
+                new="New subtitle.",
+                charts=[{"chartId": 9, "slug": "some-chart", "has_data_page": True, "is_published": True}],
+            )
+        ]
+    )
+    assert group.authored_in == []
+    assert group.n_edits == 1
+
+
 def test_group_by_edit_counts_pages_once_per_edit():
     """The edit's reach is distinct pages: a chart rendering two of its texts is one page."""
     from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, group_by_edit

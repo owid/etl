@@ -179,7 +179,13 @@ def _reach_line(summary: Summary) -> str:
     # times — which is the error the by-edit grouping exists to avoid. `group_by_edit` is the page's own
     # grouping and is pure, so this costs nothing. Where reach was never built (a summary assembled from
     # counts alone) the per-field tally stands in.
-    n_edits = len(group_by_edit(summary.reach)) if summary.reach else sum(summary.fields.values())
+    #
+    # `n_edits` per group rather than one per group: a group is keyed on the words, so an identical text
+    # written in two garden datasets is one group and two edits — two files to change, two datasets to
+    # rebuild. The page's own cards count it the same way.
+    n_edits = (
+        sum(group.n_edits for group in group_by_edit(summary.reach)) if summary.reach else sum(summary.fields.values())
+    )
 
     # ✏️ carries the same meaning here as the status icon on the `<summary>` line and as chart-diff's:
     # this is the edit line. It also keeps the line from opening on a bare digit.

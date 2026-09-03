@@ -163,13 +163,20 @@ def _tree(edits: list[EditGroup]) -> None:
     thing worth seeing first is that they are one edit, not ten.
     """
     for group in edits[:MAX_ROWS]:
+        datasets = group.authored_in
         with st.container(border=True):
             st.markdown(
-                f"**{field_label(group.field)}** · **1 edit** → "
+                f"**{field_label(group.field)}** · **{group.n_edits} edit{'s' if group.n_edits != 1 else ''}** → "
                 f"**{group.n_texts} rendered text{'s' if group.n_texts != 1 else ''}** → "
                 f"**{group.n_reader_facing} page{'s' if group.n_reader_facing != 1 else ''}** a reader can reach"
             )
             st_edit_body(group)
+            if len(datasets) > 1:
+                files = ", ".join(f"`{d}.meta.yml`" for d in datasets)
+                st.caption(
+                    f"Authored in {len(datasets)} separate garden datasets — {files}. No `definitions.*` "
+                    "block spans files, so each one has to be edited and rebuilt on its own."
+                )
             st.markdown(f"_{_surface_summary(group)}_")
 
             with st.expander("Everywhere this edit lands", expanded=False):

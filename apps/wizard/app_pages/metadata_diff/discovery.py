@@ -39,6 +39,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     build_view_bundle,
     dataset_shape,
     diff_views,
+    distinct_garden_datasets,
     edit_fingerprint,
     field_label,
     group_changes,
@@ -1551,6 +1552,25 @@ class EditGroup:
     @property
     def n_texts(self) -> int:
         return len(self.changes)
+
+    @property
+    def authored_in(self) -> list[str]:
+        """The garden step dirs this edit was written in, across every text it renders into."""
+        return distinct_garden_datasets({path for change in self.changes for path in change.catalog_paths})
+
+    @property
+    def n_edits(self) -> int:
+        """How many edits this group stands for — one per garden dataset carrying the text.
+
+        The group is keyed on the words, which is the right *review* unit: a reviewer judges the sentence
+        once however many surfaces render it. It is not the right *work* unit when the identical text
+        lives in two garden datasets. No `definitions.*` block spans files, so that is two edits to make
+        and two datasets to rebuild, and reporting it as one sent the author to fix half the change.
+
+        One when nothing is attributed — a chart whose text was typed in the admin carries no garden
+        path, and "0 edits" for a difference that is plainly there would read as a bug.
+        """
+        return max(len(self.authored_in), 1)
 
     def surfaces(self) -> dict[str, set[str]]:
         """Distinct places this edit lands, by kind — deduped, since texts share pages.
