@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate owid_mcp vsce-compile vsce-sync install-hooks setup.worktree
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate owid_mcp vsce-compile vsce-sync install-hooks setup.worktree setup.data
 
 include default.mk
 
@@ -34,6 +34,7 @@ help:
 	@echo '  make query SQL="..." Run SQL query on staging MySQL for current branch'
 	@echo '  make install-hooks	Activate pre-commit hook (auto-runs with make .venv)'
 	@echo '  make setup.worktree	Copy .env from the main checkout into this worktree (auto-runs with make .venv)'
+	@echo '  make setup.data	Clone the main checkout data/ into this worktree (copy-on-write, ~0 bytes)'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make check-all 	Format, lint, and typecheck (including for modules in lib/)'
@@ -296,6 +297,39 @@ setup.worktree:
 			[ -e "$$NAME" ] && continue; \
 			cp -p "$$SRC" "$$NAME" && echo "==> copied $$NAME from the main checkout"; \
 		done; \
+	fi
+
+# Give this worktree the main checkout's `data/` without paying for it, so ETL
+# steps read already-built datasets instead of recomputing them from snapshots.
+#
+# `cp -c` clones on APFS: the copy shares the original's blocks until something
+# writes, so it costs metadata only. Measured on this repo's 16 GB / ~32k-file
+# `data/`: 4 seconds, zero bytes. That makes a *real copy* the cheap option, which
+# is better than symlinking it (what `etl pr --share-data` does) — each worktree
+# gets an independent `data/`, so two of them running the same step can no longer
+# overwrite each other's output.
+#
+# Not part of `setup.worktree`, and deliberately: that one runs inside a
+# `post-checkout` hook where four seconds is too long to spend, and it must stay
+# safe on a machine where cloning isn't available. Call this one explicitly, or
+# from a worktree manager's setup script where the cost is expected.
+#
+# Cloning needs both paths on one APFS volume. If it isn't possible `cp -c` fails
+# rather than silently falling back, and we stop there — a real 16 GB copy is
+# never what you wanted.
+setup.data:
+	@PRIMARY="$$(dirname "$$(cd "$$(git rev-parse --git-common-dir)" && pwd)")"; \
+	if [ "$$PRIMARY" = "$$PWD" ]; then \
+		echo '==> This is the main checkout, its data/ is the original'; \
+	elif [ -e data ]; then \
+		echo '==> data/ already exists here, leaving it alone'; \
+	elif [ ! -d "$$PRIMARY/data" ]; then \
+		echo "==> No data/ in $$PRIMARY to clone"; \
+	elif cp -Rc "$$PRIMARY/data" data 2>/dev/null; then \
+		echo "==> cloned data/ from the main checkout (copy-on-write: no extra disk until written)"; \
+	else \
+		rm -rf data; \
+		echo '==> Could not clone data/ (needs one APFS volume) — left absent rather than making a real copy'; \
 	fi
 
 .venv: .venv-default install-hooks setup.worktree

@@ -218,13 +218,58 @@ If `make test` succeeds, then you should be able to build any dataset you like, 
 
 ## Git hooks
 
-The pre-commit hook is activated automatically by `make .venv` (and any target that depends on it). It runs `make check` (lint, format, type-check) before every `git commit`, which prevents accidentally pushing code that fails CI.
+The pre-commit hook is activated automatically by `make .venv` (and any target that depends on it). It runs `make check` (lint, format, type-check) before every `git commit`, which prevents accidentally pushing code that fails CI. Because `make check` *fixes* what it can, the hook re-stages the files it rewrote, so the commit carries the corrected code — you don't need to run `make check` yourself first. It refuses to touch a file that is only partially staged, since re-staging one would pull its unstaged changes into the commit.
 
 If you need to (re)activate it manually:
 
 ```bash
 make install-hooks
 ```
+
+It is installed as a symlink at `$GIT_DIR/hooks/pre-commit`, git's default location. Note that it deliberately does *not* set `core.hooksPath`: that replaces the hooks directory rather than adding to it, and a repo-local setting beats a global one, so it would silently disable any machine-wide hooks you have.
+
+## Working in a git worktree
+
+`.env` is gitignored, so `git worktree add` cannot carry it into a new worktree. `make setup.worktree` copies `.env` and the `.env.prod*` credentials from your main checkout; it runs automatically as part of `make .venv`, and never overwrites a file already there.
+
+```bash
+git worktree add ../etl-mybranch -b mybranch
+cd ../etl-mybranch
+make .venv          # venv + hooks + .env, in one step
+make setup.data     # optional: this worktree's own copy of the main checkout's data/
+```
+
+`make setup.data` is worth knowing about. A worktree starts with no `data/`, so every ETL step recomputes from snapshots. On APFS the main checkout's `data/` can be *cloned* copy-on-write — the copy shares the original's blocks until something writes to them, so it is effectively free. Measured on a 16 GB / ~32,000-file `data/`: **4 seconds and ~0 bytes**. Each worktree gets an independent `data/`, so two of them running the same step cannot overwrite each other's output. Both paths must be on the same APFS volume; if cloning isn't possible the target says so and leaves `data/` absent rather than making a real 16 GB copy.
+
+(The same trick applies to `git worktree add` itself on very large repos, and to `node_modules` — `cp -Rc` instead of `cp -R`. Plain `cp` does not clone on macOS; the `-c` flag is required.)
+
+### Provisioning worktrees automatically
+
+`setup.worktree` is a deliberately boring, shared name — owid-grapher uses it too — so anything that creates a worktree can provision *any* repo without knowing what that repo needs. Two ways to hook it up:
+
+**A worktree manager.** Point its per-repo setup script at `make .venv setup.data`. A full working worktree (config, venv, cloned `data/`) takes about 25 seconds.
+
+**A machine-wide git hook**, if you create worktrees with plain `git` and want this to happen by itself. Set `core.hooksPath` to a directory of your own and put this in its `post-checkout`:
+
+```bash
+#!/bin/sh
+# Only when the checkout is brand new: git passes the all-zero OID as the previous
+# HEAD for `git worktree add` and `git clone`, and the real old HEAD for an
+# ordinary branch switch. Without this the hook would fire on every `git checkout`.
+case "$1" in '' | *[!0]*) exit 0 ;; esac
+[ "$3" = "1" ] || exit 0
+
+# Nothing to provision in the primary checkout — it's the source everything copies from.
+[ "$(git rev-parse --git-dir)" = "$(git rev-parse --git-common-dir)" ] && exit 0
+
+cd "$(git rev-parse --show-toplevel)" || exit 0
+# `make -n` resolves the target without running it, and exits non-zero if the repo
+# has none — so this is a no-op in repos that don't define it.
+make -n setup.worktree >/dev/null 2>&1 && make setup.worktree
+exit 0
+```
+
+Two things to know if you do this. `core.hooksPath` **replaces** `$GIT_DIR/hooks` rather than adding to it, so a dispatcher of this kind should end by exec'ing the repo's own `$GIT_DIR/hooks/<name>` — otherwise it silently disables every per-repo hook, including this repo's pre-commit. And keep `setup.worktree` cheap and offline for the same reason: it runs inside a git hook, which is why `setup.data` is a separate target rather than part of it.
 
 ## GitHub Actions
 
