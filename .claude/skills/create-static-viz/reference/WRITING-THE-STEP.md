@@ -116,15 +116,29 @@ Name **two** stacks, because two different things read them, and they want diffe
 # the font it resolved. Naming Lato first is a request to whoever OPENS the file.
 EMITTED_FONT_STACK = ["Lato", "Arial", "Helvetica", "sans-serif"]
 # What this step measures and draws with. Deliberately does NOT name Lato, which is not installed on
-# our machines — asking for it only logs a `findfont` miss before falling through to Arial.
+# our machines, so it is not a font this step could measure in — only one it can ask for.
 MEASURED_FONT_STACK = ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans", "sans-serif"]
 
 matplotlib.rcParams["font.family"] = "sans-serif"
 matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
-# `Lato` is MEANT to be missing here, so quieten that one logger — a real problem with a font the
-# step does need is still visible.
-logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
+# Nothing to silence here — see below before adding a filter or a setLevel.
 ```
+
+**Leave `matplotlib.font_manager`'s logger alone**, however tempting it is to quieten a stack that
+names a font the machine does not have. Measured (matplotlib 3.10.9, Lato absent, Arial installed):
+resolving *either* stack emits **zero** WARNING records. A face that is skipped costs nothing —
+matplotlib scores every candidate at **DEBUG** (1,056 records for two lookups), which never surfaces,
+and it warns only when a whole family list resolves to nothing:
+
+```
+findfont: Font family ['Lato', 'Nonexistent Face'] not found. Falling back to DejaVu Sans.
+```
+
+That is the *only* warning this logger emits, and it is the one you cannot afford to lose: it says a
+stack failed and every measurement in the step just moved ~15% against what gets drawn, which is the
+exact failure this section exists to prevent. So `setLevel(logging.ERROR)` — or a filter over "not
+found" — suppresses nothing you actually have, in exchange for the single notice that matters. If you
+inherit either, delete it rather than narrow it.
 
 Pass the measured stack to every measurement, so measuring and drawing cannot drift whatever a
 machine has installed:

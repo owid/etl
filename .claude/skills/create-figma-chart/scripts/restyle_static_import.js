@@ -334,10 +334,30 @@ for (const job of CONFIG.jobs) {
   // coordinates, and all three move ink: a reflow that shifts the last run's right edge after the
   // crop would leave the frame, its canvas fill and every geometry row describing a box that no
   // longer bounds the drawing, which is the stale-bounds failure the crop exists to remove.
+  //
+  // Take each leaf's box THROUGH its clipping ancestors first. A path running past a clip frame
+  // renders no pixels there, so it must not widen the box: matplotlib clips its axes artists, Figma
+  // imports that clip as a `clipsContent` frame, and a line leaving the axes therefore arrives here
+  // at its full unclipped width. Intersecting is a no-op wherever nothing clips, and drops a leaf
+  // clipped away to nothing rather than letting invisible geometry set the crop.
+  const throughClips = (node) => {
+    let box = node.absoluteBoundingBox;
+    for (let a = node.parent; a && box; a = a.parent) {
+      const clip = "clipsContent" in a && a.clipsContent ? a.absoluteBoundingBox : null;
+      if (clip) {
+        const x = Math.max(box.x, clip.x), y = Math.max(box.y, clip.y);
+        const right = Math.min(box.x + box.width, clip.x + clip.width);
+        const bottom = Math.min(box.y + box.height, clip.y + clip.height);
+        box = right > x && bottom > y ? { x, y, width: right - x, height: bottom - y } : null;
+      }
+      if (a === styled) break;
+    }
+    return box;
+  };
   const inkBoxes = styled
     .findAll((n) => n.type !== "GROUP" && n.type !== "FRAME" &&
       (painted(n) || strokedAnywhere(n)))
-    .map((n) => n.absoluteBoundingBox)
+    .map(throughClips)
     .filter(Boolean);
   if (inkBoxes.length) {
     const own = styled.absoluteBoundingBox;
