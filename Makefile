@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate owid_mcp vsce-compile vsce-sync install-hooks
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate owid_mcp vsce-compile vsce-sync install-hooks setup.worktree
 
 include default.mk
 
@@ -33,6 +33,7 @@ help:
 	@echo '  make chart-sync 	Start Chart-sync on port 8083'
 	@echo '  make query SQL="..." Run SQL query on staging MySQL for current branch'
 	@echo '  make install-hooks	Activate pre-commit hook (auto-runs with make .venv)'
+	@echo '  make setup.worktree	Copy .env from the main checkout into this worktree (auto-runs with make .venv)'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make check-all 	Format, lint, and typecheck (including for modules in lib/)'
@@ -269,7 +270,35 @@ install-hooks:
 		fi; \
 	fi
 
-.venv: .venv-default install-hooks
+# Give this checkout the gitignored config a worktree can't inherit from git.
+# Idempotent — an existing file is never touched, so it is safe to re-run and safe
+# to adjust a worktree's own `.env` afterwards.
+#
+# `setup.worktree` is the agreed name for "make this checkout usable", so anything
+# that creates a worktree can provision it without knowing what this repo needs: a
+# worktree manager's setup script, a machine-wide `post-checkout` hook, or a human.
+# It is also a prerequisite of `.venv` below, so a worktree nobody provisioned
+# fixes itself on the first `make` — nothing here depends on the hook having fired.
+# Keep it cheap and offline for that reason: no installs, no network.
+#
+# Copies rather than symlinks, so a worktree can diverge from the main checkout
+# (a different `STAGING`, a scratch credential) without editing everyone's config.
+# The cost is that a rotated secret doesn't reach worktrees that already exist —
+# delete the file and re-run to pick it up.
+setup.worktree:
+	@PRIMARY="$$(dirname "$$(cd "$$(git rev-parse --git-common-dir)" && pwd)")"; \
+	if [ "$$PRIMARY" = "$$PWD" ]; then \
+		echo '==> This is the main checkout, nothing to provision'; \
+	else \
+		for SRC in "$$PRIMARY"/.env "$$PRIMARY"/.env.prod*; do \
+			[ -e "$$SRC" ] || continue; \
+			NAME="$$(basename "$$SRC")"; \
+			[ -e "$$NAME" ] && continue; \
+			cp -p "$$SRC" "$$NAME" && echo "==> copied $$NAME from the main checkout"; \
+		done; \
+	fi
+
+.venv: .venv-default install-hooks setup.worktree
 	@true
 
 # Backward-compatible alias
