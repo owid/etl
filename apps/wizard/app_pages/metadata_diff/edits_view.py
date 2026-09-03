@@ -170,10 +170,13 @@ def st_edit_cards(source_engine: Engine, target_engine: Engine, summary: Any, se
     recorded = load_reviews(source_engine, surface)
 
     n_texts = sum(e.n_texts for e in edits)
+    # Cards, which is also the unit the tick and the "Reject all" control below work in. Blast radius
+    # counts the datasets instead, because a wording written in two of them is two files to change; here
+    # it is still one thing to read and one verdict to give, and the card's own note says when it is both.
     st.markdown(
-        f"**{len(edits)} edit{'s' if len(edits) != 1 else ''}** authored on this branch land here, rendering "
-        f"**{n_texts} text{'s' if n_texts != 1 else ''}** between them — one card per edit, however many "
-        "texts it renders into."
+        f"**{len(edits)} card{'s' if len(edits) != 1 else ''}** of authored text land here, rendering "
+        f"**{n_texts} text{'s' if n_texts != 1 else ''}** between them — one card per distinct wording, "
+        "however many texts it renders into."
     )
 
     for edit in edits[:MAX_CARDS]:
