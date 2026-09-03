@@ -28,7 +28,10 @@ definitions:
   people: <% if sex == "males" %>men<% elif sex == "females" %>women<% else %>people<% endif %>
   footnote: To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
   processing_regions: |-
-    For world regions, Our World in Data sums the values of the countries in the region with data. For cancer sites, the source only reports men and women separately; the both-sexes values are the sum of the two.
+    For world regions, Our World in Data sums the values of the countries in the region with data.
+  # The source reports cancer sites for men and women only; we add the both-sexes rows. The all-cancers total for
+  # both sexes is published by the source itself, so this sentence must not appear there.
+  processing_both_sexes: <% if sex == "both" and cancer != "All cancers but non-melanoma skin cancer (C00-97, but C44)" %> For this cancer site, the source only reports men and women separately; the both-sexes value is the sum of the values reported for men and women.<% endif %>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -44,14 +47,14 @@ tables:
         title: Number of new {definitions.cases_of}{definitions.among_sex}
         description_short: Estimated number of new {definitions.cases_of}{definitions.among_sex}.
         unit: cases
-        description_processing: "{definitions.processing_regions}"
+        description_processing: "{definitions.processing_regions}{definitions.processing_both_sexes}"
         processing_level: major
 
       attr_cases:
         title: Number of new {definitions.cases_of} caused by {definitions.agent_phrase}{definitions.among_sex}
         description_short: Estimated number of new {definitions.cases_of}{definitions.among_sex} that are attributed to {definitions.agent_phrase}.
         unit: cases
-        description_processing: "{definitions.processing_regions}"
+        description_processing: "{definitions.processing_regions}{definitions.processing_both_sexes}"
         processing_level: major
 
       attr_cases_share:
@@ -60,7 +63,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_processing: |-
-          Computed by Our World in Data as the number of attributable cases divided by the total number of new cases. {definitions.processing_regions}
+          Computed by Our World in Data as the number of attributable cases divided by the total number of new cases. {definitions.processing_regions}{definitions.processing_both_sexes}
         processing_level: major
 
       paf:
