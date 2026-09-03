@@ -351,18 +351,19 @@ The one adaptation: its Steps 7–8 look up grapher's node names (`connectors`,
 `horizontal-grid-lines`, `datapoints__<Entity>`). Ours are the `gid`s from Step 4 — hand over the
 naming scheme along with the file.
 
-**Three of that skill's geometry rows cannot pass on this route, and it is structural rather than a
-defect.** `box-alignment` and `gap` measure the chart GROUP's box against the content box and the band,
-which works for a grapher import because its fit step leaves a group hugging the plot. Ours is a FRAME
-the size of the SVG canvas — deliberately, so the plot's coordinates stay the template's — so its box
-IS the artboard: `box-alignment` reports left -16 / right +16 and `gap` reports negative insets, every
-time, on a frame that is correct. `margins` then flags the canvas rectangle itself.
+**Three of that skill's geometry rows only mean anything once the import is cropped — and then they
+mean everything.** `box-alignment`, `gap` and `margins` read the chart frame's box, and an import
+arrives the size of the SVG canvas, which *is* the artboard: uncropped they report left −16 / right
++16, negative insets and the canvas rectangle, every time, on a page that is correct.
+`restyle_static_import.js` removes both causes — it strips matplotlib's frame-sized background patch
+(which paints nothing but sets the bbox) and crops the frame to its painted ink, snapping a side that
+lands within a pixel of the content column. **After that, treat those rows as live**: `box-alignment`
+must be exact and `margins` must pass — a failure there is real, not this route's noise.
 
-What to do instead of chasing them: delete matplotlib's frame-sized background patch on import (it
-paints nothing, so `restyle_static_import.js` now strips it for its bbox alone), and measure the band
-from the **ink** — the extreme edges of the painted leaves inside the chart — against `header.y +
-header.height` and the footer's first row. Report those two numbers. On the frame this lesson comes
-from that read 18.35 top / 17.01 bottom against a 12–16 target, against -70 / -79 from the stock rows.
+`gap` is the one to read rather than chase: it measures against the header frame's bottom and the
+footer frame's top, which a band derived from line-box arithmetic misses by a few px, so a page
+asserting a 14 px inset can read **18.35 / 17.01** against the 12–16 target. Report both numbers and
+name the datum the step used — [TEMPLATES.md](TEMPLATES.md) has the measurements and which to prefer.
 
 **Use grapher's OWN names for the data layers wherever the shape matches, because that skill's Step 8c
 checks key off them and skip when they are absent.** Measured on a real DI frame drawn by a local

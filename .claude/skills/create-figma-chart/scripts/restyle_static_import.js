@@ -282,6 +282,45 @@ for (const job of CONFIG.jobs) {
   styled.y = 0;
   if (old) old.remove();
 
+  // A flowed line of runs needs laying out again, one measured space apart. Rows are keyed on y
+  // alone because each run of one line sits under its own `header__…`/`category__…` parent, so
+  // keying on the parent would put every run in a row of its own and reflow nothing. That makes
+  // "the selected runs form one line per y" a precondition, which is why this is per-job opt-in.
+  let reflowed = 0;
+  if (job.reflowLegend) {
+    const runs = styled.findAll(
+      (n) => n.type === "TEXT" && /^(header|category)__/.test(n.parent.name) && !CONFIG.darkTextParent.test(n.parent.name)
+    );
+    if (runs.length) {
+      const probe = figma.createText();
+      styled.appendChild(probe);
+      probe.fontName = { family: "Lato", style: "Regular" };
+      probe.fontSize = runs[0].fontSize;
+      probe.textAutoResize = "WIDTH_AND_HEIGHT";
+      probe.characters = "nn";
+      const tight = probe.width;
+      probe.characters = "n n";
+      const space = probe.width - tight;
+      probe.remove();
+
+      const rows = new Map();
+      for (const node of runs) {
+        const key = Math.round((node.absoluteBoundingBox.y - frame.y) * 2) / 2;
+        if (!rows.has(key)) rows.set(key, []);
+        rows.get(key).push(node);
+      }
+      for (const [, nodes] of rows) {
+        nodes.sort((a, b) => a.absoluteBoundingBox.x - b.absoluteBoundingBox.x);
+        let cursor = nodes[0].absoluteBoundingBox.x;
+        for (const node of nodes) {
+          node.x += cursor - node.absoluteBoundingBox.x;
+          cursor += node.absoluteBoundingBox.width + space;
+          reflowed++;
+        }
+      }
+    }
+  }
+
   // CROP the frame to the plot's own ink, and keep clipping off so nothing is cut at the new edge.
   // An import arrives the size of the SVG canvas, which is the artboard — so a hover or click on the
   // plot highlights a rectangle indistinguishable from the artboard's, the plot cannot be grabbed as a
@@ -291,7 +330,10 @@ for (const job of CONFIG.jobs) {
   // whole 850x1095 frame). It also makes `verify_page.js`'s box-alignment and gap rows measure the
   // plot instead of the canvas — they read the real insets afterwards rather than a negative number.
   //
-  // Do it AFTER the fit and the restyle: both are written in canvas coordinates.
+  // Do it LAST — after the fit, the restyle and the legend reflow. All three are written in canvas
+  // coordinates, and all three move ink: a reflow that shifts the last run's right edge after the
+  // crop would leave the frame, its canvas fill and every geometry row describing a box that no
+  // longer bounds the drawing, which is the stale-bounds failure the crop exists to remove.
   const inkBoxes = styled
     .findAll((n) => n.type !== "GROUP" && n.type !== "FRAME" &&
       (painted(n) || strokedAnywhere(n)))
@@ -336,44 +378,6 @@ for (const job of CONFIG.jobs) {
     }
   }
 
-  // A flowed line of runs needs laying out again, one measured space apart. Rows are keyed on y
-  // alone because each run of one line sits under its own `header__…`/`category__…` parent, so
-  // keying on the parent would put every run in a row of its own and reflow nothing. That makes
-  // "the selected runs form one line per y" a precondition, which is why this is per-job opt-in.
-  let reflowed = 0;
-  if (job.reflowLegend) {
-    const runs = styled.findAll(
-      (n) => n.type === "TEXT" && /^(header|category)__/.test(n.parent.name) && !CONFIG.darkTextParent.test(n.parent.name)
-    );
-    if (runs.length) {
-      const probe = figma.createText();
-      styled.appendChild(probe);
-      probe.fontName = { family: "Lato", style: "Regular" };
-      probe.fontSize = runs[0].fontSize;
-      probe.textAutoResize = "WIDTH_AND_HEIGHT";
-      probe.characters = "nn";
-      const tight = probe.width;
-      probe.characters = "n n";
-      const space = probe.width - tight;
-      probe.remove();
-
-      const rows = new Map();
-      for (const node of runs) {
-        const key = Math.round((node.absoluteBoundingBox.y - frame.y) * 2) / 2;
-        if (!rows.has(key)) rows.set(key, []);
-        rows.get(key).push(node);
-      }
-      for (const [, nodes] of rows) {
-        nodes.sort((a, b) => a.absoluteBoundingBox.x - b.absoluteBoundingBox.x);
-        let cursor = nodes[0].absoluteBoundingBox.x;
-        for (const node of nodes) {
-          node.x += cursor - node.absoluteBoundingBox.x;
-          cursor += node.absoluteBoundingBox.width + space;
-          reflowed++;
-        }
-      }
-    }
-  }
 
   report.push({
     frame: frame.name,
