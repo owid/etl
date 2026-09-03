@@ -3696,7 +3696,7 @@ def test_a_chart_with_no_data_page_is_not_linked_to_one(monkeypatch):
             "note": None,
         }
         new, old = bundle_for("New.", "New subtitle."), bundle_for("Old.", "Old subtitle.")
-        return lambda engine, ref: (new if engine == "src" else old, dict(chart))
+        return lambda engine, ref, catalog_path=None: (new if engine == "src" else old, dict(chart))
 
     def app() -> None:
         from apps.wizard.app_pages.metadata_diff import mdim_pages
@@ -3830,6 +3830,90 @@ def test_a_charts_subtitle_is_credited_to_the_indicator_that_carries_it():
     stray = ChartTextChanges()
     attribute_chart_texts(stray, {}, {pip})
     assert not stray.diffs
+
+
+def test_a_multi_series_chart_is_reviewed_on_the_indicator_that_moved(monkeypatch):
+    """The primary y is what a data page renders; it is not always the one that changed.
+
+    A chart is in the changed list because *some* indicator of it moved — usage discovery scans every
+    variable. Building the review from the first y then compared an indicator nothing had happened to,
+    printed "No changes", and offered no verdict control on a chart that does carry an edit.
+    """
+    from streamlit.testing.v1 import AppTest
+
+    from apps.wizard.app_pages.metadata_diff import cached, mdim_pages
+    from apps.wizard.app_pages.metadata_diff.core import build_view_bundle
+
+    first_y = "grapher/demography/2024-07-15/population/historical#population_historical"
+    moved = "grapher/wb/2026-06-26/world_bank_pip/incomes#mean"
+    chart = {
+        "chartId": 42,
+        "slug": "poverty-vs-population",
+        "title": "Poverty vs population",
+        "n_indicators": 2,
+        "has_data_page": False,
+        "subtitle": "Same subtitle.",
+        "note": None,
+    }
+
+    def bundle(engine, _ref, catalog_path=None):
+        """The first y says the same thing in both environments; only the pinned indicator moved."""
+        description = "Unchanged." if catalog_path is None else ("New." if engine == "src" else "Old.")
+        return (
+            build_view_bundle(
+                view={"dimensions": {}},
+                config_metadata=None,
+                variable_row={
+                    "id": 1,
+                    "name": "x",
+                    "catalogPath": catalog_path or first_y,
+                    "descriptionShort": description,
+                },
+                chart_config={"title": "Poverty vs population", "subtitle": "Same subtitle.", "note": None},
+            ),
+            dict(chart),
+        )
+
+    monkeypatch.setattr(mdim_pages, "build_chart_bundle", bundle)
+    monkeypatch.setattr(mdim_pages, "fetch_chart_indicator_paths", lambda _engine, _chart_id: [moved, first_y])
+    monkeypatch.setattr(cached, "indicator_changes", lambda *_a, **_k: SimpleNamespace(diffs={moved: object()}, ids={}))
+    monkeypatch.setattr(cached, "usage_for_indicators", lambda *_a, **_k: {})
+
+    def app() -> None:
+        from apps.wizard.app_pages.metadata_diff import mdim_pages
+
+        mdim_pages.render_chart_by_ref("src", "tgt", "poverty-vs-population", {})
+
+    at = AppTest.from_function(app, default_timeout=60).run()
+    assert not at.exception, at.exception
+    rendered = " ".join(str(getattr(el, "value", "") or "") for el in at.markdown)
+    # The changed indicator's text is what the page shows, rather than "no changes" on the unchanged one.
+    assert "New." in rendered and "Old." in rendered
+
+
+def test_an_unpublished_chart_whose_text_moved_is_not_told_every_text_matches():
+    """`changed_charts` counts pages a reader can open, so a draft is never in it.
+
+    Falling through to the "not in the changed set" branch, the lookup asked only whether the chart's
+    indicators had been *compared* — which every indicator of a rebuilt dataset has been — and answered
+    "No metadata change on this branch" over a draft whose inherited text had moved. The lookup accepts
+    drafts on purpose, so it has to answer for them.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import IndicatorChanges
+
+    changed = IndicatorChanges()
+    compared_only = "grapher/demography/2024-07-15/population/historical#population_historical"
+    moved = "grapher/wb/2026-06-26/world_bank_pip/incomes#mean"
+    changed.ids = {compared_only: 1, moved: 2}
+    changed.diffs = {moved: ViewDiff(dimensions={}, fields={"descriptionShort": {"old": "a", "new": "b"}})}
+
+    # What the lookup asks now, and what it used to ask.
+    paths = [compared_only, moved]
+    assert [p for p in paths if p in changed.diffs] == [moved], "one of them moved"
+    assert [p for p in paths if p in changed.ids] == paths, "both were compared — which is not the same"
+
+    # A chart rendering only the unchanged one still gets the all-clear.
+    assert [p for p in [compared_only] if p in changed.diffs] == []
 
 
 def test_a_version_bump_does_not_leave_a_charts_text_credited_to_nothing(monkeypatch):

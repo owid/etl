@@ -27,6 +27,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
 )
 from apps.wizard.app_pages.metadata_diff.data import (
     build_chart_bundle,
+    fetch_chart_indicator_paths,
     load_reviews,
 )
 from apps.wizard.app_pages.metadata_diff.render import (
@@ -109,6 +110,20 @@ def render_chart_review(
                 st.markdown(render_text_html(g.new, g.old, side="new", changed_only=True), unsafe_allow_html=True)
 
 
+def _changed_indicator_of(source_engine: Engine, target_engine: Engine, chart_id: int) -> str | None:
+    """One indicator of this chart whose own text this branch changed, or None.
+
+    `changed.diffs`, not `changed.ids`: the latter says an indicator was compared, which every indicator
+    of a rebuilt dataset was. Deterministic on ties — sorted — so the chart reviews the same series on
+    every rerun and the verdict recorded against it keeps meaning the same thing.
+    """
+    changed = cached.indicator_changes(source_engine, target_engine)
+    for path in sorted(fetch_chart_indicator_paths(source_engine, chart_id)):
+        if path in changed.diffs:
+            return path
+    return None
+
+
 def render_chart_by_ref(source_engine: Engine, target_engine: Engine, ref: str, recorded: dict | None = None) -> None:
     """Review one chart's inherited text against the baseline — every field of it this branch changed.
 
@@ -132,6 +147,23 @@ def render_chart_by_ref(source_engine: Engine, target_engine: Engine, ref: str, 
     target_bundle = tgt[0] if tgt is not None else None
 
     diff = diff_views([src_bundle], [target_bundle] if target_bundle is not None else [])[0]
+
+    # A multi-series chart is in the changed list because *some* indicator of it moved, and the primary y
+    # — whose metadata a data page renders, and which every comparison above is built from — is not always
+    # that one. Reviewing it then compared an indicator nothing had happened to and said "No changes" on a
+    # chart that does carry an edit, with no verdict control on it and the section's total out of reach.
+    #
+    # Asked only when the default comparison finds nothing, so the ordinary chart costs no extra query.
+    # It reviews one changed indicator, not all of them: a chart carrying edits to two of its series still
+    # shows only the first, which is worth knowing rather than worth implying.
+    if not diff.fields and int(chart.get("n_indicators") or 0) > 1:
+        pinned = _changed_indicator_of(source_engine, target_engine, int(chart["chartId"]))
+        rebuilt = build_chart_bundle(source_engine, ref, catalog_path=pinned) if pinned else None
+        if rebuilt is not None:
+            src_bundle, chart = rebuilt
+            other = build_chart_bundle(target_engine, str(chart["slug"]), catalog_path=pinned)
+            target_bundle = other[0] if other is not None else None
+            diff = diff_views([src_bundle], [target_bundle] if target_bundle is not None else [])[0]
 
     # Blast radius on the chart's indicator — but exclude the chart itself from its own affected list.
     usage: dict[int, dict[str, list[dict[str, Any]]]] = {}

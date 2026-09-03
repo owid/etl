@@ -516,13 +516,21 @@ def fetch_chart_indicator_paths(engine: Engine, chart_id: int) -> list[str]:
     return [str(p) for p in df["catalogPath"].tolist() if p]
 
 
-def build_chart_bundle(engine: Engine, ref: str) -> tuple[ViewBundle, dict[str, Any]] | None:
+def build_chart_bundle(
+    engine: Engine, ref: str, catalog_path: str | None = None
+) -> tuple[ViewBundle, dict[str, Any]] | None:
     """Build a single-"view" bundle for a standalone chart: its y-indicator metadata + its FAUST.
 
     Returns (bundle, chart) or None if the chart can't be resolved. The chart dict also carries
     `n_indicators` and `has_data_page` — grapher renders a data page (and thus this WYSK text) only
     for single-indicator charts; a scatter/multi-series chart has none. The bundle has empty
     dimensions, so it matches its baseline counterpart in `diff_views`.
+
+    `catalog_path` pins which of the chart's indicators the metadata is read from. Without it the primary
+    y is used, which is the one a data page renders. That is the right default and the wrong answer for a
+    multi-series chart in the changed list: it is there because *some* indicator of it moved, and the
+    caller may know which. Read by catalogPath rather than by id, the only identifier that means the same
+    thing in both environments.
     """
     chart = resolve_chart(engine, ref)
     if chart is None:
@@ -535,14 +543,17 @@ def build_chart_bundle(engine: Engine, ref: str) -> tuple[ViewBundle, dict[str, 
     chart["n_indicators"] = int(dims["variableId"].nunique()) if not dims.empty else 0
     chart["has_data_page"] = chart["n_indicators"] == 1
     # Primary y-indicator (fall back to the first dimension) — whose metadata the data page renders.
-    y = dims[dims["property"] == "y"] if not dims.empty else dims
-    if not y.empty:
-        vid: int | None = int(y.iloc[0]["variableId"])
-    elif not dims.empty:
-        vid = int(dims.iloc[0]["variableId"])
-    else:
-        vid = None
-    variable_row = fetch_variable_rows(engine, [vid]).get(vid) if vid is not None else None
+    variable_row = fetch_variable_rows_by_path(engine, [catalog_path]).get(catalog_path) if catalog_path else None
+    if variable_row is None:
+        # No pin, or this environment does not hold that path (a version bump moves it): the primary y.
+        y = dims[dims["property"] == "y"] if not dims.empty else dims
+        if not y.empty:
+            vid: int | None = int(y.iloc[0]["variableId"])
+        elif not dims.empty:
+            vid = int(dims.iloc[0]["variableId"])
+        else:
+            vid = None
+        variable_row = fetch_variable_rows(engine, [vid]).get(vid) if vid is not None else None
     chart_config = {"title": chart.get("title"), "subtitle": chart.get("subtitle"), "note": chart.get("note")}
     bundle = build_view_bundle(
         view={"dimensions": {}}, config_metadata=None, variable_row=variable_row, chart_config=chart_config

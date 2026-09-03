@@ -163,6 +163,26 @@ def _chart_lookup(source_engine: Engine, target_engine: Engine) -> None:
     # Not in the changed set. Whether that means "unchanged" or "not looked at" depends on scope.
     changed = cached.indicator_changes(source_engine, target_engine)
     paths = fetch_chart_indicator_paths(source_engine, int(chart["chartId"]))
+    # Membership in `changed.ids` only says an indicator was *compared*; `changed.diffs` says it moved.
+    # An unpublished chart is never in `counts` — `changed_charts` counts pages a reader can open, and
+    # `chart_text_rows` reads published charts only — so a draft whose inherited text changed fell through
+    # to here and was told every text matches. This lookup accepts drafts deliberately, so it has to
+    # answer for them.
+    moved = [path for path in paths if path in changed.diffs]
+    if moved:
+        st.warning(
+            f"**This branch changes the text of {len(moved)} indicator{'s' if len(moved) != 1 else ''} "
+            "this chart renders.** Below, in full:"
+        )
+        if not chart.get("is_published", True):
+            st.caption(
+                "Counted nowhere else on this page: the section's lists cover charts a reader can open, "
+                "and this one is unpublished. Its own config text was not compared either."
+            )
+        recorded = load_reviews(source_engine, surface_key("item", "chart"))
+        mdim_pages.render_chart_by_ref(source_engine, target_engine, str(chart["slug"]), recorded)
+        return
+
     compared = [path for path in paths if path in changed.ids]
     if compared:
         st.success(
