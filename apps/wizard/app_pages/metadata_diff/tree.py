@@ -285,8 +285,8 @@ def _render_leaf_branch(branch: dict[str, Any], preview_offset: int) -> tuple[st
     Used for the surfaces that have no dimension grid of their own: charts, and explorers. `branch` is
     {"id": str, "label": str, "groups": [{"name": str, "note": str, "leaves": [leaf, ...]}]} where each
     leaf is {"label", "href", "preview"} plus an optional "sublabel" drawn under the name in small grey
-    type — the way a grid section carries its catalogPath under its title. An optional `branch["note"]`
-    says what order the leaves are in. Leaves reuse `.mdd-leaf` and
+    type, the way a grid section carries a subtitle under its title. An optional `branch["note"]` says
+    what order the leaves are in. Leaves reuse `.mdd-leaf` and
     `data-view`, indexing into the shared previews array from `preview_offset`, so the existing hover and
     filter code applies unchanged. Everything here is marked "changed": a leaf in this list is affected by
     definition.
@@ -680,9 +680,8 @@ def render_multi_tree_html(
     #mdd-root .mdd-leaf-grid .mdd-node {{ margin: 1px 0; min-width: 0; }}
     #mdd-root .mdd-leaf-grid .mdd-box {{ flex-shrink: 1; min-width: 0; white-space: normal;
       overflow-wrap: anywhere; }}
-    /* The slug under a chart's title, styled as a grid section's subtitle is: the title is what a reviewer
-       recognises, the slug is what identifies it in a URL or a redirect, and both are wanted. Not bold
-       even inside a `.mdd-changed` box, which sets `font-weight: 600` on the whole leaf. */
+    /* The second line under a leaf's name — its yearly views — styled as a grid section's subtitle is.
+       Not bold even inside a `.mdd-changed` box, which sets `font-weight: 600` on the whole leaf. */
     #mdd-root .mdd-branch-note {{ color: #868e96; font-size: 12px; margin: 2px 0 6px; }}
     #mdd-root .mdd-leaf-sub {{ display: block; color: #868e96; font-size: 11px; font-weight: 400;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin-top: 1px; }}

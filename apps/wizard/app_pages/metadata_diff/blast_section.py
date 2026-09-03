@@ -665,10 +665,10 @@ def _chart_branch(reach: list[ChangeReach], views: dict[int, int] | None = None)
     Grouped the way the chart lists elsewhere group: a data page lays the text out, a multi-indicator
     chart keeps it behind "Learn more about this data", and a draft shows nobody anything.
 
-    Each leaf is named by the chart's **title**, with its slug underneath in small grey type. The title is
-    what a reviewer recognises — "Share of population living in extreme poverty" rather than
-    `share-of-population-in-extreme-poverty` — and the slug is still what identifies the chart in a URL,
-    so both are shown, the way a grid section carries its catalogPath under its name.
+    Each leaf is named by the chart's **title**, with its yearly views underneath in small grey type. The
+    title is what a reviewer recognises — "Share of population living in extreme poverty" rather than
+    `share-of-population-in-extreme-poverty` — and the slug it replaces is still one hover away, in the
+    link the leaf already is.
 
     Ordered most-viewed first within each group, since which of seventy charts matters is the question an
     author has and the one a name cannot answer: on this branch the busiest carries 196,000 views a year
@@ -690,16 +690,15 @@ def _chart_branch(reach: list[ChangeReach], views: dict[int, int] | None = None)
             else SOURCE.chart_admin_site(chart.get("chartId"))  # ty: ignore
         )
         # A chart whose title is only set in its config carries one here; one that inherits its title from
-        # indicator metadata may not, and then the slug is the only name there is — shown as the name
-        # itself rather than repeated on both lines.
+        # indicator metadata may not, and then the slug is the only name there is.
         title = str(chart.get("title") or "").strip()
         seen = (views or {}).get(int(chart["chartId"]))
-        # Nothing said when nothing was recorded: absence of a row in the warehouse is not a measured
-        # zero, and "0 views" beside a chart published last week would be a claim rather than a fact.
-        sub = [part for part in (slug if title else "", f"{seen:,} views/yr" if seen else "") if part]
+        # Views only under the name. Nothing said when nothing was recorded: absence of a row in the
+        # warehouse is not a measured zero, and "0 views" beside a chart published last week would be a
+        # claim rather than a fact.
         return {
             "label": title or slug,
-            "sublabel": " · ".join(sub),
+            "sublabel": f"{seen:,} views/yr" if seen else "",
             "views": seen or 0,
             "href": href,
             "preview": (

@@ -1561,9 +1561,10 @@ def test_the_grids_chart_leaves_are_listed_busiest_first():
     views = {1: 500, 2: 195_720}
     leaves = _chart_branch(reach, views)["groups"][0]["leaves"]
     assert [leaf["label"] for leaf in leaves] == ["Busy chart", "Quiet chart", "Unmeasured chart"]
-    # The count rides beside the slug, formatted, and is absent where nothing was recorded.
-    assert leaves[0]["sublabel"] == "busy · 195,720 views/yr"
-    assert leaves[2]["sublabel"] == "unmeasured"
+    # The count is the whole second line, formatted, and there is no second line where nothing was
+    # recorded — the slug it used to sit beside is one hover away in the link the leaf already is.
+    assert leaves[0]["sublabel"] == "195,720 views/yr"
+    assert leaves[2]["sublabel"] == ""
     assert "Most viewed first" in _chart_branch(reach, views)["note"]
 
     # No view data at all: name order, and the branch says so rather than implying a popularity order.
@@ -1600,12 +1601,11 @@ def test_the_grids_chart_leaves_are_grouped_by_prominence():
     assert groups["Via Learn more about this data"] == ["middle-chart"]
 
 
-def test_a_chart_leaf_is_named_by_its_title_with_the_slug_beneath():
-    """A slug is what identifies a chart; a title is what a reviewer recognises. Both, in a hierarchy.
+def test_a_chart_leaf_is_named_by_its_title():
+    """A title is what a reviewer recognises; the slug stays in the link the leaf already is.
 
-    Sorted by the name on screen, or the order is one the reader cannot see. A chart with no title of its
-    own — its title inherited from indicator metadata, which this config column does not carry — keeps the
-    slug as its name rather than showing it twice.
+    A chart with no title of its own — its title inherited from indicator metadata, which this config
+    column does not carry — keeps the slug as its name, since that is the only name there is.
     """
     from apps.wizard.app_pages.metadata_diff.blast_section import _chart_branch
     from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach
@@ -1623,14 +1623,14 @@ def test_a_chart_leaf_is_named_by_its_title_with_the_slug_beneath():
             ],
         )
     ]
-    branch = _chart_branch(reach)
+    branch = _chart_branch(reach, {1: 4_200})
     leaves = {leaf["label"]: leaf["sublabel"] for leaf in branch["groups"][0]["leaves"]}
     assert leaves == {
-        "Access to electricity": "zebra-chart",
-        "Zebra populations": "alpha-chart",
+        "Access to electricity": "4,200 views/yr",
+        "Zebra populations": "",
         "no-title-chart": "",
-    }
-    # Ordered by the name on screen, not by the slug: were it by slug, "alpha-chart" would lead.
+    }, "the second line carries views only — never the slug"
+    # The viewed one leads; the rest fall back to the name on screen, not the slug (else "alpha-chart").
     assert [leaf["label"] for leaf in branch["groups"][0]["leaves"]] == [
         "Access to electricity",
         "no-title-chart",
@@ -1638,7 +1638,11 @@ def test_a_chart_leaf_is_named_by_its_title_with_the_slug_beneath():
     ]
 
     html_out, _height = render_multi_tree_html([], branches=[branch])
-    assert '<span class="mdd-leaf-sub">zebra-chart</span>' in html_out
+    assert '<span class="mdd-leaf-sub">4,200 views/yr</span>' in html_out
+    # The slug belongs in the href and nowhere else: it is how the leaf opens the chart, not a caption.
+    printed = re.findall(r'<span class="mdd-leaf-sub">(.*?)</span>', html_out)
+    assert printed == ["4,200 views/yr"]
+    assert 'href="http://staging-site-metadata-diff/grapher/zebra-chart"' in html_out
     assert "#mdd-root .mdd-leaf-sub" in html_out
     # The branch says which order its leaves are in, since a list of names does not show it.
     assert '<div class="mdd-branch-note">' in html_out
