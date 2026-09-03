@@ -572,16 +572,20 @@ class ChartDiffShow:
             vertical_alignment="center",
         )
 
-    def _show_edit_link(self, owid_env: OWIDEnv) -> None:
-        """Link to the chart's edit page in the admin of the given environment.
+    def _show_edit_link(self, owid_env: OWIDEnv, chart_id: int | None) -> None:
+        """Link to a chart's edit page in the admin of the given environment.
+
+        `chart_id` must be the id the chart has *in that environment*: a chart created on
+        staging gets a fresh numeric id when it is synced to production, so the production
+        twin's id and `diff.chart_id` (always the source chart's) can differ.
 
         Grapher's own "Edit" entry in the share menu never shows up here: we mount the
         chart with the npm package inside a srcdoc iframe, where none of the signals it
         uses to detect an internal user (admin cookie, host name) can apply.
         """
-        if not self.diff.chart_id:
+        if not chart_id:
             return
-        st.markdown(f"[:material/edit: Edit]({owid_env.admin_site}/charts/{self.diff.chart_id}/edit)")
+        st.markdown(f"[:material/edit: Edit]({owid_env.admin_site}/charts/{chart_id}/edit)")
 
     def _show_chart_comparison(self) -> tuple[Any, bool]:
         """Show charts (horizontally or vertically)."""
@@ -601,7 +605,11 @@ class ChartDiffShow:
                         key=f"prod-review-{self.diff.chart_id}",
                         label_visibility="collapsed",
                     )
-                    self._show_edit_link(TARGET if option == "prod" else SOURCE)
+                    if option == "prod":
+                        assert self.diff.target_chart is not None
+                        self._show_edit_link(TARGET, self.diff.target_chart.id)
+                    else:
+                        self._show_edit_link(SOURCE, self.diff.chart_id)
 
                 if option == "prod":
                     self._show_tags_if_changed(self.diff.target_chart, self.target_session)
@@ -616,7 +624,8 @@ class ChartDiffShow:
                         st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
                     else:
                         st.markdown(self._header_production_chart)
-                    self._show_edit_link(TARGET)
+                    assert self.diff.target_chart is not None
+                    self._show_edit_link(TARGET, self.diff.target_chart.id)
 
                 self._show_tags_if_changed(self.diff.target_chart, self.target_session)
 
@@ -632,7 +641,7 @@ class ChartDiffShow:
             height = "content" if self.last_approved_revision is None else 40
             with self._chart_header_row(height=height):
                 st.markdown(self._header_staging_chart)
-                self._show_edit_link(SOURCE)
+                self._show_edit_link(SOURCE, self.diff.chart_id)
 
             self._show_tags_if_changed(self.diff.source_chart, self.source_session)
 
@@ -664,7 +673,7 @@ class ChartDiffShow:
         if self.diff.target_chart is None:
             with self._chart_header_row():
                 st.markdown(f"New version ┃ _{prettify_date(self.diff.source_chart)}_")
-                self._show_edit_link(SOURCE)
+                self._show_edit_link(SOURCE, self.diff.chart_id)
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
             config_ref = self.diff.source_chart.config
         # Two charts, actual diff
