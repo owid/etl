@@ -42,6 +42,10 @@ SEVERITY_DOT = {"high": ":red_circle:", "medium": ":large_orange_circle:", "low"
 # What a person reads over coffee. If the sweep found more, the ranking is the deliverable.
 MAX_FINDINGS = 5
 
+# The digest file is the record of what was sent, and a digest is now several messages. They are
+# joined by this marker so the file shows the split that the channel will see.
+MESSAGE_SEPARATOR = "\n\n----- next message -----\n\n"
+
 
 def changed_slugs(days: int = 1, include_data_updates: bool = False) -> list[str]:
     """Published chart slugs that changed in the last ``days``.
@@ -215,6 +219,26 @@ def _chart_title(result: dict[str, Any]) -> str:
     return result["slug"]
 
 
+def _format_finding(
+    result: dict[str, Any], issue: dict[str, Any], facts: dict[str, dict[str, Any]] | None = None
+) -> str:
+    """One finding as its own message: a linked bold title, the claim in a sentence, and a footer
+    of severity, readership and an admin edit link.
+
+    Self-contained on purpose. It is read next to the lead message but it is also what someone
+    quotes, forwards or replies to on its own, so it carries the link and the edit action itself.
+    """
+    url = issue.get("url") or f"https://ourworldindata.org/grapher/{result['slug']}"
+    dot = SEVERITY_DOT.get(issue.get("severity", "low"), ":large_yellow_circle:")
+    footer = [f"{dot} {issue.get('severity', 'low')} · {issue.get('kind', 'chart')}-level"]
+    if views := format_views(result.get("views")):
+        footer.append(views)
+    chart_id = (facts or {}).get(result["slug"], {}).get("chart_id")
+    if chart_id:
+        footer.append(f"<{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit chart>")
+    return f"*<{url}|{_chart_title(result)}>*\n{issue.get('claim', '').rstrip('.')}.\n{'   ·   '.join(footer)}"
+
+
 def format_slack(
     findings: list[tuple[dict[str, Any], dict[str, Any]]],
     reviewed: int,
@@ -223,15 +247,19 @@ def format_slack(
     window_days: int | None = None,
     facts: dict[str, dict[str, Any]] | None = None,
     cost: float = 0.0,
-) -> str:
-    """Slack mrkdwn — single asterisks for bold, in the shape #analytics-bites uses.
+) -> list[str]:
+    """The digest as separate Slack mrkdwn messages — single asterisks for bold, in the shape
+    #analytics-bites uses.
 
-    Each finding is a linked bold title, the claim in a sentence, and a footer of severity,
-    readership and an admin edit link. Matching the other daily owidbot post is deliberate: it
-    is one scanning pattern to learn, and the edit link is what turns a report into an action.
+    A lead message saying what was swept and what it cost, then **one message per finding**. The
+    findings used to be one message, which gave the whole digest a single thread: every reply
+    about one chart landed in the same place as the replies about the others, and a fix on one
+    could not be acknowledged without noise for the rest. One message each gives every claim its
+    own thread, which is where the adjudication belongs. The lead stays separate rather than
+    riding on the first finding, so the first finding is not privileged.
     """
     if not findings:
-        return ""
+        return []
 
     shown = findings[:MAX_FINDINGS]
     # Say what was actually reviewed. A header claiming "changed since yesterday" on a run that
@@ -243,38 +271,25 @@ def format_slack(
     else:
         scope = "Charts reviewed"
     truncated = "" if reviewed >= candidates else f" of {candidates}"
-    header = (
+    lead = [
         f"{scope} — reviewed {reviewed}{truncated}, {len(findings)} worth a look"
         + (f" (showing the top {len(shown)})" if len(findings) > len(shown) else "")
-        + ":"
-    )
-
-    lines = [header]
-    for result, issue in shown:
-        url = issue.get("url") or f"https://ourworldindata.org/grapher/{result['slug']}"
-        dot = SEVERITY_DOT.get(issue.get("severity", "low"), ":large_yellow_circle:")
-        footer = [f"{dot} {issue.get('severity', 'low')} · {issue.get('kind', 'chart')}-level"]
-        if views := format_views(result.get("views")):
-            footer.append(views)
-        chart_id = (facts or {}).get(result["slug"], {}).get("chart_id")
-        if chart_id:
-            footer.append(f"<{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit chart>")
-        lines.append(
-            f"\n*<{url}|{_chart_title(result)}>*\n{issue.get('claim', '').rstrip('.')}.\n{'   ·   '.join(footer)}"
-        )
-    lines.append("")
+        + (", each posted separately below." if len(shown) > 1 else ", posted below."),
+        "",
+    ]
     # What the run cost, in the footer. It is the sweep's actual model spend, so a day whose
     # charts were all already reviewed reads as $0.00 — the cache doing its job, not an error.
     # The gating --eval run is a separate invocation and is not counted here.
     spend = f"${cost:,.2f}" if cost >= 0.01 else "<$0.01"
-    lines.append(
+    lead.append(
         "_Posted by `etl chart-critic` — an LLM reading each chart, its metadata and its values. "
         "Each of these is a claim to check rather than a confirmed error. "
         f"Reviewing {reviewed} chart{'s' if reviewed != 1 else ''} cost {spend}._"
     )
     if incomplete:
-        lines.append(f"_{incomplete} chart(s) could not be reviewed, so treat this as incomplete._")
-    return "\n".join(lines)
+        lead.append(f"_{incomplete} chart(s) could not be reviewed, so treat this as incomplete._")
+
+    return ["\n".join(lead)] + [_format_finding(result, issue, facts) for result, issue in shown]
 
 
 def stamp(

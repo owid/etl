@@ -393,7 +393,7 @@ def _review_one(
     "digest_out",
     type=click.Path(dir_okay=False, path_type=Path),
     default=None,
-    help="Write a Slack-ready digest of the new findings here, and record them as posted.",
+    help="Write the Slack-ready digest messages here (the lead plus one per finding), and record them as posted.",
 )
 @click.option(
     "--post",
@@ -583,7 +583,7 @@ def cli(
         facts = digest.chart_facts(results)
         fresh = digest.new_findings(results, state, facts)
         incomplete = sum(1 for r in results if r["status"].startswith(("bundle failed", "review failed")))
-        message = digest.format_slack(
+        messages = digest.format_slack(
             fresh,
             reviewed=len(results),
             candidates=len(targets),
@@ -592,14 +592,16 @@ def cli(
             facts=facts,
             cost=sum(r["cost"] for r in results),
         )
-        digest_out.write_text(message)
-        if message:
-            console.print(f"\n[bold]digest ({len(fresh)} new finding(s)) → {digest_out}[/bold]")
-            console.print(message)
+        digest_out.write_text(digest.MESSAGE_SEPARATOR.join(messages))
+        if messages:
+            console.print(
+                f"\n[bold]digest ({len(fresh)} new finding(s), {len(messages)} message(s)) → {digest_out}[/bold]"
+            )
+            console.print(digest.MESSAGE_SEPARATOR.join(messages))
             if post:
                 # Post before recording, so a failed post is re-attempted tomorrow rather than
                 # marked delivered. Duplicating a finding is a smaller harm than dropping one.
-                _post_digest(message)
+                _post_digest(messages)
             digest.save_state(digest.stamp(fresh, state, facts))
         else:
             already = sum(len(r["issues"]) for r in results)
@@ -615,8 +617,12 @@ def cli(
         raise SystemExit(2)
 
 
-def _post_digest(message: str) -> None:
-    """Send the digest to the channel, or fail the run.
+def _post_digest(messages: list[str]) -> None:
+    """Send the digest to the channel as separate messages, or fail the run.
+
+    In order, one call each: the lead first, then a message per finding, so each finding owns
+    the thread that hangs off it. A failure part-way leaves the earlier messages posted and the
+    state unrecorded, so tomorrow re-posts the whole digest — the same trade the caller makes.
 
     Deliberately not tolerant of a missing token: ``send_slack_message`` prints to stdout when
     ``SLACK_API_TOKEN`` is unset, which in a scheduled build is indistinguishable from a
@@ -628,8 +634,9 @@ def _post_digest(message: str) -> None:
 
     if not config.SLACK_API_TOKEN:
         raise click.ClickException("--post needs SLACK_API_TOKEN; refusing to silently print instead")
-    send_slack_message(digest.SLACK_CHANNEL, message)
-    console.print(f"[green]posted to {digest.SLACK_CHANNEL}[/green]")
+    for message in messages:
+        send_slack_message(digest.SLACK_CHANNEL, message)
+    console.print(f"[green]posted {len(messages)} message(s) to {digest.SLACK_CHANNEL}[/green]")
 
 
 def _evaluate(model: str, with_image: bool, repeat: int, use_cache: bool, ttl_hours: float) -> None:
