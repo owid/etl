@@ -235,12 +235,14 @@ It is installed as a symlink at `$GIT_DIR/hooks/pre-commit`, git's default locat
 ```bash
 git worktree add ../etl-mybranch -b mybranch
 cd ../etl-mybranch
-make .venv          # venv + hooks + .env + data/, in one step
+make setup.worktree   # .env, a copy-on-write clone of data/, and the venv
 ```
+
+`setup.worktree` is the single entrypoint — there is nothing else to run. `make setup.config` is the cheap half of it (config and `data/`, offline, ~6 s) if you want a worktree available immediately and the venv built on first use.
 
 Copying 16 GB of `data/` sounds absurd and isn't: on a copy-on-write filesystem (APFS on macOS) `cp -c` clones the files, sharing the original's blocks until something writes to them. Measured on a 16 GB / ~32,000-file `data/`: **4 seconds and ~0 bytes**. So a real copy is *better* than symlinking it — each worktree gets an independent `data/`, and two of them running the same step cannot overwrite each other's output. Where cloning isn't possible (a different filesystem, or a different volume) `cp -c` fails rather than silently falling back, and the target leaves `data/` absent rather than making a real 16 GB copy.
 
-The venv is not part of it, and cannot be: `setup.worktree` is a prerequisite of `.venv`, so building the venv inside it would be a dependency cycle. It is also the one step that is slow and needs the network, which makes it the wrong thing to run from a git hook — everything `setup.worktree` does is offline and effectively free.
+The venv is the one expensive part: ~19 seconds and ~2.4 GB over the network, against ~6 seconds and ~0 bytes for config and `data/`. That is why the cheap half has its own name — `make setup.config` — and why `.venv` depends on *that* rather than on `setup.worktree`: a worktree nobody provisioned still fixes its own config on the first `make`, and depending the other way round would be a dependency cycle.
 
 (The clone trick applies elsewhere too: `git worktree add` itself on very large repos, and `node_modules`. Plain `cp` does not clone on macOS; the `-c` flag is required.)
 
@@ -248,7 +250,7 @@ The venv is not part of it, and cannot be: `setup.worktree` is a prerequisite of
 
 `setup.worktree` is a deliberately boring, shared name — owid-grapher uses it too — so anything that creates a worktree can provision *any* repo without knowing what that repo needs. Two ways to hook it up:
 
-**A worktree manager.** Point its per-repo setup script at `make .venv`. That covers the one thing the hook deliberately leaves out — the venv — and a full working worktree (config, cloned `data/`, 412-package venv) takes about 25 seconds.
+**A worktree manager.** Point its per-repo setup script at `make setup.worktree`. Nothing else is needed.
 
 **A machine-wide git hook**, if you create worktrees with plain `git` and want this to happen by itself. Set `core.hooksPath` to a directory of your own and put this in its `post-checkout`:
 
@@ -270,7 +272,9 @@ make -n setup.worktree >/dev/null 2>&1 && make setup.worktree
 exit 0
 ```
 
-Two things to know if you do this. `core.hooksPath` **replaces** `$GIT_DIR/hooks` rather than adding to it, so a dispatcher of this kind should end by exec'ing the repo's own `$GIT_DIR/hooks/<name>` — otherwise it silently disables every per-repo hook, including this repo's pre-commit. And keep `setup.worktree` cheap and offline for the same reason: it runs inside a git hook, which is why the venv is not part of it.
+With this in place `git worktree add` alone produces a working worktree — config, `data/` and venv — in about 26 seconds. Point it at `setup.config` instead if you would rather `git worktree add` stay near-instant.
+
+Two things to know if you do this. `core.hooksPath` **replaces** `$GIT_DIR/hooks` rather than adding to it, so a dispatcher of this kind should end by exec'ing the repo's own `$GIT_DIR/hooks/<name>` — otherwise it silently disables every per-repo hook, including this repo's pre-commit. And keep `setup.worktree` cheap and offline for the same reason: it runs inside a git hook, which is why the cheap half is separately callable as `setup.config`.
 
 ## GitHub Actions
 
