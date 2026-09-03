@@ -18,9 +18,17 @@
 #     stillbirth rate (29-34 per 1,000) are flat across the same years while the post-neonatal series
 #     triple. A real mortality event of that size would move the neonatal series too; a misapplied
 #     crisis-mortality shock would not.
+#   - IGME's own earlier release has no spike at all. The 2018 vintage (data/garden/un/2018/igme,
+#     already a dependency of long_run_child_mortality) gives CAR a smooth monotonic decline of
+#     166.3 -> 121.5 per 1,000 across 2005-2017: 154.9 in 2009 against 489.3 in the current release,
+#     134.8 in 2014 against 186.8, 121.5 in 2017 against 155.2. A 3.2x revision of a single year is a
+#     modelling change, not new evidence about 2009.
 #   - The same six years carry the same shock in UN WPP 2024's life tables for CAR (life expectancy
-#     at birth of 14.7 in 2009 and 18.8 in 2022). See the sibling correction in
-#     un/2024-12-02/un_wpp_lt.corrections.yml.
+#     at birth of 14.7 in 2009 and 18.8 in 2022) -- see un/2024-12-02/un_wpp_lt.corrections.yml. This
+#     is NOT independent corroboration: WPP's mortality estimation draws on IGME's child-mortality
+#     estimates, so it is one artifact surfacing in two products. The numbers are close but not
+#     identical (CAR infant mortality differs by ~9 per 1,000 on average across 2005-2023), which is
+#     what a shared input reconciled through each model looks like.
 #
 # All CAR rows for these years are dropped rather than the affected indicators only: the shock runs
 # through every post-neonatal series (rates, deaths and their derived youth/child aggregates), and

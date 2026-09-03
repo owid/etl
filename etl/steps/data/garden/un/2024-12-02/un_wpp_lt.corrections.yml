@@ -14,11 +14,21 @@
 #     (un/2024-12-02/un_wpp_lt_all.csv), in WPP's separate Demographic Indicators file
 #     (un/2024-07-12/un_wpp_demographic_indicators.xlsx), and in the World Bank's WDI republication
 #     of WPP (SP.DYN.LE00.IN, retrieved 2026-09-02).
-#   - The same six years spike in UN IGME 2025's independent CAR estimates: under-five mortality of
-#     489 per 1,000 (2009) and 425 (2022) against a 113-155 baseline; see the sibling correction in
-#     un/2026-06-09/igme.corrections.yml. Only post-neonatal ages are affected in both sources --
-#     CAR's neonatal mortality and stillbirth rates stay flat across the same years, which is what
-#     identifies this as a misapplied crisis-mortality shock rather than a real event.
+#   - The same six years spike in UN IGME 2025 (under-five mortality of 489 per 1,000 in 2009 and
+#     425 in 2022, against a 113-155 baseline); see the sibling correction in
+#     un/2026-06-09/igme.corrections.yml. Note this is NOT independent corroboration: WPP's mortality
+#     estimation draws on IGME's child-mortality estimates, so the two are one artifact surfacing in
+#     two products rather than two separate observations. The numbers are close but not identical
+#     (CAR infant mortality differs by ~9 per 1,000 on average across 2005-2023), which is the
+#     signature of a shared input reconciled through each model, not of a copy.
+#   - What does corroborate it is IGME disagreeing with its own earlier release: the 2018 vintage
+#     (data/garden/un/2018/igme, already a dependency of long_run_child_mortality) gives CAR a smooth
+#     monotonic decline of 166.3 -> 121.5 per 1,000 across 2005-2017, with no spike in 2009, 2014 or
+#     2017 at all. 2009 reads 154.9 there against 489.3 in the current release -- a 3.2x revision, not
+#     a measurement.
+#   - Only post-neonatal ages are affected in both sources -- CAR's neonatal mortality and stillbirth
+#     rates stay flat across the same years, which is what identifies this as a misapplied
+#     crisis-mortality shock rather than a real event.
 #   - There is no upstream fix to wait for: WPP 2024 is still the current revision, and the UN's
 #     interim-update bundle (WPP2024_CSV_files_update.zip) still contains only the 2026-01-19 Togo
 #     revision.

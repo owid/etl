@@ -10,8 +10,8 @@
 #
 # This is the same defect, in the same years, as the one corrected in
 # un/2024-12-02/un_wpp_lt.corrections.yml (WPP's life tables) -- see that file for the full evidence
-# trail -- and in un/2026-06-09/igme.corrections.yml (UN IGME's independent child-mortality
-# estimates).
+# trail -- and in un/2026-06-09/igme.corrections.yml (UN IGME's child-mortality estimates, which
+# share an input with WPP rather than being an independent confirmation).
 # It is corrected here as well because this dataset, not the life tables, is what 12 published life
 # expectancy charts and the death/mortality charts read from; fixing only one of the two would leave
 # the site showing 18.8 years on some charts and a gap on others.
