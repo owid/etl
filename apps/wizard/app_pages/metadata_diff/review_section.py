@@ -643,34 +643,50 @@ def handover_sentence(rejected: list[dict[str, Any]], summary: Any) -> str:
     who does not need telling who he is, and by an assistant for whom it is noise. Routing is decided
     before the paste, so it is said beside the copy button and nowhere else.
 
-    Owners come from each affected dataset's own `dataset.owners`, the first entry accountable. Names
-    only, never a handle: nothing in the repo maps one to the other and a guessed handle pings somebody
-    uninvolved.
+    Owners come from each affected dataset's own `dataset.owners`. The **first** entry is the accountable
+    one, so that is who is named; a secondary owner is not the person to ask first. When the rejections
+    span datasets with different owners, each is named with the datasets that are theirs — flattening them
+    into one list read as though all of them should act on all of it, and hid whose part was whose.
+
+    Names only, never a handle: nothing in the repo maps one to the other and a guessed handle pings
+    somebody uninvolved.
     """
     edits, _reach = _edit_lookup(summary)
     directories = sorted(
         {dataset for row in rejected for dataset in (edits.get(str(row.get("changeKey"))) or {}).get("datasets", [])}
     )
-    people: list[str] = []
-    for names in dataset_owners(directories).values():
-        for name in names:
-            if name not in people:
-                people.append(name)
+    owners = dataset_owners(directories)
 
-    if not people:
-        # No owner recorded, or the file could not be read: still say who can act on it.
-        return (
-            "Send it to whoever owns the affected dataset — its `dataset.owners` says who — or paste it to "
-            "Claude, which can make the edits and re-run the steps."
-        )
-    who = ", ".join(people[:-1])
-    who = f"{who} and {people[-1]}" if who else people[-1]
-    owns = "owns" if len(people) == 1 else "own"
-    return (
-        f"Send it to {who}, who {owns} the affected "
-        f"{'dataset' if len(directories) == 1 else 'datasets'} — or paste it to Claude, which can make the "
-        "edits and re-run the steps."
-    )
+    # Accountable owner -> the datasets they own here, in the order the datasets were listed.
+    by_owner: dict[str, list[str]] = {}
+    for directory in directories:
+        names = owners.get(directory) or []
+        if names:
+            by_owner.setdefault(names[0], []).append(directory.rsplit("/", 1)[-1])
+    unowned = [d.rsplit("/", 1)[-1] for d in directories if not owners.get(d)]
+    claude = "or paste it to Claude, which can make the edits and re-run the steps."
+
+    if not by_owner:
+        # No owner recorded anywhere, or the files could not be read: still say who can act on it.
+        return f"Send it to whoever owns the affected dataset — its `dataset.owners` says who — {claude}"
+
+    if len(by_owner) == 1 and not unowned:
+        owner, datasets = next(iter(by_owner.items()))
+        what = "the affected dataset" if len(datasets) == 1 else f"all {len(datasets)} affected datasets"
+        lead = f"Send it to {owner}, who owns {what}"
+    elif len(by_owner) == 1:
+        # Something here has no owner, so "the affected dataset" would be one of two. Name theirs.
+        owner, datasets = next(iter(by_owner.items()))
+        lead = f"Send it to {owner}, who owns {', '.join(datasets)}"
+    else:
+        # Several owners: each named with their own part, or the sentence asks everybody for everything.
+        parts = [f"{owner} ({', '.join(datasets)})" for owner, datasets in by_owner.items()]
+        joined = ", ".join(parts[:-1]) + f" and {parts[-1]}"
+        lead = f"Send it to {joined} — each owns part of what was rejected"
+
+    if unowned:
+        lead += f". Nothing is recorded as owning {', '.join(unowned)} — check its `dataset.owners`"
+    return f"{lead} — {claude}"
 
 
 def _has_rejection(group: list[dict[str, Any]]) -> bool:

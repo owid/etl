@@ -3280,6 +3280,50 @@ def test_who_to_send_the_rejections_to_is_said_on_the_page_not_in_the_document()
     assert owner not in doc
 
 
+def test_rejections_spanning_two_datasets_name_each_owner_with_their_own_part(monkeypatch):
+    """Flattening the owners asked everybody for everything and hid whose part was whose.
+
+    The accountable owner is the first entry in `dataset.owners`, so that is who is named — a secondary
+    owner is not the person to ask first — and a dataset with nobody recorded is said out loud rather than
+    dropped from the sentence.
+    """
+    from apps.wizard.app_pages.metadata_diff import review_section
+
+    def sentence(owners: dict[str, list[str]], datasets: list[str]) -> str:
+        """Drive the routing with a known owner map, so the wording is what is under test."""
+        monkeypatch.setattr(review_section, "_edit_lookup", lambda _s: ({"k": {"datasets": datasets}}, {}))
+        monkeypatch.setattr(review_section, "dataset_owners", lambda dirs: {d: owners[d] for d in dirs if d in owners})
+        return review_section.handover_sentence([{"changeKey": "k"}], None)
+
+    wb = "etl/steps/data/garden/wb/2026-06-26/world_bank_pip"
+    who = "etl/steps/data/garden/who/2026-01-01/gho"
+
+    # One owner, one dataset.
+    one = sentence({wb: ["Pablo Arriagada"]}, [wb])
+    assert "Send it to Pablo Arriagada, who owns the affected dataset" in one
+
+    # One owner, two datasets: still one person, and the count is theirs.
+    both = sentence({wb: ["Pablo Arriagada"], who: ["Pablo Arriagada"]}, [wb, who])
+    assert "who owns all 2 affected datasets" in both
+
+    # Two owners: each named with their own dataset, and nobody asked for the other's part.
+    split = sentence({wb: ["Pablo Arriagada"], who: ["Fiona Spooner"]}, [wb, who])
+    assert "Pablo Arriagada (world_bank_pip)" in split
+    assert "Fiona Spooner (gho)" in split
+    assert "each owns part of what was rejected" in split
+
+    # The accountable owner is the first entry; a secondary owner is not who to ask first.
+    secondary = sentence({wb: ["Pablo Arriagada", "Fiona Spooner"]}, [wb])
+    assert "Pablo Arriagada" in secondary and "Fiona Spooner" not in secondary
+
+    # A dataset nobody owns is named rather than quietly left out.
+    partial = sentence({wb: ["Pablo Arriagada"]}, [wb, who])
+    assert "Pablo Arriagada" in partial and "check its `dataset.owners`" in partial and "gho" in partial
+
+    # Claude is offered in every case.
+    assert all("paste it to Claude" in text for text in (one, both, split, secondary, partial))
+
+
 def test_the_bar_says_a_section_can_be_read_either_way():
     """The two ways through a section are what the badges count, so the bar has to name them.
 
