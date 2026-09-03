@@ -8,12 +8,15 @@ definitions:
     processing_level: minor
     display:
       numDecimalPlaces: 1
-    description_key:
-      - Estimates come from the International Agency for Research on Cancer (IARC). They apply the population attributable fractions from the study "Global burden of cancer attributable to infections in 2018" (de Martel et al., 2020) to the GLOBOCAN 2020 cancer incidence estimates.
-      - |-
-        Ten infectious agents classified as carcinogenic by IARC are covered: Helicobacter pylori, human papillomavirus (HPV), hepatitis B and C viruses, Epstein-Barr virus (EBV), human herpesvirus type 8, human T-cell lymphotropic virus, the liver flukes Opisthorchis viverrini and Clonorchis sinensis, and Schistosoma haematobium.
-      - Non-melanoma skin cancers are excluded because their registration is often incomplete and inconsistent across countries.
-      - Estimates carry uncertainty, especially for countries without population-based cancer registries or with limited data on how common these infections are.
+    # NOTE: Draft "What you should know" bullets, not enabled. Each paraphrases text OWID or IARC already publishes
+    # (the tool's methodology statement, the agent list in the data, the footnote and subtitle on charts 8059-8061),
+    # but they have not been reviewed by the dataset owner. Uncomment after review to enable them.
+    # description_key:
+    #   - Estimates come from the International Agency for Research on Cancer (IARC). They apply the population attributable fractions from the study "Global burden of cancer attributable to infections in 2018" (de Martel et al., 2020) to the GLOBOCAN 2020 cancer incidence estimates.
+    #   - |-
+    #     Ten infectious agents classified as carcinogenic by IARC are covered: Helicobacter pylori, human papillomavirus (HPV), hepatitis B and C viruses, Epstein-Barr virus (EBV), human herpesvirus type 8, human T-cell lymphotropic virus, the liver flukes Opisthorchis viverrini and Clonorchis sinensis, and Schistosoma haematobium.
+    #   - Non-melanoma skin cancers are excluded because their registration is often incomplete and inconsistent across countries.
+    #   - Estimates carry uncertainty, especially for countries without population-based cancer registries or with limited data on how common these infections are.
   sex: <% if sex == "both" %>both sexes<% elif sex == "males" %>men<% elif sex == "females" %>women<% endif %>
   people: <% if sex == "both" %>people<% elif sex == "males" %>men<% elif sex == "females" %>women<% endif %>
   agent: |-
