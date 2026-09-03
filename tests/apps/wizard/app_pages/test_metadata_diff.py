@@ -3472,6 +3472,69 @@ def test_a_chart_can_be_named_by_any_link_a_reviewer_holds():
     assert parse_chart_ref("   ") == (None, None)
 
 
+def test_a_chart_with_no_data_page_is_not_linked_to_one(monkeypatch):
+    """The review warned "no data page" and then offered two links forcing one.
+
+    `forceDatapage=true` on a multi-indicator chart opens a page the chart does not have. Those open as
+    the chart, where their readers actually meet this text — in the sources drawer, under each indicator.
+    """
+    from streamlit.testing.v1 import AppTest
+
+    from apps.wizard.app_pages.metadata_diff import cached, mdim_pages
+    from apps.wizard.app_pages.metadata_diff.core import build_view_bundle
+
+    def bundle_for(description: str, subtitle: str):
+        return build_view_bundle(
+            view={"dimensions": {}},
+            config_metadata=None,
+            variable_row={
+                "id": 7,
+                "name": "x",
+                "catalogPath": "grapher/a/latest/b/b#x",
+                "descriptionShort": description,
+            },
+            chart_config={"title": "Some chart", "subtitle": subtitle, "note": None},
+        )
+
+    def patched(n_indicators: int):
+        """A chart with `n_indicators`, whose text differs between the two environments."""
+        chart = {
+            "chartId": 42,
+            "slug": "some-chart",
+            "title": "Some chart",
+            "n_indicators": n_indicators,
+            "has_data_page": n_indicators == 1,
+            "subtitle": "New subtitle.",
+            "note": None,
+        }
+        new, old = bundle_for("New.", "New subtitle."), bundle_for("Old.", "Old subtitle.")
+        return lambda engine, ref: (new if engine == "src" else old, dict(chart))
+
+    def app() -> None:
+        from apps.wizard.app_pages.metadata_diff import mdim_pages
+
+        # An empty record, so the review strip renders without reaching for the database.
+        mdim_pages.render_chart_by_ref("src", "tgt", "some-chart", {})
+
+    monkeypatch.setattr(cached, "usage_for_indicators", lambda *args, **kwargs: {})
+
+    def rendered(n_indicators: int) -> str:
+        monkeypatch.setattr(mdim_pages, "build_chart_bundle", patched(n_indicators))
+        at = AppTest.from_function(app, default_timeout=60).run()
+        assert not at.exception, at.exception
+        return " ".join(str(getattr(el, "value", "") or "") for el in at.markdown)
+
+    # A single-indicator chart has a data page, and the links force it so the text is visible on staging.
+    single = rendered(1)
+    assert "data page ↗" in single and "forceDatapage=true" in single
+
+    # A multi-indicator chart has none: nothing forced, and the links say what they do open.
+    multi = rendered(3)
+    assert "forceDatapage" not in multi, "it has no data page to force"
+    assert "chart ↗" in multi and "data page ↗" not in multi
+    assert "/grapher/some-chart" in multi
+
+
 def test_the_bar_says_a_section_can_be_read_either_way():
     """The two ways through a section are what the badges count, so the bar has to name them.
 

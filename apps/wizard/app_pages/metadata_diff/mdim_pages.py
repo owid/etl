@@ -62,8 +62,14 @@ def render_chart_review(
     staging_url: str,
     usage: dict[int, dict[str, list[dict[str, Any]]]],
     recorded: dict | None = None,
+    page: str = "data page",
 ) -> None:
     """One looked-up chart's changed fields, side by side, in data-page order.
+
+    `page` names what the two links open — a data page for a single-indicator chart, the chart itself for
+    one that has none. The layout below is still the data page's slot order, which is what makes two
+    charts comparable at a glance; where a chart has no data page its readers meet the same texts in the
+    sources drawer, in this order, under each indicator.
 
     Diff only. It used to carry an Approve/Flag sign-off keyed on `chart:<slug>` — a second review record
     beside the Charts list's ticks, read by nothing and consulted at no point in the merge — and a PR
@@ -79,8 +85,8 @@ def render_chart_review(
     # tick was below the last of them, so on a chart with several fields you scrolled past the answer to
     # reach the control.
     st.markdown(
-        f":gray[**{BASELINE_NAME.capitalize()}**] [data page ↗]({baseline_url}) · "
-        f":green[**This staging server**] [data page ↗]({staging_url})"
+        f":gray[**{BASELINE_NAME.capitalize()}**] [{page} ↗]({baseline_url}) · "
+        f":green[**This staging server**] [{page} ↗]({staging_url})"
     )
     if diff.fields:
         surface = surface_key("item", "chart")
@@ -148,9 +154,21 @@ def render_chart_by_ref(source_engine: Engine, target_engine: Engine, ref: str, 
     # blank); the admin chart preview with `forceDatapage=true` forces the data page, so WYSK /
     # description_key edits are actually visible. Use it for both envs (works on production too).
     cid = chart["chartId"]
-    baseline_url = chart_datapage_url(TARGET, cid)
-    staging_url = chart_datapage_url(SOURCE, cid)
-    links = f"[{BASELINE_NAME} (data page)]({baseline_url}) · [this staging server (data page)]({staging_url})"
+    # `forceDatapage=true` only where there is a data page to force. A multi-indicator chart has none —
+    # this function says so a few lines up — and forcing one there opened a page the chart does not have,
+    # under a link calling it the data page. Those charts open as the chart, which is where their readers
+    # meet this text, in the sources drawer.
+    has_data_page = bool(chart.get("has_data_page", True))
+    slug = str(chart.get("slug") or "")
+    if has_data_page:
+        baseline_url = chart_datapage_url(TARGET, cid)
+        staging_url = chart_datapage_url(SOURCE, cid)
+        page = "data page"
+    else:
+        baseline_url = f"{TARGET.site}/grapher/{slug}"
+        staging_url = f"{SOURCE.site}/grapher/{slug}"
+        page = "chart"
+    links = f"[{BASELINE_NAME} ({page})]({baseline_url}) · [this staging server ({page})]({staging_url})"
 
     if diff.is_new:
         st.info(f"This chart is **new** — it does not exist in {BASELINE_NAME}. " + links)
@@ -163,4 +181,4 @@ def render_chart_by_ref(source_engine: Engine, target_engine: Engine, ref: str, 
     st.markdown(f"**{nf} field{'s' if nf != 1 else ''} changed** in this chart.")
     render_impact(diff, usage, unit="chart")
     # Each changed field in its own collapsible, baseline on the left and this server on the right.
-    render_chart_review(chart, diff, source_engine, baseline_url, staging_url, usage, recorded)
+    render_chart_review(chart, diff, source_engine, baseline_url, staging_url, usage, recorded, page)

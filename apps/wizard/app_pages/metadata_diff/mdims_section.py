@@ -294,9 +294,14 @@ def _render_view(
         staging_href = view_url(SOURCE, catalog_path, None if row["is_draft"] else slug, view.dimensions)
         baseline_slug = str(row["slug_target"]) if row.get("published_target") == 1 else None
         baseline_href = view_url(TARGET, catalog_path, baseline_slug, view.dimensions)
-        links = f":green[**This staging server**] [view ↗]({staging_href})"
+        # "Data page" rather than "view": what opens is the page a reader gets, where these texts are laid
+        # out — the same thing the chart review calls a data page, so the two read alike. An unpublished
+        # MDim has no reader-facing page, so its link is the admin preview and says so.
+        staging_label = "preview" if row["is_draft"] else "data page"
+        baseline_label = "data page" if baseline_slug else "preview"
+        links = f":green[**This staging server**] [{staging_label} ↗]({staging_href})"
         if not view.is_new:
-            links = f":gray[**{BASELINE_NAME.capitalize()}**] [view ↗]({baseline_href}) · " + links
+            links = f":gray[**{BASELINE_NAME.capitalize()}**] [{baseline_label} ↗]({baseline_href}) · " + links
         st.markdown(links)
         if source_engine is not None and view.fields:
             surface = surface_key("item", f"mdim:{catalog_path}")
