@@ -1,0 +1,40 @@
+# Known upstream data errors in the UN IGME data, corrected locally until fixed at the source.
+# See etl/data_corrections.py for the format.
+#
+# Central African Republic: the UN IGME 2025 release injects an implausible mortality shock into six
+# single years. Under-five mortality for CAR reads 489 per 1,000 (2009), 187 (2014), 155 (2017),
+# 255 (2019), 179 (2021) and 425 (2022), against a 113-151 baseline in every neighbouring year --
+# i.e. it claims roughly half of all CAR children died before their fifth birthday in 2009 and 2022.
+# Every point is flagged "Normal value" by IGME, so nothing downstream filters it out. Mortality at
+# ages 15-24 in 2009 reads 447 per 1,000 over the interval, which is not a rate any population has
+# recorded outside a famine or genocide.
+#
+# Established before correcting:
+#   - It is not our processing: the values are in the raw snapshot as published
+#     (UN IGME 2025.csv, series "UN IGME estimate").
+#   - CAR was not in a crisis of that magnitude in any of the six years, and the years do not line up
+#     with CAR's actual conflict peaks (2013-14, 2020-21).
+#   - Only *post-neonatal* ages are affected. CAR's neonatal mortality rate (33-43 per 1,000) and
+#     stillbirth rate (29-34 per 1,000) are flat across the same years while the post-neonatal series
+#     triple. A real mortality event of that size would move the neonatal series too; a misapplied
+#     crisis-mortality shock would not.
+#   - The same six years carry the same shock in UN WPP 2024's life tables for CAR (life expectancy
+#     at birth of 14.7 in 2009 and 18.8 in 2022). See the sibling correction in
+#     un/2024-12-02/un_wpp_lt.corrections.yml.
+#
+# All CAR rows for these years are dropped rather than the affected indicators only: the shock runs
+# through every post-neonatal series (rates, deaths and their derived youth/child aggregates), and
+# publishing CAR's unaffected neonatal and stillbirth figures for a country-year whose model output
+# is known to be wrong would invite exactly the cross-series comparison that breaks. No `expect`
+# guard is set because the snapshot version is pinned and cannot change under us -- revisit this file
+# when the step is bumped to a new IGME release.
+- indicator: observation_value
+  entity: Central African Republic
+  years: [2009, 2014, 2017, 2019, 2021, 2022]
+  action: drop
+  reason: >-
+    UN IGME 2025 gives the Central African Republic an impossible mortality shock in these six years
+    (under-five mortality of 489 per 1,000 in 2009 and 425 in 2022, against a 113-151 baseline).
+    Dropped rather than replaced, since no corrected figure is published.
+  provider: United Nations
+  status: open

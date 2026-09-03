@@ -41,6 +41,10 @@ def run() -> None:
     tb = filter_data(tb)
     tb = round_down_year(tb)
 
+    # Apply known upstream data errors (see igme.corrections.yml). Applied before the regional
+    # aggregates below so the dropped country-years are excluded from them too.
+    tb = paths.apply_corrections(tb)
+
     # get regional data for count variables
     tb_counts_regions = regional_aggregates_counts(tb, threshold=0.8)
     # get regional population weighted averages for rate variables
