@@ -298,7 +298,7 @@ definitions:
   poverty_gap_index_subtitle: |-
     The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line). {definitions.subtitle_welfare_type}
 
-  ppp_adjustment_subtitle: This data is adjusted for inflation and differences in living costs between countries, so amounts are comparable across countries and over time.
+  ppp_adjustment_subtitle: This data is adjusted for inflation and differences in living costs between countries.
 
   ppp_adjustment_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {definitions.ppp_version} prices.
 
