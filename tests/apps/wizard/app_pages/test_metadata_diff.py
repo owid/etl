@@ -3324,6 +3324,74 @@ def test_rejections_spanning_two_datasets_name_each_owner_with_their_own_part(mo
     assert all("paste it to Claude" in text for text in (one, both, split, secondary, partial))
 
 
+def test_a_document_spanning_two_owners_says_whose_dataset_each_entry_is(monkeypatch):
+    """One document, shared once — but an owner has to see which entries are theirs.
+
+    Not split per owner: it travels as a single artifact into an issue or a channel, and one entry can
+    belong to two datasets (the same wording edited in both), which no split could put in one place. With
+    a single owner the annotation is noise, since the page already names them and they are the reader.
+    """
+    from apps.wizard.app_pages.metadata_diff import review_section
+    from apps.wizard.app_pages.metadata_diff.core import item_identity
+    from apps.wizard.app_pages.metadata_diff.data import REJECTED
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, edit_fields, edit_key, edits_for
+    from apps.wizard.app_pages.metadata_diff.review_section import _rejections_markdown
+
+    wb = "grapher/wb/2026-06-26/world_bank_pip/world_bank_pip#mean"
+    who = "grapher/who/2026-01-01/gho/gho#deaths"
+    rows = []
+    reach = []
+    for path, old, new in ((wb, "A.", "A. Adjusted."), (who, "B.", "B. Reworded.")):
+        reach.append(
+            ChangeReach(
+                field="descriptionShort",
+                old=old,
+                new=new,
+                charts=[{"chartId": len(reach) + 1, "slug": f"c{len(reach)}", "has_data_page": True}],
+                catalog_paths={path},
+            )
+        )
+    summary = Summary(reach=reach)
+    surface = surface_key("item", "edit:charts")
+    for edit in edits_for(summary, "charts"):
+        change_key, content_hash = item_identity(surface, edit_key(edit), edit_fields(edit))
+        rows.append(
+            {
+                "catalogPath": surface,
+                "changeKey": change_key,
+                "contentHash": content_hash,
+                "status": REJECTED,
+                "comment": None,
+            }
+        )
+    assert len(rows) == 2, "two separate edits, one per dataset"
+
+    wb_dir = "etl/steps/data/garden/wb/2026-06-26/world_bank_pip"
+    who_dir = "etl/steps/data/garden/who/2026-01-01/gho"
+
+    # Two owners: every file line says whose dataset it is.
+    monkeypatch.setattr(
+        review_section,
+        "dataset_owners",
+        lambda dirs: {wb_dir: ["Pablo Arriagada"], who_dir: ["Fiona Spooner"]},
+    )
+    split = _rejections_markdown(rows, {}, summary)
+    assert "world_bank_pip.meta.yml` (Pablo Arriagada)" in split
+    assert "gho.meta.yml` (Fiona Spooner)" in split
+    # Still one document, with one instructions section rather than one per person.
+    assert split.count("### Revert these") == 1
+
+    # One owner: no annotation, because the page names them and they are the one reading.
+    monkeypatch.setattr(
+        review_section,
+        "dataset_owners",
+        lambda dirs: {wb_dir: ["Pablo Arriagada"], who_dir: ["Pablo Arriagada"]},
+    )
+    single = _rejections_markdown(rows, {}, summary)
+    assert "(Pablo Arriagada)" not in single
+    assert "world_bank_pip.meta.yml` — change it there" in single
+
+
 def test_the_bar_says_a_section_can_be_read_either_way():
     """The two ways through a section are what the badges count, so the bar has to name them.
 

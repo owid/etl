@@ -514,6 +514,11 @@ def _rejections_markdown(rejected: list[dict[str, Any]], index: dict[str, dict[s
     by_item = [row for row in rejected if str(row.get("changeKey")) not in edits]
 
     merged = _merged_edits(by_edit, edits, reach)
+    # Whose dataset each entry is — added to the file lines only when the document spans more than one
+    # owner. One document, not one per owner: it travels as a single artifact into an issue or a channel,
+    # and an entry can legitimately belong to two datasets (the same wording edited in both), which no
+    # split could put in one place. What an owner needs is to see which entries are theirs.
+    owners = _entry_owners(merged)
     whole = [(edit, notes) for edit, notes in merged if not edit["kept"]]
     partial = [(edit, notes) for edit, notes in merged if edit["kept"]]
 
@@ -523,7 +528,7 @@ def _rejections_markdown(rejected: list[dict[str, Any]], index: dict[str, dict[s
             lines.append(f"- **{edit['field']}** — {_texts_in(edit['refused'])}")
             lines.extend(_words_lines(edit))
             for dataset in edit["datasets"]:
-                lines.append(f"  - authored in `{dataset}.meta.yml` — change it there")
+                lines.append(f"  - authored in `{dataset}.meta.yml`{_owned_by(dataset, owners)} — change it there")
             lines.extend(_note_lines(notes))
         lines.append("")
 
@@ -535,7 +540,10 @@ def _rejections_markdown(rejected: list[dict[str, Any]], index: dict[str, dict[s
             )
             lines.extend(_words_lines(edit))
             for dataset in edit["datasets"]:
-                lines.append(f"  - leave `{dataset}.meta.yml` as it is — the text is wanted elsewhere")
+                lines.append(
+                    f"  - leave `{dataset}.meta.yml`{_owned_by(dataset, owners)} as it is — the text is "
+                    "wanted elsewhere"
+                )
             for section, _n in edit["refused"]:
                 lines.append(f"  - to keep it off {SECTIONS[section][1]}: {_OVERRIDE_LEVER[section]}")
             lines.extend(_note_lines(notes))
@@ -685,7 +693,7 @@ def handover_sentence(rejected: list[dict[str, Any]], summary: Any) -> str:
         lead = f"Send it to {joined} — each owns part of what was rejected"
 
     if unowned:
-        lead += f". Nothing is recorded as owning {', '.join(unowned)} — check its `dataset.owners`"
+        lead += f". No one is recorded as owning {', '.join(unowned)} — check its `dataset.owners`"
     return f"{lead} — {claude}"
 
 
@@ -697,3 +705,21 @@ def _has_rejection(group: list[dict[str, Any]]) -> bool:
 def _edit_total(summary: Any) -> int:
     """How many authored edits this branch has across the three surfaces — the shorter way to finish."""
     return sum(len(edits_for(summary, section)) for section in COUNTED_SECTIONS)
+
+
+def _entry_owners(merged: list[tuple[dict[str, Any], list[str]]]) -> dict[str, str]:
+    """dataset dir -> its accountable owner, but only when the document spans more than one of them.
+
+    With a single owner the annotation is noise on every line: the page's routing sentence already names
+    them, and they are the person reading. With two, the same document reaches two people and neither can
+    tell which entries are theirs from the file path alone unless they know the repo well.
+    """
+    directories = sorted({dataset for edit, _notes in merged for dataset in edit["datasets"]})
+    accountable = {directory: names[0] for directory, names in dataset_owners(directories).items() if names}
+    return accountable if len(set(accountable.values())) > 1 else {}
+
+
+def _owned_by(dataset: str, owners: dict[str, str]) -> str:
+    """ " (Fiona Spooner)" for a file line, or nothing when the document has a single owner."""
+    owner = owners.get(dataset)
+    return f" ({owner})" if owner else ""
