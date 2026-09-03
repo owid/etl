@@ -82,6 +82,12 @@ can show it — but its bounding box is the whole canvas, which makes every box-
 `verify_page.js` measure the artboard instead of the plot and report three failures that are not there.
 Keep the guard the skill's pass uses: strip it only when nothing under it is painted.
 
+**Switch the import frame's fill ON and clip it**, to the clone's own canvas paint and its bound style.
+An import arrives with a `SOLID` fill marked `visible: false`, and a frame with no visible fill is not a
+hit target over its empty area — so hovering the plot highlights nothing and the chart is reachable only
+from the layer panel, which is the second way these frames feel unlike the template. It costs no pixel:
+with the chart at the bottom of the z-order the clone's identical cream sits beneath it.
+
 **Put the chart at the BOTTOM of the frame's z-order** — `frame.insertChild(0, chart)`, not
 `appendChild` — and this is a usability requirement rather than a visual one. The import is a frame the
 size of the whole artboard, so appended last it covers the header and footer, and every double-click on

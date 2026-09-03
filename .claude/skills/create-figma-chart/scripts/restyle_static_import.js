@@ -146,6 +146,9 @@ for (const job of CONFIG.jobs) {
     reference.name = `${frame.name} — original SVG (unstyled)`;
     reference.x = frame.x - reference.width - job.referenceGap;
     reference.y = frame.y;
+    // Same hit-test point as the styled copy below: an unpainted frame cannot be hovered on the canvas.
+    const refPaint = Array.isArray(frame.fills) ? frame.fills.find((f) => f.type === "SOLID") : null;
+    if (refPaint) reference.fills = [{ ...refPaint, visible: true }];
   }
 
   styled.rescale(scale);
@@ -249,7 +252,18 @@ for (const job of CONFIG.jobs) {
 
   const old = frame.children.find((c) => c.name === "chart");
   styled.name = "chart";
-  styled.clipsContent = false;
+  // Paint the import's frame with the template's own canvas, and CLIP it like the template does. An
+  // import arrives with its fill switched OFF (`SOLID`, `visible: false`), and a frame with no visible
+  // fill is not a hit target over its own empty area — so hovering the plot highlights nothing, and the
+  // chart can only be reached from the layer panel. Every frame built this route has it. Painting it
+  // costs no pixel, because the chart sits at the bottom of the z-order with the clone's identical
+  // cream beneath it (measured: max channel difference 0 across 850x1095).
+  const canvasPaint = Array.isArray(frame.fills) ? frame.fills.find((f) => f.type === "SOLID") : null;
+  if (canvasPaint) {
+    styled.fills = [{ ...canvasPaint, visible: true }];
+    if (frame.fillStyleId && frame.fillStyleId !== figma.mixed) await styled.setFillStyleIdAsync(frame.fillStyleId);
+  }
+  styled.clipsContent = true;
   // Index 0 is the BOTTOM of the z-order, and this is a usability requirement rather than a visual
   // one: the import is a frame the size of the whole artboard, so appended LAST it covers the header
   // and footer, and every double-click on the subtitle or the Note then descends into `figure_1` and
