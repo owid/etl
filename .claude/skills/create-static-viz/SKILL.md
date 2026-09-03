@@ -351,19 +351,6 @@ The one adaptation: its Steps 7–8 look up grapher's node names (`connectors`,
 `horizontal-grid-lines`, `datapoints__<Entity>`). Ours are the `gid`s from Step 4 — hand over the
 naming scheme along with the file.
 
-**Three of that skill's geometry rows cannot pass on this route, and it is structural rather than a
-defect.** `box-alignment` and `gap` measure the chart GROUP's box against the content box and the band,
-which works for a grapher import because its fit step leaves a group hugging the plot. Ours is a FRAME
-the size of the SVG canvas — deliberately, so the plot's coordinates stay the template's — so its box
-IS the artboard: `box-alignment` reports left -16 / right +16 and `gap` reports negative insets, every
-time, on a frame that is correct. `margins` then flags the canvas rectangle itself.
-
-What to do instead of chasing them: delete matplotlib's frame-sized background patch on import (it
-paints nothing, so `restyle_static_import.js` now strips it for its bbox alone), and measure the band
-from the **ink** — the extreme edges of the painted leaves inside the chart — against `header.y +
-header.height` and the footer's first row. Report those two numbers. On the frame this lesson comes
-from that read 18.35 top / 17.01 bottom against a 12–16 target, against -70 / -79 from the stock rows.
-
 **Use grapher's OWN names for the data layers wherever the shape matches, because that skill's Step 8c
 checks key off them and skip when they are absent.** Measured on a real DI frame drawn by a local
 generator — nine panels, nine series lines, 27 direct labels, all correct — **seven rows skipped for
