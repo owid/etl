@@ -36,6 +36,16 @@ INDICATORS_FOR_ANALYSIS = {
     "p99p100Share_wid_pretaxNational_perAdult": "p99p100_share_pretax",
     "p90p100Share_wid_pretaxNational_perAdult": "p90p100_share_pretax",
     "palmaRatio_wid_pretaxNational_perAdult": "palma_ratio_pretax",
+    # WID's unfiltered series (`extrapolated = "yes"`). Published alongside the score-filtered ones
+    # because WID's own coverage is far wider there — the PIP-vs-WID comparison is otherwise limited
+    # to the country-years WID rates as directly data-backed, which is a quarter of the sample in
+    # recent years, and PIP's lined-up panel is itself partly extrapolated by the World Bank. Adding
+    # them leaves the `only_all_series` intersection unchanged, since the "yes" slice is a superset
+    # of the "no" one.
+    "gini_widExtrapolated_pretaxNational_perAdult": "p0p100_gini_pretax",
+    "p99p100Share_widExtrapolated_pretaxNational_perAdult": "p99p100_share_pretax",
+    "p90p100Share_widExtrapolated_pretaxNational_perAdult": "p90p100_share_pretax",
+    "palmaRatio_widExtrapolated_pretaxNational_perAdult": "palma_ratio_pretax",
     # "gini_wid_posttaxNational_perAdult": "p0p100_gini_posttax_nat",
     # "p99p100Share_wid_posttaxNational_perAdult": "p99p100_share_posttax_nat",
     # "p90p100Share_wid_posttaxNational_perAdult": "p90p100_share_posttax_nat",
@@ -318,6 +328,10 @@ def sanity_check_keyvars(tb: Table) -> None:
         "p99p100Share_wid_pretaxNational_perAdult",
         "p90p100Share_wid_pretaxNational_perAdult",
         "palmaRatio_wid_pretaxNational_perAdult",
+        "gini_widExtrapolated_pretaxNational_perAdult",
+        "p99p100Share_widExtrapolated_pretaxNational_perAdult",
+        "p90p100Share_widExtrapolated_pretaxNational_perAdult",
+        "palmaRatio_widExtrapolated_pretaxNational_perAdult",
     }
     missing = expected - set(tb["series_code"].unique())
     assert not missing, f"Missing expected keyvars series_code(s): {missing}"
