@@ -87,8 +87,17 @@ to it, and shift the children back by the same offset, with clipping left off. T
 size of the SVG canvas, which is the artboard, and a frame that size has no box to show: hovering the
 plot highlights a rectangle identical to the artboard's, so there is no way to see or grab the plot as
 a unit, and `verify_page.js`'s box-alignment and gap rows measure the canvas and report negative
-insets. Cropping moves nothing on the canvas — measured at max channel difference 0 across the frame.
-Leave the parked unstyled copy at full canvas size: it is there to be compared against the export.
+insets. Cropping moves nothing on the canvas — measured at max channel difference 0 across the frame. Then
+**snap each side that lands within a pixel of the header's content column onto it**, moving the
+children back so no ink shifts: a TEXT node's box carries its advance width rather than its glyphs, so
+cropping to ink alone left this frame at 15.92..833.88 against a 16..834 column and `box-alignment`,
+which measures to 0.05, failed on 0.08px of font metrics. Leave the parked unstyled copy at full
+canvas size and untouched: it is there to be compared against the export.
+
+**No font pass, and no anchor pass.** The SVG names Lato first (`EMITTED_FONT_STACK`), so the import
+arrives as Lato Regular/Bold — verified 156/8 on arrival — and the passes that exist to change the
+face and undo the drift it causes have nothing to do. Read the faces before assuming it: an import
+that comes in as Inter means the stack did not survive to the file.
 
 **Switch the import frame's fill ON**, to the clone's own canvas paint and its bound style.
 An import arrives with a `SOLID` fill marked `visible: false`, and a frame with no visible fill is not a
@@ -142,6 +151,8 @@ whole point of the two light fills above. Its `reflowLegend` pass is also wrong 
 one — it re-lays a row of runs from the leftmost, which collided them (doubled separators, overlapping
 names) where this step had already spaced them by measured advance.
 """
+
+import logging
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -420,15 +431,31 @@ LICENSE_TAGLINE_GAP = 8
 # The design asks for 12-16 on these frames; 14 is the middle of that.
 BAND_INSET = 14
 
-# Every measurement is taken in the font the figure is actually drawn in, which is not a given: seaborn's
-# `set_style` installs an Arial-first stack, and `FontProperties()` with no family resolves matplotlib's
-# own DejaVu-first default instead. Those two are ~15% apart at the same size, and because the style was
-# applied *after* the title and subtitle were wrapped, this step measured in one font and drew in the
-# other — which is what made the slot allowances below look like they needed to be 1.0. Naming the stack
-# and passing it to every `FontProperties` keeps the two in step whatever a machine has installed.
-DRAWN_FONT_STACK = ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans", "sans-serif"]
+# Two font stacks, because two different things read them.
+#
+# `EMITTED_FONT_STACK` is what lands in the SVG's `font-family`, verbatim — matplotlib copies the rcParam
+# out rather than writing the font it resolved. Naming **Lato** first therefore makes Figma render the
+# import in the template's own typeface on arrival, which is worth more than it sounds: the frame no
+# longer needs a font pass, and with no face change there is no label drift for an anchor pass to undo.
+# Without it Figma resolves none of `Arial, Helvetica, DejaVu Sans` and substitutes Inter, which is wider
+# — the parked copy of this chart overran its canvas by 39px that way.
+#
+# `MEASURED_FONT_STACK` is what this step measures and draws with, and it deliberately does NOT name
+# Lato: Lato is not installed here, so asking for it would only make every `findfont` call log a miss
+# before falling through to Arial. Measuring in the font actually resolved is what the slot allowances
+# below are calibrated against — and getting that wrong is not academic. seaborn's `set_style` installs
+# its own Arial-first stack, `FontProperties()` with no family resolves matplotlib's DejaVu-first
+# default, the two are ~15% apart, and because the style was applied *after* the title and subtitle were
+# wrapped this step measured in one font and drew in the other, which made the allowances look as though
+# they needed to be 1.0.
+EMITTED_FONT_STACK = ["Lato", "Arial", "Helvetica", "sans-serif"]
+MEASURED_FONT_STACK = ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans", "sans-serif"]
 matplotlib.rcParams["font.family"] = "sans-serif"
-matplotlib.rcParams["font.sans-serif"] = DRAWN_FONT_STACK
+matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
+# matplotlib logs a miss for every name it cannot resolve, and `Lato` is meant to be missing here — it
+# is a request to whoever opens the SVG, not to this machine. Quieten just that logger, so a real
+# problem with a font this step DOES need is still visible.
+logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
 
 # The template sets its slots in Lato and Playfair Display, neither of which is installed here, so this
 # step predicts their line counts from the font it does have. Both directions are measured, in Figma, at
@@ -719,6 +746,9 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     """
     sns.set_style("ticks")
     sns.set_palette("deep")
+    # After seaborn, not before: `set_style` replaces `font.sans-serif` with its own list, which is how
+    # this step came to emit a stack it had not chosen.
+    matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
     palette = sns.color_palette("deep")
 
     width_px, height_px = layout["size"]
@@ -1446,14 +1476,14 @@ def text_width_px(text: str, fontsize: float, bold: bool = False) -> float:
     """
     if not text.strip():
         return 0.0
-    prop = FontProperties(family=DRAWN_FONT_STACK, size=fontsize, weight="bold" if bold else "normal")
+    prop = FontProperties(family=MEASURED_FONT_STACK, size=fontsize, weight="bold" if bold else "normal")
     points = TextPath((0, 0), text, prop=prop).get_extents().width
     return points / POINTS_PER_PIXEL
 
 
 def cap_height_px(fontsize: float) -> float:
     """Height of a digit's ink above the baseline, in template pixels."""
-    prop = FontProperties(family=DRAWN_FONT_STACK, size=fontsize)
+    prop = FontProperties(family=MEASURED_FONT_STACK, size=fontsize)
     return TextPath((0, 0), "0", prop=prop).get_extents().ymax / POINTS_PER_PIXEL
 
 
