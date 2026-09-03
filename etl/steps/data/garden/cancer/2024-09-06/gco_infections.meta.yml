@@ -20,13 +20,12 @@ definitions:
   # Readable labels for the three dimensions. The source labels are kept as dimension values (so indicator short names
   # do not change); only the displayed text is rewritten. "Other Non-Hodkin lymphoma" is a typo in the source.
   cases_of: |-
-    <% if cancer == "All cancers but non-melanoma skin cancer (C00-97, but C44)" %>cancer cases<% else %>cases of << cancer.lower().replace("hodkin", "hodgkin").replace("hodgkin", "Hodgkin").replace("burkitt", "Burkitt").replace("kaposi", "Kaposi").replace("t-cell", "T-cell") >><% endif %>
+    <% if cancer == "All cancers but non-melanoma skin cancer (C00-97, but C44)" %>cancer cases (excluding non-melanoma skin cancer)<% else %>cases of << cancer.lower().replace("hodkin", "hodgkin").replace("hodgkin", "Hodgkin").replace("burkitt", "Burkitt").replace("kaposi", "Kaposi").replace("t-cell", "T-cell") >><% endif %>
   agent_phrase: |-
     <% if agent == "All infectious agents" %>infections<% elif agent == "HPV" %>human papillomavirus (HPV)<% elif agent == "EBV" %>Epstein-Barr virus (EBV)<% elif agent == "Hepatitis B virus" %>hepatitis B virus<% elif agent == "Hepatitis C virus" %>hepatitis C virus<% elif agent == "Human T-cell lymphotropic virus" %>human T-cell lymphotropic virus<% elif agent == "Human herpesvirus type 8" %>human herpesvirus type 8<% else %><< agent >><% endif %>
   # Sex is only spelled out for men and women; "both sexes" is the default and is left implicit.
   among_sex: <% if sex == "males" %> among men<% elif sex == "females" %> among women<% endif %>
   people: <% if sex == "males" %>men<% elif sex == "females" %>women<% else %>people<% endif %>
-  nmsc: <% if cancer == "All cancers but non-melanoma skin cancer (C00-97, but C44)" %> Non-melanoma skin cancers are excluded.<% endif %>
   footnote: To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
   processing_regions: |-
     For world regions, Our World in Data sums the values of the countries in the region with data. For cancer sites, the source only reports men and women separately; the both-sexes values are the sum of the two.
@@ -43,21 +42,21 @@ tables:
     variables:
       cases:
         title: Number of new {definitions.cases_of}{definitions.among_sex}
-        description_short: Estimated number of new {definitions.cases_of}{definitions.among_sex}.{definitions.nmsc}
+        description_short: Estimated number of new {definitions.cases_of}{definitions.among_sex}.
         unit: cases
         description_processing: "{definitions.processing_regions}"
         processing_level: major
 
       attr_cases:
         title: Number of new {definitions.cases_of} caused by {definitions.agent_phrase}{definitions.among_sex}
-        description_short: Estimated number of new {definitions.cases_of}{definitions.among_sex} that are attributed to {definitions.agent_phrase}.{definitions.nmsc}
+        description_short: Estimated number of new {definitions.cases_of}{definitions.among_sex} that are attributed to {definitions.agent_phrase}.
         unit: cases
         description_processing: "{definitions.processing_regions}"
         processing_level: major
 
       attr_cases_share:
         title: Share of new {definitions.cases_of} caused by {definitions.agent_phrase}{definitions.among_sex}
-        description_short: Estimated share of new {definitions.cases_of}{definitions.among_sex} that are attributed to {definitions.agent_phrase}.{definitions.nmsc}
+        description_short: Estimated share of new {definitions.cases_of}{definitions.among_sex} that are attributed to {definitions.agent_phrase}.
         unit: "%"
         short_unit: "%"
         description_processing: |-
@@ -68,7 +67,7 @@ tables:
         # The source's own attributable fraction. It only covers the all-cancers total by agent, for countries; the
         # "attr_cases_share" indicator above covers cancer sites, regions and both sexes.
         title: Share of new {definitions.cases_of} caused by {definitions.agent_phrase}{definitions.among_sex} (population attributable fraction)
-        description_short: Estimated share of new {definitions.cases_of}{definitions.among_sex} that are attributed to {definitions.agent_phrase}, as published by IARC.{definitions.nmsc}
+        description_short: Estimated share of new {definitions.cases_of}{definitions.among_sex} that are attributed to {definitions.agent_phrase}, as published by IARC.
         unit: "%"
         short_unit: "%"
         presentation:
@@ -76,7 +75,7 @@ tables:
 
       asir:
         title: New {definitions.cases_of} per 100,000 {definitions.people} (age-standardized)
-        description_short: Estimated number of new {definitions.cases_of} per 100,000 {definitions.people}, age-standardized so that populations with different age structures can be compared.{definitions.nmsc}
+        description_short: Estimated number of new {definitions.cases_of} per 100,000 {definitions.people}, age-standardized so that populations with different age structures can be compared.
         unit: cases per 100,000 {definitions.people}
         presentation:
           grapher_config:
@@ -84,7 +83,7 @@ tables:
 
       asir_att:
         title: New {definitions.cases_of} caused by {definitions.agent_phrase} per 100,000 {definitions.people} (age-standardized)
-        description_short: Estimated number of new {definitions.cases_of} attributed to {definitions.agent_phrase} per 100,000 {definitions.people}, age-standardized so that populations with different age structures can be compared.{definitions.nmsc}
+        description_short: Estimated number of new {definitions.cases_of} attributed to {definitions.agent_phrase} per 100,000 {definitions.people}, age-standardized so that populations with different age structures can be compared.
         unit: cases per 100,000 {definitions.people}
         presentation:
           grapher_config:
