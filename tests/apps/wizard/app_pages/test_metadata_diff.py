@@ -1537,7 +1537,42 @@ def test_a_tick_only_counts_while_the_text_it_was_made_against_stands(monkeypatc
     assert count_ticked("engine", []) == 0
 
 
-def test_the_grids_chart_leaves_are_listed_by_name():
+def test_the_grids_chart_leaves_are_listed_busiest_first():
+    """Which of seventy charts matters is the question an author has, and a name cannot answer it.
+
+    Views decide the order; the name breaks ties and carries the list when no view data came back. A chart
+    with nothing recorded sorts last, because an absent row is not a measured zero.
+    """
+    from apps.wizard.app_pages.metadata_diff.blast_section import _chart_branch
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach
+
+    reach = [
+        ChangeReach(
+            field="descriptionKey",
+            old="a",
+            new="b",
+            charts=[
+                {"chartId": 1, "slug": "quiet", "title": "Quiet chart", "has_data_page": True},
+                {"chartId": 2, "slug": "busy", "title": "Busy chart", "has_data_page": True},
+                {"chartId": 3, "slug": "unmeasured", "title": "Unmeasured chart", "has_data_page": True},
+            ],
+        )
+    ]
+    views = {1: 500, 2: 195_720}
+    leaves = _chart_branch(reach, views)["groups"][0]["leaves"]
+    assert [leaf["label"] for leaf in leaves] == ["Busy chart", "Quiet chart", "Unmeasured chart"]
+    # The count rides beside the slug, formatted, and is absent where nothing was recorded.
+    assert leaves[0]["sublabel"] == "busy · 195,720 views/yr"
+    assert leaves[2]["sublabel"] == "unmeasured"
+    assert "Most viewed first" in _chart_branch(reach, views)["note"]
+
+    # No view data at all: name order, and the branch says so rather than implying a popularity order.
+    fallback = _chart_branch(reach, {})["groups"][0]["leaves"]
+    assert [leaf["label"] for leaf in fallback] == ["Busy chart", "Quiet chart", "Unmeasured chart"]
+    assert "name order" in _chart_branch(reach, {})["note"]
+
+
+def test_the_grids_chart_leaves_are_grouped_by_prominence():
     """Dozens of names over several columns are scannable only in an order; reach order is not one."""
     from apps.wizard.app_pages.metadata_diff.blast_section import _chart_branch
     from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach
@@ -1558,11 +1593,61 @@ def test_the_grids_chart_leaves_are_listed_by_name():
             ],
         )
     ]
-    groups = {g["name"]: [leaf["label"] for leaf in g["leaves"]] for g in _chart_branch(reach, set())["groups"]}
+    groups = {g["name"]: [leaf["label"] for leaf in g["leaves"]] for g in _chart_branch(reach)["groups"]}
     assert groups["Data pages"] == ["alpha-chart", "zebra-chart"]
     assert groups["Unpublished drafts"] == ["wip-alpha", "wip-zeta"]
     # The prominence split still decides which group a chart is in; sorting happens inside each.
     assert groups["Via Learn more about this data"] == ["middle-chart"]
+
+
+def test_a_chart_leaf_is_named_by_its_title_with_the_slug_beneath():
+    """A slug is what identifies a chart; a title is what a reviewer recognises. Both, in a hierarchy.
+
+    Sorted by the name on screen, or the order is one the reader cannot see. A chart with no title of its
+    own — its title inherited from indicator metadata, which this config column does not carry — keeps the
+    slug as its name rather than showing it twice.
+    """
+    from apps.wizard.app_pages.metadata_diff.blast_section import _chart_branch
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach
+    from apps.wizard.app_pages.metadata_diff.tree import render_multi_tree_html
+
+    reach = [
+        ChangeReach(
+            field="descriptionKey",
+            old="a",
+            new="b",
+            charts=[
+                {"chartId": 1, "slug": "zebra-chart", "title": "Access to electricity", "has_data_page": True},
+                {"chartId": 2, "slug": "alpha-chart", "title": "Zebra populations", "has_data_page": True},
+                {"chartId": 3, "slug": "no-title-chart", "title": None, "has_data_page": True},
+            ],
+        )
+    ]
+    branch = _chart_branch(reach)
+    leaves = {leaf["label"]: leaf["sublabel"] for leaf in branch["groups"][0]["leaves"]}
+    assert leaves == {
+        "Access to electricity": "zebra-chart",
+        "Zebra populations": "alpha-chart",
+        "no-title-chart": "",
+    }
+    # Ordered by the name on screen, not by the slug: were it by slug, "alpha-chart" would lead.
+    assert [leaf["label"] for leaf in branch["groups"][0]["leaves"]] == [
+        "Access to electricity",
+        "no-title-chart",
+        "Zebra populations",
+    ]
+
+    html_out, _height = render_multi_tree_html([], branches=[branch])
+    assert '<span class="mdd-leaf-sub">zebra-chart</span>' in html_out
+    assert "#mdd-root .mdd-leaf-sub" in html_out
+    # The branch says which order its leaves are in, since a list of names does not show it.
+    assert '<div class="mdd-branch-note">' in html_out
+    # One arrow per leaf, the blue "this opens" one. The bare purple `.mdd-impact` arrow that used to sit
+    # beside it read as a second link, since it was the same glyph.
+    after_title = html_out[html_out.index("Access to electricity") :]
+    leaf_html = after_title[: after_title.index("</a>")]
+    assert leaf_html.count("&#8599;") == 1, f"one arrow per leaf, got: {leaf_html}"
+    assert "mdd-impact" not in leaf_html
 
 
 def test_charts_are_listed_most_prominent_first():
@@ -3010,9 +3095,9 @@ def test_the_grid_only_offers_a_filter_for_surfaces_the_branch_reaches():
     assert set(SURFACE_LABELS) >= set(surface_options([on_mdim, on_chart, on_explorer]))
 
     # The charts branch is built only when charts are wanted and there is one to draw.
-    assert _chart_branches([on_chart], set(), "charts") and _chart_branches([on_chart], set(), "all")
-    assert _chart_branches([on_chart], set(), "mdims") == []
-    assert _chart_branches([on_mdim], set(), "charts") == [], "no chart reached, so no empty branch"
+    assert _chart_branches([on_chart], "charts") and _chart_branches([on_chart], "all")
+    assert _chart_branches([on_chart], "mdims") == []
+    assert _chart_branches([on_mdim], "charts") == [], "no chart reached, so no empty branch"
 
 
 def test_a_section_badge_says_finished_or_not_and_nothing_else():

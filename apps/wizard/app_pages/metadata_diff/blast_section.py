@@ -45,7 +45,6 @@ from apps.wizard.app_pages.metadata_diff.render import (
     DIFF_CSS,
     impact_counts,
     render_chart_list,
-    view_impact,
 )
 from apps.wizard.app_pages.metadata_diff.tree import render_multi_tree_html
 from apps.wizard.utils.components import url_persist
@@ -364,7 +363,7 @@ def _dimension_tree(
         if _wants(surface, "mdims"):
             st.caption("No MDim renders any of these changes, so there is no MDim grid to draw.")
         hierarchies = [explorer_hierarchy] if explorer_hierarchy else []
-        branches = _chart_branches(reach, set(), surface)
+        branches = _chart_branches(reach, surface)
         if not hierarchies and not branches:
             # Filtered to a surface these edits do not reach at all. Said plainly, rather than drawn as an
             # empty shell — and only reachable by choosing it, since a surface with nothing on it is not
@@ -390,7 +389,7 @@ def _dimension_tree(
     df = cached.mdim_changes(source_engine, target_engine)
     shown, dropped = affected[:MAX_TREE_MDIMS], affected[MAX_TREE_MDIMS:]
 
-    sections, badged = [], set()
+    sections = []
     for catalog_path in shown:
         row = df.loc[catalog_path] if catalog_path in df.index else None
         cache_key = f"{row.get('configMd5_source')}-{row.get('configMd5_target')}" if row is not None else ""
@@ -404,8 +403,6 @@ def _dimension_tree(
 
         ids = sorted({v.indicator_id for v in view_diffs if v.affects_indicator and v.indicator_id is not None})
         usage = cached.usage_for_indicators(tuple(ids), catalog_path, source_engine, cache_key=cache_key)
-        # What this MDim's `↗ N charts` badges account for, union across every MDim drawn.
-        badged |= {c["chartId"] for v in view_diffs for c in view_impact(v, usage)[0]}
 
         # Each leaf opens that view on this staging server — the view as a reader gets it, which is the
         # question you have when you click one view out of fifty.
@@ -442,7 +439,7 @@ def _dimension_tree(
 
     tree_html, height = render_multi_tree_html(
         [],
-        branches=_chart_branches(reach, badged, surface),
+        branches=_chart_branches(reach, surface),
         # The explorers are a hierarchy of grids now, not a flat branch: their views have dimensions.
         hierarchies=[h for h in ({"id": "mdims", "label": "MDims", "sections": sections}, explorer_hierarchy) if h],
         self_url=f"{SOURCE.wizard_url.rstrip('/')}/metadata-diff",
@@ -459,11 +456,17 @@ def _wants(surface: str, kind: str) -> bool:
     return surface in ("all", kind)
 
 
-def _chart_branches(reach: list[ChangeReach], badged: set, surface: str) -> list[dict[str, Any]]:
-    """The charts branch, when the filter draws charts and these edits reach one."""
+def _chart_branches(reach: list[ChangeReach], surface: str) -> list[dict[str, Any]]:
+    """The charts branch, when the filter draws charts and these edits reach one.
+
+    The views lookup happens here rather than inside `_chart_branch` so it is paid only when the branch is
+    actually drawn — under "MDims only" it is not, and it is the one reading that leaves OWID's own
+    databases.
+    """
     if not _wants(surface, "charts") or not any(r.charts or r.draft_charts for r in reach):
         return []
-    return [_chart_branch(reach, badged)]
+    ids = sorted({int(c["chartId"]) for r in reach for c in (*r.charts, *r.draft_charts)})
+    return [_chart_branch(reach, cached.chart_views(tuple(ids)))]
 
 
 def surface_options(reach: list[ChangeReach]) -> list[str]:
@@ -637,7 +640,6 @@ def _explorer_branch(reach: list[ChangeReach]) -> dict[str, Any] | None:
             {
                 "label": f"{slug} · {n_views} view{'s' if n_views != 1 else ''}",
                 "href": f"{SOURCE.site}/explorers/{slug}",
-                "badged": False,
                 "preview": (
                     f'<p class="mdd-impact-line">{html.escape(field_label(change.field))} changed</p>'
                     f'<div class="mdd-diff">{_preview(change)}</div>'
@@ -657,13 +659,21 @@ def _explorer_branch(reach: list[ChangeReach]) -> dict[str, Any] | None:
     }
 
 
-def _chart_branch(reach: list[ChangeReach], badged: set) -> dict[str, Any]:
+def _chart_branch(reach: list[ChangeReach], views: dict[int, int] | None = None) -> dict[str, Any]:
     """The charts these edits reach, as a branch of the grid: grouped by how a reader meets the text.
 
     Grouped the way the chart lists elsewhere group: a data page lays the text out, a multi-indicator
-    chart keeps it behind "Learn more about this data", and a draft shows nobody anything. Charts the
-    grid already accounts for through a view badge are marked rather than hidden, so the branch's total
-    and the badges' totals can be reconciled by eye.
+    chart keeps it behind "Learn more about this data", and a draft shows nobody anything.
+
+    Each leaf is named by the chart's **title**, with its slug underneath in small grey type. The title is
+    what a reviewer recognises — "Share of population living in extreme poverty" rather than
+    `share-of-population-in-extreme-poverty` — and the slug is still what identifies the chart in a URL,
+    so both are shown, the way a grid section carries its catalogPath under its name.
+
+    Ordered most-viewed first within each group, since which of seventy charts matters is the question an
+    author has and the one a name cannot answer: on this branch the busiest carries 196,000 views a year
+    and the median a few hundred. A chart with no views recorded sorts last rather than first — 16 of
+    these 76 have none, drafts among them — and with no view data at all the order falls back to the name.
     """
     charts, drafts = {}, {}
     for r in reach:
@@ -679,28 +689,45 @@ def _chart_branch(reach: list[ChangeReach], badged: set) -> dict[str, Any]:
             if published and chart.get("slug")
             else SOURCE.chart_admin_site(chart.get("chartId"))  # ty: ignore
         )
+        # A chart whose title is only set in its config carries one here; one that inherits its title from
+        # indicator metadata may not, and then the slug is the only name there is — shown as the name
+        # itself rather than repeated on both lines.
+        title = str(chart.get("title") or "").strip()
+        seen = (views or {}).get(int(chart["chartId"]))
+        # Nothing said when nothing was recorded: absence of a row in the warehouse is not a measured
+        # zero, and "0 views" beside a chart published last week would be a claim rather than a fact.
+        sub = [part for part in (slug if title else "", f"{seen:,} views/yr" if seen else "") if part]
         return {
-            "label": slug,
+            "label": title or slug,
+            "sublabel": " · ".join(sub),
+            "views": seen or 0,
             "href": href,
-            "badged": chart.get("chartId") in badged,
             "preview": (
                 f'<p class="mdd-impact-line">{html.escape(field_label(change.field))} changed</p>'
                 f'<div class="mdd-diff">{_preview(change)}</div>'
             ),
         }
 
-    # By name within each group: the list runs to dozens of charts laid out over several columns, and
-    # "is my chart in here" is answerable by eye only if there is an order to scan. Reach order is the
-    # order the comparison happened to find them, which is no order at all to a reader.
-    def by_name(leaves: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        return sorted(leaves, key=lambda leaf: str(leaf["label"]))
+    # Busiest first, then by the name on screen: the list runs to dozens of charts over several columns,
+    # and both "which of these matters" and "is mine in here" have to be answerable by eye. Reach order is
+    # the order the comparison happened to find them, which is no order at all to a reader.
+    def by_reach(leaves: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return sorted(leaves, key=lambda leaf: (-int(leaf["views"]), str(leaf["label"]).casefold()))
 
-    on_page = by_name([leaf(c, r) for c, r in charts.values() if c.get("has_data_page", True)])
-    drawer = by_name([leaf(c, r) for c, r in charts.values() if not c.get("has_data_page", True)])
-    draft_leaves = by_name([leaf(c, r, published=False) for c, r in drafts.values()])
+    on_page = by_reach([leaf(c, r) for c, r in charts.values() if c.get("has_data_page", True)])
+    drawer = by_reach([leaf(c, r) for c, r in charts.values() if not c.get("has_data_page", True)])
+    draft_leaves = by_reach([leaf(c, r, published=False) for c, r in drafts.values()])
+    measured = sum(1 for leaf in (*on_page, *drawer, *draft_leaves) if leaf["views"])
     return {
         "id": "charts",
         "label": "Charts",
+        # Which order this is, said rather than left to be inferred from the numbers — and the honest
+        # answer when the warehouse could not be reached is that it is alphabetical.
+        "note": (
+            f"Most viewed first — page views over the last year, known for {measured} of these charts."
+            if measured
+            else "In name order: this server could not read how much these charts are viewed."
+        ),
         "groups": [
             {"name": "Data pages", "note": "The text is laid out on the chart's data page.", "leaves": on_page},
             {

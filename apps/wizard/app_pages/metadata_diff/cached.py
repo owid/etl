@@ -39,6 +39,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     view_url,
 )
 from apps.wizard.app_pages.metadata_diff.usage import charts_using_indicators, mdims_using_indicators
+from etl.analytics.data import get_chart_views_last_n_days
 from etl.config import OWIDEnv
 
 log = get_logger()
@@ -324,6 +325,29 @@ def explorer_changes(_source_engine: Engine, _target_engine: Engine, cache_key: 
     """Published explorers whose view text changed, split into this branch's and baseline lag."""
     scope, built = shared_facts(_source_engine, cache_key=cache_key)
     return discovery.changed_explorer_views(_source_engine, _target_engine, scope, built)
+
+
+@st.cache_data(ttl=CACHE_TTL, show_spinner="Reading how much these charts are viewed…")
+def chart_views(chart_ids: tuple[int, ...], n_days: int = 365, cache_key: str = "") -> dict[int, int]:
+    """chart id -> page views over the last `n_days`, for ordering a list of affected charts.
+
+    A year rather than a month: what an author wants from this order is which of these charts matters,
+    and a month of traffic on a seasonal topic answers a different question.
+
+    Empty on any failure, and the caller falls back to name order. This is the one reading in the tool
+    that leaves OWID's databases for the analytics warehouse, so it is also the one most likely to be
+    unavailable — no credentials on this server, or the warehouse down — and a review must not stop for
+    it. Measured at ~3s for 76 charts, which is why it is cached and fetched only when the branch that
+    needs it is actually drawn.
+    """
+    if not chart_ids:
+        return {}
+    try:
+        df = get_chart_views_last_n_days(chart_ids=list(chart_ids), n_days=n_days)
+    except Exception as e:  # noqa: BLE001 — an unreachable warehouse means "unknown", not a broken page
+        log.warning("metadata_diff.chart_views_unavailable", error=str(e))
+        return {}
+    return {int(row["chart_id"]): int(row["views"]) for row in df.to_dict("records")}
 
 
 @st.cache_data(ttl=CACHE_TTL, show_spinner=False)

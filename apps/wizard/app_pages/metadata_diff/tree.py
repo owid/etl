@@ -284,9 +284,12 @@ def _render_leaf_branch(branch: dict[str, Any], preview_offset: int) -> tuple[st
 
     Used for the surfaces that have no dimension grid of their own: charts, and explorers. `branch` is
     {"id": str, "label": str, "groups": [{"name": str, "note": str, "leaves": [leaf, ...]}]} where each
-    leaf is {"label", "href", "preview", "badged"}. Leaves reuse `.mdd-leaf` and `data-view`, indexing
-    into the shared previews array from `preview_offset`, so the existing hover and filter code applies
-    unchanged. Everything here is marked "changed": a leaf in this list is affected by definition.
+    leaf is {"label", "href", "preview"} plus an optional "sublabel" drawn under the name in small grey
+    type — the way a grid section carries its catalogPath under its title. An optional `branch["note"]`
+    says what order the leaves are in. Leaves reuse `.mdd-leaf` and
+    `data-view`, indexing into the shared previews array from `preview_offset`, so the existing hover and
+    filter code applies unchanged. Everything here is marked "changed": a leaf in this list is affected by
+    definition.
     """
     previews: list[str] = []
     group_html: list[str] = []
@@ -301,15 +304,21 @@ def _render_leaf_branch(branch: dict[str, Any], preview_offset: int) -> tuple[st
         for chart in items:
             index = preview_offset + len(previews)
             previews.append(chart.get("preview") or "")
-            # The same marker the grid uses on a view, so a chart the grid already accounts for is
-            # recognisable as the same fact rather than a second one.
-            mark = '<span class="mdd-impact" title="Also reachable from a view badge in the grid">&#8599;</span>'
+            # One arrow per leaf, and it means "this opens". A second, purple one used to sit beside it
+            # for a chart the grid already accounted for through a view badge — the same glyph as the
+            # link's, so the two read as two links. The view badges it referred to say `↗ 10 charts` in
+            # words, which is what makes those legible; a bare arrow said nothing anyone could act on.
+            sub = (
+                f'<span class="mdd-leaf-sub">{html.escape(str(chart["sublabel"]))}</span>'
+                if chart.get("sublabel")
+                else ""
+            )
             leaves.append(
                 f'<div class="mdd-node mdd-leafnode mdd-n-changed">'
                 f'<a class="mdd-box mdd-leaf mdd-changed" data-view="{index}" '
                 f'href="{html.escape(chart.get("href") or "")}" target="_blank" rel="noopener">'
-                f"{html.escape(chart.get('label') or '')}{mark if chart.get('badged') else ''}"
-                f'<span class="mdd-golink">&#8599;</span></a>'
+                f"{html.escape(chart.get('label') or '')}"
+                f'<span class="mdd-golink">&#8599;</span>{sub}</a>'
                 f"</div>"
             )
         title = html.escape(group.get("name") or "")
@@ -337,8 +346,12 @@ def _render_leaf_branch(branch: dict[str, Any], preview_offset: int) -> tuple[st
 
     # A sibling of the "MDims" hierarchy: same header level, its groups indented the same way.
     label = html.escape(branch.get("label") or "Charts")
+    # What order the leaves are in, if the caller says. A list of seventy names is read differently
+    # depending on the answer, and it is not inferable from the list itself.
+    note = f'<div class="mdd-branch-note">{html.escape(str(branch["note"]))}</div>' if branch.get("note") else ""
     body = (
         f'<div class="mdd-super-title">{label}<span class="mdd-count">{total} affected</span></div>'
+        f"{note}"
         f'<div class="mdd-super-children">{"".join(group_html)}</div>'
     )
     return body, previews
@@ -600,7 +613,8 @@ def render_multi_tree_html(
     # flat branch's leaves wrap into, since those render expanded and are in the initial layout. The frame
     # does not scroll, so an under-estimate shows a cut-off tree until `fit()` runs; the cap keeps the
     # overshoot bounded on a branch reaching hundreds of charts.
-    leaf_rows = (branch_leaves + LEAF_COLUMNS - 1) // LEAF_COLUMNS
+    # A leaf is two lines now (title over slug), so its rows are half again as tall as a grid row.
+    leaf_rows = ((branch_leaves + LEAF_COLUMNS - 1) // LEAF_COLUMNS) * 3 // 2
     extra_rows = len(section_nodes) + drawn_groups + drawn_branches + leaf_rows
     initial_height = min(INITIAL_HEIGHT_CAP_PX, 170 + (visible_leaves + extra_rows) * 38)
     return (
@@ -650,15 +664,15 @@ def render_multi_tree_html(
     #mdd-root .mdd-children {{ display: flex; flex-direction: column; border-left: 2px solid #e3e3e3;
                                margin-left: 10px; padding-left: 14px; }}
     /* A flat branch (charts, explorers with no grid) is a long list of names rather than a dimension
-       column, so its leaves wrap into as many columns as the width allows. Capped in height because a
-       WDI-scale update reaches hundreds of charts: past the cap this box scrolls on its own rather than
-       the page growing without limit. Everything stays in the DOM and findable. */
+       column, so its leaves wrap into as many columns as the width allows. Deliberately unbounded in
+       height: a `max-height` here scrolled inside a frame that is itself inside the scrolling page, and
+       two nested scrollbars are worse than a long page. The columns are what shorten it — measured, 76
+       names went from 76 rows to about 20. */
     /* `flex: 1` because this container is a flex child of `.mdd-node`: left to size itself it shrinks to
        its content, and `auto-fill` then had a narrow box to fill — measured, 18 names still came back as
        one column. `min-width: 0` lets it shrink below its longest name instead of forcing the row wider. */
     #mdd-root .mdd-leaf-grid {{ display: grid; align-content: start; flex: 1 1 auto; min-width: 0;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); column-gap: 10px;
-      max-height: 560px; overflow-y: auto; }}
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); column-gap: 10px; }}
     /* A cell has a definite width and a chart slug can be 50-odd characters, so the name wraps inside its
        own cell. Wraps rather than clips: the slug *is* the chart's identity, and half of one identifies
        nothing. `.mdd-box` is `nowrap` and `flex-shrink: 0` for the dimension grids, where the opposite is
@@ -666,6 +680,12 @@ def render_multi_tree_html(
     #mdd-root .mdd-leaf-grid .mdd-node {{ margin: 1px 0; min-width: 0; }}
     #mdd-root .mdd-leaf-grid .mdd-box {{ flex-shrink: 1; min-width: 0; white-space: normal;
       overflow-wrap: anywhere; }}
+    /* The slug under a chart's title, styled as a grid section's subtitle is: the title is what a reviewer
+       recognises, the slug is what identifies it in a URL or a redirect, and both are wanted. Not bold
+       even inside a `.mdd-changed` box, which sets `font-weight: 600` on the whole leaf. */
+    #mdd-root .mdd-branch-note {{ color: #868e96; font-size: 12px; margin: 2px 0 6px; }}
+    #mdd-root .mdd-leaf-sub {{ display: block; color: #868e96; font-size: 11px; font-weight: 400;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin-top: 1px; }}
     #mdd-root .mdd-box {{ border: 1.5px solid; border-radius: 6px; padding: 4px 10px; margin: 2px 0;
                           white-space: nowrap; cursor: pointer; text-decoration: none; color: inherit;
                           background: #fff; flex-shrink: 0; display: inline-block; }}
