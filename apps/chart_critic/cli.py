@@ -52,6 +52,9 @@ console = Console()
 
 SEVERITY_COLOR = {"high": "red", "medium": "yellow", "low": "cyan"}
 
+# Slack's documented chat.postMessage limit is one message per second per channel.
+POST_INTERVAL_SECONDS = 1.0
+
 # Grapher query parameters the model is allowed to put in a link. Anything else it invents is
 # dropped rather than passed through into a URL a reviewer will click.
 ALLOWED_PARAMS = {"country", "time", "tab", "region", "stackMode", "mapSelect", "facet", "yScale", "xScale"}
@@ -627,6 +630,10 @@ def _post_digest(messages: list[str]) -> None:
     the thread that hangs off it. A failure part-way leaves the earlier messages posted and the
     state unrecorded, so tomorrow re-posts the whole digest — the same trade the caller makes.
 
+    Paced at Slack's documented ``chat.postMessage`` rate of one message per second per channel.
+    A digest is at most six messages, so this costs a run five seconds and takes the burst — and
+    the partial post a 429 mid-loop would leave behind — off the table.
+
     Deliberately not tolerant of a missing token: ``send_slack_message`` prints to stdout when
     ``SLACK_API_TOKEN`` is unset, which in a scheduled build is indistinguishable from a
     successful post — the failure mode where a job runs green for weeks and nobody notices the
@@ -637,7 +644,9 @@ def _post_digest(messages: list[str]) -> None:
 
     if not config.SLACK_API_TOKEN:
         raise click.ClickException("--post needs SLACK_API_TOKEN; refusing to silently print instead")
-    for message in messages:
+    for i, message in enumerate(messages):
+        if i:
+            time.sleep(POST_INTERVAL_SECONDS)
         send_slack_message(digest.SLACK_CHANNEL, message)
     console.print(f"[green]posted {len(messages)} message(s) to {digest.SLACK_CHANNEL}[/green]")
 

@@ -47,6 +47,11 @@ SERVICE_ACCOUNTS = {"etl@ourworldindata.org"}
 # one scanning pattern.
 SEVERITY_DOT = {"high": ":red_circle:", "medium": ":large_orange_circle:", "low": ":large_yellow_circle:"}
 
+# On every finding rather than once in the lead. The lead says what the sweep was; this says what
+# the claim is worth, and it is the finding that gets forwarded, quoted and replied to on its own.
+# Plain italics, no nested code span: Slack mrkdwn renders nested formatting unreliably.
+CAVEAT = "_A chart-critic claim to check, not a confirmed error._"
+
 # What a person reads over coffee. If the sweep found more, the ranking is the deliverable.
 MAX_FINDINGS = 5
 
@@ -316,11 +321,12 @@ def _chart_title(result: dict[str, Any]) -> str:
 def _format_finding(
     result: dict[str, Any], issue: dict[str, Any], facts: dict[str, dict[str, Any]] | None = None
 ) -> str:
-    """One finding as its own message: a linked bold title, the claim in a sentence, and a footer
-    of severity, readership, an admin edit link and whoever last edited the chart.
+    """One finding as its own message: a linked bold title, the claim in a sentence, a footer of
+    severity, readership, an admin edit link and whoever last edited the chart, and the caveat.
 
     Self-contained on purpose. It is read next to the lead message but it is also what someone
-    quotes, forwards or replies to on its own, so it carries the link and the edit action itself.
+    quotes, forwards or replies to on its own, so it carries the link, the edit action and — the
+    part that would otherwise be left behind in the lead — what the claim is actually worth.
     """
     chart = (facts or {}).get(result["slug"]) or {}
     url = issue.get("url") or f"https://ourworldindata.org/grapher/{result['slug']}"
@@ -332,7 +338,8 @@ def _format_finding(
         footer.append(f"<{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit chart>")
     if editor := chart.get("editor_mention"):
         footer.append(f"last edited by {editor}")
-    return f"*<{url}|{_chart_title(result)}>*\n{issue.get('claim', '').rstrip('.')}.\n{'   ·   '.join(footer)}"
+    claim = issue.get("claim", "").rstrip(".")
+    return f"*<{url}|{_chart_title(result)}>*\n{claim}.\n{'   ·   '.join(footer)}\n{CAVEAT}"
 
 
 def format_slack(
@@ -379,7 +386,6 @@ def format_slack(
     spend = f"${cost:,.2f}" if cost >= 0.01 else "<$0.01"
     lead.append(
         "_Posted by `etl chart-critic` — an LLM reading each chart, its metadata and its values. "
-        "Each of these is a claim to check rather than a confirmed error. "
         f"Reviewing {reviewed} chart{'s' if reviewed != 1 else ''} cost {spend}._"
     )
     if incomplete:
