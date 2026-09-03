@@ -22,7 +22,9 @@ averages, thresholds, shares and Ginis, and across percentiles), so it is stored
 	- wid_distribution_992j.csv: one data_quality column (rows are already per welfare concept)
 	- wid_indices_fiscal_992ijt.csv: one data_quality_fiscal992<pop> column per fiscal series (i, j, t)
 	- wid_population_992_999_i.csv: raw passthrough (includes WID's data_quality column)
-The script requires wid v1.0.7 or newer and stops in its first call if the column is missing.
+The script requires wid v1.0.7 or newer and stops in its first call if the column is missing. It also
+stops if a download carries conflicting scores within a country-year-concept, writing those rows to
+wid_data_quality_conflicts_option<n>.csv, since the garden step relies on one score per concept.
 
 HOW TO EXECUTE:
 
@@ -178,14 +180,23 @@ foreach option in $options {
 	gen concept = substr(variable, 2, 5)
 
 	* Set WID's data_quality score aside, one row per country-year-concept, so it survives the reshape.
-	* The score is constant across series types and percentiles within that key; conflicts are counted
-	* and reported (keeping the maximum) rather than aborting an extraction that has run for hours.
+	* The score must be constant across series types and percentiles within that key: the garden step
+	* applies one score per concept, so a conflict cannot be resolved downstream. If a download ever
+	* breaks that, the extraction stops here and writes the offending rows to a CSV for inspection,
+	* rather than picking one of the scores and publishing it.
 	preserve
 		keep country year concept data_quality
 		bysort country year concept: egen _qmin = min(data_quality)
 		bysort country year concept: egen _qmax = max(data_quality)
 		qui count if _qmin != _qmax
-		di "option `option': rows with conflicting data_quality within country-year-concept = " r(N)
+		local n_conflicts = r(N)
+		if `n_conflicts' > 0 {
+			keep if _qmin != _qmax
+			export delimited using "wid_data_quality_conflicts_option`option'.csv", replace
+			di as error "option `option': `n_conflicts' rows with conflicting data_quality within country-year-concept, written to wid_data_quality_conflicts_option`option'.csv. The extraction stops here because the garden step relies on one score per country-year-concept."
+			exit 9
+		}
+		* All scores within a key are identical at this point, so any aggregate returns that value.
 		collapse (max) data_quality, by(country year concept)
 		tempfile quality
 		qui save "`quality'"
