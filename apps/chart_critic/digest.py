@@ -21,12 +21,15 @@ from __future__ import annotations
 import json
 import re
 from datetime import datetime, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from structlog import get_logger
 
 from apps.chart_critic.critic import format_views
 from etl.paths import CACHE_DIR
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 log = get_logger()
 
@@ -93,7 +96,8 @@ def changed_slugs(days: int = 1, include_data_updates: bool = False) -> list[str
 
 
 def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
-    """``{slug: {"chart_id": int | None, "indicators": [catalog paths]}}`` for the flagged charts.
+    """What the digest needs to know about each flagged chart beyond the review itself:
+    ``{slug: {"chart_id", "indicators", "editor", "owners"}}``.
 
     A data-level defect lives in an indicator, not in a chart, so the same claim surfaces on
     every chart sharing that column. This already happened: the UK coal share above 100% was
@@ -106,9 +110,14 @@ def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     public slug will not do. A multi-dim view has no row here, so it has no id and gets no edit
     link; that is correct rather than missing, since there is no single chart to edit.
 
+    It also yields the two people a finding can be addressed to: the chart's last editor, and the
+    accountable owner of each dataset behind it (the first name in the step's ``owners``).
+    :mod:`apps.chart_critic.mentions` turns those into Slack mentions and explains which one a
+    given finding belongs to.
+
     Only flagged charts are looked up, so this is one small query. It fails soft: without a
     database the fingerprint falls back to the slug (which over-reports rather than dropping a
-    finding) and the message simply carries no edit link.
+    finding) and the message simply carries no edit link and names nobody.
     """
     slugs = sorted({r["slug"] for r in results if r.get("issues")})
     if not slugs:
@@ -118,11 +127,20 @@ def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     try:
         df = read_sql(
             """
-            SELECT cc.slug AS slug, c.id AS chartId, v.catalogPath AS catalogPath
+            SELECT cc.slug        AS slug,
+                   c.id           AS chartId,
+                   u.fullName     AS editorName,
+                   u.email        AS editorEmail,
+                   u.isActive     AS editorActive,
+                   d.id           AS datasetId,
+                   d.owners       AS owners,
+                   v.catalogPath  AS catalogPath
             FROM chart_configs cc
             JOIN charts c            ON c.configId = cc.id
             JOIN chart_dimensions cd ON cd.chartId = c.id
             JOIN variables v         ON v.id = cd.variableId
+            JOIN datasets d          ON d.id = v.datasetId
+            LEFT JOIN users u        ON u.id = c.lastEditedByUserId
             WHERE cc.slug IN %(slugs)s
             """,
             params={"slugs": tuple(slugs)},
@@ -136,8 +154,43 @@ def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
         # Keyed on the step path without its version, so tomorrow's re-run of the same step does
         # not re-post yesterday's finding under a new name.
         paths = sorted({re.sub(r"/\d{4}-\d{2}-\d{2}/", "/", p) for p in group["catalogPath"] if isinstance(p, str)})
-        out[str(slug)] = {"chart_id": int(group["chartId"].iloc[0]), "indicators": paths}
+        out[str(slug)] = {
+            "chart_id": int(group["chartId"].iloc[0]),
+            "indicators": paths,
+            "editor": _editor(group),
+            "owners": _dataset_owners(group),
+        }
     return out
+
+
+def _editor(group: pd.DataFrame) -> dict[str, str] | None:
+    """The chart's last editor, or ``None`` when the account is gone or has left.
+
+    One chart per slug, so the editor columns are constant across the group's rows.
+    """
+    name, email, active = group["editorName"].iloc[0], group["editorEmail"].iloc[0], group["editorActive"].iloc[0]
+    if not isinstance(name, str) or not active:
+        return None
+    return {"name": name, "email": str(email) if isinstance(email, str) else ""}
+
+
+def _dataset_owners(group: pd.DataFrame) -> list[str]:
+    """The accountable owner of each dataset behind the chart — the first name in ``owners``.
+
+    First rather than all of them: the field is ordered, and its first entry is the person who
+    answers for the dataset. A chart usually reads one or two datasets, so this is one or two
+    names; duplicates collapse, and a dataset that declares no owner simply contributes nobody.
+    """
+    owners: list[str] = []
+    for _, dataset in group.groupby("datasetId"):
+        raw = dataset["owners"].iloc[0]
+        try:
+            declared = json.loads(raw) if isinstance(raw, str) else (raw or [])
+        except json.JSONDecodeError:
+            continue
+        if declared and isinstance(declared[0], str) and declared[0] not in owners:
+            owners.append(declared[0])
+    return owners
 
 
 def _indicators(facts: dict[str, dict[str, Any]] | None, slug: str) -> list[str]:
@@ -219,23 +272,43 @@ def _chart_title(result: dict[str, Any]) -> str:
     return result["slug"]
 
 
+def _addressed_to(issue: dict[str, Any], chart: dict[str, Any]) -> str | None:
+    """Who this finding is for, as a footer element — or nothing when we cannot say.
+
+    A chart-level claim is the chart editor's; a data-level one is the dataset owner's, and it is
+    deliberately *not* handed to the chart editor when no owner is declared. A wrong column is
+    not the business of whoever last touched the chart, and naming them anyway is how a digest
+    teaches people that its mentions mean nothing.
+
+    Mentions are resolved upstream by :func:`apps.chart_critic.mentions.attach`, which is also
+    where the rule about *when* an editor may be named lives.
+    """
+    if issue.get("kind") == "data":
+        owners = chart.get("owner_mentions") or []
+        return f"dataset owner{'s' if len(owners) > 1 else ''} {' '.join(owners)}" if owners else None
+    editor = chart.get("editor_mention")
+    return f"last edited by {editor}" if editor else None
+
+
 def _format_finding(
     result: dict[str, Any], issue: dict[str, Any], facts: dict[str, dict[str, Any]] | None = None
 ) -> str:
     """One finding as its own message: a linked bold title, the claim in a sentence, and a footer
-    of severity, readership and an admin edit link.
+    of severity, readership, an admin edit link and whoever the claim is addressed to.
 
     Self-contained on purpose. It is read next to the lead message but it is also what someone
     quotes, forwards or replies to on its own, so it carries the link and the edit action itself.
     """
+    chart = (facts or {}).get(result["slug"]) or {}
     url = issue.get("url") or f"https://ourworldindata.org/grapher/{result['slug']}"
     dot = SEVERITY_DOT.get(issue.get("severity", "low"), ":large_yellow_circle:")
     footer = [f"{dot} {issue.get('severity', 'low')} · {issue.get('kind', 'chart')}-level"]
     if views := format_views(result.get("views")):
         footer.append(views)
-    chart_id = (facts or {}).get(result["slug"], {}).get("chart_id")
-    if chart_id:
+    if chart_id := chart.get("chart_id"):
         footer.append(f"<{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit chart>")
+    if who := _addressed_to(issue, chart):
+        footer.append(who)
     return f"*<{url}|{_chart_title(result)}>*\n{issue.get('claim', '').rstrip('.')}.\n{'   ·   '.join(footer)}"
 
 

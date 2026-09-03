@@ -34,7 +34,7 @@ import rich_click as click
 from rich.console import Console
 from rich.table import Table
 
-from apps.chart_critic import cache, digest, fixtures, mdim, report
+from apps.chart_critic import cache, digest, fixtures, mdim, mentions, report
 from apps.chart_critic.bundle import GRAPHER_URL, Bundle, ChartGone, build, render
 from apps.chart_critic.critic import (
     CHEAP_MODEL,
@@ -581,6 +581,10 @@ def cli(
         state = digest.load_state()
         # Resolved once and used for both the lookup and the record — see digest.stamp().
         facts = digest.chart_facts(results)
+        # Name the last editor only in a configuration-edit sweep, where the chart is under
+        # review because of that edit. In any other selection the last editor may have changed a
+        # colour two years ago — see apps/chart_critic/mentions.py.
+        mentions.attach(facts, tag_last_editor=bool(changed_since) and not include_data_updates)
         fresh = digest.new_findings(results, state, facts)
         incomplete = sum(1 for r in results if r["status"].startswith(("bundle failed", "review failed")))
         messages = digest.format_slack(
