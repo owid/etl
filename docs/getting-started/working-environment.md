@@ -235,14 +235,17 @@ It is installed as a symlink at `$GIT_DIR/hooks/pre-commit`, git's default locat
 ```bash
 git worktree add ../etl-mybranch -b mybranch
 cd ../etl-mybranch
-make setup.worktree   # .env, a copy-on-write clone of data/, and the venv
+make setup.worktree   # .env and a copy-on-write clone of data/ — offline, a few seconds
+make .venv            # only when you actually need the venv (~17 s)
 ```
 
-`setup.worktree` is the single entrypoint — there is nothing else to run. `make setup.config` is the cheap half of it (config and `data/`, offline, ~6 s) if you want a worktree available immediately and the venv built on first use.
+`make .venv` runs `setup.worktree` itself, so a single `make .venv` does everything — and so does any other make target, since they all depend on `.venv`. You only need `setup.worktree` on its own when you want the config without paying for a venv.
 
 Copying 16 GB of `data/` sounds absurd and isn't: on a copy-on-write filesystem (APFS on macOS) `cp -c` clones the files, sharing the original's blocks until something writes to them. Measured on a 16 GB / ~32,000-file `data/`: **4 seconds and ~0 bytes**. So a real copy is *better* than symlinking it — each worktree gets an independent `data/`, and two of them running the same step cannot overwrite each other's output. `setup.worktree` checks the filesystem before copying and leaves `data/` absent when cloning isn't possible, rather than making a real 16 GB copy — see the trap below, `cp -c` cannot be trusted to refuse.
 
-The venv is the one expensive part: ~19 seconds and ~2.4 GB over the network, against ~6 seconds and ~0 bytes for config and `data/`. That is why the cheap half has its own name — `make setup.config` — and why `.venv` depends on *that* rather than on `setup.worktree`: a worktree nobody provisioned still fixes its own config on the first `make`, and depending the other way round would be a dependency cycle.
+The venv is deliberately not part of `setup.worktree`. It is the one slow, network-dependent step — about 17 seconds for 412 packages, against a few seconds and ~0 bytes for config and `data/` — and plenty of worktrees never need one. Since every make target depends on `.venv`, it gets built the moment something actually needs it. If you reach for `.venv/bin/etlr` in a worktree that hasn't built one yet you'll get `no such file or directory`; `make .venv` fixes it.
+
+Two things not to try instead. **Symlinking `.venv`** to the main checkout looks tempting and is a trap twice over: the venv holds an *absolute* editable pointer to the main checkout, so `.venv/bin/etlr` would silently run the main checkout's code rather than your branch's — and `uv sync` follows the symlink rather than replacing it, so any make target in that worktree rewrites the *shared* venv, uninstalling packages the main checkout needs. **Cloning `.venv`** copy-on-write is no faster than building it (a venv is ~103,000 small files, so per-file clone cost dominates) and has the same wrong-code problem.
 
 ### Copy-on-write: there is nothing to turn on
 
@@ -306,9 +309,9 @@ make -n setup.worktree >/dev/null 2>&1 && make setup.worktree
 exit 0
 ```
 
-With this in place `git worktree add` alone produces a working worktree — config, `data/` and venv — in about 26 seconds. Point it at `setup.config` instead if you would rather `git worktree add` stay near-instant.
+With this in place `git worktree add` alone gives a worktree its config and `data/` in a few seconds, and the venv follows the first time you run a make target in it.
 
-Two things to know if you do this. `core.hooksPath` **replaces** `$GIT_DIR/hooks` rather than adding to it, so a dispatcher of this kind should end by exec'ing the repo's own `$GIT_DIR/hooks/<name>` — otherwise it silently disables every per-repo hook, including this repo's pre-commit. And keep `setup.worktree` cheap and offline for the same reason: it runs inside a git hook, which is why the cheap half is separately callable as `setup.config`.
+Two things to know if you do this. `core.hooksPath` **replaces** `$GIT_DIR/hooks` rather than adding to it, so a dispatcher of this kind should end by exec'ing the repo's own `$GIT_DIR/hooks/<name>` — otherwise it silently disables every per-repo hook, including this repo's pre-commit. And keep `setup.worktree` cheap and offline for the same reason: it runs inside a git hook, which is why it does not build the venv.
 
 ## GitHub Actions
 
