@@ -106,7 +106,7 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
         # The one thing here that somebody has to act on, so it is the only banner that leads.
         st.error(
             f"**{len(rejected)} rejected** — nothing has been changed by that. Open **What to change** "
-            "below and hand it on; it names the edits, where they were authored, and who owns them."
+            "below: it names the edits and where they were authored, ready to hand on."
         )
     elif not ticked:
         st.warning(
@@ -123,8 +123,9 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
         docs.append(
             (
                 "❌ What to change",
-                "The rejections as instructions — the edit each refers to, the garden dataset it was "
-                "authored in, and who owns it. Written to be acted on without the rest of this page.",
+                "The rejections as instructions — the edit each refers to, and the garden dataset it was "
+                "authored in. Written to be acted on without the rest of this page. "
+                + handover_sentence(rejected, summary),
                 _rejections_markdown(rejected, index, summary),
                 "metadata-rejections.md",
                 "mdd_rejections",
@@ -508,7 +509,6 @@ def _rejections_markdown(rejected: list[dict[str, Any]], index: dict[str, dict[s
         "for it to be kept off one surface — each entry says which.",
         "",
     ]
-    lines += _handover_lines(rejected, edits_of(summary))
     edits, reach = _edit_lookup(summary)
     by_edit = [row for row in rejected if str(row.get("changeKey")) in edits]
     by_item = [row for row in rejected if str(row.get("changeKey")) not in edits]
@@ -635,47 +635,42 @@ def _quoted_inline(text: str) -> str:
     return f"{fence}{trimmed}{fence}"
 
 
-def edits_of(summary: Any) -> dict[str, dict[str, Any]]:
-    """The per-surface edit lookup, exposed so the hand-over line can name the datasets involved."""
-    lookup, _reach = _edit_lookup(summary)
-    return lookup
+def handover_sentence(rejected: list[dict[str, Any]], summary: Any) -> str:
+    """Who to send the rejections to — for the page, deliberately not for the document.
 
+    A rejection is a request, and a request needs an addressee. But the document is what gets *sent*: a
+    line inside it reading "Give this to Pablo Arriagada" is addressed to the reviewer and read by Pablo,
+    who does not need telling who he is, and by an assistant for whom it is noise. Routing is decided
+    before the paste, so it is said beside the copy button and nowhere else.
 
-def _handover_lines(rejected: list[dict[str, Any]], edits: dict[str, dict[str, Any]]) -> list[str]:
-    """Who this document is for: the people who own the datasets it asks about, or Claude.
-
-    A rejection is a request, and a request with no addressee sits in a tab. The owners come from each
-    affected dataset's own `dataset.owners` — the first is accountable — so the document names the person
-    to ask rather than leaving the reviewer to work it out. Names only, never a handle: nothing in the
-    repo maps one to the other, and a guessed handle pings somebody uninvolved.
+    Owners come from each affected dataset's own `dataset.owners`, the first entry accountable. Names
+    only, never a handle: nothing in the repo maps one to the other and a guessed handle pings somebody
+    uninvolved.
     """
+    edits, _reach = _edit_lookup(summary)
     directories = sorted(
         {dataset for row in rejected for dataset in (edits.get(str(row.get("changeKey"))) or {}).get("datasets", [])}
     )
-    owners = dataset_owners(directories)
     people: list[str] = []
-    for names in owners.values():
+    for names in dataset_owners(directories).values():
         for name in names:
             if name not in people:
                 people.append(name)
 
-    if people:
-        # Plain names inside one bold phrase: `**Give this to **Name****` renders the asterisks literally.
-        who = ", ".join(people[:-1])
-        who = f"{who} and {people[-1]}" if who else people[-1]
-        owns = "owns" if len(people) == 1 else "own"
-        lead = (
-            f"**Give this to {who}** — {owns} the affected "
-            f"{'dataset' if len(directories) == 1 else 'datasets'} — or paste it to Claude, which can make "
-            "the edits and re-run the steps."
-        )
-    else:
+    if not people:
         # No owner recorded, or the file could not be read: still say who can act on it.
-        lead = (
-            "**Give this to whoever owns the affected dataset** — its `dataset.owners` says who — or paste "
-            "it to Claude, which can make the edits and re-run the steps."
+        return (
+            "Send it to whoever owns the affected dataset — its `dataset.owners` says who — or paste it to "
+            "Claude, which can make the edits and re-run the steps."
         )
-    return [lead, ""]
+    who = ", ".join(people[:-1])
+    who = f"{who} and {people[-1]}" if who else people[-1]
+    owns = "owns" if len(people) == 1 else "own"
+    return (
+        f"Send it to {who}, who {owns} the affected "
+        f"{'dataset' if len(directories) == 1 else 'datasets'} — or paste it to Claude, which can make the "
+        "edits and re-run the steps."
+    )
 
 
 def _has_rejection(group: list[dict[str, Any]]) -> bool:

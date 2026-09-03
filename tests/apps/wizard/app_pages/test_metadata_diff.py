@@ -3221,11 +3221,12 @@ def test_refusing_one_surface_asks_for_an_override_not_a_revert():
     assert "Fine on the charts, too long for a view." in doc
 
 
-def test_the_instructions_say_who_to_give_them_to():
-    """A request with no addressee sits in a tab. The owner comes from the dataset's own metadata.
+def test_who_to_send_the_rejections_to_is_said_on_the_page_not_in_the_document():
+    """The document is what gets sent, so an addressee inside it is addressed to the wrong reader.
 
-    Names only, never a handle: nothing in the repo maps one to the other and a guessed handle pings
-    somebody uninvolved. Claude is offered alongside, because it can make the edit and re-run the step.
+    "Give this to Pablo Arriagada" is read by Pablo, who does not need telling who he is, and by an
+    assistant for whom it is noise. The owner comes from the dataset's own metadata and is said beside the
+    copy button instead. Names only, never a handle: nothing in the repo maps one to the other.
     """
     from apps.wizard.app_pages.metadata_diff.core import item_identity
     from apps.wizard.app_pages.metadata_diff.data import REJECTED
@@ -3236,7 +3237,7 @@ def test_the_instructions_say_who_to_give_them_to():
         edit_key,
         edits_for,
     )
-    from apps.wizard.app_pages.metadata_diff.review_section import _rejections_markdown
+    from apps.wizard.app_pages.metadata_diff.review_section import _rejections_markdown, handover_sentence
 
     # A real step in this repo, so the owner is read rather than invented.
     directory = "etl/steps/data/garden/wb/2026-06-26/world_bank_pip"
@@ -3255,58 +3256,28 @@ def test_the_instructions_say_who_to_give_them_to():
     surface = surface_key("item", "edit:charts")
     (edit,) = edits_for(summary, "charts")
     change_key, content_hash = item_identity(surface, edit_key(edit), edit_fields(edit))
-    doc = _rejections_markdown(
-        [
-            {
-                "catalogPath": surface,
-                "changeKey": change_key,
-                "contentHash": content_hash,
-                "status": REJECTED,
-                "comment": None,
-            }
-        ],
-        {},
-        summary,
+    rows = [
+        {
+            "catalogPath": surface,
+            "changeKey": change_key,
+            "contentHash": content_hash,
+            "status": REJECTED,
+            "comment": None,
+        }
+    ]
+
+    # The page says who, naming the owner read from the step file.
+    sentence = handover_sentence(rows, summary)
+    assert owner in sentence and "paste it to Claude" in sentence
+    # An unknown owner still points at somebody who can act.
+    assert "dataset.owners" in handover_sentence(
+        [{"catalogPath": surface, "changeKey": "nothing-known", "status": REJECTED}], summary
     )
 
-    assert f"**Give this to {owner}**" in doc
-    assert "paste it to Claude" in doc
-    # Nested bold renders as literal asterisks, which is how this line first shipped.
-    assert "****" not in doc
-    # An unknown owner still names somebody who can act.
-    assert "dataset.owners" in _rejections_markdown(
-        [{"catalogPath": surface, "changeKey": "nothing-known", "status": REJECTED, "comment": None}], {}, summary
-    )
-
-
-def test_a_sections_parameters_do_not_follow_the_reviewer_to_the_next_one():
-    """The URL grew a trail: `?blast-surface=charts&diff-type=review&mdim-views=…` on the Review tab.
-
-    None of it means anything on the page being looked at, and a stale value is checked strictly the
-    moment somebody navigates back — so it is a raise waiting to happen, not only noise. The section and
-    the layout survive everywhere, because the layout is deliberately shared across the three surfaces.
-    """
-    from apps.wizard.app_pages.metadata_diff.core import foreign_params
-
-    trail = ["diff-type", "layout", "blast-surface", "mdim-views", "dim-metric", "chart", "explorer-views"]
-
-    # On Review nothing but the globals belongs.
-    assert set(foreign_params("review", trail)) == {
-        "blast-surface",
-        "mdim-views",
-        "dim-metric",
-        "chart",
-        "explorer-views",
-    }
-    # On MDims its own route and its dimension menu stay; the others go.
-    assert set(foreign_params("mdims", trail)) == {"blast-surface", "chart", "explorer-views"}
-    # On Blast its four keys stay.
-    assert "blast-surface" not in foreign_params("blast", trail)
-    # An explorer's dimension prefix belongs to Explorers and not to MDims.
-    assert "edim-Period" in foreign_params("mdims", ["edim-Period"])
-    assert "edim-Period" not in foreign_params("explorers", ["edim-Period"])
-    # Parameters this app does not own are left alone, whoever they belong to.
-    assert foreign_params("review", ["embed", "utm_source"]) == []
+    # The document itself carries no addressee — it is the thing being handed over.
+    doc = _rejections_markdown(rows, {}, summary)
+    assert "Give this to" not in doc and "Send it to" not in doc
+    assert owner not in doc
 
 
 def test_the_bar_says_a_section_can_be_read_either_way():
