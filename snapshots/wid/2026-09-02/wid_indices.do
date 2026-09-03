@@ -23,8 +23,9 @@ averages, thresholds, shares and Ginis, and across percentiles), so it is stored
 	- wid_indices_fiscal_992ijt.csv: one data_quality_fiscal992<pop> column per fiscal series (i, j, t)
 	- wid_population_992_999_i.csv: raw passthrough (includes WID's data_quality column)
 The script requires wid v1.0.7 or newer and stops in its first call if the column is missing. It also
-stops if a download carries conflicting scores within a country-year-concept, writing those rows to
-wid_data_quality_conflicts_option<n>.csv, since the garden step relies on one score per concept.
+stops if a download carries conflicting, or only partly present, scores within a country-year-concept,
+writing those rows to wid_data_quality_conflicts_option<n>.csv, since the garden step relies on one
+score per concept.
 
 HOW TO EXECUTE:
 
@@ -180,23 +181,28 @@ foreach option in $options {
 	gen concept = substr(variable, 2, 5)
 
 	* Set WID's data_quality score aside, one row per country-year-concept, so it survives the reshape.
-	* The score must be constant across series types and percentiles within that key: the garden step
-	* applies one score per concept, so a conflict cannot be resolved downstream. If a download ever
-	* breaks that, the extraction stops here and writes the offending rows to a CSV for inspection,
-	* rather than picking one of the scores and publishing it.
+	* Within that key the score must be constant across series types and percentiles, and either every
+	* row or no row may carry one: the garden step applies one score per concept and keeps unscored
+	* values, so neither differing scores nor a partly scored key can be resolved downstream. If a
+	* download ever breaks that, the extraction stops here and writes the offending rows to a CSV for
+	* inspection, rather than picking one of the scores and publishing it. (egen min/max skip missing
+	* values, hence the separate count of missing scores.)
 	preserve
 		keep country year concept data_quality
 		bysort country year concept: egen _qmin = min(data_quality)
 		bysort country year concept: egen _qmax = max(data_quality)
-		qui count if _qmin != _qmax
+		bysort country year concept: egen _nmissing = total(missing(data_quality))
+		bysort country year concept: gen _nrows = _N
+		gen _conflict = (_qmin != _qmax) | (_nmissing > 0 & _nmissing < _nrows)
+		qui count if _conflict
 		local n_conflicts = r(N)
 		if `n_conflicts' > 0 {
-			keep if _qmin != _qmax
+			keep if _conflict
 			export delimited using "wid_data_quality_conflicts_option`option'.csv", replace
-			di as error "option `option': `n_conflicts' rows with conflicting data_quality within country-year-concept, written to wid_data_quality_conflicts_option`option'.csv. The extraction stops here because the garden step relies on one score per country-year-concept."
+			di as error "option `option': `n_conflicts' rows with conflicting or partly missing data_quality within country-year-concept, written to wid_data_quality_conflicts_option`option'.csv. The extraction stops here because the garden step relies on one score per country-year-concept."
 			exit 9
 		}
-		* All scores within a key are identical at this point, so any aggregate returns that value.
+		* Every key now has a single score (or none at all), so any aggregate returns that value.
 		collapse (max) data_quality, by(country year concept)
 		tempfile quality
 		qui save "`quality'"
