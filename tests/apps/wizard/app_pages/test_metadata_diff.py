@@ -1537,6 +1537,34 @@ def test_a_tick_only_counts_while_the_text_it_was_made_against_stands(monkeypatc
     assert count_ticked("engine", []) == 0
 
 
+def test_the_grids_chart_leaves_are_listed_by_name():
+    """Dozens of names over several columns are scannable only in an order; reach order is not one."""
+    from apps.wizard.app_pages.metadata_diff.blast_section import _chart_branch
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach
+
+    reach = [
+        ChangeReach(
+            field="descriptionKey",
+            old="a",
+            new="b",
+            charts=[
+                {"chartId": 1, "slug": "zebra-chart", "has_data_page": True},
+                {"chartId": 2, "slug": "alpha-chart", "has_data_page": True},
+                {"chartId": 3, "slug": "middle-chart", "has_data_page": False},
+            ],
+            draft_charts=[
+                {"chartId": 4, "slug": "wip-zeta"},
+                {"chartId": 5, "slug": "wip-alpha"},
+            ],
+        )
+    ]
+    groups = {g["name"]: [leaf["label"] for leaf in g["leaves"]] for g in _chart_branch(reach, set())["groups"]}
+    assert groups["Data pages"] == ["alpha-chart", "zebra-chart"]
+    assert groups["Unpublished drafts"] == ["wip-alpha", "wip-zeta"]
+    # The prominence split still decides which group a chart is in; sorting happens inside each.
+    assert groups["Via Learn more about this data"] == ["middle-chart"]
+
+
 def test_charts_are_listed_most_prominent_first():
     """Charts whose page shows the change come before the ones that keep it behind the drawer.
 
@@ -2374,13 +2402,15 @@ def test_tree_draws_a_branch_per_flat_surface():
     assert html_out.count('data-target="mdd-section-') == 2
 
 
-def test_a_flat_branch_of_the_grid_opens_expanded_and_is_sized_for_it():
+def test_a_flat_branch_of_the_grid_opens_expanded_in_columns_and_is_sized_for_it():
     """A list of chart names answers "is my chart here" only when it is open, so it renders open.
 
-    And the frame it renders in does not scroll: its leaves have to be in the height estimate, or the
-    tree is cut off until the component's own resize fires.
+    Open, it is long — a shared WYSK edit reached 76 charts on this branch — so the names lay out in
+    columns rather than one per row. The height estimate has to follow that, since the frame does not
+    scroll: an under-estimate cuts the tree off until the component's own resize fires, and one row per
+    leaf overstated a 76-name branch by four times.
     """
-    from apps.wizard.app_pages.metadata_diff.tree import render_multi_tree_html
+    from apps.wizard.app_pages.metadata_diff.tree import LEAF_COLUMNS, render_multi_tree_html
 
     leaves = [
         {"label": f"chart-{i}", "href": f"http://x/grapher/chart-{i}", "preview": "", "badged": False}
@@ -2392,11 +2422,23 @@ def test_a_flat_branch_of_the_grid_opens_expanded_and_is_sized_for_it():
     group_box = html_out[: html_out.index("Data pages")]
     assert "mdd-collapsed" not in group_box.rsplit('<div class="mdd-node', 1)[-1], "the group renders open"
     assert all(f"chart-{i}" in html_out for i in range(12))
+    # `mdd-children` stays alongside it, or the click-to-collapse rule stops matching the container.
+    assert '<div class="mdd-children mdd-leaf-grid">' in html_out
+    assert "#mdd-root .mdd-leaf-grid" in html_out and "auto-fill" in html_out
+    # The grid is a flex child of its node, so it has to claim the row's width or `auto-fill` fills a box
+    # the width of its longest name — which is how 18 names came back as one column.
+    assert "flex: 1 1 auto" in html_out
+    # And a name wraps inside its cell rather than being clipped: half a slug identifies no chart.
+    assert "overflow-wrap: anywhere" in html_out and "text-overflow: ellipsis" not in html_out
 
     _empty_html, empty_height = render_multi_tree_html(
         [], branches=[{"id": "charts", "label": "Charts", "groups": [{"name": "Data pages", "leaves": leaves[:1]}]}]
     )
     assert height > empty_height, "every drawn leaf has to raise the frame's initial height"
+    # …but by rows of columns, not one row each. Eleven more leaves cost about eleven thirds of a row.
+    per_row = (height - empty_height) / 11
+    assert per_row < 38, f"the estimate is still one row per leaf ({per_row:.0f}px each)"
+    assert LEAF_COLUMNS > 1
 
 
 def test_explorer_grid_columns_are_inferred_narrowest_first():

@@ -19,6 +19,10 @@ from apps.wizard.app_pages.metadata_diff.core import ViewDiff, diff_preview_html
 # First-paint estimate only: fit() resizes the frame to its real content as soon as the script runs,
 # so this caps nothing — it just keeps the initial placeholder frame from being absurd.
 INITIAL_HEIGHT_CAP_PX = 4000
+# Columns a flat branch's leaves are assumed to wrap into, for the initial-height estimate only. The real
+# number is responsive (`repeat(auto-fill, …)`), and `fit()` measures the truth a moment later; three is a
+# deliberate under-guess, because overshooting leaves whitespace while undershooting cuts the tree off.
+LEAF_COLUMNS = 3
 
 
 # CSS/JS for the affected-charts component kept as plain (non-f) strings so their literal
@@ -319,7 +323,12 @@ def _render_leaf_branch(branch: dict[str, Any], preview_offset: int) -> tuple[st
             f'<div class="mdd-box mdd-branch mdd-changed" role="button" title="{html.escape(group.get("note") or "")}">'
             f'<span class="mdd-caret">&#9662;</span>{title}'
             f'<span class="mdd-count">{len(items)}</span></div>'
-            f'<div class="mdd-children">{"".join(leaves)}</div>'
+            # Columns, not one name per row: a shared WYSK edit reaches 76 charts here, and as a single
+            # column that is 76 rows of vertical space for what is really one fact. Grouping them by
+            # dataset or by field was the other option and neither cuts: measured on this branch, 75 of
+            # the 76 belong to one dataset, and every content cut lists the same chart under several
+            # groups. `mdd-children` stays on it so the collapse rule still applies.
+            f'<div class="mdd-children mdd-leaf-grid">{"".join(leaves)}</div>'
             f"</div>"
         )
 
@@ -587,11 +596,12 @@ def render_multi_tree_html(
         index_html = f'<div class="mdd-index"><div class="mdd-index-title">Jump to a section</div>{"".join(rows)}</div>'
 
     visible_leaves = total_changed if total_changed else len(all_views)
-    # One row per section header, one per hierarchy heading, one per flat-branch heading — plus every leaf
-    # a flat branch draws, since those render expanded and are in the initial layout. The frame does not
-    # scroll, so an under-estimate shows a cut-off tree until `fit()` runs; the cap keeps the overshoot
-    # bounded on a branch reaching hundreds of charts.
-    extra_rows = len(section_nodes) + drawn_groups + drawn_branches + branch_leaves
+    # One row per section header, one per hierarchy heading, one per flat-branch heading — plus the rows a
+    # flat branch's leaves wrap into, since those render expanded and are in the initial layout. The frame
+    # does not scroll, so an under-estimate shows a cut-off tree until `fit()` runs; the cap keeps the
+    # overshoot bounded on a branch reaching hundreds of charts.
+    leaf_rows = (branch_leaves + LEAF_COLUMNS - 1) // LEAF_COLUMNS
+    extra_rows = len(section_nodes) + drawn_groups + drawn_branches + leaf_rows
     initial_height = min(INITIAL_HEIGHT_CAP_PX, 170 + (visible_leaves + extra_rows) * 38)
     return (
         f"""
@@ -639,6 +649,23 @@ def render_multi_tree_html(
     #mdd-root .mdd-node {{ display: flex; align-items: flex-start; margin: 2px 0; }}
     #mdd-root .mdd-children {{ display: flex; flex-direction: column; border-left: 2px solid #e3e3e3;
                                margin-left: 10px; padding-left: 14px; }}
+    /* A flat branch (charts, explorers with no grid) is a long list of names rather than a dimension
+       column, so its leaves wrap into as many columns as the width allows. Capped in height because a
+       WDI-scale update reaches hundreds of charts: past the cap this box scrolls on its own rather than
+       the page growing without limit. Everything stays in the DOM and findable. */
+    /* `flex: 1` because this container is a flex child of `.mdd-node`: left to size itself it shrinks to
+       its content, and `auto-fill` then had a narrow box to fill — measured, 18 names still came back as
+       one column. `min-width: 0` lets it shrink below its longest name instead of forcing the row wider. */
+    #mdd-root .mdd-leaf-grid {{ display: grid; align-content: start; flex: 1 1 auto; min-width: 0;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); column-gap: 10px;
+      max-height: 560px; overflow-y: auto; }}
+    /* A cell has a definite width and a chart slug can be 50-odd characters, so the name wraps inside its
+       own cell. Wraps rather than clips: the slug *is* the chart's identity, and half of one identifies
+       nothing. `.mdd-box` is `nowrap` and `flex-shrink: 0` for the dimension grids, where the opposite is
+       wanted. */
+    #mdd-root .mdd-leaf-grid .mdd-node {{ margin: 1px 0; min-width: 0; }}
+    #mdd-root .mdd-leaf-grid .mdd-box {{ flex-shrink: 1; min-width: 0; white-space: normal;
+      overflow-wrap: anywhere; }}
     #mdd-root .mdd-box {{ border: 1.5px solid; border-radius: 6px; padding: 4px 10px; margin: 2px 0;
                           white-space: nowrap; cursor: pointer; text-decoration: none; color: inherit;
                           background: #fff; flex-shrink: 0; display: inline-block; }}

@@ -689,9 +689,15 @@ def _chart_branch(reach: list[ChangeReach], badged: set) -> dict[str, Any]:
             ),
         }
 
-    on_page = [leaf(c, r) for c, r in charts.values() if c.get("has_data_page", True)]
-    drawer = [leaf(c, r) for c, r in charts.values() if not c.get("has_data_page", True)]
-    draft_leaves = [leaf(c, r, published=False) for c, r in drafts.values()]
+    # By name within each group: the list runs to dozens of charts laid out over several columns, and
+    # "is my chart in here" is answerable by eye only if there is an order to scan. Reach order is the
+    # order the comparison happened to find them, which is no order at all to a reader.
+    def by_name(leaves: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return sorted(leaves, key=lambda leaf: str(leaf["label"]))
+
+    on_page = by_name([leaf(c, r) for c, r in charts.values() if c.get("has_data_page", True)])
+    drawer = by_name([leaf(c, r) for c, r in charts.values() if not c.get("has_data_page", True)])
+    draft_leaves = by_name([leaf(c, r, published=False) for c, r in drafts.values()])
     return {
         "id": "charts",
         "label": "Charts",
