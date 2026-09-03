@@ -146,9 +146,11 @@ for (const job of CONFIG.jobs) {
     reference.name = `${frame.name} — original SVG (unstyled)`;
     reference.x = frame.x - reference.width - job.referenceGap;
     reference.y = frame.y;
-    // Same hit-test point as the styled copy below: an unpainted frame cannot be hovered on the canvas.
-    const refPaint = Array.isArray(frame.fills) ? frame.fills.find((f) => f.type === "SOLID") : null;
-    if (refPaint) reference.fills = [{ ...refPaint, visible: true }];
+    // Leave its fill, its size and its clipping exactly as the import arrives. This copy exists to be
+    // compared against, so anything done to it is a difference someone later reads as the export's
+    // own: painting it the template's cream makes a transparent export look like it ships a beige
+    // background, and cropping it to the ink makes it a different size from the frame it is next to.
+    // The styled copy below gets both treatments; this one gets none.
   }
 
   styled.rescale(scale);
