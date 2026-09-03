@@ -24,7 +24,7 @@ definitions:
       - The older sample was not selected for good health and nutrition the way the under-fives sample was — of its 22,917 children, WHO set aside only 22 implausible height measurements. So for ages 5 to 19 the curves describe how children grew rather than how they could grow.
       - A percentile is the share of children who are shorter than a given height. If a 10-year-old boy is at the 25th percentile, then 25% of boys his age in WHO's reference population would be shorter than him and 75% would be taller.
       - Being far from the median is not by itself a sign of poor health. In the reference population, 3 in every 100 children fall below the 3rd percentile and 3 in every 100 rise above the 97th.
-      - WHO fitted these curves to data spanning 3 standard deviations either side of the median, which covers all but about 1 child in 370. The most extreme cut-offs published here — the 0.1st and 99.9th percentiles, and 4 or 5 standard deviations from the median — are calculated by extending that fit rather than observed directly.
+      - WHO supports reading percentiles off these curves only within 3 standard deviations either side of the median, a range that covers all but about 1 child in 370. The most extreme cut-offs published here — the 0.1st and 99.9th percentiles, and 4 or 5 standard deviations from the median — fall outside that range, and are calculated by extending WHO's fitted distribution.
       - A child whose height falls more than 2 standard deviations below the median for their age is defined as stunted. Stunting is a sign of sustained undernutrition or repeated infection rather than of being naturally short.
 
 dataset:
@@ -47,7 +47,7 @@ tables:
       height_percentile_0_1:
         title: Height at the 0.1st percentile
         description_short: |-
-          Height that 0.1% of children of this age fall below, in the population WHO uses as its growth reference. This cut-off lies beyond the range WHO's data cover, so it is calculated by extending WHO's fitted distribution.
+          Height that 0.1% of children of this age fall below, in the population WHO uses as its growth reference. This cut-off lies outside the range WHO supports for reading percentiles off its curves, so it is calculated by extending WHO's fitted distribution.
         unit: centimeters
         short_unit: cm
         display:
@@ -173,7 +173,7 @@ tables:
       height_percentile_99_9:
         title: Height at the 99.9th percentile
         description_short: |-
-          Height that 99.9% of children of this age fall below, in the population WHO uses as its growth reference. This cut-off lies beyond the range WHO's data cover, so it is calculated by extending WHO's fitted distribution.
+          Height that 99.9% of children of this age fall below, in the population WHO uses as its growth reference. This cut-off lies outside the range WHO supports for reading percentiles off its curves, so it is calculated by extending WHO's fitted distribution.
         unit: centimeters
         short_unit: cm
         display:
@@ -182,7 +182,7 @@ tables:
       height_sd_minus_5:
         title: Height at 5 standard deviations below the median
         description_short: |-
-          Height 5 standard deviations below the median for this age, in the population WHO uses as its growth reference. WHO publishes this cut-off only from age 5, to assess very short stature. It lies far beyond the range WHO's data cover, so it is calculated by extending WHO's fitted distribution.
+          Height 5 standard deviations below the median for this age, in the population WHO uses as its growth reference. WHO publishes this cut-off only from age 5, to assess very short stature. It lies far outside the range WHO supports for reading percentiles off its curves, so it is calculated by extending WHO's fitted distribution.
         unit: centimeters
         short_unit: cm
         display:
@@ -191,7 +191,7 @@ tables:
       height_sd_minus_4:
         title: Height at 4 standard deviations below the median
         description_short: |-
-          Height 4 standard deviations below the median for this age, in the population WHO uses as its growth reference. This cut-off lies beyond the range WHO's data cover, so it is calculated by extending WHO's fitted distribution.
+          Height 4 standard deviations below the median for this age, in the population WHO uses as its growth reference. This cut-off lies outside the range WHO supports for reading percentiles off its curves, so it is calculated by extending WHO's fitted distribution.
         unit: centimeters
         short_unit: cm
         display:
@@ -263,7 +263,7 @@ tables:
       height_sd_plus_4:
         title: Height at 4 standard deviations above the median
         description_short: |-
-          Height 4 standard deviations above the median for this age, in the population WHO uses as its growth reference. This cut-off lies beyond the range WHO's data cover, so it is calculated by extending WHO's fitted distribution.
+          Height 4 standard deviations above the median for this age, in the population WHO uses as its growth reference. This cut-off lies outside the range WHO supports for reading percentiles off its curves, so it is calculated by extending WHO's fitted distribution.
         unit: centimeters
         short_unit: cm
         display:
