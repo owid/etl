@@ -46,9 +46,8 @@ def verdict_reopened(row: dict[str, Any], index: dict[str, dict[str, str]]) -> b
     filtering on status alone, so a decision made on wording that has since been rewritten still counted
     as one, and a section could be badged finished over an item that had reopened.
 
-    Only for rows the index can currently hash. A chart's changed fields are assembled on the chart's own
-    page rather than enumerated in `item_index`, so a chart verdict has no current hash to compare against
-    and is reported as recorded — which is what every row did before any of this.
+    Only for rows the index can currently hash — every surface, charts included. Where an enumeration
+    failed and left a slot without a hash, the verdict is reported as recorded rather than guessed at.
     """
     if row.get("status") not in DECIDED:
         return False

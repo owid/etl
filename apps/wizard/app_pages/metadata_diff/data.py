@@ -7,6 +7,7 @@ environments being compared (staging = "source", production = "target"). Read-on
 import json
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
@@ -17,7 +18,9 @@ from structlog import get_logger
 from apps.wizard.app_pages.metadata_diff.core import (
     METADATA_FIELDS,
     ViewBundle,
+    ViewDiff,
     build_view_bundle,
+    diff_views,
     parse_chart_ref,
 )
 from etl.db import read_sql
@@ -461,6 +464,57 @@ def fetch_chart_text(engine: Engine, config_uuids: list[str]) -> dict[str, dict[
     return out
 
 
+_CHART_COLUMNS = """c.id as chartId,
+               cc.slug as slug,
+               c.publishedAt is not null as is_published,
+               cc.config ->> '$.title' as title,
+               cc.config ->> '$.subtitle' as subtitle,
+               cc.config ->> '$.note' as note"""
+
+
+def resolve_charts(engine: Engine, refs: list[str], include_drafts: bool = False) -> dict[str, dict[str, Any]]:
+    """`resolve_chart` for a whole list at once: ref -> chart row, with unresolvable refs simply absent.
+
+    Two queries for any number of charts — one keyed by id, one by slug — because a ref names a chart
+    either way and the two cannot be looked up in the same `in (...)`. Chart by chart this was a query
+    each, which is what made hashing every changed chart's verdict look unaffordable.
+    """
+    parsed = {ref: parse_chart_ref(ref) for ref in dict.fromkeys(refs)}
+    ids = [cid for cid, _ in parsed.values() if cid is not None]
+    slugs = [slug for cid, slug in parsed.values() if cid is None and slug]
+
+    published = "" if include_drafts else " and c.publishedAt is not null"
+    by_id: dict[int, dict[str, Any]] = {}
+    by_slug: dict[str, dict[str, Any]] = {}
+    for values, column in ((ids, "c.id"), (slugs, "cc.slug")):
+        if not values:
+            continue
+        for chunk in _chunked(sorted(set(values))):
+            placeholders = ", ".join(["%s"] * len(chunk))
+            df = read_sql(
+                f"""
+                select {_CHART_COLUMNS}
+                from charts c
+                join chart_configs cc on cc.id = c.configId
+                where {column} in ({placeholders}){published}
+                """,
+                engine=engine,
+                params=tuple(chunk),
+            )
+            for record in df.to_dict("records"):
+                row = {str(k): v for k, v in record.items()}
+                by_id[int(row["chartId"])] = row
+                if row.get("slug"):
+                    by_slug[str(row["slug"])] = row
+
+    out: dict[str, dict[str, Any]] = {}
+    for ref, (chart_id, slug) in parsed.items():
+        row = by_id.get(chart_id) if chart_id is not None else (by_slug.get(slug) if slug else None)
+        if row is not None:
+            out[ref] = dict(row)  # a copy: callers annotate it with `n_indicators` / `has_data_page`
+    return out
+
+
 def resolve_chart(engine: Engine, ref: str, include_drafts: bool = False) -> dict[str, Any] | None:
     """Resolve a chart from anything that names one — id, slug, grapher URL or admin URL.
 
@@ -468,33 +522,52 @@ def resolve_chart(engine: Engine, ref: str, include_drafts: bool = False) -> dic
     found" would be the wrong answer: the row carries `is_published` so the caller can say which it is.
     Left off by default, because every other caller counts reach and a draft is not reach.
     """
-    chart_id, slug = parse_chart_ref(ref)
-    if chart_id is not None:
-        where, params = "c.id = %(v)s", {"v": chart_id}
-    elif slug:
-        where, params = "cc.slug = %(v)s", {"v": slug}
-    else:
-        return None
-    published = "" if include_drafts else " and c.publishedAt is not null"
-    df = read_sql(
-        f"""
-        select c.id as chartId,
-               cc.slug as slug,
-               c.publishedAt is not null as is_published,
-               cc.config ->> '$.title' as title,
-               cc.config ->> '$.subtitle' as subtitle,
-               cc.config ->> '$.note' as note
-        from charts c
-        join chart_configs cc on cc.id = c.configId
-        where {where}{published}
-        limit 1
-        """,
-        engine=engine,
-        params=params,
-    )
-    if df.empty:
-        return None
-    return {str(k): v for k, v in df.iloc[0].to_dict().items()}
+    return resolve_charts(engine, [ref], include_drafts=include_drafts).get(ref)
+
+
+def fetch_chart_dimensions(engine: Engine, chart_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
+    """chartId -> its `chart_dimensions` rows, in `order`, for many charts at once."""
+    if not chart_ids:
+        return {}
+    out: dict[int, list[dict[str, Any]]] = {}
+    for chunk in _chunked(sorted(set(int(cid) for cid in chart_ids))):
+        placeholders = ", ".join(["%s"] * len(chunk))
+        df = read_sql(
+            f"""
+            select chartId, variableId, property
+            from chart_dimensions
+            where chartId in ({placeholders})
+            order by chartId, `order`
+            """,
+            engine=engine,
+            params=tuple(chunk),
+        )
+        for record in df.to_dict("records"):
+            out.setdefault(int(record["chartId"]), []).append({str(k): v for k, v in record.items()})
+    return out
+
+
+def fetch_chart_indicator_paths_bulk(engine: Engine, chart_ids: list[int]) -> dict[int, list[str]]:
+    """chartId -> the catalogPaths of every indicator it renders, for many charts at once."""
+    if not chart_ids:
+        return {}
+    out: dict[int, list[str]] = {}
+    for chunk in _chunked(sorted(set(int(cid) for cid in chart_ids))):
+        placeholders = ", ".join(["%s"] * len(chunk))
+        df = read_sql(
+            f"""
+            select distinct cd.chartId as chartId, v.catalogPath as catalogPath
+            from chart_dimensions cd
+            join variables v on v.id = cd.variableId
+            where cd.chartId in ({placeholders}) and v.catalogPath is not null
+            """,
+            engine=engine,
+            params=tuple(chunk),
+        )
+        for record in df.to_dict("records"):
+            if record["catalogPath"]:
+                out.setdefault(int(record["chartId"]), []).append(str(record["catalogPath"]))
+    return out
 
 
 def fetch_chart_indicator_paths(engine: Engine, chart_id: int) -> list[str]:
@@ -503,62 +576,147 @@ def fetch_chart_indicator_paths(engine: Engine, chart_id: int) -> list[str]:
     A chart outside the branch's scope was never compared, and saying "no metadata change" about it would
     be a claim the tool has not tested.
     """
-    df = read_sql(
-        """
-        select distinct v.catalogPath as catalogPath
-        from chart_dimensions cd
-        join variables v on v.id = cd.variableId
-        where cd.chartId = %(id)s and v.catalogPath is not null
-        """,
-        engine=engine,
-        params={"id": int(chart_id)},
-    )
-    return [str(p) for p in df["catalogPath"].tolist() if p]
+    return fetch_chart_indicator_paths_bulk(engine, [int(chart_id)]).get(int(chart_id), [])
+
+
+def build_chart_bundles(
+    engine: Engine,
+    refs: list[str],
+    pinned: dict[str, str] | None = None,
+    include_drafts: bool = False,
+) -> dict[str, tuple[ViewBundle, dict[str, Any]]]:
+    """Build a single-"view" bundle for each of many standalone charts: y-indicator metadata + FAUST.
+
+    ref -> (bundle, chart), with charts that cannot be resolved simply absent. Each chart dict carries
+    `n_indicators` and `has_data_page` — grapher renders a data page (and thus this WYSK text) only for
+    single-indicator charts; a scatter/multi-series chart has none. The bundles have empty dimensions, so
+    each matches its baseline counterpart in `diff_views`.
+
+    `pinned` maps a ref to the catalogPath the metadata should be read from. Without one the primary y is
+    used, which is the one a data page renders. That is the right default and the wrong answer for a
+    multi-series chart in the changed list: it is there because *some* indicator of it moved, and the
+    caller may know which. Read by catalogPath rather than by id, the only identifier that means the same
+    thing in both environments — and where this environment does not hold that path (a version bump moves
+    it), the primary y stands in.
+
+    Four queries for any number of charts, whatever the mix of pins: charts, their dimensions, the pinned
+    variables by path, the rest by id.
+    """
+    pinned = pinned or {}
+    charts = resolve_charts(engine, refs, include_drafts=include_drafts)
+    dims_by_chart = fetch_chart_dimensions(engine, [int(c["chartId"]) for c in charts.values()])
+
+    # Plan every lookup before issuing any, so the two variable fetches are one query each. The primary y
+    # is resolved even for a pinned chart: it is what the pin falls back to, and an id already in a
+    # batched `in (...)` costs nothing to carry.
+    plan: dict[str, tuple[str | None, int | None]] = {}
+    for ref, chart in charts.items():
+        rows = dims_by_chart.get(int(chart["chartId"]), [])
+        chart["n_indicators"] = len({r["variableId"] for r in rows})
+        chart["has_data_page"] = chart["n_indicators"] == 1
+        y_rows = [r for r in rows if r.get("property") == "y"] or rows
+        plan[ref] = (pinned.get(ref), int(y_rows[0]["variableId"]) if y_rows else None)
+
+    rows_by_path = fetch_variable_rows_by_path(engine, [p for p, _ in plan.values() if p])
+    rows_by_id = fetch_variable_rows(engine, [vid for _, vid in plan.values() if vid is not None])
+
+    out: dict[str, tuple[ViewBundle, dict[str, Any]]] = {}
+    for ref, chart in charts.items():
+        path, vid = plan[ref]
+        variable_row = rows_by_path.get(path) if path else None
+        if variable_row is None and vid is not None:
+            variable_row = rows_by_id.get(vid)
+        chart_config = {"title": chart.get("title"), "subtitle": chart.get("subtitle"), "note": chart.get("note")}
+        out[ref] = (
+            build_view_bundle(
+                view={"dimensions": {}}, config_metadata=None, variable_row=variable_row, chart_config=chart_config
+            ),
+            chart,
+        )
+    return out
 
 
 def build_chart_bundle(
-    engine: Engine, ref: str, catalog_path: str | None = None
+    engine: Engine, ref: str, catalog_path: str | None = None, include_drafts: bool = False
 ) -> tuple[ViewBundle, dict[str, Any]] | None:
-    """Build a single-"view" bundle for a standalone chart: its y-indicator metadata + its FAUST.
+    """One chart's bundle: `build_chart_bundles` for a single ref, so the two can never disagree."""
+    pinned = {ref: catalog_path} if catalog_path else None
+    return build_chart_bundles(engine, [ref], pinned, include_drafts=include_drafts).get(ref)
 
-    Returns (bundle, chart) or None if the chart can't be resolved. The chart dict also carries
-    `n_indicators` and `has_data_page` — grapher renders a data page (and thus this WYSK text) only
-    for single-indicator charts; a scatter/multi-series chart has none. The bundle has empty
-    dimensions, so it matches its baseline counterpart in `diff_views`.
 
-    `catalog_path` pins which of the chart's indicators the metadata is read from. Without it the primary
-    y is used, which is the one a data page renders. That is the right default and the wrong answer for a
-    multi-series chart in the changed list: it is there because *some* indicator of it moved, and the
-    caller may know which. Read by catalogPath rather than by id, the only identifier that means the same
-    thing in both environments.
+@dataclass
+class ChartComparison:
+    """One chart's two bundles and the diff between them — everything a verdict on it is built from."""
+
+    chart: dict[str, Any]
+    source: ViewBundle
+    target: ViewBundle | None
+    diff: ViewDiff
+    # The indicator the comparison ended up reading, when it is not the primary y. Only a multi-series
+    # chart has one, and only when the primary y turned out not to be the indicator that moved.
+    pinned_path: str | None = None
+
+
+def compare_charts(
+    source_engine: Engine,
+    target_engine: Engine,
+    refs: list[str],
+    changed_paths: Any = frozenset(),
+    include_drafts: bool = False,
+) -> dict[str, ChartComparison]:
+    """Compare each chart's current text against the baseline's — in bulk, in a fixed number of queries.
+
+    The one place a chart's changed fields are decided. Both callers go through it: the chart page, which
+    renders the comparison, and `item_index`, which hashes it so a stored verdict reopens when the text
+    moves. They used to be two code paths over the same question, and a verdict hashed by one of them
+    could not be checked by the other — which is why chart verdicts alone never reopened.
+
+    `changed_paths` is the set of catalogPaths this branch actually changed (`indicator_changes().diffs`).
+    It is only consulted for the second pass: a multi-series chart whose primary y shows nothing is in the
+    changed list because some *other* indicator of it moved, so the comparison is rebuilt on the first of
+    those. Passed in rather than fetched here, to keep this free of the app's caching layer.
     """
-    chart = resolve_chart(engine, ref)
-    if chart is None:
-        return None
-    dims = read_sql(
-        "select variableId, property from chart_dimensions where chartId = %(id)s order by `order`",
-        engine=engine,
-        params={"id": int(chart["chartId"])},
-    )
-    chart["n_indicators"] = int(dims["variableId"].nunique()) if not dims.empty else 0
-    chart["has_data_page"] = chart["n_indicators"] == 1
-    # Primary y-indicator (fall back to the first dimension) — whose metadata the data page renders.
-    variable_row = fetch_variable_rows_by_path(engine, [catalog_path]).get(catalog_path) if catalog_path else None
-    if variable_row is None:
-        # No pin, or this environment does not hold that path (a version bump moves it): the primary y.
-        y = dims[dims["property"] == "y"] if not dims.empty else dims
-        if not y.empty:
-            vid: int | None = int(y.iloc[0]["variableId"])
-        elif not dims.empty:
-            vid = int(dims.iloc[0]["variableId"])
-        else:
-            vid = None
-        variable_row = fetch_variable_rows(engine, [vid]).get(vid) if vid is not None else None
-    chart_config = {"title": chart.get("title"), "subtitle": chart.get("subtitle"), "note": chart.get("note")}
-    bundle = build_view_bundle(
-        view={"dimensions": {}}, config_metadata=None, variable_row=variable_row, chart_config=chart_config
-    )
-    return bundle, chart
+    src = build_chart_bundles(source_engine, refs, include_drafts=include_drafts)
+    tgt = build_chart_bundles(target_engine, list(src), include_drafts=include_drafts)
+
+    out: dict[str, ChartComparison] = {}
+    retry: dict[str, int] = {}
+    for ref, (source, chart) in src.items():
+        target = tgt[ref][0] if ref in tgt else None
+        diff = diff_views([source], [target] if target is not None else [])[0]
+        out[ref] = ChartComparison(chart=chart, source=source, target=target, diff=diff)
+        # Asked only when the default comparison finds nothing, so an ordinary chart costs no extra query.
+        if not diff.fields and int(chart.get("n_indicators") or 0) > 1:
+            retry[ref] = int(chart["chartId"])
+
+    if not retry or not changed_paths:
+        return out
+
+    # Second pass: one changed indicator, not all of them — a chart carrying edits to two of its series
+    # still shows the first. Sorted, so the chart reviews the same series on every run and the verdict
+    # recorded against it keeps meaning the same thing.
+    paths_by_chart = fetch_chart_indicator_paths_bulk(source_engine, list(retry.values()))
+    pinned: dict[str, str] = {}
+    for ref, chart_id in retry.items():
+        for path in sorted(paths_by_chart.get(chart_id, [])):
+            if path in changed_paths:
+                pinned[ref] = path
+                break
+    if not pinned:
+        return out
+
+    src2 = build_chart_bundles(source_engine, list(pinned), pinned, include_drafts=include_drafts)
+    tgt2 = build_chart_bundles(target_engine, list(src2), pinned, include_drafts=include_drafts)
+    for ref, (source, chart) in src2.items():
+        target = tgt2[ref][0] if ref in tgt2 else None
+        out[ref] = ChartComparison(
+            chart=chart,
+            source=source,
+            target=target,
+            diff=diff_views([source], [target] if target is not None else [])[0],
+            pinned_path=pinned[ref],
+        )
+    return out
 
 
 def build_env_bundles(engine: Engine, config: dict[str, Any]) -> list[ViewBundle]:

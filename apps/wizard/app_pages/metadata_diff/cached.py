@@ -210,9 +210,9 @@ def item_index(
     `hash` is that slot's *current* content hash — what `resolve_item_mark` compares a stored row against
     to decide whether a verdict still describes the text it was made on. The Review tab needs it for the
     same reason the section lists do: a stored row keeps its status when the wording moves under it, and
-    counting it as decided would put a rejection of text nobody read into the hand-off document. Absent
-    for charts, whose fields are assembled per chart on their own page and are not enumerated here — so a
-    chart verdict is reported as recorded, which is what it was before any of this.
+    counting it as decided would put a rejection of text nobody read into the hand-off document. Charts
+    included: their fields are not enumerable the way a view's are, so `chart_diff_fields` builds them in
+    bulk from the same comparison their own page renders.
 
     An enumeration that fails is skipped rather than guessed at: a total that quietly omits a surface is
     worse than one that is conservative, and the sections report their own ceilings.
@@ -275,11 +275,21 @@ def item_index(
     except Exception:  # noqa: BLE001
         counts = {}
     totals[surface] = len(counts)
+    # The same fields the chart's own page hashes its verdict on, so a chart verdict goes stale exactly
+    # as an MDim or explorer one does. An enumeration that fails leaves the hash out rather than guessing
+    # at it: without a hash a verdict is reported as recorded, which is what it was before; with a wrong
+    # one every chart verdict would read as reopened forever.
+    try:
+        chart_fields = chart_diff_fields(_source_engine, _target_engine, cache_key=cache_key)
+    except Exception:  # noqa: BLE001
+        chart_fields = {}
     for chart_slug, n_changes in counts.items():
-        key, _ = item_identity(surface, chart_slug, {})
+        fields = chart_fields.get(chart_slug)
+        key, content_hash = item_identity(surface, chart_slug, fields or {})
         index[key] = {
             "name": f"{chart_slug} ({n_changes} change{'s' if n_changes != 1 else ''})",
             "url": f"{SOURCE.site}/grapher/{chart_slug}",
+            **({"hash": content_hash} if fields is not None else {}),
         }
 
     # --- Edits, per section: what the By-edit layouts tick ---
@@ -303,6 +313,27 @@ def item_index(
                     "hash": content_hash,
                 }
     return index, totals
+
+
+@st.cache_data(ttl=CACHE_TTL, show_spinner="Reading what changed on each chart…")
+def chart_diff_fields(_source_engine: Engine, _target_engine: Engine, cache_key: str = "") -> dict[str, dict]:
+    """slug -> the changed fields of that chart: exactly what its own page hashes its verdict on.
+
+    Every other surface enumerates its items and hashes each one, so a stored verdict reopens when the
+    wording moves under it. A chart's fields are assembled by comparing two bundles rather than listed,
+    which is why they were missing here and chart verdicts alone never reopened — a tick survived any
+    number of rewrites of the text it was supposed to certify.
+
+    Bulk, and cached, because that is what makes it affordable: `compare_charts` reads every changed chart
+    in a fixed number of queries per environment, where doing it chart by chart was three queries each per
+    side and turned this into hundreds of round trips on a branch touching a few dozen charts.
+    """
+    slugs = sorted(changed_charts(_source_engine, _target_engine, cache_key=cache_key))
+    if not slugs:
+        return {}
+    changed = indicator_changes(_source_engine, _target_engine, cache_key=cache_key)
+    comparisons = data.compare_charts(_source_engine, _target_engine, slugs, changed_paths=changed.diffs)
+    return {ref: cmp.diff.fields for ref, cmp in comparisons.items()}
 
 
 @st.cache_data(ttl=CACHE_TTL, show_spinner="Listing the charts this branch changed…")

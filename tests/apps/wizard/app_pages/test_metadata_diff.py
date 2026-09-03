@@ -3668,7 +3668,7 @@ def test_a_chart_with_no_data_page_is_not_linked_to_one(monkeypatch):
     """
     from streamlit.testing.v1 import AppTest
 
-    from apps.wizard.app_pages.metadata_diff import cached, mdim_pages
+    from apps.wizard.app_pages.metadata_diff import cached, data
     from apps.wizard.app_pages.metadata_diff.core import build_view_bundle
 
     def bundle_for(description: str, subtitle: str):
@@ -3696,7 +3696,9 @@ def test_a_chart_with_no_data_page_is_not_linked_to_one(monkeypatch):
             "note": None,
         }
         new, old = bundle_for("New.", "New subtitle."), bundle_for("Old.", "Old subtitle.")
-        return lambda engine, ref, catalog_path=None: (new if engine == "src" else old, dict(chart))
+        return lambda engine, refs, pinned=None, include_drafts=False: {
+            ref: (new if engine == "src" else old, dict(chart)) for ref in refs
+        }
 
     def app() -> None:
         from apps.wizard.app_pages.metadata_diff import mdim_pages
@@ -3705,9 +3707,11 @@ def test_a_chart_with_no_data_page_is_not_linked_to_one(monkeypatch):
         mdim_pages.render_chart_by_ref("src", "tgt", "some-chart", {})
 
     monkeypatch.setattr(cached, "usage_for_indicators", lambda *args, **kwargs: {})
+    monkeypatch.setattr(cached, "indicator_changes", lambda *_a, **_k: SimpleNamespace(diffs={}, ids={}))
 
     def rendered(n_indicators: int) -> str:
-        monkeypatch.setattr(mdim_pages, "build_chart_bundle", patched(n_indicators))
+        # The bulk builder, not the comparison: `compare_charts` itself stays under test.
+        monkeypatch.setattr(data, "build_chart_bundles", patched(n_indicators))
         at = AppTest.from_function(app, default_timeout=60).run()
         assert not at.exception, at.exception
         return " ".join(str(getattr(el, "value", "") or "") for el in at.markdown)
@@ -3841,7 +3845,7 @@ def test_a_multi_series_chart_is_reviewed_on_the_indicator_that_moved(monkeypatc
     """
     from streamlit.testing.v1 import AppTest
 
-    from apps.wizard.app_pages.metadata_diff import cached, mdim_pages
+    from apps.wizard.app_pages.metadata_diff import cached, data
     from apps.wizard.app_pages.metadata_diff.core import build_view_bundle
 
     first_y = "grapher/demography/2024-07-15/population/historical#population_historical"
@@ -3856,26 +3860,34 @@ def test_a_multi_series_chart_is_reviewed_on_the_indicator_that_moved(monkeypatc
         "note": None,
     }
 
-    def bundle(engine, _ref, catalog_path=None):
+    def bundles(engine, refs, pinned=None, include_drafts=False):
         """The first y says the same thing in both environments; only the pinned indicator moved."""
-        description = "Unchanged." if catalog_path is None else ("New." if engine == "src" else "Old.")
-        return (
-            build_view_bundle(
-                view={"dimensions": {}},
-                config_metadata=None,
-                variable_row={
-                    "id": 1,
-                    "name": "x",
-                    "catalogPath": catalog_path or first_y,
-                    "descriptionShort": description,
-                },
-                chart_config={"title": "Poverty vs population", "subtitle": "Same subtitle.", "note": None},
-            ),
-            dict(chart),
-        )
+        pinned = pinned or {}
+        out = {}
+        for ref in refs:
+            catalog_path = pinned.get(ref)
+            description = "Unchanged." if catalog_path is None else ("New." if engine == "src" else "Old.")
+            out[ref] = (
+                build_view_bundle(
+                    view={"dimensions": {}},
+                    config_metadata=None,
+                    variable_row={
+                        "id": 1,
+                        "name": "x",
+                        "catalogPath": catalog_path or first_y,
+                        "descriptionShort": description,
+                    },
+                    chart_config={"title": "Poverty vs population", "subtitle": "Same subtitle.", "note": None},
+                ),
+                dict(chart),
+            )
+        return out
 
-    monkeypatch.setattr(mdim_pages, "build_chart_bundle", bundle)
-    monkeypatch.setattr(mdim_pages, "fetch_chart_indicator_paths", lambda _engine, _chart_id: [moved, first_y])
+    # Stubbed at the query layer, so the two-pass rule in `compare_charts` is what the test exercises.
+    monkeypatch.setattr(data, "build_chart_bundles", bundles)
+    monkeypatch.setattr(
+        data, "fetch_chart_indicator_paths_bulk", lambda _engine, ids: {i: [moved, first_y] for i in ids}
+    )
     monkeypatch.setattr(cached, "indicator_changes", lambda *_a, **_k: SimpleNamespace(diffs={moved: object()}, ids={}))
     monkeypatch.setattr(cached, "usage_for_indicators", lambda *_a, **_k: {})
 
@@ -4316,3 +4328,146 @@ def test_the_shared_digest_trims_around_the_change():
     # Identical values are not a diff, and must not be dressed up as one.
     same_before, same_after = _around_change("Unchanged text.", "Unchanged text.")
     assert same_before == same_after == "Unchanged text."
+
+
+def _chart_bundles_stub(subtitle_by_engine: dict[str, str]):
+    """A `build_chart_bundles` that gives every requested chart one indicator and a per-engine subtitle."""
+
+    def bundles(engine, refs, pinned=None, include_drafts=False):
+        return {
+            ref: (
+                build_view_bundle(
+                    view={"dimensions": {}},
+                    config_metadata=None,
+                    variable_row={
+                        "id": 1,
+                        "name": "x",
+                        "catalogPath": "grapher/a/latest/b/b#x",
+                        "descriptionShort": "Same.",
+                    },
+                    chart_config={"title": "T", "subtitle": subtitle_by_engine[engine], "note": None},
+                ),
+                {"chartId": 42, "slug": ref, "title": "T", "n_indicators": 1, "has_data_page": True},
+            )
+            for ref in refs
+        }
+
+    return bundles
+
+
+def test_a_chart_verdict_reopens_when_its_text_is_edited_again(monkeypatch):
+    """Every other surface reopens a decision when its wording moves; charts did not.
+
+    `item_index` listed each changed chart without a content hash, because a chart's changed fields are
+    not enumerable the way a view's are — they come from comparing two bundles. `verdict_reopened` only
+    fires where the index holds a current hash, so a chart tick survived any number of rewrites of the
+    text it was supposed to certify, and a rejection of wording since fixed still shipped in the hand-off
+    document as live.
+    """
+    from apps.wizard.app_pages.metadata_diff import data
+    from apps.wizard.app_pages.metadata_diff.core import item_identity, surface_key
+    from apps.wizard.app_pages.metadata_diff.review_state import verdict_counts, verdict_reopened
+
+    surface = surface_key("item", "chart")
+
+    def hash_for(staging_subtitle: str) -> tuple[str, str]:
+        monkeypatch.setattr(data, "build_chart_bundles", _chart_bundles_stub({"src": staging_subtitle, "tgt": "Old."}))
+        fields = data.compare_charts("src", "tgt", ["some-chart"])["some-chart"].diff.fields
+        assert fields, "the branch changed this chart's subtitle"
+        return item_identity(surface, "some-chart", fields)
+
+    key, reviewed_on = hash_for("First wording.")
+    row = {"changeKey": key, "contentHash": reviewed_on, "status": "reviewed"}
+
+    # Nothing has moved: the tick stands, and counts.
+    index = {key: {"hash": reviewed_on}}
+    assert not verdict_reopened(row, index)
+    assert verdict_counts(row, index)
+
+    # The author rewords the subtitle. The tick was made on text nobody has now.
+    _, rewritten = hash_for("Second wording.")
+    assert rewritten != reviewed_on
+    index = {key: {"hash": rewritten}}
+    assert verdict_reopened(row, index), "a chart verdict must go stale when its text is edited again"
+    assert not verdict_counts(row, index), "and must stop counting as progress"
+
+
+def test_item_index_gives_a_changed_chart_a_current_hash(monkeypatch):
+    """The bug itself: the index listed charts with a name and a URL and no hash.
+
+    Without one `verdict_reopened` cannot fire, so this is the line that decided a chart verdict never
+    went stale. Every other surface's entry carried a hash already.
+    """
+    from apps.wizard.app_pages.metadata_diff import cached
+    from apps.wizard.app_pages.metadata_diff.core import item_identity, surface_key
+
+    fields = {"chart.subtitle": {"old": "Old.", "new": "New."}}
+
+    def unavailable(*_a, **_k):
+        raise RuntimeError("not part of this test")
+
+    monkeypatch.setattr(cached, "mdim_changes", unavailable)
+    monkeypatch.setattr(cached, "explorer_changes", unavailable)
+    monkeypatch.setattr(cached, "summary", unavailable)
+    monkeypatch.setattr(cached, "changed_charts", lambda *_a, **_k: {"some-chart": 1})
+    monkeypatch.setattr(cached, "chart_diff_fields", lambda *_a, **_k: {"some-chart": fields})
+
+    surface = surface_key("item", "chart")
+    key, expected = item_identity(surface, "some-chart", fields)
+    # Cleared, so this run reads the monkeypatched dependencies rather than another test's memoized index.
+    cached.item_index.clear()
+    index, totals = cached.item_index("src", "tgt")
+
+    assert totals[surface] == 1
+    assert index[key]["hash"] == expected, "a changed chart must carry the hash its verdict is checked against"
+
+
+def test_item_index_omits_the_hash_it_could_not_compute(monkeypatch):
+    """A failed comparison leaves the slot hashless rather than guessing at it.
+
+    The conservative half of the fix. A wrong hash is worse than none: it matches no stored verdict, so
+    every chart decision would read as reopened forever. No hash restores the old behaviour for that
+    chart alone — reported as recorded — instead of breaking the surface.
+    """
+    from apps.wizard.app_pages.metadata_diff import cached
+    from apps.wizard.app_pages.metadata_diff.core import item_identity, surface_key
+
+    def unavailable(*_a, **_k):
+        raise RuntimeError("not part of this test")
+
+    monkeypatch.setattr(cached, "mdim_changes", unavailable)
+    monkeypatch.setattr(cached, "explorer_changes", unavailable)
+    monkeypatch.setattr(cached, "summary", unavailable)
+    monkeypatch.setattr(cached, "changed_charts", lambda *_a, **_k: {"some-chart": 1})
+    monkeypatch.setattr(cached, "chart_diff_fields", unavailable)
+
+    surface = surface_key("item", "chart")
+    key, _ = item_identity(surface, "some-chart", {})
+    cached.item_index.clear()
+    index, _totals = cached.item_index("src", "tgt")
+
+    assert "hash" not in index[key]
+    assert index[key]["name"].startswith("some-chart")
+
+
+def test_one_chart_is_hashed_the_same_alone_as_in_bulk(monkeypatch):
+    """The index hashes charts in bulk; the chart page hashes the one in front of you. They must agree.
+
+    If they can disagree the fix is worse than the bug: a verdict recorded on the page would never match
+    the index's hash, so every chart verdict would read as reopened forever. One implementation is what
+    rules that out — this is the test that says so.
+    """
+    from apps.wizard.app_pages.metadata_diff import data
+    from apps.wizard.app_pages.metadata_diff.core import item_identity, surface_key
+
+    monkeypatch.setattr(data, "build_chart_bundles", _chart_bundles_stub({"src": "New.", "tgt": "Old."}))
+    surface = surface_key("item", "chart")
+
+    # In bulk, the way `item_index` reads every changed chart at once.
+    in_bulk = data.compare_charts("src", "tgt", ["some-chart", "other-chart", "third-chart"])
+    # Alone, the way the chart page reads the one it is rendering.
+    alone = data.compare_charts("src", "tgt", ["some-chart"])
+
+    assert item_identity(surface, "some-chart", in_bulk["some-chart"].diff.fields) == item_identity(
+        surface, "some-chart", alone["some-chart"].diff.fields
+    )
