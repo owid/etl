@@ -580,7 +580,7 @@ def cli(
     if digest_out:
         state = digest.load_state()
         # Resolved once and used for both the lookup and the record — see digest.stamp().
-        facts = digest.chart_facts(results)
+        facts = digest.chart_facts(results, editor_window_days=changed_since)
         # Name the last editor only in a configuration-edit sweep, where the chart is under
         # review because of that edit — see digest.attach_mentions().
         digest.attach_mentions(facts, tag_last_editor=bool(changed_since) and not include_data_updates)

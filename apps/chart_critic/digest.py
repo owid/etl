@@ -24,7 +24,7 @@ import re
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
-from slack_sdk.errors import SlackApiError
+from slack_sdk.errors import SlackClientError
 from structlog import get_logger
 
 from apps.chart_critic.critic import format_views
@@ -100,7 +100,7 @@ def changed_slugs(days: int = 1, include_data_updates: bool = False) -> list[str
     return sorted(slugs)
 
 
-def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+def chart_facts(results: list[dict[str, Any]], editor_window_days: int | None = None) -> dict[str, dict[str, Any]]:
     """What the digest needs to know about each flagged chart beyond the review itself:
     ``{slug: {"chart_id", "indicators", "editor"}}``.
 
@@ -116,7 +116,10 @@ def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     link; that is correct rather than missing, since there is no single chart to edit.
 
     It also yields the chart's last editor, who is who a finding gets addressed to — see
-    :func:`attach_mentions` for when we may name them.
+    :func:`attach_mentions` for when we may name them. ``editor_window_days`` is the sweep's own
+    window, and an editor whose edit falls outside it is reported as unknown: selection is on
+    ``chart_configs.updatedAt``, which an ETL upsert or a chart sync bumps without anybody
+    editing anything, so "this chart changed" is not on its own evidence about who changed it.
 
     Only flagged charts are looked up, so this is one small query. It fails soft: without a
     database the fingerprint falls back to the slug (which over-reports rather than dropping a
@@ -127,9 +130,11 @@ def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
         return {}
     from etl.db import read_sql
 
+    # A literal fragment, and the window itself stays a bound parameter.
+    edited_in_window = "AND c.lastEditedAt >= NOW() - INTERVAL %(editor_days)s DAY" if editor_window_days is not None else ""
     try:
         df = read_sql(
-            """
+            f"""
             SELECT cc.slug        AS slug,
                    c.id           AS chartId,
                    u.fullName     AS editorName,
@@ -140,10 +145,10 @@ def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
             JOIN charts c            ON c.configId = cc.id
             JOIN chart_dimensions cd ON cd.chartId = c.id
             JOIN variables v         ON v.id = cd.variableId
-            LEFT JOIN users u        ON u.id = c.lastEditedByUserId
+            LEFT JOIN users u        ON u.id = c.lastEditedByUserId {edited_in_window}
             WHERE cc.slug IN %(slugs)s
             """,
-            params={"slugs": tuple(slugs)},
+            params={"slugs": tuple(slugs), "editor_days": editor_window_days},
         )
     except Exception as e:  # noqa: BLE001 — dedup quality and a link, not correctness
         log.warning("chart_critic.chart_facts_failed", error=str(e))
@@ -188,7 +193,11 @@ def _slack_member_id(email: str) -> str | None:
         return None
     try:
         return str(slack_client.users_lookupByEmail(email=email)["user"]["id"])
-    except SlackApiError as e:
+    # Slack refusing to answer (SlackClientError covers both an API error and a malformed
+    # request) and Slack being unreachable (a DNS failure, a timeout, a reset connection — all
+    # OSError under the SDK's urllib transport) have the same right answer: fall back to the
+    # plain name. A courtesy in a footer must not be able to fail a --digest run.
+    except (SlackClientError, OSError) as e:
         log.warning("chart_critic.slack_lookup_failed", email=email, error=str(e))
         return None
 
@@ -198,10 +207,13 @@ def attach_mentions(facts: dict[str, dict[str, Any]], tag_last_editor: bool) -> 
 
     A finding addressed to nobody gets read and forgotten, so a finding names the person who
     last edited the chart — but only when ``tag_last_editor`` says the sweep earns it. That is
-    the configuration-edit sweep, where the chart is under review *because* they edited it in
-    the last day, and where "you changed this yesterday, this may be off" is a fair thing to
-    say. In any other selection the last editor may have changed a colour two years ago, and
-    naming them is noise at best.
+    the configuration-edit sweep, where the chart is under review *because* of a recent edit and
+    "you changed this, it may be off" is a fair thing to say. In any other selection the last
+    editor may have changed a colour two years ago, and naming them is noise at best.
+
+    The other half of that rule lives in :func:`chart_facts`, which reports no editor at all
+    unless their edit is inside the sweep's window — so a longer ``--changed-since`` widens who
+    can be named exactly as far as it widens what the digest says it reviewed, and no further.
 
     Called once from the CLI so the Slack lookups happen in one visible place and the message
     formatting stays a pure function of its inputs. Fails soft to the plain name: an unresolved

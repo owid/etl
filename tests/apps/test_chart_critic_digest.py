@@ -58,3 +58,21 @@ def test_a_service_account_is_never_named():
     facts = {"a": {"chart_id": 1, "indicators": [], "editor": {"name": "ETL", "email": "etl@ourworldindata.org"}}}
     digest.attach_mentions(facts, tag_last_editor=True)
     assert facts["a"]["editor_mention"] is None
+
+
+def test_a_slack_outage_falls_back_to_the_plain_name(monkeypatch):
+    """Slack being unreachable must not fail the run — the footer just names the person plainly."""
+    from etl import config, slack_helpers
+
+    class Unreachable:
+        def users_lookupByEmail(self, email):
+            raise OSError("temporary failure in name resolution")
+
+    monkeypatch.setattr(config, "SLACK_API_TOKEN", "xoxb-not-a-real-token")
+    monkeypatch.setattr(slack_helpers, "slack_client", Unreachable())
+    digest._slack_member_id.cache_clear()
+
+    facts = {"a": {"chart_id": 1, "indicators": [], "editor": {"name": "Pablo Rosado", "email": "pablo@owid.org"}}}
+    digest.attach_mentions(facts, tag_last_editor=True)
+    assert facts["a"]["editor_mention"] == "Pablo Rosado"
+    digest._slack_member_id.cache_clear()
