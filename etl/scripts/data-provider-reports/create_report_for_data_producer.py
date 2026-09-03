@@ -225,6 +225,9 @@ def gather_producer_analytics(producers: list[str], min_date: str, max_date: str
         "posts": df_posts,
         "additional_charts_exclusive": df_additional_charts_exclusive,
         "additional_charts_mixed": df_additional_charts_mixed,
+        # ALL current standalone charts using the producer's data, regardless of period traffic
+        # (df_charts only carries the ones with views in the period).
+        "producer_charts": df_producer_charts,
     }
 
     return analytics
@@ -482,8 +485,11 @@ class Report:
 
         # Create dataframes for top content.
         list_cols = ["url", "views", "title", "featured_on_homepage"]
+        # Only content with period traffic belongs in the "most viewed" list (the catalog frames now also
+        # carry zero-view mdim views/explorers, which must not pad the list).
         df_top_charts = (
-            df_charts_and_additional_exclusive.sort_values("views", ascending=False)[list_cols]
+            df_charts_and_additional_exclusive[df_charts_and_additional_exclusive["views"] > 0]
+            .sort_values("views", ascending=False)[list_cols]
             .reset_index(drop=True)
             .iloc[0:10]
         )
@@ -499,7 +505,13 @@ class Report:
         )
 
         # Calculate metrics.
-        n_charts = len(df_charts_and_additional_exclusive)
+        # Number of charts = CURRENT catalog: standalone charts using the producer's data + all mdim views
+        # using it (counted individually; they have their own URLs and analytics) + live explorers
+        # featuring it (one each, mixed ones included - their views are reported separately below, but
+        # they are charts on the site showing the producer's data).
+        n_mdim_views_and_exclusive_explorers = len(self.analytics["additional_charts_exclusive"])
+        n_standalone_charts = self.analytics["producer_charts"]["chart_id"].nunique()
+        n_charts = n_standalone_charts + n_mdim_views_and_exclusive_explorers + len(df_additional_charts_mixed)
         n_publications = len(self.analytics["posts"])
         n_chart_views = df_charts_and_additional_exclusive["views"].sum()
         n_post_views = self.analytics["posts"]["views"].sum()

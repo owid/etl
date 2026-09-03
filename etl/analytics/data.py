@@ -598,6 +598,8 @@ def get_mdim_explorer_views_by_producer(
         Columns: slug, type, view_config_id (None for explorers), dimensions (None for explorers), title,
         url, own_views, redirected_views, views (own + redirected), n_days, views_daily,
         uses_other_producers_data, includes_redirect_views.
+        The frame is the producer's CURRENT catalog of mdim views and explorers: rows with zero views in
+        the period are included (callers count the catalog; zero rows add nothing to view totals).
     """
     cols = [
         "slug",
@@ -690,8 +692,10 @@ def get_mdim_explorer_views_by_producer(
         mdims["own_views"] = mdims["own_views"].fillna(0).astype(int)
         mdims["redirected_views"] = mdims["redirected_views"].fillna(0).astype(int)
         mdims["uses_other_producers_data"] = mdims["uses_other_producers_data"].fillna(False)
-        # Keep only views with some traffic in the period.
-        mdims = mdims[(mdims["own_views"] + mdims["redirected_views"]) > 0].reset_index(drop=True)
+        # Keep ALL producer views, including those with no traffic in the period: the returned frame is
+        # the producer's current catalog of mdim views (callers count it), and zero-view rows add nothing
+        # to view totals.
+        mdims = mdims.reset_index(drop=True)
 
         if not mdims.empty:
             mdims["type"] = "multidim"
@@ -744,22 +748,28 @@ def get_mdim_explorer_views_by_producer(
             .reset_index()
         )
         explorer_slugs = sorted(explorer_relevant["slug"].tolist())
-        df_explorers = get_explorer_views_by_url(
-            urls=[f"{POST_LINK_TYPES_TO_URL['explorer']}{slug}" for slug in explorer_slugs],
-            date_min=date_min,
-            date_max=date_max,
-        )
-        if not df_explorers.empty:
-            df_explorers["slug"] = df_explorers["url"].str.removeprefix(POST_LINK_TYPES_TO_URL["explorer"])
-            df_explorers = df_explorers.merge(explorer_flags, on="slug", how="left")
-            df_explorers["type"] = "explorer"
-            df_explorers["view_config_id"] = None
-            df_explorers["dimensions"] = None
-            df_explorers["own_views"] = df_explorers["views"].astype(int)
-            df_explorers["redirected_views"] = 0
-            df_explorers["includes_redirect_views"] = False
-            df_explorers["uses_other_producers_data"] = df_explorers["uses_other_producers_data"].fillna(False)
-            frames.append(df_explorers[cols])
+        explorer_urls = [f"{POST_LINK_TYPES_TO_URL['explorer']}{slug}" for slug in explorer_slugs]
+        df_explorer_views = get_explorer_views_by_url(urls=explorer_urls, date_min=date_min, date_max=date_max)
+        # Keep every live producer explorer, including ones with no views in the period (like mdim views
+        # above, the catalog should be complete; zero-view rows add nothing to view totals).
+        df_explorers = pd.DataFrame({"url": explorer_urls})
+        if not df_explorer_views.empty:
+            df_explorers = df_explorers.merge(df_explorer_views, on="url", how="left")
+        else:
+            df_explorers[["title", "views", "n_days", "views_daily"]] = None
+        df_explorers["slug"] = df_explorers["url"].str.removeprefix(POST_LINK_TYPES_TO_URL["explorer"])
+        for column in ["views", "n_days", "views_daily"]:
+            df_explorers[column] = df_explorers[column].fillna(0)
+        df_explorers["title"] = df_explorers["title"].fillna(df_explorers["slug"])
+        df_explorers = df_explorers.merge(explorer_flags, on="slug", how="left")
+        df_explorers["type"] = "explorer"
+        df_explorers["view_config_id"] = None
+        df_explorers["dimensions"] = None
+        df_explorers["own_views"] = df_explorers["views"].astype(int)
+        df_explorers["redirected_views"] = 0
+        df_explorers["includes_redirect_views"] = False
+        df_explorers["uses_other_producers_data"] = df_explorers["uses_other_producers_data"].fillna(False)
+        frames.append(df_explorers[cols])
 
     if not frames:
         return _empty_result()
