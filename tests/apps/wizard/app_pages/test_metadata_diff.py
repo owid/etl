@@ -3146,6 +3146,100 @@ def test_rejecting_everything_is_offered_and_approving_everything_is_not():
     assert "clear_status" in source
 
 
+def test_a_package_step_is_named_by_the_metadata_file_it_actually_has():
+    """Most garden steps are a flat `<short>.py` with `<short>.meta.yml` beside them. Some are packages.
+
+    A step grown into a package takes the directory, and its metadata moves inside it. Appending the
+    suffix to the dataset dir then names a file that is not there, so the rejection document sent the
+    editor to a path that does not exist and the owner lookup found no `dataset.owners` to read.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import garden_meta_file
+
+    # A package step, as V-Dem is: `.../vdem/` holding `vdem.meta.yml`.
+    assert (
+        garden_meta_file("etl/steps/data/garden/democracy/2026-03-17/vdem")
+        == "etl/steps/data/garden/democracy/2026-03-17/vdem/vdem.meta.yml"
+    )
+    # A flat step is unchanged.
+    assert (
+        garden_meta_file("etl/steps/data/garden/worldbank_wdi/2026-07-27/wdi")
+        == "etl/steps/data/garden/worldbank_wdi/2026-07-27/wdi.meta.yml"
+    )
+    # A `.meta.override.yml` usually is not on disk, so the guess follows the shape the step itself has.
+    assert garden_meta_file("etl/steps/data/garden/democracy/2026-03-17/vdem", ".meta.override.yml").endswith(
+        "vdem/vdem.meta.override.yml"
+    )
+    assert garden_meta_file("etl/steps/data/garden/worldbank_wdi/2026-07-27/wdi", ".meta.override.yml").endswith(
+        "2026-07-27/wdi.meta.override.yml"
+    )
+    # A dataset that is not checked out at all still gets a filename rather than a blank.
+    assert (
+        garden_meta_file("etl/steps/data/garden/nowhere/2020-01-01/nothing")
+        == "etl/steps/data/garden/nowhere/2020-01-01/nothing.meta.yml"
+    )
+
+
+def test_the_rejection_document_points_a_package_step_at_its_own_directory():
+    """The same resolution, where a reviewer actually meets it: the instruction naming the file to edit."""
+    from apps.wizard.app_pages.metadata_diff.core import item_identity
+    from apps.wizard.app_pages.metadata_diff.data import REJECTED
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, edit_fields, edit_key, edits_for
+    from apps.wizard.app_pages.metadata_diff.review_section import _rejections_markdown
+
+    reach = ChangeReach(
+        field="descriptionShort",
+        old="Electoral democracy.",
+        new="Electoral democracy, as estimated by experts.",
+        charts=[{"chartId": 1, "slug": "electoral-democracy", "has_data_page": True}],
+        catalog_paths={"grapher/democracy/2026-03-17/vdem/vdem#electdem"},
+    )
+    summary = Summary(reach=[reach])
+    surface = surface_key("item", "edit:charts")
+    (edit,) = edits_for(summary, "charts")
+    change_key, content_hash = item_identity(surface, edit_key(edit), edit_fields(edit))
+    rows = [
+        {
+            "catalogPath": surface,
+            "changeKey": change_key,
+            "contentHash": content_hash,
+            "status": REJECTED,
+            "comment": "",
+            "updatedAt": None,
+        }
+    ]
+
+    doc = _rejections_markdown(rows, {}, summary)
+    assert "`etl/steps/data/garden/democracy/2026-03-17/vdem/vdem.meta.yml` — change it there" in doc
+    assert "`etl/steps/data/garden/democracy/2026-03-17/vdem.meta.yml`" not in doc
+
+
+def test_a_verdict_reopens_when_the_text_it_was_made_on_moves():
+    """A stored row keeps its status when the wording moves under it; only its content hash goes stale.
+
+    The section lists already reopen such an item. The Review tab read status alone, so a rejection of
+    wording nobody assessed was counted as decided and written into the hand-off document as an
+    instruction to undo it.
+    """
+    from apps.wizard.app_pages.metadata_diff.data import NOTED, REJECTED, REVIEWED
+    from apps.wizard.app_pages.metadata_diff.review_section import _reopened
+
+    index = {"slot-a": {"name": "A view", "url": "http://x", "hash": "now"}, "chart-slot": {"name": "A chart"}}
+
+    def row(change_key, content_hash, status):
+        return {"changeKey": change_key, "contentHash": content_hash, "status": status}
+
+    assert not _reopened(row("slot-a", "now", REJECTED), index), "the text is as it was judged"
+    assert _reopened(row("slot-a", "before", REJECTED), index), "the text moved after the verdict"
+    assert _reopened(row("slot-a", "before", REVIEWED), index)
+    # A note is not a verdict, so nothing reopens.
+    assert not _reopened(row("slot-a", "before", NOTED), index)
+    # No current hash to compare with — a chart, whose fields are assembled on its own page — is reported
+    # as recorded rather than guessed at.
+    assert not _reopened(row("chart-slot", "before", REJECTED), index)
+    # An item no longer in the comparison is handled by the "no longer in this diff" line, not here.
+    assert not _reopened(row("gone", "before", REJECTED), index)
+
+
 def test_the_rejection_document_says_what_to_undo_and_where():
     """A rejection is only useful if somebody can act on it without the page it was made on.
 

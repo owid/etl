@@ -16,6 +16,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     distinct_garden_datasets,
     distinct_indicator_short_names,
     field_label,
+    garden_meta_file,
     group_usage,
     parse_catalog_path,
     split_by_prominence,
@@ -73,7 +74,7 @@ def garden_location_lines(g: ChangeGroup, reach: str) -> list[str]:
     garden_dir = parsed[0] if parsed else None
     table = parsed[1] if parsed else None
     if len(garden_dirs) > 1:
-        files = ", ".join(f"`{d}.meta.yml`" for d in garden_dirs)
+        files = ", ".join(f"`{garden_meta_file(d)}`" for d in garden_dirs)
         return [
             f"- **Files ({len(garden_dirs)} datasets):** {files} — or their `.meta.override.yml`",
             f"- **The identical text was edited in {len(garden_dirs)} separate garden datasets**, so this is "
@@ -82,7 +83,8 @@ def garden_location_lines(g: ChangeGroup, reach: str) -> list[str]:
             f"- **Reach (observed in this diff):** {reach}.",
         ]
     file_line = (
-        f"- **File (best guess):** `{garden_dir}.meta.yml` — or `{garden_dir}.meta.override.yml`"
+        f"- **File (best guess):** `{garden_meta_file(garden_dir)}` — or "
+        f"`{garden_meta_file(garden_dir, '.meta.override.yml')}`"
         if garden_dir
         else "- **Where:** the indicator's garden `.meta.yml` (catalogPath unavailable)"
     )

@@ -22,6 +22,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     SECTIONS,
     distinct_garden_datasets,
     field_label,
+    garden_meta_file,
     item_identity,
     section_progress,
     surface_key,
@@ -51,8 +52,15 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
     rows = load_item_notes(source_engine)
     index, totals = cached.item_index(source_engine, target_engine)
     summary = cached.summary(source_engine, target_engine)
-    ticked = [r for r in rows if r.get("status") == REVIEWED]
-    rejected = [r for r in rows if r.get("status") == REJECTED]
+    # A verdict is bound to the text it was made on. Reword that text and the row keeps its status while
+    # its `contentHash` no longer matches, which is how a rejection of wording nobody read reached the
+    # hand-off document as an instruction to undo it. The section lists already reopen such an item
+    # (`resolve_item_mark`); this reads the same current hash and applies the same rule here.
+    reopened = [r for r in rows if _reopened(r, index)]
+    settled = [r for r in rows if not _reopened(r, index)]
+    ticked = [r for r in settled if r.get("status") == REVIEWED]
+    rejected = [r for r in settled if r.get("status") == REJECTED]
+    # Notes are the reviewer's own words and stay whatever happened to the text; only verdicts reopen.
     noted = [r for r in rows if r.get("comment")]
     # Counted along whichever layout each section was reviewed in — view by view or by edit — never both
     # added, or a section finished view by view would read as unfinished for its untouched edit cards.
@@ -98,9 +106,18 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
         bits.append(f"❌ {len(rejected)}")
     if noted:
         bits.append(f"📝 {len(noted)}")
+    if reopened:
+        bits.append(f"♻️ {len(reopened)} reopened")
     bits.append(f"**{finished} of {n_sections} sections finished**")
     bits.append(f"against `{BASELINE_NAME}`")
     st.markdown(" · ".join(bits))
+
+    if reopened:
+        st.warning(
+            f"**{len(reopened)} decision{'s' if len(reopened) != 1 else ''} reopened** — the text moved "
+            "after it was made, so it is not counted here and not in the documents below. Read the item "
+            "again in its section and decide on the wording as it stands."
+        )
 
     if rejected:
         # The one thing here that somebody has to act on, so it is the only banner that leads.
@@ -180,11 +197,31 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
     _footnote()
 
 
+def _reopened(row: dict[str, Any], index: dict[str, dict[str, str]]) -> bool:
+    """Has the text moved since this verdict was recorded?
+
+    Only for rows the index can currently hash. A chart's fields are assembled on its own page rather than
+    enumerated in `item_index`, so a chart verdict has no current hash to compare with and is reported as
+    recorded — the behaviour every row had before. A row whose item has left the comparison entirely is
+    not reopened either: `_row_line` already says the item is gone, which is the more useful thing to say.
+    """
+    if row.get("status") not in DECIDED:
+        return False
+    current = (index.get(str(row.get("changeKey"))) or {}).get("hash")
+    return bool(current) and row.get("contentHash") != current
+
+
 def _row_line(row: dict[str, Any], index: dict[str, dict[str, str]]) -> str:
-    """One recorded item: reviewed, rejected or merely noted, named, and linked to the thing itself."""
+    """One recorded item: reviewed, rejected or merely noted, named, and linked to the thing itself.
+
+    A reopened verdict keeps its icon — it is a record of what was recorded — but says so, since the
+    counts and the documents above have already stopped treating it as a decision.
+    """
     icon = {REVIEWED: "✅", REJECTED: "❌"}.get(str(row.get("status")), "📝")
     known = index.get(str(row.get("changeKey")))
     when = f" :small[:gray[{row.get('updatedAt')}]]" if row.get("updatedAt") else ""
+    if _reopened(row, index):
+        when = " :orange-badge[♻️ text changed since]" + when
     if not known:
         # A row whose item is no longer in the comparison — the text was reverted, or the chart was
         # unpublished since. Said plainly rather than shown as a bare hash.
@@ -528,7 +565,9 @@ def _rejections_markdown(rejected: list[dict[str, Any]], index: dict[str, dict[s
             lines.append(f"- **{edit['field']}** — {_texts_in(edit['refused'])}")
             lines.extend(_words_lines(edit))
             for dataset in edit["datasets"]:
-                lines.append(f"  - authored in `{dataset}.meta.yml`{_owned_by(dataset, owners)} — change it there")
+                lines.append(
+                    f"  - authored in `{garden_meta_file(dataset)}`{_owned_by(dataset, owners)} — change it there"
+                )
             lines.extend(_note_lines(notes))
         lines.append("")
 
@@ -541,7 +580,7 @@ def _rejections_markdown(rejected: list[dict[str, Any]], index: dict[str, dict[s
             lines.extend(_words_lines(edit))
             for dataset in edit["datasets"]:
                 lines.append(
-                    f"  - leave `{dataset}.meta.yml`{_owned_by(dataset, owners)} as it is — the text is "
+                    f"  - leave `{garden_meta_file(dataset)}`{_owned_by(dataset, owners)} as it is — the text is "
                     "wanted elsewhere"
                 )
             for section, _n in edit["refused"]:

@@ -31,7 +31,13 @@ from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import cached, view_nav
-from apps.wizard.app_pages.metadata_diff.core import ViewDiff, diff_window_html, field_label, view_url
+from apps.wizard.app_pages.metadata_diff.core import (
+    ViewDiff,
+    diff_window_html,
+    field_label,
+    garden_meta_file,
+    view_url,
+)
 from apps.wizard.app_pages.metadata_diff.discovery import (
     ChangeReach,
     EditGroup,
@@ -172,7 +178,7 @@ def _tree(edits: list[EditGroup]) -> None:
             )
             st_edit_body(group)
             if len(datasets) > 1:
-                files = ", ".join(f"`{d}.meta.yml`" for d in datasets)
+                files = ", ".join(f"`{garden_meta_file(d)}`" for d in datasets)
                 st.caption(
                     f"Authored in {len(datasets)} separate garden datasets — {files}. No `definitions.*` "
                     "block spans files, so each one has to be edited and rebuilt on its own."

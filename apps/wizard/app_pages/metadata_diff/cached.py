@@ -201,11 +201,18 @@ def chart_text_changes(
 def item_index(
     _source_engine: Engine, _target_engine: Engine, cache_key: str = ""
 ) -> tuple[dict[str, dict[str, str]], dict[str, int]]:
-    """change key -> {name, url} for every reviewable item, plus how many each surface holds.
+    """change key -> {name, url, hash} for every reviewable item, plus how many each surface holds.
 
     Shared by the Review tab, which needs the names, and the section bar, which needs the totals. Built by
     enumerating the items the sections show and hashing each one the way its tick was hashed — a stored row
     carries a hash, not a name, because the slot has to survive an edit to the text.
+
+    `hash` is that slot's *current* content hash — what `resolve_item_mark` compares a stored row against
+    to decide whether a verdict still describes the text it was made on. The Review tab needs it for the
+    same reason the section lists do: a stored row keeps its status when the wording moves under it, and
+    counting it as decided would put a rejection of text nobody read into the hand-off document. Absent
+    for charts, whose fields are assembled per chart on their own page and are not enumerated here — so a
+    chart verdict is reported as recorded, which is what it was before any of this.
 
     An enumeration that fails is skipped rather than guessed at: a total that quietly omits a surface is
     worse than one that is conservative, and the sections report their own ceilings.
@@ -236,10 +243,11 @@ def item_index(
         changed = [v for v in view_diffs if v.changed]
         totals[surface] = len(changed)
         for view in changed:
-            key, _ = item_identity(surface, dims_str(view.dimensions), {})
+            key, content_hash = item_identity(surface, dims_str(view.dimensions), view.fields)
             index[key] = {
                 "name": f"{title or catalog_path} — {view_label(view, dimensions)}",
                 "url": view_url(SOURCE, catalog_path, None if row["is_draft"] else slug, view.dimensions),
+                "hash": content_hash,
             }
 
     # --- Explorer views ---
@@ -252,11 +260,12 @@ def item_index(
         changed = [d for d in diffs if d.changed]
         totals[surface] = len(changed)
         for view in changed:
-            key, _ = item_identity(surface, dims_str(view.dimensions), {})
+            key, content_hash = item_identity(surface, dims_str(view.dimensions), view.fields)
             label = " · ".join(str(v) for v in view.dimensions.values()) or "(view)"
             index[key] = {
                 "name": f"{explorer_slug} — {label}",
                 "url": f"{SOURCE.site}/explorers/{explorer_slug}?{urlencode(view.dimensions)}",
+                "hash": content_hash,
             }
 
     # --- Charts ---
@@ -285,12 +294,13 @@ def item_index(
             edits = discovery.edits_for(facts, section)
             totals[surface] = len(edits)
             for edit in edits:
-                key, _ = item_identity(surface, discovery.edit_key(edit), {})
+                key, content_hash = item_identity(surface, discovery.edit_key(edit), discovery.edit_fields(edit))
                 words = " ".join((edit.inserted or edit.deleted or "").split())
                 words = words if len(words) <= 60 else words[:57].rstrip() + "…"
                 index[key] = {
                     "name": f"{field_label(edit.field)} — “{words}” ({edit.n_texts} text{'s' if edit.n_texts != 1 else ''})",
                     "url": f"{wizard}/metadata-diff?diff-type={section}&{LAYOUT_QUERY_KEY}=changes",
+                    "hash": content_hash,
                 }
     return index, totals
 

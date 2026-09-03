@@ -42,6 +42,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     distinct_garden_datasets,
     edit_fingerprint,
     field_label,
+    garden_meta_file,
     group_changes,
     indicator_identity,
     mark_identity,
@@ -2052,7 +2053,10 @@ def dataset_owners(garden_dirs: list[str]) -> dict[str, list[str]]:
     out: dict[str, list[str]] = {}
     for directory in garden_dirs:
         for suffix in (".meta.yml", ".meta.override.yml"):
-            path = BASE_DIR / f"{directory}{suffix}"
+            # Not `f"{directory}{suffix}"`: a step grown into a package keeps its metadata *inside* the
+            # directory (`.../vdem/vdem.meta.yml`), and the flat form named a file that is not there — so
+            # every one of those datasets came back ownerless.
+            path = BASE_DIR / garden_meta_file(directory, suffix)
             if not path.exists():
                 continue
             try:

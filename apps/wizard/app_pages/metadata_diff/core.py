@@ -20,6 +20,7 @@ from typing import Any
 from urllib.parse import quote, unquote, urlencode
 
 from etl.files import ruamel_dump
+from etl.paths import BASE_DIR
 
 # Metadata fields we diff, in display order. Keys are the camelCase names used both as
 # columns of the `variables` table and in the (camelized) view-level `metadata`
@@ -760,6 +761,27 @@ def distinct_garden_datasets(catalog_paths: Iterable[str]) -> list[str]:
     return sorted(dirs)
 
 
+def garden_meta_file(garden_dir: str, suffix: str = ".meta.yml") -> str:
+    """Where a garden step's metadata file actually is, given the step dir `parse_catalog_path` returns.
+
+    Usually beside the step — `.../worldbank_wdi/2026-07-27/wdi.py` next to `wdi.meta.yml`. A step that
+    has grown into a package takes the directory instead, and its metadata moves inside it:
+    `.../democracy/2026-03-17/vdem/vdem.meta.yml`. Appending the suffix to the dir then names a file that
+    does not exist, which is how every instruction saying which file to open, and the owner lookup that
+    reads `dataset.owners` out of that file, ended up pointing at nothing for those datasets.
+
+    Falls back to whichever shape the step itself has when the file is not on disk — a `.meta.override.yml`
+    usually is not, and naming it inside the package is the useful guess for a package step. The brief calls
+    it a best guess, and a guess is better than an empty line where a reviewer expects a filename.
+    """
+    short = garden_dir.rsplit("/", 1)[-1]
+    inside, flat = f"{garden_dir}/{short}{suffix}", f"{garden_dir}{suffix}"
+    for candidate in (inside, flat):
+        if (BASE_DIR / candidate).exists():
+            return candidate
+    return inside if (BASE_DIR / garden_dir).is_dir() else flat
+
+
 def text_change_key(catalog_path: str, field: str, old: Any, new: Any) -> str:
     """View-agnostic, content-bound key for one distinct text change.
 
@@ -1110,7 +1132,9 @@ def where_note(field_name: str, catalog_paths: Iterable[str], n_texts: int = 1) 
     label = field_label(field_name)
 
     garden_dirs = distinct_garden_datasets(paths)
-    files = ", ".join(f"<code>{d}.meta.yml</code>" for d in garden_dirs[:4]) + (" …" if len(garden_dirs) > 4 else "")
+    files = ", ".join(f"<code>{garden_meta_file(d)}</code>" for d in garden_dirs[:4]) + (
+        " …" if len(garden_dirs) > 4 else ""
+    )
     # Two *versions* of one dataset are two garden dirs and one dataset — calling them "separate datasets"
     # named the same thing twice. What tells them apart is the (namespace, dataset) shape.
     shapes = {shape for shape in (dataset_shape(path) for path in paths) if shape}
