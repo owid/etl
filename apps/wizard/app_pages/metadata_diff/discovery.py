@@ -26,6 +26,7 @@ from typing import Any, TypeVar
 
 import git
 import pandas as pd
+import yaml
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
 from structlog import get_logger
@@ -1887,3 +1888,33 @@ def summarize(
     summary.reach = sorted(reach.values(), key=lambda r: (-r.n_reader_facing, -r.n_hidden, r.field))
 
     return summary
+
+
+def dataset_owners(garden_dirs: list[str]) -> dict[str, list[str]]:
+    """garden dataset dir -> the people who own it, from the step's own `.meta.yml`.
+
+    `dataset.owners` is the authoritative record and the first entry is the accountable owner (see the
+    dataset schema). Read from the file rather than from a roster in this app, so it cannot drift from
+    what the dataset says — and only names, since nothing machine-readable maps a name to a GitHub handle
+    and guessing one pings the wrong person.
+
+    A dataset whose file cannot be read simply has no owner here: the instructions then say to hand the
+    work to whoever is editing, which is true either way.
+    """
+    out: dict[str, list[str]] = {}
+    for directory in garden_dirs:
+        for suffix in (".meta.yml", ".meta.override.yml"):
+            path = BASE_DIR / f"{directory}{suffix}"
+            if not path.exists():
+                continue
+            try:
+                parsed = yaml.safe_load(path.read_text()) or {}
+            except Exception as e:  # noqa: BLE001 — a malformed file means "unknown owner", not a crash
+                log.warning("metadata_diff.owners_unreadable", path=str(path), error=str(e))
+                continue
+            owners = ((parsed.get("dataset") or {}) if isinstance(parsed, dict) else {}).get("owners") or []
+            names = [str(name).strip() for name in owners if str(name).strip()]
+            if names:
+                out[directory] = names
+                break
+    return out

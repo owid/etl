@@ -3221,6 +3221,64 @@ def test_refusing_one_surface_asks_for_an_override_not_a_revert():
     assert "Fine on the charts, too long for a view." in doc
 
 
+def test_the_instructions_say_who_to_give_them_to():
+    """A request with no addressee sits in a tab. The owner comes from the dataset's own metadata.
+
+    Names only, never a handle: nothing in the repo maps one to the other and a guessed handle pings
+    somebody uninvolved. Claude is offered alongside, because it can make the edit and re-run the step.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import item_identity
+    from apps.wizard.app_pages.metadata_diff.data import REJECTED
+    from apps.wizard.app_pages.metadata_diff.discovery import (
+        ChangeReach,
+        dataset_owners,
+        edit_fields,
+        edit_key,
+        edits_for,
+    )
+    from apps.wizard.app_pages.metadata_diff.review_section import _rejections_markdown
+
+    # A real step in this repo, so the owner is read rather than invented.
+    directory = "etl/steps/data/garden/wb/2026-06-26/world_bank_pip"
+    owners = dataset_owners([directory])
+    assert owners.get(directory), "this step records an owner in its own .meta.yml"
+    owner = owners[directory][0]
+
+    reach = ChangeReach(
+        field="descriptionShort",
+        old="Mean income.",
+        new="Mean income. In 2021 prices.",
+        charts=[{"chartId": 1, "slug": "gdp", "has_data_page": True}],
+        catalog_paths={"grapher/wb/2026-06-26/world_bank_pip/world_bank_pip#mean"},
+    )
+    summary = Summary(reach=[reach])
+    surface = surface_key("item", "edit:charts")
+    (edit,) = edits_for(summary, "charts")
+    change_key, content_hash = item_identity(surface, edit_key(edit), edit_fields(edit))
+    doc = _rejections_markdown(
+        [
+            {
+                "catalogPath": surface,
+                "changeKey": change_key,
+                "contentHash": content_hash,
+                "status": REJECTED,
+                "comment": None,
+            }
+        ],
+        {},
+        summary,
+    )
+
+    assert f"**Give this to {owner}**" in doc
+    assert "paste it to Claude" in doc
+    # Nested bold renders as literal asterisks, which is how this line first shipped.
+    assert "****" not in doc
+    # An unknown owner still names somebody who can act.
+    assert "dataset.owners" in _rejections_markdown(
+        [{"catalogPath": surface, "changeKey": "nothing-known", "status": REJECTED, "comment": None}], {}, summary
+    )
+
+
 def test_the_bar_says_a_section_can_be_read_either_way():
     """The two ways through a section are what the badges count, so the bar has to name them.
 

@@ -29,6 +29,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
 )
 from apps.wizard.app_pages.metadata_diff.data import DECIDED, REJECTED, REVIEWED, load_item_notes
 from apps.wizard.app_pages.metadata_diff.discovery import (
+    dataset_owners,
     edit_fields,
     edit_key,
     edit_slot,
@@ -60,15 +61,23 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
         surface = str(row.get("catalogPath") or "")
         by_surface[surface] = by_surface.get(surface, 0) + 1
     progress = section_progress(by_surface, totals)
-    total = sum(t for _done, t in progress.values())
     n_done = sum(done for done, _t in progress.values())
+    # No global denominator. Each section is counted along whichever layout its reviewer used, so summing
+    # them adds 402 explorer views to 3 authored edits — and the total swung from 71 to 556 on this branch
+    # when three rejections were cleared, which is not a fact about the branch. What is comparable across
+    # sections is whether each one is finished, so that is what the header reports; the per-surface rows
+    # below keep their own denominators, where the unit is unambiguous.
+    finished = sum(1 for done, of in progress.values() if of and done >= of)
+    n_sections = len(progress)
+    total = sum(of for _done, of in progress.values())
 
     if not rows:
         if total:
             st.warning(
                 f"**Nothing reviewed yet.** {total} item{'s' if total != 1 else ''} in this branch "
-                f"{'are' if total != 1 else 'is'} waiting: mark them reviewed or rejected in **Charts**, "
-                "**MDims** or **Explorers**, or write a note on one, and they appear here."
+                f"{'are' if total != 1 else 'is'} waiting — or {_edit_total(summary)} authored edits, if "
+                "you read them by edit. Mark them reviewed or rejected in **Charts**, **MDims** or "
+                "**Explorers**, or write a note on one, and they appear here."
             )
         else:
             st.success(
@@ -78,79 +87,96 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
         _footnote()
         return
 
-    st.markdown(
-        f"**{n_done} of {total} item{'s' if total != 1 else ''} decided** · "
-        f"**{len(ticked)} reviewed** · **{len(rejected)} rejected** · "
-        f"**{len(noted)} with a note** · against `{BASELINE_NAME}`"
-    )
+    # One line of status. It carried a counts line plus two banners plus a caption, and the documents this
+    # page exists for started 1,160px down — below the fold on a fresh look, with the last one three
+    # screens beyond that. The remainder folds into the line, and a banner is kept only for the two states
+    # somebody has to act on.
+    bits = [f"**{n_done} item{'s' if n_done != 1 else ''} decided**"]
+    if ticked:
+        bits.append(f"✅ {len(ticked)}")
     if rejected:
-        # The one thing on this page that somebody has to act on, so it leads.
+        bits.append(f"❌ {len(rejected)}")
+    if noted:
+        bits.append(f"📝 {len(noted)}")
+    bits.append(f"**{finished} of {n_sections} sections finished**")
+    bits.append(f"against `{BASELINE_NAME}`")
+    st.markdown(" · ".join(bits))
+
+    if rejected:
+        # The one thing here that somebody has to act on, so it is the only banner that leads.
         st.error(
-            f"**{len(rejected)} rejected** — nothing has been changed by that. The *What to change* "
-            "document below says which edits they are and where they were authored; paste it back to "
-            "whoever is editing, this assistant included."
+            f"**{len(rejected)} rejected** — nothing has been changed by that. Open **What to change** "
+            "below and hand it on; it names the edits, where they were authored, and who owns them."
         )
-    # The denominator is the point: a list of what you decided, with no total, reads as a finished job.
-    if not ticked and not rejected:
+    elif not ticked:
         st.warning(
             f"**Nothing decided yet** — {len(noted)} note{'s' if len(noted) != 1 else ''} recorded, but no "
             "item marked reviewed or rejected."
         )
-    elif n_done < total:
-        left = total - n_done
-        st.warning(
-            f"**Review unfinished** — {left} item{'s' if left != 1 else ''} still to look at. The three "
-            "surface sections open on the ones you have not reached."
-        )
-    else:
-        st.success(f"**All {total} items decided.**")
-    _footnote()
+    elif finished >= n_sections and n_sections:
+        st.success("**Every section is finished** — each one decided view by view or by edit.")
 
-    for surface, group in sorted(_by_surface(rows).items()):
+    # The documents first, and one at a time. They are why this tab is opened, and stacked as three code
+    # blocks they were the part nobody could see.
+    docs: list[tuple[str, str, str, str, str]] = []
+    if rejected:
+        docs.append(
+            (
+                "❌ What to change",
+                "The rejections as instructions — the edit each refers to, the garden dataset it was "
+                "authored in, and who owns it. Written to be acted on without the rest of this page.",
+                _rejections_markdown(rejected, index, summary),
+                "metadata-rejections.md",
+                "mdd_rejections",
+            )
+        )
+    docs.append(
+        (
+            "📋 What this branch changed",
+            "The metadata edits themselves, grouped as Blast radius groups them. For an issue, a PR "
+            "comment or a channel, when the change is what you want to discuss rather than the review.",
+            _changes_markdown(summary),
+            "metadata-changes.md",
+            "mdd_changes_digest",
+        )
+    )
+    docs.append(
+        (
+            "📝 Review notes",
+            "What you decided and wrote, for the same places — kept apart from the digest, since the two "
+            "often go to different people.",
+            _notes_markdown(rows, index, totals),
+            "metadata-review.md",
+            "mdd_review_notes",
+        )
+    )
+    for tab, (_label, caption, text, filename, key) in zip(st.tabs([label for label, *_ in docs]), docs):
+        with tab:
+            st.caption(caption)
+            markdown_output(text, filename, key)
+
+    # Then the record itself, as one row per surface: the counts at a glance, and the items behind them.
+    # Bordered blocks listing every note put this a screen high before the texts; collapsed rows read as
+    # the index they always were, and refused surfaces sort first because they are what needs an answer.
+    st.markdown("##### Everything you recorded")
+    for surface, group in sorted(_by_surface(rows).items(), key=lambda kv: (not _has_rejection(kv[1]), kv[0])):
         done = sum(1 for row in group if row.get("status") in DECIDED)
         refused = sum(1 for row in group if row.get("status") == REJECTED)
         of = totals.get(surface)
         with_note = [row for row in group if row.get("comment")]
-        # Decided, and nothing written: a count says everything a list of four hundred of them would.
         bare = [row for row in group if not row.get("comment")]
-        with st.container(border=True):
-            counted = f"{done} of {of}" if of else str(done)
-            summary_bits = [f"{counted} decided"]
-            if refused:
-                summary_bits.append(f"❌ {refused} rejected")
-            summary_bits.append(f"{len(with_note)} with a note")
-            st.markdown(f"**{_surface_title(surface)}** :small[:gray[{' · '.join(summary_bits)}]]")
+        counted = f"{done} of {of}" if of else str(done)
+        marks = " · ".join(
+            part for part in (f"❌ {refused}" if refused else "", f"📝 {len(with_note)}" if with_note else "") if part
+        )
+        label = f"{_surface_title(surface)} — {counted} decided" + (f" · {marks}" if marks else "")
+        with st.expander(label, expanded=bool(refused)):
             for row in with_note:
                 st.markdown(_row_line(row, index))
                 st.markdown(_quoted(str(row["comment"])))
-            if bare:
-                # Folded, not dropped: "which ones did I decide" is a fair question, just not the first.
-                with st.expander(f"{len(bare)} decided with no note"):
-                    for row in bare:
-                        st.markdown(_row_line(row, index))
-
-    st.divider()
-    st.markdown("#### What this branch changed")
-    st.caption(
-        "The metadata edits themselves, grouped as Blast radius groups them. Copy this into an issue, a PR "
-        "comment or a channel when you want to discuss the change rather than the review."
-    )
-    markdown_output(_changes_markdown(summary), "metadata-changes.md", "mdd_changes_digest")
-
-    if rejected:
-        st.markdown("#### What to change")
-        st.caption(
-            "The rejections, with the edit each one refers to and the garden dataset it was authored in. "
-            "This is the document to hand back: it is written as instructions, so an assistant can act on "
-            "it without the rest of this page."
-        )
-        markdown_output(_rejections_markdown(rejected, index, summary), "metadata-rejections.md", "mdd_rejections")
-
-    st.markdown("#### The review notes")
-    st.caption(
-        "What you ticked and wrote, for the same places — kept separate, since the two often go to different people."
-    )
-    markdown_output(_notes_markdown(rows, index, totals), "metadata-review.md", "mdd_review_notes")
+            for row in bare:
+                st.markdown(_row_line(row, index))
+    _footnote()
 
 
 def _row_line(row: dict[str, Any], index: dict[str, dict[str, str]]) -> str:
@@ -482,6 +508,7 @@ def _rejections_markdown(rejected: list[dict[str, Any]], index: dict[str, dict[s
         "for it to be kept off one surface — each entry says which.",
         "",
     ]
+    lines += _handover_lines(rejected, edits_of(summary))
     edits, reach = _edit_lookup(summary)
     by_edit = [row for row in rejected if str(row.get("changeKey")) in edits]
     by_item = [row for row in rejected if str(row.get("changeKey")) not in edits]
@@ -606,3 +633,56 @@ def _quoted_inline(text: str) -> str:
     # Backticks in the text itself would end the span early; a fenced span with a wider fence survives it.
     fence = "``" if "`" in trimmed else "`"
     return f"{fence}{trimmed}{fence}"
+
+
+def edits_of(summary: Any) -> dict[str, dict[str, Any]]:
+    """The per-surface edit lookup, exposed so the hand-over line can name the datasets involved."""
+    lookup, _reach = _edit_lookup(summary)
+    return lookup
+
+
+def _handover_lines(rejected: list[dict[str, Any]], edits: dict[str, dict[str, Any]]) -> list[str]:
+    """Who this document is for: the people who own the datasets it asks about, or Claude.
+
+    A rejection is a request, and a request with no addressee sits in a tab. The owners come from each
+    affected dataset's own `dataset.owners` — the first is accountable — so the document names the person
+    to ask rather than leaving the reviewer to work it out. Names only, never a handle: nothing in the
+    repo maps one to the other, and a guessed handle pings somebody uninvolved.
+    """
+    directories = sorted(
+        {dataset for row in rejected for dataset in (edits.get(str(row.get("changeKey"))) or {}).get("datasets", [])}
+    )
+    owners = dataset_owners(directories)
+    people: list[str] = []
+    for names in owners.values():
+        for name in names:
+            if name not in people:
+                people.append(name)
+
+    if people:
+        # Plain names inside one bold phrase: `**Give this to **Name****` renders the asterisks literally.
+        who = ", ".join(people[:-1])
+        who = f"{who} and {people[-1]}" if who else people[-1]
+        owns = "owns" if len(people) == 1 else "own"
+        lead = (
+            f"**Give this to {who}** — {owns} the affected "
+            f"{'dataset' if len(directories) == 1 else 'datasets'} — or paste it to Claude, which can make "
+            "the edits and re-run the steps."
+        )
+    else:
+        # No owner recorded, or the file could not be read: still say who can act on it.
+        lead = (
+            "**Give this to whoever owns the affected dataset** — its `dataset.owners` says who — or paste "
+            "it to Claude, which can make the edits and re-run the steps."
+        )
+    return [lead, ""]
+
+
+def _has_rejection(group: list[dict[str, Any]]) -> bool:
+    """Whether a surface holds anything refused — those rows sort first and open first."""
+    return any(row.get("status") == REJECTED for row in group)
+
+
+def _edit_total(summary: Any) -> int:
+    """How many authored edits this branch has across the three surfaces — the shorter way to finish."""
+    return sum(len(edits_for(summary, section)) for section in COUNTED_SECTIONS)
