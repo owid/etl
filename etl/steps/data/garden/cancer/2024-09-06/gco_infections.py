@@ -30,7 +30,31 @@ EXPECTED_AGENTS = {
     "Opisthorchis viverrini and Clonorchis sinensis",
     "Schistosoma haematobium",
 }
-EXPECTED_NUM_CANCERS = 21  # 20 infection-related cancer sites plus the all-cancers total.
+# The 20 infection-related cancer sites plus the all-cancers total, as labeled by the source. The reader-facing names
+# in gco_infections.meta.yml are derived from these exact strings, so a renamed or added site must be reviewed there.
+EXPECTED_CANCERS = {
+    ALL_CANCERS,
+    "Adult T-cell leukemia and lymphoma",
+    "Anus squamous cell carcinoma",
+    "Bladder carcinoma",
+    "Burkitt lymphoma",
+    "Cardia gastric cancer",
+    "Cervix uteri carcinoma",
+    "Cholangiocarcinoma",
+    "Hepatocellular carcinoma",
+    "Hodgkin lymphoma",
+    "Kaposi sarcoma",
+    "Larynx cancer",
+    "Nasopharynx carcinoma",
+    "Non-Hodgkin lymphoma of gastric location",
+    "Non-cardia gastric cancer",
+    "Oral cavity cancer",
+    "Oropharyngeal carcinoma",
+    "Other Non-Hodkin lymphoma",  # NOTE: the source's typo; corrected in display text only.
+    "Penis carcinoma",
+    "Vagina carcinoma",
+    "Vulva carcinoma",
+}
 EXPECTED_YEARS = {2020}
 # Number of countries in the current version of the data.
 # NOTE: A lower count on the next update usually means a parsing or harmonization regression, not a real change.
@@ -104,8 +128,8 @@ def sanity_check_inputs(tb: Table) -> None:
     """Check the structure and value ranges of the meadow table."""
     error = "Unexpected set of infectious agents in the source data."
     assert set(tb["agent"]) == EXPECTED_AGENTS, error
-    error = f"Expected {EXPECTED_NUM_CANCERS} cancer categories, found {tb['cancer'].nunique()}."
-    assert tb["cancer"].nunique() == EXPECTED_NUM_CANCERS, error
+    error = f"Unexpected set of cancer categories in the source data: {set(tb['cancer']) ^ EXPECTED_CANCERS}"
+    assert set(tb["cancer"]) == EXPECTED_CANCERS, error
     error = "Unexpected years in the source data."
     assert set(tb["year"]) == EXPECTED_YEARS, error
     error = "Unexpected sex categories in the source data."
