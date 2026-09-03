@@ -72,7 +72,7 @@ import lands on the file's *currently open page*, which is the **Cover** unless 
 just set the page — so fetch it by the returned `placedOnNodeId`, `appendChild` it onto the target
 page, and sweep the landing page afterwards. It arrives as a FRAME sized to the SVG canvas, which is
 0.96x the template, so the rescale is exact and needs no bbox arithmetic: `frame.width / import.width`
-(850/816 = 1.0417; mobile 540/518.4). Then drop the step's own copies of the template's slots by
+(850/816 = 1.0417). Then drop the step's own copies of the template's slots by
 prefix — `title`, `subtitle`, `note`, `data-source`, `tagline`, `license-*` — because the clone's
 wrappers carry those, and a slot emitted as runs is `license-0 ... license-5`.
 
@@ -131,11 +131,13 @@ Note, Bold(0-12) + Regular for the source, Bold(0-18) + Medium for the tagline, 
 | Tagline | `TAGLINE` | `OurWorldinData.org` |
 | License | `license_runs()` | `CC-BY` and each author's name |
 
-**In-plot restyle**, in this order, because the middle step invalidates the first: record each text
-node's anchor (its own `textAlignHorizontal`), set every run to Lato (Bold where the source style
-reads bold, Regular otherwise), then put each node back on its anchor — a face change moves a label by
-half its width change, which was 133 nodes on the desktop chart, 115 on mobile and 76 here. Country
-labels and the total-leisure column take `Text/Gray 80`; the column's header takes `Text/Gray 100`.
+**In-plot restyle.** There is no font pass and no anchor pass: the SVG names Lato first
+(`EMITTED_FONT_STACK`), so the import arrives in the template's face and nothing needs re-setting —
+which also removes the drift the anchor pass existed to undo, since a face change moves a label by half
+its width change. Read the faces on arrival before trusting that; an import in **Inter** means the
+stack did not survive to the file, and then the old recipe applies (record each node's own
+`textAlignHorizontal`, set every run to Lato, put each node back on its anchor — in that order, because
+the middle step invalidates the first). The 26 country labels take `Text/Gray 80`.
 
 **Colors**, bound as library styles rather than pasted as hexes: `Default Palette/Denim`
 `e1538d93...`, `Camel` `45161823...` with `Line and Slope Charts/Camel` `c17ca762...` for its name,
@@ -232,6 +234,8 @@ GROUPS = [
     {"column": "other_leisure", "label": "Other leisure", "color": ("tint", 0, 0.78)},
 ]
 
+# Not drawn — the chart shows the four categories — but asserted on the input, because a garden table
+# that stopped carrying it would have changed shape under this step.
 TOTAL_LEISURE_COLUMN = "total_leisure"
 
 # A group's values are drawn only where this share of countries can hold one; otherwise none of them
@@ -481,8 +485,8 @@ LATO_BOLD_SLOT_SLACK = 1.066
 # other line heights are per-slot.
 TEMPLATE_TITLE_LINE_PX = 29
 
-# Horizontal breathing room, in template pixels: between a country label and its bar, between the
-# bars and the total-leisure column, and inside a segment around its value.
+# Horizontal breathing room, in template pixels: between a country label and its bar, and inside a
+# segment around its value.
 COUNTRY_LABEL_PAD = 8
 VALUE_PAD = 3
 
@@ -567,14 +571,13 @@ LAYOUTS = {
         "country_fontsize": 9,
         "value_fontsize": 8.75,
         "header_fontsize": 9.5,
-        # Width reserved for the total-leisure column, in template pixels.
+        # Whether a value reads "4h 29m" rather than "4 hours 29 mins" when the long form does not fit.
         "with_mins_suffix": True,
         # Where each half of the header goes. The category brackets span the top row from above, and
         # each category's own member names are stacked inside its bracket, one per line
         # ("bracketed") — so the header reads category, then its members, then the data, with every
         # name over the run of bars it belongs to.
-        # Alternatives for the names: "below_flow" (one list in bar order under the bars) or
-        # "below_listed" (grouped under their category names, as mobile lists them).
+        # Both keys are asserted single-valued below: the other placements went with the other charts.
         "category_side": "above",
         "groups": MAIN_CATEGORY_GROUPS,
         "categories": MAIN_CATEGORIES,
@@ -931,11 +934,8 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     return fig
 
 
-def value_label_columns(tb: Table, px_per_min: float, layout: dict) -> set[str]:
-    """Which groups carry a value, and in which form — `{column: index into value_candidates}`.
-
-    Per frame, since the mobile bars are little over half as wide.
-    """
+def value_label_columns(tb: Table, px_per_min: float, layout: dict) -> dict[str, int]:
+    """Which groups carry a value, and in which form — `{column: index into value_candidates}`."""
     labelled = {}
     for group in layout["groups"]:
         column = group["column"]
@@ -1162,35 +1162,34 @@ def draw_footer(fig, note: str | None, source_citation: str, layout: dict, fx, f
         FOOTER_COLOR,
     )
 
-    # Desktop's tagline and license share one row; mobile stacks its two rows full-width.
-    shares_tagline_row = True
+    # The tagline and the license share this row: the tagline left, the license right-aligned to the
+    # content edge.
     row_px = template["license_px"]
-    if shares_tagline_row:
-        # Nothing wraps this row — the tagline's wording is fixed and a name is never shortened — so
-        # instead the row is drawn a hair smaller when this step's font would collide the two, which
-        # the template's narrower Lato would not. The assert is the real limit: past it the row does
-        # not fit even once the template sets it, and the wording has to give.
-        content_px = width_px - 2 * margin_px
-        needed_px = (
-            text_advance_px(TAGLINE, row_px * POINTS_PER_PIXEL)
-            + LICENSE_TAGLINE_GAP
-            + run_row_width(license_runs(), row_px)
-        )
-        assert fits_slot(needed_px, content_px, LATO_BOLD_SLOT_SLACK), (
-            f"The tagline and license need {needed_px:.0f}px of the footer's {content_px:.0f}px row. "
-            f"Shorten the license's wording — never a name."
-        )
-        row_px *= min(1.0, content_px / needed_px)
-        draw_slot(
-            fig,
-            fx(margin_px),
-            fy(template["tagline_y"]),
-            wrap_to_slot(TAGLINE, template["tagline_slot_px"], row_px),
-            row_px,
-            None,
-            "tagline",
-            FOOTER_COLOR,
-        )
+    # Nothing wraps this row — the tagline's wording is fixed and a name is never shortened — so
+    # instead the row is drawn a hair smaller when this step's font would collide the two, which
+    # the template's narrower Lato would not. The assert is the real limit: past it the row does
+    # not fit even once the template sets it, and the wording has to give.
+    content_px = width_px - 2 * margin_px
+    needed_px = (
+        text_advance_px(TAGLINE, row_px * POINTS_PER_PIXEL)
+        + LICENSE_TAGLINE_GAP
+        + run_row_width(license_runs(), row_px)
+    )
+    assert fits_slot(needed_px, content_px, LATO_BOLD_SLOT_SLACK), (
+        f"The tagline and license need {needed_px:.0f}px of the footer's {content_px:.0f}px row. "
+        f"Shorten the license's wording — never a name."
+    )
+    row_px *= min(1.0, content_px / needed_px)
+    draw_slot(
+        fig,
+        fx(margin_px),
+        fy(template["tagline_y"]),
+        wrap_to_slot(TAGLINE, template["tagline_slot_px"], row_px),
+        row_px,
+        None,
+        "tagline",
+        FOOTER_COLOR,
+    )
     # "by <names>", not the template's "by the author <name>": with two names those two words are
     # what pushes the line past the tagline it shares a row with. The license and the names it credits
     # are set in bold, as the templates set their own CC-BY, which is why the row is laid out as runs
@@ -1199,12 +1198,12 @@ def draw_footer(fig, note: str | None, source_citation: str, layout: dict, fx, f
         fig,
         license_runs(),
         row_px,
-        margin_px if not shares_tagline_row else width_px - margin_px,
+        width_px - margin_px,
         template["license_y"],
         "license",
         fx,
         fy,
-        align="right" if shares_tagline_row else "left",
+        align="right",
     )
 
 
@@ -1284,8 +1283,7 @@ def solve_category_layout(spans: dict, layout: dict) -> list[dict]:
                 break
         assert placement, f"Could not place the category name {category['name']}."
 
-        placed.append(((placement["center"] - 0.5, placement["center"] + 0.5), placement["row"]))
-        placed[-1] = (geometry(category, placement["lines"])[1], placement["row"])
+        placed.append((geometry(category, placement["lines"])[1], placement["row"]))
         placements.append(
             {
                 "name": category["name"],
