@@ -618,6 +618,31 @@ def fetch_baseline_counterparts(target_engine: Engine, unmatched: list[str]) -> 
     return {path: row for path, row in rows.items()}
 
 
+def compare_indicators_across_versions(
+    source_engine: Engine, target_engine: Engine, paths: list[str]
+) -> IndicatorChanges:
+    """`compare_indicator_texts`, with a version bump already paired up. The only way to call it.
+
+    The exact-path pass is the whole comparison only on a branch that edits metadata in place. A dataset
+    update renames every catalogPath, so nothing matches and every indicator of it lands in `new_paths` —
+    and a caller reading `diffs | new_paths` as "what this branch moved" then credits the branch with
+    every page rendering that dataset, master's lag included, on the workflow this tool exists for.
+
+    One implementation for all three callers, so they cannot drift apart: the indicator list, the MDim
+    flag and the explorer attribution each asked the same question and two of them got it wrong. Costs
+    nothing where the exact-path pass matched everything.
+    """
+    source_rows, target_rows = _both(fetch_variable_rows_by_path, source_engine, target_engine, paths)
+    unmatched = [p for p in source_rows if p not in target_rows]
+    other_versions: dict[str, dict[str, Any]] = {}
+    if unmatched:
+        try:
+            other_versions = fetch_baseline_counterparts(target_engine, unmatched)
+        except Exception as e:  # noqa: BLE001 — without it those indicators read as new, as before
+            log.warning("metadata_diff.other_versions_unavailable", error=str(e))
+    return compare_indicator_texts(source_rows, target_rows, other_versions)
+
+
 def changed_indicators(
     source_engine: Engine,
     target_engine: Engine,
@@ -631,17 +656,7 @@ def changed_indicators(
     if not paths:
         return IndicatorChanges(narrowed=narrowed)
 
-    source_rows, target_rows = _both(fetch_variable_rows_by_path, source_engine, target_engine, paths)
-    # Only when the exact-path pass leaves something unmatched, which is the version-bump case. On a
-    # branch that edits metadata in place this costs nothing.
-    unmatched = [p for p in source_rows if p not in target_rows]
-    other_versions: dict[str, dict[str, Any]] = {}
-    if unmatched:
-        try:
-            other_versions = fetch_baseline_counterparts(target_engine, unmatched)
-        except Exception as e:  # noqa: BLE001 — without it those indicators read as new, as before
-            log.warning("metadata_diff.other_versions_unavailable", error=str(e))
-    out = compare_indicator_texts(source_rows, target_rows, other_versions)
+    out = compare_indicators_across_versions(source_engine, target_engine, paths)
     out.narrowed = narrowed
     return out
 
@@ -938,6 +953,9 @@ def attribute_indicator_changes(
     master_checked = False
     if master_engine is not None and master_engine is not target_engine:
         try:
+            # Exact paths here, unlike every other comparison in this module, and deliberately: the
+            # question is whether master already holds *this* indicator saying *this*. A path master does
+            # not have is a path this branch minted, which is an answer and not a gap to pair around.
             result = compare_indicator_texts(
                 *_both(fetch_variable_rows_by_path, source_engine, master_engine, catalog_paths)
             )
@@ -1034,9 +1052,10 @@ def mdim_changes_df(
         narrowed_paths, _ = candidate_paths(source_engine, all_paths, scope, built)
         changed_paths: set[str] = set()
         if narrowed_paths:
-            result = compare_indicator_texts(
-                *_both(fetch_variable_rows_by_path, source_engine, target_engine, narrowed_paths)
-            )
+            # Across the bump, for the same reason the explorer attribution is: otherwise every MDim
+            # rendering an updated dataset is flagged as changed by this branch, whether its text moved
+            # or not.
+            result = compare_indicators_across_versions(source_engine, target_engine, narrowed_paths)
             changed_paths = set(result.diffs) | result.new_paths
         changed_mdims = {cp for cp, paths in paths_by_mdim.items() if paths & changed_paths}
     except Exception as e:  # noqa: BLE001 — never let the flag break the page; degrade and say so
@@ -1386,7 +1405,10 @@ def changed_explorer_views(
     candidates = sorted(set(candidates))
     changed_paths: set[str] = set()
     if candidates:
-        result = compare_indicator_texts(*_both(fetch_variable_rows_by_path, source_engine, target_engine, candidates))
+        # Across the version bump, or a dataset update would file every view rendering that dataset as
+        # this branch's: the exact-path pass matches nothing, every indicator reads as new, and the union
+        # below then vouches for views whose difference is only master's lag.
+        result = compare_indicators_across_versions(source_engine, target_engine, candidates)
         changed_paths = set(result.diffs) | result.new_paths
         # An explorer view's text is a chart config, and a garden step can author that text directly
         # through `presentation.grapher_config`. That edit changes no column of the `variables` row, so

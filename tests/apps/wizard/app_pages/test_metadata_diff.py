@@ -4563,6 +4563,48 @@ def test_an_unresolvable_pin_does_not_compare_two_different_indicators(monkeypat
     )
 
 
+def test_a_version_bump_alone_does_not_make_an_indicator_read_as_changed(monkeypatch):
+    """`diffs | new_paths` is read as "what this branch moved" by the MDim flag and the explorer attribution.
+
+    Without the version pairing, a dataset update puts every indicator of the bumped dataset in
+    `new_paths` — so every MDim and every explorer view rendering that dataset is credited to the branch,
+    whether its text moved or not, and master's lag is filed as this branch's work.
+    """
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    moved = "grapher/wb/2026-09-02/pip/incomes#mean"
+    still = "grapher/wb/2026-09-02/pip/incomes#median"
+    baseline = {
+        "grapher/wb/2026-06-26/pip/incomes#mean": {"id": 1, "name": "Mean", "descriptionShort": "Old wording."},
+        "grapher/wb/2026-06-26/pip/incomes#median": {"id": 2, "name": "Median", "descriptionShort": "Same wording."},
+    }
+    branch = {
+        moved: {"id": 11, "name": "Mean", "descriptionShort": "New wording."},
+        still: {"id": 12, "name": "Median", "descriptionShort": "Same wording."},
+    }
+
+    def rows(engine, catalog_paths):
+        source = branch if engine == "src" else {}
+        return {path: dict(row, catalogPath=path) for path, row in source.items() if path in set(catalog_paths)}
+
+    monkeypatch.setattr(discovery, "fetch_variable_rows_by_path", rows)
+    monkeypatch.setattr(
+        discovery,
+        "fetch_baseline_counterparts",
+        lambda _engine, unmatched: {
+            path: dict(row, catalogPath=path)
+            for path, row in baseline.items()
+            if path.replace("2026-06-26", "2026-09-02") in set(unmatched)
+        },
+    )
+
+    result = discovery.compare_indicators_across_versions("src", "tgt", [moved, still])
+
+    assert not result.new_paths, "a bumped indicator has a baseline counterpart, and is not new"
+    assert set(result.diffs) == {moved}, "only the one whose wording actually moved"
+    assert result.across_versions[moved].endswith("2026-06-26/pip/incomes#mean")
+
+
 def test_every_edit_card_keeps_its_verdict_however_many_there_are():
     """The By-edit denominator counts every edit, so no card can be dropped.
 
