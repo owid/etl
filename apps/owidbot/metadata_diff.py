@@ -13,7 +13,7 @@ be noise rather than a signal.
 from sqlalchemy.engine.base import Engine
 from structlog import get_logger
 
-from apps.wizard.app_pages.metadata_diff.discovery import Summary, summarize
+from apps.wizard.app_pages.metadata_diff.discovery import Summary, affected_pages, group_by_edit, summarize
 from etl.config import OWIDEnv, get_container_name
 from etl.db import production_or_master_engine
 
@@ -54,7 +54,22 @@ def status_icon(summary: Summary) -> str:
 
 
 def format_metadata_diff(summary: Summary) -> str:
-    """The body of the comment section: what changed, and how far it reaches."""
+    """The body of the comment section: one line of reach, plus whatever undermines it.
+
+    Deliberately short. This block sits in a comment beside chart-diff and data-diff, and its job there is
+    to say "metadata changed, roughly this much, go and look" — twelve bullets of per-surface counts made
+    the comment longer without making that decision easier, and the detail is one click away on the page.
+
+    What stays is what a reader cannot get from the counts: a stale server (which makes every number below
+    it read backwards), indicators with no baseline text to diff, changes that are master's rather than
+    this branch's, and anything the tool could not establish. Those are not detail; they are the reasons
+    a number here might be wrong.
+
+    Draft charts and unpublished MDim views are counted by `affected_pages` and deliberately not reported
+    here. Nothing a reader can open is affected by them, so they do not bear on the "go and look" this
+    block exists to prompt, and they are listed on the page for whoever does. The published counts exclude
+    them either way, so leaving them out understates nothing.
+    """
     # Lead with a stale server. Its differences read backwards — the branch appears to have written text
     # it removed — so every number below it is untrustworthy until the datasets are rebuilt.
     stale = ""
@@ -74,64 +89,104 @@ def format_metadata_diff(summary: Summary) -> str:
         return f"<ul>{stale}</ul>" if stale else "No metadata text changes."
 
     items = [stale] if stale else []
-    if summary.n_charts or summary.n_indicators:
-        indicators = f" (from {summary.n_indicators} indicator{'s' if summary.n_indicators != 1 else ''})"
-        items.append(f"<li>Charts: {summary.n_charts}{indicators}</li>")
-    if summary.n_charts_own_text:
-        # A garden `presentation.grapher_config` edit moves a chart's own title, subtitle or footnote
-        # without touching the indicator's row, so it is not in the count above — and a branch that only
-        # does that had the count above at zero, leaving the comment with a field name and no charts at
-        # all. Reported as its own line rather than added in: the two sets overlap and nothing here
-        # dedupes them, so a total would be a number we cannot vouch for.
-        changes = f" ({summary.n_chart_text_changes} change{'s' if summary.n_chart_text_changes != 1 else ''})"
-        items.append(f"<li>Charts whose own config text changed: {summary.n_charts_own_text}{changes}</li>")
-    if summary.n_mdims:
-        # A count we could not resolve view by view is a ceiling, and says so rather than overstating.
-        qualifier = "" if summary.mdims_resolved else " (flagged; too many to resolve view by view)"
-        items.append(f"<li>MDims: {summary.n_mdims}{qualifier}</li>")
-    if summary.n_draft_mdims:
-        # Not reader-facing yet, so not in the MDims count — but the text ships the moment it is published.
-        # Its own ceiling qualifier: the drafts can overflow the view-by-view budget while the count above
-        # resolved cleanly, and vice versa.
-        qualifier = "" if summary.draft_mdims_resolved else " (flagged; too many to resolve view by view)"
-        items.append(
-            f"<li>Unpublished MDims changed: {summary.n_draft_mdims}{qualifier} — no reader sees them yet</li>"
-        )
-    if summary.n_explorers:
-        items.append(f"<li>Explorers: {summary.n_explorers} ({summary.n_explorer_views} views)</li>")
-    if summary.fields:
-        fields = ", ".join(f"{label} ({n})" for label, n in sorted(summary.fields.items()))
-        items.append(f"<li>Fields: {fields}</li>")
+    line = _reach_line(summary)
+    if line:
+        items.append(f"<li>{line}</li>")
+
+    # Only what makes the line above less than the whole truth.
     if summary.n_new_indicators:
-        # A version bump makes every indicator new, so there is nothing to diff — and nothing has been
-        # read either. Say that, rather than let an empty diff pass for an empty change.
+        # A version bump used to make every indicator new; the comparison now looks past the version, so
+        # what is left here is genuinely absent from the baseline and has no old text to read.
         items.append(
             f"<li>New indicators: {summary.n_new_indicators} — absent from the baseline, so their text "
             "has no diff and is unreviewed</li>"
         )
-    # Changes that match master's own server are master's work the baseline has not rebuilt yet.
+    # Which count is a ceiling, not merely that one is: the two budgets are separate, so the published
+    # count can be exact while the drafts overflowed, and a reader deciding whether to trust a number
+    # needs to know which number.
+    capped = [
+        name
+        for name, resolved in (("MDim", summary.mdims_resolved), ("unpublished-MDim", summary.draft_mdims_resolved))
+        if not resolved
+    ]
+    if capped:
+        which = " and ".join(capped)
+        items.append(
+            f"<li>The {which} count{'s are' if len(capped) > 1 else ' is'} a ceiling — too many to "
+            "resolve view by view</li>"
+        )
     from_master = summary.attribution.get("master", 0)
     if from_master:
-        items.append(
-            f"<li>{from_master} of the changed indicators match master's server — master's edits the "
-            "baseline has not rebuilt yet, not this branch's</li>"
-        )
+        items.append(f"<li>{from_master} of these match master's server — master's edits, not this branch's</li>")
     unknown = summary.attribution.get("unknown", 0)
     if unknown:
-        items.append(
-            f"<li>❔ {unknown} could not be attributed (master's server was unreachable), so some of them "
-            "may be master's rather than this branch's</li>"
-        )
-    if summary.n_other:
-        items.append(
-            f"<li>{summary.n_other} further MDim/explorer difference(s) are baseline lag, not this branch</li>"
-        )
+        items.append(f"<li>❔ {unknown} could not be attributed — master's server was unreachable</li>")
     if not summary.narrowed:
         items.append("<li>⚠️ Could not narrow to this branch's files — may include changes from master</li>")
     for warning in summary.warnings:
         items.append(f"<li>⚠️ {warning}</li>")
 
     return f"<ul>{''.join(items)}</ul>"
+
+
+def _reach_line(summary: Summary) -> str:
+    """ "✏️ **6 edits** → 67 charts, 30 MDim views, 402 explorer views".
+
+    Which fields were edited is deliberately not here. It read as a fourth list in a line that already
+    carries two, and unlike the counts it answers nothing a reviewer decides from the comment — the
+    edits are on the page, each with its own field label and its own diff.
+
+    Edits on the left, pages on the right, and both sides counted once. Pages are the unit because they
+    are the same unit on every surface — a chart, an MDim view and an explorer view are each something
+    somebody opens — where the Summary's own numbers are not addable: `n_charts` and `n_charts_own_text`
+    are overlapping sets of the same charts, and MDims were counted as MDims beside explorers counted as
+    views. Only the reach can dedupe that, so a summary built from counts alone falls back to naming the
+    surface counts separately rather than implying a total.
+    """
+    # Pages, in one unit: a chart, an MDim view and an explorer view are each something somebody opens.
+    # Deduped from the reach, which also collapses the two overlapping chart counts the Summary carries
+    # into the one honest number — they could never be added, and reporting both read as arithmetic.
+    if summary.reach:
+        pages = affected_pages(summary.reach)
+        reach = [
+            f"{pages[key]} {label}{'' if pages[key] == 1 else 's'}"
+            for key, label in (("charts", "chart"), ("mdim_views", "MDim view"), ("explorer_views", "explorer view"))
+            if pages[key]
+        ]
+    else:
+        # A summary assembled from counts alone (no reach): the surface counts, kept apart because the two
+        # chart numbers are overlapping sets and nothing here can dedupe them.
+        reach = []
+        if summary.n_charts:
+            reach.append(f"{summary.n_charts} chart{'s' if summary.n_charts != 1 else ''}")
+        if summary.n_charts_own_text:
+            n = summary.n_charts_own_text
+            reach.append(f"{n} chart{'s' if n != 1 else ''} via their own config")
+        if summary.n_mdims:
+            reach.append(f"{summary.n_mdims} MDim{'s' if summary.n_mdims != 1 else ''}")
+        if summary.n_draft_mdims:
+            n = summary.n_draft_mdims
+            reach.append(f"{n} unpublished MDim{'s' if n != 1 else ''}")
+        if summary.n_explorers:
+            views = summary.n_explorer_views
+            reach.append(
+                f"{summary.n_explorers} explorer{'s' if summary.n_explorers != 1 else ''} "
+                f"({views} view{'s' if views != 1 else ''})"
+            )
+
+    # **Edits**, not rendered texts. One reworded subtitle reaches 348 explorer views, each wording it
+    # differently, and reporting 384 "text changes" for six authored edits overstates the work by sixty
+    # times — which is the error the by-edit grouping exists to avoid. `group_by_edit` is the page's own
+    # grouping and is pure, so this costs nothing. Where reach was never built (a summary assembled from
+    # counts alone) the per-field tally stands in.
+    n_edits = len(group_by_edit(summary.reach)) if summary.reach else sum(summary.fields.values())
+
+    # ✏️ carries the same meaning here as the status icon on the `<summary>` line and as chart-diff's:
+    # this is the edit line. It also keeps the line from opening on a bare digit.
+    head = f"✏️ <b>{n_edits} edit{'s' if n_edits != 1 else ''}</b>" if n_edits else ""
+    if not head:
+        return ", ".join(reach)
+    return f"{head} → {', '.join(reach)}" if reach else f"{head} — nothing published renders them yet"
 
 
 def run(branch: str, summary: Summary) -> str:

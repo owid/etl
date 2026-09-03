@@ -1460,9 +1460,15 @@ class Summary:
         New indicators count too. A version bump replaces every catalog path, so nothing has a baseline
         counterpart to diff against — and reporting that as "no metadata text changes" would wave
         through a whole dataset's worth of new text.
+
+        Any reach at all counts, and it is checked first. Every counter below is a summary *of* the reach,
+        so a summary holding changed texts while all of them happen to be zero can only mean a counter
+        this list has not thought of — and answering "no metadata text changes" over a populated blast
+        radius is the one failure this property exists to prevent.
         """
         return bool(
-            self.n_chart_changes
+            self.reach
+            or self.n_chart_changes
             or self.n_indicators
             or self.n_chart_text_changes
             or self.n_charts
@@ -2040,3 +2046,54 @@ def dataset_owners(garden_dirs: list[str]) -> dict[str, list[str]]:
                 out[directory] = names
                 break
     return out
+
+
+def affected_pages(reach: list[ChangeReach]) -> dict[str, int]:
+    """How many pages these edits reach, per kind, each counted once.
+
+    One comparable unit throughout: a chart, an MDim view and an explorer view are all a page somebody
+    opens. The Summary's own counts cannot be added up — `n_charts` and `n_charts_own_text` are
+    overlapping sets of charts, and MDims are counted as MDims while explorers are counted as views — so
+    anything wanting one honest total has to dedupe from the reach itself.
+
+    Views are deduped on their dimensions across every text of every edit, since a view rendering two of
+    them is one page. Where a reach entry carries a count and no dimensions, the largest count any single
+    text reported stands in: the tightest lower bound available, and exact when the texts land on the
+    same views.
+    """
+    charts: set[Any] = set()
+    draft_charts: set[Any] = set()
+    mdim_views: dict[str, set] = {}
+    mdim_counted: dict[str, int] = {}
+    draft_mdims: set[str] = set()
+    explorer_views: dict[str, set] = {}
+    explorer_counted: dict[str, int] = {}
+
+    for r in reach:
+        charts.update(c["chartId"] for c in r.charts)
+        draft_charts.update(c["chartId"] for c in r.draft_charts)
+        for m in r.mdims:
+            path = str(m["catalogPath"])
+            if m.get("is_draft"):
+                draft_mdims.add(path)
+            mdim_views.setdefault(path, set()).update(tuple(sorted(v.items())) for v in m.get("views") or [])
+            mdim_counted[path] = max(mdim_counted.get(path, 0), int(m.get("n_views") or 0))
+        for e in r.explorers:
+            slug = str(e["slug"])
+            explorer_views.setdefault(slug, set()).update(tuple(sorted(v.items())) for v in e.get("views") or [])
+            explorer_counted[slug] = max(explorer_counted.get(slug, 0), int(e.get("n_views") or 0))
+
+    def views(seen: dict[str, set], counted: dict[str, int], paths: set[str] | None = None) -> int:
+        keys = [p for p in seen if paths is None or p in paths]
+        return sum(len(seen[p]) or counted.get(p, 0) for p in keys)
+
+    published_mdims = {p for p in mdim_views if p not in draft_mdims}
+    return {
+        "charts": len(charts),
+        "draft_charts": len(draft_charts),
+        "mdim_views": views(mdim_views, mdim_counted, published_mdims),
+        "draft_mdim_views": views(mdim_views, mdim_counted, draft_mdims),
+        "explorer_views": views(explorer_views, explorer_counted),
+        "mdims": len(published_mdims),
+        "explorers": len(explorer_views),
+    }

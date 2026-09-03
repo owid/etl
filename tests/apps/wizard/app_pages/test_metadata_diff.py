@@ -958,7 +958,7 @@ def test_owidbot_leads_with_a_stale_server_and_flags_it_in_the_icon():
     assert status_icon(stale) == "🚧"
     body = format_metadata_diff(stale)
     assert "behind on 1 dataset" in body
-    assert body.index("behind on") < body.index("Charts:")  # it leads
+    assert body.index("behind on") < body.index("chart")  # it leads
 
     # And it survives the no-changes path, where a stale build may be the reason there are none.
     assert "behind on 1 dataset" in format_metadata_diff(Summary(stale=stale.stale))
@@ -1015,6 +1015,11 @@ def test_a_change_with_no_visible_chart_reach_still_counts_as_a_change():
     assert Summary(n_charts=0, n_indicators=1, n_chart_changes=1).has_changes
     # Nothing anywhere is still nothing.
     assert not Summary().has_changes
+    # Reach alone is enough: every counter is a summary of it, so a populated blast radius with all of
+    # them at zero can only mean a counter this property has not thought of.
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach as _Reach
+
+    assert Summary(reach=[_Reach(field="titlePublic", old="a", new="b")]).has_changes
     # And the pre-existing reasons to speak up are unaffected.
     assert Summary(n_charts=3).has_changes
     assert Summary(n_new_indicators=2).has_changes
@@ -1284,12 +1289,12 @@ def test_a_draft_mdim_is_reported_but_not_counted_as_reader_facing():
     assert draft_only.has_changes
     assert status_icon(draft_only) == "✏️"
     body = format_metadata_diff(draft_only)
-    assert "Unpublished MDims changed: 1" in body
+    assert "1 unpublished MDim" in body
     assert "No metadata text changes" not in body
 
     # A draft never inflates the reader-facing MDim count.
-    both = Summary(n_mdims=2, n_draft_mdims=3)
-    assert "MDims: 2" in format_metadata_diff(both)
+    both = format_metadata_diff(Summary(n_mdims=2, n_draft_mdims=3))
+    assert "2 MDims" in both and "3 unpublished MDims" in both
 
 
 def test_a_branch_owned_draft_is_not_also_reported_as_baseline_lag():
@@ -1335,12 +1340,19 @@ def test_too_many_draft_mdims_reports_a_ceiling_instead_of_a_truncated_count():
 
     capped = Summary(n_mdims=2, n_draft_mdims=MAX_MDIMS_RESOLVED + 9, draft_mdims_resolved=False)
     body = format_metadata_diff(capped)
-    assert f"Unpublished MDims changed: {MAX_MDIMS_RESOLVED + 9} (flagged; too many to resolve view by view)" in body
-    # The reader-facing count resolved cleanly, so it carries no ceiling qualifier of its own.
-    assert "MDims: 2</li>" in body
+    assert f"{MAX_MDIMS_RESOLVED + 9} unpublished MDims" in body
+    # It says *which* count is a ceiling: the reader-facing one resolved cleanly here.
+    assert "The unpublished-MDim count is a ceiling" in body
+    assert "MDim count is a ceiling" in body and "MDim and unpublished-MDim" not in body
 
-    # And the usual case stays unqualified.
-    assert "Unpublished MDims changed: 3 — no reader sees them yet" in format_metadata_diff(Summary(n_draft_mdims=3))
+    # Both capped: both named, in one line rather than two.
+    both_capped = format_metadata_diff(
+        Summary(n_mdims=2, n_draft_mdims=3, mdims_resolved=False, draft_mdims_resolved=False)
+    )
+    assert "The MDim and unpublished-MDim counts are a ceiling" in both_capped
+
+    # And the usual case says nothing about ceilings at all.
+    assert "ceiling" not in format_metadata_diff(Summary(n_draft_mdims=3))
 
 
 def test_a_retired_export_recipe_does_not_claim_the_live_product():
@@ -2772,14 +2784,16 @@ def test_the_bot_comment_reports_a_chart_config_only_change():
 
     assert config_only.has_changes
     body = format_metadata_diff(config_only)
-    assert "Charts whose own config text changed: 15 (2 changes)" in body
+    # The invariant: a config-only change still names charts, rather than a field with no reach at all.
+    assert "15 charts via their own config" in body
+    assert "✏️ <b>2 edits</b>" in body
     assert status_icon(config_only) == "✏️"
 
-    # The indicator-layer line is unchanged, and both appear when both happened.
-    both = Summary(n_charts=4, n_indicators=1, n_chart_text_changes=1, n_charts_own_text=3)
-    body = format_metadata_diff(both)
-    assert "Charts: 4 (from 1 indicator)" in body
-    assert "Charts whose own config text changed: 3 (1 change)" in body
+    # Both kinds appear when both happened, and are not summed: the two chart sets overlap and nothing
+    # here dedupes them, so a total would be a number the tool cannot vouch for.
+    both = format_metadata_diff(Summary(n_charts=4, n_indicators=1, n_chart_text_changes=1, n_charts_own_text=3))
+    assert "4 charts" in both and "3 charts via their own config" in both
+    assert "7 charts" not in both
 
 
 def test_chart_text_looks_for_variables_in_the_channel_variables_live_in(monkeypatch):
@@ -3642,6 +3656,100 @@ def test_a_charts_subtitle_is_credited_to_the_indicator_that_carries_it():
     stray = ChartTextChanges()
     attribute_chart_texts(stray, {}, {pip})
     assert not stray.diffs
+
+
+def test_the_bot_comment_counts_edits_and_not_rendered_texts():
+    """It said "384 text changes" for six authored edits — sixty times the work, in the PR comment.
+
+    One reworded subtitle reaches 348 explorer views, each wording it a little differently. Those are 348
+    rendered texts and one thing to judge, which is the whole reason the page groups by edit; the comment
+    has to count the same way or it reads as a branch nobody could review.
+    """
+    from apps.owidbot.metadata_diff import format_metadata_diff
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach
+
+    # One authored edit, rendered into three differently-worded texts on one explorer.
+    reach = [
+        ChangeReach(
+            field="chart.subtitle",
+            old=f"Mean income per {unit}.",
+            new=f"Mean income per {unit}. In 2021 prices.",
+            explorers=[{"slug": "lis", "n_views": 1, "views": [{"period": unit}]}],
+        )
+        for unit in ("day", "month", "year")
+    ]
+    summary = Summary(
+        reach=reach,
+        n_explorers=1,
+        n_explorer_views=3,
+        n_distinct_changes=3,
+        fields={"Chart subtitle": 3},
+    )
+    body = format_metadata_diff(summary)
+    assert "<b>1 edit</b>" in body, body
+    assert "3 text changes" not in body
+    # Three differently-worded texts on three views: three pages, one edit.
+    assert "3 explorer views" in body
+
+    # Without reach — a summary built from counts alone — the per-field tally stands in rather than zero.
+    assert "2 edits" in format_metadata_diff(Summary(n_charts=5, fields={"WYSK": 2}))
+
+
+def test_the_bot_comment_counts_pages_in_one_unit():
+    """Charts, MDim views and explorer views — the same unit, each counted once.
+
+    The Summary's own numbers cannot be added: `n_charts` and `n_charts_own_text` are overlapping sets of
+    charts, and MDims were counted as MDims while explorers were counted as views. Deduping from the reach
+    gives one honest count per kind, and drops the "16 charts via their own config" clause that read as
+    arithmetic nobody could do.
+    """
+    from apps.owidbot.metadata_diff import format_metadata_diff
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, affected_pages
+
+    chart = {"chartId": 1, "slug": "gdp", "has_data_page": True}
+    reach = [
+        # Two texts landing on the same chart and the same MDim view: one page each, not two.
+        ChangeReach(
+            field="descriptionKey",
+            old="a",
+            new="b",
+            charts=[chart],
+            draft_charts=[{"chartId": 9, "slug": "wip"}],
+            mdims=[{"catalogPath": "m", "n_views": 2, "is_draft": False, "views": [{"v": "1"}, {"v": "2"}]}],
+            explorers=[{"slug": "lis", "n_views": 3, "views": [{"v": "1"}, {"v": "2"}, {"v": "3"}]}],
+        ),
+        ChangeReach(
+            field="chart.subtitle",
+            old="c",
+            new="d",
+            charts=[chart],
+            mdims=[
+                {"catalogPath": "m", "n_views": 1, "is_draft": False, "views": [{"v": "1"}]},
+                {"catalogPath": "draft", "n_views": 4, "is_draft": True, "views": [{"v": str(i)} for i in range(4)]},
+            ],
+        ),
+    ]
+
+    pages = affected_pages(reach)
+    assert pages["charts"] == 1, "the same chart under two edits is one page"
+    assert pages["mdim_views"] == 2, "the repeated view is not counted twice"
+    assert pages["explorer_views"] == 3
+    assert pages["draft_charts"] == 1 and pages["draft_mdim_views"] == 4
+
+    body = format_metadata_diff(Summary(reach=reach, fields={"WYSK": 1, "Chart subtitle": 1}))
+    assert "1 chart, 2 MDim views, 3 explorer views" in body
+    assert "via their own config" not in body, "one honest chart count, not two overlapping ones"
+    # Drafts are counted (asserted above) but not reported: no reader can open them, so they do not bear
+    # on this block's one job. The published counts exclude them, so their absence understates nothing.
+    assert "draft" not in body and "unpublished" not in body
+
+    # A reach entry with a count and no dimensions still contributes its count.
+    countless = [
+        ChangeReach(
+            field="titlePublic", old="a", new="b", mdims=[{"catalogPath": "m", "n_views": 7, "is_draft": False}]
+        )
+    ]
+    assert affected_pages(countless)["mdim_views"] == 7
 
 
 def test_the_bar_says_a_section_can_be_read_either_way():
