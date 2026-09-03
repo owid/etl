@@ -3535,6 +3535,64 @@ def test_a_chart_with_no_data_page_is_not_linked_to_one(monkeypatch):
     assert "/grapher/some-chart" in multi
 
 
+def test_the_grouping_note_explains_itself_without_naming_variables():
+    """It opened with a list of internal identifiers and restated a count the header already gave.
+
+    "these 10 indicators (headcount, headcount_above, headcount_between, …) … 9 different texts" put two
+    numbers side by side that differ for a reason nobody reading chart text should have to work out, and
+    named variables a reviewer cannot act on. What the header cannot say is whether this is one decision
+    or several alike, so that is all the note says.
+    """
+    shared = {
+        "grapher/wb/2026-06-26/world_bank_pip/world_bank_pip#headcount",
+        "grapher/wb/2026-06-26/world_bank_pip/world_bank_pip#headcount_above",
+        "grapher/wb/2026-06-26/world_bank_pip/world_bank_pip#mean",
+    }
+
+    # Identical text on several indicators: written once.
+    one_text = where_note("descriptionKey", shared, n_texts=1)
+    assert "Written once" in one_text and "3 indicators" in one_text
+    # The same words across texts that differ: a shared definition, not one edit per indicator.
+    many = where_note("descriptionKey", shared, n_texts=9)
+    assert "shared definition" in many and "3 indicators" in many
+
+    for note in (one_text, many):
+        # No variable names, and no second text count to reconcile with the header's.
+        assert "headcount" not in note and "mean" not in note
+        assert "9 different texts" not in note
+        assert note.count("—") <= 1, "one sentence, one aside"
+
+    # Two versions of one dataset are one dataset. Calling them "separate datasets" named it twice, and
+    # each version does have its own file, so both are said.
+    versions = {
+        "grapher/wb/2026-06-26/world_bank_pip/world_bank_pip#headcount",
+        "grapher/wb/2026-03-24/world_bank_pip/world_bank_pip#headcount",
+    }
+    across = where_note("descriptionKey", versions)
+    assert "The same dataset in 2 versions" in across
+    assert "separate garden datasets" not in across
+    assert "2026-03-24/world_bank_pip.meta.yml" in across and "2026-06-26/world_bank_pip.meta.yml" in across
+
+    # Dimensional variants of one indicator, with texts that differ: the same distinction as above, or
+    # the note would claim eight differing texts are "the same text".
+    variants = {f"grapher/wb/2026-06-26/world_bank_pip/table_{i}#headcount_ratio" for i in range(8)}
+    assert "carry the same text" in where_note("titlePublic", variants, n_texts=1)
+    spread = where_note("titlePublic", variants, n_texts=8)
+    assert "the same place" in spread and "carry the same text" not in spread
+
+    # Nothing shared: one indicator, said plainly.
+    alone = where_note("descriptionKey", {"grapher/wb/2026-06-26/world_bank_pip/world_bank_pip#headcount"})
+    assert "belongs to one indicator only" in alone
+
+    # Two datasets do name their files, because each has to be edited on its own.
+    two = where_note(
+        "descriptionKey",
+        {"grapher/ns_a/2026-01-01/ds_a/ds_a#gdp", "grapher/ns_b/2026-01-01/ds_b/ds_b#gdp"},
+    )
+    assert "2 separate garden datasets" in two and "ds_a.meta.yml" in two
+    assert "Not shared" in two
+
+
 def test_the_bar_says_a_section_can_be_read_either_way():
     """The two ways through a section are what the badges count, so the bar has to name them.
 

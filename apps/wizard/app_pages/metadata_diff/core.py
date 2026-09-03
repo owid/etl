@@ -1085,54 +1085,74 @@ def coerce_section(value: object, fallback: str = DEFAULT_SECTION) -> str:
 
 
 def where_note(field_name: str, catalog_paths: Iterable[str], n_texts: int = 1) -> str:
-    """Why one card is one edit and not several: the same words, written once, shared. HTML for `st_note`.
+    """Why one card is one edit and not several. HTML for `st_note`.
 
-    `n_texts` is how many distinct texts the card spans. One text on several indicators is the whole text
-    shared word for word; several texts sharing an edit share the words that moved, and nothing more may
-    be claimed — an edit card saying its ten indicators carry identical WYSK, over nine different texts,
-    was wrong on its face.
+    One sentence, and only the part the card's own header does not already give. The header says how many
+    texts the edit renders into and where they land; what it cannot say is whether the reviewer is looking
+    at one decision or at several that happen to look alike — which is the whole reason these are grouped.
 
-    It says what is true — these indicators carry the identical text, all of it — rather than which YAML
-    construct produced it. Naming `definitions.*` or a variable key here was both jargon and a trap: on a
-    dimensional indicator the variable's own field holds a template reference, so pointing at it sends the
-    author to edit the wrong line.
+    No variable names. It used to open "these 10 indicators (headcount, headcount_above,
+    headcount_between, …)", which are internal identifiers a reviewer reading chart text cannot act on,
+    and it restated the header's text count beside a different number — 10 indicators, 9 texts — inviting
+    the reader to work out why they differed. Nor does it name `definitions.*`: on a dimensional indicator
+    the variable's own field holds a template reference, so pointing at it sends the author to the wrong
+    line. The exact field to edit is the rejection document's job.
 
     One case is not sharing at all: cards are keyed on the words, so the same wording edited in two garden
-    datasets arrives as one card. Nothing is shared across datasets, so that is as many edits as there are
-    datasets, and saying otherwise would send someone to fix half of it. Empty when nothing is known about
-    where the text was authored, rather than claiming it belongs to one indicator.
+    datasets arrives as one card. Nothing is shared between datasets, so that is as many edits as there
+    are datasets, and saying otherwise would send somebody to fix half of it — that branch names the files,
+    because there the reader does have to act on each one. Empty when nothing is known about where the
+    text was authored, rather than claiming it belongs to one indicator.
     """
     paths = sorted({p for p in catalog_paths if p})
     if not paths:
         return ""
-    garden_dirs = distinct_garden_datasets(paths)
-    if len(garden_dirs) > 1:
-        files = ", ".join(f"<code>{d}.meta.yml</code>" for d in garden_dirs[:4]) + (
-            " …" if len(garden_dirs) > 4 else ""
-        )
-        return (
-            f"✂️ Grouped by their text, but <b>edited in {len(garden_dirs)} separate garden datasets</b> "
-            f"({files}) — nothing is shared between datasets, so this is {len(garden_dirs)} edits, not one. "
-            "Each one has to be changed on its own."
-        )
     label = field_label(field_name)
-    shared = (
-        f"have <b>exactly the same {label}</b> — the whole text, word for word. It is written once and "
-        "shared between them, so this is one edit."
-        if n_texts <= 1
-        else f"all carry <b>this same edit to their {label}</b> — {n_texts} different texts, the same words "
-        "changed in each. It is written once and shared between them, so this is one edit."
-    )
-    shared_names = distinct_indicator_short_names(paths)
-    if len(shared_names) > 1:
-        preview = ", ".join(f"<code>{n}</code>" for n in shared_names[:5]) + (" …" if len(shared_names) > 5 else "")
-        return f"🔗 Grouped because these {len(shared_names)} indicators ({preview}) {shared}"
+
+    garden_dirs = distinct_garden_datasets(paths)
+    files = ", ".join(f"<code>{d}.meta.yml</code>" for d in garden_dirs[:4]) + (" …" if len(garden_dirs) > 4 else "")
+    # Two *versions* of one dataset are two garden dirs and one dataset — calling them "separate datasets"
+    # named the same thing twice. What tells them apart is the (namespace, dataset) shape.
+    shapes = {shape for shape in (dataset_shape(path) for path in paths) if shape}
+    if len(garden_dirs) > 1 and len(shapes) > 1:
+        return (
+            f"✂️ <b>Not shared</b> — the same wording, edited in {len(garden_dirs)} separate garden "
+            f"datasets ({files}). Nothing is shared between datasets, so this is {len(garden_dirs)} edits "
+            "to make, not one."
+        )
+    if len(garden_dirs) > 1:
+        return (
+            f"🔗 <b>The same dataset in {len(garden_dirs)} versions</b> carries this text ({files}) — one "
+            "card, because the wording is the same, but each version has its own file."
+        )
+
+    n_indicators = len(distinct_indicator_short_names(paths))
+    if n_indicators > 1:
+        if n_texts <= 1:
+            return (
+                f"🔗 <b>Written once</b> and used by {n_indicators} indicators, which is why it is one "
+                "card: one decision, not one per indicator."
+            )
+        return (
+            f"🔗 <b>One change to a shared definition</b> that {n_indicators} indicators build their "
+            f"{label} from — so it reaches all of them without being written {n_indicators} times."
+        )
     if len(paths) > 1:
-        parsed = parse_catalog_path(paths[0])
-        name = f"<code>{parsed[2]}</code>" if parsed else "this indicator"
-        return f"🔗 Grouped because {len(paths)} versions of {name} {shared}"
+        # One dataset, one short name, several paths: dimensional variants of one indicator, or the same
+        # name in more than one table. Same distinction as above — identical text, or the same edit
+        # reaching texts that differ. Saying "the same text" of eight differing ones contradicted the
+        # count beside it.
+        if n_texts <= 1:
+            return (
+                f"🔗 <b>Written once</b> — {len(paths)} indicators of this dataset carry the same text, "
+                "which is why it is one card."
+            )
+        return (
+            f"🔗 <b>One change, shared</b> — {len(paths)} indicators of this dataset take their {label} "
+            f"from the same place, so this is one edit and not {len(paths)}."
+        )
     if n_texts > 1:
-        return f"This edit to the {label} of one indicator renders into {n_texts} texts — nothing else shares it."
+        return f"This edit renders into {n_texts} texts of one indicator — nothing else shares it."
     return f"This {label} belongs to one indicator only — nothing else shares it."
 
 
