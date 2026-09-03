@@ -230,24 +230,25 @@ It is installed as a symlink at `$GIT_DIR/hooks/pre-commit`, git's default locat
 
 ## Working in a git worktree
 
-`.env` is gitignored, so `git worktree add` cannot carry it into a new worktree. `make setup.worktree` copies `.env` and the `.env.prod*` credentials from your main checkout; it runs automatically as part of `make .venv`, and never overwrites a file already there.
+`.env` is gitignored, so `git worktree add` cannot carry it into a new worktree, and a worktree starts with no `data/` either — so every ETL step would recompute from snapshots. `make setup.worktree` handles both, runs automatically as part of `make .venv`, and never overwrites anything already there.
 
 ```bash
 git worktree add ../etl-mybranch -b mybranch
 cd ../etl-mybranch
-make .venv          # venv + hooks + .env, in one step
-make setup.data     # optional: this worktree's own copy of the main checkout's data/
+make .venv          # venv + hooks + .env + data/, in one step
 ```
 
-`make setup.data` is worth knowing about. A worktree starts with no `data/`, so every ETL step recomputes from snapshots. On APFS the main checkout's `data/` can be *cloned* copy-on-write — the copy shares the original's blocks until something writes to them, so it is effectively free. Measured on a 16 GB / ~32,000-file `data/`: **4 seconds and ~0 bytes**. Each worktree gets an independent `data/`, so two of them running the same step cannot overwrite each other's output. Both paths must be on the same APFS volume; if cloning isn't possible the target says so and leaves `data/` absent rather than making a real 16 GB copy.
+Copying 16 GB of `data/` sounds absurd and isn't: on a copy-on-write filesystem (APFS on macOS) `cp -c` clones the files, sharing the original's blocks until something writes to them. Measured on a 16 GB / ~32,000-file `data/`: **4 seconds and ~0 bytes**. So a real copy is *better* than symlinking it — each worktree gets an independent `data/`, and two of them running the same step cannot overwrite each other's output. Where cloning isn't possible (a different filesystem, or a different volume) `cp -c` fails rather than silently falling back, and the target leaves `data/` absent rather than making a real 16 GB copy.
 
-(The same trick applies to `git worktree add` itself on very large repos, and to `node_modules` — `cp -Rc` instead of `cp -R`. Plain `cp` does not clone on macOS; the `-c` flag is required.)
+The venv is not part of it, and cannot be: `setup.worktree` is a prerequisite of `.venv`, so building the venv inside it would be a dependency cycle. It is also the one step that is slow and needs the network, which makes it the wrong thing to run from a git hook — everything `setup.worktree` does is offline and effectively free.
+
+(The clone trick applies elsewhere too: `git worktree add` itself on very large repos, and `node_modules`. Plain `cp` does not clone on macOS; the `-c` flag is required.)
 
 ### Provisioning worktrees automatically
 
 `setup.worktree` is a deliberately boring, shared name — owid-grapher uses it too — so anything that creates a worktree can provision *any* repo without knowing what that repo needs. Two ways to hook it up:
 
-**A worktree manager.** Point its per-repo setup script at `make .venv setup.data`. A full working worktree (config, venv, cloned `data/`) takes about 25 seconds.
+**A worktree manager.** Point its per-repo setup script at `make .venv`. That covers the one thing the hook deliberately leaves out — the venv — and a full working worktree (config, cloned `data/`, 412-package venv) takes about 25 seconds.
 
 **A machine-wide git hook**, if you create worktrees with plain `git` and want this to happen by itself. Set `core.hooksPath` to a directory of your own and put this in its `post-checkout`:
 
@@ -269,7 +270,7 @@ make -n setup.worktree >/dev/null 2>&1 && make setup.worktree
 exit 0
 ```
 
-Two things to know if you do this. `core.hooksPath` **replaces** `$GIT_DIR/hooks` rather than adding to it, so a dispatcher of this kind should end by exec'ing the repo's own `$GIT_DIR/hooks/<name>` — otherwise it silently disables every per-repo hook, including this repo's pre-commit. And keep `setup.worktree` cheap and offline for the same reason: it runs inside a git hook, which is why `setup.data` is a separate target rather than part of it.
+Two things to know if you do this. `core.hooksPath` **replaces** `$GIT_DIR/hooks` rather than adding to it, so a dispatcher of this kind should end by exec'ing the repo's own `$GIT_DIR/hooks/<name>` — otherwise it silently disables every per-repo hook, including this repo's pre-commit. And keep `setup.worktree` cheap and offline for the same reason: it runs inside a git hook, which is why the venv is not part of it.
 
 ## GitHub Actions
 
