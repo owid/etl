@@ -1,8 +1,7 @@
 definitions:
   survey_dating: &survey_dating |-
     Countries run their time-use surveys in different years, and some run them across two: we date each
-    country by the year its fieldwork ended, so a survey labelled 2009/10 is shown as 2010. The survey's
-    own label is kept in the "Survey year" indicator.
+    country by the year its fieldwork ended, so a survey labelled 2009/10 is shown as 2010.
   common:
     unit: minutes per day
     short_unit: min
@@ -17,8 +16,7 @@ definitions:
     Minutes are a daily average over the whole week, including both weekdays and weekends.
   groups_processing: &groups_processing |-
     Countries run their time-use surveys in different years, and some run them across two: we date each
-    country by the year its fieldwork ended, so a survey labelled 2009/10 is shown as 2010. The survey's
-    own label is kept in the "Survey year" indicator.
+    country by the year its fieldwork ended, so a survey labelled 2009/10 is shown as 2010.
 
     We group the OECD's detailed activities into the categories shown in our chart "How do people spend their time?":
 
