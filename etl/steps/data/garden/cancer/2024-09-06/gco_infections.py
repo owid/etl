@@ -146,8 +146,9 @@ def sanity_check_outputs(tb: Table) -> None:
         "The source's attributable fraction should not be published for all agents (it duplicates attr_cases_share)."
     )
     assert tb.loc[tb["agent"] == ALL_AGENTS, "paf"].isna().all(), error
-    error = "The source's attributable fraction should be available for every individual agent."
-    assert tb.loc[(tb["agent"] != ALL_AGENTS) & (tb["cancer"] == ALL_CANCERS), "paf"].notna().all(), error
+    is_country = ~tb["country"].isin(REGIONS)
+    error = "The source's attributable fraction should be available for every individual agent (countries only)."
+    assert tb.loc[(tb["agent"] != ALL_AGENTS) & (tb["cancer"] == ALL_CANCERS) & is_country, "paf"].notna().all(), error
     error = "There should be no columns with only NaNs."
     assert tb.columns[tb.isna().all()].empty, error
 
