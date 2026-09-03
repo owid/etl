@@ -232,15 +232,40 @@ vsce-sync:
 		echo "⚠️ VS Code CLI (code) is not installed. Skipping extension sync."; \
 	fi
 
-# Activate the tracked pre-commit hook by pointing git at scripts/hooks/.
-# Idempotent; runs as a dependency of .venv so a fresh clone gets the hook
-# the first time anyone sets up the environment.
+# Activate the tracked pre-commit hook by symlinking it into the repo's hooks
+# directory. Idempotent; runs as a dependency of .venv so a fresh clone gets the
+# hook the first time anyone sets up the environment.
+#
+# Deliberately NOT `git config core.hooksPath scripts/hooks`, which is what this
+# target used to do. `core.hooksPath` *replaces* the hooks directory rather than
+# adding to it, and a repo-local setting beats a global one — so on a machine that
+# points `core.hooksPath` at a directory of its own hooks, this repo silently
+# disabled all of them and kept only ours. That is easy to miss, because a hook
+# that never runs looks exactly like a hook that passed; the one that bit was a
+# `post-checkout` giving each new worktree its gitignored `.env`, whose absence
+# surfaces much later as a confusing connection error.
+#
+# `$GIT_DIR/hooks` is git's own default, so the symlink needs no config at all, and
+# a machine-wide hooks directory that forwards to `$GIT_DIR/hooks` still finds it.
+# `--git-common-dir` resolves to the primary `.git` from a linked worktree, so one
+# install covers every worktree, and the link points at the primary checkout's copy
+# of the script so it survives that worktree being removed.
 install-hooks:
 	@if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then \
-		if [ "$$(git config --get core.hooksPath 2>/dev/null)" != "scripts/hooks" ]; then \
-			git config core.hooksPath scripts/hooks; \
-			chmod +x scripts/hooks/pre-commit; \
-			echo '==> pre-commit hook active (core.hooksPath=scripts/hooks)'; \
+		COMMON="$$(cd "$$(git rev-parse --git-common-dir)" && pwd)"; \
+		HOOK="$$COMMON/hooks/pre-commit"; \
+		TARGET="$$(dirname "$$COMMON")/scripts/hooks/pre-commit"; \
+		chmod +x scripts/hooks/pre-commit; \
+		mkdir -p "$$COMMON/hooks"; \
+		if [ -e "$$HOOK" ] && [ ! -L "$$HOOK" ]; then \
+			echo "⚠️ $$HOOK already exists and is not a symlink — leaving it alone."; \
+		elif [ "$$(readlink "$$HOOK" 2>/dev/null)" != "$$TARGET" ]; then \
+			ln -sfn "$$TARGET" "$$HOOK"; \
+			echo "==> pre-commit hook active ($$HOOK)"; \
+		fi; \
+		if [ "$$(git config --local --get core.hooksPath 2>/dev/null)" = "scripts/hooks" ]; then \
+			git config --local --unset core.hooksPath; \
+			echo "==> removed the core.hooksPath override earlier versions of this target set"; \
 		fi; \
 	fi
 
