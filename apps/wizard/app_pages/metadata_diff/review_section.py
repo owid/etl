@@ -178,14 +178,24 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
     # the index they always were, and refused surfaces sort first because they are what needs an answer.
     st.markdown("##### Everything you recorded")
     for surface, group in sorted(_by_surface(rows).items(), key=lambda kv: (not _has_rejection(kv[1]), kv[0])):
-        done = sum(1 for row in group if row.get("status") in DECIDED)
-        refused = sum(1 for row in group if row.get("status") == REJECTED)
+        # Reopened rows are excluded from both counts, the same rule the header and the documents apply:
+        # a verdict made on wording that has since moved is not a decision about the wording there now.
+        live = [row for row in group if not _reopened(row, index)]
+        done = sum(1 for row in live if row.get("status") in DECIDED)
+        refused = sum(1 for row in live if row.get("status") == REJECTED)
+        stale = sum(1 for row in group if _reopened(row, index))
         of = totals.get(surface)
         with_note = [row for row in group if row.get("comment")]
         bare = [row for row in group if not row.get("comment")]
         counted = f"{done} of {of}" if of else str(done)
         marks = " · ".join(
-            part for part in (f"❌ {refused}" if refused else "", f"📝 {len(with_note)}" if with_note else "") if part
+            part
+            for part in (
+                f"❌ {refused}" if refused else "",
+                f"♻️ {stale}" if stale else "",
+                f"📝 {len(with_note)}" if with_note else "",
+            )
+            if part
         )
         label = f"{_surface_title(surface)} — {counted} decided" + (f" · {marks}" if marks else "")
         with st.expander(label, expanded=bool(refused)):
