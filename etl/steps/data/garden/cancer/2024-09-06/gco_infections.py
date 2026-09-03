@@ -80,6 +80,11 @@ def run() -> None:
     # unlike the source's population attributable fraction).
     tb["attr_cases_share"] = tb["attr_cases"] / tb["cases"] * 100
 
+    # The source's population attributable fraction is only published for the all-cancers total, by agent. For "all
+    # infectious agents" it duplicates our share (same values), so we do not publish it there; it stays for the
+    # individual agents, where the source does not report the denominator needed to compute a share.
+    tb.loc[tb["agent"] == ALL_AGENTS, "paf"] = np.nan
+
     # Improve table format.
     tb = tb.format(["country", "year", "sex", "agent", "cancer"], short_name=paths.short_name)
 
@@ -137,6 +142,12 @@ def sanity_check_outputs(tb: Table) -> None:
     assert set(REGIONS) <= set(tb["country"]), error
     error = "Attributable shares must be between 0% and 100%."
     assert tb["attr_cases_share"].dropna().between(0, 100 + 1e-6).all(), error
+    error = (
+        "The source's attributable fraction should not be published for all agents (it duplicates attr_cases_share)."
+    )
+    assert tb.loc[tb["agent"] == ALL_AGENTS, "paf"].isna().all(), error
+    error = "The source's attributable fraction should be available for every individual agent."
+    assert tb.loc[(tb["agent"] != ALL_AGENTS) & (tb["cancer"] == ALL_CANCERS), "paf"].notna().all(), error
     error = "There should be no columns with only NaNs."
     assert tb.columns[tb.isna().all()].empty, error
 

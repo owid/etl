@@ -67,8 +67,9 @@ tables:
         processing_level: major
 
       paf:
-        # The source's own attributable fraction. It only covers the all-cancers total by agent, for countries; the
-        # "attr_cases_share" indicator above covers cancer sites, regions and both sexes.
+        # The source's own attributable fraction, for the all-cancers total by individual agent (countries only). For
+        # "all infectious agents" it is blanked in the garden step because it duplicates attr_cases_share, which also
+        # covers cancer sites, regions and both sexes.
         title: Share of new {definitions.cases_of} caused by {definitions.agent_phrase}{definitions.among_sex} (population attributable fraction)
         description_short: Estimated share of new {definitions.cases_of}{definitions.among_sex} that are attributed to {definitions.agent_phrase}, as published by IARC.
         unit: "%"
