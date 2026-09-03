@@ -920,6 +920,20 @@ DEFAULT_SECTION = "blast"
 # PR brief has always paired it with ✅.
 REVIEW_MARKS = {"todo": "⏳", "done": "✅"}
 
+# What each mark means, shown on hover (see `render.st_section_switcher`). An emoji is a reminder, not an
+# explanation: two of them on a nav bar are learnable, but only once somebody has been told which is which.
+# Both lines name the two ways through a section, because that is what "finished" is measured against.
+REVIEW_MARK_HELP = {
+    "⏳": (
+        "Not finished — items in this section are still to tick off. Read them view by view, or by edit; "
+        "working through either one finishes the section."
+    ),
+    "✅": (
+        "Finished — every item in this section is ticked, either view by view or by edit. Ticks are yours "
+        "alone, kept on this staging server, and never read at merge time."
+    ),
+}
+
 
 def section_label(section: str, progress: dict[str, tuple[int, int]], marks: dict[str, str] | None = None) -> str:
     """The section's name, and how far its review has got.
@@ -933,7 +947,13 @@ def section_label(section: str, progress: dict[str, tuple[int, int]], marks: dic
     # Only a section that holds items can be part-way through reviewing them. Blast radius reports reach
     # and Review collects the record, so a mark on either would be a claim about nothing — enforced here
     # rather than left to the caller to remember.
-    mark = REVIEW_MARKS.get((marks or {}).get(section, ""), "") if section in COUNTED_SECTIONS else ""
+    #
+    # Nor can a section with nothing in it be unfinished: ⏳ there reads as work waiting when there is
+    # none, and the hover saying "items still to tick off" would be describing an empty list. Its zero is
+    # the finding, and `empty_sections` greys it on the strength of this same total.
+    holds_items = progress.get(section, (0, 0))[1] > 0
+    marked = section in COUNTED_SECTIONS and holds_items
+    mark = REVIEW_MARKS.get((marks or {}).get(section, ""), "") if marked else ""
     return f"{icon} {name} {mark}" if mark else f"{icon} {name}"
 
 

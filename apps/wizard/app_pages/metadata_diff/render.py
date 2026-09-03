@@ -29,6 +29,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     LAYOUT_QUERY_KEY,
     LAYOUTS,
     METADATA_FIELDS,
+    REVIEW_MARK_HELP,
     SECTIONS,
     ViewDiff,
     as_bullets,
@@ -79,6 +80,45 @@ div.st-key-{SECTION_NAV_KEY} {{
 }}
 </style>
 """
+
+# A hover for the bar's ⏳ / ✅, put on the button as a native `title`. Streamlit's own `help` renders
+# beside a widget's label, and this bar collapses its label — and even shown, one tooltip for the whole
+# control could not say which mark is which. So the same approach the review strip's key binding uses: a
+# zero-height component whose script reaches the parent document, which is same-origin.
+#
+# Matched on the mark in each button's text, which is also what keeps the bar's own "Re-read" button (a
+# sibling in the same keyed container) out of it. The observer watches childList only, so setting an
+# attribute here cannot retrigger it.
+_MARK_HELP_JS = (
+    """
+<script>
+const doc = window.parent.document;
+const HELP = __HELP__;
+function tag() {
+  doc.querySelectorAll('div[class*="st-key-__NAV_KEY__"] button').forEach((button) => {
+    const text = button.innerText || "";
+    for (const mark in HELP) {
+      if (text.includes(mark)) {
+        if (button.title !== HELP[mark]) button.title = HELP[mark];
+        return;
+      }
+    }
+  });
+}
+tag();
+// Streamlit rebuilds the DOM on every rerun, so the titles have to be reapplied rather than set once.
+new MutationObserver(tag).observe(doc.body, { childList: true, subtree: true });
+</script>
+"""
+    # Built by substitution rather than an f-string: the script is mostly braces.
+    .replace("__HELP__", json.dumps(REVIEW_MARK_HELP)).replace("__NAV_KEY__", SECTION_NAV_KEY)
+)
+
+
+def st_mark_help_script() -> None:
+    """Explain the bar's marks on hover. Purely additive: if the script never runs, the bar still reads."""
+    components.html(_MARK_HELP_JS, height=0)
+
 
 DIFF_CSS = """
 <style>
@@ -713,6 +753,8 @@ def st_section_switcher(
         "those three reads two ways — **view by view**, one page at a time, or **by edit**, one authored "
         "change with everywhere it lands — and working through either one finishes the section."
     )
+    # After the caption, so the zero-height frame lands outside the sticky bar rather than inside it.
+    st_mark_help_script()
 
     # Keep the default out of the URL, as url_persist does, so a plain link stays plain. Written only on
     # a real change, so a run that touches nothing leaves the URL alone.

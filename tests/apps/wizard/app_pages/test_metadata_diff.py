@@ -2943,20 +2943,60 @@ def test_a_section_badge_says_finished_or_not_and_nothing_else():
     """
     from apps.wizard.app_pages.metadata_diff.core import REVIEW_MARKS, section_label
 
+    # A section with something in it: only such a section can be part-way through (see the test below).
+    held = {"charts": (0, 3), "blast": (0, 3), "review": (0, 3)}
+
     assert set(REVIEW_MARKS) == {"todo", "done"}
-    assert section_label("charts", {}, {"charts": "todo"}).endswith("⏳")
-    assert section_label("charts", {}, {"charts": "done"}).endswith("✅")
+    assert section_label("charts", held, {"charts": "todo"}).endswith("⏳")
+    assert section_label("charts", held, {"charts": "done"}).endswith("✅")
 
     # No mark for this section, an unknown state, or no marks at all: the name alone. "partial" is one of
     # those unknowns now, so a stale caller cannot put a third emoji back on the bar.
-    assert section_label("charts", {}, {"mdims": "done"}).endswith("Charts")
-    assert section_label("charts", {}, {"charts": "partial"}).endswith("Charts")
-    assert section_label("charts", {}, {"charts": "elsewhere"}).endswith("Charts")
-    assert section_label("charts", {}).endswith("Charts")
+    assert section_label("charts", held, {"mdims": "done"}).endswith("Charts")
+    assert section_label("charts", held, {"charts": "partial"}).endswith("Charts")
+    assert section_label("charts", held, {"charts": "elsewhere"}).endswith("Charts")
+    assert section_label("charts", held).endswith("Charts")
 
-    # Blast radius and Review hold no items, so they never carry one.
-    assert section_label("blast", {}, {"blast": "done"}).endswith("Blast radius")
-    assert section_label("review", {}, {"review": "todo"}).endswith("Review")
+    # Blast radius and Review hold no items to tick, so they never carry one — even given a total.
+    assert section_label("blast", held, {"blast": "done"}).endswith("Blast radius")
+    assert section_label("review", held, {"review": "todo"}).endswith("Review")
+
+
+def test_a_section_with_nothing_in_it_carries_no_mark():
+    """⏳ on an empty section reads as work waiting when there is none.
+
+    Its hover says "items in this section are still to tick off", which would be describing an empty list.
+    The zero is the finding — and it is the same total `empty_sections` greys the button on.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import empty_sections, section_label
+
+    assert section_label("explorers", {"explorers": (0, 0)}, {"explorers": "todo"}).endswith("Explorers")
+    assert section_label("explorers", {"explorers": (0, 4)}, {"explorers": "todo"}).endswith("⏳")
+    # Same total, so a marked section and a greyed one can never be the same button.
+    assert "explorers" in empty_sections({"explorers": (0, 0)})
+    assert "explorers" not in empty_sections({"explorers": (0, 4)})
+
+
+def test_the_bar_explains_its_marks_on_hover():
+    """Two emojis on a nav bar are learnable, but only once somebody has been told which is which.
+
+    The script carries the text of both, keyed by the emoji it is attached to, and targets the bar's own
+    container — which is what keeps the sibling "Re-read" button out of it.
+    """
+    import json
+
+    from apps.wizard.app_pages.metadata_diff.core import REVIEW_MARK_HELP, REVIEW_MARKS
+    from apps.wizard.app_pages.metadata_diff.render import _MARK_HELP_JS, SECTION_NAV_KEY
+
+    # Every mark the bar can show has a hover, and nothing else does.
+    assert set(REVIEW_MARK_HELP) == set(REVIEW_MARKS.values())
+    assert "Not finished" in REVIEW_MARK_HELP["⏳"] and "Finished" in REVIEW_MARK_HELP["✅"]
+    # Both name what "finished" is measured against, since either way through a section completes it.
+    assert all("by edit" in text and "view by view" in text for text in REVIEW_MARK_HELP.values())
+
+    assert json.dumps(REVIEW_MARK_HELP) in _MARK_HELP_JS
+    assert f"st-key-{SECTION_NAV_KEY}" in _MARK_HELP_JS
+    assert "__HELP__" not in _MARK_HELP_JS and "__NAV_KEY__" not in _MARK_HELP_JS
 
 
 def test_the_shared_digest_trims_around_the_change():
