@@ -82,7 +82,15 @@ can show it — but its bounding box is the whole canvas, which makes every box-
 `verify_page.js` measure the artboard instead of the plot and report three failures that are not there.
 Keep the guard the skill's pass uses: strip it only when nothing under it is painted.
 
-**Switch the import frame's fill ON and clip it**, to the clone's own canvas paint and its bound style.
+**Crop the chart frame to the plot's own ink** once the restyle is done — `x`/`y` onto the ink, resize
+to it, and shift the children back by the same offset, with clipping left off. The import arrives the
+size of the SVG canvas, which is the artboard, and a frame that size has no box to show: hovering the
+plot highlights a rectangle identical to the artboard's, so there is no way to see or grab the plot as
+a unit, and `verify_page.js`'s box-alignment and gap rows measure the canvas and report negative
+insets. Cropping moves nothing on the canvas — measured at max channel difference 0 across the frame.
+Leave the parked unstyled copy at full canvas size: it is there to be compared against the export.
+
+**Switch the import frame's fill ON**, to the clone's own canvas paint and its bound style.
 An import arrives with a `SOLID` fill marked `visible: false`, and a frame with no visible fill is not a
 hit target over its empty area — so hovering the plot highlights nothing and the chart is reachable only
 from the layer panel, which is the second way these frames feel unlike the template. It costs no pixel:
