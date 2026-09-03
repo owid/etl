@@ -1,4 +1,8 @@
-"""Load a garden dataset and create a grapher dataset."""
+"""Load a garden dataset and create a grapher dataset.
+
+Each country's effective year is embedded in the status value (e.g. "Banned (2023)") so that the map
+tooltip shows it. The chart and explorer steps map each status-year value back to its plain status.
+"""
 
 from etl.helpers import PathFinder
 
@@ -33,6 +37,14 @@ def run() -> None:
     assert (status_unknown := (set(tb["status"]) - STATUS_ALL)) == set(), (
         f"Undefined status of banning: {status_unknown}"
     )
+
+    # Embed each country's effective year in the status value so it shows in the map tooltip.
+    status = tb["status"]
+    is_banned = status != STATUS_NOT_BANNED
+    with_year = status.astype("string") + " (" + tb["year_effective"].astype("Int64").astype("string") + ")"
+    new_status = status.astype("string")
+    new_status[is_banned] = with_year[is_banned]
+    tb["status"] = new_status.copy_metadata(status)
 
     # Select relevant columns.
     tb = tb[["country", "status"]]
