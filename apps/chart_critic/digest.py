@@ -18,11 +18,13 @@ Three things keep the digest worth reading, and all three are about restraint:
 
 from __future__ import annotations
 
+import functools
 import json
 import re
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
+from slack_sdk.errors import SlackApiError
 from structlog import get_logger
 
 from apps.chart_critic.critic import format_views
@@ -36,6 +38,9 @@ log = get_logger()
 STATE_PATH = CACHE_DIR / "chart_critic" / "digest_state.json"
 SLACK_CHANNEL = "C03NV9Z3YSV"  # #we-need-to-correct-it
 ADMIN_URL = "https://admin.owid.io"
+
+# Accounts that turn up as a chart's last editor without a person behind them.
+SERVICE_ACCOUNTS = {"etl@ourworldindata.org"}
 
 # Matches #analytics-bites, the other daily owidbot post in this workspace: a severity dot, then
 # facts separated by wide middots. Consistency is worth more than a bespoke shape — people learn
@@ -97,7 +102,7 @@ def changed_slugs(days: int = 1, include_data_updates: bool = False) -> list[str
 
 def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     """What the digest needs to know about each flagged chart beyond the review itself:
-    ``{slug: {"chart_id", "indicators", "editor", "owners"}}``.
+    ``{slug: {"chart_id", "indicators", "editor"}}``.
 
     A data-level defect lives in an indicator, not in a chart, so the same claim surfaces on
     every chart sharing that column. This already happened: the UK coal share above 100% was
@@ -110,10 +115,8 @@ def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     public slug will not do. A multi-dim view has no row here, so it has no id and gets no edit
     link; that is correct rather than missing, since there is no single chart to edit.
 
-    It also yields the two people a finding can be addressed to: the chart's last editor, and the
-    accountable owner of each dataset behind it (the first name in the step's ``owners``).
-    :mod:`apps.chart_critic.mentions` turns those into Slack mentions and explains which one a
-    given finding belongs to.
+    It also yields the chart's last editor, who is who a finding gets addressed to — see
+    :func:`attach_mentions` for when we may name them.
 
     Only flagged charts are looked up, so this is one small query. It fails soft: without a
     database the fingerprint falls back to the slug (which over-reports rather than dropping a
@@ -132,14 +135,11 @@ def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
                    u.fullName     AS editorName,
                    u.email        AS editorEmail,
                    u.isActive     AS editorActive,
-                   d.id           AS datasetId,
-                   d.owners       AS owners,
                    v.catalogPath  AS catalogPath
             FROM chart_configs cc
             JOIN charts c            ON c.configId = cc.id
             JOIN chart_dimensions cd ON cd.chartId = c.id
             JOIN variables v         ON v.id = cd.variableId
-            JOIN datasets d          ON d.id = v.datasetId
             LEFT JOIN users u        ON u.id = c.lastEditedByUserId
             WHERE cc.slug IN %(slugs)s
             """,
@@ -158,7 +158,6 @@ def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
             "chart_id": int(group["chartId"].iloc[0]),
             "indicators": paths,
             "editor": _editor(group),
-            "owners": _dataset_owners(group),
         }
     return out
 
@@ -174,23 +173,51 @@ def _editor(group: pd.DataFrame) -> dict[str, str] | None:
     return {"name": name, "email": str(email) if isinstance(email, str) else ""}
 
 
-def _dataset_owners(group: pd.DataFrame) -> list[str]:
-    """The accountable owner of each dataset behind the chart — the first name in ``owners``.
+@functools.cache
+def _slack_member_id(email: str) -> str | None:
+    """Slack member id for an email address, or ``None`` if Slack does not know it.
 
-    First rather than all of them: the field is ordered, and its first entry is the person who
-    answers for the dataset. A chart usually reads one or two datasets, so this is one or two
-    names; duplicates collapse, and a dataset that declares no owner simply contributes nobody.
+    Resolved at run time rather than stored: ``users.lookupByEmail`` (the owidbot token carries
+    ``users:read.email``) is exact and always current, where a handle written down next to the
+    grapher account would go stale silently the first time someone's Slack account changes.
     """
-    owners: list[str] = []
-    for _, dataset in group.groupby("datasetId"):
-        raw = dataset["owners"].iloc[0]
-        try:
-            declared = json.loads(raw) if isinstance(raw, str) else (raw or [])
-        except json.JSONDecodeError:
+    from etl import config
+    from etl.slack_helpers import slack_client
+
+    if not config.SLACK_API_TOKEN:
+        return None
+    try:
+        return str(slack_client.users_lookupByEmail(email=email)["user"]["id"])
+    except SlackApiError as e:
+        log.warning("chart_critic.slack_lookup_failed", email=email, error=str(e))
+        return None
+
+
+def attach_mentions(facts: dict[str, dict[str, Any]], tag_last_editor: bool) -> None:
+    """Resolve each chart's editor to a Slack mention, in place, before any message is built.
+
+    A finding addressed to nobody gets read and forgotten, so a finding names the person who
+    last edited the chart — but only when ``tag_last_editor`` says the sweep earns it. That is
+    the configuration-edit sweep, where the chart is under review *because* they edited it in
+    the last day, and where "you changed this yesterday, this may be off" is a fair thing to
+    say. In any other selection the last editor may have changed a colour two years ago, and
+    naming them is noise at best.
+
+    Called once from the CLI so the Slack lookups happen in one visible place and the message
+    formatting stays a pure function of its inputs. Fails soft to the plain name: an unresolved
+    person reads as "last edited by Pablo Rosado", which still says who to ask, rather than as a
+    broken mention.
+    """
+    for chart in facts.values():
+        editor = (chart.get("editor") or {}) if tag_last_editor else {}
+        name, email = editor.get("name"), editor.get("email")
+        # An ETL grapher step upserting a config shows up as a last editor with no person behind
+        # it, so it is named neither as a mention nor as a plain name — there is nobody to tell.
+        if not name or email in SERVICE_ACCOUNTS:
+            chart["editor_mention"] = None
             continue
-        if declared and isinstance(declared[0], str) and declared[0] not in owners:
-            owners.append(declared[0])
-    return owners
+        member_id = _slack_member_id(email) if email else None
+        chart["editor_mention"] = f"<@{member_id}>" if member_id else name
 
 
 def _indicators(facts: dict[str, dict[str, Any]] | None, slug: str) -> list[str]:
@@ -272,29 +299,11 @@ def _chart_title(result: dict[str, Any]) -> str:
     return result["slug"]
 
 
-def _addressed_to(issue: dict[str, Any], chart: dict[str, Any]) -> str | None:
-    """Who this finding is for, as a footer element — or nothing when we cannot say.
-
-    A chart-level claim is the chart editor's; a data-level one is the dataset owner's, and it is
-    deliberately *not* handed to the chart editor when no owner is declared. A wrong column is
-    not the business of whoever last touched the chart, and naming them anyway is how a digest
-    teaches people that its mentions mean nothing.
-
-    Mentions are resolved upstream by :func:`apps.chart_critic.mentions.attach`, which is also
-    where the rule about *when* an editor may be named lives.
-    """
-    if issue.get("kind") == "data":
-        owners = chart.get("owner_mentions") or []
-        return f"dataset owner{'s' if len(owners) > 1 else ''} {' '.join(owners)}" if owners else None
-    editor = chart.get("editor_mention")
-    return f"last edited by {editor}" if editor else None
-
-
 def _format_finding(
     result: dict[str, Any], issue: dict[str, Any], facts: dict[str, dict[str, Any]] | None = None
 ) -> str:
     """One finding as its own message: a linked bold title, the claim in a sentence, and a footer
-    of severity, readership, an admin edit link and whoever the claim is addressed to.
+    of severity, readership, an admin edit link and whoever last edited the chart.
 
     Self-contained on purpose. It is read next to the lead message but it is also what someone
     quotes, forwards or replies to on its own, so it carries the link and the edit action itself.
@@ -307,8 +316,8 @@ def _format_finding(
         footer.append(views)
     if chart_id := chart.get("chart_id"):
         footer.append(f"<{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit chart>")
-    if who := _addressed_to(issue, chart):
-        footer.append(who)
+    if editor := chart.get("editor_mention"):
+        footer.append(f"last edited by {editor}")
     return f"*<{url}|{_chart_title(result)}>*\n{issue.get('claim', '').rstrip('.')}.\n{'   ·   '.join(footer)}"
 
 
