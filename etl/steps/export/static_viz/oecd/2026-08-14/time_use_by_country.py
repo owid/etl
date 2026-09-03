@@ -454,7 +454,11 @@ BAND_INSET = 14
 # wrapped this step measured in one font and drew in the other, which made the allowances look as though
 # they needed to be 1.0.
 EMITTED_FONT_STACK = ["Lato", "Arial", "Helvetica", "sans-serif"]
-MEASURED_FONT_STACK = ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans", "sans-serif"]
+# Liberation Sans BEFORE DejaVu Sans, deliberately: matplotlib bundles DejaVu, so anything behind it is
+# unreachable — and Liberation is the metric-compatible Arial substitute, the one face that keeps these
+# allowances valid on a machine without Arial. DejaVu stays as the last named fallback, where it means
+# "nothing Arial-shaped is installed" rather than "the second choice".
+MEASURED_FONT_STACK = ["Arial", "Helvetica", "Liberation Sans", "DejaVu Sans", "sans-serif"]
 matplotlib.rcParams["font.family"] = "sans-serif"
 matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
 # Drop the per-face misses for faces we deliberately name as alternatives, and NOTHING else.
