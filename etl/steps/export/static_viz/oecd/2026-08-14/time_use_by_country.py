@@ -155,12 +155,13 @@ names) where this step had already spaced them by measured advance.
 """
 
 import logging
+from pathlib import Path
 
 import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.colors import to_rgb
-from matplotlib.font_manager import FontProperties
+from matplotlib.font_manager import FontProperties, findfont
 from matplotlib.textpath import TextPath
 from owid.catalog import Table
 
@@ -456,10 +457,41 @@ EMITTED_FONT_STACK = ["Lato", "Arial", "Helvetica", "sans-serif"]
 MEASURED_FONT_STACK = ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans", "sans-serif"]
 matplotlib.rcParams["font.family"] = "sans-serif"
 matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
-# matplotlib logs a miss for every name it cannot resolve, and `Lato` is meant to be missing here — it
-# is a request to whoever opens the SVG, not to this machine. Quieten just that logger, so a real
-# problem with a font this step DOES need is still visible.
-logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
+# Drop the per-face misses for faces we deliberately name as alternatives, and NOTHING else.
+#
+# Both stacks list fallbacks that no single machine has all of: `Lato` is a request to whoever opens
+# the SVG rather than to this machine, and `Liberation Sans` is the metric-compatible Arial substitute
+# that matters on Linux and is absent on macOS. Drawing text with an explicit family list makes
+# matplotlib build the whole fallback chain and warn once per missing face — measured at 724 warnings
+# for one run of this step — so the noise is real and worth removing.
+#
+# Do NOT reach for `setLevel(logging.ERROR)` instead, which is what this step did first: `findfont`
+# has a second warning site that fires only when a family list resolves to NOTHING
+# (`... not found. Falling back to DejaVu Sans.`), and that one says every measurement here just moved
+# ~15% against what gets drawn — the failure the two stacks exist to prevent. The filter keeps it.
+_OPTIONAL_FACES = tuple({*EMITTED_FONT_STACK, *MEASURED_FONT_STACK})
+logging.getLogger("matplotlib.font_manager").addFilter(
+    lambda record: (
+        "Falling back" in record.getMessage()
+        or not any(f"Font family '{face}' not found" in record.getMessage() for face in _OPTIONAL_FACES)
+    )
+)
+
+# The filter above cannot catch the failure that matters, so assert it instead. Every slot allowance
+# below is calibrated on ONE assumption — that this step measures in the same face it draws in — and
+# two machines break it silently: one where every face of a stack is missing (matplotlib falls back to
+# DejaVu, ~15% off, and the per-face misses are exactly the ones the filter drops), and one where Lato
+# IS installed, which makes the emitted stack draw Lato while the measured stack still resolves Arial.
+# Resolving both once turns either into a loud failure with somewhere to go.
+_DRAWN_FACE, _MEASURED_FACE = (
+    findfont(FontProperties(family=EMITTED_FONT_STACK)),
+    findfont(FontProperties(family=MEASURED_FONT_STACK)),
+)
+assert _DRAWN_FACE == _MEASURED_FACE, (
+    f"This step draws in {Path(_DRAWN_FACE).name} but measures in {Path(_MEASURED_FACE).name}, so every "
+    f"slot allowance is calibrated against a font the figure does not use. Name the same face in both "
+    f"stacks, or take the missing one out of MEASURED_FONT_STACK."
+)
 
 # The template sets its slots in Lato and Playfair Display, neither of which is installed here, so this
 # step predicts their line counts from the font it does have. Both directions are measured, in Figma, at
