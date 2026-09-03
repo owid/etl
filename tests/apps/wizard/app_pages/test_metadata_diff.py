@@ -3392,6 +3392,51 @@ def test_a_document_spanning_two_owners_says_whose_dataset_each_entry_is(monkeyp
     assert "world_bank_pip.meta.yml` — change it there" in single
 
 
+def test_a_dataset_update_is_diffed_across_the_version_bump():
+    """The workflow this tool exists for reported "nothing to diff" until now.
+
+    An update mints `grapher/wb/2026-09-02/…#mean` for what production serves as
+    `grapher/wb/2026-06-26/…#mean`, so an exact-path lookup finds no counterpart and every indicator of
+    the dataset lands in `new_paths` — "no old text to compare against", on the one branch whose texts most
+    need comparing. The comparison now falls back to the same indicator in whatever version the baseline
+    has, and records the pairing so the UI can say the diff crossed a bump.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import version_pairs
+    from apps.wizard.app_pages.metadata_diff.discovery import compare_indicator_texts
+
+    def row(path: str, short: str, description: str) -> dict:
+        return {"id": abs(hash(path)) % 10_000, "catalogPath": path, "name": short, "descriptionShort": description}
+
+    new = "grapher/wb/2026-09-02/world_bank_pip/world_bank_pip#mean"
+    old = "grapher/wb/2026-06-26/world_bank_pip/world_bank_pip#mean"
+    older = "grapher/wb/2025-01-01/world_bank_pip/world_bank_pip#mean"
+
+    source = {new: row(new, "mean", "Mean income. In 2021 prices.")}
+    # Nothing at the new path in the baseline, which is what used to end the comparison.
+    assert compare_indicator_texts(source, {}).new_paths == {new}
+
+    # With the baseline's other versions available, the texts are compared and the pairing recorded.
+    others = {old: row(old, "mean", "Mean income."), older: row(older, "mean", "Ancient wording.")}
+    out = compare_indicator_texts(source, {}, others)
+    assert not out.new_paths
+    assert set(out.diffs) == {new}
+    # The newest baseline version is the one compared — the one it is most likely serving.
+    assert out.across_versions == {new: old}
+    assert version_pairs(out.across_versions) == [("2026-06-26", "2026-09-02")]
+
+    # Same text either side of the bump is not a change, and does not claim a cross-version diff.
+    same = compare_indicator_texts({new: row(new, "mean", "Mean income.")}, {}, others)
+    assert not same.diffs and not same.across_versions and not same.new_paths
+
+    # A short name that repeats in another dataset must not be mistaken for the same indicator.
+    elsewhere = {"grapher/lis/2026-06-12/lis/lis#mean": row("grapher/lis/2026-06-12/lis/lis#mean", "mean", "Other.")}
+    assert compare_indicator_texts(source, {}, elsewhere).new_paths == {new}
+
+    # An indicator the baseline has under no version at all is still new.
+    fresh = "grapher/wb/2026-09-02/world_bank_pip/world_bank_pip#brand_new"
+    assert compare_indicator_texts({fresh: row(fresh, "brand_new", "New.")}, {}, others).new_paths == {fresh}
+
+
 def test_the_bar_says_a_section_can_be_read_either_way():
     """The two ways through a section are what the badges count, so the bar has to name them.
 

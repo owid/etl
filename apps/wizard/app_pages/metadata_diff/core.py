@@ -303,11 +303,16 @@ def _same_indicator(src_path: str | None, target_path: str | None) -> bool:
     """
     if not src_path or not target_path:
         return True
-    return _indicator_identity(src_path) == _indicator_identity(target_path)
+    return indicator_identity(src_path) == indicator_identity(target_path)
 
 
-def _indicator_identity(catalog_path: str) -> tuple[str, ...]:
-    """Everything that names an indicator except which version of the dataset it came from."""
+def indicator_identity(catalog_path: str) -> tuple[str, ...]:
+    """Everything that names an indicator except which version of the dataset it came from.
+
+    What makes a dataset update reviewable at all: the update mints `grapher/wb/2026-09-02/…#mean` for
+    what production serves as `grapher/wb/2026-06-26/…#mean`, and only this key says those are the same
+    indicator. Public because the indicator comparison needs it, not just the MDim repoint check.
+    """
     left, _, short_name = catalog_path.partition("#")
     parts = left.strip("/").split("/")
     if parts and parts[0] in ("grapher", "garden", "meadow", "snapshot"):
@@ -316,6 +321,41 @@ def _indicator_identity(catalog_path: str) -> tuple[str, ...]:
     if len(parts) >= 2:
         parts = parts[:1] + parts[2:]
     return (*parts, short_name)
+
+
+def dataset_shape(catalog_path: str) -> tuple[str, str] | None:
+    """(namespace, dataset) for an indicator path — what stays the same when the version moves.
+
+    Used to ask the baseline for the *other* versions of a dataset this branch rebuilt: matching on the
+    full path finds nothing after a bump, and matching on the short name alone crosses datasets.
+    """
+    left, _, _short = catalog_path.partition("#")
+    parts = left.strip("/").split("/")
+    if parts and parts[0] in ("grapher", "garden", "meadow", "snapshot"):
+        parts = parts[1:]
+    # namespace / version / dataset [/ table]
+    if len(parts) < 3:
+        return None
+    return parts[0], parts[2]
+
+
+def version_of(catalog_path: str) -> str:
+    """The dataset version in an indicator path — `2026-09-02` in `grapher/wb/2026-09-02/…#mean`."""
+    left, _, _short = catalog_path.partition("#")
+    parts = left.strip("/").split("/")
+    if parts and parts[0] in ("grapher", "garden", "meadow", "snapshot"):
+        parts = parts[1:]
+    return parts[1] if len(parts) >= 2 else ""
+
+
+def version_pairs(across_versions: dict[str, str]) -> list[tuple[str, str]]:
+    """The distinct (baseline version -> this branch's version) moves behind a set of cross-version diffs.
+
+    One dataset update is one move, however many indicators it re-versioned, so the UI can say
+    "2026-06-26 → 2026-09-02" once instead of per indicator.
+    """
+    pairs = {(version_of(target), version_of(source)) for source, target in across_versions.items()}
+    return sorted(pair for pair in pairs if pair[0] and pair[1] and pair[0] != pair[1])
 
 
 def surface_key(kind: str, ident: str) -> str:

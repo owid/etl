@@ -23,6 +23,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     group_changes,
     group_usage,
     requested_chart,
+    version_pairs,
 )
 from apps.wizard.app_pages.metadata_diff.data import load_reviews
 from apps.wizard.app_pages.metadata_diff.render import (
@@ -179,7 +180,8 @@ def _empty_diff_notice(changed) -> tuple[bool, str]:
         return False, (
             f"**Nothing to diff, and {n} indicator{'s' if n != 1 else ''} unreviewed** — no indicator's "
             f"text *differs* from {BASELINE_NAME}, but {n} {'are' if n != 1 else 'is'} new on this server, "
-            "so there is no old text to compare against. A version bump lands exactly here."
+            "so there is no old text to compare against. These are indicators the baseline has under no "
+            "version at all: a re-versioned one is now matched by indicator and diffed."
         )
     return True, (
         f"**No indicator text changes** against {BASELINE_NAME} — no chart's inherited title, subtitle "
@@ -189,6 +191,18 @@ def _empty_diff_notice(changed) -> tuple[bool, str]:
 
 def _extra_notes(changed) -> None:
     """New indicators and the section's scope — stated, so an empty list is never read as 'all clear'."""
+    pairs = version_pairs(getattr(changed, "across_versions", {}))
+    if pairs:
+        # A dataset update re-versions every catalogPath, so these diffs were matched by indicator rather
+        # than by path. Worth saying: a difference here can be an edit somebody made or simply how the new
+        # release words the same thing, and only the reviewer can tell those apart.
+        moves = ", ".join(f"`{was}` → `{now}`" for was, now in pairs[:3])
+        n = len(getattr(changed, "across_versions", {}))
+        st_note(
+            f"🔄 {n} of these {'indicator was' if n == 1 else 'indicators were'} compared <b>across a "
+            f"version bump</b> ({moves}) — matched by indicator, since a new version renames every "
+            "catalogPath. A difference may be an edit, or may be how the new release words it."
+        )
     if changed.new_paths:
         n = len(changed.new_paths)
         st_note(

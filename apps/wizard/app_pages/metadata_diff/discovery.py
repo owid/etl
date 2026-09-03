@@ -37,10 +37,12 @@ from apps.wizard.app_pages.metadata_diff.core import (
     ChangeGroup,
     ViewDiff,
     build_view_bundle,
+    dataset_shape,
     diff_views,
     edit_fingerprint,
     field_label,
     group_changes,
+    indicator_identity,
     mark_identity,
     surface_key,
 )
@@ -49,6 +51,7 @@ from apps.wizard.app_pages.metadata_diff.data import (
     _load_configs,
     build_env_bundles,
     fetch_indicator_config_texts,
+    fetch_latest_dataset_versions,
     fetch_variable_paths,
     fetch_variable_rows_by_path,
     load_mdim_config,
@@ -79,7 +82,11 @@ class IndicatorChanges:
 
     diffs: dict[str, ViewDiff] = field(default_factory=dict)
     ids: dict[str, int] = field(default_factory=dict)  # catalogPath -> staging variable id
-    new_paths: set[str] = field(default_factory=set)  # on staging, absent from the baseline
+    new_paths: set[str] = field(default_factory=set)
+    # source path -> the baseline path it was compared with, when the two differ only by version. A
+    # dataset update lands here, and it is worth saying: the diff below crossed a re-version, so a
+    # difference may be an edit or may be how the new release words things.
+    across_versions: dict[str, str] = field(default_factory=dict)  # on staging, absent from the baseline
     narrowed: bool = True  # False when git narrowing was unavailable (may include master's lag)
 
     @property
@@ -509,27 +516,93 @@ def charted_indicator_paths(source_engine: Engine) -> list[str]:
 def compare_indicator_texts(
     source_rows: dict[str, dict[str, Any]],
     target_rows: dict[str, dict[str, Any]],
+    other_versions: dict[str, dict[str, Any]] | None = None,
 ) -> IndicatorChanges:
     """Pure comparison: which indicators' texts differ, as one ViewDiff each.
 
     Producing ViewDiffs (an indicator is a "view" with no dimensions) means `group_changes`, the diff
     renderers and the PR brief all work on chart-side changes without a second implementation.
+
+    `other_versions` carries the baseline's rows for *any* version of the same datasets, and is what makes
+    a dataset update reviewable. A bump moves `grapher/wb/2026-06-26/…#mean` to
+    `grapher/wb/2026-09-02/…#mean`, so the exact-path lookup finds nothing and every indicator of the
+    dataset reads as new — on the one workflow this tool exists for. Falling back to the same indicator in
+    whatever version the baseline serves compares the texts that actually face readers before and after.
+
+    The version is dropped from the key and nothing else is (`indicator_identity`): short names repeat
+    across datasets, so matching on `#short_name` alone would compare one source's `gini` with another's.
+    Where the baseline holds several versions the newest is taken — the one it is most likely serving —
+    and the pairing is recorded in `across_versions` so the UI can say the diff crossed a bump rather than
+    implying the text moved on its own.
     """
     out = IndicatorChanges()
+    by_identity: dict[tuple[str, ...], list[str]] = {}
+    for path in other_versions or {}:
+        by_identity.setdefault(indicator_identity(path), []).append(path)
+
     for path, src_row in source_rows.items():
         if src_row.get("id") is not None:
             out.ids[path] = int(src_row["id"])
         tgt_row = target_rows.get(path)
+        tgt_path = path
         if tgt_row is None:
-            out.new_paths.add(path)
-            continue
+            candidates = sorted(by_identity.get(indicator_identity(path), []))
+            if not candidates:
+                out.new_paths.add(path)
+                continue
+            # Newest last: versions are dates, so lexicographic order is chronological.
+            tgt_path = candidates[-1]
+            tgt_row = (other_versions or {})[tgt_path]
+            out.across_versions[path] = tgt_path
         src = build_view_bundle(view={"dimensions": {}}, config_metadata=None, variable_row=src_row, chart_config=None)
         tgt = build_view_bundle(view={"dimensions": {}}, config_metadata=None, variable_row=tgt_row, chart_config=None)
         diff = diff_views([src], [tgt])[0]
         if diff.changed:
             diff.catalog_path = path
             out.diffs[path] = diff
+        elif path in out.across_versions:
+            # Same text either side of the bump: nothing to review, and not a change. The pairing is
+            # dropped so the count of cross-version diffs matches what is listed.
+            out.across_versions.pop(path, None)
     return out
+
+
+def fetch_baseline_counterparts(target_engine: Engine, unmatched: list[str]) -> dict[str, dict[str, Any]]:
+    """The baseline's rows for these indicators under whatever version it holds them.
+
+    Two cheap steps rather than one broad one: ask which version the baseline has of each dataset, then
+    name the exact paths wanted by swapping that version into each unmatched path. Fetching every version
+    of a dataset to find the pairing meant 73,000 rows for two datasets, and a bump of something
+    WDI-sized would be far worse.
+
+    A table renamed between versions is not matched by this and stays reported as new — the constructed
+    path names the source's table. Worth knowing rather than worth guessing at: a wrong pairing would
+    diff two different indicators and call the result an edit.
+    """
+    shapes = [shape for shape in (dataset_shape(path) for path in unmatched) if shape]
+    versions = fetch_latest_dataset_versions(target_engine, shapes)
+    if not versions:
+        return {}
+
+    # source path -> the path the baseline would use for the same indicator
+    expected: dict[str, str] = {}
+    for path in unmatched:
+        shape = dataset_shape(path)
+        version = versions.get(shape) if shape else None
+        if not version:
+            continue
+        left, sep, short = path.partition("#")
+        parts = left.strip("/").split("/")
+        if len(parts) < 4:
+            continue
+        parts[2] = version
+        candidate = "/".join(parts) + sep + short
+        if candidate != path:
+            expected[path] = candidate
+
+    rows = fetch_variable_rows_by_path(target_engine, sorted(set(expected.values())))
+    # Keyed by the baseline's own path, which is what `compare_indicator_texts` matches on by identity.
+    return {path: row for path, row in rows.items()}
 
 
 def changed_indicators(
@@ -546,7 +619,16 @@ def changed_indicators(
         return IndicatorChanges(narrowed=narrowed)
 
     source_rows, target_rows = _both(fetch_variable_rows_by_path, source_engine, target_engine, paths)
-    out = compare_indicator_texts(source_rows, target_rows)
+    # Only when the exact-path pass leaves something unmatched, which is the version-bump case. On a
+    # branch that edits metadata in place this costs nothing.
+    unmatched = [p for p in source_rows if p not in target_rows]
+    other_versions: dict[str, dict[str, Any]] = {}
+    if unmatched:
+        try:
+            other_versions = fetch_baseline_counterparts(target_engine, unmatched)
+        except Exception as e:  # noqa: BLE001 — without it those indicators read as new, as before
+            log.warning("metadata_diff.other_versions_unavailable", error=str(e))
+    out = compare_indicator_texts(source_rows, target_rows, other_versions)
     out.narrowed = narrowed
     return out
 

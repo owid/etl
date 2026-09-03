@@ -380,6 +380,35 @@ def fetch_indicator_config_texts(engine: Engine, catalog_paths: list[str]) -> di
     return rows
 
 
+def fetch_latest_dataset_versions(engine: Engine, shapes: list[tuple[str, str]]) -> dict[tuple[str, str], str]:
+    """(namespace, dataset) -> the newest version of it this environment holds.
+
+    What a version bump needs from the baseline: it serves `grapher/wb/2026-06-26/…` while the branch
+    built `grapher/wb/2026-09-02/…`, so a query for the branch's paths returns nothing and every
+    indicator of the dataset reads as new.
+
+    Only the version is asked for, not the rows. Pulling every version's variables to find the pairing
+    cost 73,000 rows and four seconds for two datasets — `world_bank_pip` alone has eight versions in
+    production — and once the version is known the caller can name the exact paths it wants. Older
+    versions linger here because charts still point at them, so the newest is the one production serves.
+    """
+    if not shapes:
+        return {}
+    out: dict[tuple[str, str], str] = {}
+    for namespace, dataset in sorted(set(shapes)):
+        df = read_sql(
+            # The version is the third segment of `grapher/<ns>/<version>/<dataset>/<table>#<short>`.
+            "select max(substring_index(substring_index(catalogPath, '/', 3), '/', -1)) as version "
+            "from variables where catalogPath like %(pat)s",
+            engine=engine,
+            params={"pat": f"grapher/{namespace}/%/{dataset}/%"},
+        )
+        version = df["version"].iloc[0] if len(df) else None
+        if version:
+            out[(namespace, dataset)] = str(version)
+    return out
+
+
 def fetch_variable_rows_by_path(engine: Engine, catalog_paths: list[str]) -> dict[str, dict[str, Any]]:
     """Same columns as `fetch_variable_rows`, but keyed by catalogPath.
 
