@@ -109,19 +109,54 @@ after the title and subtitle have been wrapped, measures matplotlib's **DejaVu**
 strings look wider than they will be set, so a slot that fits is wrapped early and the fix looks like
 "the allowance should be 1.0".
 
-Two lines prevent it. Name the stack and set it at import, next to the `svg.*` rcParams:
+Name **two** stacks, because two different things read them, and they want different answers:
 
 ```python
-DRAWN_FONT_STACK = ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans", "sans-serif"]
+# Lands in the SVG's `font-family`, verbatim: matplotlib copies the rcParam out rather than writing
+# the font it resolved. Naming Lato first is a request to whoever OPENS the file.
+EMITTED_FONT_STACK = ["Lato", "Arial", "Helvetica", "sans-serif"]
+# What this step measures and draws with. Deliberately does NOT name Lato, which is not installed on
+# our machines — asking for it only logs a `findfont` miss before falling through to Arial.
+MEASURED_FONT_STACK = ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans", "sans-serif"]
+
 matplotlib.rcParams["font.family"] = "sans-serif"
-matplotlib.rcParams["font.sans-serif"] = DRAWN_FONT_STACK
+matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
+# `Lato` is MEANT to be missing here, so quieten that one logger — a real problem with a font the
+# step does need is still visible.
+logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
 ```
 
-and pass it to every measurement, so the two cannot drift whatever a machine has installed:
+Pass the measured stack to every measurement, so measuring and drawing cannot drift whatever a
+machine has installed:
 
 ```python
-prop = FontProperties(family=DRAWN_FONT_STACK, size=fontsize, weight="bold" if bold else "normal")
+prop = FontProperties(family=MEASURED_FONT_STACK, size=fontsize, weight="bold" if bold else "normal")
 ```
+
+**Set the emitted stack again after seaborn**, inside the build function — `set_style` REPLACES
+`font.sans-serif` with its own list, so the module-level assignment above is overwritten and the step
+emits a stack it never chose (which is how one step came to ship `'Arial', 'DejaVu Sans', 'Liberation
+Sans', 'Bitstream Vera Sans'`):
+
+```python
+sns.set_style("ticks")
+sns.set_palette("deep")
+matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
+```
+
+Naming Lato first costs nothing and buys a lot downstream: **Figma renders the import in the
+template's own typeface on arrival**, so the parked reference copy looks like the deliverable, and
+`/create-figma-chart`'s font pass — plus the anchor pass that exists only to undo that face change —
+becomes a no-op. Without it Figma resolves none of `Arial, Helvetica, DejaVu Sans` and substitutes
+**Inter**, which is wider: one 850-wide chart overran its canvas by 39px that way. Verify it rather
+than assuming — the emitted stack is one grep, and the faces the import lands in are one read:
+
+```bash
+grep -o "font-family: [^;\"]*" <file>.svg | sort -u   # want 'Lato' first
+```
+
+Changing the stack must not move anything: the drawn font is unchanged, so the SVG should differ from
+its predecessor **only** in `font-family`, and the PNG not at all (measured: 0 pixels differing).
 
 Then check which font `findfont` actually returned before trusting the per-face allowances in
 [TEMPLATES.md](../TEMPLATES.md) — they are per installed font, and the bold row is not a rounding of

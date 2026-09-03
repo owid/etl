@@ -28,6 +28,14 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > | group | rows | size |
 > |---|---|---|
 > | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 52% of cap |
+
+**`text-floor` fails on the 850-wide templates themselves.** `Static Chart Template_Vertical` and its
+Horizontal twin set the `OurWorldinData.org — Research and data…` tagline and the `Licensed under
+CC-BY…` line at **11px**, under the row's 12px floor for this format — measured in the template, not
+in a page built from it. So two FAILs there are inherited furniture, not a page defect: check that the
+failing ranges are exactly those two footer rows, say so, and leave them. Anything else under the
+floor is yours.
+
 > | `series` | series-weight, furniture-weight, furniture-dash | 47% |
 > | `geometry` | box-alignment, gap, margins, **within-frame**, **dead-fills**, **page-census**, off-palette | 61% |
 > | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 69% |

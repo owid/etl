@@ -373,7 +373,7 @@ of the panel fill, never seeing the series colour. Nothing failed and nothing wa
 each row named what it could not find — but the coverage behind "no mechanical row failed" was far
 thinner than the same sentence on a grapher import. So emit `gid="line__<Entity>"` for a series line,
 `label__<Entity>` for a direct label, and `horizontal-grid-lines` for the gridline group, rather than
-inventing a scheme. Renaming in Figma afterwards works but does not survive a re-import; the `gid`
+inventing a scheme. These are **prefixes**, load-bearing as such — see [GOTCHAS.md](reference/GOTCHAS.md). Renaming in Figma afterwards works but does not survive a re-import; the `gid`
 does.
 
 Note what a `gid` actually produces: matplotlib writes `<g id="label__Ghana"><text/></g>`, so Figma

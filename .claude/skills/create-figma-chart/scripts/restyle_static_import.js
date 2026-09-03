@@ -33,7 +33,10 @@
 //   - tints are derived from each family's base rather than listed, so a family keeps its internal
 //     steps and the base can be swapped in one place;
 //   - changing a face moves every label by half its width change, so the font pass is bracketed by an
-//     anchor pass keyed on each node's own `textAlignHorizontal`;
+//     anchor pass keyed on each node's own `textAlignHorizontal`. Both are NO-OPS when the step named
+//     Lato first in its emitted `font-family` (create-static-viz/reference/WRITING-THE-STEP.md): the
+//     import then arrives in Lato already, nothing changes face, and nothing drifts. They are kept
+//     because they cost one read per node and still cover an SVG from a step that has not done it;
 //   - a line built from several runs is re-flowed afterwards, since independent boxes in a narrower
 //     face leave the gaps between them uneven.
 
@@ -308,6 +311,29 @@ for (const job of CONFIG.jobs) {
     styled.y += dy;
     styled.resizeWithoutConstraints(ink.right - ink.x, ink.bottom - ink.y);
     for (const child of styled.children) { child.x -= dx; child.y -= dy; }
+
+    // Then SNAP each side that lands within a pixel of the header's content column onto it, moving
+    // the children back so no ink shifts. Cropping to ink alone leaves the box off by a hair — a
+    // TEXT node's box carries its own advance width, not its glyphs, so a label at the plot's edge
+    // put one frame at 15.92..833.88 against a 16..834 column. `box-alignment` measures the FRAME to
+    // 0.05, so it failed on 0.08px of text metrics. A pixel is the whole tolerance: anything further
+    // out is a real misalignment and must keep failing.
+    const column = frame.children
+      .filter((c) => "layoutMode" in c && c.layoutMode !== "NONE" && !/^logo/i.test(c.name))
+      .sort((a, b) => a.y - b.y)[0];
+    if (column) {
+      const SNAP = 1;
+      let x = styled.x, w = styled.width;
+      const wantL = column.x, wantR = column.x + column.width;
+      if (Math.abs(x - wantL) <= SNAP) { w += x - wantL; x = wantL; }
+      if (Math.abs(x + w - wantR) <= SNAP) { w = wantR - x; }
+      if (x !== styled.x || w !== styled.width) {
+        const sdx = x - styled.x;
+        styled.x = x;
+        styled.resizeWithoutConstraints(w, styled.height);
+        for (const child of styled.children) child.x -= sdx;
+      }
+    }
   }
 
   // A flowed line of runs needs laying out again, one measured space apart. Rows are keyed on y

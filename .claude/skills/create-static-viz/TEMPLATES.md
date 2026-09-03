@@ -226,6 +226,17 @@ that edge. This used to need a correction: the footer frame started 16 px above 
 insetting from the frame's `y` then inset twice and left a visibly loose bottom. If you measure that
 gap again, the wrappers have been re-padded — re-verify before compensating for it.
 
+**Take those two edges from the template's own frames, not from line-height arithmetic.**
+`verify_page.js`'s `gap` row measures the plot against the header auto-layout's *bottom* and the
+footer auto-layout's *top* — the numbers `verify_templates.js` prints — so a band derived instead as
+`subtitle_y + n × line_px` and `note_bottom − n × line_px` is judged against datums it never used.
+Measured on the 2026 Vertical template, that arithmetic landed **4.35 px below** the header frame's
+bottom and **3.01 px above** the footer frame's top, which is line-box slack rather than anything
+visible: a `BAND_INSET` of 14 then reads as `gap` **18.35 / 17.01** against the 12–16 target, on a
+page whose spacing looks right and whose own assertion says 14. Either inset from the frame edges, or
+expect the row to fail by a few px and record why — but do not "fix" it by shrinking the inset
+without knowing which datum you are shrinking from.
+
 **Draw the step's own copies of these slots at the sizes in the table, not at sizes that merely look
 right.** It is tempting to set the step's title and subtitle a size or two smaller — nothing in the
 frame uses them, since the import drops them. But then the render's spacing is *not* the frame's: the
