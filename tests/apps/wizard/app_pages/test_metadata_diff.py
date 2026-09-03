@@ -2935,6 +2935,44 @@ def test_a_multiline_note_survives_the_report():
     assert _bullet_lines("") == ["  - "]
 
 
+def test_the_grid_only_offers_a_filter_for_surfaces_the_branch_reaches():
+    """Filtering to a surface with nothing on it would draw an empty page and read as a broken tool.
+
+    And with one surface reached there is nothing to choose between, so the control is not drawn at all —
+    which is also what keeps a stale `?blast-surface=` from being checked against options that never
+    rendered.
+    """
+    from apps.wizard.app_pages.metadata_diff.blast_section import SURFACE_LABELS, _chart_branches, surface_options
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach
+
+    on_mdim = ChangeReach(
+        field="titlePublic",
+        old="a",
+        new="b",
+        mdims=[{"catalogPath": "grapher/a/latest/x#x", "n_views": 1, "is_draft": False, "views": [{"m": "mean"}]}],
+    )
+    on_chart = ChangeReach(
+        field="titlePublic", old="a", new="b", charts=[{"chartId": 1, "slug": "gdp", "has_data_page": True}]
+    )
+    on_draft = ChangeReach(field="titlePublic", old="a", new="b", draft_charts=[{"chartId": 2, "slug": "wip"}])
+    on_explorer = ChangeReach(field="chart.subtitle", old="a", new="b", explorers=[{"slug": "lis", "n_views": 3}])
+
+    assert surface_options([on_mdim, on_chart, on_explorer]) == ["all", "mdims", "explorers", "charts"]
+    assert surface_options([on_mdim, on_chart]) == ["all", "mdims", "charts"]
+    # One surface reached: no second thing to choose, so the caller draws nothing.
+    assert surface_options([on_mdim]) == ["all", "mdims"]
+    assert surface_options([]) == ["all"]
+    # A draft-only chart still counts as a chart surface: it is listed on the branch, badged unpublished.
+    assert surface_options([on_draft]) == ["all", "charts"]
+    # Every option the control can show has a label, or `format_func` would raise on it.
+    assert set(SURFACE_LABELS) >= set(surface_options([on_mdim, on_chart, on_explorer]))
+
+    # The charts branch is built only when charts are wanted and there is one to draw.
+    assert _chart_branches([on_chart], set(), "charts") and _chart_branches([on_chart], set(), "all")
+    assert _chart_branches([on_chart], set(), "mdims") == []
+    assert _chart_branches([on_mdim], set(), "charts") == [], "no chart reached, so no empty branch"
+
+
 def test_a_section_badge_says_finished_or_not_and_nothing_else():
     """Two marks: ⏳ not yet, ✅ every item ticked — and nothing at all when unknown.
 

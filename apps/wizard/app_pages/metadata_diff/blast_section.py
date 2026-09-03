@@ -58,6 +58,17 @@ EDIT_KEY = view_nav.BLAST_EDIT_KEY
 # carried by `_mdim_tree_url`. Read from the URL so the link is shareable, and drawn first so
 # MAX_TREE_MDIMS can never be what drops the one MDim somebody asked for.
 TREE_MDIM_KEY = "blast-tree-mdim"
+# Which surfaces the grid draws. A filter rather than three separate views: the whole point of the grid is
+# what sits *beside* an edit, so everything is the default and narrowing is the deliberate act. Done in
+# Python rather than by hiding nodes in the component, because each MDim grid costs a view diff against the
+# baseline — filtering them out skips that work rather than drawing it and covering it up.
+SURFACE_KEY = "blast-surface"
+SURFACE_LABELS = {
+    "all": "Everything",
+    "mdims": "MDims only",
+    "explorers": "Explorers only",
+    "charts": "Charts only",
+}
 MAX_ROWS = 60
 # MDims drawn on the grid at once. Each costs a view diff against the baseline, and past a handful the
 # canvas is unreadable anyway; the rest are named rather than silently dropped.
@@ -332,24 +343,45 @@ def _dimension_tree(
     `focused` means `reach` is one edit's texts: only the views those land on are drawn as changed. The
     other changed views of the same MDim are still on the grid, greyed, because what sits beside an edit is
     half of what the grid is for.
+
+    The surface filter above it narrows to one kind of surface. Everything downstream is built behind it, so
+    choosing "Charts only" on a branch touching six MDims skips six view diffs rather than computing them
+    and hiding the result.
     """
+    surface = _st_surface_filter(reach)
     focus_mdims = _view_keys(reach, "mdims", "catalogPath") if focused else None
-    explorer_hierarchy = _explorer_hierarchy(
-        source_engine, target_engine, _view_keys(reach, "explorers", "slug") if focused else None
+    explorer_hierarchy = (
+        _explorer_hierarchy(source_engine, target_engine, _view_keys(reach, "explorers", "slug") if focused else None)
+        if _wants(surface, "explorers")
+        else None
     )
-    affected = _requested_first(sorted({str(m["catalogPath"]) for r in reach for m in r.mdims}))
+    affected = (
+        _requested_first(sorted({str(m["catalogPath"]) for r in reach for m in r.mdims}))
+        if _wants(surface, "mdims")
+        else []
+    )
     if not affected:
-        st.caption("No MDim renders any of these changes, so there is no MDim grid to draw.")
-        if explorer_hierarchy is None:
-            # Nothing to badge, so every affected chart is one the grid says nothing about.
+        if _wants(surface, "mdims"):
+            st.caption("No MDim renders any of these changes, so there is no MDim grid to draw.")
+        hierarchies = [explorer_hierarchy] if explorer_hierarchy else []
+        branches = _chart_branches(reach, set(), surface)
+        if not hierarchies and not branches:
+            # Filtered to a surface these edits do not reach at all. Said plainly, rather than drawn as an
+            # empty shell — and only reachable by choosing it, since a surface with nothing on it is not
+            # offered in the first place.
+            st.caption(f"Nothing on this surface renders any of these changes ({SURFACE_LABELS[surface]}).")
+            return
+        if surface == "all" and not hierarchies:
+            # No grid anywhere on this branch: the charts are all there is, and they read better as the
+            # grouped list than as a lone branch of a tree that is not being drawn.
             _chart_reach(reach, badged=set())
             _explorer_reach(reach)
             return
         # Explorer views have dimensions of their own, so there is still a grid worth drawing.
         tree_html, height = render_multi_tree_html(
             [],
-            branches=[_chart_branch(reach, set())],
-            hierarchies=[explorer_hierarchy],
+            branches=branches,
+            hierarchies=hierarchies,
             self_url=f"{SOURCE.wizard_url.rstrip('/')}/metadata-diff",
         )
         components.html(tree_html, height=height, scrolling=False)
@@ -397,8 +429,9 @@ def _dimension_tree(
 
     if not sections:
         st.warning("The affected MDims have no views to draw.")
-        _chart_reach(reach, badged=set())
-        _explorer_reach(reach)
+        if surface == "all":
+            _chart_reach(reach, badged=set())
+            _explorer_reach(reach)
         return
 
     if dropped:
@@ -409,7 +442,7 @@ def _dimension_tree(
 
     tree_html, height = render_multi_tree_html(
         [],
-        branches=[_chart_branch(reach, badged)],
+        branches=_chart_branches(reach, badged, surface),
         # The explorers are a hierarchy of grids now, not a flat branch: their views have dimensions.
         hierarchies=[h for h in ({"id": "mdims", "label": "MDims", "sections": sections}, explorer_hierarchy) if h],
         self_url=f"{SOURCE.wizard_url.rstrip('/')}/metadata-diff",
@@ -419,6 +452,67 @@ def _dimension_tree(
     # scrolling=False: the component resizes its frame to its content, so an iframe scrollbar could only
     # ever nest a second vertical scroll inside the page's.
     components.html(tree_html, height=height, scrolling=False)
+
+
+def _wants(surface: str, kind: str) -> bool:
+    """Whether the chosen filter draws this kind of surface."""
+    return surface in ("all", kind)
+
+
+def _chart_branches(reach: list[ChangeReach], badged: set, surface: str) -> list[dict[str, Any]]:
+    """The charts branch, when the filter draws charts and these edits reach one."""
+    if not _wants(surface, "charts") or not any(r.charts or r.draft_charts for r in reach):
+        return []
+    return [_chart_branch(reach, badged)]
+
+
+def surface_options(reach: list[ChangeReach]) -> list[str]:
+    """ "all", plus every surface these edits actually reach.
+
+    An option for a surface with nothing on it would filter the grid to an empty page and read as a bug in
+    the tool rather than as a fact about the branch — the section bar greys its empty sections for the same
+    reason. With one surface reached there is nothing to choose between, so the caller draws no control.
+    """
+    options = ["all"]
+    if any(r.mdims for r in reach):
+        options.append("mdims")
+    if any(r.explorers for r in reach):
+        options.append("explorers")
+    if any(r.charts or r.draft_charts for r in reach):
+        options.append("charts")
+    return options
+
+
+def _st_surface_filter(reach: list[ChangeReach]) -> str:
+    """Draw everything, or one surface alone. Kept in the URL, so a narrowed grid is a link.
+
+    Sanitized before the widget exists, the way the grouping control above it is: `url_persist` checks its
+    held value against the options strictly, so a link written when the branch reached an explorer would
+    otherwise raise on a branch that reaches none. A deselecting click returns None, which is not a
+    third state — it means everything.
+    """
+    options = surface_options(reach)
+    if len(options) < 3:
+        # One surface, or none: nothing to filter. Any held value is stale, and left in the URL it would
+        # be checked against options this control never rendered.
+        st.query_params.pop(SURFACE_KEY, None)
+        st.session_state.pop(SURFACE_KEY, None)
+        return "all"
+
+    for store in (st.query_params, st.session_state):
+        if store.get(SURFACE_KEY) not in options:
+            store.pop(SURFACE_KEY, None)
+
+    picked = url_persist(st.segmented_control)(
+        label="Surfaces",
+        options=options,
+        format_func=lambda s: SURFACE_LABELS[s],
+        key=SURFACE_KEY,
+        value="all",
+        label_visibility="collapsed",
+        help="Narrow the grid to one kind of surface. Only the surfaces this branch reaches are offered.",
+    )
+    return picked if picked in options else "all"
 
 
 def _explorer_hierarchy(
