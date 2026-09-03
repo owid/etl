@@ -131,7 +131,9 @@ def chart_facts(results: list[dict[str, Any]], editor_window_days: int | None = 
     from etl.db import read_sql
 
     # A literal fragment, and the window itself stays a bound parameter.
-    edited_in_window = "AND c.lastEditedAt >= NOW() - INTERVAL %(editor_days)s DAY" if editor_window_days is not None else ""
+    edited_in_window = (
+        "AND c.lastEditedAt >= NOW() - INTERVAL %(editor_days)s DAY" if editor_window_days is not None else ""
+    )
     try:
         df = read_sql(
             f"""
