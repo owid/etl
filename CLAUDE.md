@@ -4,7 +4,7 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 
 ## Critical Rules
 
-- **Always use `.venv/bin/`** for all Python commands (`etl`, `python`, `pytest`)
+- **Always use `.venv/bin/`** for all Python commands (`etl`, `python`, `pytest`). If it isn't there — `.venv/bin/etlr: no such file or directory`, most likely in a fresh worktree — run `make .venv` to build it (~17s), then retry. Never bare `uv sync`; see Package Management.
 - **Never mask problems** - no empty tables, no commented-out code, no silent exceptions
 - **Trace issues upstream**: snapshot → meadow → garden → grapher
 - **`dag/archive/*.yml` is a generated record** — it is reconstructed from git history by `etl archive-dag`, so never hand-edit it. It lists steps that were once active (with the commit where they were last active) purely for recovery; to bring one back, `git checkout` that commit.

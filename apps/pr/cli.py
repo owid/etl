@@ -494,7 +494,7 @@ def branch_out_worktree(
     except GitCommandError as e:
         raise click.ClickException(f"Failed to create worktree at '{worktree_path}':\n{e}")
 
-    # --share-data before provisioning: `setup.config` clones `data/` only when it finds
+    # --share-data before provisioning: `setup.worktree` clones `data/` only when it finds
     # none, and stands down when one is already there. Symlinking first is what makes the
     # two agree; the other order leaves the clone and silently ignores --share-data.
     if share_data:
@@ -506,11 +506,10 @@ def branch_out_worktree(
 def provision_worktree(worktree_path: Path) -> None:
     """Give a fresh worktree the gitignored config (and `data/`) it can't inherit from git.
 
-    Defers to `make setup.config` so there is one definition of what a checkout needs, rather
-    than a copy here that drifts from it — the same target a post-checkout hook or a worktree
-    manager calls. `setup.config` and not `setup.worktree`, because that one also builds the
-    venv, which `install_worktree_venv` does after the PR is created; calling it here would
-    run `uv sync` twice.
+    Defers to `make setup.worktree` so there is one definition of what a checkout needs,
+    rather than a copy here that drifts from it — the same target a post-checkout hook or a
+    worktree manager calls. It does not build the venv; `install_worktree_venv` does that after
+    the PR is created.
 
     Falls back to copying `.env` directly when the target isn't there, which happens when the
     worktree's base branch predates it (a stale local base, or a base other than master).
@@ -518,10 +517,10 @@ def provision_worktree(worktree_path: Path) -> None:
     has no credentials fails later, and confusingly.
     """
     try:
-        subprocess.run(["make", "setup.config"], cwd=worktree_path, check=True)
+        subprocess.run(["make", "setup.worktree"], cwd=worktree_path, check=True)
         return
     except (subprocess.CalledProcessError, FileNotFoundError) as e:
-        log.warning(f"`make setup.config` did not run in the new worktree ({e}); copying .env directly.")
+        log.warning(f"`make setup.worktree` did not run in the new worktree ({e}); copying .env directly.")
 
     for name in [".env", *sorted(path.name for path in BASE_DIR.glob(".env.prod*"))]:
         src = BASE_DIR / name

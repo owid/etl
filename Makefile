@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate owid_mcp vsce-compile vsce-sync install-hooks setup.worktree setup.config
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate owid_mcp vsce-compile vsce-sync install-hooks setup.worktree
 
 include default.mk
 
@@ -33,8 +33,7 @@ help:
 	@echo '  make chart-sync 	Start Chart-sync on port 8083'
 	@echo '  make query SQL="..." Run SQL query on staging MySQL for current branch'
 	@echo '  make install-hooks	Activate pre-commit hook (auto-runs with make .venv)'
-	@echo '  make setup.worktree	Set up a fresh worktree: .env, a copy-on-write clone of data/, and the venv'
-	@echo '  make setup.config	Just the cheap half of the above (.env + data/), no venv — offline, ~6s'
+	@echo '  make setup.worktree	Give this worktree the main checkout .env + a copy-on-write clone of data/ (auto-runs with make .venv)'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make check-all 	Format, lint, and typecheck (including for modules in lib/)'
@@ -285,11 +284,14 @@ install-hooks:
 # gitignored config, and `data/`. Idempotent — anything already present is left
 # alone, so it is safe to re-run and safe to adjust a worktree's own `.env` after.
 #
-# The cheap half of `setup.worktree` below, split out for two reasons: it is a
-# prerequisite of `.venv`, so a worktree nobody provisioned fixes its own config on
-# the first `make` (nothing depends on a hook having fired), and it is what to point
-# a `post-checkout` hook at if you want worktrees to appear instantly rather than
-# waiting on a venv build. Everything here is offline and effectively free.
+# `setup.worktree` is the agreed name for "make this checkout usable", so anything
+# that creates a worktree can provision it without knowing what this repo needs: a
+# worktree manager's setup script, a machine-wide `post-checkout` hook, or a person.
+# Everything it does is offline and effectively free, which is what makes it safe to
+# run from a hook.
+#
+# It is also a prerequisite of `.venv`, so a worktree nobody provisioned fixes its
+# own config on the first `make` — nothing depends on a hook having fired.
 #
 # Config is *copied*, not symlinked, so a worktree can diverge from the main
 # checkout (a different `STAGING`, a scratch credential) without editing everyone's
@@ -310,10 +312,14 @@ install-hooks:
 # avoiding, so we require one filesystem and a copy-on-write one. GNU `cp` has no
 # `-c` at all, hence the `--reflink=always` branch, which does fail honestly.
 #
-# The venv can't live in *this* target — it is a prerequisite of `.venv`, so that
-# would be a dependency cycle (`make` says so: "Circular setup.config <- .venv").
-# `setup.worktree` below is the umbrella that has both.
-setup.config:
+# The venv is deliberately NOT built here. It is the one slow, network-dependent
+# step (~17s for 412 packages), most worktrees never need one, and building it from
+# a `post-checkout` hook makes `git worktree add` block on a network install. Any
+# make target depends on `.venv`, so it gets built the moment something actually
+# needs it — see the note in CLAUDE.md for what to do when `.venv/bin/...` is
+# missing. It also *can't* live here: this target is a prerequisite of `.venv`, so
+# that would be a dependency cycle.
+setup.worktree:
 	@PRIMARY="$$(dirname "$$(cd "$$(git rev-parse --git-common-dir)" && pwd)")"; \
 	if [ "$$PRIMARY" = "$$PWD" ]; then \
 		echo '==> This is the main checkout, nothing to provision'; \
@@ -350,18 +356,7 @@ setup.config:
 		fi; \
 	fi
 
-# The one command for a fresh worktree: config, data/ and the venv. Everything a
-# checkout needs, whoever asks — a person, a worktree manager's setup script, or a
-# machine-wide `post-checkout` hook, which all call this same conventional name.
-#
-# Note what this costs, because the hook pays it at `git worktree add` time: the
-# venv is a ~19-second network install (~2.4 GB), against ~6 seconds and ~0 bytes
-# for config and the data/ clone. If you'd rather your worktrees appear instantly
-# and build the venv on first use, point the hook at `setup.config` instead — the
-# split exists for exactly that choice.
-setup.worktree: setup.config .venv
-
-.venv: .venv-default install-hooks setup.config
+.venv: .venv-default install-hooks setup.worktree
 	@true
 
 # Backward-compatible alias
