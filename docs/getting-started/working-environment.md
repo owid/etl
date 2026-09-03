@@ -240,11 +240,45 @@ make setup.worktree   # .env, a copy-on-write clone of data/, and the venv
 
 `setup.worktree` is the single entrypoint — there is nothing else to run. `make setup.config` is the cheap half of it (config and `data/`, offline, ~6 s) if you want a worktree available immediately and the venv built on first use.
 
-Copying 16 GB of `data/` sounds absurd and isn't: on a copy-on-write filesystem (APFS on macOS) `cp -c` clones the files, sharing the original's blocks until something writes to them. Measured on a 16 GB / ~32,000-file `data/`: **4 seconds and ~0 bytes**. So a real copy is *better* than symlinking it — each worktree gets an independent `data/`, and two of them running the same step cannot overwrite each other's output. Where cloning isn't possible (a different filesystem, or a different volume) `cp -c` fails rather than silently falling back, and the target leaves `data/` absent rather than making a real 16 GB copy.
+Copying 16 GB of `data/` sounds absurd and isn't: on a copy-on-write filesystem (APFS on macOS) `cp -c` clones the files, sharing the original's blocks until something writes to them. Measured on a 16 GB / ~32,000-file `data/`: **4 seconds and ~0 bytes**. So a real copy is *better* than symlinking it — each worktree gets an independent `data/`, and two of them running the same step cannot overwrite each other's output. `setup.worktree` checks the filesystem before copying and leaves `data/` absent when cloning isn't possible, rather than making a real 16 GB copy — see the trap below, `cp -c` cannot be trusted to refuse.
 
 The venv is the one expensive part: ~19 seconds and ~2.4 GB over the network, against ~6 seconds and ~0 bytes for config and `data/`. That is why the cheap half has its own name — `make setup.config` — and why `.venv` depends on *that* rather than on `setup.worktree`: a worktree nobody provisioned still fixes its own config on the first `make`, and depending the other way round would be a dependency cycle.
 
-(The clone trick applies elsewhere too: `git worktree add` itself on very large repos, and `node_modules`. Plain `cp` does not clone on macOS; the `-c` flag is required.)
+### Copy-on-write: there is nothing to turn on
+
+Worth stating plainly, because it is easy to assume otherwise: **copy-on-write is not a setting you enable.** On macOS, APFS supports file cloning out of the box, on every Mac, with no configuration. What you have to do is *ask for it*, per command — plain `cp` does a full byte-for-byte copy:
+
+```bash
+cp -Rc  src dst            # macOS / BSD cp: clone (copy-on-write)
+cp -R   src dst            # a real copy — the default
+
+cp -R --reflink=auto src dst   # GNU cp (Linux): clone if possible, else copy
+```
+
+Both paths must be on the **same APFS volume**. And here is the trap: `cp -c` does **not** fail when it can't clone — it silently makes a real copy. Verified by copying from APFS to a mounted HFS+ image: the file was created, no error. So in a script, checking the filesystem *first* is the only safe approach; `cp -c` succeeding tells you nothing about whether it cloned:
+
+```bash
+# a script that must never make a real copy of something huge
+SRC_DEV=$(df -P "$src" | awk 'NR==2{print $1}')
+DST_DEV=$(df -P . | awk 'NR==2{print $1}')
+[ "$SRC_DEV" = "$DST_DEV" ] || exit 0     # different filesystems: it could only be a copy
+```
+
+(GNU `cp` on Linux has no `-c` at all — it errors out — and `--reflink=always` does fail honestly when the filesystem can't clone. Only the macOS flag is silently forgiving.)
+
+To check a clone really happened, compare **free space**, not `du`:
+
+```bash
+df -k /System/Volumes/Data | tail -1 | awk '{print $4}'   # before
+cp -Rc big-dir clone-dir
+df -k /System/Volumes/Data | tail -1 | awk '{print $4}'   # after — expect no change
+```
+
+`du` reports *apparent* size and counts a clone (and a hard link) at full size, so it will tell you the copy cost 16 GB when it cost nothing. The same caveat makes `du` useless for sizing a `.venv`: `uv` hardlinks packages out of `~/.cache/uv`, so a 2.3 GB-looking venv adds well under 200 MB of real disk.
+
+**On Linux** it depends on the filesystem: XFS (`reflink=1`, the default since 2018), btrfs and ZFS support it; **ext4 does not** and never has, so `cp --reflink=always` fails there. `setup.worktree` reports that and leaves `data/` absent.
+
+The trick isn't specific to `data/`. It applies to any large directory you'd otherwise duplicate or symlink: `node_modules`, a dataset, or the checkout itself on a very large repo.
 
 ### Provisioning worktrees automatically
 

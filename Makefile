@@ -292,8 +292,13 @@ install-hooks:
 # copy is therefore *better* than symlinking it (what `etl pr --share-data` does) —
 # each worktree gets an independent `data/`, so two of them running the same step
 # can no longer overwrite each other's output. Without it every step recomputes
-# from snapshots. Where cloning isn't possible `cp -c` fails rather than silently
-# falling back, and we leave `data/` absent: a real 16 GB copy is never wanted.
+# from snapshots.
+#
+# Guarded by checking the filesystem *first*, because `cp -c` does NOT fail when it
+# can't clone — across volumes it silently makes a real copy (verified: APFS -> an
+# HFS+ image succeeded). Getting a surprise 16 GB copy is exactly what we're
+# avoiding, so we require one filesystem and a copy-on-write one. GNU `cp` has no
+# `-c` at all, hence the `--reflink=always` branch, which does fail honestly.
 #
 # The venv can't live in *this* target — it is a prerequisite of `.venv`, so that
 # would be a dependency cycle (`make` says so: "Circular setup.config <- .venv").
@@ -309,15 +314,28 @@ setup.config:
 			[ -e "$$NAME" ] && continue; \
 			cp -p "$$SRC" "$$NAME" && echo "==> copied $$NAME from the main checkout"; \
 		done; \
+		SRC_DEV="$$(df -P "$$PRIMARY" | awk 'NR==2{print $$1}')"; \
+		DST_DEV="$$(df -P . | awk 'NR==2{print $$1}')"; \
+		if [ "$$(uname)" = Darwin ]; then \
+			FSTYPE="$$(mount | sed -n "s|^$$DST_DEV on .* (\([a-z0-9]*\).*|\1|p" | head -1)"; \
+			CLONE='cp -Rc'; \
+		else \
+			FSTYPE="$$(stat -f -c %T . 2>/dev/null)"; \
+			CLONE='cp -R --reflink=always'; \
+		fi; \
 		if [ -e data ]; then \
 			:; \
 		elif [ ! -d "$$PRIMARY/data" ]; then \
 			echo "==> No data/ in $$PRIMARY to clone"; \
-		elif cp -Rc "$$PRIMARY/data" data 2>/dev/null; then \
+		elif [ "$$SRC_DEV" != "$$DST_DEV" ]; then \
+			echo "==> Skipping data/: this worktree ($$DST_DEV) is on a different filesystem from the main checkout ($$SRC_DEV), so it could only be a real copy"; \
+		elif ! echo " apfs xfs btrfs zfs " | grep -q " $$FSTYPE "; then \
+			echo "==> Skipping data/: $$FSTYPE has no copy-on-write, so it could only be a real copy"; \
+		elif $$CLONE "$$PRIMARY/data" data 2>/dev/null; then \
 			echo "==> cloned data/ from the main checkout (copy-on-write: no extra disk until written)"; \
 		else \
 			rm -rf data; \
-			echo '==> Could not clone data/ (needs one filesystem with copy-on-write, e.g. APFS) — left absent rather than making a real copy'; \
+			echo '==> Could not clone data/ — left absent rather than making a real copy'; \
 		fi; \
 	fi
 
