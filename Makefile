@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate owid_mcp vsce-compile vsce-sync install-hooks
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy activate owid_mcp vsce-compile vsce-sync install-hooks setup.worktree setup.config
 
 include default.mk
 
@@ -33,6 +33,8 @@ help:
 	@echo '  make chart-sync 	Start Chart-sync on port 8083'
 	@echo '  make query SQL="..." Run SQL query on staging MySQL for current branch'
 	@echo '  make install-hooks	Activate pre-commit hook (auto-runs with make .venv)'
+	@echo '  make setup.worktree	Set up a fresh worktree: .env, a copy-on-write clone of data/, and the venv'
+	@echo '  make setup.config	Just the cheap half of the above (.env + data/), no venv — offline, ~6s'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make check-all 	Format, lint, and typecheck (including for modules in lib/)'
@@ -232,19 +234,134 @@ vsce-sync:
 		echo "⚠️ VS Code CLI (code) is not installed. Skipping extension sync."; \
 	fi
 
-# Activate the tracked pre-commit hook by pointing git at scripts/hooks/.
-# Idempotent; runs as a dependency of .venv so a fresh clone gets the hook
-# the first time anyone sets up the environment.
+# Activate the tracked pre-commit hook by symlinking it into the repo's hooks
+# directory. Idempotent; runs as a dependency of .venv so a fresh clone gets the
+# hook the first time anyone sets up the environment.
+#
+# Deliberately NOT `git config core.hooksPath scripts/hooks`, which is what this
+# target used to do. `core.hooksPath` *replaces* the hooks directory rather than
+# adding to it, and a repo-local setting beats a global one — so on a machine that
+# points `core.hooksPath` at a directory of its own hooks, this repo silently
+# disabled all of them and kept only ours. That is easy to miss, because a hook
+# that never runs looks exactly like a hook that passed; the one that bit was a
+# `post-checkout` giving each new worktree its gitignored `.env`, whose absence
+# surfaces much later as a confusing connection error.
+#
+# `$GIT_DIR/hooks` is git's own default, so the symlink needs no config at all, and
+# a machine-wide hooks directory that forwards to `$GIT_DIR/hooks` still finds it.
+# A pre-commit that is already a symlink somewhere else is left alone: `ln -sfn` would
+# happily replace it, which would be this target hijacking someone's hook — the very
+# thing it stopped doing. Only our own link (into a `scripts/hooks/pre-commit`) is
+# re-pointed, so a moved checkout still gets repaired.
+#
+# `--git-common-dir` resolves to the primary `.git` from a linked worktree, so one
+# install covers every worktree, and the link points at the primary checkout's copy
+# of the script so it survives that worktree being removed.
 install-hooks:
 	@if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then \
-		if [ "$$(git config --get core.hooksPath 2>/dev/null)" != "scripts/hooks" ]; then \
-			git config core.hooksPath scripts/hooks; \
-			chmod +x scripts/hooks/pre-commit; \
-			echo '==> pre-commit hook active (core.hooksPath=scripts/hooks)'; \
+		COMMON="$$(cd "$$(git rev-parse --git-common-dir)" && pwd)"; \
+		HOOK="$$COMMON/hooks/pre-commit"; \
+		TARGET="$$(dirname "$$COMMON")/scripts/hooks/pre-commit"; \
+		chmod +x scripts/hooks/pre-commit; \
+		mkdir -p "$$COMMON/hooks"; \
+		LINK="$$(readlink "$$HOOK" 2>/dev/null)"; \
+		if [ -e "$$HOOK" ] && [ ! -L "$$HOOK" ]; then \
+			echo "⚠️ $$HOOK already exists and is not a symlink — leaving it alone."; \
+		elif [ -n "$$LINK" ] && [ "$$LINK" != "$$TARGET" ] && \
+		     [ "$${LINK%/scripts/hooks/pre-commit}" = "$$LINK" ]; then \
+			echo "⚠️ $$HOOK is a symlink to $$LINK, which isn't ours — leaving it alone."; \
+			echo "   Remove it and re-run 'make install-hooks' if you want this repo's hook."; \
+		elif [ "$$LINK" != "$$TARGET" ]; then \
+			ln -sfn "$$TARGET" "$$HOOK"; \
+			echo "==> pre-commit hook active ($$HOOK)"; \
+		fi; \
+		if [ "$$(git config --local --get core.hooksPath 2>/dev/null)" = "scripts/hooks" ]; then \
+			git config --local --unset core.hooksPath; \
+			echo "==> removed the core.hooksPath override earlier versions of this target set"; \
 		fi; \
 	fi
 
-.venv: .venv-default install-hooks
+# Give this checkout the two things a worktree can't inherit from git: the
+# gitignored config, and `data/`. Idempotent — anything already present is left
+# alone, so it is safe to re-run and safe to adjust a worktree's own `.env` after.
+#
+# The cheap half of `setup.worktree` below, split out for two reasons: it is a
+# prerequisite of `.venv`, so a worktree nobody provisioned fixes its own config on
+# the first `make` (nothing depends on a hook having fired), and it is what to point
+# a `post-checkout` hook at if you want worktrees to appear instantly rather than
+# waiting on a venv build. Everything here is offline and effectively free.
+#
+# Config is *copied*, not symlinked, so a worktree can diverge from the main
+# checkout (a different `STAGING`, a scratch credential) without editing everyone's
+# config. The cost is that a rotated secret doesn't reach worktrees that already
+# exist — delete the file and re-run to pick it up.
+#
+# `data/` is copied too, which sounds absurd for 16 GB and isn't: `cp -c` clones on
+# a copy-on-write filesystem, sharing the original's blocks until something writes.
+# Measured on this repo's 16 GB / ~32k-file `data/`: 4 seconds, ~0 bytes. A real
+# copy is therefore *better* than symlinking it (what `etl pr --share-data` does) —
+# each worktree gets an independent `data/`, so two of them running the same step
+# can no longer overwrite each other's output. Without it every step recomputes
+# from snapshots.
+#
+# Guarded by checking the filesystem *first*, because `cp -c` does NOT fail when it
+# can't clone — across volumes it silently makes a real copy (verified: APFS -> an
+# HFS+ image succeeded). Getting a surprise 16 GB copy is exactly what we're
+# avoiding, so we require one filesystem and a copy-on-write one. GNU `cp` has no
+# `-c` at all, hence the `--reflink=always` branch, which does fail honestly.
+#
+# The venv can't live in *this* target — it is a prerequisite of `.venv`, so that
+# would be a dependency cycle (`make` says so: "Circular setup.config <- .venv").
+# `setup.worktree` below is the umbrella that has both.
+setup.config:
+	@PRIMARY="$$(dirname "$$(cd "$$(git rev-parse --git-common-dir)" && pwd)")"; \
+	if [ "$$PRIMARY" = "$$PWD" ]; then \
+		echo '==> This is the main checkout, nothing to provision'; \
+	else \
+		for SRC in "$$PRIMARY"/.env "$$PRIMARY"/.env.prod*; do \
+			[ -e "$$SRC" ] || continue; \
+			NAME="$$(basename "$$SRC")"; \
+			[ -e "$$NAME" ] && continue; \
+			cp -p "$$SRC" "$$NAME" || { echo "ERROR: could not copy $$NAME into $$PWD"; exit 1; }; \
+			echo "==> copied $$NAME from the main checkout"; \
+		done; \
+		SRC_DEV="$$(df -P "$$PRIMARY" | awk 'NR==2{print $$1}')"; \
+		DST_DEV="$$(df -P . | awk 'NR==2{print $$1}')"; \
+		if [ "$$(uname)" = Darwin ]; then \
+			FSTYPE="$$(mount | sed -n "s|^$$DST_DEV on .* (\([a-z0-9]*\).*|\1|p" | head -1)"; \
+			CLONE='cp -Rc'; \
+		else \
+			FSTYPE="$$(stat -f -c %T . 2>/dev/null)"; \
+			CLONE='cp -R --reflink=always'; \
+		fi; \
+		if [ -e data ]; then \
+			:; \
+		elif [ ! -d "$$PRIMARY/data" ]; then \
+			echo "==> No data/ in $$PRIMARY to clone"; \
+		elif [ "$$SRC_DEV" != "$$DST_DEV" ]; then \
+			echo "==> Skipping data/: this worktree ($$DST_DEV) is on a different filesystem from the main checkout ($$SRC_DEV), so it could only be a real copy"; \
+		elif ! echo " apfs xfs btrfs zfs " | grep -q " $$FSTYPE "; then \
+			echo "==> Skipping data/: $$FSTYPE has no copy-on-write, so it could only be a real copy"; \
+		elif $$CLONE "$$PRIMARY/data" data 2>/dev/null; then \
+			echo "==> cloned data/ from the main checkout (copy-on-write: no extra disk until written)"; \
+		else \
+			rm -rf data; \
+			echo '==> Could not clone data/ — left absent rather than making a real copy'; \
+		fi; \
+	fi
+
+# The one command for a fresh worktree: config, data/ and the venv. Everything a
+# checkout needs, whoever asks — a person, a worktree manager's setup script, or a
+# machine-wide `post-checkout` hook, which all call this same conventional name.
+#
+# Note what this costs, because the hook pays it at `git worktree add` time: the
+# venv is a ~19-second network install (~2.4 GB), against ~6 seconds and ~0 bytes
+# for config and the data/ clone. If you'd rather your worktrees appear instantly
+# and build the venv on first use, point the hook at `setup.config` instead — the
+# split exists for exactly that choice.
+setup.worktree: setup.config .venv
+
+.venv: .venv-default install-hooks setup.config
 	@true
 
 # Backward-compatible alias

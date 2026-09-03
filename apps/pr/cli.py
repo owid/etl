@@ -277,9 +277,14 @@ def cli(
                 work_branch = f"{work_branch}-private"
         if worktree:
             resolved_worktree_path = resolve_worktree_path(work_branch, worktree_path)
-            branch_out_worktree(repo, base_branch, work_branch, resolved_worktree_path, update_base=not no_update_base)
-            if share_data:
-                symlink_shared_dirs(resolved_worktree_path)
+            branch_out_worktree(
+                repo,
+                base_branch,
+                work_branch,
+                resolved_worktree_path,
+                update_base=not no_update_base,
+                share_data=share_data,
+            )
             # Subsequent git operations (commit, push) must run inside the worktree.
             repo = Repo(resolved_worktree_path)
         else:
@@ -464,7 +469,12 @@ def resolve_worktree_path(work_branch: str, override: str | None) -> Path:
 
 
 def branch_out_worktree(
-    repo, base_branch: str, work_branch: str, worktree_path: Path, update_base: bool = True
+    repo,
+    base_branch: str,
+    work_branch: str,
+    worktree_path: Path,
+    update_base: bool = True,
+    share_data: bool = False,
 ) -> None:
     """Create branch 'work_branch' from 'base_branch' inside a new git worktree at 'worktree_path'."""
     if worktree_path.exists():
@@ -484,14 +494,41 @@ def branch_out_worktree(
     except GitCommandError as e:
         raise click.ClickException(f"Failed to create worktree at '{worktree_path}':\n{e}")
 
-    # Copy .env so the new worktree is immediately usable. .venv is intentionally not
-    # copied/symlinked — it's Python-version-specific and best recreated with `make check`.
-    src_env = BASE_DIR / ".env"
-    if src_env.exists():
-        shutil.copy2(src_env, worktree_path / ".env")
-        log.info(f"Copied .env to '{worktree_path / '.env'}'.")
-    else:
-        log.debug(f"No .env found at '{src_env}', skipping copy.")
+    # --share-data before provisioning: `setup.config` clones `data/` only when it finds
+    # none, and stands down when one is already there. Symlinking first is what makes the
+    # two agree; the other order leaves the clone and silently ignores --share-data.
+    if share_data:
+        symlink_shared_dirs(worktree_path)
+
+    provision_worktree(worktree_path)
+
+
+def provision_worktree(worktree_path: Path) -> None:
+    """Give a fresh worktree the gitignored config (and `data/`) it can't inherit from git.
+
+    Defers to `make setup.config` so there is one definition of what a checkout needs, rather
+    than a copy here that drifts from it — the same target a post-checkout hook or a worktree
+    manager calls. `setup.config` and not `setup.worktree`, because that one also builds the
+    venv, which `install_worktree_venv` does after the PR is created; calling it here would
+    run `uv sync` twice.
+
+    Falls back to copying `.env` directly when the target isn't there, which happens when the
+    worktree's base branch predates it (a stale local base, or a base other than master).
+    Always copying `.env` is a guarantee worth keeping: a worktree that looks provisioned but
+    has no credentials fails later, and confusingly.
+    """
+    try:
+        subprocess.run(["make", "setup.config"], cwd=worktree_path, check=True)
+        return
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        log.warning(f"`make setup.config` did not run in the new worktree ({e}); copying .env directly.")
+
+    for name in [".env", *sorted(path.name for path in BASE_DIR.glob(".env.prod*"))]:
+        src = BASE_DIR / name
+        dst = worktree_path / name
+        if src.exists() and not dst.exists():
+            shutil.copy2(src, dst)
+            log.info(f"Copied {name} to '{worktree_path}'.")
 
 
 # Gitignored dirs symlinked into the worktree by --share-data.
