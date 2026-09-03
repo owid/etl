@@ -484,14 +484,18 @@ def branch_out_worktree(
     except GitCommandError as e:
         raise click.ClickException(f"Failed to create worktree at '{worktree_path}':\n{e}")
 
-    # Copy .env so the new worktree is immediately usable. .venv is intentionally not
-    # copied/symlinked — it's Python-version-specific and best recreated with `make check`.
-    src_env = BASE_DIR / ".env"
-    if src_env.exists():
-        shutil.copy2(src_env, worktree_path / ".env")
-        log.info(f"Copied .env to '{worktree_path / '.env'}'.")
-    else:
-        log.debug(f"No .env found at '{src_env}', skipping copy.")
+    # Hand provisioning to `make setup.worktree` rather than copying `.env` here. It knows
+    # which gitignored files a checkout needs (`.env` plus the `.env.prod*` credentials that
+    # `ENV_FILE_PROD` resolves against the repo root), and it is the same target a
+    # post-checkout hook or a worktree manager calls — so there is one definition of "make
+    # this checkout usable" instead of a copy here that drifts from it. `.venv` is
+    # deliberately not provisioned by it: it's Python-version-specific, and `uv sync` below
+    # builds it.
+    try:
+        subprocess.run(["make", "setup.worktree"], cwd=worktree_path, check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        # The worktree exists and is usable once this is run by hand, so don't abort the PR.
+        log.warning(f"Could not provision the worktree automatically ({e}). Run `make setup.worktree` inside it.")
 
 
 # Gitignored dirs symlinked into the worktree by --share-data.
