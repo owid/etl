@@ -6,6 +6,7 @@ override (contained to the MDIM).
 """
 
 import re
+from types import SimpleNamespace
 
 import pandas as pd
 
@@ -59,6 +60,18 @@ def _view(dims, indicators=None, metadata=None):
     if metadata is not None:
         view["metadata"] = metadata
     return view
+
+
+def _stub_source(site="http://staging-site-example"):
+    """A stand-in for `SOURCE`, the environment the wizard is running against.
+
+    The real one is whichever server or branch is checked out, so a link built from it reads
+    differently on every machine and on CI. Tests asserting on a rendered href pin it to this.
+    """
+    return SimpleNamespace(
+        site=site,
+        chart_admin_site=lambda chart_id: f"{site}/admin/charts/{chart_id}/edit",
+    )
 
 
 def _var(id, description_short=None, description_key=None, name="Var"):
@@ -1656,15 +1669,20 @@ def test_the_grids_chart_leaves_are_grouped_by_prominence():
     assert groups["Via Learn more about this data"] == ["middle-chart"]
 
 
-def test_a_chart_leaf_is_named_by_its_title():
+def test_a_chart_leaf_is_named_by_its_title(monkeypatch):
     """A title is what a reviewer recognises; the slug stays in the link the leaf already is.
 
     A chart with no title of its own — its title inherited from indicator metadata, which this config
     column does not carry — keeps the slug as its name, since that is the only name there is.
     """
+    from apps.wizard.app_pages.metadata_diff import blast_section
     from apps.wizard.app_pages.metadata_diff.blast_section import _chart_branch
     from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach
     from apps.wizard.app_pages.metadata_diff.tree import render_multi_tree_html
+
+    # A leaf's href is built from the environment the wizard runs in, which is whichever server (or
+    # branch) happens to be checked out. Pin it, so the assertion below reads the same everywhere.
+    monkeypatch.setattr(blast_section, "SOURCE", _stub_source())
 
     reach = [
         ChangeReach(
@@ -1697,7 +1715,7 @@ def test_a_chart_leaf_is_named_by_its_title():
     # The slug belongs in the href and nowhere else: it is how the leaf opens the chart, not a caption.
     printed = re.findall(r'<span class="mdd-leaf-sub">(.*?)</span>', html_out)
     assert printed == ["4,200 views/yr"]
-    assert 'href="http://staging-site-metadata-diff/grapher/zebra-chart"' in html_out
+    assert 'href="http://staging-site-example/grapher/zebra-chart"' in html_out
     assert "#mdd-root .mdd-leaf-sub" in html_out
     # The branch says which order its leaves are in, since a list of names does not show it.
     assert '<div class="mdd-branch-note">' in html_out
