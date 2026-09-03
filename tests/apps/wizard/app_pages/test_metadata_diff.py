@@ -1541,8 +1541,9 @@ def test_a_chart_redirected_to_an_mdim_is_left_off_the_grid():
     """Its chart row is still published, so the usage lookup calls it live — but nobody can open it.
 
     Following `/grapher/<slug>` lands on the MDim, which the grid already draws with its own views, so
-    listing the chart counted one reader-facing page twice. Left out, and the branch says how many and
-    where they went; if every chart goes this way, the branch reports nothing rather than a bare heading.
+    listing the chart counted one reader-facing page twice. Left out without comment — a page no reader
+    reaches is not the reviewer's business — and if every chart goes this way the branch reports nothing
+    rather than a bare heading.
     """
     from apps.wizard.app_pages.metadata_diff.blast_section import _chart_branch
     from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach
@@ -1567,8 +1568,9 @@ def test_a_chart_redirected_to_an_mdim_is_left_off_the_grid():
     branch = _chart_branch(reach, {1: 10}, redirected)
     drawn = [leaf["label"] for group in branch["groups"] for leaf in group["leaves"]]
     assert drawn == ["Still a chart"], "a redirected chart is not a chart page a reader reaches"
-    assert "Another 2 charts are not listed" in branch["note"]
-    assert "incomes-across-distribution-wb" in branch["note"]
+    # Silently, on purpose: how many charts a reader cannot reach is not a finding anyone acts on, and
+    # the note is about the order the rest are in.
+    assert "not listed" not in branch["note"] and "redirect" not in branch["note"]
 
     # Without the lookup nothing is hidden: an unavailable table must not silently shrink the list.
     assert len([leaf for g in _chart_branch(reach, {1: 10}, {})["groups"] for leaf in g["leaves"]]) == 3

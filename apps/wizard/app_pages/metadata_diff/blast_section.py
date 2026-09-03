@@ -674,11 +674,12 @@ def _chart_branch(
     """The charts these edits reach, as a branch of the grid: grouped by how a reader meets the text.
 
     `redirected` names the charts whose URL now serves an MDim view instead (see
-    `data.fetch_mdim_redirected_charts`). They are left out: the chart row is still published, so the
-    usage lookup still calls them live charts, but nobody can open one — following the link lands on the
-    MDim, which is already drawn on this grid with its own views. Listing them made the same
-    reader-facing page appear twice, once as a chart nobody reaches. How many were left out, and where
-    they went, is said in the branch's note rather than dropped in silence.
+    `data.fetch_mdim_redirected_charts`). They are left out, and nothing is said about it: the chart row
+    is still published, so the usage lookup still calls them live charts, but nobody can open one —
+    following the link lands on the MDim, which is already drawn on this grid with its own views. Listing
+    them made the same reader-facing page appear twice, once as a chart nobody reaches. The count of them
+    is not a finding a reviewer acts on, so it is not on the page either; the exclusion is a correctness
+    fix, not something to report.
 
     Grouped the way the chart lists elsewhere group: a data page lays the text out, a multi-indicator
     chart keeps it behind "Learn more about this data", and a draft shows nobody anything.
@@ -749,13 +750,6 @@ def _chart_branch(
         if measured
         else "In name order: this server could not read how much these charts are viewed."
     )
-    if gone:
-        where = ", ".join(sorted(set(gone.values()))[:3])
-        note += (
-            f" Another {len(gone)} {'chart is' if len(gone) == 1 else 'charts are'} not listed: their URL "
-            f"redirects to an MDim ({where}), so those readers meet the edit in the MDim's views above "
-            "rather than on a chart page."
-        )
     return {
         "id": "charts",
         "label": "Charts",
