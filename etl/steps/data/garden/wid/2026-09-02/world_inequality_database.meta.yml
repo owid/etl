@@ -203,7 +203,7 @@ definitions:
     <% if extrapolated == "yes" %>
     This series includes every observation WID publishes, including values that WID interpolates or extrapolates from other years, or imputes from other countries in the same region.
     <%- else %>
-    This series keeps only observations that WID rates as directly supported by data. WID gives each observation a data quality score from 0 (no underlying data) to 5 (the best-documented series); we keep income values scored 3 or higher. Lower scores cover years WID interpolates or extrapolates, and series in which a substantial part of the estimate, such as the correction for top incomes missing from surveys, is imputed from other countries. Wealth series and WID's regional aggregates are kept in full: WID builds them from models and regional averages and scores them low regardless, so a score cut would remove them entirely.
+    This series excludes observations that WID rates as not directly supported by data. WID gives each observation a data quality score from 0 (no underlying data) to 5 (the best-documented series); we drop income values scored below 3. Lower scores cover years WID interpolates or extrapolates, and series in which a substantial part of the estimate, such as the correction for top incomes missing from surveys, is imputed from other countries. Wealth series and WID's regional aggregates are kept in full: WID builds them from models and regional averages and scores them low regardless, so a score cut would remove them entirely. The few income values WID publishes without a score are kept as well, since an absent score is not a low one.
     <%- endif %>
 
   numdecimalplaces_period: |-
