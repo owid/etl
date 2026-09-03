@@ -7,6 +7,7 @@ definitions:
       attribution_short: IARC
     processing_level: minor
     display:
+      # Shares and rates (the majority of indicators) show one decimal; the two count indicators override this to 0.
       numDecimalPlaces: 1
     # NOTE: Draft "What you should know" bullets, not enabled. Each paraphrases text OWID or IARC already publishes
     # (the tool's methodology statement, the agent list in the data, the footnote and subtitle on charts 8059-8061),
@@ -44,6 +45,8 @@ tables:
   gco_infections:
     variables:
       cases:
+        display:
+          numDecimalPlaces: 0
         title: Number of new {definitions.cases_of}{definitions.among_sex}
         description_short: Estimated number of new {definitions.cases_of}{definitions.among_sex}.
         unit: cases
@@ -51,6 +54,8 @@ tables:
         processing_level: major
 
       attr_cases:
+        display:
+          numDecimalPlaces: 0
         title: Number of new {definitions.cases_of} caused by {definitions.agent_phrase}{definitions.among_sex}
         description_short: Estimated number of new {definitions.cases_of}{definitions.among_sex} that are attributed to {definitions.agent_phrase}.
         unit: cases
