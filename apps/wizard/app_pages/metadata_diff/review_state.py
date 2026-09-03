@@ -50,12 +50,6 @@ class ReviewMark:
     updated_at: Any = None
     note: str = ""  # free text the reviewer wrote about this item; survives unticking
 
-    @property
-    def icon(self) -> str:
-        if self.stale:
-            return "⚠️"
-        return "✅" if self.reviewed else "🟡"
-
 
 def resolve_marks(engine: Engine, surface: str, groups: list[ChangeGroup]) -> list[ReviewMark]:
     """Attach the stored reviewed state to each change group of one surface."""

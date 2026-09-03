@@ -913,9 +913,12 @@ COUNTED_SECTIONS = frozenset({"charts", "mdims", "explorers"})
 DEFAULT_SECTION = "blast"
 
 
-# How far a pass through one section has got. The bar is well placed to say this and nothing else: 👀
-# nothing recorded, ⏳ started, ✅ every item ticked.
-REVIEW_MARKS = {"none": "👀", "partial": "⏳", "done": "✅"}
+# Whether a pass through one section is finished: ⏳ not yet, ✅ every item ticked. Two states, because
+# that is the only distinction the bar is read for — "can I stop looking at this section". Started-but-
+# unfinished was a third mark (👀 / ⏳ / ✅) that answered a question nobody asks of a nav bar, and it made
+# the two that matter harder to tell apart at a glance. ⏳ is the tool's existing word for "not yet": the
+# PR brief has always paired it with ✅.
+REVIEW_MARKS = {"todo": "⏳", "done": "✅"}
 
 
 def section_label(section: str, progress: dict[str, tuple[int, int]], marks: dict[str, str] | None = None) -> str:

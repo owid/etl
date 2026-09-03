@@ -2816,7 +2816,7 @@ def test_the_bar_says_a_section_can_be_read_either_way():
     def app() -> None:
         from apps.wizard.app_pages.metadata_diff.render import st_section_switcher
 
-        st_section_switcher({"charts": (0, 3)}, empty=(), marks={"charts": "partial"})
+        st_section_switcher({"charts": (0, 3)}, empty=(), marks={"charts": "todo"})
 
     at = AppTest.from_function(app, default_timeout=60).run()
     assert not at.exception
@@ -2935,22 +2935,28 @@ def test_a_multiline_note_survives_the_report():
     assert _bullet_lines("") == ["  - "]
 
 
-def test_a_section_badge_shows_how_far_its_review_has_got():
-    """👀 nothing recorded, ⏳ started, ✅ every item ticked — and nothing at all when unknown."""
-    from apps.wizard.app_pages.metadata_diff.core import section_label
+def test_a_section_badge_says_finished_or_not_and_nothing_else():
+    """Two marks: ⏳ not yet, ✅ every item ticked — and nothing at all when unknown.
 
-    assert section_label("charts", {}, {"charts": "none"}).endswith("👀")
-    assert section_label("charts", {}, {"charts": "partial"}).endswith("⏳")
+    A third mark for started-but-unfinished answered a question nobody asks of a nav bar, and made the two
+    that matter harder to separate at a glance. Anything that is not finished reads the same.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import REVIEW_MARKS, section_label
+
+    assert set(REVIEW_MARKS) == {"todo", "done"}
+    assert section_label("charts", {}, {"charts": "todo"}).endswith("⏳")
     assert section_label("charts", {}, {"charts": "done"}).endswith("✅")
 
-    # No mark for this section, an unknown state, or no marks at all: the name alone.
+    # No mark for this section, an unknown state, or no marks at all: the name alone. "partial" is one of
+    # those unknowns now, so a stale caller cannot put a third emoji back on the bar.
     assert section_label("charts", {}, {"mdims": "done"}).endswith("Charts")
+    assert section_label("charts", {}, {"charts": "partial"}).endswith("Charts")
     assert section_label("charts", {}, {"charts": "elsewhere"}).endswith("Charts")
     assert section_label("charts", {}).endswith("Charts")
 
     # Blast radius and Review hold no items, so they never carry one.
     assert section_label("blast", {}, {"blast": "done"}).endswith("Blast radius")
-    assert section_label("review", {}, {"review": "partial"}).endswith("Review")
+    assert section_label("review", {}, {"review": "todo"}).endswith("Review")
 
 
 def test_the_shared_digest_trims_around_the_change():
