@@ -82,6 +82,15 @@ can show it — but its bounding box is the whole canvas, which makes every box-
 `verify_page.js` measure the artboard instead of the plot and report three failures that are not there.
 Keep the guard the skill's pass uses: strip it only when nothing under it is painted.
 
+**Put the chart at the BOTTOM of the frame's z-order** — `frame.insertChild(0, chart)`, not
+`appendChild` — and this is a usability requirement rather than a visual one. The import is a frame the
+size of the whole artboard, so appended last it covers the header and footer, and every double-click on
+the subtitle or the Note descends into the import's nested groups instead of selecting the text. Below
+them, a click over the subtitle lands on the header wrapper and the text is one double-click away, as it
+is in the template, while bars and legend names still resolve to the chart. Nothing moves: the frame is
+pixel-identical either way (checked, max channel difference 0), because the header and footer wrappers
+carry no fill and the figure patch is already gone.
+
 **Text slots.** Setting `characters` gives the WHOLE string the face of the old first character, so
 re-apply **every** run's face, not only the bold ones — the runs that silently go wrong are the
 *non-bold* ones. Three of the four footer rows shipped entirely bold from a pass that re-applied the
