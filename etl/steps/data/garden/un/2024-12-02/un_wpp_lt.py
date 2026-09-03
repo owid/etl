@@ -86,6 +86,9 @@ def run(dest_dir: str) -> None:
         country_col="location",
     )
 
+    # Apply known upstream data errors (see un_wpp_lt.corrections.yml).
+    tb = paths.apply_corrections(tb, country_col="location")
+
     # Harmonize sex sex
     tb["sex"] = tb["sex"].map({"Total": "total", "Male": "male", "Female": "female"})
     assert tb["sex"].notna().all(), "NaNs detected after mapping sex values!"

@@ -249,8 +249,22 @@ def estimate_cum_survival(tb):
     )
     # Step 3: Sort by age, so we can do the cumulative product later
     tb = tb.sort_values(["country", "sex", "year", "age"], ignore_index=True)
+    # Step 3b: Truncate each cohort at its first missing age.
+    # `cumprod` below assumes an unbroken chain: a missing calendar year (e.g. a country-year removed
+    # by a data correction) would make it silently skip that year's mortality for every later age --
+    # enough to push the "probability" past 1. Ages within a cohort run 0, 1, 2, ..., so a row whose
+    # age differs from the running count marks the gap, and everything from there on is dropped.
+    # Countries with complete data are unaffected. `age_max_available` is recorded first so
+    # `aggregate_efr` can tell a cohort that simply hasn't lived long enough yet from one cut short.
+    tb["age_max_available"] = tb.groupby(["country", "sex", "year"])["age"].transform("max")
+    tb = tb[tb["age"] == tb.groupby(["country", "sex", "year"]).cumcount()].reset_index(drop=True)
+    tb["age_max_complete"] = tb.groupby(["country", "sex", "year"])["age"].transform("max")
     # Step 4: Estimate cumulative survival probability
     tb["cumulative_survival"] = tb.groupby(["country", "sex", "year"])["probability_of_survival"].cumprod()
+    assert tb["cumulative_survival"].max() <= 1, (
+        "Cumulative survival probability above 1 -- the age chain of some cohort has a gap that the "
+        "truncation above did not catch."
+    )
     # Step 6: Drop unnecessary columns
     tb = tb.drop(columns=["year_min"])
     return tb
@@ -273,6 +287,22 @@ def aggregate_efr(tb):
     ## EFR-reproductive: Average number of kids that make it to the labour age (15-65)
     ## Cum survival prob, labor: Probability of a girl to survive to the reproductive age (15-49)
     ## Cum survival prob, reproductive: Probability of a kid to survive to the labor age (15-65)
+    # A cohort only yields a comparable aggregate if its age chain is unbroken across the ages that
+    # aggregate averages over -- up to 49 for the female (reproductive) series, up to 65 for the
+    # total (labor) one, capped by how far the cohort has actually lived. Averaging over a range cut
+    # short by a gap biases the result upwards (it drops the high-mortality tail) and makes it
+    # incomparable with other countries. These cohorts are excluded here rather than in
+    # `estimate_cum_survival`, because the per-age rows *before* the gap are still perfectly valid
+    # and stay in the distribution table: a gap at age 59 costs a cohort its labor figure but not its
+    # reproductive one. `cumulative_survival` at any age already embeds the product from age 0, so
+    # requiring the chain to reach the upper bound implies it is unbroken below it too.
+    age_needed = (
+        tb["age_max_available"]
+        .clip(upper=AGE_LAB_END)
+        .where(tb["sex"] == "total", tb["age_max_available"].clip(upper=AGE_REPR_END))
+    )
+    tb = tb[tb["age_max_complete"] >= age_needed]
+
     tb = tb.loc[(tb["age"] <= AGE_REPR_END) | (tb["sex"] == "total")]
     tb = tb.groupby(["country", "year", "sex"], as_index=False)[["efr", "cumulative_survival"]].mean()
 
