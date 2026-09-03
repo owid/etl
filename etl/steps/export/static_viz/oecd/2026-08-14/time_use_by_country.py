@@ -375,6 +375,13 @@ BACKGROUND_COLOR = "#fffbf5"
 # A fill lighter than that is darkened for text here, which is the same pairing, derived rather than
 # hardcoded: the frame binds the library's variant, and this keeps the local render showing the same
 # relationship instead of printing a name nobody could read.
+#
+# ACCEPTED DEVIATION: measured in the frame, Camel* and Light Teal* come to 4.43:1 at 13.19px regular,
+# which is 0.07 under WCAG's 4.5 for body text — so `/create-figma-chart`'s label-contrast row fails on
+# the ten legend names set in them. Accepted because the variant IS the design system's answer for text
+# in a category colour, and the alternatives are worse: darkening past it leaves the library, and setting
+# those names in the body gray drops the colour that ties each name to its segment. The other three
+# measure 5.29 (Denim), 6.02 (Rusty Orange) and 6.59 (the country labels in Text/Gray 80).
 TEXT_CONTRAST_MIN = 4.4
 
 # A template pixel in points (100 template px per inch over 72 points per inch).
