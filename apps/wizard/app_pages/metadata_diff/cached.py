@@ -66,6 +66,26 @@ def _in_parallel(*thunks: Callable[[], Any]) -> list[Any]:
 # costs a cold load and explains nothing, whereas a button is asked for.
 CACHE_TTL = 1800
 
+# Every cached reading of the two servers, in declaration order — what **Re-read** drops.
+_SERVER_READS: list[Any] = []
+
+
+def _read_cache(**kwargs: Any) -> Callable[[Callable], Any]:
+    """`st.cache_data`, and remembered, so `clear_discovery_caches` cannot fall behind.
+
+    The list of caches to drop used to be written out by hand beside the button, and a list like that is
+    one somebody forgets to add to — three of these had been missed. The failure is invisible from the
+    outside: Re-read appears to work, spins, and hands back the reading it already had, so a dataset
+    rebuilt while the page was open stays unseen for the whole half-hour the entry lives.
+    """
+
+    def decorate(fn: Callable) -> Any:
+        wrapped = st.cache_data(ttl=CACHE_TTL, **kwargs)(fn)
+        _SERVER_READS.append(wrapped)
+        return wrapped
+
+    return decorate
+
 
 @st.cache_resource
 def master_engine() -> Engine | None:
@@ -86,13 +106,13 @@ def master_engine() -> Engine | None:
         return None
 
 
-@st.cache_data(ttl=CACHE_TTL, show_spinner="Reading this staging server…")
+@_read_cache(show_spinner="Reading this staging server…")
 def shared_facts(_source_engine: Engine, cache_key: str = "") -> tuple[Any, set[str]]:
     """(git scope, datasets rebuilt here) — read once per page rather than once per surface."""
     return discovery.shared_facts(_source_engine)
 
 
-@st.cache_data(ttl=CACHE_TTL, show_spinner="Looking for metadata changes on this staging server…")
+@_read_cache(show_spinner="Looking for metadata changes on this staging server…")
 def summary(_source_engine: Engine, _target_engine: Engine, cache_key: str = "") -> discovery.Summary:
     """Counts behind the section badges (and the same numbers owidbot reports).
 
@@ -134,14 +154,14 @@ def summary(_source_engine: Engine, _target_engine: Engine, cache_key: str = "")
     )
 
 
-@st.cache_data(ttl=CACHE_TTL, show_spinner="Checking which MDims changed…")
+@_read_cache(show_spinner="Checking which MDims changed…")
 def mdim_changes(_source_engine: Engine, _target_engine: Engine, cache_key: str = "") -> pd.DataFrame:
     """MDim list + change flags, indexed by catalogPath."""
     scope, built = shared_facts(_source_engine, cache_key=cache_key)
     return discovery.mdim_changes_df(_source_engine, _target_engine, scope, built)
 
 
-@st.cache_data(ttl=CACHE_TTL, show_spinner="Computing metadata diff for all views…")
+@_read_cache(show_spinner="Computing metadata diff for all views…")
 def mdim_view_diffs(
     catalog_path: str,
     _source_engine: Engine,
@@ -164,7 +184,7 @@ def mdim_view_diffs(
     )
 
 
-@st.cache_data(ttl=CACHE_TTL, show_spinner="Finding indicators whose text changed…")
+@_read_cache(show_spinner="Finding indicators whose text changed…")
 def indicator_changes(
     _source_engine: Engine, _target_engine: Engine, cache_key: str = ""
 ) -> discovery.IndicatorChanges:
@@ -173,7 +193,7 @@ def indicator_changes(
     return discovery.changed_indicators(_source_engine, _target_engine, None, scope)
 
 
-@st.cache_data(ttl=CACHE_TTL, show_spinner="Checking which side changed each dataset…")
+@_read_cache(show_spinner="Checking which side changed each dataset…")
 def indicator_attribution(
     _source_engine: Engine,
     _target_engine: Engine,
@@ -184,7 +204,7 @@ def indicator_attribution(
     return discovery.attribute_indicator_changes(_source_engine, _target_engine, list(catalog_paths), master_engine())
 
 
-@st.cache_data(ttl=CACHE_TTL, show_spinner="Checking the charts' own config text…")
+@_read_cache(show_spinner="Checking the charts' own config text…")
 def chart_text_changes(
     _source_engine: Engine, _target_engine: Engine, cache_key: str = ""
 ) -> discovery.ChartTextChanges:
@@ -197,7 +217,7 @@ def chart_text_changes(
     return discovery.changed_chart_texts(_source_engine, _target_engine, scope, built)
 
 
-@st.cache_data(ttl=CACHE_TTL, show_spinner="Listing the items to review…")
+@_read_cache(show_spinner="Listing the items to review…")
 def item_index(
     _source_engine: Engine, _target_engine: Engine, cache_key: str = ""
 ) -> tuple[dict[str, dict[str, str]], dict[str, int]]:
@@ -320,7 +340,7 @@ def item_index(
     return index, totals
 
 
-@st.cache_data(ttl=CACHE_TTL, show_spinner="Reading what changed on each chart…")
+@_read_cache(show_spinner="Reading what changed on each chart…")
 def chart_diff_fields(_source_engine: Engine, _target_engine: Engine, cache_key: str = "") -> dict[str, dict]:
     """slug -> the changed fields of that chart: exactly what its own page hashes its verdict on.
 
@@ -347,7 +367,7 @@ def chart_diff_fields(_source_engine: Engine, _target_engine: Engine, cache_key:
     return {ref: cmp.diff.fields for ref, cmp in comparisons.items()}
 
 
-@st.cache_data(ttl=CACHE_TTL, show_spinner="Listing the charts this branch changed…")
+@_read_cache(show_spinner="Listing the charts this branch changed…")
 def changed_charts(_source_engine: Engine, _target_engine: Engine, cache_key: str = "") -> dict[str, int]:
     """Every published chart this branch changed, and how many distinct changes each carries.
 
@@ -372,13 +392,16 @@ def changed_charts(_source_engine: Engine, _target_engine: Engine, cache_key: st
     return counts
 
 
-@st.cache_data(ttl=CACHE_TTL, show_spinner="Finding explorer views whose text changed…")
+@_read_cache(show_spinner="Finding explorer views whose text changed…")
 def explorer_changes(_source_engine: Engine, _target_engine: Engine, cache_key: str = "") -> discovery.ExplorerChanges:
     """Published explorers whose view text changed, split into this branch's and baseline lag."""
     scope, built = shared_facts(_source_engine, cache_key=cache_key)
     return discovery.changed_explorer_views(_source_engine, _target_engine, scope, built)
 
 
+# Not a `_read_cache`, and so not dropped by Re-read: this reads the analytics warehouse, whose numbers
+# do not move when somebody rebuilds a step, and re-fetching ~3s of traffic history on every refresh
+# would slow the one button whose job is to be quick.
 @st.cache_data(ttl=CACHE_TTL, show_spinner="Reading how much these charts are viewed…")
 def chart_views(chart_ids: tuple[int, ...], n_days: int = 365, cache_key: str = "") -> dict[int, int]:
     """chart id -> page views over the last `n_days`, for ordering a list of affected charts.
@@ -402,7 +425,7 @@ def chart_views(chart_ids: tuple[int, ...], n_days: int = 365, cache_key: str = 
     return {int(row["chart_id"]): int(row["views"]) for row in df.to_dict("records")}
 
 
-@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
+@_read_cache(show_spinner=False)
 def mdim_redirected_charts(_source_engine: Engine, cache_key: str = "") -> dict[str, str]:
     """Chart slug -> the MDim its URL redirects to. Empty when the lookup fails, which lists them all."""
     try:
@@ -412,13 +435,13 @@ def mdim_redirected_charts(_source_engine: Engine, cache_key: str = "") -> dict[
         return {}
 
 
-@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
+@_read_cache(show_spinner=False)
 def explorer_titles(_source_engine: Engine, cache_key: str = "") -> dict[str, str]:
     """Published explorers' reader-facing names, by slug."""
     return data.fetch_explorer_titles(_source_engine)
 
 
-@st.cache_data(ttl=CACHE_TTL, show_spinner="Finding affected charts and MDims…")
+@_read_cache(show_spinner="Finding affected charts and MDims…")
 def usage_for_indicators(
     indicator_ids: tuple[int, ...],
     catalog_path: str,
@@ -448,20 +471,12 @@ def usage_for_indicators(
 def clear_discovery_caches() -> None:
     """Drop this page's readings of the two servers, so the next run re-reads them.
 
+    Every `_read_cache`, rather than a list written out here: the list missed `shared_facts`, whose set of
+    datasets rebuilt on this server gates which indicators are even compared, so a dataset built after the
+    page was opened stayed invisible to Re-read for the rest of the half-hour.
+
     Only this page's caches: `st.cache_data.clear()` would also throw away Chart Diff's and the producer
     analytics', which no reviewer asked for by pressing refresh here.
     """
-    for cached_fn in (
-        summary,
-        chart_text_changes,
-        mdim_changes,
-        mdim_view_diffs,
-        indicator_changes,
-        indicator_attribution,
-        explorer_changes,
-        explorer_titles,
-        usage_for_indicators,
-        changed_charts,
-        item_index,
-    ):
+    for cached_fn in _SERVER_READS:
         cached_fn.clear()

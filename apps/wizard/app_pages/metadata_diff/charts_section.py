@@ -16,7 +16,7 @@ from typing import Any
 import streamlit as st
 from sqlalchemy.engine.base import Engine
 
-from apps.wizard.app_pages.metadata_diff import cached, edits_view, mdim_pages
+from apps.wizard.app_pages.metadata_diff import cached, data, edits_view, mdim_pages
 from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELD_PREFIX,
     ChangeGroup,
@@ -177,11 +177,34 @@ def _chart_lookup(source_engine: Engine, target_engine: Engine) -> None:
         if not chart.get("is_published", True):
             st.caption(
                 "Counted nowhere else on this page: the section's lists cover charts a reader can open, "
-                "and this one is unpublished. Its own config text was not compared either."
+                "and this one is unpublished."
             )
         recorded = load_reviews(source_engine, surface_key("item", "chart"))
         mdim_pages.render_chart_by_ref(source_engine, target_engine, str(chart["slug"]), recorded)
         return
+
+    # An unpublished chart appears in none of the lists above — `changed_charts` counts pages a reader can
+    # open, and the chart-text comparison reads published charts only — so its own title, subtitle or note
+    # is compared here or nowhere. Without this, a draft whose indicators happen to be unchanged was told
+    # every text matches *and* that its own config had been compared, which nothing had done.
+    if not chart.get("is_published", True):
+        own = data.compare_charts(
+            source_engine,
+            target_engine,
+            [str(chart["slug"])],
+            changed_paths=changed.diffs,
+            baseline_paths=changed.across_versions,
+            include_drafts=True,
+        ).get(str(chart["slug"]))
+        if own is not None and own.diff.fields:
+            st.warning("**This branch changes this chart's own text.** Below, in full:")
+            st.caption(
+                "Counted nowhere else on this page: the section's lists cover charts a reader can open, "
+                "and this one is unpublished."
+            )
+            recorded = load_reviews(source_engine, surface_key("item", "chart"))
+            mdim_pages.render_chart_by_ref(source_engine, target_engine, str(chart["slug"]), recorded)
+            return
 
     compared = [path for path in paths if path in changed.ids]
     if compared:

@@ -54,6 +54,7 @@ from apps.wizard.app_pages.metadata_diff.data import (
     build_env_bundles,
     fetch_indicator_config_texts,
     fetch_latest_dataset_versions,
+    fetch_mdim_redirected_charts,
     fetch_variable_paths,
     fetch_variable_rows_by_path,
     load_mdim_config,
@@ -1532,6 +1533,28 @@ class Summary:
         )
 
 
+def _without_mdim_redirected(
+    source_engine: Engine, usage: dict[int, list[dict[str, Any]]]
+) -> dict[int, list[dict[str, Any]]]:
+    """The same usage map, minus charts whose URL now serves an MDim view.
+
+    The chart→MDim migration leaves the chart row published and redirects its URL, so `charts` still calls
+    it a live chart while nobody can open one: following the link lands on the MDim, which the same edit
+    already reaches with its own views. Counting both made one reader-facing page appear twice.
+
+    Empty on any failure, which counts them as charts — the state before this existed, and better than a
+    reach that silently drops charts because one lookup on an older server found no table.
+    """
+    try:
+        redirected = fetch_mdim_redirected_charts(source_engine)
+    except Exception as e:  # noqa: BLE001 — an older server may not have the table; count them, as before
+        log.warning("metadata_diff.mdim_redirects_unavailable", error=str(e))
+        return usage
+    if not redirected:
+        return usage
+    return {iid: [c for c in charts if str(c.get("slug") or "") not in redirected] for iid, charts in usage.items()}
+
+
 def charts_reached(groups: list[ChangeGroup], usage: dict[int, list[dict[str, Any]]]) -> set[int]:
     """Chart ids these changes reach — published only.
 
@@ -1968,7 +1991,12 @@ def summarize(
         chart_groups = group_changes(diffs)
         summary.n_chart_changes = len(chart_groups)
         _collect_changes(seen, chart_groups)
-        usage = charts_affected(source_engine, changed)
+        # Charts superseded by an MDim leave the whole reach, not just the grid that draws it. Their row
+        # is still published so the usage lookup calls them live charts, but `/grapher/<slug>` serves an
+        # MDim view that is already counted with its own views — leaving them in counted one reader-facing
+        # page twice, once as a chart nobody can open. Dropped here, once, so the badge, the reach line
+        # and the grid cannot disagree about which pages an edit lands on.
+        usage = _without_mdim_redirected(source_engine, charts_affected(source_engine, changed))
         summary.n_charts = len(charts_reached(chart_groups, usage))
         for g in chart_groups:
             by_id: dict[int, dict[str, Any]] = {}

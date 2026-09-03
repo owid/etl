@@ -4605,6 +4605,58 @@ def test_a_version_bump_alone_does_not_make_an_indicator_read_as_changed(monkeyp
     assert result.across_versions[moved].endswith("2026-06-26/pip/incomes#mean")
 
 
+def test_re_read_drops_every_cached_reading_of_the_two_servers():
+    """The list of caches to drop was written out by hand beside the button, and had fallen behind.
+
+    `shared_facts` was the costly omission: its set of datasets rebuilt on this server gates which
+    indicators are compared at all, so a dataset built after the page was opened stayed invisible to
+    Re-read for the rest of the half-hour, and the refreshed page went on reporting no changes.
+    """
+    from apps.wizard.app_pages.metadata_diff import cached
+
+    # Not a reading of the two servers: a connection pool, and the analytics warehouse — whose numbers do
+    # not move when somebody rebuilds a step.
+    not_a_server_read = {"master_engine", "chart_views"}
+    cached_functions = {
+        name
+        for name, obj in vars(cached).items()
+        if hasattr(obj, "__wrapped__") and callable(getattr(obj, "clear", None))
+    }
+    registered = {getattr(fn, "__wrapped__", fn).__name__ for fn in cached._SERVER_READS}
+
+    assert cached_functions - not_a_server_read == registered, (
+        "every cached reading of the two servers must be registered, so Re-read cannot fall behind"
+    )
+    assert "shared_facts" in registered and "chart_diff_fields" in registered
+
+
+def test_a_chart_superseded_by_an_mdim_is_not_counted_as_a_page(monkeypatch):
+    """Its row stays published, so the usage lookup calls it a live chart — but nobody can open one.
+
+    Following `/grapher/<slug>` lands on the MDim, which the same edit already reaches with its own
+    views, so counting both made one reader-facing page appear twice: once as a chart, once as the views
+    it redirects to. The grid dropped them while the reach totals behind the PR comment did not.
+    """
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    usage = {
+        7: [
+            {"chartId": 1, "slug": "retired-chart", "is_published": True},
+            {"chartId": 2, "slug": "live-chart", "is_published": True},
+        ]
+    }
+    monkeypatch.setattr(discovery, "fetch_mdim_redirected_charts", lambda _engine: {"retired-chart": "poverty"})
+    assert [c["slug"] for c in discovery._without_mdim_redirected("src", usage)[7]] == ["live-chart"]
+
+    # A lookup that fails counts them as charts, which is what happened before this existed — better than
+    # a reach that silently drops charts because an older server has no such table.
+    def boom(_engine):
+        raise RuntimeError("no such table")
+
+    monkeypatch.setattr(discovery, "fetch_mdim_redirected_charts", boom)
+    assert discovery._without_mdim_redirected("src", usage) == usage
+
+
 def test_every_edit_card_keeps_its_verdict_however_many_there_are():
     """The By-edit denominator counts every edit, so no card can be dropped.
 
