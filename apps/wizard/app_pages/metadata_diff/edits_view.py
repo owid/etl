@@ -30,10 +30,16 @@ from apps.wizard.app_pages.metadata_diff.core import (
     view_url,
     where_note,
 )
-from apps.wizard.app_pages.metadata_diff.data import load_reviews
+from apps.wizard.app_pages.metadata_diff.data import REJECTED, bulk_upsert_reviews, clear_status, load_reviews
 from apps.wizard.app_pages.metadata_diff.discovery import EditGroup, edit_fields, edit_key, edit_slot, edits_for
 from apps.wizard.app_pages.metadata_diff.render import render_chart_list, st_note
-from apps.wizard.app_pages.metadata_diff.review_state import resolve_item_mark, st_review_strip, surface_key
+from apps.wizard.app_pages.metadata_diff.review_state import (
+    item_identity,
+    resolve_item_mark,
+    reviewer,
+    st_review_strip,
+    surface_key,
+)
 
 # Cards drawn before the list says how many more there are. Sixty edits is not a branch anyone reviews
 # edit by edit; the number exists so a pathological branch cannot render for a minute.
@@ -49,6 +55,86 @@ CONTEXT_CSS = """
   letter-spacing: .04em; margin-right: 6px; }}
 </style>
 """.replace("{{", "{").replace("}}", "}")
+
+
+def st_reject_all(engine: Engine, summary: Any, section: str) -> None:
+    """Reject every edit in one section, behind a popover — and no way to approve them all.
+
+    Deliberately one-sided. "None of this should ship" is a judgement somebody can hold about a branch,
+    and acting on it saves them ticking through eighty views to say so. "All of this is fine" is not the
+    same kind of statement: bulk approval is how a review becomes a formality, and this tool exists
+    because these texts reach readers unreviewed.
+
+    Written against the **edits**, not each view: an edit is what somebody authored and what has to be
+    undone, the numbers are small and exact, and the rejections land on the By-edit cards where the same
+    edits are listed. Progress is measured along whichever layout was used, so the section then reads as
+    decided either way through it.
+
+    Nothing is changed by any of this — see `review_state.st_decision_control`. The popover says so and
+    points at the Review tab, which is where a rejection turns into something actionable.
+    """
+    edits = edits_for(summary, section)
+    if not edits:
+        return
+
+    surface = surface_key("item", f"edit:{section}")
+    stored = load_reviews(engine, surface)
+    slots = [item_identity(surface, edit_key(edit), edit_fields(edit)) for edit in edits]
+    already = sum(
+        1
+        for change_key, content_hash in slots
+        if (stored.get(change_key) or {}).get("status") == REJECTED
+        and (stored.get(change_key) or {}).get("contentHash") == content_hash
+    )
+
+    def _reject() -> None:
+        bulk_upsert_reviews(
+            engine,
+            [
+                {
+                    "catalogPath": surface,
+                    "changeKey": change_key,
+                    "contentHash": content_hash,
+                    "status": REJECTED,
+                    # Whatever was written about this edit survives the bulk verdict.
+                    "comment": (stored.get(change_key) or {}).get("comment"),
+                    "reviewer": reviewer(),
+                }
+                for change_key, content_hash in slots
+            ],
+        )
+
+    def _undo() -> None:
+        clear_status(engine, [surface], REJECTED)
+
+    n = len(edits)
+    label = f"❌ {already} of {n} edits rejected" if already else f"❌ Reject all {n} edit{'s' if n != 1 else ''}"
+    with st.popover(label, width="content"):
+        st.markdown(
+            f"**Reject every edit in this section** — all {n} of them, however many views or charts they render into."
+        )
+        st.caption(
+            "This changes nothing: no text is reverted, no step re-runs, and nothing here is read at "
+            "merge. It records that these edits should not ship. Open **Review** afterwards — it turns "
+            "the rejections into instructions you can paste back to whoever is editing, this assistant "
+            "included. There is no *approve all*, on purpose: a branch can be wrong wholesale, but it "
+            "cannot be right wholesale without somebody reading it."
+        )
+        st.button(
+            f"Reject all {n}",
+            key=f"mdd-reject-all-{section}",
+            on_click=_reject,
+            type="primary",
+            width="stretch",
+        )
+        if already:
+            st.button(
+                f"Undo — clear {already} rejection{'s' if already != 1 else ''}",
+                key=f"mdd-reject-none-{section}",
+                on_click=_undo,
+                width="stretch",
+                help="Notes you wrote are kept; only the verdicts are cleared.",
+            )
 
 
 def st_edit_cards(source_engine: Engine, target_engine: Engine, summary: Any, section: str) -> None:

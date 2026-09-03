@@ -63,6 +63,13 @@ REVIEWED = "reviewed"
 # A row that exists only to hold a note. Needed because "reviewed" used to mean "a row exists": writing a
 # note without ticking would otherwise have marked the item reviewed.
 NOTED = "noted"
+# The reviewer read this and does not want it to ship. A verdict, not an action: nothing in ETL or in
+# grapher reads this table, so rejecting changes no text — it records what has to be undone, and the
+# Review tab turns those records into instructions to hand back to whoever is editing.
+REJECTED = "rejected"
+# The two states that mean a decision has been made, either way. Progress counts these; a note alone is
+# not a decision.
+DECIDED = (REVIEWED, REJECTED)
 
 
 def load_item_notes(engine: Engine, prefix: str = "list:item:") -> list[dict[str, Any]]:
@@ -140,6 +147,70 @@ def upsert_review(
                 "ts": datetime.now(timezone.utc),
             },
         )
+
+
+def bulk_upsert_reviews(engine: Engine, rows: list[dict[str, Any]]) -> int:
+    """Record many decisions at once — one statement, so a bulk verdict is not N round trips.
+
+    Each row is {catalogPath, changeKey, contentHash, status, comment, reviewer}. An existing row for the
+    same slot is overwritten, which is what makes "reject everything" idempotent: pressing it twice leaves
+    the same rows rather than doubling anything, and it re-binds each to the text as it stands now.
+    """
+    if not rows:
+        return 0
+    _ensure_review_table(engine)
+    now = datetime.now(timezone.utc)
+    with engine.begin() as con:
+        con.execute(
+            text(
+                "insert into metadata_review "
+                "(catalogPath, changeKey, contentHash, status, comment, reviewer, updatedAt) "
+                "values (:cp, :ck, :ch, :st, :cm, :rv, :ts) "
+                "on duplicate key update contentHash=values(contentHash), status=values(status), "
+                "comment=values(comment), reviewer=values(reviewer), updatedAt=values(updatedAt)"
+            ),
+            [
+                {
+                    "cp": row["catalogPath"],
+                    "ck": row["changeKey"],
+                    "ch": row["contentHash"],
+                    "st": row["status"],
+                    "cm": row.get("comment"),
+                    "rv": row.get("reviewer"),
+                    "ts": now,
+                }
+                for row in rows
+            ],
+        )
+    return len(rows)
+
+
+def clear_status(engine: Engine, surfaces: list[str], status: str) -> int:
+    """Undo every decision of one kind on these surfaces, keeping what the reviewer wrote.
+
+    A row carrying a note is demoted to `noted` rather than deleted — the same rule unticking follows,
+    because a bulk undo must not throw away sentences somebody typed. Returns how many rows changed.
+    """
+    if not surfaces:
+        return 0
+    _ensure_review_table(engine)
+    placeholders = ", ".join(f":s{i}" for i in range(len(surfaces)))
+    params: dict[str, Any] = {f"s{i}": surface for i, surface in enumerate(surfaces)}
+    params["st"] = status
+    with engine.begin() as con:
+        kept = con.execute(
+            text(
+                f"update metadata_review set status = '{NOTED}', updatedAt = now() "
+                f"where status = :st and catalogPath in ({placeholders}) "
+                "and comment is not null and comment != ''"
+            ),
+            params,
+        ).rowcount
+        dropped = con.execute(
+            text(f"delete from metadata_review where status = :st and catalogPath in ({placeholders})"),
+            params,
+        ).rowcount
+    return int(kept) + int(dropped)
 
 
 def delete_review(engine: Engine, change_key: str) -> None:

@@ -98,10 +98,14 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
             "most text edits are authored in the garden step and reach an MDim through indicator metadata, "
             "leaving its config identical.",
         )
-        layout = st_layout_switcher(
-            "🔍 View by view",
-            "**View by view** steps through one MDim at a time, every changed view with its diffs",
-        )
+        col_layout, col_reject = st.columns([4, 1], vertical_alignment="center")
+        with col_layout:
+            layout = st_layout_switcher(
+                "🔍 View by view",
+                "**View by view** steps through one MDim at a time, every changed view with its diffs",
+            )
+        with col_reject:
+            edits_view.st_reject_all(source_engine, cached.summary(source_engine, target_engine), "mdims")
         if layout == "items":
             _views_browser(source_engine, target_engine, df, flagged + drafts)
             return

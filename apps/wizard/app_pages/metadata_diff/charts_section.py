@@ -78,10 +78,14 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
         f"**{n_charts} published chart{'s' if n_charts != 1 else ''}**",
     )
     _extra_notes(changed)
-    layout = st_layout_switcher(
-        "🔍 Chart by chart",
-        "**Chart by chart** steps through the charts this branch changed, one full review at a time",
-    )
+    col_layout, col_reject = st.columns([4, 1], vertical_alignment="center")
+    with col_layout:
+        layout = st_layout_switcher(
+            "🔍 Chart by chart",
+            "**Chart by chart** steps through the charts this branch changed, one full review at a time",
+        )
+    with col_reject:
+        edits_view.st_reject_all(source_engine, cached.summary(source_engine, target_engine), "charts")
 
     if layout == "items":
         _chart_browser(source_engine, target_engine, groups, usage, chart_text)

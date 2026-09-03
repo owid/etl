@@ -67,10 +67,14 @@ def st_show_explorer_metadata_diffs(source_engine: Engine, target_engine: Engine
             f"**{len(branch)} explorer{'s' if len(branch) != 1 else ''}** with "
             f"**{total_views} changed view{'s' if total_views != 1 else ''}**."
         )
-        layout = st_layout_switcher(
-            "🔍 View by view",
-            "**View by view** lists every changed view of every affected explorer, with its diffs",
-        )
+        col_layout, col_reject = st.columns([4, 1], vertical_alignment="center")
+        with col_layout:
+            layout = st_layout_switcher(
+                "🔍 View by view",
+                "**View by view** lists every changed view of every affected explorer, with its diffs",
+            )
+        with col_reject:
+            edits_view.st_reject_all(source_engine, cached.summary(source_engine, target_engine), "explorers")
         if layout == "items":
             _explorer_browser(source_engine, branch)
             _render_other(other)

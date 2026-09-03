@@ -28,7 +28,9 @@ from apps.wizard.app_pages.metadata_diff.core import (  # noqa: F401
     surface_key,
 )
 from apps.wizard.app_pages.metadata_diff.data import (
+    DECIDED,
     NOTED,
+    REJECTED,
     REVIEWED,
     delete_review,
     load_reviews,
@@ -45,7 +47,10 @@ class ReviewMark:
     change_key: str
     content_hash: str
     reviewed: bool  # ticked, and the text has not moved since
-    stale: bool  # was ticked, but the text changed afterwards — counts as not reviewed
+    stale: bool  # was decided, but the text changed afterwards — the decision no longer counts
+    # Read and rejected: this text should not ship. Mutually exclusive with `reviewed`, and stale the same
+    # way — a rejection of wording that has since been rewritten is a verdict on text nobody has now.
+    rejected: bool = False
     reviewer: str | None = None
     updated_at: Any = None
     note: str = ""  # free text the reviewer wrote about this item; survives unticking
@@ -91,6 +96,7 @@ def resolve_item_mark(stored: dict[str, Any], surface: str, item_key: str, field
         content_hash=content_hash,
         # Ticked, not merely present: a row can exist to hold a note and nothing else.
         reviewed=bool(row) and row.get("status") == REVIEWED and not stale,
+        rejected=bool(row) and row.get("status") == REJECTED and not stale,
         stale=stale,
         reviewer=(row or {}).get("reviewer"),
         updated_at=(row or {}).get("updatedAt"),
@@ -115,37 +121,54 @@ def reviewed_toggle_key(surface: str, mark: ReviewMark, key_suffix: str = "") ->
     return f"mdd-reviewed::{surface}::{mark.change_key}::{mark.content_hash}{key_suffix}"
 
 
-def st_reviewed_toggle(engine: Engine, surface: str, mark: ReviewMark, key_suffix: str = "") -> None:
-    """The per-change Reviewed toggle, persisting straight to the staging DB on change."""
+def st_decision_control(engine: Engine, surface: str, mark: ReviewMark, key_suffix: str = "") -> None:
+    """One item's verdict — ✅ reviewed or ❌ reject — persisting straight to the staging DB on change.
+
+    One control rather than two toggles, because the two answers exclude each other: a change cannot be
+    both signed off and refused, and two independent switches can say exactly that. Clicking the active
+    option clears it, which is the third state: nothing decided yet.
+
+    Neither answer does anything to the data. A rejection is a record of what has to be undone, and the
+    Review tab is where those records become text to hand back to whoever is editing — said in the help
+    and again under a rejection, because "❌" invites the belief that something has been reverted.
+    """
     widget_key = reviewed_toggle_key(surface, mark, key_suffix)
     if widget_key not in st.session_state:
-        st.session_state[widget_key] = mark.reviewed
+        st.session_state[widget_key] = REVIEWED if mark.reviewed else (REJECTED if mark.rejected else None)
 
     def _save() -> None:
-        if st.session_state.get(widget_key):
-            upsert_review(engine, surface, mark.change_key, mark.content_hash, REVIEWED, mark.note or None, reviewer())
+        picked = st.session_state.get(widget_key)
+        if picked in DECIDED:
+            upsert_review(engine, surface, mark.change_key, mark.content_hash, picked, mark.note or None, reviewer())
         elif mark.note:
-            # Unticking must not throw away what the reviewer wrote: the row stays, holding the note.
+            # Clearing a verdict must not throw away what the reviewer wrote: the row stays with the note.
             upsert_review(engine, surface, mark.change_key, mark.content_hash, NOTED, mark.note, reviewer())
         else:
             delete_review(engine, mark.change_key)
 
-    st.toggle(
-        "Reviewed",
+    st.segmented_control(
+        "Decision",
+        options=list(DECIDED),
+        format_func=lambda status: "✅ Reviewed" if status == REVIEWED else "❌ Reject",
         key=widget_key,
         on_change=_save,
-        help="Your own progress marker: it is stored on this staging server, resets automatically if this "
-        "text is edited again, and is **never synced to production** — nothing here changes on merge.",
+        label_visibility="collapsed",
+        help="Stored on this staging server, reset automatically if this text is edited again, and "
+        "**never synced** — neither answer changes any text. **Reject** records that this should not "
+        "ship; the **Review** tab collects those into instructions to paste back to whoever is editing.",
     )
     if mark.stale:
-        st.caption("⚠️ Edited since you marked it reviewed — the previous tick no longer counts.")
+        st.caption("⚠️ Edited since you decided — the previous answer no longer counts.")
+    elif mark.rejected:
+        who = f" by **{mark.reviewer}**" if mark.reviewer else ""
+        st.caption(f"❌ Rejected{who} — nothing is changed here; take the wording from **Review**.")
     elif mark.reviewed and mark.reviewer:
         when = f" · {mark.updated_at}" if mark.updated_at else ""
         st.caption(f"Marked reviewed by **{mark.reviewer}**{when}")
 
 
 def item_marker(stored: dict[str, Any], surface: str, item_key: str) -> str:
-    """ "✅ " if this item is ticked, "📝 " if it only carries a note, "" if neither — for a picker label.
+    """ "✅ " reviewed, "❌ " rejected, "📝 " a note and no verdict, "" untouched — for a picker label.
 
     Reads the slot only. The change key is a hash of surface and item, not of the text, so this needs
     nothing diffed — which is what makes it usable in a list of sixty-seven charts. The consequence is
@@ -158,6 +181,8 @@ def item_marker(stored: dict[str, Any], surface: str, item_key: str) -> str:
         return ""
     if row.get("status") == REVIEWED:
         return "✅ "
+    if row.get("status") == REJECTED:
+        return "❌ "
     return "📝 " if row.get("comment") else ""
 
 
@@ -193,7 +218,7 @@ def _st_enter_saves_script() -> None:
 
 
 def surface_progress(rows: list[dict[str, Any]], surface: str) -> str:
-    """ "✅ 3 · 📝 1" for one surface's recorded rows, or "" when it has none.
+    """ "✅ 3 · ❌ 1 · 📝 1" for one surface's recorded rows, or "" when it has none.
 
     For the pickers one level up — which MDim, which explorer — where the question is not "is this item
     done" but "have I been here at all". No denominator: that would need every one of the surface's views
@@ -203,10 +228,13 @@ def surface_progress(rows: list[dict[str, Any]], surface: str) -> str:
     if not mine:
         return ""
     ticked = sum(1 for row in mine if row.get("status") == REVIEWED)
+    rejected = sum(1 for row in mine if row.get("status") == REJECTED)
     noted = sum(1 for row in mine if row.get("comment"))
     parts = []
     if ticked:
         parts.append(f"✅ {ticked}")
+    if rejected:
+        parts.append(f"❌ {rejected}")
     if noted:
         parts.append(f"📝 {noted}")
     return " · ".join(parts)
@@ -221,7 +249,8 @@ def st_review_strip(engine: Engine, surface: str, mark: ReviewMark) -> None:
     two columns of prose, an untinted row of controls disappears.
 
     A note-only row carries the `noted` status, so writing a note never reads as a tick and the Review tab
-    can tell them apart.
+    can tell them apart. On a rejection the note is the useful half — it is what tells whoever is editing
+    *why*, and it travels into the Review tab's instructions.
     """
     note_key = f"mdd-note::{surface}::{mark.change_key}::{mark.content_hash[:8]}"
     if note_key not in st.session_state:
@@ -229,18 +258,20 @@ def st_review_strip(engine: Engine, surface: str, mark: ReviewMark) -> None:
 
     def _save_note() -> None:
         note = str(st.session_state.get(note_key) or "").strip()
+        # Whichever verdict stands, stands: writing a note is not a decision, and it must not quietly
+        # promote a rejection to reviewed or the other way round.
+        verdict = REVIEWED if mark.reviewed else (REJECTED if mark.rejected else None)
         if note:
-            status = REVIEWED if mark.reviewed else NOTED
-            upsert_review(engine, surface, mark.change_key, mark.content_hash, status, note, reviewer())
-        elif mark.reviewed:
-            upsert_review(engine, surface, mark.change_key, mark.content_hash, REVIEWED, None, reviewer())
+            upsert_review(engine, surface, mark.change_key, mark.content_hash, verdict or NOTED, note, reviewer())
+        elif verdict:
+            upsert_review(engine, surface, mark.change_key, mark.content_hash, verdict, None, reviewer())
         else:
             delete_review(engine, mark.change_key)
 
     with st.container(border=True, key=f"mdd-strip-{mark.change_key[:16]}"):
         col_tick, col_note = st.columns([1, 4], vertical_alignment="center")
         with col_tick:
-            st_reviewed_toggle(engine, surface, mark)
+            st_decision_control(engine, surface, mark)
         with col_note:
             st.text_area(
                 "Note",

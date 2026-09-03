@@ -37,7 +37,7 @@ from apps.wizard.app_pages.metadata_diff import (
     review_section,
 )
 from apps.wizard.app_pages.metadata_diff.core import empty_sections, section_progress
-from apps.wizard.app_pages.metadata_diff.data import REVIEWED, load_item_notes
+from apps.wizard.app_pages.metadata_diff.data import DECIDED, load_item_notes
 from apps.wizard.app_pages.metadata_diff.discovery import keep_sections
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
@@ -58,7 +58,7 @@ st.set_page_config(
 
 
 def _review_marks(source_engine, target_engine) -> dict[str, str]:
-    """Per section: finished, or not yet.
+    """Per section: every item decided, or not yet.
 
     Done is along whichever layout the reviewer took — every view ticked view by view, *or* every edit
     ticked by edit. A section is reviewed one way or the other, so the bar has to agree with the way that
@@ -71,7 +71,9 @@ def _review_marks(source_engine, target_engine) -> dict[str, str]:
     """
     ticked: dict[str, int] = {}
     for row in load_item_notes(source_engine):
-        if row.get("status") == REVIEWED:
+        # Either verdict is a decision: a section every one of whose edits was rejected has been gone
+        # through, and telling its reviewer it is unfinished would be wrong.
+        if row.get("status") in DECIDED:
             surface = str(row.get("catalogPath") or "")
             ticked[surface] = ticked.get(surface, 0) + 1
 

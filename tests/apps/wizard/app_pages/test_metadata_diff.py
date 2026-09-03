@@ -2979,6 +2979,185 @@ def test_a_blast_radius_link_focuses_one_edit_and_greys_the_rest():
     assert edit_slot(scoped) == edit_slot(whole[0])
 
 
+def test_a_verdict_is_reviewed_or_rejected_and_never_both():
+    """Two answers that exclude each other, resolved against what is stored, and stale the same way.
+
+    A rejection of wording that has since been rewritten is a verdict on text nobody has now, so it stops
+    counting exactly as a tick does — otherwise a branch could ship a rewrite that was refused.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import item_identity
+    from apps.wizard.app_pages.metadata_diff.data import DECIDED, NOTED, REJECTED, REVIEWED
+    from apps.wizard.app_pages.metadata_diff.review_state import resolve_item_mark
+
+    surface = surface_key("item", "chart")
+    fields = {"titlePublic": {"old": "Old title", "new": "New title"}}
+    change_key, content_hash = item_identity(surface, "gdp", fields)
+
+    assert set(DECIDED) == {REVIEWED, REJECTED}
+
+    rejected = resolve_item_mark(
+        {change_key: {"status": REJECTED, "contentHash": content_hash}}, surface, "gdp", fields
+    )
+    assert rejected.rejected and not rejected.reviewed and not rejected.stale
+
+    reviewed = resolve_item_mark(
+        {change_key: {"status": REVIEWED, "contentHash": content_hash}}, surface, "gdp", fields
+    )
+    assert reviewed.reviewed and not reviewed.rejected
+
+    # A note alone is neither verdict.
+    noted = resolve_item_mark(
+        {change_key: {"status": NOTED, "contentHash": content_hash, "comment": "hm"}}, surface, "gdp", fields
+    )
+    assert not noted.reviewed and not noted.rejected and noted.note == "hm"
+
+    # The text moved since: the rejection goes stale rather than standing against wording nobody has.
+    moved = resolve_item_mark(
+        {change_key: {"status": REJECTED, "contentHash": "something-else"}}, surface, "gdp", fields
+    )
+    assert moved.stale and not moved.rejected and not moved.reviewed
+
+
+def test_a_rejection_counts_as_decided_and_shows_in_the_pickers():
+    """Rejecting is going through a section, so it finishes it; the marker says which way it went."""
+    from apps.wizard.app_pages.metadata_diff.core import item_identity, section_progress
+    from apps.wizard.app_pages.metadata_diff.data import REJECTED, REVIEWED
+    from apps.wizard.app_pages.metadata_diff.review_state import item_marker, surface_progress
+
+    surface = surface_key("item", "chart")
+    change_key, _hash = item_identity(surface, "gdp", {})
+    assert item_marker({change_key: {"status": REJECTED}}, surface, "gdp") == "❌ "
+    assert item_marker({change_key: {"status": REVIEWED}}, surface, "gdp") == "✅ "
+
+    rows = [
+        {"catalogPath": surface, "status": REVIEWED, "comment": None},
+        {"catalogPath": surface, "status": REJECTED, "comment": "wrong units"},
+        {"catalogPath": surface, "status": REJECTED, "comment": None},
+    ]
+    assert surface_progress(rows, surface) == "✅ 1 · ❌ 2 · 📝 1"
+
+    # Both verdicts count toward "this section has been gone through".
+    assert section_progress({surface: 3}, {surface: 3})["charts"] == (3, 3)
+
+
+def test_rejecting_everything_is_offered_and_approving_everything_is_not():
+    """A branch can be wrong wholesale; it cannot be right wholesale without somebody reading it.
+
+    The bulk control writes against the edits — what somebody authored, and what has to be undone — so it
+    is exact and small however many views those edits render into.
+    """
+    import inspect
+
+    from apps.wizard.app_pages.metadata_diff import edits_view
+
+    source = inspect.getsource(edits_view.st_reject_all)
+    assert "REJECTED" in source
+    assert "REVIEWED" not in source, "there is no bulk approve, on purpose"
+    # It says that nothing is changed, and where to go next — a red ❌ invites the opposite belief.
+    assert "changes nothing" in source and "Review" in source
+    # And it is reversible, keeping what the reviewer wrote.
+    assert "clear_status" in source
+
+
+def test_the_rejection_document_says_what_to_undo_and_where():
+    """A rejection is only useful if somebody can act on it without the page it was made on.
+
+    So the document names the field, the words that moved, the garden file the edit lives in, and the
+    reviewer's note — as instructions, since that is what it is for.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import item_identity
+    from apps.wizard.app_pages.metadata_diff.data import REJECTED
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach
+    from apps.wizard.app_pages.metadata_diff.review_section import _rejections_markdown
+
+    reach = ChangeReach(
+        field="descriptionShort",
+        old="Mean income.",
+        new="Mean income. In 2021 prices.",
+        charts=[{"chartId": 1, "slug": "gdp", "has_data_page": True}],
+        catalog_paths={"grapher/wb/2026-06-26/world_bank_pip/world_bank_pip#mean"},
+    )
+    summary = Summary(reach=[reach])
+    surface = surface_key("item", "edit:charts")
+    from apps.wizard.app_pages.metadata_diff.discovery import edit_fields, edit_key, edits_for
+
+    (edit,) = edits_for(summary, "charts")
+    change_key, content_hash = item_identity(surface, edit_key(edit), edit_fields(edit))
+    rows = [
+        {
+            "catalogPath": surface,
+            "changeKey": change_key,
+            "contentHash": content_hash,
+            "status": REJECTED,
+            "comment": "We do not say 'in 2021 prices' in a subtitle.\nUse the footnote.",
+            "updatedAt": None,
+        }
+    ]
+
+    doc = _rejections_markdown(rows, {}, summary)
+    assert "## Metadata changes to revert" in doc
+    assert doc.count("← remove this") == 1
+    assert "Nothing has been reverted" in doc
+    assert "Description" in doc and "Charts" in doc
+    # The words to undo, and the file to undo them in.
+    assert "In 2021 prices." in doc
+    assert "`etl/steps/data/garden/wb/2026-06-26/world_bank_pip.meta.yml`" in doc
+    # A multi-line note survives as one nested bullet rather than breaking the list.
+    assert "Use the footnote." in doc
+    assert "\n\nUse the footnote." not in doc
+
+
+def test_one_authored_edit_is_one_instruction_however_many_surfaces_refused_it():
+    """The same sentence is a card in Charts and in MDims; rejecting both is two verdicts, one change.
+
+    Printed twice it invites somebody to look for a second place to make the edit. Merged on the words and
+    the file, with each surface's own text count and every note kept.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import item_identity
+    from apps.wizard.app_pages.metadata_diff.data import REJECTED
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, edit_fields, edit_key, edits_for
+    from apps.wizard.app_pages.metadata_diff.review_section import _rejections_markdown
+
+    where = {"grapher/wb/2026-06-26/world_bank_pip/world_bank_pip#mean"}
+    on_chart = ChangeReach(
+        field="descriptionKey",
+        old="A.",
+        new="A. Adjusted.",
+        charts=[{"chartId": 1, "slug": "gdp", "has_data_page": True}],
+        catalog_paths=where,
+    )
+    on_view = ChangeReach(
+        field="descriptionKey",
+        old="B.",
+        new="B. Adjusted.",
+        mdims=[{"catalogPath": "grapher/a/latest/x#x", "title": "X", "n_views": 2, "is_draft": False}],
+        catalog_paths=where,
+    )
+    summary = Summary(reach=[on_chart, on_view])
+
+    rows = []
+    for section, note in (("charts", "Belongs in the footnote."), ("mdims", "Same here.")):
+        surface = surface_key("item", f"edit:{section}")
+        (edit,) = edits_for(summary, section)
+        change_key, content_hash = item_identity(surface, edit_key(edit), edit_fields(edit))
+        rows.append(
+            {
+                "catalogPath": surface,
+                "changeKey": change_key,
+                "contentHash": content_hash,
+                "status": REJECTED,
+                "comment": note,
+            }
+        )
+
+    doc = _rejections_markdown(rows, {}, summary)
+    # One bullet for the edit, naming both surfaces, and both notes kept.
+    assert doc.count("← remove this") == 1
+    assert "in Charts" in doc and "in MDims" in doc
+    assert "Belongs in the footnote." in doc and "Same here." in doc
+    assert doc.count("world_bank_pip.meta.yml") == 1
+
+
 def test_the_bar_says_a_section_can_be_read_either_way():
     """The two ways through a section are what the badges count, so the bar has to name them.
 
