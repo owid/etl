@@ -10,6 +10,10 @@ it. Nothing is ever looked up per environment, so the same YAML addresses the
 same chart everywhere. Admin-authored edits live in
 the chart's admin layer (`charts.patchConfigId`) and are preserved across ETL re-pushes by
 construction (ETL and admin write to different rows).
+
+The one exception is `_repair_dangling_column_slugs`, which writes the admin layer — see the
+reasoning in its docstring. It is a repair of a reference ETL itself invalidated, and it runs
+only when there is something to repair.
 """
 
 import secrets
@@ -23,10 +27,16 @@ from jsonschema.exceptions import ValidationError
 from sqlalchemy import bindparam, text
 from sqlalchemy.orm import Session
 
+import etl.grapher.model as gm
 from apps.chart_sync.admin_api import AdminAPI
 from etl.collection.utils import map_indicator_path_to_id
 from etl.config import DEFAULT_GRAPHER_SCHEMA, OWIDEnv
 from etl.files import read_json_schema
+from etl.grapher.column_slugs import (
+    find_dangling_column_slugs,
+    repair_column_slugs,
+    variable_ids_to_resolve,
+)
 from etl.paths import SCHEMAS_DIR
 
 if TYPE_CHECKING:
@@ -105,11 +115,15 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
                 reason="tags are admin-managed once a chart exists; ETL only sets them at creation",
             )
 
-    # The slug is derived from the file's short name, but grapher excludes `slug` from what an
-    # ETL layer may contribute, so an existing chart keeps the slug it already had. Renaming the
-    # config file therefore looks like it renames the chart and doesn't.
+    # Two checks that both need the chart's rendered config, and only make sense for a chart
+    # that already existed — a chart created by this very push has nothing of its own yet.
     if not is_new:
-        slug_in_grapher = admin_api.get_chart_config(chart_id).get("slug")
+        rendered_config = admin_api.get_chart_config(chart_id)
+
+        # The slug is derived from the file's short name, but grapher excludes `slug` from what
+        # an ETL layer may contribute, so an existing chart keeps the slug it already had.
+        # Renaming the config file therefore looks like it renames the chart and doesn't.
+        slug_in_grapher = rendered_config.get("slug")
         if slug_in_grapher and slug_in_grapher != slug:
             log.warning(
                 "collection.chart.slug_not_applied",
@@ -119,6 +133,8 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
                 reason="an existing chart's slug cannot be changed from ETL; rename it in the admin instead",
             )
 
+        _repair_dangling_column_slugs(admin_api, owid_env, chart_id, rendered_config)
+
     log.info(
         "collection.chart.upsert_success",
         slug=slug,
@@ -126,6 +142,59 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
         admin_url=f"{owid_env.admin_site}/charts/{chart_id}/edit",
     )
     return chart_id
+
+
+def _repair_dangling_column_slugs(
+    admin_api: AdminAPI,
+    owid_env: OWIDEnv,
+    chart_id: int,
+    rendered_config: dict[str, Any],
+) -> None:
+    """Point the chart's `map.columnSlug` / `sortColumnSlug` back at a column it actually plots.
+
+    Both fields name a column by variable id, and ETL owns `dimensions` for an ETL-authored
+    chart — so a dataset re-version changes which variables the chart plots and invalidates any
+    slug that named the old one. When the slug sits in the chart's *admin* layer (left there
+    before the chart was adopted into ETL, or set in the chart editor since) nothing fixes it:
+    the admin layer wins the merge, and Grapher's re-diff on push can only drop patch entries
+    the ETL layer has adopted, which this one never is. See `etl.grapher.column_slugs` for what
+    goes wrong downstream.
+
+    Repairing it means writing the admin layer, which ETL otherwise never does. That is
+    deliberate and narrow: ETL is the only party that knows the old and new variables are the
+    same indicator, so it is the only one that can *remap* rather than delete, and the
+    reference it is repairing is one its own push invalidated. We PUT the rendered config back
+    with the field corrected — the same call the chart editor makes on save, so Grapher
+    recomputes the patch against the current parent stack — and only when something changed.
+
+    A `map.columnSlug` the config YAML declares itself needs no repair: `_build_chart_config`
+    resolves it to a current id and it lands in the ETL layer. The catch is that a stale admin
+    entry outranks it, so this runs either way.
+    """
+    # Nothing dangling is the normal case on almost every push, and settling it from the config
+    # alone keeps that path free of a database round trip.
+    if not find_dangling_column_slugs(rendered_config):
+        return
+
+    with Session(owid_env.engine) as session:
+        # A retired variable that has since been deleted comes back absent, which
+        # `repair_column_slugs` reads as "nothing to match on".
+        catalog_paths = gm.Variable.variable_ids_to_catalog_paths(session, variable_ids_to_resolve(rendered_config))
+
+    repaired_config, repairs = repair_column_slugs(rendered_config, catalog_paths)
+    if not repairs:
+        return
+
+    for repair in repairs:
+        log.warning(
+            "collection.chart.column_slug_repaired",
+            chart_id=chart_id,
+            field=repair.field,
+            old_variable_id=repair.old_id,
+            new_variable_id=repair.new_id,
+            reason=repair.reason,
+        )
+    admin_api.update_chart(chart_id, repaired_config)
 
 
 def _build_chart_config(view: "View", slug: str) -> dict[str, Any]:

@@ -20,6 +20,7 @@ import builtins
 import copy
 import io
 import json
+from collections.abc import Iterable
 from datetime import date, datetime, timezone
 from enum import Enum
 from pathlib import Path
@@ -1461,6 +1462,18 @@ class Variable(Base):
         """Return a mapping from catalog paths to variable IDs."""
         query = select(Variable).where(Variable.catalogPath.in_(catalog_paths))
         return {var.catalogPath: var.id for var in session.scalars(query).all()}  # ty: ignore
+
+    @classmethod
+    def variable_ids_to_catalog_paths(cls, session: Session, variable_ids: Iterable[int]) -> dict[int, str | None]:
+        """Return a mapping from variable IDs to catalog paths.
+
+        Selects just the two columns rather than whole `Variable` rows, so it stays cheap when
+        asked about many ids at once. An id that isn't in the database is absent from the result
+        rather than mapped to None, so callers can tell a deleted variable from a legacy one
+        that simply never had a catalog path.
+        """
+        query = select(Variable.id, Variable.catalogPath).where(Variable.id.in_(sorted(variable_ids)))
+        return {row.id: row.catalogPath for row in session.execute(query)}
 
     @classmethod
     def infer_type(cls, values: pd.Series) -> VARIABLE_TYPE:

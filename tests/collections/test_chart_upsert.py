@@ -7,11 +7,16 @@ written to `chart_configs.etlConfig`. The only external dependency is
 stay pure.
 """
 
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
 
-from etl.collection.chart_upsert import _build_chart_config, _validate_chart_config
+from etl.collection.chart_upsert import (
+    _build_chart_config,
+    _repair_dangling_column_slugs,
+    _validate_chart_config,
+)
 from etl.collection.model.core import Collection, Definitions
 from etl.collection.model.dimension import Dimension, DimensionChoice
 from etl.collection.model.view import View, ViewIndicators
@@ -261,3 +266,102 @@ def test_declared_single_chart_routes_to_chart_upsert():
     with patch("etl.collection.chart_upsert.upsert_collection_as_chart") as mock_upsert:
         collection.upsert_to_db(owid_env=object())  # type: ignore[arg-type]
     mock_upsert.assert_called_once()
+
+
+# `_repair_dangling_column_slugs` — the admin-layer repair after a push.
+#
+# It reads the chart's *rendered* config from the admin API, resolves the variable ids it
+# references to catalog paths, and PUTs the config back only when a column-slug field named a
+# column the chart no longer plots. Both external dependencies (the admin API and the DB
+# lookup) are stubbed here; `tests/test_column_slugs.py` covers the matching rules themselves.
+
+
+class _FakeAdminAPI:
+    def __init__(self, rendered_config: dict):
+        self.rendered_config = rendered_config
+        self.updated_with: dict | None = None
+
+    def get_chart_config(self, chart_id: int) -> dict:
+        return self.rendered_config
+
+    def update_chart(self, chart_id: int, chart_config: dict) -> dict:
+        self.updated_with = chart_config
+        return {"success": True}
+
+
+def _repair(rendered_config: dict, catalog_paths: dict[int, str | None]) -> _FakeAdminAPI:
+    admin_api = _FakeAdminAPI(rendered_config)
+    with (
+        patch("etl.collection.chart_upsert.Session"),
+        patch(
+            "etl.collection.chart_upsert.gm.Variable.variable_ids_to_catalog_paths",
+            return_value=catalog_paths,
+        ),
+    ):
+        _repair_dangling_column_slugs(
+            admin_api,  # type: ignore[arg-type]
+            SimpleNamespace(engine=None),  # type: ignore[arg-type]
+            chart_id=7118,
+            rendered_config=rendered_config,
+        )
+    return admin_api
+
+
+def test_repair_remaps_a_stale_map_column_slug():
+    rendered_config = {
+        "dimensions": [{"property": "y", "variableId": 1340000}],
+        "map": {"columnSlug": "1227375", "hideTimeline": True},
+    }
+    admin_api = _repair(
+        rendered_config,
+        {
+            1227375: "grapher/animal_welfare/2026-04-16/chick_culling_laws/chick_culling_laws#status",
+            1340000: "grapher/animal_welfare/2026-09-01/chick_culling_laws/chick_culling_laws#status",
+        },
+    )
+    assert admin_api.updated_with is not None
+    assert admin_api.updated_with["map"] == {"columnSlug": "1340000", "hideTimeline": True}
+
+
+def test_repair_writes_nothing_when_the_slug_names_a_plotted_column():
+    rendered_config = {
+        "dimensions": [{"property": "y", "variableId": 1340000}],
+        "map": {"columnSlug": "1340000"},
+    }
+    admin_api = _repair(rendered_config, {1340000: "grapher/ns/2026-09-01/ds/table#col"})
+    assert admin_api.updated_with is None
+
+
+def test_repair_writes_nothing_when_there_are_no_column_slugs():
+    rendered_config = {"dimensions": [{"property": "y", "variableId": 1340000}], "map": {"hideTimeline": True}}
+    admin_api = _repair(rendered_config, {1340000: "grapher/ns/2026-09-01/ds/table#col"})
+    assert admin_api.updated_with is None
+
+
+def test_repair_writes_nothing_for_a_chart_with_no_dimensions():
+    # Guards the early return: an empty id set must not reach the DB lookup or the admin API.
+    admin_api = _repair({"dimensions": []}, {})
+    assert admin_api.updated_with is None
+
+
+def test_repair_does_not_touch_the_database_when_nothing_is_dangling():
+    # The common case on every push. Deciding it from the config alone keeps the hot path free
+    # of a query, so the lookup must not even be reached.
+    rendered_config = {
+        "dimensions": [{"property": "y", "variableId": 1340000}],
+        "map": {"columnSlug": "1340000"},
+    }
+    admin_api = _FakeAdminAPI(rendered_config)
+    with (
+        patch("etl.collection.chart_upsert.Session") as mock_session,
+        patch("etl.collection.chart_upsert.gm.Variable.variable_ids_to_catalog_paths") as mock_lookup,
+    ):
+        _repair_dangling_column_slugs(
+            admin_api,  # type: ignore[arg-type]
+            SimpleNamespace(engine=None),  # type: ignore[arg-type]
+            chart_id=7118,
+            rendered_config=rendered_config,
+        )
+    mock_session.assert_not_called()
+    mock_lookup.assert_not_called()
+    assert admin_api.updated_with is None
