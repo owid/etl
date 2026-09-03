@@ -100,6 +100,34 @@ width** (`rcParams["lines.scale_dashes"]`), so `(5, 3)` on a 1.4pt line draws a 
 the stroke width, which reads as stretched at any size. Write the pattern in multiples of the width
 and say so, or check the emitted `stroke-dasharray` against what you intended.
 
+### Measure in the font you draw in, and set the style before the first measurement
+
+`FontProperties()` with no family resolves `font.family`/`font.sans-serif` — and seaborn's `set_style`
+rewrites that list to an Arial-first one. So a step that calls `set_style` inside its build function,
+after the title and subtitle have been wrapped, measures matplotlib's **DejaVu** default and then draws
+**Arial**. The two are ~15% apart, which is far more than any slot allowance and points the wrong way:
+strings look wider than they will be set, so a slot that fits is wrapped early and the fix looks like
+"the allowance should be 1.0".
+
+Two lines prevent it. Name the stack and set it at import, next to the `svg.*` rcParams:
+
+```python
+DRAWN_FONT_STACK = ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans", "sans-serif"]
+matplotlib.rcParams["font.family"] = "sans-serif"
+matplotlib.rcParams["font.sans-serif"] = DRAWN_FONT_STACK
+```
+
+and pass it to every measurement, so the two cannot drift whatever a machine has installed:
+
+```python
+prop = FontProperties(family=DRAWN_FONT_STACK, size=fontsize, weight="bold" if bold else "normal")
+```
+
+Then check which font `findfont` actually returned before trusting the per-face allowances in
+[TEMPLATES.md](../TEMPLATES.md) — they are per installed font, and the bold row is not a rounding of
+the regular one (Arial Bold sets 6.6% wider than Lato Bold, which is enough to make a mixed-weight
+footer row fail its own step's fit assertion while setting correctly in the frame).
+
 ### Style, and where it stops
 
 - **seaborn** `set_style("ticks")` + `set_palette("deep")`, and reference colors by **palette

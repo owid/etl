@@ -146,6 +146,9 @@ for (const job of CONFIG.jobs) {
     reference.name = `${frame.name} — original SVG (unstyled)`;
     reference.x = frame.x - reference.width - job.referenceGap;
     reference.y = frame.y;
+    // Same hit-test point as the styled copy below: an unpainted frame cannot be hovered on the canvas.
+    const refPaint = Array.isArray(frame.fills) ? frame.fills.find((f) => f.type === "SOLID") : null;
+    if (refPaint) reference.fills = [{ ...refPaint, visible: true }];
   }
 
   styled.rescale(scale);
@@ -169,10 +172,19 @@ for (const job of CONFIG.jobs) {
   const painted = (n) =>
     fillsOf(n).some((f) => f.visible !== false && (f.opacity === undefined || f.opacity > 0)) ||
     ("children" in n && n.children.some(painted));
+  // Strip it whether or not it PAINTS. An unpainted patch (`fills: []`, which is what the current
+  // contract emits) hides nothing, so leaving it looks free — but it is artboard-sized, so it becomes
+  // the chart group's bounding box, and `verify_page.js`'s box-alignment, gap and margins rows then
+  // measure the artboard and report three failures that are about the canvas rather than the plot.
+  // What must survive is a STROKE-only patch: the axes spine is a `patch_N` too, and deleting it
+  // removes a line the reader can see.
+  const strokedAnywhere = (n) =>
+    (Array.isArray(n.strokes) && n.strokes.some((s) => s.visible !== false && (s.opacity === undefined || s.opacity > 0))) ||
+    ("children" in n && n.children.some(strokedAnywhere));
   for (const parent of styled.findAll((n) => CONFIG.backgroundPatchParent.test(n.name))) {
     const first = ("children" in parent ? parent.children : []).find((c) => CONFIG.backgroundPatch.test(c.name));
-    if (!first || first.removed || !painted(first)) continue;
-    strippedPatches.push(`${parent.name}/${first.name}`);
+    if (!first || first.removed || strokedAnywhere(first)) continue;
+    strippedPatches.push(`${parent.name}/${first.name}${painted(first) ? "" : " (unpainted — removed for its bbox)"}`);
     first.remove();
   }
 
@@ -240,11 +252,61 @@ for (const job of CONFIG.jobs) {
 
   const old = frame.children.find((c) => c.name === "chart");
   styled.name = "chart";
-  styled.clipsContent = false;
-  frame.appendChild(styled);
+  // Paint the import's frame with the template's own canvas, and CLIP it like the template does. An
+  // import arrives with its fill switched OFF (`SOLID`, `visible: false`), and a frame with no visible
+  // fill is not a hit target over its own empty area — so hovering the plot highlights nothing, and the
+  // chart can only be reached from the layer panel. Every frame built this route has it. Painting it
+  // costs no pixel, because the chart sits at the bottom of the z-order with the clone's identical
+  // cream beneath it (measured: max channel difference 0 across 850x1095).
+  const canvasPaint = Array.isArray(frame.fills) ? frame.fills.find((f) => f.type === "SOLID") : null;
+  if (canvasPaint) {
+    styled.fills = [{ ...canvasPaint, visible: true }];
+    if (frame.fillStyleId && frame.fillStyleId !== figma.mixed) await styled.setFillStyleIdAsync(frame.fillStyleId);
+  }
+  styled.clipsContent = true;
+  // Index 0 is the BOTTOM of the z-order, and this is a usability requirement rather than a visual
+  // one: the import is a frame the size of the whole artboard, so appended LAST it covers the header
+  // and footer, and every double-click on the subtitle or the Note then descends into `figure_1` and
+  // its gid groups instead of selecting the text. That difference between a built frame and the
+  // template is one a designer hits immediately and cannot explain. Below them, a click over the
+  // subtitle lands on the header wrapper while bars and labels still resolve into the chart, and the
+  // frame renders identically either way — measured at max channel difference 0 across 850x1095,
+  // because the wrappers carry no fill and the background patch is gone by this point.
+  frame.insertChild(0, styled);
   styled.x = 0;
   styled.y = 0;
   if (old) old.remove();
+
+  // CROP the frame to the plot's own ink, and keep clipping off so nothing is cut at the new edge.
+  // An import arrives the size of the SVG canvas, which is the artboard — so a hover or click on the
+  // plot highlights a rectangle indistinguishable from the artboard's, the plot cannot be grabbed as a
+  // unit, and there is no visible box to tell a designer what they have hold of. Cropping is what makes
+  // the plot an object: it moves nothing on the canvas, because the frame's origin shifts onto the ink
+  // and the children shift back by the same offset (verified at max channel difference 0 across a
+  // whole 850x1095 frame). It also makes `verify_page.js`'s box-alignment and gap rows measure the
+  // plot instead of the canvas — they read the real insets afterwards rather than a negative number.
+  //
+  // Do it AFTER the fit and the restyle: both are written in canvas coordinates.
+  const inkBoxes = styled
+    .findAll((n) => n.type !== "GROUP" && n.type !== "FRAME" &&
+      (painted(n) || strokedAnywhere(n)))
+    .map((n) => n.absoluteBoundingBox)
+    .filter(Boolean);
+  if (inkBoxes.length) {
+    const own = styled.absoluteBoundingBox;
+    const ink = {
+      x: Math.min(...inkBoxes.map((b) => b.x)),
+      y: Math.min(...inkBoxes.map((b) => b.y)),
+      right: Math.max(...inkBoxes.map((b) => b.x + b.width)),
+      bottom: Math.max(...inkBoxes.map((b) => b.y + b.height)),
+    };
+    const dx = ink.x - own.x, dy = ink.y - own.y;
+    styled.clipsContent = false;
+    styled.x += dx;
+    styled.y += dy;
+    styled.resizeWithoutConstraints(ink.right - ink.x, ink.bottom - ink.y);
+    for (const child of styled.children) { child.x -= dx; child.y -= dy; }
+  }
 
   // A flowed line of runs needs laying out again, one measured space apart. Rows are keyed on y
   // alone because each run of one line sits under its own `header__…`/`category__…` parent, so
