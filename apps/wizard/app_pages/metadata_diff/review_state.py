@@ -38,6 +38,35 @@ from apps.wizard.app_pages.metadata_diff.data import (
 )
 
 
+def verdict_reopened(row: dict[str, Any], index: dict[str, dict[str, str]]) -> bool:
+    """Has the text moved since this stored verdict was recorded?
+
+    The same rule `resolve_item_mark` applies to one item, for callers holding rows straight out of
+    `load_item_notes` — the Review tab and the section bar — which have no `ReviewMark` to read. Both were
+    filtering on status alone, so a decision made on wording that has since been rewritten still counted
+    as one, and a section could be badged finished over an item that had reopened.
+
+    Only for rows the index can currently hash. A chart's changed fields are assembled on the chart's own
+    page rather than enumerated in `item_index`, so a chart verdict has no current hash to compare against
+    and is reported as recorded — which is what every row did before any of this.
+    """
+    if row.get("status") not in DECIDED:
+        return False
+    current = (index.get(str(row.get("changeKey"))) or {}).get("hash")
+    return bool(current) and row.get("contentHash") != current
+
+
+def verdict_counts(row: dict[str, Any], index: dict[str, dict[str, str]]) -> bool:
+    """Does this stored row count as progress against what the page currently shows?
+
+    Three conditions, and the last two are what a bare status check misses: it has to be a decision, the
+    item has to still be in the comparison (a reverted text or an unpublished chart leaves the row behind,
+    and counting it against today's totals reads as work that is no longer there), and the wording has to
+    be the wording it was decided on.
+    """
+    return row.get("status") in DECIDED and str(row.get("changeKey")) in index and not verdict_reopened(row, index)
+
+
 @dataclass
 class ReviewMark:
     """One change group's reviewed state, resolved against what is stored."""

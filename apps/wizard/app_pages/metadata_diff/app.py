@@ -44,6 +44,7 @@ from apps.wizard.app_pages.metadata_diff.render import (
     st_section_switcher,
     st_stale_server_banner,
 )
+from apps.wizard.app_pages.metadata_diff.review_state import verdict_counts
 from apps.wizard.utils.components import st_title_with_expert
 from etl.config import OWID_ENV
 
@@ -69,19 +70,25 @@ def _review_marks(source_engine, target_engine) -> dict[str, str]:
     totals are asked for only once something has been ticked, by which point those caches are warm from
     the reading.
     """
-    ticked: dict[str, int] = {}
-    for row in load_item_notes(source_engine):
-        # Either verdict is a decision: a section every one of whose edits was rejected has been gone
-        # through, and telling its reviewer it is unfinished would be wrong.
-        if row.get("status") in DECIDED:
-            surface = str(row.get("catalogPath") or "")
-            ticked[surface] = ticked.get(surface, 0) + 1
+    # Either verdict is a decision: a section every one of whose edits was rejected has been gone
+    # through, and telling its reviewer it is unfinished would be wrong.
+    decided = [row for row in load_item_notes(source_engine) if row.get("status") in DECIDED]
 
     marks = {section: "todo" for section in ("charts", "mdims", "explorers")}
-    if not ticked:
+    if not decided:
         return marks
 
-    _index, totals = cached.item_index(source_engine, target_engine)
+    index, totals = cached.item_index(source_engine, target_engine)
+    # The index is what makes the count mean anything, and it used to be fetched and thrown away: a row
+    # keeps its status when its text is rewritten, and it keeps it when its item leaves the comparison
+    # altogether. Counting either put a ✅ on a section holding something nobody has read.
+    ticked: dict[str, int] = {}
+    for row in decided:
+        if not verdict_counts(row, index):
+            continue
+        surface = str(row.get("catalogPath") or "")
+        ticked[surface] = ticked.get(surface, 0) + 1
+
     for section, (done, total) in section_progress(ticked, totals).items():
         if total and done >= total:
             marks[section] = "done"

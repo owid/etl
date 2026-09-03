@@ -42,6 +42,7 @@ from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
     markdown_output,
 )
+from apps.wizard.app_pages.metadata_diff.review_state import verdict_counts, verdict_reopened
 
 # The PR lookup shells out, so it is asked once per session rather than on every rerun.
 _PR_CACHE_KEY = "mdd-pr-url"
@@ -56,8 +57,8 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
     # its `contentHash` no longer matches, which is how a rejection of wording nobody read reached the
     # hand-off document as an instruction to undo it. The section lists already reopen such an item
     # (`resolve_item_mark`); this reads the same current hash and applies the same rule here.
-    reopened = [r for r in rows if _reopened(r, index)]
-    settled = [r for r in rows if not _reopened(r, index)]
+    reopened = [r for r in rows if verdict_reopened(r, index)]
+    settled = [r for r in rows if not verdict_reopened(r, index)]
     ticked = [r for r in settled if r.get("status") == REVIEWED]
     rejected = [r for r in settled if r.get("status") == REJECTED]
     # Notes are the reviewer's own words and stay whatever happened to the text; only verdicts reopen.
@@ -66,6 +67,11 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
     # added, or a section finished view by view would read as unfinished for its untouched edit cards.
     by_surface: dict[str, int] = {}
     for row in [*ticked, *rejected]:
+        # `verdict_counts`, not the row alone: a decision on an item that has left the comparison is
+        # still worth listing below — it says what was recorded — but it is not progress against totals
+        # counted from what the page shows today. The section bar counts the same rows.
+        if not verdict_counts(row, index):
+            continue
         surface = str(row.get("catalogPath") or "")
         by_surface[surface] = by_surface.get(surface, 0) + 1
     progress = section_progress(by_surface, totals)
@@ -180,10 +186,10 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
     for surface, group in sorted(_by_surface(rows).items(), key=lambda kv: (not _has_rejection(kv[1]), kv[0])):
         # Reopened rows are excluded from both counts, the same rule the header and the documents apply:
         # a verdict made on wording that has since moved is not a decision about the wording there now.
-        live = [row for row in group if not _reopened(row, index)]
+        live = [row for row in group if not verdict_reopened(row, index)]
         done = sum(1 for row in live if row.get("status") in DECIDED)
         refused = sum(1 for row in live if row.get("status") == REJECTED)
-        stale = sum(1 for row in group if _reopened(row, index))
+        stale = sum(1 for row in group if verdict_reopened(row, index))
         of = totals.get(surface)
         with_note = [row for row in group if row.get("comment")]
         bare = [row for row in group if not row.get("comment")]
@@ -207,20 +213,6 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
     _footnote()
 
 
-def _reopened(row: dict[str, Any], index: dict[str, dict[str, str]]) -> bool:
-    """Has the text moved since this verdict was recorded?
-
-    Only for rows the index can currently hash. A chart's fields are assembled on its own page rather than
-    enumerated in `item_index`, so a chart verdict has no current hash to compare with and is reported as
-    recorded — the behaviour every row had before. A row whose item has left the comparison entirely is
-    not reopened either: `_row_line` already says the item is gone, which is the more useful thing to say.
-    """
-    if row.get("status") not in DECIDED:
-        return False
-    current = (index.get(str(row.get("changeKey"))) or {}).get("hash")
-    return bool(current) and row.get("contentHash") != current
-
-
 def _row_line(row: dict[str, Any], index: dict[str, dict[str, str]]) -> str:
     """One recorded item: reviewed, rejected or merely noted, named, and linked to the thing itself.
 
@@ -230,7 +222,7 @@ def _row_line(row: dict[str, Any], index: dict[str, dict[str, str]]) -> str:
     icon = {REVIEWED: "✅", REJECTED: "❌"}.get(str(row.get("status")), "📝")
     known = index.get(str(row.get("changeKey")))
     when = f" :small[:gray[{row.get('updatedAt')}]]" if row.get("updatedAt") else ""
-    if _reopened(row, index):
+    if verdict_reopened(row, index):
         when = " :orange-badge[♻️ text changed since]" + when
     if not known:
         # A row whose item is no longer in the comparison — the text was reverted, or the chart was

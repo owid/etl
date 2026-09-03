@@ -9,6 +9,7 @@ import re
 from types import SimpleNamespace
 
 import pandas as pd
+import pytest
 
 from apps.owidbot.metadata_diff import format_metadata_diff, status_icon
 from apps.wizard.app_pages.metadata_diff.brief import changed_text_lines, decision, garden_location_lines, ship_section
@@ -3221,23 +3222,31 @@ def test_a_verdict_reopens_when_the_text_it_was_made_on_moves():
     instruction to undo it.
     """
     from apps.wizard.app_pages.metadata_diff.data import NOTED, REJECTED, REVIEWED
-    from apps.wizard.app_pages.metadata_diff.review_section import _reopened
+    from apps.wizard.app_pages.metadata_diff.review_state import verdict_counts, verdict_reopened
 
     index = {"slot-a": {"name": "A view", "url": "http://x", "hash": "now"}, "chart-slot": {"name": "A chart"}}
 
     def row(change_key, content_hash, status):
         return {"changeKey": change_key, "contentHash": content_hash, "status": status}
 
-    assert not _reopened(row("slot-a", "now", REJECTED), index), "the text is as it was judged"
-    assert _reopened(row("slot-a", "before", REJECTED), index), "the text moved after the verdict"
-    assert _reopened(row("slot-a", "before", REVIEWED), index)
+    assert not verdict_reopened(row("slot-a", "now", REJECTED), index), "the text is as it was judged"
+    assert verdict_reopened(row("slot-a", "before", REJECTED), index), "the text moved after the verdict"
+    assert verdict_reopened(row("slot-a", "before", REVIEWED), index)
     # A note is not a verdict, so nothing reopens.
-    assert not _reopened(row("slot-a", "before", NOTED), index)
+    assert not verdict_reopened(row("slot-a", "before", NOTED), index)
     # No current hash to compare with — a chart, whose fields are assembled on its own page — is reported
     # as recorded rather than guessed at.
-    assert not _reopened(row("chart-slot", "before", REJECTED), index)
+    assert not verdict_reopened(row("chart-slot", "before", REJECTED), index)
     # An item no longer in the comparison is handled by the "no longer in this diff" line, not here.
-    assert not _reopened(row("gone", "before", REJECTED), index)
+    assert not verdict_reopened(row("gone", "before", REJECTED), index)
+
+    # Progress asks a stricter question than "did the text move": the item also has to still be there.
+    # The section bar badged a section ✅ over a decision whose item had left the comparison entirely.
+    assert verdict_counts(row("slot-a", "now", REJECTED), index)
+    assert verdict_counts(row("chart-slot", "anything", REVIEWED), index), "no hash is not a reason to drop it"
+    assert not verdict_counts(row("slot-a", "before", REVIEWED), index), "reopened is not progress"
+    assert not verdict_counts(row("gone", "now", REVIEWED), index), "the item is no longer in the diff"
+    assert not verdict_counts(row("slot-a", "now", NOTED), index), "a note is not a decision"
 
 
 def test_the_rejection_document_says_what_to_undo_and_where():
@@ -3821,6 +3830,51 @@ def test_a_charts_subtitle_is_credited_to_the_indicator_that_carries_it():
     stray = ChartTextChanges()
     attribute_chart_texts(stray, {}, {pip})
     assert not stray.diffs
+
+
+def test_a_version_bump_does_not_leave_a_charts_text_credited_to_nothing(monkeypatch):
+    """The bump moves every catalogPath, so the baseline holds no row under the branch's path.
+
+    Read as "this indicator has no old text", every candidate was skipped and no chart's text could be
+    credited to the dataset that authored it — on the one workflow this tool exists for. The rejection
+    document could then name no garden dataset, no file and no owner. The same version-insensitive pairing
+    the indicator comparison already uses answers it, off the config table instead of `variables`.
+    """
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    new = "grapher/wb/2026-09-02/world_bank_pip/incomes#mean"
+    old = "grapher/wb/2026-06-26/world_bank_pip/incomes#mean"
+    unbumped = "grapher/demography/2024-07-15/population/historical#population_historical"
+
+    configs = {
+        "source": {
+            new: {"title": "Mean income", "subtitle": "New wording.", "note": None},
+            unbumped: {"title": "Population", "subtitle": "Same wording.", "note": None},
+        },
+        "target": {
+            old: {"title": "Mean income", "subtitle": "Old wording.", "note": None},
+            unbumped: {"title": "Population", "subtitle": "Same wording.", "note": None},
+        },
+    }
+
+    def fake_config_texts(engine, catalog_paths):
+        return {path: fields for path, fields in configs[engine].items() if path in set(catalog_paths)}
+
+    monkeypatch.setattr(discovery, "fetch_indicator_config_texts", fake_config_texts)
+    monkeypatch.setattr(
+        discovery,
+        "baseline_counterpart_paths",
+        lambda engine, unmatched: {new: old} if new in unmatched else {},
+    )
+
+    changed = discovery.changed_indicator_configs("source", "target", [new, unbumped])
+    assert changed == {new}, "the bumped indicator's own chart text did change, and is now seen"
+
+    # The pairing is only reached for paths the exact lookup missed; an in-place edit is unaffected.
+    monkeypatch.setattr(
+        discovery, "baseline_counterpart_paths", lambda engine, unmatched: pytest.fail("no bump, no lookup")
+    )
+    assert discovery.changed_indicator_configs("source", "target", [unbumped]) == set()
 
 
 def test_the_bot_comment_counts_edits_and_not_rendered_texts():

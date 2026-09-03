@@ -569,8 +569,8 @@ def compare_indicator_texts(
     return out
 
 
-def fetch_baseline_counterparts(target_engine: Engine, unmatched: list[str]) -> dict[str, dict[str, Any]]:
-    """The baseline's rows for these indicators under whatever version it holds them.
+def baseline_counterpart_paths(target_engine: Engine, unmatched: list[str]) -> dict[str, str]:
+    """Source path -> the path the baseline uses for the same indicator, when a version bump moved it.
 
     Two cheap steps rather than one broad one: ask which version the baseline has of each dataset, then
     name the exact paths wanted by swapping that version into each unmatched path. Fetching every version
@@ -580,6 +580,10 @@ def fetch_baseline_counterparts(target_engine: Engine, unmatched: list[str]) -> 
     A table renamed between versions is not matched by this and stays reported as new — the constructed
     path names the source's table. Worth knowing rather than worth guessing at: a wrong pairing would
     diff two different indicators and call the result an edit.
+
+    Separate from the row fetch below because two comparisons need the same pairing off two different
+    tables: the indicator texts in `variables`, and the chart text a garden step authors in
+    `presentation.grapher_config`, which lives in a config of its own.
     """
     shapes = [shape for shape in (dataset_shape(path) for path in unmatched) if shape]
     versions = fetch_latest_dataset_versions(target_engine, shapes)
@@ -601,7 +605,14 @@ def fetch_baseline_counterparts(target_engine: Engine, unmatched: list[str]) -> 
         candidate = "/".join(parts) + sep + short
         if candidate != path:
             expected[path] = candidate
+    return expected
 
+
+def fetch_baseline_counterparts(target_engine: Engine, unmatched: list[str]) -> dict[str, dict[str, Any]]:
+    """The baseline's `variables` rows for these indicators, under whatever version it holds them."""
+    expected = baseline_counterpart_paths(target_engine, unmatched)
+    if not expected:
+        return {}
     rows = fetch_variable_rows_by_path(target_engine, sorted(set(expected.values())))
     # Keyed by the baseline's own path, which is what `compare_indicator_texts` matches on by identity.
     return {path: row for path, row in rows.items()}
@@ -1268,8 +1279,26 @@ def changed_indicator_configs(source_engine: Engine, target_engine: Engine, path
 
     An indicator absent from the baseline is not reported here: it has no old text to differ from, and the
     new-indicator case is already carried by `compare_indicator_texts`.
+
+    "Absent" has to survive a version bump, though. A bump moves every catalogPath, so the exact lookup
+    finds no baseline row for any of them and every candidate would be skipped — leaving the chart's text
+    credited to nothing on exactly the workflow this tool exists for, and the rejection document unable to
+    name the garden dataset, its file or its owner. The same version-insensitive pairing the indicator
+    comparison uses fills that in, off the config table rather than `variables`.
     """
     src, tgt = _both(fetch_indicator_config_texts, source_engine, target_engine, paths)
+
+    unmatched = [path for path in src if path not in tgt]
+    if unmatched:
+        try:
+            counterparts = baseline_counterpart_paths(target_engine, unmatched)
+            across = fetch_indicator_config_texts(target_engine, sorted(set(counterparts.values())))
+            for path, baseline_path in counterparts.items():
+                if baseline_path in across:
+                    tgt[path] = across[baseline_path]
+        except Exception as e:  # noqa: BLE001 — without it those indicators are unattributed, as before
+            log.warning("metadata_diff.config_counterparts_unavailable", error=str(e))
+
     changed = set()
     for path, fields in src.items():
         before = tgt.get(path)
