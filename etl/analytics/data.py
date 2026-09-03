@@ -482,7 +482,11 @@ def get_redirected_source_views(
 
     This supersedes the earlier whole-surface attribution: crediting the specific view (not the whole
     mdim) removes the over-crediting of mixed-producer mdims. Rows with a null ``viewConfigId`` in
-    ``multi_dim_redirects`` (a handful) are dropped - they can't be view-attributed.
+    ``multi_dim_redirects`` (a handful) are dropped - they can't be view-attributed. The same goes for
+    sources that fan out to MULTIPLE target views (a sunset explorer mapped view-by-view into mdims):
+    analytics only has whole-surface traffic for such a source, so it is skipped (with a warning) and its
+    period views should be disclosed separately in the affected report, as done for mixed explorers while
+    they were live.
 
     NOTE: this covers redirects recorded in ``multi_dim_redirects`` (chart→mdim and explorer→mdim, the
     only place with a ``viewConfigId``). The catch-all ``redirects_all`` log (chart→explorer,
@@ -516,6 +520,24 @@ def get_redirected_source_views(
         WHERE r.viewConfigId IS NOT NULL
         """
     )
+    # A source is only view-attributable if it redirects to a SINGLE view. A sunset explorer whose views
+    # were mapped one-by-one into mdim views produces many rows sharing the same source path; analytics
+    # only has whole-surface traffic for that path, so crediting it to any one view (or producer) would be
+    # arbitrary. Skip fanned-out sources - like the null-viewConfigId case, they can't be view-attributed.
+    # Warn about the skipped ones that would have counted for this producer, so their views can be
+    # disclosed separately in the affected report instead of silently disappearing.
+    n_targets_by_source = df_mdr.groupby("source_url")["view_config_id"].nunique()
+    fan_out = df_mdr["source_url"].map(n_targets_by_source)
+    skipped = sorted(
+        set(df_mdr.loc[(fan_out > 1) & df_mdr["view_config_id"].isin(producer_view_config_ids), "source_url"])
+    )
+    for source_url in skipped:
+        log.warning(
+            f"Skipping redirected source {source_url} (fans out to {n_targets_by_source[source_url]} views): "
+            "its whole-surface views can't be attributed to a single view or producer. If it drew traffic "
+            "in the reporting period, disclose those views separately in the affected report."
+        )
+    df_mdr = df_mdr[fan_out == 1]
     df_mdr = df_mdr[df_mdr["view_config_id"].isin(producer_view_config_ids)].copy()
     # One redirect per source URL (defensive against duplicate rows for the same source).
     df_mdr = df_mdr.drop_duplicates(subset=["source_url"]).reset_index(drop=True)
