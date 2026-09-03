@@ -10,7 +10,12 @@ a wrong verdict rather than failing. The cases below are the ones that have actu
 
 from __future__ import annotations
 
+import json
+import re
+import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -182,6 +187,224 @@ for script, calls in DOCUMENTED_CALLS.items():
     for call in calls:
         size = len(select_rows(strip_js(path.read_text()), set(call))[0])
         check(f"{script}: --rows {','.join(call)} fits the cap", size <= CAP, f"{size:,} > {CAP:,}")
+
+# --- a slice has to declare its own coverage ------------------------------------------------------
+# A slice can only fail the rows it carries. Without a stamped EMITTED_ROWS its verdict cannot name
+# what it omitted, and "no mechanical row failed" out of one documented call reads as a verdict on the
+# whole frame — the confident silence the SKIPPED rows exist to prevent, reached by slicing.
+_vp = Path(__file__).resolve().parent / "verify_page.js"
+if _vp.exists():
+    check(
+        "verify_page.js declares EMITTED_ROWS for the slicer to stamp",
+        "const EMITTED_ROWS = " in _vp.read_text(),
+        "no EMITTED_ROWS declaration",
+    )
+    for _call in DOCUMENTED_CALLS["verify_page.js"]:
+        _out = subprocess.run(
+            [sys.executable, str(Path(__file__).resolve().parent / "inline_script.py"),
+             "verify_page.js", "--rows", ",".join(_call)],
+            capture_output=True, text=True,
+        )
+        _want = "const EMITTED_ROWS = [" + ", ".join(f'"{g}"' for g in _call) + "];"
+        check(
+            f"--rows {','.join(_call)} stamps its own coverage",
+            _want in _out.stdout,
+            f"expected {_want}",
+        )
+    # The two declared lists and the file's actual #regions must agree. A region added to the script
+    # and left out of them is invisible: the slicer stamps a coverage list that omits it, and the
+    # verdict then reports full coverage for a group nobody sent. `--whole` is deliberately NOT the
+    # vehicle for this — verify_page.js is over the cap whole and correctly refuses to emit — so the
+    # invariant is read off the source.
+    _src = _vp.read_text()
+    _regions = list(dict.fromkeys(select_rows(strip_js(_src), set())[1]))
+    for _name in ("EMITTED_ROWS", "ALL_ROW_GROUPS"):
+        _m = re.search(_name + r" = \[([^\]]*)\];", _src)
+        check(f"verify_page.js declares {_name}", bool(_m), "declaration missing")
+        if _m:
+            _declared = re.findall(r'"([^"]+)"', _m.group(1))
+            check(
+                f"{_name} lists every #region exactly once",
+                _declared == _regions,
+                f"{_name} {_declared} vs regions {_regions}",
+            )
+
+# --- a slice must PARSE, not merely fit ------------------------------------------------------------
+# Fitting the cap and being valid JavaScript are different properties, and `#region` markers are what
+# separates them: a marker in the wrong place slices mid-expression and emits text that is the right
+# SIZE and syntactically broken. That surfaces in Figma as a plugin error with no clue to its cause,
+# which is the one failure mode `inline_script.py` exists to prevent. Skipped where node is absent.
+_node = shutil.which("node")
+check("node is available to parse-check the slices", bool(_node), "node not on PATH — slices unverified")
+if _node and _vp.exists():
+    _here = Path(__file__).resolve().parent
+    for _call in DOCUMENTED_CALLS["verify_page.js"]:
+        _emit = subprocess.run(
+            [sys.executable, str(_here / "inline_script.py"), "verify_page.js", "--rows", ",".join(_call)],
+            capture_output=True, text=True,
+        )
+        # verify_page.js uses top-level `return`, which is legal only inside a function — the same
+        # wrapper `use_figma` puts around the code it is handed.
+        _wrapped = "async function __w(){\n" + _emit.stdout + "\n}\n"
+        _tmp = Path(tempfile.gettempdir()) / "verify_page_slice_check.js"
+        _tmp.write_text(_wrapped)
+        _parsed = subprocess.run([_node, "--check", str(_tmp)], capture_output=True, text=True)
+        check(
+            f"--rows {','.join(_call)} emits parseable JavaScript",
+            _parsed.returncode == 0,
+            _parsed.stderr[:200],
+        )
+        _tmp.unlink(missing_ok=True)
+
+# --- discoverability: the file that cannot be pasted must say so ----------------------------------
+# This is the failure that actually happens, and it happened across several sessions: someone opens
+# verify_page.js, reads a header saying "paste the whole file as one `use_figma` call", finds it is
+# 142,000 characters, concludes the check is unrunnable, and hand-rolls a subset of the rows — which
+# reports a pass nobody earned. The slicing was documented in CHECKS.md the whole time; the script's
+# own header contradicted it, and the header is what a reader reaches first. So the claim is pinned
+# here rather than left to prose discipline.
+_skill = Path(__file__).resolve().parent.parent
+_targets = {
+    "scripts/verify_page.js": _skill / "scripts" / "verify_page.js",
+    "SKILL.md": _skill / "SKILL.md",
+    "reference/CHECKS.md": _skill / "reference" / "CHECKS.md",
+}
+# Phrases that assert the whole file goes in one call. `diff_against_template.js` genuinely IS one
+# call, so match only claims naming verify_page or its own header.
+_banned = ["paste the whole file", "in one read-only `use_figma` call"]
+for _label, _path in _targets.items():
+    if not _path.exists():
+        check(f"{_label} exists", False, str(_path))
+        continue
+    _text = _path.read_text()
+    for _phrase in _banned:
+        # CHECKS.md legitimately uses the second phrase about diff_against_template.js, so only the
+        # verify_page.js header is held to it; the docs are held to the explicit one-call claim.
+        if _label != "scripts/verify_page.js" and _phrase == "in one read-only `use_figma` call":
+            continue
+        check(
+            f"{_label} does not claim verify_page.js fits in one call ({_phrase!r})",
+            _phrase not in _text,
+            f"found {_phrase!r}",
+        )
+
+_vp_head = (_skill / "scripts" / "verify_page.js").read_text()[:3000]
+check(
+    "verify_page.js's header names inline_script.py",
+    "inline_script.py" in _vp_head,
+    "a reader who opens the file must be told how to emit it",
+)
+check(
+    "verify_page.js's header names --rows",
+    "--rows" in _vp_head,
+    "the header must carry the slicing flag, not just the tool",
+)
+check(
+    "verify_page.js's header warns against hand-rolling a subset",
+    "hand-roll" in _vp_head,
+    "the header must name the failure it is preventing",
+)
+# The spine is what an agent reads first, so the commands have to be reachable from there without
+# a detour through CHECKS.md.
+_spine = (_skill / "SKILL.md").read_text()
+check(
+    "SKILL.md Step 8c carries the emit command",
+    "inline_script.py verify_page.js --rows" in _spine,
+    "the spine must carry the command, not just a pointer",
+)
+
+# --- --config, the way a declared frame fact reaches a slice ---------------------------------------
+# CONFIG.faceted and friends are frame FACTS, and before this flag the only way to set one was to
+# hand-edit verify_page.js before emitting — which means the committed file carries one run's
+# settings, and the next run inherits them silently.
+def _run_cfg(*a: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, str(Path(__file__).resolve().parent / "inline_script.py"), "verify_page.js", *a],
+        capture_output=True, text=True,
+    )
+
+_out = _run_cfg("--rows", "series", "--config", "faceted=true")
+check("--config sets a boolean as a literal", "faceted: true," in _out.stdout, _out.stdout[:200] + _out.stderr[:200])
+check("--config leaves the other keys alone", 'chartName: "chart",' in _out.stdout, "chartName was disturbed")
+
+_out2 = _run_cfg("--rows", "series", "--config", "chartName=chart-body")
+check("--config quotes a string value", 'chartName: "chart-body",' in _out2.stdout, _out2.stdout[:200])
+
+_out3 = _run_cfg("--rows", "series", "--config", "faceted=true", "--config", "textFloor=11")
+check("--config is repeatable", "faceted: true," in _out3.stdout and "textFloor: 11," in _out3.stdout, _out3.stdout[:200])
+
+# An unknown key must be an ERROR. Silently ignoring it emits a script running on defaults while the
+# operator believes they declared something — the same confident-wrong-answer shape as a row that
+# cannot fail.
+_bad = _run_cfg("--rows", "series", "--config", "nosuchkey=true")
+check("--config refuses an unknown key", _bad.returncode != 0, f"exit {_bad.returncode}")
+check("and says why rather than just failing", "no such key" in _bad.stderr, _bad.stderr[:200])
+
+_malformed = _run_cfg("--rows", "series", "--config", "faceted")
+check("--config refuses a malformed pair", _malformed.returncode != 0, f"exit {_malformed.returncode}")
+
+# --frame-id and --config must compose: the documented call sets both.
+_both = _run_cfg("--rows", "series", "--frame-id", "12:34", "--config", "faceted=true")
+check("--frame-id and --config compose",
+      'frameId: "12:34",' in _both.stdout and "faceted: true," in _both.stdout,
+      _both.stdout[:200])
+
+# A string value must be ESCAPED, not just wrapped in a pair of quotes. The slice is pasted straight
+# into use_figma, so a value carrying a double quote or a backslash closed the string early and the
+# plugin got a syntax error with nothing in it pointing back at the flag that caused it. The emitted
+# value has to parse as JavaScript, so the assertion is that the CONFIG block still parses — checking
+# only that the characters survived would pass on the broken output too.
+_quoted = _run_cfg("--rows", "series", "--config", 'chartName=A "quoted" chart')
+check("--config escapes a double quote", _quoted.returncode == 0, _quoted.stderr[:200])
+check("and emits it as one valid JS string",
+      r'chartName: "A \"quoted\" chart",' in _quoted.stdout, _quoted.stdout[:300])
+
+_slash = _run_cfg("--rows", "series", "--config", r"chartName=share\rate")
+check("--config escapes a backslash", r'chartName: "share\\rate",' in _slash.stdout, _slash.stdout[:300])
+
+# An ARRAY has to stay an array. Quoting it into a string does not fail, it RUNS: gapTarget is truthy
+# so it survives its `||` default and then indexes character-by-character, and frameIds fails
+# Array.isArray and is silently dropped back to the single frameId. Both are documented as arrays.
+_arr = _run_cfg("--rows", "geometry", "--config", "gapTarget=[12,16]")
+check("--config keeps an array an array", "gapTarget: [12, 16]," in _arr.stdout, _arr.stdout[:300])
+check("and does not quote it into a string", 'gapTarget: "[' not in _arr.stdout, _arr.stdout[:300])
+
+# The value runs to the LAST comma on the line — a first-comma match would strand ` 16],` behind the
+# rewrite, which is a syntax error rather than a wrong value, but only for the keys that take arrays.
+check("the rest of the array is not stranded", "16]," in _arr.stdout and " 16]," not in _arr.stdout.replace("[12, 16],", ""),
+      _arr.stdout[:300])
+
+_ids = _run_cfg("--rows", "series", "--config", 'frameIds=["1:2","3:4"]')
+check("--config sets an array of strings", 'frameIds: ["1:2", "3:4"],' in _ids.stdout, _ids.stdout[:300])
+
+# A string that merely LOOKS numeric or bracketed is still whatever json says it is; a value that is
+# not JSON at all falls back to a quoted string rather than erroring.
+_notjson = _run_cfg("--rows", "series", "--config", "chartName=[unclosed")
+check("a non-JSON value falls back to a string", 'chartName: "[unclosed",' in _notjson.stdout, _notjson.stdout[:300])
+
+# The assertions above read the emitted TEXT, which is how a value that is quoted but not escaped
+# still looks right. What actually matters is that the slice PARSES after --config has rewritten it,
+# so the awkward values go through the same node --check the documented calls get.
+if _node and _vp.exists():
+    _cfg_emit = _run_cfg(
+        "--rows", "geometry",
+        "--config", "gapTarget=[12,16]",
+        "--config", 'chartName=A "quoted" chart',
+        "--config", r"frameId=1:2",
+    )
+    _cfg_tmp = Path(tempfile.gettempdir()) / "verify_page_config_check.js"
+    _cfg_tmp.write_text("async function __w(){\n" + _cfg_emit.stdout + "\n}\n")
+    _cfg_parsed = subprocess.run([_node, "--check", str(_cfg_tmp)], capture_output=True, text=True)
+    check("a --config-rewritten slice still parses", _cfg_parsed.returncode == 0, _cfg_parsed.stderr[:200])
+    _cfg_tmp.unlink(missing_ok=True)
+
+# json.loads is the arbiter: it accepts exactly the string syntax JavaScript does, so a value that
+# round-trips through it is one the plugin can parse.
+_emitted = re.search(r"\n\s*chartName:\s*(\"(?:[^\"\\]|\\.)*\"),", _quoted.stdout)
+check("the escaped value round-trips", _emitted is not None, _quoted.stdout[:300])
+check("and decodes back to what was asked for",
+      _emitted is not None and json.loads(_emitted.group(1)) == 'A "quoted" chart',
+      _emitted.group(1) if _emitted else "no match")
 
 bad = [r for r in results if not r[1]]
 for name, ok, detail in results:

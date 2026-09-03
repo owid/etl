@@ -1,0 +1,29 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: UK electricity capacity and generation by fuel between 1920 and 2020
+    description: |-
+      Estimated annual time series of the United Kingdom's electricity generation capacity and electricity generation by fuel, from 1920 to 2020, published as a special feature article of DESNZ's Energy Trends (June 2023).
+
+      Generation by fuel was not reported in the UK's official energy statistics (DUKES) before 1996. For earlier years, DESNZ estimated it from the historical series of electricity supplied and fuel input, using average generation efficiencies and average electricity used in generation by fuel, taken from DUKES 1996-2015. The data are experimental statistics and may be revised.
+    date_published: "2023-06-29"
+
+    # Citation
+    producer: Department for Energy Security and Net Zero of the UK
+    citation_full: |-
+      Department for Energy Security and Net Zero of the UK (DESNZ) - UK Electricity capacity and generation by fuel between 1920 and 2020. Energy Trends special feature article (2023).
+    attribution_short: DESNZ
+
+    # Files
+    url_main: https://www.gov.uk/government/publications/energy-trends-june-2023-special-feature-article-uk-electricity-capacity-and-generation-by-fuel-between-1920-and-2020
+    url_download: https://assets.publishing.service.gov.uk/media/649c1c09b4d6ef000c039065/UK_Electricity_capacity_and_generation_by_fuel_between_1920_and_2020.xlsx
+    date_accessed: '2026-09-01'
+
+    # License
+    license:
+      name: Open Government Licence v3.0
+      url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+outs:
+  - md5: a0b417195776d5fbf41212a2244dfa08
+    size: 152239
+    path: uk_electricity_capacity_and_generation.xlsx

@@ -1325,3 +1325,8 @@ steps:
     - data://garden/artificial_intelligence/2026-07-15/robotaxis:
       - data://meadow/artificial_intelligence/2026-07-15/robotaxis:
         - snapshot://artificial_intelligence/2026-07-15/robotaxis.csv
+  # archived; last active in abc4dd003a4f on 2026-09-02
+  data://grapher/artificial_intelligence/2026-06-08/nvidia_revenue:
+    - data://garden/artificial_intelligence/2026-06-08/nvidia_revenue:
+      - data://meadow/artificial_intelligence/2026-06-08/nvidia_revenue:
+        - snapshot://artificial_intelligence/2026-06-08/nvidia_revenue.csv

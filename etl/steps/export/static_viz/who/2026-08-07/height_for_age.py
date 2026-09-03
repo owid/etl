@@ -14,10 +14,11 @@ the far edge +2 SD rather than the 99.9th percentile then removed the asymmetry 
 one edge of a band was a standard deviation and the other a percentile. The cost is the tall upper
 tail: the band now tops out around 191 cm rather than 199, which the 200 cm axis still contains.
 
-Neither panel repeats the other sex's median. The two medians run within a few millimetres of each
-other from birth to about age 9, so a second line traces the panel's own median for two thirds of the
-range -- the same doubling that splitting the sexes into panels was meant to remove. Where the two
-sexes differ can be read off the panels at a shared gridline.
+Neither panel repeats the other sex's median. The two medians stay within about 2 cm of each other
+from birth until girls overtake boys at age 9.2 -- a couple of pixels on a 40-200 cm axis -- so a
+second line traces the panel's own median for two thirds of the range, the same doubling that
+splitting the sexes into panels was meant to remove. Where the two sexes differ can be read off the
+panels at a shared gridline.
 
 An encoding diagram names each part of the chart -- see `draw_encoding_diagram`. There is no legend
 in either version.
@@ -349,9 +350,12 @@ LAYOUTS = {
 # it fits in about 114 characters at the template's type size. Calling the whole range a *reference*
 # is also what keeps mobile honest without a Note slot to put a caveat in -- it claims only that this
 # is how the reference population's heights are distributed, not that they are heights to aim for.
-SUBTITLE = (
-    "Global growth reference for infants, children, and adolescents, as defined by the World Health Organization."
-)
+#
+# No geography word, deliberately. The under-fives standards earn one -- six countries, and WHO's own
+# claim that they apply to children everywhere -- but the 5-19 half is a reconstruction of a single
+# national sample, 22,917 US children measured between 1963 and 1975, so calling the whole range
+# 'global' over-claims on exactly the half this subtitle was hedged to protect.
+SUBTITLE = "Growth reference for infants, children, and adolescents, as defined by the World Health Organization."
 
 # The mobile template has no Note slot, so a condensed form of the note rides in the subtitle instead.
 # It says what causes the two visible steps, which is what a reader needs to know they are real rather
