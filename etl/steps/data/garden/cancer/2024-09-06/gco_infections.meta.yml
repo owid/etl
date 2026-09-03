@@ -9,15 +9,14 @@ definitions:
     display:
       # Shares and rates (the majority of indicators) show one decimal; the two count indicators override this to 0.
       numDecimalPlaces: 1
-    # NOTE: Draft "What you should know" bullets, not enabled. Each paraphrases text OWID or IARC already publishes
-    # (the tool's methodology statement, the agent list in the data, the footnote and subtitle on charts 8059-8061),
-    # but they have not been reviewed by the dataset owner. Uncomment after review to enable them.
-    # description_key:
-    #   - Estimates come from the International Agency for Research on Cancer (IARC). They apply the population attributable fractions from the study "Global burden of cancer attributable to infections in 2018" (de Martel et al., 2020) to the GLOBOCAN 2020 cancer incidence estimates.
-    #   - |-
-    #     Ten infectious agents classified as carcinogenic by IARC are covered: Helicobacter pylori, human papillomavirus (HPV), hepatitis B and C viruses, Epstein-Barr virus (EBV), human herpesvirus type 8, human T-cell lymphotropic virus, the liver flukes Opisthorchis viverrini and Clonorchis sinensis, and Schistosoma haematobium.
-    #   - Non-melanoma skin cancers are excluded because their registration is often incomplete and inconsistent across countries.
-    #   - Estimates carry uncertainty, especially for countries without population-based cancer registries or with limited data on how common these infections are.
+    description_key:
+      - Estimates come from the International Agency for Research on Cancer (IARC). They apply the population attributable fractions from the study "Global burden of cancer attributable to infections in 2018" (de Martel et al., 2020) to the GLOBOCAN 2020 cancer incidence estimates.
+      - |-
+        Ten infectious agents classified as carcinogenic by IARC are covered: Helicobacter pylori, human papillomavirus (HPV), hepatitis B and C viruses, Epstein-Barr virus (EBV), human herpesvirus type 8, human T-cell lymphotropic virus, the liver flukes Opisthorchis viverrini and Clonorchis sinensis, and Schistosoma haematobium.
+      - Non-melanoma skin cancers are excluded because their registration is often incomplete and inconsistent across countries.
+      - Estimates carry uncertainty, especially for countries without population-based cancer registries or with limited data on how common these infections are.
+      - |-
+        For four cancer types (cervical cancer, Kaposi sarcoma, anal squamous cell carcinoma, and adult T-cell leukemia and lymphoma), IARC attributes every case to an infection, so their attributable share is 100% by construction rather than an observed value.
   # Readable labels for the three dimensions. The source labels are kept as dimension values (so indicator short names
   # do not change); only the displayed text is rewritten. "Other Non-Hodkin lymphoma" is a typo in the source.
   cases_of: |-
