@@ -13,10 +13,11 @@ import difflib
 import hashlib
 import html
 import json
+import re
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Any
-from urllib.parse import quote, urlencode
+from urllib.parse import quote, unquote, urlencode
 
 from etl.files import ruamel_dump
 
@@ -1226,3 +1227,36 @@ def foreign_params(section: str, keys: Iterable[str]) -> list[str]:
         if key in known or key.startswith(known_prefixes):
             out.append(key)
     return out
+
+
+# A chart id inside an admin URL, and a slug inside a grapher URL. Searched rather than matched from the
+# start, so the host does not matter: production, a staging server and a bare path all parse the same.
+_ADMIN_CHART_RE = re.compile(r"admin/charts/(\d+)")
+_GRAPHER_SLUG_RE = re.compile(r"grapher/([^/?#]+)")
+
+
+def parse_chart_ref(text: str) -> tuple[int | None, str | None]:
+    """(chart id, slug) from whatever a reviewer pasted — one of the two, or neither.
+
+    A reviewer arrives holding a link, and which link depends on where they were: a reader's
+    `ourworldindata.org/grapher/…`, the same path on a staging server, an admin editor URL from either,
+    a bare slug, or a chart id out of a spreadsheet. All of them name one chart and all of them are
+    reasonable to paste.
+
+    The admin form is why this is not a one-liner: `…/admin/charts/1234/edit` ends in `edit`, so taking
+    the last path segment as the slug looked up a chart called "edit" and reported nothing found.
+    """
+    ref = (text or "").strip()
+    if not ref:
+        return None, None
+    if ref.isdigit():
+        return int(ref), None
+    admin = _ADMIN_CHART_RE.search(ref)
+    if admin:
+        return int(admin.group(1)), None
+    grapher = _GRAPHER_SLUG_RE.search(ref)
+    if grapher:
+        return None, unquote(grapher.group(1))
+    # A bare slug, or a path that names neither: the last segment, without query or fragment.
+    tail = ref.split("#")[0].split("?")[0].rstrip("/").split("/")[-1]
+    return None, tail or None

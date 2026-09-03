@@ -14,7 +14,12 @@ from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 from structlog import get_logger
 
-from apps.wizard.app_pages.metadata_diff.core import METADATA_FIELDS, ViewBundle, build_view_bundle
+from apps.wizard.app_pages.metadata_diff.core import (
+    METADATA_FIELDS,
+    ViewBundle,
+    build_view_bundle,
+    parse_chart_ref,
+)
 from etl.db import read_sql
 
 log = get_logger()
@@ -456,26 +461,32 @@ def fetch_chart_text(engine: Engine, config_uuids: list[str]) -> dict[str, dict[
     return out
 
 
-def resolve_chart(engine: Engine, ref: str) -> dict[str, Any] | None:
-    """Resolve a published chart by numeric id, slug, or a grapher URL. Returns its id/slug/FAUST."""
-    ref = (ref or "").strip()
-    if not ref:
-        return None
-    if ref.isdigit():
-        where, params = "c.id = %(v)s", {"v": int(ref)}
-    else:
-        slug = ref.rstrip("/").split("/")[-1].split("?")[0]  # tolerate a full /grapher/<slug>?… URL
+def resolve_chart(engine: Engine, ref: str, include_drafts: bool = False) -> dict[str, Any] | None:
+    """Resolve a chart from anything that names one — id, slug, grapher URL or admin URL.
+
+    `include_drafts` for the lookup box, where a reviewer may well paste an unpublished chart and "not
+    found" would be the wrong answer: the row carries `is_published` so the caller can say which it is.
+    Left off by default, because every other caller counts reach and a draft is not reach.
+    """
+    chart_id, slug = parse_chart_ref(ref)
+    if chart_id is not None:
+        where, params = "c.id = %(v)s", {"v": chart_id}
+    elif slug:
         where, params = "cc.slug = %(v)s", {"v": slug}
+    else:
+        return None
+    published = "" if include_drafts else " and c.publishedAt is not null"
     df = read_sql(
         f"""
         select c.id as chartId,
                cc.slug as slug,
+               c.publishedAt is not null as is_published,
                cc.config ->> '$.title' as title,
                cc.config ->> '$.subtitle' as subtitle,
                cc.config ->> '$.note' as note
         from charts c
         join chart_configs cc on cc.id = c.configId
-        where {where} and c.publishedAt is not null
+        where {where}{published}
         limit 1
         """,
         engine=engine,
@@ -484,6 +495,25 @@ def resolve_chart(engine: Engine, ref: str) -> dict[str, Any] | None:
     if df.empty:
         return None
     return {str(k): v for k, v in df.iloc[0].to_dict().items()}
+
+
+def fetch_chart_indicator_paths(engine: Engine, chart_id: int) -> list[str]:
+    """The catalogPaths of every indicator a chart renders — what decides whether it was compared at all.
+
+    A chart outside the branch's scope was never compared, and saying "no metadata change" about it would
+    be a claim the tool has not tested.
+    """
+    df = read_sql(
+        """
+        select distinct v.catalogPath as catalogPath
+        from chart_dimensions cd
+        join variables v on v.id = cd.variableId
+        where cd.chartId = %(id)s and v.catalogPath is not null
+        """,
+        engine=engine,
+        params={"id": int(chart_id)},
+    )
+    return [str(p) for p in df["catalogPath"].tolist() if p]
 
 
 def build_chart_bundle(engine: Engine, ref: str) -> tuple[ViewBundle, dict[str, Any]] | None:

@@ -22,10 +22,11 @@ from apps.wizard.app_pages.metadata_diff.core import (
     ChangeGroup,
     group_changes,
     group_usage,
+    parse_chart_ref,
     requested_chart,
     version_pairs,
 )
-from apps.wizard.app_pages.metadata_diff.data import load_reviews
+from apps.wizard.app_pages.metadata_diff.data import fetch_chart_indicator_paths, load_reviews, resolve_chart
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
     DIFF_CSS,
@@ -36,6 +37,10 @@ from apps.wizard.app_pages.metadata_diff.review_state import (
     item_marker,
     surface_key,
 )
+
+# The lookup box's value. Session-only: `?chart=` routes the Chart-by-chart picker, which lists only what
+# changed, so a lookup for an unchanged chart would have nothing there to point at.
+LOOKUP_KEY = "mdd-chart-lookup"
 
 
 def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -> None:
@@ -79,6 +84,13 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
         f"**{n_charts} published chart{'s' if n_charts != 1 else ''}**",
     )
     _extra_notes(changed)
+    # Its own control, before the two layouts: a reviewer arriving with a link is asking a different
+    # question from either list — "did this one change?" — and the answer is often no, which no list can
+    # give. Collapsed until used, and it stays open once it holds an answer.
+    lookup = str(st.session_state.get(LOOKUP_KEY) or "").strip()
+    with st.expander("🔎 Check one chart — paste a link, a slug or an id", expanded=bool(lookup)):
+        _chart_lookup(source_engine, target_engine)
+
     col_layout, col_reject = st.columns([4, 1], vertical_alignment="center")
     with col_layout:
         layout = st_layout_switcher(
@@ -95,6 +107,85 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
     # One card per authored edit, every chart it reaches counted once. The per-text cards this replaces
     # showed a shared edit once per wording it rendered into.
     edits_view.st_edit_cards(source_engine, target_engine, cached.summary(source_engine, target_engine), "charts")
+
+
+def _chart_lookup(source_engine: Engine, target_engine: Engine) -> None:
+    """Did this branch change one particular chart's metadata? Including when the answer is no.
+
+    The two lists only hold what changed, so they cannot answer a question about a chart that did not —
+    and "no, this one is untouched" is the answer a reviewer is usually after when they arrive holding a
+    link. Three outcomes, kept apart because they are three different facts:
+
+    - **changed** — the same review Chart by chart renders, since it is the same question answered.
+    - **compared, unchanged** — its indicators were in scope and their texts match the baseline.
+    - **never compared** — nothing this branch rebuilt feeds this chart, so the tool has not looked. Said
+      as such rather than as "unchanged", which would be a claim it has not tested.
+    """
+    st.text_input(
+        "Chart",
+        key=LOOKUP_KEY,
+        placeholder="ourworldindata.org/grapher/… · an admin link · a slug · a chart id",
+        label_visibility="collapsed",
+        help="A reader's link or a staging one, an admin editor URL from either, a bare slug, or the id.",
+    )
+    ref = str(st.session_state.get(LOOKUP_KEY) or "").strip()
+    if not ref:
+        return
+
+    chart_id, slug = parse_chart_ref(ref)
+    if chart_id is None and not slug:
+        st.warning("That does not name a chart. Paste a grapher or admin link, a slug, or an id.")
+        return
+
+    chart = resolve_chart(source_engine, ref, include_drafts=True)
+    if chart is None:
+        st.warning(
+            f"No chart on this staging server matches “{ref}”. It may not exist here yet, or the link may "
+            "point at something else — a slug that has since been renamed still resolves on production."
+        )
+        return
+
+    name = str(chart.get("title") or chart["slug"])
+    head = f"**{name}** · `{chart['slug']}` · id `{chart['chartId']}`"
+    if not chart.get("is_published", True):
+        head += " · :orange-badge[📝 unpublished]"
+    st.markdown(head)
+
+    counts = cached.changed_charts(source_engine, target_engine)
+    if str(chart["slug"]) in counts:
+        n = counts[str(chart["slug"])]
+        st.warning(f"**This branch changes {n} text{'s' if n != 1 else ''} on this chart.** Below, in full:")
+        recorded = load_reviews(source_engine, surface_key("item", "chart"))
+        # The same structure Chart by chart renders: it is the same question, answered the same way.
+        mdim_pages.render_chart_by_ref(source_engine, target_engine, str(chart["slug"]), recorded)
+        return
+
+    # Not in the changed set. Whether that means "unchanged" or "not looked at" depends on scope.
+    changed = cached.indicator_changes(source_engine, target_engine)
+    paths = fetch_chart_indicator_paths(source_engine, int(chart["chartId"]))
+    compared = [path for path in paths if path in changed.ids]
+    if compared:
+        st.success(
+            f"**No metadata change on this branch.** Its {len(compared)} indicator"
+            f"{'s' if len(compared) != 1 else ''} {'were' if len(compared) != 1 else 'was'} compared "
+            f"against `{BASELINE_NAME}` and every text matches. Its own chart config was compared too."
+        )
+        return
+    st.info(
+        f"**Not compared.** Nothing this branch rebuilt feeds this chart, so its metadata was never "
+        f"diffed against `{BASELINE_NAME}` — which is not the same as knowing it is unchanged. "
+        + (
+            f"It renders {len(paths)} indicator{'s' if len(paths) != 1 else ''}, none from a dataset this "
+            "branch touches."
+            if paths
+            else "No indicator of it could be resolved to a catalogPath."
+        )
+    )
+    if not changed.narrowed:
+        st.caption(
+            "This branch's changed files could not be read from git, so what counts as in scope is itself "
+            "uncertain here."
+        )
 
 
 def _chart_browser(source_engine: Engine, target_engine: Engine, groups, usage: dict, chart_text) -> None:

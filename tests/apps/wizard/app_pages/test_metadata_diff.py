@@ -3437,6 +3437,41 @@ def test_a_dataset_update_is_diffed_across_the_version_bump():
     assert compare_indicator_texts({fresh: row(fresh, "brand_new", "New.")}, {}, others).new_paths == {fresh}
 
 
+def test_a_chart_can_be_named_by_any_link_a_reviewer_holds():
+    """A reviewer arrives holding whichever link they were looking at, and all of them name one chart.
+
+    The admin form is the one that broke: `…/admin/charts/1234/edit` ends in `edit`, so taking the last
+    path segment as a slug looked up a chart called "edit" and reported nothing found.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import parse_chart_ref
+
+    # A reader's link, with and without the parameters a shared link carries.
+    assert parse_chart_ref("https://ourworldindata.org/grapher/life-expectancy") == (None, "life-expectancy")
+    assert parse_chart_ref("https://ourworldindata.org/grapher/life-expectancy?tab=map&country=~ESP") == (
+        None,
+        "life-expectancy",
+    )
+    assert parse_chart_ref("http://staging-site-metadata-diff/grapher/life-expectancy#chart") == (
+        None,
+        "life-expectancy",
+    )
+    # An admin editor URL, from production and from a staging server.
+    assert parse_chart_ref("https://admin.owid.io/admin/charts/1234/edit") == (1234, None)
+    assert parse_chart_ref("http://staging-site-metadata-diff/admin/charts/1234/edit") == (1234, None)
+    assert parse_chart_ref("https://admin.owid.io/admin/charts/1234") == (1234, None)
+    # A bare slug and a bare id.
+    assert parse_chart_ref("life-expectancy") == (None, "life-expectancy")
+    assert parse_chart_ref("  1234  ") == (1234, None)
+    # A percent-encoded slug, as a copied link may carry.
+    assert parse_chart_ref("https://ourworldindata.org/grapher/co%E2%82%82-emissions") == (
+        None,
+        "co₂-emissions",
+    )
+    # Nothing at all.
+    assert parse_chart_ref("") == (None, None)
+    assert parse_chart_ref("   ") == (None, None)
+
+
 def test_the_bar_says_a_section_can_be_read_either_way():
     """The two ways through a section are what the badges count, so the bar has to name them.
 
