@@ -77,7 +77,7 @@ tables:
           title_public: Share of new {definitions.cases_of} caused by {definitions.agent_phrase}{definitions.among_sex}
 
       asir:
-        title: New {definitions.cases_of} per 100,000 {definitions.people} (age-standardized)
+        title: Age-standardized rate of new {definitions.cases_of}, per 100,000 {definitions.people}
         description_short: Estimated number of new {definitions.cases_of} per 100,000 {definitions.people}, age-standardized so that populations with different age structures can be compared.
         unit: cases per 100,000 {definitions.people}
         presentation:
@@ -85,7 +85,7 @@ tables:
             note: "{definitions.footnote}"
 
       asir_att:
-        title: New {definitions.cases_of} caused by {definitions.agent_phrase} per 100,000 {definitions.people} (age-standardized)
+        title: Age-standardized rate of new {definitions.cases_of} caused by {definitions.agent_phrase}, per 100,000 {definitions.people}
         description_short: Estimated number of new {definitions.cases_of} attributed to {definitions.agent_phrase} per 100,000 {definitions.people}, age-standardized so that populations with different age structures can be compared.
         unit: cases per 100,000 {definitions.people}
         presentation:
