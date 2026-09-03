@@ -11,7 +11,6 @@ import io
 import re
 from pathlib import Path
 
-import click
 import pandas as pd
 import pdfplumber
 import requests
@@ -25,7 +24,13 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 
 # Source PDFs published by NVIDIA Investor Relations. Each PDF reports several
 # quarters; we keep historical PDFs for depth and the latest PDF for new data.
+#
+# NOTE: NVIDIA's filenames follow no stable convention (compare Q227 and Q127
+# below), so don't guess the next quarter's URL. Read it off their own
+# investor-site feed, where the file is tagged DocumentCategory "revenue":
+#   https://investor.nvidia.com/feed/FinancialReport.svc/GetFinancialReportList?LanguageId=1&ReportTypeId=&ReportSubTypeId=&Year=<fiscal_year>&PageSize=100
 PDF_URLS = {
+    "Q2FY27": "https://s201.q4cdn.com/141608511/files/doc_financials/2027/Q227/Q227-Revenue-by-Market-Platform-Slides.pdf",
     "Q1FY27": "https://s201.q4cdn.com/141608511/files/doc_financials/2027/Q127/Rev_by_Mkt_Qtrly_Trend_Q127-NEW-v3.pdf",
     "Q4FY26": "https://s201.q4cdn.com/141608511/files/doc_financials/2026/Q426/Rev_by_Mkt_Qtrly_Trend_Q426.pdf",
     "Q3FY26": "https://s201.q4cdn.com/141608511/files/doc_financials/2026/Q326/Rev_by_Mkt_Qtrly_Trend_Q326.pdf",
@@ -45,6 +50,12 @@ PDF_URLS = {
 # which the four non-Data-Center segments are rolled into a single "Edge
 # Computing" line, and Data Center is sub-split into Hyperscale + ACIE).
 NEW_PRESENTATION_FROM = (2027, 1)  # (fiscal_year, fiscal_quarter)
+
+
+def run(upload: bool = True) -> None:
+    snap = Snapshot(f"artificial_intelligence/{SNAPSHOT_VERSION}/nvidia_revenue.csv")
+    df = extract_nvidia_revenue()
+    snap.create_snapshot(upload=upload, data=df)
 
 
 def _parse_source_label(label: str) -> tuple[int, int]:
@@ -284,15 +295,3 @@ def extract_nvidia_revenue() -> pd.DataFrame:
 
     log.info("extraction_complete", rows=len(df), sources=df["source_pdf"].nunique(), segments=df["segment"].nunique())
     return df
-
-
-@click.command()
-@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-def main(upload: bool) -> None:
-    snap = Snapshot(f"artificial_intelligence/{SNAPSHOT_VERSION}/nvidia_revenue.csv")
-    df = extract_nvidia_revenue()
-    snap.create_snapshot(upload=upload, data=df)
-
-
-if __name__ == "__main__":
-    main()
