@@ -18,15 +18,20 @@ Three things keep the digest worth reading, and all three are about restraint:
 
 from __future__ import annotations
 
+import functools
 import json
 import re
 from datetime import datetime, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
+from slack_sdk.errors import SlackClientError
 from structlog import get_logger
 
 from apps.chart_critic.critic import format_views
 from etl.paths import CACHE_DIR
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 log = get_logger()
 
@@ -34,13 +39,25 @@ STATE_PATH = CACHE_DIR / "chart_critic" / "digest_state.json"
 SLACK_CHANNEL = "C03NV9Z3YSV"  # #we-need-to-correct-it
 ADMIN_URL = "https://admin.owid.io"
 
+# Accounts that turn up as a chart's last editor without a person behind them.
+SERVICE_ACCOUNTS = {"etl@ourworldindata.org"}
+
 # Matches #analytics-bites, the other daily owidbot post in this workspace: a severity dot, then
 # facts separated by wide middots. Consistency is worth more than a bespoke shape — people learn
 # one scanning pattern.
 SEVERITY_DOT = {"high": ":red_circle:", "medium": ":large_orange_circle:", "low": ":large_yellow_circle:"}
 
+# On every finding rather than once in the lead. The lead says what the sweep was; this says what
+# the claim is worth, and it is the finding that gets forwarded, quoted and replied to on its own.
+# Plain italics, no nested code span: Slack mrkdwn renders nested formatting unreliably.
+CAVEAT = "_A chart-critic claim to check, not a confirmed error._"
+
 # What a person reads over coffee. If the sweep found more, the ranking is the deliverable.
 MAX_FINDINGS = 5
+
+# The digest file is the record of what was sent, and a digest is now several messages. They are
+# joined by this marker so the file shows the split that the channel will see.
+MESSAGE_SEPARATOR = "\n\n----- next message -----\n\n"
 
 
 def changed_slugs(days: int = 1, include_data_updates: bool = False) -> list[str]:
@@ -88,8 +105,9 @@ def changed_slugs(days: int = 1, include_data_updates: bool = False) -> list[str
     return sorted(slugs)
 
 
-def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
-    """``{slug: {"chart_id": int | None, "indicators": [catalog paths]}}`` for the flagged charts.
+def chart_facts(results: list[dict[str, Any]], editor_window_days: int | None = None) -> dict[str, dict[str, Any]]:
+    """What the digest needs to know about each flagged chart beyond the review itself:
+    ``{slug: {"chart_id", "indicators", "editor"}}``.
 
     A data-level defect lives in an indicator, not in a chart, so the same claim surfaces on
     every chart sharing that column. This already happened: the UK coal share above 100% was
@@ -102,26 +120,42 @@ def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     public slug will not do. A multi-dim view has no row here, so it has no id and gets no edit
     link; that is correct rather than missing, since there is no single chart to edit.
 
+    It also yields the chart's last editor, who is who a finding gets addressed to — see
+    :func:`attach_mentions` for when we may name them. ``editor_window_days`` is the sweep's own
+    window, and an editor whose edit falls outside it is reported as unknown: selection is on
+    ``chart_configs.updatedAt``, which an ETL upsert or a chart sync bumps without anybody
+    editing anything, so "this chart changed" is not on its own evidence about who changed it.
+
     Only flagged charts are looked up, so this is one small query. It fails soft: without a
     database the fingerprint falls back to the slug (which over-reports rather than dropping a
-    finding) and the message simply carries no edit link.
+    finding) and the message simply carries no edit link and names nobody.
     """
     slugs = sorted({r["slug"] for r in results if r.get("issues")})
     if not slugs:
         return {}
     from etl.db import read_sql
 
+    # A literal fragment, and the window itself stays a bound parameter.
+    edited_in_window = (
+        "AND c.lastEditedAt >= NOW() - INTERVAL %(editor_days)s DAY" if editor_window_days is not None else ""
+    )
     try:
         df = read_sql(
-            """
-            SELECT cc.slug AS slug, c.id AS chartId, v.catalogPath AS catalogPath
+            f"""
+            SELECT cc.slug        AS slug,
+                   c.id           AS chartId,
+                   u.fullName     AS editorName,
+                   u.email        AS editorEmail,
+                   u.isActive     AS editorActive,
+                   v.catalogPath  AS catalogPath
             FROM chart_configs cc
             JOIN charts c            ON c.configId = cc.id
             JOIN chart_dimensions cd ON cd.chartId = c.id
             JOIN variables v         ON v.id = cd.variableId
+            LEFT JOIN users u        ON u.id = c.lastEditedByUserId {edited_in_window}
             WHERE cc.slug IN %(slugs)s
             """,
-            params={"slugs": tuple(slugs)},
+            params={"slugs": tuple(slugs), "editor_days": editor_window_days},
         )
     except Exception as e:  # noqa: BLE001 — dedup quality and a link, not correctness
         log.warning("chart_critic.chart_facts_failed", error=str(e))
@@ -132,8 +166,77 @@ def chart_facts(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
         # Keyed on the step path without its version, so tomorrow's re-run of the same step does
         # not re-post yesterday's finding under a new name.
         paths = sorted({re.sub(r"/\d{4}-\d{2}-\d{2}/", "/", p) for p in group["catalogPath"] if isinstance(p, str)})
-        out[str(slug)] = {"chart_id": int(group["chartId"].iloc[0]), "indicators": paths}
+        out[str(slug)] = {
+            "chart_id": int(group["chartId"].iloc[0]),
+            "indicators": paths,
+            "editor": _editor(group),
+        }
     return out
+
+
+def _editor(group: pd.DataFrame) -> dict[str, str] | None:
+    """The chart's last editor, or ``None`` when the account is gone or has left.
+
+    One chart per slug, so the editor columns are constant across the group's rows.
+    """
+    name, email, active = group["editorName"].iloc[0], group["editorEmail"].iloc[0], group["editorActive"].iloc[0]
+    if not isinstance(name, str) or not active:
+        return None
+    return {"name": name, "email": str(email) if isinstance(email, str) else ""}
+
+
+@functools.cache
+def _slack_member_id(email: str) -> str | None:
+    """Slack member id for an email address, or ``None`` if Slack does not know it.
+
+    Resolved at run time rather than stored: ``users.lookupByEmail`` (the owidbot token carries
+    ``users:read.email``) is exact and always current, where a handle written down next to the
+    grapher account would go stale silently the first time someone's Slack account changes.
+    """
+    from etl import config
+    from etl.slack_helpers import slack_client
+
+    if not config.SLACK_API_TOKEN:
+        return None
+    try:
+        return str(slack_client.users_lookupByEmail(email=email)["user"]["id"])
+    # Slack refusing to answer (SlackClientError covers both an API error and a malformed
+    # request) and Slack being unreachable (a DNS failure, a timeout, a reset connection — all
+    # OSError under the SDK's urllib transport) have the same right answer: fall back to the
+    # plain name. A courtesy in a footer must not be able to fail a --digest run.
+    except (SlackClientError, OSError) as e:
+        log.warning("chart_critic.slack_lookup_failed", email=email, error=str(e))
+        return None
+
+
+def attach_mentions(facts: dict[str, dict[str, Any]], tag_last_editor: bool) -> None:
+    """Resolve each chart's editor to a Slack mention, in place, before any message is built.
+
+    A finding addressed to nobody gets read and forgotten, so a finding names the person who
+    last edited the chart — but only when ``tag_last_editor`` says the sweep earns it. That is
+    the configuration-edit sweep, where the chart is under review *because* of a recent edit and
+    "you changed this, it may be off" is a fair thing to say. In any other selection the last
+    editor may have changed a colour two years ago, and naming them is noise at best.
+
+    The other half of that rule lives in :func:`chart_facts`, which reports no editor at all
+    unless their edit is inside the sweep's window — so a longer ``--changed-since`` widens who
+    can be named exactly as far as it widens what the digest says it reviewed, and no further.
+
+    Called once from the CLI so the Slack lookups happen in one visible place and the message
+    formatting stays a pure function of its inputs. Fails soft to the plain name: an unresolved
+    person reads as "last edited by Pablo Rosado", which still says who to ask, rather than as a
+    broken mention.
+    """
+    for chart in facts.values():
+        editor = (chart.get("editor") or {}) if tag_last_editor else {}
+        name, email = editor.get("name"), editor.get("email")
+        # An ETL grapher step upserting a config shows up as a last editor with no person behind
+        # it, so it is named neither as a mention nor as a plain name — there is nobody to tell.
+        if not name or email in SERVICE_ACCOUNTS:
+            chart["editor_mention"] = None
+            continue
+        member_id = _slack_member_id(email) if email else None
+        chart["editor_mention"] = f"<@{member_id}>" if member_id else name
 
 
 def _indicators(facts: dict[str, dict[str, Any]] | None, slug: str) -> list[str]:
@@ -215,6 +318,30 @@ def _chart_title(result: dict[str, Any]) -> str:
     return result["slug"]
 
 
+def _format_finding(
+    result: dict[str, Any], issue: dict[str, Any], facts: dict[str, dict[str, Any]] | None = None
+) -> str:
+    """One finding as its own message: a linked bold title, the claim in a sentence, a footer of
+    severity, readership, an admin edit link and whoever last edited the chart, and the caveat.
+
+    Self-contained on purpose. It is read next to the lead message but it is also what someone
+    quotes, forwards or replies to on its own, so it carries the link, the edit action and — the
+    part that would otherwise be left behind in the lead — what the claim is actually worth.
+    """
+    chart = (facts or {}).get(result["slug"]) or {}
+    url = issue.get("url") or f"https://ourworldindata.org/grapher/{result['slug']}"
+    dot = SEVERITY_DOT.get(issue.get("severity", "low"), ":large_yellow_circle:")
+    footer = [f"{dot} {issue.get('severity', 'low')} · {issue.get('kind', 'chart')}-level"]
+    if views := format_views(result.get("views")):
+        footer.append(views)
+    if chart_id := chart.get("chart_id"):
+        footer.append(f"<{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit chart>")
+    if editor := chart.get("editor_mention"):
+        footer.append(f"last edited by {editor}")
+    claim = issue.get("claim", "").rstrip(".")
+    return f"*<{url}|{_chart_title(result)}>*\n{claim}.\n{'   ·   '.join(footer)}\n{CAVEAT}"
+
+
 def format_slack(
     findings: list[tuple[dict[str, Any], dict[str, Any]]],
     reviewed: int,
@@ -223,15 +350,19 @@ def format_slack(
     window_days: int | None = None,
     facts: dict[str, dict[str, Any]] | None = None,
     cost: float = 0.0,
-) -> str:
-    """Slack mrkdwn — single asterisks for bold, in the shape #analytics-bites uses.
+) -> list[str]:
+    """The digest as separate Slack mrkdwn messages — single asterisks for bold, in the shape
+    #analytics-bites uses.
 
-    Each finding is a linked bold title, the claim in a sentence, and a footer of severity,
-    readership and an admin edit link. Matching the other daily owidbot post is deliberate: it
-    is one scanning pattern to learn, and the edit link is what turns a report into an action.
+    A lead message saying what was swept and what it cost, then **one message per finding**. The
+    findings used to be one message, which gave the whole digest a single thread: every reply
+    about one chart landed in the same place as the replies about the others, and a fix on one
+    could not be acknowledged without noise for the rest. One message each gives every claim its
+    own thread, which is where the adjudication belongs. The lead stays separate rather than
+    riding on the first finding, so the first finding is not privileged.
     """
     if not findings:
-        return ""
+        return []
 
     shown = findings[:MAX_FINDINGS]
     # Say what was actually reviewed. A header claiming "changed since yesterday" on a run that
@@ -243,38 +374,24 @@ def format_slack(
     else:
         scope = "Charts reviewed"
     truncated = "" if reviewed >= candidates else f" of {candidates}"
-    header = (
+    lead = [
         f"{scope} — reviewed {reviewed}{truncated}, {len(findings)} worth a look"
         + (f" (showing the top {len(shown)})" if len(findings) > len(shown) else "")
-        + ":"
-    )
-
-    lines = [header]
-    for result, issue in shown:
-        url = issue.get("url") or f"https://ourworldindata.org/grapher/{result['slug']}"
-        dot = SEVERITY_DOT.get(issue.get("severity", "low"), ":large_yellow_circle:")
-        footer = [f"{dot} {issue.get('severity', 'low')} · {issue.get('kind', 'chart')}-level"]
-        if views := format_views(result.get("views")):
-            footer.append(views)
-        chart_id = (facts or {}).get(result["slug"], {}).get("chart_id")
-        if chart_id:
-            footer.append(f"<{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit chart>")
-        lines.append(
-            f"\n*<{url}|{_chart_title(result)}>*\n{issue.get('claim', '').rstrip('.')}.\n{'   ·   '.join(footer)}"
-        )
-    lines.append("")
+        + (", each posted separately below." if len(shown) > 1 else ", posted below."),
+        "",
+    ]
     # What the run cost, in the footer. It is the sweep's actual model spend, so a day whose
     # charts were all already reviewed reads as $0.00 — the cache doing its job, not an error.
     # The gating --eval run is a separate invocation and is not counted here.
     spend = f"${cost:,.2f}" if cost >= 0.01 else "<$0.01"
-    lines.append(
+    lead.append(
         "_Posted by `etl chart-critic` — an LLM reading each chart, its metadata and its values. "
-        "Each of these is a claim to check rather than a confirmed error. "
         f"Reviewing {reviewed} chart{'s' if reviewed != 1 else ''} cost {spend}._"
     )
     if incomplete:
-        lines.append(f"_{incomplete} chart(s) could not be reviewed, so treat this as incomplete._")
-    return "\n".join(lines)
+        lead.append(f"_{incomplete} chart(s) could not be reviewed, so treat this as incomplete._")
+
+    return ["\n".join(lead)] + [_format_finding(result, issue, facts) for result, issue in shown]
 
 
 def stamp(
