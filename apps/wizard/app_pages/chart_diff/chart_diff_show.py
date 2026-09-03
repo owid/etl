@@ -8,7 +8,7 @@ import difflib
 import json
 import os
 from functools import cached_property
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 import pandas as pd
 import streamlit as st
@@ -31,7 +31,7 @@ from apps.wizard.app_pages.chart_diff.conflict_resolver import (
 )
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS, SOURCE, TARGET, prettify_date
 from apps.wizard.utils.components import grapher_chart
-from etl.config import OWID_ENV
+from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher.io import variable_metadata_df_from_s3
 
 log = get_logger()
@@ -558,13 +558,38 @@ class ChartDiffShow:
                 st.session_state[cache_key] = (response, cost_msg)
         st.caption(cost_msg)
 
+    def _chart_header_row(self, height: int | Literal["content"] = "content"):
+        """Row for a chart's header: title on the left, admin link pushed to the right.
+
+        A fixed `height` keeps both columns' headers the same size when one of them
+        shows the taller revision selectbox.
+        """
+        return st.container(
+            border=False,
+            height=height,
+            horizontal=True,
+            horizontal_alignment="distribute",
+            vertical_alignment="center",
+        )
+
+    def _show_edit_link(self, owid_env: OWIDEnv) -> None:
+        """Link to the chart's edit page in the admin of the given environment.
+
+        Grapher's own "Edit" entry in the share menu never shows up here: we mount the
+        chart with the npm package inside a srcdoc iframe, where none of the signals it
+        uses to detect an internal user (admin cookie, host name) can apply.
+        """
+        if not self.diff.chart_id:
+            return
+        st.markdown(f"[:material/edit: Edit]({owid_env.admin_site}/charts/{self.diff.chart_id}/edit)")
+
     def _show_chart_comparison(self) -> tuple[Any, bool]:
         """Show charts (horizontally or vertically)."""
 
         def _show_chart_old():
             last_approved_revision = self.last_approved_revision
             if (last_approved_revision is not None) and (not self.diff.in_conflict):
-                with st.container(height=40, border=False):
+                with self._chart_header_row(height=40):
                     options = {
                         "prod": self._header_production_chart_plain,
                         "last": f"Last approved on staging ({prettify_date(last_approved_revision)} - REV {last_approved_revision.id})",
@@ -576,6 +601,7 @@ class ChartDiffShow:
                         key=f"prod-review-{self.diff.chart_id}",
                         label_visibility="collapsed",
                     )
+                    self._show_edit_link(TARGET if option == "prod" else SOURCE)
 
                 if option == "prod":
                     self._show_tags_if_changed(self.diff.target_chart, self.target_session)
@@ -585,10 +611,12 @@ class ChartDiffShow:
                     grapher_chart(chart_config=last_approved_revision.config, owid_env=SOURCE)
                     return last_approved_revision.config, False
             else:
-                if self.diff.in_conflict:
-                    st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
-                else:
-                    st.markdown(self._header_production_chart)
+                with self._chart_header_row():
+                    if self.diff.in_conflict:
+                        st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
+                    else:
+                        st.markdown(self._header_production_chart)
+                    self._show_edit_link(TARGET)
 
                 self._show_tags_if_changed(self.diff.target_chart, self.target_session)
 
@@ -599,11 +627,12 @@ class ChartDiffShow:
             return self.diff.target_chart.config, True
 
         def _show_chart_new():
-            if self.last_approved_revision is None:
+            # Match the production column's fixed header height when it shows the
+            # revision selectbox, so both charts start at the same offset.
+            height = "content" if self.last_approved_revision is None else 40
+            with self._chart_header_row(height=height):
                 st.markdown(self._header_staging_chart)
-            else:
-                with st.container(height=40, border=False):
-                    st.markdown(self._header_staging_chart)
+                self._show_edit_link(SOURCE)
 
             self._show_tags_if_changed(self.diff.source_chart, self.source_session)
 
@@ -633,7 +662,9 @@ class ChartDiffShow:
         # Only one chart: new chart
         is_prod = True
         if self.diff.target_chart is None:
-            st.markdown(f"New version ┃ _{prettify_date(self.diff.source_chart)}_")
+            with self._chart_header_row():
+                st.markdown(f"New version ┃ _{prettify_date(self.diff.source_chart)}_")
+                self._show_edit_link(SOURCE)
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
             config_ref = self.diff.source_chart.config
         # Two charts, actual diff
