@@ -694,8 +694,12 @@ def compare_charts(
         target = tgt[ref][0] if ref in tgt else None
         diff = diff_views([source], [target] if target is not None else [])[0]
         out[ref] = ChartComparison(chart=chart, source=source, target=target, diff=diff)
-        # Asked only when the default comparison finds nothing, so an ordinary chart costs no extra query.
-        if not diff.fields and int(chart.get("n_indicators") or 0) > 1:
+        # Retried when the series read here is not one this branch changed — not merely when it shows
+        # nothing. A primary y whose own text lags the baseline has a difference of its own, and reporting
+        # that as the chart's change describes a series nobody in this PR edited while the edited one goes
+        # unread, with the verdict hashed on the wrong wording. Only a multi-indicator chart has another
+        # series to move to, and a single-indicator chart's primary *is* what its data page renders.
+        if int(chart.get("n_indicators") or 0) > 1 and (source.catalog_path or "") not in changed_paths:
             retry[ref] = int(chart["chartId"])
 
     if not retry or not changed_paths:

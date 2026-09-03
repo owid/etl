@@ -4590,6 +4590,45 @@ def test_a_pinned_series_is_compared_against_the_baselines_own_version_of_it(mon
     assert comparison.target.catalog_path == baseline_path, "compared against the baseline's own version"
 
 
+def test_a_lagging_primary_series_does_not_stand_in_for_the_one_that_moved(monkeypatch):
+    """The chart is in the changed list because a *secondary* series moved.
+
+    The second pass used to be asked for only when the primary comparison found nothing, so a primary y
+    whose own text lags the baseline suppressed it: the card, and the hash its verdict is bound to, were
+    then built from wording nobody in this PR edited while the edited series went unread.
+    """
+    from apps.wizard.app_pages.metadata_diff import data
+
+    moved = "grapher/wb/2026-09-02/pip/pip#mean"
+    primary = "grapher/wb/2026-09-02/pip/pip#headcount"
+
+    def bundles(engine, refs, pinned=None, include_drafts=False):
+        pinned = pinned or {}
+        out = {}
+        for ref in refs:
+            path = pinned.get(ref, primary)
+            # The primary differs too — master rebuilt it — which is what used to suppress the retry.
+            description = f"{engine} wording of {path}"
+            out[ref] = (
+                build_view_bundle(
+                    view={"dimensions": {}},
+                    config_metadata=None,
+                    variable_row={"id": 1, "name": "x", "catalogPath": path, "descriptionShort": description},
+                    chart_config={"title": "T", "subtitle": "Same.", "note": None},
+                ),
+                {"chartId": 7, "slug": ref, "title": "T", "n_indicators": 2, "has_data_page": False},
+            )
+        return out
+
+    monkeypatch.setattr(data, "build_chart_bundles", bundles)
+    monkeypatch.setattr(data, "fetch_chart_indicator_paths_bulk", lambda _e, ids: {i: [moved, primary] for i in ids})
+
+    comparison = data.compare_charts("src", "tgt", ["poverty"], changed_paths={moved})["poverty"]
+
+    assert comparison.pinned_path == moved, "the series this branch changed is the one reviewed"
+    assert comparison.source.catalog_path == moved
+
+
 def test_an_unresolvable_pin_does_not_compare_two_different_indicators(monkeypatch):
     """No pairing on the baseline — a renamed table, or an indicator this branch introduced.
 
@@ -4753,6 +4792,29 @@ def test_a_mixed_view_is_reviewed_on_this_branchs_fields_alone():
     kept = discovery.mdim_branch_views("grapher/wb/2026-09-02/pip#pip", [mixed], discovery.BranchScope())
     assert list(kept[0].fields) == ["descriptionShort"], "master's config text is not ours to sign off"
     assert list(mixed.fields) == ["descriptionShort", "chart.subtitle"], "and the diff itself is untouched"
+
+
+def test_the_same_wysk_bullets_are_not_a_change_in_either_storage_form():
+    """`descriptionKey` is a JSON array in some rows and the grapher channel's markdown string in others.
+
+    They render identically, which is what `as_bullets` is for — but the comparison read them raw, so an
+    environment on either side of that storage change reported every WYSK on the dataset as rewritten. On
+    a version bump that is a screen of review items and a rejection document for text nobody touched.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import ViewBundle, diff_views
+
+    def bundle(wysk):
+        return ViewBundle(dimensions={}, metadata={"descriptionKey": wysk}, chart={}, base={}, indicator_id=1)
+
+    same = diff_views([bundle(["First.", "Second."])], [bundle("- First.\n- Second.")])[0]
+    assert not same.fields, "the same bullets in the two storage forms are not an edit"
+
+    # An absent value and an empty list are the same absence, and neither is an edit.
+    assert not diff_views([bundle([])], [bundle(None)])[0].fields
+
+    # A real rewording still reports.
+    moved = diff_views([bundle(["First.", "Third."])], [bundle("- First.\n- Second.")])[0]
+    assert "descriptionKey" in moved.fields
 
 
 def test_a_wysk_only_edit_does_not_claim_an_explorer_views_text():

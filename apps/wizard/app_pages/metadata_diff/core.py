@@ -218,13 +218,25 @@ def _dims_key(dimensions: dict[str, str]) -> tuple[tuple[str, str], ...]:
 
 
 def _normalize(value: Any) -> Any:
-    """Normalize values for comparison (treat None, NaN and "" the same, strip whitespace)."""
+    """Normalize values for comparison (treat None, NaN and "" the same, strip whitespace).
+
+    Bullets are normalized to a list whichever way they arrived. `variables.descriptionKey` is stored as a
+    JSON array by some steps and as the markdown string the grapher channel writes by others, and the two
+    render identically — `as_bullets` is where that equivalence already lives, for the renderer. Compared
+    raw, an environment on either side of that storage change reports every WYSK on the dataset as
+    rewritten, which on a version bump is a screen of review items and a rejection document for text
+    nobody touched.
+    """
     if value is None or _is_nan(value):
         return ""
+    value = as_bullets(value)
     if isinstance(value, str):
         return value.strip()
     if isinstance(value, list):
-        return [_normalize(v) for v in value]
+        # No bullets and no text are the same absence: a NULL column on one server against an empty list
+        # on the other is not an edit. Elements are normalized flatly rather than recursively — a bullet
+        # is a string, and recursing would read one that happens to start with "- " as a nested list.
+        return [v.strip() if isinstance(v, str) else v for v in value] if value else ""
     return value
 
 
