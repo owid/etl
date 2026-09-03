@@ -169,10 +169,19 @@ for (const job of CONFIG.jobs) {
   const painted = (n) =>
     fillsOf(n).some((f) => f.visible !== false && (f.opacity === undefined || f.opacity > 0)) ||
     ("children" in n && n.children.some(painted));
+  // Strip it whether or not it PAINTS. An unpainted patch (`fills: []`, which is what the current
+  // contract emits) hides nothing, so leaving it looks free — but it is artboard-sized, so it becomes
+  // the chart group's bounding box, and `verify_page.js`'s box-alignment, gap and margins rows then
+  // measure the artboard and report three failures that are about the canvas rather than the plot.
+  // What must survive is a STROKE-only patch: the axes spine is a `patch_N` too, and deleting it
+  // removes a line the reader can see.
+  const strokedAnywhere = (n) =>
+    (Array.isArray(n.strokes) && n.strokes.some((s) => s.visible !== false && (s.opacity === undefined || s.opacity > 0))) ||
+    ("children" in n && n.children.some(strokedAnywhere));
   for (const parent of styled.findAll((n) => CONFIG.backgroundPatchParent.test(n.name))) {
     const first = ("children" in parent ? parent.children : []).find((c) => CONFIG.backgroundPatch.test(c.name));
-    if (!first || first.removed || !painted(first)) continue;
-    strippedPatches.push(`${parent.name}/${first.name}`);
+    if (!first || first.removed || strokedAnywhere(first)) continue;
+    strippedPatches.push(`${parent.name}/${first.name}${painted(first) ? "" : " (unpainted — removed for its bbox)"}`);
     first.remove();
   }
 
@@ -241,7 +250,15 @@ for (const job of CONFIG.jobs) {
   const old = frame.children.find((c) => c.name === "chart");
   styled.name = "chart";
   styled.clipsContent = false;
-  frame.appendChild(styled);
+  // Index 0 is the BOTTOM of the z-order, and this is a usability requirement rather than a visual
+  // one: the import is a frame the size of the whole artboard, so appended LAST it covers the header
+  // and footer, and every double-click on the subtitle or the Note then descends into `figure_1` and
+  // its gid groups instead of selecting the text. That difference between a built frame and the
+  // template is one a designer hits immediately and cannot explain. Below them, a click over the
+  // subtitle lands on the header wrapper while bars and labels still resolve into the chart, and the
+  // frame renders identically either way — measured at max channel difference 0 across 850x1095,
+  // because the wrappers carry no fill and the background patch is gone by this point.
+  frame.insertChild(0, styled);
   styled.x = 0;
   styled.y = 0;
   if (old) old.remove();

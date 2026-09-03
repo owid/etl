@@ -266,11 +266,26 @@ A step decides its layout from strings it measures in its own font, and the temp
 strings in Playfair Display and Lato. So every line count it predicts is an estimate, and the error
 does not point one way:
 
-| At the same pixel size | vs. a step measuring in Arial/DejaVu |
-|---|---|
-| Lato, 11 px | **2.4 % narrower** |
-| Lato, 16 px | 0.8 % narrower |
-| Playfair Display SemiBold, 25 px | **3.2 % wider** |
+**First, make the font the step MEASURES be the font it DRAWS — they are not the same by default.**
+`FontProperties()` with no family resolves `font.family`/`font.sans-serif`, and seaborn's `set_style`
+rewrites that list to an Arial-first one. So a step that wraps its title before calling `set_style`
+measures matplotlib's DejaVu default and then draws Arial, and the two are **~15 % apart** — far more
+than any allowance below, and in the direction that makes a slot look full when it is not. Name the
+stack, set it at import, and pass it to every `FontProperties`; then the percentages below are the whole
+of the correction.
+
+| At the same pixel size | vs. **Arial** (what these steps draw) | vs. **DejaVu Sans** (matplotlib's default) |
+|---|---|---|
+| Lato Regular, 11 px | **2.4 % narrower** | ~15 % narrower |
+| Lato Regular, 16 px | 0.8 % narrower | 15.1 % narrower |
+| Lato **Bold**, 11 px, in a mixed-weight row | **6.6 % narrower** | 26 % narrower |
+| Playfair Display SemiBold, 25 px | **3.2 % wider** | 9.6 % narrower |
+
+Two things that table is easy to under-read. The **bold** row is not a rounding of the regular one:
+Arial Bold sets 6.6 % wider than Lato Bold, so a footer row of mixed weights measured with the regular
+allowance is rejected by its own step while setting correctly in the frame — measured at 828 px against
+an 818 px row where the frame sets it in 798. And the columns are per *installed* font: check which one
+`findfont` actually returns on the machine building the step rather than assuming Arial is there.
 
 **Do not "wrap a bit early to be safe".** It reads as prudent and it is not: the footer rows are sized
 so the template just fits them, so wrapping 6 % early broke both onto second lines the frame does not
