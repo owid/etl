@@ -29,7 +29,6 @@ dataset:
   # The SURVMARK-2 project is complete (patients diagnosed 1995-2014); the producer does not publish new data.
   update_period_days: 0
   owners:
-    - Tuna Acisu
     - Lucas Rodés-Guirao
 
 tables:
