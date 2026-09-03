@@ -634,6 +634,16 @@ def group_usage(g: "ChangeGroup", usage: dict[int, dict[str, list[Any]]]) -> dic
 # difference in an explorer view's text — see `_moves_chart_text`.
 DATA_PAGE_ONLY_FIELDS = {"descriptionKey", "descriptionProcessing", "descriptionFromProducer"}
 
+# Which chart-level text each indicator field can move, on a surface that renders a chart config. Grapher
+# falls back to the indicator's public title for a chart's title and to its short description for a
+# subtitle (`build_view_bundle` already folds `name` into `titlePublic`, so a renamed indicator arrives as
+# a `titlePublic` change). A footnote comes from a config and never from indicator text, and every field
+# in `DATA_PAGE_ONLY_FIELDS` reaches none of the three — which is why they are absent here.
+INDICATOR_FIELD_REACHES: dict[str, set[str]] = {
+    "titlePublic": {"title"},
+    "descriptionShort": {"subtitle"},
+}
+
 
 def behind_sources_drawer(fields: Iterable[str], chart: dict[str, Any]) -> bool:
     """Whether this chart shows these fields only behind "Learn more about this data".

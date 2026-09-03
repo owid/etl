@@ -4694,6 +4694,47 @@ def test_a_version_bump_alone_does_not_make_an_indicator_read_as_changed(monkeyp
     assert result.across_versions[moved].endswith("2026-06-26/pip/incomes#mean")
 
 
+def test_the_review_notes_document_does_not_count_a_reopened_verdict():
+    """The page says a reopened decision is excluded from the documents below it.
+
+    This heading went on reporting it as reviewed, because it read `status` and never compared the stored
+    hash against the current one — a count handed to somebody else, standing over text edited afterwards.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import surface_key
+    from apps.wizard.app_pages.metadata_diff.review_section import _notes_markdown
+
+    surface = surface_key("item", "chart")
+    rows = [
+        {"catalogPath": surface, "changeKey": "still", "contentHash": "a", "status": "reviewed", "comment": ""},
+        {"catalogPath": surface, "changeKey": "moved", "contentHash": "a", "status": "reviewed", "comment": "note"},
+    ]
+    index = {"still": {"name": "Still", "url": "u", "hash": "a"}, "moved": {"name": "Moved", "url": "u", "hash": "b"}}
+
+    out = _notes_markdown(rows, index, {surface: 2})
+
+    assert "1 of 2 reviewed" in out, "the reopened decision is not counted as reviewed"
+    assert "note" in out, "and the reviewer's own words are kept"
+
+
+def test_a_section_with_nothing_in_it_is_not_counted_as_unfinished():
+    """A branch that only touches charts has nothing to review in MDims or Explorers.
+
+    Counting those made a finished review read "1 of 3 sections finished" for ever, and put the success
+    line out of reach on the commonest shape of branch there is — over work that does not exist.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import section_progress, surface_key
+
+    charts_only = section_progress(
+        {surface_key("item", "chart"): 4},
+        {surface_key("item", "chart"): 4},
+    )
+
+    with_items = [of for _done, of in charts_only.values() if of]
+    finished = [1 for done, of in charts_only.values() if of and done >= of]
+    assert len(with_items) == 1, "the other two sections hold nothing"
+    assert len(finished) == len(with_items), "and the one that does is finished"
+
+
 def test_re_read_drops_every_cached_reading_of_the_two_servers():
     """The list of caches to drop was written out by hand beside the button, and had fallen behind.
 
@@ -4770,6 +4811,47 @@ def test_view_by_view_lists_only_the_views_this_branch_is_answerable_for():
     assert len(discovery.mdim_branch_views("grapher/wb/2026-09-02/pip#pip", [ours, lag], mine)) == 2
 
 
+def test_a_view_whose_branch_fields_are_all_overridden_is_not_an_item():
+    """An indicator field can move while the MDim overrides that very field.
+
+    `affects_indicator` is then true and the view's own text never shifts with it, so filtering leaves
+    nothing. Listed anyway it is an item with no changed text and so no decision control — counted in the
+    denominator and impossible to decide, which is a layout that can never finish.
+    """
+    from apps.wizard.app_pages.metadata_diff import discovery
+    from apps.wizard.app_pages.metadata_diff.core import ViewDiff
+
+    masked = ViewDiff(dimensions={"metric": "mean"}, fields={"chart.note": {"old": "a", "new": "b"}})
+    masked.indicator_changed_fields.add("descriptionShort")  # moved underneath, overridden on the view
+
+    assert discovery.mdim_branch_views("grapher/wb/2026-09-02/pip#pip", [masked], discovery.BranchScope()) == []
+
+
+def test_a_version_lookup_finds_a_dataset_whose_paths_carry_no_table(monkeypatch):
+    """`grapher/<ns>/<ver>/<dataset>#<short>` is a live path shape, and the pattern only matched one form.
+
+    Every indicator of such a dataset then went unpaired across a version bump: read as new, with no text
+    diff and nothing to attribute, on exactly the workflow the pairing exists for.
+    """
+    import pandas as pd
+
+    from apps.wizard.app_pages.metadata_diff import data
+
+    seen: dict[str, str] = {}
+
+    def read_sql(_query, engine=None, params=None):
+        seen.update(params or {})
+        # Only the table-less form exists on this server.
+        matched = "2026-06-26" if any("#%" in str(v) for v in (params or {}).values()) else None
+        return pd.DataFrame([{"version": matched}])
+
+    monkeypatch.setattr(data, "read_sql", read_sql)
+    out = data.fetch_latest_dataset_versions("tgt", [("wb", "pip")])
+
+    assert out == {("wb", "pip"): "2026-06-26"}
+    assert any(str(v).endswith("/pip#%") for v in seen.values()), "the table-less form is queried too"
+
+
 def test_a_mixed_view_is_reviewed_on_this_branchs_fields_alone():
     """One view can carry both a branch-owned indicator edit and a config difference master produced.
 
@@ -4835,9 +4917,17 @@ def test_a_wysk_only_edit_does_not_claim_an_explorer_views_text():
         fields={"descriptionKey": {"old": ["a"], "new": []}, "titlePublic": {"old": "A", "new": "B"}},
     )
 
-    assert not discovery._moves_chart_text(wysk)
-    assert discovery._moves_chart_text(subtitle), "grapher falls back to it for a chart's subtitle"
-    assert discovery._moves_chart_text(both), "one field that can reach the text is enough"
+    assert discovery._chart_text_reached(wysk) == set(), "no reader of an explorer view sees a WYSK bullet"
+    assert discovery._chart_text_reached(subtitle) == {"subtitle"}, "grapher falls back to it for a subtitle"
+    assert discovery._chart_text_reached(both) == {"title"}, "the WYSK half reaches nothing on its own"
+
+    # And which text it could move is the question, not merely whether it could move one: an edit to the
+    # public title explains a view whose title differs, and nothing about one whose footnote lags.
+    title_differs = ViewDiff(dimensions={}, fields={"chart.title": {"old": "A", "new": "B"}})
+    note_differs = ViewDiff(dimensions={}, fields={"chart.note": {"old": "a", "new": "b"}})
+    assert discovery._accounts_for(title_differs, {"title"})
+    assert not discovery._accounts_for(note_differs, {"title"})
+    assert discovery._accounts_for(ViewDiff(dimensions={}, is_new=True), {"title"}), "a new view is not ruled out"
 
 
 def test_every_edit_card_keeps_its_verdict_however_many_there_are():

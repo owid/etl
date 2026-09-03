@@ -407,10 +407,17 @@ def fetch_latest_dataset_versions(engine: Engine, shapes: list[tuple[str, str]])
     for namespace, dataset in sorted(set(shapes)):
         df = read_sql(
             # The version is the third segment of `grapher/<ns>/<version>/<dataset>/<table>#<short>`.
+            # Two patterns, because an indicator's path does not always carry a table:
+            # `grapher/<ns>/<ver>/<dataset>#<short>` is the other live form, and matching only the first
+            # left every indicator of such a dataset unpaired across a version bump — read as new, with
+            # no text diff and nothing to attribute, on the workflow the pairing exists for.
             "select max(substring_index(substring_index(catalogPath, '/', 3), '/', -1)) as version "
-            "from variables where catalogPath like %(pat)s",
+            "from variables where catalogPath like %(with_table)s or catalogPath like %(no_table)s",
             engine=engine,
-            params={"pat": f"grapher/{namespace}/%/{dataset}/%"},
+            params={
+                "with_table": f"grapher/{namespace}/%/{dataset}/%",
+                "no_table": f"grapher/{namespace}/%/{dataset}#%",
+            },
         )
         version = df["version"].iloc[0] if len(df) else None
         if version:

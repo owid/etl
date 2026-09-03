@@ -32,9 +32,10 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.wizard.app_pages.metadata_diff.core import (
+    CHART_FIELD_PREFIX,
     CHART_FIELDS,
     COUNTED_SECTIONS,
-    DATA_PAGE_ONLY_FIELDS,
+    INDICATOR_FIELD_REACHES,
     ChangeGroup,
     ViewDiff,
     build_view_bundle,
@@ -1163,6 +1164,12 @@ def mdim_branch_views(
         if not view.affects_indicator:
             continue
         owned = {key: value for key, value in view.fields.items() if key in view.indicator_changed_fields}
+        # Nothing left is not an item. An indicator field can move while the MDim overrides that very
+        # field, so the view's own text never shifts with it: `affects_indicator` is true and no visible
+        # field is ours. Listed, it would be an item with no changed text and so no decision control —
+        # counted in the denominator and impossible to decide, which is a layout that cannot finish.
+        if not owned:
+            continue
         ours.append(view if len(owned) == len(view.fields) else replace(view, fields=owned))
     return ours
 
@@ -1396,17 +1403,42 @@ class ExplorerChanges:
         return {slug: diffs for slug, diffs in self.views.items() if slug not in self.in_branch}
 
 
-def _moves_chart_text(diff: ViewDiff) -> bool:
-    """Could this indicator's edit have moved a title, subtitle or footnote?
+def _chart_text_reached(diff: ViewDiff) -> set[str]:
+    """Which chart-level texts this indicator edit could have moved — title, subtitle, note, or none.
 
-    `titlePublic` and `descriptionShort` are what grapher falls back to for a chart's title and subtitle,
-    so an edit touching either can. The rest of the indicator text is laid out on a data page and nowhere
-    else — and an explorer view has no data page, which is a limit this tool states in the section itself.
-    Attributing a view to an edit that could not have reached it is claiming a change nobody made.
+    `titlePublic` and `descriptionShort` are what grapher falls back to for a chart's title and subtitle;
+    the rest of the indicator text is laid out on a data page and nowhere else, and an explorer view has
+    no data page — a limit this tool states in the section itself. Attributing a view to an edit that
+    could not have reached it is claiming a change nobody made.
 
-    True for a diff with no fields (a new view), which is not this function's question to answer.
+    Which one it could have moved matters as much as whether: an edit to the public title cannot account
+    for a view whose only difference is a lagging footnote, and answering "yes, something" there put
+    master's rebuild in the branch's bucket.
+
+    Everything, for an edit with no old text to compare — a brand-new indicator says nothing about which
+    field moved, so it vouches rather than being ruled out.
     """
-    return not diff.fields or any(key not in DATA_PAGE_ONLY_FIELDS for key in diff.fields)
+    if not diff.fields:
+        return set(CHART_FIELDS)
+    reached: set[str] = set()
+    for key in diff.fields:
+        reached |= INDICATOR_FIELD_REACHES.get(key, set())
+    return reached
+
+
+def _accounts_for(view: ViewDiff, can_move: set[str]) -> bool:
+    """Can an edit reaching these texts account for what actually differs on this view?
+
+    A new view, or one whose difference is not in the chart text at all, is not something this test can
+    rule out — those keep vouching. Where the view's difference *is* chart text, at least one of the
+    fields that moved has to be one the edit could have moved: a branch that reworded a public title
+    explains a view whose title differs, and explains nothing about one whose only difference is the
+    footnote master rebuilt.
+    """
+    if view.is_new:
+        return True
+    differs = {key.removeprefix(CHART_FIELD_PREFIX) for key in view.fields if key.startswith(CHART_FIELD_PREFIX)}
+    return not differs or bool(differs & can_move)
 
 
 def changed_explorer_views(
@@ -1451,27 +1483,33 @@ def changed_explorer_views(
     # Only indicators this branch actually rebuilt here can carry one of its edits — compare just those.
     candidates, _ = candidate_paths(source_engine, sorted(set(paths_by_id.values())), scope, built)
     candidates = sorted(set(candidates))
-    changed_paths: set[str] = set()
+    # catalogPath -> which of a view's texts this branch's edit to it could have moved. Not a bare set of
+    # changed paths: an edit to the public title cannot account for a view whose only difference is a
+    # lagging footnote, and answering the coarser question put master's rebuild in the branch's bucket.
+    reaches: dict[str, set[str]] = {}
     if candidates:
         # Across the version bump, or a dataset update would file every view rendering that dataset as
-        # this branch's: the exact-path pass matches nothing, every indicator reads as new, and the union
+        # this branch's: the exact-path pass matches nothing, every indicator reads as new, and the map
         # below then vouches for views whose difference is only master's lag.
         result = compare_indicators_across_versions(source_engine, target_engine, candidates)
-        # Only edits that could have moved the text an explorer view shows. Its stored text is a chart
-        # config — title, subtitle, note — with no data page behind it, so an indicator whose diff is
-        # confined to `DATA_PAGE_ONLY_FIELDS` cannot account for a difference here. Without this, a branch
-        # whose one edit was a WYSK bullet had every lagging view rendering that indicator filed as its
-        # own — while the section says, correctly, that no reader of an explorer ever sees that bullet.
-        # A brand-new indicator keeps vouching: there is no old text to say which field moved.
-        changed_paths = {p for p, d in result.diffs.items() if _moves_chart_text(d)} | result.new_paths
+        for path, diff in result.diffs.items():
+            reaches[path] = _chart_text_reached(diff)
+        # A brand-new indicator vouches for any of the three: there is no old text to say which moved.
+        for path in result.new_paths:
+            reaches[path] = set(CHART_FIELDS)
         # An explorer view's text is a chart config, and a garden step can author that text directly
         # through `presentation.grapher_config`. That edit changes no column of the `variables` row, so
         # asking only `compare_indicator_texts` credited the branch with none of it: a reworded shared
-        # subtitle moved 402 LIS explorer views and every one was filed as master's lag.
-        changed_paths |= changed_indicator_configs(source_engine, target_engine, candidates)
+        # subtitle moved 402 LIS explorer views and every one was filed as master's lag. It is written
+        # straight into the config, so it can reach any of the three.
+        for path in changed_indicator_configs(source_engine, target_engine, candidates):
+            reaches[path] = set(CHART_FIELDS)
 
     ours_keys = {key for key in detailed if key[0] in own_recipe}
-    ours_keys |= {key for key, ids in ids_by_view.items() if any(paths_by_id.get(i) in changed_paths for i in ids)}
+    for key, ids in ids_by_view.items():
+        can_move = {text for i in ids for text in reaches.get(paths_by_id.get(i) or "", set())}
+        if can_move and _accounts_for(detailed[key], can_move):
+            ours_keys.add(key)
 
     branch: dict[str, list[ViewDiff]] = {}
     other: dict[str, list[ViewDiff]] = {}

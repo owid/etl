@@ -82,7 +82,10 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
     # sections is whether each one is finished, so that is what the header reports; the per-surface rows
     # below keep their own denominators, where the unit is unambiguous.
     finished = sum(1 for done, of in progress.values() if of and done >= of)
-    n_sections = len(progress)
+    # Sections with something in them. A branch that only touches charts has nothing to review in MDims or
+    # Explorers, and counting those made a finished review read "1 of 3 sections finished" for ever — the
+    # success line unreachable on the commonest shape of branch there is, over work that does not exist.
+    n_sections = sum(1 for _done, of in progress.values() if of)
     total = sum(of for _done, of in progress.values())
 
     if not rows:
@@ -464,7 +467,12 @@ def _notes_markdown(rows: list[dict[str, Any]], index: dict[str, dict[str, str]]
     """
     lines = ["## Metadata review notes", ""] + _provenance() + [""]
     for surface, group in sorted(_by_surface(rows).items()):
-        done = sum(1 for row in group if row.get("status") == REVIEWED)
+        # `verdict_counts`, not the status alone. The page already says a reopened decision is excluded
+        # from the documents below it, and this heading was the one place that went on reporting it as
+        # reviewed — a count handed to somebody else, standing over text that was edited afterwards. The
+        # notes themselves are unaffected: they are the reviewer's own words and survive whatever happened
+        # to the wording.
+        done = sum(1 for row in group if row.get("status") == REVIEWED and verdict_counts(row, index))
         of = totals.get(surface)
         with_note = [row for row in group if row.get("comment")]
         head = f"### {_surface_title(surface)}"
