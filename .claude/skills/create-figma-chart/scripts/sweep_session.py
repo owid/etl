@@ -113,6 +113,32 @@ def occupied(start, end, calls):
     return total
 
 
+def batches_of(calls):
+    """One entry per issuing assistant message -- [first start, last end] -- in start order."""
+    out = {}
+    for call in calls:
+        b = out.setdefault(call["msg"], {"start": call["start"], "end": call["end"]})
+        b["start"] = min(b["start"], call["start"])
+        b["end"] = max(b["end"], call["end"])
+    return sorted(out.values(), key=itemgetter("start"))
+
+
+def spanned_messages(calls, others):
+    """OTHER assistant messages sitting inside the turns.
+
+    A turn is deliberately the model time to get from one MATCHING call to the next -- the term
+    BENCHMARK.md multiplies by the call count -- so a turn interrupted by two shell calls is three
+    thinking episodes reported as one number. That is worth knowing rather than hiding, so the count
+    is printed: it says when the median is an aggregate instead of a single think.
+    """
+    ordered, seen = batches_of(calls), set()
+    for prev, nxt in zip(ordered, ordered[1:]):
+        for c in others:
+            if prev["end"] <= c["start"] < nxt["start"]:
+                seen.add(c["msg"])
+    return len(seen)
+
+
 def turn_gaps(calls, others=()):
     """Model time: from a message's LAST result back to the next message's first call.
 
@@ -125,13 +151,7 @@ def turn_gaps(calls, others=()):
     between two Figma calls is another tool running, not the model thinking, and counting it here
     inflates the one figure BENCHMARK.md calls dominant.
     """
-    batches = {}
-    for call in calls:
-        batch = batches.setdefault(call["msg"], {"start": call["start"], "end": call["end"]})
-        batch["start"] = min(batch["start"], call["start"])
-        batch["end"] = max(batch["end"], call["end"])
-
-    ordered = sorted(batches.values(), key=itemgetter("start"))
+    ordered = batches_of(calls)
     gaps = []
     for prev, nxt in zip(ordered, ordered[1:]):
         if nxt["start"] > prev["end"]:
@@ -184,8 +204,11 @@ def main():
     for tool, secs in sorted(by_tool.items(), key=lambda kv: -len(kv[1])):
         print(f"{tool:<28} {len(secs):>3} {median(secs):>7.2f}s {min(secs):>7.2f}s {max(secs):>7.2f}s")
 
-    print(f"\nturns between calls: {len(gaps)}, median {median(gaps):.1f}s, total {sum(gaps) / 60:.1f} min"
-          + (f"  (net of {elsewhere / 60:.1f} min that other tools were running)" if elsewhere else ""))
+    print(f"\nturns between calls: {len(gaps)}, median {median(gaps):.1f}s, total {sum(gaps) / 60:.1f} min")
+    if others:
+        spanned = spanned_messages(calls, others)
+        print(f"  net of {elsewhere / 60:.1f} min that other tools were running inside those turns, across"
+              f" {spanned} other message(s) — a turn spanning one is several thinks reported as one number")
     print(f"peak in flight: {peak_in_flight(calls)}  (from overlapping intervals, not a per-message count)")
     if wall:
         print(f"sum/wall: {total / wall:.2f}x  -- read this ONLY beside the figures above; it counts a"

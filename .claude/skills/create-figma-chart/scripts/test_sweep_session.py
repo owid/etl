@@ -108,6 +108,8 @@ out = run(INTERLEAVED)
 check("a shell call between two Figma calls is not counted as thinking (20s, not 60s)",
       "turns between calls: 1" in out.stdout and "median 20.0s" in out.stdout, out.stdout)
 check("and the sweep says how much it took out", "other tools were running" in out.stdout, out.stdout)
+check("and how many other messages that one turn spans, so an aggregate never reads as one think",
+      "across 1 other message(s)" in out.stdout, out.stdout)
 
 # The A/B shape: two tools, told apart by --list.
 MIXED = [("m1", "t1", F + "use_figma", 0, 3), ("m2", "t2", F + "get_screenshot", 10, 19)]

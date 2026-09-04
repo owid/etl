@@ -440,7 +440,7 @@ The checks are a gate, not a formality: **re-run the whole pass after the last c
 ## Step 9 — Checklist pass, review, deliver
 
 1. Run the **Good Data Viz Checklist** (GUIDELINES.md, final section) against the composed frame; fix what fails.
-2. `get_screenshot` **each frame** — never the page, whose render can pull in a neighbouring page's frames (Gotchas) — and show the user the original and adapted version side by side. Iterate on feedback (no re-approval needed within the approved page).
+2. `get_screenshot` **each frame, and the original reference node with them** — never the page, whose render can pull in a neighbouring page's frames (Gotchas). The original is a page-level GROUP, not a frame (Step 5 unwraps it onto the page), so *frames only* returns the adapted version with nothing to hold it against — which is not a side-by-side, it is a solo. Batch the renders in one message and show the user the original and adapted version side by side. Iterate on feedback (no re-approval needed within the approved page).
 3. **Rename the final frame to the slug** from Step 2 (`child-mortality-asia-decline`) — Figma uses the frame name as the export filename for the website PNG. **Exactly one frame carries the bare slug**; variants get a suffix (`-palette-a`). Two frames with the same name export two files with the same name.
 
    **When the user picks a variant, move the bare slug onto it in the same breath — never leave the rename as an open item.** It reads like a one-line loose end and it is not: the page ends up with a single finished frame still called `…-palette-a`, and the PNG the website gets is named after a trial. Renaming is free while the choice is being made and invisible afterwards.
