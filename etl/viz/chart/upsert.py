@@ -18,15 +18,11 @@ import uuid
 from typing import TYPE_CHECKING, Any
 
 import structlog
-from jsonschema import validate
-from jsonschema.exceptions import ValidationError
 from sqlalchemy import bindparam, text
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWIDEnv
-from etl.files import read_json_schema
-from etl.paths import SCHEMAS_DIR
 from etl.viz.chart.utils import map_indicator_path_to_id, resolve_grapher_schema
 
 if TYPE_CHECKING:
@@ -54,7 +50,6 @@ def upsert_single_chart(chart: "Chart", owid_env: OWIDEnv) -> int:
     # Grapher slugs are dash-separated; mdim short_names are snake_case.
     slug = chart.short_name.replace("_", "-")
     chart_config = _build_chart_config(view, slug, resolve_grapher_schema(chart.grapher_schema))
-    _validate_chart_config(chart_config, slug)
 
     admin_api = AdminAPI(owid_env)
 
@@ -162,24 +157,6 @@ def _build_chart_config(view: "View", slug: str, grapher_schema: str) -> dict[st
         config["map"]["columnSlug"] = str(map_indicator_path_to_id(config["map"]["columnSlug"]))
 
     return config
-
-
-def _validate_chart_config(config: dict[str, Any], slug: str) -> None:
-    """Validate the built config against the local grapher schema before pushing.
-
-    The admin `etlConfig` endpoint only checks the schema *version*, not the
-    config's structure, so a typo'd field or wrong type would be stored and just
-    render wrong. We catch it here, with an error pointing at the offending field.
-    Skips if the config's schema version isn't vendored locally.
-    """
-    schema_file = SCHEMAS_DIR / str(config.get("$schema", "")).rsplit("/", 1)[-1]
-    if not schema_file.exists():
-        return
-    try:
-        validate(config, read_json_schema(schema_file))
-    except ValidationError as e:
-        location = "/".join(str(p) for p in e.absolute_path) or "(root)"
-        raise ValueError(f"Invalid chart config for slug '{slug}' at `{location}`: {e.message}") from e
 
 
 def new_chart_config_id() -> str:
