@@ -1,0 +1,42 @@
+# The download link should be working automatically, but if not, you can follow these steps
+#
+# STEPS TO OBTAIN THE DATA:
+#     1. Go to the OECD Data Explorer: https://data-explorer.oecd.org/
+#     2. Search for "Adults' educational attainment distribution".
+#     3. Select the dataset "Adults' educational attainment distribution, by age group and gender".
+#     4. Select these filters:
+#         1. Time period: select 1981 as the start year and 2024 as the end year.
+#         2. Reference area: all countries available. By default, all countries are selected (check if it is not).
+#         3. Sex: select "Total", "Female", "Male".
+#         4. Age: select "From 25 to 64 years".
+#         5. Educational attainment level: select "Less than primary education", "Below upper secondary education",
+#            "Upper secondary and post-secondary non-tertiary education", "Tertiary education".
+#         6. Leave all other filters at their defaults.
+#     5. Click the Download button.
+#     6. Right click on "Filtered data in tabular text (CSV)".
+#     7. Select "Copy link address".
+#     8. Paste the link in the `url_download` field in the education_attainment_distribution.csv.dvc file.
+#     9. Run
+#         etls oecd/{version}/education_attainment_distribution
+meta:
+  origin:
+    producer: OECD
+    title: Adults' educational attainment distribution
+    description: |-
+      Distribution of educational attainment among adults aged 25-64, by age group and gender.
+      Data are based on national labour force surveys, censuses, and household surveys, mapped to the ISCED 2011 classification.
+      Covers OECD members and selected partner economies.
+    citation_full: OECD (2026). Education at a Glance - Adults' educational attainment distribution, by age group and gender.
+    attribution_short: OECD
+    url_main: https://www.oecd.org/en/data/indicators/population-with-tertiary-education.html
+    url_download: |-
+      https://sdmx.oecd.org/public/rest/data/OECD.EDU.IMEP,DSD_EAG_LSO_EA@DF_LSO_NEAC_DISTR_EA,1.0/.F+M+_T.Y25T64.ISCED11A_0+ISCED11A_0T2+ISCED11A_3_4+ISCED11A_5T8..........OBS...A?startPeriod=1981&endPeriod=2024&dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: '2026-06-21'
+    date_published: '2025'
+    license:
+      name: "© OECD"
+      url: https://www.oecd.org/termsandconditions/
+outs:
+  - md5: ec203f8f1a88385f5ba63c2cf6ee7f43
+    size: 9463717
+    path: education_attainment_distribution.csv
