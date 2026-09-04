@@ -477,6 +477,9 @@ def run() -> None:
 
     tb = prepare_balance_table(tb_scl, roles=roles, manual=manual)
     tb_fish = prepare_fish_table(tb_fbsc, manual=manual)
+    # Only for the entities and years SCL covers; FBS also has OWID region aggregates, which SCL does not.
+    covered = tb[["country", "year"]].drop_duplicates()
+    tb_fish = tb_fish.merge(covered, on=["country", "year"], how="inner")
     tb = pr.concat([tb[tb_fish.columns], tb_fish], ignore_index=True)
     sanity_check_balance_identity(tb)
     tb = add_energy_densities(tb, manual=manual)
