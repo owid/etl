@@ -48,3 +48,19 @@ faostat_rl,007208,Share in Agricultural land,Share in agricultural land,Percent,
 faostat_rl,007209,Share in Land area,Share in land area,Percent,%,percent,%,,,,,0,0
 faostat_rp,005157,Agricultural Use,Agricultural use,Tonnes,t,tonnes,t,,Amount used in the agricultural sector in the year,,,0,0
 faostat_rp,005159,Use per area of cropland,Use per area of cropland,Kilograms per hectare,kg/ha,kilograms per hectare,kg/ha,,,,,0,0
+faostat_scl,005510,Production,Production,Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,005610,Import quantity,Import quantity,Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,005910,Export quantity,Export quantity,Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,005071,Stock Variation,Stock Variation,Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,005113,Opening stocks,Opening stocks,Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,005525,Seed,Seed,Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,005520,Feed,Feed,Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,005016,Loss,Loss,Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,005023,Processed,Processed,Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,005165,Other uses (non-food),Other uses (non-food),Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,005164,Tourist consumption,Tourist consumption,Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,005166,Residuals,Residuals,Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,005141,Food supply quantity (tonnes),Food supply quantity (tonnes),Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,000271,Proteins/Year,Proteins/Year,Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,000281,Fats/Year,Fats/Year,Tonnes,t,Tonnes,t,,,,sum,0,0
+faostat_scl,000261,Calories/Year,Calories/Year,million Kilocalories,million Kcal,million Kilocalories,million Kcal,,,,sum,0,0

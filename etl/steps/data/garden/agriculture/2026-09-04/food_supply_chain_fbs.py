@@ -45,8 +45,9 @@ ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
    "residuals" (FAO's own balancing item) so that the chain lands exactly on "food". Its size is kept in
    "balancing_difference" for quality control.
 
-7. All stages are divided by the same population, from OWID's population dataset, and by 365 days. FAO's own
-   regional aggregates are dropped; OWID countries and regions are kept.
+7. All stages are divided by the same population and by 365 days: OWID population for countries, and for regions the
+   population of the members with data (the FAOSTAT garden step's own per-capita denominator). FAO's own regional
+   aggregates are dropped; OWID countries and regions are kept.
 
 Known limitations, inherited from FBS: oilseed cakes and other feed by-products are not FBS items, so what goes
 oilseed -> cake -> feed appears under processing, not feed; and FBS "Losses" stop at the retail shelf.
@@ -218,10 +219,13 @@ def sanity_check_inputs(tb: Table, items: Table, excluded: dict[str, str], group
 def prepare_balance_table(tb: Table, items: Table) -> Table:
     """Reshape the FBS table to one row per (country, year, item) with one column per element, for chain items."""
     tb = tb[tb["item_code"].isin(items.index) & tb["element_code"].isin(ELEMENTS)].reset_index(drop=True)
-    tb = tb[["country", "year", "item_code", "element_code", "value"]].astype(
-        {"country": str, "item_code": str, "value": float}
+    tb = tb[["country", "year", "item_code", "element_code", "value", "population_with_data"]].astype(
+        {"country": str, "item_code": str, "value": float, "population_with_data": float}
     )
-    tb = tb.pivot(
+    # Population of the entity, or, for a region, of its members with data (the FAOSTAT garden step's own per-capita
+    # denominator). Taken as the maximum over items and elements, i.e. every member that reports anything.
+    population = tb.groupby(["country", "year"])["population_with_data"].max().rename("population").reset_index()
+    tb = tb.drop(columns=["population_with_data"]).pivot(
         index=["country", "year", "item_code"], columns="element_code", values="value", join_column_levels_with="_"
     )
     tb = tb.rename(columns={code: name for code, name in ELEMENTS.items()})
@@ -237,6 +241,8 @@ def prepare_balance_table(tb: Table, items: Table) -> Table:
 
     tb = tb.merge(items[["role"]].reset_index(), on="item_code", how="left")
     assert tb["role"].notnull().all(), "Some rows have no role (item missing from items file)."
+    tb = tb.merge(population, on=["country", "year"], how="left")
+    assert tb["population"].notnull().all(), "Some FBS rows have no population."
     return tb
 
 
@@ -323,6 +329,7 @@ def build_chain(tb: Table, nutrient: str) -> Table:
     converted = converted.drop(columns=["production"])
 
     chain = converted.groupby(["country", "year"], observed=True, as_index=False).sum(min_count=1)
+    chain = chain.merge(tb[["country", "year", "population"]].drop_duplicates(), on=["country", "year"], how="left")
 
     # Assumption 5: processing net of the production of processed items.
     chain["processing_net"] = chain["processing"] - chain["processed_production"]
@@ -337,12 +344,8 @@ def build_chain(tb: Table, nutrient: str) -> Table:
     chain["balancing_difference"] = chain["food"] - chain_end
     chain["residuals"] = chain["residuals"] - chain["balancing_difference"]
 
-    # Per person per day, using OWID population for all stages (assumption 7).
-    chain = paths.regions.add_population(chain, warn_on_missing_countries=False)
-    missing_population = sorted(set(chain[chain["population"].isnull()]["country"]))
-    if missing_population:
-        log.warning(f"Dropping entities without OWID population: {missing_population}")
-        chain = chain.dropna(subset=["population"]).reset_index(drop=True)
+    # Per person per day (assumption 7): OWID population, or for regions the population of the members with data.
+    assert chain["population"].notnull().all() and (chain["population"] > 0).all(), "Missing population."
     for stage in STAGES:
         chain[stage] = chain[stage] / chain["population"] / DAYS_PER_YEAR
     return chain[["country", "year"] + STAGES]

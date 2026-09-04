@@ -24,8 +24,8 @@ ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
    One override, listed in the items file: cotton seed is treated as a crop, because the seed cotton it is ginned
    from is a fibre crop and not in SCL.
 
-3. Density of an item (kcal, or grams of protein, per 100 g) = food supply of the nutrient per person per day /
-   food supply in grams per person per day x 100, per item, country and year. The same density is applied to every
+3. Density of an item (kcal, or grams of protein, per 100 g) = food supply of the nutrient (FAO's "Calories/Year"
+   and "Proteins/Year") / food supply in tonnes, per item, country and year. The same density is applied to every
    flow of the item, so the identity holds in the nutrient exactly as in tonnes and the chain closes by
    construction. The only rejection rule is a physical ceiling (920 kcal, or 100 g of protein, per 100 g); rejected
    cells fall back to the country's median for the item over all years, then to the item's median over all
@@ -49,14 +49,12 @@ ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
 7. FAOSTAT rounds tonnages, so balances do not close exactly. The gap is folded into "residuals" so the chain lands
    exactly on "food"; its size is kept in "balancing_difference".
 
-8. Regions. SCL itself has World and the European Union (27) as aggregates, both kept. OWID continents and income
-   groups are built here by summing the members' totals, in a year only if members covering at least
-   MIN_FRAC_POPULATION_REGIONS of the region's population report data; per-capita values divide by the population of
-   the reporting members. FAO's own regional aggregates are dropped.
-   Our sum over countries is compared with FAO's World as a check on coverage.
+8. Regions. OWID regions (World, continents, income groups) come from the FAOSTAT garden step, which builds them
+   for SCL as for every FAO dataset by summing member countries; FAO's own regional aggregates are dropped.
 
-9. All stages are divided by the same population, from OWID's population dataset, and by 365 days. SCL covers 2010
-   onward.
+9. All stages are divided by the same population and by 365 days: OWID population for countries, and for regions the
+   population of the members with data (the FAOSTAT garden step's own per-capita denominator), so that a region's
+   per-capita values are not diluted by members that do not report. SCL covers 2010 onward.
 """
 
 import numpy as np
@@ -87,15 +85,12 @@ ELEMENTS = {
     "005164": "tourist_consumption",
     "005166": "residuals",
     "005141": "food",
-    "000664": "food_kcal_per_capita_per_day",
-    "000674": "food_protein_g_per_capita_per_day",
-    "000665": "food_g_per_capita_per_day",
+    "000261": "food_million_kcal_per_year",
+    "000271": "food_protein_tonnes_per_year",
 }
-PER_CAPITA_ELEMENTS = ["000664", "000674", "000665"]
 ELEMENT_UNITS = {
-    "Kilocalories per capita per day": ["000664"],
-    "Grams per capita per day": ["000674", "000665"],
-    "Tonnes": [code for code in ELEMENTS if code not in PER_CAPITA_ELEMENTS],
+    "million Kilocalories": ["000261"],
+    "Tonnes": [code for code in ELEMENTS if code != "000261"],
 }
 # FBS elements used for the fish items (see assumption 6).
 FBS_ELEMENTS = {
@@ -116,15 +111,19 @@ FBS_ELEMENTS = {
     "0645pc": "food_kg_per_capita_per_year",
 }
 FBS_PER_CAPITA_ELEMENTS = ["0664pc", "0674pc", "0645pc"]
+# `numerator` is the food-nutrient column (million kcal, or tonnes of protein); dividing it by food in tonnes and
+# multiplying by TO_PER_100G gives the density per 100 g.
 NUTRIENTS = {
-    "energy": {"numerator": "food_kcal_per_capita_per_day", "ceiling": 920, "unit": "kilocalories per person per day"},
+    "energy": {"numerator": "food_million_kcal_per_year", "ceiling": 920, "unit": "kilocalories per person per day"},
     "protein": {
-        "numerator": "food_protein_g_per_capita_per_day",
+        "numerator": "food_protein_tonnes_per_year",
         "ceiling": 100,
         "unit": "grams of protein per person per day",
     },
     "mass": {"numerator": None, "ceiling": None, "unit": "kilograms per person per day"},
 }
+# million kcal / tonnes -> kcal per 100 g, and tonnes of protein / tonnes -> grams per 100 g: both are x 1e6 / 1e4.
+TO_PER_100G = 1e6 / 1e4
 BALANCE_ELEMENTS = [
     "production",
     "imports",
@@ -175,21 +174,6 @@ SUBTRACTED_STAGES = [
     "residuals",
 ]
 FIRST_YEAR = 2010
-# OWID regions built by summing members (assumption 8), and the minimum share of a region's population that must be
-# covered by reporting members for a year to be aggregated.
-REGIONS_TO_BUILD = [
-    "Africa",
-    "Asia",
-    "Europe",
-    "North America",
-    "South America",
-    "Oceania",
-    "Low-income countries",
-    "Lower-middle-income countries",
-    "Upper-middle-income countries",
-    "High-income countries",
-]
-MIN_FRAC_POPULATION_REGIONS = 0.7
 # SCL carries population as an item; it is not a commodity.
 POPULATION_ITEM_CODE = "00000001"
 IDENTITY_RELATIVE_TOLERANCE = 0.01
@@ -203,11 +187,7 @@ DAYS_PER_YEAR = 365
 BALANCE_COLUMNS = (
     ["country", "year", "item_code", "fao_item", "role"]
     + BALANCE_ELEMENTS
-    + [
-        "food_kcal_per_capita_per_day",
-        "food_protein_g_per_capita_per_day",
-        "food_g_per_capita_per_day",
-    ]
+    + ["food_million_kcal_per_year", "food_protein_tonnes_per_year", "food_tonnes_for_density"]
 )
 
 
@@ -270,11 +250,14 @@ def prepare_balance_table(tb: Table, roles: pd.Series, manual: dict) -> Table:
     tb = tb[tb["element_code"].isin(ELEMENTS) & (tb["item_code"].astype(str) != POPULATION_ITEM_CODE)].reset_index(
         drop=True
     )
-    tb = tb[["country", "year", "item_code", "fao_item", "element_code", "value"]].astype(
-        {"country": str, "item_code": str, "fao_item": str, "value": float}
+    tb = tb[["country", "year", "item_code", "fao_item", "element_code", "value", "population_with_data"]].astype(
+        {"country": str, "item_code": str, "fao_item": str, "value": float, "population_with_data": float}
     )
+    # Population of the entity, or, for a region, of its members with data (the FAOSTAT garden step's own per-capita
+    # denominator). Taken as the maximum over items and elements, i.e. every member that reports anything.
+    population = tb.groupby(["country", "year"])["population_with_data"].max().rename("population").reset_index()
     names = tb[["item_code", "fao_item"]].drop_duplicates().set_index("item_code")["fao_item"]
-    tb = tb.drop(columns=["fao_item"]).pivot(
+    tb = tb.drop(columns=["fao_item", "population_with_data"]).pivot(
         index=["country", "year", "item_code"], columns="element_code", values="value", join_column_levels_with="_"
     )
     tb = tb.rename(columns={code: name for code, name in ELEMENTS.items()})
@@ -287,7 +270,10 @@ def prepare_balance_table(tb: Table, roles: pd.Series, manual: dict) -> Table:
     for override in manual["role_overrides"]:
         tb.loc[tb["item_code"] == _pad_code(override["code"]), "role"] = override["role"]
     assert tb["role"].notnull().all()
-    return tb[BALANCE_COLUMNS]
+    tb["food_tonnes_for_density"] = tb["food"]
+    tb = tb.merge(population, on=["country", "year"], how="left")
+    assert tb["population"].notnull().all(), "Some SCL rows have no population."
+    return tb[BALANCE_COLUMNS + ["population"]]
 
 
 def prepare_fish_table(tb_fbsc: Table, manual: dict) -> Table:
@@ -317,9 +303,14 @@ def prepare_fish_table(tb_fbsc: Table, manual: dict) -> Table:
     tb["stock_variation"] = tb["production"] + tb["imports"] - tb["exports"] - tb["domestic_supply"]
     tb["fao_item"] = tb["item_code"].map({c: it["name"] for c, it in fish_items.items()})
     tb["role"] = tb["item_code"].map({c: it["role"] for c, it in fish_items.items()})
-    # FBS gives food per capita in kg per year; SCL in grams per day. Convert so the density formula is shared.
-    tb["food_g_per_capita_per_day"] = tb["food_kg_per_capita_per_year"] * 1000 / DAYS_PER_YEAR
-    return tb[BALANCE_COLUMNS]
+    # FBS tonnages are rounded to 1,000 t, so densities are taken from its per-capita figures. The density is a
+    # ratio, so the population cancels: express the per-capita figures per person in the same units as SCL's totals
+    # (kcal / 1e6 -> million kcal, grams of protein / 1e6 -> tonnes, kg of food / 1000 -> tonnes).
+    tb["food_million_kcal_per_year"] = tb["food_kcal_per_capita_per_day"] * DAYS_PER_YEAR / 1e6
+    tb["food_protein_tonnes_per_year"] = tb["food_protein_g_per_capita_per_day"] * DAYS_PER_YEAR / 1e6
+    tb["food_tonnes_for_density"] = tb["food_kg_per_capita_per_year"] / 1000
+    tb["population"] = np.nan  # filled from the SCL rows of the same entity and year
+    return tb[BALANCE_COLUMNS + ["population"]]
 
 
 def sanity_check_balance_identity(tb: Table) -> None:
@@ -351,7 +342,7 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
         tb["density_source"] = "mass"
         return tb
 
-    raw = 100 * tb[config["numerator"]] / tb["food_g_per_capita_per_day"]
+    raw = TO_PER_100G * tb[config["numerator"]] / tb["food_tonnes_for_density"]
     raw = raw.where(np.isfinite(raw) & (raw >= 0))
     within_ceiling = raw.where(raw <= config["ceiling"])
     # A density of exactly zero is real for oils and sugars (no protein), but it is also what a tiny food quantity
@@ -466,43 +457,7 @@ def build_chain(tb: Table) -> Table:
         converted[stage] = converted["production"].where(tb["role"] == role, 0)
     converted = converted.drop(columns=["production"])
     chain = converted.groupby(["country", "year"], as_index=False).sum(min_count=1)
-
-    # Population first (assumption 9), so that a region's per-capita values divide the reporting members' totals by
-    # the reporting members' population, not by the whole region's.
-    chain = paths.regions.add_population(chain, warn_on_missing_countries=False)
-    missing_population = sorted(set(chain[chain["population"].isnull()]["country"]))
-    if missing_population:
-        log.warning(f"Dropping entities without OWID population: {missing_population}")
-        chain = chain.dropna(subset=["population"]).reset_index(drop=True)
-
-    # Assumption 8: OWID regions as sums of their members' totals (everything is additive at this point).
-    value_columns = [c for c in chain.columns if c not in ["country", "year"]]
-    chain = paths.regions.add_aggregates(
-        chain,
-        regions=REGIONS_TO_BUILD,
-        aggregations={c: "sum" for c in value_columns},
-        min_frac_population=MIN_FRAC_POPULATION_REGIONS,
-        warn_on_missing_population=False,
-    )
-
-    # Coverage check on totals: the sum of all countries' food against FAO's own World aggregate.
-    summed = paths.regions.add_aggregates(
-        chain[~chain["country"].isin(REGIONS_TO_BUILD + ["World", "European Union (27)"])][["country", "year", "food"]],
-        regions=["World"],
-        aggregations={"food": "sum"},
-        warn_on_missing_population=False,
-    )
-    summed = summed[summed["country"] == "World"].set_index("year")["food"]
-    fao_world = chain[chain["country"] == "World"].set_index("year")["food"]
-    coverage = (summed / fao_world).dropna()
-    log.info(
-        "food_supply_chain_scl.countries_summed_vs_fao_world_food",
-        min=round(coverage.min(), 3),
-        max=round(coverage.max(), 3),
-    )
-    assert coverage.between(0.9, 1.05).all(), (
-        f"Sum of countries' food differs from FAO's World by more than 10%: {coverage.round(3).to_dict()}"
-    )
+    chain = chain.merge(tb[["country", "year", "population"]].drop_duplicates(), on=["country", "year"], how="left")
 
     chain["processing_net"] = chain["processing"] - chain["processed_production"]
     chain = chain.drop(columns=["processing", "processed_production"])
@@ -515,6 +470,8 @@ def build_chain(tb: Table) -> Table:
     chain["balancing_difference"] = chain["food"] - chain_end
     chain["residuals"] = chain["residuals"] - chain["balancing_difference"]
 
+    # Per person per day (assumption 9): OWID population, or for regions the population of the members with data.
+    assert chain["population"].notnull().all() and (chain["population"] > 0).all(), "Missing population."
     for stage in STAGES:
         chain[stage] = chain[stage] / chain["population"] / DAYS_PER_YEAR
     return chain[["country", "year"] + STAGES]
@@ -593,6 +550,7 @@ def run() -> None:
     covered = tb[["country", "year"]].drop_duplicates()
     tb_fish = tb_fish.merge(covered, on=["country", "year"], how="inner")
     tb = pr.concat([tb, tb_fish], ignore_index=True)
+    tb["population"] = tb.groupby(["country", "year"])["population"].transform("max")
     sanity_check_balance_identity(tb)
 
     tables = []
