@@ -5,47 +5,70 @@
 
 Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
 
-> **⚠️ `verify_page.js` does not fit in a `use_figma` call as it ships.** The `code` argument caps at
-> **50,000 characters** and the file is **~117,000**, so the instruction below is not executable
-> verbatim — a run that pastes it is rejected. Emit it stripped instead:
+> **⚠️ `verify_page.js` does not fit in a `use_figma` call whole.** The `code` argument caps at
+> **50,000 characters** and the file is **153,517** raw / **74,627** stripped, so the instruction below
+> is not executable verbatim. `inline_script.py verify_page.js` with no `--rows` **refuses and exits 1**,
+> and `--whole` does not override it — the cap is a hard floor for this script, not a judgement call.
 >
-> **Run it in slices — that is the supported path, and the only one.** Stripping the comments used to
-> get it *just* under the cap (the helper is context-aware, so URLs, regex literals and template
-> strings survive), and even then it sat at 97%, all of which has to be relayed verbatim — where a
-> one-character corruption yields a *wrong verdict* rather than an error, the exact failure this gate
-> exists to catch. It has since grown past the cap outright: **60,937 stripped**. So
-> `inline_script.py verify_page.js` with no `--rows` **refuses and exits 1**, naming the size and
-> pointing here, and `--whole` no longer overrides that — the cap is now a hard floor for this
-> script, not a judgement call. The rows are grouped, each slice carries the shared preamble:
+> **Run it in slices — that is the supported path, and the only one.** The stripper is context-aware,
+> so URLs, regex literals and template strings survive. Each slice carries the shared preamble:
+>
+> **Every character of a slice has to be relayed verbatim, and that is why the percentages matter
+> beyond "does it fit".** A one-character corruption in this file yields a *wrong verdict* rather than
+> an error — the exact failure the gate exists to catch. Pipe `inline_script.py` straight into the
+> call; never retype a slice, and never hand-minify one to buy room. (Minifying `verify_page.js`
+> whole does fit — 45.9KB — and is a trap for the same reason: it trades a size problem for an
+> unreadable blob you cannot proofread.)
 >
 > ```bash
 > .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js --list-rows
-> .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js --rows series --frame-id <your frame>
+> .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js --rows series,skipped --frame-id <your frame>
 > ```
 >
 > | group | rows | size |
 > |---|---|---|
-> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 74% of cap |
-> | `series` | series-weight, furniture-weight, furniture-dash | 68% |
-> | `geometry` | box-alignment, gap, margins, off-palette | 65% |
-> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 90% |
+> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 52% of cap |
+
+**`text-floor` fails on the 850-wide templates themselves.** `Static Chart Template_Vertical` and its
+Horizontal twin set the `OurWorldinData.org — Research and data…` tagline and the `Licensed under
+CC-BY…` line at **11px**, under the row's 12px floor for this format — measured in the template, not
+in a page built from it. So two FAILs there are inherited furniture, not a page defect: check that the
+failing ranges are exactly those two footer rows, say so, and leave them. Anything else under the
+floor is yours.
+
+> | `series` | series-weight, furniture-weight, furniture-dash | 47% |
+> | `geometry` | box-alignment, gap, margins, **within-frame**, **dead-fills**, **page-census**, off-palette | 61% |
+> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 69% |
+> | `skipped` | every declared gap — the colour_audit.py command, spelling, entity completeness, arrows, leader-on-map | 55% |
 >
-> Groups combine, so the whole pass is **three calls**: `--rows annotations` (45,163), `--rows series`
-> (34,217), `--rows type,geometry` (42,489) — measured 2026-08-28. Three and not four because the
-> preamble is byte-identical across slices and each row group is a self-contained block after it
-> (GOTCHAS.md → Running the scripts has the `cmp` proof and the composition rule); concatenating
-> verbatim blocks is not the hand-rolled subset forbidden below, since nothing is reimplemented.
+> Groups combine, so the whole pass is **three calls**: `--rows annotations` (34,396), `--rows
+> type,geometry` (40,664), `--rows series,skipped` (35,205) — measured 2026-09-01, largest **81% of
+> cap** against a **69% floor**. Three and not four because the preamble is byte-identical across
+> slices and each row group is a self-contained block after it (GOTCHAS.md → Running the scripts has
+> the `cmp` proof and the composition rule); concatenating verbatim blocks is not the hand-rolled
+> subset forbidden below, since nothing is reimplemented.
 >
-> `inline_script.py --check` reports the largest of the three, **90% of cap**. It measures **these
-> declared calls**, held as `DOCUMENTED_CALLS` in the script, rather than the smallest split it could
-> find for itself — an optimiser would go on reporting a comfortable number by picking a split nobody is
-> told to send. Change the calls here and there together.
+> **The `skipped` region is why the numbers came down.** Those rows are pure prose — the declared gaps
+> and the ready-to-paste `color_audit.py` command — and until 2026-09-01 they sat OUTSIDE every region,
+> so all three calls re-sent the same 13,217 characters. That was the whole reason the shared floor
+> stood at 26,899 and the largest call at **90% of cap** with re-splitting "nearly exhausted". Moving
+> them into their own region took the floor to ~15,700 and the worst call from 90% to **73%** — while
+> three checks were *added*. If this creeps back up, look first for prose that every slice is paying for.
+>
+> **Every slice declares what it did NOT carry.** `--rows` stamps `EMITTED_ROWS` into the emitted text,
+> and the returned object carries `coverage: { emitted, omitted }` plus a `PARTIAL PASS:` clause in the
+> `verdict`. Without it, "no mechanical row failed" out of one of three calls reads as a verdict on the
+> frame — the same confident silence the SKIPPED rows exist to prevent, reached by slicing rather than
+> by not looking. A sliceable script that declares no `EMITTED_ROWS` is refused by `inline_script.py`.
+>
+> `inline_script.py --check` reports the largest of the three. It measures **these declared calls**,
+> held as `DOCUMENTED_CALLS` in the script, rather than the smallest split it could find for itself —
+> an optimiser would go on reporting a comfortable number by picking a split nobody is told to send.
+> Change the calls here and there together; `test_inline_script.py` fails if they drift.
 >
 > Read the **`floor`** column beside the `sent` percentage, because they answer different questions:
 > `sent` is what today's declared calls cost and can always be bought down by re-splitting, while `floor`
 > is the preamble plus the single largest row group — the smallest any call can be, whatever the split.
-> `verify_page.js` now reads **90% sent against a 90% floor**, because `annotations` alone *is* the
-> largest call.
 >
 > **`--check` exits 1 in three distinct cases, and the remedy is different in each — read which one you
 > are in off the output:**
@@ -53,19 +76,56 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > | output | what it means | remedy |
 > |---|---|---|
 > | `OVER CAP` beside the `sent` column | the largest **documented** call is over the cap, so the pass as written does not run | **repartition**: declare a split whose largest call fits, here and in `DOCUMENTED_CALLS` together |
-> | `FLOOR OVER CAP` | preamble + the largest single row group is itself over the cap | repartitioning **cannot** help — move rows into a separate script with its own preamble |
+> | `FLOOR OVER CAP` | preamble + the largest single row group is itself over the cap | repartitioning **cannot** help — move rows into a separate script with its own preamble, or find prose every slice is paying for and give it its own region |
 > | `in the file but never sent` / `documented but not in the file` / `sent by more than one call` | `DOCUMENTED_CALLS` and the file's `#region` markers have drifted apart, so the measurement describes a workflow nobody sends | bring this doc and the constant back into step |
 >
-> The two-call pass this file prescribed until 2026-08-28 was the **first** case, not the second:
-> `--rows geometry,annotations` had reached 50,594 characters (101% of cap) while the floor was still
-> 45,163 (90%, under it), so repartitioning was available — and the three calls above are that
-> repartition.
+> Two worked examples of the first case, both real. The two-call pass this file prescribed until
+> 2026-08-28: `--rows geometry,annotations` had reached 50,594 (101% of cap) while the floor was still
+> 45,163 (90%, under it), so repartitioning was available and the three calls were that repartition.
+> Then on 2026-09-01 the floor itself hit 90% and `--check` printed `re-splitting is nearly exhausted`
+> — which was **not** the second case: the exhaustion was 13,217 characters of declared-gap prose
+> outside every region, and giving it one bought the floor back down to 68%.
 >
-> **A floor past 85% is a WARNING and exit stays 0.** `verify_page.js` prints `floor at 90% —
-> re-splitting is nearly exhausted` today and still passes: it says the second case is approaching, not
-> that anything is broken. Re-measure both places when the script next grows.
+> **A floor past 85% is a WARNING and exit stays 0.** It says the second case is approaching, not that
+> anything is broken. Re-measure both places when the script next grows.
 > **Run all three** — each reports its own rows and nothing else, so a group you skip is a group
-> nobody checked.
+> nobody checked, and each one now says so in its own verdict.
+>
+> **A locally-authored SVG gets materially LESS checking than a grapher embed, and the rows say so
+> rather than failing.** Most of this file keys off grapher's own node names — `line__<Entity>`,
+> `outline__<Entity>`, `label__<Entity>`, `datapoints__<Entity>`, `horizontal-grid-lines`,
+> `vertical-axis`. A chart drawn by `build_body.py` or any other local generator arrives with
+> matplotlib's names instead (`Vector`, and text nodes named after their own content), so those rows
+> find nothing to judge. Measured on a real DI frame — nine panels, nine teal lines, 27 labels, every
+> one of them correct — **seven rows skipped**: `series-weight`, `furniture-weight`, `polylines`,
+> `label-contrast-on-background`, `colour-vision`, `grayscale-seams`, and with them the palette, which
+> read the chart as a **single-colour** palette of `#fffbf5` (the nine panel rectangles) and never saw
+> the teal at all.
+>
+> Nothing there is wrong, and nothing is silently passed — every one of those rows names what it could
+> not find. But a run that reads "no mechanical row failed" off such a frame has far thinner coverage
+> than the same sentence on a grapher import, so **say which rows skipped for want of a name**.
+>
+> The fix is cheap and belongs in the generator: **name the nodes the way grapher does.** A series line
+> becomes `line__<Entity>`, a direct label `label__<Entity>`, the gridline group
+> `horizontal-grid-lines`. Do it in the SVG (matplotlib takes `gid`) rather than renaming in Figma
+> afterwards, so a re-import keeps it. `/create-static-viz` owns the emitting step, so a change here is
+> one for that skill too.
+>
+> **A `gid` names the wrapping GROUP, not the node inside it** — matplotlib writes
+> `<g id="label__Ghana"><text/></g>`, so Figma gives you a GROUP called `label__Ghana` holding a TEXT
+> called `Ghana`, and a series arrives as `line__Ghana` wrapping Figma's own "Clip path group"
+> wrappers around the vector. Any row reading a node's **own** name therefore still sees nothing.
+> `series-weight` and the palette were always safe (the collector carries the naming ancestor down the
+> walk), but `polylines` and `label-contrast-on-background` each read the node's own name and reported
+> "no line__* VECTOR" and "no label__* text" on a frame carrying **27 of each**. Both now resolve
+> through the ancestor. If you add a row that keys on a name, key it on the ancestor: on an imported
+> chart the name is essentially never on the painted node.
+>
+> Two rows stay skipped whatever you name: **`furniture-weight`** (nothing sits under an
+> `axis`/`grid-lines` container unless the generator emits one) and, on a single-series-colour chart,
+> the **colour audit**, which correctly reports NOTHING TO RUN because a palette of one colour has no
+> pair to compare.
 >
 > **Budget for this: relaying the pass is the single largest time cost in a run.** The benchmark's second
 > run took 48 min against a 30.8 min baseline, and roughly 17 min of the difference was relaying these
@@ -80,6 +140,23 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > after the last change.
 > `diff_against_template.js` (~12,000 stripped) needs none of this.
 >
+> **This generalizes past the fitting step: after any small incremental edit, re-run the smallest
+> `--rows` group that covers what you touched rather than the whole three-call pass, and never a
+> hand-rolled substitute.** (The whole pass still runs once, after the last change.) Look the groups
+> up rather than guessing them — the rows are grouped by what they measure, not by what you moved:
+>
+> | Edit | Groups to re-run |
+> |---|---|
+> | Moved a tick, added a gridline | `series` (furniture weight, dash) + `geometry` (box alignment, gap, margins) |
+> | …the same, with an annotation anywhere on the plot | those **plus `annotations`**: `annotation-overlap` and `annotation-knockout` compute their crossings against furniture, so a gridline that comes to run under an annotation changes the knockout tier it must carry — the failure the next paragraph describes — while the other two groups stay silent |
+> | Nudged an annotation or its label | `annotations` **plus `geometry`**: `margins` and `within-frame` live there and both judge annotation nodes (`margins` by the `annotation__*` name, `within-frame` every visible node), so a nudge that pushes an annotation past the content box or off the artboard passes `annotations` alone |
+>
+> That middle row spans all three documented calls, and that is the right answer rather than a hole
+> in the rule: on an annotated plot there is no cheap furniture edit. Everywhere else the slice is
+> real and sized in seconds. The temptation to write a quick inline equivalent instead grows with how
+> small the edit feels — exactly backwards, since the row group costs the same whether the edit was
+> one line or twenty, and the paragraph below is why the hand-rolled option is never cheaper.
+>
 > **Do NOT substitute a hand-rolled subset. It is worse than skipping the pass, and this is
 > measured.** A run that could not relay the script wrote its own seven rows instead, reported six
 > `PASS` and shipped three defects a reviewer caught by eye within minutes: a series line left at
@@ -91,11 +168,12 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > *closes* the gap on paper while leaving it open in the frame, and you cannot tell from the report
 > which you have. So: relay the script, or declare the whole pass unrun.
 >
-> **[`scripts/verify_page.js`](../scripts/verify_page.js) runs the MECHANICAL rows in ONE read-only
-> `use_figma` call** — text floor, annotation ladder, named styles, text hierarchy, series and
-> furniture weights, dash patterns, box alignment, gap, margins, unbound fills, annotation knockout
-> tier, annotation block gap, and the series polylines the annotation-overlap row needs. Done one at
-> a time those are a dozen round trips at ~8-10s each.
+> **[`scripts/verify_page.js`](../scripts/verify_page.js) runs the MECHANICAL rows in THREE sliced
+> read-only `use_figma` calls** (the slicing is above; it does not fit in one and never will) — text
+> floor, annotation ladder, named styles, text hierarchy, series and furniture weights, dash
+> patterns, box alignment, gap, margins, nothing past the artboard, dead fills, the page census,
+> unbound fills, annotation knockout tier, annotation block gap, and the series polylines the
+> annotation-overlap row needs. Done one at a time those are a dozen round trips at ~8-10s each.
 >
 > **`label-contrast-on-background` is blind to an annotation built the prescribed way — expect it to skip
 > and compute those by hand.** Bolding the category word (which the house convention requires) makes
@@ -315,7 +393,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Direct labels name what they sit on | for each category label, compare its **fill** against the fill of the segment it names, and its **x** against that segment's edges in the reference row | the color is identical (same bound style, not merely a close hex) and the label is anchored on its own segment. A direct label carries the swatch's job with none of the swatch's proximity, so a mispaired one is unfalsifiable by eye |
 | Direct labels readable as text | `contrast(labelHex, "#ffffff")` for every category label drawn on the background | **4.5:1**. The same color must also clear 4.5:1 against the white value label inside its bar — a palette that only clears one of the two has to move (Step 8) |
 | Text size | read `fontSize` off every text node | nothing below **12px**; annotations on the named ladder |
-| Mark weight | read `strokeWeight` off **every** line and halo, after the last scale | on a highlight treatment: context **1px** (the settled value — GUIDELINES.md → Highlighting; 1.5px is the reference-page treatment this skill tells you not to copy), protagonist **3px**, halo 2× (or line+1 where nothing crosses). With **no** highlight treatment every series takes that same house pair — **3px line, 4px halo** — which is what `verify_page.js` gates on (`HOUSE_LINE`/`HOUSE_HALO`, and it is not frame-width dependent). Read it even when you never set it — and especially *because* you never set it: `rescale()` multiplies stroke weight, so fitting a chart to the band took grapher's 2.5px lines down to **0.88px** hairlines on a frame that otherwise measured perfect. Set the weights explicitly *after* the final scale, never before |
+| Mark weight | read `strokeWeight` off **every** line and halo, after the last scale | on a highlight treatment: context **1px** (the settled value — GUIDELINES.md → Highlighting; 1.5px is the reference-page treatment this skill tells you not to copy), protagonist **3px**, halo 2× (or line+1 where nothing crosses). With **no** highlight treatment every series takes that same house pair — **3px line, 4px halo** — which is what `verify_page.js` gates on (`HOUSE_LINE`/`HOUSE_HALO`, and it is not frame-width dependent). **A FACETED chart — small multiples — runs 2px instead, with the halo still at line+1, so 2/3.** Nine panels of 3px reads as heavy rule work rather than as data: the line stops being the thing that varies and starts being the grid. Set **`CONFIG.faceted`** and the row's target moves; leave it false on a faceted frame and every line reports as 1px too thin. Declared rather than detected, because "is this faceted" is a fact about the chart's design and a heuristic would pass or fail a correct nine-panel chart on a node count. The two cases differ in ONE number — the pair is always `line` and `line+1` — so there is no second rule to keep in step. Read it even when you never set it — and especially *because* you never set it: `rescale()` multiplies stroke weight, so fitting a chart to the band took grapher's 2.5px lines down to **0.88px** hairlines on a frame that otherwise measured perfect. Set the weights explicitly *after* the final scale, never before |
 | Furniture weight | read `strokeWeight` **and `dashPattern`** off the gridlines, the zero line and the tick marks | all **1px** — but the dash target is **per node type**, not blanket: the dashed gridlines are `[4, 4]`, while the **zero line and the tick marks are solid** and must keep an **empty `dashPattern`**. Applying one `[4, 4]` target to all three restyles the furniture instead of unscaling it. The safe repair is conditional — reset the weight everywhere, and only re-dash a node that already had a dash pattern, scaling its existing values back rather than assigning new ones. `rescale()` thins these too, and they are the easiest properties in the frame to miss because you never touch them and "don't restyle the grid" reads as "don't look at it": a 0.7× height fit left every gridline at **0.7px with a [2.81, 2.81] dash**, i.e. a visibly fainter, finer grid than any OWID chart ships. Restore them in the same pass as the series weights |
 | Label-on-fill contrast | `contrast(labelHex, barHex)` for every in-bar label | **4.5:1** at 13.5px regular — the 3:1 large-text allowance does not apply |
 | Text hierarchy | list every distinct `fontSize` with what it belongs to, **and its rank** | title > subtitle ≥ annotations > supporting text ≥ labels. Sizes may vary inside the plot by rank; a lead annotation may *equal* the subtitle (Annotation XL 16) but nothing may exceed it, and same-rank items must share a size |
@@ -328,7 +406,9 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Annotation block gap | the **block's** outer edges (topmost annotation, bottommost annotation, plot — whichever is extreme) vs the header and footer frames | the same clearance the plot owes: **27px** each side on the 540×540 pages. An annotation outside the plot is part of the block, so spacing the plot alone is not enough ([ANNOTATIONS-AND-ARROWS.md](ANNOTATIONS-AND-ARROWS.md)) |
 | Every pointer lands on its target | for each leader, the **terminal vertex** (transformed, not the bbox) vs the thing it names — the country's own **ink** on a map, the band border at the stated year on a chart | the dot or tip is inside/on its target, and where the text names a year, at that year's x — with the first and last year taken from the plot's edge, not the tick label's centre. **A country's bounding box is not the target.** Countries are concave and multi-part, so a point can sit well inside the box and still be in open ocean — the US box reaches past Hawaii, an antimeridian straddler's spans the whole Pacific (see the map fit in `reference/per-chart-type/maps.md`). **Do it in VECTORS first — it is exact, and it is one call.** Transform the terminal into the country's local space through the inverse of its `absoluteTransform`, parse its `vectorPaths` into rings, and ray-cast. No renders, no masks, and it caught a leader whose terminal sat in the Bay of Bengal while its bbox test passed. Fall back to the **pixel** mask — hide the country vector, diff the renders, require the dot within ~1px of that pixel set — only where the vector test cannot answer: a country a few pixels across whose ring is smaller than the dot, or a shape whose fill rule makes the ray-cast ambiguous |
 | Nothing in the margins | every visible mark's `absoluteBoundingBox` vs the content band | no ink outside **16…524** on a 540-wide frame. A speck left in the margin after a map fit renders as a cut sliver at the frame edge |
-| How much is on the page | count the plot-bearing objects anywhere on the page — `countries-with-data` groups on a map, the equivalent plot group otherwise — and name what each one is for | one per **intended** item: the deliverable, plus the reference copies you meant to place. A third is clutter. **Do not check this by testing top-level children for overlap** — that answers a different question and answers it "clean": on one page three world maps sat at three distinct positions, so an overlap test passed twice while the reader was looking at a pile of near-identical maps in the left-hand column, one of which displayed the export's own legend/map collision. The reader's question is *how many of this thing am I looking at*, and only a count answers it. Watch the truncation trap too: a per-item node census keyed on a **shortened** name silently merged `<slug>` with `<slug> — original SVG (unstyled)` into one bucket, which is how a 467-node count for a 233-node frame read as normal |
+| Nothing outside the artboard | every visible node's **painted extent** vs the **frame's own** bounds, all four edges — `absoluteBoundingBox` grown by the share of its stroke that falls outside the geometry (`CENTER` half the weight, `OUTSIDE` all of it, `INSIDE` none) | nothing past `0…frame.width` / `0…frame.height`. The box alone is not enough: Figma documents `absoluteBoundingBox` as excluding stroke, so a 3px centered rule flush with an edge measures perfectly inside while half its width is cut from the export. `absoluteRenderBounds` is not used instead — it folds in blur and drop shadows, and a shadow falling off the artboard is not lost ink anyone should re-pin a footer for. A 1px centered hairline flush with the edge overhangs by exactly the 0.5 tolerance and does **not** fire. Nor does a **full-bleed rule**: a stroke on an open path expands *perpendicular to the path only*, so with Figma's default butt cap (`strokeCap: "NONE"`) it paints nothing past either endpoint however heavy it is — grapher's gridlines are exactly this shape. The share of the half-weight landing on each axis is the perpendicular's own share, read per segment off `vectorNetwork` and maxed over them, so a *shallow diagonal* starting on the left edge overhangs it by ~0.015px rather than the full 1.5 — a steep one still overhangs for real and still fails. A rotated node's vertices cannot be trusted for this, so it keeps the full conservative outset. `ROUND` and `SQUARE` caps do project half a weight past the endpoint and keep the outset on that axis. The painted extent is then **intersected with every clipping ancestor**: a frame with `clipsContent` removes its descendants' overflow before export, so a mark running past its own viewport was never at the artboard edge to lose — an imported SVG arrives wrapped in exactly those clip groups, and `FITTING.md` records the same rule from the other side (`absoluteRenderBounds` "is clipped by an ancestor frame"). When the box is inside and only the stroke overhangs, the row says so, because the fix is the `strokeAlign` and not the position. A node that paints nothing is not judged at all — but that is a rule about **paint, not area**: a zero-area gridline with a live stroke *is* ink, while a positive-area fill-less placeholder rectangle is not. Containers are the exception and are always judged, because the template's footer is an unfilled auto-layout frame and it is the node this row exists to catch. This is not the margins row: that one is left/right against the *content box* and plot ink only. The failure it exists for is a **footer that grew a row** — every template but static mobile 1 constrains its footer `MIN`, so it keeps its top edge and the extra height goes *downward, off the artboard*. Nothing errors, nothing clips, and it survives a screenshot of the frame; it is simply missing from the export. Re-pin with `footer.y = FOOTER_BOTTOM - footer.height` after any edit that changes a footer's height. A frame with `clipsContent` hides the overflow instead of spilling it — still a defect, and the row names which of the two you have |
+| Dead fills | any VECTOR whose every `vectorPaths` entry is `windingRule: "NONE"` **and** carries a visible fill **and** has area | none. A matplotlib `clipPath` arrives through `upload_assets` as exactly this: it paints nothing, so no screenshot shows it, while the layer panel shows a paint swatch and its colour enters the fill inventory that `off-palette` and the `color_audit.py` palette are built from. Nine of them put a phantom `#000000` into one real page's palette. **The area test is load-bearing** — grapher's own gridlines are open stroked paths measuring `123.75x0` with `windingRule: NONE` and a default black fill, and without it an untouched grapher import reports **29** findings, i.e. the row fires on every imported chart. Deleting them: Figma removes the wrapper GROUP once its last child goes, so reading `parent.children` after a `remove()` throws — guard with `parent.removed` |
+| How much is on the page (**computed** — `page-census`, REVIEW) | count the plot-bearing objects anywhere on the page — `countries-with-data` groups on a map, the equivalent plot group otherwise — and name what each one is for | one per **intended** item: the deliverable, plus the reference copies you meant to place. A third is clutter. **Do not check this by testing top-level children for overlap** — that answers a different question and answers it "clean": on one page three world maps sat at three distinct positions, so an overlap test passed twice while the reader was looking at a pile of near-identical maps in the left-hand column, one of which displayed the export's own legend/map collision. The reader's question is *how many of this thing am I looking at*, and only a count answers it. Watch the truncation trap too: a per-item node census keyed on a **shortened** name silently merged `<slug>` with `<slug> — original SVG (unstyled)` into one bucket, which is how a 467-node count for a 233-node frame read as normal. **`verify_page.js` now counts and names them for you**, in full and unshortened. It lists **every** object placed on the page rather than guessing which of them bear a plot — each entry carries its type and size, so a loose note or a decorative shape is dismissed by eye, whereas a wrong guess would drop a duplicate deliverable and answer "clean" to the very question the row asks. That is the same asymmetry as below: an overcount you can see beats an undercount you cannot. The objection that it never has a page was stale, since the frame gate already resolves the frame's own PAGE and switches to it, which is what loads the children. It descends **through** SECTION wrappers rather than stopping at `page.children`, because a section is a container you made rather than an item you placed — a section holding the deliverable and two reference copies would otherwise be counted and named as one object, which is this row answering "clean" to the very question it exists to ask. A GROUP and a FRAME both stay terminal: in this skill an imported chart *is* a group, so descending into one enumerates its internals — measured on a real page, a grapher import turned a 2-object census into **94**, listing every gridline and tick label, which answers "how many nodes" when the row's whole question is *how many of this thing am I looking at*. Both directions are wrong and they are not symmetric: the undercount hides clutter, the overcount buries the answer. It stays `REVIEW` and never `ok`, because the target is one per *intended* item and intent is not a property of the file |
 
 **A stroke weight read out of the embed SVG is in the EXPORT CANVAS's units, and the fit then scales
 it — so it is the weight the line *starts* at, never the one it arrives at.** Never take it as a
@@ -521,6 +601,29 @@ different losses come out of that, and only one is mechanical:
 
 Keep the improvements — the point is not to revert a colleague's edits, but to notice which of them
 were trades nobody actually chose, and put those back to the author.
+
+**Recovering geometry after a hand-edit, without trusting what you remember.** A hand-edit (or
+simply picking the work back up a session later) can leave you unsure whether a chart's current
+scale or origin still matches what you last computed — a note that grew a line and pushed the
+footer, a rebuilt template, a colleague's drag. Don't re-derive by re-reading your own old numbers;
+re-derive from what's actually on the canvas now. Any two marks whose *position* encodes a data
+value you know — two bars' ends, two *interior* ticks (never the first and last axis labels: grapher
+insets those by ~17px, see GOTCHAS.md → "the plot's edge is where the gridlines stop") — pin a
+linear scale exactly: solve for slope and origin from those two, then check a third known point
+against the prediction before trusting either. Mind what the position encodes: on a stacked bar,
+a stacked area or a Marimekko's segments, a segment's far edge is the running total up to it, not
+the segment's own value — that is a *length*, the difference between its two edges — so pair each
+edge with the cumulative value (or use the stack's outer edge); segment values fed in as positions
+fail the third point on an untouched chart just as surely as a hand-edit would. That is the recipe
+for a **linear axis**. On a logarithmic one (per-chart-type/misc.md's arrow chart is one) pixel
+position is linear in `log(value)`, not in the value, so run the same two-point pin and third-point
+check on `log(value)` — fed raw values, an untouched log-axis chart fails the third point every time
+and sends you hunting for a hand-edit that never happened. Agreement (within rounding) confirms the
+scale is still the one you assumed; a mismatch on the right transform means something *besides* the
+scale changed — a mark moved by hand, a non-uniform rescale — and the size of the mismatch tells you
+where to go looking. This costs one extra query against the alternative: silently drawing new
+geometry (a threshold line, a rescaled bar, a repositioned label) against constants that no longer
+describe the frame.
 
 ### Checking the words, not just the geometry
 

@@ -45,6 +45,7 @@ steps:
         - snapshot://wid/2026-06-18/world_inequality_database_distribution_with_extrapolations.csv
         - snapshot://wid/2026-06-18/world_inequality_database_fiscal.csv
         - snapshot://wid/2026-06-18/world_inequality_database_with_extrapolations.csv
+        - snapshot://wid/2026-06-18/wid_population.csv
         - data://garden/regions/2023-01-01/regions
   export://multidim/wid/latest/incomes_wid:
     - data://grapher/demography/2024-07-15/population
@@ -56,6 +57,19 @@ steps:
     - data://grapher/wid/2026-06-18/world_inequality_database
   export://multidim/wid/latest/wealth_wid:
     - data://grapher/wid/2026-06-18/world_inequality_database
+
+  # Harmonized PIP + WID income distributions (109 bins), bridging series and MLD decomposition
+  data://garden/poverty_inequality/2026-08-25/harmonized_income_distributions:
+    - data://garden/wb/2026-03-25/thousand_bins_distribution
+    - data://garden/wb/2026-06-26/world_bank_pip
+    - data://garden/wid/2026-06-18/world_inequality_database
+    # Demographic yardstick for the country weights: OWID population (totals) and UN WPP (adults 20+).
+    - data://garden/demography/2024-07-15/population
+    - data://garden/un/2024-07-12/un_wpp
+
+  # Varying-reference-year inequality trend analysis (PIP vs WID)
+  data://garden/poverty_inequality/2026-08-25/inequality_trends_by_reference_year:
+    - data://garden/poverty_inequality/2026-08-25/harmonized_income_distributions
 
   #
   # Luxembourg Income Study

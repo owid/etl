@@ -7,7 +7,7 @@ from typing import Any
 
 import git
 import pandas as pd
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
@@ -141,6 +141,53 @@ class ArticleRef:
             return "0"
 
 
+def same_config_uuid(a: str | None, b: str | None) -> bool:
+    """Compare two config UUIDs (`charts.configId`) case-insensitively.
+
+    UUIDs are case-insensitive identifiers, and the grapher admin accepts a
+    caller-supplied one in any case, so DB values may differ in case across
+    environments while naming the same chart.
+    """
+    return bool(a) and bool(b) and a.lower() == b.lower()  # type: ignore[union-attr]
+
+
+def _same_chart_across_envs(source_chart: gm.Chart, target_chart: gm.Chart) -> bool:
+    """Return true when source and target refer to the same logical chart."""
+    # The config UUID (charts.configId) is the chart's stable identity: rows
+    # copied from production keep it, and chart-sync carries it along when
+    # creating a chart on production. It's the strongest signal we have.
+    if same_config_uuid(source_chart.configId, target_chart.configId):
+        return True
+    if source_chart.etlConfigCatalogPath and source_chart.etlConfigCatalogPath == target_chart.etlConfigCatalogPath:
+        return True
+    # Legacy fallback for charts synced before config UUIDs were carried
+    # across environments: same numeric id and same creation time.
+    return source_chart.id == target_chart.id and source_chart.createdAt == target_chart.createdAt
+
+
+def _is_cross_env_twin(source_chart: gm.Chart, target_chart: gm.Chart | None) -> bool:
+    """True when production minted its own row (with a different numeric id) for
+    a staging chart — matched by config UUID or catalogPath instead."""
+    if target_chart is None or source_chart.id == target_chart.id:
+        return False
+    if same_config_uuid(source_chart.configId, target_chart.configId):
+        return True
+    return bool(
+        source_chart.etlConfigCatalogPath and source_chart.etlConfigCatalogPath == target_chart.etlConfigCatalogPath
+    )
+
+
+def _target_updated_at_for_review(source_chart: gm.Chart, target_chart: gm.Chart | None) -> dt.datetime | None:
+    """Timestamp key used for approvals/conflicts.
+
+    Cross-environment twins did not exist in production when the staging chart
+    was reviewed, so their approvals were recorded with targetUpdatedAt=NULL.
+    """
+    if target_chart is None or _is_cross_env_twin(source_chart, target_chart):
+        return None
+    return target_chart.updatedAt
+
+
 class ChartDiff:
     # Chart in source environment
     source_chart: gm.Chart
@@ -179,7 +226,9 @@ class ChartDiff:
         self.conflict = conflict
         self.error = error
         if target_chart:
-            assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
+            assert _same_chart_across_envs(source_chart, target_chart), (
+                "Mismatch between source and target chart identities!"
+            )
         self.chart_id = source_chart.id
         self.modified_checksum = modified_checksum
         self.edited_in_staging = edited_in_staging
@@ -305,6 +354,8 @@ class ChartDiff:
                 with Session(OWID_ENV.engine) as session:
                     staging_created_at = get_staging_creation_time(session)
             chart_edited_in_prod = self.target_chart.updatedAt > staging_created_at
+            if _is_cross_env_twin(self.source_chart, self.target_chart):
+                chart_edited_in_prod = False
 
             # If edited, check if conflict was resolved
             if chart_edited_in_prod:
@@ -382,7 +433,7 @@ class ChartDiff:
         approvals = cls._get_approvals(source_session, chart_ids, source_charts, target_charts, ignore_conflicts)
 
         # Get conflicts
-        conflicts = cls._get_conflicts(source_session, chart_ids, target_charts)
+        conflicts = cls._get_conflicts(source_session, chart_ids, source_charts, target_charts)
 
         # Get checksums
         checksums_diff = cls._get_checksums(source_session, target_session, chart_ids)
@@ -418,7 +469,7 @@ class ChartDiff:
 
             ## Checks
             if target_chart:
-                assert source_chart.createdAt == target_chart.createdAt, "CreatedAt mismatch!"
+                assert _same_chart_across_envs(source_chart, target_chart), "Chart identity mismatch!"
 
             # Approval
             assert chart_id in approvals, f"Approval not found for chart {chart_id}"
@@ -535,7 +586,10 @@ class ChartDiff:
             approval = gm.ChartDiffApprovals(
                 chartId=self.chart_id,
                 sourceUpdatedAt=self.source_chart.updatedAt,
-                targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # ty: ignore
+                # Must match the lookup in `_get_approvals`: catalog-path twins
+                # key on a NULL target timestamp (prod minted its own row), so
+                # record the same NULL here rather than the twin's updatedAt.
+                targetUpdatedAt=_target_updated_at_for_review(self.source_chart, self.target_chart),  # ty: ignore
                 status=status,  # ty: ignore
             )
             session.add(approval)
@@ -622,21 +676,44 @@ class ChartDiff:
         def _charts_are_equivalent_envs(s_chart, t_chart):
             # It can happen that both charts have the same ID, but are completely different (this
             # happens when two charts are created independently on two servers). If they
-            # have same createdAt then they are the same chart.
-            return not (t_chart and (s_chart.createdAt != t_chart.createdAt))
+            # have same createdAt then they are the same chart. ETL-authored
+            # charts can also be matched by their stable catalogPath.
+            return t_chart is not None and _same_chart_across_envs(s_chart, t_chart)
 
         chart_ids = source_charts.keys()
 
         if target_session is not None:
             try:
-                target_charts = gm.Chart.load_charts(target_session, chart_ids=chart_ids)
+                target_charts_list = gm.Chart.load_charts(target_session, chart_ids=chart_ids)
             except NoResultFound:
                 target_charts = {}
             else:
                 target_charts = {
                     chart.id: chart if _charts_are_equivalent_envs(source_charts[chart.id], chart) else None
-                    for chart in target_charts
+                    for chart in target_charts_list
                 }
+            # Charts created on staging and synced to production keep their
+            # config UUID (charts.configId) but get a fresh numeric id there.
+            # Match still-unmatched charts by config UUID first, then by
+            # catalogPath for ETL-authored charts synced before config UUIDs
+            # were carried across environments.
+            for source_chart_id, source_chart in source_charts.items():
+                if target_charts.get(source_chart_id) is not None:
+                    continue
+
+                stmt = select(gm.Chart).where(gm.Chart.configId == source_chart.configId)
+                twin = target_session.scalars(stmt).one_or_none()
+                if twin is not None:
+                    target_charts[source_chart_id] = twin
+                    continue
+
+                if source_chart.etlConfigCatalogPath:
+                    try:
+                        target_charts[source_chart_id] = gm.Chart.load_chart(
+                            target_session, catalog_path=source_chart.etlConfigCatalogPath
+                        )
+                    except NoResultFound:
+                        pass
         else:
             target_charts = {}
         return target_charts
@@ -658,10 +735,9 @@ class ChartDiff:
             # Normal timestamp-based lookup
             target_updated_ats = []
             for chart_id in chart_ids:
-                if target_charts.get(chart_id) is not None:
-                    target_updated_ats.append(target_charts[chart_id].updatedAt)  # ty: ignore
-                else:
-                    target_updated_ats.append(None)
+                target_updated_ats.append(
+                    _target_updated_at_for_review(source_charts[chart_id], target_charts.get(chart_id))
+                )
 
             approvals = gm.ChartDiffApprovals.latest_chart_approval_batch(
                 source_session,
@@ -674,13 +750,14 @@ class ChartDiff:
         return approvals
 
     @staticmethod
-    def _get_conflicts(source_session, chart_ids, target_charts) -> dict[int, gm.ChartDiffConflicts | None]:
+    def _get_conflicts(
+        source_session, chart_ids, source_charts, target_charts
+    ) -> dict[int, gm.ChartDiffConflicts | None]:
         target_updated_ats = []
         for chart_id in chart_ids:
-            if target_charts.get(chart_id) is not None:
-                target_updated_ats.append(target_charts[chart_id].updatedAt)  # ty: ignore
-            else:
-                target_updated_ats.append(None)
+            target_updated_ats.append(
+                _target_updated_at_for_review(source_charts[chart_id], target_charts.get(chart_id))
+            )
         conflicts = gm.ChartDiffConflicts.get_conflict_batch(
             source_session,
             chart_ids,
@@ -1160,6 +1237,43 @@ def get_chart_diffs_from_grapher(
     chart_diffs = {chart.chart_id: chart for chart in chart_diffs}
 
     return chart_diffs
+
+
+# Bookkeeping keys of an authored layer: grapher writes them itself, so their presence says
+# nothing about anyone having edited the chart.
+_PATCH_BOOKKEEPING_KEYS = ("id", "version", "$schema")
+
+
+def patch_paths_lost_by_sync(
+    target_patch: dict[str, Any] | None, source_patch: dict[str, Any] | None, _prefix: str = ""
+) -> list[str]:
+    """Fields of the target's authored layer that syncing the source over it would drop.
+
+    Chart-sync writes the source chart's config to the target, where the server re-diffs it into
+    the target's authored layer. That layer is then derived entirely from the source, so anything
+    only the target carries is lost. On a chart the branch created, the target's layer starts out
+    holding only the bootstrap `slug`, so anything beyond that was authored in the target's admin.
+
+    Nested fields are compared field by field, not as whole objects: the two sides can each hold a
+    different corner of the same object (`yAxis.min` in the target, `yAxis.max` in the source), and
+    reporting only `yAxis` as shared would let the target's half be dropped silently.
+
+    A field both sides carry is not reported. The source wins there by design, and that difference
+    is the change the reviewer approved in chart-diff — a slug renamed on staging, say.
+    """
+    target_patch = target_patch or {}
+    source_patch = source_patch or {}
+    lost = []
+    for key, target_value in target_patch.items():
+        # Bookkeeping only appears at the top level, and grapher writes it, not a person.
+        if not _prefix and key in _PATCH_BOOKKEEPING_KEYS:
+            continue
+        path = f"{_prefix}{key}"
+        if key not in source_patch:
+            lost.append(path)
+        elif isinstance(target_value, dict) and isinstance(source_patch[key], dict):
+            lost.extend(patch_paths_lost_by_sync(target_value, source_patch[key], f"{path}."))
+    return sorted(lost)
 
 
 def configs_are_equal(config_1: dict[str, Any], config_2: dict[str, Any], verbose=False) -> bool:

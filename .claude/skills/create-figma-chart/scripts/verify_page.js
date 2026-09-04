@@ -1,15 +1,38 @@
-// verify_page.js — the MECHANICAL rows of Step 8c, in one read-only `use_figma` call.
+// verify_page.js — the MECHANICAL rows of Step 8c, as THREE sliced read-only `use_figma` calls.
+//
+// ============================================================================================
+//  DO NOT PASTE THIS FILE INTO `use_figma`. IT DOES NOT FIT AND IT NEVER WILL.
+//
+//  `code` caps at 50,000 characters; this file is ~142,000 raw and ~72,000 stripped. Emit it in
+//  slices with the tool that exists for it — never by hand, and never by minifying it yourself:
+//
+//    .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js \
+//        --rows type,geometry --frame-id <frame>
+//    ... --rows series,skipped --frame-id <frame>
+//    ... --rows annotations   --frame-id <frame>
+//
+//  Three calls, that is the whole pass, and each one PARSES AND RUNS ALONE. Pipe the output
+//  straight into the call; every character is relayed verbatim, and a one-character corruption
+//  here yields a WRONG VERDICT rather than an error.
+//
+//  If you are about to hand-roll your own subset of these rows because this file "doesn't fit":
+//  stop. That is the exact failure the gate exists to catch, and it has happened — a run skipped
+//  this script, hand-rolled a handful of rows, and reported a pass it had not earned. Read
+//  reference/CHECKS.md, which documents the three calls and what each carries.
+// ============================================================================================
 //
 // reference/CHECKS.md is the gate before anyone sees a frame, and most of its rows are property
 // reads of a single page: font sizes, stroke weights, dash patterns, gaps, box alignment, margins,
 // bound-vs-raw fills, annotation knockouts. Run one at a time that is a dozen MCP round trips at
-// ~8-10s each; run as one traversal it is one. This is the same move `verify_templates.js` makes for
-// the template geometry, applied to a finished page.
+// ~8-10s each; run as one traversal per slice it is three. This is the same move
+// `verify_templates.js` makes for the template geometry, applied to a finished page.
 //
 // Read-only. It sets no property and creates no node.
 //
 // USAGE
-//   Fill in CONFIG and paste the whole file as one `use_figma` call.
+//   Emit a slice with `inline_script.py --rows <groups> --frame-id <frame>` (see the banner above);
+//   `--frame-id` rewrites CONFIG.frameId for you, so the output is ready to send as-is. The rest of
+//   CONFIG is edited here, in the file, before emitting.
 //     frameId       — the finished frame (the template clone, after Step 8).
 //     frameIds      — optional array, for a chart-rows SET: every frame is checked and the result is
 //                     one entry per frame. All of them must be on the SAME page, since a script may
@@ -27,6 +50,11 @@
 //                     changes the mark-weight bar (context 1px, protagonist 3px, halo 2x), makes
 //                     the muting grays a standing palette exception, and makes a muted CONTEXT line
 //                     legal to cross with an annotation (CHECKS.md allows exactly that).
+//     faceted       — true for a SMALL-MULTIPLES frame, which runs a 2px series line rather than the
+//                     house 3px (see FACET_LINE). Declared rather than detected: "is this faceted"
+//                     is a fact about the chart's design, and guessing it from node counts would
+//                     mean a correct nine-panel chart passing or failing on a heuristic. Left false
+//                     on a faceted frame, series-weight reports every line as 1px too thin.
 //     xlAnnotations — true when a lead annotation deliberately carries the message and takes
 //                     Annotation XL 16, level with the subtitle. That is the documented ceiling, spent
 //                     only when the annotation IS the message — so it has to be declared rather than
@@ -55,12 +83,25 @@ const CONFIG = {
   highlightTreatment: false,
   textFloor: null,
   xlAnnotations: false,
+  faceted: false,
 };
+
+// Which row groups this TEXT carries. `inline_script.py --rows` rewrites it to the slice it emitted.
+// Without it a slice cannot say what it did not cover, and "no mechanical row failed" out of ONE of
+// the documented calls reads as a verdict on the whole pass — the same confident-silence failure the
+// SKIPPED rows exist to prevent, arrived at by slicing rather than by not looking.
+const EMITTED_ROWS = ["type", "series", "geometry", "annotations", "skipped"];
+const ALL_ROW_GROUPS = ["type", "series", "geometry", "annotations", "skipped"];
 
 const LADDER_FULL = [12, 13, 14, 15, 16]; // Annotation XS..XL; the ceiling is L 15, XL only when
 const LADDER_CEILING = 15;                // the annotation IS the message (GUIDELINES.md)
 const SMALL_FRAME_W = 302;                // the small/pull templates, whose floor is 11 not 12
 const HOUSE_LINE = 3, HOUSE_HALO = 4;
+// A FACETED chart — small multiples — runs a thinner series line. Nine panels of 3px reads as heavy
+// rule work rather than as data: the line stops being the thing that varies and starts being the
+// grid. Settled at 2px on a nine-panel DI. The halo stays line+1, which is what the house pair
+// already is (3 -> 4), so the two cases differ in ONE number rather than in a rule.
+const FACET_LINE = 2;
 const FURNITURE_W = 1, FURNITURE_DASH = [4, 4];
 const BLOCK_CLEARANCE = 27;          // annotation block vs header/footer on the 540x540 pages
 // The chart's box must meet the content box EXACTLY — same tolerance verify_templates.js calls
@@ -706,13 +747,21 @@ const checkFrame = async (frameId) => {
       // A shared set of allowed numbers is the wrong shape: it rejects a valid 1px context line whose
       // halo is the required 2px, and accepts nonsense like a 4px `line__` beside a 1px `outline__`.
       // The bar is a RELATIONSHIP — context 1, protagonist 3, halo 2x (or line+1 where nothing crosses).
+      // The two flags COMPOSE: a small-multiples chart can also carry a highlight, and this branch runs
+      // first, so reading HOUSE_LINE here would judge a faceted frame against the house protagonist no
+      // matter what CONFIG.faceted says. That fails a correct 2px faceted protagonist and passes an
+      // incorrect 3px one — the row confidently inverted on the one frame that sets both. Only the
+      // protagonist number moves; the muted context stays 1 (it is the FLOOR of the relationship, not a
+      // scaled-down house weight) and the halo is already derived from its own paired line.
+      const proto = CONFIG.faceted ? FACET_LINE : HOUSE_LINE;
+      const which = CONFIG.faceted ? "faceted" : "house";
       const lineW = {};
       for (const s of series) if (s.seriesKind !== "outline") lineW[s.seriesName] = s.w;
       const bad = [];
       for (const s of series) {
         if (!s.seriesKind) continue;
         if (s.seriesKind !== "outline") {
-          if (!(Math.abs(s.w - 1) < 0.05 || Math.abs(s.w - HOUSE_LINE) < 0.05)) bad.push(`${s.name} ${r(s.w)} — a series line is 1 (muted context) or ${HOUSE_LINE} (protagonist)`);
+          if (!(Math.abs(s.w - 1) < 0.05 || Math.abs(s.w - proto) < 0.05)) bad.push(`${s.name} ${r(s.w)} — a series line is 1 (muted context) or ${proto} (${which} protagonist)`);
         } else {
           const lw = lineW[s.seriesName];
           if (lw === undefined) { bad.push(`${s.name} has no paired series line for ${s.seriesName} to size its halo against`); continue; }
@@ -721,12 +770,17 @@ const checkFrame = async (frameId) => {
         }
       }
       add("series-weight", bad.length ? "FAIL" : "ok",
-          bad.length ? bad.join("; ") : `all ${series.length} series stroke(s) hold the highlight relationship (line 1 or ${HOUSE_LINE}; halo 2x or line+1)`);
+          bad.length ? bad.join("; ") : `all ${series.length} series stroke(s) hold the ${which} highlight relationship (line 1 or ${proto}; halo 2x or line+1)`);
     } else {
-      const bad = series.filter((s) => Math.abs(s.w - (s.seriesKind === "outline" ? HOUSE_HALO : HOUSE_LINE)) >= 0.05);
+      // The pair is line + (line+1), which reproduces the house 3/4 exactly and gives a faceted
+      // frame 2/3. One number moves, so a faceted chart is not a second rule to keep in step.
+      const lineW = CONFIG.faceted ? FACET_LINE : HOUSE_LINE;
+      const haloW = lineW + 1;
+      const which = CONFIG.faceted ? "faceted" : "house";
+      const bad = series.filter((s) => Math.abs(s.w - (s.seriesKind === "outline" ? haloW : lineW)) >= 0.05);
       add("series-weight", bad.length ? "FAIL" : "ok",
-          (bad.length ? `off the house ${HOUSE_LINE}/${HOUSE_HALO}: ` + bad.map((s) => `${s.seriesKind}__${s.seriesName} ${r(s.w)} -> ${s.seriesKind === "outline" ? HOUSE_HALO : HOUSE_LINE}`).join(", ") + ". rescale() multiplies stroke weight — set these AFTER the last scale."
-                      : `all ${series.length} series stroke(s) at the house ${HOUSE_LINE}/${HOUSE_HALO}`) +
+          (bad.length ? `off the ${which} ${lineW}/${haloW}: ` + bad.map((s) => `${s.seriesKind}__${s.seriesName} ${r(s.w)} -> ${s.seriesKind === "outline" ? haloW : lineW}`).join(", ") + ". rescale() multiplies stroke weight — set these AFTER the last scale." + (CONFIG.faceted ? "" : " If this frame is SMALL MULTIPLES, set CONFIG.faceted and the target becomes " + FACET_LINE + "/" + (FACET_LINE + 1) + ".")
+                      : `all ${series.length} series stroke(s) at the ${which} ${lineW}/${haloW}`) +
           (unpairedOutlines.length ? ` (${unpairedOutlines.length} unpaired outline__* node(s) excluded — point rings, not halos)` : ""));
     }
   }
@@ -917,6 +971,345 @@ const checkFrame = async (frameId) => {
     }
   }
 
+
+  // Nothing outside the ARTBOARD. `margins` above is the LEFT/RIGHT content box tested against plot
+  // ink; this is the other axis and the other population — every visible node in the frame, against
+  // the frame's own bounds. It exists because this skill documents a failure that nothing caught:
+  // almost every template's footer is constrained MIN, so it keeps its TOP edge and a row that gains
+  // a line grows DOWNWARD, off the bottom of the artboard (TEXTS.md). Nothing errors and nothing
+  // clips, so it survives a screenshot of the frame and is simply missing from the export.
+  // A frame with clipsContent HIDES the overflow instead of spilling it. Still a defect — content the
+  // author wrote is not in the image — but a different one, so it is named rather than merged.
+  // Shared by within-frame and dead-fills: both ask whether a node RENDERS, and both switches —
+  // `visible: false` and effective opacity zero — are INHERITED, so neither can be read off the node.
+  const rendersHere = (n, root) => {
+    let m = n, opacity = 1;
+    while (m && m !== root) {
+      if ("visible" in m && !m.visible) return false;
+      if ("opacity" in m && typeof m.opacity === "number") opacity *= m.opacity;
+      m = m.parent;
+    }
+    return opacity > 0;
+  };
+  {
+    const OUT_EPS = 0.5;
+    // Visibility is INHERITED, and `findAll` returns a hidden node's descendants with their own
+    // `visible: true` intact. Climbing to the frame is what stops a switched-off block being reported
+    // as overflowing ink nobody can see — the same inherited-switch trap the frame gate above handles.
+    // OPACITY is the OTHER switch and it INHERITS the same way, so the same climb reads both. This file
+    // treats `visible: false` and effective opacity ZERO as ONE non-rendering state everywhere else —
+    // the frame gate above, `renders` for a paint, the zero-opacity return in `collect` for a node —
+    // and this row was the last place they were two. A block parked off the artboard at opacity 0
+    // paints no pixels, so calling it lost-on-export is a verdict about ink nobody can see: the same
+    // fire-on-nothing failure the visibility climb already exists to prevent, reached by the other
+    // switch. The test is EXACTLY zero, as it is everywhere else — a faded node is still ink, and a
+    // faded node hanging off the bottom of the artboard is still missing from the export.
+    const shown = (n) => rendersHere(n, frame);
+    // `absoluteBoundingBox` is GEOMETRY: Figma documents it as excluding stroke and effects, so a
+    // CENTER- or OUTSIDE-aligned stroke paints OUTSIDE the box every comparison below reads. A 3px
+    // centered rule sitting exactly on the artboard edge therefore measured as safely inside while
+    // half its width was cut from the export — the same silently-lost ink this row exists to catch,
+    // reached through the STROKE instead of through layout, and the one FITTING.md separates render
+    // bounds from bounding boxes for. `absoluteRenderBounds` would fold this in for free, but it
+    // folds in blur and drop shadows too, and a shadow falling off the artboard is not ink anyone
+    // should re-pin a footer for. So the outset is computed from the stroke alone, and only from one
+    // that actually PAINTS — the same `paints` test the zero-area gate below uses.
+    // How much of a unit perpendicular falls on each axis, taken over every segment of an open path.
+    // Vertices are LOCAL to the node, so a ROTATED node would report the wrong axes — the shares are
+    // refused there and the caller keeps the full, conservative outset. Over-reporting an overhang is
+    // recoverable; missing one is the failure this row exists to prevent.
+    const perpShare = (n) => {
+      const vn = n.vectorNetwork;
+      if (!vn || !Array.isArray(vn.vertices) || !Array.isArray(vn.segments) || !vn.segments.length) return null;
+      const at = n.absoluteTransform;
+      if (at && !(at[0][0] === 1 && at[0][1] === 0 && at[1][0] === 0 && at[1][1] === 1)) return null;
+      let x = 0, y = 0;
+      for (const s of vn.segments) {
+        const a = vn.vertices[s.start], z = vn.vertices[s.end];
+        if (!a || !z) return null;
+        const dx = z.x - a.x, dy = z.y - a.y, len = Math.sqrt(dx * dx + dy * dy);
+        if (!len) continue;
+        x = Math.max(x, Math.abs(dy) / len);
+        y = Math.max(y, Math.abs(dx) / len);
+      }
+      return { x, y };
+    };
+    const strokeOutset = (n, b) => {
+      if (!Array.isArray(n.strokes) || !n.strokes.some(paints)) return null;
+      // INSIDE keeps the whole stroke within the geometry; CENTER puts half of it outside; OUTSIDE all
+      // of it. Anything else (an unset align on an imported node) is treated as INSIDE and costs
+      // nothing: the plain box still gets compared.
+      const share = n.strokeAlign === "OUTSIDE" ? 1 : n.strokeAlign === "CENTER" ? 0.5 : 0;
+      if (!share) return null;
+      // `strokeWeight` is `figma.mixed` — a SYMBOL, not a number — when the four sides differ, so a
+      // `typeof === "number"` gate alone would read every per-side-weighted node as unstroked. The
+      // per-side weights stay numbers exactly when the node-level one does not.
+      const side = (k) => (typeof n.strokeWeight === "number" ? n.strokeWeight
+                                                              : typeof n[k] === "number" ? n[k] : 0);
+      const o = { l: side("strokeLeftWeight") * share, t: side("strokeTopWeight") * share,
+                  rr: side("strokeRightWeight") * share, bb: side("strokeBottomWeight") * share };
+      // A stroke on an OPEN axis-aligned path expands PERPENDICULAR to the path only: a BUTT cap —
+      // `strokeCap: "NONE"`, Figma's default — adds nothing beyond either endpoint. Grapher's
+      // gridlines and every full-bleed rule are exactly this shape, an open path measuring 123.75x0,
+      // so growing all four sides would report a 3px rule spanning the artboard as overhanging left
+      // and right by 1.5 each where it paints no pixel at all. That is the fire-on-correct-work
+      // failure this file exists to avoid, reached through the cap. ROUND and SQUARE caps DO project
+      // half a weight past the endpoint, so those keep the outset on the path's own axis. So do a
+      // MIXED cap and the ARROW variants: `strokeCap` is `figma.mixed` — a SYMBOL — exactly when the
+      // two ends DIFFER, which is how a one-ended leader arrow reports, so at least one end carries a
+      // projecting cap; and an arrowhead paints ink around its endpoint that no butt cap has. Treating
+      // both as butt read the prescribed arrow-capped leaders as gridlines. The suppressed case stays
+      // `NONE` — the shape every gridline and full-bleed rule actually is, and never mixed — so the
+      // fire-on-correct-work cases this branch was built for stay closed.
+      // The share of that half-weight landing on each AXIS is the perpendicular's own share, so it is
+      // full for a rule at right angles to the axis and near zero along the path's own direction.
+      // Restricting the exemption to exactly horizontal and vertical paths left every DIAGONAL
+      // carrying the full outset on both axes: a 3px segment from (0,10) to (100,11) paints 0.015px
+      // past the left edge and was reported as 1.5. Segments come from `vectorNetwork`, and the MAX
+      // over them is taken because one steep segment in an otherwise flat polyline does overhang, and
+      // because a corner join reaches past either segment's own perpendicular (an L of one horizontal
+      // and one vertical segment lands back on the full outset, which is right).
+      const capped = n.strokeCap === "ROUND" || n.strokeCap === "SQUARE"
+                  || typeof n.strokeCap === "symbol" || /^ARROW_/.test(n.strokeCap || "");
+      if (!capped) {
+        const p = perpShare(n) || (b && b.h === 0 && b.w > 0 ? { x: 0, y: 1 }
+                                 : b && b.w === 0 && b.h > 0 ? { x: 1, y: 0 } : null);
+        if (p) { o.l *= p.x; o.rr *= p.x; o.t *= p.y; o.bb *= p.y; }
+      }
+      return o;
+    };
+    // An intermediate frame with `clipsContent` removes its descendants' overflow BEFORE export, so a
+    // node hanging out of its own clipped viewport paints nothing beyond it and cannot then be lost at
+    // the artboard edge — those pixels were already gone, and the node needs no re-pinning. FITTING.md
+    // records the same rule from the other side: `absoluteRenderBounds` "is clipped by an ancestor
+    // frame, so it cannot measure a group that overflows". `findAll` still visits the descendant and
+    // `shown` reads only the visibility and opacity switches, so without this the row reports a series
+    // line running past its own clip group as ink lost off the artboard — an SVG import arrives
+    // wrapped in exactly those clip groups.
+    const clipTo = (n, box) => {
+      let m = n.parent, out = box;
+      while (m && m !== frame) {
+        if (m.clipsContent === true) {
+          const cb = rel(m);
+          if (cb) out = { l: Math.max(out.l, cb.l), t: Math.max(out.t, cb.t),
+                          rr: Math.min(out.rr, cb.rr), bb: Math.min(out.bb, cb.bb) };
+        }
+        m = m.parent;
+      }
+      return out;
+    };
+    // `fills` is `figma.mixed` — a SYMBOL — on a text node with PER-RANGE fills, which is exactly the
+    // shape the prescribed styled annotations take: one recoloured word inside grey text. Array.isArray
+    // reads the symbol as "no fills", a text node carries no strokes and no children, so the ink test
+    // below dropped precisely the text most likely to be hand-placed near an artboard edge. Read the
+    // RANGES, the way sizeRanges already reads per-range fontSize; when they cannot be read, count the
+    // node as ink — a spurious overhang names a node the operator can go and look at, a spurious pass
+    // cuts its text from the export with no report at all.
+    const mixedFillInks = (n) => {
+      if (typeof n.fills !== "symbol") return false;
+      try { return n.getStyledTextSegments(["fills"]).some((s) => Array.isArray(s.fills) && s.fills.some(paints)); }
+      catch (e) { return true; }
+    };
+    const offenders = [];
+    for (const n of frame.findAll(() => true)) {
+      if (!shown(n)) continue;
+      // A GROUP paints no ink of its own: its box is a UNION of its children's, and FITTING.md's
+      // measured case says that union counts HIDDEN descendants — one switched-off entity label held
+      // its ancestor groups at 510.281 against the 508.001 their visible ink actually measured. So a
+      // VISIBLE group wrapping a hidden node parked off the artboard reports an overhang that paints
+      // nothing, and `shown` cannot catch it because the group itself is genuinely shown. That is the
+      // fire-on-correct-work failure `dead-fills` needed its area gate for, reached through container
+      // bounds instead of through paint. Skipping costs no coverage — `findAll` visits every painting
+      // descendant separately, so real lost ink is still reported, and reported under the name of the
+      // node that actually overflows rather than of a wrapper three levels up.
+      if (n.type === "GROUP") continue;
+      const b = rel(n);
+      // A zero-AREA node can still be INK. A gridline is an open stroked path measuring 123.75x0, and
+      // one parked off the artboard is precisely the silently-lost-on-export case this row exists to
+      // catch — so skipping every zero-area node was a FALSE NEGATIVE, not noise control. The blanket
+      // skip came from the fill inventory, where the question is "what colour is on the page" and a
+      // strokeless zero-area node contributes none; here the question is "does this render outside the
+      // frame", and a stroke renders. Drop only what paints nothing at all.
+      const inks = (Array.isArray(n.fills) && n.fills.some(paints))
+                || mixedFillInks(n)
+                || (Array.isArray(n.strokes) && n.strokes.some(paints));
+      // A CONTAINER is judged whether or not it paints anything of its own: the template's footer is
+      // an auto-layout frame carrying NO fill, and it is both the node this row exists to catch and
+      // the node CHECKS.md tells you to re-pin. A LEAF that paints nothing is the opposite case — a
+      // fill-less placeholder rectangle, an empty spacer, a text node with no fill — and it renders no
+      // pixel anywhere, so reporting it as cut from the export is a verdict about ink that does not
+      // exist. The zero-area gate below already stated that rule ("drop only what paints nothing at
+      // all"); applying it ONLY under zero area was the oversight, not the rule itself. Area still
+      // decides nothing on its own: a zero-area node that paints IS ink, which is what the gridline
+      // case established.
+      const container = Array.isArray(n.children) && n.children.length > 0;
+      if (!b || (!inks && (!container || b.w <= 0 || b.h <= 0))) continue;
+      // Every edge is measured from the PAINTED extent — the geometry box grown by whatever share of
+      // the stroke hangs off that side. OUT_EPS still absorbs the hairline case: a 1px centered rule
+      // flush with the edge overhangs by exactly 0.5 and does not fire.
+      const so = strokeOutset(n, b) || { l: 0, t: 0, rr: 0, bb: 0 };
+      const px = clipTo(n, { l: b.l - so.l, t: b.t - so.t, rr: b.rr + so.rr, bb: b.bb + so.bb });
+      // A clip can leave nothing at all. The test is STRICT, so a zero-extent gridline — whose top and
+      // bottom are equal by construction — is not mistaken for one that was clipped away.
+      if (px.rr < px.l || px.bb < px.t) continue;
+      const edges = [];
+      if (px.l < -OUT_EPS) edges.push("left by " + r(-px.l));
+      if (px.t < -OUT_EPS) edges.push("top by " + r(-px.t));
+      if (fb && px.rr > fb.width + OUT_EPS) edges.push("right by " + r(px.rr - fb.width));
+      if (fb && px.bb > fb.height + OUT_EPS) edges.push("bottom by " + r(px.bb - fb.height));
+      if (!edges.length) continue;
+      // Whether the stroke is what pushed it out decides what the operator has to go and change: a box
+      // already outside needs re-pinning, a box still inside needs its strokeAlign or half a stroke of
+      // position. Saying which costs one comparison and saves a hunt for a layout bug that is not there.
+      const boxInside = b.l >= -OUT_EPS && b.t >= -OUT_EPS
+                     && (!fb || (b.rr <= fb.width + OUT_EPS && b.bb <= fb.height + OUT_EPS));
+      offenders.push((n.name || n.type) + " (" + n.type + ") " + edges.join(", ")
+        + (boxInside ? " — its BOX is inside the artboard; the overhang is its " + n.strokeAlign
+                     + "-aligned stroke, which paints outside the geometry absoluteBoundingBox reports"
+                     : ""));
+    }
+    const clipped = frame.clipsContent === true;
+    if (!fb) skip("within-frame", "frame box not resolved");
+    else add("within-frame", offenders.length ? "FAIL" : "ok",
+        offenders.length
+          ? offenders.length + " node(s) extend past the " + r(fb.width) + "x" + r(fb.height)
+            + " artboard: " + offenders.slice(0, 6).join("; ")
+            + (clipped
+                ? ". The frame CLIPS, so this does not spill onto the canvas — it is silently CUT from the export instead."
+                : ". The frame does not clip, so this renders outside the artboard and is lost on export.")
+            + " Almost every template footer is constrained MIN and grows downward (TEXTS.md): re-pin it"
+            + " with footer.y = FOOTER_BOTTOM - footer.height after any edit that changes its height."
+          : "every visible node's PAINTED extent — its box grown by any centered or outside stroke —"
+            + " sits inside the " + r(fb.width) + "x" + r(fb.height) + " artboard");
+  }
+
+  // Imported artifacts that carry paint but cannot paint it. A matplotlib `clipPath` arrives through
+  // `upload_assets` as a VECTOR whose every path has `windingRule: "NONE"` — a fill rule that paints
+  // nothing — while Figma gives it a default BLACK fill. It is invisible in every screenshot, so no
+  // visual review finds it, and it is fully visible in the layer panel and in `fills`: on a real page
+  // nine of them entered the palette as #000000, a colour that was nowhere on the canvas. That is the
+  // phantom-colour failure `renders` and the zero-area exclusion already guard against, reached by a
+  // third route. Reported as a FAIL because it corrupts off-palette and the colour-audit command
+  // below, not merely because it is clutter.
+  {
+    const dead = [];
+    let stroked = 0;
+    for (const n of frame.findAll(() => true)) {
+      if (n.type !== "VECTOR" || !Array.isArray(n.vectorPaths) || !n.vectorPaths.length) continue;
+      // A node that cannot RENDER cannot put a phantom colour in the palette, which is the entire harm
+      // this row reports. `paints` tests the fill's own switches but not the node's, and both of those
+      // are INHERITED — so a hidden or fully transparent clipPath artifact was reported as a defect
+      // whose stated consequence could not occur, and the remediation told the operator to go and
+      // delete something already invisible. Same inherited-switch climb within-frame uses.
+      if (!rendersHere(n, frame)) continue;
+      if (!n.vectorPaths.every((vp) => vp && vp.windingRule === "NONE")) continue;
+      if (!Array.isArray(n.fills) || !n.fills.some(paints)) continue;
+      // ZERO-AREA nodes are excluded, on the same grounds the fill inventory already excludes them:
+      // a grapher import's gridlines and ticks are open stroked paths measuring 123.75x0, so they
+      // carry windingRule NONE and Figma's default black fill and match every test above. Measured on
+      // a real page, an untouched grapher import produced 29 of them — a row that fires on every
+      // imported chart is the fire-on-correct-work failure this file exists to avoid, and it is the
+      // AREA that separates them: a clipPath artifact is a rectangle (79x57 on that same page), a
+      // gridline has no area to fill in the first place.
+      const db = rel(n);
+      if (!db || db.w <= 0 || db.h <= 0) continue;
+      const hasStroke = Array.isArray(n.strokes) && n.strokes.some(paints);
+      if (hasStroke) stroked++;
+      dead.push((n.name || n.type) + " " + r(n.width) + "x" + r(n.height)
+                + (hasStroke ? " (its STROKE still renders; only the fill is dead)" : ""));
+    }
+    // The REMEDIATION splits on that stroke, because the two cases need OPPOSITE actions and only one
+    // of them is "delete". The zero-area gate above excludes a gridline, but it does not exclude every
+    // stroked path: an open DIAGONAL — a series segment, a leader line — has both width and height in
+    // its bbox, so it has area, and it reaches this row carrying a live stroke and Figma's default
+    // black fill. That node is VISIBLE ARTWORK. A blanket "delete them" then removes a line the reader
+    // can see in order to tidy away a fill nobody can see, which is a worse defect than the one being
+    // fixed — and this row already knows the difference, since it prints "STROKE still renders" for
+    // exactly these. Clear the dead FILL there and keep the node; delete only what renders nothing.
+    const orphans = dead.length - stroked;
+    add("dead-fills", dead.length ? "FAIL" : "ok",
+        dead.length
+          ? dead.length + " node(s) carry a visible fill that CANNOT paint (every path windingRule NONE): "
+            + dead.slice(0, 6).join("; ")
+            + ". These are clipPath imports. They render nothing, so a screenshot cannot show them, but"
+            + " they sit in the layer panel with a paint swatch and their colour enters the fill"
+            + " inventory that off-palette and the color_audit.py palette are built from."
+            + (orphans
+                ? " DELETE the " + orphans + " that render nothing at all (Figma removes the wrapper"
+                  + " GROUP once its last child goes, so re-reading parent.children after a remove"
+                  + " throws — guard with parent.removed)."
+                : "")
+            + (stroked
+                ? " Do NOT delete the " + stroked + " marked \"STROKE still renders\" — the node is"
+                  + " visible artwork and only its FILL is dead. Clear that fill (fills = []) and KEEP"
+                  + " the node: deleting it removes a line the reader can see."
+                : "")
+          : "no zero-winding filled vectors — nothing carrying a paint it cannot render");
+  }
+
+  // The page-level census CHECKS.md prescribes. It was DECLARED unrunnable on two grounds and only one
+  // of them still holds. The first — that this script never has a page, and `page.children` on a page
+  // nobody switched to comes back short without erroring — is stale: the frame gate above already
+  // resolves the frame's own PAGE and switches to it, which is what loads the children. The second
+  // does not go away: the target is one object per INTENDED item, and how many reference copies were
+  // meant to be left beside the deliverable is not a property of the file. So the objects are counted
+  // and NAMED — which is the half a human cannot do quickly and the half CHECKS.md warns about
+  // ("do NOT substitute an overlap test", "do not key the census on a SHORTENED node name") — and the
+  // row is REVIEW rather than ok, because only a human can say how many were meant.
+  {
+    if (!page || !Array.isArray(page.children)) skip("page-census", "the frame's PAGE did not resolve, so its children cannot be counted");
+    else {
+      // CHECKS.md asks for the objects ANYWHERE on the page, and `page.children` alone is not that.
+      // SECTION and GROUP are pure WRAPPERS — containers the operator made, not items they placed — so
+      // a section holding the deliverable and two reference copies counts and NAMES a single object,
+      // and the pile of near-identical charts this row exists to surface is exactly what hides inside
+      // it. That is the census answering "clean" to the reader's question, which is the failure mode
+      // CHECKS.md already records for the overlap test it forbids. Wrappers are therefore descended
+      // THROUGH, keeping the wrapper name as a path prefix so the reader still knows where each item
+      // sits. A FRAME stays TERMINAL: a frame IS one of the objects being counted, and its children
+      // are that chart's parts rather than more items.
+      // SECTION only. A SECTION exists to ORGANISE a canvas, so one holding the deliverable and two
+      // reference copies is three objects and counting it as one is the undercount this descent was
+      // added to fix. A GROUP is the opposite: in this skill every imported chart IS a group, so
+      // descending into it enumerates its internals. Measured on a real page — a grapher import
+      // turned a 2-object census into **94**, listing every gridline and tick label, which answers
+      // "how many nodes" when the row's whole question is "how many of this thing am I looking at".
+      // Both directions are wrong and they are not symmetric: the undercount hides clutter, the
+      // overcount buries the answer. A FRAME was already terminal; a GROUP is terminal for the same
+      // reason.
+      const WRAPPERS = ["SECTION"];
+      let descended = false;
+      const census = (nodes, prefix) => nodes.flatMap((c) => {
+        const name = prefix + (c.name || "(unnamed)");
+        if (WRAPPERS.indexOf(c.type) !== -1 && Array.isArray(c.children) && c.children.length) {
+          descended = true;
+          return census(c.children, name + " / ");
+        }
+        // Position from the ABSOLUTE box, not `x`/`y`: those are relative to the PARENT, so a nested
+        // item's coordinates would be reported in its wrapper's space and two items under different
+        // wrappers could not be compared to each other at all.
+        const cb = c.absoluteBoundingBox;
+        return [name + " [" + c.type + "] " + r(c.width) + "x" + r(c.height)
+                + " @" + (cb ? r(cb.x) + "," + r(cb.y) : "?")
+                + (c.visible === false ? " HIDDEN" : "")];
+      });
+      const items = census(page.children, "");
+      add("page-census", "REVIEW",
+          items.length + " object(s) on page \"" + (page.name || "?") + "\", from "
+          + page.children.length + " top-level child(ren)"
+          + (descended ? " after descending through SECTION wrappers" : "") + ": "
+          + items.join(" | ")
+          + ". One per INTENDED item — the deliverable plus the reference copies you meant to place."
+          + " A spare is clutter. EVERYTHING placed on the page is listed, notes and stray shapes"
+          + " included: each carries its type and size so you can dismiss the non-plot ones by eye."
+          + " They are not filtered out, because deciding what bears a plot is a guess, and a wrong"
+          + " one DROPS a duplicate deliverable and answers \"clean\" to the question this row asks."
+          + " Names are given in FULL: keying this on a shortened name merges a"
+          + " slug with its own \"— original SVG (unstyled)\" copy into one bucket.",
+          { pageObjects: items });
+    }
+  }
+
   // Off-palette fills. Two standing exceptions are listed rather than flagged.
   {
     const plotFills = fills.filter((f) => f.insidePlot);
@@ -980,7 +1373,23 @@ const checkFrame = async (frameId) => {
     const identify = (v) => {
       const m = /^(line|slope|outline)__(.+)$/.exec(v.node.name);
       if (m) return { kind: m[1], series: m[2], label: v.node.name };
-      if (v.seriesOf && /^line$/i.test(v.node.name)) return { kind: v.seriesOf.kind, series: v.seriesOf.series, label: `${v.seriesOf.kind}__${v.seriesOf.series}` };
+      // `seriesOf` came from an ANCESTOR, so trusting it does not require the node to be named
+      // anything in particular. The old `/^line$/i` guard was written for a slope chart, whose
+      // stroked node happens to be called `line` — an SVG import names it `Vector` and buries it
+      // under Figma's own "Clip path group" wrappers, so every series failed to identify and this
+      // row reported "no line__*/outline__* VECTOR carried a readable vectorNetwork" on a frame
+      // whose nine series `series-weight` had just measured. Same group-carries-the-name trap the
+      // collector already solves; the row was the last place still reading the node's own name.
+      // ...but only for a STROKED vector. `seriesOf` comes from an ancestor, so EVERY vector inside
+      // `line__Ghana` inherits it — the endpoint markers (filled, no stroke) and Figma's own clip
+      // rectangles included. Unnarrowed, one series is reported as several polylines and
+      // annotation-overlap is handed a marker's box as though it were the line: measured on a real
+      // frame, nine series came back as 27. The series path is the stroked one; a marker is a filled
+      // blob. This narrows the ancestor rule rather than contradicting it — the name still comes from
+      // the group, because an import never puts it on the painted node.
+      if (v.seriesOf && Array.isArray(v.node.strokes) && v.node.strokes.some(paints)) {
+        return { kind: v.seriesOf.kind, series: v.seriesOf.series, label: `${v.seriesOf.kind}__${v.seriesOf.series}` };
+      }
       return null;
     };
     const lineWeightBySeries = {};
@@ -1275,7 +1684,19 @@ const checkFrame = async (frameId) => {
   // judged against the FRAME's fill, which is what is actually behind them; `label__*` nodes stay gated
   // on insidePlot because what is behind those is a mark, not the frame.
   {
-    const candidates = texts.filter((t) => t.fill && (/^annotation__/.test(t.name) || (t.insidePlot && /^label__/.test(t.name))));
+    // The name can sit on an ancestor GROUP rather than on the text: an SVG import puts the gid on a
+    // wrapping <g>, so `label__Mauritius` is a GROUP holding a TEXT called "Mauritius". Reading the
+    // node's own name misses every one of them — measured on a real page, 27 correctly named direct
+    // labels and this row reported "no label__*/annotation__* text sits on the frame's background".
+    const namedAs = (t) => {
+      let m = t.node;
+      while (m && m !== frame) {
+        if (/^(annotation|label)__/.test(m.name)) return m.name;
+        m = m.parent;
+      }
+      return t.name;
+    };
+    const candidates = texts.filter((t) => t.fill && (/^annotation__/.test(namedAs(t)) || (t.insidePlot && /^label__/.test(namedAs(t)))));
     // Two ways a label can be UNJUDGEABLE against the frame, and neither may be dropped: the on-fill row
     // is a DECLARED gap below (it needs label->mark pairing, which nothing here has), so anything routed
     // to it is reported by NOBODY, and a defect that leaves no row is worse than a row a human looks at.
@@ -1330,6 +1751,7 @@ const checkFrame = async (frameId) => {
 
   // ---------------------------------------------------------------- declared gaps in coverage
 // #endregion
+// #region skipped
   // These two are owned by color_audit.py, which cannot run in here — this is a Figma plugin
   // sandbox with no shell. But the palette it needs is already on the canvas, so emit the command
   // ready to paste instead of a tool name to go and look up. A declared gap the operator has to
@@ -1460,11 +1882,21 @@ const checkFrame = async (frameId) => {
       }
       const shared = [...catsByHex].filter(([, c]) => c.size > 1)
         .map(([h, c]) => `${h} carries ${[...c].slice(0, 4).join(" + ")}`);
-      const sharedNote = shared.length
-        ? ` One colour, two categories — the audit sees these as ONE entry and cannot report the clash,`
-          + ` so judge them by eye: ${shared.slice(0, 4).join("; ")}. Correct for a highlight treatment;`
-          + " a defect if they are separate categories."
-        : "";
+      // Two categories on one colour is normally worth raising — the audit collapses them into one
+      // entry and cannot report the clash. On a FACETED chart it is the design: every panel draws
+      // the same series in the same colour, and the panel, not the hue, is what separates them. Left
+      // ungated this note fires on every small-multiples frame and asks the reader to adjudicate
+      // nine "clashes" that are the chart working as intended — a warning that always fires is one
+      // nobody reads.
+      const sharedNote = !shared.length
+        ? ""
+        : CONFIG.faceted
+          ? ` ${shared.length} colour(s) carry more than one category (${shared.slice(0, 2).join("; ")}).`
+            + " EXPECTED here: CONFIG.faceted is set, and a small-multiples chart draws every panel's"
+            + " series in the same colour — the panel separates them, not the hue. Nothing to reconcile."
+          : ` One colour, two categories — the audit sees these as ONE entry and cannot report the clash,`
+            + ` so judge them by eye: ${shared.slice(0, 4).join("; ")}. Correct for a highlight treatment;`
+            + " a defect if they are separate categories.";
       const soleName = [...seen.values()][0];
       if (hexes.length < 2) {
         return (mixed ? (src.some((x) => x.fromMap) ? " MAP shapes —" : " Chart marks and series —") : "")
@@ -1579,26 +2011,34 @@ const checkFrame = async (frameId) => {
   // wording named the PIXEL mask as the method, which sent a reader following this output straight
   // past a one-call exact test and into a multi-render fallback.
   skip("leader-on-map", "terminal vertex against the country's own GEOMETRY, not its bounding box. Do it in VECTORS first: transform the terminal into the country's local space through the inverse of its `absoluteTransform`, parse `vectorPaths` into rings, ray-cast. Exact, and one call. The PIXEL mask (hide the country vector, diff the renders, require the dot within ~1px of that pixel set) is the FALLBACK, for the cases the ray-cast cannot answer — a country a few pixels across whose ring is smaller than the dot, or a fill rule that makes the cast ambiguous", "CHECKS.md + per-chart-type/maps.md");
-  // CHECKS.md -> "How much is on the page" prescribes this, so it gets a row: a prescribed check with
-  // no row at all is how a run returns "no mechanical row failed" while the reader is looking at a
-  // pile of near-identical maps. Declared rather than computed for two reasons, and only the first is
-  // fixable here. This script is handed FRAME ids and never a page, and `page.children` on a page
-  // nobody switched to comes back SHORT without erroring (GOTCHAS.md) — so an undercount would read
-  // as "clean", which is the exact failure the row exists to catch. `PageNode.loadAsync()` would
-  // settle that half (diff_against_template.js does it). The other half does not go away: the target
-  // is one object per INTENDED item, and how many reference copies were meant to be left on the page
-  // is not a property of the file.
-  skip("page-census", "count the plot-bearing objects ANYWHERE on the page — `countries-with-data` groups on a map, the equivalent plot group otherwise — and name what each one is for. One per intended item: the deliverable plus the reference copies you meant to place; a spare is clutter. Do NOT substitute an overlap test between top-level children — three maps at three distinct positions pass it while the reader sees a pile. And do not key the census on a SHORTENED node name, which merges `<slug>` with `<slug> — original SVG (unstyled)` into one bucket", "CHECKS.md -> How much is on the page");
 
+// #endregion
+  // What this TEXT could not have checked, stated in the verdict itself. A slice's rows are the only
+  // ones it can fail, so "no mechanical row failed" out of one documented call is a verdict on that
+  // call and not on the frame — and nothing in the returned shape said so, which is the same
+  // confident silence the SKIPPED rows exist to prevent, reached by slicing instead of by not looking.
   const fails = rows.filter((x) => x.status === "FAIL");
+  const omittedGroups = ALL_ROW_GROUPS.filter((g) => !EMITTED_ROWS.includes(g));
+  // The word that names the OUTCOME has to agree with the verdict it is appended to. This suffix was
+  // unconditional, so a slice that FAILED a row returned `FAIL on 1 row(s): margins — PARTIAL PASS` —
+  // self-contradicting to read, and it hands the string PASS to anything grepping these summaries for
+  // one. The coverage caveat itself is the same either way; only the verdict word and the sentence
+  // that says what the caveat means for the reader change.
+  const coverage = omittedGroups.length
+    ? ` — PARTIAL ${fails.length ? "CHECK" : "PASS"}: this call carried ${EMITTED_ROWS.join("+")} only.`
+      + ` The ${omittedGroups.join(", ")} row(s) are NOT in this text, so they are neither passed nor`
+      + ` failed here. Send the other documented call(s) (CHECKS.md) before reading`
+      + `${fails.length ? " the failure(s) above as this frame's only defects" : " this as a clean frame"}.`
+    : "";
   const review = rows.filter((x) => x.status === "REVIEW");
   const skipped = rows.filter((x) => x.status === "SKIPPED");
   return {
     frame: { id: frame.id, name: frame.name, w: fb ? r(fb.width) : null, h: fb ? r(fb.height) : null },
     resolved: { chartBy: chartResolvedBy, contentBox: [r(contentL), r(contentR)], band: [r(bandTop), r(footerTop)],
                 counts: { texts: texts.length, stroked: stroked.length, plotLeaves: leaves.filter((x) => x.insidePlot).length, annotations: annotations.length } },
-    verdict: fails.length ? `FAIL on ${fails.length} row(s): ${fails.map((f) => f.check).join(", ")}`
-                          : `no mechanical row failed (${review.length} to review, ${skipped.length} not covered here)`,
+    verdict: (fails.length ? `FAIL on ${fails.length} row(s): ${fails.map((f) => f.check).join(", ")}`
+                          : `no mechanical row failed (${review.length} to review, ${skipped.length} not covered here)`) + coverage,
+    coverage: { emitted: EMITTED_ROWS, omitted: ALL_ROW_GROUPS.filter((g) => !EMITTED_ROWS.includes(g)) },
     rows,
   };
 

@@ -1,0 +1,35 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Yearbook of Immigration Statistics
+    title_snapshot: Yearbook of Immigration Statistics 2024 - Lawful Permanent Residents
+    description: |-
+      The 2024 Yearbook of Immigration Statistics is a collection of tables about immigration for the fiscal year.
+    description_snapshot: |-
+      This workbook contains the Lawful Permanent Residents tables of the 2024 Yearbook (Tables 1-12 plus four supplemental tables). Table 1 shows the number of people who obtained lawful permanent resident status in the United States in each fiscal year from 1820 to 2024.
+
+      To protect privacy, DHS rounds all values to the nearest 10.
+    date_published: "2026-06-08"
+
+    # Citation
+    producer: US Department of Homeland Security
+    citation_full: |-
+      United States. Department of Homeland Security. 2024 Yearbook of Immigration Statistics. Washington, D.C.: U.S. Department of Homeland Security, Office of Homeland Security Statistics, 2026.
+    attribution_short: DHS
+
+    # Files
+    url_main: https://ohss.dhs.gov/topics/immigration/yearbook/2024/table1
+    # NOTE: the 2024 Yearbook also ships separate workbooks for refugees and asylees,
+    # naturalizations, nonimmigrant admissions, and enforcement actions - not snapshotted (2026-07-22).
+    url_download: https://ohss.dhs.gov/system/files/2026-06/2026_0604_ohss_yearbook_lawful_permanent_residents_fy2024.xlsx
+    date_accessed: "2026-07-22"
+
+    # License
+    license:
+      name: Public domain
+outs:
+  - md5: d60447d96a19476e5b08341fa02542ce
+    size: 258559
+    path: yearbook_lawful_permanent_residents_2024.xlsx
