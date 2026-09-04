@@ -8,13 +8,26 @@ ETL keeps a **vendored pin** of the upstream schema — a committed snapshot, sa
 owid-grapher (web team)
     │  publishes / mutates grapher-schema.010.json
     ▼
-schemas/grapher-schema.010.json              ← vendored pin (the only upstream copy in ETL)
+schemas/grapher-schema.010.json              ← vendored pin (the only full upstream copy in ETL)
     ├─→ etl/collection/model/schema_types.py    generated from it    ← unit test (offline)
     ├─→ multidim/explorer-schema $refs           resolved against it  ← at runtime (offline)
-    └─→ dataset-schema.json embedded block       checked against it   ← unit test (offline, enum-deep)
+    ├─→ dataset-schema.json embedded block       checked against it   ← unit test (offline, enum-deep)
+    └─→ schemas/grapher-schema.010.patch.json    same file, `required: ["$schema"]`
+                                                                     ← unit test (offline)
 
 vendored ↔ live upstream                      ← scheduled workflow + integration tests
 ```
+
+Upstream publishes a **patch variant** alongside every version, identical except that it requires
+only `$schema` instead of `$schema` + `dimensions`. It is the schema for a *partial* config, so
+`etl.grapher.helpers._validate_grapher_config` validates each indicator's
+`presentation.grapher_config` against it — that config is a patch applied on top of a chart's own
+config, never a complete chart. The URL is derived from the config's own `$schema` at validation
+time (`etl.files.patch_schema_url`), so validation follows whatever version a config pins;
+`DEFAULT_GRAPHER_SCHEMA` stays the non-patch URL, since that is the value written into configs.
+
+The patch file is vendored too, purely so the "differs in `required` and `$id` only" invariant can
+be asserted offline. Nothing reads the vendored copy at runtime.
 
 Everything inside the repo is machine-checked against the pin on every PR; only the pin itself can lag upstream, and that is what the scheduled workflow watches.
 
@@ -72,4 +85,5 @@ It can also be run ad-hoc — e.g. when the web team announces a change and you 
 | `schemas/*.json` edited without regenerating types, or generated file hand-edited | `tests/test_schema_types_generation.py` (unit, offline) |
 | Embedded `grapher_config` in `dataset-schema.json` out of sync with the vendored pin | `test_grapher_config_schema_sync` in `tests/test_metadata_schemas.py` (unit, offline, enum-deep) |
 | Vendored pin stale vs live upstream (in-place mutation) | scheduled workflow → draft PR; `test_vendored_grapher_schema_is_current` (integration) |
+| Patch variant diverges from the full schema beyond `required`/`$id`, or a refresh updated only one of the two | `test_vendored_patch_schema_matches_full_schema` in `tests/test_metadata_schemas.py` (unit, offline) |
 | Upstream publishes a new schema version | scheduled workflow → issue; `test_no_newer_grapher_schema_version` (integration) |

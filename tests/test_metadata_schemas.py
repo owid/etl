@@ -14,7 +14,7 @@ from yaml.loader import SafeLoader
 
 from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.dag_helpers import get_active_snapshots, get_active_steps
-from etl.files import read_json_schema
+from etl.files import patch_schema_url, read_json_schema
 from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR, STEP_DIR, STEPS_DATA_DIR
 
 log = structlog.get_logger()
@@ -385,6 +385,9 @@ LOCAL_ONLY_PROPERTIES = {"data", "includedEntities"}
 # Vendored copy of the upstream grapher schema (see scripts/generate_schema_types.py --refresh).
 VENDORED_GRAPHER_SCHEMA = SCHEMAS_DIR / DEFAULT_GRAPHER_SCHEMA.rsplit("/", 1)[-1]
 
+# Vendored copy of its patch variant, refreshed by the same `--refresh`.
+VENDORED_PATCH_SCHEMA = SCHEMAS_DIR / patch_schema_url(DEFAULT_GRAPHER_SCHEMA).rsplit("/", 1)[-1]
+
 
 def _local_enum_values(node) -> set | None:
     """Return the set of enum values a local schema node accepts, or None if unconstrained.
@@ -509,6 +512,40 @@ def test_grapher_config_schema_sync():
             "Local grapher_config has properties not in upstream schema (may be deprecated)",
             properties=sorted(removed),
         )
+
+
+def test_vendored_patch_schema_matches_full_schema():
+    """The patch schema must differ from the full one in `required` and `$id` only.
+
+    `etl.grapher.helpers._validate_grapher_config` validates indicator `grapher_config`
+    patches against the `.patch.json` variant, on the assumption that it is the full schema
+    with `required` narrowed to `["$schema"]` — so every other constraint
+    (`additionalProperties: false`, types, enums) still applies. This asserts that, offline.
+
+    It also catches a half-done refresh: `test_vendored_grapher_schema_is_current` detects a
+    stale *full* copy, and if `--refresh` updated the full file but not the patch one, the two
+    vendored files stop matching here.
+    """
+    with open(VENDORED_GRAPHER_SCHEMA) as f:
+        full = json.load(f)
+    with open(VENDORED_PATCH_SCHEMA) as f:
+        patch = json.load(f)
+
+    assert patch.pop("required", None) == ["$schema"], (
+        f"{VENDORED_PATCH_SCHEMA.name} must require only `$schema` — that is the whole point of "
+        "the patch variant. If upstream changed this, `_validate_grapher_config` needs revisiting."
+    )
+    assert full.pop("required", None) is not None
+    assert patch.pop("$id", None) == patch_schema_url(DEFAULT_GRAPHER_SCHEMA)
+    assert full.pop("$id", None) == DEFAULT_GRAPHER_SCHEMA
+
+    # Popping both keys means any *third* divergence fails here.
+    assert full == patch, (
+        f"{VENDORED_PATCH_SCHEMA.name} diverges from {VENDORED_GRAPHER_SCHEMA.name} beyond "
+        "`required` and `$id`. Validating partial configs against it is no longer equivalent to "
+        "validating against the full schema — review the diff before touching "
+        "`_validate_grapher_config`."
+    )
 
 
 @pytest.mark.integration

@@ -33,12 +33,20 @@ from pathlib import Path
 from typing import Any
 
 from etl.config import DEFAULT_GRAPHER_SCHEMA
+from etl.files import patch_schema_url
 from etl.paths import SCHEMAS_DIR
 
 OUTPUT_PATH = Path(__file__).parent.parent / "etl" / "collection" / "model" / "schema_types.py"
 
 # Vendored copy of the grapher schema (DEFAULT_GRAPHER_SCHEMA), refreshed with --refresh.
 VENDORED_GRAPHER_SCHEMA_PATH = SCHEMAS_DIR / DEFAULT_GRAPHER_SCHEMA.rsplit("/", 1)[-1]
+
+# Upstream publishes a patch variant of every schema, identical except that it requires only
+# `$schema` (no `dimensions`). `etl.grapher.helpers._validate_grapher_config` validates
+# indicator `grapher_config` patches against it. Vendored so the invariant test can run offline;
+# the two files always move together upstream, so `--refresh` fetches both.
+DEFAULT_GRAPHER_PATCH_SCHEMA = patch_schema_url(DEFAULT_GRAPHER_SCHEMA)
+VENDORED_PATCH_SCHEMA_PATH = SCHEMAS_DIR / DEFAULT_GRAPHER_PATCH_SCHEMA.rsplit("/", 1)[-1]
 
 # Extra fields injected into ViewConfig that are not part of the multidim schema.
 # TODO: remove once we are done with explorers
@@ -482,15 +490,19 @@ class TypedDictGenerator:
 
 
 def refresh_vendored_schema() -> None:
-    """Re-download the vendored grapher schema from the upstream URL."""
+    """Re-download the vendored grapher schemas (full + patch) from the upstream URLs."""
     from etl.http import session
 
-    resp = session.get(DEFAULT_GRAPHER_SCHEMA, timeout=30)
-    resp.raise_for_status()
-    with open(VENDORED_GRAPHER_SCHEMA_PATH, "w") as f:
-        json.dump(resp.json(), f, indent=2)
-        f.write("\n")
-    print(f"Refreshed {VENDORED_GRAPHER_SCHEMA_PATH} from {DEFAULT_GRAPHER_SCHEMA}")
+    for url, path in (
+        (DEFAULT_GRAPHER_SCHEMA, VENDORED_GRAPHER_SCHEMA_PATH),
+        (DEFAULT_GRAPHER_PATCH_SCHEMA, VENDORED_PATCH_SCHEMA_PATH),
+    ):
+        resp = session.get(url, timeout=30)
+        resp.raise_for_status()
+        with open(path, "w") as f:
+            json.dump(resp.json(), f, indent=2)
+            f.write("\n")
+        print(f"Refreshed {path} from {url}")
 
 
 def format_content(content: str) -> str:
@@ -523,7 +535,7 @@ def main():
     parser.add_argument(
         "--refresh",
         action="store_true",
-        help=f"Re-download the vendored grapher schema from {DEFAULT_GRAPHER_SCHEMA} before generating.",
+        help="Re-download the vendored grapher schemas (full + patch variant) before generating.",
     )
     args = parser.parse_args()
 

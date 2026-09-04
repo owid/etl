@@ -42,7 +42,11 @@ jobs:
         id: check
         run: |
           set -euo pipefail
-          VENDORED=$(ls schemas/grapher-schema.*.json)
+          # Exclude the patch variant: the glob must resolve to exactly one file, or basename,
+          # curl -o and the json.load below all break on a two-line $VENDORED. Detection stays
+          # keyed off the full schema only — upstream publishes the two together, so a change to
+          # one implies a change to the other, and --refresh then pulls both.
+          VENDORED=$(ls schemas/grapher-schema.*.json | grep -v '\.patch\.json$')
           NAME=$(basename "$VENDORED")
 
           # Cloudflare fronts files.ourworldindata.org with s-maxage=300, so for up to five

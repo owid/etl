@@ -425,6 +425,20 @@ def read_json_schema(path: Path | str) -> dict[str, Any]:
         return cast(dict[str, Any], dix)
 
 
+def patch_schema_url(schema_url: str) -> str:
+    """`.../grapher-schema.011.json` -> `.../grapher-schema.011.patch.json`.
+
+    The patch variant of a grapher schema requires only `$schema`, so it is the one to
+    validate a *partial* config against -- an indicator's `grapher_config`, which is applied
+    on top of a chart's own config and is never a complete chart. Upstream publishes one
+    alongside every full schema, back to 001.
+    """
+    suffix = ".json"
+    if schema_url.endswith(".patch.json") or not schema_url.endswith(suffix):
+        raise ValueError(f"Not a full grapher schema URL: {schema_url!r}")
+    return schema_url[: -len(suffix)] + ".patch.json"
+
+
 @cache
 def get_schema_from_url(schema_url: str) -> dict:
     """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
@@ -439,4 +453,8 @@ def get_schema_from_url(schema_url: str) -> dict:
     Dict[str, Any]
         Schema of a chart configuration.
     """
-    return http_session.get(schema_url, timeout=20, verify=TLS_VERIFY).json()
+    resp = http_session.get(schema_url, timeout=20, verify=TLS_VERIFY)
+    # Without this, a missing object (404 text/plain "Object Not Found") surfaces as a
+    # JSONDecodeError pointing at column 1, instead of naming the URL that is missing.
+    resp.raise_for_status()
+    return resp.json()
