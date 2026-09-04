@@ -15,8 +15,6 @@ definitions:
     In Japan, this also covers time spent reading newspapers or magazines. The Japanese survey records watching television, listening to the radio and reading print as a single activity, so they cannot be separated.
   japan_travel: &japan_travel |-
     In Japan, this also covers all travel except commuting to work. The Japanese survey records travel as one activity instead of splitting it by purpose, so time that other countries count under leisure or personal care is counted here.
-  volunteering_unreported: &volunteering_unreported |-
-    Latvia and Lithuania report zero minutes here. Their surveys do not identify this activity separately; it is not a finding that nobody does it.
   unallocated_minutes: &unallocated_minutes |-
     This group also holds any minutes a country does not assign to a specific activity, so that its day still adds up to 24 hours. That is 37 minutes a day for Poland and 22 minutes for Japan; for every other country it is under a minute.
   common:
@@ -54,7 +52,7 @@ definitions:
 
     Groups that cover "the rest" of one of the OECD's top-level categories are computed as remainders from that category's total, so minutes that a country does not allocate to any detailed sub-activity remain included.
 
-    China, Ireland, Japan, and Sweden do not report time spent on research and homework separately. Because paid work is computed as the rest of the OECD's "paid work or study" category, those countries' homework minutes are counted in paid work rather than in education.
+    Japan and Sweden do not report time spent on research and homework separately, and nor do China and Ireland, whose surveys predate 2010 and so are not published in Grapher. Because paid work is computed as the rest of the OECD's "paid work or study" category, their homework minutes are counted in paid work rather than in education.
 
 dataset:
   update_period_days: 365
@@ -130,7 +128,6 @@ tables:
           - *comparability
           - *mexico_instrument
           - *survey_vintage
-          - *volunteering_unreported
       travel_related_to_household_activities:
         title: Time spent traveling for household activities
         description_short: |-
