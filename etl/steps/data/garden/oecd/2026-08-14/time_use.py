@@ -89,7 +89,7 @@ def run() -> None:
     #
     # Process data.
     #
-    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb)
 
     # The dataset has no time dimension of its own: each country reports one survey, whose year(s)
     # the source states as a label like "2009/10". Use the survey's end year as the year.
