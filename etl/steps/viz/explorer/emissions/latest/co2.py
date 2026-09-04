@@ -1,7 +1,7 @@
 """Build the CO₂ and Greenhouse Gas Emissions explorer.
 
 54 single-indicator views split across two upstream grapher datasets:
-- gcp/2025-11-13/global_carbon_budget — fossil emissions, cumulative totals,
+- gcp/2026-09-04/global_carbon_budget — fossil emissions, cumulative totals,
   per-fuel breakdowns.
 - emissions/2025-12-04/national_contributions — non-CO₂ gases (CH₄, N₂O,
   all-GHG combined) plus warming-impact temperature responses.
