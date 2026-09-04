@@ -142,8 +142,15 @@ Anchors: y ticks by their right edge; the first x tick by its left and the last 
 centred; `Median` by its right edge; the band labels by their left; the stunting label by its centre.
 
 **Fit.** Centre the group in the band between the header's bottom and the footer's first visible row
-(`footer.y + min(0, source.y)`). No rescale is needed -- this step sizes the plot to the template --
-and one would move every font off its rank.
+(`footer.y + min(0, source.y)`), then pin the group's box to the content box.
+
+The pin is a fraction of a pixel and it is not optional. This step sizes the plot to the template,
+but it cannot land the left edge exactly: the ink starts at the widest y tick label, and that label's
+width is Lato's, set by Figma on import, where every width the step can measure is Arial's. The
+column is measured and scaled by `LATO_OVER_MEASURED_ADVANCE`, which leaves a few tenths of a pixel
+rather than the 5.92px a hand-tuned reservation left here until 2026-09-04. Close it with FITTING.md's
+stretch -- `group.resize(contentW, h)`, never a `rescale`, which would move every font off its rank,
+and never a squeeze, which rewraps labels.
 
 **Audit before showing it.** Expect sizes {16, 14, 12} only, Lato Regular and Bold only, both medians
 *and both thresholds* reporting a bound style -- and each threshold reporting the same colour as its
@@ -161,7 +168,7 @@ import seaborn as sns
 from matplotlib.colors import to_rgb
 from matplotlib.font_manager import FontProperties, findfont
 from matplotlib.lines import Line2D
-from matplotlib.textpath import TextPath
+from matplotlib.textpath import TextPath, TextToPath
 from matplotlib.ticker import FuncFormatter
 from owid.catalog import Table
 
@@ -213,6 +220,21 @@ assert _DRAWN_FACE == _MEASURED_FACE, (
     f"draws {Path(_DRAWN_FACE).name}, measures {Path(_MEASURED_FACE).name} -- every width in this step "
     "was measured in a face it will not be drawn in"
 )
+
+# What one template pixel of Arial advance becomes once Figma re-renders the import in Lato.
+#
+# The two stacks above cost a width, not just a name: the deliverable's glyphs are Lato and every
+# width this step can measure is Arial's, and Lato runs wider. That matters wherever a string's own
+# width decides where its ink starts -- the right-aligned y tick column is the case, since matplotlib
+# writes the anchor and the renderer supplies the advance leftwards from it.
+#
+# Measured off the two shipped frames, Figma's box left against the SVG's anchor: "200 cm" takes
+# 47.219px there against 45.91 here (1.0285) and "40 cm" 38.889 against 38.12 (1.0202). The spread is
+# real -- Lato's digit, space and letter advances each differ from Arial's by their own amount, so a
+# single ratio cannot be exact for every string -- and the larger of the two is used deliberately:
+# overshooting leaves a sub-pixel gap that the Figma fit closes, while undershooting puts label ink
+# outside the content box, which the margins check flags and no fit can recover without a squeeze.
+LATO_OVER_MEASURED_ADVANCE = 1.0285
 
 # One panel per sex. Colors are seaborn "deep" positions rather than raw hexes, so the
 # chart shifts with the shared palette instead of pinning its own. Position 0 is the palette's blue
@@ -381,9 +403,9 @@ LAYOUTS = {
         "title_fontsize": 16,
         "body_fontsize": LADDER_PT["body"],
         "footer_fontsize": 7.75,
-        # Space reserved inside the chart area for the y tick labels, and below the plot for the
-        # tick marks, the x tick labels and the bold "Age in years" label.
-        "y_label_space": 58,
+        # Space reserved below the plot for the tick marks, the x tick labels and the bold
+        # "Age in years" label. The y tick column is not reserved here -- it is measured from the
+        # labels themselves, see `y_tick_column_px`.
         "x_label_space": 60,
     },
     "height_for_age_mobile": {
@@ -404,7 +426,6 @@ LAYOUTS = {
         "title_fontsize": 16,
         "body_fontsize": LADDER_PT["body"],
         "footer_fontsize": 8.75,
-        "y_label_space": 58,
         "x_label_space": 60,
     },
 }
@@ -776,6 +797,33 @@ def draw_encoding_diagram(
     )
 
 
+def height_tick_label(value: float, _position: int | None = None) -> str:
+    """One y tick label: a whole number of centimetres.
+
+    Named rather than a lambda inside the formatter, because `y_tick_column_px` sizes the column from
+    these strings and has to measure the one the axis will draw.
+    """
+    return f"{value:.0f} cm"
+
+
+def y_tick_column_px(labels: list[str], fontsize: float) -> float:
+    """Width to reserve for the right-aligned y tick label column, in template pixels.
+
+    The widest label's advance plus the tick pad. matplotlib writes the label's *anchor* into the SVG
+    and leaves the renderer to lay the string out leftwards from it, so what decides where the ink
+    starts is the advance -- which is also the width Figma's text box carries. Ink extents (what
+    `wrap_to_content_width` measures, and the right tool for wrapping) would be a couple of pixels
+    short of it.
+
+    The tick pad comes from the rcParam because that is what matplotlib will use: this axis is drawn
+    with `length=0`, so the pad is the whole distance from the spine to the anchor.
+    """
+    prop = FontProperties(family=MEASURED_FONT_STACK, size=fontsize)
+    to_path = TextToPath()
+    widest = max(to_path.get_text_width_height_descent(label, prop, ismath=False)[0] for label in labels)
+    return (widest * LATO_OVER_MEASURED_ADVANCE + matplotlib.rcParams["ytick.major.pad"]) / POINTS_PER_PIXEL
+
+
 def wrap_to_content_width(text: str, layout: dict, fontsize: float) -> str:
     """Wrap text to fill the content width between the template's side margins.
 
@@ -859,6 +907,14 @@ def create_visualization(tb: Table, citation: str, breaks: list[float], layout: 
 
     width_px, height_px = layout["size"]
     margin_px = layout["margin"]
+    # Sized to the labels it holds, not to a constant: the widest one starts on the margin, so the
+    # plot takes every pixel the column does not need. A hand-tuned 58 shipped here and over-reserved
+    # by 5.92px on both layouts, which is what left the plot's ink 6px right of the title.
+    y_label_space = y_tick_column_px([height_tick_label(tick) for tick in height_ticks], body_fontsize)
+    assert 0 < y_label_space < 0.2 * (width_px - 2 * margin_px), (
+        f"the y tick column measured {y_label_space:.2f}px inside a {width_px - 2 * margin_px}px content "
+        "box -- either the labels or the face they were measured in are not what this layout expects"
+    )
 
     def fx(x_px: float) -> float:
         """Template x, in pixels from the left edge, as a figure fraction."""
@@ -966,7 +1022,7 @@ def create_visualization(tb: Table, citation: str, breaks: list[float], layout: 
         # the last -- so both sit inside the plot instead of half-overhanging it.
         labels[0].set_horizontalalignment("left")
         labels[-1].set_horizontalalignment("right")
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:.0f} cm"))
+        ax.yaxis.set_major_formatter(FuncFormatter(height_tick_label))
         ax.tick_params(axis="y", length=0, labelsize=body_fontsize, labelcolor=TEXT_COLOR)
         ax.tick_params(
             axis="x",
@@ -1124,7 +1180,7 @@ def create_visualization(tb: Table, citation: str, breaks: list[float], layout: 
     )
 
     fig.subplots_adjust(
-        left=fx(margin_px + layout["y_label_space"]),
+        left=fx(margin_px + y_label_space),
         right=fx(width_px - margin_px),
         top=fy(chart_top_px),
         bottom=fy(chart_bottom_px - layout["x_label_space"]),
