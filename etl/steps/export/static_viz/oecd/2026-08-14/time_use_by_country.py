@@ -679,7 +679,15 @@ LAYOUTS = {
     "time_use_by_country": {
         "template": "vertical",
         "size": (TEMPLATES["vertical"].width_px, TEMPLATES["vertical"].height_px),
-        "margin": 16.216,
+        # 16, not the 16.216 an earlier generation of these templates measured: the design team's
+        # 2026-08 rebuild dropped the header wrappers' inner padding, and both frames' header nodes
+        # now read 16..834 and 16..524 — margin 16, content 818 and 508. The stale figure cost 0.43px
+        # of content width, which the Figma crop-snap absorbed inside its 1px tolerance and so never
+        # failed a check. It does NOT remove the need for that snap, which was the guess: measured
+        # after the change, the crop still lands at 15.39..834.09 and is nudged onto 16..834, because
+        # a TEXT node box carries its advance width rather than its glyphs and the leftmost country
+        # label overhangs the margin. Two separate sub-pixel effects, and only one of them was this.
+        "margin": 16,
         # Every text slot the template defines, at the size and line height the template gives it,
         # so this step draws the same text the frame will and the render previews the frame instead
         # of only its proportions. The plot's band comes from these too: the header is a top-anchored
@@ -707,7 +715,7 @@ LAYOUTS = {
             "title_slot_px": 737.84,
             "title_px": 25,
             "header_gap_px": 6,
-            "subtitle_slot_px": 817.57,
+            "subtitle_slot_px": 818,
             "subtitle_px": 16,
             "subtitle_line_px": 19,
             # Footer. Its wrapper is pinned by its TOP (`constraints.vertical: MIN`), so it grows
@@ -766,7 +774,7 @@ LAYOUTS = {
     "time_use_by_country_mobile": {
         "template": "mobile",
         "size": (TEMPLATES["mobile"].width_px, TEMPLATES["mobile"].height_px),
-        "margin": 16.216,
+        "margin": 16,
         "template_text": {
             # The 540-wide set's title node is 428 wide against a 508 content box, which is the orphan
             # guard the design team builds in — so the title is measured against 428, not against the
@@ -777,7 +785,7 @@ LAYOUTS = {
             "title_slot_px": 428,
             "title_px": 25,
             "header_gap_px": 6,
-            "subtitle_slot_px": 507.57,
+            "subtitle_slot_px": 508,
             "subtitle_px": 16,
             "subtitle_line_px": 19,
             # This frame's footer is `Data source:` and the license, both full width at 14px, and
@@ -795,7 +803,7 @@ LAYOUTS = {
             # the ones that can move a bar the reader is looking at.
             "note_px": 12,
             "note_line_px": 14,
-            "note_slot_px": 507.57,
+            "note_slot_px": 508,
             "note_max_lines": 4,
             # Where the Note's own box ends, so it reads as a third footer row evenly spaced with the
             # other two — the same field the desktop frame uses, and measured the same way: on the
