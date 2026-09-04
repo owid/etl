@@ -259,23 +259,29 @@ VALUE_LABEL_COVERAGE = 0.75
 # takes the opaque seams to 1.86 / 2.12 / 2.28. Which category carries which color is free — the CVD
 # numbers are identical for any arrangement of the same four.
 #
-# THREE ACCEPTED DEVIATIONS, all at the opacity the bars are actually drawn with (0.8 over the canvas,
-# `SEGMENT_ALPHA`), because that composite is what a reader sees. The first two are now pinned in
-# `CONTRAST_ALLOWANCES` and re-measured on every build, so they cannot go stale the way this comment
-# did — it used to say 0.9 would fix the labels, and it will not:
-#   - Seams come out 1.57 / 1.86 / 1.95. The first is 2% under the floor: compositing lightens Denim and
-#     Camel unevenly and closes the gap that is 1.86 opaque. Swapping Camel and Light Teal (Denim, Light
-#     Teal, Rusty Orange, Camel) is the arrangement that clears all three at 0.8 — 1.66 / 1.95 / 1.86 —
-#     and costs no color, so it is the fix to reach for if this one is ever called.
-#   - In-bar labels: the best available color measures 3.74:1 on Denim and 4.32:1 on Rusty Orange, under
-#     the 4.5:1 these labels need. This is the cost of the opacity, not of the palette — at full opacity
-#     every segment clears it (5.46 / 4.65 / 6.21 / 5.00). Grapher can afford 0.8 because it puts no
-#     labels inside its stacked segments; this chart does, and matching grapher is the call taken here.
-#     No opacity between the two helps: 0.9 leaves Denim at 4.44:1.
-#   - Camel against Light Teal: dE 19.2 opaque, 15.3 composited, against a floor of 20 — the palette's
-#     warm-versus-light-green weak spot, made worse by everything moving towards the canvas. Fixing this
-#     one needs a different color, not a different order. The two are not adjacent, so no seam is at
-#     stake; this is about telling them apart across the chart.
+# TWO ACCEPTED DEVIATIONS, both about colour-blindness and both re-measured on every build via
+# `CONTRAST_ALLOWANCES`, so neither can go stale the way this comment once did. Everything the step
+# holds a hard floor to — the grayscale seams, the in-bar labels, the legend text — this palette clears
+# outright at 0.8, with no allowance:
+#   - Light Teal beside Maroon: the grayscale seam is a healthy 2.34, but under dichromacy it falls to
+#     1.13. That boundary is carried by HUE rather than tone for a colour-blind reader: the two simulate
+#     to dE 32 apart, which is a clear difference, just not a difference in lightness. A grayscale print
+#     is unaffected — that is the 2.34. The other two seams hold under simulation at 4.56 and 3.22.
+#   - The closest pair under dichromacy is Camel against Maroon at dE 18.1, just under a 20 floor. They
+#     sit at opposite ends of the bar and never touch, so no boundary depends on it; it is about telling
+#     them apart across the chart, and 18 is close enough to 20 to accept rather than spend a colour on.
+#
+# What the palette was chosen against, in case it is revisited: of the 10,626 four-colour sets in the
+# library, 72 clear every floor at 0.8 and only 9 also hold a seam under dichromacy — and none of those
+# 9 separates as strongly as this one, which reaches dE 56 on its weakest touching pair against 21-42
+# for them. The trade taken here is that one boundary leans on hue. `ai/palette-options/` has the
+# renders, and the search is reproducible from the palette in owid-grapher's `CustomSchemes.ts`.
+#
+# Which category carries which colour is NOT free, and that is the other half of the decision: the four
+# segments differ hugely in width, so the most advancing colour must not land on the widest. Personal
+# care is 44% of every bar, so it takes the recessive Midnight Blue; Light Teal, which reads as the most
+# forward of the four, sits on Unpaid work at 11%. Reversing those two measures identically and looks
+# markedly busier.
 # `members` names what each category holds, in the source's own terms and ordered by the minutes each
 # takes. Two of them are worth not "correcting" back to "Other": the OECD's 3.3 is labelled *personal,
 # household, and medical services + travel related to personal care* — grooming and health, 61 min/day,
@@ -292,8 +298,8 @@ MAIN_CATEGORY_GROUPS = [
         "members": ["Paid work", "Commuting", "School or classes", "Homework"],
         "compact": True,
         "label": "Paid work or study",
-        # Denim, legible as its own text at 5.3:1.
-        "color": ("hex", "#4c6a9c"),
+        # Camel, with the library's darker Camel for the name: the fill measures 2.8:1 as text.
+        "color": ("hex", "#bc8e5a", "#996d39"),
         "as_hours": True,
     },
     {
@@ -302,8 +308,9 @@ MAIN_CATEGORY_GROUPS = [
         "source_columns": ["personal_care"],
         "members": ["Sleep", "Eating & drinking", "Grooming & health"],
         "label": "Personal care",
-        # Camel, with Camel* for the name: the fill itself measures 2.8:1 as text.
-        "color": ("hex", "#bc8e5a", "#996d39"),
+        # Midnight Blue, legible as its own text at 13.9:1 — and recessive, which is why it takes
+        # the widest segment.
+        "color": ("hex", "#00295b"),
         "as_hours": True,
         # Compact like the rest, though it has room for the spelled-out form. One category set
         # differently from its neighbours reads as a difference in kind, and the only difference is
@@ -324,8 +331,9 @@ MAIN_CATEGORY_GROUPS = [
         "compact": True,
         "as_hours": True,
         "label": "Unpaid work & other",
-        # Rusty Orange, legible as its own text at 6.0:1.
-        "color": ("hex", "#b13507"),
+        # Light Teal, with the library's darker Light Teal for the name: the fill measures 2.6:1
+        # as text. On the narrowest segment on purpose.
+        "color": ("hex", "#58ac8c", "#2c8465"),
     },
     {
         "column": "main_leisure",
@@ -335,8 +343,8 @@ MAIN_CATEGORY_GROUPS = [
         "compact": True,
         "as_hours": True,
         "label": "Leisure",
-        # Light Teal, with Light Teal* for the name: the fill itself measures 2.6:1 as text.
-        "color": ("hex", "#58ac8c", "#2c8465"),
+        # Maroon, legible as its own text at 8.1:1.
+        "color": ("hex", "#883039"),
     },
 ]
 
@@ -452,15 +460,22 @@ SEAM_MIN_RATIO = 1.6
 VALUE_LABEL_MIN_RATIO = 4.5
 HEADER_TEXT_MIN_RATIO = 4.4
 
-# The shortfalls this chart accepts, as the price of drawing its bars at grapher's own bar opacity, and
-# the measured ratio each one is allowed to sit at. `check_contrast` treats every entry as a pin, not a
-# waiver: a value that drops BELOW its allowance is a regression and fails, a shortfall with no entry
-# fails, and a value that has climbed back over its floor fails too, so a fix cannot quietly leave a
-# stale allowance behind. Both entries clear their floors at full opacity (1.86 and 5.46).
+# Red-green dichromacy, the two common forms, as linear-RGB matrices. The seam floor applies under
+# these too: a boundary that exists only for a full-colour reader is not a boundary.
+DICHROMACY_MATRICES = {
+    "deuteranopia": ((0.625, 0.375, 0.0), (0.70, 0.30, 0.0), (0.0, 0.30, 0.70)),
+    "protanopia": ((0.567, 0.433, 0.0), (0.558, 0.442, 0.0), (0.0, 0.242, 0.758)),
+}
+
+# The shortfalls this chart accepts, and the measured value each one is allowed to sit at.
+# `check_contrast` treats every entry as a pin, not a waiver: a value that drops BELOW its allowance is
+# a regression and fails, a shortfall with no entry fails, and a value that has climbed back over its
+# floor fails too, so a fix cannot quietly leave a stale allowance behind.
+#
+# Both entries are colour-blindness only — see the palette notes above. Nothing here is a shortfall in
+# what a full-colour or grayscale reader sees.
 CONTRAST_ALLOWANCES = {
-    ("seam", "Paid work or study", "Personal care"): 1.57,
-    ("value", "Paid work or study"): 3.74,
-    ("value", "Unpaid work & other"): 4.32,
+    ("cvd-seam", "Unpaid work & other", "Leisure"): 1.13,
 }
 # Ratios are compared to their allowance at this tolerance, so a font or palette change that moves a
 # number in the third decimal does not fail the build.
@@ -1545,7 +1560,9 @@ def check_contrast() -> None:
     names = [group["label"] for group in MAIN_CATEGORY_GROUPS]
     composited = [composite_on_background(fill) for fill in fills]
 
-    # Touching fills need a lightness gap, or the stack merges into one block in grayscale.
+    # Touching fills need a lightness gap, or the stack merges into one block in grayscale — and the
+    # same gap has to survive dichromacy, which redistributes lightness. Checking only the first would
+    # have passed a boundary that falls to 1.13:1 for a red-green colour-blind reader.
     for (fill, name), (next_fill, next_name) in zip(zip(composited, names), list(zip(composited, names))[1:]):
         hold_contrast(
             ("seam", name, next_name),
@@ -1553,6 +1570,17 @@ def check_contrast() -> None:
             SEAM_MIN_RATIO,
             f"the {name} and {next_name} segments touch",
             "Reorder the palette, or raise SEGMENT_ALPHA",
+        )
+        worst = min(
+            contrast_ratio(simulate_dichromacy(fill, kind), simulate_dichromacy(next_fill, kind))
+            for kind in DICHROMACY_MATRICES
+        )
+        hold_contrast(
+            ("cvd-seam", name, next_name),
+            worst,
+            SEAM_MIN_RATIO,
+            f"the {name} and {next_name} seam under colour-blindness",
+            "Reorder the palette, or pick a pair that differs in tone as well as hue",
         )
     # Values sit inside the segments, so they are body text on that fill.
     for fill, name in zip(composited, names):
@@ -1644,6 +1672,27 @@ def relative_luminance(color) -> float:
 def value_label_color(fill) -> str:
     """White or dark for a value sitting on `fill`, whichever has the higher contrast against it."""
     return "white" if contrast_ratio("white", fill) >= contrast_ratio(DARK_VALUE_COLOR, fill) else DARK_VALUE_COLOR
+
+
+def simulate_dichromacy(color, kind: str) -> tuple[float, float, float]:
+    """A color as a dichromat sees it — Vienot-Brettel-Mollon, applied in linear RGB.
+
+    Here because a seam is a LIGHTNESS gap, and lightness is exactly what dichromacy redistributes: two
+    fills can sit 2.3:1 apart in grayscale and 1.1:1 apart for a red-green colour-blind reader, which is
+    the case this chart actually has. Nothing else in the step would notice.
+    """
+    matrix = DICHROMACY_MATRICES[kind]
+    channels = [srgb_to_linear(c) for c in (color if not isinstance(color, str) else to_rgb(color))]
+    out = [min(1.0, max(0.0, sum(m * c for m, c in zip(row, channels)))) for row in matrix]
+    return tuple(linear_to_srgb(c) for c in out)
+
+
+def srgb_to_linear(c: float) -> float:
+    return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+
+
+def linear_to_srgb(c: float) -> float:
+    return c * 12.92 if c <= 0.0031308 else 1.055 * c ** (1 / 2.4) - 0.055
 
 
 def composite_on_background(color, alpha: float | None = None) -> tuple[float, float, float]:
