@@ -49,8 +49,13 @@ ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
 7. FAOSTAT rounds tonnages, so balances do not close exactly. The gap is folded into "residuals" so the chain lands
    exactly on "food"; its size is kept in "balancing_difference".
 
-8. All stages are divided by the same population, from OWID's population dataset, and by 365 days. SCL covers 2010
-   onward, countries plus World and the European Union (27); FAO's own regional aggregates are dropped.
+8. Regions. SCL itself has World and the European Union (27) as aggregates, both kept. OWID continents and income
+   groups are built here by summing the members' totals, in a year only if members covering at least
+   MIN_FRAC_POPULATION_REGIONS of the region's population report data. FAO's own regional aggregates are dropped.
+   Our sum over countries is compared with FAO's World as a check on coverage.
+
+9. All stages are divided by the same population, from OWID's population dataset, and by 365 days. SCL covers 2010
+   onward.
 """
 
 import numpy as np
@@ -169,6 +174,21 @@ SUBTRACTED_STAGES = [
     "residuals",
 ]
 FIRST_YEAR = 2010
+# OWID regions built by summing members (assumption 8), and the minimum share of a region's population that must be
+# covered by reporting members for a year to be aggregated.
+REGIONS_TO_BUILD = [
+    "Africa",
+    "Asia",
+    "Europe",
+    "North America",
+    "South America",
+    "Oceania",
+    "Low-income countries",
+    "Lower-middle-income countries",
+    "Upper-middle-income countries",
+    "High-income countries",
+]
+MIN_FRAC_POPULATION_REGIONS = 0.7
 # SCL carries population as an item; it is not a commodity.
 POPULATION_ITEM_CODE = "00000001"
 IDENTITY_RELATIVE_TOLERANCE = 0.01
@@ -446,6 +466,35 @@ def build_chain(tb: Table) -> Table:
     converted = converted.drop(columns=["production"])
     chain = converted.groupby(["country", "year"], as_index=False).sum(min_count=1)
 
+    # Assumption 8: OWID regions as sums of their members' totals (everything is additive at this point).
+    value_columns = [c for c in chain.columns if c not in ["country", "year"]]
+    chain = paths.regions.add_aggregates(
+        chain,
+        regions=REGIONS_TO_BUILD,
+        aggregations={c: "sum" for c in value_columns},
+        min_frac_population=MIN_FRAC_POPULATION_REGIONS,
+        warn_on_missing_population=False,
+    )
+
+    # Coverage check on totals: the sum of all countries' food against FAO's own World aggregate.
+    summed = paths.regions.add_aggregates(
+        chain[~chain["country"].isin(REGIONS_TO_BUILD + ["World", "European Union (27)"])][["country", "year", "food"]],
+        regions=["World"],
+        aggregations={"food": "sum"},
+        warn_on_missing_population=False,
+    )
+    summed = summed[summed["country"] == "World"].set_index("year")["food"]
+    fao_world = chain[chain["country"] == "World"].set_index("year")["food"]
+    coverage = (summed / fao_world).dropna()
+    log.info(
+        "food_supply_chain_scl.countries_summed_vs_fao_world_food",
+        min=round(coverage.min(), 3),
+        max=round(coverage.max(), 3),
+    )
+    assert coverage.between(0.9, 1.05).all(), (
+        f"Sum of countries' food differs from FAO's World by more than 10%: {coverage.round(3).to_dict()}"
+    )
+
     chain["processing_net"] = chain["processing"] - chain["processed_production"]
     chain = chain.drop(columns=["processing", "processed_production"])
 
@@ -484,11 +533,11 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
         chain_end = chain_end - tb[stage] if stage in SUBTRACTED_STAGES else chain_end + tb[stage]
     assert (chain_end - tb["food"]).abs().max() < 1e-3 * tb["food"].abs().max(), "Chain does not land on food."
 
+    world = tb[tb["country"] == "World"].set_index("year")
     # Our food stage against FAO's published food supply (the FBS "Grand Total"), for World.
     fao_element = {"energy": "0664pc", "protein": "0674pc"}.get(nutrient)
     if fao_element is None:
         return
-    world = tb[tb["country"] == "World"].set_index("year")
     fao_total = (
         tb_fbsc[
             (tb_fbsc["country"].astype(str) == "World")
