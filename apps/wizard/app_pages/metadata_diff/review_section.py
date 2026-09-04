@@ -1,4 +1,4 @@
-"""Review: everything you ticked or wrote a note about, in one place.
+"""Summary: everything you ticked or wrote a note about, in one place.
 
 The three surface sections are where reading happens, one item at a time. This is the other half — what
 came out of it, gathered across charts, MDim views and explorer views, named, linked, and counted against

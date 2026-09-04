@@ -227,12 +227,12 @@ def item_index(
 ) -> tuple[dict[str, dict[str, str]], dict[str, int]]:
     """change key -> {name, url, hash} for every reviewable item, plus how many each surface holds.
 
-    Shared by the Review tab, which needs the names, and the section bar, which needs the totals. Built by
+    Shared by the Summary tab, which needs the names, and the section bar, which needs the totals. Built by
     enumerating the items the sections show and hashing each one the way its tick was hashed — a stored row
     carries a hash, not a name, because the slot has to survive an edit to the text.
 
     `hash` is that slot's *current* content hash — what `resolve_item_mark` compares a stored row against
-    to decide whether a verdict still describes the text it was made on. The Review tab needs it for the
+    to decide whether a verdict still describes the text it was made on. The Summary tab needs it for the
     same reason the section lists do: a stored row keeps its status when the wording moves under it, and
     counting it as decided would put a rejection of text nobody read into the hand-off document. Charts
     included: their fields are not enumerable the way a view's are, so `chart_diff_fields` builds them in
@@ -402,7 +402,7 @@ def chart_diff_fields(_source_engine: Engine, _target_engine: Engine, cache_key:
 def changed_charts(_source_engine: Engine, _target_engine: Engine, cache_key: str = "") -> dict[str, int]:
     """Every published chart this branch changed, and how many distinct changes each carries.
 
-    Shared by the Charts section's picker and the Review tab: both need the same list, and computing it
+    Shared by the Charts section's picker and the Summary tab: both need the same list, and computing it
     twice would let them disagree about how many charts there are.
     """
     changed = indicator_changes(_source_engine, _target_engine, cache_key=cache_key)

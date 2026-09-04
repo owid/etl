@@ -993,7 +993,7 @@ SECTIONS = {
     "explorers": (":material/explore:", "Explorers"),
     # Last on the bar because it is last in the pass: it collects what the three surface sections
     # recorded. Uncounted, like Blast radius — it holds no changes of its own.
-    "review": (":material/task_alt:", "Review"),
+    "review": (":material/task_alt:", "Summary"),
 }
 # Sections whose badge counts reviewed changes. Blast radius holds no sign-off of its own — it reports
 # reach — so a counter there would read as "nothing to review" when it means "nothing to count".
@@ -1035,7 +1035,7 @@ def section_label(section: str, progress: dict[str, tuple[int, int]], marks: dic
     """
     icon, name = SECTIONS[section]
     # Only a section that holds items can be part-way through reviewing them. Blast radius reports reach
-    # and Review collects the record, so a mark on either would be a claim about nothing — enforced here
+    # and Summary collects the record, so a mark on either would be a claim about nothing — enforced here
     # rather than left to the caller to remember.
     #
     # Nor can a section with nothing in it be unfinished: ⏳ there reads as work waiting when there is
@@ -1233,7 +1233,7 @@ def section_progress(ticked: dict[str, int], totals: dict[str, int]) -> dict[str
     A section is reviewed view by view *or* edit by edit — two ways through the same changes, not two
     halves of one job — so their counts are never added. Each layout's progress is a ratio, the higher one
     stands for the section (the larger list on a tie), and done means that layout is done. The section bar
-    and the Review tab both read this, so they cannot disagree about whether a section is finished.
+    and the Summary tab both read this, so they cannot disagree about whether a section is finished.
     """
     done: dict[tuple[str, str], int] = {}
     total: dict[tuple[str, str], int] = {}
@@ -1279,7 +1279,7 @@ GLOBAL_PARAMS = ("diff-type", LAYOUT_QUERY_KEY)
 def foreign_params(section: str, keys: Iterable[str]) -> list[str]:
     """Which of these URL parameters belong to a section other than the one on screen.
 
-    A reviewer who opens an MDim, then a chart, then Review carries the whole trail with them: the URL
+    A reviewer who opens an MDim, then a chart, then Summary carries the whole trail with them: the URL
     grows `mdim-views`, `chart`, `blast-surface`… and none of it means anything on the page they are
     looking at. Worse, a stale value is checked strictly the moment they navigate back, so a parameter
     left from a branch state that no longer exists is a raise waiting to happen rather than mere noise.

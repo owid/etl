@@ -238,7 +238,7 @@ def _chart_browser(source_engine: Engine, target_engine: Engine, groups, usage: 
     carrying one. The picker and **Next ▶** write the same `?chart=` the change-grouped cards link to, so
     all three ways of arriving here agree and any of them can be pasted to somebody else.
     """
-    # The same enumeration the Review tab counts against, so the two can never disagree about how many
+    # The same enumeration the Summary tab counts against, so the two can never disagree about how many
     # charts this branch changed.
     counts = cached.changed_charts(source_engine, target_engine)
     if not counts:

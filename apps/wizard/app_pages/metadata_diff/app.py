@@ -12,7 +12,7 @@ so you can see at a glance where this branch landed:
 - **Charts** — indicator texts that changed, and the published charts that render them.
 - **MDims** — MDims whose view texts changed, view by view or by the edit that changed them.
 - **Explorers** — published explorer views whose resolved text changed.
-- **Review** — the ticks and notes of a pass, and two markdown documents to paste elsewhere.
+- **Summary** — the ticks and notes of a pass, and two markdown documents to paste elsewhere.
 
 Each of the three surface sections reads **view by view** — one chart, MDim view or explorer view at a
 time, with its own tick and note — or **by edit**, one authored change per card with everywhere it lands
@@ -63,7 +63,7 @@ def _review_marks(source_engine, target_engine) -> dict[str, str]:
 
     Done is along whichever layout the reviewer took — every view ticked view by view, *or* every edit
     ticked by edit. A section is reviewed one way or the other, so the bar has to agree with the way that
-    was picked rather than demand both; `section_progress` makes that call, and the Review tab reads it too.
+    was picked rather than demand both; `section_progress` makes that call, and the Summary tab reads it too.
 
     Lazy on purpose. With nothing ticked nothing can be finished, so a fresh page marks every section ⏳
     without enumerating — and enumerating means diffing every changed view of every changed MDim. The

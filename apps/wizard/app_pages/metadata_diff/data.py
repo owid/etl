@@ -66,7 +66,7 @@ def load_reviews(engine: Engine, catalog_path: str) -> dict[str, dict[str, Any]]
     return {str(r["changeKey"]): {str(k): v for k, v in r.to_dict().items()} for _, r in df.iterrows()}
 
 
-# Stored status for a change the reviewer has ticked off in a list. Distinct from the Review page's
+# Stored status for a change the reviewer has ticked off in a list. Distinct from the Summary tab's
 # "approved"/"flagged", so a list tick is never mistaken for a sign-off.
 REVIEWED = "reviewed"
 # A row that exists only to hold a note. Needed because "reviewed" used to mean "a row exists": writing a
@@ -74,7 +74,7 @@ REVIEWED = "reviewed"
 NOTED = "noted"
 # The reviewer read this and does not want it to ship. A verdict, not an action: nothing in ETL or in
 # grapher reads this table, so rejecting changes no text — it records what has to be undone, and the
-# Review tab turns those records into instructions to hand back to whoever is editing.
+# Summary tab turns those records into instructions to hand back to whoever is editing.
 REJECTED = "rejected"
 # The two states that mean a decision has been made, either way. Progress counts these; a note alone is
 # not a decision.
@@ -82,7 +82,7 @@ DECIDED = (REVIEWED, REJECTED)
 
 
 def load_item_notes(engine: Engine, prefix: str = "list:item:") -> list[dict[str, Any]]:
-    """Every note and tick on the item surfaces, newest first — what the Review tab consolidates.
+    """Every note and tick on the item surfaces, newest first — what the Summary tab consolidates.
 
     Keyed by surface rather than fetched per item: the tab's whole job is to gather what is scattered
     across the sections, and one query does it.

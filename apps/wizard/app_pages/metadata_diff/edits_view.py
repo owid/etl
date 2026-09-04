@@ -65,7 +65,7 @@ def st_reject_all(engine: Engine, summary: Any, section: str) -> None:
 
     Scoped to the surface on purpose, because that is the shape of the judgement: "these changes are right
     for charts but not for the MDims" is a normal thing to conclude, and one sentence usually reaches all
-    three surfaces at once. Rejecting per section, in any combination, is how that is said — and the Review
+    three surfaces at once. Rejecting per section, in any combination, is how that is said — and the Summary
     tab reads the combination back, since an edit refused on every surface it reaches is reverted at source
     while one refused on some is overridden on those.
 
@@ -80,7 +80,7 @@ def st_reject_all(engine: Engine, summary: Any, section: str) -> None:
     decided either way through it.
 
     Nothing is changed by any of this — see `review_state.st_decision_control`. The popover says so and
-    points at the Review tab, which is where a rejection turns into something actionable.
+    points at the Summary tab, which is where a rejection turns into something actionable.
     """
     edits = edits_for(summary, section)
     if not edits:
@@ -127,7 +127,7 @@ def st_reject_all(engine: Engine, summary: Any, section: str) -> None:
         st.caption(
             f"Scoped to {what}. The same sentence often reaches charts, MDim views and explorer views at "
             "once, so rejecting it here says *not on this surface* and leaves the others as they are — "
-            "reject each surface you do not want it on, and leave the ones you do. **Review** then knows "
+            "reject each surface you do not want it on, and leave the ones you do. **Summary** then knows "
             "the difference: an edit refused everywhere it lands is one to revert at source, while one "
             "refused on some surfaces is one to override on those, keeping the text where it is wanted."
         )

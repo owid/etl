@@ -749,7 +749,7 @@ def st_section_switcher(
 
     st.caption(
         "Left to right: **Blast radius** for how far this branch's edits reach, then **Charts**, **MDims** "
-        "and **Explorers** to read and tick off, then **Review** to collect what you wrote down. Each of "
+        "and **Explorers** to read and tick off, then **Summary** to collect what you wrote down. Each of "
         "those three reads two ways — **view by view**, one page at a time, or **by edit**, one authored "
         "change with everywhere it lands — and working through either one finishes the section."
     )

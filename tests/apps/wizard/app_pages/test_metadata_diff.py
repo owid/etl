@@ -3135,12 +3135,14 @@ def test_rejecting_everything_is_offered_and_approving_everything_is_not():
     import inspect
 
     from apps.wizard.app_pages.metadata_diff import edits_view
+    from apps.wizard.app_pages.metadata_diff.core import SECTIONS
 
     source = inspect.getsource(edits_view.st_reject_all)
     assert "REJECTED" in source
     assert "REVIEWED" not in source, "there is no bulk approve, on purpose"
-    # It says that nothing is changed, and where to go next — a red ❌ invites the opposite belief.
-    assert "Nothing is changed by this" in source and "Review" in source
+    # It says that nothing is changed, and where to go next — a red ❌ invites the opposite belief. Named
+    # from the section bar, so renaming that tab cannot leave the popover pointing at a name nobody sees.
+    assert "Nothing is changed by this" in source and SECTIONS["review"][1] in source
     # It is scoped to one surface, which is what makes any combination of the three sayable.
     assert "not on this surface" in source
     # And it is reversible, keeping what the reviewer wrote.
@@ -4263,9 +4265,9 @@ def test_a_section_badge_says_finished_or_not_and_nothing_else():
     assert section_label("charts", held, {"charts": "elsewhere"}).endswith("Charts")
     assert section_label("charts", held).endswith("Charts")
 
-    # Blast radius and Review hold no items to tick, so they never carry one — even given a total.
+    # Blast radius and Summary hold no items to tick, so they never carry one — even given a total.
     assert section_label("blast", held, {"blast": "done"}).endswith("Blast radius")
-    assert section_label("review", held, {"review": "todo"}).endswith("Review")
+    assert section_label("review", held, {"review": "todo"}).endswith("Summary")
 
 
 def test_a_section_with_nothing_in_it_carries_no_mark():

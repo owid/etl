@@ -42,7 +42,7 @@ def verdict_reopened(row: dict[str, Any], index: dict[str, dict[str, str]]) -> b
     """Has the text moved since this stored verdict was recorded?
 
     The same rule `resolve_item_mark` applies to one item, for callers holding rows straight out of
-    `load_item_notes` — the Review tab and the section bar — which have no `ReviewMark` to read. Both were
+    `load_item_notes` — the Summary tab and the section bar — which have no `ReviewMark` to read. Both were
     filtering on status alone, so a decision made on wording that has since been rewritten still counted
     as one, and a section could be badged finished over an item that had reopened.
 
@@ -157,7 +157,7 @@ def st_decision_control(engine: Engine, surface: str, mark: ReviewMark, key_suff
     option clears it, which is the third state: nothing decided yet.
 
     Neither answer does anything to the data. A rejection is a record of what has to be undone, and the
-    Review tab is where those records become text to hand back to whoever is editing — said in the help
+    Summary tab is where those records become text to hand back to whoever is editing — said in the help
     and again under a rejection, because "❌" invites the belief that something has been reverted.
     """
     widget_key = reviewed_toggle_key(surface, mark, key_suffix)
@@ -183,13 +183,13 @@ def st_decision_control(engine: Engine, surface: str, mark: ReviewMark, key_suff
         label_visibility="collapsed",
         help="Stored on this staging server, reset automatically if this text is edited again, and "
         "**never synced** — neither answer changes any text. **Reject** records that this should not "
-        "ship; the **Review** tab collects those into instructions to paste back to whoever is editing.",
+        "ship; the **Summary** tab collects those into instructions to paste back to whoever is editing.",
     )
     if mark.stale:
         st.caption("⚠️ Edited since you decided — the previous answer no longer counts.")
     elif mark.rejected:
         who = f" by **{mark.reviewer}**" if mark.reviewer else ""
-        st.caption(f"❌ Rejected{who} — nothing is changed here; take the wording from **Review**.")
+        st.caption(f"❌ Rejected{who} — nothing is changed here; take the wording from **Summary**.")
     elif mark.reviewed and mark.reviewer:
         when = f" · {mark.updated_at}" if mark.updated_at else ""
         st.caption(f"Marked reviewed by **{mark.reviewer}**{when}")
@@ -276,9 +276,9 @@ def st_review_strip(engine: Engine, surface: str, mark: ReviewMark) -> None:
     easy to walk past. The box is tinted (see the diff CSS) for the same reason: on a page whose body is
     two columns of prose, an untinted row of controls disappears.
 
-    A note-only row carries the `noted` status, so writing a note never reads as a tick and the Review tab
+    A note-only row carries the `noted` status, so writing a note never reads as a tick and the Summary tab
     can tell them apart. On a rejection the note is the useful half — it is what tells whoever is editing
-    *why*, and it travels into the Review tab's instructions.
+    *why*, and it travels into the Summary tab's instructions.
     """
     note_key = f"mdd-note::{surface}::{mark.change_key}::{mark.content_hash[:8]}"
     if note_key not in st.session_state:
