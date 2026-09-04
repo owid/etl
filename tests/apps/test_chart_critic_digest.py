@@ -76,3 +76,55 @@ def test_a_slack_outage_falls_back_to_the_plain_name(monkeypatch):
     digest.attach_mentions(facts, tag_last_editor=True)
     assert facts["a"]["editor_mention"] == "Pablo Rosado"
     digest._slack_member_id.cache_clear()
+
+
+def test_a_reworded_repeat_of_a_posted_finding_is_not_posted_again():
+    """The two wordings below are what the model actually said on consecutive days about
+    `oil-prices-inflation-adjusted`, and the second was posted because the state key carried the
+    claim's words. They are one finding."""
+    yesterday = _result(
+        "oil-prices-inflation-adjusted",
+        "chart",
+        "The subtitle states prices are in constant 2023 US$, while the indicator metadata specifies constant 2025 US$.",
+    )
+    today = _result(
+        "oil-prices-inflation-adjusted",
+        "chart",
+        "The chart subtitle states prices are measured in constant 2023 US$, contradicting the indicator metadata base year of 2025.",
+    )
+    state = digest.stamp(digest.new_findings([yesterday], {}), {})
+    assert digest.new_findings([today], state) == []
+
+
+def test_two_different_findings_on_one_chart_both_get_posted():
+    """Dedup is per claim, not per chart — a second, unrelated problem is still news."""
+    subtitle = _result("a", "chart", "The subtitle says the values are age-standardized but they are not.")
+    empty = _result("a", "chart", "The chart opens with no entity selected, so a reader sees an empty chart.")
+    state = digest.stamp(digest.new_findings([subtitle], {}), {})
+    assert len(digest.new_findings([empty], state)) == 1
+
+
+def test_the_same_data_finding_on_a_chart_sharing_an_indicator_is_not_news():
+    facts = {
+        "a": {"chart_id": 1, "indicators": ["grapher/energy/energy_mix#coal_share"], "editor_mention": None},
+        "b": {"chart_id": 2, "indicators": ["grapher/energy/energy_mix#coal_share"], "editor_mention": None},
+    }
+    claim = "The UK coal share exceeds 100% in 1913, which is impossible for a share."
+    state = digest.stamp(digest.new_findings([_result("a", "data", claim)], {}, facts), {}, facts)
+    reworded = "Coal share for the United Kingdom is above 100% in 1913, an impossible value for a share."
+    assert digest.new_findings([_result("b", "data", reworded)], state, facts) == []
+
+
+def test_the_old_state_format_still_suppresses_what_it_recorded():
+    """The file on the runner is the only record of what the channel has seen, so the previous
+    format — the claim's words baked into the key — is read rather than dropped."""
+    legacy = {
+        "oil-prices-inflation-adjusted:chart:constant-indicator-metadata-price-specifie-state-subtitle-while": "2026-09-03"
+    }
+    state = digest._upgrade(legacy)
+    today = _result(
+        "oil-prices-inflation-adjusted",
+        "chart",
+        "The chart subtitle states prices are measured in constant 2023 US$, contradicting the indicator metadata base year of 2025.",
+    )
+    assert digest.new_findings([today], state) == []

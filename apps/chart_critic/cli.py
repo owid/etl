@@ -41,9 +41,11 @@ from apps.chart_critic.critic import (
     DEFAULT_MODEL,
     FALLBACK_PRICES,
     build_agent,
+    claim_tokens,
     format_views,
     issue_params,
     prompt_parts,
+    same_claim,
 )
 from apps.utils.llms.costs import estimate_llm_cost
 from etl.db import read_sql
@@ -214,28 +216,39 @@ def _link_keys(slug: str, params: str) -> set[str]:
         return keys
 
 
-def _claim_tokens(claim: str) -> set[str]:
-    # Crude singular/plural folding. Without it "the unit for all three indicators is incorrectly
-    # set to 'doses'" and "the indicator unit is incorrectly set to 'doses'" scored below the
-    # merge threshold and were reported as two findings.
-    return {w.rstrip("s") for w in re.findall(r"[a-z0-9]{4,}", claim.lower())}
-
-
 def _merge(issues: list[dict[str, Any]], new: dict[str, Any]) -> None:
     """Fold a finding into the list, merging it with the same finding from an earlier pass.
 
     The model rewords freely between passes — "life expectancy of around 18–20 years" and
-    "under 20 years" are one finding — so matching on a prefix counts them separately. Overlap
-    of the significant words is crude but survives the rewording.
+    "under 20 years" are one finding — so matching on a prefix counts them separately.
+    :func:`critic.same_claim` is the shared notion of "the same finding", and the digest
+    recognises what it has already posted with the same test.
     """
-    tokens = _claim_tokens(new["claim"])
+    tokens = claim_tokens(new["claim"])
     for existing in issues:
-        other = _claim_tokens(existing["claim"])
-        overlap = len(tokens & other) / max(len(tokens | other), 1)
-        if existing["kind"] == new["kind"] and overlap >= 0.4:
+        if existing["kind"] == new["kind"] and same_claim(tokens, claim_tokens(existing["claim"])):
             existing["passes"] += 1
             return
     issues.append(new | {"passes": 1})
+
+
+def _resolve_cache_ttl(cache_ttl: float | None, changed_since: int | None) -> float:
+    """How long a cached bundle stays fresh, when the caller did not say.
+
+    A ``--changed-since`` sweep must not replay a cached bundle, and the reason is that
+    selection's whole premise: a chart is in it *because* its configuration changed inside the
+    window, so a bundle fetched inside that same window describes the chart as it was *before*
+    the change. With a daily cron and a 24-hour TTL the previous run's bundle is always a few
+    minutes inside the TTL, so it is not an edge case but the normal path — every finding a
+    report on yesterday's chart. It reached the channel: a subtitle fixed during the day was
+    flagged again the next morning, on a chart whose fix is what nominated it for review.
+
+    It is ~17 charts a day, so re-fetching them costs nothing worth saving. Any explicit
+    ``--cache-ttl`` still wins, including for a sweep of a hand-picked list.
+    """
+    if cache_ttl is not None:
+        return cache_ttl
+    return 0.0 if changed_since is not None else cache.DEFAULT_TTL_HOURS
 
 
 def _review_one(
@@ -457,9 +470,12 @@ def _review_one(
 @click.option(
     "--cache-ttl",
     type=float,
-    default=cache.DEFAULT_TTL_HOURS,
-    show_default=True,
-    help="Hours a cached chart bundle stays fresh. Use -1 to keep bundles indefinitely.",
+    default=None,
+    help=(
+        f"Hours a cached chart bundle stays fresh [default: {cache.DEFAULT_TTL_HOURS}, "
+        "or 0 with --changed-since, which reviews charts because they just changed]. "
+        "Use -1 to keep bundles indefinitely."
+    ),
 )
 def cli(
     slugs: str | None,
@@ -480,7 +496,7 @@ def cli(
     dry_run: bool,
     no_cache: bool,
     clear_cache: bool,
-    cache_ttl: float,
+    cache_ttl: float | None,
     run_eval: bool,
     changed_since: int | None,
     include_data_updates: bool,
@@ -494,6 +510,8 @@ def cli(
 
     if cheap:
         model = CHEAP_MODEL
+
+    cache_ttl = _resolve_cache_ttl(cache_ttl, changed_since)
 
     if run_eval:
         # Five passes, because that is what was measured to reach 8/8: at two passes the two
