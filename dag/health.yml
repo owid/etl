@@ -297,10 +297,10 @@ steps:
     - data://garden/who/latest/monkeypox
 
   # Eurostat Cancer Screening
-  data://grapher/health/2024-08-23/eurostat_cancer:
-    - data://garden/health/2024-08-23/eurostat_cancer:
-        - data://meadow/health/2024-08-23/eurostat_cancer:
-            - snapshot://health/2024-08-23/eurostat_cancer.csv
+  data://grapher/health/2026-09-02/eurostat_cancer:
+    - data://garden/health/2026-09-02/eurostat_cancer:
+        - data://meadow/health/2026-09-02/eurostat_cancer:
+            - snapshot://health/2026-09-02/eurostat_cancer.csv
 
   # NOTE: this was just a proof of concept for multi-dims, it'd have to be revisited.
   #   We commented it because there were too many indicators and rendering thumbnail

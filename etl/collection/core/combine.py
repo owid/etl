@@ -324,7 +324,7 @@ def combine_collections(
                 )
                 choice_name = collection_choices_names[i]
             else:
-                choice_name = collection.title.get("title", collection.short_name)
+                choice_name = (collection.title or {}).get("title", collection.short_name)
 
             dimension_collection = Dimension(
                 slug=collection_dimension_slug,

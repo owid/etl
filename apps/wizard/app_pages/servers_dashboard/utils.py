@@ -22,9 +22,9 @@ LXC_HOST = "gaia-1"
 
 # Auto-stop lifecycle, mirrored from the ops reaper cron
 # (ops/templates/lxc-manager/stop_staging_containers.py). A running container is stopped (idled,
-# data preserved) once its most recent sign of activity — max(latest commit, last *start*) — is
-# older than STOP_AFTER_DAYS. We recompute that here so the dashboard's "Auto-stop" column agrees
-# with what the cron will actually do. Keep these in sync with that script.
+# data preserved) once its most recent sign of activity — max(latest commit, last deliberate
+# *wake*) — is older than STOP_AFTER_DAYS. We recompute that here so the dashboard's "Auto-stop"
+# column agrees with what the cron will actually do. Keep these in sync with that script.
 STOP_AFTER_DAYS = 14
 # Container the reaper skips explicitly — never auto-stopped.
 PERSISTENT_CONTAINERS = {"staging-site-master"}
@@ -191,13 +191,18 @@ def _process_server_data(df: pd.DataFrame) -> pd.DataFrame:
     df["etl_commit_parsed"] = pd.to_datetime(df["etl_last_commit"], errors="coerce")
     df["grapher_commit_parsed"] = pd.to_datetime(df["grapher_last_commit"], errors="coerce")
 
-    # Last *start* time (bumped by LXC only on container start, not exec/ssh). This is what the
-    # reaper counts alongside commits, so a freshly-woken server isn't stopped the same night.
-    if "last_used_at" not in df.columns:
-        df["last_used_at"] = None
-    # format="ISO8601" handles LXC's variable fractional-second precision (and None) without the
-    # per-element dateutil fallback that pandas warns about.
-    df["last_used_parsed"] = pd.to_datetime(df["last_used_at"], errors="coerce", format="ISO8601")
+    # Last deliberate wake, stamped on the container by `owid-lxc start` (which is what the Wake
+    # button runs). This is what the reaper counts alongside commits, so a freshly-woken server
+    # isn't stopped the same night.
+    #
+    # Not LXD's own `last_used_at`: that is bumped by *any* start, and the weekly gaia-1 reboot
+    # restores every running container, so it read as "restarted last Monday" fleet-wide and the
+    # reaper could never reach the 14-day threshold for anything.
+    if "woken_at" not in df.columns:
+        df["woken_at"] = None
+    # format="ISO8601" handles both the plain "…Z" stamp we write and any fractional-second
+    # variant (and None) without the per-element dateutil fallback that pandas warns about.
+    df["woken_parsed"] = pd.to_datetime(df["woken_at"], errors="coerce", format="ISO8601")
 
     # Calculate days since last commit
     df["etl_days_old"] = _calculate_days_since_commit(df["etl_commit_parsed"])
@@ -412,9 +417,9 @@ def _format_last_commit_neutral(row: pd.Series) -> str:
 def _compute_auto_stop(row: pd.Series, now: datetime) -> str:
     """When (and why) the reaper will stop this server, mirroring stop_staging_containers.py.
 
-    The cron stops a running container once max(latest commit, last start) is older than
+    The cron stops a running container once max(latest commit, last wake) is older than
     STOP_AFTER_DAYS. We surface the countdown plus the reason it's still alive, so an old commit
-    next to a recent restart no longer reads as "should be dead".
+    next to a recent wake no longer reads as "should be dead".
     """
     # Idle servers are already stopped — the action is Wake, not a countdown.
     if row["status"] != "Running":
@@ -427,8 +432,8 @@ def _compute_auto_stop(row: pd.Series, now: datetime) -> str:
         return "❓ won't auto-stop (commit unreadable)"
 
     commit_date = _latest_commit_date(row)
-    last_used = _as_utc(row["last_used_parsed"]) if pd.notna(row["last_used_parsed"]) else pd.NaT
-    candidates = [d for d in (commit_date, last_used) if pd.notna(d)]
+    woken = _as_utc(row["woken_parsed"]) if pd.notna(row["woken_parsed"]) else pd.NaT
+    candidates = [d for d in (commit_date, woken) if pd.notna(d)]
     # No commit date at all → cron can't judge and skips it; mirror that rather than guess.
     if pd.isna(commit_date) or not candidates:
         return "❓ won't auto-stop (no commit date)"
@@ -436,9 +441,9 @@ def _compute_auto_stop(row: pd.Series, now: datetime) -> str:
     last_activity = max(candidates)
     days_left = STOP_AFTER_DAYS - (now - last_activity).days
 
-    # Which signal is keeping it alive — a recent restart or a recent commit?
-    if pd.notna(last_used) and last_used >= commit_date:
-        reason = f"restarted {last_used.strftime('%b %-d')}"
+    # Which signal is keeping it alive — a recent wake or a recent commit?
+    if pd.notna(woken) and woken >= commit_date:
+        reason = f"woken {woken.strftime('%b %-d')}"
     else:
         reason = f"commit {commit_date.strftime('%b %-d')}"
 
