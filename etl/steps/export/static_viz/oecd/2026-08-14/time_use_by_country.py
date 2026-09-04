@@ -662,6 +662,12 @@ LEGEND_BLOCK_GAP = 8
 # slot of its own has to put it.
 NOTE_BAND_GAP = 10
 
+# The Note's lead-in, set BOLD — the same shape the templates give their own footer: the placeholder's
+# `Data source: ` is Lato Bold and the producer name Regular. It is named here because three places
+# need to agree about it: the text `build_note` composes, the width its wrap has to leave for a bold
+# run, and the run `draw_note` draws.
+NOTE_LEAD = "Note:"
+
 # Bars fill this share of a row's pitch.
 BAR_FRACTION = 0.8
 
@@ -814,8 +820,11 @@ LAYOUTS = {
             # of the box it is laid out in. So equal BOX gaps would render as 14px against 8px, and
             # this number is the one that puts the same 8px above the source row. To re-derive it after
             # a type-size change: measure the ink bands at the foot of the frame and shift by the
-            # difference (`measure_footer_ink.py` in the session notes did exactly that).
-            "note_bottom_px": 772,
+            # difference (`measure_footer_ink.py` in the session notes did exactly that). It moved
+            # once already, by 2px, when the lead-in went bold: the Note is drawn as a one-line object
+            # plus a block of the rest, and those two do not compose their vertical metrics the way a
+            # single four-line block did.
+            "note_bottom_px": 770,
         },
         # The same point sizes as the desktop frame, deliberately: on a frame 0.64x as wide they read
         # half again as large, which is the direction the template itself goes (its own source and
@@ -1194,16 +1203,7 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
         # slots BY PREFIX, and `note` is one of them. On this frame the Note is not a duplicate of a
         # template slot — the frame has no Note slot, which is why it is drawn here — so a name that
         # collides with that list would have it deleted on import, silently and only on mobile.
-        draw_slot(
-            fig,
-            fx(margin_px),
-            fy(note_top_px),
-            band_note,
-            template["note_px"],
-            template["note_line_px"],
-            "chart-note",
-            FOOTER_COLOR,
-        )
+        draw_note(fig, margin_px, note_top_px, band_note, template, "chart-note", fx, fy)
 
     # Clipping is swept in `export_frame`, on the way out, which is what lets the labels drawn
     # outside the axes box survive into the SVG whole.
@@ -1530,9 +1530,7 @@ def draw_footer(fig, note: str | None, source_citation: str, layout: dict, fx, f
 
     if note is not None:
         note_top = template["note_bottom_px"] - lines_in(note) * template["note_line_px"]
-        draw_slot(
-            fig, fx(margin_px), fy(note_top), note, template["note_px"], template["note_line_px"], "note", FOOTER_COLOR
-        )
+        draw_note(fig, margin_px, note_top, note, template, "note", fx, fy)
     draw_slot(
         fig,
         fx(margin_px),
@@ -2032,6 +2030,55 @@ def cap_height_px(fontsize: float) -> float:
     return TextPath((0, 0), "0", prop=prop).get_extents().ymax / POINTS_PER_PIXEL
 
 
+def draw_note(fig, x_px: float, y_px: float, text: str, template: dict, gid: str, fx, fy) -> None:
+    """Draw a Note with its lead-in bold: `Note:` in bold, then the sentence in regular.
+
+    matplotlib has no rich text, so the first line is two objects and the rest are one block. The
+    lead-in is anchored on its own ink centre and the remainder on its LEFT edge, which is what
+    survives Figma: a centred run re-rendered in the template's narrower Lato shrinks away from its
+    centre, and doing that to the remainder would open a gap after the lead-in.
+    """
+    size_px = template["note_px"]
+    line_height_px = template["note_line_px"]
+    fontsize = size_px * POINTS_PER_PIXEL
+    lines = text.split("\n")
+    assert lines[0].startswith(NOTE_LEAD), f"The Note does not start with {NOTE_LEAD!r}: {lines[0][:40]!r}"
+
+    drawn, ink_px, step_px = place_run(NOTE_LEAD + " ", fontsize, bold=True)
+    fig.text(
+        fx(x_px + ink_px / 2),
+        fy(y_px),
+        drawn,
+        ha="center",
+        va="top",
+        fontsize=fontsize,
+        fontweight="bold",
+        color=FOOTER_COLOR,
+        gid=gid,
+    )
+    fig.text(
+        fx(x_px + step_px),
+        fy(y_px),
+        lines[0][len(NOTE_LEAD) :].lstrip(),
+        ha="left",
+        va="top",
+        fontsize=fontsize,
+        color=FOOTER_COLOR,
+        gid=f"{gid}--rest",
+    )
+    if len(lines) > 1:
+        draw_slot(
+            fig,
+            fx(x_px),
+            fy(y_px + line_height_px),
+            "\n".join(lines[1:]),
+            size_px,
+            line_height_px,
+            f"{gid}--tail",
+            FOOTER_COLOR,
+        )
+
+
 def draw_slot(
     fig, x, y, text: str, size_px: float, line_height_px: float | None, gid: str, color=TITLE_COLOR, ha="left"
 ):
@@ -2255,7 +2302,14 @@ def build_note(tb: Table, ages: dict[str, str], layout: dict) -> str:
     # but a mobile frame's content is narrower than it.
     template = layout["template_text"]
     content_px = layout["size"][0] - 2 * layout["margin"]
-    wrapped = wrap_to_slot(text, min(template["note_slot_px"], content_px), template["note_px"])
+    # The lead-in is drawn bold and bold is wider, so its extra width comes off the wrap's budget
+    # here rather than being discovered as an overhanging first line. Taken off every line, not just
+    # the first: it is under 2px at this size, and both frames wrap to the same break points either
+    # way, so the simpler rule costs nothing and cannot leave the first line short of room.
+    note_pt = template["note_px"] * POINTS_PER_PIXEL
+    bold_extra = text_advance_px(NOTE_LEAD, note_pt, bold=True) - text_advance_px(NOTE_LEAD, note_pt)
+    slot_px = min(template["note_slot_px"], content_px) - bold_extra
+    wrapped = wrap_to_slot(text, slot_px, template["note_px"])
     # Two lines on the desktop frame, whose footer grows DOWNWARD from a fixed top (see
     # `note_bottom_px`), so a third eats the template's bottom margin rather than the chart's band.
     # The mobile frame has no Note slot at all and draws this inside the band, where a line costs a

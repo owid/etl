@@ -1320,8 +1320,13 @@ z
    <text style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #5b5b5b" x="11.52" y="45.1062" transform="rotate(-0 11.52 45.1062)">Average hours and minutes in a 24-hour day, from surveys run between 2010 and 2024, for people aged 15 to 64.</text>
   </g>
   <g id="note">
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #858585" transform="translate(11.52 737.67825)">Note: The chart covers every country whose most recent survey in the OECD database is from 2010 onwards; that survey's year is in brackets. The OECD</text>
-   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #858585" transform="translate(11.52 746.834625)">flags Mexico's estimates as not fully comparable, because it measures time use differently. In Japan, travel other than commuting counts as unpaid work.</text>
+   <text style="font-weight: 700; font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #858585" x="22.608984" y="737.56755" transform="rotate(-0 22.608984 737.56755)">Note:</text>
+  </g>
+  <g id="note--rest">
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="36.098438" y="737.67825" transform="rotate(-0 36.098438 737.67825)">The chart covers every country whose most recent survey in the OECD database is from 2010 onwards; that survey's year is in brackets. The OECD</text>
+  </g>
+  <g id="note--tail">
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="747.75285" transform="rotate(-0 11.52 747.75285)">flags Mexico's estimates as not fully comparable, because it measures time use differently. In Japan, travel other than commuting counts as unpaid work.</text>
   </g>
   <g id="data-source">
    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="760.71825" transform="rotate(-0 11.52 760.71825)">Data source: OECD (2026)</text>
