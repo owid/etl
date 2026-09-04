@@ -8,10 +8,12 @@ import pandas as pd
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
+from etl.analytics.config import GRAPHERS_BASE_URL
 from etl.analytics.data import (
     get_chart_views_by_chart_id,
     get_mdim_explorer_views_by_producer,
     get_post_views_by_chart_id,
+    get_post_views_of_producer_collections,
     get_post_views_of_redirected_charts_by_producer,
     get_visualizations_using_data_by_producer,
 )
@@ -19,6 +21,7 @@ from etl.config import (
     DATA_PRODUCER_REPORT_FOLDER_ID,
     DATA_PRODUCER_REPORT_STATUS_SHEET_ID,
     DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID,
+    OWID_ENV,
 )
 from etl.data_helpers.misc import humanize_number
 from etl.db import get_engine
@@ -175,11 +178,16 @@ def gather_producer_analytics(producers: list[str], min_date: str, max_date: str
     df_posts_redirected = get_post_views_of_redirected_charts_by_producer(
         producers=producers, date_min=min_date, date_max=max_date
     )
-    if not df_posts_redirected.empty:
+    # Posts that embed one of the producer's mdims or explorers (linked by the live slug): also missed
+    # by the chart-id lookup (collections have no chart id), e.g. after a chart→mdim migration
+    # re-points the post.
+    df_posts_collections = get_post_views_of_producer_collections(
+        producers=producers, date_min=min_date, date_max=max_date
+    )
+    recovered = [df for df in [df_posts_redirected, df_posts_collections] if not df.empty]
+    if recovered:
         df_posts = (
-            pd.concat([df_posts, df_posts_redirected], ignore_index=True)
-            .drop_duplicates(subset=["url"])
-            .reset_index(drop=True)
+            pd.concat([df_posts, *recovered], ignore_index=True).drop_duplicates(subset=["url"]).reset_index(drop=True)
         )
 
     # Get views of the producer's mdim VIEWS (one row per view) and explorers. Each mdim view's total
@@ -217,6 +225,9 @@ def gather_producer_analytics(producers: list[str], min_date: str, max_date: str
         "posts": df_posts,
         "additional_charts_exclusive": df_additional_charts_exclusive,
         "additional_charts_mixed": df_additional_charts_mixed,
+        # ALL current standalone charts using the producer's data, regardless of period traffic
+        # (df_charts only carries the ones with views in the period).
+        "producer_charts": df_producer_charts,
     }
 
     return analytics
@@ -307,6 +318,13 @@ class Report:
     """An analytics report for a data producer."""
 
     def __init__(self, producer: str, period: str, year: int, aliases: list[str] | None = None):
+        # The analytics semantic layer is built from production, so grapher-DB reads (redirects,
+        # origins_variables, chart configs) must target production too; against a staging snapshot, any
+        # redirect or re-versioned dataset newer than the snapshot is silently dropped from the report.
+        assert OWID_ENV.env_remote == "production", (
+            f"Reports must be generated against the production grapher DB "
+            f"(current: {OWID_ENV.conf.DB_HOST}). Run with ENV_FILE=.env.prod."
+        )
         self.producer = producer  # Canonical name for display
         self.aliases = aliases or []
         self.all_producer_names = [producer] + self.aliases  # All names for data gathering
@@ -467,8 +485,11 @@ class Report:
 
         # Create dataframes for top content.
         list_cols = ["url", "views", "title", "featured_on_homepage"]
+        # Only content with period traffic belongs in the "most viewed" list (the catalog frames now also
+        # carry zero-view mdim views/explorers, which must not pad the list).
         df_top_charts = (
-            df_charts_and_additional_exclusive.sort_values("views", ascending=False)[list_cols]
+            df_charts_and_additional_exclusive[df_charts_and_additional_exclusive["views"] > 0]
+            .sort_values("views", ascending=False)[list_cols]
             .reset_index(drop=True)
             .iloc[0:10]
         )
@@ -484,12 +505,19 @@ class Report:
         )
 
         # Calculate metrics.
-        n_charts = len(df_charts_and_additional_exclusive)
+        # Number of charts = CURRENT catalog: standalone charts using the producer's data + all mdim views
+        # using it (counted individually; they have their own URLs and analytics) + live explorers
+        # featuring it (one each, mixed ones included - their views are reported separately below, but
+        # they are charts on the site showing the producer's data).
+        n_mdim_views_and_exclusive_explorers = len(self.analytics["additional_charts_exclusive"])
+        n_standalone_charts = self.analytics["producer_charts"]["chart_id"].nunique()
+        n_charts = n_standalone_charts + n_mdim_views_and_exclusive_explorers + len(df_additional_charts_mixed)
         n_publications = len(self.analytics["posts"])
         n_chart_views = df_charts_and_additional_exclusive["views"].sum()
         n_post_views = self.analytics["posts"]["views"].sum()
         n_daily_chart_views = n_chart_views / df_charts_and_additional_exclusive["n_days"].max()
-        n_daily_post_views = n_post_views / self.analytics["posts"]["n_days"].max()
+        # A producer can have no qualifying posts; avoid NaN (n_days.max() over an empty frame).
+        n_daily_post_views = n_post_views / self.analytics["posts"]["n_days"].max() if n_publications > 0 else 0
         n_additional = len(df_additional_charts_mixed)
         n_additional_views = df_additional_charts_mixed["views"].sum()
 
@@ -540,16 +568,20 @@ class Report:
         self.google_doc.replace_text(mapping=replacements)
 
         # Add content.
-        # NOTE: The top chart image can only come from a grapher chart (via its ".png" static export), never from
-        # an mdim/explorer, so it's picked from self.analytics["charts"] directly rather than
-        # df_charts_and_additional_exclusive. charts may be empty (a producer whose only traffic in the period
-        # came from mdim views/explorers): there's no grapher chart to render, so drop the image placeholder.
-        df_grapher_charts = self.analytics["charts"]
-        if df_grapher_charts.empty:
-            log.warning("No grapher charts with views in the period; skipping the top-chart image.")
+        # The image shows the most viewed chart overall, so it matches the top entry of the list below.
+        # Grapher charts and mdim views both export a ".png" (for an mdim view, inserted before its query
+        # string); explorers don't, so they're skipped. The eligible list may be empty (a producer whose
+        # only traffic came from explorers): drop the image placeholder in that case.
+        df_with_image = df_charts_and_additional_exclusive[
+            df_charts_and_additional_exclusive["url"].str.startswith(GRAPHERS_BASE_URL)
+        ]
+        if df_with_image.empty:
+            log.warning("No charts with a static export among top content; skipping the top-chart image.")
             self.google_doc.replace_text(mapping={r"{{top_chart_image}}": ""})
         else:
-            top_chart_url = df_grapher_charts.sort_values("views", ascending=False).iloc[0]["url"] + ".png"
+            top_url = df_with_image.sort_values("views", ascending=False).iloc[0]["url"]
+            base, _, query = top_url.partition("?")
+            top_chart_url = f"{base}.png?{query}" if query else f"{base}.png"
             self.google_doc.insert_image(image_url=top_chart_url, placeholder=r"{{top_chart_image}}", width=320)
         insert_list_with_links_in_gdoc(self.google_doc, df=df_top_charts, placeholder=r"{{top_charts_list}}")
         insert_list_with_links_in_gdoc(self.google_doc, df=df_top_posts, placeholder=r"{{top_posts_list}}")

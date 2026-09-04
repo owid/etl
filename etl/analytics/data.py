@@ -482,7 +482,12 @@ def get_redirected_source_views(
 
     This supersedes the earlier whole-surface attribution: crediting the specific view (not the whole
     mdim) removes the over-crediting of mixed-producer mdims. Rows with a null ``viewConfigId`` in
-    ``multi_dim_redirects`` (a handful) are dropped - they can't be view-attributed.
+
+    ``multi_dim_redirects`` (a handful) are dropped - they can't be view-attributed. The same goes for
+    sources that fan out to MULTIPLE target views (a sunset explorer mapped view-by-view into mdims):
+    analytics only has whole-surface traffic for such a source, so it is skipped (with a warning) and its
+    period views should be disclosed separately in the affected report, as done for mixed explorers while
+    they were live.
 
     NOTE: this covers redirects recorded in ``multi_dim_redirects`` (chart→mdim and explorer→mdim, the
     only place with a ``viewConfigId``). The catch-all ``redirects_all`` log (chart→explorer,
@@ -516,6 +521,24 @@ def get_redirected_source_views(
         WHERE r.viewConfigId IS NOT NULL
         """
     )
+    # A source is only view-attributable if it redirects to a SINGLE view. A sunset explorer whose views
+    # were mapped one-by-one into mdim views produces many rows sharing the same source path; analytics
+    # only has whole-surface traffic for that path, so crediting it to any one view (or producer) would be
+    # arbitrary. Skip fanned-out sources - like the null-viewConfigId case, they can't be view-attributed.
+    # Warn about the skipped ones that would have counted for this producer, so their views can be
+    # disclosed separately in the affected report instead of silently disappearing.
+    n_targets_by_source = df_mdr.groupby("source_url")["view_config_id"].nunique()
+    fan_out = df_mdr["source_url"].map(n_targets_by_source)
+    skipped = sorted(
+        set(df_mdr.loc[(fan_out > 1) & df_mdr["view_config_id"].isin(producer_view_config_ids), "source_url"])
+    )
+    for source_url in skipped:
+        log.warning(
+            f"Skipping redirected source {source_url} (fans out to {n_targets_by_source[source_url]} views): "
+            "its whole-surface views can't be attributed to a single view or producer. If it drew traffic "
+            "in the reporting period, disclose those views separately in the affected report."
+        )
+    df_mdr = df_mdr[fan_out == 1]
     df_mdr = df_mdr[df_mdr["view_config_id"].isin(producer_view_config_ids)].copy()
     # One redirect per source URL (defensive against duplicate rows for the same source).
     df_mdr = df_mdr.drop_duplicates(subset=["source_url"]).reset_index(drop=True)
@@ -576,6 +599,8 @@ def get_mdim_explorer_views_by_producer(
         Columns: slug, type, view_config_id (None for explorers), dimensions (None for explorers), title,
         url, own_views, redirected_views, views (own + redirected), n_days, views_daily,
         uses_other_producers_data, includes_redirect_views.
+        The frame is the producer's CURRENT catalog of mdim views and explorers: rows with zero views in
+        the period are included (callers count the catalog; zero rows add nothing to view totals).
     """
     cols = [
         "slug",
@@ -668,8 +693,10 @@ def get_mdim_explorer_views_by_producer(
         mdims["own_views"] = mdims["own_views"].fillna(0).astype(int)
         mdims["redirected_views"] = mdims["redirected_views"].fillna(0).astype(int)
         mdims["uses_other_producers_data"] = mdims["uses_other_producers_data"].fillna(False)
-        # Keep only views with some traffic in the period.
-        mdims = mdims[(mdims["own_views"] + mdims["redirected_views"]) > 0].reset_index(drop=True)
+        # Keep ALL producer views, including those with no traffic in the period: the returned frame is
+        # the producer's current catalog of mdim views (callers count it), and zero-view rows add nothing
+        # to view totals.
+        mdims = mdims.reset_index(drop=True)
 
         if not mdims.empty:
             mdims["type"] = "multidim"
@@ -722,22 +749,28 @@ def get_mdim_explorer_views_by_producer(
             .reset_index()
         )
         explorer_slugs = sorted(explorer_relevant["slug"].tolist())
-        df_explorers = get_explorer_views_by_url(
-            urls=[f"{POST_LINK_TYPES_TO_URL['explorer']}{slug}" for slug in explorer_slugs],
-            date_min=date_min,
-            date_max=date_max,
-        )
-        if not df_explorers.empty:
-            df_explorers["slug"] = df_explorers["url"].str.removeprefix(POST_LINK_TYPES_TO_URL["explorer"])
-            df_explorers = df_explorers.merge(explorer_flags, on="slug", how="left")
-            df_explorers["type"] = "explorer"
-            df_explorers["view_config_id"] = None
-            df_explorers["dimensions"] = None
-            df_explorers["own_views"] = df_explorers["views"].astype(int)
-            df_explorers["redirected_views"] = 0
-            df_explorers["includes_redirect_views"] = False
-            df_explorers["uses_other_producers_data"] = df_explorers["uses_other_producers_data"].fillna(False)
-            frames.append(df_explorers[cols])
+        explorer_urls = [f"{POST_LINK_TYPES_TO_URL['explorer']}{slug}" for slug in explorer_slugs]
+        df_explorer_views = get_explorer_views_by_url(urls=explorer_urls, date_min=date_min, date_max=date_max)
+        # Keep every live producer explorer, including ones with no views in the period (like mdim views
+        # above, the catalog should be complete; zero-view rows add nothing to view totals).
+        df_explorers = pd.DataFrame({"url": explorer_urls})
+        if not df_explorer_views.empty:
+            df_explorers = df_explorers.merge(df_explorer_views, on="url", how="left")
+        else:
+            df_explorers[["title", "views", "n_days", "views_daily"]] = None
+        df_explorers["slug"] = df_explorers["url"].str.removeprefix(POST_LINK_TYPES_TO_URL["explorer"])
+        for column in ["views", "n_days", "views_daily"]:
+            df_explorers[column] = df_explorers[column].fillna(0)
+        df_explorers["title"] = df_explorers["title"].fillna(df_explorers["slug"])
+        df_explorers = df_explorers.merge(explorer_flags, on="slug", how="left")
+        df_explorers["type"] = "explorer"
+        df_explorers["view_config_id"] = None
+        df_explorers["dimensions"] = None
+        df_explorers["own_views"] = df_explorers["views"].astype(int)
+        df_explorers["redirected_views"] = 0
+        df_explorers["includes_redirect_views"] = False
+        df_explorers["uses_other_producers_data"] = df_explorers["uses_other_producers_data"].fillna(False)
+        frames.append(df_explorers[cols])
 
     if not frames:
         return _empty_result()
@@ -1039,6 +1072,59 @@ def get_post_views_by_chart_id(
 _REPORTED_POST_TYPES = ("article", "topic-page", "linear-topic-page", "data-insight")
 
 
+def _get_post_views_citing_slugs(
+    slugs: list[str],
+    component_types: list[str],
+    date_min: str,
+    date_max: str,
+) -> pd.DataFrame:
+    """Views of published posts that link any of ``slugs`` via one of ``component_types``.
+
+    Shared tail of the post-recovery lookups: posts come from ``posts_gdocs_links`` (grapher DB), views
+    from get_post_views_by_url. Returns the report-aligned columns: url, title, post_type,
+    post_publication_date, views, n_days, views_daily.
+    """
+    cols = ["url", "title", "post_type", "post_publication_date", "views", "n_days", "views_daily"]
+    empty = pd.DataFrame(columns=cols)
+    if not slugs:
+        return empty
+
+    slug_list = ", ".join(f"'{s}'" for s in sorted(set(slugs)))
+    component_types_str = ", ".join(f"'{c}'" for c in component_types)
+
+    # Posts citing those slugs, restricted to the qualifying component types.
+    df = OWID_ENV.read_sql(
+        f"""
+        SELECT DISTINCT
+            pg.slug AS post_slug,
+            pg.type AS post_type,
+            JSON_UNQUOTE(JSON_EXTRACT(pg.content, '$.title')) AS title,
+            pg.publishedAt AS post_publication_date
+        FROM posts_gdocs pg
+        JOIN posts_gdocs_links pgl ON pg.id = pgl.sourceId
+        WHERE pg.published = 1
+          AND pgl.componentType IN ({component_types_str})
+          AND pgl.target IN ({slug_list})
+        """
+    )
+    df = df[df["post_type"].isin(_REPORTED_POST_TYPES)].copy()
+    if df.empty:
+        return empty
+
+    df["url"] = df["post_type"].map(POST_TYPE_TO_URL) + df["post_slug"]
+    df = df.dropna(subset=["url"]).drop_duplicates(subset=["url"]).reset_index(drop=True)
+    df["post_publication_date"] = pd.to_datetime(df["post_publication_date"]).dt.date.astype(str)
+
+    # Attach post views.
+    df_views = get_post_views_by_url(urls=sorted(set(df["url"])), date_min=date_min, date_max=date_max)
+    df = df.merge(df_views, on="url", how="left").dropna(subset=["views"]).reset_index(drop=True)
+    if df.empty:
+        return empty
+    df = df.astype({"views": int, "n_days": int})
+
+    return df[cols]
+
+
 def get_post_views_of_redirected_charts_by_producer(
     producers: list[str],
     date_min: str = DATE_MIN,
@@ -1101,40 +1187,57 @@ def get_post_views_of_redirected_charts_by_producer(
         return source.strip("/")
 
     source_slugs = sorted({_slug(s) for s in df_mdr["source"]})
-    slug_list = ", ".join(f"'{s}'" for s in source_slugs)
-    component_types_str = ", ".join(f"'{c}'" for c in component_types)
 
-    # Posts citing those slugs, restricted to the qualifying component types.
-    df = OWID_ENV.read_sql(
-        f"""
-        SELECT DISTINCT
-            pg.slug AS post_slug,
-            pg.type AS post_type,
-            JSON_UNQUOTE(JSON_EXTRACT(pg.content, '$.title')) AS title,
-            pg.publishedAt AS post_publication_date
-        FROM posts_gdocs pg
-        JOIN posts_gdocs_links pgl ON pg.id = pgl.sourceId
-        WHERE pg.published = 1
-          AND pgl.componentType IN ({component_types_str})
-          AND pgl.target IN ({slug_list})
-        """
+    return _get_post_views_citing_slugs(
+        slugs=source_slugs, component_types=component_types, date_min=date_min, date_max=date_max
     )
-    df = df[df["post_type"].isin(_REPORTED_POST_TYPES)].copy()
-    if df.empty:
+
+
+def get_post_views_of_producer_collections(
+    producers: list[str],
+    date_min: str = DATE_MIN,
+    date_max: str = DATE_MAX,
+    component_types: list[str] | None = None,
+) -> pd.DataFrame:
+    """Views of posts that embed one of the producer's mdims or explorers (linked by the live slug).
+
+    Post-attribution counterpart of get_mdim_explorer_views_by_producer: a post that embeds an mdim or
+    explorer shows the producer's data, but the live-chart post lookup (get_post_views_by_chart_id)
+    matches on chart ids (collections have none), and get_post_views_of_redirected_charts_by_producer
+    only covers dead slugs. When charts are migrated into an mdim, posts are typically re-pointed to the
+    live mdim slug, so both lookups miss them.
+
+    Only links whose ``componentType`` is in ``component_types`` (default
+    COMPONENT_TYPES_TO_LINK_GDOCS_WITH_VIEWS) are counted - the same "post displays the chart" rule as the
+    other post lookups. Like the whole-chart rule, a post embedding a multi-producer collection counts in
+    full for each producer whose data is in it.
+
+    Returns
+    -------
+    pd.DataFrame
+        Columns: url, title, post_type, post_publication_date, views, n_days, views_daily - aligned with
+        the report's processed posts dataframe so it can be concatenated directly.
+    """
+    cols = ["url", "title", "post_type", "post_publication_date", "views", "n_days", "views_daily"]
+    empty = pd.DataFrame(columns=cols)
+
+    if component_types is None:
+        component_types = COMPONENT_TYPES_TO_LINK_GDOCS_WITH_VIEWS
+
+    variable_ids = set(get_producer_variable_ids(producers=producers))
+    if not variable_ids:
         return empty
 
-    df["url"] = df["post_type"].map(POST_TYPE_TO_URL) + df["post_slug"]
-    df = df.dropna(subset=["url"]).drop_duplicates(subset=["url"]).reset_index(drop=True)
-    df["post_publication_date"] = pd.to_datetime(df["post_publication_date"]).dt.date.astype(str)
+    # Slugs of mdims/explorers with at least one view (mdims) or indicator (explorers) using the
+    # producer's data.
+    df_map = read_analytics(
+        sql=f"SELECT DISTINCT slug, indicator_id FROM {SEMANTIC_LAYER_SCHEMA}.mdim_explorers_x_indicators"
+    )
+    collection_slugs = sorted(set(df_map.loc[df_map["indicator_id"].isin(variable_ids), "slug"]))
 
-    # Attach post views.
-    df_views = get_post_views_by_url(urls=sorted(set(df["url"])), date_min=date_min, date_max=date_max)
-    df = df.merge(df_views, on="url", how="left").dropna(subset=["views"]).reset_index(drop=True)
-    if df.empty:
-        return empty
-    df = df.astype({"views": int, "n_days": int})
-
-    return df[cols]
+    return _get_post_views_citing_slugs(
+        slugs=collection_slugs, component_types=component_types, date_min=date_min, date_max=date_max
+    )
 
 
 def get_post_views_last_n_days(
