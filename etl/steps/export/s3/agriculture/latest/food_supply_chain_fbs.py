@@ -1,6 +1,6 @@
-"""Export the food supply chain (FAOSTAT Food Balance Sheets in kilocalories per person per day) as one JSON file.
+"""Export the food supply chain (Food Balance Sheets method, in kilocalories per person per day) as one JSON file.
 
-Reshaping only: the field names are the columns of the garden table `food_supply_chain`, and the values are the
+Reshaping only: the field names are the columns of the garden table `food_supply_chain_fbs`, and the values are the
 garden values rounded. The file is written locally and uploaded to the public S3 bucket unless DRY_RUN is set.
 
 Schema:
@@ -18,7 +18,7 @@ Schema:
     }
 
 Output URL:
-    https://owid-public.owid.io/data/food-supply-chain/food-supply-chain.json
+    https://owid-public.owid.io/data/food-supply-chain/food-supply-chain-fbs.json
 """
 
 import json
@@ -37,7 +37,7 @@ paths = PathFinder(__file__)
 # Public S3 bucket and prefix.
 S3_BUCKET_NAME = "owid-public"
 S3_DATA_DIR = Path("data/food-supply-chain")
-FILENAME = "food-supply-chain.json"
+FILENAME = "food-supply-chain-fbs.json"
 
 # Decimal places kept for values (kcal per person per day).
 NUM_DECIMALS = 2
@@ -47,8 +47,8 @@ def run() -> None:
     #
     # Load inputs.
     #
-    ds = paths.load_dataset("food_supply_chain")
-    tb = ds.read("food_supply_chain")
+    ds = paths.load_dataset("food_supply_chain_fbs")
+    tb = ds.read("food_supply_chain_fbs")
     stages = [column for column in tb.columns if column not in ["country", "year"]]
 
     #
@@ -77,7 +77,7 @@ def run() -> None:
     local_file = export_dir / FILENAME
     with open(local_file, "w") as f:
         json.dump(data, f, separators=(",", ":"))
-    log.info("food_supply_chain.export", n_entities=len(entities), n_stages=len(stages), file=str(local_file))
+    log.info("food_supply_chain_fbs.export", n_entities=len(entities), n_stages=len(stages), file=str(local_file))
 
     s3_path = f"s3://{S3_BUCKET_NAME}/{S3_DATA_DIR / FILENAME}"
     if DRY_RUN:

@@ -118,12 +118,12 @@ steps:
         # Food supply chain in kilocalories: FAOSTAT Food Balance Sheets with every balance element (production, trade,
         # feed, processing, losses, food...) converted to kilocalories per person per day, for a waterfall visualization.
         #
-        data://garden/agriculture/2026-09-04/food_supply_chain:
+        data://garden/agriculture/2026-09-04/food_supply_chain_fbs:
                 - data://garden/faostat/2026-02-25/faostat_fbsc
                 - data://garden/demography/2024-07-15/population
         # S3 export step: one JSON with the chain per entity and year, for the bespoke visualization to fetch.
-        export://s3/agriculture/latest/food_supply_chain:
-                - data://garden/agriculture/2026-09-04/food_supply_chain
+        export://s3/agriculture/latest/food_supply_chain_fbs:
+                - data://garden/agriculture/2026-09-04/food_supply_chain_fbs
         #
         # USDA/FAS - Corn yields
         #
