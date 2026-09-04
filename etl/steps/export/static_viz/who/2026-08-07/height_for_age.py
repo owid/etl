@@ -320,7 +320,25 @@ TICK_WIDTH = 1
 # content, with half a line of padding under them (labelPadding = 0.5 * facetLabelFontSize). Grapher
 # derives its facet base font size as facetLabelFontSize / GRAPHER_FONT_SCALE_12 * 0.9, so the label
 # ends up about 1/0.9 of the tick size.
-FACET_TITLE_SCALE = 1 / 0.9
+# A template pixel in points: the figure is 100 template px per inch and there are 72 points to the
+# inch, so one pixel is 0.72pt. Used to convert the templates' geometry for text measurement, which
+# matplotlib does in points.
+POINTS_PER_PIXEL = 0.72
+
+# The design team's type ladder for the text INSIDE the plot, in template pixels -- which is what
+# Figma shows, because the figure is drawn at the template's own width.
+#
+# Emit exactly these rather than sizes near them. A point is 100/72 template px, so 14px is 10.08pt
+# and the import then arrives already on the ladder, needing no size pass. That is not merely tidier:
+# snapping a size in Figma changes every glyph width in the label, which moves the label off its
+# anchor and is most of what the anchor pass is left correcting. Emitting 10.5pt instead put every
+# rank about 4% high -- 14.58 / 16.20 / 12.08 -- and bought a round of snapping and re-anchoring for
+# nothing.
+#
+# It also makes the step's own PNG the size the frame will be, so a wrap decided here is decided at
+# the size that ships.
+LADDER_PX = {"facet": 16, "body": 14, "diagram": 12}
+LADDER_PT = {rank: px * POINTS_PER_PIXEL for rank, px in LADDER_PX.items()}
 FACET_TITLE_PAD = 0.5
 
 TITLE = "Expected height of boys and girls, from birth to age 19"
@@ -361,7 +379,7 @@ LAYOUTS = {
         "age_ticks": [0, 5, 10, 15, 19],
         "diagram": "panel",
         "title_fontsize": 16,
-        "body_fontsize": 10.5,
+        "body_fontsize": LADDER_PT["body"],
         "footer_fontsize": 7.75,
         # Space reserved inside the chart area for the y tick labels, and below the plot for the
         # tick marks, the x tick labels and the bold "Age in years" label.
@@ -384,7 +402,7 @@ LAYOUTS = {
         "age_ticks": [0, 5, 10, 15, 19],
         "diagram": "header",
         "title_fontsize": 16,
-        "body_fontsize": 10.5,
+        "body_fontsize": LADDER_PT["body"],
         "footer_fontsize": 8.75,
         "y_label_space": 58,
         "x_label_space": 60,
@@ -411,10 +429,6 @@ MOBILE_NOTE = (
     "and an older-age reference at {second:.0f}."
 )
 
-# A template pixel in points: the figure is 100 template px per inch and there are 72 points
-# to the inch, so one pixel is 0.72pt. Used to convert the templates' geometry for text
-# measurement, which matplotlib does in points.
-POINTS_PER_PIXEL = 0.72
 
 # One dash plus one gap, in POINTS: the dash units are multiples of the line width, so this is what
 # one repetition of the pattern measures. `even_dashes` converts it to display pixels with the
@@ -423,9 +437,6 @@ POINTS_PER_PIXEL = 0.72
 # template pixels made every segment half a period and left the dash as uneven as before.
 STUNTING_DASH_PERIOD_PT = sum(STUNTING_DASHES[1]) * STUNTING_LINEWIDTH
 
-# Font size for the encoding diagram's labels, in points, relative to the body size. The design
-# team's floor is 12px and a point here renders as 100/72 px, so this must stay above 8.64pt.
-DIAGRAM_FONTSIZE_DROP = 1.8
 
 # Gap between the title block and the subtitle, in template pixels. Calibrated so that a
 # two-line title puts the subtitle at the templates' own y=80.
@@ -827,7 +838,7 @@ def create_visualization(tb: Table, citation: str, breaks: list[float], layout: 
     palette = sns.color_palette("deep")
 
     body_fontsize = layout["body_fontsize"]
-    facet_fontsize = body_fontsize * FACET_TITLE_SCALE
+    facet_fontsize = LADDER_PT["facet"]
     # Room the facet titles need above each panel: one line plus grapher's half-line of padding.
     facet_title_space_px = (1 + FACET_TITLE_PAD) * facet_fontsize / POINTS_PER_PIXEL
     age_max = float(tb["age_years"].max())
@@ -927,7 +938,7 @@ def create_visualization(tb: Table, citation: str, breaks: list[float], layout: 
             ax.plot(age, values, color=color, linewidth=line_width, zorder=5, gid=f"{slug}__{column[-3:]}")
 
         if layout["diagram"] == "panel" and ax is axes[0]:
-            draw_encoding_diagram(ax, body_fontsize - DIAGRAM_FONTSIZE_DROP)
+            draw_encoding_diagram(ax, LADDER_PT["diagram"])
 
         # --- panel title, above the plot and left-aligned with it, as grapher labels a facet ---
         ax.set_title(
@@ -1034,7 +1045,7 @@ def create_visualization(tb: Table, citation: str, breaks: list[float], layout: 
         diagram_axes.patch.set_visible(False)
         draw_encoding_diagram(
             diagram_axes,
-            body_fontsize - DIAGRAM_FONTSIZE_DROP,
+            LADDER_PT["diagram"],
             left=0.33,
             right=0.57,
             middle=0.49,
