@@ -377,6 +377,24 @@ function buildFrame(opts = {}) {
                 fills: solid(opts.frameFill || "#ffffff"), children });
 }
 
+// Figma THROWS on a property a node type does not have — the live error is `node.vectorNetwork: no
+// such property 'vectorNetwork' on TEXT node` — while `"vectorNetwork" in node` is FALSE. A plain
+// object stub models neither half: it answers `undefined` and never throws. That gap is why this
+// harness passed a script whose within-frame row crashed on the first frame whose annotation carried
+// the PRESCRIBED tier-2 knockout (a 3px OUTSIDE stroke on the annotation, which is a TEXT node), and
+// `use_figma` being atomic, took the whole geometry group down with it. Wrap a TEXT fixture in this
+// and a guarded read (`"x" in n ? n.x : null`) passes while an unguarded `n.x` throws, as on canvas.
+const NOT_ON_TEXT = ["vectorNetwork", "strokeCap"];
+const figmaText = (n) => new Proxy(n, {
+  has: (t, k) => (NOT_ON_TEXT.includes(k) && !(k in t) ? false : k in t),
+  get: (t, k) => {
+    if (NOT_ON_TEXT.includes(k) && !(k in t)) {
+      throw new TypeError(`node.${String(k)}: no such property '${String(k)}' on TEXT node`);
+    }
+    return t[k];
+  },
+});
+
 // `strokeVisible: false` / `strokeOpacity: 0` model a knockout paint that is PRESENT but renders
 // nothing — `strokes.length` counts it either way. `decoyStroke` puts such a paint in FRONT of the real
 // one, which is what makes reading `strokes[0]` the wrong paint rather than merely a redundant one.
@@ -1867,6 +1885,27 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           /label__retired/.test(row(wrapperReal, "within-frame").detail)
           && !/text-labels/.test(row(wrapperReal, "within-frame").detail),
           row(wrapperReal, "within-frame").detail);
+
+    // The stroke outset reads `vectorNetwork` and `strokeCap` to work out how much of a stroke falls
+    // outside the geometry — and the node carrying the prescribed tier-2 knockout is an ANNOTATION,
+    // i.e. TEXT, which has neither property. Unguarded, that threw on a frame where nothing was wrong
+    // (measured live 2026-09-04, benchmark run 4) and the whole geometry group returned an error
+    // instead of a verdict. A stroked annotation must still be JUDGED here — it keeps the full,
+    // conservative outset — so this asserts a verdict rather than the absence of a crash.
+    const strokedAnn = await run(buildFrame({
+      annotation: figmaText(annotation({ x: 100, y: 200, w: 120, h: 40, stroke: "#ffffff", strokeWeight: 3 })),
+    }), {});
+    check("37 a stroked TEXT annotation is judged, not a crash",
+          row(strokedAnn, "within-frame").status === "ok", row(strokedAnn, "within-frame").detail);
+    check("37 and an off-artboard stroked TEXT annotation still FAILS",
+          (await (async () => {
+            const off = await run(buildFrame({
+              annotation: figmaText(annotation({ x: 100, y: 524, w: 120, h: 40, stroke: "#ffffff", strokeWeight: 3 })),
+            }), {});
+            return row(off, "within-frame").status === "FAIL"
+                   && /annotation__test/.test(row(off, "within-frame").detail);
+          })()),
+          "an annotation hanging off the bottom must still be reported");
   }
 
   // 38 — dead-fills. Invisible on canvas, visible in the layer panel and in every fill inventory:
