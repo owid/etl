@@ -151,11 +151,15 @@ own median, which is the check that catches a stale band or threshold selector -
 16..W-16, and gaps of about 14 on desktop and 20 on mobile.
 """
 
+import logging
+from pathlib import Path
+
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from matplotlib.colors import to_rgb
-from matplotlib.font_manager import FontProperties
+from matplotlib.font_manager import FontProperties, findfont
 from matplotlib.lines import Line2D
 from matplotlib.textpath import TextPath
 from matplotlib.ticker import FuncFormatter
@@ -168,6 +172,47 @@ from etl.static_viz import PIXELS_PER_INCH, apply_svg_rcparams, export_frame, so
 apply_svg_rcparams()
 
 paths = PathFinder(__file__)
+
+# Two stacks, because two different readers want different answers.
+#
+# This one lands in the SVG's `font-family` verbatim -- matplotlib copies the rcParam out rather than
+# writing the face it resolved -- so naming Lato first is a request to whoever opens the file. Figma
+# then renders the import in the template's own typeface on arrival, which makes the parked reference
+# copy look like the deliverable and turns `/create-figma-chart`'s font pass, and the anchor pass that
+# exists only to undo it, into no-ops. Without it Figma resolves none of Arial/Helvetica/DejaVu and
+# substitutes Inter, which is wider.
+EMITTED_FONT_STACK = ["Lato", "Arial", "Helvetica", "sans-serif"]
+# And this one is what the step measures and draws with. It deliberately does NOT name Lato, which is
+# not installed on our machines: Lato is a font this step can ask for, not one it could measure in.
+MEASURED_FONT_STACK = ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans", "sans-serif"]
+
+matplotlib.rcParams["font.family"] = "sans-serif"
+matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
+
+# Drop the per-face misses for faces we deliberately list as alternatives, and nothing else. A blanket
+# silence would also take "Falling back to DejaVu Sans", which is the one that says a whole stack
+# failed and every measurement has just moved ~15% against what gets drawn.
+_OPTIONAL_FACES = tuple({*EMITTED_FONT_STACK, *MEASURED_FONT_STACK})
+logging.getLogger("matplotlib.font_manager").addFilter(
+    lambda record: (
+        "Falling back" in record.getMessage()
+        or not any(f"Font family '{face}' not found" in record.getMessage() for face in _OPTIONAL_FACES)
+    )
+)
+
+# No filter can protect the invariant the allowances actually rest on, so assert it. Silencing a
+# declared face also silences the case where every face of a stack is missing; and Lato-first has its
+# own trap -- a machine that HAS Lato draws Lato while the measured stack still resolves Arial, and
+# nothing warns at all. This passes on a Mac without Lato (Arial/Arial) and on a box with neither
+# (DejaVu/DejaVu -- a different face, still self-consistent), and fails on the two drifting machines.
+_DRAWN_FACE, _MEASURED_FACE = (
+    findfont(FontProperties(family=EMITTED_FONT_STACK)),
+    findfont(FontProperties(family=MEASURED_FONT_STACK)),
+)
+assert _DRAWN_FACE == _MEASURED_FACE, (
+    f"draws {Path(_DRAWN_FACE).name}, measures {Path(_MEASURED_FACE).name} -- every width in this step "
+    "was measured in a face it will not be drawn in"
+)
 
 # One panel per sex. Colors are seaborn "deep" positions rather than raw hexes, so the
 # chart shifts with the shared palette instead of pinning its own. Position 0 is the palette's blue
@@ -729,7 +774,7 @@ def wrap_to_content_width(text: str, layout: dict, fontsize: float) -> str:
     wrapping some 10% narrow than the space available.
     """
     max_points = (layout["size"][0] - 2 * layout["margin"]) * POINTS_PER_PIXEL
-    font = FontProperties(size=fontsize)
+    font = FontProperties(family=MEASURED_FONT_STACK, size=fontsize)
 
     def measure(candidate: str) -> float:
         return TextPath((0, 0), candidate, prop=font).get_extents().width if candidate.strip() else 0.0
@@ -775,6 +820,10 @@ def create_visualization(tb: Table, citation: str, breaks: list[float], layout: 
     """
     sns.set_style("ticks")
     sns.set_palette("deep")
+    # `set_style` REPLACES `font.sans-serif` with its own Arial-first list, so the module-level
+    # assignment above is gone by here and the step would emit a stack it never chose. This is how it
+    # came to ship `'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans'`.
+    matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
     palette = sns.color_palette("deep")
 
     body_fontsize = layout["body_fontsize"]

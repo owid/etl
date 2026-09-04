@@ -46,7 +46,7 @@ L 0 3.6
       </g>
      </g>
      <g id="text_1">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="53.28" y="353.745703" transform="rotate(-0 53.28 353.745703)">Birth</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #5b5b5b" x="53.28" y="353.745703" transform="rotate(-0 53.28 353.745703)">Birth</text>
      </g>
     </g>
     <g id="xtick_2">
@@ -56,7 +56,7 @@ L 0 3.6
       </g>
      </g>
      <g id="text_2">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="121.848957" y="353.745703" transform="rotate(-0 121.848957 353.745703)">5</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #5b5b5b" x="121.848957" y="353.745703" transform="rotate(-0 121.848957 353.745703)">5</text>
      </g>
     </g>
     <g id="xtick_3">
@@ -66,7 +66,7 @@ L 0 3.6
       </g>
      </g>
      <g id="text_3">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="190.417915" y="353.745703" transform="rotate(-0 190.417915 353.745703)">10</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #5b5b5b" x="190.417915" y="353.745703" transform="rotate(-0 190.417915 353.745703)">10</text>
      </g>
     </g>
     <g id="xtick_4">
@@ -76,7 +76,7 @@ L 0 3.6
       </g>
      </g>
      <g id="text_4">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="258.986872" y="353.745703" transform="rotate(-0 258.986872 353.745703)">15</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #5b5b5b" x="258.986872" y="353.745703" transform="rotate(-0 258.986872 353.745703)">15</text>
      </g>
     </g>
     <g id="xtick_5">
@@ -86,18 +86,18 @@ L 0 3.6
       </g>
      </g>
      <g id="text_5">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="313.842038" y="353.745703" transform="rotate(-0 313.842038 353.745703)">19</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="313.842038" y="353.745703" transform="rotate(-0 313.842038 353.745703)">19</text>
      </g>
     </g>
     <g id="text_6">
-     <text style="font-weight: 700; font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="183.565714" y="373.348281" transform="rotate(-0 183.565714 373.348281)">Age in years</text>
+     <text style="font-weight: 700; font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #5b5b5b" x="183.565714" y="373.348281" transform="rotate(-0 183.565714 373.348281)">Age in years</text>
     </g>
    </g>
    <g id="matplotlib.axis_2">
     <g id="ytick_1">
      <g id="line2d_6"/>
      <g id="text_7">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="342.887852" transform="rotate(-0 49.78 342.887852)">40 cm</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="342.887852" transform="rotate(-0 49.78 342.887852)">40 cm</text>
      </g>
     </g>
     <g id="ytick_2">
@@ -108,7 +108,7 @@ L 313.851429 306.833437
      </g>
      <g id="line2d_8"/>
      <g id="text_8">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="310.591289" transform="rotate(-0 49.78 310.591289)">60 cm</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="310.591289" transform="rotate(-0 49.78 310.591289)">60 cm</text>
      </g>
     </g>
     <g id="ytick_3">
@@ -119,7 +119,7 @@ L 313.851429 274.536875
      </g>
      <g id="line2d_10"/>
      <g id="text_9">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="278.294727" transform="rotate(-0 49.78 278.294727)">80 cm</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="278.294727" transform="rotate(-0 49.78 278.294727)">80 cm</text>
      </g>
     </g>
     <g id="ytick_4">
@@ -130,7 +130,7 @@ L 313.851429 242.240312
      </g>
      <g id="line2d_12"/>
      <g id="text_10">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="245.998164" transform="rotate(-0 49.78 245.998164)">100 cm</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="245.998164" transform="rotate(-0 49.78 245.998164)">100 cm</text>
      </g>
     </g>
     <g id="ytick_5">
@@ -141,7 +141,7 @@ L 313.851429 209.94375
      </g>
      <g id="line2d_14"/>
      <g id="text_11">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="213.701602" transform="rotate(-0 49.78 213.701602)">120 cm</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="213.701602" transform="rotate(-0 49.78 213.701602)">120 cm</text>
      </g>
     </g>
     <g id="ytick_6">
@@ -152,7 +152,7 @@ L 313.851429 177.647187
      </g>
      <g id="line2d_16"/>
      <g id="text_12">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="181.405039" transform="rotate(-0 49.78 181.405039)">140 cm</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="181.405039" transform="rotate(-0 49.78 181.405039)">140 cm</text>
      </g>
     </g>
     <g id="ytick_7">
@@ -163,7 +163,7 @@ L 313.851429 145.350625
      </g>
      <g id="line2d_18"/>
      <g id="text_13">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="149.108477" transform="rotate(-0 49.78 149.108477)">160 cm</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="149.108477" transform="rotate(-0 49.78 149.108477)">160 cm</text>
      </g>
     </g>
     <g id="ytick_8">
@@ -174,7 +174,7 @@ L 313.851429 113.054062
      </g>
      <g id="line2d_20"/>
      <g id="text_14">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="116.811914" transform="rotate(-0 49.78 116.811914)">180 cm</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="116.811914" transform="rotate(-0 49.78 116.811914)">180 cm</text>
      </g>
     </g>
     <g id="ytick_9">
@@ -185,7 +185,7 @@ L 313.851429 80.7575
      </g>
      <g id="line2d_22"/>
      <g id="text_15">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="84.515352" transform="rotate(-0 49.78 84.515352)">200 cm</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="49.78" y="84.515352" transform="rotate(-0 49.78 84.515352)">200 cm</text>
      </g>
     </g>
    </g>
@@ -8317,7 +8317,7 @@ L 313.851429 339.13
 " style="fill: none; stroke: #999999; stroke-width: 0.72; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_16">
-    <text style="font-weight: 700; font-size: 11.666667px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="53.28" y="74.924167" transform="rotate(-0 53.28 74.924167)">Boys</text>
+    <text style="font-weight: 700; font-size: 11.666667px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #5b5b5b" x="53.28" y="74.924167" transform="rotate(-0 53.28 74.924167)">Boys</text>
    </g>
    <g id="boys__stunting-threshold">
     <path d="M 53.28 329.282779 
@@ -8869,7 +8869,7 @@ L 211.707429 234.489137
 " style="fill: none; stroke: #777777; stroke-width: 0.8"/>
    </g>
    <g id="diagram__label-19-in-20">
-    <text style="font-size: 8.7px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="218.742857" y="236.738223" transform="rotate(-0 218.742857 236.738223)">95.4% of children</text>
+    <text style="font-size: 8.7px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #5b5b5b" x="218.742857" y="236.738223" transform="rotate(-0 218.742857 236.738223)">95.4% of children</text>
    </g>
    <g id="diagram__bracket-8-in-10">
     <path d="M 219.524571 279.002585 
@@ -8879,10 +8879,10 @@ L 219.524571 244.233915
 " style="fill: none; stroke: #777777; stroke-width: 0.8"/>
    </g>
    <g id="diagram__label-8-in-10">
-    <text style="font-size: 8.7px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="226.56" y="263.867336" transform="rotate(-0 226.56 263.867336)">80% of children</text>
+    <text style="font-size: 8.7px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #5b5b5b" x="226.56" y="263.867336" transform="rotate(-0 226.56 263.867336)">80% of children</text>
    </g>
    <g id="diagram__label-median">
-    <text style="font-size: 8.7px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="136.662857" y="294.872036" transform="rotate(-0 136.662857 294.872036)">Median</text>
+    <text style="font-size: 8.7px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="136.662857" y="294.872036" transform="rotate(-0 136.662857 294.872036)">Median</text>
    </g>
    <g id="diagram__leader-stunted">
     <path d="M 176.17736 289.722858 
@@ -8890,7 +8890,7 @@ L 176.17736 315.036764
 " style="fill: none; stroke: #777777; stroke-width: 0.8"/>
    </g>
    <g id="diagram__label-stunted">
-    <text style="font-size: 8.7px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="176.17736" y="321.370093" transform="rotate(-0 176.17736 321.370093)">Stunted: below this line, too short for their age</text>
+    <text style="font-size: 8.7px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #5b5b5b" x="176.17736" y="321.370093" transform="rotate(-0 176.17736 321.370093)">Stunted: below this line, too short for their age</text>
    </g>
   </g>
   <g id="axes_2">
@@ -8911,7 +8911,7 @@ z
       </g>
      </g>
      <g id="text_17">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="339.908571" y="353.745703" transform="rotate(-0 339.908571 353.745703)">Birth</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #5b5b5b" x="339.908571" y="353.745703" transform="rotate(-0 339.908571 353.745703)">Birth</text>
      </g>
     </g>
     <g id="xtick_7">
@@ -8921,7 +8921,7 @@ z
       </g>
      </g>
      <g id="text_18">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="408.477529" y="353.745703" transform="rotate(-0 408.477529 353.745703)">5</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #5b5b5b" x="408.477529" y="353.745703" transform="rotate(-0 408.477529 353.745703)">5</text>
      </g>
     </g>
     <g id="xtick_8">
@@ -8931,7 +8931,7 @@ z
       </g>
      </g>
      <g id="text_19">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="477.046486" y="353.745703" transform="rotate(-0 477.046486 353.745703)">10</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #5b5b5b" x="477.046486" y="353.745703" transform="rotate(-0 477.046486 353.745703)">10</text>
      </g>
     </g>
     <g id="xtick_9">
@@ -8941,7 +8941,7 @@ z
       </g>
      </g>
      <g id="text_20">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="545.615444" y="353.745703" transform="rotate(-0 545.615444 353.745703)">15</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #5b5b5b" x="545.615444" y="353.745703" transform="rotate(-0 545.615444 353.745703)">15</text>
      </g>
     </g>
     <g id="xtick_10">
@@ -8951,11 +8951,11 @@ z
       </g>
      </g>
      <g id="text_21">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="600.47061" y="353.745703" transform="rotate(-0 600.47061 353.745703)">19</text>
+      <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="600.47061" y="353.745703" transform="rotate(-0 600.47061 353.745703)">19</text>
      </g>
     </g>
     <g id="text_22">
-     <text style="font-weight: 700; font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="470.194286" y="373.348281" transform="rotate(-0 470.194286 373.348281)">Age in years</text>
+     <text style="font-weight: 700; font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: middle; fill: #5b5b5b" x="470.194286" y="373.348281" transform="rotate(-0 470.194286 373.348281)">Age in years</text>
     </g>
    </g>
    <g id="matplotlib.axis_4">
@@ -17155,7 +17155,7 @@ L 600.48 339.13
 " style="fill: none; stroke: #999999; stroke-width: 0.72; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_23">
-    <text style="font-weight: 700; font-size: 11.666667px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="339.908571" y="74.924167" transform="rotate(-0 339.908571 74.924167)">Girls</text>
+    <text style="font-weight: 700; font-size: 11.666667px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #5b5b5b" x="339.908571" y="74.924167" transform="rotate(-0 339.908571 74.924167)">Girls</text>
    </g>
    <g id="girls__stunting-threshold">
     <path d="M 339.908571 330.3744 
@@ -17257,25 +17257,25 @@ L 600.48 140.255844
    </g>
   </g>
   <g id="title">
-   <text style="font-size: 16px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #111111" x="11.52" y="23.1675" transform="rotate(-0 11.52 23.1675)">Expected height of boys and girls, from birth to age 19</text>
+   <text style="font-size: 16px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #111111" x="11.52" y="23.1675" transform="rotate(-0 11.52 23.1675)">Expected height of boys and girls, from birth to age 19</text>
   </g>
   <g id="subtitle">
-   <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #555555" x="11.52" y="44.290234" transform="rotate(-0 11.52 44.290234)">Growth reference for infants, children, and adolescents, as defined by the World Health Organization.</text>
+   <text style="font-size: 10.5px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #555555" x="11.52" y="44.290234" transform="rotate(-0 11.52 44.290234)">Growth reference for infants, children, and adolescents, as defined by the World Health Organization.</text>
   </g>
   <g id="note">
-   <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #777777" transform="translate(11.52 387.976602)">Note: The curves step down slightly at age 2, where height starts being measured standing up rather than lying down, and at age 5, where WHO’s standards for under-fives</text>
-   <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #777777" transform="translate(11.52 396.377844)">give way to its reference for older children. The under-fives standards show how children grow in good conditions; the reference for older children describes how an earlier</text>
-   <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #777777" transform="translate(11.52 404.779086)">sample did grow. A child is stunted if they are more than two standard deviations shorter than the median for their age, which is the shaded area’s lower edge: 2.3% of the</text>
-   <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #777777" transform="translate(11.52 413.180328)">reference population falls below it.</text>
+   <text style="font-size: 7.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #777777" transform="translate(11.52 387.976602)">Note: The curves step down slightly at age 2, where height starts being measured standing up rather than lying down, and at age 5, where WHO’s standards for under-fives</text>
+   <text style="font-size: 7.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #777777" transform="translate(11.52 396.377844)">give way to its reference for older children. The under-fives standards show how children grow in good conditions; the reference for older children describes how an earlier</text>
+   <text style="font-size: 7.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #777777" transform="translate(11.52 404.779086)">sample did grow. A child is stunted if they are more than two standard deviations shorter than the median for their age, which is the shaded area’s lower edge: 2.3% of the</text>
+   <text style="font-size: 7.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #777777" transform="translate(11.52 413.180328)">reference population falls below it.</text>
   </g>
   <g id="data-source">
-   <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #888888" x="11.52" y="431.166602" transform="rotate(-0 11.52 431.166602)">Data source: World Health Organization (2006; 2007)</text>
+   <text style="font-size: 7.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #888888" x="11.52" y="431.166602" transform="rotate(-0 11.52 431.166602)">Data source: World Health Organization (2006; 2007)</text>
   </g>
   <g id="tagline">
-   <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #888888" x="11.52" y="444.126602" transform="rotate(-0 11.52 444.126602)">OurWorldinData.org — Research and data to make progress against the world’s largest problems.</text>
+   <text style="font-size: 7.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #888888" x="11.52" y="444.126602" transform="rotate(-0 11.52 444.126602)">OurWorldinData.org — Research and data to make progress against the world’s largest problems.</text>
   </g>
   <g id="license">
-   <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #888888" x="600.48" y="444.121758" transform="rotate(-0 600.48 444.121758)">Licensed under CC-BY by the author Pablo Arriagada</text>
+   <text style="font-size: 7.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #888888" x="600.48" y="444.121758" transform="rotate(-0 600.48 444.121758)">Licensed under CC-BY by the author Pablo Arriagada</text>
   </g>
  </g>
 </svg>
