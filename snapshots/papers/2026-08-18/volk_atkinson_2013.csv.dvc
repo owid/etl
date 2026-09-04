@@ -1,0 +1,39 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Infant and child death in the human environment of evolutionary adaptation
+    description: |-
+      The paper reconstructs how often infants and children died before the modern decline in mortality, by pooling mortality rates reported for hunter-gatherer, historical and agriculturalist societies, and for non-human primates. It reports two rates per society: the infant mortality rate (IMR), the share failing to survive the first year of life, and the child mortality rate (CMR), the share failing to survive to puberty. The authors estimate that about 27% of infants and about 47.5% of children died across the environments in which humans evolved.
+
+      The age at which the child mortality rate is measured is not identical across the studies pooled. It is the age of, or immediately before, puberty, which is generally around 15 years. The authors note that infant and child remains, death records and life histories are systematically worse preserved than adult ones, so the historical rates should be read as conservative estimates that err toward understating actual mortality.
+    description_snapshot: |-
+      Table 1 (hunter-gatherer societies) and Table 2 (historical societies), transcribed from the paper by Our World in Data. Each row carries the culture, the period it covers, the infant and child mortality rates, and the study each rate comes from, exactly as printed - including the ranges ("40%-50%"), the open-ended values ("40%+") and the one rate measured at a different age ("35% (at age 10)"). The tables' own N and Mean rows are transcribed as rows too, so the paper's published averages travel with the data rather than being recomputed.
+
+      Three inconsistencies in the tables' own summary rows are reproduced here as printed, and must not be silently corrected:
+
+      1. Table 1 gives N = 15 for the infant mortality rate, but 16 of its 20 cultures carry one.
+      2. Table 2 gives N = 42 for the infant mortality rate, but 41 of its 43 cultures carry one.
+      3. Neither published mean is recoverable from the rates above it. Table 1's child mortality mean of 48.8% recomputes to between 47.3% and 47.9% depending on how the open-ended and range values are read; Table 2's 46.2% recomputes to about 47.0%.
+
+      In Table 2 the row for China, 1700-1800, prints no infant mortality rate: its single value, "40%+", sits in the child mortality column. In the final row the infant mortality cell for modern developed countries prints as "N 1%", which is transcribed verbatim; the paper's own text gives modern Western rates as 0.1% for infants and 1% for children.
+    date_published: "2013-05-01"
+
+    # Citation
+    producer: Volk and Atkinson
+    citation_full: |-
+      Volk, A. A., & Atkinson, J. A. (2013). Infant and child death in the human environment of evolutionary adaptation. Evolution and Human Behavior, 34(3), 182-192.
+
+    # Files
+    url_main: https://doi.org/10.1016/j.evolhumbehav.2012.11.007
+    date_accessed: "2026-08-18"
+
+    # License
+    license:
+      name: © Elsevier Inc.
+      url: https://doi.org/10.1016/j.evolhumbehav.2012.11.007
+outs:
+  - md5: 0cfdd74dd2d78ef622043bdc92738099
+    size: 3646
+    path: volk_atkinson_2013.csv

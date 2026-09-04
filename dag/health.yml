@@ -230,6 +230,18 @@ steps:
         - data://meadow/ihme_gbd/2020-12-19/child_mortality:
             - snapshot://ihme_gbd/2020-12-19/child_mortality.feather
 
+  # Child mortality before the modern decline - Volk & Atkinson (2013) and Knodel (1970), assembled
+  # with the modern global series for the long-run history of child mortality static visualization
+  data://garden/papers/2026-08-18/child_mortality_in_the_past:
+    - data://meadow/papers/2026-08-18/volk_atkinson_2013:
+      - snapshot://papers/2026-08-18/volk_atkinson_2013.csv
+    - data://meadow/papers/2026-08-18/knodel_1970:
+      - snapshot://papers/2026-08-18/knodel_1970.csv
+    - data://garden/hmd/2025-10-22/hmd
+    - data://garden/un/2026-06-09/igme
+    - data://garden/un/2024-12-02/un_wpp_lt
+    - data://garden/demography/2024-07-15/population
+
   # GBD 2023 - GBD Health-adjusted Life Expectancy and Life Expectancy
   data-private://grapher/ihme_gbd/2026-02-07/gbd_healthy_life_expectancy:
     - data-private://garden/ihme_gbd/2026-02-07/gbd_healthy_life_expectancy:

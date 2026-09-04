@@ -1,0 +1,39 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Two and a half centuries of demographic history in a Bavarian village
+    description: |-
+      A family reconstitution of the parish registers of Anhausen, a village in Bavaria, covering marriages from the late seventeenth century to the end of the nineteenth. It reports fertility and infant and child mortality by marriage cohort, which makes it possible to say how many children a married woman bore and how many of them died before reaching adulthood.
+
+      Knodel cautions that the figures for couples married before 1750 are spuriously high, because infant and child deaths were frequently omitted from the parish registers in that period, and that even the later figures probably understate mortality.
+    description_snapshot: |-
+      Table 11, "Effective family size", transcribed from the paper by Our World in Data. One row per marriage cohort, giving the average number of children ever born per couple, how many of them survived to their first birthday, how many survived to their fifteenth, and the number of couples the row is based on.
+
+      Note that the last two columns count children who **survived**, not children who died. For the 1750-1799 cohort the two happen to coincide - 5.6 born and 2.8 surviving means 2.8 died - which makes the column easy to misread; the share who died is always births minus survivors, over births.
+
+      The table covers only couples for whom both death dates are known and whose marriage remained intact until the wife's 45th birthday, which is why the number of couples is far smaller than the number of marriages in the village.
+
+      Knodel reports the 1692-1749 row as unreliable: infant and child deaths were frequently omitted from the parish registers in that period, making the surviving-children figure spuriously high. He also notes that the later rows probably understate child mortality, since model life tables imply a higher childhood mortality than Anhausen shows at the infant mortality rates that prevailed before 1900.
+
+      The paper's own Total row - 5.6 born, 3.6 surviving to age 1, 3.2 surviving to age 15, over 184 couples - is not transcribed as a row, because it is the couple-weighted average of the five cohorts. The meadow step reconciles the transcription against all four of those published figures.
+    date_published: "1970-11-01"
+
+    # Citation
+    producer: Knodel
+    citation_full: |-
+      Knodel, J. (1970). Two and a half centuries of demographic history in a Bavarian village. Population Studies, 24(3), 353-376.
+
+    # Files
+    url_main: https://doi.org/10.1080/00324728.1970.10406134
+    date_accessed: "2026-08-18"
+
+    # License
+    license:
+      name: © Population Investigation Committee
+      url: https://doi.org/10.1080/00324728.1970.10406134
+outs:
+  - md5: a7e7337636271fe173222ac75bfca26d
+    size: 351
+    path: knodel_1970.csv
