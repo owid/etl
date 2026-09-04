@@ -62,10 +62,27 @@ from typing import Any
 # shift a day depending on where ETL happens to run.
 MONTH_NAMES = list(calendar.month_name)[1:]
 
+# `OWID_ATTRIBUTION` (metadataHelpers.ts). A constant rather than a literal per use
+# site: the port had three of them and one said "Our World In Data", so a readme
+# credited us two different ways within four lines.
+OWID_ATTRIBUTION = "Our World in Data"
+
 
 # ---------------------------------------------------------------------------
 # Small helpers standing in for lodash / dayjs
 # ---------------------------------------------------------------------------
+
+
+def format_attributions(attributions: list[str]) -> str:
+    """`formatAttributions` (metadataHelpers.ts) -- semicolons, not commas.
+
+    Producer fragments carry commas of their own ("Department for Business, Energy &
+    Industrial Strategy of the UK (2023)"), so joining them with commas makes one list
+    indistinguishable from the next. Upstream moved to semicolons; this port kept
+    commas in `get_attribution` while already using semicolons in the citations, so the
+    Source line and the citation four lines below it disagreed.
+    """
+    return "; ".join(attributions)
 
 
 def _uniq(values: list[str]) -> list[str]:
@@ -318,8 +335,8 @@ def get_citation_short(origins: list[dict], attributions: list[str] | None, proc
     phrase = get_phrase_for_processing_level(processing_level)
 
     fragments = attributions if attributions is not None else producers_with_year
-    shortened = f"{fragments[0]} and other sources" if len(fragments) > 3 else "; ".join(fragments)
-    return f"{shortened} – {phrase} by Our World in Data"
+    shortened = f"{fragments[0]} and other sources" if len(fragments) > 3 else format_attributions(fragments)
+    return f"{shortened} – {phrase} by {OWID_ATTRIBUTION}"
 
 
 def get_citation_long(
@@ -348,7 +365,7 @@ def get_citation_long(
     phrase = get_phrase_for_processing_level(processing_level)
 
     fragments = attributions if attributions is not None else producers_with_year
-    citation_longer = f"{'; '.join(fragments)} – {phrase} by Our World in Data"
+    citation_longer = f"{format_attributions(fragments)} – {phrase} by {OWID_ATTRIBUTION}"
     title_with_fragments = " – ".join(_exclude_undefined([indicator_title.get("title"), source_short_name]))
     origins_long = "; ".join(
         _uniq(
@@ -514,17 +531,17 @@ def get_title(col: IndicatorColumn) -> str:
 
 def get_attribution(col: IndicatorColumn) -> str:
     """`getAttribution`."""
-    attribution = ", ".join(col.attribution_fragments)
+    attribution = format_attributions(col.attribution_fragments)
     if attribution == "":
         return col.source_name or ""
     return attribution
 
 
 def get_source(attribution: str, col: IndicatorColumn) -> str:
-    """`getSource`."""
-    if attribution.lower() != "our world in data":
+    """`getSource`, now `getAttributionWithProcessing` upstream."""
+    if attribution.lower() != OWID_ATTRIBUTION.lower():
         phrase = get_phrase_for_processing_level(col.processing_level)
-        return f"{attribution} – {phrase} by Our World In Data"
+        return f"{attribution} – {phrase} by {OWID_ATTRIBUTION}"
     return attribution
 
 
@@ -639,7 +656,7 @@ def _sources_lines(col: IndicatorColumn) -> list[str]:
     if not sources:
         return []
 
-    lines = ["", "#### Source" if len(sources) == 1 else "#### Sources"]
+    lines = ["", "#### Sources"]
     for source in sources:
         lines += ["", f"##### {source['label']}"]
         if source.get("dataPublishedBy"):
@@ -745,7 +762,9 @@ def sources_section_lines(sources: list[dict]) -> list[str]:
     """
     if not sources:
         return []
-    lines = ["", "## Source" if len(sources) == 1 else "## Sources", ""]
+    # Always plural: the sentence below is written that way and a section heading naming
+    # a category reads fine over one item, so the branch decided nothing.
+    lines = ["", "## Sources", ""]
     lines.append(
         "These are the sources behind the data in this package. Each time series above names the ones "
         "it draws on in its citation."

@@ -344,3 +344,40 @@ def test_readme_describes_the_time_columns_the_package_actually_has():
 
     stacked = _readme("Energy mix", "https://example.org", [], time_header="Time", frequency_column=True)
     assert '"Frequency" and "Time"' in stacked
+
+
+def test_source_line_matches_the_citation_it_sits_next_to():
+    """Test get_source - semicolon-joined attributions, and one spelling of our name.
+
+    The port kept `getAttribution`'s old comma join and a hand-written "Our World In
+    Data" after upstream had moved to semicolons and a constant, so a readme credited
+    us two ways four lines apart and joined producers with a comma that several
+    producer names contain themselves.
+    """
+    from etl.collection.download_package_format import IndicatorColumn, get_attribution, get_source
+
+    col = IndicatorColumn(
+        {
+            "processingLevel": "major",
+            "origins": [
+                {"producer": "Ember", "datePublished": "2026-04-21"},
+                {
+                    "producer": "Department for Business, Energy & Industrial Strategy of the UK",
+                    "datePublished": "2023-01-01",
+                },
+            ],
+        }
+    )
+    attribution = get_attribution(col)
+
+    assert attribution == "Ember (2026); Department for Business, Energy & Industrial Strategy of the UK (2023)"
+    assert get_source(attribution, col).endswith("– with major processing by Our World in Data")
+    assert "Our World In Data" not in get_source(attribution, col)
+
+
+def test_owid_alone_is_not_credited_as_processing_its_own_data():
+    """Test get_source - no processing phrase when we are the sole attribution."""
+    from etl.collection.download_package_format import IndicatorColumn, get_source
+
+    col = IndicatorColumn({"processingLevel": "major"})
+    assert get_source("Our World in Data", col) == "Our World in Data"

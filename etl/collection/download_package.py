@@ -899,7 +899,7 @@ Each row is an observation for an entity (usually a country or region) at a time
 
 ## Metadata.json structure
 
-The .metadata.json file contains metadata about the data package. The "chart" key contains information to recreate the chart, like the title, subtitle etc.. The "columns" key contains information about each of the columns in the csv, like the unit, timespan covered, citation for the data etc..
+The .metadata.json file contains metadata about the data package. The "chart" key contains information to recreate the chart, like the title, subtitle etc. The "columns" key contains information about each of the columns in the csv, like the unit, timespan covered, citation for the data etc.
 
 The "dimensions" key lists this dataset's dimensions and the choices available for each, as a stable slug plus a display name. Every column entry then carries its own "dimensions" key naming the combination of choices that column belongs to, by slug, plus a "url" that opens that combination on our website. Together those let you go from a CSV column to its dimension choices, and back, without parsing column headers.
 
@@ -907,10 +907,10 @@ A few columns belong to more than one combination, which happens when a dimensio
 
 ## How we process data at Our World in Data
 
-Our World in Data is almost never the original producer of the data - almost all of the data we use has been compiled by others. If you want to re-use data, it is your responsibility to ensure that you adhere to the sources' license and to credit them correctly. Please note that a single time series may have more than one source - e.g. when we stich together data from different time periods by different producers or when we calculate per capita metrics using population data from a second source.
+Our World in Data is almost never the original producer of the data - almost all of the data we use has been compiled by others. If you want to re-use data, it is your responsibility to ensure that you adhere to the sources' license and to credit them correctly. Please note that a single time series may have more than one source - e.g. when we stitch together data from different time periods by different producers or when we calculate per capita metrics using population data from a second source.
 
-All data and visualizations on Our World in Data rely on data sourced from one or several original data providers. Preparing this original data involves several processing steps. Depending on the data, this can include standardizing country names and world region definitions, converting units, calculating derived indicators such as per capita measures, as well as adding or adapting metadata such as the name or the description given to an indicator.
-[Read about our data pipeline](https://docs.owid.io/projects/etl/)
+Preparing this data involves several processing steps. Depending on the data, this can include standardizing country names and world region definitions, converting units, calculating derived indicators such as per capita measures, as well as adding or adapting metadata such as the name or the description given to an indicator.
+[Read about our data pipeline](https://docs.owid.io/projects/etl/).
 
 ## Detailed information about each time series
 
