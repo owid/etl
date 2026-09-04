@@ -2,12 +2,33 @@ definitions:
   survey_dating: &survey_dating |-
     Countries run their time-use surveys in different years, and some run them across two: we date each
     country by the year its fieldwork ended, so a survey labeled 2009/10 is shown as 2010.
+  # The caveats every indicator carries. The first is the OECD's own, from the database's landing page;
+  # the rest name the countries it flags, and what each flag means for a reader comparing bars.
+  comparability: &comparability |-
+    Time-use surveys are run differently in different countries. The OECD notes that differences in how the surveys are designed, in how many diary days each one samples, and in how each one groups activities all limit how comparable the results are between countries.
+  mexico_instrument: &mexico_instrument |-
+    The OECD flags Mexico's estimates as not fully comparable. Mexico measures time use with a questionnaire that asks how long people spent on a set list of activities over the previous week, rather than with a diary of a single day, and recall over a week tends to raise the time reported for frequent activities such as housework and care.
+  survey_vintage: &survey_vintage |-
+    Each country's estimates come from a single survey, and the survey years differ widely. They are the most recent surveys in the OECD's database, which is not always updated when a country runs a new one.
+  # Indicator-specific caveats, all from the per-country footnotes in the source's own workbook.
+  japan_reading: &japan_reading |-
+    In Japan, this also covers time spent reading newspapers or magazines. The Japanese survey records watching television, listening to the radio and reading print as a single activity, so they cannot be separated.
+  japan_travel: &japan_travel |-
+    In Japan, this also covers all travel except commuting to work. The Japanese survey records travel as one activity instead of splitting it by purpose, so time that other countries count under leisure or personal care is counted here.
+  volunteering_unreported: &volunteering_unreported |-
+    Latvia and Lithuania report zero minutes here. Their surveys do not identify this activity separately; it is not a finding that nobody does it.
+  unallocated_minutes: &unallocated_minutes |-
+    This group also holds any minutes a country does not assign to a specific activity, so that its day still adds up to 24 hours. That is 37 minutes a day for Poland and 22 minutes for Japan; for every other country it is under a minute.
   common:
     unit: minutes per day
     short_unit: min
     display:
       numDecimalPlaces: 0
     description_processing: *survey_dating
+    description_key:
+      - *comparability
+      - *mexico_instrument
+      - *survey_vintage
     presentation:
       topic_tags:
         - Time Use
@@ -32,6 +53,8 @@ definitions:
     - Other leisure: sports, participating in or attending events, and other leisure activities.
 
     Groups that cover "the rest" of one of the OECD's top-level categories are computed as remainders from that category's total, so minutes that a country does not allocate to any detailed sub-activity remain included.
+
+    China, Ireland, Japan, and Sweden do not report time spent on research and homework separately. Because paid work is computed as the rest of the OECD's "paid work or study" category, those countries' homework minutes are counted in paid work rather than in education.
 
 dataset:
   update_period_days: 365
@@ -103,10 +126,20 @@ tables:
         title: Time spent volunteering
         description_short: |-
           Average time spent volunteering. {definitions.averaged}
+        description_key:
+          - *comparability
+          - *mexico_instrument
+          - *survey_vintage
+          - *volunteering_unreported
       travel_related_to_household_activities:
         title: Time spent traveling for household activities
         description_short: |-
           Average time spent traveling in relation to household activities. {definitions.averaged}
+        description_key:
+          - *comparability
+          - *mexico_instrument
+          - *survey_vintage
+          - *japan_travel
       other_unpaid_work_activities:
         title: Time spent on other unpaid work
         description_short: |-
@@ -147,6 +180,11 @@ tables:
         title: Time spent watching TV or listening to the radio at home
         description_short: |-
           Average time spent watching TV or listening to the radio at home. {definitions.averaged}
+        description_key:
+          - *comparability
+          - *mexico_instrument
+          - *survey_vintage
+          - *japan_reading
       other_leisure_activities:
         title: Time spent on other leisure activities
         description_short: |-
@@ -155,6 +193,11 @@ tables:
         title: Time spent on other activities
         description_short: |-
           Average time spent on religious and spiritual activities, civic obligations, and activities without a category. {definitions.averaged}
+        description_key:
+          - *comparability
+          - *mexico_instrument
+          - *survey_vintage
+          - *japan_travel
       religious_spiritual_and_civic_activities:
         title: Time spent on religious, spiritual, and civic activities
         description_short: |-
@@ -163,6 +206,11 @@ tables:
         title: Time spent on uncategorized activities
         description_short: |-
           Average time spent on activities without a category. {definitions.averaged}
+        description_key:
+          - *comparability
+          - *mexico_instrument
+          - *survey_vintage
+          - *japan_travel
       survey_year:
         title: Survey year
         unit: ""
@@ -199,6 +247,12 @@ tables:
         title: Time spent on other unpaid work
         description_short: |-
           Average time spent on care work, volunteering, travel related to household activities, and other unpaid or uncategorized activities. {definitions.averaged}
+        description_key:
+          - *comparability
+          - *mexico_instrument
+          - *survey_vintage
+          - *japan_travel
+          - *unallocated_minutes
       personal_care:
         title: Time spent on personal care other than sleeping, eating, and drinking
         description_short: |-
@@ -211,6 +265,11 @@ tables:
         title: Time spent watching TV or listening to the radio
         description_short: |-
           Average time spent watching TV or listening to the radio at home. {definitions.averaged}
+        description_key:
+          - *comparability
+          - *mexico_instrument
+          - *survey_vintage
+          - *japan_reading
       seeing_friends:
         title: Time spent seeing friends
         description_short: |-
