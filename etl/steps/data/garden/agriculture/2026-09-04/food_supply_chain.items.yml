@@ -19,10 +19,9 @@
 #           losses, tourist consumption, residuals, food) are summed over all items regardless of role.
 #   fao_group (optional): "vegetal" or "animal". Only needed where FAO's own grouping (its "Vegetal Products" and
 #           "Animal Products" items) differs from the natural group of the role. Used by the partition check.
-#   fixed_factor_kcal_per_100g (optional): energy factor to use instead of the one reverse-engineered from FBS. Not
-#           used by any item at the moment; it exists for items with no food use at all, for which nothing can be
-#           reverse-engineered (see "Palm kernels" under excluded). Source for any value: FAO (2001), "Food Balance
-#           Sheets: A Handbook", Annex "Food composition tables": https://www.fao.org/4/X9892E/X9892e05.htm
+#   fixed_factor_kcal_per_100g (optional): energy factor to use instead of the one reverse-engineered from FBS. Only
+#           for items with no food use at all, for which nothing can be reverse-engineered. Source: FAO (2001), "Food
+#           Balance Sheets: A Handbook", Annex "Food composition tables": https://www.fao.org/4/X9892E/X9892e05.htm
 items:
   # Cereals.
   - {code: 2511, name: "Wheat and products", role: primary_crop}
@@ -59,6 +58,9 @@ items:
   - {code: 2558, name: "Rape and Mustardseed", role: primary_crop}
   - {code: 2559, name: "Cottonseed", role: primary_crop}
   - {code: 2560, name: "Coconuts - Incl Copra", role: primary_crop}
+  # The whole oil palm harvest: FAO defines this item as "Oil, palm fruit" plus "Palm kernels". None of it is eaten as
+  # such, so no factor can be reverse-engineered; FAO handbook: "Oil palm fruit" 158 kcal per 100 g.
+  - {code: 2562, name: "Palm kernels", role: primary_crop, fixed_factor_kcal_per_100g: 158}
   - {code: 2561, name: "Sesame seed", role: primary_crop}
   - {code: 2563, name: "Olives (including preserved)", role: primary_crop}
   - {code: 2570, name: "Oilcrops, Other", role: primary_crop}
@@ -146,12 +148,6 @@ items:
 excluded:
   - {code: 2501, name: "Population", reason: Not a food item.}
   - {code: 2659, name: "Alcohol, Non-Food", reason: Non-food by definition (industrial alcohol); no food energy.}
-  - code: 2562
-    name: Palm kernels
-    reason: >-
-      Carries the whole oil palm harvest (hundreds of millions of tonnes of fruit) with zero food use, so no energy
-      factor can be reverse-engineered and any fixed factor would double count the oil that this harvest becomes.
-      Oil palm calories enter the chain through "Palm Oil" and "Palmkernel Oil" instead (tagged as primary crops).
   - {code: 2768, name: "Meat, Aquatic Mammals", reason: Negligible production and no reported food energy anywhere.}
 
 # FAO's aggregate items. They sum their member items, so they must not be added to the chain (double counting);
