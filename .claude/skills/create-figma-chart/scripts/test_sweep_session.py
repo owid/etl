@@ -99,6 +99,16 @@ out = run(STAGGERED)
 check("turn is measured from the batch's LAST result (10s, not 20s)",
       "turns between calls: 1" in out.stdout and "median 10.0s" in out.stdout, out.stdout)
 
+# A non-Figma tool running between two Figma calls. Its 40s is another tool executing, not the model
+# thinking, so the turn is 60s of wall clock minus that 40s -- the filter must not hide it from the gap.
+INTERLEAVED = [("m1", "t1", F + "get_screenshot", 0, 10),
+               ("m2", "t2", "Bash", 20, 60),
+               ("m3", "t3", F + "get_screenshot", 70, 80)]
+out = run(INTERLEAVED)
+check("a shell call between two Figma calls is not counted as thinking (20s, not 60s)",
+      "turns between calls: 1" in out.stdout and "median 20.0s" in out.stdout, out.stdout)
+check("and the sweep says how much it took out", "other tools were running" in out.stdout, out.stdout)
+
 # The A/B shape: two tools, told apart by --list.
 MIXED = [("m1", "t1", F + "use_figma", 0, 3), ("m2", "t2", F + "get_screenshot", 10, 19)]
 out = run(MIXED, "--list")

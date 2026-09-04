@@ -20,14 +20,16 @@ Two things this deliberately does NOT do, both from BENCHMARK.md:
     call's own wait as work, so it flatters batching locally and understates it in the cloud.
 
 `turn` is the gap from a message's LAST tool_result back to the next assistant message's first
-tool_use -- the model thinking, which BENCHMARK.md measures at ~60s of every ~66s call. That is the
-term to watch.
+tool_use, MINUS whatever other tool was running inside that gap -- the model thinking, which
+BENCHMARK.md measures at ~60s of every ~66s call. That is the term to watch, so it is the one term
+that must not quietly absorb a shell call's runtime.
 """
 
 import argparse
 import json
 import sys
 from datetime import datetime
+from operator import itemgetter
 
 FIGMA = "mcp__claude_ai_Figma__"
 
@@ -38,7 +40,12 @@ def parse_ts(value):
 
 
 def load(path, tool_filter=None, since=None):
-    """Pair every tool_use with its tool_result, keeping the issuing assistant message id."""
+    """Pair every tool_use with its tool_result, keeping the issuing assistant message id.
+
+    Returns (matched, others): the calls the filter kept, and every OTHER completed tool call in the
+    same window. The second list is what keeps the turn honest -- a 40s shell call between two Figma
+    calls is not the model thinking, and without it that runtime is reported as thinking time.
+    """
     uses, results = {}, {}
     for line in open(path):
         line = line.strip()
@@ -63,19 +70,18 @@ def load(path, tool_filter=None, since=None):
             elif block.get("type") == "tool_result":
                 results[block.get("tool_use_id")] = ts
 
-    calls = []
+    matched, others = [], []
     for tid, use in uses.items():
         if tid not in results:
             continue
         if since and use["start"] < since:
             continue
         name = use["name"]
-        if tool_filter and tool_filter not in name:
-            continue
-        calls.append({"tool": name.replace(FIGMA, ""), "msg": use["msg"],
-                      "start": use["start"], "end": results[tid],
-                      "secs": (results[tid] - use["start"]).total_seconds()})
-    return sorted(calls, key=lambda c: c["start"])
+        call = {"tool": name.replace(FIGMA, ""), "msg": use["msg"],
+                "start": use["start"], "end": results[tid],
+                "secs": (results[tid] - use["start"]).total_seconds()}
+        (others if tool_filter and tool_filter not in name else matched).append(call)
+    return sorted(matched, key=itemgetter("start")), sorted(others, key=itemgetter("start"))
 
 
 def peak_in_flight(calls):
@@ -94,13 +100,30 @@ def peak_in_flight(calls):
     return peak
 
 
-def turn_gaps(calls):
+def occupied(start, end, calls):
+    """Seconds of [start, end) that some call was running -- their UNION, never their sum."""
+    clipped = sorted((max(c["start"], start), min(c["end"], end))
+                     for c in calls if c["end"] > start and c["start"] < end)
+    total, cursor = 0.0, start
+    for lo, hi in clipped:
+        if hi <= cursor:
+            continue
+        total += (hi - max(lo, cursor)).total_seconds()
+        cursor = hi
+    return total
+
+
+def turn_gaps(calls, others=()):
     """Model time: from a message's LAST result back to the next message's first call.
 
     Measured per message, not between adjacent calls: the model cannot start the next turn until
     every result in the batch is back, so the gap runs from the batch's MAX end. Adjacent pairs
     would measure it from whichever call happened to sort last by start time, and a batch whose
     longest call started first would then be credited with thinking time it never spent.
+
+    `others` -- the calls the tool filter dropped -- are subtracted from each gap. A 40s shell call
+    between two Figma calls is another tool running, not the model thinking, and counting it here
+    inflates the one figure BENCHMARK.md calls dominant.
     """
     batches = {}
     for call in calls:
@@ -108,11 +131,12 @@ def turn_gaps(calls):
         batch["start"] = min(batch["start"], call["start"])
         batch["end"] = max(batch["end"], call["end"])
 
-    ordered = sorted(batches.values(), key=lambda b: b["start"])
+    ordered = sorted(batches.values(), key=itemgetter("start"))
     gaps = []
     for prev, nxt in zip(ordered, ordered[1:]):
         if nxt["start"] > prev["end"]:
-            gaps.append((nxt["start"] - prev["end"]).total_seconds())
+            gaps.append(max(0.0, (nxt["start"] - prev["end"]).total_seconds()
+                            - occupied(prev["end"], nxt["start"], others)))
     return gaps
 
 
@@ -135,7 +159,7 @@ def main():
     args = ap.parse_args()
 
     since = parse_ts(args.since) if args.since else None
-    calls = load(args.session, args.tool or (None if args.all_tools else FIGMA), since)
+    calls, others = load(args.session, args.tool or (None if args.all_tools else FIGMA), since)
     if not calls:
         print("no matching tool calls", file=sys.stderr)
         return 1
@@ -146,7 +170,9 @@ def main():
 
     wall = (max(c["end"] for c in calls) - min(c["start"] for c in calls)).total_seconds()
     total = sum(c["secs"] for c in calls)
-    gaps = turn_gaps(calls)
+    gaps = turn_gaps(calls, others)
+    # What the gaps would have claimed as thinking before the other tools were taken out of them.
+    elsewhere = sum(turn_gaps(calls)) - sum(gaps) if others else 0.0
     messages = len({c["msg"] for c in calls})
 
     print(f"{len(calls)} call(s) in {messages} message(s), {wall / 60:.1f} min from first to last\n")
@@ -158,7 +184,8 @@ def main():
     for tool, secs in sorted(by_tool.items(), key=lambda kv: -len(kv[1])):
         print(f"{tool:<28} {len(secs):>3} {median(secs):>7.2f}s {min(secs):>7.2f}s {max(secs):>7.2f}s")
 
-    print(f"\nturns between calls: {len(gaps)}, median {median(gaps):.1f}s, total {sum(gaps) / 60:.1f} min")
+    print(f"\nturns between calls: {len(gaps)}, median {median(gaps):.1f}s, total {sum(gaps) / 60:.1f} min"
+          + (f"  (net of {elsewhere / 60:.1f} min that other tools were running)" if elsewhere else ""))
     print(f"peak in flight: {peak_in_flight(calls)}  (from overlapping intervals, not a per-message count)")
     if wall:
         print(f"sum/wall: {total / wall:.2f}x  -- read this ONLY beside the figures above; it counts a"

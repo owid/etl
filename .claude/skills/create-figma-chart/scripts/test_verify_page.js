@@ -421,7 +421,10 @@ const annotation = (o) => text("annotation__test", o.chars || "Note", o.size || 
 // `wrap` puts the frame under an ancestor — a section or a group — because two of the switches that
 // decide whether a frame renders at all live ABOVE it, and a page whose only child is the frame cannot
 // model either. It takes the frame and returns whatever should sit on the page in its place.
-async function run(frame, config, wrap, emitted) {
+// `patch` rewrites the committed source before it runs — the only way to make a chosen row throw at a
+// chosen POINT. A fence covering two rows can only be tested by throwing after the first has reported,
+// and no fixture reaches that spot: the second half reads nothing off a node that a Proxy could poison.
+async function run(frame, config, wrap, emitted, patch) {
   const byId = {};
   const index = (n) => { if (n.id) byId[n.id] = n; for (const c of n.children || []) index(c); };
   const page = node({ id: "P:1", type: "PAGE", name: "page", children: [wrap ? wrap(frame) : frame] });
@@ -433,6 +436,7 @@ async function run(frame, config, wrap, emitted) {
   // off-canvas rather than only reachable through the slicer.
   if (emitted) body = body.replace(/^const EMITTED_ROWS = \[[^\]]*\];$/m,
     "const EMITTED_ROWS = [" + emitted.map((g) => `"${g}"`).join(", ") + "];");
+  if (patch) body = patch(body);
   const fn = new Function("figma", "__CONFIG__", `return (async () => { ${body} })();`);
   return fn(figma, Object.assign({ frameId: "F:1", chartName: "chart", gapTarget: null, tightlyMeasured: false, highlightTreatment: false, textFloor: null, faceted: false }, config));
 }
@@ -2390,6 +2394,32 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const clean = await run(buildFrame(), {});
     check("50 a clean frame reports no ERROR row at all",
           clean.rows.every((x) => x.status !== "ERROR") && !/THREW/.test(clean.verdict), clean.verdict);
+  }
+
+  // 50b — a fence covering TWO rows, thrown AFTER the first has reported. The row that ran keeps its
+  // verdict and the row the throw cost must appear under its OWN name. Reporting the composite `a+b`
+  // instead left `furniture-dash` absent from `rows` altogether while the verdict claimed every other
+  // row ran — the same silent gap the fence exists to close, one level up.
+  {
+    const ANCHOR = '      add("furniture-dash", badTotal ? "FAIL" : "ok",';
+    let applied = false;
+    const cursed = await run(buildFrame(), {}, undefined, undefined, (src) => {
+      applied = src.includes(ANCHOR);
+      return src.replace(ANCHOR, '      throw new Error("mock: dash read exploded");\n' + ANCHOR);
+    });
+    check("50b the mutation anchor still exists in verify_page.js", applied,
+          "anchor not found — the furniture-dash add() was reworded, so update ANCHOR");
+    check("50b the row that already ran keeps its verdict",
+          row(cursed, "furniture-weight") && row(cursed, "furniture-weight").status === "ok",
+          JSON.stringify(row(cursed, "furniture-weight")));
+    check("50b the row the throw cost is an ERROR under its OWN name",
+          row(cursed, "furniture-dash") && row(cursed, "furniture-dash").status === "ERROR",
+          JSON.stringify(row(cursed, "furniture-dash")));
+    check("50b no row is ever reported under a composite fence name",
+          cursed.rows.every((x) => !x.check.includes("+")),
+          cursed.rows.filter((x) => x.check.includes("+")).map((x) => x.check).join(", "));
+    check("50b the verdict names the real row, not the fence",
+          /THREW and did not run: furniture-dash/.test(cursed.verdict), cursed.verdict);
   }
 
   const bad = results.filter((x) => !x.ok);

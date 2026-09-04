@@ -203,12 +203,19 @@ const add = (name, status, detail, extra) => rows.push({ check: name, status, de
 // One row's worth of checking, fenced. Figma throws on a property the node type lacks, and a throw
 // costs the whole call — so an unguarded read in one row used to return an error instead of a
 // verdict for every row in the slice. ERROR is deliberately not a pass: the gap is reported, loudly.
-const R = (name, fn) => {
+// A fence that covers two rows names them `a+b`, and reporting THAT as the errored row was the same
+// silent gap one level up: the row that already ran keeps its verdict, the row the throw actually
+// cost is absent from `rows` entirely, and the verdict says one composite name that matches no check.
+// So the ERROR is emitted under EVERY covered name that has not already reported.
+const R = (names, fn) => {
   try { fn(); }
   catch (e) {
-    add(name, "ERROR", `this row THREW and did not run: ${e && e.message ? e.message : e}`
-        + " — every OTHER row in this call did run, so this is a GAP in coverage, not a clean result."
-        + " Fix the read and re-send this slice, or judge this row by hand.");
+    for (const name of names.split("+")) {
+      if (rows.some((x) => x.check === name)) continue;
+      add(name, "ERROR", `this row THREW and did not run: ${e && e.message ? e.message : e}`
+          + " — every OTHER row in this call did run, so this is a GAP in coverage, not a clean result."
+          + " Fix the read and re-send this slice, or judge this row by hand.");
+    }
   }
 };
 const skip = (name, why, owner) => add(name, "SKIPPED", why, owner ? { ownedBy: owner } : null);
