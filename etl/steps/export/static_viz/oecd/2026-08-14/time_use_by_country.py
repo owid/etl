@@ -1,8 +1,8 @@
 """Draw the 'How do people spend their time?' chart from the OECD Time Use Database.
 
 One row per country, splitting the 1440 minutes of a day into the OECD's four top-level categories —
-paid work or study, personal care, unpaid work and other, leisure — ranked by `SORT_BY`, time spent on
-paid work, as the original chart by Esteban Ortiz-Ospina ranked it.
+paid work or study, personal care, unpaid work and other, leisure — ranked by the leading segment,
+paid work or study, as the original chart by Esteban Ortiz-Ospina ranked it (see `sort_rows`).
 
 **Four categories, not the source's ten display groups**, and that is the substantive decision in this
 step: the ten resolve more than the harmonization supports. Measured across the source's countries, the
@@ -32,6 +32,14 @@ wrapped to it, and `blocks_collide` asserts that no block reaches into its neigh
 cannot save a single word wider than its span. Labelling each activity over its own segment, with a
 leader back to it, was tried and dropped: threading names past each other needed elbow leaders and a
 crossing budget, for a header no easier to read.
+
+Nothing draws each block's *extent*, only its centre, so how wide a category is has to be read off the
+bars. A 1px rule under each name, spanning that category's own segment, was built and rendered (the
+`bracket` span on every placement is what it needs) and is an open question for design rather than a
+decision taken here: it does say which segment a block belongs to and how wide it is, but the rules
+follow their own lists' depths, so four of them stagger across the band, and the two narrow ones very
+nearly meet. The header lost its bracket rules on purpose when each category became a single segment,
+and putting one back is that call being revisited.
 
 One frame is emitted, 850x1095, following the vertical static-chart template. Fonts and the logo come
 from that template and are deliberately not set here. Colors *are* set here, unlike the retired
@@ -159,6 +167,7 @@ from pathlib import Path
 
 import matplotlib
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
 from matplotlib.colors import to_rgb
 from matplotlib.font_manager import FontProperties, findfont
@@ -206,30 +215,22 @@ CATEGORIES = [
 ]
 
 # The ten groups, in bar order, which must match the categories' column order above (asserted).
-# `contents` says what a group holds where its name does not; it is written into the Note rather
-# than under the name, because a second line over a 25px segment costs several tiers of wrapping
-# (see `place_header_labels`) and the Note has room for the same words. `label` is the name for a
-# group standing on its own; wherever its category's name is beside it, the three residual buckets
-# shorten to "Other" (see `label_in_context`), which is why they are named "Other <category>" here
-# rather than repeating the category outright.
+# `label` is the name for a group standing on its own; wherever its category's name is beside it, the
+# three residual buckets shorten to "Other" (see `label_in_context`), which is why they are named
+# "Other <category>" here rather than repeating the category outright.
+#
+# Two of these used to carry a `contents` key, which `build_note` wrote into the Note to say what a
+# group held where its name did not. It went with the sentence that carried it: this chart draws the
+# four categories, so the Note's room goes to caveats about THEM (see `build_note`), and what the ten
+# groups hold is said in their `description_key` in garden, where the ten are actually on show.
 GROUPS = [
     {"column": "paid_work", "label": "Paid work", "color": ("deep", 3)},
-    {
-        "column": "education",
-        "label": "Education",
-        "contents": "time in school and studying",
-        "color": ("tint", 3, 0.45),
-    },
+    {"column": "education", "label": "Education", "color": ("tint", 3, 0.45)},
     {"column": "sleep", "label": "Sleep", "color": ("deep", 7)},
     {"column": "eating_and_drinking", "label": "Eating & drinking", "color": ("tint", 7, 0.3)},
     {"column": "personal_care", "label": "Other personal care", "color": ("tint", 7, 0.68)},
     {"column": "housework_and_shopping", "label": "Housework & shopping", "color": ("deep", 5)},
-    {
-        "column": "other_unpaid_work",
-        "label": "Other unpaid work",
-        "contents": "care work and volunteering",
-        "color": ("tint", 5, 0.45),
-    },
+    {"column": "other_unpaid_work", "label": "Other unpaid work", "color": ("tint", 5, 0.45)},
     {"column": "tv_and_radio", "label": "TV & Radio", "color": ("deep", 0)},
     {"column": "seeing_friends", "label": "Seeing friends", "color": ("tint", 0, 0.42)},
     {"column": "other_leisure", "label": "Other leisure", "color": ("tint", 0, 0.78)},
@@ -252,9 +253,6 @@ VALUE_LABEL_COVERAGE = 0.75
 # categories themselves vary far less (personal care is 665 +/- 31), so most of what the ten-segment
 # split resolves at that level is where each survey drew its coding lines rather than how people
 # differ. Aggregating takes the mean coefficient of variation across the segments from 0.22 to 0.12.
-#
-# `contents` is deliberately terse here: all four are aggregates, so the Note has to say what each one
-# holds, and it has three lines to do it in.
 #
 # These four name Chart colors library colors outright rather than the seaborn placeholders the ten-group
 # version uses: the reason for placeholders is that the fonts cannot be reproduced here, and colors can,
@@ -283,18 +281,23 @@ VALUE_LABEL_COVERAGE = 0.75
 # takes the opaque seams to 1.86 / 2.12 / 2.28. Which category carries which color is free — the CVD
 # numbers are identical for any arrangement of the same four.
 #
-# THREE ACCEPTED DEVIATIONS, all measured at the opacity the bars are actually drawn with (0.8 over the
-# canvas, `SEGMENT_ALPHA`), because that composite is what a reader sees:
+# THREE ACCEPTED DEVIATIONS, all at the opacity the bars are actually drawn with (0.8 over the canvas,
+# `SEGMENT_ALPHA`), because that composite is what a reader sees. The first two are now pinned in
+# `CONTRAST_ALLOWANCES` and re-measured on every build, so they cannot go stale the way this comment
+# did — it used to say 0.9 would fix the labels, and it will not:
 #   - Seams come out 1.57 / 1.86 / 1.95. The first is 2% under the floor: compositing lightens Denim and
 #     Camel unevenly and closes the gap that is 1.86 opaque. Swapping Camel and Light Teal (Denim, Light
-#     Teal, Rusty Orange, Camel) is the arrangement that clears all three at 0.8 — 1.66 / 1.95 / 1.86.
-#   - In-bar labels: the best available color measures 3.74:1 on Denim and 4.30:1 on Rusty Orange, under
+#     Teal, Rusty Orange, Camel) is the arrangement that clears all three at 0.8 — 1.66 / 1.95 / 1.86 —
+#     and costs no color, so it is the fix to reach for if this one is ever called.
+#   - In-bar labels: the best available color measures 3.74:1 on Denim and 4.32:1 on Rusty Orange, under
 #     the 4.5:1 these labels need. This is the cost of the opacity, not of the palette — at full opacity
-#     both clear it (5.46 and 6.21 in white). Grapher can afford 0.8 because it puts no labels inside its
-#     stacked segments; this chart does.
+#     every segment clears it (5.46 / 4.65 / 6.21 / 5.00). Grapher can afford 0.8 because it puts no
+#     labels inside its stacked segments; this chart does, and matching grapher is the call taken here.
+#     No opacity between the two helps: 0.9 leaves Denim at 4.44:1.
 #   - Camel against Light Teal: dE 19.2 opaque, 15.3 composited, against a floor of 20 — the palette's
 #     warm-versus-light-green weak spot, made worse by everything moving towards the canvas. Fixing this
-#     one needs a different color, not a different order.
+#     one needs a different color, not a different order. The two are not adjacent, so no seam is at
+#     stake; this is about telling them apart across the chart.
 # `members` names what each category holds, in the source's own terms and ordered by the minutes each
 # takes. Two of them are worth not "correcting" back to "Other": the OECD's 3.3 is labelled *personal,
 # household, and medical services + travel related to personal care* — grooming and health, 61 min/day,
@@ -327,7 +330,11 @@ MAIN_CATEGORY_GROUPS = [
     },
     {
         "column": "main_unpaid_work_and_other",
-        "members": ["Housework", "Childcare", "Shopping", "Volunteering", "Other"],
+        # "Travel", not "Volunteering". Both are in here, but a five-name list has to name the five
+        # biggest things, and across the 26 charted countries household travel is a median 17.3
+        # min/day reported by 25 of them while volunteering is 3.0 min — the list was naming the
+        # 7th-largest member and skipping the 4th. `check_members_are_the_largest` asserts it.
+        "members": ["Housework", "Childcare", "Shopping", "Travel", "Other"],
         "compact": True,
         "as_hours": True,
         "label": "Unpaid work & other",
@@ -345,6 +352,60 @@ MAIN_CATEGORY_GROUPS = [
     },
 ]
 
+# Which source sub-activity each name in the key stands for, and which ones the key does not name.
+# A five-name list is a selection, and the invariant is that it selects the *biggest* members: the key
+# named volunteering (a median 3.0 min/day) while leaving household travel (17.3, reported by 25 of the
+# 26 charted countries) unnamed, which `check_members_are_the_largest` now makes impossible to ship.
+# `care_for_household_members` is deliberately absent: it is the parent of child and adult care, and
+# counting it would double the branch.
+KEY_MEMBER_COLUMNS = {
+    "Paid work or study": {
+        "named": {
+            "Paid work": "paid_work_all_jobs",
+            "Commuting": "travel_to_and_from_work_or_study",
+            "School or classes": "time_in_school_or_classes",
+            "Homework": "research_and_homework",
+        },
+        "unnamed": ["job_search", "other_paid_work_or_study_related"],
+    },
+    "Personal care": {
+        "named": {
+            "Sleep": "sleeping",
+            "Eating & drinking": "eating_and_drinking",
+            "Grooming & health": "other_personal_care_services",
+        },
+        "unnamed": [],
+    },
+    "Unpaid work & other": {
+        "named": {
+            "Housework": "routine_housework",
+            "Childcare": "child_care",
+            "Shopping": "shopping",
+            "Travel": "travel_related_to_household_activities",
+        },
+        "unnamed": [
+            "adult_care",
+            "care_for_non_household_members",
+            "volunteering",
+            "other_unpaid_work_activities",
+            "religious_spiritual_and_civic_activities",
+            "other_uncategorized_activities",
+        ],
+        # Whatever the category has left over, so it is not compared against the named members.
+        "residual": "Other",
+    },
+    "Leisure": {
+        "named": {
+            "TV & radio": "tv_or_radio_at_home",
+            "Seeing friends": "visiting_or_entertaining_friends",
+            "Sports": "sports",
+            "Events": "participating_in_or_attending_events",
+            "Hobbies & other": "other_leisure_activities",
+        },
+        "unnamed": [],
+    },
+}
+
 # One category per segment, so the header machinery names each segment instead of bracketing a run.
 MAIN_CATEGORIES = [
     {
@@ -357,10 +418,6 @@ MAIN_CATEGORIES = [
     }
     for group in MAIN_CATEGORY_GROUPS
 ]
-
-# Paid work is the original chart's ranking, and the one column education cannot distort: education
-# time is depressed wherever the survey's age floor excludes teenagers (Lithuania, 20-64).
-SORT_BY = "paid_work"
 
 TITLE = "How do people spend their time?"
 
@@ -393,11 +450,17 @@ TAGLINE = "OurWorldinData.org — Research and data to make progress against the
 TITLE_COLOR = "#2d2e2d"
 TEXT_COLOR = "#5b5b5b"
 FOOTER_COLOR = "#858585"
-# Bar fills carry grapher's own default, GRAPHER_AREA_OPACITY_DEFAULT = 0.8 (GrapherConstants.ts), which
-# both the stacked and the discrete bar chart apply to every bar; grapher leaves its labels at 1, and so
-# does this. It changes every measured number, because what a reader sees is the fill composited over the
-# canvas rather than the library hex — see `composite_on_background`, which is what the label colours and
-# the recorded seams are measured against.
+# Grapher's own GRAPHER_AREA_OPACITY_DEFAULT = 0.8 (GrapherConstants.ts), which both the stacked and the
+# discrete bar chart apply to every bar; grapher leaves its labels at 1, and so does this. It changes
+# every measured number, because what a reader sees is the fill composited over the canvas rather than
+# the library hex — see `composite_on_background`, which is what the label colours and the recorded
+# seams are measured against.
+#
+# It also costs two contrast floors, and that is a deliberate trade rather than an oversight: matching
+# grapher's stacked bars is worth more here than clearing them. Both shortfalls are pinned in
+# `CONTRAST_ALLOWANCES`, so they are checked on every build instead of recorded in prose — the comment
+# they replace claimed 0.9 would fix the labels, and it does not (Denim's best colour there is white at
+# 4.44:1, still short of 4.5). Only full opacity clears everything.
 SEGMENT_ALPHA = 0.8
 
 # In-bar values are white on saturated fills and dark on light ones, whichever reads better *measured*
@@ -405,6 +468,28 @@ SEGMENT_ALPHA = 0.8
 # 4.68:1, and the 4.5:1 bar is exactly what these labels have to clear. The dark is Text/Gray 100, the
 # style the frame binds them to, so the render and the frame agree.
 DARK_VALUE_COLOR = "#2d2e2d"
+
+# The floors `check_contrast` holds every color to, measured over the canvas at `SEGMENT_ALPHA`.
+# A seam is a lightness gap between touching fills, so it is well below a text ratio; the value floor
+# is WCAG AA for body text; the header floor is the tier the Chart colors library's own "Line and Slope
+# Charts" variants land on, which is what makes them the answer for a light fill's text.
+SEAM_MIN_RATIO = 1.6
+VALUE_LABEL_MIN_RATIO = 4.5
+HEADER_TEXT_MIN_RATIO = 4.4
+
+# The shortfalls this chart accepts, as the price of drawing its bars at grapher's own bar opacity, and
+# the measured ratio each one is allowed to sit at. `check_contrast` treats every entry as a pin, not a
+# waiver: a value that drops BELOW its allowance is a regression and fails, a shortfall with no entry
+# fails, and a value that has climbed back over its floor fails too, so a fix cannot quietly leave a
+# stale allowance behind. Both entries clear their floors at full opacity (1.86 and 5.46).
+CONTRAST_ALLOWANCES = {
+    ("seam", "Paid work or study", "Personal care"): 1.57,
+    ("value", "Paid work or study"): 3.74,
+    ("value", "Unpaid work & other"): 4.32,
+}
+# Ratios are compared to their allowance at this tolerance, so a font or palette change that moves a
+# number in the third decimal does not fail the build.
+CONTRAST_TOLERANCE = 0.02
 
 # The templates' own canvas, which the transparent SVG sits on. A category's name and member list are
 # printed in that category's colour, so this is what they have to stand out against.
@@ -607,6 +692,12 @@ LAYOUTS = {
         "country_fontsize": 9,
         "value_fontsize": 8.75,
         "header_fontsize": 9.5,
+        # The bold category name, one pixel up on the member list under it. It is a heading over a list,
+        # and at the same size the only thing separating the two is the weight — a pixel is enough to
+        # make the hierarchy read without the name starting to compete with the title. It feeds the wrap
+        # and collision solver as well as the drawing, so a name that no longer fits its own segment at
+        # this size gets wrapped (or, if a single word overhangs, fails `place_header_labels`).
+        "category_fontsize": 10.5,
         # Whether a value reads "4h 29m" rather than "4 hours 29 mins" when the long form does not fit.
         "with_mins_suffix": True,
         # Where each half of the header goes. The category brackets span the top row from above, and
@@ -618,7 +709,11 @@ LAYOUTS = {
         "groups": MAIN_CATEGORY_GROUPS,
         "categories": MAIN_CATEGORIES,
         "group_labels": "bracketed",
-        "subtitle": "Average hours and minutes per day, from time-use surveys run between {years}, for people aged 15 to 64.",
+        # "in a 24-hour day" earns its words: every bar is the same length, and nothing else on the
+        # frame says that the length is a whole day rather than a scale someone chose. It costs the
+        # "time-use" in "time-use surveys", which the title and the source line both carry — the line
+        # is full at 1117px of a 818px slot before Lato's slack, so anything longer wraps.
+        "subtitle": "Average hours and minutes in a 24-hour day, from surveys run between {years}, for people aged 15 to 64.",
         # With one segment per category, a name that overhangs its own bar reads as pointing at its
         # neighbour too — so wrap it rather than only wrapping to avoid a collision.
         "wrap_overhanging_names": True,
@@ -631,6 +726,7 @@ LAYOUTS = {
 
 def run() -> None:
     """Load data, render and save the chart."""
+    check_contrast()
     tb, ages = load_chart_groups()
     tb = add_main_category_totals(tb)
     paths.log.info(f"Loaded {len(tb)} countries, surveys {tb['year'].min()}-{tb['year'].max()}")
@@ -687,7 +783,7 @@ def add_main_category_totals(tb: Table) -> Table:
 
 
 def load_chart_groups() -> tuple[Table, dict[str, str]]:
-    """Load the precomputed chart groups (total population), ranked by `SORT_BY`.
+    """Load the precomputed chart groups (total population), unsorted — `sort_rows` ranks them.
 
     Returns the table plus the age-of-reference exceptions (country -> age range) for the note.
     """
@@ -707,15 +803,15 @@ def load_chart_groups() -> tuple[Table, dict[str, str]]:
 
     group_columns = [group["column"] for group in GROUPS]
     assert not set(group_columns + [TOTAL_LEISURE_COLUMN]) - set(tb.columns), "Chart group columns changed."
-    # A category name ranks by the sum of its groups; a group column ranks by itself.
-    sort_columns = next((list(c["columns"]) for c in CATEGORIES if c["name"] == SORT_BY), [SORT_BY])
-    assert not set(sort_columns) - set(group_columns), f"{SORT_BY} is not a group or category of the chart."
-    # Stable, so tied countries (Norway and New Zealand at 241, Belgium and Greece at 194) keep the
-    # source's order instead of swapping between runs and churning the SVG.
-    tb = tb.loc[tb[sort_columns].sum(axis=1).sort_values(ascending=False, kind="stable").index]
+    # No sort here. `sort_rows` ranks by the layout's own leading segment and runs after this, so a sort
+    # in this function only ever set an order that was thrown away — and it was set by `paid_work`,
+    # which is not what this chart draws: ranking the 26 rows by `paid_work` alone leaves the drawn
+    # `paid_work + education` segment out of order on 6 of them (South Korea, Sweden, Luxembourg,
+    # Turkey, South Africa, France), so the trap was live.
 
     detail = ds.read("time_use")
     detail = detail[detail["sex"] == "total"]
+    check_members_are_the_largest(detail[detail["country"].isin(set(tb["country"]))])
     ages = {
         str(row["country"]): str(row["age_of_reference"])
         for _, row in detail.iterrows()
@@ -878,7 +974,7 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
         if category_at == side and category_placements is not None:
             # The tallest name decides the band: its row, plus however many lines it wrapped onto.
             tallest = max(
-                placement["row"] * TIER_HEIGHT + len(placement["lines"]) * line_px(layout["header_fontsize"])
+                placement["row"] * TIER_HEIGHT + len(placement["lines"]) * line_px(layout["category_fontsize"])
                 for placement in category_placements
             )
             name_gap = (
@@ -1118,11 +1214,11 @@ def draw_category_name(
         offset = len(placement["lines"]) - 1 - index if side == "above" else index
         ax.text(
             placement["center"] / px_per_min,
-            rows_out(label_px + offset * line_px(layout["header_fontsize"])),
+            rows_out(label_px + offset * line_px(layout["category_fontsize"])),
             line,
             ha="center",
             va="bottom" if side == "above" else "top",
-            fontsize=layout["header_fontsize"],
+            fontsize=layout["category_fontsize"],
             fontweight="bold",
             color=header_text_color(placement["color"], palette),
             gid=f"category__{slugify(placement['name'])}"
@@ -1153,6 +1249,15 @@ def draw_bracketed_names(
         # the bars — two lines of air under "Personal care" while "Leisure" reaches down to them.
         # Bottom-aligned, every list ends the same distance above the bars and the air moves under the
         # category name, where it reads as space beneath a heading instead of a detached list.
+        #
+        # Putting the four category NAMES on one baseline instead — bottom-aligned lists, one header
+        # row above them — was tried and dropped. It does tidy the top of the band, where the names
+        # otherwise land on four baselines up to 51px apart (the blank above the first line of text is
+        # 26px over "Unpaid work & other" and 77px over "Personal care", the widest and so emptiest
+        # column). But it re-opens the gap this bottom-alignment exists to close: with a 3-name list,
+        # "Personal care" ends up two lines clear of "Sleep" and stops reading as its heading. It buys
+        # no height either — `band_px` sizes the band from the deepest list plus the tallest name, which
+        # neither choice changes, so it only ever moved names through space already reserved.
         depth_px = len(block["lines"]) * line_px(fontsize) if layout.get("names_bottom_aligned") else height_px
         for index, line in enumerate(block["lines"]):
             width = sum(text_advance_px(text, fontsize) for text, _ in line)
@@ -1278,7 +1383,7 @@ def solve_category_layout(spans: dict, layout: dict) -> list[dict]:
     def geometry(category: dict, lines: list[str]) -> tuple[float, tuple[float, float]]:
         start = spans[category["columns"][0]][0]
         end = spans[category["columns"][-1]][1]
-        width = max(text_width_px(line, layout["header_fontsize"], bold=True) for line in lines)
+        width = max(text_width_px(line, layout["category_fontsize"], bold=True) for line in lines)
         center = min(max((start + end) / 2, width / 2), right_edge - width / 2)
         return center, (center - width / 2, center + width / 2)
 
@@ -1289,13 +1394,21 @@ def solve_category_layout(spans: dict, layout: dict) -> list[dict]:
         if layout.get("wrap_overhanging_names"):
             # Collision with a neighbour is not the only reason to wrap. Where each category is a
             # single segment, a name can clear its neighbours and still overhang its own bar by half
-            # its length, which reads as pointing at both. Prefer any form that fits inside the span
-            # it names; `sorted` is stable, so the widest-first order survives within each group.
+            # its length, which reads as pointing at both. So rank the forms by how far each one
+            # overhangs the span it names, least first; `sorted` is stable, so the widest-first order
+            # survives among forms that overhang equally (every form that fits is 0).
+            #
+            # By how MUCH, not whether it fits: a boolean key ties whenever no form fits, and a tie
+            # hands the row to the widest form, which is the worst one. "Unpaid work & other" over a
+            # 79px segment is the case — one line overhangs by 63px, two by 8px — and it wrapped only
+            # for as long as the two-line form happened to fit, which it stopped doing when this name
+            # went up a pixel.
             span_px = spans[category["columns"][-1]][1] - spans[category["columns"][0]][0]
             variants = sorted(
                 variants,
-                key=lambda lines: (
-                    max(text_width_px(line, layout["header_fontsize"], bold=True) for line in lines) > span_px
+                key=lambda lines: max(
+                    0.0,
+                    max(text_width_px(line, layout["category_fontsize"], bold=True) for line in lines) - span_px,
                 ),
             )
         remaining = layout["categories"][index + 1 :]
@@ -1330,6 +1443,18 @@ def solve_category_layout(spans: dict, layout: dict) -> list[dict]:
                 "row": placement["row"],
             }
         )
+    # Say which names still reach past the segment they name, and by how much. There is no threshold
+    # worth asserting — "Unpaid work & other" legitimately overhangs its 79px segment by 8 at the size
+    # this chart sets — but the one form that reads as pointing at two segments at once got chosen
+    # silently before the ranking above was fixed, and a font change is exactly when that recurs.
+    for placement in placements:
+        start, end = placement["bracket"]
+        widest = max(text_width_px(line, layout["category_fontsize"], bold=True) for line in placement["lines"])
+        if widest > end - start:
+            paths.log.info(
+                f"Category name overhangs its segment: {placement['name']} is {widest:.1f}px over a "
+                f"{end - start:.1f}px span, on {len(placement['lines'])} line(s)."
+            )
     return placements
 
 
@@ -1341,8 +1466,8 @@ def category_variants(name: str, layout: dict) -> list[list[str]]:
         best = min(
             range(1, len(words)),
             key=lambda i: abs(
-                text_width_px(" ".join(words[:i]), layout["header_fontsize"], bold=True)
-                - text_width_px(" ".join(words[i:]), layout["header_fontsize"], bold=True)
+                text_width_px(" ".join(words[:i]), layout["category_fontsize"], bold=True)
+                - text_width_px(" ".join(words[i:]), layout["category_fontsize"], bold=True)
             ),
         )
         variants.append([" ".join(words[:best]), " ".join(words[best:])])
@@ -1478,6 +1603,102 @@ def shade(color, weight: float) -> tuple[float, float, float]:
     return (r * (1 - weight), g * (1 - weight), b * (1 - weight))
 
 
+def check_contrast() -> None:
+    """Check every contrast ratio this chart's colors have to hold, at the opacity it draws them.
+
+    A ratio either clears its floor or matches a pin in `CONTRAST_ALLOWANCES`, and an allowance that
+    is no longer needed fails too. Recorded numbers go stale and prose lies: the comment beside
+    `SEGMENT_ALPHA` claimed for a while that 0.9 would fix the in-bar labels, and it does not.
+    Measuring on every build is the only version of those numbers that cannot drift.
+    """
+    fills = [group["color"][1] for group in MAIN_CATEGORY_GROUPS]
+    names = [group["label"] for group in MAIN_CATEGORY_GROUPS]
+    composited = [composite_on_background(fill) for fill in fills]
+
+    # Touching fills need a lightness gap, or the stack merges into one block in grayscale.
+    for (fill, name), (next_fill, next_name) in zip(zip(composited, names), list(zip(composited, names))[1:]):
+        hold_contrast(
+            ("seam", name, next_name),
+            contrast_ratio(fill, next_fill),
+            SEAM_MIN_RATIO,
+            f"the {name} and {next_name} segments touch",
+            "Reorder the palette, or raise SEGMENT_ALPHA",
+        )
+    # Values sit inside the segments, so they are body text on that fill.
+    for fill, name in zip(composited, names):
+        color = value_label_color(fill)
+        hold_contrast(
+            ("value", name),
+            contrast_ratio(color, fill),
+            VALUE_LABEL_MIN_RATIO,
+            f"the value inside the {name} segment, in its best available color ({color})",
+            "Raise SEGMENT_ALPHA, or draw this segment's values outside the bar",
+        )
+    # A category's name and member list are printed in its own color, on the cream canvas.
+    for group in MAIN_CATEGORY_GROUPS:
+        spec = group["color"]
+        color = spec[2] if len(spec) > 2 else spec[1]
+        hold_contrast(
+            ("header", group["label"]),
+            contrast_ratio(color, BACKGROUND_COLOR),
+            HEADER_TEXT_MIN_RATIO,
+            f"the {group['label']} name on the canvas",
+            "Pair the fill with its Line and Slope Charts variant",
+        )
+
+
+def hold_contrast(key: tuple, ratio: float, floor: float, what: str, remedy: str) -> None:
+    """One measured ratio against its floor, or against the shortfall this chart has accepted."""
+    allowance = CONTRAST_ALLOWANCES.get(key)
+    if ratio + CONTRAST_TOLERANCE >= floor:
+        assert allowance is None, (
+            f"CONTRAST_ALLOWANCES still pins {key} at {allowance:.2f}:1, but {what} now measures "
+            f"{ratio:.2f}:1 and clears the {floor}:1 floor. Delete the allowance."
+        )
+        return
+    assert allowance is not None, (
+        f"At SEGMENT_ALPHA={SEGMENT_ALPHA}, {what} measures {ratio:.2f}:1, under the {floor}:1 floor. "
+        f"{remedy} — or, if the shortfall is deliberate, pin it in CONTRAST_ALLOWANCES with the reason."
+    )
+    assert ratio + CONTRAST_TOLERANCE >= allowance, (
+        f"{what.capitalize()} has regressed to {ratio:.2f}:1, below the {allowance:.2f}:1 this chart accepts. {remedy}."
+    )
+
+
+def check_members_are_the_largest(detail: Table) -> None:
+    """Assert each category's key names its biggest members, not an arbitrary four or five of them.
+
+    A key with fewer names than the category has members is a selection, and the only defensible
+    selection is by size. Measured on the countries actually drawn, and on medians rather than means
+    so one country's coding choice cannot promote a member into the key.
+    """
+    assert {category["name"] for category in MAIN_CATEGORIES} == set(KEY_MEMBER_COLUMNS), (
+        "KEY_MEMBER_COLUMNS no longer covers exactly the drawn categories."
+    )
+    for category in MAIN_CATEGORIES:
+        spec = KEY_MEMBER_COLUMNS[category["name"]]
+        residual = {spec["residual"]} if "residual" in spec else set()
+        assert set(category["members"]) == set(spec["named"]) | residual, (
+            f"The names drawn for {category['name']} and the columns they map to have drifted: "
+            f"{sorted(set(category['members']) ^ (set(spec['named']) | residual))}."
+        )
+        columns = list(spec["named"].values()) + list(spec["unnamed"])
+        assert not set(columns) - set(detail.columns), f"Source columns changed under {category['name']}."
+        medians = {column: detail[column].median() for column in columns}
+        # A member no country reports has no median; it cannot outrank anything.
+        smallest_named = min(
+            ((name, medians[column]) for name, column in spec["named"].items() if pd.notna(medians[column])),
+            key=lambda named: named[1],
+        )
+        for column in spec["unnamed"]:
+            median = medians[column]
+            assert pd.isna(median) or median <= smallest_named[1], (
+                f"{category['name']} names '{smallest_named[0]}' at a median {smallest_named[1]:.1f} min/day "
+                f"but leaves '{column}' unnamed at {median:.1f} — the key is naming a smaller member than "
+                f"one it hides. Swap the name, or say why in KEY_MEMBER_COLUMNS."
+            )
+
+
 def contrast_ratio(first, second) -> float:
     """WCAG contrast ratio between two colors."""
     light, dark = sorted((relative_luminance(first), relative_luminance(second)), reverse=True)
@@ -1495,8 +1716,14 @@ def value_label_color(fill) -> str:
     return "white" if contrast_ratio("white", fill) >= contrast_ratio(DARK_VALUE_COLOR, fill) else DARK_VALUE_COLOR
 
 
-def composite_on_background(color, alpha: float = SEGMENT_ALPHA) -> tuple[float, float, float]:
-    """A fill as it lands on the canvas once its opacity is applied — the color a label sits on."""
+def composite_on_background(color, alpha: float | None = None) -> tuple[float, float, float]:
+    """A fill as it lands on the canvas once its opacity is applied — the color a label sits on.
+
+    `alpha` is read at call time, not captured as a default: a default argument would freeze
+    `SEGMENT_ALPHA` at import, which both hides a later change to the constant and makes
+    `check_contrast` untestable against any other opacity.
+    """
+    alpha = SEGMENT_ALPHA if alpha is None else alpha
     fill, canvas = to_rgb(color), to_rgb(BACKGROUND_COLOR)
     return tuple(alpha * f + (1 - alpha) * c for f, c in zip(fill, canvas))
 
@@ -1692,28 +1919,38 @@ def build_note(tb: Table, ages: dict[str, str], layout: dict) -> str:
         "20-64": "20 to 64",
     }
     exceptions = ", ".join(f"{country} ({described.get(age, age)})" for country, age in sorted(ages.items()))
-    ages_sentence = (
-        f"Estimates cover people aged 15 to 64, except in {exceptions}. "
-        if exceptions
-        else "Estimates cover people aged 15 to 64. "
+    # Only the exceptions, because the subtitle already says 15 to 64 and the Note has two lines to
+    # spend on things said nowhere else. With the 2010 cutoff there are no exceptions left, so this is
+    # normally empty — it exists for a release that adds an older survey back.
+    ages_sentence = f"Estimates cover people aged 15 to 64, except in {exceptions}. " if exceptions else ""
+    # "in the OECD database", not "most recent survey": the OECD does not refresh a country the moment
+    # it runs a new survey, and Korea is the standing example — shown here at 2014 while Statistics
+    # Korea has published 2019 and 2024 rounds. And state the cutoff as what the chart covers rather
+    # than as countries it excludes: the reader is being told the scope of what they are looking at,
+    # and a chart does not owe them a list of what is missing from it. It still rules out reading
+    # "each country" as all 35 rather than the 26 that clear `EARLIEST_SURVEY_YEAR`.
+    text = "Note: The chart covers every country whose most recent survey in the OECD database is from "
+    text += f"{EARLIEST_SURVEY_YEAR if EARLIEST_SURVEY_YEAR is not None else tb['year'].min()} onwards; "
+    text += "that survey's year is in brackets. "
+    text += ages_sentence
+    # The Note's two lines go to the caveats that can move a bar a reader is looking at, and only those.
+    #
+    # Which rules out the one this Note used to carry — that a country not reporting an activity
+    # separately keeps those minutes inside the same category. True, and irrelevant here: each of the
+    # four segments is one of the OECD's own top-level category totals, computed as a remainder that
+    # comes out equal to the source's own number for all 26 countries (checked: the largest difference
+    # is 1.5e-05 minutes, which is float32). So where a country drew its sub-activity coding lines
+    # cannot change a value this chart draws. It belongs on the ten-group indicators, where the finer
+    # split IS on show, and it is in their `description_key` in garden.
+    #
+    # What is left is the two countries whose top-level totals are not like the others'. Mexico's whole
+    # instrument differs, which the OECD flags. Japan's category 5 absorbs its non-commuting travel,
+    # which every other country reports inside personal care and leisure, so Japan's minutes move
+    # BETWEEN drawn segments — the only caveat here that does.
+    text += (
+        "The OECD flags Mexico's estimates as not fully comparable, because it measures time use "
+        "differently. In Japan, travel other than commuting counts as unpaid work."
     )
-    # What the groups whose names do not say it themselves contain, in bar order.
-    contents = "; ".join(
-        f"{group['label'].lower()} covers {group['contents']}" for group in layout["groups"] if group.get("contents")
-    )
-    text = (
-        f"Note: Each country's most recent time-use survey is shown, with its year in brackets; "
-        f"survey years range from {tb['year'].min()} to {tb['year'].max()}. " + ages_sentence
-    )
-    if contents:
-        text += f"{contents[0].upper()}{contents[1:]}."
-    else:
-        # Where the legend names a category's activities, the Note's job is the caveat instead: not
-        # every country reports every activity separately, and those minutes stay inside the category.
-        text += (
-            "Not every country reports each activity separately; where one does not, its minutes stay "
-            "within the same category."
-        )
     # Against the narrower of the Note's own slot and the content width — the slot is the template's,
     # but a mobile frame's content is narrower than it.
     template = layout["template_text"]
