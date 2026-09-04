@@ -1,0 +1,82 @@
+definitions:
+  common:
+    unit: kilocalories per person per day
+    short_unit: kcal
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Food Supply
+    description_processing: |-
+      - FAOSTAT Food Balance Sheets report every element of the food balance in tonnes, and only food available for consumption also in kilocalories. We convert each element of each item to kilocalories with an energy factor, in kilocalories per 100 grams, and sum the items into the stages of the chain.
+      - The energy factor of each item, country and year is derived from the Food Balance Sheets themselves, as food supply in kilocalories divided by food supply in tonnes. Where this ratio is implausible (more than twice, or less than half, the item's median across all countries and years), the median is used instead.
+      - For items whose direct food use is a small part of their production (sugar cane, sugar beet, cottonseed, other oil crops) and for vegetable and fish oils, we use fixed factors from FAO's food composition tables instead: 30 kcal per 100 g for sugar cane, 70 for sugar beet, 253 for cottonseed, 387 for other oil crops, 884 for vegetable oils and 902 for fish oils.
+      - The same factor is applied to every element of an item, so the balance (production plus imports, minus exports and stock changes, equals the sum of all uses) holds in kilocalories as it does in tonnes.
+      - Stock variation is derived as production plus imports minus exports minus domestic supply, since FAOSTAT only reports it from 2010 onward.
+      - Only individual items are summed; FAO's aggregate items (such as "Cereals" or "Vegetal Products") are left out to avoid double counting. "Palm kernels", which carries the oil palm harvest with no food use, is left out; oil palm enters the chain as palm oil and palm kernel oil. Industrial alcohol is left out.
+      - All stages are divided by the same population series, from Our World in Data's population dataset, and by 365 days.
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  food_supply_chain:
+    title: Food supply chain in kilocalories
+    variables:
+      crop_production:
+        title: Crop production
+        description_short: Energy content of the domestic production of primary crops, including palm oil and palm kernel oil.
+        description_key:
+          - Primary crops are cereals, roots and tubers, sugar crops, pulses, nuts, oil crops, vegetables, fruit, stimulants, spices and aquatic plants.
+          - Vegetable oils (other than palm oil), sugar, sweeteners and alcoholic beverages are not included, because they are made from these crops; their production is reported separately as derived vegetal production.
+      imports:
+        title: Imports
+        description_short: Energy content of imports of all food items.
+      exports:
+        title: Exports
+        description_short: Energy content of exports of all food items.
+      stock_variation:
+        title: Stock variation
+        description_short: Energy content of the net change in stocks of all food items. Positive values mean that stocks grew, removing calories from the supply.
+      seed:
+        title: Seed
+        description_short: Energy content of crops set aside as seed for the next harvest.
+      losses:
+        title: Losses
+        description_short: Energy content of food lost in the supply chain, between the farm and the retailer.
+        description_key:
+          - FAOSTAT's "Losses" cover losses in storage, transport and processing. They do not include waste at retail or in households.
+      other_uses:
+        title: Other uses
+        description_short: Energy content of food items used for non-food purposes, such as biofuels, soap and other industrial uses.
+      processing:
+        title: Processing
+        description_short: Energy content of food items that enter processing into other food items, such as oil crops into oil, sugar crops into sugar, or barley into beer.
+        description_key:
+          - This is the gross amount entering processing. The products that come out of it (oils, sugar, beer, and others) are reported separately as derived vegetal production, and are not part of crop production.
+      feed:
+        title: Feed
+        description_short: Energy content of food items fed to animals.
+      animal_products:
+        title: Animal products
+        description_short: Energy content of the domestic production of meat, offal, animal fats, dairy, eggs, honey, fish and seafood.
+      tourist_consumption:
+        title: Tourist consumption
+        description_short: Energy content of food consumed by visitors from other countries. Only reported by FAOSTAT from 2010 onward.
+      residuals:
+        title: Residuals
+        description_short: Energy content of the statistical discrepancies in the balance. Only reported by FAOSTAT from 2010 onward; can be negative.
+      food:
+        title: Food available for consumption
+        description_short: Energy content of food available for human consumption, before waste at retail and in households.
+      derived_vegetal_production:
+        title: Derived vegetal production
+        description_short: Energy content of the domestic production of vegetable oils (except palm oil), sugar and sweeteners, alcoholic beverages and other processed vegetal products.
+        description_key:
+          - These items are made from primary crops, largely from the quantities reported under processing, so they are not part of crop production.
+      balancing_difference:
+        title: Balancing difference
+        description_short: Food available for consumption minus the chain from crop production through animal products. It equals derived vegetal production, up to rounding in the source.
+        description_key:
+          - The chain is crop production plus imports, minus exports, stock variation, seed, losses, other uses, processing and feed, plus animal products, minus tourist consumption and residuals.

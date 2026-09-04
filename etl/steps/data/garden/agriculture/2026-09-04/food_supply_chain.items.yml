@@ -1,0 +1,189 @@
+# Curated FAOSTAT Food Balance Sheet (FBS) items for the food supply chain step.
+#
+# The step works from this explicit list rather than from "everything in FBS", so that the chain is a complete
+# partition of FAO's "Total" item and closes. Every FBS item code in the input table must appear in exactly one of
+# the three lists below (items, excluded, aggregate_groups); the step asserts this, and asserts that each code
+# still carries the expected FAO name.
+#
+# Each item:
+#   code:   FAO FBS item code (as an integer; the garden table zero-pads it to 8 characters).
+#   name:   FAO item name, as given in the `fao_item` column of the garden table.
+#   role:   Where the item's production enters the chain:
+#             primary_crop     -> "crop_production" stage.
+#             derived_vegetal  -> "derived_vegetal_production" (vegetable oils, sugar and sweeteners, alcoholic
+#                                 beverages, other processed vegetal products). Their production largely
+#                                 re-appears from the "processing" of primary crops, so it is reported separately
+#                                 and is NOT part of "crop_production".
+#             animal_product   -> "animal_products" stage.
+#           All other balance elements (imports, exports, stock variation, seed, feed, processing, other uses,
+#           losses, tourist consumption, residuals, food) are summed over all items regardless of role.
+#   fao_group (optional): "vegetal" or "animal". Only needed where FAO's own grouping (its "Vegetal Products" and
+#           "Animal Products" items) differs from the natural group of the role. Used by the partition check.
+#   fixed_factor_kcal_per_100g (optional): energy conversion factor to use instead of the one reverse-engineered
+#           from FBS (food kcal / food tonnes). Set for items whose direct food use is a small sliver of their
+#           production (so the reverse-engineered factor rests on an unrepresentative subset and is then applied
+#           to all of the production), and for oils, whose reverse-engineered factors exceed the physical maximum
+#           of about 884 kcal/100g. Values are from FAO (2001), "Food Balance Sheets: A Handbook", Annex "Food
+#           composition tables" (kcal per 100 g of retail weight): https://www.fao.org/4/X9892E/X9892e05.htm
+items:
+  # Cereals.
+  - {code: 2511, name: "Wheat and products", role: primary_crop}
+  - {code: 2513, name: "Barley and products", role: primary_crop}
+  - {code: 2514, name: "Maize and products", role: primary_crop}
+  - {code: 2515, name: "Rye and products", role: primary_crop}
+  - {code: 2516, name: "Oats", role: primary_crop}
+  - {code: 2517, name: "Millet and products", role: primary_crop}
+  - {code: 2518, name: "Sorghum and products", role: primary_crop}
+  - {code: 2520, name: "Cereals, other", role: primary_crop}
+  - {code: 2807, name: "Rice and products", role: primary_crop}
+  # Starchy roots.
+  - {code: 2531, name: "Potatoes and products", role: primary_crop}
+  - {code: 2532, name: "Cassava and products", role: primary_crop}
+  - {code: 2533, name: "Sweet potatoes", role: primary_crop}
+  - {code: 2534, name: "Roots, Other", role: primary_crop}
+  - {code: 2535, name: "Yams", role: primary_crop}
+  # Sugar crops. Almost all of their production goes to processing (into sugar); only a sliver is eaten as such.
+  # FAO handbook: "Sugar cane" 30 kcal, "Sugar beets" 70 kcal.
+  - {code: 2536, name: "Sugar cane", role: primary_crop, fixed_factor_kcal_per_100g: 30}
+  - {code: 2537, name: "Sugar beet", role: primary_crop, fixed_factor_kcal_per_100g: 70}
+  # Sugar and sweeteners (derived from sugar crops, and from cereals in the case of other sweeteners).
+  - {code: 2541, name: "Sugar non-centrifugal", role: derived_vegetal}
+  - {code: 2542, name: "Sugar (Raw Equivalent)", role: derived_vegetal}
+  - {code: 2543, name: "Sweeteners, Other", role: derived_vegetal}
+  # Pulses.
+  - {code: 2546, name: "Beans", role: primary_crop}
+  - {code: 2547, name: "Peas", role: primary_crop}
+  - {code: 2549, name: "Pulses, Other and products", role: primary_crop}
+  # Tree nuts and oil crops.
+  - {code: 2551, name: "Nuts and products", role: primary_crop}
+  - {code: 2552, name: "Groundnuts", role: primary_crop}
+  - {code: 2555, name: "Soyabeans", role: primary_crop}
+  - {code: 2557, name: "Sunflower seed", role: primary_crop}
+  - {code: 2558, name: "Rape and Mustardseed", role: primary_crop}
+  # Cottonseed: food use is a few thousand tonnes out of tens of millions. FAO handbook: "Cottonseed" 253 kcal.
+  - {code: 2559, name: "Cottonseed", role: primary_crop, fixed_factor_kcal_per_100g: 253}
+  - {code: 2560, name: "Coconuts - Incl Copra", role: primary_crop}
+  - {code: 2561, name: "Sesame seed", role: primary_crop}
+  - {code: 2563, name: "Olives (including preserved)", role: primary_crop}
+  # Other oil crops: mostly processed into oil, little direct food use. FAO handbook: "Oilseeds nes" 387 kcal.
+  - {code: 2570, name: "Oilcrops, Other", role: primary_crop, fixed_factor_kcal_per_100g: 387}
+  # Vegetable oils. All pure oils are 884 kcal per 100 g in the FAO handbook. The reverse-engineered factors come
+  # out at 900-1,100, above the physical maximum, so the fixed factor is used for every oil.
+  - {code: 2571, name: "Soyabean Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
+  - {code: 2572, name: "Groundnut Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
+  - {code: 2573, name: "Sunflowerseed Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
+  - {code: 2574, name: "Rape and Mustard Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
+  - {code: 2575, name: "Cottonseed Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
+  # Palm oil and palm kernel oil are the only oils tagged as primary crops. The FBS item that carries the oil palm
+  # harvest ("Palm kernels", excluded below) has no food use at all, so no factor can be reverse-engineered for it
+  # and it cannot be the entry point; the oils are the first point where oil palm calories can be counted.
+  - {code: 2576, name: "Palmkernel Oil", role: primary_crop, fixed_factor_kcal_per_100g: 884}
+  - {code: 2577, name: "Palm Oil", role: primary_crop, fixed_factor_kcal_per_100g: 884}
+  - {code: 2578, name: "Coconut Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
+  - {code: 2579, name: "Sesameseed Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
+  - {code: 2580, name: "Olive Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
+  - {code: 2581, name: "Ricebran Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
+  - {code: 2582, name: "Maize Germ Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
+  - {code: 2586, name: "Oilcrops Oil, Other", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
+  # Vegetables.
+  - {code: 2601, name: "Tomatoes and products", role: primary_crop}
+  - {code: 2602, name: "Onions", role: primary_crop}
+  - {code: 2605, name: "Vegetables, other", role: primary_crop}
+  # Fruit.
+  - {code: 2611, name: "Oranges, Mandarines", role: primary_crop}
+  - {code: 2612, name: "Lemons, Limes and products", role: primary_crop}
+  - {code: 2613, name: "Grapefruit and products", role: primary_crop}
+  - {code: 2614, name: "Citrus, Other", role: primary_crop}
+  - {code: 2615, name: "Bananas", role: primary_crop}
+  - {code: 2616, name: "Plantains", role: primary_crop}
+  - {code: 2617, name: "Apples and products", role: primary_crop}
+  - {code: 2618, name: "Pineapples and products", role: primary_crop}
+  - {code: 2619, name: "Dates", role: primary_crop}
+  - {code: 2620, name: "Grapes and products (excl wine)", role: primary_crop}
+  - {code: 2625, name: "Fruits, other", role: primary_crop}
+  # Stimulants and spices.
+  - {code: 2630, name: "Coffee and products", role: primary_crop}
+  - {code: 2633, name: "Cocoa Beans and products", role: primary_crop}
+  - {code: 2635, name: "Tea (including mate)", role: primary_crop}
+  - {code: 2640, name: "Pepper", role: primary_crop}
+  - {code: 2641, name: "Pimento", role: primary_crop}
+  - {code: 2642, name: "Cloves", role: primary_crop}
+  - {code: 2645, name: "Spices, Other", role: primary_crop}
+  # Alcoholic beverages (derived from cereals, grapes and other crops).
+  - {code: 2655, name: "Wine", role: derived_vegetal}
+  - {code: 2656, name: "Beer", role: derived_vegetal}
+  - {code: 2657, name: "Beverages, Fermented", role: derived_vegetal}
+  - {code: 2658, name: "Beverages, Alcoholic", role: derived_vegetal}
+  # Other processed vegetal products (no production reported; they enter through trade).
+  - {code: 2680, name: "Infant food", role: derived_vegetal}
+  - {code: 2899, name: "Miscellaneous", role: derived_vegetal}
+  # Aquatic plants (seaweed). FAO groups them with animal products ("Aquatic Products, Other").
+  - {code: 2775, name: "Aquatic Plants", role: primary_crop, fao_group: animal}
+  # Meat and offal.
+  - {code: 2731, name: "Bovine Meat", role: animal_product}
+  - {code: 2732, name: "Mutton & Goat Meat", role: animal_product}
+  - {code: 2733, name: "Pigmeat", role: animal_product}
+  - {code: 2734, name: "Poultry Meat", role: animal_product}
+  - {code: 2735, name: "Meat, Other", role: animal_product}
+  - {code: 2736, name: "Offals, Edible", role: animal_product}
+  # Animal fats and dairy.
+  - {code: 2737, name: "Fats, Animals, Raw", role: animal_product}
+  - {code: 2740, name: "Butter, Ghee", role: animal_product}
+  - {code: 2743, name: "Cream", role: animal_product}
+  - {code: 2848, name: "Milk - Excluding Butter", role: animal_product}
+  - {code: 2744, name: "Eggs", role: animal_product}
+  # Honey. FAO groups it with vegetal products ("Sugar & Sweeteners").
+  - {code: 2745, name: "Honey", role: animal_product, fao_group: vegetal}
+  # Fish and seafood.
+  - {code: 2761, name: "Freshwater Fish", role: animal_product}
+  - {code: 2762, name: "Demersal Fish", role: animal_product}
+  - {code: 2763, name: "Pelagic Fish", role: animal_product}
+  - {code: 2764, name: "Marine Fish, Other", role: animal_product}
+  - {code: 2765, name: "Crustaceans", role: animal_product}
+  - {code: 2766, name: "Cephalopods", role: animal_product}
+  - {code: 2767, name: "Molluscs, Other", role: animal_product}
+  - {code: 2769, name: "Aquatic Animals, Others", role: animal_product}
+  # Fish oils: little direct food use, factors unstable. FAO handbook: fish body and liver oils 902 kcal.
+  - {code: 2781, name: "Fish, Body Oil", role: animal_product, fixed_factor_kcal_per_100g: 902}
+  - {code: 2782, name: "Fish, Liver Oil", role: animal_product, fixed_factor_kcal_per_100g: 902}
+
+# Individual items deliberately left out of the chain. Each is asserted to exist in the input table, so that a
+# change at FAO does not go unnoticed, but contributes to no stage.
+excluded:
+  - {code: 2501, name: "Population", reason: Not a food item.}
+  - {code: 2659, name: "Alcohol, Non-Food", reason: Non-food by definition (industrial alcohol); no food energy.}
+  - code: 2562
+    name: Palm kernels
+    reason: >-
+      Carries the whole oil palm harvest (hundreds of millions of tonnes of fruit) with zero food use, so no energy
+      factor can be reverse-engineered and any fixed factor would double count the oil that this harvest becomes.
+      Oil palm calories enter the chain through "Palm Oil" and "Palmkernel Oil" instead (tagged as primary crops).
+  - {code: 2768, name: "Meat, Aquatic Mammals", reason: Negligible production and no reported food energy anywhere.}
+
+# FAO's aggregate items. They sum their member items, so they must not be added to the chain (double counting);
+# three of them are used to check that the curated items partition the total.
+aggregate_groups:
+  - {code: 2901, name: "Grand Total"}
+  - {code: 2903, name: "Vegetal Products"}
+  - {code: 2905, name: "Cereals - Excluding Beer"}
+  - {code: 2907, name: "Starchy Roots"}
+  - {code: 2908, name: "Sugar Crops"}
+  - {code: 2909, name: "Sugar & Sweeteners"}
+  - {code: 2911, name: "Pulses"}
+  - {code: 2912, name: "Treenuts"}
+  - {code: 2913, name: "Oilcrops"}
+  - {code: 2914, name: "Vegetable Oils"}
+  - {code: 2918, name: "Vegetables"}
+  - {code: 2919, name: "Fruits - Excluding Wine"}
+  - {code: 2922, name: "Stimulants"}
+  - {code: 2923, name: "Spices"}
+  - {code: 2924, name: "Alcoholic Beverages"}
+  - {code: 2928, name: "Miscellaneous"}
+  - {code: 2941, name: "Animal Products"}
+  - {code: 2943, name: "Meat"}
+  - {code: 2945, name: "Offals"}
+  - {code: 2946, name: "Animal fats"}
+  - {code: 2948, name: "Milk - Excluding Butter"}
+  - {code: 2949, name: "Eggs"}
+  - {code: 2960, name: "Fish, Seafood"}
+  - {code: 2961, name: "Aquatic Products, Other"}
