@@ -5,6 +5,10 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Which cut of FrontierMath we chart. Epoch reissued the benchmark on 2026-06-12 after finding errors in
+# 42% of the problems, and stopped evaluating new models on the original set; the v2 files are the live ones.
+BENCHMARK_FILE = "frontiermath_tiers_1_3_v2.csv"
+
 
 def run() -> None:
     """Extract and load FrontierMath CSV from benchmark_data.zip."""
@@ -16,12 +20,21 @@ def run() -> None:
     #
     # Process data.
     #
-    # Extract frontiermath.csv from the zip file.
+    # Extract the benchmark table from the zip file.
     with snap.extracted() as archive:
-        tb = archive.read("frontiermath.csv", safe_types=False)
+        tb = archive.read(BENCHMARK_FILE, safe_types=False)
         # Epoch's model registry ships in the same archive and maps every model version string used across
         # its benchmark files to a curated human-readable name.
         tb_registry = archive.read("epoch_capabilities_index.csv", safe_types=False)
+        # The archive also indexes its own benchmarks, marking retired ones in "superseded_by". Reading a
+        # superseded file is how this chart silently stopped gaining models for three months, so refuse to.
+        tb_benchmarks = archive.read("benchmark_metadata.csv", safe_types=False)
+
+    superseded = tb_benchmarks.loc[tb_benchmarks["source_file"] == BENCHMARK_FILE, "superseded_by"].dropna()
+    assert superseded.empty, (
+        f"Epoch marks {BENCHMARK_FILE} as superseded by {superseded.iloc[0]!r}. Point this step at the "
+        "replacement file and rewrite the metadata: a reissued benchmark is a new series, not a refresh."
+    )
 
     tb = tb.reset_index(drop=True)
 
