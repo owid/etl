@@ -58,6 +58,24 @@ REQUIRED_CODES = ["1", "2", "3", "4", "5", "T", "1.3", "2.1", "2.2", "3.1", "3.2
 # Minutes of slack tolerated when the source's numbers are reconciled against each other.
 TOLERANCE = 0.5
 
+# Only publish countries whose one survey is from this year on.
+#
+# The source gives a single survey per country and never re-runs it, so a cutoff drops countries rather
+# than years: 26 of the 35 survive, over 2010-2024. What it buys is that nothing downstream can put a
+# 1999 survey beside a 2024 one, and every chart and every static viz on this dataset is a
+# cross-country comparison, so that mixing is the failure mode rather than an edge case.
+#
+# What it costs is India (1999) and China (2008), and with them most of the coverage outside
+# high-income Europe. Weighed against that: 2010 is where the cutoff costs least, since six countries
+# sit on 2010 itself and it buys eleven years of recency for nine others; and survey year does not tilt
+# what the data says, the correlation between a country's survey year and any of the four top-level
+# categories being +0.09 at most (ai/time_use_comparability).
+#
+# It also removes every age-of-reference exception — Australia (15+), China (15-74) and Lithuania
+# (20-64) are all pre-2010 — so what is published is 15-to-64 throughout, which `sanity_check_cutoff`
+# asserts. Set to None to publish all 35.
+EARLIEST_SURVEY_YEAR = 2010
+
 
 def run() -> None:
     #
@@ -85,6 +103,10 @@ def run() -> None:
     # The source's own total row (~1440 everywhere by construction) is only needed for the checks.
     tb_wide = tb_wide.drop(columns=["total"])
 
+    # Applied here, after the checks: they reconcile what the OECD publishes, and one of them
+    # reproduces the previous edition's published values for China 2008, which the cutoff removes.
+    tb_wide, tb_groups = apply_survey_year_cutoff(tb_wide, tb_groups)
+
     tb_wide = tb_wide.format(["country", "year", "sex"], short_name="time_use")
     tb_groups = tb_groups.format(["country", "year", "sex"], short_name="time_use_chart_groups")
 
@@ -93,6 +115,28 @@ def run() -> None:
     #
     ds_garden = paths.create_dataset(tables=[tb_wide, tb_groups], default_metadata=ds_meadow.metadata)
     ds_garden.save()
+
+
+def apply_survey_year_cutoff(tb_wide: Table, tb_groups: Table) -> tuple[Table, Table]:
+    """Keep only the countries whose survey is from `EARLIEST_SURVEY_YEAR` on."""
+    if EARLIEST_SURVEY_YEAR is None:
+        return tb_wide, tb_groups
+
+    dropped = sorted(
+        {
+            (str(country), int(year))
+            for country, year in zip(tb_wide["country"], tb_wide["year"])
+            if year < EARLIEST_SURVEY_YEAR
+        }
+    )
+    log.info(
+        f"Surveys before {EARLIEST_SURVEY_YEAR} not published: "
+        + ", ".join(f"{country} ({year})" for country, year in dropped)
+    )
+    tb_wide = tb_wide[tb_wide["year"] >= EARLIEST_SURVEY_YEAR]
+    tb_groups = tb_groups[tb_groups["year"] >= EARLIEST_SURVEY_YEAR]
+    sanity_check_cutoff(tb_wide, tb_groups)
+    return tb_wide, tb_groups
 
 
 def parse_survey_end_year(survey_year: str) -> int:
@@ -144,6 +188,21 @@ def build_chart_groups(tb_wide: Table) -> Table:
     tb["total_leisure"] = tb_wide["leisure"]
 
     return tb
+
+
+def sanity_check_cutoff(tb_wide: Table, tb_groups: Table) -> None:
+    """Check what the cutoff left: the same countries in both tables, and one reference age."""
+    countries = set(tb_wide["country"])
+    assert countries == set(tb_groups["country"]), "The two tables no longer cover the same countries."
+    expected = 26 if EARLIEST_SURVEY_YEAR == 2010 else None
+    assert expected is None or len(countries) == expected, (
+        f"Expected {expected} countries from {EARLIEST_SURVEY_YEAR} on, got {len(countries)}."
+    )
+    assert tb_wide["year"].min() >= EARLIEST_SURVEY_YEAR, "A survey older than the cutoff survived."
+    # Every age-of-reference exception the source flags is pre-2010, so a 2010 cutoff leaves one age
+    # range — which is what lets everything downstream say "aged 15 to 64" without qualifying it.
+    ages = set(tb_wide["age_of_reference"].astype(str))
+    assert ages == {"15-64"}, f"More than one reference age survived the cutoff: {sorted(ages)}."
 
 
 def sanity_check_inputs(tb: Table) -> None:

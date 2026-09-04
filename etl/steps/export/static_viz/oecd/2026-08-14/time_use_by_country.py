@@ -17,9 +17,10 @@ The garden step (`time_use_chart_groups`) still hands over ten groups, so `GROUP
 remain here as the recipe for summing them into four — which is all they are now, and
 `add_main_category_totals` asserts the two stay in step.
 
-**Only surveys from 2010 on** (`EARLIEST_SURVEY_YEAR`), which is 26 countries over 2010-2024. The source
-gives one survey per country, so the cutoff drops countries rather than years; the reasoning, and what
-it costs, is beside that constant.
+**26 countries over 2010-2024**, which is what garden publishes rather than anything this step
+selects: the survey-year cutoff and the reasoning behind it live beside `EARLIEST_SURVEY_YEAR` in
+`data://garden/oecd/2026-08-14/time_use`. This step asserts what it received and does not filter — a
+second filter here would be dead code that reads as the live one.
 
 Values are written inside segments wide enough to hold them, in hours and minutes. Survey years differ
 by country, so each country label carries its year — the original's surveys spanned a narrower window
@@ -441,19 +442,6 @@ MAIN_CATEGORIES = [
 
 TITLE = "How do people spend their time?"
 
-# Countries whose most recent survey predates this are left out. The source gives one survey per
-# country, so this drops countries rather than years, and 2010 is where that costs least: six
-# countries sit on 2010 itself, so the cut lands on a cluster instead of slicing mid-run, and it buys
-# eleven years of recency for nine countries. It also happens to remove every age-of-reference
-# exception — Australia (15+), China (15-74) and Lithuania (20-64) are all pre-2010 — so what is left
-# is 15-to-64 throughout.
-#
-# What it costs is India and China, and with them most of the coverage outside high-income Europe.
-# Worth knowing when weighing that: survey year does not tilt the ranking. The correlation between a
-# country's survey year and any of the four categories is +0.09 at most (ai/time_use_comparability).
-# Set to None to draw all 35.
-EARLIEST_SURVEY_YEAR = 2010
-
 # The row labels set the width of the column they sit in, so the two longest names are shortened to
 # the forms the style guide sanctions (no periods). It buys the bars 15px on desktop and 13px on
 # mobile, which is the gap between these two names and the next-longest, "New Zealand".
@@ -811,16 +799,6 @@ def load_chart_groups() -> tuple[Table, dict[str, str]]:
     tb = ds.read("time_use_chart_groups")
     tb = tb[tb["sex"] == "total"].drop(columns=["sex"])
 
-    if EARLIEST_SURVEY_YEAR is not None:
-        dropped = sorted(
-            (str(row["country"]), int(row["year"])) for _, row in tb[tb["year"] < EARLIEST_SURVEY_YEAR].iterrows()
-        )
-        tb = tb[tb["year"] >= EARLIEST_SURVEY_YEAR]
-        paths.log.info(
-            f"Surveys before {EARLIEST_SURVEY_YEAR} left out: "
-            + ", ".join(f"{country} ({year})" for country, year in dropped)
-        )
-
     group_columns = [group["column"] for group in GROUPS]
     assert not set(group_columns + [TOTAL_LEISURE_COLUMN]) - set(tb.columns), "Chart group columns changed."
     # No sort here. `sort_rows` ranks by the layout's own leading segment and runs after this, so a sort
@@ -838,8 +816,11 @@ def load_chart_groups() -> tuple[Table, dict[str, str]]:
         if str(row["age_of_reference"]) != "15-64"
     }
 
-    expected_countries = 26 if EARLIEST_SURVEY_YEAR == 2010 else 35
-    assert len(tb) == expected_countries, f"Expected {expected_countries} countries, got {len(tb)}."
+    # What garden publishes, which this step takes as given. A layout tuned for 26 rows is not a layout
+    # for 35: the row pitch, the value-label coverage and the header band all derive from the row
+    # count, so a change to garden's cutoff should stop here to be looked at rather than be silently
+    # redrawn.
+    assert len(tb) == 26, f"Garden published {len(tb)} countries, not the 26 this layout is drawn for."
     assert tb["country"].is_unique, "One row per country expected."
     # The category brackets span contiguous runs of segments, which only holds if the bar order
     # is the categories' column order concatenated.
@@ -857,19 +838,12 @@ def load_chart_groups() -> tuple[Table, dict[str, str]]:
     # The groups partition the day (asserted strictly in garden; re-checked here at the source's
     # own rounding tolerance so a broken load cannot draw bars that misrepresent shares).
     assert ((tb[group_columns].sum(axis=1) - MINUTES_PER_DAY).abs() < 2.0).all(), "Rows do not sum to 24 hours."
-    # The source's three exceptions are all pre-2010 surveys, so a 2010 cutoff removes them; without a
-    # cutoff all three are in. Either way, assert which ones survive rather than trusting the filter.
+    # The source's three age-of-reference exceptions are all pre-2010 surveys, so garden's cutoff
+    # removes them and everything here can say "aged 15 to 64" unqualified — garden asserts that too.
+    # Assert it rather than assume it: `build_note` names the exceptions if any ever arrive, and this
+    # is what says the subtitle would be wrong before the Note started covering for it.
     ages = {country: age for country, age in ages.items() if country in set(tb["country"])}
-    expected_ages: set[str] = (
-        set()
-        if EARLIEST_SURVEY_YEAR and EARLIEST_SURVEY_YEAR > 2006
-        else {
-            "Australia",
-            "China",
-            "Lithuania",
-        }
-    )
-    assert set(ages) == expected_ages, f"Age-of-reference exceptions changed: {sorted(ages)}."
+    assert not ages, f"Garden published an age-of-reference exception the subtitle does not cover: {sorted(ages)}."
 
     return tb, ages
 
@@ -1948,10 +1922,11 @@ def build_note(tb: Table, ages: dict[str, str], layout: dict) -> str:
     # Korea has published 2019 and 2024 rounds. And state the cutoff as what the chart covers rather
     # than as countries it excludes: the reader is being told the scope of what they are looking at,
     # and a chart does not owe them a list of what is missing from it. It still rules out reading
-    # "each country" as all 35 rather than the 26 that clear `EARLIEST_SURVEY_YEAR`.
+    # "each country" as all 35 rather than the 26 garden publishes. The year comes off the data, not
+    # off a constant here: garden owns the cutoff, and reading it back means the Note cannot claim a
+    # span the rows do not have.
     text = "Note: The chart covers every country whose most recent survey in the OECD database is from "
-    text += f"{EARLIEST_SURVEY_YEAR if EARLIEST_SURVEY_YEAR is not None else tb['year'].min()} onwards; "
-    text += "that survey's year is in brackets. "
+    text += f"{int(tb['year'].min())} onwards; that survey's year is in brackets. "
     text += ages_sentence
     # The Note's two lines go to the caveats that can move a bar a reader is looking at, and only those.
     #
