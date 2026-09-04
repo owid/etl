@@ -1,0 +1,35 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: ICBP SURVMARK-2 - Cancer Survival Rates
+    description: |-
+      ICBP SURVMARK-2 provides data on cancer survival, incidence, and mortality within the second phase of the International Cancer Benchmarking Partnership (ICBP), a global collaboration that brings together clinicians, policy-makers, researchers, and cancer data experts to measure international differences in cancer survival and identify factors that might be driving these differences.
+
+      The data are derived from 21 population-based cancer registries in seven countries (Australia, Canada, Denmark, Ireland, New Zealand, Norway, and the United Kingdom) and cover patients diagnosed in 1995–2014, with follow-up until 31 December 2015 (Ontario: 2014; Ireland: 2013; Quebec: 2000–2011 only). Eight cancer sites are covered (esophagus, stomach, colon, rectum, liver, pancreas, lung, and ovary), plus colorectal cancer as a combined site.
+
+      The bulk data file behind the online tool reports, for each country (and, where available, sub-national jurisdiction), cancer site, sex, and age group: age-standardized incidence and mortality rates, net survival at 1, 3, and 5 years after diagnosis, and conditional net survival, both as annual estimates and as estimates for five-year diagnosis periods (1995–1999, 2000–2004, 2005–2009, 2010–2014).
+
+      Net survival (patients' survival as if cancer was the only cause of death) is age-standardized using the International Cancer Survival Standard weights. Age-standardized incidence and mortality rates were computed for ages 25 years and older using the age-truncated World Standard Population and are expressed per 100,000 person-years. The cohort approach was used for 1995–1999, 2000–2004, and 2005–2009, and the period approach for 2010–2014.
+    date_published: "2019"
+
+    # Citation
+    producer: Global Cancer Observatory
+    citation_full: |-
+      Arnold M, Rutherford M, Lam F, Bray F, Ervik M, Soerjomataram I (2019). ICBP SURVMARK-2 online tool: International Cancer Survival Benchmarking. Lyon, France: International Agency for Research on Cancer. Available from: https://gco.iarc.who.int/survival/survmark, accessed [02 September 2026].
+
+    # Files
+    url_main: https://gco.iarc.who.int/survival/survmark/
+    url_download: https://gco.iarc.who.int/survival/survmark/data/V2.csv
+    date_accessed: "2026-09-02"
+
+    # License
+    license:
+      name: Protocol 2 of the Universal Copyright Convention
+      url: https://gco.iarc.who.int/survival/survmark/about/
+
+outs:
+  - md5: 69fc2bb206036cee770ffea8e1270711
+    size: 10404156
+    path: gco_cancer_survival.csv

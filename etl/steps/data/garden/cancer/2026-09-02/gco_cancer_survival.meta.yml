@@ -1,0 +1,86 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Cancer
+      attribution_short: ICBP SURVMARK-2
+      grapher_config:
+        note: To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
+    processing_level: minor
+  # The source labels the site "Oesophagus"; we use American spelling in user-facing text.
+  cancer_lower: << cancer.lower().replace("oesophageal", "esophageal") >>
+  cancer_title: << cancer.replace("Oesophageal", "Esophageal") >>
+  patients: <% if gender == "Females" %>women<% elif gender == "Males" %>men<% else %>patients<% endif %>
+  people: <% if gender == "Females" %>women<% elif gender == "Males" %>men<% else %>people<% endif %>
+  among_gender: <% if gender == "Females" %> among women<% elif gender == "Males" %> among men<% endif %>
+  description_prod_incidence_mortality: &description_prod_incidence_mortality |-
+    Age-standardized cancer incidence and mortality rates (ASR) were computed for ages 25 years and older using the age-truncated World Standard Population and expressed as rates per 100 000 person-years (Segi, 1960).
+  description_prod_survival: &description_prod_survival |-
+    Net survival (patients' survival as if cancer was the only cause of death) was calculated to estimate population-based cancer survival.
+
+    Age-standardization was carried out using international cancer survival standard weights (Corazziari et al., 2004). The cohort approach was used for 1995–1999, 2000–2004, and 2005–2009, and the period approach was used for 2010–2014 (Brenner and Gefeller, 1996).
+  registries: |-
+    Data come from 21 population-based cancer registries in seven high-income countries: Australia, Canada, Denmark, Ireland, New Zealand, Norway, and the United Kingdom.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  # The SURVMARK-2 project is complete (patients diagnosed 1995-2014); the producer does not publish new data.
+  update_period_days: 0
+  owners:
+    - Lucas Rodés-Guirao
+
+tables:
+  gco_cancer_survival:
+    variables:
+      net_survival:
+        title: Net survival rates of {definitions.patients} with {definitions.cancer_lower} cancer after five years
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of {definitions.patients} still alive five years after being diagnosed with {definitions.cancer_lower} cancer, assuming cancer is the only cause of death.
+        description_key:
+          - Net survival is the percentage of patients still alive a given time after diagnosis, assuming cancer is the only possible cause of death. It removes the effect of deaths from other causes, so that survival can be compared between populations with different background mortality.
+          - The year shown is the year of diagnosis. Patients diagnosed from 1995 to 2009 were followed for five years (cohort approach); for 2010 to 2014, five-year survival is estimated from the survival experience of patients in recent years (period approach).
+          - Estimates are age-standardized using the International Cancer Survival Standard weights, so that differences in the age of patients do not drive differences in survival.
+          - "{definitions.registries}"
+        description_from_producer: *description_prod_survival
+        presentation:
+          title_public: Net survival rates of {definitions.patients} with {definitions.cancer_lower} cancer after five years
+        display:
+          numDecimalPlaces: 0
+          name: "{definitions.cancer_title} cancer{definitions.among_gender}"
+
+      incidence__asr:
+        title: Age-standardized incidence rate of {definitions.cancer_lower} cancer{definitions.among_gender}
+        unit: cases per 100,000 {definitions.people}
+        short_unit: ""
+        description_short: Number of new cases of {definitions.cancer_lower} cancer per 100,000 {definitions.people} aged 25 and older in a year, age-standardized to the World Standard Population.
+        description_key:
+          - Cancer incidence is the number of new cancer cases arising in a specified population over a given period of time, typically one year.
+          - Rates are computed for ages 25 years and older and age-standardized using the age-truncated World Standard Population, so that differences in the age structure of populations do not drive differences in rates.
+          - Incidence information is collected routinely by population-based cancer registries.
+          - "{definitions.registries}"
+        description_from_producer: *description_prod_incidence_mortality
+        presentation:
+          title_public: Incidence rate of {definitions.cancer_lower} cancer{definitions.among_gender}
+        display:
+          numDecimalPlaces: 1
+          name: "{definitions.cancer_title} cancer{definitions.among_gender}"
+
+      mortality__asr:
+        title: Age-standardized mortality rate of {definitions.cancer_lower} cancer{definitions.among_gender}
+        unit: deaths per 100,000 {definitions.people}
+        short_unit: ""
+        description_short: Number of deaths from {definitions.cancer_lower} cancer per 100,000 {definitions.people} aged 25 and older in a year, age-standardized to the World Standard Population.
+        description_key:
+          - Cancer mortality is the number of deaths due to cancer occurring in a specified population in a given year.
+          - Rates are computed for ages 25 years and older and age-standardized using the age-truncated World Standard Population, so that differences in the age structure of populations do not drive differences in rates.
+          - Mortality data are provided by national statistical offices.
+          - "{definitions.registries}"
+        description_from_producer: *description_prod_incidence_mortality
+        presentation:
+          title_public: Mortality rate of {definitions.cancer_lower} cancer{definitions.among_gender}
+        display:
+          numDecimalPlaces: 1
+          name: "{definitions.cancer_title} cancer{definitions.among_gender}"
