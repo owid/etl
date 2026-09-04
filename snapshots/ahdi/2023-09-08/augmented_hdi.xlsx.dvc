@@ -29,20 +29,16 @@ meta:
 
       By how much did human development improve over the long run? Given the way in which the index has been computed, the conventional logarithmic rate of variation (as in the case of GDP per head) can be used.
     producer: Leandro Prados de la Escosura
-    citation_full: Prados de la Escosura, L. (2021), Augmented Human Development
-      in the Age of Globalisation, Economic History Review.
-    url_main:
-      https://frdelpino.es/investigacion/en/category/01_social-sciences/02_world-economy/03_human-development-world-economy/
-    url_download:
-      https://frdelpino.es/investigacion/wp-content/uploads/2023/02/AHDI_countries_1870-2020.xlsx
-    date_published: 2021
-    date_accessed: 2023-09-08
+    citation_full: 'Leandro Prados de la Escosura (2022), Human Development and the Path to Freedom: 1870 to the Present, Cambridge: Cambridge University Press. https://doi.org/10.1017/9781108769655'
+    url_main: https://frdelpino.es/investigacion/en_gb/world-economy/human-development-world-economy/
+    url_download: https://frdelpino.es/investigacion/wp-content/uploads/2025/11/AHDI_countries_1870-2020_dataset.xlsx
+    date_published: 2022
+    date_accessed: 2026-09-04
     license:
-      url:
-        https://frdelpino.es/investigacion/en/category/01_social-sciences/02_world-economy/03_human-development-world-economy/
+      url: https://frdelpino.es/investigacion/en_gb/world-economy/human-development-world-economy/
       name: Creative Commons BY 4.0
 wdir: ../../../data/snapshots/ahdi/2023-09-08
 outs:
-- md5: d187329001384e104e019a3e08d533c6
-  size: 478574
-  path: augmented_hdi.xlsx
+  - md5: 62715a5870cdfe87b431de244460bc91
+    size: 476940
+    path: augmented_hdi.xlsx
