@@ -92,15 +92,15 @@ here as human time the skill did not need to spend.
 **Runs 2 and 3, both 2026-08-28, both in a cloud sandbox** (run 2 on
 `claude/create-figma-benchmark-chart-3r1st7`, run 3 on `claude/figma-chart-benchmark-pwgleo`):
 
-| | run 1 (local) | run 2 (cloud) | run 3 (cloud) |
-|---|---|---|---|
-| **agent time** | **30.8 min** | **~48 min** | **29.0 min** |
-| whole-run wall clock, incl. pre-Figma work | not recorded | not recorded | **34.3 min** (5.3 of it before the first Figma call) |
-| human wait | 93 s (16 s checkpoint + 77 s stall) | ~60 s — one checkpoint, no stall | one checkpoint, no stall — and it fell *before* the first Figma call, so the headline excludes it entirely |
-| Figma calls | 28 in the build proper | 28 (14 in the build spine) | 24 (16 in the build spine, 4 check slices, 3 renders, 1 fix) |
-| messages with >1 Figma call | 0 | 3, peak 3 in flight | 3, peak 3 in flight |
-| `verify_page.js` run? | **no — not at all** | **yes, all four row groups** | **yes, all three documented calls** |
-| defects the pass caught | — | **2**, neither visible in a render | **1** (`source-line-weight`) — plus run 2's own new furniture rule caught a second before the pass ran |
+| | run 1 (local) | run 2 (cloud) | run 3 (cloud) | run 4 (local) |
+|---|---|---|---|---|
+| **agent time** | **30.8 min** | **~48 min** | **29.0 min** | **32.6 min** |
+| whole-run wall clock, incl. pre-Figma work | not recorded | not recorded | **34.3 min** (5.3 of it before the first Figma call) | **38.7 min** (6.1 of it before the first Figma call) |
+| human wait | 93 s (16 s checkpoint + 77 s stall) | ~60 s — one checkpoint, no stall | one checkpoint, no stall — and it fell *before* the first Figma call, so the headline excludes it entirely | one checkpoint, no stall, again before the first Figma call — so the headline excludes it |
+| Figma calls | 28 in the build proper | 28 (14 in the build spine) | 24 (16 in the build spine, 4 check slices, 3 renders, 1 fix) | 24 (17 in the build spine incl. 3 uploads and 2 palette searches, 1 render, 5 check calls, 1 page-hygiene read) |
+| messages with >1 Figma call | 0 | 3, peak 3 in flight | 3, peak 3 in flight | 4, peak 2 in flight |
+| `verify_page.js` run? | **no — not at all** | **yes, all four row groups** | **yes, all three documented calls** | **yes, all three — but the committed `type,geometry` slice CRASHED and had to be re-sent guarded** |
+| defects the pass caught | — | **2**, neither visible in a render | **1** (`source-line-weight`) — plus run 2's own new furniture rule caught a second before the pass ran | **0 in the frame, 1 in the GATE** — every row passed, and the crash was the finding |
 
 **The headline's start point is doing more work than it looks, and run 3 is where that shows.** "First
 Figma call → delivered" excludes Step 1's chart resolution, the data verification, the texts, the Step 4
@@ -157,6 +157,39 @@ series was monotonic and well-formed, and it said Chile's democracy *improved* u
 only got caught because the rendered SVG's own path disagreed with it. **The general habit that saved it
 is worth more than the specific trap: the exported SVG is the ground truth for what the reader will see,
 so cross-check any number you are about to print against the geometry you are about to import.**
+
+**Run 4, 2026-09-04, local, on `worktree-etl-figma-benchmark-run4`.** The first run where the
+accumulated lessons carried the *whole* build: the end-dot reserve (`--band 503x390`, per
+[per-chart-type/line.md](per-chart-type/line.md)) landed the box on 16..524.01 with **no** corrective
+rescale, the furniture sweep put every gridline back to 1px `[4, 4]` and the series to 3/4 before any
+check ran, and the device table's verdict — recolour the stretch, a dashed event rule per year, **no
+arrow** — was applied without re-deriving it. The three check slices came back with every mechanical
+row `ok` on the first try. **The one defect the run found was in the gate itself**, which is why the
+headline moved up 3.6 min against run 3 rather than down: `verify_page.js`'s `within-frame` row reads
+`node.vectorNetwork` and `node.strokeCap` on any stroked node, and the node carrying the prescribed
+tier-2 knockout is an *annotation* — a TEXT node, which has neither property. Figma throws on a
+property a node type lacks, and `use_figma` is atomic, so the whole `type,geometry` group returned an
+error instead of a verdict. It cannot have fired before: an annotation earns a knockout only by
+crossing furniture, and runs 2 and 3 placed theirs in empty plot space. The two-pass export also did
+not land, for the first time — see the table in FITTING.md.
+
+**What run 4 sent back into the skill** — again, none of it on this page:
+
+| Lesson | Went to |
+|---|---|
+| `within-frame` crashes on a TEXT node carrying the prescribed 3px `OUTSIDE` knockout, taking the whole geometry group with it. Both reads are now guarded, and the harness models Figma's *throwing* property access (a plain object stub answers `undefined`, which is why 424 passing checks never caught it). | [`scripts/verify_page.js`](../scripts/verify_page.js) + [`scripts/test_verify_page.js`](../scripts/test_verify_page.js) |
+| The export inset is stable to ~2px only for a *small* canvas move: a 35px move shifted `insetY` 16px, pass 2 missed the target aspect by 12.6px, and a pass 3 solved from the pass-2 numbers landed exactly. Plus: measure the inset the same way in both passes or you read a drift that isn't there. | [FITTING.md](FITTING.md) |
+| Putting the export's labels on the ladder moves a hugging, right-aligned tick-label column from its LEFT edge, which walked the chart's box off the content edge by 1px and fails `box-alignment` at `BOX_EPS` 0.05. | [FITTING.md](FITTING.md) |
+| `search_design_system` clamps a `queries` batch to ONE query server-side, with a `warning` and no error — so a palette harvest is N calls, whatever the tool's own description says. | [GOTCHAS.md](GOTCHAS.md) |
+
+**Run 4's page was KEPT too, at the user's request**, so Charts (2026) now carries two benchmark-built
+pages on purpose. Page `20260904 One coup ended Chile's democracy; it took 17 years to win it back
+(Pablo A)` (index 9), frame **`chile-democracy-1973-1990`** (`27491:12`), beside its reference import
+`original — grapher square export` (`27492:5`).
+[Deep link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=27491-12). The
+frame name is the durable join, as above. Note the two pages are the *same chart* built to two
+different titles, which makes them a usable side-by-side of what the lessons changed — but it also
+means a third run must pick a new slug again, or the website would export two PNGs by one name.
 
 **A correction to this page's own rationale, which run 2 falsified.** *Why this one* claims the two
 annotations force "the curvy arrows, and therefore the Step 8c pixel probes — the arrow-gap check". They
