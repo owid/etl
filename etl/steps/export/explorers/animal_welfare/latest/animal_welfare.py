@@ -1,5 +1,6 @@
 """Load grapher datasets and create an explorer tsv file."""
 
+import re
 from copy import deepcopy
 
 from etl.collection import expand_config
@@ -223,6 +224,20 @@ def run() -> None:
     )
 
     # Add view with map chart for chick culling laws.
+    # The grapher step embeds each country's effective year in the status value (e.g. "Banned (2023)").
+    # Build one bin per status-year value found in the data, relabeled back to its plain status, so the
+    # legend shows one entry per status while the tooltip shows the year.
+    tb_chick = paths.load_dataset("chick_culling_laws").read("chick_culling_laws")
+    status_colors = {
+        "Banned": "#759AC8",
+        "Banned but not yet in effect": "#058580",
+        "Not banned": "#AE2E3F",
+        "Partially banned": "#A46F49",
+    }
+    bins = []
+    for value in sorted(set(tb_chick["status"])):
+        plain = re.sub(r" \(\d{4}\)$", "", value)
+        bins.append(f"{value},{status_colors[plain]},{plain if plain != value else ''}")
     config["views"].append(
         {
             "dimensions": {
@@ -237,14 +252,14 @@ def run() -> None:
                         "catalogPath": "chick_culling_laws#status",
                         "display": {
                             "colorScaleScheme": "OwidCategoricalC",
-                            "colorScaleCategoricalBins": "Banned,#759AC8,;Banned but not yet in effect,#058580,;Not banned,#AE2E3F,;Partially banned,#A46F49,;No data,,",
+                            "colorScaleCategoricalBins": ";".join(bins) + ";No data,,",
                         },
                     }
                 ]
             },
             "config": {
                 "title": "Which countries have banned chick culling?",
-                "subtitle": "Chick culling is the process of separating and killing unwanted male and unhealthy female chicks that cannot produce eggs in industrialized egg facilities.",
+                "subtitle": "Chick culling is the routine killing of newly hatched male chicks, which cannot lay eggs and are of no commercial value to the egg industry.",
                 "hasMapTab": True,
                 "type": "None",
             },

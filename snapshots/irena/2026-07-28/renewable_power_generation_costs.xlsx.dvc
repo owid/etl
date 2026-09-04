@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: IRENA
+    title: Renewable Power Generation Costs in 2025
+    citation_full: IRENA - Renewable Power Generation Costs in 2025. International Renewable Energy Agency, Abu Dhabi (2026).
+    attribution_short: IRENA
+    url_main: https://www.irena.org/Publications/2026/Jul/Renewable-Power-Generation-Costs-in-2025
+    url_download: https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2026/Jul/IRENA_TEC_RPGC_in_2025_data_file_2026.xlsx
+    date_accessed: '2026-07-28'
+    date_published: '2026-07-01'
+    license:
+      name: ©IRENA 2026
+      url: https://www.irena.org/Publications/2026/Jul/Renewable-Power-Generation-Costs-in-2025
+outs:
+  - md5: 0541443c8014b111db9f00b0abb15126
+    size: 12908268
+    path: renewable_power_generation_costs.xlsx

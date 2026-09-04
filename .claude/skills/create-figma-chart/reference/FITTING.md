@@ -457,7 +457,18 @@ shares its colour), then replay that map onto the fresh import. The rest of the 
    the step had to emit as runs is `license-0 … license-5`, and an exact-name match silently leaves all
    six behind to print over the template's own row.
 3. Paint, set faces, restore anchors, re-flow multi-run lines.
-4. Append into the target frame at (0,0) with `clipsContent = false`, then remove the old group.
+4. Insert into the target frame at (0,0) at the **bottom** of the z-order (`insertChild(0, …)`, never
+   `append`), and paint the frame with the template's own canvas fill, then remove the old group. An
+   artboard-sized import appended on top covers the header and footer, so every double-click on the
+   subtitle descends into the chart instead of selecting the text — and a frame whose fill arrives
+   switched off is not a hit target over its own empty area.
+5. **Crop the frame to its rendered ink, and do it last** — after the rescale, the paint pass and any
+   re-flow, since all three move ink. Count only what renders: skip a leaf under a hidden or
+   zero-opacity ancestor, take each box through the clips *inside* the import, and ignore the default
+   fill Figma gives an imported clip path. Left uncropped the frame is the size of the SVG canvas,
+   which *is* the artboard — it cannot be grabbed as a unit, and `verify_page.js`'s `box-alignment`,
+   `gap` and `margins` rows measure the canvas and report negative insets. `restyle_static_import.js`
+   does all of this already; reach for it before hand-rolling the pass.
 
 Keep it as one script per frame: the pass is run more than once, always after a step change, and the
 only thing that varies is which frame.
