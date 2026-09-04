@@ -402,6 +402,17 @@ matplotlib's fallback stack and seaborn's palette, and needs an explicit pass:
 - **Everything above is lost on re-import**, along with the rest of Step 8 — see the re-export
   section. Keep the pass as one script you re-run, because a frame that has quietly reverted to
   matplotlib's type looks finished.
+- **A palette change does NOT need a re-import — recolour the frame in place, once you have proved the
+  geometry is unchanged.** The proof is cheap and it is a proof, not a glance: harvest the frame's
+  named groups and every text run, and compare against the freshly rendered SVG. The only expected
+  difference is the template slots the restyle drops (twelve on a Static Vertical: title, subtitle, two
+  Note lines, source, tagline and a six-run licence), so subtract those and the two sets must be
+  identical. Hash them if the lists are long — an FNV-1a of the sorted, newline-joined names runs
+  unchanged in `use_figma`, where there is no `crypto`. Identical on both counts means the frame is the
+  same render and only the paint differs, which is one pass instead of the whole
+  upload-restyle-crop-snap sequence and keeps every Step 8 edit the frame already carries. **Unescape
+  HTML entities before comparing**: the SVG holds `TV &amp; radio` where Figma holds `TV & radio`, and
+  five such labels are enough to make two identical sets hash differently.
 
 #### Changing a font moves every label. Put them back.
 
