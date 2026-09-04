@@ -240,11 +240,20 @@ timestamp proximity, and takes concurrency off overlapping intervals rather than
 Transcripts sit under `~/.claude/projects/<slugified-cwd>/<session-id>.jsonl`, and a **worktree
 session has its own projects dir** — pass the path, don't glob for the newest file. What it reports:
 
-| | why |
+| what the script prints | why |
 |---|---|
 | Figma calls by tool, and the total | against the **~14–18 per template** a build should cost |
 | turns, and median gap between them | the term that dominates `turns × (turn + call)` |
-| messages containing >1 Figma call, and peak in-flight | but read the warning below before scoring it |
+| peak in-flight, off overlapping intervals | but read the warning below before scoring it |
+
+**It stops there, and the sweep is not the whole benchmark.** It deliberately never prints *messages
+containing >1 Figma call*: that per-message histogram scored a measured 4.12× probe as eight
+singletons, which is exactly why concurrency is read off intervals instead. The two rows below it
+prints nothing for either — they stay a read of the transcript by hand, and a run that reports only
+the script's numbers has dropped them:
+
+| still read by hand | why |
+|---|---|
 | screenshots that were *looked at* vs measured by script | the thing `measure_pixels.py` exists to reduce |
 | re-work: calls spent on a mistake, and what it was | the honest denominator — a fast wrong build is not fast |
 

@@ -19,8 +19,9 @@ Two things this deliberately does NOT do, both from BENCHMARK.md:
   - It reports `sum/wall` only beside the honest figures, never instead of them: it counts a queued
     call's own wait as work, so it flatters batching locally and understates it in the cloud.
 
-`turn` is the gap from a tool_result back to the next tool_use in a LATER assistant message -- the
-model thinking, which BENCHMARK.md measures at ~60s of every ~66s call. That is the term to watch.
+`turn` is the gap from a message's LAST tool_result back to the next assistant message's first
+tool_use -- the model thinking, which BENCHMARK.md measures at ~60s of every ~66s call. That is the
+term to watch.
 """
 
 import argparse
@@ -78,9 +79,14 @@ def load(path, tool_filter=None, since=None):
 
 
 def peak_in_flight(calls):
-    """Concurrency from overlapping intervals -- never from a per-message count."""
+    """Concurrency from overlapping intervals -- never from a per-message count.
+
+    The tie-break is load-bearing: at an identical timestamp an end (-1) must be applied before a
+    start (+1), or two touching but strictly serial calls -- [0,10] and [10,20] -- report a peak of
+    2 and overstate batching, which is the one direction this number must never err in.
+    """
     events = [(c["start"], 1) for c in calls] + [(c["end"], -1) for c in calls]
-    events.sort(key=lambda e: (e[0], -e[1]))
+    events.sort(key=lambda e: (e[0], e[1]))
     peak = live = 0
     for _, delta in events:
         live += delta
@@ -89,10 +95,23 @@ def peak_in_flight(calls):
 
 
 def turn_gaps(calls):
-    """Model time: the gap from one call finishing to the next call in a LATER message starting."""
+    """Model time: from a message's LAST result back to the next message's first call.
+
+    Measured per message, not between adjacent calls: the model cannot start the next turn until
+    every result in the batch is back, so the gap runs from the batch's MAX end. Adjacent pairs
+    would measure it from whichever call happened to sort last by start time, and a batch whose
+    longest call started first would then be credited with thinking time it never spent.
+    """
+    batches = {}
+    for call in calls:
+        batch = batches.setdefault(call["msg"], {"start": call["start"], "end": call["end"]})
+        batch["start"] = min(batch["start"], call["start"])
+        batch["end"] = max(batch["end"], call["end"])
+
+    ordered = sorted(batches.values(), key=lambda b: b["start"])
     gaps = []
-    for prev, nxt in zip(calls, calls[1:]):
-        if nxt["msg"] != prev["msg"] and nxt["start"] > prev["end"]:
+    for prev, nxt in zip(ordered, ordered[1:]):
+        if nxt["start"] > prev["end"]:
             gaps.append((nxt["start"] - prev["end"]).total_seconds())
     return gaps
 

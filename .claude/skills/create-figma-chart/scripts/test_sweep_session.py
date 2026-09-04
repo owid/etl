@@ -82,6 +82,23 @@ check("serial: finds three turns", "turns between calls: 3" in out.stdout, out.s
 check("serial: turn is the GAP, not the call (2s, not 10s)",
       "median 2.0s" in out.stdout, out.stdout)
 
+# Two strictly serial calls that TOUCH: one ends exactly as the next begins. Applying the start
+# before the end counts both as live and reports a peak of 2 -- batching overstated, silently.
+TOUCHING = [("m1", "t1", F + "get_screenshot", 0, 10),
+            ("m2", "t2", F + "get_screenshot", 10, 20)]
+out = run(TOUCHING)
+check("touching intervals are serial: peak in flight is 1, not 2",
+      "peak in flight: 1" in out.stdout, out.stdout)
+
+# One message whose FIRST-started call finishes LAST. The turn runs from the batch's max end (20),
+# not from whichever call sorts last by start (10), which would invent 10s of thinking time.
+STAGGERED = [("m1", "t1", F + "get_screenshot", 0, 20),
+             ("m1", "t2", F + "get_screenshot", 1, 10),
+             ("m2", "t3", F + "get_screenshot", 30, 33)]
+out = run(STAGGERED)
+check("turn is measured from the batch's LAST result (10s, not 20s)",
+      "turns between calls: 1" in out.stdout and "median 10.0s" in out.stdout, out.stdout)
+
 # The A/B shape: two tools, told apart by --list.
 MIXED = [("m1", "t1", F + "use_figma", 0, 3), ("m2", "t2", F + "get_screenshot", 10, 19)]
 out = run(MIXED, "--list")
