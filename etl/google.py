@@ -72,8 +72,10 @@ class GoogleDrive:
     SCOPES = [
         # Create and edit docs.
         "https://www.googleapis.com/auth/documents",
-        # Only access files created by the app.
-        "https://www.googleapis.com/auth/drive.file",
+        # Full Drive access (read/write, not just files created by the app): reports live in a shared
+        # Drive folder and are copied from a template the app did not create, so the narrower
+        # drive.file scope can't find or write them.
+        "https://www.googleapis.com/auth/drive",
         # Read and write Google Sheets.
         "https://www.googleapis.com/auth/spreadsheets",
     ]
@@ -239,6 +241,48 @@ class GoogleDrive:
 
         return files
 
+    def get_or_create_subfolder(self, parent_folder_id: str, folder_name: str) -> str:
+        """
+        Return the ID of a subfolder with the given name inside the parent folder.
+        Creates it if it doesn't exist.
+
+        Parameters
+        ----------
+        parent_folder_id : str
+            ID of the parent folder.
+        folder_name : str
+            Name of the subfolder to find or create.
+
+        Returns
+        -------
+        str
+            ID of the subfolder.
+
+        """
+        query = (
+            f"'{parent_folder_id}' in parents"
+            f" and name = '{folder_name}'"
+            f" and mimeType = 'application/vnd.google-apps.folder'"
+            f" and trashed = false"
+        )
+        response = self.drive_service.files().list(q=query, spaces="drive", fields="files(id, name)").execute()
+        files = response.get("files", [])
+        if files:
+            return files[0]["id"]
+        folder = (
+            self.drive_service.files()
+            .create(
+                body={
+                    "name": folder_name,
+                    "mimeType": "application/vnd.google-apps.folder",
+                    "parents": [parent_folder_id],
+                },
+                fields="id",
+            )
+            .execute()
+        )
+        return folder["id"]
+
     def set_file_permissions(
         self,
         file_id: str,
@@ -401,6 +445,54 @@ class GoogleDoc:
                     if marker in text_run.get("content", ""):
                         return run["startIndex"]
         raise ValueError(f"Marker '{marker}' not found in document.")
+
+    def find_marker_range(self, marker: str) -> tuple[int, int]:
+        """
+        Find the start and end index of the text run containing a marker in the document.
+
+        Unlike find_marker_index (which only returns the start), this also returns the end index of that run, so
+        callers can operate on (or delete) the whole run, not just insert at its start.
+
+        Parameters
+        ----------
+        marker : str
+            Marker string to search for in the document.
+
+        Returns
+        -------
+        tuple[int, int]
+            Start and end index of the run containing the marker.
+
+        """
+        doc = self.drive.docs_service.documents().get(documentId=self.doc_id).execute()
+        for element in doc.get("body", {}).get("content", []):
+            if "paragraph" in element:
+                for run in element["paragraph"].get("elements", []):
+                    text_run = run.get("textRun", {})
+                    if marker in text_run.get("content", ""):
+                        return run["startIndex"], run["endIndex"]
+        raise ValueError(f"Marker '{marker}' not found in document.")
+
+    def delete_section(self, start_marker: str, end_marker: str) -> None:
+        """
+        Delete an optional section of the document, delimited by two marker lines.
+
+        Useful for template sections that should only appear conditionally (e.g. when there is no data to show):
+        wrap the section between two marker lines in the template, and call this to remove it (both markers
+        included) when the section isn't needed. Both markers must be present in the document, each on their own
+        text run, and start_marker must come before end_marker.
+
+        Parameters
+        ----------
+        start_marker : str
+            Marker string at the start of the section to delete.
+        end_marker : str
+            Marker string at the end of the section to delete.
+
+        """
+        start_index, _ = self.find_marker_range(marker=start_marker)
+        _, end_index = self.find_marker_range(marker=end_marker)
+        self.edit(requests=[{"deleteContentRange": {"range": {"startIndex": start_index, "endIndex": end_index}}}])
 
     def insert_image(self, image_url, placeholder, width=350) -> None:
         """

@@ -1,0 +1,24 @@
+YEAR: 2026
+PERIOD: "H1"
+PROVIDERS:
+  - name: "Uppsala Conflict Data Program"
+    alias:
+      - "Uppsala Conflict Data Program and Peace Research Institute Oslo"
+  - name: "Global Carbon Project"
+    alias: []
+  - name: "WHO Mortality Database"
+    alias: []
+  - name: "IHME, Global Burden of Disease"
+    alias: ["IHME Global Burden of Disease"]
+  - name: "Epoch AI"
+    alias: []
+  - name: "Ember"
+    alias: []
+  - name: "EM-DAT"
+    alias: []
+  - name: "V-Dem"
+    alias: []
+  - name: "Equaldex"
+    alias: []
+  - name: "Luxembourg Income Study"
+    alias: []
