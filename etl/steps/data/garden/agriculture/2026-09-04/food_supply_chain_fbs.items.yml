@@ -1,0 +1,172 @@
+# Items of the FAOSTAT Food Balance Sheets (FBS) for the food supply chain step (FBS method).
+#
+# Every FBS item code in the input table must appear in exactly one of the three lists below; the step asserts this
+# and asserts that each code still carries the expected FAO name.
+#
+# Each chain item:
+#   code:   FAO FBS item code (as an integer; the garden table zero-pads it to 8 characters).
+#   name:   FAO item name, as given in the `fao_item` column of the garden table.
+#   role:   Where the item's production enters the chain (see the step's assumption 5):
+#             crop      -> "crop_production", the start of the chain.
+#             animal    -> "animal_products", added after feed is subtracted.
+#             processed -> netted against processing ("processing_net"): these are made from other items (oils,
+#                          sugar, alcoholic beverages, butter, cream), so their production is not a new input.
+#   fao_group (optional): "vegetal" or "animal", only where FAO's own grouping differs from the role's natural
+#           group. Used by the partition check.
+items:
+  # Cereals.
+  - {code: 2511, name: "Wheat and products", role: crop}
+  - {code: 2513, name: "Barley and products", role: crop}
+  - {code: 2514, name: "Maize and products", role: crop}
+  - {code: 2515, name: "Rye and products", role: crop}
+  - {code: 2516, name: "Oats", role: crop}
+  - {code: 2517, name: "Millet and products", role: crop}
+  - {code: 2518, name: "Sorghum and products", role: crop}
+  - {code: 2520, name: "Cereals, other", role: crop}
+  - {code: 2807, name: "Rice and products", role: crop}
+  # Starchy roots.
+  - {code: 2531, name: "Potatoes and products", role: crop}
+  - {code: 2532, name: "Cassava and products", role: crop}
+  - {code: 2533, name: "Sweet potatoes", role: crop}
+  - {code: 2534, name: "Roots, Other", role: crop}
+  - {code: 2535, name: "Yams", role: crop}
+  # Sugar crops.
+  - {code: 2536, name: "Sugar cane", role: crop}
+  - {code: 2537, name: "Sugar beet", role: crop}
+  # Sugar and sweeteners (made from sugar crops, and from cereals in the case of other sweeteners).
+  - {code: 2541, name: "Sugar non-centrifugal", role: processed}
+  - {code: 2542, name: "Sugar (Raw Equivalent)", role: processed}
+  - {code: 2543, name: "Sweeteners, Other", role: processed}
+  # Pulses.
+  - {code: 2546, name: "Beans", role: crop}
+  - {code: 2547, name: "Peas", role: crop}
+  - {code: 2549, name: "Pulses, Other and products", role: crop}
+  # Tree nuts and oil crops.
+  - {code: 2551, name: "Nuts and products", role: crop}
+  - {code: 2552, name: "Groundnuts", role: crop}
+  - {code: 2555, name: "Soyabeans", role: crop}
+  - {code: 2557, name: "Sunflower seed", role: crop}
+  - {code: 2558, name: "Rape and Mustardseed", role: crop}
+  - {code: 2559, name: "Cottonseed", role: crop}
+  - {code: 2560, name: "Coconuts - Incl Copra", role: crop}
+  - {code: 2561, name: "Sesame seed", role: crop}
+  - {code: 2563, name: "Olives (including preserved)", role: crop}
+  - {code: 2570, name: "Oilcrops, Other", role: crop}
+  # Vegetable oils.
+  - {code: 2571, name: "Soyabean Oil", role: processed}
+  - {code: 2572, name: "Groundnut Oil", role: processed}
+  - {code: 2573, name: "Sunflowerseed Oil", role: processed}
+  - {code: 2574, name: "Rape and Mustard Oil", role: processed}
+  - {code: 2575, name: "Cottonseed Oil", role: processed}
+  # Palm oil and palm kernel oil are the only oils tagged as crops: the item carrying the oil palm harvest has no
+  # food energy (see "Palm kernels" under excluded), so the oils are the first point where oil palm calories exist.
+  - {code: 2576, name: "Palmkernel Oil", role: crop}
+  - {code: 2577, name: "Palm Oil", role: crop}
+  - {code: 2578, name: "Coconut Oil", role: processed}
+  - {code: 2579, name: "Sesameseed Oil", role: processed}
+  - {code: 2580, name: "Olive Oil", role: processed}
+  - {code: 2581, name: "Ricebran Oil", role: processed}
+  - {code: 2582, name: "Maize Germ Oil", role: processed}
+  - {code: 2586, name: "Oilcrops Oil, Other", role: processed}
+  # Vegetables.
+  - {code: 2601, name: "Tomatoes and products", role: crop}
+  - {code: 2602, name: "Onions", role: crop}
+  - {code: 2605, name: "Vegetables, other", role: crop}
+  # Fruit.
+  - {code: 2611, name: "Oranges, Mandarines", role: crop}
+  - {code: 2612, name: "Lemons, Limes and products", role: crop}
+  - {code: 2613, name: "Grapefruit and products", role: crop}
+  - {code: 2614, name: "Citrus, Other", role: crop}
+  - {code: 2615, name: "Bananas", role: crop}
+  - {code: 2616, name: "Plantains", role: crop}
+  - {code: 2617, name: "Apples and products", role: crop}
+  - {code: 2618, name: "Pineapples and products", role: crop}
+  - {code: 2619, name: "Dates", role: crop}
+  - {code: 2620, name: "Grapes and products (excl wine)", role: crop}
+  - {code: 2625, name: "Fruits, other", role: crop}
+  # Stimulants and spices.
+  - {code: 2630, name: "Coffee and products", role: crop}
+  - {code: 2633, name: "Cocoa Beans and products", role: crop}
+  - {code: 2635, name: "Tea (including mate)", role: crop}
+  - {code: 2640, name: "Pepper", role: crop}
+  - {code: 2641, name: "Pimento", role: crop}
+  - {code: 2642, name: "Cloves", role: crop}
+  - {code: 2645, name: "Spices, Other", role: crop}
+  # Alcoholic beverages (made from cereals, grapes and other crops).
+  - {code: 2655, name: "Wine", role: processed}
+  - {code: 2656, name: "Beer", role: processed}
+  - {code: 2657, name: "Beverages, Fermented", role: processed}
+  - {code: 2658, name: "Beverages, Alcoholic", role: processed}
+  # Other processed vegetal products (no production reported; they enter through trade).
+  - {code: 2680, name: "Infant food", role: processed}
+  - {code: 2899, name: "Miscellaneous", role: processed}
+  # Aquatic plants (seaweed). FAO groups them with animal products ("Aquatic Products, Other").
+  - {code: 2775, name: "Aquatic Plants", role: crop, fao_group: animal}
+  # Meat and offal.
+  - {code: 2731, name: "Bovine Meat", role: animal}
+  - {code: 2732, name: "Mutton & Goat Meat", role: animal}
+  - {code: 2733, name: "Pigmeat", role: animal}
+  - {code: 2734, name: "Poultry Meat", role: animal}
+  - {code: 2735, name: "Meat, Other", role: animal}
+  - {code: 2736, name: "Offals, Edible", role: animal}
+  # Animal fats and dairy. Butter, ghee and cream are made from milk, so they are netted against processing.
+  - {code: 2737, name: "Fats, Animals, Raw", role: animal}
+  - {code: 2740, name: "Butter, Ghee", role: processed, fao_group: animal}
+  - {code: 2743, name: "Cream", role: processed, fao_group: animal}
+  - {code: 2848, name: "Milk - Excluding Butter", role: animal}
+  - {code: 2744, name: "Eggs", role: animal}
+  # Honey. FAO groups it with vegetal products ("Sugar & Sweeteners").
+  - {code: 2745, name: "Honey", role: animal, fao_group: vegetal}
+  # Fish and seafood.
+  - {code: 2761, name: "Freshwater Fish", role: animal}
+  - {code: 2762, name: "Demersal Fish", role: animal}
+  - {code: 2763, name: "Pelagic Fish", role: animal}
+  - {code: 2764, name: "Marine Fish, Other", role: animal}
+  - {code: 2765, name: "Crustaceans", role: animal}
+  - {code: 2766, name: "Cephalopods", role: animal}
+  - {code: 2767, name: "Molluscs, Other", role: animal}
+  - {code: 2769, name: "Aquatic Animals, Others", role: animal}
+  # Fish oils (made from fish).
+  - {code: 2781, name: "Fish, Body Oil", role: processed, fao_group: animal}
+  - {code: 2782, name: "Fish, Liver Oil", role: processed, fao_group: animal}
+
+# Individual items deliberately left out of the chain. Each is asserted to exist in the input table, so that a
+# change at FAO does not go unnoticed, but contributes to no stage.
+excluded:
+  - {code: 2501, name: "Population", reason: Not a food item.}
+  - {code: 2659, name: "Alcohol, Non-Food", reason: Non-food by definition (industrial alcohol); no food energy.}
+  - code: 2562
+    name: "Palm kernels"
+    reason: >-
+      Carries the whole oil palm harvest (FAO defines it as "Oil, palm fruit" plus "Palm kernels") with zero food
+      use, so it has no food energy in FBS. The oil palm enters the chain as "Palm Oil" and "Palmkernel Oil", which
+      are tagged as crops.
+  - {code: 2768, name: "Meat, Aquatic Mammals", reason: Negligible production and no reported food energy anywhere.}
+
+# FAO's aggregate items. They sum their member items, so they must not be added to the chain (double counting);
+# three of them are used to check that the curated items partition the total.
+aggregate_groups:
+  - {code: 2901, name: "Grand Total"}
+  - {code: 2903, name: "Vegetal Products"}
+  - {code: 2905, name: "Cereals - Excluding Beer"}
+  - {code: 2907, name: "Starchy Roots"}
+  - {code: 2908, name: "Sugar Crops"}
+  - {code: 2909, name: "Sugar & Sweeteners"}
+  - {code: 2911, name: "Pulses"}
+  - {code: 2912, name: "Treenuts"}
+  - {code: 2913, name: "Oilcrops"}
+  - {code: 2914, name: "Vegetable Oils"}
+  - {code: 2918, name: "Vegetables"}
+  - {code: 2919, name: "Fruits - Excluding Wine"}
+  - {code: 2922, name: "Stimulants"}
+  - {code: 2923, name: "Spices"}
+  - {code: 2924, name: "Alcoholic Beverages"}
+  - {code: 2928, name: "Miscellaneous"}
+  - {code: 2941, name: "Animal Products"}
+  - {code: 2943, name: "Meat"}
+  - {code: 2945, name: "Offals"}
+  - {code: 2946, name: "Animal fats"}
+  - {code: 2948, name: "Milk - Excluding Butter"}
+  - {code: 2949, name: "Eggs"}
+  - {code: 2960, name: "Fish, Seafood"}
+  - {code: 2961, name: "Aquatic Products, Other"}

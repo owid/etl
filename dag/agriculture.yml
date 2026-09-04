@@ -115,6 +115,24 @@ steps:
                           - data://garden/regions/2023-01-01/regions
         ######################################################################################################################
         #
+        # Food supply chain in kilocalories: FAOSTAT Food Balance Sheets with every balance element (production, trade,
+        # feed, processing, losses, food...) converted to kilocalories per person per day, for a waterfall visualization.
+        #
+        data://garden/agriculture/2026-09-04/food_supply_chain_fbs:
+                - data://garden/faostat/2026-02-25/faostat_fbsc
+                - data://garden/demography/2024-07-15/population
+        # Same chain from FAO's Supply Utilization Accounts (2010 onward), which include the feed by-products FBS lacks.
+        data://garden/agriculture/2026-09-04/food_supply_chain_scl:
+                - data://garden/faostat/2026-02-25/faostat_scl
+                - data://meadow/faostat/2026-02-25/faostat_metadata
+                - data://garden/faostat/2026-02-25/faostat_fbsc
+                - data://garden/demography/2024-07-15/population
+        # S3 export for the bespoke visualization: a metadata JSON plus one JSON per entity, under
+        # s3://owid-public/data/food-supply-chain/. The single garden dependency below decides which method is
+        # published; switching to the other method is a matter of changing that line.
+        export://s3/agriculture/latest/food_supply_chain:
+                - data://garden/agriculture/2026-09-04/food_supply_chain_fbs
+        #
         # USDA/FAS - Corn yields
         #
         data://grapher/agriculture/2026-03-02/corn_yields:

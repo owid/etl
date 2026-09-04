@@ -1,0 +1,91 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Food Supply
+    description_processing: |-
+      - FAOSTAT Food Balance Sheets report every element of the food balance in tonnes, and only food available for consumption also in kilocalories and grams of protein. We convert each element of each item with a density (kilocalories, or grams of protein, per 100 grams) and sum the items into the stages of the chain; the mass table keeps the tonnes, expressed in kilograms per person per day.
+      - The energy density of each item, country and year is derived from the Food Balance Sheets themselves, as food supply in kilocalories divided by food supply in tonnes. Densities above the energy of pure fat (920 kilocalories per 100 grams) or above 100 grams of protein per 100 grams are treated as data errors and replaced by the country's median for the item, or failing that by the item's median across all countries and years.
+      - The same density is applied to every element of an item, so the balance (production plus imports, minus exports and stock changes, equals the sum of all uses) holds in kilocalories as it does in tonnes.
+      - Stock variation is derived as production plus imports minus exports minus domestic supply, since FAOSTAT only reports it from 2010 onward.
+      - Only individual items are summed; FAO's aggregate items (such as "Cereals" or "Vegetal Products") are left out to avoid double counting. Three items with no food energy are left out: "Palm kernels" (which carries the oil palm harvest; the oil palm enters the chain as palm oil and palm kernel oil), non-food alcohol and aquatic mammals.
+      - Production of items made from other items (vegetable oils, sugar and sweeteners, alcoholic beverages, butter, cream, fish oils and other processed products) is netted against processing, so that no calorie is counted twice.
+      - FAOSTAT rounds tonnages to the nearest thousand, so its balances do not close exactly; the gap is folded into residuals so that the chain lands exactly on food available for consumption.
+      - All stages are divided by the same population series, from Our World in Data's population dataset, and by 365 days.
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  energy:
+    title: Food supply chain in kilocalories (Food Balance Sheets method)
+    common:
+      unit: kilocalories per person per day
+      short_unit: kcal
+    variables: &variables
+      crop_production:
+        title: Crop production
+        description_short: Domestic production of crops, including palm oil and palm kernel oil.
+        description_key:
+          - Crops are cereals, roots and tubers, sugar crops, pulses, nuts, oil crops, vegetables, fruit, stimulants, spices and aquatic plants, plus palm oil and palm kernel oil, which stand in for the oil palm harvest.
+          - Products made from crops (other vegetable oils, sugar, sweeteners, alcoholic beverages) are not included here; their production is netted against processing.
+      imports:
+        title: Imports
+        description_short: Imports of all food items.
+      exports:
+        title: Exports
+        description_short: Exports of all food items.
+      stock_variation:
+        title: Stock variation
+        description_short: The net change in stocks of all food items. Positive values mean that stocks grew, taking from the supply.
+      seed:
+        title: Seed
+        description_short: Crops set aside as seed for the next harvest.
+      losses:
+        title: Losses
+        description_short: Food lost in the supply chain, between the farm and the retailer.
+        description_key:
+          - FAOSTAT's "Losses" cover losses in storage, transport and processing. They do not include waste at retail or in households.
+      other_uses:
+        title: Other uses
+        description_short: Food items used for non-food purposes, such as biofuels, soap and other industrial uses.
+      processing_net:
+        title: Processing, net
+        description_short: Food items entering processing, minus the the processed products that come out of it. Positive values are a net loss along the chain.
+        description_key:
+          - Oilseed cakes and other feed by-products are not items of the Food Balance Sheets, so what goes from oilseeds to cakes to animal feed appears here rather than under feed.
+      feed:
+        title: Feed
+        description_short: Food items fed to animals.
+        description_key:
+          - Animals also eat grass, forage, crop residues and oilseed cakes, none of which are items of the Food Balance Sheets. Dividing animal products by feed therefore overstates the efficiency of livestock.
+      animal_products:
+        title: Animal products
+        description_short: Domestic production of meat, offal, animal fats, milk, eggs, honey, fish and seafood.
+      tourist_consumption:
+        title: Tourist consumption
+        description_short: Food consumed by visitors from other countries. Only reported by FAOSTAT from 2010 onward.
+      residuals:
+        title: Residuals
+        description_short: The statistical discrepancies in the balance, including the rounding of FAOSTAT's tonnages. Can be negative.
+      food:
+        title: Food available for consumption
+        description_short: Food available for human consumption, before waste at retail and in households.
+      balancing_difference:
+        title: Balancing difference
+        description_short: The gap by which FAOSTAT's rounded balances fail to close, in the unit of the table. It is included in residuals; this column only records its size.
+  protein:
+    title: Food supply chain in grams of protein (Food Balance Sheets method)
+    common:
+      unit: grams of protein per person per day
+      short_unit: g
+    variables: *variables
+  mass:
+    title: Food supply chain in kilograms (Food Balance Sheets method)
+    common:
+      unit: kilograms per person per day
+      short_unit: kg
+    variables: *variables
