@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 
 from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.db import get_engine, read_sql
-from etl.files import get_schema_from_url, yaml_dump
+from etl.files import get_schema_from_url, patch_schema_url, yaml_dump
 from etl.grapher.io import add_entity_code_and_name, trim_long_variable_name
 
 log = structlog.get_logger()
@@ -777,15 +777,16 @@ def _validate_time_interval(tab: Table, col: str) -> None:
 
 
 def _validate_grapher_config(tab: Table, col: str) -> None:
-    """Validate grapher config against given schema or against the default schema."""
+    """Validate grapher config against the patch schema for its version.
+
+    An indicator's `grapher_config` is a patch applied on top of a chart's own config, so it
+    is validated against the `.patch.json` variant (which requires only `$schema`) rather than
+    the full schema (which also requires `dimensions`).
+    """
     grapher_config = getattr(tab[col].m.presentation, "grapher_config", None)
     if grapher_config:
         grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
-
-        # Load schema and remove properties that are not relevant for the validation
-        schema = get_schema_from_url(grapher_config["$schema"])
-        # schema["required"] = [f for f in schema["required"] if f not in ("dimensions", "version", "title")]
-        schema["required"] = []
+        schema = get_schema_from_url(patch_schema_url(grapher_config["$schema"]))
 
         from jsonschema import ValidationError, validate
 

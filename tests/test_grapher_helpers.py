@@ -1,15 +1,23 @@
+import copy
+import json
 from unittest import mock
 
 import numpy as np
 import pandas as pd
+import pytest
 from owid.catalog import (
     DatasetMeta,
     Table,
     TableMeta,
     VariableMeta,
+    VariablePresentationMeta,
 )
 
+from etl import files
+from etl.config import DEFAULT_GRAPHER_SCHEMA
+from etl.files import patch_schema_url
 from etl.grapher import helpers as gh
+from etl.paths import SCHEMAS_DIR
 
 
 def test_yield_wide_table():
@@ -224,3 +232,80 @@ def test_adapt_table_with_dates_preserves_declared_interval():
     tb["value"].metadata.display = {"timeInterval": "month"}
     tb = gh.adapt_table_with_dates_to_grapher(tb)
     assert tb["value"].m.display["timeInterval"] == "month"
+
+
+def _tab_with_grapher_config(grapher_config: dict) -> Table:
+    tb = Table(pd.DataFrame({"value": [1.0]}))
+    tb.value.metadata.presentation = VariablePresentationMeta(grapher_config=grapher_config)
+    return tb
+
+
+def _fake_schema_session(monkeypatch) -> list[str]:
+    """Serve the vendored schemas from disk instead of the network; return requested URLs."""
+    requested = []
+
+    class _Resp:
+        def __init__(self, payload):
+            self._payload = payload
+
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            # A fresh copy per call, so a mutating caller can't poison the fixture itself and
+            # hide the very bug case 1 guards against.
+            return copy.deepcopy(self._payload)
+
+    def fake_get(url, *args, **kwargs):
+        requested.append(url)
+        path = SCHEMAS_DIR / url.rsplit("/", 1)[-1]
+        if not path.exists():
+            raise AssertionError(f"Test asked for a schema that is not vendored: {url}")
+        with open(path) as f:
+            return _Resp(json.load(f))
+
+    files.get_schema_from_url.cache_clear()
+    monkeypatch.setattr(files.http_session, "get", fake_get)
+    return requested
+
+
+def test_validate_grapher_config_accepts_partial_config(monkeypatch):
+    """A `grapher_config` is a patch, so it validates without `dimensions`."""
+    requested = _fake_schema_session(monkeypatch)
+    tab = _tab_with_grapher_config({"$schema": DEFAULT_GRAPHER_SCHEMA, "hasMapTab": True})
+
+    gh._validate_grapher_config(tab, "value")
+
+    assert requested == [patch_schema_url(DEFAULT_GRAPHER_SCHEMA)]
+    # The full schema's cached dict must come back untouched — validation used to empty
+    # `required` in place on a @cache'd dict, poisoning it for every other caller.
+    assert files.get_schema_from_url(DEFAULT_GRAPHER_SCHEMA)["required"] == ["$schema", "dimensions"]
+
+
+def test_validate_grapher_config_rejects_unknown_property(monkeypatch):
+    """`additionalProperties: false` must survive the switch to the patch schema."""
+    _fake_schema_session(monkeypatch)
+    tab = _tab_with_grapher_config({"$schema": DEFAULT_GRAPHER_SCHEMA, "hasMapTabb": True})
+
+    with pytest.raises(ValueError, match="Invalid grapher_config for column `value`"):
+        gh._validate_grapher_config(tab, "value")
+
+
+def test_validate_grapher_config_rejects_wrong_type(monkeypatch):
+    _fake_schema_session(monkeypatch)
+    tab = _tab_with_grapher_config({"$schema": DEFAULT_GRAPHER_SCHEMA, "hasMapTab": "yes"})
+
+    with pytest.raises(ValueError, match="Invalid grapher_config for column `value`"):
+        gh._validate_grapher_config(tab, "value")
+
+
+def test_validate_grapher_config_defaults_missing_schema(monkeypatch):
+    """No `$schema` is filled in, not rejected — the patch schema requires it."""
+    requested = _fake_schema_session(monkeypatch)
+    config = {"hasMapTab": True}
+    tab = _tab_with_grapher_config(config)
+
+    gh._validate_grapher_config(tab, "value")
+
+    assert config["$schema"] == DEFAULT_GRAPHER_SCHEMA
+    assert requested == [patch_schema_url(DEFAULT_GRAPHER_SCHEMA)]

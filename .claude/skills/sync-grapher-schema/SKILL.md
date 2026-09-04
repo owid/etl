@@ -15,16 +15,17 @@ metadata:
 
 # Sync Grapher Schema
 
-The grapher chart-config schema is owned by the web team in [`owid-grapher`](https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema) and published at `https://files.ourworldindata.org/schemas/grapher-schema.NNN.json`. **It is mutated in place without version bumps** (e.g. dumbbell plots landed in `.010` directly), so when it changes upstream, four things in this repo need to follow:
+The grapher chart-config schema is owned by the web team in [`owid-grapher`](https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema) and published at `https://files.ourworldindata.org/schemas/grapher-schema.NNN.json`. **It is mutated in place without version bumps** (e.g. dumbbell plots landed in `.010` directly), so when it changes upstream, five things in this repo need to follow:
 
 | File | Role | Sync mechanism |
 |---|---|---|
 | `schemas/grapher-schema.NNN.json` | Vendored copy of upstream | automatic (`--refresh`) |
+| `schemas/grapher-schema.NNN.patch.json` | Vendored copy of upstream's patch variant (same schema, `required: ["$schema"]`) — what `_validate_grapher_config` validates indicator `grapher_config` patches against | automatic (same `--refresh`); never hand-edited |
 | `schemas/multidim-schema.json` + `schemas/explorer-schema.json` | View config `$ref`s into the grapher schema | manual: add `$ref` for **new** properties |
 | `schemas/dataset-schema.json` | Embedded `grapher_config` block (validates garden `.meta.yml`) | manual: mirror changes, preserve deviations |
 | `etl/collection/model/schema_types.py` | Generated Python TypedDicts | automatic (regenerate) |
 
-Unit tests enforce consistency between all of these (`tests/test_schema_types_generation.py`, `test_grapher_config_schema_sync` in `tests/test_metadata_schemas.py`), so partial syncs fail CI. Full background: `docs/guides/grapher-schema-sync.md`.
+Unit tests enforce consistency between all of these (`tests/test_schema_types_generation.py`, `test_grapher_config_schema_sync` and `test_vendored_patch_schema_matches_full_schema` in `tests/test_metadata_schemas.py`), so partial syncs fail CI. The last of those also catches a half-done refresh, i.e. the full file updated but not the patch one. Full background: `docs/guides/grapher-schema-sync.md`.
 
 ## Entry points
 
@@ -118,7 +119,9 @@ Rarer case — when the web team publishes a new schema version instead of mutat
 
 1. Bump `DEFAULT_GRAPHER_SCHEMA` in `etl/config.py`. (Keep it a concrete version, never `latest` — it is written into chart configs as `$schema`, and grapher's config migrations are keyed on the version.)
 2. Update every `$ref` in `schemas/multidim-schema.json` and `schemas/explorer-schema.json`: `sed -i 's/grapher-schema.NNN.json/grapher-schema.MMM.json/g' schemas/multidim-schema.json schemas/explorer-schema.json`.
-3. `.venv/bin/python scripts/generate_schema_types.py --refresh` (vendors the new version — the filename follows `DEFAULT_GRAPHER_SCHEMA`), then `git rm` the old vendored file.
+3. `.venv/bin/python scripts/generate_schema_types.py --refresh` (vendors the new version — both filenames follow `DEFAULT_GRAPHER_SCHEMA`), then `git rm` **both** old vendored files (`grapher-schema.NNN.json` and `grapher-schema.NNN.patch.json`).
+
+   ⚠️ **The new version needs its patch variant published too.** `_validate_grapher_config` derives `grapher-schema.MMM.patch.json` from each config's `$schema` and fetches it with no fallback, so if upstream published `MMM` without the patch variant, every grapher step carrying a `presentation.grapher_config` hard-fails on a 404. Check it before bumping (`curl -fsSI https://files.ourworldindata.org/schemas/grapher-schema.MMM.patch.json`) and flag it to the web team as part of the bump rather than discovering it afterwards.
 4. Continue from step 1's diff review above (diff old vendored vs new: `git diff --no-index schemas/grapher-schema.NNN.json schemas/grapher-schema.MMM.json`).
 
 ### Don't bump the `grapher_schema` pins in MDIM configs

@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from etl import files
 
@@ -84,3 +85,16 @@ def test_checksum_dict():
 def test_checksum_df():
     df = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "x", "y"]})
     assert files.checksum_df(df) == "34c7a3a435e4a0703b37904f09f967f1"
+
+
+def test_patch_schema_url():
+    assert (
+        files.patch_schema_url("https://files.ourworldindata.org/schemas/grapher-schema.011.json")
+        == "https://files.ourworldindata.org/schemas/grapher-schema.011.patch.json"
+    )
+    # Already patched — deriving again would give `.patch.patch.json`.
+    with pytest.raises(ValueError):
+        files.patch_schema_url("https://files.ourworldindata.org/schemas/grapher-schema.011.patch.json")
+    # Not a .json URL at all.
+    with pytest.raises(ValueError):
+        files.patch_schema_url("https://files.ourworldindata.org/schemas/grapher-schema.011")
