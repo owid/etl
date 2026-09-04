@@ -5,15 +5,12 @@ garden values rounded. The file is written locally and uploaded to the public S3
 
 Schema:
     {
-      "source": "<attribution of the FBS origin>",
-      "unit": "kilocalories per person per day",
+      "source": "<attribution of the FAO origin>",
       "stages": ["crop_production", "imports", ...],          # garden columns, in chain order
-      "entities": {
-        "<entity name>": {
-          "year": [1961, 1962, ...],
-          "crop_production": [..., ...],                       # one value per year, null where missing
-          ...
-        }
+      "nutrients": {
+        "energy":  {"unit": "kilocalories per person per day", "entities": {"<entity>": {"year": [...], "crop_production": [...], ...}}},
+        "protein": {"unit": "grams of protein per person per day", "entities": {...}},
+        "mass":    {"unit": "kilograms per person per day", "entities": {...}}
       }
     }
 
@@ -39,7 +36,7 @@ S3_BUCKET_NAME = "owid-public"
 S3_DATA_DIR = Path("data/food-supply-chain")
 FILENAME = "food-supply-chain-scl.json"
 
-# Decimal places kept for values (kcal per person per day).
+# Decimal places kept for values (kcal, grams of protein, or kilograms per person per day).
 NUM_DECIMALS = 2
 
 
@@ -48,26 +45,26 @@ def run() -> None:
     # Load inputs.
     #
     ds = paths.load_dataset("food_supply_chain_scl")
-    tb = ds.read("food_supply_chain_scl")
-    stages = [column for column in tb.columns if column not in ["country", "year"]]
+    nutrients = {}
+    stages = None
+    for nutrient in ["energy", "protein", "mass"]:
+        tb = ds.read(nutrient)
+        stages = [column for column in tb.columns if column not in ["country", "year"]]
 
-    #
-    # Reshape.
-    #
-    entities = {}
-    for country, rows in tb.sort_values(["country", "year"]).groupby("country", observed=True, sort=True):
-        entity = {"year": rows["year"].astype(int).tolist()}
-        for stage in stages:
-            values = rows[stage].astype(float).round(NUM_DECIMALS)
-            entity[stage] = [None if v != v else v for v in values]
-        entities[str(country)] = entity
+        #
+        # Reshape.
+        #
+        entities = {}
+        for country, rows in tb.sort_values(["country", "year"]).groupby("country", observed=True, sort=True):
+            entity = {"year": rows["year"].astype(int).tolist()}
+            for stage in stages:
+                values = rows[stage].astype(float).round(NUM_DECIMALS)
+                entity[stage] = [None if v != v else v for v in values]
+            entities[str(country)] = entity
+        nutrients[nutrient] = {"unit": tb["food"].metadata.unit, "entities": entities}
+        source = tb["food"].metadata.origins[0].attribution
 
-    data = {
-        "source": tb["food"].metadata.origins[0].attribution,
-        "unit": tb["food"].metadata.unit,
-        "stages": stages,
-        "entities": entities,
-    }
+    data = {"source": source, "stages": stages, "nutrients": nutrients}
 
     #
     # Save outputs.
@@ -77,7 +74,13 @@ def run() -> None:
     local_file = export_dir / FILENAME
     with open(local_file, "w") as f:
         json.dump(data, f, separators=(",", ":"))
-    log.info("food_supply_chain_scl.export", n_entities=len(entities), n_stages=len(stages), file=str(local_file))
+    log.info(
+        "food_supply_chain_scl.export",
+        n_entities=len(entities),
+        n_stages=len(stages),
+        n_nutrients=len(nutrients),
+        file=str(local_file),
+    )
 
     s3_path = f"s3://{S3_BUCKET_NAME}/{S3_DATA_DIR / FILENAME}"
     if DRY_RUN:

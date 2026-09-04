@@ -4,33 +4,35 @@
 # from the data itself: the item list and the crop/animal/processed roles come from FAO's item groups, and energy
 # densities are reverse-engineered from FAO's food figures. This file holds only what cannot come from the data.
 
-# 1. Energy densities, in kcal per 100 g, for items that nobody eats, so that nothing can be reverse-engineered.
-#    Each item is valued as the human food it would be if eaten: defatted oilseed flours for the cakes, the cereal
-#    brans as sold for human consumption, pure ethanol, pure oil.
-#    Source: USDA FoodData Central, SR Legacy (soy flour defatted 330, sunflower seed flour 326, sesame flour 333,
-#    cottonseed flour 332, peanut flour defatted 327; wheat bran 216, rice bran 316, corn bran 224, oat bran 246;
-#    hemp seed 553; vegetable oils 884). Ethanol is 7 kcal per gram.
+# 1. Energy (kcal per 100 g) and protein (g per 100 g) for items that nobody eats, so that nothing can be
+#    reverse-engineered. Each item is valued as the human food it would be if eaten: defatted oilseed flours for the
+#    cakes, the cereal brans as sold for human consumption, pure ethanol, pure oil.
+#    Source: USDA FoodData Central, SR Legacy. Energy: soy flour defatted 330, sunflower seed flour 326, sesame flour
+#    333, cottonseed flour 332, peanut flour defatted 327; wheat bran 216, rice bran 316, corn bran 224, oat bran 246;
+#    hemp seed 553; vegetable oils 884. Protein: soy flour defatted 47, sunflower seed flour 48, sesame flour 50,
+#    cottonseed flour 50, peanut flour defatted 52; wheat bran 15.6, rice bran 13.4, corn bran 8.4, oat bran 17.3;
+#    hemp seed 31.6; oils and ethanol 0. Ethanol is 7 kcal per gram.
 fixed_densities:
   families:
     # Applied by name pattern to every item whose name starts with the pattern, unless the item is listed
     # individually below.
-    - {pattern: "Cake of", density: 330, note: Defatted oilseed flours, 326-333 in USDA.}
-    - {pattern: "Cake,", density: 330, note: Same family (oilseeds not elsewhere classified).}
-    - {pattern: "Bran of", density: 216, note: Wheat bran as the default for cereal brans without a USDA entry.}
+    - {pattern: "Cake of", energy: 330, protein: 47, note: "Defatted oilseed flours, 326-333 in USDA."}
+    - {pattern: "Cake,", energy: 330, protein: 47, note: "Same family (oilseeds not elsewhere classified)."}
+    - {pattern: "Bran of", energy: 216, protein: 15.6, note: "Wheat bran as the default for cereal brans without a USDA entry."}
   items:
-    - {code: 158, name: "Cane sugar, centrifugal", density: 380, note: Raw sugar, USDA brown sugar 380; no food use is reported for it because it is refined further.}
-    - {code: 35, name: "Bran of rice", density: 316}
-    - {code: 59, name: "Bran of maize", density: 224}
-    - {code: 77, name: "Bran of oats", density: 246}
-    - {code: 846, name: "Gluten feed and meal", density: 330, note: Valued as the cakes; a protein by-product of maize milling.}
-    - {code: 632, name: "Undenatured ethyl alcohol of an alcoholic strength by volume of 80% vol or higher", density: 700}
-    - {code: 634, name: "Undenatured ethyl alcohol of an alcoholic strength by volume of less than 80% vol; spirits, liqueurs and other spirituous beverages", density: 700}
-    - {code: 1276, name: "Industrial monocarboxylic fatty acids; acid oils from refining", density: 884, note: Fat that left the food chain to industry.}
-    - {code: 1277, name: "Residues of fatty substances", density: 884}
-    - {code: 1274, name: "Animal or vegetable fats and oils and their fractions, chemically modified, except those hydrogenated, inter-esterified, re-esterified or elaidinized; inedible mixtures or preparations of animal or vegetable fats or oils", density: 884}
-    - {code: 336, name: "Hempseed", density: 553}
-    - {code: 337, name: "Oil of hempseed", density: 884}
-    - {code: 1225, name: "Tallow", density: 884, note: Only used where no food-based density exists.}
+    - {code: 158, name: "Cane sugar, centrifugal", energy: 380, protein: 0, note: "Raw sugar, USDA brown sugar 380; no food use is reported for it because it is refined further."}
+    - {code: 35, name: "Bran of rice", energy: 316, protein: 13.4}
+    - {code: 59, name: "Bran of maize", energy: 224, protein: 8.4}
+    - {code: 77, name: "Bran of oats", energy: 246, protein: 17.3}
+    - {code: 846, name: "Gluten feed and meal", energy: 330, protein: 47, note: "Valued as the cakes; a protein by-product of maize milling."}
+    - {code: 632, name: "Undenatured ethyl alcohol of an alcoholic strength by volume of 80% vol or higher", energy: 700, protein: 0}
+    - {code: 634, name: "Undenatured ethyl alcohol of an alcoholic strength by volume of less than 80% vol; spirits, liqueurs and other spirituous beverages", energy: 700, protein: 0}
+    - {code: 1276, name: "Industrial monocarboxylic fatty acids; acid oils from refining", energy: 884, protein: 0, note: "Fat that left the food chain to industry."}
+    - {code: 1277, name: "Residues of fatty substances", energy: 884, protein: 0}
+    - {code: 1274, name: "Animal or vegetable fats and oils and their fractions, chemically modified, except those hydrogenated, inter-esterified, re-esterified or elaidinized; inedible mixtures or preparations of animal or vegetable fats or oils", energy: 884, protein: 0}
+    - {code: 336, name: "Hempseed", energy: 553, protein: 31.6}
+    - {code: 337, name: "Oil of hempseed", energy: 884, protein: 0}
+    - {code: 1225, name: "Tallow", energy: 884, protein: 0, note: "Only used where no food-based density exists."}
 
 # 2. Items that are never food, whatever happens to them. Their density is zero, which removes them from every
 #    flow consistently (the balance identity is linear in the density).
