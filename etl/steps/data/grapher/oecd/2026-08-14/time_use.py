@@ -13,7 +13,6 @@ def run() -> None:
     ds_garden = paths.load_dataset("time_use")
 
     tb = ds_garden.read("time_use")
-    tb_groups = ds_garden.read("time_use_chart_groups", reset_index=False)
 
     #
     # Process data.
@@ -25,7 +24,5 @@ def run() -> None:
     #
     # Save outputs.
     #
-    ds_grapher = paths.create_dataset(
-        tables=[tb, tb_groups], check_variables_metadata=True, default_metadata=ds_garden.metadata
-    )
+    ds_grapher = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata)
     ds_grapher.save()

@@ -13,9 +13,13 @@ of what the finer split resolves is where each survey drew its coding lines. The
 `ai/time_use_comparability/`. A ten-group version and a 540x824 mobile one were built and dropped; if
 the aggregation outlives this step, move the sums into garden so the four categories are in the catalog.
 
-The garden step (`time_use_chart_groups`) still hands over ten groups, so `GROUPS` and `CATEGORIES`
-remain here as the recipe for summing them into four — which is all they are now, and
-`add_main_category_totals` asserts the two stay in step.
+**Each of the four IS one of the source's own top-level categories**, so nothing is aggregated here
+beyond a single addition. Codes 1, 3 and 4 are read straight off garden's `time_use` table as
+`paid_work_or_study`, `personal_care` and `leisure`; "Unpaid work & other" is code 2 plus code 5, the
+source's small religious/civic/uncategorized bucket, which is a presentation choice and so belongs
+here rather than in the catalog. A ten-display-group table used to sit in between and was summed back
+up to these same numbers, which is a detour: it reconstructed the source's own totals to within
+3e-05 minutes, and no chart used any of its 33 indicators.
 
 **26 countries over 2010-2024**, which is what garden publishes rather than anything this step
 selects: the survey-year cutoff and the reasoning behind it live beside `EARLIEST_SURVEY_YEAR` in
@@ -213,72 +217,25 @@ MINUTES_PER_DAY = 1440
 # library and Lato actually live. Setting them here would also be unreproducible — matplotlib on this
 # machine has neither Lato nor Playfair Display, so a step that asked for them would silently fall
 # back and emit different type depending on which machine built it.
-# `Unpaid work & other` is named for what it holds: the OECD's unpaid-work category plus its small
-# "other" category (religious and civic activities, and uncategorized time), which garden folds
-# into the same group.
-CATEGORIES = [
-    {"name": "Paid work or study", "color": ("deep", 3), "columns": ["paid_work", "education"]},
-    {
-        "name": "Personal care",
-        "color": ("deep", 7),
-        "columns": ["sleep", "eating_and_drinking", "personal_care"],
-    },
-    {
-        "name": "Unpaid work & other",
-        "color": ("deep", 5),
-        "columns": ["housework_and_shopping", "other_unpaid_work"],
-    },
-    {
-        "name": "Leisure",
-        "color": ("deep", 0),
-        "columns": ["tv_and_radio", "seeing_friends", "other_leisure"],
-    },
-]
-
-# The ten groups, in bar order, which must match the categories' column order above (asserted).
-# `label` is the name for a group standing on its own; wherever its category's name is beside it, the
-# three residual buckets shorten to "Other" (see `label_in_context`), which is why they are named
-# "Other <category>" here rather than repeating the category outright.
-#
-# Two of these used to carry a `contents` key, which `build_note` wrote into the Note to say what a
-# group held where its name did not. It went with the sentence that carried it: this chart draws the
-# four categories, so the Note's room goes to caveats about THEM (see `build_note`), and what the ten
-# groups hold is said in their `description_key` in garden, where the ten are actually on show.
-GROUPS = [
-    {"column": "paid_work", "label": "Paid work", "color": ("deep", 3)},
-    {"column": "education", "label": "Education", "color": ("tint", 3, 0.45)},
-    {"column": "sleep", "label": "Sleep", "color": ("deep", 7)},
-    {"column": "eating_and_drinking", "label": "Eating & drinking", "color": ("tint", 7, 0.3)},
-    {"column": "personal_care", "label": "Other personal care", "color": ("tint", 7, 0.68)},
-    {"column": "housework_and_shopping", "label": "Housework & shopping", "color": ("deep", 5)},
-    {"column": "other_unpaid_work", "label": "Other unpaid work", "color": ("tint", 5, 0.45)},
-    {"column": "tv_and_radio", "label": "TV & Radio", "color": ("deep", 0)},
-    {"column": "seeing_friends", "label": "Seeing friends", "color": ("tint", 0, 0.42)},
-    {"column": "other_leisure", "label": "Other leisure", "color": ("tint", 0, 0.78)},
-]
-
-# Not drawn — the chart shows the four categories — but asserted on the input, because a garden table
-# that stopped carrying it would have changed shape under this step.
-TOTAL_LEISURE_COLUMN = "total_leisure"
-
 # A group's values are drawn only where this share of countries can hold one; otherwise none of them
 # are. A number on a handful of rows reads as a fact about those countries rather than as the rest
 # being too narrow to print — education fitted on 1 of 35 rows, and that one number said nothing.
 VALUE_LABEL_COVERAGE = 0.75
 
-# Countries are ranked by this group or category, most minutes at the top. A GROUPS column ranks by
-# that group alone; a CATEGORIES name ranks by the sum of its groups. Asserted in load_chart_groups.
-# The alternative chart draws the four categories as single segments and nothing below them. The case
-# for it is in `ai/time_use_comparability/`: the residual buckets *inside* each category vary two- to
-# threefold across countries (other unpaid work runs 39-132 minutes, other leisure 78-179) while the
-# categories themselves vary far less (personal care is 665 +/- 31), so most of what the ten-segment
-# split resolves at that level is where each survey drew its coding lines rather than how people
-# differ. Aggregating takes the mean coefficient of variation across the segments from 0.22 to 0.12.
+# The four drawn segments. Each is one of the source's own top-level categories, so what this chart
+# resolves is what the OECD itself publishes at that level.
 #
-# These four name Chart colors library colors outright rather than the seaborn placeholders the ten-group
-# version uses: the reason for placeholders is that the fonts cannot be reproduced here, and colors can,
-# so a render that shows the real ones is simply a truer preview of the frame. Figma still binds each to
-# its library style — the hex is the preview, the binding is the artifact.
+# A finer ten-group version was built and dropped, and the case against it is in
+# `ai/time_use_comparability/`: the residual buckets *inside* each category vary two- to threefold
+# across countries (other unpaid work runs 39-132 minutes, other leisure 78-179) while the categories
+# themselves vary far less (personal care is 665 +/- 31), so most of what a ten-segment split resolves
+# at that level is where each survey drew its coding lines rather than how people differ. Aggregating
+# takes the mean coefficient of variation across the segments from 0.22 to 0.12.
+#
+# These four name Chart colors library colors outright rather than the seaborn placeholders the
+# ten-group version used: the reason for a placeholder is that a font cannot be reproduced here and a
+# color can, so a render that shows the real ones is simply a truer preview of the frame. Figma still
+# binds each to its library style — the hex is the preview, the binding is the artifact.
 #
 # Why not the detailed chart's Coral, Denim, Copper and Dark Olive Green: both of that set's problems
 # appear only once ten segments become four. Its neighbours merge in grayscale without the tints that
@@ -330,6 +287,8 @@ VALUE_LABEL_COVERAGE = 0.75
 MAIN_CATEGORY_GROUPS = [
     {
         "column": "main_paid_work_or_study",
+        # The source's own code 1.
+        "source_columns": ["paid_work_or_study"],
         "members": ["Paid work", "Commuting", "School or classes", "Homework"],
         "compact": True,
         "label": "Paid work or study",
@@ -339,6 +298,8 @@ MAIN_CATEGORY_GROUPS = [
     },
     {
         "column": "main_personal_care",
+        # The source's own code 3.
+        "source_columns": ["personal_care"],
         "members": ["Sleep", "Eating & drinking", "Grooming & health"],
         "label": "Personal care",
         # Camel, with Camel* for the name: the fill itself measures 2.8:1 as text.
@@ -351,6 +312,10 @@ MAIN_CATEGORY_GROUPS = [
     },
     {
         "column": "main_unpaid_work_and_other",
+        # Code 2 plus code 5 — the only addition this chart makes. Code 5 is religious and civic
+        # activities and uncategorized time, 18 min/day, too small to read as its own segment and
+        # closest in kind to unpaid work; folding it is a presentation call, which is why it is here.
+        "source_columns": ["unpaid_work", "other_activities"],
         # "Travel", not "Volunteering". Both are in here, but a five-name list has to name the five
         # biggest things, and across the 26 charted countries household travel is a median 17.3
         # min/day reported by 25 of them while volunteering is 3.0 min — the list was naming the
@@ -364,6 +329,8 @@ MAIN_CATEGORY_GROUPS = [
     },
     {
         "column": "main_leisure",
+        # The source's own code 4.
+        "source_columns": ["leisure"],
         "members": ["TV & radio", "Seeing friends", "Sports", "Events", "Hobbies & other"],
         "compact": True,
         "as_hours": True,
@@ -432,7 +399,7 @@ MAIN_CATEGORIES = [
     {
         "name": group["label"],
         "color": group["color"],
-        "columns": [group["column"]],
+        "columns": [group["column"]],  # one drawn segment per category
         # What the segment holds, listed under its name — the same names the detailed chart sets inside
         # each bracket, so a reader moving between the two versions recognises them.
         "members": group["members"],
@@ -771,48 +738,40 @@ def sort_rows(tb: Table, layout: dict) -> Table:
 
 
 def add_main_category_totals(tb: Table) -> Table:
-    """Add each top-level category's total as its own column, for the four-category chart.
+    """Build each drawn category from the source's own top-level columns.
 
-    This is a chart-side sum of this step's own display groups, which is why it lives here rather than
-    in garden: garden owns the mapping from the OECD's 30 activities into the ten groups, and
-    `CATEGORIES` is how *this* step groups those ten. If the four-category version is the one that
-    ships, promote the sums to garden so the aggregate is in the catalog too.
+    Three of the four are a straight rename; "Unpaid work & other" is the one addition. The day has to
+    still close afterwards, which is what catches a source column read under the wrong name.
     """
-    assert [group["label"] for group in MAIN_CATEGORY_GROUPS] == [category["name"] for category in CATEGORIES], (
-        "The four-category groups must stay in the same order as CATEGORIES, since they are its totals."
-    )
-    for group, category in zip(MAIN_CATEGORY_GROUPS, CATEGORIES):
-        tb[group["column"]] = tb[list(category["columns"])].sum(axis=1)
+    for group in MAIN_CATEGORY_GROUPS:
+        tb[group["column"]] = tb[list(group["source_columns"])].sum(axis=1)
     totals = tb[[group["column"] for group in MAIN_CATEGORY_GROUPS]].sum(axis=1)
     assert totals.between(MINUTES_PER_DAY - 1, MINUTES_PER_DAY + 1).all(), (
-        f"The four categories must still spend the whole day: got {totals.min():.1f}-{totals.max():.1f}."
+        f"The four categories must spend the whole day: got {totals.min():.1f}-{totals.max():.1f}."
     )
     return tb
 
 
 def load_chart_groups() -> tuple[Table, dict[str, str]]:
-    """Load the precomputed chart groups (total population), unsorted — `sort_rows` ranks them.
+    """Load garden's `time_use` table (total population), unsorted — `sort_rows` ranks them.
 
     Returns the table plus the age-of-reference exceptions (country -> age range) for the note.
     """
     ds = paths.load_dataset("time_use")
-    tb = ds.read("time_use_chart_groups")
+    tb = ds.read("time_use")
     tb = tb[tb["sex"] == "total"].drop(columns=["sex"])
 
-    group_columns = [group["column"] for group in GROUPS]
-    assert not set(group_columns + [TOTAL_LEISURE_COLUMN]) - set(tb.columns), "Chart group columns changed."
+    source_columns = sorted({column for group in MAIN_CATEGORY_GROUPS for column in group["source_columns"]})
+    assert not set(source_columns) - set(tb.columns), (
+        f"Source columns changed in garden: missing {sorted(set(source_columns) - set(tb.columns))}."
+    )
     # No sort here. `sort_rows` ranks by the layout's own leading segment and runs after this, so a sort
-    # in this function only ever set an order that was thrown away — and it was set by `paid_work`,
-    # which is not what this chart draws: ranking the 26 rows by `paid_work` alone leaves the drawn
-    # `paid_work + education` segment out of order on 6 of them (South Korea, Sweden, Luxembourg,
-    # Turkey, South Africa, France), so the trap was live.
+    # in this function only ever set an order that was thrown away.
 
-    detail = ds.read("time_use")
-    detail = detail[detail["sex"] == "total"]
-    check_members_are_the_largest(detail[detail["country"].isin(set(tb["country"]))])
+    check_members_are_the_largest(tb)
     ages = {
         str(row["country"]): str(row["age_of_reference"])
-        for _, row in detail.iterrows()
+        for _, row in tb.iterrows()
         if str(row["age_of_reference"]) != "15-64"
     }
 
@@ -822,27 +781,14 @@ def load_chart_groups() -> tuple[Table, dict[str, str]]:
     # redrawn.
     assert len(tb) == 26, f"Garden published {len(tb)} countries, not the 26 this layout is drawn for."
     assert tb["country"].is_unique, "One row per country expected."
-    # The category brackets span contiguous runs of segments, which only holds if the bar order
-    # is the categories' column order concatenated.
-    assert group_columns == [column for category in CATEGORIES for column in category["columns"]], (
-        "Bar order no longer matches the category grouping, so a bracket would span the wrong segments."
-    )
-    # A residual "other" group is whatever its category has left over, so it belongs at that
-    # category's far end rather than between two named activities.
-    for category in CATEGORIES:
-        labels = [next(g["label"] for g in GROUPS if g["column"] == column) for column in category["columns"]]
-        residual = [index for index, label in enumerate(labels) if label.startswith("Other ")]
-        assert all(index == len(labels) - 1 for index in residual), (
-            f"An 'other' group is not last within {category['name']}: {labels}"
-        )
-    # The groups partition the day (asserted strictly in garden; re-checked here at the source's
-    # own rounding tolerance so a broken load cannot draw bars that misrepresent shares).
-    assert ((tb[group_columns].sum(axis=1) - MINUTES_PER_DAY).abs() < 2.0).all(), "Rows do not sum to 24 hours."
+    # The source's five top-level categories partition the day (asserted strictly in garden; re-checked
+    # here at the source's own rounding tolerance so a broken load cannot draw bars that misrepresent
+    # shares).
+    assert ((tb[source_columns].sum(axis=1) - MINUTES_PER_DAY).abs() < 2.0).all(), "Rows do not sum to 24 hours."
     # The source's three age-of-reference exceptions are all pre-2010 surveys, so garden's cutoff
     # removes them and everything here can say "aged 15 to 64" unqualified — garden asserts that too.
     # Assert it rather than assume it: `build_note` names the exceptions if any ever arrive, and this
     # is what says the subtitle would be wrong before the Note started covering for it.
-    ages = {country: age for country, age in ages.items() if country in set(tb["country"])}
     assert not ages, f"Garden published an age-of-reference exception the subtitle does not cover: {sorted(ages)}."
 
     return tb, ages
@@ -851,7 +797,7 @@ def load_chart_groups() -> tuple[Table, dict[str, str]]:
 def build_source_citation(tb: Table) -> str:
     """Cite the producer behind the chart from the origins, as `producer (year)`."""
     years: dict[str, list[str]] = {}
-    for origin in tb["paid_work"].metadata.origins:
+    for origin in tb[MAIN_CATEGORY_GROUPS[0]["source_columns"][0]].metadata.origins:
         year = origin.date_published.split("-")[0] if origin.date_published else ""
         seen = years.setdefault(origin.producer, [])
         if year and year not in seen:
@@ -1468,16 +1414,6 @@ def category_variants(name: str, layout: dict) -> list[list[str]]:
     return variants
 
 
-def label_in_context(group: dict) -> str:
-    """A group's name for use where its category's name is already beside it.
-
-    The residual buckets become just "Other": "Other unpaid work" set inside the "Unpaid work &
-    other" bracket repeats the bracket, and at 68px wraps onto three lines to do it. Where a group
-    stands on its own — a flat list, or a label over its own segment — `label` is used instead.
-    """
-    return "Other" if group["label"].startswith("Other ") else group["label"]
-
-
 def layout_bracketed_names(spans: dict, layout: dict) -> list[dict]:
     """Each category's member names laid out inside its own bracket's span, one per line.
 
@@ -1504,7 +1440,7 @@ def layout_bracketed_names(spans: dict, layout: dict) -> list[dict]:
         lines = [
             [(text, group)]
             for group in members
-            for text in wrap_to_width(label_in_context(group), end - start, fontsize).split("\n")
+            for text in wrap_to_width(group["label"], end - start, fontsize).split("\n")
         ]
         blocks.append({"name": category["name"], "lines": lines, "span": (start, end)})
     return blocks
@@ -1882,12 +1818,12 @@ def format_hours(minutes: float) -> list[str]:
 def value_candidates(group: dict, minutes: float, with_suffix: bool) -> list[str]:
     """In-bar label candidates for a segment, longest first.
 
-    A segment worth hours rather than minutes says so — sleep on the detailed chart, personal care on
-    the four-category one — and the leftmost segment carries the unit for the row.
+    Every drawn segment is worth hours rather than minutes, so all four set `as_hours`; `unit_suffix`
+    puts the unit on the leftmost segment of a row where the values are minutes.
     """
-    if group.get("as_hours") or group["column"] == "sleep":
+    if group.get("as_hours"):
         return format_hours(minutes)
-    if with_suffix and group.get("unit_suffix", group["column"] == "paid_work"):
+    if with_suffix and group.get("unit_suffix"):
         return [f"{round(minutes)} mins", f"{round(minutes)}"]
     return [f"{round(minutes)}"]
 
