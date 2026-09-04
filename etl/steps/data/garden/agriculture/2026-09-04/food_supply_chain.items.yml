@@ -19,12 +19,10 @@
 #           losses, tourist consumption, residuals, food) are summed over all items regardless of role.
 #   fao_group (optional): "vegetal" or "animal". Only needed where FAO's own grouping (its "Vegetal Products" and
 #           "Animal Products" items) differs from the natural group of the role. Used by the partition check.
-#   fixed_factor_kcal_per_100g (optional): energy conversion factor to use instead of the one reverse-engineered
-#           from FBS (food kcal / food tonnes). Set for items whose direct food use is a small sliver of their
-#           production (so the reverse-engineered factor rests on an unrepresentative subset and is then applied
-#           to all of the production), and for oils, whose reverse-engineered factors exceed the physical maximum
-#           of about 884 kcal/100g. Values are from FAO (2001), "Food Balance Sheets: A Handbook", Annex "Food
-#           composition tables" (kcal per 100 g of retail weight): https://www.fao.org/4/X9892E/X9892e05.htm
+#   fixed_factor_kcal_per_100g (optional): energy factor to use instead of the one reverse-engineered from FBS. Not
+#           used by any item at the moment; it exists for items with no food use at all, for which nothing can be
+#           reverse-engineered (see "Palm kernels" under excluded). Source for any value: FAO (2001), "Food Balance
+#           Sheets: A Handbook", Annex "Food composition tables": https://www.fao.org/4/X9892E/X9892e05.htm
 items:
   # Cereals.
   - {code: 2511, name: "Wheat and products", role: primary_crop}
@@ -42,10 +40,9 @@ items:
   - {code: 2533, name: "Sweet potatoes", role: primary_crop}
   - {code: 2534, name: "Roots, Other", role: primary_crop}
   - {code: 2535, name: "Yams", role: primary_crop}
-  # Sugar crops. Almost all of their production goes to processing (into sugar); only a sliver is eaten as such.
-  # FAO handbook: "Sugar cane" 30 kcal, "Sugar beets" 70 kcal.
-  - {code: 2536, name: "Sugar cane", role: primary_crop, fixed_factor_kcal_per_100g: 30}
-  - {code: 2537, name: "Sugar beet", role: primary_crop, fixed_factor_kcal_per_100g: 70}
+  # Sugar crops.
+  - {code: 2536, name: "Sugar cane", role: primary_crop}
+  - {code: 2537, name: "Sugar beet", role: primary_crop}
   # Sugar and sweeteners (derived from sugar crops, and from cereals in the case of other sweeteners).
   - {code: 2541, name: "Sugar non-centrifugal", role: derived_vegetal}
   - {code: 2542, name: "Sugar (Raw Equivalent)", role: derived_vegetal}
@@ -60,31 +57,28 @@ items:
   - {code: 2555, name: "Soyabeans", role: primary_crop}
   - {code: 2557, name: "Sunflower seed", role: primary_crop}
   - {code: 2558, name: "Rape and Mustardseed", role: primary_crop}
-  # Cottonseed: food use is a few thousand tonnes out of tens of millions. FAO handbook: "Cottonseed" 253 kcal.
-  - {code: 2559, name: "Cottonseed", role: primary_crop, fixed_factor_kcal_per_100g: 253}
+  - {code: 2559, name: "Cottonseed", role: primary_crop}
   - {code: 2560, name: "Coconuts - Incl Copra", role: primary_crop}
   - {code: 2561, name: "Sesame seed", role: primary_crop}
   - {code: 2563, name: "Olives (including preserved)", role: primary_crop}
-  # Other oil crops: mostly processed into oil, little direct food use. FAO handbook: "Oilseeds nes" 387 kcal.
-  - {code: 2570, name: "Oilcrops, Other", role: primary_crop, fixed_factor_kcal_per_100g: 387}
-  # Vegetable oils. All pure oils are 884 kcal per 100 g in the FAO handbook. The reverse-engineered factors come
-  # out at 900-1,100, above the physical maximum, so the fixed factor is used for every oil.
-  - {code: 2571, name: "Soyabean Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
-  - {code: 2572, name: "Groundnut Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
-  - {code: 2573, name: "Sunflowerseed Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
-  - {code: 2574, name: "Rape and Mustard Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
-  - {code: 2575, name: "Cottonseed Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
+  - {code: 2570, name: "Oilcrops, Other", role: primary_crop}
+  # Vegetable oils.
+  - {code: 2571, name: "Soyabean Oil", role: derived_vegetal}
+  - {code: 2572, name: "Groundnut Oil", role: derived_vegetal}
+  - {code: 2573, name: "Sunflowerseed Oil", role: derived_vegetal}
+  - {code: 2574, name: "Rape and Mustard Oil", role: derived_vegetal}
+  - {code: 2575, name: "Cottonseed Oil", role: derived_vegetal}
   # Palm oil and palm kernel oil are the only oils tagged as primary crops. The FBS item that carries the oil palm
   # harvest ("Palm kernels", excluded below) has no food use at all, so no factor can be reverse-engineered for it
   # and it cannot be the entry point; the oils are the first point where oil palm calories can be counted.
-  - {code: 2576, name: "Palmkernel Oil", role: primary_crop, fixed_factor_kcal_per_100g: 884}
-  - {code: 2577, name: "Palm Oil", role: primary_crop, fixed_factor_kcal_per_100g: 884}
-  - {code: 2578, name: "Coconut Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
-  - {code: 2579, name: "Sesameseed Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
-  - {code: 2580, name: "Olive Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
-  - {code: 2581, name: "Ricebran Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
-  - {code: 2582, name: "Maize Germ Oil", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
-  - {code: 2586, name: "Oilcrops Oil, Other", role: derived_vegetal, fixed_factor_kcal_per_100g: 884}
+  - {code: 2576, name: "Palmkernel Oil", role: primary_crop}
+  - {code: 2577, name: "Palm Oil", role: primary_crop}
+  - {code: 2578, name: "Coconut Oil", role: derived_vegetal}
+  - {code: 2579, name: "Sesameseed Oil", role: derived_vegetal}
+  - {code: 2580, name: "Olive Oil", role: derived_vegetal}
+  - {code: 2581, name: "Ricebran Oil", role: derived_vegetal}
+  - {code: 2582, name: "Maize Germ Oil", role: derived_vegetal}
+  - {code: 2586, name: "Oilcrops Oil, Other", role: derived_vegetal}
   # Vegetables.
   - {code: 2601, name: "Tomatoes and products", role: primary_crop}
   - {code: 2602, name: "Onions", role: primary_crop}
@@ -143,9 +137,9 @@ items:
   - {code: 2766, name: "Cephalopods", role: animal_product}
   - {code: 2767, name: "Molluscs, Other", role: animal_product}
   - {code: 2769, name: "Aquatic Animals, Others", role: animal_product}
-  # Fish oils: little direct food use, factors unstable. FAO handbook: fish body and liver oils 902 kcal.
-  - {code: 2781, name: "Fish, Body Oil", role: animal_product, fixed_factor_kcal_per_100g: 902}
-  - {code: 2782, name: "Fish, Liver Oil", role: animal_product, fixed_factor_kcal_per_100g: 902}
+  # Fish oils.
+  - {code: 2781, name: "Fish, Body Oil", role: animal_product}
+  - {code: 2782, name: "Fish, Liver Oil", role: animal_product}
 
 # Individual items deliberately left out of the chain. Each is asserted to exist in the input table, so that a
 # change at FAO does not go unnoticed, but contributes to no stage.

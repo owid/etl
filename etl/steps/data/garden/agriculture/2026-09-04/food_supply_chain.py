@@ -11,10 +11,9 @@ that a waterfall chart can show where calories go between crop production and fo
 
 Energy factors (kcal per 100 g) are reverse-engineered from FBS itself, as food supply in kcal divided by food
 supply in tonnes, per item, country and year. The same factor is applied to all elements of an item, so the
-balance identity above holds in kcal exactly as it holds in tonnes. Items whose direct food use is a sliver of
-their production, and oils (whose implied factors exceed the physical maximum), use fixed factors from FAO's own
-food composition tables instead (declared in `food_supply_chain.items.yml`). Implausible country-year factors
-(outside a band around the item's pooled median) fall back to that median.
+balance identity above holds in kcal exactly as it holds in tonnes, and summing food over items reproduces FAO's own
+food supply in kcal. Implausible country-year factors (outside a band around the item's pooled median, typically
+where a tiny food quantity is rounded to zero) fall back to that median.
 
 The curated item list, the role of each item (primary crop, derived vegetal product, animal product), and the
 fixed factors live in `food_supply_chain.items.yml`. Changing the treatment of derived products (which items count
@@ -121,9 +120,6 @@ SUBTRACTED_STAGES = [
 # median (over all countries and years); otherwise the median is used. Guards against country-years where a tiny
 # food quantity is rounded to zero (or near zero) in FBS, which gives absurd factors.
 FACTOR_BAND = 2.0
-# No food has more energy than pure fat: 902 kcal per 100 g is the highest factor in FAO's food composition tables
-# (rendered animal fats and fish oils). Reverse-engineered factors above it are artifacts and fall back to the median.
-FACTOR_MAX = 902
 # Item codes of FAO's aggregate items used to check that the curated items partition the total food supply.
 TOTAL_ITEM_CODE = "00002901"
 VEGETAL_ITEM_CODE = "00002903"
@@ -163,8 +159,9 @@ def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
     natural_group = items["role"].map(
         {"primary_crop": "vegetal", "derived_vegetal": "vegetal", "animal_product": "animal"}
     )
-    if "fao_group" not in items.columns:
-        items["fao_group"] = None
+    for optional_column in ["fao_group", "fixed_factor_kcal_per_100g"]:
+        if optional_column not in items.columns:
+            items[optional_column] = np.nan
     items["fao_group"] = items["fao_group"].fillna(natural_group)
     items = items.set_index("item_code", verify_integrity=True)
 
@@ -253,10 +250,8 @@ def add_energy_factors(tb: Table) -> Table:
 
     # Pooled median per item, over all countries and years with a finite factor.
     tb["factor_median"] = tb.groupby("item_code", observed=True)["factor_raw"].transform("median")
-    within_band = (
-        (tb["factor_raw"] >= tb["factor_median"] / FACTOR_BAND)
-        & (tb["factor_raw"] <= tb["factor_median"] * FACTOR_BAND)
-        & (tb["factor_raw"] <= FACTOR_MAX)
+    within_band = (tb["factor_raw"] >= tb["factor_median"] / FACTOR_BAND) & (
+        tb["factor_raw"] <= tb["factor_median"] * FACTOR_BAND
     )
 
     tb["factor_source"] = "fallback_median"
@@ -275,14 +270,15 @@ def add_energy_factors(tb: Table) -> Table:
 
 def sanity_check_energy_factors(tb: Table, items: Table) -> None:
     """Check the factor distribution and log a per-item table of factors for review."""
-    error = f"Energy factors must be positive and cannot exceed {FACTOR_MAX} kcal per 100 g."
-    assert (tb["factor"] > 0).all() and (tb["factor"] <= FACTOR_MAX).all(), error
+    assert (tb["factor"] > 0).all(), "Energy factors must be positive."
 
     # Share of production (tonnes) converted with a fallback (median) factor, per item and overall.
     fallback_production = tb["production"].where(tb["factor_source"] == "fallback_median", 0)
     share_fallback = fallback_production.sum() / tb["production"].sum()
+    # NOTE: Most of this is sugar cane: in countries where no cane is eaten as such, its factor cannot be
+    # reverse-engineered for that country-year, and the pooled median (about 29 kcal per 100 g) is used instead.
     error = f"{100 * share_fallback:.1f}% of production (in tonnes) was converted with fallback factors."
-    assert share_fallback < 0.02, error
+    assert share_fallback < 0.10, error
 
     summary = tb.groupby("item_code", observed=True).agg(
         median=("factor_median", "first"),
@@ -365,8 +361,7 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table) -> None:
     )
     assert gap.max() < 0.01, error
     # Our food stage should reproduce FAO's own food supply (its "Grand Total" item). The two differ only through
-    # the fixed factors (oils in particular, where FAO's implied factors are above the physical maximum) and through
-    # the population series used. For World this is under 1%.
+    # the fallback factors and through the population series used.
     fao_total = tb_fbsc[
         (tb_fbsc["country"] == "World")
         & (tb_fbsc["element_code"] == "0664pc")
