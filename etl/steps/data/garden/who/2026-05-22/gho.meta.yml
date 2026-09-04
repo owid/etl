@@ -203,7 +203,3 @@ tables:
           - "Interval lengths differ by age group: one year for the under-1 group, four years for ages 1–4, and five years for every group from 5–9 upwards. A value cannot be compared across age groups without accounting for that."
           - For the under-1 group the interval is a single year, so the value coincides with the infant mortality rate.
           - "As an example: a value of 0.043 for ages 1–4 means about 43 of every 1,000 children who reach their first birthday die before their fifth — an average annual risk of roughly 1.1%, not 4.3%."
-        short_unit: ""
-        unit: ""
-        display:
-          numDecimalPlaces: 4
