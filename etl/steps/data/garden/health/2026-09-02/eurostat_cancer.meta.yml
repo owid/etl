@@ -8,6 +8,7 @@ definitions:
       - Values come from the administrative records of national organized screening programs, not from population surveys. Screening done outside these programs, for example by general practitioners, is not counted.
       - Coverage is the share of people in a program's target population who were screened within the recommended interval. Several countries use age ranges or screening intervals that differ from the standard ones described here, and Eurostat flags such values as following a different definition.
       - Countries without an organized program for a given cancer, or that cannot compile program data, are not shown.
+      - Countries report with a lag, so the most recent year usually has values for only some of them, and recent values can be revised in later releases.
     presentation:
       topic_tags:
         - Cancer
