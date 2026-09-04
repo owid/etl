@@ -293,6 +293,12 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
     check("an INSIDE-aligned stroke does not outset", await widthWith({ strokeAlign: "INSIDE" }), near(360));
     check("a stroke that paints nothing does not outset",
           await widthWith({ strokes: solid(false), fills: solid() }), near(360));
+    // `strokeWeight` reads `figma.mixed` on a node carrying per-side weights. SVG cannot express those
+    // and VECTOR nodes do not have them, so an import should never produce one — but the script reads
+    // the property straight into arithmetic, and a Symbol in a `>` comparison THROWS rather than
+    // comparing false. Cheap to pin, and the guard is already written.
+    check("a mixed strokeWeight does not outset, and does not throw",
+          await widthWith({ strokeWeight: MIXED }), near(360));
   }
 
   console.log("\nsnap to the content column");
@@ -308,13 +314,18 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
 
   console.log("\nreflow runs BEFORE the crop");
   {
-    const legend = node({ name: "header__leisure", type: "GROUP", x: 0, y: 40, width: 400, height: 14, fills: [],
-                          children: [textNode("run-a", "Sports", 0, 0, 60, 14), textNode("run-b", "Events", 300, 0, 60, 14)] });
+    // The far run has to stick out PAST the bar, or this scenario cannot fail: with it at x=300 the
+    // ink ended at the bar's 440 whether the crop ran before or after the reflow, so the check held
+    // either way. At x=500 the pre-reflow ink ends at 560 and the post-reflow ink at 440, and only
+    // the right order gives 440.
+    const legend = node({ name: "header__leisure", type: "GROUP", x: 0, y: 40, width: 600, height: 14, fills: [],
+                          children: [textNode("run-a", "Sports", 0, 0, 60, 14), textNode("run-b", "Events", 500, 0, 60, 14)] });
     const s = scene({ inkNodes: [leaf("bar", 40, 100, 400, 30), legend] });
     s.config.jobs[0].reflowLegend = true;
     const out = await run(s);
     check("runs were re-flowed", out.report[0].reflowed > 0, true);
-    check("the crop reflects the POST-reflow ink", s.styled.x + s.styled.width < 440.001, true);
+    check("the crop reflects the POST-reflow ink, not the 560 it spanned before",
+          +(s.styled.x + s.styled.width).toFixed(2), 440);
   }
 
   console.log("\nthe parked reference copy is left alone");
@@ -342,6 +353,27 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
     check("and that fill is switched ON", s.page.children[0].children[0].fills[0].visible, true);
   }
 
+  console.log("\na blank import is refused before anything is destroyed");
+  {
+    const s = scene({ inkNodes: [leaf("ghost", 0, 0, 850, 1095, { visible: false })], oldChart: true });
+    let threw = null;
+    try { await run(s); } catch (e) { threw = e; }
+    check("an import with no visible ink throws", /no visible ink/.test(threw && threw.message), true);
+    // Throwing HERE rather than at the crop is the whole point: nothing has been destroyed yet.
+    check("the old chart is still on the frame", s.page.children[0].children.filter((c) => c.name === "chart").length, 1);
+    check("and the blank import was not swapped in", s.page.children[0].children.indexOf(s.styled) < 0, true);
+  }
+
+  console.log("\nink clipped entirely away is an error, not an empty crop");
+  {
+    const clip = node({ name: "axes_1", type: "FRAME", x: 16, y: 88, width: 818, height: 800, fills: [],
+                        clipsContent: true, children: [leaf("off-in-the-weeds", 3000, 3000, 20, 20)] });
+    const s = scene({ inkNodes: [clip] });
+    let threw = null;
+    try { await run(s); } catch (e) { threw = e; }
+    check("a crop with nothing left to bound throws", /clipped away/.test(threw && threw.message), true);
+  }
+
   console.log("\n" + (checks - failures) + "/" + checks + " checks passed");
   if (failures) process.exit(1);
   if (process.env.RESTYLE_MUTANT) return; // a mutated child runs the scenarios only
@@ -363,6 +395,21 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
     ["import appended on TOP of the header and footer", [["frame.insertChild(0, styled);", "frame.appendChild(styled);"]]],
     ["frame fill left switched off (not a hit target)", [["styled.fills = [{ ...canvasPaint, visible: true }];", "styled.fills = [{ ...canvasPaint, visible: false }];"]]],
     ["snap tolerance widened past a real misalignment", [["const SNAP = 1;", "const SNAP = 20;"]]],
+    ["blank import accepted silently (ink guard bypassed)", [["if (!inkLeaves().length) {", "if (false) {"]]],
+    ["every leaf clipped away accepted silently", [["if (!inkBoxes.length) throw", "if (false) throw"]]],
+    ["strokeWeight guard dropped (figma.mixed reaches the arithmetic)",
+     [["const weight = typeof n.strokeWeight === \"number\" ? n.strokeWeight : 0;", "const weight = n.strokeWeight;"]]],
+    // "The crop runs LAST" is an ORDERING guarantee, and no token in the file means "before the
+    // reflow" — so it cannot be re-broken by swapping one string for another. Hence a function: cut
+    // the crop block out and splice it back above the reflow, which is the code as it stood when the
+    // stale-bounds bug was found. Anchors gone => null => STALE, the same safety a find string has.
+    ["crop computed BEFORE the legend reflow", (src) => {
+      const start = src.indexOf("  // CROP the frame to the plot's own ink");
+      const end = src.indexOf("\n  report.push({");
+      const reflow = src.indexOf("  // A flowed line of runs needs laying out again");
+      if (start < 0 || end < 0 || reflow < 0 || !(reflow < start && start < end)) return null;
+      return src.slice(0, reflow) + src.slice(start, end) + "\n" + src.slice(reflow, start) + src.slice(end);
+    }],
   ];
 
   const os = require("os");
@@ -375,9 +422,16 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "restyle-mutant-"));
     let src = original;
     let applied = true;
-    for (const [find, replace] of edits) {
-      if (!src.includes(find)) { applied = false; break; }
-      src = src.replace(find, replace);
+    if (typeof edits === "function") {
+      // An ordering mutation cannot be written as find/replace, so it is allowed to be a function.
+      // Returning null means its anchors moved, which reports STALE exactly like a dead find string.
+      const out = edits(original);
+      if (out === null) applied = false; else src = out;
+    } else {
+      for (const [find, replace] of edits) {
+        if (!src.includes(find)) { applied = false; break; }
+        src = src.replace(find, replace);
+      }
     }
     if (!applied) {
       console.log("  STALE  " + label + " — the mutation no longer matches the script; update it");

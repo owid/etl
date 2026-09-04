@@ -132,9 +132,9 @@ Rules: replace `characters`, and leave the node's **base** styling alone — the
 | `Note:` | Bold@0-5, Medium@5-6, Regular@6-… | wholly **Bold** |
 | `Data source:` | Bold@0-12, Regular@12-… | wholly **Bold** |
 | tagline | Bold@0-18 (`OurWorldinData.org`), Medium@18-… | wholly **Bold** |
-| licence | Medium@0-15, Bold@15-20, Medium@20-35, Bold@35-… | correct |
+| licence | Medium@0-15, Bold@15-20, Medium@20-35, Bold@35-… | wholly **Medium** — both Bold ranges lost |
 
-The licence row survives only because its *first* run is Medium — the propagated face happens to be the one most of the row wants — so a recipe that re-applies the bold ranges and trusts the rest passes on that row and fails on the other three. **The runs that go wrong are the ones that are NOT bold**, which is the opposite of where attention goes: write every run's face explicitly rather than only the emphasis. A wholly bold Note reads as deliberate emphasis on a caveat, and both times it has happened it was caught on a finished frame — once by eye, once by `diff_against_template.js` — never in review.
+**All four collapse — the licence row included.** It loses its two Bold ranges exactly as the others lose their Medium and Regular ones; what it does not do is *look* broken, because the face that propagates is the one most of the row already wanted. That makes it the most dangerous of the four to check by eye, and it is why a recipe that re-applies the bold ranges and trusts the rest appears to work: it passes on the row that proves nothing and fails on the other three. **The runs that go wrong are the ones whose face differs from the FIRST run's**, which on three rows means every run that is not bold and on the licence row means the bold ones — so write every run's face explicitly rather than only the emphasis, on all four. A wholly bold Note reads as deliberate emphasis on a caveat, and both times it has happened it was caught on a finished frame — once by eye, once by `diff_against_template.js` — never in review.
 
 Write the string, then push Regular back over the tail:
 

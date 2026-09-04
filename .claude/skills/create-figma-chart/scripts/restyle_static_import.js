@@ -197,6 +197,41 @@ for (const job of CONFIG.jobs) {
     for (const node of styled.findAll((n) => n.name === slot || n.name.startsWith(slot + "-"))) node.remove();
   }
 
+  // Let only what RENDERS count as ink. `painted` reads a node's own fill switches, which is not
+  // the same question: `visible` and `opacity` are INHERITED, so a leaf under a hidden or zero-opacity
+  // group still answers yes while painting nothing. Climb to `styled` and test the opacity PRODUCT for
+  // exactly zero, the way `verify_page.js`'s `collect` does — zero is no pixels, and a factor of 0
+  // anywhere zeroes the product.
+  const rendersInTree = (n) => {
+    for (let a = n; a; a = a.parent) {
+      if ("visible" in a && !a.visible) return false;
+      if ("opacity" in a && typeof a.opacity === "number" && a.opacity <= 0) return false;
+      if (a === styled) break;
+    }
+    return true;
+  };
+  // A VECTOR whose every subpath is `windingRule: "NONE"` has no fillable area, but Figma imports it
+  // with a default VISIBLE fill — so `painted` says yes and its box counts, while it paints no pixels.
+  // That is exactly what an imported clip path becomes, and it arrives as a rectangle the size of the
+  // thing it clipped, so it is a prime candidate to set a phantom crop. `verify_page.js` reports these
+  // as dead fills for the same reason. A NONE-winding path that is STROKED is still real ink — an open
+  // path like a gridline — so it stays, on its stroke.
+  const fillPaints = (n) =>
+    n.type === "VECTOR" && Array.isArray(n.vectorPaths) && n.vectorPaths.length &&
+    n.vectorPaths.every((vp) => vp && vp.windingRule === "NONE")
+      ? false
+      : painted(n);
+  const inkLeaves = () => styled.findAll((n) => n.type !== "GROUP" && n.type !== "FRAME" &&
+    (fillPaints(n) || strokedAnywhere(n)) && rendersInTree(n));
+  // Refuse a BLANK import HERE, while the old chart is still on the page. Below this point it is
+  // removed and the replacement is painted with the template's canvas, so an import with no ink would
+  // be swapped in and REPORTED AS A SUCCESS — an empty chart that looks deliberate. The crop itself
+  // has to wait for the reflow, but whether ANY ink exists does not change when runs move, so it is
+  // settled before anything is destroyed rather than discovered after.
+  if (!inkLeaves().length) {
+    throw new Error(`${frame.name}: the import has no visible ink — nothing was replaced`);
+  }
+
   for (const family of CONFIG.families) {
     for (const [column, weight] of family.members) {
       const fill = weight ? tint(family.base, weight) : family.base;
@@ -382,37 +417,12 @@ for (const job of CONFIG.jobs) {
     }
     return box;
   };
-  //
-  // And let only what RENDERS set the crop. `painted` reads a node's own fill switches, which is not
-  // the same question: `visible` and `opacity` are INHERITED, so a leaf under a hidden or zero-opacity
-  // group still answers yes while painting nothing. Climb to `styled` and test the opacity PRODUCT for
-  // exactly zero, the way `verify_page.js`'s `collect` does — zero is no pixels, and a factor of 0
-  // anywhere zeroes the product.
-  const rendersInTree = (n) => {
-    for (let a = n; a; a = a.parent) {
-      if ("visible" in a && !a.visible) return false;
-      if ("opacity" in a && typeof a.opacity === "number" && a.opacity <= 0) return false;
-      if (a === styled) break;
-    }
-    return true;
-  };
-  // A VECTOR whose every subpath is `windingRule: "NONE"` has no fillable area, but Figma imports it
-  // with a default VISIBLE fill — so `painted` says yes and its box counts, while it paints no pixels.
-  // That is exactly what an imported clip path becomes, and it arrives as a rectangle the size of the
-  // thing it clipped, so it is a prime candidate to set a phantom crop. `verify_page.js` reports these
-  // as dead fills for the same reason. A NONE-winding path that is STROKED is still real ink — an open
-  // path like a gridline — so it stays, on its stroke.
-  const fillPaints = (n) =>
-    n.type === "VECTOR" && Array.isArray(n.vectorPaths) && n.vectorPaths.length &&
-    n.vectorPaths.every((vp) => vp && vp.windingRule === "NONE")
-      ? false
-      : painted(n);
-  const inkBoxes = styled
-    .findAll((n) => n.type !== "GROUP" && n.type !== "FRAME" &&
-      (fillPaints(n) || strokedAnywhere(n)) && rendersInTree(n))
-    .map(throughClips)
-    .filter(Boolean);
-  if (inkBoxes.length) {
+  const inkBoxes = inkLeaves().map(throughClips).filter(Boolean);
+  // Ink existed before the clips were applied, so an empty set here means every leaf was clipped away.
+  // Skipping the crop would leave a canvas-sized frame and report it as done — the same silent pass the
+  // guard above refuses, reached through the clips instead of through an empty import.
+  if (!inkBoxes.length) throw new Error(`${frame.name}: every leaf was clipped away — nothing to crop to`);
+  {
     const own = styled.absoluteBoundingBox;
     const ink = {
       x: Math.min(...inkBoxes.map((b) => b.x)),
