@@ -661,3 +661,16 @@ steps:
     - data://garden/emissions/2023-10-10/net_zero_tracker:
       - data://meadow/emissions/2023-10-10/net_zero_tracker:
         - snapshot://emissions/2023-10-10/net_zero_tracker.xlsx
+  # archived; last active in 98f5817cd9e9 on 2026-09-04
+  data://grapher/gcp/2025-11-13/global_carbon_budget:
+    - data://garden/gcp/2025-11-13/global_carbon_budget:
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/energy/2026-05-05/primary_energy_consumption
+      - data://meadow/gcp/2025-11-13/global_carbon_budget:
+        - snapshot://gcp/2025-11-13/global_carbon_budget_fossil_co2_emissions.csv
+        - snapshot://gcp/2025-11-13/global_carbon_budget_global_emissions.xlsx
+        - snapshot://gcp/2025-11-13/global_carbon_budget_national_emissions.xlsx
+        - snapshot://gcp/2025-11-13/global_carbon_budget_land_use_change_emissions.xlsx
+      - data://garden/demography/2024-07-15/population
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/ggdc/2024-04-26/maddison_project_database
