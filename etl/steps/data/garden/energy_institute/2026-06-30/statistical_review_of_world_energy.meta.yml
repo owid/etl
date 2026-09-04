@@ -4,6 +4,12 @@ definitions:
     presentation:
       topic_tags:
         - Energy
+  # The constant-dollar oil price's reference year is derived from the release's publication date
+  # (see the step), so this sentence must be templated rather than typed into a chart -- the chart
+  # subtitle used to hard-code "2023" while the indicator's unit already said 2025.
+  description_oil_price_constant: &description-oil-price-constant >-
+    Prices are measured in constant {price_reference_year} US$ per cubic meter, which means they are
+    adjusted for inflation.
   description_processing_oil_production_twh: &description-processing-oil-production-twh |-
     * Oil production is approximately converted from million tonnes to energy using a standard average oil-equivalent conversion factor of 41.868 petajoules per million tonnes. We then convert 1 petajoule to 0.278 terawatt-hours.
 
@@ -886,8 +892,13 @@ tables:
         title: 'Oil price - Crude prices since 1861 (constant {price_reference_year} US$)'
         unit: 'constant {price_reference_year} US$ per cubic meter'
         short_unit: '$'
+        description_short: *description-oil-price-constant
         presentation:
           title_public: 'Oil price - Crude prices since 1861'
+          # `description_short` is not used as a chart-subtitle fallback at render time, so the
+          # subtitle has to be set here for a chart to inherit it.
+          grapher_config:
+            subtitle: *description-oil-price-constant
       # oil_spot_crude_price_brent_current_dollars_per_barrel:
       #   title: Oil spot crude price - Brent
       #   unit: 'current US$ per barrel'
