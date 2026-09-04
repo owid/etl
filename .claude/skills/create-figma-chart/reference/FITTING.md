@@ -482,7 +482,18 @@ shares its colour), then replay that map onto the fresh import. The rest of the 
    the step had to emit as runs is `license-0 … license-5`, and an exact-name match silently leaves all
    six behind to print over the template's own row.
 3. Paint, set faces, restore anchors, re-flow multi-run lines.
-4. Append into the target frame at (0,0) with `clipsContent = false`, then remove the old group.
+4. Insert into the target frame at (0,0) at the **bottom** of the z-order (`insertChild(0, …)`, never
+   `append`), and paint the frame with the template's own canvas fill, then remove the old group. An
+   artboard-sized import appended on top covers the header and footer, so every double-click on the
+   subtitle descends into the chart instead of selecting the text — and a frame whose fill arrives
+   switched off is not a hit target over its own empty area.
+5. **Crop the frame to its rendered ink, and do it last** — after the rescale, the paint pass and any
+   re-flow, since all three move ink. Count only what renders: skip a leaf under a hidden or
+   zero-opacity ancestor, take each box through the clips *inside* the import, and ignore the default
+   fill Figma gives an imported clip path. Left uncropped the frame is the size of the SVG canvas,
+   which *is* the artboard — it cannot be grabbed as a unit, and `verify_page.js`'s `box-alignment`,
+   `gap` and `margins` rows measure the canvas and report negative insets. `restyle_static_import.js`
+   does all of this already; reach for it before hand-rolling the pass.
 
 Keep it as one script per frame: the pass is run more than once, always after a step change, and the
 only thing that varies is which frame.
@@ -719,6 +730,31 @@ Verify against the actual clone with `get_metadata` (the templates evolve; the g
 > rather than being another guess. Measured errors: pass 1 predicted the canvas to 1.2–1.4px, pass 2
 > to **0.4–0.5px**.
 >
+> **That stability is a function of how far the canvas MOVES, so read the fitted aspect after pass 2
+> and be ready for a third.** `insetY` grows as the canvas shrinks — measured on one single-series
+> line chart at a fixed `imFontSize` 31, all three group boxes:
+>
+> | declared canvas | ink (group box) | insetX / insetY |
+> |---|---|---|
+> | 833 × 612 (pass 1 probe) | 767.28 × 582.64 | 65.72 / **29.36** |
+> | 883 × 577 (pass 2) | 757.30 × 531.64 | 125.70 / **45.36** |
+> | 874 × 584 (pass 3) | 750.30 × 540.64 | 123.70 / **43.36** |
+>
+> Pass 2 → 3 moved the canvas 9px wide and 7px tall and the inset by 2px, which is the ~2px above.
+> Pass 1 → 2 moved it 35px and the inset by **16px**, so pass 2 came back at an ink aspect of
+> **1.4245** against the 1.3895 it was solved for — a 12.6px width miss, twice what the x-map should
+> be asked to close. Re-solving with the *pass-2* numbers landed pass 3 first time: aspect 1.39, gaps
+> **13.86 / 13.86**, and a **0.62px** width residual for the x-map. So the two-pass rule is the common
+> case, not a guarantee: judge it on `xMapShortfall`, and when it is more than a few px run the same
+> `--declared/--ink/--im-font-size` solve again on the numbers you have just measured. Another pass
+> costs ~3 calls (export, upload, swap) against an 18px gap you would otherwise ship.
+>
+> **And measure the inset the same way both times, or you will read a drift that isn't there.**
+> `measure_fit.js` reports a leaf-union ink with the replaced furniture excluded; a hand read of
+> `chart.absoluteBoundingBox` reports the group's box with everything still in it. Those are different
+> numbers on the same import — the ones above are all group boxes on purpose — and mixing them across
+> passes attributes the difference to the export.
+>
 > **And solve for the gap, not for the band.** `--gap` defaults to 14 because the target is 12–16px at
 > *each end*; solving for the band's own aspect asks the chart to fill it edge to edge and leaves
 > nothing. On a 508×409 band that is the difference between a target ink aspect of 1.2421 and 1.3333.
@@ -730,6 +766,15 @@ Verify against the actual clone with `get_metadata` (the templates evolve; the g
 **The header reflows itself — don't reposition it.** Every template's header block is a flat vertical auto-layout of `[title, subtitle]` (the logo is a sibling, not a child — see the node map), so a title that grows from two lines to three pushes the subtitle down and grows the header on its own. Set `characters`, then **read the new `header.y + header.height` back** and measure the band from that; any y you computed before the text went in is stale. Measured on the portrait: a two-line title gives a 135 band bottom, three lines 199.
 
 **The logo no longer sets a floor under that** — it is a sibling of the header, not a child, so it contributes nothing to the header's height and a one-line title buys the full reduction. What the logo still constrains is *width*: the title node is sized narrower than the content box to clear it (737.84 against 818 on Static Vertical, 428 against 508 on the 540-wide set), which is the number a title has to be measured against. Read the band back rather than deriving it from line counts either way.
+
+**Setting a font size moves a HUGGING label, so re-pin the column afterwards — a 1px left-edge miss
+fails `box-alignment` outright.** Putting the export's labels on the ladder (15.4 → 15) is a size
+edit, not a scale, so it looks like it cannot move the fit. It can: grapher's y tick labels arrive
+`textAutoResize: "WIDTH_AND_HEIGHT"` and right-aligned, and Figma shrinks such a box from its LEFT
+edge — the widest label's left edge went 16 → 17 and the chart group's box with it, against a
+`BOX_EPS` of 0.05. Shift the whole y-label column back by the difference (`t.x += 16 − leftmost`,
+which keeps their shared right edge), then re-read the box. Same class as the trap above: measure the
+group after the last *content* edit, not after the last scale.
 
 **Prefer reaching the content width without `rescale()` at all.** `rescale()` multiplies font sizes along with geometry, so a 1.006× nudge to close a 3px gap silently moves every label from 15px to 15.09 — off the ladder, and the Step 8c "sizes are named styles" check then fails on a difference no one can see. When the width can be closed another way — the label reclaim above is the usual one — take that route and every size stays exactly where the export put it.
 

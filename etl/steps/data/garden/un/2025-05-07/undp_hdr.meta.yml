@@ -494,6 +494,11 @@ tables:
           Official PPP conversion rates are produced by the International Comparison Program, whose surveys periodically collect thousands of prices of matched goods and services in many countries. The last round of this exercise refers to 2021 and covered 176 economies.
         presentation:
           title_variant: In constant international-$
+          # Authored here rather than typed into the chart: the PPP base year moves with each HDR
+          # release, so a hard-coded year in a chart note silently goes stale (it read "2017" while
+          # the unit already said 2021).
+          grapher_config:
+            note: "{definitions.ppp_prices}"
 
       # Labour force
       lfpr:

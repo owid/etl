@@ -28,13 +28,21 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > | group | rows | size |
 > |---|---|---|
 > | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 52% of cap |
+
+**`text-floor` fails on the 850-wide templates themselves.** `Static Chart Template_Vertical` and its
+Horizontal twin set the `OurWorldinData.org — Research and data…` tagline and the `Licensed under
+CC-BY…` line at **11px**, under the row's 12px floor for this format — measured in the template, not
+in a page built from it. So two FAILs there are inherited furniture, not a page defect: check that the
+failing ranges are exactly those two footer rows, say so, and leave them. Anything else under the
+floor is yours.
+
 > | `series` | series-weight, furniture-weight, furniture-dash | 47% |
 > | `geometry` | box-alignment, gap, margins, **within-frame**, **dead-fills**, **page-census**, off-palette | 61% |
 > | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 69% |
 > | `skipped` | every declared gap — the colour_audit.py command, spelling, entity completeness, arrows, leader-on-map | 55% |
 >
 > Groups combine, so the whole pass is **three calls**: `--rows annotations` (34,396), `--rows
-> type,geometry` (40,664), `--rows series,skipped` (35,205) — measured 2026-09-01, largest **81% of
+> type,geometry` (40,723), `--rows series,skipped` (35,205) — measured 2026-09-04, largest **81% of
 > cap** against a **69% floor**. Three and not four because the preamble is byte-identical across
 > slices and each row group is a self-contained block after it (GOTCHAS.md → Running the scripts has
 > the `cmp` proof and the composition rule); concatenating verbatim blocks is not the hand-rolled

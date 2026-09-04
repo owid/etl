@@ -1,0 +1,71 @@
+# Known errors in UN WPP 2024 that we blank locally until the provider fixes them.
+# See etl/data_corrections.py for the format; `etl corrections --charts` inventories them.
+#
+# Australia's deaths-by-age distribution is broken for 2022 and 2023. In the source file
+# (WPP2024_DeathsBySingleAgeSex_Medium_1950-2023.csv.gz) every single year of age from 9 to 39 is
+# pinned at a floor of 1-2 deaths in 2022 — for a country that has recorded roughly 460 deaths a year
+# among 15-19-year-olds for the past decade — while ages 55-64 and 70-94 absorb the difference:
+#
+#   age band   2019    2020    2021     2022     2023
+#   10-14       137     142     156       10       14
+#   15-19       460     474     463        8       43
+#   20-24       779     716     689       10      107
+#   25-29       903     916     818       10       40
+#   30-34     1,078   1,123   1,068       10       30
+#   35-39     1,471   1,461   1,404       10      189
+#   40-44     1,921   1,804   1,825       29      838
+#   45-49     3,007   2,911   2,839    1,152    2,173
+#   55-59     6,117   5,964   6,182    9,317    6,987
+#   60-64     8,440   8,294   8,401   19,781   12,671
+#
+# The 21 five-year bands still sum exactly to the annual total the UN publishes for Australia
+# (204,741 in 2022; 183,927 in 2023) — the deaths are misdistributed across brackets, not missing.
+# So the totals are kept and only the age-disaggregated rows are blanked; the step applies this file
+# to those rows only.
+#
+# The whole age distribution goes, not just the bands that are visibly too low. Blanking only those
+# would leave the inflated bands published alongside a profile that still sums to the correct total —
+# wrong data that looks internally coherent. There is also no clean intact subset to keep: the 0-4
+# band is off too in 2022 (1,370 vs 1,172 in 2021, driven by age 1 jumping from 45 to 153), 5-9
+# contains a floored age-9 value, and the 10-year bands and the 0 / 1-4 / 100+ groups are all summed
+# from the same single-age values.
+#
+# Confined to 2022-2023: 1950-2021 and the 2024+ projections have a normal age profile.
+#
+# The first two entries duplicate what the last one does, narrowed to a single band, purely to carry
+# an `expect` guard — `override` keeps the row, so without it a fixed upstream file would be silently
+# re-blanked. They must stay above the broad entry, which blanks the guarded cells too.
+
+- indicator: deaths
+  match: {country: Australia, year: 2022, age: 15-19}
+  action: override
+  value: null
+  expect: {lt: 200}
+  reason: >-
+    Deaths at ages 15-19 in Australia are reported as 8 for 2022, against 460-475 a year for
+    2015-2021; the guard for the 2022 age distribution below.
+  provider: United Nations, World Population Prospects
+  status: open
+
+- indicator: deaths
+  match: {country: Australia, year: 2023, age: 15-19}
+  action: override
+  value: null
+  expect: {lt: 200}
+  reason: >-
+    Deaths at ages 15-19 in Australia are reported as 43 for 2023, against 460-475 a year for
+    2015-2021; the guard for the 2023 age distribution below.
+  provider: United Nations, World Population Prospects
+  status: open
+
+- indicator: deaths
+  entity: Australia
+  years: [2022, 2023]
+  action: override
+  value: null
+  reason: >-
+    Australia's deaths-by-age distribution is unusable for 2022 and 2023 — every single year of age
+    from 9 to 39 is floored at 1-2 deaths while ages 55-64 and 70-94 are inflated by up to 135%,
+    though the bands still sum to the correct annual total.
+  provider: United Nations, World Population Prospects
+  status: open

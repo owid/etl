@@ -4,69 +4,95 @@ definitions:
     presentation:
       topic_tags:
         - Cancer
-
+      attribution_short: IARC
     processing_level: minor
     display:
+      # Shares and rates (the majority of indicators) show one decimal; the two count indicators override this to 0.
       numDecimalPlaces: 1
-  sex: |-
-    <% if sex == "both" %>all individuals<% elif sex == "males" %>males<% elif sex == "females" %>females<% endif %>
-  footnote: |-
-    To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
+    description_key:
+      - Estimates come from the International Agency for Research on Cancer (IARC). They apply the population attributable fractions from the study "Global burden of cancer attributable to infections in 2018" (de Martel et al., 2020) to the GLOBOCAN 2020 cancer incidence estimates.
+      - |-
+        Ten infectious agents classified as carcinogenic by IARC are covered: Helicobacter pylori, human papillomavirus (HPV), hepatitis B and C viruses, Epstein-Barr virus (EBV), human herpesvirus type 8, human T-cell lymphotropic virus, the liver flukes Opisthorchis viverrini and Clonorchis sinensis, and Schistosoma haematobium.
+      - Non-melanoma skin cancers are excluded because their registration is often incomplete and inconsistent across countries.
+      - Estimates carry uncertainty, especially for countries without population-based cancer registries or with limited data on how common these infections are.
+      - |-
+        For four cancer types (cervical cancer, Kaposi sarcoma, anal squamous cell carcinoma, and adult T-cell leukemia and lymphoma), IARC attributes every case to an infection, so their attributable share is 100% by construction rather than an observed value.
+  # Readable labels for the three dimensions. The source labels are kept as dimension values (so indicator short names
+  # do not change); only the displayed text is rewritten. "Other Non-Hodkin lymphoma" is a typo in the source.
+  cases_of: |-
+    <% if cancer == "All cancers but non-melanoma skin cancer (C00-97, but C44)" %>cancer cases (excluding non-melanoma skin cancer)<% else %>cases of << cancer.lower().replace("hodkin", "hodgkin").replace("hodgkin", "Hodgkin").replace("burkitt", "Burkitt").replace("kaposi", "Kaposi").replace("t-cell", "T-cell") >><% endif %>
+  agent_phrase: |-
+    <% if agent == "All infectious agents" %>infections<% elif agent == "HPV" %>human papillomavirus (HPV)<% elif agent == "EBV" %>Epstein-Barr virus (EBV)<% elif agent == "Hepatitis B virus" %>hepatitis B virus<% elif agent == "Hepatitis C virus" %>hepatitis C virus<% elif agent == "Human T-cell lymphotropic virus" %>human T-cell lymphotropic virus<% elif agent == "Human herpesvirus type 8" %>human herpesvirus type 8<% else %><< agent >><% endif %>
+  # Sex is only spelled out for men and women; "both sexes" is the default and is left implicit.
+  among_sex: <% if sex == "males" %> among men<% elif sex == "females" %> among women<% endif %>
+  people: <% if sex == "males" %>men<% elif sex == "females" %>women<% else %>people<% endif %>
+  footnote: To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
+  processing_regions: |-
+    For world regions, Our World in Data sums the values of the countries in the region with data.
+  # The source reports cancer sites for men and women only; we add the both-sexes rows. The all-cancers total for
+  # both sexes is published by the source itself, so this sentence must not appear there.
+  processing_both_sexes: <% if sex == "both" and cancer != "All cancers but non-melanoma skin cancer (C00-97, but C44)" %> For this cancer site, the source only reports men and women separately; the both-sexes value is the sum of the values reported for men and women.<% endif %>
 
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
-
   owners:
-    - Tuna Acisu
+    - Lucas Rodés-Guirao
+
 tables:
   gco_infections:
     variables:
-      attr_cases:
-        title: |-
-          Number of new << cancer.lower() >> cases attributable to << agent.lower() >> among {definitions.sex}
-        description_short: |-
-          Estimated number of new << cancer.lower() >> cases attributable to << agent.lower() >> among {definitions.sex}.
+      cases:
+        display:
+          numDecimalPlaces: 0
+        title: Number of new {definitions.cases_of}{definitions.among_sex}
+        description_short: Estimated number of new {definitions.cases_of}{definitions.among_sex}.
         unit: cases
+        description_processing: "{definitions.processing_regions}{definitions.processing_both_sexes}"
+        processing_level: major
 
-      asir_att:
-        title: |-
-          Age-standardized incidence rate of << cancer.lower() >> attributable to << agent.lower() >> among {definitions.sex}
-        description_short: |-
-          Estimated age-standardized incidence rate of << cancer.lower() >> attributable to << agent.lower() >> among {definitions.sex}.
-        unit: per 100,000 people
-        presentation:
-          grapher_config:
-            note: |-
-              {definitions.footnote}
+      attr_cases:
+        display:
+          numDecimalPlaces: 0
+        title: Number of new {definitions.cases_of} caused by {definitions.agent_phrase}{definitions.among_sex}
+        description_short: Estimated number of new {definitions.cases_of}{definitions.among_sex} that are attributed to {definitions.agent_phrase}.
+        unit: cases
+        description_processing: "{definitions.processing_regions}{definitions.processing_both_sexes}"
+        processing_level: major
+
+      attr_cases_share:
+        title: Share of new {definitions.cases_of} caused by {definitions.agent_phrase}{definitions.among_sex}
+        description_short: Estimated share of new {definitions.cases_of}{definitions.among_sex} that are attributed to {definitions.agent_phrase}.
+        unit: "%"
+        short_unit: "%"
+        description_processing: |-
+          Computed by Our World in Data as the number of attributable cases divided by the total number of new cases. {definitions.processing_regions}{definitions.processing_both_sexes}
+        processing_level: major
+
       paf:
-        title: |-
-          Proportion of << cancer.lower() >> cases among {definitions.sex} attributable to << agent.lower() >>
-        description_short: |-
-          Proportion of << cancer.lower() >> cases among {definitions.sex} attributable to << agent.lower() >>.
-        unit: '%'
-        short_unit: '%'
+        # The source's own attributable fraction, for the all-cancers total by individual agent (countries only). For
+        # "all infectious agents" it is blanked in the garden step because it duplicates attr_cases_share, which also
+        # covers cancer sites, regions and both sexes.
+        title: Share of new {definitions.cases_of} caused by {definitions.agent_phrase}{definitions.among_sex} (population attributable fraction)
+        description_short: Estimated share of new {definitions.cases_of}{definitions.among_sex} that are attributed to {definitions.agent_phrase}, as published by IARC.
+        unit: "%"
+        short_unit: "%"
+        presentation:
+          title_public: Share of new {definitions.cases_of} caused by {definitions.agent_phrase}{definitions.among_sex}
 
       asir:
-        title: |-
-          Age-standardized incidence rate of << cancer.lower() >> among {definitions.sex}
-        description_short: |-
-          Estimated age-standardized incidence rate of << cancer.lower() >> among {definitions.sex}.
-        unit: per 100,000 people
+        title: Age-standardized rate of new {definitions.cases_of}, per 100,000 {definitions.people}
+        description_short: Estimated number of new {definitions.cases_of} per 100,000 {definitions.people}, age-standardized so that populations with different age structures can be compared.
+        unit: cases per 100,000 {definitions.people}
         presentation:
           grapher_config:
-            note: |-
-              {definitions.footnote}
-      attr_cases_share:
-        title: |-
-          Share of new << cancer.lower() >> cases among {definitions.sex} attributable to << agent.lower() >>
-        description_short: |-
-          Share of new << cancer.lower() >> cases among {definitions.sex} attributable to << agent.lower() >>.
-        unit: '%'
-        short_unit: '%'
-      cases:
-        title: |-
-          Number of new << cancer.lower() >> cases among {definitions.sex}
-        description_short: |-
-          Estimated number of new << cancer.lower() >> cases among {definitions.sex}.
-        unit: cases
+            note: "{definitions.footnote}"
+
+      asir_att:
+        title: Age-standardized rate of new {definitions.cases_of} caused by {definitions.agent_phrase}, per 100,000 {definitions.people}
+        description_short: Estimated number of new {definitions.cases_of} attributed to {definitions.agent_phrase} per 100,000 {definitions.people}, age-standardized so that populations with different age structures can be compared.
+        unit: cases per 100,000 {definitions.people}
+        presentation:
+          grapher_config:
+            note: "{definitions.footnote}"
