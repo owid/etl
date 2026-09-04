@@ -90,6 +90,15 @@ can show it — but its bounding box is the whole canvas, which makes every box-
 `verify_page.js` measure the artboard instead of the plot and report three failures that are not there.
 Keep the guard the skill's pass uses: strip it only when nothing under it is painted.
 
+**Pin every descendant's constraints to MIN/MIN before resizing the chart frame.** This frame KEEPS
+its import frame, which is a deliberate departure from `/create-figma-chart`'s "bin the import frame"
+— the frame is what makes the plot grabbable as a unit — and the crop below therefore resizes it. An
+SVG import arrives with `SCALE/SCALE` on every descendant (269 of 269, measured), and `resize()`
+applies them: it stretches each text box through its constraint and rewraps all 152 labels, "Paid work
+or study" onto two lines, every country label split from its year, every value split from its unit. The
+call succeeds, so nothing tells you; only a screenshot does. `rescale()` is safe and needs no pin — it
+scales type with geometry by design.
+
 **Crop the chart frame to the plot's own ink** once the restyle is done — `x`/`y` onto the ink, resize
 to it, and shift the children back by the same offset, with clipping left off. The import arrives the
 size of the SVG canvas, which is the artboard, and a frame that size has no box to show: hovering the
@@ -99,7 +108,9 @@ insets. Cropping moves nothing on the canvas — measured at max channel differe
 **snap each side that lands within a pixel of the header's content column onto it**, moving the
 children back so no ink shifts: a TEXT node's box carries its advance width rather than its glyphs, so
 cropping to ink alone left this frame at 15.92..833.88 against a 16..834 column and `box-alignment`,
-which measures to 0.05, failed on 0.08px of font metrics. Leave the parked unstyled copy at full
+which measures to 0.05, failed on 0.08px of font metrics. Compute the target edge and set it, rather
+than nudging the ink offsets and deriving the edge: a nudge in the wrong direction puts the left edge
+at 15.83, which reads as a rounding artifact rather than as the sign error it is. Leave the parked unstyled copy at full
 canvas size and untouched: it is there to be compared against the export.
 
 **No font pass, and no anchor pass.** The SVG names Lato first (`EMITTED_FONT_STACK`), so the import
@@ -122,8 +133,14 @@ is in the template, while bars and legend names still resolve to the chart. Noth
 pixel-identical either way (checked, max channel difference 0), because the header and footer wrappers
 carry no fill and the figure patch is already gone.
 
-**Text slots.** Setting `characters` gives the WHOLE string the face of the old first character, so
-re-apply **every** run's face, not only the bold ones — the runs that silently go wrong are the
+**Text slots.** Rebind the template's text STYLE where a slot has one — a single-face slot like the
+subtitle carries `S:bd2b46c8f1ae73...`, which owns family, size and line height, and re-applying the
+face by hand with `setRangeFontName`/`setRangeFontSize` leaves the text looking right and the binding
+gone. `diff_against_template.js` is what catches it (`header[1] style (unbound) != template`); a
+screenshot cannot. Use `setTextStyleIdAsync` and let the style supply all three. A multi-run slot like
+the Note cannot be fully style-bound — a bolded range and a style binding are exclusive — so those
+keep the per-run recipe: setting `characters` gives the WHOLE string the face of the old first
+character, so re-apply **every** run's face, not only the bold ones — the runs that silently go wrong are the
 *non-bold* ones. Three of the four footer rows shipped entirely bold from a pass that re-applied the
 bold ranges and trusted the rest, and a screenshot does not show it; `/create-figma-chart`'s
 `diff_against_template.js` does. The template's own faces are Bold(0-5) + Medium(5-6) + Regular for the
@@ -151,8 +168,11 @@ the middle step invalidates the first). The 26 country labels take `Text/Gray 80
 `e1538d93...`, `Camel` `45161823...` with `Line and Slope Charts/Camel` `c17ca762...` for its name,
 `Rusty Orange` `65bab597...`, and `Light Teal` `9a2854bc...` with `Line and Slope Charts/Light Teal`
 `a07c1354...`. Bars carry `SEGMENT_ALPHA` as *node* opacity, not paint opacity, so the binding
-survives. Value labels: white on Denim and Rusty Orange, `Text/Gray 100` on Camel and Light Teal,
-each measured against the composited fill.
+survives. Value labels: white on Rusty Orange only, and `Text/Gray 100` on the other three, which is what
+`value_label_color` picks measured against the composited fill at `SEGMENT_ALPHA`. This line used to
+say white on Denim too, and the frame was styled that way; at 0.8 that is the WORSE of the two (dark
+reaches 3.74:1 there and white less), so bind whatever hex the SVG carries rather than a colour named
+here — the step measures it and this comment cannot.
 
 **Paint this frame with its own pass, not `/create-figma-chart`'s `restyle_static_import.js`.** That
 script is the right tool for a base-plus-tints chart and its font and anchor passes are the ones used
