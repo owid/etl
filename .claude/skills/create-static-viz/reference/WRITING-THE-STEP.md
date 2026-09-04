@@ -378,6 +378,25 @@ with its labels (`Note:`, `Data source:` — singular — the exact tagline and 
 - A caveat about **what the chart claims** cannot go. Move it into the subtitle, which mobile does
   have. Dropping it silently reintroduces an over-claim.
 
+**The step and the template will not agree on how many lines a string takes, and the step is the one
+that reserves the space.** The step measures its own type — 10.5pt here — while the template renders
+the same string at the slot's size, 16px for a subtitle on the 850- and 540-wide templates. Those wrap
+differently, so the line counts can differ, and the step is reserving the chart area against the wrong
+one. It cannot be fixed from the step: it deliberately sets no fonts, so it cannot measure Lato.
+
+What this costs is a surprise on the *next copy edit*, not on the first build. Adding a single
+character — an Oxford comma, in the case that found this — tipped a mobile subtitle from three lines
+to four in the template while the step still reserved three, and the chart's topmost label then sat
+above the header's last line. So after **any** change to a title, subtitle or note, re-read the
+template slot's height in Figma rather than trusting the step's own wrap, and check the header
+clearance on the frame.
+
+Two things make that cheap. The step should reserve the *larger* of the two counts where they differ,
+so the failure mode is a generous gap rather than an overlap. And an orphan — a last line holding a
+word or two — is worth removing at the same time, because it is both a copy defect in its own right
+and the state one character away from adding a line: measure it by cloning the slot, setting
+`textAutoResize = "WIDTH_AND_HEIGHT"` to get the unwrapped width, and comparing against the slot's.
+
 ### Derive every string from the data
 
 Crossover ages, discontinuity positions, the source citation built from `col.metadata.origins` —
