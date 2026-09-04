@@ -35,6 +35,31 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 > reconcile an export whose proportions were chosen by grapher, and this one's were chosen from
 > `TEMPLATES.md`. The scale is the one piece of the fit the route still needs.
 >
+>
+> **If you KEEP the import frame — to crop it to the plot's ink so the chart is grabbable as a unit —
+> pin every descendant's constraints to `MIN/MIN` BEFORE you resize it.** Step 5's remedy for the
+> import frame is to bin it, and a run that keeps it instead is outside that remedy and owes this step.
+> An SVG import arrives with **`SCALE/SCALE` on every descendant** — 269 of 269 in a measured case —
+> and resizing the frame applies them, so the crop's `resize()` stretches each text box through its
+> constraint and rewraps all of them: "Paid work or study" over two lines, every country label split
+> from its year, every in-bar value split from its unit. It survives the atomic call, so it is not an
+> error you get told about; it is a screenshot away and nothing else catches it.
+>
+> ```js
+> for (const n of imported.findAll(() => true)) {
+>   if ("constraints" in n) n.constraints = { horizontal: "MIN", vertical: "MIN" };
+> }
+> imported.rescale(clone.width / imported.width);   // rescale is fine — it scales type WITH geometry
+> ```
+>
+> `rescale()` is not the operation at risk: it scales type with geometry by design, which is why the
+> width fix uses it. It is `resize()` that reads constraints, so pin them and the crop moves nothing.
+>
+> **Crop by targeting the content column directly, not by nudging the ink offsets.** A TEXT node's box
+> carries its advance width rather than its glyphs, so cropping to ink alone lands a 16..834 column at
+> 15.92..833.88; snap a side that falls within a pixel. Compute the target edge and set it — an offset
+> nudged in the wrong direction put a left edge at 15.83 instead of 16, which reads as a rounding
+> artifact rather than as the sign error it was.
 > What *does* happen here is stripping whatever the template already provides. **The background comes
 > first, and it is the one that ruins the page.** matplotlib fills the figure and axes patches white
 > unless the step turned them off, so the import can carry a frame-sized opaque rectangle (`patch_1`,
@@ -377,6 +402,17 @@ matplotlib's fallback stack and seaborn's palette, and needs an explicit pass:
 - **Everything above is lost on re-import**, along with the rest of Step 8 — see the re-export
   section. Keep the pass as one script you re-run, because a frame that has quietly reverted to
   matplotlib's type looks finished.
+- **A palette change does NOT need a re-import — recolour the frame in place, once you have proved the
+  geometry is unchanged.** The proof is cheap and it is a proof, not a glance: harvest the frame's
+  named groups and every text run, and compare against the freshly rendered SVG. The only expected
+  difference is the template slots the restyle drops (twelve on a Static Vertical: title, subtitle, two
+  Note lines, source, tagline and a six-run licence), so subtract those and the two sets must be
+  identical. Hash them if the lists are long — an FNV-1a of the sorted, newline-joined names runs
+  unchanged in `use_figma`, where there is no `crypto`. Identical on both counts means the frame is the
+  same render and only the paint differs, which is one pass instead of the whole
+  upload-restyle-crop-snap sequence and keeps every Step 8 edit the frame already carries. **Unescape
+  HTML entities before comparing**: the SVG holds `TV &amp; radio` where Figma holds `TV & radio`, and
+  five such labels are enough to make two identical sets hash differently.
 
 #### Changing a font moves every label. Put them back.
 

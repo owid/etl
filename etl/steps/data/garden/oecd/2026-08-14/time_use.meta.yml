@@ -1,0 +1,209 @@
+definitions:
+  survey_dating: &survey_dating |-
+    Countries run their time-use surveys in different years, and some run them across two: we date each
+    country by the year its fieldwork ended, so a survey labeled 2009/10 is shown as 2010.
+
+    We include each country whose most recent survey is from 2010 onwards, which is 26 of the 35 countries the OECD publishes. The source runs one survey per country and does not repeat it, so this leaves out countries rather than years, and it avoids showing a survey from the 1990s beside one from 2024.
+  # The caveats every indicator carries. The first is the OECD's own, from the database's landing page;
+  # the rest name the countries it flags, and what each flag means for a reader comparing bars.
+  comparability: &comparability |-
+    Time-use surveys are run differently in different countries. The OECD notes that differences in how the surveys are designed, in how many diary days each one samples, and in how each one groups activities all limit how comparable the results are between countries.
+  mexico_instrument: &mexico_instrument |-
+    The OECD flags Mexico's estimates as not fully comparable. Mexico measures time use with a questionnaire that asks how long people spent on a set list of activities over the previous week, rather than with a diary of a single day, and recall over a week tends to raise the time reported for frequent activities such as housework and care.
+  survey_vintage: &survey_vintage |-
+    Each country's estimates come from a single survey, and the survey years differ widely — from 2010 to 2024. They are the most recent surveys in the OECD's database, which can be older than a country's own latest survey: South Korea's estimates here are from 2014, while Statistics Korea has since published 2019 and 2024 rounds.
+  age_weighting: &age_weighting |-
+    For eleven countries the estimate for people aged 15 to 64 is not measured directly but averaged across age brackets, weighted by how much of the population each bracket holds. Belgium, Greece, Hungary, Lithuania, Luxembourg, and Poland use four brackets weighted with Eurostat population data; Bulgaria, Estonia, Finland, Germany, and Norway use five-year brackets weighted with figures from their own national statistical institutes.
+  # Indicator-specific caveats, all from the per-country footnotes in the source's own workbook.
+  japan_reading: &japan_reading |-
+    In Japan, this also covers time spent reading newspapers or magazines. The Japanese survey records watching television, listening to the radio and reading print as a single activity, so they cannot be separated.
+  japan_travel: &japan_travel |-
+    In Japan, this also covers all travel except commuting to work. The Japanese survey records travel as one activity instead of splitting it by purpose, so time that other countries count under leisure or personal care is counted here.
+  unallocated_minutes: &unallocated_minutes |-
+    Some countries do not break this category down into every activity the OECD lists, so the activities shown separately can add up to less than the total. Poland leaves 37 minutes a day unassigned and Japan 22, which is 15-18% of the category; for every other country it is under a minute of rounding.
+  common:
+    unit: minutes per day
+    short_unit: min
+    display:
+      numDecimalPlaces: 0
+    description_processing: *survey_dating
+    description_key:
+      - *comparability
+      - *mexico_instrument
+      - *age_weighting
+      - *survey_vintage
+    presentation:
+      topic_tags:
+        - Time Use
+      attribution_short: OECD
+  averaged: &averaged |-
+    Minutes are a daily average over the whole week, including both weekdays and weekends.
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Arriagada
+
+tables:
+  time_use:
+    title: Time use across activities
+    variables:
+      paid_work_or_study:
+        title: Time spent on paid work or study
+        description_short: |-
+          Average time spent on paid work or study, including travel to and from work or study and job search. {definitions.averaged}
+      paid_work_all_jobs:
+        title: Time spent on paid work (all jobs)
+        description_short: |-
+          Average time spent on paid work, across all jobs. {definitions.averaged}
+      travel_to_and_from_work_or_study:
+        title: Time spent traveling to and from work or study
+        description_short: |-
+          Average time spent traveling to and from work or study. {definitions.averaged}
+      time_in_school_or_classes:
+        title: Time spent in school or classes
+        description_short: |-
+          Average time spent in school or classes. {definitions.averaged}
+      research_and_homework:
+        title: Time spent on research and homework
+        description_short: |-
+          Average time spent on research and homework. {definitions.averaged}
+      job_search:
+        title: Time spent on job search
+        description_short: |-
+          Average time spent searching for a job. {definitions.averaged}
+      other_paid_work_or_study_related:
+        title: Time spent on other paid work or study-related activities
+        description_short: |-
+          Average time spent on other activities related to paid work or study. {definitions.averaged}
+      unpaid_work:
+        title: Time spent on unpaid work
+        description_short: |-
+          Average time spent on unpaid work, such as housework, shopping, care work, and volunteering. {definitions.averaged}
+        description_key:
+          - *comparability
+          - *mexico_instrument
+          - *age_weighting
+          - *survey_vintage
+          - *unallocated_minutes
+      routine_housework:
+        title: Time spent on routine housework
+        description_short: |-
+          Average time spent on routine housework. {definitions.averaged}
+      shopping:
+        title: Time spent shopping
+        description_short: |-
+          Average time spent shopping. {definitions.averaged}
+      care_for_household_members:
+        title: Time spent caring for household members
+        description_short: |-
+          Average time spent caring for household members, including children and adults. {definitions.averaged}
+      child_care:
+        title: Time spent on child care
+        description_short: |-
+          Average time spent caring for children in the household. {definitions.averaged}
+      adult_care:
+        title: Time spent on adult care
+        description_short: |-
+          Average time spent caring for adults in the household. {definitions.averaged}
+      care_for_non_household_members:
+        title: Time spent caring for non-household members
+        description_short: |-
+          Average time spent caring for people outside the household. {definitions.averaged}
+      volunteering:
+        title: Time spent volunteering
+        description_short: |-
+          Average time spent volunteering. {definitions.averaged}
+      travel_related_to_household_activities:
+        title: Time spent traveling for household activities
+        description_short: |-
+          Average time spent traveling in relation to household activities. {definitions.averaged}
+        description_key:
+          - *comparability
+          - *mexico_instrument
+          - *age_weighting
+          - *survey_vintage
+          - *japan_travel
+      other_unpaid_work_activities:
+        title: Time spent on other unpaid work
+        description_short: |-
+          Average time spent on other unpaid work. {definitions.averaged}
+      personal_care:
+        title: Time spent on personal care
+        description_short: |-
+          Average time spent on personal care, including sleeping, eating and drinking. {definitions.averaged}
+      sleeping:
+        title: Time spent sleeping
+        description_short: |-
+          Average time spent sleeping. {definitions.averaged}
+      eating_and_drinking:
+        title: Time spent eating and drinking
+        description_short: |-
+          Average time spent eating and drinking. {definitions.averaged}
+      other_personal_care_services:
+        title: Time spent on other personal care
+        description_short: |-
+          Average time spent on personal, household, and medical services, and travel related to personal care. {definitions.averaged}
+      leisure:
+        title: Time spent on leisure
+        description_short: |-
+          Average time spent on leisure activities, such as sports, events, seeing friends, TV or radio, and other leisure. {definitions.averaged}
+      sports:
+        title: Time spent on sports
+        description_short: |-
+          Average time spent on sports. {definitions.averaged}
+      participating_in_or_attending_events:
+        title: Time spent participating in or attending events
+        description_short: |-
+          Average time spent participating in or attending events. {definitions.averaged}
+      visiting_or_entertaining_friends:
+        title: Time spent visiting or entertaining friends
+        description_short: |-
+          Average time spent visiting or entertaining friends. {definitions.averaged}
+      tv_or_radio_at_home:
+        title: Time spent watching TV or listening to the radio at home
+        description_short: |-
+          Average time spent watching TV or listening to the radio at home. {definitions.averaged}
+        description_key:
+          - *comparability
+          - *mexico_instrument
+          - *age_weighting
+          - *survey_vintage
+          - *japan_reading
+      other_leisure_activities:
+        title: Time spent on other leisure activities
+        description_short: |-
+          Average time spent on other leisure activities. {definitions.averaged}
+      other_activities:
+        title: Time spent on other activities
+        description_short: |-
+          Average time spent on religious and spiritual activities, civic obligations, and activities without a category. {definitions.averaged}
+        description_key:
+          - *comparability
+          - *mexico_instrument
+          - *age_weighting
+          - *survey_vintage
+          - *japan_travel
+      religious_spiritual_and_civic_activities:
+        title: Time spent on religious, spiritual, and civic activities
+        description_short: |-
+          Average time spent on religious and spiritual activities and civic obligations. {definitions.averaged}
+      other_uncategorized_activities:
+        title: Time spent on uncategorized activities
+        description_short: |-
+          Average time spent on activities without a category. {definitions.averaged}
+        description_key:
+          - *comparability
+          - *mexico_instrument
+          - *age_weighting
+          - *survey_vintage
+          - *japan_travel
+      survey_year:
+        title: Survey year
+        unit: ""
+        short_unit: ""
+        description_short: Year(s) in which the country's most recent national time-use survey was conducted.
+      age_of_reference:
+        title: Age of reference
+        unit: ""
+        short_unit: ""
+        description_short: Age range of the population covered by the country's time-use survey.
