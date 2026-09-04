@@ -2,11 +2,10 @@ import re
 from copy import deepcopy
 from dataclasses import dataclass
 from types import SimpleNamespace
-from typing import Any, cast
+from typing import Any
 
 from etl.collection.exceptions import CommonViewParamConflict, ExtraIndicatorsInUseError, InvalidColorScaleConfigError
 from etl.collection.model.base import MDIMBase, pruned_json
-from etl.collection.model.schema_types import ViewConfig, ViewMetadata
 from etl.collection.utils import CHART_DIMENSIONS
 
 REGEX_CATALOG_PATH = (
@@ -28,8 +27,8 @@ class ReadOnlyNamespace(SimpleNamespace):
 @dataclass
 class CommonView(MDIMBase):
     dimensions: dict[str, Any] | None = None
-    config: ViewConfig | dict[str, Any] | None = None
-    metadata: ViewMetadata | dict[str, Any] | None = None
+    config: dict[str, Any] | None = None
+    metadata: dict[str, Any] | None = None
 
     @property
     def num_dimensions(self) -> int:
@@ -215,9 +214,8 @@ class View(MDIMBase):
 
     dimensions: dict[str, str]
     indicators: ViewIndicators
-    # config: Optional[Union[ViewConfig, Dict[str, Any]]] = None
-    config: ViewConfig | dict[str, Any] | None = None
-    metadata: ViewMetadata | dict[str, Any] | None = None
+    config: dict[str, Any] | None = None
+    metadata: dict[str, Any] | None = None
     _is_grouped: bool = False  # Private flag to mark views created by grouping
 
     @property
@@ -315,7 +313,7 @@ class View(MDIMBase):
             common_has_priority=common_has_priority,
         )
         if new_config:
-            self.config = cast(ViewConfig, new_config)
+            self.config = new_config
         # Update metadata
         new_metadata = merge_common_metadata_by_dimension(
             common_views,
@@ -325,7 +323,7 @@ class View(MDIMBase):
             common_has_priority=common_has_priority,
         )
         if new_metadata:
-            self.metadata = cast(ViewMetadata, new_metadata)
+            self.metadata = new_metadata
 
         # Validate the merged config for incompatible color scale settings
         self.validate_color_scale_config()
