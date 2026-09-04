@@ -5,10 +5,11 @@ and vice versa, because a reviewer working through one surface should not be cou
 This section is the deliberate exception: it is the one place where crossing surfaces is the point, so an
 author can see what one edit costs before deciding how careful to be with it.
 
-Three levels, which is the point: an **edit** somebody authored, the **texts** it renders into, and the
-**pages** each of those texts lands on. A sentence added to a shared `definitions.*` entry is one edit,
-eleven texts and seventy-odd pages, and reporting any one of those numbers alone misleads — as reporting
-the middle one did.
+Two numbers at the top, the same pair owidbot posts on the PR: the **edits** somebody authored, and the
+**pages** they reach, named by surface. A sentence added to a shared `definitions.*` entry is one edit on
+seventy-odd pages, and that is the whole of what an author decides from — the work on one side, the
+exposure on the other. The texts each edit renders into stay on its own card, where the number answers a
+question ("which of them moved?") rather than sitting between the other two implying they multiply.
 
 Two readings of the same data:
 
@@ -41,9 +42,9 @@ from apps.wizard.app_pages.metadata_diff.core import (
 from apps.wizard.app_pages.metadata_diff.discovery import (
     ChangeReach,
     EditGroup,
+    affected_pages,
     edit_slot,
     group_by_edit,
-    reach_by_surface,
 )
 from apps.wizard.app_pages.metadata_diff.edits_view import CONTEXT_CSS, st_edit_body
 from apps.wizard.app_pages.metadata_diff.render import (
@@ -108,26 +109,34 @@ def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
     # Pages are counted from the inverted view, so a page rendering two of these texts counts once.
     # Summing each text's reach gave a larger number for the same data, which is what made "11 changes"
     # read as eleven things to review when one sentence had been written.
-    rows = reach_by_surface(reach)
-    pages = sum(1 for r in rows if r["published"])
-    hidden_pages = len(rows) - pages
-
-    # `n_edits`, not one per card: a card is keyed on the words, and the same text written in two garden
-    # datasets is one card and two edits. The cards below count it the same way, so the two agree.
+    # The line owidbot posts on the PR, said the same way here: edits on the left, pages on the right,
+    # both sides counted once. The middle number — how many distinct texts the edits rendered into — is
+    # gone on purpose. It answered nothing an author decides from: it is neither the work (that is the
+    # edits) nor the exposure (that is the pages), and put between the two it read as though the three
+    # multiplied. Each edit's own card below still gives its texts, where the number means something.
+    #
+    # Surfaces named rather than summed, because which kind of page an edit reaches is what tells an
+    # author where to go and look.
     n_edits = sum(group.n_edits for group in edits)
-    head = (
-        f"**{n_edits} edit{'s' if n_edits != 1 else ''}** authored here, rendering "
-        f"**{len(reach)} distinct text{'s' if len(reach) != 1 else ''}**, on "
-        f"**{pages} page{'s' if pages != 1 else ''}** a reader can reach"
-    )
-    if hidden_pages:
-        head += f" · {hidden_pages} unpublished"
+    pages = affected_pages(reach)
+    surfaces = [
+        f"{pages[key]} {label}{'' if pages[key] == 1 else 's'}"
+        for key, label in (("charts", "chart"), ("mdim_views", "MDim view"), ("explorer_views", "explorer view"))
+        if pages[key]
+    ]
+    head = f"✏️ **{n_edits} edit{'s' if n_edits != 1 else ''}**"
+    head += f" → {', '.join(surfaces)}" if surfaces else " — nothing published renders them yet"
     st.markdown(head)
-    st.caption(
-        "Why three numbers: one edit can render into several texts, and each text lands on many pages. "
-        "A sentence added to a shared definition across multiple indicators is one thing to judge, even "
-        "when it turns up in eighty places."
-    )
+    # Its own line, never folded into the counts above: a draft chart and an unpublished MDim view ship
+    # the moment somebody publishes them, so they are worth an author's eye, but counting them as pages
+    # would make the number above mean something other than what a reader can open today.
+    unpublished = [
+        f"{pages[key]} {label}{'' if pages[key] == 1 else 's'}"
+        for key, label in (("draft_charts", "draft chart"), ("draft_mdim_views", "unpublished MDim view"))
+        if pages[key]
+    ]
+    if unpublished:
+        st.caption(f"Not public yet: {', '.join(unpublished)}")
 
     if not summary.mdims_resolved:
         st.warning(
