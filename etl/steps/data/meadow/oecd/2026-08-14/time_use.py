@@ -11,6 +11,14 @@ paths = PathFinder(__file__)
 # Sheets of the OECD workbook, and the sex label each one reports on.
 SHEETS = {"Total": "total", "Men": "men", "Women": "women"}
 
+# The markers the source writes in place of a number. All become NaN, but they do not mean the same
+# thing, and the set is asserted rather than assumed: ".." and a blank are "not available", "-" is
+# not applicable, and "(see notes)" means the minutes were counted under a *different* activity and a
+# footnote says which — Japan's household travel, which the source folds into its "other" category.
+# A marker the source adds in a later edition would otherwise become a silent NaN, and every group
+# that is built as a remainder would quietly absorb it.
+MISSING_MARKERS = {"..", "-", "(see notes)"}
+
 
 def run() -> None:
     #
@@ -63,7 +71,10 @@ def parse_sheet(tb: Table, sex: str) -> Table:
     long["activity_code"] = long["activity_code"].astype(str).str.strip()
     long["activity"] = long["activity"].astype(str).str.strip()
     long["sex"] = sex
-    # Some cells carry ".." for not-available; coerce them to NaN.
+    markers = {str(value).strip() for value in long["minutes"].dropna().unique() if not isinstance(value, (int, float))}
+    assert markers <= MISSING_MARKERS, (
+        f"Unknown missing-value markers in the {sex} sheet: {sorted(markers - MISSING_MARKERS)}"
+    )
     long["minutes"] = pr.to_numeric(long["minutes"], errors="coerce")
 
     # Label columns built via .map/.str lose the snapshot origins; restore them from the values.
