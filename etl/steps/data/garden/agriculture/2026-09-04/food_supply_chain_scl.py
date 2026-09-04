@@ -25,7 +25,7 @@ ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
    from is a fibre crop and not in SCL.
 
 3. Density of an item (kcal, or grams of protein, per 100 g) = food supply of the nutrient (FAO's "Calories/Year"
-   and "Proteins/Year") / food supply in tonnes, per item, country and year. The same density is applied to every
+   and "Proteins/Year", in kilocalories and tonnes) / food supply in tonnes, per item, country and year. The same density is applied to every
    flow of the item, so the identity holds in the nutrient exactly as in tonnes and the chain closes by
    construction. The only rejection rule is a physical ceiling (920 kcal, or 100 g of protein, per 100 g); rejected
    cells fall back to the country's median for the item over all years, then to the item's median over all
@@ -85,12 +85,12 @@ ELEMENTS = {
     "005164": "tourist_consumption",
     "005166": "residuals",
     "005141": "food",
-    "000261": "food_million_kcal_per_year",
+    "000261": "food_kcal_per_year",
     "000271": "food_protein_tonnes_per_year",
 }
 ELEMENT_UNITS = {
-    "million Kilocalories": ["000261"],
-    "Tonnes": [code for code in ELEMENTS if code != "000261"],
+    "kilocalories": ["000261"],
+    "tonnes": [code for code in ELEMENTS if code != "000261"],
 }
 # FBS elements used for the fish items (see assumption 6).
 FBS_ELEMENTS = {
@@ -111,19 +111,24 @@ FBS_ELEMENTS = {
     "0645pc": "food_kg_per_capita_per_year",
 }
 FBS_PER_CAPITA_ELEMENTS = ["0664pc", "0674pc", "0645pc"]
-# `numerator` is the food-nutrient column (million kcal, or tonnes of protein); dividing it by food in tonnes and
-# multiplying by TO_PER_100G gives the density per 100 g.
+# `numerator` is the food-nutrient column (kcal, or tonnes of protein); dividing it by food in tonnes and multiplying
+# by `to_per_100g` gives the density per 100 g (kcal / tonnes -> kcal per 100 g is / 1e4; tonnes of protein / tonnes
+# -> grams per 100 g is x 1e6 / 1e4).
 NUTRIENTS = {
-    "energy": {"numerator": "food_million_kcal_per_year", "ceiling": 920, "unit": "kilocalories per person per day"},
+    "energy": {
+        "numerator": "food_kcal_per_year",
+        "to_per_100g": 1 / 1e4,
+        "ceiling": 920,
+        "unit": "kilocalories per person per day",
+    },
     "protein": {
         "numerator": "food_protein_tonnes_per_year",
+        "to_per_100g": 1e6 / 1e4,
         "ceiling": 100,
         "unit": "grams of protein per person per day",
     },
-    "mass": {"numerator": None, "ceiling": None, "unit": "kilograms per person per day"},
+    "mass": {"numerator": None, "to_per_100g": None, "ceiling": None, "unit": "kilograms per person per day"},
 }
-# million kcal / tonnes -> kcal per 100 g, and tonnes of protein / tonnes -> grams per 100 g: both are x 1e6 / 1e4.
-TO_PER_100G = 1e6 / 1e4
 BALANCE_ELEMENTS = [
     "production",
     "imports",
@@ -187,7 +192,7 @@ DAYS_PER_YEAR = 365
 BALANCE_COLUMNS = (
     ["country", "year", "item_code", "fao_item", "role"]
     + BALANCE_ELEMENTS
-    + ["food_million_kcal_per_year", "food_protein_tonnes_per_year", "food_tonnes_for_density"]
+    + ["food_kcal_per_year", "food_protein_tonnes_per_year", "food_tonnes_for_density"]
 )
 
 
@@ -305,8 +310,8 @@ def prepare_fish_table(tb_fbsc: Table, manual: dict) -> Table:
     tb["role"] = tb["item_code"].map({c: it["role"] for c, it in fish_items.items()})
     # FBS tonnages are rounded to 1,000 t, so densities are taken from its per-capita figures. The density is a
     # ratio, so the population cancels: express the per-capita figures per person in the same units as SCL's totals
-    # (kcal / 1e6 -> million kcal, grams of protein / 1e6 -> tonnes, kg of food / 1000 -> tonnes).
-    tb["food_million_kcal_per_year"] = tb["food_kcal_per_capita_per_day"] * DAYS_PER_YEAR / 1e6
+    # (kcal per year; grams of protein / 1e6 -> tonnes; kg of food / 1000 -> tonnes).
+    tb["food_kcal_per_year"] = tb["food_kcal_per_capita_per_day"] * DAYS_PER_YEAR
     tb["food_protein_tonnes_per_year"] = tb["food_protein_g_per_capita_per_day"] * DAYS_PER_YEAR / 1e6
     tb["food_tonnes_for_density"] = tb["food_kg_per_capita_per_year"] / 1000
     tb["population"] = np.nan  # filled from the SCL rows of the same entity and year
@@ -342,7 +347,7 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
         tb["density_source"] = "mass"
         return tb
 
-    raw = TO_PER_100G * tb[config["numerator"]] / tb["food_tonnes_for_density"]
+    raw = config["to_per_100g"] * tb[config["numerator"]] / tb["food_tonnes_for_density"]
     raw = raw.where(np.isfinite(raw) & (raw >= 0))
     within_ceiling = raw.where(raw <= config["ceiling"])
     # A density of exactly zero is real for oils and sugars (no protein), but it is also what a tiny food quantity

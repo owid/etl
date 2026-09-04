@@ -40,7 +40,7 @@ tables:
         description_short: Exports of all food items.
       stock_variation:
         title: Stock variation
-        description_short: The net change in stocks of all food items. Positive values mean that stocks grew, removing calories from the supply.
+        description_short: The net change in stocks of all food items. Positive values mean that stocks grew, taking from the supply.
       seed:
         title: Seed
         description_short: Crops set aside as seed for the next harvest.
@@ -54,9 +54,9 @@ tables:
         description_short: Food items used for non-food purposes, such as biofuels, soap and other industrial uses.
       processing_net:
         title: Processing, net
-        description_short: Food items entering processing, minus the energy content of the processed products that come out of it. Positive values are a net loss along the chain.
+        description_short: Food items entering processing, minus the the processed products that come out of it. Positive values are a net loss along the chain.
         description_key:
-          - Oilseed cakes and other feed by-products are not items of the Food Balance Sheets, so the calories that go from oilseeds to cakes to animal feed appear here rather than under feed.
+          - Oilseed cakes and other feed by-products are not items of the Food Balance Sheets, so what goes from oilseeds to cakes to animal feed appears here rather than under feed.
       feed:
         title: Feed
         description_short: Food items fed to animals.
@@ -76,7 +76,7 @@ tables:
         description_short: Food available for human consumption, before waste at retail and in households.
       balancing_difference:
         title: Balancing difference
-        description_short: The gap by which FAOSTAT's rounded balances fail to close, in energy terms. It is included in residuals; this column only records its size.
+        description_short: The gap by which FAOSTAT's rounded balances fail to close, in the unit of the table. It is included in residuals; this column only records its size.
   protein:
     title: Food supply chain in grams of protein (Food Balance Sheets method)
     common:

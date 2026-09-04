@@ -40,7 +40,7 @@ tables:
         description_short: Exports of all commodities.
       stock_variation:
         title: Stock variation
-        description_short: The net change in stocks of all commodities. Positive values mean that stocks grew, removing calories from the supply.
+        description_short: The net change in stocks of all commodities. Positive values mean that stocks grew, taking from the supply.
       seed:
         title: Seed
         description_short: Crops set aside as seed for the next harvest.
@@ -54,7 +54,7 @@ tables:
         description_short: Commodities used for non-food purposes, such as biofuels, soap and other industrial uses.
       processing_net:
         title: Processing, net
-        description_short: Commodities entering processing, minus the energy content of the processed products that come out of it. Positive values are a net loss along the chain.
+        description_short: Commodities entering processing, minus the the processed products that come out of it. Positive values are a net loss along the chain.
         description_key:
           - Oilseed cakes, brans and other by-products of processing are commodities in their own right here, so what animals eat of them appears under feed, and this bar shows only what is lost in transformation.
       feed:
@@ -76,7 +76,7 @@ tables:
         description_short: Food available for human consumption, before waste at retail and in households.
       balancing_difference:
         title: Balancing difference
-        description_short: The gap by which FAO's rounded balances fail to close, in energy terms. It is included in residuals; this column only records its size.
+        description_short: The gap by which FAO's rounded balances fail to close, in the unit of the table. It is included in residuals; this column only records its size.
   protein:
     title: Food supply chain in grams of protein (Supply Utilization Accounts method)
     common:

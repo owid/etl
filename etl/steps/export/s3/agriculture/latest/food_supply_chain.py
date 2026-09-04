@@ -4,7 +4,7 @@ Reads whichever food supply chain garden dataset is the step's dependency in the
 `food_supply_chain_scl`; the DAG line decides which method is published) and writes, in the shape of the other
 bespoke-visualization exports (food trade, causes of death):
 
-  * one metadata JSON at `food-supply-chain.metadata.json`: the method, the source, the year range, the stages of
+  * one metadata JSON at `food-supply-chain.metadata.json`: the method, the sources, the year range, the stages of
     the chain in order (with a label and whether the bar adds to or takes from the chain), the units, and the
     entity id-to-name mapping;
   * one JSON per entity at `food-supply-chain.<entity_id>.json`, with the years and, for each unit (energy,
@@ -104,7 +104,8 @@ def run() -> None:
     entity_to_id = {name: i + 1 for i, name in enumerate(entities)}
     metadata = {
         "method": METHODS[short_name],
-        "source": reference["food"].metadata.origins[0].attribution,
+        # Every origin behind the chain (FAO's balances, OWID's population), not only the first.
+        "sources": sorted({origin.attribution for origin in reference["food"].metadata.origins if origin.attribution}),
         "timeRange": {"start": int(reference["year"].min()), "end": int(reference["year"].max())},
         "units": {nutrient: tables[nutrient]["food"].metadata.unit for nutrient in NUTRIENTS},
         "stages": [{"key": key, "name": name, "direction": direction} for key, name, direction in STAGES],
