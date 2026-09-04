@@ -482,6 +482,7 @@ def get_redirected_source_views(
 
     This supersedes the earlier whole-surface attribution: crediting the specific view (not the whole
     mdim) removes the over-crediting of mixed-producer mdims. Rows with a null ``viewConfigId`` in
+
     ``multi_dim_redirects`` (a handful) are dropped - they can't be view-attributed. The same goes for
     sources that fan out to MULTIPLE target views (a sunset explorer mapped view-by-view into mdims):
     analytics only has whole-surface traffic for such a source, so it is skipped (with a warning) and its
