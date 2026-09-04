@@ -1329,6 +1329,51 @@ def explorer_view_rows(
     return out
 
 
+def explorer_views_by_indicator(engine: Engine) -> dict[int, set[tuple[str, str]]]:
+    """Indicator id -> the published explorer views that render it.
+
+    One JSON column over every published view, where `explorer_view_rows` extracts four. That is the whole
+    reason this exists separately: it answers "which views render this indicator" for views whose stored
+    text did *not* move, so their text is not wanted yet — only their identity.
+    """
+    df = read_sql(
+        """
+        select ev.explorerSlug as explorerSlug,
+               ev.viewId as viewId,
+               cc.config ->> '$.dimensions' as indicators
+        from explorer_views ev
+        join explorers e on e.slug = ev.explorerSlug
+        join chart_configs cc on cc.id = ev.chartConfigId
+        where e.isPublished = 1
+        """,
+        engine=engine,
+    )
+    out: dict[int, set[tuple[str, str]]] = {}
+    for record in df.to_dict("records"):
+        key = (str(record["explorerSlug"]), str(record["viewId"]))
+        for vid in _variable_ids(record.get("indicators")):
+            out.setdefault(vid, set()).add(key)
+    return out
+
+
+def indicator_paths_of_datasets(engine: Engine, dataset_paths: list[str]) -> dict[str, int]:
+    """catalogPath -> variable id, for every indicator of these `grapher/ns/version/short` datasets."""
+    if not dataset_paths:
+        return {}
+    out: dict[str, int] = {}
+    for start in range(0, len(dataset_paths), 100):
+        chunk = dataset_paths[start : start + 100]
+        clauses = " or ".join(["v.catalogPath like %s"] * len(chunk))
+        df = read_sql(
+            f"select v.id as id, v.catalogPath as catalogPath from variables v where {clauses}",
+            engine=engine,
+            params=tuple(f"{path}/%" for path in chunk),
+        )
+        for record in df.to_dict("records"):
+            out[str(record["catalogPath"])] = int(record["id"])
+    return out
+
+
 def _variable_ids(raw: Any) -> set[int]:
     """The variable ids a chart config's `dimensions` array references."""
     try:
@@ -1512,6 +1557,68 @@ def _accounts_for(view: ViewDiff, can_move: set[str]) -> bool:
     return not differs or bool(differs & can_move)
 
 
+def explorer_views_reached_by_config_edits(
+    source_engine: Engine,
+    target_engine: Engine,
+    scope: BranchScope,
+    built: set[str] | None,
+) -> dict[tuple[str, str], ViewDiff]:
+    """Published explorer views whose *rendered* text this branch moved through an indicator's config.
+
+    The gap this closes, verified on a staging server: a garden step rewords
+    `presentation.grapher_config.note`, the indicator's own config row moves — and not one explorer view
+    rendering it does. An explorer's saved view config keeps the wording baked in at its last export, so
+    the two environments store byte-identical configs, the hash join finds no candidate, and the edit is
+    invisible on this surface. Re-running the explorer's export step does not refresh it either.
+
+    Every other surface already resolves this rather than trusting what is stored: a standalone chart has
+    the indicator's config baked into its own, and the MDim comparison merges the indicator's row in
+    Python. Explorers were the one surface reading only the stored text, so they were the one surface
+    where a shared footnote edit reached hundreds of views and the tool reported none of them.
+
+    Attributed by construction, not by the guesswork the stored-text path needs: these views are here
+    *because* an indicator this branch rebuilt changed its own authored text. There is nothing for
+    `_accounts_for` to rule out.
+    """
+    in_play = sorted({f"grapher/{_dataset_of(p)}" for p in scope.dataset_paths if _dataset_of(p) in (built or set())})
+    if not in_play:
+        return {}
+    ids_by_path = indicator_paths_of_datasets(source_engine, in_play)
+    if not ids_by_path:
+        return {}
+    moved = changed_indicator_config_fields(source_engine, target_engine, sorted(ids_by_path))
+    if not moved:
+        return {}
+
+    # Only now is the full view scan worth its cost, and only the identity column: a branch that authors
+    # no `grapher_config` text pays nothing for any of this.
+    views_by_id = explorer_views_by_indicator(source_engine)
+    wanted: dict[tuple[str, str], dict[str, set[str]]] = {}
+    for path, fields in moved.items():
+        for key in views_by_id.get(ids_by_path.get(path, -1), ()):
+            wanted.setdefault(key, {})[path] = fields
+    if not wanted:
+        return {}
+
+    src_texts, tgt_texts = _both(fetch_indicator_config_texts, source_engine, target_engine, sorted(moved))
+    rows = explorer_view_rows(source_engine, sorted(wanted))
+
+    out: dict[tuple[str, str], ViewDiff] = {}
+    for key, by_path in wanted.items():
+        row = rows.get(key)
+        diff = ViewDiff(dimensions=(row or {}).get("dimensions") or {})
+        for path, fields in sorted(by_path.items()):
+            for name in sorted(fields):
+                old = (tgt_texts.get(path) or {}).get(name)
+                new = (src_texts.get(path) or {}).get(name)
+                # A view rendering two changed indicators keeps the first, deterministically: the field is
+                # one slot on the page and the alternative is inventing a merge grapher does not perform.
+                diff.fields.setdefault(CHART_FIELD_PREFIX + name, {"old": old, "new": new})
+        if diff.fields:
+            out[key] = diff
+    return out
+
+
 def changed_explorer_views(
     source_engine: Engine,
     target_engine: Engine,
@@ -1534,8 +1641,19 @@ def changed_explorer_views(
         views.setdefault(slug, []).append(diff)
 
     scope = scope if scope is not None else branch_scope()
-    if not scope.available or not views:
-        return ExplorerChanges(views=views, in_branch=set(views), narrowed=scope.available)
+    if not scope.available:
+        return ExplorerChanges(views=views, in_branch=set(views), narrowed=False)
+
+    # Views the stored-text comparison above cannot see at all: their config is identical in both
+    # environments, and what moved is the indicator config they render. Folded in before the attribution
+    # pass, and their keys carried separately, because they need none of it — see the function's docstring.
+    inherited = explorer_views_reached_by_config_edits(source_engine, target_engine, scope, built)
+    for key, diff in inherited.items():
+        if key not in detailed:
+            detailed[key] = diff
+            views.setdefault(key[0], []).append(diff)
+    if not views:
+        return ExplorerChanges(views=views, in_branch=set(views), narrowed=True)
 
     # A *view* is this branch's if the explorer's own export recipe changed (then every view of it is),
     # or if the text of an indicator that view renders actually changed. "Uses a dataset this branch
@@ -1545,7 +1663,8 @@ def changed_explorer_views(
     own_recipe = {slug for slug in views if scope.covers_export(EXPLORER_EXPORT_KIND, slug)}
     ids_by_view: dict[tuple[str, str], set[int]] = {}
     for key in detailed:
-        if key[0] in own_recipe:
+        # `inherited` is already attributed and has no `source_rows` entry to read ids from.
+        if key[0] in own_recipe or key in inherited:
             continue
         ids_by_view[key] = set(source_rows.get(key, {}).get("indicator_ids") or set())
 
@@ -1580,7 +1699,10 @@ def changed_explorer_views(
         for path, moved in changed_indicator_config_fields(source_engine, target_engine, candidates).items():
             reaches[path] = reaches.get(path, set()) | moved
 
-    ours_keys = {key for key in detailed if key[0] in own_recipe}
+    # Attributed by construction — an indicator this branch rebuilt moved its own authored text — so they
+    # join the branch's bucket without passing through `_accounts_for`, which has no stored difference to
+    # weigh for them.
+    ours_keys = {key for key in detailed if key[0] in own_recipe} | set(inherited)
     for key, ids in ids_by_view.items():
         can_move = {text for i in ids for text in reaches.get(paths_by_id.get(i) or "", set())}
         if can_move and _accounts_for(detailed[key], can_move):

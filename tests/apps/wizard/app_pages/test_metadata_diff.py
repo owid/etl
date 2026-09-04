@@ -5031,12 +5031,58 @@ def test_a_config_edit_vouches_only_for_the_explorer_text_it_moved(monkeypatch):
     # than an answer from a missing call: "this indicator's config moved" is true of both views' sole
     # indicator, and on its own it vouches for the lagging footnote as readily as for the subtitle.
     monkeypatch.setattr(discovery, "changed_indicator_configs", lambda s, t, paths: {path})
+    # This test is about attributing views whose *stored* text differs. The separate pass that finds views
+    # whose stored text does not differ has its own test below; switched off here so it reaches no DB.
+    monkeypatch.setattr(discovery, "indicator_paths_of_datasets", lambda engine, datasets: {})
 
     scope = BranchScope(dataset_paths={"grapher/ns/2026-01-01/ds"}, available=True)
     out = discovery.changed_explorer_views("source", "target", scope, {"ns/2026-01-01/ds"})
 
     assert [d.dimensions for d in out.branch_views()["an-explorer"]] == [{"metric": "a"}], "the subtitle view"
     assert [d.dimensions for d in out.other_views()["an-explorer"]] == [{"metric": "b"}], "the footnote lags"
+
+
+def test_a_garden_config_edit_reaches_an_explorer_view_whose_stored_text_never_moved(monkeypatch):
+    """The edit that reached every surface except this one.
+
+    A garden step rewords `presentation.grapher_config.note`; the indicator's own config row moves and not
+    one explorer view rendering it does, because an explorer stores the wording baked in at its last
+    export. Both environments then hold byte-identical view configs, the hash join names no candidate, and
+    the whole edit was reported as reaching no explorer view at all. Confirmed against a staging server
+    before this existed: the indicator's config carried the new text, its explorer views did not, and
+    re-running the explorer's export step did not refresh them.
+    """
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    path = "grapher/ns/2026-01-01/ds/tb#indicator"
+    view = ("an-explorer", "v1")
+
+    # The view's stored text is identical in both environments — nothing for the hash join to find.
+    monkeypatch.setattr(discovery, "explorer_view_hashes", lambda engine: {view: "same-hash"})
+    monkeypatch.setattr(
+        discovery,
+        "explorer_view_rows",
+        lambda engine, keys=None: {view: {"dimensions": {"metric": "a"}, "indicator_ids": {1}, "note": "Stored"}},
+    )
+    monkeypatch.setattr(discovery, "indicator_paths_of_datasets", lambda engine, datasets: {path: 1})
+    monkeypatch.setattr(discovery, "explorer_views_by_indicator", lambda engine: {1: {view}})
+    monkeypatch.setattr(discovery, "changed_indicator_config_fields", lambda s, t, paths: {path: {"note"}})
+    monkeypatch.setattr(
+        discovery,
+        "fetch_indicator_config_texts",
+        lambda engine, paths: {path: {"note": "New footnote." if engine == "source" else "Old footnote."}},
+    )
+
+    scope = BranchScope(dataset_paths={"grapher/ns/2026-01-01/ds"}, available=True)
+    out = discovery.changed_explorer_views("source", "target", scope, {"ns/2026-01-01/ds"})
+
+    branch = out.branch_views()
+    assert "an-explorer" in branch, "the view its edit renders into has to be reported"
+    diff = branch["an-explorer"][0]
+    assert diff.fields == {"chart.note": {"old": "Old footnote.", "new": "New footnote."}}
+    # And it is the branch's by construction: an indicator it rebuilt moved its own authored text, so
+    # there is no stored difference for the attribution pass to weigh, and none is asked for.
+    assert not out.other_views().get("an-explorer")
 
 
 def test_a_chart_text_master_already_says_is_not_this_branchs(monkeypatch):
