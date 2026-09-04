@@ -51,7 +51,8 @@ ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
 
 8. Regions. SCL itself has World and the European Union (27) as aggregates, both kept. OWID continents and income
    groups are built here by summing the members' totals, in a year only if members covering at least
-   MIN_FRAC_POPULATION_REGIONS of the region's population report data. FAO's own regional aggregates are dropped.
+   MIN_FRAC_POPULATION_REGIONS of the region's population report data; per-capita values divide by the population of
+   the reporting members. FAO's own regional aggregates are dropped.
    Our sum over countries is compared with FAO's World as a check on coverage.
 
 9. All stages are divided by the same population, from OWID's population dataset, and by 365 days. SCL covers 2010
@@ -466,6 +467,14 @@ def build_chain(tb: Table) -> Table:
     converted = converted.drop(columns=["production"])
     chain = converted.groupby(["country", "year"], as_index=False).sum(min_count=1)
 
+    # Population first (assumption 9), so that a region's per-capita values divide the reporting members' totals by
+    # the reporting members' population, not by the whole region's.
+    chain = paths.regions.add_population(chain, warn_on_missing_countries=False)
+    missing_population = sorted(set(chain[chain["population"].isnull()]["country"]))
+    if missing_population:
+        log.warning(f"Dropping entities without OWID population: {missing_population}")
+        chain = chain.dropna(subset=["population"]).reset_index(drop=True)
+
     # Assumption 8: OWID regions as sums of their members' totals (everything is additive at this point).
     value_columns = [c for c in chain.columns if c not in ["country", "year"]]
     chain = paths.regions.add_aggregates(
@@ -506,11 +515,6 @@ def build_chain(tb: Table) -> Table:
     chain["balancing_difference"] = chain["food"] - chain_end
     chain["residuals"] = chain["residuals"] - chain["balancing_difference"]
 
-    chain = paths.regions.add_population(chain, warn_on_missing_countries=False)
-    missing_population = sorted(set(chain[chain["population"].isnull()]["country"]))
-    if missing_population:
-        log.warning(f"Dropping entities without OWID population: {missing_population}")
-        chain = chain.dropna(subset=["population"]).reset_index(drop=True)
     for stage in STAGES:
         chain[stage] = chain[stage] / chain["population"] / DAYS_PER_YEAR
     return chain[["country", "year"] + STAGES]
