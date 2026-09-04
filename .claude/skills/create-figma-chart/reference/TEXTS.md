@@ -125,7 +125,7 @@ Rules: replace `characters`, and leave the node's **base** styling alone — the
 
 **Watch for template text that is already mixed-weight, and restore it after writing.** Setting `characters` propagates the *first character's* style over the whole new string, so any node whose label is bolder than its content comes out uniformly bold.
 
-**Count the slots that ship that way before trusting a pass over them: on the 850-wide templates it is four, and three of them collapse.** Measured on `Static Chart Template_Vertical` (2026-09-03):
+**Count the slots that ship that way before trusting a pass over them: on the 850-wide templates it is four, and all four collapse** — three of them visibly, and the licence row quietly. Measured on `Static Chart Template_Vertical` (2026-09-03):
 
 | Footer row | The template's own runs | After `characters` |
 |---|---|---|

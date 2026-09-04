@@ -402,11 +402,13 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
     ["blank import accepted silently (ink guard bypassed)", [["if (!inkLeaves().length) {", "if (false) {"]]],
     ["clipped-away import validated only AFTER the swap",
      [["if (!inkLeaves().map(throughClips).filter(Boolean).length) {", "if (false) {"]]],
-    // The crop-side `if (!inkBoxes.length)` throw carries NO mutation on purpose: both emptiness cases
-    // are refused before the swap, so nothing the scenarios can build reaches it. It is kept as a loud
-    // floor for the one path that could — a reflow moving a run out of its clip — which the mock cannot
-    // stage, since the reflow only shifts runs within a row. Recorded here rather than deleted, so the
-    // gap is where someone will read it.
+    // The clipped-away case is refused in TWO places — before the swap, and again after the reflow —
+    // so no SINGLE edit can break the check that it throws at all: remove either and the other still
+    // fires. That is what made this check look unreachable and earned it a coverage excuse. Removing
+    // BOTH is the defect the check actually states, and it is what the two-edit form is for.
+    ["clipped-away import refused nowhere",
+     [["if (!inkLeaves().map(throughClips).filter(Boolean).length) {", "if (false) {"],
+      ["if (!inkBoxes.length) throw", "if (false) throw"]]],
     ["strokeWeight guard dropped (figma.mixed reaches the arithmetic)",
      [["const weight = typeof n.strokeWeight === \"number\" ? n.strokeWeight : 0;", "const weight = n.strokeWeight;"]]],
     // "The crop runs LAST" is an ORDERING guarantee, and no token in the file means "before the
@@ -489,12 +491,10 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
   // style id alone, an ordering case whose runs sat inside the bar's own span, and a chart-replaced
   // count that counted the replacement too). Each was invisible until something asked which checks a
   // mutant actually breaks. So the suite asserts its own coverage rather than anyone re-deriving it.
-  const UNMUTATED = new Map([
-    ["a crop with nothing left to bound throws",
-     "unreachable by construction — both emptiness cases are refused before the swap, and the mock" +
-     " cannot stage the one path that would reach it (a reflow moving a run out of its clip, when the" +
-     " reflow only shifts within a row). Kept as a belt-and-braces throw."],
-  ]);
+  // Empty, and worth keeping that way. The one entry this ever held turned out to be wrong: the check
+  // looked unreachable only because every mutation tried was a SINGLE edit, and its guarantee was
+  // defended in two places. An excuse here should be read as a claim to re-test, not a fact.
+  const UNMUTATED = new Map([]);
   const uncovered = declared.filter((l) => !broken.has(l) && !UNMUTATED.has(l));
   const excused = declared.filter((l) => UNMUTATED.has(l));
   console.log("\ncoverage: " + (declared.length - uncovered.length - excused.length) + "/" +
