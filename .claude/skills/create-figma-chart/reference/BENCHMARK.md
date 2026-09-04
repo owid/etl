@@ -168,7 +168,7 @@ row `ok` on the first try. **The one defect the run found was in the gate itself
 headline moved up 3.6 min against run 3 rather than down: `verify_page.js`'s `within-frame` row reads
 `node.vectorNetwork` and `node.strokeCap` on any stroked node, and the node carrying the prescribed
 tier-2 knockout is an *annotation* — a TEXT node, which has neither property. Figma throws on a
-property a node type lacks, and `use_figma` is atomic, so the whole `type,geometry` group returned an
+property a node type lacks, and a throw costs the whole call, so the `type,geometry` group returned an
 error instead of a verdict. It cannot have fired before: an annotation earns a knockout only by
 crossing furniture, and runs 2 and 3 placed theirs in empty plot space. The two-pass export also did
 not land, for the first time — see the table in FITTING.md.
@@ -233,8 +233,12 @@ actually making runs cheaper.
 
 ## What explains the number
 
-Sweep the session transcript afterwards — `tool_use` → `tool_result` timestamps, **grouped by the
-issuing assistant message id**, never by timestamp proximity:
+Sweep the session transcript afterwards with **`scripts/sweep_session.py <session.jsonl>`** — it is
+this prose executed, so two runs are scored the same way rather than hand-rolled twice. It reads
+`tool_use` → `tool_result` timestamps **grouped by the issuing assistant message id**, never by
+timestamp proximity, and takes concurrency off overlapping intervals rather than a per-message count.
+Transcripts sit under `~/.claude/projects/<slugified-cwd>/<session-id>.jsonl`, and a **worktree
+session has its own projects dir** — pass the path, don't glob for the newest file. What it reports:
 
 | | why |
 |---|---|
@@ -282,3 +286,29 @@ For that, use a fixed sub-task with identical inputs — the arrow-probe compari
 Treat this as **validation plus a coarse cost envelope**: does the flow complete, does the output
 survive review, and roughly what did it take. If a change claims a speedup, prove it on a fixed
 sub-task and use this to check nothing broke.
+
+## Fixed sub-task: an inline render against a separate `get_screenshot`
+
+The pattern above, run on one settled frame (`27350:6`, 850×638, never written this session, so both
+sides are read-only). Same node, same state, only the method changes. Measured 2026-09-04, **local**
+session, with `sweep_session.py`:
+
+| shape | n | median |
+|---|---|---|
+| `use_figma` reading the frame's box, **ending in `await frame.screenshot({scale: 1})`** | 3 | **3.64 s** |
+| `use_figma` reading the same box, no render | 3 | **2.31 s** |
+| `get_screenshot` of that frame | 3 | **8.82 s** |
+
+**So the render costs ~1.3 s inside a call that was happening anyway, against 8.8 s and a whole extra
+message as its own call.** Folding one is worth **~7.5 s of call plus one turn** — and the turn is
+the larger half on a build, where BENCHMARK puts it near 60 s. Confirmed on the same runs: `{scale: 1}`
+returns the frame at its **natural 850×638**, not the 0.5× default, and the response carries the image
+*and* the script's return value together. `get_screenshot` returns a **URL** and the inline path does
+not, which is the whole reason `measure_pixels.py` work cannot fold (SKILL.md → Round-trip budget).
+
+**n = 3 a side: read the direction, not the decimals.** Two things in it are worth re-testing rather
+than believing. `get_screenshot` at 8.7–9.3 s and `use_figma` at 2.2–3.9 s are this file's *cloud*
+figures measured in a *local* session — the recorded local ranges are 12.5–20.5 s and 3.5–5.8 s — so
+either the connector got faster or the local/cloud split has narrowed. And one bare read came back at
+7.79 s against a 2.2–2.9 s median, which is the same variance the round-trip budget warns about.
+Neither changes the ranking here, because the gap being measured is 7.5 s wide.

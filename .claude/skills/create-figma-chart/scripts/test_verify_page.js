@@ -279,6 +279,12 @@ function buildFrame(opts = {}) {
         x: 16, y: 600, width: 100, height: 40, fills: solid("#4c6a9c") })] }));
   if (opts.deadVector) children.push(node({ type: "VECTOR", name: "Vector", x: 40, y: 200, width: 80, height: 57,
     fills: solid("#000000"), strokes: [], vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L 80 0 L 80 57 Z" }] }));
+  // A node that THROWS on a property one row reads. `vectorPaths` is read by dead-fills and nowhere
+  // else, so this makes exactly one row fail to run — which is what lets the fence be tested for
+  // isolation rather than merely for not crashing.
+  if (opts.throwingVector) children.push(new Proxy(
+    node({ type: "VECTOR", name: "cursed", x: 40, y: 400, width: 80, height: 20, fills: solid("#000000") }),
+    { get: (t, k) => { if (k === "vectorPaths") throw new Error("no such property 'vectorPaths' on VECTOR node"); return t[k]; } }));
   // The same artifact but ALSO stroked: its stroke still renders, so only the fill is dead and the row
   // has to say which — deleting a node whose stroke is real would remove visible ink.
   if (opts.deadVectorStroked) children.push(node({ type: "VECTOR", name: "half-dead", x: 40, y: 300, width: 80, height: 20,
@@ -382,7 +388,7 @@ function buildFrame(opts = {}) {
 // object stub models neither half: it answers `undefined` and never throws. That gap is why this
 // harness passed a script whose within-frame row crashed on the first frame whose annotation carried
 // the PRESCRIBED tier-2 knockout (a 3px OUTSIDE stroke on the annotation, which is a TEXT node), and
-// `use_figma` being atomic, took the whole geometry group down with it. Wrap a TEXT fixture in this
+// a throw costing the whole call, took the geometry group down with it. Wrap a TEXT fixture in this
 // and a guarded read (`"x" in n ? n.x : null`) passes while an unguarded `n.x` throws, as on canvas.
 const NOT_ON_TEXT = ["vectorNetwork", "strokeCap"];
 const figmaText = (n) => new Proxy(n, {
@@ -2350,6 +2356,40 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const butt = await run(buildFrame({ fullBleedRule: 3 }), {});
     check("49 a NONE-capped full-bleed rule is still exempt",
           row(butt, "within-frame").status === "ok", row(butt, "within-frame").detail);
+  }
+
+  // 50 — the row fence. Benchmark run 4 lost the whole `type,geometry` group to one property read
+  // on one node type: 13 rows reported nothing because 1 threw. The fence turns that into 12 verdicts
+  // and 1 ERROR. What makes it worth testing is the second half — an ERROR must never be quiet, or it
+  // becomes a row that silently stopped checking while the frame still read as clean.
+  {
+    const cursed = await run(buildFrame({ throwingVector: true }), {});
+    const df = row(cursed, "dead-fills");
+    check("50 the throwing row is reported as ERROR, not missing",
+          df && df.status === "ERROR", JSON.stringify(df));
+    check("50 and it names what threw",
+          df && /vectorPaths/.test(df.detail), df && df.detail);
+    check("50 and it says the gap is not a clean result",
+          df && /GAP in coverage, not a clean result/.test(df.detail), df && df.detail);
+
+    // Isolation: everything else in the slice still ran.
+    const others = cursed.rows.filter((x) => x.check !== "dead-fills");
+    check("50 every OTHER row still returned a verdict",
+          others.length > 5 && others.every((x) => x.status !== "ERROR"),
+          `${others.length} others, errored: ${others.filter((x) => x.status === "ERROR").map((x) => x.check)}`);
+    check("50 and a row that would have passed still passes",
+          row(cursed, "text-floor").status === "ok", row(cursed, "text-floor").detail);
+
+    // The verdict must not read as clean while a row is unjudged.
+    check("50 the verdict names the rows that THREW",
+          /1 row\(s\) THREW and did not run: dead-fills/.test(cursed.verdict), cursed.verdict);
+    check("50 and a partial slice does not call itself a PARTIAL PASS",
+          !/PARTIAL PASS/.test(cursed.verdict), cursed.verdict);
+
+    // The negative: no fence anywhere near a clean frame.
+    const clean = await run(buildFrame(), {});
+    check("50 a clean frame reports no ERROR row at all",
+          clean.rows.every((x) => x.status !== "ERROR") && !/THREW/.test(clean.verdict), clean.verdict);
   }
 
   const bad = results.filter((x) => !x.ok);

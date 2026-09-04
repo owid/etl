@@ -200,6 +200,17 @@ const flattenFills = (fills, nodeOpacity) => {
 const groundOver = (g, base) => hexFrom(chOf(base).map((b, i) => g.C[i] + (1 - g.A) * b));
 let rows = [];
 const add = (name, status, detail, extra) => rows.push({ check: name, status, detail, ...(extra || {}) });
+// One row's worth of checking, fenced. Figma throws on a property the node type lacks, and a throw
+// costs the whole call — so an unguarded read in one row used to return an error instead of a
+// verdict for every row in the slice. ERROR is deliberately not a pass: the gap is reported, loudly.
+const R = (name, fn) => {
+  try { fn(); }
+  catch (e) {
+    add(name, "ERROR", `this row THREW and did not run: ${e && e.message ? e.message : e}`
+        + " — every OTHER row in this call did run, so this is a GAP in coverage, not a clean result."
+        + " Fix the read and re-send this slice, or judge this row by hand.");
+  }
+};
 const skip = (name, why, owner) => add(name, "SKIPPED", why, owner ? { ownedBy: owner } : null);
 
 // One frame's worth of checking. Split out so a CHART-ROWS SET — 3-5 frames that ship as one
@@ -531,7 +542,7 @@ const checkFrame = async (frameId) => {
   // ---------------------------------------------------------------- rows
   // Text floor (CHECKS.md: nothing below 12px)
 // #region type
-  {
+  R("text-floor", () => {
     const under = texts.filter((t) => t.size < TEXT_FLOOR - 0.01);
     // A node whose sizes could not be READ is not a pass. `sizeRanges` swallows a throwing or
     // non-numeric segment read and returns [], so the node contributes no ranges at all — and the
@@ -544,11 +555,11 @@ const checkFrame = async (frameId) => {
         ` (floor ${TEXT_FLOOR}px, ${CONFIG.textFloor != null ? "from CONFIG" : isSmall ? "302-wide format — SMALL-CHARTS.md overrides 12 to 11" : "540/850-wide format"})` +
         (texts.some((t) => t.mixedSize) ? `. ${texts.filter((t) => t.mixedSize).length} range(s) come from MIXED-size node(s), read per range rather than per node` : "") +
         (unreadableText.length ? `. ${unreadableText.length} text node(s) NOT judged — no readable fontSize on the node or its ranges: ${unreadableText.slice(0, 4).join(", ")}` : ""));
-  }
+  });
 
   // Annotation ladder + ceiling. Only annotation__* nodes are ours; an imported chart's label sizes
   // come from the export and are governed by the floor row above, not by the ladder.
-  {
+  R("annotation-ladder", () => {
     const ann = texts.filter((t) => /^annotation__/.test(t.name));
     if (!ann.length) skip("annotation-ladder", "no annotation__* text nodes on this frame");
     else {
@@ -562,7 +573,7 @@ const checkFrame = async (frameId) => {
       add("annotation-ladder", bad.length ? "FAIL" : "ok",
           bad.length ? bad.join(", ") : `all ${ann.length} annotation(s) on the ladder and at or below ${ceiling}` + (CONFIG.xlAnnotations ? " (XL declared)" : ""));
     }
-  }
+  });
 
   // Sizes are named styles — CHECKS.md's bar is "no arbitrary sizes left over from scaling the export
   // (13.7, 16.8)", which is about the NUMBER, not about carrying a Figma style id. An SVG import can
@@ -570,7 +581,7 @@ const checkFrame = async (frameId) => {
   // a fitted chart's labels land wherever the rescale puts them (13.36 measured on a live run) and the
   // row still reported ok. So check the numeric size of every plot and annotation text against the
   // ladder, and keep the style-id question as its own row below.
-  {
+  R("ladder-sizes", () => {
     const subject = texts.filter((t) => t.insidePlot || /^annotation__/.test(t.name));
     if (!subject.length) skip("ladder-sizes", "no plot or annotation text to size");
     else {
@@ -608,11 +619,11 @@ const checkFrame = async (frameId) => {
                impOff.length && !wayOff.length ? `${impOff.length} of ${subject.length} imported text node(s) off the ladder but all within ${FIT_DRIFT}px of a rung (max ${r(maxDrift)}px): ${distinct.join(", ")}px. Expected for a fitted export — snapping them to rungs moves the group off the content edge, so it is a designer's call, not a defect` : ""].filter(Boolean).join(". "),
           { offLadderSizes: distinct, maxDriftFromRung: r(maxDrift), annotationsOffLadder: annOff.length });
     }
-  }
+  });
 
   // Style BINDING, separately from the numbers above. An SVG import cannot carry a style id, so this
   // row judges OUR nodes only and reports the imported ones as context.
-  {
+  R("named-styles", () => {
     const ann = texts.filter((t) => /^annotation__/.test(t.name));
     // TWO exemptions, both the same API limitation, and both prescribed rather than tolerated.
     //
@@ -654,10 +665,10 @@ const checkFrame = async (frameId) => {
              (bold.length ? ` ${bold.length} wholly-bold annotation(s) exempted — the ladder is all Lato Regular, so binding a style would strip the bold; GUIDELINES.md prescribes size-without-binding here and the finished pages ship it (weights seen: ${[...new Set(bold.flatMap((t) => t.weights))].join(", ")}).` : "") +
              ((mixed.length || bold.length) ? " Their sizes are covered by ladder-sizes." : "") +
              ` ${importedRaw} imported chart text node(s) are raw, which is expected.`);
-  }
+  });
 
   // Text hierarchy: nothing may exceed the subtitle (CHECKS.md row 26).
-  {
+  R("text-hierarchy", () => {
     // Structurally: the header's second TEXT child. Picking index 1 out of a list of collected texts
     // sorted by y is fragile — anything that lands two nodes at the same top, or collects a node
     // twice, silently promotes the TITLE into the subtitle's place, and a 25px bar passes everything.
@@ -678,7 +689,7 @@ const checkFrame = async (frameId) => {
           ". CEILING ONLY — the rest of CHECKS.md's hierarchy (annotations outranking supporting text and labels, same-rank items sharing a size) needs a rank per node, which nothing here supplies, so an inverted lower order is NOT covered. See text-hierarchy-ranks.",
           { distinctPlotSizes: [...new Set(texts.filter((t) => t.insidePlot).map((t) => r(t.size)))].sort((a, b) => a - b) });
     }
-  }
+  });
 
   // The footer's source line: bold on the `Data source:` prefix ONLY.
   //
@@ -687,7 +698,7 @@ const checkFrame = async (frameId) => {
   // to its FIRST run's style, and the template's first run is the bold prefix — so filling the slot
   // silently bolds the producer name. It renders as a slightly heavy line that reads as fine.
   // Nothing else here inspects weight outside `annotation__*`, which is why it went unnoticed.
-  {
+  R("source-line-weight", () => {
     // findAll, not findOne: the static templates nest the source inside a row frame, and findOne is
     // surface the test harness's figma stub does not implement.
     const src = footer ? footer.findAll((c) => c.type === "TEXT" && /^\s*Data source:/.test(c.characters || ""))[0] : null;
@@ -724,7 +735,7 @@ const checkFrame = async (frameId) => {
             { prefixWeights, restWeights });
       }
     }
-  }
+  });
 
   // Mark weight — the series lines and their halos.
   //
@@ -736,7 +747,7 @@ const checkFrame = async (frameId) => {
   // So a halo is paired or it is not a halo.
 // #endregion
 // #region series
-  {
+  R("series-weight", () => {
     const lineNames = new Set();
     for (const s of stroked) if (s.seriesKind && s.seriesKind !== "outline") lineNames.add(s.seriesName);
     const unpairedOutlines = stroked.filter((s) => s.seriesKind === "outline" && !lineNames.has(s.seriesName));
@@ -783,10 +794,10 @@ const checkFrame = async (frameId) => {
                       : `all ${series.length} series stroke(s) at the ${which} ${lineW}/${haloW}`) +
           (unpairedOutlines.length ? ` (${unpairedOutlines.length} unpaired outline__* node(s) excluded — point rings, not halos)` : ""));
     }
-  }
+  });
 
   // Furniture weight and dash — the two rows that are easiest to miss because you never set them.
-  {
+  R("furniture-weight+furniture-dash", () => {
     const furn = stroked.filter((s) => s.insidePlot && s.inFurniture && !s.seriesKind);
     if (!furn.length) skip("furniture-weight", "no stroked node sits under an axis/gridline group (" + FURNITURE_GROUPS + ") — the 1px rule covers gridlines, zero lines and tick marks only, so it is not applied to whatever else this chart draws (a map's country borders run 0.22px by design)");
     else {
@@ -887,12 +898,12 @@ const checkFrame = async (frameId) => {
               zeroTicksByName: zeroTicks.map((s) => s.name),
               axisOnlyGroups: axisOnly } });
     }
-  }
+  });
 
   // Box alignment — the chart's edges against the header box, to the pixel.
 // #endregion
 // #region geometry
-  {
+  R("box-alignment", () => {
     const boxes = plotRoots.map(rel).filter(Boolean);
     if (isSmall) skip("box-alignment", "302-wide format: the header HUGS its own text (206-278 against a 278 content box), so the chart's width is not meant to match it — SMALL-CHARTS.md");
     else if (!boxes.length || contentL === null) skip("box-alignment", "chart or header box not resolved");
@@ -911,10 +922,10 @@ const checkFrame = async (frameId) => {
           (bad ? " — re-pin per FITTING.md: rescale to the content width, restore the type ladder and stroke weights, translate, then re-centre the block and re-check anything parented to the FRAME" : "") +
           (isMap ? " — on a map this is the BINDING axis, not a cross-check: the width is what the fit sets and the gap row is skipped" : ""));
     }
-  }
+  });
 
   // Gap — top and bottom, against the band of the template actually filled.
-  {
+  R("gap", () => {
     const boxes = plotRoots.map(rel).filter(Boolean);
     const target = CONFIG.gapTarget || (fb && Math.round(fb.width) === 560 ? [30, 30] : [12, 16]);
     if (isMap) skip("gap", "map: its ink aspect is fixed by the projection (measured 1.74 unsolved, 1.54 even when solved for 1.40), so it cannot be aspect-solved into the band and maps.md fits it WIDTH-first — which leaves gaps well outside 12-16 by construction. Centre it in the band and check the width instead, which box-alignment does");
@@ -936,10 +947,10 @@ const checkFrame = async (frameId) => {
       add("gap", bad ? "FAIL" : "ok",
           `top ${r(t)}, bottom ${r(b2)} against a ${target[0]}-${target[1]}px target${Math.abs(t - b2) > SYMMETRY ? ` — and the two ends differ by more than ${SYMMETRY}px` : ""}`);
     }
-  }
+  });
 
   // Nothing in the margins.
-  {
+  R("margins", () => {
     // On the 302-wide format the header hugs its text, so a header-derived right edge would reject ink
     // that is legitimately inside the format's own 12..290 content box. Take the bounds from the FORMAT
     // there and from the header everywhere else (SMALL-CHARTS.md -> Checks).
@@ -969,7 +980,7 @@ const checkFrame = async (frameId) => {
           ` (bounds from ${isSmall ? "the 302-wide FORMAT, not its hugging header" : "the header box"})` +
           (straddlersSeen.length ? `. ${straddlersSeen.length} antimeridian straddler(s) excluded — their bbox spans the plot while their ink does not: ${straddlersSeen.slice(0, 3).map((x) => `${x.name} ${r(x.box.w)}x${r(x.box.h)}`).join(", ")}` : ""));
     }
-  }
+  });
 
 
   // Nothing outside the ARTBOARD. `margins` above is the LEFT/RIGHT content box tested against plot
@@ -991,7 +1002,7 @@ const checkFrame = async (frameId) => {
     }
     return opacity > 0;
   };
-  {
+  R("within-frame", () => {
     const OUT_EPS = 0.5;
     // Visibility is INHERITED, and `findAll` returns a hidden node's descendants with their own
     // `visible: true` intact. Climbing to the frame is what stops a switched-off block being reported
@@ -1021,7 +1032,7 @@ const checkFrame = async (frameId) => {
     const perpShare = (n) => {
       // TEXT carries no `vectorNetwork`, and a TEXT node is exactly what reaches here: the prescribed
       // tier-2 knockout is a 3px OUTSIDE stroke ON THE ANNOTATION ITSELF, so an unguarded read threw
-      // `no such property 'vectorNetwork' on TEXT node` and, because `use_figma` is atomic, took the
+      // `no such property 'vectorNetwork' on TEXT node` and, a throw costing the whole call, took the
       // whole geometry group with it — the row could not run on any correctly annotated frame. Guard
       // it and let the caller keep the conservative full outset when the segments cannot be read.
       const vn = ("vectorNetwork" in n) ? n.vectorNetwork : null;
@@ -1189,7 +1200,7 @@ const checkFrame = async (frameId) => {
             + " with footer.y = FOOTER_BOTTOM - footer.height after any edit that changes its height."
           : "every visible node's PAINTED extent — its box grown by any centered or outside stroke —"
             + " sits inside the " + r(fb.width) + "x" + r(fb.height) + " artboard");
-  }
+  });
 
   // Imported artifacts that carry paint but cannot paint it. A matplotlib `clipPath` arrives through
   // `upload_assets` as a VECTOR whose every path has `windingRule: "NONE"` — a fill rule that paints
@@ -1199,7 +1210,7 @@ const checkFrame = async (frameId) => {
   // phantom-colour failure `renders` and the zero-area exclusion already guard against, reached by a
   // third route. Reported as a FAIL because it corrupts off-palette and the colour-audit command
   // below, not merely because it is clutter.
-  {
+  R("dead-fills", () => {
     const dead = [];
     let stroked = 0;
     for (const n of frame.findAll(() => true)) {
@@ -1253,7 +1264,7 @@ const checkFrame = async (frameId) => {
                   + " the node: deleting it removes a line the reader can see."
                 : "")
           : "no zero-winding filled vectors — nothing carrying a paint it cannot render");
-  }
+  });
 
   // The page-level census CHECKS.md prescribes. It was DECLARED unrunnable on two grounds and only one
   // of them still holds. The first — that this script never has a page, and `page.children` on a page
@@ -1264,7 +1275,7 @@ const checkFrame = async (frameId) => {
   // and NAMED — which is the half a human cannot do quickly and the half CHECKS.md warns about
   // ("do NOT substitute an overlap test", "do not key the census on a SHORTENED node name") — and the
   // row is REVIEW rather than ok, because only a human can say how many were meant.
-  {
+  R("page-census", () => {
     if (!page || !Array.isArray(page.children)) skip("page-census", "the frame's PAGE did not resolve, so its children cannot be counted");
     else {
       // CHECKS.md asks for the objects ANYWHERE on the page, and `page.children` alone is not that.
@@ -1316,10 +1327,10 @@ const checkFrame = async (frameId) => {
           + " slug with its own \"— original SVG (unstyled)\" copy into one bucket.",
           { pageObjects: items });
     }
-  }
+  });
 
   // Off-palette fills. Two standing exceptions are listed rather than flagged.
-  {
+  R("off-palette", () => {
     const plotFills = fills.filter((f) => f.insidePlot);
     if (!plotFills.length) skip("off-palette", "no solid fills found in the plot");
     else {
@@ -1335,7 +1346,7 @@ const checkFrame = async (frameId) => {
           (CONFIG.highlightTreatment ? " (declared for this frame)" : "") + ", and a grapher-managed sequential map ramp.",
           { distinctUnboundFills: distinct });
     }
-  }
+  });
 
   // ---- Crossings, computed BEFORE the two rows that read them. Vertices are LOCAL to their node, so
   // map them through absoluteTransform — a bbox is not a substitute for a line (CHECKS.md), and an
@@ -1348,7 +1359,7 @@ const checkFrame = async (frameId) => {
 // #endregion
 // #region annotations
   let crossings = null;
-  {
+  R("polylines+annotation-overlap", () => {
     const map = (n, pt) => { const m = n.absoluteTransform; return { x: m[0][0] * pt.x + m[0][1] * pt.y + m[0][2] - fb.x, y: m[1][0] * pt.x + m[1][1] * pt.y + m[1][2] - fb.y }; };
     const segHitsRect = (p, q, b) => {
       const inside = (pt) => pt[0] >= b.l && pt[0] <= b.rr && pt[1] >= b.t && pt[1] <= b.bb;
@@ -1483,13 +1494,13 @@ const checkFrame = async (frameId) => {
           (mapMarks.length ? ` — ${mapMarks.length} map shape(s) NOT judged here: a country's bbox is not its ink (maps.md), so an annotation over ocean inside it would read as covering it. Whether an annotation sits on land is the rendered-pixel probe's call.` : ""),
           { crossingsPerAnnotation: crossings, approximate: "segment-vs-rect on sampled vertices; a near-miss is settled by CHECKS.md's four-render pixel probe." });
     }
-  }
+  });
 
   // Annotation knockout tier. The TIER IS DECIDED BY WHAT IS CROSSED, so this row cannot be a
   // property check alone: an annotation crossing a gridline with NO stroke is a missing knockout, and
   // judging only the nodes that already have one certifies exactly that defect. Crossings are computed
   // below (furniture bboxes + series polylines) and this row reads them.
-  {
+  R("annotation-knockout", () => {
     if (!annotations.length) skip("annotation-knockout", "no annotation__* nodes on this frame");
     else if (!crossings) skip("annotation-knockout", "crossings not computed (no furniture and no readable polylines) — cannot decide the tier, so not judging the strokes either");
     else {
@@ -1649,10 +1660,10 @@ const checkFrame = async (frameId) => {
           (bad.length ? bad.join("; ") : `all ${annotations.length} annotation(s) carry the tier their crossings require`)
           + (unsure.length ? `. ${unsure.length} NOT certified: ${unsure.join("; ")}` : ""));
     }
-  }
+  });
 
   // Annotation block gap — the block's outer edges, not the plot's.
-  {
+  R("annotation-block-gap", () => {
     if (!annotations.length) skip("annotation-block-gap", "no annotation__* nodes on this frame");
     else if (isSmall) skip("annotation-block-gap", "302-wide format: SMALL-CHARTS.md replaces the 27px constant with 'scale to the frame', so the 540x540 figure would reject a valid scaled layout. Measure it against that page's own rule and record the number");
     else if (bandTop === null || footerTop === null) skip("annotation-block-gap", "band not resolved");
@@ -1679,7 +1690,7 @@ const checkFrame = async (frameId) => {
             `block clears header by ${r(cTop)} and footer by ${r(cBot)} (want >= ${BLOCK_CLEARANCE}); ${outside.length} annotation(s) extend past the plot, which is what puts this row in scope`);
       }
     }
-  }
+  });
 
   // Direct labels readable as text — computed, not declared. CHECKS.md wants 4.5:1 against the
   // background for every category label drawn on it; that is a pure function of two hexes.
@@ -1691,7 +1702,7 @@ const checkFrame = async (frameId) => {
   // "no annotation text with a solid fill" while carrying nine filled annotations. So: annotations are
   // judged against the FRAME's fill, which is what is actually behind them; `label__*` nodes stay gated
   // on insidePlot because what is behind those is a mark, not the frame.
-  {
+  R("label-contrast-on-background", () => {
     // The name can sit on an ancestor GROUP rather than on the text: an SVG import puts the gid on a
     // wrapping <g>, so `label__Mauritius` is a GROUP holding a TEXT called "Mauritius". Reading the
     // node's own name misses every one of them — measured on a real page, 27 correctly named direct
@@ -1755,7 +1766,7 @@ const checkFrame = async (frameId) => {
                      : `all ${onBg.length} label(s) clear 4.5:1 against ${frameFill} (lowest ${r(Math.min(...onBg.map((t) => contrast(t.fill, frameFill))))}:1)`) +
           (ambiguous.length ? `. Plus ${review(ambiguous.length)}` : ""));
     }
-  }
+  });
 
   // ---------------------------------------------------------------- declared gaps in coverage
 // #endregion
@@ -1764,7 +1775,7 @@ const checkFrame = async (frameId) => {
   // sandbox with no shell. But the palette it needs is already on the canvas, so emit the command
   // ready to paste instead of a tool name to go and look up. A declared gap the operator has to
   // reconstruct by hand is the one most likely to be skipped for real.
-  {
+  R("colour-vision+grayscale-seams", () => {
     // The palette is built from IDENTIFIED DATA MARKS AND SERIES STROKES, never from the `fills`
     // inventory. `fills` holds every solid paint on an area node inside the plot and a TEXT node has
     // both, so axis and legend labels would enter the palette as categories; meanwhile a line chart's
@@ -2001,7 +2012,7 @@ const checkFrame = async (frameId) => {
         : " No data marks or series strokes found in the plot, so there is no palette to audit.";
     skip("colour-vision", "all-pairs deltaE 20 for deuteranopia/protanopia on CATEGORICAL fills." + how, "scripts/color_audit.py");
     skip("grayscale-seams", "adjacent pairs above ~1.6:1 — same command, same run as colour-vision." + how, "scripts/color_audit.py");
-  }
+  });
   skip("spelling-and-prose", "American spelling, typos, style-guide breaches", ".venv/bin/codespell + /check-metadata-style");
   skip("text-true-of-indicator", "every claim in every string checked against the producer's documentation", "/adversarial-data-review");
   skip("entities-all-render", "needs the EFFECTIVE selection (URL country=, or the MDim view's resolved list from the DB) — never the SVG's own labels, which makes the check unable to fail", "Step 1's table + /query-grapher-db");
@@ -2026,6 +2037,7 @@ const checkFrame = async (frameId) => {
   // call and not on the frame — and nothing in the returned shape said so, which is the same
   // confident silence the SKIPPED rows exist to prevent, reached by slicing instead of by not looking.
   const fails = rows.filter((x) => x.status === "FAIL");
+  const errored = rows.filter((x) => x.status === "ERROR");
   const omittedGroups = ALL_ROW_GROUPS.filter((g) => !EMITTED_ROWS.includes(g));
   // The word that names the OUTCOME has to agree with the verdict it is appended to. This suffix was
   // unconditional, so a slice that FAILED a row returned `FAIL on 1 row(s): margins — PARTIAL PASS` —
@@ -2033,7 +2045,7 @@ const checkFrame = async (frameId) => {
   // one. The coverage caveat itself is the same either way; only the verdict word and the sentence
   // that says what the caveat means for the reader change.
   const coverage = omittedGroups.length
-    ? ` — PARTIAL ${fails.length ? "CHECK" : "PASS"}: this call carried ${EMITTED_ROWS.join("+")} only.`
+    ? ` — PARTIAL ${fails.length || errored.length ? "CHECK" : "PASS"}: this call carried ${EMITTED_ROWS.join("+")} only.`
       + ` The ${omittedGroups.join(", ")} row(s) are NOT in this text, so they are neither passed nor`
       + ` failed here. Send the other documented call(s) (CHECKS.md) before reading`
       + `${fails.length ? " the failure(s) above as this frame's only defects" : " this as a clean frame"}.`
@@ -2045,7 +2057,9 @@ const checkFrame = async (frameId) => {
     resolved: { chartBy: chartResolvedBy, contentBox: [r(contentL), r(contentR)], band: [r(bandTop), r(footerTop)],
                 counts: { texts: texts.length, stroked: stroked.length, plotLeaves: leaves.filter((x) => x.insidePlot).length, annotations: annotations.length } },
     verdict: (fails.length ? `FAIL on ${fails.length} row(s): ${fails.map((f) => f.check).join(", ")}`
-                          : `no mechanical row failed (${review.length} to review, ${skipped.length} not covered here)`) + coverage,
+                          : `no mechanical row failed (${review.length} to review, ${skipped.length} not covered here)`)
+             + (errored.length ? ` — ${errored.length} row(s) THREW and did not run: ${errored.map((e) => e.check).join(", ")}. Those rows are NOT judged.` : "")
+             + coverage,
     coverage: { emitted: EMITTED_ROWS, omitted: ALL_ROW_GROUPS.filter((g) => !EMITTED_ROWS.includes(g)) },
     rows,
   };

@@ -115,21 +115,31 @@ async function paint(node, hexColor, styleId) {
 
 const page = figma.root.children.find((p) => p.id === CONFIG.pageId);
 await figma.setCurrentPageAsync(page);
-await figma.loadFontAsync({ family: "Lato", style: "Regular" });
-await figma.loadFontAsync({ family: "Lato", style: "Bold" });
-
+// Independent IPC calls: awaiting them one at a time serializes a round trip each, and a script
+// that imports a font plus every style is where that bites hardest. Assign in entry order, so a
+// role sharing a family's name still wins the way the two sequential loops used to leave it.
+const styleEntries = [
+  ...CONFIG.families.map((family) => [family.base, family.styleKey]),
+  ...Object.entries(CONFIG.textStyles),
+];
+const imported = await Promise.all([
+  figma.loadFontAsync({ family: "Lato", style: "Regular" }),
+  figma.loadFontAsync({ family: "Lato", style: "Bold" }),
+  ...styleEntries.map(([, key]) => figma.importStyleByKeyAsync(key)),
+]);
 const styleIds = {};
-for (const family of CONFIG.families) styleIds[family.base] = (await figma.importStyleByKeyAsync(family.styleKey)).id;
-for (const [role, key] of Object.entries(CONFIG.textStyles)) styleIds[role] = (await figma.importStyleByKeyAsync(key)).id;
+styleEntries.forEach(([role], i) => { styleIds[role] = imported[i + 2].id; });
 
 const report = [];
 const landingPages = new Set();
 for (const job of CONFIG.jobs) {
   const frame = page.children.find((f) => f.id === job.frameId);
-  const styled = await figma.getNodeByIdAsync(job.styled);
   // Absent is a decision; present-but-missing is a typo. Distinguishing them matters, because silently
   // treating an unresolvable id as "no reference wanted" ships the page the rule is about by accident.
-  const reference = job.reference ? await figma.getNodeByIdAsync(job.reference) : null;
+  const [styled, reference] = await Promise.all([
+    figma.getNodeByIdAsync(job.styled),
+    job.reference ? figma.getNodeByIdAsync(job.reference) : Promise.resolve(null),
+  ]);
   if (job.reference && !reference)
     throw new Error(`reference ${job.reference} not found — re-read the placedOnNodeId, or drop the field if this frame wants no reference copy`);
   for (const node of [styled, reference].filter(Boolean)) {
@@ -294,7 +304,7 @@ for (const job of CONFIG.jobs) {
   }
 
   // Fonts, bracketed by the anchor pass.
-  const texts = styled.findAll((n) => n.type === "TEXT");
+  const texts = styled.findAllWithCriteria({ types: ["TEXT"] });
   const anchors = texts.map((node) => {
     const box = node.absoluteBoundingBox;
     return { node, align: node.textAlignHorizontal, left: box.x, right: box.x + box.width, center: box.x + box.width / 2 };
@@ -303,7 +313,7 @@ for (const job of CONFIG.jobs) {
   for (const node of texts) {
     for (const segment of node.getStyledTextSegments(["fontName"])) fonts.add(JSON.stringify(segment.fontName));
   }
-  for (const font of fonts) await figma.loadFontAsync(JSON.parse(font));
+  await Promise.all([...fonts].map((font) => figma.loadFontAsync(JSON.parse(font))));
   for (const node of texts) {
     for (const segment of node.getStyledTextSegments(["fontName"])) {
       const bold = /bold|black|heavy/i.test(segment.fontName.style);
@@ -325,13 +335,13 @@ for (const job of CONFIG.jobs) {
     }
   }
 
-  for (const node of styled.findAll((n) => n.type === "TEXT")) {
+  // Same set as the font pass above — nothing between them adds or removes a node. One setter per
+  // node is one IPC round trip, and they are independent of each other.
+  await Promise.all(texts.map((node) => {
     const parent = node.parent ? node.parent.name : "";
-    if (CONFIG.bodyTextParent.test(parent) || CONFIG.darkTextParent.test(parent)) {
-      const dark = CONFIG.darkTextParent.test(parent);
-      await node.setFillStyleIdAsync(styleIds[dark ? "dark" : "body"]);
-    }
-  }
+    if (!CONFIG.bodyTextParent.test(parent) && !CONFIG.darkTextParent.test(parent)) return null;
+    return node.setFillStyleIdAsync(styleIds[CONFIG.darkTextParent.test(parent) ? "dark" : "body"]);
+  }));
 
   const old = frame.children.find((c) => c.name === "chart");
   styled.name = "chart";

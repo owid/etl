@@ -41,9 +41,9 @@ floor is yours.
 > | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 69% |
 > | `skipped` | every declared gap — the colour_audit.py command, spelling, entity completeness, arrows, leader-on-map | 55% |
 >
-> Groups combine, so the whole pass is **three calls**: `--rows annotations` (34,396), `--rows
-> type,geometry` (40,723), `--rows series,skipped` (35,205) — measured 2026-09-04, largest **81% of
-> cap** against a **69% floor**. Three and not four because the preamble is byte-identical across
+> Groups combine, so the whole pass is **three calls**: `--rows annotations` (35,136), `--rows
+> type,geometry` (41,644), `--rows series,skipped` (35,909) — measured 2026-09-04, largest **83% of
+> cap** against a **70% floor**. Three and not four because the preamble is byte-identical across
 > slices and each row group is a self-contained block after it (GOTCHAS.md → Running the scripts has
 > the `cmp` proof and the composition rule); concatenating verbatim blocks is not the hand-rolled
 > subset forbidden below, since nothing is reimplemented.
@@ -54,6 +54,21 @@ floor is yours.
 > stood at 26,899 and the largest call at **90% of cap** with re-splitting "nearly exhausted". Moving
 > them into their own region took the floor to ~15,700 and the worst call from 90% to **73%** — while
 > three checks were *added*. If this creeps back up, look first for prose that every slice is paying for.
+>
+> **A row that throws now costs one row, not the slice — and reports itself as `ERROR`.** Every row
+> block runs inside `R("<row>", () => {…})`, so a property Figma refuses on a node type (run 4 lost
+> all 13 rows of `type,geometry` to `vectorNetwork` on a TEXT node) degrades that row alone and the
+> other twelve still return verdicts. **`ERROR` is not a pass and not a `SKIPPED`:** it means the row
+> was supposed to run and could not, so the frame is *unjudged* on it. The verdict names every such
+> row, and a slice carrying one refuses to call itself a `PARTIAL PASS`. Treat one as you would a
+> `FAIL` you cannot yet read: fix the read and re-send the slice, or judge that row by hand and say
+> which. The fence costs ~1,500 characters across the three slices (largest 81% → 83% of cap).
+>
+> **That also settles re-slicing: three calls stay three.** Two slices were arithmetically possible
+> before the fence — the best partition sat at 96.9% of cap — and the fence spends exactly the room
+> that made it possible. It was the right trade: the saving was one `use_figma`'s own latency
+> (~4.4 s local, ~0.70 s cloud, since the four Step 8c calls already share one message and therefore
+> one turn), against a permanent constraint that the next check row added would have broken.
 >
 > **Every slice declares what it did NOT carry.** `--rows` stamps `EMITTED_ROWS` into the emitted text,
 > and the returned object carries `coverage: { emitted, omitted }` plus a `PARTIAL PASS:` clause in the

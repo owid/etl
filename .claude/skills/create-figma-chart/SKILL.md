@@ -102,7 +102,7 @@ its per-chart-type conventions are now one file each under
 under 145 KB.** (Raised from 62/140 on 2026-08-28, once, to land the benchmark's second-run lessons — the
 spine was already 925 bytes over before they were added, so the old figure had stopped describing the file.
 A cap that moves whenever it is hit is not a cap: the discipline below is unchanged, and the next addition
-pays for itself by deduplicating rather than by another raise.) **Held at 64 KB on 2026-09-02**, with 19 bytes
+pays for itself by deduplicating rather than by another raise.) **Held at 64 KB on 2026-09-02**, from 19 bytes
 left, by moving Steps 1 and 3 into `reference/` — the remedy this paragraph names, and the one Steps 6 to 8c
 already model: the spine routes, the step's own file carries the detail. Both are read on every run, so a paragraph added here costs every future
 chart — and moving one from this file into GUIDELINES.md saves a run nothing, which is why the pair
@@ -129,7 +129,9 @@ median 8.8 s, range 7.7–10.6 s) against **12.5–20.5 s** locally; `use_figma`
 equal to a screenshot. Either is flat regardless of script size *or* render size — a 545-char script
 that loaded a page and walked 286 nodes came back **faster** than a 45-char one, and a natural-size
 screenshot costs 1.10× a 256 px one. **So collapse work into fewer calls freely, and never shrink a
-screenshot for speed.** **The *turn* tracks the work in it, not the environment** — identical light probes
+screenshot for speed.** The `figma-use` skill's default is the opposite — "work in small steps and
+validate after each one", because its concern is bugs, not latency; the numbers here are what
+override it, and the ~10-operation bound below is the part of its advice that survives. **The *turn* tracks the work in it, not the environment** — identical light probes
 measured **2.8 s in the cloud and 3.7 s locally**, so there is no cloud turn penalty. The **~12 s**
 this file once billed to the cloud came from 23 turns doing real chart work: read it as the
 *heavy-turn* figure, which is what a real run pays in either environment. Budget a run as
@@ -169,13 +171,31 @@ in one message, so batching is mechanical rather than a fresh judgment call ever
 - **Step 8c — the checks.** `verify_page.js` is **three** read-only slices and `diff_against_template.js` is one; issue all four together, with every pixel probe that reads one fixed state.
 - **Step 9 — the delivery renders.** One screenshot per delivered frame, all in one message.
 - **The palette harvest.** `search_design_system` caps at ~14 results against a 24-fill palette, so it takes one group query plus ~11 by-name queries. All independent; 4–6 per message.
-- **A size-only survey is one batch, not two.** `get_screenshot` returns `original_width`/`original_height` — the node's natural size — beside the rendered dimensions, so it already answers how big a frame is. Add `get_metadata` only when you also need names or structure; eight A/B runs each paid for both batches before noticing.
+- **A size-only survey is one batch, not two — and better still, not a render at all.** A `use_figma` property read returns `width`/`height` without rendering anything, which is the cheap way to ask how big a frame is. `get_screenshot` *can* also answer it — it returns `original_width`/`original_height`, the node's natural size, beside the rendered dimensions — and that is worth knowing, because eight A/B runs each paid for a screenshot batch *and* a `get_metadata` batch before noticing. Add `get_metadata` only when you also need names or structure.
 - **Screenshots of different frames or pages.** Issue them together, then download all the URLs in one parallel bash call (pattern and its two silent traps: Gotchas). Keep these on the hosted `get_screenshot`: most frames a build screenshots are ones it just wrote, and the desktop reader cannot see those (Gotchas).
 - **Every format in a multi-format run**, and every frame of a `chart-rows` set — their *reads* fan out. Their **writes do not**: one chart is one page, and Step 4 lines the formats up on that page, so those frames are separate frames on a *shared* page — which by the rule above makes two `use_figma` writes in one message race. Batch the screenshots and property reads; build the frames one call at a time.
 - **Any survey of N nodes** — but at 4–6, not more; past that the connector queues and every call slows (Gotchas).
 - **`upload_assets` takes a `count`.** One call returns N single-use `submitUrl`s and the POSTs parallelize, so a two-format run uploads both originals in one call rather than two — and both embeds in one more.
 - **The Step 8c property sweeps** — font sizes, stroke weights, dash patterns, fills, polylines. Those are reads of a single page, so they collapse into *one* `use_figma` returning one JSON. `scripts/verify_templates.js` already does exactly this for ten templates.
 - **The arrow probe's baseline render.** Only the FULL render is shared across arrows: the other three states of the four-render protocol (no-arrow, no-target, both-hidden) each hide *that pair's* nodes, so they are pair-specific and cannot be reused. N arrows cost `3N + 1` screenshots, not `4N` — and not `N + 2`, which under-collects and produces masks containing another pair's target.
+
+**A render you only look at can ride inside a `use_figma` you were already making.** End that script
+with `await frame.screenshot({scale: 1})` — wrapped in its own `try`, so a failed render cannot cost
+you the write — and the PNG comes back attached to the same response. **Measured on a fixed sub-task:
+the render adds 1.3 s to a call that was happening anyway, against 8.8 s for a `get_screenshot` plus
+its own message** (BENCHMARK.md).
+**The site that qualifies is the Step 9 delivery render**, folded into the last write before it; a
+build takes only 1–3 renders, so that is the whole prize, and it is worth taking as much for
+correctness as for speed — an in-call render cannot catch a half-built frame the way a following
+call has (Gotchas). Pass `{scale: 1}` explicitly: the default is 0.5×, and a resampled render is the
+one thing CHECKS.md says you must never measure or mask.
+
+**Three things never qualify.** A set of screenshots you would otherwise **batch** — `use_figma`
+serializes per file, so folding four batched `get_screenshot`s into four inline ones trades the
+~4.0× fan-out for four serial calls. Anything **`measure_pixels.py` measures** — `screenshot()`
+returns `void` and the image reaches the response, not a URL you can download and not a file on
+disk. And a **read with no adjacent write** — browsing finished pages, reading a designer's
+rework — where folding swaps one call for another and forfeits the fan-out.
 
 **What is serial for a reason — don't collapse these:**
 
@@ -186,7 +206,7 @@ in one message, so batching is mechanical rather than a fresh judgment call ever
 | one page per `use_figma` call | `page.children` on a page you have not switched to returns a short list *without erroring* (Gotchas) |
 | hide → render → hide → render | the four-render arrow probe needs a *different* `visible` state per render, so batching them races the writes and the masks capture the wrong state (CHECKS.md) |
 
-And a bigger batch is a bigger loss: `use_figma` is atomic, so a script that throws on its last line reverts the whole pass. Stay inside the plugin's ~10-logical-operations-per-call guidance.
+And a bigger batch is a bigger loss: a script that throws on its last line loses the whole pass, and **you cannot assume it left the file untouched** — Figma withdrew that guarantee, so read the error's `safeToRetryWithoutCanvasRead` before retrying (Gotchas). Stay inside the plugin's ~10-logical-operations-per-call guidance.
 
 **To check whether a run actually batched, sweep `tool_use` → `tool_result` intervals for peak in-flight calls** — never a calls-per-message count, which reports singletons for a provably concurrent run (Gotchas).
 
@@ -420,7 +440,7 @@ The checks are a gate, not a formality: **re-run the whole pass after the last c
 ## Step 9 — Checklist pass, review, deliver
 
 1. Run the **Good Data Viz Checklist** (GUIDELINES.md, final section) against the composed frame; fix what fails.
-2. `get_screenshot` the new page and show the user — original and adapted version side by side. Iterate on feedback (no re-approval needed within the approved page).
+2. `get_screenshot` **each frame** — never the page, whose render can pull in a neighbouring page's frames (Gotchas) — and show the user the original and adapted version side by side. Iterate on feedback (no re-approval needed within the approved page).
 3. **Rename the final frame to the slug** from Step 2 (`child-mortality-asia-decline`) — Figma uses the frame name as the export filename for the website PNG. **Exactly one frame carries the bare slug**; variants get a suffix (`-palette-a`). Two frames with the same name export two files with the same name.
 
    **When the user picks a variant, move the bare slug onto it in the same breath — never leave the rename as an open item.** It reads like a one-line loose end and it is not: the page ends up with a single finished frame still called `…-palette-a`, and the PNG the website gets is named after a trial. Renaming is free while the choice is being made and invisible afterwards.

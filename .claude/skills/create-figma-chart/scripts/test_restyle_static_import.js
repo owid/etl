@@ -60,6 +60,11 @@ function node(props) {
     rec(this);
     return out;
   };
+  // The indexed type lookup the real API exposes. Same subtree, same order as findAll — only the
+  // real implementation is faster, so a fixture that models it as a filter is honest.
+  n.findAllWithCriteria = function ({ types }) {
+    return this.findAll((c) => types.includes(c.type));
+  };
   n.appendChild = function (child) { detach(child); child.parent = this; (this.children || (this.children = [])).push(child); };
   n.insertChild = function (i, child) { detach(child); child.parent = this; (this.children || (this.children = [])).splice(i, 0, child); };
   n.remove = function () { detach(this); this.removed = true; };
