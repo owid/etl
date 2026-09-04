@@ -233,9 +233,17 @@ footer auto-layout's *top* — the numbers `verify_templates.js` prints — so a
 Measured on the 2026 Vertical template, that arithmetic landed **4.35 px below** the header frame's
 bottom and **3.01 px above** the footer frame's top, which is line-box slack rather than anything
 visible: a `BAND_INSET` of 14 then reads as `gap` **18.35 / 17.01** against the 12–16 target, on a
-page whose spacing looks right and whose own assertion says 14. Either inset from the frame edges, or
-expect the row to fail by a few px and record why — but do not "fix" it by shrinking the inset
-without knowing which datum you are shrinking from.
+page whose spacing looks right and whose own assertion says 14. **Inset from the frame edges**, and
+the row passes: the same measurement that explains the 4.35 and the 3.01 is what makes a 14 px inset
+off those datums read as `gap` 14. What you must not do is "fix" a failing row by shrinking the inset
+without knowing which datum you are shrinking from — that moves the plot to satisfy a number measured
+from somewhere else.
+
+`gap` is a live row, so a failure is a real discrepancy and not explanatory noise: a band derived from
+line-height arithmetic is a defect to correct, not a caveat to record. One frame predates this —
+the time-use chart built in #6678 ships at 18.35 / 17.01, which is the measurement above and is
+pending a design decision on whether to re-cut it. That is one named, dated exception, not a licence:
+new work insets from the frame edges and passes.
 
 **Draw the step's own copies of these slots at the sizes in the table, not at sizes that merely look
 right.** It is tempting to set the step's title and subtitle a size or two smaller — nothing in the

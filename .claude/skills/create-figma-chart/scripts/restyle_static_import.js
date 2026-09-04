@@ -221,6 +221,42 @@ for (const job of CONFIG.jobs) {
     n.vectorPaths.every((vp) => vp && vp.windingRule === "NONE")
       ? false
       : painted(n);
+  // Start from the PAINTED extent, not the geometry. Figma documents `absoluteBoundingBox` as
+  // excluding the stroke, so a CENTER-aligned stroke paints half its width outside the box and an
+  // OUTSIDE-aligned one all of it — and the plot's outermost edge is normally a stroked axis, gridline
+  // or line series. Cropping to the centreline cuts that half off ink the frame is supposed to bound,
+  // and `clipsContent = false` below then leaves it hanging outside the frame. Only a stroke that
+  // PAINTS counts, the same test `verify_page.js` applies for the same reason; the outset is taken on
+  // all four sides rather than resolved per segment, because over-reporting an overhang costs a
+  // fraction of a pixel of frame and missing one is the bug.
+  const strokeOutset = (n) => {
+    const paints = Array.isArray(n.strokes) &&
+      n.strokes.some((s) => s.visible !== false && (s.opacity === undefined || s.opacity > 0));
+    const weight = typeof n.strokeWeight === "number" ? n.strokeWeight : 0;
+    if (!paints || !(weight > 0)) return 0;
+    return n.strokeAlign === "INSIDE" ? 0 : n.strokeAlign === "OUTSIDE" ? weight : weight / 2;
+  };
+  const throughClips = (node) => {
+    const o = strokeOutset(node);
+    const b = node.absoluteBoundingBox;
+    let box = b && o ? { x: b.x - o, y: b.y - o, width: b.width + 2 * o, height: b.height + 2 * o } : b;
+    for (let a = node.parent; a && box && a !== styled; a = a.parent) {
+      const clip = "clipsContent" in a && a.clipsContent ? a.absoluteBoundingBox : null;
+      if (clip) {
+        const x = Math.max(box.x, clip.x), y = Math.max(box.y, clip.y);
+        const right = Math.min(box.x + box.width, clip.x + clip.width);
+        const bottom = Math.min(box.y + box.height, clip.y + clip.height);
+        // `>=`, not `>`: an open path has a DEGENERATE box. `absoluteBoundingBox` excludes the stroke,
+        // so a horizontal gridline measures 123.75x0 and a spine 0xN — visible ink whose box has no
+        // area. A strict test calls every one of them fully clipped and drops it, which loses the axes
+        // and lets labels set the plot edge. Only a box lying OUTSIDE its clip becomes null. The stroke
+        // outset above now keeps a painting leaf non-degenerate on its own, so this is the belt to that
+        // braces — narrow the outset and it goes back to load-bearing.
+        box = right >= x && bottom >= y ? { x, y, width: right - x, height: bottom - y } : null;
+      }
+    }
+    return box;
+  };
   const inkLeaves = () => styled.findAll((n) => n.type !== "GROUP" && n.type !== "FRAME" &&
     (fillPaints(n) || strokedAnywhere(n)) && rendersInTree(n));
   // Refuse a BLANK import HERE, while the old chart is still on the page. Below this point it is
@@ -230,6 +266,13 @@ for (const job of CONFIG.jobs) {
   // settled before anything is destroyed rather than discovered after.
   if (!inkLeaves().length) {
     throw new Error(`${frame.name}: the import has no visible ink — nothing was replaced`);
+  }
+  // And refuse one whose ink is entirely CLIPPED AWAY, here rather than at the crop. Every clip that
+  // trims it lives INSIDE the import, so this answer cannot change when the chart is inserted — which
+  // means discovering it after the swap would destroy a perfectly good chart in order to report a
+  // failure. Same reasoning as the guard above, reached through the clips instead of an empty import.
+  if (!inkLeaves().map(throughClips).filter(Boolean).length) {
+    throw new Error(`${frame.name}: every leaf was clipped away — nothing to crop to; nothing was replaced`);
   }
 
   for (const family of CONFIG.families) {
@@ -380,48 +423,11 @@ for (const job of CONFIG.jobs) {
   // overflow as ink and the frame grows to contain it, which is what keeps the fill, the hit target
   // and the geometry rows bounding everything visible. Intersect with it instead and that overflow is
   // first excluded from the box and then un-hidden, landing outside the frame meant to bound it.
-  //
-  // Start from the PAINTED extent, not the geometry. Figma documents `absoluteBoundingBox` as
-  // excluding the stroke, so a CENTER-aligned stroke paints half its width outside the box and an
-  // OUTSIDE-aligned one all of it — and the plot's outermost edge is normally a stroked axis, gridline
-  // or line series. Cropping to the centreline cuts that half off ink the frame is supposed to bound,
-  // and `clipsContent = false` below then leaves it hanging outside the frame. Only a stroke that
-  // PAINTS counts, the same test `verify_page.js` applies for the same reason; the outset is taken on
-  // all four sides rather than resolved per segment, because over-reporting an overhang costs a
-  // fraction of a pixel of frame and missing one is the bug.
-  const strokeOutset = (n) => {
-    const paints = Array.isArray(n.strokes) &&
-      n.strokes.some((s) => s.visible !== false && (s.opacity === undefined || s.opacity > 0));
-    const weight = typeof n.strokeWeight === "number" ? n.strokeWeight : 0;
-    if (!paints || !(weight > 0)) return 0;
-    return n.strokeAlign === "INSIDE" ? 0 : n.strokeAlign === "OUTSIDE" ? weight : weight / 2;
-  };
-  const throughClips = (node) => {
-    const o = strokeOutset(node);
-    const b = node.absoluteBoundingBox;
-    let box = b && o ? { x: b.x - o, y: b.y - o, width: b.width + 2 * o, height: b.height + 2 * o } : b;
-    for (let a = node.parent; a && box && a !== styled; a = a.parent) {
-      const clip = "clipsContent" in a && a.clipsContent ? a.absoluteBoundingBox : null;
-      if (clip) {
-        const x = Math.max(box.x, clip.x), y = Math.max(box.y, clip.y);
-        const right = Math.min(box.x + box.width, clip.x + clip.width);
-        const bottom = Math.min(box.y + box.height, clip.y + clip.height);
-        // `>=`, not `>`: an open path has a DEGENERATE box. `absoluteBoundingBox` excludes the stroke,
-        // so a horizontal gridline measures 123.75x0 and a spine 0xN — visible ink whose box has no
-        // area. A strict test calls every one of them fully clipped and drops it, which loses the axes
-        // and lets labels set the plot edge. Only a box lying OUTSIDE its clip becomes null. The stroke
-        // outset above now keeps a painting leaf non-degenerate on its own, so this is the belt to that
-        // braces — narrow the outset and it goes back to load-bearing.
-        box = right >= x && bottom >= y ? { x, y, width: right - x, height: bottom - y } : null;
-      }
-    }
-    return box;
-  };
   const inkBoxes = inkLeaves().map(throughClips).filter(Boolean);
-  // Ink existed before the clips were applied, so an empty set here means every leaf was clipped away.
-  // Skipping the crop would leave a canvas-sized frame and report it as done — the same silent pass the
-  // guard above refuses, reached through the clips instead of through an empty import.
-  if (!inkBoxes.length) throw new Error(`${frame.name}: every leaf was clipped away — nothing to crop to`);
+  // Both emptiness cases were refused before the swap. A reflow moves ink but deletes none, so this
+  // can only fire if a moved run left its clip — unlikely, and still better loud than a canvas-sized
+  // frame reported as done.
+  if (!inkBoxes.length) throw new Error(`${frame.name}: every leaf was clipped away after the reflow — nothing to crop to`);
   {
     const own = styled.absoluteBoundingBox;
     const ink = {

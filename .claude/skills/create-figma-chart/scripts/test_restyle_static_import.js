@@ -143,8 +143,10 @@ async function run(scenario) {
   return fn(figma, config);
 }
 
+const declared = [];
 function check(label, actual, expected) {
   checks++;
+  declared.push(label);
   const ok = typeof expected === "function" ? expected(actual) : JSON.stringify(actual) === JSON.stringify(expected);
   if (!ok) {
     failures++;
@@ -360,7 +362,7 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
     try { await run(s); } catch (e) { threw = e; }
     check("an import with no visible ink throws", /no visible ink/.test(threw && threw.message), true);
     // Throwing HERE rather than at the crop is the whole point: nothing has been destroyed yet.
-    check("the old chart is still on the frame", s.page.children[0].children.filter((c) => c.name === "chart").length, 1);
+    check("the old chart is still on the frame", s.page.children[0].children.some((c) => c.id === "old"), true);
     check("and the blank import was not swapped in", s.page.children[0].children.indexOf(s.styled) < 0, true);
   }
 
@@ -368,10 +370,12 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
   {
     const clip = node({ name: "axes_1", type: "FRAME", x: 16, y: 88, width: 818, height: 800, fills: [],
                         clipsContent: true, children: [leaf("off-in-the-weeds", 3000, 3000, 20, 20)] });
-    const s = scene({ inkNodes: [clip] });
+    const s = scene({ inkNodes: [clip], oldChart: true });
     let threw = null;
     try { await run(s); } catch (e) { threw = e; }
     check("a crop with nothing left to bound throws", /clipped away/.test(threw && threw.message), true);
+    check("and the old chart was not destroyed to report it",
+          s.page.children[0].children.some((c) => c.id === "old"), true);
   }
 
   console.log("\n" + (checks - failures) + "/" + checks + " checks passed");
@@ -396,13 +400,33 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
     ["frame fill left switched off (not a hit target)", [["styled.fills = [{ ...canvasPaint, visible: true }];", "styled.fills = [{ ...canvasPaint, visible: false }];"]]],
     ["snap tolerance widened past a real misalignment", [["const SNAP = 1;", "const SNAP = 20;"]]],
     ["blank import accepted silently (ink guard bypassed)", [["if (!inkLeaves().length) {", "if (false) {"]]],
-    ["every leaf clipped away accepted silently", [["if (!inkBoxes.length) throw", "if (false) throw"]]],
+    ["clipped-away import validated only AFTER the swap",
+     [["if (!inkLeaves().map(throughClips).filter(Boolean).length) {", "if (false) {"]]],
+    // The crop-side `if (!inkBoxes.length)` throw carries NO mutation on purpose: both emptiness cases
+    // are refused before the swap, so nothing the scenarios can build reaches it. It is kept as a loud
+    // floor for the one path that could — a reflow moving a run out of its clip — which the mock cannot
+    // stage, since the reflow only shifts runs within a row. Recorded here rather than deleted, so the
+    // gap is where someone will read it.
     ["strokeWeight guard dropped (figma.mixed reaches the arithmetic)",
      [["const weight = typeof n.strokeWeight === \"number\" ? n.strokeWeight : 0;", "const weight = n.strokeWeight;"]]],
     // "The crop runs LAST" is an ORDERING guarantee, and no token in the file means "before the
     // reflow" — so it cannot be re-broken by swapping one string for another. Hence a function: cut
     // the crop block out and splice it back above the reflow, which is the code as it stood when the
     // stale-bounds bug was found. Anchors gone => null => STALE, the same safety a find string has.
+    ["stroke-only patch stripped too (the axes spine deleted)", [["if (!first || first.removed || strokedAnywhere(first)) continue;", "if (!first || first.removed) continue;"]]],
+    ["crop never resizes the frame", [["styled.resizeWithoutConstraints(ink.right - ink.x, ink.bottom - ink.y);", ""]]],
+    ["children not shifted back, so the crop MOVES the ink", [["for (const child of styled.children) { child.x -= dx; child.y -= dy; }", ""]]],
+    ["inner clips ignored entirely", [["const clip = \"clipsContent\" in a && a.clipsContent ? a.absoluteBoundingBox : null;", "const clip = null;"]]],
+    ["outset taken from a stroke that paints nothing", [["    const paints = Array.isArray(n.strokes) &&\n      n.strokes.some((s) => s.visible !== false && (s.opacity === undefined || s.opacity > 0));", "    const paints = Array.isArray(n.strokes) && n.strokes.length > 0;"]]],
+    ["snap disabled (a side within a pixel no longer snaps)", [["const SNAP = 1;", "const SNAP = 0;"]]],
+    ["legend reflow skipped altogether", [["if (job.reflowLegend) {", "if (false) {"]]],
+    ["reference copy not rescaled to the frame width", [["reference.rescale(scale);", ""]]],
+    ["reference copy not renamed", [["reference.name = `${frame.name} — original SVG (unstyled)`;", ""]]],
+    ["reference copy not parked beside the frame", [["reference.x = frame.x - reference.width - job.referenceGap;", ""]]],
+    ["reference copy painted like the chart", [["styled.fills = [{ ...canvasPaint, visible: true }];", "for (const n of [styled, reference].filter(Boolean)) n.fills = [{ ...canvasPaint, visible: true }];"]]],
+    ["old chart left on the frame beside the new one", [["if (old) old.remove();", ""]]],
+    ["landing page not recorded for the sweep", [["if (ancestor) landingPages.add(`${ancestor.id} ${ancestor.name}`);", ""]]],
+    ["frame's fill STYLE not copied onto the chart", [["if (frame.fillStyleId && frame.fillStyleId !== figma.mixed) await styled.setFillStyleIdAsync(frame.fillStyleId);", ""]]],
     ["crop computed BEFORE the legend reflow", (src) => {
       const start = src.indexOf("  // CROP the frame to the plot's own ink");
       const end = src.indexOf("\n  report.push({");
@@ -416,6 +440,7 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
   const cp = require("child_process");
   const SRC_PATH = path.join(__dirname, "restyle_static_import.js");
   const original = fs.readFileSync(SRC_PATH, "utf8");
+  const broken = new Set();
   let caught = 0;
   console.log("\nre-breaking each guarantee — every one must FAIL the scenarios above");
   for (const [label, edits] of MUTATIONS) {
@@ -450,8 +475,36 @@ const box = (n) => ({ l: +n.x.toFixed(2), t: +n.y.toFixed(2), w: +n.width.toFixe
     } else {
       caught++;
       console.log("  caught " + label);
+      for (const ln of (done.stdout || "").split("\n")) {
+        if (ln.startsWith("  FAIL ")) broken.add(ln.slice(7).trim());
+      }
     }
   }
   console.log("\n" + caught + "/" + MUTATIONS.length + " re-introduced defects caught");
+
+  // ---------------------------------------------------------------------------------------------
+  // Phase 3 — the other direction. A mutation nothing catches is reported above; a CHECK no mutation
+  // breaks is the same defect seen from the other end, and it is the one that keeps happening: three
+  // scenarios in this suite passed while their guarantee was broken (the frame's fill asserted by
+  // style id alone, an ordering case whose runs sat inside the bar's own span, and a chart-replaced
+  // count that counted the replacement too). Each was invisible until something asked which checks a
+  // mutant actually breaks. So the suite asserts its own coverage rather than anyone re-deriving it.
+  const UNMUTATED = new Map([
+    ["a crop with nothing left to bound throws",
+     "unreachable by construction — both emptiness cases are refused before the swap, and the mock" +
+     " cannot stage the one path that would reach it (a reflow moving a run out of its clip, when the" +
+     " reflow only shifts within a row). Kept as a belt-and-braces throw."],
+  ]);
+  const uncovered = declared.filter((l) => !broken.has(l) && !UNMUTATED.has(l));
+  const excused = declared.filter((l) => UNMUTATED.has(l));
+  console.log("\ncoverage: " + (declared.length - uncovered.length - excused.length) + "/" +
+              declared.length + " checks broken by at least one mutation" +
+              (excused.length ? ", " + excused.length + " excused" : ""));
+  for (const l of excused) console.log("  excused  " + l + " — " + UNMUTATED.get(l));
+  for (const l of uncovered) {
+    console.log("  DECORATION " + l + " — no mutation breaks it, so it cannot fail. Write one, or" +
+                " excuse it in UNMUTATED with the reason.");
+    failures++;
+  }
   process.exit(failures ? 1 : 0);
 })();
