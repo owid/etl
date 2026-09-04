@@ -1,0 +1,103 @@
+# Manual inputs of the food supply chain step based on FAO's Supply Utilization Accounts (SCL).
+#
+# Item codes are FAO SCL (SUA) item codes; names are asserted against the data. Everything not listed here comes
+# from the data itself: the item list and the crop/animal/processed roles come from FAO's item groups, and energy
+# densities are reverse-engineered from FAO's food figures. This file holds only what cannot come from the data.
+
+# 1. Energy densities, in kcal per 100 g, for items that nobody eats, so that nothing can be reverse-engineered.
+#    Each item is valued as the human food it would be if eaten: defatted oilseed flours for the cakes, the cereal
+#    brans as sold for human consumption, pure ethanol, pure oil.
+#    Source: USDA FoodData Central, SR Legacy (soy flour defatted 330, sunflower seed flour 326, sesame flour 333,
+#    cottonseed flour 332, peanut flour defatted 327; wheat bran 216, rice bran 316, corn bran 224, oat bran 246;
+#    hemp seed 553; vegetable oils 884). Ethanol is 7 kcal per gram.
+fixed_densities:
+  families:
+    # Applied by name pattern to every item whose name starts with the pattern, unless the item is listed
+    # individually below.
+    - {pattern: "Cake of", density: 330, note: Defatted oilseed flours, 326-333 in USDA.}
+    - {pattern: "Cake,", density: 330, note: Same family (oilseeds not elsewhere classified).}
+    - {pattern: "Bran of", density: 216, note: Wheat bran as the default for cereal brans without a USDA entry.}
+  items:
+    - {code: 158, name: "Cane sugar, centrifugal", density: 380, note: Raw sugar, USDA brown sugar 380; no food use is reported for it because it is refined further.}
+    - {code: 35, name: "Bran of rice", density: 316}
+    - {code: 59, name: "Bran of maize", density: 224}
+    - {code: 77, name: "Bran of oats", density: 246}
+    - {code: 846, name: "Gluten feed and meal", density: 330, note: Valued as the cakes; a protein by-product of maize milling.}
+    - {code: 632, name: "Undenatured ethyl alcohol of an alcoholic strength by volume of 80% vol or higher", density: 700}
+    - {code: 634, name: "Undenatured ethyl alcohol of an alcoholic strength by volume of less than 80% vol; spirits, liqueurs and other spirituous beverages", density: 700}
+    - {code: 1276, name: "Industrial monocarboxylic fatty acids; acid oils from refining", density: 884, note: Fat that left the food chain to industry.}
+    - {code: 1277, name: "Residues of fatty substances", density: 884}
+    - {code: 1274, name: "Animal or vegetable fats and oils and their fractions, chemically modified, except those hydrogenated, inter-esterified, re-esterified or elaidinized; inedible mixtures or preparations of animal or vegetable fats or oils", density: 884}
+    - {code: 336, name: "Hempseed", density: 553}
+    - {code: 337, name: "Oil of hempseed", density: 884}
+    - {code: 1225, name: "Tallow", density: 884, note: Only used where no food-based density exists.}
+
+# 2. Items that are never food, whatever happens to them. Their density is zero, which removes them from every
+#    flow consistently (the balance identity is linear in the density).
+never_food:
+  - {code: 265, name: "Castor oil seeds"}
+  - {code: 266, name: "Oil of castor beans"}
+  - {code: 1273, name: "Castor oil, hydrogenated"}
+  - {code: 275, name: "Tung nuts"}
+  - {code: 276, name: "Oil of tung nuts"}
+  - {code: 305, name: "Tallowtree seeds"}
+  - {code: 306, name: "Vegetable tallow"}
+  - {code: 310, name: "Kapok fruit"}
+  - {code: 311, name: "Kapokseed in shell"}
+  - {code: 312, name: "Kapokseed, shelled"}
+  - {code: 313, name: "Oil of kapok"}
+  - {code: 314, name: "Cake of kapok"}
+  - {code: 277, name: "Jojoba seeds"}
+  - {code: 278, name: "Jojoba oil"}
+  - {code: 994, name: "Wool grease and lanolin"}
+  - {code: 1222, name: "Degras"}
+  - {code: 663, name: "Cocoa husks and shells"}
+
+# 3. Crops that are not eaten as harvested (paddy rice, sugar cane and beet, oil palm fruit, rapeseed, cotton seed),
+#    whose food-based density therefore rests on an unrepresentative sliver (or does not exist). Their density is derived from the products they are made into: calories of the family's
+#    products (minus the calories of products processed further within the family) over the tonnes of crop that
+#    went into processing, computed for World each year and applied to every country.
+output_implied_densities:
+  - crops: {156: "Sugar cane", 157: "Sugar beet"}
+    products: {158: "Cane sugar, centrifugal", 162: "Raw cane or beet sugar (centrifugal only)", 163: "Cane sugar, non-centrifugal", 160: "Refined cane or beet sugar, in solid form, containing added flavouring or colouring matter; maple sugar and maple syrup", 164: "Refined sugar", 165: "Molasses", 167: "Sugar and syrups n.e.c.", 168: "Sugar confectionery"}
+    intermediates: {158: "Cane sugar, centrifugal", 162: "Raw cane or beet sugar (centrifugal only)", 164: "Refined sugar"}
+  - crops: {27: "Rice"}
+    products: {28: "Husked rice", 29: "Rice, milled (husked)", 31: "Rice, milled", 32: "Rice, broken", 34: "Starch of rice", 35: "Bran of rice", 36: "Oil of rice bran", 37: "Cake of rice bran", 38: "Flour of rice", 39: "Rice-fermented beverages"}
+    intermediates: {28: "Husked rice", 29: "Rice, milled (husked)", 31: "Rice, milled", 32: "Rice, broken", 35: "Bran of rice"}
+  - crops: {254: "Oil palm fruit"}
+    products: {256: "Palm kernels", 257: "Palm oil", 258: "Oil of palm kernel", 259: "Cake of palm kernel"}
+    intermediates: {256: "Palm kernels"}
+  - crops: {270: "Rape or colza seed"}
+    products: {271: "Rapeseed or canola oil, crude", 272: "Cake of rapeseed"}
+    intermediates: {}
+  - crops: {329: "Cotton seed"}
+    products: {331: "Cottonseed oil", 332: "Cake of cottonseed"}
+    intermediates: {}
+
+# 4. Role overrides. FAO tags cotton seed as processed (it comes out of ginning seed cotton), but seed cotton is a
+#    fibre crop and not in SCL, so cotton seed is the first point where its calories exist.
+role_overrides:
+  - {code: 329, name: "Cotton seed", role: crop}
+
+# 5. Fish and seafood are not in SCL. These FBS items are spliced in, converted with their FBS densities.
+fish_from_fbs:
+  - {code: 2761, name: "Freshwater Fish", role: animal}
+  - {code: 2762, name: "Demersal Fish", role: animal}
+  - {code: 2763, name: "Pelagic Fish", role: animal}
+  - {code: 2764, name: "Marine Fish, Other", role: animal}
+  - {code: 2765, name: "Crustaceans", role: animal}
+  - {code: 2766, name: "Cephalopods", role: animal}
+  - {code: 2767, name: "Molluscs, Other", role: animal}
+  - {code: 2768, name: "Meat, Aquatic Mammals", role: animal}
+  - {code: 2769, name: "Aquatic Animals, Others", role: animal}
+  - {code: 2781, name: "Fish, Body Oil", role: processed}
+  - {code: 2782, name: "Fish, Liver Oil", role: processed}
+
+# 6. Processing families used only as a check: for World, the calories coming out of processing as products should
+#    be close to the calories going in (a few percent are lost in milling, crushing and brewing).
+processing_families_for_checks:
+  wheat: [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 41, 110, 113]
+  rice: [27, 28, 29, 31, 32, 34, 35, 36, 37, 38]
+  soybeans: [236, 237, 238, 239, 240, 241]
+  cow milk: [882, 885, 886, 887, 888, 889, 890, 891, 892, 893, 894, 897, 898, 900, 901, 903, 904, 907, 173]
+  barley: [44, 45, 46, 47, 48, 49, 50, 51]

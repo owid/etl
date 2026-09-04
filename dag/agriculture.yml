@@ -124,6 +124,14 @@ steps:
         # S3 export step: one JSON with the chain per entity and year, for the bespoke visualization to fetch.
         export://s3/agriculture/latest/food_supply_chain_fbs:
                 - data://garden/agriculture/2026-09-04/food_supply_chain_fbs
+        # Same chain from FAO's Supply Utilization Accounts (2010 onward), which include the feed by-products FBS lacks.
+        data://garden/agriculture/2026-09-04/food_supply_chain_scl:
+                - data://garden/faostat/2026-02-25/faostat_scl
+                - data://meadow/faostat/2026-02-25/faostat_metadata
+                - data://garden/faostat/2026-02-25/faostat_fbsc
+                - data://garden/demography/2024-07-15/population
+        export://s3/agriculture/latest/food_supply_chain_scl:
+                - data://garden/agriculture/2026-09-04/food_supply_chain_scl
         #
         # USDA/FAS - Corn yields
         #
