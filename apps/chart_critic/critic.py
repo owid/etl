@@ -1,6 +1,6 @@
 """Ask a model whether a published chart would mislead a reader.
 
-The prompt is doing the work here, so the three things it must contain are worth stating:
+The prompt is doing the work here, so what it must contain is worth stating:
 
 1. **Today's date.** Without it the model reasons from its own sense of "now" and flags recent
    data as future-dated. That produced a false positive on ``weekly-growth-covid-deaths``
@@ -15,6 +15,13 @@ The prompt is doing the work here, so the three things it must contain are worth
    to make a judgement rather than hedge.
 4. **A reader-impact field.** A finding that cannot name what a reader would wrongly conclude
    is usually noise, and asking for it up front suppresses more of it than any threshold.
+5. **That our own documentation of the data outranks the model's suspicion.** The bundle carries
+   the indicator's key facts and processing notes, which is where a genuine-but-alarming value is
+   explained; a discontinuity the metadata accounts for is documented, not a finding. This is the
+   route a false positive is closed by — see ``COLUMN_FIELDS`` in ``bundle.py``. Deliberately
+   stated as a rule about the metadata and not as a list of cases: an earlier draft named the
+   Central African Republic here, which suppressed that one chart by name and would have taught
+   nothing about the next one.
 
 What this catches that statistical detection cannot: an error that is stable over time and
 statistically unremarkable, where the only tell is knowing something about the world. The
@@ -26,6 +33,7 @@ tests are ``apps/anomalist``'s job and are deliberately not duplicated here.
 from __future__ import annotations
 
 import datetime as dt
+import re
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -137,6 +145,14 @@ For each issue, set chart_params to the grapher query parameters that put the pr
 screen — the entity and time range you are talking about — so a reviewer sees it immediately
 rather than the chart's default view.
 
+The indicator's key facts and processing notes are our own documentation of the data, written
+for readers. They are where a value that looks impossible is explained — a crisis adjustment
+added on top of a modelled series, a survey redesign, a deliberate aggregation. An extreme value
+or a discontinuity that the metadata accounts for is documented rather than wrong: say nothing
+about it. Judge it against what the metadata actually says, not against whether the number looks
+extreme — an explanation that does not cover the value you are looking at is not a licence to
+dismiss it.
+
 Your knowledge of definitions and thresholds may be out of date, and the chart's own metadata
 is more current than you are. Do not flag a definition, a poverty line, a classification or a
 unit convention merely because it differs from what you remember — flag it only when the chart
@@ -145,6 +161,33 @@ that the International Poverty Line is not $3 per day, when it was revised to ex
 
 Do not invent problems. An ordinary chart has no issues, and returning an empty list is the
 expected outcome for most charts."""
+
+
+# How much of a claim's significant words two findings must share to be the same finding. The
+# model rewords freely — "the subtitle states prices are in constant 2023 US$" and "the chart
+# subtitle states prices are measured in constant 2023 US$" are one claim — so identity has to
+# survive rewording rather than be a hash of the sentence.
+#
+# One definition, used in the two places that have to agree: merging the repeat passes of a
+# single run, and recognising in the digest what has already been posted. They disagreed for a
+# while, and the consequence reached the channel — a finding merged across passes within a run
+# was posted again the next day under its new wording, on a chart that had been fixed in between.
+CLAIM_OVERLAP = 0.4
+
+
+def claim_tokens(claim: str) -> set[str]:
+    """The significant words of a claim, crudely singular-folded.
+
+    Without the folding, "the unit for all three indicators is incorrectly set to 'doses'" and
+    "the indicator unit is incorrectly set to 'doses'" scored below the threshold and were
+    reported as two findings.
+    """
+    return {w.rstrip("s") for w in re.findall(r"[a-z0-9]{4,}", claim.lower())}
+
+
+def same_claim(tokens: set[str], other: set[str]) -> bool:
+    """Whether two claims, reduced to :func:`claim_tokens`, say the same thing."""
+    return len(tokens & other) / max(len(tokens | other), 1) >= CLAIM_OVERLAP
 
 
 def issue_params(target_params: str, issue: dict) -> str:

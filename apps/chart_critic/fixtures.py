@@ -22,14 +22,19 @@ Two honest caveats:
   worth treating as a regression rather than re-running, and that one case is marked ``flaky``
   and left out of the gate.
 
-Measured on 2026-08-31 with ``google:gemini-3.7-flash``:
+Measured with ``google:gemini-3.7-flash``:
 
-===========  ====================  =================================
-passes       result                cost
-===========  ====================  =================================
-2            6/8 (2/4 errors)      $0.05
-5            **8/8 (4/4 errors)**  $0.22
-===========  ====================  =================================
+===========  ==========  ====================  ======
+date         passes      result                cost
+===========  ==========  ====================  ======
+2026-08-31   2           6/8 (2/4 errors)      $0.05
+2026-08-31   5           **8/8 (4/4 errors)**  $0.22
+2026-09-04   5           **9/9 (3/3 errors)**  $0.24
+===========  ==========  ====================  ======
+
+The last row is with the indicator's ``descriptionKey`` and ``descriptionProcessing`` in the
+bundle, and it is also the first run in which the flaky COVID case landed — one run is not
+evidence that it stopped being flaky.
 
 Both misses at two passes were the subtlest cases — a subtitle typo and a baseline offset —
 and no number of passes made a clean chart fire. So passes buy recall without costing
@@ -66,7 +71,14 @@ CASES: list[Case] = [
         slug="life-expectancy-vs-gdp-per-capita",
         expect_keywords=["central african", "life expectancy"],
         why="CAR's life expectancy oscillates 52.3 → 31.5 → 50.6 → 40.3 → 18.8 → 57.4 (2018-2023). "
-        "Filed as owid/etl#6779. The indicator sits behind 6 charts and ~199k views/yr.",
+        "Filed as owid/etl#6779. The indicator sits behind 6 charts and ~199k views/yr. "
+        "**This one turned out to be a false positive**: the oscillation is the UN's crisis-mortality "
+        "adjustment, corroborated by the surveys it is built from, and owid/etl#6813 documents it in "
+        "the indicator's description_key rather than changing any data. So this case is expected to "
+        "flip to FAIL once that PR is deployed — measured 2026-09-04, splicing its bullet into the "
+        "bundle takes the finding from 5/5 passes to 0/5. When it flips, move it to the clean section "
+        "as a guard case (clear expect_keywords, fill guards_against) rather than deleting it: it then "
+        "guards the mechanism that a documented anomaly is not a finding.",
     ),
     # ---------- fixed since it was filed, kept as a clean case ----------
     Case(
