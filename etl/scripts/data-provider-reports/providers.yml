@@ -11,8 +11,6 @@ PROVIDERS:
   - name: "IHME, Global Burden of Disease"
     alias: ["IHME Global Burden of Disease"]
   - name: "Epoch AI"
-    # NOTE: old dataset versions attribute the producer as "Epoch", but no published chart uses their
-    # variables (checked 2026-09-02), so no alias is needed.
     alias: []
   - name: "Ember"
     alias: []
