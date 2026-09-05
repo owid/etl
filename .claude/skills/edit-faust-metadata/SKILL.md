@@ -206,8 +206,8 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
    - route (b): `STAGING=1 .venv/bin/etlr export://multidim/<ns>/<ver>/<name> --export --private`.
    - route (c): already live on staging.
 8. Run the metadata quality checks scoped to the edit (next section); fix findings and re-run the affected steps.
-9. Verify on staging (section after); show the user the preview links.
-10. **CHECKPOINT** — show: the `git diff` (routes a/b) and/or the chart-patch JSON diff (route c), staging preview links (strip the `.tail6e23.ts.net` suffix from admin links), the blast-radius summary, and any unresolved check findings. **Wait for the user's explicit go-ahead.**
+9. Verify on staging (section after); show the user the preview links, Metadata Diff included — it is the only view of every surface the edit reaches.
+10. **CHECKPOINT** — show: the `git diff` (routes a/b) and/or the chart-patch JSON diff (route c), staging preview links (strip the `.tail6e23.ts.net` suffix from admin links), the blast-radius summary (link Metadata Diff's `?diff-type=blast` beside it once the grapher step is on staging — the same claim, verified against what the server actually renders), and any unresolved check findings. **Wait for the user's explicit go-ahead.**
 11. After the go-ahead, hands-off:
     - `make check`;
     - commit `🔨🤖 <description>` with `Co-Authored-By: Claude <model name> <noreply@anthropic.com>`;
@@ -235,22 +235,24 @@ Scoping rules specific to this skill:
 
 ## Verifying on staging
 
+- **Everything this branch changed, everywhere it lands**: the **Metadata Diff** Wizard page — `/etl/wizard/metadata-diff` on this branch's staging server (resolve the host with `get_container_name`, never by hand) — diffs the *rendered* texts (title/subtitle/footnote, `description_short`, WYSK) against production/`staging-site-master` and lists every chart, MDim view and explorer view each edit reaches. This is the broad check; the bullets below are the narrow spot-checks for one field at a time. Two limits: it needs the grapher step uploaded to this server (`STAGING=1 .venv/bin/etlr grapher://grapher/<path> --grapher`), and its scope is the branch's *changed step files* ∩ *datasets rebuilt here* — so it covers routes (a) and (b), but **not** a route-(c) staging-only chart-config edit, which changes no step file and shows up in **chart-diff** instead. Details in `/owid-metadata-generation`, "Reviewing the change on staging (Metadata Diff)".
 - **Chart text without a browser**: `curl -s http://staging-site-<branch>/grapher/<slug>.svg | grep -o '<new text fragment>'` — the server-side render carries title/subtitle/note.
 - **Indicator fields**: `https://api-staging.owid.io/staging-site-<branch>/v1/indicators/<id>.metadata.json` (path prefix is the full container name, not the bare branch — a wrong prefix silently serves another environment).
 - **MDim views**: the resolver's per-view collection-preview URL (`/admin/grapher/<urlquoted catalogPath>?dim=choice...`).
 - **Visual QA**: hand off to the `check-chart-preview` skill for a screenshot.
-- **Big text changes**: re-run the report scripts in indicator-list mode and diff against the previous output (see dump mode below).
+- **Big text changes**: Metadata Diff (first bullet) covers this once the branch is on staging. Without a staging server, re-run the report scripts in indicator-list mode and diff against the previous output (see dump mode below).
 - **Jinja-templated definitions**: after editing shared `definitions`, rebuild garden AND grapher before reading anything — the report scripts and ad-hoc reads use the grapher channel, and a stale channel shows pre-edit metadata. Spot-check several rendered variants; dimension comparisons are type-sensitive (`decile == 5` vs `decile == "5"` — copy the comparison form from a working definition in the same file).
 
 ## Path to production
 
 - Route (a)/(b) file edits deploy when the PR merges (normal ETL deploy).
 - Route (c) staging chart edits appear in **chart-diff**; they are synced to production by chart-sync only after approval in the Wizard + merge. Remind the user of the pending approval.
+- **Text has no approval gate.** Route (a)/(b) text ships with the merge, and **Metadata Diff** is where it gets reviewed — a rejection there changes nothing by itself, it exports `metadata-rejections.md` for whoever owns the dataset. Route (c) config edits are the ones chart-diff actually gates.
 - Never point a write at `admin.owid.io` or the production DB. The guard in `update_chart_config.py` enforces this; don't work around it.
 
 ### Close with what's still open
 
-End the checkpoint and the final hand-off by saying what's still open — a line or two in chat, written out in the PR body when there is one. `.claude/docs/open-items.md` lists what tends to get dropped. This skill's usual danglers: `#dod:` terms to create in admin and editorial calls on pin-coupled text (waiting on someone else), the checkpoint diff itself and route-(c) chart-diff approval in the Wizard (waiting on a decision — easy to leave dangling because the merge doesn't force it), and checks scoped out or staging surfaces not previewed (nobody checked it).
+End the checkpoint and the final hand-off by saying what's still open — a line or two in chat, written out in the PR body when there is one. `.claude/docs/open-items.md` lists what tends to get dropped. This skill's usual danglers: `#dod:` terms to create in admin and editorial calls on pin-coupled text (waiting on someone else), the checkpoint diff itself, route-(c) chart-diff approval in the Wizard, and any Metadata Diff rejection still unactioned (waiting on a decision — easy to leave dangling because the merge doesn't force it), and checks scoped out or staging surfaces not previewed (nobody checked it).
 
 ## The guarded chart editor (route c)
 
@@ -442,6 +444,8 @@ When you change an MDim `.py` (reorder indicators, flip a choice order, change w
    .venv/bin/python .claude/skills/edit-faust-metadata/scripts/generate_mdim_text_report.py --config /tmp/fa.json
    ```
 3. Diff, stripping the BEFORE/AFTER name token: `diff <(sed 's/BEFORE//g' ai/gini_lis_BEFORE.md) <(sed 's/AFTER//g' ai/gini_lis_AFTER.md)`. Byte-identical = all six fields render the same.
+
+Metadata Diff does not replace this. It answers "what changed, and where does it land" on a server that has the build; this answers "prove nothing changed" offline, byte for byte, before anything is pushed.
 
 The FAUST diff only covers user-facing **text**. It will NOT catch indicator-order-only changes (e.g. a Dumbbell arrow direction or a series-color swap that follows column order) — pair it with a structural diff of the two `.config.json` files when order matters.
 

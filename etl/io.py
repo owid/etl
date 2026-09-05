@@ -66,6 +66,42 @@ def get_dag_dependency_changed_steps(files_changed: dict[str, dict[str, str]]) -
     return changed_steps
 
 
+def get_directly_changed_export_uris(files_changed: dict[str, dict[str, str]]) -> list[str]:
+    """``export://`` URIs of the export recipes whose *own* files this branch changed.
+
+    Only recipes edited here — not the exports :func:`get_all_changed_catalog_paths` reaches downstream
+    from a changed data step. Callers asking "did this branch author this product's config?" need the
+    distinction: a single garden metadata edit expands into every MDim and explorer downstream of it,
+    and nobody here wrote any of their configs.
+    """
+    uris: list[str] = []
+    for step_path in get_changed_steps(files_changed):
+        abs_step_path = BASE_DIR / Path(step_path)
+        try:
+            rel_export = abs_step_path.relative_to(STEP_DIR / "export")
+        except ValueError:
+            continue  # Not an export step (a data or snapshot step).
+        # A collection recipe can be split across companion config files named
+        # `<short>.<key>.config.yml` (e.g. democracy.eiu.config.yml) that all feed the single
+        # `<short>.py` step. Blindly stripping suffixes would invent a nonexistent
+        # `<short>.<key>` step, so resolve to the sibling `<short>.py` recipe when it exists.
+        short = abs_step_path.name.split(".", 1)[0]
+        if (abs_step_path.parent / f"{short}.py").exists():
+            export_path = (rel_export.parent / short).as_posix()
+        else:
+            export_path = rel_export.with_suffix("").with_suffix("").as_posix()
+        uri = f"export://{export_path}"
+        if uri not in uris:
+            uris.append(uri)
+
+    # Dependency-only DAG edits change an export step's content without touching its files.
+    for step_uri in sorted(get_dag_dependency_changed_steps(files_changed)):
+        if step_uri.startswith("export://") and step_uri not in uris:
+            uris.append(step_uri)
+
+    return uris
+
+
 def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]], include_export: bool = False) -> list[str]:
     """Get all changed steps and their downstream dependencies.
 
@@ -77,7 +113,7 @@ def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]], incl
     # Directly-changed export steps (e.g. a modified multidim/explorer recipe). These live under
     # etl/steps/export/, not etl/steps/data/, so they aren't data catalog paths; we keep their full
     # export:// URI and add them to the result when include_export is set.
-    changed_export_uris = []
+    changed_export_uris = get_directly_changed_export_uris(files_changed)
 
     # Get catalog paths of all datasets with changed files.
     for step_path in get_changed_steps(files_changed):
@@ -90,22 +126,8 @@ def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]], incl
                 ds_path = abs_step_path.relative_to(STEP_DIR / "data").with_suffix("").with_suffix("").as_posix()
             dataset_catalog_paths.append(ds_path)
         except ValueError:
-            # Not a data/snapshot step. It might be an export step (etl/steps/export/...); if so,
-            # record its export:// URI so a branch that only edits an export recipe still selects it.
-            try:
-                rel_export = abs_step_path.relative_to(STEP_DIR / "export")
-            except ValueError:
-                continue
-            # A collection recipe can be split across companion config files named
-            # `<short>.<key>.config.yml` (e.g. democracy.eiu.config.yml) that all feed the single
-            # `<short>.py` step. Blindly stripping suffixes would invent a nonexistent
-            # `<short>.<key>` step, so resolve to the sibling `<short>.py` recipe when it exists.
-            short = abs_step_path.name.split(".", 1)[0]
-            if (abs_step_path.parent / f"{short}.py").exists():
-                export_path = (rel_export.parent / short).as_posix()
-            else:
-                export_path = rel_export.with_suffix("").with_suffix("").as_posix()
-            changed_export_uris.append(f"export://{export_path}")
+            # Not a data/snapshot step. Export steps are already collected above.
+            continue
 
     # Dependency-only DAG edits (repoints) change a step's content without touching its files —
     # select those steps too, so they enter the subgraph expansion below like any changed step.
@@ -114,8 +136,6 @@ def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]], incl
             ds_path = step_uri.split("://", 1)[1]
             if ds_path not in dataset_catalog_paths:
                 dataset_catalog_paths.append(ds_path)
-        elif step_uri.startswith("export://") and step_uri not in changed_export_uris:
-            changed_export_uris.append(step_uri)
 
     if not dataset_catalog_paths:
         # No data steps changed. We can still have directly-changed export steps; return those when

@@ -211,6 +211,8 @@ Any `NULL` row is a 🔴.
 
 Run `/check-metadata-typos`, `/check-metadata-spacing`, `/check-metadata-style` against the new garden + grapher `.meta.yml` files. See `/update-dataset` § 6b for the full procedure (typos / spacing / style + a manual clarity checklist for general-audience readability — apply that checklist here too). Report findings as 🟡 (or 🔴 if a violation breaks rendering or makes the text outright misleading).
 
+**Did the PR change reader-facing text?** If so, open the **Metadata Diff** Wizard page on the PR's staging server (`http://staging-site-<container_branch>/etl/wizard/metadata-diff`) and grade the edits there. It lists every chart, MDim view and explorer view each edit lands on — the only view of a garden text change's actual reach, since inherited text produces no config diff at all. A wording you would reject is 🟡 (🔴 when the new text is misleading or contradicts what the view shows): reject it in the page and hand the author the exported `metadata-rejections.md`, which already names the edit, the garden `.meta.yml` and the dataset owner. Check two things before trusting the counts — the page's 🚧 stale-server banner (a dataset the server is behind on reports its diffs *backwards*) and whether the grapher step reached that server at all. Author side: the QA hand-off in `/update-dataset`.
+
 Also grep the metadata **prose** for numbers carried over from the previous release (country counts, category counts, year ranges in `description_key`/descriptions): validated fields are covered by checks, prose numbers are not — a panel-composition change (dropped country, new category set) silently strands them (see `/update-dataset` Guardrails, "Grep metadata prose"). Stale prose count: 🟡.
 
 Five further prose checks from `/update-dataset` § 6b that the skills don't automate:
@@ -336,8 +338,8 @@ Structure the review with:
 5. **🔴 Blockers** — must-fix before merge
 6. **🟡 Suggestions** — nice-to-have
 7. **🟢 Informational** — observations, no action needed
-8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, etc. (The Slack + `/latest` drafts live in `workbench/`, not the PR — don't expect them here.)
-9. **What's still open** — carried forward from the PR body, covering the categories in `.claude/docs/open-items.md` plus the update workflow's fourth one (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
+8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, whether the QA hand-off included Metadata Diff when the PR changed reader-facing text, etc. (The Slack + `/latest` drafts live in `workbench/`, not the PR — don't expect them here.)
+9. **What's still open** — carried forward from the PR body, covering the categories in `.claude/docs/open-items.md` plus the update workflow's fourth one (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Unactioned Metadata Diff rejections belong here — nothing in the merge enforces them. Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
 
 **Check the PR body doesn't leave pending work unmentioned.** A PR whose description lists only what was done, while the session left content edits pending, audits unrun, or a follow-up PR's scope undefined, is missing the one artifact that survives after the chat is gone — flag it 🟡. Judge it on whether a reader can tell what's outstanding, not on whether it uses any particular headings or wording. Work that was deliberately handed off needs a locator in the body too, not just a description: an item the next person can't act on without redoing the analysis isn't handed off.
 

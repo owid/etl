@@ -8,7 +8,7 @@ import structlog
 from rich import print
 from rich_click.rich_command import RichCommand
 
-from apps.owidbot import anomalist, chart_diff, data_diff, grapher
+from apps.owidbot import anomalist, chart_diff, data_diff, grapher, metadata_diff
 from etl.config import OWIDBOT_ACCESS_TOKEN, get_container_name
 from etl.git_api_helpers import GithubApiRepo
 
@@ -31,7 +31,7 @@ def get_cloudflare_subdomain(branch_name: str) -> str:
 log = structlog.get_logger()
 
 REPOS = Literal["etl", "owid-grapher"]
-SERVICES = Literal["data-diff", "chart-diff", "grapher", "anomalist"]
+SERVICES = Literal["data-diff", "chart-diff", "metadata-diff", "grapher", "anomalist"]
 
 
 @click.command("owidbot", cls=RichCommand, help=__doc__)
@@ -90,6 +90,13 @@ def cli(
 
             # update github check run
             chart_diff.create_check_run(repo_name, branch, charts_df, dry_run)
+
+        elif service == "metadata-diff":
+            metadata_summary = metadata_diff.call_metadata_diff(branch)
+            services_body["metadata-diff"] = metadata_diff.run(branch, metadata_summary)
+
+            # No check run on purpose: metadata ships through ETL on merge and gates nothing, so a
+            # red check here would be noise rather than a signal.
 
         elif service == "grapher":
             services_body["grapher"] = grapher.run(branch, head_sha=pr.head.sha)
@@ -166,6 +173,9 @@ def create_comment_body(branch: str, services: dict[str, str], start_time: float
 <!--chart-diff-start-->
 {services.get("chart-diff", "")}
 <!--chart-diff-end-->
+<!--metadata-diff-start-->
+{services.get("metadata-diff", "")}
+<!--metadata-diff-end-->
 <!--data-diff-start-->
 {services.get("data-diff", "")}
 <!--data-diff-end-->
