@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: World Inequality Database (WID.world)
+    title: World Inequality Database (WID)
+    description: |-
+      The World Inequality Database (WID.world) aims to provide open and convenient access to the most extensive available database on the historical evolution of the world distribution of income and wealth, both within countries and between countries.
+    title_snapshot: World Inequality Database (WID) - Distributional data
+    description_snapshot: |-
+      Distributional data for the same four welfare concepts and population: one row per country, year, welfare concept and fractile (the 100 percentiles plus finer fractiles within the top 1%, 0.1% and 0.01%), with the average, threshold and share of each fractile, and WID's data quality score for the row's welfare concept. Monetary values are converted to international dollars at the prices of the latest year in WID's price index.
+
+      Extracted with the wid Stata command (v1.0.7) without any quality filter, so it includes every observation WID publishes, including extrapolated and imputed ones, together with WID's row-level data quality score (0 = no underlying data, 5 = the best annual sources), which is constant within a country, year and welfare concept.
+    citation_full: World Inequality Database (WID), https://wid.world
+    attribution_short: WID
+    url_main: https://wid.world
+    date_accessed: '2026-09-02'
+    date_published: '2026'
+    license:
+      name: CC BY 4.0
+      url: https://wid.world/
+outs:
+  - md5: f06c08782f01f54b49ba7aa72155be2e
+    size: 387074998
+    path: world_inequality_database_distribution.csv

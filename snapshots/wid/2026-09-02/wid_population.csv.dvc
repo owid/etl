@@ -12,12 +12,12 @@ meta:
     citation_full: World Inequality Database (WID), https://wid.world
     attribution_short: WID
     url_main: https://wid.world
-    date_accessed: '2026-08-25'
+    date_accessed: '2026-09-02'
     date_published: '2026'
     license:
       name: CC BY 4.0
       url: https://wid.world/
 outs:
-  - md5: c114e8de1bfa41cf7774a5a53997f960
-    size: 5077560
+  - md5: 0ab6078d3b13d6fd2b5038b7e60b61f4
+    size: 5330785
     path: wid_population.csv

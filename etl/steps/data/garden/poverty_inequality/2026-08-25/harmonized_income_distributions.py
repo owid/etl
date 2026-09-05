@@ -63,8 +63,11 @@ log = paths.log
 
 # WID series to use: including extrapolations ("yes") matches the source project (whose fetch did
 # not exclude them) and is the only slice with near-complete country coverage (without
-# extrapolations WID covers ~17 countries in 2023 vs ~226 with them). PIP's thousand-bins panel is
+# extrapolations WID covers 54 countries in 2023 vs 226 with them). PIP's thousand-bins panel is
 # itself lined up/extrapolated by the World Bank, so this is the symmetric choice.
+# NOTE: that 54 was 17 before wid/2026-09-02. WID retired the extrapolation flag the "no" slice used
+# to come from, so it is now defined by WID's own data-quality score (income scored >= 3); the
+# argument for "yes" is unchanged, but re-measure the counts whenever the WID version moves.
 EXTRAPOLATED_CHOICE = "yes"
 
 DAYS_PER_YEAR = 365
@@ -457,7 +460,10 @@ def process_wid_distributions(
         d = d[~unusable]
 
     # Provenance flag: a WID country-year counts as extrapolated unless it also appears in WID's
-    # non-extrapolated series (i.e. it is anchored in observed data).
+    # non-extrapolated series (i.e. it is anchored in data WID rates as directly supporting it).
+    # Since wid/2026-09-02 that slice is defined by WID's data-quality score (income scored >= 3)
+    # rather than by WID's retired extrapolation flag, so the flag is stricter for some country-years
+    # and looser for others; the counts above record the net effect on 2023.
     observed = (
         tb_dist.loc[tb_dist["extrapolated"] == "no", ["country", "year", "welfare_type"]].drop_duplicates().copy()
     )

@@ -550,3 +550,18 @@ steps:
   # archived; last active in 1c3d0dac654a on 2026-07-28
   data://garden/wid/2026-06-18/world_inequality_database_legacy:
     - data://meadow/wid/2026-06-18/world_inequality_database
+  # archived; last active in a489c28c5ab3 on 2026-09-03
+  data://garden/wid/2026-06-18/world_inequality_database:
+    - data://meadow/wid/2026-06-18/world_inequality_database
+  # archived; last active in a489c28c5ab3 on 2026-09-03
+  data://grapher/wid/2026-06-18/world_inequality_database:
+    - data://garden/wid/2026-06-18/world_inequality_database
+  # archived; last active in a489c28c5ab3 on 2026-09-03
+  data://meadow/wid/2026-06-18/world_inequality_database:
+    - snapshot://wid/2026-06-18/world_inequality_database_distribution_with_extrapolations.csv
+    - data://garden/regions/2023-01-01/regions
+    - snapshot://wid/2026-06-18/wid_population.csv
+    - snapshot://wid/2026-06-18/world_inequality_database_with_extrapolations.csv
+    - snapshot://wid/2026-06-18/world_inequality_database_fiscal.csv
+    - snapshot://wid/2026-06-18/world_inequality_database.csv
+    - snapshot://wid/2026-06-18/world_inequality_database_distribution.csv
