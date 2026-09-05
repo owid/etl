@@ -509,12 +509,6 @@
                             "Income level"
                         ],
                         "examples_bad": [
-                            "metric",
-                            "age group",
-                            "gender",
-                            "income level"
-                        ],
-                        "examples_bad": [
                             "Metric",
                             "AgeGroup",
                             "GENDER",
@@ -813,7 +807,7 @@
                     "config": {
                         "type": "object",
                         "title": "View chart configuration",
-                        "description": "Chart configuration options that override default settings for this view.",
+                        "description": "Chart configuration options that override default settings for this view. Validated by the grapher admin API when the config is upserted, not here. See the [grapher schema](https://files.ourworldindata.org/schemas/grapher-schema.latest.json) for the available fields.",
                         "requirement_level": "optional",
                         "guidelines": [
                             [
@@ -826,183 +820,7 @@
                                 "Common options include title, subtitle, chart types, and axis settings."
                             ]
                         ],
-                        "properties": {
-                            "$schema": {
-                                "$ref": "grapher-schema.011.json#/properties/$schema"
-                            },
-                            "addCountryMode": {
-                                "$ref": "grapher-schema.011.json#/properties/addCountryMode"
-                            },
-                            "compareEndPointsOnly": {
-                                "$ref": "grapher-schema.011.json#/properties/compareEndPointsOnly"
-                            },
-                            "selectedEntityColors": {
-                                "$ref": "grapher-schema.011.json#/properties/selectedEntityColors"
-                            },
-                            "relatedQuestions": {
-                                "$ref": "grapher-schema.011.json#/properties/relatedQuestions"
-                            },
-                            "title": {
-                                "$ref": "grapher-schema.011.json#/properties/title"
-                            },
-                            "map": {
-                                "$ref": "grapher-schema.011.json#/properties/map"
-                            },
-                            "maxTime": {
-                                "$ref": "grapher-schema.011.json#/properties/maxTime"
-                            },
-                            "subtitle": {
-                                "$ref": "grapher-schema.011.json#/properties/subtitle"
-                            },
-                            "selectedEntityNames": {
-                                "$ref": "grapher-schema.011.json#/properties/selectedEntityNames"
-                            },
-                            "focusedSeriesNames": {
-                                "$ref": "grapher-schema.011.json#/properties/focusedSeriesNames"
-                            },
-                            "baseColorScheme": {
-                                "$ref": "grapher-schema.011.json#/properties/baseColorScheme"
-                            },
-                            "yAxis": {
-                                "$ref": "grapher-schema.011.json#/properties/yAxis"
-                            },
-                            "tab": {
-                                "$ref": "grapher-schema.011.json#/properties/tab"
-                            },
-                            "matchingEntitiesOnly": {
-                                "$ref": "grapher-schema.011.json#/properties/matchingEntitiesOnly"
-                            },
-                            "hideSeriesLabels": {
-                                "$ref": "grapher-schema.011.json#/properties/hideSeriesLabels"
-                            },
-                            "hideLogo": {
-                                "$ref": "grapher-schema.011.json#/properties/hideLogo"
-                            },
-                            "timelineMinTime": {
-                                "$ref": "grapher-schema.011.json#/properties/timelineMinTime"
-                            },
-                            "variantName": {
-                                "$ref": "grapher-schema.011.json#/properties/variantName"
-                            },
-                            "hideTimeline": {
-                                "$ref": "grapher-schema.011.json#/properties/hideTimeline"
-                            },
-                            "originUrl": {
-                                "$ref": "grapher-schema.011.json#/properties/originUrl"
-                            },
-                            "license": {
-                                "$ref": "grapher-schema.011.json#/properties/license"
-                            },
-                            "colorScale": {
-                                "$ref": "grapher-schema.011.json#/properties/colorScale"
-                            },
-                            "scatterPointLabelStrategy": {
-                                "$ref": "grapher-schema.011.json#/properties/scatterPointLabelStrategy"
-                            },
-                            "selectedFacetStrategy": {
-                                "$ref": "grapher-schema.011.json#/properties/selectedFacetStrategy"
-                            },
-                            "sourceDesc": {
-                                "$ref": "grapher-schema.011.json#/properties/sourceDesc"
-                            },
-                            "invertColorScheme": {
-                                "$ref": "grapher-schema.011.json#/properties/invertColorScheme"
-                            },
-                            "hideRelativeToggle": {
-                                "$ref": "grapher-schema.011.json#/properties/hideRelativeToggle"
-                            },
-                            "comparisonLines": {
-                                "$ref": "grapher-schema.011.json#/properties/comparisonLines"
-                            },
-                            "internalNotes": {
-                                "$ref": "grapher-schema.011.json#/properties/internalNotes"
-                            },
-                            "version": {
-                                "$ref": "grapher-schema.011.json#/properties/version"
-                            },
-                            "logo": {
-                                "$ref": "grapher-schema.011.json#/properties/logo"
-                            },
-                            "entityType": {
-                                "$ref": "grapher-schema.011.json#/properties/entityType"
-                            },
-                            "facettingLabelByYVariables": {
-                                "$ref": "grapher-schema.011.json#/properties/facettingLabelByYVariables"
-                            },
-                            "note": {
-                                "$ref": "grapher-schema.011.json#/properties/note"
-                            },
-                            "chartTypes": {
-                                "$ref": "grapher-schema.011.json#/properties/chartTypes"
-                            },
-                            "dumbbell": {
-                                "$ref": "grapher-schema.011.json#/properties/dumbbell"
-                            },
-                            "hasMapTab": {
-                                "$ref": "grapher-schema.011.json#/properties/hasMapTab"
-                            },
-                            "stackMode": {
-                                "$ref": "grapher-schema.011.json#/properties/stackMode"
-                            },
-                            "minTime": {
-                                "$ref": "grapher-schema.011.json#/properties/minTime"
-                            },
-                            "hideAnnotationFieldsInTitle": {
-                                "$ref": "grapher-schema.011.json#/properties/hideAnnotationFieldsInTitle"
-                            },
-                            "excludedEntityNames": {
-                                "$ref": "grapher-schema.011.json#/properties/excludedEntityNames"
-                            },
-                            "xAxis": {
-                                "$ref": "grapher-schema.011.json#/properties/xAxis"
-                            },
-                            "timelineMaxTime": {
-                                "$ref": "grapher-schema.011.json#/properties/timelineMaxTime"
-                            },
-                            "hideConnectedScatterLines": {
-                                "$ref": "grapher-schema.011.json#/properties/hideConnectedScatterLines"
-                            },
-                            "showNoDataArea": {
-                                "$ref": "grapher-schema.011.json#/properties/showNoDataArea"
-                            },
-                            "zoomToSelection": {
-                                "$ref": "grapher-schema.011.json#/properties/zoomToSelection"
-                            },
-                            "showYearLabels": {
-                                "$ref": "grapher-schema.011.json#/properties/showYearLabels"
-                            },
-                            "hideTotalValueLabel": {
-                                "$ref": "grapher-schema.011.json#/properties/hideTotalValueLabel"
-                            },
-                            "hideScatterLabels": {
-                                "$ref": "grapher-schema.011.json#/properties/hideScatterLabels"
-                            },
-                            "sortBy": {
-                                "$ref": "grapher-schema.011.json#/properties/sortBy"
-                            },
-                            "sortOrder": {
-                                "$ref": "grapher-schema.011.json#/properties/sortOrder"
-                            },
-                            "sortColumnSlug": {
-                                "$ref": "grapher-schema.011.json#/properties/sortColumnSlug"
-                            },
-                            "hideFacetControl": {
-                                "$ref": "grapher-schema.011.json#/properties/hideFacetControl"
-                            },
-                            "includedEntityNames": {
-                                "$ref": "grapher-schema.011.json#/properties/includedEntityNames"
-                            },
-                            "inapplicableEntityNames": {
-                                "$ref": "grapher-schema.011.json#/properties/inapplicableEntityNames"
-                            },
-                            "entityTypePlural": {
-                                "$ref": "grapher-schema.011.json#/properties/entityTypePlural"
-                            },
-                            "missingDataStrategy": {
-                                "$ref": "grapher-schema.011.json#/properties/missingDataStrategy"
-                            }
-                        },
-                        "additionalProperties": false
+                        "additionalProperties": true
                     },
                     "metadata": {
                         "title": "View metadata overrides",
@@ -1083,18 +901,9 @@
                     ]
                 },
                 "display": {
-                    "title": "Display configuration",
-                    "description": "Display settings that override the indicator's default configuration.",
-                    "requirement_level": "optional",
-                    "guidelines": [
-                        [
-                            "Only specify display options that need to be overridden."
-                        ],
-                        [
-                            "Common overrides include name, unit, and color settings."
-                        ]
-                    ],
-                    "$ref": "grapher-schema.011.json#/properties/dimensions/items/properties/display"
+                    "type": "object",
+                    "description": "Overrides the display settings for the indicator. Validated by the grapher admin API when the config is upserted, not here. See the [grapher schema](https://files.ourworldindata.org/schemas/grapher-schema.latest.json) for the available fields.",
+                    "additionalProperties": true
                 }
             },
             "required": [
