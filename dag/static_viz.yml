@@ -22,3 +22,9 @@ steps:
   # How do people spend their time? (OECD Time Use Database, one stacked bar per country)
   export://static_viz/oecd/2026-08-14/time_use_by_country:
     - data://garden/oecd/2026-08-14/time_use
+
+  # Long-run incidence of child work, from the first census estimates to today
+  export://static_viz/child_labor/2026-09-06/child_work_incidence:
+    - data://grapher/child_labor/2026-09-06/child_work_incidence
+    - data://garden/un/2026-04-08/child_labor_report
+    - data://garden/labor/2017-09-27/child_labor__world_1950_1995__basu__1999

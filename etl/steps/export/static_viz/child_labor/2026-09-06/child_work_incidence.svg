@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="612pt" height="459.36pt" viewBox="0 0 612 459.36" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 459.36 
+L 612 459.36 
+L 612 0 
+L 0 0 
+L 0 459.36 
+z
+" style="fill: none"/>
+  </g>
+  <g id="axes_1">
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <defs>
+       <path id="m0cfa592a35" d="M 0 0 
+L 0 3.6 
+" style="stroke: #999999"/>
+      </defs>
+      <g>
+       <use xlink:href="#m0cfa592a35" x="32.626912" y="364.464" style="fill: #999999; stroke: #999999"/>
+      </g>
+     </g>
+     <g id="text_1">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="32.626912" y="377.3253" transform="rotate(-0 32.626912 377.3253)">1825</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2">
+      <g>
+       <use xlink:href="#m0cfa592a35" x="103.608548" y="364.464" style="fill: #999999; stroke: #999999"/>
+      </g>
+     </g>
+     <g id="text_2">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="103.608548" y="377.3253" transform="rotate(-0 103.608548 377.3253)">1850</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3">
+      <g>
+       <use xlink:href="#m0cfa592a35" x="174.590184" y="364.464" style="fill: #999999; stroke: #999999"/>
+      </g>
+     </g>
+     <g id="text_3">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="174.590184" y="377.3253" transform="rotate(-0 174.590184 377.3253)">1875</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_4">
+      <g>
+       <use xlink:href="#m0cfa592a35" x="245.57182" y="364.464" style="fill: #999999; stroke: #999999"/>
+      </g>
+     </g>
+     <g id="text_4">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="245.57182" y="377.3253" transform="rotate(-0 245.57182 377.3253)">1900</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_5">
+      <g>
+       <use xlink:href="#m0cfa592a35" x="316.553456" y="364.464" style="fill: #999999; stroke: #999999"/>
+      </g>
+     </g>
+     <g id="text_5">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="316.553456" y="377.3253" transform="rotate(-0 316.553456 377.3253)">1925</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_6">
+      <g>
+       <use xlink:href="#m0cfa592a35" x="387.535092" y="364.464" style="fill: #999999; stroke: #999999"/>
+      </g>
+     </g>
+     <g id="text_6">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="387.535092" y="377.3253" transform="rotate(-0 387.535092 377.3253)">1950</text>
+     </g>
+    </g>
+    <g id="xtick_7">
+     <g id="line2d_7">
+      <g>
+       <use xlink:href="#m0cfa592a35" x="458.516728" y="364.464" style="fill: #999999; stroke: #999999"/>
+      </g>
+     </g>
+     <g id="text_7">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="458.516728" y="377.3253" transform="rotate(-0 458.516728 377.3253)">1975</text>
+     </g>
+    </g>
+    <g id="xtick_8">
+     <g id="line2d_8">
+      <g>
+       <use xlink:href="#m0cfa592a35" x="529.498364" y="364.464" style="fill: #999999; stroke: #999999"/>
+      </g>
+     </g>
+     <g id="text_8">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="529.498364" y="377.3253" transform="rotate(-0 529.498364 377.3253)">2000</text>
+     </g>
+    </g>
+    <g id="xtick_9">
+     <g id="line2d_9">
+      <g>
+       <use xlink:href="#m0cfa592a35" x="600.48" y="364.464" style="fill: #999999; stroke: #999999"/>
+      </g>
+     </g>
+     <g id="text_9">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="600.48" y="377.3253" transform="rotate(-0 600.48 377.3253)">2025</text>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_10"/>
+     <g id="text_10">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="28.626913" y="367.59465" transform="rotate(-0 28.626913 367.59465)">0%</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="horizontal-grid-lines">
+      <path d="M 32.626913 322.992 
+L 600.48 322.992 
+" style="fill: none; stroke-dasharray: 4,4; stroke-dashoffset: 0; stroke: #dddddd"/>
+     </g>
+     <g id="line2d_11"/>
+     <g id="text_11">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="28.626913" y="326.12265" transform="rotate(-0 28.626913 326.12265)">10%</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="horizontal-grid-lines">
+      <path d="M 32.626913 281.52 
+L 600.48 281.52 
+" style="fill: none; stroke-dasharray: 4,4; stroke-dashoffset: 0; stroke: #dddddd"/>
+     </g>
+     <g id="line2d_12"/>
+     <g id="text_12">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="28.626913" y="284.65065" transform="rotate(-0 28.626913 284.65065)">20%</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="horizontal-grid-lines">
+      <path d="M 32.626913 240.048 
+L 600.48 240.048 
+" style="fill: none; stroke-dasharray: 4,4; stroke-dashoffset: 0; stroke: #dddddd"/>
+     </g>
+     <g id="line2d_13"/>
+     <g id="text_13">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="28.626913" y="243.17865" transform="rotate(-0 28.626913 243.17865)">30%</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="horizontal-grid-lines">
+      <path d="M 32.626913 198.576 
+L 600.48 198.576 
+" style="fill: none; stroke-dasharray: 4,4; stroke-dashoffset: 0; stroke: #dddddd"/>
+     </g>
+     <g id="line2d_14"/>
+     <g id="text_14">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="28.626913" y="201.70665" transform="rotate(-0 28.626913 201.70665)">40%</text>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="horizontal-grid-lines">
+      <path d="M 32.626913 157.104 
+L 600.48 157.104 
+" style="fill: none; stroke-dasharray: 4,4; stroke-dashoffset: 0; stroke: #dddddd"/>
+     </g>
+     <g id="line2d_15"/>
+     <g id="text_15">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="28.626913" y="160.23465" transform="rotate(-0 28.626913 160.23465)">50%</text>
+     </g>
+    </g>
+    <g id="ytick_7">
+     <g id="horizontal-grid-lines">
+      <path d="M 32.626913 115.632 
+L 600.48 115.632 
+" style="fill: none; stroke-dasharray: 4,4; stroke-dashoffset: 0; stroke: #dddddd"/>
+     </g>
+     <g id="line2d_16"/>
+     <g id="text_16">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="28.626913" y="118.76265" transform="rotate(-0 28.626913 118.76265)">60%</text>
+     </g>
+    </g>
+    <g id="ytick_8">
+     <g id="horizontal-grid-lines">
+      <path d="M 32.626913 74.16 
+L 600.48 74.16 
+" style="fill: none; stroke-dasharray: 4,4; stroke-dashoffset: 0; stroke: #dddddd"/>
+     </g>
+     <g id="line2d_17"/>
+     <g id="text_17">
+      <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="28.626913" y="77.29065" transform="rotate(-0 28.626913 77.29065)">70%</text>
+     </g>
+    </g>
+   </g>
+   <g id="line__italy">
+    <path d="M 191.625777 97.799027 
+L 248.411086 157.518714 
+L 276.80374 178.669443 
+L 305.196394 233.8272 
+L 333.589049 250.830722 
+L 347.785376 231.338886 
+L 390.374358 322.992 
+L 418.767012 349.53408 
+" style="fill: none; stroke: #4c72b0; stroke-width: 2.2; stroke-linecap: round"/>
+   </g>
+   <g id="datapoints__italy">
+    <defs>
+     <path id="m02f39b1779" d="M 0 2.25 
+C 0.596707 2.25 1.169055 2.012926 1.59099 1.59099 
+C 2.012926 1.169055 2.25 0.596707 2.25 0 
+C 2.25 -0.596707 2.012926 -1.169055 1.59099 -1.59099 
+C 1.169055 -2.012926 0.596707 -2.25 0 -2.25 
+C -0.596707 -2.25 -1.169055 -2.012926 -1.59099 -1.59099 
+C -2.012926 -1.169055 -2.25 -0.596707 -2.25 0 
+C -2.25 0.596707 -2.012926 1.169055 -1.59099 1.59099 
+C -1.169055 2.012926 -0.596707 2.25 0 2.25 
+z
+" style="stroke: #4c72b0"/>
+    </defs>
+    <g>
+     <use xlink:href="#m02f39b1779" x="191.625777" y="97.799027" style="fill: #4c72b0; stroke: #4c72b0"/>
+     <use xlink:href="#m02f39b1779" x="248.411086" y="157.518714" style="fill: #4c72b0; stroke: #4c72b0"/>
+     <use xlink:href="#m02f39b1779" x="276.80374" y="178.669443" style="fill: #4c72b0; stroke: #4c72b0"/>
+     <use xlink:href="#m02f39b1779" x="305.196394" y="233.8272" style="fill: #4c72b0; stroke: #4c72b0"/>
+     <use xlink:href="#m02f39b1779" x="333.589049" y="250.830722" style="fill: #4c72b0; stroke: #4c72b0"/>
+     <use xlink:href="#m02f39b1779" x="347.785376" y="231.338886" style="fill: #4c72b0; stroke: #4c72b0"/>
+     <use xlink:href="#m02f39b1779" x="390.374358" y="322.992" style="fill: #4c72b0; stroke: #4c72b0"/>
+     <use xlink:href="#m02f39b1779" x="418.767012" y="349.53408" style="fill: #4c72b0; stroke: #4c72b0"/>
+    </g>
+   </g>
+   <g id="line__england-and-wales">
+    <path d="M 106.447814 212.676486 
+L 134.840468 211.432314 
+L 163.233123 231.338886 
+L 191.625777 269.493122 
+L 220.018431 256.6368 
+L 248.411086 273.640322 
+L 276.80374 288.570243 
+" style="fill: none; stroke: #dd8452; stroke-width: 2.2; stroke-linecap: round"/>
+   </g>
+   <g id="datapoints__england-and-wales">
+    <defs>
+     <path id="m8e718a32d5" d="M 0 2.25 
+C 0.596707 2.25 1.169055 2.012926 1.59099 1.59099 
+C 2.012926 1.169055 2.25 0.596707 2.25 0 
+C 2.25 -0.596707 2.012926 -1.169055 1.59099 -1.59099 
+C 1.169055 -2.012926 0.596707 -2.25 0 -2.25 
+C -0.596707 -2.25 -1.169055 -2.012926 -1.59099 -1.59099 
+C -2.012926 -1.169055 -2.25 -0.596707 -2.25 0 
+C -2.25 0.596707 -2.012926 1.169055 -1.59099 1.59099 
+C -1.169055 2.012926 -0.596707 2.25 0 2.25 
+z
+" style="stroke: #dd8452"/>
+    </defs>
+    <g>
+     <use xlink:href="#m8e718a32d5" x="106.447814" y="212.676486" style="fill: #dd8452; stroke: #dd8452"/>
+     <use xlink:href="#m8e718a32d5" x="134.840468" y="211.432314" style="fill: #dd8452; stroke: #dd8452"/>
+     <use xlink:href="#m8e718a32d5" x="163.233123" y="231.338886" style="fill: #dd8452; stroke: #dd8452"/>
+     <use xlink:href="#m8e718a32d5" x="191.625777" y="269.493122" style="fill: #dd8452; stroke: #dd8452"/>
+     <use xlink:href="#m8e718a32d5" x="220.018431" y="256.6368" style="fill: #dd8452; stroke: #dd8452"/>
+     <use xlink:href="#m8e718a32d5" x="248.411086" y="273.640322" style="fill: #dd8452; stroke: #dd8452"/>
+     <use xlink:href="#m8e718a32d5" x="276.80374" y="288.570243" style="fill: #dd8452; stroke: #dd8452"/>
+    </g>
+   </g>
+   <g id="line__united-states">
+    <path d="M 188.786512 230.094714 
+L 217.179166 257.051522 
+L 245.57182 256.222078 
+L 273.964475 274.469757 
+L 302.357129 294.791043 
+L 330.749783 337.92192 
+" style="fill: none; stroke: #55a868; stroke-width: 2.2; stroke-linecap: round"/>
+   </g>
+   <g id="datapoints__united-states">
+    <defs>
+     <path id="m562e72b523" d="M 0 2.25 
+C 0.596707 2.25 1.169055 2.012926 1.59099 1.59099 
+C 2.012926 1.169055 2.25 0.596707 2.25 0 
+C 2.25 -0.596707 2.012926 -1.169055 1.59099 -1.59099 
+C 1.169055 -2.012926 0.596707 -2.25 0 -2.25 
+C -0.596707 -2.25 -1.169055 -2.012926 -1.59099 -1.59099 
+C -2.012926 -1.169055 -2.25 -0.596707 -2.25 0 
+C -2.25 0.596707 -2.012926 1.169055 -1.59099 1.59099 
+C -1.169055 2.012926 -0.596707 2.25 0 2.25 
+z
+" style="stroke: #55a868"/>
+    </defs>
+    <g>
+     <use xlink:href="#m562e72b523" x="188.786512" y="230.094714" style="fill: #55a868; stroke: #55a868"/>
+     <use xlink:href="#m562e72b523" x="217.179166" y="257.051522" style="fill: #55a868; stroke: #55a868"/>
+     <use xlink:href="#m562e72b523" x="245.57182" y="256.222078" style="fill: #55a868; stroke: #55a868"/>
+     <use xlink:href="#m562e72b523" x="273.964475" y="274.469757" style="fill: #55a868; stroke: #55a868"/>
+     <use xlink:href="#m562e72b523" x="302.357129" y="294.791043" style="fill: #55a868; stroke: #55a868"/>
+     <use xlink:href="#m562e72b523" x="330.749783" y="337.92192" style="fill: #55a868; stroke: #55a868"/>
+    </g>
+   </g>
+   <g id="line__colombia">
+    <path d="M 390.374358 250.001278 
+L 427.284808 241.292157 
+L 452.838197 247.512957 
+" style="fill: none; stroke: #c44e52; stroke-width: 2.2; stroke-linecap: round"/>
+   </g>
+   <g id="datapoints__colombia">
+    <defs>
+     <path id="m713536f9a8" d="M 0 2.25 
+C 0.596707 2.25 1.169055 2.012926 1.59099 1.59099 
+C 2.012926 1.169055 2.25 0.596707 2.25 0 
+C 2.25 -0.596707 2.012926 -1.169055 1.59099 -1.59099 
+C 1.169055 -2.012926 0.596707 -2.25 0 -2.25 
+C -0.596707 -2.25 -1.169055 -2.012926 -1.59099 -1.59099 
+C -2.012926 -1.169055 -2.25 -0.596707 -2.25 0 
+C -2.25 0.596707 -2.012926 1.169055 -1.59099 1.59099 
+C -1.169055 2.012926 -0.596707 2.25 0 2.25 
+z
+" style="stroke: #c44e52"/>
+    </defs>
+    <g>
+     <use xlink:href="#m713536f9a8" x="390.374358" y="250.001278" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#m713536f9a8" x="427.284808" y="241.292157" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#m713536f9a8" x="452.838197" y="247.512957" style="fill: #c44e52; stroke: #c44e52"/>
+    </g>
+   </g>
+   <g id="datapoints__netherlands">
+    <defs>
+     <path id="m3febbafacd" d="M -0 5.303301 
+L 5.303301 0 
+L 0 -5.303301 
+L -5.303301 -0 
+z
+" style="stroke: #8172b3; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#m3febbafacd" x="100.769283" y="264.9312" style="fill: #8172b3; stroke: #8172b3; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="datapoints__canada">
+    <defs>
+     <path id="m99d637cd7d" d="M -0 5.303301 
+L 5.303301 0 
+L 0 -5.303301 
+L -5.303301 -0 
+z
+" style="stroke: #937860; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#m99d637cd7d" x="220.018431" y="260.784" style="fill: #937860; stroke: #937860; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="leader__canada">
+    <path d="M 220.018431 255.80736 
+L 220.018431 211.0176 
+" style="fill: none; stroke: #937860; stroke-width: 0.8; stroke-linecap: round"/>
+   </g>
+   <g id="datapoints__france">
+    <defs>
+     <path id="m90adad028f" d="M -0 5.303301 
+L 5.303301 0 
+L 0 -5.303301 
+L -5.303301 -0 
+z
+" style="stroke: #da8bc3; stroke-linejoin: miter"/>
+    </defs>
+    <g>
+     <use xlink:href="#m90adad028f" x="234.214759" y="281.52" style="fill: #da8bc3; stroke: #da8bc3; stroke-linejoin: miter"/>
+    </g>
+   </g>
+   <g id="leader__france">
+    <path d="M 237.054024 284.83776 
+L 248.411086 302.256 
+" style="fill: none; stroke: #da8bc3; stroke-width: 0.8; stroke-linecap: round"/>
+   </g>
+   <g id="line__world-10-14">
+    <path d="M 387.535092 250.125697 
+L 415.927747 261.57197 
+L 444.320401 271.981443 
+L 472.713055 281.893249 
+L 501.10571 303.707522 
+L 515.302037 310.467454 
+" style="fill: none; stroke-dasharray: 6.4,4; stroke-dashoffset: 0; stroke: #6e7581; stroke-width: 1.6"/>
+   </g>
+   <g id="datapoints__world-10-14">
+    <defs>
+     <path id="m9016ce544b" d="M 0 2.25 
+C 0.596707 2.25 1.169055 2.012926 1.59099 1.59099 
+C 2.012926 1.169055 2.25 0.596707 2.25 0 
+C 2.25 -0.596707 2.012926 -1.169055 1.59099 -1.59099 
+C 1.169055 -2.012926 0.596707 -2.25 0 -2.25 
+C -0.596707 -2.25 -1.169055 -2.012926 -1.59099 -1.59099 
+C -2.012926 -1.169055 -2.25 -0.596707 -2.25 0 
+C -2.25 0.596707 -2.012926 1.169055 -1.59099 1.59099 
+C -1.169055 2.012926 -0.596707 2.25 0 2.25 
+z
+" style="stroke: #6e7581"/>
+    </defs>
+    <g>
+     <use xlink:href="#m9016ce544b" x="387.535092" y="250.125697" style="fill: #6e7581; stroke: #6e7581"/>
+     <use xlink:href="#m9016ce544b" x="415.927747" y="261.57197" style="fill: #6e7581; stroke: #6e7581"/>
+     <use xlink:href="#m9016ce544b" x="444.320401" y="271.981443" style="fill: #6e7581; stroke: #6e7581"/>
+     <use xlink:href="#m9016ce544b" x="472.713055" y="281.893249" style="fill: #6e7581; stroke: #6e7581"/>
+     <use xlink:href="#m9016ce544b" x="501.10571" y="303.707522" style="fill: #6e7581; stroke: #6e7581"/>
+     <use xlink:href="#m9016ce544b" x="515.302037" y="310.467454" style="fill: #6e7581; stroke: #6e7581"/>
+    </g>
+   </g>
+   <g id="line__world-5-17">
+    <path d="M 529.498364 298.1088 
+L 540.855426 305.573761 
+L 552.212488 308.062078 
+L 563.569549 320.503678 
+L 574.926611 324.650878 
+L 586.283673 324.650878 
+L 597.640735 332.115839 
+" style="fill: none; stroke-dasharray: 2.4,3.2; stroke-dashoffset: 0; stroke: #6e7581; stroke-width: 1.6"/>
+   </g>
+   <g id="datapoints__world-5-17">
+    <g>
+     <use xlink:href="#m9016ce544b" x="529.498364" y="298.1088" style="fill: #6e7581; stroke: #6e7581"/>
+     <use xlink:href="#m9016ce544b" x="540.855426" y="305.573761" style="fill: #6e7581; stroke: #6e7581"/>
+     <use xlink:href="#m9016ce544b" x="552.212488" y="308.062078" style="fill: #6e7581; stroke: #6e7581"/>
+     <use xlink:href="#m9016ce544b" x="563.569549" y="320.503678" style="fill: #6e7581; stroke: #6e7581"/>
+     <use xlink:href="#m9016ce544b" x="574.926611" y="324.650878" style="fill: #6e7581; stroke: #6e7581"/>
+     <use xlink:href="#m9016ce544b" x="586.283673" y="324.650878" style="fill: #6e7581; stroke: #6e7581"/>
+     <use xlink:href="#m9016ce544b" x="597.640735" y="332.115839" style="fill: #6e7581; stroke: #6e7581"/>
+    </g>
+   </g>
+   <g id="horizontal-axis__line">
+    <path d="M 32.626912 364.464 
+L 600.48 364.464 
+" style="fill: none; stroke: #999999; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="label__italy__0">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #4c72b0" x="234.214759" y="91.6218" transform="rotate(-0 234.214759 91.6218)">Italy</text>
+   </g>
+   <g id="label__italy__1">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #4c72b0" x="234.214759" y="103.3218" transform="rotate(-0 234.214759 103.3218)">all children, 10-14</text>
+   </g>
+   <g id="label__england-and-wales__0">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #dd8452" x="100.769283" y="186.96645" transform="rotate(-0 100.769283 186.96645)">England &amp; Wales</text>
+   </g>
+   <g id="label__england-and-wales__1">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #dd8452" x="100.769283" y="198.7074" transform="rotate(-0 100.769283 198.7074)">boys, 10-14</text>
+   </g>
+   <g id="label__united-states__0">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #55a868" x="339.26758" y="321.480675" transform="rotate(-0 339.26758 321.480675)">United States</text>
+   </g>
+   <g id="label__united-states__1">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #55a868" x="339.26758" y="333.180675" transform="rotate(-0 339.26758 333.180675)">boys, 10-15</text>
+   </g>
+   <g id="label__colombia__0">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #c44e52" x="407.40995" y="216.0378" transform="rotate(-0 407.40995 216.0378)">Colombia</text>
+   </g>
+   <g id="label__colombia__1">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #c44e52" x="407.40995" y="227.7378" transform="rotate(-0 407.40995 227.7378)">boys, 12-14</text>
+   </g>
+   <g id="label__netherlands__0">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #8172b3" x="112.126345" y="282.082275" transform="rotate(-0 112.126345 282.082275)">Netherlands, 1849</text>
+   </g>
+   <g id="label__netherlands__1">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #8172b3" x="112.126345" y="293.782275" transform="rotate(-0 112.126345 293.782275)">ages 12-15</text>
+   </g>
+   <g id="label__canada__0">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: middle; fill: #937860" x="220.018431" y="197.3754" transform="rotate(-0 220.018431 197.3754)">Canada, 1891</text>
+   </g>
+   <g id="label__canada__1">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: middle; fill: #937860" x="220.018431" y="209.0754" transform="rotate(-0 220.018431 209.0754)">boys, 10-14</text>
+   </g>
+   <g id="label__france__0">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #da8bc3" x="248.411086" y="309.039075" transform="rotate(-0 248.411086 309.039075)">France, 1896</text>
+   </g>
+   <g id="label__france__1">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #da8bc3" x="248.411086" y="320.739075" transform="rotate(-0 248.411086 320.739075)">ages 10-14</text>
+   </g>
+   <g id="label__world-10-14__0">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #6e7581" x="467.034524" y="255.39525" transform="rotate(-0 467.034524 255.39525)">World, ages 10-14</text>
+   </g>
+   <g id="label__world-10-14__1">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #6e7581" x="467.034524" y="267.1362" transform="rotate(-0 467.034524 267.1362)">ILO estimates</text>
+   </g>
+   <g id="label__world-5-17__0">
+    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #6e7581" x="600.48" y="346.363875" transform="rotate(-0 600.48 346.363875)">World, ages 5-17</text>
+   </g>
+   <g id="label__world-5-17__1">
+    <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #6e7581" x="600.48" y="358.063875" transform="rotate(-0 600.48 358.063875)">ILO child labour estimates</text>
+   </g>
+  </g>
+  <g id="title__0">
+   <text style="font-size: 18px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="11.52" y="27.8064" transform="rotate(-0 11.52 27.8064)">Child work was once common, and has declined sharply</text>
+  </g>
+  <g id="subtitle__0">
+   <text style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="11.52" y="47.3904" transform="rotate(-0 11.52 47.3904)">Share of children recorded as working, from population censuses and other national records. Each series is labeled</text>
+  </g>
+  <g id="subtitle__1">
+   <text style="font-size: 11.52px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="11.52" y="61.0704" transform="rotate(-0 11.52 61.0704)">with the country, the age group and the sex it covers.</text>
+  </g>
+  <g id="note__0">
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="400.2624" transform="rotate(-0 11.52 400.2624)">Note: These estimates come from a dozen different studies and are not strictly comparable: the age group, the sex covered and what counts as work all</text>
+  </g>
+  <g id="note__1">
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="410.3424" transform="rotate(-0 11.52 410.3424)">vary. Census counts also understate children's work, particularly unpaid work at home. The two world series in grey are ILO estimates rather than census</text>
+  </g>
+  <g id="note__2">
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="420.4224" transform="rotate(-0 11.52 420.4224)">counts; Toniolo and Vecchi find the 1950-1995 series far too high for Italy.</text>
+  </g>
+  <g id="data-source__0">
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="435.6" transform="rotate(-0 11.52 435.6)">Data source: Basu (1999); Carter and Sutch (1996); Cunningham and Viazzo (1996); Heywood (1988); International Labour Organization and UNICEF</text>
+  </g>
+  <g id="data-source__1">
+   <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="445.68" transform="rotate(-0 11.52 445.68)">(2025); Schenkeveld (2008); Statistics Canada (1991); Toniolo and Vecchi (2007)</text>
+  </g>
+  <g id="tagline">
+   <text style="font-size: 7.92px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="457.92" transform="rotate(-0 11.52 457.92)">OurWorldinData.org — Research and data to make progress against the world's largest problems.</text>
+  </g>
+  <g id="license">
+   <text style="font-size: 7.92px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #858585" x="600.48" y="457.92" transform="rotate(-0 600.48 457.92)">Licensed under CC-BY by Bertha Rohenkohl and Esteban Ortiz-Ospina</text>
+  </g>
+ </g>
+</svg>
