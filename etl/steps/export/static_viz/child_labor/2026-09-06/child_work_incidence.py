@@ -44,11 +44,87 @@ correct and the preview is 2.4% tight; do not "fix" it by shrinking the type or 
 
 Figma
 -----
-Not yet placed. When it is, record here: the file key and page name, each frame's name and the
-template node it was cloned from, the import mechanics (`upload_assets` + POST to the returned
-`submitUrl`, never `createNodeFromSvg`; bin the wrapper frame; `rescale(100 / 96)`), which text
-slots take which constant from this module and where the mixed weights fall, every colour as
-its library style name and key, and the audit numbers a later run should expect.
+The whole handoff, written so a later session can redo it from this file alone.
+
+**Target.** File `Charts (2026)`, key `s6Sv60bakebRRW2TxsMQbF`. Page
+`20260906 In the past, a large share of children worked (Bertha)`, inserted directly after the
+`-----------` divider page (find the divider by `/^-{10,}$/` on the trimmed name — never a counted
+index). One frame, `child-work-incidence-long-run`, cloned from `5332:75`
+(Static Chart Template_Horizontal, 850x638), with this step's own PNG placed to its left as the
+reference copy. The frame NAME is the durable join — it is the kebab-case slug the website exports
+the PNG by — so find the page by name and the frame by name rather than by the node ids, which die
+if anyone rebuilds the frame from the template.
+
+**Import.** Upload with `upload_assets` (it takes a `count`, so the SVG and PNG go in one call) and
+POST each to the returned `submitUrl` with `curl -F "file=@<path>"`; never `createNodeFromSvg`,
+which caps at 50k characters. Then, in order:
+
+1. Move the import FRAME's children out to the template clone and delete the frame. It carries a
+   white fill that would paint over the template's cream background, and `resize()` on it stretches
+   every child through its constraints, rewrapping every text box.
+2. `rescale(clone.width / chart.width)` — 850 / 816 = 100 / 96. matplotlib writes the root in
+   points, Figma reads them at 96px per inch, and this figure is drawn at 100 template px per inch.
+   The height then lands on 638 by construction, which is what proves the step used the template's
+   ratio; a miss means the canvas was cropped, not that the scale went wrong.
+3. **Set `chart.x = 0; chart.y = 0`, NOT the clone's page position.** A frame child's x/y are
+   FRAME-relative. Setting them to the clone's page x (950) put the chart 950px right of the frame's
+   left edge, where the frame clipped it away completely — a blank frame whose nodes all report
+   `visible: true`, in range, and correctly painted.
+4. Delete `patch_1` and every `title*`, `subtitle*`, `note*`, `data-source*`, `tagline`, `license`
+   group. The template's own slots carry those strings in the file's bound styles; left in place the
+   frame carries two of each, one of them in matplotlib's font. Match by name and by the `__<n>` run
+   suffix, never by position — the template's slots sit under the same ink.
+5. Snap the group's left edge to 16. A TEXT box carries its advance width rather than its glyphs, so
+   cropping to ink lands the content column within a pixel of 16..834 rather than on it.
+
+**Template text slots.** Filled from this module's own constants. Setting `characters` flattens the
+mixed weights the templates ship, so re-apply the runs from the faces already on the node
+(`getStyledTextSegments(["fontName"])` before overwriting):
+
+| Slot | Content | Weights |
+|---|---|---|
+| Title | `TITLE` | Playfair Display SemiBold, one run |
+| Subtitle | `SUBTITLE` | Lato Regular, one run |
+| `Note:` | `NOTE` | `Note:` Bold, rest Medium |
+| `Data source:` | `Data source: ` + `source_citation(...)` | `Data source:` Bold, rest Regular |
+| Tagline | the template's own — leave it | unchanged |
+| License | `Licensed under CC-BY by {AUTHOR}` | Medium, with `CC-BY` and the names Bold |
+
+**Move the footer after filling it.** Its vertical constraint is MIN, so a footer whose rows wrap
+grows DOWN out of the frame. The template's design is the opposite — it stacks upward from a fixed
+bottom margin — so set `footer.y = 622 - footer.height` once the text is in. With this chart's
+three-line note and two-line source that puts it at 531, which is also `band_bottom` here.
+
+**Colours.** Bound to the [Chart Colors] library by style key; never a typed hex. The `gid` names a
+GROUP, so descend to its painted children and set both the stroke style (lines, leaders) and the
+fill style (markers, labels).
+
+| Series | Style | Key |
+|---|---|---|
+| `italy` | Default Palette/Denim | `e1538d9330d7b22168f0c19fa562897aa8975f90` |
+| `england-and-wales` | Default Palette/Rusty Orange | `65bab597d085689b1ea82a69f4d785cb9212c234` |
+| `united-states` | Line and Slope Charts/Light Teal | `a07c13547f40f65980745f6ad8b96e0f7b440f5c` |
+| `colombia` | Line and Slope Charts/Camel | `c17ca762a19289d7f2ec4fd00ba83a053f4d39f9` |
+| `netherlands` | Default Palette/Purple | `030befbc17dcb742e540000342935c6edd9e9b24` |
+| `canada` | Default Palette/Maroon | `d60b26254b168fa436cc688ebaa84289da88d843` |
+| `france` | Default Palette/Fuchsia | `858d20ade7aabc5e115d721a75c9171027609b32` |
+| `world-10-14`, `world-5-17` | Default Palette/Gray | `cff6a9c524ec336634cb95474beb0239240cf70b` |
+
+**The colour-vision numbers to expect** (`scripts/color_audit.py --line`). Eight categories is past
+what the palette can separate — `--suggest` reports that nothing in it clears dE 20 at this many —
+so the assignment above is the best measured, not a clean bill. It clears NORMAL vision entirely and
+floors at **dE 6.1** under deuteranopia (United States vs France), against dE 4.2 for the first
+attempt. The pairs that fail are far apart on the chart, and every series is directly labelled, so
+the colours distinguish rather than encode. Two earlier assignments are recorded because they are
+the ones to avoid: Netherlands vs France both purple failed NORMAL vision at dE 18.7, and England &
+Wales vs a Camel United States failed deuteranopia at dE 14.6 — two lines that cross in the 1880s.
+
+**The audit numbers to expect.** Ink box 16.00 .. 834.03 against the 16..834 content column; band
+89..531 with the chart inset 14.00 above and 14.04 below, inside the 12-16 target. Series strokes
+3px for the four country lines and 1px for the two world lines (muted context — they are estimates
+the chart itself caveats); furniture 1px; gridline dash [4,4]. Those come out right only because
+the weights here are set in template pixels via `PX_TO_PT`: matplotlib takes points, and it also
+multiplies a dash pattern by the linewidth, so a 1.0pt grid drew a 1.39px line with a 5.56px dash.
 """
 
 from __future__ import annotations
@@ -109,7 +185,7 @@ AUTHOR = "Bertha Rohenkohl and Esteban Ortiz-Ospina"
 # Copied verbatim from the template rather than paraphrased.
 TAGLINE = "OurWorldinData.org — Research and data to make progress against the world's largest problems."
 
-TITLE = "Child work was once common, and has declined sharply"
+TITLE = "In the past, a large share of children worked"
 SUBTITLE = (
     "Share of children recorded as working, from population censuses and other national records. "
     "Each series is labeled with the country, the age group and the sex it covers."
@@ -133,7 +209,12 @@ TICK_PX, SERIES_LABEL_PX = 12, 13
 ORIGIN_Y = 16
 TITLE_LINE_PX, SUBTITLE_LINE_PX, NOTE_LINE_PX = 29, 19, 14
 TITLE_SUBTITLE_GAP_PX = 6
-NOTE_INK_BOTTOM_PX = 587  # Horizontal template
+# The footer is one auto-layout block pinned to the frame's bottom margin, and it grows UPWARDS as
+# its rows wrap. So the note's ink top — which is the chart band's bottom — is derived from the
+# footer's bottom edge and everything below the note, not pinned to the template's shipped position.
+# 587 is what this works out to for a ONE-line data source, which is the placeholder the template
+# ships; this chart cites nine publications and takes two, which moved the note up by a line.
+FOOTER_BOTTOM_PX = 622  # Horizontal template: the footer block's bottom, 16px above the frame edge
 FOOTER_ROW_GAP_PX = 4
 BAND_INSET_PX = 14
 MARGIN_PX = 16
@@ -163,11 +244,24 @@ LATO_OVER_MEASURED, PLAYFAIR_OVER_MEASURED = _ALLOWANCES[_FACE_KEY]
 # Grapher's axis treatment, so the static chart reads like our interactive ones.
 GRID_COLOR = "#ddd"
 GRID_DASHES = (0, (4, 4))
-GRID_LINEWIDTH = 1.0
+# Grapher's furniture is 1 template px and its gridline dash is 4,4 template px. Both are set here
+# in POINTS, and a template pixel is 0.72pt — so 1.0 drew a 1.39px line, and matplotlib's
+# `lines.scale_dashes` then multiplied the dash by that same linewidth and drew 5.56px segments.
+# Setting the weight in template pixels fixes both at once: 4 x 0.72 = 2.88pt = 4px of dash.
+GRID_LINEWIDTH = 1.0 * PX_TO_PT
 AXIS_COLOR = "#999"
 TEXT_COLOR = "#5b5b5b"
 TICK_LENGTH_PX = 5
-Y_LABEL_PAD_PX = 6
+# Gap between the y tick labels and the plot. The plot's RIGHT edge is exact by construction
+# (margin + content width), so this pad is what sets the left: it moves the labels' left edge one
+# for one. 7 rather than a round 6 because the import measured 15.11 against the content column's
+# 16 — matplotlib's own tick pad is in points, so the step cannot predict the label box to the
+# sub-pixel and this closes the measured 0.89.
+Y_LABEL_PAD_PX = 6.9
+# How far the tick labels reach beyond the plot rectangle, measured on the placed Figma frame. The
+# band's 14px inset is to the chart's ink, not to the axes, so these are what make the two agree.
+TICK_LABEL_HALF_PX = 7.65
+X_LABEL_REACH_PX = 19.9
 
 X_TICKS = list(range(1825, 2026, 25))
 Y_TICKS = list(range(0, 71, 10))
@@ -256,8 +350,11 @@ SERIES = [
     ),
 ]
 
-SERIES_LINEWIDTH = 2.2
-WORLD_LINEWIDTH = 1.6
+# The house line is 3 template px for a series the chart is about, and 1 for muted context. The two
+# world series are context: they are ILO estimates rather than census counts, and one of them the
+# chart's own sources dispute, so they get the thin grey treatment rather than equal billing.
+SERIES_LINEWIDTH = 3.0 * PX_TO_PT
+WORLD_LINEWIDTH = 1.0 * PX_TO_PT
 MARKER_SIZE = 4.5
 SINGLE_MARKER_SIZE = 7.5
 
@@ -380,9 +477,20 @@ def build(data: dict[str, tuple[np.ndarray, np.ndarray]], source: str):
     )
     note_rows = max(len(note_lines), len(wrap(f"Note: {NOTE}", NOTE_PX, CONTENT_WIDTH_PX, allowance=LATO_OVER_MEASURED)))
 
+    # The citation is built from the origins on the plotted columns, so it grows with the data. Its
+    # line count has to be known before the band, because the footer stacks upwards from its own
+    # bottom edge: an extra source line pushes the note up, and with it the chart.
+    source_lines = wrap(f"Data source: {source}", SOURCE_PX, CONTENT_WIDTH_PX)
+    source_rows = max(
+        len(source_lines), len(wrap(f"Data source: {source}", SOURCE_PX, CONTENT_WIDTH_PX, allowance=LATO_OVER_MEASURED))
+    )
+
     subtitle_y = ORIGIN_Y + title_rows * TITLE_LINE_PX + TITLE_SUBTITLE_GAP_PX
     band_top = subtitle_y + subtitle_rows * SUBTITLE_LINE_PX
-    band_bottom = NOTE_INK_BOTTOM_PX - note_rows * NOTE_LINE_PX
+    note_ink_bottom = (
+        FOOTER_BOTTOM_PX - FOOTER_PX - 2 - FOOTER_ROW_GAP_PX - source_rows * NOTE_LINE_PX - FOOTER_ROW_GAP_PX
+    )
+    band_bottom = note_ink_bottom - note_rows * NOTE_LINE_PX
     assert band_bottom - band_top > 300, "The text slots have left too little room for the chart."
 
     def px(x: float) -> float:
@@ -397,19 +505,24 @@ def build(data: dict[str, tuple[np.ndarray, np.ndarray]], source: str):
     # Tick labels are drawn OUTSIDE the axes rectangle, so the plot has to be inset from the band by
     # their own size or they land outside the frame entirely.
     y_label_px = max(text_width_px(f"{tick}%", TICK_PX) for tick in Y_TICKS) + Y_LABEL_PAD_PX
-    x_label_px = TICK_PX * 1.4 + TICK_LENGTH_PX + 3
     plot_left = MARGIN_PX + y_label_px
-    plot_bottom = chart_bottom - x_label_px
+    # The band inset is measured to the chart's INK, and the tick labels are the outermost ink on
+    # three sides: the topmost y label is centred on the top gridline and so reaches half a line
+    # above the plot, and the x labels hang below it. Inset the plot by those reaches on top of the
+    # band inset, or the chart crowds the subtitle while leaving a gap above the note.
+    # Both measured off the placed frame: 7.65 above, 19.9 below.
+    plot_top = chart_top + TICK_LABEL_HALF_PX
+    plot_bottom = chart_bottom - X_LABEL_REACH_PX
     ax = fig.add_axes(
         (
             px(plot_left),
             py(plot_bottom),
             px(CONTENT_WIDTH_PX - y_label_px),
-            (plot_bottom - chart_top) / template.height_px,
+            (plot_bottom - plot_top) / template.height_px,
         )
     )
     ax.patch.set_visible(False)
-    plot_height_px = plot_bottom - chart_top
+    plot_height_px = plot_bottom - plot_top
 
     # ── Axes, following grapher ────────────────────────────────────────────────
     ax.set_xlim(X_TICKS[0], X_TICKS[-1])
@@ -429,13 +542,13 @@ def build(data: dict[str, tuple[np.ndarray, np.ndarray]], source: str):
     for side in ("top", "right", "left"):
         ax.spines[side].set_visible(False)
     ax.spines["bottom"].set_color(AXIS_COLOR)
-    ax.spines["bottom"].set_linewidth(1.0)
+    ax.spines["bottom"].set_linewidth(1.0 * PX_TO_PT)
     ax.spines["bottom"].set_gid("horizontal-axis__line")
 
     ax.tick_params(
         axis="x",
         length=TICK_LENGTH_PX * PX_TO_PT,
-        width=1.0,
+        width=1.0 * PX_TO_PT,
         color=AXIS_COLOR,
         labelsize=TICK_PX * PX_TO_PT,
         labelcolor=TEXT_COLOR,
@@ -551,10 +664,7 @@ def build(data: dict[str, tuple[np.ndarray, np.ndarray]], source: str):
             va="baseline",
             gid=f"note__{i}",
         )
-    # The citation is built from the origins on the plotted columns, so it grows with the data and
-    # has to wrap rather than run off the frame.
-    source_lines = wrap(f"Data source: {source}", SOURCE_PX, CONTENT_WIDTH_PX)
-    source_y = NOTE_INK_BOTTOM_PX + NOTE_LINE_PX + FOOTER_ROW_GAP_PX
+    source_y = note_ink_bottom + NOTE_LINE_PX + FOOTER_ROW_GAP_PX
     for i, line in enumerate(source_lines):
         fig.text(
             px(MARGIN_PX),
