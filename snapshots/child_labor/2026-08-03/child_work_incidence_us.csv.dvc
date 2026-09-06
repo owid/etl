@@ -1,7 +1,10 @@
-# NOTE: Manually transcribed by OWID from Table 1 of the paper (the "Youths, 10-15 yrs"
-# rows), covering both the labor-force participation rates as published in the census and
-# the authors' corrected rates. The other Table 1 rows (married women, older men) and the
-# rest of the paper are not included. In case of updating, upload manually.
+# NOTE: Manually transcribed by OWID from the "Youths, 10-15 yrs" columns of Table 1 (p. 7),
+# which gives the labor-force participation rates as published in the census. The corrected
+# 1880 rates (32.4% and 12.1%) come from the authors' PUMS tabulation, reported in the text
+# on p. 9; the paper publishes no corrected figure for any other year, so the remaining rows
+# of the corrected series repeat the published ones. The other Table 1 rows (married women,
+# older men) are not included. Verified against the paper on 2026-09-06: all values match.
+# In case of updating, upload manually.
 
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/

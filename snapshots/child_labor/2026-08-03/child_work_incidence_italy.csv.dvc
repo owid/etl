@@ -1,8 +1,9 @@
-# NOTE: Manually transcribed by OWID from an appendix table of the paper reporting the
-# headline child-work incidence series (overall economic-activity rate of children aged
-# 10-14, by sex). The paper also
-# reports child work by economic sector and by region, and companion series for other
-# countries — none of which are included here. In case of updating, upload manually.
+# NOTE: Manually transcribed by OWID from the "Italy" rows of Table 3 in the statistical
+# appendix (pp. 425-426), which reports the incidence of child work — the economic-activity
+# rate of children aged 10-14 — for all children, boys and girls. The same table reports the
+# figures by region, and the paper reports them by economic sector; neither is included here.
+# Verified against the paper on 2026-09-06: all 24 values match. In case of updating, upload
+# manually.
 
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/

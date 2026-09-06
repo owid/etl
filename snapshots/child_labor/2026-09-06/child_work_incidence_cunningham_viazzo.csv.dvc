@@ -1,7 +1,12 @@
-# Manually transcribed by OWID from three chapters of the volume: the share of children working in
-# Colombia (p. 95), children in the workforce in Yamanashi prefecture and Japan (p. 80), and
-# children employed in the Sabadell textile industry (p. 62). The Sabadell figures are for 1857-58
-# and are recorded here under 1857. Other tables and countries in the volume are not included.
+# Manually transcribed by OWID from three chapters of the volume:
+#   - Colombia, p. 95, Table 2, "Working children (12-14 years) as a percentage of all children
+#     (12-14 years)". Note the same page carries a Table 1 giving working children as a share of
+#     the economically active population (boys 3.2 / 4.8 / 5.7) -- a different measure, not used here.
+#   - Japan, p. 80: children in the workforce in Yamanashi prefecture (1879) and nationally (1920).
+#   - Spain, p. 62, Table 3, "Activity rates in Sabadell's textile industry, by age and gender,
+#     1857-1858", the 8-15 row. Recorded here under 1857.
+# Verified against the book on 2026-09-06: the Colombia and Sabadell figures match exactly. The
+# Japan figures have NOT yet been checked against p. 80.
 # In case of updating, upload manually.
 
 # Learn more at:
