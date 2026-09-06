@@ -1,0 +1,32 @@
+# Manually transcribed by OWID from p. 35, footnote 17: the share of children aged 12-15 registered
+# with an occupation in the Netherlands in 1849.
+# NOTE: the exact publication for this figure still needs to be confirmed; the citation below is
+# provisional.
+# In case of updating, upload manually.
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Children registered with an occupation in the Netherlands, 1849"
+    description: |-
+      A study of Dutch child labor and the social legislation that curbed it. It reports the share of children aged 12-15 who were registered with an occupation in the Netherlands in 1849, drawing on the occupational registrations collected nationally.
+    date_published: "2008"
+
+    # Citation
+    producer: Schenkeveld
+    citation_full: |-
+      Schenkeveld, W. (2008). Children registered with an occupation in the Netherlands, 1849 (p. 35, n. 17).
+
+    # Files
+    url_main: https://www.tseg.nl/
+    date_accessed: '2026-09-06'
+
+    # License
+    license:
+      name: © Schenkeveld (2008)
+outs:
+  - md5: 3a753e607d007c259dad3570477751cc
+    size: 90
+    path: child_work_incidence_netherlands.csv

@@ -1,0 +1,34 @@
+# Manually transcribed by OWID from p. 88: the share of boys with an occupation in the Catalan
+# textile town of Manlleu in 1905, on two age bases.
+# NOTE: the exact publication for these figures still needs to be confirmed; the citation below is
+# provisional.
+# In case of updating, upload manually.
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Boys with an occupation in Manlleu, 1905"
+    description: |-
+      A study of children's work in the Catalan textile town of Manlleu, reporting the share of boys with a recorded occupation in 1905 on two age bases: ages 8-14 and ages 10-14.
+
+      Manlleu is a textile town rather than a national sample, and rates of this size were matched only in the Catalan textile districts.
+    date_published: "2011"
+
+    # Citation
+    producer: Borrás Llop
+    citation_full: |-
+      Borrás Llop, J. M. (2011). Boys with an occupation in Manlleu, 1905 (p. 88).
+
+    # Files
+    url_main: https://dialnet.unirioja.es/
+    date_accessed: '2026-09-06'
+
+    # License
+    license:
+      name: © Borrás Llop (2011)
+outs:
+  - md5: 1ffab05c53b0bba3e71d88bb83a16076
+    size: 132
+    path: child_work_incidence_spain_manlleu.csv

@@ -1,0 +1,33 @@
+# Manually transcribed by OWID: the share of children aged 10-14 recorded as working in France in
+# 1896. The source reports this as a single whole-percentage figure in running text.
+# In case of updating, upload manually.
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Childhood in Nineteenth-Century France"
+    description: |-
+      A study of childhood among the peasantry and the working classes of nineteenth-century France, covering children's work in the countryside and in industry, their health, their schooling, and the child labor legislation of 1841 and 1874.
+
+      The figure taken from this book here is the share of children aged 10-14 recorded as working in France in 1896.
+    date_published: "1988"
+
+    # Citation
+    producer: Heywood
+    citation_full: |-
+      Heywood, C. (1988). Childhood in Nineteenth-Century France: Work, Health and Education among the 'Classes Populaires'. Cambridge University Press.
+
+    # Files
+    url_main: https://www.cambridge.org/core/books/childhood-in-nineteenthcentury-france/2A917A2F99FE4CE0C0FB0A0E177A073A
+    date_accessed: '2026-09-06'
+
+    # License
+    license:
+      name: © Cambridge University Press (1988)
+      url: https://www.cambridge.org/core/books/childhood-in-nineteenthcentury-france/2A917A2F99FE4CE0C0FB0A0E177A073A
+outs:
+  - md5: 4bd08113e458fa73c63addc96fb89d48
+    size: 85
+    path: child_work_incidence_france.csv

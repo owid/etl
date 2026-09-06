@@ -1,0 +1,34 @@
+# Manually transcribed by OWID from p. 87: the share of primary-school pupils in Tampere with paid
+# employment at home or outside the home, as a percentage of the age group still at school.
+# NOTE: the exact chapter and volume for this figure still needs to be confirmed; the citation
+# below is provisional.
+# In case of updating, upload manually.
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "School children with paid employment in Tampere, 1906"
+    description: |-
+      A study of children's work in the Finnish industrial city of Tampere at the start of the twentieth century. It reports how many primary-school pupils had paid employment, at home or outside the home, as a share of the children of that age who were still at school.
+
+      Because the denominator is children still in school, the figures leave out children who had already left school for full-time work.
+    date_published: "1997"
+
+    # Citation
+    producer: Markkola
+    citation_full: |-
+      Markkola, P. (1997). Working children in Tampere, 1906 (p. 87).
+
+    # Files
+    url_main: https://www.tuni.fi/en
+    date_accessed: '2026-09-06'
+
+    # License
+    license:
+      name: © Markkola (1997)
+outs:
+  - md5: b5025425d11f260bb2f9ed6c1ec37c9c
+    size: 169
+    path: child_work_incidence_finland.csv

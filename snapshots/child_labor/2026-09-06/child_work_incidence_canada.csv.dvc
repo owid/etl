@@ -1,0 +1,35 @@
+# Manually transcribed by OWID from the article's 'Occupations' section, which reports the
+# share of boys and girls aged 10-14 who stated an occupation in the 1891 Census of Canada.
+# The source gives these two figures as whole percentages in running text, not in a table.
+# In case of updating, upload manually.
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "The Census: One hundred years ago"
+    description: |-
+      An article marking the centenary of the 1891 Census of Canada, published in Statistics Canada's Perspectives on Labour and Income. It reviews what the census recorded about population growth, industry and occupations, and reports the share of boys and girls aged 10-14 who stated an occupation to census enumerators.
+
+      The article notes that 87% of boys under 15 who reported an occupation described themselves as farmers' sons, so the figure captures unpaid family farm work as well as paid employment.
+    date_published: "1991-06-01"
+
+    # Citation
+    producer: Statistics Canada
+    citation_full: |-
+      Grainger, P. (1991). The Census: One hundred years ago. Perspectives on Labour and Income, 3(2), Article 1. Statistics Canada, Catalogue no. 75-001-X. https://www150.statcan.gc.ca/n1/pub/75-001-x/1991002/article/88-eng.pdf
+    attribution_short: Statistics Canada
+
+    # Files
+    url_main: https://www150.statcan.gc.ca/n1/pub/75-001-x/1991002/article/88-eng.pdf
+    date_accessed: '2026-09-06'
+
+    # License
+    license:
+      name: Statistics Canada Open Licence
+      url: https://www.statcan.gc.ca/en/reference/licence
+outs:
+  - md5: 0c63086807b62914da79ae276cddfd12
+    size: 115
+    path: child_work_incidence_canada.csv

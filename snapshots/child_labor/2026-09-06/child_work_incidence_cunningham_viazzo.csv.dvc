@@ -1,0 +1,36 @@
+# Manually transcribed by OWID from three chapters of the volume: the share of children working in
+# Colombia (p. 95), children in the workforce in Yamanashi prefecture and Japan (p. 80), and
+# children employed in the Sabadell textile industry (p. 62). The Sabadell figures are for 1857-58
+# and are recorded here under 1857. Other tables and countries in the volume are not included.
+# In case of updating, upload manually.
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Child labour in historical perspective (1800-1985)"
+    description: |-
+      A collection of case studies of child labor in Europe, Japan and Colombia, published by the UNICEF International Child Development Centre. The chapters draw on population censuses and other national and local records to measure how common children's work was and how it declined.
+
+      The figures taken from this volume here are the share of children of a given age recorded as working or as having an occupation, in Colombia nationally, in Yamanashi prefecture and Japan, and in the textile industry of Sabadell in Catalonia.
+    date_published: "1996"
+
+    # Citation
+    producer: Cunningham and Viazzo
+    citation_full: |-
+      Cunningham, H., & Viazzo, P. P. (Eds.) (1996). Child labour in historical perspective, 1800-1985: Case studies from Europe, Japan and Colombia (pp. 62, 80, 95). UNICEF International Child Development Centre / Istituto degli Innocenti, Florence, Italy.
+    attribution_short: UNICEF
+
+    # Files
+    url_main: https://ideas.repec.org/p/ucf/hisper/hisper96-1.html
+    date_accessed: '2026-09-06'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ideas.repec.org/p/ucf/hisper/hisper96-1.html
+outs:
+  - md5: b47abe3332d2fac6b3ec645d3d9275a4
+    size: 650
+    path: child_work_incidence_cunningham_viazzo.csv

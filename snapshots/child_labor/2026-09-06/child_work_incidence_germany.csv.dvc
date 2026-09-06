@@ -1,0 +1,34 @@
+# Manually transcribed by OWID: the share of school children employed in agriculture in 1904, and
+# the share of children aged 12-16 working in factories with at least ten workers, from the first
+# Reich-wide count of 1874-76 (recorded here under 1875, its mid-point).
+# NOTE: the exact pages for these two figures still need to be confirmed.
+# In case of updating, upload manually.
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Kinderarbeit im Kaiserreich 1871-1914"
+    description: |-
+      A doctoral thesis on child labor in the German Empire, drawing on school surveys and the first Reich-wide factory counts. It reports how many school children worked in agriculture alongside compulsory schooling, and how many children were employed in factories.
+
+      Both measures cover a single sector rather than all of children's work: the 1904 figure counts agricultural work by pupils, and the 1874-76 figure counts only factories employing at least ten workers.
+    date_published: "2007"
+
+    # Citation
+    producer: Boentert
+    citation_full: |-
+      Boentert, A. (2007). Kinderarbeit im Kaiserreich 1871-1914. Ferdinand Schöningh, Paderborn.
+
+    # Files
+    url_main: https://www.schoeningh.de/
+    date_accessed: '2026-09-06'
+
+    # License
+    license:
+      name: © Boentert (2007)
+outs:
+  - md5: 7a8b31d5a380b73f557e9358d6416361
+    size: 168
+    path: child_work_incidence_germany.csv

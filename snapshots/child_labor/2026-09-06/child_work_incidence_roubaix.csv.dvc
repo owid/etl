@@ -1,0 +1,35 @@
+# Manually transcribed by OWID: the share of children aged 10-14 in Roubaix who listed an occupation
+# in the census, by sex, in 1872 and 1906. Roubaix was a textile town, chosen by the author for that
+# reason, so the figures are well above the French national rate.
+# NOTE: the exact article and page for these figures still needs to be confirmed; the citation below
+# is provisional.
+# In case of updating, upload manually.
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Child labor in Roubaix, 1872-1906"
+    description: |-
+      A study of the industrial town of Roubaix in northern France, whose economy was dominated by textiles. Using the town's census returns, it reports the share of children aged 10 to 14 who listed an occupation, separately for boys and girls, in 1872 and again in 1906.
+
+      The sharp fall between the two dates tracks the fortunes of the town's textile industry rather than the national trend.
+    date_published: "1979"
+
+    # Citation
+    producer: Tilly
+    citation_full: |-
+      Tilly, L. A. (1979). Child labor and family economy in Roubaix, 1872-1906.
+
+    # Files
+    url_main: https://www.jstor.org/
+    date_accessed: '2026-09-06'
+
+    # License
+    license:
+      name: © Tilly (1979)
+outs:
+  - md5: 758dc13991ec73305c460ef0965d5bb1
+    size: 233
+    path: child_work_incidence_roubaix.csv

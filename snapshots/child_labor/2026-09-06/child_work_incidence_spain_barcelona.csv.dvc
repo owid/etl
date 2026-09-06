@@ -1,0 +1,35 @@
+# Manually transcribed by OWID from p. 34: activity rates ('tasa de actividad') for children aged
+# 10-14 in Barcelona in 1905, from the city's municipal Censo Obrero. The census distinguishes sexes
+# but not precise ages, so the 10-14 rate involves some approximation.
+# NOTE: the exact publication for these figures still needs to be confirmed; the citation below is
+# provisional.
+# In case of updating, upload manually.
+
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Activity rates of children in Barcelona, 1905"
+    description: |-
+      A study of children's work in Catalonia drawing on Barcelona's municipal workers' census (Censo Obrero) of 1905. It reports activity rates for children aged 10-14, for boys and for both sexes together.
+
+      The census distinguishes sexes but not precise ages, so a rate for the 10-14 band involves some approximation. Barcelona is industrial Catalonia rather than Spain as a whole.
+    date_published: "1999"
+
+    # Citation
+    producer: Borrás Llop
+    citation_full: |-
+      Borrás Llop, J. M. (1999). Activity rates of children in Barcelona, 1905 (p. 34).
+
+    # Files
+    url_main: https://dialnet.unirioja.es/
+    date_accessed: '2026-09-06'
+
+    # License
+    license:
+      name: © Borrás Llop (1999)
+outs:
+  - md5: 4d9c3b28c8681ee9831e9934f4bc15ab
+    size: 147
+    path: child_work_incidence_spain_barcelona.csv

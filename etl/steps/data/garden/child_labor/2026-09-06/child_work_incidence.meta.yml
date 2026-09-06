@@ -1,0 +1,80 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    unit: "%"
+    short_unit: "%"
+    presentation:
+      topic_tags:
+        - Child Labor
+    description_key:
+      - Each country or place in this chart comes from a different study, and the studies do not measure exactly the same thing. Some cover a whole country and others a single town; some count boys only and others all children; the age bands run from 8-14 to 12-15; and a few count only work in one sector.
+      - The series that meet a common standard — a national estimate, drawn from a census or administrative records, covering roughly ages 10 to 15, and counting any kind of work rather than one sector — are Canada (1891), Colombia, England and Wales, France (1896), Italy, the Netherlands (1849), and the United States.
+      - Most of these estimates come from population censuses, which record whether a child stated an occupation. Whether unpaid work on a family farm counted as an occupation varied between countries and between censuses, which is one reason the levels are not strictly comparable.
+      - The United States figures are the estimates corrected by Carter and Sutch, who show that the editing of the 1880 census understated how many children worked. Their 1870 figure is left out of the comparable series because the correction cannot repair it.
+      - "\"Child work\" here means any economic activity by children, as recorded by the source. This is broader than \"child labor\" as the International Labour Organization defines it for its modern estimates, which counts only work that is damaging to the child."
+    description_processing: |-
+      Estimates were transcribed from the tables and text of each publication and stacked into one table. Where a source reports several age bands for the same place and year, the band closest to 10-14 is the one shown on the chart; the others are kept in the underlying dataset. Where a source reports several sexes, the series shown is the one its own author reports for that place.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Incidence of child work, historical estimates
+  update_period_days: 0
+  owners:
+    - Bertha Rohenkohl
+
+tables:
+  child_work_incidence:
+    title: Incidence of child work, every historical estimate
+    variables:
+      share:
+        title: Share of children recorded as working
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of children in the given age group recorded as working.
+        display:
+          numDecimalPlaces: 1
+      comparable:
+        title: Meets the comparable-estimate definition
+        unit: ""
+        description_short: Whether the estimate is national in scope, drawn from a census or administrative records, covers roughly ages 10 to 15, and counts any kind of work.
+
+  child_work_incidence_chart:
+    title: Incidence of child work, long-run chart series
+    variables:
+      share_all:
+        title: Share of children recorded as working
+        presentation:
+          title_public: Share of children recorded as working
+        description_short: Share of children recorded as working. Age group and sex vary by country — see the notes.
+        display:
+          name: All estimates
+          numDecimalPlaces: 1
+
+      share_comparable:
+        title: Share of children recorded as working (comparable estimates)
+        presentation:
+          title_public: Share of children recorded as working
+        description_short: Share of children recorded as working, restricted to national estimates covering roughly ages 10 to 15 and counting any kind of work.
+        display:
+          name: Comparable estimates
+          numDecimalPlaces: 1
+
+      share_girls_all:
+        title: Share of girls recorded as working
+        presentation:
+          title_public: Share of girls recorded as working
+        description_short: Share of girls recorded as working. Age group varies by country — see the notes.
+        display:
+          name: All estimates, girls
+          numDecimalPlaces: 1
+
+      share_girls_comparable:
+        title: Share of girls recorded as working (comparable estimates)
+        presentation:
+          title_public: Share of girls recorded as working
+        description_short: Share of girls recorded as working, restricted to national estimates covering roughly ages 10 to 15 and counting any kind of work.
+        display:
+          name: Comparable estimates, girls
+          numDecimalPlaces: 1
