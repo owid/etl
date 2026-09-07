@@ -262,6 +262,23 @@ Run all of these after the metadata is written and the steps are built, so every
 
 If any check rewrites a `.meta.yml`, re-run the affected step so the built catalog reflects the edits (**add `--grapher` when the step is on the grapher channel**, otherwise staging keeps serving the old text), then re-run the check to confirm zero remaining violations.
 
+### Reviewing the change on staging (Metadata Diff)
+
+The checks above read the text **as authored**. The **Metadata Diff** Wizard page reads it **as rendered** — indicator metadata merged with any view-level override, the way the site resolves it — and lists every chart, MDim view and explorer view each edit lands on:
+
+```
+http://staging-site-<container_branch>/etl/wizard/metadata-diff
+```
+
+It is not an eighth check: it needs a staging server and a human's judgment, and it runs *after* the checks, once the text is settled. What it shows that nothing above does is **reach** — reword one shared `description_key` and dozens of charts change while every chart-config diff stays empty, because that text is inherited, not configured. (Chart Diff compares configs; this compares rendered texts. It is also not Chart Diff's own per-chart "Metadata differences" modal.)
+
+Two preconditions, both silent when unmet:
+
+- **Staging only** — the page refuses to run against production. Its baseline is production where the server has production credentials, `staging-site-master` otherwise: the same baseline Chart Diff uses.
+- **The grapher step must be on that server** (`STAGING=1 .venv/bin/etlr grapher://grapher/<path> --grapher`). Its scope is the branch's changed step files **intersected with** the datasets actually rebuilt there, so text that never reached the server simply doesn't appear. A server that is behind gets a 🚧 banner naming each stale dataset and the command to rebuild it — read that banner before trusting any count, because a stale dataset reports its diffs *backwards*, showing its older text as this branch's change.
+
+Reviewing marks each chart / MDim view / explorer view ✅ or ❌ with a note; the Review section then exports `metadata-rejections.md`, the rejections written as instructions naming the edit, the garden `.meta.yml` it was authored in, and the dataset owner. Nothing here gates the merge — rejecting changes no text — so an unactioned rejection is an open item somebody has to carry (`.claude/docs/open-items.md`). Verdicts are bound to the wording they were made on: reword the text and the decision reopens rather than counting as done.
+
 ## Quality Checklist
 
 Items that are easy to miss (obvious rules like "set title" are omitted — see field guidelines above):
