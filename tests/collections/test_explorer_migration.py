@@ -9,6 +9,7 @@ from unittest import mock
 
 import pytest
 
+from etl.collection.explorer.core import Explorer
 from etl.collection.explorer.migration import migrate_csv_explorer
 from etl.files import yaml_dump
 from etl.helpers import PathFinder
@@ -291,6 +292,10 @@ def test_explorer_legacy_1(tmp_path, monkeypatch):
     paths = PathFinder(str(STEP_DIR / "viz/explorer/who/latest/influenza"))
     assert paths._create_current_step_name() == "viz://explorer/who/latest/influenza"
     paths.__dict__["dest_dir"] = tmp_path
+    # `save()` exports the config to `local_config_path`, which is the real `viz/explorer/...` output
+    # folder of the influenza step. On staging this test runs next to the ETL build, and a config
+    # file dropped there before the step creates its dataset makes the step refuse to run.
+    monkeypatch.setattr(Explorer, "local_config_path", property(lambda self: tmp_path / "influenza.config.json"))
 
     # Load explorer config
     config = paths.load_config(path=config_path)
@@ -345,6 +350,10 @@ def test_explorer_legacy_2(tmp_path, monkeypatch):
     paths = PathFinder(str(STEP_DIR / "viz/explorer/who/latest/influenza"))
     assert paths._create_current_step_name() == "viz://explorer/who/latest/influenza"
     paths.__dict__["dest_dir"] = tmp_path
+    # `save()` exports the config to `local_config_path`, which is the real `viz/explorer/...` output
+    # folder of the influenza step. On staging this test runs next to the ETL build, and a config
+    # file dropped there before the step creates its dataset makes the step refuse to run.
+    monkeypatch.setattr(Explorer, "local_config_path", property(lambda self: tmp_path / "influenza.config.json"))
 
     # Load explorer config
     config = paths.load_config(path=config_path)

@@ -1234,6 +1234,10 @@ class ExportStep(DataStep):
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 
+        # An output folder without index.json (an interrupted run, or a file dropped there by
+        # something else) would make create_dataset refuse to run; start from scratch instead.
+        self._clean_partial_output()
+
         from etl.helpers import create_dataset
 
         # Create folder for the dataset, the step can save files there
