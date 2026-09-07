@@ -87,7 +87,7 @@ tables:
       other_causes:
         title: Other causes
         unit: spills
-        description_short: Events such as heavy weather damage and human error have been categorised as 'Other'.
+        description_short: Events such as heavy weather damage and human error have been categorized as 'Other'.
         presentation:
           title_public: Other
         display:

@@ -377,7 +377,7 @@ tables:
           grapher_config:
             title: Contribution to global mean surface temperature rise
             subtitle: Global mean surface temperature change as a result of a country or region's cumulative emissions of three gases – carbon dioxide, methane, and nitrous oxide.
-            note: This does not include cooling impacts from sulphur dioxide and aerosols, so the net warming can be lower.
+            note: This does not include cooling impacts from sulfur dioxide and aerosols, so the net warming can be lower.
             map:
               colorScale:
                 baseColorScheme: Oranges
@@ -571,7 +571,7 @@ tables:
           grapher_config:
             title: "Global warming: Contributions to the change in global mean surface temperature"
             subtitle: This is shown as a country or region's share of the global mean surface temperature change as a result of its cumulative emissions of three gases – carbon dioxide, methane, and nitrous oxide.
-            note: Cooling effects of sulphur dioxide and aerosols are not included – this means the net impact for some countries can be negative. Methane and nitrous oxide are included using the GWP* approach.
+            note: Cooling effects of sulfur dioxide and aerosols are not included – this means the net impact for some countries can be negative. Methane and nitrous oxide are included using the GWP* approach.
             map:
               colorScale:
                 baseColorScheme: YlOrBr

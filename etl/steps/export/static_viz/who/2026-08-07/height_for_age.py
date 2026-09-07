@@ -1,12 +1,24 @@
 """Recreate the 'Expected height of boys and girls' growth-curve chart.
 
-Each panel shows nested percentile bands from the WHO growth reference standards, the median, and
-the -2 SD stunting threshold.
+Each panel shows two nested bands from the WHO growth reference standards and the median. The outer
+band runs from -2 SD to +2 SD, so its lower edge is the stunting threshold: the boundary a reader has
+to find carries two encodings at once -- where the tint stops and a dashed line -- and everything below
+the shaded area is the stunted region.
 
-Neither panel repeats the other sex's median. The two medians run within a few millimetres of each
-other from birth to about age 9, so a second line traces the panel's own median for two thirds of the
-range -- the same doubling that splitting the sexes into panels was meant to remove. Where the two
-sexes differ can be read off the panels at a shared gridline.
+Both bands are symmetric about the median, and both edges of the outer one are the same kind of cut.
+An earlier version ran the threshold as a faint dotted line *inside* a band spanning the 0.1st to the
+99.9th percentile, which put two near-parallel boundaries a few pixels apart at the bottom of each
+panel -- one a labelled band edge, one an unlabelled line -- and gave the reader no cue as to which
+side of the line was 'too short'. Cutting the band at the threshold removed the competing edge; making
+the far edge +2 SD rather than the 99.9th percentile then removed the asymmetry that replaced it, where
+one edge of a band was a standard deviation and the other a percentile. The cost is the tall upper
+tail: the band now tops out around 191 cm rather than 199, which the 200 cm axis still contains.
+
+Neither panel repeats the other sex's median. The two medians stay within about 2 cm of each other
+from birth until girls overtake boys at age 9.2 -- a couple of pixels on a 40-200 cm axis -- so a
+second line traces the panel's own median for two thirds of the range, the same doubling that
+splitting the sexes into panels was meant to remove. Where the two sexes differ can be read off the
+panels at a shared gridline.
 
 An encoding diagram names each part of the chart -- see `draw_encoding_diagram`. There is no legend
 in either version.
@@ -41,10 +53,18 @@ the dated block -- insert after the `-----------` divider page, not at a counted
 each named for the slug the website exports by, with a reference copy of this step's own render to
 their left:
 
-| Frame | Cloned from | Size |
-|---|---|---|
-| `expected-height-boys-girls` | `5332:75` Static Chart Template_Horizontal | 850x638 |
-| `expected-height-boys-girls-mobile` | `24590:32` Static Chart Template_Mobile (example 2) | 540x824 |
+| Frame | Node | Open it | Cloned from | Size |
+|---|---|---|---|---|
+| `expected-height-boys-girls` | `26869:1501` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26869-1501) | `5332:75` Static Chart Template_Horizontal | 850x638 |
+| `expected-height-boys-girls-mobile` | `26869:1515` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26869-1515) | `24590:32` Static Chart Template_Mobile (example 2) | 540x824 |
+
+The node ids are a convenience, not the join: they die if anyone rebuilds a frame from the template
+rather than swapping its chart -- which happened here on 2026-08-27, when the design team's rebuild of
+`Static Chart Template_Horizontal` made re-cloning worthwhile and both frames got new ids. **The frame name is what actually identifies a chart** -- it is the
+kebab-case slug the website exports the PNG by, so it is the same string in the Figma layer panel, in
+the exported filename and in this table. Lost the ids? Search the file's page list for `height`; the
+pages are named `YYYYMMDD <Title> (<Creator>)` and this one is dated 20260812, the day it was first
+placed, which does not change when the chart is refreshed.
 
 **Import.** Upload with `upload_assets` and POST the file to the returned `submitUrl`
 (`curl -F "file=@<path>"`); never `createNodeFromSvg`, which caps at 50k characters. The upload lands
@@ -68,7 +88,7 @@ templates ship -- setting `characters` propagates the first character's style ov
 | Title | `TITLE` | template's Playfair |
 | Subtitle | `SUBTITLE` | Lato Regular |
 | `Note:` (desktop only) | `build_note(...)` | `Note:` Bold, rest Regular |
-| `Data source:` | `Data source: ` + `build_source_citation(...)` | `Data source:` Bold, rest Regular |
+| `Data source:` | `Data source: ` + `source_citation(...)` from `etl.static_viz` | `Data source:` Bold, rest Regular |
 | Tagline (desktop) | leave the template's | -- |
 | License | `Licensed under ` / `CC-BY` / ` by the author ` / `AUTHOR` | Medium / Bold / Medium / Bold |
 
@@ -81,21 +101,32 @@ two-line title and a two-line subtitle:
 
 - `subtitle.y = 16.216 + title.height + 6`. Reset `title.y = 16.216` first -- the desktop header is
   not an auto-layout frame, so Figma re-centres a title that shrinks to one line.
-- `note.y = 589.216 - 5.4 - note.height`, so a third line eats into the chart area rather than the
-  source row. Mobile's header is auto-layout and needs neither.
+- `note.y = 591 - 4 - note.height`, so a fourth line eats into the chart area rather than the source
+  row. The 4 is `Frame 22`'s own `itemSpacing`; read it off the clone rather than typing it, since it
+  was 5.4 in the template's previous build. Mobile's header is auto-layout and needs neither.
 
-**Colors.** Bind the medians to library styles and derive the bands from them; the library carries no
-tints. The gid names a group, so descend to its `VECTOR` children before calling the setter.
+**Colors.** Bind each panel's median *and its threshold* to the library style, and derive that panel's
+bands from it; the library carries no tints. The gid names a group, so descend to its `VECTOR` children
+before calling the setter.
+
+The threshold has to be bound too, and to the same style as the median beside it. The step draws both
+in the panel's own colour on purpose -- colour says which panel a mark belongs to, style says which mark
+it is -- so binding only the median splits the pair in Figma: the median moves to the library colour
+while the threshold keeps matplotlib's `#4c72b0` / `#dd8452`. Binding a paint style leaves
+`dashPattern` alone, so the dash survives the binding. The encoding diagram's marks are not in this
+table: they stay the step's grey, which is what marks the diagram as a key rather than as data.
 
 | Layer | Treatment |
 |---|---|
-| `boys___50` | `setStrokeStyleIdAsync` -> `Default Palette/Rusty Orange`, key `65bab597d085689b1ea82a69f4d785cb9212c234` |
-| `girls___50` | `setStrokeStyleIdAsync` -> `Default Palette/Denim`, key `e1538d9330d7b22168f0c19fa562897aa8975f90` |
-| `<sex>__almost-all-children` | that style's color blended 0.90 towards white |
+| `boys___50` | `setStrokeStyleIdAsync` -> `Default Palette/Denim`, key `e1538d9330d7b22168f0c19fa562897aa8975f90` |
+| `girls___50` | `setStrokeStyleIdAsync` -> `Default Palette/Rusty Orange`, key `65bab597d085689b1ea82a69f4d785cb9212c234` |
+| `<sex>__stunting-threshold` | the same style as `<sex>___50` |
+| `<sex>__19-in-20-children` | that style's color blended 0.90 towards white |
 | `<sex>__8-in-10-children` | blended 0.74 towards white |
 
-Rusty Orange and Denim separate by dE 70 at worst; their grayscale seam is 1.14:1, which does not gate
-here because the two series sit in separate, text-titled panels.
+Denim and Rusty Orange separate by dE 70 at worst; their grayscale seam is 1.14:1, which does not gate
+here because the two series sit in separate, text-titled panels. Which panel takes which is set by
+`PANEL_COLOR_INDEX`, not here -- keep the two in step.
 
 **In-plot text.** Figma substitutes Inter for matplotlib's family, so restyle to Lato at three ranks
 and re-anchor every label on its mark. Do both in one call and in that order: the widths only settle
@@ -111,41 +142,133 @@ Anchors: y ticks by their right edge; the first x tick by its left and the last 
 centred; `Median` by its right edge; the band labels by their left; the stunting label by its centre.
 
 **Fit.** Centre the group in the band between the header's bottom and the footer's first visible row
-(`footer.y + min(0, source.y)`). No rescale is needed -- this step sizes the plot to the template --
-and one would move every font off its rank.
+(`footer.y + min(0, source.y)`), then pin the group's box to the content box.
+
+The pin is a fraction of a pixel and it is not optional. This step sizes the plot to the template,
+but it cannot land the left edge exactly: the ink starts at the widest y tick label, and that label's
+width is Lato's, set by Figma on import, where every width the step can measure is Arial's. The
+column is measured and scaled by `LATO_OVER_MEASURED_ADVANCE`, which leaves a few tenths of a pixel
+rather than the 5.92px a hand-tuned reservation left here until 2026-09-04. Close it with FITTING.md's
+stretch -- `group.resize(contentW, h)`, never a `rescale`, which would move every font off its rank,
+and never a squeeze, which rewraps labels.
 
 **Audit before showing it.** Expect sizes {16, 14, 12} only, Lato Regular and Bold only, both medians
-reporting a bound style, no ink outside 16..W-16, and gaps of about 14 on desktop and 20 on mobile.
+*and both thresholds* reporting a bound style -- and each threshold reporting the same colour as its
+own median, which is the check that catches a stale band or threshold selector -- no ink outside
+16..W-16, and gaps of about 14 on desktop and 20 on mobile.
 """
+
+import logging
+from pathlib import Path
 
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from matplotlib.colors import to_rgb
-from matplotlib.font_manager import FontProperties
-from matplotlib.textpath import TextPath
+from matplotlib.font_manager import FontProperties, findfont
+from matplotlib.lines import Line2D
+from matplotlib.textpath import TextPath, TextToPath
 from matplotlib.ticker import FuncFormatter
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
+from etl.static_viz import PIXELS_PER_INCH, apply_svg_rcparams, export_frame, source_citation
 
-# Use non-path text so SVGs stay editable in Figma
-matplotlib.rcParams["svg.fonttype"] = "none"
-# Set deterministic hash for reproducible SVG output
-matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"
+# Figma-editable text, deterministic ids. Must run before any figure is created.
+apply_svg_rcparams()
 
 paths = PathFinder(__file__)
 
+# Two stacks, because two different readers want different answers.
+#
+# This one lands in the SVG's `font-family` verbatim -- matplotlib copies the rcParam out rather than
+# writing the face it resolved -- so naming Lato first is a request to whoever opens the file. Figma
+# then renders the import in the template's own typeface on arrival, which makes the parked reference
+# copy look like the deliverable and turns `/create-figma-chart`'s font pass, and the anchor pass that
+# exists only to undo it, into no-ops. Without it Figma resolves none of Arial/Helvetica/DejaVu and
+# substitutes Inter, which is wider.
+EMITTED_FONT_STACK = ["Lato", "Arial", "Helvetica", "sans-serif"]
+# And this one is what the step measures and draws with. It deliberately does NOT name Lato, which is
+# not installed on our machines: Lato is a font this step can ask for, not one it could measure in.
+MEASURED_FONT_STACK = ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans", "sans-serif"]
+
+matplotlib.rcParams["font.family"] = "sans-serif"
+matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
+
+# Drop the per-face misses for faces we deliberately list as alternatives, and nothing else. A blanket
+# silence would also take "Falling back to DejaVu Sans", which is the one that says a whole stack
+# failed and every measurement has just moved ~15% against what gets drawn.
+_OPTIONAL_FACES = tuple({*EMITTED_FONT_STACK, *MEASURED_FONT_STACK})
+logging.getLogger("matplotlib.font_manager").addFilter(
+    lambda record: (
+        "Falling back" in record.getMessage()
+        or not any(f"Font family '{face}' not found" in record.getMessage() for face in _OPTIONAL_FACES)
+    )
+)
+
+# No filter can protect the invariant the allowances actually rest on, so assert it. Silencing a
+# declared face also silences the case where every face of a stack is missing; and Lato-first has its
+# own trap -- a machine that HAS Lato draws Lato while the measured stack still resolves Arial, and
+# nothing warns at all. This passes on a Mac without Lato (Arial/Arial) and on a box with neither
+# (DejaVu/DejaVu -- a different face, still self-consistent), and fails on the two drifting machines.
+_DRAWN_FACE, _MEASURED_FACE = (
+    findfont(FontProperties(family=EMITTED_FONT_STACK)),
+    findfont(FontProperties(family=MEASURED_FONT_STACK)),
+)
+assert _DRAWN_FACE == _MEASURED_FACE, (
+    f"draws {Path(_DRAWN_FACE).name}, measures {Path(_MEASURED_FACE).name} -- every width in this step "
+    "was measured in a face it will not be drawn in"
+)
+
+# What one template pixel of Arial advance becomes once Figma re-renders the import in Lato.
+#
+# The two stacks above cost a width, not just a name: the deliverable's glyphs are Lato and every
+# width this step can measure is Arial's, and Lato runs wider. That matters wherever a string's own
+# width decides where its ink starts -- the right-aligned y tick column is the case, since matplotlib
+# writes the anchor and the renderer supplies the advance leftwards from it.
+#
+# Measured off the two shipped frames, Figma's box left against the SVG's anchor: "200 cm" takes
+# 47.219px there against 45.91 here (1.0285) and "40 cm" 38.889 against 38.12 (1.0202). The spread is
+# real -- Lato's digit, space and letter advances each differ from Arial's by their own amount, so a
+# single ratio cannot be exact for every string -- and the larger of the two is used deliberately:
+# overshooting leaves a sub-pixel gap that the Figma fit closes, while undershooting puts label ink
+# outside the content box, which the margins check flags and no fit can recover without a squeeze.
+LATO_OVER_MEASURED_ADVANCE = 1.0285
+
 # One panel per sex. Colors are seaborn "deep" positions rather than raw hexes, so the
-# chart shifts with the shared palette instead of pinning its own.
-PANEL_COLOR_INDEX = {"Boys": 1, "Girls": 0}
+# chart shifts with the shared palette instead of pinning its own. Position 0 is the palette's blue
+# and 1 its orange, which Figma rebinds to Denim and Rusty Orange respectively -- so this mapping is
+# what decides which library colour each panel ends up in, and the Colors table in the Figma section
+# has to move with it.
+PANEL_COLOR_INDEX = {"Boys": 0, "Girls": 1}
 
-# Color for reference lines and their labels.
-REFERENCE_LINE_COLOR = "#6c7a89"
+# The stunting threshold's stroke. It carries no colour of its own: in a panel it takes that panel's
+# colour, and in the encoding diagram it takes the diagram's grey, so colour says which panel a mark
+# belongs to and style says which mark it is. A neutral slate here instead read as chart furniture --
+# gridlines and annotation are grey -- which is the wrong rank for the chart's most important idea.
+#
+# Dashed rather than dotted, at a weight that puts it third behind the median (2.6pt) and ahead of the
+# gridlines (1.0pt), and that survives both print and the 217px mobile panel. At 0.8pt dotted it was
+# the faintest stroke in the chart.
+#
+# The pattern is in multiples of the line's own width, NOT points: matplotlib multiplies a dash
+# sequence by the linewidth (`rcParams["lines.scale_dashes"]`, on by default), so a pattern written in
+# points comes out `linewidth` times longer than intended. At 1.4pt this draws a 4.5pt dash with a
+# 2.8pt gap -- the SVG carries `stroke-dasharray: 4.48,2.8`, which is what to check against. Reading
+# the same numbers as points shipped a 7pt dash on a 1.4pt stroke, five times the stroke width, which
+# reads as stretched at any size and looked like a Figma import defect rather than a step one.
+STUNTING_LINEWIDTH = 1.4
+STUNTING_DASHES = (0, (3.2, 2.0))
 
-# Neutral grey for the encoding diagram's bands and median. Grey is what marks the diagram as a
-# key rather than as data.
+# What the threshold is called in the encoding diagram. It leads with the direction because the mark
+# it names is the region below the line rather than the line itself, and it keeps the plain-language
+# gloss rather than deferring it to the Note, which the mobile template has no room for.
+STUNTING_LABEL = "Stunted: below this line, too short for their age"
+
+# Neutral grey for the encoding diagram's bands, median and threshold. Grey is what marks the diagram
+# as a key rather than as data, and it is why the diagram has to separate the median from the threshold
+# by style alone -- solid against dashed -- which is the distinction the panels rely on too.
 DIAGRAM_COLOR = "#666666"
 
 # Nested percentile bands, drawn widest first, as (lower column, upper column, how far the fill is
@@ -153,16 +276,32 @@ DIAGRAM_COLOR = "#666666"
 # composites onto whatever is behind it, and the SVG is saved transparent for the Figma template to
 # supply the background. A tint renders the same on any backdrop and gives Figma one flat fill each.
 BANDS = [
-    ("height_percentile_0_1", "height_percentile_99_9", 0.90, "almost-all-children"),
+    ("height_sd_minus_2", "height_sd_plus_2", 0.90, "19-in-20-children"),
     ("height_percentile_10", "height_percentile_90", 0.74, "8-in-10-children"),
 ]
 
-# The encoding diagram names each band by the share of children inside it, and a percentile is a cut
-# point rather than a share: the 0.1st percentile has 0.1% of children below it and the 99.9th has
-# 0.1% above it, so the band between them holds 99.9 - 0.1 = 99.8%. Labelling it 99.9% would count
-# everyone below the upper edge, including the 0.1% who are below the lower edge and so outside the
-# band. The inner band runs from the 10th to the 90th, holding 80%.
-BAND_LABELS = ["99.8% of children", "80% of children"]
+# What 2 SD is worth as a percentile: the share of children beyond the threshold at either end. The
+# note states it and the outer band's label is derived from it, so the two can't drift apart. Carried
+# to seven figures rather than rounded, because both derived strings are printed to one decimal and
+# 2.275 would round the band's label up to 95.5%.
+#
+# The conversion is exact rather than approximate, which is what lets a band bounded in standard
+# deviations be labelled as a share at all: WHO's height-for-age standard sets the LMS skewness
+# parameter L to 1 at every age, so the distribution is normal and -2 SD is the 2.275th percentile
+# rather than an age-varying centile. `assert_threshold_is_a_fixed_percentile` checks L is still 1 in
+# the data before the label ships.
+STUNTED_SHARE = 2.2750132
+
+# The encoding diagram names each band by the share of children inside it, and a cut point is not a
+# share: 2.3% of children fall below -2 SD and the same share above +2 SD, so the band between them
+# holds 100 - 2 x 2.3 = 95.4%. The inner band runs from the 10th percentile to the 90th, holding 80%.
+BAND_LABELS = [f"{100 - 2 * STUNTED_SHARE:.1f}% of children", "80% of children"]
+
+# The inner band's half-width as a share of the outer's, for the encoding diagram's schematic. Both
+# bands are fixed multiples of the standard deviation -- the 10th and 90th percentiles sit at -+1.2816
+# SD -- so the ratio is 1.2816 / 2 and holds at every age rather than being eyeballed. Under the old
+# asymmetric band it was an approximation (0.42) fitted to one end of the range.
+DIAGRAM_INNER_RATIO = 1.2816 / 2
 
 # Percentiles drawn as lines on top of the bands, as (column, line width), so a specific centile
 # can be read off rather than only a range. Named in the encoding diagram, not on the line.
@@ -203,7 +342,25 @@ TICK_WIDTH = 1
 # content, with half a line of padding under them (labelPadding = 0.5 * facetLabelFontSize). Grapher
 # derives its facet base font size as facetLabelFontSize / GRAPHER_FONT_SCALE_12 * 0.9, so the label
 # ends up about 1/0.9 of the tick size.
-FACET_TITLE_SCALE = 1 / 0.9
+# A template pixel in points: the figure is 100 template px per inch and there are 72 points to the
+# inch, so one pixel is 0.72pt. Used to convert the templates' geometry for text measurement, which
+# matplotlib does in points.
+POINTS_PER_PIXEL = 0.72
+
+# The design team's type ladder for the text INSIDE the plot, in template pixels -- which is what
+# Figma shows, because the figure is drawn at the template's own width.
+#
+# Emit exactly these rather than sizes near them. A point is 100/72 template px, so 14px is 10.08pt
+# and the import then arrives already on the ladder, needing no size pass. That is not merely tidier:
+# snapping a size in Figma changes every glyph width in the label, which moves the label off its
+# anchor and is most of what the anchor pass is left correcting. Emitting 10.5pt instead put every
+# rank about 4% high -- 14.58 / 16.20 / 12.08 -- and bought a round of snapping and re-anchoring for
+# nothing.
+#
+# It also makes the step's own PNG the size the frame will be, so a wrap decided here is decided at
+# the size that ships.
+LADDER_PX = {"facet": 16, "body": 14, "diagram": 12}
+LADDER_PT = {rank: px * POINTS_PER_PIXEL for rank, px in LADDER_PX.items()}
 FACET_TITLE_PAD = 0.5
 
 TITLE = "Expected height of boys and girls, from birth to age 19"
@@ -212,7 +369,7 @@ TITLE = "Expected height of boys and girls, from birth to age 19"
 # static-chart templates leave for it.
 AUTHOR = "Pablo Arriagada"
 
-TAGLINE = "OurWorldinData.org — Research and data to make progress against the world's largest problems."
+TAGLINE = "OurWorldinData.org — Research and data to make progress against the world\u2019s largest problems."
 
 # The two layouts, taken from the static-chart template frames. All geometry is in the
 # templates' own pixel units, measured from the top-left as Figma reports them, and converted
@@ -227,10 +384,16 @@ TAGLINE = "OurWorldinData.org — Research and data to make progress against the
 LAYOUTS = {
     "height_for_age": {
         "size": (850, 638),
+        "template": "horizontal",
         "margin": 16,
         "title_y": 16,
-        "chart_bottom_y": 556,
-        "source_y": 589,
+        # The three footer rows of `Static Chart Template_Horizontal`, measured 2026-08-27 after the
+        # design team rebuilt it: Note at 559, Data source at 591, and the tagline/licence row at 609,
+        # inside a `Frame 22` that starts at 559 and is 63 tall. `chart_bottom_y` is the Note's top
+        # for a two-line note, which is the shape the template ships. The previous values (556 / 589)
+        # came from the template's earlier build and left every row about 2px high.
+        "chart_bottom_y": 559,
+        "source_y": 591,
         "footer_y": 609,
         "nrows": 1,
         "ncols": 2,
@@ -238,15 +401,16 @@ LAYOUTS = {
         "age_ticks": [0, 5, 10, 15, 19],
         "diagram": "panel",
         "title_fontsize": 16,
-        "body_fontsize": 10.5,
+        "body_fontsize": LADDER_PT["body"],
         "footer_fontsize": 7.75,
-        # Space reserved inside the chart area for the y tick labels, and below the plot for the
-        # tick marks, the x tick labels and the bold "Age in years" label.
-        "y_label_space": 58,
+        # Space reserved below the plot for the tick marks, the x tick labels and the bold
+        # "Age in years" label. The y tick column is not reserved here -- it is measured from the
+        # labels themselves, see `y_tick_column_px`.
         "x_label_space": 60,
     },
     "height_for_age_mobile": {
         "size": (540, 824),
+        "template": "mobile",
         "margin": 16,
         "title_y": 16,
         # The mobile templates' footer is a two-row block at y=770: Data source, then the license 21px
@@ -260,9 +424,8 @@ LAYOUTS = {
         "age_ticks": [0, 5, 10, 15, 19],
         "diagram": "header",
         "title_fontsize": 16,
-        "body_fontsize": 10.5,
+        "body_fontsize": LADDER_PT["body"],
         "footer_fontsize": 8.75,
-        "y_label_space": 58,
         "x_label_space": 60,
     },
 }
@@ -271,7 +434,12 @@ LAYOUTS = {
 # it fits in about 114 characters at the template's type size. Calling the whole range a *reference*
 # is also what keeps mobile honest without a Note slot to put a caveat in -- it claims only that this
 # is how the reference population's heights are distributed, not that they are heights to aim for.
-SUBTITLE = "Global growth reference for infants, children and adolescents, as defined by the World Health Organization."
+#
+# No geography word, deliberately. The under-fives standards earn one -- six countries, and WHO's own
+# claim that they apply to children everywhere -- but the 5-19 half is a reconstruction of a single
+# national sample, 22,917 US children measured between 1963 and 1975, so calling the whole range
+# 'global' over-claims on exactly the half this subtitle was hedged to protect.
+SUBTITLE = "Growth reference for infants, children, and adolescents, as defined by the World Health Organization."
 
 # The mobile template has no Note slot, so a condensed form of the note rides in the subtitle instead.
 # It says what causes the two visible steps, which is what a reader needs to know they are real rather
@@ -279,21 +447,17 @@ SUBTITLE = "Global growth reference for infants, children and adolescents, as de
 # since that switch is what the step at 5 is. Every line it adds comes out of the plot's height.
 MOBILE_NOTE = (
     "The steps mark a switch from lying to standing measurement at age {first:.0f}, "
-    "and to an older-age reference at {second:.0f}."
+    "and an older-age reference at {second:.0f}."
 )
 
-# A template pixel in points: the figure is 100 template px per inch and there are 72 points
-# to the inch, so one pixel is 0.72pt. Used to convert the templates' geometry for text
-# measurement, which matplotlib does in points.
-POINTS_PER_PIXEL = 0.72
 
-# Template pixels per inch. The figure is sized so that one template pixel is one hundredth
-# of an inch, which keeps the saved image at the template's proportions.
-PIXELS_PER_INCH = 100
+# One dash plus one gap, in POINTS: the dash units are multiples of the line width, so this is what
+# one repetition of the pattern measures. `even_dashes` converts it to display pixels with the
+# figure's own dpi rather than a constant, because the two are not the same number -- this figure
+# renders at 200 dpi while its geometry is laid out in 100-per-inch template pixels, so assuming
+# template pixels made every segment half a period and left the dash as uneven as before.
+STUNTING_DASH_PERIOD_PT = sum(STUNTING_DASHES[1]) * STUNTING_LINEWIDTH
 
-# Font size for the encoding diagram's labels, in points, relative to the body size. The design
-# team's floor is 12px and a point here renders as 100/72 px, so this must stay above 8.64pt.
-DIAGRAM_FONTSIZE_DROP = 1.8
 
 # Gap between the title block and the subtitle, in template pixels. Calibrated so that a
 # two-line title puts the subtitle at the templates' own y=80.
@@ -324,26 +488,63 @@ def run() -> None:
     tb = load_growth_reference()
     paths.log.info(f"Loaded {len(tb)} rows covering ages {tb['age_years'].min():.1f}-{tb['age_years'].max():.1f}")
 
-    source_citation = build_source_citation(tb)
-    paths.log.info(f"Source citation: {source_citation}")
+    assert_threshold_is_a_fixed_percentile(tb)
+
+    citation = source_citation(tb[MEDIAN_COLUMN], key="producer")
+    paths.log.info(f"Source citation: {citation}")
 
     breaks = find_discontinuities(tb)
     paths.log.info(f"Steps down in the median at ages: {[round(age, 2) for age in breaks]}")
 
     for short_name, layout in LAYOUTS.items():
-        fig = create_visualization(tb, source_citation, breaks, layout)
+        fig = create_visualization(tb, citation, breaks, layout)
         # No bbox_inches="tight" on either: cropping to the drawn content would change the frame,
         # and the point is to hand Figma an image at the template's exact proportions.
         #
-        # The two formats want opposite things from the canvas, so they are saved separately. The
-        # PNG stays opaque, because it is the copy a human reviews and a transparent one is
-        # unreadable against a dark editor background. The SVG is saved transparent, because it
-        # goes into a Figma template that supplies its own background -- and matplotlib's white
-        # figure patch is its own SVG group, so it would sit over that background and would not be
-        # uncovered by deleting the text.
-        paths.export_fig(fig, short_name, ["png"], dpi=300)
-        paths.export_fig(fig, short_name, ["svg"], transparent=True)
+        # export_frame owns the save discipline: the clip sweep, the opaque-PNG /
+        # transparent-SVG split, and the template-aspect assertion. `template` is a check, not a
+        # setting -- it fails the run if this layout's figsize has drifted off the frame it is
+        # laid out against.
+        export_frame(paths, fig, short_name, template=layout["template"])
         plt.close(fig)
+
+
+def assert_threshold_is_a_fixed_percentile(tb: Table) -> None:
+    """Check the premise behind the outer band's label.
+
+    The band is labelled as a *share of children* while its lower edge is defined in *standard
+    deviations*, and that conversion only holds because WHO's height-for-age standard sets the LMS
+    skewness parameter L to 1 at every age, making the distribution normal. If a future revision
+    introduced skewness, -2 SD would become an age-varying centile and the label would silently start
+    overstating or understating how many children the band holds -- a wrong number on a published
+    chart, with nothing else in the step to catch it.
+    """
+    skewness = tb["lms_l_skewness"].unique()
+    assert set(skewness) == {1}, (
+        f"Height-for-age is no longer a normal distribution (L = {skewness}), so -2 SD is no longer "
+        f"the {STUNTED_SHARE}th percentile and BAND_LABELS overstates the outer band."
+    )
+
+    # The same claim checked against the percentile columns rather than the parameter: 2.275 sits
+    # between the 1st and the 3rd, so the threshold must too, at every age and for both sexes.
+    outside = (tb["height_sd_minus_2"] <= tb["height_percentile_1"]) | (
+        tb["height_sd_minus_2"] >= tb["height_percentile_3"]
+    )
+    assert not outside.any(), (
+        f"-2 SD escapes the 1st-3rd percentile range in {int(outside.sum())} rows, so it is not the "
+        f"{STUNTED_SHARE}th percentile the band label assumes."
+    )
+
+    # The outer band is drawn as symmetric about the median and labelled with one share doubled, so the
+    # two thresholds have to be equidistant from it. They are by construction under L = 1, which makes
+    # this a check on the columns rather than on the maths.
+    lower_gap = tb["height_percentile_50"] - tb["height_sd_minus_2"]
+    upper_gap = tb["height_sd_plus_2"] - tb["height_percentile_50"]
+    skew = (lower_gap - upper_gap).abs().max()
+    assert skew < 0.01, (
+        f"-+2 SD are not equidistant from the median (worst gap {skew:.3f} cm), so the outer band is "
+        "not symmetric and BAND_LABELS cannot double one tail's share."
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -357,21 +558,66 @@ def load_growth_reference() -> Table:
     return ds.read("height_for_age")
 
 
-def build_source_citation(tb: Table) -> str:
-    """Cite the producers behind the chart, from the origins on the median indicator.
+def resample_for_even_dashes(x, y, transform, period_px: float):
+    """Resample a polyline so every segment spans exactly one dash period on the page.
 
-    Follows grapher's own footer convention of `producer (year)`, so the two WHO products cite as one
-    producer carrying both release years rather than as two separate data products.
+    Matplotlib dashes continuously along a path, so its own render does not care where the vertices
+    fall. **Figma does**: it fits a whole number of dash repetitions into each segment individually,
+    stretching or squeezing the pattern to make them fit. So the rendered dash length becomes a
+    function of vertex spacing, and a line whose vertices are unevenly spaced comes out with visibly
+    different dash frequencies along its length.
 
-    Returned without a label, so the caller supplies the template's "Data source:" slot name.
+    That is exactly what a growth curve produces. Matplotlib's path simplification keeps vertices
+    where the curvature is high and drops them where the line is straight, so the threshold arrived
+    in Figma with 51 vertices at a 6.7pt mean spacing against a 7.28pt dash period -- 35 of its 50
+    segments shorter than a single repetition. The steep part near birth collapsed into dots, the
+    flat part ran as long dashes, and the encoding diagram's miniature, densest of all, read as a
+    solid line rather than a dashed one.
+
+    Measured in Figma on four otherwise identical lines: at 6.7px spacing the pattern renders as
+    dots, at 13px as over-long dashes, and only at >=50px as specified. Rather than push the spacing
+    up -- which would cost the curve its shape, since the whole path is only ~470px long -- put
+    *exactly one* repetition in each segment. Then there is nothing to round: every segment renders
+    one dash and one gap, at any spacing, in both renderers.
+
+    Sampling is along the original polyline, so the curve's shape and its two step discontinuities
+    survive; only the vertex positions change.
     """
-    years: dict[str, list[str]] = {}
-    for origin in tb[MEDIAN_COLUMN].metadata.origins:
-        year = origin.date_published.split("-")[0] if origin.date_published else ""
-        seen = years.setdefault(origin.producer, [])
-        if year and year not in seen:
-            seen.append(year)
-    return "; ".join(f"{producer} ({'; '.join(sorted(ys))})" for producer, ys in years.items())
+    points = transform.transform(np.column_stack([x, y]))
+    spans = np.hypot(*np.diff(points, axis=0).T)
+    distance = np.concatenate([[0.0], np.cumsum(spans)])
+    if distance[-1] <= period_px:
+        return x, y
+    steps = max(2, int(round(distance[-1] / period_px)) + 1)
+    targets = np.linspace(0.0, distance[-1], steps)
+    return np.interp(targets, distance, x), np.interp(targets, distance, y)
+
+
+def even_dashes(fig: plt.Figure, period_pt: float) -> int:
+    """Respace every dashed threshold in the figure so Figma renders its dash evenly.
+
+    Finds the lines by gid rather than being handed them, so a threshold added to a future panel or
+    diagram is picked up without plumbing. Returns how many it respaced, which is what the caller
+    logs -- a zero there means the gids drifted and the fix silently stopped applying.
+    """
+    # A transform lands in display pixels, which are the figure's dpi per inch and NOT the 100
+    # template pixels per inch its geometry is written in. Take the conversion from the figure.
+    period_px = period_pt * fig.dpi / 72
+    respaced = 0
+    for line in fig.findobj(Line2D):
+        gid = line.get_gid()
+        if not gid or not gid.endswith("__stunting-threshold"):
+            continue
+        x, y = line.get_data()
+        x, y = resample_for_even_dashes(np.asarray(x), np.asarray(y), line.get_transform(), period_px)
+        line.set_data(x, y)
+        # `set_data` invalidates the cached path; force it to rebuild now so that simplification --
+        # which is what made the spacing uneven to begin with -- can be switched off on the result
+        # before anything draws it. Left on, it would drop vertices from exactly the flat stretches
+        # this resampling exists to keep evenly spaced.
+        line.get_path().should_simplify = False
+        respaced += 1
+    return respaced
 
 
 def find_discontinuities(tb: Table) -> list[float]:
@@ -410,13 +656,13 @@ def draw_encoding_diagram(
     middle: float = 0.24,
     outer_half: float = 0.105,
     rise: float = 0.12,
-    label_gap: float = 0.03,
+    label_gap: float = 0.05,
 ) -> None:
     """Draw a miniature growth curve carrying the encoding, with each part named beside it.
 
-    Shaped like the chart it explains rather than as a flat block: a rising median with the two bands
-    widening around it and the -2 SD line running below, so the reader recognises the marks by their
-    shape and not only by their colour. It is a schematic, not a data slice -- the bands are drawn
+    Shaped like the chart it explains rather than as a flat block: a rising median with both bands
+    widening symmetrically around it, the outer one's lower edge being the -2 SD line, so the reader
+    recognises the marks by their shape and not only by their colour. It is a schematic, not a data slice -- the bands are drawn
     wider than the real ones so the four labelled marks separate at the curve's right-hand end, where
     the labels attach.
 
@@ -429,7 +675,9 @@ def draw_encoding_diagram(
       nest outwards and their labels attach to the top cap, which is what keeps the inner label from
       having to cross the outer bracket -- the panel is too narrow for it to clear.
     - The median's label sits at the line's left end, and the stunting label below the curve with a
-      short leader. A leader is drawn only where a label cannot sit against the thing it names.
+      short leader. A leader is drawn only where a label cannot sit against the thing it names. The
+      stunting label is the wider of the two and runs beneath the median's, so `label_gap` has to hold
+      it a clear line below rather than merely below.
 
     Geometry is in axes fractions of whatever `ax` it is given, so the same drawing serves both
     layouts: the empty triangle below the growth curve on desktop, and its own axes across the header
@@ -441,12 +689,11 @@ def draw_encoding_diagram(
     median = middle - rise / 2 + rise * t**0.55
     # The bands widen with age in the data, so they widen along the schematic too.
     outer = outer_half * (0.35 + 0.65 * t)
-    # The inner band is the middle 80%, the outer the middle 99.8%, so it is about 0.42 as tall.
-    inner = outer * 0.42
-    # -2 SD inside the schematic: the outer band's edge is the 99.9th percentile, at about z = 3.09,
-    # so 2 SD sits at 2/3.09 of the half-width. That ratio is what puts the stunting line inside the
-    # outer band and below the inner one, as it is in the data.
-    minus_2sd = median - outer * 2 / 3.09
+    # Both bands are symmetric about the median, as the chart's are, and the outer band's own lower
+    # edge is the -2 SD threshold -- so the schematic shows the same single boundary at its foot that
+    # the panels do, with nothing else running near it.
+    inner = outer * DIAGRAM_INNER_RATIO
+    minus_2sd = median - outer
 
     for half, weight, name in ((outer, 0.90, "outer-band"), (inner, 0.74, "inner-band")):
         ax.fill_between(
@@ -463,9 +710,10 @@ def draw_encoding_diagram(
     ax.plot(
         x,
         minus_2sd,
-        color=REFERENCE_LINE_COLOR,
-        linestyle=":",
-        linewidth=0.8,
+        color=DIAGRAM_COLOR,
+        linestyle=STUNTING_DASHES,
+        linewidth=STUNTING_LINEWIDTH,
+        dash_capstyle="butt",
         transform=ax.transAxes,
         zorder=8,
         gid="diagram__stunting-threshold",
@@ -478,7 +726,7 @@ def draw_encoding_diagram(
     # labels sit against their own bracket: the top label then clears the small bracket entirely, and
     # the middle label starts to the right of both.
     for half_end, bracket_x, label_x, at_top, name, text in (
-        (outer[-1], right + 0.020, right + 0.035, True, "almost-all", BAND_LABELS[0]),
+        (outer[-1], right + 0.020, right + 0.035, True, "19-in-20", BAND_LABELS[0]),
         (inner[-1], right + 0.050, right + 0.065, False, "8-in-10", BAND_LABELS[1]),
     ):
         ax.plot(
@@ -518,10 +766,13 @@ def draw_encoding_diagram(
         gid="diagram__label-median",
     )
 
-    # The stunting label sits below the curve, where there is room for one line, with a leader
-    # dropping from the dotted line at the curve's midpoint.
+    # The stunting label sits below the curve, where there is room for one line, with a leader dropping
+    # from the threshold at the curve's midpoint. The threshold is now the band's own lower edge, so
+    # the leader starts on that edge and crosses nothing on its way down -- it used to start inside the
+    # band and cross its lower boundary, which left it pointing at two marks at once. The label says
+    # *below this line* because the mark it names is a region, not a line: everything under the band.
     mid = len(t) // 2
-    label_y = float((median - outer).min()) - label_gap
+    label_y = float(minus_2sd.min()) - label_gap
     ax.plot(
         [x[mid]] * 2,
         [minus_2sd[mid], label_y],
@@ -535,7 +786,7 @@ def draw_encoding_diagram(
     ax.text(
         x[mid],
         label_y,
-        "Stunted: too short for their age",
+        STUNTING_LABEL,
         transform=ax.transAxes,
         fontsize=fontsize,
         color=TEXT_COLOR,
@@ -544,6 +795,33 @@ def draw_encoding_diagram(
         zorder=8,
         gid="diagram__label-stunted",
     )
+
+
+def height_tick_label(value: float, _position: int | None = None) -> str:
+    """One y tick label: a whole number of centimetres.
+
+    Named rather than a lambda inside the formatter, because `y_tick_column_px` sizes the column from
+    these strings and has to measure the one the axis will draw.
+    """
+    return f"{value:.0f} cm"
+
+
+def y_tick_column_px(labels: list[str], fontsize: float) -> float:
+    """Width to reserve for the right-aligned y tick label column, in template pixels.
+
+    The widest label's advance plus the tick pad. matplotlib writes the label's *anchor* into the SVG
+    and leaves the renderer to lay the string out leftwards from it, so what decides where the ink
+    starts is the advance -- which is also the width Figma's text box carries. Ink extents (what
+    `wrap_to_content_width` measures, and the right tool for wrapping) would be a couple of pixels
+    short of it.
+
+    The tick pad comes from the rcParam because that is what matplotlib will use: this axis is drawn
+    with `length=0`, so the pad is the whole distance from the spine to the anchor.
+    """
+    prop = FontProperties(family=MEASURED_FONT_STACK, size=fontsize)
+    to_path = TextToPath()
+    widest = max(to_path.get_text_width_height_descent(label, prop, ismath=False)[0] for label in labels)
+    return (widest * LATO_OVER_MEASURED_ADVANCE + matplotlib.rcParams["ytick.major.pad"]) / POINTS_PER_PIXEL
 
 
 def wrap_to_content_width(text: str, layout: dict, fontsize: float) -> str:
@@ -555,7 +833,7 @@ def wrap_to_content_width(text: str, layout: dict, fontsize: float) -> str:
     wrapping some 10% narrow than the space available.
     """
     max_points = (layout["size"][0] - 2 * layout["margin"]) * POINTS_PER_PIXEL
-    font = FontProperties(size=fontsize)
+    font = FontProperties(family=MEASURED_FONT_STACK, size=fontsize)
 
     def measure(candidate: str) -> float:
         return TextPath((0, 0), candidate, prop=font).get_extents().width if candidate.strip() else 0.0
@@ -578,18 +856,22 @@ def build_note(breaks: list[float], layout: dict) -> str:
     """Compose the Note row: the two source discontinuities and what each product is."""
     text = (
         f"Note: The curves step down slightly at age {breaks[0]:.0f}, where height starts being measured standing "
-        f"up rather than lying down, and at age {breaks[1]:.0f}, where WHO's standards for under-fives give way to "
+        f"up rather than lying down, and at age {breaks[1]:.0f}, where WHO\u2019s standards for under-fives give way to "
         "its reference for older children. The under-fives standards show how children grow in good conditions; the "
-        "reference for older children describes how an earlier sample did grow."
+        "reference for older children describes how an earlier sample did grow. A child is stunted if they are more "
+        "than two standard deviations shorter than the median for their age, which is the shaded area\u2019s lower edge: "
+        f"{STUNTED_SHARE:.1f}% of the reference population falls below it."
     )
     return wrap_to_content_width(text, layout, layout["footer_fontsize"])
 
 
-def create_visualization(tb: Table, source_citation: str, breaks: list[float], layout: dict) -> plt.Figure:
+def create_visualization(tb: Table, citation: str, breaks: list[float], layout: dict) -> plt.Figure:
     """Build one version of the two-panel growth-curve chart.
 
     Layout notes:
-    - One panel per sex, sharing a y-axis, each with two nested percentile bands as flat tints
+    - One panel per sex, sharing a y-axis, each with two nested bands as flat tints, both symmetric
+      about the median
+    - The outer band runs -+2 SD, so its lower edge is the stunting threshold, dashed over the tint edge
     - Median drawn solid on top of the bands
     - The median, the -2 SD stunting threshold and both bands are named in the encoding diagram
     - No spines; light horizontal gridlines carry the height reading
@@ -597,27 +879,42 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     """
     sns.set_style("ticks")
     sns.set_palette("deep")
+    # `set_style` REPLACES `font.sans-serif` with its own Arial-first list, so the module-level
+    # assignment above is gone by here and the step would emit a stack it never chose. This is how it
+    # came to ship `'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans'`.
+    matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
     palette = sns.color_palette("deep")
 
     body_fontsize = layout["body_fontsize"]
-    facet_fontsize = body_fontsize * FACET_TITLE_SCALE
+    facet_fontsize = LADDER_PT["facet"]
     # Room the facet titles need above each panel: one line plus grapher's half-line of padding.
     facet_title_space_px = (1 + FACET_TITLE_PAD) * facet_fontsize / POINTS_PER_PIXEL
     age_max = float(tb["age_years"].max())
-    height_max = float(tb["height_percentile_99_9"].max())
+    # The outermost band decides both ends of the height axis, so a change to what is drawn cannot
+    # leave the axis sized for a series the chart no longer shows.
+    band_lower, band_upper = BANDS[0][0], BANDS[0][1]
+    height_max = float(tb[band_upper].max())
     # Snap the height axis out to whole gridline steps, so the outermost gridlines sit exactly on the
     # plot's top and bottom edges. That is how grapher avoids a gridline running a few pixels clear of
     # an edge: its y domain is [lowest tick, highest tick], so there is only ever one line there. The
     # bottom one coincides with the baseline, which draws it solid, so its gridline is suppressed
     # below rather than dashed over the top of it.
     height_ticks = np.arange(
-        np.floor(float(tb["height_percentile_0_1"].min()) / HEIGHT_STEP) * HEIGHT_STEP,
+        np.floor(float(tb[band_lower].min()) / HEIGHT_STEP) * HEIGHT_STEP,
         np.ceil(height_max / HEIGHT_STEP) * HEIGHT_STEP + 1,
         HEIGHT_STEP,
     )
 
     width_px, height_px = layout["size"]
     margin_px = layout["margin"]
+    # Sized to the labels it holds, not to a constant: the widest one starts on the margin, so the
+    # plot takes every pixel the column does not need. A hand-tuned 58 shipped here and over-reserved
+    # by 5.92px on both layouts, which is what left the plot's ink 6px right of the title.
+    y_label_space = y_tick_column_px([height_tick_label(tick) for tick in height_ticks], body_fontsize)
+    assert 0 < y_label_space < 0.2 * (width_px - 2 * margin_px), (
+        f"the y tick column measured {y_label_space:.2f}px inside a {width_px - 2 * margin_px}px content "
+        "box -- either the labels or the face they were measured in are not what this layout expects"
+    )
 
     def fx(x_px: float) -> float:
         """Template x, in pixels from the left edge, as a figure fraction."""
@@ -676,16 +973,18 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
                 gid=f"{slug}__{band_name}",
             )
 
-        # --- stunting threshold; named in the encoding diagram where there is one, and otherwise
-        # under the line around mid-childhood, where the panel is empty (at the right-hand end the
-        # bands and medians all converge) ---
+        # --- stunting threshold, drawn over the outer band's lower edge, which is the same series.
+        # Doubling the boundary as a tint edge and a dashed stroke is what makes it findable without a
+        # label in the panel: the tint stops there, and the region below it is the stunted one. It is
+        # named in the encoding diagram. ---
         stunting = tb_sex[STUNTING_COLUMN].to_numpy()
         ax.plot(
             age,
             stunting,
-            color=REFERENCE_LINE_COLOR,
-            linestyle=":",
-            linewidth=0.8,
+            color=color,
+            linestyle=STUNTING_DASHES,
+            linewidth=STUNTING_LINEWIDTH,
+            dash_capstyle="butt",
             zorder=4,
             gid=f"{slug}__stunting-threshold",
         )
@@ -695,7 +994,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
             ax.plot(age, values, color=color, linewidth=line_width, zorder=5, gid=f"{slug}__{column[-3:]}")
 
         if layout["diagram"] == "panel" and ax is axes[0]:
-            draw_encoding_diagram(ax, body_fontsize - DIAGRAM_FONTSIZE_DROP)
+            draw_encoding_diagram(ax, LADDER_PT["diagram"])
 
         # --- panel title, above the plot and left-aligned with it, as grapher labels a facet ---
         ax.set_title(
@@ -723,7 +1022,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         # the last -- so both sit inside the plot instead of half-overhanging it.
         labels[0].set_horizontalalignment("left")
         labels[-1].set_horizontalalignment("right")
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:.0f} cm"))
+        ax.yaxis.set_major_formatter(FuncFormatter(height_tick_label))
         ax.tick_params(axis="y", length=0, labelsize=body_fontsize, labelcolor=TEXT_COLOR)
         ax.tick_params(
             axis="x",
@@ -802,7 +1101,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         diagram_axes.patch.set_visible(False)
         draw_encoding_diagram(
             diagram_axes,
-            body_fontsize - DIAGRAM_FONTSIZE_DROP,
+            LADDER_PT["diagram"],
             left=0.33,
             right=0.57,
             middle=0.49,
@@ -846,7 +1145,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     fig.text(
         fx(margin_px),
         fy(layout["source_y"]),
-        f"Data source: {source_citation}",
+        f"Data source: {citation}",
         ha="left",
         va="top",
         fontsize=footer_fontsize,
@@ -881,7 +1180,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     )
 
     fig.subplots_adjust(
-        left=fx(margin_px + layout["y_label_space"]),
+        left=fx(margin_px + y_label_space),
         right=fx(width_px - margin_px),
         top=fy(chart_top_px),
         bottom=fy(chart_bottom_px - layout["x_label_space"]),
@@ -889,9 +1188,11 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         hspace=0.35,
     )
 
-    # Drop clipping everywhere so labels that sit outside the axes survive into the SVG
-    # and Figma receives whole shapes rather than cropped ones.
-    for artist in fig.findobj():
-        artist.set_clip_on(False)
+    # Every dashed threshold -- both panels and whichever diagram this layout drew -- is respaced now
+    # rather than where it was plotted, because `resample_for_even_dashes` measures on the page and
+    # the axes only reach their final size on the line above. Each line's own transform is the right
+    # one to measure through: the panels' is `transData`, the diagram's `transAxes`, and both land in
+    # display pixels.
+    even_dashes(fig, STUNTING_DASH_PERIOD_PT)
 
     return fig

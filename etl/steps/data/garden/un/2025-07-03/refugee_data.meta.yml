@@ -45,7 +45,7 @@ definitions:
   description_unhcr_host: |-
     Host community refers to a community that hosts large populations of refugees or internally displaced persons, whether in camps, integrated into households, or independently.
 
-    UNHCR reports on host communities in countries with substantive programmes focusing on sharing the burden of hosting large refugee populations, as set out in the Global Compact on Refugees.
+    UNHCR reports on host communities in countries with substantive programs focusing on sharing the burden of hosting large refugee populations, as set out in the Global Compact on Refugees.
   description_unhcr_return: |-
     Returned [refugees](#dod:refugee) are former refugees who have returned to their countries of origin, either spontaneously or in an organized fashion, but are yet to be fully integrated. Such returns would ideally take place only under conditions of safety and dignity. For the purpose of UNHCR's statistics, only refugees who returned during the calendar year are included, although in practice, operations may assist returnees for longer periods.
   description_unhcr_idp_return: |-

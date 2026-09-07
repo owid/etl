@@ -720,7 +720,7 @@ def get_info_for_etl_datasets(db_conn: pymysql.Connection | None = None) -> pd.D
             JOIN charts c ON c.id = cd.chartId
             JOIN chart_configs cc ON c.configId = cc.id
         WHERE
-            json_extract(cc.full, "$.isPublished") = TRUE
+            json_extract(cc.config, "$.isPublished") = TRUE
         GROUP BY
             d.id) q2
         ON d.id = q2.datasetId

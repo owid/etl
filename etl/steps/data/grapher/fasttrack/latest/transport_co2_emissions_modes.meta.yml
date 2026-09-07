@@ -9,9 +9,9 @@ tables:
   transport_co2_emissions_modes:
     variables:
       transport_emissions_factor:
-        title: Transport emissions per kilometer travelled
+        title: Transport emissions per kilometer traveled
         unit: kgCO2e
         short_unit: kg
         display:
           numDecimalPlaces: 2
-        description: Estimated greenhouse gas emissions per kilometer travelled. This is measured in kilograms of carbon-dioxide equivalents (CO2e) per kilometer.
+        description: Estimated greenhouse gas emissions per kilometer traveled. This is measured in kilograms of carbon-dioxide equivalents (CO2e) per kilometer.

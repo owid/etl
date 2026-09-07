@@ -1,0 +1,34 @@
+grapher_schema: "011"
+# Identity of the chart in grapher (`charts.configId`) — this is the chart that
+# already existed at /grapher/banning-of-chick-culling before it moved to ETL.
+chart_config_id: "0191b6c7-5595-70b2-8d30-fa03fccd7add"
+topic_tags:
+  - "Animal Welfare"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - "chick_culling_laws#status"
+    config:
+      title: "Which countries have banned chick culling?"
+      subtitle: "Chick culling is the routine killing of newly hatched male chicks, which cannot lay eggs and are of no commercial value to the egg industry."
+      note: "In Switzerland grinding is banned but gassing is still allowed. Belgium has only regional measures."
+      originUrl: "/animal-welfare"
+      tab: "map"
+      hasMapTab: true
+      chartTypes: []
+      yAxis:
+        min: "auto"
+      map:
+        hideTimeline: true
+        colorScale:
+          baseColorScheme: "BinaryMapPaletteA"
+          customNumericColorsActive: true
+          # Colors per plain status; the accompanying .py step expands them into one entry per
+          # status-year value found in the data (e.g. "Banned (2023)"), relabeled back to the plain status.
+          customCategoryColors:
+            Banned: "#759ac8"
+            "Not banned": "#ae2e3f"
+            "Partially banned": "#a46f49"
+            "Banned but not yet in effect": "#058580"

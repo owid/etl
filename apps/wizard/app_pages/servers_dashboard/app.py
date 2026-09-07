@@ -116,10 +116,10 @@ with st.container(horizontal=True, vertical_alignment="bottom", horizontal_align
         **Last commit**: age of the newest ETL/Grapher commit. This is reference info only — it does **not** by itself decide when a server is stopped.
 
         **Auto-stop** — when (and why) the reaper will stop a server:
-        - A running server is auto-stopped once **max(last commit, last _start_) is older than 14 days**. Stopping just idles it (data preserved); it's not destroyed.
-        - Because *last start* counts, **waking or restarting a server resets the clock** — so a server with an old commit can still be far from being stopped. The column shows the reason (e.g. *restarted Jun 19* vs *commit Jun 19*).
+        - A running server is auto-stopped once **max(last commit, last _wake_) is older than 14 days**. Stopping just idles it (data preserved); it's not destroyed.
+        - Because a *wake* counts, **using the Wake button resets the clock** — so a server with an old commit can still be far from being stopped. The column shows the reason (e.g. *woken Jun 19* vs *commit Jun 19*).
         - 🟢 healthy · 🟡 stops within a few days · 🔴 stops on the next nightly run · ⏸️ already idle · ♾️ persistent (`master`, never auto-stopped) · ❓ can't be judged (commit unreadable).
-        - ⚠️ A **host restart bumps every container's last-start at once**, resetting the timer fleet-wide — so right after a `gaia-1` reboot most servers will read the same countdown regardless of commit age.
+        - Only a **deliberate** wake counts. The weekly `gaia-1` reboot restarts every container, but it does not reset anyone's countdown.
 
         **Destroy** (frees the disk) only happens after the **PR is merged/closed** (~3 days later) — auto-stop never destroys.
 
@@ -449,8 +449,8 @@ else:
             "Auto-stop": st.column_config.TextColumn(
                 "Auto-stop",
                 help="When the reaper will stop this server, and why it's still alive. A server is "
-                "auto-stopped once max(last commit, last start) exceeds 14 days — so a recent "
-                "restart keeps an old-commit server running. 🟢 healthy · 🟡 stops soon · "
+                "auto-stopped once max(last commit, last wake) exceeds 14 days — so a recent "
+                "wake keeps an old-commit server running. 🟢 healthy · 🟡 stops soon · "
                 "🔴 stops tonight · ⏸️ already idle · ♾️ persistent.",
                 width="medium",
             ),

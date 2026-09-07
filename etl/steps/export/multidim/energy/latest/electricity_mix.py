@@ -1,5 +1,7 @@
 """Multidim for the electricity mix (source x metric, plus total-only metrics)."""
 
+# Force re-run to re-upsert view-level default entity selections (grapher #6922).
+
 import math
 from copy import deepcopy
 

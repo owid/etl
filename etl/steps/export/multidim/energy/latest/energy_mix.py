@@ -1,5 +1,7 @@
 """Multidim for the energy mix (source x metric), based on Total Energy Supply."""
 
+# Force re-run to re-upsert view-level default entity selections (grapher #6922).
+
 import math
 from copy import deepcopy
 
@@ -279,7 +281,7 @@ COMMON_VIEW_EXTRAS = {
     "relatedQuestions": [
         {
             "text": "Why has our energy data changed?",
-            "url": "https://ourworldindata.org/how-primary-energy-is-measured-has-changed-across-our-charts",
+            "url": "https://ourworldindata.org/primary-energy-measurement-change",
         }
     ],
 }

@@ -159,7 +159,7 @@ tables:
         unit: people per square kilometer
         short_unit: people/km²
         description_short: |-
-          Number of people per square kilometre of land area. {definitions.global.dimensions.description_short}
+          Number of people per square kilometer of land area. {definitions.global.dimensions.description_short}
         display:
           isProjection: *projection
           roundingMode: significantFigures
@@ -666,7 +666,7 @@ tables:
             The old-age dependency ratio compares those aged 65 and over with the working-age population (aged 15 to 64).
             <%- endif -%>
           - |-
-            This is a purely demographic measure. It does *not* count who is actually working or financially dependent — many people aged 15–64 are not in the labour force, and many people over 65 still are.
+            This is a purely demographic measure. It does *not* count who is actually working or financially dependent — many people aged 15–64 are not in the labor force, and many people over 65 still are.
         description_processing: |-
           We compute the dependency ratios from the UN's population by age. The total dependency ratio is (population aged 0–14 plus population aged 65 and over) divided by population aged 15–64, multiplied by 100. The youth and old-age ratios use only the under-15 or 65+ numerators, respectively.
         display:

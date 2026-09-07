@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: American Community Survey
+    title_snapshot: American Community Survey - Nativity of the population
+    description: |-
+      The American Community Survey (ACS) is an annual survey run by the US Census Bureau. It samples about 3.5 million housing unit addresses each year and measures the demographic, social, economic, and housing characteristics of the US population. Since 2005, it has replaced the long-form questionnaire of the decennial census.
+    description_snapshot: |-
+      This file contains the total population and the foreign-born population of the United States for each year from 2005, from the ACS 1-year estimates (table B05002, "Place of Birth by Nativity and Citizenship Status"), retrieved through the Census Bureau data API. The foreign-born population covers everyone living in the United States who was born in another country, whatever their legal status. There is no value for 2020: the Census Bureau did not release standard 1-year estimates for that year because of data-collection problems during the COVID-19 pandemic.
+    date_published: "2025-09-11"
+
+    # Citation
+    producer: US Census Bureau
+    citation_full: |-
+      U.S. Census Bureau, American Community Survey 1-Year Estimates, Table B05002 (Place of Birth by Nativity and Citizenship Status).
+
+    # Files
+    url_main: https://www.census.gov/programs-surveys/acs
+    url_download: https://api.census.gov/data/2024/acs/acs1
+    date_accessed: "2026-07-22"
+
+    # License
+    license:
+      name: Public domain
+outs:
+  - md5: 4fa9e555f62fe340b1006ec64011ff83
+    size: 526
+    path: us_foreign_born_population_american_community_survey.csv

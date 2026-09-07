@@ -7,9 +7,9 @@ definitions:
 
       To build the CPI, eligible data sources are first selected. A source qualifies only if it measures public‑sector corruption perceptions; relies on a sound, comparable scoring method; is produced by a credible institution; shows enough score variation to differentiate countries; covers a substantial number of nations; bases its ratings on the views of country experts or businesspeople; and is updated at least every two years. The current CPI draws on 13 data sets supplied by 12 separate institutions, each reflecting perceptions recorded during the preceding two years (the accompanying source‑description document details them).
 
-      Next, every source is converted to a 0–100 scale, where 0 represents the highest perceived corruption and 100 the lowest. This standardisation subtracts the source’s baseline‑year mean from each country’s raw score and divides the result by that source’s baseline‑year standard deviation. The standardised value is then rescaled by multiplying by the CPI’s 2012 standard deviation (20) and adding the CPI’s 2012 mean (45), ensuring scores remain comparable across years while fitting the CPI’s 0–100 range.
+      Next, every source is converted to a 0–100 scale, where 0 represents the highest perceived corruption and 100 the lowest. This standardization subtracts the source’s baseline‑year mean from each country’s raw score and divides the result by that source’s baseline‑year standard deviation. The standardized value is then rescaled by multiplying by the CPI’s 2012 standard deviation (20) and adding the CPI’s 2012 mean (45), ensuring scores remain comparable across years while fitting the CPI’s 0–100 range.
 
-      Finally, a country or territory enters the CPI only when at least three separate sources assess it. The country’s CPI figure is the arithmetic mean of all its available standardised scores, rounded to the nearest whole number.
+      Finally, a country or territory enters the CPI only when at least three separate sources assess it. The country’s CPI figure is the arithmetic mean of all its available standardized scores, rounded to the nearest whole number.
     presentation:
       topic_tags:
         - Corruption

@@ -3,7 +3,7 @@ meta:
     producer: Defra
     title: UK egg statistics
     description: |-
-      Defra runs a quarterly voluntary survey of 27 registered UK egg packing stations, covering around 75% of eggs packed in the UK, with a response rate of typically 100 per cent. It collects data on egg throughput by production type (enriched cage, barn, free range, organic), which are used to estimate UK-level figures.
+      Defra runs a quarterly voluntary survey of 27 registered UK egg packing stations, covering around 75% of eggs packed in the UK, with a response rate of typically 100 percent. It collects data on egg throughput by production type (enriched cage, barn, free range, organic), which are used to estimate UK-level figures.
     citation_full: |-
       Quarterly UK statistics on Egg Packing Station Throughput and Prices, by the Department for Environment, Food & Rural Affairs of the United Kingdom.
     url_main: https://www.gov.uk/government/statistics/egg-statistics

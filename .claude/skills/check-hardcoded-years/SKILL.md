@@ -200,7 +200,7 @@ ids = tuple({r["config_id"] for r in refs})
 if not ids:  # `WHERE id IN ()` is a MySQL syntax error, not an empty result
     raise SystemExit("No config-bearing references — report the unchecked surfaces instead.")
 cfgs = env.read_sql(
-    "SELECT id, slug, full AS config FROM chart_configs WHERE id IN %(i)s",
+    "SELECT id, slug, config FROM chart_configs WHERE id IN %(i)s",
     params={"i": ids},
 )
 
@@ -232,7 +232,7 @@ for _, row in cfgs.iterrows():
 
 The same loop covers MDim views and explorer views — they are `chart_configs` rows too, and the sweep already returned their `config_id`. Two surfaces need their own handling: **narrative charts** (read `AdminAPI.get_narrative_chart(id)["configFull"]`, since the stored full lags a parent edit) and **article references** (parse the `time=` components out of each row's `query_string`). Then fold in the repo grep for indicator-level `presentation.grapher_config` pins, which live in YAML and are invisible to any DB sweep.
 
-Query gotchas: pymysql `%`-formats break on quoted literals — parameterize everything. **The public Datasette mirror is DuckDB**, not SQLite/MySQL — `json_type()` returns DuckDB type names (`UBIGINT`, `VARCHAR`, …), so don't filter numerics by type name in SQL; use `TRY_CAST(json_extract_string(cc.full, '$.maxTime') AS DOUBLE) IS NOT NULL` or pull `json_extract_string(...)` values and classify client-side.
+Query gotchas: pymysql `%`-formats break on quoted literals — parameterize everything. **The public Datasette mirror is DuckDB**, not SQLite/MySQL — `json_type()` returns DuckDB type names (`UBIGINT`, `VARCHAR`, …), so don't filter numerics by type name in SQL; use `TRY_CAST(json_extract_string(cc.config, '$.maxTime') AS DOUBLE) IS NOT NULL` or pull `json_extract_string(...)` values and classify client-side.
 
 ## Report format
 

@@ -1012,3 +1012,23 @@ tables:
                 binningStrategy: "manual"
                 customNumericValues: *map_brackets_thr
             selectedEntityNames: *entity_names_inequality
+  population:
+    variables:
+      adult_population:
+        title: Adult population (WID)
+        unit: people
+        short_unit: ""
+        description_short: Number of people aged 20 and over, as reported by the World Inequality Database.
+        description_key:
+          - WID's income series are expressed per adult ("equal-split adults", with household income divided equally among adult members), so adult counts are the population base matching those series.
+        display:
+          numDecimalPlaces: 0
+      total_population:
+        title: Total population (WID)
+        unit: people
+        short_unit: ""
+        description_short: Number of people of all ages, as reported by the World Inequality Database.
+        description_key:
+          - WID's population estimates can differ from other sources' (such as the UN World Population Prospects). Using WID's own counts keeps per-adult and per-capita versions of WID indicators internally consistent.
+        display:
+          numDecimalPlaces: 0

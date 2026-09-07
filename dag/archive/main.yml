@@ -1337,6 +1337,13 @@ steps:
   # archived; last active in 8b30eb0a0898 on 2026-08-18
   data://garden/bls/2026-07-20/us_ppi_construction:
     - snapshot://bls/2026-07-20/us_ppi_construction.csv
+  # archived; last active in be72221eef2d on 2026-08-21
+  data://grapher/technology/2024-12-23/internet:
+    - data://garden/technology/2024-12-23/internet:
+      - data://garden/worldbank_wdi/2026-07-27/wdi
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
+      - data://garden/regions/2023-01-01/regions
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

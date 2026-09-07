@@ -4,7 +4,27 @@ Simple LLM-based CLI to extract characteristic keywords from OWID chart titles a
 
 ## Overview
 
-This tool uses a direct LLM approach to extract searchable, domain-specific keywords from chart text. It bypasses traditional NLP processing and asks an LLM to identify terms users would actually search for.
+For each OWID topic, this builds the short line of suggested search terms shown
+under the all-charts block's search box.
+
+Selection is an optimisation, not a judgement call: **cover as much of the
+topic's chart list as a few terms can, weighting charts by how much they are
+viewed**, first term revealing the most, each next one adding the most that is
+still uncovered. The LLM only proposes candidates; arithmetic picks them.
+
+Four phases:
+
+1. Load, once: topic names, chart view counts (`analytics_chart_views`), and the
+   multi-dim view → config id map that lets a single view's popularity be found.
+2. Per topic, fetch the record set the all-charts block actually lists — plain
+   charts, multi-dim views and explorer views alike — and weight each record by
+   its views.
+3. Ask the model for candidate terms, having shown it that record set.
+4. Choose the terms covering the most of it, by greedy weighted maximum coverage.
+
+Two things follow from (4) rather than needing a second LLM pass: a term whose
+rows are already covered adds nothing and is not chosen, and a term the block
+would show nothing for covers nothing and cannot be chosen at all.
 
 ## Quick Start
 
@@ -14,40 +34,103 @@ This tool uses a direct LLM approach to extract searchable, domain-specific keyw
 ```
 
 ### Extract for specific topics
-```bash
-# Single topic
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy
 
-# Multiple topics (run in parallel)
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --topic climate-change
+The uploaded file *replaces* the vocabulary rather than merging into it, so a
+`--topic` run can't go to the key the site reads — every topic it skipped would
+lose its suggestions. Such a run therefore has to say where its result should go
+instead: `--no-upload` to keep it local, or `--upload-path` to try it on a
+staging server.
+
+```bash
+# Single topic, kept out of production
+.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --no-upload
+
+# Multiple topics (run in parallel), published to a staging key
+.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --topic climate-change \
+    --upload-path topic_vocabulary/my-branch.json
 ```
 
 ### Save to file
 ```bash
-# Single topic - saves as single object
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --output vocab.json
-
-# Multiple topics - saves as dict keyed by slug
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --topic climate-change --output vocab.json
+# A dict keyed by topic slug, whatever the topic count
+.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --no-upload --output vocab.json
 ```
 
 ### Choose model
 ```bash
 # Use faster/cheaper model (default: gemini-3-flash-preview)
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --model gemini-2.5-flash-lite
+.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --no-upload --model gemini-2.5-flash-lite
 ```
 
 ## CLI Options
 
 - `--topic SLUG` - Topic slug(s) to extract (can be specified multiple times). If not provided, extracts for all topics.
 - `--output PATH` - Output JSON file path (optional, prints to console if not provided)
-- `--model MODEL` - Gemini model to use: `gemini-3-flash-preview` (default) or `gemini-2.5-flash-lite`
+- `--model MODEL` - Gemini model to use (default: `gemini-3.7-flash`). Any model id the API accepts works; models missing from `PRICING` just report their cost as unknown.
+- `--upload-path KEY` - Key to write inside the `owid-public` bucket (default: `topic_vocabulary.json`)
+- `--no-upload` - Generate without writing to R2
+- `--report PATH` - Write an HTML coverage report: per term, what it reveals and what it adds, plus the most-viewed charts nothing covers
+- `--weighting {views,uniform}` - Weight charts by views (default) or count them equally
+- `--views-column {views_7d,views_14d,views_365d}` - Which window to weight by (default `views_365d`; a vocabulary is read for weeks, so the year is steadier than the week)
+- `--max-terms N` - Most terms to publish per topic (default 8; the site shows five and drops some, so a couple of spares keep the line full)
+- `--min-marginal-share F` - Stop once the next term would reveal less than this share of a topic's views (default 0.01)
+
+## Chart view data
+
+Weighting reads `analytics_chart_views` from grapher MySQL — the only table with
+per-view granularity, which matters because multi-dim and explorer pages
+contribute one record per view and dominate some topics. It ships only in the
+private data dump, so a local database has it **empty**: either run
+`make refresh.private` in owid-grapher, or point `OWID_ENV` at a staging or
+production database (with `STAGING=1` in `.env`, it already is). A run with no
+view data **aborts** rather than silently weighting everything zero; pass
+`--weighting uniform` to generate without popularity.
+
+Plain charts and multi-dim views are weighted by their own view counts. Explorer
+views can't be: their index records carry no config id, so each is weighted by
+the average views per view of its explorer. The report says how many records fell
+back that way.
+
+## Where the vocabulary goes, and how to try one out
+
+The result is uploaded to the `owid-public` R2 bucket and served through
+`files.ourworldindata.org`, whose worker adds CORS and a 5-minute edge cache.
+The site reads the default key directly from the browser:
+
+    https://files.ourworldindata.org/topic_vocabulary.json
+
+**A plain run overwrites the vocabulary the live site uses.** To try a new one
+without doing that, upload it under a different key — the worker serves the
+whole bucket, so any key works:
+
+```bash
+python scripts/vocabulary/vocabulary.py \
+    --upload-path topic_vocabulary/my-branch.json
+```
+
+then point a staging server at it (see `TOPIC_VOCABULARY_URL` in owid-grapher's
+`settings/clientSettings.ts`):
+
+```
+TOPIC_VOCABULARY_URL=https://files.ourworldindata.org/topic_vocabulary/my-branch.json
+```
+
+Suggestions fall back to the production vocabulary if that key isn't there, so
+a half-finished experiment leaves the page looking normal.
+
+Keywords are consumed by the all-charts block's "Suggested:" line on topic
+pages. It shows the leading few terms per topic, so ordering within a topic
+matters: the terms it lists first are the ones most likely to be shown.
 
 ## How It Works
 
-1. **Extract chart text**: Queries database for all published charts tagged with requested topic(s)
+1. **Extract chart text**: takes the titles and subtitles of every record the
+   topic's all-charts block lists, via the search index — not from the `charts`
+   table, which omits multi-dim and explorer views entirely
 2. **Deduplication**: Removes duplicate titles/subtitles (many charts share text)
-3. **Sampling**: If >200 unique texts, randomly samples 200 for token efficiency
+3. **Sampling**: the 200 most-viewed distinct texts (not a random sample — the
+   terms proposed should describe what people actually look at, and two runs
+   should see the same input)
 4. **LLM extraction**: Feeds all text to Gemini with instructions to extract modern, searchable keywords
 5. **Parallel processing**: When multiple topics requested, processes all in parallel using asyncio
 

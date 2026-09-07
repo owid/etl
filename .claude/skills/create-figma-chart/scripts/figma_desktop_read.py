@@ -1,0 +1,311 @@
+#!/usr/bin/env python3
+"""Read from the Figma DESKTOP MCP server, which serves this skill's reads ~30x faster than the
+hosted connector — 0.37 s a screenshot against 12 s, and it parallelizes where the hosted one queues.
+
+Only for reads. The desktop server offers six tools, all read-only, and none of what this skill
+writes with (`use_figma`, `upload_assets`, `search_design_system`); those stay on the hosted
+connector. See reference/GOTCHAS.md for the measurements and the full constraint list.
+
+Two constraints decide whether this is usable at all, and both fail loudly here rather than quietly:
+
+  * There is no fileKey parameter. The server renders from whatever document is the ACTIVE TAB in
+    the running desktop app, so the Charts file must be open and frontmost. A node it cannot see
+    reports "No node could be found ... make sure ... the document containing the node is the
+    active tab" — which is also what you get when the right file is open but a different tab is on
+    top, so treat that message as "check the tab", not "wrong node id".
+  * A cloud session has no desktop app, so none of this exists there. Fall back to the hosted
+    connector's `get_screenshot`.
+
+Screenshots come back as inline base64 PNGs, with none of the hosted tool's
+original_width/original_height JSON — so this reads the real pixel size out of each PNG header and
+reports it. Note there is no maxDimension AND a silent 1024 px cap on the longer edge: the printed
+size is the RENDERED size, which equals the natural size only below that cap (the Reel template,
+natural 616x1096, arrives 576x1024). Needing true natural size above 1024 px means the hosted
+get_screenshot, which reports it whatever it renders.
+
+Usage (from the repo root, always through the repo virtualenv):
+    # Screenshot nodes, concurrently, into a directory:
+    .venv/bin/python .claude/skills/create-figma-chart/scripts/figma_desktop_read.py shot 798:161 6689:8 --out-dir /tmp/shots
+
+    # Structure of a page or frame as XML (every page, if you omit the node):
+    .venv/bin/python .claude/skills/create-figma-chart/scripts/figma_desktop_read.py meta 798:54
+    .venv/bin/python .claude/skills/create-figma-chart/scripts/figma_desktop_read.py meta
+
+Exit codes — the contract, stated once, because every mode added later inherits it:
+
+    0  every requested node was read
+    1  an ordinary failure: a bad node id, the wrong active tab, an unopened page, a server that
+       is not running
+    2  the daily read quota is exhausted — in EVERY mode, and however it surfaces
+
+`2` is separate because the two want opposite remedies. `1` says fix the ids and retry; `2` says
+stop calling this server today and use the hosted connector, which has its own, unaffected quota.
+Folding them together sends a caller to re-check node ids that were fine. Every path that can see
+the server's refusal — a tool result's `isError` in `check`, `shot` and `meta`, and a transport-level
+JSON-RPC error in `rpc` — routes through `rate_limited()`, so the distinction cannot be lost by
+adding a mode that forgets to make it.
+"""
+
+from __future__ import annotations
+
+import argparse
+import base64
+import json
+import struct
+import sys
+import urllib.error
+import urllib.request
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+SERVER = "http://127.0.0.1:3845/mcp"
+TIMEOUT = 120
+PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
+# Prefix that marks a per-node failure as the daily quota rather than a bad node, so `shot` can
+# raise its exit code to 2 the way `check` does. A sentinel, not a phrase to match loosely.
+QUOTA_MARK = "FAILED (desktop daily quota exhausted"
+# Said once, printed by every mode that can hit the cap.
+QUOTA_ADVICE = (
+    "The desktop server's OWN daily read quota is exhausted — separate from the hosted\n"
+    "connector's, which is unaffected and still usable. Nothing to fix today: use the hosted\n"
+    "get_screenshot. And do not POLL this server; every call is quota, so a retry loop can\n"
+    "spend the whole day's allowance."
+)
+
+
+def quota_note(indent: str = "  ") -> str:
+    return "\n".join(f"{indent}{line}" for line in QUOTA_ADVICE.splitlines())
+
+
+def rpc(payload: dict, session: str | None = None) -> dict:
+    """One JSON-RPC call. The server answers in SSE framing even for single responses."""
+    headers = {
+        "Content-Type": "application/json",
+        # Required: the server refuses a request that does not accept the event-stream framing.
+        "Accept": "application/json, text/event-stream",
+    }
+    if session:
+        headers["mcp-session-id"] = session
+    req = urllib.request.Request(SERVER, data=json.dumps(payload).encode(), headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
+            body = resp.read().decode()
+    except urllib.error.URLError as exc:
+        raise SystemExit(
+            f"cannot reach the Figma desktop MCP server at {SERVER}: {exc}\n"
+            "Is the Figma desktop app running? (A cloud session has no desktop app — use the "
+            "hosted connector's get_screenshot instead.)"
+        ) from exc
+    # Strip SSE framing: the JSON payload is spread over the "data: " lines.
+    data = "".join(line[6:] for line in body.splitlines() if line.startswith("data: "))
+    # A notification gets no reply at all, so an empty body is normal; a top-level `error` is not.
+    reply = json.loads(data) if data else {}
+    if isinstance(reply, dict) and reply.get("error"):
+        err = reply["error"]
+        detail = err.get("message", err) if isinstance(err, dict) else err
+        code = err.get("code", "?") if isinstance(err, dict) else "?"
+        message = f"the Figma desktop MCP server returned JSON-RPC error {code}: {detail}"
+        # The cap can also surface as a transport-level error rather than a tool result's isError,
+        # and it exits 2 wherever it appears — every other failure here wants a different remedy.
+        if rate_limited(str(detail)):
+            print(f"{message}\n{quota_note('')}", file=sys.stderr)
+            raise SystemExit(2)
+        raise SystemExit(message)
+    return reply
+
+
+def connect() -> str | None:
+    """Initialize a session. One handshake serves many calls, so callers should reuse the id."""
+    headers = {"Content-Type": "application/json", "Accept": "application/json, text/event-stream"}
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "initialize",
+        "params": {
+            "protocolVersion": "2024-11-05",
+            "capabilities": {},
+            "clientInfo": {"name": "owid-create-figma-chart", "version": "1"},
+        },
+    }
+    req = urllib.request.Request(SERVER, data=json.dumps(payload).encode(), headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
+            session = resp.headers.get("mcp-session-id")
+    except urllib.error.URLError as exc:
+        raise SystemExit(
+            f"cannot reach the Figma desktop MCP server at {SERVER}: {exc}\nIs the Figma desktop app running?"
+        ) from exc
+    rpc({"jsonrpc": "2.0", "method": "notifications/initialized"}, session)
+    return session
+
+
+def call_tool(name: str, arguments: dict, req_id: int, session: str | None) -> dict:
+    return rpc(
+        {"jsonrpc": "2.0", "id": req_id, "method": "tools/call", "params": {"name": name, "arguments": arguments}},
+        session,
+    )
+
+
+def result_text(result: dict) -> str:
+    return "".join(item.get("text", "") for item in result.get("content", []))
+
+
+def rate_limited(text: str) -> bool:
+    """The desktop server has its OWN daily read quota, separate from the hosted connector's.
+
+    Exhausting it answers with "Rate limit exceeded, please try again tomorrow" and blocks every
+    further read for the day, while the hosted path keeps working. Worth naming distinctly: it is
+    indistinguishable from a missing node unless you read the message.
+    """
+    return "rate limit" in text.lower()
+
+
+def check(expect_node: str) -> int:
+    """Preflight: is the desktop path usable right now? Exit 0 yes, 1 no — never raises.
+
+    Pass the node you actually intend to read, not the default: "usable" is per-node, not per-file.
+    Three things have to hold, and only the first is about the server being up. The document must be
+    the ACTIVE TAB (there is no fileKey to pass), and the node's PAGE must already have been opened
+    in the app — page contents are lazily loaded there, so a page created by a write and never
+    visited by a human reports its children as missing, indefinitely. That is why the server's "No
+    node could be found" is usually not a bad id.
+    """
+    try:
+        session = connect()
+        reply = call_tool(
+            "get_metadata",
+            {"nodeId": expect_node, "clientLanguages": "unknown", "clientFrameworks": "unknown"},
+            300,
+            session,
+        )
+    except SystemExit as exc:
+        # A quota refusal raised as a transport error already carries its own code, and printed its
+        # own message to stderr — so don't flatten it back to 1, and don't print the bare code as
+        # though it were the reason.
+        if exc.code == 2:
+            print("desktop path UNAVAILABLE: the daily read quota is exhausted (detail above).")
+            print("Fall back to the hosted connector's get_screenshot.")
+            return 2
+        print(f"desktop path UNAVAILABLE: {exc}")
+        print("Fall back to the hosted connector's get_screenshot.")
+        return 1
+
+    result = reply.get("result", {})
+    text = result_text(result)
+    if result.get("isError") or not text.strip():
+        print(f"desktop path UNAVAILABLE for {expect_node}.")
+        print(f"  server said: {text.strip()[:200]}")
+        if rate_limited(text):
+            print(quota_note())
+            return 2
+        print("  Two causes, and the message does not distinguish them:")
+        print("   - the target file is not the ACTIVE TAB in the Figma desktop app; or")
+        print("   - that node's PAGE has never been opened in the app, so its contents are not")
+        print("     loaded in the replica. Writes cannot fix this and it does not resolve on its")
+        print("     own — a human must open the page, or you read via the hosted get_screenshot.")
+        return 1
+
+    name = ""
+    if 'name="' in text:
+        name = text.split('name="', 1)[1].split('"', 1)[0]
+    print(f"desktop path available — {expect_node} resolves to {name!r} in the active document.")
+    return 0
+
+
+def shot(nodes: list[str], out_dir: Path) -> int:
+    session = connect()
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    def one(index_node: tuple[int, str]) -> tuple[str, str]:
+        index, node = index_node
+        reply = call_tool("get_screenshot", {"nodeId": node}, 100 + index, session)
+        result = reply.get("result", {})
+        if result.get("isError"):
+            text = result_text(result).strip()
+            if rate_limited(text):
+                return node, f"{QUOTA_MARK} — use the hosted path) {text}"
+            return node, f"FAILED {text}"
+        for item in result.get("content", []):
+            if item.get("type") != "image":
+                continue
+            png = base64.b64decode(item.get("data", ""))
+            if not png.startswith(PNG_MAGIC):
+                return node, "FAILED response was not a PNG"
+            # PNG IHDR carries width/height as big-endian uint32 at byte offset 16.
+            width, height = struct.unpack(">II", png[16:24])
+            path = out_dir / f"{node.replace(':', '-')}.png"
+            path.write_bytes(png)
+            return node, f"{path}  {width}x{height}  {len(png):,}B"
+        return node, "FAILED no image in response"
+
+    # The server serves these concurrently — six at once measured 0.51 s against 2.2 s serially.
+    with ThreadPoolExecutor(max_workers=min(8, len(nodes))) as pool:
+        results = list(pool.map(one, enumerate(nodes)))
+
+    failures, quota = 0, False
+    for node, line in results:
+        print(f"{node}: {line}")
+        failures += line.startswith("FAILED")
+        quota = quota or line.startswith(QUOTA_MARK)
+    # Quota outranks the count. A batch can exhaust the allowance partway through — the preflight
+    # passed, then the cap hit — and collapsing that to a generic 1 tells the caller "bad node ids",
+    # whose remedy is to fix the ids. The remedy here is the opposite: stop calling this server for
+    # the day and use the hosted connector. `check` already separates the two; so does `shot` now.
+    if quota:
+        return 2
+    return 1 if failures else 0
+
+
+def meta(node: str | None) -> int:
+    session = connect()
+    args = {"clientLanguages": "unknown", "clientFrameworks": "unknown"}
+    if node:
+        args["nodeId"] = node
+    reply = call_tool("get_metadata", args, 200, session)
+    if "result" not in reply:
+        print(f"FAILED no result in the server's reply: {reply}", file=sys.stderr)
+        return 1
+    result = reply["result"]
+    text = result_text(result)
+    if result.get("isError"):
+        print(f"FAILED {text.strip()}", file=sys.stderr)
+        # Every mode that can see the server's isError owes the same distinction: quota is 2, and a
+        # bad node or the wrong active tab is 1. `meta` used to fold them together, so a caller
+        # reading a structure dump could not tell "fix the node id" from "stop using this server".
+        if rate_limited(text):
+            print(quota_note(""), file=sys.stderr)
+            return 2
+        return 1
+    print(text)
+    return 0
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = ap.add_subparsers(dest="mode", required=True)
+
+    p_shot = sub.add_parser("shot", help="screenshot one or more nodes, concurrently")
+    p_shot.add_argument("nodes", nargs="+", metavar="NODE_ID", help="e.g. 798:161 (or 798-161)")
+    p_shot.add_argument("--out-dir", type=Path, default=Path("."), help="where to write the PNGs")
+
+    p_check = sub.add_parser("check", help="preflight: is the desktop path usable right now?")
+    p_check.add_argument(
+        "--expect-node",
+        default="798:161",
+        metavar="NODE_ID",
+        help="a node that must exist in the active document (default: a Charts-file template)",
+    )
+
+    p_meta = sub.add_parser("meta", help="XML structure of a node, or the page list with no node")
+    p_meta.add_argument("node", nargs="?", metavar="NODE_ID")
+
+    args = ap.parse_args()
+    if args.mode == "shot":
+        return shot(args.nodes, args.out_dir)
+    if args.mode == "check":
+        return check(args.expect_node)
+    return meta(args.node)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

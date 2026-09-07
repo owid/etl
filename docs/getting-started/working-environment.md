@@ -218,13 +218,100 @@ If `make test` succeeds, then you should be able to build any dataset you like, 
 
 ## Git hooks
 
-The pre-commit hook is activated automatically by `make .venv` (and any target that depends on it). It runs `make check` (lint, format, type-check) before every `git commit`, which prevents accidentally pushing code that fails CI.
+The pre-commit hook is activated automatically by `make .venv` (and any target that depends on it). It runs `make check` (lint, format, type-check) before every `git commit`, which prevents accidentally pushing code that fails CI. Because `make check` *fixes* what it can, the hook re-stages the files it rewrote, so the commit carries the corrected code — you don't need to run `make check` yourself first. It refuses to touch a file that is only partially staged, since re-staging one would pull its unstaged changes into the commit.
 
 If you need to (re)activate it manually:
 
 ```bash
 make install-hooks
 ```
+
+It is installed as a symlink at `$GIT_DIR/hooks/pre-commit`, git's default location. Note that it deliberately does *not* set `core.hooksPath`: that replaces the hooks directory rather than adding to it, and a repo-local setting beats a global one, so it would silently disable any machine-wide hooks you have.
+
+## Working in a git worktree
+
+`.env` is gitignored, so `git worktree add` cannot carry it into a new worktree, and a worktree starts with no `data/` either — so every ETL step would recompute from snapshots. `make setup.worktree` handles both, runs automatically as part of `make .venv`, and never overwrites anything already there.
+
+```bash
+git worktree add ../etl-mybranch -b mybranch
+cd ../etl-mybranch
+make setup.worktree   # .env and a copy-on-write clone of data/ — offline, a few seconds
+make .venv            # only when you actually need the venv (~17 s)
+```
+
+`make .venv` runs `setup.worktree` itself, so a single `make .venv` does everything — and so does any other make target, since they all depend on `.venv`. You only need `setup.worktree` on its own when you want the config without paying for a venv.
+
+Copying 16 GB of `data/` sounds absurd and isn't: on a copy-on-write filesystem (APFS on macOS) `cp -c` clones the files, sharing the original's blocks until something writes to them. Measured on a 16 GB / ~32,000-file `data/`: **4 seconds and ~0 bytes**. So a real copy is *better* than symlinking it — each worktree gets an independent `data/`, and two of them running the same step cannot overwrite each other's output. `setup.worktree` checks the filesystem before copying and leaves `data/` absent when cloning isn't possible, rather than making a real 16 GB copy — see the trap below, `cp -c` cannot be trusted to refuse.
+
+The venv is deliberately not part of `setup.worktree`. It is the one slow, network-dependent step — about 17 seconds for 412 packages, against a few seconds and ~0 bytes for config and `data/` — and plenty of worktrees never need one. Since every make target depends on `.venv`, it gets built the moment something actually needs it. If you reach for `.venv/bin/etlr` in a worktree that hasn't built one yet you'll get `no such file or directory`; `make .venv` fixes it.
+
+Two things not to try instead. **Symlinking `.venv`** to the main checkout looks tempting and is a trap twice over: the venv holds an *absolute* editable pointer to the main checkout, so `.venv/bin/etlr` would silently run the main checkout's code rather than your branch's — and `uv sync` follows the symlink rather than replacing it, so any make target in that worktree rewrites the *shared* venv, uninstalling packages the main checkout needs. **Cloning `.venv`** copy-on-write is no faster than building it (a venv is ~103,000 small files, so per-file clone cost dominates) and has the same wrong-code problem.
+
+### Copy-on-write: there is nothing to turn on
+
+Worth stating plainly, because it is easy to assume otherwise: **copy-on-write is not a setting you enable.** On macOS, APFS supports file cloning out of the box, on every Mac, with no configuration. What you have to do is *ask for it*, per command — plain `cp` does a full byte-for-byte copy:
+
+```bash
+cp -Rc  src dst            # macOS / BSD cp: clone (copy-on-write)
+cp -R   src dst            # a real copy — the default
+
+cp -R --reflink=auto src dst   # GNU cp (Linux): clone if possible, else copy
+```
+
+Both paths must be on the **same APFS volume**. And here is the trap: `cp -c` does **not** fail when it can't clone — it silently makes a real copy. Verified by copying from APFS to a mounted HFS+ image: the file was created, no error. So in a script, checking the filesystem *first* is the only safe approach; `cp -c` succeeding tells you nothing about whether it cloned:
+
+```bash
+# a script that must never make a real copy of something huge
+SRC_DEV=$(df -P "$src" | awk 'NR==2{print $1}')
+DST_DEV=$(df -P . | awk 'NR==2{print $1}')
+[ "$SRC_DEV" = "$DST_DEV" ] || exit 0     # different filesystems: it could only be a copy
+```
+
+(GNU `cp` on Linux has no `-c` at all — it errors out — and `--reflink=always` does fail honestly when the filesystem can't clone. Only the macOS flag is silently forgiving.)
+
+To check a clone really happened, compare **free space**, not `du`:
+
+```bash
+df -k /System/Volumes/Data | tail -1 | awk '{print $4}'   # before
+cp -Rc big-dir clone-dir
+df -k /System/Volumes/Data | tail -1 | awk '{print $4}'   # after — expect no change
+```
+
+`du` reports *apparent* size and counts a clone (and a hard link) at full size, so it will tell you the copy cost 16 GB when it cost nothing. The same caveat makes `du` useless for sizing a `.venv`: `uv` hardlinks packages out of `~/.cache/uv`, so a 2.3 GB-looking venv adds well under 200 MB of real disk.
+
+**On Linux** it depends on the filesystem: XFS (`reflink=1`, the default since 2018), btrfs and ZFS support it; **ext4 does not** and never has, so `cp --reflink=always` fails there. `setup.worktree` reports that and leaves `data/` absent.
+
+The trick isn't specific to `data/`. It applies to any large directory you'd otherwise duplicate or symlink: `node_modules`, a dataset, or the checkout itself on a very large repo.
+
+### Provisioning worktrees automatically
+
+`setup.worktree` is a deliberately boring, shared name — owid-grapher uses it too — so anything that creates a worktree can provision *any* repo without knowing what that repo needs. Two ways to hook it up:
+
+**A worktree manager.** Point its per-repo setup script at `make setup.worktree`. Nothing else is needed.
+
+**A machine-wide git hook**, if you create worktrees with plain `git` and want this to happen by itself. Set `core.hooksPath` to a directory of your own and put this in its `post-checkout`:
+
+```bash
+#!/bin/sh
+# Only when the checkout is brand new: git passes the all-zero OID as the previous
+# HEAD for `git worktree add` and `git clone`, and the real old HEAD for an
+# ordinary branch switch. Without this the hook would fire on every `git checkout`.
+case "$1" in '' | *[!0]*) exit 0 ;; esac
+[ "$3" = "1" ] || exit 0
+
+# Nothing to provision in the primary checkout — it's the source everything copies from.
+[ "$(git rev-parse --git-dir)" = "$(git rev-parse --git-common-dir)" ] && exit 0
+
+cd "$(git rev-parse --show-toplevel)" || exit 0
+# `make -n` resolves the target without running it, and exits non-zero if the repo
+# has none — so this is a no-op in repos that don't define it.
+make -n setup.worktree >/dev/null 2>&1 && make setup.worktree
+exit 0
+```
+
+With this in place `git worktree add` alone gives a worktree its config and `data/` in a few seconds, and the venv follows the first time you run a make target in it.
+
+Two things to know if you do this. `core.hooksPath` **replaces** `$GIT_DIR/hooks` rather than adding to it, so a dispatcher of this kind should end by exec'ing the repo's own `$GIT_DIR/hooks/<name>` — otherwise it silently disables every per-repo hook, including this repo's pre-commit. And keep `setup.worktree` cheap and offline for the same reason: it runs inside a git hook, which is why it does not build the venv.
 
 ## GitHub Actions
 

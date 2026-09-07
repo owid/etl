@@ -59,9 +59,9 @@ def main() -> int:
     cfgs = {
         r["id"]: r
         for r in datasette(
-            "select c.id, cc.slug, json_extract_string(cc.full,'$.chartTypes') as types, "
-            "json_extract_string(cc.full,'$.dimensions') as dims, "
-            "json_extract_string(cc.full,'$.isPublished') as pub "
+            "select c.id, cc.slug, json_extract_string(cc.config,'$.chartTypes') as types, "
+            "json_extract_string(cc.config,'$.dimensions') as dims, "
+            "json_extract_string(cc.config,'$.isPublished') as pub "
             f"from charts c join chart_configs cc on cc.id=c.configId where c.id in ({','.join(map(str, ids))})"
         )
     }

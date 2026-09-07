@@ -131,7 +131,7 @@ def path_tail(catalog_path: str | None) -> str:
 
 CHART_SELECT = """
 SELECT DISTINCT c.id AS chart_id, cc.slug AS chart_slug, cc.chartType AS chart_type,
-       cc.full->>'$.title' AS title, c.publishedAt AS published_at, cc.fullMd5 AS config_md5
+       cc.config->>'$.title' AS title, c.publishedAt AS published_at, cc.configMd5 AS config_md5
 FROM charts c
 JOIN chart_configs cc ON cc.id = c.configId
 """
@@ -141,7 +141,7 @@ JOIN chart_configs cc ON cc.id = c.configId
 # put charts an editor has already retired into the migration CSV, and applying that CSV
 # would make their dead URLs resolve again. The live state is `isPublished` in the config,
 # the same test `preflight.py:unpublished_sources` uses.
-LIVE_PUBLISHED = "COALESCE(cc.full->>'$.isPublished', 'false') = 'true'"
+LIVE_PUBLISHED = "COALESCE(cc.config->>'$.isPublished', 'false') = 'true'"
 
 
 def resolve_charts(args) -> tuple[list[dict], dict]:
@@ -396,7 +396,7 @@ def attach_view_config_facts(views: list[dict], mdim_ids: list[int]) -> None:
     changes together with the view id, which is already tracked.
     """
     df = OWID_ENV.read_sql(
-        "SELECT mx.chartConfigId AS cc_id, cc.chartType AS chart_type, cc.fullMd5 AS config_md5 "
+        "SELECT mx.chartConfigId AS cc_id, cc.chartType AS chart_type, cc.configMd5 AS config_md5 "
         "FROM multi_dim_x_chart_configs mx JOIN chart_configs cc ON cc.id = mx.chartConfigId "
         "WHERE mx.multiDimId IN %(ids)s",
         params={"ids": tuple(mdim_ids)},

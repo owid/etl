@@ -9,7 +9,7 @@ meta:
     date_published: "2021-11-11"
     title_snapshot: Antibiotic usage in children
     description_snapshot: |-
-      Data sources for modelled estimates of antibiotic usage in children under 5 years old: Demographic Health Surveys, Multiple Indicator Cluster Surveys.
+      Data sources for modeled estimates of antibiotic usage in children under 5 years old: Demographic Health Surveys, Multiple Indicator Cluster Surveys.
 
     # Citation
     producer: Browne AJ et al.

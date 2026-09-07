@@ -2,58 +2,58 @@ steps:
   # Internal displacement monitoring centre
   data://grapher/idmc/2024-08-02/internal_displacement:
     - data://meadow/idmc/2024-08-02/internal_displacement:
-      - snapshot://idmc/2024-08-02/internal_displacement.xlsx
-      - data://garden/demography/2024-07-15/population
+        - snapshot://idmc/2024-08-02/internal_displacement.xlsx
+        - data://garden/demography/2024-07-15/population
 
   # UNHCR refugee data
   data://grapher/un/2024-07-25/refugee_data:
     - data://garden/un/2024-07-25/refugee_data:
-      - data://meadow/un/2024-07-25/refugee_data:
-        - snapshot://un/2024-07-25/refugee_data.zip
-      - data://garden/demography/2024-07-15/population
-      # UNHCR resettlement data
-      - data://garden/un/2024-07-25/resettlement:
-        - data://meadow/un/2024-07-25/resettlement:
-          - snapshot://un/2024-07-25/resettlement.zip
+        - data://meadow/un/2024-07-25/refugee_data:
+            - snapshot://un/2024-07-25/refugee_data.zip
         - data://garden/demography/2024-07-15/population
+      # UNHCR resettlement data
+        - data://garden/un/2024-07-25/resettlement:
+            - data://meadow/un/2024-07-25/resettlement:
+                - snapshot://un/2024-07-25/resettlement.zip
+            - data://garden/demography/2024-07-15/population
 
   # Child migration (UNICEF)
   data://grapher/unicef/2024-07-30/child_migration:
     - data://garden/unicef/2024-07-30/child_migration:
-      - data://meadow/unicef/2024-07-30/child_migration:
-        - snapshot://unicef/2024-07-30/child_migration.csv
-      - data://garden/demography/2024-07-15/population
+        - data://meadow/unicef/2024-07-30/child_migration:
+            - snapshot://unicef/2024-07-30/child_migration.csv
+        - data://garden/demography/2024-07-15/population
 
   #KNOMAD
   data://grapher/wb/2024-12-17/bilateral_remittance:
     - data://garden/wb/2024-12-17/bilateral_remittance:
-      - data://meadow/wb/2024-12-17/knomad:
-        - snapshot://wb/2024-12-17/knomad.xlsx
-      - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2026-07-01/income_groups
+        - data://meadow/wb/2024-12-17/knomad:
+            - snapshot://wb/2024-12-17/knomad.xlsx
+        - data://garden/regions/2023-01-01/regions
+        - data://garden/wb/2026-07-01/income_groups
 
   # Migration between regions, based on UN DESA flows
   data://grapher/migration/2024-11-18/migration_between_regions:
     - data://garden/migration/2024-11-18/migration_between_regions:
-      - data://garden/un/2025-03-12/migrant_stock
-      - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2026-07-01/income_groups
+        - data://garden/un/2025-03-12/migrant_stock
+        - data://garden/regions/2023-01-01/regions
+        - data://garden/wb/2026-07-01/income_groups
 
   # UN DESA migrant stock (2024)
   data://garden/un/2025-03-12/migrant_stock:
     - data://meadow/un/2025-03-12/migrant_stock:
-      - snapshot://un/2025-03-12/migrant_stock_dest.xlsx
-      - snapshot://un/2025-03-12/migrant_stock_origin.xlsx
-      - snapshot://un/2025-03-12/migrant_stock_dest_origin.xlsx
+        - snapshot://un/2025-03-12/migrant_stock_dest.xlsx
+        - snapshot://un/2025-03-12/migrant_stock_origin.xlsx
+        - snapshot://un/2025-03-12/migrant_stock_dest_origin.xlsx
     - data://garden/wb/2026-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
 
   # UN DESA migrant stock flows (2024)
   data://grapher/un/2025-03-18/migration_stock_flows:
     - data://garden/un/2025-03-18/migration_stock_flows:
-      - data://garden/un/2025-03-12/migrant_stock
-      - data://garden/wb/2026-07-01/income_groups
-      - data://garden/regions/2023-01-01/regions
+        - data://garden/un/2025-03-12/migrant_stock
+        - data://garden/wb/2026-07-01/income_groups
+        - data://garden/regions/2023-01-01/regions
     - data://garden/regions/2023-01-01/regions
 
   # UN DESA multidim migration flows (2024)
@@ -88,30 +88,53 @@ steps:
   export://explorers/migration/2026-01-27/migration:
     # UNICEF child migration data (up to 2024)
     - data://grapher/unicef/2026-01-07/child_migration:
-      - data://garden/unicef/2026-01-07/child_migration:
-        - data://meadow/unicef/2026-01-07/child_migration:
-          - snapshot://unicef/2026-01-07/child_migration.csv
-        - data://garden/demography/2024-07-15/population
-        - data://garden/regions/2023-01-01/regions
+        - data://garden/unicef/2026-01-07/child_migration:
+            - data://meadow/unicef/2026-01-07/child_migration:
+                - snapshot://unicef/2026-01-07/child_migration.csv
+            - data://garden/demography/2024-07-15/population
+            - data://garden/regions/2023-01-01/regions
     # UNHCR refugee data (2025)
     - data://grapher/un/2025-07-03/refugee_data:
-      - data://garden/un/2025-07-03/refugee_data:
-        - data://meadow/un/2025-07-03/refugee_data:
-          - snapshot://un/2025-07-03/refugee_data.zip
-        - data://garden/demography/2024-07-15/population
+        - data://garden/un/2025-07-03/refugee_data:
+            - data://meadow/un/2025-07-03/refugee_data:
+                - snapshot://un/2025-07-03/refugee_data.zip
+            - data://garden/demography/2024-07-15/population
     - data://grapher/un/2025-03-12/migrant_stock:
-      - data://garden/un/2025-03-12/migrant_stock
+        - data://garden/un/2025-03-12/migrant_stock
     - data://grapher/un/2024-07-12/un_wpp
     - data://grapher/worldbank_wdi/2026-07-27/wdi
     # IDMC Internal Displacement Data (2025 update)
     - data://grapher/idmc/2026-01-19/internal_displacement:
-      - data://garden/idmc/2026-01-19/internal_displacement:
-        - data://meadow/idmc/2026-01-19/internal_displacement:
-          - snapshot://idmc/2026-01-19/internal_displacement.csv
-        - data://garden/demography/2024-07-15/population
+        - data://garden/idmc/2026-01-19/internal_displacement:
+            - data://meadow/idmc/2026-01-19/internal_displacement:
+                - snapshot://idmc/2026-01-19/internal_displacement.csv
+            - data://garden/demography/2024-07-15/population
 
+
+  #
+  # Average annual change in the US foreign-born population, by decade — chart authored in ETL.
+  #
+  export://multidim/migration/latest/us_foreign_born_annual_change_by_decade:
+    - data://grapher/migration/2026-07-22/us_foreign_born_population
 
   # UN DESA migration flows S3 JSON export (2024)
   export://s3/un_migration/latest/migration_stock_flows_json:
     - data://garden/demography/2024-07-15/population
     - data://garden/un/2025-03-18/migration_stock_flows
+  data://meadow/migration/2026-07-22/us_lawful_permanent_residents:
+    - snapshot://migration/2026-07-22/yearbook_lawful_permanent_residents_2024.xlsx
+    - snapshot://migration/2026-07-22/yearbook_lawful_permanent_residents_2020.zip
+  data://garden/migration/2026-07-22/us_lawful_permanent_residents:
+    - data://meadow/migration/2026-07-22/us_lawful_permanent_residents
+    - data://garden/demography/2024-07-15/population
+  data://grapher/migration/2026-07-22/us_lawful_permanent_residents:
+    - data://garden/migration/2026-07-22/us_lawful_permanent_residents
+  data://meadow/migration/2026-07-22/us_foreign_born_population:
+    - snapshot://migration/2026-07-22/us_foreign_born_population_census.xls
+    - snapshot://migration/2026-07-22/us_foreign_born_population_census_by_country.xls
+    - snapshot://migration/2026-07-22/us_foreign_born_population_american_community_survey.csv
+    - snapshot://migration/2026-07-22/us_foreign_born_population_by_country_american_community_survey.csv
+  data://garden/migration/2026-07-22/us_foreign_born_population:
+    - data://meadow/migration/2026-07-22/us_foreign_born_population
+  data://grapher/migration/2026-07-22/us_foreign_born_population:
+    - data://garden/migration/2026-07-22/us_foreign_born_population

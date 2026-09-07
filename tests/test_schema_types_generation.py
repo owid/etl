@@ -28,3 +28,24 @@ def test_schema_types_is_up_to_date():
         "(hand-written types belong in etl/collection/model/params.py, not in the generated file).\n\n"
         f"{result.stdout}\n{result.stderr}"
     )
+
+
+def test_special_property_names_are_escaped_in_generated_annotations(tmp_path):
+    """Special JSON-schema property names must not become executable Python."""
+    from typing import TypedDict
+
+    from scripts.generate_schema_types import TypedDictGenerator
+
+    marker = tmp_path / "schema_codegen_pwned"
+    malicious_name = f'poc": __import__("pathlib").Path({str(marker)!r}).write_text("pwned") #\''
+
+    generated = TypedDictGenerator().generate_typeddict(
+        class_name="ExploitConfig",
+        properties={malicious_name: {"type": "string"}},
+    )
+
+    namespace = {"TypedDict": TypedDict}
+    exec(generated, namespace)
+
+    assert not marker.exists()
+    assert namespace["ExploitConfig"].__annotations__[malicious_name] is str

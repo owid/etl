@@ -388,7 +388,7 @@ tables:
         unit: people
         description_short: Projected total number of people living in the country's capital city. {definitions.desc_cities_definition}
         description_key:
-          - Projected total population living in the country's capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected total population living in the country's capital city, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
@@ -429,7 +429,7 @@ tables:
         short_unit: per km²
         description_short: Projected number of people per km² of land area in the country's capital city. {definitions.desc_cities_definition}
         description_key:
-          - Projected population density of the country's capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected population density of the country's capital city, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - Where a country has multiple capital cities, the density shown is for the administrative capital.
@@ -466,7 +466,7 @@ tables:
         unit: people
         description_short: Projected total number of people living in cities ranked among the top 100 most populous in 2020. {definitions.desc_cities_definition}
         description_key:
-          - Projected total population living in each of the world's 100 most populous cities (as ranked in 2020), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected total population living in each of the world's 100 most populous cities (as ranked in 2020), based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The ranking of the top 100 cities is fixed based on their population in 2020. Projected values show the population of those same cities in future years.
@@ -502,7 +502,7 @@ tables:
         short_unit: per km²
         description_short: Projected number of people per km² of land area for cities ranked among the top 100 most populous in 2020. {definitions.desc_cities_definition}
         description_key:
-          - Projected population density of each of the world's 100 most populous cities (as ranked in 2020), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected population density of each of the world's 100 most populous cities (as ranked in 2020), based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The ranking of the top 100 cities is fixed based on their population in 2020. Projected values show the density of those same cities in future years.
@@ -543,7 +543,7 @@ tables:
         short_unit: "%"
         description_short: Projected percentage of the urban population living in the country's capital city. {definitions.desc_cities_definition}
         description_key:
-          - Projected share of a country's urban population living in its capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected share of a country's urban population living in its capital city, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The urban population total used as the denominator covers all cities (urban centers with at least 50,000 people) within the country.
@@ -581,7 +581,7 @@ tables:
         short_unit: "%"
         description_short: Projected percentage of the total population living in the country's capital city. {definitions.desc_cities_definition}
         description_key:
-          - Projected share of a country's total population living in its capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected share of a country's total population living in its capital city, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The total population includes both urban and rural populations.
@@ -621,7 +621,7 @@ tables:
         short_unit: "%"
         description_short: Projected percentage of the urban population living in the country's largest city (by population). {definitions.desc_cities_definition}
         description_key:
-          - Projected share of a country's urban population living in its largest city (determined by 2020 population), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected share of a country's urban population living in its largest city (determined by 2020 population), based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The largest city is determined by 2020 population and may differ from the capital city. The urban population total used as the denominator covers all cities (urban centers with at least 50,000 people) within the country.
@@ -658,7 +658,7 @@ tables:
         short_unit: "%"
         description_short: Projected percentage of the total population living in the country's largest city (by population). {definitions.desc_cities_definition}
         description_key:
-          - Projected share of a country's total population living in its largest city (determined by 2020 population), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected share of a country's total population living in its largest city (determined by 2020 population), based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The largest city is determined by 2020 population and may differ from the capital city. The total population includes both urban and rural populations.
@@ -695,7 +695,7 @@ tables:
         unit: people
         description_short: Projected total population living in cities with 50,000 to 300,000 people. {definitions.desc_cities_definition}
         description_key:
-          - Projected total population living in cities with 50,000 to 300,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected total population living in cities with 50,000 to 300,000 people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - City size categories are based on each city's 2020 population and held fixed across all years.
@@ -726,7 +726,7 @@ tables:
         unit: people
         description_short: Projected total population living in cities with 50,000 to 1 million people. {definitions.desc_cities_definition}
         description_key:
-          - Projected total population living in cities with 50,000 to 1 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected total population living in cities with 50,000 to 1 million people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - City size categories are based on each city's 2020 population and held fixed across all years.
@@ -756,7 +756,7 @@ tables:
         unit: people
         description_short: Projected total population living in cities with 1 to 5 million people. {definitions.desc_cities_definition}
         description_key:
-          - Projected total population living in cities with 1 to 5 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected total population living in cities with 1 to 5 million people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
@@ -785,7 +785,7 @@ tables:
         unit: people
         description_short: Projected total population living in cities with 5 to 10 million people. {definitions.desc_cities_definition}
         description_key:
-          - Projected total population living in cities with 5 to 10 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected total population living in cities with 5 to 10 million people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
@@ -814,7 +814,7 @@ tables:
         unit: people
         description_short: Projected total population living in cities with more than 10 million people. {definitions.desc_cities_definition}
         description_key:
-          - Projected total population living in cities with more than 10 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected total population living in cities with more than 10 million people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
@@ -843,7 +843,7 @@ tables:
         unit: people
         description_short: Projected total population living in cities with 1 million or more people. {definitions.desc_cities_definition}
         description_key:
-          - Projected total population living in cities with 1 million or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected total population living in cities with 1 million or more people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
@@ -876,7 +876,7 @@ tables:
         short_unit: "%"
         description_short: Projected percentage of the urban population living in cities with 50,000 to 300,000 people. {definitions.desc_cities_definition}
         description_key:
-          - Projected share of the urban population living in cities with 50,000 to 300,000 people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected share of the urban population living in cities with 50,000 to 300,000 people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - City size categories are based on each city's 2020 population and held fixed across all years.
@@ -908,7 +908,7 @@ tables:
         short_unit: "%"
         description_short: Projected percentage of the urban population living in cities with 50,000 to 1 million people. {definitions.desc_cities_definition}
         description_key:
-          - Projected share of the urban population living in cities with 50,000 to 1 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected share of the urban population living in cities with 50,000 to 1 million people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - City size categories are based on each city's 2020 population and held fixed across all years.
@@ -940,7 +940,7 @@ tables:
         short_unit: "%"
         description_short: Projected percentage of the urban population living in cities with 1 to 5 million people. {definitions.desc_cities_definition}
         description_key:
-          - Projected share of the urban population living in cities with 1 to 5 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected share of the urban population living in cities with 1 to 5 million people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
@@ -971,7 +971,7 @@ tables:
         short_unit: "%"
         description_short: Projected percentage of the urban population living in cities with 5 to 10 million people. {definitions.desc_cities_definition}
         description_key:
-          - Projected share of the urban population living in cities with 5 to 10 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected share of the urban population living in cities with 5 to 10 million people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
@@ -1002,7 +1002,7 @@ tables:
         short_unit: "%"
         description_short: Projected percentage of the urban population living in cities with more than 10 million people. {definitions.desc_cities_definition}
         description_key:
-          - Projected share of the urban population living in cities with more than 10 million people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected share of the urban population living in cities with more than 10 million people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
@@ -1033,7 +1033,7 @@ tables:
         short_unit: "%"
         description_short: Projected percentage of the urban population living in cities with 1 million or more people. {definitions.desc_cities_definition}
         description_key:
-          - Projected share of the urban population living in cities with 1 million or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected share of the urban population living in cities with 1 million or more people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         display:
@@ -1066,7 +1066,7 @@ tables:
         short_unit: "%"
         description_short: Projected percentage of the total population living in cities with 1 million or more people. {definitions.desc_cities_definition}
         description_key:
-          - Projected share of the total population living in cities with 1 million or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected share of the total population living in cities with 1 million or more people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
           - The total population includes both urban and rural populations.
@@ -1101,7 +1101,7 @@ tables:
         unit: people
         description_short: Projected total population living in cities with 300,000 or more people. {definitions.desc_cities_definition}
         description_key:
-          - Projected total population living in cities with 300,000 or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected total population living in cities with 300,000 or more people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - City size categories are based on each city's 2020 population and held fixed across all years.
@@ -1134,7 +1134,7 @@ tables:
         short_unit: "%"
         description_short: Projected percentage of the total population living in cities with 300,000 or more people. {definitions.desc_cities_definition}
         description_key:
-          - Projected share of the total population living in cities with 300,000 or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected share of the total population living in cities with 300,000 or more people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - City size categories are based on each city's 2020 population and held fixed across all years.
@@ -1167,7 +1167,7 @@ tables:
         short_unit: "%"
         description_short: Expected average annual growth in the share of population living in cities with at least 300,000 people, calculated over five-year periods. {definitions.desc_cities_definition}
         description_key:
-          - Projected annual growth rate of the share of the population living in cities with 300,000 or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
+          - Projected annual growth rate of the share of the population living in cities with 300,000 or more people, based on the GHSL modeling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - City size categories are based on each city's 2020 population and held fixed across all years.
         description_processing: *desc_processing_cagr
@@ -1184,7 +1184,7 @@ tables:
         description_short: Total population living in [towns and suburbs](#dod:towns-degurba) with fewer than 50,000 people.
         description_key:
           - *text_degurba_overview
-          - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
+          - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometer and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
           - *text_data_source
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
           - *text_degurba_caveat
@@ -1201,7 +1201,7 @@ tables:
         description_short: Projected total population living in [towns and suburbs](#dod:towns-degurba) with fewer than 50,000 people.
         description_key:
           - *text_degurba_overview
-          - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
+          - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometer and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
           - *text_data_source
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - *text_degurba_caveat
@@ -1220,7 +1220,7 @@ tables:
         description_short: Percentage of the urban population living in [towns and suburbs](#dod:towns-degurba) with fewer than 50,000 people.
         description_key:
           - *text_degurba_overview
-          - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
+          - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometer and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
           - *text_data_source
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer](https://human-settlement.emergency.copernicus.eu/).
           - *text_degurba_caveat
@@ -1238,7 +1238,7 @@ tables:
         description_short: Projected percentage of the urban population living in [towns and suburbs](#dod:towns-degurba) with fewer than 50,000 people.
         description_key:
           - *text_degurba_overview
-          - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
+          - Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometer and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.
           - *text_data_source
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - *text_degurba_caveat

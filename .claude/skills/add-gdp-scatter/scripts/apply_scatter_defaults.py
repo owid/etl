@@ -484,13 +484,13 @@ def source_lossiness(chart_ids: Iterable[int]) -> dict[int, dict]:
     if not ids:
         return {}
     df = OWID_ENV.read_sql(
-        "SELECT c.id, cc.full ->> '$.yAxis.scaleType' AS scale_type, cc.full AS full_config "
+        "SELECT c.id, cc.config ->> '$.yAxis.scaleType' AS scale_type, cc.config AS config "
         "FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE c.id IN %(i)s",
         params={"i": ids},
     )
     out: dict[int, dict] = {}
     for row in df.to_dict("records"):
-        cfg = row["full_config"] if isinstance(row["full_config"], dict) else json.loads(row["full_config"])
+        cfg = row["config"] if isinstance(row["config"], dict) else json.loads(row["config"])
         y_dim = find_dim(cfg, "y") or {}
         # A reversed source (GDP on its y) is kept out of the log set: its `scaleType` describes
         # the GDP axis, while the target's y is the non-GDP indicator, so proposing log there

@@ -3,8 +3,14 @@ grapher_schema: "011"
 title:
   title: Migration
   title_variant: to and from each country
+topic_tags:
+  - Migration
+
+
 default_selection:
   - World
+
+
 dimensions:
   - name: Country
     slug: country_select
