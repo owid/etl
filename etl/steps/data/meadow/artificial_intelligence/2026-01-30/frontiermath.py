@@ -30,7 +30,14 @@ def run() -> None:
         # superseded file is how this chart silently stopped gaining models for three months, so refuse to.
         tb_benchmarks = archive.read("benchmark_metadata.csv", safe_types=False)
 
-    superseded = tb_benchmarks.loc[tb_benchmarks["source_file"] == BENCHMARK_FILE, "superseded_by"].dropna()
+    # Require the row to exist: an empty filter would leave "superseded" empty too, so a renamed or
+    # dropped file would satisfy the assert below and switch the guard off exactly when it is needed.
+    matches = tb_benchmarks.loc[tb_benchmarks["source_file"] == BENCHMARK_FILE]
+    assert len(matches) == 1, (
+        f"Expected one benchmark_metadata.csv row for {BENCHMARK_FILE}, found {len(matches)}. Epoch has "
+        "renamed, dropped or split the file; work out what replaced it before trusting this step's output."
+    )
+    superseded = matches["superseded_by"].dropna()
     assert superseded.empty, (
         f"Epoch marks {BENCHMARK_FILE} as superseded by {superseded.iloc[0]!r}. Point this step at the "
         "replacement file and rewrite the metadata: a reissued benchmark is a new series, not a refresh."
