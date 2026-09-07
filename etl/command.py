@@ -69,13 +69,13 @@ STEP_FAILURES: list[tuple[str, str]] = []
     "-g/-ng",
     default=False,
     type=bool,
-    help="Run steps that write to the grapher DB: grapher:// upserts, viz://chart and viz://explorer _(OWID staff only, DB access required)_",
+    help="Run steps that write to the grapher DB: grapher:// upserts and every viz:// step except viz://static _(OWID staff only, DB access required)_",
 )
 @click.option(
     "--export/--no-export",
     default=False,
     type=bool,
-    help="Run steps that write to shared destinations (R2, GitHub): export:// and viz://bespoke _(OWID staff only, access required)_",
+    help="Run export:// steps, which write to shared destinations (R2, GitHub) _(OWID staff only, access required)_",
 )
 @click.option(
     "--ipdb",
@@ -274,12 +274,12 @@ def main_cli(
                 if not steps:
                     click.echo("No steps modified relative to origin/master.")
                     return
-                # `--modified` surfaces modified viz/export steps (chart, explorer, bespoke recipes) by
+                # `--modified` surfaces modified viz/export steps (chart, explorer, bespoke, export recipes) by
                 # design, but they're only buildable when the flag for their destination is passed.
                 # When a branch edits only such a recipe (e.g. a single `<explorer>.<key>.config.yml`),
                 # without this we would exclude it downstream and crash with "No steps matched".
                 # enable the flag for each destination the modified steps write to (grapher DB, external
-                # service), so the chart/explorer/bespoke step actually rebuilds.
+                # service), so the viz/export step actually rebuilds.
                 from etl.steps import Destination, step_destination
 
                 destinations = {step_destination(s) for s in steps if "://" in s}
@@ -511,8 +511,8 @@ def construct_full_dag(dag: DAG) -> DAG:
     # Make sure we don't have both public and private steps in the same DAG
     _check_public_private_steps(dag)
 
-    # A step that writes to the grapher DB (viz://chart, viz://explorer) needs its grapher-channel
-    # inputs upserted first: add the corresponding grapher:// steps as dependencies.
+    # A step that writes to the grapher DB (viz://chart, viz://explorer, viz://bespoke) needs its
+    # grapher-channel inputs upserted first: add the corresponding grapher:// steps as dependencies.
     for step in list(dag.keys()):
         if step_destination(step) == Destination.GRAPHER_DB:
             for dep in list(dag[step]):

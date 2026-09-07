@@ -59,7 +59,7 @@ class Destination(str, Enum):
     LOCAL = "local"
     # The grapher MySQL DB of the targeted environment (local, staging, prod). Gated by --grapher.
     GRAPHER_DB = "grapher_db"
-    # Shared, environment-less destinations (R2, GitHub). Gated by --export.
+    # Shared, environment-less destinations (R2, GitHub), for export:// steps. Gated by --export.
     EXTERNAL = "external"
 
 
@@ -1275,17 +1275,20 @@ class VizStep(ExportStep):
     - `viz://bespoke/...`: a bespoke interactive visualization, whose data feed is uploaded to R2.
 
     Recipes live in `etl/steps/viz/<channel>/...`; local outputs go to `viz/<channel>/...`.
+    Every viz step runs under `--grapher`, so there is one flag for all visualizations. Bespoke
+    steps currently upload to R2, which is shared with production; they honor `DRY_RUN=1` to skip
+    the upload, and will write metadata to the DB like the other channels eventually.
     """
 
     step_type = "viz"
 
-    # Where each channel writes. A channel changing destination (e.g. static images uploaded to R2
-    # one day) is a one-line edit here; `etlr` gates the channel by the matching flag.
+    # Where each channel writes, i.e. which flag gates it. A channel changing destination is a
+    # one-line edit here.
     DESTINATION_BY_CHANNEL: dict[str, Destination] = {
         "chart": Destination.GRAPHER_DB,
         "explorer": Destination.GRAPHER_DB,
         "static": Destination.LOCAL,
-        "bespoke": Destination.EXTERNAL,
+        "bespoke": Destination.GRAPHER_DB,
     }
 
     @classmethod

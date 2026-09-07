@@ -13,7 +13,7 @@ Outputs:
   * https://owid-public.owid.io/data/migration/migration-stock-flows.<entityId>.json
 
 Run with DRY_RUN=1 to skip S3 upload and only write local files:
-  DRY_RUN=1 .venv/bin/etlr viz://bespoke/un_migration/latest/migration_stock_flows_json --export
+  DRY_RUN=1 .venv/bin/etlr viz://bespoke/un_migration/latest/migration_stock_flows_json --grapher
 """
 
 import json

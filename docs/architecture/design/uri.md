@@ -75,7 +75,7 @@ where channel is one of the following:
 - `chart`: For charts and multidimensional indicators (a chart is an MDIM with no dimensions). Writes to the grapher DB; run with `--grapher`.
 - `explorer`: For explorers. Writes to the grapher DB; run with `--grapher`.
 - `static`: For static images (PNG/SVG). Only writes local files; no flag needed.
-- `bespoke`: For the data feeds of bespoke interactive visualizations. Uploads to R2; run with `--export`.
+- `bespoke`: For the data feeds of bespoke interactive visualizations. Run with `--grapher` like the other viz steps (currently uploads to R2; `DRY_RUN=1` skips the upload).
 
 ### Path for `export://`
 Export steps ship files to an external destination. They are defined in the `etl/steps/export` directory and have a similar structure to regular steps. Their URI begins with the prefix `export://` and uses the following format:

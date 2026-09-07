@@ -132,14 +132,14 @@ Internal terms that recur across this guide, the skills, and the codebase:
 ```bash
 .venv/bin/etlr namespace/version/dataset --private      # Run step
 .venv/bin/etlr namespace/version/dataset --grapher      # Upload to grapher
-.venv/bin/etlr viz://chart/.../name --grapher            # Run a chart/MDIM (or viz://explorer) step: it writes to the grapher DB
+.venv/bin/etlr viz://chart/.../name --grapher            # Run a viz step (chart/MDIM, explorer, bespoke): all take --grapher
 .venv/bin/etlr viz://static/.../name                      # Run a static viz step: it only writes local files, no flag needed
-.venv/bin/etlr export://.../name --export                 # Run an export:// (or viz://bespoke) step: it writes to R2/GitHub
+.venv/bin/etlr export://.../name --export                 # Run an export:// step: it writes to R2/GitHub
 .venv/bin/etlr namespace/version/dataset --dry-run      # Preview
 .venv/bin/etlr namespace/version/dataset --force --only # Force re-run
 ```
 
-Key flags describe **destinations**, not step types: `--grapher/-g` runs the steps that write to the grapher DB (`grapher://` upserts, `viz://chart`, `viz://explorer`); `--export` runs the steps that write to shared external destinations (`export://*`, `viz://bespoke`); steps that only write local files (`data://`, `viz://static`) need no flag. A step whose flag is missing is skipped; if it was the only step you asked for, `etlr` says which flag to pass and then lists the "closest matches". Other flags: `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
+Key flags describe **destinations**, not step types: `--grapher/-g` runs the steps that write to the grapher DB (`grapher://` upserts and every `viz://` step except `viz://static`); `--export` runs the `export://` steps, which write to shared external destinations (R2, GitHub); steps that only write local files (`data://`, `viz://static`) need no flag. A step whose flag is missing is skipped; if it was the only step you asked for, `etlr` says which flag to pass and then lists the "closest matches". Other flags: `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
 
 **"The step completed" is not "the data is right".** After running a step for
 someone, report what came out of it: row count, year range, entities, and a few

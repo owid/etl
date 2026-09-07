@@ -426,7 +426,7 @@ def test_parse_step_viz_and_destinations():
     assert step_destination("viz://chart/a/latest/b") == Destination.GRAPHER_DB
     assert step_destination("viz://explorer/a/latest/b") == Destination.GRAPHER_DB
     assert step_destination("viz://static/a/2026-01-01/b") == Destination.LOCAL
-    assert step_destination("viz://bespoke/a/latest/b") == Destination.EXTERNAL
+    assert step_destination("viz://bespoke/a/latest/b") == Destination.GRAPHER_DB
     assert step_destination("export://s3/a/latest/b") == Destination.EXTERNAL
     assert step_destination("grapher://grapher/a/2026-01-01/b") == Destination.GRAPHER_DB
     assert step_destination("data://garden/a/2026-01-01/b") == Destination.LOCAL
