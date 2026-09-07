@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from owid.catalog import Table
 
-STEP_PATH = Path(__file__).parents[1] / "etl/steps/data/garden/artificial_intelligence/2026-01-30/frontiermath.py"
+STEP_PATH = Path(__file__).parents[1] / "etl/steps/data/garden/artificial_intelligence/2026-09-07/frontiermath.py"
 
 
 def load_step_module():
