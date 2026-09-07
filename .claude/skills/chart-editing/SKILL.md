@@ -1,6 +1,6 @@
 ---
 name: chart-editing
-description: Create or edit an ETL-authored Grapher chart — a single-chart `.config.yml` in `etl/steps/export/multidim/`. Use when the user wants to author a chart from ETL, edit one, change its title/subtitle/colors/map settings, or preview an ETL-authored chart on staging. For charts with dropdowns (multi-dimensional), use the `create-multidim` skill instead.
+description: Create or edit an ETL-authored Grapher chart — a single-chart `.config.yml` in `etl/steps/viz/chart/`. Use when the user wants to author a chart from ETL, edit one, change its title/subtitle/colors/map settings, or preview an ETL-authored chart on staging. For charts with dropdowns (multi-dimensional), use the `create-multidim` skill instead.
 metadata:
   internal: true
 ---
@@ -14,12 +14,12 @@ This skill covers creating and editing those `.config.yml` files, pushing them t
 ## File layout
 
 ```
-etl/steps/export/multidim/<namespace>/latest/<short_name>.config.yml
+etl/steps/viz/chart/<namespace>/latest/<short_name>.config.yml
 ```
 
 Reference example in this repo:
 
-- `etl/steps/export/multidim/animal_welfare/latest/banning_of_chick_culling.config.yml`
+- `etl/steps/viz/chart/animal_welfare/latest/banning_of_chick_culling.config.yml`
 
 The chart's public slug is auto-derived from the short name with underscores replaced by dashes (`banning_of_chick_culling` → `banning-of-chick-culling`).
 
@@ -86,7 +86,7 @@ Add to `dag/<namespace>.yml`:
   #
   # <Chart description> — chart authored in ETL.
   #
-  export://multidim/<namespace>/latest/<short_name>:
+  viz://chart/<namespace>/latest/<short_name>:
     - data://grapher/<namespace>/<version>/<dataset_short_name>
 ```
 
@@ -132,7 +132,7 @@ For the authoritative list, see the schema at `DEFAULT_GRAPHER_SCHEMA` (`etl/con
 ## Pushing to staging
 
 ```bash
-.venv/bin/etlr export://multidim/<namespace>/latest/<short_name> --export
+.venv/bin/etlr viz://chart/<namespace>/latest/<short_name> --grapher
 ```
 
 Editing the YAML is enough to trigger a re-run — ETL's change detection picks it up, so no extra flags are needed. Reserve `--force --only` for re-pushing when *nothing* changed (and note `--only` skips dependency resolution, so it fails unless the upstream datasets are already built locally). The step prints `admin_url=http://staging-site-<branch>/admin/charts/<id>/edit` on success.
@@ -159,7 +159,7 @@ Read the resulting PNG with the `Read` tool to view the chart.
 
 1. Read the current `.config.yml` and the upstream dataset's `.meta.yml` (so you know what indicators exist and their default titles/units).
 2. Edit the YAML using the `Edit` tool. Preserve comments with `ruamel` if needed (see `etl.files.ruamel_load/dump`).
-3. Push: `.venv/bin/etlr export://multidim/<namespace>/latest/<short_name> --export`.
+3. Push: `.venv/bin/etlr viz://chart/<namespace>/latest/<short_name> --grapher`.
 4. Preview the PNG (see above) and iterate.
 5. Once the chart looks right, commit the `.config.yml` (and the DAG entry if newly added) on the working branch.
 

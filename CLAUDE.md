@@ -92,7 +92,7 @@ The disclosure rule does **not** apply to OWID-reader-facing artifacts (e.g. the
 
 ## Pipeline Overview
 
-**snapshot** → **meadow** → **garden** → **grapher** → **export**
+**snapshot** → **meadow** → **garden** → **grapher** → **viz** / **export**
 
 | Stage | Location | Purpose |
 |-------|----------|---------|
@@ -100,7 +100,8 @@ The disclosure rule does **not** apply to OWID-reader-facing artifacts (e.g. the
 | meadow | `etl/steps/data/meadow/` | Basic cleaning |
 | garden | `etl/steps/data/garden/` | Business logic, harmonization |
 | grapher | `etl/steps/data/grapher/` | MySQL ingestion |
-| export | `etl/steps/export/` | Explorers, collections, APIs |
+| viz | `etl/steps/viz/` | Visualizations: charts and MDIMs (`viz://chart`), explorers (`viz://explorer`), static images (`viz://static`), bespoke interactive visualizations (`viz://bespoke`) |
+| export | `etl/steps/export/` | Files shipped to external destinations (R2, GitHub) |
 
 **Snapshot is raw passthrough only.** It downloads the source files and writes them out using the source's own row labels, column labels, and period labels. That's it. The following all belong in **garden**, not in the snapshot script:
 
@@ -131,12 +132,14 @@ Internal terms that recur across this guide, the skills, and the codebase:
 ```bash
 .venv/bin/etlr namespace/version/dataset --private      # Run step
 .venv/bin/etlr namespace/version/dataset --grapher      # Upload to grapher
-.venv/bin/etlr export://.../dataset --export             # Run an export:// step (mdim, explorer, static_viz, ...)
+.venv/bin/etlr viz://chart/.../name --grapher            # Run a chart/MDIM (or viz://explorer) step: it writes to the grapher DB
+.venv/bin/etlr viz://static/.../name                      # Run a static viz step: it only writes local files, no flag needed
+.venv/bin/etlr export://.../name --export                 # Run an export:// (or viz://bespoke) step: it writes to R2/GitHub
 .venv/bin/etlr namespace/version/dataset --dry-run      # Preview
 .venv/bin/etlr namespace/version/dataset --force --only # Force re-run
 ```
 
-Key flags: `--grapher/-g` (upload), `--export` (required for any `export://...` step — mdims, explorers, static viz; omitting it makes `etlr` report "No steps matched" and then list your exact step among the "closest matches", even though it is in the DAG), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
+Key flags describe **destinations**, not step types: `--grapher/-g` runs the steps that write to the grapher DB (`grapher://` upserts, `viz://chart`, `viz://explorer`); `--export` runs the steps that write to shared external destinations (`export://*`, `viz://bespoke`); steps that only write local files (`data://`, `viz://static`) need no flag. A step whose flag is missing is skipped; if it was the only step you asked for, `etlr` says which flag to pass and then lists the "closest matches". Other flags: `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
 
 **"The step completed" is not "the data is right".** After running a step for
 someone, report what came out of it: row count, year range, entities, and a few
@@ -231,7 +234,7 @@ Only universally understood abbreviations are fine (`gdp`, `co2`, `un_wpp`-style
 - **`Table.format(keys, short_name=paths.short_name)`** sets the index, sorts, verifies integrity, and sets `short_name` in one call — use it in data steps. It takes an explicit key list; if `keys` is None (default) it uses `country` + `year`, but it is not limited to those. For a year-only table use `tb.format(["year"], short_name=paths.short_name)`. Don't hand-roll `set_index` + `tb.metadata.short_name`.
 - **`*.meta.yml`**: the `dataset:` block carries only `update_period_days` and `owners` — everything else is inherited from origin. Always make sure `owners` is set (new dataset: the user; update: append the user if missing) — first entry is the accountable owner; canonical names per the `schemas/dataset-schema.json` enum, resolved via `etl.owners.resolve_owner`.
 - **`grapher_config`: omit `$schema:`** — pinning a specific schema version ages badly. The default in `etl/config.py:DEFAULT_GRAPHER_SCHEMA` is applied automatically by `_validate_grapher_config`.
-- **`description_key` is a list *or* a markdown string — check, never assume.** A YAML list survives garden so per-item Jinja can render, and is joined into markdown by `update_variable_metadata`, which runs when a step renders dimensions (`_yield_wide_table` / `_metadata_for_dimensions`) and again at the DB write (`etl/grapher/to_db.py`). A `data://grapher/...` dataset on disk therefore holds a string for some datasets and a list for others — MySQL is string-only, the grapher channel is not. Steps reading one — mdim and explorer `export://` steps especially — must handle both and pass the value through rather than rebuild it. Never `list()` it: that yields one bullet *per character*, which every write path used to rejoin into valid-looking markdown, and it shipped ~2,900 one-character WYSK bullets to readers (#6647). The string form is now an `owid.catalog.core.meta.Markdown` — a `str` that raises `TypeError` on iteration, so the mistake fails on the line that writes it.
+- **`description_key` is a list *or* a markdown string — check, never assume.** A YAML list survives garden so per-item Jinja can render, and is joined into markdown by `update_variable_metadata`, which runs when a step renders dimensions (`_yield_wide_table` / `_metadata_for_dimensions`) and again at the DB write (`etl/grapher/to_db.py`). A `data://grapher/...` dataset on disk therefore holds a string for some datasets and a list for others — MySQL is string-only, the grapher channel is not. Steps reading one — chart and explorer `viz://` steps especially — must handle both and pass the value through rather than rebuild it. Never `list()` it: that yields one bullet *per character*, which every write path used to rejoin into valid-looking markdown, and it shipped ~2,900 one-character WYSK bullets to readers (#6647). The string form is now an `owid.catalog.core.meta.Markdown` — a `str` that raises `TypeError` on iteration, so the mistake fails on the line that writes it.
 
 ### Performance
 

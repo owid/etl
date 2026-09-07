@@ -69,13 +69,13 @@ STEP_FAILURES: list[tuple[str, str]] = []
     "-g/-ng",
     default=False,
     type=bool,
-    help="Upsert datasets from grapher channel to DB _(OWID staff only, DB access required)_",
+    help="Run steps that write to the grapher DB: grapher:// upserts, viz://chart and viz://explorer _(OWID staff only, DB access required)_",
 )
 @click.option(
     "--export/--no-export",
     default=False,
     type=bool,
-    help="Run export steps like saving explorer _(OWID staff only, access required)_",
+    help="Run steps that write to shared destinations (R2, GitHub): export:// and viz://bespoke _(OWID staff only, access required)_",
 )
 @click.option(
     "--ipdb",
@@ -274,15 +274,23 @@ def main_cli(
                 if not steps:
                     click.echo("No steps modified relative to origin/master.")
                     return
-                # `--modified` surfaces modified export steps (multidim/explorer recipes) by design,
-                # but they're only buildable in export mode. When a branch edits only such a recipe
-                # (e.g. a single `<explorer>.<key>.config.yml`), the modified set is export-only;
+                # `--modified` surfaces modified viz/export steps (chart, explorer, bespoke recipes) by
+                # design, but they're only buildable when the flag for their destination is passed.
+                # When a branch edits only such a recipe (e.g. a single `<explorer>.<key>.config.yml`),
                 # without this we would exclude it downstream and crash with "No steps matched".
-                # Enable export (which also un-excludes the grapher deps the export step needs) so
-                # the explorer actually rebuilds.
-                if not export and any(s.startswith("export://") for s in steps):
+                # enable the flag for each destination the modified steps write to (grapher DB, external
+                # service), so the chart/explorer/bespoke step actually rebuilds.
+                from etl.steps import Destination, step_destination
+
+                destinations = {step_destination(s) for s in steps if "://" in s}
+                if not grapher and Destination.GRAPHER_DB in destinations:
+                    grapher = True
+                    click.echo("Detected modified step(s) writing to the grapher DB; enabling --grapher for this run.")
+                if not export and Destination.EXTERNAL in destinations:
                     export = True
-                    click.echo("Detected modified export step(s); enabling --export for this run.")
+                    click.echo(
+                        "Detected modified step(s) writing to external destinations; enabling --export for this run."
+                    )
                 click.echo(f"Restricting to {len(steps)} step(s) modified vs origin/master.")
                 # We matched modified catalog paths as substrings, so disable exact matching downstream.
                 exact_match = False
@@ -390,9 +398,9 @@ def _modified_steps(
     so the selection matches what chart-diff considers affected. If `includes` is non-empty, the
     result is narrowed to changed paths that also match one of those patterns.
 
-    Export steps (e.g. `export://multidim/...`) are included too, so `--modified` can pick the
+    Viz and export steps (e.g. `viz://chart/...`) are included too, so `--modified` can pick the
     multidims/explorers a branch affects via their upstream data steps. Data steps are returned
-    URI-less (e.g. "garden/foo/bar"); export steps keep their full URI so `export://...` patterns
+    URI-less (e.g. "garden/foo/bar"); viz/export steps keep their full URI so `viz://...` patterns
     match them.
 
     :param files_changed: Pass in an already-fetched `get_changed_files()` result to avoid
@@ -498,16 +506,21 @@ def sanity_check_db_settings(grapher_user_id) -> None:
 
 def construct_full_dag(dag: DAG) -> DAG:
     """Construct full DAG."""
+    from etl.steps import Destination, step_destination
 
     # Make sure we don't have both public and private steps in the same DAG
     _check_public_private_steps(dag)
 
-    # For export:// steps, add the grapher:// steps that are needed to upsert data to DB.
+    # A step that writes to the grapher DB (viz://chart, viz://explorer) needs its grapher-channel
+    # inputs upserted first: add the corresponding grapher:// steps as dependencies.
     for step in list(dag.keys()):
-        if step.startswith("export://multidim/") or step.startswith("export://explorers/"):
+        if step_destination(step) == Destination.GRAPHER_DB:
             for dep in list(dag[step]):
                 if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep):
-                    dag[step].add(re.sub(r"^(data|data-private)://", "grapher://", dep))
+                    grapher_dep = re.sub(r"^(data|data-private)://", "grapher://", dep)
+                    # A grapher:// step's own upsert is not a dependency of itself.
+                    if grapher_dep != step:
+                        dag[step].add(grapher_dep)
 
     # Add all grapher steps
     dag.update(_grapher_steps(dag, private=True))
@@ -538,28 +551,53 @@ def construct_subdag(
     if not excludes:
         excludes = []
 
-    # Export steps
-    if not export:
-        excludes.append("export://.*")
-
-    # Grapher steps
-    if not grapher and not export:
-        excludes.append("grapher://.*")
-
     # Exclude private steps
     if not private:
         excludes.append("private://.*")
 
+    # Flags name destinations, not step types: skip every step whose destination's flag was not passed.
+    # Each step class states where it writes (see `etl.steps.Destination`), so a new step type or a
+    # channel changing destination needs no change here.
+    gated_steps = _steps_gated_by_flags(dag, grapher=grapher, export=export)
+
     # Get subdag based on includes and excludes
-    subdag = filter_to_subgraph(dag, includes=includes, excludes=excludes, only=only, exact_match=exact_match)
+    subdag = filter_to_subgraph(
+        dag, includes=includes, excludes=excludes, exclude_steps=gated_steps, only=only, exact_match=exact_match
+    )
 
     if not subdag:
-        # If no steps are found, the most likely case is that the step passed as argument was misspelled.
-        # Print a short error message, show a list of the closest matches, and exit.
+        # No steps found. Either the requested step exists but was skipped because the flag for
+        # its destination is missing, or (most likely) the argument was misspelled. Say which.
+        _explain_gated_matches(includes, exact_match, gated_steps)
         _find_closest_matches(" ".join(orig_includes or []), dag)
         sys.exit(1)
 
     return subdag
+
+
+def _steps_gated_by_flags(dag: DAG, grapher: bool, export: bool) -> set[str]:
+    """Steps in `dag` that must be skipped because the flag for their destination was not passed."""
+    from etl.steps import Destination, graph_nodes, step_destination
+
+    flag_passed = {Destination.LOCAL: True, Destination.GRAPHER_DB: grapher, Destination.EXTERNAL: export}
+    return {step for step in graph_nodes(dag) if not flag_passed[step_destination(step)]}
+
+
+def _explain_gated_matches(includes: list[str], exact_match: bool, gated_steps: set[str]) -> None:
+    """Tell the user which requested steps were skipped for lack of a flag, and which flag to pass."""
+    from etl.steps import Destination, step_destination
+
+    if exact_match:
+        matched = [step for step in includes if step in gated_steps]
+    else:
+        patterns = [re.compile(p) for p in includes]
+        matched = sorted(step for step in gated_steps if any(p.search(step) for p in patterns))
+    explanation = {
+        Destination.GRAPHER_DB: "writes to the grapher DB; pass --grapher to run it.",
+        Destination.EXTERNAL: "writes to an external destination (R2, GitHub); pass --export to run it.",
+    }
+    for step in matched[:10]:
+        print(f"`{step}` {explanation[step_destination(step)]}")
 
 
 def run_steps(

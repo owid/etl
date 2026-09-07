@@ -196,8 +196,8 @@ class StepUpdater:
         elif (folder / step_info["name"]).is_dir():
             # Gather all relevant files from this folder.
             step_files = [file_name for file_name in list(folder.glob(f"{step_info['name']}/*")) if file_name.is_file()]
-        elif step_info["step_type"] == "export":
-            # Some export steps (e.g. YAML-only single-chart or mdim collections)
+        elif step_info["step_type"] in ["export", "viz"]:
+            # Some viz steps (e.g. YAML-only single-chart or mdim collections)
             # don't have a Python script — just a `.config.yml`.
             step_files = [
                 file_name
@@ -283,7 +283,19 @@ class StepUpdater:
             log.info(f"Updating {step} to version {step_version_new}.")
         if step_channel == "snapshot":
             return self._update_snapshot_step(step=step, step_version_new=step_version_new, step_header=step_header)
-        elif step_channel in ["meadow", "garden", "grapher", "explorers", "external", "s3", "github", "multidim"]:
+        elif step_channel in [
+            "meadow",
+            "garden",
+            "grapher",
+            "explorers",
+            "external",
+            "s3",
+            "github",
+            "chart",
+            "explorer",
+            "static",
+            "bespoke",
+        ]:
             return self._update_data_step(step=step, step_version_new=step_version_new, step_header=step_header)
         else:
             log.error(f"Channel {step_channel} not yet supported.")

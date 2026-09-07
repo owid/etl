@@ -25,7 +25,7 @@ paths = PathFinder(__file__)
 
 def run() -> None:
     # Load upstream explorer
-    cs = paths.load_collectionset("conflict_data_source", channel="explorers")
+    cs = paths.load_collectionset("conflict_data_source", channel="explorer")
     c_old = cast(Explorer, cs.read("conflict-data-source"))
 
     # Create new explorer

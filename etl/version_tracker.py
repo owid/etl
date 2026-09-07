@@ -441,8 +441,8 @@ class VersionTracker:
         # Active steps should have a script in the active directory.
         # But steps that are in the archive dag can be either in the active or the archive directory.
         path_to_script = None
-        if step_type == "export":
-            path_to_script = paths.STEP_DIR / "export" / channel / namespace / version / name  # ty: ignore
+        if step_type in ["export", "viz"]:
+            path_to_script = paths.STEP_DIR / step_type / channel / namespace / version / name  # ty: ignore
         elif channel == "snapshot":
             path_to_script = paths.SNAPSHOTS_DIR / namespace / version / name  # ty: ignore
         elif channel in ["meadow", "garden", "grapher", "explorers", "open_numbers", "examples", "external"]:
@@ -462,8 +462,8 @@ class VersionTracker:
             path_to_script / "__init__.py",  # ty: ignore
             path_to_script.with_name(path_to_script.name + ".dvc"),  # ty: ignore
         ]
-        # YAML-only export steps (single-chart or mdim collections without a .py).
-        if step_type == "export" and channel == "multidim":
+        # YAML-only chart steps (single-chart or mdim collections without a .py).
+        if step_type == "viz" and channel == "chart":
             path_to_script_candidates.append(path_to_script.with_suffix(".config.yml"))  # ty: ignore
 
         for path_to_script_candidate in path_to_script_candidates:
@@ -543,9 +543,9 @@ class VersionTracker:
             )
             for dependencies in steps_active_df["all_active_dependencies"]
         ]
-        # Add a column with the number of dependencies from the explorers and external channels.
+        # Add a column with the number of dependencies from the explorer(s) and external channels.
         steps_active_df["external_usages"] = [
-            [usage for usage in usages if steps_dict[usage]["channel"] in ["explorers", "external"]]
+            [usage for usage in usages if steps_dict[usage]["channel"] in ["explorers", "explorer", "external"]]
             for usages in steps_active_df["all_active_usages"]
         ]
         # Add a column with the total number of external usages.
@@ -583,8 +583,8 @@ class VersionTracker:
             "update_state",
         ] = UpdateState.UNUSED.value
 
-        # All explorers and external steps should be considered up to date.
-        steps_active_df.loc[steps_active_df["channel"].isin(["explorers", "external"]), "update_state"] = (
+        # All explorer and external steps should be considered up to date.
+        steps_active_df.loc[steps_active_df["channel"].isin(["explorers", "explorer", "external"]), "update_state"] = (
             UpdateState.UP_TO_DATE.value
         )
 

@@ -6,7 +6,7 @@ the file decides which chart every push lands on — getting it wrong either aba
 creates a duplicate. This command writes it for you, in the two situations that come up:
 
     # Brand-new chart: mint a UUIDv7 (same shape as the ones grapher generates).
-    etl chart-config-id new etl/steps/export/multidim/animal_welfare/latest/my_chart.config.yml
+    etl chart-config-id new etl/steps/viz/chart/animal_welfare/latest/my_chart.config.yml
 
     # Existing chart moving into ETL: take the UUID from the chart already in grapher,
     # identified by slug or by the numeric id from the admin URL.

@@ -19,6 +19,7 @@ from collections.abc import Generator, Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 from dataclasses import dataclass, field
+from enum import Enum
 from functools import partial
 from glob import glob
 from importlib import import_module
@@ -48,6 +49,19 @@ from etl.snapshot import Snapshot
 log = structlog.get_logger()
 
 DAG = dict[str, set[str]]
+
+
+class Destination(str, Enum):
+    """Where a step writes. `etlr` flags name destinations, not step types: a step is skipped when
+    the flag for its destination was not passed (see `etl.command.construct_subdag`)."""
+
+    # Files under the repo only (data/, viz/, export/, snapshots/). Never gated by a flag.
+    LOCAL = "local"
+    # The grapher MySQL DB of the targeted environment (local, staging, prod). Gated by --grapher.
+    GRAPHER_DB = "grapher_db"
+    # Shared, environment-less destinations (R2, GitHub). Gated by --export.
+    EXTERNAL = "external"
+
 
 # Dictionary to store metadata changes for each dataset if INSTANT flag is set
 INSTANT_METADATA_DIFF = {}
@@ -114,12 +128,16 @@ def filter_to_subgraph(
     only: bool = False,
     exact_match: bool = False,
     excludes: list[str] | None = None,
+    exclude_steps: Iterable[str] | None = None,
 ) -> DAG:
     """
     Filter the full graph to only the included nodes, and all their dependencies.
 
     If the downstream flag is true, also include downstream dependencies (ie steps
     that depend on the included steps), as well as their OWN dependencies.
+
+    `excludes` are regex patterns; `exclude_steps` are exact step names. Steps downstream
+    of an excluded step are excluded too.
 
     Assumes that the graph is organized dependent -> dependency (A -> B means A is
     dependent on B).
@@ -128,7 +146,7 @@ def filter_to_subgraph(
     includes_list = list(includes)
 
     # Handle exclusions first - find all steps that should be excluded
-    excluded_steps = set()
+    excluded_steps = set(exclude_steps or ()) & all_steps
     if excludes:
         compiled_excludes = [re.compile(p) for p in excludes]
         for step in all_steps:
@@ -216,11 +234,15 @@ def graph_nodes(graph: DAG) -> set[str]:
     return all_steps
 
 
+def _split_step_name(step_name: str) -> tuple[str, str]:
+    """Split `type://path` into its step type (URI scheme) and path."""
+    parts = urlparse(step_name)
+    return parts.scheme, parts.netloc + parts.path
+
+
 def parse_step(step_name: str, dag: dict[str, Any]) -> "Step":
     "Convert each step's name into a step object that we can run."
-    parts = urlparse(step_name)
-    step_type = parts.scheme
-    path = parts.netloc + parts.path
+    step_type, path = _split_step_name(step_name)
     # dependencies are new objects
     dependencies = [parse_step(s, dag) for s in dag.get(step_name, [])]
 
@@ -243,6 +265,9 @@ def parse_step(step_name: str, dag: dict[str, Any]) -> "Step":
     elif step_type == "export":
         step = ExportStep(path, dependencies)
 
+    elif step_type == "viz":
+        step = VizStep(path, dependencies)
+
     elif step_type == "data-private":
         step = DataStepPrivate(path, dependencies)
 
@@ -253,6 +278,14 @@ def parse_step(step_name: str, dag: dict[str, Any]) -> "Step":
         raise Exception(f"no recipe for executing step: {step_name}")
 
     return step
+
+
+def step_destination(step_name: str) -> Destination:
+    """Where the step named `step_name` writes, decided by its step class alone (no dependencies parsed)."""
+    step_type, path = _split_step_name(step_name)
+    if step_type not in STEP_CLASSES:
+        raise Exception(f"no recipe for executing step: {step_name}")
+    return STEP_CLASSES[step_type].destination_for(path)
 
 
 def extract_step_attributes(step: str) -> dict[str, str]:
@@ -359,6 +392,13 @@ class Step(Protocol):
     is_public: bool = True
     version: str
     dependencies: list["Step"]
+    # Where the step writes; each class states its own. See `Destination`.
+    destination: Destination = Destination.LOCAL
+
+    @classmethod
+    def destination_for(cls, path: str) -> Destination:
+        """Where a step of this class with the given path writes, without instantiating it."""
+        return cls.destination
 
     def run(self) -> None: ...
 
@@ -961,6 +1001,7 @@ class GrapherStep(Step):
     path: str
     data_step: DataStep
     dependencies: list[Step]
+    destination = Destination.GRAPHER_DB
 
     def __init__(self, path: str, dependencies: list[Step]) -> None:
         # GrapherStep should have exactly one DataStep dependency
@@ -1165,26 +1206,29 @@ class GrapherStep(Step):
 
 class ExportStep(DataStep):
     """
-    A step which exports something once. For instance committing to a Github repository
-    or upserting an Explorer to DB.
+    A step which ships files to a shared, environment-less destination, e.g. committing to a
+    GitHub repository or uploading to R2. Its recipe lives in `etl/steps/export/<channel>/...`.
     """
 
     path: str
     dependencies: list[Step]
+    destination = Destination.EXTERNAL
+    # Step type: the URI scheme and the folder under `etl/steps/`.
+    step_type = "export"
 
     def __init__(self, path: str, dependencies: list[Step]) -> None:
         self.dependencies = dependencies
         self.path = path
 
     def __str__(self) -> str:
-        return f"export://{self.path}"
+        return f"{self.step_type}://{self.path}"
 
     def can_execute(self, archive_ok: bool = True) -> bool:
         sp = self._search_path
         if not archive_ok and "/archive/" in sp.as_posix():
             return False
 
-        return super().can_execute(archive_ok=archive_ok) or self._is_multidim_yaml_only()
+        return super().can_execute(archive_ok=archive_ok)
 
     def run(self) -> None:
         # make sure the enclosing folder is there
@@ -1192,32 +1236,91 @@ class ExportStep(DataStep):
 
         from etl.helpers import create_dataset
 
-        # Create folder for the dataset, export step can save files there
+        # Create folder for the dataset, the step can save files there
         ds = create_dataset(self._dest_dir, tables=[])
 
-        sp = self._search_path
-        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
-            if config.DEBUG:
-                DataStep._run_py_isolated(self)  # ty: ignore
-            else:
-                DataStep._run_py(self)  # ty: ignore
-        elif self._is_multidim_yaml_only():
-            # YAML-only multidim: no .py, just a .config.yml. Run the default
-            # boilerplate (load_collection_config → create_collection → save).
-            self._run_multidim_yaml_only(sp)
+        self._run_recipe()
 
         # save checksum (only update index.json, don't call ds.save() which iterates
-        # table_names and would pick up custom JSON files written by the export script)
+        # table_names and would pick up custom JSON files written by the step)
         ds.metadata.source_checksum = self.checksum_input()
         ds.metadata.save(ds._index_file)
 
-    def _is_multidim_yaml_only(self) -> bool:
-        """True if this is an `export://multidim/...` step backed only by a `.config.yml`."""
-        if not self.path.startswith("multidim/"):
+    def _run_recipe(self) -> None:
+        if config.DEBUG:
+            DataStep._run_py_isolated(self)  # ty: ignore
+        else:
+            DataStep._run_py(self)  # ty: ignore
+
+    def checksum_output(self) -> str:
+        # output checksum is checksum of all ingredients
+        return self.checksum_input()
+
+    @property
+    def _search_path(self) -> Path:
+        return paths.STEP_DIR / self.step_type / self.path
+
+    @property
+    def _dest_dir(self) -> Path:
+        return paths.EXPORT_DIR / self.path.lstrip("/")
+
+
+class VizStep(ExportStep):
+    """
+    A step which produces a visualization. Its channel says which kind:
+
+    - `viz://chart/...`: a chart or an MDIM (a chart is an MDIM with `dimensions: []`), upserted to the grapher DB.
+    - `viz://explorer/...`: an explorer, upserted to the grapher DB.
+    - `viz://static/...`: a static image (PNG/SVG), written next to the recipe.
+    - `viz://bespoke/...`: a bespoke interactive visualization, whose data feed is uploaded to R2.
+
+    Recipes live in `etl/steps/viz/<channel>/...`; local outputs go to `viz/<channel>/...`.
+    """
+
+    step_type = "viz"
+
+    # Where each channel writes. A channel changing destination (e.g. static images uploaded to R2
+    # one day) is a one-line edit here; `etlr` gates the channel by the matching flag.
+    DESTINATION_BY_CHANNEL: dict[str, Destination] = {
+        "chart": Destination.GRAPHER_DB,
+        "explorer": Destination.GRAPHER_DB,
+        "static": Destination.LOCAL,
+        "bespoke": Destination.EXTERNAL,
+    }
+
+    @classmethod
+    def destination_for(cls, path: str) -> Destination:
+        channel = path.split("/")[0]
+        try:
+            return cls.DESTINATION_BY_CHANNEL[channel]
+        except KeyError:
+            raise ValueError(
+                f"Unknown viz channel {channel!r} in step viz://{path}; add it to VizStep.DESTINATION_BY_CHANNEL."
+            )
+
+    @property
+    def destination(self) -> Destination:
+        return self.destination_for(self.path)
+
+    def can_execute(self, archive_ok: bool = True) -> bool:
+        return super().can_execute(archive_ok=archive_ok) or self._is_chart_yaml_only()
+
+    def _run_recipe(self) -> None:
+        sp = self._search_path
+        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
+            super()._run_recipe()
+        elif self._is_chart_yaml_only():
+            # YAML-only chart/MDIM: no .py, just a .config.yml. Run the default
+            # boilerplate (load_collection_config → create_collection → save).
+            self._run_chart_yaml_only(sp)
+
+    def _is_chart_yaml_only(self) -> bool:
+        """True if this is a `viz://chart/...` step backed only by a `.config.yml`."""
+        if self.channel != "chart":
             return False
         return self._search_path.with_suffix(".config.yml").exists()
 
-    def _run_multidim_yaml_only(self, search_path: Path) -> None:
+    def _run_chart_yaml_only(self, search_path: Path) -> None:
         from etl.helpers import PathFinder
 
         # Synthesise the `.py` path PathFinder expects; the file doesn't need to exist,
@@ -1226,17 +1329,9 @@ class ExportStep(DataStep):
         collection = paths_.create_collection(config=paths_.load_collection_config())
         collection.save()
 
-    def checksum_output(self) -> str:
-        # output checksum is checksum of all ingredients
-        return self.checksum_input()
-
-    @property
-    def _search_path(self) -> Path:
-        return paths.STEP_DIR / "export" / self.path
-
     @property
     def _dest_dir(self) -> Path:
-        return paths.EXPORT_DIR / self.path.lstrip("/")
+        return paths.VIZ_DIR / self.path.lstrip("/")
 
 
 @dataclass
@@ -1320,6 +1415,21 @@ class DataStepPrivate(PrivateMixin, DataStep):
 
     def __str__(self) -> str:
         return f"data-private://{self.path}"
+
+
+# Step class for each step type (the URI scheme), used to answer questions about a step from its
+# name alone (see `step_destination`). `parse_step` constructs the objects.
+STEP_CLASSES: dict[str, type[Step]] = {
+    "data": DataStep,
+    "data-private": DataStepPrivate,
+    "snapshot": SnapshotStep,
+    "snapshot-private": SnapshotStepPrivate,
+    "github": GithubStep,
+    "etag": ETagStep,
+    "grapher": GrapherStep,
+    "export": ExportStep,
+    "viz": VizStep,
+}
 
 
 def select_dirty_steps(steps: list[Step], workers: int = 1) -> list[Step]:

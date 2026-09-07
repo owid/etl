@@ -1,4 +1,4 @@
-"""Export step that generates JSON files for the IHME GBD treemap visualization.
+"""Bespoke viz step that generates JSON files for the IHME GBD treemap visualization.
 
 This step combines the GBD treemap datasets and generates:
 * A metadata JSON file with categories, dimensions, and time ranges
@@ -21,7 +21,7 @@ from tqdm.auto import tqdm
 
 from etl.config import DRY_RUN
 from etl.helpers import PathFinder
-from etl.paths import EXPORT_DIR
+from etl.paths import VIZ_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -188,7 +188,7 @@ def save_and_upload_json(data: dict, filename: str, s3_data_dir: Path) -> None:
         s3_data_dir: S3 directory path (within bucket)
     """
     # Create export directory using paths
-    export_dir = EXPORT_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
+    export_dir = VIZ_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
     export_dir.mkdir(parents=True, exist_ok=True)
 
     # Create full paths

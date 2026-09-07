@@ -42,7 +42,7 @@ from etl.collection.utils import (
 )
 from etl.config import DEFAULT_GRAPHER_SCHEMA, OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
-from etl.paths import EXPORT_DIR, SCHEMAS_DIR
+from etl.paths import SCHEMAS_DIR, VIZ_DIR
 
 # Logging
 log = get_logger()
@@ -230,11 +230,12 @@ class Collection(MDIMBase):
 
     @property
     def local_config_path(self) -> Path:
-        # energy/latest/energy_prices#energy_prices -> export/multidim/energy/latest/energy_prices/config.yml
+        # energy/latest/energy_prices#energy_prices -> viz/chart/energy/latest/energy_prices/energy_prices.config.json
         if self._collection_type is None:
             raise ValueError("_collection_type must have a value!")
-        collection_dir = "explorers" if self._collection_type == "explorer" else self._collection_type
-        return EXPORT_DIR / collection_dir / (self.catalog_path.replace("#", "/") + ".config.json")
+        # Collections are `viz://chart` steps, explorers `viz://explorer` steps.
+        collection_dir = "explorer" if self._collection_type == "explorer" else "chart"
+        return VIZ_DIR / collection_dir / (self.catalog_path.replace("#", "/") + ".config.json")
 
     @property
     def local_download_package_dir(self) -> Path:
@@ -925,7 +926,7 @@ class Collection(MDIMBase):
         MDIMs convert these lists into a markdown string on upsert, and explorers skip
         that conversion altogether (they override `upsert_to_db`), so neither path
         noticed a corrupted value. `grapher_checks` doesn't help either: it only runs
-        from `create_dataset`, never for `export://` steps.
+        from `create_dataset`, never for `viz://` steps.
         """
         for view in self.views:
             # `ViewMetadata` is a TypedDict, so view metadata is a plain dict at runtime.

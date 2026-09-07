@@ -53,7 +53,7 @@ batching is what wins it.
 Read [GUIDELINES.md](GUIDELINES.md) (sibling file) before editing any chart — it distills the DI Charts Guidelines per chart type and the Good Data Viz Checklist.
 
 > **Paired skill — an update here may oblige an update there, and the reverse.**
-> [`/create-static-viz`](../create-static-viz/SKILL.md) writes the `export://static_viz` matplotlib
+> [`/create-static-viz`](../create-static-viz/SKILL.md) writes the `viz://static` matplotlib
 > step whose SVG this skill picks up, so the two share a contract that lives half in each file. **When
 > you change something on this list, check the other skill in the same session and update it too —
 > or state explicitly that you checked and no change was needed.** Neither side is allowed to drift
@@ -193,7 +193,7 @@ And a bigger batch is a bigger loss: `use_figma` is atomic, so a script that thr
 ## Inputs
 
 - **A chart reference**, in any of the forms of the Step 1 table. If the user only describes the chart ("the life expectancy chart with just the US and China"), resolve candidates first and confirm.
-- **Or a local SVG already on disk** — `etl/steps/export/static_viz/…/<name>.svg` from an `export://static_viz` step, handed over by [`/create-static-viz`](../create-static-viz/SKILL.md). Its texts are baked in and its frame already matches a template, so Step 1's text sourcing and Step 3's export both fall away; follow the local-SVG notes in Steps 1, 3, 5 and 7.
+- **Or a local SVG already on disk** — `etl/steps/viz/static/…/<name>.svg` from an `viz://static` step, handed over by [`/create-static-viz`](../create-static-viz/SKILL.md). Its texts are baked in and its frame already matches a template, so Step 1's text sourcing and Step 3's export both fall away; follow the local-SVG notes in Steps 1, 3, 5 and 7.
 - **Or a bespoke visualization** — a client-rendered React viz from `owid-grapher`'s `bespoke/projects/*`, with **no** `.svg` endpoint at all. [BESPOKE-SVG.md](BESPOKE-SVG.md) covers getting a chart-only SVG out of one; after that it behaves like grapher's `uncaptioned` embed and every step here applies.
 - Optionally, **the DI/article text** the chart accompanies — the best source for annotation content. Ask for it if annotations are wanted and it exists.
 - Optionally, **a link to a finished page in the file to work like** (see below).
@@ -223,7 +223,7 @@ Get an SVG URL for the chart, then pull its texts. **[reference/RESOLVING-THE-CH
 | Narrative chart | name → uuid via `admin.owid.io/api/narrative-chart-map`, then `grapher/by-uuid/<uuid>.svg`. A numeric id needs a Datasette lookup, and an id newer than the mirror needs the guessing route |
 | Bespoke component | no endpoint — render and serialize it yourself ([BESPOKE-SVG.md](BESPOKE-SVG.md)) |
 | Description only | find candidates by search, and confirm one before proceeding |
-| Local SVG from an `export://static_viz` step | nothing to resolve and no texts to pull — the step baked them into the file |
+| Local SVG from an `viz://static` step | nothing to resolve and no texts to pull — the step baked them into the file |
 
 Then pull the chart's texts, which seed the template texts in Step 6. Read **`.metadata.json`**, not `.config.json`, and **keep the view's query params on the request**: it gives title, subtitle, note and `chart.citation`, with grapher's detail-on-demand markup already unwrapped. The `by-uuid` route is the exception — it has no `.metadata.json`, so a narrative chart's texts come off `.config.json` plus the rendered SVG's footer.
 
@@ -273,7 +273,7 @@ curl -sL "https://ourworldindata.org/grapher/<slug>.svg?<params>&imType=uncaptio
 
 > **[`scripts/solve_export.py`](scripts/solve_export.py) solves the embed's numbers — don't do the arithmetic by hand.** `--band 508x371 --slug <slug> --params '<the view's query string>'` returns the `imFontSize`, the `imWidth`/`imHeight` to request, the height-first scale into the band and the finished `curl`. **Omit `--params` and that `curl` exports the DEFAULT chart** — a valid, plausible SVG of the wrong entities. It is a two-pass tool, and pass 1 is a probe even when your numbers are measured; EXPORTING.md says why, and what changes between the passes.
 
-**Local SVG on disk: skip this step entirely.** A file from an `export://static_viz` step already *is* the framed chart at a template's proportions, so none of the aspect solving applies — take the SVG and the PNG the step emitted, and follow the local-SVG route in Steps 5 and 7.
+**Local SVG on disk: skip this step entirely.** A file from an `viz://static` step already *is* the framed chart at a template's proportions, so none of the aspect solving applies — take the SVG and the PNG the step emitted, and follow the local-SVG route in Steps 5 and 7.
 
 ## Step 4 — Propose, then get the go-ahead
 
@@ -430,6 +430,6 @@ The checks are a gate, not a formality: **re-run the whole pass after the last c
    For a **302-wide thumbnail** the export is part of the deliverable rather than optional, and it has its own route: `GET /api/figma/image?fileId=<key>&nodeId=<node>` on the OWID admin (`adminSiteServer/apiRoutes/figma.ts`) calls the Figma API at `scale: 3`, then `POST /api/images` uploads it to Cloudflare Images. PNG only — `ACCEPTED_IMG_TYPES` rejects SVG. **Its 3× disagrees with the family's 2×;** SMALL-CHARTS.md → Delivery has the rules. **Neither call reaches `admin.owid.io` from a cloud session**, so there the export and upload move to the user's machine — say that when you deliver instead of leaving the deliverable half-finished.
 6. **Give the user a clickable link to the frame — once, when you first create it.** `https://www.figma.com/design/<fileKey>/<FileName>?node-id=<node-id>`, with the node id's colon written as a hyphen (`24977:6` → `node-id=24977-6`). Deep-link the **frame**, not the page: it opens with the chart on screen rather than wherever the canvas was last parked. A first delivery without the link is not delivered — making someone hunt for a page in a ~200-page file is pure friction. But **don't repeat it on every iteration**: they already have the tab open, and a link at the top of every reply is noise. Re-send it only if the frame moves to a new page or they ask.
 
-   **A link given only in chat is lost by the next session — write it back into whatever generates the chart.** For an `export://static_viz` step that means its docstring, which is the file someone opens to refresh the viz; for a grapher chart, wherever the run is being recorded. Record the page name, each frame's node id and its deep link. Do it as part of delivering, not as a follow-up: the question "where in Figma is this?" arrives weeks later, from someone with no transcript, and the answer is otherwise a by-eye search of a ~200-page file. Say in the same breath that the node ids are a convenience and the **frame name is the durable join** — it is the kebab-case slug the website exports the PNG by, so it is the one string shared by the layer panel, the exported filename and the step — and that the page is findable as `YYYYMMDD <Title> (<Creator>)`, dated when it was first placed rather than last refreshed.
+   **A link given only in chat is lost by the next session — write it back into whatever generates the chart.** For an `viz://static` step that means its docstring, which is the file someone opens to refresh the viz; for a grapher chart, wherever the run is being recorded. Record the page name, each frame's node id and its deep link. Do it as part of delivering, not as a follow-up: the question "where in Figma is this?" arrives weeks later, from someone with no transcript, and the answer is otherwise a by-eye search of a ~200-page file. Say in the same breath that the node ids are a convenience and the **frame name is the durable join** — it is the kebab-case slug the website exports the PNG by, so it is the one string shared by the layer panel, the exported filename and the step — and that the page is findable as `YYYYMMDD <Title> (<Creator>)`, dated when it was first placed rather than last refreshed.
 7. Report what was created (page name, frames, edits made) and what remains manual: the Flags plugin if it was used, and any design review — **you cannot read Figma comments via MCP, so never report the design review as clean.** Deviations and open items go in the report and the handover doc; put them on the Figma page **only if the user asks** — an unrequested note is clutter in someone else's design file.
    - **Name the Step 8c rows that came back `SKIPPED`** — about a dozen do, each owned by a tool this pass doesn't run. A report listing only what passed turns a declared gap into an implied clean bill.

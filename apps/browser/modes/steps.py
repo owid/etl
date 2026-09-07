@@ -39,7 +39,7 @@ class StepMode(BaseBrowserMode):
             prompt="steps> ",
             item_noun="step",
             item_noun_plural="steps",
-            description="Browse and run ETL pipeline steps (data://, grapher://, export://)",
+            description="Browse and run ETL pipeline steps (data://, grapher://, viz://, export://)",
             loading_message="Loading steps...",
             empty_message="No steps found in DAG.",
         )
@@ -166,7 +166,7 @@ class StepMode(BaseBrowserMode):
                 flag_name="export",
                 is_flag=True,
                 default=False,
-                help="Run export steps",
+                help="Run steps writing to external destinations (export://, viz://bespoke)",
             ),
             BrowserOption(
                 name="private",

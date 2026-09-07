@@ -1,4 +1,4 @@
-"""Export step that generates JSON files for the UN migration flows visualization.
+"""Bespoke viz step that generates JSON files for the UN migration flows visualization.
 
 This step reads the migration_stock_flows garden dataset and generates:
 * A metadata JSON file with entity/gender dimensions and time range
@@ -13,7 +13,7 @@ Outputs:
   * https://owid-public.owid.io/data/migration/migration-stock-flows.<entityId>.json
 
 Run with DRY_RUN=1 to skip S3 upload and only write local files:
-  DRY_RUN=1 .venv/bin/etlr export://s3/un_migration/latest/migration_stock_flows_json
+  DRY_RUN=1 .venv/bin/etlr viz://bespoke/un_migration/latest/migration_stock_flows_json --export
 """
 
 import json
@@ -26,7 +26,7 @@ from tqdm.auto import tqdm
 
 from etl.config import DRY_RUN
 from etl.helpers import PathFinder
-from etl.paths import EXPORT_DIR
+from etl.paths import VIZ_DIR
 
 log = get_logger()
 
@@ -180,7 +180,7 @@ def create_entity_data_json(tb: Table, entity: str, mappings: dict) -> dict:
 
 def save_and_upload_json(data: dict, filename: str) -> None:
     """Write JSON locally and upload to S3 (unless DRY_RUN)."""
-    export_dir = EXPORT_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
+    export_dir = VIZ_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
     export_dir.mkdir(parents=True, exist_ok=True)
 
     local_file = export_dir / filename

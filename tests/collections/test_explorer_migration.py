@@ -288,8 +288,8 @@ def test_explorer_legacy_1(tmp_path, monkeypatch):
     with open(config_path, "w") as f:
         yaml_dump(config, f)
 
-    paths = PathFinder(str(STEP_DIR / "export/explorers/who/latest/influenza"))
-    assert paths._create_current_step_name() == "export://explorers/who/latest/influenza"
+    paths = PathFinder(str(STEP_DIR / "viz/explorer/who/latest/influenza"))
+    assert paths._create_current_step_name() == "viz://explorer/who/latest/influenza"
     paths.__dict__["dest_dir"] = tmp_path
 
     # Load explorer config
@@ -342,8 +342,8 @@ def test_explorer_legacy_2(tmp_path, monkeypatch):
     with open(config_path, "w") as f:
         yaml_dump(config, f)
 
-    paths = PathFinder(str(STEP_DIR / "export/explorers/who/latest/influenza"))
-    assert paths._create_current_step_name() == "export://explorers/who/latest/influenza"
+    paths = PathFinder(str(STEP_DIR / "viz/explorer/who/latest/influenza"))
+    assert paths._create_current_step_name() == "viz://explorer/who/latest/influenza"
     paths.__dict__["dest_dir"] = tmp_path
 
     # Load explorer config

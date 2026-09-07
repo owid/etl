@@ -82,7 +82,7 @@ Primitives:
 Three routes:
 
 - **(a) Indicator ETL metadata** — edit the garden `.meta.yml` → rebuild garden+grapher → `STAGING=1 etlr grapher://grapher/<ns>/<ver>/<ds> --grapher` to upsert to staging. **Check for a `<short_name>.meta.override.yml` next to the meta.yml first** — the ETL merges it on top of the built metadata automatically (`etl/steps/__init__.py`), and datasets that carry one (WDI is the flagship: `wdi.meta.override.yml`) auto-generate their main `.meta.yml`, so manual curation MUST go into the override file — an edit to the auto-generated file builds fine but is silently lost on the next regeneration. The resolver lists the override file first when it exists.
-- **(b) MDim step files** — edit the MDim `.config.yml` / `.py` → `STAGING=1 .venv/bin/etlr export://multidim/<ns>/<ver>/<name> --export --private`.
+- **(b) MDim step files** — edit the MDim `.config.yml` / `.py` → `STAGING=1 .venv/bin/etlr viz://chart/<ns>/<ver>/<name> --grapher --private`.
 - **(c) Chart config on staging** — `scripts/update_chart_config.py` (guarded, staging-only; see below). Reaches production only via chart-diff approval + chart-sync after merge.
 
 **Default rule: inherited fields get fixed in the ETL files, never patched via the admin API.** If the rendered text comes from the indicator's metadata or an MDim's step files, the edit belongs in those files — routes (a)/(b). File edits are the durable source of truth: they survive rebuilds and dataset updates, reach every surface, and go through code review. A route-(c) patch on an inherited field creates a chart-level override that shadows the source from then on — the chart silently stops tracking future metadata improvements. Reserve route (c) for fields that are genuinely chart-level (already in the patch, or with no inheritance path) or for a deliberate, user-confirmed decision to scope a change to one chart.
@@ -203,7 +203,7 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
    - route (c): `update_chart_config.py --branch <b> --chart-id <id> --set ... [--dry-run first]`.
 7. Reflect on staging **without committing**:
    - route (a): `.venv/bin/etlr garden/<ns>/<ver>/<ds> grapher/<ns>/<ver>/<ds> --private` then `STAGING=1 .venv/bin/etlr grapher://grapher/<ns>/<ver>/<ds> --grapher` (the MySQL upsert takes ~50 s+/dataset — warn the user; the automatic rebuild after the eventual push re-does it harmlessly). Needed because the staging auto-rebuild only sees *pushed* code.
-   - route (b): `STAGING=1 .venv/bin/etlr export://multidim/<ns>/<ver>/<name> --export --private`.
+   - route (b): `STAGING=1 .venv/bin/etlr viz://chart/<ns>/<ver>/<name> --grapher --private`.
    - route (c): already live on staging.
 8. Run the metadata quality checks scoped to the edit (next section); fix findings and re-run the affected steps.
 9. Verify on staging (section after); show the user the preview links.
@@ -275,7 +275,7 @@ Scripts (shared helpers in `scripts/_common.py`: grapher-channel metadata loader
 - `scripts/generate_mdim_text_report.py` — MDim view mode (supports `collapse_dims` and placeholder parametrization).
 - `scripts/grapher_dataset_mode.py` — grapher-dataset mode (iterates every indicator column) and indicator-list mode (`--indicators <cp> <cp> ...` or `--indicators-file <path>`).
 
-Rebuilding the MDim `.config.json` is done via `etlr <mdim> --export --private` — there is no DB-bypass helper. Change detection handles the common case: nothing changed → ~2 s; garden `.meta.yml`, garden data, or MDim yaml/py changed → etlr rebuilds only the affected steps.
+Rebuilding the MDim `.config.json` is done via `etlr <mdim> --grapher --private` — there is no DB-bypass helper. Change detection handles the common case: nothing changed → ~2 s; garden `.meta.yml`, garden data, or MDim yaml/py changed → etlr rebuilds only the affected steps.
 
 Do **not** add `--grapher` unless you specifically need to re-upload indicator data/metadata to MySQL — it triggers a `grapher://grapher/<dataset>` upload step that can take ~50 s per dataset and isn't needed for the report (the script reads metadata directly from the local grapher-channel feather files). Do **not** add `--only` when you want garden/MDim edits to take effect — it skips upstream rebuilds by design; use `--only --force` only to re-run just the MDim step without touching anything upstream.
 
@@ -294,7 +294,7 @@ Never report Axis titles or Units in the default output (keep the report skimmab
 
 | Input kind | Example | Source of per-entity text |
 |---|---|---|
-| MDim export | `wb/latest/incomes_pip#incomes_pip` | `export/multidim/<ns>/<ver>/<name>/<name>.config.json`, plus grapher-channel inheritance for each view's primary `y` indicator |
+| MDim export | `wb/latest/incomes_pip#incomes_pip` | `viz/chart/<ns>/<ver>/<name>/<name>.config.json`, plus grapher-channel inheritance for each view's primary `y` indicator |
 | Grapher/garden dataset | `data/grapher/wb/2026-03-24/world_bank_pip` | iterate columns across all tables; all text is `[inherited]` |
 | Hand-picked indicators | `grapher/wb/2026-03-24/world_bank_pip/incomes#share__...` | same, filtered to the listed columns |
 
@@ -336,7 +336,7 @@ Total views: **N**   (for MDims)
 
 1a. **`description_key` arrives as a markdown STRING, not a list**: the grapher channel serializes it via `owid.catalog.core.meta.description_key_to_string` — multiple bullets become one string joined as `"- b1\n- b2\n…"`, a single bullet becomes plain prose (datasets built before the change still carry lists). `scripts/_common.py:description_key_as_list()` normalizes both forms back into a bullet list; both report modes route through it. The same trap hits **MDim step code** that asserts/replaces bullets from `tb[col].metadata.description_key`: `OLD_TEXT in list(dk)` silently iterates characters on the string form and the assertion fails (or, worse, a `for b in dk` loop explodes bullets into characters). Normalize first (see `_description_key_bullets` in `incomes_pip.py` / `gini_lis.py` / `gini_wid.py`), then do list-membership asserts and per-bullet swaps; setting either a list or a markdown string back on `view.metadata["description_key"]` is accepted (`Collection` converts lists via `_convert_description_key_lists`).
 
-2. **Rebuilding the MDim `.config.json`**: use `etlr export://multidim/<ns>/<ver>/<name> --export --private`. This runs `Collection.save()` (`validate_indicators_in_db` + `save_config_local` + `upsert_to_db` — admin-API upsert, not a big data push). If the command errors with a MySQL connection-refused trace, surface that to the user and stop — don't monkey-patch around it.
+2. **Rebuilding the MDim `.config.json`**: use `etlr viz://chart/<ns>/<ver>/<name> --grapher --private`. This runs `Collection.save()` (`validate_indicators_in_db` + `save_config_local` + `upsert_to_db` — admin-API upsert, not a big data push). If the command errors with a MySQL connection-refused trace, surface that to the user and stop — don't monkey-patch around it.
 
 3. **Description-key dedup with auto slugs**: collect unique bullets into a per-file legend, auto-generate a short slug from the first ~3 non-stopword content words of each bullet (kebab-case), disambiguate collisions with `-2`/`-3` suffixes. Each view references bullets by their slugs, rendered as sub-bullets.
 
@@ -364,7 +364,7 @@ Total views: **N**   (for MDims)
 4. Run the appropriate script:
    - **MDim config rebuild**:
      ```
-     .venv/bin/etlr export://multidim/wb/latest/incomes_pip --export --private
+     .venv/bin/etlr viz://chart/wb/latest/incomes_pip --grapher --private
      ```
    - **MDim mode** — edit the `MDIMS` list at the top of `scripts/generate_mdim_text_report.py` or pass `--config <json>`:
      ```
@@ -396,7 +396,7 @@ Before doing the field-by-field comparison, refresh everything the live config d
 
 ```
 .venv/bin/etlr garden/<ns>/<ver>/<ds> grapher/<ns>/<ver>/<ds> --private --force --only
-.venv/bin/etlr multidim/<ns>/<ver>/<mdim> --export --only --private --force
+.venv/bin/etlr chart/<ns>/<ver>/<mdim> --grapher --only --private --force
 ```
 
 Run both upstream steps — `garden --only` alone does NOT refresh the grapher channel, and the FAUST scripts read from grapher, not garden.
@@ -431,9 +431,9 @@ A recurring large-scale workflow: the user pastes an edited FAUST report as the 
 
 When you change an MDim `.py` (reorder indicators, flip a choice order, change which y-indicator is primary) and need to prove the rendered FAUST is **unchanged except for the intended diff**, diff two auto-generated reports instead of eyeballing one. This is the right check whenever a change shifts the **primary y-indicator** (`y[0]`), because that's what drives inheritance.
 
-`config_path` accepts **any** JSON path, not just the live `export/multidim/.../<name>.config.json` — so point two runs at two config snapshots:
+`config_path` accepts **any** JSON path, not just the live `viz/chart/.../<name>.config.json` — so point two runs at two config snapshots:
 
-1. Build the baseline config (e.g. `git checkout origin/master -- <step>.py && etlr <mdim> --export --grapher`) and copy its `<name>.config.json` to `/tmp/cfg_before/`. Restore your branch, rebuild, copy to `/tmp/cfg_after/`. (Note: `git checkout … -- a.py b.py` won't word-split an unquoted `$files` var in zsh — pass the paths literally or use an array.)
+1. Build the baseline config (e.g. `git checkout origin/master -- <step>.py && etlr <mdim> --grapher`) and copy its `<name>.config.json` to `/tmp/cfg_before/`. Restore your branch, rebuild, copy to `/tmp/cfg_after/`. (Note: `git checkout … -- a.py b.py` won't word-split an unquoted `$files` var in zsh — pass the paths literally or use an array.)
 2. Run the report against each snapshot:
    ```
    echo '[{"name":"gini_lis_BEFORE","config_path":"/tmp/cfg_before/gini_lis.json","collapse_dims":[]}]' > /tmp/fb.json
