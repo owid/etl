@@ -452,10 +452,18 @@ class Report:
             producers=self.all_producer_names, min_date=self.min_date, max_date=self.max_date, df=notion_df
         )
 
-    def create_google_doc(self) -> None:
-        """Create the Google Doc from template."""
+    def create_google_doc(self, overwrite: bool = False) -> None:
+        """Create the Google Doc from template.
+
+        A Doc is always created as a fresh copy of the template. If ``overwrite`` is True and a same-named
+        Doc already exists (detected at init), that previous Doc is deleted once the new one is fully
+        populated, so the report is replaced in place rather than leaving two Docs with the same name.
+        """
         if not self.analytics:
             raise ValueError("Analytics must be gathered before creating the document")
+
+        # A same-named Doc found at init that we should replace once the new one is ready.
+        previous_doc_id = self.doc_id if overwrite else None
 
         # Initialize Google Drive and copy template into the period subfolder.
         google_drive = GoogleDrive()
@@ -467,6 +475,12 @@ class Report:
 
         # Populate the document.
         self._populate_document()
+
+        # Only remove the old Doc after the new one is built and populated, so a failure above leaves the
+        # existing report intact.
+        if previous_doc_id and previous_doc_id != self.doc_id:
+            log.info(f"Overwriting existing Google Doc for {self.title}")
+            google_drive.delete_file(previous_doc_id)
 
     def _populate_document(self) -> None:
         """Internal method to populate the Google Doc with data."""
@@ -741,13 +755,22 @@ class Report:
             log.warning("Emails are not defined. Consider manually changing sharing permissions directly from the PDF.")
 
     def create_full_report(
-        self, overwrite_pdf: bool = True, grant_permissions: bool = False, notion_df: pd.DataFrame | None = None
+        self,
+        overwrite: bool = False,
+        overwrite_pdf: bool = True,
+        grant_permissions: bool = False,
+        notion_df: pd.DataFrame | None = None,
     ) -> None:
-        """Create a complete report from scratch."""
+        """Create a complete report from scratch.
+
+        If ``overwrite`` is True, an existing same-named Doc is replaced in place (see create_google_doc);
+        combine with ``overwrite_pdf`` to also replace the existing PDF, so a forced re-run refreshes the
+        report under the same name instead of creating duplicates.
+        """
         self.gather_analytics(notion_df=notion_df)
 
         # Create the report
-        self.create_google_doc()
+        self.create_google_doc(overwrite=overwrite)
         self.create_pdf(overwrite=overwrite_pdf)
         self.generate_links()
 
