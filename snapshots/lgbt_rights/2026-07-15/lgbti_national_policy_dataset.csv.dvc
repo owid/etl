@@ -1,0 +1,34 @@
+meta:
+  origin:
+    producer: Velasco
+    title: LGBTI National Policy Dataset
+    description: |-
+      The LGBTI National Policy Dataset (Version 2.2) is a country-year-policy panel tracking the adoption, scope, and enforcement of LGBTI-related policies across 195 countries from 1991 to 2025. The dataset is distributed in long format: each row records one country in one year for one specific policy-status combination. It is designed for use in comparative political research, policy diffusion analysis, and quantitative cross-national studies of LGBTI rights.
+
+      The dataset covers 27 distinct policy areas organized into 54 policy-status combinations (each policy paired with two mutually exclusive status directions). Of these 54 combinations, 36 contain substantive data; the remaining 18 are structural placeholders with all-zero values, included to maintain a fully balanced panel suitable for econometric methods.
+    citation_full: |-
+      Velasco, Kristopher. 2026. "LGBTI National Policy Dataset, Version 2.2." https://doi.org/10.17605/OSF.IO/WTA9P.
+    attribution_short: Velasco
+    version_producer: '2.2'
+    url_main: https://osf.io/wta9p/overview
+    # NOTE: The producer deletes and re-uploads LGBTI_Policy_Data_Long.csv on each revision, so this file
+    # gets a NEW OSF GUID every time and the previous url_download starts returning 404 (zpd78 → a file-id
+    # link → zp78k so far). On each update, re-derive the current link from the OSF API rather than reusing
+    # this one:
+    #   curl -s "https://api.osf.io/v2/nodes/wta9p/files/osfstorage/?page%5Bsize%5D=50"
+    # and read `links.download` for LGBTI_Policy_Data_Long.csv.
+    url_download: https://osf.io/download/zp78k/
+    date_accessed: '2026-08-07'
+    # NOTE: The producer revises Version 2.x in place on OSF without a changelog, so the version label alone
+    # can't distinguish revisions — compare OSF file dates/hashes when updating. The 2026-07-31 revision
+    # (Version 2.2) followed coding questions we raised: it re-codes the Gender_Change_Requirement field to
+    # follow each country's reform (previously frozen at the pre-reform value for nine countries) and adds a
+    # documented "Court Order" requirement class.
+    date_published: '2026-07-31'
+    license:
+      name: CC BY 4.0
+      url: https://osf.io/wta9p/
+outs:
+  - md5: 4eeb45a202d401d0851f475312e56e47
+    size: 83775950
+    path: lgbti_national_policy_dataset.csv

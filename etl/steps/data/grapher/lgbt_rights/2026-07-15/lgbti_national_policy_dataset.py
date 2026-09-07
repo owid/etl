@@ -19,12 +19,13 @@ def run() -> None:
     ds_garden = paths.load_dataset("lgbti_national_policy_dataset")
     tb_combined = ds_garden["lgbti_national_policy_dataset_combined"]
     tb_combined_regions = ds_garden["lgbti_national_policy_dataset_combined_regions"]
+    tb_index = ds_garden["lgbti_composite_index"]
 
     #
     # Save outputs.
     #
     ds_grapher = paths.create_dataset(
-        tables=[tb_combined, tb_combined_regions],
+        tables=[tb_combined, tb_combined_regions, tb_index],
         default_metadata=ds_garden.metadata,
     )
     ds_grapher.save()
