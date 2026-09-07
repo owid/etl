@@ -249,6 +249,20 @@ def filter_columns_by_dimension_choices(
         True to remove every dimension that is left with a single choice after filtering (not only
         the filtered ones), from the column metadata and from the table-level metadata.
 
+    Raises
+    ------
+    ValueError
+        If a dimension or a choice does not exist, if a column has dimensions but not one of the
+        filtered ones, or if no single indicator carries all the requested choices at once.
+
+    Notes
+    -----
+    Filtering down to one choice of every dimension leaves the surviving indicators with no
+    dimensions at all. That is a legitimate way to filter a table down to a single indicator, but
+    such a table cannot be expanded into a collection: `expand_config` skips indicators whose
+    dimensions are empty and raises `MissingDimensionalIndicatorError`. Pass
+    `drop_single_choice_dimensions=False` if you need the dimensions kept.
+
     """
     # Accept a single choice or a list of choices per dimension.
     choices_by_dimension = {
@@ -259,6 +273,10 @@ def filter_columns_by_dimension_choices(
     columns_keep = []
     columns_without_dimension = defaultdict(list)
     choices_found = defaultdict(set)
+    # Dimensions carried by any indicator before filtering. Needed to tell a dimension that the
+    # filtering emptied from an index dimension (e.g. country, year), which is listed in the
+    # table-level metadata but never appears in an indicator's dimensions.
+    dimensions_in_indicators = {dimension for column in tb.columns for dimension in (tb[column].m.dimensions or {})}
     for column in tb.columns:
         dims = tb[column].m.dimensions
         if not dims:
@@ -296,6 +314,17 @@ def filter_columns_by_dimension_choices(
                 f"Available choices: {sorted(str(choice) for choice in choices_found[dimension])}"
             )
 
+    # Each choice exists on its own, but the requested combination may not occur on any single
+    # indicator (e.g. only male/adult and female/child exist, and male/child was requested). Without
+    # this check the result would silently contain no indicator at all, and a collection built from
+    # it would fail later with a MissingDimensionalIndicatorError.
+    if not any(tb[column].m.dimensions for column in columns_keep):
+        raise ValueError(
+            f"No column in table '{tb.m.short_name}' matches all of the requested dimension choices "
+            f"{choices_by_dimension}. Each choice exists on its own, but no single indicator has that "
+            f"combination of them."
+        )
+
     # Copy so the metadata edits below don't modify the caller's table.
     tb = tb[columns_keep].copy()
 
@@ -314,9 +343,15 @@ def filter_columns_by_dimension_choices(
                 for dimension in dimensions_drop:
                     dims.pop(dimension, None)
 
+        # A dimension carried only by columns that the filter removed keeps no choice at all, so it
+        # is not in dimensions_drop, yet no indicator advertises it any more. Leaving it in the
+        # table-level metadata trips expand_config's completeness check, so drop those too. Index
+        # dimensions (country, year) are never indicator dimensions and must stay.
+        dimensions_emptied = {dimension for dimension in dimensions_in_indicators if dimension not in choices_kept}
+
         # Drop them from the table-level metadata, if defined there.
         if tb.m.dimensions:
-            tb.m.dimensions = [d for d in tb.m.dimensions if d["slug"] not in dimensions_drop]
+            tb.m.dimensions = [d for d in tb.m.dimensions if d["slug"] not in (dimensions_drop | dimensions_emptied)]
 
     return tb
 

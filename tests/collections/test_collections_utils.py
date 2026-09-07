@@ -378,6 +378,81 @@ def test_filter_columns_by_dimension_choices_with_non_string_choices():
     assert result.metadata.dimensions == []
 
 
+def test_filter_columns_by_dimension_choices_rejects_empty_intersection():
+    """
+    Test filter_columns_by_dimension_choices when each requested choice exists but no single
+    indicator carries all of them - the result would hold no indicator at all, so it must fail
+    instead of silently returning a table with only index columns.
+    """
+    from owid.catalog import Table, Variable
+    from owid.catalog.core.meta import VariableMeta
+
+    from etl.collection.utils import filter_columns_by_dimension_choices
+
+    tb = Table(
+        {"country": ["USA"], "year": [2020], "income__male_adult": [1], "income__female_child": [2]},
+        short_name="test_table",
+    )
+    for column, dimensions in [
+        ("income__male_adult", {"sex": "male", "age": "adult"}),
+        ("income__female_child", {"sex": "female", "age": "child"}),
+    ]:
+        tb[column] = Variable(
+            tb[column],
+            name=column,
+            metadata=VariableMeta(original_short_name="income", dimensions=dimensions),
+        )
+    tb.metadata.dimensions = [{"slug": "sex", "name": "Sex"}, {"slug": "age", "name": "Age"}]
+
+    # Both "male" and "child" exist, but never on the same indicator.
+    with pytest.raises(ValueError, match="no single indicator has that combination"):
+        filter_columns_by_dimension_choices(tb, {"sex": "male", "age": "child"})
+
+
+def test_filter_columns_by_dimension_choices_drops_dimensions_without_surviving_choices():
+    """
+    Test filter_columns_by_dimension_choices when an unfiltered dimension is carried only by columns
+    that the filter removes - it must go from the table-level metadata too, otherwise the table
+    advertises a dimension that no column has and expand_config fails its completeness check.
+    """
+    from owid.catalog import Table, Variable
+    from owid.catalog.core.meta import VariableMeta
+
+    from etl.collection.utils import filter_columns_by_dimension_choices
+
+    columns = {
+        "income__sqrt_male": {"equivalence_scale": "square root", "sex": "male"},
+        "income__sqrt_female": {"equivalence_scale": "square root", "sex": "female"},
+        "income__none_adult": {"equivalence_scale": "none", "age": "adult"},
+        "income__none_child": {"equivalence_scale": "none", "age": "child"},
+    }
+    tb = Table({"country": ["USA"], "year": [2020], **{column: [1] for column in columns}}, short_name="test_table")
+    for column, dimensions in columns.items():
+        tb[column] = Variable(
+            tb[column],
+            name=column,
+            metadata=VariableMeta(original_short_name="income", dimensions=dimensions),
+        )
+    # Real grapher tables list their index dimensions here alongside the indicator dimensions.
+    tb.metadata.dimensions = [
+        {"slug": "country", "name": "Country"},
+        {"slug": "year", "name": "Year"},
+        {"slug": "equivalence_scale", "name": "Equivalence scale"},
+        {"slug": "sex", "name": "Sex"},
+        {"slug": "age", "name": "Age"},
+    ]
+
+    result = filter_columns_by_dimension_choices(tb, {"equivalence_scale": "square root"})
+
+    # Only the "square root" columns survive, and they carry sex, not age.
+    assert sorted(result.columns) == ["country", "income__sqrt_female", "income__sqrt_male", "year"]
+    assert result["income__sqrt_male"].m.dimensions == {"sex": "male"}
+    # equivalence_scale goes because it is left with a single choice, and age because the only
+    # columns that had it were filtered out. country and year are index dimensions, never carried by
+    # an indicator, so they must survive.
+    assert [dim["slug"] for dim in result.metadata.dimensions or []] == ["country", "year", "sex"]
+
+
 def test_resolve_grapher_schema_accepted_forms():
     """
     Test resolve_grapher_schema - both authoring forms resolve to a full schema URL.
