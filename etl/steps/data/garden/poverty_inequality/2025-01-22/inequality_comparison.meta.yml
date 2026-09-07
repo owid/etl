@@ -86,6 +86,34 @@ tables:
         display:
           name: Palma ratio around <<ref_year>>
 
+      gini_widextrapolated_pretaxnational_peradult:
+        title: Gini coefficient (WID, including extrapolated datapoints) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>> (pre-tax)
+        unit: ""
+        short_unit: ""
+        display:
+          name: Gini coefficient around <<ref_year>>
+
+      p90p100share_widextrapolated_pretaxnational_peradult:
+        title: Income share of the richest 10% (WID, including extrapolated datapoints) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>> (pre-tax)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Income share of the richest 10% around <<ref_year>>
+
+      p99p100share_widextrapolated_pretaxnational_peradult:
+        title: Income share of the richest 1% (WID, including extrapolated datapoints) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>> (pre-tax)
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Income share of the richest 1% around <<ref_year>>
+
+      palmaratio_widextrapolated_pretaxnational_peradult:
+        title: Palma ratio (WID, including extrapolated datapoints) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>> (pre-tax)
+        unit: ""
+        short_unit: ""
+        display:
+          name: Palma ratio around <<ref_year>>
+
       # gini_wid_posttaxnational_peradult:
       #   title: Gini coefficient (WID) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>> (post-tax)
       #   display:

@@ -140,6 +140,9 @@ CODES_EXCLUDED = {
     "US-DC": "District of Columbia",
     "US-DE": "Delaware",
     "US-FL": "Florida",
+    # NOTE: this label collides with the country Georgia. It is harmless while the code stays in
+    # CODES_EXCLUDED (the rows are dropped), but moving it to CODES_MISSING would silently merge the
+    # US state into the country instead of failing. Rename it if it is ever published.
     "US-GA": "Georgia",
     "US-HI": "Hawaii",
     "US-IA": "Iowa",
@@ -184,7 +187,11 @@ CODES_EXCLUDED = {
 }
 
 
-# Create a dictionary with the names of the snapshots and their id variables
+# Create a dictionary with the names of the snapshots and their id variables.
+# Since wid v1.0.7 each snapshot is a single unfiltered extract that carries WID's row-level
+# `data_quality` score (0-5) instead of an exclude/include pair; the score columns
+# (`data_quality_<welfare>` in the wide table, `data_quality` in the distribution table) pass
+# through this step untouched and the garden step decides what to do with them.
 SNAPSHOTS_DICT = {
     "world_inequality_database": ["country", "year"],
     "world_inequality_database_distribution": ["country", "year", "welfare", "p", "percentile"],
@@ -206,7 +213,11 @@ def run() -> None:
 
     # Load regions table
     ds_regions = paths.load_dataset("regions")
-    tb_regions = ds_regions["regions"].reset_index()
+    # NOTE: safe_types=False is required, not cosmetic. It keeps `name`/`iso_alpha2` as categoricals,
+    # so an unmatched left merge below yields NaN whose astype(str) is "nan" — the sentinel
+    # harmonize_countries() tests for. The default nullable-string dtypes render it "<NA>" instead,
+    # which silently leaves unmatched rows in with country "<NA>" and duplicates the index.
+    tb_regions = ds_regions.read("regions", safe_types=False)
 
     #
     # Load inputs.
@@ -221,11 +232,6 @@ def run() -> None:
         snap = paths.load_snapshot(f"{tb_name}.csv")
         tb = snap.read(keep_default_na=False, na_values=NA_VALUES)
 
-        # Retrieve snapshot with extrapolations
-        snap = paths.load_snapshot(f"{tb_name}_with_extrapolations.csv")
-        # Load data from snapshot.
-        tb_extrapolations = snap.read(keep_default_na=False, na_values=NA_VALUES)
-
         #
         # Process data.
         #
@@ -233,16 +239,12 @@ def run() -> None:
         tb = harmonize_countries(
             tb=tb, tb_regions=tb_regions, codes_missing=CODES_MISSING, codes_excluded=CODES_EXCLUDED
         )
-        tb_extrapolations = harmonize_countries(
-            tb=tb_extrapolations, tb_regions=tb_regions, codes_missing=CODES_MISSING, codes_excluded=CODES_EXCLUDED
-        )
 
         # Set index and sort
         tb = tb.format(tb_ids, short_name=tb_name)
-        tb_extrapolations = tb_extrapolations.format(tb_ids, short_name=f"{tb_name}_with_extrapolations")
 
-        # Append current tables
-        tables.extend([tb, tb_extrapolations])
+        # Append current table
+        tables.append(tb)
 
     # Add fiscal income data
     snap_fiscal = paths.load_snapshot("world_inequality_database_fiscal.csv")
@@ -305,9 +307,9 @@ def harmonize_countries(tb: Table, tb_regions: Table, codes_missing: dict, codes
     for x, y in codes_missing.items():
         tb.loc[tb["country"] == x, "name"] = y
 
-    # Create list of unmatched entitites
+    # Create list of unmatched entities
     missing_list = list(tb[tb["name"] == "nan"]["country"].unique())
-    # Substract excluded from missing_list
+    # Subtract excluded from missing_list
     missing_list = [x for x in missing_list if x not in codes_excluded.keys()]
     missing_count = len(missing_list)
 

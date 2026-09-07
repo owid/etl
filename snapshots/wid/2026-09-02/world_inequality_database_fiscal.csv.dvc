@@ -5,15 +5,19 @@ meta:
     description: |-
       The World Inequality Database (WID.world) aims to provide open and convenient access to the most extensive available database on the historical evolution of the world distribution of income and wealth, both within countries and between countries.
     title_snapshot: World Inequality Database (WID) - Fiscal income
+    description_snapshot: |-
+      Top 1% shares of fiscal income (WID indicator sfiinc, percentile p99p100) among adults aged 20 and over, for three population units (individuals, equal-split adults and tax units), each with its own WID data quality score.
+
+      Extracted with the wid Stata command (v1.0.7) without any quality filter, so it includes every observation WID publishes, including extrapolated and imputed ones, together with WID's row-level data quality score (0 = no underlying data, 5 = the best annual sources), which is constant within a country, year and welfare concept.
     citation_full: World Inequality Database (WID), https://wid.world
     attribution_short: WID
     url_main: https://wid.world
-    date_accessed: '2026-07-07'
+    date_accessed: '2026-09-02'
     date_published: '2026'
     license:
       name: CC BY 4.0
       url: https://wid.world/
 outs:
-  - md5: e560697bc572736302a27c80bb9ec0fc
-    size: 141903
+  - md5: 23f33864f108cdc29e69f848da82da0d
+    size: 173980
     path: world_inequality_database_fiscal.csv

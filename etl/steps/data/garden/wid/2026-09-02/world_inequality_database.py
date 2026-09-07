@@ -9,6 +9,7 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
 
 """
 
+import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
@@ -27,6 +28,33 @@ DEBUG = False
 
 # Define if I show the full table or just the first 5 rows for assertions (only applies when DEBUG=True)
 LONG_FORMAT = False
+
+# The `extrapolated` dimension is derived here from WID's row-level data quality score (0-5): since
+# wid v1.0.7 (July 2026) the `exclude` option that used to produce separate extracts no longer exists.
+#   "yes" = every observation WID publishes.
+#   "no"  = income values with a score >= DATA_QUALITY_MIN, plus wealth and WID's regional aggregates
+#           in full (both are model- and imputation-based by construction, so WID scores them low
+#           regardless of extrapolation and a plain cut would delete them).
+# A row is dropped only when WID actually scored it below the threshold: an absent score is not a low
+# score, so unscored values are kept (a handful of series carry values with no score at all, e.g.
+# France's post-tax disposable income). Do not write this as `score >= MIN`, which yields pd.NA on
+# these nullable columns and silently drops them in row selection but keeps them in .loc assignment.
+# NOTE: re-check the threshold against WID's documentation of the score at every update.
+DATA_QUALITY_MIN = 3
+QUALITY_FILTERED_WELFARE = ["pretax", "posttax_nat", "posttax_dis"]
+# WID's own regional aggregates, as named by the meadow step (CODES_MISSING).
+WID_AGGREGATES = [
+    "World",
+    "Europe (WID)",
+    "Oceania (WID)",
+    "Russia and Central Asia (WID)",
+    "East Asia (WID)",
+    "North America (WID)",
+    "Sub-Saharan Africa (WID)",
+    "Latin America (WID)",
+    "Middle East and North Africa (WID)",
+    "South and South-East Asia (WID)",
+]
 
 # Define welfare types available and their new names
 WELFARE_TYPES = {
@@ -100,9 +128,7 @@ def run() -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("world_inequality_database")
-    tb_extrapolated = ds_meadow.read("world_inequality_database_with_extrapolations")
     tb_distribution = ds_meadow.read("world_inequality_database_distribution")
-    tb_distribution_extrapolated = ds_meadow.read("world_inequality_database_distribution_with_extrapolations")
     tb_fiscal = ds_meadow.read("world_inequality_database_fiscal")
     tb_population = ds_meadow.read("population")
 
@@ -110,9 +136,12 @@ def run() -> None:
     # Process data.
     #
 
-    # Combine main table with its extrapolated version.
-    tb = combine_tables(tb=tb, tb_extrapolated=tb_extrapolated)
-    tb_distribution = combine_tables(tb=tb_distribution, tb_extrapolated=tb_distribution_extrapolated)
+    # Derive the `extrapolated` dimension from WID's data quality score (see the constants above).
+    tb = add_extrapolated_dimension_wide(tb=tb)
+    tb_distribution = add_extrapolated_dimension_long(tb=tb_distribution)
+
+    # Fiscal income keeps every observation: its main series (individuals) carries no quality score.
+    tb_fiscal = tb_fiscal.drop(columns=list(tb_fiscal.filter(like="data_quality")))
 
     tb_inequality, tb_incomes = make_table_long_and_separate(tb=tb)
 
@@ -182,14 +211,75 @@ def run() -> None:
     ds_garden.save()
 
 
-def combine_tables(tb: Table, tb_extrapolated: Table) -> Table:
+def add_extrapolated_dimension_wide(tb: Table) -> Table:
     """
-    Combine the main table with its extrapolated version. We concatenate and add a new column to indicate whether the value is extrapolated or not.
+    Stack two copies of the wide indicators table: `extrapolated == "yes"` keeps every value, `extrapolated == "no"`
+    blanks the income values whose welfare concept scores below DATA_QUALITY_MIN (wealth and WID aggregates exempt).
+    The table carries one `data_quality_<welfare>` column per concept; those columns are consumed here.
     """
-    tb["extrapolated"] = "no"
-    tb_extrapolated["extrapolated"] = "yes"
+    quality_cols = [col for col in tb.columns if col.startswith("data_quality_")]
+    value_cols = [col for col in tb.columns if col not in ["country", "year"] + quality_cols]
 
-    tb_combined = pr.concat([tb, tb_extrapolated], ignore_index=True)
+    # Every value column must belong to exactly one welfare concept, or the rule would silently skip it.
+    by_welfare = {welfare: [col for col in value_cols if col.endswith(f"_{welfare}")] for welfare in WELFARE_TYPES}
+    covered = sorted(col for cols in by_welfare.values() for col in cols)
+    assert covered == sorted(value_cols), f"Columns without a welfare suffix: {sorted(set(value_cols) - set(covered))}"
+    missing_aggregates = sorted(set(WID_AGGREGATES) - set(tb["country"]))
+    assert not missing_aggregates, f"WID aggregates missing from the data (renamed in meadow?): {missing_aggregates}"
+
+    tb_all = tb.drop(columns=quality_cols)
+    tb_all["extrapolated"] = "yes"
+
+    tb_observed = tb.copy()
+    exempt = tb_observed["country"].isin(WID_AGGREGATES)
+    unscored = 0
+    for welfare in QUALITY_FILTERED_WELFARE:
+        score = tb_observed[f"data_quality_{welfare}"]
+        drop = ~exempt & score.notna() & (score < DATA_QUALITY_MIN)
+        tb_observed.loc[drop.fillna(False).astype(bool), by_welfare[welfare]] = np.nan
+        unscored += int((~exempt & score.isna() & tb_observed[by_welfare[welfare]].notna().any(axis=1)).sum())
+    paths.log.info(f"key indicators: kept {unscored} unscored country-year values in extrapolated='no'")
+    tb_observed = tb_observed.drop(columns=quality_cols)
+    tb_observed["extrapolated"] = "no"
+
+    # Wealth and aggregate values must come through the rule untouched.
+    assert tb_observed[by_welfare["wealth"]].equals(tb_all[by_welfare["wealth"]]), (
+        "Wealth values changed by the quality rule."
+    )
+    assert tb_observed.loc[exempt, value_cols].equals(tb_all.loc[exempt, value_cols]), (
+        "WID aggregate values changed by the quality rule."
+    )
+
+    tb_combined = pr.concat([tb_observed, tb_all], ignore_index=True)
+
+    return tb_combined
+
+
+def add_extrapolated_dimension_long(tb: Table) -> Table:
+    """
+    Same split for the long distribution table, which has one `welfare` and one `data_quality` column per row:
+    `extrapolated == "no"` drops the income rows scored below DATA_QUALITY_MIN (wealth and WID aggregates exempt).
+    """
+    exempt = tb["country"].isin(WID_AGGREGATES) | ~tb["welfare"].isin(QUALITY_FILTERED_WELFARE)
+    score = tb["data_quality"]
+    drop = ~exempt & score.notna() & (score < DATA_QUALITY_MIN)
+    keep = ~drop.fillna(False).astype(bool)
+
+    unscored = int((score.isna() & ~exempt).sum())
+    paths.log.info(f"distribution: kept {unscored} unscored income rows in extrapolated='no'")
+
+    tb_all = tb.drop(columns=["data_quality"])
+    tb_all["extrapolated"] = "yes"
+
+    tb_observed = tb[keep].drop(columns=["data_quality"]).reset_index(drop=True)
+    tb_observed["extrapolated"] = "no"
+
+    assert len(tb_observed) <= len(tb_all), "extrapolated='no' must be a subset of extrapolated='yes'."
+    assert (tb_observed["welfare"] == "wealth").sum() == (tb_all["welfare"] == "wealth").sum(), (
+        "Wealth rows were dropped."
+    )
+
+    tb_combined = pr.concat([tb_observed, tb_all], ignore_index=True)
 
     return tb_combined
 
@@ -200,9 +290,6 @@ def make_table_long_and_separate(tb: Table) -> tuple[Table, Table]:
     Also, separate the tables into two: one for inequality indicators and another for income indicators (avg, thr, share, median, mean).
     """
     tb_long = tb.copy()
-
-    # Drop age and pop
-    tb_long = tb_long.drop(columns=["age", "pop"], errors="raise")
 
     tb_long = tb_long.melt(id_vars=["country", "year", "extrapolated"], var_name="indicator", value_name="value")
 

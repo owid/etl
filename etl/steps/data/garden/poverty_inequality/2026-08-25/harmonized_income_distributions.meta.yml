@@ -32,7 +32,7 @@ tables:
     description: |-
       Full income distributions on an identical structure of 109 quantile bins (99 one-percent bins, nine 0.1% bins between p99 and p99.9, and the top 0.1%) for every country and year covered by both sources. PIP's 1,000 equal bins nest exactly into this structure, so the aggregation introduces no approximation error; WID publishes (a superset of) the structure directly.
 
-      Values are daily incomes in international-$: PIP at 2021 prices, WID at the latest PPP vintage used by its own conversion factors — a known level difference between the two sources. WID series include WID's extrapolated country-years (the only slice with near-complete coverage; PIP's lined-up panel is itself partly extrapolated by the World Bank), flagged per row. Zero incomes in WID's bottom percentiles are retained; how to treat them is an analysis-stage decision.
+      Values are daily incomes in international-$: PIP at 2021 prices, WID at the latest PPP vintage used by its own conversion factors — a known level difference between the two sources. WID series include the country-years WID does not rate as directly supported by data (the only slice with near-complete coverage; PIP's lined-up panel is itself partly extrapolated by the World Bank), flagged per row. Zero incomes in WID's bottom percentiles are retained; how to treat them is an analysis-stage decision.
     variables:
       p_low:
         title: Lower bound of the quantile bin
@@ -63,9 +63,9 @@ tables:
         unit: ""
         description_short: Bin's share of the country's total income under the series, as a fraction between 0 and 1.
       wid_extrapolated:
-        title: WID country-year is extrapolated
+        title: WID country-year is not directly supported by data
         unit: ""
-        description_short: Whether the WID country-year is extrapolated by WID rather than anchored in observed data ("yes"/"no"; empty for PIP-side series).
+        description_short: Whether WID rates the country-year as not directly supported by data ("yes"/"no"; empty for PIP-side series). WID scores every observation from 0 (no underlying data) to 5; "no" marks the income country-years it scores 3 or higher, which are the years anchored in survey or tax data rather than interpolated, extrapolated or imputed from other countries.
 
   consumption_income_model:
     title: Consumption-to-income mapping, fitted per percentile
