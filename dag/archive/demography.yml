@@ -351,3 +351,14 @@ steps:
   # archived; last active in 8555670c40f0 on 2025-10-22
   data://garden/demography/2024-12-02/survivor_percentiles:
     - data://garden/hmd/2024-12-01/hmd
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/un/latest/un_wpp:
+    - data://grapher/un/2024-07-12/un_wpp
+    - data://grapher/un/2024-07-12/un_wpp_full
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/un/latest/un_wpp:
+    - data://grapher/un/2024-07-12/un_wpp
+    - data://grapher/un/2024-07-12/un_wpp_full
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/pew/latest/religious_composition:
+    - data://grapher/pew/2025-10-31/religious_composition

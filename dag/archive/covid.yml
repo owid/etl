@@ -151,3 +151,33 @@ steps:
     - data://grapher/covid/latest/hospital
     - data://grapher/covid/latest/oxcgrt_policy
     - data://grapher/covid/latest/testing
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/covid/latest/covid:
+    - data://grapher/covid/latest/combined
+    - data-private://grapher/covid/latest/sequence
+    - data://grapher/covid/latest/oxcgrt_policy
+    - data://grapher/regions/2023-01-01/regions
+    - data-private://grapher/excess_mortality/latest/excess_mortality_economist
+    - data://grapher/covid/latest/covax
+    - data://grapher/excess_mortality/latest/excess_mortality
+    - data://grapher/covid/latest/google_mobility
+    - data://grapher/covid/latest/cases_deaths
+    - data://grapher/covid/latest/vaccinations_global
+    - data://grapher/covid/latest/vaccinations_manufacturer
+    - data://grapher/covid/latest/testing
+    - data://grapher/covid/latest/infections_model
+    - data://grapher/covid/latest/hospital
+    - data://grapher/covid/latest/tracking_r
+    - data://grapher/covid/latest/xm_who
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/covid/latest/covid:
+    - data://grapher/covid/latest/combined
+    - data-private://grapher/covid/latest/sequence
+    - data://grapher/covid/latest/oxcgrt_policy
+    - data-private://grapher/excess_mortality/latest/excess_mortality_economist
+    - data://grapher/excess_mortality/latest/excess_mortality
+    - data://grapher/covid/latest/cases_deaths
+    - data://grapher/covid/latest/vaccinations_global
+    - data://grapher/covid/latest/testing
+    - data://grapher/covid/latest/hospital
+    - data://grapher/covid/latest/tracking_r

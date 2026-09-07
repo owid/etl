@@ -2902,3 +2902,10 @@ steps:
   # archived; last active in 5f13da3a11d6 on 2026-08-28
   data://grapher/climate/2026-08-21/weekly_wildfires:
     - data://garden/climate/2026-08-21/weekly_wildfires
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/climate/latest/climate_change:
+    - data://grapher/climate/2026-08-21/climate_change_impacts_annual
+    - data://grapher/climate/2026-08-21/climate_change_impacts_monthly
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/emissions/latest/ipcc_scenarios:
+    - data://grapher/emissions/2022-08-30/ipcc_scenarios

@@ -1530,3 +1530,19 @@ steps:
   # archived; last active in 4b4042b26656 on 2026-09-01
   data://garden/uk_beis/2023-12-12/uk_historical_electricity:
     - data://meadow/uk_beis/2023-12-12/uk_historical_electricity
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/energy/latest/impacts_of_energy_sources:
+    - data://grapher/unece/2026-05-04/life_cycle_assessment_of_electricity
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/energy/latest/energy_prices:
+    - data://grapher/energy/2025-02-03/energy_prices
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/energy/latest/energy_mix:
+    - data://grapher/energy/2026-06-30/energy_mix
+    - data://grapher/energy/2026-06-30/carbon_intensity_of_energy
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/energy/latest/fossil_fuels:
+    - data://grapher/energy/2026-06-30/fossil_fuels
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/energy/latest/electricity_mix:
+    - data://grapher/energy/2026-06-30/electricity_mix
