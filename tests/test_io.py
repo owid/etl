@@ -246,3 +246,15 @@ steps:
     # like their public counterparts.
     assert "garden/malnutrition/2024-12-16/malnutrition" in result
     assert "grapher/malnutrition/2024-12-16/malnutrition" in result
+
+
+@patch("etl.io.load_dag")
+def test_get_all_changed_catalog_paths_skips_deleted_files(mock_load_dag):
+    """A deleted or moved-away recipe must not produce a phantom step, whatever shape the status takes."""
+    mock_load_dag.return_value = {}
+    files_changed = {
+        "etl/steps/export/explorers/who/latest/influenza.py": {"status": "D", "diff": ""},
+        "etl/steps/data/garden/who/2024-01-01/influenza.py": {"status": "D", "diff": ""},
+        "etl/steps/viz/explorer/who/latest/influenza.py": {"status": "A", "diff": ""},
+    }
+    assert get_all_changed_catalog_paths(files_changed, include_export=True) == ["viz://explorer/who/latest/influenza"]

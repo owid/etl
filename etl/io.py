@@ -17,10 +17,14 @@ def get_changed_steps(files_changed: dict[str, dict[str, str]]) -> list[str]:
     for file_path, file_status in files_changed.items():
         # File status can be: D (deleted), A (added), M (modified).
         # NOTE: In principle, we could select only "A" files. But it is possible that the user adds a new grapher step, and then commits changes to it, in which case (I think) the status would be "M".
+        # files_changed values are {"status": ..., "diff": ...} dicts from get_changed_files, but plain
+        # status strings are also accepted.
+        status = file_status.get("status") if isinstance(file_status, dict) else file_status
 
-        # If deleted, skip loop iteration
-        if file_status == "D":
-            # Skip deleted files.
+        # Skip deleted files: a removed (or moved-away) recipe is not a step to select. Before this
+        # unwrapped the dict, every deleted step file produced a phantom step name, which `--modified`
+        # then used to decide which flags to enable.
+        if status == "D":
             continue
 
         # Identify potential recipes for data steps
