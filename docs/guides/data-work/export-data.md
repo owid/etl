@@ -71,9 +71,9 @@ views:
 
 ```
 
-The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically (using function `etl.collection.multidim.expand_config`).
+The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically (using function `etl.collection.expand_config`).
 
-You can also combine manually defined views with generated ones. See the `etl.collection.multidim` module for available helper functions or refer to examples from `etl/steps/viz/chart/`. Feel free to add or modify the helper functions as needed.
+You can also combine manually defined views with generated ones. See the `etl.collection` module for available helper functions or refer to examples from `etl/steps/viz/chart/`. Feel free to add or modify the helper functions as needed.
 
 The chart step loads the data dependencies and the config YAML file, adds `views` to the config, and then pushes the configuration to the database.
 
@@ -96,7 +96,7 @@ def run() -> None:
     config = paths.load_collection_config()
 
     # Create views.
-    config["views"] = multidim.expand_config(
+    config["views"] = expand_config(
         tb_annual,
         dimensions=["frequency", "source", "unit"],
         additional_config={"chartTypes": ["LineChart", "DiscreteBar"], "hasMapTab": True, "tab": "map"},
