@@ -159,7 +159,7 @@ class StepMode(BaseBrowserMode):
                 flag_name="grapher",
                 is_flag=True,
                 default=False,
-                help="Run steps writing to the grapher DB (grapher:// upserts, viz://chart, viz://explorer, viz://bespoke)",
+                help="Run steps writing to the grapher DB (grapher:// upserts and viz:// steps)",
             ),
             BrowserOption(
                 name="export",

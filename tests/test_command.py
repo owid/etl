@@ -150,8 +150,8 @@ def test_construct_full_dag():
         "viz://explorer/happiness/latest/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
         "viz://chart/happiness/latest/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
         "viz://bespoke/happiness/latest/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
-        # Static and export steps don't write to the DB, so they get no grapher:// dependency.
         "viz://static/happiness/2023-01-01/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
+        # Export steps don't write to the DB, so they get no grapher:// dependency.
         "export://s3/happiness/latest/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
     }
 
@@ -166,13 +166,8 @@ def test_construct_full_dag():
     assert expected_grapher_step in full_dag["viz://explorer/happiness/latest/happiness"]
     assert expected_grapher_step in full_dag["viz://chart/happiness/latest/happiness"]
     assert expected_grapher_step in full_dag["viz://bespoke/happiness/latest/happiness"]
-    for step in [
-        "viz://static/happiness/2023-01-01/happiness",
-        "export://s3/happiness/latest/happiness",
-    ]:
-        assert expected_grapher_step not in full_dag[step]
-    # The grapher step's own upsert is not a dependency of itself
-    assert expected_grapher_step not in full_dag[expected_grapher_step]
+    assert expected_grapher_step in full_dag["viz://static/happiness/2023-01-01/happiness"]
+    assert expected_grapher_step not in full_dag["export://s3/happiness/latest/happiness"]
 
     # Check that original dependencies are preserved
     assert "data://garden/happiness/2023-01-01/happiness" in full_dag
@@ -224,17 +219,16 @@ def test_construct_subdag():
     grapher_steps = [step for step in subdag.keys() if step.startswith("grapher://")]
     assert len(grapher_steps) > 0
 
-    # Flags name destinations: with no flag, only steps writing local files run.
+    # With no flag, only data steps run: no grapher:// upserts, no viz:// steps, no export:// steps.
     subdag = cmd.construct_subdag(full_dag, includes=["happiness"])
-    assert "viz://static/happiness/2023-01-01/happiness" in subdag
-    assert not [step for step in subdag if step.startswith(("grapher://", "export://"))]
-    assert not [step for step in subdag if step.startswith(("viz://chart/", "viz://explorer/", "viz://bespoke/"))]
+    assert "data://garden/happiness/2023-01-01/happiness" in subdag
+    assert not [step for step in subdag if step.startswith(("grapher://", "viz://", "export://"))]
 
-    # --grapher runs the steps writing to the grapher DB: grapher:// upserts and every viz step but static
+    # --grapher runs the steps writing to the grapher DB: grapher:// upserts and every viz:// step
     subdag = cmd.construct_subdag(full_dag, includes=["happiness"], grapher=True)
-    assert "viz://chart/happiness/latest/happiness" in subdag
-    assert "viz://explorer/happiness/latest/happiness" in subdag
-    assert "viz://bespoke/happiness/latest/happiness" in subdag
+    for channel in ["chart", "explorer", "bespoke"]:
+        assert f"viz://{channel}/happiness/latest/happiness" in subdag
+    assert "viz://static/happiness/2023-01-01/happiness" in subdag
     assert "grapher://grapher/happiness/2023-01-01/happiness" in subdag
     assert not [step for step in subdag if step.startswith("export://")]
 
@@ -242,9 +236,7 @@ def test_construct_subdag():
     # It no longer implies --grapher: grapher:// upserts and viz steps stay excluded.
     subdag = cmd.construct_subdag(full_dag, includes=["happiness"], export=True)
     assert "export://s3/happiness/latest/happiness" in subdag
-    assert not [
-        step for step in subdag if step.startswith(("grapher://", "viz://chart/", "viz://explorer/", "viz://bespoke/"))
-    ]
+    assert not [step for step in subdag if step.startswith(("grapher://", "viz://"))]
 
     # Test private step exclusion by default
     subdag = cmd.construct_subdag(full_dag, includes=[".*"], private=False)
@@ -301,7 +293,7 @@ def test_construct_subdag_no_matches():
 
 
 def test_construct_subdag_explains_steps_skipped_for_missing_flag(capsys):
-    """Requesting a step whose destination flag is missing says which flag to pass, then exits."""
+    """Requesting a step whose flag is missing says which flag to pass, then exits."""
     full_dag = {
         "data://grapher/happiness/2023-01-01/happiness": set(),
         "viz://chart/happiness/latest/happiness": {"data://grapher/happiness/2023-01-01/happiness"},

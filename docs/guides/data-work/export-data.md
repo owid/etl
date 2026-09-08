@@ -6,7 +6,7 @@ icon: lucide/forward
 
 # Viz and export steps
 
-Viz steps (`viz://`) produce visualizations and export steps (`export://`) ship files to external destinations. They are defined in the `etl/steps/viz` and `etl/steps/export` directories and have a similar structure to regular steps. Flags describe where a step writes: viz steps (chart, explorer, bespoke) are run with `--grapher`; export steps write to R2 or GitHub and are run with `--export`; static viz steps only write local files and need no flag.
+Viz steps (`viz://`) produce visualizations and export steps (`export://`) ship files to external destinations. They are defined in the `etl/steps/viz` and `etl/steps/export` directories and have a similar structure to regular steps. Viz steps are run with `--grapher`; export steps write to R2 or GitHub and are run with `--export`.
 
 ```bash
 etlr viz://explorer/minerals/latest/minerals --grapher

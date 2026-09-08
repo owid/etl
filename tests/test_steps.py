@@ -407,9 +407,9 @@ tables:
         config.INSTANT = original_instant
 
 
-def test_parse_step_viz_and_destinations():
-    """Each step class states where it writes; `viz://` channels differ in destination."""
-    from etl.steps import Destination, ExportStep, VizStep, parse_step, step_destination
+def test_parse_step_viz_and_export():
+    """viz:// and export:// steps have their own recipe and output folders."""
+    from etl.steps import ExportStep, VizStep, parse_step
 
     chart = parse_step("viz://chart/animal_welfare/latest/banning_of_chick_culling", {})
     assert isinstance(chart, VizStep)
@@ -422,31 +422,3 @@ def test_parse_step_viz_and_destinations():
     assert str(export) == "export://github/co2_data/latest/owid_co2"
     assert export._search_path == paths.STEP_DIR / "export/github/co2_data/latest/owid_co2"
     assert export._dest_dir == paths.EXPORT_DIR / "github/co2_data/latest/owid_co2"
-
-    assert step_destination("viz://chart/a/latest/b") == Destination.GRAPHER_DB
-    assert step_destination("viz://explorer/a/latest/b") == Destination.GRAPHER_DB
-    assert step_destination("viz://static/a/2026-01-01/b") == Destination.LOCAL
-    assert step_destination("viz://bespoke/a/latest/b") == Destination.GRAPHER_DB
-    assert step_destination("export://s3/a/latest/b") == Destination.EXTERNAL
-    assert step_destination("grapher://grapher/a/2026-01-01/b") == Destination.GRAPHER_DB
-    assert step_destination("data://garden/a/2026-01-01/b") == Destination.LOCAL
-    assert step_destination("data-private://garden/a/2026-01-01/b") == Destination.LOCAL
-    assert step_destination("snapshot://a/2026-01-01/b.csv") == Destination.LOCAL
-
-    with pytest.raises(ValueError, match="Unknown viz channel"):
-        step_destination("viz://unknown/a/latest/b")
-
-
-def test_filter_to_subgraph_exclude_steps():
-    """Exact-name exclusions drop the step and everything downstream of it, like regex excludes."""
-    dag = {
-        "data://garden/a/2026-01-01/a": {"data://meadow/a/2026-01-01/a"},
-        "data://grapher/a/2026-01-01/a": {"data://garden/a/2026-01-01/a"},
-        "grapher://grapher/a/2026-01-01/a": {"data://grapher/a/2026-01-01/a"},
-        "viz://chart/a/latest/a": {"data://grapher/a/2026-01-01/a", "grapher://grapher/a/2026-01-01/a"},
-    }
-    subdag = filter_to_subgraph(dag, includes=["a"], exclude_steps={"grapher://grapher/a/2026-01-01/a"})
-    assert "grapher://grapher/a/2026-01-01/a" not in subdag
-    assert "viz://chart/a/latest/a" not in subdag
-    assert "data://grapher/a/2026-01-01/a" in subdag
-    assert "data://meadow/a/2026-01-01/a" in subdag

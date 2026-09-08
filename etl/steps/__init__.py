@@ -19,7 +19,6 @@ from collections.abc import Generator, Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from enum import Enum
 from functools import partial
 from glob import glob
 from importlib import import_module
@@ -49,18 +48,6 @@ from etl.snapshot import Snapshot
 log = structlog.get_logger()
 
 DAG = dict[str, set[str]]
-
-
-class Destination(str, Enum):
-    """Where a step writes. `etlr` flags name destinations, not step types: a step is skipped when
-    the flag for its destination was not passed (see `etl.command.construct_subdag`)."""
-
-    # Files under the repo only (data/, viz/, export/, snapshots/). Never gated by a flag.
-    LOCAL = "local"
-    # The grapher MySQL DB of the targeted environment (local, staging, prod). Gated by --grapher.
-    GRAPHER_DB = "grapher_db"
-    # Shared, environment-less destinations (R2, GitHub), for export:// steps. Gated by --export.
-    EXTERNAL = "external"
 
 
 # Dictionary to store metadata changes for each dataset if INSTANT flag is set
@@ -128,16 +115,12 @@ def filter_to_subgraph(
     only: bool = False,
     exact_match: bool = False,
     excludes: list[str] | None = None,
-    exclude_steps: Iterable[str] | None = None,
 ) -> DAG:
     """
     Filter the full graph to only the included nodes, and all their dependencies.
 
     If the downstream flag is true, also include downstream dependencies (ie steps
     that depend on the included steps), as well as their OWN dependencies.
-
-    `excludes` are regex patterns; `exclude_steps` are exact step names. Steps downstream
-    of an excluded step are excluded too.
 
     Assumes that the graph is organized dependent -> dependency (A -> B means A is
     dependent on B).
@@ -146,7 +129,7 @@ def filter_to_subgraph(
     includes_list = list(includes)
 
     # Handle exclusions first - find all steps that should be excluded
-    excluded_steps = set(exclude_steps or ()) & all_steps
+    excluded_steps = set()
     if excludes:
         compiled_excludes = [re.compile(p) for p in excludes]
         for step in all_steps:
@@ -234,15 +217,11 @@ def graph_nodes(graph: DAG) -> set[str]:
     return all_steps
 
 
-def _split_step_name(step_name: str) -> tuple[str, str]:
-    """Split `type://path` into its step type (URI scheme) and path."""
-    parts = urlparse(step_name)
-    return parts.scheme, parts.netloc + parts.path
-
-
 def parse_step(step_name: str, dag: dict[str, Any]) -> "Step":
     "Convert each step's name into a step object that we can run."
-    step_type, path = _split_step_name(step_name)
+    parts = urlparse(step_name)
+    step_type = parts.scheme
+    path = parts.netloc + parts.path
     # dependencies are new objects
     dependencies = [parse_step(s, dag) for s in dag.get(step_name, [])]
 
@@ -278,14 +257,6 @@ def parse_step(step_name: str, dag: dict[str, Any]) -> "Step":
         raise Exception(f"no recipe for executing step: {step_name}")
 
     return step
-
-
-def step_destination(step_name: str) -> Destination:
-    """Where the step named `step_name` writes, decided by its step class alone (no dependencies parsed)."""
-    step_type, path = _split_step_name(step_name)
-    if step_type not in STEP_CLASSES:
-        raise Exception(f"no recipe for executing step: {step_name}")
-    return STEP_CLASSES[step_type].destination_for(path)
 
 
 def extract_step_attributes(step: str) -> dict[str, str]:
@@ -392,13 +363,6 @@ class Step(Protocol):
     is_public: bool = True
     version: str
     dependencies: list["Step"]
-    # Where the step writes; each class states its own. See `Destination`.
-    destination: Destination = Destination.LOCAL
-
-    @classmethod
-    def destination_for(cls, path: str) -> Destination:
-        """Where a step of this class with the given path writes, without instantiating it."""
-        return cls.destination
 
     def run(self) -> None: ...
 
@@ -1001,7 +965,6 @@ class GrapherStep(Step):
     path: str
     data_step: DataStep
     dependencies: list[Step]
-    destination = Destination.GRAPHER_DB
 
     def __init__(self, path: str, dependencies: list[Step]) -> None:
         # GrapherStep should have exactly one DataStep dependency
@@ -1212,7 +1175,6 @@ class ExportStep(DataStep):
 
     path: str
     dependencies: list[Step]
-    destination = Destination.EXTERNAL
     # Step type: the URI scheme and the folder under `etl/steps/`.
     step_type = "export"
 
@@ -1278,36 +1240,13 @@ class VizStep(ExportStep):
     - `viz://static/...`: a static image (PNG/SVG), written next to the recipe.
     - `viz://bespoke/...`: a bespoke interactive visualization, whose data feed is uploaded to R2.
 
-    Recipes live in `etl/steps/viz/<channel>/...`; local outputs go to `viz/<channel>/...`.
-    Every viz step runs under `--grapher`, so there is one flag for all visualizations. Bespoke
-    steps currently upload to R2, which is shared with production; they honor `DRY_RUN=1` to skip
-    the upload, and will write metadata to the DB like the other channels eventually.
+    Recipes live in `etl/steps/viz/<channel>/...`; local outputs go to `viz/<channel>/...`. Every viz
+    step runs under `--grapher` (`export://` steps under `--export`), see `etl.command.construct_subdag`.
+    Bespoke steps currently upload to a fixed public path rather than to the environment being built;
+    they honor `DRY_RUN=1` to skip the upload.
     """
 
     step_type = "viz"
-
-    # Where each channel writes, i.e. which flag gates it. A channel changing destination is a
-    # one-line edit here.
-    DESTINATION_BY_CHANNEL: dict[str, Destination] = {
-        "chart": Destination.GRAPHER_DB,
-        "explorer": Destination.GRAPHER_DB,
-        "static": Destination.LOCAL,
-        "bespoke": Destination.GRAPHER_DB,
-    }
-
-    @classmethod
-    def destination_for(cls, path: str) -> Destination:
-        channel = path.split("/")[0]
-        try:
-            return cls.DESTINATION_BY_CHANNEL[channel]
-        except KeyError:
-            raise ValueError(
-                f"Unknown viz channel {channel!r} in step viz://{path}; add it to VizStep.DESTINATION_BY_CHANNEL."
-            )
-
-    @property
-    def destination(self) -> Destination:
-        return self.destination_for(self.path)
 
     def can_execute(self, archive_ok: bool = True) -> bool:
         return super().can_execute(archive_ok=archive_ok) or self._is_chart_yaml_only()
@@ -1422,21 +1361,6 @@ class DataStepPrivate(PrivateMixin, DataStep):
 
     def __str__(self) -> str:
         return f"data-private://{self.path}"
-
-
-# Step class for each step type (the URI scheme), used to answer questions about a step from its
-# name alone (see `step_destination`). `parse_step` constructs the objects.
-STEP_CLASSES: dict[str, type[Step]] = {
-    "data": DataStep,
-    "data-private": DataStepPrivate,
-    "snapshot": SnapshotStep,
-    "snapshot-private": SnapshotStepPrivate,
-    "github": GithubStep,
-    "etag": ETagStep,
-    "grapher": GrapherStep,
-    "export": ExportStep,
-    "viz": VizStep,
-}
 
 
 def select_dirty_steps(steps: list[Step], workers: int = 1) -> list[Step]:

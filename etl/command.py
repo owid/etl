@@ -69,7 +69,7 @@ STEP_FAILURES: list[tuple[str, str]] = []
     "-g/-ng",
     default=False,
     type=bool,
-    help="Run steps that write to the grapher DB: grapher:// upserts and every viz:// step except viz://static _(OWID staff only, DB access required)_",
+    help="Run steps that write to the grapher DB: grapher:// upserts and viz:// steps _(OWID staff only, DB access required)_",
 )
 @click.option(
     "--export/--no-export",
@@ -262,23 +262,17 @@ def main_cli(
             modified_steps = _modified_steps(includes=steps, exact_match=exact_match, files_changed=files_changed)
 
             # `--modified` surfaces modified viz/export steps (chart, explorer, bespoke, export recipes) by
-            # design, but they're only buildable when the flag for their destination is passed.
+            # design, but they're only buildable when their flag is passed (see construct_subdag).
             # When a branch edits only such a recipe (e.g. a single `<explorer>.<key>.config.yml`),
             # without this we would exclude it downstream and crash with "No steps matched".
-            # Enable the flag for each destination the modified steps write to (grapher DB, external
-            # service), so the viz/export step actually rebuilds. This applies whether or not the run
-            # is filtered below.
-            from etl.steps import Destination, step_destination
-
-            destinations = {step_destination(s) for s in modified_steps if "://" in s}
-            if not grapher and Destination.GRAPHER_DB in destinations:
+            # Enable the flag the modified steps need, so they actually rebuild. This applies whether
+            # or not the run is filtered below.
+            if not grapher and any(s.startswith(GRAPHER_FLAG_PREFIXES) for s in modified_steps):
                 grapher = True
-                click.echo("Detected modified step(s) writing to the grapher DB; enabling --grapher for this run.")
-            if not export and Destination.EXTERNAL in destinations:
+                click.echo("Detected modified viz:// step(s); enabling --grapher for this run.")
+            if not export and any(s.startswith(EXPORT_FLAG_PREFIXES) for s in modified_steps):
                 export = True
-                click.echo(
-                    "Detected modified step(s) writing to external destinations; enabling --export for this run."
-                )
+                click.echo("Detected modified export:// step(s); enabling --export for this run.")
 
             if global_changes:
                 # These files aren't under etl/steps/ or snapshots/, so _modified_steps would see
@@ -510,21 +504,16 @@ def sanity_check_db_settings(grapher_user_id) -> None:
 
 def construct_full_dag(dag: DAG) -> DAG:
     """Construct full DAG."""
-    from etl.steps import Destination, step_destination
 
     # Make sure we don't have both public and private steps in the same DAG
     _check_public_private_steps(dag)
 
-    # A step that writes to the grapher DB (viz://chart, viz://explorer, viz://bespoke) needs its
-    # grapher-channel inputs upserted first: add the corresponding grapher:// steps as dependencies.
+    # For viz:// steps, add the grapher:// steps that are needed to upsert their inputs to DB.
     for step in list(dag.keys()):
-        if step_destination(step) == Destination.GRAPHER_DB:
+        if step.startswith("viz://"):
             for dep in list(dag[step]):
                 if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep):
-                    grapher_dep = re.sub(r"^(data|data-private)://", "grapher://", dep)
-                    # A grapher:// step's own upsert is not a dependency of itself.
-                    if grapher_dep != step:
-                        dag[step].add(grapher_dep)
+                    dag[step].add(re.sub(r"^(data|data-private)://", "grapher://", dep))
 
     # Add all grapher steps
     dag.update(_grapher_steps(dag, private=True))
@@ -555,53 +544,60 @@ def construct_subdag(
     if not excludes:
         excludes = []
 
+    # Steps that write to the grapher DB (grapher:// upserts and viz:// steps) run only with --grapher;
+    # steps that write to external destinations (export://, i.e. R2 and GitHub) only with --export.
+    if not grapher:
+        excludes.append(_prefix_pattern(GRAPHER_FLAG_PREFIXES))
+    if not export:
+        excludes.append(_prefix_pattern(EXPORT_FLAG_PREFIXES))
+
     # Exclude private steps
     if not private:
         excludes.append("private://.*")
 
-    # Flags name destinations, not step types: skip every step whose destination's flag was not passed.
-    # Each step class states where it writes (see `etl.steps.Destination`), so a new step type or a
-    # channel changing destination needs no change here.
-    gated_steps = _steps_gated_by_flags(dag, grapher=grapher, export=export)
-
     # Get subdag based on includes and excludes
-    subdag = filter_to_subgraph(
-        dag, includes=includes, excludes=excludes, exclude_steps=gated_steps, only=only, exact_match=exact_match
-    )
+    subdag = filter_to_subgraph(dag, includes=includes, excludes=excludes, only=only, exact_match=exact_match)
 
     if not subdag:
-        # No steps found. Either the requested step exists but was skipped because the flag for
-        # its destination is missing, or (most likely) the argument was misspelled. Say which.
-        _explain_gated_matches(includes, exact_match, gated_steps)
+        # No steps found. Either the requested step exists but was skipped because its flag is
+        # missing, or (most likely) the argument was misspelled. Say which.
+        _explain_missing_flags(dag, includes, exact_match, grapher=grapher, export=export)
         _find_closest_matches(" ".join(orig_includes or []), dag)
         sys.exit(1)
 
     return subdag
 
 
-def _steps_gated_by_flags(dag: DAG, grapher: bool, export: bool) -> set[str]:
-    """Steps in `dag` that must be skipped because the flag for their destination was not passed."""
-    from etl.steps import Destination, graph_nodes, step_destination
-
-    flag_passed = {Destination.LOCAL: True, Destination.GRAPHER_DB: grapher, Destination.EXTERNAL: export}
-    return {step for step in graph_nodes(dag) if not flag_passed[step_destination(step)]}
+# Step types gated by each flag. grapher:// upserts and viz:// steps write to the grapher DB of the
+# targeted environment; export:// steps write to shared destinations (R2, GitHub).
+GRAPHER_FLAG_PREFIXES = ("grapher://", "viz://")
+EXPORT_FLAG_PREFIXES = ("export://",)
 
 
-def _explain_gated_matches(includes: list[str], exact_match: bool, gated_steps: set[str]) -> None:
+def _prefix_pattern(prefixes: tuple[str, ...]) -> str:
+    return "^(?:" + "|".join(re.escape(p) for p in prefixes) + ")"
+
+
+def _explain_missing_flags(dag: DAG, includes: list[str], exact_match: bool, grapher: bool, export: bool) -> None:
     """Tell the user which requested steps were skipped for lack of a flag, and which flag to pass."""
-    from etl.steps import Destination, step_destination
+    from etl.steps import graph_nodes
 
+    gated = []
+    if not grapher:
+        gated.append((GRAPHER_FLAG_PREFIXES, "writes to the grapher DB; pass --grapher to run it."))
+    if not export:
+        gated.append((EXPORT_FLAG_PREFIXES, "writes to an external destination (R2, GitHub); pass --export to run it."))
     if exact_match:
-        matched = [step for step in includes if step in gated_steps]
+        requested = [step for step in includes if step in dag]
     else:
         patterns = [re.compile(p) for p in includes]
-        matched = sorted(step for step in gated_steps if any(p.search(step) for p in patterns))
-    explanation = {
-        Destination.GRAPHER_DB: "writes to the grapher DB; pass --grapher to run it.",
-        Destination.EXTERNAL: "writes to an external destination (R2, GitHub); pass --export to run it.",
-    }
-    for step in matched[:10]:
-        print(f"`{step}` {explanation[step_destination(step)]}")
+        requested = sorted(step for step in graph_nodes(dag) if any(p.search(step) for p in patterns))
+    shown = 0
+    for step in requested:
+        for prefixes, explanation in gated:
+            if step.startswith(prefixes) and shown < 10:
+                print(f"`{step}` {explanation}")
+                shown += 1
 
 
 def run_steps(
