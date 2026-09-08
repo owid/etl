@@ -4,7 +4,6 @@ definitions:
     presentation:
       topic_tags:
         - Cancer
-      attribution_short: ICBP SURVMARK-2
       grapher_config:
         note: To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
     processing_level: minor
