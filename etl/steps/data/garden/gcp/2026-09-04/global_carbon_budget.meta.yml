@@ -15,6 +15,9 @@ definitions:
     - "CO₂ emissions per capita are calculated by dividing emissions by population. They represent the average emissions per person in a country or region. To learn more about how different metrics capture the distribution of CO₂ emissions, read our article: [Per capita, national, historical: how do countries compare on CO2 metrics?](https://ourworldindata.org/co2-emissions-metrics)"
   per_capita_description_processing: |-
     - To calculate CO₂ emissions per capita, we divide the original data by a country's estimated population. These estimates come from our population dataset based on [multiple sources](https://ourworldindata.org/population-sources).
+  land_use_change_description_processing: |-
+    - Emissions from land-use change are estimated by three bookkeeping models: BLUE, OSCAR, and LUCE. For each country, we use the average of the three models, which is also what the Global Carbon Project uses for its own national and global estimates.
+    - Emissions from land-use change for the World are taken from the Global Carbon Project's global estimates, which are also the average of the three models.
   # Map colour for the first (net-negative / carbon-sink) bin on land-use-inclusive maps, where values can fall below zero.
   color_carbon_sink: &color_carbon_sink "#74c0bd"
   # Common fields to be used in all indicators (unless overridden for specific indicators below).
@@ -87,7 +90,8 @@ tables:
           - *per_capita_description_key
           - *international_aviation_description_key
         description_processing: |-
-          {definitions.common.description_processing}{definitions.per_capita_description_processing}
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         unit: tonnes per person
         short_unit: t/person
         display:
@@ -165,7 +169,8 @@ tables:
           - The data comes from the Global Carbon Budget. Fossil CO₂ emissions are estimated using national statistics on energy use — such as coal, oil, and gas consumption — and industrial production, particularly cement. These figures are converted into CO₂ emissions using standardized emission factors. For more details, read [the Global Carbon Budget paper](https://doi.org/10.5194/essd-15-5301-2023).
           - *per_capita_description_key
         description_processing: |-
-          {definitions.common.description_processing}{definitions.per_capita_description_processing}
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
         presentation:
           title_public: CO₂ emissions per capita
           ##################################################################################################################
@@ -411,6 +416,9 @@ tables:
         unit: "tonnes"
         short_unit: "t"
         description_short: "Cumulative emissions of carbon dioxide (CO₂) from land-use change since the first year of available data, measured in tonnes."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.land_use_change_description_processing}
         presentation:
           grapher_config:
             subtitle: Emissions from [land-use change](#dod:land-use-change-emissions) can be positive or negative depending on whether these changes emit (positive) or sequester (negative) carbon.
@@ -436,6 +444,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: "Cumulative emissions of carbon dioxide (CO₂) from land-use change since the first year of available data, measured as a percentage of global cumulative emissions of CO₂ from land-use change."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.land_use_change_description_processing}
         presentation:
           grapher_config:
             subtitle: Emissions from [land-use change](#dod:land-use-change-emissions) can be positive or negative depending on whether these changes emit (positive) or sequester (negative) carbon. Cumulative emissions are the running sum of emissions since 1850.
@@ -562,6 +573,9 @@ tables:
         unit: "tonnes"
         short_unit: "t"
         description_short: "Total cumulative emissions of carbon dioxide (CO₂), including land-use change, since the first year of available data, measured in tonnes."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.land_use_change_description_processing}
         presentation:
           grapher_config:
             subtitle: Emissions include those from [fossil fuels and industry](#dod:fossilemissions), and [land-use change](#dod:land-use-change-emissions). They are measured as the cumulative total since 1850, in tonnes.
@@ -589,6 +603,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: "Total cumulative emissions of carbon dioxide (CO₂), including land-use change, since the first year of available data, measured as a percentage of global total cumulative emissions of CO₂ (including land-use change)."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.land_use_change_description_processing}
         presentation:
           grapher_config:
             subtitle: Emissions include those from [fossil fuels and industry](#dod:fossilemissions), and [land-use change](#dod:land-use-change-emissions). This is measured as the cumulative total since 1850.
@@ -837,6 +854,9 @@ tables:
         unit: "tonnes"
         short_unit: "t"
         description_short: "Annual emissions of carbon dioxide (CO₂) from land-use change, measured in tonnes."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.land_use_change_description_processing}
         presentation:
           grapher_config:
             subtitle: Emissions from [land-use change](#dod:land-use-change-emissions) can be positive or negative depending on whether these changes emit (positive) or sequester (negative) carbon.
@@ -862,6 +882,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: "Annual emissions of carbon dioxide (CO₂) from land-use change, measured as a percentage of global emissions of CO₂ from land-use change in the same year."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.land_use_change_description_processing}
         presentation:
           grapher_config:
             title: Share of global CO₂ emissions from land-use change
@@ -893,6 +916,10 @@ tables:
         display:
           shortUnit: t
         description_short: "Annual emissions of carbon dioxide (CO₂) from land-use change, measured in tonnes per person."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
+          {definitions.land_use_change_description_processing}
         description_key:
           - *per_capita_description_key
           - *production_emissions_description_key
@@ -1043,6 +1070,9 @@ tables:
         unit: "tonnes"
         short_unit: "t"
         description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured in tonnes."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.land_use_change_description_processing}
         presentation:
           grapher_config:
             subtitle: Emissions include those from [fossil fuels and industry](#dod:fossilemissions), and [land-use change](#dod:land-use-change-emissions). They are measured in tonnes.
@@ -1070,6 +1100,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured as a percentage of global total emissions of CO₂ in the same year."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.land_use_change_description_processing}
         presentation:
           grapher_config:
             title: Share of global CO₂ emissions including land-use change
@@ -1100,6 +1133,10 @@ tables:
         display:
           shortUnit: t
         description_short: "Annual emissions of carbon dioxide (CO₂), including land-use change, measured in tonnes per person."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.per_capita_description_processing}
+          {definitions.land_use_change_description_processing}
         description_key:
           - *per_capita_description_key
           - *production_emissions_description_key
@@ -1131,11 +1168,17 @@ tables:
         unit: "kilograms per international-$"
         short_unit: "kg/$"
         description_short: "Annual total emissions of carbon dioxide (CO₂), including land-use change, measured in kilograms per dollar of GDP (2011 international-$)."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.land_use_change_description_processing}
       emissions_total_including_land_use_change_per_unit_energy:
         title: "CO₂ emissions including land-use change per unit energy"
         unit: "grams per kilowatt-hour"
         short_unit: "g/kWh"
         description_short: "Carbon dioxide (CO₂) emitted per unit of [primary energy consumption](#dod:primaryenergy), measured in grams of CO₂ per [kilowatt-hour](#dod:watt-hours). [Land-use change emissions](#dod:land-use-change-emissions) are included."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.land_use_change_description_processing}
         display:
           shortUnit: g
           numDecimalPlaces: 0
@@ -1207,6 +1250,9 @@ tables:
         unit: "tonnes"
         short_unit: "t"
         description_short: "Annual growth in total emissions of carbon dioxide (CO₂), including land-use change, measured in tonnes."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.land_use_change_description_processing}
       pct_growth_emissions_total:
         title: "Annual CO₂ emissions growth (%)"
         unit: "%"
@@ -1217,6 +1263,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: "Annual percentage growth in total emissions of carbon dioxide (CO₂), including land-use change."
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.land_use_change_description_processing}
       pct_traded_emissions:
         title: "Share of annual CO₂ emissions embedded in trade"
         unit: "%"

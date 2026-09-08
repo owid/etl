@@ -105,7 +105,7 @@ steps:
   # supply (energy_mix, TES). This is the TES-based successor to the Global Carbon Budget's own
   # substitution-method emissions-per-energy indicator.
   data://garden/energy/2026-06-30/carbon_intensity_of_energy:
-    - data://garden/gcp/2025-11-13/global_carbon_budget
+    - data://garden/gcp/2026-09-04/global_carbon_budget
     - data://garden/energy/2026-06-30/energy_mix
   data://grapher/energy/2026-06-30/carbon_intensity_of_energy:
     - data://garden/energy/2026-06-30/carbon_intensity_of_energy

@@ -55,19 +55,19 @@ steps:
   # CO₂ and greenhouse gas emissions explorer.
   #
   export://explorers/emissions/latest/co2:
-    - data://grapher/gcp/2025-11-13/global_carbon_budget
+    - data://grapher/gcp/2026-09-04/global_carbon_budget
     - data://grapher/emissions/2025-12-04/national_contributions
 
   #
   # GCP - Global Carbon Budget.
   #
-  data://garden/gcp/2025-11-13/global_carbon_budget:
+  data://garden/gcp/2026-09-04/global_carbon_budget:
     - data://garden/wb/2026-07-01/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/energy/2026-05-05/primary_energy_consumption
-    - data://meadow/gcp/2025-11-13/global_carbon_budget:
+    - data://meadow/gcp/2026-09-04/global_carbon_budget:
       - snapshot://gcp/2025-11-13/global_carbon_budget_fossil_co2_emissions.csv
       - snapshot://gcp/2025-11-13/global_carbon_budget_land_use_change_emissions.xlsx
       - snapshot://gcp/2025-11-13/global_carbon_budget_global_emissions.xlsx
@@ -75,8 +75,8 @@ steps:
   #
   # GCP - Global Carbon Budget.
   #
-  data://grapher/gcp/2025-11-13/global_carbon_budget:
-    - data://garden/gcp/2025-11-13/global_carbon_budget
+  data://grapher/gcp/2026-09-04/global_carbon_budget:
+    - data://garden/gcp/2026-09-04/global_carbon_budget
   #
   # IPCC - Emission Factor Database.
   #
@@ -110,7 +110,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/emissions/2025-12-04/national_contributions
     - data://garden/energy/2026-05-05/primary_energy_consumption
-    - data://garden/gcp/2025-11-13/global_carbon_budget
+    - data://garden/gcp/2026-09-04/global_carbon_budget
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2024-07-15/population
   #
@@ -118,7 +118,7 @@ steps:
   #
   data://garden/emissions/2026-03-05/gdp_and_co2_decoupling:
     - data://garden/worldbank_wdi/2026-07-27/wdi
-    - data://garden/gcp/2025-11-13/global_carbon_budget
+    - data://garden/gcp/2026-09-04/global_carbon_budget
     - data://garden/regions/2023-01-01/regions
   #
   # Decoupling of GDP and CO2.
