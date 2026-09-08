@@ -19,8 +19,8 @@ def run() -> None:
     #
     # Save outputs.
     #
-    # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata)
+    # Initialize a new grapher dataset.
+    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
 
-    # Save changes in the new grapher dataset.
+    # Save grapher dataset.
     ds_grapher.save()

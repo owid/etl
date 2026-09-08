@@ -1183,3 +1183,8 @@ steps:
   # archived; last active in e2c57887abcb on 2026-09-07
   export://multidim/health/latest/vaccination_introductions:
     - data://grapher/who/2025-07-15/vaccination_introductions
+  # archived; last active in ae169d2bd32f on 2026-09-08
+  data://grapher/cancer/2025-02-17/gco_cancer_survival:
+    - data://garden/cancer/2025-02-17/gco_cancer_survival:
+      - data://meadow/cancer/2025-02-17/gco_cancer_survival:
+        - snapshot://cancer/2025-02-17/gco_cancer_survival.csv
