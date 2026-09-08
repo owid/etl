@@ -49,7 +49,6 @@ log = structlog.get_logger()
 
 DAG = dict[str, set[str]]
 
-
 # Dictionary to store metadata changes for each dataset if INSTANT flag is set
 INSTANT_METADATA_DIFF = {}
 
