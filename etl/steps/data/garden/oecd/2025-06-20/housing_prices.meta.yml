@@ -46,17 +46,17 @@ tables:
           - The index is normalized to 2015 prices, so its 2015 value is set to 100. A year with a value of 120 indicates that the price to rent ratio is 20% higher than in 2015.
       std_price_income_ratio:
         description_short: Ratio of house prices to income, compared to the long-term average (since 1980). The average is set to 100.
-        description_from_producer: The standardised price-income ratio shows the current price-income ratio relative to its long-term average. The long-term average, which is used as a reference value, is calculated over the whole period available when the indicator begins after 1980 or 1980 if the indicator is available over a longer time period.
+        description_from_producer: The standardized price-income ratio shows the current price-income ratio relative to its long-term average. The long-term average, which is used as a reference value, is calculated over the whole period available when the indicator begins after 1980 or 1980 if the indicator is available over a longer time period.
         description_key:
-          - The standardised price-income ratio is a measure of the affordability of housing, showing how house prices compare to household income relative to their long-term average.
-          - To calculate the standardised price-income ratio, first the nominal house prices are divided by nominal disposable income per head. Then, the long-term average of this ratio is calculated for the period from 1980 to now. This average is set to 100, and the current ratio is expressed relative to this average.
+          - The standardized price-income ratio is a measure of the affordability of housing, showing how house prices compare to household income relative to their long-term average.
+          - To calculate the standardized price-income ratio, first the nominal house prices are divided by nominal disposable income per head. Then, the long-term average of this ratio is calculated for the period from 1980 to now. This average is set to 100, and the current ratio is expressed relative to this average.
           - A value above 100 indicates that the current price-income ratio is higher than the long-term average, suggesting that housing is less affordable than it has been historically. A value below 100 indicates that the current price-income ratio is lower than the long-term average, suggesting that housing is more affordable than it has been historically.
       std_price_rent_ratio:
         description_short: Ratio of house prices to rent, compared to the long-term average (since 1980). The average is set to 100.
-        description_from_producer: The standardised price-rent ratio shows the current price-rent ratio relative to its long-term average. The long-term average, which is used as a reference value, is calculated over the whole period available when the indicator begins after 1980 or 1980 if the indicator is available over a longer time period.
+        description_from_producer: The standardized price-rent ratio shows the current price-rent ratio relative to its long-term average. The long-term average, which is used as a reference value, is calculated over the whole period available when the indicator begins after 1980 or 1980 if the indicator is available over a longer time period.
         description_key:
-          - The standardised price-rent ratio is a measure of the cost of buying a home compared to renting, relative to its long-term average.
-          - To calculate the standardised price-rent ratio, first the nominal house prices are divided by nominal rent prices. Then, the long-term average of this ratio is calculated for the period from 1980 to now. This average is set to 100, and the current ratio is expressed relative to this average.
+          - The standardized price-rent ratio is a measure of the cost of buying a home compared to renting, relative to its long-term average.
+          - To calculate the standardized price-rent ratio, first the nominal house prices are divided by nominal rent prices. Then, the long-term average of this ratio is calculated for the period from 1980 to now. This average is set to 100, and the current ratio is expressed relative to this average.
           - A value above 100 indicates that the current price-rent ratio is higher than the long-term average, suggesting that it is more expensive to buy a home relative to renting than it has been historically. A value below 100 indicates that the current price-rent ratio is lower than the long-term average, suggesting that it is more affordable to buy a home relative to renting than it has been historically.
 
 

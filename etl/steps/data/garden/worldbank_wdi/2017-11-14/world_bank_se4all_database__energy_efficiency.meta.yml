@@ -62,7 +62,7 @@ tables:
         title: GDP (2011 USD PPP)
         unit: 2011 USD PPP
         description_short: |-
-          GDP (2011 USD PPP): Gross domestic product, measured at purchasing power parity in constant 2011 US dollars. The data is obtained from the World Development Indicators (WDI) database, refer to the WDI for further details on the indicator
+          GDP (2011 USD PPP): Gross domestic product, measured at purchasing power parity in constant 2011 US dollars. The data is obtained from the World Development Indicators (WDI) database, refer to the WDI for further details on the indicator.
       thermal_efficiency_in_power_supply__pct:
         title: Thermal efficiency in power supply (%)
         unit: '%'
@@ -74,7 +74,7 @@ tables:
         unit: TJ
         short_unit: TJ
         description_short: |-
-          Total final consumption (TJ): As defined by the IEA, total final consumption represents the sum of consumption in the end-use sectors and excludes energy used for transformation processes and energy used of the energy producing industries
+          Total final consumption (TJ): As defined by the IEA, total final consumption represents the sum of consumption in the end-use sectors and excludes energy used for transformation processes and energy used of the energy producing industries.
       total_primary_energy_supply__tj:
         title: Total primary energy supply (TJ)
         unit: TJ

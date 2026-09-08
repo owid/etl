@@ -3,7 +3,7 @@ meta:
     producer: International Labour Organization
     title: ILOSTAT
     description: |-
-      The ILO’s main online database, ILOSTAT, maintained by the Department of Statistics, is the world’s largest repository of labour market statistics. It covers all countries and regions and a wide range of labour-related topics, including employment, unemployment, wages, working time and labour productivity, to name a few. It includes time series going back as far as 1938; annual, quarterly and monthly labour statistics; country-level, regional and global estimates; and even projections of the main labour market indicators.
+      The ILO’s main online database, ILOSTAT, maintained by the Department of Statistics, is the world’s largest repository of labor market statistics. It covers all countries and regions and a wide range of labor-related topics, including employment, unemployment, wages, working time and labor productivity, to name a few. It includes time series going back as far as 1938; annual, quarterly and monthly labor statistics; country-level, regional and global estimates; and even projections of the main labor market indicators.
     title_snapshot: ILOSTAT - indicator dictionary
     description_snapshot: This file the ILOSTAT dictionary that provides additional details for the `indicator` column.
     citation_full: |-

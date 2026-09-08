@@ -1,8 +1,8 @@
 # Writing and style guide
 
 > Source: OWID Notion page — [Writing and style guide](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c).
-> Last synced from Notion: 2026-07-07
-> The check-metadata-style skill verifies this date on every run and refreshes this file from Notion when it is more than two months old. Commit refreshes via a PR.
+> Last synced from Notion: 2026-08-17
+> The check-metadata-style skill verifies this date on every run and refreshes this file from Notion when it is more than two weeks old. Commit refreshes via a PR.
 
 This guide establishes a uniform style for all OWID content to ensure consistency, clarity, and accuracy across our publications. The rules in this guide apply to all writing we do on OWID, whether in articles, topic pages, or charts.
 
@@ -44,19 +44,14 @@ One exception is when you directly refer to the page's title.
 - ❌ Our new energy page is live.
 - ✅ Our new Energy page is live.
 
-### Use title-case for topic page and data explorer titles
+### Use sentence case almost everywhere
 
-- ❌ (Topic page title) Animal welfare
-- ✅ (Topic page title) Animal Welfare
-
-### Use sentence-case everywhere else, including article titles
-
-Always use sentence-case throughout articles, data pages, and charts.
-
-- ❌ The Limits of our Personal Experience and the Value of Statistics
-- ✅ The limits of our personal experience and the value of statistics
-- ❌ Life Expectancy at Birth
-- ✅ Life expectancy at birth
+| Sentence case | Title case |
+|---|---|
+| Title of articles<br><br>❌ The Limits of our Personal Experience and the Value of Statistics<br>✅ The limits of our personal experience and the value of statistics | Title of topic pages<br><br>❌ Artificial intelligence<br>✅ Artificial Intelligence |
+| Title of charts<br><br>❌ Life Expectancy at Birth<br>✅ Life expectancy at birth | Headers of modular topic pages<br><br>❌ Key charts on energy<br>✅ Key Charts on Energy |
+| Headers of linear topic pages<br><br>❌ Understanding Labor Force Statistics: Participation, Unemployment, and Employment<br>✅ Understanding labor force statistics: participation, unemployment, and employment | |
+| Homepage components<br><br>❌ Updates and Announcements<br>✅ Updates and announcements | |
 
 ## Grammar and syntax
 
@@ -80,6 +75,20 @@ We always use "data" as a singular noun, never as a plural one.
 
 - ❌ The data published by OPHI are the most prominent multidimensional poverty data.
 - ✅ The data published by OPHI is the most prominent multidimensional poverty data.
+
+### Don't start chart subtitles with "The" if the next word works just as well
+
+Don't add "The" at the start of a subtitle if it isn't strictly required. (This rule also applies to `description_short` and `grapher_config.subtitle`, given ETL inheritance rules.)
+
+- ❌ The estimated number of deaths from drowning among children under 5.
+- ✅ Estimated number of deaths from drowning among children under 5.
+
+### Always finish chart subtitles with punctuation (typically a period)
+
+Chart subtitles should always end with punctuation, most likely a simple period. (This rule also applies to `description_short` and `grapher_config.subtitle`, given ETL inheritance rules.)
+
+- ❌ Estimated number of deaths from drowning among children under 5
+- ✅ Estimated number of deaths from drowning among children under 5.
 
 ## Short citations for charts
 

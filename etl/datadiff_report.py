@@ -95,6 +95,11 @@ class ValueDiff:
     # for numeric "changed" diffs.
     appeared_count: int = 0
     disappeared_count: int = 0
+    # Rows that changed but hold no comparable number on either side — a sentinel whose text was
+    # edited, say. Neither revisions nor coverage events, so they are tallied on their own rather
+    # than left to be inferred from `count` minus the other two, which would report them as
+    # revisions in the HTML breakdown.
+    not_scored_count: int = 0
 
     @property
     def pct(self) -> float:
@@ -173,6 +178,23 @@ class ColumnDiffResult:
     def is_metadata_only(self) -> bool:
         """A changed column whose diff carries no value changes at all — only metadata edits."""
         return self.kind == "changed" and not self.value_diffs
+
+    @property
+    def is_scored(self) -> bool:
+        """Whether this column's severity is a measured median BARD rather than the fallback.
+
+        False only for a genuinely categorical changed column, whose `severity` is the 1.0
+        "a category flip has no meaningful size" default. The report labels those "not scored"
+        instead of quoting a 100% median it never computed.
+
+        A column with no in-place revisions at all — only rows added or removed — is still scored:
+        its severity comes from the share of rows lost, which is measured, not a fallback. Only a
+        `changed` diff can be unscoreable, so the absence of one is never evidence of one.
+        """
+        changed = [v for v in self.value_diffs if v.kind == "changed"]
+        if self.kind != "changed" or not changed:
+            return True
+        return any(v.median_bard is not None for v in changed)
 
 
 @dataclass
@@ -265,6 +287,16 @@ class DatasetDiffResult:
     @property
     def removed_row_count(self) -> int:
         return sum(t.removed_row_count for t in self.tables)
+
+    @property
+    def not_scored_count(self) -> int:
+        """Changed rows carrying no comparable number on either side — an edited sentinel, say.
+
+        They score zero on both the anomaly and the coverage axis, since nothing moved and nothing
+        appeared or disappeared, so a dataset whose only change is one of these would otherwise be
+        summarized as having added data.
+        """
+        return sum(v.not_scored_count for t in self.tables for c in t.columns for v in c.value_diffs)
 
     @property
     def removed_labels(self) -> list[str]:
@@ -458,7 +490,7 @@ def dataset_watch_key(ds: DatasetDiffResult) -> tuple:
     return (tier_rank[ds.tier], lossy_first, -ds.severity, ds.path)
 
 
-def _tier_chip(severity: float, kind: ChangeKind = "changed", tier: Tier | None = None) -> str:
+def _tier_chip(severity: float, kind: ChangeKind = "changed", tier: Tier | None = None, scored: bool = True) -> str:
     """Colored triage chip for a single column: tier icon + its own median BARD score.
 
     Pass `tier` to override the severity-derived tier — a removed column is forced 🔴 regardless
@@ -467,11 +499,19 @@ def _tier_chip(severity: float, kind: ChangeKind = "changed", tier: Tier | None 
     dataset level — see `_rollup_tier_chip`, which a max-of-columns would make say "median" while
     actually showing the single worst column, and which saturates to 100% on any dataset wide
     enough that some column always has a genuine full anomaly (WDI-sized: ~1500 columns).
+
+    Pass `scored=False` for a column whose severity is the non-numeric 1.0 fallback rather than a
+    measured median: the chip then says "not scored" instead of claiming a 100% median that was
+    never computed.
     """
     tier = tier or _tier(severity)
     if tier == "none":
         return ""
-    label = {"removed": "removed", "new": "new"}.get(kind) or f"median anomaly score {format_score(severity)}"
+    if scored is False and kind == "changed":
+        # Unscoreable (categorical) column: severity is the 1.0 fallback, not a measurement.
+        label = "not scored (non-numeric)"
+    else:
+        label = {"removed": "removed", "new": "new"}.get(kind) or f"median anomaly score {format_score(severity)}"
     return f'<span class="chip tier {tier}">{TIER_ICONS[tier]} {_e(label)}</span>'
 
 
@@ -573,7 +613,8 @@ def _top_changes(
                     continue
                 if c.severity > 0:
                     pct = max((v.pct for v in c.value_diffs if v.kind != "new"), default=0.0)
-                    changes.append((c.severity, pct, ds.path, t.name, c.name, "anomaly"))
+                    axis = "anomaly" if c.is_scored else "unscored"
+                    changes.append((c.severity, pct, ds.path, t.name, c.name, axis))
                 elif c.coverage_severity > 0:
                     changes.append((c.coverage_severity, 0.0, ds.path, t.name, c.name, "coverage"))
     losses.sort(key=lambda r: (-r[0], r[2]))
@@ -627,13 +668,15 @@ def _render_value_diff(v: ValueDiff, sample_cap: int = SAMPLE_LIMIT) -> str:
         )
         head_note = f' <span class="head-note">— showing {what}{capped}</span>'
     breakdown = ""
-    if v.kind == "changed" and (v.appeared_count or v.disappeared_count):
-        revised = v.count - v.appeared_count - v.disappeared_count
-        bits = [f"{revised:,} revised"]
+    if v.kind == "changed" and (v.appeared_count or v.disappeared_count or v.not_scored_count):
+        revised = v.count - v.appeared_count - v.disappeared_count - v.not_scored_count
+        bits = [f"{revised:,} revised"] if revised else []
         if v.appeared_count:
             bits.append(f"{v.appeared_count:,} appeared")
         if v.disappeared_count:
             bits.append(f"{v.disappeared_count:,} disappeared")
+        if v.not_scored_count:
+            bits.append(f"{v.not_scored_count:,} not scored")
         breakdown = f' <span class="head-note">({", ".join(bits)})</span>'
     head = (
         f'<div class="vd-head {v.kind}">{_e(v.symbol)} {label}: '
@@ -662,7 +705,7 @@ def _render_value_diff(v: ValueDiff, sample_cap: int = SAMPLE_LIMIT) -> str:
 def _render_column(table_name: str, c: ColumnDiffResult, ds_path: str = "", sample_cap: int = SAMPLE_LIMIT) -> str:
     chips = "".join(f'<span class="chip">{_e(ch)}</span>' for ch in c.changes)
     dim = '<span class="chip dim">dim</span>' if c.is_dim else ""
-    tier = _tier_chip(c.severity, c.kind) if not c.is_dim else ""
+    tier = _tier_chip(c.severity, c.kind, scored=c.is_scored) if not c.is_dim else ""
     anchor = f' id="{_anchor(ds_path, table_name, c.name)}"' if ds_path else ""
     # Dims are navigation context, not indicators — the indicator tier filter skips them.
     # Metadata-only columns get their own filterable category ("meta") instead of a tier.
@@ -834,12 +877,18 @@ def render_html(report: DiffReport) -> str:
     n_meta_only = sum(1 for ds in report.datasets if ds.is_metadata_only)
     if n_meta_only:
         strip_bits.append(f"📝 {n_meta_only} metadata-only")
-    n_new_only = sum(
-        1 for ds in report.datasets if ds.change_kind == "changed" and ds.tier == "none" and not ds.is_metadata_only
-    )
+    untiered = [
+        ds for ds in report.datasets if ds.change_kind == "changed" and ds.tier == "none" and not ds.is_metadata_only
+    ]
+    # An edited sentinel scores zero on both axes without anything having been added, so it needs
+    # its own bucket rather than being swept in with the datasets that only gained data.
+    n_new_only = sum(1 for ds in untiered if not ds.not_scored_count)
     if n_new_only:
         strip_bits.append(f"➕ {n_new_only} new-data-only")
-    n_diff = sum(tier_counts.values()) + n_meta_only + n_new_only
+    n_unscored_only = sum(1 for ds in untiered if ds.not_scored_count)
+    if n_unscored_only:
+        strip_bits.append(f"🔤 {n_unscored_only} non-numeric-only")
+    n_diff = sum(tier_counts.values()) + n_meta_only + n_new_only + n_unscored_only
     if strip_bits and n_diff >= 2:
         tier_strip = (
             f'<div class="tier-strip">Of the {n_diff:,} dataset{"s" if n_diff != 1 else ""} with '
@@ -865,11 +914,12 @@ def render_html(report: DiffReport) -> str:
             cov_label = _tier_counts_label(
                 _col_tier_counts([c for t in d.tables for c in t.columns], score=lambda c: c.coverage_severity)
             )
-            meta_html = (
-                f'<span class="top-meta">{_e(cov_label)} column(s) w/ shifted coverage</span>'
-                if cov_label
-                else '<span class="top-meta">new data only</span>'
-            )
+            if cov_label:
+                meta_html = f'<span class="top-meta">{_e(cov_label)} column(s) w/ shifted coverage</span>'
+            elif d.not_scored_count:
+                meta_html = '<span class="top-meta">non-numeric value changes only</span>'
+            else:
+                meta_html = '<span class="top-meta">new data only</span>'
         else:
             n_cols = sum(len(t.changed_columns) for t in d.tables)
             n_tables = sum(1 for t in d.tables if t.any_change)
@@ -902,6 +952,11 @@ def render_html(report: DiffReport) -> str:
         if axis == "coverage":
             icon = "↕"
             meta = f"coverage churn {_e(format_score(severity))} (values appeared/disappeared)"
+        elif axis == "unscored":
+            # Categorical column: severity is the 1.0 fallback, not a measured median. Say so
+            # rather than quoting a 100% score that was never computed.
+            icon = TIER_ICONS.get(_tier(severity), "")
+            meta = f"not scored (non-numeric) · {pct:.0f}% of rows"
         else:
             icon = TIER_ICONS.get(_tier(severity), "")
             meta = f"median anomaly score {_e(format_score(severity))} · {pct:.0f}% of rows"

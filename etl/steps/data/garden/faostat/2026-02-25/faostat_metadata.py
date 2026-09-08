@@ -1078,3 +1078,4 @@ def run() -> None:
 # at runtime but do not match those patterns, so editing them alone does NOT trigger a rebuild here (or
 # in any downstream FAOSTAT step). After changing that harmonization, make a small edit anywhere in this
 # file (e.g. tweak this comment) to force this step's checksum to change and propagate the rebuild.
+# Last forced rebuild: 2026-08-14 (USSR-breakup annotations on FAOSTAT's own Europe and Asia aggregates).

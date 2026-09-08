@@ -52,6 +52,6 @@
     "shell-quote": "^1.10.0"
   },
   "dependencies": {
-    "js-yaml": "^4.3.0"
+    "js-yaml": "^4.3.1"
   }
 }

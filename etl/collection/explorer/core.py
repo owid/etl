@@ -52,6 +52,14 @@ class Explorer(Collection):
         """
         self._collection_type = "explorer"
 
+        # Explorers reach Grapher through the legacy TSV path, which has no equivalent of the
+        # multidim `grapherConfigSchema`. Setting it here would silently do nothing.
+        if self.grapher_schema is not None:
+            raise ValueError(
+                "`grapher_schema` is only supported for multidim collections, not explorers: "
+                "Grapher has no way to apply it to explorer view configs."
+            )
+
     @property
     def local_config_path(self) -> Path:
         # energy/latest/energy_prices#energy_prices -> export/multidim/energy/latest/energy_prices/config.yml

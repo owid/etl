@@ -14,7 +14,7 @@ tables:
         title: Number of described species
         unit: species
         description_short: |-
-          The number of identified and named species in each [taxonomic group](#dod:taxonomic_group), as of 2025. Since many species have not yet been described, this is a large underestimate of the total number of species in the world.
+          Number of identified and named species in each [taxonomic group](#dod:taxonomic_group), as of 2025. Since many species have not yet been described, this is a large underestimate of the total number of species in the world.
         description_key:
           - Since many species have not yet been described, this is a large underestimate of the total number of species in the world.
           - For a species to be formally described, it's description must be published in a scientific journal or book.

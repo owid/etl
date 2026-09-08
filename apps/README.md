@@ -19,7 +19,6 @@ Tooling built around the ETL pipeline. Most are exposed as subcommands of the un
 | [`indicator_upgrade`](indicator_upgrade/) | Match and remap indicators between old/new dataset versions | `etl indicator-upgrade` |
 | [`autoupdate`](autoupdate/) | Refresh autoupdate-enabled snapshots and open PRs on changes | `etl autoupdate` |
 | [`owidbot`](owidbot/) | GitHub bot that posts ETL/chart/data diffs on PRs | `etl owidbot` |
-| [`housekeeper`](housekeeper/) | Periodic catalog hygiene checks (e.g. chart review reminders) | `etl d housekeeper` |
 | [`backport`](backport/) | Bring legacy datasets and fasttrack imports into the ETL | `etl b run` / `etl b fasttrack` / `etl b migrate` |
 | [`cli`](cli/) | The unified `etl` click group that wires the subcommands above | — |
 | [`utils`](utils/) | Shared helpers (LLM clients, profiling, dataset mapping, …) | — |

@@ -21,7 +21,6 @@ WOMEN_TEACHER_PATTERN = r"percentage_of_teachers_in_(primary|secondary|tertiary)
 
 # Main chart configuration
 MULTIDIM_CONFIG = {
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
     "originUrl": "ourworldindata.org/education",
     "hideAnnotationFieldsInTitle": {"time": True},
     "hasMapTab": True,

@@ -1,19 +1,29 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
+{#-
+  Single-line fields below are emitted as double-quoted YAML with the escape chain
+  `replace('\\', '\\\\') | replace('"', '\\"') | replace('\n', '\\n')`.
+  Producer text routinely contains characters that break an unescaped scalar: a `"` in a
+  title ends the quoted string early, and a `: ` in a producer name makes a plain scalar
+  parse as a nested mapping. Both produced an unparseable .dvc before this was added.
+  Order matters — backslashes must be doubled before quotes are escaped, or the escape
+  character itself gets mangled. Multi-line prose (description, citation_full) uses block
+  scalars instead, which need no escaping.
+#}
 meta:
   origin:
     # Data product / Snapshot
-    title: "{{cookiecutter.title}}"
+    title: "{{cookiecutter.title | replace('\\', '\\\\') | replace('"', '\\"') | replace('\n', '\\n')}}"
     {%- if cookiecutter.description %}
     description: |-
       {{cookiecutter.description.replace("\n", "\n      ")}}
     {%- endif %}
     date_published: "{{cookiecutter.date_published}}"
     {%- if cookiecutter.origin_version %}
-    version_producer: {{cookiecutter.origin_version}}
+    version_producer: "{{cookiecutter.origin_version | replace('\\', '\\\\') | replace('"', '\\"') | replace('\n', '\\n')}}"
     {%- endif %}
     {%- if cookiecutter.title_snapshot %}
-    title_snapshot: {{cookiecutter.title_snapshot}}
+    title_snapshot: "{{cookiecutter.title_snapshot | replace('\\', '\\\\') | replace('"', '\\"') | replace('\n', '\\n')}}"
     {%- endif %}
     {%- if cookiecutter.description_snapshot %}
     description_snapshot: |-
@@ -21,14 +31,14 @@ meta:
     {%- endif %}
 
     # Citation
-    producer: {{cookiecutter.producer}}
+    producer: "{{cookiecutter.producer | replace('\\', '\\\\') | replace('"', '\\"') | replace('\n', '\\n')}}"
     citation_full: |-
       {{cookiecutter.citation_full.replace("\n", "\n      ")}}
     {%- if cookiecutter.attribution %}
-    attribution: {{cookiecutter.attribution}}
+    attribution: "{{cookiecutter.attribution | replace('\\', '\\\\') | replace('"', '\\"') | replace('\n', '\\n')}}"
     {%- endif %}
     {%- if cookiecutter.attribution_short %}
-    attribution_short: {{cookiecutter.attribution_short}}
+    attribution_short: "{{cookiecutter.attribution_short | replace('\\', '\\\\') | replace('"', '\\"') | replace('\n', '\\n')}}"
     {%- endif %}
 
     # Files
@@ -40,7 +50,7 @@ meta:
 
     # License
     license:
-      name: {{cookiecutter.license_name}}
+      name: "{{cookiecutter.license_name | replace('\\', '\\\\') | replace('"', '\\"') | replace('\n', '\\n')}}"
       {%- if cookiecutter.license_url %}
       url: {{cookiecutter.license_url}}
       {%- endif %}

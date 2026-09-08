@@ -20,6 +20,6 @@ tables:
         unit: cases
       case_rate:
         title: Diphtheria case rate per 100,000 population
-        description_short: The number of diphtheria cases per 100,000 population.
+        description_short: Number of diphtheria cases per 100,000 population.
         unit: cases per 100,000 population
         processing_level: major

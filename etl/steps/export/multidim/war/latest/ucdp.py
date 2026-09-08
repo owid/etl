@@ -308,7 +308,7 @@ def _set_description_key(view, tb):
 
     if (view.d.estimate == "best_ci") or (view.d.indicator == "num_conflicts"):
         assert keys[-1].startswith('We show here the "best" death')
-        keys = keys[:-1] + [None]
+        keys = keys[:-1]
 
     return keys
 
@@ -369,7 +369,7 @@ def _set_subtitle(view):
                 # NOTE: update this on every stable/quarterly UCDP update — it must
                 # describe exactly which years are preliminary/incomplete in the
                 # preview dataset (see the checklist in the owid-issues template).
-                subtitle += " Data for 2026 is incomplete and includes deaths within the first quarter."
+                subtitle += " Data for 2026 is incomplete and includes deaths within the first half of the year."
             return subtitle
         elif view.d.indicator == "death_rate":
             return subtitle_template.format(placeholder=f", per 100,000 people. Included are {dod}")

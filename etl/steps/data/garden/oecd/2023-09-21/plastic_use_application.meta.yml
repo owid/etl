@@ -90,7 +90,7 @@ tables:
         display:
           numDecimalPlaces: 0
       transportation__tyres:
-        title: Transportation tyres
+        title: Transportation tires
         unit: 'tonnes'
         short_unit: 't'
         display:

@@ -185,3 +185,15 @@ steps:
       - data://meadow/cow/2024-07-26/national_material_capabilities:
         - snapshot://cow/2024-07-26/national_material_capabilities.csv
       - data://garden/countries/2023-09-29/cow_ssm
+  # archived; last active in 7766d5e8b96c on 2026-08-27
+  data://grapher/health_expenditure/2025-07-10/health_expenditure_omm:
+    - data://garden/health_expenditure/2025-07-10/health_expenditure_omm:
+      - data://garden/oecd/2026-07-07/health_expenditure:
+        - data://garden/regions/2023-01-01/regions
+        - data://meadow/oecd/2026-07-07/health_expenditure:
+          - snapshot://oecd/2026-07-07/health_expenditure.csv
+      - data://garden/health_expenditure/2025-03-04/lindert
+      - data://garden/oecd/2025-03-04/health_expenditure_1993
+  # archived; last active in 7766d5e8b96c on 2026-08-27
+  data://grapher/oecd/2026-07-07/health_expenditure:
+    - data://garden/oecd/2026-07-07/health_expenditure

@@ -113,7 +113,7 @@ tables:
         title: 6.2.1 - Proportion of population using safely managed sanitation services, by urban/rural (%) - SH_SAN_SAFE - All areas
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of the total population using safely managed sanitation services
+        description_short: Proportion of the total population using safely managed sanitation services.
         description_key:
           - Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
           - "Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-06-02-01a.pdf and https://unstats.un.org/sdgs/metadata/files/Metadata-06-02-01b.pdf"
@@ -184,7 +184,7 @@ tables:
         short_unit: "%"
         description_short: A safely managed drinking water service is defined as one located on premises, available when needed and free from contamination.
         description_from_producer: |-
-          "The proportion of the population using safely managed drinking water services is defined as the proportion of population using an improved drinking water source which is accessible on premises, available when needed and free from faecal and priority chemical contamination. ‘Improved’ drinking water sources include: piped supplies, boreholes and tubewells, protected dug wells, protected springs, rainwater, water kiosks, and packaged and delivered water."
+          "The proportion of the population using safely managed drinking water services is defined as the proportion of population using an improved drinking water source which is accessible on premises, available when needed and free from fecal and priority chemical contamination. ‘Improved’ drinking water sources include: piped supplies, boreholes and tubewells, protected dug wells, protected springs, rainwater, water kiosks, and packaged and delivered water."
         presentation:
           title_public: Share of the population using safely managed drinking water
           attribution_short: WHO/UNICEF JMP
@@ -251,13 +251,13 @@ tables:
         - Data comes primarily from national surveys, where respondents report their own direct experiences. Reports involving intermediaries (e.g. a bribe paid through someone else) are included, but second-hand accounts from other household members are excluded.
         - When national data is unavailable or insufficient, estimates may draw on [Global Corruption Barometer (GCB)](https://www.transparency.org/en/gcb) data, provided it aligns closely with UNODC definitions. These estimates are reviewed and validated by national authorities, usually through national statistics offices.
         - In some cases — such as Peru and Panama — UNODC estimates differ significantly from the GCB's figures. These differences may arise from variations in survey scope (e.g. UNODC's surveys inquire about any contact with public officials, while GCB asks about contact concerning a few core services), sample size, how people without recent contact with officials are handled, or how surveys are conducted (e.g. phone vs. in-person).
-        - Earlier surveys often excluded people who were asked for a bribe but refused to pay. This likely led to underestimates of the prevalence of bribery. The UNODC aims to correct this by applying standardised methods across countries.
+        - Earlier surveys often excluded people who were asked for a bribe but refused to pay. This likely led to underestimates of the prevalence of bribery. The UNODC aims to correct this by applying standardized methods across countries.
         description_from_producer: |-
-          This indicator is defined as the percentage of persons who paid at least one bribe (gave a public official money, a gift or counter favour) to a public official, or were asked for a bribe by these public officials, in the last 12 months, as a percentage of persons who had at least one contact with a public official in the same period.
+          This indicator is defined as the percentage of persons who paid at least one bribe (gave a public official money, a gift or counter favor) to a public official, or were asked for a bribe by these public officials, in the last 12 months, as a percentage of persons who had at least one contact with a public official in the same period.
 
           In the International Classification of Crime for Statistical Purposes (ICCS), bribery is defined as: ‘Promising, offering, giving, soliciting, or accepting an undue advantage to or from a public official or a person who directs or works in a private sector entity, directly or indirectly, in order that the person act or refrain from acting in the exercise of his or her official duties’ (ICCS Category 07031).
 
-          This definition is based on definitions of bribery of national public officials, bribery of foreign public officials and official of international organisations and bribery in the private sector that are contained in the United Nations Convention against Corruption (articles 15, 16, and 21). While the concept of bribery is broader, as it includes also actions such as promising or offering, and it covers both public and private sector, this indicator focuses on specific forms of bribery that are more measurable (the giving and/or requesting of bribes) and it limits the scope to the public sector.
+          This definition is based on definitions of bribery of national public officials, bribery of foreign public officials and official of international organizations and bribery in the private sector that are contained in the United Nations Convention against Corruption (articles 15, 16, and 21). While the concept of bribery is broader, as it includes also actions such as promising or offering, and it covers both public and private sector, this indicator focuses on specific forms of bribery that are more measurable (the giving and/or requesting of bribes) and it limits the scope to the public sector.
 
           The concept of undue advantage is operationalized by reference to giving of money (in addition to an official fee), gifts or provision of a service requested/offered by/to a public official in exchange for a special treatment. This indicator captures the often called ‘administrative bribery’, which is often intended as the type of bribery affecting citizens in their dealings with public administrations and/or civil servants.
 

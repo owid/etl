@@ -34,7 +34,6 @@ from owid import catalog
 from owid.catalog import s3_utils
 from owid.catalog.api.utils import DEFAULT_CATALOG_URL
 from owid.catalog.core.datasets import DEFAULT_FORMATS
-from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 from tqdm import tqdm
 
@@ -43,7 +42,6 @@ from etl import config, files, git_helpers, paths
 from etl.config import OWID_ENV, TLS_VERIFY
 from etl.db import get_engine
 from etl.grapher import helpers as gh
-from etl.grapher import model as gm
 from etl.helpers import get_metadata_path
 from etl.snapshot import Snapshot
 
@@ -1117,7 +1115,7 @@ class GrapherStep(Step):
             # cleaning up ghost resources could be unsuccessful if someone renamed short_name of a variable
             # and remapped it in chart-sync. In that case, we cannot delete old variables because they are still
             # needed for remapping. However, we can delete it on next ETL run
-            success = self._cleanup_ghost_resources(engine, dataset_upsert_results, catalog_paths)
+            success = self._delete_ghost_variables(admin_api, preloaded_checksums, catalog_paths)
 
             # set checksum and updatedAt timestamps after all data got inserted
             if success:
@@ -1135,33 +1133,31 @@ class GrapherStep(Step):
         """Checksum of a grapher step is the same as checksum of the underyling data://grapher step."""
         return self.data_step.checksum_input()
 
-    @classmethod
-    def _cleanup_ghost_resources(
-        cls,
-        engine: Engine,
-        dataset_upsert_results,
+    @staticmethod
+    def _delete_ghost_variables(
+        admin_api: AdminAPI,
+        preloaded_checksums: dict,
         catalog_paths: list[str],
     ) -> bool:
         """
-        Cleanup all ghost variables that weren't upserted
+        Remove the dataset's variables that this run didn't upsert.
+
         NOTE: we can't just remove all dataset variables before starting this step because
         there could be charts that use them and we can't remove and recreate with a new ID
 
-        Return True if cleanup was successfull, False otherwise.
+        `preloaded_checksums` was read before the upserts, so it holds exactly the variables
+        that already existed; anything created during this run isn't in it and can't be
+        mistaken for a ghost.
+
+        Return True if cleanup was successful, False otherwise.
         """
         import etl.grapher.to_db as db
 
-        # convert catalog_paths to variable_ids
-        with Session(engine) as session:
-            upserted_variable_ids = list(gm.Variable.catalog_paths_to_variable_ids(session, catalog_paths).values())
+        upserted = set(catalog_paths)
+        ghost_variable_ids = [row["id"] for path, row in preloaded_checksums.items() if path not in upserted]
 
-        # Try to cleanup ghost variables, but make sure to raise an error if they are used
-        # in any chart
-        success = db.cleanup_ghost_variables(
-            engine,
-            dataset_upsert_results.dataset_id,
-            upserted_variable_ids,
-        )
+        # Try to delete them, but make sure to raise an error if they are used in any chart
+        success = db.delete_ghost_variables(admin_api, ghost_variable_ids)
 
         # TODO: cleanup origins that are not used by any variable. We can do it in batch
         return success
@@ -1183,6 +1179,13 @@ class ExportStep(DataStep):
     def __str__(self) -> str:
         return f"export://{self.path}"
 
+    def can_execute(self, archive_ok: bool = True) -> bool:
+        sp = self._search_path
+        if not archive_ok and "/archive/" in sp.as_posix():
+            return False
+
+        return super().can_execute(archive_ok=archive_ok) or self._is_multidim_yaml_only()
+
     def run(self) -> None:
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
@@ -1198,11 +1201,30 @@ class ExportStep(DataStep):
                 DataStep._run_py_isolated(self)  # ty: ignore
             else:
                 DataStep._run_py(self)  # ty: ignore
+        elif self._is_multidim_yaml_only():
+            # YAML-only multidim: no .py, just a .config.yml. Run the default
+            # boilerplate (load_collection_config → create_collection → save).
+            self._run_multidim_yaml_only(sp)
 
         # save checksum (only update index.json, don't call ds.save() which iterates
         # table_names and would pick up custom JSON files written by the export script)
         ds.metadata.source_checksum = self.checksum_input()
         ds.metadata.save(ds._index_file)
+
+    def _is_multidim_yaml_only(self) -> bool:
+        """True if this is an `export://multidim/...` step backed only by a `.config.yml`."""
+        if not self.path.startswith("multidim/"):
+            return False
+        return self._search_path.with_suffix(".config.yml").exists()
+
+    def _run_multidim_yaml_only(self, search_path: Path) -> None:
+        from etl.helpers import PathFinder
+
+        # Synthesise the `.py` path PathFinder expects; the file doesn't need to exist,
+        # PathFinder only parses namespace/version/short_name out of the path components.
+        paths_ = PathFinder(str(search_path.with_suffix(".py")))
+        collection = paths_.create_collection(config=paths_.load_collection_config())
+        collection.save()
 
     def checksum_output(self) -> str:
         # output checksum is checksum of all ingredients

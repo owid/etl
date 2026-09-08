@@ -116,7 +116,7 @@ views:
     config:
       title: 'Projected habitat loss for all species in 2050: Combined interventions'
       subtitle: |-
-        Projected habitat loss for mammal, bird and amphibian species by 2050 if all approaches are combined: (1) closing yield gaps; (2) halving food waste; (3) global adoption of healthy diets in line with nutritional requirements; and (4) the optimisation of agricultural production to avoid the most at-risk locations for habitat loss.
+        Projected habitat loss for mammal, bird and amphibian species by 2050 if all approaches are combined: (1) closing yield gaps; (2) halving food waste; (3) global adoption of healthy diets in line with nutritional requirements; and (4) the optimization of agricultural production to avoid the most at-risk locations for habitat loss.
   - dimensions:
       scenario: adoption_of_healthy_diets
       species_group: all_vertebrates
@@ -203,7 +203,7 @@ views:
     config:
       title: 'Projected habitat loss of mammals in 2050: Combined interventions'
       subtitle: |-
-        Projected habitat loss for mammal species by 2050 if all approaches are combined: (1) closing yield gaps; (2) halving food waste; (3) global adoption of healthy diets in line with nutritional requirements; and (4) the optimisation of agricultural production to avoid the most at-risk locations for habitat loss.
+        Projected habitat loss for mammal species by 2050 if all approaches are combined: (1) closing yield gaps; (2) halving food waste; (3) global adoption of healthy diets in line with nutritional requirements; and (4) the optimization of agricultural production to avoid the most at-risk locations for habitat loss.
   - dimensions:
       scenario: adoption_of_healthy_diets
       species_group: mammals
@@ -290,7 +290,7 @@ views:
     config:
       title: 'Projected habitat loss of birds in 2050: Combined interventions'
       subtitle: |-
-        Projected habitat loss for bird species by 2050 if all approaches are combined: (1) closing yield gaps; (2) halving food waste; (3) global adoption of healthy diets in line with nutritional requirements; and (4) the optimisation of agricultural production to avoid the most at-risk locations for habitat loss.
+        Projected habitat loss for bird species by 2050 if all approaches are combined: (1) closing yield gaps; (2) halving food waste; (3) global adoption of healthy diets in line with nutritional requirements; and (4) the optimization of agricultural production to avoid the most at-risk locations for habitat loss.
   - dimensions:
       scenario: adoption_of_healthy_diets
       species_group: birds
@@ -377,7 +377,7 @@ views:
     config:
       title: 'Projected habitat loss of amphibians in 2050: Combined interventions'
       subtitle: |-
-        Projected habitat loss for amphibian species by 2050 if all approaches are combined: (1) closing yield gaps; (2) halving food waste; (3) global adoption of healthy diets in line with nutritional requirements; and (4) the optimisation of agricultural production to avoid the most at-risk locations for habitat loss.
+        Projected habitat loss for amphibian species by 2050 if all approaches are combined: (1) closing yield gaps; (2) halving food waste; (3) global adoption of healthy diets in line with nutritional requirements; and (4) the optimization of agricultural production to avoid the most at-risk locations for habitat loss.
   - dimensions:
       scenario: adoption_of_healthy_diets
       species_group: amphibians
@@ -447,7 +447,7 @@ views:
     config:
       title: 'Projected change in cropland area: Combined interventions'
       subtitle: |-
-        Projected change in cropland area by 2050 if all approaches are combined: (1) closing yield gaps; (2) halving food waste; (3) global adoption of healthy diets in line with nutritional requirements; and (4) the optimisation of agricultural production to avoid the most at-risk locations for habitat loss.
+        Projected change in cropland area by 2050 if all approaches are combined: (1) closing yield gaps; (2) halving food waste; (3) global adoption of healthy diets in line with nutritional requirements; and (4) the optimization of agricultural production to avoid the most at-risk locations for habitat loss.
   - dimensions:
       scenario: adoption_of_healthy_diets
       species_group: na

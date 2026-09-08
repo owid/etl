@@ -359,3 +359,54 @@ def test_update_choice_slugs_in_views_handles_nan_entries_from_unstack():
     # sub_b's view dimension was left untouched — its NaN entry was filtered out
     # so ``view_type`` never reached ``.replace``.
     assert result["1"].views[0].dimensions["view_type"] == "b"
+
+
+def _make_subcollection(view_type: str, catalog_path: str):
+    """Build a minimal (non-explorer) Collection sub-collection for combine tests."""
+    config = {
+        "title": {"title": f"Test {view_type}", "title_variant": ""},
+        "default_selection": ["World"],
+        "dimensions": [
+            {
+                "slug": "view_type",
+                "name": "View type",
+                "choices": [{"slug": view_type, "name": view_type}],
+            },
+        ],
+        "views": [
+            {
+                "dimensions": {"view_type": view_type},
+                "indicators": {"y": [{"catalogPath": f"{catalog_path}#{view_type}"}]},
+            },
+        ],
+    }
+    with patch("etl.collection.core.utils.process_views"):
+        return create_collection_from_config(
+            config,
+            dependencies=set(),
+            catalog_path=f"{catalog_path}#test_collection",
+            validate_schema=False,
+        )
+
+
+def test_combine_collections_preserves_grapher_schema():
+    """The combined collection must keep the `grapher_schema` pin from the YAML config.
+
+    Multi-table MDIMs build one sub-collection per table and then combine them, so the pin has to
+    survive that round trip — otherwise those MDIMs would silently fall back to the default.
+    """
+    sub_a = _make_subcollection("a", "src_a")
+    sub_b = _make_subcollection("b", "src_b")
+
+    with patch("etl.collection.core.utils.process_views"):
+        combined = combine_collections(
+            collections=[sub_a, sub_b],
+            catalog_path="combined#combined",
+            config={
+                "grapher_schema": "008",
+                "title": {"title": "Combined", "title_variant": ""},
+                "default_selection": ["World"],
+            },
+        )
+
+    assert combined.grapher_schema == "008"

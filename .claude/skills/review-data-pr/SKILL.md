@@ -56,7 +56,7 @@ When it's a restructure:
 - **Don't expect the auto-Indicator-Upgrader to have remapped charts.** When short_names differ entirely, the upgrader has nothing to match on. Look for a hand-curated v1 title → v2 title mapping table in the PR description (or a follow-up PR thread). 🟡 if charts on the old chain are still published but no mapping plan exists.
 - **Don't expect a `.py` step copy from the old version.** Step files should be authored from scratch, not produced by `etl update` rename. If the new step files look mechanically renamed (same logic, just version-bumped strings), flag 🟡 — the author may have skipped restructure-specific decisions.
 - **A chart remapped onto a successor indicator needs a config-vs-shape check.** Verify its pinned `selectedEntityNames` exist in the successor's data (v1 regional aggregates often don't — expect the garden step to rebuild them, mirroring the retired step's method), that pinned `yAxis` bounds don't clip the new range, and that the subtitle doesn't still describe the old construction. Any of the three broken: 🔴 (the default view renders empty, clipped, or mislabeled).
-- **Slack + `/latest` drafts are not expected in the PR body at all.** `/update-dataset` keeps them in the author's `workbench/` (steps 9 / 9b), so their absence from the PR is correct — don't flag it.
+- **Slack + `/latest` drafts are not expected in the PR body at all.** `/update-dataset` keeps them in the author's `workbench/` (steps 9 / 9b, owned by `/data-updates-comms` and `/data-update-announcement`), so their absence from the PR is correct — don't flag it.
 
 ### 4. Run the full pipeline end-to-end
 
@@ -149,11 +149,19 @@ Run after the §4 pipeline build. Three checks:
 
 If the garden step doesn't use the harmonizer at all (no `.countries.json`; `country` assigned inline), checks #2 and #3 still apply — #2 is the only thing that catches non-canonical inline values.
 
+### 8c-bis. Did another dataset update merge while this PR was open?
+
+Cheap and worth doing on any PR more than a few days old. A branch serves *its own* snapshot of every other dataset, so if another update merged to `master` meanwhile, the branch's staging is behind on that dataset — and any chart combining both differs from production on two axes. Approving it syncs the stale config back and **reverts the other update** on a published chart. Nothing flags this: CI is green and the chart renders.
+
+Check `git log HEAD..origin/master --oneline` for `📊` dataset commits; for each, look for charts carrying indicators from both datasets and compare **every** dimension's dataset version, staging vs production — not just the dimension this PR touches. The fix is merging `master` in and remapping the affected charts' foreign dimensions; charts using *only* the other dataset are out of chart-diff scope and never sync, so they're correctly left alone. 🔴 if a shared chart would regress.
+
 ### 8d. Empty-entity audit (optional to run — always offer it)
 
 The author-side audit is optional to *run* in `/update-dataset` (the `check-empty-entities` skill sweeps every chart/MDim/explorer/narrative/gdoc surface, which can consume many tokens) — so a missing audit is not a finding. If the author ran it, verify the **outcome**: a selection that had data on production but none on staging is a 🔴 regression from the update; a gap identical on production is 🟡 pre-existing — it still needs fixing (chart-config edit or content follow-up on the gdoc), just not necessarily in this PR, so confirm the PR body documents it and a fix is planned.
 
 If the author didn't run it, **you MUST offer it to the user** as an optional add-on to this review (name the token cost) — surfacing this offer is mandatory, never silently skip it — and recommend accepting when the risk is real: many charts remapped, hand-curated (non-auto) mappings, a restructure, or indicators whose country coverage shrank. Run the full sweep on opt-in.
+
+For a cheap version of the same question — *which* surfaces carry this dataset at all, without the per-view availability checks — run `find-chart-references --dataset-id <id>`. It's the surface list both step-7 audits are built on, and it answers "did the author miss a surface entirely" in one query.
 
 Either way, do a cheap manual spot-check as part of the base review: open 2–3 of the most-viewed upgraded charts on staging (SVG render is enough) and confirm their pinned entity selections still draw lines — an empty published chart is a 🔴 however it's found, and a spot-check hit is itself a reason to recommend the full sweep.
 
@@ -205,7 +213,11 @@ Run `/check-metadata-typos`, `/check-metadata-spacing`, `/check-metadata-style` 
 
 Also grep the metadata **prose** for numbers carried over from the previous release (country counts, category counts, year ranges in `description_key`/descriptions): validated fields are covered by checks, prose numbers are not — a panel-composition change (dropped country, new category set) silently strands them (see `/update-dataset` Guardrails, "Grep metadata prose"). Stale prose count: 🟡.
 
-Three further prose checks from `/update-dataset` § 6b that the skills don't automate:
+Five further prose checks from `/update-dataset` § 6b that the skills don't automate:
+
+- **Redundant user-facing text.** Read each indicator's `description_key` as the reader gets it, together with `description_short` and the chart title: a bullet that restates another bullet, or the short line, at the same level of detail is padding — 🟡, with a proposed merge into the bullet that already covers it. Unpacking `description_short` (full definition, how it's measured, what's included) is not redundancy and must not be flagged. Watch new bullets added by this PR against the ones already there, and Jinja variants that restate the shared bullet for only some dimension values.
+
+- **Dimensional text that only holds for one breakdown.** For indicators templated over a dimension (or sharing a `definitions:` key across variants), read each rendered variant, not just one: a caveat that the data doesn't control for X is wrong on the variant grouped **by** X, a scope word like "all employees" overclaims on a variant filtered to a subgroup, and a sentence about a toggle is wrong on views that exist for only one choice of that dimension. Text that misdescribes the population on some variants: 🟡 (🔴 when it contradicts what the view actually shows). Author side: `/update-dataset` § 6b dimension sweep.
 
 - **Methodology-attribution claims** ("following guidance from <agency>…"): open the cited link and confirm it actually says that — agencies revise methodology, and a stale claim survives every link check (real case: metadata cited BEA guidance for an office-PPI deflator after BEA had switched that category to a different composite). A claim the cited page doesn't support: 🔴 (it's factually wrong reader-facing text).
 - **Scope qualifiers in the origin title** (private-only, adults-only, market-exchange-rates-only) must surface in `description_short`/`description_key`, not only in the citation. Missing: 🟡.
@@ -217,9 +229,37 @@ Three further prose checks from `/update-dataset` § 6b that the skills don't au
 
 When the PR body (or `workbench/<short_name>/update-context.yml`) does reference an `ai/adversarial-review-<short_name>-<date>.md` report, verify the **outcome**: its 🔴 findings must be resolved — metadata edited, or a `<short_name>.corrections.yml` added with `reason`/`provider`/`status` filled in. Then spot-check independently — don't take the report's word for it: re-verify 2–3 of its findings and 2–3 anchor values (World total + one major country, latest year) against an independent source yourself, following that skill's independence rules (a different producer measuring the same quantity; never OWID republishers or mirrors of the same producer). A value you confirm wrong that the report missed or waved through is 🔴.
 
+### 10c. Referencing-prose check
+
+`/update-dataset` step 7 asks the author to read the prose of every surface citing the dataset — articles, data
+insights, and especially titles — for quantitative claims the update invalidates. As reviewer, check the PR body
+records an outcome for it: either a clean verdict, or a named list of claims with what was decided (handed to
+content, or deliberately left with a reason). A clean verdict has to say three things to be acceptable: **what was
+checked** — no unbounded claim, and, on an update that revised any named period (a restatement, a corrected date),
+no bounded claim touching a revised observation; the outcome must state which kind of update it was, since on an
+append-only update bounded claims are out of scope; **what was swept** — the surfaces from `find-chart-references`;
+and **what was not** — the sweep's coverage gaps (the script prints them and writes them with `--gaps-json`; a
+chart nested in an article layout container, or a data insight holding its chart outside `grapher-url`, can be
+missing from its list). A blanket "nothing stale" with none of that is the first failure mode below in mild form —
+ask what was checked and swept.
+
+Two ways this goes wrong, both worth a 🟡:
+
+- **Nothing recorded at all** on a dataset with articles or data insights citing it. The sweep is cheap once
+  `find-chart-references` has run, and a headline multiple is the most-read number we publish.
+- **A time-bounded claim reported as stale on an append-only update.** "By late 2025 it had reached $62
+  billion" is untouched by a newly added quarter; only unbounded claims ("has grown 1,300-fold", "now accounts
+  for over 90%") re-point at the newest data. Flagging the former on an update that only appended periods
+  suggests the claims were compared against the latest value rather than read. The exemption does not apply
+  when the update *revised* a named period (a restatement, a corrected date) — then a bounded claim can be
+  genuinely stale, and reporting it is correct.
+
+A claim deliberately left unchanged is a perfectly good outcome — a data insight whose chart is a static image
+cannot have its text updated alone without desyncing it from the picture. Look for the reason, not for a fix.
+
 ### 11. DAG checks
 
-The remove-and-reorder procedure is in `/update-dataset` § "Removing the old version & reordering the DAG". As reviewer, verify the **outcome** (the archive dag is regenerated separately by `etl archive-dag`, so don't expect the old version under `dag/archive/` in this PR):
+The remove-and-reorder procedure is in `/update-dataset` § "Removing the old version & reordering the DAG". Its two halves land at different times: the old **dag entries** are removed and archived during the update, but the old **step files** stay on disk until this review is signed off — the consecutive-version comparison (`compare-previous-version` VS Code extension) diffs same-named files across `YYYY-MM-DD` sibling folders on the filesystem and never reads the dag. Old step files already deleted at review time = 🟡 — ask the author to restore them until sign-off (deleting them is the final commit before merge). For the dag itself, verify the **outcome** (the old entries should be under `dag/archive/` already, regenerated by `etl archive-dag`):
 
 ```bash
 rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"   # should be empty (old version removed from active dag)
@@ -269,7 +309,7 @@ Verify the author completed each post-step item from `/update-dataset`. The proc
 | Hardcoded-time-bounds audit ran (§7 / §8e) | Standard author-side step. Spot-check per §8e: numeric `maxTime`/`map.time`/`timelineMaxTime` pins among the dataset's staging chart configs vs the new indicators' latest time — non-deliberate pins below it must be fixed on staging or documented in the PR body. Skipped audit or an unfixed, undocumented pin = 🟡. |
 | Chart-diff bot result | PR comments include `<!--chart-diff-start-->` block ✅. A diff that shifts **every** historical year/region by a tiny amount is usually **upstream-dataset drift** (the live data was built against an older population/regions/income_groups snapshot), not a regression — don't flag it as a 🔴; the real change should be isolable by rebuilding the old version on the current catalog (see `/update-dataset` §5). |
 | Scheduled-issue workflow checked (§6d) | An `update-*.yml` in `owid/owid-issues` covers this dataset — exact name `update-<namespace>-<short_name>.yml`, fuzzy filename, or group workflow (check `~/owid-issues/.github/workflows/`, cloning the repo first if absent — a filename-only `gh api …/contents` listing can't verify cron/body or find group workflows); its cron is consistent with `update_period_days` + the release cadence evident from the PR (and fires *after* the producer's release window, not before); the issue body tells the next updater to run `/update-dataset <short_name>` (space-separated short names for group workflows). Missing workflow for a ≥annual dataset, a cron that contradicts the observed cadence, a stale body, or a workflow file missing its `.yml` extension (Actions never runs it) = 🟡. |
-| Pinned chart FAUST not stale (§ Guardrails) | Only when the PR changed methodology/scope wording in indicator metadata (`grapher_config.note`, deflator/source claims): for each affected chart, read `chart_configs.patch` on staging — a chart overriding `title`/`subtitle`/`note` keeps the old text regardless of the metadata fix. Stale method/scope claim on a published chart's pinned FAUST = 🔴 (reader-facing contradiction with the data page). |
+| Pinned chart FAUST not stale (§ Guardrails) | Only when the PR changed methodology/scope wording in indicator metadata (`grapher_config.note`, deflator/source claims): for each affected chart, read the authored layer (the `chart_configs` row named by `patchConfigId`) on staging — a chart overriding `title`/`subtitle`/`note` keeps the old text regardless of the metadata fix. Stale method/scope claim on a published chart's pinned FAUST = 🔴 (reader-facing contradiction with the data page). |
 | Narrative-chart stale-FAUST sweep ran (§7) | Only when narrative charts carry the dataset's variables (query `narrative_charts` joined via parent `chart_dimensions` on staging). The upgrader warns only about charts visited in its own run, so the author must sweep **all** of them (`_find_stale_faust_overrides` + a plain grep of the patches for old unit/base-year strings — see `/update-dataset` §7). Cheap outcome check: grep the narrative patches on staging for the *previous* release's unit/base-year strings (e.g. "constant <old base year> US$") — a hit on a published narrative chart = 🔴; narrative charts present but no sweep evidence in the PR = 🟡. |
 | `@codex review` posted (§9) | `gh pr view <num> --json comments` shows the trigger comment + a Codex review |
 | Codex threads resolved (§10) | Write the query to a file and pass `-F query=@file.graphql` (see GraphQL note below) — list `reviewThreads(first:20){ nodes { isResolved } }`; all `isResolved: true`. |
@@ -297,6 +337,9 @@ Structure the review with:
 6. **🟡 Suggestions** — nice-to-have
 7. **🟢 Informational** — observations, no action needed
 8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, etc. (The Slack + `/latest` drafts live in `workbench/`, not the PR — don't expect them here.)
+9. **What's still open** — carried forward from the PR body, covering the categories in `.claude/docs/open-items.md` plus the update workflow's fourth one (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
+
+**Check the PR body doesn't leave pending work unmentioned.** A PR whose description lists only what was done, while the session left content edits pending, audits unrun, or a follow-up PR's scope undefined, is missing the one artifact that survives after the chat is gone — flag it 🟡. Judge it on whether a reader can tell what's outstanding, not on whether it uses any particular headings or wording. Work that was deliberately handed off needs a locator in the body too, not just a description: an item the next person can't act on without redoing the analysis isn't handed off.
 
 ## Severity rubric
 

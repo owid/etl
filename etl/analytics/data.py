@@ -8,6 +8,7 @@ from etl.analytics.config import (
     COMPONENT_TYPES_TO_LINK_GDOCS_WITH_VIEWS,
     DATE_MAX,
     DATE_MIN,
+    GA_SCHEMA,
     GRAPHERS_BASE_URL,
     OWID_BASE_URL,
     POST_LINK_TYPES_TO_URL,
@@ -64,7 +65,9 @@ def get_number_of_days(
     date_max : str
         Maximum date to consider.
     table_name : str
-        Name of the DB table to query for the maximum informed date.
+        Name of the DB table to query for the maximum informed date, qualified with its schema
+        (BigQuery dataset), e.g. "prod_ga4.grapher_views_detailed". The tables involved no longer all
+        live in the same dataset, so the caller says which one.
     day_column_name : str
         Name of the column in the DB table that contains the date.
 
@@ -84,7 +87,7 @@ def get_number_of_days(
         )
 
     # There is always a lag in analytics, so we need to find out the maximum date informed in the analytics data.
-    query = f"SELECT MAX({day_column_name}) AS date_max FROM {SEMANTIC_LAYER_SCHEMA}.{table_name}"
+    query = f"SELECT MAX({day_column_name}) AS date_max FROM {table_name}"
     date_max_informed = read_analytics(sql=query)["date_max"].item()
     date_end = min(pd.to_datetime(date_max_informed), pd.to_datetime(date_max))
 
@@ -136,6 +139,9 @@ def get_chart_views_per_day_by_chart_id(
 
     where_sql = "WHERE " + " AND ".join(where_clauses) if where_clauses else ""
 
+    # Join on the resolved `chart_id`, not on the URL as GA4 recorded it: that URL is truncated at 126
+    # characters and may be a slug the chart has since been renamed away from, so matching it against
+    # the chart's current URL loses views (owid/analytics#733).
     query = f"""
     SELECT
         c.chart_id,
@@ -143,7 +149,7 @@ def get_chart_views_per_day_by_chart_id(
         v.day,
         SUM(v.events) AS events
     FROM {SEMANTIC_LAYER_SCHEMA}.charts c
-    JOIN {SEMANTIC_LAYER_SCHEMA}.grapher_views_detailed v ON c.url = v.grapher
+    JOIN {GA_SCHEMA}.grapher_views_detailed v ON v.chart_id = c.chart_id
     {where_sql}
     GROUP BY c.chart_id, c.url, v.day
     ORDER BY c.chart_id, v.day ASC;
@@ -187,6 +193,9 @@ def get_chart_views_by_chart_id(
 
     where_sql = "WHERE " + " AND ".join(where_clauses) if where_clauses else ""
 
+    # Join on the resolved `chart_id`, not on the URL as GA4 recorded it: that URL is truncated at 126
+    # characters and may be a slug the chart has since been renamed away from, so matching it against
+    # the chart's current URL loses views (owid/analytics#733).
     query = f"""
     SELECT
         c.chart_id,
@@ -194,7 +203,7 @@ def get_chart_views_by_chart_id(
         c.published_at,
         SUM(v.events) AS views
     FROM {SEMANTIC_LAYER_SCHEMA}.charts c
-    JOIN {SEMANTIC_LAYER_SCHEMA}.grapher_views_detailed v ON c.url = v.grapher
+    JOIN {GA_SCHEMA}.grapher_views_detailed v ON v.chart_id = c.chart_id
     {where_sql}
     GROUP BY c.chart_id, c.url, c.published_at
     ORDER BY views DESC
@@ -206,7 +215,7 @@ def get_chart_views_by_chart_id(
         published_at=df_views["published_at"],
         date_min=date_min,
         date_max=date_max,
-        table_name="grapher_views_detailed",
+        table_name=f"{GA_SCHEMA}.grapher_views_detailed",
         day_column_name="day",
     )
 
@@ -323,7 +332,7 @@ def get_post_views_by_url(
     df_views["n_days"] = get_number_of_days(
         date_min=date_min,
         date_max=date_max,
-        table_name="views_detailed",
+        table_name=f"{SEMANTIC_LAYER_SCHEMA}.views_detailed",
         day_column_name="day",
     )
 
@@ -691,10 +700,10 @@ def get_visualizations_using_data_by_producer(
     query = f"""WITH t_base AS (
 	SELECT
 		cd.chartId chart_id,
-		JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.title')) chart_title,
+		JSON_UNQUOTE(JSON_EXTRACT(cc.config, '$.title')) chart_title,
 		cc.slug chart_slug,
 		CONCAT('{GRAPHERS_BASE_URL}', cc.slug) chart_url,
-		JSON_EXTRACT(cc.full, '$.isPublished') is_published,
+		JSON_EXTRACT(cc.config, '$.isPublished') is_published,
 		cd.variableId variable_id,
 		v.name variable_name,
 		d.id dataset_id,

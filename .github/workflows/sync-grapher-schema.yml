@@ -9,8 +9,18 @@ name: Sync grapher schema
 # Remaining manual propagation (e.g. the grapher_config block embedded in
 # dataset-schema.json) is enforced by unit tests on the PR — finish it with the
 # /sync-grapher-schema skill.
+#
+# Until the vendored copy is refreshed, test_vendored_grapher_schema_is_current fails the
+# staging integration build on *every* etl branch, so the gap between an upstream publish
+# and this workflow noticing is the thing to keep small. Hence the dispatch trigger: the
+# cron alone left a Friday-afternoon publish red until Monday morning.
 
 on:
+  # owid-grapher's "Upload to R2" workflow fires this the moment it publishes the schema.
+  # This is the trigger that matters; the cron below is only a backstop for a dispatch that
+  # never arrives (revoked token, someone narrowing the upstream paths filter).
+  repository_dispatch:
+    types: [grapher-schema-published]
   schedule:
     - cron: "0 7 * * 1-5" # weekdays at 07:00 UTC
   workflow_dispatch:
@@ -24,7 +34,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -34,7 +44,26 @@ jobs:
           set -euo pipefail
           VENDORED=$(ls schemas/grapher-schema.*.json)
           NAME=$(basename "$VENDORED")
-          curl -fsS "https://files.ourworldindata.org/schemas/$NAME" -o /tmp/upstream.json
+
+          # Cloudflare fronts files.ourworldindata.org with s-maxage=300, so for up to five
+          # minutes after the upload the edge can still serve the pre-change object. When the
+          # upload itself woke us, poll across that window instead of recording a spurious
+          # "nothing changed" — otherwise the dispatch just moves the race instead of closing
+          # it. Falling out of the loop still-identical is a legitimate outcome, not a
+          # timeout: upstream's paths filter also fires on schema-directory .ts edits that
+          # leave the published JSON alone.
+          ATTEMPTS=1
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then ATTEMPTS=7; fi
+          for attempt in $(seq "$ATTEMPTS"); do
+            curl -fsS "https://files.ourworldindata.org/schemas/$NAME" -o /tmp/upstream.json
+            # exits 0 when the two differ, i.e. when the CDN is serving the new object
+            if python3 -c 'import json, sys; sys.exit(json.load(open(sys.argv[1])) == json.load(open(sys.argv[2])))' "$VENDORED" /tmp/upstream.json; then
+              break
+            fi
+            echo "Upstream still identical to vendored copy (attempt $attempt/$ATTEMPTS)"
+            [ "$attempt" = "$ATTEMPTS" ] || sleep 60
+          done
+
           curl -fsS "https://files.ourworldindata.org/schemas/grapher-schema.latest.json" -o /tmp/latest.json
           python3 - "$VENDORED" >> "$GITHUB_OUTPUT" <<'EOF'
           import json
@@ -67,12 +96,12 @@ jobs:
             echo "Issue #$EXISTING already open, skipping."
           fi
 
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         if: steps.check.outputs.changed == 'true'
         with:
           python-version: "3.12"
 
-      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         if: steps.check.outputs.changed == 'true'
         with:
           enable-cache: true
@@ -98,6 +127,8 @@ jobs:
 
             - refreshed vendored `schemas/grapher-schema.*.json`
             - regenerated `etl/collection/model/schema_types.py`
+
+            Published by: ${{ github.event.client_payload.commit && format('https://github.com/owid/owid-grapher/commit/{0}', github.event.client_payload.commit) || format('n/a — this run came from {0}, not an upstream dispatch', github.event_name) }}
 
             **Review the vendored diff** — it is the authoritative list of upstream changes.
 

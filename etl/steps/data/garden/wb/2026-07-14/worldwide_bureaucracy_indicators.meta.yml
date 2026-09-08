@@ -32,7 +32,7 @@ tables:
         title: Public sector employment, as a share of total employment
         unit: "%"
         short_unit: "%"
-        description_short: The share of all employed people who are paid employees of the public sector, including government, the armed forces, public services, and state-owned enterprises.
+        description_short: Share of all employed people who are paid employees of the public sector, including government, the armed forces, public services, and state-owned enterprises.
         description_key:
           - The public sector covers core public administration at the central, regional, and local levels of government, the security sector (including the armed forces), public education and healthcare workers, and public institutions such as central banks and state-owned enterprises.
           - The indicator counts paid public sector employees relative to all employed people, including the self-employed, employers, and unpaid family workers. In countries where self-employment is widespread — as in much of South Asia and Sub-Saharan Africa — it is therefore much lower than the public sector's share of paid employees, which the dataset reports separately.

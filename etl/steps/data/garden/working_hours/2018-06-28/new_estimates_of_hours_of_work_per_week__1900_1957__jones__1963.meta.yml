@@ -9,12 +9,12 @@ tables:
         title: Average hours of work per week in anthracite coal (BLS)
         unit: hours
         description: |-
-          Average hours of work per week in bituminous coal. Data gathered using monthly reports from a sample of establishments since 1932. Jones' historical series takes the data from the BLS and performs downward adjustments of the BLS observations necessitated by the introduction of a number of employer pay practices. In 1943, employers began to compensate workers in bituminous and anthracite industries for the hours spent travelling in the mine shaft opening to the place of work within the time. Travel time within the mine is included in average work hours when it is paid for, and excluded when it is not. Employee coverage is limited to production workers.
+          Average hours of work per week in bituminous coal. Data gathered using monthly reports from a sample of establishments since 1932. Jones' historical series takes the data from the BLS and performs downward adjustments of the BLS observations necessitated by the introduction of a number of employer pay practices. In 1943, employers began to compensate workers in bituminous and anthracite industries for the hours spent traveling in the mine shaft opening to the place of work within the time. Travel time within the mine is included in average work hours when it is paid for, and excluded when it is not. Employee coverage is limited to production workers.
       average_hours_of_work_per_week_in_anthracite_coal__jones:
         title: Average hours of work per week in anthracite coal (Jones)
         unit: hours
         description: |-
-          Average hours of work per week in bituminous coal. Data gathered using monthly reports from a sample of establishments since 1932. Jones' historical series takes the data from the BLS and performs downward adjustments of the BLS observations necessitated by the introduction of a number of employer pay practices. In 1943, employers began to compensate workers in bituminous and anthracite industries for the hours spent travelling in the mine shaft opening to the place of work within the time. Travel time within the mine is included in average work hours when it is paid for, and excluded when it is not. Employee coverage is limited to production workers.
+          Average hours of work per week in bituminous coal. Data gathered using monthly reports from a sample of establishments since 1932. Jones' historical series takes the data from the BLS and performs downward adjustments of the BLS observations necessitated by the introduction of a number of employer pay practices. In 1943, employers began to compensate workers in bituminous and anthracite industries for the hours spent traveling in the mine shaft opening to the place of work within the time. Travel time within the mine is included in average work hours when it is paid for, and excluded when it is not. Employee coverage is limited to production workers.
       average_hours_of_work_per_week_in_bituminous_coal__bls:
         title: Average hours of work per week in bituminous coal (BLS)
         unit: hours
@@ -24,7 +24,7 @@ tables:
         title: Average hours of work per week in bituminous coal (Jones)
         unit: hours
         description: |-
-          Average hours of work per week in bituminous coal. Data gathered using monthly reports from a sample of establishments since 1932. Jones' historical series takes the data from the BLS and performs downward adjustments of the BLS observations necessitated by the introduction of a number of employer pay practices. In 1943, employers began to compensate workers in bituminous and anthracite industries for the hours spent travelling in the mine shaft opening to the place of work within the time. Travel time within the mine is included in average work hours when it is paid for, and excluded when it is not. Employee coverage is limited to production workers.
+          Average hours of work per week in bituminous coal. Data gathered using monthly reports from a sample of establishments since 1932. Jones' historical series takes the data from the BLS and performs downward adjustments of the BLS observations necessitated by the introduction of a number of employer pay practices. In 1943, employers began to compensate workers in bituminous and anthracite industries for the hours spent traveling in the mine shaft opening to the place of work within the time. Travel time within the mine is included in average work hours when it is paid for, and excluded when it is not. Employee coverage is limited to production workers.
       average_hours_of_work_per_week_on_railroads__bls:
         title: Average hours of work per week on railroads (BLS)
         unit: hours
@@ -39,7 +39,7 @@ tables:
         title: Average hours per week worked in manufacturing (BLS)
         unit: hours
         description: |-
-          Average hours of work per week in manufacturing using the Bureau of Labour Statistics' (BLS) historical series. Employee coverage is limited to production workers.
+          Average hours of work per week in manufacturing using the Bureau of Labor Statistics' (BLS) historical series. Employee coverage is limited to production workers.
       average_hours_per_week_worked_in_manufacturing__jones:
         title: Average hours per week worked in manufacturing (Jones)
         unit: hours

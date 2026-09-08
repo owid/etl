@@ -303,6 +303,7 @@ class _ViewConfigBase(TypedDict, total=False):
     hideSeriesLabels: bool
     hideTimeline: bool
     hideTotalValueLabel: bool
+    inapplicableEntityNames: list[str]
     includedEntityNames: list[str]
     internalNotes: str
     invertColorScheme: bool

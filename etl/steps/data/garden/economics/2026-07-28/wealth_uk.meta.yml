@@ -7,7 +7,7 @@ definitions:
         - Economic Inequality
       attribution_short: Alvaredo, Atkinson and Morelli
     description_key:
-      - Wealth refers to marketable (net) personal wealth: the value of the assets individuals own, minus their debts.
+      - "Wealth refers to marketable (net) personal wealth: the value of the assets individuals own, minus their debts."
       - Most of the estimates are based on estate data — the wealth recorded when people die — scaled up to represent the living population using the "estate multiplier" method, in which the deceased are re-weighted by mortality rates that vary with age, sex and wealth.
       - The series is linked with earlier investment-income and administrative sources so that it can be extended back to 1895, covering more than a century.
       - Definitions of wealth and of the reference population change somewhat over this long period; the source paper documents these breaks in detail.
@@ -30,7 +30,7 @@ tables:
           title_public: Wealth share of the poorest 90%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total personal wealth held by the least wealthy 90% of the population.
+        description_short: Share of total personal wealth held by the least wealthy 90% of the population.
         display:
           name: Bottom 90%
           numDecimalPlaces: 1
@@ -42,7 +42,7 @@ tables:
           title_public: Wealth share of the richest 10%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total personal wealth held by the wealthiest 10% of the population.
+        description_short: Share of total personal wealth held by the wealthiest 10% of the population.
         display:
           name: Top 10%
           numDecimalPlaces: 1
@@ -54,7 +54,7 @@ tables:
           title_public: Wealth share of the richest 5%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total personal wealth held by the wealthiest 5% of the population.
+        description_short: Share of total personal wealth held by the wealthiest 5% of the population.
         display:
           name: Top 5%
           numDecimalPlaces: 1
@@ -66,7 +66,7 @@ tables:
           title_public: Wealth share of the richest 1%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total personal wealth held by the wealthiest 1% of the population.
+        description_short: Share of total personal wealth held by the wealthiest 1% of the population.
         display:
           name: Top 1%
           numDecimalPlaces: 1
@@ -78,7 +78,7 @@ tables:
           title_public: Wealth share of the richest 0.5%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total personal wealth held by the wealthiest 0.5% of the population.
+        description_short: Share of total personal wealth held by the wealthiest 0.5% of the population.
         display:
           name: Top 0.5%
           numDecimalPlaces: 1
@@ -90,7 +90,7 @@ tables:
           title_public: Wealth share of the richest 0.1%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total personal wealth held by the wealthiest 0.1% of the population.
+        description_short: Share of total personal wealth held by the wealthiest 0.1% of the population.
         display:
           name: Top 0.1%
           numDecimalPlaces: 1
@@ -102,7 +102,7 @@ tables:
           title_public: Wealth share of the richest 10% excluding the richest 5%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total personal wealth held by people in the richest 10% but not the richest 5% of the population.
+        description_short: Share of total personal wealth held by people in the richest 10% but not the richest 5% of the population.
         display:
           name: Top 10–5%
           numDecimalPlaces: 1
@@ -114,7 +114,7 @@ tables:
           title_public: Wealth share of the richest 5% excluding the richest 1%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total personal wealth held by people in the richest 5% but not the richest 1% of the population.
+        description_short: Share of total personal wealth held by people in the richest 5% but not the richest 1% of the population.
         display:
           name: Top 5–1%
           numDecimalPlaces: 1
@@ -126,7 +126,7 @@ tables:
           title_public: Wealth share of the richest 1% excluding the richest 0.5%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total personal wealth held by people in the richest 1% but not the richest 0.5% of the population.
+        description_short: Share of total personal wealth held by people in the richest 1% but not the richest 0.5% of the population.
         display:
           name: Top 1–0.5%
           numDecimalPlaces: 1
@@ -138,7 +138,7 @@ tables:
           title_public: Wealth share of the richest 0.5% excluding the richest 0.1%
         unit: "%"
         short_unit: "%"
-        description_short: The share of total personal wealth held by people in the richest 0.5% but not the richest 0.1% of the population.
+        description_short: Share of total personal wealth held by people in the richest 0.5% but not the richest 0.1% of the population.
         display:
           name: Top 0.5–0.1%
           numDecimalPlaces: 1

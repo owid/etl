@@ -109,9 +109,6 @@ steps:
   data-private://grapher/economics/2018/global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018:
     - data-private://garden/economics/2018/global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018:
         - snapshot-private://economics/2018/global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018.feather
-  data://grapher/agriculture/2017/water_withdrawals_and_consumption__aquastat:
-    - data://garden/agriculture/2017/water_withdrawals_and_consumption__aquastat:
-        - snapshot://agriculture/2017/water_withdrawals_and_consumption__aquastat.feather
   data://grapher/journalism/2022/world_press_freedom_index__reporters_sans_frontieres__2022:
     - data://garden/journalism/2022/world_press_freedom_index__reporters_sans_frontieres__2022:
         - snapshot://journalism/2022/world_press_freedom_index__reporters_sans_frontieres__2022.feather
@@ -790,9 +787,6 @@ steps:
   data://grapher/fisheries/2018-03-08/fishery_catch_breakdown__pauly_and_zeller__2016:
     - data://garden/fisheries/2018-03-08/fishery_catch_breakdown__pauly_and_zeller__2016:
         - snapshot://fisheries/2018-03-08/fishery_catch_breakdown__pauly_and_zeller__2016.feather
-  data-private://grapher/oecd/2020-11-05/time_use_across_activities__oecd_gender_data__2020:
-    - data-private://garden/oecd/2020-11-05/time_use_across_activities__oecd_gender_data__2020:
-        - snapshot-private://oecd/2020-11-05/time_use_across_activities__oecd_gender_data__2020.feather
   data://grapher/health/2018-04-19/mental_health_as_risk_factor_for_substance_use__swendsen_et_al__2010:
     - data://garden/health/2018-04-19/mental_health_as_risk_factor_for_substance_use__swendsen_et_al__2010:
         - snapshot://health/2018-04-19/mental_health_as_risk_factor_for_substance_use__swendsen_et_al__2010.feather

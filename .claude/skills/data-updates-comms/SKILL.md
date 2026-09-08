@@ -1,6 +1,14 @@
 ---
 name: data-updates-comms
-description: Draft answers for OWID's data-updates-comms Slack template using snapshot DVC + garden metadata + staging DB queries. Use when the user wants to announce a dataset update, fill the "Message about new data update" form, or generate the FAQ-style Slack post after an ETL update. Mechanical fields (producer, dates, coverage, chart count, search URL) are filled directly; editorial fields (why it matters, caveats, what's interesting about this update) get prompts seeded with extracted context for the user to refine.
+description: >-
+  Draft answers for OWID's data-updates-comms Slack template using snapshot DVC + garden metadata
+  + staging DB queries. Use when the user wants to fill the "Message about new data update" form,
+  announce a dataset update to the internal #data-updates-comms channel, or generate the FAQ-style
+  Slack post after an ETL update. Mechanical fields (producer, dates, coverage, chart count,
+  search URL) are filled directly; editorial fields (why it matters, caveats, what's interesting
+  about this update) get prompts seeded with extracted context for the user to refine. This is the
+  INTERNAL Slack form only — for the public reader-facing "Data update" post on
+  ourworldindata.org/latest, use /data-update-announcement instead.
 metadata:
   internal: true
 ---
@@ -113,9 +121,9 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
    sql = """
    SELECT c.id AS chart_id, cc.slug,
-          JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.title'))       AS title,
-          JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.hasMapTab'))   AS has_map,
-          JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.type'))        AS chart_type,
+          JSON_UNQUOTE(JSON_EXTRACT(cc.config, '$.title'))       AS title,
+          JSON_UNQUOTE(JSON_EXTRACT(cc.config, '$.hasMapTab'))   AS has_map,
+          JSON_UNQUOTE(JSON_EXTRACT(cc.config, '$.type'))        AS chart_type,
           SUM(v_new.dataChecksum <> v_old.dataChecksum)        AS n_changed,
           COUNT(*)                                             AS n_vars
    FROM charts c
@@ -328,4 +336,5 @@ https://ourworldindata.org/search?datasetProducts=<urlencoded dataset title>
 ## Related
 
 - `.claude/skills/update-dataset/SKILL.md` step 9 — the orchestrator entry point that should call this skill.
+- `.claude/skills/data-update-announcement/SKILL.md` — what happens **next**. This skill's Slack post is the input to the public "Data update" post on ourworldindata.org/latest; that skill either reads the Slack message directly or, inside `/update-dataset` (step 9b), reads `update-context.yml` plus the `slack-announcement.md` this skill produced. Two different artifacts: a 10-field internal form here, a reader-facing mini-post there. Don't draft the `/latest` post from this skill. Note that the `/latest` skill declines to post when OWID covered the same data publicly less than six months ago — **that cooldown does not apply here**. This Slack form runs on every update regardless, because its audience is internal and its job is to tell Charlie what changed.
 - `.claude/skills/edit-faust-metadata/SKILL.md` — reuses the same grapher-channel metadata patterns for chart-view selection.

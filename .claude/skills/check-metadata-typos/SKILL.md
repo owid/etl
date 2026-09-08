@@ -80,20 +80,46 @@ echo "Total files to check: $(wc -l < /tmp/active_meta_files.txt)"
 
 ### 2. Run codespell with ignore list and exclusions
 
-Use the existing `.codespell-ignore.txt` file to filter out domain-specific terms:
+Use the existing `.codespell-ignore.txt` file to filter out domain-specific terms.
+
+**Whichever option the user picked, write that scope's file list to `/tmp/codespell_targets.txt` and check it.** Steps 5 and 6 reuse that one file, so the fix and the verification cannot act on a wider scope than the check did. Never point a later step at a different list.
 
 **For option 1 (current step only):**
 
-1. Ask the user to provide the step path (e.g., `etl/steps/data/garden/energy/2025-06-27/electricity_mix`)
-2. Construct the full path to the metadata file: `<step_path>/*.meta.yml`
-3. Run codespell on that specific path:
+Ask the user for the path, then normalize it. This scope has to accept three shapes, because `/create-snapshot` step 5 calls it on a single new snapshot file:
+
+- an ETL step directory (`etl/steps/data/garden/energy/2025-06-27/electricity_mix`) → every `.meta.yml` in it
+- a snapshot stem with no extension (`snapshots/who/2026-04-22/mortality`) → the matching `.dvc`
+- a single file, `.meta.yml` or `.dvc` → itself
 
 ```bash
-# For specific step (option 1)
-STEP_PATH="<user_provided_path>"  # e.g., etl/steps/data/garden/energy/2025-06-27/electricity_mix
-.venv/bin/codespell "${STEP_PATH}"/*.meta.yml \
+# For specific step or single file (option 1)
+TARGET="<user_provided_path>"
+
+.venv/bin/python - "$TARGET" > /tmp/codespell_targets.txt <<'PY'
+import glob, os, sys
+
+target = sys.argv[1].rstrip("/")
+if os.path.isdir(target):
+    paths = sorted(glob.glob(f"{target}/*.meta.yml")) + sorted(glob.glob(f"{target}/*.dvc"))
+elif os.path.isfile(target):
+    paths = [target]
+else:
+    # A snapshot stem: snapshots/<namespace>/<version>/<short_name>, extension unknown.
+    paths = sorted(glob.glob(f"{target}.*.dvc")) or sorted(glob.glob(f"{target}.dvc"))
+print("\n".join(paths))
+PY
+
+cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
   --ignore-words=.codespell-ignore.txt
 ```
+
+Two ways this scope silently checks nothing, both of which must be treated as an error rather than a clean result:
+
+- **A `.dvc` target matched by a `*.meta.yml`-only pattern.** A snapshot path has no `.meta.yml` in it, so a `.meta.yml`-only search returns an empty list and codespell reports no typos on a file it never opened. The normalizer above exists for exactly this case.
+- **An empty list from a shell glob.** Don't build the list with `ls <path>/*.meta.yml`: under zsh a glob matching nothing aborts the command before the redirect, so no file is written and a wider list left over from an earlier run gets reused.
+
+**Always report the number of files in `/tmp/codespell_targets.txt` before running codespell.** If it is 0, say the path matched nothing and ask for a corrected one — never fall through to a wider scope, and never report "no typos found".
 
 **For option 2 (all ETL metadata - garden, meadow, grapher):**
 
@@ -102,9 +128,9 @@ STEP_PATH="<user_provided_path>"  # e.g., etl/steps/data/garden/energy/2025-06-2
 find etl/steps/data/garden -name "*.meta.yml" > /tmp/all_step_files.txt
 find etl/steps/data/meadow -name "*.meta.yml" >> /tmp/all_step_files.txt
 find etl/steps/data/grapher -name "*.meta.yml" >> /tmp/all_step_files.txt
-grep -vFf /tmp/archived_files.txt /tmp/all_step_files.txt > /tmp/active_step_files.txt
+grep -vFf /tmp/archived_files.txt /tmp/all_step_files.txt > /tmp/codespell_targets.txt
 
-cat /tmp/active_step_files.txt | xargs .venv/bin/codespell \
+cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
   --ignore-words=.codespell-ignore.txt
 ```
 
@@ -115,20 +141,22 @@ Note: Excluding archived steps reduces the scope by ~3,570 files and focuses on 
 ```bash
 # For all snapshot metadata (option 3)
 find snapshots -name "*.dvc" > /tmp/all_snapshot_files.txt
-grep -vFf /tmp/archived_files.txt /tmp/all_snapshot_files.txt > /tmp/active_snapshot_files.txt
+grep -vFf /tmp/archived_files.txt /tmp/all_snapshot_files.txt > /tmp/codespell_targets.txt
 
-cat /tmp/active_snapshot_files.txt | xargs .venv/bin/codespell \
+cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
   --ignore-words=.codespell-ignore.txt
 ```
 
-Note: Snapshot `.dvc` files contain metadata in the `meta.source.description` and `meta.source.published_by` fields. ~736 archived snapshots are excluded.
+Note: the prose worth checking in a snapshot `.dvc` lives under `meta.origin` — `description`, `description_snapshot`, `title`, `title_snapshot`, `citation_full`, `attribution`. Older files instead use the deprecated `meta.source.description` / `meta.source.published_by`; both shapes are still in the repo (~2,000 files on `origin`, ~6,000 on `source`). codespell reads the whole file either way, so no filtering is needed — but report hits by their real field path, and don't "fix" a typo by migrating a file from `source` to `origin` (that's a separate change, out of scope here). ~736 archived snapshots are excluded.
 
 **For option 4 (all metadata):**
 
 ```bash
 # For all metadata - ETL and snapshots (option 4)
 # Use the active_meta_files.txt created in step 1
-cat /tmp/active_meta_files.txt | xargs .venv/bin/codespell \
+cp /tmp/active_meta_files.txt /tmp/codespell_targets.txt
+
+cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
   --ignore-words=.codespell-ignore.txt
 ```
 
@@ -167,24 +195,29 @@ After presenting results, ask the user:
 
 ### 5. Apply fixes (if user confirms)
 
-For automatic fixes:
+For automatic fixes, let codespell apply its own corrections — it rewrites only the words it flagged, at the positions it flagged them. Run it over `/tmp/codespell_targets.txt`, the list step 2 wrote for the scope the user chose:
 
 ```bash
-# Use sed or Python script to replace typos in files
-# Example: sed -i '' 's/seperate/separate/g' file.meta.yml
+cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
+  --ignore-words=.codespell-ignore.txt --write-changes
 ```
 
-For reviewed fixes, confirm each change before applying.
+**Never widen the scope here.** `--write-changes` rewrites every file it is given, so pointing this at `/tmp/active_meta_files.txt` (the option-4 list) after the user asked for one step would silently edit thousands of unrelated files. The list must be the one that produced the reported typos — if `/tmp/codespell_targets.txt` is missing or you are unsure it matches, re-run step 2 for the chosen option before fixing anything.
+
+For reviewed fixes, apply each one with the `Edit` tool, matching enough surrounding words to be unambiguous.
+
+**Never fix with an unanchored `sed` substitution.** `sed -i 's/word/word/g' file` rewrites *every* occurrence in the file, including the ones you decided to ignore — inside URLs, domain names, and ALL-CAPS acronyms (see Notes). It also silently rewrites a word codespell never flagged on that line. `sed -i ''` is BSD-only on top of that, so it breaks on Linux (CI, cloud sandbox) where the same command needs `sed -i`.
 
 ### 6. Verify fixes
 
-After applying fixes, re-run codespell to verify all typos were corrected:
+After applying fixes, re-run codespell over the same scope to verify all typos were corrected:
 
 ```bash
-.venv/bin/codespell <path> --ignore-words=.codespell-ignore.txt
+cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
+  --ignore-words=.codespell-ignore.txt
 ```
 
-Should return 0 results.
+Should return 0 results. If the user chose to review typos one by one and deliberately skipped some, expect exactly those to remain — say which, rather than reporting the check as failed.
 
 ### 7. Clean up
 

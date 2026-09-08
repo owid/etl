@@ -16,13 +16,55 @@ from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
 from etl.collection.exceptions import ParamKeyError
-from etl.config import OWID_ENV, OWIDEnv
+from etl.config import DEFAULT_GRAPHER_SCHEMA, OWID_ENV, OWIDEnv
 from etl.db import read_sql
 from etl.files import yaml_dump
 from etl.paths import DATA_DIR
 
 CHART_DIMENSIONS = ["y", "x", "size", "color"]
 INDICATORS_SLUG = "indicator"
+
+# Grapher chart-config schemas are published as
+# https://files.ourworldindata.org/schemas/grapher-schema.011.json
+GRAPHER_SCHEMA_URL_TEMPLATE = "https://files.ourworldindata.org/schemas/grapher-schema.{version}.json"
+_GRAPHER_SCHEMA_VERSION_PATTERN = re.compile(r"^\d{3}$")
+_GRAPHER_SCHEMA_URL_PATTERN = re.compile(r"^https://files\.ourworldindata\.org/schemas/grapher-schema\.\d{3}\.json$")
+
+
+def resolve_grapher_schema(value: str | int | None) -> str:
+    """Resolve an authored `grapher_schema` value into a full grapher schema URL.
+
+    Two authoring forms are accepted:
+
+    - short: `grapher_schema: "011"`
+    - full:  `grapher_schema: https://files.ourworldindata.org/schemas/grapher-schema.011.json`
+
+    `None` falls back to `DEFAULT_GRAPHER_SCHEMA` — the version this repo vendors and validates
+    against. Pinning explicitly is preferred: it records the version the config was authored
+    against, so Grapher migrates it forward after a breaking schema change instead of assuming
+    it is already current.
+    """
+    if value is None:
+        return DEFAULT_GRAPHER_SCHEMA
+
+    if isinstance(value, str):
+        if _GRAPHER_SCHEMA_URL_PATTERN.match(value):
+            return value
+        if _GRAPHER_SCHEMA_VERSION_PATTERN.match(value):
+            return GRAPHER_SCHEMA_URL_TEMPLATE.format(version=value)
+
+    # YAML 1.1 reads a bare `011` as an octal number, so it arrives here as 9 (or "9", once the
+    # dataclass coerces it to a string). Point at the missing quotes, not at the mangled value.
+    hint = ""
+    if isinstance(value, int) or (isinstance(value, str) and re.match(r"^\d{1,2}$", value)):
+        hint = (
+            " Quote it: an unquoted YAML value like `011` is parsed as octal and silently becomes"
+            ' a different version, so write `grapher_schema: "011"`.'
+        )
+    raise ValueError(
+        f"Invalid `grapher_schema` value {value!r}. Expected a three-digit version as a quoted "
+        f'string (e.g. "011") or a full schema URL (e.g. {DEFAULT_GRAPHER_SCHEMA}).{hint}'
+    )
 
 
 # combine

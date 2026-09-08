@@ -43,6 +43,12 @@ The automatic part of a sync (vendored refresh + type regeneration) is committed
 - adding `$ref`s for genuinely new properties to `schemas/multidim-schema.json` / `schemas/explorer-schema.json`;
 - handling the rarer **version bump** (new `grapher-schema.NNN`): bumping `DEFAULT_GRAPHER_SCHEMA` in `etl/config.py`, updating `$ref`s, re-vendoring.
 
+!!! warning "A version bump does *not* touch the `grapher_schema` pins in MDIM configs"
+
+    Every multidim config pins `grapher_schema` (see [MDIMs and Explorers](data-work/mdims.md)), which grapher applies as the `$schema` of each view config. Those pins record what the config was authored against, and that is precisely what lets grapher migrate them to the new version on upsert — bumping them would tell grapher the configs are already current and skip the migration.
+
+    A bump only repoints multidim view-config *validation* at the new version, so a config that is no longer valid under it fails `Collection.validate_schema()`. Then, and only then, fix that config and bump its own pin.
+
 It can also be run ad-hoc — e.g. when the web team announces a change and you don't want to wait for the cron (the skill performs the refresh itself), or trigger the workflow manually via `workflow_dispatch`.
 
 !!! warning "Never edit `schema_types.py` by hand"

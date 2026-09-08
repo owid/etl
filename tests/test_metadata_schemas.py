@@ -15,7 +15,7 @@ from yaml.loader import SafeLoader
 from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.dag_helpers import get_active_snapshots, get_active_steps
 from etl.files import read_json_schema
-from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
+from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR, STEP_DIR, STEPS_DATA_DIR
 
 log = structlog.get_logger()
 
@@ -64,6 +64,28 @@ def _strip_jinja_templated_values(obj):
     elif isinstance(obj, list):
         for item in obj:
             _strip_jinja_templated_values(item)
+
+
+def _strip_jinja_from_typed_blocks(ind):
+    """Strip Jinja templates from the two blocks of an indicator that hold typed fields.
+
+    `display` (numDecimalPlaces, timeInterval, …) and
+    `presentation.grapher_config` (yAxis.min/max, yEquals, …) declare enums and
+    numbers, which a Jinja template never satisfies statically. Those validate
+    at runtime once the dimensions are known — `_expand_jinja` renders them, and
+    `etl.grapher.helpers._validate_grapher_config` re-validates grapher_config
+    afterwards. Every other field (description_short, title_public, …) is typed
+    `string` in the schema, so a Jinja template passes and keeps its coverage.
+
+    Applied to each indicator *and* to `definitions.common`, which the schema
+    `$ref`s to the very same indicator definition (#6674).
+    """
+    if not isinstance(ind, dict):
+        return
+    _strip_jinja_templated_values(ind.get("display"))
+    presentation = ind.get("presentation")
+    if isinstance(presentation, dict):
+        _strip_jinja_templated_values(presentation.get("grapher_config"))
 
 
 def _get_changed_files_vs_master(pattern: str) -> set[str] | None:
@@ -135,6 +157,7 @@ def test_dataset_schemas():
 
     validator = Draft7Validator(DATASET_SCHEMA)
     validation_errors = []
+    validated_count = 0
     active_steps = get_active_steps()
 
     # Walk over all files in STEPS_DATA_DIR with *.meta.yml extension
@@ -142,9 +165,13 @@ def test_dataset_schemas():
         if not _should_validate(meta_file_path, changed_files):
             continue
 
-        # Skip files that are not part of the active DAG (archived steps)
+        # Skip files that are not part of the active DAG (archived steps). Match the whole step
+        # path: a prefix test against the version directory would also accept archived datasets
+        # that share it with an active one (`garden/covid/latest/ecdc` next to the active
+        # `garden/covid/latest/cases_deaths`). The `/` form covers steps whose files live in
+        # their own directory, e.g. `garden/owid/latest/key_indicators/key_indicators.meta.yml`.
         rel = str(meta_file_path.relative_to(STEPS_DATA_DIR)).rsplit(".meta.yml", 1)[0]
-        if not any(s.startswith(rel) for s in active_steps):
+        if not any(rel == step or rel.startswith(step + "/") for step in active_steps):
             continue
 
         # extract version from path
@@ -164,6 +191,12 @@ def test_dataset_schemas():
 
         data = load_yaml_as_string(meta_file_path)
 
+        # `definitions.common` is merged into every indicator, and the schema validates it
+        # against the same indicator definition, so its typed blocks need the same treatment.
+        definitions = data.get("definitions")
+        if isinstance(definitions, dict):
+            _strip_jinja_from_typed_blocks(definitions.get("common"))
+
         # Ignore invalid `description` field, it's in too many latest datasets
         for tab in data.get("tables", {}).values():
             for ind in tab.get("variables", {}).values():
@@ -174,28 +207,23 @@ def test_dataset_schemas():
                 if "$schema" in ind.get("presentation", {}).get("grapher_config", {}):
                     del ind["presentation"]["grapher_config"]
 
-                # Strip Jinja templates from the two blocks that hold typed
-                # numeric fields (display: numDecimalPlaces, yAxis…; grapher_config:
-                # yAxis.min/max, yEquals…). Runtime rendering + post-render schema
-                # validation in `etl.grapher.helpers._validate_grapher_config`
-                # catches type mismatches for those fields after Jinja resolves.
-                # All other fields (description_short, title_public, etc.) keep
-                # their schema coverage even when they contain Jinja, since their
-                # schema type is `string` and Jinja-templated strings still pass.
-                display = ind.get("display", {})
-                if display:
-                    for key in list(display.keys()):
-                        if isinstance(display[key], str) and "<%" in display[key]:
-                            del display[key]
-                gc = ind.get("presentation", {}).get("grapher_config", {})
-                if gc:
-                    _strip_jinja_templated_values(gc)
+                _strip_jinja_from_typed_blocks(ind)
 
         # Validate the loaded data against the schema
+        validated_count += 1
         try:
             validator.validate(data)
         except ValidationError as e:
             validation_errors.append((meta_file_path, e))
+
+    # A full scan must reach the validator, otherwise a broken filter makes this test a no-op that
+    # passes for three months (#6572). The branch fast path is exempt: a PR may legitimately touch
+    # only files that every other filter then skips.
+    if changed_files is None:
+        assert validated_count > 0, (
+            "test_dataset_schemas validated 0 files on a full scan — the active-DAG filter is "
+            "skipping everything, so this test is not checking any metadata."
+        )
 
     # If there are validation errors, log summary and raise the first one
     if validation_errors:
@@ -206,6 +234,34 @@ def test_dataset_schemas():
         # Raise the first error
         first_file, first_error = validation_errors[0]
         raise ValidationError(f"Validation error in file: {first_file}") from first_error
+
+
+def test_jinja_in_typed_fields_is_stripped_from_definitions_common():
+    """A Jinja-templated enum/numeric field must be skipped in `definitions.common` too.
+
+    `definitions.common` `$ref`s the indicator definition, so its `display` and
+    `presentation.grapher_config` carry the same enums and numbers a template can't
+    satisfy statically. Only `tables.*.variables.*` used to be sanitized, so the
+    first such template on master (`timeInterval` in covid/2024-11-05/github_stats,
+    #6613) broke every build until #6674.
+    """
+    data = {
+        "definitions": {
+            "common": {
+                # Renders to `week` / `day`, both in the schema's enum, once `interval` is known.
+                "display": {"timeInterval": '<% if interval == "weekly" %>week<% else %>day<% endif %>'},
+            }
+        },
+        "tables": {},
+    }
+    _strip_jinja_from_typed_blocks(data["definitions"]["common"])
+    Draft7Validator(DATASET_SCHEMA).validate(data)
+
+    # Guardrail: a non-templated bad value must still fail, i.e. the block is sanitized, not skipped.
+    bad = {"definitions": {"common": {"display": {"timeInterval": "fortnight"}}}, "tables": {}}
+    _strip_jinja_from_typed_blocks(bad["definitions"]["common"])
+    with pytest.raises(ValidationError):
+        Draft7Validator(DATASET_SCHEMA).validate(bad)
 
 
 def test_snapshot_schemas():
@@ -291,6 +347,34 @@ def test_snapshot_license_lives_under_origin():
         "These snapshots set a top-level license (`meta.license` / `meta.license_name` / "
         "`meta.license_url`) on an origin-based snapshot. Move it under `meta.origin.license`:\n  "
         + "\n  ".join(sorted(violations))
+    )
+
+
+def test_multidim_configs_pin_grapher_schema():
+    """Guardrail: every multidim collection config must pin `grapher_schema`.
+
+    Grapher injects the collection's `grapherConfigSchema` as the `$schema` of each view config and
+    migrates outdated configs forward. When no version is given, ETL falls back to
+    `DEFAULT_GRAPHER_SCHEMA`, i.e. it tells Grapher the configs are already current — so a breaking
+    schema change upstream would silently skip the migration for those views.
+
+    Pinning records the version the config was actually authored against. See
+    `etl.collection.utils.resolve_grapher_schema` for the accepted forms.
+    """
+    missing = []
+    for config_path in sorted(Path(STEP_DIR / "export" / "multidim").glob("**/*.yml")):
+        config = yaml.safe_load(config_path.read_text()) or {}
+        # Only collection configs are in scope; the directory also holds plain data yaml
+        # (e.g. un/latest/map_brackets.yml).
+        if not isinstance(config, dict) or not {"dimensions", "views"} <= set(config):
+            continue
+        if "grapher_schema" not in config:
+            missing.append(str(config_path.relative_to(BASE_DIR)))
+
+    assert not missing, (
+        "These multidim configs don't pin `grapher_schema`. Add the current version as a "
+        f'**quoted** string (an unquoted `011` is parsed as octal) — `grapher_schema: "'
+        f'{DEFAULT_GRAPHER_SCHEMA.rsplit(".", 2)[1]}"`:\n  ' + "\n  ".join(missing)
     )
 
 

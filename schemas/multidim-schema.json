@@ -63,43 +63,65 @@
                 ]
             ]
         },
-        "grapherConfigSchema": {
+        "grapher_schema": {
             "type": "string",
-            "title": "Grapher config schema URL",
-            "description": "URL pointing to the JSON schema that validates the grapher configuration.",
-            "requirement_level": "optional",
+            "pattern": "^(\\d{3}|https://files\\.ourworldindata\\.org/schemas/grapher-schema\\.\\d{3}\\.json)$",
+            "title": "Grapher config schema version",
+            "description": "Version of the OWID Grapher chart-config schema that this collection's view configs were authored against. Grapher uses it as the `$schema` of every view config, and migrates outdated configs forward to the current version.",
+            "requirement_level": "recommended",
             "guidelines": [
                 [
-                    "Should point to the current version of the OWID Grapher schema."
+                    "Pin the version explicitly. When it is omitted, Grapher is told the configs already match the version this repo vendors (`DEFAULT_GRAPHER_SCHEMA`), so a breaking schema change would skip the migration."
                 ],
                 [
-                    "Used for validation of chart configuration objects."
+                    "Two forms are accepted: the short three-digit version (`\"011\"`) or the full schema URL."
+                ],
+                [
+                    "**Quote the short form.** YAML parses a bare `011` as an octal number, which silently resolves to a different version."
+                ],
+                [
+                    "Leave the pin alone once set — it records what the config was authored against, which is what lets Grapher migrate it after a breaking change."
+                ],
+                [
+                    "Pin here and nowhere else. A `$schema` inside a view's `config` overrides this field (grapher spreads the view config last) while being much less visible, so the two silently disagree. ETL logs a warning when a view shadows this pin."
+                ],
+                [
+                    "The exception is a pin that contradicts the config body (e.g. pinned `005` while using `chartTypes`, which only exists from `006`). That is a stale pin, not a record: Grapher would run migrations over a config they were never meant to touch. Correct it to the version the config is actually written against."
                 ]
             ],
             "examples": [
+                "011",
                 "https://files.ourworldindata.org/schemas/grapher-schema.011.json"
             ],
             "examples_bad": [
                 [
-                    "http://invalid-url.com/schema.json",
-                    "grapher-schema.011.json"
+                    "11",
+                    "0.11",
+                    "latest"
+                ],
+                [
+                    "grapher-schema.011.json",
+                    "https://files.ourworldindata.org/schemas/grapher-schema.latest.json"
                 ]
             ]
         },
         "title": {
             "type": "object",
             "title": "Collection title",
-            "description": "Title configuration for the collection display.",
-            "requirement_level": "required",
+            "description": "Title configuration for the collection display. Required for multidim collections (with non-empty `dimensions`); ignored for single-chart collections (with `dimensions: []`).",
+            "requirement_level": "conditional",
             "guidelines": [
                 [
-                    "Both `title` and `title_variant` are required."
+                    "Required when the collection has at least one dimension."
+                ],
+                [
+                    "`title_variant` is optional and may be omitted."
                 ],
                 [
                     "The title should be descriptive and user-friendly."
                 ],
                 [
-                    "The title variant should provide additional context or disambiguation."
+                    "The title variant, when present, should provide additional context or disambiguation."
                 ]
             ],
             "properties": {
@@ -147,7 +169,7 @@
                     "type": "string",
                     "title": "Title variant",
                     "description": "Additional context or variant information for the title.",
-                    "requirement_level": "required",
+                    "requirement_level": "optional",
                     "guidelines": [
                         [
                             "Must not end with a period."
@@ -162,19 +184,21 @@
                 }
             },
             "required": [
-                "title",
-                "title_variant"
+                "title"
             ],
             "additionalProperties": false
         },
         "default_selection": {
             "type": "array",
             "title": "Default entity selection",
-            "description": "List of entity names (e.g., countries) selected by default when the collection loads.",
-            "requirement_level": "required",
+            "description": "List of entity names (e.g., countries) selected by default when the collection loads. Conditional: required for multidim collections with at least one view that has chart tabs (line/bar/scatter/etc.) and no per-view `selectedEntityNames` fallback. Optional for single-chart collections (`dimensions: []`) and map-only mdims.",
+            "requirement_level": "conditional",
             "guidelines": [
                 [
-                    "Must contain at least one entity."
+                    "Can be omitted when every view either has its own `selectedEntityNames` or is map-only."
+                ],
+                [
+                    "When present, must contain at least one entity."
                 ],
                 [
                     "Entity names must be harmonized country names from the OWID catalog."
@@ -286,6 +310,41 @@
                 ]
             ]
         },
+        "chart_config_id": {
+            "type": "string",
+            "title": "Chart config UUID",
+            "description": "Identity of the single chart this config authors, as stored in grapher's `charts.configId`.",
+            "requirement_level": "required for single charts (`dimensions: []`), otherwise must be omitted",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            "guidelines": [
+                [
+                    "Only valid on single-chart collections (`dimensions: []`); multi-dimensional collections are identified by their catalog path."
+                ],
+                [
+                    "When bringing an existing chart into ETL, use that chart's `charts.configId` so the config lands on the existing chart instead of creating a new one."
+                ],
+                [
+                    "For a brand-new chart, mint a UUIDv7 with `python -c 'from etl.collection.chart_upsert import new_chart_config_id; print(new_chart_config_id())'`."
+                ],
+                [
+                    "Never change it once set — it is the chart's identity in every environment (local, staging, production)."
+                ],
+                [
+                    "Must be in canonical lower-case dashed form; it is used verbatim as grapher's lookup key."
+                ]
+            ],
+            "examples": [
+                "0191b6c7-5595-70b2-8d30-fa03fccd7add"
+            ],
+            "examples_bad": [
+                [
+                    "7118",
+                    "banning-of-chick-culling",
+                    "0191B6C7-5595-70B2-8D30-FA03FCCD7ADD",
+                    "0191b6c7559570b28d30fa03fccd7add"
+                ]
+            ]
+        },
         "topic_tags": {
             "type": "array",
             "title": "Topic tags",
@@ -325,14 +384,63 @@
                 "type": "string"
             }
         },
+        "download_package": {
+            "type": "object",
+            "title": "Complete-dataset download package",
+            "description": "Where the pre-built \"download the complete dataset\" package for this collection was published. Not authored by hand: Collection.save() builds the package, uploads it to R2, and fills this in. Absent when no package was built.",
+            "requirement_level": "optional",
+            "guidelines": [
+                [
+                    "Never set this by hand -- it records the output of a build, and a stale value points readers at an object that no longer matches the data."
+                ],
+                [
+                    "Pass `download_package=False` to `Collection.save()` to publish a collection without a package."
+                ]
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "url": {
+                    "type": "string",
+                    "description": "Public URL of the zip (wide CSV + metadata.json + readme.md), for the download button."
+                },
+                "parquetUrl": {
+                    "type": "string",
+                    "description": "Public URL of the same data as Parquet, for reading with code."
+                },
+                "metadataUrl": {
+                    "type": "string",
+                    "description": "Public URL of the standalone metadata.json accompanying the Parquet."
+                },
+                "indicatorCount": {
+                    "type": "integer",
+                    "description": "Number of indicator columns in the package."
+                },
+                "rowCount": {
+                    "type": "integer",
+                    "description": "Number of data rows in the package."
+                },
+                "sizeBytes": {
+                    "type": "integer",
+                    "description": "Size of the zip in bytes."
+                }
+            },
+            "required": [
+                "url",
+                "parquetUrl",
+                "metadataUrl",
+                "indicatorCount",
+                "rowCount",
+                "sizeBytes"
+            ]
+        },
         "dimensions": {
             "type": "array",
             "title": "Collection dimensions",
-            "description": "Array of dimension objects that define the filter dropdowns available to users.",
+            "description": "Array of dimension objects that define the filter dropdowns available to users. An empty array (and a single view) means the collection is pushed as a regular Grapher chart instead of a multi-dim page.",
             "requirement_level": "required",
             "guidelines": [
                 [
-                    "Must contain at least one dimension."
+                    "Can be empty when the collection is a single chart (no dimension dropdowns)."
                 ],
                 [
                     "Each dimension creates a dropdown filter in the user interface."
@@ -884,6 +992,9 @@
                             "includedEntityNames": {
                                 "$ref": "grapher-schema.011.json#/properties/includedEntityNames"
                             },
+                            "inapplicableEntityNames": {
+                                "$ref": "grapher-schema.011.json#/properties/inapplicableEntityNames"
+                            },
                             "entityTypePlural": {
                                 "$ref": "grapher-schema.011.json#/properties/entityTypePlural"
                             },
@@ -932,8 +1043,6 @@
         }
     },
     "required": [
-        "title",
-        "default_selection",
         "dimensions",
         "views"
     ],

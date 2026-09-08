@@ -16,6 +16,9 @@ meta:
     # Files
     url_main: https://gco.iarc.who.int/causes/infections/tools-map?mode=1&sex=0&continent=0&agent=0&cancer=0&key=asr&scale=quantile
     url_download: https://gco.iarc.who.int/causes/infections/data/v2/
+    # NOTE: Checked for a newer release in September 2026 and found none: the tool still applies the de Martel et al.
+    # (2020) attributable fractions to GLOBOCAN 2020 incidence, and its data files were last modified on 2023-08-31.
+    # Before the next update, check whether IARC has published a GLOBOCAN 2022-based version.
     date_accessed: 2024-09-06
 
     # License

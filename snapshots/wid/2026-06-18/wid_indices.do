@@ -13,9 +13,10 @@ When needed, values are converted to PPP (2011 vintage) adjusted to prices of th
 HOW TO EXECUTE:
 
 1. Open this do-file in a local installation of Stata (it takes several hours to execute)
-2. It generates five CSV files in this directory (snapshots/wid/2026-06-18/), which exclude and
-   include extrapolations. A single command imports all five as snapshots in the ETL (the script
-   world_inequality_database.py maps each generated CSV to its snapshot):
+2. It generates six CSV files in this directory (snapshots/wid/2026-06-18/): the five income and
+   wealth extracts, which exclude and include extrapolations, plus population. A single command
+   imports all six as snapshots in the ETL (the script world_inequality_database.py maps each
+   generated CSV to its snapshot):
 	etls wid/2026-06-18/world_inequality_database
 3. Delete the leftover csv files: from the snapshots/wid/2026-06-18/ folder, run
     rm *.csv
@@ -343,5 +344,35 @@ sort country year
 
 *Export csv
 export delimited using "wid_indices_fiscal_992ijt_exclude.csv", replace
+
+*-------------------------------------------------------------------------------
+* POPULATION
+*-------------------------------------------------------------------------------
+* WID's population counts (npopul) for ages 992 (adults, 20+) and 999 (all ages).
+* These are the demographic yardstick for the derived poverty_inequality steps:
+* WID's income series are per adult while the World Bank's are per capita, so
+* converting between the two bases, and weighting countries in global
+* decompositions, needs WID's own adult and total counts (another source's
+* population would leak cross-source demographic disagreements into the
+* comparison).
+*
+* Unit i (individuals) is deliberate. The population dimension only exists for
+* distributed series: WID's codes dictionary says "for aggregate series (or
+* prices, exchange rates, and population series), we use the letter 'i' (for
+* individuals) by default", and the API confirms it — requesting population(i j)
+* for npopul returns "1 population category" and yields only npopul992i/999i,
+* while the same request on aptinc returns both 992i and 992j. The j in
+* aptinc992j says how income is split among adults, not how many adults there
+* are, so aptinc992j / npopul992i is the correct pairing.
+*
+* This block is a single API call and takes a few minutes, unlike the extractions
+* above; it is last so it can be re-run on its own if only population changes.
+
+qui wid, indicators(npopul) areas(_all) ages(992 999) population(i) clear
+
+* Raw passthrough: export the response exactly as the wid command returns it
+* (country / variable / percentile / year / value). The reshape to one column
+* per variable and the descriptive column names happen in the meadow step.
+export delimited using "wid_population_992_999_i.csv", replace delim(",")
 
 exit, clear

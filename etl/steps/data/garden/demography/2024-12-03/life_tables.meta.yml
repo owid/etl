@@ -57,7 +57,7 @@ tables:
         title: Central death rate
         unit: deaths per 1,000 people
         description_short: |-
-          The death rate, calculated as the number of deaths divided by the average number of people alive during the interval.
+          Death rate, calculated as the number of deaths divided by the average number of people alive during the interval.
         description_key:
           - |-
             The death rate is measured using the number of person-years lived during the interval.
@@ -83,7 +83,7 @@ tables:
         title: Probability of death
         unit: "%"
         description_short: |-
-          The probability of dying in a given interval, among people who survived to the start of that interval.
+          Probability of dying in a given interval, among people who survived to the start of that interval.
         description_key:
           - |-
             For example, the probability of death for a 50 year old in a given year is found by: dividing the number of deaths in 50 year olds that year, by the number of people alive at the age of 50 at the start of the year.
@@ -138,15 +138,15 @@ tables:
         description_short: |-
           <%- if age == '0' -%>
           <%- if sex == 'both' -%>
-          The << type >> life expectancy at birth, in a given year.
+          << type | capitalize >> life expectancy at birth, in a given year.
           <%- else -%>
-          The << type >> life expectancy at birth among << sex + 's' >>, in a given year.
+          << type | capitalize >> life expectancy at birth among << sex + 's' >>, in a given year.
           <%- endif -%>
           <%- else -%>
           <%- if sex == 'both' -%>
-          The remaining << type >> life expectancy at age << age >>, in a given year.
+          Remaining << type >> life expectancy at age << age >>, in a given year.
           <%- else -%>
-          The remaining << type >> life expectancy at age << age >> among << sex + 's' >>, in a given year.
+          Remaining << type >> life expectancy at age << age >> among << sex + 's' >>, in a given year.
           <%- endif -%>
           <%- endif -%>
         description_key:
@@ -179,7 +179,7 @@ tables:
         short_unit: years
         unit: years
         description_short: |-
-          The difference in << type >> life expectancy (females - males) at a given age.
+          Difference in << type >> life expectancy (females - males) at a given age.
         description_key:
           - Higher values indicate longer life expectancy among females than males.
           - |-
@@ -204,7 +204,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-          The ratio of << type >> life expectancy (females/males) at a given age.
+          Ratio of << type >> life expectancy (females/males) at a given age.
         description_key:
           - Higher values indicate longer life expectancy among females than males.
           - |-

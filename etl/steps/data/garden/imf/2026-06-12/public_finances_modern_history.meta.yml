@@ -29,7 +29,7 @@ tables:
         title: Government revenue (% of GDP)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: The sum of all the money received by the government from taxes and other non-tax sources, as a percentage of GDP.
+        description_short: Sum of all the money received by the government from taxes and other non-tax sources, as a percentage of GDP.
         display:
           name: Government revenue (% of GDP)
           numDecimalPlaces: 1
@@ -40,7 +40,7 @@ tables:
         title: Government expenditure (% of GDP)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: The sum of all the money spent by the government on goods and services, as a percentage of GDP. It includes interest paid on government debt.
+        description_short: Sum of all the money spent by the government on goods and services, as a percentage of GDP. It includes interest paid on government debt.
         display:
           name: Government expenditure (% of GDP)
           numDecimalPlaces: 1
@@ -51,7 +51,7 @@ tables:
         title: Government interest expense (% of GDP)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: The sum of all the money spent by the government on interest payments, as a percentage of GDP.
+        description_short: Sum of all the money spent by the government on interest payments, as a percentage of GDP.
         display:
           name: Government interest expense (% of GDP)
           numDecimalPlaces: 1
@@ -62,7 +62,7 @@ tables:
         title: Government primary expenditure (% of GDP)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: The sum of all the money spent by the government on goods and services, as a percentage of GDP. It excludes the government’s interest expense.
+        description_short: Sum of all the money spent by the government on goods and services, as a percentage of GDP. It excludes the government’s interest expense.
         display:
           name: Government primary expenditure (% of GDP)
           numDecimalPlaces: 1
@@ -73,7 +73,7 @@ tables:
         title: Government primary balance (% of GDP)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: The difference between government revenue and government expenditure, excluding interest payments, as a percentage of GDP.
+        description_short: Difference between government revenue and government expenditure, excluding interest payments, as a percentage of GDP.
         display:
           name: Government primary balance (% of GDP)
           numDecimalPlaces: 1
@@ -93,7 +93,7 @@ tables:
         title: Real long-term interest rate
         unit: "%"
         short_unit: "%"
-        description_short: The long-term interest rate adjusted for inflation.
+        description_short: Long-term interest rate adjusted for inflation.
         description_key:
           - The Public Finances in Modern History database is compiled by the International Monetary Fund from a wide range of historical sources and documents 200 years of government revenue, spending, deficits, and debt.
         display:
@@ -105,7 +105,7 @@ tables:
         title: Real GDP growth rate
         unit: "%"
         short_unit: "%"
-        description_short: The rate of change of the GDP, adjusted for inflation.
+        description_short: Rate of change of the GDP, adjusted for inflation.
         description_key:
           - The Public Finances in Modern History database is compiled by the International Monetary Fund from a wide range of historical sources and documents 200 years of government revenue, spending, deficits, and debt.
         display:

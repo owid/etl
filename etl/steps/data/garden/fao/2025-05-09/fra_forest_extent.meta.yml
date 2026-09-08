@@ -17,7 +17,7 @@ tables:
     variables:
       forest_share:
         title: Forest cover
-        description_short: "The share of land area covered by forests."
+        description_short: "Share of land area covered by forests."
         unit: "%"
         short_unit: "%"
         display:

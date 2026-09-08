@@ -126,7 +126,7 @@ def get_chart_details(slug):
 
     details = {
         "type": chart.chart_config.chartType,
-        "tab": chart.chart_config.full.get("tab"),
+        "tab": chart.chart_config.config.get("tab"),
     }
     return details
 

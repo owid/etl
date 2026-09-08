@@ -27,15 +27,15 @@ macros: |-
   <% macro description_short(metric, age, cause, unit) %>
     <% if metric == "Rate" %>
         <% if age == 'Age-standardized' %>
-            The estimated number of age-standardized << unit >> from << cause >>, per 100,000 people.
+            Estimated number of age-standardized << unit >> from << cause >>, per 100,000 people.
         <% elif age == 'All ages' %>
-            The estimated number of << unit >> from << cause >>, per 100,000 people.
+            Estimated number of << unit >> from << cause >>, per 100,000 people.
         <% endif %>
     <% elif metric == "Share" %>
         <% if age == 'Age-standardized' %>
-            The estimated share of age-standardized << unit >> from << cause >>.
+            Estimated share of age-standardized << unit >> from << cause >>.
         <% elif age == 'All ages' %>
-            The estimated share of << unit >> from << cause >>.
+            Estimated share of << unit >> from << cause >>.
         <% endif %>
     <% endif %>
   <% endmacro %>

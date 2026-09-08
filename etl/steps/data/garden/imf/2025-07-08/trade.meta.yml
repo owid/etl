@@ -99,9 +99,9 @@ tables:
         short_unit: "%"
         description_short: |-
           <% if counterpart_country == 'Intraregional' %>
-          The percentage of a country's total goods exports, excluding freight and insurance costs, that happen within the region.
+          Percentage of a country's total goods exports, excluding freight and insurance costs, that happen within the region.
           <% elif counterpart_country != 'Intraregional' %>
-          The percentage of a country's total goods exports, excluding freight and insurance costs, that go to << counterpart_country >>.
+          Percentage of a country's total goods exports, excluding freight and insurance costs, that go to << counterpart_country >>.
           <%- endif -%>
         description_key:
           - This indicator shows how much of a country’s merchandise exports are sent to << counterpart_country >>, expressed as a percentage of country´s total exports.
@@ -133,9 +133,9 @@ tables:
         short_unit: "%"
         description_short: |-
           <% if counterpart_country == 'Intraregional' %>
-          The percentage of a country's total goods imports, including freight and insurance costs, that happen within the region.
+          Percentage of a country's total goods imports, including freight and insurance costs, that happen within the region.
           <% elif counterpart_country != 'Intraregional' %>
-          The percentage of a country's total goods imports, including freight and insurance costs, that come from << counterpart_country >>.
+          Percentage of a country's total goods imports, including freight and insurance costs, that come from << counterpart_country >>.
           <%- endif -%>
         description_key:
           - This indicator shows how much of a country’s merchandise imports are sourced from << counterpart_country >>, expressed as a percentage of country´s total imports.
@@ -167,9 +167,9 @@ tables:
         short_unit: "%"
         description_short: |-
           <% if counterpart_country == 'Intraregional' %>
-          The percentage of a country's total goods trade (exports + imports) that happen within the region.
+          Percentage of a country's total goods trade (exports + imports) that happen within the region.
           <% elif counterpart_country != 'Intraregional' %>
-          The percentage of a country's total goods trade (exports + imports) that takes place with << counterpart_country >>.
+          Percentage of a country's total goods trade (exports + imports) that takes place with << counterpart_country >>.
           <%- endif -%>
         description_key:
           - This indicator shows the share of a country’s total trade in goods that is conducted with << counterpart_country >>.
@@ -196,7 +196,7 @@ tables:
           <%- endif -%>
         unit: "%"
         short_unit: "%"
-        description_short: The value of goods imported from China, including freight and insurance costs, as a percentage of a country’s [gross domestic product (GDP)](#dod:gdp).
+        description_short: Value of goods imported from China, including freight and insurance costs, as a percentage of a country’s [gross domestic product (GDP)](#dod:gdp).
         description_key:
           - This indicator shows the value of merchandise goods a country imports from China relative to a country’s economic output.
           - *cif_basis
@@ -213,7 +213,7 @@ tables:
           <%- endif -%>
         unit: "%"
         short_unit: "%"
-        description_short: The value of a country’s total goods imports, including freight and insurance costs, as a percentage of a country’s [gross domestic product (GDP)](#dod:gdp).
+        description_short: Value of a country’s total goods imports, including freight and insurance costs, as a percentage of a country’s [gross domestic product (GDP)](#dod:gdp).
         description_key:
           - This indicator measures how large a country’s total imports are compared with the size of its economy.
           - *cif_basis
@@ -226,7 +226,7 @@ tables:
         title: << counterpart_country >>´s rank among import partners
         unit: "rank"
         short_unit: ""
-        description_short: The rank of << counterpart_country >> among a country's import partners, based on import values that include the cost of goods, freight, and insurance.  A rank of 1 indicates that the << counterpart_country >> is the country's largest import partner.
+        description_short: Rank of << counterpart_country >> among a country's import partners, based on import values that include the cost of goods, freight, and insurance.  A rank of 1 indicates that the << counterpart_country >> is the country's largest import partner.
         description_key:
           - This indicator shows the rank of << counterpart_country >> among a country's import partners.
           - *cif_basis
@@ -240,7 +240,7 @@ tables:
         title: << counterpart_country >>´s rank category among import partners
         unit: ""
         short_unit: ""
-        description_short: The categorical rank of << counterpart_country >> among a country's import partners, based on import values that include the cost of goods, freight, and insurance. Categories range from "1st - Top partner" for the largest import partner to "Not in top 5" for all others.
+        description_short: Categorical rank of << counterpart_country >> among a country's import partners, based on import values that include the cost of goods, freight, and insurance. Categories range from "1st - Top partner" for the largest import partner to "Not in top 5" for all others.
         description_key:
           - This indicator categorizes the rank of << counterpart_country >> among a country's import partners into distinct groups.
           - *cif_basis
@@ -301,9 +301,9 @@ tables:
         short_unit: "US$"
         description_short: |-
           <% if counterpart_country == 'Intraregional' %>
-          The combined value of a country’s goods exports and imports that happens within the region, measured in current US dollars.
+          Combined value of a country’s goods exports and imports that happens within the region, measured in current US dollars.
           <% elif counterpart_country != 'Intraregional' %>
-          The combined value of a country’s goods exports and imports, measured in current US dollars.
+          Combined value of a country’s goods exports and imports, measured in current US dollars.
           <%- endif -%>
         description_key:
           - This indicator shows the total value of a country’s international trade in goods, combining both exports and imports.

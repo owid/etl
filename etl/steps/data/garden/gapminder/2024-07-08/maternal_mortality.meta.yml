@@ -26,14 +26,14 @@ tables:
           numDecimalPlaces: 1
       live_births:
         title: Live births
-        description_short: The number of live births in a given year.
+        description_short: Number of live births in a given year.
         unit: births
         short_unit: ""
         display:
           numDecimalPlaces: 0
       maternal_deaths:
         title: Maternal deaths
-        description_short: The number of maternal deaths in a given year.
+        description_short: Number of maternal deaths in a given year.
         unit: deaths
         short_unit: ""
         display:
@@ -43,7 +43,7 @@ tables:
           from any cause related or aggravated by the pregnancy or its management, but not from accidental or incidental causes.
       number_of_women_between_15_49_years:
         title: Number of women of reproductive age (15-49 years)
-        description_short: The number of women and girls aged 15-49 years in a given year.
+        description_short: Number of women and girls aged 15-49 years in a given year.
         unit: women of reproductive age
         short_unit: ""
         display:
@@ -59,7 +59,7 @@ tables:
       skilled_attendance_pct:
         title: Skilled personnel attendance at birth (%)
         description_short: |-
-          The percentage of births attended by skilled health personnel.
+          Percentage of births attended by skilled health personnel.
         unit: "%"
         short_unit: "%"
         display:

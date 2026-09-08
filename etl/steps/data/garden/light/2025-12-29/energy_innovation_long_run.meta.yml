@@ -8,7 +8,7 @@ definitions:
         - Energy
 
   description_short_price_of_lighting: |-
-    The price for lighting per million lumen-hours. 1 lumen-hour is equal to the luminous energy emitted in 1 hour by a light source emitting a luminous flux of 1 lumen. For comparison: a standard 100W incandescent light bulb emits around 1600 lumen. This data is expressed in British pounds, adjusted for inflation.
+    Price for lighting per million lumen-hours. 1 lumen-hour is equal to the luminous energy emitted in 1 hour by a light source emitting a luminous flux of 1 lumen. For comparison: a standard 100W incandescent light bulb emits around 1600 lumen. This data is expressed in British pounds, adjusted for inflation.
 
   description_processing_weeks_of_earnings_needed_for_reading: |-
     To construct this indicator, we converted the lighting price series (originally expressed as the cost per 1 million lumen-hours) into the daily cost of lighting suitable for reading, assuming 800 lumen-hours per day. This was done by dividing the original series by 1,000,000 and multiplying by 800.
@@ -69,7 +69,7 @@ tables:
         title: Weeks of average earnings needed to afford lighting for reading
         unit: weeks
         short_unit: weeks
-        description_short: "The number of weeks of average earnings needed to afford lighting for reading (defined as 800 lumen-hours per day)."
+        description_short: "Number of weeks of average earnings needed to afford lighting for reading (defined as 800 lumen-hours per day)."
         description_key:
           - ""
         processing_level: major
@@ -84,7 +84,7 @@ tables:
         title: Days of average earnings needed to afford lighting for reading
         unit: days
         short_unit: days
-        description_short: "The number of days of average earnings needed to afford lighting for reading (defined as 800 lumen-hours per day)."
+        description_short: "Number of days of average earnings needed to afford lighting for reading (defined as 800 lumen-hours per day)."
         description_key:
           - ""
         processing_level: major

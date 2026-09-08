@@ -1,11 +1,15 @@
 from unittest.mock import patch
 
+import numpy as np
+import pandas as pd
+import pytest
 from owid import catalog
 
 from etl import paths
 from etl.helpers import (
     PathFinder,
     create_dataset,
+    end_with_punctuation,
 )
 
 
@@ -87,3 +91,27 @@ def test_PathFinder_with_private_steps():
     }
     assert pf.step == "data-private://garden/namespace/2023/name"
     assert pf.get_dependency_step_name("name") == "snapshot-private://namespace/2023/name"
+
+
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        ("Share of adults with an account", "Share of adults with an account."),
+        ("Share of adults with an account.", "Share of adults with an account."),
+        ("Which of these do you agree with?", "Which of these do you agree with?"),
+        ('... do you agree with?"', '... do you agree with?"'),
+        ("Deaths (per 100,000 people).", "Deaths (per 100,000 people)."),
+        ("Trailing space is kept as is ", "Trailing space is kept as is."),
+        ("", ""),
+        ("   ", "   "),
+        (None, None),
+    ],
+)
+def test_end_with_punctuation(text, expected):
+    assert end_with_punctuation(text) == expected
+
+
+@pytest.mark.parametrize("missing", [pd.NA, np.nan, pd.NaT])
+def test_end_with_punctuation_missing_values(missing):
+    # producer text read out of a table column is a pandas missing value, not None
+    assert end_with_punctuation(missing) is missing

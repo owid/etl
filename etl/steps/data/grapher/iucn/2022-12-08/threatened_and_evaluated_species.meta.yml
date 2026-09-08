@@ -15,7 +15,7 @@ tables:
         display:
           name: Estimated number of described species
           numDecimalPlaces: 0
-        description_short: The total number of known/described species. This does not mean these species have been assessed for their extinction risk level.
+        description_short: Total number of known/described species. This does not mean these species have been assessed for their extinction risk level.
         description_key:
           - Since many species have not yet been described, this is a large underestimate of the total number of species in the world.
           - For a species to be formally described, it's description must be published in a scientific journal or book.

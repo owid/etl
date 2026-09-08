@@ -47,6 +47,7 @@ MDIMs can be crafted in various ways, going from totally manual to fully automat
 Below is a simple MDIM configuration file (modified for demo purposes):
 
 ```yaml title="etl/steps/export/multidim/covid/latest/covid.deaths.yml"
+grapher_schema: "011"
 title:
   title: COVID-19 confirmed deaths
   title_variant: ""
@@ -105,6 +106,38 @@ def run() -> None:
 As you can see, there are top-level fields (`title`, `default_selection`, `topic_tags`) which define the MDIM name and other details, and then we have `dimensions` and `views` fields. The `dimensions` field defines the selectors, and the `views` field defines the views for the selection. Each view has a reference to the dimensions it represents.
 
 In this example, we note that we can group together indicators from any dataset. While we may present them as "dimensional", the underlying data structure may not be.
+
+!!! important "Always pin `grapher_schema`"
+    `grapher_schema` records the version of the [Grapher chart-config schema](https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema) that this MDIM's view configs were written against. Grapher uses it as the `$schema` of every view config, and migrates outdated configs forward to the current version when it upserts the MDIM.
+
+    Two forms are accepted — the short version, or the full URL:
+
+    ```yaml
+    grapher_schema: "011"
+    grapher_schema: https://files.ourworldindata.org/schemas/grapher-schema.011.json
+    ```
+
+    **Quote the short form.** YAML parses a bare `011` as an octal number, so it would silently resolve to a different version (ETL rejects it rather than guessing).
+
+    Omitting the field falls back to `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`), which tells Grapher the configs are already current — so the next breaking schema change would skip the migration for those views. Once set, leave the pin alone: it is a record of what the config was authored against, which is exactly what lets Grapher migrate it later.
+
+    The one exception is a pin that **contradicts the config body** — e.g. pinned `005` while the config uses `chartTypes`, a field that only exists from `006` onwards (the 005→006 migration is what creates it). That is a stale pin rather than a record, and leaving it means Grapher runs migrations over a config they were never meant to touch. Correct such a pin to the version the config is actually written against.
+
+    **Pin it in one place only.** A view's own `config` may also carry a `$schema`, and Grapher lets that value *win* over the collection pin — while being far less visible, since it usually sits in a Python dict rather than on line 1 of the YAML. ETL logs a warning when a view shadows the collection pin; don't add new ones. If you need to know what version an MDIM actually declares, the collection pin is the answer unless that warning fires.
+
+    **The pin appears under three different names**, which is worth knowing before you go looking for it:
+
+    | Where | Key | Value |
+    |---|---|---|
+    | config YAML | `grapher_schema` | `"011"` |
+    | `export/multidim/…/<name>.config.json` | `grapher_schema` | `"011"` |
+    | Grapher DB / admin API payload | `grapherConfigSchema` | `https://…/grapher-schema.011.json` |
+
+    The generated JSON keeps the authored short form because `CollectionSet.read()` loads it back through `Collection.from_dict`; only the upsert payload is camelized and resolved to a full URL. So grepping the generated JSON for `grapherConfigSchema` finds nothing even when the pin is working perfectly.
+
+    Note also that while `DEFAULT_GRAPHER_SCHEMA` equals the version everything pins, a working pin and a dropped one look identical in the database. ETL logs a warning when a collection falls back to the default, which is the signal to trust.
+
+    This field is MDIM-only. Explorers reach Grapher through the legacy TSV path, which has no equivalent.
 
 !!! tip "Learn more about the structure of MDIMs in [:fontawesome-brands-github: their schema](https://github.com/owid/etl/blob/master/schemas/multidim-schema.json)"
     There are more options available in the schema that are not covered here. E.g. you can set chart configurations for each view (`.config`), or indicator-level display settings (`.display`). You can even tweak the presentation fields like `description_key` for a specific view (`.metadata`).

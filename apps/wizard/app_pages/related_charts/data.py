@@ -58,9 +58,9 @@ def get_raw_charts() -> pd.DataFrame:
         c.id as chart_id,
         c.createdAt as created_at,
         cf.slug,
-        cf.full->>'$.title' as title,
-        cf.full->>'$.subtitle' as subtitle,
-        cf.full->>'$.note' as note,
+        cf.config->>'$.title' as title,
+        cf.config->>'$.subtitle' as subtitle,
+        cf.config->>'$.note' as note,
         t.tags,
         a.views_7d,
         a.views_14d,
@@ -70,7 +70,7 @@ def get_raw_charts() -> pd.DataFrame:
     left join analytics as a on cf.slug = a.slug
     left join tags as t on c.id = t.chart_id
     -- exclude drafts
-    where cf.full->>'$.isPublished' != 'false'
+    where cf.config->>'$.isPublished' != 'false'
     """
     df = read_sql(query)
 

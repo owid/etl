@@ -197,6 +197,32 @@ def get_metadata_path(dest_dir: str) -> Path:
     return N.metadata_path
 
 
+def end_with_punctuation(text: str | None) -> str | None:
+    """Append a period to text that doesn't already end with punctuation.
+
+    Our style guide requires chart subtitles — and `description_short`, which Grapher
+    falls back to for the subtitle — to end with punctuation. Use this on text taken
+    verbatim from a producer, where we relay their wording but still want the sentence
+    to close properly. Don't use it on text we author ourselves: write the period.
+
+    A closing quote or bracket after the punctuation counts as ending with it, so
+    `… agree with?"` and `… (per 100,000 people).` are both left alone.
+
+    Text taken straight out of a table column can be a pandas missing value rather
+    than `None` (`pd.NA` raises on `bool()`), so anything that isn't a string is
+    handed back untouched.
+    """
+    if not isinstance(text, str) or not text:
+        return text
+    stripped = text.rstrip()
+    if not stripped:
+        return text
+    # a trailing quote/bracket may sit after the punctuation mark
+    if stripped.rstrip("\"'”’)]")[-1:] in {".", "!", "?"}:
+        return text
+    return stripped + "."
+
+
 def render_yaml_metadata(ds: catalog.Dataset) -> None:
     """Render Jinja templates in metadata for all tables in a dataset.
 
@@ -930,6 +956,17 @@ class PathFinder:
 
         return explorer
 
+    # Metadata that makes an exported figure reproducible, per format. matplotlib stamps the
+    # timestamp and its own version into every file, so without this an unchanged figure re-rendered
+    # under a new matplotlib produces a diff with no pixel change — measured on 3.10.8 -> 3.10.9,
+    # which rewrote all ten committed static_viz outputs and altered nothing but `<dc:title>` and
+    # PNG `Software`. A byte diff should mean the picture changed.
+    # `Title` cannot be nulled: the SVG backend type-checks it and raises on None.
+    _REPRODUCIBLE_METADATA = {
+        "svg": {"Date": None, "Creator": None},
+        "png": {"Software": None},
+    }
+
     def export_fig(self, fig, filename: str, extensions: list[str], **kwargs) -> None:
         """Export a matplotlib figure to multiple formats.
 
@@ -937,6 +974,9 @@ class PathFinder:
         :param filename: The base filename (without extension).
         :param extensions: List of file extensions to export (e.g., ["png", "svg"]).
         :param kwargs: Additional keyword arguments to pass to fig.savefig().
+            A ``metadata`` dict is merged over the reproducible defaults for that format rather
+            than replacing them, so a caller can add fields without re-introducing the version
+            stamp.
         """
         for ext in extensions:
             path = self.directory / f"{filename}.{ext}"
@@ -945,9 +985,9 @@ class PathFinder:
                 "format": ext,
                 **kwargs,
             }
-            if ext == "svg":
-                # Remove date metadata for SVG to keep files clean
-                save_kwargs["metadata"] = {"Date": None}
+            defaults = self._REPRODUCIBLE_METADATA.get(ext)
+            if defaults is not None:
+                save_kwargs["metadata"] = {**defaults, **(kwargs.get("metadata") or {})}
             fig.savefig(**save_kwargs)
             self.log.info(f"Saved chart to {path}")
 

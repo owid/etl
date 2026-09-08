@@ -22,9 +22,7 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Number of countries V-Dem lists in the last year of the data, used as the denominator for the
-# "share of countries that ever had ..." indicators, whose framing looks back over the history of
-# the countries that exist today.
+# Number of countries that V-Dem lists in the most recent year of the data
 NUM_COUNTRIES_LAST_YEAR = 179
 
 # REGION AGGREGATES
@@ -410,10 +408,10 @@ def append_citation_full(tb: Table) -> Table:
 def estimate_share_countries(tb: Table, num_countries_last) -> Table:
     """Estimate the share of countries with a certain property."""
     # NOTE: The count of countries only considers *actually* existing countries, and skips imputed countries. That's due to how `aggregate.run` has implemented that. Therefore, we can estimate the share of countries easily by num_countries_women_ever / total_countries * 100. No need to worry about counting imputed countries!
-    # The share is estimated relative to the number of countries as of 2024, which is a different strategy compared to the rest of indicators. That's because the framing is "looking backwards at the history of current countris".
+    # The share is estimated relative to the number of countries in the most recent year of the data, which is a different strategy compared to the rest of indicators. That's because the framing is "looking backwards at the history of current countries".
 
     assert num_countries_last == NUM_COUNTRIES_LAST_YEAR, (
-        f"Expected {NUM_COUNTRIES_LAST_YEAR} countries in the last year of the data, found {num_countries_last}."
+        f"Expected {NUM_COUNTRIES_LAST_YEAR} countries in the most recent year of the data, found {num_countries_last}."
     )
 
     columns_rename = {
@@ -430,7 +428,7 @@ def estimate_share_countries(tb: Table, num_countries_last) -> Table:
     # Keep only category "yes", and entity "World"
     tb_share = tb_share[(tb_share["category"] == "yes") & (tb_share["country"] == "World")].drop(columns=["category"])
 
-    # Share of countries relative to the number of countries as of the last year of the data
+    # Share of countries relative to the number of countries in the most recent year of the data
     for column in columns_rename.values():
         assert tb_share[column].notna().all(), f"NA detected in `{column}`!"
         tb_share[column] /= num_countries_last * 0.01

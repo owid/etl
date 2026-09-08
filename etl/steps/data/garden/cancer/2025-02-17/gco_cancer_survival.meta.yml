@@ -35,7 +35,7 @@ tables:
           <%- endif -%>
         unit: "%"
         short_unit: "%"
-        description_short: The percentage of patients still alive five years after the diagnosis, assuming cancer is the only cause of death.
+        description_short: Percentage of patients still alive five years after the diagnosis, assuming cancer is the only cause of death.
         description_key:
           - The percentage of patients still alive at a certain time after diagnosis, assuming cancer is the only cause of death.
           - Net survival estimates survival by removing the effect of other causes of death.
@@ -68,7 +68,7 @@ tables:
           <%- endif -%>
         unit: "%"
         short_unit: "%"
-        description_short: The probability of developing cancer in a given population in a given year.
+        description_short: Probability of developing cancer in a given population in a given year.
         description_key:
           - Cancer incidence is the number of new cancer cases arising in a specified population over a given period of time (typically 1 year).
           - It can be expressed as an absolute number of cases within the entire population per year or as a rate per 100,000 persons per year.
@@ -99,7 +99,7 @@ tables:
           <%- endif -%>
         unit: "%"
         short_unit: "%"
-        description_short: The probability of dying from cancer in a given population in a given year.
+        description_short: Probability of dying from cancer in a given population in a given year.
         description_key:
           - Cancer mortality is the number of deaths due to cancer occurring in a specified population in a given year.
           - It can be expressed as an absolute number of deaths within the entire population per year or as a rate per 100 000 persons per year.

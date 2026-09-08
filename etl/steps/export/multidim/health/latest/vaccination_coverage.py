@@ -30,7 +30,6 @@ def run() -> None:
     )
 
     common_view_config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
         "chartTypes": ["LineChart", "SlopeChart", "DiscreteBar"],
         "hasMapTab": True,
         "tab": "chart",

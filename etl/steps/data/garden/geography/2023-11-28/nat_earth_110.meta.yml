@@ -24,7 +24,7 @@ tables:
     variables:
       latitude_centroid:
         title: Latitude
-        description_short: The latitude of the centroid of the country.
+        description_short: Latitude of the centroid of the country.
         unit: degrees
         short_unit: °
         display:
@@ -36,7 +36,7 @@ tables:
               The latitude is given of the [centroid](#dod:centroid) of the country.
       absolute_latitude:
         title: Absolute latitude
-        description_short: The absolute value of the latitude of the centroid of the country.
+        description_short: Absolute value of the latitude of the centroid of the country.
         unit: degrees from the equator
         short_unit: °
         display:

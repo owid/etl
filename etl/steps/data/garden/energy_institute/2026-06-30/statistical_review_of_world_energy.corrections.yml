@@ -1,0 +1,36 @@
+# Known errors in the Energy Institute's Statistical Review of World Energy that we patch locally
+# until the provider fixes them. One entry per error. See etl/data_corrections.py for the format.
+
+- indicator: total_energy_supply_ej
+  entity: Croatia
+  years: [1983]
+  action: override
+  value: null
+  expect: {gt: 1}
+  reason: >-
+    Croatia is reported with a total energy supply of ~7.8 EJ in 1983 (roughly 20 times its
+    present-day value, and before Croatia existed as an independent country). Every other year before
+    1990 is zero. This is a spurious value in the 2026 consolidated dataset, present in both the narrow
+    CSV and the "Total Energy Supply (TES) -EJ" sheet of the workbook.
+  provider: Energy Institute
+  status: open
+
+- indicator: total_energy_supply_ej
+  entity: Poland
+  years: [1975]
+  action: override
+  value: 4.379
+  expect: {lt: 1}
+  reason: >-
+    Poland's total energy supply for 1975 is reported as ~0.34 EJ, about one thirteenth of the
+    neighboring years (~4 EJ) and smaller than Poland's coal supply alone that year. This is a
+    regression in the 2026 release, present in both the narrow CSV and the "Total Energy Supply
+    (TES) -EJ" sheet of the workbook: the 2025 release reported 4.393 EJ for the same country-year.
+    We restore 4.379 EJ, which two independent routes agree on: it is the sum of Poland's own energy
+    sources in the 2026 release (which is what total energy supply measures), and it is the 2025
+    figure rebased by the 0.3% offset between the two releases that holds for every other Polish year
+    from 1965 to 1989. Leaving it empty instead would silently understate the 1975 aggregates for
+    Europe, the European Union, high-income countries and the World, since those are built from the
+    country values.
+  provider: Energy Institute
+  status: open

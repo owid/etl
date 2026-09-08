@@ -209,7 +209,7 @@ tables:
 
       decile1_share:
         title: Poorest decile - Share (<<table>>) (Spell <<survey_number>>)
-        description_short: The share of income received by the poorest 10% of the population.
+        description_short: Share of income received by the poorest 10% of the population.
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -223,7 +223,7 @@ tables:
 
       decile2_share:
         title: 2nd decile - Share (<<table>>) (Spell <<survey_number>>)
-        description_short: The share of income received by the 2nd decile (tenth of the population).
+        description_short: Share of income received by the 2nd decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -237,7 +237,7 @@ tables:
 
       decile3_share:
         title: 3rd decile - Share (<<table>>) (Spell <<survey_number>>)
-        description_short: The share of income received by the 3rd decile (tenth of the population).
+        description_short: Share of income received by the 3rd decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -251,7 +251,7 @@ tables:
 
       decile4_share:
         title: 4th decile - Share (<<table>>) (Spell <<survey_number>>)
-        description_short: The share of income received by the 4th decile (tenth of the population).
+        description_short: Share of income received by the 4th decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -265,7 +265,7 @@ tables:
 
       decile5_share:
         title: 5th decile - Share (<<table>>) (Spell <<survey_number>>)
-        description_short: The share of income received by the 5th decile (tenth of the population).
+        description_short: Share of income received by the 5th decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -279,7 +279,7 @@ tables:
 
       decile6_share:
         title: 6th decile - Share (<<table>>) (Spell <<survey_number>>)
-        description_short: The share of income received by the 6th decile (tenth of the population).
+        description_short: Share of income received by the 6th decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -293,7 +293,7 @@ tables:
 
       decile7_share:
         title: 7th decile - Share (<<table>>) (Spell <<survey_number>>)
-        description_short: The share of income received by the 7th decile (tenth of the population).
+        description_short: Share of income received by the 7th decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -307,7 +307,7 @@ tables:
 
       decile8_share:
         title: 8th decile - Share (<<table>>) (Spell <<survey_number>>)
-        description_short: The share of income received by the 8th decile (tenth of the population).
+        description_short: Share of income received by the 8th decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -321,7 +321,7 @@ tables:
 
       decile9_share:
         title: 9th decile - Share (<<table>>) (Spell <<survey_number>>)
-        description_short: The share of income received by the 9th decile (tenth of the population).
+        description_short: Share of income received by the 9th decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -335,7 +335,7 @@ tables:
 
       decile10_share:
         title: Richest decile - Share (<<table>>) (Spell <<survey_number>>)
-        description_short: The share of income received by the richest 10% of the population.
+        description_short: Share of income received by the richest 10% of the population.
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -590,7 +590,7 @@ tables:
 
       decile1_share:
         title: Poorest decile - Share (<<table>>)
-        description_short: The share of income received by the poorest 10% of the population.
+        description_short: Share of income received by the poorest 10% of the population.
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -604,7 +604,7 @@ tables:
 
       decile2_share:
         title: 2nd decile - Share (<<table>>)
-        description_short: The share of income received by the 2nd decile (tenth of the population).
+        description_short: Share of income received by the 2nd decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -618,7 +618,7 @@ tables:
 
       decile3_share:
         title: 3rd decile - Share (<<table>>)
-        description_short: The share of income received by the 3rd decile (tenth of the population).
+        description_short: Share of income received by the 3rd decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -632,7 +632,7 @@ tables:
 
       decile4_share:
         title: 4th decile - Share (<<table>>)
-        description_short: The share of income received by the 4th decile (tenth of the population).
+        description_short: Share of income received by the 4th decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -646,7 +646,7 @@ tables:
 
       decile5_share:
         title: 5th decile - Share (<<table>>)
-        description_short: The share of income received by the 5th decile (tenth of the population).
+        description_short: Share of income received by the 5th decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -660,7 +660,7 @@ tables:
 
       decile6_share:
         title: 6th decile - Share (<<table>>)
-        description_short: The share of income received by the 6th decile (tenth of the population).
+        description_short: Share of income received by the 6th decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -674,7 +674,7 @@ tables:
 
       decile7_share:
         title: 7th decile - Share (<<table>>)
-        description_short: The share of income received by the 7th decile (tenth of the population).
+        description_short: Share of income received by the 7th decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -688,7 +688,7 @@ tables:
 
       decile8_share:
         title: 8th decile - Share (<<table>>)
-        description_short: The share of income received by the 8th decile (tenth of the population).
+        description_short: Share of income received by the 8th decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -702,7 +702,7 @@ tables:
 
       decile9_share:
         title: 9th decile - Share (<<table>>)
-        description_short: The share of income received by the 9th decile (tenth of the population).
+        description_short: Share of income received by the 9th decile (tenth of the population).
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'
@@ -716,7 +716,7 @@ tables:
 
       decile10_share:
         title: Richest decile - Share (<<table>>)
-        description_short: The share of income received by the richest 10% of the population.
+        description_short: Share of income received by the richest 10% of the population.
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: '%'

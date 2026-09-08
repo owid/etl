@@ -3,6 +3,7 @@
 import inspect
 import json
 import re
+import uuid
 from collections import defaultdict
 from collections.abc import Callable
 from copy import deepcopy
@@ -13,7 +14,7 @@ from typing import Any, Literal, TypedDict, cast
 import fastjsonschema
 import pandas as pd
 import yaml
-from owid.catalog.core.meta import GrapherConfig, description_key_to_string
+from owid.catalog.core.meta import GrapherConfig, description_key_to_string, validate_description_key_list
 from owid.catalog.core.utils import underscore
 from structlog import get_logger
 from typing_extensions import Self
@@ -35,15 +36,47 @@ from etl.collection.utils import (
     get_complete_dimensions_filter,
     get_tables_by_name_mapping,
     map_indicator_path_to_id,
+    resolve_grapher_schema,
     unique_records,
     validate_indicators_in_db,
 )
-from etl.config import OWID_ENV, OWIDEnv
+from etl.config import DEFAULT_GRAPHER_SCHEMA, OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import EXPORT_DIR, SCHEMAS_DIR
 
 # Logging
 log = get_logger()
+
+# Query params that Grapher reads from a chart URL. Dimension slugs are also encoded as query
+# params on multidim/explorer pages, so they must not collide with these.
+# Source: `GRAPHER_QUERY_PARAM_KEYS` in owid-grapher (packages/@ourworldindata/types/src/
+# grapherTypes/GrapherTypes.ts), plus `hideControls` (a page-level param not in that list).
+GRAPHER_RESERVED_QUERY_PARAMS = {
+    "country",
+    "endpointsOnly",
+    "facet",
+    "focus",
+    "globe",
+    "globeRotation",
+    "globeZoom",
+    "hideControls",
+    "mapSelect",
+    "overlay",
+    "peerCountries",
+    "region",
+    "showNoDataArea",
+    "showSelectionOnlyInTable",
+    "stackMode",
+    "tab",
+    "tableFilter",
+    "tableSearch",
+    "time",
+    "uniformYAxis",
+    "xScale",
+    "yScale",
+    "year",
+    "zoomToSelection",
+}
 
 
 class _GroupedViewsEntry(TypedDict):
@@ -87,14 +120,35 @@ class Collection(MDIMBase):
     dimensions: list[Dimension]
     views: list[View]
     catalog_path: str
-    title: dict[str, str]
-    default_selection: list[str]
 
     _definitions: Definitions
 
+    # Optional for single-chart collections (`dimensions: []`) and map-only mdims.
+    # See `validate_required_fields()` for the per-collection-type rules.
+    title: dict[str, str] | None = None
+    default_selection: list[str] | None = None
+
+    # The chart's stable identity (`charts.configId` in grapher). Required for — and only
+    # valid on — single-chart collections (`dimensions: []`); mdims are identified by
+    # their catalog path instead. See `validate_chart_config_id()`.
+    chart_config_id: str | None = None
+
     dependencies: set[str] = field(default_factory=set)
     topic_tags: list[str] | None = None
+    # Grapher chart-config schema version that this collection's view configs were authored
+    # against. Short ("011") or full URL form; see `resolve_grapher_schema`. Grapher uses it as the
+    # `$schema` of every view config, and skips config migrations entirely when it is missing — so
+    # pin it explicitly rather than relying on the `DEFAULT_GRAPHER_SCHEMA` fallback.
+    grapher_schema: str | None = None
     _default_dimensions: dict[str, str] | None = None
+
+    # The published "download the complete dataset" package covering every
+    # dimension combination, as opposed to the per-view download. Shape matches
+    # grapher's DownloadPackage type. Not authored by hand: `save()` builds the
+    # package and fills this in, so a collection whose save() was passed
+    # `download_package=False` (or that failed to build one) leaves it None and
+    # its page renders exactly as before.
+    download_package: dict | None = None
 
     # Internal use. For save() method.
     _collection_type: str | None = field(init=False, default="multidim")
@@ -128,6 +182,9 @@ class Collection(MDIMBase):
         if isinstance(self.dependencies, list):
             # Convert list to set
             self.dependencies = set(self.dependencies)
+
+        # Fail at authoring time on a malformed pin, rather than at upsert time
+        resolve_grapher_schema(self.grapher_schema)
 
     @property
     def definitions(self) -> Definitions:
@@ -180,6 +237,13 @@ class Collection(MDIMBase):
         return EXPORT_DIR / collection_dir / (self.catalog_path.replace("#", "/") + ".config.json")
 
     @property
+    def local_download_package_dir(self) -> Path:
+        # Where the download package's files are written before being uploaded to R2.
+        # Kept next to the local config JSON, for the same reason: so the artifacts a
+        # run published can be inspected on disk afterwards.
+        return self.local_config_path.parent / "download_package"
+
+    @property
     def short_name(self):
         _, name = self.catalog_path.split("#")
         return name
@@ -198,6 +262,7 @@ class Collection(MDIMBase):
         tolerate_extra_indicators: bool = False,
         prune_choices: bool = True,
         prune_dimensions: bool = True,
+        download_package: bool = True,
     ):
         # Ensure we have an environment set
         if owid_env is None:
@@ -226,6 +291,9 @@ class Collection(MDIMBase):
         # Check that no choice name or slug is repeated
         self.validate_dimension_uniqueness()
 
+        # Check that no dimension slug collides with a query param reserved by Grapher
+        self.validate_dimension_slugs_not_grapher_query_params()
+
         # Validate that datasets used are part of the dependencies
         indicators = self.indicators_in_use(tolerate_extra_indicators)
         self.validate_indicators_are_from_dependencies(indicators)
@@ -237,8 +305,25 @@ class Collection(MDIMBase):
         # Disabled as it is not really necessary? This fails on CI/CD for explorers
         # self.validate_topic_tags()
 
+        # Top-level title / default_selection are required only for mdims (and only conditionally
+        # for default_selection). Single-chart collections (`dimensions: []`) ignore both.
+        self.validate_title()
+        self.validate_default_selection()
+
+        # Single charts must declare their grapher identity (`chart_config_id`); mdims must not.
+        self.validate_chart_config_id()
+
         # Run sanity checks on grouped views
         self.validate_grouped_views()
+
+        # Check that no view carries a corrupted description_key
+        self.validate_description_keys()
+
+        # Warn about view configs that shadow the collection-level schema pin
+        self.warn_on_view_schema_overrides()
+
+        # Warn when no version is pinned and we fall back to the vendored default
+        self.warn_if_grapher_schema_unpinned()
 
         # Sort views based on dimension order
         self.sort_views_based_on_dimensions()
@@ -259,14 +344,88 @@ class Collection(MDIMBase):
         # Upsert to DB
         self.upsert_to_db(owid_env)
 
+        # Build and publish the complete-dataset download package.
+        if download_package:
+            self.save_download_package(owid_env)
+
+    def save_download_package(self, owid_env: OWIDEnv | None = None) -> None:
+        """Build the complete-dataset package (wide CSV + metadata.json + readme.md
+        zipped, plus Parquet + metadata.json), publish it to R2, and record where it
+        landed in the collection's config so the data page can link to it.
+
+        Called at the end of `save()`, and deliberately *after* `upsert_to_db()`:
+        the builder needs the page slug, which grapher assigns when the MDIM row is
+        created, and the indicators to be resolvable in the DB. That ordering is why
+        the config gets upserted a second time here -- the first upsert necessarily
+        happened before there was a package to point at.
+
+        Two kinds of collection are skipped, both because there is no page to attach a
+        package to: explorers, which have no `multi_dim_data_pages` row at all, and
+        MDIMs that have a row but no slug because nobody has published them yet. The
+        latter is not an edge case -- 13 of the 59 multidim steps are in that state on a
+        staging server -- so it must not fail the step. A collection published later
+        gets its package on the next run.
+        """
+        from etl.collection.download_package import build_download_package_for_collection, resolve_page_slug
+
+        if self._collection_type != "multidim":
+            log.info("collection.download_package.skipped_not_multidim", collection_type=self._collection_type)
+            return
+
+        if resolve_page_slug(self) is None:
+            log.info("collection.download_package.skipped_unpublished", catalog_path=self.catalog_path)
+            return
+
+        package = build_download_package_for_collection(self, dest_dir=self.local_download_package_dir)
+        self.download_package = package.to_config()
+
+        # Re-export and re-upsert so the local debug config and the DB both carry the
+        # package, rather than the version from before it was built.
+        self.save_config_local()
+        self.upsert_to_db(owid_env or OWID_ENV)
+
     def upsert_to_db(self, owid_env: OWIDEnv):
+        # Single-chart case: no multi-dim page, so we push to the charts table via
+        # the chart admin endpoint instead of `/multi-dims/`. The charts/mdims split
+        # is legacy — the longer-term goal is one table with grapher handling both
+        # (see #6069). Chart mode is decided by the *declared* identity
+        # (`chart_config_id`, which `validate_chart_config_id` ties to declared
+        # `dimensions: []`), not by `self.dimensions` here: `prune_dimensions()` may
+        # have emptied the dimension list of a genuine mdim whose dimensions all had
+        # a single choice in use, and such an mdim must not be reclassified.
+        if self.chart_config_id is not None:
+            if len(self.views) != 1:
+                raise ValueError(
+                    f"Collection '{self.catalog_path}' declares `chart_config_id` but has "
+                    f"{len(self.views)} views. A single-chart collection must have exactly one view."
+                )
+            from etl.collection.chart_upsert import upsert_collection_as_chart
+
+            upsert_collection_as_chart(self, owid_env)
+            return
+
+        if len(self.dimensions) == 0:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' has no dimensions left but does not declare "
+                f"`chart_config_id`. If this is a multidim whose dimensions were dropped because "
+                f"each had a single choice in use, pass `prune_dimensions=False` to `save()` to "
+                f"keep them. If it is meant to be a single chart, declare `chart_config_id` "
+                f"(see `etl chart-config-id --help`)."
+            )
+
         # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
         # TODO: I think we could move this to the Grapher side.
         config = replace_catalog_paths_with_ids(self.to_dict())
 
         # description_key is a markdown string; a YAML list is authoring sugar
         # and gets converted before the config is stored.
-        _convert_description_key_lists(config)
+        _convert_description_key_lists(config, context=self.catalog_path)
+
+        # Grapher expects the resolved schema URL under its own key (`grapherConfigSchema`), which
+        # it injects as the `$schema` of every view config before migrating it to the latest
+        # version. Always send it: without it, Grapher skips those migrations.
+        config.pop("grapher_schema", None)
+        config["grapherConfigSchema"] = resolve_grapher_schema(self.grapher_schema)
 
         # Convert config from snake_case to camelCase
         config = camelize(config, exclude_keys={"dimensions"})
@@ -564,6 +723,25 @@ class Collection(MDIMBase):
             # Add slug to set
             slugs.add(dim.slug)
 
+    def validate_dimension_slugs_not_grapher_query_params(self):
+        """Validate that no dimension slug collides with a query param reserved by Grapher.
+
+        Dimension choices are encoded as query params on multidim/explorer pages (e.g.
+        ``?sex=female``), in the same URL where Grapher reads its own params (``time``,
+        ``country``, ``tab``, ...). A colliding slug would break one or the other.
+
+        Slugs are compared in their snake_case form, since that is what `save()` persists
+        and what ends up in the URL (e.g. a slug "Time" would be saved as "time").
+        """
+        for dim in self.dimensions:
+            slug = underscore(dim.slug)
+            if slug in GRAPHER_RESERVED_QUERY_PARAMS:
+                raise ValueError(
+                    f"Dimension slug '{slug}' in collection '{self.catalog_path}' collides with a query param "
+                    f"reserved by Grapher. Rename the dimension slug. Reserved names: "
+                    f"{sorted(GRAPHER_RESERVED_QUERY_PARAMS)}"
+                )
+
     def validate_indicators_are_from_dependencies(self, indicators):
         """Validate that the provided indicators are from tables in datasets specified in the collections dependencies."""
         deps = {dep.split("://", 1)[-1] if "://" in dep else dep for dep in self.dependencies}
@@ -580,10 +758,186 @@ class Collection(MDIMBase):
                 "Add 'topic_tags' to your config YAML."
             )
 
+    def validate_title(self):
+        """`title.title` is required for mdim collections (the data page renders empty `<h1>` otherwise)."""
+        # Only multidims render a data page that needs a top-level title. Explorers manage their
+        # own title, and single-chart collections (`dimensions: []`) have no data page.
+        if self._collection_type != "multidim":
+            return
+        if not self.dimensions:
+            return
+        if not self.title or not self.title.get("title"):
+            raise ValueError(
+                f"Collection '{self.catalog_path}' is a multidim (has dimensions) but is missing "
+                "a top-level `title.title`. Add it to your config YAML."
+            )
+
+    def validate_chart_config_id(self):
+        """`chart_config_id` is required for — and only valid on — single-chart collections.
+
+        A single chart's identity in grapher is its config UUID (`charts.configId`), and the
+        ETL config YAML has to declare it: for a chart that already exists, look up its UUID;
+        for a new chart, mint one. Without it we couldn't tell "push this config to that chart"
+        apart from "create yet another chart".
+        """
+        # Only multidims can be single charts (`dimensions: []`); explorers are always multi-view.
+        if self._collection_type != "multidim":
+            return
+
+        if self.dimensions:
+            # An mdim is identified by its catalog path (`multi_dim_data_pages.catalogPath`).
+            if self.chart_config_id:
+                raise ValueError(
+                    f"Collection '{self.catalog_path}' declares `chart_config_id` but has dimensions. "
+                    "That field identifies a single chart; mdims are identified by their catalog path. "
+                    "Remove it."
+                )
+            return
+
+        if not self.chart_config_id:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' is a single chart (`dimensions: []`) but is missing "
+                "a top-level `chart_config_id`. It is the chart's identity in grapher (`charts.configId`) "
+                "and must be declared in the config YAML. `etl chart-config-id` writes it for you:\n"
+                "  - for a chart that already exists: "
+                "`etl chart-config-id lookup <config file> --slug <slug>`;\n"
+                "  - for a brand-new chart: `etl chart-config-id new <config file>`."
+            )
+
+        # The UUID is used verbatim as the lookup key in
+        # `PUT /charts/by-config/:uuid/etlConfig` and stored as a CHAR(36), so it has to be
+        # in canonical lower-case dashed form. `uuid.UUID()` alone is too lenient — it happily
+        # parses '{...}', 'urn:uuid:...', undashed hex and upper case, none of which would
+        # match the chart we mean to target: the endpoint would create a *new* chart instead.
+        if not isinstance(self.chart_config_id, str):
+            raise ValueError(
+                f"Collection '{self.catalog_path}' has an invalid `chart_config_id` "
+                f"({self.chart_config_id!r}): expected a UUID string, got {type(self.chart_config_id).__name__}. "
+                "Quote it in the config YAML."
+            )
+        try:
+            parsed = uuid.UUID(self.chart_config_id)
+        except ValueError:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' has an invalid `chart_config_id` "
+                f"('{self.chart_config_id}'): expected a UUID."
+            ) from None
+        if str(parsed) != self.chart_config_id:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' has a non-canonical `chart_config_id` "
+                f"('{self.chart_config_id}'). Grapher stores and matches it as a lower-case dashed "
+                f"UUID, so write it exactly as '{parsed}'."
+            )
+        if parsed.version != 7:
+            # Every chart config UUID grapher has ever generated is a UUIDv7, so a different
+            # version means the value probably didn't come from grapher (or from
+            # `new_chart_config_id`). Not fatal — the upsert would just create a new chart —
+            # but almost always a sign the wrong UUID was pasted in.
+            log.warning(
+                "collection.chart_config_id.not_uuid7",
+                catalog_path=self.catalog_path,
+                chart_config_id=self.chart_config_id,
+                version=parsed.version,
+                message=(
+                    "`chart_config_id` is not a UUIDv7. Grapher generates v7 UUIDs for chart "
+                    "configs — double-check this is the intended chart's `charts.configId`."
+                ),
+            )
+
+    def validate_default_selection(self):
+        """Warn per-view when a non-map-only view has no entity-selection fallback.
+
+        Top-level `default_selection` and per-view `selectedEntityNames` are independent
+        fallbacks; a view is only ill-defined when neither is set AND the view actually
+        renders a chart tab (line/bar/scatter/etc.) where the selection matters.
+        """
+        # Explorers manage their own entity selection; this fallback check is mdim-only.
+        if self._collection_type != "multidim":
+            return
+        if not self.dimensions:
+            return
+        if self.default_selection:
+            return
+        for view in self.views:
+            view_config = view.config or {}
+            chart_types = view_config.get("chartTypes")
+            is_map_only = chart_types == [] and view_config.get("tab") == "map"
+            if is_map_only:
+                continue
+            if view_config.get("selectedEntityNames"):
+                continue
+            log.warning(
+                "collection.missing_default_selection",
+                catalog_path=self.catalog_path,
+                view_dimensions=view.dimensions,
+                message=(
+                    "View has chart tabs but no entity selection — set `default_selection` "
+                    "at the collection level or `selectedEntityNames` on this view."
+                ),
+            )
+
     def validate_grouped_views(self):
         for view in self.views:
             if view.is_grouped:
                 sanity_check_grouped_view(view)
+
+    def warn_on_view_schema_overrides(self):
+        """Warn when a view config carries its own `$schema`, shadowing `grapher_schema`.
+
+        Grapher applies the collection pin as `{$schema: grapherConfigSchema, **view.config}`, so a
+        view's own `$schema` wins — and it is far less visible than the collection pin on line 1 of
+        the config YAML. That combination has bitten us before: a config pinned at an old version
+        while its body used fields from a newer one, so Grapher ran migrations over a config they
+        were never meant to touch. Pin the collection instead.
+        """
+        overrides = defaultdict(int)
+        for view in self.views:
+            config = view.config
+            if isinstance(config, dict) and "$schema" in config:
+                overrides[config["$schema"]] += 1
+
+        for schema, n_views in sorted(overrides.items()):
+            log.warning(
+                f"Collection '{self.catalog_path}': {n_views} view(s) set `$schema` in their config "
+                f"({schema}), which overrides the collection-level `grapher_schema` "
+                f"({resolve_grapher_schema(self.grapher_schema)}). Remove it and pin the whole "
+                "collection with the top-level `grapher_schema` field instead."
+            )
+
+    def warn_if_grapher_schema_unpinned(self):
+        """Warn when the collection pins no schema version and the default is used.
+
+        The fallback is `DEFAULT_GRAPHER_SCHEMA`, so grapher is told the config already matches the
+        version this repo vendors. That is usually true, but it means a config authored against an
+        older schema would skip migration. It also makes "pinned" and "defaulted" indistinguishable
+        in the database while the two happen to agree — so say so out loud instead.
+        """
+        if self.grapher_schema is None:
+            log.warning(
+                f"Collection '{self.catalog_path}' pins no `grapher_schema`; falling back to "
+                f"{DEFAULT_GRAPHER_SCHEMA}. Add a top-level `grapher_schema` to the config YAML "
+                "recording the version its view configs were authored against."
+            )
+
+    def validate_description_keys(self):
+        """Fail on a view whose `description_key` list cannot be real content.
+
+        MDIMs convert these lists into a markdown string on upsert, and explorers skip
+        that conversion altogether (they override `upsert_to_db`), so neither path
+        noticed a corrupted value. `grapher_checks` doesn't help either: it only runs
+        from `create_dataset`, never for `export://` steps.
+        """
+        for view in self.views:
+            # `ViewMetadata` is a TypedDict, so view metadata is a plain dict at runtime.
+            metadata = view.metadata
+            if metadata is None:
+                continue
+            description_key = metadata.get("description_key")
+            if isinstance(description_key, list):
+                validate_description_key_list(
+                    _flatten_description_key(description_key),
+                    context=f"{self.catalog_path}, view {view.dimensions}",
+                )
 
     def prune_dimensions(self):
         """Remove dimension if only one of its choice is in use."""
@@ -1304,15 +1658,22 @@ def snake_to_camel(s: str) -> str:
     return _pattern.sub(lambda match: match.group(1).upper(), s)
 
 
-def _convert_description_key_lists(config: dict[str, Any]) -> None:
+def _flatten_description_key(description_key: list[Any]) -> list[str]:
+    """`- *anchor` authoring produces nested lists; flatten them like dataset YAML
+    metadata does."""
+    return [item for sub in description_key for item in ([sub] if isinstance(sub, str) else sub)]
+
+
+def _convert_description_key_lists(config: dict[str, Any], context: str | None = None) -> None:
     """Convert description_key lists to markdown strings in the collection-level
     and per-view metadata of a collection config (in place)."""
     metadatas = [config.get("metadata"), *(view.get("metadata") for view in config.get("views", []))]
     for metadata in metadatas:
         if metadata and isinstance(metadata.get("description_key"), list):
-            # `- *anchor` authoring produces nested lists; flatten them like
-            # dataset YAML metadata does before converting.
-            flat = [item for sub in metadata["description_key"] for item in ([sub] if isinstance(sub, str) else sub)]
+            flat = _flatten_description_key(metadata["description_key"])
+            # The conversion below joins the items into a markdown string, which hides a
+            # corrupted list (e.g. one bullet per character) rather than failing on it.
+            validate_description_key_list(flat, context=context)
             metadata["description_key"] = description_key_to_string(flat)
 
 

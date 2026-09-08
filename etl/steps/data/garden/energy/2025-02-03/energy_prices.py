@@ -106,6 +106,11 @@ def run() -> None:
     tb_monthly = tb_ember_monthly.copy()
     tb_monthly = tb_monthly.format(keys=["country", "date"], short_name="energy_prices_monthly")
 
+    # Each point represents a calendar month, so tag the interval: grapher encodes sub-yearly data as
+    # days-since-zeroDay integers, and without this it would format them as individual days.
+    for column in tb_monthly.columns:
+        tb_monthly[column].m.display = {**(tb_monthly[column].m.display or {}), "timeInterval": "month"}
+
     #
     # Save outputs.
     #

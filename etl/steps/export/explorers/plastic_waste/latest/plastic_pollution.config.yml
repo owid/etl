@@ -389,7 +389,7 @@ views:
             colorScaleNumericBins: "0.01;0.1;1;10;10"
     config:
       title: Share of global plastic waste exports
-      subtitle: The share of the world's plastic exports in a given year.
+      subtitle: Share of the world's plastic exports in a given year.
       type: LineChart
       yAxisMin: 0
       hasMapTab: true
@@ -453,7 +453,7 @@ views:
             colorScaleNumericBins: "0.01;0.1;1;10;10"
     config:
       title: Share of global plastic waste imports
-      subtitle: The share of the world's plastic imports in a given year.
+      subtitle: Share of the world's plastic imports in a given year.
       type: LineChart
       yAxisMin: 0
       hasMapTab: true

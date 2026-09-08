@@ -41,27 +41,27 @@ macros: |-
   <% macro description_short(metric, age, cause, sex) %>
       <% if age != 'Age-standardized' and age != 'All ages' %>
           <% if metric == "Number" %>
-              The estimated prevalence of << cause >> in << sex >> aged << age >>.
+              Estimated prevalence of << cause >> in << sex >> aged << age >>.
           <% elif metric == "Rate" %>
-              The estimated prevalence of << cause >> in << sex >> aged << age >>, per 100,000 people.
+              Estimated prevalence of << cause >> in << sex >> aged << age >>, per 100,000 people.
           <% elif metric == "Share" %>
-              The estimated prevalence of << cause >> in << sex >> aged << age >>, per 100 people.
+              Estimated prevalence of << cause >> in << sex >> aged << age >>, per 100 people.
           <% endif %>
       <% elif age == 'Age-standardized' %>
           <% if metric == "Number" %>
-              The estimated age-standardized prevalence of << sex >> with << cause >>.
+              Estimated age-standardized prevalence of << sex >> with << cause >>.
           <% elif metric == "Rate" %>
-              The estimated age-standardized prevalence of << sex >> with << cause >>, per 100,000 people.
+              Estimated age-standardized prevalence of << sex >> with << cause >>, per 100,000 people.
           <% elif metric == "Share" %>
-              The estimated age-standardized prevalence of << sex >> with << cause >>, per 100 people.
+              Estimated age-standardized prevalence of << sex >> with << cause >>, per 100 people.
           <% endif %>
       <% elif age == 'All ages' %>
           <% if metric == "Number" %>
-              The estimated prevalence of << cause >> in << sex >>.
+              Estimated prevalence of << cause >> in << sex >>.
           <% elif metric == "Rate" %>
-              The estimated prevalence of << cause >> in << sex >>, per 100,000 people.
+              Estimated prevalence of << cause >> in << sex >>, per 100,000 people.
           <% elif metric == "Share" %>
-              The estimated prevalence of << cause >> in << sex >>, per 100 people.
+              Estimated prevalence of << cause >> in << sex >>, per 100 people.
           <% endif %>
       <% endif %>
   <% endmacro %>

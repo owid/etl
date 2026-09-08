@@ -1,0 +1,203 @@
+# Known upstream data errors in the WDI data, corrected locally until fixed at the source.
+# See etl/data_corrections.py for the format.
+#
+# 2025 World Bank-aggregate spikes/drops in trade-ratio indicators, caused by a severe drop in
+# underlying country coverage for 2025 (many countries -- notably large, low-trade-ratio economies
+# like the US and Japan -- haven't reported yet). These are ratio-of-aggregates (e.g. world trade /
+# world GDP), so an incomplete, non-random sample of reporting countries biases the aggregate, not
+# just adds noise. Confirmed via: (a) country coverage collapsing 35-45% for 2025 specifically
+# (vs. the normal ~5-10% year-to-year reporting lag), and (b) inconsistent *directions* across
+# related aggregates for the same indicator in the same year (e.g. Euro area -44% while Low & middle
+# income +18% for bx_gsr_ccis_zs) -- a signature of composition noise, not a real global trend.
+# Each entry below was individually verified against a z-score threshold (|z| > 2 relative to that
+# series' own historical year-over-year volatility). Revisit next update once 2025 reporting catches up.
+#
+# 2026-07-27: the audit was re-run against the re-snapshotted release and extended to every ratio /
+# share indicator (_zs family), using a *robust* z-score (median/MAD) so the outliers themselves
+# don't inflate the threshold. That surfaced 6 more (indicator, entity) pairs with the same
+# signature -- 5 of them already present (and equally biased) in the 2026-07-14 release, i.e. the
+# first pass simply didn't reach that far. Growth-rate (_zg) and net-flow (bn_*, bx_pef_*)
+# indicators are deliberately excluded from the sweep: they are already differences and/or cross
+# zero, so a percent-change z-score is not a meaningful statistic for them.
+# Three travel-services aggregates (bm_gsr_trvl_zs and bx_gsr_trvl_zs for EU(27) / Europe and
+# Central Asia) cleared the threshold too but are NOT corrected: travel services have a genuine
+# post-COVID recovery trend, so their 2025 moves can't be cleanly separated from composition noise.
+# Re-check them next update.
+- indicator: ne_trd_gnfs_zs
+  entity: World
+  years: [2025]
+  action: override
+  value: null
+  reason: World jumped from 56.7% to 68.5% (+20.7%) -- the US and Japan (large, low trade-ratio economies) are both missing from the 2025 sample, which mechanically inflates this GDP-weighted aggregate.
+  provider: World Bank
+  status: open
+- indicator: bg_gsr_nfsv_gd_zs
+  entity: World
+  years: [2025]
+  action: override
+  value: null
+  reason: Country coverage collapsed from 211 to 127 countries for 2025 (vs. the normal small year-to-year lag), biasing this GDP-weighted aggregate.
+  provider: World Bank
+  status: open
+- indicator: bg_gsr_nfsv_gd_zs
+  entity: High-income countries
+  years: [2025]
+  action: override
+  value: null
+  reason: Same coverage collapse as the World row for this indicator; the aggregate moved -14.0% in 2025 alone.
+  provider: World Bank
+  status: open
+- indicator: bg_gsr_nfsv_gd_zs
+  entity: European Union (27)
+  years: [2025]
+  action: override
+  value: null
+  reason: Same coverage collapse as the World row for this indicator; the aggregate moved -20.7% in 2025 alone.
+  provider: World Bank
+  status: open
+- indicator: bg_gsr_nfsv_gd_zs
+  entity: Europe and Central Asia (WB)
+  years: [2025]
+  action: override
+  value: null
+  reason: Same coverage collapse as the World row for this indicator; the aggregate moved -13.8% in 2025 alone.
+  provider: World Bank
+  status: open
+- indicator: bg_gsr_nfsv_gd_zs
+  entity: Middle East, North Africa, Afghanistan and Pakistan (WB)
+  years: [2025]
+  action: override
+  value: null
+  reason: Same coverage collapse as the World row for this indicator; the aggregate moved -20.9% in 2025 alone.
+  provider: World Bank
+  status: open
+- indicator: bx_gsr_tran_zs
+  entity: World
+  years: [2025]
+  action: override
+  value: null
+  reason: Country coverage collapsed from 209 to 126 countries for 2025, biasing this trade-weighted aggregate.
+  provider: World Bank
+  status: open
+- indicator: bx_gsr_tran_zs
+  entity: Lower-middle-income countries
+  years: [2025]
+  action: override
+  value: null
+  reason: Same coverage collapse as the World row for this indicator; the aggregate moved -16.4% in 2025 alone.
+  provider: World Bank
+  status: open
+- indicator: bx_gsr_ccis_zs
+  entity: World
+  years: [2025]
+  action: override
+  value: null
+  reason: Country coverage collapsed from 204 to 124 countries for 2025, biasing this trade-weighted aggregate.
+  provider: World Bank
+  status: open
+- indicator: bx_gsr_ccis_zs
+  entity: High-income countries
+  years: [2025]
+  action: override
+  value: null
+  reason: Same coverage collapse as the World row for this indicator; the aggregate moved -20.7% in 2025 alone.
+  provider: World Bank
+  status: open
+- indicator: bx_gsr_ccis_zs
+  entity: Europe and Central Asia (WB)
+  years: [2025]
+  action: override
+  value: null
+  reason: Same coverage collapse as the World row for this indicator; the aggregate moved -30.3% in 2025 alone -- the largest swing found in this audit.
+  provider: World Bank
+  status: open
+- indicator: tx_val_tran_zs_wt
+  entity: High-income countries
+  years: [2025]
+  action: override
+  value: null
+  reason: Country coverage collapsed from 209 to 126 countries for 2025, biasing this trade-weighted aggregate; moved -11.7% in 2025 alone.
+  provider: World Bank
+  status: open
+- indicator: tx_val_tran_zs_wt
+  entity: Latin America and Caribbean (WB)
+  years: [2025]
+  action: override
+  value: null
+  reason: Same coverage collapse as the High-income countries row for this indicator; the aggregate moved -14.4% in 2025 alone.
+  provider: World Bank
+  status: open
+
+# --- Added 2026-07-27 (second audit pass; see header note) --------------------------------------
+- indicator: bx_gsr_ccis_zs
+  entity: European Union (27)
+  years: [2025]
+  action: override
+  value: null
+  reason: Missed sibling of the World / High-income / Europe and Central Asia rows already corrected for this indicator. Country coverage collapsed from 204 to 124 for 2025 (-39%); the aggregate fell from 18.50% to 12.02% (-35.0%) after sitting in a 16.7-18.5% band since 2020.
+  provider: World Bank
+  status: open
+- indicator: bx_gsr_cmcp_zs
+  entity: European Union (27)
+  years: [2025]
+  action: override
+  value: null
+  reason: Country coverage collapsed from 208 to 126 for 2025 (-39%); the aggregate fell from 44.39% to 37.27% (-16.0%) after sitting in a 42.8-47.9% band since 2020. Sibling aggregates of this indicator move in inconsistent directions in 2025 -- the composition-noise signature.
+  provider: World Bank
+  status: open
+- indicator: bx_gsr_cmcp_zs
+  entity: Europe and Central Asia (WB)
+  years: [2025]
+  action: override
+  value: null
+  reason: Same coverage collapse as the European Union (27) row for this indicator; the aggregate fell from 39.55% to 33.85% (-14.4%) after sitting in a 38.2-42.8% band since 2020.
+  provider: World Bank
+  status: open
+- indicator: bx_gsr_tran_zs
+  entity: Upper-middle-income countries
+  years: [2025]
+  action: override
+  value: null
+  reason: Missed sibling of the World / Lower-middle-income rows already corrected for this indicator. Country coverage collapsed from 209 to 126 for 2025 (-40%); the aggregate fell from 19.31% to 15.94% (-17.5%).
+  provider: World Bank
+  status: open
+- indicator: bx_trf_pwkr_dt_gd_zs
+  entity: Middle East, North Africa, Afghanistan and Pakistan (WB)
+  years: [2025]
+  action: override
+  value: null
+  reason: Newly published in this release. Country coverage collapsed from 206 to 123 for 2025 (-40%); the aggregate jumped from 2.08% to 3.07% of GDP (+47.7%), implausible year-over-year movement for a remittances-to-GDP ratio that has stayed within 1.9-3.0% since 2020.
+  provider: World Bank
+  status: open
+- indicator: se_sec_uner_lo_ma_zs
+  entity: High-income countries
+  years: [2025]
+  action: override
+  value: null
+  reason: Country coverage collapsed from 100 to 15 economies for 2025 (-85%, the largest drop in this audit) -- with 15 of 100 economies reporting, the aggregate is not a meaningful high-income figure. Rose from 1.70% to 2.00% (+17.6%) against a flat 1.5-1.7% band since 2020.
+  provider: World Bank
+  status: open
+
+# --- Country-level point error (not a coverage-collapse aggregate) -------------------------------
+# Unlike every entry above, this one is a single wrong country value, and it is provable from the
+# World Bank's own data rather than from a coverage argument. See the note in the entry.
+- indicator: eg_elc_accs_ru_zs
+  entity: Chad
+  years: [2024]
+  action: override
+  value: null
+  # Guard: if the World Bank fixes this, the value will drop back to the single digits and the
+  # build will fail here, prompting removal of this entry rather than silently nulling a good value.
+  expect: {gt: 50}
+  reason: >-
+    The World Bank publishes 100.0% rural electricity access for Chad in 2024, up from 0.4% in 2023
+    and against a 0.4-7.7% range over the whole 2005-2023 series. It is arithmetically incompatible
+    with the World Bank's own other two series for the same country-year: with a rural population
+    share of 73.1% (SP.RUR.TOTL.ZS), rural access of 100.0% and urban access of 51.0%
+    (EG.ELC.ACCS.UR.ZS) imply a national access rate of 86.8%, but the published national figure
+    (EG.ELC.ACCS.ZS) is 13.4%. Solving that identity for the rural term gives approximately 0%,
+    consistent with the 0.4% reported for 2023. Chad is the only economy in the release with this
+    pattern, and the value carries no footnote in WDIfootnote.csv. Nulled rather than replaced,
+    since the correct figure is not published. Recheck next update.
+  provider: World Bank
+  status: open

@@ -11,7 +11,9 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 740
+  # The UN postponed the next World Population Prospects revision from 2026 to 2027; WPP releases
+  # land on World Population Day (July 11). 2024-07-12 + 1095 days -> 2027-07-12.
+  update_period_days: 1095
   title: Historical World Population Prospects
 
 

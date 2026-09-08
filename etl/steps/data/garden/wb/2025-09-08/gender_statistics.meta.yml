@@ -175,7 +175,7 @@ tables:
 
       sg_own_ldal_ma_zs:
         title: Share of men who own land alone
-        description_short: The share of men aged 15–49 with land registered in their name or requiring their signature to sell.
+        description_short: Share of men aged 15–49 with land registered in their name or requiring their signature to sell.
         description_key:
           - This measures the proportion of men aged 15–49 who are the sole owners of land.
           - Sole ownership means the land is legally registered in their name or cannot be sold without their approval.
@@ -189,7 +189,7 @@ tables:
 
       sg_own_ldal_fe_zs:
         title: Share of women who own land alone
-        description_short: The share of women aged 15–49 with land registered in their name or requiring their signature to sell.
+        description_short: Share of women aged 15–49 with land registered in their name or requiring their signature to sell.
         description_key:
           - This measures the proportion of women aged 15–49 who are the sole owners of land.
           - Sole ownership means the land is legally registered in their name or cannot be sold without their approval.
@@ -340,7 +340,7 @@ tables:
 
       sl_uem_neet_fe_zs:
         title: Share of young women not in education, employment or training
-        description_short: The share of women aged 15–24 who are not in education, employment, or vocational training.
+        description_short: Share of women aged 15–24 who are not in education, employment, or vocational training.
         description_key:
           - This measures the percentage of young women aged 15–24 who are not studying, working, or in training.
           - It shows how many are outside both the education system and the labor market.
@@ -355,7 +355,7 @@ tables:
 
       sl_uem_neet_ma_zs:
         title: Share of young men not in education, employment or training
-        description_short: The share of men aged 15–24 who are not in education, employment, or vocational training.
+        description_short: Share of men aged 15–24 who are not in education, employment, or vocational training.
         description_key:
           - This measures the percentage of young men aged 15–24 who are not studying, working, or in training.
           - It captures how many are excluded from both education and the labor market.
@@ -495,7 +495,7 @@ tables:
 
       sg_dmk_prch_fn_zs:
         title: Share of women involved in major household purchases
-        description_short: The share of currently married women aged 15-49 who say that they alone or jointly have a say in major household purchase decisions.
+        description_short: Share of currently married women aged 15-49 who say that they alone or jointly have a say in major household purchase decisions.
         description_key:
           - This measures the percentage of married women aged 15–49 involved in making major household purchases.
           - Women are counted if they decide alone or together with their spouse.

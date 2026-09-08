@@ -8,7 +8,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 365
+  update_period_days: 0
   title: Human Height (Blum and Baten)
 
   owners:
@@ -22,3 +22,5 @@ tables:
         short_unit: cm
         description_short: Reconstruction of human heights by birth decade using a variety of different sources.
         processing_level: minor
+        display:
+          numDecimalPlaces: 1

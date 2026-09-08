@@ -8,6 +8,8 @@ tags:
 
 Dedicated staging servers are automatically created from every ETL pull request. That gives data manager the ability to share and test their changes before they are merged into the live site.
 
+Note that the pull request is what triggers everything: pushing a branch alone creates no staging server. The same rule applies to owid-grapher: the staging server deploys the owid-grapher branch with the same name as your etl branch only if that branch has an open pull request; otherwise it runs grapher `master`.
+
 !!! note "PR staging servers URLs"
 
     You can visit your PR staging server at `http://staging-site-<branch>` or `https://<branch>.owid.pages.dev/`. Note that `<branch>` might differ from the exact branch name, for example `feature/123` will be `feature-123` (all symbols are changed to dashes, and the maximum length is of 50 characters).

@@ -33,7 +33,7 @@ def run() -> None:
                 "choices": ["male", "female"],
                 "choice_new_slug": "male_vs_female",
                 "view_config": {
-                    "hideRelativeToggle": "false",
+                    "hideRelativeToggle": False,
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
                     "chartTypes": ["LineChart", "DiscreteBar", "SlopeChart"],

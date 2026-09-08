@@ -53,7 +53,7 @@ definitions:
   short_flows: Total official and private flows are defined as the sum of official development assistance, other official flows and private flows. This represents the total net disbursements by the official and private sector of the creditor country to the recipient country.
 
   short_oda_bilateral: Bilateral [ODA](#dod:oda) represents flows from official (government) sources directly to the recipient country.
-  short_oda_multilateral: Multilateral [ODA](#dod:oda) represents core contributions from official (government) sources to multilateral agencies which use them to fund their own developmental programmes.
+  short_oda_multilateral: Multilateral [ODA](#dod:oda) represents core contributions from official (government) sources to multilateral agencies which use them to fund their own developmental programs.
 
   short_food_aid: Food aid is a subset of [official development assistance (ODA)](#dod:oda) that includes grants and concessional loans for food and food security.
 
@@ -136,7 +136,7 @@ definitions:
   producer_oda: |-
     _[From OECD's indicator explainer](https://www.oecd.org/en/data/indicators/net-oda.html)_
 
-    Official development assistance (ODA) is defined as government aid designed to promote the economic development and welfare of developing countries. Loans and credits for military purposes are excluded. Aid may be provided bilaterally, from donor to recipient, or channelled through a multilateral development agency such as the United Nations or the World Bank. Aid includes grants, "soft" loans and the provision of technical assistance. The OECD maintains a list of developing countries and territories; only aid to these countries counts as ODA. The list is periodically updated and currently contains over 150 countries or territories (see DAC List of ODA Recipients: https://oe.cd/dac-list). A long-standing United Nations target is that developed countries should devote 0.7% of their gross national income to ODA. Prior to 2018, the ODA flows basis methodology covered loans expressed on a “cash basis”, meaning their full face value was included, then repayments were subtracted as they came in. From 2018, the ODA grant-equivalent methodology is used whereby only the “grant portion” of the loan, i.e. the amount “given” by lending below market rates, counts as ODA.
+    Official development assistance (ODA) is defined as government aid designed to promote the economic development and welfare of developing countries. Loans and credits for military purposes are excluded. Aid may be provided bilaterally, from donor to recipient, or channeled through a multilateral development agency such as the United Nations or the World Bank. Aid includes grants, "soft" loans and the provision of technical assistance. The OECD maintains a list of developing countries and territories; only aid to these countries counts as ODA. The list is periodically updated and currently contains over 150 countries or territories (see DAC List of ODA Recipients: https://oe.cd/dac-list). A long-standing United Nations target is that developed countries should devote 0.7% of their gross national income to ODA. Prior to 2018, the ODA flows basis methodology covered loans expressed on a “cash basis”, meaning their full face value was included, then repayments were subtracted as they came in. From 2018, the ODA grant-equivalent methodology is used whereby only the “grant portion” of the loan, i.e. the amount “given” by lending below market rates, counts as ODA.
 
   producer_oof: |-
     _[From OECD's indicator explainer](https://www.oecd.org/en/data/indicators/other-official-flows-oof.html)_
@@ -172,7 +172,7 @@ definitions:
 
     Food aid are grants and concessional loans that conform to official development assistance (ODA).
 
-    Food aid is categorized and reported in terms of its uses and modes of supply. In terms of the use of food aid, three categories are distinguished: programme food aid is supplied as a resource transfer providing balance of payments (BoP) or budgetary support; project food aid is usually provided to support specific poverty alleviation and disaster prevention activities, targeted on specific beneficiary groups or areas; relief food aid is targeted on, and freely distributed to, victims of natural or man-made disasters. In practice, there has been a blurring of the distinctions between different categories of use, especially in an emergency, crisis situation. The other main approach to distinguish food aid is by looking at its sources or modes of supply: direct transfers, including all food aid originating from a donor country; food aid purchases or exchanges in one developing country for use as food aid in another country; and, local purchases, procured in a country and used as food aid in the same country.
+    Food aid is categorized and reported in terms of its uses and modes of supply. In terms of the use of food aid, three categories are distinguished: program food aid is supplied as a resource transfer providing balance of payments (BoP) or budgetary support; project food aid is usually provided to support specific poverty alleviation and disaster prevention activities, targeted on specific beneficiary groups or areas; relief food aid is targeted on, and freely distributed to, victims of natural or man-made disasters. In practice, there has been a blurring of the distinctions between different categories of use, especially in an emergency, crisis situation. The other main approach to distinguish food aid is by looking at its sources or modes of supply: direct transfers, including all food aid originating from a donor country; food aid purchases or exchanges in one developing country for use as food aid in another country; and, local purchases, procured in a country and used as food aid in the same country.
 
   processing_per_capita: |-
     We calculated this indicator by dividing by the population of the donor country or regional aggregation. The population estimate is available in the OECD dataset.
@@ -673,10 +673,10 @@ tables:
           <<: *common_display
 
       i_a_2_bilateral_core_contributions_pooled_programmes_funds_grant_equivalents:
-        title: ODA by donor - Bilateral core contributions & pooled programmes & funds - Grant equivalents
+        title: ODA by donor - Bilateral core contributions & pooled programs & funds - Grant equivalents
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
-        description_short: "[Official development assistance](#dod:oda) component that represents bilateral core contributions & pooled programmes & funds. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_short: "[Official development assistance](#dod:oda) component that represents bilateral core contributions & pooled programs & funds. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_coverage_limits}"
@@ -685,7 +685,7 @@ tables:
         presentation:
           title_variant: Grant equivalents
         display:
-          name: ODA by donor - Bilateral core contributions & pooled programmes & funds
+          name: ODA by donor - Bilateral core contributions & pooled programs & funds
           numDecimalPlaces: 0
           <<: *common_display
 
@@ -966,10 +966,10 @@ tables:
           <<: *common_display
 
       i_a_2_bilateral_core_contributions_pooled_programmes_funds_net_disbursements:
-        title: ODA by donor - Bilateral core contributions & pooled programmes & funds - Net disbursements
+        title: ODA by donor - Bilateral core contributions & pooled programs & funds - Net disbursements
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
-        description_short: "[Official development assistance](#dod:oda) component that represents bilateral core contributions & pooled programmes & funds. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_short: "[Official development assistance](#dod:oda) component that represents bilateral core contributions & pooled programs & funds. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_coverage_limits}"
@@ -978,7 +978,7 @@ tables:
         presentation:
           title_variant: Net disbursements
         display:
-          name: ODA by donor - Bilateral core contributions & pooled programmes & funds
+          name: ODA by donor - Bilateral core contributions & pooled programs & funds
           numDecimalPlaces: 0
           <<: *common_display
 

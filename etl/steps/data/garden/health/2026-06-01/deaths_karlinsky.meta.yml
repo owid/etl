@@ -11,7 +11,7 @@ tables:
         title: Registered deaths
         unit: "deaths"
         description_short: |-
-          The number of deaths registered in the vital registration system for the country-year.
+          Number of deaths registered in the vital registration system for the country-year.
         display:
           numDecimalPlaces: 1
 
@@ -19,7 +19,7 @@ tables:
         title: Expected number of deaths (WPP 2022)
         unit: deaths
         description_short: |-
-          The number of deaths expected to occur for the country-year from World Population Prospects 2022.
+          Number of deaths expected to occur for the country-year from World Population Prospects 2022.
         display:
           numDecimalPlaces: 0
         presentation:
@@ -30,7 +30,7 @@ tables:
         title: Expected number of deaths (GBD 2019)
         unit: deaths
         description_short: |-
-          The number of deaths expected to occur for the country-year from Global Burden of Disease 2019.
+          Number of deaths expected to occur for the country-year from Global Burden of Disease 2019.
         display:
           numDecimalPlaces: 0
         presentation:
@@ -41,7 +41,7 @@ tables:
         title: Expected number of deaths (GHE 2019)
         unit: deaths
         description_short: |-
-          The number of deaths expected to occur for the country-year from Global Health Estimates 2019.
+          Number of deaths expected to occur for the country-year from Global Health Estimates 2019.
         display:
           numDecimalPlaces: 0
         presentation:
@@ -52,7 +52,7 @@ tables:
         title: Expected number of deaths
         unit: deaths
         description_short: |-
-          The mean of the expected number of deaths from sources: WPP 2022, GBD 2019 and GHE 2019.
+          Mean of the expected number of deaths from sources: WPP 2022, GBD 2019 and GHE 2019.
         display:
           numDecimalPlaces: 0
         presentation:
@@ -64,7 +64,7 @@ tables:
         short_unit: "%"
         unit: "%"
         description_short: |-
-          The number of deaths reported in a country's vital registration system as a share of total expected deaths. Expected deaths are taken as the average of estimates from three international sources: the UN, WHO, and IHME.
+          Number of deaths reported in a country's vital registration system as a share of total expected deaths. Expected deaths are taken as the average of estimates from three international sources: the UN, WHO, and IHME.
         description_from_producer: |-
           Death registration completeness, the share of deaths captured by countries’ vital registration systems, vary substantially across countries. Estimates of completeness, even recent ones, are outdated or contradictory for many countries. In this short paper, I utilize the annual amount of deaths registered in 139 vital registration systems around the world to provide the most up-to-date estimates of death-registration completeness from 2015 to 2019.
 
@@ -86,7 +86,7 @@ tables:
           grapher_config:
             title: Share of deaths that are registered
             subtitle: >-
-              The number of deaths reported in a country's [vital registration
+              Number of deaths reported in a country's [vital registration
               system](#dod:cvrs) as a share of total expected deaths. Expected deaths are
               estimated by three international sources: UN, WHO, and IHME, using data from
               household surveys and censuses.

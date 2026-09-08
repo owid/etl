@@ -12,7 +12,7 @@ import tempfile
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import pandas as pd
@@ -339,7 +339,7 @@ class Snapshot:
                     ) from err
 
         snapshots[self.name] = {
-            "captured_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "captured_at": datetime.now(UTC).isoformat(timespec="seconds"),
             "md5": md5,
             "size": size,
             "suffix": suffix,

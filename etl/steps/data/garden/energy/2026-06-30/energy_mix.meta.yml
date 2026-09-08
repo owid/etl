@@ -1,0 +1,870 @@
+definitions:
+  # The long-run World series. It does not apply to the annual-change indicators: Smil's years are
+  # decadal, and add_annual_change only keeps consecutive years, so those have no pre-1965 values.
+  # They clear the common note with the empty definition below.
+  description_processing_smil_world: |-
+    - For the World, data before 1965 (going back to 1800) comes from Vaclav Smil's historical estimates (2017).
+  # Same, for total energy supply per unit of GDP: Maddison's World GDP starts in 1820, not 1800.
+  description_processing_smil_world_from_1820: |-
+    - For the World, data before 1965 (going back to 1820) comes from Vaclav Smil's historical estimates (2017), divided by GDP from the Maddison Project Database, which starts in 1820.
+  # Cleared processing description, for the indicators that no note applies to.
+  description_processing_none: ""
+  # The traditional biomass series itself, which is only reported for the World.
+  description_processing_traditional_biomass: |-
+    - Traditional biomass comes from Vaclav Smil's historical estimates (2017), which cover the World only, going back to 1800.
+    - Smil's estimates end in 2015. For later years, we assume that traditional biomass stays at its 2015 value.
+  # Denominator of the shares of primary energy including traditional biomass.
+  description_processing_biomass_included: |-
+    - The Statistical Review of World Energy does not include data on traditional biomass. We add Vaclav Smil's estimates of traditional biomass to total energy supply.
+    - Smil's estimates end in 2015. For later years, we assume that traditional biomass stays at its 2015 value.
+  # Total energy supply and the indicators derived from it. This does not apply to the by-source
+  # indicators: the EIA is only used to extend the total, and adds no breakdown by source.
+  description_processing_eia: |-
+    - Total energy supply is extended with total energy consumption from the U.S. Energy Information Administration (EIA), to cover countries and years for which the Statistical Review does not report a total. Where both sources report a value, we use the Statistical Review.
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Energy
+    description_processing: |-
+      {definitions.description_processing_smil_world}
+
+dataset:
+  title: Energy mix
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+tables:
+  energy_mix:
+    variables:
+      traditional_biomass_twh:
+        title: Traditional biomass
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Energy from traditional biomass (fuelwood, charcoal, crop residues, and dung), measured in [terawatt-hours](#dod:watt-hours).
+        # Not total energy supply, so the shared key points about how it is measured do not apply here.
+        description_key:
+          - Traditional biomass is fuelwood, charcoal, crop residues and dung. It is not part of total energy supply, which covers only fuels that are traded commercially.
+          - Traditional biomass is only available at the global level.
+        description_processing: |-
+          {definitions.description_processing_traditional_biomass}
+        display:
+          name: Traditional biomass
+        presentation:
+          title_public: '{tables.energy_mix.variables.traditional_biomass_twh.title}'
+      biofuels_annual_change_pct:
+        title: Annual change in biofuels (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Biofuels
+        presentation:
+          title_public: '{tables.energy_mix.variables.biofuels_annual_change_pct.title}'
+      biofuels_annual_change_twh:
+        title: Annual change in biofuels
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Biofuels
+        presentation:
+          title_public: '{tables.energy_mix.variables.biofuels_annual_change_twh.title}'
+      biofuels_per_capita_kwh:
+        title: Biofuels per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        display:
+          name: Biofuels
+        presentation:
+          title_public: '{tables.energy_mix.variables.biofuels_per_capita_kwh.title}'
+      biofuels_share_including_biomass_pct:
+        title: Biofuels as a share of primary energy (including traditional biomass)
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
+        display:
+          name: Biofuels
+        presentation:
+          title_public: '{tables.energy_mix.variables.biofuels_share_including_biomass_pct.title}'
+      biofuels_share_pct:
+        title: Biofuels as a share of total energy supply
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Biofuels
+        presentation:
+          title_public: '{tables.energy_mix.variables.biofuels_share_pct.title}'
+      biofuels_twh:
+        title: Biofuels
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Biofuels
+        presentation:
+          title_public: '{tables.energy_mix.variables.biofuels_twh.title}'
+      coal_annual_change_pct:
+        title: Annual change in coal (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.energy_mix.variables.coal_annual_change_pct.title}'
+      coal_annual_change_twh:
+        title: Annual change in coal
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.energy_mix.variables.coal_annual_change_twh.title}'
+      coal_per_capita_kwh:
+        title: Coal per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.energy_mix.variables.coal_per_capita_kwh.title}'
+      coal_share_including_biomass_pct:
+        title: Coal as a share of primary energy (including traditional biomass)
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.energy_mix.variables.coal_share_including_biomass_pct.title}'
+      coal_share_pct:
+        title: Coal as a share of total energy supply
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.energy_mix.variables.coal_share_pct.title}'
+      coal_twh:
+        title: Coal
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.energy_mix.variables.coal_twh.title}'
+      fossil_fuels_annual_change_pct:
+        title: Annual change in fossil fuels (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: '{tables.energy_mix.variables.fossil_fuels_annual_change_pct.title}'
+      fossil_fuels_annual_change_twh:
+        title: Annual change in fossil fuels
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: '{tables.energy_mix.variables.fossil_fuels_annual_change_twh.title}'
+      fossil_fuels_per_capita_kwh:
+        title: Fossil fuels per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: '{tables.energy_mix.variables.fossil_fuels_per_capita_kwh.title}'
+      fossil_fuels_share_pct:
+        title: Fossil fuels as a share of total energy supply
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: '{tables.energy_mix.variables.fossil_fuels_share_pct.title}'
+      fossil_fuels_twh:
+        title: Fossil fuels
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: '{tables.energy_mix.variables.fossil_fuels_twh.title}'
+      gas_annual_change_pct:
+        title: Annual change in gas (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.energy_mix.variables.gas_annual_change_pct.title}'
+      gas_annual_change_twh:
+        title: Annual change in gas
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.energy_mix.variables.gas_annual_change_twh.title}'
+      gas_per_capita_kwh:
+        title: Gas per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.energy_mix.variables.gas_per_capita_kwh.title}'
+      gas_share_including_biomass_pct:
+        title: Gas as a share of primary energy (including traditional biomass)
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.energy_mix.variables.gas_share_including_biomass_pct.title}'
+      gas_share_pct:
+        title: Gas as a share of total energy supply
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.energy_mix.variables.gas_share_pct.title}'
+      gas_twh:
+        title: Gas
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.energy_mix.variables.gas_twh.title}'
+      hydro_annual_change_pct:
+        title: Annual change in hydropower (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Hydropower
+        presentation:
+          title_public: '{tables.energy_mix.variables.hydro_annual_change_pct.title}'
+      hydro_annual_change_twh:
+        title: Annual change in hydropower
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Hydropower
+        presentation:
+          title_public: '{tables.energy_mix.variables.hydro_annual_change_twh.title}'
+      hydro_per_capita_kwh:
+        title: Hydropower per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        display:
+          name: Hydropower
+        presentation:
+          title_public: '{tables.energy_mix.variables.hydro_per_capita_kwh.title}'
+      hydro_share_including_biomass_pct:
+        title: Hydropower as a share of primary energy (including traditional biomass)
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
+        display:
+          name: Hydropower
+        presentation:
+          title_public: '{tables.energy_mix.variables.hydro_share_including_biomass_pct.title}'
+      hydro_share_pct:
+        title: Hydropower as a share of total energy supply
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Hydropower
+        presentation:
+          title_public: '{tables.energy_mix.variables.hydro_share_pct.title}'
+      hydro_twh:
+        title: Hydropower
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Hydropower
+        presentation:
+          title_public: '{tables.energy_mix.variables.hydro_twh.title}'
+      low_carbon_energy_annual_change_pct:
+        title: Annual change in low-carbon energy (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Low-carbon energy
+        presentation:
+          title_public: '{tables.energy_mix.variables.low_carbon_energy_annual_change_pct.title}'
+      low_carbon_energy_annual_change_twh:
+        title: Annual change in low-carbon energy
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Low-carbon energy
+        presentation:
+          title_public: '{tables.energy_mix.variables.low_carbon_energy_annual_change_twh.title}'
+      low_carbon_energy_per_capita_kwh:
+        title: Low-carbon energy per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        display:
+          name: Low-carbon energy
+        presentation:
+          title_public: '{tables.energy_mix.variables.low_carbon_energy_per_capita_kwh.title}'
+      low_carbon_energy_share_pct:
+        title: Low-carbon energy as a share of total energy supply
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Low-carbon energy
+        presentation:
+          title_public: '{tables.energy_mix.variables.low_carbon_energy_share_pct.title}'
+      low_carbon_energy_twh:
+        title: Low-carbon energy
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Low-carbon energy
+        presentation:
+          title_public: '{tables.energy_mix.variables.low_carbon_energy_twh.title}'
+      nuclear_annual_change_pct:
+        title: Annual change in nuclear (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Nuclear
+        presentation:
+          title_public: '{tables.energy_mix.variables.nuclear_annual_change_pct.title}'
+      nuclear_annual_change_twh:
+        title: Annual change in nuclear
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Nuclear
+        presentation:
+          title_public: '{tables.energy_mix.variables.nuclear_annual_change_twh.title}'
+      nuclear_per_capita_kwh:
+        title: Nuclear per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        display:
+          name: Nuclear
+        presentation:
+          title_public: '{tables.energy_mix.variables.nuclear_per_capita_kwh.title}'
+      nuclear_share_including_biomass_pct:
+        title: Nuclear as a share of primary energy (including traditional biomass)
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
+        display:
+          name: Nuclear
+        presentation:
+          title_public: '{tables.energy_mix.variables.nuclear_share_including_biomass_pct.title}'
+      nuclear_share_pct:
+        title: Nuclear as a share of total energy supply
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Nuclear
+        presentation:
+          title_public: '{tables.energy_mix.variables.nuclear_share_pct.title}'
+      nuclear_twh:
+        title: Nuclear
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Nuclear
+        presentation:
+          title_public: '{tables.energy_mix.variables.nuclear_twh.title}'
+      oil_annual_change_pct:
+        title: Annual change in oil (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.energy_mix.variables.oil_annual_change_pct.title}'
+      oil_annual_change_twh:
+        title: Annual change in oil
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.energy_mix.variables.oil_annual_change_twh.title}'
+      oil_per_capita_kwh:
+        title: Oil per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.energy_mix.variables.oil_per_capita_kwh.title}'
+      oil_share_including_biomass_pct:
+        title: Oil as a share of primary energy (including traditional biomass)
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.energy_mix.variables.oil_share_including_biomass_pct.title}'
+      oil_share_pct:
+        title: Oil as a share of total energy supply
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.energy_mix.variables.oil_share_pct.title}'
+      oil_twh:
+        title: Oil
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.energy_mix.variables.oil_twh.title}'
+      other_renewables_annual_change_pct:
+        title: Annual change in other renewables (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Other renewables
+        presentation:
+          title_public: '{tables.energy_mix.variables.other_renewables_annual_change_pct.title}'
+      other_renewables_annual_change_twh:
+        title: Annual change in other renewables
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Other renewables
+        presentation:
+          title_public: '{tables.energy_mix.variables.other_renewables_annual_change_twh.title}'
+      other_renewables_per_capita_kwh:
+        title: Other renewables per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        display:
+          name: Other renewables
+        presentation:
+          title_public: '{tables.energy_mix.variables.other_renewables_per_capita_kwh.title}'
+      other_renewables_share_including_biomass_pct:
+        title: Other renewables as a share of primary energy (including traditional biomass)
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
+        display:
+          name: Other renewables
+        presentation:
+          title_public: '{tables.energy_mix.variables.other_renewables_share_including_biomass_pct.title}'
+      other_renewables_share_pct:
+        title: Other renewables as a share of total energy supply
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Other renewables
+        presentation:
+          title_public: '{tables.energy_mix.variables.other_renewables_share_pct.title}'
+      other_renewables_twh:
+        title: Other renewables
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Other renewables
+        presentation:
+          title_public: '{tables.energy_mix.variables.other_renewables_twh.title}'
+      renewables_annual_change_pct:
+        title: Annual change in renewables (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Renewables
+        presentation:
+          title_public: '{tables.energy_mix.variables.renewables_annual_change_pct.title}'
+      renewables_annual_change_twh:
+        title: Annual change in renewables
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Renewables
+        presentation:
+          title_public: '{tables.energy_mix.variables.renewables_annual_change_twh.title}'
+      renewables_per_capita_kwh:
+        title: Renewables per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        display:
+          name: Renewables
+        presentation:
+          title_public: '{tables.energy_mix.variables.renewables_per_capita_kwh.title}'
+      renewables_share_pct:
+        title: Renewables as a share of total energy supply
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Renewables
+        presentation:
+          title_public: '{tables.energy_mix.variables.renewables_share_pct.title}'
+      renewables_twh:
+        title: Renewables
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Renewables
+        presentation:
+          title_public: '{tables.energy_mix.variables.renewables_twh.title}'
+      solar_and_wind_annual_change_pct:
+        title: Annual change in solar and wind (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Solar and wind
+        presentation:
+          title_public: '{tables.energy_mix.variables.solar_and_wind_annual_change_pct.title}'
+      solar_and_wind_annual_change_twh:
+        title: Annual change in solar and wind
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Solar and wind
+        presentation:
+          title_public: '{tables.energy_mix.variables.solar_and_wind_annual_change_twh.title}'
+      solar_and_wind_per_capita_kwh:
+        title: Solar and wind per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        display:
+          name: Solar and wind
+        presentation:
+          title_public: '{tables.energy_mix.variables.solar_and_wind_per_capita_kwh.title}'
+      solar_and_wind_share_pct:
+        title: Solar and wind as a share of total energy supply
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Solar and wind
+        presentation:
+          title_public: '{tables.energy_mix.variables.solar_and_wind_share_pct.title}'
+      solar_and_wind_twh:
+        title: Solar and wind
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Solar and wind
+        presentation:
+          title_public: '{tables.energy_mix.variables.solar_and_wind_twh.title}'
+      solar_annual_change_pct:
+        title: Annual change in solar (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Solar
+        presentation:
+          title_public: '{tables.energy_mix.variables.solar_annual_change_pct.title}'
+      solar_annual_change_twh:
+        title: Annual change in solar
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Solar
+        presentation:
+          title_public: '{tables.energy_mix.variables.solar_annual_change_twh.title}'
+      solar_per_capita_kwh:
+        title: Solar per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        display:
+          name: Solar
+        presentation:
+          title_public: '{tables.energy_mix.variables.solar_per_capita_kwh.title}'
+      solar_share_including_biomass_pct:
+        title: Solar as a share of primary energy (including traditional biomass)
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
+        display:
+          name: Solar
+        presentation:
+          title_public: '{tables.energy_mix.variables.solar_share_including_biomass_pct.title}'
+      solar_share_pct:
+        title: Solar as a share of total energy supply
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Solar
+        presentation:
+          title_public: '{tables.energy_mix.variables.solar_share_pct.title}'
+      solar_twh:
+        title: Solar
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Solar
+        presentation:
+          title_public: '{tables.energy_mix.variables.solar_twh.title}'
+      total_energy_supply_annual_change_pct:
+        title: Annual change in total energy supply (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_eia}
+        display:
+          name: Total energy supply
+        presentation:
+          title_public: '{tables.energy_mix.variables.total_energy_supply_annual_change_pct.title}'
+      total_energy_supply_annual_change_twh:
+        title: Annual change in total energy supply
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_eia}
+        display:
+          name: Total energy supply
+        presentation:
+          title_public: '{tables.energy_mix.variables.total_energy_supply_annual_change_twh.title}'
+      total_energy_supply_per_capita_kwh:
+        title: Total energy supply per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_eia}
+          {definitions.description_processing_smil_world}
+        display:
+          name: Total energy supply
+        presentation:
+          title_public: '{tables.energy_mix.variables.total_energy_supply_per_capita_kwh.title}'
+      total_energy_supply_per_gdp_kwh_per_dollar:
+        title: Total energy supply per unit of GDP
+        unit: kilowatt-hours per dollar
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per international-$ of GDP.
+        description_processing: |-
+          {definitions.description_processing_eia}
+          {definitions.description_processing_smil_world_from_1820}
+        presentation:
+          title_public: '{tables.energy_mix.variables.total_energy_supply_per_gdp_kwh_per_dollar.title}'
+      total_energy_supply_twh:
+        title: Total energy supply
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        description_processing: |-
+          {definitions.description_processing_eia}
+          {definitions.description_processing_smil_world}
+        display:
+          name: Total energy supply
+        presentation:
+          title_public: '{tables.energy_mix.variables.total_energy_supply_twh.title}'
+      traditional_biomass_share_including_biomass_pct:
+        title: Traditional biomass as a share of primary energy (including traditional biomass)
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_key:
+          - Traditional biomass is fuelwood, charcoal, crop residues and dung.
+          - Total energy supply covers only commercially-traded fuels, so shares on this chart are measured against total energy supply plus traditional biomass.
+          - Traditional biomass is only available at the global level.
+        description_processing: |-
+          {definitions.description_processing_traditional_biomass}
+        display:
+          name: Traditional biomass
+        presentation:
+          title_public: '{tables.energy_mix.variables.traditional_biomass_share_including_biomass_pct.title}'
+      wind_annual_change_pct:
+        title: Annual change in wind (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Wind
+        presentation:
+          title_public: '{tables.energy_mix.variables.wind_annual_change_pct.title}'
+      wind_annual_change_twh:
+        title: Annual change in wind
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
+        display:
+          name: Wind
+        presentation:
+          title_public: '{tables.energy_mix.variables.wind_annual_change_twh.title}'
+      wind_per_capita_kwh:
+        title: Wind per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        display:
+          name: Wind
+        presentation:
+          title_public: '{tables.energy_mix.variables.wind_per_capita_kwh.title}'
+      wind_share_including_biomass_pct:
+        title: Wind as a share of primary energy (including traditional biomass)
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
+        display:
+          name: Wind
+        presentation:
+          title_public: '{tables.energy_mix.variables.wind_share_including_biomass_pct.title}'
+      wind_share_pct:
+        title: Wind as a share of total energy supply
+        unit: '%'
+        short_unit: '%'
+        description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Wind
+        presentation:
+          title_public: '{tables.energy_mix.variables.wind_share_pct.title}'
+      wind_twh:
+        title: Wind
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        display:
+          name: Wind
+        presentation:
+          title_public: '{tables.energy_mix.variables.wind_twh.title}'

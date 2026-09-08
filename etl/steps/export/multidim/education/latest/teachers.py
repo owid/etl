@@ -38,7 +38,6 @@ TRAINED_TEACHER_PATTERN = r"^(se_pre_tcaq_zs|se_prm_tcaq_zs|se_sec_tcaq_lo_zs|se
 
 # Main chart configuration for individual views (maps)
 MULTIDIM_CONFIG = {
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
     "originUrl": "ourworldindata.org/education",
     "hideAnnotationFieldsInTitle": {"time": True},
     "hasMapTab": True,

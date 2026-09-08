@@ -1,0 +1,12 @@
+# Model names we set ourselves, keyed on Epoch's "Model version" string.
+#
+# Names normally come from Epoch's own model registry (`epoch_capabilities_index.csv`, shipped in the same
+# snapshot archive as the benchmark). Add an entry here only when that registry cannot tell two models
+# apart, or when the name it gives is unusable in a chart. The step asserts that no two models end up with
+# the same name, so a new clash fails the build instead of quietly merging them into one entity.
+#
+# The context window or reasoning effort is still appended automatically, so write the model name alone.
+names:
+  # Epoch calls both the preview and the general-availability build "Gemini 2.5 Pro (Jun 2025)", and neither
+  # version string carries a date, so nothing else separates them.
+  gemini-2.5-pro-preview-06-05: Gemini 2.5 Pro (preview)

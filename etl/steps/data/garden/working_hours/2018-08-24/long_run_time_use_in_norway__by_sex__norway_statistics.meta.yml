@@ -50,17 +50,17 @@ tables:
         title: Time spent on leisure, all (Statistics Norway)
         unit: minutes
         description: |-
-          Time spent on leisure on an average day. Leisure activities includes sports and outdoor activities, entertainment and culture, socialising, reading, television viewing, other leisure time, and travel connected to leisure time activities.
+          Time spent on leisure on an average day. Leisure activities includes sports and outdoor activities, entertainment and culture, socializing, reading, television viewing, other leisure time, and travel connected to leisure time activities.
       time_spent_on_leisure__female__statistics_norway:
         title: Time spent on leisure, female (Statistics Norway)
         unit: minutes
         description: |-
-          Time spent on leisure, by females, on an average day. Leisure activities includes sports and outdoor activities, entertainment and culture, socialising, reading, television viewing, other leisure time, and travel connected to leisure time activities.
+          Time spent on leisure, by females, on an average day. Leisure activities includes sports and outdoor activities, entertainment and culture, socializing, reading, television viewing, other leisure time, and travel connected to leisure time activities.
       time_spent_on_leisure__male__statistics_norway:
         title: Time spent on leisure, male (Statistics Norway)
         unit: minutes
         description: |-
-          Time spent on leisure, by males, on an average day. Leisure activities includes sports and outdoor activities, entertainment and culture, socialising, reading, television viewing, other leisure time, and travel connected to leisure time activities.
+          Time spent on leisure, by males, on an average day. Leisure activities includes sports and outdoor activities, entertainment and culture, socializing, reading, television viewing, other leisure time, and travel connected to leisure time activities.
       time_spent_on_other_activities__all__statistics_norway:
         title: Time spent on other activities, all (Statistics Norway)
         unit: minutes

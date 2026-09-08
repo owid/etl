@@ -1,3 +1,5 @@
+grapher_schema: "011"
+
 definitions:
   confirmed_infections: &confirmed_infections
     catalogPath: cases_deaths#new_cases_7_day_avg_right

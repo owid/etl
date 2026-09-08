@@ -70,16 +70,16 @@ Two sources: the TSV in `owid-grapher/explorers/<slug>.explorer.tsv`, and the li
 make query SQL="SELECT id, catalogPath FROM variables WHERE id IN (...)"
 
 # grapherId — two-step lookup. Chart config lives in chart_configs (joined via charts.configId).
-make query SQL="SELECT c.id, JSON_EXTRACT(cc.full, '\$.dimensions[0].variableId') AS yVarId FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE c.id IN (...)"
+make query SQL="SELECT c.id, JSON_EXTRACT(cc.config, '\$.dimensions[0].variableId') AS yVarId FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE c.id IN (...)"
 # then feed the resulting variable IDs into the variables query above.
 
 # Pull the full chart config in one go (variable IDs + title/subtitle/type/map/etc.) for grapher-chart explorers:
-make query SQL="SELECT c.id, cc.full FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE c.id IN (...)"
+make query SQL="SELECT c.id, cc.config FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE c.id IN (...)"
 ```
 
 Variables without `catalogPath` are not yet in ETL — their underlying datasets need to be migrated first (use the `/migrate-dataset` skill). **Halt and report which datasets are missing rather than guessing.**
 
-For multi-indicator charts (e.g. stacked bars), `dimensions[0]` only gives the first y variable. Pull all dimensions from `chart_configs.full` and treat each one as an entry in `view.indicators.y[]`.
+For multi-indicator charts (e.g. stacked bars), `dimensions[0]` only gives the first y variable. Pull all dimensions from `chart_configs.config` and treat each one as an entry in `view.indicators.y[]`.
 
 ## Step 3 — Identify upstream grapher datasets
 
@@ -101,7 +101,7 @@ For each catalog path (`<ns>/<v>/<dataset>/<table>#<short>`), the underlying ste
 | Per-view chart settings (`title`, `subtitle`, `type`, `hasMapTab`, `minTime`, `yAxisMin`, …) | `view.config` — but for single-indicator views, prefer pushing `title`/`subtitle`/`note` into the indicator's garden `presentation.grapher_config` (see `/create-explorer` Step 5) |
 | `columns` table row | `view.indicators.<axis>[i].display` (color scales, tolerance, units, …) |
 
-For grapher-chart-based explorers, also pull each chart's stored config (`SELECT cc.full FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE c.id = ?`) and merge `title`/`subtitle`/`type`/`hasMapTab`/`yAxis`/`map.colorScale`/etc. into `view.config` — or, for single-indicator views, into the indicator's garden metadata.
+For grapher-chart-based explorers, also pull each chart's stored config (`SELECT cc.config FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE c.id = ?`) and merge `title`/`subtitle`/`type`/`hasMapTab`/`yAxis`/`map.colorScale`/etc. into `view.config` — or, for single-indicator views, into the indicator's garden metadata.
 
 ## Step 5 — Hand off to `/create-explorer`
 

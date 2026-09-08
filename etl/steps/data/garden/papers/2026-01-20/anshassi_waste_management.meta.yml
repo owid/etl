@@ -36,7 +36,7 @@ definitions:
 
   text_classification_caution: &text_classification_caution This level is a simplified categorization intended for comparing countries globally. Countries within the same level can still differ substantially in how they handle waste.
 
-  text_data_sources: &text_data_sources The indicator is based on waste generation and management data from the World Bank’s What a Waste 2.0 database, combined with mismanagement rates from Lebreton and Andrady (2019). The authors used World Bank data from 2016, standardised it, and projected the results to 2020.
+  text_data_sources: &text_data_sources The indicator is based on waste generation and management data from the World Bank’s What a Waste 2.0 database, combined with mismanagement rates from Lebreton and Andrady (2019). The authors used World Bank data from 2016, standardized it, and projected the results to 2020.
 
   text_gap_filling: &text_gap_filling For countries with missing data, the authors used proxy countries with similar characteristics (same region, classification level, and income level) to fill gaps in waste composition and management statistics.
 
@@ -125,7 +125,7 @@ tables:
         title: Share of total municipal solid waste collected
         unit: "%"
         short_unit: "%"
-        description_short: Share of total municipal solid waste generated that is captured by organised collection services and enters a managed waste stream (regardless of final treatment or disposal method).
+        description_short: Share of total municipal solid waste generated that is captured by organized collection services and enters a managed waste stream (regardless of final treatment or disposal method).
         description_key: *desc_key_collected
         display:
           numDecimalPlaces: 1
@@ -134,7 +134,7 @@ tables:
         title: Share of total municipal solid waste uncollected
         unit: "%"
         short_unit: "%"
-        description_short: Share of total municipal solid waste generated that is not captured by organised collection services and therefore remains outside formal waste management (often dumped, burned, or handled informally).
+        description_short: Share of total municipal solid waste generated that is not captured by organized collection services and therefore remains outside formal waste management (often dumped, burned, or handled informally).
         description_key: *desc_key_uncollected
         display:
           numDecimalPlaces: 1
