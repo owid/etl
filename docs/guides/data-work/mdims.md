@@ -96,9 +96,9 @@ paths = PathFinder(__file__)
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config(fname)
+    config = paths.load_collection_config(fname)
     # Create MDIM object
-    mdim = paths.create_mdim(config)
+    mdim = paths.create_collection(config)
     # Save to DB
     mdim.save()
 ```
@@ -212,7 +212,7 @@ def run() -> None:
     # Process data.
     #
     # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config()
+    config = paths.load_collection_config()
 
     # Create views.
     config["views"] = multidim.expand_config(
@@ -224,7 +224,7 @@ def run() -> None:
     #
     # Save outputs.
     #
-    mdim = paths.create_mdim(config=config)
+    mdim = paths.create_collection(config=config)
     mdim.save()
 
 ```
@@ -321,11 +321,7 @@ Also, instead of relying on `etl.collection.multidim`, you should instead use th
 - [:fontawesome-brands-github:  Climate change](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/climate/latest/climate_change.config.yml): Manually crafted.
 
 ### How are explorers saved in admin?
-While MDIMs are pushed to our database, explorers need to go through the old legacy channel of `owid-content` repository. Hence, when calling `Explorer.save`, the configuration is re-shaped and stored as a TSV file in `owid-content`.
-
-
-!!! info "Creating explorers on staging servers"
-    Explorers can be created or edited on staging servers and then manually migrated to production. Each staging server creates a branch in the `owid-content` repository. Editing explorers in Admin or running the `create_explorer` function pushes changes to that branch. Once the PR is merged, the branch gets pushed to the `owid-content` repository (not to the `master` branch, but its own branch). You then need to manually create a PR from that branch and merge it into `master`.
+Like MDIMs, explorers are upserted to the grapher DB when calling `.save()`. Staging servers write to their own DB, and production is updated when the PR is merged.
 
 ## MDIM pending features
 For better reference, read [:fontawesome-brands-github: this issue](https://github.com/owid/etl/issues/3992), or follow the latest news in `#proj-explorers-mdims-convergence`.
