@@ -6,16 +6,27 @@ This script reads the multidim, grapher, and dataset schemas and generates
 static TypedDict classes that provide autocompletion and type checking.
 
 Usage:
-    python scripts/generate_schema_types.py            # regenerate the file
-    python scripts/generate_schema_types.py --check    # fail if the file is out of date
-    python scripts/generate_schema_types.py --refresh  # re-download the vendored grapher schema, then regenerate
+    python scripts/generate_schema_types.py                 # regenerate the file (offline)
+    python scripts/generate_schema_types.py --check         # fail if the file is out of date (offline)
+    python scripts/generate_schema_types.py --refresh       # re-download the SAME version, then regenerate
+    python scripts/generate_schema_types.py --bump-version  # move to a NEWER version, then regenerate
 
 This will update etl/collection/model/schema_types.py with the latest types.
 
 The grapher schema is read from a vendored copy in `schemas/` (committed to the repo) so that
-generation is deterministic and offline. The upstream schema is mutated in place by the web team
-(e.g. dumbbell plots landed in grapher-schema.010.json without a version bump), so run `--refresh`
-to pull in upstream changes — the resulting diff of the vendored file is reviewable in the PR.
+generation is deterministic and offline. `--refresh` and `--bump-version` are the only modes that
+hit the network, and they are run deliberately — by the scheduled sync workflow or by a person.
+ETL itself never fetches a schema at run time.
+
+Which one to use:
+
+- `--refresh`: upstream mutated the version we already vendor (the web team does this without
+  version bumps — dumbbell plots landed in grapher-schema.010.json that way). The resulting diff
+  of the vendored file is what you review in the PR.
+- `--bump-version`: upstream published a *new* version. Reads the version from
+  `grapher-schema.latest.json`, vendors it, drops the old copy, repoints the `$ref`s in the
+  multidim/explorer schemas. `DEFAULT_GRAPHER_SCHEMA` needs no edit — `etl/config.py` derives it
+  from whichever file is vendored.
 
 NOTE: hand-written types that are not derived from any JSON schema belong in
 `etl/collection/model/params.py`, NOT in the generated file (they would be lost on
@@ -26,19 +37,31 @@ legacy fields into ViewConfig that the schemas don't know about.
 import argparse
 import difflib
 import json
+import re
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 from typing import Any
 
-from etl.config import DEFAULT_GRAPHER_SCHEMA
+from etl.config import DEFAULT_GRAPHER_SCHEMA, GRAPHER_SCHEMA_LATEST_URL, vendored_grapher_schema_id
 from etl.paths import SCHEMAS_DIR
 
 OUTPUT_PATH = Path(__file__).parent.parent / "etl" / "collection" / "model" / "schema_types.py"
 
-# Vendored copy of the grapher schema (DEFAULT_GRAPHER_SCHEMA), refreshed with --refresh.
-VENDORED_GRAPHER_SCHEMA_PATH = SCHEMAS_DIR / DEFAULT_GRAPHER_SCHEMA.rsplit("/", 1)[-1]
+# Schemas whose `$ref`s name the vendored grapher schema by filename, and so have to be repointed
+# when the vendored version changes.
+SCHEMAS_REFERENCING_GRAPHER = ("multidim-schema.json", "explorer-schema.json")
+
+
+def vendored_grapher_schema_path() -> Path:
+    """Path of the vendored grapher schema copy, resolved on each call.
+
+    Deliberately a function rather than a module constant: `--bump-version` replaces the file mid-run, and
+    a path computed at import time would still point at the version that was just deleted.
+    """
+    return SCHEMAS_DIR / vendored_grapher_schema_id().rsplit("/", 1)[-1]
+
 
 # Extra fields injected into ViewConfig that are not part of the multidim schema.
 # TODO: remove once we are done with explorers
@@ -316,12 +339,13 @@ class TypedDictGenerator:
         with open(dataset_schema_path) as f:
             dataset_schema = json.load(f)
 
-        if not VENDORED_GRAPHER_SCHEMA_PATH.exists():
+        vendored_path = vendored_grapher_schema_path()
+        if not vendored_path.exists():
             raise SystemExit(
-                f"Vendored grapher schema not found at {VENDORED_GRAPHER_SCHEMA_PATH}. "
+                f"Vendored grapher schema not found at {vendored_path}. "
                 "Run `python scripts/generate_schema_types.py --refresh` to download it."
             )
-        with open(VENDORED_GRAPHER_SCHEMA_PATH) as f:
+        with open(vendored_path) as f:
             grapher_schema = json.load(f)
 
         # Extract properties
@@ -410,7 +434,7 @@ class TypedDictGenerator:
             "",
             "Provides strongly-typed interfaces for:",
             "- View configuration (based on multidim-schema.json, resolving $refs against the",
-            f"  vendored schemas/{VENDORED_GRAPHER_SCHEMA_PATH.name} — refresh it with --refresh)",
+            f"  vendored schemas/{vendored_grapher_schema_path().name} — refresh it with --refresh)",
             "- View metadata (based on dataset-schema.json)",
             '"""',
             "",
@@ -481,16 +505,92 @@ class TypedDictGenerator:
         return "\n".join(lines)
 
 
+def _write_vendored_schema(path: Path, schema: dict[str, Any]) -> None:
+    with open(path, "w") as f:
+        json.dump(schema, f, indent=2)
+        f.write("\n")
+
+
 def refresh_vendored_schema() -> None:
-    """Re-download the vendored grapher schema from the upstream URL."""
+    """Re-download the vendored grapher schema from the upstream URL (same version)."""
     from etl.http import session
 
     resp = session.get(DEFAULT_GRAPHER_SCHEMA, timeout=30)
     resp.raise_for_status()
-    with open(VENDORED_GRAPHER_SCHEMA_PATH, "w") as f:
-        json.dump(resp.json(), f, indent=2)
-        f.write("\n")
-    print(f"Refreshed {VENDORED_GRAPHER_SCHEMA_PATH} from {DEFAULT_GRAPHER_SCHEMA}")
+    path = vendored_grapher_schema_path()
+    _write_vendored_schema(path, resp.json())
+    print(f"Refreshed {path} from {DEFAULT_GRAPHER_SCHEMA}")
+
+
+def bump_vendored_schema() -> bool:
+    """Move the vendored grapher schema to the newest published version.
+
+    Reads the version from `grapher-schema.latest.json` — the alias upstream keeps pointed at the
+    newest concrete schema, whose `$id` names that version. This is the one place `latest` belongs:
+    a deliberate, reviewable action, not a run-time lookup.
+
+    Returns True if anything changed, False if we already vendor the newest version.
+    """
+    from etl.http import session
+
+    resp = session.get(GRAPHER_SCHEMA_LATEST_URL, timeout=30)
+    resp.raise_for_status()
+    schema = resp.json()
+
+    latest_id = schema.get("$id")
+    if not isinstance(latest_id, str) or not re.fullmatch(
+        r"https://files\.ourworldindata\.org/schemas/grapher-schema\.\d{3}\.json", latest_id
+    ):
+        raise SystemExit(
+            f"{GRAPHER_SCHEMA_LATEST_URL} declares `$id` {latest_id!r}, which is not a concrete "
+            "versioned schema URL. Refusing to vendor it — check with the web team."
+        )
+
+    old_path = vendored_grapher_schema_path()
+    new_path = SCHEMAS_DIR / latest_id.rsplit("/", 1)[-1]
+    if new_path == old_path:
+        print(f"Already vendoring the newest published schema ({old_path.name}); nothing to bump.")
+        print("To pull in an in-place upstream change to this same version, use --refresh.")
+        return False
+
+    # Write the new copy and drop the old one in one go: `etl.config` insists on exactly one
+    # vendored schema, so leaving both on disk would break every later import.
+    _write_vendored_schema(new_path, schema)
+    old_path.unlink()
+    print(f"Vendored {new_path.name} (was {old_path.name})")
+
+    # Repoint the `$ref`s that name the vendored file.
+    for name in SCHEMAS_REFERENCING_GRAPHER:
+        path = SCHEMAS_DIR / name
+        text = path.read_text()
+        updated = text.replace(f"{old_path.name}#", f"{new_path.name}#")
+        if updated != text:
+            path.write_text(updated)
+            print(f"Repointed $refs in {name}: {text.count(f'{old_path.name}#')} reference(s)")
+
+    # Anything left is a mention in prose, `description`s or `examples` rather than a `$ref` — e.g.
+    # the `grapher_schema` examples in multidim-schema.json, which show what a *new* config should
+    # pin. Not rewritten automatically: some of those examples are deliberately version-specific.
+    leftover = sorted(p.name for p in SCHEMAS_DIR.glob("*.json") if p != new_path and old_path.name in p.read_text())
+    if leftover:
+        print(
+            f"NOTE: {', '.join(leftover)} still reference {old_path.name} outside of `$ref`s "
+            "(descriptions/examples). Update the ones that should show the current version."
+        )
+
+    print(
+        "\nStill to do by hand (see the `/sync-grapher-schema` skill):\n"
+        "  1. Review what changed upstream:\n"
+        f"     git show HEAD:schemas/{old_path.name} | diff -u - schemas/{new_path.name}\n"
+        "  2. Mirror genuinely new/changed properties into the `grapher_config` block embedded in\n"
+        "     schemas/dataset-schema.json, PRESERVING the deliberate ETL-side deviations (Jinja\n"
+        "     `oneOf` escape hatches, the extra `WorldMap` chart type, the ETL-only\n"
+        "     `data`/`includedEntities` properties). `test_grapher_config_schema_sync` fails until\n"
+        "     this is done.\n"
+        "  3. Do NOT bump the `grapher_schema` pins in existing collection configs — those record\n"
+        "     what each config was authored against, and are what lets grapher migrate them.\n"
+    )
+    return True
 
 
 def format_content(content: str) -> str:
@@ -525,10 +625,30 @@ def main():
         action="store_true",
         help=f"Re-download the vendored grapher schema from {DEFAULT_GRAPHER_SCHEMA} before generating.",
     )
+    parser.add_argument(
+        "--bump-version",
+        action="store_true",
+        help=(
+            "Vendor the newest published schema version instead (read from "
+            f"{GRAPHER_SCHEMA_LATEST_URL}), repoint the $refs that name it, then generate. "
+            "No-op if we already vendor the newest version."
+        ),
+    )
     args = parser.parse_args()
+
+    if args.refresh and args.bump_version:
+        raise SystemExit(
+            "--refresh and --bump-version are mutually exclusive: --refresh re-downloads the version we already vendor, --bump-version moves to a newer one."
+        )
+
+    if args.check and (args.refresh or args.bump_version):
+        raise SystemExit("--check is read-only; don't combine it with --refresh/--bump-version.")
 
     if args.refresh:
         refresh_vendored_schema()
+
+    if args.bump_version:
+        bump_vendored_schema()
 
     generator = TypedDictGenerator()
     content = format_content(generator.generate_file_content())

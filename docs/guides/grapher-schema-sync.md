@@ -41,7 +41,7 @@ The automatic part of a sync (vendored refresh + type regeneration) is committed
 
 - mirroring the upstream diff into the `grapher_config` block embedded in `schemas/dataset-schema.json`, **preserving the deliberate ETL-side deviations** (Jinja `oneOf` escape hatches, the extra `WorldMap` chart type, the ETL-only `data`/`includedEntities` properties);
 - adding `$ref`s for genuinely new properties to `schemas/multidim-schema.json` / `schemas/explorer-schema.json`;
-- handling the rarer **version bump** (new `grapher-schema.NNN`): bumping `DEFAULT_GRAPHER_SCHEMA` in `etl/config.py`, updating `$ref`s, re-vendoring.
+- handling the rarer **version bump** (new `grapher-schema.NNN`): run `python scripts/generate_schema_types.py --bump-version`, which reads the new version from `grapher-schema.latest.json`, vendors it, drops the old copy, repoints the `$ref`s and regenerates the types. `DEFAULT_GRAPHER_SCHEMA` follows on its own — `etl/config.py` derives it from whichever schema is vendored — so nothing there is hand-edited. What's left after the command is judgment: reviewing the upstream diff and mirroring new properties into the embedded `grapher_config` block.
 
 !!! warning "A version bump does *not* touch the `grapher_schema` pins in MDIM configs"
 
@@ -73,3 +73,4 @@ It can also be run ad-hoc — e.g. when the web team announces a change and you 
 | Embedded `grapher_config` in `dataset-schema.json` out of sync with the vendored pin | `test_grapher_config_schema_sync` in `tests/test_metadata_schemas.py` (unit, offline, enum-deep) |
 | Vendored pin stale vs live upstream (in-place mutation) | scheduled workflow → draft PR; `test_vendored_grapher_schema_is_current` (integration) |
 | Upstream publishes a new schema version | scheduled workflow → issue; `test_no_newer_grapher_schema_version` (integration) |
+| A collection config with no `grapher_schema` pin, whose meaning would then change under the next bump | `grapher_schema` in multidim-schema.json's `required` + `Collection.validate_grapher_schema_pinned()`; `test_multidim_configs_pin_grapher_schema` (unit, offline) |
