@@ -9,7 +9,7 @@ import streamlit as st
 from owid.catalog import Dataset
 
 from apps.wizard.utils import get_datasets_in_etl, set_states
-from apps.wizard.utils.components import st_title_with_expert
+from apps.wizard.utils.components import st_page_title
 from etl.config import ENV_IS_REMOTE
 from etl.harmonize import Harmonizer
 from etl.paths import STEP_DIR
@@ -218,7 +218,7 @@ def show_submit_section(path_export: str):
 
 def render(step_uri):
     # Page config
-    st_title_with_expert("Entity Harmonizer", icon=":material/music_note:")
+    st_page_title("Entity Harmonizer", icon=":material/music_note:")
 
     # Set states
     st.session_state["show_all"] = st.session_state.get("show_all", False)

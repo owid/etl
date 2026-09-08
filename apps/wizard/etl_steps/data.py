@@ -21,7 +21,7 @@ from apps.wizard.utils.components import (
     preview_file,
     st_horizontal,
     st_multiselect_wider,
-    st_title_with_expert,
+    st_page_title,
 )
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
@@ -484,7 +484,7 @@ def render_form():
 #########################################################
 st_multiselect_wider()
 # TITLE
-st_title_with_expert("Data **:gray[Create steps]**", icon=":material/table:")
+st_page_title("Data **:gray[Create steps]**", icon=":material/table:")
 
 # SELECT MODE
 step_selected = render_step_selection()

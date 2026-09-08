@@ -5,7 +5,7 @@ import pandas as pd
 import streamlit as st
 from structlog import get_logger
 
-from apps.wizard.utils.components import st_horizontal, st_multiselect_wider, st_title_with_expert, url_persist
+from apps.wizard.utils.components import st_horizontal, st_multiselect_wider, st_page_title, url_persist
 from etl.config import OWID_ENV, SEARCH_API_URL
 from etl.http import session as http_session
 
@@ -171,7 +171,7 @@ def deduplicate_dimensions(indicators: list[Indicator]) -> list[Indicator]:
 ########################################################################################################################
 
 # Streamlit app layout.
-st_title_with_expert("Indicator search", icon=":material/search:")
+st_page_title("Indicator search", icon=":material/search:")
 
 # Box for input text.
 input_string = url_persist(st.text_input)(

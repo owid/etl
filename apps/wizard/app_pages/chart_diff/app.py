@@ -21,7 +21,7 @@ from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines, indica
 from apps.wizard.utils import set_states
 from apps.wizard.utils.components import (
     Pagination,
-    st_title_with_expert,
+    st_page_title,
     url_persist,
 )
 from etl.config import FORCE_DATASETTE, OWID_ENV
@@ -559,7 +559,7 @@ def st_docs():
 ########################################
 def main():
     # Title and links
-    st_title_with_expert(
+    st_page_title(
         title="Chart Diff",
         icon=":material/difference:",
         help=f"""

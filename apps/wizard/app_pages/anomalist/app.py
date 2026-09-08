@@ -39,7 +39,7 @@ from apps.wizard.utils.components import (
     grapher_chart,
     st_horizontal,
     st_multiselect_wider,
-    st_title_with_expert,
+    st_page_title,
     tag_in_md,
     url_persist,
 )
@@ -586,7 +586,7 @@ create_tables()
 
 # 1/ PAGE TITLE
 # Show title
-st_title_with_expert(
+st_page_title(
     "Anomalist",
     icon=":material/planner_review:",
 )

@@ -6,7 +6,7 @@ from apps.wizard.app_pages.producer_analytics.data_io import get_analytics
 from apps.wizard.app_pages.producer_analytics.producer import UIProducerAnalytics
 from apps.wizard.app_pages.producer_analytics.selection import render_selection
 from apps.wizard.app_pages.producer_analytics.summary import UISummary
-from apps.wizard.utils.components import st_title_with_expert
+from apps.wizard.utils.components import st_page_title
 
 # Initialize log.
 log = get_logger()
@@ -24,7 +24,7 @@ st.set_page_config(
 ########################################################################################################################
 
 # Streamlit app layout.
-st_title_with_expert("Producer analytics", icon=":material/analytics:")
+st_page_title("Producer analytics", icon=":material/analytics:")
 st.markdown("Explore analytics of data producers.")
 
 # Selection box

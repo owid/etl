@@ -395,19 +395,11 @@ def st_wizard_page_link(alias: str, border: bool = False, **kwargs) -> None:
         st.warning(f"App must be run via `make wizard` to display link to `{alias}`.")
 
 
-def st_title_with_expert(title: str, icon: str | None = None, **kwargs):
-    container = st.container(border=False, horizontal=True, vertical_alignment="bottom")
+def st_page_title(title: str, icon: str | None = None, **kwargs):
+    """Page title, optionally prefixed with a material icon."""
     if icon is not None:
         title = f"{icon} {title}"
-    with container:
-        st.title(title, **kwargs)
-        st_wizard_page_link(
-            alias="expert",
-            label=":rainbow[**Ask the Expert**]",
-            help="Ask the expert any documentation question!",
-            width="content",
-            border=False,
-        )
+    st.title(title, **kwargs)
 
 
 # ---------------------------------------------------------------------------

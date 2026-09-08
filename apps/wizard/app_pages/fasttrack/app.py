@@ -24,7 +24,7 @@ from apps.wizard.app_pages.fasttrack.utils import (
     UPDATE_GSHEET,
     set_states,
 )
-from apps.wizard.utils.components import config_style_html, preview_file, st_horizontal, st_title_with_expert
+from apps.wizard.utils.components import config_style_html, preview_file, st_horizontal, st_page_title
 from etl import config
 from etl.command import main as etl_main
 from etl.paths import DAG_DIR
@@ -94,7 +94,7 @@ APP_STATE = wizard_utils.AppState()
 # MAIN ###################################################
 ##########################################################
 # TITLE & description
-st_title_with_expert(
+st_page_title(
     "Fast-Track import",
     icon=":material/fast_forward:",
 )
