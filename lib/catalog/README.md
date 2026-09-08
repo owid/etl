@@ -87,8 +87,8 @@ Maintainer notes — how the version is bumped, how a release reaches PyPI, and 
 
 ## Changelog
 
-### Unreleased
-Merged to `master` but not published yet — see [`DEVELOPMENT.md`](DEVELOPMENT.md) for how a release is cut.
+### `v1.2.5`
+- Remove the leftover `multidim` channel from `CHANNEL` in `core.datasets` and `core.paths`. MDIM configs were written as datasets under `data/multidim/` for a short while in 2025; they have lived outside the data catalog since, so the channel only made the publish job look for an empty folder and write an empty index file on every deploy
 - Render metadata Jinja in a `SandboxedEnvironment`, so a producer-supplied value containing `<<` or `<%` cannot walk `__class__`/`__subclasses__` on whatever runs the ETL
 - Fail loudly on a character-exploded `description_key` (a markdown string that was iterated character by character): `Markdown` is now a `str` subclass that raises `TypeError` on iteration, alongside a new `validate_description_key_list()` sanity check
 - New `s3_utils.object_exists()` to check for an object without downloading it

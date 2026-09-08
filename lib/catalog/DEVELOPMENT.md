@@ -86,12 +86,12 @@ There is no written policy; this is what the history does (the package is still
 |------|----------|----------|
 | MAJOR | redesign of the public surface | `1.0.0` — restructure into `core`/`api`, unified `Client` |
 | MINOR | removing or renaming public API | `1.1.0` dropped the processing log; `1.2.0` dropped `Source`/`sources` |
-| PATCH | additive API, bug fixes, dependency bumps, Python-support changes | `1.2.1`–`1.2.4` |
+| PATCH | additive API, bug fixes, dependency bumps, Python-support changes | `1.2.1`–`1.2.5` |
 
 Note that breaking *removals* have not been treated as major: `1.1.0` and `1.2.0` took
-public API away in minor releases, and `1.2.4` dropped `display.yearIsDay` in a patch. So
-pinning `owid-catalog` loosely is not enough to be safe — and when you do remove something,
-say so prominently in the changelog.
+public API away in minor releases, while `1.2.4` dropped `display.yearIsDay` and `1.2.5`
+dropped a `CHANNEL` member — both in patches. So pinning `owid-catalog` loosely is not
+enough to be safe, and when you do remove something, say so prominently in the changelog.
 
 ### When a bump is worth it
 
