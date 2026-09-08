@@ -1,6 +1,6 @@
 ---
 name: create-static-viz
-description: Build or refresh an OWID static visualization end to end — resolve what data it needs from an old static viz image, an indicator, or a grapher chart; check both the ETL catalog and the producer's own site for a newer release and route to /create-dataset or /update-dataset when one exists; write the export://static_viz matplotlib step that emits Figma-ready SVG and PNG at the static-chart templates' proportions; then hand off to /create-figma-chart. Trigger when the user asks to "refresh this static viz", "remake this chart as a static image", "create a static viz", pastes an old static viz image or filename and asks for a better version, or picks up a viz from the static-viz refresh queue.
+description: Build or refresh an OWID static visualization end to end — resolve what data it needs from an old static viz image, an indicator, or a grapher chart; check both the ETL catalog and the producer's own site for a newer release and route to /create-dataset or /update-dataset when one exists; write the viz://static matplotlib step that emits Figma-ready SVG and PNG at the static-chart templates' proportions; then hand off to /create-figma-chart. Trigger when the user asks to "refresh this static viz", "remake this chart as a static image", "create a static viz", pastes an old static viz image or filename and asks for a better version, or picks up a viz from the static-viz refresh queue.
 metadata:
   internal: true
 ---
@@ -8,7 +8,7 @@ metadata:
 # Create or refresh a static visualization
 
 Joins the three halves of a static-viz refresh that are otherwise separate: getting the data into
-ETL at a current vintage, drawing it in an `export://static_viz` step whose SVG a designer can
+ETL at a current vintage, drawing it in an `viz://static` step whose SVG a designer can
 actually pick up, and getting that SVG into the Charts file.
 
 **Model check:** the session context names the running model. On **Fable**, recommend re-running on
@@ -123,7 +123,7 @@ rather than letting it pass as polish.
 > - Mobile: discuss with Marwa whether a mobile version is feasible; otherwise, make the desktop
 >   version as readable as possible on mobile.
 
-The second line is why this skill exists: an `export://static_viz` step *is* the reproducibility
+The second line is why this skill exists: an `viz://static` step *is* the reproducibility
 requirement, met. The third is not optional — @mrwbkrm signs off on every one. The fourth means a
 mobile version is a question to ask, not a default to assume.
 
@@ -287,7 +287,7 @@ Put the whole proposal in front of the user at once, and get an explicit go-ahea
 This mirrors `/create-figma-chart`'s single-checkpoint rule, for the same reason: everything after
 here is expensive to redo.
 
-## Step 4 — Write the `export://static_viz` step
+## Step 4 — Write the `viz://static` step
 
 > **Read [reference/WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md) for this step.**
 
@@ -296,11 +296,11 @@ Everything about authoring the step: the Figma handoff contract the emitted file
 ## Step 5 — Render, verify, and look at it
 
 ```bash
-.venv/bin/etlr export://static_viz/<ns>/<version>/<short_name> --private --export
+.venv/bin/etlr viz://static/<ns>/<version>/<short_name> --private --grapher
 ```
 
-**The `--export` flag is mandatory.** Without it the step silently does not match, and the error
-says "No steps matched" while listing your step as the closest match.
+`--grapher` is the flag for every `viz://` step. A static step only writes the PNG and SVG next to
+the recipe, but without the flag it is skipped, and `etlr` says so.
 
 **From a fresh worktree, give it its own `.venv` before rendering.** A worktree starts without one,
 and borrowing the main checkout's is a trap: `etl` is installed there editable via a `.pth` holding
@@ -311,7 +311,7 @@ reports `Finished`, your worktree's files never change, and that reads exactly l
 ```bash
 make .venv                             # uv sync --all-extras --group dev; the pre-commit hook also does this
 ln -s /path/to/main/checkout/data data # gitignored; the built deps only exist in the main checkout
-.venv/bin/etlr export://... --private --export
+.venv/bin/etlr viz://static/... --private --grapher
 ```
 
 Confirm before trusting a render: `.venv/bin/python -c "from etl import paths; print(paths.BASE_DIR)"`

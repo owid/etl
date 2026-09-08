@@ -4,12 +4,12 @@ tags:
 icon: lucide/forward
 ---
 
-# Export steps
+# Viz and export steps
 
-Export steps are defined in `etl/steps/export` directory and have similar structure to regular steps. They are run with the `--export` flag:
+Viz steps (`viz://`) produce visualizations and export steps (`export://`) ship files to external destinations. They are defined in the `etl/steps/viz` and `etl/steps/export` directories and have a similar structure to regular steps. Viz steps are run with `--grapher`; export steps write to R2 or GitHub and are run with `--export`.
 
 ```bash
-etlr export://explorers/minerals/latest/minerals --export
+etlr viz://explorer/minerals/latest/minerals --grapher
 ```
 
 The `def run():` function doesn't save a dataset, but calls a method that performs the action. For instance `create_explorer(...)` or `gh.commit_file_to_github(...)`. Once the step is executed successfully, it won't be run again unless its code or dependencies change (it won't be "dirty").
@@ -35,7 +35,7 @@ ds_explorer.save()
 
 Multi-dimensional indicators are powered by a configuration that is typically created from a YAML file. The structure of the YAML file looks like this:
 
-```yaml title="etl/steps/export/multidim/energy/latest/energy_prices.yaml"
+```yaml title="etl/steps/viz/chart/energy/latest/energy_prices.yaml"
 title:
   title: "Energy prices"
   title_variant: "by energy source"
@@ -77,11 +77,11 @@ views:
 
 The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically (using function `etl.collection.multidim.expand_config`).
 
-You can also combine manually defined views with generated ones. See the `etl.collection.multidim` module for available helper functions or refer to examples from `etl/steps/export/multidim/`. Feel free to add or modify the helper functions as needed.
+You can also combine manually defined views with generated ones. See the `etl.collection.multidim` module for available helper functions or refer to examples from `etl/steps/viz/chart/`. Feel free to add or modify the helper functions as needed.
 
-The export step loads the data dependencies and the config YAML file, adds `views` to the config, and then pushes the configuration to the database.
+The chart step loads the data dependencies and the config YAML file, adds `views` to the config, and then pushes the configuration to the database.
 
-```python title="etl/steps/export/multidim/energy/latest/energy_prices.py"
+```python title="etl/steps/viz/chart/energy/latest/energy_prices.py"
 def run() -> None:
     #
     # Load inputs.
@@ -117,7 +117,7 @@ def run() -> None:
 To see the multi-dimensional indicator in Admin, run
 
 ```bash
-etlr export://multidim/energy/latest/energy_prices --export
+etlr viz://chart/energy/latest/energy_prices --grapher
 ```
 
 and check out the preview at: http://staging-site-my-branch/admin/grapher/mdd-energy-prices
@@ -148,5 +148,5 @@ gh.commit_file_to_github(
 This code will commit the dataset to the `co2-data` repository on GitHub if you specify the `CO2_BRANCH` environment variable, i.e.
 
 ```bash
-CO2_BRANCH=main etlr export://co2/latest/co2 --export
+CO2_BRANCH=main etlr export://github/co2_data/latest/owid_co2 --export
 ```

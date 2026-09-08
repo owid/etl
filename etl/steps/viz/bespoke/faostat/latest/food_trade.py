@@ -1,4 +1,4 @@
-"""S3 JSON export step for the FAOSTAT food-trade Sankey viz.
+"""Bespoke viz step producing the S3 JSON feed for the FAOSTAT food-trade Sankey viz.
 
 Loads the `food_trade` garden table and writes two kinds of files:
 
@@ -30,7 +30,7 @@ from tqdm.auto import tqdm
 
 from etl.config import DRY_RUN
 from etl.helpers import PathFinder
-from etl.paths import EXPORT_DIR
+from etl.paths import VIZ_DIR
 
 log = get_logger()
 paths = PathFinder(__file__)
@@ -85,7 +85,7 @@ def _build_products_by_entity(df: pd.DataFrame, entity_to_id: dict, product_to_i
 
 def _save_and_upload(data: dict, filename: str) -> None:
     """Write JSON locally and upload to S3 (skipping the upload under DRY_RUN)."""
-    export_dir = EXPORT_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
+    export_dir = VIZ_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
     export_dir.mkdir(parents=True, exist_ok=True)
     local_file = export_dir / filename
     s3_path = f"s3://{S3_BUCKET_NAME}/{S3_DATA_DIR / filename}"

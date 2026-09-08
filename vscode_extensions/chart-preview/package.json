@@ -3,7 +3,7 @@
   "publisher": "owid",
   "displayName": "Chart Preview",
   "description": "Live preview panel for .chart.yml files using OWID Grapher",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "repository": {
     "type": "git",
     "url": "https://github.com/owid/etl"
@@ -33,7 +33,7 @@
       "editor/title": [
         {
           "command": "chart-preview.open",
-          "when": "resourceFilename =~ /\\.chart\\.yml$/ || resourceDirname =~ /export[\\/\\\\]multidim/ && resourceFilename =~ /\\.(config\\.yml|py)$/ || resourceDirname =~ /steps[\\/\\\\]data[\\/\\\\]/ && resourceFilename =~ /\\.py$/",
+          "when": "resourceFilename =~ /\\.chart\\.yml$/ || resourceDirname =~ /steps[\\/\\\\]viz[\\/\\\\]chart/ && resourceFilename =~ /\\.(config\\.yml|py)$/ || resourceDirname =~ /steps[\\/\\\\]data[\\/\\\\]/ && resourceFilename =~ /\\.py$/",
           "group": "navigation"
         }
       ]

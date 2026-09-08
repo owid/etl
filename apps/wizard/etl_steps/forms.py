@@ -603,7 +603,7 @@ class CollectionForm(StepForm):
     @property
     def step_uri(self) -> str:
         """Get step URI."""
-        return f"export://multidim/{self.base_step_name}"
+        return f"viz://chart/{self.base_step_name}"
 
     def to_dict(self):
         return {
@@ -648,6 +648,6 @@ class CollectionForm(StepForm):
 def generate_export_step_to_channel(cookiecutter_path: Path, data: dict[str, Any]) -> Path:
     assert {"namespace", "version"} <= data.keys()
 
-    target_dir = STEP_DIR / "export" / "multidim"
+    target_dir = STEP_DIR / "viz" / "chart"
     generate_step(cookiecutter_path, data, target_dir)
     return target_dir / data["namespace"] / data["version"]

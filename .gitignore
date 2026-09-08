@@ -13,6 +13,7 @@ __pycache__
 etl/scripts/countries-regions/intermediate
 /data
 export/*
+viz/*
 .env
 .env.*
 *.dot

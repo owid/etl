@@ -6,8 +6,8 @@ those four pieces as `metric|commodity|sub_commodity|unit`. This step parses
 that title, lifts the four pieces onto `m.dimensions`, and lets
 `paths.create_collection(tb=tb, ...)` auto-expand one view per column.
 
-The explorer is the YAML-driven sibling of `export://multidim/minerals/latest/minerals`
-(see `etl/steps/export/multidim/minerals/latest/minerals.py`); the construction
+The explorer is the YAML-driven sibling of `viz://chart/minerals/latest/minerals`
+(see `etl/steps/viz/chart/minerals/latest/minerals.py`); the construction
 logic is intentionally near-identical, with two differences:
 - Top-level `config:` carries the legacy explorer settings (explorerTitle,
   explorerSubtitle, selection, …) instead of the multidim's title block.

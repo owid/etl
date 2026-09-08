@@ -375,7 +375,7 @@ Two things this exercise is good for beyond tidiness:
 
 ### Restyling a local-SVG import to OWID's fonts and colors
 
-An `export://static_viz` step deliberately does **not** set them: the machine building it may have
+An `viz://static` step deliberately does **not** set them: the machine building it may have
 neither Lato nor Playfair Display (this one has 436 font families and neither), so a step that asked
 for them would fall back silently and emit different type depending on where it ran. Colors are the
 same story — the Chart colors library lives in Figma, not in matplotlib. So the step owns the data,

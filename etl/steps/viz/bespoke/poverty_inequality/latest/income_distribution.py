@@ -20,7 +20,7 @@ from tqdm.auto import tqdm
 from etl.config import DRY_RUN
 from etl.data_helpers.misc import round_to_sig_figs
 from etl.helpers import PathFinder
-from etl.paths import EXPORT_DIR
+from etl.paths import VIZ_DIR
 
 # S3 bucket name and folder where dataset files will be stored.
 S3_BUCKET_NAME = "owid-public"
@@ -90,7 +90,7 @@ def create_distribution_json(tb_export: pd.DataFrame, year: int) -> dict:
 def save_and_upload_json(data: dict, filename: str, s3_data_dir: Path) -> None:
     """Save JSON data to local file and upload to S3."""
     # Create export directory using paths.
-    export_dir = EXPORT_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
+    export_dir = VIZ_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
     export_dir.mkdir(parents=True, exist_ok=True)
 
     # Create full paths.

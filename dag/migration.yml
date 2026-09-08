@@ -57,35 +57,35 @@ steps:
     - data://garden/regions/2023-01-01/regions
 
   # UN DESA multidim migration flows (2024)
-  export://multidim/migration/latest/migration_flows:
+  viz://chart/migration/latest/migration_flows:
     - data://grapher/un/2025-03-18/migration_stock_flows
-  export://explorers/migration/latest/migration_flows:
+  viz://explorer/migration/latest/migration_flows:
     - data://grapher/un/2025-03-18/migration_stock_flows
 
   # Migration multidims
-  export://multidim/migration/latest/migrant_populations:
+  viz://chart/migration/latest/migrant_populations:
     - data://grapher/un/2025-03-12/migrant_stock
     - data://grapher/regions/2023-01-01/regions
 
-  export://multidim/migration/latest/net_migration:
+  viz://chart/migration/latest/net_migration:
     - data://grapher/un/2024-07-12/un_wpp
 
-  export://multidim/migration/latest/asylum_seekers_and_refugees:
+  viz://chart/migration/latest/asylum_seekers_and_refugees:
     - data://grapher/un/2025-07-03/refugee_data
     - data://grapher/unicef/2026-01-07/child_migration
     - data://grapher/regions/2023-01-01/regions
 
-  export://multidim/migration/latest/internal_displacement:
+  viz://chart/migration/latest/internal_displacement:
     - data://grapher/idmc/2026-01-19/internal_displacement
     - data://grapher/un/2025-07-03/refugee_data
     - data://grapher/unicef/2026-01-07/child_migration
     - data://grapher/regions/2023-01-01/regions
 
-  export://multidim/migration/latest/remittances:
+  viz://chart/migration/latest/remittances:
     - data://grapher/worldbank_wdi/2026-07-27/wdi
 
   #Refugee, Asylum and Migration Explorer (2026 Jan update):
-  export://explorers/migration/2026-01-27/migration:
+  viz://explorer/migration/2026-01-27/migration:
     # UNICEF child migration data (up to 2024)
     - data://grapher/unicef/2026-01-07/child_migration:
         - data://garden/unicef/2026-01-07/child_migration:
@@ -114,11 +114,11 @@ steps:
   #
   # Average annual change in the US foreign-born population, by decade — chart authored in ETL.
   #
-  export://multidim/migration/latest/us_foreign_born_annual_change_by_decade:
+  viz://chart/migration/latest/us_foreign_born_annual_change_by_decade:
     - data://grapher/migration/2026-07-22/us_foreign_born_population
 
   # UN DESA migration flows S3 JSON export (2024)
-  export://s3/un_migration/latest/migration_stock_flows_json:
+  viz://bespoke/un_migration/latest/migration_stock_flows_json:
     - data://garden/demography/2024-07-15/population
     - data://garden/un/2025-03-18/migration_stock_flows
   data://meadow/migration/2026-07-22/us_lawful_permanent_residents:

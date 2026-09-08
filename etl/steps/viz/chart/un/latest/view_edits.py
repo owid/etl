@@ -380,7 +380,7 @@ class ViewEditor:
                 # a 0-baseline flattens the curve.
                 # In MDIM grapher config the y-axis minimum lives on nested
                 # `yAxis.min` (the Explorer-grammar equivalent was the flat
-                # `yAxisMin` field used in `etl/steps/export/explorers/.../view_edits.py`).
+                # `yAxisMin` field used in `etl/steps/viz/explorer/.../view_edits.py`).
                 if age == "0":
                     if v.config is None:
                         v.config = {}

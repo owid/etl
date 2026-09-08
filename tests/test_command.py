@@ -141,13 +141,18 @@ def test_exec_graph_parallel_does_not_exit_silently_on_system_exit(capsys):
 
 
 def test_construct_full_dag():
-    """Test construct_full_dag function covers grapher step generation and export step handling."""
-    # Test DAG with data://grapher step and export step
+    """Test construct_full_dag function covers grapher step generation and viz step handling."""
+    # Test DAG with data://grapher step, and chart and explorer steps
     dag = {
         "data://meadow/happiness/2023-01-01/happiness": {"snapshot://meadow/happiness/2023-01-01/happiness"},
         "data://garden/happiness/2023-01-01/happiness": {"data://meadow/happiness/2023-01-01/happiness"},
         "data://grapher/happiness/2023-01-01/happiness": {"data://garden/happiness/2023-01-01/happiness"},
-        "export://explorers/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
+        "viz://explorer/happiness/latest/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
+        "viz://chart/happiness/latest/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
+        "viz://bespoke/happiness/latest/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
+        "viz://static/happiness/2023-01-01/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
+        # Export steps don't write to the DB, so they get no grapher:// dependency.
+        "export://s3/happiness/latest/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
     }
 
     full_dag = cmd.construct_full_dag(dag)
@@ -157,8 +162,12 @@ def test_construct_full_dag():
     assert expected_grapher_step in full_dag
     assert full_dag[expected_grapher_step] == {"data://grapher/happiness/2023-01-01/happiness"}
 
-    # Check that export step dependencies were updated to include grapher step
-    assert expected_grapher_step in full_dag["export://explorers/happiness"]
+    # Check that the dependencies of steps writing to the grapher DB were updated to include the grapher step
+    assert expected_grapher_step in full_dag["viz://explorer/happiness/latest/happiness"]
+    assert expected_grapher_step in full_dag["viz://chart/happiness/latest/happiness"]
+    assert expected_grapher_step in full_dag["viz://bespoke/happiness/latest/happiness"]
+    assert expected_grapher_step in full_dag["viz://static/happiness/2023-01-01/happiness"]
+    assert expected_grapher_step not in full_dag["export://s3/happiness/latest/happiness"]
 
     # Check that original dependencies are preserved
     assert "data://garden/happiness/2023-01-01/happiness" in full_dag
@@ -173,9 +182,19 @@ def test_construct_subdag():
         "data://garden/happiness/2023-01-01/happiness": {"data://meadow/happiness/2023-01-01/happiness"},
         "data://grapher/happiness/2023-01-01/happiness": {"data://garden/happiness/2023-01-01/happiness"},
         "grapher://grapher/happiness/2023-01-01/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
-        "export://explorers/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
+        "viz://explorer/happiness/latest/happiness": {
+            "data://grapher/happiness/2023-01-01/happiness",
+            "grapher://grapher/happiness/2023-01-01/happiness",
+        },
+        "viz://chart/happiness/latest/happiness": {
+            "data://grapher/happiness/2023-01-01/happiness",
+            "grapher://grapher/happiness/2023-01-01/happiness",
+        },
+        "viz://static/happiness/2023-01-01/happiness": {"data://garden/happiness/2023-01-01/happiness"},
+        "viz://bespoke/happiness/latest/happiness": {"data://garden/happiness/2023-01-01/happiness"},
+        "export://s3/happiness/latest/happiness": {"data://garden/happiness/2023-01-01/happiness"},
         "data-private://garden/secret/2023-01-01/secret": {"snapshot-private://meadow/secret/2023-01-01/secret"},
-        "private://test/private_step": {"data-private://garden/secret/2023-01-01/secret"},
+        "data-private://grapher/secret/2023-01-01/secret": {"data-private://garden/secret/2023-01-01/secret"},
         "data://meadow/climate/2023-01-01/temperature": {"snapshot://meadow/climate/2023-01-01/temperature"},
     }
 
@@ -200,24 +219,33 @@ def test_construct_subdag():
     grapher_steps = [step for step in subdag.keys() if step.startswith("grapher://")]
     assert len(grapher_steps) > 0
 
-    # Test export step exclusion by default
-    subdag = cmd.construct_subdag(full_dag, includes=["happiness"], export=False)
-    export_steps = [step for step in subdag.keys() if step.startswith("export://")]
-    assert len(export_steps) == 0
+    # With no flag, only data steps run: no grapher:// upserts, no viz:// steps, no export:// steps.
+    subdag = cmd.construct_subdag(full_dag, includes=["happiness"])
+    assert "data://garden/happiness/2023-01-01/happiness" in subdag
+    assert not [step for step in subdag if step.startswith(("grapher://", "viz://", "export://"))]
 
-    # Test export step inclusion
+    # --grapher runs the steps writing to the grapher DB: grapher:// upserts and every viz:// step
+    subdag = cmd.construct_subdag(full_dag, includes=["happiness"], grapher=True)
+    for channel in ["chart", "explorer", "bespoke"]:
+        assert f"viz://{channel}/happiness/latest/happiness" in subdag
+    assert "viz://static/happiness/2023-01-01/happiness" in subdag
+    assert "grapher://grapher/happiness/2023-01-01/happiness" in subdag
+    assert not [step for step in subdag if step.startswith("export://")]
+
+    # --export runs the export:// steps, which write to external destinations.
+    # It no longer implies --grapher: grapher:// upserts and viz steps stay excluded.
     subdag = cmd.construct_subdag(full_dag, includes=["happiness"], export=True)
-    export_steps = [step for step in subdag.keys() if step.startswith("export://")]
-    assert len(export_steps) > 0
+    assert "export://s3/happiness/latest/happiness" in subdag
+    assert not [step for step in subdag if step.startswith(("grapher://", "viz://"))]
 
     # Test private step exclusion by default
     subdag = cmd.construct_subdag(full_dag, includes=[".*"], private=False)
-    private_steps = [step for step in subdag.keys() if step.startswith("private://")]
+    private_steps = [step for step in subdag.keys() if "-private://" in step]
     assert len(private_steps) == 0
 
     # Test private step inclusion
     subdag = cmd.construct_subdag(full_dag, includes=[".*"], private=True)
-    private_steps = [step for step in subdag.keys() if step.startswith("private://")]
+    private_steps = [step for step in subdag.keys() if "-private://" in step]
     assert len(private_steps) > 0
 
     # Test exact match - should include dependencies by default
@@ -262,3 +290,28 @@ def test_construct_subdag_no_matches():
     with pytest.raises(SystemExit) as exc_info:
         cmd.construct_subdag(dag, includes=["nonexistent"])
     assert exc_info.value.code == 1
+
+
+def test_construct_subdag_explains_steps_skipped_for_missing_flag(capsys):
+    """Requesting a step whose flag is missing says which flag to pass, then exits."""
+    full_dag = {
+        "data://grapher/happiness/2023-01-01/happiness": set(),
+        "viz://chart/happiness/latest/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
+        "export://s3/happiness/latest/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
+    }
+
+    with pytest.raises(SystemExit):
+        cmd.construct_subdag(full_dag, includes=["viz://chart/happiness"])
+    captured = capsys.readouterr()
+    assert (
+        "`viz://chart/happiness/latest/happiness` is skipped without --grapher; pass it to run this step."
+        in captured.out
+    )
+
+    with pytest.raises(SystemExit):
+        cmd.construct_subdag(full_dag, includes=["export://s3/happiness/latest/happiness"], exact_match=True)
+    captured = capsys.readouterr()
+    assert (
+        "`export://s3/happiness/latest/happiness` is skipped without --export; pass it to run this step."
+        in captured.out
+    )

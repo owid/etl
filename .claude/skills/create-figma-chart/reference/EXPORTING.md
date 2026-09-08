@@ -4,7 +4,7 @@
 
 
 > **Local SVG on disk: there is nothing to export.** When the input is a file from an
-> `export://static_viz` step, skip this whole step. The step chose its own `figsize` to match a
+> `viz://static` step, skip this whole step. The step chose its own `figsize` to match a
 > template's proportions, so none of the `imType` / `imFontSize` / `imWidth` aspect solving below
 > applies, and there is no chart-only "embed" to export — the file already *is* the framed chart,
 > carrying its own title, subtitle, `Note:`, `Data source:` and license at that template's own slot

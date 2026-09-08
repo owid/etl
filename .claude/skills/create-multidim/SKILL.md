@@ -20,7 +20,7 @@ A multidim requires three things:
 2. A **config YAML** file (dimensions, views, chart settings)
 3. A **DAG entry** in the appropriate `dag/*.yml` file
 
-All files live in `etl/steps/export/multidim/{namespace}/latest/`.
+All files live in `etl/steps/viz/chart/{namespace}/latest/`.
 
 ## Step-by-Step Process
 
@@ -36,7 +36,7 @@ https://ourworldindata.org/grapher/{chart-slug}.metadata.json
 https://api.ourworldindata.org/v1/indicators/{id}.metadata.json
 ```
 
-**Reference indicators by the short `{table}#{variable_name}` form** (e.g. `child_labor#share_child_labor__sex_total__age_5_17`). PathFinder resolves the namespace/version/dataset from the step's DAG dependency, so the config never hardcodes the version — when the dataset version bumps, only the DAG entry changes. See `etl/steps/export/multidim/wid/latest/wealth_wid.config.yml` for a real example.
+**Reference indicators by the short `{table}#{variable_name}` form** (e.g. `child_labor#share_child_labor__sex_total__age_5_17`). PathFinder resolves the namespace/version/dataset from the step's DAG dependency, so the config never hardcodes the version — when the dataset version bumps, only the DAG entry changes. See `etl/steps/viz/chart/wid/latest/wealth_wid.config.yml` for a real example.
 
 The full form `grapher/{namespace}/{version}/{dataset}/{table}#{variable_name}` is valid too, but only reach for it to disambiguate when two DAG dependencies both contain a table of the same name. Never hardcode the version just to "be explicit" — it rots on the next update.
 
@@ -56,14 +56,14 @@ Decide which aspects become dropdown dimensions vs. multi-line indicators on a s
 
 #### Directory structure
 ```
-etl/steps/export/multidim/{namespace}/latest/
+etl/steps/viz/chart/{namespace}/latest/
 ├── {short_name}.py
 └── {short_name}.config.yml
 ```
 
 Create the directory if it doesn't exist:
 ```bash
-mkdir -p etl/steps/export/multidim/{namespace}/latest
+mkdir -p etl/steps/viz/chart/{namespace}/latest
 ```
 
 #### Python file (always the same boilerplate)
@@ -82,7 +82,7 @@ def run() -> None:
     c.save()
 ```
 
-This is sufficient for config-driven multidims (explicit views in YAML). For more advanced patterns (programmatic view generation from table data, combining collections, grouping views), look at existing examples in `etl/steps/export/multidim/` for reference.
+This is sufficient for config-driven multidims (explicit views in YAML). For more advanced patterns (programmatic view generation from table data, combining collections, grouping views), look at existing examples in `etl/steps/viz/chart/` for reference.
 
 #### Config YAML file
 
@@ -93,7 +93,7 @@ See below for the config structure and examples.
 Add to the appropriate `dag/*.yml` file (find it by searching for the grapher dataset dependency):
 
 ```yaml
-export://multidim/{namespace}/latest/{short_name}:
+viz://chart/{namespace}/latest/{short_name}:
   - data://grapher/{namespace}/{version}/{dataset}
 ```
 
@@ -104,8 +104,8 @@ Place it right after the grapher step it depends on.
 **Always run the step after creating it** — schema validation only happens at runtime, so errors (like invalid fields in `config`) won't surface until the step is executed. CI will catch these, but it's better to fix them locally first.
 
 ```bash
-# Export steps are excluded by default — the --export flag is required
-.venv/bin/etl run {short_name} --export --only --private
+# Chart steps write to the grapher DB, so they need the --grapher flag
+.venv/bin/etl run {short_name} --grapher --only --private
 ```
 
 This outputs a preview URL like:
@@ -282,7 +282,7 @@ Key fields for `config` in views or `common_views`:
 
 ## Troubleshooting
 
-**"No steps matched"**: Export steps need the `--export` flag. Without it, they're excluded from matching.
+**"No steps matched"**: Chart steps need the `--grapher` flag. Without it, they're skipped (etlr says which flag to pass).
 
 **Step not found in DAG**: Check that the entry is under the `steps:` key in the correct `dag/*.yml` file, and that the file is included from `dag/main.yml`.
 

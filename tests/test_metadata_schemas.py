@@ -362,7 +362,7 @@ def test_multidim_configs_pin_grapher_schema():
     `etl.collection.utils.resolve_grapher_schema` for the accepted forms.
     """
     missing = []
-    for config_path in sorted(Path(STEP_DIR / "export" / "multidim").glob("**/*.yml")):
+    for config_path in sorted(Path(STEP_DIR / "viz" / "chart").glob("**/*.yml")):
         config = yaml.safe_load(config_path.read_text()) or {}
         # Only collection configs are in scope; the directory also holds plain data yaml
         # (e.g. un/latest/map_brackets.yml).

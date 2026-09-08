@@ -550,3 +550,52 @@ steps:
   # archived; last active in 1c3d0dac654a on 2026-07-28
   data://garden/wid/2026-06-18/world_inequality_database_legacy:
     - data://meadow/wid/2026-06-18/world_inequality_database
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/lis/latest/gini_lis:
+    - data://grapher/lis/2026-06-12/luxembourg_income_study
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/wb/latest/gini_pip:
+    - data://grapher/wb/2026-06-26/world_bank_pip
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/lis/latest/incomes_lis:
+    - data://grapher/lis/2026-06-12/luxembourg_income_study
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/wid/latest/palma_ratio_wid:
+    - data://grapher/wid/2026-06-18/world_inequality_database
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/lis/latest/relative_poverty_lis:
+    - data://grapher/lis/2026-06-12/luxembourg_income_study
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://s3/poverty_inequality/latest/income_distribution:
+    - data://garden/wb/2026-03-25/thousand_bins_distribution
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/lis/latest/incomes_lis:
+    - data://grapher/lis/2026-06-12/luxembourg_income_study
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/wid/latest/wealth_wid:
+    - data://grapher/wid/2026-06-18/world_inequality_database
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/wb/latest/palma_ratio_pip:
+    - data://grapher/wb/2026-06-26/world_bank_pip
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/wb/latest/incomes_pip:
+    - data://grapher/wb/2026-06-26/world_bank_pip
+    - data://grapher/demography/2024-07-15/population
+    - data://grapher/regions/2023-01-01/regions
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/wid/latest/incomes_wid:
+    - data://grapher/regions/2023-01-01/regions
+    - data://grapher/demography/2024-07-15/population
+    - data://grapher/wid/2026-06-18/world_inequality_database
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/lis/latest/poverty_lis:
+    - data://grapher/lis/2026-06-12/luxembourg_income_study
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/wid/latest/gini_wid:
+    - data://grapher/wid/2026-06-18/world_inequality_database
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/wb/latest/poverty_pip:
+    - data://grapher/wb/2026-06-26/world_bank_pip
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/lis/latest/inequality_lis:
+    - data://grapher/lis/2026-06-12/luxembourg_income_study

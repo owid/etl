@@ -13,12 +13,12 @@ class CollectionSet:
     def __init__(self, path: Path):
         self.path = path
         self.collections = self._build_dictionary()
-        # Pick the concrete subclass to instantiate. The export directory layout
-        # encodes the collection type: `export/explorers/...` → Explorer,
-        # `export/multidim/...` → Collection. Without this dispatch,
+        # Pick the concrete subclass to instantiate. The viz directory layout
+        # encodes the collection type: `viz/explorer/...` → Explorer,
+        # `viz/chart/...` → Collection. Without this dispatch,
         # `Collection.load` on an Explorer config raises on the missing `title`
         # field (which Explorer.from_dict defaults to `{}`).
-        self._cls: type[Collection] = Explorer if "explorers" in path.parts else Collection
+        self._cls: type[Collection] = Explorer if "explorer" in path.parts else Collection
 
     def _build_dictionary(self) -> dict[str, Path]:
         dix = {}
@@ -42,7 +42,7 @@ class CollectionSet:
         except TypeError as e:
             # This is a workaround for the TypeError that occurs when loading the config file.
             raise TypeError(
-                f"Error loading Collection config file. Please check the file format and ensure it is valid JSON. Suggestion: Re-run export step generating {name}. Error: {e}"
+                f"Error loading Collection config file. Please check the file format and ensure it is valid JSON. Suggestion: Re-run the viz step generating {name}. Error: {e}"
             )
 
         # Get and set catalog path

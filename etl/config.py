@@ -398,6 +398,7 @@ class OWIDEnv:
     _env_local: OWIDEnvType | None
     conf: Config
     _engine: Engine | None
+    _engine_pid: int | None
 
     def __init__(
         self,
@@ -408,8 +409,9 @@ class OWIDEnv:
         self._env_remote = None
         # Local environment: environment where the code is running
         self._env_local = None  # "production", "staging", "dev"
-        # Engine (cached)
+        # Engine (cached per process, see `engine`)
         self._engine = None
+        self._engine_pid = None
 
     @property
     def env(self) -> OWIDEnvType:
@@ -493,11 +495,19 @@ class OWIDEnv:
 
     @property
     def engine(self) -> Engine:
-        """Get engine for env."""
+        """Get engine for env.
+
+        Cached per process: a step forked by `etlr` inherits this object from its parent, but not
+        usable DB sockets (the child closes every inherited file descriptor), so an engine created
+        in the parent must not be reused in the child. `etl.db.get_engine` memoizes by pid for the
+        same reason.
+        """
         from etl.db import get_engine
 
-        if self._engine is None:
+        pid = os.getpid()
+        if self._engine is None or self._engine_pid != pid:
             self._engine = get_engine(self.conf.__dict__)
+            self._engine_pid = pid
         return self._engine
 
     @property
