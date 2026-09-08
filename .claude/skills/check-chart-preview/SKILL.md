@@ -52,7 +52,7 @@ Accepts chart slugs, mdim slugs, or file paths:
 
 For `.chart.yml`: the `slug` is in the YAML `slug:` field. For mdim slugs containing `#`, the catalogPath inserts the version from the file path.
 
-For export multidim: derive from path `etl/steps/viz/chart/<namespace>/<version>/<shortName>.*` → catalogPath is `<namespace>/<version>/<shortName>#<shortName>`.
+For viz chart steps: derive from path `etl/steps/viz/chart/<namespace>/<version>/<shortName>.*` → catalogPath is `<namespace>/<version>/<shortName>#<shortName>`.
 
 ## Checking the Preview
 
@@ -99,6 +99,6 @@ If the chart hasn't been pushed yet:
 # For graph step charts
 .venv/bin/etlr graph://<namespace>/<version>/<slug> --graph --graph-push --private
 
-# For export multidim
+# For viz chart steps (charts and MDIMs)
 .venv/bin/etlr viz://chart/<namespace>/<version>/<shortName> --grapher --private
 ```
