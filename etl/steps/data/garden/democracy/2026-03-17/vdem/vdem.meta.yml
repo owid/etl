@@ -163,6 +163,9 @@ definitions:
       For example, V-Dem only provides regime data since Bangladesh's independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
 
       For more details on the imputation methodology and which countries are affected, refer to [this file](https://github.com/owid/etl/blob/master/etl/steps/data/garden/democracy/2025-03-17/vdem/vdem.countries_impute.yml).
+    description_no_imputes: |-
+      ### Data imputation
+      Unlike most indicators in this dataset, this one is not extended back in time with the data of the historical entity a country was part of. Who led a country is a fact about that country rather than about the power that ruled its territory earlier, so the years before a country appears in V-Dem's data are left empty.
     estimate: |-
       << "central" if estimate == 'best' else estimate >>
     estimate_title: |-
@@ -503,6 +506,8 @@ tables:
           If the head of state is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
 
           Indicator name: `v2exfemhos`
+        description_processing: |-
+          {definitions.aux.description_no_imputes}
         unit: ""
 
       wom_hos_vdem: # (corrected)
@@ -541,7 +546,7 @@ tables:
           - Shimon Peres:
             - 2007-2013 Israel
 
-          {definitions.aux.description_imputes}
+          {definitions.aux.description_no_imputes}
         unit: ""
 
       # Had female HOS ever
@@ -563,7 +568,27 @@ tables:
 
           This indicator is only estimated for countries listed in V-Dem in the most recent year of the data.
 
-          {definitions.aux.description_imputes}
+          {definitions.aux.description_no_imputes}
+        unit: ""
+
+      # Had female democratically elected HOS ever
+      wom_hos_ever_dem:
+        title: Country had a woman head of state democratically elected at least once
+        description_short: |-
+          Denotes whether a country ever had a democratically elected woman head of state.
+        description_processing: |-
+          We derive this indicator as follows:
+
+          1) Take the gender of the head of state in a given year from V-Dem's `v2exfemhos` indicator, which refers to any point during the year rather than to December 31.
+          2) If 1) evaluates to "female", the office was filled through multi-party elections, and the country was an electoral or liberal democracy, we assign the value 1 to the indicator for the given year and all following years.
+
+          Both conditions in 2) are required. Asking only whether the country was a democracy would count hereditary monarchs, since many democracies have an unelected head of state. Asking only whether the office was filled through multi-party elections would count monarchs of countries that had an elected legislature alongside a hereditary throne.
+
+          To assess whether the office was filled through multi-party elections, we use V-Dem's `v2elmulpar_osp_hos` indicator. To assess whether the country was a democracy, we use our political regime classification, which is based on V-Dem's Regimes of the World indicator.
+
+          This indicator is only estimated for countries listed in V-Dem in the most recent year of the data.
+
+          {definitions.aux.description_no_imputes}
         unit: ""
 
       ## 3.4.3.16 HOG female
@@ -581,6 +606,8 @@ tables:
           1: Female
 
           Indicator name: `v2exfemhog`
+        description_processing: |-
+          {definitions.aux.description_no_imputes}
         unit: ""
 
       wom_hog_vdem: # (corrected)
@@ -608,7 +635,7 @@ tables:
           KåreIsaachsen Willoch: 1981-1985 Norway
           YuriiIvanovych Yekhanurov: 2005 Ukraine
 
-          {definitions.aux.description_imputes}
+          {definitions.aux.description_no_imputes}
         unit: ""
 
       # Had female HOG ever
@@ -637,7 +664,27 @@ tables:
 
           This indicator is only estimated for countries listed in V-Dem in the most recent year of the data.
 
-          {definitions.aux.description_imputes}
+          {definitions.aux.description_no_imputes}
+        unit: ""
+
+      # Had female democratically elected HOG ever
+      wom_hog_ever_dem:
+        title: Country had a woman head of government democratically elected at least once
+        description_short: |-
+          Denotes whether a country ever had a democratically elected woman head of government.
+        description_processing: |-
+          We derive this indicator as follows:
+
+          1) Take the gender of the head of government in a given year from V-Dem's `v2exfemhog` indicator, which refers to any point during the year rather than to December 31. Where the head of state was also the head of government, given by V-Dem's `v2exhoshog` indicator, we use the gender of the head of state instead.
+          2) If 1) evaluates to "female", the office was filled through multi-party elections, and the country was an electoral or liberal democracy, we assign the value 1 to the indicator for the given year and all following years.
+
+          Both conditions in 2) are required. Asking only whether the country was a democracy would count leaders who never stood for election. Asking only whether the office was filled through multi-party elections would count leaders of countries whose elections were neither free nor fair.
+
+          To assess whether the office was filled through multi-party elections, we use V-Dem's `v2elmulpar_osp_hog` indicator. To assess whether the country was a democracy, we use our political regime classification, which is based on V-Dem's Regimes of the World indicator.
+
+          This indicator is only estimated for countries listed in V-Dem in the most recent year of the data.
+
+          {definitions.aux.description_no_imputes}
         unit: ""
 
       ## HOE female (custom)
@@ -658,7 +705,7 @@ tables:
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
 
-          {definitions.aux.description_imputes}
+          {definitions.aux.description_no_imputes}
         unit: ""
 
       wom_hoe_vdem: # (corrected)
@@ -678,7 +725,7 @@ tables:
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
 
-          {definitions.aux.description_imputes}
+          {definitions.aux.description_no_imputes}
         unit: ""
 
       # Had female HOE ever
@@ -706,7 +753,7 @@ tables:
 
           This indicator is only estimated for countries listed in V-Dem in the most recent year of the data.
 
-          {definitions.aux.description_imputes}
+          {definitions.aux.description_no_imputes}
         unit: ""
 
       # Had female democratically elected HOE ever
@@ -718,7 +765,7 @@ tables:
           We derive this indicator as follows:
 
           1) Estimate the gender of the chief executive for a given year. We have used the gender of the most powerful chief: either Head of state or Head of government.
-          2) If 1) evaluates to "female" and the country is an electoral or liberal democracy, we assign the value 1 to the indicator for the given year and all following years.
+          2) If 1) evaluates to "female", the office was filled through multi-party elections, and the country was an electoral or liberal democracy, we assign the value 1 to the indicator for the given year and all following years.
 
           To get the gender of the chief executive for a given year, we have used the gender of the most powerful chief: either Head of state or Head of government.
 
@@ -732,9 +779,11 @@ tables:
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
 
-          In addition, we used the V-Dem indicator `electmulpar_hoe_row_owid`, which is based on V-Dem indicator `v2elmulpar_osp_hoe`, to assess if the country goes through electoral processes to elect the chief executive.
+          Both conditions in 2) are required. Asking only whether the country was a democracy would count leaders who never stood for election, such as hereditary monarchs. Asking only whether the office was filled through multi-party elections would count leaders of countries whose elections were neither free nor fair.
 
-          {definitions.aux.description_imputes}
+          To assess whether the office was filled through multi-party elections, we use the V-Dem indicator `electmulpar_hoe_row_owid`, which is based on V-Dem indicator `v2elmulpar_osp_hoe`. To assess whether the country was a democracy, we use our political regime classification, which is based on V-Dem's Regimes of the World indicator.
+
+          {definitions.aux.description_no_imputes}
         unit: ""
 
       wom_parl_vdem_cat: # wom_parl_gr_vdem_owid
@@ -3074,6 +3123,46 @@ tables:
           Number of countries that never had a woman chief executive elected democratically
           <%- endif -%>
 
+      num_countries_wom_hos_ever:
+        title: |-
+          <%- if category == '-1' -%>
+          Number of countries with unknown female head of state history
+          <%- elif category == "yes" %>
+          Number of countries that had a woman head of state
+          <%- elif category == "no" %>
+          Number of countries that never had a woman head of state
+          <%- endif -%>
+
+      num_countries_wom_hos_ever_demelect:
+        title: |-
+          <%- if category == '-1' -%>
+          Number of countries with unknown democratically elected female head of state history
+          <%- elif category == "yes" %>
+          Number of countries that had a woman head of state elected democratically
+          <%- elif category == "no" %>
+          Number of countries that never had a woman head of state elected democratically
+          <%- endif -%>
+
+      num_countries_wom_hog_ever:
+        title: |-
+          <%- if category == '-1' -%>
+          Number of countries with unknown female head of government history
+          <%- elif category == "yes" %>
+          Number of countries that had a woman head of government
+          <%- elif category == "no" %>
+          Number of countries that never had a woman head of government
+          <%- endif -%>
+
+      num_countries_wom_hog_ever_demelect:
+        title: |-
+          <%- if category == '-1' -%>
+          Number of countries with unknown democratically elected female head of government history
+          <%- elif category == "yes" %>
+          Number of countries that had a woman head of government elected democratically
+          <%- elif category == "no" %>
+          Number of countries that never had a woman head of government elected democratically
+          <%- endif -%>
+
   ##################################################################################################
   ##################################################################################################
   # TABLE: SHARE OF COUNTRIES WITH X
@@ -3081,7 +3170,7 @@ tables:
     common:
       unit: "%"
       description_processing: |-
-        We estimate the share based on the countries that V-Dem lists in 2024.
+        We estimate the share based on the countries that V-Dem lists in the most recent year of the data.
     variables:
       share_countries_wom_hoe_ever:
         title: |-
@@ -3090,6 +3179,22 @@ tables:
       share_countries_wom_hoe_ever_demelect:
         title: |-
           Share of countries that had a woman chief executive elected democratically
+
+      share_countries_wom_hos_ever:
+        title: |-
+          Share of countries that had a woman head of state
+
+      share_countries_wom_hos_ever_demelect:
+        title: |-
+          Share of countries that had a woman head of state elected democratically
+
+      share_countries_wom_hog_ever:
+        title: |-
+          Share of countries that had a woman head of government
+
+      share_countries_wom_hog_ever_demelect:
+        title: |-
+          Share of countries that had a woman head of government elected democratically
 
   ##################################################################################################
   ##################################################################################################
