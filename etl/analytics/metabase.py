@@ -1,6 +1,5 @@
 """Metabase utils"""
 
-import datetime
 import json
 import re
 import urllib.parse
@@ -18,17 +17,9 @@ from etl.config import (
     METABASE_SEMANTIC_LAYER_DATABASE_ID,
     METABASE_URL,
     METABASE_URL_LOCAL,
-    OWID_ENV,
 )
 
 log = get_logger()
-
-# Config
-COLLECTION_EXPERT_ID = 61  # Expert collection
-# Default DB for created questions = the semantic layer (now the prod_semantic dataset on the
-# BigQuery "Data warehouse" connection; the old DuckDB connection (id 2) was retired). Single
-# source of truth with the read path.
-DATABASE_ID = METABASE_SEMANTIC_LAYER_DATABASE_ID
 
 # HTTP status codes that indicate Metabase is temporarily unavailable rather than a permanent error.
 # Metabase is restarted by the analytics pipeline whenever the DuckDB mirrors are rebuilt (daily, plus
@@ -168,147 +159,12 @@ def read_metabase(
     return df
 
 
-def _generate_question_url(card: dict) -> str:
-    """
-    Generate URL to access a Metabase question.
-
-    Args:
-        card (dict): Metabase card object as returned by the Metabase API.
-    Returns:
-        str: Link to the created question in Metabase. This link can be shared with others to access the question directly.
-
-    """
-    assert "id" in card, "Card must have an 'id' field"
-    card_id = card["id"]
-    assert "name" in card, "Card must have an 'name' field"
-    card_name = card["name"]
-
-    # Preliminary cleaning
-    slug = card_name.lower().replace(" ", "-").replace("/", "-")
-    # Use urllib.parse.quote to handle special characters properly
-    slug = urllib.parse.quote(slug, safe="")
-
-    if OWID_ENV.env_local == "production":
-        url = f"{METABASE_URL}/question/{card_id}-{slug}"
-    else:
-        url = f"{METABASE_URL_LOCAL}/question/{card_id}-{slug}"
-
-    return url
-
-
-def create_question(
-    title: str,
-    query: str,
-    description: str | None = None,
-    database_id: int = DATABASE_ID,
-    collection_id: int = COLLECTION_EXPERT_ID,
-    **kwargs,
-):
-    """Create a question in Metabase with the given SQL query and title.
-
-    This tool should be used once we are sure that the query is valid (i.e. it ran successfully against the semantic layer).
-
-    Args:
-        query: SQL query (BigQuery / GoogleSQL) for the Metabase question.
-        title: Title that describes what the query does. Should be short, but concise.
-    Returns:
-        Question object from Metabase API.
-    """
-    # Define title
-    QUESTION_TIMESTAMP = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    q_title = f"🤖 {title} ({QUESTION_TIMESTAMP})"
-
-    # Init API client
-    mb = mb_cli()
-
-    # Create question
-    question = mb.create_card(
-        # card_name=f"{QUESTION_TITLE} (1)",
-        collection_id=collection_id,
-        # If you are providing only this argument, the keys 'name', 'dataset_query' and 'display' are required (https://github.com/metabase/metabase/blob/master/docs/api-documentation.md#post-apicard).
-        custom_json={
-            "name": q_title,
-            "description": description,
-            "type": "question",
-            "dataset_query": {
-                "type": "native",
-                "database": database_id,
-                "native": {"query": query},
-            },
-            "display": "table",
-        },
-        return_card=True,
-        **kwargs,
-    )
-
-    return question
-
-
 def _get_domain(prod: bool = False) -> str:
     if prod:
         domain = METABASE_URL
     else:
         domain = METABASE_URL_LOCAL
     return domain
-
-
-def list_questions(prod: bool = False) -> list[dict]:
-    domain = _get_domain(prod=prod)
-
-    # Init API client
-    mb = mb_cli(domain=domain)
-
-    # Get cards
-    cards = mb.get("/api/card/")
-
-    # Ensure cards is a list
-    if not isinstance(cards, list):
-        cards = []
-
-    # Filter from list only those with type="question"
-    questions = [card for card in cards if card.get("type") == "question"]
-
-    return questions
-
-
-def get_question_info(question_id: int, prod: bool = False) -> dict:
-    domain = _get_domain(prod=prod)
-
-    # Init API client
-    mb = mb_cli(domain=domain)
-
-    # Get question
-    question = mb.get_item_info(item_id=question_id, item_type="card")
-    assert question is not None, f"No card found with id {question_id}"
-    assert question.get("type") == "question", f"Card with id {question_id} is not a question"
-
-    return question
-
-
-def get_question_data(card_id: int, data_format: str = "csv", prod: bool = False) -> pd.DataFrame:
-    domain = _get_domain(prod=prod)
-
-    # Init API client
-    mb = mb_cli(domain=domain)
-
-    # Get card data
-    data_str = mb.get_card_data(
-        card_id=card_id,
-        data_format=data_format,
-    )
-    if data_str is None:
-        return pd.DataFrame()  # Return empty DataFrame if no data
-
-    # Fix encoding: the library may return UTF-8 bytes decoded as Latin-1
-    try:
-        data_str = data_str.encode("latin-1").decode("utf-8")
-    except (UnicodeDecodeError, UnicodeEncodeError):
-        pass  # Already correct encoding
-
-    # Parse raw data as dataframe
-    df = pd.read_csv(BytesIO(initial_bytes=data_str.encode("utf-8")), encoding="utf-8")
-
-    return df
 
 
 def get_metabase_analytics(prod: bool = False):
