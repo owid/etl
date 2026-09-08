@@ -1164,3 +1164,8 @@ steps:
     - data://garden/health/2024-08-23/eurostat_cancer:
       - data://meadow/health/2024-08-23/eurostat_cancer:
         - snapshot://health/2024-08-23/eurostat_cancer.csv
+  # archived; last active in ae169d2bd32f on 2026-09-08
+  data://grapher/cancer/2025-02-17/gco_cancer_survival:
+    - data://garden/cancer/2025-02-17/gco_cancer_survival:
+      - data://meadow/cancer/2025-02-17/gco_cancer_survival:
+        - snapshot://cancer/2025-02-17/gco_cancer_survival.csv
