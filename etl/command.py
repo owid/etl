@@ -261,18 +261,15 @@ def main_cli(
             global_changes = _global_checksum_inputs_changed(files_changed)
             modified_steps = _modified_steps(includes=steps, exact_match=exact_match, files_changed=files_changed)
 
-            # `--modified` surfaces modified viz/export steps (chart, explorer, bespoke, export recipes) by
-            # design, but they're only buildable when their flag is passed (see construct_subdag).
-            # When a branch edits only such a recipe (e.g. a single `<explorer>.<key>.config.yml`),
-            # without this we would exclude it downstream and crash with "No steps matched".
-            # Enable the flag the modified steps need, so they actually rebuild. This applies whether
-            # or not the run is filtered below.
-            if not grapher and any(s.startswith(GRAPHER_FLAG_PREFIXES) for s in modified_steps):
+            # `--modified` surfaces modified viz steps (chart/explorer recipes) by design, but they're
+            # only buildable with --grapher (see construct_subdag). When a branch edits only such a
+            # recipe (e.g. a single `<explorer>.<key>.config.yml`), without this we would exclude it
+            # downstream and crash with "No steps matched". Enable --grapher so it actually rebuilds,
+            # whether or not the run is filtered below. --export is never inferred: it gates uploads
+            # to shared destinations (R2, GitHub) and must stay an explicit choice.
+            if not grapher and any(s.startswith("viz://") for s in modified_steps):
                 grapher = True
                 click.echo("Detected modified viz:// step(s); enabling --grapher for this run.")
-            if not export and any(s.startswith(EXPORT_FLAG_PREFIXES) for s in modified_steps):
-                export = True
-                click.echo("Detected modified export:// step(s); enabling --export for this run.")
 
             if global_changes:
                 # These files aren't under etl/steps/ or snapshots/, so _modified_steps would see
@@ -584,9 +581,9 @@ def _explain_missing_flags(dag: DAG, includes: list[str], exact_match: bool, gra
 
     gated = []
     if not grapher:
-        gated.append((GRAPHER_FLAG_PREFIXES, "writes to the grapher DB; pass --grapher to run it."))
+        gated.append((GRAPHER_FLAG_PREFIXES, "is skipped without --grapher; pass it to run this step."))
     if not export:
-        gated.append((EXPORT_FLAG_PREFIXES, "writes to an external destination (R2, GitHub); pass --export to run it."))
+        gated.append((EXPORT_FLAG_PREFIXES, "is skipped without --export; pass it to run this step."))
     if exact_match:
         requested = [step for step in includes if step in dag]
     else:
