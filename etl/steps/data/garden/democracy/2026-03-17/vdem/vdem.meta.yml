@@ -3280,23 +3280,3 @@ tables:
           People living in countries that << category >> in the given year.
           <%- endif -%>
         description_processing: *country_natelect_processing
-
-      population_wom_hoe_ever:
-        title: |-
-          <%- if category == '-1' -%>
-          People living in countries with unknown female chief executive history
-          <%- elif category == "yes" %>
-          People living in countries that had a woman chief executive
-          <%- elif category == "no" %>
-          People living in countries that never had a woman chief executive
-          <%- endif -%>
-
-      population_wom_hoe_ever_demelect:
-        title: |-
-          <%- if category == '-1' -%>
-          People living in countries with unknown democratically elected female chief executive history
-          <%- elif category == "yes" %>
-          People living in countries that had a woman chief executive elected democratically
-          <%- elif category == "no" %>
-          People living in countries that never had a woman chief executive elected democratically
-          <%- endif -%>

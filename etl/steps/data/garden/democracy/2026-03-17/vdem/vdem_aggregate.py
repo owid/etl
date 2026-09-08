@@ -32,8 +32,7 @@ paths = PathFinder(__file__)
 # Offices for which we count countries that ever had a woman leader: head of state, head of
 # government, and chief executive.
 OFFICES_EVER = ["hos", "hog", "hoe"]
-# Their country counts, which get a share-of-countries counterpart. Population counterparts exist
-# only for the chief executive.
+# Their country counts, which get a share-of-countries counterpart but no population counterpart.
 COLUMNS_COUNTS_EVER = [
     f"num_countries_wom_{office}_ever{suffix}" for office in OFFICES_EVER for suffix in ["", "_demelect"]
 ]
@@ -505,8 +504,8 @@ def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: 
     )
 
     # Sanity check on output shape
-    # NOTE: 61 -> 73 for the same reason as in make_table_countries_counts. The four new indicators
-    # are dropped again further down, since they get no population counterpart.
+    # NOTE: 61 -> 73 for the same reason as in make_table_countries_counts. All six "ever had a
+    # woman leader" indicators are dropped again further down, since none has a population variant.
     assert tb_.shape[1] == 73, f"Unexpected number of columns {tb_.shape[1]}."
 
     # Long format
@@ -524,13 +523,11 @@ def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: 
             "num_countries_years_in_electdem": "population_years_in_electdem",
             "num_countries_years_in_libdem": "population_years_in_libdem",
             "num_countries_natelect": "population_natelect",
-            "num_countries_wom_hoe_ever": "population_wom_hoe_ever",
-            "num_countries_wom_hoe_ever_demelect": "population_wom_hoe_ever_demelect",
         }
     )
 
-    # The head-of-state and head-of-government "ever had a woman leader" indicators are counted by
-    # country and as a share of countries, but not by population.
+    # The "ever had a woman leader" indicators are counted by country and as a share of countries,
+    # but not by population.
     tb_ = tb_.drop(columns=[c for c in COLUMNS_COUNTS_EVER if c in tb_.columns])
 
     # Remove some dimensions
