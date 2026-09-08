@@ -65,7 +65,7 @@ Turn DAG entries into clickable links with visual status feedback:
 
 !!! note "How it works"
 
-    - Click any DAG entry to open its `.py` file (data/export steps) or `.dvc` file (snapshots)
+    - Click any DAG entry to open its `.py` file (data/viz/export steps) or `.dvc` file (snapshots)
     - Status emoji appears based on step version and health
     - Works across all DAG files in the project
 
@@ -166,7 +166,7 @@ The panel **auto-rebuilds** when you save the step file (uses `etlr --watch` in 
 
 #### Chart preview
 
-Embeds the staging admin chart viewer for `.chart.yml` and multidim export steps.
+Embeds the staging admin chart viewer for `.chart.yml` files and `viz://chart` steps (charts and MDIMs).
 
 !!! note "How it works"
 
