@@ -300,7 +300,7 @@ Everything about authoring the step: the Figma handoff contract the emitted file
 ```
 
 `--grapher` is the flag for every `viz://` step. A static step only writes the PNG and SVG next to
-the recipe, but without the flag it is skipped, and `etlr` says so.
+the recipe, but without the flag it is skipped ("No steps matched").
 
 **From a fresh worktree, give it its own `.venv` before rendering.** A worktree starts without one,
 and borrowing the main checkout's is a trap: `etl` is installed there editable via a `.pth` holding

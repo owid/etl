@@ -290,27 +290,3 @@ def test_construct_subdag_no_matches():
     with pytest.raises(SystemExit) as exc_info:
         cmd.construct_subdag(dag, includes=["nonexistent"])
     assert exc_info.value.code == 1
-
-
-def test_construct_subdag_explains_steps_skipped_for_missing_flag(capsys):
-    """Requesting a step whose flag is missing says which flag to pass, then exits."""
-    full_dag = {
-        "data://grapher/happiness/2023-01-01/happiness": set(),
-        "viz://chart/happiness/latest/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
-        "export://s3/happiness/latest/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
-    }
-
-    with pytest.raises(SystemExit):
-        cmd.construct_subdag(full_dag, includes=["viz://chart/happiness"])
-    captured = capsys.readouterr()
-    assert (
-        "`viz://chart/happiness/latest/happiness` writes to the grapher DB; pass --grapher to run it." in captured.out
-    )
-
-    with pytest.raises(SystemExit):
-        cmd.construct_subdag(full_dag, includes=["export://s3/happiness/latest/happiness"], exact_match=True)
-    captured = capsys.readouterr()
-    assert (
-        "`export://s3/happiness/latest/happiness` writes to an external destination (R2, GitHub); pass --export to run it."
-        in captured.out
-    )
