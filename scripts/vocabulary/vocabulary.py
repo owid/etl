@@ -64,7 +64,7 @@ from etl.config import OWID_ENV  # ty: ignore
 S3_BUCKET_NAME = "owid-public"
 DEFAULT_S3_VOCABULARY_PATH = "topic_vocabulary.json"
 
-DEFAULT_MODEL = "gemini-3.7-flash"
+DEFAULT_MODEL = "gemini-3.8-flash"
 
 # Ask for the same candidates every time. Left at the model's defaults, two runs
 # of identical code disagreed on almost every topic — Gender Ratio came back

@@ -34,16 +34,18 @@ import rich_click as click
 from rich.console import Console
 from rich.table import Table
 
-from apps.chart_critic import cache, digest, fixtures, mdim, report
+from apps.chart_critic import cache, digest, mdim, report
 from apps.chart_critic.bundle import GRAPHER_URL, Bundle, ChartGone, build, render
 from apps.chart_critic.critic import (
     CHEAP_MODEL,
     DEFAULT_MODEL,
     FALLBACK_PRICES,
     build_agent,
+    claim_tokens,
     format_views,
     issue_params,
     prompt_parts,
+    same_claim,
 )
 from apps.utils.llms.costs import estimate_llm_cost
 from etl.db import read_sql
@@ -51,6 +53,9 @@ from etl.db import read_sql
 console = Console()
 
 SEVERITY_COLOR = {"high": "red", "medium": "yellow", "low": "cyan"}
+
+# Slack's documented chat.postMessage limit is one message per second per channel.
+POST_INTERVAL_SECONDS = 1.0
 
 # Grapher query parameters the model is allowed to put in a link. Anything else it invents is
 # dropped rather than passed through into a URL a reviewer will click.
@@ -211,28 +216,39 @@ def _link_keys(slug: str, params: str) -> set[str]:
         return keys
 
 
-def _claim_tokens(claim: str) -> set[str]:
-    # Crude singular/plural folding. Without it "the unit for all three indicators is incorrectly
-    # set to 'doses'" and "the indicator unit is incorrectly set to 'doses'" scored below the
-    # merge threshold and were reported as two findings.
-    return {w.rstrip("s") for w in re.findall(r"[a-z0-9]{4,}", claim.lower())}
-
-
 def _merge(issues: list[dict[str, Any]], new: dict[str, Any]) -> None:
     """Fold a finding into the list, merging it with the same finding from an earlier pass.
 
     The model rewords freely between passes — "life expectancy of around 18–20 years" and
-    "under 20 years" are one finding — so matching on a prefix counts them separately. Overlap
-    of the significant words is crude but survives the rewording.
+    "under 20 years" are one finding — so matching on a prefix counts them separately.
+    :func:`critic.same_claim` is the shared notion of "the same finding", and the digest
+    recognises what it has already posted with the same test.
     """
-    tokens = _claim_tokens(new["claim"])
+    tokens = claim_tokens(new["claim"])
     for existing in issues:
-        other = _claim_tokens(existing["claim"])
-        overlap = len(tokens & other) / max(len(tokens | other), 1)
-        if existing["kind"] == new["kind"] and overlap >= 0.4:
+        if existing["kind"] == new["kind"] and same_claim(tokens, claim_tokens(existing["claim"])):
             existing["passes"] += 1
             return
     issues.append(new | {"passes": 1})
+
+
+def _resolve_cache_ttl(cache_ttl: float | None, changed_since: int | None) -> float:
+    """How long a cached bundle stays fresh, when the caller did not say.
+
+    A ``--changed-since`` sweep must not replay a cached bundle, and the reason is that
+    selection's whole premise: a chart is in it *because* its configuration changed inside the
+    window, so a bundle fetched inside that same window describes the chart as it was *before*
+    the change. With a daily cron and a 24-hour TTL the previous run's bundle is always a few
+    minutes inside the TTL, so it is not an edge case but the normal path — every finding a
+    report on yesterday's chart. It reached the channel: a subtitle fixed during the day was
+    flagged again the next morning, on a chart whose fix is what nominated it for review.
+
+    It is ~17 charts a day, so re-fetching them costs nothing worth saving. Any explicit
+    ``--cache-ttl`` still wins, including for a sweep of a hand-picked list.
+    """
+    if cache_ttl is not None:
+        return cache_ttl
+    return 0.0 if changed_since is not None else cache.DEFAULT_TTL_HOURS
 
 
 def _review_one(
@@ -393,7 +409,7 @@ def _review_one(
     "digest_out",
     type=click.Path(dir_okay=False, path_type=Path),
     default=None,
-    help="Write a Slack-ready digest of the new findings here, and record them as posted.",
+    help="Write the Slack-ready digest messages here (the lead plus one per finding), and record them as posted.",
 )
 @click.option(
     "--post",
@@ -402,12 +418,6 @@ def _review_one(
         "Post the digest to #we-need-to-correct-it instead of only writing it. For scheduled runs, "
         "where there is no human between the file and the channel. Needs SLACK_API_TOKEN."
     ),
-)
-@click.option(
-    "--eval",
-    "run_eval",
-    is_flag=True,
-    help="Run the known-answer fixtures instead of a sweep, and exit nonzero if any regressed.",
 )
 @click.option(
     "--views",
@@ -454,9 +464,12 @@ def _review_one(
 @click.option(
     "--cache-ttl",
     type=float,
-    default=cache.DEFAULT_TTL_HOURS,
-    show_default=True,
-    help="Hours a cached chart bundle stays fresh. Use -1 to keep bundles indefinitely.",
+    default=None,
+    help=(
+        f"Hours a cached chart bundle stays fresh [default: {cache.DEFAULT_TTL_HOURS}, "
+        "or 0 with --changed-since, which reviews charts because they just changed]. "
+        "Use -1 to keep bundles indefinitely."
+    ),
 )
 def cli(
     slugs: str | None,
@@ -477,8 +490,7 @@ def cli(
     dry_run: bool,
     no_cache: bool,
     clear_cache: bool,
-    cache_ttl: float,
-    run_eval: bool,
+    cache_ttl: float | None,
     changed_since: int | None,
     include_data_updates: bool,
     digest_out: Path | None,
@@ -492,12 +504,7 @@ def cli(
     if cheap:
         model = CHEAP_MODEL
 
-    if run_eval:
-        # Five passes, because that is what was measured to reach 8/8: at two passes the two
-        # subtlest cases (a subtitle typo and a baseline offset) are missed about half the time,
-        # and a regression test that cries wolf is worse than one that costs 22 cents.
-        _evaluate(model, not no_image, max(repeat, 5), not no_cache, cache_ttl)
-        return
+    cache_ttl = _resolve_cache_ttl(cache_ttl, changed_since)
 
     use_cache = not no_cache
     charts_cached, reviews_cached, cache_mb = cache.stats()
@@ -580,10 +587,13 @@ def cli(
     if digest_out:
         state = digest.load_state()
         # Resolved once and used for both the lookup and the record — see digest.stamp().
-        facts = digest.chart_facts(results)
+        facts = digest.chart_facts(results, editor_window_days=changed_since)
+        # Name the last editor only in a configuration-edit sweep, where the chart is under
+        # review because of that edit — see digest.attach_mentions().
+        digest.attach_mentions(facts, tag_last_editor=bool(changed_since) and not include_data_updates)
         fresh = digest.new_findings(results, state, facts)
         incomplete = sum(1 for r in results if r["status"].startswith(("bundle failed", "review failed")))
-        message = digest.format_slack(
+        messages = digest.format_slack(
             fresh,
             reviewed=len(results),
             candidates=len(targets),
@@ -592,14 +602,16 @@ def cli(
             facts=facts,
             cost=sum(r["cost"] for r in results),
         )
-        digest_out.write_text(message)
-        if message:
-            console.print(f"\n[bold]digest ({len(fresh)} new finding(s)) → {digest_out}[/bold]")
-            console.print(message)
+        digest_out.write_text(digest.MESSAGE_SEPARATOR.join(messages))
+        if messages:
+            console.print(
+                f"\n[bold]digest ({len(fresh)} new finding(s), {len(messages)} message(s)) → {digest_out}[/bold]"
+            )
+            console.print(digest.MESSAGE_SEPARATOR.join(messages))
             if post:
                 # Post before recording, so a failed post is re-attempted tomorrow rather than
                 # marked delivered. Duplicating a finding is a smaller harm than dropping one.
-                _post_digest(message)
+                _post_digest(messages)
             digest.save_state(digest.stamp(fresh, state, facts))
         else:
             already = sum(len(r["issues"]) for r in results)
@@ -615,8 +627,16 @@ def cli(
         raise SystemExit(2)
 
 
-def _post_digest(message: str) -> None:
-    """Send the digest to the channel, or fail the run.
+def _post_digest(messages: list[str]) -> None:
+    """Send the digest to the channel as separate messages, or fail the run.
+
+    In order, one call each: the lead first, then a message per finding, so each finding owns
+    the thread that hangs off it. A failure part-way leaves the earlier messages posted and the
+    state unrecorded, so tomorrow re-posts the whole digest — the same trade the caller makes.
+
+    Paced at Slack's documented ``chat.postMessage`` rate of one message per second per channel.
+    A digest is at most six messages, so this costs a run five seconds and takes the burst — and
+    the partial post a 429 mid-loop would leave behind — off the table.
 
     Deliberately not tolerant of a missing token: ``send_slack_message`` prints to stdout when
     ``SLACK_API_TOKEN`` is unset, which in a scheduled build is indistinguishable from a
@@ -628,81 +648,11 @@ def _post_digest(message: str) -> None:
 
     if not config.SLACK_API_TOKEN:
         raise click.ClickException("--post needs SLACK_API_TOKEN; refusing to silently print instead")
-    send_slack_message(digest.SLACK_CHANNEL, message)
-    console.print(f"[green]posted to {digest.SLACK_CHANNEL}[/green]")
-
-
-def _evaluate(model: str, with_image: bool, repeat: int, use_cache: bool, ttl_hours: float) -> None:
-    """Run the fixtures and report which known answers the critic still gets right."""
-    console.print(
-        f"[bold]Evaluating against {len(fixtures.CASES)} known-answer cases[/bold] with {model}, {repeat} passes each"
-    )
-    results = []
-    with cf.ThreadPoolExecutor(min(len(fixtures.CASES), 6)) as ex:
-        futures = {
-            ex.submit(
-                _review_one, c.slug, 0, model, with_image, False, repeat, use_cache, ttl_hours, c.views, c.params
-            ): c
-            for c in fixtures.CASES
-        }
-        for fut in cf.as_completed(futures):
-            case = futures[fut]
-            r = fut.result()
-            # A chart that could not be fetched has no issues, which looks exactly like a clean
-            # review — so a guard case would "pass" on a chart nobody looked at, and the eval
-            # would green-light a critic that never ran.
-            ok = r["status"] == "ok" and fixtures.matches(case, r["issues"])
-            results.append((case, r, ok))
-
-    table = Table(title="Known-answer evaluation")
-    table.add_column("chart")
-    table.add_column("expects")
-    table.add_column("result")
-    table.add_column("what the critic said", max_width=54)
-    for case, r, ok in sorted(results, key=lambda x: (x[2], x[0].slug)):
-        expects = "finds: " + ", ".join(case.expect_keywords) if case.expect_keywords else "nothing"
-        said = "; ".join(i["claim"] for i in r["issues"])[:200] or (
-            "—" if r["status"] == "ok" else f"[yellow]not reviewed: {r['status']}[/yellow]"
-        )
-        verdict = "[green]PASS[/green]" if ok else "[red]FAIL[/red]"
-        if case.guards_against and ok:
-            verdict += " [dim](guard)[/dim]"
-        table.add_row(case.slug, expects, verdict, said)
-    console.print(table)
-
-    passed = sum(1 for _, _, ok in results if ok)
-    # The gate ignores cases marked flaky. Eight of the nine are deterministic in practice
-    # (15/15 cached passes each), so a failure among those is a regression; the ninth lands
-    # roughly one pass in fifteen, and gating on it would fail most scheduled runs and teach
-    # everyone to ignore the result.
-    regressions = [(c, r) for c, r, ok in results if not ok and not c.flaky]
-    flaky_misses = [c for c, _, ok in results if not ok and c.flaky]
-    found = [(c, r) for c, r, ok in results if c.expect_keywords and ok]
-    clean_ok = [(c, r) for c, r, ok in results if not c.expect_keywords and ok]
-    cost = sum(r["cost"] for _, r, _ in results)
-    console.print(
-        f"\n[bold]{passed}/{len(results)} cases pass[/bold] — "
-        f"{len(found)}/{sum(1 for c in fixtures.CASES if c.expect_keywords)} known errors found, "
-        f"{len(clean_ok)}/{sum(1 for c in fixtures.CASES if not c.expect_keywords)} clean charts left alone"
-        f" · ${cost:.4f}"
-    )
-    for case, r, ok in results:
-        if not ok:
-            tag = "[yellow]MISS[/yellow]" if case.flaky else "[red]FAIL[/red]"
-            console.print(f"{tag} {case.slug}: {case.why}")
-            if case.guards_against:
-                console.print(f"       this case guards against: {case.guards_against}")
-    if flaky_misses:
-        console.print(
-            f"\n[yellow]{len(flaky_misses)} flaky case(s) missed[/yellow] — a recall probe, not a "
-            "regression, and not gated."
-        )
-    if regressions:
-        console.print(
-            "\n[dim]A fixture can also fail because the chart was fixed — check the chart before "
-            "assuming the critic broke, then update the case and note the date.[/dim]"
-        )
-        raise SystemExit(1)
+    for i, message in enumerate(messages):
+        if i:
+            time.sleep(POST_INTERVAL_SECONDS)
+        send_slack_message(digest.SLACK_CHANNEL, message)
+    console.print(f"[green]posted {len(messages)} message(s) to {digest.SLACK_CHANNEL}[/green]")
 
 
 def _print_summary(results: list[dict[str, Any]], model: str) -> bool:

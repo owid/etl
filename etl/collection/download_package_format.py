@@ -31,6 +31,16 @@
     -- a chart download and an MDIM complete-dataset download are supposed to
     be the same format, and nothing automated will notice if they drift.
 
+    The readme half of the port has deliberately moved ahead of upstream,
+    following a review of an MDIM package (owid/etl#6668): headings shifted a
+    level so an indicator is a child of the section introducing it, the full
+    citation dropped (it survives in metadata.json), sources listed once for the
+    document instead of per indicator, "Next expected update" rather than "Next
+    update", a plural descriptionFromProducer heading with no producer names in
+    it, the Source line moved in with the other per-indicator facts, and DoD
+    links stripped. None of it is MDIM-specific -- it should land in
+    readmeTools.ts too, at which point these notes can go.
+
 Input shape: every function here takes the public indicator metadata dict as
 served at `api.ourworldindata.org/v1/indicators/<id>.metadata.json` (the same
 JSON the Cloudflare Function fetches, obtained here via
@@ -52,10 +62,27 @@ from typing import Any
 # shift a day depending on where ETL happens to run.
 MONTH_NAMES = list(calendar.month_name)[1:]
 
+# `OWID_ATTRIBUTION` (metadataHelpers.ts). A constant rather than a literal per use
+# site: the port had three of them and one said "Our World In Data", so a readme
+# credited us two different ways within four lines.
+OWID_ATTRIBUTION = "Our World in Data"
+
 
 # ---------------------------------------------------------------------------
 # Small helpers standing in for lodash / dayjs
 # ---------------------------------------------------------------------------
+
+
+def format_attributions(attributions: list[str]) -> str:
+    """`formatAttributions` (metadataHelpers.ts) -- semicolons, not commas.
+
+    Producer fragments carry commas of their own ("Department for Business, Energy &
+    Industrial Strategy of the UK (2023)"), so joining them with commas makes one list
+    indistinguishable from the next. Upstream moved to semicolons; this port kept
+    commas in `get_attribution` while already using semicolons in the citations, so the
+    Source line and the citation four lines below it disagreed.
+    """
+    return "; ".join(attributions)
 
 
 def _uniq(values: list[str]) -> list[str]:
@@ -308,8 +335,8 @@ def get_citation_short(origins: list[dict], attributions: list[str] | None, proc
     phrase = get_phrase_for_processing_level(processing_level)
 
     fragments = attributions if attributions is not None else producers_with_year
-    shortened = f"{fragments[0]} and other sources" if len(fragments) > 3 else "; ".join(fragments)
-    return f"{shortened} – {phrase} by Our World in Data"
+    shortened = f"{fragments[0]} and other sources" if len(fragments) > 3 else format_attributions(fragments)
+    return f"{shortened} – {phrase} by {OWID_ATTRIBUTION}"
 
 
 def get_citation_long(
@@ -338,7 +365,7 @@ def get_citation_long(
     phrase = get_phrase_for_processing_level(processing_level)
 
     fragments = attributions if attributions is not None else producers_with_year
-    citation_longer = f"{'; '.join(fragments)} – {phrase} by Our World in Data"
+    citation_longer = f"{format_attributions(fragments)} – {phrase} by {OWID_ATTRIBUTION}"
     title_with_fragments = " – ".join(_exclude_undefined([indicator_title.get("title"), source_short_name]))
     origins_long = "; ".join(
         _uniq(
@@ -504,17 +531,17 @@ def get_title(col: IndicatorColumn) -> str:
 
 def get_attribution(col: IndicatorColumn) -> str:
     """`getAttribution`."""
-    attribution = ", ".join(col.attribution_fragments)
+    attribution = format_attributions(col.attribution_fragments)
     if attribution == "":
         return col.source_name or ""
     return attribution
 
 
 def get_source(attribution: str, col: IndicatorColumn) -> str:
-    """`getSource`."""
-    if attribution.lower() != "our world in data":
+    """`getSource`, now `getAttributionWithProcessing` upstream."""
+    if attribution.lower() != OWID_ATTRIBUTION.lower():
         phrase = get_phrase_for_processing_level(col.processing_level)
-        return f"{attribution} – {phrase} by Our World In Data"
+        return f"{attribution} – {phrase} by {OWID_ATTRIBUTION}"
     return attribution
 
 
@@ -536,7 +563,9 @@ def _key_data_lines(col: IndicatorColumn, today: date) -> list[str]:
 
     next_update = get_next_update_from_variable(col.meta, today)
     if next_update:
-        lines.append(f"Next update: {format_source_date(next_update, 'MMMM YYYY')}" + MARKDOWN_NEWLINE_ENDING)
+        # "Next expected update", not "Next update": the date is the producer's stated
+        # update period added to our last update, so it's our expectation, not a promise.
+        lines.append(f"Next expected update: {format_source_date(next_update, 'MMMM YYYY')}" + MARKDOWN_NEWLINE_ENDING)
 
     timespan = col.meta.get("timespan")
     date_range = get_date_range(timespan) if timespan else None
@@ -562,7 +591,16 @@ def _format_js_number(value: float) -> str:
 
 
 def _citation_lines(col: IndicatorColumn) -> list[str]:
-    """`getCitationLines`.
+    """`getCitationLines`, minus the full citation.
+
+    Upstream prints both the short in-line citation and a full one that spells out
+    every origin. The full one is several lines of the same producer names already
+    listed, with far more detail, in the document-level Sources section -- across 46
+    indicators it was a fifth of the readme for something a reader is unlikely to copy
+    out of a data package. The short citation is what a chart or a sentence needs, and
+    each source's own requested citation is in the Sources section verbatim. Nothing is
+    lost either way: `metadata_column_entry` still emits `citationLong`, so the full
+    string is in metadata.json for anyone who wants it.
 
     Note the upstream quirk faithfully reproduced here: this block rebuilds the
     attribution fragments from `{...def, source: {name: def.sourceName}}` --
@@ -578,36 +616,36 @@ def _citation_lines(col: IndicatorColumn) -> list[str]:
     )
     return [
         "",
-        "### How to cite this data",
+        "#### How to cite this data",
         "",
-        "#### In-line citation",
-        "If you have limited space (e.g. in data visualizations), you can use this abbreviated in-line citation:"
-        + MARKDOWN_NEWLINE_ENDING,
         citation_short,
-        "",
-        "#### Full citation",
-        col.citation_long(),
     ]
 
 
-def _description_section_lines(col: IndicatorColumn, attribution: str) -> list[str]:
-    """`getDescriptionLines`."""
+def _description_section_lines(col: IndicatorColumn) -> list[str]:
+    """`getDescriptionLines`.
+
+    Upstream names the producer in the descriptionFromProducer heading, which for an
+    indicator combining several of them runs to a full line of names and reads as a
+    question about a list. The plural heading says the same thing and works for one
+    producer as well as seven.
+    """
     lines = []
     description_key = col.description_key
     if description_key:
-        lines += ["", "### What you should know about this data", description_key.strip()]
+        lines += ["", "#### What you should know about this data", description_key.strip()]
 
     description_from_producer = col.meta.get("descriptionFromProducer")
     if description_from_producer:
         lines += [
             "",
-            f"### How is this data described by its producer - {attribution}?",
+            "#### How this data is described by its producers",
             description_from_producer.strip(),
         ]
 
     additional_info = col.meta.get("additionalInfo")
     if additional_info:
-        lines += ["", "### Additional information about this data", additional_info.strip()]
+        lines += ["", "#### Additional information about this data", additional_info.strip()]
 
     return lines
 
@@ -618,9 +656,9 @@ def _sources_lines(col: IndicatorColumn) -> list[str]:
     if not sources:
         return []
 
-    lines = ["", "### Source" if len(sources) == 1 else "### Sources"]
+    lines = ["", "#### Sources"]
     for source in sources:
-        lines += ["", f"#### {source['label']}"]
+        lines += ["", f"##### {source['label']}"]
         if source.get("dataPublishedBy"):
             lines.append(f"Data published by: {source['dataPublishedBy'].strip()}" + MARKDOWN_NEWLINE_ENDING)
         if source.get("retrievedOn"):
@@ -631,7 +669,12 @@ def _sources_lines(col: IndicatorColumn) -> list[str]:
 
 
 def _data_processing_lines(col: IndicatorColumn) -> list[str]:
-    """`getDataProcessingLines`."""
+    """`getDataProcessingLines`.
+
+    The only heading not shifted a level: upstream already prints it at `####`, one
+    deeper than its siblings, so it read as a child of whatever came last (the final
+    source block). At the new sibling level it is where it belongs.
+    """
     description_processing = col.meta.get("descriptionProcessing")
     if not description_processing:
         return []
@@ -654,17 +697,25 @@ def column_readme_text(
     that lists the sources once up front instead. Repeating them per indicator is
     what the TypeScript does and is bearable for a chart's handful of columns; at
     46 columns drawn from 7 sources it is 354 blocks, and most of the file.
+
+    Every heading here sits one level deeper than upstream's, because these sections
+    are children of the document's "Detailed information about each time series" -- at
+    the upstream levels an indicator was a sibling of the heading introducing it, so
+    the whole per-indicator half of the document was flat.
     """
     attribution = get_attribution(col)
     return [
         "",
-        f"## {heading or get_title(col)}",
+        f"### {heading or get_title(col)}",
         *_description_lines(col),
         *_key_data_lines(col, today),
-        "",
+        # Upstream prints this immediately after the full citation, where it reads as a
+        # trailing fragment of it. It is a fact about the indicator like the ones above,
+        # so it goes with them -- and next to the citation it now looks like a
+        # duplicate, since with the full citation gone both lines are attributions.
+        f"Source: {get_source(attribution, col)}" + MARKDOWN_NEWLINE_ENDING,
         *_citation_lines(col),
-        f"Source: {get_source(attribution, col)}",
-        *_description_section_lines(col, attribution),
+        *_description_section_lines(col),
         *(_sources_lines(col) if include_sources else []),
         *_data_processing_lines(col),
         "",
@@ -698,7 +749,9 @@ def collect_unique_sources(cols: list[IndicatorColumn]) -> list[dict]:
 def sources_section_lines(sources: list[dict]) -> list[str]:
     """The document-level Sources section, rendered one level shallower than the
     per-indicator blocks it replaces (`##`/`###` rather than `###`/`####`), because it
-    now sits alongside the other top-level sections rather than inside one.
+    now sits alongside the other top-level sections rather than inside one -- last of
+    them, since it is reference material a reader arrives at from a citation rather than
+    something to read past on the way to the indicators.
 
     Each source gets what someone re-using the data actually needs, rather than the
     retrieval date and URL the per-indicator blocks were limited to: what the source is,
@@ -709,9 +762,11 @@ def sources_section_lines(sources: list[dict]) -> list[str]:
     """
     if not sources:
         return []
-    lines = ["", "## Source" if len(sources) == 1 else "## Sources", ""]
+    # Always plural: the sentence below is written that way and a section heading naming
+    # a category reads fine over one item, so the branch decided nothing.
+    lines = ["", "## Sources", ""]
     lines.append(
-        "These are the sources behind the data in this package. Each time series below names the ones "
+        "These are the sources behind the data in this package. Each time series above names the ones "
         "it draws on in its citation."
     )
     for source in sources:

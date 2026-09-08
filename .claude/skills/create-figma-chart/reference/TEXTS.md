@@ -123,7 +123,20 @@ line that is 38% full, which is a real line of text; the test is the fill, not t
 
 Rules: replace `characters`, and leave the node's **base** styling alone — the fonts, sizes, colors, and positions are the template's, not yours. `await figma.loadFontAsync(node.fontName)` before each text edit. If you need a *new* text block the template doesn't have, **clone the nearest template text node and edit it** — that inherits the correct shared style without hunting style ids.
 
-**Watch for template text that is already mixed-weight, and restore it after writing.** Setting `characters` propagates the *first character's* style over the whole new string, so any node whose label is bolder than its content comes out uniformly bold. **Two slots ship that way, not one** — `Data source:` and, on the templates that carry it, `Note:`. Fixing only the source line leaves a wholly bold note, which reads as deliberate emphasis on a caveat and was spotted on a finished frame rather than in review. Write the string, then push Regular back over the tail:
+**Watch for template text that is already mixed-weight, and restore it after writing.** Setting `characters` propagates the *first character's* style over the whole new string, so any node whose label is bolder than its content comes out uniformly bold.
+
+**Count the slots that ship that way before trusting a pass over them: on the 850-wide templates it is four, and all four collapse** — three of them visibly, and the licence row quietly. Measured on `Static Chart Template_Vertical` (2026-09-03):
+
+| Footer row | The template's own runs | After `characters` |
+|---|---|---|
+| `Note:` | Bold@0-5, Medium@5-6, Regular@6-… | wholly **Bold** |
+| `Data source:` | Bold@0-12, Regular@12-… | wholly **Bold** |
+| tagline | Bold@0-18 (`OurWorldinData.org`), Medium@18-… | wholly **Bold** |
+| licence | Medium@0-15, Bold@15-20, Medium@20-35, Bold@35-… | wholly **Medium** — both Bold ranges lost |
+
+**All four collapse — the licence row included.** It loses its two Bold ranges exactly as the others lose their Medium and Regular ones; what it does not do is *look* broken, because the face that propagates is the one most of the row already wanted. That makes it the most dangerous of the four to check by eye, and it is why a recipe that re-applies the bold ranges and trusts the rest appears to work: it passes on the row that proves nothing and fails on the other three. **The runs that go wrong are the ones whose face differs from the FIRST run's**, which on three rows means every run that is not bold and on the licence row means the bold ones — so write every run's face explicitly rather than only the emphasis, on all four. A wholly bold Note reads as deliberate emphasis on a caveat, and both times it has happened it was caught on a finished frame — once by eye, once by `diff_against_template.js` — never in review.
+
+Write the string, then push Regular back over the tail:
 
 ```js
 const PREFIX = "Data source:";

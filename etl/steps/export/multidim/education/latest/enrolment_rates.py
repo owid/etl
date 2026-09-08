@@ -361,12 +361,17 @@ LEVEL_MAPPINGS = {
         "level_side_by_side_net": "[pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [lower secondary](#dod:lower-secondary-education), and [upper secondary](#dod:upper-secondary-education)",
         "enrolment_type_side_by_side": "{level_dod}",
     },
+    # These parentheticals are the age *span* a level covers, matching the ISCED reference ages used
+    # in children_out_of_school.py. They previously gave the range of official *entrance* ages across
+    # countries (primary "between 5 and 7 years old"), which is a different quantity: primary lasts
+    # about six years, and the denominator of an enrolment ratio is the official school-age
+    # population, i.e. a span rather than the entrance window.
     "plain": {
-        "primary": "primary school age (between 5 and 7 years old)",
-        "preprimary": "pre-primary school age (between 3 and 5 years old)",
-        "lower_secondary": "lower secondary school age (between 11 and 14 years old)",
-        "upper_secondary": "upper secondary school age (between 15 and 18 years old)",
-        "tertiary": "tertiary education age (typically between 18 and 22 years old)",
+        "primary": "primary school age (typically 6–11 years)",
+        "preprimary": "pre-primary school age (typically 3–5 years)",
+        "lower_secondary": "lower secondary school age (typically 12–14 years)",
+        "upper_secondary": "upper secondary school age (typically 15–17 years)",
+        "tertiary": "tertiary education age (typically 18–22 years)",
         "level_side_by_side_gross": "pre-primary, primary, lower secondary, upper secondary, and tertiary",
         "level_side_by_side_net": "pre-primary, primary, lower secondary, and upper secondary",
         "enrolment_type_side_by_side": "{level_plain}",

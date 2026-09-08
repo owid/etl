@@ -15,9 +15,6 @@ SVG_TESTER_SUITES = ("graphers", "grapher-views", "mdims", "thumbnails")
 # Written by devTools/svgTester/verify-graphs.ts, one per suite
 VERIFY_RESULTS_FILENAME = "verify-results.json"
 
-# Written by templates/lxc-manager/site-screenshots in owid/ops, next to the repos
-SCREENSHOTS_STATUS_FILENAME = "site-screenshots-status.json"
-
 # Mirrors SVG_TESTER_HEARTBEAT_STALE_MS in owid-grapher
 HEARTBEAT_STALE_SECONDS = 90
 
@@ -29,7 +26,6 @@ def run(branch: str, head_sha: str | None = None) -> str:
     container_name = get_container_name(branch)
 
     svgs_repo = BASE_DIR.parent / "owid-grapher-svgs"
-    screenshots_status = read_screenshots_status(BASE_DIR.parent / SCREENSHOTS_STATUS_FILENAME)
 
     results_by_suite = {suite: resolve_running(svgs_repo / suite) for suite in SVG_TESTER_SUITES}
 
@@ -58,7 +54,6 @@ def run(branch: str, head_sha: str | None = None) -> str:
     )
 
     body = f"""
-- **Site-screenshots:** {make_screenshots_line(screenshots_status, branch=branch, head_sha=head_sha)}
 - **SVG tester:** {make_report_url(container_name)}
 
 <details open>
@@ -79,60 +74,6 @@ def run(branch: str, head_sha: str | None = None) -> str:
     """.strip()
 
     return body
-
-
-def read_screenshots_status(path: Path) -> dict | None:
-    """Parsed site-screenshots-status.json, None when the file does not exist."""
-    if not path.exists():
-        return None
-
-    try:
-        return json.loads(path.read_text())
-    except (OSError, json.JSONDecodeError) as e:
-        log.warning("owidbot.site_screenshots.unreadable_status", path=str(path), error=str(e))
-        return {"status": "unreadable"}
-
-
-def make_screenshots_line(status: dict | None, branch: str, head_sha: str | None) -> str:
-    """The Site-screenshots line: the compare link, plus what the run that produced it found.
-
-    Worth stating because a failed run is invisible otherwise. The buildkite step soft
-    fails, and a run that fails commits nothing, so the compare link keeps showing the
-    previous run's diff - which reads exactly like a run that found no changes.
-
-    A finished run is not one state but two, and only one of them wants the reviewer's
-    attention: a branch that changes seven pages and a branch that changes none both used
-    to read as a plain tick. `changedPages` counts what the compare link shows, so the
-    branch that repaints the site says so. Absent from the status file - an ops host that
-    predates it, or a run that failed before committing - the line stays as it was.
-
-    There is one status file for all branches, because every branch's screenshots are
-    taken in the same working copy on lxc-manager-1. A run of another branch that landed
-    in between therefore says nothing about ours, and is reported as not-yet-reported.
-    """
-    compare_url = f"https://github.com/owid/site-screenshots/compare/{branch}"
-
-    if status is None:
-        return compare_url
-
-    if status.get("status") == "unreadable":
-        return f"⚠️ status file unreadable: {compare_url}"
-
-    is_ours = status.get("branch") == branch and (not head_sha or status.get("grapherCommit") == head_sha)
-    if not is_ours:
-        pending = f"`{head_sha[:7]}`" if head_sha else "this commit"
-        return f"⏳ the run for {pending} hasn't reported yet: {compare_url}"
-
-    if status.get("status") == "ok":
-        changed_pages = status.get("changedPages")
-        if changed_pages is None:
-            return f"✅ {compare_url}"
-        if not changed_pages:
-            return f"✅ no changes: {compare_url}"
-        pages = "page" if len(changed_pages) == 1 else "pages"
-        return f"⚠️ {len(changed_pages)} {pages} changed: {compare_url}"
-
-    return f"❌ the run failed, so {compare_url} is still the previous run's"
 
 
 def read_verify_results(suite_dir: Path) -> dict | None:

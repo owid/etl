@@ -14,10 +14,11 @@ the far edge +2 SD rather than the 99.9th percentile then removed the asymmetry 
 one edge of a band was a standard deviation and the other a percentile. The cost is the tall upper
 tail: the band now tops out around 191 cm rather than 199, which the 200 cm axis still contains.
 
-Neither panel repeats the other sex's median. The two medians run within a few millimetres of each
-other from birth to about age 9, so a second line traces the panel's own median for two thirds of the
-range -- the same doubling that splitting the sexes into panels was meant to remove. Where the two
-sexes differ can be read off the panels at a shared gridline.
+Neither panel repeats the other sex's median. The two medians stay within about 2 cm of each other
+from birth until girls overtake boys at age 9.2 -- a couple of pixels on a 40-200 cm axis -- so a
+second line traces the panel's own median for two thirds of the range, the same doubling that
+splitting the sexes into panels was meant to remove. Where the two sexes differ can be read off the
+panels at a shared gridline.
 
 An encoding diagram names each part of the chart -- see `draw_encoding_diagram`. There is no legend
 in either version.
@@ -141,8 +142,15 @@ Anchors: y ticks by their right edge; the first x tick by its left and the last 
 centred; `Median` by its right edge; the band labels by their left; the stunting label by its centre.
 
 **Fit.** Centre the group in the band between the header's bottom and the footer's first visible row
-(`footer.y + min(0, source.y)`). No rescale is needed -- this step sizes the plot to the template --
-and one would move every font off its rank.
+(`footer.y + min(0, source.y)`), then pin the group's box to the content box.
+
+The pin is a fraction of a pixel and it is not optional. This step sizes the plot to the template,
+but it cannot land the left edge exactly: the ink starts at the widest y tick label, and that label's
+width is Lato's, set by Figma on import, where every width the step can measure is Arial's. The
+column is measured and scaled by `LATO_OVER_MEASURED_ADVANCE`, which leaves a few tenths of a pixel
+rather than the 5.92px a hand-tuned reservation left here until 2026-09-04. Close it with FITTING.md's
+stretch -- `group.resize(contentW, h)`, never a `rescale`, which would move every font off its rank,
+and never a squeeze, which rewraps labels.
 
 **Audit before showing it.** Expect sizes {16, 14, 12} only, Lato Regular and Bold only, both medians
 *and both thresholds* reporting a bound style -- and each threshold reporting the same colour as its
@@ -150,13 +158,17 @@ own median, which is the check that catches a stale band or threshold selector -
 16..W-16, and gaps of about 14 on desktop and 20 on mobile.
 """
 
+import logging
+from pathlib import Path
+
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from matplotlib.colors import to_rgb
-from matplotlib.font_manager import FontProperties
+from matplotlib.font_manager import FontProperties, findfont
 from matplotlib.lines import Line2D
-from matplotlib.textpath import TextPath
+from matplotlib.textpath import TextPath, TextToPath
 from matplotlib.ticker import FuncFormatter
 from owid.catalog import Table
 
@@ -167,6 +179,62 @@ from etl.static_viz import PIXELS_PER_INCH, apply_svg_rcparams, export_frame, so
 apply_svg_rcparams()
 
 paths = PathFinder(__file__)
+
+# Two stacks, because two different readers want different answers.
+#
+# This one lands in the SVG's `font-family` verbatim -- matplotlib copies the rcParam out rather than
+# writing the face it resolved -- so naming Lato first is a request to whoever opens the file. Figma
+# then renders the import in the template's own typeface on arrival, which makes the parked reference
+# copy look like the deliverable and turns `/create-figma-chart`'s font pass, and the anchor pass that
+# exists only to undo it, into no-ops. Without it Figma resolves none of Arial/Helvetica/DejaVu and
+# substitutes Inter, which is wider.
+EMITTED_FONT_STACK = ["Lato", "Arial", "Helvetica", "sans-serif"]
+# And this one is what the step measures and draws with. It deliberately does NOT name Lato, which is
+# not installed on our machines: Lato is a font this step can ask for, not one it could measure in.
+MEASURED_FONT_STACK = ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans", "sans-serif"]
+
+matplotlib.rcParams["font.family"] = "sans-serif"
+matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
+
+# Drop the per-face misses for faces we deliberately list as alternatives, and nothing else. A blanket
+# silence would also take "Falling back to DejaVu Sans", which is the one that says a whole stack
+# failed and every measurement has just moved ~15% against what gets drawn.
+_OPTIONAL_FACES = tuple({*EMITTED_FONT_STACK, *MEASURED_FONT_STACK})
+logging.getLogger("matplotlib.font_manager").addFilter(
+    lambda record: (
+        "Falling back" in record.getMessage()
+        or not any(f"Font family '{face}' not found" in record.getMessage() for face in _OPTIONAL_FACES)
+    )
+)
+
+# No filter can protect the invariant the allowances actually rest on, so assert it. Silencing a
+# declared face also silences the case where every face of a stack is missing; and Lato-first has its
+# own trap -- a machine that HAS Lato draws Lato while the measured stack still resolves Arial, and
+# nothing warns at all. This passes on a Mac without Lato (Arial/Arial) and on a box with neither
+# (DejaVu/DejaVu -- a different face, still self-consistent), and fails on the two drifting machines.
+_DRAWN_FACE, _MEASURED_FACE = (
+    findfont(FontProperties(family=EMITTED_FONT_STACK)),
+    findfont(FontProperties(family=MEASURED_FONT_STACK)),
+)
+assert _DRAWN_FACE == _MEASURED_FACE, (
+    f"draws {Path(_DRAWN_FACE).name}, measures {Path(_MEASURED_FACE).name} -- every width in this step "
+    "was measured in a face it will not be drawn in"
+)
+
+# What one template pixel of Arial advance becomes once Figma re-renders the import in Lato.
+#
+# The two stacks above cost a width, not just a name: the deliverable's glyphs are Lato and every
+# width this step can measure is Arial's, and Lato runs wider. That matters wherever a string's own
+# width decides where its ink starts -- the right-aligned y tick column is the case, since matplotlib
+# writes the anchor and the renderer supplies the advance leftwards from it.
+#
+# Measured off the two shipped frames, Figma's box left against the SVG's anchor: "200 cm" takes
+# 47.219px there against 45.91 here (1.0285) and "40 cm" 38.889 against 38.12 (1.0202). The spread is
+# real -- Lato's digit, space and letter advances each differ from Arial's by their own amount, so a
+# single ratio cannot be exact for every string -- and the larger of the two is used deliberately:
+# overshooting leaves a sub-pixel gap that the Figma fit closes, while undershooting puts label ink
+# outside the content box, which the margins check flags and no fit can recover without a squeeze.
+LATO_OVER_MEASURED_ADVANCE = 1.0285
 
 # One panel per sex. Colors are seaborn "deep" positions rather than raw hexes, so the
 # chart shifts with the shared palette instead of pinning its own. Position 0 is the palette's blue
@@ -274,7 +342,25 @@ TICK_WIDTH = 1
 # content, with half a line of padding under them (labelPadding = 0.5 * facetLabelFontSize). Grapher
 # derives its facet base font size as facetLabelFontSize / GRAPHER_FONT_SCALE_12 * 0.9, so the label
 # ends up about 1/0.9 of the tick size.
-FACET_TITLE_SCALE = 1 / 0.9
+# A template pixel in points: the figure is 100 template px per inch and there are 72 points to the
+# inch, so one pixel is 0.72pt. Used to convert the templates' geometry for text measurement, which
+# matplotlib does in points.
+POINTS_PER_PIXEL = 0.72
+
+# The design team's type ladder for the text INSIDE the plot, in template pixels -- which is what
+# Figma shows, because the figure is drawn at the template's own width.
+#
+# Emit exactly these rather than sizes near them. A point is 100/72 template px, so 14px is 10.08pt
+# and the import then arrives already on the ladder, needing no size pass. That is not merely tidier:
+# snapping a size in Figma changes every glyph width in the label, which moves the label off its
+# anchor and is most of what the anchor pass is left correcting. Emitting 10.5pt instead put every
+# rank about 4% high -- 14.58 / 16.20 / 12.08 -- and bought a round of snapping and re-anchoring for
+# nothing.
+#
+# It also makes the step's own PNG the size the frame will be, so a wrap decided here is decided at
+# the size that ships.
+LADDER_PX = {"facet": 16, "body": 14, "diagram": 12}
+LADDER_PT = {rank: px * POINTS_PER_PIXEL for rank, px in LADDER_PX.items()}
 FACET_TITLE_PAD = 0.5
 
 TITLE = "Expected height of boys and girls, from birth to age 19"
@@ -315,11 +401,11 @@ LAYOUTS = {
         "age_ticks": [0, 5, 10, 15, 19],
         "diagram": "panel",
         "title_fontsize": 16,
-        "body_fontsize": 10.5,
+        "body_fontsize": LADDER_PT["body"],
         "footer_fontsize": 7.75,
-        # Space reserved inside the chart area for the y tick labels, and below the plot for the
-        # tick marks, the x tick labels and the bold "Age in years" label.
-        "y_label_space": 58,
+        # Space reserved below the plot for the tick marks, the x tick labels and the bold
+        # "Age in years" label. The y tick column is not reserved here -- it is measured from the
+        # labels themselves, see `y_tick_column_px`.
         "x_label_space": 60,
     },
     "height_for_age_mobile": {
@@ -338,9 +424,8 @@ LAYOUTS = {
         "age_ticks": [0, 5, 10, 15, 19],
         "diagram": "header",
         "title_fontsize": 16,
-        "body_fontsize": 10.5,
+        "body_fontsize": LADDER_PT["body"],
         "footer_fontsize": 8.75,
-        "y_label_space": 58,
         "x_label_space": 60,
     },
 }
@@ -349,9 +434,12 @@ LAYOUTS = {
 # it fits in about 114 characters at the template's type size. Calling the whole range a *reference*
 # is also what keeps mobile honest without a Note slot to put a caveat in -- it claims only that this
 # is how the reference population's heights are distributed, not that they are heights to aim for.
-SUBTITLE = (
-    "Global growth reference for infants, children, and adolescents, as defined by the World Health Organization."
-)
+#
+# No geography word, deliberately. The under-fives standards earn one -- six countries, and WHO's own
+# claim that they apply to children everywhere -- but the 5-19 half is a reconstruction of a single
+# national sample, 22,917 US children measured between 1963 and 1975, so calling the whole range
+# 'global' over-claims on exactly the half this subtitle was hedged to protect.
+SUBTITLE = "Growth reference for infants, children, and adolescents, as defined by the World Health Organization."
 
 # The mobile template has no Note slot, so a condensed form of the note rides in the subtitle instead.
 # It says what causes the two visible steps, which is what a reader needs to know they are real rather
@@ -362,10 +450,6 @@ MOBILE_NOTE = (
     "and an older-age reference at {second:.0f}."
 )
 
-# A template pixel in points: the figure is 100 template px per inch and there are 72 points
-# to the inch, so one pixel is 0.72pt. Used to convert the templates' geometry for text
-# measurement, which matplotlib does in points.
-POINTS_PER_PIXEL = 0.72
 
 # One dash plus one gap, in POINTS: the dash units are multiples of the line width, so this is what
 # one repetition of the pattern measures. `even_dashes` converts it to display pixels with the
@@ -374,9 +458,6 @@ POINTS_PER_PIXEL = 0.72
 # template pixels made every segment half a period and left the dash as uneven as before.
 STUNTING_DASH_PERIOD_PT = sum(STUNTING_DASHES[1]) * STUNTING_LINEWIDTH
 
-# Font size for the encoding diagram's labels, in points, relative to the body size. The design
-# team's floor is 12px and a point here renders as 100/72 px, so this must stay above 8.64pt.
-DIAGRAM_FONTSIZE_DROP = 1.8
 
 # Gap between the title block and the subtitle, in template pixels. Calibrated so that a
 # two-line title puts the subtitle at the templates' own y=80.
@@ -716,6 +797,33 @@ def draw_encoding_diagram(
     )
 
 
+def height_tick_label(value: float, _position: int | None = None) -> str:
+    """One y tick label: a whole number of centimetres.
+
+    Named rather than a lambda inside the formatter, because `y_tick_column_px` sizes the column from
+    these strings and has to measure the one the axis will draw.
+    """
+    return f"{value:.0f} cm"
+
+
+def y_tick_column_px(labels: list[str], fontsize: float) -> float:
+    """Width to reserve for the right-aligned y tick label column, in template pixels.
+
+    The widest label's advance plus the tick pad. matplotlib writes the label's *anchor* into the SVG
+    and leaves the renderer to lay the string out leftwards from it, so what decides where the ink
+    starts is the advance -- which is also the width Figma's text box carries. Ink extents (what
+    `wrap_to_content_width` measures, and the right tool for wrapping) would be a couple of pixels
+    short of it.
+
+    The tick pad comes from the rcParam because that is what matplotlib will use: this axis is drawn
+    with `length=0`, so the pad is the whole distance from the spine to the anchor.
+    """
+    prop = FontProperties(family=MEASURED_FONT_STACK, size=fontsize)
+    to_path = TextToPath()
+    widest = max(to_path.get_text_width_height_descent(label, prop, ismath=False)[0] for label in labels)
+    return (widest * LATO_OVER_MEASURED_ADVANCE + matplotlib.rcParams["ytick.major.pad"]) / POINTS_PER_PIXEL
+
+
 def wrap_to_content_width(text: str, layout: dict, fontsize: float) -> str:
     """Wrap text to fill the content width between the template's side margins.
 
@@ -725,7 +833,7 @@ def wrap_to_content_width(text: str, layout: dict, fontsize: float) -> str:
     wrapping some 10% narrow than the space available.
     """
     max_points = (layout["size"][0] - 2 * layout["margin"]) * POINTS_PER_PIXEL
-    font = FontProperties(size=fontsize)
+    font = FontProperties(family=MEASURED_FONT_STACK, size=fontsize)
 
     def measure(candidate: str) -> float:
         return TextPath((0, 0), candidate, prop=font).get_extents().width if candidate.strip() else 0.0
@@ -771,10 +879,14 @@ def create_visualization(tb: Table, citation: str, breaks: list[float], layout: 
     """
     sns.set_style("ticks")
     sns.set_palette("deep")
+    # `set_style` REPLACES `font.sans-serif` with its own Arial-first list, so the module-level
+    # assignment above is gone by here and the step would emit a stack it never chose. This is how it
+    # came to ship `'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans'`.
+    matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
     palette = sns.color_palette("deep")
 
     body_fontsize = layout["body_fontsize"]
-    facet_fontsize = body_fontsize * FACET_TITLE_SCALE
+    facet_fontsize = LADDER_PT["facet"]
     # Room the facet titles need above each panel: one line plus grapher's half-line of padding.
     facet_title_space_px = (1 + FACET_TITLE_PAD) * facet_fontsize / POINTS_PER_PIXEL
     age_max = float(tb["age_years"].max())
@@ -795,6 +907,14 @@ def create_visualization(tb: Table, citation: str, breaks: list[float], layout: 
 
     width_px, height_px = layout["size"]
     margin_px = layout["margin"]
+    # Sized to the labels it holds, not to a constant: the widest one starts on the margin, so the
+    # plot takes every pixel the column does not need. A hand-tuned 58 shipped here and over-reserved
+    # by 5.92px on both layouts, which is what left the plot's ink 6px right of the title.
+    y_label_space = y_tick_column_px([height_tick_label(tick) for tick in height_ticks], body_fontsize)
+    assert 0 < y_label_space < 0.2 * (width_px - 2 * margin_px), (
+        f"the y tick column measured {y_label_space:.2f}px inside a {width_px - 2 * margin_px}px content "
+        "box -- either the labels or the face they were measured in are not what this layout expects"
+    )
 
     def fx(x_px: float) -> float:
         """Template x, in pixels from the left edge, as a figure fraction."""
@@ -874,7 +994,7 @@ def create_visualization(tb: Table, citation: str, breaks: list[float], layout: 
             ax.plot(age, values, color=color, linewidth=line_width, zorder=5, gid=f"{slug}__{column[-3:]}")
 
         if layout["diagram"] == "panel" and ax is axes[0]:
-            draw_encoding_diagram(ax, body_fontsize - DIAGRAM_FONTSIZE_DROP)
+            draw_encoding_diagram(ax, LADDER_PT["diagram"])
 
         # --- panel title, above the plot and left-aligned with it, as grapher labels a facet ---
         ax.set_title(
@@ -902,7 +1022,7 @@ def create_visualization(tb: Table, citation: str, breaks: list[float], layout: 
         # the last -- so both sit inside the plot instead of half-overhanging it.
         labels[0].set_horizontalalignment("left")
         labels[-1].set_horizontalalignment("right")
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:.0f} cm"))
+        ax.yaxis.set_major_formatter(FuncFormatter(height_tick_label))
         ax.tick_params(axis="y", length=0, labelsize=body_fontsize, labelcolor=TEXT_COLOR)
         ax.tick_params(
             axis="x",
@@ -981,7 +1101,7 @@ def create_visualization(tb: Table, citation: str, breaks: list[float], layout: 
         diagram_axes.patch.set_visible(False)
         draw_encoding_diagram(
             diagram_axes,
-            body_fontsize - DIAGRAM_FONTSIZE_DROP,
+            LADDER_PT["diagram"],
             left=0.33,
             right=0.57,
             middle=0.49,
@@ -1060,7 +1180,7 @@ def create_visualization(tb: Table, citation: str, breaks: list[float], layout: 
     )
 
     fig.subplots_adjust(
-        left=fx(margin_px + layout["y_label_space"]),
+        left=fx(margin_px + y_label_space),
         right=fx(width_px - margin_px),
         top=fy(chart_top_px),
         bottom=fy(chart_bottom_px - layout["x_label_space"]),

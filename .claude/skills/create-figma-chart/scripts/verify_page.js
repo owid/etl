@@ -1019,7 +1019,12 @@ const checkFrame = async (frameId) => {
     // refused there and the caller keeps the full, conservative outset. Over-reporting an overhang is
     // recoverable; missing one is the failure this row exists to prevent.
     const perpShare = (n) => {
-      const vn = n.vectorNetwork;
+      // TEXT carries no `vectorNetwork`, and a TEXT node is exactly what reaches here: the prescribed
+      // tier-2 knockout is a 3px OUTSIDE stroke ON THE ANNOTATION ITSELF, so an unguarded read threw
+      // `no such property 'vectorNetwork' on TEXT node` and, because `use_figma` is atomic, took the
+      // whole geometry group with it — the row could not run on any correctly annotated frame. Guard
+      // it and let the caller keep the conservative full outset when the segments cannot be read.
+      const vn = ("vectorNetwork" in n) ? n.vectorNetwork : null;
       if (!vn || !Array.isArray(vn.vertices) || !Array.isArray(vn.segments) || !vn.segments.length) return null;
       const at = n.absoluteTransform;
       if (at && !(at[0][0] === 1 && at[0][1] === 0 && at[1][0] === 0 && at[1][1] === 1)) return null;
@@ -1069,8 +1074,11 @@ const checkFrame = async (frameId) => {
       // over them is taken because one steep segment in an otherwise flat polyline does overhang, and
       // because a corner join reaches past either segment's own perpendicular (an L of one horizontal
       // and one vertical segment lands back on the full outset, which is right).
-      const capped = n.strokeCap === "ROUND" || n.strokeCap === "SQUARE"
-                  || typeof n.strokeCap === "symbol" || /^ARROW_/.test(n.strokeCap || "");
+      // `strokeCap` is absent on a TEXT node for the same reason, and the same stroked annotation
+      // reaches this line — so read it through the same guard rather than off the node.
+      const cap = ("strokeCap" in n) ? n.strokeCap : null;
+      const capped = cap === "ROUND" || cap === "SQUARE"
+                  || typeof cap === "symbol" || /^ARROW_/.test(cap || "");
       if (!capped) {
         const p = perpShare(n) || (b && b.h === 0 && b.w > 0 ? { x: 0, y: 1 }
                                  : b && b.w === 0 && b.h > 0 ? { x: 1, y: 0 } : null);

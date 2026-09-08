@@ -226,6 +226,25 @@ that edge. This used to need a correction: the footer frame started 16 px above 
 insetting from the frame's `y` then inset twice and left a visibly loose bottom. If you measure that
 gap again, the wrappers have been re-padded — re-verify before compensating for it.
 
+**Take those two edges from the template's own frames, not from line-height arithmetic.**
+`verify_page.js`'s `gap` row measures the plot against the header auto-layout's *bottom* and the
+footer auto-layout's *top* — the numbers `verify_templates.js` prints — so a band derived instead as
+`subtitle_y + n × line_px` and `note_bottom − n × line_px` is judged against datums it never used.
+Measured on the 2026 Vertical template, that arithmetic landed **4.35 px below** the header frame's
+bottom and **3.01 px above** the footer frame's top, which is line-box slack rather than anything
+visible: a `BAND_INSET` of 14 then reads as `gap` **18.35 / 17.01** against the 12–16 target, on a
+page whose spacing looks right and whose own assertion says 14. **Inset from the frame edges**, and
+the row passes: the same measurement that explains the 4.35 and the 3.01 is what makes a 14 px inset
+off those datums read as `gap` 14. What you must not do is "fix" a failing row by shrinking the inset
+without knowing which datum you are shrinking from — that moves the plot to satisfy a number measured
+from somewhere else.
+
+`gap` is a live row, so a failure is a real discrepancy and not explanatory noise: a band derived from
+line-height arithmetic is a defect to correct, not a caveat to record. One frame predates this —
+the time-use chart built in #6678 ships at 18.35 / 17.01, which is the measurement above and is
+pending a design decision on whether to re-cut it. That is one named, dated exception, not a licence:
+new work insets from the frame edges and passes.
+
 **Draw the step's own copies of these slots at the sizes in the table, not at sizes that merely look
 right.** It is tempting to set the step's title and subtitle a size or two smaller — nothing in the
 frame uses them, since the import drops them. But then the render's spacing is *not* the frame's: the
@@ -266,11 +285,26 @@ A step decides its layout from strings it measures in its own font, and the temp
 strings in Playfair Display and Lato. So every line count it predicts is an estimate, and the error
 does not point one way:
 
-| At the same pixel size | vs. a step measuring in Arial/DejaVu |
-|---|---|
-| Lato, 11 px | **2.4 % narrower** |
-| Lato, 16 px | 0.8 % narrower |
-| Playfair Display SemiBold, 25 px | **3.2 % wider** |
+**First, make the font the step MEASURES be the font it DRAWS — they are not the same by default.**
+`FontProperties()` with no family resolves `font.family`/`font.sans-serif`, and seaborn's `set_style`
+rewrites that list to an Arial-first one. So a step that wraps its title before calling `set_style`
+measures matplotlib's DejaVu default and then draws Arial, and the two are **~15 % apart** — far more
+than any allowance below, and in the direction that makes a slot look full when it is not. Name the
+stack, set it at import, and pass it to every `FontProperties`; then the percentages below are the whole
+of the correction.
+
+| At the same pixel size | vs. **Arial** (what these steps draw) | vs. **DejaVu Sans** (matplotlib's default) |
+|---|---|---|
+| Lato Regular, 11 px | **2.4 % narrower** | ~15 % narrower |
+| Lato Regular, 16 px | 0.8 % narrower | 15.1 % narrower |
+| Lato **Bold**, 11 px, in a mixed-weight row | **6.6 % narrower** | 26 % narrower |
+| Playfair Display SemiBold, 25 px | **3.2 % wider** | 9.6 % narrower |
+
+Two things that table is easy to under-read. The **bold** row is not a rounding of the regular one:
+Arial Bold sets 6.6 % wider than Lato Bold, so a footer row of mixed weights measured with the regular
+allowance is rejected by its own step while setting correctly in the frame — measured at 828 px against
+an 818 px row where the frame sets it in 798. And the columns are per *installed* font: check which one
+`findfont` actually returns on the machine building the step rather than assuming Arial is there.
 
 **Do not "wrap a bit early to be safe".** It reads as prudent and it is not: the footer rows are sized
 so the template just fits them, so wrapping 6 % early broke both onto second lines the frame does not

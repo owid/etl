@@ -95,3 +95,16 @@
   nothing returns the string unchanged and reports success, so the render silently keeps the old
   behavior while you debug the wrong thing. For the same reason, never delete by slicing between two
   anchors without checking what lies between them: an unrelated helper sitting there goes too.
+
+## `label__` is a prefix, and a suffix reads as unnamed
+
+`/create-figma-chart`'s rows resolve a text node through its naming ancestors with
+`/^(annotation|label)__/`, so a group named the other way round — `ghana__label`, `country__label` —
+is invisible to every one of them. It fails silently, and worse, it fails *quietly*: a chart carrying
+26 country labels on the frame's own background had `label-contrast-on-background` report "no
+`label__*`/`annotation__*` text sits on the frame's own background". That is a SKIPPED row,
+indistinguishable at a glance from the same row on a chart that genuinely has no such text — on the
+one check that would have measured those labels' contrast.
+
+Renaming after the fact means renaming in three places at once (the step's gids, the restyle script's
+parent regexes, and the frame), so get the order right in the step.

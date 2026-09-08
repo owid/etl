@@ -3,7 +3,9 @@ definitions:
   common:
     description_short: |-
       Death rates are calculated as the number of deaths in each group, divided by the total number of people in this group. This is given per 100,000 people.
-    unit: doses
+    # Every indicator in this dataset is a death rate, not a dose count -- `doses` was left over from
+    # the vaccination-doses datasets these were built alongside.
+    unit: deaths per 100,000 people
     presentation:
       topic_tags:
         - COVID-19
@@ -82,6 +84,14 @@ tables:
           timeInterval: week
   england:
     common:
+      # ONS reports these as age-standardized rates per 100,000 *person-years*, not per 100,000
+      # people: person-years count the time each individual spends in a given vaccination status, so
+      # the denominator is exposure time rather than a headcount. The other three sources (CDC,
+      # Chile, Switzerland) do report per-population rates, so this overrides the shared unit rather
+      # than changing it.
+      unit: deaths per 100,000 person-years
+      description_short: |-
+        Death rates are age-standardized and given per 100,000 person-years, which accounts for both the number of people in each vaccination status and the time they spent in it.
       description_key:
         - Unvaccinated people have not received any dose.
         - Partially-vaccinated people are excluded.

@@ -33,7 +33,10 @@
 //   - tints are derived from each family's base rather than listed, so a family keeps its internal
 //     steps and the base can be swapped in one place;
 //   - changing a face moves every label by half its width change, so the font pass is bracketed by an
-//     anchor pass keyed on each node's own `textAlignHorizontal`;
+//     anchor pass keyed on each node's own `textAlignHorizontal`. Both are NO-OPS when the step named
+//     Lato first in its emitted `font-family` (create-static-viz/reference/WRITING-THE-STEP.md): the
+//     import then arrives in Lato already, nothing changes face, and nothing drifts. They are kept
+//     because they cost one read per node and still cover an SVG from a step that has not done it;
 //   - a line built from several runs is re-flowed afterwards, since independent boxes in a narrower
 //     face leave the gaps between them uneven.
 
@@ -146,6 +149,11 @@ for (const job of CONFIG.jobs) {
     reference.name = `${frame.name} — original SVG (unstyled)`;
     reference.x = frame.x - reference.width - job.referenceGap;
     reference.y = frame.y;
+    // Leave its fill, its size and its clipping exactly as the import arrives. This copy exists to be
+    // compared against, so anything done to it is a difference someone later reads as the export's
+    // own: painting it the template's cream makes a transparent export look like it ships a beige
+    // background, and cropping it to the ink makes it a different size from the frame it is next to.
+    // The styled copy below gets both treatments; this one gets none.
   }
 
   styled.rescale(scale);
@@ -169,15 +177,102 @@ for (const job of CONFIG.jobs) {
   const painted = (n) =>
     fillsOf(n).some((f) => f.visible !== false && (f.opacity === undefined || f.opacity > 0)) ||
     ("children" in n && n.children.some(painted));
+  // Strip it whether or not it PAINTS. An unpainted patch (`fills: []`, which is what the current
+  // contract emits) hides nothing, so leaving it looks free — but it is artboard-sized, so it becomes
+  // the chart group's bounding box, and `verify_page.js`'s box-alignment, gap and margins rows then
+  // measure the artboard and report three failures that are about the canvas rather than the plot.
+  // What must survive is a STROKE-only patch: the axes spine is a `patch_N` too, and deleting it
+  // removes a line the reader can see.
+  const strokedAnywhere = (n) =>
+    (Array.isArray(n.strokes) && n.strokes.some((s) => s.visible !== false && (s.opacity === undefined || s.opacity > 0))) ||
+    ("children" in n && n.children.some(strokedAnywhere));
   for (const parent of styled.findAll((n) => CONFIG.backgroundPatchParent.test(n.name))) {
     const first = ("children" in parent ? parent.children : []).find((c) => CONFIG.backgroundPatch.test(c.name));
-    if (!first || first.removed || !painted(first)) continue;
-    strippedPatches.push(`${parent.name}/${first.name}`);
+    if (!first || first.removed || strokedAnywhere(first)) continue;
+    strippedPatches.push(`${parent.name}/${first.name}${painted(first) ? "" : " (unpainted — removed for its bbox)"}`);
     first.remove();
   }
 
   for (const slot of CONFIG.slots) {
     for (const node of styled.findAll((n) => n.name === slot || n.name.startsWith(slot + "-"))) node.remove();
+  }
+
+  // Let only what RENDERS count as ink. `painted` reads a node's own fill switches, which is not
+  // the same question: `visible` and `opacity` are INHERITED, so a leaf under a hidden or zero-opacity
+  // group still answers yes while painting nothing. Climb to `styled` and test the opacity PRODUCT for
+  // exactly zero, the way `verify_page.js`'s `collect` does — zero is no pixels, and a factor of 0
+  // anywhere zeroes the product.
+  const rendersInTree = (n) => {
+    for (let a = n; a; a = a.parent) {
+      if ("visible" in a && !a.visible) return false;
+      if ("opacity" in a && typeof a.opacity === "number" && a.opacity <= 0) return false;
+      if (a === styled) break;
+    }
+    return true;
+  };
+  // A VECTOR whose every subpath is `windingRule: "NONE"` has no fillable area, but Figma imports it
+  // with a default VISIBLE fill — so `painted` says yes and its box counts, while it paints no pixels.
+  // That is exactly what an imported clip path becomes, and it arrives as a rectangle the size of the
+  // thing it clipped, so it is a prime candidate to set a phantom crop. `verify_page.js` reports these
+  // as dead fills for the same reason. A NONE-winding path that is STROKED is still real ink — an open
+  // path like a gridline — so it stays, on its stroke.
+  const fillPaints = (n) =>
+    n.type === "VECTOR" && Array.isArray(n.vectorPaths) && n.vectorPaths.length &&
+    n.vectorPaths.every((vp) => vp && vp.windingRule === "NONE")
+      ? false
+      : painted(n);
+  // Start from the PAINTED extent, not the geometry. Figma documents `absoluteBoundingBox` as
+  // excluding the stroke, so a CENTER-aligned stroke paints half its width outside the box and an
+  // OUTSIDE-aligned one all of it — and the plot's outermost edge is normally a stroked axis, gridline
+  // or line series. Cropping to the centreline cuts that half off ink the frame is supposed to bound,
+  // and `clipsContent = false` below then leaves it hanging outside the frame. Only a stroke that
+  // PAINTS counts, the same test `verify_page.js` applies for the same reason; the outset is taken on
+  // all four sides rather than resolved per segment, because over-reporting an overhang costs a
+  // fraction of a pixel of frame and missing one is the bug.
+  const strokeOutset = (n) => {
+    const paints = Array.isArray(n.strokes) &&
+      n.strokes.some((s) => s.visible !== false && (s.opacity === undefined || s.opacity > 0));
+    const weight = typeof n.strokeWeight === "number" ? n.strokeWeight : 0;
+    if (!paints || !(weight > 0)) return 0;
+    return n.strokeAlign === "INSIDE" ? 0 : n.strokeAlign === "OUTSIDE" ? weight : weight / 2;
+  };
+  const throughClips = (node) => {
+    const o = strokeOutset(node);
+    const b = node.absoluteBoundingBox;
+    let box = b && o ? { x: b.x - o, y: b.y - o, width: b.width + 2 * o, height: b.height + 2 * o } : b;
+    for (let a = node.parent; a && box && a !== styled; a = a.parent) {
+      const clip = "clipsContent" in a && a.clipsContent ? a.absoluteBoundingBox : null;
+      if (clip) {
+        const x = Math.max(box.x, clip.x), y = Math.max(box.y, clip.y);
+        const right = Math.min(box.x + box.width, clip.x + clip.width);
+        const bottom = Math.min(box.y + box.height, clip.y + clip.height);
+        // `>=`, not `>`: an open path has a DEGENERATE box. `absoluteBoundingBox` excludes the stroke,
+        // so a horizontal gridline measures 123.75x0 and a spine 0xN — visible ink whose box has no
+        // area. A strict test calls every one of them fully clipped and drops it, which loses the axes
+        // and lets labels set the plot edge. Only a box lying OUTSIDE its clip becomes null. The stroke
+        // outset above now keeps a painting leaf non-degenerate on its own, so this is the belt to that
+        // braces — narrow the outset and it goes back to load-bearing.
+        box = right >= x && bottom >= y ? { x, y, width: right - x, height: bottom - y } : null;
+      }
+    }
+    return box;
+  };
+  const inkLeaves = () => styled.findAll((n) => n.type !== "GROUP" && n.type !== "FRAME" &&
+    (fillPaints(n) || strokedAnywhere(n)) && rendersInTree(n));
+  // Refuse a BLANK import HERE, while the old chart is still on the page. Below this point it is
+  // removed and the replacement is painted with the template's canvas, so an import with no ink would
+  // be swapped in and REPORTED AS A SUCCESS — an empty chart that looks deliberate. The crop itself
+  // has to wait for the reflow, but whether ANY ink exists does not change when runs move, so it is
+  // settled before anything is destroyed rather than discovered after.
+  if (!inkLeaves().length) {
+    throw new Error(`${frame.name}: the import has no visible ink — nothing was replaced`);
+  }
+  // And refuse one whose ink is entirely CLIPPED AWAY, here rather than at the crop. Every clip that
+  // trims it lives INSIDE the import, so this answer cannot change when the chart is inserted — which
+  // means discovering it after the swap would destroy a perfectly good chart in order to report a
+  // failure. Same reasoning as the guard above, reached through the clips instead of an empty import.
+  if (!inkLeaves().map(throughClips).filter(Boolean).length) {
+    throw new Error(`${frame.name}: every leaf was clipped away — nothing to crop to; nothing was replaced`);
   }
 
   for (const family of CONFIG.families) {
@@ -240,8 +335,27 @@ for (const job of CONFIG.jobs) {
 
   const old = frame.children.find((c) => c.name === "chart");
   styled.name = "chart";
-  styled.clipsContent = false;
-  frame.appendChild(styled);
+  // Paint the import's frame with the template's own canvas, and CLIP it like the template does. An
+  // import arrives with its fill switched OFF (`SOLID`, `visible: false`), and a frame with no visible
+  // fill is not a hit target over its own empty area — so hovering the plot highlights nothing, and the
+  // chart can only be reached from the layer panel. Every frame built this route has it. Painting it
+  // costs no pixel, because the chart sits at the bottom of the z-order with the clone's identical
+  // cream beneath it (measured: max channel difference 0 across 850x1095).
+  const canvasPaint = Array.isArray(frame.fills) ? frame.fills.find((f) => f.type === "SOLID") : null;
+  if (canvasPaint) {
+    styled.fills = [{ ...canvasPaint, visible: true }];
+    if (frame.fillStyleId && frame.fillStyleId !== figma.mixed) await styled.setFillStyleIdAsync(frame.fillStyleId);
+  }
+  styled.clipsContent = true;
+  // Index 0 is the BOTTOM of the z-order, and this is a usability requirement rather than a visual
+  // one: the import is a frame the size of the whole artboard, so appended LAST it covers the header
+  // and footer, and every double-click on the subtitle or the Note then descends into `figure_1` and
+  // its gid groups instead of selecting the text. That difference between a built frame and the
+  // template is one a designer hits immediately and cannot explain. Below them, a click over the
+  // subtitle lands on the header wrapper while bars and labels still resolve into the chart, and the
+  // frame renders identically either way — measured at max channel difference 0 across 850x1095,
+  // because the wrappers carry no fill and the background patch is gone by this point.
+  frame.insertChild(0, styled);
   styled.x = 0;
   styled.y = 0;
   if (old) old.remove();
@@ -284,6 +398,75 @@ for (const job of CONFIG.jobs) {
       }
     }
   }
+
+  // CROP the frame to the plot's own ink, and keep clipping off so nothing is cut at the new edge.
+  // An import arrives the size of the SVG canvas, which is the artboard — so a hover or click on the
+  // plot highlights a rectangle indistinguishable from the artboard's, the plot cannot be grabbed as a
+  // unit, and there is no visible box to tell a designer what they have hold of. Cropping is what makes
+  // the plot an object: it moves nothing on the canvas, because the frame's origin shifts onto the ink
+  // and the children shift back by the same offset (verified at max channel difference 0 across a
+  // whole 850x1095 frame). It also makes `verify_page.js`'s box-alignment and gap rows measure the
+  // plot instead of the canvas — they read the real insets afterwards rather than a negative number.
+  //
+  // Do it LAST — after the fit, the restyle and the legend reflow. All three are written in canvas
+  // coordinates, and all three move ink: a reflow that shifts the last run's right edge after the
+  // crop would leave the frame, its canvas fill and every geometry row describing a box that no
+  // longer bounds the drawing, which is the stale-bounds failure the crop exists to remove.
+  //
+  // Take each leaf's box THROUGH its clipping ancestors first. A path running past a clip frame
+  // renders no pixels there, so it must not widen the box: matplotlib clips its axes artists, Figma
+  // imports that clip as a `clipsContent` frame, and a line leaving the axes therefore arrives here
+  // at its full unclipped width. Intersecting is a no-op wherever nothing clips.
+  //
+  // Stop BELOW `styled`. Only a clip still in force after the crop may shrink these bounds, and
+  // `styled`'s own is not: it is switched off a few lines down so the new edge cuts nothing. Count its
+  // overflow as ink and the frame grows to contain it, which is what keeps the fill, the hit target
+  // and the geometry rows bounding everything visible. Intersect with it instead and that overflow is
+  // first excluded from the box and then un-hidden, landing outside the frame meant to bound it.
+  const inkBoxes = inkLeaves().map(throughClips).filter(Boolean);
+  // Both emptiness cases were refused before the swap. A reflow moves ink but deletes none, so this
+  // can only fire if a moved run left its clip — unlikely, and still better loud than a canvas-sized
+  // frame reported as done.
+  if (!inkBoxes.length) throw new Error(`${frame.name}: every leaf was clipped away after the reflow — nothing to crop to`);
+  {
+    const own = styled.absoluteBoundingBox;
+    const ink = {
+      x: Math.min(...inkBoxes.map((b) => b.x)),
+      y: Math.min(...inkBoxes.map((b) => b.y)),
+      right: Math.max(...inkBoxes.map((b) => b.x + b.width)),
+      bottom: Math.max(...inkBoxes.map((b) => b.y + b.height)),
+    };
+    const dx = ink.x - own.x, dy = ink.y - own.y;
+    styled.clipsContent = false;
+    styled.x += dx;
+    styled.y += dy;
+    styled.resizeWithoutConstraints(ink.right - ink.x, ink.bottom - ink.y);
+    for (const child of styled.children) { child.x -= dx; child.y -= dy; }
+
+    // Then SNAP each side that lands within a pixel of the header's content column onto it, moving
+    // the children back so no ink shifts. Cropping to ink alone leaves the box off by a hair — a
+    // TEXT node's box carries its own advance width, not its glyphs, so a label at the plot's edge
+    // put one frame at 15.92..833.88 against a 16..834 column. `box-alignment` measures the FRAME to
+    // 0.05, so it failed on 0.08px of text metrics. A pixel is the whole tolerance: anything further
+    // out is a real misalignment and must keep failing.
+    const column = frame.children
+      .filter((c) => "layoutMode" in c && c.layoutMode !== "NONE" && !/^logo/i.test(c.name))
+      .sort((a, b) => a.y - b.y)[0];
+    if (column) {
+      const SNAP = 1;
+      let x = styled.x, w = styled.width;
+      const wantL = column.x, wantR = column.x + column.width;
+      if (Math.abs(x - wantL) <= SNAP) { w += x - wantL; x = wantL; }
+      if (Math.abs(x + w - wantR) <= SNAP) { w = wantR - x; }
+      if (x !== styled.x || w !== styled.width) {
+        const sdx = x - styled.x;
+        styled.x = x;
+        styled.resizeWithoutConstraints(w, styled.height);
+        for (const child of styled.children) child.x -= sdx;
+      }
+    }
+  }
+
 
   report.push({
     frame: frame.name,
