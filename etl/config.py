@@ -8,6 +8,7 @@ only important for OWID staff.
 """
 
 import asyncio
+import json
 import logging
 import os
 import pwd
@@ -28,7 +29,7 @@ from joblib import Memory  # 0.08
 from sqlalchemy.engine import Engine  # 0.07
 from sqlalchemy.orm import Session  # ~ 0.07
 
-from etl.paths import BASE_DIR, CACHE_DIR
+from etl.paths import BASE_DIR, CACHE_DIR, SCHEMAS_DIR
 
 log = structlog.get_logger()
 
@@ -319,8 +320,48 @@ GITHUB_API_URL = f"{GITHUB_API_BASE}/pulls"
 # Skip SSL verify
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
-# Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.011.json"
+# Upstream alias that always serves the newest published grapher chart-config schema. Used only to
+# *discover* a new version at bump time (`scripts/generate_schema_types.py --bump-version`, and the
+# scheduled sync workflow). Never resolve it at run time: its `properties.$schema.const` names one
+# concrete version, so it can't validate a config pinned at an older one, and stamping it on our
+# output would claim configs match a version we haven't vendored, validated or generated types for.
+GRAPHER_SCHEMA_LATEST_URL = "https://files.ourworldindata.org/schemas/grapher-schema.latest.json"
+
+_GRAPHER_SCHEMA_FILE_RE = re.compile(r"^grapher-schema\.\d{3}\.json$")
+
+
+def vendored_grapher_schema_id() -> str:
+    """`$id` of the grapher chart-config schema this repo vendors.
+
+    The vendored file under `schemas/` is the single source of truth for the version: it is what
+    `multidim-schema.json` / `explorer-schema.json` `$ref`, what `schema_types.py` is generated
+    from, and what ETL validates configs against offline. Reading its own `$id` instead of
+    repeating the version here means the constant can never name a version we don't have on disk.
+    """
+    vendored = sorted(p for p in SCHEMAS_DIR.glob("grapher-schema.*.json") if _GRAPHER_SCHEMA_FILE_RE.match(p.name))
+    if len(vendored) != 1:
+        raise RuntimeError(
+            f"Expected exactly one vendored grapher schema (grapher-schema.NNN.json) in {SCHEMAS_DIR}, "
+            f"found {[p.name for p in vendored]}. A version bump replaces the file rather than adding "
+            "one — run `python scripts/generate_schema_types.py --bump-version`."
+        )
+
+    path = vendored[0]
+    schema_id = json.loads(path.read_text()).get("$id")
+    if not isinstance(schema_id, str) or schema_id.rsplit("/", 1)[-1] != path.name:
+        raise RuntimeError(
+            f"Vendored {path.name} declares `$id` {schema_id!r}, which doesn't match its filename. "
+            "Grapher keys config migrations on the `$id`, and ETL resolves `$schema` URLs to local "
+            "files by basename, so the two must agree. Re-vendor with "
+            "`python scripts/generate_schema_types.py --refresh`."
+        )
+    return schema_id
+
+
+# Grapher chart-config schema version this repo is built against — the default `$schema` for
+# indicator-level `presentation.grapher_config`, and the version a new collection config should pin.
+# Derived from the vendored copy (see above); bump it with `--bump-version`, never by hand.
+DEFAULT_GRAPHER_SCHEMA = vendored_grapher_schema_id()
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")

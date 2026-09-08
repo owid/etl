@@ -15,6 +15,8 @@ from etl.collection.model.view import CommonView, View
 def create_test_config():
     """Create a basic test configuration for collections."""
     return {
+        # Required for mdims/charts (see `Collection.validate_grapher_schema_pinned`).
+        "grapher_schema": "011",
         "title": {"title": "Test Collection", "title_variant": "Test Collection Variant"},
         "default_selection": ["country"],
         "dimensions": [
@@ -45,6 +47,8 @@ def create_test_config_with_common_views():
 def create_test_explorer_config():
     """Create a basic test configuration for explorers."""
     config = create_test_config()
+    # Explorers reject `grapher_schema`: the legacy TSV path has no `grapherConfigSchema`.
+    config.pop("grapher_schema")
     config["config"] = {"hasMapTab": True, "chartTypes": ["LineChart"]}
     return config
 

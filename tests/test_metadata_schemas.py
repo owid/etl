@@ -351,30 +351,36 @@ def test_snapshot_license_lives_under_origin():
 
 
 def test_multidim_configs_pin_grapher_schema():
-    """Guardrail: every multidim collection config must pin `grapher_schema`.
+    """Guardrail: every multidim collection config must pin a valid `grapher_schema`.
 
-    Grapher injects the collection's `grapherConfigSchema` as the `$schema` of each view config and
-    migrates outdated configs forward. When no version is given, ETL falls back to
-    `DEFAULT_GRAPHER_SCHEMA`, i.e. it tells Grapher the configs are already current — so a breaking
-    schema change upstream would silently skip the migration for those views.
+    Grapher injects the collection's `grapherConfigSchema` as the `$schema` of each view config
+    (single charts carry it as `$schema` directly) and migrates outdated configs forward. Without a
+    pin there is nothing recording what the config was authored against, and ETL refuses to guess —
+    see `etl.collection.utils.resolve_grapher_schema` for the accepted forms.
 
-    Pinning records the version the config was actually authored against. See
-    `etl.collection.utils.resolve_grapher_schema` for the accepted forms.
+    `Collection` enforces this at run time too (`validate_grapher_schema_pinned`, plus `required`
+    in multidim-schema.json). This test is the fast, offline version: it needs no step run, and it
+    catches a *malformed* pin (`grapher_schema:` with no value, an unquoted octal `011`) that a
+    key-presence check would wave through.
     """
-    missing = []
-    for config_path in sorted(Path(STEP_DIR / "viz" / "chart").glob("**/*.yml")):
+    from etl.collection.utils import default_grapher_schema_version, resolve_grapher_schema
+
+    broken = []
+    for config_path in sorted(Path(STEP_DIR / "viz" / "chart").glob("**/*.y*ml")):
         config = yaml.safe_load(config_path.read_text()) or {}
         # Only collection configs are in scope; the directory also holds plain data yaml
         # (e.g. un/latest/map_brackets.yml).
         if not isinstance(config, dict) or not {"dimensions", "views"} <= set(config):
             continue
-        if "grapher_schema" not in config:
-            missing.append(str(config_path.relative_to(BASE_DIR)))
+        try:
+            resolve_grapher_schema(config.get("grapher_schema"))
+        except ValueError as e:
+            broken.append(f"{config_path.relative_to(BASE_DIR)}: {e}")
 
-    assert not missing, (
-        "These multidim configs don't pin `grapher_schema`. Add the current version as a "
+    assert not broken, (
+        "These multidim configs don't pin a valid `grapher_schema`. Add the current version as a "
         f'**quoted** string (an unquoted `011` is parsed as octal) — `grapher_schema: "'
-        f'{DEFAULT_GRAPHER_SCHEMA.rsplit(".", 2)[1]}"`:\n  ' + "\n  ".join(missing)
+        f'{default_grapher_schema_version()}"`:\n  ' + "\n  ".join(broken)
     )
 
 
@@ -541,14 +547,53 @@ def test_no_newer_grapher_schema_version():
     when that moves past DEFAULT_GRAPHER_SCHEMA, we should consider bumping. See the
     "Version bump" section of the /sync-grapher-schema skill.
     """
+    from etl.config import GRAPHER_SCHEMA_LATEST_URL
     from etl.http import session
 
-    latest_url = DEFAULT_GRAPHER_SCHEMA.rsplit("/", 1)[0] + "/grapher-schema.latest.json"
-    resp = session.get(latest_url, timeout=30)
+    resp = session.get(GRAPHER_SCHEMA_LATEST_URL, timeout=30)
     resp.raise_for_status()
     latest_id = resp.json().get("$id")
     assert latest_id == DEFAULT_GRAPHER_SCHEMA, (
         f"Upstream published a newer grapher schema: {latest_id} "
         f"(we pin {DEFAULT_GRAPHER_SCHEMA}).\n"
-        "Follow the 'Version bump' section of the /sync-grapher-schema skill to upgrade."
+        "Run `python scripts/generate_schema_types.py --bump-version` and follow /sync-grapher-schema."
     )
+
+
+def test_default_grapher_schema_is_derived_from_the_vendored_copy():
+    """`DEFAULT_GRAPHER_SCHEMA` must name the schema we actually have on disk.
+
+    It is derived from the vendored file's own `$id` rather than written out in `etl/config.py`,
+    so the two can't drift apart. This test pins the contract the derivation provides: exactly one
+    vendored `grapher-schema.NNN.json`, whose filename matches its `$id`.
+    """
+    from etl.config import vendored_grapher_schema_id
+
+    vendored = sorted(SCHEMAS_DIR.glob("grapher-schema.[0-9][0-9][0-9].json"))
+    assert len(vendored) == 1, f"Expected exactly one vendored grapher schema, found {[p.name for p in vendored]}"
+    assert DEFAULT_GRAPHER_SCHEMA == vendored_grapher_schema_id()
+    assert DEFAULT_GRAPHER_SCHEMA.rsplit("/", 1)[-1] == vendored[0].name
+    assert json.loads(vendored[0].read_text())["$id"] == DEFAULT_GRAPHER_SCHEMA
+
+
+def test_vendored_schema_id_rejects_broken_states(tmp_path, monkeypatch):
+    """The derivation fails loudly rather than guessing a version.
+
+    Two states that must not resolve silently: more than one (or no) vendored schema — the state a
+    half-done bump leaves behind — and a file whose `$id` disagrees with its filename, since
+    grapher migrates on the `$id` while ETL resolves `$schema` URLs to local files by basename.
+    """
+    import etl.config as config
+
+    monkeypatch.setattr(config, "SCHEMAS_DIR", tmp_path)
+
+    with pytest.raises(RuntimeError, match="Expected exactly one vendored grapher schema"):
+        config.vendored_grapher_schema_id()
+
+    (tmp_path / "grapher-schema.011.json").write_text(json.dumps({"$id": "https://x/grapher-schema.012.json"}))
+    with pytest.raises(RuntimeError, match="doesn't match its filename"):
+        config.vendored_grapher_schema_id()
+
+    (tmp_path / "grapher-schema.012.json").write_text("{}")
+    with pytest.raises(RuntimeError, match="Expected exactly one vendored grapher schema"):
+        config.vendored_grapher_schema_id()

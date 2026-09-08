@@ -15,6 +15,7 @@ from typing_extensions import Self
 from apps.utils.files import generate_step, generate_step_to_channel
 from apps.wizard.etl_steps.utils import ADD_DAG_OPTIONS, COOKIE_STEPS, SNAPSHOT_SCHEMA, remove_playground_notebook
 from apps.wizard.utils import clean_empty_dict
+from etl.collection.utils import default_grapher_schema_version
 from etl.dag_helpers import write_to_dag_file
 from etl.files import ruamel_dump
 from etl.owners import resolve_owner
@@ -647,6 +648,10 @@ class CollectionForm(StepForm):
 
 def generate_export_step_to_channel(cookiecutter_path: Path, data: dict[str, Any]) -> Path:
     assert {"namespace", "version"} <= data.keys()
+
+    # Collection configs must pin `grapher_schema`; scaffold it at the version we vendor today so
+    # the generated config runs as-is instead of failing on the missing pin.
+    data = {**data, "grapher_schema": default_grapher_schema_version()}
 
     target_dir = STEP_DIR / "viz" / "chart"
     generate_step(cookiecutter_path, data, target_dir)

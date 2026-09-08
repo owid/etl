@@ -175,11 +175,9 @@ def test_resolve_grapher_schema_accepted_forms():
     """
     Test resolve_grapher_schema - both authoring forms resolve to a full schema URL.
 
-    Short form "011" expands to the published URL; a full URL passes through unchanged;
-    None falls back to the version this repo vendors (DEFAULT_GRAPHER_SCHEMA).
+    Short form "011" expands to the published URL; a full URL passes through unchanged.
     """
     from etl.collection.utils import resolve_grapher_schema
-    from etl.config import DEFAULT_GRAPHER_SCHEMA
 
     assert resolve_grapher_schema("011") == "https://files.ourworldindata.org/schemas/grapher-schema.011.json"
     # An older pin is preserved — that is the point of pinning: Grapher migrates it forward.
@@ -188,7 +186,23 @@ def test_resolve_grapher_schema_accepted_forms():
     full = "https://files.ourworldindata.org/schemas/grapher-schema.010.json"
     assert resolve_grapher_schema(full) == full
 
-    assert resolve_grapher_schema(None) == DEFAULT_GRAPHER_SCHEMA
+
+def test_resolve_grapher_schema_rejects_missing_pin():
+    """
+    Test resolve_grapher_schema - `None` raises instead of falling back to a default.
+
+    A fallback would resolve an unpinned config to whatever version the repo vendors on the day the
+    step runs: it tells Grapher the config is already current (skipping migrations for a config
+    authored earlier), and it silently resolves to a different version after the next version bump.
+    """
+    from etl.collection.utils import default_grapher_schema_version, resolve_grapher_schema
+    from etl.config import DEFAULT_GRAPHER_SCHEMA
+
+    with pytest.raises(ValueError, match="No `grapher_schema` pinned"):
+        resolve_grapher_schema(None)
+
+    # The version suggested in the error is the one this repo vendors, in short quoted form.
+    assert DEFAULT_GRAPHER_SCHEMA.endswith(f"grapher-schema.{default_grapher_schema_version()}.json")
 
 
 def test_resolve_grapher_schema_rejects_unquoted_yaml_version():

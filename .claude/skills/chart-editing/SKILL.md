@@ -26,6 +26,7 @@ The chart's public slug is auto-derived from the short name with underscores rep
 ## Minimum viable config
 
 ```yaml
+grapher_schema: "011"  # QUOTED — a bare 011 is YAML octal
 chart_config_id: "0191b6c7-5595-70b2-8d30-fa03fccd7add"
 topic_tags:
   - "Animal Welfare"
@@ -51,10 +52,11 @@ views:
 
 Key fields:
 
+- `grapher_schema` — **required**, and there is no fallback: the grapher chart-config schema version this config is written against, which becomes the chart's `$schema` and is what lets grapher migrate the config after a breaking schema change. Use the version in `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`) when authoring, then leave it alone. Quote it — an unquoted `011` is YAML octal.
 - `chart_config_id` — **required**, the chart's identity in grapher (`charts.configId`). See "The chart's identity" below.
 - `dimensions: []` and exactly one view → this YAML pushes as a single chart, not an mdim page.
 - `views[0].indicators.y` — list of indicator catalog paths. For multi-series, list more than one.
-- `views[0].config` — the grapher config that becomes the chart's `etlConfig` in `chart_configs`. Same shape as a chart-admin export. Omit `$schema` — the current default (`DEFAULT_GRAPHER_SCHEMA` in `etl/config.py`) is applied automatically, so pinning a version only ages badly.
+- `views[0].config` — the grapher config that becomes the chart's `etlConfig` in `chart_configs`. Same shape as a chart-admin export. Never put `$schema` in here: it would override the top-level `grapher_schema` while being far less visible (ETL warns when it does).
 - No top-level `title:` or `default_selection:` block — those exist only for multidim data pages and are ignored for single charts.
 
 ## The chart's identity (`chart_config_id`)

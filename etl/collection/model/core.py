@@ -32,6 +32,7 @@ from etl.collection.model.schema_types import (
 )
 from etl.collection.model.view import CommonView, View, ViewIndicators
 from etl.collection.utils import (
+    default_grapher_schema_version,
     fill_placeholders,
     get_complete_dimensions_filter,
     get_tables_by_name_mapping,
@@ -40,7 +41,7 @@ from etl.collection.utils import (
     unique_records,
     validate_indicators_in_db,
 )
-from etl.config import DEFAULT_GRAPHER_SCHEMA, OWID_ENV, OWIDEnv
+from etl.config import OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import SCHEMAS_DIR, VIZ_DIR
 
@@ -137,8 +138,9 @@ class Collection(MDIMBase):
     topic_tags: list[str] | None = None
     # Grapher chart-config schema version that this collection's view configs were authored
     # against. Short ("011") or full URL form; see `resolve_grapher_schema`. Grapher uses it as the
-    # `$schema` of every view config, and skips config migrations entirely when it is missing — so
-    # pin it explicitly rather than relying on the `DEFAULT_GRAPHER_SCHEMA` fallback.
+    # `$schema` of every view config, and skips config migrations entirely when it is missing.
+    # Required for mdims and single charts (`required` in multidim-schema.json, re-checked by
+    # `validate_grapher_schema_pinned()` on save); `None` only for explorers, which reject it.
     grapher_schema: str | None = None
     _default_dimensions: dict[str, str] | None = None
 
@@ -183,8 +185,11 @@ class Collection(MDIMBase):
             # Convert list to set
             self.dependencies = set(self.dependencies)
 
-        # Fail at authoring time on a malformed pin, rather than at upsert time
-        resolve_grapher_schema(self.grapher_schema)
+        # Fail at authoring time on a malformed pin, rather than at upsert time. A *missing* pin is
+        # caught by schema validation and by `validate_grapher_schema_pinned()`, not here: this runs
+        # for every Collection ever constructed, including ones assembled field-by-field.
+        if self.grapher_schema is not None:
+            resolve_grapher_schema(self.grapher_schema)
 
     @property
     def definitions(self) -> Definitions:
@@ -320,11 +325,11 @@ class Collection(MDIMBase):
         # Check that no view carries a corrupted description_key
         self.validate_description_keys()
 
+        # Require a schema pin (mdims and single charts; explorers have no equivalent)
+        self.validate_grapher_schema_pinned()
+
         # Warn about view configs that shadow the collection-level schema pin
         self.warn_on_view_schema_overrides()
-
-        # Warn when no version is pinned and we fall back to the vendored default
-        self.warn_if_grapher_schema_unpinned()
 
         # Sort views based on dimension order
         self.sort_views_based_on_dimensions()
@@ -890,7 +895,13 @@ class Collection(MDIMBase):
         the config YAML. That combination has bitten us before: a config pinned at an old version
         while its body used fields from a newer one, so Grapher ran migrations over a config they
         were never meant to touch. Pin the collection instead.
+
+        Skipped for explorers: they have no collection-level pin to shadow (see
+        `Explorer.__post_init__`), so a `$schema` in an explorer view config overrides nothing.
         """
+        if self._collection_type == "explorer":
+            return
+
         overrides = defaultdict(int)
         for view in self.views:
             config = view.config
@@ -905,19 +916,29 @@ class Collection(MDIMBase):
                 "collection with the top-level `grapher_schema` field instead."
             )
 
-    def warn_if_grapher_schema_unpinned(self):
-        """Warn when the collection pins no schema version and the default is used.
+    def validate_grapher_schema_pinned(self):
+        """Fail when an mdim or single chart pins no schema version.
 
-        The fallback is `DEFAULT_GRAPHER_SCHEMA`, so grapher is told the config already matches the
-        version this repo vendors. That is usually true, but it means a config authored against an
-        older schema would skip migration. It also makes "pinned" and "defaulted" indistinguishable
-        in the database while the two happen to agree — so say so out loud instead.
+        The pin has to live in the config, because it is the only record of what the view configs
+        were authored against: without one, the version Grapher is told about is whatever this repo
+        vendors on the day the step runs, which (a) claims the config is already current, so a
+        config written against an older schema skips migration, and (b) silently changes the next
+        time the step runs after a version bump. `multidim-schema.json` requires the field, which
+        catches every authored config; this re-check covers collections built without schema
+        validation or assembled field-by-field in Python.
+
+        Explorers are exempt — they reach Grapher through the legacy TSV path, which has no
+        equivalent of `grapherConfigSchema`, and `Explorer.__post_init__` rejects the field.
         """
+        if self._collection_type == "explorer":
+            return
+
         if self.grapher_schema is None:
-            log.warning(
-                f"Collection '{self.catalog_path}' pins no `grapher_schema`; falling back to "
-                f"{DEFAULT_GRAPHER_SCHEMA}. Add a top-level `grapher_schema` to the config YAML "
-                "recording the version its view configs were authored against."
+            raise ValueError(
+                f"Collection '{self.catalog_path}' pins no `grapher_schema`. Add a top-level "
+                "`grapher_schema` to the config YAML recording the version its view configs were "
+                f'authored against — `grapher_schema: "{default_grapher_schema_version()}"` for a '
+                "config written today (quoted: an unquoted `011` is YAML octal)."
             )
 
     def validate_description_keys(self):
