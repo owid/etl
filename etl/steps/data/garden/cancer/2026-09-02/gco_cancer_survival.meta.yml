@@ -10,10 +10,12 @@ definitions:
   # The source labels the site "Oesophagus"; we use American spelling in user-facing text.
   cancer_lower: << cancer.lower().replace("oesophageal", "esophageal") >>
   cancer_title: << cancer.replace("Oesophageal", "Esophageal") >>
-  patients: <% if gender == "All" %>patients<% else %><< gender.lower() >><% endif %>
-  people: <% if gender == "All" %>people<% else %><< gender.lower() >><% endif %>
-  amongst_gender: <% if gender != "All" %> amongst << gender.lower() >><% endif %>
-  among_gender: <% if gender != "All" %> among << gender.lower() >><% endif %>
+  # Style guide: women/men, never females/males as nouns. The data cover ages 25 and older.
+  sex_noun: <% if gender == "Females" %>women<% elif gender == "Males" %>men<% endif %>
+  patients: <% if gender == "All" %>patients<% else %>{definitions.sex_noun}<% endif %>
+  people: <% if gender == "All" %>people<% else %>{definitions.sex_noun}<% endif %>
+  amongst_gender: <% if gender != "All" %> amongst {definitions.sex_noun}<% endif %>
+  among_gender: <% if gender != "All" %> among {definitions.sex_noun}<% endif %>
   description_prod_incidence_mortality: &description_prod_incidence_mortality |-
     Age-standardized cancer incidence and mortality rates (ASR) were computed for ages 25 years and older using the age-truncated World Standard Population and expressed as rates per 100 000 person-years (Segi, 1960).
   description_prod_survival: &description_prod_survival |-
@@ -56,7 +58,7 @@ tables:
         short_unit: ""
         description_short: Number of new cases of {definitions.cancer_lower} cancer per 100,000 {definitions.people} aged 25 and older in a given year, age-standardized to the World Standard Population.
         description_key:
-          - Cancer incidence is the number of new cancer cases arising in a specified population over a given period of time (typically 1 year).
+          - Cancer incidence is the number of new cancer cases arising in a specified population over a given period of time (typically one year).
           - It can be expressed as an absolute number of cases within the entire population per year or as a rate per 100,000 persons per year.
           - Incidence information is collected routinely by cancer registries.
           - Rates are computed for ages 25 years and older and age-standardized using the World Standard Population.
@@ -75,7 +77,7 @@ tables:
         description_key:
           - Cancer mortality is the number of deaths due to cancer occurring in a specified population in a given year.
           - It can be expressed as an absolute number of deaths within the entire population per year or as a rate per 100,000 persons per year.
-          - Mortality data are provided by national statistical offices.
+          - Mortality data is provided by national statistical offices.
           - Rates are computed for ages 25 years and older and age-standardized using the World Standard Population.
         description_from_producer: *description_prod_incidence_mortality
         presentation:
