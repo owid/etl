@@ -107,7 +107,7 @@ As you can see, there are top-level fields (`title`, `default_selection`, `topic
 
 In this example, we note that we can group together indicators from any dataset. While we may present them as "dimensional", the underlying data structure may not be.
 
-!!! important "Always pin `grapher_schema`"
+!!! important "`grapher_schema` is required"
     `grapher_schema` records the version of the [Grapher chart-config schema](https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema) that this MDIM's view configs were written against. Grapher uses it as the `$schema` of every view config, and migrates outdated configs forward to the current version when it upserts the MDIM.
 
     Two forms are accepted — the short version, or the full URL:
@@ -119,7 +119,7 @@ In this example, we note that we can group together indicators from any dataset.
 
     **Quote the short form.** YAML parses a bare `011` as an octal number, so it would silently resolve to a different version (ETL rejects it rather than guessing).
 
-    Omitting the field falls back to `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`), which tells Grapher the configs are already current — so the next breaking schema change would skip the migration for those views. Once set, leave the pin alone: it is a record of what the config was authored against, which is exactly what lets Grapher migrate it later.
+    **There is no default.** Omitting the field fails the step — schema validation rejects it when `create_collection` builds the config, and `Collection.save()` re-checks. That is deliberate: a fallback would resolve an unpinned config to whatever version the repo vendors *on the day the step runs*, which both tells Grapher the config is already current (so the next breaking schema change skips the migration for those views) and silently resolves to a different version the next time the step runs. Once set, leave the pin alone: it is a record of what the config was authored against, which is exactly what lets Grapher migrate it later.
 
     The one exception is a pin that **contradicts the config body** — e.g. pinned `005` while the config uses `chartTypes`, a field that only exists from `006` onwards (the 005→006 migration is what creates it). That is a stale pin rather than a record, and leaving it means Grapher runs migrations over a config they were never meant to touch. Correct such a pin to the version the config is actually written against.
 
@@ -131,13 +131,14 @@ In this example, we note that we can group together indicators from any dataset.
     |---|---|---|
     | config YAML | `grapher_schema` | `"011"` |
     | `viz/chart/…/<name>.config.json` | `grapher_schema` | `"011"` |
-    | Grapher DB / admin API payload | `grapherConfigSchema` | `https://…/grapher-schema.011.json` |
+    | Grapher DB / admin API payload (mdim) | `grapherConfigSchema` | `https://…/grapher-schema.011.json` |
+    | Grapher DB (single chart, `chart_configs.etlConfig`) | `$schema` | `https://…/grapher-schema.011.json` |
 
     The generated JSON keeps the authored short form because `CollectionSet.read()` loads it back through `Collection.from_dict`; only the upsert payload is camelized and resolved to a full URL. So grepping the generated JSON for `grapherConfigSchema` finds nothing even when the pin is working perfectly.
 
-    Note also that while `DEFAULT_GRAPHER_SCHEMA` equals the version everything pins, a working pin and a dropped one look identical in the database. ETL logs a warning when a collection falls back to the default, which is the signal to trust.
+    A single chart (`dimensions: []`) has no `grapherConfigSchema` indirection — its config carries `$schema` directly — so for charts the pin *is* the stored `$schema`.
 
-    This field is MDIM-only. Explorers reach Grapher through the legacy TSV path, which has no equivalent.
+    This field is MDIM-and-chart-only. Explorers reach Grapher through the legacy TSV path, which has no equivalent, and they reject the field outright.
 
 !!! tip "Learn more about the structure of MDIMs in [:fontawesome-brands-github: their schema](https://github.com/owid/etl/blob/master/schemas/multidim-schema.json)"
     There are more options available in the schema that are not covered here. E.g. you can set chart configurations for each view (`.config`), or indicator-level display settings (`.display`). You can even tweak the presentation fields like `description_key` for a specific view (`.metadata`).

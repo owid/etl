@@ -35,12 +35,12 @@ def _make_view(indicators: dict, config: dict | None = None) -> View:
     )
 
 
-def _build(view: View, slug: str = "my-chart") -> dict:
+def _build(view: View, slug: str = "my-chart", grapher_schema: str = DEFAULT_GRAPHER_SCHEMA) -> dict:
     with patch(
         "etl.collection.chart_upsert.map_indicator_path_to_id",
         side_effect=lambda path: _PATH_TO_ID[path],
     ):
-        return _build_chart_config(view, slug)
+        return _build_chart_config(view, slug, grapher_schema)
 
 
 def test_single_y_indicator():
@@ -48,6 +48,18 @@ def test_single_y_indicator():
     assert config["slug"] == "my-chart"
     assert config["$schema"] == DEFAULT_GRAPHER_SCHEMA
     assert config["dimensions"] == [{"property": "y", "variableId": 111}]
+
+
+def test_collection_pin_becomes_the_config_schema():
+    """The collection's `grapher_schema` is what a single chart stores as `$schema`.
+
+    A chart config has no `grapherConfigSchema` indirection, so this is the only place the pin can
+    land. It used to be ignored here in favour of `DEFAULT_GRAPHER_SCHEMA`, which silently told
+    grapher every ETL-authored chart was written against the version of the day.
+    """
+    older = "https://files.ourworldindata.org/schemas/grapher-schema.008.json"
+    config = _build(_make_view({"y": "table#ind1"}), grapher_schema=older)
+    assert config["$schema"] == older
 
 
 def test_multiple_y_indicators_preserve_order():

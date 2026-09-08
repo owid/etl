@@ -364,6 +364,8 @@ def test_update_choice_slugs_in_views_handles_nan_entries_from_unstack():
 def _make_subcollection(view_type: str, catalog_path: str):
     """Build a minimal (non-explorer) Collection sub-collection for combine tests."""
     config = {
+        # Sub-collections are built from the same YAML as the combined one, so they carry its pin.
+        "grapher_schema": "008",
         "title": {"title": f"Test {view_type}", "title_variant": ""},
         "default_selection": ["World"],
         "dimensions": [

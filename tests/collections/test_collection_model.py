@@ -2368,7 +2368,8 @@ def test_collection_grapher_schema_round_trips():
     assert collection.grapher_schema == "011"
     assert collection.to_dict()["grapher_schema"] == "011"
 
-    # Omitted: the key is pruned, and `upsert_to_db` resolves the DEFAULT_GRAPHER_SCHEMA fallback.
+    # Omitted: the key is pruned. Construction still succeeds (explorers legitimately leave it
+    # unset); the requirement is enforced by `validate_grapher_schema_pinned` and schema validation.
     collection = Collection.from_dict(_make_minimal_config())
     assert collection.grapher_schema is None
     assert "grapher_schema" not in collection.to_dict()
@@ -2394,6 +2395,19 @@ def test_collection_grapher_schema_passes_schema_validation():
     collection = Collection.from_dict(_make_minimal_config(grapher_schema="011"))
     collection.grapher_schema = "latest"  # bypasses __post_init__
     with pytest.raises(ValueError, match="must match pattern"):
+        collection.validate_schema()
+
+
+def test_collection_grapher_schema_is_required_by_schema():
+    """
+    Test Collection.validate_schema - an unpinned collection fails schema validation.
+
+    `grapher_schema` is in multidim-schema.json's top-level `required`, so the missing pin is
+    caught for every authored config — YAML or assembled programmatically — the moment
+    `create_collection` builds it.
+    """
+    collection = Collection.from_dict(_make_minimal_config())
+    with pytest.raises(ValueError, match="grapher_schema"):
         collection.validate_schema()
 
 
@@ -2439,18 +2453,48 @@ def test_warn_on_view_schema_overrides(capsys):
     assert capsys.readouterr().out == ""
 
 
-def test_warn_if_grapher_schema_unpinned(capsys):
+def test_validate_grapher_schema_pinned():
     """
-    Test Collection.warn_if_grapher_schema_unpinned - an unpinned collection says so.
+    Test Collection.validate_grapher_schema_pinned - an unpinned mdim fails, an explorer doesn't.
 
-    Without this, a config that silently relies on the DEFAULT_GRAPHER_SCHEMA fallback is
-    indistinguishable in the database from one that pins the same version deliberately.
+    There is no default on purpose: an unpinned config would resolve to whatever version the repo
+    vendors on the day the step runs, so it both claims to be current and changes meaning after the
+    next version bump. Explorers are exempt — the legacy TSV path has no `grapherConfigSchema`, and
+    `Explorer.__post_init__` rejects the field outright.
     """
-    Collection.from_dict(_make_minimal_config()).warn_if_grapher_schema_unpinned()
-    out = capsys.readouterr().out
-    assert "pins no `grapher_schema`" in out
+    from etl.collection.explorer import Explorer
 
-    Collection.from_dict(_make_minimal_config(grapher_schema="011")).warn_if_grapher_schema_unpinned()
+    with pytest.raises(ValueError, match="pins no `grapher_schema`"):
+        Collection.from_dict(_make_minimal_config()).validate_grapher_schema_pinned()
+
+    Collection.from_dict(_make_minimal_config(grapher_schema="011")).validate_grapher_schema_pinned()
+
+    explorer = Explorer.from_dict(_make_minimal_config(config={"explorerTitle": "T"}))
+    explorer.validate_grapher_schema_pinned()
+
+
+def test_warn_on_view_schema_overrides_skips_explorers(capsys):
+    """
+    Test Collection.warn_on_view_schema_overrides - explorers have no pin to shadow, so no warning.
+
+    Explorers always leave `grapher_schema` unset, so the warning used to fire on every explorer
+    save and point at a collection pin that does not exist.
+    """
+    from etl.collection.explorer import Explorer
+
+    explorer = Explorer.from_dict(
+        _make_minimal_config(
+            config={"explorerTitle": "T"},
+            views=[
+                {
+                    "dimensions": {"metric": "total"},
+                    "indicators": {"y": [{"catalogPath": "grapher/ns/2024-01-01/ds/tb#ind"}]},
+                    "config": {"$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json"},
+                }
+            ],
+        )
+    )
+    explorer.warn_on_view_schema_overrides()
     assert capsys.readouterr().out == ""
 
 
