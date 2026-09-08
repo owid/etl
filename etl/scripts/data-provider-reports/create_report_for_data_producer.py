@@ -321,10 +321,11 @@ class Report:
         # The analytics semantic layer is built from production, so grapher-DB reads (redirects,
         # origins_variables, chart configs) must target production too; against a staging snapshot, any
         # redirect or re-versioned dataset newer than the snapshot is silently dropped from the report.
-        assert OWID_ENV.env_remote == "production", (
-            f"Reports must be generated against the production grapher DB "
-            f"(current: {OWID_ENV.conf.DB_HOST}). Run with ENV_FILE=.env.prod."
-        )
+        if OWID_ENV.env_remote != "production":
+            raise RuntimeError(
+                f"Reports must be generated against the production grapher DB "
+                f"(current: {OWID_ENV.conf.DB_HOST}). Run with ENV_FILE=.env.prod."
+            )
         self.producer = producer  # Canonical name for display
         self.aliases = aliases or []
         self.all_producer_names = [producer] + self.aliases  # All names for data gathering
@@ -582,10 +583,11 @@ class Report:
         self.google_doc.replace_text(mapping=replacements)
 
         # Add content.
-        # The image shows the most viewed chart overall, so it matches the top entry of the list below.
-        # Grapher charts and mdim views both export a ".png" (for an mdim view, inserted before its query
-        # string); explorers don't, so they're skipped. The eligible list may be empty (a producer whose
-        # only traffic came from explorers): drop the image placeholder in that case.
+        # The image shows the most viewed item that has a static export. Grapher charts and mdim views both
+        # export a ".png" (for an mdim view, inserted before its query string); explorers don't, so they're
+        # skipped. This means that, when an explorer leads the list below, the image shows the highest-ranked
+        # grapher chart instead of entry #1. The eligible list may be empty (a producer whose only traffic came
+        # from explorers): drop the image placeholder in that case.
         df_with_image = df_charts_and_additional_exclusive[
             df_charts_and_additional_exclusive["url"].str.startswith(GRAPHERS_BASE_URL)
         ]

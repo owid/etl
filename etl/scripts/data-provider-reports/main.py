@@ -117,15 +117,20 @@ def main(force: bool, update_pdfs: bool) -> None:
             overwrite = False
             if report.exists:
                 if not force:
-                    log.warning(f"Report already exists for {producer} — skipping")
+                    log.warning(
+                        f"Report already exists for {producer} ({report.status}) — skipping. "
+                        "Use --update-pdfs to export a missing PDF from the existing Doc, or --force to rebuild."
+                    )
                     continue
                 overwrite = True
                 log.warning(f"Report already exists for {producer} — overwriting Doc and PDF in place (--force)")
 
             log.info(f"Creating report for {producer}")
+            # A same-named PDF found here is either from the Doc being replaced (--force) or a leftover of a Doc
+            # that no longer exists, so it is stale either way and must be re-exported.
             report.create_full_report(
                 overwrite=overwrite,
-                overwrite_pdf=overwrite,
+                overwrite_pdf=True,
                 grant_permissions=False,
                 notion_df=notion_table_period,
             )
