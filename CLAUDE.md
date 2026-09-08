@@ -138,7 +138,7 @@ Internal terms that recur across this guide, the skills, and the codebase:
 .venv/bin/etlr namespace/version/dataset --force --only # Force re-run
 ```
 
-Key flags: `--grapher/-g` runs `grapher://` upserts and every `viz://` step (chart, explorer, static, bespoke); `--export` runs the `export://` steps, which write to shared external destinations (R2, GitHub); `data://` steps need no flag. A step whose flag is missing is skipped (if it was the only step you asked for, `etlr` reports "No steps matched" and lists it among the "closest matches"). Other flags: `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
+Key flags: `--grapher/-g` runs `grapher://` upserts and every `viz://` step (chart, explorer, static, bespoke); `--export` runs the `export://` steps, which write to shared external destinations (R2, GitHub); `data://` steps need no flag. A step whose flag is missing is skipped; if it was the only step you asked for, `etlr` says which flag to pass and then lists the "closest matches". Other flags: `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
 
 **"The step completed" is not "the data is right".** After running a step for
 someone, report what came out of it: row count, year range, entities, and a few

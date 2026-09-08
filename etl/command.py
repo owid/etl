@@ -259,6 +259,21 @@ def main_cli(
             # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
             files_changed = get_changed_files(include_diff=False)
             global_changes = _global_checksum_inputs_changed(files_changed)
+            modified_steps = _modified_steps(includes=steps, exact_match=exact_match, files_changed=files_changed)
+
+            # `--modified` surfaces modified viz/export steps (chart, explorer, bespoke, export recipes) by
+            # design, but they're only buildable when their flag is passed (see construct_subdag).
+            # When a branch edits only such a recipe (e.g. a single `<explorer>.<key>.config.yml`),
+            # without this we would exclude it downstream and crash with "No steps matched".
+            # Enable the flag the modified steps need, so they actually rebuild. This applies whether
+            # or not the run is filtered below.
+            if not grapher and any(s.startswith(GRAPHER_FLAG_PREFIXES) for s in modified_steps):
+                grapher = True
+                click.echo("Detected modified viz:// step(s); enabling --grapher for this run.")
+            if not export and any(s.startswith(EXPORT_FLAG_PREFIXES) for s in modified_steps):
+                export = True
+                click.echo("Detected modified export:// step(s); enabling --export for this run.")
+
             if global_changes:
                 # These files aren't under etl/steps/ or snapshots/, so _modified_steps would see
                 # nothing changed - but DataStep.checksum_input() bakes pd.__version__ and
@@ -270,19 +285,10 @@ def main_cli(
                     "(no diff filter)."
                 )
             else:
-                steps = _modified_steps(includes=steps, exact_match=exact_match, files_changed=files_changed)
+                steps = modified_steps
                 if not steps:
                     click.echo("No steps modified relative to origin/master.")
                     return
-                # `--modified` surfaces modified viz steps (chart/explorer recipes) by design, but
-                # they're only buildable with --grapher. When a branch edits only such a recipe
-                # (e.g. a single `<explorer>.<key>.config.yml`), the modified set is viz-only;
-                # without this we would exclude it downstream and crash with "No steps matched".
-                # Enable --grapher (which also un-excludes the grapher deps the viz step needs) so
-                # the chart/explorer actually rebuilds.
-                if not grapher and any(s.startswith("viz://") for s in steps):
-                    grapher = True
-                    click.echo("Detected modified viz step(s); enabling --grapher for this run.")
                 click.echo(f"Restricting to {len(steps)} step(s) modified vs origin/master.")
                 # We matched modified catalog paths as substrings, so disable exact matching downstream.
                 exact_match = False
@@ -538,13 +544,12 @@ def construct_subdag(
     if not excludes:
         excludes = []
 
-    # Grapher steps and viz steps (charts, explorers, static, bespoke) write to the grapher DB
+    # Steps that write to the grapher DB (grapher:// upserts and viz:// steps) run only with --grapher;
+    # steps that write to external destinations (export://, i.e. R2 and GitHub) only with --export.
     if not grapher:
-        excludes.append("^(grapher|viz)://.*")
-
-    # Export steps (R2, GitHub)
+        excludes.append(_prefix_pattern(GRAPHER_FLAG_PREFIXES))
     if not export:
-        excludes.append("^export://.*")
+        excludes.append(_prefix_pattern(EXPORT_FLAG_PREFIXES))
 
     # Exclude private steps
     if not private:
@@ -554,12 +559,45 @@ def construct_subdag(
     subdag = filter_to_subgraph(dag, includes=includes, excludes=excludes, only=only, exact_match=exact_match)
 
     if not subdag:
-        # If no steps are found, the most likely case is that the step passed as argument was misspelled.
-        # Print a short error message, show a list of the closest matches, and exit.
+        # No steps found. Either the requested step exists but was skipped because its flag is
+        # missing, or (most likely) the argument was misspelled. Say which.
+        _explain_missing_flags(dag, includes, exact_match, grapher=grapher, export=export)
         _find_closest_matches(" ".join(orig_includes or []), dag)
         sys.exit(1)
 
     return subdag
+
+
+# Step types gated by each flag. grapher:// upserts and viz:// steps write to the grapher DB of the
+# targeted environment; export:// steps write to shared destinations (R2, GitHub).
+GRAPHER_FLAG_PREFIXES = ("grapher://", "viz://")
+EXPORT_FLAG_PREFIXES = ("export://",)
+
+
+def _prefix_pattern(prefixes: tuple[str, ...]) -> str:
+    return "^(?:" + "|".join(re.escape(p) for p in prefixes) + ")"
+
+
+def _explain_missing_flags(dag: DAG, includes: list[str], exact_match: bool, grapher: bool, export: bool) -> None:
+    """Tell the user which requested steps were skipped for lack of a flag, and which flag to pass."""
+    from etl.steps import graph_nodes
+
+    gated = []
+    if not grapher:
+        gated.append((GRAPHER_FLAG_PREFIXES, "writes to the grapher DB; pass --grapher to run it."))
+    if not export:
+        gated.append((EXPORT_FLAG_PREFIXES, "writes to an external destination (R2, GitHub); pass --export to run it."))
+    if exact_match:
+        requested = [step for step in includes if step in dag]
+    else:
+        patterns = [re.compile(p) for p in includes]
+        requested = sorted(step for step in graph_nodes(dag) if any(p.search(step) for p in patterns))
+    shown = 0
+    for step in requested:
+        for prefixes, explanation in gated:
+            if step.startswith(prefixes) and shown < 10:
+                print(f"`{step}` {explanation}")
+                shown += 1
 
 
 def run_steps(

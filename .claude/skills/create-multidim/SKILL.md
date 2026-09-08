@@ -282,7 +282,7 @@ Key fields for `config` in views or `common_views`:
 
 ## Troubleshooting
 
-**"No steps matched"**: Chart steps need the `--grapher` flag. Without it, they're skipped.
+**"No steps matched"**: Chart steps need the `--grapher` flag. Without it, they're skipped (etlr says which flag to pass).
 
 **Step not found in DAG**: Check that the entry is under the `steps:` key in the correct `dag/*.yml` file, and that the file is included from `dag/main.yml`.
 
