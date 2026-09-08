@@ -58,7 +58,7 @@ make format             # Format code with ruff
 make lint               # Lint and auto-fix with ruff
 make check-linting      # Check linting without fixing
 make check-formatting   # Check formatting without fixing
-make check-typing       # Type check with pyright
+make check-typing       # Type check with ty
 make unittest           # Run unit tests only
 make coverage           # Run tests with coverage report
 ```
@@ -87,11 +87,11 @@ The library follows a layered metadata architecture:
 
 ```
 Dataset (folder with index.json)
-├── metadata: DatasetMeta (title, description, sources, licenses)
+├── metadata: DatasetMeta (title, description, origins, licenses)
 └── Tables (feather/parquet/csv files)
     ├── metadata: TableMeta (table-level metadata)
     └── Variables (columns)
-        └── metadata: VariableMeta (unit, description, sources, etc.)
+        └── metadata: VariableMeta (unit, description, origins, etc.)
 ```
 
 ### Package Structure
@@ -122,7 +122,7 @@ owid/catalog/
 - **`tables.py`**: Table class with metadata-aware operations
 - **`indicators.py`**: Variable/Indicator class (pandas.Series with metadata)
 - **`datasets.py`**: Dataset container and serialization logic
-- **`meta.py`**: All metadata dataclasses (DatasetMeta, TableMeta, VariableMeta, Source, Origin, License)
+- **`meta.py`**: All metadata dataclasses (DatasetMeta, TableMeta, VariableMeta, Origin, License)
 - **`processing.py`**: Pandas-like functions that propagate metadata (concat, merge, melt, pivot)
 
 ### API Module (`owid.catalog.api`)
@@ -256,7 +256,7 @@ tb = pr.read_rda("data.rda")
 - Use fixtures from `conftest.py` for common test setup
 - Mock data generation utilities in `tests/mocking.py`
 - Test both functionality and metadata preservation
-- Run type checking with pyright - must pass before committing
+- Run type checking with ty - must pass before committing
 
 ## Dependencies
 
@@ -282,9 +282,11 @@ uv build
 # Package will be in dist/ directory
 ```
 
+Releases are **not** automatic: the version in `pyproject.toml` is bumped by hand, and pushing that bump to `master` is what triggers the PyPI publish. See [`DEVELOPMENT.md`](DEVELOPMENT.md) for the release checklist, versioning practice, and which checks actually cover this directory (the repo-root pre-commit hook does not).
+
 ## Configuration Files
 
-- **pyproject.toml**: Package dependencies, tool configuration (ruff, pyright, hatch)
+- **pyproject.toml**: Package dependencies, tool configuration (ruff, ty, hatch)
 - **Makefile**: Development command shortcuts (includes `../../default.mk`)
 - **.pre-commit-config.yaml**: Pre-commit hooks configuration
 
@@ -294,4 +296,4 @@ uv build
 - This library is experimental - APIs may change
 - Extends ruff configuration from parent `../../pyproject.toml`
 - Always run `make check` before committing changes
-- Type checking is mandatory - must pass pyright checks
+- Type checking is mandatory - must pass ty checks

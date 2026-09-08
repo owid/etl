@@ -1,6 +1,6 @@
 [![Build status](https://badge.buildkite.com/66cc67fc572120ca97b9ffff288d5d73cb33e019dd70323053.svg)](https://buildkite.com/our-world-in-data/owid-catalog-unit-tests)
 [![PyPI version](https://badge.fury.io/py/owid-catalog.svg)](https://badge.fury.io/py/owid-catalog)
-![](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg)
+![](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue.svg)
 
 # owid-catalog
 
@@ -73,7 +73,7 @@ This library is part of OWID's [ETL project](https://github.com/owid/etl), which
 
 ## Development
 
-You need Python 3.10+, `uv` and `make` installed. Clone the repo, then you can simply run:
+You need Python 3.11+, `uv` and `make` installed. Clone the repo, then you can simply run:
 
 ```
 # run all unit tests and CI checks
@@ -83,7 +83,44 @@ make test
 make watch
 ```
 
+Maintainer notes — how the version is bumped, how a release reaches PyPI, and which checks actually cover this directory — are in [`DEVELOPMENT.md`](DEVELOPMENT.md).
+
 ## Changelog
+
+### Unreleased
+Merged to `master` but not published yet — see [`DEVELOPMENT.md`](DEVELOPMENT.md) for how a release is cut.
+- Render metadata Jinja in a `SandboxedEnvironment`, so a producer-supplied value containing `<<` or `<%` cannot walk `__class__`/`__subclasses__` on whatever runs the ETL
+- Fail loudly on a character-exploded `description_key` (a markdown string that was iterated character by character): `Markdown` is now a `str` subclass that raises `TypeError` on iteration, alongside a new `validate_description_key_list()` sanity check
+- New `s3_utils.object_exists()` to check for an object without downloading it
+
+### `v1.2.4`
+- **Python support**
+  - Add Python 3.14, drop Python 3.10 (`requires-python = ">=3.11, <3.15"`)
+  - Drop the `typing_extensions` fallbacks for `Self`, `Required` and `NotRequired`
+- **`description_key` becomes free-form markdown**
+  - `VariableMeta.description_key` is now a markdown string
+  - A list of bullet points is still accepted (items may carry per-item Jinja) and is converted to a markdown list after rendering — the grapher only ever sees a string
+  - New `description_key_to_string()` in `owid.catalog.core.meta`, reproducing how the grapher rendered those lists before
+- **Display metadata**
+  - Add `display.timeInterval` (`day`, `week`, `month`, `quarter`, `year`, `decade`)
+  - Remove the deprecated `display.yearIsDay`
+
+### `v1.2.3`
+- `combine_indicators_processing_level` tolerates unrendered Jinja templates in `processing_level` instead of asserting on an unknown level — when a template is combined with a literal it overstates rather than understates the result, since `processing_level` feeds licensing downstream
+- `s3_utils.upload()` accepts `content_type` and `cache_control`
+- Catalog JSON-LD (`schema_org`): license and keyword fixes, `citation` dropped
+- Dependency bumps for security advisories
+
+### `v1.2.2`
+- Add `owners` to `DatasetMeta`
+- New `Dataset.update_metadata_from_dict()` and `yaml_metadata.update_metadata_from_dict()`, for callers that already hold parsed metadata rather than a YAML path (used by the Owl runner)
+- New `schema_org` module emitting schema.org JSON-LD for catalog datasets and tables, with follow-ups: stable short landing-page URLs, table descriptions filled from existing metadata, an explicit dataset description requirement, and unrendered Jinja templates kept out of the output
+- YAML variable checks accept a long-format base name as a match for pivoted `{base}__{dim}_{value}` columns, so a `long_to_wide` override block is no longer flagged as a typo
+- Republished to PyPI after the `ty` upgrade, with no functional change of its own
+
+### `v1.2.1`
+- Send `User-Agent: owid-catalog/<version> (python <x.y.z>)` on every outbound HTTP call, via a shared `requests.Session` in `owid.catalog.api.utils` (plus `STORAGE_OPTIONS` for the pandas reads that cannot take a session)
+- `prune_dict()` keeps explicitly-empty values for keys listed in `KEEP_IF_EMPTY`: `chartTypes: []` is a meaningful "render no chart-type toggles" override, not the same as an absent key
 
 ### `v1.2.0`
 - **Remove legacy `Source` metadata (origins only)**
