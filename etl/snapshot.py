@@ -1,3 +1,4 @@
+import datetime as dt
 import re
 import tempfile
 import time
@@ -22,8 +23,7 @@ from owid.catalog.core.meta import (
     TableMeta,
     pruned_json,
 )
-from owid.datautils import dataframes
-from owid.datautils.io import decompress_file
+from owid.datautils.io import decompress_file, df_to_file
 from owid.repack import to_safe_types
 from tenacity import Retrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
@@ -401,7 +401,7 @@ class Snapshot:
             self.path.write_bytes(Path(filename).read_bytes())
         elif data is not None:
             # Copy dataframe to snapshots data folder.
-            dataframes.to_file(data, file_path=self.path)
+            df_to_file(data, file_path=self.path)
         elif self.metadata.origin and self.metadata.origin.url_download:
             # Create snapshot by downloading data from a URL with retry logic.
             for attempt in range(1, download_retries + 1):
@@ -689,6 +689,22 @@ class Snapshot:
             return tb
 
 
+def _dates_as_strings(value: Any) -> Any:
+    """Recursively coerce dates to strings, the way the metadata classes store them.
+
+    `yaml.safe_load` parses an unquoted `date_accessed: 2026-03-20` into a `datetime.date`, while
+    `Origin` keeps its date fields as ISO strings. Comparing a freshly loaded .dvc against
+    `SnapshotMeta._meta_to_dict()` without this would always differ on those fields.
+    """
+    if isinstance(value, dict):
+        return {k: _dates_as_strings(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_dates_as_strings(v) for v in value]
+    if isinstance(value, dt.date):
+        return str(value)
+    return value
+
+
 @pruned_json
 @dataclass
 class SnapshotMeta(MetaBase):
@@ -817,8 +833,9 @@ class SnapshotMeta(MetaBase):
             # NOTE: meta does not have `outs` field, it's reset when saving
             meta = self._meta_to_dict()
 
-            # No change, keep the file as is
-            if yaml["meta"] == meta:
+            # No change, keep the file as is. Rewriting would reformat the whole file (re-wrapping
+            # long lines, re-indenting `outs`) for no reason.
+            if _dates_as_strings(yaml["meta"]) == _dates_as_strings(meta):
                 return
 
             # Otherwise update the file
