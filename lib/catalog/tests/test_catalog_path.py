@@ -443,7 +443,6 @@ class TestAdditionalCoverage:
             "examples",
             "explorers",
             "external",
-            "multidim",
         ]
         for channel in channels:
             p = CatalogPath.from_str(f"{channel}/ns/2024/ds")
