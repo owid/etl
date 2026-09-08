@@ -430,7 +430,6 @@ def format_slack(
     ]
     # What the run cost, in the footer. It is the sweep's actual model spend, so a day whose
     # charts were all already reviewed reads as $0.00 — the cache doing its job, not an error.
-    # The gating --eval run is a separate invocation and is not counted here.
     spend = f"${cost:,.2f}" if cost >= 0.01 else "<$0.01"
     lead.append(
         "_Posted by `etl chart-critic` — an LLM reading each chart, its metadata and its values. "

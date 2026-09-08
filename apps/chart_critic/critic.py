@@ -43,14 +43,14 @@ from apps.chart_critic.bundle import Bundle
 
 # Tested defaults. The flash tier is enough: on the SDG 16.2.2 case both flash and flash-lite
 # identified the swap from the render alone, and flash-lite did it for ~$0.0002 a call.
-DEFAULT_MODEL = "google:gemini-3.7-flash"
+DEFAULT_MODEL = "google:gemini-3.8-flash"
 CHEAP_MODEL = "google:gemini-3.1-flash-lite"
 
 # Fallback prices in $ per million tokens (input, output), from Google's published rates.
 # `genai_prices` (used by apps.utils.llms.costs) does not carry these models yet; drop an entry
-# here once it does, and note that gemini-3.7-flash doubles to 1.50/7.50 on 2027-01-01.
+# here once it does, and note that gemini-3.8-flash doubles to 1.50/7.50 on 2027-01-01.
 FALLBACK_PRICES = {
-    "google:gemini-3.7-flash": (0.75, 3.75),
+    "google:gemini-3.8-flash": (0.75, 3.75),
     "google:gemini-3.1-flash-lite": (0.10, 0.40),
 }
 

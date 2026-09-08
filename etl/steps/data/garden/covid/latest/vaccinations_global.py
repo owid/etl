@@ -200,6 +200,13 @@ def _interp_ffill_fillna(tb: Table, columns: list[str], entity_col: str = "count
         entity_col=entity_col,
         time_col=time_col,
         time_mode="none",
+        # Only fill gaps *between* a country's own observations. `interpolate_table` defaults to
+        # `limit_direction="both"`, which back-propagates a country's first reported value to the
+        # start of the (global) date range -- so China's first cumulative report of 777M people fully
+        # vaccinated (2021-08-12) was being carried back to 2020-12-02 and summed into the World
+        # aggregate, which opened at 10.1% before anyone had been vaccinated anywhere. Leading NaNs
+        # belong to the `.fillna(0)` below, trailing ones to the `.ffill()`.
+        limit_area="inside",
     )
 
     tb.loc[:, columns] = tb.groupby("country")[columns].ffill().fillna(0)  # ty: ignore
