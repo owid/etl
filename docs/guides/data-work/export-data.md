@@ -8,12 +8,14 @@ icon: lucide/forward
 
 Viz steps (`viz://`) produce visualizations and export steps (`export://`) ship files to external destinations. They are defined in the `etl/steps/viz` and `etl/steps/export` directories and have a similar structure to regular steps. Viz steps are run with `--grapher`; export steps write to R2 or GitHub and are run with `--export`.
 
-The channel of a viz step says what it produces, and its output goes to the gitignored `viz/<channel>/...` folder:
+The channel of a viz step says what it produces:
 
 - `viz://chart/`: a chart or an MDIM (a chart is just an MDIM with no dimensions), upserted to the grapher DB. A chart step can be a bare `<name>.config.yml` with no Python file.
 - `viz://explorer/`: an explorer, upserted to the grapher DB.
 - `viz://static/`: a static image (PNG/SVG) rendered with matplotlib next to the recipe and committed.
 - `viz://bespoke/`: the data feed of a bespoke interactive visualization, uploaded to R2.
+
+Chart and explorer steps also write their expanded config to the gitignored `viz/<channel>/...` folder, like `data/` for data steps.
 
 ```bash
 etlr viz://explorer/minerals/latest/minerals --grapher
