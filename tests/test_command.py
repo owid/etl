@@ -304,13 +304,14 @@ def test_construct_subdag_explains_steps_skipped_for_missing_flag(capsys):
         cmd.construct_subdag(full_dag, includes=["viz://chart/happiness"])
     captured = capsys.readouterr()
     assert (
-        "`viz://chart/happiness/latest/happiness` writes to the grapher DB; pass --grapher to run it." in captured.out
+        "`viz://chart/happiness/latest/happiness` is skipped without --grapher; pass it to run this step."
+        in captured.out
     )
 
     with pytest.raises(SystemExit):
         cmd.construct_subdag(full_dag, includes=["export://s3/happiness/latest/happiness"], exact_match=True)
     captured = capsys.readouterr()
     assert (
-        "`export://s3/happiness/latest/happiness` writes to an external destination (R2, GitHub); pass --export to run it."
+        "`export://s3/happiness/latest/happiness` is skipped without --export; pass it to run this step."
         in captured.out
     )
