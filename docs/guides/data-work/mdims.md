@@ -88,7 +88,7 @@ views:
 This example is fairly simple, and is entirely manual. The corresponding step script could simply look like:
 
 ```python
-from etl.collection import multidim
+from etl.collection import expand_config
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -96,9 +96,9 @@ paths = PathFinder(__file__)
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config(fname)
+    config = paths.load_collection_config(fname)
     # Create MDIM object
-    mdim = paths.create_mdim(config)
+    mdim = paths.create_collection(config)
     # Save to DB
     mdim.save()
 ```
@@ -145,7 +145,7 @@ In this example, we note that we can group together indicators from any dataset.
     Proper documentation of all available options will be available soon.
 
 ### Automated MDIMs
-MDIMs are very suitable for those datasets that have a lot of dimensions in them. For these, one can leverage functions like `etl.collection.multidim.expand_config`, which programmatically generates all possible views from an indicator (or multiple ones) in a table.
+MDIMs are very suitable for those datasets that have a lot of dimensions in them. For these, one can leverage functions like `etl.collection.expand_config`, which programmatically generates all possible views from an indicator (or multiple ones) in a table.
 
 !!! question "What does it mean for a dataset to have dimensions?"
     Datasets with dimensions are those that have additional index (e.g. `age`) in Garden, beyond the standard ones (`year` or `date`, and `country`).
@@ -212,10 +212,10 @@ def run() -> None:
     # Process data.
     #
     # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config()
+    config = paths.load_collection_config()
 
     # Create views.
-    config["views"] = multidim.expand_config(
+    config["views"] = expand_config(
         tb_annual,
         dimensions=["frequency", "source", "unit"],
         additional_config={"chartTypes": ["LineChart", "DiscreteBar"], "hasMapTab": True, "tab": "map"},
@@ -224,12 +224,12 @@ def run() -> None:
     #
     # Save outputs.
     #
-    mdim = paths.create_mdim(config=config)
+    mdim = paths.create_collection(config=config)
     mdim.save()
 
 ```
 
-You can also combine manually defined views with generated ones. See the `etl.collection.multidim` module for available helper functions or refer to examples from `etl/steps/viz/chart/`.
+You can also combine manually defined views with generated ones. See the `etl.collection` module for available helper functions or refer to examples from `etl/steps/viz/chart/`.
 
 
 ### Defining view configurations
@@ -309,7 +309,7 @@ Some key differences are:
 - **View config has different fields:** MDIMs rely on our standard grapher configs. Instead, Explorers rely on a custom configuration. Fields available are equivalent to the columns that are available in the `grapher` table of a legacy explorer config in admin.
 - **Indicator display config**: Explorers also rely on a custom configuration. Fields available are equivalent to the columns that are available in the `columns` table of a legacy explorer config in admin.
 
-Also, instead of relying on `etl.collection.multidim`, you should instead use the functions from `etl.collection.explorer`.
+The same helpers work for explorers: pass `explorer=True` to `paths.create_collection`.
 
 !!! note "There is no schema for explorers"
 
@@ -321,11 +321,7 @@ Also, instead of relying on `etl.collection.multidim`, you should instead use th
 - [:fontawesome-brands-github:  Climate change](https://github.com/owid/etl/blob/master/etl/steps/viz/explorer/climate/latest/climate_change.config.yml): Manually crafted.
 
 ### How are explorers saved in admin?
-While MDIMs are pushed to our database, explorers need to go through the old legacy channel of `owid-content` repository. Hence, when calling `Explorer.save`, the configuration is re-shaped and stored as a TSV file in `owid-content`.
-
-
-!!! info "Creating explorers on staging servers"
-    Explorers can be created or edited on staging servers and then manually migrated to production. Each staging server creates a branch in the `owid-content` repository. Editing explorers in Admin or running the `create_explorer` function pushes changes to that branch. Once the PR is merged, the branch gets pushed to the `owid-content` repository (not to the `master` branch, but its own branch). You then need to manually create a PR from that branch and merge it into `master`.
+Like MDIMs, explorers are upserted to the grapher DB when calling `.save()`. Staging servers write to their own DB, and production is updated when the PR is merged.
 
 ## MDIM pending features
 For better reference, read [:fontawesome-brands-github: this issue](https://github.com/owid/etl/issues/3992), or follow the latest news in `#proj-explorers-mdims-convergence`.
