@@ -1159,3 +1159,8 @@ steps:
     - data://garden/cardiovascular_diseases/2025-10-21/esc:
       - data://meadow/cardiovascular_diseases/2025-10-21/esc:
         - snapshot://cardiovascular_diseases/2025-10-21/esc.csv
+  # archived; last active in 98daa87b24a7 on 2026-09-02
+  data://grapher/health/2024-08-23/eurostat_cancer:
+    - data://garden/health/2024-08-23/eurostat_cancer:
+      - data://meadow/health/2024-08-23/eurostat_cancer:
+        - snapshot://health/2024-08-23/eurostat_cancer.csv

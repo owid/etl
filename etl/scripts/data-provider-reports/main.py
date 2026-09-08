@@ -1,5 +1,6 @@
 """Run create_report_for_data_producer for all providers listed in providers.yml."""
 
+import sys
 from pathlib import Path
 
 import click
@@ -39,8 +40,8 @@ def _get_aliases(entry: dict) -> list[str]:
     is_flag=True,
     default=False,
     help="Run all producers even if a report already exists for them, instead of skipping. "
-    "NOTE: create_full_report always copies a fresh doc from the template, so this creates an additional "
-    "report alongside the existing one rather than overwriting it.",
+    "The existing Google Doc and PDF are overwritten in place under the same name (the old Doc is "
+    "replaced once the new one is built).",
 )
 @click.option(
     "--update-pdfs",
@@ -66,6 +67,7 @@ def main(force: bool, update_pdfs: bool) -> None:
 
     if update_pdfs:
         log.info(f"Updating PDFs for {len(providers)} providers — {period} {year}")
+        failed_producers: list[str] = []
         for entry in providers:
             producer: str = entry["name"]
             aliases = _get_aliases(entry)
@@ -82,11 +84,18 @@ def main(force: bool, update_pdfs: bool) -> None:
                 report.generate_links()
             except Exception as e:
                 log.error(f"Failed to update PDF for {producer}: {e}")
+                failed_producers.append(producer)
                 continue
 
         log.info(
             f"Done. Files can be found in the Google Drive folder: https://drive.google.com/drive/folders/{DATA_PRODUCER_REPORT_FOLDER_ID}"
         )
+        if failed_producers:
+            log.error(
+                f"Failed to update PDFs for {len(failed_producers)} of {len(providers)} providers: "
+                f"{', '.join(failed_producers)}"
+            )
+            sys.exit(1)
         return
 
     log.info(f"Running reports for {len(providers)} providers — {period} {year}")
@@ -97,6 +106,7 @@ def main(force: bool, update_pdfs: bool) -> None:
     # Fetch impact highlights from Notion already filtered to this run's period.
     notion_table_period = get_notion_table_period(min_date=min_date, max_date=max_date)
 
+    failed_producers: list[str] = []
     for entry in providers:
         producer: str = entry["name"]
         aliases = _get_aliases(entry)
@@ -104,14 +114,21 @@ def main(force: bool, update_pdfs: bool) -> None:
         try:
             report = Report(producer, period, year, aliases=aliases)
 
+            overwrite = False
             if report.exists:
                 if not force:
                     log.warning(f"Report already exists for {producer} — skipping")
                     continue
-                log.warning(f"Report already exists for {producer} — creating an additional one anyway (--force)")
+                overwrite = True
+                log.warning(f"Report already exists for {producer} — overwriting Doc and PDF in place (--force)")
 
             log.info(f"Creating report for {producer}")
-            report.create_full_report(overwrite_pdf=False, grant_permissions=False, notion_df=notion_table_period)
+            report.create_full_report(
+                overwrite=overwrite,
+                overwrite_pdf=overwrite,
+                grant_permissions=False,
+                notion_df=notion_table_period,
+            )
 
             # notion_table_period is already filtered to this run's period, so this only filters by producer.
             highlights_df = get_impact_highlights(
@@ -136,11 +153,19 @@ def main(force: bool, update_pdfs: bool) -> None:
 
         except Exception as e:
             log.error(f"Failed to create report for {producer}: {e}")
+            failed_producers.append(producer)
             continue
 
     log.info(
         f"Done. Files can be found in the Google Drive folder: https://drive.google.com/drive/folders/{DATA_PRODUCER_REPORT_FOLDER_ID}"
     )
+
+    if failed_producers:
+        log.error(
+            f"Failed to create reports for {len(failed_producers)} of {len(providers)} providers: "
+            f"{', '.join(failed_producers)}"
+        )
+        sys.exit(1)
 
 
 if __name__ == "__main__":

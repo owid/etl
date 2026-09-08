@@ -100,12 +100,27 @@ class GoogleDrive:
             The authenticated credentials object.
 
         """
-        # Check if the token file exists and load the credentials from it.
+        credentials = None
+
         # Load the cached OAuth token if it exists.
         if TOKEN_PATH.exists():
             with TOKEN_PATH.open("rb") as token_file:
                 credentials = pickle.load(token_file)
-        else:
+
+            # A token cached under a narrower set of scopes does not grant permissions added later (e.g.
+            # the widening from drive.file to full drive access). Loading it blindly would leave the user
+            # unable to reach the shared folder/template with no obvious cause, so discard it and force a
+            # fresh consent when it is missing any currently required scope.
+            granted_scopes = set(getattr(credentials, "scopes", None) or [])
+            missing_scopes = set(self.SCOPES) - granted_scopes
+            if missing_scopes:
+                log.warning(
+                    "Cached Google token is missing required scopes; re-running OAuth flow to re-authorize.",
+                    missing_scopes=sorted(missing_scopes),
+                )
+                credentials = None
+
+        if credentials is None:
             if not CLIENT_SECRET_FILE.exists():
                 log.error("Follow instructions in etl/google.py to create a client_secret.json file.")
                 raise FileNotFoundError(f"Client secret file not found at {CLIENT_SECRET_FILE}.")
@@ -206,6 +221,18 @@ class GoogleDrive:
 
         copied_file = self.drive_service.files().copy(fileId=file_id, body=body).execute()
         return copied_file["id"]
+
+    def delete_file(self, file_id: str) -> None:
+        """
+        Permanently delete a file from Google Drive.
+
+        Parameters
+        ----------
+        file_id : str
+            ID of the file to delete.
+
+        """
+        self.drive_service.files().delete(fileId=file_id).execute()
 
     def list_files_in_folder(self, folder_id: str) -> list[dict]:
         """
