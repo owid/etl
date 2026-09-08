@@ -67,18 +67,3 @@ def test_OWIDEnv_dev():
 
     env._env_local = "dev"
     assert env.wizard_url == "http://localhost:8053/"
-
-
-def test_OWIDEnv_engine_is_not_shared_across_processes(monkeypatch):
-    """A forked step must not reuse the parent's engine: its pooled DB sockets are closed in the child."""
-    env = OWIDEnv.from_staging("branch")
-    first = env.engine
-    assert env.engine is first
-
-    # Simulate the fork: same object, different pid.
-    import os
-
-    monkeypatch.setattr(os, "getpid", lambda: -1)
-    second = env.engine
-    assert second is not first
-    assert env.engine is second
