@@ -33,7 +33,7 @@
       "editor/title": [
         {
           "command": "chart-preview.open",
-          "when": "resourceFilename =~ /\\.chart\\.yml$/ || resourceDirname =~ /export[\\/\\\\]multidim/ && resourceFilename =~ /\\.(config\\.yml|py)$/ || resourceDirname =~ /steps[\\/\\\\]data[\\/\\\\]/ && resourceFilename =~ /\\.py$/",
+          "when": "resourceFilename =~ /\\.chart\\.yml$/ || resourceDirname =~ /steps[\\/\\\\]viz[\\/\\\\]chart/ && resourceFilename =~ /\\.(config\\.yml|py)$/ || resourceDirname =~ /steps[\\/\\\\]data[\\/\\\\]/ && resourceFilename =~ /\\.py$/",
           "group": "navigation"
         }
       ]
