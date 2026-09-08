@@ -1093,10 +1093,13 @@ def make_table_with_dummies(tb: Table, people_living_in: bool = False) -> Table:
             "has_na_once_expanded": True,
         },
         # "Ever had a woman leader", for each of the three offices, counting all women and then only
-        # the democratically elected ones. Built as a comprehension so the six stay named alike.
+        # the democratically elected ones. Generated rather than written out so the six cannot drift
+        # apart. NOTE: the democratically elected variant is suffixed `_dem` at country level but
+        # `_demelect` in the counts; that mismatch is inherited from the published chief-executive
+        # indicators and is kept so they hold on to their variable IDs.
         *[
             {
-                "name": f"wom_{office}_ever{suffix}",
+                "name": f"wom_{office}_ever{suffix_indicator}",
                 "name_new": f"num_countries_wom_{office}_ever{suffix_count}",
                 "values_expected": {
                     "0": "no",
@@ -1106,7 +1109,7 @@ def make_table_with_dummies(tb: Table, people_living_in: bool = False) -> Table:
                 "has_na_once_expanded": True,
             }
             for office in OFFICES_EVER
-            for suffix, suffix_count in [("", ""), ("_dem", "_demelect")]
+            for suffix_indicator, suffix_count in [("", ""), ("_dem", "_demelect")]
         ],
     ]
 
