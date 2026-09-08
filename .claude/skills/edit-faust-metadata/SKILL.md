@@ -277,7 +277,7 @@ Scripts (shared helpers in `scripts/_common.py`: grapher-channel metadata loader
 
 Rebuilding the MDim `.config.json` is done via `etlr <mdim> --grapher --private` — there is no DB-bypass helper. Change detection handles the common case: nothing changed → ~2 s; garden `.meta.yml`, garden data, or MDim yaml/py changed → etlr rebuilds only the affected steps.
 
-Do **not** add `--grapher` unless you specifically need to re-upload indicator data/metadata to MySQL — it triggers a `grapher://grapher/<dataset>` upload step that can take ~50 s per dataset and isn't needed for the report (the script reads metadata directly from the local grapher-channel feather files). Do **not** add `--only` when you want garden/MDim edits to take effect — it skips upstream rebuilds by design; use `--only --force` only to re-run just the MDim step without touching anything upstream.
+`--grapher` is required (a `viz://chart` step writes to the grapher DB, so without the flag it is skipped); it also pulls in the `grapher://grapher/<dataset>` upload steps of its inputs, which can take ~50 s per dataset when they are dirty, but change detection skips them when nothing changed. Do **not** add `--only` when you want garden/MDim edits to take effect — it skips upstream rebuilds by design; use `--only --force` only to re-run just the MDim step without touching anything upstream.
 
 ### Fields reported
 

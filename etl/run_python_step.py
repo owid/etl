@@ -26,7 +26,7 @@ def main(uri: str, dest_dir: str, ipdb: bool | None) -> None:
 
     step_type, path = uri.split("://", 1)
 
-    allowed_step_types = ["data", "data-private", "export"]
+    allowed_step_types = ["data", "data-private", "export", "viz"]
     if step_type not in allowed_step_types:
         raise ValueError(f"Step type must be one of {allowed_step_types}, not {step_type}")
 

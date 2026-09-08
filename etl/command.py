@@ -259,6 +259,27 @@ def main_cli(
             # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
             files_changed = get_changed_files(include_diff=False)
             global_changes = _global_checksum_inputs_changed(files_changed)
+            modified_steps = _modified_steps(includes=steps, exact_match=exact_match, files_changed=files_changed)
+
+            # `--modified` surfaces modified viz/export steps (chart, explorer, bespoke, export recipes) by
+            # design, but they're only buildable when the flag for their destination is passed.
+            # When a branch edits only such a recipe (e.g. a single `<explorer>.<key>.config.yml`),
+            # without this we would exclude it downstream and crash with "No steps matched".
+            # Enable the flag for each destination the modified steps write to (grapher DB, external
+            # service), so the viz/export step actually rebuilds. This applies whether or not the run
+            # is filtered below.
+            from etl.steps import Destination, step_destination
+
+            destinations = {step_destination(s) for s in modified_steps if "://" in s}
+            if not grapher and Destination.GRAPHER_DB in destinations:
+                grapher = True
+                click.echo("Detected modified step(s) writing to the grapher DB; enabling --grapher for this run.")
+            if not export and Destination.EXTERNAL in destinations:
+                export = True
+                click.echo(
+                    "Detected modified step(s) writing to external destinations; enabling --export for this run."
+                )
+
             if global_changes:
                 # These files aren't under etl/steps/ or snapshots/, so _modified_steps would see
                 # nothing changed - but DataStep.checksum_input() bakes pd.__version__ and
@@ -270,27 +291,10 @@ def main_cli(
                     "(no diff filter)."
                 )
             else:
-                steps = _modified_steps(includes=steps, exact_match=exact_match, files_changed=files_changed)
+                steps = modified_steps
                 if not steps:
                     click.echo("No steps modified relative to origin/master.")
                     return
-                # `--modified` surfaces modified viz/export steps (chart, explorer, bespoke, export recipes) by
-                # design, but they're only buildable when the flag for their destination is passed.
-                # When a branch edits only such a recipe (e.g. a single `<explorer>.<key>.config.yml`),
-                # without this we would exclude it downstream and crash with "No steps matched".
-                # enable the flag for each destination the modified steps write to (grapher DB, external
-                # service), so the viz/export step actually rebuilds.
-                from etl.steps import Destination, step_destination
-
-                destinations = {step_destination(s) for s in steps if "://" in s}
-                if not grapher and Destination.GRAPHER_DB in destinations:
-                    grapher = True
-                    click.echo("Detected modified step(s) writing to the grapher DB; enabling --grapher for this run.")
-                if not export and Destination.EXTERNAL in destinations:
-                    export = True
-                    click.echo(
-                        "Detected modified step(s) writing to external destinations; enabling --export for this run."
-                    )
                 click.echo(f"Restricting to {len(steps)} step(s) modified vs origin/master.")
                 # We matched modified catalog paths as substrings, so disable exact matching downstream.
                 exact_match = False

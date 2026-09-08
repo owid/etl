@@ -7,13 +7,13 @@ Usage:
 Accepts:
     - Chart slug:           population-density, life-expectancy
     - Mdim slug:            energy/latest/energy_prices#energy_prices
-    - Export multidim path: etl/steps/export/multidim/energy/latest/energy_prices.config.yml
+    - Viz chart path:        etl/steps/viz/chart/energy/latest/energy_prices.config.yml
     - Chart file path:      etl/steps/graph/covid/latest/covid-cases.chart.yml
 
 Examples:
     .venv/bin/python .claude/skills/check-chart-preview/get_staging_url.py life-expectancy
     .venv/bin/python .claude/skills/check-chart-preview/get_staging_url.py energy/latest/energy_prices#energy_prices
-    .venv/bin/python .claude/skills/check-chart-preview/get_staging_url.py etl/steps/export/multidim/energy/latest/energy_prices.config.yml
+    .venv/bin/python .claude/skills/check-chart-preview/get_staging_url.py etl/steps/viz/chart/energy/latest/energy_prices.config.yml
 """
 
 import re
@@ -36,11 +36,11 @@ def get_container_name(branch: str) -> str:
     return container.rstrip("-")
 
 
-def parse_export_multidim(file_path: str) -> str:
-    """Parse export/multidim path → staging URL path."""
-    m = re.search(r"export/multidim/(.+?)\.(?:config\.yml|py)$", file_path)
+def parse_viz_chart(file_path: str) -> str:
+    """Parse viz/chart step path → staging URL path."""
+    m = re.search(r"viz/chart/(.+?)\.(?:config\.yml|py)$", file_path)
     if not m:
-        raise ValueError(f"Cannot parse export multidim path: {file_path}")
+        raise ValueError(f"Cannot parse viz chart path: {file_path}")
     step_path = m.group(1)
     short_name = step_path.split("/")[-1]
     catalog_path = f"{step_path}#{short_name}"
@@ -93,8 +93,8 @@ def main() -> None:
     arg = sys.argv[1]
     container = get_container_name(get_git_branch())
 
-    if "export/multidim/" in arg:
-        url_path = parse_export_multidim(arg)
+    if "viz/chart/" in arg:
+        url_path = parse_viz_chart(arg)
     elif arg.endswith(".chart.yml"):
         url_path = parse_chart_yml(arg)
     else:
