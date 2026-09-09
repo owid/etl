@@ -30,7 +30,7 @@ tables:
         title: Crop production
         description_short: Domestic production of primary crops.
         description_key:
-          - Primary crops are the harvested commodities: cereals, roots and tubers, sugar crops, pulses, nuts, oil crops (including oil palm fruit), vegetables, fruit, stimulants and spices, plus cotton seed.
+          - "Primary crops are the harvested commodities: cereals, roots and tubers, sugar crops, pulses, nuts, oil crops (including oil palm fruit), vegetables, fruit, stimulants and spices, plus cotton seed."
           - Products made from them (flour, oils, sugar, alcoholic beverages) are not included here; their production is netted against processing.
       imports:
         title: Imports
