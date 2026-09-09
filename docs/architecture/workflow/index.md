@@ -7,7 +7,7 @@ tags:
 
 We have designed an ETL (Extract, Transform, Load) system that allows us to manage the entire lifecycle of data, from ingestion to publication.
 
-There are three main types of ETL steps: snapshots (ingest data from source), data steps (process and curate data), and export steps (make data available to other parts of the system). We elaborate on these below.
+There are four main types of ETL steps: snapshots (ingest data from source), data steps (process and curate data), viz steps (produce visualizations: charts, explorers, static images) and export steps (make data available to other parts of the system). We elaborate on these below.
 
 ## Five stages
 
@@ -239,24 +239,27 @@ In principle, a Grapher step only loads a single garden step.
 
 Note that the diagram shows a final step outside of the ETL. This is when the `grapher://` step is executed, and takes data from the ETL (from the etl `garden` step) and imports it to our database.
 
-## Export steps
+## Viz and export steps
 
-Sometimes we want to perform an action instead of creating a dataset. For instance, we might want to create a TSV file for an explorer, commit a CSV to a GitHub repository, or create a config for a multi-dimensional indicator. This is where the `Export` step comes in.
+Sometimes we want to perform an action instead of creating a dataset. For instance, we might want to create the config of a chart or a multi-dimensional indicator, create an explorer, render a static image, or commit a CSV to a GitHub repository. This is where the `viz://` and `export://` steps come in.
 
-Export steps are used to perform an action on an already created dataset. This action typically implies making the data available to other parts of the system. There are different types of export steps:
+A step's type says what it produces. Viz steps produce visualizations, and their channel says which kind:
 
-- **Explorers**: Create a TSV file for a data explorer.
-- **Multi-dimensional indicators** (Mdim): Create a configuration for a multi-dimensional indicator.
-- **Export to GitHub**: Commit a dataset to a GitHub repository.
+- **Charts and multi-dimensional indicators** (`viz://chart/`): Create the configuration of a chart or an MDIM and upsert it to the grapher DB. Run with `--grapher`.
+- **Explorers** (`viz://explorer/`): Create a data explorer and upsert it to the grapher DB. Run with `--grapher`.
+- **Static images** (`viz://static/`): Render a PNG/SVG with matplotlib next to the recipe. Run with `--grapher`, like every other viz step.
+- **Bespoke visualizations** (`viz://bespoke/`): Produce the data feed of a bespoke interactive visualization (currently uploaded to R2). Run with `--grapher`, like every other viz step.
 
-Export steps should be used after the data has been processed and is ready to be used (post-Garden).
+Export steps ship files to an external destination, e.g. **Export to GitHub** (`export://github/`) commits a dataset to a GitHub repository, and `export://s3/` uploads files to R2. Run with `--export`.
 
-!!! note "Learn more about [export steps](../../guides/data-work/export-data.md)"
+Both kinds of steps should be used after the data has been processed and is ready to be used (post-Garden).
+
+!!! note "Learn more about [viz and export steps](../../guides/data-work/export-data.md)"
 
 ### MDIMs and explorers
 !!! warning "This space is very new and in development"
 
-MDIMs (`export://multidim/`) and explorers (`export://explorers/`) are Grapher charts expanded with additional functionalities to facilitate exploration, such as dynamic entity filters or customizable menus. They are usually powered by indicators from OWID's Grapher database.
+MDIMs (`viz://chart/`) and explorers (`viz://explorer/`) are Grapher charts expanded with additional functionalities to facilitate exploration, such as dynamic entity filters or customizable menus. They are usually powered by indicators from OWID's Grapher database.
 
 In ETL, we define these by grouping indicators together into "collections". These collections are then upserted to the database to power explorers and multidims (collection of charts). Having multidim and explorer steps allows us to properly track dependencies and ensure that the data is up-to-date.
 

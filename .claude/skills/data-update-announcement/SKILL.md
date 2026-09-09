@@ -113,7 +113,7 @@ and paste in one go, so posting it first settles the question by default instead
 the question only when no post is being drafted (a cooldown decline needs no image), or when the
 update is a **static-viz refresh** — there the route is already settled, because
 [`/create-static-viz`](../create-static-viz/SKILL.md) hands its viz to `/create-figma-chart`
-itself. Settled is not delivered, though: the `export://static_viz` PNG is a *pre-Figma*
+itself. Settled is not delivered, though: the `viz://static` PNG is a *pre-Figma*
 artifact, so finish through the designed route's ending below — the approved frame's PNG, then
 upload, alt text, paste back. **A map is not an exception**: it takes the same two routes as any
 other chart. The designed route just carries extra map guidance — `/create-figma-chart` →

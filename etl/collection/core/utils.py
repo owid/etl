@@ -92,6 +92,10 @@ def create_collection_from_config(
     # Edit views
     process_views(c, dependencies=dependencies)
 
+    # Require a schema pin before `validate_schema()`, which also enforces it (`required` in
+    # multidim-schema.json) but only reports the missing key — not how to fill it in.
+    c.validate_grapher_schema_pinned()
+
     # Validate config
     if validate_schema:
         c.validate_schema()

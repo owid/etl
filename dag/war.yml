@@ -55,7 +55,7 @@ steps:
     - data://garden/war/2026-06-10/ucdp
 
   # UCDP (+preview)
-  export://multidim/war/latest/ucdp:
+  viz://chart/war/latest/ucdp:
     - data://grapher/war/2026-06-10/ucdp
     - data://grapher/war/latest/ucdp_preview:
         - data://garden/war/latest/ucdp_preview:
@@ -84,7 +84,7 @@ steps:
     - data://garden/war/2025-06-16/ucdp_prio
 
   # UCDP/PRIO
-  export://multidim/war/latest/ucdp_prio:
+  viz://chart/war/latest/ucdp_prio:
     - data://grapher/war/2026-06-10/ucdp_prio:
         - data://garden/war/2026-06-10/ucdp_prio:
             - data://garden/war/2026-06-10/ucdp
@@ -122,7 +122,7 @@ steps:
         - data://garden/countries/2023-09-29/cow_ssm
 
   # Mars
-  export://multidim/war/latest/mars:
+  viz://chart/war/latest/mars:
     - data://grapher/war/2023-09-21/mars:
         - data://garden/war/2023-09-21/mars:
             - data://meadow/war/2023-09-21/mars:
@@ -197,12 +197,12 @@ steps:
             - snapshot://war/2026-05-13/nuclear_weapons_inventories.csv
 
   # Countries in Conflict explorer.
-  export://explorers/war/latest/countries_in_conflict_data:
+  viz://explorer/war/latest/countries_in_conflict_data:
     - data://grapher/war/2026-06-10/ucdp
 
   # Conflict Data Source explorer — single config covering all seven data sources
   # via a leading `data_source` dropdown.
-  export://explorers/war/latest/conflict_data_source:
+  viz://explorer/war/latest/conflict_data_source:
     - data://grapher/war/2023-09-21/cow
     - data://grapher/war/2023-09-21/cow_mid
     - data://grapher/war/2023-09-21/mars
@@ -213,8 +213,8 @@ steps:
 
   # Conflict explorer — same view set as conflict_data_source, re-ordered with
   # `conflict_type` as the primary dropdown and `data_source` demoted.
-  export://explorers/war/latest/conflict_data:
-    - export://explorers/war/latest/conflict_data_source
+  viz://explorer/war/latest/conflict_data:
+    - viz://explorer/war/latest/conflict_data_source
     - data://grapher/war/2023-09-21/cow
     - data://grapher/war/2023-09-21/cow_mid
     - data://grapher/war/2023-09-21/mars

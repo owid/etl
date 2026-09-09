@@ -91,7 +91,7 @@ jobs:
           TITLE="New grapher schema version published upstream"
           EXISTING=$(gh issue list --search "\"$TITLE\" in:title" --state open --json number --jq '.[0].number // empty')
           if [ -z "$EXISTING" ]; then
-            gh issue create --title "$TITLE" --body "$(printf 'Upstream now publishes **%s** while we pin **%s**.\n\nFollow the "Version bump" section of the \`/sync-grapher-schema\` skill to upgrade (bump \`DEFAULT_GRAPHER_SCHEMA\` in \`etl/config.py\`, sed the \`$ref\`s, re-vendor, regenerate).\n\n_Opened automatically by the sync-grapher-schema workflow._' "$LATEST_ID" "$PINNED_URL")"
+            gh issue create --title "$TITLE" --body "$(printf 'Upstream now publishes **%s** while we vendor **%s**.\n\nRun `python scripts/generate_schema_types.py --bump-version` — it vendors the new version, drops the old copy, repoints the `$ref`s and regenerates the types (`DEFAULT_GRAPHER_SCHEMA` is derived from the vendored file, so nothing there is hand-edited). It then prints what still needs judgment: the upstream diff review, and mirroring new properties into the embedded `grapher_config` block in `schemas/dataset-schema.json`.\n\nSee the "Version bump" section of the `/sync-grapher-schema` skill. Do **not** bump the `grapher_schema` pins in existing collection configs.\n\n_Opened automatically by the sync-grapher-schema workflow._' "$LATEST_ID" "$PINNED_URL")"
           else
             echo "Issue #$EXISTING already open, skipping."
           fi
