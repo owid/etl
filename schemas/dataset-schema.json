@@ -977,7 +977,9 @@
                           }
                         ],
                         [
-                          "Must join multiple attributions by a `;`.",
+                          "Must join multiple attributions by a `;`."
+                        ],
+                        [
                           "Must separate a producer from a data product with a spaced en dash (–), not a hyphen."
                         ],
                         [
