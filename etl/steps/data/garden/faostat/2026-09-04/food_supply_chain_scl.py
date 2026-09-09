@@ -32,8 +32,8 @@ ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
    countries and years. For mass there is no density: tonnes are converted to kilograms.
 
 4. Items nobody eats (cakes, brans, ethanol, refining residues) have no food figures to reverse-engineer from. They
-   get the energy and protein of the human food they would be if eaten, from USDA's food composition tables:
-   numbers and sources are in `food_supply_chain_scl.items.yml`. Items that are never food (castor, tung, kapok,
+   get the energy and protein of the human food they would be if eaten: energy from USDA's food composition tables,
+   protein of each cake from the Feedipedia feed tables. Numbers and sources are in `food_supply_chain_scl.items.yml`. Items that are never food (castor, tung, kapok,
    jojoba, wool grease) get zero energy and protein, which removes them from every flow consistently. In the mass
    table every item counts as it is.
 

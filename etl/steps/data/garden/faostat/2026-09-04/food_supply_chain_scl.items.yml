@@ -16,15 +16,30 @@ fixed_densities:
   families:
     # Applied by name pattern to every item whose name starts with the pattern, unless the item is listed
     # individually below.
-    - {pattern: "Cake of", energy: 330, protein: 47, note: "Defatted oilseed flours, 326-333 in USDA."}
-    - {pattern: "Cake,", energy: 330, protein: 47, note: "Same family (oilseeds not elsewhere classified)."}
+    # Energy: defatted oilseed flours, 326-333 kcal in USDA. Protein: a typical oilseed cake, for the minor cakes not
+    # listed individually below (safflower, mustard, kapok, hemp, poppy, oilseeds nes; about 1.5 Mt in total).
+    - {pattern: "Cake of", energy: 330, protein: 35, note: "Default for minor cakes; the main cakes are listed individually."}
+    - {pattern: "Cake,", energy: 330, protein: 35, note: "Same family (oilseeds not elsewhere classified)."}
     - {pattern: "Bran of", energy: 216, protein: 15.6, note: "Wheat bran as the default for cereal brans without a USDA entry."}
   items:
+    # Cakes: protein from Feedipedia (INRAE-CIRAD-AFZ-FAO feed tables, https://www.feedipedia.org), as fed = crude
+    # protein in % of dry matter x dry matter share, for the solvent-extracted meal. Energy as the family (330).
+    - {code: 238, name: "Cake of soya beans", energy: 330, protein: 46, note: "Soybean meal 48: 52.6% DM protein x 88% DM (feedipedia.org/node/674)."}
+    - {code: 272, name: "Cake of rapeseed", energy: 330, protein: 34, note: "Rapeseed meal: 38.1% DM x 89% DM (feedipedia.org/node/52)."}
+    - {code: 269, name: "Cake of sunflower seed", energy: 330, protein: 31, note: "Sunflower meal, mean of partially dehulled (37.7% DM) and non-dehulled (31.3% DM) x 89% DM (feedipedia.org/node/732)."}
+    - {code: 332, name: "Cake of cottonseed", energy: 330, protein: 43, note: "Cottonseed meal, decorticated: 47.3% DM x 91% DM (feedipedia.org/node/550); undecorticated cake would be lower."}
+    - {code: 259, name: "Cake of palm kernel", energy: 330, protein: 16, note: "Palm kernel meal: 16.7-18.7% DM x 91% DM (feedipedia.org/node/43)."}
+    - {code: 245, name: "Cake of groundnuts", energy: 330, protein: 49, note: "Peanut meal: 54.5% DM x 89% DM (feedipedia.org/node/699)."}
+    - {code: 37, name: "Cake of rice bran", energy: 330, protein: 15, note: "Defatted rice bran, about 15-17% protein as fed (Feedipedia)."}
+    - {code: 61, name: "Cake of maize", energy: 330, protein: 22, note: "Maize germ meal, 20-30% protein type (feedipedia.org/node/12286)."}
+    - {code: 253, name: "Cake of copra", energy: 330, protein: 20, note: "Copra meal: 20-25% DM protein (feedipedia.org/node/46)."}
+    - {code: 291, name: "Cake of sesame seed", energy: 330, protein: 40, note: "Sesame meal: 40-50% protein (Feedipedia)."}
+    - {code: 335, name: "Cake of linseed", energy: 330, protein: 30, note: "Linseed meal: about 33-35% DM protein (Feedipedia)."}
     - {code: 158, name: "Cane sugar, centrifugal", energy: 380, protein: 0, note: "Raw sugar, USDA brown sugar 380; no food use is reported for it because it is refined further."}
     - {code: 35, name: "Bran of rice", energy: 316, protein: 13.4}
     - {code: 59, name: "Bran of maize", energy: 224, protein: 8.4}
     - {code: 77, name: "Bran of oats", energy: 246, protein: 17.3}
-    - {code: 846, name: "Gluten feed and meal", energy: 330, protein: 47, note: "Valued as the cakes; a protein by-product of maize milling."}
+    - {code: 846, name: "Gluten feed and meal", energy: 330, protein: 22, note: "Maize gluten feed: about 22% protein as fed (Feedipedia); gluten meal is higher but a smaller volume."}
     - {code: 632, name: "Undenatured ethyl alcohol of an alcoholic strength by volume of 80% vol or higher", energy: 700, protein: 0}
     - {code: 1276, name: "Industrial monocarboxylic fatty acids; acid oils from refining", energy: 884, protein: 0, note: "Fat that left the food chain to industry."}
     - {code: 1277, name: "Residues of fatty substances", energy: 884, protein: 0}
