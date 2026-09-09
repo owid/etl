@@ -30,7 +30,7 @@ Any rewrites you propose use American spelling.
 - A step path `garden/<namespace>/<version>/<short_name>` (the `data://` URI form also works), a bare `<short_name>` — resolve via the DAG like `/update-dataset` does (`rg "/<short_name>:?$" dag/ -g "*.yml" | grep -v "^dag/archive"`, latest active version, ask the user if ambiguous).
 - Optional: `--top N` (deep-review cap, default 10) or `--full` (deep-review every indicator regardless of chart usage).
 - Also accepts a **single chart** (slug or id) as the target: scope the whole review to that chart's indicator(s) — verify every displayed country-category/value for the latest year, compare against the previous dataset version, and review the chart's own FAUST text as claims. Drafts count (find them in the staging DB; they have no production row).
-- Precondition: the garden dataset is built locally (`.venv/bin/etlr data://garden/<ns>/<version>/<short_name> --private`; `PREFER_DOWNLOAD=1` is fine for already-published upstream deps). **Exception:** the `/create-snapshot` context runs Phase 0 only against the `.dvc` and the fetched docs — no meadow/garden step exists yet, so skip this precondition (and Steps 1, 3–5) there.
+- Precondition: the garden dataset is built locally (`.venv/bin/etlr data://garden/<ns>/<version>/<short_name>`; `PREFER_DOWNLOAD=1` is fine for already-published upstream deps). **Exception:** the `/create-snapshot` context runs Phase 0 only against the `.dvc` and the fetched docs — no meadow/garden step exists yet, so skip this precondition (and Steps 1, 3–5) there.
 
 Scope by calling context:
 

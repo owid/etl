@@ -149,8 +149,16 @@ def filter_to_subgraph(
     elif exact_match:
         included = set(includes_list) & available_steps
     else:
-        compiled_includes = [re.compile(p) for p in includes_list]
-        included = {s for s in available_steps if any(p.search(s) for p in compiled_includes)}
+        included = set()
+        for pattern in includes_list:
+            if pattern in all_steps:
+                # A full step name selects that step only: read as a regex, `data://garden/x/2024-01-01/foo`
+                # would also pull in `.../foo_extended`.
+                included.add(pattern)
+            else:
+                compiled = re.compile(pattern)
+                included.update(s for s in available_steps if compiled.search(s))
+        included &= available_steps
 
     if only:
         # Only include explicitly selected nodes, but filter out excluded steps
@@ -1170,6 +1178,9 @@ class ExportStep(DataStep):
     """
     A step which ships files to a shared, environment-less destination, e.g. committing to a
     GitHub repository or uploading to R2. Its recipe lives in `etl/steps/export/<channel>/...`.
+
+    Runs with `--export`, which grants the write (`config.EXPORT_ENABLED`); named without it, the
+    step builds its files locally and skips the upload, see `publishes`.
     """
 
     path: str
@@ -1206,10 +1217,28 @@ class ExportStep(DataStep):
 
         self._run_recipe()
 
+        if not self.publishes:
+            # Leave the checksum unrecorded, so that the next run with the flag rebuilds and publishes.
+            log.warning(
+                "step.built_locally_only",
+                step=str(self),
+                hint=f"pass {self.permission_flag} to publish; the step stays dirty until then",
+            )
+            return
+
         # save checksum (only update index.json, don't call ds.save() which iterates
         # table_names and would pick up custom JSON files written by the step)
         ds.metadata.source_checksum = self.checksum_input()
         ds.metadata.save(ds._index_file)
+
+    # The etlr flag that grants this step's write.
+    permission_flag = "--export"
+
+    @property
+    def publishes(self) -> bool:
+        """Whether this run may write to the step's destination. Off, the recipe still runs (the steps
+        check the same `config` switch before uploading), but nothing leaves the machine."""
+        return config.EXPORT_ENABLED
 
     def _run_recipe(self) -> None:
         if config.DEBUG:
@@ -1240,12 +1269,19 @@ class VizStep(ExportStep):
     - `viz://bespoke/...`: a bespoke interactive visualization, whose data feed is uploaded to R2.
 
     Recipes live in `etl/steps/viz/<channel>/...`; local outputs go to `viz/<channel>/...`. Every viz
-    step runs under `--grapher` (`export://` steps under `--export`), see `etl.command.construct_subdag`.
-    Bespoke steps currently upload to a fixed public path rather than to the environment being built;
-    they honor `DRY_RUN=1` to skip the upload.
+    step runs under `--grapher`, which grants the write (`config.GRAPHER_ENABLED`); named without it,
+    the step builds its output locally (the chart config under `viz/`, the bespoke feed) and skips
+    the upsert or upload, see `etl.command.construct_subdag`. Static steps only write local files,
+    so they publish regardless. Bespoke steps currently upload to a fixed public path rather than
+    to the environment being built.
     """
 
     step_type = "viz"
+    permission_flag = "--grapher"
+
+    @property
+    def publishes(self) -> bool:
+        return config.GRAPHER_ENABLED or self.channel == "static"
 
     def can_execute(self, archive_ok: bool = True) -> bool:
         return super().can_execute(archive_ok=archive_ok) or self._is_chart_yaml_only()

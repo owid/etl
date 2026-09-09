@@ -61,7 +61,7 @@ Assumptions:
 - [ ] Draft the public-facing "Data update" post for OWID /latest via `data-update-announcement` (Mode A) — two versions, user picks, then the Google Doc in /Data updates, and hand the user the link (not added to the PR). The skill declines when we posted about this data less than six months ago; a declined post is a **completed** item — record the eligible date, don't override
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
-- [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: confirm the `buildkite/etl-automated-staging-environment` PR check is green (red = a consumer crashed on staging, and the report under-reports until it's fixed; `.venv/bin/etlr --modified --continue-on-failure --private` is the optional local equivalent for small fan-outs), then triage the data-diff report — every red "− lost N data point(s)" entry in its Top-changes list and every 🔴-tier dataset (see "Silent-breakage check" section) and run the full-report audit probes (structural / World / raw-country / >30% / wipe-vs-edge per loss)
+- [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: confirm the `buildkite/etl-automated-staging-environment` PR check is green (red = a consumer crashed on staging, and the report under-reports until it's fixed; `.venv/bin/etlr --modified --continue-on-failure` is the optional local equivalent for small fan-outs), then triage the data-diff report — every red "− lost N data point(s)" entry in its Top-changes list and every 🔴-tier dataset (see "Silent-breakage check" section) and run the full-report audit probes (structural / World / raw-country / >30% / wipe-vs-edge per loss)
 - [ ] Ask the user whether to remove the old version; if yes, remove+archive its DAG entries now and relocate the new entries into the old slot, but KEEP the old step files until review sign-off — the consecutive-version review diffs them from disk; deleting the files is the final commit before merge (see "Removing the old version & reordering the DAG") — don't forget this step
 - [ ] Hand off the QA links to the user (Anomalist + Chart Diff on the staging branch, plus the data-diff report) — this is the final step
 
@@ -196,8 +196,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
    **Diff against a freshly-rebuilt old version, not the stale feather on disk.** The old version's `data/garden/.../` feather was built whenever it last ran — possibly against an *earlier* snapshot of a shared upstream dataset (population, regions, income_groups). A fresh build of the new version uses the *current* upstream, so a naive new-vs-old-feather diff shows differences in **every population-weighted cell across all years and regions** — pure upstream drift that has nothing to do with your change. Before trusting any diff, rebuild the old version on the current catalog and diff against *that*:
    ```bash
-   .venv/bin/etlr data://meadow/<ns>/<old_version>/<short> --private --force --only
-   .venv/bin/etlr data://garden/<ns>/<old_version>/<short> --private --force --only
+   .venv/bin/etlr data://meadow/<ns>/<old_version>/<short> --force --only
+   .venv/bin/etlr data://garden/<ns>/<old_version>/<short> --force --only
    ```
    The apples-to-apples diff should collapse to just your intended change. Mention the drift separately in the PR (Chart Diff on staging *will* show it, because the live data is also stale relative to current upstream). This bit me twice in one update — don't skip it.
 
@@ -223,7 +223,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    1. Flip the flag to `True` at the top of the garden step file.
    2. Re-run the garden step, capturing output:
       ```bash
-      .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --private --force --only \
+      .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --force --only \
           > workbench/<short_name>/sanity_checks.log 2>&1
       ```
    3. Review the log: scan for `AssertionError`, `error`, `warning`, `dropped`, outliers flagged by country/year, unexpected totals. Surface actionable findings in the PR description under a "Sanity-check findings" collapsed section.
@@ -280,7 +280,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
    1. **Capture a fresh garden log:**
       ```bash
-      .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --private --force --only \
+      .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --force --only \
           > workbench/<short_name>/harmonization.log 2>&1
       ```
 
@@ -305,7 +305,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
           raise RuntimeError(
               "No data/garden/regions/<version>/regions built locally — the audit can't "
               "run without the canonical regions catalog. Build it first with "
-              "`.venv/bin/etlr data://garden/regions/<latest>/regions --private`."
+              "`.venv/bin/etlr data://garden/regions/<latest>/regions`."
           )
       tb_regions = Dataset(str(regions_dirs[-1]))["regions"]
       canonical_regions = set(tb_regions["name"].dropna().astype(str))
@@ -458,9 +458,9 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    If any skill rewrites a `.meta.yml`, re-run the affected step so the built catalog reflects the edits. **Add `--grapher` when the affected step is on the grapher channel** — without it the local catalog is updated but staging stays stale, so the step 7 indicator upgrade sees the old text.
    ```bash
    # garden / meadow:
-   .venv/bin/etlr <channel>/<namespace>/<new_version>/<short_name> --private --force --only
+   .venv/bin/etlr <channel>/<namespace>/<new_version>/<short_name> --force --only
    # grapher:
-   .venv/bin/etlr grapher/<namespace>/<new_version>/<short_name> --grapher --private --force --only
+   .venv/bin/etlr grapher/<namespace>/<new_version>/<short_name> --grapher --force --only
    ```
    Then re-run the relevant check to confirm zero remaining violations.
 
@@ -590,14 +590,14 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 7) Indicator upgrade (optional, staging only)
    - First upload the new grapher dataset to the staging DB (required before the upgrader can detect it):
      ```bash
-     STAGING=<branch> .venv/bin/etlr data://grapher/<namespace>/<new_version>/<short_name> --grapher --private
+     STAGING=<branch> .venv/bin/etlr data://grapher/<namespace>/<new_version>/<short_name> --grapher
      ```
      **Then confirm the variables actually landed in MySQL** — `data://grapher/... --grapher` sometimes only builds the feather without upserting (observed: 0 rows in `variables` afterward). If the count is 0, run the separate `grapher://` step, which does the MySQL upsert:
      ```bash
      # verify
      STAGING=<branch> .venv/bin/python -c "from etl.config import OWIDEnv; print(OWIDEnv.from_staging('<branch>').read_sql(\"SELECT COUNT(*) n FROM variables WHERE catalogPath LIKE %(p)s\", params={'p':'%<namespace>/<new_version>/<short_name>%'}).n[0])"
      # if 0, force the upsert:
-     STAGING=<branch> .venv/bin/etlr grapher://grapher/<namespace>/<new_version>/<short_name> --grapher --private
+     STAGING=<branch> .venv/bin/etlr grapher://grapher/<namespace>/<new_version>/<short_name> --grapher
      ```
    - Then run the automatic upgrader:
      ```bash
@@ -624,7 +624,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      If the count is 0, the upgrade did not run — re-run it.
    - **The auto-upgrader only remaps grapher charts — NOT ETL-defined explorers or MDims.** Explorers (`viz://explorer/...`) and multidims (`viz://chart/...`) reference indicators by catalog path and are rebuilt by running their **viz steps**, which the indicator-upgrader never touches. If the dataset has any (check the DAG: `rg "viz://(explorer|chart)/.*/<short_name>" dag/ -g "*.yml"`), they'll still point at the **old** variables on staging until you re-run them:
      ```bash
-     STAGING=<branch> .venv/bin/etlr viz://explorer/<ns>/latest/<short> viz://chart/<ns>/latest/<short> ... --grapher --private
+     STAGING=<branch> .venv/bin/etlr viz://explorer/<ns>/latest/<short> viz://chart/<ns>/latest/<short> ... --grapher
      ```
      Verify none still reference the old version (both queries should return empty):
      ```bash
@@ -916,10 +916,10 @@ A foundational-dataset update can leave a downstream step **building cleanly whi
 **1. Do all downstream consumers still build?** Staging answers this on every push — run the command locally only when you want the answer before pushing:
 
 ```bash
-.venv/bin/etlr --modified --continue-on-failure --private              # add --dry-run to list scope first
+.venv/bin/etlr --modified --continue-on-failure  # add --dry-run to list scope first
 ```
 
-`--modified` detects the steps changed vs `origin/master` and expands to their **full transitive downstream** via the branch DAG (same machinery as chart-diff), runs them in dependency order, skips dependents of failed steps, and ends with a failure summary + non-zero exit. **Staging runs the same check on every push**: its bake (`ops/templates/owid-site-staging/etl-build.sh`) is `etl run garden grapher explorers --modified --grapher --private --continue-on-failure` with `PREFER_DOWNLOAD=1`, and `--continue-on-failure` re-raises the first failure at the end — so any consumer crash turns the **`buildkite/etl-automated-staging-environment`** PR check red. That makes the local run optional fast feedback, not the primary net. The caveat that matters: **while that check is red, the data-diff report under-reports** — dependents of the failed step are skipped, stay stale in the catalog, and diff as unchanged. Always confirm the check is green before trusting the report. Use `--workers N` to parallelize a big local fan-out.
+`--modified` detects the steps changed vs `origin/master` and expands to their **full transitive downstream** via the branch DAG (same machinery as chart-diff), runs them in dependency order, skips dependents of failed steps, and ends with a failure summary + non-zero exit. **Staging runs the same check on every push**: its bake (`ops/templates/owid-site-staging/etl-build.sh`) is `etl run garden grapher explorers --modified --grapher --continue-on-failure` with `PREFER_DOWNLOAD=1`, and `--continue-on-failure` re-raises the first failure at the end — so any consumer crash turns the **`buildkite/etl-automated-staging-environment`** PR check red. That makes the local run optional fast feedback, not the primary net. The caveat that matters: **while that check is red, the data-diff report under-reports** — dependents of the failed step are skipped, stay stale in the catalog, and diff as unchanged. Always confirm the check is green before trusting the report. Use `--workers N` to parallelize a big local fan-out.
 
 **Size the fan-out first** (`--dry-run` lists the scope). Small (≲50 steps): the local run gives you the crash check in minutes, before burning a staging cycle. Foundational-dataset scale (hundreds of steps — an income-groups bump is ~560): skip the local build and rely on the staging check — locally it costs ~35 min and ~7 GB of `data/` to duplicate what the bake does anyway (if you do run it, delete the builds afterwards; `data/` is regenerable cache). Skip the **local** `etl diff` at that scale too — another ~25 min and a JSON in the hundreds of MB; owidbot's hosted report on the PR is the same comparison for free.
 

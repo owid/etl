@@ -14,7 +14,7 @@ icon: lucide/layout-grid
     Summary of the status of Explorers/MDIMs convergence in [this slides](https://docs.google.com/presentation/d/1A2xUmlueRKZRlmVyHfOIONZCSoWEtqoL-bw-MfJc4-c/edit?usp=sharing) (March 2025).
 
 MDIMs and Explorer (simply referred t as "MDIMs" from now on) steps are [viz steps](export-data.md) that create multi-dimensional indicators and explorers, respectively.
-These have a similar structure to regular steps. They write to the grapher DB, so they are run with the `--grapher` flag:
+These have a similar structure to regular steps. They write to the grapher DB with the `--grapher` flag (without it, the step only writes the expanded config under `viz/`):
 
 ```bash
 etlr viz://explorer/minerals/latest/minerals --grapher

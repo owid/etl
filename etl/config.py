@@ -254,11 +254,18 @@ CONTINUE_ON_FAILURE = env.get("CONTINUE_ON_FAILURE", "0") in ("True", "true", "1
 # if set, skip the actual garden step and only apply the metadata
 INSTANT = env.get("INSTANT", "0") in ("True", "true", "1")
 
-# if set, always upload grapher data & metadata JSON files even if checksums match
-FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
+# Upload grapher data & metadata JSON files even if their checksums match. Set by `etlr --force`.
+FORCE_UPLOAD: bool = False
 
-# if set, export steps will not upload/commit files (e.g. S3, GitHub)
-DRY_RUN = env.get("DRY_RUN", "0") in ("True", "true", "1")
+# Write permissions, set by `etlr` from its --grapher / --export flags (see `etl.command.main`, which
+# `etl browser` and fasttrack call directly, so they get the same gating).
+# A step whose destination is gated builds its output locally and skips the upsert/upload when its
+# permission is off: chart, explorer and bespoke steps under GRAPHER_ENABLED, export:// steps under
+# EXPORT_ENABLED. Outside `etlr` (a notebook calling `collection.save()`, a step module run directly)
+# nothing is gated, hence the defaults. `etlr` also exports them to the environment so that a step
+# run in a subprocess sees the same permissions.
+GRAPHER_ENABLED = env.get("GRAPHER_ENABLED", "1") in ("True", "true", "1")
+EXPORT_ENABLED = env.get("EXPORT_ENABLED", "1") in ("True", "true", "1")
 
 # Filter to speed up development - works as regex for both data processing and grapher upload
 # - In data steps: filters data rows by matching against relevant columns (e.g. causes, indicators)

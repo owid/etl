@@ -2,6 +2,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 from textwrap import dedent
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -347,3 +348,43 @@ def test_metadata_save_leaves_a_dvc_with_unquoted_dates_untouched(tmp_path, monk
     snap.metadata.save()
     assert "date_accessed: '2023-11-20'" in dvc_path.read_text()
     assert "md5: a9bae94a60b04dea8b889d16f23c0ca9" in dvc_path.read_text()
+
+
+def test_private_snapshot_says_how_to_get_access_or_skip(monkeypatch, tmp_path):
+    """A credentials failure on a private snapshot names the bucket and --public-only; a missing
+    object is left alone, so it still reads as "not uploaded" rather than "no access"."""
+    from botocore.exceptions import ClientError, EndpointConnectionError, NoCredentialsError
+    from owid.catalog import s3_utils
+
+    from etl.snapshot import PrivateSnapshotAccessError, Snapshot
+
+    snap = Snapshot("dummy/2020-01-01/dummy.csv")
+    monkeypatch.setattr(type(snap), "path", property(lambda self: tmp_path / "dummy.csv"))
+    snap.metadata = SimpleNamespace(is_public=False)  # ty: ignore[invalid-assignment]
+
+    def fail_with(error):
+        def _download(*args, **kwargs):
+            raise error
+
+        monkeypatch.setattr(s3_utils, "download", _download)
+
+    def client_error(code):
+        return s3_utils.UploadError(ClientError({"Error": {"Code": code}}, "HeadObject"))
+
+    # No credentials configured at all, and a stray AWS_PROFILE shadowing the R2 ones.
+    for error in [NoCredentialsError(), client_error("400"), client_error("AccessDenied")]:
+        fail_with(error)
+        with pytest.raises(PrivateSnapshotAccessError) as exc:
+            snap._download_dvc_file("abc123")
+        assert "owid-snapshots-private" in str(exc.value)
+        assert "--public-only" in str(exc.value)
+
+    # A genuinely missing object is not an access problem: the original error survives.
+    fail_with(client_error("404"))
+    with pytest.raises(s3_utils.UploadError):
+        snap._download_dvc_file("abc123")
+
+    # Neither is an unreachable endpoint, even though it is a BotoCoreError like NoCredentialsError.
+    fail_with(EndpointConnectionError(endpoint_url="https://r2.example"))
+    with pytest.raises(EndpointConnectionError):
+        snap._download_dvc_file("abc123")

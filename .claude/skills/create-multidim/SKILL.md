@@ -105,7 +105,7 @@ Place it right after the grapher step it depends on.
 
 ```bash
 # Chart steps write to the grapher DB, so they need the --grapher flag
-.venv/bin/etl run {short_name} --grapher --only --private
+.venv/bin/etl run {short_name} --grapher --only
 ```
 
 This outputs a preview URL like:
@@ -282,10 +282,10 @@ Key fields for `config` in views or `common_views`:
 
 ## Troubleshooting
 
-**"No steps matched"**: Chart steps need the `--grapher` flag. Without it, they're skipped (etlr says which flag to pass).
+**Chart built but not on staging**: without `--grapher`, `etlr viz://chart/...` only writes the config under `viz/chart/` and logs `collection.not_upserted`; pass `--grapher` to upsert.
 
 **Step not found in DAG**: Check that the entry is under the `steps:` key in the correct `dag/*.yml` file, and that the file is included from `dag/main.yml`.
 
-**Preview URL shows errors**: Verify that the catalogPaths in your config match actual indicators in the grapher dataset. Check by running the grapher step first: `.venv/bin/etl run {dataset} --grapher --private`.
+**Preview URL shows errors**: Verify that the catalogPaths in your config match actual indicators in the grapher dataset. Check by running the grapher step first: `.venv/bin/etl run {dataset} --grapher`.
 
 **`config must not contain {'description_key'}` or similar**: View-level metadata like `description_key`, `description_short`, and `presentation` belong under `metadata`, not `config`. The `config` block is for chart settings only (title, subtitle, chartTypes, etc.).

@@ -176,5 +176,5 @@ Also flag `.claude/rules/sanity-checks.md` if the garden step will do more than 
 List all files created and the DAG entries added, and the deferred checks from step 6 — saying plainly that nothing has been checked yet because there is nothing to check, so the next person doesn't read silence as a clean bill of health. Suggest running:
 
 ```bash
-.venv/bin/etlr <namespace>/<version>/<short_name> --private
+.venv/bin/etlr <namespace>/<version>/<short_name>
 ```

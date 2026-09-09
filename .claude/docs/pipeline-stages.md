@@ -21,10 +21,10 @@ Business logic layer:
 MySQL database ingestion for OWID visualization platform.
 
 ### Viz (`etl/steps/viz/`)
-Visualizations, addressed as `viz://<channel>/...`: `chart` (charts and MDIMs; a chart is an MDIM with `dimensions: []`), `explorer`, `static` (PNG/SVG images), `bespoke` (data feeds of bespoke interactive visualizations). All viz steps run with `--grapher`.
+Visualizations, addressed as `viz://<channel>/...`: `chart` (charts and MDIMs; a chart is an MDIM with `dimensions: []`), `explorer`, `static` (PNG/SVG images), `bespoke` (data feeds of bespoke interactive visualizations). All viz steps publish with `--grapher`; named without it, they only build locally.
 
 ### Export (`etl/steps/export/`)
-Files shipped to external destinations (R2, GitHub). Addressed as `export://...`, not `data://export/...`; need `--export`.
+Files shipped to external destinations (R2, GitHub). Addressed as `export://...`, not `data://export/...`; they write only with `--export` (named without it, they build the files locally).
 
 ## Step URI Pattern
 

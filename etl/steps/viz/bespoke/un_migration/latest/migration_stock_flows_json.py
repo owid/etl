@@ -8,12 +8,12 @@ Each per-country file contains all pairwise immigrant and emigrant stocks for
 that country, encoded as parallel arrays indexed by entity IDs from the metadata.
 
 Outputs:
-* Files are saved locally and (unless DRY_RUN) uploaded to S3 at:
+* Files are saved locally and (with --grapher) uploaded to S3 at:
   * https://owid-public.owid.io/data/migration/migration-stock-flows.metadata.json
   * https://owid-public.owid.io/data/migration/migration-stock-flows.<entityId>.json
 
-Run with DRY_RUN=1 to skip S3 upload and only write local files:
-  DRY_RUN=1 .venv/bin/etlr viz://bespoke/un_migration/latest/migration_stock_flows_json --grapher
+Run without --grapher to skip the S3 upload and only write the local files:
+  .venv/bin/etlr viz://bespoke/un_migration/latest/migration_stock_flows_json
 """
 
 import json
@@ -24,7 +24,7 @@ from owid.catalog import Table, s3_utils
 from structlog import get_logger
 from tqdm.auto import tqdm
 
-from etl.config import DRY_RUN
+from etl import config
 from etl.helpers import PathFinder
 from etl.paths import VIZ_DIR
 
@@ -179,7 +179,7 @@ def create_entity_data_json(tb: Table, entity: str, mappings: dict) -> dict:
 
 
 def save_and_upload_json(data: dict, filename: str) -> None:
-    """Write JSON locally and upload to S3 (unless DRY_RUN)."""
+    """Write JSON locally and upload to S3 (only with --grapher)."""
     export_dir = VIZ_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
     export_dir.mkdir(parents=True, exist_ok=True)
 
@@ -187,13 +187,13 @@ def save_and_upload_json(data: dict, filename: str) -> None:
     s3_path = S3_DATA_DIR / filename
 
     with open(local_file, "w") as f:
-        if DRY_RUN:
+        if not config.GRAPHER_ENABLED:
             json.dump(data, f, indent=2)
         else:
             json.dump(data, f, separators=(",", ":"))
 
-    if DRY_RUN:
-        tqdm.write(f"[DRY RUN] Would upload {local_file} to s3://{S3_BUCKET_NAME}/{s3_path}")
+    if not config.GRAPHER_ENABLED:
+        tqdm.write(f"[not uploaded, no --grapher] {local_file} -> s3://{S3_BUCKET_NAME}/{s3_path}")
     else:
         s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_path)}", local_file, public=True, downloadable=True)
 
@@ -221,7 +221,7 @@ def run() -> None:
     metadata, mappings = create_metadata_json(tb, tb_pop)
 
     total_files = len(mappings["entities"]) + 1
-    log.info(f"Creating and {'uploading' if not DRY_RUN else 'dry-running'} {total_files} JSON files.")
+    log.info(f"Creating and {'uploading' if config.GRAPHER_ENABLED else 'not uploading'} {total_files} JSON files.")
 
     save_and_upload_json(metadata, "migration-stock-flows.metadata.json")
 
@@ -235,5 +235,5 @@ def run() -> None:
         save_and_upload_json(data, f"migration-stock-flows.{entity_id}.json")
 
     log.info(
-        f"Done. Created {total_files} files: 1 metadata + {len(mappings['entities'])} entity files. (DRY_RUN={DRY_RUN})"
+        f"Done. Created {total_files} files: 1 metadata + {len(mappings['entities'])} entity files. (uploaded={config.GRAPHER_ENABLED})"
     )

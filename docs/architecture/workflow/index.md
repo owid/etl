@@ -245,10 +245,12 @@ Sometimes we want to perform an action instead of creating a dataset. For instan
 
 A step's type says what it produces. Viz steps produce visualizations, and their channel says which kind:
 
-- **Charts and multi-dimensional indicators** (`viz://chart/`): Create the configuration of a chart or an MDIM and upsert it to the grapher DB. Run with `--grapher`.
-- **Explorers** (`viz://explorer/`): Create a data explorer and upsert it to the grapher DB. Run with `--grapher`.
-- **Static images** (`viz://static/`): Render a PNG/SVG with matplotlib next to the recipe. Run with `--grapher`, like every other viz step.
-- **Bespoke visualizations** (`viz://bespoke/`): Produce the data feed of a bespoke interactive visualization (currently uploaded to R2). Run with `--grapher`, like every other viz step.
+- **Charts and multi-dimensional indicators** (`viz://chart/`): Create the configuration of a chart or an MDIM and upsert it to the grapher DB.
+- **Explorers** (`viz://explorer/`): Create a data explorer and upsert it to the grapher DB.
+- **Static images** (`viz://static/`): Render a PNG/SVG with matplotlib next to the recipe.
+- **Bespoke visualizations** (`viz://bespoke/`): Produce the data feed of a bespoke interactive visualization (currently uploaded to R2).
+
+Viz steps publish with `--grapher`. Named by their URI they also run without it, in which case they only build locally (the chart config, the data feed) and skip the DB upsert or upload; a pattern such as `energy` selects them only with the flag.
 
 Export steps ship files to an external destination, e.g. **Export to GitHub** (`export://github/`) commits a dataset to a GitHub repository, and `export://s3/` uploads files to R2. Run with `--export`.
 

@@ -72,10 +72,12 @@ viz://<channel>/<namespace>/<version>/<name>
 
 where channel is one of the following:
 
-- `chart`: For charts and multidimensional indicators (a chart is an MDIM with no dimensions). Writes to the grapher DB; run with `--grapher`.
-- `explorer`: For explorers. Writes to the grapher DB; run with `--grapher`.
-- `static`: For static images (PNG/SVG), written next to the recipe. Run with `--grapher` like the other viz steps.
-- `bespoke`: For the data feeds of bespoke interactive visualizations. Run with `--grapher` like the other viz steps (currently uploads to R2; `DRY_RUN=1` skips the upload).
+- `chart`: For charts and multidimensional indicators (a chart is an MDIM with no dimensions). Writes to the grapher DB with `--grapher`; without it, only the local config under `viz/chart/`.
+- `explorer`: For explorers. Writes to the grapher DB with `--grapher`; without it, only the local config under `viz/explorer/`.
+- `static`: For static images (PNG/SVG), written next to the recipe. They only write local files, so a named static step runs with or without `--grapher`.
+- `bespoke`: For the data feeds of bespoke interactive visualizations. Uploaded to R2 with `--grapher`; without it, only written locally.
+
+Every `viz://` step is selected by a pattern only with `--grapher`; named by its URI it is always selected, and the flag decides whether it may write.
 
 ### Path for `export://`
 Export steps ship files to an external destination. They are defined in the `etl/steps/export` directory and have a similar structure to regular steps. Their URI begins with the prefix `export://` and uses the following format:
@@ -89,4 +91,4 @@ where channel is typically one of the following:
 - `github`: For exports to GitHub.
 - `s3`: For uploads to R2.
 
-They are run with `--export`.
+They write to their destination only with `--export`. Named by their URI they run without it too, building the files locally without uploading or committing them; a pattern selects them only with the flag.

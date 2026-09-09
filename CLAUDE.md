@@ -130,15 +130,16 @@ Internal terms that recur across this guide, the skills, and the codebase:
 ## Running ETL Steps
 
 ```bash
-.venv/bin/etlr namespace/version/dataset --private      # Run step
-.venv/bin/etlr namespace/version/dataset --grapher      # Upload to grapher
-.venv/bin/etlr viz://chart/.../name --grapher            # Run a viz step (chart/MDIM, explorer, static, bespoke): all take --grapher
-.venv/bin/etlr export://.../name --export                 # Run an export:// step: it writes to R2/GitHub
+.venv/bin/etlr namespace/version/dataset                # Run step (private steps included by default)
+.venv/bin/etlr namespace/version/dataset --grapher      # Build and upsert to grapher
+.venv/bin/etlr viz://chart/.../name --grapher            # Run a viz step (chart/MDIM, explorer, static, bespoke) and publish it
+.venv/bin/etlr viz://chart/.../name                      # Same, but only build the config locally (no DB write)
+.venv/bin/etlr export://.../name --export                 # Run an export:// step and push to R2/GitHub (without --export: build only)
 .venv/bin/etlr namespace/version/dataset --dry-run      # Preview
 .venv/bin/etlr namespace/version/dataset --force --only # Force re-run
 ```
 
-Key flags: `--grapher/-g` runs `grapher://` upserts and every `viz://` step (chart, explorer, static, bespoke); `--export` runs the `export://` steps, which write to shared external destinations (R2, GitHub); `data://` steps need no flag. A step whose flag is missing is skipped; if it was the only step you asked for, `etlr` says which flag to pass and then lists the "closest matches". Other flags: `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
+Two flags grant writes, and they are all you normally need: `--grapher/-g` allows writes to the grapher DB and R2 of the targeted environment (`grapher://` upserts run, `viz://` steps publish); `--export` allows `export://` steps to write to their shared destinations (GitHub, public R2), which have no staging equivalent. Naming selects, flags permit: a step named by its full URI or scheme (`viz://chart/...`, `grapher://...`, `export://...`) is always selected, and without its flag it builds locally and skips the write (a named `grapher://` upsert is skipped with a note). A plain pattern (`energy`, `'.*'`) never pulls in those step types without the flag. Other flags: `--dry-run` (preview), `--force/-f` (re-run, also re-uploads grapher files), `--only/-o` (no deps), `--modified/-m` (steps changed vs `origin/master`), `--public-only` (skip private steps; they run by default), `--debug` (single process + ipdb). Run `etlr --help` for the grouped list.
 
 **"The step completed" is not "the data is right".** After running a step for
 someone, report what came out of it: row count, year range, entities, and a few
@@ -166,7 +167,7 @@ catalog. `✅ No differences found` is itself a result worth reporting.
 - **`STAGING=1`** — makes `etlr` target the current branch's staging server: `STAGING=1 .venv/bin/etlr grapher://grapher/<path> --grapher` upserts the indicators straight to `staging-site-<branch>`'s DB. Optional: staging rebuilds automatically after you push, so you only need this when you want a change reflected there right away, or when the automatic rebuild is unusually slow (rare, e.g. edits to the regions or FAOSTAT datasets that invalidate a large part of the DAG). `STAGING=<name>` targets another branch's staging server.
 - **Version-bumping a grapher step mints new variable IDs**, so existing charts referencing the old indicators become ghost variables and must be remapped on staging (see the `remapping-ghost-variables` skill / `indicator_upgrade` CLI). Budget for this whenever you rename or re-version a grapher dataset.
 - **Versioning hygiene for derived/OMM steps:** an OMM's version reflects when its combining logic was written, not its inputs — but when you repoint a derived step to a newer-dated dependency, bump the step's own version folder too. Leaving a step dated before the data it ingests is confusing and should be fixed when noticed.
-- Some steps support **`SUBSET`** env var for fast dev iterations: `SUBSET='France,Germany' .venv/bin/etlr namespace/version/dataset --private`
+- Some steps support **`SUBSET`** env var for fast dev iterations: `SUBSET='France,Germany' .venv/bin/etlr namespace/version/dataset`
 - **No `.py` for simple downloads** — when a snapshot is a plain `url_download` (no custom fetch/parse/auth logic), create only the `.dvc` file; do **not** write `snapshots/.../<short>.py`. `etls <ns>/<version>/<short>` runs it straight from the `.dvc`. Write a script only when the download genuinely needs custom code (API pagination, auth, multi-file assembly, local/manual file input, non-trivial parsing before storing).
 
 ## Git Workflow
