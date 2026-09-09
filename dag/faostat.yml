@@ -227,3 +227,27 @@ steps:
   viz://bespoke/faostat/latest/food_trade:
     - data://garden/faostat/2026-05-07/food_trade
   ######################################################################################################################
+  #
+  # Food supply chain per person per day (waterfall visualization).
+  #
+  # FAO's food balances with every element (production, trade, stock changes, seed, feed, processing, losses, food...)
+  # converted to kilocalories, grams of protein and kilograms per person per day.
+  # Food Balance Sheets method (1961 onward), reproducing the prototype's assumptions:
+  data://garden/agriculture/2026-09-04/food_supply_chain_fbs:
+    - data://garden/faostat/2026-02-25/faostat_fbsc
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2026-07-01/income_groups
+  # Supply Utilization Accounts method (2010 onward), which includes the feed by-products FBS lacks:
+  data://garden/agriculture/2026-09-04/food_supply_chain_scl:
+    - data://garden/faostat/2026-02-25/faostat_scl
+    - data://meadow/faostat/2026-02-25/faostat_metadata
+    - data://garden/faostat/2026-02-25/faostat_fbsc
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2026-07-01/income_groups
+  # Bespoke viz step: a metadata JSON plus one JSON per entity under s3://owid-public/data/food-supply-chain/. The
+  # single garden dependency decides which method is published; switching method is a matter of changing that line.
+  viz://bespoke/agriculture/latest/food_supply_chain:
+    - data://garden/agriculture/2026-09-04/food_supply_chain_fbs
+  ######################################################################################################################

@@ -1,4 +1,4 @@
-"""S3 JSON export for the food supply chain waterfall visualization.
+"""Bespoke viz step producing the S3 JSON feed for the food supply chain waterfall visualization.
 
 Reads whichever food supply chain garden dataset is the step's dependency in the DAG (`food_supply_chain_fbs` or
 `food_supply_chain_scl`; the DAG line decides which method is published) and writes, in the shape of the other
@@ -28,7 +28,7 @@ from tqdm.auto import tqdm
 
 from etl import config
 from etl.helpers import PathFinder
-from etl.paths import EXPORT_DIR
+from etl.paths import VIZ_DIR
 
 log = get_logger()
 paths = PathFinder(__file__)
@@ -67,15 +67,15 @@ NUM_DECIMALS = {"energy": 1, "protein": 2, "mass": 4}
 
 
 def _save_and_upload(data: dict, filename: str) -> None:
-    """Write JSON locally and upload to S3 (only with --export)."""
-    export_dir = EXPORT_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
+    """Write JSON locally and upload to S3 (skipping the upload without --grapher)."""
+    export_dir = VIZ_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
     export_dir.mkdir(parents=True, exist_ok=True)
     local_file = export_dir / filename
     s3_path = f"s3://{S3_BUCKET_NAME}/{S3_DATA_DIR / filename}"
     with open(local_file, "w") as f:
         json.dump(data, f, separators=(",", ":"))
-    if not config.EXPORT_ENABLED:
-        tqdm.write(f"[not uploaded, no --export] {local_file} -> {s3_path}")
+    if not config.GRAPHER_ENABLED:
+        tqdm.write(f"[not uploaded, no --grapher] {local_file} -> {s3_path}")
     else:
         s3_utils.upload(s3_path, local_file, public=True, downloadable=True)
 
