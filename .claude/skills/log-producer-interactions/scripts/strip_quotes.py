@@ -1,6 +1,6 @@
 """Print each message of a saved Gmail get_thread JSON with quoted replies and signatures stripped.
 
-Usage: python3 strip_quotes.py <saved_get_thread_result.json>
+Usage: .venv/bin/python strip_quotes.py <saved_get_thread_result.json>
 """
 
 import json
@@ -31,7 +31,11 @@ SIGN_OFF = re.compile(
 )
 
 # Typical mobile footers and legal boilerplate that end a body when no sign-off is present.
-FOOTER = re.compile(r"^(sent from my |get outlook for |this e-?mail .*confidential|caution: |varning: )", re.I)
+FOOTER = re.compile(r"^(sent from my |get outlook for |this e-?mail .*confidential)", re.I)
+
+# Gateway banners, which mail systems prepend *above* the body: drop the line and keep reading, or a
+# banner on the first line would leave the body empty.
+BANNER = re.compile(r"^(caution[:!]|varning[:!]|\[external\]|external email|warning: external)", re.I)
 
 
 def _join_wrapped_quote_headers(body: str) -> str:
@@ -48,12 +52,14 @@ def strip(body: str) -> str:
         s = line.strip()
         if QUOTE_START.match(s) or FOOTER.match(s):
             break
+        if BANNER.match(s):
+            continue
         kept.append(line.rstrip())
     lines = "\n".join(kept).strip().splitlines()
     for i, line in enumerate(lines):
         if i > 0 and SIGN_OFF.match(line.strip()):
             tail = [line]
-            # Keep a following short name line ("Nic", "Dr. J. Smith"), drop titles, orgs and links.
+            # Keep a following short name line ("Alex", "Dr. J. Smith"), drop titles, orgs and links.
             for nxt in lines[i + 1 :]:
                 if not nxt.strip():
                     continue

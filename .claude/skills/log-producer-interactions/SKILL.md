@@ -55,7 +55,7 @@ A producer with no address at all has no pass 1, only pass 2.
 
 Query the interactions table once (SQL, single source) for `Producer`, `date:Date:start`, `Link`. Keep:
 
-- the latest date per producer (the watermark);
+- the latest date per producer **among rows that came from an email**, i.e. rows whose `Link` is set (the watermark). Never take the maximum over all rows: a `call` row is dated when the call happens, so a scheduled future call would push the watermark forward and make the next run skip every email in between;
 - the set of Gmail message IDs already logged: the part after `#all/` in every `Link` (older rows may use the `/mail/u/0/#all/<messageId>` form; treat both the same).
 
 Search from **7 days before the watermark** (Gmail dates and thread grouping make a small overlap safer than an exact cutoff). For a producer with no rows yet, search without a date filter.
@@ -85,7 +85,7 @@ If a search result is too large and gets saved to a file, filter it with `jq` on
 For each thread with at least one message not yet logged, call `get_thread` with `messageFormat: "PLAIN_TEXT"`. If the result is saved to a file, run:
 
 ```
-python3 .claude/skills/log-producer-interactions/scripts/strip_quotes.py <saved_file>
+.venv/bin/python .claude/skills/log-producer-interactions/scripts/strip_quotes.py <saved_file>
 ```
 
 It prints one block per message (id, date, from, to, cc, subject) with quoted replies and signatures stripped. Apply the same stripping by hand to results returned inline.
