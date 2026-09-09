@@ -11,7 +11,7 @@ meta:
       National Oceanic and Atmospheric Administration (NOAA) National Centers for Environmental Information (NCEI) - Heat Content Monthly Basin Time Series.
 
       Levitus, Sydney; Antonov, John I.; Boyer, Tim P.; Baranova, Olga K.; García, Hernán E.; Locarnini, Ricardo A.; Mishonov, Alexey V.; Reagan, James R.; Seidov, Dan; Yarosh, Evgeney; Zweng, Melissa M. (2017). NCEI ocean heat content, temperature anomalies, salinity anomalies, thermosteric sea level anomalies, halosteric sea level anomalies, and total steric sea level anomalies from 1955 to present calculated from in situ oceanographic subsurface profile data (NCEI Accession 0164586). https://doi.org/10.7289/v53f4mvp.
-    attribution: NOAA National Centers for Environmental Information - Heat Content Monthly Basin Time Series (2026)
+    attribution: NOAA National Centers for Environmental Information – Heat Content Monthly Basin Time Series (2026)
     attribution_short: NOAA/NCEI
     url_main: https://www.ncei.noaa.gov/products/ocean-heat-salt-sea-level
     url_download: |-

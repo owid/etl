@@ -8,7 +8,7 @@ meta:
       National Oceanic and Atmospheric Administration (NOAA) Global Monitoring Laboratory, Boulder, Colorado, USA (https://gml.noaa.gov) - Trends in Atmospheric Carbon Dioxide.
 
       Lan, X., Tans, P. and K.W. Thoning: Trends in globally-averaged CO2 determined from NOAA Global Monitoring Laboratory measurements. https://doi.org/10.15138/9N0H-ZH07
-    attribution: NOAA Global Monitoring Laboratory - Trends in Atmospheric Carbon Dioxide (2026)
+    attribution: NOAA Global Monitoring Laboratory – Trends in Atmospheric Carbon Dioxide (2026)
     attribution_short: NOAA/GML
     url_main: https://gml.noaa.gov/ccgg/trends/gl_data.html
     url_download: https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_gl.csv

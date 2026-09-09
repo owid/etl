@@ -10,7 +10,7 @@ meta:
       HOT observations are supported by the U.S. National Science Foundation under Award #1756517.
 
       More details can be found at [the HOT Carbon Dioxide page](https://hahana.soest.hawaii.edu/hot/hotco2/hotco2.html), specifically in [this technical document](https://hahana.soest.hawaii.edu/hot/hotco2/HOT_surface_CO2_readme.pdf).
-    attribution: School of Ocean & Earth Science & Technology - Hawaii Ocean Time-series (2026)
+    attribution: School of Ocean & Earth Science & Technology – Hawaii Ocean Time-series (2026)
     attribution_short: SOEST/Hawaii
     url_main: https://hahana.soest.hawaii.edu/hot/
     url_download: https://hahana.soest.hawaii.edu/hot/hotco2/HOT_surface_CO2.txt

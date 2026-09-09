@@ -22,7 +22,7 @@ meta:
       This monadic dataset was sent to Our World in Data by K. Suh in a private communication. The underlying data is based on the following publication (where data is presented in a dyadic format):
 
       Suh, Kyungwon. 2022. “Nuclear Balance and the Initiation of Nuclear Crises: Does Superiority Matter?” Journal of Peace Research, Vol. 60, No. 2 (March): 337-351. Doi:10.1177/00223433211067899.
-    attribution: Suh - The Strategic Nuclear Forces Dataset v2.0 (2023)
+    attribution: Suh – The Strategic Nuclear Forces Dataset v2.0 (2023)
     attribution_short: Suh
 
     # Files

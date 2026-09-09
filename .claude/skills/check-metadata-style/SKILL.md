@@ -104,6 +104,7 @@ for table_name in ds.table_names:
         if pres is not None:
             put('presentation.title_public', getattr(pres, 'title_public', None))
             put('presentation.title_variant', getattr(pres, 'title_variant', None))
+            put('presentation.attribution', getattr(pres, 'attribution', None))
             put('presentation.attribution_short', getattr(pres, 'attribution_short', None))
             gc = getattr(pres, 'grapher_config', None) or {}
             put('presentation.grapher_config.title', gc.get('title'))
@@ -127,6 +128,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 | `display.name` | Series label in chart legends |
 | `presentation.title_public` | Public-facing chart title |
 | `presentation.title_variant` | Disambiguator ("Historical", "WHO estimate", …) |
+| `presentation.attribution` | Full source credit under the chart (`producer – data product (year)`) |
 | `presentation.attribution_short` | Short source credit under the chart |
 | `presentation.grapher_config.title` | Overrides chart title when set |
 | `presentation.grapher_config.subtitle` | Chart subtitle |

@@ -195,7 +195,7 @@ def run(upload: bool) -> None:
 
         # Assign a custom attribution.
         snap.metadata.origin.attribution = (  # ty: ignore
-            f"{snap.metadata.origin.producer} - {snap.metadata.origin.title} ({year_published})"  # ty: ignore
+            f"{snap.metadata.origin.producer} – {snap.metadata.origin.title} ({year_published})"  # ty: ignore
         )
 
         # Rewrite metadata to dvc file.

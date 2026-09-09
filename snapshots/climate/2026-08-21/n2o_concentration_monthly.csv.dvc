@@ -8,7 +8,7 @@ meta:
       National Oceanic and Atmospheric Administration (NOAA) Global Monitoring Laboratory, Boulder, Colorado, USA (https://gml.noaa.gov) - Trends in Atmospheric Nitrous Oxide.
 
       Lan, X., K.W. Thoning, and E.J. Dlugokencky: Trends in globally-averaged CH4, N2O, and SF6 determined from NOAA Global Monitoring Laboratory measurements. https://doi.org/10.15138/P8XG-AA10
-    attribution: NOAA Global Monitoring Laboratory - Trends in Atmospheric Nitrous Oxide (2026)
+    attribution: NOAA Global Monitoring Laboratory – Trends in Atmospheric Nitrous Oxide (2026)
     attribution_short: NOAA/GML
     url_main: https://gml.noaa.gov/ccgg/trends_n2o/
     url_download: https://gml.noaa.gov/webdata/ccgg/trends/n2o/n2o_mm_gl.csv
