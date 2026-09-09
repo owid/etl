@@ -12,7 +12,7 @@ definitions:
       - Only individual items are summed; FAO's aggregate items (such as "Cereals" or "Vegetal Products") are left out to avoid double counting. Three items with no food energy are left out: "Palm kernels" (which carries the oil palm harvest; the oil palm enters the chain as palm oil and palm kernel oil), non-food alcohol and aquatic mammals.
       - Production of items made from other items (vegetable oils, sugar and sweeteners, alcoholic beverages, butter, cream, fish oils and other processed products) is netted against processing, so that no calorie is counted twice.
       - FAOSTAT rounds tonnages to the nearest thousand, so its balances do not close exactly; the gap is folded into residuals so that the chain lands exactly on food available for consumption.
-      - All stages are divided by the same population series, from Our World in Data's population dataset, and by 365 days. Regions (the world, continents and income groups) are built by summing the member countries with an FAO balance in that year, and divided by the population of those same countries.
+      - All stages are divided by the same population series, from Our World in Data's population dataset, and by 365 days. Regions (the world, continents and income groups) are built by summing the member countries with an FAO balance in that year, and divided by the population of those same countries; a region is left empty in years when those countries hold less than 80% of its population.
 
 dataset:
   update_period_days: 365

@@ -54,7 +54,9 @@ ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
    flow and food nutrient total is summed over those countries (fish included, from the same countries), and the
    region's population is the sum of those same countries' population. A country either has a full balance or none
    at all, so numerator and denominator always cover the same countries; countries FAO has not compiled for SCL
-   (Japan, Sudan, Somalia and a few others) are in neither. No minimum coverage is imposed.
+   (Japan, Sudan, Somalia and a few others) are in neither. A region-year is dropped when those countries hold less
+   than 80% of the region's population. "Low-income countries" is left out altogether: SCL never covers more than
+   80% of its population.
 
 9. All stages are divided by that population and by 365 days. SCL covers 2010 onward.
 """
@@ -191,6 +193,8 @@ FBS_TOTAL_ITEM_CODE = "00002901"
 HUNDRED_GRAMS_PER_TONNE = 10_000
 KG_PER_TONNE = 1000
 GRAMS_PER_TONNE = 1_000_000
+# Minimum share of a region's population that must live in member countries with a balance (assumption 8).
+MIN_FRACTION_POPULATION_COVERED = 0.8
 DAYS_PER_YEAR = 365
 # OWID regions rebuilt in this step (assumption 8); the FAOSTAT garden step's rows for them, if any, are dropped.
 REGIONS = [
@@ -201,7 +205,7 @@ REGIONS = [
     "North America",
     "Oceania",
     "South America",
-    "Low-income countries",
+    # "Low-income countries" is left out (assumption 8): SCL covers at most 80% of its population.
     "Lower-middle-income countries",
     "Upper-middle-income countries",
     "High-income countries",
@@ -366,7 +370,20 @@ def add_region_aggregates(tb: Table) -> Table:
     )
     tb = flows.merge(item_attributes, on="item_code", how="left").merge(population, on=["country", "year"], how="left")
     assert tb["population"].notnull().all(), "Some rows have no population after aggregating regions."
-    return tb
+
+    # A region-year whose members with a balance hold less than MIN_FRACTION_POPULATION_COVERED of the region's
+    # population is dropped, so that a label such as "Africa" is not carried by a fraction of Africa.
+    regions = population[population["country"].isin(REGIONS)]
+    regions = paths.regions.add_population(regions, population_col="region_population")
+    coverage = regions["population"] / regions["region_population"]
+    dropped = regions[coverage < MIN_FRACTION_POPULATION_COVERED]
+    if not dropped.empty:
+        log.info(
+            "food_supply_chain.regions_dropped_for_low_coverage",
+            region_years={r: sorted(g["year"].astype(int)) for r, g in dropped.groupby("country")},
+        )
+    keep = ~tb.set_index(["country", "year"]).index.isin(dropped.set_index(["country", "year"]).index)
+    return tb[keep].reset_index(drop=True)
 
 
 def sanity_check_balance_identity(tb: Table) -> None:
