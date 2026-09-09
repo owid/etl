@@ -31,7 +31,7 @@ meta:
         - Off-grid solar photovoltaic
         - Other off-grid renewable energy
 
-    citation_full: IRENA - Renewable capacity statistics 2024. International Renewable Energy Agency, Abu Dhabi (2024).
+    citation_full: IRENA – Renewable capacity statistics 2024. International Renewable Energy Agency, Abu Dhabi (2024).
     attribution_short: IRENA
     ####################################################################################################################
     # TODO: On next update, consider using the Renewable Energy Statistics report as the main source,
