@@ -1,7 +1,7 @@
 """Multidim export for LIS incomes across the distribution."""
 
-from etl.collection import filter_columns_by_dimension_choices
 from etl.helpers import PathFinder
+from etl.viz import filter_columns_by_dimension_choices
 
 paths = PathFinder(__file__)
 

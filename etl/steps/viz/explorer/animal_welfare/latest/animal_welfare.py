@@ -3,8 +3,8 @@
 import re
 from copy import deepcopy
 
-from etl.collection import expand_config
 from etl.helpers import PathFinder
+from etl.viz import expand_config
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

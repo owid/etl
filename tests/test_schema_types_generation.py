@@ -1,10 +1,10 @@
-"""Guard against drift in the auto-generated etl/collection/model/schema_types.py.
+"""Guard against drift in the auto-generated etl/viz/chart/model/schema_types.py.
 
 The file is generated from `schemas/multidim-schema.json`, `schemas/dataset-schema.json` and the
 vendored grapher schema in `schemas/` — all committed to the repo, so this check is deterministic
 and offline. It fails when:
 - one of the source schemas was edited without regenerating schema_types.py, or
-- schema_types.py was edited by hand (hand-written types belong in etl/collection/model/params.py).
+- schema_types.py was edited by hand (hand-written types belong in etl/viz/chart/model/params.py).
 
 To fix a failure, run: python scripts/generate_schema_types.py
 """
@@ -28,9 +28,9 @@ def test_schema_types_is_up_to_date():
         cwd=BASE_DIR,
     )
     assert result.returncode == 0, (
-        "etl/collection/model/schema_types.py is out of date with the JSON schemas in schemas/.\n"
+        "etl/viz/chart/model/schema_types.py is out of date with the JSON schemas in schemas/.\n"
         "Run `python scripts/generate_schema_types.py` to regenerate it "
-        "(hand-written types belong in etl/collection/model/params.py, not in the generated file).\n\n"
+        "(hand-written types belong in etl/viz/chart/model/params.py, not in the generated file).\n\n"
         f"{result.stdout}\n{result.stderr}"
     )
 

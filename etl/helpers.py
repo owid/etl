@@ -26,14 +26,14 @@ from owid.catalog.core.tables import (
 from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
 
 from etl import paths
-from etl.collection import Collection, CollectionSet
-from etl.collection.core.create import Listable, create_collection
-from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
 from etl.dag_helpers import load_dag
 from etl.data_corrections import apply_corrections, build_audit, load_corrections, write_audit
 from etl.data_helpers.geo import Regions
 from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
+from etl.viz import Collection, CollectionSet
+from etl.viz.chart.core.create import Listable, create_collection
+from etl.viz.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
 
 log = structlog.get_logger()
 

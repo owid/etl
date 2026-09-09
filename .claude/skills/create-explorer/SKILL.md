@@ -148,7 +148,7 @@ def run() -> None:
     c.save(tolerate_extra_indicators=True)
 ```
 
-Key APIs (see `etl/collection/core/expand.py` and `etl/collection/core/create.py`):
+Key APIs (see `etl/viz/chart/core/expand.py` and `etl/viz/chart/core/create.py`):
 
 - `tb[col].m.dimensions: dict[str, str]` — required per column. Each entry says "this column represents the (dim1=value, dim2=value) cell." Columns without `m.dimensions` are ignored by the expander.
 - `tb[col].m.original_short_name: str` — the unifying indicator name. With `indicator_names=[that_name]` and a single name, the expander treats all N columns as one logical indicator with N dimension combinations and drops the auto-added "indicator" pseudo-dimension.
@@ -235,7 +235,7 @@ For table-driven explorers, `views:` should still be present but is typically `v
 
 #### `catalogPath` — short forms accepted
 
-The `Indicator.is_a_valid_path` check (`etl/collection/model/view.py:62`) accepts three forms; pick the shortest one that still unambiguously resolves:
+The `Indicator.is_a_valid_path` check (`etl/viz/chart/model/view.py:62`) accepts three forms; pick the shortest one that still unambiguously resolves:
 
 | Form | Example | When to use |
 |---|---|---|
@@ -425,7 +425,7 @@ Hand the user the exact `etlr` command — don't run it yourself.
 
 ## Common pitfalls
 
-- **`build_views` does not propagate per-view `display` from indicator metadata** — see TODO at `etl/collection/core/expand.py:313`. Each auto-expanded view gets `indicators.y[0]` with only `catalogPath`, no `display`. If you need different color scales per view, either (a) put them in the indicator's `presentation.grapher_config.map.colorScale` so they apply at chart render time, or (b) post-process `c.views` in Python.
+- **`build_views` does not propagate per-view `display` from indicator metadata** — see TODO at `etl/viz/chart/core/expand.py:313`. Each auto-expanded view gets `indicators.y[0]` with only `catalogPath`, no `display`. If you need different color scales per view, either (a) put them in the indicator's `presentation.grapher_config.map.colorScale` so they apply at chart render time, or (b) post-process `c.views` in Python.
 - **`type: LineChart` is not a valid `grapher_config` field** when authoring via indicator metadata — use `chartTypes: ["LineChart"]` (the schema is an array). Per-view `config.type` in the explorer YAML still accepts strings.
 - **`tb.read(..., load_data=False)`** is essential when you only need column metadata to set dimensions; loading data unnecessarily slows the step.
 - **YAML schema requires `views:` key** in the explorer config even when empty. Pass `views: []`.

@@ -22,7 +22,7 @@ The grapher chart-config schema is owned by the web team in [`owid-grapher`](htt
 | `schemas/grapher-schema.NNN.json` | Vendored copy of upstream, and the single source of truth for the version (`DEFAULT_GRAPHER_SCHEMA` is derived from its `$id`) | automatic (`--refresh`; `--bump-version` for a new version) |
 | `schemas/multidim-schema.json` + `schemas/explorer-schema.json` | View config `$ref`s into the grapher schema | manual: add `$ref` for **new** properties |
 | `schemas/dataset-schema.json` | Embedded `grapher_config` block (validates garden `.meta.yml`) | manual: mirror changes, preserve deviations |
-| `etl/collection/model/schema_types.py` | Generated Python TypedDicts | automatic (regenerate) |
+| `etl/viz/chart/model/schema_types.py` | Generated Python TypedDicts | automatic (regenerate) |
 
 Unit tests enforce consistency between all of these (`tests/test_schema_types_generation.py`, `test_grapher_config_schema_sync` in `tests/test_metadata_schemas.py`), so partial syncs fail CI. Full background: `docs/guides/grapher-schema-sync.md`.
 
@@ -92,12 +92,12 @@ The grapher config is **embedded inline** (not `$ref`'d) under `...variables.add
 
 ```bash
 .venv/bin/python scripts/generate_schema_types.py
-git diff etl/collection/model/schema_types.py
+git diff etl/viz/chart/model/schema_types.py
 ```
 
 Sanity-check the diff: it should reflect exactly the upstream changes (plus any multidim `$ref` additions). If a class or field unexpectedly *disappears*, a `$ref` is probably missing (step 2).
 
-Hand-written types (e.g. `GroupViewsConfig`) live in `etl/collection/model/params.py` — never add them to the generated file.
+Hand-written types (e.g. `GroupViewsConfig`) live in `etl/viz/chart/model/params.py` — never add them to the generated file.
 
 ### 5. Validate
 

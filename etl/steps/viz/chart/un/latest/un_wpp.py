@@ -6,7 +6,7 @@ Strategy:
     - While some of the metadata is inherited from Garden/Grapher, some of it is set manually in the YAML files or programmatically once sub-collections are created.
     - Most of the sub-collections are created programmatically, with slight edits coming from YAML files (un_wpp.config.yml and un_wpp.sex_ratio.config.yml).
     - In addition, some views were created using manual configuration (see un_wpp.manual.config.yml).
-    - To create a sub-collection, we use the custom-made class MDIMCreator, which has a function `create`. While these object/functions are custom (they combine ds and ds_full tables in a particular way), some of its logic could be generalized and moved to etl.collection. For more details, please refer to the module utils.py.
+    - To create a sub-collection, we use the custom-made class MDIMCreator, which has a function `create`. While these object/functions are custom (they combine ds and ds_full tables in a particular way), some of its logic could be generalized and moved to etl.viz. For more details, please refer to the module utils.py.
     - All the created sub-collections are combined into a single MDIM, which is then exported.
 
 This step was migrated from the legacy explorer at `viz://explorer/un/latest/un_wpp` to replace the Explorer with a Multidim (MDIM) collection. The MDIM drops the TSV/owid-content template dependency of the Explorer pipeline and emits a JSON config that grapher renders natively.
@@ -15,8 +15,8 @@ This step was migrated from the legacy explorer at `viz://explorer/un/latest/un_
 from utils import MDIMCreator
 from view_edits import ViewEditor
 
-from etl.collection import combine_collections
 from etl.helpers import PathFinder
+from etl.viz import combine_collections
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

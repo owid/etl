@@ -39,9 +39,9 @@ from typing import Any, Literal
 
 from owid.catalog.tables import Table
 
-from etl.collection.core.combine import combine_collections
-from etl.collection.model.view import Indicator, View, ViewIndicators
 from etl.helpers import PathFinder
+from etl.viz.chart.core.combine import combine_collections
+from etl.viz.chart.model.view import Indicator, View, ViewIndicators
 
 paths = PathFinder(__file__)
 

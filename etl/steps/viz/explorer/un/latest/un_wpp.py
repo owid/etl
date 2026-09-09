@@ -7,7 +7,7 @@ Strategy:
     - While some of the metadata is inherited from Garden/Grapher, some of it is set manually in the YAML files or programmatically once explorers are created.
     - Most of the explorers are created programmatically, with slight edits coming from YAML files (un_wpp.config.yml and un_wpp.sex_ratio.yml).
     - In addition, some views, were created using manual configuration (see un_wpp.manual.yml).
-    - To create an explorer, we use the custom-made class ExplorerCreator, which has a function `create`. While these object/functions are custom (they combine ds and ds_full tables in a particular way), some of its logic could be generalized and moved to etl.collection. For more details, please refer to the module utils.py.
+    - To create an explorer, we use the custom-made class ExplorerCreator, which has a function `create`. While these object/functions are custom (they combine ds and ds_full tables in a particular way), some of its logic could be generalized and moved to etl.viz. For more details, please refer to the module utils.py.
     - All the created explorers are combined into a single one, which is then exported.
 
 NOTE: This pipeline assumes that there is a TSV template in owid-content, this should probably be change din the future.
@@ -16,8 +16,8 @@ NOTE: This pipeline assumes that there is a TSV template in owid-content, this s
 from utils import ExplorerCreator
 from view_edits import ViewEditor
 
-from etl.collection import combine_collections
 from etl.helpers import PathFinder
+from etl.viz import combine_collections
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

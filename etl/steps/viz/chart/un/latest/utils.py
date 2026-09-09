@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from etl.collection.model import Collection
 from etl.helpers import PathFinder
+from etl.viz.chart.model import Collection
 
 # Projection variants in UN WPP. Order matters: it's the order in which y-indicators
 # are concatenated when grouping with estimates. Estimates come first (solid line),

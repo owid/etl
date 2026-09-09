@@ -11,8 +11,8 @@ Grapher inherits them at chart render time, so most views are just
 `dimensions.{metric, sub_metric}` + `indicators.y[catalogPath]`.
 """
 
-from etl.collection import combine_collections
 from etl.helpers import PathFinder
+from etl.viz import combine_collections
 
 paths = PathFinder(__file__)
 

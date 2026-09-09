@@ -5,8 +5,8 @@
 import math
 from copy import deepcopy
 
-from etl.collection.model.view import View, ViewIndicators
 from etl.helpers import PathFinder
+from etl.viz.chart.model.view import View, ViewIndicators
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

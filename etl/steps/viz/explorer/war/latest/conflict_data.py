@@ -17,8 +17,8 @@ collection — no view rewriting, no `create_collection` call:
 
 from typing import cast
 
-from etl.collection.explorer import Explorer
 from etl.helpers import PathFinder
+from etl.viz.explorer import Explorer
 
 paths = PathFinder(__file__)
 

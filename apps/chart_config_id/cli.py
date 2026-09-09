@@ -28,9 +28,9 @@ from ruamel.yaml.comments import CommentedMap
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
-from etl.collection.chart_upsert import new_chart_config_id
 from etl.config import OWID_ENV, OWIDEnv
 from etl.files import ruamel_dump, ruamel_load
+from etl.viz.chart.upsert import new_chart_config_id
 
 console = Console()
 

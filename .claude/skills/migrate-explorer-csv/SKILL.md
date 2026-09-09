@@ -91,7 +91,7 @@ Before invoking `/create-explorer`, you can seed `<short>.config.yml` with a par
 
 ```python
 # In a notebook or one-off script
-from etl.collection.explorer.migration import migrate_csv_explorer
+from etl.viz.explorer.migration import migrate_csv_explorer
 config = migrate_csv_explorer("<slug>")  # reads from MySQL
 import yaml
 print(yaml.safe_dump(config, sort_keys=False))

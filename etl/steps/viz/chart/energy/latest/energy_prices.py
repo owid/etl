@@ -3,8 +3,8 @@ from typing import Any
 from owid.catalog.utils import underscore
 from pandas import DataFrame
 
-from etl.collection.model.view import View
 from etl.helpers import PathFinder
+from etl.viz.chart.model.view import View
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

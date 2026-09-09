@@ -7,8 +7,8 @@ from typing import Any
 from owid.catalog.utils import underscore
 from structlog import get_logger
 
-from etl.collection import combine_config_dimensions, expand_config
 from etl.helpers import PathFinder
+from etl.viz import combine_config_dimensions, expand_config
 
 # Initialize log.
 log = get_logger()

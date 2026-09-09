@@ -126,7 +126,7 @@ jobs:
             The upstream grapher schema changed in place. This PR contains the automatic part of the sync:
 
             - refreshed vendored `schemas/grapher-schema.*.json`
-            - regenerated `etl/collection/model/schema_types.py`
+            - regenerated `etl/viz/chart/model/schema_types.py`
 
             Published by: ${{ github.event.client_payload.commit && format('https://github.com/owid/owid-grapher/commit/{0}', github.event.client_payload.commit) || format('n/a — this run came from {0}, not an upstream dispatch', github.event_name) }}
 

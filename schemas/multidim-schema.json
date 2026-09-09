@@ -324,7 +324,7 @@
                     "When bringing an existing chart into ETL, use that chart's `charts.configId` so the config lands on the existing chart instead of creating a new one."
                 ],
                 [
-                    "For a brand-new chart, mint a UUIDv7 with `python -c 'from etl.collection.chart_upsert import new_chart_config_id; print(new_chart_config_id())'`."
+                    "For a brand-new chart, mint a UUIDv7 with `python -c 'from etl.viz.chart.upsert import new_chart_config_id; print(new_chart_config_id())'`."
                 ],
                 [
                     "Never change it once set — it is the chart's identity in every environment (local, staging, production)."

@@ -15,11 +15,11 @@ from typing_extensions import Self
 from apps.utils.files import generate_step, generate_step_to_channel
 from apps.wizard.etl_steps.utils import ADD_DAG_OPTIONS, COOKIE_STEPS, SNAPSHOT_SCHEMA, remove_playground_notebook
 from apps.wizard.utils import clean_empty_dict
-from etl.collection.utils import default_grapher_schema_version
 from etl.dag_helpers import write_to_dag_file
 from etl.files import ruamel_dump
 from etl.owners import resolve_owner
 from etl.paths import DAG_DIR, STEP_DIR
+from etl.viz.chart.utils import default_grapher_schema_version
 
 
 def _current_git_owner() -> str:

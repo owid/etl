@@ -35,7 +35,7 @@ python scripts/generate_schema_types.py --refresh
 python scripts/generate_schema_types.py --bump-version
 ```
 
-`--bump-version` reads the new version from `grapher-schema.latest.json`, vendors it, deletes the old copy, repoints the `$ref`s in `schemas/multidim-schema.json` and `schemas/explorer-schema.json`, and regenerates `etl/collection/model/schema_types.py`. It prints what still needs a human: reviewing the upstream diff, and mirroring genuinely new properties into the `grapher_config` block embedded in `schemas/dataset-schema.json` while preserving the deliberate ETL-side deviations.
+`--bump-version` reads the new version from `grapher-schema.latest.json`, vendors it, deletes the old copy, repoints the `$ref`s in `schemas/multidim-schema.json` and `schemas/explorer-schema.json`, and regenerates `etl/viz/chart/model/schema_types.py`. It prints what still needs a human: reviewing the upstream diff, and mirroring genuinely new properties into the `grapher_config` block embedded in `schemas/dataset-schema.json` while preserving the deliberate ETL-side deviations.
 
 !!! warning "Don't touch the `grapher_schema` pins in collection configs"
 

@@ -356,14 +356,14 @@ def test_multidim_configs_pin_grapher_schema():
     Grapher injects the collection's `grapherConfigSchema` as the `$schema` of each view config
     (single charts carry it as `$schema` directly) and migrates outdated configs forward. Without a
     pin there is nothing recording what the config was authored against, and ETL refuses to guess —
-    see `etl.collection.utils.resolve_grapher_schema` for the accepted forms.
+    see `etl.viz.chart.utils.resolve_grapher_schema` for the accepted forms.
 
     `Collection` enforces this at run time too (`validate_grapher_schema_pinned`, plus `required`
     in multidim-schema.json). This test is the fast, offline version: it needs no step run, and it
     catches a *malformed* pin (`grapher_schema:` with no value, an unquoted octal `011`) that a
     key-presence check would wave through.
     """
-    from etl.collection.utils import default_grapher_schema_version, resolve_grapher_schema
+    from etl.viz.chart.utils import default_grapher_schema_version, resolve_grapher_schema
 
     broken = []
     for config_path in sorted(Path(STEP_DIR / "viz" / "chart").glob("**/*.y*ml")):

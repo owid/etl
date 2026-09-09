@@ -14,7 +14,7 @@ from typing import Any
 
 import yaml
 
-from etl.collection.model import Collection
+from etl.viz.chart.model import Collection
 
 # Last year for which UN WPP publishes estimates (projections start the year after).
 # Used as the default `map.time` on grouped projection views so the map opens

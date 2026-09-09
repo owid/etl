@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.collection import filter_columns_by_dimension_choices
 from etl.helpers import PathFinder
+from etl.viz import filter_columns_by_dimension_choices
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

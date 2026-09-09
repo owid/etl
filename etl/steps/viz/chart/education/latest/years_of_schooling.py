@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.collection import combine_collections
 from etl.helpers import PathFinder
+from etl.viz import combine_collections
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
