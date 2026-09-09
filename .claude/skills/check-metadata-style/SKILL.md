@@ -112,8 +112,7 @@ for table_name in ds.table_names:
             put('presentation.grapher_config.note', gc.get('note'))
 
         # The chart footer resolves presentation.attribution > origin.attribution >
-        # origin.producer (year), so the visible credit usually comes from the origin —
-        # and from the producer alone when the origin sets no attribution.
+        # origin.producer (year), so the visible credit usually comes from the origin.
         for i, o in enumerate(getattr(m, 'origins', None) or []):
             put(f'origins[{i}].attribution', getattr(o, 'attribution', None))
             put(f'origins[{i}].producer', getattr(o, 'producer', None))
@@ -154,30 +153,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 
 If `DATA_DIR / step_path` does not exist, parse the `.meta.yml` directly with `etl.files.ruamel_load` and pull the same field names from the `tables → <name> → variables → <var>` tree.
 
-That covers the indicator-level fields only. The origin fields (`origins[i].attribution`, `origins[i].producer`) never appear in a `.meta.yml`, so to keep them in the audit resolve the step's snapshot dependencies through the DAG and read them from each snapshot's `.dvc`:
-
-```python
-from etl.dag_helpers import load_dag
-from etl.files import ruamel_load
-from etl.paths import SNAPSHOTS_DIR
-
-dag = load_dag()
-deps = {d for d in dag.get(f"data://{step_path}", set()) | dag.get(f"data-private://{step_path}", set())}
-# walk down to the snapshots (meadow/garden steps sit in between)
-seen, stack, snaps = set(), list(deps), []
-while stack:
-    d = stack.pop()
-    if d in seen: continue
-    seen.add(d)
-    if d.startswith("snapshot"): snaps.append(d.split("://", 1)[1])          # 'ns/version/name.ext'
-    else: stack.extend(dag.get(d, set()))
-for rel in snaps:
-    origin = (ruamel_load(SNAPSHOTS_DIR / f"{rel}.dvc") or {}).get("meta", {}).get("origin") or {}
-    put(f"{rel}.origin.attribution", origin.get("attribution"))
-    put(f"{rel}.origin.producer", origin.get("producer"))
-```
-
-A step can also assign origin fields in code after loading the snapshot (see the routing note in step 5); the fallback cannot see those, so say so in the report.
+Origin fields (`origins[i].attribution`, `origins[i].producer`) live in the snapshot `.dvc`, not the `.meta.yml`, so this fallback does not cover them — say so in the report.
 
 **Parse the garden `.meta.yml`, not just the grapher one.** Most datasets author their user-facing text in garden and have a thin or absent grapher `.meta.yml`, so reading only the grapher layer here finds nothing and reports a clean bill of health on unaudited text. Read both (`etl/steps/data/garden/<ns>/<version>/<dataset>.meta.yml` and the grapher one if it exists) and note that grapher values override garden ones on the same field.
 
@@ -206,7 +182,7 @@ Report format, one block per violation:
 
 Group the blocks by variable for readability. End with a summary count.
 
-**Exception — producer-prescribed citations.** The short-citation rules (en dash between producer and data product, surname format, capitalization as the provider writes it) do not apply when the producer explicitly asked for a specific short citation: `schemas/definitions.json` says to follow their guidelines and ignore the preferred format in that case (`origin.attribution`, last guideline). So for `origins[i].attribution`, check the snapshot's `.dvc` first — a `citation_full`, `description` or comment that states the producer's required wording. If the attribution reproduces that wording, report it as *"producer-prescribed — not changed"* rather than as a violation, and never offer a fix. `origins[i].producer` is OWID-authored (the producer's name in our own words), so it gets the normal rules.
+**Exception:** when the producer explicitly asked for a specific short citation, `schemas/definitions.json` says to follow it. Report a matching `origins[i].attribution` as producer-prescribed rather than as a violation, and don't offer a fix.
 
 If no violations are found, say so and list the fields that were inspected — the user should know what was checked, not just that nothing came up.
 
@@ -228,7 +204,7 @@ with open(meta_yml_path, 'w') as f:
     f.write(ruamel_dump(data))
 ```
 
-Origin fields (`origins[i].attribution`, `origins[i].producer`) are not in the `.meta.yml` at all. Trace each one to where it is actually set before fixing it: usually the snapshot's `.dvc` (`meta.origin.*`), but a meadow or garden step can construct or overwrite an origin in code after loading the snapshot — e.g. `etl/steps/data/meadow/energy_institute/2026-06-30/statistical_review_of_world_energy.py` assigns `origins[0].attribution` for the price indicators. Grep the step's `.py` files for `.attribution =`, `.producer =`, `Origin(` and `origins[` first; if the value comes from code, the fix goes in that step (editing the `.dvc` would be rebuilt away). Otherwise edit the `.dvc` with the same `ruamel_load` / `ruamel_dump` round-trip. Anything reported as producer-prescribed is excluded from **Fix all**.
+Origin fields are set in the snapshot `.dvc` (`meta.origin.*`) — or, occasionally, by the step's own code after it loads the snapshot. Check which before editing, and edit that one. Producer-prescribed attributions stay out of **Fix all**.
 
 If a violation only shows up in the rendered output because of a Jinja definition (e.g. the issue is inside `{definitions.foo}`), flag it for manual fix — don't auto-rewrite the definition without asking.
 
