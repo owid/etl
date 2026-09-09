@@ -206,15 +206,11 @@ def get_table_from_notion_url(
     return df
 
 
-def get_impact_highlights(
-    producers: list[str] | None = None,
+def get_notion_table_period(
     min_date: str = NOTION_IMPACT_HIGHLIGHTS_MIN_DATE,
     max_date: str = NOTION_IMPACT_HIGHLIGHTS_MAX_DATE,
     max_rows: int | None = None,
-) -> pd.DataFrame:
-    # Name of column of related data producers.
-    producer_col = "Data provider(s) related"
-    # Name of column containing the date.
+):
     date_col = "Date"
 
     # Fetch impact highlights from Notion.
@@ -231,6 +227,24 @@ def get_impact_highlights(
     )
 
     log.info(f"Filtered impact highlights to date range {min_date} to {max_date}, {len(df)} rows remaining")
+
+    return df
+
+
+def get_impact_highlights(
+    producers: list[str] | None = None,
+    min_date: str = NOTION_IMPACT_HIGHLIGHTS_MIN_DATE,
+    max_date: str = NOTION_IMPACT_HIGHLIGHTS_MAX_DATE,
+    max_rows: int | None = None,
+    df: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    # Name of column of related data producers.
+    producer_col = "Data provider(s) related"
+    # Name of column containing the date.
+    if df is None:
+        df = get_notion_table_period(min_date=min_date, max_date=max_date, max_rows=max_rows)
+    else:
+        df = df.copy()
 
     if producers is not None:
         # Find indexes of rows where the given producers are mentioned.
