@@ -1,5 +1,5 @@
 # Known errors in the Lexical Index source data (Skaaning et al.), patched locally until the
-# provider ships the fix. See etl/data_corrections.py for the format.
+# producer ships the fix. See etl/data_corrections.py for the format.
 #
 # India's universal right to vote (men and women) is coded as beginning in 1947 (independence),
 # but it began in 1950, when the Constitution came into force. Confirmed with Svend-Erik Skaaning;
@@ -15,7 +15,7 @@
   reason: >-
     Universal male suffrage in India is coded as beginning in 1947 (independence), but it began in
     1950 (Constitution in force). Confirmed with Svend-Erik Skaaning; fix due in the 2027 release.
-  provider: Lexical Index
+  producer: Lexical Index
   reported: "2026-07-09"
   status: acknowledged
 - indicator: female_suffrage_lied
@@ -27,7 +27,7 @@
   reason: >-
     Universal female suffrage in India is coded as beginning in 1947 (independence), but it began in
     1950 (Constitution in force). Confirmed with Svend-Erik Skaaning; fix due in the 2027 release.
-  provider: Lexical Index
+  producer: Lexical Index
   reported: "2026-07-09"
   status: acknowledged
 # India's political regime classification carries the same 1947-vs-1950 dating error as the suffrage
@@ -63,7 +63,7 @@
     1947-1949 keeps the component consistent with the corrected multi-party autocracy (score 3), which
     is defined by the absence of competitive elections. Same upstream dating error as the India
     suffrage corrections above; fix due in the 2027 release.
-  provider: Lexical Index
+  producer: Lexical Index
   reported: "2026-07-09"
   status: acknowledged
 - indicator: regime_redux_lied
@@ -77,7 +77,7 @@
     (independence), but India held no competitive multi-party elections under universal suffrage until
     1951-52; it should be a multi-party autocracy (3) from 1947 to 1949. Same upstream dating error as
     the India suffrage corrections above; fix due in the 2027 release.
-  provider: Lexical Index
+  producer: Lexical Index
   reported: "2026-07-09"
   status: acknowledged
 - indicator: regime_lied
@@ -94,6 +94,6 @@
     multi-party elections under universal suffrage until 1951-52; it should be a multi-party autocracy
     (3) from 1947 to 1949. Same upstream dating error as the India suffrage corrections above; fix due
     in the 2027 release.
-  provider: Lexical Index
+  producer: Lexical Index
   reported: "2026-07-09"
   status: acknowledged

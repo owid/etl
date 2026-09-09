@@ -789,7 +789,7 @@ FORCE_DATASETTE = (not METABASE_API_KEY) or (not METABASE_URL)
 # Get Notion credentials.
 NOTION_API_KEY = os.environ.get("NOTION_API_KEY")
 NOTION_IMPACT_HIGHLIGHTS_TABLE_URL = os.environ.get("NOTION_IMPACT_HIGHLIGHTS_TABLE_URL")
-NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL = os.environ.get("NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL")
+NOTION_DATA_PRODUCERS_CONTACTS_TABLE_URL = os.environ.get("NOTION_DATA_PRODUCERS_CONTACTS_TABLE_URL")
 
 # Google drive IDs for folders, docs and sheets, for the data producer reports project.
 # NOTE: Here we fill all variables with "" if not found to simplify type checks (this way we ensure they are strings).

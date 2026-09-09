@@ -1,7 +1,7 @@
 """CLI to inventory and visualise all `.corrections.yml` files in the repo.
 
 Scans every step for a `.corrections.yml` sidecar, validates the entries (so this also acts as a
-repo-wide lint), and renders a self-contained HTML dashboard grouped by provider and status. This is
+repo-wide lint), and renders a self-contained HTML dashboard grouped by producer and status. This is
 the cross-dataset view of known upstream data errors and what we've reported to whom.
 
     etl corrections -o /tmp/c.html            # write the dashboard and open it
@@ -28,8 +28,8 @@ console = Console()
 # Colours for each status, used for the HTML badges.
 STATUS_COLORS = {
     "open": "#d9534f",  # red — unreported error we're carrying
-    "reported": "#f0ad4e",  # amber — told the provider, awaiting fix
-    "acknowledged": "#5bc0de",  # blue — provider confirmed
+    "reported": "#f0ad4e",  # amber — told the producer, awaiting fix
+    "acknowledged": "#5bc0de",  # blue — producer confirmed
     "fixed_upstream": "#5cb85c",  # green — fixed at source (correction can likely be removed)
 }
 STATUS_ORDER = ["open", "reported", "acknowledged", "fixed_upstream"]
@@ -201,11 +201,11 @@ def _render_html(rows: list[dict[str, Any]], generated_at: str, charts: bool) ->
         for s in STATUS_ORDER
     )
 
-    # Sort rows by provider, then status order, then dataset path.
+    # Sort rows by producer, then status order, then dataset path.
     rows = sorted(
         rows,
         key=lambda r: (
-            str(r["correction"].get("provider", "")).lower(),
+            str(r["correction"].get("producer", "")).lower(),
             STATUS_ORDER.index(r["correction"]["status"]) if r["correction"].get("status") in STATUS_ORDER else 99,
             str(r["path"]),
         ),
@@ -227,7 +227,7 @@ def _render_html(rows: list[dict[str, Any]], generated_at: str, charts: bool) ->
         body_rows.append(
             f'<tr class="{row_class}">'
             f"{expand_cell}"
-            f"<td>{html.escape(str(c.get('provider', '')))}</td>"
+            f"<td>{html.escape(str(c.get('producer', '')))}</td>"
             f"<td><code>{html.escape(dataset)}</code></td>"
             f"<td><code>{html.escape(str(c.get('indicator', '')))}</code></td>"
             f"<td>{html.escape(_locator(c))}</td>"
@@ -288,11 +288,11 @@ def _render_html(rows: list[dict[str, Any]], generated_at: str, charts: bool) ->
   <h1>Data corrections inventory</h1>
   <div class="sub">{len(rows)} corrections across the repo · generated {generated_at}</div>
   <div class="cards">{summary_cards}</div>
-  <input type="search" id="filter" placeholder="Filter (provider, dataset, country, reason…)">
+  <input type="search" id="filter" placeholder="Filter (producer, dataset, country, reason…)">
   <div class="table-wrap">
   <table id="t">
     <thead><tr>
-      {"<th></th>" if charts else ""}<th>Provider</th><th>Dataset</th><th>Indicator</th><th>Locator</th>
+      {"<th></th>" if charts else ""}<th>Producer</th><th>Dataset</th><th>Indicator</th><th>Locator</th>
       <th>Action</th><th>Status</th><th>Reported</th><th>Reason</th>
     </tr></thead>
     <tbody>
@@ -362,16 +362,16 @@ def _render_html(rows: list[dict[str, Any]], generated_at: str, charts: bool) ->
 
 def _print_terminal_summary(rows: list[dict[str, Any]]) -> None:
     table = RichTable(title=f"{len(rows)} data corrections", show_lines=False)
-    table.add_column("Provider")
+    table.add_column("Producer")
     table.add_column("Dataset")
     table.add_column("Locator")
     table.add_column("Action")
     table.add_column("Status")
-    for r in sorted(rows, key=lambda r: str(r["correction"].get("provider", ""))):
+    for r in sorted(rows, key=lambda r: str(r["correction"].get("producer", ""))):
         c = r["correction"]
         dataset = str(r["path"].parent.relative_to(STEP_DIR)) + "/" + r["path"].name.replace(".corrections.yml", "")
         table.add_row(
-            str(c.get("provider", "")),
+            str(c.get("producer", "")),
             dataset,
             _locator(c),
             _action_detail(c),
@@ -398,7 +398,7 @@ def cli(output: Path, open_browser: bool, charts: bool) -> None:
     """Inventory all `.corrections.yml` files and render an HTML dashboard.
 
     Scans every step for a `.corrections.yml` sidecar, validates each entry, and writes a
-    self-contained HTML page grouped by provider and status. With ``--charts``, each row expands to a
+    self-contained HTML page grouped by producer and status. With ``--charts``, each row expands to a
     small time-series of the affected indicator (loaded from the built dataset — run the steps first).
     """
     rows = collect_corrections(STEP_DIR)

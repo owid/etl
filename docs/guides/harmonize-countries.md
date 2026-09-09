@@ -3,7 +3,7 @@ tags:
   - Data Workflow
 icon: lucide/whole-word
 ---
-A crucial step in the ETL process is harmonizing country names. This is because different datasets or providers may use different names to refer to the same country. We want to keep country names consistent, and use names from our standardised list.
+A crucial step in the ETL process is harmonizing country names. This is because different datasets or producers may use different names to refer to the same country. We want to keep country names consistent, and use names from our standardised list.
 
 !!! info
 
@@ -24,7 +24,7 @@ Typically, harmonizing country names is done while developing the Garden step, a
 
 Harmonization is the editorial process by which we modify the indexing columns for a dataset to ensure that the data is consistent and unambiguous.
 
-Harmonizing a country name can sometimes be done automatically, based on mappings done in the past. However, in many cases, manual intervention is needed. For example, a `country` column containing the value `Korea` could be referring to South Korea, North Korea, or historical unified Korea, depending on the context and the intent of the data provider. In such case, human judgement is needed.
+Harmonizing a country name can sometimes be done automatically, based on mappings done in the past. However, in many cases, manual intervention is needed. For example, a `country` column containing the value `Korea` could be referring to South Korea, North Korea, or historical unified Korea, depending on the context and the intent of the data producer. In such case, human judgement is needed.
 
 We strive to harmonize country names in a way that is consistent with the [:octicons-link-external-16: ISO 3166-1 standard](https://en.wikipedia.org/wiki/ISO_3166-1), however we use custom editorial labels for countries and regions that are often shorter than those in the standard, in order to make data visualisations richer and more understandable.
 

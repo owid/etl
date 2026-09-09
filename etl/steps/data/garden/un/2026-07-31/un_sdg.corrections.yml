@@ -1,4 +1,4 @@
-# Known errors in the UN SDG source data, patched locally until the provider fixes them.
+# Known errors in the UN SDG source data, patched locally until the producer fixes them.
 # See etl/data_corrections.py for the format; `etl corrections --charts` inventories them.
 
 # South Africa's 2024 submission for indicator 8.8.1 (occupational injuries) is unusable in
@@ -34,7 +34,7 @@
   # Every matched row is >100 per 100,000 (116.08, 440.92, 556.99); a corrected rate would be
   # single-digit, so this fails the build instead of silently suppressing the fix.
   expect: {gt: 100}
-  provider: International Labour Organization
+  producer: International Labour Organization
   status: open
 
 - indicator: value
@@ -46,7 +46,7 @@
     male and female rates rather than a weighted average. Consistent with this series being
     transposed with the fatal one at source.
   expect: {lt: 100}
-  provider: International Labour Organization
+  producer: International Labour Organization
   status: open
 
 # ---------------------------------------------------------------------------------------------
@@ -99,7 +99,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2007: 10.52 kg/capita published
     against 9.509 kg/capita implied by 325,100 tonnes; product = 100.0.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -110,7 +110,7 @@
     population (see the block comment above). 2023: 7.12 kg/capita published
     against 14.05 kg/capita implied by 1,136 tonnes; product = 100.0.
   expect: {lt: 9.99548}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -121,7 +121,7 @@
     population (see the block comment above). 2021: 4.87 kg/capita published
     against 20.54 kg/capita implied by 930,850 tonnes; product = 100.0.
   expect: {lt: 10.0037}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -132,7 +132,7 @@
     population (see the block comment above). 2023: 0.01 kg/capita published
     against 1.087e+04 kg/capita implied by 32,000,570 tonnes; product = 108.7.
   expect: {lt: 9.98198}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -142,7 +142,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2023: 4.43 kg/capita published
     against 22.57 kg/capita implied by 232,926 tonnes; product = 100.0.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -153,7 +153,7 @@
     population (see the block comment above). 2019: 1.61 kg/capita published
     against 62.25 kg/capita implied by 92,481 tonnes; product = 100.2.
   expect: {lt: 9.99916}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -163,7 +163,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2021: 1.54 kg/capita published
     against 64.82 kg/capita implied by 10,867,839 tonnes; product = 99.8.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -173,7 +173,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2023: 0.39 kg/capita published
     against 253.3 kg/capita implied by 2,309,131 tonnes; product = 98.8.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -184,7 +184,7 @@
     population (see the block comment above). 2000: 31.07 kg/capita published
     against 3.218 kg/capita implied by 775 tonnes; product = 100.0.
   expect: {gt: 9.99966}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -195,7 +195,7 @@
     population (see the block comment above). 2002: 452.03 kg/capita published
     against 0.2212 kg/capita implied by 1,698 tonnes; product = 100.0.
   expect: {gt: 10}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -205,7 +205,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2019: 3.56 kg/capita published
     against 28.07 kg/capita implied by 1,800 tonnes; product = 99.9.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -216,7 +216,7 @@
     population (see the block comment above). 2019: 213.26 kg/capita published
     against 0.4689 kg/capita implied by 359 tonnes; product = 100.0.
   expect: {gt: 10}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -227,7 +227,7 @@
     population (see the block comment above). 2011: 91048.7 kg/capita published
     against 0.001098 kg/capita implied by 18 tonnes; product = 100.0.
   expect: {gt: 10}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -238,7 +238,7 @@
     population (see the block comment above). 2009: 219.28 kg/capita published
     against 0.456 kg/capita implied by 8,717 tonnes; product = 100.0.
   expect: {gt: 10.0001}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -249,7 +249,7 @@
     population (see the block comment above). 2014: 14.44 kg/capita published
     against 6.927 kg/capita implied by 3,549 tonnes; product = 100.0.
   expect: {gt: 10.0013}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -259,7 +259,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2023: 1.35 kg/capita published
     against 74.14 kg/capita implied by 105,465,000 tonnes; product = 100.1.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -270,7 +270,7 @@
     population (see the block comment above). 2021: 4.72 kg/capita published
     against 21.17 kg/capita implied by 235,498 tonnes; product = 99.9.
   expect: {lt: 10.001}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -280,7 +280,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2021: 8.75 kg/capita published
     against 11.42 kg/capita implied by 768 tonnes; product = 100.0.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -291,7 +291,7 @@
     population (see the block comment above). 2020: 125.5 kg/capita published
     against 0.7968 kg/capita implied by 13,981 tonnes; product = 100.0.
   expect: {gt: 10.0002}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -302,7 +302,7 @@
     population (see the block comment above). 2021: 0.44 kg/capita published
     against 228.4 kg/capita implied by 1,428,520 tonnes; product = 100.5.
   expect: {lt: 10.0147}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -312,7 +312,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2023: 4.82 kg/capita published
     against 20.73 kg/capita implied by 19,158 tonnes; product = 99.9.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -322,7 +322,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2023: 17.98 kg/capita published
     against 5.56 kg/capita implied by 1,687 tonnes; product = 100.0.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -332,7 +332,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2023: 2.86 kg/capita published
     against 34.94 kg/capita implied by 13,157 tonnes; product = 99.9.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -342,7 +342,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2017: 106.45 kg/capita published
     against 0.9394 kg/capita implied by 15,564 tonnes; product = 100.0.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -352,7 +352,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2023: 26.81 kg/capita published
     against 3.73 kg/capita implied by 27,765 tonnes; product = 100.0.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -362,7 +362,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2023: 9.18 kg/capita published
     against 10.89 kg/capita implied by 15,657,711 tonnes; product = 100.0.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -373,7 +373,7 @@
     population (see the block comment above). 2023: 124.59 kg/capita published
     against 0.8026 kg/capita implied by 36,178 tonnes; product = 100.0.
   expect: {gt: 9.99987}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -384,7 +384,7 @@
     population (see the block comment above). 2006: 27.01 kg/capita published
     against 3.702 kg/capita implied by 10,000 tonnes; product = 100.0.
   expect: {gt: 10.0003}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -394,7 +394,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2021: 14.62 kg/capita published
     against 6.842 kg/capita implied by 75,715 tonnes; product = 100.0.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -405,7 +405,7 @@
     population (see the block comment above). 2023: 0.05 kg/capita published
     against 2159 kg/capita implied by 43,894,188 tonnes; product = 108.0.
   expect: {lt: 10.3243}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -416,7 +416,7 @@
     population (see the block comment above). 2017: 128.3 kg/capita published
     against 0.7795 kg/capita implied by 38,347 tonnes; product = 100.0.
   expect: {gt: 10.0002}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -427,7 +427,7 @@
     population (see the block comment above). 2017: 0.05 kg/capita published
     against 2033 kg/capita implied by 12,648,247 tonnes; product = 101.7.
   expect: {lt: 10.191}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -438,7 +438,7 @@
     population (see the block comment above). 2002: 4.44 kg/capita published
     against 22.51 kg/capita implied by 100,492 tonnes; product = 100.0.
   expect: {lt: 9.99814}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -449,7 +449,7 @@
     population (see the block comment above). 2019: 782.7 kg/capita published
     against 0.1278 kg/capita implied by 282 tonnes; product = 100.0.
   expect: {gt: 10.0001}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -460,7 +460,7 @@
     population (see the block comment above). 2023: 0.44 kg/capita published
     against 228.3 kg/capita implied by 9,047 tonnes; product = 100.5.
   expect: {lt: 10.0034}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -471,7 +471,7 @@
     population (see the block comment above). 2023: 60.91 kg/capita published
     against 1.642 kg/capita implied by 1,172 tonnes; product = 100.0.
   expect: {gt: 9.99938}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -482,7 +482,7 @@
     population (see the block comment above). 2007: 44.21 kg/capita published
     against 2.262 kg/capita implied by 45,957 tonnes; product = 100.0.
   expect: {gt: 9.99975}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -493,7 +493,7 @@
     population (see the block comment above). 2023: 0.6 kg/capita published
     against 166.3 kg/capita implied by 5,841,597 tonnes; product = 99.8.
   expect: {lt: 10.003}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -503,7 +503,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2023: 8.04 kg/capita published
     against 12.44 kg/capita implied by 4,304 tonnes; product = 100.0.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -513,7 +513,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2017: 5.98 kg/capita published
     against 16.72 kg/capita implied by 21,576 tonnes; product = 100.0.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -524,7 +524,7 @@
     population (see the block comment above). 2021: 60.29 kg/capita published
     against 1.659 kg/capita implied by 5,015 tonnes; product = 100.0.
   expect: {gt: 10.0007}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -534,7 +534,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2023: 0.86 kg/capita published
     against 115.7 kg/capita implied by 4,512 tonnes; product = 99.5.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -545,7 +545,7 @@
     population (see the block comment above). 2023: 0.79 kg/capita published
     against 126.4 kg/capita implied by 433,903 tonnes; product = 99.9.
   expect: {lt: 9.99244}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -556,7 +556,7 @@
     population (see the block comment above). 2013: 11.68 kg/capita published
     against 8.562 kg/capita implied by 289,284 tonnes; product = 100.0.
   expect: {gt: 10.0001}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -567,7 +567,7 @@
     population (see the block comment above). 2021: 6101.38 kg/capita published
     against 0.01639 kg/capita implied by 875 tonnes; product = 100.0.
   expect: {gt: 10}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -578,7 +578,7 @@
     population (see the block comment above). 2005: 2.48 kg/capita published
     against 40.27 kg/capita implied by 554,000 tonnes; product = 99.9.
   expect: {lt: 10.005}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -588,7 +588,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2024: 5.06 kg/capita published
     against 19.75 kg/capita implied by 104,285 tonnes; product = 99.9.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -598,7 +598,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2016: 0.65 kg/capita published
     against 152.8 kg/capita implied by 707,791 tonnes; product = 99.3.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -609,7 +609,7 @@
     population (see the block comment above). 2011: 119.35 kg/capita published
     against 0.8379 kg/capita implied by 3,095 tonnes; product = 100.0.
   expect: {gt: 10}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -620,7 +620,7 @@
     population (see the block comment above). 2021: 1.58 kg/capita published
     against 63.14 kg/capita implied by 2,093,460 tonnes; product = 99.8.
   expect: {lt: 10.007}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -630,7 +630,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2019: 2.3 kg/capita published
     against 43.53 kg/capita implied by 4,823,160 tonnes; product = 100.1.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -640,7 +640,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2023: 1.64 kg/capita published
     against 60.92 kg/capita implied by 181,477 tonnes; product = 99.9.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -650,7 +650,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2023: 4.97 kg/capita published
     against 20.1 kg/capita implied by 17,589 tonnes; product = 99.9.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -661,7 +661,7 @@
     population (see the block comment above). 2023: 0.18 kg/capita published
     against 557.6 kg/capita implied by 81,093,016 tonnes; product = 100.4.
   expect: {lt: 10.0181}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -672,7 +672,7 @@
     population (see the block comment above). 2002: 75564.7 kg/capita published
     against 0.001323 kg/capita implied by 0 tonnes; product = 100.0.
   expect: {gt: 9.99921}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -683,7 +683,7 @@
     population (see the block comment above). 2020: 1.79 kg/capita published
     against 55.97 kg/capita implied by 1,734,527 tonnes; product = 100.2.
   expect: {lt: 9.99831}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -694,7 +694,7 @@
     population (see the block comment above). 2021: 190.65 kg/capita published
     against 0.5245 kg/capita implied by 65 tonnes; product = 100.0.
   expect: {gt: 9.99952}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -705,7 +705,7 @@
     population (see the block comment above). 2020: 1.56 kg/capita published
     against 63.91 kg/capita implied by 359,170 tonnes; product = 99.7.
   expect: {lt: 9.9982}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -716,7 +716,7 @@
     population (see the block comment above). 2017: 0.11 kg/capita published
     against 903.6 kg/capita implied by 52,076,716 tonnes; product = 99.4.
   expect: {lt: 10.0031}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -727,7 +727,7 @@
     population (see the block comment above). 2023: 62888.6 kg/capita published
     against 0.00159 kg/capita implied by 1 tonnes; product = 100.0.
   expect: {gt: 9.99994}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -738,7 +738,7 @@
     population (see the block comment above). 2003: 38889.8 kg/capita published
     against 0.002571 kg/capita implied by 46 tonnes; product = 100.0.
   expect: {gt: 10}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -749,7 +749,7 @@
     population (see the block comment above). 2021: 92086.2 kg/capita published
     against 0.001086 kg/capita implied by 68 tonnes; product = 100.0.
   expect: {gt: 9.99982}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -759,7 +759,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2023: 30.11 kg/capita published
     against 3.321 kg/capita implied by 238,135 tonnes; product = 100.0.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -770,7 +770,7 @@
     population (see the block comment above). 2013: 621.53 kg/capita published
     against 0.1724 kg/capita implied by 1,172 tonnes; product = 107.2.
   expect: {gt: 10.3755}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -780,7 +780,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2022: 4617.04 kg/capita published
     against 0.02166 kg/capita implied by 32 tonnes; product = 100.0.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -791,7 +791,7 @@
     population (see the block comment above). 2020: 3.57 kg/capita published
     against 28 kg/capita implied by 335,227 tonnes; product = 99.9.
   expect: {lt: 10.0009}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -801,7 +801,7 @@
     Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
     population (see the block comment above). 2023: 20.07 kg/capita published
     against 4.984 kg/capita implied by 188,048 tonnes; product = 100.0.
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -812,7 +812,7 @@
     population (see the block comment above). 2023: 1.24 kg/capita published
     against 80.94 kg/capita implied by 861,330 tonnes; product = 100.4.
   expect: {lt: 9.99942}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -823,7 +823,7 @@
     population (see the block comment above). 2023: 28.39 kg/capita published
     against 3.523 kg/capita implied by 125,593 tonnes; product = 100.0.
   expect: {gt: 10.0005}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -834,7 +834,7 @@
     population (see the block comment above). 2023: 7.27 kg/capita published
     against 13.76 kg/capita implied by 1,381,027 tonnes; product = 100.0.
   expect: {lt: 10.0024}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 - indicator: value
@@ -845,7 +845,7 @@
     population (see the block comment above). 2005: 14.65 kg/capita published
     against 6.827 kg/capita implied by 80,000 tonnes; product = 100.0.
   expect: {gt: 10.0005}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 # Brunei is broken differently: its total (EN_HAZ_GENV) reads 0.00-0.01 tonnes while the
 # per-capita series reads 8.7-36 million "kg per capita". The two series look transposed or
@@ -859,7 +859,7 @@
     0.00-0.01 tonnes over the same years, so the two series are inconsistent by ~12 orders of
     magnitude.
   expect: {gt: 1000000}
-  provider: United Nations Statistics Division and United Nations Environment Programme
+  producer: United Nations Statistics Division and United Nations Environment Programme
   status: open
 
 # ---------------------------------------------------------------------------------------------
@@ -910,7 +910,7 @@
     value anywhere else in the indicator. The OECD's SDMX API returns the same figure, so the
     error is inherited rather than introduced by the UN.
   expect: {gt: 20}
-  provider: Organisation for Economic Co-operation and Development
+  producer: Organisation for Economic Co-operation and Development
   status: open
 
 - indicator: value
@@ -920,7 +920,7 @@
     Fossil-fuel subsidies of 59.31% of GDP for Latvia in 2022, against 0.61% in 2021 and 1.17%
     in 2023. Follows directly from the erroneous $21.58bn total; see the ER_FFS_CMPT_CD entry.
   expect: {gt: 50}
-  provider: Organisation for Economic Co-operation and Development
+  producer: Organisation for Economic Co-operation and Development
   status: open
 
 - indicator: value
@@ -931,7 +931,7 @@
     $224 in 2023, and 2.5x the largest value anywhere else in the indicator (Kuwait 2022, at
     $4,510). Follows directly from the erroneous $21.58bn total; see the ER_FFS_CMPT_CD entry.
   expect: {gt: 10000}
-  provider: Organisation for Economic Co-operation and Development
+  producer: Organisation for Economic Co-operation and Development
   status: open
 
 - indicator: value
@@ -942,7 +942,7 @@
     that year. The UN uses Italy's ISTAT submission, which has no 2024 figure, and encodes the
     missing year as zero rather than leaving it blank.
   expect: {eq: 0}
-  provider: United Nations Statistics Division
+  producer: United Nations Statistics Division
   status: open
 
 - indicator: value
@@ -952,7 +952,7 @@
     Italy's 2024 per-capita value is an exact 0 after $327.86 in 2023. Missing year encoded as
     zero; see the ER_FFS_CMPT_CD entry.
   expect: {eq: 0}
-  provider: United Nations Statistics Division
+  producer: United Nations Statistics Division
   status: open
 
 - indicator: value
@@ -963,7 +963,7 @@
     The 2023-08-16 release published $21.36-35.35bn for those same years, and Venezuela remains
     in the OECD-IEA 82-country coverage list, so these are missing years encoded as zero rather
     than a genuine absence of subsidies.
-  provider: United Nations Statistics Division
+  producer: United Nations Statistics Division
   status: open
 
 - indicator: value
@@ -972,7 +972,7 @@
   reason: >-
     Venezuela reports an exact 0% of GDP for 2010-2014 and 1.61-15.74% for every year from 2015
     on. Missing years encoded as zero; see the ER_FFS_CMPT_CD entry.
-  provider: United Nations Statistics Division
+  producer: United Nations Statistics Division
   status: open
 
 - indicator: value
@@ -982,7 +982,7 @@
     Venezuela reports an exact $0 per person for 2010-2014 and $161-644 for every year from
     2015 on, where the 2023-08-16 release published $744-1,185. Missing years encoded as zero;
     see the ER_FFS_CMPT_CD entry.
-  provider: United Nations Statistics Division
+  producer: United Nations Statistics Division
   status: open
 
 # ---------------------------------------------------------------------------------------------
@@ -1028,7 +1028,7 @@
     series is consistent with the total, so only this series is mis-scaled. Also covers the 2025
     and 2026 carry-forwards, for which no subsidy total is published.
   expect: {lt: 0.01}
-  provider: United Nations Statistics Division
+  producer: United Nations Statistics Division
   status: open
 
 - indicator: value
@@ -1039,7 +1039,7 @@
     value is an exact carry-forward of Denmark's 2024 figure (0.23775), not a measured 2025
     observation.
   expect: {gt: 0.23, lt: 0.24}
-  provider: United Nations Statistics Division
+  producer: United Nations Statistics Division
   status: open
 
 - indicator: value
@@ -1049,5 +1049,5 @@
     As for 2025: an exact carry-forward of Denmark's 2024 figure (0.23775) in a year with no
     published subsidy total.
   expect: {gt: 0.23, lt: 0.24}
-  provider: United Nations Statistics Division
+  producer: United Nations Statistics Division
   status: open

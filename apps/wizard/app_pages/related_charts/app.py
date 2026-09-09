@@ -320,9 +320,9 @@ def show_section_related_charts(df: pd.DataFrame, n: int) -> None:
 
 def show_section_other_providers(df: pd.DataFrame, n: int) -> None:
     st.markdown("---")
-    st.header("Other providers")
+    st.header("Other producers")
     st.markdown(
-        "Identifying other providers is a hard problem. Here we show charts with **very similar titles**."
+        "Identifying other producers is a hard problem. Here we show charts with **very similar titles**."
         "More precise identification would require GPT or deeper data relationships."
     )
 

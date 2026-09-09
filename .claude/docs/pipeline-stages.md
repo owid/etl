@@ -5,7 +5,7 @@
 **snapshot** → **meadow** → **garden** → **grapher** → **viz** / **export**
 
 ### Snapshot (`snapshots/`)
-DVC-tracked raw files with rich metadata. Source data downloaded from external providers.
+DVC-tracked raw files with rich metadata. Source data downloaded from external producers.
 
 ### Meadow (`etl/steps/data/meadow/`)
 Basic cleaning and format standardization. Minimal transformations - mostly loading and reshaping.
