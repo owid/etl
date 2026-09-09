@@ -17,6 +17,7 @@ QUOTE_START = re.compile(
     r"|-----Original Message-----"
     r"|De : |Von: |El .{5,120} escribi[oó]:|Le .{5,120} a écrit"
     r"|Den .{5,120} skrev"
+    r"|Am .{5,160} schrieb:?"
     r"|\d{1,2}/\d{1,2}/\d{2,4} .*wrote:"
     r")",
     re.I,

@@ -99,7 +99,7 @@ Create pages with parent `{"type": "data_source_id", "data_source_id": "<log dat
 | `date:Date:start` | `YYYY-MM-DD` of the message; `date:Date:is_datetime`: the number `0` (Notion rejects the string `"0"`). |
 | `Producer` | `["<contacts page URL>"]`. |
 | `Direction` | `outgoing` if the sender is `@ourworldindata.org`, else `incoming`. For a colleague's message, add "sent by <first name>" to Notes. |
-| `Type` | `report sent` for the message that shares a report; `feedback` for what the producer says back. Those are the only two options the property has, because nothing else is in scope. |
+| `Type` | `report sent` for the message that shares a report; `feedback` for what the producer says back; `other` for the rest of a report thread, such as our answer to a producer's question, or a message arranging who should receive the file. |
 | `Link` | `https://mail.google.com/mail/?authuser=<caller email>#all/<messageId>` (message ID, not thread ID). The `authuser` parameter opens the right Google account whatever order the caller signed in. The link only resolves for the mailbox holding the message, so it is a convenience for its owner, not something a colleague can open. Do not use `git config user.email`; it is often a personal address. |
 | `Notes` | Optional, at most 300 characters: people cc'd, whether the PDF was attached, commitments, whether the message got a reply. |
 | `Status` | Who owes the next action: `waiting on OWID`, `waiting on producer`, or `closed` when the exchange needs nothing further. Every row carries one, so the table answers "what is still pending" by itself. |
@@ -108,6 +108,8 @@ Create pages with parent `{"type": "data_source_id", "data_source_id": "<log dat
 `content`: the stripped body of that message only, as plain markdown paragraphs. Keep the sign-off line; drop signatures, legal boilerplate and everything quoted from earlier messages. A producer's verbatim words about a report are the useful part of the log, because they are what the team can quote in a funding case.
 
 Heuristics for Status: an outgoing report email with no reply yet is `waiting on producer`. An incoming reply that asks something still unanswered is `waiting on OWID`. A reply that needs nothing further is `closed`, and so is an outgoing report once it has been answered. Set `Owner` to whoever sent the report.
+
+**A later message resolves an earlier row.** A report logged before its reply sits at `waiting on producer`; once the reply is logged, set that report row to `closed` in the same run, otherwise the log keeps claiming the producer owes an answer they already sent. The same applies in reverse: when we answer a row marked `waiting on OWID`, close it. This is the one case where the skill edits an existing row's properties, and it must be named in the report.
 
 ### 7. Report
 
@@ -125,7 +127,7 @@ Do not paste email bodies into the reply.
 - Search only the addresses recorded in the contacts table. Never by domain, never by producer name.
 - Log only analytics-report threads. Anything else gets a line in the report, never a row.
 - Never write a row without showing it to the user first.
-- Never edit or delete existing rows except to fill an empty `Link` or empty page body of a row that clearly matches a message (same producer, same date, same direction); say so in the report.
+- Never edit or delete existing rows, with two exceptions, both of which must be named in the report: filling an empty `Link` or empty page body of a row that clearly matches a message (same producer, same date, same direction), and closing a row that a newly logged message resolves. Never rewrite a `Summary`, a `Notes` or a page body that is already there.
 - Never add rows to the contacts table, and never edit it.
 - Never write producer names, contact names or email addresses into files in this repo. Examples in this file use invented institutions on purpose.
 - Nothing personal or sensitive belongs in a shared log, whatever address it came from.
