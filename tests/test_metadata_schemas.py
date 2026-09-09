@@ -350,17 +350,28 @@ def test_snapshot_license_lives_under_origin():
     )
 
 
-def test_snapshot_attribution_uses_en_dash():
-    """Guardrail: `origin.attribution` must separate the producer from the data product with a
-    spaced en dash (–), not a hyphen.
+# Fields that feed the source line at the bottom of a grapher chart. Per
+# `getAttributionFragmentsFromVariable` (ported in etl/collection/download_package_format.py),
+# that line resolves `presentation.attribution`, else each origin's `attribution` or its
+# `producer (year)` fallback, plus the legacy `source.name`. `attribution_short` is the
+# space-constrained form of the same credit, and `source.published_by` the legacy equivalent.
+_FOOTER_ORIGIN_FIELDS = ("attribution", "attribution_short", "producer")
+_FOOTER_SOURCE_FIELDS = ("name", "published_by")
+_HYPHEN_SEPARATOR_RE = re.compile(r"[A-Za-z0-9)\]] - [A-Za-z0-9]")
 
-    The attribution renders as the source label under a chart, so the separator is reader-facing.
-    See the "Short citations for charts" section of the Writing and Style Guide.
 
-    Scoped to `attribution` deliberately. `citation_full` follows the producer's requested
-    citation, where a hyphen can legitimately belong to a proper name or a verbatim publication
-    title (`UNICEF Office of Research - Innocenti`), so it cannot be checked mechanically.
-    `attribution` is OWID-authored and has no such exceptions.
+def test_chart_footer_fields_use_en_dash():
+    """Guardrail: every field that renders at the bottom of a chart must separate a producer from
+    a data product with a spaced en dash (–), not a hyphen.
+
+    These strings are reader-facing — they are the "Data source:" credit under every chart that
+    uses the indicator. See the "Short citations for charts" section of the Writing and Style
+    Guide.
+
+    `citation_full` is deliberately NOT checked. It follows the producer's requested citation,
+    where a hyphen can legitimately belong to a proper name or a verbatim publication title
+    (`UNICEF Office of Research - Innocenti`), so it cannot be checked mechanically. Nor are
+    `title` / `title_snapshot`, which carry published titles whose own subtitles use a dash.
 
     fasttrack and backport snapshots are auto-generated and excluded, as in the tests above.
     """
@@ -370,19 +381,17 @@ def test_snapshot_attribution_uses_en_dash():
         if "fasttrack/" in rel or "backport/" in rel:
             continue
 
-        text = meta_file_path.read_text()
-        # Fast prefilter: skip files with no attribution at all.
-        if "attribution:" not in text:
-            continue
-
-        origin = ((yaml.safe_load(text) or {}).get("meta") or {}).get("origin") or {}
-        attribution = origin.get("attribution")
-        if isinstance(attribution, str) and re.search(r"[A-Za-z0-9)] - [A-Za-z0-9]", attribution):
-            violations.append(f"{rel}: {attribution}")
+        meta = (yaml.safe_load(meta_file_path.read_text()) or {}).get("meta") or {}
+        for section, fields in (("origin", _FOOTER_ORIGIN_FIELDS), ("source", _FOOTER_SOURCE_FIELDS)):
+            block = meta.get(section) or {}
+            for field in fields:
+                value = block.get(field)
+                if isinstance(value, str) and _HYPHEN_SEPARATOR_RE.search(value):
+                    violations.append(f"{rel} [{section}.{field}]: {value}")
 
     assert not violations, (
-        "These snapshots use a hyphen where `origin.attribution` separates the producer from the "
-        "data product. Use a spaced en dash (–):\n  " + "\n  ".join(sorted(violations))
+        "These snapshots use a hyphen in a field that renders at the bottom of a chart. Use a "
+        "spaced en dash (–):\n  " + "\n  ".join(sorted(violations))
     )
 
 
