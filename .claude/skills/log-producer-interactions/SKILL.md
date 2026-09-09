@@ -40,7 +40,7 @@ Read both with `grep '^NOTION_DATA_P' .env`. If either is missing, stop and tell
 Call `notion-fetch` on each URL. From the results keep:
 
 - the contacts data source URL (`collection://...`) and, for every row: page URL, `Name`, `Contacts`, `Emails for analytics reports`;
-- the log's data source URL and its schema. Expected properties: `Summary` (title), `Date`, `Producer` (relation to contacts), `Direction`, `Channel`, `Type`, `Link`, `Notes`, `Status`, `Owner`. If a property is missing, stop and report it rather than improvising.
+- the log's data source URL and its schema. Expected properties: `Summary` (title), `Date`, `Producer` (relation to contacts), `Direction`, `Type`, `Link`, `Notes`, `Status`, `Owner`. There is deliberately no channel property: every row comes from an email. If a property is missing, stop and report it rather than improvising.
 
 Query the contacts rows with `notion-query-data-sources` in SQL mode (single data source). If the workspace's SQL quota is exhausted, view mode works and is not metered.
 
@@ -58,7 +58,7 @@ For each producer, take every email address appearing in `Contacts` and `Emails 
 
 Query the log once for `Producer`, `date:Date:start`, `Link`. Keep:
 
-- the latest date per producer **among rows whose `Link` is set**, i.e. rows that came from an email (the watermark). Never take the maximum over all rows: a `call` row is dated when the call happens, so a scheduled future call would push the watermark forward and make the next run skip every email in between;
+- the latest date per producer **among rows whose `Link` is set**, i.e. rows that came from an email (the watermark). Never take the maximum over all rows: a hand-added row (a call, a Slack thread) carries no Gmail link, and if it is dated in the future it would push the watermark forward and make the next run skip every email in between;
 - the set of Gmail message IDs already logged: the part after `#all/` in every `Link` (older rows may use the `/mail/u/0/#all/<messageId>` form; treat both the same).
 
 Search from **7 days before the watermark** (Gmail dates and thread grouping make a small overlap safer than an exact cutoff). For a producer with no rows yet, search the last 12 months.
@@ -99,8 +99,7 @@ Create pages with parent `{"type": "data_source_id", "data_source_id": "<log dat
 | `date:Date:start` | `YYYY-MM-DD` of the message; `date:Date:is_datetime`: the number `0` (Notion rejects the string `"0"`). |
 | `Producer` | `["<contacts page URL>"]`. |
 | `Direction` | `outgoing` if the sender is `@ourworldindata.org`, else `incoming`. For a colleague's message, add "sent by <first name>" to Notes. |
-| `Channel` | `email`. |
-| `Type` | `report sent` for the message that shares a report; `feedback` for what the producer says back. Nothing else is in scope. |
+| `Type` | `report sent` for the message that shares a report; `feedback` for what the producer says back. Those are the only two options the property has, because nothing else is in scope. |
 | `Link` | `https://mail.google.com/mail/?authuser=<caller email>#all/<messageId>` (message ID, not thread ID). The `authuser` parameter opens the right Google account whatever order the caller signed in. The link only resolves for the mailbox holding the message, so it is a convenience for its owner, not something a colleague can open. Do not use `git config user.email`; it is often a personal address. |
 | `Notes` | Optional, at most 300 characters: people cc'd, whether the PDF was attached, commitments, whether the message got a reply. |
 | `Status` | Set **only** when the message needs follow-up: `open` (OWID owes an answer), `waiting on producer` (OWID asked, no reply yet). Leave empty otherwise. Never set `closed` when creating. |
