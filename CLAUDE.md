@@ -189,7 +189,7 @@ git push
 gh pr edit <number> --body "..."
 ```
 
-**Merging reruns the pipeline.** Merging to master triggers the production ETL run, which rebuilds every step whose checksum changed and performs the `grapher://` upserts. You do **not** need to re-run steps for a change to take effect, and it isn't an open item worth reporting — editing a step's code or metadata is enough, because `etlr`'s change detection picks it up on that run. Run steps locally to *verify* output before merge, not to publish it. The exceptions still worth flagging: a `--force` case where no checksum changed (upstream data patched out-of-band), and ghost-variable remapping after a version bump.
+**Merging reruns the pipeline.** Merging to master triggers the production ETL run (a Buildkite pipeline), which rebuilds every step whose checksum changed and performs the `grapher://` upserts. You do **not** need to re-run steps for a change to take effect, and it isn't an open item worth reporting — editing a step's code or metadata is enough, because `etlr`'s change detection picks it up on that run. Run steps locally to *verify* output before merge, not to publish it. The exceptions still worth flagging: a `--force` case where no checksum changed (upstream data patched out-of-band), and ghost-variable remapping after a version bump.
 
 **Cleaning up after merge**: `etl pr-clean` lists local branches whose PR was merged or closed (it checks the GitHub PR state, so squash-merges are detected), then deletes the selected branch(es). For branches created in a worktree (`etl pr "..." --worktree`), it also removes the worktree and copies that worktree's Claude sessions back into the main repo's `~/.claude/projects/` dir so they stay resumable.
 
