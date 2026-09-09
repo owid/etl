@@ -70,6 +70,8 @@ INDICATORS_NO_ORIGINS = [
     "wom_hoe_vdem",
     "wom_hoe_ever",
     "wom_hoe_ever_dem",
+    "wom_hos_ever_dem",
+    "wom_hog_ever_dem",
     "v2exfemhoe",
     "regime_imputed",
     "num_years_in_electdem_consecutive",
@@ -413,8 +415,7 @@ def estimate_share_countries(tb: Table, num_countries_last) -> Table:
     )
 
     columns_rename = {
-        "num_countries_wom_hoe_ever": "share_countries_wom_hoe_ever",
-        "num_countries_wom_hoe_ever_demelect": "share_countries_wom_hoe_ever_demelect",
+        column: column.replace("num_countries_", "share_countries_") for column in aggregate.COLUMNS_COUNTS_EVER
     }
     columns = list(columns_rename.keys())
     tb_share = (
@@ -427,20 +428,10 @@ def estimate_share_countries(tb: Table, num_countries_last) -> Table:
     # Keep only category "yes", and entity "World"
     tb_share = tb_share[(tb_share["category"] == "yes") & (tb_share["country"] == "World")].drop(columns=["category"])
 
-    # Add a column with the total count of countries per year-country
-    tb_share["total_countries"] = tb_share.groupby(["country", "year"], as_index=False)[
-        "share_countries_wom_hoe_ever"
-    ].transform("sum")
-
-    assert tb_share["total_countries"].notna().all(), "NA detected!"
-
-    # Option 1: Share of countries relative to current number of countries
-    # tb_share["share_countries_wom_hoe_ever"] /= tb_share["total_countries"] * 0.01
-    # tb_share["share_countries_wom_hoe_ever_demelect"] /= tb_share["total_countries"] * 0.01
-    tb_share = tb_share.drop(columns=["total_countries"])
-
-    # Option 2: Share of countries relative to number of countries in the most recent year of the data
-    tb_share["share_countries_wom_hoe_ever"] /= num_countries_last * 0.01
-    tb_share["share_countries_wom_hoe_ever_demelect"] /= num_countries_last * 0.01
+    # Share of countries relative to the number of countries in the most recent year of the data
+    for column in columns_rename.values():
+        assert tb_share[column].notna().all(), f"NA detected in `{column}`!"
+        tb_share[column] /= num_countries_last * 0.01
+        assert tb_share[column].max() <= 100, f"`{column}` exceeds 100%."
 
     return tb_share

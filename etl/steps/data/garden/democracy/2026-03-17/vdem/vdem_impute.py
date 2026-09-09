@@ -29,6 +29,22 @@ INDICATORS_AVOID_IMPUTE = [
     "corr_jud_vdem",
     "v2mecorrpt",
     "v2xnp_client",
+    # Who led a country is a fact about that country, not about the power that ruled it earlier, so
+    # imputing it from the predecessor state misleads. It is worst for the cumulative "ever had"
+    # indicators: imputing Ukraine from Russia made Ukraine count Catherine the Great, so it read as
+    # having had a woman head of state from its first year in the data.
+    "v2exfemhos",
+    "v2exfemhog",
+    "v2exfemhoe",
+    "wom_hos_vdem",
+    "wom_hog_vdem",
+    "wom_hoe_vdem",
+    "wom_hos_ever",
+    "wom_hog_ever",
+    "wom_hoe_ever",
+    "wom_hos_ever_dem",
+    "wom_hog_ever_dem",
+    "wom_hoe_ever_dem",
 ]
 
 
