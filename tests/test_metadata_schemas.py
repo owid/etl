@@ -360,10 +360,15 @@ def test_snapshot_license_lives_under_origin():
 # (`f"{attribution} – {phrase} by {OWID_ATTRIBUTION}"`), so a hyphen here renders next to real
 # en dashes in the same line.
 _FOOTER_FIELDS = ("attribution", "attribution_short", "producer", "published_by")
+# `source.name` is a footer field too (`getAttributionFragmentsFromVariable` reads it for legacy
+# source-based datasets), but a bare `name` key is not: `license.name`, `display.name` and the
+# deprecated top-level `meta.name` all use it for other things. So it is only checked when its
+# parent key is `source`.
+_FOOTER_FIELDS_UNDER_SOURCE = ("name",)
 _HYPHEN_SEPARATOR_RE = re.compile(r"[A-Za-z0-9)\]] - [A-Za-z0-9]")
 
 
-def _footer_field_violations(node, path=""):
+def _footer_field_violations(node, path="", parent_key=None):
     """Yield `(dotted path, value)` for every footer field holding a hyphen separator.
 
     Walks the parsed document rather than matching field names at fixed depths: these fields
@@ -373,13 +378,14 @@ def _footer_field_violations(node, path=""):
     if isinstance(node, dict):
         for key, value in node.items():
             here = f"{path}.{key}" if path else str(key)
-            if key in _FOOTER_FIELDS and isinstance(value, str) and _HYPHEN_SEPARATOR_RE.search(value):
+            in_scope = key in _FOOTER_FIELDS or (parent_key == "source" and key in _FOOTER_FIELDS_UNDER_SOURCE)
+            if in_scope and isinstance(value, str) and _HYPHEN_SEPARATOR_RE.search(value):
                 yield here, value
             else:
-                yield from _footer_field_violations(value, here)
+                yield from _footer_field_violations(value, here, key)
     elif isinstance(node, list):
         for i, value in enumerate(node):
-            yield from _footer_field_violations(value, f"{path}[{i}]")
+            yield from _footer_field_violations(value, f"{path}[{i}]", parent_key)
 
 
 def test_chart_footer_fields_use_en_dash():
@@ -408,7 +414,7 @@ def test_chart_footer_fields_use_en_dash():
     for meta_file_path in targets:
         text = meta_file_path.read_text()
         # Fast prefilter: skip files that mention none of the fields.
-        if not any(f"{field}:" in text for field in _FOOTER_FIELDS):
+        if not any(f"{field}:" in text for field in _FOOTER_FIELDS + _FOOTER_FIELDS_UNDER_SOURCE):
             continue
         try:
             doc = yaml.safe_load(text)
