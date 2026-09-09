@@ -26,7 +26,7 @@ from owid.catalog import s3_utils
 from structlog import get_logger
 from tqdm.auto import tqdm
 
-from etl.config import DRY_RUN
+from etl import config
 from etl.helpers import PathFinder
 from etl.paths import EXPORT_DIR
 
@@ -67,15 +67,15 @@ NUM_DECIMALS = {"energy": 1, "protein": 2, "mass": 4}
 
 
 def _save_and_upload(data: dict, filename: str) -> None:
-    """Write JSON locally and upload to S3 (skipping the upload under DRY_RUN)."""
+    """Write JSON locally and upload to S3 (only with --export)."""
     export_dir = EXPORT_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
     export_dir.mkdir(parents=True, exist_ok=True)
     local_file = export_dir / filename
     s3_path = f"s3://{S3_BUCKET_NAME}/{S3_DATA_DIR / filename}"
     with open(local_file, "w") as f:
         json.dump(data, f, separators=(",", ":"))
-    if DRY_RUN:
-        tqdm.write(f"[DRY RUN] Would upload {local_file} -> {s3_path}")
+    if not config.EXPORT_ENABLED:
+        tqdm.write(f"[not uploaded, no --export] {local_file} -> {s3_path}")
     else:
         s3_utils.upload(s3_path, local_file, public=True, downloadable=True)
 
