@@ -16,7 +16,6 @@ import click
 import pandas as pd
 import requests
 from owid.catalog import Dataset
-from owid.datautils.io import df_to_file
 from structlog import get_logger
 from tqdm import tqdm
 
@@ -330,14 +329,11 @@ def main(upload: bool) -> None:
             f"New snapshot has fewer rows ({len(df_final)}) than the previous snapshot ({len(orig_snapshot_df)}). API could be down or data is missing."
         )
 
-    # Save the final DataFrame to the specified file path in the snapshot.
-    df_to_file(df_final, file_path=snap.path)  # ty: ignore[invalid-argument-type]
-
     # Add date_accessed
     snap = modify_metadata(snap)
 
-    # Add the file to DVC and optionally upload it to S3, based on the `upload` parameter.
-    snap.dvc_add(upload=upload)
+    # Save the final DataFrame, add it to DVC and optionally upload it to S3, based on the `upload` parameter.
+    snap.create_snapshot(data=df_final, upload=upload)
 
 
 def modify_metadata(snap: Snapshot) -> Snapshot:

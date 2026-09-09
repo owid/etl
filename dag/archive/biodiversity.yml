@@ -118,3 +118,9 @@ steps:
   # archived; last active in 38c04a5ca908 on 2026-01-06
   data://grapher/iucn/2025-09-09/iucn_number_each_status:
     - data://garden/iucn/2025-09-09/iucn_number_each_status
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/biodiversity/latest/fish_stocks:
+    - data://grapher/biodiversity/2024-10-30/fish_stocks
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/biodiversity/latest/habitat_loss:
+    - data://grapher/biodiversity/2021-01-01/habitat_loss

@@ -243,6 +243,9 @@ def parse_step(step_name: str, dag: dict[str, Any]) -> "Step":
     elif step_type == "export":
         step = ExportStep(path, dependencies)
 
+    elif step_type == "viz":
+        step = VizStep(path, dependencies)
+
     elif step_type == "data-private":
         step = DataStepPrivate(path, dependencies)
 
@@ -1165,59 +1168,104 @@ class GrapherStep(Step):
 
 class ExportStep(DataStep):
     """
-    A step which exports something once. For instance committing to a Github repository
-    or upserting an Explorer to DB.
+    A step which ships files to a shared, environment-less destination, e.g. committing to a
+    GitHub repository or uploading to R2. Its recipe lives in `etl/steps/export/<channel>/...`.
     """
 
     path: str
     dependencies: list[Step]
+    # Step type: the URI scheme and the folder under `etl/steps/`.
+    step_type = "export"
 
     def __init__(self, path: str, dependencies: list[Step]) -> None:
         self.dependencies = dependencies
         self.path = path
 
     def __str__(self) -> str:
-        return f"export://{self.path}"
+        return f"{self.step_type}://{self.path}"
 
     def can_execute(self, archive_ok: bool = True) -> bool:
         sp = self._search_path
         if not archive_ok and "/archive/" in sp.as_posix():
             return False
 
-        return super().can_execute(archive_ok=archive_ok) or self._is_multidim_yaml_only()
+        return super().can_execute(archive_ok=archive_ok)
 
     def run(self) -> None:
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 
+        # An output folder without index.json (an interrupted run, or a file dropped there by
+        # something else) would make create_dataset refuse to run; start from scratch instead.
+        self._clean_partial_output()
+
         from etl.helpers import create_dataset
 
-        # Create folder for the dataset, export step can save files there
+        # Create folder for the dataset, the step can save files there
         ds = create_dataset(self._dest_dir, tables=[])
 
-        sp = self._search_path
-        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
-            if config.DEBUG:
-                DataStep._run_py_isolated(self)  # ty: ignore
-            else:
-                DataStep._run_py(self)  # ty: ignore
-        elif self._is_multidim_yaml_only():
-            # YAML-only multidim: no .py, just a .config.yml. Run the default
-            # boilerplate (load_collection_config → create_collection → save).
-            self._run_multidim_yaml_only(sp)
+        self._run_recipe()
 
         # save checksum (only update index.json, don't call ds.save() which iterates
-        # table_names and would pick up custom JSON files written by the export script)
+        # table_names and would pick up custom JSON files written by the step)
         ds.metadata.source_checksum = self.checksum_input()
         ds.metadata.save(ds._index_file)
 
-    def _is_multidim_yaml_only(self) -> bool:
-        """True if this is an `export://multidim/...` step backed only by a `.config.yml`."""
-        if not self.path.startswith("multidim/"):
+    def _run_recipe(self) -> None:
+        if config.DEBUG:
+            DataStep._run_py_isolated(self)  # ty: ignore
+        else:
+            DataStep._run_py(self)  # ty: ignore
+
+    def checksum_output(self) -> str:
+        # output checksum is checksum of all ingredients
+        return self.checksum_input()
+
+    @property
+    def _search_path(self) -> Path:
+        return paths.STEP_DIR / self.step_type / self.path
+
+    @property
+    def _dest_dir(self) -> Path:
+        return paths.EXPORT_DIR / self.path.lstrip("/")
+
+
+class VizStep(ExportStep):
+    """
+    A step which produces a visualization. Its channel says which kind:
+
+    - `viz://chart/...`: a chart or an MDIM (a chart is an MDIM with `dimensions: []`), upserted to the grapher DB.
+    - `viz://explorer/...`: an explorer, upserted to the grapher DB.
+    - `viz://static/...`: a static image (PNG/SVG), written next to the recipe.
+    - `viz://bespoke/...`: a bespoke interactive visualization, whose data feed is uploaded to R2.
+
+    Recipes live in `etl/steps/viz/<channel>/...`; local outputs go to `viz/<channel>/...`. Every viz
+    step runs under `--grapher` (`export://` steps under `--export`), see `etl.command.construct_subdag`.
+    Bespoke steps currently upload to a fixed public path rather than to the environment being built;
+    they honor `DRY_RUN=1` to skip the upload.
+    """
+
+    step_type = "viz"
+
+    def can_execute(self, archive_ok: bool = True) -> bool:
+        return super().can_execute(archive_ok=archive_ok) or self._is_chart_yaml_only()
+
+    def _run_recipe(self) -> None:
+        sp = self._search_path
+        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
+            super()._run_recipe()
+        elif self._is_chart_yaml_only():
+            # YAML-only chart/MDIM: no .py, just a .config.yml. Run the default
+            # boilerplate (load_collection_config → create_collection → save).
+            self._run_chart_yaml_only(sp)
+
+    def _is_chart_yaml_only(self) -> bool:
+        """True if this is a `viz://chart/...` step backed only by a `.config.yml`."""
+        if self.channel != "chart":
             return False
         return self._search_path.with_suffix(".config.yml").exists()
 
-    def _run_multidim_yaml_only(self, search_path: Path) -> None:
+    def _run_chart_yaml_only(self, search_path: Path) -> None:
         from etl.helpers import PathFinder
 
         # Synthesise the `.py` path PathFinder expects; the file doesn't need to exist,
@@ -1226,17 +1274,9 @@ class ExportStep(DataStep):
         collection = paths_.create_collection(config=paths_.load_collection_config())
         collection.save()
 
-    def checksum_output(self) -> str:
-        # output checksum is checksum of all ingredients
-        return self.checksum_input()
-
-    @property
-    def _search_path(self) -> Path:
-        return paths.STEP_DIR / "export" / self.path
-
     @property
     def _dest_dir(self) -> Path:
-        return paths.EXPORT_DIR / self.path.lstrip("/")
+        return paths.VIZ_DIR / self.path.lstrip("/")
 
 
 @dataclass

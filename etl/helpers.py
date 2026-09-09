@@ -373,13 +373,12 @@ class PathFinder:
     @property
     def collection_path(self) -> Path:
         """TODO: worth aligning with `metadata_path` (add missing '.meta'), maybe even just deprecate this and use `metadata_path`."""
-        assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
+        assert "chart" in str(self.directory), "MDIM path is only available for viz://chart steps!"
         return self.directory / (self.short_name + ".yml")
 
     @property
     def config_path(self) -> Path:
-        """Config file. Used in `multidim` and `explorer` ETL steps."""
-        # assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
+        """Config file. Used in `viz://chart` and `viz://explorer` ETL steps."""
         return self.directory / (self.short_name + ".config.yml")
 
     @property
@@ -464,8 +463,8 @@ class PathFinder:
         # Suffix to add to, e.g. "data" if step is private.
         is_private_suffix = "-private" if is_private else ""
 
-        if step_type == "export":
-            step_name = f"export://{channel}/{namespace}/{version}/{short_name}"
+        if step_type in ("export", "viz"):
+            step_name = f"{step_type}://{channel}/{namespace}/{version}/{short_name}"
         elif channel == "snapshot":
             # match also on snapshot short_names without extension
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
@@ -495,7 +494,7 @@ class PathFinder:
         if channel_type.startswith(("snapshot",)):
             channel = channel_type
             namespace, version, short_name = path.split("/")
-        elif channel_type.startswith(("data", "export")):
+        elif channel_type.startswith(("data", "export", "viz")):
             channel, namespace, version, short_name = path.split("/")
         else:
             raise WrongStepName
@@ -615,7 +614,7 @@ class PathFinder:
         version: str | int | None = None,
         is_private: bool | None = None,
     ) -> catalog.Dataset | Snapshot | CollectionSet:
-        """Load a (dataset or export) dependency, given its attributes (at least its short name)."""
+        """Load a (dataset or collection) dependency, given its attributes (at least its short name)."""
         dependency_step_name = self.get_dependency_step_name(
             step_type=step_type,
             short_name=short_name,
@@ -627,9 +626,9 @@ class PathFinder:
         dependency = self._get_attributes_from_step_name(step_name=dependency_step_name)
         if dependency["channel"] == "snapshot":
             dataset = Snapshot(f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}")
-        elif (step_type == "export") and (dependency["channel"] in ("multidim", "explorers")):
+        elif (step_type == "viz") and (dependency["channel"] in ("chart", "explorer")):
             collection_path = (
-                paths.EXPORT_DIR
+                paths.VIZ_DIR
                 / dependency["channel"]
                 / f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}"
             )
@@ -674,10 +673,10 @@ class PathFinder:
         short_name: str | None = None,
         namespace: str | None = None,
         version: str | int | None = None,
-        channel: Literal["multidim", "explorers"] = "multidim",
+        channel: Literal["chart", "explorer"] = "chart",
     ) -> CollectionSet:
         cs = self.load_dependency(
-            step_type="export",
+            step_type="viz",
             short_name=short_name or self.short_name,
             channel=channel,
             namespace=namespace,

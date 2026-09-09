@@ -8,3 +8,6 @@ steps:
   # archived; last active in dda6a2c02e08 on 2026-02-18
   export://multidim/dummy/latest/dummy:
     - export://multidim/covid/latest/covid
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/dummy/latest/issue_reporting:
+    - data://grapher/covid/latest/cases_deaths

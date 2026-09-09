@@ -1,3 +1,7 @@
+# Grapher chart-config schema version these view configs are written against. Required, and
+# QUOTED — a bare `011` is YAML octal. Leave it as it is once the config exists: it lets Grapher
+# migrate the config forward after a breaking schema change.
+grapher_schema: "{{cookiecutter.grapher_schema}}"
 title:
   title: TODO
   title_variant: TODO

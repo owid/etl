@@ -1,13 +1,13 @@
 ---
 name: migrate-explorer-csv
-description: Migrate a non-ETL CSV-based explorer (data lives in a static CSV hosted in `owid-grapher/public/explorers/` or on GitHub; explorer config has `tableSlug`/`table` blocks) into ETL by adding a snapshot → meadow → garden → grapher chain, then handing off to `/create-explorer` for the export step. Trigger when the user says "bring CSV explorer <slug> into ETL", or refers to fish-stocks (the only remaining target).
+description: Migrate a non-ETL CSV-based explorer (data lives in a static CSV hosted in `owid-grapher/public/explorers/` or on GitHub; explorer config has `tableSlug`/`table` blocks) into ETL by adding a snapshot → meadow → garden → grapher chain, then handing off to `/create-explorer` for the explorer step. Trigger when the user says "bring CSV explorer <slug> into ETL", or refers to fish-stocks (the only remaining target).
 metadata:
   internal: true
 ---
 
 # Migrate CSV-based Explorer into ETL
 
-Bring an explorer that today reads from a static CSV (e.g. hosted under `owid-grapher/public/explorers/<slug>/...` or a GitHub raw URL) into ETL. After this skill, the data is snapshot-tracked and flows through standard ETL stages, and `/create-explorer` writes the final `export://explorers/<ns>/latest/<short>` step.
+Bring an explorer that today reads from a static CSV (e.g. hosted under `owid-grapher/public/explorers/<slug>/...` or a GitHub raw URL) into ETL. After this skill, the data is snapshot-tracked and flows through standard ETL stages, and `/create-explorer` writes the final `viz://explorer/<ns>/latest/<short>` step.
 
 > **Scope of this skill:** the data-pipeline half — locating the source CSV and producing the `snapshot → meadow → garden → grapher` chain. The export-step authoring (YAML schema, dimensions/views, full-YAML vs table-driven, FAUST upstream, post-processing, DAG, verification) lives in `/create-explorer` and is shared with the other migrate-explorer-* skills and with `/create-multidim`. Don't duplicate that content here.
 
@@ -79,7 +79,7 @@ def run() -> None:
 
 **FAUST hint.** While authoring indicator metadata, push chart text/config (`title_public`, `subtitle`, `note`, `map.colorScale`, `hasMapTab`, `tab`, `yAxis`, …) into each indicator's `presentation.{title_public, grapher_config}`. Cross-cutting baselines go under `definitions.common.presentation.grapher_config` (recursive merge). The explorer view inherits this text at chart render time, so the `<short>.config.yml` in the next skill stays minimal. See `/create-explorer` Step 5 for the full mechanics and the `dynamic-yaml` `"{definitions.<key>}"` interpolation pattern.
 
-CSV-explorer migrations have a slight advantage: *you control the garden output*, so you can shape the new garden table to be dimensional (one row per country/year × dim_a × dim_b) and the export step in the next skill can use `paths.create_collection(tb=tb, indicator_names=..., dimensions=...)` to expand views directly.
+CSV-explorer migrations have a slight advantage: *you control the garden output*, so you can shape the new garden table to be dimensional (one row per country/year × dim_a × dim_b) and the explorer step in the next skill can use `paths.create_collection(tb=tb, indicator_names=..., dimensions=...)` to expand views directly.
 
 ## Step 5 — Grapher step
 
@@ -101,7 +101,7 @@ print(yaml.safe_dump(config, sort_keys=False))
 
 ## Step 7 — Hand off to `/create-explorer`
 
-Invoke `/create-explorer` to author `etl/steps/export/explorers/<ns>/latest/<short>.{py,config.yml}` and the DAG entry. That skill covers:
+Invoke `/create-explorer` to author `etl/steps/viz/explorer/<ns>/latest/<short>.{py,config.yml}` and the DAG entry. That skill covers:
 
 - the Python skeleton (full-YAML or table-driven)
 - the YAML schema (`config:`, `definitions.common_views`, `dimensions:`, `views:`)
@@ -112,8 +112,8 @@ If `/create-explorer` was already invoked once and you only need to refine the l
 
 ## Reference: existing migrations
 
-There are no fully CSV-backed explorers in ETL today (fish-stocks is the lone remaining target). For the indicator-based pieces of the workflow that the export step will lean on, see the reference examples listed in `/create-explorer`.
+There are no fully CSV-backed explorers in ETL today (fish-stocks is the lone remaining target). For the indicator-based pieces of the workflow that the explorer step will lean on, see the reference examples listed in `/create-explorer`.
 
 ## Follow-up
 
-Once in ETL, the explorer is a candidate for the Track-B port to MDIM (`export://multidim/...`) once feature parity is reached. See umbrella issue #6014.
+Once in ETL, the explorer is a candidate for the Track-B port to MDIM (`viz://chart/...`) once feature parity is reached. See umbrella issue #6014.

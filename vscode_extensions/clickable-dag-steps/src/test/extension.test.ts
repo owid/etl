@@ -62,9 +62,9 @@ suite('classifyDagLine', () => {
 	});
 
 	test('export scheme is recognised', () => {
-		const result = classifyDagLine('    - export://explorers/un/latest/un_wpp');
+		const result = classifyDagLine('    - export://github/co2_data/latest/owid_co2');
 		assert.deepStrictEqual(result, {
-			uri: 'export://explorers/un/latest/un_wpp',
+			uri: 'export://github/co2_data/latest/owid_co2',
 			isDefinition: false,
 		});
 	});

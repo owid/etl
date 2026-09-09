@@ -31,6 +31,11 @@ _GRAPHER_SCHEMA_VERSION_PATTERN = re.compile(r"^\d{3}$")
 _GRAPHER_SCHEMA_URL_PATTERN = re.compile(r"^https://files\.ourworldindata\.org/schemas/grapher-schema\.\d{3}\.json$")
 
 
+def default_grapher_schema_version() -> str:
+    """Three-digit version of `DEFAULT_GRAPHER_SCHEMA` — the value a new config should pin."""
+    return DEFAULT_GRAPHER_SCHEMA.rsplit(".", 2)[1]
+
+
 def resolve_grapher_schema(value: str | int | None) -> str:
     """Resolve an authored `grapher_schema` value into a full grapher schema URL.
 
@@ -39,13 +44,19 @@ def resolve_grapher_schema(value: str | int | None) -> str:
     - short: `grapher_schema: "011"`
     - full:  `grapher_schema: https://files.ourworldindata.org/schemas/grapher-schema.011.json`
 
-    `None` falls back to `DEFAULT_GRAPHER_SCHEMA` — the version this repo vendors and validates
-    against. Pinning explicitly is preferred: it records the version the config was authored
-    against, so Grapher migrates it forward after a breaking schema change instead of assuming
-    it is already current.
+    `None` is rejected. There is deliberately no fallback: resolving an unpinned collection to
+    whatever version the repo happens to vendor today would tell Grapher the config is already
+    current, so a config authored against an older schema would skip migration — and the same
+    config would resolve to a *different* version the next time the step runs. The pin has to be
+    recorded in the config itself.
     """
     if value is None:
-        return DEFAULT_GRAPHER_SCHEMA
+        raise ValueError(
+            "No `grapher_schema` pinned. Add a top-level `grapher_schema` to the config YAML "
+            f'recording the version its view configs were authored against — `grapher_schema: "'
+            f'{default_grapher_schema_version()}"` for a config written today. Quote it: an '
+            "unquoted YAML value like `011` is parsed as octal."
+        )
 
     if isinstance(value, str):
         if _GRAPHER_SCHEMA_URL_PATTERN.match(value):

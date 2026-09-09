@@ -1,7 +1,7 @@
 """MDIM diff: compare multi-dimensional data pages (MDIMs) between staging and production.
 
 This is rendered as a section of the chart-diff app. Unlike charts, MDIM configs are fully
-defined in ETL (export steps), so there is no approval workflow: merging the PR redeploys
+defined in ETL (viz steps), so there is no approval workflow: merging the PR redeploys
 them. This section exists to *review* the changes, not to approve them.
 """
 

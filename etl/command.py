@@ -69,13 +69,13 @@ STEP_FAILURES: list[tuple[str, str]] = []
     "-g/-ng",
     default=False,
     type=bool,
-    help="Upsert datasets from grapher channel to DB _(OWID staff only, DB access required)_",
+    help="Run steps that write to the grapher DB: grapher:// upserts and viz:// steps _(OWID staff only, DB access required)_",
 )
 @click.option(
     "--export/--no-export",
     default=False,
     type=bool,
-    help="Run export steps like saving explorer _(OWID staff only, access required)_",
+    help="Run export:// steps, which write to shared destinations (R2, GitHub) _(OWID staff only, access required)_",
 )
 @click.option(
     "--ipdb",
@@ -259,6 +259,18 @@ def main_cli(
             # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
             files_changed = get_changed_files(include_diff=False)
             global_changes = _global_checksum_inputs_changed(files_changed)
+            modified_steps = _modified_steps(includes=steps, exact_match=exact_match, files_changed=files_changed)
+
+            # `--modified` surfaces modified viz steps (chart/explorer recipes) by design, but they're
+            # only buildable with --grapher (see construct_subdag). When a branch edits only such a
+            # recipe (e.g. a single `<explorer>.<key>.config.yml`), without this we would exclude it
+            # downstream and crash with "No steps matched". Enable --grapher so it actually rebuilds,
+            # whether or not the run is filtered below. --export is never inferred: it gates uploads
+            # to shared destinations (R2, GitHub) and must stay an explicit choice.
+            if not grapher and any(s.startswith("viz://") for s in modified_steps):
+                grapher = True
+                click.echo("Detected modified viz:// step(s); enabling --grapher for this run.")
+
             if global_changes:
                 # These files aren't under etl/steps/ or snapshots/, so _modified_steps would see
                 # nothing changed - but DataStep.checksum_input() bakes pd.__version__ and
@@ -270,19 +282,10 @@ def main_cli(
                     "(no diff filter)."
                 )
             else:
-                steps = _modified_steps(includes=steps, exact_match=exact_match, files_changed=files_changed)
+                steps = modified_steps
                 if not steps:
                     click.echo("No steps modified relative to origin/master.")
                     return
-                # `--modified` surfaces modified export steps (multidim/explorer recipes) by design,
-                # but they're only buildable in export mode. When a branch edits only such a recipe
-                # (e.g. a single `<explorer>.<key>.config.yml`), the modified set is export-only;
-                # without this we would exclude it downstream and crash with "No steps matched".
-                # Enable export (which also un-excludes the grapher deps the export step needs) so
-                # the explorer actually rebuilds.
-                if not export and any(s.startswith("export://") for s in steps):
-                    export = True
-                    click.echo("Detected modified export step(s); enabling --export for this run.")
                 click.echo(f"Restricting to {len(steps)} step(s) modified vs origin/master.")
                 # We matched modified catalog paths as substrings, so disable exact matching downstream.
                 exact_match = False
@@ -390,9 +393,9 @@ def _modified_steps(
     so the selection matches what chart-diff considers affected. If `includes` is non-empty, the
     result is narrowed to changed paths that also match one of those patterns.
 
-    Export steps (e.g. `export://multidim/...`) are included too, so `--modified` can pick the
+    Viz and export steps (e.g. `viz://chart/...`) are included too, so `--modified` can pick the
     multidims/explorers a branch affects via their upstream data steps. Data steps are returned
-    URI-less (e.g. "garden/foo/bar"); export steps keep their full URI so `export://...` patterns
+    URI-less (e.g. "garden/foo/bar"); viz/export steps keep their full URI so `viz://...` patterns
     match them.
 
     :param files_changed: Pass in an already-fetched `get_changed_files()` result to avoid
@@ -502,9 +505,9 @@ def construct_full_dag(dag: DAG) -> DAG:
     # Make sure we don't have both public and private steps in the same DAG
     _check_public_private_steps(dag)
 
-    # For export:// steps, add the grapher:// steps that are needed to upsert data to DB.
+    # For viz:// steps, add the grapher:// steps that are needed to upsert their inputs to DB.
     for step in list(dag.keys()):
-        if step.startswith("export://multidim/") or step.startswith("export://explorers/"):
+        if step.startswith("viz://"):
             for dep in list(dag[step]):
                 if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep):
                     dag[step].add(re.sub(r"^(data|data-private)://", "grapher://", dep))
@@ -538,13 +541,12 @@ def construct_subdag(
     if not excludes:
         excludes = []
 
-    # Export steps
+    # Steps that write to the grapher DB (grapher:// upserts and viz:// steps) run only with --grapher;
+    # steps that write to external destinations (export://, i.e. R2 and GitHub) only with --export.
+    if not grapher:
+        excludes.append(_prefix_pattern(GRAPHER_FLAG_PREFIXES))
     if not export:
-        excludes.append("export://.*")
-
-    # Grapher steps
-    if not grapher and not export:
-        excludes.append("grapher://.*")
+        excludes.append(_prefix_pattern(EXPORT_FLAG_PREFIXES))
 
     # Exclude private steps
     if not private:
@@ -554,12 +556,45 @@ def construct_subdag(
     subdag = filter_to_subgraph(dag, includes=includes, excludes=excludes, only=only, exact_match=exact_match)
 
     if not subdag:
-        # If no steps are found, the most likely case is that the step passed as argument was misspelled.
-        # Print a short error message, show a list of the closest matches, and exit.
+        # No steps found. Either the requested step exists but was skipped because its flag is
+        # missing, or (most likely) the argument was misspelled. Say which.
+        _explain_missing_flags(dag, includes, exact_match, grapher=grapher, export=export)
         _find_closest_matches(" ".join(orig_includes or []), dag)
         sys.exit(1)
 
     return subdag
+
+
+# Step types gated by each flag. grapher:// upserts and viz:// steps write to the grapher DB of the
+# targeted environment; export:// steps write to shared destinations (R2, GitHub).
+GRAPHER_FLAG_PREFIXES = ("grapher://", "viz://")
+EXPORT_FLAG_PREFIXES = ("export://",)
+
+
+def _prefix_pattern(prefixes: tuple[str, ...]) -> str:
+    return "^(?:" + "|".join(re.escape(p) for p in prefixes) + ")"
+
+
+def _explain_missing_flags(dag: DAG, includes: list[str], exact_match: bool, grapher: bool, export: bool) -> None:
+    """Tell the user which requested steps were skipped for lack of a flag, and which flag to pass."""
+    from etl.steps import graph_nodes
+
+    gated = []
+    if not grapher:
+        gated.append((GRAPHER_FLAG_PREFIXES, "is skipped without --grapher; pass it to run this step."))
+    if not export:
+        gated.append((EXPORT_FLAG_PREFIXES, "is skipped without --export; pass it to run this step."))
+    if exact_match:
+        requested = [step for step in includes if step in dag]
+    else:
+        patterns = [re.compile(p) for p in includes]
+        requested = sorted(step for step in graph_nodes(dag) if any(p.search(step) for p in patterns))
+    shown = 0
+    for step in requested:
+        for prefixes, explanation in gated:
+            if step.startswith(prefixes) and shown < 10:
+                print(f"`{step}` {explanation}")
+                shown += 1
 
 
 def run_steps(

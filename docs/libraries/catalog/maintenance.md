@@ -18,12 +18,15 @@ pip install owid-catalog
 After working on your changes in the library, publishing to PyPI is automated:
 
 1. **Bump the version** in [:fontawesome-brands-github: `lib/catalog/pyproject.toml`](https://github.com/owid/etl/blob/master/lib/catalog/pyproject.toml)
-2. **Update the changelog** in [:fontawesome-brands-github: `lib/catalog/README.md`](https://github.com/owid/etl/blob/master/lib/catalog/README.md?plain=1#L215)
-3. **Commit and push to `master`** - the package will be automatically published to PyPI via [:fontawesome-brands-github: GitHub Actions](https://github.com/owid/etl/actions/workflows/publish-owid-catalog.yml)
+2. **Update the changelog** in [:fontawesome-brands-github: `lib/catalog/README.md`](https://github.com/owid/etl/blob/master/lib/catalog/README.md#changelog)
+3. **Refresh both lockfiles** — the version is recorded in `lib/catalog/uv.lock` *and* in the repo-root `uv.lock`; run `make .venv` in `lib/catalog/` and at the repo root
+4. **Commit and push to `master`** - the package will be automatically published to PyPI via [:fontawesome-brands-github: GitHub Actions](https://github.com/owid/etl/actions/workflows/publish-owid-packages.yml)
 
 The workflow triggers automatically when `lib/catalog/pyproject.toml` changes on the master branch. It includes a safety check to ensure the version was actually bumped before publishing.
 
-**Manual trigger:** You can still manually trigger the workflow by clicking `Run Workflow` in [:fontawesome-brands-github: GitHub Actions](https://github.com/owid/etl/actions/workflows/publish-owid-catalog.yml) if needed.
+**Manual trigger:** You can still manually trigger the workflow by clicking `Run Workflow` in [:fontawesome-brands-github: GitHub Actions](https://github.com/owid/etl/actions/workflows/publish-owid-packages.yml) if needed.
+
+Nothing bumps the version for you: a PR that only changes library source files publishes nothing, and those changes ship with whoever bumps next. The full maintainer guide — release checklist, versioning practice, dev environment, and which checks actually cover `lib/catalog` — is in [:fontawesome-brands-github: `lib/catalog/DEVELOPMENT.md`](https://github.com/owid/etl/blob/master/lib/catalog/DEVELOPMENT.md).
 
 ### Generate `llms.txt`
 

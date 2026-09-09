@@ -60,10 +60,10 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/un/2024-07-12/un_wpp_full:
     - data://garden/un/2024-07-12/un_wpp
-  export://explorers/un/latest/un_wpp:
+  viz://explorer/un/latest/un_wpp:
     - data://grapher/un/2024-07-12/un_wpp
     - data://grapher/un/2024-07-12/un_wpp_full
-  export://multidim/un/latest/un_wpp:
+  viz://chart/un/latest/un_wpp:
     - data://grapher/un/2024-07-12/un_wpp
     - data://grapher/un/2024-07-12/un_wpp_full
 
@@ -335,7 +335,7 @@ steps:
   #
   # PEW: Global Religious Composition
   #
-  export://multidim/pew/latest/religious_composition:
+  viz://chart/pew/latest/religious_composition:
     - data://grapher/pew/2025-10-31/religious_composition:
         - data://garden/pew/2025-10-31/religious_composition:
             - data://meadow/pew/2025-10-31/religious_composition:

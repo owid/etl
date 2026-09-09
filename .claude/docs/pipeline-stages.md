@@ -2,7 +2,7 @@
 
 ## Core Pipeline Flow
 
-**snapshot** → **meadow** → **garden** → **grapher** → **export**
+**snapshot** → **meadow** → **garden** → **grapher** → **viz** / **export**
 
 ### Snapshot (`snapshots/`)
 DVC-tracked raw files with rich metadata. Source data downloaded from external providers.
@@ -20,8 +20,11 @@ Business logic layer:
 ### Grapher (`etl/steps/data/grapher/`)
 MySQL database ingestion for OWID visualization platform.
 
+### Viz (`etl/steps/viz/`)
+Visualizations, addressed as `viz://<channel>/...`: `chart` (charts and MDIMs; a chart is an MDIM with `dimensions: []`), `explorer`, `static` (PNG/SVG images), `bespoke` (data feeds of bespoke interactive visualizations). All viz steps run with `--grapher`.
+
 ### Export (`etl/steps/export/`)
-Final outputs - explorers, collections, APIs. Addressed as `export://...`, not `data://export/...`.
+Files shipped to external destinations (R2, GitHub). Addressed as `export://...`, not `data://export/...`; need `--export`.
 
 ## Step URI Pattern
 
