@@ -1,20 +1,20 @@
 ---
 name: create-explorer
-description: Author or modify an Our World in Data explorer (multi-dimensional dashboard with dropdown selectors, published from ETL via `export://explorers/<ns>/latest/<short>`). Trigger when the user wants to build a new explorer, add/remove views or dimensions on an existing one, change the explorer's chart text or selection defaults, or finish an explorer migration once the snapshot/garden/grapher chain is already in place.
+description: Author or modify an Our World in Data explorer (multi-dimensional dashboard with dropdown selectors, published from ETL via `viz://explorer/<ns>/latest/<short>`). Trigger when the user wants to build a new explorer, add/remove views or dimensions on an existing one, change the explorer's chart text or selection defaults, or finish an explorer migration once the snapshot/garden/grapher chain is already in place.
 metadata:
   internal: true
 ---
 
 # Creating an Explorer
 
-Explorers are OWID's multi-dimensional dashboards (e.g. `ourworldindata.org/explorers/food-prices`). They're authored as YAML in this repo and published by ETL at `export://explorers/<ns>/latest/<short>`.
+Explorers are OWID's multi-dimensional dashboards (e.g. `ourworldindata.org/explorers/food-prices`). They're authored as YAML in this repo and published by ETL at `viz://explorer/<ns>/latest/<short>`.
 
 This skill is the explorer-flavored sibling of `/create-multidim`. They use the same `paths.create_collection(...)` engine and the same YAML schema for `dimensions` / `views` / `definitions.common_views`. The differences are:
 
 | | Multidim | Explorer |
 |---|---|---|
-| Channel | `export://multidim/...` | `export://explorers/...` |
-| Step file location | `etl/steps/export/multidim/<ns>/latest/` | `etl/steps/export/explorers/<ns>/latest/` |
+| Channel | `viz://chart/...` | `viz://explorer/...` |
+| Step file location | `etl/steps/viz/chart/<ns>/latest/` | `etl/steps/viz/explorer/<ns>/latest/` |
 | `create_collection` flag | (default) | `explorer=True` |
 | Top-level config block | `title:`, `default_selection:`, `default_dimensions:` | `config:` block carrying legacy explorer settings (`explorerTitle`, `explorerSubtitle`, `selection`, `subNavId`, `entityType`, …) |
 | Slug convention | underscores in file paths and `short_name` | underscores in file path, **hyphens** in URL slug and `short_name` argument |
@@ -25,7 +25,7 @@ If you're modifying an existing explorer (adjusting chart text, swapping a catal
 
 ## When to use this skill
 
-- After a `/migrate-explorer-csv`, `/migrate-explorer-grapher`, or `/migrate-explorer-indicator-legacy` skill has produced (or already located) the upstream snapshot/meadow/garden/grapher chain, and now needs the export step.
+- After a `/migrate-explorer-csv`, `/migrate-explorer-grapher`, or `/migrate-explorer-indicator-legacy` skill has produced (or already located) the upstream snapshot/meadow/garden/grapher chain, and now needs the explorer step.
 - For a brand-new explorer where the data is already in ETL (skip directly to step 1).
 - When porting an existing explorer's view layout (e.g. full-YAML → table-driven, or moving FAUST text from per-view YAML up into indicator metadata).
 
@@ -34,13 +34,13 @@ If you're modifying an existing explorer (adjusting chart text, swapping a catal
 Every explorer is exactly two files plus a DAG entry:
 
 ```
-etl/steps/export/explorers/<ns>/latest/
+etl/steps/viz/explorer/<ns>/latest/
 ├── <short>.py              # Python uses snake_case
 └── <short>.config.yml
 ```
 
 ```bash
-mkdir -p etl/steps/export/explorers/<ns>/latest
+mkdir -p etl/steps/viz/explorer/<ns>/latest
 ```
 
 **Hyphens vs underscores** (recurring source of confusion):
@@ -384,9 +384,9 @@ After `paths.create_collection()` returns the collection `c`, you can mutate it 
 
     Pattern: `migration_flows.py`'s `add_display_settings(c)`. Avoid this loop when the setting can live on the indicator's garden metadata instead.
 
-- **`choice_renames={dim: {slug: display_name, ...}}`** (passed directly to `create_collection`) — map slug → display name when you need to derive the display label programmatically. Model: `multidim/minerals/latest/minerals.py`.
+- **`choice_renames={dim: {slug: display_name, ...}}`** (passed directly to `create_collection`) — map slug → display name when you need to derive the display label programmatically. Model: `chart/minerals/latest/minerals.py`.
 
-- **Sidecar `<short>.dims.yaml`** — when the column → dimensions map exceeds ~50 entries, lift it out of the Python step into a sidecar YAML loaded at module-import time. Keeps `<short>.py` focused on logic and turns dim-tagging changes into a 1-line YAML edit. Model: `etl/steps/export/explorers/emissions/latest/co2.{py,dims.yaml}`:
+- **Sidecar `<short>.dims.yaml`** — when the column → dimensions map exceeds ~50 entries, lift it out of the Python step into a sidecar YAML loaded at module-import time. Keeps `<short>.py` focused on logic and turns dim-tagging changes into a 1-line YAML edit. Model: `etl/steps/viz/explorer/emissions/latest/co2.{py,dims.yaml}`:
 
     ```python
     from pathlib import Path
@@ -399,7 +399,7 @@ After `paths.create_collection()` returns the collection `c`, you can mutate it 
 In `dag/<ns>.yml`:
 
 ```yaml
-export://explorers/<ns>/latest/<short>:
+viz://explorer/<ns>/latest/<short>:
   - data://grapher/<ns1>/<v1>/<dataset1>
   - data://grapher/<ns2>/<v2>/<dataset2>
   # ... one line per unique upstream grapher dataset
@@ -411,7 +411,7 @@ Place near related explorer entries (or alongside the upstream grapher steps) fo
 
 Hand off to the user:
 
-1. `.venv/bin/etlr export://explorers/<ns>/latest/<short>` — runs the step and writes the TSV.
+1. `.venv/bin/etlr viz://explorer/<ns>/latest/<short> --grapher` — runs the step and upserts the explorer to the staging DB.
 2. Open `http://staging-site-<branch>/admin/explorers/preview/<slug>` and spot-check:
    - default view (no dimensions toggled)
    - every dimension switch
@@ -441,20 +441,20 @@ Hand the user the exact `etlr` command — don't run it yourself.
 
 Full-YAML (each view hand-listed):
 
-- `etl/steps/export/explorers/agriculture/latest/crop_yields.{py,config.yml}` — large indicator-based explorer with many dimensions.
-- `etl/steps/export/explorers/agriculture/latest/food_prices.{py,config.yml}` — small grapher-chart-based migration (12 chart IDs unwrapped to 12 single-indicator views) with conditional dimensions ("na" pattern).
-- `etl/steps/export/explorers/agriculture/latest/fertilizers.{py,config.yml}` — checkbox dimension with `choice_slug_true`; multi-namespace dependencies.
-- `etl/steps/export/explorers/food/latest/food_footprints.{py,config.yml}` — hybrid (16 grapher-chart views + 29 CSV-backed views) showing dimension-filtered `common_views` for differing `sourceDesc` per view-type.
-- `etl/steps/export/explorers/war/latest/countries_in_conflict_data.{py,config.yml}` — uses `na`-named choices to model conditional dimensions.
-- `etl/steps/export/explorers/emissions/latest/ipcc_scenarios.{py,config.yml}` — moderate-size YAML-driven.
+- `etl/steps/viz/explorer/agriculture/latest/crop_yields.{py,config.yml}` — large indicator-based explorer with many dimensions.
+- `etl/steps/viz/explorer/agriculture/latest/food_prices.{py,config.yml}` — small grapher-chart-based migration (12 chart IDs unwrapped to 12 single-indicator views) with conditional dimensions ("na" pattern).
+- `etl/steps/viz/explorer/agriculture/latest/fertilizers.{py,config.yml}` — checkbox dimension with `choice_slug_true`; multi-namespace dependencies.
+- `etl/steps/viz/explorer/food/latest/food_footprints.{py,config.yml}` — hybrid (16 grapher-chart views + 29 CSV-backed views) showing dimension-filtered `common_views` for differing `sourceDesc` per view-type.
+- `etl/steps/viz/explorer/war/latest/countries_in_conflict_data.{py,config.yml}` — uses `na`-named choices to model conditional dimensions.
+- `etl/steps/viz/explorer/emissions/latest/ipcc_scenarios.{py,config.yml}` — moderate-size YAML-driven.
 
 Table-driven (views auto-expanded from a dimensional table):
 
-- `etl/steps/export/explorers/migration/latest/migration_flows.{py,config.yml}` — passes `tb=tb, indicator_names=[...], dimensions=[...]` to `create_collection`; YAML carries only the static config and dimension presentation. Includes `add_display_settings(c)` post-processing.
-- `etl/steps/export/explorers/emissions/latest/co2.{py,dims.yaml,config.yml}` — sidecar `.dims.yaml` for the 54-entry column→dimensions map; uses `c.edit_views([...])` with both an unscoped default and a 4-dim-filtered override; uses a `c.views` loop with `view.matches(...)` for per-indicator `numDecimalPlaces` overrides.
-- `etl/steps/export/explorers/emissions/latest/air_pollution.{py,config.yml}` — table-driven with `c.group_views(...)` to add facet views, `c.drop_views(...)` to prune cross-products.
-- `etl/steps/export/multidim/minerals/latest/minerals.py` — same APIs in the multidim channel; useful read for `choice_renames`.
+- `etl/steps/viz/explorer/migration/latest/migration_flows.{py,config.yml}` — passes `tb=tb, indicator_names=[...], dimensions=[...]` to `create_collection`; YAML carries only the static config and dimension presentation. Includes `add_display_settings(c)` post-processing.
+- `etl/steps/viz/explorer/emissions/latest/co2.{py,dims.yaml,config.yml}` — sidecar `.dims.yaml` for the 54-entry column→dimensions map; uses `c.edit_views([...])` with both an unscoped default and a 4-dim-filtered override; uses a `c.views` loop with `view.matches(...)` for per-indicator `numDecimalPlaces` overrides.
+- `etl/steps/viz/explorer/emissions/latest/air_pollution.{py,config.yml}` — table-driven with `c.group_views(...)` to add facet views, `c.drop_views(...)` to prune cross-products.
+- `etl/steps/viz/chart/minerals/latest/minerals.py` — same APIs in the multidim channel; useful read for `choice_renames`.
 
 ## Follow-up
 
-Once an explorer is on `create_collection(explorer=True)`, it's a candidate for the Track-B port to MDIM (`export://multidim/...`) once feature parity is reached. See umbrella issue #6014.
+Once an explorer is on `create_collection(explorer=True)`, it's a candidate for the Track-B port to MDIM (`viz://chart/...`) once feature parity is reached. See umbrella issue #6014.

@@ -4,38 +4,34 @@ tags:
 icon: lucide/forward
 ---
 
-# Export steps
+# Viz and export steps
 
-Export steps are defined in `etl/steps/export` directory and have similar structure to regular steps. They are run with the `--export` flag:
+Viz steps (`viz://`) produce visualizations and export steps (`export://`) ship files to external destinations. They are defined in the `etl/steps/viz` and `etl/steps/export` directories and have a similar structure to regular steps. Viz steps publish with `--grapher`; export steps write to R2 or GitHub with `--export`. Either kind, named by its URI and run without its flag, only builds its output locally: handy for checking a chart config or an export file before publishing it.
+
+The channel of a viz step says what it produces:
+
+- `viz://chart/`: a chart or an MDIM (a chart is just an MDIM with no dimensions), upserted to the grapher DB. A chart step can be a bare `<name>.config.yml` with no Python file.
+- `viz://explorer/`: an explorer, upserted to the grapher DB.
+- `viz://static/`: a static image (PNG/SVG) rendered with matplotlib next to the recipe and committed.
+- `viz://bespoke/`: the data feed of a bespoke interactive visualization, uploaded to R2.
+
+Chart and explorer steps also write their expanded config to the gitignored `viz/<channel>/...` folder, like `data/` for data steps.
 
 ```bash
-etlr export://explorers/minerals/latest/minerals --export
+etlr viz://explorer/minerals/latest/minerals --grapher
 ```
 
-The `def run():` function doesn't save a dataset, but calls a method that performs the action. For instance `create_explorer(...)` or `gh.commit_file_to_github(...)`. Once the step is executed successfully, it won't be run again unless its code or dependencies change (it won't be "dirty").
+The `def run():` function doesn't save a dataset, but calls a method that performs the action. For instance `paths.create_collection(...)` or `gh.commit_file_to_github(...)`. Once the step is executed successfully, it won't be run again unless its code or dependencies change (it won't be "dirty").
 
 ## Creating explorers
 
-TSV files for explorers are created using the `create_explorer` function, usually from a configuration YAML file
-
-```py
-# Create a new explorers dataset and tsv file.
-ds_explorer = paths.create_explorer(config=config, df_graphers=df_graphers)
-ds_explorer.save()
-```
-
-!!! info "Creating explorers on staging servers"
-
-    TODO: how do we push explorers to production?
-
-    Explorers can be created or edited on staging servers and then manually migrated to production. Each staging server creates a branch in the `owid-content` repository. Editing explorers in Admin or running the `create_explorer` function pushes changes to that branch. Once the PR is merged, the branch gets pushed to the `owid-content` repository (not to the `master` branch, but its own branch). You then need to manually create a PR from that branch and merge it into `master`.
-
+Explorers are created with `paths.create_collection(config=..., explorer=True)` from a configuration YAML file, and upserted to the grapher DB by `.save()`. They follow the same structure as MDIMs, see [MDIMs and Explorers](mdims.md).
 
 ## Creating multi-dimensional indicators
 
 Multi-dimensional indicators are powered by a configuration that is typically created from a YAML file. The structure of the YAML file looks like this:
 
-```yaml title="etl/steps/export/multidim/energy/latest/energy_prices.yaml"
+```yaml title="etl/steps/viz/chart/energy/latest/energy_prices.yaml"
 title:
   title: "Energy prices"
   title_variant: "by energy source"
@@ -75,13 +71,13 @@ views:
 
 ```
 
-The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically (using function `etl.collection.multidim.expand_config`).
+The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically (using function `etl.collection.expand_config`).
 
-You can also combine manually defined views with generated ones. See the `etl.collection.multidim` module for available helper functions or refer to examples from `etl/steps/export/multidim/`. Feel free to add or modify the helper functions as needed.
+You can also combine manually defined views with generated ones. See the `etl.collection` module for available helper functions or refer to examples from `etl/steps/viz/chart/`. Feel free to add or modify the helper functions as needed.
 
-The export step loads the data dependencies and the config YAML file, adds `views` to the config, and then pushes the configuration to the database.
+The chart step loads the data dependencies and the config YAML file, adds `views` to the config, and then pushes the configuration to the database.
 
-```python title="etl/steps/export/multidim/energy/latest/energy_prices.py"
+```python title="etl/steps/viz/chart/energy/latest/energy_prices.py"
 def run() -> None:
     #
     # Load inputs.
@@ -97,10 +93,10 @@ def run() -> None:
     # Process data.
     #
     # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config()
+    config = paths.load_collection_config()
 
     # Create views.
-    config["views"] = multidim.expand_config(
+    config["views"] = expand_config(
         tb_annual,
         dimensions=["frequency", "source", "unit"],
         additional_config={"chartTypes": ["LineChart", "DiscreteBar"], "hasMapTab": True, "tab": "map"},
@@ -109,7 +105,7 @@ def run() -> None:
     #
     # Save outputs.
     #
-    mdim = paths.create_mdim(config=config)
+    mdim = paths.create_collection(config=config)
     mdim.save()
 
 ```
@@ -117,7 +113,7 @@ def run() -> None:
 To see the multi-dimensional indicator in Admin, run
 
 ```bash
-etlr export://multidim/energy/latest/energy_prices --export
+etlr viz://chart/energy/latest/energy_prices --grapher
 ```
 
 and check out the preview at: http://staging-site-my-branch/admin/grapher/mdd-energy-prices
@@ -148,5 +144,5 @@ gh.commit_file_to_github(
 This code will commit the dataset to the `co2-data` repository on GitHub if you specify the `CO2_BRANCH` environment variable, i.e.
 
 ```bash
-CO2_BRANCH=main etlr export://co2/latest/co2 --export
+CO2_BRANCH=main etlr export://github/co2_data/latest/owid_co2 --export
 ```

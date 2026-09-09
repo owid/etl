@@ -68,10 +68,10 @@
             "pattern": "^(\\d{3}|https://files\\.ourworldindata\\.org/schemas/grapher-schema\\.\\d{3}\\.json)$",
             "title": "Grapher config schema version",
             "description": "Version of the OWID Grapher chart-config schema that this collection's view configs were authored against. Grapher uses it as the `$schema` of every view config, and migrates outdated configs forward to the current version.",
-            "requirement_level": "recommended",
+            "requirement_level": "required",
             "guidelines": [
                 [
-                    "Pin the version explicitly. When it is omitted, Grapher is told the configs already match the version this repo vendors (`DEFAULT_GRAPHER_SCHEMA`), so a breaking schema change would skip the migration."
+                    "Pin the version explicitly — ETL fails without it. There is no fallback on purpose: an unpinned config would resolve to whatever version the repo vendors on the day the step runs, which both claims the config is already current (so a breaking schema change skips the migration) and silently changes on the next run after a version bump."
                 ],
                 [
                     "Two forms are accepted: the short three-digit version (`\"011\"`) or the full schema URL."
@@ -1044,7 +1044,8 @@
     },
     "required": [
         "dimensions",
-        "views"
+        "views",
+        "grapher_schema"
     ],
     "$defs": {
         "indicatorConfig": {

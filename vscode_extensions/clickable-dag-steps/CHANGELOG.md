@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.0.6] – 2026-09-07
+- Recognise `viz://` steps (`etl/steps/viz/<channel>/...`), the new home of chart, explorer, static and bespoke visualization steps.
+
 ## [0.0.5] – 2026-06-01
 - Support YAML-only export steps by linking DAG entries to adjacent `.config.yml` files when no `.py` file exists.
 

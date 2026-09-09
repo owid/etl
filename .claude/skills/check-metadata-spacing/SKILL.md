@@ -116,5 +116,5 @@ If no issues are found, confirm that all templates render cleanly.
 ## Notes
 
 - This check requires the step to have been run already (it reads from the built dataset, not the YAML directly)
-- If the dataset hasn't been built yet, build it first: `.venv/bin/etlr <channel>/<namespace>/<version>/<dataset> --private`. No `--force`: `etlr`'s change detection already re-runs a step whose `.meta.yml` you just edited. No `--only` either — when the catalog is missing, upstream outputs usually are too, and `--only` skips dependency resolution and fails on the missing inputs.
+- If the dataset hasn't been built yet, build it first: `.venv/bin/etlr <channel>/<namespace>/<version>/<dataset>`. No `--force`: `etlr`'s change detection already re-runs a step whose `.meta.yml` you just edited. No `--only` either — when the catalog is missing, upstream outputs usually are too, and `--only` skips dependency resolution and fails on the missing inputs.
 - The check looks at the **rendered** output, not the raw YAML — this catches issues that only appear after Jinja evaluation

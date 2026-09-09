@@ -44,7 +44,7 @@ steps:
   #
   # Animal welfare data explorer.
   #
-  export://explorers/animal_welfare/latest/animal_welfare:
+  viz://explorer/animal_welfare/latest/animal_welfare:
     # Chick culling laws (Various sources).
     - data://grapher/animal_welfare/2026-09-01/chick_culling_laws:
       - data://garden/animal_welfare/2026-09-01/chick_culling_laws:
@@ -107,5 +107,5 @@ steps:
   #
   # Banning of chick culling — chart authored in ETL.
   #
-  export://multidim/animal_welfare/latest/banning_of_chick_culling:
+  viz://chart/animal_welfare/latest/banning_of_chick_culling:
     - data://grapher/animal_welfare/2026-09-01/chick_culling_laws

@@ -1,6 +1,8 @@
 import tempfile
 import zipfile
 from pathlib import Path
+from textwrap import dedent
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -306,3 +308,83 @@ def test_snapshot_to_yaml():
         "version": "2023-04-18",
         "origin": {"title": "Aviation Statistics by Period", "producer": "Producer"},
     }
+
+
+def test_metadata_save_leaves_a_dvc_with_unquoted_dates_untouched(tmp_path, monkeypatch):
+    """An unchanged .dvc must survive `save()` byte for byte, unquoted dates included.
+
+    `yaml.safe_load` parses `date_accessed: 2023-10-05` into a `datetime.date` while `Origin` keeps
+    it as a string, so the "nothing changed" check used to always miss and rewrite the file —
+    reflowing long lines and re-indenting `outs` for no reason. `create_snapshot` calls `save()` on
+    every run, so those diffs surfaced in whichever dataset update happened to come next.
+    """
+    monkeypatch.setattr(paths, "SNAPSHOTS_DIR", tmp_path)
+    dvc_path = tmp_path / "namespace" / "2023-10-05" / "dataset.csv.dvc"
+    dvc_path.parent.mkdir(parents=True)
+    original = dedent("""\
+        meta:
+          origin:
+            title: A title long enough that a rewrite would wrap it onto a second line of its own
+            producer: Producer
+            citation_full: Producer (2023)
+            url_main: https://example.org/data
+            date_published: 2023-10-01
+            date_accessed: 2023-10-05
+            license:
+              name: CC BY 4.0
+        outs:
+        - md5: a9bae94a60b04dea8b889d16f23c0ca9
+          size: 1632
+          path: dataset.csv
+        """)
+    dvc_path.write_text(original)
+
+    snap = Snapshot("namespace/2023-10-05/dataset.csv")
+    snap.metadata.save()
+    assert dvc_path.read_text() == original
+
+    # A genuine change is still written out.
+    snap.metadata.origin.date_accessed = "2023-11-20"  # ty: ignore
+    snap.metadata.save()
+    assert "date_accessed: '2023-11-20'" in dvc_path.read_text()
+    assert "md5: a9bae94a60b04dea8b889d16f23c0ca9" in dvc_path.read_text()
+
+
+def test_private_snapshot_says_how_to_get_access_or_skip(monkeypatch, tmp_path):
+    """A credentials failure on a private snapshot names the bucket and --public-only; a missing
+    object is left alone, so it still reads as "not uploaded" rather than "no access"."""
+    from botocore.exceptions import ClientError, EndpointConnectionError, NoCredentialsError
+    from owid.catalog import s3_utils
+
+    from etl.snapshot import PrivateSnapshotAccessError, Snapshot
+
+    snap = Snapshot("dummy/2020-01-01/dummy.csv")
+    monkeypatch.setattr(type(snap), "path", property(lambda self: tmp_path / "dummy.csv"))
+    snap.metadata = SimpleNamespace(is_public=False)  # ty: ignore[invalid-assignment]
+
+    def fail_with(error):
+        def _download(*args, **kwargs):
+            raise error
+
+        monkeypatch.setattr(s3_utils, "download", _download)
+
+    def client_error(code):
+        return s3_utils.UploadError(ClientError({"Error": {"Code": code}}, "HeadObject"))
+
+    # No credentials configured at all, and a stray AWS_PROFILE shadowing the R2 ones.
+    for error in [NoCredentialsError(), client_error("400"), client_error("AccessDenied")]:
+        fail_with(error)
+        with pytest.raises(PrivateSnapshotAccessError) as exc:
+            snap._download_dvc_file("abc123")
+        assert "owid-snapshots-private" in str(exc.value)
+        assert "--public-only" in str(exc.value)
+
+    # A genuinely missing object is not an access problem: the original error survives.
+    fail_with(client_error("404"))
+    with pytest.raises(s3_utils.UploadError):
+        snap._download_dvc_file("abc123")
+
+    # Neither is an unreachable endpoint, even though it is a BotoCoreError like NoCredentialsError.
+    fail_with(EndpointConnectionError(endpoint_url="https://r2.example"))
+    with pytest.raises(EndpointConnectionError):
+        snap._download_dvc_file("abc123")

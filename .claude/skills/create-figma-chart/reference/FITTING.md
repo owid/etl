@@ -35,6 +35,31 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 > reconcile an export whose proportions were chosen by grapher, and this one's were chosen from
 > `TEMPLATES.md`. The scale is the one piece of the fit the route still needs.
 >
+>
+> **If you KEEP the import frame — to crop it to the plot's ink so the chart is grabbable as a unit —
+> pin every descendant's constraints to `MIN/MIN` BEFORE you resize it.** Step 5's remedy for the
+> import frame is to bin it, and a run that keeps it instead is outside that remedy and owes this step.
+> An SVG import arrives with **`SCALE/SCALE` on every descendant** — 269 of 269 in a measured case —
+> and resizing the frame applies them, so the crop's `resize()` stretches each text box through its
+> constraint and rewraps all of them: "Paid work or study" over two lines, every country label split
+> from its year, every in-bar value split from its unit. It survives the atomic call, so it is not an
+> error you get told about; it is a screenshot away and nothing else catches it.
+>
+> ```js
+> for (const n of imported.findAll(() => true)) {
+>   if ("constraints" in n) n.constraints = { horizontal: "MIN", vertical: "MIN" };
+> }
+> imported.rescale(clone.width / imported.width);   // rescale is fine — it scales type WITH geometry
+> ```
+>
+> `rescale()` is not the operation at risk: it scales type with geometry by design, which is why the
+> width fix uses it. It is `resize()` that reads constraints, so pin them and the crop moves nothing.
+>
+> **Crop by targeting the content column directly, not by nudging the ink offsets.** A TEXT node's box
+> carries its advance width rather than its glyphs, so cropping to ink alone lands a 16..834 column at
+> 15.92..833.88; snap a side that falls within a pixel. Compute the target edge and set it — an offset
+> nudged in the wrong direction put a left edge at 15.83 instead of 16, which reads as a rounding
+> artifact rather than as the sign error it was.
 > What *does* happen here is stripping whatever the template already provides. **The background comes
 > first, and it is the one that ruins the page.** matplotlib fills the figure and axes patches white
 > unless the step turned them off, so the import can carry a frame-sized opaque rectangle (`patch_1`,
@@ -350,7 +375,7 @@ Two things this exercise is good for beyond tidiness:
 
 ### Restyling a local-SVG import to OWID's fonts and colors
 
-An `export://static_viz` step deliberately does **not** set them: the machine building it may have
+An `viz://static` step deliberately does **not** set them: the machine building it may have
 neither Lato nor Playfair Display (this one has 436 font families and neither), so a step that asked
 for them would fall back silently and emit different type depending on where it ran. Colors are the
 same story — the Chart colors library lives in Figma, not in matplotlib. So the step owns the data,
@@ -377,6 +402,17 @@ matplotlib's fallback stack and seaborn's palette, and needs an explicit pass:
 - **Everything above is lost on re-import**, along with the rest of Step 8 — see the re-export
   section. Keep the pass as one script you re-run, because a frame that has quietly reverted to
   matplotlib's type looks finished.
+- **A palette change does NOT need a re-import — recolour the frame in place, once you have proved the
+  geometry is unchanged.** The proof is cheap and it is a proof, not a glance: harvest the frame's
+  named groups and every text run, and compare against the freshly rendered SVG. The only expected
+  difference is the template slots the restyle drops (twelve on a Static Vertical: title, subtitle, two
+  Note lines, source, tagline and a six-run licence), so subtract those and the two sets must be
+  identical. Hash them if the lists are long — an FNV-1a of the sorted, newline-joined names runs
+  unchanged in `use_figma`, where there is no `crypto`. Identical on both counts means the frame is the
+  same render and only the paint differs, which is one pass instead of the whole
+  upload-restyle-crop-snap sequence and keeps every Step 8 edit the frame already carries. **Unescape
+  HTML entities before comparing**: the SVG holds `TV &amp; radio` where Figma holds `TV & radio`, and
+  five such labels are enough to make two identical sets hash differently.
 
 #### Changing a font moves every label. Put them back.
 
@@ -705,6 +741,31 @@ Verify against the actual clone with `get_metadata` (the templates evolve; the g
 > rather than being another guess. Measured errors: pass 1 predicted the canvas to 1.2–1.4px, pass 2
 > to **0.4–0.5px**.
 >
+> **That stability is a function of how far the canvas MOVES, so read the fitted aspect after pass 2
+> and be ready for a third.** `insetY` grows as the canvas shrinks — measured on one single-series
+> line chart at a fixed `imFontSize` 31, all three group boxes:
+>
+> | declared canvas | ink (group box) | insetX / insetY |
+> |---|---|---|
+> | 833 × 612 (pass 1 probe) | 767.28 × 582.64 | 65.72 / **29.36** |
+> | 883 × 577 (pass 2) | 757.30 × 531.64 | 125.70 / **45.36** |
+> | 874 × 584 (pass 3) | 750.30 × 540.64 | 123.70 / **43.36** |
+>
+> Pass 2 → 3 moved the canvas 9px wide and 7px tall and the inset by 2px, which is the ~2px above.
+> Pass 1 → 2 moved it 35px and the inset by **16px**, so pass 2 came back at an ink aspect of
+> **1.4245** against the 1.3895 it was solved for — a 12.6px width miss, twice what the x-map should
+> be asked to close. Re-solving with the *pass-2* numbers landed pass 3 first time: aspect 1.39, gaps
+> **13.86 / 13.86**, and a **0.62px** width residual for the x-map. So the two-pass rule is the common
+> case, not a guarantee: judge it on `xMapShortfall`, and when it is more than a few px run the same
+> `--declared/--ink/--im-font-size` solve again on the numbers you have just measured. Another pass
+> costs ~3 calls (export, upload, swap) against an 18px gap you would otherwise ship.
+>
+> **And measure the inset the same way both times, or you will read a drift that isn't there.**
+> `measure_fit.js` reports a leaf-union ink with the replaced furniture excluded; a hand read of
+> `chart.absoluteBoundingBox` reports the group's box with everything still in it. Those are different
+> numbers on the same import — the ones above are all group boxes on purpose — and mixing them across
+> passes attributes the difference to the export.
+>
 > **And solve for the gap, not for the band.** `--gap` defaults to 14 because the target is 12–16px at
 > *each end*; solving for the band's own aspect asks the chart to fill it edge to edge and leaves
 > nothing. On a 508×409 band that is the difference between a target ink aspect of 1.2421 and 1.3333.
@@ -716,6 +777,15 @@ Verify against the actual clone with `get_metadata` (the templates evolve; the g
 **The header reflows itself — don't reposition it.** Every template's header block is a flat vertical auto-layout of `[title, subtitle]` (the logo is a sibling, not a child — see the node map), so a title that grows from two lines to three pushes the subtitle down and grows the header on its own. Set `characters`, then **read the new `header.y + header.height` back** and measure the band from that; any y you computed before the text went in is stale. Measured on the portrait: a two-line title gives a 135 band bottom, three lines 199.
 
 **The logo no longer sets a floor under that** — it is a sibling of the header, not a child, so it contributes nothing to the header's height and a one-line title buys the full reduction. What the logo still constrains is *width*: the title node is sized narrower than the content box to clear it (737.84 against 818 on Static Vertical, 428 against 508 on the 540-wide set), which is the number a title has to be measured against. Read the band back rather than deriving it from line counts either way.
+
+**Setting a font size moves a HUGGING label, so re-pin the column afterwards — a 1px left-edge miss
+fails `box-alignment` outright.** Putting the export's labels on the ladder (15.4 → 15) is a size
+edit, not a scale, so it looks like it cannot move the fit. It can: grapher's y tick labels arrive
+`textAutoResize: "WIDTH_AND_HEIGHT"` and right-aligned, and Figma shrinks such a box from its LEFT
+edge — the widest label's left edge went 16 → 17 and the chart group's box with it, against a
+`BOX_EPS` of 0.05. Shift the whole y-label column back by the difference (`t.x += 16 − leftmost`,
+which keeps their shared right edge), then re-read the box. Same class as the trap above: measure the
+group after the last *content* edit, not after the last scale.
 
 **Prefer reaching the content width without `rescale()` at all.** `rescale()` multiplies font sizes along with geometry, so a 1.006× nudge to close a 3px gap silently moves every label from 15px to 15.09 — off the ladder, and the Step 8c "sizes are named styles" check then fails on a difference no one can see. When the width can be closed another way — the label reclaim above is the usual one — take that route and every size stays exactly where the export put it.
 

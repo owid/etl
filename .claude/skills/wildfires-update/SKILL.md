@@ -74,7 +74,7 @@ snapshot folder: `git rm -r snapshots/climate/<old>`.
 ### 4. Build the rest of the chain
 
 ```bash
-.venv/bin/etlr climate/<new> --private
+.venv/bin/etlr climate/<new>
 ```
 
 Runs meadow, garden and all four grapher steps (plus any stale upstream deps). The garden step's

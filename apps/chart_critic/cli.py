@@ -34,7 +34,7 @@ import rich_click as click
 from rich.console import Console
 from rich.table import Table
 
-from apps.chart_critic import cache, digest, fixtures, mdim, report
+from apps.chart_critic import cache, digest, mdim, report
 from apps.chart_critic.bundle import GRAPHER_URL, Bundle, ChartGone, build, render
 from apps.chart_critic.critic import (
     CHEAP_MODEL,
@@ -420,12 +420,6 @@ def _review_one(
     ),
 )
 @click.option(
-    "--eval",
-    "run_eval",
-    is_flag=True,
-    help="Run the known-answer fixtures instead of a sweep, and exit nonzero if any regressed.",
-)
-@click.option(
     "--views",
     type=int,
     default=1,
@@ -497,7 +491,6 @@ def cli(
     no_cache: bool,
     clear_cache: bool,
     cache_ttl: float | None,
-    run_eval: bool,
     changed_since: int | None,
     include_data_updates: bool,
     digest_out: Path | None,
@@ -512,13 +505,6 @@ def cli(
         model = CHEAP_MODEL
 
     cache_ttl = _resolve_cache_ttl(cache_ttl, changed_since)
-
-    if run_eval:
-        # Five passes, because that is what was measured to reach 8/8: at two passes the two
-        # subtlest cases (a subtitle typo and a baseline offset) are missed about half the time,
-        # and a regression test that cries wolf is worse than one that costs 22 cents.
-        _evaluate(model, not no_image, max(repeat, 5), not no_cache, cache_ttl)
-        return
 
     use_cache = not no_cache
     charts_cached, reviews_cached, cache_mb = cache.stats()
@@ -667,79 +653,6 @@ def _post_digest(messages: list[str]) -> None:
             time.sleep(POST_INTERVAL_SECONDS)
         send_slack_message(digest.SLACK_CHANNEL, message)
     console.print(f"[green]posted {len(messages)} message(s) to {digest.SLACK_CHANNEL}[/green]")
-
-
-def _evaluate(model: str, with_image: bool, repeat: int, use_cache: bool, ttl_hours: float) -> None:
-    """Run the fixtures and report which known answers the critic still gets right."""
-    console.print(
-        f"[bold]Evaluating against {len(fixtures.CASES)} known-answer cases[/bold] with {model}, {repeat} passes each"
-    )
-    results = []
-    with cf.ThreadPoolExecutor(min(len(fixtures.CASES), 6)) as ex:
-        futures = {
-            ex.submit(
-                _review_one, c.slug, 0, model, with_image, False, repeat, use_cache, ttl_hours, c.views, c.params
-            ): c
-            for c in fixtures.CASES
-        }
-        for fut in cf.as_completed(futures):
-            case = futures[fut]
-            r = fut.result()
-            # A chart that could not be fetched has no issues, which looks exactly like a clean
-            # review — so a guard case would "pass" on a chart nobody looked at, and the eval
-            # would green-light a critic that never ran.
-            ok = r["status"] == "ok" and fixtures.matches(case, r["issues"])
-            results.append((case, r, ok))
-
-    table = Table(title="Known-answer evaluation")
-    table.add_column("chart")
-    table.add_column("expects")
-    table.add_column("result")
-    table.add_column("what the critic said", max_width=54)
-    for case, r, ok in sorted(results, key=lambda x: (x[2], x[0].slug)):
-        expects = "finds: " + ", ".join(case.expect_keywords) if case.expect_keywords else "nothing"
-        said = "; ".join(i["claim"] for i in r["issues"])[:200] or (
-            "—" if r["status"] == "ok" else f"[yellow]not reviewed: {r['status']}[/yellow]"
-        )
-        verdict = "[green]PASS[/green]" if ok else "[red]FAIL[/red]"
-        if case.guards_against and ok:
-            verdict += " [dim](guard)[/dim]"
-        table.add_row(case.slug, expects, verdict, said)
-    console.print(table)
-
-    passed = sum(1 for _, _, ok in results if ok)
-    # The gate ignores cases marked flaky. Eight of the nine are deterministic in practice
-    # (15/15 cached passes each), so a failure among those is a regression; the ninth lands
-    # roughly one pass in fifteen, and gating on it would fail most scheduled runs and teach
-    # everyone to ignore the result.
-    regressions = [(c, r) for c, r, ok in results if not ok and not c.flaky]
-    flaky_misses = [c for c, _, ok in results if not ok and c.flaky]
-    found = [(c, r) for c, r, ok in results if c.expect_keywords and ok]
-    clean_ok = [(c, r) for c, r, ok in results if not c.expect_keywords and ok]
-    cost = sum(r["cost"] for _, r, _ in results)
-    console.print(
-        f"\n[bold]{passed}/{len(results)} cases pass[/bold] — "
-        f"{len(found)}/{sum(1 for c in fixtures.CASES if c.expect_keywords)} known errors found, "
-        f"{len(clean_ok)}/{sum(1 for c in fixtures.CASES if not c.expect_keywords)} clean charts left alone"
-        f" · ${cost:.4f}"
-    )
-    for case, r, ok in results:
-        if not ok:
-            tag = "[yellow]MISS[/yellow]" if case.flaky else "[red]FAIL[/red]"
-            console.print(f"{tag} {case.slug}: {case.why}")
-            if case.guards_against:
-                console.print(f"       this case guards against: {case.guards_against}")
-    if flaky_misses:
-        console.print(
-            f"\n[yellow]{len(flaky_misses)} flaky case(s) missed[/yellow] — a recall probe, not a "
-            "regression, and not gated."
-        )
-    if regressions:
-        console.print(
-            "\n[dim]A fixture can also fail because the chart was fixed — check the chart before "
-            "assuming the critic broke, then update the case and note the date.[/dim]"
-        )
-        raise SystemExit(1)
 
 
 def _print_summary(results: list[dict[str, Any]], model: str) -> bool:

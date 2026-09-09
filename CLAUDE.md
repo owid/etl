@@ -33,6 +33,7 @@ Most recurring work here has a skill that runs it end to end. Reach for it **bef
 | Review a dataset-update PR | `/review-data-pr` |
 | Announce a finished update, internally | `/data-updates-comms` — the #data-updates-comms Slack form |
 | Announce a finished update, to readers | `/data-update-announcement` — the "Data update" post on ourworldindata.org/latest |
+| Log the analytics reports sent to data producers, and their replies, in the shared Notion log | `/log-producer-interactions` — incremental, from your own Gmail, reports only |
 
 One that's easy to skip and shouldn't be: `/edit-faust-metadata` owns **every** user-facing-text edit — it routes each field to the right layer (garden `.meta.yml` vs MDim yaml vs chart config on staging) and reports the blast radius on other charts before touching shared metadata.
 
@@ -92,7 +93,7 @@ The disclosure rule does **not** apply to OWID-reader-facing artifacts (e.g. the
 
 ## Pipeline Overview
 
-**snapshot** → **meadow** → **garden** → **grapher** → **export**
+**snapshot** → **meadow** → **garden** → **grapher** → **viz** / **export**
 
 | Stage | Location | Purpose |
 |-------|----------|---------|
@@ -100,7 +101,8 @@ The disclosure rule does **not** apply to OWID-reader-facing artifacts (e.g. the
 | meadow | `etl/steps/data/meadow/` | Basic cleaning |
 | garden | `etl/steps/data/garden/` | Business logic, harmonization |
 | grapher | `etl/steps/data/grapher/` | MySQL ingestion |
-| export | `etl/steps/export/` | Explorers, collections, APIs |
+| viz | `etl/steps/viz/` | Visualizations: charts and MDIMs (`viz://chart`), explorers (`viz://explorer`), static images (`viz://static`), bespoke interactive visualizations (`viz://bespoke`) |
+| export | `etl/steps/export/` | Files shipped to external destinations (R2, GitHub) |
 
 **Snapshot is raw passthrough only.** It downloads the source files and writes them out using the source's own row labels, column labels, and period labels. That's it. The following all belong in **garden**, not in the snapshot script:
 
@@ -129,14 +131,16 @@ Internal terms that recur across this guide, the skills, and the codebase:
 ## Running ETL Steps
 
 ```bash
-.venv/bin/etlr namespace/version/dataset --private      # Run step
-.venv/bin/etlr namespace/version/dataset --grapher      # Upload to grapher
-.venv/bin/etlr export://.../dataset --export             # Run an export:// step (mdim, explorer, static_viz, ...)
+.venv/bin/etlr namespace/version/dataset                # Run step (private steps included by default)
+.venv/bin/etlr namespace/version/dataset --grapher      # Build and upsert to grapher
+.venv/bin/etlr viz://chart/.../name --grapher            # Run a viz step (chart/MDIM, explorer, static, bespoke) and publish it
+.venv/bin/etlr viz://chart/.../name                      # Same, but only build the config locally (no DB write)
+.venv/bin/etlr export://.../name --export                 # Run an export:// step and push to R2/GitHub (without --export: build only)
 .venv/bin/etlr namespace/version/dataset --dry-run      # Preview
 .venv/bin/etlr namespace/version/dataset --force --only # Force re-run
 ```
 
-Key flags: `--grapher/-g` (upload), `--export` (required for any `export://...` step — mdims, explorers, static viz; omitting it makes `etlr` report "No steps matched" and then list your exact step among the "closest matches", even though it is in the DAG), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
+Two flags grant writes, and they are all you normally need: `--grapher/-g` allows writes to the grapher DB and R2 of the targeted environment (`grapher://` upserts run, `viz://` steps publish); `--export` allows `export://` steps to write to their shared destinations (GitHub, public R2), which have no staging equivalent. Naming selects, flags permit: a step named by its full URI or scheme (`viz://chart/...`, `grapher://...`, `export://...`) is always selected, and without its flag it builds locally and skips the write (a named `grapher://` upsert is skipped with a note). A plain pattern (`energy`, `'.*'`) never pulls in those step types without the flag. Other flags: `--dry-run` (preview), `--force/-f` (re-run, also re-uploads grapher files), `--only/-o` (no deps), `--modified/-m` (steps changed vs `origin/master`), `--public-only` (skip private steps; they run by default), `--debug` (single process + ipdb). Run `etlr --help` for the grouped list.
 
 **"The step completed" is not "the data is right".** After running a step for
 someone, report what came out of it: row count, year range, entities, and a few
@@ -164,7 +168,7 @@ catalog. `✅ No differences found` is itself a result worth reporting.
 - **`STAGING=1`** — makes `etlr` target the current branch's staging server: `STAGING=1 .venv/bin/etlr grapher://grapher/<path> --grapher` upserts the indicators straight to `staging-site-<branch>`'s DB. Optional: staging rebuilds automatically after you push, so you only need this when you want a change reflected there right away, or when the automatic rebuild is unusually slow (rare, e.g. edits to the regions or FAOSTAT datasets that invalidate a large part of the DAG). `STAGING=<name>` targets another branch's staging server.
 - **Version-bumping a grapher step mints new variable IDs**, so existing charts referencing the old indicators become ghost variables and must be remapped on staging (see the `remapping-ghost-variables` skill / `indicator_upgrade` CLI). Budget for this whenever you rename or re-version a grapher dataset.
 - **Versioning hygiene for derived/OMM steps:** an OMM's version reflects when its combining logic was written, not its inputs — but when you repoint a derived step to a newer-dated dependency, bump the step's own version folder too. Leaving a step dated before the data it ingests is confusing and should be fixed when noticed.
-- Some steps support **`SUBSET`** env var for fast dev iterations: `SUBSET='France,Germany' .venv/bin/etlr namespace/version/dataset --private`
+- Some steps support **`SUBSET`** env var for fast dev iterations: `SUBSET='France,Germany' .venv/bin/etlr namespace/version/dataset`
 - **No `.py` for simple downloads** — when a snapshot is a plain `url_download` (no custom fetch/parse/auth logic), create only the `.dvc` file; do **not** write `snapshots/.../<short>.py`. `etls <ns>/<version>/<short>` runs it straight from the `.dvc`. Write a script only when the download genuinely needs custom code (API pagination, auth, multi-file assembly, local/manual file input, non-trivial parsing before storing).
 
 ## Git Workflow
@@ -185,6 +189,8 @@ git push
 # 4. Add PR description
 gh pr edit <number> --body "..."
 ```
+
+**Merging reruns the pipeline.** Merging to master triggers the production ETL run (a Buildkite pipeline), which rebuilds every step whose checksum changed and performs the `grapher://` upserts. You do **not** need to re-run steps for a change to take effect, and it isn't an open item worth reporting — editing a step's code or metadata is enough, because `etlr`'s change detection picks it up on that run. Run steps locally to *verify* output before merge, not to publish it. The exceptions still worth flagging: a `--force` case where no checksum changed (upstream data patched out-of-band), and ghost-variable remapping after a version bump.
 
 **Cleaning up after merge**: `etl pr-clean` lists local branches whose PR was merged or closed (it checks the GitHub PR state, so squash-merges are detected), then deletes the selected branch(es). For branches created in a worktree (`etl pr "..." --worktree`), it also removes the worktree and copies that worktree's Claude sessions back into the main repo's `~/.claude/projects/` dir so they stay resumable.
 
@@ -231,7 +237,7 @@ Only universally understood abbreviations are fine (`gdp`, `co2`, `un_wpp`-style
 - **`Table.format(keys, short_name=paths.short_name)`** sets the index, sorts, verifies integrity, and sets `short_name` in one call — use it in data steps. It takes an explicit key list; if `keys` is None (default) it uses `country` + `year`, but it is not limited to those. For a year-only table use `tb.format(["year"], short_name=paths.short_name)`. Don't hand-roll `set_index` + `tb.metadata.short_name`.
 - **`*.meta.yml`**: the `dataset:` block carries only `update_period_days` and `owners` — everything else is inherited from origin. Always make sure `owners` is set (new dataset: the user; update: append the user if missing) — first entry is the accountable owner; canonical names per the `schemas/dataset-schema.json` enum, resolved via `etl.owners.resolve_owner`.
 - **`grapher_config`: omit `$schema:`** — pinning a specific schema version ages badly. The default in `etl/config.py:DEFAULT_GRAPHER_SCHEMA` is applied automatically by `_validate_grapher_config`.
-- **`description_key` is a list *or* a markdown string — check, never assume.** A YAML list survives garden so per-item Jinja can render, and is joined into markdown by `update_variable_metadata`, which runs when a step renders dimensions (`_yield_wide_table` / `_metadata_for_dimensions`) and again at the DB write (`etl/grapher/to_db.py`). A `data://grapher/...` dataset on disk therefore holds a string for some datasets and a list for others — MySQL is string-only, the grapher channel is not. Steps reading one — mdim and explorer `export://` steps especially — must handle both and pass the value through rather than rebuild it. Never `list()` it: that yields one bullet *per character*, which every write path used to rejoin into valid-looking markdown, and it shipped ~2,900 one-character WYSK bullets to readers (#6647). The string form is now an `owid.catalog.core.meta.Markdown` — a `str` that raises `TypeError` on iteration, so the mistake fails on the line that writes it.
+- **`description_key` is a list *or* a markdown string — check, never assume.** A YAML list survives garden so per-item Jinja can render, and is joined into markdown by `update_variable_metadata`, which runs when a step renders dimensions (`_yield_wide_table` / `_metadata_for_dimensions`) and again at the DB write (`etl/grapher/to_db.py`). A `data://grapher/...` dataset on disk therefore holds a string for some datasets and a list for others — MySQL is string-only, the grapher channel is not. Steps reading one — chart and explorer `viz://` steps especially — must handle both and pass the value through rather than rebuild it. Never `list()` it: that yields one bullet *per character*, which every write path used to rejoin into valid-looking markdown, and it shipped ~2,900 one-character WYSK bullets to readers (#6647). The string form is now an `owid.catalog.core.meta.Markdown` — a `str` that raises `TypeError` on iteration, so the mistake fails on the line that writes it.
 
 ### Performance
 
@@ -256,7 +262,7 @@ def run() -> None:
 
 ### Correcting known upstream data errors (`.corrections.yml`)
 
-For a known *source* error we patch locally until the provider fixes it, don't inline `.loc[...]`/`.drop(...)` — declare it in a `<short_name>.corrections.yml` next to the step and apply with `tb = paths.apply_corrections(tb)`. See `etl/data_corrections.py` for the format; `etl corrections -o /tmp/c.html --charts` inventories and visualises them all. For enumerated provider point-errors only — systematic recoding *rules* and aggregation stay in step code.
+For a known *source* error we patch locally until the producer fixes it, don't inline `.loc[...]`/`.drop(...)` — declare it in a `<short_name>.corrections.yml` next to the step and apply with `tb = paths.apply_corrections(tb)`. See `etl/data_corrections.py` for the format; `etl corrections -o /tmp/c.html --charts` inventories and visualises them all. For enumerated producer point-errors only — systematic recoding *rules* and aggregation stay in step code.
 
 ### HTTP calls to OWID infra
 
@@ -268,7 +274,7 @@ from etl.http import HEADERS                   # for httpx.AsyncClient(headers=H
 from etl.http import STORAGE_OPTIONS           # for pd.read_csv(url, storage_options=STORAGE_OPTIONS)
 ```
 
-Don't tag calls to third-party hosts (GitHub, Notion, Slack, source-data providers in `snapshots/`, etc.) — they should keep the default UA.
+Don't tag calls to third-party hosts (GitHub, Notion, Slack, data producers in `snapshots/`, etc.) — they should keep the default UA.
 
 ### YAML Editing (preserve comments)
 ```python

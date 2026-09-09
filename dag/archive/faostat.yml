@@ -1740,3 +1740,14 @@ steps:
   # archived; last active in 1b0db6b9a131 on 2026-06-19
   data://grapher/faostat/2026-02-25/additional_variables:
     - data://garden/faostat/2026-02-25/additional_variables
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/faostat/latest/fertilizer_use:
+    - data://grapher/faostat/2026-02-25/faostat_rfn
+    - data://grapher/faostat/2026-05-22/additional_variables
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://s3/faostat/latest/food_trade:
+    - data://garden/faostat/2026-05-07/food_trade
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/faostat/latest/global_food:
+    - data://grapher/faostat/2026-02-25/faostat_qcl
+    - data://grapher/faostat/2026-02-25/faostat_fbsc

@@ -32,7 +32,7 @@ Accepts chart slugs, mdim slugs, or file paths:
 .venv/bin/python .claude/skills/check-chart-preview/get_staging_url.py energy/latest/energy_prices#energy_prices
 
 # Export multidim file path
-.venv/bin/python .claude/skills/check-chart-preview/get_staging_url.py etl/steps/export/multidim/energy/latest/energy_prices.config.yml
+.venv/bin/python .claude/skills/check-chart-preview/get_staging_url.py etl/steps/viz/chart/energy/latest/energy_prices.config.yml
 
 # Chart file path
 .venv/bin/python .claude/skills/check-chart-preview/get_staging_url.py etl/steps/graph/covid/latest/covid-cases.chart.yml
@@ -48,11 +48,11 @@ Accepts chart slugs, mdim slugs, or file paths:
 |---|---|
 | `.chart.yml` (simple, no `#` in slug) | `http://<container>/grapher/<slug>` |
 | `.chart.yml` (mdim, `#` in slug) | `http://<container>/admin/grapher/<catalogPath>` |
-| `export/multidim/*.config.yml` or `*.py` | `http://<container>/admin/grapher/<namespace>/<version>/<shortName>%23<shortName>` |
+| `viz/chart/*.config.yml` or `*.py` | `http://<container>/admin/grapher/<namespace>/<version>/<shortName>%23<shortName>` |
 
 For `.chart.yml`: the `slug` is in the YAML `slug:` field. For mdim slugs containing `#`, the catalogPath inserts the version from the file path.
 
-For export multidim: derive from path `etl/steps/export/multidim/<namespace>/<version>/<shortName>.*` → catalogPath is `<namespace>/<version>/<shortName>#<shortName>`.
+For viz chart steps: derive from path `etl/steps/viz/chart/<namespace>/<version>/<shortName>.*` → catalogPath is `<namespace>/<version>/<shortName>#<shortName>`.
 
 ## Checking the Preview
 
@@ -97,8 +97,8 @@ If the chart hasn't been pushed yet:
 
 ```bash
 # For graph step charts
-.venv/bin/etlr graph://<namespace>/<version>/<slug> --graph --graph-push --private
+.venv/bin/etlr graph://<namespace>/<version>/<slug> --graph --graph-push
 
-# For export multidim
-.venv/bin/etlr export://multidim/<namespace>/<version>/<shortName> --export --private
+# For viz chart steps (charts and MDIMs)
+.venv/bin/etlr viz://chart/<namespace>/<version>/<shortName> --grapher
 ```

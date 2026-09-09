@@ -14,7 +14,7 @@ All our data work is public by default; we only use private data sources when it
 
 ## Outputs as pure functions of inputs
 
-To ensure our work is reproducible, we take our own snapshots of any upstream data that we use, meaning that if in future the upstream data provider changes their site, their data or their API, we can still build our datasets from "raw ingredients".
+To ensure our work is reproducible, we take our own snapshots of any upstream data that we use, meaning that if in future the upstream data producer changes their site, their data or their API, we can still build our datasets from "raw ingredients".
 
 ```mermaid
 graph LR
@@ -37,4 +37,4 @@ When we ask the ETL to build something by running `etl <query>`, it will only bu
 
 Previously, although we could chart data, it was very difficult to work with in Jupyter notebooks.
 
-We have designed the ETL so that data is recorded at different stages of processing. The phase called `meadow` is the version closest to the upstream provider, and the version called `garden` is the best and most useful version of the data. We call data in `garden` "ready for data science".
+We have designed the ETL so that data is recorded at different stages of processing. The phase called `meadow` is the version closest to the upstream producer, and the version called `garden` is the best and most useful version of the data. We call data in `garden` "ready for data science".

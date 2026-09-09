@@ -31,3 +31,45 @@ steps:
     - data://grapher/un/2024-07-12/un_wpp_full
     - data://grapher/worldbank_wdi/2024-05-20/wdi
     - data://grapher/idmc/2024-08-02/internal_displacement
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/migration/latest/migration_flows:
+    - data://grapher/un/2025-03-18/migration_stock_flows
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/migration/latest/us_foreign_born_annual_change_by_decade:
+    - data://grapher/migration/2026-07-22/us_foreign_born_population
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/migration/latest/migration_flows:
+    - data://grapher/un/2025-03-18/migration_stock_flows
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/migration/latest/net_migration:
+    - data://grapher/un/2024-07-12/un_wpp
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/migration/2026-01-27/migration:
+    - data://grapher/un/2025-07-03/refugee_data
+    - data://grapher/un/2025-03-12/migrant_stock
+    - data://grapher/un/2024-07-12/un_wpp
+    - data://grapher/idmc/2026-01-19/internal_displacement
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
+    - data://grapher/unicef/2026-01-07/child_migration
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://s3/un_migration/latest/migration_stock_flows_json:
+    - data://garden/un/2025-03-18/migration_stock_flows
+    - data://garden/demography/2024-07-15/population
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/migration/latest/remittances:
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/migration/latest/migrant_populations:
+    - data://grapher/un/2025-03-12/migrant_stock
+    - data://grapher/regions/2023-01-01/regions
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/migration/latest/internal_displacement:
+    - data://grapher/unicef/2026-01-07/child_migration
+    - data://grapher/un/2025-07-03/refugee_data
+    - data://grapher/idmc/2026-01-19/internal_displacement
+    - data://grapher/regions/2023-01-01/regions
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/migration/latest/asylum_seekers_and_refugees:
+    - data://grapher/unicef/2026-01-07/child_migration
+    - data://grapher/un/2025-07-03/refugee_data
+    - data://grapher/regions/2023-01-01/regions

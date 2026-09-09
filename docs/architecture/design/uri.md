@@ -63,15 +63,32 @@ where
     - **Grapher**: `data://grapher/nasa/2023-03-06/ozone_hole_area`
     - **Explorers**: `data://explorers/faostat/2023-02-22/food_explorer`
 
-### Path for `export://`
-Export steps are defined in `etl/steps/export` directory and have similar structure to regular steps. Their URI begins with the prefix `export://` and use the following format:
+### Path for `viz://`
+Viz steps produce visualizations. They are defined in the `etl/steps/viz` directory and have a similar structure to regular steps. Their URI begins with the prefix `viz://` and uses the following format:
 
 ```
-export://<channel>/<namespace>/<version>/<filename>
+viz://<channel>/<namespace>/<version>/<name>
+```
+
+where channel is one of the following:
+
+- `chart`: For charts and multidimensional indicators (a chart is an MDIM with no dimensions). Writes to the grapher DB with `--grapher`; without it, only the local config under `viz/chart/`.
+- `explorer`: For explorers. Writes to the grapher DB with `--grapher`; without it, only the local config under `viz/explorer/`.
+- `static`: For static images (PNG/SVG), written next to the recipe. They only write local files, so a named static step runs with or without `--grapher`.
+- `bespoke`: For the data feeds of bespoke interactive visualizations. Uploaded to R2 with `--grapher`; without it, only written locally.
+
+Every `viz://` step is selected by a pattern only with `--grapher`; named by its URI it is always selected, and the flag decides whether it may write.
+
+### Path for `export://`
+Export steps ship files to an external destination. They are defined in the `etl/steps/export` directory and have a similar structure to regular steps. Their URI begins with the prefix `export://` and uses the following format:
+
+```
+export://<channel>/<namespace>/<version>/<name>
 ```
 
 where channel is typically one of the following:
 
-- `multidim`: For multidimensional indicators.
-- `explorers`: For explorers.
 - `github`: For exports to GitHub.
+- `s3`: For uploads to R2.
+
+They write to their destination only with `--export`. Named by their URI they run without it too, building the files locally without uploading or committing them; a pattern selects them only with the flag.

@@ -31,7 +31,7 @@ steps:
   data://garden/who/latest/flunet:
     - data://meadow/who/latest/flunet:
         - snapshot://who/latest/flunet.csv
-  export://explorers/who/latest/influenza:
+  viz://explorer/who/latest/influenza:
     - data://grapher/who/latest/flu:
         - data://garden/who/latest/fluid:
             - data://meadow/who/latest/fluid:
@@ -290,23 +290,23 @@ steps:
     - data://garden/health/latest/global_health_mpox:
         - data://meadow/health/latest/global_health_mpox:
             - snapshot://health/latest/global_health_mpox.csv
-  export://explorers/who/latest/monkeypox:
+  viz://explorer/who/latest/monkeypox:
     - data://grapher/who/latest/monkeypox:
         - data://garden/who/latest/monkeypox
   export://github/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
 
   # Eurostat Cancer Screening
-  data://grapher/health/2024-08-23/eurostat_cancer:
-    - data://garden/health/2024-08-23/eurostat_cancer:
-        - data://meadow/health/2024-08-23/eurostat_cancer:
-            - snapshot://health/2024-08-23/eurostat_cancer.csv
+  data://grapher/health/2026-09-02/eurostat_cancer:
+    - data://garden/health/2026-09-02/eurostat_cancer:
+        - data://meadow/health/2026-09-02/eurostat_cancer:
+            - snapshot://health/2026-09-02/eurostat_cancer.csv
 
   # NOTE: this was just a proof of concept for multi-dims, it'd have to be revisited.
   #   We commented it because there were too many indicators and rendering thumbnail
   #   was freezing Cloudflare Workers and crashing staging servers
   # Multi-dim indicators
-  #  export://multidim/health/latest/causes_of_death:
+  #  viz://chart/health/latest/causes_of_death:
   #    - data-private://grapher/ihme_gbd/2024-05-20/gbd_cause
 
   # GBD data on share of deaths from total cancers
@@ -520,10 +520,10 @@ steps:
   #
   # Cancer survival rates (GCO)
   #
-  data://grapher/cancer/2025-02-17/gco_cancer_survival:
-    - data://garden/cancer/2025-02-17/gco_cancer_survival:
-        - data://meadow/cancer/2025-02-17/gco_cancer_survival:
-            - snapshot://cancer/2025-02-17/gco_cancer_survival.csv
+  data://grapher/cancer/2026-09-02/gco_cancer_survival:
+    - data://garden/cancer/2026-09-02/gco_cancer_survival:
+        - data://meadow/cancer/2026-09-02/gco_cancer_survival:
+            - snapshot://cancer/2026-09-02/gco_cancer_survival.csv
 
   # Measles deaths long run
   data://grapher/health/2025-02-20/measles_deaths_long_run:
@@ -624,7 +624,7 @@ steps:
         - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
 
   # Multi-dim indicators - vaccination coverage
-  export://multidim/health/latest/vaccination_coverage:
+  viz://chart/health/latest/vaccination_coverage:
     - data://grapher/who/2025-07-15/vaccination_coverage:
         - data://garden/who/2025-07-15/vaccination_coverage:
             - data://garden/un/2024-07-12/un_wpp
@@ -634,7 +634,7 @@ steps:
             - data://garden/demography/2024-07-15/population
 
   # WHO Vaccine Introductions
-  export://multidim/health/latest/vaccination_introductions:
+  viz://chart/health/latest/vaccination_introductions:
     - data://grapher/who/2025-07-15/vaccination_introductions:
         - data://garden/who/2025-07-15/vaccination_introductions:
             - data://meadow/who/2025-07-15/vaccination_introductions:
@@ -770,7 +770,7 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/who/2026-05-22/gho:
     - data://garden/who/2026-05-22/gho
-  #export://multidim/who/latest/share_overweight_adults:
+  #viz://chart/who/latest/share_overweight_adults:
   #  - data://grapher/who/2026-05-22/gho
 
   # WHO growth reference standards for height-for-age (0-19 years)
@@ -890,7 +890,7 @@ steps:
         - snapshot-private://ihme_gbd/2025-10-13/gbd_treemap.feather
   data://grapher/ihme_gbd/2025-10-13/gbd_treemap:
     - data://garden/ihme_gbd/2025-10-13/gbd_treemap
-  export://s3/ihme_gbd/latest/gbd_treemap_json:
+  viz://bespoke/ihme_gbd/latest/gbd_treemap_json:
     - data://garden/ihme_gbd/2025-10-13/gbd_treemap
     - data-private://garden/ihme_gbd/2025-11-18/gbd_child_treemap
 
@@ -1027,7 +1027,7 @@ steps:
         - snapshot-private://ihme_gbd/2026-02-07/gbd_risk_deaths.feather
     - data://garden/regions/2023-01-01/regions
     - data://garden/un/2024-07-12/un_wpp
-  export://multidim/ihme_gbd/latest/air_pollution:
+  viz://chart/ihme_gbd/latest/air_pollution:
     - data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_deaths:
         - data-private://garden/ihme_gbd/2026-02-07/gbd_risk_deaths
 

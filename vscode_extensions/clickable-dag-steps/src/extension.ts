@@ -22,7 +22,7 @@ const symbols = {
 // **step definition**; a plain URI reference is a **dependency**. Exported
 // so the test suite can pin this invariant explicitly.
 const DAG_URI_LINE_RE =
-  /^(?:\s*-\s*|\s*)(data(?:-private)?|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s#]+/;
+  /^(?:\s*-\s*|\s*)(data(?:-private)?|viz|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s#]+/;
 
 export function classifyDagLine(line: string): { uri: string; isDefinition: boolean } | null {
   const match = DAG_URI_LINE_RE.exec(line);
@@ -58,7 +58,7 @@ function parseStepUri(uri: string): { scheme: string; key: string; version: stri
     return { scheme, key, version, fullKey, filePaths: [filePath] };
   }
 
-  if (scheme === 'data' || scheme === 'export') {
+  if (scheme === 'data' || scheme === 'export' || scheme === 'viz') {
     if (segments.length < 4) {
       return null;
     }
@@ -68,12 +68,12 @@ function parseStepUri(uri: string): { scheme: string; key: string; version: stri
     const shortName = segments.slice(3).join('/');
     const key = `${scheme}://${channel}/${namespace}/${shortName}`;
     const fullKey = `${scheme}://${channel}/${namespace}/${version}/${shortName}`;
-    const base = scheme === 'data' ? 'etl/steps/data' : 'etl/steps/export';
+    const base = `etl/steps/${scheme}`;
     const dir = path.join(base, channel, namespace, version);
     const filePaths = [
       path.join(dir, shortName + '.py'),
-      // YAML-only export steps (single-chart or mdim collections without a .py)
-      ...(scheme === 'export' ? [path.join(dir, shortName + '.config.yml')] : []),
+      // YAML-only viz://chart steps (single-chart or mdim collections without a .py)
+      ...(scheme === 'viz' ? [path.join(dir, shortName + '.config.yml')] : []),
       path.join(dir, shortName, '__init__.py'),
       path.join(dir, shortName + '.ipynb'),
     ];
@@ -286,7 +286,7 @@ export function activate(context: vscode.ExtensionContext) {
   const linkProvider: vscode.DocumentLinkProvider = {
     provideDocumentLinks(document: vscode.TextDocument) {
       const links: vscode.DocumentLink[] = [];
-      const regex = /(?:data(?:-private)?|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s"']+/g;
+      const regex = /(?:data(?:-private)?|viz|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s"']+/g;
       const text = document.getText();
       let match: RegExpExecArray | null;
       const isArchiveFile = document.uri.fsPath.includes(path.join('dag', 'archive'));
@@ -449,7 +449,7 @@ function updateDecorations(editor: vscode.TextEditor) {
   const isArchiveFile = filePath.includes(path.join('dag', 'archive'));
 
   const text = editor.document.getText();
-  const regex = /(?:data(?:-private)?|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s"']+/g;
+  const regex = /(?:data(?:-private)?|viz|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s"']+/g;
   let match: RegExpExecArray | null;
 
   while ((match = regex.exec(text)) !== null) {

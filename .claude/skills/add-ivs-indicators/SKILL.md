@@ -502,8 +502,8 @@ single pipeline step runs.
 ## Step 7 — Run & verify
 
 ```bash
-.venv/bin/etlr integrated_values_surveys --private             # meadow→garden→grapher
-.venv/bin/etlr integrated_values_surveys --grapher --private   # upload to staging grapher
+.venv/bin/etlr integrated_values_surveys  # meadow→garden→grapher
+.venv/bin/etlr integrated_values_surveys --grapher  # upload to staging grapher
 ```
 
 - **Two separate gates:** the build (first command) runs `check_sum_100` in garden (green = recodes sum to
@@ -517,7 +517,7 @@ single pipeline step runs.
   is not enough.** `etlr grapher://… --grapher --force --only` forces only the **upload** step, and `--only`
   skips its `data://grapher` build dependency, so it re-uploads the **stale** grapher dataset (every variable
   `skipped_no_changes`) and the new tags never reach the DB. Rebuild the built dataset itself —
-  `etlr data://grapher/ivs/<v>/integrated_values_surveys --private --force --only` (delete
+  `etlr data://grapher/ivs/<v>/integrated_values_surveys --force --only` (delete
   `data/grapher/ivs/<v>/integrated_values_surveys/` first if in doubt) — **then** run the `--grapher` upload.
   Confirm the links actually landed (and that omitted/`Uncategorized` columns produced **no**
   `create_links.missing_tags` warnings):

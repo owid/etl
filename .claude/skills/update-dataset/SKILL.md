@@ -61,7 +61,7 @@ Assumptions:
 - [ ] Draft the public-facing "Data update" post for OWID /latest via `data-update-announcement` (Mode A) — two versions, user picks, then the Google Doc in /Data updates, and hand the user the link (not added to the PR). The skill declines when we posted about this data less than six months ago; a declined post is a **completed** item — record the eligible date, don't override
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
-- [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: confirm the `buildkite/etl-automated-staging-environment` PR check is green (red = a consumer crashed on staging, and the report under-reports until it's fixed; `.venv/bin/etlr --modified --continue-on-failure --private` is the optional local equivalent for small fan-outs), then triage the data-diff report — every red "− lost N data point(s)" entry in its Top-changes list and every 🔴-tier dataset (see "Silent-breakage check" section) and run the full-report audit probes (structural / World / raw-country / >30% / wipe-vs-edge per loss)
+- [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: confirm the `buildkite/etl-automated-staging-environment` PR check is green (red = a consumer crashed on staging, and the report under-reports until it's fixed; `.venv/bin/etlr --modified --continue-on-failure` is the optional local equivalent for small fan-outs), then triage the data-diff report — every red "− lost N data point(s)" entry in its Top-changes list and every 🔴-tier dataset (see "Silent-breakage check" section) and run the full-report audit probes (structural / World / raw-country / >30% / wipe-vs-edge per loss)
 - [ ] Ask the user whether to remove the old version; if yes, remove+archive its DAG entries now and relocate the new entries into the old slot, but KEEP the old step files until review sign-off — the consecutive-version review diffs them from disk; deleting the files is the final commit before merge (see "Removing the old version & reordering the DAG") — don't forget this step
 - [ ] Hand off the QA links to the user (Anomalist + Chart Diff on the staging branch, plus the data-diff report) — this is the final step
 
@@ -196,8 +196,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
    **Diff against a freshly-rebuilt old version, not the stale feather on disk.** The old version's `data/garden/.../` feather was built whenever it last ran — possibly against an *earlier* snapshot of a shared upstream dataset (population, regions, income_groups). A fresh build of the new version uses the *current* upstream, so a naive new-vs-old-feather diff shows differences in **every population-weighted cell across all years and regions** — pure upstream drift that has nothing to do with your change. Before trusting any diff, rebuild the old version on the current catalog and diff against *that*:
    ```bash
-   .venv/bin/etlr data://meadow/<ns>/<old_version>/<short> --private --force --only
-   .venv/bin/etlr data://garden/<ns>/<old_version>/<short> --private --force --only
+   .venv/bin/etlr data://meadow/<ns>/<old_version>/<short> --force --only
+   .venv/bin/etlr data://garden/<ns>/<old_version>/<short> --force --only
    ```
    The apples-to-apples diff should collapse to just your intended change. Mention the drift separately in the PR (Chart Diff on staging *will* show it, because the live data is also stale relative to current upstream). This bit me twice in one update — don't skip it.
 
@@ -223,7 +223,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    1. Flip the flag to `True` at the top of the garden step file.
    2. Re-run the garden step, capturing output:
       ```bash
-      .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --private --force --only \
+      .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --force --only \
           > workbench/<short_name>/sanity_checks.log 2>&1
       ```
    3. Review the log: scan for `AssertionError`, `error`, `warning`, `dropped`, outliers flagged by country/year, unexpected totals. Surface actionable findings in the PR description under a "Sanity-check findings" collapsed section.
@@ -280,7 +280,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
    1. **Capture a fresh garden log:**
       ```bash
-      .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --private --force --only \
+      .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --force --only \
           > workbench/<short_name>/harmonization.log 2>&1
       ```
 
@@ -305,7 +305,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
           raise RuntimeError(
               "No data/garden/regions/<version>/regions built locally — the audit can't "
               "run without the canonical regions catalog. Build it first with "
-              "`.venv/bin/etlr data://garden/regions/<latest>/regions --private`."
+              "`.venv/bin/etlr data://garden/regions/<latest>/regions`."
           )
       tb_regions = Dataset(str(regions_dirs[-1]))["regions"]
       canonical_regions = set(tb_regions["name"].dropna().astype(str))
@@ -458,9 +458,9 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    If any skill rewrites a `.meta.yml`, re-run the affected step so the built catalog reflects the edits. **Add `--grapher` when the affected step is on the grapher channel** — without it the local catalog is updated but staging stays stale, so the step 7 indicator upgrade sees the old text.
    ```bash
    # garden / meadow:
-   .venv/bin/etlr <channel>/<namespace>/<new_version>/<short_name> --private --force --only
+   .venv/bin/etlr <channel>/<namespace>/<new_version>/<short_name> --force --only
    # grapher:
-   .venv/bin/etlr grapher/<namespace>/<new_version>/<short_name> --grapher --private --force --only
+   .venv/bin/etlr grapher/<namespace>/<new_version>/<short_name> --grapher --force --only
    ```
    Then re-run the relevant check to confirm zero remaining violations.
 
@@ -590,14 +590,14 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 7) Indicator upgrade (optional, staging only)
    - First upload the new grapher dataset to the staging DB (required before the upgrader can detect it):
      ```bash
-     STAGING=<branch> .venv/bin/etlr data://grapher/<namespace>/<new_version>/<short_name> --grapher --private
+     STAGING=<branch> .venv/bin/etlr data://grapher/<namespace>/<new_version>/<short_name> --grapher
      ```
      **Then confirm the variables actually landed in MySQL** — `data://grapher/... --grapher` sometimes only builds the feather without upserting (observed: 0 rows in `variables` afterward). If the count is 0, run the separate `grapher://` step, which does the MySQL upsert:
      ```bash
      # verify
      STAGING=<branch> .venv/bin/python -c "from etl.config import OWIDEnv; print(OWIDEnv.from_staging('<branch>').read_sql(\"SELECT COUNT(*) n FROM variables WHERE catalogPath LIKE %(p)s\", params={'p':'%<namespace>/<new_version>/<short_name>%'}).n[0])"
      # if 0, force the upsert:
-     STAGING=<branch> .venv/bin/etlr grapher://grapher/<namespace>/<new_version>/<short_name> --grapher --private
+     STAGING=<branch> .venv/bin/etlr grapher://grapher/<namespace>/<new_version>/<short_name> --grapher
      ```
    - Then run the automatic upgrader:
      ```bash
@@ -622,9 +622,9 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      mysql -h "staging-site-<branch>" -u owid --port 3306 -D owid -e "SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id WHERE v.catalogPath LIKE '%<namespace>/<new_version>%'"
      ```
      If the count is 0, the upgrade did not run — re-run it.
-   - **The auto-upgrader only remaps grapher charts — NOT ETL-defined explorers or MDims.** Explorers (`export://explorers/...`) and multidims (`export://multidim/...`) reference indicators by catalog path and are rebuilt by running their **export steps**, which the indicator-upgrader never touches. If the dataset has any (check the DAG: `rg "export://(explorers|multidim)/.*/<short_name>" dag/ -g "*.yml"`), they'll still point at the **old** variables on staging until you re-run them:
+   - **The auto-upgrader only remaps grapher charts — NOT ETL-defined explorers or MDims.** Explorers (`viz://explorer/...`) and multidims (`viz://chart/...`) reference indicators by catalog path and are rebuilt by running their **viz steps**, which the indicator-upgrader never touches. If the dataset has any (check the DAG: `rg "viz://(explorer|chart)/.*/<short_name>" dag/ -g "*.yml"`), they'll still point at the **old** variables on staging until you re-run them:
      ```bash
-     STAGING=<branch> .venv/bin/etlr export://explorers/<ns>/latest/<short> export://multidim/<ns>/latest/<short> ... --export --private
+     STAGING=<branch> .venv/bin/etlr viz://explorer/<ns>/latest/<short> viz://chart/<ns>/latest/<short> ... --grapher
      ```
      Verify none still reference the old version (both queries should return empty):
      ```bash
@@ -787,7 +787,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
        AND c.publishedAt IS NOT NULL
      GROUP BY c.id
      ```
-   - **Charts are not the only surface — also count the explorers and MDims that use this data.** Many datasets feed published OWID explorers and multi-dimensional collections, which the grapher-`charts` query above misses entirely. Run the export steps first (step 7) so these point at the new variables, then query both:
+   - **Charts are not the only surface — also count the explorers and MDims that use this data.** Many datasets feed published OWID explorers and multi-dimensional collections, which the grapher-`charts` query above misses entirely. Run the viz steps first (step 7) so these point at the new variables, then query both:
      ```sql
      -- Explorers (note isPublished — only published ones count for the announcement)
      SELECT DISTINCT ev.explorerSlug, e.isPublished
@@ -916,10 +916,10 @@ A foundational-dataset update can leave a downstream step **building cleanly whi
 **1. Do all downstream consumers still build?** Staging answers this on every push — run the command locally only when you want the answer before pushing:
 
 ```bash
-.venv/bin/etlr --modified --continue-on-failure --private              # add --dry-run to list scope first
+.venv/bin/etlr --modified --continue-on-failure  # add --dry-run to list scope first
 ```
 
-`--modified` detects the steps changed vs `origin/master` and expands to their **full transitive downstream** via the branch DAG (same machinery as chart-diff), runs them in dependency order, skips dependents of failed steps, and ends with a failure summary + non-zero exit. **Staging runs the same check on every push**: its bake (`ops/templates/owid-site-staging/etl-build.sh`) is `etl run garden grapher explorers --modified --grapher --private --continue-on-failure` with `PREFER_DOWNLOAD=1`, and `--continue-on-failure` re-raises the first failure at the end — so any consumer crash turns the **`buildkite/etl-automated-staging-environment`** PR check red. That makes the local run optional fast feedback, not the primary net. The caveat that matters: **while that check is red, the data-diff report under-reports** — dependents of the failed step are skipped, stay stale in the catalog, and diff as unchanged. Always confirm the check is green before trusting the report. Use `--workers N` to parallelize a big local fan-out.
+`--modified` detects the steps changed vs `origin/master` and expands to their **full transitive downstream** via the branch DAG (same machinery as chart-diff), runs them in dependency order, skips dependents of failed steps, and ends with a failure summary + non-zero exit. **Staging runs the same check on every push**: its bake (`ops/templates/owid-site-staging/etl-build.sh`) is `etl run garden grapher explorers --modified --grapher --continue-on-failure` with `PREFER_DOWNLOAD=1`, and `--continue-on-failure` re-raises the first failure at the end — so any consumer crash turns the **`buildkite/etl-automated-staging-environment`** PR check red. That makes the local run optional fast feedback, not the primary net. The caveat that matters: **while that check is red, the data-diff report under-reports** — dependents of the failed step are skipped, stay stale in the catalog, and diff as unchanged. Always confirm the check is green before trusting the report. Use `--workers N` to parallelize a big local fan-out.
 
 **Size the fan-out first** (`--dry-run` lists the scope). Small (≲50 steps): the local run gives you the crash check in minutes, before burning a staging cycle. Foundational-dataset scale (hundreds of steps — an income-groups bump is ~560): skip the local build and rely on the staging check — locally it costs ~35 min and ~7 GB of `data/` to duplicate what the bake does anyway (if you do run it, delete the builds afterwards; `data/` is regenerable cache). Skip the **local** `etl diff` at that scale too — another ~25 min and a JSON in the hundreds of MB; owidbot's hosted report on the PR is the same comparison for free.
 
@@ -1071,7 +1071,7 @@ These pages need a fresh staging build, so they're only meaningful after the PR'
 - **Metadata rewrites don't reach charts that pin their own FAUST.** When an update changes methodology or scope wording in indicator metadata (`grapher_config.note`, `description_short`, deflator/source claims), query the authored layer (the `chart_configs` row named by `patchConfigId`) for every affected chart (published *and* draft) to **detect** which FAUST fields are pinned: any chart whose patch overrides `title`/`subtitle`/`note` keeps the stale text no matter what the indicator now says. Propose the minimal text edit (usually one sentence), **ask before changing** (reader-facing FAUST), then apply via the staging admin API with the **full config as the payload** — fetch the rendered config (`gm.Chart.config`, or `chart_configs.config` via `charts.configId`), edit the field, and pass that to `apps.chart_sync.admin_api.AdminAPI.update_chart`; the server re-derives the stored patch by diffing against the inherited layer, so inheritance survives. Do **not** PUT the bare patch: for charts inheriting from an indicator `grapher_config`, fields present only in the rendered config are silently dropped (in-repo callers like `apps/indicator_upgrade` submit `chart.config`, the resolved full config, for exactly this reason). Verify on the staging SVG render, and make sure the chart's diff gets **approved in Chart Diff before merge**: chart-sync copies a staging chart to production only when its diff is approved (`apps/chart_sync/cli.py` checks `diff.is_approved`; pending diffs are skipped), so an unapproved FAUST edit silently stays behind on staging while the PR merges. After the production bake, spot-check the live chart SVG for the new wording. When many charts pin the same sentence with an embedded year (deflator base years especially), swap by **literal substring** (`constant 2023 US$` → `constant 2024 US$`), never by year-regex — neighbouring years in the same note (a GDP PPP year, a methodology-break year) must not move. And if the pinned sentence will restale at every release, propose the durable fix alongside: move it into indicator metadata via a `definitions` variable (e.g. `constant {definitions.inflation_year} US$`) and clear the chart-level overrides in a follow-up.
   **Clearing a pinned FAUST field to "restore inheritance" is only safe if the field is actually in the inherited layer — check first.** Chart FAUST inherits from `presentation.grapher_config` *only*; `presentation.title_public` does **not** enter the chart-config inherited layer, so a chart whose sole override is `title` has nothing to fall back to, and clearing it leaves the chart titleless. Read the layer before touching the chart — `variables.patchConfigIdETL` → `chart_configs.config` shows exactly which keys it carries. When the field is missing, the fix is two steps in order: add it to `presentation.grapher_config` in garden, rebuild and upload (`grapher://` for the MySQL upsert), confirm it now appears in the inherited layer, and only then clear the chart-level override by PUTting the full config with that field set to the inherited value (identical values drop out of the patch). Verify on the rendered SVG, not just the stored config. (NVIDIA Q2 FY2027: a curly-apostrophe title fix never reached the chart, whose inherited layer held only `note` and `$schema`.)
 - **Partial-year preliminary releases: sweep per-series max years and guard single-time views.** When a producer's preliminary release adds a new year to only *some* series, check each charted indicator's latest year rather than the dataset's (`metadata.json` → `dimensions.years`). Stacked **time-series** charts self-protect — grapher drops a time point whose stack is incomplete — but a **single-time discrete view** (`minTime: "latest"` + StackedDiscreteBar) happily renders the partial year, and `display.tolerance` backfills the missing series with *prior-year* values, so the bar looks complete while silently mixing vintages (for shares, mixing denominators). Never conclude "the chart has all the data" from the render — check the series' own max years. Guard such views with **`timelineMaxTime: <last complete year>`**, not `maxTime` (a `maxTime` pin only moves the default; the slider still reaches the bad year), and remove the clamp at the detailed release. (ODA: the in-donor share chart rendered a "2025" bar stacking 2025 refugee/admin shares with tolerance-carried 2024 scholarship shares.)
-- **Audit blanket transformation rules per indicator before trusting them.** Any garden rule that applies one transformation to a pattern-matched *group* of indicators — unit scaling by title keywords, sign conventions, currency or magnitude conversions — assumes the source stores the whole group in a single convention. Sources mix conventions, especially when different indicators come from different upstream providers. Scan each matched indicator's raw range to confirm it fits the assumed convention, split the rule where it doesn't, and guard both sides with sanity checks (inputs within the assumed convention; outputs within a data-grounded bound). **"Matches the previous version" is not evidence of correctness** — magnitude bugs are inherited from the old step; judge absolute plausibility against real-world values, not just old-vs-new equality. (This caught a long-standing 100× inflation: fraction-stored share indicators sharing a ×100 rule with ratios the source already stored in percent.)
+- **Audit blanket transformation rules per indicator before trusting them.** Any garden rule that applies one transformation to a pattern-matched *group* of indicators — unit scaling by title keywords, sign conventions, currency or magnitude conversions — assumes the source stores the whole group in a single convention. Sources mix conventions, especially when different indicators come from different upstream producers. Scan each matched indicator's raw range to confirm it fits the assumed convention, split the rule where it doesn't, and guard both sides with sanity checks (inputs within the assumed convention; outputs within a data-grounded bound). **"Matches the previous version" is not evidence of correctness** — magnitude bugs are inherited from the old step; judge absolute plausibility against real-world values, not just old-vs-new equality. (This caught a long-standing 100× inflation: fraction-stored share indicators sharing a ×100 rule with ratios the source already stored in percent.)
 - **Programmatic metadata: still curate the charted indicator(s).** When a dataset's indicator metadata is generated in code (titles/units inferred from source names), the indicators actually used in charts deserve an explicit per-indicator block in the garden `.meta.yml` — `description_short`, `description_key`, `display` — layered on top (YAML merges per-field, so code-set fields like `description_from_producer` survive). Ground the bullets in the producer's codebook/methodology PDF rather than inferring from the data: the codebook yields the precise scope, the exact numerator/denominator, and caveats you won't guess (e.g. WWBI approximates the EEA 2004–2018 public sector from industry classifications). Leave a `# NOTE:` in the YAML explaining the programmatic/curated split for the next maintainer.
 - **Unguessable producer filenames: find the document index instead of brute-forcing URLs.** When a producer's download filenames follow no stable convention, stop guessing after one or two 404s and look for the machine-readable index behind their JavaScript-rendered page — the page HTML itself is usually an empty shell, so `curl`/WebFetch on it finds nothing, but the index the page calls returns JSON with one entry per document (Q4 Inc investor sites, common for US-listed companies, expose it under `/feed/`). Record the endpoint as a `# NOTE:` in the snapshot so the next updater looks it up rather than repeating the search, and note that the same index answers "was any older file moved or renamed" — comparing its entries against the hardcoded URLs is a cheap moved-file check. It is *not* an in-place-revision check: a file replaced under the same URL looks identical in it, so for that use the index's per-document dates where it carries them, otherwise the file dates/hashes in the in-place-revision guardrail below. (NVIDIA renamed its quarterly PDF; six guessed patterns all 404'd.)
 - **Scraped chart embeds: the page's own data tables are the canonical source — embed CDNs lag.** When a snapshot's data lives in a chart embedded on the producer's page (Datawrapper and similar), don't fetch the chart platform's CDN endpoint (`datawrapper.dwcdn.net/<id>/<version>/dataset.csv`): the latest *published* chart version can trail the page by a full release (observed with Gallup's AI indicator: the page's tables already carried the May 2026 survey wave while the chart CDN's newest version still ended at February 2026 — caught by Codex, not by the snapshot diff). Producer pages server-render each embed's data as an HTML fallback table (`<noscript><table>`), so parse that instead: whole-page `pd.read_html(io.StringIO(resp.text))`, select the table whose columns exactly match the expected header, assert exactly one match. Related trap: the producer's visible "Updated" stamp and prose can lag their own data tables — trust the data, and when the newest rows have no stamped release date, `date_published` falls back to `date_accessed` (document why in a `.dvc` comment).

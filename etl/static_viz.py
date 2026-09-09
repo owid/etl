@@ -1,4 +1,4 @@
-"""Shared helpers for `export://static_viz` steps.
+"""Shared helpers for `viz://static` steps.
 
 Every static viz is a matplotlib figure that has to satisfy the same handoff contract before it can
 be opened in Figma: real `<text>` rather than outlined glyphs, no clipping, deterministic output, and

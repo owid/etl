@@ -16,7 +16,7 @@ from etl.collection.model import Collection
 from etl.collection.model.base import pruned_json
 from etl.collection.utils import CHART_DIMENSIONS, INDICATORS_SLUG
 from etl.config import OWID_ENV, OWIDEnv
-from etl.paths import EXPORT_EXPLORER_DIR
+from etl.paths import VIZ_EXPLORER_DIR
 
 
 @pruned_json
@@ -62,11 +62,11 @@ class Explorer(Collection):
 
     @property
     def local_config_path(self) -> Path:
-        # energy/latest/energy_prices#energy_prices -> export/multidim/energy/latest/energy_prices/config.yml
+        # who/latest/influenza#influenza -> viz/explorer/who/latest/influenza/influenza.config.json
         assert self.catalog_path
         if self._collection_type is None:
             raise ValueError("_collection_type must have a value!")
-        return EXPORT_EXPLORER_DIR / (self.catalog_path.replace("#", "/") + ".config.json")
+        return VIZ_EXPLORER_DIR / (self.catalog_path.replace("#", "/") + ".config.json")
 
     def display_config_names(self):
         """Get display names for all dimensions and choices.
