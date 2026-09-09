@@ -145,7 +145,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 **Fields deliberately skipped:**
 
 - `description_from_producer` — verbatim text from the source, not OWID copy.
-- `citation_full` — follows the producer's requested citation, so its wording, capitalization and punctuation are theirs, not ours to restyle.
+- `citation_full` — follows the producer's requested citation, so its wording and capitalization are theirs, not ours to restyle. (Dash typography is the one exception: a spaced hyphen separating producer from data product is an en dash everywhere, per the style guide.)
 - `unit`, `short_unit`, `processing_level`, internal names — not user-facing prose.
 - `description_long`, `description_processing` — technical, de-prioritized (re-enable later if needed).
 

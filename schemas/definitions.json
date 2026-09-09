@@ -519,9 +519,9 @@
         "type": "string",
         "description": "Title of the snapshot (i.e. the subset of data that we extract from the data product).",
         "examples": [
-          "Penn World Table - National Accounts",
-          "War data - Inter-State Wars",
-          "Global Carbon Budget - Fossil fuels"
+          "Penn World Table – National Accounts",
+          "War data – Inter-State Wars",
+          "Global Carbon Budget – Fossil fuels"
         ],
         "examples_bad": [
           [
@@ -570,7 +570,7 @@
               "value": [
                 "The name of the origin is well known and includes other metadata fields.",
                 [
-                  "The producer's data product has a well-known name, and the snapshot is a specific slice of the data product. If so, use the format 'Data product - Specific slice'.",
+                  "The producer's data product has a well-known name, and the snapshot is a specific slice of the data product. If so, use the format 'Data product – Specific slice', with a spaced en dash (–), not a hyphen.",
                   {
                     "type": "list",
                     "value": [
