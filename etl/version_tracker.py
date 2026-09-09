@@ -462,7 +462,7 @@ class VersionTracker:
             path_to_script / "__init__.py",  # ty: ignore
             path_to_script.with_name(path_to_script.name + ".dvc"),  # ty: ignore
         ]
-        # YAML-only chart steps (single charts or MDIMs without a .py).
+        # YAML-only chart steps (single charts or multidims without a .py).
         if step_type == "viz" and channel == "chart":
             path_to_script_candidates.append(path_to_script.with_suffix(".config.yml"))  # ty: ignore
 

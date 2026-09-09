@@ -73,7 +73,7 @@ etl:
       entrypoint: etl_steps/chart.py
       icon: ":material/bar_chart:"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Minard.png/960px-Minard.png"
-      description: "Charts, MDIMs, Explorers."
+      description: "Charts, multidims, explorers."
       disable:
         "production": True
         "staging": True

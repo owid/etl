@@ -123,7 +123,7 @@ def submit_form() -> None:
 st_title_with_expert("Chart **:gray[Create step]**", icon=":material/bar_chart:")
 
 st.markdown(":small[:orange-badge[:material/warning: This app is in development. Please review the generated files.]]")
-st.markdown("Use this app to create a chart or MDIM step.")
+st.markdown("Use this app to create a chart or multidim step.")
 with st.container(border=True):
     render_form()
 

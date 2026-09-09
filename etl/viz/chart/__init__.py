@@ -1,4 +1,4 @@
-"""Charts and MDIMs: the model, and the functions that build one from a config and dimensional tables.
+"""Charts and multidims: the model, and the functions that build one from a config and dimensional tables.
 
 Import order inside this package: `model`, `utils` and `exceptions` are leaves; `core` may import
 anything, including `etl.viz.explorer`.

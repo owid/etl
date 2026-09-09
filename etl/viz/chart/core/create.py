@@ -1,4 +1,4 @@
-"""Methods and tools to create charts (and MDIMs) from indicators."""
+"""Methods and tools to create charts (and multidims) from indicators."""
 
 import inspect
 from collections.abc import Callable, Mapping, Sequence

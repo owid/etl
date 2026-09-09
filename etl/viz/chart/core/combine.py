@@ -20,7 +20,7 @@ log = get_logger()
 
 # Dimension added when the combined charts have overlapping views and the caller gave no
 # `chart_dimension_slug` / `chart_dimension_name`. The values are published (they end up in
-# MDIM and explorer URLs), so they are kept as they are.
+# multidim and explorer URLs), so they are kept as they are.
 DEFAULT_SOURCE_DIMENSION_SLUG = "collection__slug"
 DEFAULT_SOURCE_DIMENSION_NAME = "Collection"
 

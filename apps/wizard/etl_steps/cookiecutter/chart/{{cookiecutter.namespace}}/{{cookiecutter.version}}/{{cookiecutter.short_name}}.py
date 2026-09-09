@@ -1,4 +1,4 @@
-"""Create a chart (or MDIM) from a grapher dataset."""
+"""Create a chart (or multidim) from a grapher dataset."""
 
 from etl.helpers import PathFinder
 
@@ -31,7 +31,6 @@ def run() -> None:
         # indicator_names=[],
         # dimensions={},
     )
-
 
     #
     # (optional) Edit views

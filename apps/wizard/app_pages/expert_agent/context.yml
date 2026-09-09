@@ -4,7 +4,7 @@ system_prompt: |-
   You will receive generic questions, and you will need to use the appropriate resources (i.e. function tools, MCPs) that are available to try to answer it. A first good step is using `get_context` tool to get more context for your specific needs. Below are the available categories for context:
 
   - "docs": General questions. Good to complement other resources.
-  - "metadata": API reference questions on Metadata fields (e.g. Dataset, Table, Indicator, Charts (or MDIMs), Origins, and Grapher config).
+  - "metadata": API reference questions on Metadata fields (e.g. Dataset, Table, Indicator, Charts (or multidims), Origins, and Grapher config).
   - "analytics": Questions about analytics, on topics like content-related, user views, etc. (e.g. "which author writes the most articles on Democracy?")
 
   HOWEVER, if you are asked about data values, indicators data/metadata, OWID article content, chart data/images etc. please use OWID MCP (https://mcp.owid.io/mcp). However, for questions about chart configurations (variable IDs, chart configs, etc.), use the analytics database tools instead.
@@ -35,16 +35,16 @@ context:
     - Getting Started: For new contributors to get started with the ETL project.
     - Guides: Guides for various tasks and topics related to the ETL project. These include regular data work (adding datasets, updating datasets/charts, etc.), using Wizard, Environment setup (staging servers), publishing datasets, workflow, etc.
     - Design Principles: Overview of ETL's over-arching design principles.
-    - Metadata: Documentation on the metadata used in the ETL project, including Dataset, Table, Indicator, Charts (or MDIMs), and Origins. Provides more details and context on how these metadata entities are structured and used.
+    - Metadata: Documentation on the metadata used in the ETL project, including Dataset, Table, Indicator, Charts (or multidims), and Origins. Provides more details and context on how these metadata entities are structured and used.
     - API and catalog: APIs available and catalog used in the ETL project. Also COVID-19 documentation.
 
     To access all the available doc files, call `get_docs_index` tool, which will return a list of all the available documentation files. Then, decide which files you want to read, and use `get_docs_page` tool to read the documentation from a specific file(s).
   metadata: |-
     Datasets group together Tables, which are akin to pandas DataFrames but include extra metadata, and Tables feature Indicators as columns. Indicators may be linked to multiple Origins, identifying the data's sources.
 
-    In addition, there are Charts (or MDIMs), which group Indicators into views that readers select through dimensions.
+    In addition, there are Charts (or multidims), which group Indicators into views that readers select through dimensions.
 
-    Use `get_api_reference_metadata` tool to get details on the metadata fields for Dataset, Table, Indicator, Chart (or MDIM), and Origin. This will provide you with the API reference documentation for these metadata entities. Additionally, resort to `get_docs_index` tool find out metadata-related available documentation files, and then use `get_docs_page` tool to read them.
+    Use `get_api_reference_metadata` tool to get details on the metadata fields for Dataset, Table, Indicator, Chart (or multidim), and Origin. This will provide you with the API reference documentation for these metadata entities. Additionally, resort to `get_docs_index` tool find out metadata-related available documentation files, and then use `get_docs_page` tool to read them.
   analytics: |-
     We have our main user "Semantic Layer", the `prod_semantic` dataset on our BigQuery data warehouse. It is the result of careful curation of our other more raw datasets, and is intended mostly for analytics purposes. It is exposed via Metabase, which lets users run SQL queries against it.
 

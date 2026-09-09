@@ -108,7 +108,7 @@
         "title": {
             "type": "object",
             "title": "Chart title",
-            "description": "Title configuration for the chart display. Required for MDIMs (with non-empty `dimensions`); ignored for single charts (with `dimensions: []`).",
+            "description": "Title configuration for the chart display. Required for multidims (with non-empty `dimensions`); ignored for single charts (with `dimensions: []`).",
             "requirement_level": "conditional",
             "guidelines": [
                 [
@@ -191,7 +191,7 @@
         "default_selection": {
             "type": "array",
             "title": "Default entity selection",
-            "description": "List of entity names (e.g., countries) selected by default when the chart loads. Conditional: required for MDIMs with at least one view that has chart tabs (line/bar/scatter/etc.) and no per-view `selectedEntityNames` fallback. Optional for single charts (`dimensions: []`) and map-only mdims.",
+            "description": "List of entity names (e.g., countries) selected by default when the chart loads. Conditional: required for multidims with at least one view that has chart tabs (line/bar/scatter/etc.) and no per-view `selectedEntityNames` fallback. Optional for single charts (`dimensions: []`) and map-only mdims.",
             "requirement_level": "conditional",
             "guidelines": [
                 [
@@ -318,7 +318,7 @@
             "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
             "guidelines": [
                 [
-                    "Only valid on single charts (`dimensions: []`); MDIMs are identified by their catalog path."
+                    "Only valid on single charts (`dimensions: []`); multidims are identified by their catalog path."
                 ],
                 [
                     "When bringing an existing chart into ETL, use that chart's `charts.configId` so the config lands on the existing chart instead of creating a new one."

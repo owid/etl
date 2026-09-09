@@ -1,4 +1,4 @@
-"""Visualizations built from ETL indicators: charts (single charts and MDIMs), explorers and static
+"""Visualizations built from ETL indicators: charts (single charts and multidims), explorers and static
 images. Each kind has a `viz://` step channel, with recipes under `etl/steps/viz/<channel>/`.
 
 The names most steps need are re-exported here; the submodules hold the rest:

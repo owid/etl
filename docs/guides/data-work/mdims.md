@@ -297,7 +297,7 @@ etlr viz://chart/energy/latest/energy_prices --grapher
 and check out the preview at: http://staging-site-my-branch/admin/multi-dims
 
 ### Combining charts
-`etl.viz.combine_charts` merges several `Chart` (or `Explorer`) objects into one, adding a dimension for the source when their views overlap. This is how MDIMs generated from several tables are assembled; see [:fontawesome-brands-github: `un_wpp.py`](https://github.com/owid/etl/blob/master/etl/steps/viz/chart/un/latest/un_wpp.py).
+`etl.viz.combine_charts` merges several `Chart` (or `Explorer`) objects into one, adding a dimension for the source when their views overlap. This is how multidims generated from several tables are assembled; see [:fontawesome-brands-github: `un_wpp.py`](https://github.com/owid/etl/blob/master/etl/steps/viz/chart/un/latest/un_wpp.py).
 
 ## Nuances of creating an Explorer
 While Explorer and MDIM steps are almost identical, there are some subtle implementation differences. We hope that this is just a temporary situation and that we will be able to merge them into a single step in the future.

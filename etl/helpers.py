@@ -774,7 +774,7 @@ class PathFinder:
         choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
         catalog_path_full: bool = False,
     ) -> Chart:
-        """Create a chart (or MDIM) with the given configuration and data.
+        """Create a chart (or multidim) with the given configuration and data.
 
         This function creates a Chart based on the provided configuration and table data. It supports both single and multiple table inputs with flexible indicator and dimension specification.
 
@@ -843,7 +843,7 @@ class PathFinder:
         Returns
         -------
         Chart
-            A single chart when `dimensions` is empty, an MDIM otherwise.
+            A single chart when `dimensions` is empty, a multidim otherwise.
 
         Notes
         -----

@@ -76,7 +76,7 @@ icon: material/api
 !!! warning "AI-Generated Documentation"
     This documentation was generated with AI assistance and is currently under construction. The content is dynamically generated from `schemas/multidim-schema.json`. If you notice any inconsistencies or missing information, please check the source schema file or report the issue.
 
-Charts and multi-dimensional charts (MDIMs) are defined in ETL by a config that names their dimensions, views and metadata. This reference documents that schema.
+Charts and multidims are defined in ETL by a config that names their dimensions, views and metadata. This reference documents that schema.
 
 <div class="grid cards" markdown>
 
