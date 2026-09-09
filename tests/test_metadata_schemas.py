@@ -350,6 +350,42 @@ def test_snapshot_license_lives_under_origin():
     )
 
 
+def test_snapshot_attribution_uses_en_dash():
+    """Guardrail: `origin.attribution` must separate the producer from the data product with a
+    spaced en dash (–), not a hyphen.
+
+    The attribution renders as the source label under a chart, so the separator is reader-facing.
+    See the "Short citations for charts" section of the Writing and Style Guide.
+
+    Scoped to `attribution` deliberately. `citation_full` follows the producer's requested
+    citation, where a hyphen can legitimately belong to a proper name or a verbatim publication
+    title (`UNICEF Office of Research - Innocenti`), so it cannot be checked mechanically.
+    `attribution` is OWID-authored and has no such exceptions.
+
+    fasttrack and backport snapshots are auto-generated and excluded, as in the tests above.
+    """
+    violations = []
+    for meta_file_path in Path(SNAPSHOTS_DIR).glob("**/*.dvc"):
+        rel = str(meta_file_path.relative_to(SNAPSHOTS_DIR))
+        if "fasttrack/" in rel or "backport/" in rel:
+            continue
+
+        text = meta_file_path.read_text()
+        # Fast prefilter: skip files with no attribution at all.
+        if "attribution:" not in text:
+            continue
+
+        origin = ((yaml.safe_load(text) or {}).get("meta") or {}).get("origin") or {}
+        attribution = origin.get("attribution")
+        if isinstance(attribution, str) and re.search(r"[A-Za-z0-9)] - [A-Za-z0-9]", attribution):
+            violations.append(f"{rel}: {attribution}")
+
+    assert not violations, (
+        "These snapshots use a hyphen where `origin.attribution` separates the producer from the "
+        "data product. Use a spaced en dash (–):\n  " + "\n  ".join(sorted(violations))
+    )
+
+
 def test_multidim_configs_pin_grapher_schema():
     """Guardrail: every multidim collection config must pin a valid `grapher_schema`.
 
