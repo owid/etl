@@ -11,7 +11,6 @@ import numpy as np
 import pandas as pd
 import requests
 import world_bank_data as wb
-from owid.datautils.io import df_to_file
 from tqdm import tqdm
 
 from etl.db import get_engine
@@ -43,9 +42,8 @@ def main(upload: bool) -> None:
 
     # Merge the results back into the original DataFrame
     df = pd.merge(temp_df, wb_education_df, on="wb_seriescode", how="right")
-    df_to_file(df, file_path=snap.path)
-    # Download data from source, add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
+    # Save data, add file to DVC and upload to S3.
+    snap.create_snapshot(data=df, upload=upload)
 
 
 def fetch_indicator_metadata(indicator):

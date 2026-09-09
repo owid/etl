@@ -1330,3 +1330,8 @@ steps:
     - data://garden/artificial_intelligence/2026-06-08/nvidia_revenue:
       - data://meadow/artificial_intelligence/2026-06-08/nvidia_revenue:
         - snapshot://artificial_intelligence/2026-06-08/nvidia_revenue.csv
+  # archived; last active in ddd6e90d6a72 on 2026-09-04
+  data://grapher/artificial_intelligence/2026-01-30/frontiermath:
+    - data://garden/artificial_intelligence/2026-01-30/frontiermath:
+      - data://meadow/artificial_intelligence/2026-01-30/frontiermath:
+        - snapshot://artificial_intelligence/2026-01-30/epoch_benchmark_data.zip

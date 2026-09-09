@@ -63,15 +63,30 @@ where
     - **Grapher**: `data://grapher/nasa/2023-03-06/ozone_hole_area`
     - **Explorers**: `data://explorers/faostat/2023-02-22/food_explorer`
 
-### Path for `export://`
-Export steps are defined in `etl/steps/export` directory and have similar structure to regular steps. Their URI begins with the prefix `export://` and use the following format:
+### Path for `viz://`
+Viz steps produce visualizations. They are defined in the `etl/steps/viz` directory and have a similar structure to regular steps. Their URI begins with the prefix `viz://` and uses the following format:
 
 ```
-export://<channel>/<namespace>/<version>/<filename>
+viz://<channel>/<namespace>/<version>/<name>
+```
+
+where channel is one of the following:
+
+- `chart`: For charts and multidimensional indicators (a chart is an MDIM with no dimensions). Writes to the grapher DB; run with `--grapher`.
+- `explorer`: For explorers. Writes to the grapher DB; run with `--grapher`.
+- `static`: For static images (PNG/SVG), written next to the recipe. Run with `--grapher` like the other viz steps.
+- `bespoke`: For the data feeds of bespoke interactive visualizations. Run with `--grapher` like the other viz steps (currently uploads to R2; `DRY_RUN=1` skips the upload).
+
+### Path for `export://`
+Export steps ship files to an external destination. They are defined in the `etl/steps/export` directory and have a similar structure to regular steps. Their URI begins with the prefix `export://` and uses the following format:
+
+```
+export://<channel>/<namespace>/<version>/<name>
 ```
 
 where channel is typically one of the following:
 
-- `multidim`: For multidimensional indicators.
-- `explorers`: For explorers.
 - `github`: For exports to GitHub.
+- `s3`: For uploads to R2.
+
+They are run with `--export`.

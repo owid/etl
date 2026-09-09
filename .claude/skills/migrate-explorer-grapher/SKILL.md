@@ -16,7 +16,7 @@ metadata:
 
 # Translate a non-ETL grapher-style explorer for `/create-explorer`
 
-The TSV in `owid-grapher/explorers/<slug>.explorer.tsv` (and the live config in MySQL `explorers.config`) is the legacy source of truth. This skill pulls the IDs out of it, resolves them to ETL catalog paths, recovers any chart-stored config, and hands the result to `/create-explorer` to write the actual `export://explorers/<ns>/latest/<short>` step.
+The TSV in `owid-grapher/explorers/<slug>.explorer.tsv` (and the live config in MySQL `explorers.config`) is the legacy source of truth. This skill pulls the IDs out of it, resolves them to ETL catalog paths, recovers any chart-stored config, and hands the result to `/create-explorer` to write the actual `viz://explorer/<ns>/latest/<short>` step.
 
 > **Scope of this skill:** the ID-resolution and TSV-translation half. The export-step authoring (Python skeleton, YAML schema, full-YAML vs table-driven choice, FAUST upstream, post-processing, DAG, verification) lives in `/create-explorer` and is shared with the other migrate-explorer-* skills and with `/create-multidim`. Don't duplicate that content here.
 
@@ -24,7 +24,7 @@ The TSV in `owid-grapher/explorers/<slug>.explorer.tsv` (and the live config in 
 
 Required:
 - `<slug>` — explorer slug (matches the `.explorer.tsv` filename and the `slug` column in MySQL `explorers`)
-- `<ns>` — target namespace under `etl/steps/export/explorers/<ns>/latest/`
+- `<ns>` — target namespace under `etl/steps/viz/explorer/<ns>/latest/`
 - `<short>` — file/short name for the new step
 
 ## Step 0 — Classify the explorer
@@ -119,4 +119,4 @@ Invoke `/create-explorer` with the materials prepared above:
 
 ## Follow-up
 
-Once the explorer is in ETL, it's a candidate for the Track-B port to MDIM (`export://multidim/...`) once feature parity is reached. See umbrella issue #6014.
+Once the explorer is in ETL, it's a candidate for the Track-B port to MDIM (`viz://chart/...`) once feature parity is reached. See umbrella issue #6014.

@@ -5,7 +5,7 @@ description: >-
   the YAML-driven `paths.create_collection(explorer=True)` API yet. Covers two
   legacy shapes: (A) `data://explorers/<ns>/<v>/<short>` steps that write wide
   CSV tables for the legacy explorer infra (e.g. poverty_inequality, lis, wid,
-  wb, emdat, monkeypox); (B) `export://explorers/<ns>/latest/<short>` steps
+  wb, emdat, monkeypox); (B) `viz://explorer/<ns>/latest/<short>` steps
   that already exist but build the TSV programmatically via
   `paths.create_explorer_legacy(df_graphers, df_columns)` (minerals,
   air_pollution, migration/2024-08-05, minerals_supply_and_demand_prospects).
@@ -13,7 +13,7 @@ description: >-
   hands them to `/create-explorer` to write the modern step. Trigger when the
   user says "migrate indicator-legacy explorer <short>", "convert
   create_explorer_legacy to create_collection", or "move data://explorers/...
-  to export://explorers/...".
+  to viz://explorer/...".
 metadata:
   internal: true
 ---
@@ -29,7 +29,7 @@ Take an explorer step that already lives in this repo but uses the old DataFrame
 Required:
 - The legacy step path. Either:
   - **Pattern A** — `etl/steps/data/explorers/<ns>/<v>/<short>.py` (writes wide CSV tables under `data://explorers/...`); or
-  - **Pattern B** — `etl/steps/export/explorers/<ns>/<v>/<short>.py` that calls `paths.create_explorer_legacy(...)`.
+  - **Pattern B** — `etl/steps/viz/explorer/<ns>/<v>/<short>.py` that calls `paths.create_explorer_legacy(...)`.
 - Target `<ns>` and `<short>` for the new step.
 
 > **Not covered:** explorers that don't have any ETL step yet (e.g. `plastic-pollution`, `conflict-data`, `conflict-data-source`, `countries-in-conflict-data` referenced in umbrella issue #6014). For those use `/migrate-explorer-grapher` (their TSVs reference indicator IDs and need fresh authoring as YAML, not modernization of an existing step).
@@ -40,8 +40,8 @@ Required:
 # Pattern A: legacy data://explorers/ writing wide CSVs
 ls etl/steps/data/explorers/
 
-# Pattern B: existing export://explorers/ using create_explorer_legacy
-grep -l create_explorer_legacy etl/steps/export/explorers/ -r
+# Pattern B: existing viz://explorer/ using create_explorer_legacy
+grep -l create_explorer_legacy etl/steps/viz/explorer/ -r
 ```
 
 | Pattern | Examples in repo today | What it produces |
@@ -49,7 +49,7 @@ grep -l create_explorer_legacy etl/steps/export/explorers/ -r
 | **A.** `data://explorers/<ns>/<v>/<short>` | `poverty_inequality`, `lis/luxembourg_income_study`, `wid/world_inequality_database`, `wb/world_bank_pip`, `emdat/natural_disasters`, `who/monkeypox`, `dummy` | A wide CSV at `data/explorers/<ns>/<v>/<short>/...` that the live explorer TSV (`owid-grapher/explorers/<short>.explorer.tsv`) reads via `tableSlug`. |
 | **B.** `paths.create_explorer_legacy(df_graphers, df_columns, ...)` | `minerals/latest/minerals`, `minerals/latest/minerals_supply_and_demand_prospects`, `emissions/latest/air_pollution`, `migration/2024-08-05/migration` | A complete explorer TSV pushed straight to MySQL — no live TSV file in `owid-grapher/`, the ETL step is the source of truth. |
 
-The two patterns share the destination (`export://explorers/<ns>/latest/<short>` with YAML config) but differ in starting state.
+The two patterns share the destination (`viz://explorer/<ns>/latest/<short>` with YAML config) but differ in starting state.
 
 ## Pattern B workflow (most common today)
 
@@ -92,9 +92,9 @@ Invoke `/create-explorer` with:
 
 ### 4. DAG
 
-In `dag/<ns>.yml`, the `/create-explorer` skill writes the new `export://explorers/<ns>/latest/<short>:` block. You then need to:
+In `dag/<ns>.yml`, the `/create-explorer` skill writes the new `viz://explorer/<ns>/latest/<short>:` block. You then need to:
 
-- If a previous `export://explorers/<ns>/<v>/<short>:` block existed (Pattern B with non-`latest` version), delete it from `dag/<ns>.yml`.
+- If a previous `viz://explorer/<ns>/<v>/<short>:` block existed (Pattern B with non-`latest` version), delete it from `dag/<ns>.yml`.
 - For Pattern A: also remove the legacy `data://explorers/<ns>/<v>/<short>:` block from `dag/<ns>.yml`. Find any consumers (`grep -rn 'data://explorers/<ns>/<v>/<short>' dag/`) and update them.
 
 The archive dag (`dag/archive/*.yml`) is not edited by hand — `etl archive-dag` reconstructs it from git history and records the removed steps with their last-active commit (for recovery via `git checkout`).
@@ -103,7 +103,7 @@ The archive dag (`dag/archive/*.yml`) is not edited by hand — `etl archive-dag
 
 ```bash
 # Pattern B
-git rm etl/steps/export/explorers/<ns>/<v>/<short>.py
+git rm etl/steps/viz/explorer/<ns>/<v>/<short>.py
 
 # Pattern A (also remove the wide-CSV writer)
 git rm etl/steps/data/explorers/<ns>/<v>/<short>.py
@@ -151,10 +151,10 @@ Hand off to the user the verification commands per `/create-explorer` Step 8. Fo
 
 ## Reference: existing migrations
 
-- **Pattern B → table-driven**: `etl/steps/export/explorers/migration/latest/migration_flows.py` (the new shape that replaced `migration/2024-08-05/migration.py`).
-- **Pattern B → full-YAML**: `etl/steps/export/explorers/agriculture/latest/crop_yields.{py,config.yml}` shows the YAML-only style.
+- **Pattern B → table-driven**: `etl/steps/viz/explorer/migration/latest/migration_flows.py` (the new shape that replaced `migration/2024-08-05/migration.py`).
+- **Pattern B → full-YAML**: `etl/steps/viz/explorer/agriculture/latest/crop_yields.{py,config.yml}` shows the YAML-only style.
 - **Reference for legacy-to-modern diff**: compare `migration/2024-08-05/migration.py` (still on `create_explorer_legacy`) with `migration/latest/migration_flows.py` (modern).
 
 ## Follow-up
 
-Once on `create_collection(explorer=True)`, the explorer is a candidate for the Track-B port to MDIM (`export://multidim/...`) once feature parity is reached. See umbrella issue #6014.
+Once on `create_collection(explorer=True)`, the explorer is a candidate for the Track-B port to MDIM (`viz://chart/...`) once feature parity is reached. See umbrella issue #6014.

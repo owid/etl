@@ -324,7 +324,7 @@ steps:
     - data://garden/gfs/2026-04-08/gfs_wave_two:
       - data://meadow/gfs/2026-04-08/gfs_wave_two:
         - snapshot://gfs/2026-04-08/gfs_wave_two.csv
-  export://multidim/owid/latest/ig_countries:
+  viz://chart/owid/latest/ig_countries:
     - data-private://grapher/owid/latest/ig_countries:
       - data-private://garden/owid/latest/ig_countries:
         - data-private://meadow/owid/latest/ig_countries:

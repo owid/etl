@@ -58,7 +58,7 @@ staging server.
 
 ### Choose model
 ```bash
-# Use faster/cheaper model (default: gemini-3-flash-preview)
+# Use faster/cheaper model (default: gemini-3.8-flash)
 .venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --no-upload --model gemini-2.5-flash-lite
 ```
 
@@ -66,7 +66,7 @@ staging server.
 
 - `--topic SLUG` - Topic slug(s) to extract (can be specified multiple times). If not provided, extracts for all topics.
 - `--output PATH` - Output JSON file path (optional, prints to console if not provided)
-- `--model MODEL` - Gemini model to use (default: `gemini-3.7-flash`). Any model id the API accepts works; models missing from `PRICING` just report their cost as unknown.
+- `--model MODEL` - Gemini model to use (default: `gemini-3.8-flash`). Any model id the API accepts works; models missing from `PRICING` just report their cost as unknown.
 - `--upload-path KEY` - Key to write inside the `owid-public` bucket (default: `topic_vocabulary.json`)
 - `--no-upload` - Generate without writing to R2
 - `--report PATH` - Write an HTML coverage report: per term, what it reveals and what it adds, plus the most-viewed charts nothing covers

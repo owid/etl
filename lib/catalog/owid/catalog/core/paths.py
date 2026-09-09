@@ -16,7 +16,6 @@ CHANNEL = Literal[
     "examples",
     "explorers",
     "external",
-    "multidim",
 ]
 
 # Set of valid channels for runtime validation

@@ -53,7 +53,7 @@ Footer row count does not separate them: DI carries one row, static mobile and I
 The same Templates page also holds a `"SMALL" Charts` section (heading `25344:1235`) with
 `small-chart-template-guided` (`25344:1357`) and `small-chart-template-pull` (`25344:1391`), both
 302 px wide with a **free height**. Those are article thumbnails for the `chart-rows` and
-`pull-chart` gdoc blocks, and they are **not** built by an `export://static_viz` step — their
+`pull-chart` gdoc blocks, and they are **not** built by an `viz://static` step — their
 geometry comes from a grapher `imType=thumbnail` export, handled entirely by
 [`/create-figma-chart`](../create-figma-chart/SMALL-CHARTS.md).
 

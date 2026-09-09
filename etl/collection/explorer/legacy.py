@@ -22,7 +22,7 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher import model as gm
 from etl.grapher.io import get_variables_data
-from etl.paths import EXPORT_DIR
+from etl.paths import VIZ_EXPLORER_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -218,9 +218,9 @@ class ExplorerLegacy:
 
     @property
     def local_tsv_path(self) -> Path:
-        # export://explorers/who/latest/influenza#influenza -> explorers/who/latest/influenza/influenza.tsv
+        # viz://explorer/who/latest/influenza#influenza -> viz/explorer/who/latest/influenza/influenza.tsv
         assert self.catalog_path, "Catalog path not set. Please set it before saving."
-        return EXPORT_DIR / "explorers" / (self.catalog_path.replace("#", "/") + ".tsv")
+        return VIZ_EXPLORER_DIR / (self.catalog_path.replace("#", "/") + ".tsv")
 
     @staticmethod
     def _parse_config(config_raw, sep) -> dict[str, Any]:

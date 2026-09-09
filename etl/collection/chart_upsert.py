@@ -24,8 +24,8 @@ from sqlalchemy import bindparam, text
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.collection.utils import map_indicator_path_to_id
-from etl.config import DEFAULT_GRAPHER_SCHEMA, OWIDEnv
+from etl.collection.utils import map_indicator_path_to_id, resolve_grapher_schema
+from etl.config import OWIDEnv
 from etl.files import read_json_schema
 from etl.paths import SCHEMAS_DIR
 
@@ -53,7 +53,7 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
     view = collection.views[0]
     # Grapher slugs are dash-separated; mdim short_names are snake_case.
     slug = collection.short_name.replace("_", "-")
-    chart_config = _build_chart_config(view, slug)
+    chart_config = _build_chart_config(view, slug, resolve_grapher_schema(collection.grapher_schema))
     _validate_chart_config(chart_config, slug)
 
     admin_api = AdminAPI(owid_env)
@@ -128,11 +128,18 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
     return chart_id
 
 
-def _build_chart_config(view: "View", slug: str) -> dict[str, Any]:
-    """Translate `view.config` + `view.indicators` into a grapher chart config dict."""
+def _build_chart_config(view: "View", slug: str, grapher_schema: str) -> dict[str, Any]:
+    """Translate `view.config` + `view.indicators` into a grapher chart config dict.
+
+    `grapher_schema` is the collection's resolved pin. A chart config carries its schema version
+    directly in `$schema` (there is no `grapherConfigSchema` indirection as in mdims), so this is
+    where the pin becomes the thing grapher migrates from. `setdefault` keeps the same precedence
+    as the mdim path, where grapher spreads the view config over the collection pin — a `$schema`
+    inside the view config still wins, and `warn_on_view_schema_overrides` flags it.
+    """
     config: dict[str, Any] = dict(view.config or {})
     config["slug"] = slug
-    config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
+    config.setdefault("$schema", grapher_schema)
 
     # Resolve indicator catalog paths (y/x/size/color) to variable IDs and emit as
     # the grapher `dimensions` block, which charts identify by numeric variableId.

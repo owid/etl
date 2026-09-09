@@ -36,7 +36,7 @@ def get_all_steps(dag: DAG, private: bool = False) -> list[str]:
 
     # Filter out steps that are not relevant for etlr (snapshots, github, etag)
     # Focus on data and grapher steps
-    relevant_prefixes = ("data://", "data-private://", "grapher://", "export://")
+    relevant_prefixes = ("data://", "data-private://", "grapher://", "viz://", "export://")
     all_steps = [s for s in all_steps if s.startswith(relevant_prefixes)]
 
     return all_steps

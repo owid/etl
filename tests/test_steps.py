@@ -405,3 +405,20 @@ tables:
     finally:
         # Restore original INSTANT value
         config.INSTANT = original_instant
+
+
+def test_parse_step_viz_and_export():
+    """viz:// and export:// steps have their own recipe and output folders."""
+    from etl.steps import ExportStep, VizStep, parse_step
+
+    chart = parse_step("viz://chart/animal_welfare/latest/banning_of_chick_culling", {})
+    assert isinstance(chart, VizStep)
+    assert str(chart) == "viz://chart/animal_welfare/latest/banning_of_chick_culling"
+    assert chart._search_path == paths.STEP_DIR / "viz/chart/animal_welfare/latest/banning_of_chick_culling"
+    assert chart._dest_dir == paths.VIZ_DIR / "chart/animal_welfare/latest/banning_of_chick_culling"
+
+    export = parse_step("export://github/co2_data/latest/owid_co2", {})
+    assert isinstance(export, ExportStep) and not isinstance(export, VizStep)
+    assert str(export) == "export://github/co2_data/latest/owid_co2"
+    assert export._search_path == paths.STEP_DIR / "export/github/co2_data/latest/owid_co2"
+    assert export._dest_dir == paths.EXPORT_DIR / "github/co2_data/latest/owid_co2"
