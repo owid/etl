@@ -102,19 +102,19 @@ Create pages with parent `{"type": "data_source_id", "data_source_id": "<log dat
 | `Type` | `report sent` for the message that shares a report; `feedback` for what the producer says back. Those are the only two options the property has, because nothing else is in scope. |
 | `Link` | `https://mail.google.com/mail/?authuser=<caller email>#all/<messageId>` (message ID, not thread ID). The `authuser` parameter opens the right Google account whatever order the caller signed in. The link only resolves for the mailbox holding the message, so it is a convenience for its owner, not something a colleague can open. Do not use `git config user.email`; it is often a personal address. |
 | `Notes` | Optional, at most 300 characters: people cc'd, whether the PDF was attached, commitments, whether the message got a reply. |
-| `Status` | Set **only** when the message needs follow-up: `open` (OWID owes an answer), `waiting on producer` (OWID asked, no reply yet). Leave empty otherwise. Never set `closed` when creating. |
+| `Status` | Who owes the next action: `waiting on OWID`, `waiting on producer`, or `closed` when the exchange needs nothing further. Every row carries one, so the table answers "what is still pending" by itself. |
 | `Owner` | Set together with Status, to the OWID person who owes the action (user ID from `notion-fetch` of `self` when it is the caller, or leave empty and say so in the report). |
 
 `content`: the stripped body of that message only, as plain markdown paragraphs. Keep the sign-off line; drop signatures, legal boilerplate and everything quoted from earlier messages. A producer's verbatim words about a report are the useful part of the log, because they are what the team can quote in a funding case.
 
-Heuristics for Status: an outgoing report email with no reply yet is `waiting on producer`. An incoming reply that asks something still unanswered is `open`. Set `Owner` to whoever sent the report.
+Heuristics for Status: an outgoing report email with no reply yet is `waiting on producer`. An incoming reply that asks something still unanswered is `waiting on OWID`. A reply that needs nothing further is `closed`, and so is an outgoing report once it has been answered. Set `Owner` to whoever sent the report.
 
 ### 7. Report
 
 Reply to the user with, in this order:
 
 1. A table of the rows created: producer, date, direction, type, summary. Group by producer.
-2. Rows given a Status, with the reason, so the user can correct them.
+2. Rows not marked `closed`, with the reason, so the user can correct them.
 3. Out-of-scope messages the search surfaced, one line each, and any reply that came from an address not in the contacts table, which is worth adding there.
 4. Producers with no new report emails, in one line.
 
