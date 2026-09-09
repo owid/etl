@@ -154,6 +154,31 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 
 If `DATA_DIR / step_path` does not exist, parse the `.meta.yml` directly with `etl.files.ruamel_load` and pull the same field names from the `tables → <name> → variables → <var>` tree.
 
+That covers the indicator-level fields only. The origin fields (`origins[i].attribution`, `origins[i].producer`) never appear in a `.meta.yml`, so to keep them in the audit resolve the step's snapshot dependencies through the DAG and read them from each snapshot's `.dvc`:
+
+```python
+from etl.dag_helpers import load_dag
+from etl.files import ruamel_load
+from etl.paths import SNAPSHOTS_DIR
+
+dag = load_dag()
+deps = {d for d in dag.get(f"data://{step_path}", set()) | dag.get(f"data-private://{step_path}", set())}
+# walk down to the snapshots (meadow/garden steps sit in between)
+seen, stack, snaps = set(), list(deps), []
+while stack:
+    d = stack.pop()
+    if d in seen: continue
+    seen.add(d)
+    if d.startswith("snapshot"): snaps.append(d.split("://", 1)[1])          # 'ns/version/name.ext'
+    else: stack.extend(dag.get(d, set()))
+for rel in snaps:
+    origin = (ruamel_load(SNAPSHOTS_DIR / f"{rel}.dvc") or {}).get("meta", {}).get("origin") or {}
+    put(f"{rel}.origin.attribution", origin.get("attribution"))
+    put(f"{rel}.origin.producer", origin.get("producer"))
+```
+
+A step can also assign origin fields in code after loading the snapshot (see the routing note in step 5); the fallback cannot see those, so say so in the report.
+
 **Parse the garden `.meta.yml`, not just the grapher one.** Most datasets author their user-facing text in garden and have a thin or absent grapher `.meta.yml`, so reading only the grapher layer here finds nothing and reports a clean bill of health on unaudited text. Read both (`etl/steps/data/garden/<ns>/<version>/<dataset>.meta.yml` and the grapher one if it exists) and note that grapher values override garden ones on the same field.
 
 Warn the user that Jinja templates (`<<var>>`, `{definitions.xxx}`, `<%- ... -%>`) and garden→grapher inheritance are **not** resolved in this fallback path, so template-generated violations will be missed. Suggest building the step first:
@@ -203,7 +228,7 @@ with open(meta_yml_path, 'w') as f:
     f.write(ruamel_dump(data))
 ```
 
-Origin fields (`origins[i].attribution`, `origins[i].producer`) are not in the `.meta.yml` at all — they come from the snapshot's `.dvc` (`meta.origin.*`), so a fix goes there, with the same `ruamel_load` / `ruamel_dump` round-trip. Anything reported as producer-prescribed is excluded from **Fix all**.
+Origin fields (`origins[i].attribution`, `origins[i].producer`) are not in the `.meta.yml` at all. Trace each one to where it is actually set before fixing it: usually the snapshot's `.dvc` (`meta.origin.*`), but a meadow or garden step can construct or overwrite an origin in code after loading the snapshot — e.g. `etl/steps/data/meadow/energy_institute/2026-06-30/statistical_review_of_world_energy.py` assigns `origins[0].attribution` for the price indicators. Grep the step's `.py` files for `.attribution =`, `.producer =`, `Origin(` and `origins[` first; if the value comes from code, the fix goes in that step (editing the `.dvc` would be rebuilt away). Otherwise edit the `.dvc` with the same `ruamel_load` / `ruamel_dump` round-trip. Anything reported as producer-prescribed is excluded from **Fix all**.
 
 If a violation only shows up in the rendered output because of a Jinja definition (e.g. the issue is inside `{definitions.foo}`), flag it for manual fix — don't auto-rewrite the definition without asking.
 
