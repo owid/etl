@@ -6,7 +6,7 @@ icon: lucide/forward
 
 # Viz and export steps
 
-Viz steps (`viz://`) produce visualizations and export steps (`export://`) ship files to external destinations. They are defined in the `etl/steps/viz` and `etl/steps/export` directories and have a similar structure to regular steps. Viz steps are run with `--grapher`; export steps write to R2 or GitHub and are run with `--export`.
+Viz steps (`viz://`) produce visualizations and export steps (`export://`) ship files to external destinations. They are defined in the `etl/steps/viz` and `etl/steps/export` directories and have a similar structure to regular steps. Viz steps publish with `--grapher`; export steps write to R2 or GitHub with `--export`. Either kind, named by its URI and run without its flag, only builds its output locally: handy for checking a chart config or an export file before publishing it.
 
 The channel of a viz step says what it produces:
 

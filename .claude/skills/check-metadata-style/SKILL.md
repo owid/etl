@@ -147,7 +147,7 @@ If `DATA_DIR / step_path` does not exist, parse the `.meta.yml` directly with `e
 Warn the user that Jinja templates (`<<var>>`, `{definitions.xxx}`, `<%- ... -%>`) and garden→grapher inheritance are **not** resolved in this fallback path, so template-generated violations will be missed. Suggest building the step first:
 
 ```bash
-.venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher --private
+.venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher
 ```
 
 Drop `--only` here on purpose: when the catalog is missing, upstream meadow/garden outputs are usually missing too, and `--only` would skip them and fail on missing inputs.
@@ -197,7 +197,7 @@ After fixes:
 
 1. Rebuild the step if metadata text was changed in a way that affects rendering:
    ```bash
-   .venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher --private --force --only
+   .venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher --force --only
    ```
 2. Re-run steps 3–4 of this skill on the same step. Expect zero violations.
 3. Run `make check` to confirm no lint/format regressions from the YAML edits.

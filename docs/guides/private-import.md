@@ -70,10 +70,10 @@ data-private://grapher/ihme_gbd/2024-06-10/leading_causes_deaths:
 
 ## Running private ETL
 
-To run a private step, you need to use the `--private` flag. Otherwise, private steps are not detected by `etl` command:
+Private steps run like any other step; `etl run` includes them by default. To leave them out (for instance without access to the private bucket), pass `--public-only`, which also fails if a public step depends on a private one:
 
 ```
-etl run run [step-name] --private
+etl run [step-name] --public-only
 ```
 
 ## Bringing private data to public

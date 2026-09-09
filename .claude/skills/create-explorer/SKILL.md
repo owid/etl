@@ -411,7 +411,7 @@ Place near related explorer entries (or alongside the upstream grapher steps) fo
 
 Hand off to the user:
 
-1. `.venv/bin/etlr viz://explorer/<ns>/latest/<short> --grapher --private` — runs the step and upserts the explorer to the staging DB.
+1. `.venv/bin/etlr viz://explorer/<ns>/latest/<short> --grapher` — runs the step and upserts the explorer to the staging DB.
 2. Open `http://staging-site-<branch>/admin/explorers/preview/<slug>` and spot-check:
    - default view (no dimensions toggled)
    - every dimension switch

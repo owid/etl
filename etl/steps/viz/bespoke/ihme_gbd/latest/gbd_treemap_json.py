@@ -19,7 +19,7 @@ from owid.catalog import processing as pr
 from structlog import get_logger
 from tqdm.auto import tqdm
 
-from etl.config import DRY_RUN
+from etl import config
 from etl.helpers import PathFinder
 from etl.paths import VIZ_DIR
 
@@ -200,8 +200,8 @@ def save_and_upload_json(data: dict, filename: str, s3_data_dir: Path) -> None:
         json.dump(data, f, indent=2)
 
     # Upload to S3
-    if DRY_RUN:
-        tqdm.write(f"[DRY RUN] Would upload {local_file} to s3://{S3_BUCKET_NAME}/{s3_path}")
+    if not config.GRAPHER_ENABLED:
+        tqdm.write(f"[not uploaded, no --grapher] {local_file} -> s3://{S3_BUCKET_NAME}/{s3_path}")
     else:
         s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_path)}", local_file, public=True, downloadable=True)
 

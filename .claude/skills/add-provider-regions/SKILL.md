@@ -141,7 +141,7 @@ For anything beyond a couple of regions, **regenerate the whole provider section
 ## Step 5 — Build and verify the garden step
 
 ```bash
-.venv/bin/etlr data://garden/regions/2023-01-01/regions --private
+.venv/bin/etlr data://garden/regions/2023-01-01/regions
 ```
 
 (No `--force` — editing the YAML is enough to trigger a rebuild.) The step runs sanity checks: unique codes/names, unique members within a region, all referenced codes exist, and cycle detection during aggregate expansion.
@@ -248,7 +248,7 @@ print(o.producer, "|", o.title, "|", o.url_main, "|", o.date_accessed, "|", o.at
 **6d. Build and verify:**
 
 ```bash
-.venv/bin/etlr data://grapher/regions/2023-01-01/regions --private
+.venv/bin/etlr data://grapher/regions/2023-01-01/regions
 ```
 
 ```python

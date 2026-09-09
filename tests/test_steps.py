@@ -169,6 +169,22 @@ def test_dependency_filtering():
     }
 
 
+def test_dependency_filtering_full_name_is_exact():
+    """An include equal to a step name selects that step only; anything else is a regex."""
+    dag = {
+        "data://garden/x/2024-01-01/foo": {"data://meadow/x/2024-01-01/foo"},
+        "data://garden/x/2024-01-01/foo_extended": {"data://garden/x/2024-01-01/foo"},
+        "data://meadow/x/2024-01-01/foo": set(),
+    }
+    assert set(filter_to_subgraph(dag, ["data://garden/x/2024-01-01/foo"])) == {
+        "data://garden/x/2024-01-01/foo",
+        "data://meadow/x/2024-01-01/foo",
+    }
+    assert set(filter_to_subgraph(dag, ["garden/x/2024-01-01/foo"])) == set(dag)
+    # An excluded step is not selected even when named in full.
+    assert set(filter_to_subgraph(dag, ["data://garden/x/2024-01-01/foo"], excludes=["garden"])) == set()
+
+
 def test_dependency_filtering_with_excludes():
     """Test that excludes properly remove steps and their downstream dependencies."""
     dag = {
@@ -422,3 +438,25 @@ def test_parse_step_viz_and_export():
     assert str(export) == "export://github/co2_data/latest/owid_co2"
     assert export._search_path == paths.STEP_DIR / "export/github/co2_data/latest/owid_co2"
     assert export._dest_dir == paths.EXPORT_DIR / "github/co2_data/latest/owid_co2"
+
+
+def test_viz_and_export_steps_publish_only_with_their_flag(monkeypatch):
+    """Without the permission a step builds locally; static steps have nothing to gate."""
+    from etl import config
+    from etl.steps import ExportStep, VizStep
+
+    chart = VizStep("chart/happiness/latest/happiness", dependencies=[])
+    static = VizStep("static/happiness/2023-01-01/happiness", dependencies=[])
+    export = ExportStep("s3/happiness/latest/happiness", dependencies=[])
+
+    monkeypatch.setattr(config, "GRAPHER_ENABLED", False)
+    monkeypatch.setattr(config, "EXPORT_ENABLED", False)
+    assert not chart.publishes
+    assert static.publishes
+    assert not export.publishes
+
+    monkeypatch.setattr(config, "GRAPHER_ENABLED", True)
+    assert chart.publishes
+    assert not export.publishes
+    monkeypatch.setattr(config, "EXPORT_ENABLED", True)
+    assert export.publishes

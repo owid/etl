@@ -19,6 +19,7 @@ from owid.catalog.core.utils import underscore
 from structlog import get_logger
 from typing_extensions import Self
 
+import etl.config as etl_config
 from apps.chart_sync.admin_api import AdminAPI
 from etl.collection.exceptions import DuplicateCollectionViews, DuplicateValuesError
 from etl.collection.model.base import MDIMBase, pruned_json
@@ -304,8 +305,9 @@ class Collection(MDIMBase):
         indicators = self.indicators_in_use(tolerate_extra_indicators)
         self.validate_indicators_are_from_dependencies(indicators)
 
-        # Check that all indicators in collection exist
-        validate_indicators_in_db(indicators, owid_env.engine)
+        # Check that all indicators in collection exist (needs the DB, so only when we may write to it)
+        if etl_config.GRAPHER_ENABLED:
+            validate_indicators_in_db(indicators, owid_env.engine)
 
         # Ensure at least one topic tag is set (needed for search)
         # Disabled as it is not really necessary? This fails on CI/CD for explorers
@@ -346,6 +348,16 @@ class Collection(MDIMBase):
 
         # Export config to local directory in addition to uploading it to MySQL for debugging.
         self.save_config_local()
+
+        # Without the write permission (`etlr` without --grapher), the local config is the result.
+        if not etl_config.GRAPHER_ENABLED:
+            log.warning(
+                "collection.not_upserted",
+                catalog_path=self.catalog_path,
+                local_config=str(self.local_config_path),
+                hint="pass --grapher to upsert it",
+            )
+            return
 
         # Upsert to DB
         self.upsert_to_db(owid_env)
