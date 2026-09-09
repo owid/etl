@@ -8,7 +8,7 @@ meta:
       The American Time Use Survey (ATUS) measures the amount of time people spend doing various activities, such as paid work, childcare, volunteering, and socializing. It provides nationally representative estimates of how, where, and with whom Americans spend their time, and is the only federal survey providing data on the full range of nonmarket activities, from childcare to volunteering.
     date_published: "2023"
     version_producer: 2023
-    title_snapshot: American Time Use Survey - Single Activity codes
+    title_snapshot: American Time Use Survey – Single Activity codes
     description_snapshot: |-
       Activity codes used in the 2023 activity coding. The ATUS Activity Coding Lexicon is a 3-tiered classification system with 17 first-tier categories. Each of the first-tier categories has two additional levels of detail. Respondents' reported activities are assigned 6-digit activity codes based on this classification system. Activity codes are periodically evaluated and updated prior to the start of each year’s data collection.
 

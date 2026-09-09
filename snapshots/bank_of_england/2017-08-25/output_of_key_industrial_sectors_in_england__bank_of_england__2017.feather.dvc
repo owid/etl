@@ -2,7 +2,7 @@ meta:
   origin:
     producer: Bank of England
     title: A millennium of macroeconomic data
-    title_snapshot: A millennium of macroeconomic data - Output of key industrial sectors in England
+    title_snapshot: A millennium of macroeconomic data – Output of key industrial sectors in England
     description_snapshot: |-
       This dataset is produced using 'A4. Ind Production 1270-1870' sheet in BoE dataset. For each variables, output figures are indexed those in year 1700 (i.e. 1700 = 100), and they are measured on a log scale.
     citation_full: Bank of England (2017). A millennium of macroeconomic data.

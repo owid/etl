@@ -4,7 +4,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: The State of Food and Agriculture 1949
-    title_snapshot: The State of Food and Agriculture 1949 - Daily calories in various countries
+    title_snapshot: The State of Food and Agriculture 1949 – Daily calories in various countries
     description: |-
       This dataset contains daily calories in various countries, from Table 15 of FAO's "The State of Food and Agriculture 1949".
     date_published: "1949-10-01"

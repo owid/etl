@@ -4,7 +4,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: Swedish Historical National Accounts
-    title_snapshot: Swedish Historical National Accounts - Value added by sector
+    title_snapshot: Swedish Historical National Accounts – Value added by sector
     description: |-
       The Swedish Historical National Accounts 1560–2010, released in 2015 and updated in 2020, 2023 and 2025, presents a database with an extended and revised version of SHNA 1560–2022. Principles for revisions and extension of data 1560-1800 are found in Schön & Krantz (2015), "New Swedish Historical National Accounts since the 16th Century in Constant and Current Prices", Lund Papers in Economic History 140, Lund University.
 

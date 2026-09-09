@@ -4,7 +4,7 @@ meta:
     title: Influenza Vaccination Coverage
     description: |-
       WHO/UNICEF Joint Reporting Form on Immunization (JRF) influenza vaccination coverage data for older people.
-    citation_full: 'WHO and UNICEF (2023). WHO/UNICEF Joint Reporting Form on Immunization (JRF) - Influenza vaccination coverage.'
+    citation_full: 'WHO and UNICEF (2023). WHO/UNICEF Joint Reporting Form on Immunization (JRF) – Influenza vaccination coverage.'
     attribution_short: WHO/UNICEF
     url_main: https://immunizationdata.who.int/pages/coverage/flu.html?ANTIGEN=FLU_ELDERLY&YEAR=
     date_accessed: '2023-04-03'

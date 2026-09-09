@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical Measles Cases - United States
+    title: Historical Measles Cases – United States
     description: |-
       Data on historical measles cases in the United States, compiled from a selection of government sources.
 
@@ -32,7 +32,7 @@ meta:
 
       Public Health Reports Vol. 40, No. 51. The Notifiable Diseases: Prevalence during 1924 in States.
 
-      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States 1944-45.
+      US Census Bureau. Part 2 – Vital Statistics, Statistical Abstract of the United States 1944-45.
 
       Morbidity and Mortality Weekly Report Annual Supplement Summary 1993 Vol. 42, No. 53 by the Centers for Disease Control and Prevention (CDC), US Public Health Service.
 

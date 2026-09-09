@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: International Union for Conservation of Nature Red List of Threatened Species
-    title: IUCN Red List Summary Statistics - Total, threatened and extinct invertebrate species in each country
+    title: IUCN Red List Summary Statistics – Total, threatened and extinct invertebrate species in each country
     description: |-
       Total number of endemic, threatened endemic and extinct invertebrate species recorded for each country for comprehensively assessed groups only.
     citation_full: |-
