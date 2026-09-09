@@ -44,7 +44,12 @@ Run `search_threads` with query `in:sent newer_than:90d`, `pageSize: 1`, and tak
 
 ### 2. Build the search terms per producer
 
-From `Contacts` and `Emails for analytics reports`, extract every email address (regex `[\w.+-]+@[\w.-]+\.\w+`). For each address also take its domain, except generic mail providers (`gmail.com`, `outlook.com`, `hotmail.com`, `yahoo.*`, `protonmail.com`, `icloud.com`). Producers with no address at all are searched by name only (pass 2 below).
+Two separate sets, used by the two passes below. Only the first one ever produces rows.
+
+- **Addresses (pass 1).** Every email address in `Contacts` and `Emails for analytics reports`. Both columns are free text, so extract with `[\w.+-]+@[\w.-]+\.\w+` rather than reading the cell whole; `Contacts` typically looks like `TO: <name> (<address>)\nCC: <name> (<address>)`. These are the addresses the team has recorded for the relationship, and they are the only basis for logging.
+- **Widening terms (pass 2 only).** The producer's name and its obvious short forms, plus the domain of each address above, excluding generic mail providers (`gmail.com`, `outlook.com`, `hotmail.com`, `yahoo.*`, `protonmail.com`, `icloud.com`). These exist because the person who writes is often a colleague of the recorded contact who is not in the table yet. They surface candidates for the report; they never create rows.
+
+A producer with no address at all has no pass 1, only pass 2.
 
 ### 3. Find the watermark and the already-logged messages
 
@@ -57,15 +62,21 @@ Search from **7 days before the watermark** (Gmail dates and thread grouping mak
 
 ### 4. Search Gmail
 
-**Pass 1, exact.** One `search_threads` per producer, `pageSize: 50`, query like:
+**Pass 1, the recorded addresses.** This is the only pass that produces rows. One `search_threads` per producer, `pageSize: 50`, query like:
 
 ```
-addr1 OR addr2 OR from:domain OR to:domain OR cc:domain after:YYYY/MM/DD
+addr1 OR addr2 OR addr3 after:YYYY/MM/DD
 ```
 
-Paginate with `pageToken` until exhausted.
+Addresses only, never `from:domain`. A whole institutional domain carries a lot of mail that has nothing to do with the data relationship, and logging by domain would copy it into a shared table. Paginate with `pageToken` until exhausted.
 
-**Pass 2, broad.** One search per producer on the producer's name (and obvious short forms, e.g. `UCDP OR "Uppsala Conflict Data Program"`) with the same date filter. Anything from pass 2 whose sender or recipients are not in pass 1's address set is a **candidate**: do not log it, list it in the report with sender, date and subject, and let the user decide.
+**Pass 2, widening.** One search per producer over the widening terms, same date filter, e.g.:
+
+```
+("Aurora Energy Institute" OR AEI OR from:aurora-energy.example OR to:aurora-energy.example) after:YYYY/MM/DD
+```
+
+Everything pass 2 finds that pass 1 did not is a **candidate**: do not log it, and do not paste its body anywhere. List it in the report with sender, date and subject, and let the user decide whether it belongs in the log and whether the sender should join the contacts table. A colleague of the recorded contact writing about the data relationship is the case this is for; anything else is noise the user can ignore in one glance.
 
 If a search result is too large and gets saved to a file, filter it with `jq` on the saved file instead of re-running with a smaller page size; the tool result tells you the path.
 
@@ -89,8 +100,8 @@ Create pages with parent `{"type": "data_source_id", "data_source_id": "<interac
 
 | Property | Value |
 |---|---|
-| `Summary` | One line, at most 110 characters, who did what. Never the subject line verbatim. Good: "Nic announced Global Electricity Review 2025 and updated 2024 data". |
-| `date:Date:start` | `YYYY-MM-DD` of the message; `date:Date:is_datetime`: `0`. |
+| `Summary` | One line, at most 110 characters, who did what. Never the subject line verbatim. Shape to aim for, with an invented producer: "Their data lead announced the 2026 Aurora Energy Review and revised the 2025 figures". |
+| `date:Date:start` | `YYYY-MM-DD` of the message; `date:Date:is_datetime`: the number `0` (Notion rejects the string `"0"`). |
 | `Producer` | `["<contacts page URL>"]`. |
 | `Direction` | `outgoing` if the sender is `@ourworldindata.org`, else `incoming`. For a colleague's message, add "sent by <first name>" to Notes. |
 | `Channel` | `email`. Use `call` (no Link) only when a message schedules a call whose date is clear; one extra row for the call, with a Note asking to confirm it happened. |
@@ -119,5 +130,6 @@ Do not paste email bodies into the reply.
 
 - Never edit or delete existing rows except to fill an empty `Link` or empty page body of a row that clearly matches a message (same producer, same date, same direction); say so in the report.
 - Never add rows to the contacts table.
-- Never write producer names, contact names or email addresses into files in this repo.
+- Never write producer names, contact names or email addresses into files in this repo. Examples in this file use invented institutions on purpose.
+- Log only what concerns the data relationship. A message that is personal, sensitive, or unrelated to the producer's data does not belong in a shared log, even when it comes from a recorded address: name it in the report and let the user decide, rather than creating a row. The same goes for anything a reasonable sender would not expect the whole team to read.
 - Each run covers the caller's mailbox only. Rows for messages the caller received in cc are fine; rows for messages the caller cannot see are not this skill's job.
