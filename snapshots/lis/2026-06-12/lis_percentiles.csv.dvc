@@ -6,7 +6,7 @@ meta:
       The Luxembourg Income Study Database (LIS) is the largest available income database of harmonized microdata collected from over 50 countries in Europe, North America, Latin America, Africa, Asia, and Australasia spanning five decades.
 
       Harmonized into a common framework, LIS datasets contain household- and person-level data on labor income, capital income, pensions, public social benefits (excl. pensions) and private transfers, as well as taxes and contributions, demography, employment, and expenditures.
-    title_snapshot: Luxembourg Income Study (LIS) - Income percentiles
+    title_snapshot: Luxembourg Income Study (LIS) – Income percentiles
     description_snapshot: Income thresholds at each percentile (1–99) of the distribution, by income measure and equivalization.
     citation_full: 'Luxembourg Income Study (LIS) Database, http://www.lisdatacenter.org (multiple countries; June 2026). Luxembourg: LIS.'
     attribution_short: Luxembourg Income Study

@@ -364,7 +364,7 @@
         "description": "Citation of the data product to be used when the automatic format `producer (year)` needs to be overridden.",
         "requirement_level": "optional",
         "examples": [
-          "Energy Institute - Statistical Review of World Energy (2023)"
+          "Energy Institute – Statistical Review of World Energy (2023)"
         ],
         "examples_bad": [
           [
@@ -395,7 +395,7 @@
             "Should only be used if the automatic attribution format `producer (year)` is considered uninformative. For example, when the title of the data product is well known and should be cited along with the producer, or when the original version of the data product should also be mentioned."
           ],
           [
-            "If this field is used to mention the data product, follow the preferred format `{producer} - {title} {version_producer} ({year})` (where `version_producer` may be omitted)."
+            "If this field is used to mention the data product, follow the preferred format `{producer} – {title} {version_producer} ({year})`, with a spaced en dash (–), not a hyphen (where `version_producer` may be omitted)."
           ],
           [
             "If the producer explicitly asked for a specific short citation, follow their guidelines and ignore the above."

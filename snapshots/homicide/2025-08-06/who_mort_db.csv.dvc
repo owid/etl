@@ -2,7 +2,7 @@ meta:
   origin:
     producer: WHO Mortality Database
     title: WHO Mortality Database
-    title_snapshot: WHO Mortality Database - Deaths from violence
+    title_snapshot: WHO Mortality Database – Deaths from violence
     citation_full: WHO Division of Data, Analytics and Delivery for Impact (DDI), World Health Organization (2025)
     attribution_short: WHO
     url_main: https://platform.who.int/mortality

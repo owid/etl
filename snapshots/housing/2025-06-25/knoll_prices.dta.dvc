@@ -2,7 +2,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: "No Price Like Home: Global House Prices, 1870-2012"
+    title: "No Price Like Home: Global House Prices, 1870–2012"
     description: |-
       Annual house prices for 14 advanced economies since 1870, taken from the paper "No Price Like Home: Global House Prices, 1870-2012" by Katharina Knoll, Moritz Schularick and Thomas Steger.
 

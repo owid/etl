@@ -27,7 +27,7 @@ meta:
 
       Because of the complexity of the dataset, it is published across 27 CSV files. Our technical documentation (https://github.com/OxCGRT/covid-policy-dataset/blob/main/documentation_and_codebook.md) contains all the information users need to navigate and use the data.
 
-    title_snapshot: Government Response Tracker (OxCGRT) - National data 2020
+    title_snapshot: Government Response Tracker (OxCGRT) – National data 2020
     description_snapshot: |-
       This file provides maximum detail while still reporting the overall situation in each jurisdiction. Only data for 2021.
 
