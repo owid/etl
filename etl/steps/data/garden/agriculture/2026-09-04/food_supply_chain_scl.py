@@ -495,17 +495,6 @@ def sanity_check_densities(tb: Table, nutrient: str) -> None:
     assert provenance.get("direct", 0) > 55, (
         f"Only {provenance.get('direct', 0):.1f}% of supply uses a direct {nutrient} density."
     )
-    summary = tb.groupby("fao_item").agg(
-        role=("role", "first"),
-        density_median=("density", "median"),
-        source=("density_source", lambda x: x.value_counts().index[0]),
-        production_mt=("production", lambda x: x.sum() / 1e6),
-    )
-    with pd.option_context("display.max_rows", None, "display.width", 200):
-        log.info(
-            f"food_supply_chain_scl.{nutrient}_densities_per_100g\n"
-            + summary.sort_values("production_mt", ascending=False).round(1).to_string()
-        )
 
 
 def sanity_check_processing_families(tb: Table, manual: dict, nutrient: str) -> None:

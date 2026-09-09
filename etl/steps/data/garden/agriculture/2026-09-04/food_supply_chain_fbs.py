@@ -389,18 +389,6 @@ def sanity_check_densities(tb: Table, items: Table, nutrient: str) -> None:
         f"Only {provenance.get('direct', 0):.1f}% of domestic supply uses a direct {nutrient} density."
     )
 
-    summary = tb.groupby("item_code", observed=True).agg(
-        item_median=("density", "median"),
-        p10=("density_raw", lambda x: x.quantile(0.1)),
-        p90=("density_raw", lambda x: x.quantile(0.9)),
-        share_rejected_pct=("density_source", lambda x: 100 * (x != "direct").mean()),
-    )
-    summary = summary.join(items[["name", "role"]]).set_index("name")[
-        ["role", "item_median", "p10", "p90", "share_rejected_pct"]
-    ]
-    with pd.option_context("display.max_rows", None, "display.width", 200):
-        log.info(f"food_supply_chain_fbs.{nutrient}_densities_per_100g\n" + summary.round(1).to_string())
-
 
 def build_chain(tb: Table, nutrient: str) -> Table:
     """Convert balance elements with the densities, sum items into stages, and express them per person per day."""
