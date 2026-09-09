@@ -85,7 +85,7 @@ click.rich_click.OPTION_GROUPS = {  # ty: ignore[invalid-assignment]
 @click.option(
     "--public-only",
     is_flag=True,
-    help="Skip private steps (`data-private://`, `snapshot-private://`), and fail if a public step depends on one. Private steps run by default.",
+    help="Skip private steps (`data-private://`, `snapshot-private://`) and everything downstream of them. Private steps run by default.",
 )
 @click.option(
     "--private",
@@ -404,7 +404,9 @@ def _modified_steps(
 
     # Narrow to those also matching the explicit STEPS arguments.
     if includes:
-        patterns = [re.compile(p) for p in includes]
+        # Data steps come back scheme-less (`garden/foo/bar`), so a full URI include (`data://garden/foo/bar`)
+        # is matched on its path; viz/export includes keep working as substrings of their full URI.
+        patterns = [re.compile(p.split("://", 1)[-1]) for p in includes]
         changed_paths = [p for p in changed_paths if any(pat.search(p) for pat in patterns)]
 
     return changed_paths

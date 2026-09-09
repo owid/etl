@@ -70,7 +70,7 @@ data-private://grapher/ihme_gbd/2024-06-10/leading_causes_deaths:
 
 ## Running private ETL
 
-Private steps run like any other step; `etl run` includes them by default. To leave them out (for instance without access to the private bucket), pass `--public-only`, which also fails if a public step depends on a private one:
+Private steps run like any other step; `etl run` includes them by default. To leave them out (for instance without access to the private bucket), pass `--public-only`, which also skips the steps downstream of them:
 
 ```
 etl run [step-name] --public-only

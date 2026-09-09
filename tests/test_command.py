@@ -356,3 +356,20 @@ def test_construct_subdag_full_step_name_selects_that_step_only():
     # A prefix is still a pattern.
     subdag = cmd.construct_subdag(GATED_DAG, includes=["viz://chart/happiness/latest/happi"], grapher=True)
     assert "viz://chart/happiness/latest/happiness_extended" in subdag
+
+
+def test_modified_steps_matches_full_uri_includes(monkeypatch):
+    """Changed data steps come back scheme-less, so `etlr data://garden/... --modified` must still match them."""
+    import etl.io
+
+    changed = ["garden/happiness/2023-01-01/happiness", "viz://chart/happiness/latest/happiness"]
+    monkeypatch.setattr(etl.io, "get_all_changed_catalog_paths", lambda files_changed, include_export: changed)
+
+    assert cmd._modified_steps(includes=["data://garden/happiness/2023-01-01/happiness"], files_changed={}) == [
+        "garden/happiness/2023-01-01/happiness"
+    ]
+    assert cmd._modified_steps(includes=["viz://chart/happiness"], files_changed={}) == [
+        "viz://chart/happiness/latest/happiness"
+    ]
+    # Plain patterns keep working, and match both kinds.
+    assert cmd._modified_steps(includes=["happiness"], files_changed={}) == changed
