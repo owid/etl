@@ -112,10 +112,11 @@ for table_name in ds.table_names:
             put('presentation.grapher_config.note', gc.get('note'))
 
         # The chart footer resolves presentation.attribution > origin.attribution >
-        # origin.producer (year), so the visible credit usually comes from the origin.
+        # origin.producer (year), so the visible credit usually comes from the origin —
+        # and from the producer alone when the origin sets no attribution.
         for i, o in enumerate(getattr(m, 'origins', None) or []):
             put(f'origins[{i}].attribution', getattr(o, 'attribution', None))
-            put(f'origins[{i}].citation_full', getattr(o, 'citation_full', None))
+            put(f'origins[{i}].producer', getattr(o, 'producer', None))
 
         if entry['fields']:
             rows.append(entry)
@@ -136,7 +137,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 | `presentation.title_variant` | Disambiguator ("Historical", "WHO estimate", …) |
 | `presentation.attribution` | Full source credit under the chart (`producer – data product (year)`) |
 | `origins[i].attribution` | Where that credit usually comes from — the footer falls back to it when `presentation.attribution` is unset |
-| `origins[i].citation_full` | Full citation on the data page |
+| `origins[i].producer` | The last fallback: with no attribution set, the footer renders `producer (year)` |
 | `presentation.attribution_short` | Short source credit under the chart |
 | `presentation.grapher_config.title` | Overrides chart title when set |
 | `presentation.grapher_config.subtitle` | Chart subtitle |
@@ -145,6 +146,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 **Fields deliberately skipped:**
 
 - `description_from_producer` — verbatim text from the source, not OWID copy.
+- `citation_full` — follows the producer's requested citation, so its wording, capitalization and punctuation are theirs, not ours to restyle.
 - `unit`, `short_unit`, `processing_level`, internal names — not user-facing prose.
 - `description_long`, `description_processing` — technical, de-prioritized (re-enable later if needed).
 
