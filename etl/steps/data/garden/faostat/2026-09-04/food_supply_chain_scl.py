@@ -191,6 +191,8 @@ FBS_TOTAL_ITEM_CODE = "00002901"
 HUNDRED_GRAMS_PER_TONNE = 10_000
 KG_PER_TONNE = 1000
 GRAMS_PER_TONNE = 1_000_000
+# An item in the fixed-density list keeps its data-based density if more than this share of its supply is eaten as food.
+FIXED_DENSITY_MAX_FOOD_SHARE = 0.01
 # Minimum share of a region's population that must live in member countries with a balance (assumption 8).
 MIN_FRACTION_POPULATION_COVERED = 0.8
 # Regions that lose some years to that rule (assumption 8); none once low-income countries are left out.
@@ -434,9 +436,14 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
     fixed = fixed_density_map(tb, manual, nutrient)
     for item in manual["never_food"]:
         fixed[_pad_code(item["code"])] = 0.0
-    no_density = tb["density"].isnull()
-    tb.loc[no_density, "density"] = tb.loc[no_density, "item_code"].map(fixed)
-    tb.loc[no_density & tb["density"].notnull(), "density_source"] = "fixed"
+    # Fixed densities take precedence over the data for items that are not really food: a few hundred tonnes of soybean
+    # cake eaten somewhere would otherwise set the density of hundreds of millions of tonnes. Items in the list with
+    # a real food use (spirits, wheat bran) keep their data-based density.
+    supply = (tb["production"] + tb["imports"]).abs().groupby(tb["item_code"]).transform("sum")
+    food_share = tb["food"].abs().groupby(tb["item_code"]).transform("sum") / supply
+    is_fixed = tb["item_code"].isin(fixed) & (food_share.fillna(0) < FIXED_DENSITY_MAX_FOOD_SHARE)
+    tb.loc[is_fixed, "density"] = tb.loc[is_fixed, "item_code"].map(fixed)
+    tb.loc[is_fixed, "density_source"] = "fixed"
     never = tb["item_code"].isin([_pad_code(item["code"]) for item in manual["never_food"]])
     tb.loc[never, ["density", "density_source"]] = [0.0, "never_food"]
 

@@ -26,7 +26,6 @@ fixed_densities:
     - {code: 77, name: "Bran of oats", energy: 246, protein: 17.3}
     - {code: 846, name: "Gluten feed and meal", energy: 330, protein: 47, note: "Valued as the cakes; a protein by-product of maize milling."}
     - {code: 632, name: "Undenatured ethyl alcohol of an alcoholic strength by volume of 80% vol or higher", energy: 700, protein: 0}
-    - {code: 634, name: "Undenatured ethyl alcohol of an alcoholic strength by volume of less than 80% vol; spirits, liqueurs and other spirituous beverages", energy: 700, protein: 0}
     - {code: 1276, name: "Industrial monocarboxylic fatty acids; acid oils from refining", energy: 884, protein: 0, note: "Fat that left the food chain to industry."}
     - {code: 1277, name: "Residues of fatty substances", energy: 884, protein: 0}
     - {code: 1274, name: "Animal or vegetable fats and oils and their fractions, chemically modified, except those hydrogenated, inter-esterified, re-esterified or elaidinized; inedible mixtures or preparations of animal or vegetable fats or oils", energy: 884, protein: 0}
