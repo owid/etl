@@ -181,6 +181,8 @@ Report format, one block per violation:
 
 Group the blocks by variable for readability. End with a summary count.
 
+**Exception — producer-prescribed citations.** The short-citation rules (en dash between producer and data product, surname format, capitalization as the provider writes it) do not apply when the producer explicitly asked for a specific short citation: `schemas/definitions.json` says to follow their guidelines and ignore the preferred format in that case (`origin.attribution`, last guideline). So for `origins[i].attribution`, check the snapshot's `.dvc` first — a `citation_full`, `description` or comment that states the producer's required wording. If the attribution reproduces that wording, report it as *"producer-prescribed — not changed"* rather than as a violation, and never offer a fix. `origins[i].producer` is OWID-authored (the producer's name in our own words), so it gets the normal rules.
+
 If no violations are found, say so and list the fields that were inspected — the user should know what was checked, not just that nothing came up.
 
 ### 5. Offer to fix
@@ -200,6 +202,8 @@ data = ruamel_load(meta_yml_path)
 with open(meta_yml_path, 'w') as f:
     f.write(ruamel_dump(data))
 ```
+
+Origin fields (`origins[i].attribution`, `origins[i].producer`) are not in the `.meta.yml` at all — they come from the snapshot's `.dvc` (`meta.origin.*`), so a fix goes there, with the same `ruamel_load` / `ruamel_dump` round-trip. Anything reported as producer-prescribed is excluded from **Fix all**.
 
 If a violation only shows up in the rendered output because of a Jinja definition (e.g. the issue is inside `{definitions.foo}`), flag it for manual fix — don't auto-rewrite the definition without asking.
 
