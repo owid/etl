@@ -66,11 +66,9 @@ import pandas as pd
 import yaml
 from owid.catalog import Table
 from owid.catalog import processing as pr
-from structlog import get_logger
 
 from etl.helpers import PathFinder
 
-log = get_logger()
 paths = PathFinder(__file__)
 
 N_CHARACTERS_ITEM_CODE = 8
@@ -195,6 +193,8 @@ KG_PER_TONNE = 1000
 GRAMS_PER_TONNE = 1_000_000
 # Minimum share of a region's population that must live in member countries with a balance (assumption 8).
 MIN_FRACTION_POPULATION_COVERED = 0.8
+# Regions that lose some years to that rule (assumption 8); none once low-income countries are left out.
+REGIONS_WITH_LOW_COVERAGE = set()
 DAYS_PER_YEAR = 365
 # OWID regions rebuilt in this step (assumption 8); the FAOSTAT garden step's rows for them, if any, are dropped.
 REGIONS = [
@@ -377,11 +377,9 @@ def add_region_aggregates(tb: Table) -> Table:
     regions = paths.regions.add_population(regions, population_col="region_population")
     coverage = regions["population"] / regions["region_population"]
     dropped = regions[coverage < MIN_FRACTION_POPULATION_COVERED]
-    if not dropped.empty:
-        log.info(
-            "food_supply_chain.regions_dropped_for_low_coverage",
-            region_years={r: sorted(g["year"].astype(int)) for r, g in dropped.groupby("country")},
-        )
+    assert set(dropped["country"]) == REGIONS_WITH_LOW_COVERAGE, (
+        f"Regions dropped for low coverage changed: {sorted(set(dropped['country']))}. Update the docstring."
+    )
     keep = ~tb.set_index(["country", "year"]).index.isin(dropped.set_index(["country", "year"]).index)
     return tb[keep].reset_index(drop=True)
 
@@ -488,7 +486,6 @@ def sanity_check_densities(tb: Table, nutrient: str) -> None:
     mass = (tb["production"] + tb["imports"]).abs()
     provenance = mass.groupby(tb["density_source"]).sum()
     provenance = (100 * provenance / provenance.sum()).round(2)
-    log.info(f"food_supply_chain_scl.{nutrient}_density_provenance_pct_of_supply", **provenance.to_dict())
     # In SCL, staples such as paddy rice and sugar cane are only eaten after processing, so a large share of supply
     # legitimately uses median or product-implied densities rather than a direct one.
     assert provenance.get("none", 0) == 0, "Some supply has no density."
@@ -571,12 +568,6 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
         .astype(float)
     )
     deviation = (world["food"] - fao_total).dropna() / fao_total
-    log.info(
-        f"food_supply_chain_scl.{nutrient}_food_vs_fao_total",
-        max_deviation_pct=round(100 * deviation.abs().max(), 2),
-        latest_year=int(deviation.index.max()),
-        latest_deviation_pct=round(100 * deviation[deviation.index.max()], 2),
-    )
     assert deviation.abs().max() < 0.05, (
         f"World food {nutrient} deviates from FAO's total by up to {100 * deviation.abs().max():.1f}%."
     )

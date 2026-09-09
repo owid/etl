@@ -23,14 +23,12 @@ import json
 from pathlib import Path
 
 from owid.catalog import s3_utils
-from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl import config
 from etl.helpers import PathFinder
 from etl.paths import VIZ_DIR
 
-log = get_logger()
 paths = PathFinder(__file__)
 
 # Public S3 bucket and prefix.
@@ -111,7 +109,6 @@ def run() -> None:
         "stages": [{"key": key, "name": name, "direction": direction} for key, name, direction in STAGES],
         "dimensions": {"entities": [{"id": entity_to_id[name], "name": name} for name in entities]},
     }
-    log.info("food_supply_chain.write_metadata", method=METHODS[short_name], n_entities=len(entities))
     _save_and_upload(metadata, f"{FILE_SLUG}.metadata.json")
 
     #
