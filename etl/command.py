@@ -404,12 +404,25 @@ def _modified_steps(
 
     # Narrow to those also matching the explicit STEPS arguments.
     if includes:
-        # Data steps come back scheme-less (`garden/foo/bar`), so a full URI include (`data://garden/foo/bar`)
-        # is matched on its path; viz/export includes keep working as substrings of their full URI.
-        patterns = [re.compile(p.split("://", 1)[-1]) for p in includes]
+        # Data and snapshot steps come back scheme-less (`garden/foo/bar`), so a full URI include
+        # (`data://garden/foo/bar`) is matched on its path. Viz and export steps keep their full URI, and so
+        # do their includes: `viz://explorer` must not become the bare `explorer`, which would also match
+        # data paths such as `explorers/wb/latest/world_bank_pip`.
+        patterns = [re.compile(_strip_data_scheme(p)) for p in includes]
         changed_paths = [p for p in changed_paths if any(pat.search(p) for pat in patterns)]
 
     return changed_paths
+
+
+# The schemes `get_all_changed_catalog_paths` strips from changed steps; viz:// and export:// are kept.
+_DATA_SCHEMES = ("data://", "data-private://", "snapshot://", "snapshot-private://")
+
+
+def _strip_data_scheme(include: str) -> str:
+    for scheme in _DATA_SCHEMES:
+        if include.startswith(scheme):
+            return include[len(scheme) :]
+    return include
 
 
 def _find_closest_matches(includes_str: str, dag: DAG) -> None:

@@ -384,7 +384,11 @@ def test_modified_steps_matches_full_uri_includes(monkeypatch):
     """Changed data steps come back scheme-less, so `etlr data://garden/... --modified` must still match them."""
     import etl.io
 
-    changed = ["garden/happiness/2023-01-01/happiness", "viz://chart/happiness/latest/happiness"]
+    changed = [
+        "garden/happiness/2023-01-01/happiness",
+        "explorers/happiness/latest/happiness",
+        "viz://chart/happiness/latest/happiness",
+    ]
     monkeypatch.setattr(etl.io, "get_all_changed_catalog_paths", lambda files_changed, include_export: changed)
 
     assert cmd._modified_steps(includes=["data://garden/happiness/2023-01-01/happiness"], files_changed={}) == [
@@ -393,5 +397,8 @@ def test_modified_steps_matches_full_uri_includes(monkeypatch):
     assert cmd._modified_steps(includes=["viz://chart/happiness"], files_changed={}) == [
         "viz://chart/happiness/latest/happiness"
     ]
-    # Plain patterns keep working, and match both kinds.
+    # A viz:// include keeps its scheme: `viz://explorer` must not turn into the bare `explorer` and match
+    # the `explorers/...` data step (ops selects the mdim pass with `viz://chart viz://explorer --modified`).
+    assert cmd._modified_steps(includes=["viz://explorer"], files_changed={}) == []
+    # Plain patterns keep working, and match every kind.
     assert cmd._modified_steps(includes=["happiness"], files_changed={}) == changed
