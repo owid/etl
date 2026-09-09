@@ -355,9 +355,31 @@ def test_snapshot_license_lives_under_origin():
 # that line resolves `presentation.attribution`, else each origin's `attribution` or its
 # `producer (year)` fallback, plus the legacy `source.name`. `attribution_short` is the
 # space-constrained form of the same credit, and `source.published_by` the legacy equivalent.
-_FOOTER_ORIGIN_FIELDS = ("attribution", "attribution_short", "producer")
-_FOOTER_SOURCE_FIELDS = ("name", "published_by")
+#
+# Grapher joins the footer's own fragments with a spaced en dash too
+# (`f"{attribution} – {phrase} by {OWID_ATTRIBUTION}"`), so a hyphen here renders next to real
+# en dashes in the same line.
+_FOOTER_FIELDS = ("attribution", "attribution_short", "producer", "published_by")
 _HYPHEN_SEPARATOR_RE = re.compile(r"[A-Za-z0-9)\]] - [A-Za-z0-9]")
+
+
+def _footer_field_violations(node, path=""):
+    """Yield `(dotted path, value)` for every footer field holding a hyphen separator.
+
+    Walks the parsed document rather than matching field names at fixed depths: these fields
+    appear under `meta.origin`, `meta.source`, a `definitions:` block, and per-variable
+    `presentation:` blocks, in both `.dvc` and `.meta.yml` / `.meta.override.yml` files.
+    """
+    if isinstance(node, dict):
+        for key, value in node.items():
+            here = f"{path}.{key}" if path else str(key)
+            if key in _FOOTER_FIELDS and isinstance(value, str) and _HYPHEN_SEPARATOR_RE.search(value):
+                yield here, value
+            else:
+                yield from _footer_field_violations(value, here)
+    elif isinstance(node, list):
+        for i, value in enumerate(node):
+            yield from _footer_field_violations(value, f"{path}[{i}]")
 
 
 def test_chart_footer_fields_use_en_dash():
@@ -368,30 +390,43 @@ def test_chart_footer_fields_use_en_dash():
     uses the indicator. See the "Short citations for charts" section of the Writing and Style
     Guide.
 
+    Covers snapshot `.dvc` files and the garden/grapher `.meta.yml` files that can override them:
+    `presentation.attribution` wins over the origin, so checking only snapshots would miss the
+    highest-priority field. fasttrack and backport are included here (unlike the schema tests
+    above) because their attributions render on charts like any other.
+
     `citation_full` is deliberately NOT checked. It follows the producer's requested citation,
     where a hyphen can legitimately belong to a proper name or a verbatim publication title
     (`UNICEF Office of Research - Innocenti`), so it cannot be checked mechanically. Nor are
     `title` / `title_snapshot`, which carry published titles whose own subtitles use a dash.
-
-    fasttrack and backport snapshots are auto-generated and excluded, as in the tests above.
     """
     violations = []
-    for meta_file_path in Path(SNAPSHOTS_DIR).glob("**/*.dvc"):
-        rel = str(meta_file_path.relative_to(SNAPSHOTS_DIR))
-        if "fasttrack/" in rel or "backport/" in rel:
+    targets = list(Path(SNAPSHOTS_DIR).glob("**/*.dvc"))
+    targets += Path(STEP_DIR).glob("data/**/*.meta.yml")
+    targets += Path(STEP_DIR).glob("data/**/*.meta.override.yml")
+
+    for meta_file_path in targets:
+        text = meta_file_path.read_text()
+        # Fast prefilter: skip files that mention none of the fields.
+        if not any(f"{field}:" in text for field in _FOOTER_FIELDS):
+            continue
+        try:
+            doc = yaml.safe_load(text)
+        except yaml.YAMLError:
+            # Jinja-templated metadata that isn't valid YAML on its own is out of scope here;
+            # the schema tests above are what police file validity.
             continue
 
-        meta = (yaml.safe_load(meta_file_path.read_text()) or {}).get("meta") or {}
-        for section, fields in (("origin", _FOOTER_ORIGIN_FIELDS), ("source", _FOOTER_SOURCE_FIELDS)):
-            block = meta.get(section) or {}
-            for field in fields:
-                value = block.get(field)
-                if isinstance(value, str) and _HYPHEN_SEPARATOR_RE.search(value):
-                    violations.append(f"{rel} [{section}.{field}]: {value}")
+        try:
+            rel = str(meta_file_path.relative_to(SNAPSHOTS_DIR))
+        except ValueError:
+            rel = str(meta_file_path.relative_to(STEP_DIR))
+        for field_path, value in _footer_field_violations(doc):
+            violations.append(f"{rel} [{field_path}]: {value}")
 
     assert not violations, (
-        "These snapshots use a hyphen in a field that renders at the bottom of a chart. Use a "
-        "spaced en dash (–):\n  " + "\n  ".join(sorted(violations))
+        "These files use a hyphen in a field that renders at the bottom of a chart. Use a spaced "
+        "en dash (–):\n  " + "\n  ".join(sorted(violations))
     )
 
 
