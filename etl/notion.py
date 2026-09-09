@@ -7,7 +7,7 @@ import pandas as pd
 import requests
 from structlog import get_logger
 
-from etl.config import NOTION_API_KEY, NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL, NOTION_IMPACT_HIGHLIGHTS_TABLE_URL
+from etl.config import NOTION_API_KEY, NOTION_DATA_PRODUCERS_CONTACTS_TABLE_URL, NOTION_IMPACT_HIGHLIGHTS_TABLE_URL
 
 # Initialize log.
 log = get_logger()
@@ -239,7 +239,7 @@ def get_impact_highlights(
     df: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     # Name of column of related data producers.
-    producer_col = "Data provider(s) related"
+    producer_col = "Data producer(s) related"
     # Name of column containing the date.
     if df is None:
         df = get_notion_table_period(min_date=min_date, max_date=max_date, max_rows=max_rows)
@@ -256,8 +256,8 @@ def get_impact_highlights(
 
 
 def get_data_producer_contacts(producers: list[str] | None = None) -> pd.DataFrame:
-    # Fetch data providers contacts table from Notion.
-    df = get_table_from_notion_url(notion_url=NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL)  # ty: ignore
+    # Fetch data producers contacts table from Notion.
+    df = get_table_from_notion_url(notion_url=NOTION_DATA_PRODUCERS_CONTACTS_TABLE_URL)  # ty: ignore
 
     if producers is not None:
         # Select relevant producers.

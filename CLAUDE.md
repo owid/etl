@@ -259,7 +259,7 @@ def run() -> None:
 
 ### Correcting known upstream data errors (`.corrections.yml`)
 
-For a known *source* error we patch locally until the provider fixes it, don't inline `.loc[...]`/`.drop(...)` — declare it in a `<short_name>.corrections.yml` next to the step and apply with `tb = paths.apply_corrections(tb)`. See `etl/data_corrections.py` for the format; `etl corrections -o /tmp/c.html --charts` inventories and visualises them all. For enumerated provider point-errors only — systematic recoding *rules* and aggregation stay in step code.
+For a known *source* error we patch locally until the producer fixes it, don't inline `.loc[...]`/`.drop(...)` — declare it in a `<short_name>.corrections.yml` next to the step and apply with `tb = paths.apply_corrections(tb)`. See `etl/data_corrections.py` for the format; `etl corrections -o /tmp/c.html --charts` inventories and visualises them all. For enumerated producer point-errors only — systematic recoding *rules* and aggregation stay in step code.
 
 ### HTTP calls to OWID infra
 
@@ -271,7 +271,7 @@ from etl.http import HEADERS                   # for httpx.AsyncClient(headers=H
 from etl.http import STORAGE_OPTIONS           # for pd.read_csv(url, storage_options=STORAGE_OPTIONS)
 ```
 
-Don't tag calls to third-party hosts (GitHub, Notion, Slack, source-data providers in `snapshots/`, etc.) — they should keep the default UA.
+Don't tag calls to third-party hosts (GitHub, Notion, Slack, data producers in `snapshots/`, etc.) — they should keep the default UA.
 
 ### YAML Editing (preserve comments)
 ```python

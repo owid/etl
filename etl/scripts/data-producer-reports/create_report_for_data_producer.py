@@ -337,8 +337,8 @@ class Report:
         self.min_date = f"{year}-{PERIODS[period]['min_date']}"
         self.max_date = f"{year}-{PERIODS[period]['max_date']}"
 
-        # Determine the period subfolder name, e.g. "Y-2025 Data provider reports"
-        self.subfolder_name = f"{period}-{year} Data provider reports"
+        # Determine the period subfolder name, e.g. "Y-2025 Data producer reports"
+        self.subfolder_name = f"{period}-{year} Data producer reports"
 
         # Check if this report already exists in Google Drive
         google_drive = GoogleDrive()
@@ -351,7 +351,7 @@ class Report:
         self.doc_id: str | None = None
         self.pdf_id: str | None = None
 
-        # Data provider emails, that will be granted reading permissions to access the pdf reports.
+        # Data producer emails, that will be granted reading permissions to access the pdf reports.
         # NOTE: They will be fetched by gather_emails()
         self.emails: list[str] | None = None
 
@@ -718,7 +718,7 @@ class Report:
         return links
 
     def gather_emails(self) -> None:
-        # Try to fetch data provider contacts from Notion table using all producer names
+        # Try to fetch data producer contacts from Notion table using all producer names
         df = get_data_producer_contacts(producers=self.all_producer_names)
 
         if len(df) >= 1:
@@ -740,11 +740,11 @@ class Report:
         if emails:
             self.emails = emails
         else:
-            log.warning("Could not find contact emails for this data provider in the Notion contacts page.")
+            log.warning("Could not find contact emails for this data producer in the Notion contacts page.")
             self.emails = None
 
     def change_file_permissions(self) -> None:
-        # Add data providers emails with commenter permissions.
+        # Add data producers emails with commenter permissions.
         if self.emails is not None:
             GoogleDrive().set_file_permissions(
                 file_id=self.pdf_id,  # ty: ignore
@@ -779,14 +779,14 @@ class Report:
         # Gather contact emails (with whom reports will be shared).
         self.gather_emails()
 
-        # Change file permissions, to include data providers emails.
+        # Change file permissions, to include data producers emails.
         if grant_permissions:
             self.change_file_permissions()
 
 
 def print_impact_highlights(highlights: pd.DataFrame) -> None:
     # TODO:
-    # * Consider creating another column in the highlights table, that contains the description to be shared with the data provider.
+    # * Consider creating another column in the highlights table, that contains the description to be shared with the data producer.
     # * Then, here, filter for only those selected highlights where that column is not empty.
     # * Adapt GDoc template to include those highlights, if any.
     # * It might be useful to create a function that writes to GDoc with embedded hyperlinks.
@@ -831,7 +831,7 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
 @click.option(
     "--grant-permissions/--no-grant-permissions",
     default=False,
-    help="Grant permissions to data providers to access PDF file.",
+    help="Grant permissions to data producers to access PDF file.",
 )
 def run(producer, aliases, period, year, overwrite_pdf, grant_permissions):
     # First check if all required definitions of Google Drive, Doc and Sheet IDs are in place.
@@ -862,7 +862,7 @@ def run(producer, aliases, period, year, overwrite_pdf, grant_permissions):
                 log.warning("PDF already exists and overwrite_pdf=False. No action taken.")
 
             if grant_permissions:
-                # Gather data provider emails and grant read access to already existing PDF.
+                # Gather data producer emails and grant read access to already existing PDF.
                 report.gather_emails()
                 report.change_file_permissions()
 

@@ -1,6 +1,6 @@
 YEAR: 2026
 PERIOD: "H1"
-PROVIDERS:
+PRODUCERS:
   - name: "Uppsala Conflict Data Program"
     alias:
       - "Uppsala Conflict Data Program and Peace Research Institute Oslo"

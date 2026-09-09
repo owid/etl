@@ -1,4 +1,4 @@
-"""Run create_report_for_data_producer for all providers listed in providers.yml."""
+"""Run create_report_for_data_producer for all producers listed in producers.yml."""
 
 import sys
 from pathlib import Path
@@ -20,11 +20,11 @@ from etl.notion import get_notion_table_period
 
 log = get_logger()
 
-PROVIDERS_FILE = Path(__file__).parent / "providers.yml"
+PRODUCERS_FILE = Path(__file__).parent / "producers.yml"
 
 
 def _get_aliases(entry: dict) -> list[str]:
-    """Normalize a providers.yml entry's "alias" field (missing, a string, or a list) to a list."""
+    """Normalize a producers.yml entry's "alias" field (missing, a string, or a list) to a list."""
     raw_alias = entry.get("alias")
     if isinstance(raw_alias, list):
         return raw_alias
@@ -47,15 +47,15 @@ def _get_aliases(entry: dict) -> list[str]:
     "--update-pdfs",
     is_flag=True,
     default=False,
-    help="Don't create any new reports - for every provider that already has a Google Doc, just re-export its "
+    help="Don't create any new reports - for every producer that already has a Google Doc, just re-export its "
     "current content to PDF, overwriting the existing PDF. Producers with no existing Google Doc are skipped. "
     "Ignores --force.",
 )
 def main(force: bool, update_pdfs: bool) -> None:
-    config = yaml.safe_load(PROVIDERS_FILE.read_text())
+    config = yaml.safe_load(PRODUCERS_FILE.read_text())
     year: int = int(config["YEAR"])
     period: str = config["PERIOD"]
-    providers: list[dict] = config["PROVIDERS"]
+    producers: list[dict] = config["PRODUCERS"]
 
     for drive_id in [
         DATA_PRODUCER_REPORT_FOLDER_ID,
@@ -66,9 +66,9 @@ def main(force: bool, update_pdfs: bool) -> None:
         assert drive_id != "", error
 
     if update_pdfs:
-        log.info(f"Updating PDFs for {len(providers)} providers — {period} {year}")
+        log.info(f"Updating PDFs for {len(producers)} producers — {period} {year}")
         failed_producers: list[str] = []
-        for entry in providers:
+        for entry in producers:
             producer: str = entry["name"]
             aliases = _get_aliases(entry)
 
@@ -92,13 +92,13 @@ def main(force: bool, update_pdfs: bool) -> None:
         )
         if failed_producers:
             log.error(
-                f"Failed to update PDFs for {len(failed_producers)} of {len(providers)} providers: "
+                f"Failed to update PDFs for {len(failed_producers)} of {len(producers)} producers: "
                 f"{', '.join(failed_producers)}"
             )
             sys.exit(1)
         return
 
-    log.info(f"Running reports for {len(providers)} providers — {period} {year}")
+    log.info(f"Running reports for {len(producers)} producers — {period} {year}")
 
     min_date = f"{year}-{PERIODS[period]['min_date']}"
     max_date = f"{year}-{PERIODS[period]['max_date']}"
@@ -107,7 +107,7 @@ def main(force: bool, update_pdfs: bool) -> None:
     notion_table_period = get_notion_table_period(min_date=min_date, max_date=max_date)
 
     failed_producers: list[str] = []
-    for entry in providers:
+    for entry in producers:
         producer: str = entry["name"]
         aliases = _get_aliases(entry)
 
@@ -167,7 +167,7 @@ def main(force: bool, update_pdfs: bool) -> None:
 
     if failed_producers:
         log.error(
-            f"Failed to create reports for {len(failed_producers)} of {len(providers)} providers: "
+            f"Failed to create reports for {len(failed_producers)} of {len(producers)} producers: "
             f"{', '.join(failed_producers)}"
         )
         sys.exit(1)

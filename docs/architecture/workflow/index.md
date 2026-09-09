@@ -38,7 +38,7 @@ A data manager must implement all these steps to make something chartable on the
 
 ## Snapshot
 
-The initial step consists in **transferring an external file from an upstream provider into our platform**. This ensures, that the source data is always accessible. This is because the upstream provider might remove the file at any time, or change it.
+The initial step consists in **transferring an external file from an upstream producer into our platform**. This ensures, that the source data is always accessible. This is because the upstream producer might remove the file at any time, or change it.
 
 !!! info "Snapshot steps are executed with command [`etls`](../../guides/etl-cli/#etl-snapshot){data-preview}"
 
@@ -70,7 +70,7 @@ Note that we need a DVC file per upstream data file; hence, in some instances, i
 
 ### Snapshot metadata
 
-A Snapshot is a picture of a data product (e.g. a data CSV file) provided by an upstream data provider at a particular point in time. It is the entrypoint to ETL and where we define metadata attributes of that picture. This is fundamental to ensure that the data is properly documented and that the metadata is propagated to the rest of the system.
+A Snapshot is a picture of a data product (e.g. a data CSV file) provided by an upstream data producer at a particular point in time. It is the entrypoint to ETL and where we define metadata attributes of that picture. This is fundamental to ensure that the data is properly documented and that the metadata is propagated to the rest of the system.
 
 The metadata in Snapshot consists mainly of one object: `meta.origin`.
 
