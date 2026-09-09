@@ -3,7 +3,7 @@
 meta:
   origin:
     # File-specific
-    title_snapshot: Excess Deaths Model - Country data (per 100k)
+    title_snapshot: Excess Deaths Model – Country data (per 100k)
     url_download: https://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/refs/heads/main/output-data/export_country_per_100k.csv
 
     # Data product / Snapshot

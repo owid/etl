@@ -11,7 +11,7 @@ meta:
     # Citation
     producer: World Health Organization
     citation_full: |-
-      World Health Organization - Historical Polio Dataset (2019).
+      World Health Organization – Historical Polio Dataset (2019).
     attribution_short: WHO
     # Files
     url_main: https://www.who.int/news-room/fact-sheets/detail/poliomyelitis

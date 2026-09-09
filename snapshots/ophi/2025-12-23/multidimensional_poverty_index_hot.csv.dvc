@@ -12,7 +12,7 @@ meta:
       This makes the MPI and its linked information platform invaluable as an analytical tool to identify the most vulnerable people – the poorest among the poor, revealing poverty patterns within countries and over time, enabling policy makers to target resources and design policies more effectively.
 
       The global MPI was developed by OPHI with the UN Development Programme (UNDP) for inclusion in UNDP’s flagship Human Development Report in 2010. It has been published annually by OPHI and in the HDRs ever since.
-    title_snapshot: Global Multidimensional Poverty Index (MPI) - Harmonized over time (HOT)
+    title_snapshot: Global Multidimensional Poverty Index (MPI) – Harmonized over time (HOT)
     description_snapshot: |-
       This dataset contains harmonized over time (HOT) estimates. This harmonization seeks to make two or more MPI estimations comparable by aligning the indicator definitions in each survey.
     citation_full: |-

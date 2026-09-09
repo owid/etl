@@ -4,7 +4,7 @@ meta:
     title: Penn World Table
     description: |-
       PWT version 11.0 is a database with information on relative levels of income, output, input and productivity, covering 185 countries between 1950 and 2023.
-    title_snapshot: Penn World Table - National Accounts
+    title_snapshot: Penn World Table – National Accounts
     description_snapshot: |-
       National Accounts data in current and constant national prices and exchange rate and population data for Penn World Table.
     citation_full: |-

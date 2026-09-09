@@ -2,9 +2,9 @@ meta:
   origin:
     producer: Met Office Hadley Centre
     title: Hadley Centre's Sea Surface Temperature (HadSST)
-    title_snapshot: Hadley Centre's Sea Surface Temperature (HadSST) - Northern hemisphere
+    title_snapshot: Hadley Centre's Sea Surface Temperature (HadSST) – Northern hemisphere
     citation_full: |-
-      Met Office Hadley Centre - Hadley Centre's Sea Surface Temperature (HadSST).
+      Met Office Hadley Centre – Hadley Centre's Sea Surface Temperature (HadSST).
 
       Kennedy, J. J., Rayner, N. A., Atkinson, C. P., & Killick, R.
       E. (2019). An ensemble data set of sea-surface temperature change from 1850:

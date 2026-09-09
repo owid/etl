@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: US Census Bureau
-    title: Health Insurance Coverage in the US - Current Population Survey
+    title: Health Insurance Coverage in the US – Current Population Survey
     description: |-
       Health Insurance plans are not mutually exclusive – individuals may be simultaneously covered by private and government programs.
 

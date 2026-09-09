@@ -15,7 +15,7 @@ meta:
       Ember - Yearly Electricity Data (2023).
 
       The data is collected from multi-country datasets (EIA, Eurostat, BP, UN) as well as national sources (e.g China data from the National Bureau of Statistics).
-    attribution: Ember – Yearly Electricity Data (2023)
+    attribution: Ember - Yearly Electricity Data (2023)
     attribution_short: Ember
 
     # Files

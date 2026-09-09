@@ -5,7 +5,7 @@ meta:
     description: |-
       The World Mineral Statistics dataset is a compilation of production and trade statistics on a wide range of mineral commodities since 1913.
       However, data prior to 1960 is only available a scanned PDF books, whose content, currently, cannot successfully be extracted programmatically.
-    title_snapshot: World Mineral Statistics - 1970 onwards
+    title_snapshot: World Mineral Statistics – 1970 onwards
     description_snapshot: |-
       This is a compilation of all the data that is accessible via the BGS web interface, containing imports, exports and production of minerals by country from 1970 onwards.
     citation_full: |-

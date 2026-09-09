@@ -2,7 +2,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: OECD Family Database - Children in Families
+    title: OECD Family Database – Children in Families
     description: |-
       Data on share of children living with a single parent from the OECD Family Database. Note that the Excel files are badly formatted. The OECD Family Database provides cross-national indicators on family outcomes and family policies across the OECD countries, its enhanced engagement partners and EU member states.
     date_published: '2025-09-03'

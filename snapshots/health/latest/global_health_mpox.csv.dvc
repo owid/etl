@@ -5,7 +5,7 @@
 meta:
   origin:
     producer: Global.health
-    title: Mpox - 2024
+    title: Mpox – 2024
     citation_full: Global.health Mpox (accessed on 2024-09-02)
     url_main: https://global.health/
     # url_download no longer accessible (403 Access Denied as of 2026-06-01); source discontinued.

@@ -4,7 +4,7 @@ meta:
     title: Environmental Data Explorer
     description: |-
       The UNEP Environmental Data Explorer is the authoritative source for data sets used by the United Nations Environment Programme and its partners in the Global Environment Outlook (GEO) report and other integrated environment assessments. Its online database holds national, sub-regional, regional and global statistics and geospatial data sets, covering themes like freshwater, population, forests, emissions, climate, disasters, health and GDP.
-    title_snapshot: Environmental Data Explorer - Waste production and management
+    title_snapshot: Environmental Data Explorer – Waste production and management
     description_snapshot: |-
       This snapshot bundles six waste-related indicators from UNEP's Environmental Data Explorer. Each indicator is described below, preserving the originator, abstract, and temporal/geographic extent recorded in the source.
 

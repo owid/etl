@@ -4,7 +4,7 @@ meta:
     title: Treaties Database
     description: |-
       Since 1978, the United Nations has been publishing the status of multilateral Arms Regulation and Disarmament Agreements, presenting data on signatories, parties of relevant agreements and the texts of the agreements themselves.
-    title_snapshot: Treaties Database - Comprehensive Nuclear Test Ban Treaty
+    title_snapshot: Treaties Database – Comprehensive Nuclear Test Ban Treaty
     description_snapshot: This dataset contains the list of countries that have participated in the Comprehensive Nuclear-Test-Ban Treaty.
     citation_full: United Nations Office for Disarmament Affairs – Treaties Database (2024).
     attribution_short: UNODA

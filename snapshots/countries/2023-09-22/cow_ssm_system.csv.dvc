@@ -12,7 +12,7 @@ meta:
       Find more information in [their codebook](https://correlatesofwar.org/wp-content/uploads/State-System-Membership-Codebook-V2016.pdf)
     date_published: 2017-02-20
     version_producer: v2016
-    title_snapshot: State System Membership - System
+    title_snapshot: State System Membership – System
     description_snapshot: |-
       Gives the composition of the state system year by year (providing a blank country-year dataset).
 

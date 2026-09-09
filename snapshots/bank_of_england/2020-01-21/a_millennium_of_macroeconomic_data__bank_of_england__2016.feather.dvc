@@ -2,7 +2,7 @@ meta:
   origin:
     producer: Bank of England
     title: A Millennium of Macroeconomic Data
-    title_snapshot: A Millennium of Macroeconomic Data - Headline annual composite series and real GDP per capita
+    title_snapshot: A Millennium of Macroeconomic Data – Headline annual composite series and real GDP per capita
     description_snapshot: |-
       This dataset consists of all the variables from the Headline Annual Composite Series and real GDP per capita taken from the "Summary of Population and GDP per capita 1086-2016" worksheet available from the Bank of England's "A Millennium of Macroeconomic Data".
     citation_full: Bank of England (2016). A Millennium of Macroeconomic Data.

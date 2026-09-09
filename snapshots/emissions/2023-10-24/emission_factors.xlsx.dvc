@@ -14,7 +14,7 @@ meta:
       The Intergovernmental Panel on Climate Change (IPCC) Emission Factor Database (EFDB) contains default data from IPCC Guidelines and data from other sources (e.g., peer-reviewed papers) with background information.
 
       The data extracted from the IPCC EFDB comes from the 2006 IPCC Guidelines for National Greenhouse Gas Inventories, 1A, Sheet 1 of 4 (page A1.6) in Annex 1 of Volume 2.
-    attribution: IPCC – Emission Factor Database (2023)
+    attribution: IPCC - Emission Factor Database (2023)
     attribution_short: IPCC
 
     # Files

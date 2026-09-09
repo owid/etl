@@ -4,7 +4,7 @@ meta:
     title: Health Nutrition and Population Statistics
     description: |-
       The World Bank's Health Nutrition and Population Statistics database brings together key health, nutrition, and population indicators compiled from a range of national and international sources, including demographic and health surveys, multiple indicator cluster surveys, and country statistical agencies.
-    title_snapshot: Health Nutrition and Population Statistics - Postnatal care coverage (% of mothers)
+    title_snapshot: Health Nutrition and Population Statistics – Postnatal care coverage (% of mothers)
     description_snapshot: |-
       Percentage of women with a postnatal checkup in the first two days after birth.
     citation_full: World Bank (2022). Health Nutrition and Population Statistics – Postnatal care coverage (% of mothers) [SH.STA.PNVC.ZS].
