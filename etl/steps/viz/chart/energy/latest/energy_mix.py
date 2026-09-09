@@ -102,8 +102,8 @@ def run() -> None:
         "chartTypes": ["LineChart", "DiscreteBar", "Dumbbell", "SlopeChart"],
     }
 
-    c = paths.create_collection(
-        config=paths.load_collection_config(),
+    c = paths.create_chart(
+        config=paths.load_config(),
         tb=tb,
         indicator_names=["energy"],
         dimensions=["source", "metric"],
@@ -274,7 +274,7 @@ def _decomposition_title(source: str, base_metric: str) -> str:
 
 
 # Fields that the views built here have to repeat, because they are assembled after
-# create_collection and so do not inherit `definitions.common_views` from the config.yml.
+# create_chart and so do not inherit `definitions.common_views` from the config.yml.
 # Keep in sync with that block.
 COMMON_VIEW_EXTRAS = {
     "originUrl": "https://ourworldindata.org/energy",

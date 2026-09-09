@@ -1,7 +1,7 @@
 """Tests for etl.viz.chart.core.expand module.
 
 This module tests the expand_config function and related functionality
-used to automatically generate collection configurations from multi-dimensional data.
+used to automatically generate chart configurations from multi-dimensional data.
 """
 
 import pytest
@@ -299,25 +299,25 @@ class TestExpandConfig:
             expand_config(tb)
 
 
-class TestCollectionConfigExpander:
-    """Test suite for CollectionConfigExpander class methods."""
+class TestChartConfigExpander:
+    """Test suite for ChartConfigExpander class methods."""
 
     def test_dimension_names_property(self):
         """Test dimension_names property returns correct dimension columns."""
-        from etl.viz.chart.core.expand import CollectionConfigExpander
+        from etl.viz.chart.core.expand import ChartConfigExpander
 
         tb = create_test_table()
-        expander = CollectionConfigExpander(tb, "indicator", "deaths")
+        expander = ChartConfigExpander(tb, "indicator", "deaths")
 
         # Should return dimensions excluding short_name
         assert expander.dimension_names == ["sex"]
 
     def test_table_properties(self):
         """Test table name and dataset properties."""
-        from etl.viz.chart.core.expand import CollectionConfigExpander
+        from etl.viz.chart.core.expand import ChartConfigExpander
 
         tb = create_table_with_metadata()
-        expander = CollectionConfigExpander(tb, "indicator", "deaths")
+        expander = ChartConfigExpander(tb, "indicator", "deaths")
 
         assert expander.table_name == "test_table"
         assert expander.dataset_name == "test_dataset"

@@ -33,18 +33,18 @@
         },
         "catalog_path": {
             "type": "string",
-            "title": "Collection catalog path",
-            "description": "Unique identifier for the collection in the format 'namespace/version/dataset#name'.",
+            "title": "Chart catalog path",
+            "description": "Unique identifier for the chart in the format 'namespace/version/dataset#name'.",
             "requirement_level": "required",
             "guidelines": [
                 [
                     "Must follow the pattern 'namespace/version/dataset#name'."
                 ],
                 [
-                    "Must be unique across all collections."
+                    "Must be unique across all charts."
                 ],
                 [
-                    "Should use descriptive names that identify the collection's purpose."
+                    "Should use descriptive names that identify the chart's purpose."
                 ]
             ],
             "examples": [
@@ -67,7 +67,7 @@
             "type": "string",
             "pattern": "^(\\d{3}|https://files\\.ourworldindata\\.org/schemas/grapher-schema\\.\\d{3}\\.json)$",
             "title": "Grapher config schema version",
-            "description": "Version of the OWID Grapher chart-config schema that this collection's view configs were authored against. Grapher uses it as the `$schema` of every view config, and migrates outdated configs forward to the current version.",
+            "description": "Version of the OWID Grapher chart-config schema that this chart's view configs were authored against. Grapher uses it as the `$schema` of every view config, and migrates outdated configs forward to the current version.",
             "requirement_level": "required",
             "guidelines": [
                 [
@@ -107,12 +107,12 @@
         },
         "title": {
             "type": "object",
-            "title": "Collection title",
-            "description": "Title configuration for the collection display. Required for multidim collections (with non-empty `dimensions`); ignored for single-chart collections (with `dimensions: []`).",
+            "title": "Chart title",
+            "description": "Title configuration for the chart display. Required for MDIMs (with non-empty `dimensions`); ignored for single charts (with `dimensions: []`).",
             "requirement_level": "conditional",
             "guidelines": [
                 [
-                    "Required when the collection has at least one dimension."
+                    "Required when the chart has at least one dimension."
                 ],
                 [
                     "`title_variant` is optional and may be omitted."
@@ -128,7 +128,7 @@
                 "title": {
                     "type": "string",
                     "title": "Main title",
-                    "description": "Primary title displayed for the collection.",
+                    "description": "Primary title displayed for the chart.",
                     "requirement_level": "required",
                     "guidelines": [
                         [
@@ -141,7 +141,7 @@
                             "Should be concise but descriptive."
                         ],
                         [
-                            "Should clearly indicate the collection's purpose."
+                            "Should clearly indicate the chart's purpose."
                         ]
                     ],
                     "examples": [
@@ -191,7 +191,7 @@
         "default_selection": {
             "type": "array",
             "title": "Default entity selection",
-            "description": "List of entity names (e.g., countries) selected by default when the collection loads. Conditional: required for multidim collections with at least one view that has chart tabs (line/bar/scatter/etc.) and no per-view `selectedEntityNames` fallback. Optional for single-chart collections (`dimensions: []`) and map-only mdims.",
+            "description": "List of entity names (e.g., countries) selected by default when the chart loads. Conditional: required for MDIMs with at least one view that has chart tabs (line/bar/scatter/etc.) and no per-view `selectedEntityNames` fallback. Optional for single charts (`dimensions: []`) and map-only mdims.",
             "requirement_level": "conditional",
             "guidelines": [
                 [
@@ -274,8 +274,8 @@
         },
         "dependencies": {
             "type": "array",
-            "title": "Collection dependencies",
-            "description": "List of dataset URIs that this collection depends on for its indicators.",
+            "title": "Chart dependencies",
+            "description": "List of dataset URIs that this chart depends on for its indicators.",
             "requirement_level": "optional",
             "guidelines": [
                 [
@@ -288,7 +288,7 @@
                     "Can optionally include protocol prefixes like 'data://garden/namespace/version/dataset'."
                 ],
                 [
-                    "Dependencies are automatically resolved during collection creation if not explicitly provided."
+                    "Dependencies are automatically resolved during chart creation if not explicitly provided."
                 ]
             ],
             "items": {
@@ -318,7 +318,7 @@
             "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
             "guidelines": [
                 [
-                    "Only valid on single-chart collections (`dimensions: []`); multi-dimensional collections are identified by their catalog path."
+                    "Only valid on single charts (`dimensions: []`); MDIMs are identified by their catalog path."
                 ],
                 [
                     "When bringing an existing chart into ETL, use that chart's `charts.configId` so the config lands on the existing chart instead of creating a new one."
@@ -348,7 +348,7 @@
         "topic_tags": {
             "type": "array",
             "title": "Topic tags",
-            "description": "List of topic categories that this collection relates to.",
+            "description": "List of topic categories that this chart relates to.",
             "requirement_level": "optional",
             "guidelines": [
                 [
@@ -387,14 +387,14 @@
         "download_package": {
             "type": "object",
             "title": "Complete-dataset download package",
-            "description": "Where the pre-built \"download the complete dataset\" package for this collection was published. Not authored by hand: Collection.save() builds the package, uploads it to R2, and fills this in. Absent when no package was built.",
+            "description": "Where the pre-built \"download the complete dataset\" package for this chart was published. Not authored by hand: Chart.save() builds the package, uploads it to R2, and fills this in. Absent when no package was built.",
             "requirement_level": "optional",
             "guidelines": [
                 [
                     "Never set this by hand -- it records the output of a build, and a stale value points readers at an object that no longer matches the data."
                 ],
                 [
-                    "Pass `download_package=False` to `Collection.save()` to publish a collection without a package."
+                    "Pass `download_package=False` to `Chart.save()` to publish a chart without a package."
                 ]
             ],
             "additionalProperties": false,
@@ -435,18 +435,18 @@
         },
         "dimensions": {
             "type": "array",
-            "title": "Collection dimensions",
-            "description": "Array of dimension objects that define the filter dropdowns available to users. An empty array (and a single view) means the collection is pushed as a regular Grapher chart instead of a multi-dim page.",
+            "title": "Chart dimensions",
+            "description": "Array of dimension objects that define the filter dropdowns available to users. An empty array (and a single view) means the chart is pushed as a regular Grapher chart instead of a multi-dim page.",
             "requirement_level": "required",
             "guidelines": [
                 [
-                    "Can be empty when the collection is a single chart (no dimension dropdowns)."
+                    "Can be empty for a single chart (no dimension dropdowns)."
                 ],
                 [
                     "Each dimension creates a dropdown filter in the user interface."
                 ],
                 [
-                    "Dimension slugs must be unique within the collection."
+                    "Dimension slugs must be unique within the chart."
                 ],
                 [
                     "Should be ordered by importance or logical flow."
@@ -460,11 +460,11 @@
                     "slug": {
                         "$ref": "definitions.json#/slug_relaxed",
                         "title": "Dimension slug",
-                        "description": "Unique identifier for the dimension within the collection.",
+                        "description": "Unique identifier for the dimension within the chart.",
                         "requirement_level": "required",
                         "guidelines": [
                             [
-                                "Must be unique within the collection."
+                                "Must be unique within the chart."
                             ],
                             [
                                 "Should use snake_case format."
@@ -633,7 +633,7 @@
         },
         "views": {
             "type": "array",
-            "title": "Collection views",
+            "title": "Chart views",
             "description": "Array of view configurations that define specific chart instances.",
             "requirement_level": "required",
             "guidelines": [
@@ -650,7 +650,7 @@
             "items": {
                 "type": "object",
                 "title": "View configuration",
-                "description": "Configuration for a specific view within the collection.",
+                "description": "Configuration for a specific view within the chart.",
                 "additionalProperties": false,
                 "properties": {
                     "dimensions": {
@@ -660,13 +660,13 @@
                         "requirement_level": "required",
                         "guidelines": [
                             [
-                                "Keys must match dimension slugs defined in the collection."
+                                "Keys must match dimension slugs defined in the chart."
                             ],
                             [
                                 "Values must match choice slugs within the corresponding dimension."
                             ],
                             [
-                                "Must specify a choice for each dimension in the collection."
+                                "Must specify a choice for each dimension in the chart."
                             ]
                         ],
                         "examples": [
@@ -1006,14 +1006,14 @@
                     },
                     "metadata": {
                         "title": "View metadata overrides",
-                        "description": "Metadata overrides specific to this view, taking precedence over collection-level metadata.",
+                        "description": "Metadata overrides specific to this view, taking precedence over chart-level metadata.",
                         "requirement_level": "optional",
                         "guidelines": [
                             [
-                                "Only specify metadata that differs from the collection defaults."
+                                "Only specify metadata that differs from the chart defaults."
                             ],
                             [
-                                "Takes precedence over collection-level metadata overrides."
+                                "Takes precedence over chart-level metadata overrides."
                             ],
                             [
                                 "Uses the same structure as variable metadata in datasets."
@@ -1025,12 +1025,12 @@
             }
         },
         "metadata": {
-            "title": "Collection metadata overrides",
-            "description": "Default metadata overrides applied to all views in the collection.",
+            "title": "Chart metadata overrides",
+            "description": "Default metadata overrides applied to all views in the chart.",
             "requirement_level": "optional",
             "guidelines": [
                 [
-                    "Provides default metadata for all views in the collection."
+                    "Provides default metadata for all views in the chart."
                 ],
                 [
                     "Individual view metadata can override these settings."

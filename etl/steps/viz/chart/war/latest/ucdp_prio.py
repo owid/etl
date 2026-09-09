@@ -1,4 +1,4 @@
-"""I've implemented a simple version of create_collections with support for multiple tables. We should move this somewhere so others can use, or just replace the behavior of paths.create_collection."""
+"""I've implemented a simple version of create_charts with support for multiple tables. We should move this somewhere so others can use, or just replace the behavior of paths.create_chart."""
 
 from etl.helpers import PathFinder
 
@@ -28,7 +28,7 @@ TEXT_KEY_EXTRA = "PRIO's conflict-level data cannot be neatly mapped to individu
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # load table using load_data=False which only loads metadata significantly speeds this up
     ## UCDP/PRIO
@@ -47,8 +47,8 @@ def run() -> None:
     ## UCDP
     tb_ucdp = adjust_dimensions_ucdp(tb_ucdp)
 
-    # Create collections
-    c = paths.create_collection(
+    # Create charts
+    c = paths.create_chart(
         tb=[tb_up, tb_ucdp],
         config=config,
         indicator_names=[

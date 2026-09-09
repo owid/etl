@@ -47,7 +47,7 @@ The automatic part of a sync (vendored refresh + type regeneration) is committed
 
     Every multidim config pins `grapher_schema` (see [MDIMs and Explorers](data-work/mdims.md)), which grapher applies as the `$schema` of each view config. Those pins record what the config was authored against, and that is precisely what lets grapher migrate them to the new version on upsert — bumping them would tell grapher the configs are already current and skip the migration.
 
-    A bump only repoints multidim view-config *validation* at the new version, so a config that is no longer valid under it fails `Collection.validate_schema()`. Then, and only then, fix that config and bump its own pin.
+    A bump only repoints multidim view-config *validation* at the new version, so a config that is no longer valid under it fails `Chart.validate_schema()`. Then, and only then, fix that config and bump its own pin.
 
 It can also be run ad-hoc — e.g. when the web team announces a change and you don't want to wait for the cron (the skill performs the refresh itself), or trigger the workflow manually via `workflow_dispatch`.
 
@@ -73,4 +73,4 @@ It can also be run ad-hoc — e.g. when the web team announces a change and you 
 | Embedded `grapher_config` in `dataset-schema.json` out of sync with the vendored pin | `test_grapher_config_schema_sync` in `tests/test_metadata_schemas.py` (unit, offline, enum-deep) |
 | Vendored pin stale vs live upstream (in-place mutation) | scheduled workflow → draft PR; `test_vendored_grapher_schema_is_current` (integration) |
 | Upstream publishes a new schema version | scheduled workflow → issue; `test_no_newer_grapher_schema_version` (integration) |
-| A collection config with no `grapher_schema` pin, whose meaning would then change under the next bump | `grapher_schema` in multidim-schema.json's `required` + `Collection.validate_grapher_schema_pinned()`; `test_multidim_configs_pin_grapher_schema` (unit, offline) |
+| A chart config with no `grapher_schema` pin, whose meaning would then change under the next bump | `grapher_schema` in multidim-schema.json's `required` + `Chart.validate_grapher_schema_pinned()`; `test_multidim_configs_pin_grapher_schema` (unit, offline) |

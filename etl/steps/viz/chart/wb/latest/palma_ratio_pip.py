@@ -11,7 +11,7 @@ DIMENSIONS_CONFIG = {
 
 
 def run() -> None:
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     ds = paths.load_dataset("world_bank_pip")
     tb = ds.read("inequality", load_data=False)
@@ -31,8 +31,8 @@ def run() -> None:
             survey_comp_values.add(tb[col].metadata.dimensions["survey_comparability"])
     survey_comp_spells = [v for v in survey_comp_values if v != "No spells"]
 
-    # Create collection
-    c = paths.create_collection(
+    # Create chart
+    c = paths.create_chart(
         config=config,
         short_name="palma_ratio_pip",
         tb=tb,

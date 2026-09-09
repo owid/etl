@@ -171,7 +171,7 @@ def run() -> None:
     #
     # Process data.
     #
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Define common view configuration
     common_view_config = {
@@ -190,7 +190,7 @@ def run() -> None:
 
     # Create standard line/map views
     dimensions = ["frequency", "source", "consumer", "price_component", "unit"]
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         tb=[
             tb_annual.loc[:, use_cols_annual],

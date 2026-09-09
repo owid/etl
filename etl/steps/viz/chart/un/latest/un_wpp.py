@@ -1,22 +1,22 @@
-"""This step creates the population and demography MDIM. It uses multiple tables from the UN WPP dataset and combines them into a single multi-dimensional collection.
+"""This step creates the population and demography MDIM. It uses multiple tables from the UN WPP dataset and combines them into a single multi-dimensional chart.
 
 Strategy:
 
-    - This MDIM relies on multiple tables from the UN WPP dataset. Therefore, we first create individual sub-collections for each table and then combine them.
-    - While some of the metadata is inherited from Garden/Grapher, some of it is set manually in the YAML files or programmatically once sub-collections are created.
-    - Most of the sub-collections are created programmatically, with slight edits coming from YAML files (un_wpp.config.yml and un_wpp.sex_ratio.config.yml).
+    - This MDIM relies on multiple tables from the UN WPP dataset. Therefore, we first create individual sub-charts for each table and then combine them.
+    - While some of the metadata is inherited from Garden/Grapher, some of it is set manually in the YAML files or programmatically once sub-charts are created.
+    - Most of the sub-charts are created programmatically, with slight edits coming from YAML files (un_wpp.config.yml and un_wpp.sex_ratio.config.yml).
     - In addition, some views were created using manual configuration (see un_wpp.manual.config.yml).
-    - To create a sub-collection, we use the custom-made class MDIMCreator, which has a function `create`. While these object/functions are custom (they combine ds and ds_full tables in a particular way), some of its logic could be generalized and moved to etl.viz. For more details, please refer to the module utils.py.
-    - All the created sub-collections are combined into a single MDIM, which is then exported.
+    - To create a sub-chart, we use the custom-made class MDIMCreator, which has a function `create`. While these object/functions are custom (they combine ds and ds_full tables in a particular way), some of its logic could be generalized and moved to etl.viz. For more details, please refer to the module utils.py.
+    - All the created sub-charts are combined into a single MDIM, which is then exported.
 
-This step was migrated from the legacy explorer at `viz://explorer/un/latest/un_wpp` to replace the Explorer with a Multidim (MDIM) collection. The MDIM drops the TSV/owid-content template dependency of the Explorer pipeline and emits a JSON config that grapher renders natively.
+This step was migrated from the legacy explorer at `viz://explorer/un/latest/un_wpp` to replace the Explorer with a Multidim (MDIM) chart. The MDIM drops the TSV/owid-content template dependency of the Explorer pipeline and emits a JSON config that grapher renders natively.
 """
 
 from utils import MDIMCreator
 from view_edits import ViewEditor
 
 from etl.helpers import PathFinder
-from etl.viz import combine_collections
+from etl.viz import combine_charts
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -55,25 +55,25 @@ def run() -> None:
     ds = paths.load_dataset("un_wpp")
     ds_full = paths.load_dataset("un_wpp_full")
 
-    # Build object to deal with sub-collection creation. It is a wrapper around our classic create_collection function.
+    # Build object to deal with sub-chart creation. It is a wrapper around our classic create_chart function.
     mdim_creator = MDIMCreator(paths, ds, ds_full)
 
-    # Default config: This config contains the default metadata for most sub-collections. Exceptions are sex_ratio, which needs other names for certain dimension choices, and manual views.
-    config_default = paths.load_collection_config()
+    # Default config: This config contains the default metadata for most sub-charts. Exceptions are sex_ratio, which needs other names for certain dimension choices, and manual views.
+    config_default = paths.load_config()
 
     # Object used to edit view configs: Some of the views need extra-curation (this includes adding map brackets, renaming titles, etc.)
     view_editor = ViewEditor(map_brackets_yaml=paths.side_file("map_brackets.yml"))
 
     #################################################################################################
-    # Create individual sub-collections (building blocks)
+    # Create individual sub-charts (building blocks)
     #
-    # There are various tables required for this MDIM. We create one sub-collection for each of them.
+    # There are various tables required for this MDIM. We create one sub-chart for each of them.
     # Later, we combine them into a single one.
     # Note that all configs have `indicator` dimension, as a way to "hack" the indicator name
     # into the view dimension config.
     #################################################################################################
 
-    ########## Population sub-collection
+    ########## Population sub-chart
     collection_pop = mdim_creator.create_with_grouped_projections(
         table_name="population",
         config=config_default,
@@ -89,7 +89,7 @@ def run() -> None:
     # title_public / subtitle per indicator, which it copies onto the grouped views.
     view_editor.edit_views_pop(collection_pop, ds_grapher=ds)
 
-    ########## Dependency ratio sub-collection
+    ########## Dependency ratio sub-chart
     collection_dep = mdim_creator.create_with_grouped_projections(
         table_name="dependency_ratio",
         config=config_default,
@@ -101,10 +101,10 @@ def run() -> None:
     )
     view_editor.edit_views_dr(collection_dep, ds_grapher=ds)
 
-    ########## Sex ratio sub-collection
+    ########## Sex ratio sub-chart
     collection_sr = mdim_creator.create_with_grouped_projections(
         table_name="sex_ratio",
-        config=paths.load_collection_config("un_wpp.sex_ratio.config.yml"),
+        config=paths.load_config("un_wpp.sex_ratio.config.yml"),
         indicator_names=["sex_ratio"],
         dimensions={
             "age": ["all", "0"] + list(AGES_SR.keys()),
@@ -114,7 +114,7 @@ def run() -> None:
     )
     view_editor.edit_views_sr(collection_sr, ds_grapher=ds)
 
-    ########## Migration sub-collection
+    ########## Migration sub-chart
     collection_mig = mdim_creator.create_with_grouped_projections(
         table_name="migration",
         config=config_default,
@@ -127,11 +127,11 @@ def run() -> None:
     )
     view_editor.edit_views_mig(collection_mig, ds_grapher=ds)
 
-    ########## Deaths sub-collection
-    # Split into two sub-collections because the source only has low/high projections for
+    ########## Deaths sub-chart
+    # Split into two sub-charts because the source only has low/high projections for
     # `death_rate`, not `deaths` (counts). Hiding the empty options for `deaths` avoids
     # dropdown choices that would render as estimates-only views. `death_rate` is only
-    # available at age=all, so the two sub-collections use different `age` dimensions.
+    # available at age=all, so the two sub-charts use different `age` dimensions.
     collection_deaths_counts = mdim_creator.create_with_grouped_projections(
         table_name="deaths",
         config=config_default,
@@ -155,7 +155,7 @@ def run() -> None:
     )
     view_editor.edit_views_deaths(collection_deaths_rate, ds_grapher=ds)
 
-    ########## Births sub-collection
+    ########## Births sub-chart
     collection_b = mdim_creator.create_with_grouped_projections(
         table_name="births",
         config=config_default,
@@ -168,7 +168,7 @@ def run() -> None:
     )
     view_editor.edit_views_b(collection_b, ds_grapher=ds)
 
-    ########## Median age sub-collection
+    ########## Median age sub-chart
     collection_ma = mdim_creator.create_with_grouped_projections(
         table_name="median_age",
         config=config_default,
@@ -181,7 +181,7 @@ def run() -> None:
     )
     view_editor.edit_views_ma(collection_ma, ds_grapher=ds)
 
-    ########## Life expectancy sub-collection
+    ########## Life expectancy sub-chart
     # At birth: all three projection scenarios (low/medium/high)
     collection_le_birth = mdim_creator.create_with_grouped_projections(
         table_name="life_expectancy",
@@ -217,7 +217,7 @@ def run() -> None:
     )
     view_editor.edit_views_le(collection_le_other, ds_grapher=ds)
 
-    ########## Fertility rate sub-collection
+    ########## Fertility rate sub-chart
     collection_fr = mdim_creator.create_with_grouped_projections(
         table_name="fertility_rate",
         config=config_default,
@@ -230,7 +230,7 @@ def run() -> None:
     )
     view_editor.edit_views_fr(collection_fr, ds_grapher=ds)
 
-    ########## Growth rate sub-collection
+    ########## Growth rate sub-chart
     collection_growth = mdim_creator.create_with_grouped_projections(
         table_name="growth_rate",
         config=config_default,
@@ -242,7 +242,7 @@ def run() -> None:
     )
     view_editor.edit_views_rates(collection_growth, ds_grapher=ds)
 
-    ########## Natural change rate sub-collection
+    ########## Natural change rate sub-chart
     collection_natchange = mdim_creator.create_with_grouped_projections(
         table_name="natural_change_rate",
         config=config_default,
@@ -254,18 +254,18 @@ def run() -> None:
     )
     view_editor.edit_views_rates(collection_natchange, ds_grapher=ds)
 
-    ########## Manual sub-collection: views with grouped indicators, and others
+    ########## Manual sub-chart: views with grouped indicators, and others
     collection_manual = mdim_creator.create_manual(
-        config=paths.load_collection_config("un_wpp.manual.config.yml"),
+        config=paths.load_config("un_wpp.manual.config.yml"),
     )
     view_editor.edit_views_manual(collection_manual, ds_grapher=ds)
 
     #################################################################################################
-    # Combine sub-collections
+    # Combine sub-charts
     #################################################################################################
 
-    # List with all sub-collections
-    collections = [
+    # List with all sub-charts
+    charts = [
         collection_pop,
         collection_dep,
         collection_sr,
@@ -279,18 +279,18 @@ def run() -> None:
         collection_fr,
         collection_growth,
         collection_natchange,
-        # manual views sub-collection
+        # manual views sub-chart
         collection_manual,
     ]
 
     # Combine them into a single MDIM
-    c = combine_collections(
-        collections=collections,
-        collection_name="population-and-demography",
+    c = combine_charts(
+        charts=charts,
+        chart_name="population-and-demography",
         config=config_default,
     )
 
-    # Sort indicator choices. `sort_choices` is defined on the `Collection` base class
+    # Sort indicator choices. `sort_choices` is defined on the `Chart` base class
     # (the Explorer variant of this step used the Explorer-only `sort_indicators`,
     # which is a thin wrapper around `sort_choices({"indicator": order})`).
     c.sort_choices(

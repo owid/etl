@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate TypedDict classes from JSON schemas for better typing in Collection model.
+Generate TypedDict classes from JSON schemas for better typing in Chart model.
 
 This script reads the multidim, grapher, and dataset schemas and generates
 static TypedDict classes that provide autocompletion and type checking.
@@ -427,7 +427,7 @@ class TypedDictGenerator:
         # Assemble file content
         lines = [
             '"""',
-            "Generated TypedDict schemas for Collection model.",
+            "Generated TypedDict schemas for Chart model.",
             "",
             "This file is auto-generated from JSON schemas. Do not edit manually.",
             "Run `python scripts/generate_schema_types.py` to regenerate.",
@@ -587,7 +587,7 @@ def bump_vendored_schema() -> bool:
         "     `oneOf` escape hatches, the extra `WorldMap` chart type, the ETL-only\n"
         "     `data`/`includedEntities` properties). `test_grapher_config_schema_sync` fails until\n"
         "     this is done.\n"
-        "  3. Do NOT bump the `grapher_schema` pins in existing collection configs — those record\n"
+        "  3. Do NOT bump the `grapher_schema` pins in existing chart configs — those record\n"
         "     what each config was authored against, and are what lets grapher migrate them.\n"
     )
     return True

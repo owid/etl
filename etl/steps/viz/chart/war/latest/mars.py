@@ -47,7 +47,7 @@ COMMON_CONFIG = {
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # load table using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("mars")
@@ -57,7 +57,7 @@ def run() -> None:
     tb = adjust_dimensions(tb)
 
     # Create MDIM
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         short_name="mars",
         tb=tb,

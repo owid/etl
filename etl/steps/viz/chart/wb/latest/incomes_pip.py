@@ -23,7 +23,7 @@ DIMENSIONS_CONFIG = {
 PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences in living costs between countries."
 
 # Set x (population) and color (region) indicators needed by the Marimekko tab.
-# Given in short form (`table#column`); `Collection.save` resolves them against the step's
+# Given in short form (`table#column`); `Chart.save` resolves them against the step's
 # dependencies, so the dataset versions are not hardcoded here.
 POPULATION_PATH = "historical#population_historical"
 REGION_PATH = "regions#owid_region"
@@ -45,8 +45,8 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Default collection config
-    config = paths.load_collection_config()
+    # Default chart config
+    config = paths.load_config()
 
     # Load grapher dataset.
     ds = paths.load_dataset("world_bank_pip")
@@ -70,9 +70,9 @@ def run() -> None:
     survey_comp_spells = [v for v in survey_comp_values if v != "No spells"]
 
     #
-    # Create collection object
+    # Create chart object
     #
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         short_name="incomes_pip",
         tb=tb,

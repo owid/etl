@@ -3,7 +3,7 @@
 from typing import Any
 
 from etl.helpers import PathFinder
-from etl.viz.chart.model import Collection
+from etl.viz.chart.model import Chart
 
 # Projection variants in UN WPP. Order matters: it's the order in which y-indicators
 # are concatenated when grouping with estimates. Estimates come first (solid line),
@@ -37,13 +37,13 @@ class MDIMCreator:
             self.tbs["proj"][table_name] = self.ds_proj.read(table_name, load_data=False)
         return self.tbs["proj"][table_name]
 
-    def create_manual(self, config: dict[str, Any], **kwargs) -> Collection:
-        collection = self.paths.create_collection(
+    def create_manual(self, config: dict[str, Any], **kwargs) -> Chart:
+        chart = self.paths.create_chart(
             config=config,
             indicator_as_dimension=True,
             **kwargs,
         )
-        return collection
+        return chart
 
     def create(
         self,
@@ -51,28 +51,28 @@ class MDIMCreator:
         dimensions: dict[str, list[str] | str],
         dimensions_proj: dict[str, list[str] | str] | None = None,
         **kwargs,
-    ) -> Collection:
-        """Creates a collection based on `tb` (1950-2023) and `tb_proj` (1950-2100)."""
-        self.paths.log.info(f"Creating collection for {table_name}")
+    ) -> Chart:
+        """Creates a chart based on `tb` (1950-2023) and `tb_proj` (1950-2100)."""
+        self.paths.log.info(f"Creating chart for {table_name}")
 
         if "config" not in kwargs:
-            raise ValueError("The config is required to create the collection. Please provide it in the kwargs.")
+            raise ValueError("The config is required to create the chart. Please provide it in the kwargs.")
 
         # Load tables
         tb = self.table(table_name)
         tb_proj = self.table_proj(table_name)
 
-        # Collection with projections
+        # Chart with projections
         dimensions_ = {**dimensions, **(dimensions_proj or {"variant": ["medium", "high", "low"]})}
 
-        collection = self.paths.create_collection(
+        chart = self.paths.create_chart(
             tb=[tb, tb_proj],
             dimensions=[dimensions, dimensions_],
             indicator_as_dimension=True,
             **kwargs,
         )
 
-        return collection
+        return chart
 
     def create_with_grouped_projections(
         self,
@@ -80,8 +80,8 @@ class MDIMCreator:
         dimensions: dict[str, list[str] | str],
         projection_variants: list[str] = PROJECTION_VARIANTS,
         **kwargs,
-    ) -> Collection:
-        """Create a collection where projection views show estimates + projection as two y-indicators.
+    ) -> Chart:
+        """Create a chart where projection views show estimates + projection as two y-indicators.
 
         This builds views from `un_wpp` alone (no `un_wpp_full`) for all four variants
         (estimates, medium, low, high), then groups each `[estimates, projection_variant]`
@@ -94,10 +94,10 @@ class MDIMCreator:
         indicator (see `autoDetectSeriesStrategy`). Only works when each view ends up with
         exactly two y-indicators.
         """
-        self.paths.log.info(f"Creating collection (grouped projections) for {table_name}")
+        self.paths.log.info(f"Creating chart (grouped projections) for {table_name}")
 
         if "config" not in kwargs:
-            raise ValueError("The config is required to create the collection. Please provide it in the kwargs.")
+            raise ValueError("The config is required to create the chart. Please provide it in the kwargs.")
 
         if "variant" in dimensions:
             raise ValueError("`variant` should not be in `dimensions`; it is set by `create_with_grouped_projections`.")
@@ -108,7 +108,7 @@ class MDIMCreator:
         # Include all four variants as separate single-indicator views
         dimensions_all = {**dimensions, "variant": ["estimates", *projection_variants]}
 
-        collection = self.paths.create_collection(
+        chart = self.paths.create_chart(
             tb=tb,
             dimensions=dimensions_all,
             indicator_as_dimension=True,
@@ -128,7 +128,7 @@ class MDIMCreator:
         # `indicator` (when there's a single `indicator_names`) or `age` (e.g. `["all"]`
         # for median_age). The `edit_views_*` helpers rely on those dimensions being
         # present on every view.
-        collection.group_views(
+        chart.group_views(
             groups=[
                 {
                     "dimension": "variant",
@@ -141,4 +141,4 @@ class MDIMCreator:
             drop_dimensions_if_single_choice=False,
         )
 
-        return collection
+        return chart

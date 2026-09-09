@@ -1,18 +1,22 @@
-"""Charts and MDIMs: the model, and the functions that build one from a config and dimensional tables."""
+"""Charts and MDIMs: the model, and the functions that build one from a config and dimensional tables.
 
-from etl.viz.chart.core.collection_set import CollectionSet
-from etl.viz.chart.core.combine import combine_collections, combine_config_dimensions
-from etl.viz.chart.core.create import create_collection
+Import order inside this package: `model`, `utils` and `exceptions` are leaves; `core` may import
+anything, including `etl.viz.explorer`.
+"""
+
+from etl.viz.chart.core.chart_set import ChartSet
+from etl.viz.chart.core.combine import combine_charts, combine_config_dimensions
+from etl.viz.chart.core.create import create_chart
 from etl.viz.chart.core.expand import expand_config
-from etl.viz.chart.model.core import Collection
+from etl.viz.chart.model.core import Chart
 from etl.viz.chart.utils import filter_columns_by_dimension_choices
 
 __all__ = [
-    "combine_collections",
-    "create_collection",
-    "expand_config",
+    "Chart",
+    "ChartSet",
+    "combine_charts",
     "combine_config_dimensions",
+    "create_chart",
+    "expand_config",
     "filter_columns_by_dimension_choices",
-    "CollectionSet",
-    "Collection",
 ]

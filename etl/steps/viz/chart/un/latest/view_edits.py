@@ -1,7 +1,7 @@
 """
 This module is a bit complex, and we should work towards simplifying this.
 
-But in a nutshell, it contains utils to tweak the views of a collection based on indicator names and dimensions. Note that it is specific to the population and demography collection.
+But in a nutshell, it contains utils to tweak the views of a chart based on indicator names and dimensions. Note that it is specific to the population and demography chart.
 
 Example: We want to tweak the view title when we are looking at the population indicator for sex="female", age="all" and variant="medium".
 
@@ -14,7 +14,7 @@ from typing import Any
 
 import yaml
 
-from etl.viz.chart.model import Collection
+from etl.viz.chart.model import Chart
 
 # Last year for which UN WPP publishes estimates (projections start the year after).
 # Used as the default `map.time` on grouped projection views so the map opens
@@ -26,7 +26,7 @@ UN_WPP_ESTIMATES_LAST_YEAR = 2023
 class ViewEditor:
     """Edit views.
 
-    There is a function `edit_views_*` for each different sub-collection.
+    There is a function `edit_views_*` for each different sub-chart.
 
     NOTE: There might be redundancy in functions.
     """
@@ -126,8 +126,8 @@ class ViewEditor:
             return brackets["brackets"], brackets.get("min_value")
         return brackets, None
 
-    def edit_views_pop(self, collection: Collection, ds_grapher=None):
-        """Edit population collection views.
+    def edit_views_pop(self, chart: Chart, ds_grapher=None):
+        """Edit population chart views.
 
         Views may have one y-indicator (estimates-only) or two (estimates + projection
         variant, grouped by `create_with_grouped_projections`). The map colorScale
@@ -137,7 +137,7 @@ class ViewEditor:
         ``title`` / ``subtitle`` set explicitly from the indicator metadata — see
         ``_apply_grouped_view_metadata``.
         """
-        for v in collection.views:
+        for v in chart.views:
             indicator_name = v.dimensions["indicator"]
             sex = v.dimensions["sex"]
             age = v.dimensions["age"]
@@ -160,7 +160,7 @@ class ViewEditor:
     def _apply_grouped_view_metadata(self, view, ds_grapher):
         """Populate ``view.config`` title/subtitle for grouped projection views.
 
-        Shared by every ``edit_views_*`` that operates on a collection produced by
+        Shared by every ``edit_views_*`` that operates on a chart produced by
         ``create_with_grouped_projections``. Grouped views have two y-indicators
         — **projection variant first, estimates second** — that disagree on their
         ``title`` field (so grapher falls back to the dataset origin like
@@ -168,7 +168,7 @@ class ViewEditor:
         projection-scenario note gets dropped). We fix both:
 
         - ``title`` copied from the estimates indicator's ``title_public`` (both
-          indicators carry the same value for these collections);
+          indicators carry the same value for these charts);
         - ``subtitle`` copied from the projection indicator's
           ``grapher_config.subtitle``, which already includes the "Future
           projections are based on …" sentence plus any indicator-specific base
@@ -242,8 +242,8 @@ class ViewEditor:
             self._grapher_tables[table_name] = ds_grapher.read(table_name, load_data=False)
         return self._grapher_tables[table_name]
 
-    def edit_views_manual(self, collection: Collection, ds_grapher=None):
-        """Edit views of the manual sub-collection.
+    def edit_views_manual(self, chart: Chart, ds_grapher=None):
+        """Edit views of the manual sub-chart.
 
         Covers two kinds of view that can't be produced by
         ``create_with_grouped_projections``:
@@ -256,7 +256,7 @@ class ViewEditor:
             transition.
         """
         pattern = re.compile(r".*/population#population__sex_(?:[a-z]+)__age_([\d_+(plus)]+)__variant_(?:[a-z]+)$")
-        for v in collection.views:
+        for v in chart.views:
             indicator_name = v.dimensions["indicator"]
             variant = v.dimensions.get("variant", "estimates")
 
@@ -303,9 +303,9 @@ class ViewEditor:
             # title_public + projection subtitle from grapher metadata onto the view.
             self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_fr(self, collection, ds_grapher=None):
-        """Edit fertility rate collection views."""
-        for v in collection.views:
+    def edit_views_fr(self, chart, ds_grapher=None):
+        """Edit fertility rate chart views."""
+        for v in chart.views:
             indicator_name = v.dimensions["indicator"]
             sex = v.dimensions["sex"]
             age = v.dimensions["age"]
@@ -313,18 +313,18 @@ class ViewEditor:
                 self._set_map_colorscale_on_view(age, sex, indicator_name, v)
             self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_b(self, collection, ds_grapher=None):
-        """Edit births collection views."""
-        for v in collection.views:
+    def edit_views_b(self, chart, ds_grapher=None):
+        """Edit births chart views."""
+        for v in chart.views:
             indicator_name = v.dimensions["indicator"]
             age = v.dimensions["age"]
             sex = v.dimensions["sex"]
             self._set_map_colorscale_on_view(age, sex, indicator_name, v)
             self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_ma(self, collection, ds_grapher=None):
-        """Edit median age collection views."""
-        for v in collection.views:
+    def edit_views_ma(self, chart, ds_grapher=None):
+        """Edit median age chart views."""
+        for v in chart.views:
             indicator_name = v.dimensions["indicator"]
             age = v.dimensions["age"]
             sex = v.dimensions["sex"]
@@ -332,9 +332,9 @@ class ViewEditor:
                 self._set_map_colorscale_on_view(age, sex, indicator_name, v)
             self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_mig(self, collection, ds_grapher=None):
-        """Edit migration collection views."""
-        for v in collection.views:
+    def edit_views_mig(self, chart, ds_grapher=None):
+        """Edit migration chart views."""
+        for v in chart.views:
             indicator_name = v.dimensions["indicator"]
             age = v.dimensions["age"]
             sex = v.dimensions["sex"]
@@ -342,18 +342,18 @@ class ViewEditor:
                 self._set_map_colorscale_on_view(age, sex, indicator_name, v)
             self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_deaths(self, collection, ds_grapher=None):
-        """Edit deaths collection views."""
-        for v in collection.views:
+    def edit_views_deaths(self, chart, ds_grapher=None):
+        """Edit deaths chart views."""
+        for v in chart.views:
             indicator_name = v.dimensions["indicator"]
             sex = v.dimensions["sex"]
             age = v.dimensions["age"]
             self._set_map_colorscale_on_view(age, sex, indicator_name, v)
             self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_le(self, collection, ds_grapher=None):
-        """Edit life expectancy collection views."""
-        for v in collection.views:
+    def edit_views_le(self, chart, ds_grapher=None):
+        """Edit life expectancy chart views."""
+        for v in chart.views:
             indicator_name = v.dimensions["indicator"]
             sex = v.dimensions["sex"]
             age = v.dimensions["age"]
@@ -369,9 +369,9 @@ class ViewEditor:
             self._set_map_colorscale_on_view(age, sex, indicator_name, v)
             self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_sr(self, collection, ds_grapher=None):
-        """Edit sex ratio collection views"""
-        for v in collection.views:
+    def edit_views_sr(self, chart, ds_grapher=None):
+        """Edit sex ratio chart views"""
+        for v in chart.views:
             indicator_name = v.dimensions["indicator"]
             age = v.dimensions["age"]
             if indicator_name == "sex_ratio":
@@ -390,22 +390,22 @@ class ViewEditor:
                 self._set_map_colorscale_on_view(age, "all", indicator_name, v)
             self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_dr(self, collection, ds_grapher=None):
-        """Edit dependency ratio collection views."""
-        for v in collection.views:
+    def edit_views_dr(self, chart, ds_grapher=None):
+        """Edit dependency ratio chart views."""
+        for v in chart.views:
             indicator_name = v.dimensions["indicator"]
             sex = v.dimensions["sex"]
             age = v.dimensions["age"]
             self._set_map_colorscale_on_view(age, sex, indicator_name, v)
             self._apply_grouped_view_metadata(v, ds_grapher)
 
-    def edit_views_rates(self, collection, ds_grapher=None):
-        """Edit views for rate-style sub-collections with a single (sex=all, age=all) view.
+    def edit_views_rates(self, chart, ds_grapher=None):
+        """Edit views for rate-style sub-charts with a single (sex=all, age=all) view.
 
         Used by ``collection_growth`` (growth_rate) and ``collection_natchange``
         (natural_change_rate).
         """
-        for v in collection.views:
+        for v in chart.views:
             indicator_name = v.dimensions["indicator"]
             assert v.indicators.y is not None
             self._set_map_colorscale_on_view("all", "all", indicator_name, v)

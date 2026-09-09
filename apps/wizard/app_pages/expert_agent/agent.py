@@ -22,7 +22,7 @@ from etl.analytics.metabase import _generate_question_url, create_question, get_
 from etl.analytics.metabase import get_question_data as _get_question_data
 from etl.config import GOOGLE_API_KEY, OWID_MCP_SERVER_URL
 from etl.docs import (
-    render_collection,
+    render_chart,
     render_dataset,
     render_grapher_config,
     render_indicator,
@@ -304,7 +304,7 @@ async def get_docs_page(file_path: str) -> str:
 # API reference for Metadata
 @agent.tool_plain(docstring_format="google")
 async def get_api_reference_metadata(
-    object_name: Literal["dataset", "table", "indicator", "origin", "collection", "grapher_config"],
+    object_name: Literal["dataset", "table", "indicator", "origin", "chart", "grapher_config"],
 ) -> str:
     """Get the API reference documentation for a certain object's metadata.
 
@@ -325,8 +325,8 @@ async def get_api_reference_metadata(
             return render_table()
         case "indicator":
             return render_indicator()
-        case "collection":
-            return render_collection()
+        case "chart":
+            return render_chart()
         case "grapher_config":
             return render_grapher_config()
         case "origin":

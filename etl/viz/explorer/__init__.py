@@ -1,8 +1,6 @@
-"""This submodule contains utils specific to Explorers.
+"""Explorers, built on the chart model: `Explorer` subclasses `Chart`.
 
-Explorers are a particular type of ETL collections.
-
-NOTE: Shouldn't import from collection.model or collection.core.
+NOTE: Shouldn't import from `etl.viz.chart.core`, which imports this package.
 """
 
 from etl.viz.explorer.core import Explorer

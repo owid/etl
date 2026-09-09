@@ -197,7 +197,7 @@ class StepUpdater:
             # Gather all relevant files from this folder.
             step_files = [file_name for file_name in list(folder.glob(f"{step_info['name']}/*")) if file_name.is_file()]
         elif step_info["step_type"] in ["export", "viz"]:
-            # Some viz steps (e.g. YAML-only single-chart or mdim collections)
+            # Some viz steps (e.g. YAML-only single charts or MDIMs)
             # don't have a Python script — just a `.config.yml`.
             step_files = [
                 file_name

@@ -1,7 +1,7 @@
 """MDIM step for urbanization data - cities, towns, and rural areas."""
 
 from etl.helpers import PathFinder
-from etl.viz import combine_collections
+from etl.viz import combine_charts
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -25,7 +25,7 @@ def run() -> None:
     # Load inputs.
     #
     # Load configuration from adjacent yaml file
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Load grapher datasets
     ds_grapher = paths.load_dataset("ghsl_countries")
@@ -33,11 +33,11 @@ def run() -> None:
     tb_dominant = ds_grapher.read("ghsl_countries_dominant_type", load_data=False)
 
     #
-    # Process data - create two separate collections
+    # Process data - create two separate charts
     #
 
-    # Collection 1: Main population/density data with location types
-    c1 = paths.create_collection(
+    # Chart 1: Main population/density data with location types
+    c1 = paths.create_chart(
         config=config,
         tb=[tb],  # Include both tables to allow combined views later
         indicator_names=["value"],
@@ -101,8 +101,8 @@ def run() -> None:
         ]
     )
 
-    # Collection 2: Dominant type data (has metric='dominant_type', data_type, and location_type dimensions)
-    c2 = paths.create_collection(
+    # Chart 2: Dominant type data (has metric='dominant_type', data_type, and location_type dimensions)
+    c2 = paths.create_chart(
         config=config,
         tb=tb_dominant,
         indicator_names=["value"],
@@ -110,11 +110,11 @@ def run() -> None:
         common_view_config=MULTIDIM_CONFIG,
     )
 
-    # Merge the two collections
-    c = combine_collections(
+    # Merge the two charts
+    c = combine_charts(
         [c1, c2],
-        collection_name=paths.short_name,
-        config=paths.load_collection_config(),
+        chart_name=paths.short_name,
+        config=paths.load_config(),
     )
     # Rename data_type for location_type_area views BEFORE grouping
     # This prevents them from being included in the grouping operation below

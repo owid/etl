@@ -1,4 +1,4 @@
-"""Build the "complete dataset" download package for a Collection (MDIM/Explorer).
+"""Build the "complete dataset" download package for a Chart (MDIM/Explorer).
 
 Prototype for the mdim-downloads project (see owid-projects/mdim-downloads).
 
@@ -6,7 +6,7 @@ The whole package -- wide CSV + metadata.json + readme.md, zipped -- is built
 here, once, at ETL publish time, and uploaded to R2. The grapher side does
 nothing but link to it.
 
-Three objects go up per collection, for two different audiences:
+Three objects go up per chart, for two different audiences:
 
   * `<slug>.complete-dataset.zip` -- the download button. One click, a CSV that
     opens in a spreadsheet, and a readme explaining every column.
@@ -37,7 +37,7 @@ What that buys, beyond avoiding the Worker limits:
     so both the technical ceiling and the fallback design are gone. What
     remains is a policy one: `_check_package_size` refuses to publish a
     package big enough to suggest the wide CSV is the wrong format for that
-    collection.
+    chart.
   * Real compression. littlezipper wrote stored (uncompressed) entries, so a
     34.8MB CSV was a ~34.8MB download. DEFLATE on a wide, sparse table does a
     lot better.
@@ -84,7 +84,7 @@ from etl.viz.chart.download_package_format import (
 )
 
 if TYPE_CHECKING:
-    from etl.viz.chart.model.core import Collection
+    from etl.viz.chart.model.core import Chart
 from etl.grapher.helpers import SUB_YEARLY_TIME_INTERVALS
 
 log = get_logger()
@@ -106,7 +106,7 @@ MAX_PACKAGE_SIZE_BYTES = 50_000_000
 
 
 class MixedTimeGranularityError(ValueError):
-    """Raised when a collection's indicators mix annual ("year") and daily
+    """Raised when a chart's indicators mix annual ("year") and daily
     ("date") tables -- joining those needs a resampling decision this
     prototype doesn't make for you. See mdim-downloads status.md."""
 
@@ -195,10 +195,10 @@ def _check_package_size(
     all a few MB zipped -- and it is what makes the package readable in a
     spreadsheet and keyed one-to-one to `metadata.json`'s per-column entries.
     But its width grows with the product of the dimension cardinalities while
-    each new column is mostly empty, so a collection with a few more dimensions
+    each new column is mostly empty, so a chart with a few more dimensions
     than usual produces a file that is enormous and almost entirely padding.
     A package that trips this is nearly always telling us the format is wrong
-    for that collection, not that the data is unusually large.
+    for that chart, not that the data is unusually large.
 
     Note that this is a statement about the *zip* only. The Parquet published
     beside it does not have the problem: nulls are run-length-encoded definition
@@ -208,7 +208,7 @@ def _check_package_size(
     So an MDIM that trips this has a working programmatic path already; what it
     lacks is a sane one-click download.
 
-    So when it trips, the fix is a judgement call about that collection, and
+    So when it trips, the fix is a judgement call about that chart, and
     the options are roughly:
 
       * Raise `max_size_bytes`, if a multi-MB download is genuinely acceptable for
@@ -216,14 +216,14 @@ def _check_package_size(
         Parquet does not automatically rescue the reader here: on a sparse table it
         is far smaller than the zip, but on a merely *large* one it is the same
         order of magnitude, since what it drops is the padding, not the data.
-      * No zip for this collection, pointing people at the Parquet and the
+      * No zip for this chart, pointing people at the Parquet and the
         Python catalog library instead, which let them select the columns they
         actually want and skip the padding entirely.
-      * Long format for this collection. Better in a text editor, worse in a
+      * Long format for this chart. Better in a text editor, worse in a
         spreadsheet, and the per-column metadata no longer lines up. Note that a
         format heuristic was tried before and abandoned -- the switching rule was
         hard to get right and cost us two code paths to maintain -- so prefer an
-        explicit per-collection choice over reintroducing one. Least attractive
+        explicit per-chart choice over reintroducing one. Least attractive
         of the three now that Parquet exists.
 
     Whichever it is, it wants a human decision, which is why this raises rather
@@ -326,7 +326,7 @@ def _resolve_time_column(tb: Table) -> tuple[Table, str]:
     if "date" in tb.columns:
         # Normalize dtype regardless of source -- real "date" columns show up
         # as category, datetime64, or object depending on the table, and a
-        # collection can combine several of those. Merging mismatched dtypes
+        # chart can combine several of those. Merging mismatched dtypes
         # on the join key raises ("merge on object and datetime64[ns] columns
         # for key 'date'"), so every table's "date" is cast to the same
         # plain ISO-string form before it reaches any join.
@@ -381,9 +381,9 @@ def _outer_join_on_key(tables: list[Table]) -> Table:
 class WideTable:
     """The joined data plus what the output layer needs to lay its key columns out.
 
-    Two shapes come out of here. A collection whose indicators all share one time axis
+    Two shapes come out of here. A chart whose indicators all share one time axis
     gets the familiar one: a `country` + `year`/`date` key, and no frequency column. A
-    collection that mixes axes -- an integer-year series and a calendar-date one, which
+    chart that mixes axes -- an integer-year series and a calendar-date one, which
     cannot share a column without inventing precision -- gets its frequencies stacked
     instead: one row per (entity, frequency, time), with `frequency` as an ordinary key
     column. That keeps it to one file and one column per metric, since the same metric at
@@ -407,7 +407,7 @@ class WideTable:
         return self.frequency_column is not None
 
 
-def _used_indicators(collection: Collection) -> dict[str, list[dict]]:
+def _used_indicators(chart: Chart) -> dict[str, list[dict]]:
     """Map each distinct indicator's catalog path to every dimension
     combination it is shown under -- keys and combinations both in first-seen
     order -- skipping views created by group_views(), since those just
@@ -431,7 +431,7 @@ def _used_indicators(collection: Collection) -> dict[str, list[dict]]:
     introduces a new one," which isn't something `view.is_grouped` alone
     can answer."""
     used: dict[str, list[dict]] = {}
-    for view in collection.views:
+    for view in chart.views:
         if view.is_grouped:
             continue
         for ind in view.indicators.y or []:
@@ -448,9 +448,9 @@ def _split_catalog_path(catalog_path: str) -> tuple[str, str, str]:
     return "/".join(dataset_segments), table_name, column
 
 
-def build_wide_table_for_collection(collection: Collection) -> WideTable:
+def build_wide_table_for_chart(chart: Chart) -> WideTable:
     """Resolves the indicator list and their dimension values from the
-    collection's own views, and loads each underlying table fresh from the
+    chart's own views, and loads each underlying table fresh from the
     on-disk catalog (no dependency on any script's in-memory tables).
 
     Tables are grouped by time axis before joining. Within an axis they are
@@ -481,7 +481,7 @@ def build_wide_table_for_collection(collection: Collection) -> WideTable:
     the Parquet field name and metadata.json's key are all `_long_column_name`,
     which is checked separately for uniqueness by `_check_column_names_unique`."""
     by_table: dict[tuple[str, str], list[tuple[str, list[dict]]]] = defaultdict(list)
-    for catalog_path, combinations in _used_indicators(collection).items():
+    for catalog_path, combinations in _used_indicators(chart).items():
         dataset_dir, table_name, column = _split_catalog_path(catalog_path)
         by_table[(dataset_dir, table_name)].append((column, combinations))
 
@@ -542,7 +542,7 @@ def build_wide_table_for_collection(collection: Collection) -> WideTable:
         interval = intervals.pop()
         if interval is None:
             raise UndeclaredTimeIntervalError(
-                f"The {axis!r} axis of {collection.catalog_path} declares no display.timeInterval, so "
+                f"The {axis!r} axis of {chart.catalog_path} declares no display.timeInterval, so "
                 "its rows cannot be labelled with a frequency or written at the right resolution. "
                 "Declare it on those indicators (`timeInterval: month`, as energy_prices does) rather "
                 "than having this guess -- guessing publishes monthly figures as daily ones, dated to "
@@ -591,20 +591,20 @@ def _resolve_entity_codes(names: list[str]) -> dict[str, str]:
         return {name: code for name, code in session.execute(query) if code}
 
 
-def resolve_page_slug(collection: Collection) -> str | None:
+def resolve_page_slug(chart: Chart) -> str | None:
     """The MDIM's public page slug (e.g. "years-of-schooling"), or None if it has none.
 
     Not derivable from the catalog path -- grapher owns the mapping, and the
     slug is hyphenated where the catalog short name is underscored. Requires
-    `collection.save()` to have run first, which is what creates the row.
+    `chart.save()` to have run first, which is what creates the row.
     It matters here for more than the R2 filename: the readme and
     metadata.json both link to the real page URL.
 
-    None means the collection has no data page. `put_mdim_config` sends only the
+    None means the chart has no data page. `put_mdim_config` sends only the
     config, never a slug -- that is assigned when someone publishes the MDIM in the
     admin -- so an MDIM whose export step runs but which was never published has a
     row and no slug. On a staging server that is the normal state of 13 of the 59
-    multidim steps. Such a collection has nothing to attach a package to, which is
+    multidim steps. Such a chart has nothing to attach a package to, which is
     why callers treat it as "nothing to publish" rather than an error.
     """
     from sqlalchemy.orm import Session
@@ -613,7 +613,7 @@ def resolve_page_slug(collection: Collection) -> str | None:
     from etl.grapher.model import MultiDimDataPage
 
     with Session(OWID_ENV.engine) as session:
-        mdim = MultiDimDataPage.load_mdim(session, catalogPath=collection.catalog_path)
+        mdim = MultiDimDataPage.load_mdim(session, catalogPath=chart.catalog_path)
     if mdim is None or not mdim.slug:
         return None
     return mdim.slug
@@ -642,8 +642,8 @@ def _fetch_indicator_metadata(variable_ids: list[int]) -> dict[int, dict]:
     return dict(zip(variable_ids, metadata))
 
 
-def _dimension_definitions(collection: Collection) -> list[dict]:
-    """metadata.json's top-level "dimensions" -- the collection's dimensions and
+def _dimension_definitions(chart: Chart) -> list[dict]:
+    """metadata.json's top-level "dimensions" -- the chart's dimensions and
     choices, each as a stable slug plus the display name.
 
     This exists so a consumer can label a column's dimension combination
@@ -656,7 +656,7 @@ def _dimension_definitions(collection: Collection) -> list[dict]:
             "name": dimension.name,
             "choices": [{"slug": choice.slug, "name": choice.name} for choice in dimension.choices],
         }
-        for dimension in collection.dimensions
+        for dimension in chart.dimensions
     ]
 
 
@@ -834,12 +834,12 @@ def _time_column_lines(time_header: str, frequency_column: bool) -> str:
     Upstream hedges -- "the third column is either Year or Day" -- because a chart
     download's readme is one static string. This one is built per package, so it can
     just say which it is, and can describe the Frequency/Time pair that a
-    mixed-resolution collection gets and no chart download has.
+    mixed-resolution chart gets and no chart download has.
     """
     if frequency_column:
         return (
             '- "Frequency" and "Time" — the resolution a row is reported at ("annual", "monthly", ...) and '
-            'the timepoint at that resolution ("2025", "2026-06"). Collections that report the same metric at '
+            'the timepoint at that resolution ("2025", "2026-06"). Charts that report the same metric at '
             "more than one resolution keep it in a single column and tell the rows apart here."
         )
     if time_header == "Day":
@@ -1001,36 +1001,36 @@ def _merge_columns_by_name(
     return merged
 
 
-def build_download_package_for_collection(
-    collection: Collection,
+def build_download_package_for_chart(
+    chart: Chart,
     dest_dir: Path,
     build_date: date | None = None,
     max_size_bytes: int = MAX_PACKAGE_SIZE_BYTES,
 ) -> DownloadPackageResult:
     """Build the complete-dataset zip and publish it to R2.
 
-    Requires `collection.save()` to have run first: indicator catalog paths
+    Requires `chart.save()` to have run first: indicator catalog paths
     need to be fully expanded, the indicators need to exist in the DB so their
     variable IDs and published metadata can be resolved, and the MDIM needs a
     page slug.
 
     Raises `DownloadPackageTooLargeError` if the result exceeds
-    `max_size_bytes`; raise it per collection only for the reasons in
+    `max_size_bytes`; raise it per chart only for the reasons in
     `_check_package_size`.
     """
     dest_dir.mkdir(parents=True, exist_ok=True)
     build_date = build_date or pd.Timestamp.now(tz=timezone.utc).date()
 
-    page_slug = resolve_page_slug(collection)
+    page_slug = resolve_page_slug(chart)
     if page_slug is None:
         raise ValueError(
-            f"No published MDIM found for {collection.catalog_path!r} -- call collection.save() "
+            f"No published MDIM found for {chart.catalog_path!r} -- call chart.save() "
             "before building the download package, and check the MDIM has been published (it needs "
-            "a slug). `Collection.save()` skips unpublished collections rather than calling this."
+            "a slug). `Chart.save()` skips unpublished charts rather than calling this."
         )
     page_url = f"https://ourworldindata.org/grapher/{page_slug}"
 
-    wide_table = build_wide_table_for_collection(collection)
+    wide_table = build_wide_table_for_chart(chart)
     wide, column_to_dimensions = wide_table.table, wide_table.column_to_dimensions
 
     catalog_paths = list(column_to_dimensions)
@@ -1057,14 +1057,14 @@ def build_download_package_for_collection(
     # row rather than by a suffix on the name.
     columns = _merge_columns_by_name(wide, indicators, column_to_dimensions)
 
-    dimension_definitions = _dimension_definitions(collection)
+    dimension_definitions = _dimension_definitions(chart)
 
     #
     # metadata.json + readme.md
     #
     # An mdim without a title fails validation long before this point, so absence here is a bug.
-    assert collection.title, f"Collection '{collection.catalog_path}' has no title."
-    title = collection.title.get("title")
+    assert chart.title, f"Chart '{chart.catalog_path}' has no title."
+    title = chart.title.get("title")
     metadata_columns = {}
     readme_sections = []
     attributions = set()
@@ -1093,7 +1093,7 @@ def build_download_package_for_collection(
                 "title": title,
                 "citation": "; ".join(sorted(attributions)),
                 "originalChartUrl": page_url,
-                "selection": collection.default_selection or [],
+                "selection": chart.default_selection or [],
             },
             "dimensions": dimension_definitions,
             "columns": metadata_columns,
@@ -1130,7 +1130,7 @@ def build_download_package_for_collection(
         # one of its categories.
         "Code": wide["country"].astype(str).map(entity_codes).fillna(""),
     }
-    # Only a collection that actually mixes frequencies gets a Frequency column. Adding
+    # Only a chart that actually mixes frequencies gets a Frequency column. Adding
     # a column with one value everywhere to the other 66 would churn every package to
     # say nothing, and would cost them their typed Year for a string Time.
     if wide_table.frequency_column:

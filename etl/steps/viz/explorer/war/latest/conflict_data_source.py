@@ -7,7 +7,7 @@ from its grapher table(s) via the same `build_source_explorer` pipeline:
      metadata to expose the explorer's dimensions (`measure`, `conflict_type`,
      `conflict_sub_type`, `sub_measure`) plus a helper `_estimate` dim used to
      identify confidence-interval (CI) variants.
-  2. `paths.create_collection(tb=…)` auto-expands one view per column.
+  2. `paths.create_chart(tb=…)` auto-expands one view per column.
   3. `group_views` collapses the (best, low, high) helper choices on `_estimate`
      into single CI-stacked deaths views.
   4. `_build_by_sub_type_views` constructs the stacked-across-children views
@@ -19,8 +19,8 @@ from its grapher table(s) via the same `build_source_explorer` pipeline:
      notes, and per-indicator display blocks via templates parameterised by
      the spec.
 
-The seven sub-explorers are merged by `combine_collections` under a leading
-`data_source` dropdown (introduced by `force_collection_dimension=True`).
+The seven sub-explorers are merged by `combine_charts` under a leading
+`data_source` dropdown (introduced by `force_chart_dimension=True`).
 The YAML carries only dim definitions + explorer-level config — every source
 is built programmatically.
 
@@ -40,7 +40,7 @@ from typing import Any, Literal
 from owid.catalog.tables import Table
 
 from etl.helpers import PathFinder
-from etl.viz.chart.core.combine import combine_collections
+from etl.viz.chart.core.combine import combine_charts
 from etl.viz.chart.model.view import Indicator, View, ViewIndicators
 
 paths = PathFinder(__file__)
@@ -265,7 +265,7 @@ INTRASTATE_VARIANT_REMAP = {
     CT._INTRA_NON_INT: CT.INTRASTATE,
 }
 
-# Canonical dimension orderings applied via `Collection.sort_choices` after the build.
+# Canonical dimension orderings applied via `Chart.sort_choices` after the build.
 CONFLICT_TYPE_ORDER = [
     CT.ALL_ARMED,
     CT.ALL_STATE_BASED,
@@ -664,7 +664,7 @@ def _maybe_dim_dict(spec: SourceSpec, measure: str, ctype: str, sub_measure: str
 
 
 def _adjust_table(tb: Table, spec: SourceSpec, parse: Callable) -> Table:
-    """Rewrite each column's metadata so create_collection picks up explorer dims."""
+    """Rewrite each column's metadata so create_explorer picks up explorer dims."""
     drops: list[str] = []
     for col in list(tb.columns):
         if col in ("year", "country"):
@@ -874,7 +874,7 @@ def _build_mic_post_process(c, spec: SourceSpec) -> None:
 
 
 # ===========================================================================
-# Collection-level helpers
+# Chart-level helpers
 # ===========================================================================
 
 
@@ -1480,13 +1480,13 @@ def _set_locations_or_participants_displays(ys: list[Indicator], measure: str, s
 def build_source_explorer(spec: SourceSpec, sub_config: dict[str, Any]):
     """Build one sub-explorer for `spec` and return it.
 
-    `sub_config` is the shared per-spec create_collection input — the YAML's
+    `sub_config` is the shared per-spec create_explorer input — the YAML's
     dim definitions (minus `data_source`) plus the explorer's `definitions`
     block. It's identical across sources, so `run()` computes it once and
     passes it in.
 
     The returned explorer does not carry the `data_source` dim; that's added
-    by `_attach_data_source_dim` (or by `combine_collections` in the future,
+    by `_attach_data_source_dim` (or by `combine_charts` in the future,
     once every source is built programmatically).
     """
     tables = _load_and_adjust(spec)
@@ -1499,14 +1499,13 @@ def build_source_explorer(spec: SourceSpec, sub_config: dict[str, Any]):
     if spec.locations_table:
         indicator_names.append([M.LOCATIONS])
 
-    c = paths.create_collection(
+    c = paths.create_explorer(
         config=sub_config,
         tb=tables,
         indicator_names=indicator_names,
         dimensions=["conflict_type", "conflict_sub_type", "sub_measure", "_estimate"],
         indicators_slug="measure",
         short_name=spec.slug,
-        explorer=True,
     )
 
     # 1) CI collapse: merge all `_estimate` values into a single "_ci" stack.
@@ -1520,7 +1519,7 @@ def build_source_explorer(spec: SourceSpec, sub_config: dict[str, Any]):
     #    We pass `drop_dimensions_if_single_choice=False` and drop `_estimate`
     #    explicitly below so we keep `conflict_type` for MIC sources (where it
     #    has a single choice but still needs to surface in the combined
-    #    explorer for `combine_collections` to merge cleanly).
+    #    explorer for `combine_charts` to merge cleanly).
     estimate_in_use = list(c.dimension_choices_in_use().get("_estimate", set()))
     if "best" in estimate_in_use:
         estimate_in_use = ["best"] + [
@@ -2054,19 +2053,18 @@ def _validate_constants_match_yaml(config: dict[str, Any]) -> None:
 
 
 def run() -> None:
-    yaml_config = paths.load_collection_config()
+    yaml_config = paths.load_config()
     _validate_constants_match_yaml(yaml_config)
 
     # The YAML carries dim definitions + explorer-level config only — every
     # source is built programmatically now.
-    yaml_explorer = paths.create_collection(
+    yaml_explorer = paths.create_explorer(
         config=yaml_config,
-        explorer=True,
         short_name="conflict-data-source",
     )
 
     # Per-source sub_config shared by all programmatic specs: same dim
-    # definitions as the YAML (minus `data_source`, which combine_collections
+    # definitions as the YAML (minus `data_source`, which combine_charts
     # re-introduces below), same `definitions` block, no views.
     sub_config = {
         "config": {},
@@ -2077,14 +2075,14 @@ def run() -> None:
 
     programmatic_subs = [build_source_explorer(spec, sub_config) for spec in PROGRAMMATIC_SPECS]
 
-    final = combine_collections(
-        collections=programmatic_subs,
+    final = combine_charts(
+        charts=programmatic_subs,
         catalog_path=yaml_explorer.catalog_path,
         config={"config": yaml_config.get("config", {})},
-        force_collection_dimension=True,
-        collection_dimension_slug="data_source",
-        collection_dimension_name="Data source",
-        collection_choices_names=[spec.name for spec in PROGRAMMATIC_SPECS],
+        force_chart_dimension=True,
+        chart_dimension_slug="data_source",
+        chart_dimension_name="Data source",
+        chart_choices_names=[spec.name for spec in PROGRAMMATIC_SPECS],
     )
 
     # The "related question" link is the same on every view. The YAML's

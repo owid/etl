@@ -351,14 +351,14 @@ def test_snapshot_license_lives_under_origin():
 
 
 def test_multidim_configs_pin_grapher_schema():
-    """Guardrail: every multidim collection config must pin a valid `grapher_schema`.
+    """Guardrail: every multidim chart config must pin a valid `grapher_schema`.
 
-    Grapher injects the collection's `grapherConfigSchema` as the `$schema` of each view config
+    Grapher injects the chart's `grapherConfigSchema` as the `$schema` of each view config
     (single charts carry it as `$schema` directly) and migrates outdated configs forward. Without a
     pin there is nothing recording what the config was authored against, and ETL refuses to guess —
     see `etl.viz.chart.utils.resolve_grapher_schema` for the accepted forms.
 
-    `Collection` enforces this at run time too (`validate_grapher_schema_pinned`, plus `required`
+    `Chart` enforces this at run time too (`validate_grapher_schema_pinned`, plus `required`
     in multidim-schema.json). This test is the fast, offline version: it needs no step run, and it
     catches a *malformed* pin (`grapher_schema:` with no value, an unquoted octal `011`) that a
     key-presence check would wave through.
@@ -368,7 +368,7 @@ def test_multidim_configs_pin_grapher_schema():
     broken = []
     for config_path in sorted(Path(STEP_DIR / "viz" / "chart").glob("**/*.y*ml")):
         config = yaml.safe_load(config_path.read_text()) or {}
-        # Only collection configs are in scope; the directory also holds plain data yaml
+        # Only chart configs are in scope; the directory also holds plain data yaml
         # (e.g. un/latest/map_brackets.yml).
         if not isinstance(config, dict) or not {"dimensions", "views"} <= set(config):
             continue

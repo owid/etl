@@ -40,10 +40,10 @@ FIELD = "chart_config_id"
 def _load_config(path: Path) -> CommentedMap:
     """Read the config YAML and refuse anything that isn't a single-chart config.
 
-    `chart_config_id` identifies one chart, so it is only meaningful on a collection that pushes
+    `chart_config_id` identifies one chart, so it is only meaningful on a chart that pushes
     as one chart: no dimensions and exactly one view. Mdims — including the ones that declare
     `dimensions: []` in the YAML and fill dimensions/views programmatically — are identified by
-    their catalog path instead, and `Collection.validate_chart_config_id()` rejects the field on
+    their catalog path instead, and `Chart.validate_chart_config_id()` rejects the field on
     them.
     """
     # `ruamel_load` is annotated as returning a plain dict, but in round-trip mode it hands back a
@@ -58,7 +58,7 @@ def _load_config(path: Path) -> CommentedMap:
         raise click.ClickException(
             f"{path} is not a single-chart config (expected `dimensions: []` and exactly one view, "
             f"got {len(dimensions or [])} dimensions and {len(views or [])} views). Multi-dimensional "
-            f"collections are identified by their catalog path and must not declare `{FIELD}`."
+            f"charts are identified by their catalog path and must not declare `{FIELD}`."
         )
     return config
 

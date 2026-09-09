@@ -26,12 +26,12 @@ def expand_config(
 
     NOTE
     ----
-    1) For more details, refer to class CollectionConfigExpander.
+    1) For more details, refer to class ChartConfigExpander.
 
     2) This function generates PARTIAL configuration, you need to then combine it with the config loaded from a YAML file. You can do this combination as you consider. Currently this is mostly manual, but we can look into improving this space:
 
         ```python
-        config = paths.load_collection_config("filename.yml)
+        config = paths.load_config("filename.yml)
         config_new = expand_config(tb=tb)
         config["views"] = config_new["views"]
         config["dimensions"] = config_new["dimensions"]
@@ -121,7 +121,7 @@ def expand_config(
     config_partial = {}
 
     # Initiate expander object
-    expander = CollectionConfigExpander(
+    expander = ChartConfigExpander(
         tb=tb,
         indicators_slug=indicators_slug,
         indicator_names=indicator_names,
@@ -159,7 +159,7 @@ def expand_config(
     return config_partial
 
 
-class CollectionConfigExpander:
+class ChartConfigExpander:
     def __init__(
         self,
         tb: Table,

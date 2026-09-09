@@ -13,7 +13,7 @@ from typing_extensions import Self
 import etl.grapher.model as gm
 from etl.config import OWID_ENV, OWIDEnv
 from etl.paths import VIZ_EXPLORER_DIR
-from etl.viz.chart.model import Collection
+from etl.viz.chart.model import Chart
 from etl.viz.chart.model.base import pruned_json
 from etl.viz.chart.utils import CHART_DIMENSIONS, INDICATORS_SLUG
 from etl.viz.explorer.legacy import create_explorer_legacy
@@ -21,7 +21,7 @@ from etl.viz.explorer.legacy import create_explorer_legacy
 
 @pruned_json
 @dataclass
-class Explorer(Collection):
+class Explorer(Chart):
     """Model for Explorer configuration."""
 
     config: dict[str, Any] = field(default_factory=dict)
@@ -47,16 +47,16 @@ class Explorer(Collection):
     def __post_init__(self):
         """We set it here because of simplicity.
 
-        Adding a class attribute like `_collection_type: Optional[str] = "explorer"` leads to error `TypeError: non-default argument 'config' follows default argument`.
-        Alternative would be to define the class attribute like `_collection_type: Optional[str] = field(init=False, default="explorer")` but feels a bit redundant with parent definition.
+        Adding a class attribute like `_chart_type: Optional[str] = "explorer"` leads to error `TypeError: non-default argument 'config' follows default argument`.
+        Alternative would be to define the class attribute like `_chart_type: Optional[str] = field(init=False, default="explorer")` but feels a bit redundant with parent definition.
         """
-        self._collection_type = "explorer"
+        self._chart_type = "explorer"
 
         # Explorers reach Grapher through the legacy TSV path, which has no equivalent of the
         # multidim `grapherConfigSchema`. Setting it here would silently do nothing.
         if self.grapher_schema is not None:
             raise ValueError(
-                "`grapher_schema` is only supported for multidim collections, not explorers: "
+                "`grapher_schema` is only supported for multidim charts, not explorers: "
                 "Grapher has no way to apply it to explorer view configs."
             )
 
@@ -64,8 +64,8 @@ class Explorer(Collection):
     def local_config_path(self) -> Path:
         # who/latest/influenza#influenza -> viz/explorer/who/latest/influenza/influenza.config.json
         assert self.catalog_path
-        if self._collection_type is None:
-            raise ValueError("_collection_type must have a value!")
+        if self._chart_type is None:
+            raise ValueError("_chart_type must have a value!")
         return VIZ_EXPLORER_DIR / (self.catalog_path.replace("#", "/") + ".config.json")
 
     def display_config_names(self):
@@ -201,7 +201,7 @@ def _extract_explorers_tables(
         # Get indicators
         indicators = bake_indicators_view(indicator_paths)
 
-        # Tweak view: TODO: add function Collection.add_view_config()
+        # Tweak view: TODO: add function Chart.add_view_config()
         # name = view["dimensions"]["metric"]
         # if name in RELATED:
         #     view["relatedQuestionText"] = RELATED[name]["text"]

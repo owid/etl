@@ -1,8 +1,8 @@
 """
-Tests for ETL collection model components: Dimension and View classes.
+Tests for ETL chart model components: Dimension and View classes.
 
 This module tests the functionality of dimension and view models used in the ETL
-collection system. These models are part of the data visualization and filtering
+chart model. These models are part of the data visualization and filtering
 system that allows users to interact with datasets through different dimensions
 and view configurations.
 
@@ -95,7 +95,7 @@ def test_unique_validations():
     Dimensions must have unique slugs and names across all their choices to:
     1. Prevent ambiguity in data filtering and selection
     2. Ensure proper UI rendering without conflicts
-    3. Maintain data integrity in the collection system
+    3. Maintain data integrity in the chart model
 
     Tests both successful validation and expected failures with duplicates.
     """
@@ -129,7 +129,7 @@ def test_indicator_expand_path():
     The expand_path method uses a mapping dictionary to convert table names to their
     full catalog paths, preserving the variable/column reference after the '#'.
 
-    This is essential for resolving data references in the collection system.
+    This is essential for resolving data references in the chart model.
     """
     # Create indicator with short-form path
     indicator = Indicator("table#value")
@@ -148,7 +148,7 @@ def test_view_indicators_from_dict_and_to_records():
     """
     Test ViewIndicators serialization and deserialization methods.
 
-    ViewIndicators manages a collection of indicators mapped to chart axes.
+    ViewIndicators manages a set of indicators mapped to chart axes.
     This tests the round-trip conversion:
     1. from_dict: Creates ViewIndicators from a dictionary mapping axes to paths
     2. to_records: Converts back to a list of record dictionaries
@@ -220,12 +220,12 @@ def test_view_expand_paths_covers_non_y_dimensions_set_after_creation():
     """
     Test that expand_paths resolves short-form paths on every chart dimension, not just y.
 
-    Steps set x/color/size after the collection is built (e.g. to add a Marimekko tab, which
+    Steps set x/color/size after the chart is built (e.g. to add a Marimekko tab, which
     needs population on x and region on color). Those indicators miss the create-time
-    expansion, so `Collection.save` calls `expand_paths` again to catch them. This test pins
+    expansion, so `Chart.save` calls `expand_paths` again to catch them. This test pins
     that behavior: short paths assigned via `set_indicator` must end up as full catalog paths.
     """
-    # Start from a y-only view, as a collection would produce it.
+    # Start from a y-only view, as a chart would produce it.
     view = View(dimensions={"d": "a"}, indicators=ViewIndicators.from_dict({"y": "table#ind1"}))
 
     # Assign the remaining dimensions afterwards, in short form.

@@ -1,7 +1,7 @@
-"""Tests for common metadata merging functionality in ETL collections.
+"""Tests for common metadata merging functionality in ETL charts.
 
 This module tests the complex logic for merging metadata configurations based on
-dimensions and priority rules, which is essential for creating dynamic collection views.
+dimensions and priority rules, which is essential for creating dynamic chart views.
 
 Table of Contents:
 - test_merge_common_metadata_1: Tests basic metadata merging with dimension-based priority
@@ -299,7 +299,7 @@ def test_definitions():
     This test ensures that the Definitions class properly validates:
     - Duplicate common_views with identical dimension combinations
     - Proper error reporting when conflicting definitions are found
-    - Data integrity enforcement in collection configurations
+    - Data integrity enforcement in chart configurations
     """
     common_params = [
         # Top-level params

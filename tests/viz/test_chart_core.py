@@ -2,7 +2,7 @@
 
 This module tests the functionality of combining configuration dimensions,
 which is used to merge automatically generated dimensions with YAML-configured
-dimensions in ETL collection processing.
+dimensions in ETL chart processing.
 """
 
 from unittest.mock import patch
@@ -11,22 +11,22 @@ import pytest
 
 from etl.viz.chart.core.combine import (
     _update_choice_slugs_in_views,
-    combine_collections,
+    combine_charts,
     combine_config_dimensions,
 )
-from etl.viz.chart.core.utils import create_collection_from_config
+from etl.viz.chart.core.utils import create_chart_from_config
 
 
-def _make_explorer_subcollection(
+def _make_explorer_sub(
     view_type: str,
     catalog_path: str,
     *,
     extra_dimensions: list[dict] | None = None,
     extra_view_dimensions: dict[str, str] | None = None,
 ):
-    """Build a minimal Explorer sub-collection for combine tests.
+    """Build a minimal Explorer sub-chart for combine tests.
 
-    Each sub-collection has one ``view_type`` dimension (with a single choice) and one
+    Each sub-chart has one ``view_type`` dimension (with a single choice) and one
     view referencing a fake catalog path. Extra dimensions can be passed via
     ``extra_dimensions`` (e.g. a checkbox dim) — they're appended to the dimensions
     list, and ``extra_view_dimensions`` adds the corresponding choice to the view.
@@ -57,7 +57,7 @@ def _make_explorer_subcollection(
     # process_views attempts to expand catalog paths against table mappings — we use
     # already-complete fake paths, so the side trip to MySQL/the catalog is unnecessary.
     with patch("etl.viz.chart.core.utils.process_views"):
-        return create_collection_from_config(
+        return create_chart_from_config(
             config,
             dependencies=set(),
             catalog_path=f"{catalog_path}#test_explorer",
@@ -144,30 +144,30 @@ def test_combine_config_dimensions_choices_top():
 
 
 # ---------------------------------------------------------------------------
-# combine_collections — multi-table workflow
+# combine_charts — multi-table workflow
 # ---------------------------------------------------------------------------
 
 
-def test_combine_collections_preserves_yaml_views():
+def test_combine_charts_preserves_yaml_views():
     """Hand-listed YAML views passed through ``config["views"]`` must end up in the
-    combined collection alongside the views accumulated from sub-collections.
+    combined chart alongside the views accumulated from sub-charts.
 
-    ``etl.viz.chart.core.create.create_collection`` strips YAML views from the configs
-    handed to per-table sub-collections (so they don't get duplicated). Those views are
+    ``etl.viz.chart.core.create.create_chart`` strips YAML views from the configs
+    handed to per-table sub-charts (so they don't get duplicated). Those views are
     then forwarded here via the ``config`` argument and must be merged into the final
-    combined collection — otherwise users authoring a multi-table explorer have no way to
+    combined chart — otherwise users authoring a multi-table explorer have no way to
     declare a hand-listed view in YAML.
     """
-    # Sub-collections both use by_stage=combined; the YAML view uses by_stage=stages so
+    # Sub-charts both use by_stage=combined; the YAML view uses by_stage=stages so
     # it occupies a unique dimensional slot (this mirrors the actual food-footprints case
     # where the lifecycle-stage view is the only one with by_stage=stages).
-    sub_a = _make_explorer_subcollection(
+    sub_a = _make_explorer_sub(
         "commodity",
         "poore_2018",
         extra_dimensions=[CHECKBOX_DIM],
         extra_view_dimensions={"by_stage": "combined"},
     )
-    sub_b = _make_explorer_subcollection(
+    sub_b = _make_explorer_sub(
         "specific",
         "clark_2022",
         extra_dimensions=[CHECKBOX_DIM],
@@ -202,31 +202,31 @@ def test_combine_collections_preserves_yaml_views():
     }
 
     with patch("etl.viz.chart.core.utils.process_views"):
-        combined = combine_collections(
-            collections=[sub_a, sub_b],
+        combined = combine_charts(
+            charts=[sub_a, sub_b],
             catalog_path="combined#combined",
             config=config,
             is_explorer=True,
         )
 
     catalog_paths = [v.indicators.y[0].catalogPath for v in combined.views if v.indicators.y]
-    assert "poore_2018#commodity" in catalog_paths, "sub-collection A's view was lost"
-    assert "clark_2022#specific" in catalog_paths, "sub-collection B's view was lost"
+    assert "poore_2018#commodity" in catalog_paths, "sub-chart A's view was lost"
+    assert "clark_2022#specific" in catalog_paths, "sub-chart B's view was lost"
     assert "lifecycle#stages" in catalog_paths, "YAML hand-listed view was not preserved"
 
 
-def test_combine_collections_allows_identical_checkbox_dim():
-    """When every sub-collection declares the same checkbox dimension (same slug, same
+def test_combine_charts_allows_identical_checkbox_dim():
+    """When every sub-chart declares the same checkbox dimension (same slug, same
     choice slugs, same ``choice_slug_true``), the combine should succeed — the merge is
     structurally equivalent to a 2-choice radio.
     """
-    sub_a = _make_explorer_subcollection(
+    sub_a = _make_explorer_sub(
         "commodity",
         "poore_2018",
         extra_dimensions=[CHECKBOX_DIM],
         extra_view_dimensions={"by_stage": "combined"},
     )
-    sub_b = _make_explorer_subcollection(
+    sub_b = _make_explorer_sub(
         "specific",
         "clark_2022",
         extra_dimensions=[CHECKBOX_DIM],
@@ -256,8 +256,8 @@ def test_combine_collections_allows_identical_checkbox_dim():
     }
 
     with patch("etl.viz.chart.core.utils.process_views"):
-        combined = combine_collections(
-            collections=[sub_a, sub_b],
+        combined = combine_charts(
+            charts=[sub_a, sub_b],
             catalog_path="combined#combined",
             config=config,
             is_explorer=True,
@@ -268,12 +268,12 @@ def test_combine_collections_allows_identical_checkbox_dim():
     assert sorted(c.slug for c in by_stage_dim.choices) == ["combined", "stages"]
 
 
-def test_combine_collections_rejects_differing_checkbox_dim():
-    """When sub-collections declare a checkbox dimension with different choice slugs, the
+def test_combine_charts_rejects_differing_checkbox_dim():
+    """When sub-charts declare a checkbox dimension with different choice slugs, the
     combine logic can't safely merge them (the checkbox would silently turn into a 3+-choice
     widget). It should raise a ``NotImplementedError`` with a message pointing at the
     actual problem."""
-    sub_a = _make_explorer_subcollection(
+    sub_a = _make_explorer_sub(
         "commodity",
         "poore_2018",
         extra_dimensions=[CHECKBOX_DIM],
@@ -292,7 +292,7 @@ def test_combine_collections_rejects_differing_checkbox_dim():
         ],
         "presentation": {"type": "checkbox", "choice_slug_true": "stages"},
     }
-    sub_b = _make_explorer_subcollection(
+    sub_b = _make_explorer_sub(
         "specific",
         "clark_2022",
         extra_dimensions=[different_checkbox],
@@ -309,8 +309,8 @@ def test_combine_collections_rejects_differing_checkbox_dim():
 
     with patch("etl.viz.chart.core.utils.process_views"):
         with pytest.raises(NotImplementedError, match="Checkbox dimension"):
-            combine_collections(
-                collections=[sub_a, sub_b],
+            combine_charts(
+                charts=[sub_a, sub_b],
                 catalog_path="combined#combined",
                 config=config,
                 is_explorer=True,
@@ -325,7 +325,7 @@ def test_combine_collections_rejects_differing_checkbox_dim():
 def test_update_choice_slugs_in_views_handles_nan_entries_from_unstack():
     """Regression: ``_extract_choice_slug_changes`` builds its renames dict via
     ``pd.DataFrame.unstack(...).to_dict()``, which leaves NaN placeholders for
-    ``(collection, dimension)`` pairs where another collection had conflicts but
+    ``(chart, dimension)`` pairs where another chart had conflicts but
     this one didn't. ``_update_choice_slugs_in_views`` must drop those non-dict
     entries before calling ``pd.DataFrame.replace`` — pandas rejects a nested
     mapping unless every top-level value is also a mapping
@@ -338,21 +338,21 @@ def test_update_choice_slugs_in_views_handles_nan_entries_from_unstack():
     """
     nan = float("nan")
 
-    # Two sub-collections, each with one view referencing its own view_type slug.
-    sub_a = _make_explorer_subcollection("a", "src_a")
-    sub_b = _make_explorer_subcollection("b", "src_b")
-    collection_by_id = {"0": sub_a, "1": sub_b}
+    # Two sub-charts, each with one view referencing its own view_type slug.
+    sub_a = _make_explorer_sub("a", "src_a")
+    sub_b = _make_explorer_sub("b", "src_b")
+    charts_by_id = {"0": sub_a, "1": sub_b}
 
-    # Shape produced by ``.unstack("collection_id").to_dict()`` when sub_a had a
+    # Shape produced by ``.unstack("chart_id").to_dict()`` when sub_a had a
     # conflict on ``view_type`` and sub_b on an unrelated ``other`` dim; each
-    # collection sees a NaN for the other's conflicting dim.
+    # chart sees a NaN for the other's conflicting dim.
     slug_changes = {
         "0": {"view_type": {"a": "a__0"}, "other": nan},
         "1": {"view_type": nan, "other": {"x": "x__1"}},
     }
 
     # Should not raise.
-    result = _update_choice_slugs_in_views(slug_changes, collection_by_id)
+    result = _update_choice_slugs_in_views(slug_changes, charts_by_id)
 
     # sub_a's view dimension got the rename applied.
     assert result["0"].views[0].dimensions["view_type"] == "a__0"
@@ -361,10 +361,10 @@ def test_update_choice_slugs_in_views_handles_nan_entries_from_unstack():
     assert result["1"].views[0].dimensions["view_type"] == "b"
 
 
-def _make_subcollection(view_type: str, catalog_path: str):
-    """Build a minimal (non-explorer) Collection sub-collection for combine tests."""
+def _make_sub_chart(view_type: str, catalog_path: str):
+    """Build a minimal (non-explorer) Chart sub-chart for combine tests."""
     config = {
-        # Sub-collections are built from the same YAML as the combined one, so they carry its pin.
+        # Sub-charts are built from the same YAML as the combined one, so they carry its pin.
         "grapher_schema": "008",
         "title": {"title": f"Test {view_type}", "title_variant": ""},
         "default_selection": ["World"],
@@ -383,26 +383,26 @@ def _make_subcollection(view_type: str, catalog_path: str):
         ],
     }
     with patch("etl.viz.chart.core.utils.process_views"):
-        return create_collection_from_config(
+        return create_chart_from_config(
             config,
             dependencies=set(),
-            catalog_path=f"{catalog_path}#test_collection",
+            catalog_path=f"{catalog_path}#test_chart",
             validate_schema=False,
         )
 
 
-def test_combine_collections_preserves_grapher_schema():
-    """The combined collection must keep the `grapher_schema` pin from the YAML config.
+def test_combine_charts_preserves_grapher_schema():
+    """The combined chart must keep the `grapher_schema` pin from the YAML config.
 
-    Multi-table MDIMs build one sub-collection per table and then combine them, so the pin has to
+    Multi-table MDIMs build one sub-chart per table and then combine them, so the pin has to
     survive that round trip — otherwise those MDIMs would silently fall back to the default.
     """
-    sub_a = _make_subcollection("a", "src_a")
-    sub_b = _make_subcollection("b", "src_b")
+    sub_a = _make_sub_chart("a", "src_a")
+    sub_b = _make_sub_chart("b", "src_b")
 
     with patch("etl.viz.chart.core.utils.process_views"):
-        combined = combine_collections(
-            collections=[sub_a, sub_b],
+        combined = combine_charts(
+            charts=[sub_a, sub_b],
             catalog_path="combined#combined",
             config={
                 "grapher_schema": "008",

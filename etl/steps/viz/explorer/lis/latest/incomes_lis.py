@@ -32,23 +32,22 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Default collection config
-    config = paths.load_collection_config()
+    # Default chart config
+    config = paths.load_config()
 
     # Load grapher dataset.
     ds = paths.load_dataset("luxembourg_income_study")
     tb = ds.read("incomes", load_data=False)
 
     #
-    # Create collection object
+    # Create chart object
     #
-    c = paths.create_collection(
+    c = paths.create_explorer(
         config=config,
         short_name="incomes-across-distribution-lis",
         tb=tb,
         indicator_names=INDICATOR_NAMES,
         # dimensions=DIMENSIONS_CONFIG,
-        explorer=True,
     )
 
     # Make the equivalence_scale dimension a checkbox

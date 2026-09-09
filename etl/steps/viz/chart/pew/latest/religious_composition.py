@@ -21,8 +21,8 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Default collection config
-    config = paths.load_collection_config()
+    # Default chart config
+    config = paths.load_config()
 
     # Load grapher dataset.
     ds = paths.load_dataset("religious_composition")
@@ -34,9 +34,9 @@ def run() -> None:
     #
 
     #
-    # Create collection object
+    # Create chart object
     #
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         short_name="religious_composition",
         tb=[
@@ -62,7 +62,7 @@ def run() -> None:
 
 
 def add_religious_composition(c):
-    """Add religious composition views to collection c."""
+    """Add religious composition views to chart c."""
     # Group views to create religious composition aggregate view
     c.group_views(
         groups=[

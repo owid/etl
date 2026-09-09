@@ -548,10 +548,10 @@ class SnapshotForm(StepForm):
         return meta
 
 
-class CollectionForm(StepForm):
-    """express step form."""
+class ChartForm(StepForm):
+    """Chart step form."""
 
-    step_name: str = "collection"
+    step_name: str = "chart"
 
     # Common
     namespace: str
@@ -569,18 +569,16 @@ class CollectionForm(StepForm):
 
     def create_files(self) -> list[dict[str, Any]]:
         # Generate files
-        COLLECTION_DIR = generate_export_step_to_channel(
-            cookiecutter_path=COOKIE_STEPS[self.step_name], data=self.to_dict()
-        )
+        CHART_DIR = generate_export_step_to_channel(cookiecutter_path=COOKIE_STEPS[self.step_name], data=self.to_dict())
 
         # Add to generated files
         generated_files = [
             {
-                "path": COLLECTION_DIR / (self.short_name + ".py"),
+                "path": CHART_DIR / (self.short_name + ".py"),
                 "language": "python",
             },
             {
-                "path": COLLECTION_DIR / (self.short_name + ".config.yml"),
+                "path": CHART_DIR / (self.short_name + ".config.yml"),
                 "language": "yaml",
             },
         ]
@@ -649,7 +647,7 @@ class CollectionForm(StepForm):
 def generate_export_step_to_channel(cookiecutter_path: Path, data: dict[str, Any]) -> Path:
     assert {"namespace", "version"} <= data.keys()
 
-    # Collection configs must pin `grapher_schema`; scaffold it at the version we vendor today so
+    # Chart configs must pin `grapher_schema`; scaffold it at the version we vendor today so
     # the generated config runs as-is instead of failing on the missing pin.
     data = {**data, "grapher_schema": default_grapher_schema_version()}
 

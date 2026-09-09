@@ -1,9 +1,9 @@
 """
-Tests for Collection model from etl.viz.chart.model.core.
+Tests for Chart model from etl.viz.chart.model.core.
 
-This module tests the core functionality of the Collection class including
+This module tests the core functionality of the Chart class including
 initialization, validation, view management, dimension handling, and data export.
-It also tests the CollectionSet class for managing multiple collections.
+It also tests the ChartSet class for managing multiple charts.
 """
 
 import warnings
@@ -12,23 +12,23 @@ from unittest.mock import patch
 
 import pytest
 
-from etl.viz.chart.core.collection_set import CollectionSet
-from etl.viz.chart.exceptions import DuplicateCollectionViews, DuplicateValuesError
-from etl.viz.chart.model.core import Collection, Definitions
+from etl.viz.chart.core.chart_set import ChartSet
+from etl.viz.chart.exceptions import DuplicateChartViews, DuplicateValuesError
+from etl.viz.chart.model.core import Chart, Definitions
 from etl.viz.chart.model.dimension import Dimension, DimensionChoice
 from etl.viz.chart.model.view import Indicator, View, ViewIndicators
 
 
-def test_collection_from_dict_basic():
+def test_chart_from_dict_basic():
     """
-    Test Collection.from_dict - creates Collection from dictionary configuration.
+    Test Chart.from_dict - creates Chart from dictionary configuration.
 
-    Example: Standard config dict becomes a Collection with proper field mapping
+    Example: Standard config dict becomes a Chart with proper field mapping
     (definitions -> _definitions, default_dimensions -> _default_dimensions)
     """
     config = {
         "catalog_path": "test/latest/data#table",
-        "title": {"en": "Test Collection"},
+        "title": {"en": "Test Chart"},
         "default_selection": ["country"],
         "dimensions": [{"slug": "country", "name": "Country", "choices": [{"slug": "usa", "name": "United States"}]}],
         "views": [{"dimensions": {"country": "usa"}, "indicators": {"y": [{"catalogPath": "test#indicator"}]}}],
@@ -36,20 +36,20 @@ def test_collection_from_dict_basic():
         "default_dimensions": {"country": "usa"},
     }
 
-    collection = Collection.from_dict(config)
+    chart = Chart.from_dict(config)
 
-    assert collection.catalog_path == "test/latest/data#table"
-    assert collection.title == {"en": "Test Collection"}
-    assert collection.default_selection == ["country"]
-    assert len(collection.dimensions) == 1
-    assert len(collection.views) == 1
-    assert collection._definitions is not None
-    assert collection._default_dimensions == {"country": "usa"}
+    assert chart.catalog_path == "test/latest/data#table"
+    assert chart.title == {"en": "Test Chart"}
+    assert chart.default_selection == ["country"]
+    assert len(chart.dimensions) == 1
+    assert len(chart.views) == 1
+    assert chart._definitions is not None
+    assert chart._default_dimensions == {"country": "usa"}
 
 
-def test_collection_catalog_path_validation():
+def test_chart_catalog_path_validation():
     """
-    Test Collection catalog_path validation - must contain '#' separator.
+    Test Chart catalog_path validation - must contain '#' separator.
 
     Example: "dataset/table" fails, "dataset#table" succeeds
     """
@@ -63,16 +63,16 @@ def test_collection_catalog_path_validation():
     }
 
     with pytest.raises(AssertionError, match="Catalog path should be in the format"):
-        Collection.from_dict(config)
+        Chart.from_dict(config)
 
 
-def test_collection_properties():
+def test_chart_properties():
     """
-    Test Collection property accessors - short_name, dimension_slugs, etc.
+    Test Chart property accessors - short_name, dimension_slugs, etc.
 
     Example: catalog_path "data/latest/test#my_table" gives short_name "my_table"
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="data/latest/test#my_table",
         title={"en": "Test"},
         default_selection=["dim1"],
@@ -83,19 +83,19 @@ def test_collection_properties():
         _definitions=Definitions(),
     )
 
-    assert collection.short_name == "my_table"
-    assert collection.dimension_slugs == ["dim1"]
-    assert collection.dimension_choices == {"dim1": ["choice1"]}
+    assert chart.short_name == "my_table"
+    assert chart.dimension_slugs == ["dim1"]
+    assert chart.dimension_choices == {"dim1": ["choice1"]}
 
 
-def test_collection_get_dimension():
+def test_chart_get_dimension():
     """
-    Test Collection.get_dimension - retrieves dimension by slug.
+    Test Chart.get_dimension - retrieves dimension by slug.
 
     Example: get_dimension("country") returns the country Dimension object
     """
     dim = Dimension(slug="country", name="Country", choices=[DimensionChoice(slug="usa", name="USA")])
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -104,21 +104,21 @@ def test_collection_get_dimension():
         _definitions=Definitions(),
     )
 
-    result = collection.get_dimension("country")
+    result = chart.get_dimension("country")
     assert result.slug == "country"
     assert result.name == "Country"
 
     with pytest.raises(ValueError, match="Dimension missing not found"):
-        collection.get_dimension("missing")
+        chart.get_dimension("missing")
 
 
-def test_collection_get_choice_names():
+def test_chart_get_choice_names():
     """
-    Test Collection.get_choice_names - gets choice slug->name mapping for dimension.
+    Test Chart.get_choice_names - gets choice slug->name mapping for dimension.
 
     Example: country dimension returns {"usa": "United States", "uk": "United Kingdom"}
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -136,18 +136,18 @@ def test_collection_get_choice_names():
         _definitions=Definitions(),
     )
 
-    choice_names = collection.get_choice_names("country")
+    choice_names = chart.get_choice_names("country")
     assert choice_names == {"usa": "United States", "uk": "United Kingdom"}
 
 
-def test_collection_dimension_choices_in_use():
+def test_chart_dimension_choices_in_use():
     """
-    Test Collection.dimension_choices_in_use - finds choices actually used in views.
+    Test Chart.dimension_choices_in_use - finds choices actually used in views.
 
     Example: If views only use "usa" and "uk", returns {"country": {"usa", "uk"}}
     even if dimension has more choices defined
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -169,17 +169,17 @@ def test_collection_dimension_choices_in_use():
         _definitions=Definitions(),
     )
 
-    choices_in_use = collection.dimension_choices_in_use()
+    choices_in_use = chart.dimension_choices_in_use()
     assert choices_in_use == {"country": {"usa", "uk"}}
 
 
-def test_collection_prune_dimension_choices():
+def test_chart_prune_dimension_choices():
     """
-    Test Collection.prune_dimension_choices - removes unused choices from dimensions.
+    Test Chart.prune_dimension_choices - removes unused choices from dimensions.
 
     Example: Dimension with 3 choices but only 2 used in views gets pruned to 2 choices
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -202,25 +202,25 @@ def test_collection_prune_dimension_choices():
     )
 
     # Before pruning
-    assert len(collection.dimensions[0].choices) == 3
+    assert len(chart.dimensions[0].choices) == 3
 
-    collection.prune_dimension_choices()
+    chart.prune_dimension_choices()
 
     # After pruning - unused choice removed
-    assert len(collection.dimensions[0].choices) == 2
-    choice_slugs = [c.slug for c in collection.dimensions[0].choices]
+    assert len(chart.dimensions[0].choices) == 2
+    choice_slugs = [c.slug for c in chart.dimensions[0].choices]
     assert "usa" in choice_slugs
     assert "uk" in choice_slugs
     assert "france" not in choice_slugs
 
 
-def test_collection_prune_dimensions():
+def test_chart_prune_dimensions():
     """
-    Test Collection.prune_dimensions - removes dimensions with only one choice in use.
+    Test Chart.prune_dimensions - removes dimensions with only one choice in use.
 
-    Example: Dimension with only one choice used gets removed from collection entirely
+    Example: Dimension with only one choice used gets removed from chart entirely
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country", "metric"],
@@ -240,27 +240,27 @@ def test_collection_prune_dimensions():
     )
 
     # Before pruning
-    assert len(collection.dimensions) == 2
+    assert len(chart.dimensions) == 2
 
-    collection.prune_dimensions()
+    chart.prune_dimensions()
 
     # After pruning - country dimension removed (only usa used)
-    assert len(collection.dimensions) == 1
-    assert collection.dimensions[0].slug == "metric"
+    assert len(chart.dimensions) == 1
+    assert chart.dimensions[0].slug == "metric"
 
     # Views should also have country dimension removed
-    for view in collection.views:
+    for view in chart.views:
         assert "country" not in view.dimensions
         assert "metric" in view.dimensions
 
 
-def test_collection_drop_views_single_key_value():
+def test_chart_drop_views_single_key_value():
     """
-    Test Collection.drop_views - removes views matching a single dimension filter.
+    Test Chart.drop_views - removes views matching a single dimension filter.
 
     Example: drop_views({"country": "usa"}) removes all views with country=usa
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country", "metric"],
@@ -280,23 +280,23 @@ def test_collection_drop_views_single_key_value():
     )
 
     # Before dropping
-    assert len(collection.views) == 2
+    assert len(chart.views) == 2
 
-    collection.drop_views({"country": "usa"})
+    chart.drop_views({"country": "usa"})
 
     # After dropping - only UK view remains
-    assert len(collection.views) == 1
-    assert collection.views[0].dimensions["country"] == "uk"
+    assert len(chart.views) == 1
+    assert chart.views[0].dimensions["country"] == "uk"
 
 
-def test_collection_drop_views_multiple_key_value_pairs():
+def test_chart_drop_views_multiple_key_value_pairs():
     """
-    Test Collection.drop_views with multiple key-value pairs (AND logic).
+    Test Chart.drop_views with multiple key-value pairs (AND logic).
 
     Example: drop_views({"country": "usa", "metric": "cases"}) removes views
     that have BOTH country=usa AND metric=cases.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country", "metric"],
@@ -321,27 +321,27 @@ def test_collection_drop_views_multiple_key_value_pairs():
         _definitions=Definitions(),
     )
 
-    assert len(collection.views) == 4
+    assert len(chart.views) == 4
 
     # Drop views where country=usa AND metric=cases (only 1 view matches)
-    collection.drop_views({"country": "usa", "metric": "cases"})
+    chart.drop_views({"country": "usa", "metric": "cases"})
 
-    assert len(collection.views) == 3
-    remaining_dims = [(v.dimensions["country"], v.dimensions["metric"]) for v in collection.views]
+    assert len(chart.views) == 3
+    remaining_dims = [(v.dimensions["country"], v.dimensions["metric"]) for v in chart.views]
     assert ("usa", "cases") not in remaining_dims
     assert ("usa", "deaths") in remaining_dims
     assert ("uk", "cases") in remaining_dims
     assert ("uk", "deaths") in remaining_dims
 
 
-def test_collection_drop_views_list_values_or_logic():
+def test_chart_drop_views_list_values_or_logic():
     """
-    Test Collection.drop_views with list values (OR logic within a dimension).
+    Test Chart.drop_views with list values (OR logic within a dimension).
 
     Example: drop_views({"country": ["usa", "uk"]}) removes views that have
     country=usa OR country=uk.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country", "metric"],
@@ -365,23 +365,23 @@ def test_collection_drop_views_list_values_or_logic():
         _definitions=Definitions(),
     )
 
-    assert len(collection.views) == 3
+    assert len(chart.views) == 3
 
     # Drop views where country is "usa" OR "uk"
-    collection.drop_views({"country": ["usa", "uk"]})
+    chart.drop_views({"country": ["usa", "uk"]})
 
-    assert len(collection.views) == 1
-    assert collection.views[0].dimensions["country"] == "france"
+    assert len(chart.views) == 1
+    assert chart.views[0].dimensions["country"] == "france"
 
 
-def test_collection_drop_views_list_of_dicts_or_logic():
+def test_chart_drop_views_list_of_dicts_or_logic():
     """
-    Test Collection.drop_views with list of dicts (OR logic between dicts).
+    Test Chart.drop_views with list of dicts (OR logic between dicts).
 
     Example: drop_views([{"country": "usa", "metric": "cases"}, {"country": "uk", "metric": "deaths"}])
     removes views that match the first dict OR the second dict.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country", "metric"],
@@ -406,27 +406,27 @@ def test_collection_drop_views_list_of_dicts_or_logic():
         _definitions=Definitions(),
     )
 
-    assert len(collection.views) == 4
+    assert len(chart.views) == 4
 
     # Drop views matching (country=usa AND metric=cases) OR (country=uk AND metric=deaths)
-    collection.drop_views([{"country": "usa", "metric": "cases"}, {"country": "uk", "metric": "deaths"}])
+    chart.drop_views([{"country": "usa", "metric": "cases"}, {"country": "uk", "metric": "deaths"}])
 
-    assert len(collection.views) == 2
-    remaining_dims = [(v.dimensions["country"], v.dimensions["metric"]) for v in collection.views]
+    assert len(chart.views) == 2
+    remaining_dims = [(v.dimensions["country"], v.dimensions["metric"]) for v in chart.views]
     assert ("usa", "cases") not in remaining_dims
     assert ("uk", "deaths") not in remaining_dims
     assert ("usa", "deaths") in remaining_dims
     assert ("uk", "cases") in remaining_dims
 
 
-def test_collection_drop_views_combined_list_and_or_logic():
+def test_chart_drop_views_combined_list_and_or_logic():
     """
-    Test Collection.drop_views with combined list of dicts and list values.
+    Test Chart.drop_views with combined list of dicts and list values.
 
     Example: drop_views([{"country": ["usa", "uk"], "metric": "cases"}])
     removes views that have (country=usa OR country=uk) AND metric=cases.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country", "metric"],
@@ -457,13 +457,13 @@ def test_collection_drop_views_combined_list_and_or_logic():
         _definitions=Definitions(),
     )
 
-    assert len(collection.views) == 6
+    assert len(chart.views) == 6
 
     # Drop views where (country=usa OR country=uk) AND metric=cases
-    collection.drop_views([{"country": ["usa", "uk"], "metric": "cases"}])
+    chart.drop_views([{"country": ["usa", "uk"], "metric": "cases"}])
 
-    assert len(collection.views) == 4
-    remaining_dims = [(v.dimensions["country"], v.dimensions["metric"]) for v in collection.views]
+    assert len(chart.views) == 4
+    remaining_dims = [(v.dimensions["country"], v.dimensions["metric"]) for v in chart.views]
     assert ("usa", "cases") not in remaining_dims
     assert ("uk", "cases") not in remaining_dims
     assert ("usa", "deaths") in remaining_dims
@@ -472,13 +472,13 @@ def test_collection_drop_views_combined_list_and_or_logic():
     assert ("france", "deaths") in remaining_dims
 
 
-def test_collection_drop_views_invalid_dimension_slug():
+def test_chart_drop_views_invalid_dimension_slug():
     """
-    Test Collection.drop_views raises ValueError for invalid dimension slugs.
+    Test Chart.drop_views raises ValueError for invalid dimension slugs.
 
     Example: drop_views({"invalid_dim": "value"}) should raise ValueError
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -497,16 +497,16 @@ def test_collection_drop_views_invalid_dimension_slug():
     )
 
     with pytest.raises(ValueError, match="Invalid dimension slug.*invalid_dim.*in drop_views filter"):
-        collection.drop_views({"invalid_dim": "value"})
+        chart.drop_views({"invalid_dim": "value"})
 
 
-def test_collection_drop_views_invalid_slug_in_list_of_dicts():
+def test_chart_drop_views_invalid_slug_in_list_of_dicts():
     """
-    Test Collection.drop_views raises ValueError when invalid slug is in one of multiple dicts.
+    Test Chart.drop_views raises ValueError when invalid slug is in one of multiple dicts.
 
     Example: drop_views([{"country": "usa"}, {"invalid": "value"}]) should raise ValueError
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -525,17 +525,17 @@ def test_collection_drop_views_invalid_slug_in_list_of_dicts():
     )
 
     with pytest.raises(ValueError, match="Invalid dimension slug.*invalid.*in drop_views filter"):
-        collection.drop_views([{"country": "usa"}, {"invalid": "value"}])
+        chart.drop_views([{"country": "usa"}, {"invalid": "value"}])
 
 
-def test_collection_drop_views_multiple_invalid_slugs():
+def test_chart_drop_views_multiple_invalid_slugs():
     """
-    Test Collection.drop_views raises ValueError when multiple invalid slugs are provided.
+    Test Chart.drop_views raises ValueError when multiple invalid slugs are provided.
 
     Example: drop_views({"invalid1": "v1", "invalid2": "v2"}) should raise ValueError
     mentioning multiple slugs.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -553,17 +553,17 @@ def test_collection_drop_views_multiple_invalid_slugs():
     )
 
     with pytest.raises(ValueError, match="Invalid dimension slugs.*in drop_views filter"):
-        collection.drop_views({"invalid1": "v1", "invalid2": "v2"})
+        chart.drop_views({"invalid1": "v1", "invalid2": "v2"})
 
 
-def test_collection_drop_views_partial_dimension_filter():
+def test_chart_drop_views_partial_dimension_filter():
     """
-    Test Collection.drop_views with a filter that doesn't specify all dimensions.
+    Test Chart.drop_views with a filter that doesn't specify all dimensions.
 
     Example: With 2 dimensions (country, metric), drop_views({"country": "usa"})
     should drop all views with country=usa regardless of metric value.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country", "metric"],
@@ -588,23 +588,23 @@ def test_collection_drop_views_partial_dimension_filter():
         _definitions=Definitions(),
     )
 
-    assert len(collection.views) == 4
+    assert len(chart.views) == 4
 
     # Drop all views where country=usa (both cases and deaths)
-    collection.drop_views({"country": "usa"})
+    chart.drop_views({"country": "usa"})
 
-    assert len(collection.views) == 2
-    for view in collection.views:
+    assert len(chart.views) == 2
+    for view in chart.views:
         assert view.dimensions["country"] == "uk"
 
 
-def test_collection_check_duplicate_views():
+def test_chart_check_duplicate_views():
     """
-    Test Collection.check_duplicate_views - detects views with identical dimensions.
+    Test Chart.check_duplicate_views - detects views with identical dimensions.
 
-    Example: Two views with same dimensions should raise DuplicateCollectionViews
+    Example: Two views with same dimensions should raise DuplicateChartViews
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -616,17 +616,17 @@ def test_collection_check_duplicate_views():
         _definitions=Definitions(),
     )
 
-    with pytest.raises(DuplicateCollectionViews):
-        collection.check_duplicate_views()
+    with pytest.raises(DuplicateChartViews):
+        chart.check_duplicate_views()
 
 
-def test_collection_default_dimensions_setter():
+def test_chart_default_dimensions_setter():
     """
-    Test Collection.default_dimensions setter - validates and sets default view.
+    Test Chart.default_dimensions setter - validates and sets default view.
 
     Example: Setting default to existing view succeeds, non-existing view fails
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -636,21 +636,21 @@ def test_collection_default_dimensions_setter():
     )
 
     # Setting valid default dimensions should work
-    collection.default_dimensions = {"country": "usa"}
-    assert collection.default_dimensions == {"country": "usa"}
+    chart.default_dimensions = {"country": "usa"}
+    assert chart.default_dimensions == {"country": "usa"}
 
     # Setting invalid default dimensions should fail
     with pytest.raises(ValueError, match="no view matches these dimensions"):
-        collection.default_dimensions = {"country": "nonexistent"}
+        chart.default_dimensions = {"country": "nonexistent"}
 
 
-def test_collection_indicators_in_use():
+def test_chart_indicators_in_use():
     """
-    Test Collection.indicators_in_use - extracts all indicator paths from views.
+    Test Chart.indicators_in_use - extracts all indicator paths from views.
 
     Example: Views with different indicators return all unique indicator paths
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -670,17 +670,17 @@ def test_collection_indicators_in_use():
         _definitions=Definitions(),
     )
 
-    indicators = collection.indicators_in_use()
+    indicators = chart.indicators_in_use()
     assert set(indicators) == {"test#indicator1", "test#indicator2"}
 
 
-def test_collection_to_dict():
+def test_chart_to_dict():
     """
-    Test Collection.to_dict - converts Collection back to dictionary format.
+    Test Chart.to_dict - converts Chart back to dictionary format.
 
-    Example: Collection object becomes dict suitable for YAML export
+    Example: Chart object becomes dict suitable for YAML export
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -689,7 +689,7 @@ def test_collection_to_dict():
         _definitions=Definitions(),
     )
 
-    result = collection.to_dict()
+    result = chart.to_dict()
 
     assert result["catalog_path"] == "test#table"
     assert result["title"] == {"en": "Test"}
@@ -702,11 +702,11 @@ def test_collection_to_dict():
 
 def test_snake_case_slugs():
     """
-    Test Collection.snake_case_slugs - converts all slugs to snake_case format.
+    Test Chart.snake_case_slugs - converts all slugs to snake_case format.
 
     Example: "United States" becomes "united_states", "GDP per capita" becomes "gdp_per_capita"
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -717,23 +717,23 @@ def test_snake_case_slugs():
         _definitions=Definitions(),
     )
 
-    collection.snake_case_slugs()
+    chart.snake_case_slugs()
 
     # Dimension slug should be snake_case
-    assert collection.dimensions[0].slug == "country_name"
+    assert chart.dimensions[0].slug == "country_name"
     # Choice slug should be snake_case
-    assert collection.dimensions[0].choices[0].slug == "united_states"
+    assert chart.dimensions[0].choices[0].slug == "united_states"
     # View dimensions should be updated
-    assert collection.views[0].dimensions == {"country_name": "united_states"}
+    assert chart.views[0].dimensions == {"country_name": "united_states"}
 
 
 def test_sort_views_with_default_first():
     """
-    Test Collection.sort_views_with_default_first - moves default view to front.
+    Test Chart.sort_views_with_default_first - moves default view to front.
 
     Example: View matching default_dimensions gets moved to position 0
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -753,23 +753,23 @@ def test_sort_views_with_default_first():
     )
 
     # Before sorting - USA view is second
-    assert collection.views[0].dimensions["country"] == "uk"
-    assert collection.views[1].dimensions["country"] == "usa"
+    assert chart.views[0].dimensions["country"] == "uk"
+    assert chart.views[1].dimensions["country"] == "usa"
 
-    collection.sort_views_with_default_first()
+    chart.sort_views_with_default_first()
 
     # After sorting - USA view should be first
-    assert collection.views[0].dimensions["country"] == "usa"
-    assert collection.views[1].dimensions["country"] == "uk"
+    assert chart.views[0].dimensions["country"] == "usa"
+    assert chart.views[1].dimensions["country"] == "uk"
 
 
 def test_validate_dimension_uniqueness_success():
     """
-    Test Collection.validate_dimension_uniqueness - passes with unique dimension slugs.
+    Test Chart.validate_dimension_uniqueness - passes with unique dimension slugs.
 
-    Example: Collection with dimensions having different slugs should pass validation
+    Example: Chart with dimensions having different slugs should pass validation
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country", "metric"],
@@ -783,16 +783,16 @@ def test_validate_dimension_uniqueness_success():
     )
 
     # Should not raise any exception
-    collection.validate_dimension_uniqueness()
+    chart.validate_dimension_uniqueness()
 
 
 def test_validate_dimension_uniqueness_duplicate_slugs():
     """
-    Test Collection.validate_dimension_uniqueness - fails with duplicate dimension slugs.
+    Test Chart.validate_dimension_uniqueness - fails with duplicate dimension slugs.
 
-    Example: Collection with dimensions having same slug should raise DuplicateValuesError
+    Example: Chart with dimensions having same slug should raise DuplicateValuesError
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -807,16 +807,16 @@ def test_validate_dimension_uniqueness_duplicate_slugs():
     )
 
     with pytest.raises(DuplicateValuesError, match="Dimension slug 'country' is not unique"):
-        collection.validate_dimension_uniqueness()
+        chart.validate_dimension_uniqueness()
 
 
 def test_validate_dimension_uniqueness_empty_dimensions():
     """
-    Test Collection.validate_dimension_uniqueness - passes with no dimensions.
+    Test Chart.validate_dimension_uniqueness - passes with no dimensions.
 
-    Example: Collection with empty dimensions list should pass validation
+    Example: Chart with empty dimensions list should pass validation
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=[],
@@ -826,16 +826,16 @@ def test_validate_dimension_uniqueness_empty_dimensions():
     )
 
     # Should not raise any exception
-    collection.validate_dimension_uniqueness()
+    chart.validate_dimension_uniqueness()
 
 
 def test_validate_dimension_uniqueness_single_dimension():
     """
-    Test Collection.validate_dimension_uniqueness - passes with single dimension.
+    Test Chart.validate_dimension_uniqueness - passes with single dimension.
 
-    Example: Collection with only one dimension should always pass validation
+    Example: Chart with only one dimension should always pass validation
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -847,11 +847,11 @@ def test_validate_dimension_uniqueness_single_dimension():
     )
 
     # Should not raise any exception
-    collection.validate_dimension_uniqueness()
+    chart.validate_dimension_uniqueness()
 
 
-def _collection_with_dimension_slug(slug: str) -> Collection:
-    return Collection(
+def _chart_with_dimension_slug(slug: str) -> Chart:
+    return Chart(
         catalog_path="test/latest/data#table",
         title={"en": "Test"},
         default_selection=[],
@@ -865,51 +865,51 @@ def _collection_with_dimension_slug(slug: str) -> Collection:
 
 def test_validate_dimension_slugs_not_grapher_query_params_success():
     """
-    Test Collection.validate_dimension_slugs_not_grapher_query_params - passes with a regular slug.
+    Test Chart.validate_dimension_slugs_not_grapher_query_params - passes with a regular slug.
 
-    Example: Collection with dimension slug "sex" should pass validation
+    Example: Chart with dimension slug "sex" should pass validation
     """
-    collection = _collection_with_dimension_slug("sex")
+    chart = _chart_with_dimension_slug("sex")
 
     # Should not raise any exception
-    collection.validate_dimension_slugs_not_grapher_query_params()
+    chart.validate_dimension_slugs_not_grapher_query_params()
 
 
 def test_validate_dimension_slugs_not_grapher_query_params_reserved_slug():
     """
-    Test Collection.validate_dimension_slugs_not_grapher_query_params - fails with a reserved slug.
+    Test Chart.validate_dimension_slugs_not_grapher_query_params - fails with a reserved slug.
 
-    Example: Collection with dimension slug "time" (a Grapher query param) should raise ValueError
+    Example: Chart with dimension slug "time" (a Grapher query param) should raise ValueError
     """
-    collection = _collection_with_dimension_slug("time")
+    chart = _chart_with_dimension_slug("time")
 
     with pytest.raises(ValueError, match="collides with a query param reserved by Grapher"):
-        collection.validate_dimension_slugs_not_grapher_query_params()
+        chart.validate_dimension_slugs_not_grapher_query_params()
 
 
 def test_validate_dimension_slugs_not_grapher_query_params_normalized_slug():
     """
-    Test Collection.validate_dimension_slugs_not_grapher_query_params - compares snake_case forms.
+    Test Chart.validate_dimension_slugs_not_grapher_query_params - compares snake_case forms.
 
     Example: slug "Time" is persisted as "time" by save(), so it must fail; slug "stackMode" is
     persisted as "stack_mode", which does not collide, so it must pass.
     """
-    collection = _collection_with_dimension_slug("Time")
+    chart = _chart_with_dimension_slug("Time")
 
     with pytest.raises(ValueError, match="collides with a query param reserved by Grapher"):
-        collection.validate_dimension_slugs_not_grapher_query_params()
+        chart.validate_dimension_slugs_not_grapher_query_params()
 
     # Should not raise any exception
-    _collection_with_dimension_slug("stackMode").validate_dimension_slugs_not_grapher_query_params()
+    _chart_with_dimension_slug("stackMode").validate_dimension_slugs_not_grapher_query_params()
 
 
 def test_validate_dimension_uniqueness_multiple_duplicates():
     """
-    Test Collection.validate_dimension_uniqueness - catches first duplicate when multiple exist.
+    Test Chart.validate_dimension_uniqueness - catches first duplicate when multiple exist.
 
-    Example: Collection with multiple duplicate dimension slugs should raise error for first found
+    Example: Chart with multiple duplicate dimension slugs should raise error for first found
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -929,22 +929,22 @@ def test_validate_dimension_uniqueness_multiple_duplicates():
 
     # Should raise error for the first duplicate found (country)
     with pytest.raises(DuplicateValuesError, match="Dimension slug 'country' is not unique"):
-        collection.validate_dimension_uniqueness()
+        chart.validate_dimension_uniqueness()
 
 
 # =============================================================================
-# CollectionSet and grouped view validation tests
+# ChartSet and grouped view validation tests
 # =============================================================================
 
 
-def _simple_collection_dict(name: str) -> dict:
-    """Create a minimal collection dictionary for testing purposes.
+def _simple_chart_dict(name: str) -> dict:
+    """Create a minimal chart dictionary for testing purposes.
 
     Args:
-        name: The name to use for the collection (used in catalog_path)
+        name: The name to use for the chart (used in catalog_path)
 
     Returns:
-        A dictionary representing a basic collection with:
+        A dictionary representing a basic chart with:
         - One dimension with one choice
         - One view with that dimension and one indicator
         - Basic metadata (title, catalog_path, etc.)
@@ -963,30 +963,30 @@ def _simple_collection_dict(name: str) -> dict:
     }
 
 
-def test_collection_set(tmp_path: Path):
-    """Test CollectionSet functionality for managing multiple collections.
+def test_chart_set(tmp_path: Path):
+    """Test ChartSet functionality for managing multiple charts.
 
     This test verifies that:
-    1. Collections can be created from dictionaries and saved to files
-    2. CollectionSet can discover and list collection files in a directory
-    3. CollectionSet can load individual collections by name
-    4. Loaded collections maintain their properties (short_name, etc.)
+    1. Charts can be created from dictionaries and saved to files
+    2. ChartSet can discover and list chart files in a directory
+    3. ChartSet can load individual charts by name
+    4. Loaded charts maintain their properties (short_name, etc.)
     5. The file naming convention (*.config.json) works correctly
 
     Args:
         tmp_path: Pytest fixture providing a temporary directory for test files
     """
     path = tmp_path
-    coll1 = Collection.from_dict(_simple_collection_dict("coll1"))
-    coll2 = Collection.from_dict(_simple_collection_dict("coll2"))
+    coll1 = Chart.from_dict(_simple_chart_dict("coll1"))
+    coll2 = Chart.from_dict(_simple_chart_dict("coll2"))
     coll1.save_file(path / "coll1.config.json")
     coll2.save_file(path / "coll2.config.json")
 
-    cs = CollectionSet(path)
+    cs = ChartSet(path)
     assert cs.names == ["coll1", "coll2"]
 
     loaded = cs.read("coll1")
-    assert isinstance(loaded, Collection)
+    assert isinstance(loaded, Chart)
     assert loaded.short_name == "coll1"
 
 
@@ -994,13 +994,13 @@ def test_grouped_view_validation_warnings():
     """Test that grouped views without proper metadata generate warnings during save.
 
     This test verifies the sanity_check_grouped_view functionality by:
-    1. Creating a collection with multiple views
+    1. Creating a chart with multiple views
     2. Grouping views to create grouped views without metadata
     3. Mocking the database validation to avoid DB dependency
     4. Calling save() and verifying appropriate warnings are raised
     """
-    # Create collection with dimensions and views
-    collection = Collection(
+    # Create chart with dimensions and views
+    chart = Chart(
         dimensions=[
             Dimension(
                 slug="sex",
@@ -1037,17 +1037,17 @@ def test_grouped_view_validation_warnings():
                 indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator4"}]}),
             ),
         ],
-        catalog_path="test#collection",
-        title={"title": "Test Collection"},
+        catalog_path="test#chart",
+        title={"title": "Test Chart"},
         default_selection=["test"],
         _definitions=Definitions(common_views=None),
     )
 
     # Group views by sex dimension (creates grouped views without metadata)
-    collection.group_views([{"dimension": "sex", "choice_new_slug": "all_sexes", "choices": ["male", "female"]}])
+    chart.group_views([{"dimension": "sex", "choice_new_slug": "all_sexes", "choices": ["male", "female"]}])
 
     # Verify that grouped views were created and marked as grouped
-    grouped_views = [view for view in collection.views if view.is_grouped]
+    grouped_views = [view for view in chart.views if view.is_grouped]
     assert len(grouped_views) == 2  # Should have 2 grouped views (one for each age group)
 
     # Mock database validation to avoid DB dependency
@@ -1057,7 +1057,7 @@ def test_grouped_view_validation_warnings():
             warnings.simplefilter("always")  # Ensure all warnings are captured
 
             # This should trigger warnings for missing metadata
-            collection.validate_grouped_views()
+            chart.validate_grouped_views()
 
             # Verify warnings were raised
             assert len(w) >= 2  # At least 2 warnings (one per grouped view)
@@ -1078,8 +1078,8 @@ def test_grouped_view_validation_warnings():
 
 def test_grouped_view_validation_with_incomplete_metadata():
     """Test warnings for grouped views with partial metadata."""
-    # Create a collection similar to above
-    collection = Collection(
+    # Create a chart similar to above
+    chart = Chart(
         dimensions=[
             Dimension(
                 slug="category",
@@ -1100,14 +1100,14 @@ def test_grouped_view_validation_with_incomplete_metadata():
                 indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator2"}]}),
             ),
         ],
-        catalog_path="test#collection2",
-        title={"title": "Test Collection 2"},
+        catalog_path="test#chart2",
+        title={"title": "Test Chart 2"},
         default_selection=["test"],
         _definitions=Definitions(common_views=None),
     )
 
     # Group views with partial metadata (missing description_short)
-    collection.group_views(
+    chart.group_views(
         [
             {
                 "dimension": "category",
@@ -1124,7 +1124,7 @@ def test_grouped_view_validation_with_incomplete_metadata():
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
 
-        collection.validate_grouped_views()
+        chart.validate_grouped_views()
 
         # Should have warning about missing description_short
         warning_messages = [str(warning.message) for warning in w]
@@ -1134,12 +1134,12 @@ def test_grouped_view_validation_with_incomplete_metadata():
 
 def test_validate_indicators_are_from_dependencies_success():
     """
-    Test Collection.validate_indicators_are_from_dependencies - passes when indicators match dependencies.
+    Test Chart.validate_indicators_are_from_dependencies - passes when indicators match dependencies.
 
-    Example: If collection has dependency "data://grapher/ns/2023/dataset" and uses
+    Example: If chart has dependency "data://grapher/ns/2023/dataset" and uses
     indicator "grapher/ns/2023/dataset/table#column", validation should pass.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -1155,21 +1155,21 @@ def test_validate_indicators_are_from_dependencies_success():
     )
 
     # Get indicators in use
-    indicators = collection.indicators_in_use()
+    indicators = chart.indicators_in_use()
 
     # Should pass validation
-    result = collection.validate_indicators_are_from_dependencies(indicators)
+    result = chart.validate_indicators_are_from_dependencies(indicators)
     assert result is True
 
 
 def test_validate_indicators_are_from_dependencies_failure():
     """
-    Test Collection.validate_indicators_are_from_dependencies - fails when indicators don't match dependencies.
+    Test Chart.validate_indicators_are_from_dependencies - fails when indicators don't match dependencies.
 
-    Example: If collection has dependency "data://grapher/ns/2023/dataset" but uses
+    Example: If chart has dependency "data://grapher/ns/2023/dataset" but uses
     indicator from "grapher/other/2023/otherset", validation should fail.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -1185,22 +1185,22 @@ def test_validate_indicators_are_from_dependencies_failure():
     )
 
     # Get indicators in use
-    indicators = collection.indicators_in_use()
+    indicators = chart.indicators_in_use()
 
     # Should fail validation
     with pytest.raises(
         ValueError, match="Indicator grapher/other/2023/otherset/table#column is not covered by any dependency"
     ):
-        collection.validate_indicators_are_from_dependencies(indicators)
+        chart.validate_indicators_are_from_dependencies(indicators)
 
 
 def test_validate_indicators_are_from_dependencies_multiple_dependencies():
     """
-    Test Collection.validate_indicators_are_from_dependencies - works with multiple dependencies.
+    Test Chart.validate_indicators_are_from_dependencies - works with multiple dependencies.
 
-    Example: Collection with multiple dependencies should validate indicators from any of them.
+    Example: Chart with multiple dependencies should validate indicators from any of them.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country", "metric"],
@@ -1224,20 +1224,20 @@ def test_validate_indicators_are_from_dependencies_multiple_dependencies():
     )
 
     # Get indicators in use
-    indicators = collection.indicators_in_use()
+    indicators = chart.indicators_in_use()
 
     # Should pass validation - both indicators covered by dependencies
-    result = collection.validate_indicators_are_from_dependencies(indicators)
+    result = chart.validate_indicators_are_from_dependencies(indicators)
     assert result is True
 
 
 def test_validate_indicators_are_from_dependencies_partial_match():
     """
-    Test Collection.validate_indicators_are_from_dependencies - fails when only some indicators match.
+    Test Chart.validate_indicators_are_from_dependencies - fails when only some indicators match.
 
     Example: If one indicator matches dependencies but another doesn't, validation should fail.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country", "metric"],
@@ -1261,22 +1261,22 @@ def test_validate_indicators_are_from_dependencies_partial_match():
     )
 
     # Get indicators in use
-    indicators = collection.indicators_in_use()
+    indicators = chart.indicators_in_use()
 
     # Should fail validation for the uncovered indicator
     with pytest.raises(
         ValueError, match="Indicator grapher/other/2023/uncovered/table#column2 is not covered by any dependency"
     ):
-        collection.validate_indicators_are_from_dependencies(indicators)
+        chart.validate_indicators_are_from_dependencies(indicators)
 
 
 def test_validate_indicators_are_from_dependencies_empty_dependencies():
     """
-    Test Collection.validate_indicators_are_from_dependencies - fails when no dependencies set.
+    Test Chart.validate_indicators_are_from_dependencies - fails when no dependencies set.
 
-    Example: Collection with indicators but no dependencies should fail validation.
+    Example: Chart with indicators but no dependencies should fail validation.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -1292,22 +1292,22 @@ def test_validate_indicators_are_from_dependencies_empty_dependencies():
     )
 
     # Get indicators in use
-    indicators = collection.indicators_in_use()
+    indicators = chart.indicators_in_use()
 
     # Should fail validation
     with pytest.raises(
         ValueError, match="Indicator grapher/ns/2023/dataset/table#column is not covered by any dependency"
     ):
-        collection.validate_indicators_are_from_dependencies(indicators)
+        chart.validate_indicators_are_from_dependencies(indicators)
 
 
 def test_validate_indicators_are_from_dependencies_empty_indicators():
     """
-    Test Collection.validate_indicators_are_from_dependencies - passes when no indicators used.
+    Test Chart.validate_indicators_are_from_dependencies - passes when no indicators used.
 
-    Example: Collection with no indicators should pass validation regardless of dependencies.
+    Example: Chart with no indicators should pass validation regardless of dependencies.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -1318,27 +1318,27 @@ def test_validate_indicators_are_from_dependencies_empty_indicators():
     )
 
     # Get indicators in use (should be empty)
-    indicators = collection.indicators_in_use()
+    indicators = chart.indicators_in_use()
     assert len(indicators) == 0
 
     # Should pass validation
-    result = collection.validate_indicators_are_from_dependencies(indicators)
+    result = chart.validate_indicators_are_from_dependencies(indicators)
     assert result is True
 
 
 # =============================================================================
-# Tests for Collection.group_views with replace=True
+# Tests for Chart.group_views with replace=True
 # =============================================================================
 
 
 def test_group_views_replace_removes_original_views():
     """
-    Test Collection.group_views with replace=True removes original views.
+    Test Chart.group_views with replace=True removes original views.
 
     When replace=True, the views with the original grouped choices should be removed,
     leaving only the newly created grouped views.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["sex", "age"],
@@ -1382,10 +1382,10 @@ def test_group_views_replace_removes_original_views():
     )
 
     # Before grouping: 4 views (2 sex choices x 2 age choices)
-    assert len(collection.views) == 4
+    assert len(chart.views) == 4
 
     # Group views with replace=True - should remove male/female views and add combined
-    collection.group_views(
+    chart.group_views(
         [
             {
                 "dimension": "sex",
@@ -1398,25 +1398,25 @@ def test_group_views_replace_removes_original_views():
     )
 
     # After grouping: only 2 views remain (the combined views for each age)
-    assert len(collection.views) == 2
+    assert len(chart.views) == 2
 
     # All remaining views should have sex="combined"
-    for view in collection.views:
+    for view in chart.views:
         assert view.dimensions["sex"] == "combined"
 
     # Views should be for different age groups
-    ages = {view.dimensions["age"] for view in collection.views}
+    ages = {view.dimensions["age"] for view in chart.views}
     assert ages == {"young", "old"}
 
 
 def test_group_views_replace_prunes_choices():
     """
-    Test Collection.group_views with replace=True prunes unused choices from dimension.
+    Test Chart.group_views with replace=True prunes unused choices from dimension.
 
     When replace=True, the original choices that were grouped should be removed
     from the dimension's choices list.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["metric"],
@@ -1449,10 +1449,10 @@ def test_group_views_replace_prunes_choices():
     )
 
     # Before grouping: 3 choices
-    assert len(collection.dimensions[0].choices) == 3
+    assert len(chart.dimensions[0].choices) == 3
 
     # Group cases and deaths with replace=True
-    collection.group_views(
+    chart.group_views(
         [
             {
                 "dimension": "metric",
@@ -1465,7 +1465,7 @@ def test_group_views_replace_prunes_choices():
     )
 
     # After grouping: cases and deaths should be removed, only recovered and combined remain
-    choice_slugs = [c.slug for c in collection.dimensions[0].choices]
+    choice_slugs = [c.slug for c in chart.dimensions[0].choices]
     assert "cases" not in choice_slugs
     assert "deaths" not in choice_slugs
     assert "recovered" in choice_slugs
@@ -1475,11 +1475,11 @@ def test_group_views_replace_prunes_choices():
 
 def test_group_views_replace_false_keeps_original_views():
     """
-    Test Collection.group_views with replace=False (default) keeps original views.
+    Test Chart.group_views with replace=False (default) keeps original views.
 
     When replace=False, both the original views and the new grouped views should exist.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["category"],
@@ -1507,10 +1507,10 @@ def test_group_views_replace_false_keeps_original_views():
     )
 
     # Before grouping: 2 views
-    assert len(collection.views) == 2
+    assert len(chart.views) == 2
 
     # Group views with replace=False (default)
-    collection.group_views(
+    chart.group_views(
         [
             {
                 "dimension": "category",
@@ -1523,23 +1523,23 @@ def test_group_views_replace_false_keeps_original_views():
     )
 
     # After grouping: 3 views (original a, original b, and combined)
-    assert len(collection.views) == 3
+    assert len(chart.views) == 3
 
     # Check all choices are present
-    categories = {view.dimensions["category"] for view in collection.views}
+    categories = {view.dimensions["category"] for view in chart.views}
     assert categories == {"a", "b", "all"}
 
 
 def test_group_views_replace_with_multiple_groups():
     """
-    Test Collection.group_views with replace=True for multiple groups.
+    Test Chart.group_views with replace=True for multiple groups.
 
     When multiple groups are processed together, ALL groups create their views based on
     the ORIGINAL views. Then, the replace logic runs for all groups with replace=True.
     This means views from a second group may be removed if they have dimension values
     that a first group with replace=True is removing.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["sex", "age"],
@@ -1583,12 +1583,12 @@ def test_group_views_replace_with_multiple_groups():
     )
 
     # Before grouping: 4 views
-    assert len(collection.views) == 4
+    assert len(chart.views) == 4
 
     # Group both dimensions: sex with replace=True, age with replace=False
     # Note: The age grouping creates views based on original views (with sex=male/female),
     # but these get removed by the sex grouping's replace=True logic.
-    collection.group_views(
+    chart.group_views(
         [
             {
                 "dimension": "sex",
@@ -1611,14 +1611,14 @@ def test_group_views_replace_with_multiple_groups():
     # Then replace=True for sex removes all views where sex is "male" or "female"
     # This removes: original 4 views + the 2 age-grouped views (which had sex=male/female)
     # Remaining: only the sex-grouped views (sex="both_sexes")
-    assert len(collection.views) == 2
+    assert len(chart.views) == 2
 
     # Verify sex dimension only has "both_sexes"
-    sex_choices = {view.dimensions["sex"] for view in collection.views}
+    sex_choices = {view.dimensions["sex"] for view in chart.views}
     assert sex_choices == {"both_sexes"}
 
     # Verify age dimension only has young and old (all_ages views were removed)
-    age_choices = {view.dimensions["age"] for view in collection.views}
+    age_choices = {view.dimensions["age"] for view in chart.views}
     assert age_choices == {"young", "old"}
 
 
@@ -1628,7 +1628,7 @@ def test_group_views_replace_combines_indicators():
 
     The grouped view should contain all y indicators from the original views.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["source"],
@@ -1656,7 +1656,7 @@ def test_group_views_replace_combines_indicators():
     )
 
     # Group with replace=True
-    collection.group_views(
+    chart.group_views(
         [
             {
                 "dimension": "source",
@@ -1669,10 +1669,10 @@ def test_group_views_replace_combines_indicators():
     )
 
     # Only 1 view should remain
-    assert len(collection.views) == 1
+    assert len(chart.views) == 1
 
     # The combined view should have both indicators
-    combined_view = collection.views[0]
+    combined_view = chart.views[0]
     assert combined_view.dimensions["source"] == "combined_sources"
 
     assert combined_view.indicators.y is not None
@@ -1687,7 +1687,7 @@ def test_group_views_replace_dimension_pruned_when_single_choice():
     Test that with replace=True and drop_dimensions_if_single_choice=True,
     the dimension is removed if only one choice remains.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["type", "region"],
@@ -1731,10 +1731,10 @@ def test_group_views_replace_dimension_pruned_when_single_choice():
     )
 
     # Before: 2 dimensions
-    assert len(collection.dimensions) == 2
+    assert len(chart.dimensions) == 2
 
     # Group type dimension with replace=True and allow pruning (default)
-    collection.group_views(
+    chart.group_views(
         [
             {
                 "dimension": "type",
@@ -1747,23 +1747,23 @@ def test_group_views_replace_dimension_pruned_when_single_choice():
     )
 
     # Type dimension should be removed (only 1 choice: all_types)
-    assert len(collection.dimensions) == 1
-    assert collection.dimensions[0].slug == "region"
+    assert len(chart.dimensions) == 1
+    assert chart.dimensions[0].slug == "region"
 
     # Views should not have "type" dimension anymore
-    for view in collection.views:
+    for view in chart.views:
         assert "type" not in view.dimensions
         assert "region" in view.dimensions
 
 
 def test_group_views_replace_with_partial_choices():
     """
-    Test Collection.group_views with replace=True grouping only some choices.
+    Test Chart.group_views with replace=True grouping only some choices.
 
     When only some choices are grouped with replace=True, the ungrouped choices
     should remain as separate views.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["status"],
@@ -1796,10 +1796,10 @@ def test_group_views_replace_with_partial_choices():
     )
 
     # Before: 3 views
-    assert len(collection.views) == 3
+    assert len(chart.views) == 3
 
     # Group only active and pending, leaving archived
-    collection.group_views(
+    chart.group_views(
         [
             {
                 "dimension": "status",
@@ -1812,10 +1812,10 @@ def test_group_views_replace_with_partial_choices():
     )
 
     # After: 2 views (current + archived)
-    assert len(collection.views) == 2
+    assert len(chart.views) == 2
 
     # Check status values
-    status_values = {view.dimensions["status"] for view in collection.views}
+    status_values = {view.dimensions["status"] for view in chart.views}
     assert status_values == {"current", "archived"}
     assert "active" not in status_values
     assert "pending" not in status_values
@@ -1828,7 +1828,7 @@ def test_group_views_replace_sequential_calls():
     When you need to group multiple dimensions and use the grouped results
     of one dimension in another grouping, call group_views separately.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["sex", "age"],
@@ -1872,10 +1872,10 @@ def test_group_views_replace_sequential_calls():
     )
 
     # Before grouping: 4 views
-    assert len(collection.views) == 4
+    assert len(chart.views) == 4
 
     # First: group sex dimension with replace=True
-    collection.group_views(
+    chart.group_views(
         [
             {
                 "dimension": "sex",
@@ -1888,12 +1888,12 @@ def test_group_views_replace_sequential_calls():
     )
 
     # After first grouping: 2 views (both_sexes x young/old)
-    assert len(collection.views) == 2
-    for view in collection.views:
+    assert len(chart.views) == 2
+    for view in chart.views:
         assert view.dimensions["sex"] == "both_sexes"
 
     # Second: group age dimension with replace=False (keeping young/old, adding all_ages)
-    collection.group_views(
+    chart.group_views(
         [
             {
                 "dimension": "age",
@@ -1906,14 +1906,14 @@ def test_group_views_replace_sequential_calls():
     )
 
     # After second grouping: 3 views (both_sexes x young/old/all_ages)
-    assert len(collection.views) == 3
+    assert len(chart.views) == 3
 
     # All views have sex="both_sexes"
-    sex_choices = {view.dimensions["sex"] for view in collection.views}
+    sex_choices = {view.dimensions["sex"] for view in chart.views}
     assert sex_choices == {"both_sexes"}
 
     # Age has young, old, and all_ages
-    age_choices = {view.dimensions["age"] for view in collection.views}
+    age_choices = {view.dimensions["age"] for view in chart.views}
     assert age_choices == {"young", "old", "all_ages"}
 
 
@@ -1926,7 +1926,7 @@ def test_group_views_replace_does_not_prune_other_dimensions():
     (e.g. "all" decile meant for a later group_views call) should not be
     removed when replace=True is used on a different dimension.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=["country"],
@@ -1981,12 +1981,12 @@ def test_group_views_replace_does_not_prune_other_dimensions():
         _definitions=Definitions(),
     )
 
-    decile_choices_before = {c.slug for c in collection.dimensions[1].choices}
+    decile_choices_before = {c.slug for c in chart.dimensions[1].choices}
     assert "all" in decile_choices_before
     assert "all_bar" in decile_choices_before
 
     # Group survey_comparability with replace=True (this should NOT affect decile choices)
-    collection.group_views(
+    chart.group_views(
         [
             {
                 "dimension": "survey_comparability",
@@ -1999,14 +1999,14 @@ def test_group_views_replace_does_not_prune_other_dimensions():
     )
 
     # Verify survey_comparability was grouped correctly
-    survey_choices = {c.slug for c in collection.dimensions[0].choices}
+    survey_choices = {c.slug for c in chart.dimensions[0].choices}
     assert "spell_a" not in survey_choices
     assert "spell_b" not in survey_choices
     assert "no_spells" in survey_choices
     assert "spells" in survey_choices
 
     # Key assertion: decile choices that had no views should still be preserved
-    decile_choices_after = {c.slug for c in collection.dimensions[1].choices}
+    decile_choices_after = {c.slug for c in chart.dimensions[1].choices}
     assert "all" in decile_choices_after, "Choice 'all' was incorrectly pruned from decile dimension"
     assert "all_bar" in decile_choices_after, "Choice 'all_bar' was incorrectly pruned from decile dimension"
     assert "1" in decile_choices_after
@@ -2022,7 +2022,7 @@ def test_group_views_omit_choices_with_replace_keeps_new_views():
     slug was appended to the dim, so the replace pass also dropped the just-
     created views. Make sure that doesn't happen anymore.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=[],
@@ -2050,15 +2050,15 @@ def test_group_views_omit_choices_with_replace_keeps_new_views():
     )
 
     # Omit `choices` (≡ "group every choice on the dim") + replace=True.
-    collection.group_views(
+    chart.group_views(
         [{"dimension": "sex", "choice_new_slug": "both", "replace": True}],
         drop_dimensions_if_single_choice=False,
     )
 
     # One stacked view should remain, carrying both original indicators.
-    assert len(collection.views) == 1
-    assert collection.views[0].dimensions["sex"] == "both"
-    ys = collection.views[0].indicators.y
+    assert len(chart.views) == 1
+    assert chart.views[0].dimensions["sex"] == "both"
+    ys = chart.views[0].indicators.y
     assert ys is not None
     assert {ind.catalogPath for ind in ys} == {"table#ind_m", "table#ind_f"}
 
@@ -2071,8 +2071,8 @@ def test_group_views_omit_choices_with_replace_keeps_new_views():
 def _make_rename_fixture(
     declared_extra_choices: list[DimensionChoice] | None = None,
     view_choice_slugs: list[str] | None = None,
-) -> Collection:
-    """One-dim collection — for tests where a rename either succeeds cleanly
+) -> Chart:
+    """One-dim chart — for tests where a rename either succeeds cleanly
     or fails due to the soft-rule (declared collision)."""
     choices = [
         DimensionChoice(slug="old", name="Old", description="old desc", group="g_old"),
@@ -2087,7 +2087,7 @@ def _make_rename_fixture(
         )
         for slug in (view_choice_slugs or ["old", "other"])
     ]
-    return Collection(
+    return Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=[],
@@ -2097,10 +2097,10 @@ def _make_rename_fixture(
     )
 
 
-def _make_consolidation_fixture() -> Collection:
-    """Two-dim collection where ``old`` and ``new`` both have views but
+def _make_consolidation_fixture() -> Chart:
+    """Two-dim chart where ``old`` and ``new`` both have views but
     differ on the second dim, so a consolidation rename is safe."""
-    return Collection(
+    return Chart(
         catalog_path="test#table",
         title={"en": "Test"},
         default_selection=[],
@@ -2267,7 +2267,7 @@ def test_rename_choice_slug_invalid_dedup_value_raises():
 
 
 def test_convert_description_key_lists_flattens_anchored_lists():
-    """`- *anchor` authoring in collection configs produces nested lists, which
+    """`- *anchor` authoring in chart configs produces nested lists, which
     must be flattened before the list is converted to a markdown string."""
     from etl.viz.chart.model.core import _convert_description_key_lists
 
@@ -2304,10 +2304,10 @@ def test_validate_description_keys_rejects_character_explosion():
     """The shape of the natural-disasters bug (#6647): a grouped view whose
     `description_key` was rebuilt with `list()` from the grapher-channel markdown string.
 
-    `Collection.save()` runs this before the upsert, so explorers — which override
+    `Chart.save()` runs this before the upsert, so explorers — which override
     `upsert_to_db` and never convert the list — are covered too.
     """
-    collection = Collection(
+    chart = Chart(
         catalog_path="multidim/natural_disasters/latest/affected#affected",
         title={"en": "Test"},
         default_selection=["World"],
@@ -2331,17 +2331,17 @@ def test_validate_description_keys_rejects_character_explosion():
     )
 
     with pytest.raises(ValueError, match="Pathological `description_key`"):
-        collection.validate_description_keys()
+        chart.validate_description_keys()
 
     # The same view with the string left alone passes.
-    collection.views[0].metadata = {
+    chart.views[0].metadata = {
         "description_key": "- EM-DAT counts an event as a disaster when it meets any of several criteria."
     }
-    collection.validate_description_keys()
+    chart.validate_description_keys()
 
 
 def _make_minimal_config(**extra) -> dict:
-    """Smallest config that `Collection.from_dict` accepts."""
+    """Smallest config that `Chart.from_dict` accepts."""
     return {
         "catalog_path": "test/latest/data#table",
         "title": {"title": "Test", "title_variant": "variant"},
@@ -2358,57 +2358,57 @@ def _make_minimal_config(**extra) -> dict:
     }
 
 
-def test_collection_grapher_schema_round_trips():
+def test_chart_grapher_schema_round_trips():
     """
-    Test Collection.grapher_schema - the authored pin survives from_dict/to_dict.
+    Test Chart.grapher_schema - the authored pin survives from_dict/to_dict.
 
     Without it the model used to drop the key entirely, so the version never reached Grapher.
     """
-    collection = Collection.from_dict(_make_minimal_config(grapher_schema="011"))
-    assert collection.grapher_schema == "011"
-    assert collection.to_dict()["grapher_schema"] == "011"
+    chart = Chart.from_dict(_make_minimal_config(grapher_schema="011"))
+    assert chart.grapher_schema == "011"
+    assert chart.to_dict()["grapher_schema"] == "011"
 
     # Omitted: the key is pruned. Construction still succeeds (explorers legitimately leave it
     # unset); the requirement is enforced by `validate_grapher_schema_pinned` and schema validation.
-    collection = Collection.from_dict(_make_minimal_config())
-    assert collection.grapher_schema is None
-    assert "grapher_schema" not in collection.to_dict()
+    chart = Chart.from_dict(_make_minimal_config())
+    assert chart.grapher_schema is None
+    assert "grapher_schema" not in chart.to_dict()
 
 
-def test_collection_grapher_schema_validates_at_init():
+def test_chart_grapher_schema_validates_at_init():
     """
-    Test Collection.grapher_schema - a malformed pin fails at authoring time, not at upsert time.
+    Test Chart.grapher_schema - a malformed pin fails at authoring time, not at upsert time.
 
     Example: `grapher_schema: 011` unquoted in YAML arrives as 9 and is rejected.
     """
     with pytest.raises(ValueError, match="Invalid `grapher_schema` value"):
-        Collection.from_dict(_make_minimal_config(grapher_schema=9))
+        Chart.from_dict(_make_minimal_config(grapher_schema=9))
 
 
-def test_collection_grapher_schema_passes_schema_validation():
+def test_chart_grapher_schema_passes_schema_validation():
     """
-    Test Collection.validate_schema - `grapher_schema` is accepted and format-checked by
+    Test Chart.validate_schema - `grapher_schema` is accepted and format-checked by
     schemas/multidim-schema.json (which sets additionalProperties: false at the top level).
     """
-    Collection.from_dict(_make_minimal_config(grapher_schema="011")).validate_schema()
+    Chart.from_dict(_make_minimal_config(grapher_schema="011")).validate_schema()
 
-    collection = Collection.from_dict(_make_minimal_config(grapher_schema="011"))
-    collection.grapher_schema = "latest"  # bypasses __post_init__
+    chart = Chart.from_dict(_make_minimal_config(grapher_schema="011"))
+    chart.grapher_schema = "latest"  # bypasses __post_init__
     with pytest.raises(ValueError, match="must match pattern"):
-        collection.validate_schema()
+        chart.validate_schema()
 
 
-def test_collection_grapher_schema_is_required_by_schema():
+def test_chart_grapher_schema_is_required_by_schema():
     """
-    Test Collection.validate_schema - an unpinned collection fails schema validation.
+    Test Chart.validate_schema - an unpinned chart fails schema validation.
 
     `grapher_schema` is in multidim-schema.json's top-level `required`, so the missing pin is
     caught for every authored config — YAML or assembled programmatically — the moment
-    `create_collection` builds it.
+    `create_chart` builds it.
     """
-    collection = Collection.from_dict(_make_minimal_config())
+    chart = Chart.from_dict(_make_minimal_config())
     with pytest.raises(ValueError, match="grapher_schema"):
-        collection.validate_schema()
+        chart.validate_schema()
 
 
 def test_explorer_rejects_grapher_schema():
@@ -2419,18 +2419,18 @@ def test_explorer_rejects_grapher_schema():
     """
     from etl.viz.explorer import Explorer
 
-    with pytest.raises(ValueError, match="only supported for multidim collections"):
+    with pytest.raises(ValueError, match="only supported for multidim charts"):
         Explorer.from_dict(_make_minimal_config(grapher_schema="011", config={"explorerTitle": "T"}))
 
 
 def test_warn_on_view_schema_overrides(capsys):
     """
-    Test Collection.warn_on_view_schema_overrides - a view `$schema` shadowing the collection pin
+    Test Chart.warn_on_view_schema_overrides - a view `$schema` shadowing the chart pin
     is surfaced, since Grapher lets the view value win and it is much less visible.
 
     structlog writes to stdout rather than through stdlib logging, hence capsys not caplog.
     """
-    collection = Collection.from_dict(
+    chart = Chart.from_dict(
         _make_minimal_config(
             grapher_schema="011",
             views=[
@@ -2442,20 +2442,20 @@ def test_warn_on_view_schema_overrides(capsys):
             ],
         )
     )
-    collection.warn_on_view_schema_overrides()
+    chart.warn_on_view_schema_overrides()
     out = capsys.readouterr().out
     assert "grapher-schema.008.json" in out
     assert "grapher-schema.011.json" in out
     assert "grapher_schema" in out
 
     # A view without its own `$schema` stays quiet.
-    Collection.from_dict(_make_minimal_config(grapher_schema="011")).warn_on_view_schema_overrides()
+    Chart.from_dict(_make_minimal_config(grapher_schema="011")).warn_on_view_schema_overrides()
     assert capsys.readouterr().out == ""
 
 
 def test_validate_grapher_schema_pinned():
     """
-    Test Collection.validate_grapher_schema_pinned - an unpinned mdim fails, an explorer doesn't.
+    Test Chart.validate_grapher_schema_pinned - an unpinned mdim fails, an explorer doesn't.
 
     There is no default on purpose: an unpinned config would resolve to whatever version the repo
     vendors on the day the step runs, so it both claims to be current and changes meaning after the
@@ -2465,9 +2465,9 @@ def test_validate_grapher_schema_pinned():
     from etl.viz.explorer import Explorer
 
     with pytest.raises(ValueError, match="pins no `grapher_schema`"):
-        Collection.from_dict(_make_minimal_config()).validate_grapher_schema_pinned()
+        Chart.from_dict(_make_minimal_config()).validate_grapher_schema_pinned()
 
-    Collection.from_dict(_make_minimal_config(grapher_schema="011")).validate_grapher_schema_pinned()
+    Chart.from_dict(_make_minimal_config(grapher_schema="011")).validate_grapher_schema_pinned()
 
     explorer = Explorer.from_dict(_make_minimal_config(config={"explorerTitle": "T"}))
     explorer.validate_grapher_schema_pinned()
@@ -2475,10 +2475,10 @@ def test_validate_grapher_schema_pinned():
 
 def test_warn_on_view_schema_overrides_skips_explorers(capsys):
     """
-    Test Collection.warn_on_view_schema_overrides - explorers have no pin to shadow, so no warning.
+    Test Chart.warn_on_view_schema_overrides - explorers have no pin to shadow, so no warning.
 
     Explorers always leave `grapher_schema` unset, so the warning used to fire on every explorer
-    save and point at a collection pin that does not exist.
+    save and point at a chart pin that does not exist.
     """
     from etl.viz.explorer import Explorer
 
@@ -2498,28 +2498,28 @@ def test_warn_on_view_schema_overrides_skips_explorers(capsys):
     assert capsys.readouterr().out == ""
 
 
-def test_collection_download_package_defaults_to_absent():
+def test_chart_download_package_defaults_to_absent():
     """
-    Test Collection.download_package - unset, the key is pruned from the config.
+    Test Chart.download_package - unset, the key is pruned from the config.
 
-    It records the output of a build, so a collection that never built one must upsert a
+    It records the output of a build, so a chart that never built one must upsert a
     config byte-identical to what it would have sent before packages existed.
     """
-    collection = Collection.from_dict(_make_minimal_config())
-    assert collection.download_package is None
-    assert "download_package" not in collection.to_dict()
+    chart = Chart.from_dict(_make_minimal_config())
+    assert chart.download_package is None
+    assert "download_package" not in chart.to_dict()
 
 
 def test_save_download_package_records_and_reupserts():
     """
-    Test Collection.save_download_package - the built package lands in the config, and the
+    Test Chart.save_download_package - the built package lands in the config, and the
     config is upserted again.
 
     The second upsert is the point of the method: `save()` necessarily pushed the config
     before there was a package to point at, so without it the DB keeps a config with no
     package and the data page has nothing to link to.
     """
-    collection = Collection.from_dict(_make_minimal_config())
+    chart = Chart.from_dict(_make_minimal_config())
     manifest = {
         "url": "https://example.org/x.complete-dataset.zip",
         "parquetUrl": "https://example.org/x.parquet",
@@ -2531,23 +2531,23 @@ def test_save_download_package_records_and_reupserts():
     built = type("Result", (), {"to_config": lambda self: manifest})()
 
     with (
-        patch("etl.viz.chart.download_package.build_download_package_for_collection", return_value=built) as build,
+        patch("etl.viz.chart.download_package.build_download_package_for_chart", return_value=built) as build,
         patch("etl.viz.chart.download_package.resolve_page_slug", return_value="a-slug"),
-        patch.object(Collection, "save_config_local") as save_local,
-        patch.object(Collection, "upsert_to_db") as upsert,
+        patch.object(Chart, "save_config_local") as save_local,
+        patch.object(Chart, "upsert_to_db") as upsert,
     ):
-        collection.save_download_package()
+        chart.save_download_package()
 
-    assert collection.download_package == manifest
-    assert collection.to_dict()["download_package"] == manifest
-    assert build.call_args.kwargs["dest_dir"] == collection.local_download_package_dir
+    assert chart.download_package == manifest
+    assert chart.to_dict()["download_package"] == manifest
+    assert build.call_args.kwargs["dest_dir"] == chart.local_download_package_dir
     assert save_local.call_count == 1
     assert upsert.call_count == 1
 
 
 def test_save_download_package_skips_explorers():
     """
-    Test Collection.save_download_package - explorers build no package.
+    Test Chart.save_download_package - explorers build no package.
 
     They have no `multi_dim_data_pages` row to take a page slug from, so the builder would
     raise; and no page that could render a download button.
@@ -2556,16 +2556,16 @@ def test_save_download_package_skips_explorers():
 
     explorer = Explorer.from_dict(_make_minimal_config(config={"explorerTitle": "T"}))
 
-    with patch("etl.viz.chart.download_package.build_download_package_for_collection") as build:
+    with patch("etl.viz.chart.download_package.build_download_package_for_chart") as build:
         explorer.save_download_package()
 
     assert build.call_count == 0
     assert explorer.download_package is None
 
 
-def test_save_download_package_skips_unpublished_collections():
+def test_save_download_package_skips_unpublished_charts():
     """
-    Test Collection.save_download_package - a collection with no page slug builds nothing.
+    Test Chart.save_download_package - a chart with no page slug builds nothing.
 
     ETL never assigns the slug (`put_mdim_config` sends only the config); someone publishing
     the MDIM in the admin does. So a step whose MDIM was never published has a
@@ -2573,15 +2573,15 @@ def test_save_download_package_skips_unpublished_collections():
     multidim steps on a staging server. Since save() now builds packages by default, that
     has to be a skip rather than a failed step.
     """
-    collection = Collection.from_dict(_make_minimal_config())
+    chart = Chart.from_dict(_make_minimal_config())
 
     with (
         patch("etl.viz.chart.download_package.resolve_page_slug", return_value=None),
-        patch("etl.viz.chart.download_package.build_download_package_for_collection") as build,
-        patch.object(Collection, "upsert_to_db") as upsert,
+        patch("etl.viz.chart.download_package.build_download_package_for_chart") as build,
+        patch.object(Chart, "upsert_to_db") as upsert,
     ):
-        collection.save_download_package()
+        chart.save_download_package()
 
     assert build.call_count == 0
     assert upsert.call_count == 0
-    assert collection.download_package is None
+    assert chart.download_package is None

@@ -52,10 +52,10 @@ def st_show_home():
     st.markdown(WIZARD_CONFIG["etl"]["description"])
     steps = WIZARD_CONFIG["etl"]["steps"]
 
-    # 1/ CLASSIC: Snapshot -> Data -> Collection (no captions, match original)
+    # 1/ CLASSIC: Snapshot -> Data -> Chart (no captions, match original)
     if steps["fasttrack"]["enable"]:
         _render_cards_row(
-            [steps["snapshot"], steps["data"], steps["collection"]],
+            [steps["snapshot"], steps["data"], steps["chart"]],
             height=100,
             col_widths=[1, 2, 1],
             show_caption=False,

@@ -1,7 +1,7 @@
 """Tests for etl.viz.chart.core.create module.
 
-This module tests the main collection creation function that combines
-various collection utilities to create complete collections and explorers
+This module tests the main chart creation function that combines
+various chart utilities to create complete charts and explorers
 from configurations and optional table data.
 """
 
@@ -17,18 +17,18 @@ from etl.viz.chart.core.create import (
     _get_expand_path_mode,
     _remap_choice_renames,
     _rename_choices,
-    create_collection,
-    create_collection_single_table,
+    create_chart,
+    create_chart_single_table,
 )
-from etl.viz.chart.model.core import Collection
+from etl.viz.chart.model.core import Chart
 from etl.viz.chart.model.dimension import Dimension, DimensionChoice
 from etl.viz.explorer import Explorer
 
 
 def create_test_config():
-    """Create a basic test configuration for collections."""
+    """Create a basic test configuration for charts."""
     return {
-        "title": {"title": "Test Collection", "title_variant": "Test Collection Variant"},
+        "title": {"title": "Test Chart", "title_variant": "Test Chart Variant"},
         "default_selection": ["country"],
         "dimensions": [
             {
@@ -101,29 +101,27 @@ def create_multiple_test_tables():
     return [create_test_table(), create_test_table_2()]
 
 
-class TestCreateCollection:
-    """Test suite for create_collection function."""
+class TestCreateChart:
+    """Test suite for create_chart function."""
 
-    def test_create_collection_basic_no_table(self):
-        """Test basic collection creation without table input."""
+    def test_create_chart_basic_no_table(self):
+        """Test basic chart creation without table input."""
         config = create_test_config()
         dependencies = {"test#indicator1"}
         catalog_path = "test/latest/data#table"
 
-        with patch("etl.viz.chart.core.create.create_collection_from_config") as mock_create:
-            mock_collection = Mock(spec=Collection)
-            mock_create.return_value = mock_collection
+        with patch("etl.viz.chart.core.create.create_chart_from_config") as mock_create:
+            mock_chart = Mock(spec=Chart)
+            mock_create.return_value = mock_chart
 
-            result = create_collection_single_table(
-                config_yaml=config, dependencies=dependencies, catalog_path=catalog_path
-            )
+            result = create_chart_single_table(config_yaml=config, dependencies=dependencies, catalog_path=catalog_path)
 
             # Verify the function was called correctly
             mock_create.assert_called_once_with(config=config, dependencies=dependencies, catalog_path=catalog_path)
-            assert result == mock_collection
+            assert result == mock_chart
 
-    def test_create_collection_with_table_input(self):
-        """Test collection creation with table input for auto-expansion."""
+    def test_create_chart_with_table_input(self):
+        """Test chart creation with table input for auto-expansion."""
         config = create_test_config()
         dependencies = {"test#indicator1"}
         catalog_path = "test/latest/data#table"
@@ -132,7 +130,7 @@ class TestCreateCollection:
         with patch("etl.viz.chart.core.create.has_duplicate_table_names") as mock_has_duplicates:
             with patch("etl.viz.chart.core.create.expand_config") as mock_expand:
                 with patch("etl.viz.chart.core.create.combine_config_dimensions") as mock_combine:
-                    with patch("etl.viz.chart.core.create.create_collection_from_config") as mock_create:
+                    with patch("etl.viz.chart.core.create.create_chart_from_config") as mock_create:
                         mock_has_duplicates.return_value = False
 
                         # Mock expand_config to return auto-generated config
@@ -158,10 +156,10 @@ class TestCreateCollection:
                             }
                         ]
 
-                        mock_collection = Mock(spec=Collection)
-                        mock_create.return_value = mock_collection
+                        mock_chart = Mock(spec=Chart)
+                        mock_create.return_value = mock_chart
 
-                        result = create_collection_single_table(
+                        result = create_chart_single_table(
                             config_yaml=config,
                             dependencies=dependencies,
                             catalog_path=catalog_path,
@@ -183,22 +181,22 @@ class TestCreateCollection:
                         # Verify combine_config_dimensions was called
                         mock_combine.assert_called_once()
 
-                        # Verify create_collection_from_config was called
+                        # Verify create_chart_from_config was called
                         mock_create.assert_called_once()
 
-                        assert result == mock_collection
+                        assert result == mock_chart
 
-    def test_create_collection_explorer_mode(self):
-        """Test collection creation in explorer mode."""
+    def test_create_chart_explorer_mode(self):
+        """Test chart creation in explorer mode."""
         config = create_test_explorer_config()
         dependencies = {"test#indicator1"}
         catalog_path = "test/latest/data#table"
 
-        with patch("etl.viz.chart.core.create.create_collection_from_config") as mock_create:
+        with patch("etl.viz.chart.core.create.create_chart_from_config") as mock_create:
             mock_explorer = Mock(spec=Explorer)
             mock_create.return_value = mock_explorer
 
-            result = create_collection_single_table(
+            result = create_chart_single_table(
                 config_yaml=config, dependencies=dependencies, catalog_path=catalog_path, explorer=True
             )
 
@@ -212,17 +210,17 @@ class TestCreateCollection:
             )
             assert result == mock_explorer
 
-    def test_create_collection_with_choice_renames_dict(self):
-        """Test collection creation with choice renaming using dictionary."""
+    def test_create_chart_with_choice_renames_dict(self):
+        """Test chart creation with choice renaming using dictionary."""
         config = create_test_config()
         dependencies = {"test#indicator1"}
         catalog_path = "test/latest/data#table"
         choice_renames = {"country": {"usa": "United States of America", "can": "Canada"}}
         choice_renames = cast(dict[str, dict[str, str] | Callable], choice_renames)
 
-        with patch("etl.viz.chart.core.create.create_collection_from_config") as mock_create:
-            # Create a mock collection with dimensions and choices
-            mock_collection = Mock(spec=Collection)
+        with patch("etl.viz.chart.core.create.create_chart_from_config") as mock_create:
+            # Create a mock chart with dimensions and choices
+            mock_chart = Mock(spec=Chart)
 
             # Create mock dimensions with choices
             usa_choice = Mock(spec=DimensionChoice)
@@ -237,20 +235,20 @@ class TestCreateCollection:
             country_dim.slug = "country"
             country_dim.choices = [usa_choice, can_choice]
 
-            mock_collection.dimensions = [country_dim]
-            mock_create.return_value = mock_collection
+            mock_chart.dimensions = [country_dim]
+            mock_create.return_value = mock_chart
 
-            result = create_collection_single_table(
+            result = create_chart_single_table(
                 config_yaml=config, dependencies=dependencies, catalog_path=catalog_path, choice_renames=choice_renames
             )
 
             # Verify choice names were updated
             assert usa_choice.name == "United States of America"
             assert can_choice.name == "Canada"
-            assert result == mock_collection
+            assert result == mock_chart
 
-    def test_create_collection_with_choice_renames_function(self):
-        """Test collection creation with choice renaming using function."""
+    def test_create_chart_with_choice_renames_function(self):
+        """Test chart creation with choice renaming using function."""
         config = create_test_config()
         dependencies = {"test#indicator1"}
         catalog_path = "test/latest/data#table"
@@ -265,9 +263,9 @@ class TestCreateCollection:
         choice_renames = {"country": rename_country}
         choice_renames = cast(dict[str, dict[str, str] | Callable], choice_renames)
 
-        with patch("etl.viz.chart.core.create.create_collection_from_config") as mock_create:
-            # Create a mock collection with dimensions and choices
-            mock_collection = Mock(spec=Collection)
+        with patch("etl.viz.chart.core.create.create_chart_from_config") as mock_create:
+            # Create a mock chart with dimensions and choices
+            mock_chart = Mock(spec=Chart)
 
             usa_choice = Mock(spec=DimensionChoice)
             usa_choice.slug = "usa"
@@ -277,19 +275,19 @@ class TestCreateCollection:
             country_dim.slug = "country"
             country_dim.choices = [usa_choice]
 
-            mock_collection.dimensions = [country_dim]
-            mock_create.return_value = mock_collection
+            mock_chart.dimensions = [country_dim]
+            mock_create.return_value = mock_chart
 
-            result = create_collection_single_table(
+            result = create_chart_single_table(
                 config_yaml=config, dependencies=dependencies, catalog_path=catalog_path, choice_renames=choice_renames
             )
 
             # Verify choice name was updated via function
             assert usa_choice.name == "United States of America"
-            assert result == mock_collection
+            assert result == mock_chart
 
-    def test_create_collection_with_all_expand_params(self):
-        """Test collection creation with all expand_config parameters."""
+    def test_create_chart_with_all_expand_params(self):
+        """Test chart creation with all expand_config parameters."""
         config = create_test_config()
         dependencies = {"test#indicator1"}
         catalog_path = "test/latest/data#table"
@@ -298,14 +296,14 @@ class TestCreateCollection:
         with patch("etl.viz.chart.core.create.has_duplicate_table_names") as mock_has_duplicates:
             with patch("etl.viz.chart.core.create.expand_config") as mock_expand:
                 with patch("etl.viz.chart.core.create.combine_config_dimensions") as mock_combine:
-                    with patch("etl.viz.chart.core.create.create_collection_from_config") as mock_create:
+                    with patch("etl.viz.chart.core.create.create_chart_from_config") as mock_create:
                         mock_has_duplicates.return_value = False
                         mock_expand.return_value = {"dimensions": [], "views": []}
                         mock_combine.return_value = []
-                        mock_collection = Mock(spec=Collection)
-                        mock_create.return_value = mock_collection
+                        mock_chart = Mock(spec=Chart)
+                        mock_create.return_value = mock_chart
 
-                        result = create_collection_single_table(
+                        result = create_chart_single_table(
                             config_yaml=config,
                             dependencies=dependencies,
                             catalog_path=catalog_path,
@@ -329,7 +327,7 @@ class TestCreateCollection:
                             expand_path_mode="full",
                         )
 
-                        assert result == mock_collection
+                        assert result == mock_chart
 
 
 class TestGetExpandPathMode:
@@ -373,8 +371,8 @@ class TestRenameChoices:
 
     def test_rename_choices_with_dict(self):
         """Test choice renaming using dictionary mapping."""
-        # Create mock collection with dimensions and choices
-        mock_collection = Mock(spec=Collection)
+        # Create mock chart with dimensions and choices
+        mock_chart = Mock(spec=Chart)
 
         choice1 = Mock(spec=DimensionChoice)
         choice1.slug = "usa"
@@ -388,12 +386,12 @@ class TestRenameChoices:
         dimension.slug = "country"
         dimension.choices = [choice1, choice2]
 
-        mock_collection.dimensions = [dimension]
+        mock_chart.dimensions = [dimension]
 
         choice_renames = {"country": {"usa": "United States of America", "can": "Canada (Renamed)"}}
         choice_renames = cast(dict[str, dict[str, str] | Callable], choice_renames)
 
-        _rename_choices(mock_collection, choice_renames)
+        _rename_choices(mock_chart, choice_renames)
 
         # Verify names were updated
         assert choice1.name == "United States of America"
@@ -401,7 +399,7 @@ class TestRenameChoices:
 
     def test_rename_choices_with_function(self):
         """Test choice renaming using function."""
-        mock_collection = Mock(spec=Collection)
+        mock_chart = Mock(spec=Chart)
 
         choice1 = Mock(spec=DimensionChoice)
         choice1.slug = "usa"
@@ -411,7 +409,7 @@ class TestRenameChoices:
         dimension.slug = "country"
         dimension.choices = [choice1]
 
-        mock_collection.dimensions = [dimension]
+        mock_chart.dimensions = [dimension]
 
         def rename_func(slug):
             if slug == "usa":
@@ -421,14 +419,14 @@ class TestRenameChoices:
         choice_renames = {"country": rename_func}
         choice_renames = cast(dict[str, dict[str, str] | Callable], choice_renames)
 
-        _rename_choices(mock_collection, choice_renames)
+        _rename_choices(mock_chart, choice_renames)
 
         # Verify name was updated via function
         assert choice1.name == "United States of America"
 
     def test_rename_choices_function_returns_none(self):
         """Test choice renaming when function returns None (no rename)."""
-        mock_collection = Mock(spec=Collection)
+        mock_chart = Mock(spec=Chart)
 
         choice1 = Mock(spec=DimensionChoice)
         choice1.slug = "gbr"
@@ -438,7 +436,7 @@ class TestRenameChoices:
         dimension.slug = "country"
         dimension.choices = [choice1]
 
-        mock_collection.dimensions = [dimension]
+        mock_chart.dimensions = [dimension]
 
         def rename_func(slug):
             if slug == "usa":
@@ -448,14 +446,14 @@ class TestRenameChoices:
         choice_renames = {"country": rename_func}
         choice_renames = cast(dict[str, dict[str, str] | Callable], choice_renames)
 
-        _rename_choices(mock_collection, choice_renames)
+        _rename_choices(mock_chart, choice_renames)
 
         # Verify name was not changed
         assert choice1.name == "United Kingdom"
 
     def test_rename_choices_no_renames(self):
         """Test choice renaming when choice_renames is None."""
-        mock_collection = Mock(spec=Collection)
+        mock_chart = Mock(spec=Chart)
 
         choice1 = Mock(spec=DimensionChoice)
         choice1.slug = "usa"
@@ -465,16 +463,16 @@ class TestRenameChoices:
         dimension.slug = "country"
         dimension.choices = [choice1]
 
-        mock_collection.dimensions = [dimension]
+        mock_chart.dimensions = [dimension]
 
-        _rename_choices(mock_collection, None)
+        _rename_choices(mock_chart, None)
 
         # Verify name was not changed
         assert choice1.name == "United States"
 
     def test_rename_choices_dimension_not_in_renames(self):
         """Test choice renaming when dimension slug is not in renames."""
-        mock_collection = Mock(spec=Collection)
+        mock_chart = Mock(spec=Chart)
 
         choice1 = Mock(spec=DimensionChoice)
         choice1.slug = "usa"
@@ -484,7 +482,7 @@ class TestRenameChoices:
         dimension.slug = "country"
         dimension.choices = [choice1]
 
-        mock_collection.dimensions = [dimension]
+        mock_chart.dimensions = [dimension]
 
         choice_renames = {
             "region": {  # Different dimension slug
@@ -493,14 +491,14 @@ class TestRenameChoices:
         }
         choice_renames = cast(dict[str, dict[str, str] | Callable], choice_renames)
 
-        _rename_choices(mock_collection, choice_renames)
+        _rename_choices(mock_chart, choice_renames)
 
         # Verify name was not changed
         assert choice1.name == "United States"
 
     def test_rename_choices_invalid_renames_format(self):
         """Test choice renaming with invalid renames format raises error."""
-        mock_collection = Mock(spec=Collection)
+        mock_chart = Mock(spec=Chart)
 
         choice1 = Mock(spec=DimensionChoice)
         choice1.slug = "usa"
@@ -510,19 +508,19 @@ class TestRenameChoices:
         dimension.slug = "country"
         dimension.choices = [choice1]
 
-        mock_collection.dimensions = [dimension]
+        mock_chart.dimensions = [dimension]
 
         choice_renames = {
             "country": "invalid_format"  # Should be dict or function
         }
 
         with pytest.raises(ValueError, match="Invalid choice_renames format"):
-            _rename_choices(mock_collection, choice_renames)  # ty: ignore[invalid-argument-type]
+            _rename_choices(mock_chart, choice_renames)  # ty: ignore[invalid-argument-type]
 
 
 class TestRemapChoiceRenames:
     """Tests for _remap_choice_renames, which merges per-table choice_renames
-    after combine_collections may have renamed choice slugs to resolve conflicts."""
+    after combine_charts may have renamed choice slugs to resolve conflicts."""
 
     def test_no_slug_changes_dict_renames(self):
         """Disjoint dimensions from two tables should merge without alteration."""
@@ -554,12 +552,12 @@ class TestRemapChoiceRenames:
 
     def test_handles_nan_entries_from_unstack(self):
         """Regression test for Codex P1: _extract_choice_slug_changes uses
-        ``unstack``, which produces NaN placeholders for (collection, dimension)
-        pairs with no conflicts when other collections did have conflicts on the
+        ``unstack``, which produces NaN placeholders for (chart, dimension)
+        pairs with no conflicts when other charts did have conflicts on the
         same dimension. Those NaN values must not reach ``.get()`` / ``.items()``.
         """
         # Simulate the structure returned by _extract_choice_slug_changes when
-        # collection "0" had a conflict on "sex" but collection "1" did not.
+        # chart "0" had a conflict on "sex" but chart "1" did not.
         # For completeness, "1" had a conflict on "age" but "0" did not, so
         # slug_changes["0"]["age"] is NaN too.
         nan = float("nan")
@@ -670,9 +668,9 @@ class TestRemapChoiceRenames:
 
 
 class TestIntegration:
-    """Integration tests for create_collection function."""
+    """Integration tests for create_chart function."""
 
-    def test_create_collection_integration_with_table(self):
+    def test_create_chart_integration_with_table(self):
         """Test complete integration with table expansion and choice renaming."""
         config = create_test_config()
         dependencies = {"test#indicator1"}
@@ -683,11 +681,11 @@ class TestIntegration:
         choice_renames = cast(dict[str, dict[str, str] | Callable], choice_renames)
 
         with patch("etl.viz.chart.core.create.has_duplicate_table_names") as mock_has_duplicates:
-            with patch("etl.viz.chart.core.create.create_collection_from_config") as mock_create:
+            with patch("etl.viz.chart.core.create.create_chart_from_config") as mock_create:
                 mock_has_duplicates.return_value = False
 
-                # Create a mock collection to test the full flow
-                mock_collection = Mock(spec=Collection)
+                # Create a mock chart to test the full flow
+                mock_chart = Mock(spec=Chart)
 
                 # Mock dimension with choices for renaming test
                 choice_male = Mock(spec=DimensionChoice)
@@ -702,8 +700,8 @@ class TestIntegration:
                 sex_dimension.slug = "sex"
                 sex_dimension.choices = [choice_male, choice_female]
 
-                mock_collection.dimensions = [sex_dimension]
-                mock_create.return_value = mock_collection
+                mock_chart.dimensions = [sex_dimension]
+                mock_create.return_value = mock_chart
 
                 # Mock the expand_config and combine functions to work together
                 with patch("etl.viz.chart.core.create.expand_config") as mock_expand:
@@ -714,7 +712,7 @@ class TestIntegration:
                         }
                         mock_combine.return_value = [{"slug": "sex", "name": "Sex", "choices": []}]
 
-                        result = create_collection_single_table(
+                        result = create_chart_single_table(
                             config_yaml=config,
                             dependencies=dependencies,
                             catalog_path=catalog_path,
@@ -732,31 +730,31 @@ class TestIntegration:
                         assert choice_male.name == "Male"
                         assert choice_female.name == "Female"
 
-                        assert result == mock_collection
+                        assert result == mock_chart
 
 
-class TestCreateCollectionMultipleTables:
-    """Test suite for create_collection function with multiple tables."""
+class TestCreateChartMultipleTables:
+    """Test suite for create_chart function with multiple tables."""
 
-    def test_create_collection_multiple_tables_basic(self):
-        """Test collection creation with multiple tables."""
+    def test_create_chart_multiple_tables_basic(self):
+        """Test chart creation with multiple tables."""
         config = create_test_config()
         dependencies = {"test#indicator1", "test#indicator2"}
         catalog_path = "test/latest/data#table"
         tables = create_multiple_test_tables()
 
-        with patch("etl.viz.chart.core.create.create_collection_single_table") as mock_single:
-            with patch("etl.viz.chart.core.create.combine_collections") as mock_combine:
-                # Mock single table creation to return different collections
-                mock_collection_1 = Mock(spec=Collection)
-                mock_collection_2 = Mock(spec=Collection)
-                mock_single.side_effect = [mock_collection_1, mock_collection_2]
+        with patch("etl.viz.chart.core.create.create_chart_single_table") as mock_single:
+            with patch("etl.viz.chart.core.create.combine_charts") as mock_combine:
+                # Mock single table creation to return different charts
+                mock_chart_1 = Mock(spec=Chart)
+                mock_chart_2 = Mock(spec=Chart)
+                mock_single.side_effect = [mock_chart_1, mock_chart_2]
 
-                # Mock combine_collections to return final collection
-                mock_final_collection = Mock(spec=Collection)
-                mock_combine.return_value = mock_final_collection
+                # Mock combine_charts to return final chart
+                mock_final_chart = Mock(spec=Chart)
+                mock_combine.return_value = mock_final_chart
 
-                result = create_collection(
+                result = create_chart(
                     config_yaml=config,
                     dependencies=dependencies,
                     catalog_path=catalog_path,
@@ -764,7 +762,7 @@ class TestCreateCollectionMultipleTables:
                     indicator_names=[["deaths"], ["cases"]],
                 )
 
-                # Verify create_collection_single_table was called twice
+                # Verify create_chart_single_table was called twice
                 assert mock_single.call_count == 2
 
                 # Verify first call arguments
@@ -777,22 +775,22 @@ class TestCreateCollectionMultipleTables:
                 assert second_call[1]["tb"] is tables[1]
                 assert second_call[1]["indicator_names"] == ["cases"]
 
-                # Verify combine_collections was called
+                # Verify combine_charts was called
                 mock_combine.assert_called_once()
                 call_kwargs = mock_combine.call_args[1]
-                assert call_kwargs["collections"] == [mock_collection_1, mock_collection_2]
+                assert call_kwargs["charts"] == [mock_chart_1, mock_chart_2]
                 assert call_kwargs["catalog_path"] == catalog_path
                 assert call_kwargs["config"] == config
                 assert call_kwargs["is_explorer"] is False
 
-                assert result == mock_final_collection
+                assert result == mock_final_chart
 
-    def test_create_collection_multiple_tables_with_list_parameters(self):
-        """Test collection creation with multiple tables and list parameters.
+    def test_create_chart_multiple_tables_with_list_parameters(self):
+        """Test chart creation with multiple tables and list parameters.
 
         When choice_renames is a list, each element is passed to its corresponding
-        sub-collection, and after combining, remapped renames are applied to the
-        final collection.
+        sub-chart, and after combining, remapped renames are applied to the
+        final chart.
         """
         config = create_test_config()
         dependencies = {"test#indicator1", "test#indicator2"}
@@ -808,13 +806,13 @@ class TestCreateCollectionMultipleTables:
             {"age": {"young": "Young", "old": "Old"}},
         ]
 
-        with patch("etl.viz.chart.core.create.create_collection_single_table") as mock_single:
-            with patch("etl.viz.chart.core.create.combine_collections") as mock_combine:
-                mock_collection_1 = Mock(spec=Collection)
-                mock_collection_2 = Mock(spec=Collection)
-                mock_single.side_effect = [mock_collection_1, mock_collection_2]
+        with patch("etl.viz.chart.core.create.create_chart_single_table") as mock_single:
+            with patch("etl.viz.chart.core.create.combine_charts") as mock_combine:
+                mock_chart_1 = Mock(spec=Chart)
+                mock_chart_2 = Mock(spec=Chart)
+                mock_single.side_effect = [mock_chart_1, mock_chart_2]
 
-                # Final collection needs dimensions for _rename_choices
+                # Final chart needs dimensions for _rename_choices
                 sex_choice_male = Mock(spec=DimensionChoice)
                 sex_choice_male.slug = "male"
                 sex_choice_male.name = "male"
@@ -835,11 +833,11 @@ class TestCreateCollectionMultipleTables:
                 age_dim.slug = "age"
                 age_dim.choices = [age_choice_young, age_choice_old]
 
-                mock_final_collection = Mock(spec=Collection)
-                mock_final_collection.dimensions = [sex_dim, age_dim]
-                mock_combine.return_value = mock_final_collection
+                mock_final_chart = Mock(spec=Chart)
+                mock_final_chart.dimensions = [sex_dim, age_dim]
+                mock_combine.return_value = mock_final_chart
 
-                result = create_collection(
+                result = create_chart(
                     config_yaml=config,
                     dependencies=dependencies,
                     catalog_path=catalog_path,
@@ -850,7 +848,7 @@ class TestCreateCollectionMultipleTables:
                     choice_renames=choice_renames,
                 )
 
-                # Verify sub-collections received per-table choice_renames
+                # Verify sub-charts received per-table choice_renames
                 assert mock_single.call_count == 2
 
                 first_call = mock_single.call_args_list[0]
@@ -867,16 +865,16 @@ class TestCreateCollectionMultipleTables:
                 assert second_call[1]["common_view_config"] == {"chartType": "BarChart"}
                 assert second_call[1]["choice_renames"] == {"age": {"young": "Young", "old": "Old"}}
 
-                # Verify remapped renames were applied to the final collection
+                # Verify remapped renames were applied to the final chart
                 assert sex_choice_male.name == "Male"
                 assert sex_choice_female.name == "Female"
                 assert age_choice_young.name == "Young"
                 assert age_choice_old.name == "Old"
 
-                assert result == mock_final_collection
+                assert result == mock_final_chart
 
-    def test_create_collection_multiple_tables_single_parameters(self):
-        """Test collection creation with multiple tables and single parameters applied to all."""
+    def test_create_chart_multiple_tables_single_parameters(self):
+        """Test chart creation with multiple tables and single parameters applied to all."""
         config = create_test_config()
         dependencies = {"test#indicator1", "test#indicator2"}
         catalog_path = "test/latest/data#table"
@@ -887,16 +885,16 @@ class TestCreateCollectionMultipleTables:
         single_dimensions = {"country": ["USA", "CAN"]}
         single_common_view_config = {"chartType": "ScatterPlot"}
 
-        with patch("etl.viz.chart.core.create.create_collection_single_table") as mock_single:
-            with patch("etl.viz.chart.core.create.combine_collections") as mock_combine:
-                mock_collection_1 = Mock(spec=Collection)
-                mock_collection_2 = Mock(spec=Collection)
-                mock_single.side_effect = [mock_collection_1, mock_collection_2]
+        with patch("etl.viz.chart.core.create.create_chart_single_table") as mock_single:
+            with patch("etl.viz.chart.core.create.combine_charts") as mock_combine:
+                mock_chart_1 = Mock(spec=Chart)
+                mock_chart_2 = Mock(spec=Chart)
+                mock_single.side_effect = [mock_chart_1, mock_chart_2]
 
-                mock_final_collection = Mock(spec=Collection)
-                mock_combine.return_value = mock_final_collection
+                mock_final_chart = Mock(spec=Chart)
+                mock_combine.return_value = mock_final_chart
 
-                result = create_collection(
+                result = create_chart(
                     config_yaml=config,
                     dependencies=dependencies,
                     catalog_path=catalog_path,
@@ -914,17 +912,17 @@ class TestCreateCollectionMultipleTables:
                     assert call[1]["dimensions"] == single_dimensions
                     assert call[1]["common_view_config"] == single_common_view_config
 
-                assert result == mock_final_collection
+                assert result == mock_final_chart
 
-    def test_create_collection_multiple_tables_explorer_mode(self):
-        """Test collection creation with multiple tables in explorer mode."""
+    def test_create_chart_multiple_tables_explorer_mode(self):
+        """Test chart creation with multiple tables in explorer mode."""
         config = create_test_explorer_config()
         dependencies = {"test#indicator1", "test#indicator2"}
         catalog_path = "test/latest/data#table"
         tables = create_multiple_test_tables()
 
-        with patch("etl.viz.chart.core.create.create_collection_single_table") as mock_single:
-            with patch("etl.viz.chart.core.create.combine_collections") as mock_combine:
+        with patch("etl.viz.chart.core.create.create_chart_single_table") as mock_single:
+            with patch("etl.viz.chart.core.create.combine_charts") as mock_combine:
                 mock_explorer_1 = Mock(spec=Explorer)
                 mock_explorer_2 = Mock(spec=Explorer)
                 mock_single.side_effect = [mock_explorer_1, mock_explorer_2]
@@ -932,7 +930,7 @@ class TestCreateCollectionMultipleTables:
                 mock_final_explorer = Mock(spec=Explorer)
                 mock_combine.return_value = mock_final_explorer
 
-                result = create_collection(
+                result = create_chart(
                     config_yaml=config,
                     dependencies=dependencies,
                     catalog_path=catalog_path,
@@ -945,17 +943,17 @@ class TestCreateCollectionMultipleTables:
                 for call in mock_single.call_args_list:
                     assert call[1]["explorer"] is True
 
-                # Verify combine_collections was called with explorer flag
+                # Verify combine_charts was called with explorer flag
                 mock_combine.assert_called_once()
                 call_kwargs = mock_combine.call_args[1]
-                assert call_kwargs["collections"] == [mock_explorer_1, mock_explorer_2]
+                assert call_kwargs["charts"] == [mock_explorer_1, mock_explorer_2]
                 assert call_kwargs["catalog_path"] == catalog_path
                 assert call_kwargs["config"] == config
                 assert call_kwargs["is_explorer"] is True
 
                 assert result == mock_final_explorer
 
-    def test_create_collection_multiple_tables_mismatched_list_length(self):
+    def test_create_chart_multiple_tables_mismatched_list_length(self):
         """Test that mismatched list lengths raise ValueError."""
         config = create_test_config()
         dependencies = {"test#indicator1", "test#indicator2"}
@@ -966,7 +964,7 @@ class TestCreateCollectionMultipleTables:
         indicator_names = [["deaths"], ["cases"], ["extra"]]
 
         with pytest.raises(ValueError, match="Parameter 'indicator_names' is a list of length 3"):
-            create_collection(
+            create_chart(
                 config_yaml=config,
                 dependencies=dependencies,
                 catalog_path=catalog_path,
@@ -974,8 +972,8 @@ class TestCreateCollectionMultipleTables:
                 indicator_names=indicator_names,
             )
 
-    def test_create_collection_multiple_tables_mixed_none_parameters(self):
-        """Test collection creation with multiple tables where some list parameters contain None."""
+    def test_create_chart_multiple_tables_mixed_none_parameters(self):
+        """Test chart creation with multiple tables where some list parameters contain None."""
         config = create_test_config()
         dependencies = {"test#indicator1", "test#indicator2"}
         catalog_path = "test/latest/data#table"
@@ -985,16 +983,16 @@ class TestCreateCollectionMultipleTables:
         indicator_names = [None, "cases"]  # First table uses all indicators, second uses specific
         dimensions = [None, {"age": ["young"]}]  # First table uses all dimensions, second uses specific
 
-        with patch("etl.viz.chart.core.create.create_collection_single_table") as mock_single:
-            with patch("etl.viz.chart.core.create.combine_collections") as mock_combine:
-                mock_collection_1 = Mock(spec=Collection)
-                mock_collection_2 = Mock(spec=Collection)
-                mock_single.side_effect = [mock_collection_1, mock_collection_2]
+        with patch("etl.viz.chart.core.create.create_chart_single_table") as mock_single:
+            with patch("etl.viz.chart.core.create.combine_charts") as mock_combine:
+                mock_chart_1 = Mock(spec=Chart)
+                mock_chart_2 = Mock(spec=Chart)
+                mock_single.side_effect = [mock_chart_1, mock_chart_2]
 
-                mock_final_collection = Mock(spec=Collection)
-                mock_combine.return_value = mock_final_collection
+                mock_final_chart = Mock(spec=Chart)
+                mock_combine.return_value = mock_final_chart
 
-                result = create_collection(
+                result = create_chart(
                     config_yaml=config,
                     dependencies=dependencies,
                     catalog_path=catalog_path,
@@ -1012,12 +1010,12 @@ class TestCreateCollectionMultipleTables:
                 assert second_call[1]["indicator_names"] == "cases"
                 assert second_call[1]["dimensions"] == {"age": ["young"]}
 
-                assert result == mock_final_collection
+                assert result == mock_final_chart
 
-    def test_create_collection_multiple_tables_single_dict_choice_renames(self):
+    def test_create_chart_multiple_tables_single_dict_choice_renames(self):
         """When choice_renames is a single dict with multiple tables, it should
-        NOT be passed to sub-collections and should be applied to the final
-        combined collection instead."""
+        NOT be passed to sub-charts and should be applied to the final
+        combined chart instead."""
         config = create_test_config()
         dependencies = {"test#indicator1", "test#indicator2"}
         catalog_path = "test/latest/data#table"
@@ -1025,13 +1023,13 @@ class TestCreateCollectionMultipleTables:
 
         choice_renames = {"sex": {"male": "Male", "female": "Female"}}
 
-        with patch("etl.viz.chart.core.create.create_collection_single_table") as mock_single:
-            with patch("etl.viz.chart.core.create.combine_collections") as mock_combine:
-                mock_collection_1 = Mock(spec=Collection)
-                mock_collection_2 = Mock(spec=Collection)
-                mock_single.side_effect = [mock_collection_1, mock_collection_2]
+        with patch("etl.viz.chart.core.create.create_chart_single_table") as mock_single:
+            with patch("etl.viz.chart.core.create.combine_charts") as mock_combine:
+                mock_chart_1 = Mock(spec=Chart)
+                mock_chart_2 = Mock(spec=Chart)
+                mock_single.side_effect = [mock_chart_1, mock_chart_2]
 
-                # Final collection needs dimensions for _rename_choices
+                # Final chart needs dimensions for _rename_choices
                 choice_male = Mock(spec=DimensionChoice)
                 choice_male.slug = "male"
                 choice_male.name = "male"
@@ -1042,11 +1040,11 @@ class TestCreateCollectionMultipleTables:
                 sex_dim.slug = "sex"
                 sex_dim.choices = [choice_male, choice_female]
 
-                mock_final_collection = Mock(spec=Collection)
-                mock_final_collection.dimensions = [sex_dim]
-                mock_combine.return_value = mock_final_collection
+                mock_final_chart = Mock(spec=Chart)
+                mock_final_chart.dimensions = [sex_dim]
+                mock_combine.return_value = mock_final_chart
 
-                result = create_collection(
+                result = create_chart(
                     config_yaml=config,
                     dependencies=dependencies,
                     catalog_path=catalog_path,
@@ -1055,26 +1053,26 @@ class TestCreateCollectionMultipleTables:
                     choice_renames=choice_renames,
                 )
 
-                # Sub-collections should NOT receive choice_renames
+                # Sub-charts should NOT receive choice_renames
                 for call in mock_single.call_args_list:
                     assert call[1]["choice_renames"] is None
 
-                # Renames should be applied to the final combined collection
+                # Renames should be applied to the final combined chart
                 assert choice_male.name == "Male"
                 assert choice_female.name == "Female"
 
-                assert result == mock_final_collection
+                assert result == mock_final_chart
 
-    def test_create_collection_multiple_tables_strips_yaml_views(self):
+    def test_create_chart_multiple_tables_strips_yaml_views(self):
         """Hand-listed YAML views must be stripped from the config passed to each
-        sub-collection — otherwise they'd be added to every sub-collection and
-        ``combine_collections`` would reject the resulting duplicates. The original
-        YAML config (with views) is still forwarded to ``combine_collections``, where
-        those views are merged into the final combined collection.
+        sub-chart — otherwise they'd be added to every sub-chart and
+        ``combine_charts`` would reject the resulting duplicates. The original
+        YAML config (with views) is still forwarded to ``combine_charts``, where
+        those views are merged into the final combined chart.
         """
         config = create_test_config()
         # Add a hand-listed view in the YAML; the user expects this view to end up
-        # in the *combined* collection only.
+        # in the *combined* chart only.
         config["views"] = [
             {
                 "dimensions": {"country": "usa"},
@@ -1085,12 +1083,12 @@ class TestCreateCollectionMultipleTables:
         catalog_path = "test/latest/data#table"
         tables = create_multiple_test_tables()
 
-        with patch("etl.viz.chart.core.create.create_collection_single_table") as mock_single:
-            with patch("etl.viz.chart.core.create.combine_collections") as mock_combine:
-                mock_single.side_effect = [Mock(spec=Collection), Mock(spec=Collection)]
-                mock_combine.return_value = Mock(spec=Collection)
+        with patch("etl.viz.chart.core.create.create_chart_single_table") as mock_single:
+            with patch("etl.viz.chart.core.create.combine_charts") as mock_combine:
+                mock_single.side_effect = [Mock(spec=Chart), Mock(spec=Chart)]
+                mock_combine.return_value = Mock(spec=Chart)
 
-                create_collection(
+                create_chart(
                     config_yaml=config,
                     dependencies=dependencies,
                     catalog_path=catalog_path,
@@ -1098,21 +1096,21 @@ class TestCreateCollectionMultipleTables:
                     indicator_names=[["deaths"], ["cases"]],
                 )
 
-                # Each sub-collection received a config with views: []
+                # Each sub-chart received a config with views: []
                 assert mock_single.call_count == 2
                 for call in mock_single.call_args_list:
                     sub_cfg = call[1]["config_yaml"]
                     assert sub_cfg["views"] == [], (
-                        f"YAML views were not stripped from sub-collection config: {sub_cfg['views']}"
+                        f"YAML views were not stripped from sub-chart config: {sub_cfg['views']}"
                     )
 
                 # The original YAML config (with views populated) was forwarded to
-                # combine_collections so the views can be re-attached to the final
-                # combined collection.
+                # combine_charts so the views can be re-attached to the final
+                # combined chart.
                 combine_call = mock_combine.call_args
                 forwarded_cfg = combine_call[1]["config"]
                 assert forwarded_cfg["views"] == config["views"], (
-                    "combine_collections did not receive the original YAML views"
+                    "combine_charts did not receive the original YAML views"
                 )
 
                 # The user's input config object must not have been mutated.
@@ -1120,9 +1118,9 @@ class TestCreateCollectionMultipleTables:
                 assert config["views"][0]["indicators"]["y"][0]["catalogPath"] == "manual_view#stages"
 
 
-def test_create_collection_preserves_grapher_schema_from_table():
+def test_create_chart_preserves_grapher_schema_from_table():
     """
-    Test create_collection - the `grapher_schema` pin survives the table-driven path.
+    Test create_chart - the `grapher_schema` pin survives the table-driven path.
 
     Some configs (e.g. corruption_barometer, causes_of_death, migration_flows) get their dimension
     choices from the table rather than the YAML, so the config dict is rebuilt on the way through.
@@ -1134,7 +1132,7 @@ def test_create_collection_preserves_grapher_schema_from_table():
     from owid.catalog import Table, Variable
     from owid.catalog.meta import VariableMeta
 
-    from etl.viz.chart.core.create import create_collection
+    from etl.viz.chart.core.create import create_chart
 
     tb = Table(
         {"country": ["USA", "CAN"], "year": [2020, 2020], "deaths__sex_male": [1, 2]},
@@ -1158,7 +1156,7 @@ def test_create_collection_preserves_grapher_schema_from_table():
         patch("etl.viz.chart.core.utils.process_views"),
         patch("etl.viz.chart.core.create._get_expand_path_mode", return_value="table"),
     ):
-        c = create_collection(
+        c = create_chart(
             config_yaml=config,
             dependencies=set(),
             catalog_path="ns/latest/ds#short",

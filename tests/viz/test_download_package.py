@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from owid.catalog import Table
 
-from etl.viz.chart.download_package import build_wide_table_for_collection
+from etl.viz.chart.download_package import build_wide_table_for_chart
 
 
 def _table_with_two_indistinguishable_columns() -> Table:
@@ -25,7 +25,7 @@ def _table_with_two_indistinguishable_columns() -> Table:
 
 
 def test_wide_table_keeps_columns_a_single_view_cannot_distinguish():
-    """Test build_wide_table_for_collection - two indicators shown under one view both survive.
+    """Test build_wide_table_for_chart - two indicators shown under one view both survive.
 
     Regression test for poverty_pip. The wide column used to be named after the
     indicator's dimension-stripped short name plus the dimensions of the view showing
@@ -51,7 +51,7 @@ def test_wide_table_keeps_columns_a_single_view_cannot_distinguish():
             return_value={"poverty": tb.set_index(["country", "year"])},
         ),
     ):
-        result = build_wide_table_for_collection(collection=None)  # ty: ignore[invalid-argument-type]
+        result = build_wide_table_for_chart(chart=None)  # ty: ignore[invalid-argument-type]
 
     wide, column_to_dimensions = result.table, result.column_to_dimensions
     assert not result.is_stacked, "one time axis, so no frequency column"
@@ -132,7 +132,7 @@ def _annual_and_monthly_tables():
 
 
 def test_mixed_frequencies_stack_with_a_frequency_key():
-    """Test build_wide_table_for_collection - two time axes become rows, not columns.
+    """Test build_wide_table_for_chart - two time axes become rows, not columns.
 
     An integer year and a calendar date cannot share a time column without stamping the
     annual figures with a month and a day they do not have. Stacking keeps it to one
@@ -154,7 +154,7 @@ def test_mixed_frequencies_stack_with_a_frequency_key():
         patch("etl.viz.chart.download_package._used_indicators", return_value=used),
         patch("etl.viz.chart.download_package.CatalogDataset", return_value=datasets),
     ):
-        result = build_wide_table_for_collection(collection=None)  # ty: ignore[invalid-argument-type]
+        result = build_wide_table_for_chart(chart=None)  # ty: ignore[invalid-argument-type]
 
     assert result.is_stacked
     assert result.time_header == "Time"
@@ -194,7 +194,7 @@ def test_same_metric_at_two_frequencies_merges_into_one_column():
         patch("etl.viz.chart.download_package._used_indicators", return_value=used),
         patch("etl.viz.chart.download_package.CatalogDataset", return_value=datasets),
     ):
-        result = build_wide_table_for_collection(collection=None)  # ty: ignore[invalid-argument-type]
+        result = build_wide_table_for_chart(chart=None)  # ty: ignore[invalid-argument-type]
 
     col = type("C", (), {"meta": {"name": "Electricity generation - TWh"}})()
     indicators = [(path, "Electricity generation - TWh", i, col) for i, path in enumerate(used)]

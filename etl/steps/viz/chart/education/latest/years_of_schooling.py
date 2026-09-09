@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from etl.helpers import PathFinder
-from etl.viz import combine_collections
+from etl.viz import combine_charts
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -111,8 +111,8 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Default collection config
-    config = paths.load_collection_config()
+    # Default chart config
+    config = paths.load_config()
 
     # Load datasets
     ds_undp = paths.load_dataset("undp_hdr")
@@ -164,20 +164,20 @@ def run() -> None:
     tb_gender_stats = adjust_dimensions_schooling(tb_gender_stats)
 
     #
-    # Create collection object
+    # Create chart object
     #
-    collections = []
+    charts = []
     for tb in [tb_undp, tb_opri, tb_gender_stats]:
-        c_ = paths.create_collection(
+        c_ = paths.create_chart(
             config=config,
             tb=tb,
             common_view_config=MULTIDIM_CONFIG,
         )
-        collections.append(c_)
+        charts.append(c_)
 
-    c = combine_collections(
-        collections=collections,
-        collection_name=paths.short_name,
+    c = combine_charts(
+        charts=charts,
+        chart_name=paths.short_name,
         config=config,
     )
 

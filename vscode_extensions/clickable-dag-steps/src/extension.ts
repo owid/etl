@@ -72,7 +72,7 @@ function parseStepUri(uri: string): { scheme: string; key: string; version: stri
     const dir = path.join(base, channel, namespace, version);
     const filePaths = [
       path.join(dir, shortName + '.py'),
-      // YAML-only viz://chart steps (single-chart or mdim collections without a .py)
+      // YAML-only viz://chart steps (single charts or MDIMs without a .py)
       ...(scheme === 'viz' ? [path.join(dir, shortName + '.config.yml')] : []),
       path.join(dir, shortName, '__init__.py'),
       path.join(dir, shortName + '.ipynb'),

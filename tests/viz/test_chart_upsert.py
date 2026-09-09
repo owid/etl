@@ -1,6 +1,6 @@
 """Tests for `etl.viz.chart.upsert._build_chart_config`.
 
-`_build_chart_config` translates a zero-dimension collection's single `View`
+`_build_chart_config` translates a zero-dimension chart's single `View`
 (its `config` + `indicators`) into the grapher chart-config dict that gets
 written to `chart_configs.etlConfig`. The only external dependency is
 `map_indicator_path_to_id` (a DB lookup), which is mocked here so the tests
@@ -12,7 +12,7 @@ from unittest.mock import patch
 import pytest
 
 from etl.config import DEFAULT_GRAPHER_SCHEMA
-from etl.viz.chart.model.core import Collection, Definitions
+from etl.viz.chart.model.core import Chart, Definitions
 from etl.viz.chart.model.dimension import Dimension, DimensionChoice
 from etl.viz.chart.model.view import View, ViewIndicators
 from etl.viz.chart.upsert import _build_chart_config, _validate_chart_config
@@ -50,8 +50,8 @@ def test_single_y_indicator():
     assert config["dimensions"] == [{"property": "y", "variableId": 111}]
 
 
-def test_collection_pin_becomes_the_config_schema():
-    """The collection's `grapher_schema` is what a single chart stores as `$schema`.
+def test_chart_pin_becomes_the_config_schema():
+    """The chart's `grapher_schema` is what a single chart stores as `$schema`.
 
     A chart config has no `grapherConfigSchema` indirection, so this is the only place the pin can
     land. It used to be ignored here in favour of `DEFAULT_GRAPHER_SCHEMA`, which silently told
@@ -155,18 +155,18 @@ def test_validate_skips_when_schema_not_vendored_locally():
 
 
 def test_chart_config_id_required_for_single_charts():
-    collection = Collection(
+    chart = Chart(
         catalog_path="animal_welfare/latest/my_chart#my_chart",
         dimensions=[],
         views=[_make_view({"y": "table#ind1"})],
         _definitions=Definitions(),
     )
     with pytest.raises(ValueError, match="missing a top-level `chart_config_id`"):
-        collection.validate_chart_config_id()
+        chart.validate_chart_config_id()
 
 
-def _chart_collection(chart_config_id) -> Collection:
-    return Collection(
+def _single_chart(chart_config_id) -> Chart:
+    return Chart(
         catalog_path="animal_welfare/latest/my_chart#my_chart",
         dimensions=[],
         views=[_make_view({"y": "table#ind1"})],
@@ -177,13 +177,13 @@ def _chart_collection(chart_config_id) -> Collection:
 
 def test_chart_config_id_must_be_a_uuid():
     with pytest.raises(ValueError, match="invalid `chart_config_id`"):
-        _chart_collection("7118").validate_chart_config_id()
+        _single_chart("7118").validate_chart_config_id()
 
 
 def test_chart_config_id_must_be_a_string():
     # An unquoted numeric-looking value in the YAML would arrive as an int.
     with pytest.raises(ValueError, match="expected a UUID string, got int"):
-        _chart_collection(7118).validate_chart_config_id()  # type: ignore[arg-type]
+        _single_chart(7118).validate_chart_config_id()  # type: ignore[arg-type]
 
 
 @pytest.mark.parametrize(
@@ -198,17 +198,17 @@ def test_chart_config_id_must_be_a_string():
 )
 def test_chart_config_id_must_be_canonical(value):
     with pytest.raises(ValueError, match="non-canonical `chart_config_id`"):
-        _chart_collection(value).validate_chart_config_id()
+        _single_chart(value).validate_chart_config_id()
 
 
 def test_chart_config_id_warns_when_not_uuid7(capsys):
     # A canonical UUIDv4 is accepted but flagged — grapher only ever mints v7.
-    _chart_collection("6e8bc430-9c3a-41d9-a52e-b0a9b8b64f3d").validate_chart_config_id()
-    assert "collection.chart_config_id.not_uuid7" in capsys.readouterr().out
+    _single_chart("6e8bc430-9c3a-41d9-a52e-b0a9b8b64f3d").validate_chart_config_id()
+    assert "chart.chart_config_id.not_uuid7" in capsys.readouterr().out
 
 
 def test_chart_config_id_accepted_for_single_charts():
-    collection = Collection(
+    chart = Chart(
         catalog_path="animal_welfare/latest/my_chart#my_chart",
         dimensions=[],
         views=[_make_view({"y": "table#ind1"})],
@@ -216,11 +216,11 @@ def test_chart_config_id_accepted_for_single_charts():
         _definitions=Definitions(),
     )
     # Should not raise.
-    collection.validate_chart_config_id()
+    chart.validate_chart_config_id()
 
 
 def test_chart_config_id_rejected_on_mdims():
-    collection = Collection(
+    chart = Chart(
         catalog_path="animal_welfare/latest/my_mdim#my_mdim",
         dimensions=[Dimension(slug="sex", name="Sex", choices=[DimensionChoice(slug="female", name="Female")])],
         views=[View(dimensions={"sex": "female"}, indicators=ViewIndicators.from_dict({"y": "table#ind1"}))],
@@ -228,7 +228,7 @@ def test_chart_config_id_rejected_on_mdims():
         _definitions=Definitions(),
     )
     with pytest.raises(ValueError, match="declares `chart_config_id` but has dimensions"):
-        collection.validate_chart_config_id()
+        chart.validate_chart_config_id()
 
 
 def test_new_chart_config_id_is_valid_uuid7_and_time_ordered():
@@ -247,11 +247,11 @@ def test_new_chart_config_id_is_valid_uuid7_and_time_ordered():
     assert before_ms <= generated.int >> 80 <= after_ms
 
 
-def _single_choice_mdim() -> Collection:
+def _single_choice_mdim() -> Chart:
     # A genuine mdim whose only dimension has a single choice in use — after
     # `prune_dimensions()` its dimension list is empty, but it must NOT be
     # reclassified as a single chart (it declared no `chart_config_id`).
-    return Collection(
+    return Chart(
         catalog_path="animal_welfare/latest/my_mdim#my_mdim",
         dimensions=[Dimension(slug="sex", name="Sex", choices=[DimensionChoice(slug="female", name="Female")])],
         views=[View(dimensions={"sex": "female"}, indicators=ViewIndicators.from_dict({"y": "table#ind1"}))],
@@ -260,16 +260,16 @@ def _single_choice_mdim() -> Collection:
 
 
 def test_pruned_mdim_is_not_reclassified_as_chart():
-    collection = _single_choice_mdim()
-    collection.validate_chart_config_id()  # passes as an mdim
-    collection.prune_dimensions()
-    assert collection.dimensions == []
+    chart = _single_choice_mdim()
+    chart.validate_chart_config_id()  # passes as an mdim
+    chart.prune_dimensions()
+    assert chart.dimensions == []
     with pytest.raises(ValueError, match="pass `prune_dimensions=False`"):
-        collection.upsert_to_db(owid_env=object())  # type: ignore[arg-type]
+        chart.upsert_to_db(owid_env=object())  # type: ignore[arg-type]
 
 
 def test_declared_single_chart_routes_to_chart_upsert():
-    collection = _chart_collection("0191b6c7-5595-70b2-8d30-fa03fccd7add")
-    with patch("etl.viz.chart.upsert.upsert_collection_as_chart") as mock_upsert:
-        collection.upsert_to_db(owid_env=object())  # type: ignore[arg-type]
+    chart = _single_chart("0191b6c7-5595-70b2-8d30-fa03fccd7add")
+    with patch("etl.viz.chart.upsert.upsert_single_chart") as mock_upsert:
+        chart.upsert_to_db(owid_env=object())  # type: ignore[arg-type]
     mock_upsert.assert_called_once()

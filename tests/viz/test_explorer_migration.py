@@ -1,4 +1,4 @@
-"""Tests for CSV explorer migration to new collection format.
+"""Tests for CSV explorer migration to new chart format.
 
 The influenza example contains one dimension with only one choice, which gets
 dropped during save unless prune_dimensions=False is set.
@@ -301,9 +301,8 @@ def test_explorer_legacy_1(tmp_path, monkeypatch):
     config = paths.load_config(path=config_path)
 
     # Create explorer
-    explorer = paths.create_collection(
+    explorer = paths.create_explorer(
         config=config,
-        explorer=True,
     )
 
     # Instead of performing the actual save, get the explorer legacy content
@@ -359,9 +358,8 @@ def test_explorer_legacy_2(tmp_path, monkeypatch):
     config = paths.load_config(path=config_path)
 
     # Create explorer
-    explorer = paths.create_collection(
+    explorer = paths.create_explorer(
         config=config,
-        explorer=True,
     )
 
     # Instead of performing the actual save, get the explorer legacy content

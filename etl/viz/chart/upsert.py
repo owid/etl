@@ -1,6 +1,6 @@
-"""Upsert a Collection with zero dimensions as a regular Grapher chart.
+"""Upsert a Chart with zero dimensions as a regular Grapher chart.
 
-The collection's YAML is treated as the chart's ETL-authored grapher config and
+The chart's YAML is treated as the chart's ETL-authored grapher config and
 written to the chart's ETL config row via
 `PUT /admin/api/charts/by-config/:chartConfigId/etlConfig`, addressed by the
 chart's config UUID (`charts.configId`) — the chart's stable identity, declared
@@ -30,7 +30,7 @@ from etl.paths import SCHEMAS_DIR
 from etl.viz.chart.utils import map_indicator_path_to_id, resolve_grapher_schema
 
 if TYPE_CHECKING:
-    from etl.viz.chart.model.core import Collection
+    from etl.viz.chart.model.core import Chart
     from etl.viz.chart.model.view import View
 
 
@@ -40,20 +40,20 @@ log = structlog.get_logger()
 _AXIS_ORDER = ("y", "x", "size", "color")
 
 
-def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> int:
-    """Push a zero-dimension collection to Grapher as a regular chart.
+def upsert_single_chart(chart: "Chart", owid_env: OWIDEnv) -> int:
+    """Push a zero-dimension chart to Grapher as a regular chart.
 
-    Expects `len(collection.dimensions) == 0` and `len(collection.views) == 1`.
+    Expects `len(chart.dimensions) == 0` and `len(chart.views) == 1`.
     """
-    if len(collection.dimensions) != 0:
-        raise ValueError("upsert_collection_as_chart called on a collection with dimensions.")
-    if len(collection.views) != 1:
-        raise ValueError(f"Chart mode (no dimensions) requires exactly one view; got {len(collection.views)}.")
+    if len(chart.dimensions) != 0:
+        raise ValueError("upsert_single_chart called on a chart with dimensions.")
+    if len(chart.views) != 1:
+        raise ValueError(f"Chart mode (no dimensions) requires exactly one view; got {len(chart.views)}.")
 
-    view = collection.views[0]
+    view = chart.views[0]
     # Grapher slugs are dash-separated; mdim short_names are snake_case.
-    slug = collection.short_name.replace("_", "-")
-    chart_config = _build_chart_config(view, slug, resolve_grapher_schema(collection.grapher_schema))
+    slug = chart.short_name.replace("_", "-")
+    chart_config = _build_chart_config(view, slug, resolve_grapher_schema(chart.grapher_schema))
     _validate_chart_config(chart_config, slug)
 
     admin_api = AdminAPI(owid_env)
@@ -64,11 +64,11 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
     # put the right UUID there: the existing chart's `charts.configId` when
     # bringing a chart into ETL, or a freshly minted UUIDv7 (see
     # `new_chart_config_id`) for a brand-new chart.
-    # `Collection.save()` already ran this, but re-run it here so the guarantee holds for any
+    # `Chart.save()` already ran this, but re-run it here so the guarantee holds for any
     # entry point into the upsert: a malformed UUID must never reach the admin, where it would
     # miss the intended chart and silently create a new one.
-    collection.validate_chart_config_id()
-    chart_config_id = collection.chart_config_id
+    chart.validate_chart_config_id()
+    chart_config_id = chart.chart_config_id
 
     # Write the chart's ETL-authored config. The endpoint has upsert semantics: it
     # creates the chart carrying this UUID if it doesn't exist yet, otherwise it
@@ -79,29 +79,29 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
     # default for new charts). Server-side, the rendered config is recomputed as
     # merge(indicator config, etlConfig, existing admin layer), so anything already
     # authored in the admin is preserved.
-    log.info("collection.chart.upsert", slug=slug, chart_config_id=chart_config_id)
+    log.info("chart.chart.upsert", slug=slug, chart_config_id=chart_config_id)
     result = admin_api.upsert_chart_etl_config(
         chart_config_id=chart_config_id,
         grapher_config=chart_config,
-        catalog_path=collection.catalog_path,
+        catalog_path=chart.catalog_path,
     )
     chart_id = result["chartId"]
     is_new = result["created"]
 
     # Set topic tags on freshly created charts only — once a chart exists,
     # tags are admin-managed and ETL must not stomp on them.
-    if collection.topic_tags:
+    if chart.topic_tags:
         if is_new:
-            tags = _resolve_topic_tags(owid_env, collection.topic_tags)
+            tags = _resolve_topic_tags(owid_env, chart.topic_tags)
             if tags:
                 admin_api.set_tags(chart_id=chart_id, tags=tags)
         else:
             # Editing `topic_tags` on a chart that already exists does nothing, and without
             # this the config author has no way of telling that from a successful push.
             log.warning(
-                "collection.chart.topic_tags_ignored",
+                "chart.chart.topic_tags_ignored",
                 chart_id=chart_id,
-                topic_tags=collection.topic_tags,
+                topic_tags=chart.topic_tags,
                 reason="tags are admin-managed once a chart exists; ETL only sets them at creation",
             )
 
@@ -112,7 +112,7 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
         slug_in_grapher = admin_api.get_chart_config(chart_id).get("slug")
         if slug_in_grapher and slug_in_grapher != slug:
             log.warning(
-                "collection.chart.slug_not_applied",
+                "chart.chart.slug_not_applied",
                 chart_id=chart_id,
                 slug_in_grapher=slug_in_grapher,
                 slug_from_file_name=slug,
@@ -120,7 +120,7 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
             )
 
     log.info(
-        "collection.chart.upsert_success",
+        "chart.chart.upsert_success",
         slug=slug,
         chart_id=chart_id,
         admin_url=f"{owid_env.admin_site}/charts/{chart_id}/edit",
@@ -131,10 +131,10 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
 def _build_chart_config(view: "View", slug: str, grapher_schema: str) -> dict[str, Any]:
     """Translate `view.config` + `view.indicators` into a grapher chart config dict.
 
-    `grapher_schema` is the collection's resolved pin. A chart config carries its schema version
+    `grapher_schema` is the chart's resolved pin. A chart config carries its schema version
     directly in `$schema` (there is no `grapherConfigSchema` indirection as in mdims), so this is
     where the pin becomes the thing grapher migrates from. `setdefault` keeps the same precedence
-    as the mdim path, where grapher spreads the view config over the collection pin — a `$schema`
+    as the mdim path, where grapher spreads the view config over the chart pin — a `$schema`
     inside the view config still wins, and `warn_on_view_schema_overrides` flags it.
     """
     config: dict[str, Any] = dict(view.config or {})
@@ -214,7 +214,7 @@ def _resolve_topic_tags(owid_env: OWIDEnv, tag_names: list[str]) -> list[dict[st
     by_name = {row["name"]: row["id"] for row in rows}
     missing = [n for n in tag_names if n not in by_name]
     if missing:
-        log.warning("collection.chart.unknown_topic_tags", tags=missing)
+        log.warning("chart.chart.unknown_topic_tags", tags=missing)
     return [
         {"id": by_name[name], "name": name, "isApproved": True, "keyChartLevel": 0}
         for name in tag_names

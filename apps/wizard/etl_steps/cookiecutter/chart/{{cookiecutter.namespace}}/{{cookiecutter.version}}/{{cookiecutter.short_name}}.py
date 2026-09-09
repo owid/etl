@@ -1,4 +1,4 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Create a chart (or MDIM) from a grapher dataset."""
 
 from etl.helpers import PathFinder
 
@@ -10,8 +10,8 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Default collection config
-    config = paths.load_collection_config()
+    # Default chart config
+    config = paths.load_config()
 
     # Load grapher dataset.
     ds = paths.load_dataset("{{cookiecutter.short_name}}")
@@ -22,9 +22,9 @@ def run() -> None:
     #
 
     #
-    # Create collection object
+    # Create chart object
     #
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         short_name="{{cookiecutter.short_name}}",
         tb=tb,
@@ -42,6 +42,6 @@ def run() -> None:
         pass
 
     #
-    # Save garden dataset.
+    # Save the chart.
     #
     c.save()

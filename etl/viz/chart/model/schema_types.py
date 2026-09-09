@@ -1,5 +1,5 @@
 """
-Generated TypedDict schemas for Collection model.
+Generated TypedDict schemas for Chart model.
 
 This file is auto-generated from JSON schemas. Do not edit manually.
 Run `python scripts/generate_schema_types.py` to regenerate.

@@ -1,5 +1,5 @@
 """
-Tests for ETL collection utility functions.
+Tests for ETL chart utility functions.
 
 This module tests utility functions from etl.viz.chart.utils that handle
 data manipulation, view processing, and configuration management.
@@ -175,7 +175,7 @@ def _create_table_with_dimensions():
     """Create a table with two indicators over dimensions sex and equivalence_scale.
 
     Mirrors the shape that motivates filter_columns_by_dimension_choices: a table where only one
-    value of a dimension (equivalence_scale="square root") is wanted in a collection.
+    value of a dimension (equivalence_scale="square root") is wanted in a chart.
     """
     from owid.catalog import Table, Variable
     from owid.catalog.core.meta import VariableMeta
@@ -244,7 +244,7 @@ def test_filter_columns_by_dimension_choices():
 
 def test_filter_columns_by_dimension_choices_expands_without_the_dimension():
     """
-    Test that a table processed with filter_columns_by_dimension_choices expands into a collection
+    Test that a table processed with filter_columns_by_dimension_choices expands into a chart
     config without the dropped dimension (the motivating use case, see issue #5670).
     """
     from etl.viz import expand_config
@@ -351,7 +351,7 @@ def test_filter_columns_by_dimension_choices_without_dropping_dimensions():
 def test_filter_columns_by_dimension_choices_with_non_string_choices():
     """
     Test filter_columns_by_dimension_choices with integer choices - dimension choices are not always
-    strings (e.g. ppp_version=2021 in the World Bank PIP collections).
+    strings (e.g. ppp_version=2021 in the World Bank PIP charts).
     """
     from owid.catalog import Table, Variable
     from owid.catalog.core.meta import VariableMeta

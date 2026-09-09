@@ -1,28 +1,28 @@
 from typing import Any, overload
 
-from etl.viz.chart.model.core import Collection
+from etl.viz.chart.model.core import Chart
 from etl.viz.chart.utils import get_tables_by_name_mapping
 from etl.viz.explorer import Explorer
 
 
 def process_views(
-    collection: Collection | Explorer,
+    chart: Chart | Explorer,
     dependencies: set[str],
     combine_metadata_when_mult: bool = False,
 ):
-    """Process views in Collection configuration."""
-    # Resolve short-form catalog paths to full paths. Collection.save() does this again
+    """Process views in Chart configuration."""
+    # Resolve short-form catalog paths to full paths. Chart.save() does this again
     # before validation; doing it here too means anything that reads view paths between
-    # create_collection and save sees full paths.
+    # create_chart and save sees full paths.
     tables_by_name = get_tables_by_name_mapping(dependencies)
 
-    for view in collection.views:
+    for view in chart.views:
         # Merge common_views FIRST so any short-form paths it injects
         # (e.g. `colorVariableId: regions#owid_region`) are visible to expand_paths
         # below. The opposite order leaves merged paths un-expanded — the failure
-        # surfaces later at `combine_collections` time where dependencies are empty.
-        if (collection.definitions is not None) and (collection.definitions.common_views is not None):
-            view.combine_with_common(collection.definitions.common_views)
+        # surfaces later at `combine_charts` time where dependencies are empty.
+        if (chart.definitions is not None) and (chart.definitions.common_views is not None):
+            view.combine_with_common(chart.definitions.common_views)
         else:
             # Validate even when there are no common_views to merge — the view's own config
             # might have incompatible settings
@@ -42,7 +42,7 @@ def process_views(
 
 
 @overload
-def create_collection_from_config(
+def create_chart_from_config(
     config: dict[str, Any],
     dependencies: set[str],
     catalog_path: str,
@@ -54,7 +54,7 @@ def create_collection_from_config(
 
 
 @overload
-def create_collection_from_config(
+def create_chart_from_config(
     config: dict[str, Any],
     dependencies: set[str],
     catalog_path: str,
@@ -62,10 +62,10 @@ def create_collection_from_config(
     dependencies_combined: set[str] | None = None,
     validate_schema: bool = True,
     explorer: bool = False,
-) -> Collection: ...
+) -> Chart: ...
 
 
-def create_collection_from_config(
+def create_chart_from_config(
     config: dict[str, Any],
     dependencies: set[str],
     catalog_path: str,
@@ -73,21 +73,21 @@ def create_collection_from_config(
     dependencies_combined: set[str] | None = None,
     validate_schema: bool = True,
     explorer: bool = False,
-) -> Explorer | Collection:
-    """Create a Collection or Explorer instance from a configuration dictionary.
+) -> Explorer | Chart:
+    """Create a Chart or Explorer instance from a configuration dictionary.
 
-    config: Configuration of the collection.
-    dependencies: Set of dependencies (dataset URIs) for the collection.
+    config: Configuration of the chart.
+    dependencies: Set of dependencies (dataset URIs) for the chart.
     catalog_path: Path to the step.
     dependencies_combined: Optional set of combined dependencies.
-    validate_schema: Whether to validate the schema of the collection.
-    explorer: Whether to create an Explorer instance instead of a Collection.
+    validate_schema: Whether to validate the schema of the chart.
+    explorer: Whether to create an Explorer instance instead of a Chart.
     """
     # Read config as structured object
     if explorer:
         c = Explorer.from_dict(dict(**config, catalog_path=catalog_path))
     else:
-        c = Collection.from_dict(dict(**config, catalog_path=catalog_path))
+        c = Chart.from_dict(dict(**config, catalog_path=catalog_path))
 
     # Edit views
     process_views(c, dependencies=dependencies)
@@ -106,7 +106,7 @@ def create_collection_from_config(
     # Validate duplicate views
     c.check_duplicate_views()
 
-    # Add dependencies to collection
+    # Add dependencies to chart
     c.dependencies = dependencies_combined or dependencies
 
     return c

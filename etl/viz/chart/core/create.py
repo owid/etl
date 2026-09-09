@@ -1,4 +1,4 @@
-"""Methods and tools to create collections of indicators."""
+"""Methods and tools to create charts (and MDIMs) from indicators."""
 
 import inspect
 from collections.abc import Callable, Mapping, Sequence
@@ -8,10 +8,10 @@ from typing import Any, TypeAlias, TypeVar, cast
 from owid.catalog import Table
 from structlog import get_logger
 
-from etl.viz.chart.core.combine import combine_collections, combine_config_dimensions
+from etl.viz.chart.core.combine import combine_charts, combine_config_dimensions
 from etl.viz.chart.core.expand import expand_config
-from etl.viz.chart.core.utils import create_collection_from_config
-from etl.viz.chart.model.core import Collection
+from etl.viz.chart.core.utils import create_chart_from_config
+from etl.viz.chart.model.core import Chart
 from etl.viz.chart.utils import has_duplicate_table_names
 from etl.viz.explorer import Explorer
 
@@ -24,7 +24,7 @@ T = TypeVar("T", covariant=True)
 Listable: TypeAlias = T | Sequence[T]
 
 
-def create_collection(
+def create_chart(
     config_yaml: dict[str, Any],
     dependencies: set[str],
     catalog_path: str,
@@ -37,25 +37,25 @@ def create_collection(
     choice_renames: Listable[Mapping[str, dict[str, str] | Callable] | None] = None,
     catalog_path_full: bool = False,
     explorer: bool = False,
-) -> Collection:
+) -> Chart:
     """
-    Create a collection that supports multiple tables and corresponding list parameters.
+    Create a chart that supports multiple tables and corresponding list parameters.
 
-    When ``tb`` is a list of tables, one sub-collection is created per table and
-    they are combined via ``combine_collections``. The parameters
+    When ``tb`` is a list of tables, one sub-chart is created per table and
+    they are combined via ``combine_charts``. The parameters
     ``indicator_names``, ``dimensions``, and ``common_view_config`` can also be
     lists (one element per table); if they are single values they are broadcast.
 
     Args:
         config_yaml: Configuration dictionary (YAML-based). Provides the base
             structure including dimensions, views, and explorer settings. In the
-            multi-table path this config is applied twice — once per sub-collection
+            multi-table path this config is applied twice — once per sub-chart
             and once after combining — so it acts as the authoritative source for
             dimension/choice metadata (names, descriptions, ordering).
-        dependencies: Set of dependency URIs for the collection.
-        catalog_path: Catalog path for the collection (e.g. "namespace#short_name").
+        dependencies: Set of dependency URIs for the chart.
+        catalog_path: Catalog path for the chart (e.g. "namespace#short_name").
         tb: Single table or list of tables. When a list is provided, one
-            sub-collection is created per table and they are combined.
+            sub-chart is created per table and they are combined.
         indicator_names: Indicator column names to include. A single value is
             broadcast to all tables; a list must match the number of tables.
         dimensions: Dimension specification (column names or {col: values} mapping).
@@ -70,15 +70,15 @@ def create_collection(
         choice_renames: Rename display names of dimension choices. Maps dimension
             slugs to either a ``{choice_slug: new_name}`` dict or a
             ``callable(choice_slug) -> new_name | None``. When ``tb`` is a list,
-            a single dict renames choices in the final collection; a list of dicts
+            a single dict renames choices in the final chart; a list of dicts
             renames per table (keys are auto-remapped if slugs change during
             combining). Always takes precedence over names from ``config_yaml``.
         catalog_path_full: Whether to use the full catalog path for indicators
             (applies to all tables).
-        explorer: Whether to create an Explorer (True) or a Collection (False).
+        explorer: Whether to create an Explorer (True) or a Chart (False).
 
     Returns:
-        Collection (or Explorer) object.
+        Chart (or Explorer) object.
 
     Raises:
         ValueError: If list parameters don't match the number of tables.
@@ -111,22 +111,22 @@ def create_collection(
                 num_tables=num_tables,
             )
         else:
-            # Single dict (or None): don't pass to sub-collections.
+            # Single dict (or None): don't pass to sub-charts.
             choice_renames_ = [None] * num_tables
 
-        # Hand-listed YAML views belong to the combined collection, not to each sub-collection
-        # — applying them per-table would duplicate them and `combine_collections` would
+        # Hand-listed YAML views belong to the combined chart, not to each sub-chart
+        # — applying them per-table would duplicate them and `combine_charts` would
         # reject the duplicate. Strip them here and re-attach during combine via `config_yaml`.
         sub_config = {**config_yaml, "views": []}
 
-        # Create collections for each table.
-        collections = []
+        # Create charts for each table.
+        charts = []
         indicator_as_dimension_ = False
         for i in range(num_tables):
             if isinstance(indicator_names_[i], list) and len(cast(list, indicator_names_[i])) > 1:
                 indicator_as_dimension_ = True
 
-            c = create_collection_single_table(
+            c = create_chart_single_table(
                 config_yaml=sub_config,
                 dependencies=dependencies,
                 catalog_path=catalog_path,
@@ -140,22 +140,22 @@ def create_collection(
                 catalog_path_full=catalog_path_full,
                 explorer=explorer,
             )
-            collections.append(c)
+            charts.append(c)
 
-        if len(collections) == 1:
+        if len(charts) == 1:
             if not is_list_renames and choice_renames is not None:
                 # Single dict was deferred — apply now.
-                _rename_choices(collections[0], cast("dict[str, dict[str, str] | Callable]", choice_renames))
-            return collections[0]
+                _rename_choices(charts[0], cast("dict[str, dict[str, str] | Callable]", choice_renames))
+            return charts[0]
 
-        # Combine all collections, capturing slug changes for remapping.
+        # Combine all charts, capturing slug changes for remapping.
         # Forward `dependencies` so that `process_views` (called from inside
-        # combine_collections via create_collection_from_config) can expand short-form
+        # combine_charts via create_chart_from_config) can expand short-form
         # `<table>#<indicator>` catalog paths in YAML hand-listed views against the
         # dependency tables.
         slug_changes: dict = {}
-        c = combine_collections(
-            collections=collections,
+        c = combine_charts(
+            charts=charts,
             catalog_path=catalog_path,
             config=config_yaml,
             dependencies=dependencies,
@@ -163,18 +163,18 @@ def create_collection(
             _slug_changes_out=slug_changes,
         )
 
-        # Apply choice_renames to the final combined collection.
+        # Apply choice_renames to the final combined chart.
         if is_list_renames:
             # Per-table renames: remap keys using slug changes, then apply.
             remapped = _remap_choice_renames(choice_renames_, slug_changes)
             if remapped:
                 _rename_choices(c, remapped)
         elif choice_renames is not None:
-            # Single dict: apply directly to the final collection.
+            # Single dict: apply directly to the final chart.
             _rename_choices(c, cast("dict[str, dict[str, str] | Callable]", choice_renames))
     else:
         # Single table case - call original function directly
-        c = create_collection_single_table(
+        c = create_chart_single_table(
             config_yaml=config_yaml,
             dependencies=dependencies,
             catalog_path=catalog_path,
@@ -320,8 +320,8 @@ def _get_choice_renames(
     )
 
 
-# Create collection from a single table
-def create_collection_single_table(
+# Create chart from a single table
+def create_chart_single_table(
     config_yaml: dict[str, Any],
     dependencies: set[str],
     catalog_path: str,
@@ -334,7 +334,7 @@ def create_collection_single_table(
     choice_renames: dict[str, dict[str, str] | Callable] | None = None,
     catalog_path_full: bool = False,
     explorer: bool = False,
-) -> Collection:
+) -> Chart:
     config = deepcopy(config_yaml)
 
     # Read from table (programmatically expand)
@@ -366,7 +366,7 @@ def create_collection_single_table(
 
     # Create actual explorer
     if explorer:
-        coll = create_collection_from_config(
+        coll = create_chart_from_config(
             config=config,
             dependencies=dependencies,
             catalog_path=catalog_path,
@@ -374,7 +374,7 @@ def create_collection_single_table(
             explorer=True,
         )
     else:
-        coll = create_collection_from_config(
+        coll = create_chart_from_config(
             config=config,
             dependencies=dependencies,
             catalog_path=catalog_path,
@@ -400,7 +400,7 @@ def _get_expand_path_mode(dependencies, catalog_path_full):
     return expand_path_mode
 
 
-def _rename_choices(coll: Collection, choice_renames: dict[str, dict[str, str] | Callable] | None = None):
+def _rename_choices(coll: Chart, choice_renames: dict[str, dict[str, str] | Callable] | None = None):
     if choice_renames is not None:
         for dim in coll.dimensions:
             if dim.slug in choice_renames:
@@ -422,10 +422,10 @@ def _remap_choice_renames(
     slug_changes: dict[str, Any],
 ) -> dict[str, dict[str, str] | Callable]:
     """Merge per-table choice_renames into a single dict, remapping choice slugs
-    to account for conflict-resolution renaming done by ``combine_collections``.
+    to account for conflict-resolution renaming done by ``combine_charts``.
 
     ``slug_changes`` has structure
-    ``{collection_id: {dimension_slug: {original_slug: renamed_slug}}}``.
+    ``{chart_id: {dimension_slug: {original_slug: renamed_slug}}}``.
 
     When multiple tables contribute renames for the same dimension the entries
     are composed with later-tables-win semantics: dict-only contributions are
@@ -438,12 +438,12 @@ def _remap_choice_renames(
     for i, renames in enumerate(choice_renames_per_table):
         if renames is None:
             continue
-        collection_id = str(i)
-        table_changes = slug_changes.get(collection_id, {})
+        chart_id = str(i)
+        table_changes = slug_changes.get(chart_id, {})
         for dim_slug, dim_renames in renames.items():
-            # Slug changes for this (collection, dimension). After ``unstack``
+            # Slug changes for this (chart, dimension). After ``unstack``
             # in ``_extract_choice_slug_changes``, dimensions with conflicts in
-            # some collections but not this one show up as ``NaN``; sanitize to
+            # some charts but not this one show up as ``NaN``; sanitize to
             # ``{}`` so downstream lookups stay dict-safe.
             raw_changes = table_changes.get(dim_slug, {}) if isinstance(table_changes, dict) else {}
             changes = raw_changes if isinstance(raw_changes, dict) else {}

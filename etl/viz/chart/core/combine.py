@@ -1,4 +1,4 @@
-"""Logic and code to combine multiple collections (MDIMs or Explorers) into a single one.
+"""Logic and code to combine multiple charts (MDIMs or Explorers) into a single one.
 
 Additional: combine dimensions (using raw dictionaries)
 """
@@ -10,19 +10,22 @@ from typing import Any, TypeVar, overload
 import pandas as pd
 from structlog import get_logger
 
-from etl.viz.chart.core.utils import create_collection_from_config
-from etl.viz.chart.model.core import Collection
+from etl.viz.chart.core.utils import create_chart_from_config
+from etl.viz.chart.model.core import Chart
 from etl.viz.chart.model.dimension import Dimension, DimensionChoice
 from etl.viz.chart.utils import records_to_dictionary
 from etl.viz.explorer import Explorer
 
 log = get_logger()
 
-COLLECTION_SLUG = "collection__slug"
-COLLECTION_TITLE = "Collection"
+# Dimension added when the combined charts have overlapping views and the caller gave no
+# `chart_dimension_slug` / `chart_dimension_name`. The values are published (they end up in
+# MDIM and explorer URLs), so they are kept as they are.
+DEFAULT_SOURCE_DIMENSION_SLUG = "collection__slug"
+DEFAULT_SOURCE_DIMENSION_NAME = "Collection"
 
 # Define type variables to use in overloads
-T = TypeVar("T", bound=Collection)
+T = TypeVar("T", bound=Chart)
 E = TypeVar("E", bound=Explorer)
 
 
@@ -160,140 +163,138 @@ def _order(config_yaml, config_combined):
 
 
 @overload
-def combine_collections(
-    collections: list[E],
-    collection_name: str | None = None,
+def combine_charts(
+    charts: list[E],
+    chart_name: str | None = None,
     catalog_path: str | None = None,
     config: dict[str, Any] | None = None,
     dependencies: set[str] | None = None,
-    force_collection_dimension: bool = False,
-    collection_dimension_name: str | None = None,
-    collection_dimension_slug: str | None = None,
-    collection_choices_names: list[str] | None = None,
+    force_chart_dimension: bool = False,
+    chart_dimension_name: str | None = None,
+    chart_dimension_slug: str | None = None,
+    chart_choices_names: list[str] | None = None,
     is_explorer: bool | None = None,
     _slug_changes_out: dict | None = None,
 ) -> E: ...
 
 
 @overload
-def combine_collections(
-    collections: list[T],
-    collection_name: str | None = None,
+def combine_charts(
+    charts: list[T],
+    chart_name: str | None = None,
     catalog_path: str | None = None,
     config: dict[str, Any] | None = None,
     dependencies: set[str] | None = None,
-    force_collection_dimension: bool = False,
-    collection_dimension_name: str | None = None,
-    collection_dimension_slug: str | None = None,
-    collection_choices_names: list[str] | None = None,
+    force_chart_dimension: bool = False,
+    chart_dimension_name: str | None = None,
+    chart_dimension_slug: str | None = None,
+    chart_choices_names: list[str] | None = None,
     is_explorer: bool | None = None,
     _slug_changes_out: dict | None = None,
 ) -> T: ...
 
 
-# COMBINE COLLECTIONS
-def combine_collections(
-    collections: list[Collection] | list[Explorer],
-    collection_name: str | None = None,
+# COMBINE CHARTS
+def combine_charts(
+    charts: list[Chart] | list[Explorer],
+    chart_name: str | None = None,
     catalog_path: str | None = None,
     config: dict[str, Any] | None = None,
     dependencies: set[str] | None = None,
-    force_collection_dimension: bool = False,
-    collection_dimension_name: str | None = None,
-    collection_dimension_slug: str | None = None,
-    collection_choices_names: list[str] | None = None,
+    force_chart_dimension: bool = False,
+    chart_dimension_name: str | None = None,
+    chart_dimension_slug: str | None = None,
+    chart_choices_names: list[str] | None = None,
     is_explorer: bool | None = None,
     _slug_changes_out: dict | None = None,
-) -> Collection | Explorer:
-    """Combine multiple collections (MDIMs or Explorers) into a single one.
+) -> Chart | Explorer:
+    """Combine multiple charts (MDIMs or Explorers) into a single one.
 
     This function serves as a unified interface to combine either Explorers
-    or MDIMs (Collections), abstracting the common logic between the two.
+    or MDIMs (Charts), abstracting the common logic between the two.
 
     Args:
-        collections:
-            List of collections (either all MDIMs or all Explorers) to combine
-        collection_name:
-            Name of the resulting combined collection. This is used to define the `catalog_path` of the resulting combined collection (re-uses the catalog_path of the first collection, and replaced its short_name with the `collection_name`). Alternatively, you can use `catalog_path` to force a specific path.
+        charts:
+            List of charts (either all MDIMs or all Explorers) to combine
+        chart_name:
+            Name of the resulting combined chart. This is used to define the `catalog_path` of the resulting combined chart (re-uses the catalog_path of the first chart, and replaced its short_name with the `chart_name`). Alternatively, you can use `catalog_path` to force a specific path.
         catalog_path:
-            Force specific catalog path, regardless of `collection_name`.
+            Force specific catalog path, regardless of `chart_name`.
         config:
-            Configuration for the combined collection
+            Configuration for the combined chart
         dependencies:
-            Set of dependencies for the combined collection
-        force_collection_dimension:
-            If True, adds a dimension to identify the source collection even if there are no duplicate views
-        collection_dimension_slug:
-            Slug for the dimension that identifies the source collection. If None, defaults to "collection__slug".
-        collection_dimension_name:
-            Name for the dimension that identifies the source collection. If None, defaults to "Collection".
-        collection_choices_names:
-            Names for the choices in the source dimension (should match the length of collections)
+            Set of dependencies for the combined chart
+        force_chart_dimension:
+            If True, adds a dimension to identify the source chart even if there are no duplicate views
+        chart_dimension_slug:
+            Slug for the dimension that identifies the source chart. If None, defaults to "collection__slug".
+        chart_dimension_name:
+            Name for the dimension that identifies the source chart. If None, defaults to "Chart".
+        chart_choices_names:
+            Names for the choices in the source dimension (should match the length of charts)
         is_explorer:
-            Force the result to be an Explorer (True) or MDIM (False). If None (default), inferred from the input collections.
+            Force the result to be an Explorer (True) or MDIM (False). If None (default), inferred from the input charts.
         _slug_changes_out:
             Internal. When a non-None dict is passed, it is mutated in-place with
             the slug changes produced by conflict resolution. Structure:
-            ``{collection_id: {dimension_slug: {original_slug: renamed_slug}}}``.
-            Used by ``create_collection`` to remap per-table ``choice_renames``.
+            ``{chart_id: {dimension_slug: {original_slug: renamed_slug}}}``.
+            Used by ``create_chart`` to remap per-table ``choice_renames``.
 
     Returns:
-        A combined Collection or Explorer, matching the type of the input collections
+        A combined Chart or Explorer, matching the type of the input charts
 
     Notes:
-        - All collections must have the same dimensions structure (slug, name, etc.)
+        - All charts must have the same dimensions structure (slug, name, etc.)
         - Choice conflicts are resolved by renaming conflicting choices
         - If duplicate views exist, a source dimension is automatically added
     """
-    # Check that there are at least 2 collections to combine
-    assert len(collections) > 0, "No collections to combine."
-    assert len(collections) > 1, "At least two collections should be provided."
+    # Check that there are at least 2 charts to combine
+    assert len(charts) > 0, "No charts to combine."
+    assert len(charts) > 1, "At least two charts should be provided."
 
-    # Check that either collection_name or catalog_path is provided
-    if collection_name is None and catalog_path is None:
-        raise ValueError("Either collection_name or catalog_path must be provided.")
+    # Check that either chart_name or catalog_path is provided
+    if chart_name is None and catalog_path is None:
+        raise ValueError("Either chart_name or catalog_path must be provided.")
 
-    # Determine collection type if not specified
+    # Determine chart type if not specified
     if is_explorer is None:
-        is_explorer = all(isinstance(c, Explorer) for c in collections)
-        if not (is_explorer or all(not isinstance(c, Explorer) for c in collections)):
-            raise ValueError("All collections must be of the same type (either all Explorers or all Collections)")
+        is_explorer = all(isinstance(c, Explorer) for c in charts)
+        if not (is_explorer or all(not isinstance(c, Explorer) for c in charts)):
+            raise ValueError("All charts must be of the same type (either all Explorers or all Charts)")
 
-    # Set appropriate default dimension name based on collection type
-    if collection_dimension_name is None:
-        collection_dimension_name = COLLECTION_TITLE
-    if collection_dimension_slug is None:
-        collection_dimension_slug = COLLECTION_SLUG
+    # Set appropriate default dimension name based on chart type
+    if chart_dimension_name is None:
+        chart_dimension_name = DEFAULT_SOURCE_DIMENSION_NAME
+    if chart_dimension_slug is None:
+        chart_dimension_slug = DEFAULT_SOURCE_DIMENSION_SLUG
 
-    # Check that all collections have the same dimensions structure
-    collection_dims = None
-    for collection in collections:
-        dimensions_flatten = [
-            {k: v for k, v in dim.to_dict().items() if k != "choices"} for dim in collection.dimensions
-        ]
-        if collection_dims is None:
-            collection_dims = dimensions_flatten
+    # Check that all charts have the same dimensions structure
+    chart_dims = None
+    for chart in charts:
+        dimensions_flatten = [{k: v for k, v in dim.to_dict().items() if k != "choices"} for dim in chart.dimensions]
+        if chart_dims is None:
+            chart_dims = dimensions_flatten
         else:
-            assert collection_dims == dimensions_flatten, (
-                "Dimensions are not the same across collections. Please review that dimensions are listed in the same order, have the same slugs, names, description, etc."
+            assert chart_dims == dimensions_flatten, (
+                "Dimensions are not the same across charts. Please review that dimensions are listed in the same order, have the same slugs, names, description, etc."
             )
 
-    # Checkbox dimensions are only safe to combine when all collections share the same
+    # Checkbox dimensions are only safe to combine when all charts share the same
     # definition (same slug/name/presentation AND same choice set). When they match, the
     # merge is structurally identical to a 2-choice radio. The structural equality of
     # everything except `choices` was already asserted above (see `dimensions_flatten`);
     # we additionally require the choice slugs to match, since `_combine_dimensions`
     # currently rebuilds the choice list by union and that would silently flip a checkbox
-    # into a 3+-choice widget if the sub-collections disagreed on the off/on slugs.
-    for dim in collections[0].dimensions:
+    # into a 3+-choice widget if the sub-charts disagreed on the off/on slugs.
+    for dim in charts[0].dimensions:
         if dim.ui_type == "checkbox" and is_explorer:
             ref_slugs = sorted(dim.choice_slugs)
-            for other in collections[1:]:
+            for other in charts[1:]:
                 other_dim = next((d for d in other.dimensions if d.slug == dim.slug), None)
                 if other_dim is None or sorted(other_dim.choice_slugs) != ref_slugs:
                     raise NotImplementedError(
                         f"Checkbox dimension '{dim.slug}' has different choices across "
-                        "collections — merging is not supported. Ensure every sub-collection "
+                        "charts — merging is not supported. Ensure every sub-chart "
                         "declares the same checkbox slug, choices, and `choice_slug_true`."
                     )
 
@@ -301,78 +302,76 @@ def combine_collections(
     seen_dims = set()
     has_duplicate_views = False
     dependencies_combined = set()
-    for collection in collections:
-        # duplicate views within a collection
-        collection.check_duplicate_views()
-        # duplicate views across collections
-        for view in collection.views:
+    for chart in charts:
+        # duplicate views within a chart
+        chart.check_duplicate_views()
+        # duplicate views across charts
+        for view in chart.views:
             dims = tuple(view.dimensions.items())
             if dims in seen_dims:
                 has_duplicate_views = True
                 break
             seen_dims.add(dims)
 
-        # Save dependencies from each collection
-        dependencies_combined |= collection.dependencies
+        # Save dependencies from each chart
+        dependencies_combined |= chart.dependencies
 
-    # Add collection dimension if needed
-    if has_duplicate_views or force_collection_dimension:
-        for i, collection in enumerate(collections):
-            if collection_choices_names is not None:
-                assert len(collection_choices_names) == len(collections), (
-                    "Length of collection_choices_names must match the number of collections"
+    # Add chart dimension if needed
+    if has_duplicate_views or force_chart_dimension:
+        for i, chart in enumerate(charts):
+            if chart_choices_names is not None:
+                assert len(chart_choices_names) == len(charts), (
+                    "Length of chart_choices_names must match the number of charts"
                 )
-                choice_name = collection_choices_names[i]
+                choice_name = chart_choices_names[i]
             else:
-                choice_name = (collection.title or {}).get("title", collection.short_name)
+                choice_name = (chart.title or {}).get("title", chart.short_name)
 
-            dimension_collection = Dimension(
-                slug=collection_dimension_slug,
-                name=collection_dimension_name,
+            dimension_source = Dimension(
+                slug=chart_dimension_slug,
+                name=chart_dimension_name,
                 choices=[
-                    DimensionChoice(slug=collection.short_name, name=choice_name),
+                    DimensionChoice(slug=chart.short_name, name=choice_name),
                 ],
             )
-            collection.dimensions = [dimension_collection] + collection.dimensions
-            for v in collection.views:
-                v.dimensions[collection_dimension_slug] = collection.short_name
+            chart.dimensions = [dimension_source] + chart.dimensions
+            for v in chart.views:
+                v.dimensions[chart_dimension_slug] = chart.short_name
 
-    # Create dictionary with collections for tracking
-    collections_by_id = {str(i): deepcopy(collection) for i, collection in enumerate(collections)}
+    # Create dictionary with charts for tracking
+    charts_by_id = {str(i): deepcopy(chart) for i, chart in enumerate(charts)}
 
     # Build dataframe with all choices
-    df_choices, cols_choices = _build_df_choices(collections_by_id)
+    df_choices, cols_choices = _build_df_choices(charts_by_id)
 
-    # Combine dimensions (use first collection as template)
+    # Combine dimensions (use first chart as template)
     dimensions = _combine_dimensions(
         df_choices=df_choices,
         cols_choices=cols_choices,
-        collection=collections[0].copy(),
+        chart=charts[0].copy(),
     )
 
     # Track modifications (useful later for views)
     choice_slug_changes = _extract_choice_slug_changes(df_choices)
 
     # Update views based on changes to choice slugs
-    collections_by_id = _update_choice_slugs_in_views(choice_slug_changes, collections_by_id)
+    charts_by_id = _update_choice_slugs_in_views(choice_slug_changes, charts_by_id)
 
     # Collect all views
     views = []
-    for _, collection in collections_by_id.items():
-        views.extend(collection.views)
+    for _, chart in charts_by_id.items():
+        views.extend(chart.views)
 
     # Create catalog path
     if isinstance(catalog_path, str):
-        assert "#" in catalog_path, (
-            "Catalog path must contain a '#' to separate the base path from the collection name."
-        )
+        assert "#" in catalog_path, "Catalog path must contain a '#' to separate the base path from the chart name."
         catalog_path_new = catalog_path
-        collection_name_new = catalog_path_new.split("#")[-1]
+        chart_name_new = catalog_path_new.split("#")[-1]
     else:
-        assert isinstance(collections[0].catalog_path, str), "Catalog path is not set. Please set it before saving."
-        assert collection_name is not None, "Collection name must be provided if catalog_path is not set."
-        catalog_path_new = collections[0].catalog_path.split("#")[0] + "#" + collection_name
-        collection_name_new = collection_name
+        assert isinstance(charts[0].catalog_path, str), "Catalog path is not set. Please set it before saving."
+        assert chart_name is not None, "Chart name must be provided if catalog_path is not set."
+        catalog_path_new = charts[0].catalog_path.split("#")[0] + "#" + chart_name
+        chart_name_new = chart_name
 
     # Ensure config has minimal required fields
     if config is None:
@@ -382,7 +381,7 @@ def combine_collections(
 
     # Make sure there is title and default_selection. If not given, use default values.
     default_title = {
-        "title": f"Combined Collection: {collection_name_new}",
+        "title": f"Combined Chart: {chart_name_new}",
         "title_variant": "Use a YAML to define these attributes",
     }
     if not is_explorer:
@@ -391,7 +390,7 @@ def combine_collections(
         else:
             cconfig["title"] = {**default_title, **cconfig["title"]}
         if "default_selection" not in cconfig:
-            cconfig["default_selection"] = collections[0].default_selection
+            cconfig["default_selection"] = charts[0].default_selection
     else:
         if "config" not in cconfig:
             cconfig["config"] = {}
@@ -407,14 +406,14 @@ def combine_collections(
         cconfig.get("dimensions", []),
     )
     # Hand-listed YAML views (from the user's config) belong here — alongside the views
-    # accumulated from sub-collections. Sub-collection views are View instances; YAML views
-    # are dicts. `create_collection_from_config` (via Explorer.from_dict / Collection.from_dict)
+    # accumulated from sub-charts. Sub-chart views are View instances; YAML views
+    # are dicts. `create_chart_from_config` (via Explorer.from_dict / Chart.from_dict)
     # accepts both shapes.
     yaml_views = cconfig.get("views") or []
     cconfig["views"] = views + list(yaml_views)
 
-    # Create the combined collection
-    combined = create_collection_from_config(
+    # Create the combined chart
+    combined = create_chart_from_config(
         config=cconfig,
         dependencies=dependencies if dependencies is not None else set(),
         catalog_path=catalog_path_new,
@@ -430,13 +429,13 @@ def combine_collections(
         for (dimension_slug, choice_slug), group in df_conflict.groupby(["dimension_slug", "slug_original"]):
             log.warning(f"(dimension={dimension_slug}, choice={choice_slug})")
             for _, subgroup in group.groupby("choice_slug_id"):
-                collection_ids = subgroup["collection_id"].unique().tolist()
-                collection_names = [collections_by_id[i].short_name for i in collection_ids]
+                chart_ids = subgroup["chart_id"].unique().tolist()
+                chart_names = [charts_by_id[i].short_name for i in chart_ids]
                 record = subgroup[cols_choices].drop_duplicates().to_dict("records")
                 assert len(record) == 1, "Unexpected, please report!"
-                log.warning(f" Collections {collection_names} map to {record[0]}")
+                log.warning(f" Charts {chart_names} map to {record[0]}")
 
-    # Expose slug changes to caller if requested (used by create_collection
+    # Expose slug changes to caller if requested (used by create_chart
     # to remap per-table choice_renames after combining).
     if _slug_changes_out is not None:
         _slug_changes_out.update(choice_slug_changes)
@@ -448,21 +447,19 @@ def _extract_choice_slug_changes(df_choices) -> dict[str, Any]:
     # Track modifications (useful later for views)
     slug_changes = (
         df_choices.loc[df_choices["in_conflict"]]
-        .groupby(["collection_id", "dimension_slug"])
+        .groupby(["chart_id", "dimension_slug"])
         .apply(lambda x: dict(zip(x["slug_original"], x["slug"])), include_groups=False)
-        .unstack("collection_id")
+        .unstack("chart_id")
         .to_dict()
     )
 
     return slug_changes
 
 
-def _combine_dimensions(
-    df_choices: pd.DataFrame, cols_choices: list[str], collection: Explorer | Collection
-) -> list[Dimension]:
+def _combine_dimensions(df_choices: pd.DataFrame, cols_choices: list[str], chart: Explorer | Chart) -> list[Dimension]:
     """Combine dimensions from different explorers"""
     # Dimension bucket
-    dimensions = collection.dimensions.copy()
+    dimensions = chart.dimensions.copy()
 
     # Drop duplicates
     df_choices = df_choices.drop_duplicates(subset=cols_choices + ["slug", "dimension_slug"])
@@ -486,21 +483,21 @@ def _combine_dimensions(
     return dimensions
 
 
-def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id) -> Mapping[str, Collection | Explorer]:
+def _update_choice_slugs_in_views(choice_slug_changes, charts_by_id) -> Mapping[str, Chart | Explorer]:
     """Access each explorer, and update choice slugs in views"""
-    for collection_id, change in choice_slug_changes.items():
+    for chart_id, change in choice_slug_changes.items():
         # `change` is the column from `_extract_choice_slug_changes`'s unstacked frame —
-        # dimensions with no conflicts in this collection come through as NaN. Drop them;
+        # dimensions with no conflicts in this chart come through as NaN. Drop them;
         # pandas.DataFrame.replace rejects a nested mapping if any top-level value isn't a dict.
         change = {k: v for k, v in change.items() if isinstance(v, dict) and v}
         if not change:
             continue
 
-        # Get collection
-        collection = collection_by_id[collection_id]
+        # Get chart
+        chart = charts_by_id[chart_id]
 
         # Get views as dataframe for easy processing
-        df_views_dimensions = pd.DataFrame([view.dimensions for view in collection.views])
+        df_views_dimensions = pd.DataFrame([view.dimensions for view in chart.views])
 
         # FUTURE: this needs to change in order to support checkboxes
         df_views_dimensions = df_views_dimensions.astype("string")
@@ -508,32 +505,32 @@ def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id) -> Mapp
         # Process views
         df_views_dimensions = df_views_dimensions.replace(change)
 
-        # Bring back views to collections
+        # Bring back views to charts
         views_dimensions = df_views_dimensions.to_dict("records")
-        for view, view_dimensions in zip(collection.views, views_dimensions):
+        for view, view_dimensions in zip(chart.views, views_dimensions):
             # cast keys to str to satisfy type requirements
             view.dimensions = {str(key): value for key, value in view_dimensions.items()}
-    return collection_by_id
+    return charts_by_id
 
 
-def _build_df_choices(collections_by_id: Mapping[str, Collection | Explorer]) -> tuple[pd.DataFrame, list[str]]:
-    # Collect all choices in a dataframe: choice_slug, choice_name, ..., collection_id, dimension_slug.
+def _build_df_choices(charts_by_id: Mapping[str, Chart | Explorer]) -> tuple[pd.DataFrame, list[str]]:
+    # Collect all choices in a dataframe: choice_slug, choice_name, ..., chart_id, dimension_slug.
     records = []
-    for i, explorer in collections_by_id.items():
+    for i, explorer in charts_by_id.items():
         for dim in explorer.dimensions:
             for choice in dim.choices:
                 records.append(
                     {
                         **choice.to_dict(),
                         "dimension_slug": dim.slug,
-                        "collection_id": i,
+                        "chart_id": i,
                     }
                 )
     # This needs to change to support checkboxes
     df_choices = pd.DataFrame(records).astype("string")
 
     # Get column names of fields from choice objects
-    cols_choices = [col for col in df_choices.columns if col not in ["slug", "collection_id", "dimension_slug"]]
+    cols_choices = [col for col in df_choices.columns if col not in ["slug", "chart_id", "dimension_slug"]]
 
     # For each choice slug, assign an ID (choice_slug_id) that identifies that "slug flavour". E.g. if a slug has different names (or descriptions) across explorers, each "flavour" will have a different ID. This will be useful later to identify conflicts & rename slugs.
     df_choices["choice_slug_id"] = (

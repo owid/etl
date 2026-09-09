@@ -1,7 +1,7 @@
 """Should not import from any other submodule in etl.viz."""
 
 
-class DuplicateCollectionViews(Exception):
+class DuplicateChartViews(Exception):
     pass
 
 

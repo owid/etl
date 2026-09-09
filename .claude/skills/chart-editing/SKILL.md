@@ -7,7 +7,7 @@ metadata:
 
 # Chart Editing (ETL-authored single charts)
 
-ETL-authored single charts are stored as zero-dimension mdim collections — a `.config.yml` with `dimensions: []` and exactly one view. Each layer of a chart is its own `chart_configs` row: ETL pushes to the one named by `charts.patchConfigIdETL`, admin edits land in the one named by `charts.patchConfigId`, and the two never collide.
+ETL-authored single charts are stored as zero-dimension charts — a `.config.yml` with `dimensions: []` and exactly one view. Each layer of a chart is its own `chart_configs` row: ETL pushes to the one named by `charts.patchConfigIdETL`, admin edits land in the one named by `charts.patchConfigId`, and the two never collide.
 
 This skill covers creating and editing those `.config.yml` files, pushing them to staging, and previewing the result.
 

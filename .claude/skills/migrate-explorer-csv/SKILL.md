@@ -79,7 +79,7 @@ def run() -> None:
 
 **FAUST hint.** While authoring indicator metadata, push chart text/config (`title_public`, `subtitle`, `note`, `map.colorScale`, `hasMapTab`, `tab`, `yAxis`, …) into each indicator's `presentation.{title_public, grapher_config}`. Cross-cutting baselines go under `definitions.common.presentation.grapher_config` (recursive merge). The explorer view inherits this text at chart render time, so the `<short>.config.yml` in the next skill stays minimal. See `/create-explorer` Step 5 for the full mechanics and the `dynamic-yaml` `"{definitions.<key>}"` interpolation pattern.
 
-CSV-explorer migrations have a slight advantage: *you control the garden output*, so you can shape the new garden table to be dimensional (one row per country/year × dim_a × dim_b) and the explorer step in the next skill can use `paths.create_collection(tb=tb, indicator_names=..., dimensions=...)` to expand views directly.
+CSV-explorer migrations have a slight advantage: *you control the garden output*, so you can shape the new garden table to be dimensional (one row per country/year × dim_a × dim_b) and the explorer step in the next skill can use `paths.create_chart(tb=tb, indicator_names=..., dimensions=...)` to expand views directly.
 
 ## Step 5 — Grapher step
 

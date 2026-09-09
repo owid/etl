@@ -2,12 +2,12 @@ import streamlit as st
 from rapidfuzz import fuzz
 
 from apps.wizard import utils
-from apps.wizard.etl_steps.forms import CollectionForm
+from apps.wizard.etl_steps.forms import ChartForm
 from apps.wizard.etl_steps.utils import dag_files, dag_not_add_option
 from apps.wizard.utils.components import preview_file, st_title_with_expert
 
 st.set_page_config(
-    page_title="Wizard: Collection Step",
+    page_title="Wizard: Chart Step",
     page_icon="🪄",
     layout="centered",
 )
@@ -18,7 +18,7 @@ st.session_state.submit_form = st.session_state.get("submit_form", False)
 
 
 # FIELDS FROM OTHER STEPS
-st.session_state["step_name"] = "collection"
+st.session_state["step_name"] = "chart"
 APP_STATE = utils.AppState()
 APP_STATE._previous_step = "data"
 
@@ -111,7 +111,7 @@ def edit_field() -> None:
 def submit_form() -> None:
     """Submit form."""
     # Create form
-    form = CollectionForm.from_state()
+    form = ChartForm.from_state()
     # Update states with values from form
     APP_STATE.update_from_form(form)
 
@@ -120,10 +120,10 @@ def submit_form() -> None:
 
 
 # TITLE
-st_title_with_expert("Collection **:gray[Create step]**", icon=":material/collections:")
+st_title_with_expert("Chart **:gray[Create step]**", icon=":material/bar_chart:")
 
 st.markdown(":small[:orange-badge[:material/warning: This app is in development. Please review the generated files.]]")
-st.markdown("Use this app to create a collection (previously referred as MDIMs).")
+st.markdown("Use this app to create a chart or MDIM step.")
 with st.container(border=True):
     render_form()
 
@@ -139,7 +139,7 @@ with st.container(border=True):
 #########################################################
 if st.session_state.submit_form:
     # Create form
-    form = CollectionForm.from_state()
+    form = ChartForm.from_state()
 
     # Create files
     generated_files = form.create_files()

@@ -1,6 +1,6 @@
 """Utils
 
-NOTE: Should not import from any other submodule in etl.viz.
+NOTE: Should not import from any other submodule in `etl.viz`, except `etl.viz.chart.exceptions`.
 """
 
 import re
@@ -47,7 +47,7 @@ def resolve_grapher_schema(value: str | int | None) -> str:
     - short: `grapher_schema: "011"`
     - full:  `grapher_schema: https://files.ourworldindata.org/schemas/grapher-schema.011.json`
 
-    `None` is rejected. There is deliberately no fallback: resolving an unpinned collection to
+    `None` is rejected. There is deliberately no fallback: resolving an unpinned chart to
     whatever version the repo happens to vendor today would tell Grapher the config is already
     current, so a config authored against an older schema would skip migration — and the same
     config would resolve to a *different* version the next time the step runs. The pin has to be
@@ -216,17 +216,17 @@ def filter_columns_by_dimension_choices(
 ) -> Table:
     """Keep only the indicators of `tb` whose dimensions match `dimension_choices`.
 
-    Use it when a collection should only use some choices of a dimension, e.g. one equivalence
+    Use it when a chart should only use some choices of a dimension, e.g. one equivalence
     scale out of several, or two sexes out of three. Columns with no dimensional metadata at all
     (e.g. index columns like country or year) are always kept. The input table is not modified; a
     copy is returned.
 
     By default, any dimension that is left with a single choice after filtering is removed from the
     metadata of the kept columns and from the table-level metadata. That is usually what you want:
-    a dimension with one choice renders as a dropdown with a single option. `Collection.save` prunes
+    a dimension with one choice renders as a dropdown with a single option. `Chart.save` prunes
     such dimensions too, but that happens too late for two reasons: `expand_config` would already
-    have built one view per choice of the dimension you are filtering out, and `create_collection`
-    fails earlier if the collection's YAML has hand-written views, since those views do not carry
+    have built one view per choice of the dimension you are filtering out, and `create_chart`
+    fails earlier if the chart's YAML has hand-written views, since those views do not carry
     the dimension. Set `drop_single_choice_dimensions=False` to keep the dimensions as they are.
 
     Example: a table with indicators over `sex` (male, female) and `equivalence_scale` (square root,
@@ -270,7 +270,7 @@ def filter_columns_by_dimension_choices(
     -----
     Filtering down to one choice of every dimension leaves the surviving indicators with no
     dimensions at all. That is a legitimate way to filter a table down to a single indicator, but
-    such a table cannot be expanded into a collection: `expand_config` skips indicators whose
+    such a table cannot be expanded into a chart: `expand_config` skips indicators whose
     dimensions are empty and raises `MissingDimensionalIndicatorError`. Pass
     `drop_single_choice_dimensions=False` if you need the dimensions kept.
 
@@ -327,7 +327,7 @@ def filter_columns_by_dimension_choices(
 
     # Each choice exists on its own, but the requested combination may not occur on any single
     # indicator (e.g. only male/adult and female/child exist, and male/child was requested). Without
-    # this check the result would silently contain no indicator at all, and a collection built from
+    # this check the result would silently contain no indicator at all, and a chart built from
     # it would fail later with a MissingDimensionalIndicatorError.
     if not any(tb[column].m.dimensions for column in columns_keep):
         raise ValueError(
@@ -504,7 +504,7 @@ def fill_placeholders(data, params) -> dict[str, Any] | list[Any] | set[Any] | t
     return data
 
 
-@deprecated("Use class method Collection.group_views instead.")
+@deprecated("Use class method Chart.group_views instead.")
 def group_views_legacy(views: list[dict[str, Any]], by: list[str]) -> list[dict[str, Any]]:
     """
     Group views by the specified dimensions. Concatenate indicators for the same group.

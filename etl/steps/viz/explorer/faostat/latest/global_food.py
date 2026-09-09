@@ -471,7 +471,7 @@ def run():
     tb_fbsc = ds_fbsc.read("faostat_fbsc_flat", load_data=False)
 
     # Load grapher config from YAML.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     #
     # Process data.
@@ -551,10 +551,9 @@ def run():
     # Save outputs.
     #
     # Initialize a new explorer.
-    c = paths.create_collection(
+    c = paths.create_explorer(
         config=config,
         short_name="global-food",
-        explorer=True,
     )
 
     # Save explorer.

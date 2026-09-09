@@ -15,7 +15,7 @@ ALL_DISEASES = "The data compares vaccination coverage for multiple childhood in
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Add views for all dimensions
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
@@ -35,8 +35,8 @@ def run() -> None:
         "tab": "chart",
         "yAxis": {"min": 0},
     }
-    # Create and save collection
-    c = paths.create_collection(
+    # Create and save chart
+    c = paths.create_chart(
         config=config,
         tb=tb,
         indicator_names=["coverage", "unvaccinated", "vaccinated"],

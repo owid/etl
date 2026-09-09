@@ -1,4 +1,4 @@
-"""Model for collections."""
+"""Model for charts."""
 
 import inspect
 import json
@@ -24,7 +24,7 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import SCHEMAS_DIR, VIZ_DIR
-from etl.viz.chart.exceptions import DuplicateCollectionViews, DuplicateValuesError
+from etl.viz.chart.exceptions import DuplicateChartViews, DuplicateValuesError
 from etl.viz.chart.model.base import MDIMBase, pruned_json
 from etl.viz.chart.model.dimension import Dimension, DimensionChoice
 from etl.viz.chart.model.params import GroupViewsConfig
@@ -116,7 +116,7 @@ class Definitions(MDIMBase):
 
 @pruned_json
 @dataclass
-class Collection(MDIMBase):
+class Chart(MDIMBase):
     """Overall MDIM/Explorer config"""
 
     dimensions: list[Dimension]
@@ -125,19 +125,19 @@ class Collection(MDIMBase):
 
     _definitions: Definitions
 
-    # Optional for single-chart collections (`dimensions: []`) and map-only mdims.
-    # See `validate_required_fields()` for the per-collection-type rules.
+    # Optional for single charts (`dimensions: []`) and map-only mdims.
+    # See `validate_required_fields()` for the per-chart-type rules.
     title: dict[str, str] | None = None
     default_selection: list[str] | None = None
 
     # The chart's stable identity (`charts.configId` in grapher). Required for — and only
-    # valid on — single-chart collections (`dimensions: []`); mdims are identified by
+    # valid on — single charts (`dimensions: []`); mdims are identified by
     # their catalog path instead. See `validate_chart_config_id()`.
     chart_config_id: str | None = None
 
     dependencies: set[str] = field(default_factory=set)
     topic_tags: list[str] | None = None
-    # Grapher chart-config schema version that this collection's view configs were authored
+    # Grapher chart-config schema version that this chart's view configs were authored
     # against. Short ("011") or full URL form; see `resolve_grapher_schema`. Grapher uses it as the
     # `$schema` of every view config, and skips config migrations entirely when it is missing.
     # Required for mdims and single charts (`required` in multidim-schema.json, re-checked by
@@ -148,13 +148,13 @@ class Collection(MDIMBase):
     # The published "download the complete dataset" package covering every
     # dimension combination, as opposed to the per-view download. Shape matches
     # grapher's DownloadPackage type. Not authored by hand: `save()` builds the
-    # package and fills this in, so a collection whose save() was passed
+    # package and fills this in, so a chart whose save() was passed
     # `download_package=False` (or that failed to build one) leaves it None and
     # its page renders exactly as before.
     download_package: dict | None = None
 
     # Internal use. For save() method.
-    _collection_type: str | None = field(init=False, default="multidim")
+    _chart_type: str | None = field(init=False, default="multidim")
     _group_operations_done: int = field(init=False, default=0)
 
     @classmethod
@@ -188,7 +188,7 @@ class Collection(MDIMBase):
 
         # Fail at authoring time on a malformed pin, rather than at upsert time. A *missing* pin is
         # caught by schema validation and by `validate_grapher_schema_pinned()`, not here: this runs
-        # for every Collection ever constructed, including ones assembled field-by-field.
+        # for every Chart ever constructed, including ones assembled field-by-field.
         if self.grapher_schema is not None:
             resolve_grapher_schema(self.grapher_schema)
 
@@ -202,7 +202,7 @@ class Collection(MDIMBase):
 
     @default_dimensions.setter
     def default_dimensions(self, view_dimensions: dict[str, str]) -> None:
-        """Set the default view for the collection.
+        """Set the default view for the chart.
 
         Args:
             view_dimensions: Dictionary mapping dimension slugs to their choice values
@@ -237,11 +237,11 @@ class Collection(MDIMBase):
     @property
     def local_config_path(self) -> Path:
         # energy/latest/energy_prices#energy_prices -> viz/chart/energy/latest/energy_prices/energy_prices.config.json
-        if self._collection_type is None:
-            raise ValueError("_collection_type must have a value!")
-        # Collections are `viz://chart` steps, explorers `viz://explorer` steps.
-        collection_dir = "explorer" if self._collection_type == "explorer" else "chart"
-        return VIZ_DIR / collection_dir / (self.catalog_path.replace("#", "/") + ".config.json")
+        if self._chart_type is None:
+            raise ValueError("_chart_type must have a value!")
+        # Charts are `viz://chart` steps, explorers `viz://explorer` steps.
+        channel = "explorer" if self._chart_type == "explorer" else "chart"
+        return VIZ_DIR / channel / (self.catalog_path.replace("#", "/") + ".config.json")
 
     @property
     def local_download_package_dir(self) -> Path:
@@ -257,10 +257,10 @@ class Collection(MDIMBase):
 
     @property
     def schema_path(self) -> Path:
-        return SCHEMAS_DIR / f"{self._collection_type}-schema.json"
+        return SCHEMAS_DIR / f"{self._chart_type}-schema.json"
 
     def save_config_local(self) -> None:
-        log.info(f"Exporting collection config to {self.local_config_path}")
+        log.info(f"Exporting chart config to {self.local_config_path}")
         self.save_file(self.local_config_path, force_create=True)
 
     def save(  # ty: ignore[invalid-method-override]
@@ -305,7 +305,7 @@ class Collection(MDIMBase):
         indicators = self.indicators_in_use(tolerate_extra_indicators)
         self.validate_indicators_are_from_dependencies(indicators)
 
-        # Check that all indicators in collection exist (needs the DB, so only when we may write to it)
+        # Check that all indicators in chart exist (needs the DB, so only when we may write to it)
         if etl_config.GRAPHER_ENABLED:
             validate_indicators_in_db(indicators, owid_env.engine)
 
@@ -314,7 +314,7 @@ class Collection(MDIMBase):
         # self.validate_topic_tags()
 
         # Top-level title / default_selection are required only for mdims (and only conditionally
-        # for default_selection). Single-chart collections (`dimensions: []`) ignore both.
+        # for default_selection). Single-chart charts (`dimensions: []`) ignore both.
         self.validate_title()
         self.validate_default_selection()
 
@@ -330,7 +330,7 @@ class Collection(MDIMBase):
         # Require a schema pin (mdims and single charts; explorers have no equivalent)
         self.validate_grapher_schema_pinned()
 
-        # Warn about view configs that shadow the collection-level schema pin
+        # Warn about view configs that shadow the chart-level schema pin
         self.warn_on_view_schema_overrides()
 
         # Sort views based on dimension order
@@ -352,7 +352,7 @@ class Collection(MDIMBase):
         # Without the write permission (`etlr` without --grapher), the local config is the result.
         if not etl_config.GRAPHER_ENABLED:
             log.warning(
-                "collection.not_upserted",
+                "chart.not_upserted",
                 catalog_path=self.catalog_path,
                 local_config=str(self.local_config_path),
                 hint="pass --grapher to upsert it",
@@ -369,7 +369,7 @@ class Collection(MDIMBase):
     def save_download_package(self, owid_env: OWIDEnv | None = None) -> None:
         """Build the complete-dataset package (wide CSV + metadata.json + readme.md
         zipped, plus Parquet + metadata.json), publish it to R2, and record where it
-        landed in the collection's config so the data page can link to it.
+        landed in the chart's config so the data page can link to it.
 
         Called at the end of `save()`, and deliberately *after* `upsert_to_db()`:
         the builder needs the page slug, which grapher assigns when the MDIM row is
@@ -377,24 +377,24 @@ class Collection(MDIMBase):
         the config gets upserted a second time here -- the first upsert necessarily
         happened before there was a package to point at.
 
-        Two kinds of collection are skipped, both because there is no page to attach a
+        Two kinds of chart are skipped, both because there is no page to attach a
         package to: explorers, which have no `multi_dim_data_pages` row at all, and
         MDIMs that have a row but no slug because nobody has published them yet. The
         latter is not an edge case -- 13 of the 59 multidim steps are in that state on a
-        staging server -- so it must not fail the step. A collection published later
+        staging server -- so it must not fail the step. A chart published later
         gets its package on the next run.
         """
-        from etl.viz.chart.download_package import build_download_package_for_collection, resolve_page_slug
+        from etl.viz.chart.download_package import build_download_package_for_chart, resolve_page_slug
 
-        if self._collection_type != "multidim":
-            log.info("collection.download_package.skipped_not_multidim", collection_type=self._collection_type)
+        if self._chart_type != "multidim":
+            log.info("chart.download_package.skipped_not_multidim", chart_type=self._chart_type)
             return
 
         if resolve_page_slug(self) is None:
-            log.info("collection.download_package.skipped_unpublished", catalog_path=self.catalog_path)
+            log.info("chart.download_package.skipped_unpublished", catalog_path=self.catalog_path)
             return
 
-        package = build_download_package_for_collection(self, dest_dir=self.local_download_package_dir)
+        package = build_download_package_for_chart(self, dest_dir=self.local_download_package_dir)
         self.download_package = package.to_config()
 
         # Re-export and re-upsert so the local debug config and the DB both carry the
@@ -414,17 +414,17 @@ class Collection(MDIMBase):
         if self.chart_config_id is not None:
             if len(self.views) != 1:
                 raise ValueError(
-                    f"Collection '{self.catalog_path}' declares `chart_config_id` but has "
-                    f"{len(self.views)} views. A single-chart collection must have exactly one view."
+                    f"Chart '{self.catalog_path}' declares `chart_config_id` but has "
+                    f"{len(self.views)} views. A single chart must have exactly one view."
                 )
-            from etl.viz.chart.upsert import upsert_collection_as_chart
+            from etl.viz.chart.upsert import upsert_single_chart
 
-            upsert_collection_as_chart(self, owid_env)
+            upsert_single_chart(self, owid_env)
             return
 
         if len(self.dimensions) == 0:
             raise ValueError(
-                f"Collection '{self.catalog_path}' has no dimensions left but does not declare "
+                f"Chart '{self.catalog_path}' has no dimensions left but does not declare "
                 f"`chart_config_id`. If this is a multidim whose dimensions were dropped because "
                 f"each had a single choice in use, pass `prune_dimensions=False` to `save()` to "
                 f"keep them. If it is meant to be a single chart, declare `chart_config_id` "
@@ -453,7 +453,7 @@ class Collection(MDIMBase):
         admin_api.put_mdim_config(self.catalog_path, config)
 
         # Link to preview
-        log.info(f"PREVIEW: {owid_env.collection_preview(self.catalog_path)}")
+        log.info(f"PREVIEW: {owid_env.chart_preview(self.catalog_path)}")
 
     def snake_case_slugs(self):
         """
@@ -665,7 +665,7 @@ class Collection(MDIMBase):
         return indicators
 
     def check_duplicate_views(self):
-        """Check for duplicate views in the collection."""
+        """Check for duplicate views in the chart."""
         check_duplicate_views(self.views)
 
     def sort_choices(self, slug_order: dict[str, list[str] | Callable]):
@@ -755,13 +755,13 @@ class Collection(MDIMBase):
             slug = underscore(dim.slug)
             if slug in GRAPHER_RESERVED_QUERY_PARAMS:
                 raise ValueError(
-                    f"Dimension slug '{slug}' in collection '{self.catalog_path}' collides with a query param "
+                    f"Dimension slug '{slug}' in chart '{self.catalog_path}' collides with a query param "
                     f"reserved by Grapher. Rename the dimension slug. Reserved names: "
                     f"{sorted(GRAPHER_RESERVED_QUERY_PARAMS)}"
                 )
 
     def validate_indicators_are_from_dependencies(self, indicators):
-        """Validate that the provided indicators are from tables in datasets specified in the collections dependencies."""
+        """Validate that the provided indicators are from tables in datasets specified in the charts dependencies."""
         deps = {dep.split("://", 1)[-1] if "://" in dep else dep for dep in self.dependencies}
         for indicator in indicators:
             if not any(indicator.startswith(f"{dep}/") for dep in deps):
@@ -772,26 +772,25 @@ class Collection(MDIMBase):
         """Ensure that at least one topic tag is set. Required for search."""
         if not self.topic_tags:
             raise ValueError(
-                f"Collection '{self.catalog_path}' must have at least one topic tag. "
-                "Add 'topic_tags' to your config YAML."
+                f"Chart '{self.catalog_path}' must have at least one topic tag. Add 'topic_tags' to your config YAML."
             )
 
     def validate_title(self):
-        """`title.title` is required for mdim collections (the data page renders empty `<h1>` otherwise)."""
+        """`title.title` is required for mdim charts (the data page renders empty `<h1>` otherwise)."""
         # Only multidims render a data page that needs a top-level title. Explorers manage their
-        # own title, and single-chart collections (`dimensions: []`) have no data page.
-        if self._collection_type != "multidim":
+        # own title, and single charts (`dimensions: []`) have no data page.
+        if self._chart_type != "multidim":
             return
         if not self.dimensions:
             return
         if not self.title or not self.title.get("title"):
             raise ValueError(
-                f"Collection '{self.catalog_path}' is a multidim (has dimensions) but is missing "
+                f"Chart '{self.catalog_path}' is a multidim (has dimensions) but is missing "
                 "a top-level `title.title`. Add it to your config YAML."
             )
 
     def validate_chart_config_id(self):
-        """`chart_config_id` is required for — and only valid on — single-chart collections.
+        """`chart_config_id` is required for — and only valid on — single charts.
 
         A single chart's identity in grapher is its config UUID (`charts.configId`), and the
         ETL config YAML has to declare it: for a chart that already exists, look up its UUID;
@@ -799,14 +798,14 @@ class Collection(MDIMBase):
         apart from "create yet another chart".
         """
         # Only multidims can be single charts (`dimensions: []`); explorers are always multi-view.
-        if self._collection_type != "multidim":
+        if self._chart_type != "multidim":
             return
 
         if self.dimensions:
             # An mdim is identified by its catalog path (`multi_dim_data_pages.catalogPath`).
             if self.chart_config_id:
                 raise ValueError(
-                    f"Collection '{self.catalog_path}' declares `chart_config_id` but has dimensions. "
+                    f"Chart '{self.catalog_path}' declares `chart_config_id` but has dimensions. "
                     "That field identifies a single chart; mdims are identified by their catalog path. "
                     "Remove it."
                 )
@@ -814,7 +813,7 @@ class Collection(MDIMBase):
 
         if not self.chart_config_id:
             raise ValueError(
-                f"Collection '{self.catalog_path}' is a single chart (`dimensions: []`) but is missing "
+                f"Chart '{self.catalog_path}' is a single chart (`dimensions: []`) but is missing "
                 "a top-level `chart_config_id`. It is the chart's identity in grapher (`charts.configId`) "
                 "and must be declared in the config YAML. `etl chart-config-id` writes it for you:\n"
                 "  - for a chart that already exists: "
@@ -829,7 +828,7 @@ class Collection(MDIMBase):
         # match the chart we mean to target: the endpoint would create a *new* chart instead.
         if not isinstance(self.chart_config_id, str):
             raise ValueError(
-                f"Collection '{self.catalog_path}' has an invalid `chart_config_id` "
+                f"Chart '{self.catalog_path}' has an invalid `chart_config_id` "
                 f"({self.chart_config_id!r}): expected a UUID string, got {type(self.chart_config_id).__name__}. "
                 "Quote it in the config YAML."
             )
@@ -837,12 +836,12 @@ class Collection(MDIMBase):
             parsed = uuid.UUID(self.chart_config_id)
         except ValueError:
             raise ValueError(
-                f"Collection '{self.catalog_path}' has an invalid `chart_config_id` "
+                f"Chart '{self.catalog_path}' has an invalid `chart_config_id` "
                 f"('{self.chart_config_id}'): expected a UUID."
             ) from None
         if str(parsed) != self.chart_config_id:
             raise ValueError(
-                f"Collection '{self.catalog_path}' has a non-canonical `chart_config_id` "
+                f"Chart '{self.catalog_path}' has a non-canonical `chart_config_id` "
                 f"('{self.chart_config_id}'). Grapher stores and matches it as a lower-case dashed "
                 f"UUID, so write it exactly as '{parsed}'."
             )
@@ -852,7 +851,7 @@ class Collection(MDIMBase):
             # `new_chart_config_id`). Not fatal — the upsert would just create a new chart —
             # but almost always a sign the wrong UUID was pasted in.
             log.warning(
-                "collection.chart_config_id.not_uuid7",
+                "chart.chart_config_id.not_uuid7",
                 catalog_path=self.catalog_path,
                 chart_config_id=self.chart_config_id,
                 version=parsed.version,
@@ -870,7 +869,7 @@ class Collection(MDIMBase):
         renders a chart tab (line/bar/scatter/etc.) where the selection matters.
         """
         # Explorers manage their own entity selection; this fallback check is mdim-only.
-        if self._collection_type != "multidim":
+        if self._chart_type != "multidim":
             return
         if not self.dimensions:
             return
@@ -885,12 +884,12 @@ class Collection(MDIMBase):
             if view_config.get("selectedEntityNames"):
                 continue
             log.warning(
-                "collection.missing_default_selection",
+                "chart.missing_default_selection",
                 catalog_path=self.catalog_path,
                 view_dimensions=view.dimensions,
                 message=(
                     "View has chart tabs but no entity selection — set `default_selection` "
-                    "at the collection level or `selectedEntityNames` on this view."
+                    "at the chart level or `selectedEntityNames` on this view."
                 ),
             )
 
@@ -902,16 +901,16 @@ class Collection(MDIMBase):
     def warn_on_view_schema_overrides(self):
         """Warn when a view config carries its own `$schema`, shadowing `grapher_schema`.
 
-        Grapher applies the collection pin as `{$schema: grapherConfigSchema, **view.config}`, so a
-        view's own `$schema` wins — and it is far less visible than the collection pin on line 1 of
+        Grapher applies the chart pin as `{$schema: grapherConfigSchema, **view.config}`, so a
+        view's own `$schema` wins — and it is far less visible than the chart pin on line 1 of
         the config YAML. That combination has bitten us before: a config pinned at an old version
         while its body used fields from a newer one, so Grapher ran migrations over a config they
-        were never meant to touch. Pin the collection instead.
+        were never meant to touch. Pin the chart instead.
 
-        Skipped for explorers: they have no collection-level pin to shadow (see
+        Skipped for explorers: they have no chart-level pin to shadow (see
         `Explorer.__post_init__`), so a `$schema` in an explorer view config overrides nothing.
         """
-        if self._collection_type == "explorer":
+        if self._chart_type == "explorer":
             return
 
         overrides = defaultdict(int)
@@ -922,10 +921,10 @@ class Collection(MDIMBase):
 
         for schema, n_views in sorted(overrides.items()):
             log.warning(
-                f"Collection '{self.catalog_path}': {n_views} view(s) set `$schema` in their config "
-                f"({schema}), which overrides the collection-level `grapher_schema` "
+                f"Chart '{self.catalog_path}': {n_views} view(s) set `$schema` in their config "
+                f"({schema}), which overrides the chart-level `grapher_schema` "
                 f"({resolve_grapher_schema(self.grapher_schema)}). Remove it and pin the whole "
-                "collection with the top-level `grapher_schema` field instead."
+                "chart with the top-level `grapher_schema` field instead."
             )
 
     def validate_grapher_schema_pinned(self):
@@ -936,18 +935,18 @@ class Collection(MDIMBase):
         vendors on the day the step runs, which (a) claims the config is already current, so a
         config written against an older schema skips migration, and (b) silently changes the next
         time the step runs after a version bump. `multidim-schema.json` requires the field, which
-        catches every authored config; this re-check covers collections built without schema
+        catches every authored config; this re-check covers charts built without schema
         validation or assembled field-by-field in Python.
 
         Explorers are exempt — they reach Grapher through the legacy TSV path, which has no
         equivalent of `grapherConfigSchema`, and `Explorer.__post_init__` rejects the field.
         """
-        if self._collection_type == "explorer":
+        if self._chart_type == "explorer":
             return
 
         if self.grapher_schema is None:
             raise ValueError(
-                f"Collection '{self.catalog_path}' pins no `grapher_schema`. Add a top-level "
+                f"Chart '{self.catalog_path}' pins no `grapher_schema`. Add a top-level "
                 "`grapher_schema` to the config YAML recording the version its view configs were "
                 f'authored against — `grapher_schema: "{default_grapher_schema_version()}"` for a '
                 "config written today (quoted: an unquoted `011` is YAML octal)."
@@ -1396,8 +1395,8 @@ class Collection(MDIMBase):
             else:
                 try:
                     check_duplicate_views(new_views["views"] + self.views)
-                except DuplicateCollectionViews:
-                    raise DuplicateCollectionViews(
+                except DuplicateChartViews:
+                    raise DuplicateChartViews(
                         f"Duplicate views found (dimension `{new_views['dimension']}`, new choice `{new_views['choice_new']}`)! If you want to overwrite the existing views, set `overwrite_dimension_choice=True` in the parameters."
                     )
             # Add views to list
@@ -1507,7 +1506,7 @@ class Collection(MDIMBase):
                 f"Choices {choices} not found in dimension {dimension}! Available choices are: {dimension_choices[dimension]}"
             )
 
-        # Check that the new choice slug is not IN USE. Note that it could still be in the dimension choices, but not in use. NOTE: this is tricky. As implemented above it fails for war/latest/mars collection step.
+        # Check that the new choice slug is not IN USE. Note that it could still be in the dimension choices, but not in use. NOTE: this is tricky. As implemented above it fails for war/latest/mars chart step.
         # choices_in_use = self.dimension_choices_in_use()
         # if choice_new_slug in choices_in_use[dimension]:
         #     raise ValueError(
@@ -1626,12 +1625,12 @@ def _combine_view_indicators(views: list[View]):
 
 
 def check_duplicate_views(views: list[View]):
-    """Check for duplicate views in the collection."""
+    """Check for duplicate views in the chart."""
     seen_dims = set()
     for view in views:
         dims = tuple(view.dimensions.items())
         if dims in seen_dims:
-            raise DuplicateCollectionViews(f"Duplicate view:\n\n{yaml.dump(view.dimensions)}")
+            raise DuplicateChartViews(f"Duplicate view:\n\n{yaml.dump(view.dimensions)}")
         seen_dims.add(dims)
 
 
@@ -1699,8 +1698,8 @@ def _flatten_description_key(description_key: list[Any]) -> list[str]:
 
 
 def _convert_description_key_lists(config: dict[str, Any], context: str | None = None) -> None:
-    """Convert description_key lists to markdown strings in the collection-level
-    and per-view metadata of a collection config (in place)."""
+    """Convert description_key lists to markdown strings in the chart-level
+    and per-view metadata of a chart config (in place)."""
     metadatas = [config.get("metadata"), *(view.get("metadata") for view in config.get("views", []))]
     for metadata in metadatas:
         if metadata and isinstance(metadata.get("description_key"), list):
