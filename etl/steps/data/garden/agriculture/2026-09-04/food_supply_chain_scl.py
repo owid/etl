@@ -49,12 +49,14 @@ ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
 7. FAOSTAT rounds tonnages, so balances do not close exactly. The gap is folded into "residuals" so the chain lands
    exactly on "food"; its size is kept in "balancing_difference".
 
-8. Regions. OWID regions (World, continents, income groups) come from the FAOSTAT garden step, which builds them
-   for SCL as for every FAO dataset by summing member countries; FAO's own regional aggregates are dropped.
+8. Regions. FAO's own regional aggregates are dropped, and SCL has no other region rows. OWID regions (World,
+   continents, income groups) are built here from the member countries that have an SCL balance that year: every
+   flow and food nutrient total is summed over those countries (fish included, from the same countries), and the
+   region's population is the sum of those same countries' population. A country either has a full balance or none
+   at all, so numerator and denominator always cover the same countries; countries FAO has not compiled for SCL
+   (Japan, Sudan, Somalia and a few others) are in neither. No minimum coverage is imposed.
 
-9. All stages are divided by the same population and by 365 days: OWID population for countries, and for regions the
-   population of the members with data (the FAOSTAT garden step's own per-capita denominator), so that a region's
-   per-capita values are not diluted by members that do not report. SCL covers 2010 onward.
+9. All stages are divided by that population and by 365 days. SCL covers 2010 onward.
 """
 
 import numpy as np
@@ -89,9 +91,10 @@ ELEMENTS = {
     "000271": "food_protein_tonnes_per_year",
 }
 ELEMENT_UNITS = {
-    "kilocalories": ["000261"],
-    "tonnes": [code for code in ELEMENTS if code != "000261"],
+    "million Kilocalories": ["000261"],
+    "Tonnes": [code for code in ELEMENTS if code != "000261"],
 }
+KCAL_PER_MILLION_KCAL = 1e6
 # FBS elements used for the fish items (see assumption 6).
 FBS_ELEMENTS = {
     "005511": "production",
@@ -187,7 +190,22 @@ IDENTITY_ABSOLUTE_TOLERANCE_TONNES = 2000
 FBS_TOTAL_ITEM_CODE = "00002901"
 HUNDRED_GRAMS_PER_TONNE = 10_000
 KG_PER_TONNE = 1000
+GRAMS_PER_TONNE = 1_000_000
 DAYS_PER_YEAR = 365
+# OWID regions rebuilt in this step (assumption 8); the FAOSTAT garden step's rows for them, if any, are dropped.
+REGIONS = [
+    "World",
+    "Africa",
+    "Asia",
+    "Europe",
+    "North America",
+    "Oceania",
+    "South America",
+    "Low-income countries",
+    "Lower-middle-income countries",
+    "Upper-middle-income countries",
+    "High-income countries",
+]
 # Columns of the per-item balance table shared by the SCL and the FBS (fish) parts.
 BALANCE_COLUMNS = (
     ["country", "year", "item_code", "fao_item", "role"]
@@ -258,9 +276,12 @@ def prepare_balance_table(tb: Table, roles: pd.Series, manual: dict) -> Table:
     tb = tb[["country", "year", "item_code", "fao_item", "element_code", "value", "population_with_data"]].astype(
         {"country": str, "item_code": str, "fao_item": str, "value": float, "population_with_data": float}
     )
-    # Population of the entity, or, for a region, of its members with data (the FAOSTAT garden step's own per-capita
-    # denominator). Taken as the maximum over items and elements, i.e. every member that reports anything.
-    population = tb.groupby(["country", "year"])["population_with_data"].max().rename("population").reset_index()
+    # Countries only: the FAOSTAT garden step's region rows, if any, are dropped and rebuilt in `add_region_aggregates`.
+    tb = tb[~tb["country"].isin(REGIONS)].reset_index(drop=True)
+    # OWID population of the country, which the FAOSTAT garden step attaches to every row.
+    population = tb.groupby(["country", "year"])["population_with_data"].agg(["min", "max"])
+    assert (population["min"] == population["max"]).all(), "Population differs across rows of a country-year."
+    population = population["max"].rename("population").reset_index()
     names = tb[["item_code", "fao_item"]].drop_duplicates().set_index("item_code")["fao_item"]
     tb = tb.drop(columns=["fao_item", "population_with_data"]).pivot(
         index=["country", "year", "item_code"], columns="element_code", values="value", join_column_levels_with="_"
@@ -269,6 +290,7 @@ def prepare_balance_table(tb: Table, roles: pd.Series, manual: dict) -> Table:
     for element in ELEMENTS.values():
         if element not in tb.columns:
             tb[element] = np.nan
+    tb["food_kcal_per_year"] = tb["food_kcal_per_year"] * KCAL_PER_MILLION_KCAL
     tb[BALANCE_ELEMENTS] = tb[BALANCE_ELEMENTS].fillna(0)
     tb["fao_item"] = tb["item_code"].map(names)
     tb["role"] = tb["item_code"].map(roles)
@@ -281,7 +303,7 @@ def prepare_balance_table(tb: Table, roles: pd.Series, manual: dict) -> Table:
     return tb[BALANCE_COLUMNS + ["population"]]
 
 
-def prepare_fish_table(tb_fbsc: Table, manual: dict) -> Table:
+def prepare_fish_table(tb_fbsc: Table, manual: dict, population: Table) -> Table:
     """FBS fish items, reshaped like the SCL balance table (see assumption 6)."""
     fish_items = {_pad_code(item["code"]): item for item in manual["fish_from_fbs"]}
     tb = tb_fbsc[
@@ -308,14 +330,43 @@ def prepare_fish_table(tb_fbsc: Table, manual: dict) -> Table:
     tb["stock_variation"] = tb["production"] + tb["imports"] - tb["exports"] - tb["domestic_supply"]
     tb["fao_item"] = tb["item_code"].map({c: it["name"] for c, it in fish_items.items()})
     tb["role"] = tb["item_code"].map({c: it["role"] for c, it in fish_items.items()})
-    # FBS tonnages are rounded to 1,000 t, so densities are taken from its per-capita figures. The density is a
-    # ratio, so the population cancels: express the per-capita figures per person in the same units as SCL's totals
-    # (kcal per year; grams of protein / 1e6 -> tonnes; kg of food / 1000 -> tonnes).
-    tb["food_kcal_per_year"] = tb["food_kcal_per_capita_per_day"] * DAYS_PER_YEAR
-    tb["food_protein_tonnes_per_year"] = tb["food_protein_g_per_capita_per_day"] * DAYS_PER_YEAR / 1e6
-    tb["food_tonnes_for_density"] = tb["food_kg_per_capita_per_year"] / 1000
-    tb["population"] = np.nan  # filled from the SCL rows of the same entity and year
+    # Only the countries and years SCL covers (the population table comes from the SCL rows). FBS tonnages are
+    # rounded to 1,000 t, so densities are taken from its per-capita figures, expressed as totals in SCL's units
+    # (kcal per year; tonnes of protein per year; tonnes of food) so that they can be summed into regions.
+    tb = tb.merge(population, on=["country", "year"], how="inner")
+    tb["food_kcal_per_year"] = tb["food_kcal_per_capita_per_day"] * DAYS_PER_YEAR * tb["population"]
+    tb["food_protein_tonnes_per_year"] = (
+        tb["food_protein_g_per_capita_per_day"] * DAYS_PER_YEAR * tb["population"] / GRAMS_PER_TONNE
+    )
+    tb["food_tonnes_for_density"] = tb["food_kg_per_capita_per_year"] * tb["population"] / KG_PER_TONNE
     return tb[BALANCE_COLUMNS + ["population"]]
+
+
+def add_region_aggregates(tb: Table) -> Table:
+    """Assumption 8: OWID regions as the sum of the member countries present each year, for the flows and the population."""
+    assert not tb["country"].isin(REGIONS).any(), "Region rows must be dropped before aggregating."
+    keys = ["country", "year", "item_code"]
+    value_columns = [c for c in tb.columns if c not in keys + ["population"] and pd.api.types.is_numeric_dtype(tb[c])]
+    item_columns = [c for c in tb.columns if c not in keys + ["population"] + value_columns]
+    item_attributes = tb[["item_code"] + item_columns].drop_duplicates()
+    assert not item_attributes["item_code"].duplicated().any(), "Item attributes differ across rows of an item."
+    population = tb[["country", "year", "population"]].drop_duplicates()
+    assert not population.duplicated(["country", "year"]).any(), "Population differs across items of a country-year."
+
+    # A total that no member reports (FAO gives no food nutrients for cakes, for one) stays missing, not zero.
+    flows = paths.regions.add_aggregates(
+        tb[keys + value_columns],
+        regions=REGIONS,
+        index_columns=keys,
+        aggregations={c: "sum" for c in value_columns},
+        min_num_values_per_year=1,
+    )
+    population = paths.regions.add_aggregates(
+        population, regions=REGIONS, index_columns=["country", "year"], aggregations={"population": "sum"}
+    )
+    tb = flows.merge(item_attributes, on="item_code", how="left").merge(population, on=["country", "year"], how="left")
+    assert tb["population"].notnull().all(), "Some rows have no population after aggregating regions."
+    return tb
 
 
 def sanity_check_balance_identity(tb: Table) -> None:
@@ -475,7 +526,7 @@ def build_chain(tb: Table) -> Table:
     chain["balancing_difference"] = chain["food"] - chain_end
     chain["residuals"] = chain["residuals"] - chain["balancing_difference"]
 
-    # Per person per day (assumption 9): OWID population, or for regions the population of the members with data.
+    # Per person per day (assumption 9): the entity's population, or, for regions, that of the summed members.
     assert chain["population"].notnull().all() and (chain["population"] > 0).all(), "Missing population."
     for stage in STAGES:
         chain[stage] = chain[stage] / chain["population"] / DAYS_PER_YEAR
@@ -550,12 +601,10 @@ def run() -> None:
     sanity_check_inputs(tb_scl, roles=roles, manual=manual)
 
     tb = prepare_balance_table(tb_scl, roles=roles, manual=manual)
-    tb_fish = prepare_fish_table(tb_fbsc, manual=manual)
-    # Only for the entities and years SCL covers; FBS also has OWID region aggregates, which SCL does not.
-    covered = tb[["country", "year"]].drop_duplicates()
-    tb_fish = tb_fish.merge(covered, on=["country", "year"], how="inner")
+    population = tb[["country", "year", "population"]].drop_duplicates()
+    tb_fish = prepare_fish_table(tb_fbsc, manual=manual, population=population)
     tb = pr.concat([tb, tb_fish], ignore_index=True)
-    tb["population"] = tb.groupby(["country", "year"])["population"].transform("max")
+    tb = add_region_aggregates(tb)
     sanity_check_balance_identity(tb)
 
     tables = []
