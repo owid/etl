@@ -318,7 +318,7 @@ def show_section_related_charts(df: pd.DataFrame, n: int) -> None:
     st_related_charts_table(df, n=n)
 
 
-def show_section_other_providers(df: pd.DataFrame, n: int) -> None:
+def show_section_other_producers(df: pd.DataFrame, n: int) -> None:
     st.markdown("---")
     st.header("Other producers")
     st.markdown(
@@ -348,5 +348,5 @@ def show_section_explore_included_data(df: pd.DataFrame, n: int) -> None:
 reset_df = charts_df.reset_index()
 show_section_others_viewed(reset_df, nr_recommendations)
 show_section_related_charts(reset_df, nr_recommendations)
-show_section_other_providers(reset_df, nr_recommendations)
+show_section_other_producers(reset_df, nr_recommendations)
 show_section_explore_included_data(reset_df, nr_recommendations)
