@@ -111,6 +111,12 @@ for table_name in ds.table_names:
             put('presentation.grapher_config.subtitle', gc.get('subtitle'))
             put('presentation.grapher_config.note', gc.get('note'))
 
+        # The chart footer resolves presentation.attribution > origin.attribution >
+        # origin.producer (year), so the visible credit usually comes from the origin.
+        for i, o in enumerate(getattr(m, 'origins', None) or []):
+            put(f'origins[{i}].attribution', getattr(o, 'attribution', None))
+            put(f'origins[{i}].citation_full', getattr(o, 'citation_full', None))
+
         if entry['fields']:
             rows.append(entry)
 
@@ -129,6 +135,8 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 | `presentation.title_public` | Public-facing chart title |
 | `presentation.title_variant` | Disambiguator ("Historical", "WHO estimate", …) |
 | `presentation.attribution` | Full source credit under the chart (`producer – data product (year)`) |
+| `origins[i].attribution` | Where that credit usually comes from — the footer falls back to it when `presentation.attribution` is unset |
+| `origins[i].citation_full` | Full citation on the data page |
 | `presentation.attribution_short` | Short source credit under the chart |
 | `presentation.grapher_config.title` | Overrides chart title when set |
 | `presentation.grapher_config.subtitle` | Chart subtitle |
