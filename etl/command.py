@@ -573,6 +573,17 @@ def construct_subdag(
         ).items():
             subdag[step] = subdag.get(step, set()) | deps
 
+    if not private:
+        # The exclusion also drops the public steps downstream of a private one. Fine for a pattern (the
+        # rest still runs), but a step named in full should not vanish silently.
+        dropped = sorted(i for i in includes if i in dag and i not in subdag)
+        if dropped:
+            click.secho(
+                f"Skipping {len(dropped)} named step(s) with --public-only, private or depending on a private step: "
+                + ", ".join(dropped),
+                fg="yellow",
+            )
+
     if not grapher:
         # A named viz step brings its grapher:// dependencies (the upserts of its inputs) along, and a
         # named grapher:// step selects itself; neither may run without the permission.

@@ -348,6 +348,28 @@ def test_construct_subdag_patterns_still_skip_gated_steps_without_their_flag(cap
     assert not [step for step in subdag if step.startswith(("grapher://", "viz://"))]
 
 
+def test_construct_subdag_public_only_warns_about_dropped_named_steps(capsys):
+    """A pattern silently skips the public steps downstream of a private one; a named step says so."""
+    dag = {
+        "data-private://garden/secret/2023-01-01/secret": {"snapshot-private://meadow/secret/2023-01-01/secret"},
+        "data://garden/mixed/2023-01-01/mixed": {"data-private://garden/secret/2023-01-01/secret"},
+        "data://garden/open/2023-01-01/open": {"snapshot://meadow/open/2023-01-01/open"},
+    }
+
+    subdag = cmd.construct_subdag(dag, includes=["garden"], private=False)
+    assert set(subdag) == {"data://garden/open/2023-01-01/open", "snapshot://meadow/open/2023-01-01/open"}
+    assert "Skipping" not in capsys.readouterr().out
+
+    subdag = cmd.construct_subdag(
+        dag, includes=["data://garden/mixed/2023-01-01/mixed", "data://garden/open/2023-01-01/open"], private=False
+    )
+    assert "data://garden/mixed/2023-01-01/mixed" not in subdag
+    assert "data://garden/open/2023-01-01/open" in subdag
+    out = capsys.readouterr().out
+    assert "Skipping 1 named step(s) with --public-only" in out
+    assert "data://garden/mixed/2023-01-01/mixed" in out
+
+
 def test_construct_subdag_full_step_name_selects_that_step_only():
     """`viz://chart/.../happiness` must not also select `.../happiness_extended`."""
     subdag = cmd.construct_subdag(GATED_DAG, includes=["viz://chart/happiness/latest/happiness"], grapher=True)
