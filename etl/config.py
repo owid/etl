@@ -257,7 +257,8 @@ INSTANT = env.get("INSTANT", "0") in ("True", "true", "1")
 # Upload grapher data & metadata JSON files even if their checksums match. Set by `etlr --force`.
 FORCE_UPLOAD: bool = False
 
-# Write permissions, set by `etlr` from its --grapher / --export flags (see `etl.command.main_cli`).
+# Write permissions, set by `etlr` from its --grapher / --export flags (see `etl.command.main`, which
+# `etl browser` and fasttrack call directly, so they get the same gating).
 # A step whose destination is gated builds its output locally and skips the upsert/upload when its
 # permission is off: chart, explorer and bespoke steps under GRAPHER_ENABLED, export:// steps under
 # EXPORT_ENABLED. Outside `etlr` (a notebook calling `collection.save()`, a step module run directly)

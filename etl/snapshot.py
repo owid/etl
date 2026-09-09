@@ -80,12 +80,13 @@ def _r2_access_denied_reason(error: Exception) -> str | None:
 
     `s3_utils.download` wraps botocore's `ClientError` in an `UploadError`, so the status code sits
     on the wrapped exception. Missing credentials never reach the wire and surface as a
-    `BotoCoreError` instead (`NoCredentialsError`, or `ProfileNotFound` when a stray AWS_PROFILE
-    shadows the R2 ones).
+    credentials `BotoCoreError` instead (`NoCredentialsError`, or `ProfileNotFound` when a stray
+    AWS_PROFILE shadows the R2 ones). Other `BotoCoreError`s (an unreachable endpoint, a timeout) are
+    not access problems and keep their own message.
     """
-    from botocore.exceptions import BotoCoreError, ClientError
+    from botocore.exceptions import ClientError, NoCredentialsError, PartialCredentialsError, ProfileNotFound
 
-    if isinstance(error, BotoCoreError):
+    if isinstance(error, (NoCredentialsError, PartialCredentialsError, ProfileNotFound)):
         return str(error)
 
     inner = error.args[0] if error.args else None

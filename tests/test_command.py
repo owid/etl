@@ -6,6 +6,7 @@
 Test components of the etl command-line tool.
 """
 
+import os
 import time
 
 import pytest
@@ -348,6 +349,29 @@ def test_construct_subdag_patterns_still_skip_gated_steps_without_their_flag(cap
     assert not [step for step in subdag if step.startswith(("grapher://", "viz://"))]
 
 
+def test_main_sets_write_permissions_for_programmatic_callers(monkeypatch):
+    """`etl browser` and fasttrack call `main()` directly, so the write switches must be set there, not
+    only in `main_cli`: a named viz step run from the browser without its permission must not publish."""
+    from etl import config
+
+    dag = {"data://garden/happiness/2023-01-01/happiness": {"snapshot://meadow/happiness/2023-01-01/happiness"}}
+    monkeypatch.setattr(cmd, "load_dag", lambda dag_path: dag)
+    monkeypatch.setattr(cmd, "run_steps", lambda *args, **kwargs: None)
+    monkeypatch.setattr(cmd, "sanity_check_db_settings", lambda grapher_user_id: None)
+    monkeypatch.setattr(config, "GRAPHER_ENABLED", True)
+    monkeypatch.setattr(config, "EXPORT_ENABLED", True)
+    monkeypatch.setenv("GRAPHER_ENABLED", "1")
+    monkeypatch.setenv("EXPORT_ENABLED", "1")
+
+    cmd.main(includes=["happiness"])
+    assert (config.GRAPHER_ENABLED, config.EXPORT_ENABLED) == (False, False)
+    assert (os.environ["GRAPHER_ENABLED"], os.environ["EXPORT_ENABLED"]) == ("0", "0")
+
+    cmd.main(includes=["happiness"], grapher=True)
+    assert (config.GRAPHER_ENABLED, config.EXPORT_ENABLED) == (True, False)
+    assert os.environ["GRAPHER_ENABLED"] == "1"
+
+
 def test_construct_subdag_public_only_warns_about_dropped_named_steps(capsys):
     """A pattern silently skips the public steps downstream of a private one; a named step says so."""
     dag = {
@@ -386,13 +410,20 @@ def test_modified_steps_matches_full_uri_includes(monkeypatch):
 
     changed = [
         "garden/happiness/2023-01-01/happiness",
+        "garden/happiness/2023-01-01/happiness_extended",
         "explorers/happiness/latest/happiness",
         "viz://chart/happiness/latest/happiness",
     ]
     monkeypatch.setattr(etl.io, "get_all_changed_catalog_paths", lambda files_changed, include_export: changed)
 
+    # A full URI selects that step only, not `happiness_extended` as well.
     assert cmd._modified_steps(includes=["data://garden/happiness/2023-01-01/happiness"], files_changed={}) == [
         "garden/happiness/2023-01-01/happiness"
+    ]
+    # A prefix is still a pattern.
+    assert cmd._modified_steps(includes=["data://garden/happiness/2023-01-01/happi"], files_changed={}) == [
+        "garden/happiness/2023-01-01/happiness",
+        "garden/happiness/2023-01-01/happiness_extended",
     ]
     assert cmd._modified_steps(includes=["viz://chart/happiness"], files_changed={}) == [
         "viz://chart/happiness/latest/happiness"

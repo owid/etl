@@ -353,7 +353,7 @@ def test_metadata_save_leaves_a_dvc_with_unquoted_dates_untouched(tmp_path, monk
 def test_private_snapshot_says_how_to_get_access_or_skip(monkeypatch, tmp_path):
     """A credentials failure on a private snapshot names the bucket and --public-only; a missing
     object is left alone, so it still reads as "not uploaded" rather than "no access"."""
-    from botocore.exceptions import ClientError, NoCredentialsError
+    from botocore.exceptions import ClientError, EndpointConnectionError, NoCredentialsError
     from owid.catalog import s3_utils
 
     from etl.snapshot import PrivateSnapshotAccessError, Snapshot
@@ -382,4 +382,9 @@ def test_private_snapshot_says_how_to_get_access_or_skip(monkeypatch, tmp_path):
     # A genuinely missing object is not an access problem: the original error survives.
     fail_with(client_error("404"))
     with pytest.raises(s3_utils.UploadError):
+        snap._download_dvc_file("abc123")
+
+    # Neither is an unreachable endpoint, even though it is a BotoCoreError like NoCredentialsError.
+    fail_with(EndpointConnectionError(endpoint_url="https://r2.example"))
+    with pytest.raises(EndpointConnectionError):
         snap._download_dvc_file("abc123")

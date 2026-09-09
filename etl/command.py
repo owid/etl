@@ -247,13 +247,6 @@ def main_cli(
     if subset:
         config.SUBSET = subset
 
-    # Write permissions for the steps (see `config.GRAPHER_ENABLED`). Also exported to the environment,
-    # for a step that runs in a subprocess rather than a fork.
-    config.GRAPHER_ENABLED = grapher
-    config.EXPORT_ENABLED = export
-    environ["GRAPHER_ENABLED"] = "1" if grapher else "0"
-    environ["EXPORT_ENABLED"] = "1" if export else "0"
-
     # Restrict to steps modified vs origin/master (and their downstream steps).
     if modified:
         current_branch = _current_branch_name()
@@ -408,8 +401,12 @@ def _modified_steps(
         # (`data://garden/foo/bar`) is matched on its path. Viz and export steps keep their full URI, and so
         # do their includes: `viz://explorer` must not become the bare `explorer`, which would also match
         # data paths such as `explorers/wb/latest/world_bank_pip`.
-        patterns = [re.compile(_strip_data_scheme(p)) for p in includes]
-        changed_paths = [p for p in changed_paths if any(pat.search(p) for pat in patterns)]
+        # And as in `filter_to_subgraph`, an include that names a changed step in full selects that step
+        # only, not `.../foo_extended` as well.
+        changed = set(changed_paths)
+        wanted = [_strip_data_scheme(p) for p in includes]
+        patterns = [re.compile(p) for p in wanted if p not in changed]
+        changed_paths = [p for p in changed_paths if p in wanted or any(pat.search(p) for pat in patterns)]
 
     return changed_paths
 
@@ -453,6 +450,14 @@ def main(
     """
     from etl import config
     from etl.steps import compile_steps
+
+    # Write permissions for the steps (see `config.GRAPHER_ENABLED`). Set here rather than in `main_cli`
+    # so that programmatic callers (`etl browser`, fasttrack) get the same gating as the command line.
+    # Also exported to the environment, for a step that runs in a subprocess rather than a fork.
+    config.GRAPHER_ENABLED = grapher
+    config.EXPORT_ENABLED = export
+    environ["GRAPHER_ENABLED"] = "1" if grapher else "0"
+    environ["EXPORT_ENABLED"] = "1" if export else "0"
 
     if grapher:
         sanity_check_db_settings(grapher_user_id=config.GRAPHER_USER_ID)
