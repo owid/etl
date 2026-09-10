@@ -39,7 +39,6 @@ from apps.wizard.utils.components import (
     grapher_chart,
     st_horizontal,
     st_multiselect_wider,
-    st_page_title,
     tag_in_md,
     url_persist,
 )
@@ -586,10 +585,7 @@ create_tables()
 
 # 1/ PAGE TITLE
 # Show title
-st_page_title(
-    "Anomalist",
-    icon=":material/planner_review:",
-)
+st.title(":material/planner_review: Anomalist")
 
 # 2/ DATASET FORM
 # Ask user to select datasets. By default, we select the new datasets (those that are new in the current PR compared to master).

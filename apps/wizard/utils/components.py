@@ -395,13 +395,6 @@ def st_wizard_page_link(alias: str, border: bool = False, **kwargs) -> None:
         st.warning(f"App must be run via `make wizard` to display link to `{alias}`.")
 
 
-def st_page_title(title: str, icon: str | None = None, **kwargs):
-    """Page title, optionally prefixed with a material icon."""
-    if icon is not None:
-        title = f"{icon} {title}"
-    st.title(title, **kwargs)
-
-
 # ---------------------------------------------------------------------------
 # st_wizard_card — native replacement for the legacy `streamlit_card` component.
 # Renders a clickable card (background image + dark overlay + centered label and

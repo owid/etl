@@ -16,7 +16,7 @@ from apps.chart_animation.cli import (
     get_years_in_chart,
 )
 from apps.wizard.utils import set_states
-from apps.wizard.utils.components import grapher_chart_from_url, st_info, st_page_title, url_persist
+from apps.wizard.utils.components import grapher_chart_from_url, st_info, url_persist
 from etl.config import OWID_ENV
 
 # Initialize log.
@@ -136,10 +136,7 @@ def get_chart_details(slug):
 ########################################################################################################################
 
 # Streamlit app layout.
-st_page_title(
-    "Chart animation",
-    icon=":material/animated_images:",
-)
+st.title(":material/animated_images: Chart animation")
 
 # 1/ INPUT CHART & GET YEARS
 chart_url = url_persist(st.text_input)(

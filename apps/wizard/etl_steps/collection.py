@@ -4,7 +4,7 @@ from rapidfuzz import fuzz
 from apps.wizard import utils
 from apps.wizard.etl_steps.forms import CollectionForm
 from apps.wizard.etl_steps.utils import dag_files, dag_not_add_option
-from apps.wizard.utils.components import preview_file, st_page_title
+from apps.wizard.utils.components import preview_file
 
 st.set_page_config(
     page_title="Wizard: Collection Step",
@@ -120,7 +120,7 @@ def submit_form() -> None:
 
 
 # TITLE
-st_page_title("Collection **:gray[Create step]**", icon=":material/collections:")
+st.title(":material/collections: Collection **:gray[Create step]**")
 
 st.markdown(":small[:orange-badge[:material/warning: This app is in development. Please review the generated files.]]")
 st.markdown("Use this app to create a collection (previously referred as MDIMs).")

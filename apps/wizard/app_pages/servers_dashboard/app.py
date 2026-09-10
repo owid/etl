@@ -16,7 +16,6 @@ from apps.wizard.app_pages.servers_dashboard.utils import (
     start_server,
     stop_server,
 )
-from apps.wizard.utils.components import st_page_title
 
 # Configure page
 st.set_page_config(
@@ -94,7 +93,7 @@ st.session_state.setdefault("servers_metric_swap", None)
 
 
 # Header
-st_page_title("Staging Servers Dashboard", icon=":material/computer:")
+st.title(":material/computer: Staging Servers Dashboard")
 
 # Add refresh button and auto-refresh controls
 with st.container(horizontal=True, vertical_alignment="bottom", horizontal_alignment="distribute"):

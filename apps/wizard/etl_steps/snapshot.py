@@ -11,7 +11,7 @@ from apps.utils.files import generate_step
 from apps.wizard import utils
 from apps.wizard.etl_steps.forms import SnapshotForm
 from apps.wizard.etl_steps.utils import COOKIE_SNAPSHOT, MD_SNAPSHOT, SCHEMA_ORIGIN
-from apps.wizard.utils.components import preview_file, st_page_title, st_wizard_page_link
+from apps.wizard.utils.components import preview_file, st_wizard_page_link
 from etl.docs import examples_to_markdown, faqs_to_markdown, guidelines_to_markdown
 from etl.paths import SNAPSHOTS_DIR
 
@@ -370,7 +370,7 @@ def create_snapshot_command(form: SnapshotForm, manual_import_file: str | None =
 #########################################################
 
 # TITLE
-st_page_title("Snapshot **:gray[Create step]**", icon=":material/photo_camera:")
+st.title(":material/photo_camera: Snapshot **:gray[Create step]**")
 
 # SIDEBAR
 with st.sidebar:
