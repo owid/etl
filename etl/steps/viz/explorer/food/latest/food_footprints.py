@@ -133,7 +133,7 @@ UNIT_NOUN = {
 
 def _dim(view, key):
     """Safe accessor — `view.d.<key>` raises AttributeError on missing keys, which can
-    happen for views emitted by `combine_charts` (e.g. the auto-added `collection__slug`
+    happen for views emitted by `combine_charts` (e.g. the auto-added `chart__slug`
     dim) or for any future grouped view that drops a dimension. Reading from
     `view.dimensions` directly with `.get()` keeps the lambdas robust."""
     return view.dimensions.get(key)

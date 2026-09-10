@@ -69,7 +69,7 @@ SECTORS_REAL = [v for v in SECTOR_SLUG.values() if v != "all_sectors"]
 
 
 def _dim(view, key):
-    """Safe accessor — robust to missing keys (e.g. the auto-added `collection__slug`)."""
+    """Safe accessor — robust to missing keys (e.g. the auto-added `chart__slug`)."""
     return view.dimensions.get(key)
 
 

@@ -19,10 +19,9 @@ from etl.viz.explorer import Explorer
 log = get_logger()
 
 # Dimension added when the combined charts have overlapping views and the caller gave no
-# `chart_dimension_slug` / `chart_dimension_name`. The values are published (they end up in
-# multidim and explorer URLs), so they are kept as they are.
-DEFAULT_SOURCE_DIMENSION_SLUG = "collection__slug"
-DEFAULT_SOURCE_DIMENSION_NAME = "Collection"
+# `chart_dimension_slug` / `chart_dimension_name`. The slug ends up in multidim and explorer URLs.
+DEFAULT_SOURCE_DIMENSION_SLUG = "chart__slug"
+DEFAULT_SOURCE_DIMENSION_NAME = "Chart"
 
 # Define type variables to use in overloads
 T = TypeVar("T", bound=Chart)
@@ -227,7 +226,7 @@ def combine_charts(
         force_chart_dimension:
             If True, adds a dimension to identify the source chart even if there are no duplicate views
         chart_dimension_slug:
-            Slug for the dimension that identifies the source chart. If None, defaults to "collection__slug".
+            Slug for the dimension that identifies the source chart. If None, defaults to "chart__slug".
         chart_dimension_name:
             Name for the dimension that identifies the source chart. If None, defaults to "Chart".
         chart_choices_names:
