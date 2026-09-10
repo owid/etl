@@ -13,7 +13,6 @@ from apps.wizard.utils.components import (
     st_cache_data,
     st_horizontal,
     st_multiselect_wider,
-    st_title_with_expert,
     url_persist,
 )
 from etl import paths
@@ -208,7 +207,7 @@ top_100_charts = sorted(charts, key=lambda x: x.views_365d, reverse=True)[:100] 
 # SIDEBAR / SEARCH
 ########################################################################################################################
 
-st_title_with_expert("Related charts", icon=":material/search:")
+st.title(":material/search: Related charts")
 
 col1, col2 = st.columns(2)
 with col2:

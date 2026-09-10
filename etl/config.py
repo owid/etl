@@ -305,6 +305,8 @@ SENTRY_DSN = env.get("SENTRY_DSN")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
 ANTHROPIC_API_KEY = env.get("ANTHROPIC_API_KEY", None)
+# NOTE: Nothing imports this constant, but the env var is read straight from the environment by
+# pydantic-ai's Google provider (chart-critic defaults to a Gemini model) and by scripts/vocabulary.
 GOOGLE_API_KEY = env.get("GOOGLE_API_KEY", None)
 
 OWIDBOT_ACCESS_TOKEN = env.get("OWIDBOT_ACCESS_TOKEN", None)
@@ -781,12 +783,10 @@ for env_var in env_vars:
 
 # Get Metabase credentials and parameters (for more information, visit the analytics repos).
 METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
-METABASE_API_KEY_ADMIN = os.environ.get("METABASE_API_KEY_ADMIN")
 METABASE_URL = os.environ.get("METABASE_URL")
 # Semantic layer = the `prod_semantic` dataset on the "Data warehouse (BigQuery)" connection (id 3).
 # The old DuckDB semantic-layer connection (id 2) was retired (owid/analytics#735).
 METABASE_SEMANTIC_LAYER_DATABASE_ID = 3
-METABASE_URL_LOCAL = os.environ.get("METABASE_URL", "http://localhost:3000")
 METABASE_URL = os.environ.get("METABASE_URL", "http://metabase.owid.io")
 
 ########################################################################################################################
@@ -804,6 +804,3 @@ NOTION_DATA_PRODUCER_INTERACTIONS_TABLE_URL = os.environ.get("NOTION_DATA_PRODUC
 DATA_PRODUCER_REPORT_FOLDER_ID = os.environ.get("DATA_PRODUCER_REPORT_FOLDER_ID", "")
 DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID = os.environ.get("DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID", "")
 DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get("DATA_PRODUCER_REPORT_STATUS_SHEET_ID", "")
-
-# MCP server
-OWID_MCP_SERVER_URL = env.get("OWID_MCP_SERVER_URL", "https://mcp.owid.io/mcp")

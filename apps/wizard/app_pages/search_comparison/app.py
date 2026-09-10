@@ -9,7 +9,7 @@ import requests
 import streamlit as st
 
 from apps.wizard.app_pages.search_comparison.random_queries import get_benchmark_query, get_random_search_query
-from apps.wizard.utils.components import st_horizontal, st_title_with_expert, url_persist
+from apps.wizard.utils.components import st_horizontal, url_persist
 from etl.config import OWID_ENV  # noqa: F401 -- needed after TODO revert
 from etl.db import read_sql
 from etl.http import session as http_session
@@ -472,7 +472,7 @@ def get_search_type(source: str) -> str:
 
 
 def main():
-    st_title_with_expert("Search Comparison", icon=":material/compare:")
+    st.title(":material/compare: Search Comparison")
 
     st.markdown(
         "Compare different search approaches side-by-side: **Algolia keyword search**, "
