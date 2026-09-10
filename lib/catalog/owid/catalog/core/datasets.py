@@ -21,7 +21,7 @@ import pandas as pd
 import yaml
 from owid.repack import to_safe_types
 
-from owid.catalog.core import tables, utils
+from owid.catalog.core import docs, tables, utils
 from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta, VariableMeta
 from owid.catalog.core.properties import metadata_property
 
@@ -53,6 +53,10 @@ CHANNEL = Literal[
     "explorers",
     "external",
 ]
+
+# Hard limits of the xlsx format.
+EXCEL_MAX_ROWS = 1_048_576
+EXCEL_MAX_SHEET_NAME = 31
 
 # all pandas nullable dtypes
 NULLABLE_DTYPES = [f"{sign}{typ}{size}" for typ in ("Int", "Float") for sign in ("", "U") for size in (8, 16, 32, 64)]
@@ -325,6 +329,66 @@ class Dataset:
 
             with open(table_meta_path, "w") as f:
                 json.dump(table_meta, f, indent=2, default=str)
+
+    def readme(self, url: str | None = None) -> str:
+        """Markdown README for this dataset, rendered from its metadata and that of its tables.
+
+        Sections: title and dataset description, how we process data, one block per indicator
+        (title, description, unit, date range, sources, processing notes), one block per source,
+        license, and how to cite. ``url`` is where the dataset is published, when known.
+        """
+        return docs.render_readme(self, [self[name] for name in docs.ordered_table_names(self)], url=url)
+
+    @property
+    def codebook(self) -> pd.DataFrame:
+        """Codebook of every table in this dataset (see Table.codebook).
+
+        When the dataset has several tables, a leading ``table`` column names the table each row belongs to.
+        """
+        codebooks = []
+        for name in docs.ordered_table_names(self):
+            codebook = self[name].codebook
+            if len(self.table_names) > 1:
+                codebook.insert(0, "table", name)
+            codebooks.append(codebook)
+        return pd.concat(codebooks, ignore_index=True)
+
+    @property
+    def sources(self) -> pd.DataFrame:
+        """One row per unique origin used by any column of any table in this dataset (see Table.sources)."""
+        origins = {}
+        for name in docs.ordered_table_names(self):
+            table = self.read(name, load_data=False)
+            for column in table.all_columns:
+                origins[f"{name}.{column}"] = list(table.get_column_or_index(column).metadata.origins)
+        return docs.sources_frame(origins)
+
+    def to_excel(self, path: str | Path) -> None:
+        """Save the dataset as one Excel workbook.
+
+        Sheets: one per table (named after the table; a single table is named ``data``), then
+        ``indicators`` (the codebook of every table), ``sources`` and ``readme``.
+
+        Raises:
+            ValueError: If a table has more rows than an Excel sheet can hold. The workbook is not
+                written at all rather than truncated.
+        """
+        tables_by_name = {name: self[name] for name in docs.ordered_table_names(self)}
+        too_long = [name for name, table in tables_by_name.items() if len(table) > EXCEL_MAX_ROWS]
+        if too_long:
+            raise ValueError(f"Tables exceed Excel's row limit of {EXCEL_MAX_ROWS:,}: {too_long}")
+
+        readme_lines = pd.DataFrame({"readme": self.readme().splitlines()})
+
+        with pd.ExcelWriter(path) as writer:  # ty: ignore
+            for name, table in tables_by_name.items():
+                sheet_name = "data" if len(tables_by_name) == 1 else name[:EXCEL_MAX_SHEET_NAME]
+                pd.DataFrame(table.reset_index(drop=not table.primary_key)).to_excel(
+                    writer, sheet_name=sheet_name, index=False
+                )
+            self.codebook.to_excel(writer, sheet_name="indicators", index=False)
+            self.sources.to_excel(writer, sheet_name="sources", index=False)
+            readme_lines.to_excel(writer, sheet_name="readme", index=False, header=False)
 
     def update_metadata(
         self,

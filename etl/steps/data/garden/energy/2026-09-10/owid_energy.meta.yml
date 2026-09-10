@@ -1,0 +1,36 @@
+dataset:
+  # Opt in to the public catalog page (rendered from this dataset's metadata) and its JSON-LD side product.
+  jsonld: true
+  title: Energy dataset
+  description: |-
+    Our World in Data's complete energy dataset: one wide table with, for each country and year, total energy supply and the energy mix (by source, in energy units, per capita, as shares and as annual changes), the electricity mix (generation by source, demand, trade, emissions and carbon intensity), and fossil fuel production, trade, reserves and consumption in physical units. Population and GDP are included so that per capita and per GDP indicators can be recomputed.
+
+    It is compiled from the Energy Institute's Statistical Review of World Energy, Ember's electricity data, the U.S. Energy Information Administration and several historical reconstructions, with population from Our World in Data's population dataset and GDP from the Maddison Project Database.
+
+    All energy indicators follow the total energy supply methodology of the Statistical Review, which counts electricity from nuclear and renewable sources by its physical energy content. Earlier releases of this dataset used the substitution method, which scaled that electricity up to the amount of fossil fuel that would have been needed to generate it. The two methods are not comparable: under total energy supply, hydro, wind and solar are roughly 60% lower than in the previous release, nuclear (counted by the heat produced in the reactor) is roughly 20% higher, fossil fuels and biofuels are unchanged, and total energy supply is roughly 5% lower, so the shares of fossil fuels are higher.
+
+    ## Changelog
+
+    - 2026-09-10: New release on the total energy supply methodology, replacing the substitution method used until the 2025 release. Every column is renamed to one grammar, `<source>_<domain>_<measure>` with the unit last (for example `hydro_energy_twh`, `hydro_electricity_share_pct`, `coal_production_twh`); the `column_mapping` table lists the previous name of each column, and the columns that are new or no longer published. New columns: fossil fuel imports, exports, net imports and reserves, production and consumption in physical units (tonnes and cubic meters), reserves-to-production ratios, solar and wind combined, traditional biomass, and shares of total energy supply including traditional biomass. The regional aggregates defined by the U.S. Energy Information Administration and the Shift Dataportal (for example "Africa (EIA)", "OECD (Shift)") and the Energy Institute's residual regions (for example "Other Africa (EI)") are no longer included; the Energy Institute's and Ember's main regions are. The dataset is no longer published as JSON. The previous release stays available, unchanged, at https://owid-public.owid.io/data/energy/owid-energy-data.csv (also .xlsx and .json).
+  update_period_days: 365
+  licenses:
+    - name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+  owners:
+    - Pablo Rosado
+tables:
+  owid_energy:
+    variables:
+      population:
+        title: Population
+        unit: people
+        short_unit: ""
+        description_short: Population of the country or region.
+      gdp:
+        title: GDP
+        unit: international-$ in 2011 prices
+        short_unit: $
+        description_short: Total real gross domestic product, adjusted for inflation and differences in the cost of living between countries.
+  column_mapping:
+    title: Column mapping
+    description: Name of each column of the dataset in the previous release (the owid-energy-data.csv file), to help migrate to the new names.

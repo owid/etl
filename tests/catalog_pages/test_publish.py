@@ -6,8 +6,8 @@ from botocore.client import ClientError
 from owid.catalog import Dataset, DatasetMeta, License, Origin, Table, VariableMeta
 from owid.catalog.api.legacy import LocalCatalog
 
-from etl.catalog_jsonld.artifacts import DATASET_JSONLD_FILENAME, QUALITY_REPORT_FILENAME, SITEMAP_FILENAME
-from etl.catalog_jsonld.publish import build_and_publish_catalog_jsonld, sync_jsonld_artifacts
+from etl.catalog_pages.artifacts import DATASET_JSONLD_FILENAME, QUALITY_REPORT_FILENAME, SITEMAP_FILENAME
+from etl.catalog_pages.publish import build_and_publish_catalog_pages, sync_jsonld_artifacts
 
 
 def _step_uri(catalog_path: str) -> str:
@@ -110,7 +110,7 @@ def test_sync_jsonld_artifacts_skips_delete_for_local_file_not_on_remote(tmp_pat
     assert s3.deleted == []
 
 
-def test_build_and_publish_catalog_jsonld_uses_short_keys_and_deletes_old_dated_paths(
+def test_build_and_publish_catalog_pages_uses_short_keys_and_deletes_old_dated_paths(
     tmp_path: Path, monkeypatch
 ) -> None:
     data_dir = tmp_path / "data"
@@ -123,10 +123,10 @@ def test_build_and_publish_catalog_jsonld_uses_short_keys_and_deletes_old_dated_
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
 
-    monkeypatch.setattr("etl.catalog_jsonld.publish.connect_r2", lambda: object())
-    monkeypatch.setattr("etl.catalog_jsonld.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
+    monkeypatch.setattr("etl.catalog_pages.publish.connect_r2", lambda: object())
+    monkeypatch.setattr("etl.catalog_pages.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
 
-    build_and_publish_catalog_jsonld(
+    build_and_publish_catalog_pages(
         bucket="test-bucket", catalog_dir=data_dir, channel="garden", active_steps={_step_uri(co2_path)}
     )
 
@@ -139,7 +139,7 @@ def test_build_and_publish_catalog_jsonld_uses_short_keys_and_deletes_old_dated_
     assert f"{co2_path}/{DATASET_JSONLD_FILENAME}" in captured["delete_keys"]
 
 
-def test_build_and_publish_catalog_jsonld_deletes_short_key_for_skipped_dataset(tmp_path: Path, monkeypatch) -> None:
+def test_build_and_publish_catalog_pages_deletes_short_key_for_skipped_dataset(tmp_path: Path, monkeypatch) -> None:
     """A dataset that fails the quality gate (e.g. becomes non-redistributable) must have its
     live short-key JSON-LD scheduled for deletion — a prior publish may have emitted it, and
     an ineligible dataset must stop being served."""
@@ -153,10 +153,10 @@ def test_build_and_publish_catalog_jsonld_deletes_short_key_for_skipped_dataset(
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
 
-    monkeypatch.setattr("etl.catalog_jsonld.publish.connect_r2", lambda: object())
-    monkeypatch.setattr("etl.catalog_jsonld.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
+    monkeypatch.setattr("etl.catalog_pages.publish.connect_r2", lambda: object())
+    monkeypatch.setattr("etl.catalog_pages.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
 
-    build_and_publish_catalog_jsonld(
+    build_and_publish_catalog_pages(
         bucket="test-bucket", catalog_dir=data_dir, channel="garden", active_steps={_step_uri(restricted_path)}
     )
 
@@ -165,7 +165,7 @@ def test_build_and_publish_catalog_jsonld_deletes_short_key_for_skipped_dataset(
     assert f"{restricted_path}/{DATASET_JSONLD_FILENAME}" in captured["delete_keys"]
 
 
-def test_build_and_publish_catalog_jsonld_deletes_both_locations_for_archived_dataset(
+def test_build_and_publish_catalog_pages_deletes_both_locations_for_archived_dataset(
     tmp_path: Path, monkeypatch
 ) -> None:
     """A dataset removed from the DAG with no active replacement at all must have both its old
@@ -181,19 +181,17 @@ def test_build_and_publish_catalog_jsonld_deletes_both_locations_for_archived_da
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
 
-    monkeypatch.setattr("etl.catalog_jsonld.publish.connect_r2", lambda: object())
-    monkeypatch.setattr("etl.catalog_jsonld.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
+    monkeypatch.setattr("etl.catalog_pages.publish.connect_r2", lambda: object())
+    monkeypatch.setattr("etl.catalog_pages.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
 
-    build_and_publish_catalog_jsonld(bucket="test-bucket", catalog_dir=data_dir, channel="garden", active_steps=set())
+    build_and_publish_catalog_pages(bucket="test-bucket", catalog_dir=data_dir, channel="garden", active_steps=set())
 
     assert f"emissions/owid_co2/{DATASET_JSONLD_FILENAME}" not in captured["keys"]
     assert f"emissions/owid_co2/{DATASET_JSONLD_FILENAME}" in captured["delete_keys"]
     assert f"{archived_path}/{DATASET_JSONLD_FILENAME}" in captured["delete_keys"]
 
 
-def test_build_and_publish_catalog_jsonld_deletes_dated_path_for_superseded_version(
-    tmp_path: Path, monkeypatch
-) -> None:
+def test_build_and_publish_catalog_pages_deletes_dated_path_for_superseded_version(tmp_path: Path, monkeypatch) -> None:
     """A dataset version superseded by an active replacement under the same short key (e.g. a
     stale ".../latest/..." build left behind after re-versioning to a dated one) must have its
     own old dated-path JSON-LD scheduled for deletion — but not the short key, which the
@@ -209,10 +207,10 @@ def test_build_and_publish_catalog_jsonld_deletes_dated_path_for_superseded_vers
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
 
-    monkeypatch.setattr("etl.catalog_jsonld.publish.connect_r2", lambda: object())
-    monkeypatch.setattr("etl.catalog_jsonld.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
+    monkeypatch.setattr("etl.catalog_pages.publish.connect_r2", lambda: object())
+    monkeypatch.setattr("etl.catalog_pages.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
 
-    build_and_publish_catalog_jsonld(
+    build_and_publish_catalog_pages(
         bucket="test-bucket", catalog_dir=data_dir, channel="garden", active_steps={_step_uri(current_path)}
     )
 
