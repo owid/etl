@@ -10,12 +10,12 @@ meta:
 
       The database groups indicators along three dimensions: housing market, housing conditions and affordability, and public policies towards affordable housing. Each indicator presents data, relevant definitions and methodology, and key results. Indicators also discuss comparability, data issues, and, where relevant, include the raw data or descriptive information across countries.
     date_published: "2024-04-30"
-    title_snapshot: "OECD Affordable Housing Database (AHD) - Housing conditions: People experiencing homelessness"
+    title_snapshot: "OECD Affordable Housing Database (AHD) – Housing conditions: People experiencing homelessness"
 
     # Citation
     producer: OECD
     citation_full: |-
-      OECD (2024). Affordable Housing Database (AHD) - Housing conditions: People experiencing homelessness, https://www.oecd.org/housing/data/affordable-housing-database/
+      OECD (2024). Affordable Housing Database (AHD) – Housing conditions: People experiencing homelessness, https://www.oecd.org/housing/data/affordable-housing-database/
 
     # Files
     url_main: https://www.oecd.org/housing/data/affordable-housing-database/

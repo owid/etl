@@ -946,7 +946,7 @@
                           "Should only be used if the indicator's title is ambiguous (e.g. if there are multiple indicators with the same title)."
                         ],
                         [
-                          "Should not reference the data provider. For that, instead, use `attribution_short`."
+                          "Should not reference the data producer. For that, instead, use `attribution_short`."
                         ]
                       ],
                       "examples": [
@@ -980,6 +980,9 @@
                           "Must join multiple attributions by a `;`."
                         ],
                         [
+                          "Must separate a producer from a data product with a spaced en dash (–), not a hyphen."
+                        ],
+                        [
                           "Must not end in a period (and must **not** end in `;`)."
                         ],
                         [
@@ -991,7 +994,7 @@
                       ],
                       "requirement_level": "optional",
                       "examples": [
-                        "Energy Institute - Statistical Review of World Energy (2023); Ember (2022)"
+                        "Energy Institute – Statistical Review of World Energy (2023); Ember (2022)"
                       ],
                       "examples_bad": [
                         [

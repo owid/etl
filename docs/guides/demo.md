@@ -401,7 +401,7 @@ The ETL pipeline[^1] processes data from multiple international organizations[^2
 [^1]: ETL stands for Extract, Transform, Load - the three core stages of data processing.
 
 [^2]:
-    Major data providers include:
+    Major data producers include:
 
     - World Health Organization (WHO)
     - World Bank

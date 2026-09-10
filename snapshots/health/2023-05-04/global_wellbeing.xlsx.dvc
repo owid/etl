@@ -18,7 +18,7 @@ meta:
       - Educational level, employment status and per capita income quintiles
       - Country income level (World Bank)
       - Urban/Rural location
-    citation_full: 'Gallup (2020). Gallup World Poll - Global Wellbeing Initiative dataset.'
+    citation_full: 'Gallup (2020). Gallup World Poll – Global Wellbeing Initiative dataset.'
     attribution_short: GWI
     url_main: https://www.gallup.com/analytics/468179/global-wellbeing-initiative-dataset.aspx
     date_accessed: '2023-05-04'

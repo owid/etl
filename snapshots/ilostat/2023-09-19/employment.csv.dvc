@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Education and Mismatch Indicators (EMI) - Employment
+    title: Education and Mismatch Indicators (EMI) – Employment
     description: |-
       With the aim of promoting international comparability, statistics presented on ILOSTAT are based on standard international definitions wherever feasible and may differ from official national figures. This series is based on the 13th ICLS definitions. For time series comparability, it includes countries that have implemented the 19th ICLS standards, for which data are also available in the Work Statistics -- 19th ICLS (WORK) database. The employment-to-population ratio is the number of persons who are employed as a percent of the total of working-age population. Data disaggregated by level of education are provided on the highest level of education completed, classified according to the International Standard Classification of Education (ISCED). Data may have been regrouped from national classifications, which may not be strictly compatible with ISCED. For more information, refer to the Education and Mismatch Indicators (EMI) database description.
 
@@ -11,7 +11,7 @@ meta:
     date_published: 2023-09-09
     # Citation
     producer: International Labour Organization
-    citation_full: Education and Mismatch Indicators (EMI) - Employment. International
+    citation_full: Education and Mismatch Indicators (EMI) – Employment. International
       Labour Organization. ILO modelled estimates database, ILOSTAT. https://ilostat.ilo.org/data/.
     attribution_short: ILOSTAT
 

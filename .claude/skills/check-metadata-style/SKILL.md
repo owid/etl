@@ -104,11 +104,18 @@ for table_name in ds.table_names:
         if pres is not None:
             put('presentation.title_public', getattr(pres, 'title_public', None))
             put('presentation.title_variant', getattr(pres, 'title_variant', None))
+            put('presentation.attribution', getattr(pres, 'attribution', None))
             put('presentation.attribution_short', getattr(pres, 'attribution_short', None))
             gc = getattr(pres, 'grapher_config', None) or {}
             put('presentation.grapher_config.title', gc.get('title'))
             put('presentation.grapher_config.subtitle', gc.get('subtitle'))
             put('presentation.grapher_config.note', gc.get('note'))
+
+        # The chart footer resolves presentation.attribution > origin.attribution >
+        # origin.producer (year), so the visible credit usually comes from the origin.
+        for i, o in enumerate(getattr(m, 'origins', None) or []):
+            put(f'origins[{i}].attribution', getattr(o, 'attribution', None))
+            put(f'origins[{i}].producer', getattr(o, 'producer', None))
 
         if entry['fields']:
             rows.append(entry)
@@ -127,6 +134,9 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 | `display.name` | Series label in chart legends |
 | `presentation.title_public` | Public-facing chart title |
 | `presentation.title_variant` | Disambiguator ("Historical", "WHO estimate", …) |
+| `presentation.attribution` | Full source credit under the chart (`producer – data product (year)`) |
+| `origins[i].attribution` | Where that credit usually comes from — the footer falls back to it when `presentation.attribution` is unset |
+| `origins[i].producer` | The last fallback: with no attribution set, the footer renders `producer (year)` |
 | `presentation.attribution_short` | Short source credit under the chart |
 | `presentation.grapher_config.title` | Overrides chart title when set |
 | `presentation.grapher_config.subtitle` | Chart subtitle |
@@ -135,6 +145,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 **Fields deliberately skipped:**
 
 - `description_from_producer` — verbatim text from the source, not OWID copy.
+- `citation_full` — follows the producer's requested citation, so its wording and capitalization are theirs, not ours to restyle. (Dash typography is the one exception: a spaced hyphen separating producer from data product is an en dash everywhere, per the style guide.)
 - `unit`, `short_unit`, `processing_level`, internal names — not user-facing prose.
 - `description_long`, `description_processing` — technical, de-prioritized (re-enable later if needed).
 
@@ -142,12 +153,14 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 
 If `DATA_DIR / step_path` does not exist, parse the `.meta.yml` directly with `etl.files.ruamel_load` and pull the same field names from the `tables → <name> → variables → <var>` tree.
 
+Origin fields (`origins[i].attribution`, `origins[i].producer`) live in the snapshot `.dvc`, not the `.meta.yml`, so this fallback does not cover them — say so in the report.
+
 **Parse the garden `.meta.yml`, not just the grapher one.** Most datasets author their user-facing text in garden and have a thin or absent grapher `.meta.yml`, so reading only the grapher layer here finds nothing and reports a clean bill of health on unaudited text. Read both (`etl/steps/data/garden/<ns>/<version>/<dataset>.meta.yml` and the grapher one if it exists) and note that grapher values override garden ones on the same field.
 
 Warn the user that Jinja templates (`<<var>>`, `{definitions.xxx}`, `<%- ... -%>`) and garden→grapher inheritance are **not** resolved in this fallback path, so template-generated violations will be missed. Suggest building the step first:
 
 ```bash
-.venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher --private
+.venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher
 ```
 
 Drop `--only` here on purpose: when the catalog is missing, upstream meadow/garden outputs are usually missing too, and `--only` would skip them and fail on missing inputs.
@@ -169,6 +182,8 @@ Report format, one block per violation:
 
 Group the blocks by variable for readability. End with a summary count.
 
+**Exception:** when the producer explicitly asked for a specific short citation, `schemas/definitions.json` says to follow it. Report a matching `origins[i].attribution` as producer-prescribed rather than as a violation, and don't offer a fix.
+
 If no violations are found, say so and list the fields that were inspected — the user should know what was checked, not just that nothing came up.
 
 ### 5. Offer to fix
@@ -189,6 +204,8 @@ with open(meta_yml_path, 'w') as f:
     f.write(ruamel_dump(data))
 ```
 
+Origin fields are set in the snapshot `.dvc` (`meta.origin.*`) — or, occasionally, by the step's own code after it loads the snapshot. Check which before editing, and edit that one. Producer-prescribed attributions stay out of **Fix all**.
+
 If a violation only shows up in the rendered output because of a Jinja definition (e.g. the issue is inside `{definitions.foo}`), flag it for manual fix — don't auto-rewrite the definition without asking.
 
 ### 6. Verify
@@ -197,7 +214,7 @@ After fixes:
 
 1. Rebuild the step if metadata text was changed in a way that affects rendering:
    ```bash
-   .venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher --private --force --only
+   .venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher --force --only
    ```
 2. Re-run steps 3–4 of this skill on the same step. Expect zero violations.
 3. Run `make check` to confirm no lint/format regressions from the YAML edits.

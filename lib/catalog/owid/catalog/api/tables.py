@@ -297,7 +297,7 @@ class TableResult(BaseModel):
         table: Table name.
         path: Full path to the table.
         channel: Data channel (garden, meadow, etc.).
-        namespace: Data provider namespace.
+        namespace: Data producer namespace.
         version: Version string.
         dataset: Dataset name.
         dimensions: List of dimension columns.

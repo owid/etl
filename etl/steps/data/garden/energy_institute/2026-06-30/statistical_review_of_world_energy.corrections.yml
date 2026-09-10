@@ -1,5 +1,5 @@
 # Known errors in the Energy Institute's Statistical Review of World Energy that we patch locally
-# until the provider fixes them. One entry per error. See etl/data_corrections.py for the format.
+# until the producer fixes them. One entry per error. See etl/data_corrections.py for the format.
 
 - indicator: total_energy_supply_ej
   entity: Croatia
@@ -12,7 +12,7 @@
     present-day value, and before Croatia existed as an independent country). Every other year before
     1990 is zero. This is a spurious value in the 2026 consolidated dataset, present in both the narrow
     CSV and the "Total Energy Supply (TES) -EJ" sheet of the workbook.
-  provider: Energy Institute
+  producer: Energy Institute
   status: open
 
 - indicator: total_energy_supply_ej
@@ -32,5 +32,5 @@
     from 1965 to 1989. Leaving it empty instead would silently understate the 1975 aggregates for
     Europe, the European Union, high-income countries and the World, since those are built from the
     country values.
-  provider: Energy Institute
+  producer: Energy Institute
   status: open

@@ -2,7 +2,7 @@ meta:
   origin:
     producer: Eurostat
     title: Harmonised European time use surveys
-    title_snapshot: Harmonised European time use surveys - Time spent, participation time, and participation rates
+    title_snapshot: Harmonised European time use surveys – Time spent, participation time, and participation rates
     description_snapshot: |-
       This Eurostat data set measures the time spent, participation time, and participation rate in 55 activities.
 

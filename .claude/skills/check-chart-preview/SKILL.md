@@ -97,8 +97,8 @@ If the chart hasn't been pushed yet:
 
 ```bash
 # For graph step charts
-.venv/bin/etlr graph://<namespace>/<version>/<slug> --graph --graph-push --private
+.venv/bin/etlr graph://<namespace>/<version>/<slug> --graph --graph-push
 
 # For viz chart steps (charts and MDIMs)
-.venv/bin/etlr viz://chart/<namespace>/<version>/<shortName> --grapher --private
+.venv/bin/etlr viz://chart/<namespace>/<version>/<shortName> --grapher
 ```

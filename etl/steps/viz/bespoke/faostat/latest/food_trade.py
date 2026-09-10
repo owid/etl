@@ -28,7 +28,7 @@ from owid.catalog import s3_utils
 from structlog import get_logger
 from tqdm.auto import tqdm
 
-from etl.config import DRY_RUN
+from etl import config
 from etl.helpers import PathFinder
 from etl.paths import VIZ_DIR
 
@@ -84,7 +84,7 @@ def _build_products_by_entity(df: pd.DataFrame, entity_to_id: dict, product_to_i
 
 
 def _save_and_upload(data: dict, filename: str) -> None:
-    """Write JSON locally and upload to S3 (skipping the upload under DRY_RUN)."""
+    """Write JSON locally and upload to S3 (skipping the upload without --grapher)."""
     export_dir = VIZ_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
     export_dir.mkdir(parents=True, exist_ok=True)
     local_file = export_dir / filename
@@ -93,8 +93,8 @@ def _save_and_upload(data: dict, filename: str) -> None:
     with open(local_file, "w") as f:
         json.dump(data, f, separators=(",", ":"))
 
-    if DRY_RUN:
-        tqdm.write(f"[DRY RUN] Would upload {local_file} -> {s3_path}")
+    if not config.GRAPHER_ENABLED:
+        tqdm.write(f"[not uploaded, no --grapher] {local_file} -> {s3_path}")
     else:
         s3_utils.upload(s3_path, local_file, public=True, downloadable=True)
 

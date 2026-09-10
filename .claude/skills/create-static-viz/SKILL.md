@@ -296,11 +296,11 @@ Everything about authoring the step: the Figma handoff contract the emitted file
 ## Step 5 — Render, verify, and look at it
 
 ```bash
-.venv/bin/etlr viz://static/<ns>/<version>/<short_name> --private --grapher
+.venv/bin/etlr viz://static/<ns>/<version>/<short_name>
 ```
 
-`--grapher` is the flag for every `viz://` step. A static step only writes the PNG and SVG next to
-the recipe, but without the flag it is skipped, and `etlr` says so.
+A static step only writes the PNG and SVG next to the recipe, so named by its URI it runs fully
+without `--grapher` (a pattern such as `etlr population` would select it only with the flag).
 
 **From a fresh worktree, give it its own `.venv` before rendering.** A worktree starts without one,
 and borrowing the main checkout's is a trap: `etl` is installed there editable via a `.pth` holding
@@ -311,7 +311,7 @@ reports `Finished`, your worktree's files never change, and that reads exactly l
 ```bash
 make .venv                             # uv sync --all-extras --group dev; the pre-commit hook also does this
 ln -s /path/to/main/checkout/data data # gitignored; the built deps only exist in the main checkout
-.venv/bin/etlr viz://static/... --private --grapher
+.venv/bin/etlr viz://static/...
 ```
 
 Confirm before trusting a render: `.venv/bin/python -c "from etl import paths; print(paths.BASE_DIR)"`

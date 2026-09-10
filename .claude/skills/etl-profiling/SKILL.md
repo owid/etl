@@ -164,7 +164,7 @@ def run():
     # ... rest of processing
 ```
 
-Usage: `SUBSET='France,Germany' .venv/bin/etlr namespace/version/dataset --private`
+Usage: `SUBSET='France,Germany' .venv/bin/etlr namespace/version/dataset`
 
 ### 6. Expensive `create_dataset` or `ds.add`
 

@@ -11,7 +11,7 @@ meta:
     # Citation
     producer: Eurostat
     citation_full: |-
-      Eurostat - Harmonised index of consumer prices (HICP, 2025).
+      Eurostat – Harmonised index of consumer prices (HICP, 2025).
 
     # Files
     url_main: https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_midx__custom_13200491/default/table?lang=en

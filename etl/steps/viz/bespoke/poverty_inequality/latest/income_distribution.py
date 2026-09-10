@@ -7,7 +7,7 @@ This step uses the thousand_bins_distribution dataset dependency as its basis.
 Output:
 * https://owid-public.owid.io/data/poverty-inequality/income-distribution.<year>.json
 
-Run with DRY_RUN=1 to skip S3 upload and only write the local export file.
+Run without --grapher to skip the S3 upload and only write the local export file.
 """
 
 import json
@@ -17,7 +17,7 @@ import pandas as pd
 from owid.catalog import Table, s3_utils
 from tqdm.auto import tqdm
 
-from etl.config import DRY_RUN
+from etl import config
 from etl.data_helpers.misc import round_to_sig_figs
 from etl.helpers import PathFinder
 from etl.paths import VIZ_DIR
@@ -102,8 +102,8 @@ def save_and_upload_json(data: dict, filename: str, s3_data_dir: Path) -> None:
         json.dump(data, f, separators=(",", ":"))
 
     # Upload to S3.
-    if DRY_RUN:
-        paths.log.info(f"[DRY RUN] Would upload {local_file} to s3://{S3_BUCKET_NAME}/{s3_path}")
+    if not config.GRAPHER_ENABLED:
+        paths.log.info(f"[not uploaded, no --grapher] {local_file} -> s3://{S3_BUCKET_NAME}/{s3_path}")
     else:
         s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_path)}", local_file, public=True, downloadable=True)
 

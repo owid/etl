@@ -38,7 +38,7 @@ A data manager must implement all these steps to make something chartable on the
 
 ## Snapshot
 
-The initial step consists in **transferring an external file from an upstream provider into our platform**. This ensures, that the source data is always accessible. This is because the upstream provider might remove the file at any time, or change it.
+The initial step consists in **transferring an external file from an upstream producer into our platform**. This ensures, that the source data is always accessible. This is because the upstream producer might remove the file at any time, or change it.
 
 !!! info "Snapshot steps are executed with command [`etls`](../../guides/etl-cli/#etl-snapshot){data-preview}"
 
@@ -70,7 +70,7 @@ Note that we need a DVC file per upstream data file; hence, in some instances, i
 
 ### Snapshot metadata
 
-A Snapshot is a picture of a data product (e.g. a data CSV file) provided by an upstream data provider at a particular point in time. It is the entrypoint to ETL and where we define metadata attributes of that picture. This is fundamental to ensure that the data is properly documented and that the metadata is propagated to the rest of the system.
+A Snapshot is a picture of a data product (e.g. a data CSV file) provided by an upstream data producer at a particular point in time. It is the entrypoint to ETL and where we define metadata attributes of that picture. This is fundamental to ensure that the data is properly documented and that the metadata is propagated to the rest of the system.
 
 The metadata in Snapshot consists mainly of one object: `meta.origin`.
 
@@ -245,10 +245,12 @@ Sometimes we want to perform an action instead of creating a dataset. For instan
 
 A step's type says what it produces. Viz steps produce visualizations, and their channel says which kind:
 
-- **Charts and multi-dimensional indicators** (`viz://chart/`): Create the configuration of a chart or an MDIM and upsert it to the grapher DB. Run with `--grapher`.
-- **Explorers** (`viz://explorer/`): Create a data explorer and upsert it to the grapher DB. Run with `--grapher`.
-- **Static images** (`viz://static/`): Render a PNG/SVG with matplotlib next to the recipe. Run with `--grapher`, like every other viz step.
-- **Bespoke visualizations** (`viz://bespoke/`): Produce the data feed of a bespoke interactive visualization (currently uploaded to R2). Run with `--grapher`, like every other viz step.
+- **Charts and multi-dimensional indicators** (`viz://chart/`): Create the configuration of a chart or an MDIM and upsert it to the grapher DB.
+- **Explorers** (`viz://explorer/`): Create a data explorer and upsert it to the grapher DB.
+- **Static images** (`viz://static/`): Render a PNG/SVG with matplotlib next to the recipe.
+- **Bespoke visualizations** (`viz://bespoke/`): Produce the data feed of a bespoke interactive visualization (currently uploaded to R2).
+
+Viz steps publish with `--grapher`. Named by their URI they also run without it, in which case they only build locally (the chart config, the data feed) and skip the DB upsert or upload; a pattern such as `energy` selects them only with the flag.
 
 Export steps ship files to an external destination, e.g. **Export to GitHub** (`export://github/`) commits a dataset to a GitHub repository, and `export://s3/` uploads files to R2. Run with `--export`.
 

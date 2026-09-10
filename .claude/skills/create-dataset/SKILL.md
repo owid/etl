@@ -133,7 +133,7 @@ Scaffold the three steps with `/create-etl-steps` (DAG file = the topic that bes
 ### Step 6 — Run the chain and harmonize countries
 
 ```bash
-.venv/bin/etlr <namespace>/<version>/<short_name> --private
+.venv/bin/etlr <namespace>/<version>/<short_name>
 ```
 
 Fix whatever breaks (trace upstream, never mask). The most common task is **country harmonization**: the garden run logs unmatched country names that need mapping into `<short_name>.countries.json`.
@@ -147,7 +147,7 @@ from owid.catalog import Dataset
 import pandas as pd
 
 # Needs the regions dataset built locally:
-#   .venv/bin/etlr data://garden/regions/2023-01-01/regions --private
+#   .venv/bin/etlr data://garden/regions/2023-01-01/regions
 tb_regions = Dataset(str(sorted(Path("data/garden/regions").glob("*/regions"))[-1]))["regions"]
 canonical = set(tb_regions["name"].dropna().astype(str))
 alias_map = {}
@@ -170,7 +170,7 @@ After the garden step builds, also run the **garden-output entity check** from `
 Then build and upload the grapher step to staging — target the `grapher/...` path (no `--only`, so the `grapher://` MySQL upsert step actually runs):
 
 ```bash
-STAGING=<branch> .venv/bin/etlr grapher/<namespace>/<version>/<short_name> --grapher --private
+STAGING=<branch> .venv/bin/etlr grapher/<namespace>/<version>/<short_name> --grapher
 ```
 
 Confirm the upsert actually succeeded before moving on: it should print the dataset's admin URL / id (`…/admin/datasets/<id>`). **Capture that `<id>`** — you'll hand it to the user in Step 7. If the upsert errored or printed no dataset, fix it now rather than handing over a link that won't resolve.
