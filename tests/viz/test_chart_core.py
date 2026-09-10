@@ -17,7 +17,7 @@ from etl.viz.chart.core.combine import (
 from etl.viz.chart.core.utils import create_chart_from_config
 
 
-def _make_explorer_sub(
+def _make_sub_explorer(
     view_type: str,
     catalog_path: str,
     *,
@@ -161,13 +161,13 @@ def test_combine_charts_preserves_yaml_views():
     # Sub-charts both use by_stage=combined; the YAML view uses by_stage=stages so
     # it occupies a unique dimensional slot (this mirrors the actual food-footprints case
     # where the lifecycle-stage view is the only one with by_stage=stages).
-    sub_a = _make_explorer_sub(
+    sub_a = _make_sub_explorer(
         "commodity",
         "poore_2018",
         extra_dimensions=[CHECKBOX_DIM],
         extra_view_dimensions={"by_stage": "combined"},
     )
-    sub_b = _make_explorer_sub(
+    sub_b = _make_sub_explorer(
         "specific",
         "clark_2022",
         extra_dimensions=[CHECKBOX_DIM],
@@ -220,13 +220,13 @@ def test_combine_charts_allows_identical_checkbox_dim():
     choice slugs, same ``choice_slug_true``), the combine should succeed — the merge is
     structurally equivalent to a 2-choice radio.
     """
-    sub_a = _make_explorer_sub(
+    sub_a = _make_sub_explorer(
         "commodity",
         "poore_2018",
         extra_dimensions=[CHECKBOX_DIM],
         extra_view_dimensions={"by_stage": "combined"},
     )
-    sub_b = _make_explorer_sub(
+    sub_b = _make_sub_explorer(
         "specific",
         "clark_2022",
         extra_dimensions=[CHECKBOX_DIM],
@@ -273,7 +273,7 @@ def test_combine_charts_rejects_differing_checkbox_dim():
     combine logic can't safely merge them (the checkbox would silently turn into a 3+-choice
     widget). It should raise a ``NotImplementedError`` with a message pointing at the
     actual problem."""
-    sub_a = _make_explorer_sub(
+    sub_a = _make_sub_explorer(
         "commodity",
         "poore_2018",
         extra_dimensions=[CHECKBOX_DIM],
@@ -292,7 +292,7 @@ def test_combine_charts_rejects_differing_checkbox_dim():
         ],
         "presentation": {"type": "checkbox", "choice_slug_true": "stages"},
     }
-    sub_b = _make_explorer_sub(
+    sub_b = _make_sub_explorer(
         "specific",
         "clark_2022",
         extra_dimensions=[different_checkbox],
@@ -339,8 +339,8 @@ def test_update_choice_slugs_in_views_handles_nan_entries_from_unstack():
     nan = float("nan")
 
     # Two sub-charts, each with one view referencing its own view_type slug.
-    sub_a = _make_explorer_sub("a", "src_a")
-    sub_b = _make_explorer_sub("b", "src_b")
+    sub_a = _make_sub_explorer("a", "src_a")
+    sub_b = _make_sub_explorer("b", "src_b")
     charts_by_id = {"0": sub_a, "1": sub_b}
 
     # Shape produced by ``.unstack("chart_id").to_dict()`` when sub_a had a
