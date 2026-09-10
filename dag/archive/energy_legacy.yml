@@ -1,0 +1,16 @@
+steps:
+  # archived; last active in 99afa7cdd37b on 2026-09-10
+  data://garden/energy_data/2026-04-24/owid_energy:
+    - data://garden/demography/2024-07-15/population
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/energy/2026-05-05/primary_energy_consumption
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/energy/2025-06-27/energy_mix
+    - data://garden/energy/2025-06-27/fossil_fuel_production
+    - data://garden/energy/2026-04-24/electricity_mix
+  # archived; last active in 99afa7cdd37b on 2026-09-10
+  export://github/energy_data/latest/owid_energy:
+    - data://garden/energy_data/2026-04-24/owid_energy
+  # archived; last active in 99afa7cdd37b on 2026-09-10
+  export://s3/energy_data/latest/owid_energy:
+    - data://garden/energy_data/2026-04-24/owid_energy
