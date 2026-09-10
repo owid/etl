@@ -263,7 +263,7 @@ Both kinds of steps should be used after the data has been processed and is read
 
 MDIMs (`viz://chart/`) and explorers (`viz://explorer/`) are Grapher charts expanded with additional functionalities to facilitate exploration, such as dynamic entity filters or customizable menus. They are usually powered by indicators from OWID's Grapher database.
 
-In ETL, we define these by grouping indicators together into "collections". These collections are then upserted to the database to power explorers and multidims (collection of charts). Having multidim and explorer steps allows us to properly track dependencies and ensure that the data is up-to-date.
+In ETL, both are defined as a `Chart` config: the dimensions a reader can select, and the views (indicator selections) each combination points to. The step upserts that config to the database. Having chart and explorer steps in the DAG lets us track their dependencies and keep them up to date.
 
 These steps must depend only on `data://grapher` steps, since they require indicators to be in the Database. This is because explorers and multidims on the site access indicators in the database.
 

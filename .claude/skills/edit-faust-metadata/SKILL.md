@@ -55,7 +55,7 @@ Accepted references:
 | Live chart URL | `https://ourworldindata.org/grapher/life-expectancy?country=FRA` | chart (slug) |
 | Staging chart URL | `http://staging-site-my-branch/grapher/life-expectancy` | chart (slug) |
 | Admin chart edit URL | `https://admin.owid.io/admin/charts/104/edit` | chart (id) |
-| Admin collection/MDim preview URL | `.../admin/grapher/wb%2Flatest%2Fincomes_pip%23incomes_pip?indicator=mean` | mdim / mdim-view |
+| Admin chart/MDim preview URL | `.../admin/grapher/wb%2Flatest%2Fincomes_pip%23incomes_pip?indicator=mean` | mdim / mdim-view |
 | Bare slug | `life-expectancy` | chart or mdim |
 | Chart id | `104` | chart |
 | Indicator catalogPath | `grapher/wb/2026-03-24/world_bank_pip/incomes#mean__...` | indicator |
@@ -102,7 +102,7 @@ Three routes:
 2. Not overridden → inherited from the view's primary y indicator → **route (a)** (the grapher upsert refreshes the view; nothing extra needed on the MDim), or scope down to a new view-level override (**route b**) if the blast radius shows the indicator is shared.
 3. Never write `multi_dim_x_chart_configs` or PUT MDim configs directly — they're rebuilt from the step files on every export.
 
-**Target = MDim (whole collection):** top-level `title`, `default_selection`, `common_view_config`, config-level `definitions` → **route (b)**.
+**Target = MDim (whole chart):** top-level `title`, `default_selection`, `common_view_config`, config-level `definitions` → **route (b)**.
 
 **Target = indicator:** → **route (a)**; blast radius on its variable ids.
 
@@ -159,7 +159,7 @@ It sweeps: **charts** (with `--field`, charts shielded by their own patch overri
 
 - the **indicators** carrying the edit, with how many charts each feeds, so a lopsided distribution is visible;
 - **charts** as links, each annotated with the indicator it comes through, published state included;
-- **MDim views** as links — the reader URL with the view's dimension query string, plus the admin collection preview;
+- **MDim views** as links — the reader URL with the view's dimension query string, plus the admin chart preview;
 - **explorers** as links, with the number of affected views in each;
 - **narrative charts** as admin links, marking the ones shielded by their own override;
 - **article references**, which change what readers see even though the embeds keep working.
@@ -237,7 +237,7 @@ Scoping rules specific to this skill:
 
 - **Chart text without a browser**: `curl -s http://staging-site-<branch>/grapher/<slug>.svg | grep -o '<new text fragment>'` — the server-side render carries title/subtitle/note.
 - **Indicator fields**: `https://api-staging.owid.io/staging-site-<branch>/v1/indicators/<id>.metadata.json` (path prefix is the full container name, not the bare branch — a wrong prefix silently serves another environment).
-- **MDim views**: the resolver's per-view collection-preview URL (`/admin/grapher/<urlquoted catalogPath>?dim=choice...`).
+- **MDim views**: the resolver's per-view chart-preview URL (`/admin/grapher/<urlquoted catalogPath>?dim=choice...`).
 - **Visual QA**: hand off to the `check-chart-preview` skill for a screenshot.
 - **Big text changes**: re-run the report scripts in indicator-list mode and diff against the previous output (see dump mode below).
 - **Jinja-templated definitions**: after editing shared `definitions`, rebuild garden AND grapher before reading anything — the report scripts and ad-hoc reads use the grapher channel, and a stale channel shows pre-edit metadata. Spot-check several rendered variants; dimension comparisons are type-sensitive (`decile == 5` vs `decile == "5"` — copy the comparison form from a working definition in the same file).
@@ -334,9 +334,9 @@ Total views: **N**   (for MDims)
 
 1. **Grapher-channel metadata loading**: `Dataset(data/grapher/<ns>/<ver>/<ds>).read(<table>, safe_types=False)[<col>].metadata`.
 
-1a. **`description_key` arrives as a markdown STRING, not a list**: the grapher channel serializes it via `owid.catalog.core.meta.description_key_to_string` — multiple bullets become one string joined as `"- b1\n- b2\n…"`, a single bullet becomes plain prose (datasets built before the change still carry lists). `scripts/_common.py:description_key_as_list()` normalizes both forms back into a bullet list; both report modes route through it. The same trap hits **MDim step code** that asserts/replaces bullets from `tb[col].metadata.description_key`: `OLD_TEXT in list(dk)` silently iterates characters on the string form and the assertion fails (or, worse, a `for b in dk` loop explodes bullets into characters). Normalize first (see `_description_key_bullets` in `incomes_pip.py` / `gini_lis.py` / `gini_wid.py`), then do list-membership asserts and per-bullet swaps; setting either a list or a markdown string back on `view.metadata["description_key"]` is accepted (`Collection` converts lists via `_convert_description_key_lists`).
+1a. **`description_key` arrives as a markdown STRING, not a list**: the grapher channel serializes it via `owid.catalog.core.meta.description_key_to_string` — multiple bullets become one string joined as `"- b1\n- b2\n…"`, a single bullet becomes plain prose (datasets built before the change still carry lists). `scripts/_common.py:description_key_as_list()` normalizes both forms back into a bullet list; both report modes route through it. The same trap hits **MDim step code** that asserts/replaces bullets from `tb[col].metadata.description_key`: `OLD_TEXT in list(dk)` silently iterates characters on the string form and the assertion fails (or, worse, a `for b in dk` loop explodes bullets into characters). Normalize first (see `_description_key_bullets` in `incomes_pip.py` / `gini_lis.py` / `gini_wid.py`), then do list-membership asserts and per-bullet swaps; setting either a list or a markdown string back on `view.metadata["description_key"]` is accepted (`Chart` converts lists via `_convert_description_key_lists`).
 
-2. **Rebuilding the MDim `.config.json`**: use `etlr viz://chart/<ns>/<ver>/<name>` (no `--grapher`). `Collection.save()` then stops after `save_config_local`, skipping `validate_indicators_in_db` and `upsert_to_db`, so the report never needs the DB.
+2. **Rebuilding the MDim `.config.json`**: use `etlr viz://chart/<ns>/<ver>/<name>` (no `--grapher`). `Chart.save()` then stops after `save_config_local`, skipping `validate_indicators_in_db` and `upsert_to_db`, so the report never needs the DB.
 
 3. **Description-key dedup with auto slugs**: collect unique bullets into a per-file legend, auto-generate a short slug from the first ~3 non-stopword content words of each bullet (kebab-case), disambiguate collisions with `-2`/`-3` suffixes. Each view references bullets by their slugs, rendered as sub-bullets.
 
@@ -455,7 +455,7 @@ The FAUST diff only covers user-facing **text**. It will NOT catch indicator-ord
 - Do NOT write to production — no `admin.owid.io` writes, no prod DB writes, ever. All chart edits go to the branch's staging server and ride chart-diff to production.
 - Do NOT call `AdminAPI.put_grapher_config` or `put_mdim_config` by hand — the ETL files are the source of truth and the next rebuild overwrites DB-side edits.
 - Do NOT hand-build `staging-site-<branch>` hostnames — use `get_container_name` / `OWIDEnv.from_staging`.
-- Do NOT monkey-patch around a MySQL outage by calling `Collection.save_config_local()` directly or stubbing out `validate_indicators_in_db` / `upsert_to_db`. If MySQL is down, stop and tell the user.
+- Do NOT monkey-patch around a MySQL outage by calling `Chart.save_config_local()` directly or stubbing out `validate_indicators_in_db` / `upsert_to_db`. If MySQL is down, stop and tell the user.
 - Do NOT produce HTML `<details>` blocks or tables in dump-mode reports — the preferred format is a flat Markdown outline with bullet fields.
 - Do NOT suggest dump + compare mode — only enter it on explicit request.
 

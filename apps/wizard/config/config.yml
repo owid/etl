@@ -61,12 +61,12 @@ etl:
       disable:
         "production": True
         "staging": True
-    collection:
-      title: "Collection"
-      entrypoint: etl_steps/collection.py
-      icon: ":material/collections:"
-      image_url: "https://cdn12.picryl.com/photo/2016/12/31/stamps-collection-philately-backgrounds-textures-0097d9-1024.jpg"
-      description: "MDIMs, Explorers."
+    chart:
+      title: "Chart"
+      entrypoint: etl_steps/chart.py
+      icon: ":material/bar_chart:"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Minard.png/960px-Minard.png"
+      description: "Charts, multidims, explorers."
       disable:
         "production": True
         "staging": True

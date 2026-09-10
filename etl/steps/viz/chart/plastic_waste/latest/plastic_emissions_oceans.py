@@ -43,7 +43,7 @@ def run() -> None:
     # Load inputs.
     #
     # Load configuration from adjacent yaml file
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Load grapher dataset
     ds_grapher = paths.load_dataset("meijer_2021")
@@ -60,8 +60,8 @@ def run() -> None:
             # Set original_short_name
             tb[col].m.original_short_name = INDICATOR_NAME
 
-    # Create collection - this will automatically generate views from dimensions
-    c = paths.create_collection(
+    # Create chart - this will automatically generate views from dimensions
+    c = paths.create_chart(
         config=config,
         tb=tb,
         indicator_names=[INDICATOR_NAME],

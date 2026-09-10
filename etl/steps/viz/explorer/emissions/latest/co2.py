@@ -9,7 +9,7 @@
 Each chart's text (title, subtitle, note, default tab) lives upstream in the
 indicator's `presentation.grapher_config` (set in the relevant garden meta YAML);
 this step's only job is to tag each column with `m.dimensions` so
-`paths.create_collection(tb=[...], ...)` auto-expands one view per indicator.
+`paths.create_chart(tb=[...], ...)` auto-expands one view per indicator.
 
 The column → dimensions map lives in the sidecar `co2.dims.yaml` — bulk data
 out of the way of the step logic. The `fuel` dimension has an "na" slot for
@@ -35,7 +35,7 @@ def _tag(tb):
 
     The two upstream tables don't share column names, so we iterate `tb.columns`
     blindly — columns from the other table simply aren't here, and untagged
-    columns are silently ignored by `create_collection`'s expander.
+    columns are silently ignored by `create_explorer`'s expander.
     """
     for col in tb.columns:
         if col not in COLUMN_DIMENSIONS:
@@ -46,7 +46,7 @@ def _tag(tb):
 
 
 def run() -> None:
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     ds_gcb = paths.load_dataset("global_carbon_budget")
     tb_gcb = ds_gcb.read("global_carbon_budget", load_data=False)
@@ -56,12 +56,11 @@ def run() -> None:
     tb_nc = ds_nc.read("national_contributions", load_data=False)
     _tag(tb_nc)
 
-    c = paths.create_collection(
+    c = paths.create_explorer(
         config=config,
         tb=[tb_gcb, tb_nc],
         indicator_names="emissions",
         short_name="co2",
-        explorer=True,
     )
 
     # Universal chart-level config + a dimension-scoped override for the flagship

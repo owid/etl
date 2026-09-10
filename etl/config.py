@@ -261,7 +261,7 @@ FORCE_UPLOAD: bool = False
 # `etl browser` and fasttrack call directly, so they get the same gating).
 # A step whose destination is gated builds its output locally and skips the upsert/upload when its
 # permission is off: chart, explorer and bespoke steps under GRAPHER_ENABLED, export:// steps under
-# EXPORT_ENABLED. Outside `etlr` (a notebook calling `collection.save()`, a step module run directly)
+# EXPORT_ENABLED. Outside `etlr` (a notebook calling `chart.save()`, a step module run directly)
 # nothing is gated, hence the defaults. `etlr` also exports them to the environment so that a step
 # run in a subprocess sees the same permissions.
 GRAPHER_ENABLED = env.get("GRAPHER_ENABLED", "1") in ("True", "true", "1")
@@ -368,7 +368,7 @@ def vendored_grapher_schema_id() -> str:
 
 
 # Grapher chart-config schema version this repo is built against — the default `$schema` for
-# indicator-level `presentation.grapher_config`, and the version a new collection config should pin.
+# indicator-level `presentation.grapher_config`, and the version a new chart config should pin.
 # Derived from the vendored copy (see above); bump it with `--bump-version`, never by hand.
 DEFAULT_GRAPHER_SCHEMA = vendored_grapher_schema_id()
 
@@ -700,7 +700,7 @@ class OWIDEnv:
         """Get indicator admin url."""
         return f"{self.admin_site}/datapage-preview/{variable_id}/"
 
-    def collection_preview(self, catalog_path: str):
+    def chart_preview(self, catalog_path: str):
         encoded_path = quote(catalog_path, safe="")
         return f"{self.admin_site}/grapher/{encoded_path}/"
 

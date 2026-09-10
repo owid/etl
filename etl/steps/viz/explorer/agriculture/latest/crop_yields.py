@@ -11,16 +11,15 @@ def run() -> None:
     # Load inputs.
     #
     # Load grapher config from YAML.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     #
     # Save outputs.
     #
     # Initialize a new explorer.
-    c = paths.create_collection(
+    c = paths.create_explorer(
         config=config,
         short_name="crop-yields",
-        explorer=True,
     )
 
     # Save explorer.

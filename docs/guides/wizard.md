@@ -54,7 +54,7 @@ In the following sections we try to give a brief overview of each of the section
 
 ### Create ETL steps
 
-Create new ETL steps from Wizard, including **Snapshot**, **Data** (Meadow, Garden, Grapher) and also **Collection** steps. Additionally, **Fast-Track** steps can also be created using the Wizard.
+Create new ETL steps from Wizard, including **Snapshot**, **Data** (Meadow, Garden, Grapher) and also **Chart** steps. Additionally, **Fast-Track** steps can also be created using the Wizard.
 
 
 In each step creation, a form is presented to the user so that they can fill in the necessary metadata fields. Based on the input, new files (e.g. python scripts, metadata YAML files, etc.) are created and modifications to existing ones (e.g. the DAG) are done.
@@ -75,11 +75,11 @@ After submitting each of the forms, a short guideline is shown so that the user 
 
     Data step creation
 
-- ![Collection step](../assets/step-collection.png){ width="100%" }
+- ![Chart step](../assets/step-chart.png){ width="100%" }
 
     ---
 
-    Collection step creation
+    Chart step creation
 
 </div>
 

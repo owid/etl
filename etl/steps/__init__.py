@@ -1292,7 +1292,7 @@ class VizStep(ExportStep):
             super()._run_recipe()
         elif self._is_chart_yaml_only():
             # YAML-only chart/MDIM: no .py, just a .config.yml. Run the default
-            # boilerplate (load_collection_config → create_collection → save).
+            # boilerplate (load_config → create_chart → save).
             self._run_chart_yaml_only(sp)
 
     def _is_chart_yaml_only(self) -> bool:
@@ -1307,8 +1307,8 @@ class VizStep(ExportStep):
         # Synthesise the `.py` path PathFinder expects; the file doesn't need to exist,
         # PathFinder only parses namespace/version/short_name out of the path components.
         paths_ = PathFinder(str(search_path.with_suffix(".py")))
-        collection = paths_.create_collection(config=paths_.load_collection_config())
-        collection.save()
+        chart = paths_.create_chart(config=paths_.load_config())
+        chart.save()
 
     @property
     def _dest_dir(self) -> Path:

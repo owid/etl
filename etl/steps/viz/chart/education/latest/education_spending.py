@@ -64,9 +64,9 @@ SPENDING_PATTERNS = {
 
 
 def run() -> None:
-    """Main function to process education spending data and create collection."""
+    """Main function to process education spending data and create chart."""
     # Load inputs
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Load datasets
     ds_opri = paths.load_dataset("education_opri")
@@ -87,8 +87,8 @@ def run() -> None:
     tb_opri = adjust_dimensions(tb_opri)
     tb_sdgs = adjust_dimensions(tb_sdgs)
 
-    # Create collection
-    c = paths.create_collection(
+    # Create chart
+    c = paths.create_chart(
         config=config,
         tb=[tb_opri, tb_sdgs],
         common_view_config=MULTIDIM_CONFIG,
@@ -108,7 +108,7 @@ def run() -> None:
     for view in c.views:
         edit_indicator_displays(view)
 
-    # Save collection
+    # Save chart
     c.save()
 
 
@@ -205,7 +205,7 @@ def adjust_dimensions(tb):
     return tb
 
 
-def create_grouped_views(collection):
+def create_grouped_views(chart):
     """Add grouped views for education level comparisons."""
     view_metadata = {
         "presentation": {
@@ -218,7 +218,7 @@ def create_grouped_views(collection):
         "subtitle": "{subtitle}",
     }
 
-    collection.group_views(
+    chart.group_views(
         groups=[
             {
                 "dimension": "level",

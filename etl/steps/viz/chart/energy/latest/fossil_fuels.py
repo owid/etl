@@ -5,8 +5,8 @@
 import math
 from copy import deepcopy
 
-from etl.collection.model.view import View, ViewIndicators
 from etl.helpers import PathFinder
+from etl.viz.chart.model.view import View, ViewIndicators
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -146,8 +146,8 @@ def run() -> None:
         "chartTypes": ["LineChart", "DiscreteBar", "Dumbbell", "SlopeChart"],
     }
 
-    c = paths.create_collection(
-        config=paths.load_collection_config(),
+    c = paths.create_chart(
+        config=paths.load_config(),
         tb=tb,
         indicator_names=["fossil_fuels"],
         dimensions=["fuel", "metric", "per_capita"],
@@ -293,7 +293,7 @@ def add_decomposition_views(c) -> None:
         "hasMapTab": False,
         "hideRelativeToggle": False,
         "yAxis": {"min": 0},
-        # These decomposition views are appended after create_collection, so the config.yml
+        # These decomposition views are appended after create_chart, so the config.yml
         # common_views originUrl does not reach them; set it here too.
         "originUrl": "https://ourworldindata.org/fossil-fuels",
     }

@@ -75,14 +75,14 @@ paths = PathFinder(__file__)
 
 
 def run() -> None:
-    c = paths.create_collection(
-        config=paths.load_collection_config(),
+    c = paths.create_chart(
+        config=paths.load_config(),
         short_name="{short_name}",
     )
     c.save()
 ```
 
-This is sufficient for config-driven multidims (explicit views in YAML). For more advanced patterns (programmatic view generation from table data, combining collections, grouping views), look at existing examples in `etl/steps/viz/chart/` for reference.
+This is sufficient for config-driven multidims (explicit views in YAML). For more advanced patterns (programmatic view generation from table data, combining charts, grouping views), look at existing examples in `etl/steps/viz/chart/` for reference.
 
 #### Config YAML file
 
@@ -124,7 +124,7 @@ The ETL has built-in change detection — if you modify the config, it will auto
 # alone: it is what lets Grapher migrate the config forward after a breaking schema change.
 grapher_schema: "011"
 # Never put `$schema` inside a view's `config` block: Grapher lets the view value override this
-# collection-level pin, so the two silently disagree. ETL warns when that happens.
+# chart-level pin, so the two silently disagree. ETL warns when that happens.
 
 title:
   title: "Chart Title"
@@ -282,7 +282,7 @@ Key fields for `config` in views or `common_views`:
 
 ## Troubleshooting
 
-**Chart built but not on staging**: without `--grapher`, `etlr viz://chart/...` only writes the config under `viz/chart/` and logs `collection.not_upserted`; pass `--grapher` to upsert.
+**Chart built but not on staging**: without `--grapher`, `etlr viz://chart/...` only writes the config under `viz/chart/` and logs `chart.not_upserted`; pass `--grapher` to upsert.
 
 **Step not found in DAG**: Check that the entry is under the `steps:` key in the correct `dag/*.yml` file, and that the file is included from `dag/main.yml`.
 
