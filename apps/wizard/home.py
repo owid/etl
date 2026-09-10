@@ -1,9 +1,15 @@
-"""Home page of wizard."""
+"""Home page of wizard.
+
+An index of every app, grouped in the same sections as the sidebar. Unlike the sidebar, it also
+shows what each app does, who maintains it, and which apps are unavailable in this environment.
+"""
+
+from collections.abc import Callable
 
 import streamlit as st
 
 from apps.wizard.config import WIZARD_CONFIG
-from apps.wizard.utils.components import st_wizard_card
+from etl.config import ENV, OWID_ENV
 
 st.set_page_config(
     page_title="Wizard: Home",
@@ -11,7 +17,10 @@ st.set_page_config(
     layout="wide",
 )
 
+# Number of section boxes per row.
 MAX_COLS_PER_ROW = 3
+# Badge color for each environment the wizard can run in.
+ENV_COLORS = {"dev": "green", "staging": "orange", "production": "red"}
 
 
 def st_show_home():
@@ -32,83 +41,97 @@ def st_show_home():
                 if st.query_params["page"] == app["alias"]:
                     st.switch_page(app["entrypoint"])
 
-    # Page config
-    container = st.container(border=False, horizontal=True, vertical_alignment="bottom")
-    with container:
-        st.title("Wizard 🪄")
-        st.caption(f"streamlit {st.__version__}", width="content")
+    #########################
+    # HEADER
+    #########################
+    with st.container(horizontal=True, vertical_alignment="bottom", horizontal_alignment="distribute"):
+        st.title("Wizard 🪄", width="content")
+        with st.container(horizontal=True, vertical_alignment="center", width="content"):
+            st.badge(ENV, icon=":material/dns:", color=ENV_COLORS.get(ENV, "gray"))
+            st.badge(OWID_ENV.conf.DB_HOST, icon=":material/database:", color="gray", help="Grapher database host.")
+            st.caption(f"streamlit {st.__version__}", width="content")
 
     #########################
-    # ETL Steps
+    # CREATE (ETL steps)
     #########################
-    st.markdown(f"## {WIZARD_CONFIG['etl']['title']}")
-    st.markdown(WIZARD_CONFIG["etl"]["description"])
-    steps = WIZARD_CONFIG["etl"]["steps"]
-
-    # 1/ CLASSIC: Snapshot -> Data -> Collection (no captions, match original)
-    if steps["fasttrack"]["enable"]:
-        _render_cards_row(
-            [steps["snapshot"], steps["data"], steps["collection"]],
-            height=100,
-            col_widths=[1, 2, 1],
-            show_caption=False,
-        )
-
-    # 2/ FAST TRACK
-    if steps["fasttrack"]["enable"]:
-        col1, _ = st.columns([3, 1])
-        with col1:
-            _render_card(steps["fasttrack"], height=50, show_caption=False)
+    etl = WIZARD_CONFIG["etl"]
+    steps = list(etl["steps"].values())
+    with st.container(border=True):
+        _render_box_header(etl["title"], etl["description"], etl.get("icon"))
+        for col, step in zip(st.columns(len(steps)), steps):
+            with col:
+                _render_app(step)
 
     #########################
-    # Sections
+    # SECTIONS, LINKS, LEGACY
     #########################
-    sections = WIZARD_CONFIG["sections"]
-    num_rows = len(sections) // MAX_COLS_PER_ROW + 1
-    for row in range(num_rows):
-        cols = st.columns(MAX_COLS_PER_ROW)
-        for i, section in enumerate(sections[row * MAX_COLS_PER_ROW : (row + 1) * MAX_COLS_PER_ROW]):
-            apps = [app for app in section["apps"] if app["enable"]]
-            if not apps:
-                continue
-            with cols[i]:
-                st.markdown(f"## {section['title']}")
-                st.markdown(section["description"])
-                for app in apps:
-                    _render_card(app)
+    boxes: list[Callable[[], None]] = []
+    for section in WIZARD_CONFIG["sections"]:
+        boxes.append(lambda section=section: _render_section(section))
 
-    #########################
-    # Legacy
-    #########################
-    if "legacy" in WIZARD_CONFIG:
-        legacy_apps = [app for app in WIZARD_CONFIG["legacy"]["apps"] if app["enable"]]
-        if legacy_apps:
-            st.warning(WIZARD_CONFIG["legacy"]["description"])
-            _render_cards_row(legacy_apps)
+    links = [e for e in WIZARD_CONFIG["main"].values() if str(e["entrypoint"]).startswith(("http://", "https://"))]
+    if links:
+        boxes.append(lambda: _render_links(links))
+
+    legacy_apps = WIZARD_CONFIG.get("legacy", {}).get("apps", [])
+    if legacy_apps:
+        boxes.append(lambda: _render_legacy(legacy_apps))
+
+    for i in range(0, len(boxes), MAX_COLS_PER_ROW):
+        row = boxes[i : i + MAX_COLS_PER_ROW]
+        for col, render in zip(st.columns(len(row), border=True), row):
+            with col:
+                render()
 
 
-def _render_card(item: dict, height: int = 80, show_caption: bool = True) -> None:
-    """Render a single wizard card from a WIZARD_CONFIG app/step dict."""
-    st_wizard_card(
-        entrypoint=item["entrypoint"],
-        title=item["title"],
-        image_url=item["image_url"],
-        caption=item.get("description", "") if show_caption else "",
-        height=height,
-    )
+def _render_box_header(title: str, description: str, icon: str | None) -> None:
+    st.subheader(title, icon=icon)
+    st.caption(description)
 
 
-def _render_cards_row(
-    items: list[dict],
-    height: int = 80,
-    col_widths: list[int] | None = None,
-    show_caption: bool = True,
-) -> None:
-    """Render a row of wizard cards across Streamlit columns."""
-    cols = st.columns(col_widths or len(items))
-    for col, item in zip(cols, items):
-        with col:
-            _render_card(item, height=height, show_caption=show_caption)
+def _render_section(section: dict) -> None:
+    _render_box_header(section["title"], section["description"], section.get("icon"))
+    for app in section["apps"]:
+        _render_app(app)
+
+
+def _render_links(links: list[dict]) -> None:
+    _render_box_header("Links", "Other OWID tools and resources.", ":material/link:")
+    for link in links:
+        _render_app(link)
+
+
+def _render_legacy(apps: list[dict]) -> None:
+    _render_box_header("Legacy", WIZARD_CONFIG["legacy"]["description"], ":material/history:")
+    for app in apps:
+        _render_app(app)
+
+
+def _maintainer_help(item: dict) -> str | None:
+    maintainer = item.get("maintainer")
+    if not maintainer:
+        return None
+    if isinstance(maintainer, list):
+        maintainer = ", ".join(maintainer)
+    return f"Maintainer: {maintainer}"
+
+
+def _render_app(item: dict) -> None:
+    """Render one app (or external link) from the wizard config: a full-width link with its description below.
+
+    Apps disabled in this environment are shown greyed out, not hidden, so it is clear they exist and
+    where they can be run.
+    """
+    title, icon, description = item["title"], item["icon"], item.get("description", "")
+    with st.container(gap=None):
+        if item.get("enable", True):
+            st.page_link(
+                item["entrypoint"], label=f"**{title}**", icon=icon, help=_maintainer_help(item), width="stretch"
+            )
+        else:
+            st.markdown(f":gray[{icon} **{title}**]", help=f"Not available on `{ENV}`.")
+        if description:
+            st.caption(description)
 
 
 # Show the home page

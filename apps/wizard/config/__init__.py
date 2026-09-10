@@ -1,6 +1,7 @@
-"""This modules help with the configuration of the wizard app.
+"""This module helps with the configuration of the wizard app.
 
-It basically reads the configuration from .wizard.yml and renders the home page and other details.
+It reads `config.yml` (the list of pages, grouped in sections) and derives what the navigation and
+the home page need: which apps are enabled in the current environment, and the alias of each app.
 """
 
 import yaml
@@ -65,7 +66,7 @@ def load_wizard_config():  # -> Any:
 
 def _check_wizard_config(config: dict):
     """Check if the wizard config is valid."""
-    _app_properties_expected = ["title", "entrypoint", "icon", "image_url"]
+    _app_properties_expected = ["title", "entrypoint", "icon"]
     pages_properties_expected = _app_properties_expected + ["alias", "description"]
     etl_steps_properties_expected = _app_properties_expected
 
@@ -95,6 +96,7 @@ def _check_wizard_config(config: dict):
     for section in config["sections"]:
         assert "title" in section, "`sections.title` property is required in wizard config!"
         assert "description" in section, "`sections.description` property is required in wizard config!"
+        assert "icon" in section, "`sections.icon` property is required in wizard config!"
         assert "apps" in section, "`sections.apps` property is required in wizard config!"
         for app in section["apps"]:
             for prop in pages_properties_expected:

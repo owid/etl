@@ -1,9 +1,10 @@
 # Use this file to add new apps (or pages) to Wizard (see property 'sections')
 #
 # There are three main properties in this file:
-# - main: Reserved for the 'Home' page and other top-level entries.
-# - etl: This is the section for the ETL apps. Each app in this section will be shown in the ETL home page.
-# - sections: This is a list of sections. Each section is a group of apps. Each section will have its own home page.
+# - main: Reserved for the 'Home' page and other top-level entries (external links are rendered as plain links).
+# - etl: The step-creation apps. They are shown in the "Create" box of the home page and in their own sidebar section.
+# - sections: A list of sections. Each section is a group of apps, rendered as one box on the home page and one
+#   group in the sidebar. A section has a title, a description, an icon and a list of apps.
 #
 # HOW TO ADD A NEW APP?
 # ----------------------
@@ -12,11 +13,10 @@
 # Your app should have the following properties:
 # - title (str): Title of the app. This will be shown in the home page and sidebar menu of Wizard.
 # - alias (str): [not needed in etl.steps] Alias of the app. This is used if you want to directly access the app from the command line (e.g. `etlwiz [alias]`).
-# - description (str): Description of the app. This will be shown in the card of the app in the home page of Wizard.
-# - maintenaner (str): Slack handle of the person responsible for the app.
+# - description (str): One-line description of the app. Shown next to the app on the home page.
+# - maintainer (str): Slack handle of the person responsible for the app. Shown as a tooltip on the home page.
 # - entrypoint (str): Path to the main file of the app. This file should be the streamlit python script.
-# - icon (str): Emoji or material icon to show in the sidebar menu. Use from https://fonts.google.com/icons?icon.set=Material+Symbols&icon.style=Rounded
-# - image_url (str): Link to the image you want to show on the card in the home page of Wizard.
+# - icon (str): Emoji or material icon to show in the sidebar menu and home page. Use from https://fonts.google.com/icons?icon.set=Material+Symbols&icon.style=Rounded
 # - disable (bool): Whether the app is disabled in certain settings. To detect if the app is running in a remote setting, it checks the value of the environment variable `ENV`.
 #     bool: Whether the app is disabled in all settings.
 #     dict: Whether the app is disabled in certain settings. The key is the setting and the value is a boolean. Available settings (keys) are 'production', 'staging', 'dev'. 'dev' stands for local environments.
@@ -38,17 +38,24 @@ main:
     # External URLs are rendered as plain links in the navigation menu.
     entrypoint: http://metabase.owid.io
     icon: ":material/bar_chart:"
+  docs:
+    title: "Documentation"
+    description: "ETL docs: guides, architecture and reference."
+    maintainer: "@lucas"
+    entrypoint: https://docs.owid.io/projects/etl
+    icon: ":material/menu_book:"
 
 # ETL steps
 etl:
   title: Create
   description: Create an ETL step.
+  icon: ":material/add_circle:"
   steps:
     snapshot:
       title: "Snapshot"
       entrypoint: etl_steps/snapshot.py
       icon: ":material/photo_camera:"
-      image_url: "https://greatescapepublishing.com/wp-content/uploads/2019/11/30463274482_90aff8a230_c.jpg"
+      description: "Raw data from a producer."
       disable:
         "production": True
         "staging": True
@@ -56,7 +63,6 @@ etl:
       title: "Data step"
       entrypoint: etl_steps/data.py
       icon: ":material/table:"
-      image_url: "https://media.gettyimages.com/id/1272610693/es/v%C3%ADdeo/muro-de-perspectiva-del-fondo-del-patr%C3%B3n-digital-del-c%C3%B3digo-binario.jpg?s=640x640&k=20&c=Pb4m4UbGiVZEuQ8egLm2IYtLLmQxncBFFa1zR87-St4%3D"
       description: "Meadow, Garden, Grapher."
       disable:
         "production": True
@@ -65,7 +71,6 @@ etl:
       title: "Collection"
       entrypoint: etl_steps/collection.py
       icon: ":material/collections:"
-      image_url: "https://cdn12.picryl.com/photo/2016/12/31/stamps-collection-philately-backgrounds-textures-0097d9-1024.jpg"
       description: "MDIMs, Explorers."
       disable:
         "production": True
@@ -75,12 +80,13 @@ etl:
       alias: fasttrack
       entrypoint: app_pages/fasttrack/app.py
       icon: ":material/fast_forward:"
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/b/be/Alonso_%28Renault%29_qualifying_at_USGP_2005.jpg"
+      description: "Import a small dataset from a Google Sheet or CSV."
 
 sections:
   - title: "Update"
     description: |-
       Updates, data edits, etc.
+    icon: ":material/update:"
     apps:
       - title: "Step upgrader"
         alias: dashboard
@@ -88,14 +94,12 @@ sections:
         description: Update ETL steps
         maintainer: "@pablo"
         icon: ":material/upgrade:"
-        image_url: "https://cdn.pixabay.com/photo/2018/09/04/17/02/indicator-3654257_960_720.jpg"
       - title: "Indicator Upgrader"
         alias: indicator-upgrade
         entrypoint: app_pages/indicator_upgrade/app.py
         description: Migrate indicators in charts
         maintainer: "@lucas"
         icon: ":material/upgrade:"
-        image_url: "https://wallpapers.com/images/hd/pokemon-evolution-1920-x-1080-wallpaper-h5u6nbg98e3tibyn.jpg"
         disable:
           production: True
       - title: "Chart Diff"
@@ -104,13 +108,13 @@ sections:
         description: Compare charts, MDIMs & explorers in staging and prod
         maintainer: "@mojmir"
         icon: ":material/difference:"
-        image_url: "https://images.squarespace-cdn.com/content/v1/5ea8287254c2e00f35d1cc48/1595511684480-6RM6YK3XZGB2SD21GPGP/20140620appletoapplescomparison.jpg"
         disable:
           production: True
 
   - title: "Data tools"
     description: |-
       Control panel for ETL steps.
+    icon: ":material/handyman:"
     apps:
       - title: "Anomalist"
         alias: anomalist
@@ -118,7 +122,6 @@ sections:
         description: List anomalies in data
         maintainer: "@lucas"
         icon: ":material/planner_review:"
-        image_url: "https://www.shutterstock.com/image-illustration/multitude-endless-standing-white-eggs-260nw-310142192.jpg"
         disable:
           production: True
       - title: "Harmonizer"
@@ -127,18 +130,17 @@ sections:
         maintainer: "@lucas"
         entrypoint: app_pages/harmonizer/app.py
         icon: ":material/music_note:"
-        image_url: "https://www.shutterstock.com/image-vector/abstract-vector-musical-background-music-260nw-485443810.jpg"
       - title: "Producer analytics"
         alias: producer-analytics
         description: "Share analytics with data producers"
         maintainer: "@pablo"
         entrypoint: app_pages/producer_analytics/app.py
         icon: ":material/analytics:"
-        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Wikimedia_Product_Analytics_team_logo.svg/512px-Wikimedia_Product_Analytics_team_logo.svg.png"
 
   - title: "Search"
     description: |-
       Browse our content.
+    icon: ":material/search:"
     apps:
       - title: "Search Comparison"
         alias: search-comparison
@@ -146,25 +148,23 @@ sections:
         maintainer: "@mojmir"
         entrypoint: app_pages/search_comparison/app.py
         icon: ":material/compare:"
-        image_url: "https://images.squarespace-cdn.com/content/v1/5ea8287254c2e00f35d1cc48/1595511684480-6RM6YK3XZGB2SD21GPGP/20140620appletoapplescomparison.jpg"
       - title: "Indicator search"
         alias: indicator_search
         description: "Find similar indicators"
         maintainer: "@mojmir"
         entrypoint: app_pages/indicator_search/app.py
         icon: ":material/search:"
-        image_url: "https://www.shutterstock.com/image-vector/standard-ph-chart-aqueous-solution-600nw-2007387788.jpg"
       - title: "Related charts"
         alias: related_charts
         description: "Find related charts"
         maintainer: "@mojmir"
         entrypoint: app_pages/related_charts/app.py
         icon: ":material/bar_chart:"
-        image_url: "https://static.vecteezy.com/system/resources/previews/011/091/185/non_2x/constellation-interconnected-colored-dots-cartoon-logo-concept-bubbles-structure-shape-isolated-icon-connected-color-beats-illustration-for-science-technology-and-medical-graphic-free-vector.jpg"
 
   - title: "Assistant"
     description: |-
       Research tools.
+    icon: ":material/auto_awesome:"
     apps:
       - title: "Chart animation"
         alias: chart-animation
@@ -172,11 +172,11 @@ sections:
         maintainer: "@pablo"
         entrypoint: app_pages/chart_animation.py
         icon: ":material/animated_images:"
-        image_url: "https://img.freepik.com/free-photo/abstract-yellow-smooth-wave-lines_1017-24863.jpg"
 
   - title: "Misc"
     description: |-
       Other helpful tools in the ETL ecosystem.
+    icon: ":material/widgets:"
     apps:
       - title: "Servers Dashboard"
         alias: servers-dashboard
@@ -184,6 +184,5 @@ sections:
         description: Real-time monitoring of our LXC staging servers
         maintainer: "@mojmir"
         icon: ":material/computer:"
-        image_url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
         disable:
           staging: true

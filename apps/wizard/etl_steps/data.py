@@ -17,9 +17,7 @@ from apps.wizard.etl_steps.forms import DataForm
 from apps.wizard.etl_steps.instructions import render_instructions
 from apps.wizard.etl_steps.utils import STEP_NAME_PRESENT, TAGS_DEFAULT, dag_files, dag_not_add_option
 from apps.wizard.utils.components import (
-    config_style_html,
     preview_file,
-    st_horizontal,
     st_multiselect_wider,
 )
 from etl.config import DB_HOST, DB_NAME
@@ -53,7 +51,6 @@ st.session_state["step_name"] = "data"
 APP_STATE = utils.AppState()
 APP_STATE._previous_step = "snapshot"
 # Config style
-config_style_html()
 # DUMMY defaults
 dummy_values = {
     "namespace": "dummy",
@@ -172,7 +169,7 @@ def edit_dependant_field() -> None:
 def render_step_selection():
     """Render step selection."""
     # st.write(st.session_state)
-    with st_horizontal(vertical_alignment="center"):  # ("center", justify_content="space-between"):
+    with st.container(horizontal=True, vertical_alignment="center"):
         # Multi-select (data steps)
         if (st.session_state.update_steps_selection) and (st.session_state["data_steps_to_create"] is not None):
             st.session_state["data.steps_to_create"] = ["meadow", "garden", "grapher"]
@@ -343,7 +340,7 @@ def render_form_main():
 @st.fragment
 def render_form_dependencies():
     if "meadow" in st.session_state["data.steps_to_create"]:
-        with st_horizontal(vertical_alignment="center", justify_content="space-between"):
+        with st.container(horizontal=True, vertical_alignment="center", horizontal_alignment="distribute"):
             st.markdown("#### Dependencies")
             st.button(
                 ":material/refresh: Refresh snapshot list",

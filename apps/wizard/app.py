@@ -1,8 +1,7 @@
 """Entry page.
 
-This is the page that is loaded when the app is started. It redirects to the home page, unless an argument is passed. E.g. `etlwiz charts` will redirect to the charts page.
-
-NOTE: This only works with >1.35 (nightly) version of Streamlit.
+This is the page that is loaded when the app is started. It builds the multi-page navigation from
+`apps/wizard/config/config.yml` and runs the selected page (Home by default).
 """
 
 import streamlit as st

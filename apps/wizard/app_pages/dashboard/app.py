@@ -13,7 +13,6 @@ from apps.wizard.app_pages.dashboard.utils import (
     load_steps_df,
     load_steps_df_to_display,
 )
-from apps.wizard.utils.components import st_horizontal
 
 st.set_page_config(
     page_title="Wizard: ETL Dashboard",
@@ -61,7 +60,7 @@ tutorial_html = f"""
 </ol>
 """
 
-with st_horizontal(justify_content="space-between"):
+with st.container(horizontal=True, vertical_alignment="center", horizontal_alignment="distribute"):
     st.markdown("Select an ETL step from the table below and perform actions on it.")
 
     with st.popover("More details", icon=":material/help:"):

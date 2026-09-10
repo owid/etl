@@ -4,7 +4,6 @@ from rapidfuzz import fuzz
 from structlog import get_logger
 
 from apps.wizard.app_pages.dashboard.utils import NON_UPDATEABLE_IDENTIFIERS, unselect_step
-from apps.wizard.utils.components import st_horizontal
 
 log = get_logger()
 
@@ -51,7 +50,7 @@ HELP_TEXT += "\n\nSteps with ':material/table_chart:' and in bold come from the 
 def render_selection_list(steps_df):
     """Render selection list."""
     if st.session_state.selected_steps:
-        with st_horizontal():
+        with st.container(horizontal=True, vertical_alignment="center"):
             st.markdown("""### Selection""", help=HELP_TEXT)
             num_steps = len(st.session_state.selected_steps)
             if num_steps == 1:
@@ -85,8 +84,7 @@ def render_selection_list(steps_df):
             _show_main_buttons(steps_df)
 
     else:
-        with st_horizontal():
-            st.markdown("""### Selection""", help=HELP_TEXT)
+        st.markdown("""### Selection""", help=HELP_TEXT)
         import_steps_from_preview()
         st.warning("No datasets selected. Please add at least one dataset from the preview list.")
 
@@ -145,7 +143,7 @@ def _show_main_buttons(steps_df):
     - Remove non-updateable
     - Replace with latest versions
     """
-    with st_horizontal():
+    with st.container(horizontal=True):
         # Add button to clear the selection list.
         st.button(
             ":primary[:material/clear_all: Clear list]",

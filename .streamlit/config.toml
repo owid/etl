@@ -3,10 +3,14 @@ enableStaticServing = true
 
 
 [theme]
-base="light"
-primaryColor="#002147"
-textColor="#333333"
-secondaryBackgroundColor="#f0f4fa"
-
-
+base = "light"
+primaryColor = "#002147"
+textColor = "#333333"
+secondaryBackgroundColor = "#f0f4fa"
 baseRadius = "medium"
+
+# OWID's web fonts, served from the same stylesheet Grapher loads (CORS-enabled). Streamlit appends its
+# own fallbacks ("Source Sans", sans-serif), so if the stylesheet can't be fetched (e.g. offline) the app
+# still renders. NOTE: don't add a comma-separated fallback here — Streamlit would append it to the URL.
+font = "Lato:https://ourworldindata.org/fonts.css"
+headingFont = "Playfair Display:https://ourworldindata.org/fonts.css"

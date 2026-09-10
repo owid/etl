@@ -49,7 +49,7 @@ In the following sections we try to give a brief overview of each of the section
 
 <figure markdown="span">
   ![Wizard](../assets/wizard.png)
-  <figcaption>Wizard as of November 2025.</figcaption>
+  <figcaption>Wizard as of September 2026.</figcaption>
 </figure>
 
 ### Create ETL steps

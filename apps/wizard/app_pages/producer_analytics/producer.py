@@ -2,7 +2,7 @@
 
 import pandas as pd
 import streamlit as st
-from st_aggrid import AgGrid, GridUpdateMode
+from st_aggrid import AgGrid, ColumnsAutoSizeMode, GridUpdateMode
 
 from apps.wizard.app_pages.producer_analytics.utils import columns_producer, make_grid
 from apps.wizard.utils.components import st_cache_data
@@ -56,7 +56,7 @@ class UIProducerAnalytics:
             # height=500,
             width="100%",
             update_mode=GridUpdateMode.MODEL_CHANGED,
-            fit_columns_on_grid_load=True,  # Automatically adjust columns when the grid loads.
+            columns_auto_size_mode=ColumnsAutoSizeMode.FIT_ALL_COLUMNS_TO_VIEW,
             allow_unsafe_jscode=True,
             theme="streamlit",
             custom_css=custom_css,
