@@ -1,6 +1,6 @@
 """The functions below are a bit more specific to this step, so maybe harder to generalize."""
 
-from typing import Any, cast
+from typing import Any
 
 from etl.helpers import PathFinder
 from etl.viz.explorer import Explorer
@@ -43,7 +43,7 @@ class ExplorerCreator:
             indicator_as_dimension=True,
             **kwargs,
         )
-        return cast(Explorer, explorer)
+        return explorer
 
     def create(
         self,
@@ -141,4 +141,4 @@ class ExplorerCreator:
             drop_dimensions_if_single_choice=False,
         )
 
-        return cast(Explorer, explorer)
+        return explorer
