@@ -117,7 +117,7 @@ class Definitions(MDIMBase):
 @pruned_json
 @dataclass
 class Chart(MDIMBase):
-    """Overall MDIM/Explorer config"""
+    """Config of a chart or multidim; `Explorer` subclasses it for explorers."""
 
     dimensions: list[Dimension]
     views: list[View]
