@@ -1,4 +1,8 @@
-"""I've implemented a simple version of create_charts with support for multiple tables. We should move this somewhere so others can use, or just replace the behavior of paths.create_chart."""
+"""Multidim on armed conflicts since 1946, from UCDP/PRIO and UCDP.
+
+Deaths, death rates and ongoing wars by conflict type, built as one chart per source table
+(`ucdp_prio` and `ucdp`) that `create_chart` combines into a single multidim.
+"""
 
 from etl.helpers import PathFinder
 
