@@ -7,16 +7,13 @@ from io import BytesIO
 
 import pandas as pd
 import requests
-from metabase_api import Metabase_API
 from structlog import get_logger
 from tenacity import Retrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from etl.config import (
     METABASE_API_KEY,
-    METABASE_API_KEY_ADMIN,
     METABASE_SEMANTIC_LAYER_DATABASE_ID,
     METABASE_URL,
-    METABASE_URL_LOCAL,
 )
 
 log = get_logger()
@@ -30,14 +27,6 @@ RETRYABLE_STATUS_CODES = frozenset({502, 503, 504})
 
 class MetabaseTransientError(RuntimeError):
     """Metabase upstream was temporarily unavailable (e.g. mid-restart). Safe to retry."""
-
-
-def mb_cli(domain: str | None = None, key: str | None = None):
-    if domain is None:
-        domain = METABASE_URL_LOCAL
-    if key is None:
-        key = METABASE_API_KEY
-    return Metabase_API(domain, api_key=key)
 
 
 def read_semantic_layer(sql: str) -> pd.DataFrame:
@@ -156,56 +145,4 @@ def read_metabase(
     # Create a dataframe with the returned data.
     df = pd.read_csv(BytesIO(response.content))
 
-    return df
-
-
-def _get_domain(prod: bool = False) -> str:
-    if prod:
-        domain = METABASE_URL
-    else:
-        domain = METABASE_URL_LOCAL
-    return domain
-
-
-def get_metabase_analytics(prod: bool = False):
-    """Get views on Metabase questions."""
-    domain = _get_domain(prod=prod)
-    mb = mb_cli(key=METABASE_API_KEY_ADMIN, domain=domain)
-
-    #########################
-    # View counts
-    #########################
-    dfs = []
-    # Get cards
-    cards = mb.get("/api/card/")
-    # Ensure cards is a list
-    if not isinstance(cards, list):
-        cards = []
-
-    # Build cards dataframe
-    cards = [{"id": c["id"], "type": c["type"], "name": c["name"], "views": c["view_count"]} for c in cards]
-    df = pd.DataFrame(cards)
-    dfs.append(df)
-
-    # Get dashboards
-    dashboards = mb.get("/api/dashboard/")
-    # Ensure dashboards is a list
-    if not isinstance(dashboards, list):
-        dashboards = []
-
-    # Build cards dataframe
-    dashboards = [{"id": c["id"], "type": "dashboard", "name": c["name"], "views": c["view_count"]} for c in dashboards]
-    df = pd.DataFrame(dashboards)
-    dfs.append(df)
-
-    # Combine dataframes
-    df = pd.concat(dfs, ignore_index=True)
-
-    # Sort dataframe
-    df = df.sort_values(by="views", ascending=False).reset_index(drop=True)  # ty: ignore
-
-    #########################
-    # Anonymous stats
-    #########################
-    # stats = mb.get("/api/analytics/anonymous-stats")
     return df
