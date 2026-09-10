@@ -9,7 +9,7 @@ meta:
     # Citation
     producer: World Health Organization
     citation_full: |-
-      World Health Organization - Polio cases (2024).
+      World Health Organization – Polio cases (2024).
     attribution_short: WHO
     # Files
     url_main: https://extranet.who.int/polis/public/CaseCount.aspx

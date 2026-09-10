@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Natural Earth - Large scale data (1:10m Cultural Vectors)
+    title: Natural Earth – Large scale data (1:10m Cultural Vectors)
     description: |-
       There are 258 countries in the world. Greenland as separate from Denmark. Most users will want this file instead of sovereign states, though some users will want map units instead when distinguishing overseas regions of France.
 

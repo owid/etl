@@ -83,17 +83,6 @@ After submitting each of the forms, a short guideline is shown so that the user 
 
 </div>
 
-### Expert
-
-GPT-based assistant to help resolve doubts. Doubts can include anything ETL-related (metadata structure, environment setup, etc.). This documentation is fed to the Expert, so it should be able to answer most of the questions concerning this documentation.
-
-Additionally, Expert can also help out create Datasette queries!
-
-<figure markdown="span">
-  ![Expert](../assets/expert.png)
-  <figcaption>Asking the Expert a data question.</figcaption>
-</figure>
-
 ### Update tools
 
 Pages to help us improve our charts (e.g. keeping them up to date). The current pages are:

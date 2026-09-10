@@ -8,7 +8,7 @@ meta:
       This dataset makes it possible to assess whether countries are making progress toward the goals of the Paris Agreement and is widely recognized as the most comprehensive report of its kind.
 
       Since 2001, the GCP has published estimates of global and national fossil CO₂ emissions. Initially, these were simple republished data from other sources, but over time, refinements were made based on feedback and correction of inaccuracies.
-    title_snapshot: Global Carbon Budget - Fossil CO2 emissions
+    title_snapshot: Global Carbon Budget – Fossil CO2 emissions
     citation_full: |-
       Andrew, R. M., & Peters, G. P. (2025). The Global Carbon Project's fossil CO2 emissions dataset (2025v15) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.17417124
 

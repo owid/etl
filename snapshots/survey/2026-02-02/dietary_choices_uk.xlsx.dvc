@@ -10,7 +10,7 @@ meta:
       - Vegetarian: do not eat any meat, poultry, game, fish, or shellfish.
       - Plant-based / Vegan: do not eat dairy products, eggs, or any other animal product.
       - None of these.
-    citation_full: YouGov (2026) - Dietary choices of Brits (e.g. vegetarian, flexitarian, meat-eater etc)?
+    citation_full: YouGov (2026) – Dietary choices of Brits (e.g. vegetarian, flexitarian, meat-eater etc)?
     attribution_short: YouGov
     url_main: https://yougov.co.uk/topics/health/trackers/dietery-choices-of-brits-eg-vegeterian-flexitarian-meat-eater-etc
     url_download: https://yougov.co.uk/_pubapis/v5/uk/trackers/dietery-choices-of-brits-eg-vegeterian-flexitarian-meat-eater-etc/download/

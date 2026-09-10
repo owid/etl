@@ -9,7 +9,7 @@ meta:
 
        Division covers approximately 200 countries and represents more than 99% of the world's merchandise trade. Information can be extracted in a variety of formats, including API developer tools for integration into enterprise applications and workflows.
     date_published: "2025"
-    title_snapshot: Comtrade Database - 3915 (waste, parings and scarp, of plastics)
+    title_snapshot: Comtrade Database – 3915 (waste, parings and scarp, of plastics)
     description_snapshot: |-
       Subset of Comtrade database only concerning indicators related to plastic waste. The data is sourced from the commodity category '3915 – Waste, parings and scrap, of plastics' from the UN's Comtrade Database. This snapshot only includes data for 2023 and 2024.
 

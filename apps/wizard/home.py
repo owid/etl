@@ -3,7 +3,7 @@
 import streamlit as st
 
 from apps.wizard.config import WIZARD_CONFIG
-from apps.wizard.utils.components import st_wizard_card, st_wizard_page_link
+from apps.wizard.utils.components import st_wizard_card
 
 st.set_page_config(
     page_title="Wizard: Home",
@@ -36,13 +36,6 @@ def st_show_home():
     container = st.container(border=False, horizontal=True, vertical_alignment="bottom")
     with container:
         st.title("Wizard 🪄")
-        st_wizard_page_link(
-            "expert",
-            label=":rainbow[**Ask the Expert**]",
-            help="Ask the expert any documentation question!",
-            width="content",
-            border=False,
-        )
         st.caption(f"streamlit {st.__version__}", width="content")
 
     #########################

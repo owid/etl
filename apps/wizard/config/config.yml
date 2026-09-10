@@ -1,7 +1,7 @@
 # Use this file to add new apps (or pages) to Wizard (see property 'sections')
 #
 # There are three main properties in this file:
-# - main: Reserved for 'Home' and 'Expert' pages.
+# - main: Reserved for the 'Home' page and other top-level entries.
 # - etl: This is the section for the ETL apps. Each app in this section will be shown in the ETL home page.
 # - sections: This is a list of sections. Each section is a group of apps. Each section will have its own home page.
 #
@@ -29,13 +29,6 @@ main:
     maintainer: "@lucas"
     entrypoint: home.py
     icon: ":material/home:"
-  expert:
-    title: "Expert"
-    description: "Ask the expert ETL questions!"
-    maintainer:
-      - "@lucas"
-    entrypoint: app_pages/expert_agent/app.py
-    icon: ":material/smart_toy:"
   analytics:
     title: "Metabase"
     description: "Learn more about OWID in Data!"
