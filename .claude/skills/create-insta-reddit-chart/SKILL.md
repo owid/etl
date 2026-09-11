@@ -21,13 +21,12 @@ feed posts and Reddit. One image serves both destinations; nothing is Reddit-spe
 Where a decision was *not* made, this file says so and tells you to ask — don't fill the gap with
 a guess.
 
-**Model check, before anything else:** the session context names the running model. On **Fable**,
-recommend re-running on **Opus** (or **Sonnet** for a re-export) and continue only on the user's
-say-so — the same rule as [`/create-figma-chart`](../create-figma-chart/SKILL.md), which this skill
-leans on for everything it does not spell out.
-
-**The Charts file is shared.** Nothing is written to it before the user has seen the proposal
-(Step 3) and approved it. Reading the file needs no permission.
+**No gates.** The user asked for the frame, so build it: say in one line what you are about to do,
+write to the file, show the result, iterate on feedback. Do not stop for a plan review, do not
+recommend switching model, and do not ask a question the decisions table below already answers —
+every question that is allowed is named in Step 2, and there is at most one. This skill leans on
+[`/create-figma-chart`](../create-figma-chart/SKILL.md) for mechanics it does not spell out, **but
+not for its checkpoints**: that skill's approval step and model check do not apply here.
 
 **Say it in plain words.** The person asking is usually not a designer or a data scientist. Lead
 with what changed and why it matters; keep node ids, style ids and pixel arithmetic for the final
@@ -46,8 +45,8 @@ before/after.
 | Title / subtitle | Rebound to the Instagram **portrait** text styles: `Instagram/Title (portrait)` (Playfair Display SemiBold **28**, line height 32) and `Instagram/Subtitle (portrait)` (Lato **18**), fill styles `Instagram/Title` and `Instagram/Subtitle` — **unless that makes the header more than 30px taller than in the source**, in which case the source's own sizes stay (Step 5). Text content unchanged either way. |
 | Footer | Always the **Instagram footer**, cloned from the square Instagram template's footer in the linked file: `Data source: …` (bold prefix), then `OurWorldinData.org/<topic>` and `CC BY`. A source frame that carries a `Note: …` keeps it as a **first row** above those two. The source frame's own footer is removed. |
 | Extra height | **The chart fills it**, by chart type (Step 7): bar rows are re-spaced with taller bars; an axis chart's plot is stretched vertically with text, dots and tick marks moved rather than stretched; a map keeps its size and is centred in the taller band; anything else stops and asks. The chart keeps the source frame's own gaps above and below it. |
-| Knockout halos | Text with a **white outside stroke** (the halo that keeps an annotation legible over a line) and any **white backdrop** behind an annotation take the beige — bound to `Instagram/Beige Background` — because a white halo on beige is a visible outline. Flags and the logo keep their white. |
-| Checks | (1) every element inside the frame and its 16px margin; (2) a text diff against the source frame — only the footer may differ; (3) the `text-floor` and `ladder-sizes` rows of the parent skill's `verify_page.js` **type** slice. Nothing else. |
+| Knockout halos | Every **white stroke** that is a knockout — the outside stroke on annotation text, the white outline drawn under each line so crossing lines separate, a leader's outline — and any **white backdrop** behind an annotation take the beige, bound to `Instagram/Beige Background`, because white on beige is a visible halo. Flags and the logo keep their white. Settled: apply it, never ask. |
+| Checks | One read: every element inside the frame and its 16px margin, and a list of any white stroke or fill left outside the flags and logo. Then the screenshot. Nothing else. |
 | Delivery | The frame's **deep link**. No PNG export — the user exports from Figma (the Instagram family's export scale is **3×**, 1620×2025). |
 
 ## Prerequisites
@@ -132,24 +131,21 @@ renamed, and that is a stop, not something to paper over with a raw color. The i
 **trailing comma** (`S:<hash>,`); that comma is part of the id (gotcha 2). This read switches to the
 Templates page, so keep it in its own `use_figma` call, separate from the source-frame read.
 
-## Step 2 — Ask for what only the user knows
+## Step 2 — The topic slug, and nothing else
 
-One `AskUserQuestion`, not a drip:
+The one thing the frame does not carry is the topic for `OurWorldinData.org/<topic>`. **Infer it**
+when the chart's subject maps plainly onto an OWID topic page (emigrants → `migration`, data-center
+spending → `artificial-intelligence`, child mortality → `child-mortality`) and name your choice in
+the report so it can be corrected. Ask — one `AskUserQuestion`, one question — only when the mapping
+is genuinely ambiguous. It has to be a real topic-page slug.
 
-1. **Topic slug** for `OurWorldinData.org/<topic>` — propose one from the chart's subject
-   (e.g. `migration`). It has to be a real topic-page slug.
-2. **Anything the user noticed in the source** that should be fixed in the copy — and whether to fix
-   it in the original too (a wrong flag color, say). Don't go looking for such things yourself; this
-   is the user's call.
+Nothing else is asked. Not whether the user noticed something to fix in the source, not which
+chart type this is, not whether halos should take the beige — the decisions table settles all of it.
 
-Everything else is fixed by the table above.
+## Step 3 — Announce and go
 
-## Step 3 — Propose, then wait
-
-Show in one message: the new frame name, where it will sit, the topic line, the header restyle
-(25→28, 16→18, or why the source sizes stay), the footer change, the chart type you classified
-and the layout numbers you computed for it (band, and bar height and pitch for bars, or the stretch
-factor for an axis chart). **Wait for explicit approval.** After it, iterate freely on the same frame without re-asking.
+One sentence in chat — which frame, what it becomes, where it lands — then straight into Step 4.
+No plan, no approval. The user sees the finished frame in Step 8 and iterates from there.
 
 ## Step 4 — Clone, resize, recolor (one write)
 
@@ -271,9 +267,12 @@ Text sizes on the chart itself are never changed — only the header may (Step 5
 
 ## Step 7b — Halos and backdrops take the beige (one write)
 
-A DI built on white knocks its annotations out with a **white outside stroke** on the text (typically
-3px) or a white-filled frame behind it. On the beige frame that white is a visible outline around
-every word. Sweep the clone and rebind those to the background style:
+A DI built on white uses white as a knockout in three recognisable shapes: an **outside stroke on
+text** (typically 3px), a **white outline under a line or leader** — a second vector with the *same
+path* as the coloured one and a *wider* stroke, drawn beneath it so crossing lines separate — and a
+**white-filled frame behind an annotation**. On the beige frame every one of those is a visible
+halo. Sweep the clone and rebind exactly those three to the background style — **this is settled,
+apply it without asking**:
 
 ```js
 const BEIGE = STYLE.beige;                                            // Instagram/Beige Background, resolved in Step 1
@@ -281,54 +280,47 @@ const isWhite = p => p && p.type === "SOLID" && p.visible !== false && p.color.r
 const keep = new Set([LOGO_ID, ...FLAG_IDS]);                        // white belongs there
 for (const n of clone.findAll(() => true)) {
   if ([...keep].some(id => n.id === id || (n.parent && n.parent.id === id))) continue;
-  if (n.type === "TEXT" && n.strokes.some(isWhite)) await n.setStrokeStyleIdAsync(BEIGE);      // halo
+  const whiteStroke = "strokes" in n && n.strokes !== figma.mixed && n.strokes.some(isWhite);
+  if (n.type === "TEXT" && whiteStroke) await n.setStrokeStyleIdAsync(BEIGE);                 // text halo
+  if (n.type === "VECTOR" && whiteStroke && n.vectorPaths.length) {
+    const path = n.vectorPaths[0].data;                              // an outline shares its line's path…
+    const twin = clone.findOne(k => k !== n && k.type === "VECTOR" && k.vectorPaths.length      // …wherever the line lives
+      && k.vectorPaths[0].data === path && k.strokes.some(p => p.type === "SOLID" && !isWhite(p)));
+    if (twin && n.strokeWeight > twin.strokeWeight) await n.setStrokeStyleIdAsync(BEIGE);      // …with a wider stroke
+  }
   if (n.type === "FRAME" && n.children.some(c => c.type === "TEXT") && n.fills.some(isWhite))
-    await n.setFillStyleIdAsync(BEIGE);                                                          // backdrop
+    await n.setFillStyleIdAsync(BEIGE);                            // annotation backdrop
 }
 ```
 
-Leave every other white alone — a white stripe in a flag, the logo's lettering, a white value label
-sitting inside a dark bar — and **list what you left** in the report, so a white the sweep did not
+Leave every other white alone. White that sits **on colour** is ink, not a knockout, and must stay
+white: the ring around a dot on a stacked area, a white leader or label inside a filled area, a
+white value label inside a dark bar, a flag's stripe, the logo's lettering. The predicate above
+never matches those — a dot's ring has no same-path twin, a leader inside a fill has none either —
+so anything white the sweep skipped is listed, not changed. **List what you left** in the report, so a white the sweep did not
 recognise as a knockout is a known item rather than a surprise. A flag is any FRAME named
 `<Country> (<ISO>)` or `Clip path group` beside an entity label; the logo is the top-right FRAME.
 
 ## Step 8 — Check, show, deliver
 
-**Checks — one message, three calls in parallel** (all read-only):
-
-1. **Geometry and whites** (`use_figma`): every child of the clone inside `0 ≤ x, x+w ≤ 540, 0 ≤ y,
-   y+h ≤ 675` and, for non-GROUP nodes, inside the 16px margin; report breaches with node id and
-   name — and say which the source frame already had, since an inherited overhang is the designer's
-   choice, not a defect of this run. In the same pass list every remaining **pure-white stroke or
-   fill** outside the logo and the flags (Step 7b).
-2. **Text diff** (`use_figma`): collect `characters` of every TEXT under the source and under the
-   clone, as multisets. The only allowed differences are the footer: the old source/CC BY nodes gone,
-   the new source (same text), topic line and CC BY present. Anything else is a defect.
-3. **Type slice** of the parent's checker:
-
-   ```bash
-   .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js \
-       --rows type --frame-id <clone id>
-   ```
-
-   Set `chartName` in its `CONFIG` to the plot group's name, paste the output verbatim into one
-   `use_figma`, and read **`text-floor` and `ladder-sizes`**. The other rows in that slice assume the
-   parent skill's template structure — a header that is an auto-layout frame. A hand-built DI has
-   loose title and subtitle nodes, so the script takes the footer for the header: `text-hierarchy`
-   then measures plot text against the footer's 14px and fails wrongly, and `source-line-weight`
-   finds no footer. Report those two as *not judged*, not as failures, and name the `SKIPPED` rows —
-   they are owned by tools this skill does not run.
+**One read-only check, one call** (`use_figma`): every child of the clone inside `0 ≤ x, x+w ≤ 540,
+0 ≤ y, y+h ≤ 675` and, for non-GROUP nodes, inside the 16px margin; report breaches with node id and
+name — and say which the source frame already had, since an inherited overhang is the designer's
+choice, not a defect of this run. In the same pass list every remaining **pure-white stroke or fill**
+outside the logo and the flags (Step 7b). No text diff, no run of the parent skill's checker: the
+scripts never touch text, and the parent's type rows misread a hand-built DI.
 
 Then `get_screenshot` the clone at `maxDimension: 1350` (natural size, 540×675) and download it.
-Look at it. Fix, re-check, repeat. Re-run **all three** checks after the last change.
+Look at it — this is the check that matters. Fix, re-check, repeat; re-run the read after the last
+change.
 
 **Deliver:**
 
 1. The deep link, once: `https://www.figma.com/design/<fileKey>/<FileName>?node-id=<a>-<b>` (colon
    → hyphen). Deep-link the frame, not the page.
-2. **Report** what was created (page, frame name, node id, deep link), the layout numbers, the check
-   results including the `SKIPPED` rows, and what stays open — the
-   design review above all: **you cannot read Figma comments**, so never report it as clean.
+2. **Report** what was created (page, frame name, node id, deep link), the topic slug you chose, the
+   layout numbers, the check result, and what stays open — the design review above all: **you cannot
+   read Figma comments**, so never report it as clean.
 
 ## Gotchas
 
