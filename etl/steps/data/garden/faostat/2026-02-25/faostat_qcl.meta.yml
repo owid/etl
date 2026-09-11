@@ -137,12 +137,21 @@ tables:
       cottonseed_oil__00000331__production__005510__tonnes:
         presentation:
           title_public: Cottonseed oil production
+      eggs__00001783__laying__5313pc__animals_per_capita:
+        presentation:
+          title_public: Number of laying birds (hens and other birds) per capita
       eggs__00001783__production__005510__tonnes:
         presentation:
           title_public: Egg production
       eggs__00001783__yield__005424__kilograms_per_animal:
         presentation:
           title_public: Egg production per bird
+      eggs_from_hens__00001062__laying__5313pc__animals_per_capita:
+        presentation:
+          title_public: Number of laying hens per capita
+      eggs_from_other_birds__excl__hens__00001091__laying__5313pc__animals_per_capita:
+        presentation:
+          title_public: Number of laying birds (excluding hens) per capita
       grapes__00000560__production__005510__tonnes:
         presentation:
           title_public: Grape production
@@ -239,6 +248,9 @@ tables:
       meat__turkey__00001080__producing_or_slaughtered_animals__005321__animals:
         presentation:
           title_public: Number of turkeys slaughtered for meat
+      milk__00001780__milk_animals__5318pc__animals_per_capita:
+        presentation:
+          title_public: Number of animals used to produce milk per capita
       milk__00001780__production__005510__tonnes:
         presentation:
           title_public: Milk production
@@ -689,7 +701,7 @@ tables:
           title_public: Number of eggs produced from hens
       eggs_from_hens__00001062__eggs_produced__5513pc__eggs_per_capita:
         presentation:
-          title_public: Egg production from hens per capita
+          title_public: Number of eggs produced from hens per capita
       eggs_from_hens__00001062__laying__005313__animals:
         presentation:
           title_public: Number of laying hens
@@ -713,7 +725,7 @@ tables:
           title_public: Number of eggs produced from birds other than hens
       eggs_from_other_birds__excl__hens__00001091__eggs_produced__5513pc__eggs_per_capita:
         presentation:
-          title_public: Egg production from birds other than hens per capita
+          title_public: Number of eggs produced from birds other than hens per capita
       eggs_from_other_birds__excl__hens__00001091__laying__005313__animals:
         presentation:
           title_public: Number of laying birds (excluding hens)
