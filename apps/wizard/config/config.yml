@@ -38,7 +38,29 @@ main:
     icon: ":material/menu_book:"
 
 sections:
-  - title: "Create"
+  - title: "QA"
+    group: "ETL work"
+    description: |-
+      Check data and chart changes.
+    apps:
+      - title: "Chart diff"
+        alias: chart-diff
+        entrypoint: app_pages/chart_diff/app.py
+        description: Compare charts & MDIMs, staging vs. prod
+        maintainer: "@mojmir"
+        icon: ":material/difference:"
+        disable:
+          production: True
+      - title: "Anomalist"
+        alias: anomalist
+        entrypoint: app_pages/anomalist/app.py
+        description: List anomalies in data
+        maintainer: "@lucas"
+        icon: ":material/planner_review:"
+        disable:
+          production: True
+
+  - title: "Create step"
     group: "ETL work"
     description: |-
       Create an ETL step.
@@ -72,28 +94,6 @@ sections:
         entrypoint: app_pages/fasttrack/app.py
         description: "Import data from a Google Sheet or CSV."
         icon: ":material/fast_forward:"
-
-  - title: "QA"
-    group: "ETL work"
-    description: |-
-      Check data and chart changes.
-    apps:
-      - title: "Chart diff"
-        alias: chart-diff
-        entrypoint: app_pages/chart_diff/app.py
-        description: Compare charts & MDIMs, staging vs. prod
-        maintainer: "@mojmir"
-        icon: ":material/difference:"
-        disable:
-          production: True
-      - title: "Anomalist"
-        alias: anomalist
-        entrypoint: app_pages/anomalist/app.py
-        description: List anomalies in data
-        maintainer: "@lucas"
-        icon: ":material/planner_review:"
-        disable:
-          production: True
 
   - title: "Data tools"
     group: "ETL work"
