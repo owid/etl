@@ -87,29 +87,52 @@ graphers, `climate_change_impacts_annual`/`_monthly`, and `yearly_burned_area`.
 2. Run each updateable chain through the `/update-dataset` flow on that branch, all targeting
    today's date as `<new_version>` so they land on a common version. Bump the aggregate
    (`climate_change_impacts`) only after its sources are done, so it picks up the new versions
-   once rather than repeatedly.
-3. Chart remap on staging via the Indicator Upgrader. The version bump mints new variable IDs
+   once rather than repeatedly. Keep the DAG's nesting and comment headers: version-substitute
+   the existing UPDATEABLE block instead of keeping the flat block `etl update` appends.
+3. **Do not remove or archive the old steps yet.** The previous versions (their step files,
+   their snapshot folders *and* their `dag/climate.yml` entries) stay active until the review is
+   done. Two things depend on them being present:
+   - The reviewer compares consecutive versions with the `compare-previous-version` VS Code
+     extension, which diffs each step file against the same-named file in the nearest lower
+     version folder. Delete the old folders and there is nothing to compare against.
+   - The chart remap (step 4) finds each dataset's predecessor through the version tracker,
+     which reads only the *active* DAG. Remove the old DAG entries first and
+     `etl indicator-upgrade auto` reports "No dataset migrations detected".
+
+   If the old entries were already removed, restore them: `git checkout <base> -- <old folders>
+   dag/archive/climate.yml`, and append the old UPDATEABLE block to `dag/climate.yml` under a
+   comment that says it is kept until the review is done.
+4. Chart remap on staging via the Indicator Upgrader. The version bump mints new variable IDs
    for every grapher dataset, and charts do **not** follow on their own; until the remap, Chart
-   Diff shows nothing. `etl indicator-upgrade auto` reports "No dataset migrations detected" for
-   this batch, so run one explicit `match` per dataset pair, then a single `upgrade`:
+   Diff shows nothing. With both versions in the DAG, automatic detection works:
 
    ```bash
-   # one line per grapher dataset (20 pairs), ids from `datasets` on staging; note that
-   # `datasets.catalogPath` has no `grapher/` prefix, and that staging can hold *two* old
-   # wildfire versions (the batch's and the last weekly one): pair the one that carries charts.
-   STAGING=1 .venv/bin/etl indicator-upgrade match -old <old_id> -new <new_id> --perfect-match-only
-   STAGING=1 .venv/bin/etl indicator-upgrade upgrade --dry-run
-   STAGING=1 .venv/bin/etl indicator-upgrade upgrade
+   STAGING=1 .venv/bin/etl indicator-upgrade auto --dry-run
+   STAGING=1 .venv/bin/etl indicator-upgrade auto
    ```
 
-   Every old variable a chart uses must get a perfect match ("All variables in the old dataset
-   have been matched"); "N unmatched variables in new dataset" is normal (indicators no chart
-   uses yet). Afterwards, check that the per-dataset chart counts on staging equal production's
-   and that no `<old>` dataset still carries a chart (the 2026-09-11 run moved 66 charts and 3
-   narrative charts, 70 chart-dataset pairs). **Watch the once-off cases**: any dataset moving
-   from `latest` or changing namespace needs its remap reviewed explicitly (see below).
-4. Verify on staging: Anomalist + Chart Diff (enable "Show all charts").
-5. **One** announcement: run [`/data-updates-comms`](../data-updates-comms/SKILL.md) for the
+   It detects 18 of the 20 pairs. The two `climate_change_impacts_*` grapher steps are declared
+   only under the explorer's `viz://` entry and the version tracker does not list them; remap
+   those two by hand (`match -old <id> -new <id> --perfect-match-only`, then `upgrade`; dataset
+   ids from `datasets` on staging, whose `catalogPath` has no `grapher/` prefix). Staging can
+   hold *two* old wildfire versions (the batch's and the last weekly one): pair the one that
+   carries charts. Afterwards, check that no old dataset still carries a chart and that the
+   per-dataset chart counts on staging equal production's (the 2026-09-11 run moved 66 charts
+   and 3 narrative charts, 70 chart-dataset pairs). **Watch the once-off cases**: any dataset
+   moving from `latest` or changing namespace needs its remap reviewed explicitly (see below).
+5. Hand off for review. In the PR body and in the chat, **list exactly which files changed in
+   content** relative to the previous version, so the reviewer does not have to open all ~110
+   files. Compute it with `cmp` between the old and new version folders; in a normal month only
+   the snapshot folder differs (the `.dvc` files and any edited snapshot script), and every
+   meadow, garden and grapher file is byte-identical to its predecessor. Then Anomalist + Chart
+   Diff on staging (enable "Show all charts").
+6. **Only when the user says the review is done**, archive the old versions, as the last
+   commits before merge: remove the old block from `dag/climate.yml` and the old step and
+   snapshot folders (`git rm -r`) → commit → `etl archive-dag` (it reads *committed* history)
+   → commit `dag/archive/climate.yml`. It should add exactly the old climate steps (48 for a
+   full batch). **Remind the user of this step** at the end of every hand-off; it is easy to
+   forget and the PR must not merge with both versions active.
+7. **One** announcement: run [`/data-updates-comms`](../data-updates-comms/SKILL.md) for the
    combined batch, post to #data-updates-comms, and draft the single `/latest` post. Do not
    produce per-dataset announcements.
 
