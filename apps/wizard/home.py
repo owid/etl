@@ -17,6 +17,8 @@ st.set_page_config(
 
 # Badge color for each environment the wizard can run in.
 ENV_COLORS = {"dev": "green", "staging": "orange", "production": "red"}
+# Width (px) of each section tile. Tiles wrap, so a wide screen shows four per row, a laptop three, a phone one.
+TILE_WIDTH = 260
 # Width (px) of the link in each row: wide enough for the longest app name, so the help icons line up.
 LINK_WIDTH = 200
 
@@ -50,12 +52,11 @@ def st_show_home():
             st.caption(f"streamlit {st.__version__}", width="content")
 
     #########################
-    # DIRECTORY: two page columns of groups (create, sections, links, legacy)
+    # DIRECTORY: one bordered tile per group (create, sections, links, legacy), as many per row as fit
     #########################
-    left, right = _split_balanced(_groups())
-    for col, column_groups in zip(st.columns(2, gap="medium"), (left, right)):
-        with col:
-            for group in column_groups:
+    with st.container(horizontal=True, gap="small"):
+        for group in _groups():
+            with st.container(border=True, width=TILE_WIDTH, height="stretch"):
                 _render_group(group)
 
 
@@ -73,18 +74,6 @@ def _groups() -> list[dict]:
     if legacy_apps:
         groups.append({"title": "Legacy", "description": WIZARD_CONFIG["legacy"]["description"], "apps": legacy_apps})
     return groups
-
-
-def _split_balanced(groups: list[dict]) -> tuple[list[dict], list[dict]]:
-    """Split groups into two columns of roughly equal height (one row per app plus a header per group)."""
-    weights = [len(g["apps"]) + 1.5 for g in groups]
-    total, acc, cut = sum(weights), 0.0, len(groups)
-    for i, w in enumerate(weights):
-        acc += w
-        if acc >= total / 2:
-            cut = i + 1
-            break
-    return groups[:cut], groups[cut:]
 
 
 def _render_group(group: dict) -> None:
