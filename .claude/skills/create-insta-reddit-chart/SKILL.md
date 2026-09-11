@@ -44,7 +44,7 @@ before/after.
 | Placement | On the **same page** as the source frame, **100px to its right**, same `y`. Never a new page. |
 | Frame name | **`<source frame name>-insta-reddit`** — `my-chart-DI` → `my-chart-DI-insta-reddit`. |
 | Title / subtitle | Rebound to the Instagram **portrait** text styles: `Instagram/Title (portrait)` (Playfair Display SemiBold **28**, line height 32) and `Instagram/Subtitle (portrait)` (Lato **18**), fill styles `Instagram/Title` and `Instagram/Subtitle` — **unless that makes the header more than 30px taller than in the source**, in which case the source's own sizes stay (Step 5). Text content unchanged either way. |
-| Footer | Always the **Instagram footer**, cloned from the square Instagram template (`25518:14`): `Data source: …` (bold prefix), then `OurWorldinData.org/<topic>` and `CC BY`. A source frame that carries a `Note: …` keeps it as a **first row** above those two. The source frame's own footer is removed. |
+| Footer | Always the **Instagram footer**, cloned from the square Instagram template's footer in the linked file: `Data source: …` (bold prefix), then `OurWorldinData.org/<topic>` and `CC BY`. A source frame that carries a `Note: …` keeps it as a **first row** above those two. The source frame's own footer is removed. |
 | Extra height | **The chart fills it**, by chart type (Step 7): bar rows are re-spaced with taller bars; an axis chart's plot is stretched vertically with text, dots and tick marks moved rather than stretched; a map keeps its size and is centred in the taller band; anything else stops and asks. The chart keeps the source frame's own gaps above and below it. |
 | Knockout halos | Text with a **white outside stroke** (the halo that keeps an annotation legible over a line) and any **white backdrop** behind an annotation take the beige — bound to `Instagram/Beige Background` — because a white halo on beige is a visible outline. Flags and the logo keep their white. |
 | Checks | (1) every element inside the frame and its 16px margin; (2) a text diff against the source frame — only the footer may differ; (3) the `text-floor` and `ladder-sizes` rows of the parent skill's `verify_page.js` **type** slice. Nothing else. |
@@ -63,7 +63,7 @@ before/after.
 
 Every Figma call costs a network hop plus a model turn, so **batch independent reads into one
 message** and keep writes to **one `use_figma` per message** (two writes to the same page in one
-message race each other). A build is about **8 Figma calls**: 2 reads, 4 writes, 2 renders.
+message race each other). A build is about **9 Figma calls**: 3 reads, 4 writes, 2 renders.
 
 ## Step 1 — Read the source frame
 
@@ -105,18 +105,32 @@ From that, identify by **position and type, never by name** (names are `Vector`,
 **Stop if** the frame is not 540×540 (every rule below assumes the DI/mobile proportions), or a bar
 chart's bars are not all one height.
 
-**Read the styles you will bind, don't hardcode them:** `figma.getLocalTextStylesAsync()` and
-`getLocalPaintStylesAsync()`, matched by name. For reference, the ids in the 2026 file:
+**Resolve every style and template by name in the linked file — never by a remembered id.** Node
+and style ids are file-local, and the yearly Charts file changes every January, so an id copied from
+one year returns `null` in the next and `.clone()` on it aborts the build. In the same read as the
+frame survey, collect:
 
-| Style | Kind | Id (note the trailing comma — it is part of the id) |
-|---|---|---|
-| `Instagram/Beige Background` | paint | `S:f8453340ca58fa189b3dd4ac749d6bacfcff537f,` |
-| `Instagram/Title (portrait)` | text, 28/32 | `S:699119cfe058395e284747c79560082a8d3d9c7b,` |
-| `Instagram/Subtitle (portrait)` | text, 18 | `S:6c8c6b7defcbd52b397fb7188a5b3e0f50cf1cc4,` |
-| `Instagram/Title` | paint #2D2E2D | `S:dec80a5977abe523d5d2526dac25dcca4f704dfc,` |
-| `Instagram/Subtitle` | paint #5B5B5B | `S:3368034c398e8296f47580372599016b2cb7b1b9,` |
-| `Instagram/Source` | paint #858585 | `S:86a2b07fc2581bbc9a9296888904630ad838b60b,` |
-| Square Instagram footer (template node) | frame | `25518:14` on the ` 📑 Templates` page |
+```js
+const paint = Object.fromEntries((await figma.getLocalPaintStylesAsync()).map(st => [st.name, st.id]));
+const text  = Object.fromEntries((await figma.getLocalTextStylesAsync()).map(st => [st.name, st.id]));
+const STYLE = {
+  beige:            paint["Instagram/Beige Background"],   // frame fill, halos, backdrops
+  titleText:        text["Instagram/Title (portrait)"],    // Playfair Display SemiBold 28 / 32
+  subtitleText:     text["Instagram/Subtitle (portrait)"], // Lato 18
+  titlePaint:       paint["Instagram/Title"],              // #2D2E2D
+  subtitlePaint:    paint["Instagram/Subtitle"],           // #5B5B5B
+};
+// the square Instagram template's footer: bottommost auto-layout child of that frame, on the Templates page
+const templates = figma.root.children.find(pg => pg.name.trim() === "📑 Templates");
+await figma.setCurrentPageAsync(templates);
+const square = templates.findOne(n => n.type === "FRAME" && n.name === "InstagramPost_Template_English");
+const FOOTER_TEMPLATE_ID = square.children.filter(c => c.layoutMode && c.layoutMode !== "NONE").sort((a, b) => b.y - a.y)[0].id;
+```
+
+Every value must be non-empty before you go on — a missing style name means the file's styles were
+renamed, and that is a stop, not something to paper over with a raw color. The ids come back with a
+**trailing comma** (`S:<hash>,`); that comma is part of the id (gotcha 2). This read switches to the
+Templates page, so keep it in its own `use_figma` call, separate from the source-frame read.
 
 ## Step 2 — Ask for what only the user knows
 
@@ -148,7 +162,7 @@ page.appendChild(clone);
 clone.x = src.x + src.width + 100; clone.y = src.y;
 clone.name = src.name + "-insta-reddit";
 clone.resizeWithoutConstraints(540, 675);          // NOT resize(): see gotcha 1
-await clone.setFillStyleIdAsync(BEIGE_ID);           // id WITH its trailing comma: gotcha 2
+await clone.setFillStyleIdAsync(STYLE.beige);        // resolved by name in Step 1; id WITH its trailing comma: gotcha 2
 // return clone.id and a [source child id → clone child id] map: children keep their order
 return { createdNodeIds: [clone.id], map: src.children.map((c, i) => [c.id, clone.children[i].id]) };
 ```
@@ -161,7 +175,7 @@ took (gotcha 2).
 Load `Playfair Display SemiBold` and `Lato Regular` first (`loadFontAsync`), then on the clone's
 title and subtitle:
 
-1. `await title.setTextStyleIdAsync(TITLE_PORTRAIT_ID)`; `await title.setFillStyleIdAsync(INSTAGRAM_TITLE_PAINT)`.
+1. `await title.setTextStyleIdAsync(STYLE.titleText)`; `await title.setFillStyleIdAsync(STYLE.titlePaint)`.
 2. A DI title is `WIDTH_AND_HEIGHT` (auto-width). At 28px it may run into the logo, so give it the
    templates' title box: `title.resize(428, title.height)` **then** `title.textAutoResize = "HEIGHT"`
    — `resize()` resets the sizing mode, so the order matters (parent GOTCHAS).
@@ -183,7 +197,7 @@ styles.
 ```js
 await figma.loadFontAsync({family:"Lato", style:"Bold"});
 await figma.loadFontAsync({family:"Lato", style:"Regular"});
-const footer = (await figma.getNodeByIdAsync("25518:14")).clone();   // square IG footer, 508×36
+const footer = (await figma.getNodeByIdAsync(FOOTER_TEMPLATE_ID)).clone();   // square IG footer, 508×36 (Step 1)
 clone.appendChild(footer); footer.x = 16; footer.y = 675 - 16 - 36;   // → 623
 const src = footer.children[0];                                        // "Data source: …" row
 src.characters = SOURCE_TEXT;                                          // copied from the old footer
@@ -261,7 +275,7 @@ A DI built on white knocks its annotations out with a **white outside stroke** o
 every word. Sweep the clone and rebind those to the background style:
 
 ```js
-const BEIGE = "S:f8453340ca58fa189b3dd4ac749d6bacfcff537f,";           // Instagram/Beige Background
+const BEIGE = STYLE.beige;                                            // Instagram/Beige Background, resolved in Step 1
 const isWhite = p => p && p.type === "SOLID" && p.visible !== false && p.color.r > 0.99 && p.color.g > 0.99 && p.color.b > 0.99;
 const keep = new Set([LOGO_ID, ...FLAG_IDS]);                        // white belongs there
 for (const n of clone.findAll(() => true)) {
