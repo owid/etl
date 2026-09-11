@@ -2,8 +2,9 @@
 // taller (540×540 → 540×675). Run through `use_figma` with CONFIG filled in. One write, one page.
 //
 // What it does, in order:
-//   1. finds the bars: VECTOR children whose path is a plain rectangle, sharing one x (the axis) and
-//      one height; sorts them top to bottom into rows;
+//   1. finds the bars: VECTOR children whose path is a plain rectangle at the chart's one bar height
+//      (the modal rectangle height), grouped into rows by y — a stacked or two-sided bar chart has
+//      several rectangles per row, and every one of them is a bar;
 //   2. computes the band it may fill: [headerBottom + gapBelowHeader, footerTop - gapAboveFooter];
 //   3. resizes each bar to barHeight and places row i at bandTop + inset + i * pitch, with
 //      pitch = (band - 2*inset - barHeight) / (rows - 1);
@@ -37,14 +38,19 @@ const isRect = v => v.type === "VECTOR" && v.vectorPaths.length === 1 &&
 const mode = arr => { const m = new Map(); for (const a of arr) m.set(a, (m.get(a) || 0) + 1);
   return [...m.entries()].sort((a, b) => b[1] - a[1])[0][0]; };
 
-// 1. bars
+// 1. bars — every rectangle at the modal height, whatever its x (stacked segments, negative bars)
 const rects = frame.children.filter(isRect);
 if (rects.length < 2) throw new Error("fewer than two rectangle vectors — not a bar chart I recognise");
-const axisX = mode(rects.map(r => Math.round(r.x)));
 const oldH = mode(rects.map(r => Math.round(r.height)));
-const bars = rects.filter(r => Math.round(r.x) === axisX && Math.round(r.height) === oldH).sort((a, b) => a.y - b.y);
-const oldBarY = bars.map(b => b.y);
-const n = bars.length;
+const bars = rects.filter(r => Math.abs(r.height - oldH) <= 1);
+const nearMiss = rects.filter(r => !bars.includes(r) && Math.abs(r.height - oldH) <= 4);
+if (nearMiss.length) throw new Error("rectangles within 4px of the bar height but not equal to it — bars of two heights, refusing to guess: " + nearMiss.map(r => r.id).join(", "));
+// rows: distinct bar tops, merged when within 2px
+const oldBarY = [...new Set(bars.map(b => Math.round(b.y * 2) / 2))].sort((a, b) => a - b).reduce((acc, y) => (acc.length && y - acc[acc.length - 1] <= 2 ? acc : [...acc, y]), []);
+const rowIndexOfBar = b => { let best = 0, bd = Infinity; oldBarY.forEach((y, i) => { const d = Math.abs(b.y - y); if (d < bd) { bd = d; best = i; } }); return best; };
+const n = oldBarY.length;
+if (n < 2) throw new Error("only one bar row found");
+const axisX = mode(bars.map(r => Math.round(r.x)));
 
 // 2. band
 const bandTop = CONFIG.headerBottom + CONFIG.gapBelowHeader;
@@ -72,9 +78,9 @@ const visit = c => {
     for (const k of c.children) visit(k); return;                       // the `axes` group
   }
   if (barIds.has(c.id)) {
-    const i = bars.findIndex(b => b.id === c.id);
+    const i = rowIndexOfBar(c);
     c.resize(c.width, CONFIG.barHeight); c.y = newBarY[i];
-    moved.push({ id: c.id, row: i, bar: true, y: +c.y.toFixed(1), h: c.height });
+    moved.push({ id: c.id, row: i, bar: true, x: +c.x.toFixed(1), y: +c.y.toFixed(1), h: c.height });
     return;
   }
   const i = rowOf(c);
@@ -89,7 +95,7 @@ if (axis) { axis.vectorPaths = [{ windingRule: "NONZERO", data: `M 0 0 L 0 ${ban
 
 return {
   mutatedNodeIds: [...moved.map(m => m.id), ...(axis ? [axis.id] : [])],
-  rows: n, axisX, oldBarHeight: oldH, newBarHeight: CONFIG.barHeight,
+  rows: n, barsFound: bars.length, axisX, oldBarHeight: oldH, newBarHeight: CONFIG.barHeight,
   oldPitch: n > 1 ? +((oldBarY[n - 1] - oldBarY[0]) / (n - 1)).toFixed(1) : null,
   newPitch: +pitch.toFixed(1), band: { top: bandTop, bottom: bandBottom, height: band },
   axis: axis ? { id: axis.id, y: axis.y, h: axis.height } : "NOT FOUND",

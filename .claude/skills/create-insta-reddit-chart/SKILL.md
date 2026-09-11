@@ -97,7 +97,7 @@ From that, identify by **position and type, never by name** (names are `Vector`,
 
 | Chart | Tell | Step 7 rule |
 |---|---|---|
-| Horizontal bars | rectangle VECTORs sharing one `x` and one height, stacked in rows | re-space the rows |
+| Horizontal bars | rectangle VECTORs of one height, stacked in rows — one per row, or several per row when the bars are stacked or run both ways from the axis | re-space the rows |
 | Axis chart — line, stacked area, slope, column, scatter, small multiples | one plot GROUP holding horizontal gridlines (hairline VECTORs, `h < 1`) or a vertical axis, plus stroked polylines, filled areas, columns or dots | stretch the plot vertically |
 | Map | one group of hundreds of filled country VECTORs, no gridlines, usually a legend strip | keep its size, centre it |
 | Anything else — marimekko, combination, or a frame you cannot place in a row above | — | **stop and ask**, offering "centre it with whitespace" as the option you can execute |
@@ -218,7 +218,9 @@ impose gaps of your own — the person who built the frame chose those.
 
 **Bars — [`scripts/relayout_rows.js`](scripts/relayout_rows.js).** Fill its `CONFIG` (clone id,
 header bottom, footer top, the source's gaps, the ids to leave alone). It finds the bars (rectangle
-VECTORs sharing one `x` and one height), makes them **30px** tall, inset **7px** from each end of the
+VECTORs of the chart's one bar height, grouped into rows by their `y` — a stacked or two-sided bar
+chart has several rectangles per row and every one is resized), makes them **30px** tall, inset
+**7px** from each end of the
 band, at `pitch = (band − 14 − 30) / (rows − 1)`; moves every row companion (label, flag, value
 text) by its row's delta **plus 3px** — half the bar-height increase — so it stays centred; redraws
 the axis to span the band. Anything it could not assign to a row comes back as `unmatched`, and
@@ -242,8 +244,10 @@ group's box linearly onto the band and treats each descendant by what it is, nev
 It returns what it moved and stretched, and `unmatched` for any leaf it did not know how to treat —
 non-empty is a stop.
 
-**Maps.** Nothing is resized. Move the map group and its legend down by half the band's growth,
-`(newBand − oldBand) / 2`, so the whitespace splits evenly above and below.
+**Maps.** Nothing is resized. Centre the map-and-legend block in the **new** band: with the block's
+current top and height, `dy = (bandTop + (bandBottom − bandTop) / 2) − (blockTop + blockHeight / 2)`,
+and move the map group, the legend and any annotations by that `dy`. Don't shortcut it to half the
+band's growth — the band's top moves too whenever the header changed height.
 
 **Anything else.** Stop. Say what the frame holds and that no fill rule exists for it, offer the
 even-whitespace centring as the option you can execute, and wait.
