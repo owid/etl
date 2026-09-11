@@ -25,7 +25,7 @@ If you're modifying an existing explorer (adjusting chart text, swapping a catal
 
 ## When to use this skill
 
-- After a `/migrate-explorer-csv`, `/migrate-explorer-grapher`, or `/migrate-explorer-indicator-legacy` skill has produced (or already located) the upstream snapshot/meadow/garden/grapher chain, and now needs the explorer step.
+- After the `/migrate-explorer-grapher` skill has produced (or already located) the upstream snapshot/meadow/garden/grapher chain, and now needs the explorer step.
 - For a brand-new explorer where the data is already in ETL (skip directly to step 1).
 - When porting an existing explorer's view layout (e.g. full-YAML → table-driven, or moving FAUST text from per-view YAML up into indicator metadata).
 
