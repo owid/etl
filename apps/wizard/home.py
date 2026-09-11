@@ -45,7 +45,7 @@ def st_show_home():
     # HEADER
     #########################
     with st.container(horizontal=True, vertical_alignment="bottom", horizontal_alignment="distribute"):
-        st.title("Wizard 🪄", width="content")
+        st.title("Wizard", width="content")
         with st.container(horizontal=True, vertical_alignment="center", width="content"):
             st.badge(ENV, icon=":material/dns:", color=ENV_COLORS.get(ENV, "gray"))
             st.badge(OWID_ENV.conf.DB_HOST, icon=":material/database:", color="gray", help="Grapher database host.")
