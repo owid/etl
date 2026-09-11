@@ -288,7 +288,9 @@ ELEMENT_CODES_QCL = [
     "005513",  # Eggs produced (eggs).
     "5513pc",  # Eggs produced per capita (eggs per capita).
     "005313",  # Laying (animals).
+    "5313pc",  # Laying per capita (animals per capita).
     "005318",  # Milk animals (animals).
+    "5318pc",  # Milk animals per capita (animals per capita).
 ]
 
 # Elements from faostat_fbsc to include.
