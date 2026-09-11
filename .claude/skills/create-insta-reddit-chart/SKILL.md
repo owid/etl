@@ -267,11 +267,12 @@ Text sizes on the chart itself are never changed — only the header may (Step 5
 
 ## Step 7b — Halos and backdrops take the beige (one write)
 
-A DI built on white uses white as a knockout in three places: an **outside stroke on annotation
-text** (typically 3px), a **white outline drawn under each line** (a wider white copy of the line, so
-crossing lines separate) or under a leader, and a **white-filled frame behind an annotation**. On the
-beige frame every one of those is a visible halo. Sweep the clone and rebind them all to the
-background style — **this is settled, apply it without asking**:
+A DI built on white uses white as a knockout in three recognisable shapes: an **outside stroke on
+text** (typically 3px), a **white outline under a line or leader** — a second vector with the *same
+path* as the coloured one and a *wider* stroke, drawn beneath it so crossing lines separate — and a
+**white-filled frame behind an annotation**. On the beige frame every one of those is a visible
+halo. Sweep the clone and rebind exactly those three to the background style — **this is settled,
+apply it without asking**:
 
 ```js
 const BEIGE = STYLE.beige;                                            // Instagram/Beige Background, resolved in Step 1
@@ -279,15 +280,24 @@ const isWhite = p => p && p.type === "SOLID" && p.visible !== false && p.color.r
 const keep = new Set([LOGO_ID, ...FLAG_IDS]);                        // white belongs there
 for (const n of clone.findAll(() => true)) {
   if ([...keep].some(id => n.id === id || (n.parent && n.parent.id === id))) continue;
-  if ("strokes" in n && n.strokes !== figma.mixed && n.strokes.some(isWhite))
-    await n.setStrokeStyleIdAsync(BEIGE);                          // text halo, line outline, leader outline
+  const whiteStroke = "strokes" in n && n.strokes !== figma.mixed && n.strokes.some(isWhite);
+  if (n.type === "TEXT" && whiteStroke) await n.setStrokeStyleIdAsync(BEIGE);                 // text halo
+  if (n.type === "VECTOR" && whiteStroke && n.vectorPaths.length) {
+    const path = n.vectorPaths[0].data;                              // an outline shares its line's path…
+    const twin = n.parent.children.find(k => k !== n && k.type === "VECTOR" && k.vectorPaths.length
+      && k.vectorPaths[0].data === path && k.strokes.some(p => p.type === "SOLID" && !isWhite(p)));
+    if (twin && n.strokeWeight > twin.strokeWeight) await n.setStrokeStyleIdAsync(BEIGE);      // …with a wider stroke
+  }
   if (n.type === "FRAME" && n.children.some(c => c.type === "TEXT") && n.fills.some(isWhite))
     await n.setFillStyleIdAsync(BEIGE);                            // annotation backdrop
 }
 ```
 
-Leave every other white **fill** alone — a white stripe in a flag, the logo's lettering, a white
-value label sitting inside a dark bar — and **list what you left** in the report, so a white the sweep did not
+Leave every other white alone. White that sits **on colour** is ink, not a knockout, and must stay
+white: the ring around a dot on a stacked area, a white leader or label inside a filled area, a
+white value label inside a dark bar, a flag's stripe, the logo's lettering. The predicate above
+never matches those — a dot's ring has no same-path twin, a leader inside a fill has none either —
+so anything white the sweep skipped is listed, not changed. **List what you left** in the report, so a white the sweep did not
 recognise as a knockout is a known item rather than a surprise. A flag is any FRAME named
 `<Country> (<ISO>)` or `Clip path group` beside an entity label; the logo is the top-right FRAME.
 
