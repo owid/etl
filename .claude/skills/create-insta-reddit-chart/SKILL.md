@@ -318,9 +318,9 @@ change.
 
 1. The deep link, once: `https://www.figma.com/design/<fileKey>/<FileName>?node-id=<a>-<b>` (colon
    → hyphen). Deep-link the frame, not the page.
-2. **Report** what was created (page, frame name, node id, deep link), the layout numbers, the check
-   results including the `SKIPPED` rows, and what stays open — the
-   design review above all: **you cannot read Figma comments**, so never report it as clean.
+2. **Report** what was created (page, frame name, node id, deep link), the topic slug you chose, the
+   layout numbers, the check result, and what stays open — the design review above all: **you cannot
+   read Figma comments**, so never report it as clean.
 
 ## Gotchas
 
