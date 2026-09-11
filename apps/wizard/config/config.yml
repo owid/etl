@@ -13,8 +13,8 @@
 # Your app should have the following properties:
 # - title (str): Title of the app. This will be shown in the home page and sidebar menu of Wizard.
 # - alias (str): [not needed in etl.steps] Alias of the app. This is used if you want to directly access the app from the command line (e.g. `etlwiz [alias]`).
-# - description (str): One-line description of the app. Shown next to the app on the home page.
-# - maintainer (str): Slack handle of the person responsible for the app. Shown as a tooltip on the home page.
+# - description (str): One-line description of the app. Shown in the app's help tooltip on the home page.
+# - maintainer (str): Slack handle of the person responsible for the app. Shown in the app's help tooltip on the home page.
 # - entrypoint (str): Path to the main file of the app. This file should be the streamlit python script.
 # - icon (str): Emoji or material icon to show in the sidebar menu and home page. Use from https://fonts.google.com/icons?icon.set=Material+Symbols&icon.style=Rounded
 # - disable (bool): Whether the app is disabled in certain settings. To detect if the app is running in a remote setting, it checks the value of the environment variable `ENV`.

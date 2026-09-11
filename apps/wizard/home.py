@@ -17,8 +17,7 @@ st.set_page_config(
 
 # Badge color for each environment the wizard can run in.
 ENV_COLORS = {"dev": "green", "staging": "orange", "production": "red"}
-# Width (px) of the link in each row: wide enough for the longest app name, so the descriptions line up.
-# On narrow screens the description wraps onto the next line instead of being clipped.
+# Width (px) of the link in each row: wide enough for the longest app name, so the help icons line up.
 LINK_WIDTH = 200
 
 
@@ -98,24 +97,25 @@ def _render_group(group: dict) -> None:
             _render_app(app)
 
 
-def _maintainer_help(item: dict) -> str | None:
+def _help_text(item: dict) -> str:
+    """Tooltip of an app: its description, whether it is available here, and who maintains it."""
+    parts = [item.get("description", "")]
+    if not item.get("enable", True):
+        parts.append(f"Not available on `{ENV}`.")
     maintainer = item.get("maintainer")
-    if not maintainer:
-        return None
-    if isinstance(maintainer, list):
-        maintainer = ", ".join(maintainer)
-    return f"Maintainer: {maintainer}"
+    if maintainer:
+        if isinstance(maintainer, list):
+            maintainer = ", ".join(maintainer)
+        parts.append(f"Maintainer: {maintainer}")
+    return "\n\n".join(p for p in parts if p)
 
 
 def _render_app(item: dict) -> None:
-    """One row: the link (or a disabled button when the app is unavailable here) and the description."""
+    """One row: the link (or a disabled button when the app is unavailable here) and a help icon with the details."""
     title, icon = item["title"], item["icon"]
-    # The row wraps: on wide screens the description sits next to the link, on narrow ones it drops below it.
-    with st.container(horizontal=True, vertical_alignment="center", gap="small"):
+    with st.container(horizontal=True, vertical_alignment="center", gap=None):
         if item.get("enable", True):
-            st.page_link(
-                item["entrypoint"], label=f"**{title}**", icon=icon, help=_maintainer_help(item), width=LINK_WIDTH
-            )
+            st.page_link(item["entrypoint"], label=f"**{title}**", icon=icon, width=LINK_WIDTH)
         else:
             # A disabled tertiary button looks like a greyed-out page link (same padding, icon and font).
             st.button(
@@ -123,12 +123,11 @@ def _render_app(item: dict) -> None:
                 icon=icon,
                 type="tertiary",
                 disabled=True,
-                help=f"Not available on `{ENV}`.",
                 key=f"home-unavailable-{item['entrypoint']}",
                 width=LINK_WIDTH,
             )
-        if item.get("description"):
-            st.caption(item["description"])
+        # Description, availability and maintainer live in the tooltip, so rows stay one line at any width.
+        st.markdown("", help=_help_text(item), width="content")
 
 
 # Show the home page
