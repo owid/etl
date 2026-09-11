@@ -88,11 +88,11 @@ def _split_balanced(groups: list[dict]) -> tuple[list[dict], list[dict]]:
 
 
 def _render_group(group: dict) -> None:
-    """Section title with its description on the same line, then one row per app."""
+    """Section title with its description underneath, then one row per app."""
     with st.container(gap="xsmall"):
-        with st.container(horizontal=True, vertical_alignment="bottom", gap="small"):
-            st.markdown(f"##### {group['title']}", width="content")
-            st.caption(group["description"], width="content")
+        with st.container(gap=None):
+            st.markdown(f"##### {group['title']}")
+            st.caption(group["description"])
         for app in group["apps"]:
             _render_app(app)
 
