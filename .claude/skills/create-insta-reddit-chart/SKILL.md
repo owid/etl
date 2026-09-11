@@ -21,13 +21,12 @@ feed posts and Reddit. One image serves both destinations; nothing is Reddit-spe
 Where a decision was *not* made, this file says so and tells you to ask — don't fill the gap with
 a guess.
 
-**Model check, before anything else:** the session context names the running model. On **Fable**,
-recommend re-running on **Opus** (or **Sonnet** for a re-export) and continue only on the user's
-say-so — the same rule as [`/create-figma-chart`](../create-figma-chart/SKILL.md), which this skill
-leans on for everything it does not spell out.
-
-**The Charts file is shared.** Nothing is written to it before the user has seen the proposal
-(Step 3) and approved it. Reading the file needs no permission.
+**No gates.** The user asked for the frame, so build it: say in one line what you are about to do,
+write to the file, show the result, iterate on feedback. Do not stop for a plan review, do not
+recommend switching model, and do not ask a question the decisions table below already answers —
+every question that is allowed is named in Step 2, and there is at most one. This skill leans on
+[`/create-figma-chart`](../create-figma-chart/SKILL.md) for mechanics it does not spell out, **but
+not for its checkpoints**: that skill's approval step and model check do not apply here.
 
 **Say it in plain words.** The person asking is usually not a designer or a data scientist. Lead
 with what changed and why it matters; keep node ids, style ids and pixel arithmetic for the final
@@ -46,7 +45,7 @@ before/after.
 | Title / subtitle | Rebound to the Instagram **portrait** text styles: `Instagram/Title (portrait)` (Playfair Display SemiBold **28**, line height 32) and `Instagram/Subtitle (portrait)` (Lato **18**), fill styles `Instagram/Title` and `Instagram/Subtitle` — **unless that makes the header more than 30px taller than in the source**, in which case the source's own sizes stay (Step 5). Text content unchanged either way. |
 | Footer | Always the **Instagram footer**, cloned from the square Instagram template's footer in the linked file: `Data source: …` (bold prefix), then `OurWorldinData.org/<topic>` and `CC BY`. A source frame that carries a `Note: …` keeps it as a **first row** above those two. The source frame's own footer is removed. |
 | Extra height | **The chart fills it**, by chart type (Step 7): bar rows are re-spaced with taller bars; an axis chart's plot is stretched vertically with text, dots and tick marks moved rather than stretched; a map keeps its size and is centred in the taller band; anything else stops and asks. The chart keeps the source frame's own gaps above and below it. |
-| Knockout halos | Text with a **white outside stroke** (the halo that keeps an annotation legible over a line) and any **white backdrop** behind an annotation take the beige — bound to `Instagram/Beige Background` — because a white halo on beige is a visible outline. Flags and the logo keep their white. |
+| Knockout halos | Every **white stroke** that is a knockout — the outside stroke on annotation text, the white outline drawn under each line so crossing lines separate, a leader's outline — and any **white backdrop** behind an annotation take the beige, bound to `Instagram/Beige Background`, because white on beige is a visible halo. Flags and the logo keep their white. Settled: apply it, never ask. |
 | Checks | (1) every element inside the frame and its 16px margin; (2) a text diff against the source frame — only the footer may differ; (3) the `text-floor` and `ladder-sizes` rows of the parent skill's `verify_page.js` **type** slice. Nothing else. |
 | Delivery | The frame's **deep link**. No PNG export — the user exports from Figma (the Instagram family's export scale is **3×**, 1620×2025). |
 
@@ -132,24 +131,21 @@ renamed, and that is a stop, not something to paper over with a raw color. The i
 **trailing comma** (`S:<hash>,`); that comma is part of the id (gotcha 2). This read switches to the
 Templates page, so keep it in its own `use_figma` call, separate from the source-frame read.
 
-## Step 2 — Ask for what only the user knows
+## Step 2 — The topic slug, and nothing else
 
-One `AskUserQuestion`, not a drip:
+The one thing the frame does not carry is the topic for `OurWorldinData.org/<topic>`. **Infer it**
+when the chart's subject maps plainly onto an OWID topic page (emigrants → `migration`, data-center
+spending → `artificial-intelligence`, child mortality → `child-mortality`) and name your choice in
+the report so it can be corrected. Ask — one `AskUserQuestion`, one question — only when the mapping
+is genuinely ambiguous. It has to be a real topic-page slug.
 
-1. **Topic slug** for `OurWorldinData.org/<topic>` — propose one from the chart's subject
-   (e.g. `migration`). It has to be a real topic-page slug.
-2. **Anything the user noticed in the source** that should be fixed in the copy — and whether to fix
-   it in the original too (a wrong flag color, say). Don't go looking for such things yourself; this
-   is the user's call.
+Nothing else is asked. Not whether the user noticed something to fix in the source, not which
+chart type this is, not whether halos should take the beige — the decisions table settles all of it.
 
-Everything else is fixed by the table above.
+## Step 3 — Announce and go
 
-## Step 3 — Propose, then wait
-
-Show in one message: the new frame name, where it will sit, the topic line, the header restyle
-(25→28, 16→18, or why the source sizes stay), the footer change, the chart type you classified
-and the layout numbers you computed for it (band, and bar height and pitch for bars, or the stretch
-factor for an axis chart). **Wait for explicit approval.** After it, iterate freely on the same frame without re-asking.
+One sentence in chat — which frame, what it becomes, where it lands — then straight into Step 4.
+No plan, no approval. The user sees the finished frame in Step 8 and iterates from there.
 
 ## Step 4 — Clone, resize, recolor (one write)
 
@@ -271,9 +267,11 @@ Text sizes on the chart itself are never changed — only the header may (Step 5
 
 ## Step 7b — Halos and backdrops take the beige (one write)
 
-A DI built on white knocks its annotations out with a **white outside stroke** on the text (typically
-3px) or a white-filled frame behind it. On the beige frame that white is a visible outline around
-every word. Sweep the clone and rebind those to the background style:
+A DI built on white uses white as a knockout in three places: an **outside stroke on annotation
+text** (typically 3px), a **white outline drawn under each line** (a wider white copy of the line, so
+crossing lines separate) or under a leader, and a **white-filled frame behind an annotation**. On the
+beige frame every one of those is a visible halo. Sweep the clone and rebind them all to the
+background style — **this is settled, apply it without asking**:
 
 ```js
 const BEIGE = STYLE.beige;                                            // Instagram/Beige Background, resolved in Step 1
@@ -281,14 +279,15 @@ const isWhite = p => p && p.type === "SOLID" && p.visible !== false && p.color.r
 const keep = new Set([LOGO_ID, ...FLAG_IDS]);                        // white belongs there
 for (const n of clone.findAll(() => true)) {
   if ([...keep].some(id => n.id === id || (n.parent && n.parent.id === id))) continue;
-  if (n.type === "TEXT" && n.strokes.some(isWhite)) await n.setStrokeStyleIdAsync(BEIGE);      // halo
+  if ("strokes" in n && n.strokes !== figma.mixed && n.strokes.some(isWhite))
+    await n.setStrokeStyleIdAsync(BEIGE);                          // text halo, line outline, leader outline
   if (n.type === "FRAME" && n.children.some(c => c.type === "TEXT") && n.fills.some(isWhite))
-    await n.setFillStyleIdAsync(BEIGE);                                                          // backdrop
+    await n.setFillStyleIdAsync(BEIGE);                            // annotation backdrop
 }
 ```
 
-Leave every other white alone — a white stripe in a flag, the logo's lettering, a white value label
-sitting inside a dark bar — and **list what you left** in the report, so a white the sweep did not
+Leave every other white **fill** alone — a white stripe in a flag, the logo's lettering, a white
+value label sitting inside a dark bar — and **list what you left** in the report, so a white the sweep did not
 recognise as a knockout is a known item rather than a surprise. A flag is any FRAME named
 `<Country> (<ISO>)` or `Clip path group` beside an entity label; the logo is the top-right FRAME.
 
