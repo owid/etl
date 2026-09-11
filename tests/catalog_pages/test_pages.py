@@ -117,7 +117,9 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     sources = pd.read_csv(page_dir / "sources.csv")
     assert sources["label"].tolist() == ["Example Producer – Original dataset (2025)"]
     assert manifest["jsonld"] == "dataset.jsonld"
-    assert manifest["tables"] == ["owid_energy"]
+    assert manifest["tables"] == [
+        {"name": "owid_energy", "title": "owid_energy table", "description": None, "rows": 2, "columns": 3}
+    ]
     files = {entry["name"]: entry for entry in manifest["files"]}
     assert set(files) == {
         "owid_energy.csv",
@@ -154,7 +156,7 @@ def test_build_writes_one_csv_per_table(tmp_path: Path) -> None:
     assert (page_dir / "extra_1.csv").exists()
     manifest = json.loads((page_dir / "manifest.json").read_text())
     # The main table (named after the dataset) comes first.
-    assert manifest["tables"] == ["owid_energy", "extra_1"]
+    assert [table["name"] for table in manifest["tables"]] == ["owid_energy", "extra_1"]
     codebook = pd.read_csv(page_dir / "codebook.csv")
     assert codebook.columns.tolist()[:2] == ["table", "column"]
 

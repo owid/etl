@@ -87,11 +87,22 @@ def write_page_files(
 
     # One CSV per table; the download filename is the table name, which says what the file is once detached
     # from our folders.
+    tables: list[dict[str, Any]] = []
     for name in ordered_table_names(ds):
         table = ds[name]
         csv_name = f"{name}.csv"
-        pd.DataFrame(table.reset_index(drop=not table.primary_key)).to_csv(target_dir / csv_name, index=False)
+        flat = pd.DataFrame(table.reset_index(drop=not table.primary_key))
+        flat.to_csv(target_dir / csv_name, index=False)
         register(csv_name, "csv", table=name)
+        tables.append(
+            {
+                "name": name,
+                "title": table.metadata.title,
+                "description": table.metadata.description,
+                "rows": int(len(flat)),
+                "columns": int(len(flat.columns)),
+            }
+        )
 
     # One workbook with every table, the codebook, the sources and the README. Refused, not truncated, when a
     # table exceeds Excel's row limit.
@@ -133,7 +144,8 @@ def write_page_files(
         "readme": README_FILENAME,
         "codebook": CODEBOOK_FILENAME,
         "sources": SOURCES_FILENAME,
-        "tables": list(ordered_table_names(ds)),
+        # First entry is the main table (the one named after the dataset).
+        "tables": tables,
         "files": files,
     }
     if jsonld_written:

@@ -106,6 +106,8 @@ dataset:
     - Pablo Rosado
 tables:
   owid_energy:
+    title: Energy dataset
+    description: One row per country (or region) and year, with every indicator as a column.
     variables:
       population:
         title: Population

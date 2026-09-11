@@ -325,7 +325,7 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
         main = [origin_label(origin) for origin in origins[:MAIN_SOURCES_IN_CITATION]]
         citation += f". Based on {'; '.join(main)}"
         if len(origins) > MAIN_SOURCES_IN_CITATION:
-            citation += " and other sources (see above)"
+            citation += " and other sources"
     citation += "."
     if url:
         citation += f" Retrieved from {url}."
