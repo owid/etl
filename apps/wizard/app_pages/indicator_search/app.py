@@ -5,7 +5,7 @@ import pandas as pd
 import streamlit as st
 from structlog import get_logger
 
-from apps.wizard.utils.components import st_horizontal, st_multiselect_wider, url_persist
+from apps.wizard.utils.components import st_multiselect_wider, url_persist
 from etl.config import OWID_ENV, SEARCH_API_URL
 from etl.http import session as http_session
 
@@ -182,7 +182,7 @@ input_string = url_persist(st.text_input)(
 )
 
 st_multiselect_wider()
-with st_horizontal():
+with st.container(horizontal=True, vertical_alignment="center"):
     # Filter indicators
     selection = st.segmented_control(
         "Indicator status",

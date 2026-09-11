@@ -24,7 +24,7 @@ from apps.wizard.app_pages.fasttrack.utils import (
     UPDATE_GSHEET,
     set_states,
 )
-from apps.wizard.utils.components import config_style_html, preview_file, st_horizontal
+from apps.wizard.utils.components import preview_file
 from etl import config
 from etl.command import main as etl_main
 from etl.paths import DAG_DIR
@@ -76,7 +76,6 @@ def reset_states() -> None:
 CURRENT_DIR = Path(__file__).parent
 DAG_FASTTRACK_PATH = DAG_DIR / "fasttrack.yml"
 # Config style
-config_style_html()
 # Logger
 log = get_logger()
 
@@ -145,7 +144,7 @@ IMPORT_OPTIONS = {
 #     horizontal=True,
 # )
 
-with st_horizontal(vertical_alignment="flex-end", justify_content="space-between"):
+with st.container(horizontal=True, vertical_alignment="bottom", horizontal_alignment="distribute"):
     import_method = st.segmented_control(
         label="How do you want to import the dataset?",
         options=IMPORT_OPTIONS.keys(),
