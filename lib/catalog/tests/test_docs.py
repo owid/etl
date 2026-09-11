@@ -153,11 +153,9 @@ def test_readme_sections(tmp_path):
     assert "## License\n\nThis dataset is published under CC BY 4.0" in readme
     assert (
         "## How to cite this dataset\n\nEnergy Institute (2026); Population based on various sources (2024) – with "
-        "minor processing by Our World in Data.\n\nFull citation: Energy Institute (2026); Population based on various "
-        "sources (2024) – with minor processing by Our World in Data. “Energy dataset” [dataset]. Energy Institute, "
-        "“Statistical Review of World Energy”; Various sources, “Population” [original data]. Retrieved from "
-        "https://catalog.ourworldindata.org/energy/owid_energy/.\n"
+        "minor processing by Our World in Data.\n"
     ) in readme
+    assert "[dataset]" not in readme
     assert "Last updated" not in readme
     # Nothing unrendered leaks through.
     assert "<%" not in readme and "<<" not in readme and "#dod:" not in readme

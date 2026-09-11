@@ -392,11 +392,6 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
         )
         else "minor"
     )
-    # Short form first (one line), then the full form with every source.
-    parts += [
-        f"{citation_short(origins, processing_level=processing_level)}.",
-        "",
-        f"Full citation: {citation_long(title, origins, processing_level=processing_level, url=url)}",
-        "",
-    ]
+    # The short form only: each source carries its own full citation in the Sources section.
+    parts += [f"{citation_short(origins, processing_level=processing_level)}.", ""]
     return "\n".join(parts).rstrip() + "\n"
