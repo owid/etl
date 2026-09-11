@@ -75,7 +75,7 @@ where channel is one of the following:
 - `chart`: For charts and multidimensional indicators (a chart is an MDIM with no dimensions). Writes to the grapher DB with `--grapher`; without it, only the local config under `viz/chart/`.
 - `explorer`: For explorers. Writes to the grapher DB with `--grapher`; without it, only the local config under `viz/explorer/`.
 - `static`: For static images (PNG/SVG), written next to the recipe. They only write local files, so a named static step runs with or without `--grapher`.
-- `bespoke`: For the data feeds of bespoke interactive visualizations. Uploaded to R2 with `--grapher`; without it, only written locally.
+- `bespoke`: For the data feeds of bespoke interactive visualizations. Synced to the environment's R2 path with `--grapher`; without it, only written locally.
 
 Every `viz://` step is selected by a pattern only with `--grapher`; named by its URI it is always selected, and the flag decides whether it may write.
 
