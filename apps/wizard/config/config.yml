@@ -121,6 +121,38 @@ sections:
         entrypoint: app_pages/harmonizer/app.py
         icon: ":material/music_note:"
 
+  - title: "Engineering"
+    description: |-
+      Infrastructure and operations.
+    apps:
+      - title: "Servers dashboard"
+        alias: servers-dashboard
+        entrypoint: app_pages/servers_dashboard/app.py
+        description: Monitor the LXC staging servers
+        maintainer: "@mojmir"
+        icon: ":material/computer:"
+        disable:
+          staging: true
+
+  - title: "Analytics"
+    description: |-
+      How our content is used.
+    apps:
+      - title: "Producer analytics"
+        alias: producer-analytics
+        description: "Share analytics with data producers"
+        maintainer: "@pablo"
+        entrypoint: app_pages/producer_analytics/app.py
+        icon: ":material/analytics:"
+      - title: "Metabase"
+        alias: metabase
+        description: "Learn more about OWID in Data!"
+        maintainer:
+          - "@bobbie"
+          - "@lucas"
+        entrypoint: http://metabase.owid.io
+        icon: ":material/bar_chart:"
+
   - title: "Search"
     description: |-
       Browse our content.
@@ -143,35 +175,3 @@ sections:
         maintainer: "@mojmir"
         entrypoint: app_pages/related_charts/app.py
         icon: ":material/bar_chart:"
-
-  - title: "Analytics"
-    description: |-
-      How our content is used.
-    apps:
-      - title: "Producer analytics"
-        alias: producer-analytics
-        description: "Share analytics with data producers"
-        maintainer: "@pablo"
-        entrypoint: app_pages/producer_analytics/app.py
-        icon: ":material/analytics:"
-      - title: "Metabase"
-        alias: metabase
-        description: "Learn more about OWID in Data!"
-        maintainer:
-          - "@bobbie"
-          - "@lucas"
-        entrypoint: http://metabase.owid.io
-        icon: ":material/bar_chart:"
-
-  - title: "Engineering"
-    description: |-
-      Infrastructure and operations.
-    apps:
-      - title: "Servers dashboard"
-        alias: servers-dashboard
-        entrypoint: app_pages/servers_dashboard/app.py
-        description: Monitor the LXC staging servers
-        maintainer: "@mojmir"
-        icon: ":material/computer:"
-        disable:
-          staging: true

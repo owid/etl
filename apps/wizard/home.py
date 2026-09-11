@@ -63,8 +63,6 @@ def st_show_home():
             for col, group in zip(st.columns(len(members), gap="medium"), members):
                 with col:
                     _render_group(group)
-    if labelled and standalone:
-        st.divider()
     with st.container(horizontal=True, gap="small"):
         for group in standalone:
             with st.container(border=True, width=TILE_WIDTH):
@@ -75,6 +73,7 @@ def st_show_home():
     #########################
     docs = WIZARD_CONFIG["main"].get("docs")
     if docs:
+        st.divider()
         st.caption(f"For more details, refer to the ETL [documentation]({docs['entrypoint']}).")
 
 
