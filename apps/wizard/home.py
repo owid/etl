@@ -117,15 +117,16 @@ def _render_app(item: dict) -> None:
         if item.get("enable", True):
             st.page_link(item["entrypoint"], label=f"**{title}**", icon=icon, width=LINK_WIDTH)
         else:
-            # A disabled tertiary button looks like a greyed-out page link (same padding, icon and font).
-            st.button(
-                f"**{title}**",
-                icon=icon,
-                type="tertiary",
-                disabled=True,
-                key=f"home-unavailable-{item['entrypoint']}",
-                width=LINK_WIDTH,
-            )
+            # A disabled tertiary button looks like a greyed-out page link (same padding, icon and font). It keeps
+            # its natural width inside a fixed-width box so the label stays left-aligned and the help icons line up.
+            with st.container(width=LINK_WIDTH):
+                st.button(
+                    f"**{title}**",
+                    icon=icon,
+                    type="tertiary",
+                    disabled=True,
+                    key=f"home-unavailable-{item['entrypoint']}",
+                )
         # Description, availability and maintainer live in the tooltip, so rows stay one line at any width.
         st.markdown("", help=_help_text(item), width="content")
 
