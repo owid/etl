@@ -77,4 +77,4 @@ from sqlalchemy.orm import Session
 - Material icons: `:material/icon_name:` (Google Material Symbols)
 - HTTP requests: always `timeout=30` and `.raise_for_status()`
 - Layout: use native `st.container(horizontal=True, vertical_alignment=..., horizontal_alignment=...)` for rows, `st.columns(..., border=True)` for grids. No CSS/HTML hacks (`st.markdown(..., unsafe_allow_html=True)` with `<style>`) — they break silently across Streamlit versions.
-- Sections in `config.yml` need `title`, `description`, `icon` and `apps`; the home page is generated from them (no images).
+- Sections in `config.yml` need `title`, `description` and `apps`; the home page is generated from them (no images).

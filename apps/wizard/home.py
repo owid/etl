@@ -1,10 +1,8 @@
 """Home page of wizard.
 
-An index of every app, grouped in the same sections as the sidebar. Unlike the sidebar, it also
+A directory of every app, grouped in the same sections as the sidebar. Unlike the sidebar, it also
 shows what each app does, who maintains it, and which apps are unavailable in this environment.
 """
-
-from collections.abc import Callable
 
 import streamlit as st
 
@@ -17,10 +15,11 @@ st.set_page_config(
     layout="wide",
 )
 
-# Number of section boxes per row.
-MAX_COLS_PER_ROW = 3
 # Badge color for each environment the wizard can run in.
 ENV_COLORS = {"dev": "green", "staging": "orange", "production": "red"}
+# Width (px) of the link in each row: wide enough for the longest app name, so the descriptions line up.
+# On narrow screens the description wraps onto the next line instead of being clipped.
+LINK_WIDTH = 200
 
 
 def st_show_home():
@@ -52,59 +51,51 @@ def st_show_home():
             st.caption(f"streamlit {st.__version__}", width="content")
 
     #########################
-    # CREATE (ETL steps)
+    # DIRECTORY: two page columns of groups (create, sections, links, legacy)
     #########################
+    left, right = _split_balanced(_groups())
+    for col, column_groups in zip(st.columns(2, gap="medium"), (left, right)):
+        with col:
+            for group in column_groups:
+                _render_group(group)
+
+
+def _groups() -> list[dict]:
+    """Every group of apps shown on the home page: the step-creation apps, the config sections, links, legacy."""
     etl = WIZARD_CONFIG["etl"]
-    steps = list(etl["steps"].values())
-    with st.container(border=True):
-        _render_box_header(etl["title"], etl["description"], etl.get("icon"))
-        for col, step in zip(st.columns(len(steps)), steps):
-            with col:
-                _render_app(step)
-
-    #########################
-    # SECTIONS, LINKS, LEGACY
-    #########################
-    boxes: list[Callable[[], None]] = []
-    for section in WIZARD_CONFIG["sections"]:
-        boxes.append(lambda section=section: _render_section(section))
-
+    groups = [{"title": etl["title"], "description": etl["description"], "apps": list(etl["steps"].values())}]
+    groups += [
+        {"title": s["title"], "description": s["description"], "apps": s["apps"]} for s in WIZARD_CONFIG["sections"]
+    ]
     links = [e for e in WIZARD_CONFIG["main"].values() if str(e["entrypoint"]).startswith(("http://", "https://"))]
     if links:
-        boxes.append(lambda: _render_links(links))
-
+        groups.append({"title": "Links", "description": "Other OWID tools and resources.", "apps": links})
     legacy_apps = WIZARD_CONFIG.get("legacy", {}).get("apps", [])
     if legacy_apps:
-        boxes.append(lambda: _render_legacy(legacy_apps))
-
-    for i in range(0, len(boxes), MAX_COLS_PER_ROW):
-        row = boxes[i : i + MAX_COLS_PER_ROW]
-        for col, render in zip(st.columns(len(row), border=True), row):
-            with col:
-                render()
+        groups.append({"title": "Legacy", "description": WIZARD_CONFIG["legacy"]["description"], "apps": legacy_apps})
+    return groups
 
 
-def _render_box_header(title: str, description: str, icon: str | None) -> None:
-    st.subheader(title, icon=icon)
-    st.caption(description)
+def _split_balanced(groups: list[dict]) -> tuple[list[dict], list[dict]]:
+    """Split groups into two columns of roughly equal height (one row per app plus a header per group)."""
+    weights = [len(g["apps"]) + 1.5 for g in groups]
+    total, acc, cut = sum(weights), 0.0, len(groups)
+    for i, w in enumerate(weights):
+        acc += w
+        if acc >= total / 2:
+            cut = i + 1
+            break
+    return groups[:cut], groups[cut:]
 
 
-def _render_section(section: dict) -> None:
-    _render_box_header(section["title"], section["description"], section.get("icon"))
-    for app in section["apps"]:
-        _render_app(app)
-
-
-def _render_links(links: list[dict]) -> None:
-    _render_box_header("Links", "Other OWID tools and resources.", ":material/link:")
-    for link in links:
-        _render_app(link)
-
-
-def _render_legacy(apps: list[dict]) -> None:
-    _render_box_header("Legacy", WIZARD_CONFIG["legacy"]["description"], ":material/history:")
-    for app in apps:
-        _render_app(app)
+def _render_group(group: dict) -> None:
+    """Section title with its description on the same line, then one row per app."""
+    with st.container(gap="xsmall"):
+        with st.container(horizontal=True, vertical_alignment="bottom", gap="small"):
+            st.markdown(f"##### {group['title']}", width="content")
+            st.caption(group["description"], width="content")
+        for app in group["apps"]:
+            _render_app(app)
 
 
 def _maintainer_help(item: dict) -> str | None:
@@ -117,16 +108,13 @@ def _maintainer_help(item: dict) -> str | None:
 
 
 def _render_app(item: dict) -> None:
-    """Render one app (or external link) from the wizard config: a full-width link with its description below.
-
-    Apps disabled in this environment are shown greyed out, not hidden, so it is clear they exist and
-    where they can be run.
-    """
-    title, icon, description = item["title"], item["icon"], item.get("description", "")
-    with st.container(gap=None):
+    """One row: the link (or a disabled button when the app is unavailable here) and the description."""
+    title, icon = item["title"], item["icon"]
+    # The row wraps: on wide screens the description sits next to the link, on narrow ones it drops below it.
+    with st.container(horizontal=True, vertical_alignment="center", gap="small"):
         if item.get("enable", True):
             st.page_link(
-                item["entrypoint"], label=f"**{title}**", icon=icon, help=_maintainer_help(item), width="stretch"
+                item["entrypoint"], label=f"**{title}**", icon=icon, help=_maintainer_help(item), width=LINK_WIDTH
             )
         else:
             # A disabled tertiary button looks like a greyed-out page link (same padding, icon and font).
@@ -137,9 +125,10 @@ def _render_app(item: dict) -> None:
                 disabled=True,
                 help=f"Not available on `{ENV}`.",
                 key=f"home-unavailable-{item['entrypoint']}",
+                width=LINK_WIDTH,
             )
-        if description:
-            st.caption(description)
+        if item.get("description"):
+            st.caption(item["description"])
 
 
 # Show the home page

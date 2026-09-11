@@ -96,7 +96,6 @@ def _check_wizard_config(config: dict):
     for section in config["sections"]:
         assert "title" in section, "`sections.title` property is required in wizard config!"
         assert "description" in section, "`sections.description` property is required in wizard config!"
-        assert "icon" in section, "`sections.icon` property is required in wizard config!"
         assert "apps" in section, "`sections.apps` property is required in wizard config!"
         for app in section["apps"]:
             for prop in pages_properties_expected:

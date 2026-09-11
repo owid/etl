@@ -2,9 +2,9 @@
 #
 # There are three main properties in this file:
 # - main: Reserved for the 'Home' page and other top-level entries (external links are rendered as plain links).
-# - etl: The step-creation apps. They are shown in the "Create" box of the home page and in their own sidebar section.
-# - sections: A list of sections. Each section is a group of apps, rendered as one box on the home page and one
-#   group in the sidebar. A section has a title, a description, an icon and a list of apps.
+# - etl: The step-creation apps. They are shown under "Create" on the home page and in their own sidebar section.
+# - sections: A list of sections. Each section is a group of apps, rendered as one group on the home page and one
+#   group in the sidebar. A section has a title, a description and a list of apps.
 #
 # HOW TO ADD A NEW APP?
 # ----------------------
@@ -40,7 +40,7 @@ main:
     icon: ":material/bar_chart:"
   docs:
     title: "Documentation"
-    description: "ETL docs: guides, architecture and reference."
+    description: "Guides, architecture and reference."
     maintainer: "@lucas"
     entrypoint: https://docs.owid.io/projects/etl
     icon: ":material/menu_book:"
@@ -49,7 +49,6 @@ main:
 etl:
   title: Create
   description: Create an ETL step.
-  icon: ":material/add_circle:"
   steps:
     snapshot:
       title: "Snapshot"
@@ -80,13 +79,12 @@ etl:
       alias: fasttrack
       entrypoint: app_pages/fasttrack/app.py
       icon: ":material/fast_forward:"
-      description: "Import a small dataset from a Google Sheet or CSV."
+      description: "Import data from a Google Sheet or CSV."
 
 sections:
   - title: "Update"
     description: |-
       Updates, data edits, etc.
-    icon: ":material/update:"
     apps:
       - title: "Step upgrader"
         alias: dashboard
@@ -105,7 +103,7 @@ sections:
       - title: "Chart Diff"
         alias: chart-diff
         entrypoint: app_pages/chart_diff/app.py
-        description: Compare charts, MDIMs & explorers in staging and prod
+        description: Compare charts & MDIMs, staging vs. prod
         maintainer: "@mojmir"
         icon: ":material/difference:"
         disable:
@@ -114,7 +112,6 @@ sections:
   - title: "Data tools"
     description: |-
       Control panel for ETL steps.
-    icon: ":material/handyman:"
     apps:
       - title: "Anomalist"
         alias: anomalist
@@ -140,7 +137,6 @@ sections:
   - title: "Search"
     description: |-
       Browse our content.
-    icon: ":material/search:"
     apps:
       - title: "Search Comparison"
         alias: search-comparison
@@ -164,7 +160,6 @@ sections:
   - title: "Assistant"
     description: |-
       Research tools.
-    icon: ":material/auto_awesome:"
     apps:
       - title: "Chart animation"
         alias: chart-animation
@@ -176,12 +171,11 @@ sections:
   - title: "Misc"
     description: |-
       Other helpful tools in the ETL ecosystem.
-    icon: ":material/widgets:"
     apps:
       - title: "Servers Dashboard"
         alias: servers-dashboard
         entrypoint: app_pages/servers_dashboard/app.py
-        description: Real-time monitoring of our LXC staging servers
+        description: Monitor the LXC staging servers
         maintainer: "@mojmir"
         icon: ":material/computer:"
         disable:
