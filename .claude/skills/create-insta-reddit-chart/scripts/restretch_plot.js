@@ -17,8 +17,9 @@
 //                        zero-width vector throws);
 //   - every other VECTOR / RECTANGLE / LINE / BOOLEAN (polylines, areas, columns) → height × s, then
 //                        moved. Stroke weights are untouched by resize, so lines keep their weight.
-// Siblings of the plot group that overlap its y-range (end dots, annotations placed beside the line)
-// are moved by their centre with the same map, unless listed in `skipIds`.
+// Siblings of the plot group whose centre lies in its y-range (end dots, value labels, annotations and
+// their leaders) are TRANSLATED as rigid wholes — each sibling, group or leaf, moves by the map of its
+// own centre and nothing inside it is resized — unless listed in `skipIds`.
 //
 // It changes no text, font, fill or stroke. It returns everything it touched, and `unmatched` for
 // leaves it did not know how to treat — treat a non-empty `unmatched` as a stop.
@@ -85,21 +86,23 @@ const leaf = n => {
 const walk = n => { if (skip.has(n.id)) return; if (n.type === "GROUP") { for (const c of n.children) walk(c); } else leaf(n); };
 for (const c of plot.children) walk(c);
 
-// siblings that live in the plot's y-range: end dots, value labels, annotations
+// siblings that live in the plot's y-range: end dots, value labels, annotations and their leaders.
+// Rigid translation only — an annotation's curved leader or backdrop must never be stretched.
 const siblings = [];
 for (const c of frame.children) {
   if (c === plot || skip.has(c.id)) continue;
   const cy = c.y + c.height / 2;
   if (cy < plotTop || cy > plotBottom) continue;
-  if (c.type === "GROUP") { for (const k of c.children) leaf(k); siblings.push(c.id); }
-  else { leaf(c); siblings.push(c.id); }
+  c.y += mapY(cy) - cy;
+  siblings.push({ id: c.id, type: c.type, name: c.name.slice(0, 24), y: +c.y.toFixed(1) });
+  moved.push({ id: c.id, type: c.type, name: c.name.slice(0, 24), y: +c.y.toFixed(1) });
 }
 
 return {
   mutatedNodeIds: [...moved.map(m => m.id), ...stretched.map(m => m.id)],
   scale: +s.toFixed(4), plotBefore: { top: plotTop, bottom: plotBottom, h: oldH },
   plotAfter: { top: +plot.y.toFixed(1), bottom: +(plot.y + plot.height).toFixed(1), h: +plot.height.toFixed(1) },
-  band: { top: CONFIG.bandTop, bottom: CONFIG.bandBottom }, siblingsTouched: siblings,
+  band: { top: CONFIG.bandTop, bottom: CONFIG.bandBottom }, siblingsTranslated: siblings,
   counts: { moved: moved.length, stretched: stretched.length, unmatched: unmatched.length },
   stretched, unmatched, movedSample: moved.slice(0, 12),
 };

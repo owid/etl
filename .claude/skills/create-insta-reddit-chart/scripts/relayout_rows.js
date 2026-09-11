@@ -46,13 +46,15 @@ const collect = n => { if (skip.has(n.id)) return; if (n.type === "GROUP") { for
 const skip = new Set(CONFIG.skipIds);
 for (const c of frame.children) collect(c);
 
-// 1. bars — every HORIZONTAL rectangle (wider than tall, at least 8px tall, so gridlines and columns
-//    are excluded) at the modal height, whatever its x (stacked segments, negative bars)
-const rects = leaves.filter(isRect).filter(r => r.height >= 8 && r.width > r.height);
-if (rects.length < 2) throw new Error("fewer than two horizontal rectangle vectors — not a horizontal bar chart (a column chart takes the axis-chart route)");
-const oldH = mode(rects.map(r => Math.round(r.height)));
-const bars = rects.filter(r => Math.abs(r.height - oldH) <= 1);
-const nearMiss = rects.filter(r => !bars.includes(r) && Math.abs(r.height - oldH) <= 4);
+// 1. bars. The bar HEIGHT is read off the clearly horizontal rectangles (wider than tall, at least
+//    8px tall — gridlines and columns cannot set it); bar MEMBERSHIP is then every rectangle at that
+//    height whatever its aspect, so a short stacked segment (10×24) is a bar too.
+const allRects = leaves.filter(isRect);
+const wide = allRects.filter(r => r.height >= 8 && r.width > r.height);
+if (wide.length < 2) throw new Error("fewer than two horizontal rectangle vectors — not a horizontal bar chart (a column chart takes the axis-chart route)");
+const oldH = mode(wide.map(r => Math.round(r.height)));
+const bars = allRects.filter(r => Math.abs(r.height - oldH) <= 1);
+const nearMiss = allRects.filter(r => !bars.includes(r) && Math.abs(r.height - oldH) <= 4);
 if (nearMiss.length) throw new Error("rectangles within 4px of the bar height but not equal to it — bars of two heights, refusing to guess: " + nearMiss.map(r => r.id).join(", "));
 // rows: distinct bar tops, merged when within 2px
 const oldBarY = [...new Set(bars.map(b => Math.round(b.y * 2) / 2))].sort((a, b) => a - b).reduce((acc, y) => (acc.length && y - acc[acc.length - 1] <= 2 ? acc : [...acc, y]), []);

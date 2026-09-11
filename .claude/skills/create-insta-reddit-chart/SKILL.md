@@ -253,7 +253,8 @@ group's box linearly onto the band and treats each descendant by what it is, nev
 - every other vector, rectangle or boolean (polylines, areas, columns) gets `height × s` — `resize`
   leaves stroke weights alone, so lines keep their weight;
 - siblings of the plot group whose centre lies in the plot's y-range (end dots, value labels beside
-  the line, annotations) are moved with the same map.
+  the line, annotations with their leaders) are **translated as rigid wholes** by the map of their
+  own centre — nothing inside them is resized, so a curved leader or a backdrop keeps its shape.
 
 It returns what it moved and stretched, and `unmatched` for any leaf it did not know how to treat —
 non-empty is a stop.
