@@ -34,6 +34,17 @@ from owid.catalog.api.utils import session, storage_options_for_http
 from owid.catalog.core import docs, indicators, utils, warnings
 from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, TableMeta, VariableMeta
 
+# Columns of Table.codebook, in order.
+CODEBOOK_COLUMNS = [
+    "column",
+    "title",
+    "description",
+    "unit",
+    "source",
+    "description_key",
+    "description_processing",
+]
+
 log = structlog.get_logger()
 
 # Schema is in parent directory (not core/)
@@ -357,12 +368,15 @@ class Table(pd.DataFrame):
     def codebook(self) -> pd.DataFrame:
         """Generate a human-readable codebook for this table.
 
-        One row per column (index columns included) with its title, short description, unit and
-        the short labels of its sources. The labels match the ``label`` column of
-        :attr:`sources`, which carries the full details (URLs, licenses, citations).
+        One row per column (index columns included) with its title, short description, unit, the
+        short labels of its sources, and the longer texts: what you should know about the indicator
+        (``description_key``) and how we processed it (``description_processing``), both as markdown.
+        The source labels match the ``label`` column of :attr:`sources`, which carries the full
+        details (URLs, licenses, citations).
 
         Returns:
-            DataFrame with columns ``column``, ``title``, ``description``, ``unit``, ``source``.
+            DataFrame with columns ``column``, ``title``, ``description``, ``unit``, ``source``,
+            ``description_key``, ``description_processing``.
 
         Example:
             ```python
@@ -383,9 +397,11 @@ class Table(pd.DataFrame):
                     "description": utils.remove_details_on_demand(md.description_short or ""),
                     "unit": unit,
                     "source": docs.column_source_labels(list(md.origins)),
+                    "description_key": docs.description_key_text(md) or "",
+                    "description_processing": utils.remove_details_on_demand(md.description_processing or ""),
                 }
             )
-        return pd.DataFrame(rows, columns=["column", "title", "description", "unit", "source"])
+        return pd.DataFrame(rows, columns=CODEBOOK_COLUMNS)
 
     @property
     def sources(self) -> pd.DataFrame:

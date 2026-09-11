@@ -86,13 +86,23 @@ def test_origin_label_without_title_or_date():
 
 def test_codebook_uses_short_source_labels():
     codebook = make_table().codebook
-    assert codebook.columns.tolist() == ["column", "title", "description", "unit", "source"]
+    assert codebook.columns.tolist() == [
+        "column",
+        "title",
+        "description",
+        "unit",
+        "source",
+        "description_key",
+        "description_processing",
+    ]
     assert codebook["column"].tolist() == ["country", "year", "hydro_energy_twh", "hydro_energy_per_capita_kwh"]
     hydro = codebook.set_index("column").loc["hydro_energy_twh"]
     assert hydro["title"] == "Hydropower"
     assert hydro["description"] == "Energy from hydropower."
     assert hydro["unit"] == "terawatt-hours (TWh)"
     assert hydro["source"] == "Energy Institute – Statistical Review of World Energy (2026)"
+    assert hydro["description_processing"] == "Converted from exajoules."
+    assert hydro["description_key"] == ""
     per_capita = codebook.set_index("column").loc["hydro_energy_per_capita_kwh"]
     assert per_capita["source"] == (
         "Energy Institute – Statistical Review of World Energy (2026); Population based on various sources (2024)"
@@ -142,6 +152,7 @@ def test_readme_sections(tmp_path):
     assert "Citation: Energy Institute - Statistical Review of World Energy (2026)." in readme
     assert "## License\n\nThis dataset is published under CC BY 4.0" in readme
     assert '## How to cite this dataset\n\nOur World in Data (2026). "Energy dataset". Based on' in readme
+    assert "Last updated" not in readme
     # Nothing unrendered leaks through.
     assert "<%" not in readme and "<<" not in readme and "#dod:" not in readme
 

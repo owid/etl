@@ -25,6 +25,7 @@ MANIFEST_VERSION = 1
 MANIFEST_FILENAME = "manifest.json"
 README_FILENAME = "readme.md"
 CODEBOOK_FILENAME = "codebook.csv"
+SOURCES_FILENAME = "sources.csv"
 DATASET_JSONLD_FILENAME = "dataset.jsonld"
 # Dated catalog files (immutable) that the manifest links to when they exist on disk.
 VERSIONED_FORMATS = ("parquet", "feather")
@@ -45,7 +46,7 @@ def page_url(base_url: str, short_key: str) -> str:
 def page_filenames(ds: Dataset) -> list[str]:
     """Every file a dataset page can own in its stable folder, so that a stale page can be removed in full."""
     names = [f"{name}.csv" for name in ordered_table_names(ds)]
-    names += [f"{ds.metadata.short_name}.xlsx", CODEBOOK_FILENAME, README_FILENAME, MANIFEST_FILENAME]
+    names += [f"{ds.metadata.short_name}.xlsx", CODEBOOK_FILENAME, SOURCES_FILENAME, README_FILENAME, MANIFEST_FILENAME]
     names.append(DATASET_JSONLD_FILENAME)
     return names
 
@@ -107,6 +108,8 @@ def write_page_files(
 
     ds.codebook.to_csv(target_dir / CODEBOOK_FILENAME, index=False)
     register(CODEBOOK_FILENAME, "csv")
+    ds.sources.to_csv(target_dir / SOURCES_FILENAME, index=False)
+    register(SOURCES_FILENAME, "csv")
 
     (target_dir / README_FILENAME).write_text(ds.readme(url=url))
     register(README_FILENAME, "md")
@@ -129,6 +132,7 @@ def write_page_files(
         "license": _license(ds),
         "readme": README_FILENAME,
         "codebook": CODEBOOK_FILENAME,
+        "sources": SOURCES_FILENAME,
         "tables": list(ordered_table_names(ds)),
         "files": files,
     }

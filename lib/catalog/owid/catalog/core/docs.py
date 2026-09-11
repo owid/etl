@@ -35,6 +35,9 @@ SOURCES_COLUMNS = [
     "license_url",
 ]
 
+# Sources named in the suggested citation; the rest are referred to collectively.
+MAIN_SOURCES_IN_CITATION = 3
+
 # Paragraph shared with the README of chart downloads on ourworldindata.org.
 PROCESSING_NOTE = (
     "Our World in Data is almost never the original producer of the data. Almost all of the data we use has "
@@ -155,6 +158,14 @@ def _clean_text(text: str | None) -> str | None:
     return remove_details_on_demand(text).strip()
 
 
+def description_key_text(meta: VariableMeta) -> str | None:
+    """The "what you should know" text of a column as markdown, or None."""
+    key = meta.description_key
+    if isinstance(key, list):
+        key = description_key_to_string(key)
+    return _clean_text(key)
+
+
 def _unit(meta: VariableMeta) -> str:
     unit = meta.unit or ""
     if meta.short_unit and meta.short_unit != meta.unit:
@@ -180,12 +191,6 @@ def _year_range(table: Table, column: str) -> str | None:
     return None
 
 
-def _latest_date_published(origins: list[Origin]) -> str | None:
-    dates = [str(origin.date_published) for origin in origins if origin.date_published]
-    dates = [d for d in dates if d != "latest"]
-    return max(dates) if dates else None
-
-
 def _indicator_section(name: str, meta: VariableMeta, table: Table, level: int) -> str:
     heading = "#" * level
     lines = [f"{heading} {variable_title(name, meta)}", ""]
@@ -199,17 +204,11 @@ def _indicator_section(name: str, meta: VariableMeta, table: Table, level: int) 
     year_range = _year_range(table, name)
     if year_range:
         facts.append(f"Date range: {year_range}")
-    last_updated = _latest_date_published(meta.origins)
-    if last_updated:
-        facts.append(f"Last updated: {last_updated}")
     if meta.origins:
         facts.append(f"Sources: {column_source_labels(meta.origins)}")
     lines += [f"{fact}  " for fact in facts]
     lines.append("")
-    key = meta.description_key
-    if isinstance(key, list):
-        key = description_key_to_string(key)
-    key = _clean_text(key)
+    key = description_key_text(meta)
     if key:
         lines += [f"{heading}# What you should know about this indicator", "", key, ""]
     processing = _clean_text(meta.description_processing)
@@ -322,7 +321,11 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
     year = _year(meta.version) or str(date.today().year)
     citation = f'Our World in Data ({year}). "{title}"'
     if origins:
-        citation += f". Based on {'; '.join(origin_label(origin) for origin in origins)}"
+        # Origins are ordered by how many indicators use them; name the main ones and point to the rest.
+        main = [origin_label(origin) for origin in origins[:MAIN_SOURCES_IN_CITATION]]
+        citation += f". Based on {'; '.join(main)}"
+        if len(origins) > MAIN_SOURCES_IN_CITATION:
+            citation += " and other sources (see above)"
     citation += "."
     if url:
         citation += f" Retrieved from {url}."

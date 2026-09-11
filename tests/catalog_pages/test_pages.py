@@ -81,6 +81,7 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
         "owid_energy.csv",
         "owid_energy.xlsx",
         "readme.md",
+        "sources.csv",
     ]
     assert sorted(result.page_keys) == sorted(
         f"energy/owid_energy/{name}" for name in page_filenames(Dataset(data_dir / catalog_path))
@@ -112,10 +113,20 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     assert manifest["license"] == {"name": "CC BY 4.0", "url": "https://creativecommons.org/licenses/by/4.0/"}
     assert manifest["readme"] == "readme.md"
     assert manifest["codebook"] == "codebook.csv"
+    assert manifest["sources"] == "sources.csv"
+    sources = pd.read_csv(page_dir / "sources.csv")
+    assert sources["label"].tolist() == ["Example Producer – Original dataset (2025)"]
     assert manifest["jsonld"] == "dataset.jsonld"
     assert manifest["tables"] == ["owid_energy"]
     files = {entry["name"]: entry for entry in manifest["files"]}
-    assert set(files) == {"owid_energy.csv", "owid_energy.xlsx", "codebook.csv", "readme.md", "owid_energy.feather"}
+    assert set(files) == {
+        "owid_energy.csv",
+        "owid_energy.xlsx",
+        "codebook.csv",
+        "sources.csv",
+        "readme.md",
+        "owid_energy.feather",
+    }
     csv = files["owid_energy.csv"]
     assert csv["format"] == "csv"
     assert csv["table"] == "owid_energy"
