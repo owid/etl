@@ -18,6 +18,7 @@ If a certain snapshot has been failing multiple times (which you can see by look
 
 import re
 from datetime import datetime
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 import click
@@ -170,6 +171,12 @@ def find_date_published(snap: Snapshot) -> str | None:
                     return date
                 else:
                     log.warn(f"Failed to extract date_published for: {snap.path.name}")
+
+    # Otherwise, use the Last-Modified header of the data file, if the server provides one.
+    response = requests.head(snap.metadata.origin.url_download, allow_redirects=True, timeout=30)  # ty: ignore
+    last_modified = response.headers.get("Last-Modified")
+    if last_modified:
+        return parsedate_to_datetime(last_modified).strftime("%Y-%m-%d")
 
     # In all other cases, assume date_published is the same as date_accessed.
     return snap.metadata.origin.date_accessed  # ty: ignore

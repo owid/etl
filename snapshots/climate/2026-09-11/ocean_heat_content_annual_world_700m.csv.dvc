@@ -15,7 +15,7 @@ meta:
     attribution_short: NOAA/NCEI
     url_main: https://www.ncei.noaa.gov/products/ocean-heat-salt-sea-level
     url_download: https://www.ncei.noaa.gov/data/oceans/woa/DATA_ANALYSIS/3M_HEAT_CONTENT/DATA/basin/yearly/h22-w0-700m.dat
-    date_accessed: '2026-08-21'
+    date_accessed: '2026-09-11'
     date_published: '2026-07-06'
     license:
       name: CC BY 4.0

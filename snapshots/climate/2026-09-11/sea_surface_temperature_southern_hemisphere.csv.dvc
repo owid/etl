@@ -2,7 +2,7 @@ meta:
   origin:
     producer: Met Office Hadley Centre
     title: Hadley Centre's Sea Surface Temperature (HadSST)
-    title_snapshot: Hadley Centre's Sea Surface Temperature (HadSST) – Northern hemisphere
+    title_snapshot: Hadley Centre's Sea Surface Temperature (HadSST) – Southern hemisphere
     citation_full: |-
       Met Office Hadley Centre – Hadley Centre's Sea Surface Temperature (HadSST).
 
@@ -14,13 +14,13 @@ meta:
     attribution_short: Met Office
     version_producer: 4.2.0.0
     url_main: https://www.metoffice.gov.uk/hadobs/hadsst4/
-    url_download: https://www.metoffice.gov.uk/hadobs/hadsst4/data/data/HadSST.4.2.0.0_monthly_NHEM.csv
-    date_accessed: '2026-08-21'
+    url_download: https://www.metoffice.gov.uk/hadobs/hadsst4/data/data/HadSST.4.2.0.0_monthly_SHEM.csv
+    date_accessed: '2026-09-11'
     date_published: '2026-08-13'
     license:
       name: Open Government Licence v3
       url: https://www.metoffice.gov.uk/hadobs/hadsst4/data/download.html
 outs:
-  - md5: b080d646e143f411a125d968cd927b45
-    size: 171689
-    path: sea_surface_temperature_northern_hemisphere.csv
+  - md5: 55809ab63d3c69ea03d6dbc020e75ed5
+    size: 172369
+    path: sea_surface_temperature_southern_hemisphere.csv

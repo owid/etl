@@ -9,13 +9,13 @@ meta:
     citation_full: NASA, Goddard Space Flight Center. 2025. NASA Ozone Watch.
     attribution_short: NASA
     url_main: http://ozonewatch.gsfc.nasa.gov/meteorology/annual_data.html
-    url_download: https://ozonewatch.gsfc.nasa.gov/statistics/ytd_data.txt
-    date_accessed: '2026-08-21'
+    url_download: https://ozonewatch.gsfc.nasa.gov/statistics/annual_data.txt
+    date_accessed: '2026-09-11'
     date_published: '2025-10-20'
     license:
       name: CC BY
       url: https://science.data.nasa.gov/license/
 outs:
-  - md5: c74c8fd51f12cd96bd34f2948d244701
-    size: 2491
-    path: nasa_ozone_hole_extremes.txt
+  - md5: ec807fc7f7ebb053375f17d76317ce2c
+    size: 1890
+    path: nasa_ozone_hole_annual.txt
