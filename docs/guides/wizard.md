@@ -106,14 +106,11 @@ Pages to keep our steps and charts up to date. The current pages are:
 - **Related charts**: Given a chart, find related charts based on semantic similarity.
 
 
-### Analytics
-
-- **Producer analytics**: Share chart analytics with data producers.
-- **Metabase**: OWID's analytics dashboards (external).
-
-### Engineering
+### Engineering/Analytics
 
 - **Servers dashboard**: Track the status of all our servers.
+- **Producer analytics**: Share chart analytics with data producers.
+- **Metabase**: OWID's analytics dashboards (external).
 
 <!--
 ### Metadata

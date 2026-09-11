@@ -121,9 +121,9 @@ sections:
         entrypoint: app_pages/harmonizer/app.py
         icon: ":material/music_note:"
 
-  - title: "Engineering"
+  - title: "Engineering/Analytics"
     description: |-
-      Infrastructure and operations.
+      Infrastructure, operations and usage analytics.
     apps:
       - title: "Servers dashboard"
         alias: servers-dashboard
@@ -133,11 +133,6 @@ sections:
         icon: ":material/computer:"
         disable:
           staging: true
-
-  - title: "Analytics"
-    description: |-
-      How our content is used.
-    apps:
       - title: "Producer analytics"
         alias: producer-analytics
         description: "Share analytics with data producers"
