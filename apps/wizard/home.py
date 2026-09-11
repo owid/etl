@@ -17,8 +17,8 @@ st.set_page_config(
 
 # Badge color for each environment the wizard can run in.
 ENV_COLORS = {"dev": "green", "staging": "orange", "production": "red"}
-# Width (px) of each standalone section tile. Tiles wrap, so a wide screen shows several per row, a phone one.
-TILE_WIDTH = 260
+# Standalone sections (those without a `group`) share the row width equally, at most this many per row.
+MAX_TILES_PER_ROW = 4
 # Width (px) of the link in each row: wide enough for the longest app name, so the help icons line up.
 LINK_WIDTH = 200
 
@@ -51,7 +51,7 @@ def st_show_home():
     #########################
     # DIRECTORY
     # Sections sharing a `group` label (e.g. "ETL work") share one wide box, one column each. The remaining
-    # sections (plus legacy) follow as bordered tiles, as many per row as fit.
+    # sections (plus legacy) follow as bordered tiles sharing the row width.
     #########################
     groups = _groups()
     labelled = [g for g in groups if g.get("group")]
@@ -63,9 +63,12 @@ def st_show_home():
             for col, group in zip(st.columns(len(members), gap="medium"), members):
                 with col:
                     _render_group(group)
-    with st.container(horizontal=True, gap="small"):
-        for group in standalone:
-            with st.container(border=True, width=TILE_WIDTH):
+    if labelled and standalone:
+        st.divider()
+    for i in range(0, len(standalone), MAX_TILES_PER_ROW):
+        row = standalone[i : i + MAX_TILES_PER_ROW]
+        for col, group in zip(st.columns(len(row), border=True, gap="small"), row):
+            with col:
                 _render_group(group)
 
     #########################
