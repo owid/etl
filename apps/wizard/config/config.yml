@@ -4,7 +4,8 @@
 # - main: Reserved for the 'Home' page and other top-level entries (external links are rendered as plain links).
 # - etl: The step-creation apps. They are shown under "Create" on the home page and in their own sidebar section.
 # - sections: A list of sections. Each section is a group of apps, rendered as one group on the home page and one
-#   group in the sidebar. A section has a title, a description and a list of apps.
+#   group in the sidebar. A section has a title, a description and a list of apps. Sections that share an optional
+#   `group` label (e.g. "ETL work") are shown together on the home page, in one wide box under that label.
 #
 # HOW TO ADD A NEW APP?
 # ----------------------
@@ -49,6 +50,7 @@ main:
 etl:
   title: Create
   description: Create an ETL step.
+  group: "ETL work"
   steps:
     snapshot:
       title: "Snapshot"
@@ -83,6 +85,7 @@ etl:
 
 sections:
   - title: "Update"
+    group: "ETL work"
     description: |-
       Updates, data edits, etc.
     apps:
@@ -110,6 +113,7 @@ sections:
           production: True
 
   - title: "Data tools"
+    group: "ETL work"
     description: |-
       Control panel for ETL steps.
     apps:

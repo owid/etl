@@ -17,7 +17,7 @@ st.set_page_config(
 
 # Badge color for each environment the wizard can run in.
 ENV_COLORS = {"dev": "green", "staging": "orange", "production": "red"}
-# Width (px) of each section tile. Tiles wrap, so a wide screen shows four per row, a laptop three, a phone one.
+# Width (px) of each standalone section tile. Tiles wrap, so a wide screen shows several per row, a phone one.
 TILE_WIDTH = 260
 # Width (px) of the link in each row: wide enough for the longest app name, so the help icons line up.
 LINK_WIDTH = 200
@@ -52,20 +52,42 @@ def st_show_home():
             st.caption(f"streamlit {st.__version__}", width="content")
 
     #########################
-    # DIRECTORY: one bordered tile per group (create, sections, links, legacy), as many per row as fit
+    # DIRECTORY
+    # Sections sharing a `group` label (e.g. "ETL work") share one wide box, one column each. The remaining
+    # sections (plus links and legacy) follow as bordered tiles, as many per row as fit.
     #########################
+    groups = _groups()
+    labelled = [g for g in groups if g.get("group")]
+    standalone = [g for g in groups if not g.get("group")]
+    for label in dict.fromkeys(g["group"] for g in labelled):
+        members = [g for g in labelled if g["group"] == label]
+        with st.container(border=True):
+            st.markdown(f"#### {label}")
+            for col, group in zip(st.columns(len(members), gap="medium"), members):
+                with col:
+                    _render_group(group)
+    if labelled and standalone:
+        st.divider()
     with st.container(horizontal=True, gap="small"):
-        for group in _groups():
-            with st.container(border=True, width=TILE_WIDTH, height="stretch"):
+        for group in standalone:
+            with st.container(border=True, width=TILE_WIDTH):
                 _render_group(group)
 
 
 def _groups() -> list[dict]:
     """Every group of apps shown on the home page: the step-creation apps, the config sections, links, legacy."""
     etl = WIZARD_CONFIG["etl"]
-    groups = [{"title": etl["title"], "description": etl["description"], "apps": list(etl["steps"].values())}]
+    groups = [
+        {
+            "title": etl["title"],
+            "description": etl["description"],
+            "group": etl.get("group"),
+            "apps": list(etl["steps"].values()),
+        }
+    ]
     groups += [
-        {"title": s["title"], "description": s["description"], "apps": s["apps"]} for s in WIZARD_CONFIG["sections"]
+        {"title": s["title"], "description": s["description"], "group": s.get("group"), "apps": s["apps"]}
+        for s in WIZARD_CONFIG["sections"]
     ]
     links = [e for e in WIZARD_CONFIG["main"].values() if str(e["entrypoint"]).startswith(("http://", "https://"))]
     if links:
