@@ -87,7 +87,7 @@ sections:
   - title: "Update"
     group: "ETL work"
     description: |-
-      Updates, data edits, etc.
+      Update steps, indicators and country names.
     apps:
       - title: "Step upgrader"
         alias: dashboard
@@ -103,6 +103,18 @@ sections:
         icon: ":material/upgrade:"
         disable:
           production: True
+      - title: "Harmonizer"
+        alias: harmonizer
+        description: "Harmonize a column of a table"
+        maintainer: "@lucas"
+        entrypoint: app_pages/harmonizer/app.py
+        icon: ":material/music_note:"
+
+  - title: "Data QA"
+    group: "ETL work"
+    description: |-
+      Check data and chart changes.
+    apps:
       - title: "Chart Diff"
         alias: chart-diff
         entrypoint: app_pages/chart_diff/app.py
@@ -111,12 +123,6 @@ sections:
         icon: ":material/difference:"
         disable:
           production: True
-
-  - title: "Data tools"
-    group: "ETL work"
-    description: |-
-      Control panel for ETL steps.
-    apps:
       - title: "Anomalist"
         alias: anomalist
         entrypoint: app_pages/anomalist/app.py
@@ -125,18 +131,6 @@ sections:
         icon: ":material/planner_review:"
         disable:
           production: True
-      - title: "Harmonizer"
-        alias: harmonizer
-        description: "Harmonize a column of a table"
-        maintainer: "@lucas"
-        entrypoint: app_pages/harmonizer/app.py
-        icon: ":material/music_note:"
-      - title: "Producer analytics"
-        alias: producer-analytics
-        description: "Share analytics with data producers"
-        maintainer: "@pablo"
-        entrypoint: app_pages/producer_analytics/app.py
-        icon: ":material/analytics:"
 
   - title: "Search"
     description: |-
@@ -184,3 +178,9 @@ sections:
         maintainer: "@pablo"
         entrypoint: app_pages/chart_animation.py
         icon: ":material/animated_images:"
+      - title: "Producer analytics"
+        alias: producer-analytics
+        description: "Share analytics with data producers"
+        maintainer: "@pablo"
+        entrypoint: app_pages/producer_analytics/app.py
+        icon: ":material/analytics:"
