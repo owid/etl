@@ -46,7 +46,7 @@ before/after.
 | Footer | Always the **Instagram footer**, cloned from the square Instagram template's footer in the linked file: `Data source: …` (bold prefix), then `OurWorldinData.org/<topic>` and `CC BY`. A source frame that carries a `Note: …` keeps it as a **first row** above those two. The source frame's own footer is removed. |
 | Extra height | **The chart fills it**, by chart type (Step 7): bar rows are re-spaced with taller bars; an axis chart's plot is stretched vertically with text, dots and tick marks moved rather than stretched; a map keeps its size and is centred in the taller band; anything else stops and asks. The chart keeps the source frame's own gaps above and below it. |
 | Knockout halos | Every **white stroke** that is a knockout — the outside stroke on annotation text, the white outline drawn under each line so crossing lines separate, a leader's outline — and any **white backdrop** behind an annotation take the beige, bound to `Instagram/Beige Background`, because white on beige is a visible halo. Flags and the logo keep their white. Settled: apply it, never ask. |
-| Checks | (1) every element inside the frame and its 16px margin; (2) a text diff against the source frame — only the footer may differ; (3) the `text-floor` and `ladder-sizes` rows of the parent skill's `verify_page.js` **type** slice. Nothing else. |
+| Checks | One read: every element inside the frame and its 16px margin, and a list of any white stroke or fill left outside the flags and logo. Then the screenshot. Nothing else. |
 | Delivery | The frame's **deep link**. No PNG export — the user exports from Figma (the Instagram family's export scale is **3×**, 1620×2025). |
 
 ## Prerequisites
@@ -303,33 +303,16 @@ recognise as a knockout is a known item rather than a surprise. A flag is any FR
 
 ## Step 8 — Check, show, deliver
 
-**Checks — one message, three calls in parallel** (all read-only):
-
-1. **Geometry and whites** (`use_figma`): every child of the clone inside `0 ≤ x, x+w ≤ 540, 0 ≤ y,
-   y+h ≤ 675` and, for non-GROUP nodes, inside the 16px margin; report breaches with node id and
-   name — and say which the source frame already had, since an inherited overhang is the designer's
-   choice, not a defect of this run. In the same pass list every remaining **pure-white stroke or
-   fill** outside the logo and the flags (Step 7b).
-2. **Text diff** (`use_figma`): collect `characters` of every TEXT under the source and under the
-   clone, as multisets. The only allowed differences are the footer: the old source/CC BY nodes gone,
-   the new source (same text), topic line and CC BY present. Anything else is a defect.
-3. **Type slice** of the parent's checker:
-
-   ```bash
-   .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js \
-       --rows type --frame-id <clone id>
-   ```
-
-   Set `chartName` in its `CONFIG` to the plot group's name, paste the output verbatim into one
-   `use_figma`, and read **`text-floor` and `ladder-sizes`**. The other rows in that slice assume the
-   parent skill's template structure — a header that is an auto-layout frame. A hand-built DI has
-   loose title and subtitle nodes, so the script takes the footer for the header: `text-hierarchy`
-   then measures plot text against the footer's 14px and fails wrongly, and `source-line-weight`
-   finds no footer. Report those two as *not judged*, not as failures, and name the `SKIPPED` rows —
-   they are owned by tools this skill does not run.
+**One read-only check, one call** (`use_figma`): every child of the clone inside `0 ≤ x, x+w ≤ 540,
+0 ≤ y, y+h ≤ 675` and, for non-GROUP nodes, inside the 16px margin; report breaches with node id and
+name — and say which the source frame already had, since an inherited overhang is the designer's
+choice, not a defect of this run. In the same pass list every remaining **pure-white stroke or fill**
+outside the logo and the flags (Step 7b). No text diff, no run of the parent skill's checker: the
+scripts never touch text, and the parent's type rows misread a hand-built DI.
 
 Then `get_screenshot` the clone at `maxDimension: 1350` (natural size, 540×675) and download it.
-Look at it. Fix, re-check, repeat. Re-run **all three** checks after the last change.
+Look at it — this is the check that matters. Fix, re-check, repeat; re-run the read after the last
+change.
 
 **Deliver:**
 
