@@ -157,20 +157,9 @@ sections:
         entrypoint: app_pages/related_charts/app.py
         icon: ":material/bar_chart:"
 
-  - title: "Assistant"
+  - title: "Engineering"
     description: |-
-      Research tools.
-    apps:
-      - title: "Chart animation"
-        alias: chart-animation
-        description: "Animate charts (GIF/video)"
-        maintainer: "@pablo"
-        entrypoint: app_pages/chart_animation.py
-        icon: ":material/animated_images:"
-
-  - title: "Misc"
-    description: |-
-      Other helpful tools in the ETL ecosystem.
+      Infrastructure and operations.
     apps:
       - title: "Servers Dashboard"
         alias: servers-dashboard
@@ -180,3 +169,14 @@ sections:
         icon: ":material/computer:"
         disable:
           staging: true
+
+  - title: "Misc"
+    description: |-
+      Other helpful tools in the ETL ecosystem.
+    apps:
+      - title: "Chart animation"
+        alias: chart-animation
+        description: "Animate charts (GIF/video)"
+        maintainer: "@pablo"
+        entrypoint: app_pages/chart_animation.py
+        icon: ":material/animated_images:"

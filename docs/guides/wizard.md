@@ -100,19 +100,19 @@ Pages to help us improve our charts (e.g. keeping them up to date). The current 
 <!--
 - **Dataset Explorer**: A tool to explore the datasets in the ETL catalog. You can check the step dependancies and its metadata. If it is a Garden step, you can also perform some actions with it. -->
 
-### Assistant
-
-- **Chart animation**: Animate a chart over time and export it as a GIF.
-
 ### Search (experimental)
 
 - **Indicator search**: Browse indicators.
 - **Related charts**: Given a chart, find related charts based on semantic similarity.
 
 
-### Misc
+### Engineering
 
 - **Servers dashboard**: Track the status of all our servers.
+
+### Misc
+
+- **Chart animation**: Animate a chart over time and export it as a GIF.
 <!--
 ### Metadata
 
