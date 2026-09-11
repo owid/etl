@@ -5,8 +5,8 @@
 import math
 from copy import deepcopy
 
-from etl.collection.model.view import View, ViewIndicators
 from etl.helpers import PathFinder
+from etl.viz.chart.model.view import View, ViewIndicators
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -133,8 +133,8 @@ def run() -> None:
                 if (source, metric, f) in dims_max:
                     dims_max[(source, metric, f)] = shared
 
-    c = paths.create_collection(
-        config=paths.load_collection_config(),
+    c = paths.create_chart(
+        config=paths.load_config(),
         tb=tables,
         indicator_names=["electricity"],
         dimensions=["source", "metric", "frequency"],

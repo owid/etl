@@ -22,7 +22,7 @@ The grapher chart-config schema is owned by the web team in [`owid-grapher`](htt
 | `schemas/grapher-schema.NNN.json` | Vendored copy of upstream, and the single source of truth for the version (`DEFAULT_GRAPHER_SCHEMA` is derived from its `$id`) | automatic (`--refresh`; `--bump-version` for a new version) |
 | `schemas/multidim-schema.json` + `schemas/explorer-schema.json` | View config `$ref`s into the grapher schema | manual: add `$ref` for **new** properties |
 | `schemas/dataset-schema.json` | Embedded `grapher_config` block (validates garden `.meta.yml`) | manual: mirror changes, preserve deviations |
-| `etl/collection/model/schema_types.py` | Generated Python TypedDicts | automatic (regenerate) |
+| `etl/viz/chart/model/schema_types.py` | Generated Python TypedDicts | automatic (regenerate) |
 
 Unit tests enforce consistency between all of these (`tests/test_schema_types_generation.py`, `test_grapher_config_schema_sync` in `tests/test_metadata_schemas.py`), so partial syncs fail CI. Full background: `docs/guides/grapher-schema-sync.md`.
 
@@ -61,7 +61,7 @@ git diff schemas/grapher-schema.*.json
 
 Only needed for **new top-level properties** (new chart-type config objects like `dumbbell`, new view-level fields). Existing `$ref`s resolve against the live schema automatically.
 
-For each new upstream property that makes sense in a multidim/explorer view, add a `$ref` entry to the view config properties block (search for `"chartTypes"` to find it). The same applies to `schemas/explorer-schema.json`. Refs are **local relative refs** to the vendored copy (resolved offline by `Collection.validate_schema`):
+For each new upstream property that makes sense in a multidim/explorer view, add a `$ref` entry to the view config properties block (search for `"chartTypes"` to find it). The same applies to `schemas/explorer-schema.json`. Refs are **local relative refs** to the vendored copy (resolved offline by `Chart.validate_schema`):
 
 ```json
 "<newProp>": {
@@ -92,17 +92,17 @@ The grapher config is **embedded inline** (not `$ref`'d) under `...variables.add
 
 ```bash
 .venv/bin/python scripts/generate_schema_types.py
-git diff etl/collection/model/schema_types.py
+git diff etl/viz/chart/model/schema_types.py
 ```
 
 Sanity-check the diff: it should reflect exactly the upstream changes (plus any multidim `$ref` additions). If a class or field unexpectedly *disappears*, a `$ref` is probably missing (step 2).
 
-Hand-written types (e.g. `GroupViewsConfig`) live in `etl/collection/model/params.py` — never add them to the generated file.
+Hand-written types (e.g. `GroupViewsConfig`) live in `etl/viz/chart/model/params.py` — never add them to the generated file.
 
 ### 5. Validate
 
 ```bash
-.venv/bin/pytest tests/test_schema_types_generation.py tests/test_metadata_schemas.py tests -k "collection or schema" -m "not integration" -q
+.venv/bin/pytest tests/test_schema_types_generation.py tests/test_metadata_schemas.py tests -k "chart or schema" -m "not integration" -q
 make check
 ```
 
@@ -132,10 +132,10 @@ Then, by hand:
 
 ### Don't bump the `grapher_schema` pins in MDIM configs
 
-Every multidim and single-chart config pins `grapher_schema: "NNN"` — required, with no fallback (`required` in `schemas/multidim-schema.json`, re-checked by `Collection.validate_grapher_schema_pinned()`, and swept offline by `test_multidim_configs_pin_grapher_schema`). **Leave those pins at their old version.** They record what each config was authored against, which is what lets grapher migrate them to `MMM` on upsert. Bumping them would tell grapher the configs are already current and skip the migration — the exact failure the pins exist to prevent.
+Every multidim and single-chart config pins `grapher_schema: "NNN"` — required, with no fallback (`required` in `schemas/multidim-schema.json`, re-checked by `Chart.validate_grapher_schema_pinned()`, and swept offline by `test_multidim_configs_pin_grapher_schema`). **Leave those pins at their old version.** They record what each config was authored against, which is what lets grapher migrate them to `MMM` on upsert. Bumping them would tell grapher the configs are already current and skip the migration — the exact failure the pins exist to prevent.
 
-The one thing to check: `--bump-version` repoints multidim view-config validation at the new version, so a config that is no longer valid under `MMM` will now fail `Collection.validate_schema()`. Fix the config *and* bump only that config's pin, since at that point it genuinely was re-authored against `MMM`.
+The one thing to check: `--bump-version` repoints multidim view-config validation at the new version, so a config that is no longer valid under `MMM` will now fail `Chart.validate_schema()`. Fix the config *and* bump only that config's pin, since at that point it genuinely was re-authored against `MMM`.
 
-Views can also carry their own `$schema` inside a `config` block, which **overrides** the collection-level pin (grapher spreads the view config last). As of #6705 follow-up no step does this any more, and ETL warns if one reappears — so treat a hit from `grep -rn '\$schema' etl/steps/viz/chart` as something to remove rather than to bump.
+Views can also carry their own `$schema` inside a `config` block, which **overrides** the chart-level pin (grapher spreads the view config last). As of #6705 follow-up no step does this any more, and ETL warns if one reappears — so treat a hit from `grep -rn '\$schema' etl/steps/viz/chart` as something to remove rather than to bump.
 
 One caveat on "leave the pins alone": that holds for pins that are *true*. A pin that contradicts its own config body — pinned `005` while the config uses `chartTypes`, which only exists from `006` (the 005→006 migration creates it) — is stale, not a record, and leaving it makes grapher run migrations over a config they were never meant to touch. Check a suspicious pin against the properties of that schema version (`curl https://files.ourworldindata.org/schemas/grapher-schema.NNN.json`) and correct it to the version the config is actually written against.

@@ -2,7 +2,7 @@
 name: migrate-explorer-indicator-legacy
 description: >-
   Modernize an explorer step that already exists in this repo but doesn't use
-  the YAML-driven `paths.create_collection(explorer=True)` API yet. Covers two
+  the YAML-driven `paths.create_explorer()` API yet. Covers two
   legacy shapes: (A) `data://explorers/<ns>/<v>/<short>` steps that write wide
   CSV tables for the legacy explorer infra (e.g. poverty_inequality, lis, wid,
   wb, emdat, monkeypox); (B) `viz://explorer/<ns>/latest/<short>` steps
@@ -12,7 +12,7 @@ description: >-
   This skill extracts the dimensions/views/config from the legacy shape and
   hands them to `/create-explorer` to write the modern step. Trigger when the
   user says "migrate indicator-legacy explorer <short>", "convert
-  create_explorer_legacy to create_collection", or "move data://explorers/...
+  create_explorer_legacy to create_explorer", or "move data://explorers/...
   to viz://explorer/...".
 metadata:
   internal: true
@@ -57,7 +57,7 @@ The legacy step builds two pandas DataFrames programmatically:
 - `df_graphers` — one row per view, with dimension columns (`<Name> Dropdown` / `<Name> Radio` / `<Name> Checkbox`), `yVariableIds` (or catalog-path strings), and per-view chart settings (`hasMapTab`, `minTime`, `yAxisMin`, `defaultView`, …).
 - `df_columns` — per-(view, indicator) display overrides (color scales, tolerances, units, …). Sometimes omitted.
 
-You're going to delete the DataFrame plumbing and replace it with a YAML config plus, optionally, a table-driven `create_collection(tb=tb, ...)` call when the dimensions map cleanly onto an upstream multidim grapher dataset.
+You're going to delete the DataFrame plumbing and replace it with a YAML config plus, optionally, a table-driven `create_explorer(tb=tb, ...)` call when the dimensions map cleanly onto an upstream multidim grapher dataset.
 
 ### 1. Read the legacy step end-to-end
 
@@ -157,4 +157,4 @@ Hand off to the user the verification commands per `/create-explorer` Step 8. Fo
 
 ## Follow-up
 
-Once on `create_collection(explorer=True)`, the explorer is a candidate for the Track-B port to MDIM (`viz://chart/...`) once feature parity is reached. See umbrella issue #6014.
+Once on `paths.create_explorer()`, the explorer is a candidate for the Track-B port to MDIM (`viz://chart/...`) once feature parity is reached. See umbrella issue #6014.

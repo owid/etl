@@ -1,4 +1,4 @@
-"""Create multidimensional collection for children out of school data."""
+"""Create multidimensional chart for children out of school data."""
 
 import re
 
@@ -118,8 +118,8 @@ GENDERS = {
 
 
 def run() -> None:
-    """Main function to process children out of school data and create collection."""
-    config = paths.load_collection_config()
+    """Main function to process children out of school data and create chart."""
+    config = paths.load_config()
     tbs_adjusted = []
 
     for dataset_name in ["education_opri", "education_sdgs"]:
@@ -131,22 +131,22 @@ def run() -> None:
         tb = adjust_dimensions(tb)
         tbs_adjusted.append(tb)
 
-    collection = paths.create_collection(
+    chart = paths.create_chart(
         config=config,
         tb=tbs_adjusted,
         common_view_config=MULTIDIM_CONFIG,
     )
 
-    create_grouped_views(collection)
+    create_grouped_views(chart)
 
-    collection.set_global_config(
+    chart.set_global_config(
         config={
             "title": lambda view: generate_title_by_dimensions(view),
             "subtitle": lambda view: generate_subtitle_by_dimensions(view),
         }
     )
 
-    for view in collection.views:
+    for view in chart.views:
         # Update title and subtitle based on view dimensions
         sex = view.dimensions["sex"]
         level = view.dimensions["level"]
@@ -169,7 +169,7 @@ def run() -> None:
             }
         edit_indicator_displays(view)
 
-    collection.save()
+    chart.save()
 
 
 def get_out_of_school_columns(tb):
@@ -227,7 +227,7 @@ def adjust_dimensions(tb):
     return tb
 
 
-def create_grouped_views(collection):
+def create_grouped_views(chart):
     """Add grouped views for gender, education level, and metric type comparisons."""
 
     view_metadata = {
@@ -256,7 +256,7 @@ def create_grouped_views(collection):
 
         return config
 
-    collection.group_views(
+    chart.group_views(
         groups=[
             {
                 "dimension": "sex",

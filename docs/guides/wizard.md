@@ -54,7 +54,7 @@ In the following sections we try to give a brief overview of each of the section
 
 ### Create ETL steps
 
-Create new ETL steps from Wizard, including **Snapshot**, **Data** (Meadow, Garden, Grapher) and also **Collection** steps. Additionally, **Fast-Track** steps can also be created using the Wizard.
+Create new ETL steps from Wizard, including **Snapshot**, **Data** (Meadow, Garden, Grapher) and also **Chart** steps. Additionally, **Fast-Track** steps can also be created using the Wizard.
 
 
 In each step creation, a form is presented to the user so that they can fill in the necessary metadata fields. Based on the input, new files (e.g. python scripts, metadata YAML files, etc.) are created and modifications to existing ones (e.g. the DAG) are done.
@@ -75,24 +75,13 @@ After submitting each of the forms, a short guideline is shown so that the user 
 
     Data step creation
 
-- ![Collection step](../assets/step-collection.png){ width="100%" }
+- ![Chart step](../assets/step-chart.png){ width="100%" }
 
     ---
 
-    Collection step creation
+    Chart step creation
 
 </div>
-
-### Expert
-
-GPT-based assistant to help resolve doubts. Doubts can include anything ETL-related (metadata structure, environment setup, etc.). This documentation is fed to the Expert, so it should be able to answer most of the questions concerning this documentation.
-
-Additionally, Expert can also help out create Datasette queries!
-
-<figure markdown="span">
-  ![Expert](../assets/expert.png)
-  <figcaption>Asking the Expert a data question.</figcaption>
-</figure>
 
 ### Update tools
 

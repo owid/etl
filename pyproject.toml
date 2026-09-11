@@ -69,7 +69,6 @@ dependencies = [
     "fastmcp>=3.2.0",
     "pyproj>=3.7.2",
     "pydantic-ai-slim[anthropic,fastmcp,google,mcp,openai]>=1.99.0",
-    "metabase-api>=3.5.2",
     "codespell>=2.4.1",
     "zensical>=0.0.15",
     "pandas-gbq>=0.29.2",

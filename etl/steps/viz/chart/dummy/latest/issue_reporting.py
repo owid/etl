@@ -16,10 +16,10 @@ def run() -> None:
     #
 
     #
-    # Create collection object
+    # Create chart object
     #
-    c = paths.create_collection(
-        config=paths.load_collection_config(),
+    c = paths.create_chart(
+        config=paths.load_config(),
         short_name="issue_reporting",
     )
 

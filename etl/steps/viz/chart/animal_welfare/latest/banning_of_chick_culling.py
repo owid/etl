@@ -19,7 +19,7 @@ def run() -> None:
     # Load inputs.
     #
     # Load configuration from adjacent yaml file.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Load grapher dataset and read its main table.
     ds = paths.load_dataset("chick_culling_laws")
@@ -40,6 +40,6 @@ def run() -> None:
     #
     # Save outputs.
     #
-    # Create and save the chart collection.
-    collection = paths.create_collection(config=config)
-    collection.save()
+    # Create and save the chart.
+    chart = paths.create_chart(config=config)
+    chart.save()

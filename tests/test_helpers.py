@@ -140,7 +140,7 @@ def test_PathFinder_viz_step_names():
         "short_name": "influenza",
         "is_private": False,
     }
-    # A dependency step name for a collection is built as a `viz://` step.
+    # A dependency step name for a chart is built as a `viz://` step.
     assert (
         PathFinder.create_step_name(
             short_name="conflict_data_source", channel="explorer", namespace="war", version="latest", step_type="viz"

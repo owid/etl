@@ -52,16 +52,20 @@ Run `search_threads` with query `in:sent newer_than:90d`, `pageSize: 1`, and tak
 
 For each producer, take every email address appearing in `Contacts` and `Emails for analytics reports`. Both columns are free text (`Contacts` typically reads `TO: <name> (<address>)`), so pull the addresses out with `[\w.+-]+@[\w.-]+\.\w+` rather than using the cell whole.
 
-**These addresses are the only thing this skill ever searches for.** Do not search by the producer's domain, and do not search by the producer's name. A domain search returns everything the institution ever sent, most of which has nothing to do with us; a name search returns newsletters and third parties discussing the producer. Both were in an earlier version of this skill and both were wrong. If a contact writes from an unrecorded address, the reply simply will not be found, and the fix is to add that address to the contacts table, not to widen the search.
+**These addresses are the only thing this skill ever searches for.** Do not search by the producer's domain, and do not search by the producer's name. A domain search returns everything the institution ever sent, most of which has nothing to do with us; a name search returns newsletters and third parties discussing the producer. Both were in an earlier version of this skill and both were wrong. A contact writing from an unrecorded address is only half lost. Gmail matches whole threads, so if they hit reply on a report we sent, the thread still comes back on the recorded address in our own outgoing message, and their reply comes with it. What is lost is a message with no such anchor: a fresh thread from the new address, or a reply arriving so late that our original message has fallen behind the search window. Those are silently invisible — no row, no error. The fix is to add the address to the contacts table (see step 5), never to widen the search.
 
 ### 3. Find the watermark and the already-logged messages
 
 Query the log once for `Producer`, `date:Date:start`, `Link`. Keep:
 
-- the latest date per producer **among rows whose `Link` is set**, i.e. rows that came from an email (the watermark). Never take the maximum over all rows: a hand-added row (a call, a Slack thread) carries no Gmail link, and if it is dated in the future it would push the watermark forward and make the next run skip every email in between;
+- **the caller's watermark**: the latest date among rows whose `Link` carries the caller's own address in its `authuser` parameter. Every link this skill writes names the mailbox it was read from, so those rows, and only those, mark how far this caller has already swept. Two kinds of row are deliberately excluded. A hand-added row (a call, a Slack thread) has no Gmail link and can be dated anywhere, including the future. A row logged by a colleague from *their* mailbox says nothing about what this caller has seen. Counting either would push the watermark forward and make the run skip every email in between;
 - the set of Gmail message IDs already logged: the part after `#all/` in every `Link` (older rows may use the `/mail/u/0/#all/<messageId>` form; treat both the same).
 
-Search from **7 days before the watermark** (Gmail dates and thread grouping make a small overlap safer than an exact cutoff). For a producer with no rows yet, search the last 12 months.
+**One watermark covers every producer** — there is no per-producer cutoff. Search each producer from **7 days before it** (Gmail dates and thread grouping make a small overlap safer than an exact cutoff).
+
+If the caller has no linked rows at all, this is their first run: search the last 12 months for every producer, so a colleague picking the skill up gets the recent history rather than nothing.
+
+The cost of a single shared watermark is that a producer added to the contacts table later is searched only from the last run, so an older exchange with them is never picked up. That is the intended trade. The per-producer rule this replaced made every run re-scan a year of mail for every producer with no rows, which was slow and re-surfaced the same out-of-scope threads on every run.
 
 ### 4. Search Gmail, then keep only the report threads
 
@@ -88,6 +92,8 @@ Skip automated messages entirely: calendar and Calendly notices, Drive share req
 ### 5. Propose the rows, and wait
 
 Before writing anything, show the user a table of the rows you intend to create (producer, date, direction, type, summary) and the out-of-scope messages you are leaving out. **Wait for approval.** The log is shared, so a wrong row is seen by the whole team, and one confirmation per run costs far less than removing rows afterwards.
+
+**Ask about new addresses in the same breath.** If an in-scope message came from an address that is not in the contacts table — a colleague of the usual contact joining the thread, someone writing from a personal account, a contact who has changed employer — name the producer and the address, and ask the user to add it to the contacts table. Do this in the same message as the row proposal, so the run still costs one confirmation. It matters because the address was found this time only by riding on the thread of a report we sent; once that message falls behind the search window, anything further from that address is invisible. This skill never edits the contacts table itself (see Guardrails), so asking is the only way the address gets recorded.
 
 ### 6. Create one row per message
 
@@ -117,7 +123,7 @@ Reply to the user with, in this order:
 
 1. A table of the rows created: producer, date, direction, type, summary. Group by producer.
 2. Rows not marked `closed`, with the reason, so the user can correct them.
-3. Out-of-scope messages the search surfaced, one line each, and any reply that came from an address not in the contacts table, which is worth adding there.
+3. Out-of-scope messages the search surfaced, one line each, and a repeat of any unrecorded address from step 5 that the user has not yet added, so it is not lost when the run ends.
 4. Producers with no new report emails, in one line.
 
 Do not paste email bodies into the reply.

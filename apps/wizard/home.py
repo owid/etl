@@ -3,7 +3,7 @@
 import streamlit as st
 
 from apps.wizard.config import WIZARD_CONFIG
-from apps.wizard.utils.components import st_wizard_card, st_wizard_page_link
+from apps.wizard.utils.components import st_wizard_card
 
 st.set_page_config(
     page_title="Wizard: Home",
@@ -36,13 +36,6 @@ def st_show_home():
     container = st.container(border=False, horizontal=True, vertical_alignment="bottom")
     with container:
         st.title("Wizard 🪄")
-        st_wizard_page_link(
-            "expert",
-            label=":rainbow[**Ask the Expert**]",
-            help="Ask the expert any documentation question!",
-            width="content",
-            border=False,
-        )
         st.caption(f"streamlit {st.__version__}", width="content")
 
     #########################
@@ -52,10 +45,10 @@ def st_show_home():
     st.markdown(WIZARD_CONFIG["etl"]["description"])
     steps = WIZARD_CONFIG["etl"]["steps"]
 
-    # 1/ CLASSIC: Snapshot -> Data -> Collection (no captions, match original)
+    # 1/ CLASSIC: Snapshot -> Data -> Chart (no captions, match original)
     if steps["fasttrack"]["enable"]:
         _render_cards_row(
-            [steps["snapshot"], steps["data"], steps["collection"]],
+            [steps["snapshot"], steps["data"], steps["chart"]],
             height=100,
             col_widths=[1, 2, 1],
             show_caption=False,

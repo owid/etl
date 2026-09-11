@@ -21,11 +21,11 @@ Chart and explorer steps also write their expanded config to the gitignored `viz
 etlr viz://explorer/minerals/latest/minerals --grapher
 ```
 
-The `def run():` function doesn't save a dataset, but calls a method that performs the action. For instance `paths.create_collection(...)` or `gh.commit_file_to_github(...)`. Once the step is executed successfully, it won't be run again unless its code or dependencies change (it won't be "dirty").
+The `def run():` function doesn't save a dataset, but calls a method that performs the action. For instance `paths.create_chart(...)` or `gh.commit_file_to_github(...)`. Once the step is executed successfully, it won't be run again unless its code or dependencies change (it won't be "dirty").
 
 ## Creating explorers
 
-Explorers are created with `paths.create_collection(config=..., explorer=True)` from a configuration YAML file, and upserted to the grapher DB by `.save()`. They follow the same structure as MDIMs, see [MDIMs and Explorers](mdims.md).
+Explorers are created with `paths.create_explorer(config=...)` from a configuration YAML file, and upserted to the grapher DB by `.save()`. They follow the same structure as MDIMs, see [MDIMs and Explorers](mdims.md).
 
 ## Creating multi-dimensional indicators
 
@@ -71,9 +71,9 @@ views:
 
 ```
 
-The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically (using function `etl.collection.expand_config`).
+The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically (using function `etl.viz.expand_config`).
 
-You can also combine manually defined views with generated ones. See the `etl.collection` module for available helper functions or refer to examples from `etl/steps/viz/chart/`. Feel free to add or modify the helper functions as needed.
+You can also combine manually defined views with generated ones. See the `etl.viz` module for available helper functions or refer to examples from `etl/steps/viz/chart/`. Feel free to add or modify the helper functions as needed.
 
 The chart step loads the data dependencies and the config YAML file, adds `views` to the config, and then pushes the configuration to the database.
 
@@ -93,7 +93,7 @@ def run() -> None:
     # Process data.
     #
     # Load configuration from adjacent yaml file.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Create views.
     config["views"] = expand_config(
@@ -105,7 +105,7 @@ def run() -> None:
     #
     # Save outputs.
     #
-    mdim = paths.create_collection(config=config)
+    mdim = paths.create_chart(config=config)
     mdim.save()
 
 ```

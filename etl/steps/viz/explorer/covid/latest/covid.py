@@ -34,10 +34,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load grapher config from YAML
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Create explorer
-    c = paths.create_collection(config=config, explorer=True)
+    c = paths.create_explorer(config=config)
 
     # Create a new explorers dataset and tsv file.
     c.save(tolerate_extra_indicators=True)
