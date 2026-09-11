@@ -7,7 +7,6 @@ hand-written text living in step code.
 
 from __future__ import annotations
 
-from datetime import date
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
@@ -35,8 +34,12 @@ SOURCES_COLUMNS = [
     "license_url",
 ]
 
-# Sources named in the suggested citation; the rest are referred to collectively.
-MAIN_SOURCES_IN_CITATION = 3
+# Citations follow the same rules as the chart downloads on ourworldindata.org (owid-grapher,
+# packages/@ourworldindata/utils/src/metadataHelpers.ts): attributions are the origin's attribution
+# or "Producer (year)"; more than three of them are shortened to the first one "and other sources";
+# the long form names the dataset in curly quotes followed by [dataset] and the original data after it.
+OWID_ATTRIBUTION = "Our World in Data"
+MAX_ATTRIBUTIONS_IN_SHORT_CITATION = 3
 
 # Paragraph shared with the README of chart downloads on ourworldindata.org.
 PROCESSING_NOTE = (
@@ -139,6 +142,68 @@ def column_source_labels(origins: list[Origin]) -> str:
         if label not in labels:
             labels.append(label)
     return "; ".join(labels)
+
+
+def attribution_label(origin: Origin) -> str:
+    """Attribution of an origin as grapher renders it: its attribution, or "Producer (year)"."""
+    if origin.attribution:
+        return origin.attribution
+    name = origin.producer or origin.title or origin.url_main or ""
+    year = _year(origin.date_published)
+    return f"{name} ({year})" if year else name
+
+
+def attribution_labels(origins: list[Origin]) -> list[str]:
+    labels: list[str] = []
+    for origin in origins:
+        label = attribution_label(origin)
+        if label and label not in labels:
+            labels.append(label)
+    return labels
+
+
+def _processing_phrase(attributions: list[str], processing_level: str) -> str | None:
+    if all(attribution.startswith(OWID_ATTRIBUTION) for attribution in attributions):
+        return None
+    if processing_level == "major":
+        return f"with major processing by {OWID_ATTRIBUTION}"
+    if processing_level == "minor":
+        return f"with minor processing by {OWID_ATTRIBUTION}"
+    return f"processed by {OWID_ATTRIBUTION}"
+
+
+def citation_short(origins: list[Origin], processing_level: str = "major") -> str:
+    """Short citation, e.g. "Energy Institute (2026) and other sources – with major processing by Our World in Data"."""
+    attributions = attribution_labels(origins)
+    if len(attributions) > MAX_ATTRIBUTIONS_IN_SHORT_CITATION:
+        text = f"{attributions[0]} and other sources"
+    else:
+        text = "; ".join(attributions)
+    phrase = _processing_phrase(attributions, processing_level)
+    return f"{text} – {phrase}" if phrase else text
+
+
+def citation_long(title: str, origins: list[Origin], processing_level: str = "major", url: str | None = None) -> str:
+    """Long citation, in the format of the chart downloads on ourworldindata.org."""
+    attributions = attribution_labels(origins)
+    phrase = _processing_phrase(attributions, processing_level)
+    attribution_text = "; ".join(attributions)
+    if phrase:
+        attribution_text += f" – {phrase}"
+    originals: list[str] = []
+    for origin in origins:
+        origin_title = origin.title or origin.title_snapshot
+        if origin.version_producer and origin_title:
+            origin_title = f"{origin_title} {origin.version_producer}"
+        text = ", ".join(part for part in [origin.producer, f"“{origin_title}”" if origin_title else None] if part)
+        if text and text not in originals:
+            originals.append(text)
+    parts = [f"{attribution_text}.", f"“{title}” [dataset]."]
+    if originals:
+        parts.append(f"{'; '.join(originals)} [original data].")
+    if url:
+        parts.append(f"Retrieved from {url}.")
+    return " ".join(parts)
 
 
 def variable_title(name: str, meta: VariableMeta) -> str:
@@ -318,16 +383,19 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
     ]
 
     parts += ["## How to cite this dataset", ""]
-    year = _year(meta.version) or str(date.today().year)
-    citation = f'Our World in Data ({year}). "{title}"'
-    if origins:
-        # Origins are ordered by how many indicators use them; name the main ones and point to the rest.
-        main = [origin_label(origin) for origin in origins[:MAIN_SOURCES_IN_CITATION]]
-        citation += f". Based on {'; '.join(main)}"
-        if len(origins) > MAIN_SOURCES_IN_CITATION:
-            citation += " and other sources"
-    citation += "."
-    if url:
-        citation += f" Retrieved from {url}."
-    parts += [citation, ""]
+    processing_level = (
+        "major"
+        if any(
+            table.get_column_or_index(column).metadata.processing_level == "major"
+            for table in tables
+            for column in table.all_columns
+        )
+        else "minor"
+    )
+    parts += [
+        citation_long(title, origins, processing_level=processing_level, url=url),
+        "",
+        f"In short: {citation_short(origins, processing_level=processing_level)}.",
+        "",
+    ]
     return "\n".join(parts).rstrip() + "\n"

@@ -151,7 +151,13 @@ def test_readme_sections(tmp_path):
     assert "License: © Energy Institute 2026 (https://www.energyinst.org/terms)" in readme
     assert "Citation: Energy Institute - Statistical Review of World Energy (2026)." in readme
     assert "## License\n\nThis dataset is published under CC BY 4.0" in readme
-    assert '## How to cite this dataset\n\nOur World in Data (2026). "Energy dataset". Based on' in readme
+    assert (
+        "## How to cite this dataset\n\nEnergy Institute (2026); Population based on various sources (2024) – with "
+        "minor processing by Our World in Data. “Energy dataset” [dataset]. Energy Institute, “Statistical Review "
+        "of World Energy”; Various sources, “Population” [original data]. Retrieved from "
+        "https://catalog.ourworldindata.org/energy/owid_energy/.\n\nIn short: Energy Institute (2026); Population "
+        "based on various sources (2024) – with minor processing by Our World in Data.\n"
+    ) in readme
     assert "Last updated" not in readme
     # Nothing unrendered leaks through.
     assert "<%" not in readme and "<<" not in readme and "#dod:" not in readme
@@ -201,3 +207,29 @@ def test_table_to_excel_includes_sources_sheet(tmp_path):
     path = tmp_path / "table.xlsx"
     make_table().to_excel(path)
     assert openpyxl.load_workbook(path, read_only=True).sheetnames == ["data", "metadata", "sources"]
+
+
+def test_citations_follow_grapher_rules():
+    origins = [
+        EI,
+        POPULATION,
+        Origin(producer="Smil", title="Energy Transitions", date_published="2017", version_producer="2nd edition"),
+        Origin(producer="Bolt and van Zanden", title="Maddison Project Database", date_published="2024-04-26"),
+    ]
+    assert docs.attribution_label(EI) == "Energy Institute (2026)"
+    assert docs.attribution_label(POPULATION) == "Population based on various sources (2024)"
+    # More than three attributions are shortened to the first one.
+    assert (
+        docs.citation_short(origins, processing_level="major")
+        == "Energy Institute (2026) and other sources – with major processing by Our World in Data"
+    )
+    assert docs.citation_short(origins[:2], processing_level="minor") == (
+        "Energy Institute (2026); Population based on various sources (2024) – with minor processing by Our World in Data"
+    )
+    long = docs.citation_long("Energy dataset", origins, processing_level="major", url="https://example.org/")
+    assert long == (
+        "Energy Institute (2026); Population based on various sources (2024); Smil (2017); Bolt and van Zanden (2024) – "
+        "with major processing by Our World in Data. “Energy dataset” [dataset]. Energy Institute, “Statistical Review of "
+        "World Energy”; Various sources, “Population”; Smil, “Energy Transitions 2nd edition”; Bolt and van Zanden, "
+        "“Maddison Project Database” [original data]. Retrieved from https://example.org/."
+    )
