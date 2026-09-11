@@ -88,9 +88,26 @@ graphers, `climate_change_impacts_annual`/`_monthly`, and `yearly_burned_area`.
    today's date as `<new_version>` so they land on a common version. Bump the aggregate
    (`climate_change_impacts`) only after its sources are done, so it picks up the new versions
    once rather than repeatedly.
-3. Chart remap on staging via the Indicator Upgrader. Variables remap by catalogPath, so most
-   charts follow automatically. **Watch the once-off cases**: any dataset moving from `latest`
-   or changing namespace needs its remap reviewed explicitly (see below).
+3. Chart remap on staging via the Indicator Upgrader. The version bump mints new variable IDs
+   for every grapher dataset, and charts do **not** follow on their own; until the remap, Chart
+   Diff shows nothing. `etl indicator-upgrade auto` reports "No dataset migrations detected" for
+   this batch, so run one explicit `match` per dataset pair, then a single `upgrade`:
+
+   ```bash
+   # one line per grapher dataset (20 pairs), ids from `datasets` on staging; note that
+   # `datasets.catalogPath` has no `grapher/` prefix, and that staging can hold *two* old
+   # wildfire versions (the batch's and the last weekly one): pair the one that carries charts.
+   STAGING=1 .venv/bin/etl indicator-upgrade match -old <old_id> -new <new_id> --perfect-match-only
+   STAGING=1 .venv/bin/etl indicator-upgrade upgrade --dry-run
+   STAGING=1 .venv/bin/etl indicator-upgrade upgrade
+   ```
+
+   Every old variable a chart uses must get a perfect match ("All variables in the old dataset
+   have been matched"); "N unmatched variables in new dataset" is normal (indicators no chart
+   uses yet). Afterwards, check that the per-dataset chart counts on staging equal production's
+   and that no `<old>` dataset still carries a chart (the 2026-09-11 run moved 66 charts and 3
+   narrative charts, 70 chart-dataset pairs). **Watch the once-off cases**: any dataset moving
+   from `latest` or changing namespace needs its remap reviewed explicitly (see below).
 4. Verify on staging: Anomalist + Chart Diff (enable "Show all charts").
 5. **One** announcement: run [`/data-updates-comms`](../data-updates-comms/SKILL.md) for the
    combined batch, post to #data-updates-comms, and draft the single `/latest` post. Do not
