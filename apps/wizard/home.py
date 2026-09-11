@@ -129,7 +129,15 @@ def _render_app(item: dict) -> None:
                 item["entrypoint"], label=f"**{title}**", icon=icon, help=_maintainer_help(item), width="stretch"
             )
         else:
-            st.markdown(f":gray[{icon} **{title}**]", help=f"Not available on `{ENV}`.")
+            # A disabled tertiary button looks like a greyed-out page link (same padding, icon and font).
+            st.button(
+                f"**{title}**",
+                icon=icon,
+                type="tertiary",
+                disabled=True,
+                help=f"Not available on `{ENV}`.",
+                key=f"home-unavailable-{item['entrypoint']}",
+            )
         if description:
             st.caption(description)
 
