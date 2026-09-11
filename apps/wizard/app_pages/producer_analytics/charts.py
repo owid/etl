@@ -3,7 +3,7 @@
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-from st_aggrid import AgGrid, ColumnsAutoSizeMode, JsCode
+from st_aggrid import AgGrid, JsCode
 
 from apps.wizard.app_pages.producer_analytics.data_io import get_chart_views_from_bq
 from apps.wizard.app_pages.producer_analytics.utils import (
@@ -148,7 +148,6 @@ class UIChartProducerAnalytics:
             gridOptions=grid_options,
             height=500,
             width="100%",
-            columns_auto_size_mode=ColumnsAutoSizeMode.FIT_ALL_COLUMNS_TO_VIEW,
             allow_unsafe_jscode=True,
             theme="streamlit",
             # excel_export_mode=ExcelExportMode.MANUAL,  # Doesn't work?
