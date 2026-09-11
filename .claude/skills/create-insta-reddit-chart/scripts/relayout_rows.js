@@ -2,9 +2,11 @@
 // taller (540×540 → 540×675). Run through `use_figma` with CONFIG filled in. One write, one page.
 //
 // What it does, in order:
-//   1. finds the bars: VECTOR children whose path is a plain rectangle at the chart's one bar height
-//      (the modal rectangle height), grouped into rows by y — a stacked or two-sided bar chart has
-//      several rectangles per row, and every one of them is a bar;
+//   1. finds the bars: VECTORs whose path is a plain rectangle at the chart's one bar height (the
+//      modal rectangle height), grouped into rows by y — a stacked or two-sided bar chart has several
+//      rectangles per row, and every one of them is a bar. The search walks through GROUPs (a chart
+//      kept in a top-level group, an `axes` group), since a group's children share the frame's
+//      coordinate space; it does not enter FRAMEs (flags, the logo), which are moved as one leaf;
 //   2. computes the band it may fill: [headerBottom + gapBelowHeader, footerTop - gapAboveFooter];
 //   3. resizes each bar to barHeight and places row i at bandTop + inset + i * pitch, with
 //      pitch = (band - 2*inset - barHeight) / (rows - 1);
@@ -38,9 +40,16 @@ const isRect = v => v.type === "VECTOR" && v.vectorPaths.length === 1 &&
 const mode = arr => { const m = new Map(); for (const a of arr) m.set(a, (m.get(a) || 0) + 1);
   return [...m.entries()].sort((a, b) => b[1] - a[1])[0][0]; };
 
-// 1. bars — every rectangle at the modal height, whatever its x (stacked segments, negative bars)
-const rects = frame.children.filter(isRect);
-if (rects.length < 2) throw new Error("fewer than two rectangle vectors — not a bar chart I recognise");
+// leaves of the frame, seen through groups: groups are transparent, frames are leaves
+const leaves = [];
+const collect = n => { if (skip.has(n.id)) return; if (n.type === "GROUP") { for (const c of n.children) collect(c); } else leaves.push(n); };
+const skip = new Set(CONFIG.skipIds);
+for (const c of frame.children) collect(c);
+
+// 1. bars — every HORIZONTAL rectangle (wider than tall, at least 8px tall, so gridlines and columns
+//    are excluded) at the modal height, whatever its x (stacked segments, negative bars)
+const rects = leaves.filter(isRect).filter(r => r.height >= 8 && r.width > r.height);
+if (rects.length < 2) throw new Error("fewer than two horizontal rectangle vectors — not a horizontal bar chart (a column chart takes the axis-chart route)");
 const oldH = mode(rects.map(r => Math.round(r.height)));
 const bars = rects.filter(r => Math.abs(r.height - oldH) <= 1);
 const nearMiss = rects.filter(r => !bars.includes(r) && Math.abs(r.height - oldH) <= 4);
@@ -61,7 +70,6 @@ const newBarY = oldBarY.map((_, i) => bandTop + CONFIG.inset + i * pitch);
 const shift = (CONFIG.barHeight - oldH) / 2;
 
 // 3 + 4. move
-const skip = new Set(CONFIG.skipIds);
 const barIds = new Set(bars.map(b => b.id));
 const moved = [], unmatched = [];
 let axis = CONFIG.axisId ? await figma.getNodeByIdAsync(CONFIG.axisId) : null;
@@ -72,11 +80,7 @@ const rowOf = c => {
   return bd <= oldH ? best : -1;
 };
 const visit = c => {
-  if (skip.has(c.id)) return;
   if (!axis && c.type === "VECTOR" && c.width < 1 && c.height > band * 0.5) { axis = c; return; }
-  if (c.type === "GROUP" && !barIds.has(c.id) && c.children.some(k => k.type === "VECTOR" && k.width < 1)) {
-    for (const k of c.children) visit(k); return;                       // the `axes` group
-  }
   if (barIds.has(c.id)) {
     const i = rowIndexOfBar(c);
     c.resize(c.width, CONFIG.barHeight); c.y = newBarY[i];
@@ -88,7 +92,7 @@ const visit = c => {
   c.y = newBarY[i] + (c.y - oldBarY[i]) + shift;
   moved.push({ id: c.id, row: i, name: c.name.slice(0, 30), y: +c.y.toFixed(1) });
 };
-for (const c of frame.children) visit(c);
+for (const c of leaves) visit(c);
 
 // 5. axis
 if (axis) { axis.vectorPaths = [{ windingRule: "NONZERO", data: `M 0 0 L 0 ${band}` }]; axis.y = bandTop; }
