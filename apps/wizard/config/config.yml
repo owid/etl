@@ -67,11 +67,11 @@ etl:
       disable:
         "production": True
         "staging": True
-    collection:
-      title: "Collection"
-      entrypoint: etl_steps/collection.py
-      icon: ":material/collections:"
-      description: "MDIMs, Explorers."
+    chart:
+      title: "Chart"
+      entrypoint: etl_steps/chart.py
+      icon: ":material/bar_chart:"
+      description: "Charts, multidims, explorers."
       disable:
         "production": True
         "staging": True

@@ -9,13 +9,13 @@ metadata:
 
 Explorers are OWID's multi-dimensional dashboards (e.g. `ourworldindata.org/explorers/food-prices`). They're authored as YAML in this repo and published by ETL at `viz://explorer/<ns>/latest/<short>`.
 
-This skill is the explorer-flavored sibling of `/create-multidim`. They use the same `paths.create_collection(...)` engine and the same YAML schema for `dimensions` / `views` / `definitions.common_views`. The differences are:
+This skill is the explorer-flavored sibling of `/create-multidim`. They use the same engine (`paths.create_chart` for multidims, `paths.create_explorer` for explorers) and the same YAML schema for `dimensions` / `views` / `definitions.common_views`. The differences are:
 
 | | Multidim | Explorer |
 |---|---|---|
 | Channel | `viz://chart/...` | `viz://explorer/...` |
 | Step file location | `etl/steps/viz/chart/<ns>/latest/` | `etl/steps/viz/explorer/<ns>/latest/` |
-| `create_collection` flag | (default) | `explorer=True` |
+| PathFinder method | `paths.create_chart(...)` | `paths.create_explorer(...)` |
 | Top-level config block | `title:`, `default_selection:`, `default_dimensions:` | `config:` block carrying legacy explorer settings (`explorerTitle`, `explorerSubtitle`, `selection`, `subNavId`, `entityType`, …) |
 | Slug convention | underscores in file paths and `short_name` | underscores in file path, **hyphens** in URL slug and `short_name` argument |
 | Verification | preview URL on staging | preview URL on staging + diff against `owid-grapher/explorers/<slug>.explorer.tsv` |
@@ -47,7 +47,7 @@ mkdir -p etl/steps/viz/explorer/<ns>/latest
 
 - The Python file path uses **underscores**: `food_footprints.py`, `crop_yields.py`.
 - The explorer slug used in the URL and the `short_name=` argument keeps **hyphens**: `food-footprints`, `crop-yields`.
-- `paths.create_collection(short_name="<short-with-hyphens>")` — pass the hyphenated slug.
+- `paths.create_explorer(short_name="<short-with-hyphens>")` — pass the hyphenated slug.
 
 ## Step 2 — Pick a construction style
 
@@ -55,11 +55,11 @@ The two ends of the spectrum, plus everything in between:
 
 | | Full-YAML | Programmatic / table-driven |
 |---|---|---|
-| Where views live | Hand-listed in `<short>.config.yml` under `views:` | Auto-expanded by `paths.create_collection(tb=tb, ...)` from columns whose `m.dimensions` is set |
+| Where views live | Hand-listed in `<short>.config.yml` under `views:` | Auto-expanded by `paths.create_explorer(tb=tb, ...)` from columns whose `m.dimensions` is set |
 | Where chart text (FAUST) lives | Per-view `view.config.{title, subtitle, note}` in YAML | `presentation.{title_public, grapher_config}` on each indicator's garden metadata; common defaults via `definitions.common.presentation.grapher_config` |
 | Where chart-level config lives (`hasMapTab`, `tab`, `yAxis`, `chartTypes`) | Per-view `view.config` | Indicator's `presentation.grapher_config` — single source of truth, same as for any standalone chart on that indicator |
 | Map color scale | `view.indicators.y[i].display.{colorScaleScheme, colorScaleNumericBins}` (semicolon-string form, explorer-flavored override) | `presentation.grapher_config.map.colorScale.{baseColorScheme, binningStrategy, customNumericValues}` (canonical grapher form, inherited at chart render time) |
-| Python step content | Trivial: `paths.create_collection(config=config, short_name=..., explorer=True).save(...)` | Loops columns to set `m.dimensions`, optionally post-processes (`sort_choices`, `group_views`, per-view `display` tweaks) |
+| Python step content | Trivial: `paths.create_explorer(config=config, short_name=...).save(...)` | Loops columns to set `m.dimensions`, optionally post-processes (`sort_choices`, `group_views`, per-view `display` tweaks) |
 
 It's a spectrum, not a switch. Mix freely: use table-driven for the bulk of views, hand-list a handful of bespoke ones; or stay full-YAML but still push title/subtitle for the single-indicator views into garden metadata to remove duplication.
 
@@ -67,7 +67,7 @@ It's a spectrum, not a switch. Mix freely: use table-driven for the bulk of view
 
 - **Single-indicator views dominate.** Each view is a thin wrapper around one indicator → that indicator's metadata is the right home for chart text. Avoids duplication between explorer YAML and the equivalent standalone chart, and keeps both in sync forever.
 - **Many views (>20)** following the cartesian product of a few dimensions. Hand-listing them is repetitive; auto-expansion plus YAML dimensions is significantly less code.
-- **Upstream is a dimensional table** (one row per country/year × dim_a × dim_b × …) with one indicator. `create_collection(tb=tb, indicator_names=..., dimensions=...)` matches this shape directly — model: `migration/latest/migration_flows.py`.
+- **Upstream is a dimensional table** (one row per country/year × dim_a × dim_b × …) with one indicator. `create_explorer(tb=tb, indicator_names=..., dimensions=...)` matches this shape directly — model: `migration/latest/migration_flows.py`.
 - **Same indicators back standalone grapher charts.** Pushing FAUST upstream means explorer view and standalone chart inherit the same text — no drift over time.
 
 **Stick with full-YAML when:**
@@ -89,11 +89,10 @@ paths = PathFinder(__file__)
 
 
 def run() -> None:
-    config = paths.load_collection_config()
-    c = paths.create_collection(
+    config = paths.load_config()
+    c = paths.create_explorer(
         config=config,
         short_name="<short-with-hyphens>",  # explorer slug
-        explorer=True,
     )
     c.save(tolerate_extra_indicators=True)
 ```
@@ -119,7 +118,7 @@ COLUMN_DIMENSIONS: dict[str, dict[str, str]] = {
 
 
 def run() -> None:
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     ds = paths.load_dataset("<grapher_dataset>")
     tb = ds.read("<table>", load_data=False)  # metadata only — faster, we don't need values
@@ -128,7 +127,7 @@ def run() -> None:
         tb[column].m.dimensions = dims
         tb[column].m.original_short_name = "<unifying_indicator_name>"
 
-    c = paths.create_collection(
+    c = paths.create_explorer(
         config=config,
         tb=tb,
         indicator_names=["<unifying_indicator_name>"],
@@ -138,7 +137,6 @@ def run() -> None:
         },
         # common_view_config={...},                   # only if not in indicator metadata
         short_name="<short-with-hyphens>",
-        explorer=True,
     )
 
     # Optional post-processing — see "Post-processing" below.
@@ -148,7 +146,7 @@ def run() -> None:
     c.save(tolerate_extra_indicators=True)
 ```
 
-Key APIs (see `etl/collection/core/expand.py` and `etl/collection/core/create.py`):
+Key APIs (see `etl/viz/chart/core/expand.py` and `etl/viz/chart/core/create.py`):
 
 - `tb[col].m.dimensions: dict[str, str]` — required per column. Each entry says "this column represents the (dim1=value, dim2=value) cell." Columns without `m.dimensions` are ignored by the expander.
 - `tb[col].m.original_short_name: str` — the unifying indicator name. With `indicator_names=[that_name]` and a single name, the expander treats all N columns as one logical indicator with N dimension combinations and drops the auto-added "indicator" pseudo-dimension.
@@ -231,11 +229,11 @@ views:
       yAxisMin: 0
 ```
 
-For table-driven explorers, `views:` should still be present but is typically `views: []` — the explorer JSON schema requires the key, and `create_collection(tb=tb, ...)` populates the views at runtime.
+For table-driven explorers, `views:` should still be present but is typically `views: []` — the explorer JSON schema requires the key, and `create_explorer(tb=tb, ...)` populates the views at runtime.
 
 #### `catalogPath` — short forms accepted
 
-The `Indicator.is_a_valid_path` check (`etl/collection/model/view.py:62`) accepts three forms; pick the shortest one that still unambiguously resolves:
+The `Indicator.is_a_valid_path` check (`etl/viz/chart/model/view.py:62`) accepts three forms; pick the shortest one that still unambiguously resolves:
 
 | Form | Example | When to use |
 |---|---|---|
@@ -336,9 +334,9 @@ subtitle: "{definitions.prefix} {definitions.suffix}"
 
 This composes N unique full strings from a handful of building blocks. Verified via `dynamic_yaml_to_dict` (`lib/catalog/owid/catalog/core/utils.py`).
 
-## Step 6 — Post-processing the collection (table-driven only)
+## Step 6 — Post-processing the chart (table-driven only)
 
-After `paths.create_collection()` returns the collection `c`, you can mutate it before `c.save()`:
+After `paths.create_explorer()` returns the explorer `c`, you can mutate it before `c.save()`:
 
 - **`c.sort_choices({dim_slug: lambda x: sorted(x)})`** — control the order of dimension dropdowns. Useful when slugs sort poorly alphabetically.
 
@@ -384,7 +382,7 @@ After `paths.create_collection()` returns the collection `c`, you can mutate it 
 
     Pattern: `migration_flows.py`'s `add_display_settings(c)`. Avoid this loop when the setting can live on the indicator's garden metadata instead.
 
-- **`choice_renames={dim: {slug: display_name, ...}}`** (passed directly to `create_collection`) — map slug → display name when you need to derive the display label programmatically. Model: `chart/minerals/latest/minerals.py`.
+- **`choice_renames={dim: {slug: display_name, ...}}`** (passed directly to `create_explorer`) — map slug → display name when you need to derive the display label programmatically. Model: `chart/minerals/latest/minerals.py`.
 
 - **Sidecar `<short>.dims.yaml`** — when the column → dimensions map exceeds ~50 entries, lift it out of the Python step into a sidecar YAML loaded at module-import time. Keeps `<short>.py` focused on logic and turns dim-tagging changes into a 1-line YAML edit. Model: `etl/steps/viz/explorer/emissions/latest/co2.{py,dims.yaml}`:
 
@@ -425,7 +423,7 @@ Hand the user the exact `etlr` command — don't run it yourself.
 
 ## Common pitfalls
 
-- **`build_views` does not propagate per-view `display` from indicator metadata** — see TODO at `etl/collection/core/expand.py:313`. Each auto-expanded view gets `indicators.y[0]` with only `catalogPath`, no `display`. If you need different color scales per view, either (a) put them in the indicator's `presentation.grapher_config.map.colorScale` so they apply at chart render time, or (b) post-process `c.views` in Python.
+- **`build_views` does not propagate per-view `display` from indicator metadata** — see TODO at `etl/viz/chart/core/expand.py:313`. Each auto-expanded view gets `indicators.y[0]` with only `catalogPath`, no `display`. If you need different color scales per view, either (a) put them in the indicator's `presentation.grapher_config.map.colorScale` so they apply at chart render time, or (b) post-process `c.views` in Python.
 - **`type: LineChart` is not a valid `grapher_config` field** when authoring via indicator metadata — use `chartTypes: ["LineChart"]` (the schema is an array). Per-view `config.type` in the explorer YAML still accepts strings.
 - **`tb.read(..., load_data=False)`** is essential when you only need column metadata to set dimensions; loading data unnecessarily slows the step.
 - **YAML schema requires `views:` key** in the explorer config even when empty. Pass `views: []`.
@@ -450,11 +448,11 @@ Full-YAML (each view hand-listed):
 
 Table-driven (views auto-expanded from a dimensional table):
 
-- `etl/steps/viz/explorer/migration/latest/migration_flows.{py,config.yml}` — passes `tb=tb, indicator_names=[...], dimensions=[...]` to `create_collection`; YAML carries only the static config and dimension presentation. Includes `add_display_settings(c)` post-processing.
+- `etl/steps/viz/explorer/migration/latest/migration_flows.{py,config.yml}` — passes `tb=tb, indicator_names=[...], dimensions=[...]` to `create_explorer`; YAML carries only the static config and dimension presentation. Includes `add_display_settings(c)` post-processing.
 - `etl/steps/viz/explorer/emissions/latest/co2.{py,dims.yaml,config.yml}` — sidecar `.dims.yaml` for the 54-entry column→dimensions map; uses `c.edit_views([...])` with both an unscoped default and a 4-dim-filtered override; uses a `c.views` loop with `view.matches(...)` for per-indicator `numDecimalPlaces` overrides.
 - `etl/steps/viz/explorer/emissions/latest/air_pollution.{py,config.yml}` — table-driven with `c.group_views(...)` to add facet views, `c.drop_views(...)` to prune cross-products.
 - `etl/steps/viz/chart/minerals/latest/minerals.py` — same APIs in the multidim channel; useful read for `choice_renames`.
 
 ## Follow-up
 
-Once an explorer is on `create_collection(explorer=True)`, it's a candidate for the Track-B port to MDIM (`viz://chart/...`) once feature parity is reached. See umbrella issue #6014.
+Once an explorer is on `paths.create_explorer()`, it's a candidate for the Track-B port to MDIM (`viz://chart/...`) once feature parity is reached. See umbrella issue #6014.

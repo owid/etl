@@ -38,8 +38,8 @@ def test_get_all_changed_catalog_paths_yaml_only_chart_and_export_steps(mock_loa
 
 
 @patch("etl.io.load_dag")
-def test_get_all_changed_catalog_paths_collection_subconfig(mock_load_dag):
-    """A collection sub-config maps to its parent `<short>` explorer step, not a phantom step.
+def test_get_all_changed_catalog_paths_viz_subconfig(mock_load_dag):
+    """A viz step's sub-config maps to its parent `<short>` explorer step, not a phantom step.
 
     The democracy explorer is built by `democracy.py` from companion configs like
     `democracy.eiu.config.yml`. Editing only a sub-config must select the real

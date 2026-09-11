@@ -7,8 +7,8 @@ REGION_PATH = "regions#owid_region"
 
 
 def run() -> None:
-    c = paths.create_collection(
-        config=paths.load_collection_config(),
+    c = paths.create_chart(
+        config=paths.load_config(),
         short_name="internal_displacement",
     )
 

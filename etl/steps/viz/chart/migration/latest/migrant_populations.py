@@ -11,8 +11,8 @@ EXCLUDED_ENTITIES = ["Niue", "Bonaire Sint Eustatius and Saba", "Wallis and Futu
 
 
 def run() -> None:
-    c = paths.create_collection(
-        config=paths.load_collection_config(),
+    c = paths.create_chart(
+        config=paths.load_config(),
         short_name="migrant_populations",
     )
 

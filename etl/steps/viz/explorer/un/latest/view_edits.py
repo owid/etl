@@ -14,7 +14,7 @@ from typing import Any
 
 import yaml
 
-from etl.collection.explorer import Explorer
+from etl.viz.explorer import Explorer
 
 # Last year for which UN WPP publishes estimates (projections start the year after).
 # Used as the default `mapTargetTime` on grouped projection views so the map opens

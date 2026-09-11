@@ -1,3 +1,4 @@
+import pickle
 import tempfile
 import zipfile
 from pathlib import Path
@@ -10,7 +11,14 @@ from owid.catalog import Origin, s3_utils
 
 from etl import config, paths
 from etl.files import checksum_file, ruamel_load
-from etl.snapshot import Snapshot, SnapshotArchive, SnapshotMeta, _parse_snapshot_path
+from etl.snapshot import (
+    PrivateSnapshotAccessError,
+    Snapshot,
+    SnapshotArchive,
+    SnapshotMeta,
+    SnapshotNotFoundException,
+    _parse_snapshot_path,
+)
 
 
 @pytest.fixture
@@ -388,3 +396,25 @@ def test_private_snapshot_says_how_to_get_access_or_skip(monkeypatch, tmp_path):
     fail_with(EndpointConnectionError(endpoint_url="https://r2.example"))
     with pytest.raises(EndpointConnectionError):
         snap._download_dvc_file("abc123")
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        SnapshotNotFoundException("dummy/2020-01-01/dummy.csv", "abc123"),
+        PrivateSnapshotAccessError("dummy/2020-01-01/dummy.csv", "R2 returned 400"),
+    ],
+    ids=lambda e: type(e).__name__,
+)
+def test_snapshot_errors_survive_a_process_boundary(error):
+    """Steps run in worker processes, so these have to be able to come back from one.
+
+    An exception whose `__init__` takes more arguments than reach `self.args` cannot be rebuilt by
+    the default `BaseException.__reduce__`, and unpickling it raises TypeError inside the
+    ProcessPoolExecutor result reader instead — killing the pool and failing every step that was
+    left with BrokenProcessPool — which a nightly rebuild once spent 546MB of log reporting.
+    """
+    revived = pickle.loads(pickle.dumps(error))
+
+    assert type(revived) is type(error)
+    assert str(revived) == str(error)

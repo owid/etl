@@ -44,8 +44,8 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Default collection config
-    config = paths.load_collection_config()
+    # Default chart config
+    config = paths.load_config()
 
     # Load grapher dataset.
     ds_sdgs = paths.load_dataset("education_sdgs")
@@ -103,10 +103,10 @@ def run() -> None:
     tb_opri = adjust_dimensions_enrolment(tb_opri)
     tb_wdi = adjust_dimensions_enrolment(tb_wdi)
     #
-    # Create collection object
+    # Create chart object
     #
 
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         tb=[tb_sdgs, tb_opri, tb_wdi],
         common_view_config=MULTIDIM_CONFIG,
