@@ -470,7 +470,7 @@ if submitted:
             )
 
             st.markdown("#### 3. Proceed to next step")
-            st_wizard_page_link("data", width="stretch", border=True)
+            st_wizard_page_link("data-step", width="stretch", border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

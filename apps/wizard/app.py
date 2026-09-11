@@ -39,11 +39,6 @@ pages["Overview"] = [
     for item in WIZARD_CONFIG["main"].values()
 ]
 
-# ETL steps
-pages[WIZARD_CONFIG["etl"]["title"]] = [
-    _page(step, url_path=step["alias"]) for step in WIZARD_CONFIG["etl"]["steps"].values() if step["enable"]
-]
-
 # Sections
 for section in WIZARD_CONFIG["sections"]:
     apps = [app for app in section["apps"] if app["enable"]]

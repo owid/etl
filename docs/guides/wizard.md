@@ -115,9 +115,6 @@ Pages to keep our steps and charts up to date. The current pages are:
 
 - **Servers dashboard**: Track the status of all our servers.
 
-### Misc
-
-- **Chart animation**: Animate a chart over time and export it as a GIF.
 <!--
 ### Metadata
 

@@ -41,9 +41,6 @@ def load_wizard_config():  # -> Any:
 
         raise ValueError(f"Invalid disable property: {disable}")
 
-    ## ETL steps
-    for _, step in config["etl"]["steps"].items():
-        step["enable"] = _get_enable(step)
     ## Sections
     for section in config["sections"]:
         for app in section["apps"]:
@@ -54,9 +51,6 @@ def load_wizard_config():  # -> Any:
             app["enable"] = _get_enable(app)
 
     # Add alias if not there by lowering the title
-    for _, step in config["etl"]["steps"].items():
-        if "alias" not in step:
-            step["alias"] = step["title"].lower().replace(" ", "-")
     for section in config["sections"]:
         for app in section["apps"]:
             if "alias" not in app:
@@ -66,31 +60,8 @@ def load_wizard_config():  # -> Any:
 
 def _check_wizard_config(config: dict):
     """Check if the wizard config is valid."""
-    _app_properties_expected = ["title", "entrypoint", "icon"]
-    pages_properties_expected = _app_properties_expected + ["alias", "description"]
-    etl_steps_properties_expected = _app_properties_expected
+    pages_properties_expected = ["title", "entrypoint", "icon", "alias", "description"]
 
-    # Check `etl` property
-    assert "etl" in config, "`etl` property is required in wizard config!"
-    assert "title" in config["etl"], "`etl.title` property is required in wizard config!"
-    assert "description" in config["etl"], "`etl.description` property is required in wizard config!"
-    assert "steps" in config["etl"], "`etl.steps` property is required in wizard config!"
-    steps = config["etl"]["steps"]
-    steps_expected = [
-        "snapshot",
-        "data",
-        # "express",
-        # "meadow",
-        # "garden",
-        # "grapher",
-        "fasttrack",
-    ]
-    for step_expected in steps_expected:
-        assert step_expected in steps, f"{step_expected} property is required in etl.steps property in wizard config!"
-        for prop in etl_steps_properties_expected:
-            assert prop in steps[step_expected], (
-                f"`etl.steps.{step_expected}.{prop}` property is required in `etl.steps` property in wizard config!"
-            )
     # Check `sections` property
     assert "sections" in config, "sections property is required in wizard config!"
     for section in config["sections"]:
@@ -106,20 +77,9 @@ def _check_wizard_config(config: dict):
 
 WIZARD_CONFIG = load_wizard_config()
 
-# Phases accepted
-_aliases = []
-## Aliases from pages
-for section in WIZARD_CONFIG["sections"]:
-    for app in section["apps"]:
-        _aliases.append(app["alias"])
-## Add aliases from etl steps and 'all'
-_aliases = tuple(_aliases + list(WIZARD_CONFIG["etl"]["steps"].keys()) + ["all"])
-WIZARD_PHASES = _aliases
-
 # Get all pages by alias
 _pages = [ww for w in WIZARD_CONFIG["sections"] for ww in w["apps"]]
 PAGES_BY_ALIAS = {
     **WIZARD_CONFIG["main"],
-    **WIZARD_CONFIG["etl"]["steps"],
     **{p["alias"]: {k: v for k, v in p.items() if k not in ["alias"]} for p in _pages},
 }

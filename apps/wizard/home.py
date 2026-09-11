@@ -29,9 +29,6 @@ def st_show_home():
     # Check early to avoid rendering the home page before redirecting.
     #########################
     if "page" in st.query_params:
-        for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
-            if st.query_params["page"] == step_name:
-                st.switch_page(step_props["entrypoint"])
         for section in WIZARD_CONFIG["sections"]:
             for app in section["apps"]:
                 if st.query_params["page"] == app["alias"]:
@@ -74,25 +71,16 @@ def st_show_home():
                 _render_group(group)
 
     #########################
-    # FOOTER: the top-level external links (e.g. documentation) as a muted note
+    # FOOTER
     #########################
-    links = [e for e in WIZARD_CONFIG["main"].values() if str(e["entrypoint"]).startswith(("http://", "https://"))]
-    if links:
-        st.caption(" · ".join(f"{e['icon']} [{e['title']}]({e['entrypoint']})" for e in links))
+    docs = WIZARD_CONFIG["main"].get("docs")
+    if docs:
+        st.caption(f"For more details, refer to the ETL [documentation]({docs['entrypoint']}).")
 
 
 def _groups() -> list[dict]:
-    """Every group of apps shown on the home page: the step-creation apps, the config sections, legacy."""
-    etl = WIZARD_CONFIG["etl"]
+    """Every group of apps shown on the home page: the config sections, plus legacy."""
     groups = [
-        {
-            "title": etl["title"],
-            "description": etl["description"],
-            "group": etl.get("group"),
-            "apps": list(etl["steps"].values()),
-        }
-    ]
-    groups += [
         {"title": s["title"], "description": s["description"], "group": s.get("group"), "apps": s["apps"]}
         for s in WIZARD_CONFIG["sections"]
     ]

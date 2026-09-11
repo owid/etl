@@ -1,8 +1,7 @@
 # Use this file to add new apps (or pages) to Wizard (see property 'sections')
 #
-# There are three main properties in this file:
+# There are two main properties in this file:
 # - main: Reserved for the 'Home' page and other top-level entries (external links are rendered as plain links).
-# - etl: The step-creation apps. They are shown under "Create" on the home page and in their own sidebar section.
 # - sections: A list of sections. Each section is a group of apps, rendered as one group on the home page and one
 #   group in the sidebar. A section has a title, a description and a list of apps. Sections that share an optional
 #   `group` label (e.g. "ETL work") are shown together on the home page, in one wide box under that label.
@@ -13,7 +12,7 @@
 #
 # Your app should have the following properties:
 # - title (str): Title of the app. This will be shown in the home page and sidebar menu of Wizard.
-# - alias (str): [not needed in etl.steps] Alias of the app. This is used if you want to directly access the app from the command line (e.g. `etlwiz [alias]`).
+# - alias (str): Alias of the app. This is used if you want to directly access the app from the command line (e.g. `etlwiz [alias]`).
 # - description (str): One-line description of the app. Shown in the app's help tooltip on the home page.
 # - maintainer (str): Slack handle of the person responsible for the app. Shown in the app's help tooltip on the home page.
 # - entrypoint (str): Path to the main file of the app. This file should be the streamlit python script.
@@ -38,44 +37,42 @@ main:
     entrypoint: https://docs.owid.io/projects/etl
     icon: ":material/menu_book:"
 
-# ETL steps
-etl:
-  title: Create
-  description: Create an ETL step.
-  group: "ETL work"
-  steps:
-    snapshot:
-      title: "Snapshot"
-      entrypoint: etl_steps/snapshot.py
-      icon: ":material/photo_camera:"
-      description: "Raw data from a producer."
-      disable:
-        "production": True
-        "staging": True
-    data:
-      title: "Data step"
-      entrypoint: etl_steps/data.py
-      icon: ":material/table:"
-      description: "Meadow, Garden, Grapher."
-      disable:
-        "production": True
-        "staging": True
-    chart:
-      title: "Chart"
-      entrypoint: etl_steps/chart.py
-      icon: ":material/bar_chart:"
-      description: "Charts, multidims, explorers."
-      disable:
-        "production": True
-        "staging": True
-    fasttrack:
-      title: "Fast track"
-      alias: fasttrack
-      entrypoint: app_pages/fasttrack/app.py
-      icon: ":material/fast_forward:"
-      description: "Import data from a Google Sheet or CSV."
-
 sections:
+  - title: "Create"
+    group: "ETL work"
+    description: |-
+      Create an ETL step.
+    apps:
+      - title: "Snapshot"
+        alias: snapshot
+        entrypoint: etl_steps/snapshot.py
+        description: "Raw data from a producer."
+        icon: ":material/photo_camera:"
+        disable:
+          "production": True
+          "staging": True
+      - title: "Data step"
+        alias: data-step
+        entrypoint: etl_steps/data.py
+        description: "Meadow, Garden, Grapher."
+        icon: ":material/table:"
+        disable:
+          "production": True
+          "staging": True
+      - title: "Chart"
+        alias: chart
+        entrypoint: etl_steps/chart.py
+        description: "Charts, multidims, explorers."
+        icon: ":material/bar_chart:"
+        disable:
+          "production": True
+          "staging": True
+      - title: "Fast track"
+        alias: fasttrack
+        entrypoint: app_pages/fasttrack/app.py
+        description: "Import data from a Google Sheet or CSV."
+        icon: ":material/fast_forward:"
+
   - title: "QA"
     group: "ETL work"
     description: |-
@@ -178,14 +175,3 @@ sections:
         icon: ":material/computer:"
         disable:
           staging: true
-
-  - title: "Misc"
-    description: |-
-      Other helpful tools in the ETL ecosystem.
-    apps:
-      - title: "Chart animation"
-        alias: chart-animation
-        description: "Animate charts (GIF/video)"
-        maintainer: "@pablo"
-        entrypoint: app_pages/chart_animation.py
-        icon: ":material/animated_images:"
