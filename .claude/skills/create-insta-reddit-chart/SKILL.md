@@ -284,7 +284,7 @@ for (const n of clone.findAll(() => true)) {
   if (n.type === "TEXT" && whiteStroke) await n.setStrokeStyleIdAsync(BEIGE);                 // text halo
   if (n.type === "VECTOR" && whiteStroke && n.vectorPaths.length) {
     const path = n.vectorPaths[0].data;                              // an outline shares its line's path…
-    const twin = n.parent.children.find(k => k !== n && k.type === "VECTOR" && k.vectorPaths.length
+    const twin = clone.findOne(k => k !== n && k.type === "VECTOR" && k.vectorPaths.length      // …wherever the line lives
       && k.vectorPaths[0].data === path && k.strokes.some(p => p.type === "SOLID" && !isWhite(p)));
     if (twin && n.strokeWeight > twin.strokeWeight) await n.setStrokeStyleIdAsync(BEIGE);      // …with a wider stroke
   }
