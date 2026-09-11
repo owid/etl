@@ -83,7 +83,7 @@ After submitting each of the forms, a short guideline is shown so that the user 
 
 </div>
 
-### Update
+### Data tools
 
 Pages to keep our steps and charts up to date. The current pages are:
 
@@ -93,7 +93,7 @@ Pages to keep our steps and charts up to date. The current pages are:
 
 !!! info "Learn more about [updating charts](data-work/update-charts.md) section"
 
-### Data QA
+### QA
 
 - [**Chart diff**](data-work/update-charts/#using-chart-diff){ data-preview }: Shows all charts in your environment (e.g. staging server) that have been modified compared to the production. This is useful to review the changes before they are pushed to the production. Additionally, we provide MDIM and Explorer diff (experimental).
 - **Anomalist**: Presents all anomalies detected in a given selected dataset. By default, it attempts to load anomalies from the newly added datasets (and, if applicable, it also compares the new indicators with the old counterparts).
@@ -106,6 +106,11 @@ Pages to keep our steps and charts up to date. The current pages are:
 - **Related charts**: Given a chart, find related charts based on semantic similarity.
 
 
+### Analytics
+
+- **Producer analytics**: Share chart analytics with data producers.
+- **Metabase**: OWID's analytics dashboards (external).
+
 ### Engineering
 
 - **Servers dashboard**: Track the status of all our servers.
@@ -113,7 +118,6 @@ Pages to keep our steps and charts up to date. The current pages are:
 ### Misc
 
 - **Chart animation**: Animate a chart over time and export it as a GIF.
-- **Producer analytics**: Share chart analytics with data producers.
 <!--
 ### Metadata
 

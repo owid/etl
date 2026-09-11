@@ -54,7 +54,7 @@ def st_show_home():
     #########################
     # DIRECTORY
     # Sections sharing a `group` label (e.g. "ETL work") share one wide box, one column each. The remaining
-    # sections (plus links and legacy) follow as bordered tiles, as many per row as fit.
+    # sections (plus legacy) follow as bordered tiles, as many per row as fit.
     #########################
     groups = _groups()
     labelled = [g for g in groups if g.get("group")]
@@ -73,9 +73,16 @@ def st_show_home():
             with st.container(border=True, width=TILE_WIDTH):
                 _render_group(group)
 
+    #########################
+    # FOOTER: the top-level external links (e.g. documentation) as a muted note
+    #########################
+    links = [e for e in WIZARD_CONFIG["main"].values() if str(e["entrypoint"]).startswith(("http://", "https://"))]
+    if links:
+        st.caption(" · ".join(f"{e['icon']} [{e['title']}]({e['entrypoint']})" for e in links))
+
 
 def _groups() -> list[dict]:
-    """Every group of apps shown on the home page: the step-creation apps, the config sections, links, legacy."""
+    """Every group of apps shown on the home page: the step-creation apps, the config sections, legacy."""
     etl = WIZARD_CONFIG["etl"]
     groups = [
         {
@@ -89,9 +96,6 @@ def _groups() -> list[dict]:
         {"title": s["title"], "description": s["description"], "group": s.get("group"), "apps": s["apps"]}
         for s in WIZARD_CONFIG["sections"]
     ]
-    links = [e for e in WIZARD_CONFIG["main"].values() if str(e["entrypoint"]).startswith(("http://", "https://"))]
-    if links:
-        groups.append({"title": "Links", "description": "Other OWID tools and resources.", "apps": links})
     legacy_apps = WIZARD_CONFIG.get("legacy", {}).get("apps", [])
     if legacy_apps:
         groups.append({"title": "Legacy", "description": WIZARD_CONFIG["legacy"]["description"], "apps": legacy_apps})
