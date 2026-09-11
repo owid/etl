@@ -32,8 +32,8 @@ Most recurring work here has a skill that runs it end to end. Reach for it **bef
 | Build a multi-dim indicator, or an explorer | `/create-multidim`, `/create-explorer` |
 | Review a dataset-update PR | `/review-data-pr` |
 | Announce a finished update, internally | `/data-updates-comms` — the #data-updates-comms Slack form |
-| Announce a finished update, to readers | `/data-update-announcement` — the "Data update" post on ourworldindata.org/latest |
-| Log the analytics reports sent to data producers, and their replies, in the shared Notion log | `/log-producer-interactions` — incremental, from your own Gmail, reports only |
+| Announce a finished update, to readers | `/owid-staff:draft-data-update-post` — the "Data update" post on ourworldindata.org/latest; from the `owid-staff` plugin (owid/skills-private), auto-installed here |
+| Log the analytics reports sent to data producers, and their replies, in the shared Notion log | `/owid-staff:log-producer-interactions` — incremental, from your own Gmail, reports only; from the `owid-staff` plugin (owid/skills-private) |
 | Make a designed static chart in the Charts Figma file, or its Instagram/Reddit version | `/owid-staff:create-figma-chart`, `/owid-staff:create-insta-reddit-chart` — from the `owid-staff` plugin (`owid/skills-private`), auto-installed here via `.claude/settings.json` |
 
 One that's easy to skip and shouldn't be: `/edit-faust-metadata` owns **every** user-facing-text edit — it routes each field to the right layer (garden `.meta.yml` vs MDim yaml vs chart config on staging) and reports the blast radius on other charts before touching shared metadata.
