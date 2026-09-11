@@ -52,8 +52,8 @@ EOF
 |---|---|---|
 | `yVariableIds` (and optional `xVariableId` / `colorVariableId` / `sizeVariableId`) | **Indicator-based** | This skill — direct ID→catalogPath mapping. |
 | `grapherId` only | **Grapher-chart-based** | This skill — two-step lookup; the chart's stored config (title, subtitle, type, hasMapTab, …) becomes per-view config. |
-| `tableSlug` (with `table` blocks) — pure CSV | **Wrong skill** | Use `/migrate-explorer-csv` instead. |
-| Mixed `grapherId` + `tableSlug` | **Hybrid** | Rare (`natural-disasters`, `food-footprints`). Migrate the grapherId rows here; for the tableSlug rows, do the snapshot/garden chain via `/migrate-explorer-csv` (steps 1–5) and merge the resulting catalogPaths into the same explorer config. |
+| `tableSlug` (with `table` blocks) — pure CSV | **Retired route** | No CSV-backed explorers remain to migrate; the `/migrate-explorer-csv` skill was removed. |
+| Mixed `grapherId` + `tableSlug` | **Hybrid** | Rare (`natural-disasters`, `food-footprints`). Migrate the grapherId rows here; for the tableSlug rows, do the snapshot/garden chain via the retired CSV route (steps 1–5) and merge the resulting catalogPaths into the same explorer config. |
 
 ## Step 1 — Read the legacy explorer config
 
@@ -77,7 +77,7 @@ make query SQL="SELECT c.id, JSON_EXTRACT(cc.config, '\$.dimensions[0].variableI
 make query SQL="SELECT c.id, cc.config FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE c.id IN (...)"
 ```
 
-Variables without `catalogPath` are not yet in ETL — their underlying datasets need to be migrated first (use the `/migrate-dataset` skill). **Halt and report which datasets are missing rather than guessing.**
+Variables without `catalogPath` are not yet in ETL — their underlying datasets need to be migrated first (the `/migrate-dataset` skill was retired; bring the dataset into ETL first). **Halt and report which datasets are missing rather than guessing.**
 
 For multi-indicator charts (e.g. stacked bars), `dimensions[0]` only gives the first y variable. Pull all dimensions from `chart_configs.config` and treat each one as an entry in `view.indicators.y[]`.
 
