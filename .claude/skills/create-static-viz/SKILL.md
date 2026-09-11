@@ -16,11 +16,13 @@ actually pick up, and getting that SVG into the Charts file.
 say-so — same rule as `/create-figma-chart`.
 
 > **Paired skill — an update here may oblige an update there, and the reverse.**
-> [`/create-figma-chart`](../create-figma-chart/SKILL.md) owns everything that happens inside Figma,
+> `/create-figma-chart` owns everything that happens inside Figma,
 > and this skill hands off to it at Step 7. The two share a contract that lives half in each file, so
 > **when you change something on this list, check the other skill in the same session and update it
 > too — or state explicitly that you checked and no change was needed.** Neither side may drift
 > silently; a stale cross-skill fact is how a later run re-derives geometry by trial and error.
+> That skill now lives in `owid/skills-private` (the `owid-staff` plugin, auto-installed here via
+> `.claude/settings.json`); invoke it as `/owid-staff:create-figma-chart`.
 >
 > | Shared fact | Owner | Consumed by |
 > |---|---|---|
@@ -29,14 +31,14 @@ say-so — same rule as `/create-figma-chart`.
 > | Node naming (`gid`s) this step emits, and frame proportions | this skill | that skill's Steps 1/3/7–8 |
 > | Which text slots this step fills vs. leaves to the template | this skill | that skill's Step 6 |
 > | Type and palette — this step sets neither | that skill | this skill defers to it |
-> | The design vocabulary (per chart type, labeling, colors) | that skill's [`GUIDELINES.md`](../create-figma-chart/GUIDELINES.md) | both |
+> | The design vocabulary (per chart type, labeling, colors) | that skill's `GUIDELINES.md` | both |
 >
 > The asymmetry worth remembering: **this skill owns the data, the geometry and the proportions; that
 > one owns the type and the palette.** A change that crosses that line belongs in both files. In
 > particular, if you change what the step emits — node naming, frame proportions, which text slots it
 > fills — check whether that skill's Step 1/3/7 notes on local SVGs still hold.
 >
-> Its **[`GUIDELINES.md`](../create-figma-chart/GUIDELINES.md)** is where the visual vocabulary this
+> Its **`GUIDELINES.md`** is where the visual vocabulary this
 > skill defers to actually lives — the per-chart-type rules, direct labeling in place of legends, the
 > OWID palette, the annotation and reference-line conventions. Read the section for your chart type
 > before choosing a form or deciding what to label: the point is not to style anything here, it is to
@@ -64,9 +66,9 @@ run, so a paragraph added here costs every future viz — new detail belongs in 
 its step. After editing any doc in this skill:
 
 ```bash
-.venv/bin/python .claude/skills/create-figma-chart/scripts/verify_docs.py --skill create-static-viz --structure
+.venv/bin/python .claude/skills/create-static-viz/scripts/verify_docs.py --structure
 # and after moving text between files, prove nothing was dropped:
-.venv/bin/python .claude/skills/create-figma-chart/scripts/verify_docs.py --skill create-static-viz --against <ref>
+.venv/bin/python .claude/skills/create-static-viz/scripts/verify_docs.py --against <ref>
 ```
 
 **When you do make a Figma MCP call, batch it.** A call costs twice — the network hop to the hosted

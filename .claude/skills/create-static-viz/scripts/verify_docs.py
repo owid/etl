@@ -14,8 +14,8 @@ Two modes, both read-only:
                          what it reports is text that actually went missing.
 
 Usage (from the repo root, always through the repo virtualenv):
-    .venv/bin/python .claude/skills/create-figma-chart/scripts/verify_docs.py --structure
-    .venv/bin/python .claude/skills/create-figma-chart/scripts/verify_docs.py --against HEAD~1
+    .venv/bin/python .claude/skills/create-static-viz/scripts/verify_docs.py --structure
+    .venv/bin/python .claude/skills/create-static-viz/scripts/verify_docs.py --against HEAD~1
 
 Exits 1 on any finding.
 """
