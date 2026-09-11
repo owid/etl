@@ -123,7 +123,7 @@ to *offer* that route on a map, not to skip the question.
 | Route | What it costs | When it fits |
 |---|---|---|
 | **Default grapher export** | minutes | the chart already reads well at 540px: few series, legible labels, nothing to reduce or re-annotate |
-| **Designed chart** via [`/create-figma-chart`](../create-figma-chart/SKILL.md) | a build in the shared Charts file, plus a design review | the default is crowded — many series, a legend eating the width, a marker on every observation, or a story that wants direct labels or an annotation |
+| **Designed chart** via `/create-figma-chart` — installed from `owid/skills-private` as `/owid-staff:create-figma-chart` | a build in the shared Charts file, plus a design review | the default is crowded — many series, a legend eating the width, a marker on every observation, or a story that wants direct labels or an annotation |
 
 **Series count is the usual tell**: past about four lines grapher falls back to an elbow legend that
 can take ~30% of the width, and the lines themselves stop being followable. Say what you can see when
