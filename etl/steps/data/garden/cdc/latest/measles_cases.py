@@ -8,11 +8,11 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# The CDC's JSON has one record per year, but since 2026-09-10 it also carries a single record
-# with no `year` key at all (`{"cases": "5", "filter": "1985-Present*"}`), which pandas reads as a
-# missing year. It is not a year we can plot, and the years it sits between are all complete, so we
-# drop it. Bounded, so that a producer-side change that starts stripping years from real records
-# fails the step instead of silently shrinking the series.
+# The CDC's JSON has one record per year, but since 2026-09-10 it leads with a record that has no
+# `year` key at all (`{"cases": "5", "filter": "1985-Present*"}`), which pandas reads as a missing
+# year. There is nowhere to plot it, and every year from 1985 to the present is already reported by
+# its own record, so we drop it. The bound is there so that a producer-side change that starts
+# stripping years from real records fails the step instead of silently shrinking the series.
 MAX_RECORDS_WITHOUT_YEAR = 1
 
 
