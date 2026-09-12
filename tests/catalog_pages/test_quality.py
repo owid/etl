@@ -1,7 +1,7 @@
 from owid.catalog.core.meta import DatasetMeta, License, Origin, TableMeta, VariableMeta
 from owid.catalog.schema_org import TableSchemaInput
 
-from etl.catalog_jsonld.quality import assess_dataset_quality, find_duplicate_short_key_paths, is_reserved_namespace
+from etl.catalog_pages.quality import assess_dataset_quality, find_duplicate_short_key_paths, is_reserved_namespace
 
 
 def _eligible_table() -> TableSchemaInput:
@@ -177,7 +177,7 @@ def test_missing_table_description_warned_when_no_description_anywhere() -> None
 
 
 def test_jsonld_contains_raw_jinja_detects_template_markers() -> None:
-    from etl.catalog_jsonld.quality import jsonld_contains_raw_jinja
+    from etl.catalog_pages.quality import jsonld_contains_raw_jinja
 
     assert jsonld_contains_raw_jinja({"name": '<% if x == "a" %>A<% endif %>'})
     assert jsonld_contains_raw_jinja({"hasPart": [{"description": "The value of <<x>>."}]})

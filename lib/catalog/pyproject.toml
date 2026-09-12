@@ -47,6 +47,7 @@ dependencies = [
     "marshmallow>=3.26.2",
     "brotli>=1.2.0",
     "urllib3>=2.7.0",
+    "openpyxl>=3.0.9",
 ]
 
 [dependency-groups]
