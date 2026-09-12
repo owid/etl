@@ -62,12 +62,11 @@ from sqlalchemy.orm import Session
 
 ## Components (`apps.wizard.utils.components`)
 
-- `st_horizontal()` — flexbox row context manager
 - `Pagination(items, items_per_page, pagination_key)` — paginated lists
 - `grapher_chart()` / `grapher_chart_from_url()` — OWID charts
 - `st_wizard_page_link(alias)` — link to another Wizard page
-- `st_tag(name, color, icon)` / `tag_in_md()` — colored badges
-- `st_toast_success()` / `st_toast_error()` — toast notifications
+- `tag_in_md(name, color, icon)` — colored badge markup for `st.markdown` (or use native `st.badge`)
+- `st_toast_error()` — error toast
 - `preview_file(path)` — code preview in expander
 
 ## Rules
@@ -77,3 +76,5 @@ from sqlalchemy.orm import Session
 - Use `url_persist()` for shareable widget state
 - Material icons: `:material/icon_name:` (Google Material Symbols)
 - HTTP requests: always `timeout=30` and `.raise_for_status()`
+- Layout: use native `st.container(horizontal=True, vertical_alignment=..., horizontal_alignment=...)` for rows, `st.columns(..., border=True)` for grids. No CSS/HTML hacks (`st.markdown(..., unsafe_allow_html=True)` with `<style>`) — they break silently across Streamlit versions.
+- Sections in `config.yml` need `title`, `description` and `apps`; the home page is generated from them (no images).

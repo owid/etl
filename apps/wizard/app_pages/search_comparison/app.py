@@ -9,7 +9,7 @@ import requests
 import streamlit as st
 
 from apps.wizard.app_pages.search_comparison.random_queries import get_benchmark_query, get_random_search_query
-from apps.wizard.utils.components import st_horizontal, url_persist
+from apps.wizard.utils.components import url_persist
 from etl.config import OWID_ENV  # noqa: F401 -- needed after TODO revert
 from etl.db import read_sql
 from etl.http import session as http_session
@@ -355,7 +355,7 @@ def render_source_options(side: str, source: str) -> SearchOptions:
     options = SearchOptions()
 
     if source == SearchSource.SEMANTIC:
-        with st_horizontal():
+        with st.container(horizontal=True, vertical_alignment="bottom"):
             options.llm_rerank = url_persist(st.checkbox)(
                 key=f"{side}_llm_rerank",
                 label="LLM rerank",
@@ -373,7 +373,7 @@ def render_source_options(side: str, source: str) -> SearchOptions:
                 value=False,
             )
     elif source == SearchSource.AGENT:
-        with st_horizontal():
+        with st.container(horizontal=True, vertical_alignment="bottom"):
             options.agent_model = url_persist(st.selectbox)(
                 key=f"{side}_agent_model",
                 label="Model",
@@ -391,7 +391,7 @@ def render_source_options(side: str, source: str) -> SearchOptions:
                 help="Filter results by type",
             )
     elif source == SearchSource.TYPESENSE:
-        with st_horizontal():
+        with st.container(horizontal=True, vertical_alignment="bottom"):
             options.typesense_alpha = url_persist(st.number_input)(
                 key=f"{side}_typesense_alpha",
                 label="Alpha",
@@ -498,7 +498,7 @@ def main():
         )
     with col_btns:
         st.markdown("")  # align with text input
-        with st_horizontal():
+        with st.container(horizontal=True):
             if st.button("🎲 Random", help="Random query from real user searches (weighted by popularity)"):
                 st.session_state["_set_random_query"] = get_random_search_query(require_hits=True)
                 st.rerun()

@@ -2345,6 +2345,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "005313",  # Laying (animals).
                 assert unit == "animals"
                 title = f"Laying animals to produce {item.lower()}"
+                num_decimal_places = 0
             elif element_code == "005513":
                 # "005513",  # Eggs produced (eggs).
                 assert unit == "eggs"
@@ -2354,8 +2355,11 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "005318",  # Milk animals (animals).
                 assert unit == "animals"
                 title = f"Number of animals used to produce {item.lower()}"
-            elif element_code == "005111":
+                num_decimal_places = 0
+            elif element_code in ["005111", "005112", "005114"]:
                 # "005111",  # Stocks (animals)
+                # "005112",  # Stocks (thousand animals, converted to animals)
+                # "005114",  # Stocks (number, e.g. beehives, converted to animals)
                 assert unit == "animals"
                 title = f"Live {item.lower()}"
                 num_decimal_places = 0

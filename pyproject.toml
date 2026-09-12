@@ -153,7 +153,9 @@ api = [
 ]
 
 wizard = [
-    "streamlit>=1.58.0",
+    "streamlit>=1.63.0",
+    # 1.1.9+ (incl. 1.2.x) render an empty grid in the browser for our tables: the frontend fails with
+    # `Unrecognized type: "LargeUtf8"` (Arrow large_string columns). Verified with 1.2.1.post2 in Sept 2026.
     "streamlit-aggrid>=1.1.0,!=1.1.8.*,<1.1.9",
     "plotly>=5.23.0",
     "statsmodels>=0.14.4",
