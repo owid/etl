@@ -180,7 +180,7 @@ views:
         - catalogPath: climate_change_impacts_annual#arctic_sea_ice_extent_min
     config:
       title: "Climate change: Arctic sea ice extent"
-      subtitle: The minimum and maximum sea ice extent typically occur in February and September each year.
+      subtitle: Minimum and maximum sea ice extent typically occur in September and March each year.
       yScaleToggle: false
       yAxisMin: 0
       baseColorScheme: owid-distinct

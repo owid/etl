@@ -20,24 +20,28 @@ tables:
     variables:
       arctic_sea_ice_extent_min:
         title: Minimum Arctic sea ice extent
+        description_short: Average Arctic sea ice extent in September, the month when it is usually at its lowest.
         display:
           name: September
         presentation:
           title_public: Minimum Arctic sea ice extent
       arctic_sea_ice_extent_max:
         title: Maximum Arctic sea ice extent
+        description_short: Average Arctic sea ice extent in March, the month when it is usually at its highest.
         display:
-          name: February
+          name: March
         presentation:
           title_public: Maximum Arctic sea ice extent
       antarctic_sea_ice_extent_min:
         title: Minimum Antarctic sea ice extent
+        description_short: Average Antarctic sea ice extent in February, the month when it is usually at its lowest.
         display:
           name: February
         presentation:
           title_public: Minimum Antarctic sea ice extent
       antarctic_sea_ice_extent_max:
         title: Maximum Antarctic sea ice extent
+        description_short: Average Antarctic sea ice extent in September, the month when it is usually at its highest.
         display:
           name: September
         presentation:

@@ -12,13 +12,13 @@ paths = PathFinder(__file__)
 def prepare_sea_ice_extent(tb_nsidc: Table) -> tuple[Table, Table]:
     tb_nsidc = tb_nsidc.copy()
     # Create a table with the minimum and maximum Arctic sea ice extent.
-    # Assume minimum and maximum occur in September and February every year.
+    # Assume minimum and maximum occur in September and March every year.
     tb_nsidc["month"] = tb_nsidc["date"].astype(str).str[5:7]
     tb_nsidc["year"] = tb_nsidc["date"].astype(str).str[0:4].astype(int)
     arctic_sea_ice_extent = (
-        tb_nsidc[(tb_nsidc["location"] == "Northern Hemisphere") & (tb_nsidc["month"].isin(["02", "09"]))]
+        tb_nsidc[(tb_nsidc["location"] == "Northern Hemisphere") & (tb_nsidc["month"].isin(["03", "09"]))]
         .pivot(index=["location", "year"], columns=["month"], values="sea_ice_extent", join_column_levels_with=" ")
-        .rename(columns={"02": "arctic_sea_ice_extent_max", "09": "arctic_sea_ice_extent_min"}, errors="raise")
+        .rename(columns={"03": "arctic_sea_ice_extent_max", "09": "arctic_sea_ice_extent_min"}, errors="raise")
     )
     # Instead of calling the location a generic "Northern Hemisphere", call it "Arctic Ocean".
     arctic_sea_ice_extent["location"] = "Arctic Ocean"
