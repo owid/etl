@@ -21,8 +21,6 @@ definitions:
         chartTypes: ["LineChart", "DiscreteBar"]
         yAxis:
           min: 0
-        note: |-
-          Estimates based on the number of laying hens reported by FAOSTAT, assuming that hens are replaced every 62 weeks and that one male chick is hatched for every hen. Male embryos removed before hatching by in-ovo sexing are not counted.
 
 dimensions:
   - slug: metric
@@ -43,7 +41,6 @@ views:
         - catalogPath: chickens_killed_for_eggs#chickens_killed
     config:
       title: Chickens killed to produce eggs
-      subtitle: Estimated number of chickens killed each year to produce eggs. This includes laying hens, killed at the end of their laying period, and their male siblings, most of whom are killed within a day of hatching.
 
   - dimensions:
       metric: per_capita
@@ -52,7 +49,6 @@ views:
         - catalogPath: chickens_killed_for_eggs#chickens_killed_per_capita
     config:
       title: Chickens killed to produce eggs per person
-      subtitle: Estimated number of chickens killed each year to produce eggs, per person. This includes laying hens, killed at the end of their laying period, and their male siblings, most of whom are killed within a day of hatching.
 
   - dimensions:
       metric: per_100_eggs
@@ -61,4 +57,3 @@ views:
         - catalogPath: chickens_killed_for_eggs#chickens_killed_per_100_eggs
     config:
       title: Chickens killed to produce eggs per 100 eggs
-      subtitle: Estimated number of chickens killed for every 100 eggs produced. This includes laying hens, killed at the end of their laying period, and their male siblings, most of whom are killed within a day of hatching.
