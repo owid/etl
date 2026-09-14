@@ -3,6 +3,10 @@ definitions:
     presentation:
       topic_tags:
         - Climate Change
+  description_key_sea_ice_extent: &description_key_sea_ice_extent |-
+    Sea ice extent is the total ocean area where at least 15% of the surface is covered by ice, as measured by satellites.
+
+    Each value is the average extent over the whole month, as reported by the National Snow and Ice Data Center. It is not the same as the single-day maximum or minimum extent.
   description_processing_baseline: &description_processing_baseline |-
     - We switch from using 1961-1990 to using 1861-1890 as our baseline to better show how temperatures have changed since pre-industrial times.
     - For each region, we calculate the mean temperature anomalies for 1961-1990 and for 1861-1890. The difference between these two means serves as the adjustment factor.
@@ -20,24 +24,32 @@ tables:
     variables:
       arctic_sea_ice_extent_min:
         title: Minimum Arctic sea ice extent
+        description_short: Average Arctic sea ice extent in September, the month when it is usually at its lowest.
+        description_key: *description_key_sea_ice_extent
         display:
           name: September
         presentation:
           title_public: Minimum Arctic sea ice extent
       arctic_sea_ice_extent_max:
         title: Maximum Arctic sea ice extent
+        description_short: Average Arctic sea ice extent in March, the month when it is usually at its highest.
+        description_key: *description_key_sea_ice_extent
         display:
           name: March
         presentation:
           title_public: Maximum Arctic sea ice extent
       antarctic_sea_ice_extent_min:
         title: Minimum Antarctic sea ice extent
+        description_short: Average Antarctic sea ice extent in February, the month when it is usually at its lowest.
+        description_key: *description_key_sea_ice_extent
         display:
           name: February
         presentation:
           title_public: Minimum Antarctic sea ice extent
       antarctic_sea_ice_extent_max:
         title: Maximum Antarctic sea ice extent
+        description_short: Average Antarctic sea ice extent in September, the month when it is usually at its highest.
+        description_key: *description_key_sea_ice_extent
         display:
           name: September
         presentation:
