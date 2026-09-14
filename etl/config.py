@@ -205,6 +205,14 @@ if STAGING is not None:
     DB_HOST = get_container_name(STAGING)
     DATA_API_ENV = get_container_name(STAGING)
 
+# A blank DB_HOST is a misconfiguration, never a default: `env.get` returns "" only when the key
+# is present and empty, and neither branch above can produce that (`load_STAGING` maps "" to None,
+# `get_container_name` always returns a "staging-site-..." string). On a staging server it means
+# the container's .env was read while being rewritten. Caught here so it fails on one readable
+# line instead of a SQLAlchemy traceback ending in `Can't connect to MySQL server on ''`, which
+# names no step and looks like an outage rather than a config problem.
+assert DB_HOST, "DB_HOST is set but empty. Expected a hostname; check the .env this process loaded."
+
 
 # if running against live, use s3://owid-api, otherwise use s3://owid-api-staging
 # Cloudflare workers running on https://api.ourworldindata.org/ and https://api-staging.owid.io/ will use them
