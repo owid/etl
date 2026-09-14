@@ -10,6 +10,9 @@ bespoke-visualization exports (food trade, causes of death):
   * one JSON per entity at `food-supply-chain.<entity_id>.json`, with the years and, for each unit (energy,
     protein, mass), one array per stage aligned with the years.
 
+After uploading, the step deletes the entity files left in the folder from a previous run that this run did not
+write (entities get 1-based alphabetical ids, so a shrinking entity set leaves orphan files at the top ids).
+
 Reshaping only; all logic lives in the garden steps. Values are FAO's sign convention: stages listed with
 "direction": "out" are magnitudes to subtract along the chain (a negative value there adds back), and the chain
 lands exactly on "food".
@@ -20,6 +23,7 @@ Output URLs:
 """
 
 import json
+import re
 from pathlib import Path
 
 from owid.catalog import s3_utils
@@ -64,18 +68,42 @@ STAGES = [
 NUM_DECIMALS = {"energy": 1, "protein": 2, "mass": 4}
 
 
-def _save_and_upload(data: dict, filename: str) -> None:
-    """Write JSON locally and upload to S3 (skipping the upload without --grapher)."""
+# Keys of the files this step owns in the S3 folder (the metadata file and one file per entity id).
+OWN_FILE_PATTERN = re.compile(rf"^{re.escape(str(S3_DATA_DIR / FILE_SLUG))}\.(metadata|\d+)\.json$")
+
+
+def _save_and_upload(data: dict, filename: str) -> str:
+    """Write JSON locally and upload to S3 (skipping the upload without --grapher). Returns the S3 key."""
     export_dir = VIZ_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
     export_dir.mkdir(parents=True, exist_ok=True)
     local_file = export_dir / filename
-    s3_path = f"s3://{S3_BUCKET_NAME}/{S3_DATA_DIR / filename}"
+    s3_key = str(S3_DATA_DIR / filename)
+    s3_path = f"s3://{S3_BUCKET_NAME}/{s3_key}"
     with open(local_file, "w") as f:
         json.dump(data, f, separators=(",", ":"))
     if not config.GRAPHER_ENABLED:
         tqdm.write(f"[not uploaded, no --grapher] {local_file} -> {s3_path}")
     else:
         s3_utils.upload(s3_path, local_file, public=True, downloadable=True)
+    return s3_key
+
+
+def _prune_stale_files(written_keys: set[str]) -> None:
+    """Delete the step's own files in the S3 folder that this run did not write (skipped without --grapher)."""
+    if not config.GRAPHER_ENABLED:
+        tqdm.write("[not pruned, no --grapher] stale entity files in the S3 folder are left in place")
+        return
+    client = s3_utils.connect_r2()
+    existing_keys = s3_utils.list_s3_objects(f"s3://{S3_BUCKET_NAME}/{S3_DATA_DIR}/", client=client)
+    stale_keys = sorted(key for key in existing_keys if OWN_FILE_PATTERN.match(key) and key not in written_keys)
+    if not stale_keys:
+        return
+    # delete_objects accepts at most 1000 keys per call.
+    for i in range(0, len(stale_keys), 1000):
+        client.delete_objects(  # ty: ignore
+            Bucket=S3_BUCKET_NAME, Delete={"Objects": [{"Key": key} for key in stale_keys[i : i + 1000]]}
+        )
+    tqdm.write(f"Deleted {len(stale_keys)} stale files from s3://{S3_BUCKET_NAME}/{S3_DATA_DIR}/: {stale_keys}")
 
 
 def run() -> None:
@@ -109,7 +137,7 @@ def run() -> None:
         "stages": [{"key": key, "name": name, "direction": direction} for key, name, direction in STAGES],
         "dimensions": {"entities": [{"id": entity_to_id[name], "name": name} for name in entities]},
     }
-    _save_and_upload(metadata, f"{FILE_SLUG}.metadata.json")
+    written_keys = {_save_and_upload(metadata, f"{FILE_SLUG}.metadata.json")}
 
     #
     # One file per entity: years, then for each unit one array per stage aligned with the years.
@@ -126,4 +154,9 @@ def run() -> None:
                 key: [None if v != v else v for v in rows[key].astype(float).round(NUM_DECIMALS[nutrient])]
                 for key in stage_keys
             }
-        _save_and_upload({"years": years, **data}, f"{FILE_SLUG}.{entity_to_id[name]}.json")
+        written_keys.add(_save_and_upload({"years": years, **data}, f"{FILE_SLUG}.{entity_to_id[name]}.json"))
+
+    #
+    # Remove entity files from a previous run that no longer correspond to any entity.
+    #
+    _prune_stale_files(written_keys)

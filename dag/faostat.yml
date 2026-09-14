@@ -249,5 +249,5 @@ steps:
   # Bespoke viz step: a metadata JSON plus one JSON per entity under s3://owid-public/data/food-supply-chain/. The
   # single garden dependency decides which method is published; switching method is a matter of changing that line.
   viz://bespoke/faostat/latest/food_supply_chain:
-    - data://garden/faostat/2026-09-04/food_supply_chain_fbs
+    - data://garden/faostat/2026-09-04/food_supply_chain_scl
   ######################################################################################################################
