@@ -27,7 +27,7 @@ tables:
       arctic_sea_ice_extent_max:
         title: Maximum Arctic sea ice extent
         display:
-          name: February
+          name: March
         presentation:
           title_public: Maximum Arctic sea ice extent
       antarctic_sea_ice_extent_min:
