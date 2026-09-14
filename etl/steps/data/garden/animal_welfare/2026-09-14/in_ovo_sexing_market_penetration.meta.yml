@@ -1,0 +1,86 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Animal Welfare
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  in_ovo_sexing_market_penetration:
+    title: In-ovo sexing market penetration
+    variables:
+      share_of_commercial_hens_sexed_in_ovo:
+        title: Share of commercial laying hens sexed in ovo
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the commercial laying hen flock that was sexed in ovo, so that no male chicks were killed to produce it.
+        display:
+          numDecimalPlaces: 1
+      share_of_commercial_hens_sexed_in_ovo_low:
+        title: Share of commercial laying hens sexed in ovo (lower bound)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      share_of_commercial_hens_sexed_in_ovo_high:
+        title: Share of commercial laying hens sexed in ovo (upper bound)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      share_of_all_hens_sexed_in_ovo:
+        title: Share of all laying hens sexed in ovo
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of all laying hens, including backyard flocks of fewer than 350 hens, that were sexed in ovo, so that no male chicks were killed to produce them.
+        display:
+          numDecimalPlaces: 1
+      share_of_all_hens_sexed_in_ovo_low:
+        title: Share of all laying hens sexed in ovo (lower bound)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      share_of_all_hens_sexed_in_ovo_high:
+        title: Share of all laying hens sexed in ovo (upper bound)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      hens_sexed_in_ovo:
+        title: Number of commercial laying hens sexed in ovo
+        unit: hens
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      hens_sexed_in_ovo_low:
+        title: Number of commercial laying hens sexed in ovo (lower bound)
+        unit: hens
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      hens_sexed_in_ovo_high:
+        title: Number of commercial laying hens sexed in ovo (upper bound)
+        unit: hens
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      female_chicks_produced_with_in_ovo_sexing:
+        title: Number of female chicks produced with in-ovo sexing
+        unit: chicks
+        short_unit: ""
+        description_short: Female day-old chicks hatched from in-ovo sexed eggs in the 12 months ending in June of each year.
+        display:
+          numDecimalPlaces: 0
+      cumulative_male_embryos_removed:
+        title: Cumulative number of male embryos removed before hatching
+        unit: embryos
+        short_unit: ""
+        description_short: Male chicken embryos identified by in-ovo sexing and removed before hatching since 2021, instead of being killed as chicks. Excludes China.
+        display:
+          numDecimalPlaces: 0

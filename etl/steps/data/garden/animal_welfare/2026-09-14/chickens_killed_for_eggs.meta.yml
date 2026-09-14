@@ -1,0 +1,118 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Animal Welfare
+    processing_level: major
+    description_processing: |-
+      Our World in Data estimates the number of chickens killed to produce eggs from the number of laying hens reported by FAOSTAT, as follows:
+      - Hens spend on average 62 weeks in the laying flock before being replaced and killed. Every year, about 84% of the hens in the flock are therefore killed and replaced. This is the laying period used by [Faunalytics in their estimate of the global number of chicks culled](https://faunalytics.org/global-chick-culling-2019-2024/). Unlike that estimate, we do not correct for the few percent of chicks and hens that die before the end of the laying period, in the same way that FAOSTAT's numbers of animals slaughtered for meat do not include animals that die before slaughter.
+      - For every female chick hatched to replace a hen, one male chick is hatched. Male chicks cannot lay eggs, and are either killed within a day of hatching, or (in a few countries) raised and killed for meat. Either way, they are counted as killed.
+      - In countries that use in-ovo sexing, a share of the male embryos is removed before hatching, and those are not counted as killed. The number of hens sexed in ovo is taken from market penetration reports that give a total for the European Union and shares for Norway, Switzerland, the United States and Brazil. The EU total is allocated among the countries that have banned or agreed to phase out chick culling (Germany from 2019, France and Austria from 2022, the Netherlands from 2026 and Italy from 2027), in proportion to their number of laying hens. The share is assumed to be zero everywhere else.
+      - FAOSTAT has no data for some countries in some years (in particular for several EU countries in the most recent year). Those gaps are filled by repeating the latest reported value, for at most five years. FAOSTAT's own regional aggregates include such imputed values.
+      - Regional aggregates are the sum of the countries in each region.
+    description_key:
+      - Eggs are laid by hens, but the hens do not live long. Commercial laying hens are killed after roughly a year in production, once their egg output declines, and are replaced by younger hens.
+      - For every hen that is hatched, a male chick is hatched too. Male chicks of laying breeds cannot lay eggs and grow too slowly to be raised for meat profitably, so in most countries they are killed within a day of hatching. In a few countries, some are raised for meat instead, but they are killed too.
+      - In-ovo sexing identifies the sex of the embryo in the egg, so that male embryos can be removed before hatching. It is used in the European Union, Norway and Switzerland, and is starting in the United States and Brazil.
+      - These numbers are estimates. They rely on the number of laying hens reported by FAOSTAT, on a typical laying period, and on estimates of how widely in-ovo sexing is used.
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  chickens_killed_for_eggs:
+    title: Chickens killed for eggs
+    variables:
+      laying_hens:
+        title: Number of laying hens
+        unit: hens
+        short_unit: ""
+        description_short: Number of hens kept for egg production.
+        processing_level: minor
+        description_processing: Gaps in the data for a country are filled by repeating its latest reported value, for at most five years. Aggregates for regions are the sum of the countries in each region.
+        description_key: []
+        display:
+          numDecimalPlaces: 0
+      eggs_produced:
+        title: Number of eggs produced
+        unit: eggs
+        short_unit: ""
+        description_short: Number of hen eggs produced.
+        processing_level: minor
+        description_processing: Gaps in the data for a country are filled by repeating its latest reported value, for at most five years. Aggregates for regions are the sum of the countries in each region.
+        description_key: []
+        display:
+          numDecimalPlaces: 0
+      hens_killed:
+        title: Hens killed to produce eggs
+        unit: hens
+        short_unit: ""
+        description_short: Estimated number of laying hens killed each year at the end of their laying period.
+        display:
+          numDecimalPlaces: 0
+      male_chickens_killed:
+        title: Male chickens killed to produce eggs
+        unit: chickens
+        short_unit: ""
+        description_short: Estimated number of male chickens killed each year in the egg industry, most of them within a day of hatching.
+        display:
+          numDecimalPlaces: 0
+      chickens_killed:
+        title: Chickens killed to produce eggs
+        unit: chickens
+        short_unit: ""
+        description_short: Estimated number of chickens killed each year to produce eggs, including laying hens killed at the end of their laying period and their male siblings.
+        display:
+          numDecimalPlaces: 0
+      male_embryos_removed:
+        title: Male embryos removed before hatching
+        unit: embryos
+        short_unit: ""
+        description_short: Estimated number of male chicken embryos identified by in-ovo sexing and removed before hatching, instead of being killed as chicks.
+        display:
+          numDecimalPlaces: 0
+      share_of_males_spared:
+        title: Share of male chicks spared by in-ovo sexing
+        unit: "%"
+        short_unit: "%"
+        description_short: Estimated share of the male chicks that would have hatched in the egg industry that were instead removed as embryos, thanks to in-ovo sexing.
+        display:
+          numDecimalPlaces: 1
+      chickens_killed_per_100_eggs:
+        title: Chickens killed to produce eggs per 100 eggs
+        unit: chickens per 100 eggs
+        short_unit: ""
+        description_short: Estimated number of chickens killed to produce eggs, including laying hens killed at the end of their laying period and their male siblings, per 100 eggs produced.
+        display:
+          numDecimalPlaces: 2
+      hens_killed_per_capita:
+        title: Hens killed to produce eggs per person
+        unit: hens per person
+        short_unit: ""
+        description_short: Estimated number of laying hens killed each year at the end of their laying period, per person.
+        display:
+          numDecimalPlaces: 2
+      male_chickens_killed_per_capita:
+        title: Male chickens killed to produce eggs per person
+        unit: chickens per person
+        short_unit: ""
+        description_short: Estimated number of male chickens killed each year in the egg industry, most of them within a day of hatching, per person.
+        display:
+          numDecimalPlaces: 2
+      chickens_killed_per_capita:
+        title: Chickens killed to produce eggs per person
+        unit: chickens per person
+        short_unit: ""
+        description_short: Estimated number of chickens killed each year to produce eggs, including laying hens killed at the end of their laying period and their male siblings, per person.
+        display:
+          numDecimalPlaces: 2
+      male_embryos_removed_per_capita:
+        title: Male embryos removed before hatching per person
+        unit: embryos per person
+        short_unit: ""
+        description_short: Estimated number of male chicken embryos identified by in-ovo sexing and removed before hatching, instead of being killed as chicks, per person.
+        display:
+          numDecimalPlaces: 2
