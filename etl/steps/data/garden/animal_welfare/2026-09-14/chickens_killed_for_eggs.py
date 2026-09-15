@@ -115,8 +115,8 @@ def run() -> None:
         100 * tb["male_embryos_removed"] / (tb["male_embryos_removed"] + tb["male_chickens_killed"])
     )
 
-    # Add the number of chickens killed per 100 eggs produced.
-    tb["chickens_killed_per_100_eggs"] = 100 * tb["chickens_killed"] / tb["eggs_produced"]
+    # Add the number of chickens killed per 1,000 eggs produced.
+    tb["chickens_killed_per_1000_eggs"] = 1000 * tb["chickens_killed"] / tb["eggs_produced"]
 
     # Add per capita indicators.
     tb = paths.regions.add_per_capita(tb=tb, columns=COUNT_COLUMNS, warn_on_missing_countries=False)
@@ -226,14 +226,14 @@ def sanity_check_outputs(tb: Table, tb_qcl: Table) -> None:
     error = "The share of males spared should be between 0 and 100."
     assert tb["share_of_males_spared"].between(0, 100).all(), error
 
-    # A hen lays a few hundred eggs per year, so there should be roughly one chicken killed per 100 eggs. Much larger
+    # A hen lays a few hundred eggs per year, so there should be roughly 10 chickens killed per 1,000 eggs. Much larger
     # values point to inconsistent FAOSTAT data (e.g. Benin reports about 7 eggs per hen from 1991 to 2015).
-    error = "Chickens killed per 100 eggs should be a small number."
-    assert tb["chickens_killed_per_100_eggs"].dropna().between(0, 100).all(), error
-    suspicious = tb[tb["chickens_killed_per_100_eggs"] > 10]
+    error = "Chickens killed per 1,000 eggs should be a small number."
+    assert tb["chickens_killed_per_1000_eggs"].dropna().between(0, 1000).all(), error
+    suspicious = tb[tb["chickens_killed_per_1000_eggs"] > 100]
     if not suspicious.empty:
         log.warning(
-            "Countries with more than 10 chickens killed per 100 eggs (inconsistent FAOSTAT data on hens and eggs): "
+            "Countries with more than 100 chickens killed per 1,000 eggs (inconsistent FAOSTAT data on hens and eggs): "
             f"{suspicious.groupby('country')['year'].agg(['min', 'max']).to_dict('index')}"
         )
 

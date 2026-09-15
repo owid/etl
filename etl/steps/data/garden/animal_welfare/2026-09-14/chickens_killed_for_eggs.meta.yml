@@ -31,25 +31,25 @@ tables:
         display:
           numDecimalPlaces: 0
       hens_killed:
-        title: Hens killed to produce eggs
+        title: Estimated number of hens killed to produce eggs
         unit: hens
         short_unit: ""
         display:
           numDecimalPlaces: 0
       male_chickens_killed:
-        title: Male chickens killed to produce eggs
+        title: Estimated number of male chickens killed to produce eggs
         unit: chickens
         short_unit: ""
         display:
           numDecimalPlaces: 0
       chickens_killed:
-        title: Chickens killed to produce eggs
+        title: Estimated number of chickens killed to produce eggs
         unit: chickens
         short_unit: ""
         display:
           numDecimalPlaces: 0
       male_embryos_removed:
-        title: Male embryos removed before hatching
+        title: Estimated number of male embryos removed before hatching
         unit: embryos
         short_unit: ""
         display:
@@ -60,32 +60,32 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
-      chickens_killed_per_100_eggs:
-        title: Chickens killed to produce eggs per 100 eggs
-        unit: chickens per 100 eggs
+      chickens_killed_per_1000_eggs:
+        title: Estimated number of chickens killed to produce eggs per 1,000 eggs
+        unit: chickens per 1,000 eggs
         short_unit: ""
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
       hens_killed_per_capita:
-        title: Hens killed to produce eggs per person
+        title: Estimated number of hens killed to produce eggs per person
         unit: hens per person
         short_unit: ""
         display:
           numDecimalPlaces: 2
       male_chickens_killed_per_capita:
-        title: Male chickens killed to produce eggs per person
+        title: Estimated number of male chickens killed to produce eggs per person
         unit: chickens per person
         short_unit: ""
         display:
           numDecimalPlaces: 2
       chickens_killed_per_capita:
-        title: Chickens killed to produce eggs per person
+        title: Estimated number of chickens killed to produce eggs per person
         unit: chickens per person
         short_unit: ""
         display:
           numDecimalPlaces: 2
       male_embryos_removed_per_capita:
-        title: Male embryos removed before hatching per person
+        title: Estimated number of male embryos removed before hatching per person
         unit: embryos per person
         short_unit: ""
         display:
