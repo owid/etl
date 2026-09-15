@@ -81,6 +81,27 @@ def test_variable_meta_drops_unrendered_templates(table):
     assert api["display"] == {"numDecimalPlaces": 0}
 
 
+def test_variable_meta_drops_templated_list_items(table):
+    """`description_key` is a list, and gbd_treemap templates one of its bullets -- an unfiltered
+    list would be joined into markdown and published with the template text in it."""
+    table._fields["value"].description_key = [
+        "Deaths are counted by underlying cause.",
+        "<% if cause == 'Conflict and terrorism' %>IHME splits conflict deaths evenly.<% endif %>",
+    ]
+
+    api = bespoke.variable_meta_to_api_dict(table["value"])
+
+    assert api["descriptionKey"] == ["Deaths are counted by underlying cause."]
+
+
+def test_variable_meta_drops_a_fully_templated_list(table):
+    table._fields["value"].description_key = ["<% if cause == 'X' %>only bullet<% endif %>"]
+
+    api = bespoke.variable_meta_to_api_dict(table["value"])
+
+    assert "descriptionKey" not in api
+
+
 def test_build_feed_metadata(table):
     metadata = bespoke.build_feed_metadata(
         title="Causes of death",
@@ -114,11 +135,14 @@ def test_write_feed_metadata(tmp_path, table):
 
 
 class _FakeClient:
-    def __init__(self):
+    def __init__(self, delete_errors: list[dict] | None = None):
         self.deleted: list[str] = []
+        self.delete_errors = delete_errors or []
 
-    def delete_objects(self, Bucket: str, Delete: dict) -> None:
+    def delete_objects(self, Bucket: str, Delete: dict) -> dict:
         self.deleted += [obj["Key"] for obj in Delete["Objects"]]
+        # S3 reports a per-key failure in the body of an otherwise successful response.
+        return {"Errors": self.delete_errors}
 
 
 def test_sync_feed_uploads_and_deletes_stale(tmp_path, monkeypatch):
@@ -169,3 +193,27 @@ def test_output_dir_of_a_bespoke_step():
 
     step_file = etl_paths.STEP_DIR / "viz/bespoke/ihme_gbd/latest/gbd_treemap_json.py"
     assert PathFinder(str(step_file)).output_dir == Path(etl_paths.VIZ_DIR / "bespoke/ihme_gbd/latest/gbd_treemap_json")
+
+
+def test_sync_feed_raises_when_a_stale_object_cannot_be_deleted(tmp_path, monkeypatch):
+    """A per-key delete failure arrives inside a 200 response. Unnoticed, the step would record
+    its checksum and go on serving the stale file until something else made it dirty."""
+    local = tmp_path / "gbd_treemap_json"
+    local.mkdir()
+    (local / "causes-of-death.metadata.json").write_text("{}")
+
+    prefix = "v1/bespoke/ihme_gbd/latest/gbd_treemap_json"
+    client = _FakeClient(delete_errors=[{"Key": f"{prefix}/causes-of-death.999.json", "Code": "AccessDenied"}])
+    monkeypatch.setattr(bespoke.s3_utils, "connect_r2", lambda: client)
+    monkeypatch.setattr(bespoke.s3_utils, "upload", lambda url, path, **kwargs: None)
+    monkeypatch.setattr(
+        bespoke.s3_utils,
+        "list_s3_objects",
+        lambda folder, client=None: [
+            f"{prefix}/causes-of-death.metadata.json",
+            f"{prefix}/causes-of-death.999.json",
+        ],
+    )
+
+    with pytest.raises(RuntimeError, match="Failed to delete 1 stale object"):
+        bespoke.sync_feed("bespoke/ihme_gbd/latest/gbd_treemap_json", local)

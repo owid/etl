@@ -119,7 +119,17 @@ def sync_feed(step_path: str, local_dir: Path, max_workers: int = 20) -> FeedLoc
     if stale:
         # delete_objects takes at most 1000 keys per call.
         for i in range(0, len(stale), 1000):
-            client.delete_objects(Bucket=bucket, Delete={"Objects": [{"Key": key} for key in stale[i : i + 1000]]})
+            response = client.delete_objects(
+                Bucket=bucket, Delete={"Objects": [{"Key": key} for key in stale[i : i + 1000]]}
+            )
+            # A per-key failure comes back in the body of a 200, so it has to be read out. Raising
+            # leaves the step dirty and the next run retries; swallowing it would record the
+            # checksum and serve the stale file until something else changed.
+            errors = response.get("Errors") or []
+            if errors:
+                raise RuntimeError(
+                    f"Failed to delete {len(errors)} stale object(s) from {location.s3_folder}: {errors}"
+                )
 
     log.info(
         "bespoke.published",
@@ -245,18 +255,34 @@ def variable_meta_to_api_dict(
     return api
 
 
+def _is_template(value: object) -> bool:
+    return isinstance(value, str) and any(marker in value for marker in JINJA_MARKERS)
+
+
 def _drop_unrendered_templates(value: dict, path: str = "") -> tuple[list[str], dict]:
-    """Drop every string field that is still a Jinja template, and report which ones went."""
+    """Drop every string field that is still a Jinja template, and report which ones went.
+
+    Lists are walked too, element by element: `description_key` is a list of bullets, and a
+    dataset that templates one of them (gbd_treemap does) would otherwise have the template text
+    joined into markdown by `metadata_column_entry` and published as a bullet.
+    """
     dropped = []
     kept = {}
     for key, item in value.items():
         name = f"{path}{key}"
-        if isinstance(item, str) and any(marker in item for marker in JINJA_MARKERS):
+        if _is_template(item):
             dropped.append(name)
         elif isinstance(item, dict):
             nested_dropped, nested = _drop_unrendered_templates(item, path=f"{name}.")
             dropped += nested_dropped
             kept[key] = nested
+        elif isinstance(item, list):
+            templated = [i for i, element in enumerate(item) if _is_template(element)]
+            dropped += [f"{name}[{i}]" for i in templated]
+            remaining = [element for i, element in enumerate(item) if i not in set(templated)]
+            # A list emptied by the filter is dropped rather than published as [].
+            if remaining:
+                kept[key] = remaining
         elif item is not None:
             kept[key] = item
     return dropped, kept
