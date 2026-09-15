@@ -28,7 +28,7 @@ Most recurring work here has a skill that runs it end to end. Reach for it **bef
 | Scaffold meadow/garden/grapher steps for a snapshot that already exists | `/create-etl-steps` — the primitive `/create-dataset` calls; don't run it standalone unless scaffolding really is all you need |
 | Change user-facing chart/indicator text — title, subtitle, footnote, units, `description_short`, WYSK/`description_key`, entity selection | `/edit-faust-metadata` |
 | Check that text against the Writing and Style Guide | `/check-metadata-style` |
-| Build a multi-dim indicator, or an explorer | `/create-multidim`, `/create-explorer` |
+| Build a chart from ETL (a single chart or a multidim), or an explorer | `/create-chart`, `/create-explorer` |
 | Review a dataset-update PR | `/review-data-pr` |
 | Announce a finished update, internally | `/data-updates-comms` — the #data-updates-comms Slack form |
 | Announce a finished update, to readers | `/owid-staff:draft-data-update-post` — the "Data update" post on ourworldindata.org/latest; from the `owid-staff` plugin (owid/skills-private), auto-installed here |
