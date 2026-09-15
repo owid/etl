@@ -44,8 +44,8 @@ views:
       map:
         colorScale:
           binningStrategy: manual
-          # The trailing 1 makes the top bracket open-ended.
-          customNumericValues: [100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, 1000000000, 1]
+          # The leading 0 closes the bottom bracket, and the trailing 1 makes the top bracket open-ended.
+          customNumericValues: [0, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, 1000000000, 1]
 
   - dimensions:
       metric: per_capita
@@ -57,8 +57,8 @@ views:
       map:
         colorScale:
           binningStrategy: manual
-          # The trailing 1 makes the top bracket open-ended.
-          customNumericValues: [0.5, 1, 1.5, 2, 2.5, 3, 4, 1]
+          # The leading 0 closes the bottom bracket, and the trailing 1 makes the top bracket open-ended.
+          customNumericValues: [0, 0.5, 1, 1.5, 2, 2.5, 3, 4, 1]
 
   - dimensions:
       metric: per_100_eggs
@@ -70,5 +70,5 @@ views:
       map:
         colorScale:
           binningStrategy: manual
-          # The trailing 1 makes the top bracket open-ended.
-          customNumericValues: [0.5, 0.75, 1, 1.25, 1.5, 2, 3, 1]
+          # The leading 0 closes the bottom bracket, and the trailing 1 makes the top bracket open-ended.
+          customNumericValues: [0, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 1]
