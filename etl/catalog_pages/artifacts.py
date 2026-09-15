@@ -1,4 +1,4 @@
-"""Build local JSON-LD artifacts for OWID catalog datasets."""
+"""Build the local page files (data, codebook, README, manifest) and JSON-LD of OWID catalog datasets."""
 
 from __future__ import annotations
 
@@ -23,13 +23,18 @@ from owid.catalog.schema_org import (
 )
 from structlog import get_logger
 
-from etl.catalog_jsonld.quality import (
+from etl.catalog_pages.pages import (
+    DATASET_JSONLD_FILENAME,
+    remove_page_files,
+    write_page_files,
+)
+from etl.catalog_pages.quality import (
     DatasetQualityResult,
     assess_dataset_quality,
     find_duplicate_short_key_paths,
     jsonld_contains_raw_jinja,
 )
-from etl.catalog_jsonld.sitemap import SitemapEntry, sitemap_xml
+from etl.catalog_pages.sitemap import SitemapEntry, sitemap_xml
 from etl.dag_helpers import graph_nodes, load_dag
 from etl.paths import DATA_DIR
 
@@ -37,7 +42,6 @@ log = get_logger()
 
 QUALITY_REPORT_FILENAME = "jsonld_quality_report.json"
 SITEMAP_FILENAME = "sitemap.xml"
-DATASET_JSONLD_FILENAME = "dataset.jsonld"
 
 _VERSION_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
@@ -62,6 +66,15 @@ class LatestDatasetPath:
 
 @dataclass
 class JsonLdBuildResult:
+    """What a build produced: page files (``pages``, ``page_keys``) and the JSON-LD side product (``emitted``)."""
+
+    # Datasets whose page files (data, codebook, README, manifest) were written, and the keys of those files.
+    pages: list[str] = field(default_factory=list)
+    page_entries: list[LatestDatasetPath] = field(default_factory=list)
+    page_keys: list[str] = field(default_factory=list)
+    # Datasets that were page-eligible but whose files could not be written; keep their published page.
+    page_failures: dict[str, str] = field(default_factory=dict)
+    # Datasets whose dataset.jsonld was emitted (a subset of the pages: every JSON-LD quality gate passed).
     emitted: list[str] = field(default_factory=list)
     emitted_entries: list[LatestDatasetPath] = field(default_factory=list)
     skipped: list[DatasetQualityResult] = field(default_factory=list)
@@ -71,7 +84,7 @@ class JsonLdBuildResult:
     superseded_entries: list[LatestDatasetPath] = field(default_factory=list)
 
 
-def build_catalog_jsonld_artifacts(
+def build_catalog_page_artifacts(
     *,
     catalog_dir: Path = DATA_DIR,
     channel: CHANNEL = "garden",
@@ -80,12 +93,13 @@ def build_catalog_jsonld_artifacts(
     only: set[str] | None = None,
     active_steps: set[str] | None = None,
 ) -> JsonLdBuildResult:
-    """Generate dataset JSON-LD files, sitemap, and quality report locally.
+    """Generate the page files of every opted-in dataset, plus sitemap and JSON-LD quality report, locally.
 
-    JSON-LD files are written to a stable, version-agnostic short-key tree
-    (``catalog_dir / "<namespace>" / "<dataset>" / "dataset.jsonld"``) rather than inside the
-    dataset's own dated catalog folder, so the public landing page URL doesn't change every
-    time the dataset gets a new version. When ``only`` is given, restrict generation to
+    The files are written to a stable, version-agnostic short-key tree
+    (``catalog_dir / "<namespace>" / "<dataset>" / ...``) rather than inside the dataset's own dated catalog
+    folder, so the public page URL doesn't change every time the dataset gets a new version. Each page has
+    one CSV per table, an XLSX workbook, ``codebook.csv``, ``readme.md`` and ``manifest.json`` (see
+    :mod:`etl.catalog_pages.pages`), and, when the dataset passes every quality gate, ``dataset.jsonld``. When ``only`` is given, restrict generation to
     datasets whose ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist);
     otherwise only datasets that opt in via ``DatasetMeta.jsonld`` are considered.
 
@@ -110,7 +124,7 @@ def build_catalog_jsonld_artifacts(
     for entry in result.archived_entries:
         if not dry_run:
             _remove_if_exists(catalog_dir / entry.catalog_path / DATASET_JSONLD_FILENAME)
-            _remove_if_exists(catalog_dir / entry.namespace / entry.dataset / DATASET_JSONLD_FILENAME)
+            remove_page_files(Dataset(catalog_dir / entry.catalog_path), catalog_dir / entry.namespace / entry.dataset)
     for entry in result.superseded_entries:
         # Its short key is legitimately owned by the active version emitted elsewhere in this
         # same build (or by nothing, if that active version is itself quality-skipped) — only
@@ -131,6 +145,7 @@ def build_catalog_jsonld_artifacts(
         # previously published artifacts are left untouched.
         if only is None and not ds.metadata.jsonld:
             continue
+        target_dir = catalog_dir / entry.namespace / entry.dataset
         tables = load_table_schema_inputs(ds)
         quality = assess_dataset_quality(
             catalog_path=catalog_path,
@@ -139,42 +154,77 @@ def build_catalog_jsonld_artifacts(
             tables=tables,
             duplicate_short_key=catalog_path in duplicate_catalog_paths,
         )
-        if not quality.is_eligible:
+        if not quality.is_page_eligible:
+            # The dataset must not be served at all: remove every page file, locally here and on R2 in the
+            # publish step.
             result.skipped.append(quality)
             result.skipped_entries.append(entry)
             if not dry_run:
                 _remove_if_exists(Path(ds.path) / DATASET_JSONLD_FILENAME)
-                # A prior build may have emitted this dataset at its stable short key;
-                # remove the local copy so it can't linger after the dataset stops
-                # being eligible (the R2 copy is deleted by the publish step).
-                _remove_if_exists(catalog_dir / entry.namespace / entry.dataset / DATASET_JSONLD_FILENAME)
+                remove_page_files(ds, target_dir)
             continue
 
-        jsonld = dataset_to_schema_org(
-            dataset_path=catalog_path,
-            page_path=entry.short_key,
-            version=entry.version,
-            dataset_meta=ds.metadata,
-            tables=tables,
-            base_url=base_url,
-        )
-        # Safety net: metadata fields can be Jinja templates (long-format tables render them
-        # per dimension combination elsewhere). schema_org guards the known fields, but any
-        # template that still leaks into the output must never ship — skip the dataset instead.
-        if jsonld_contains_raw_jinja(jsonld):
-            quality.blockers.append("raw_jinja_in_jsonld")
+        # The JSON-LD side product has stricter gates than the page: metadata must be complete, and no Jinja
+        # template may leak into it. A dataset that fails them still gets its page.
+        jsonld = None
+        if quality.is_eligible:
+            jsonld = dataset_to_schema_org(
+                dataset_path=catalog_path,
+                page_path=entry.short_key,
+                version=entry.version,
+                dataset_meta=ds.metadata,
+                tables=tables,
+                base_url=base_url,
+            )
+            # Safety net: metadata fields can be Jinja templates (long-format tables render them
+            # per dimension combination elsewhere). schema_org guards the known fields, but any
+            # template that still leaks into the output must never ship — skip the JSON-LD instead.
+            if jsonld_contains_raw_jinja(jsonld):
+                quality.blockers.append("raw_jinja_in_jsonld")
+                log.warning("catalog_pages.raw_jinja_in_jsonld", dataset=catalog_path)
+                jsonld = None
+        if jsonld is None:
             result.skipped.append(quality)
-            result.skipped_entries.append(entry)
-            log.warning("catalog_jsonld.raw_jinja_in_jsonld", dataset=catalog_path)
             if not dry_run:
                 _remove_if_exists(Path(ds.path) / DATASET_JSONLD_FILENAME)
-                _remove_if_exists(catalog_dir / entry.namespace / entry.dataset / DATASET_JSONLD_FILENAME)
-            continue
+                _remove_if_exists(target_dir / DATASET_JSONLD_FILENAME)
+        else:
+            result.emitted.append(catalog_path)
+            result.emitted_entries.append(entry)
+            if quality.warnings or quality.table_warnings:
+                result.warnings.append(quality)
+            if not dry_run:
+                # The dataset used to be served at its dated catalog-folder path; that location is
+                # no longer written to, so clean up anything left over from a prior publish.
+                _remove_if_exists(Path(ds.path) / DATASET_JSONLD_FILENAME)
+                target_dir.mkdir(parents=True, exist_ok=True)
+                with open(target_dir / DATASET_JSONLD_FILENAME, "w") as ostream:
+                    json.dump(jsonld, ostream, indent=2, ensure_ascii=False)
+                    ostream.write("\n")
 
-        result.emitted.append(catalog_path)
-        result.emitted_entries.append(entry)
-        if quality.warnings or quality.table_warnings:
-            result.warnings.append(quality)
+        if dry_run:
+            result.pages.append(catalog_path)
+            result.page_entries.append(entry)
+        else:
+            try:
+                page_files = write_page_files(
+                    ds,
+                    catalog_dir=catalog_dir,
+                    catalog_path=catalog_path,
+                    short_key=entry.short_key,
+                    version=entry.version,
+                    base_url=base_url,
+                    jsonld_written=jsonld is not None,
+                )
+            except Exception as error:  # noqa: BLE001 - one broken dataset must not stop the whole publish.
+                log.error("catalog_pages.page_failed", dataset=catalog_path, error=str(error))
+                result.page_failures[catalog_path] = str(error)
+                continue
+            result.pages.append(catalog_path)
+            result.page_entries.append(entry)
+            result.page_keys.extend(page_files.keys)
+            if jsonld is not None:
+                result.page_keys.append(f"{entry.short_key}/{DATASET_JSONLD_FILENAME}")
 
         sitemap_entries.append(
             SitemapEntry(
@@ -185,16 +235,6 @@ def build_catalog_jsonld_artifacts(
                 lastmod=entry.version if _VERSION_DATE_RE.match(entry.version) else None,
             )
         )
-        if not dry_run:
-            # The dataset used to be served at its dated catalog-folder path; that location is
-            # no longer written to, so clean up anything left over from a prior publish.
-            _remove_if_exists(Path(ds.path) / DATASET_JSONLD_FILENAME)
-
-            target_dir = catalog_dir / entry.namespace / entry.dataset
-            target_dir.mkdir(parents=True, exist_ok=True)
-            with open(target_dir / DATASET_JSONLD_FILENAME, "w") as ostream:
-                json.dump(jsonld, ostream, indent=2, ensure_ascii=False)
-                ostream.write("\n")
 
     if not dry_run:
         (catalog_dir / SITEMAP_FILENAME).write_text(sitemap_xml(sitemap_entries))
@@ -374,11 +414,15 @@ def quality_report(result: JsonLdBuildResult) -> dict[str, Any]:
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "summary": {
+            "pages": len(result.pages),
+            "page_failures": len(result.page_failures),
             "emitted": len(result.emitted),
             "skipped": len(result.skipped),
             "warnings": len(result.warnings),
             "archived": len(result.archived_entries),
         },
+        "pages": result.pages,
+        "page_failures": result.page_failures,
         "emitted": result.emitted,
         "skipped": [_quality_to_record(item, include_blockers=True) for item in result.skipped],
         "warnings": [_quality_to_record(item, include_blockers=False) for item in result.warnings],

@@ -1,0 +1,124 @@
+dataset:
+  # Opt in to the public catalog page (rendered from this dataset's metadata) and its JSON-LD side product.
+  jsonld: true
+  title: Energy dataset
+  description: |-
+    Our World in Data's complete energy dataset: one wide table with, for each country and year, total energy supply and the energy mix (by source, in energy units, per capita, as shares and as annual changes), the electricity mix (generation by source, demand, trade, emissions and carbon intensity), and fossil fuel production, trade, reserves and consumption in physical units. Population and GDP are included so that per capita and per GDP indicators can be recomputed.
+
+    It is compiled from the Energy Institute's Statistical Review of World Energy, Ember's electricity data, the U.S. Energy Information Administration and several historical reconstructions, with population from Our World in Data's population dataset and GDP from the Maddison Project Database.
+
+    Regions follow [Our World in Data's definitions](https://ourworldindata.org/world-region-map-definitions). Regions as defined by the original sources are also included, with the source in brackets: for example, "Europe (EI)" is Europe as defined by the Energy Institute, and "Europe (Ember)" as defined by Ember.
+
+    All energy indicators follow the total energy supply methodology of the Statistical Review, which counts electricity from nuclear and renewable sources by its physical energy content. Earlier releases of this dataset used the substitution method, which scaled that electricity up to the amount of fossil fuel that would have been needed to generate it. The two methods are not comparable: under total energy supply, hydro, wind and solar are roughly 60% lower than in the previous release, nuclear (counted by the heat produced in the reactor) is roughly 20% higher, fossil fuels and biofuels are unchanged, and total energy supply is roughly 5% lower, so the shares of fossil fuels are higher.
+
+    ## Changelog
+
+    - 2026-09-10:
+      - New release on the total energy supply methodology, replacing the substitution method used until the 2025 release (see above).
+      - Every column is renamed to one grammar, `<source>_<domain>_<measure>` with the unit last (for example `hydro_energy_twh`, `hydro_electricity_share_pct`, `coal_production_twh`). The `column_mapping` table lists the previous name of each column, and the columns that are new or no longer published.
+      - New columns: fossil fuel imports, exports, net imports and reserves; production and consumption in physical units (tonnes and cubic meters); reserves-to-production ratios; solar and wind combined; traditional biomass; shares of total energy supply including traditional biomass.
+      - The regional aggregates defined by the U.S. Energy Information Administration and the Shift Dataportal (for example "Africa (EIA)", "OECD (Shift)") and the Energy Institute's residual regions (for example "Other Africa (EI)") are no longer included; the Energy Institute's and Ember's main regions are.
+      - The dataset moved from the owid/energy-data GitHub repository to this catalog page, and is no longer published as JSON. The previous release stays available, unchanged, at https://owid-public.owid.io/data/energy/owid-energy-data.csv (also .xlsx and .json).
+    - 2026-04-27:
+      - Update Ember's yearly electricity data, after they updated their Global electricity data.
+    - 2026-01-26:
+      - Update Ember's yearly electricity data, after they updated their European electricity data.
+      - Fixed a few issues in aggregate regions related to how Ember's data is combined with the Energy Institute's Statistical Review of World Energy.
+    - 2026-01-09:
+      - Updated Ember's yearly electricity data.
+      - Fixed a few small issues (related to "Other *" regions coming from the Energy Institute's Statistical Review of World Energy).
+    - 2025-11-11:
+      - Moved dataset to different URL.
+      - Various improvements in the codebook format.
+    - 2025-07-17:
+      - Updated the Energy Institute Statistical Review of World Energy.
+      - Updated EIA's International energy data.
+    - 2025-05-30:
+      - Updated Ember's yearly electricity data, which includes data for 2024.
+    - 2024-09-05:
+      - Added per capita electricity demand, from Ember's yearly electricity data.
+    - 2024-08-30:
+      - Fixed coal electricity generation for Switzerland, which was missing in the original data, and should be zero instead.
+    - 2024-06-20:
+      - Updated the Energy Institute Statistical Review of World Energy.
+      - Fixed issues on electricity data for aggregate regions.
+    - 2024-05-08:
+      - Updated Ember's yearly electricity data, which includes data for 2023.
+      - Updated GDP data, now coming from Maddison Project Database 2023.
+    - 2024-01-24:
+      - Improved codebook, to clarify whether indicators refer to electricity generation or primary energy consumption.
+      - Improved the calculation of the share of electricity in primary energy. Previously, electricity generation was calculated as a share of input-equivalent primary energy consumption. Now it is calculated as a share of direct primary energy consumption.
+    - 2023-12-12:
+      - Updated Ember's yearly electricity data and EIA's International energy data.
+      - Enhanced codebook (improved descriptions, added units, updated sources).
+      - Fixed various minor issues.
+    - 2023-07-07:
+      - Replaced BP's data by the new Energy Institute Statistical Review of World Energy 2023.
+      - Updated Ember's yearly electricity data.
+      - Updated all datasets accordingly.
+    - 2023-06-01:
+      - Updated Ember's yearly electricity data.
+      - Renamed countries 'East Timor' and 'Faroe Islands', and added 'Middle East (Ember)'.
+      - Population and per capita indicators are now calculated using an updated version of our population dataset.
+    - 2023-03-01:
+      - Updated Ember's yearly electricity data and fixed some minor issues.
+    - 2022-12-30:
+      - Fixed some minor issues with BP's dataset. Regions like "Other North America (BP)" have been removed from the data, since, in the original Statistical Review of World Energy, these regions represented different sets of countries for different indicators.
+    - 2022-12-16:
+      - The column `electricity_share_energy` (electricity as a share of primary energy) was added to the dataset.
+      - Fixed some minor inconsistencies in electricity data between Ember and BP, by prioritizing data from Ember.
+      - Updated Ember's yearly electricity data.
+    - 2022-08-09:
+      - All inconsistencies due to different definitions of regions among different datasets (especially Europe) have been fixed.
+        - Now all regions follow [Our World in Data's definitions](https://ourworldindata.org/world-region-map-definitions).
+        - We also include data for regions as defined in the original datasets; for example, `Europe (BP)` corresponds to Europe as defined by BP.
+      - All data processing now occurs outside this repository; the code has been migrated to be part of the [etl repository](https://github.com/owid/etl).
+      - Indicator `fossil_cons_per_capita` has been renamed `fossil_elec_per_capita` for consistency, since it corresponds to electricity generation.
+      - The codebook has been updated following these changes.
+    - 2022-04-08:
+      - Electricity data from Ember was updated (using the Global Electricity Review 2022).
+      - Data on greenhouse-gas emissions in electricity generation was added (`greenhouse_gas_emissions`).
+      - Data on emissions intensity is now provided for most countries in the world.
+    - 2022-03-25:
+      - Data on net electricity imports and electricity demand was added.
+      - BP data was updated (using the Statistical Review of World Energy 2021).
+      - Maddison data on GDP was updated (using the Maddison Project Database 2020).
+      - EIA data on primary energy consumption was included in the dataset.
+      - Some issues in the dataset were corrected (for example some missing data in production by fossil fuels).
+    - 2022-02-14:
+      - Some issues were corrected in the electricity data, and the energy dataset was updated accordingly.
+      - The json and xlsx dataset files were removed from GitHub in favor of an external storage service, to keep this repository at a reasonable size.
+      - The `carbon_intensity_elec` column was added back into the energy dataset.
+    - 2022-02-03:
+      - We updated the [Ember global electricity data](https://ember-climate.org/data/global-electricity/), combined with the [European Electricity Review from Ember](https://ember-climate.org/project/european-electricity-review-2022/).
+      - The `carbon_intensity_elec` column was removed from the energy dataset (since no updated data was available).
+      - Columns for electricity from other renewable sources excluding bioenergy were added (namely `other_renewables_elec_per_capita_exc_biofuel`, and `other_renewables_share_elec_exc_biofuel`).
+      - Certain countries and regions have been removed from the dataset, because we identified significant inconsistencies in the original data.
+    - 2021-03-31:
+      - We updated 2020 electricity mix data.
+    - 2020-09-09:
+      - The first version of this dataset was made available.
+  update_period_days: 365
+  licenses:
+    - name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+  owners:
+    - Pablo Rosado
+tables:
+  owid_energy:
+    title: Energy dataset
+    description: One row per country (or region) and year, with every indicator as a column.
+    variables:
+      population:
+        title: Population
+        unit: people
+        short_unit: ""
+        description_short: Population of the country or region.
+      gdp:
+        title: GDP
+        unit: international-$ in 2011 prices
+        short_unit: $
+        description_short: Total real gross domestic product, adjusted for inflation and differences in the cost of living between countries.
+  column_mapping:
+    title: Column mapping
+    description: Name of each column of the dataset in the previous release (the owid-energy-data.csv file), to help migrate to the new names.

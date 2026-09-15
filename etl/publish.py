@@ -64,19 +64,20 @@ class CannotPublish(Exception):
     "--jsonld",
     is_flag=True,
     default=False,
-    help="Generate and publish Schema.org Dataset JSON-LD artifacts for catalog datasets that "
-    "opt in via `dataset: jsonld: true` in their metadata (and pass the quality gates).",
+    help="Generate and publish the public page files (CSV, XLSX, codebook, README, manifest) and the "
+    "Schema.org JSON-LD side product for catalog datasets that opt in via `dataset: jsonld: true` "
+    "in their metadata.",
 )
 @click.option(
     "--jsonld-base-url",
     type=str,
     default="https://catalog.ourworldindata.org",
-    help="Base URL to use in generated JSON-LD and sitemap URLs.",
+    help="Base URL to use in generated manifest, README, JSON-LD and sitemap URLs.",
 )
 @click.option(
     "--jsonld-only",
     multiple=True,
-    help="Restrict JSON-LD generation to these datasets, as '<namespace>/<dataset>' "
+    help="Restrict page generation to these datasets, as '<namespace>/<dataset>' "
     "(repeatable). Overrides the metadata opt-in: listed datasets are considered even "
     "without `dataset: jsonld: true`.",
 )
@@ -122,12 +123,12 @@ def publish(
         sync_catalog_to_s3(bucket, catalog, channel=c, dry_run=dry_run, private_bucket=config.R2_BUCKET_PRIVATE)
 
     if jsonld:
-        from etl.catalog_jsonld.publish import build_and_publish_catalog_jsonld
+        from etl.catalog_pages.publish import build_and_publish_catalog_pages
 
         jsonld_allowlist = set(jsonld_only) or None
         for c in channel:
             if c == "garden":
-                build_and_publish_catalog_jsonld(
+                build_and_publish_catalog_pages(
                     bucket=bucket,
                     catalog_dir=catalog,
                     channel=c,
