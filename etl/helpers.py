@@ -340,6 +340,19 @@ class PathFinder:
         return self.f.stem
 
     @property
+    def output_dir(self) -> Path:
+        """Folder a `viz://` or `export://` step writes its files to.
+
+        It is the folder the framework then publishes: for a `viz://bespoke` step, everything
+        written here is synced to the environment's R2 feed path (see `etl.viz.bespoke`).
+        """
+        assert self.step_type in ("viz", "export"), (
+            f"Only viz:// and export:// steps have an output folder, not {self.step_type}://"
+        )
+        root = paths.VIZ_DIR if self.step_type == "viz" else paths.EXPORT_DIR
+        return root / self.channel / self.namespace / self.version / self.short_name
+
+    @property
     def country_mapping_path(self) -> Path:
         return self.directory / (self.short_name + ".countries.json")
 
