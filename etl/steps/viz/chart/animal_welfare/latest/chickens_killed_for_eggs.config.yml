@@ -16,6 +16,7 @@ definitions:
   common_views:
     - config:
         originUrl: ourworldindata.org/animal-welfare
+        subtitle: Around half of the estimated total are hens, killed when their egg production declines. The other half are male chicks, which in most countries are killed within a day of hatching.
         note: Estimates assume that each laying hen reported by FAOSTAT is killed after 62 weeks of laying. The estimated number of male embryos removed before hatching through in-ovo sexing is subtracted.
         hasMapTab: true
         tab: map
@@ -42,7 +43,6 @@ views:
         - catalogPath: chickens_killed_for_eggs#chickens_killed
     config:
       title: Chickens killed to produce eggs
-      subtitle: Estimated number of chickens killed to produce eggs. Around half are hens, killed when their egg production declines. The other half are male chicks, which in most countries are killed within a day of hatching.
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -57,7 +57,6 @@ views:
         - catalogPath: chickens_killed_for_eggs#chickens_killed_per_capita
     config:
       title: Chickens killed to produce eggs per person
-      subtitle: Estimated number of chickens killed to produce eggs, per person. Around half are hens, killed when their egg production declines. The other half are male chicks, which in most countries are killed within a day of hatching.
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -72,7 +71,6 @@ views:
         - catalogPath: chickens_killed_for_eggs#chickens_killed_per_1000_eggs
     config:
       title: Chickens killed to produce eggs per 1,000 eggs
-      subtitle: Estimated number of chickens killed for every 1,000 eggs produced. Around half are hens, killed when their egg production declines. The other half are male chicks, which in most countries are killed within a day of hatching.
       map:
         colorScale:
           baseColorScheme: OrRd
