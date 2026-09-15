@@ -41,6 +41,7 @@ views:
         - catalogPath: chickens_killed_for_eggs#chickens_killed
     config:
       title: Estimated number of chickens killed to produce eggs
+      subtitle: Estimated number of chickens killed to produce eggs. Around half are hens, killed when their egg production declines. The other half are male chicks, which in most countries are killed within a day of hatching.
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -55,6 +56,7 @@ views:
         - catalogPath: chickens_killed_for_eggs#chickens_killed_per_capita
     config:
       title: Estimated number of chickens killed to produce eggs per person
+      subtitle: Estimated number of chickens killed to produce eggs, per person. Around half are hens, killed when their egg production declines. The other half are male chicks, which in most countries are killed within a day of hatching.
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -69,6 +71,7 @@ views:
         - catalogPath: chickens_killed_for_eggs#chickens_killed_per_1000_eggs
     config:
       title: Estimated number of chickens killed to produce eggs per 1,000 eggs
+      subtitle: Estimated number of chickens killed for every 1,000 eggs produced. Around half are hens, killed when their egg production declines. The other half are male chicks, which in most countries are killed within a day of hatching.
       map:
         colorScale:
           baseColorScheme: OrRd
