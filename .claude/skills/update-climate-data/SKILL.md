@@ -1,6 +1,6 @@
 ---
-name: climate-update
-description: Run OWID's monthly climate data update. Bumps all updateable climate-namespace datasets to one common version in a single PR with one announcement, skipping the frozen sources. Use when the user wants to update climate data or run the monthly climate update. For a wildfires-only refresh during fire season, use the wildfires-update skill instead.
+name: update-climate-data
+description: Run OWID's monthly climate data update. Bumps all updateable climate-namespace datasets to one common version in a single PR with one announcement, skipping the frozen sources. Use when the user wants to update climate data or run the monthly climate update. For a wildfires-only refresh during fire season, use the update-wildfires-data skill instead.
 metadata:
   internal: true
 ---
@@ -26,7 +26,7 @@ September.
   new version date.
 - **Wildfires-only subset**: bump just `weekly_wildfires` (and optionally
   `yearly_burned_area`) to a new version, for the weekly in-season refresh. Follow
-  [`/wildfires-update`](../wildfires-update/SKILL.md), which covers the source's weekly
+  [`/update-wildfires-data`](../update-wildfires-data/SKILL.md), which covers the source's weekly
   grid, its provisional last data point, and the snapshot's silent per-country failure
   mode. Come back here only if you are bumping the whole batch.
 
@@ -132,7 +132,7 @@ graphers, `climate_change_impacts_annual`/`_monthly`, and `yearly_burned_area`.
    → commit `dag/archive/climate.yml`. It should add exactly the old climate steps (48 for a
    full batch). **Remind the user of this step** at the end of every hand-off; it is easy to
    forget and the PR must not merge with both versions active.
-7. **One** announcement: run [`/data-updates-comms`](../data-updates-comms/SKILL.md) for the
+7. **One** announcement: run [`/draft-data-update-slack-post`](../draft-data-update-slack-post/SKILL.md) for the
    combined batch, post to #data-updates-comms, and draft the single `/latest` post. Do not
    produce per-dataset announcements.
 
@@ -142,7 +142,7 @@ These are structural moves that happen once, then the dataset behaves like any o
 
 - **`weekly_wildfires`: `latest` → versioned.** Its grapher variables get new IDs, so the wildfire
   charts (and any wildfires explorer) need a ghost-variable remap — see
-  [`/remapping-ghost-variables`](../remapping-ghost-variables/SKILL.md).
+  [`/remap-ghost-variables`](../remap-ghost-variables/SKILL.md).
 - **`ipcc_scenarios`: namespace `emissions` → `climate`**, and **EPA 2024-04-17: namespace `epa` → `climate`**
   (retires the `epa` namespace). ipcc also moves its standalone explorer. EPA has no charts of its own
   (it only feeds `climate_change_impacts`), so its move is chart-free; ipcc's needs an explorer/chart remap.

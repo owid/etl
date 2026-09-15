@@ -1,5 +1,5 @@
 ---
-name: owl
+name: tool-owl
 description: Working with Owl — OWID's lightweight, single-folder pipeline runner for small datasets (an alternative to the full snapshot → meadow → garden → grapher chain). Use whenever the user mentions Owl, `owl_steps/`, the `owl` CLI (`owl new`/`run`/`snapshot`/`viz`), or wants to create, migrate, run, or debug a small dataset with Owl.
 metadata:
   internal: true

@@ -1,7 +1,8 @@
 ---
-name: pr-babysitter
+name: babysit-pr
 description: Spawn a background agent that babysits an open PR — triggers a Codex review, watches CI, judges and fixes valid findings, replies to and resolves review threads, and loops to a cap. Never merges. Trigger when the user asks to "babysit the PR", "ask for codex review(s) and watch CI", or after pushing a substantial chunk to a PR branch.
-metadata: { internal: true }
+metadata:
+  internal: true
 ---
 
 # PR Babysitter

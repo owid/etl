@@ -30,7 +30,7 @@ Most recurring work here has a skill that runs it end to end. Reach for it **bef
 | Check that text against the Writing and Style Guide | `/check-metadata-style` |
 | Build a chart from ETL (a single chart or a multidim), or an explorer | `/create-chart`, `/create-explorer` |
 | Review a dataset-update PR | `/review-data-pr` |
-| Announce a finished update, internally | `/data-updates-comms` — the #data-updates-comms Slack form |
+| Announce a finished update, internally | `/draft-data-update-slack-post` — the #data-updates-comms Slack form |
 | Announce a finished update, to readers | `/owid-staff:draft-data-update-post` — the "Data update" post on ourworldindata.org/latest; from the `owid-staff` plugin (owid/skills-private), auto-installed here |
 | Log the analytics reports sent to data producers, and their replies, in the shared Notion log | `/owid-staff:log-producer-interactions` — incremental, from your own Gmail, reports only; from the `owid-staff` plugin (owid/skills-private) |
 | Make a designed static chart in the Charts Figma file, or its Instagram/Reddit version | `/owid-staff:create-figma-chart`, `/owid-staff:create-insta-reddit-chart` — from the `owid-staff` plugin (`owid/skills-private`), auto-installed here via `.claude/settings.json` |
@@ -166,7 +166,7 @@ catalog. `✅ No differences found` is itself a result worth reporting.
 - For `grapher://` steps, always add `--grapher` flag
 - **Pushing to the grapher DB:** running a `data://grapher/...` step (even with `--grapher`) only builds the dataset feather. The MySQL upsert is the separate `grapher://...` step. If a metadata-only change (`display`, `description_key`, etc.) isn't showing up in the grapher DB, run `etlr grapher://grapher/<path> --grapher` explicitly to force the variable upsert.
 - **`STAGING=1`** — makes `etlr` target the current branch's staging server: `STAGING=1 .venv/bin/etlr grapher://grapher/<path> --grapher` upserts the indicators straight to `staging-site-<branch>`'s DB. Optional: staging rebuilds automatically after you push, so you only need this when you want a change reflected there right away, or when the automatic rebuild is unusually slow (rare, e.g. edits to the regions or FAOSTAT datasets that invalidate a large part of the DAG). `STAGING=<name>` targets another branch's staging server.
-- **Version-bumping a grapher step mints new variable IDs**, so existing charts referencing the old indicators become ghost variables and must be remapped on staging (see the `remapping-ghost-variables` skill / `indicator_upgrade` CLI). Budget for this whenever you rename or re-version a grapher dataset.
+- **Version-bumping a grapher step mints new variable IDs**, so existing charts referencing the old indicators become ghost variables and must be remapped on staging (see the `remap-ghost-variables` skill / `indicator_upgrade` CLI). Budget for this whenever you rename or re-version a grapher dataset.
 - **Versioning hygiene for derived/OMM steps:** an OMM's version reflects when its combining logic was written, not its inputs — but when you repoint a derived step to a newer-dated dependency, bump the step's own version folder too. Leaving a step dated before the data it ingests is confusing and should be fixed when noticed.
 - Some steps support **`SUBSET`** env var for fast dev iterations: `SUBSET='France,Germany' .venv/bin/etlr namespace/version/dataset`
 - **No `.py` for simple downloads** — when a snapshot is a plain `url_download` (no custom fetch/parse/auth logic), create only the `.dvc` file; do **not** write `snapshots/.../<short>.py`. `etls <ns>/<version>/<short>` runs it straight from the `.dvc`. Write a script only when the download genuinely needs custom code (API pagination, auth, multi-file assembly, local/manual file input, non-trivial parsing before storing).
@@ -194,7 +194,7 @@ gh pr edit <number> --body "..."
 
 **Cleaning up after merge**: `etl pr-clean` lists local branches whose PR was merged or closed (it checks the GitHub PR state, so squash-merges are detected), then deletes the selected branch(es). For branches created in a worktree (`etl pr "..." --worktree`), it also removes the worktree and copies that worktree's Claude sessions back into the main repo's `~/.claude/projects/` dir so they stay resumable.
 
-To run the full **review → wait → fix → re-review** loop hands-off (and watch CI) in the background while you keep working, use the `pr-babysitter` skill — it spawns a background agent that triggers Codex, judges and fixes the valid findings, and loops to a cap (never merges). Fire it proactively after pushing a substantial chunk to a PR branch.
+To run the full **review → wait → fix → re-review** loop hands-off (and watch CI) in the background while you keep working, use the `babysit-pr` skill — it spawns a background agent that triggers Codex, judges and fixes the valid findings, and loops to a cap (never merges). Fire it proactively after pushing a substantial chunk to a PR branch.
 
 ### Commit Message Emojis
 
