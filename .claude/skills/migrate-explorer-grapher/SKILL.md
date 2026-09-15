@@ -18,7 +18,7 @@ metadata:
 
 The TSV in `owid-grapher/explorers/<slug>.explorer.tsv` (and the live config in MySQL `explorers.config`) is the legacy source of truth. This skill pulls the IDs out of it, resolves them to ETL catalog paths, recovers any chart-stored config, and hands the result to `/create-explorer` to write the actual `viz://explorer/<ns>/latest/<short>` step.
 
-> **Scope of this skill:** the ID-resolution and TSV-translation half. The export-step authoring (Python skeleton, YAML schema, full-YAML vs table-driven choice, FAUST upstream, post-processing, DAG, verification) lives in `/create-explorer` and is shared with the other migrate-explorer-* skills and with `/create-multidim`. Don't duplicate that content here.
+> **Scope of this skill:** the ID-resolution and TSV-translation half. The export-step authoring (Python skeleton, YAML schema, full-YAML vs table-driven choice, FAUST upstream, post-processing, DAG, verification) lives in `/create-explorer` and is shared with the other migrate-explorer-* skills and with `/create-chart`. Don't duplicate that content here.
 
 ## Inputs
 
