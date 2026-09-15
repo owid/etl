@@ -1,6 +1,6 @@
 """Generate a self-contained HTML to review an explorer → MDIM view mapping.
 
-Consumes the output of the ``map-explorer-to-mdim`` skill (the
+Step 4 of the ``map-explorer-to-mdim`` skill. Consumes that skill's output (the
 ``ai/<slug>-mdim-mapping`` folder, containing ``mapping_proposal.csv``,
 ``mapping_rules.py``, and ``multidim_<short>_views.csv``) and renders a single
 HTML file where a human can step through each (explorer view, proposed MDIM
@@ -10,7 +10,7 @@ browser ``localStorage`` and can also be mirrored to a JSON file on disk
 
 Usage::
 
-    .venv/bin/python .claude/skills/review-explorer-mdim-mapping/scripts/build_review.py \\
+    .venv/bin/python .claude/skills/map-explorer-to-mdim/scripts/build_review.py \\
         --mapping-dir ai/<slug>-mdim-mapping \\
         --explorer-slug <slug> \\
         --mdim-slug <short>=<published-grapher-slug> \\
