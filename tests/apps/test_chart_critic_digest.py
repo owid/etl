@@ -10,13 +10,26 @@ def _result(slug: str, kind: str, claim: str = "Something is off") -> dict:
         "cost": 0.01,
         "status": "ok",
         "summary": f"title: Chart {slug}",
-        "issues": [{"severity": "medium", "kind": kind, "confidence": "high", "claim": claim}],
+        "issues": [
+            {
+                "severity": "medium",
+                "kind": kind,
+                "confidence": "high",
+                "claim": claim,
+                "evidence": "The 1913 value is 104.2.",
+                "reader_impact": "A reader would read an impossible share as real.",
+            }
+        ],
     }
 
 
-def _format(results: list[dict], facts: dict) -> list[str]:
+def _format(results: list[dict], facts: dict) -> list[digest.DigestMessage]:
     return digest.format_slack(
-        digest.new_findings(results, {}, facts), reviewed=len(results), candidates=len(results), facts=facts
+        digest.new_findings(results, {}, facts),
+        reviewed=len(results),
+        candidates=len(results),
+        facts=facts,
+        model="claude-opus-5",
     )
 
 
@@ -24,25 +37,63 @@ def test_one_message_per_finding_after_the_lead():
     results = [_result("a", "chart", "Claim A"), _result("b", "chart", "Claim B")]
     messages = _format(results, {})
     assert len(messages) == 3
-    assert "reviewed 2, 2 worth a look" in messages[0]
-    assert "Claim A" in messages[1] and "Claim B" not in messages[1]
+    assert "reviewed 2, 2 worth a look" in messages[0].text
+    assert "Claim A" in messages[1].text and "Claim B" not in messages[1].text
 
 
 def test_no_findings_is_no_messages():
     assert digest.format_slack([], reviewed=5, candidates=5) == []
 
 
+def test_a_finding_shows_the_chart_at_the_view_the_claim_is_about():
+    """The picture is what a reader adjudicates the claim against, so it must be the finding's
+    own view — the thumbnail endpoint honours the same query parameters the link carries."""
+    result = _result("a", "chart")
+    result["issues"][0]["url"] = "https://ourworldindata.org/grapher/a?country=~GBR&tab=chart"
+    (_, message) = _format([result], {})
+    assert "https://ourworldindata.org/grapher/thumbnail/a.png?country=~GBR&tab=chart" in message.text
+
+
+def test_the_evidence_is_posted_in_the_finding_s_thread():
+    """Not in the message: the parent is the decision, the reply is the argument."""
+    (_, message) = _format([_result("a", "chart")], {})
+    assert "The 1913 value is 104.2." not in message.text
+    (reply,) = message.thread
+    assert "The 1913 value is 104.2." in reply
+    assert "A reader would read an impossible share as real." in reply
+    # Per-finding provenance, which a lead message posted once cannot carry.
+    assert "high confidence" in reply and "claude-opus-5" in reply
+
+
 def test_a_finding_names_the_last_editor():
     facts = {"a": {"chart_id": 1, "indicators": [], "editor_mention": "<@U1>"}}
     (_, message) = _format([_result("a", "chart")], facts)
-    assert "last edited by <@U1>" in message
+    assert "<@U1>   ·   _You last edited this chart._" in message.text
+    # The ask and the mention share a line near the top, not the footer.
+    assert message.text.splitlines().index(digest.ASK + "   <@U1>   ·   _You last edited this chart._") == 3
 
 
 def test_a_finding_with_nobody_to_name_names_nobody():
     facts = {"a": {"chart_id": 1, "indicators": [], "editor_mention": None}}
     (_, message) = _format([_result("a", "data")], facts)
-    assert "last edited" not in message
-    assert "Edit chart>" in message
+    assert "last edited" not in message.text
+    assert digest.ASK in message.text
+    assert "Edit in admin>" in message.text
+
+
+def test_an_mdim_view_gets_no_edit_link():
+    """There is no single chart behind a multi-dim view, so there is nothing to edit."""
+    facts = {"a": {"chart_id": None, "indicators": [], "editor_mention": None}}
+    (_, message) = _format([_result("a", "chart")], facts)
+    assert "Edit in admin" not in message.text
+    assert "View live chart" in message.text
+
+
+def test_the_digest_file_shows_the_split_the_channel_will_see():
+    messages = _format([_result("a", "chart")], {})
+    text = digest.render(messages)
+    assert digest.MESSAGE_SEPARATOR in text and digest.THREAD_SEPARATOR in text
+    assert digest.post_count(messages) == 3  # lead, finding, its evidence
 
 
 def test_mentions_are_only_attached_when_the_sweep_earns_them():
