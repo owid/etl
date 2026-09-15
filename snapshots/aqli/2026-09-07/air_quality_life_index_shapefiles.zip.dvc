@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Air Quality Life Index (AQLI)"
+    description: |-
+      The Air Quality Life Index (AQLI) by the Energy Policy Institute at the University of Chicago showcases the potential for life expectancy gains if air pollution levels were reduced. Fine particle pollution (PM2.5) shortens people's lives when they breathe them in, the AQLI projects how many more years people could live if pollution was reduced to meet the World Health Organization's guidelines (an annual exposure of 5 µg/m3). Using global, satellite-derived data, the AQLI provides a detailed picture of air pollution levels and their health impact around the world, tracking changes from 1998 to 2022. This information can be used to inform policies and actions that aim to improve air quality and public health.
+    # date_published is the shapefile release stamp (filenames: aqli_gadm{1,2}_final_june302023); citation_full year (2024) is the AQLI product edition, which differs deliberately.
+    date_published: "2023-06-30"
+    title_snapshot: "Air Quality Life Index (AQLI) - Subnational boundary shapefiles (GADM levels 1 and 2)"
+    description_snapshot: |-
+      The administrative-boundary shapefiles underlying the AQLI subnational data, distributed by AQLI (via a Box link referenced in their data Readme at https://github.com/aqli-epic/aqli-update) and originally sourced from the Global Administrative Areas database (GADM, https://gadm.org). The geometries are in EPSG:4326 (WGS84). This archive bundles both administrative levels — GADM level 1 (states/provinces/regions) and GADM level 2 (counties/districts/municipalities) — each in its own subfolder (`gadm1/`, `gadm2/`) as a standard shapefile set (.shp/.shx/.dbf/.prj/.cpg). Each feature carries an AQLI-assigned integer id (`obidgadm1` / `obidgadm2`) plus the country and region names (`name0`, `name1`, `name2`), matching the integer `id1`/`id2` keys in the AQLI subnational data tables. The shapefiles are stamped 2023-06-30. OWID-side, the two source zips were combined into this single archive; the geometry itself is unmodified.
+
+    # Citation
+    producer: "Energy Policy Institute at the University of Chicago (EPIC)"
+    citation_full: |-
+      Air Quality Life Index (AQLI) by the Energy Policy Institute at the University of Chicago (https://aqli.epic.uchicago.edu/) (2024)
+    attribution_short: "AQLI"
+
+    # Files
+    url_main: https://aqli.epic.uchicago.edu/
+    date_accessed: '2026-09-07'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://github.com/aqli-epic/aqli-update/tree/main?tab=CC-BY-4.0-1-ov-file#
+outs:
+  - md5: 52623b6864c39019b7c77e5db1952d01
+    size: 2025184628
+    path: air_quality_life_index_shapefiles.zip
