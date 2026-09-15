@@ -1,5 +1,5 @@
 ---
-name: wildfires-update
+name: update-wildfires-data
 description: Update OWID's GWIS weekly wildfires data (climate/*/weekly_wildfires) on its own, outside the monthly climate batch. A start-to-finish runbook covering the version bump, the snapshot, the checks, the chart remap on staging, and archiving. Also explains the source's weekly grid and why its most recent point is always an undercount. Use when the user wants to refresh wildfires data, run the weekly fire-season update, or asks why our wildfire numbers lag or keep being revised.
 metadata:
   internal: true
@@ -16,7 +16,7 @@ This is a full runbook, safe to follow without prior experience of this dataset.
 in order. If a check fails, **stop and ask** rather than working around it: every check here
 exists because the failure it catches is invisible in the charts.
 
-Related: [`/climate-update`](../climate-update/SKILL.md) for the monthly batch of all climate
+Related: [`/update-climate-data`](../update-climate-data/SKILL.md) for the monthly batch of all climate
 datasets, [`/update-dataset`](../update-dataset/SKILL.md) for the generic update flow.
 
 ## What you are updating

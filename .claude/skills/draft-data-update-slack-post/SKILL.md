@@ -1,7 +1,7 @@
 ---
-name: data-updates-comms
+name: draft-data-update-slack-post
 description: >-
-  Draft answers for OWID's data-updates-comms Slack template using snapshot DVC + garden metadata
+  Draft answers for OWID's draft-data-update-slack-post Slack template using snapshot DVC + garden metadata
   + staging DB queries. Use when the user wants to fill the "Message about new data update" form,
   announce a dataset update to the internal #data-updates-comms channel, or generate the FAQ-style
   Slack post after an ETL update. Mechanical fields (producer, dates, coverage, chart count,
