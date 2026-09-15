@@ -20,7 +20,7 @@ Factual accuracy only. Don't duplicate:
 
 - Style-guide compliance → `/check-metadata-style`
 - Spelling typos → `/check-metadata-typos`
-- Jinja whitespace artifacts → `/check-metadata-spacing`
+- Jinja whitespace artifacts → `/check-metadata-style` (its mechanical first pass)
 - Field-coverage / freshness / link-liveness audits → `/update-dataset` § 6c (that step checks the links *resolve*; this skill *reads what's behind them*)
 
 Any rewrites you propose use American spelling.

@@ -165,9 +165,8 @@ Template drift is covered by the detector itself rather than by a check here: `a
 So report the checks the person will need once the steps do something, rather than running them on empty files. The metadata checks in particular have nothing to bite on yet — the scaffolded `.meta.yml` is entirely commented out:
 
 - `/check-outdated-practices` — **after** adapting the step `.py` files, and on any helper module copied in by hand
-- `/check-metadata-style` — user-facing text against the Writing and Style Guide
+- `/check-metadata-style` — user-facing text against the Writing and Style Guide, and Jinja rendering artifacts once the metadata uses templates
 - `/check-metadata-typos` — spelling
-- `/check-metadata-spacing` — Jinja rendering artifacts, once the metadata uses templates
 
 Also flag `.claude/rules/sanity-checks.md` if the garden step will do more than load-and-format: assertions are expected in the step, and the scaffold has none.
 
