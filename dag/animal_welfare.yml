@@ -110,6 +110,8 @@ steps:
   data://garden/animal_welfare/2026-09-14/in_ovo_sexing_market_penetration:
     - data://meadow/animal_welfare/2026-09-14/in_ovo_sexing_market_penetration:
       - snapshot://animal_welfare/2026-09-14/in_ovo_sexing_market_penetration.csv
+    - data://garden/faostat/2026-02-25/faostat_qcl
+    - data://garden/regions/2023-01-01/regions
   #
   # Chickens killed for eggs (OWID estimate based on FAOSTAT and in-ovo sexing market penetration).
   #

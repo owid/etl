@@ -3,7 +3,8 @@
 Starting from the number of laying hens reported by FAOSTAT, this step estimates how many hens are killed each year to
 keep that flock in production, and how many male chickens (the brothers of those hens) are killed as well, either as
 day-old chicks or later on. In countries that use in-ovo sexing, a share of the male embryos is removed before hatching;
-those are counted separately, and not as killed chickens.
+those are counted separately, and not as killed chickens. The share of hens sexed in ovo in each country and year is
+taken from the in-ovo sexing market penetration dataset.
 """
 
 import owid.catalog.processing as pr
@@ -29,24 +30,8 @@ FAOSTAT_ELEMENT_CODE_EGGS_PRODUCED = "005513"
 # that model, we ignore mortality before and during the laying period (a few percent), as we do for animals slaughtered
 # for meat.
 WEEKS_IN_LAY = 62
-# Sex ratio at hatch: number of male chicks hatched per female chick hatched.
-MALES_PER_FEMALE = 1.0
 
-# Countries assumed to receive the in-ovo sexed hens of the European Union, and the first year they do.
-# NOTE: The producer of the in-ovo sexing data only publishes a total for the EU. Until they provide country figures,
-# we allocate that total among the countries that have banned (or agreed to phase out) the culling of male chicks,
-# from the year before the ban took effect (when hatcheries started the transition), in proportion to their number of
-# laying hens. Germany is included from the start, since the technology was first rolled out for its market.
-EU_IN_OVO_COUNTRIES = {
-    "Germany": 2019,
-    "France": 2022,
-    "Austria": 2022,
-    "Netherlands": 2026,
-    "Italy": 2027,
-}
-# Countries whose in-ovo sexing share is reported directly by the producer.
-IN_OVO_COUNTRIES_REPORTED = ["Norway", "Switzerland", "United States", "Brazil"]
-# Name of the EU aggregate in the FAOSTAT and in-ovo sexing data.
+# Name of the EU aggregate in the FAOSTAT data.
 EU = "European Union (27)"
 
 # Regions for which we compute aggregates (as the sum of their member countries).
@@ -66,8 +51,9 @@ REGIONS = [
 ]
 # Suffix of FAOSTAT's own regions (which are dropped, like the OWID regions already included in the FAOSTAT dataset).
 FAOSTAT_AGGREGATE_SUFFIX = "(FAO)"
-# Gaps in a country's series are filled with its latest reported value, for at most this many years. Many countries
-# (in the latest year, 14 EU countries) have no data for some years, and a few have not reported since 2020.
+# Gaps of at most this many years in a country's series are filled with its latest reported value; longer gaps are left
+# empty. Many countries (in the latest year, 14 EU countries) have no data for some years, and a few have not reported
+# since 2020.
 # NOTE: FAOSTAT's own World and EU aggregates include the missing countries; when we compared them with the sum of
 # reported countries plus the carried-forward values of the missing ones, they agreed within 0.5% in every year, so
 # this is also (in effect) what FAOSTAT does.
@@ -84,9 +70,9 @@ def run() -> None:
     ds_qcl = paths.load_dataset("faostat_qcl")
     tb_qcl = ds_qcl.read("faostat_qcl", safe_types=False)
 
-    # Load in-ovo sexing market penetration dataset and read its main table.
+    # Load in-ovo sexing market penetration dataset and read the share of hens sexed in ovo by country and year.
     ds_in_ovo = paths.load_dataset("in_ovo_sexing_market_penetration")
-    tb_in_ovo = ds_in_ovo.read("in_ovo_sexing_market_penetration")
+    tb_in_ovo = ds_in_ovo.read("share_of_hens_sexed_in_ovo")
 
     #
     # Process data.
@@ -97,18 +83,20 @@ def run() -> None:
     # Fill gaps in country series with the latest reported value.
     tb = fill_gaps(tb=tb)
 
-    # Prepare the share of hens sexed in ovo for each country and year.
-    tb_in_ovo = prepare_in_ovo_shares(tb_in_ovo=tb_in_ovo, tb=tb)
-
     # Keep only countries (drop FAOSTAT's regions, and the OWID regions included in the FAOSTAT dataset, which are
     # recomputed below).
     tb = tb[~(tb["country"].str.endswith(FAOSTAT_AGGREGATE_SUFFIX) | tb["country"].isin(REGIONS))].reset_index(
         drop=True
     )
 
-    # Add the share of hens sexed in ovo (zero where the technology is not used).
+    # Add the share (0 to 1) of hens sexed in ovo.
     tb = tb.merge(tb_in_ovo, on=["country", "year"], how="left")
-    tb["share_in_ovo"] = tb["share_in_ovo"].fillna(0)
+    error = (
+        "Some country-years have no share of hens sexed in ovo (it should be zero where the technology is not used)."
+    )
+    assert tb["share_of_hens_sexed_in_ovo"].notna().all(), error
+    tb["share_in_ovo"] = tb["share_of_hens_sexed_in_ovo"] / 100
+    tb = tb.drop(columns=["share_of_hens_sexed_in_ovo"])
 
     # Estimate the number of hens and male chickens killed each year.
     tb = estimate_chickens_killed(tb=tb)
@@ -169,7 +157,7 @@ def select_faostat_data(tb_qcl: Table) -> Table:
 
 
 def fill_gaps(tb: Table) -> Table:
-    """Fill gaps in country series with the latest reported value, for at most MAX_YEARS_TO_FILL years.
+    """Fill gaps of at most MAX_YEARS_TO_FILL years in country series with the latest reported value.
 
     Historical regions (e.g. USSR) are not filled, otherwise they would overlap with their successors.
     """
@@ -190,7 +178,10 @@ def fill_gaps(tb: Table) -> Table:
         .sort_values(["country", "year"])
     )
     for column in columns:
-        tb_current[column] = tb_current.groupby("country")[column].transform(lambda x: x.ffill(limit=MAX_YEARS_TO_FILL))
+        missing = tb_current[column].isna()
+        gap_length = missing.groupby([tb_current["country"], (missing != missing.shift()).cumsum()]).transform("size")
+        short_gap = missing & (gap_length <= MAX_YEARS_TO_FILL)
+        tb_current.loc[short_gap, column] = tb_current.groupby("country")[column].ffill()[short_gap]
     tb_current = tb_current.dropna(subset=["laying_hens"])
 
     tb_filled = pr.concat([tb_current, tb[tb["country"].isin(historical)]], ignore_index=True)
@@ -198,73 +189,12 @@ def fill_gaps(tb: Table) -> Table:
     return tb_filled
 
 
-def prepare_in_ovo_shares(tb_in_ovo: Table, tb: Table) -> Table:
-    """Create a table with the share (0 to 1) of laying hens sexed in ovo, for each country and year.
-
-    The producer reports a share for the EU as a whole, and for a few non-EU countries. Each observation is assigned to
-    the calendar year of its date. The EU number of in-ovo sexed hens (taken from the producer where given, otherwise
-    estimated as their share of all hens times the number of laying hens in the EU) is then allocated among the EU
-    countries that have banned chick culling.
-    """
-    tb_in_ovo = tb_in_ovo.copy()
-    tb_in_ovo["year"] = tb_in_ovo["date"].str[:4].astype(int)
-
-    # For countries reported directly, use the central estimate, or the midpoint of the range if there is none.
-    share = tb_in_ovo["share_of_commercial_hens_sexed_in_ovo"].astype("Float64")
-    share_from_range = (
-        tb_in_ovo["share_of_commercial_hens_sexed_in_ovo_low"] + tb_in_ovo["share_of_commercial_hens_sexed_in_ovo_high"]
-    ) / 2
-    tb_in_ovo["share_in_ovo"] = share.fillna(share_from_range) / 100
-    tb_in_ovo["share_in_ovo"] = tb_in_ovo["share_in_ovo"].copy_metadata(
-        tb_in_ovo["share_of_commercial_hens_sexed_in_ovo"]
-    )
-    tb_reported = tb_in_ovo[tb_in_ovo["country"].isin(IN_OVO_COUNTRIES_REPORTED)][["country", "year", "share_in_ovo"]]
-    tb_reported = tb_reported.dropna(subset=["share_in_ovo"])
-    error = "Each reported country should have at most one observation per year."
-    assert not tb_reported.duplicated(subset=["country", "year"]).any(), error
-
-    # For the EU, use the producer's number of in-ovo sexed hens where given. Otherwise, estimate it as their share of
-    # all hens (including backyard flocks, which matches the scope of FAOSTAT's laying hens) times FAOSTAT's EU flock.
-    tb_eu = tb_in_ovo[(tb_in_ovo["country"] == EU)][["year", "hens_sexed_in_ovo", "share_of_all_hens_sexed_in_ovo"]]
-    tb_eu = tb_eu.dropna(subset=["hens_sexed_in_ovo", "share_of_all_hens_sexed_in_ovo"], how="all")
-    error = "The EU should have at most one observation per year."
-    assert not tb_eu["year"].duplicated().any(), error
-    tb_eu = tb_eu.merge(
-        tb[tb["country"] == EU][["year", "laying_hens"]].rename(columns={"laying_hens": "eu_laying_hens"}),
-        on="year",
-        how="inner",
-    )
-    estimated = tb_eu["share_of_all_hens_sexed_in_ovo"] / 100 * tb_eu["eu_laying_hens"]
-    tb_eu["eu_hens_in_ovo"] = tb_eu["hens_sexed_in_ovo"].astype("Float64").fillna(estimated)
-    tb_eu["eu_hens_in_ovo"] = tb_eu["eu_hens_in_ovo"].copy_metadata(tb_eu["share_of_all_hens_sexed_in_ovo"])
-
-    # Allocate the EU in-ovo sexed hens among the countries assumed to receive them, in proportion to their flocks.
-    tb_allocated = tb[tb["country"].isin(EU_IN_OVO_COUNTRIES)].copy()
-    tb_allocated = tb_allocated[tb_allocated["year"] >= tb_allocated["country"].map(EU_IN_OVO_COUNTRIES).astype(int)]
-    tb_allocated = tb_allocated.merge(tb_eu[["year", "eu_hens_in_ovo"]], on="year", how="inner")
-    tb_allocated["share_in_ovo"] = tb_allocated["eu_hens_in_ovo"] / tb_allocated.groupby("year")[
-        "laying_hens"
-    ].transform("sum")
-    tb_allocated["share_in_ovo"] = tb_allocated["share_in_ovo"].copy_metadata(tb_eu["eu_hens_in_ovo"])
-    error = (
-        "The EU in-ovo sexed hens exceed the laying hens of the countries they are allocated to. Revisit the allocation "
-        f"in EU_IN_OVO_COUNTRIES:\n{tb_allocated[tb_allocated['share_in_ovo'] > 1]}"
-    )
-    assert (tb_allocated["share_in_ovo"] <= 1).all(), error
-
-    tb_shares = pr.concat([tb_reported, tb_allocated[["country", "year", "share_in_ovo"]]], ignore_index=True)
-    error = "Shares of hens sexed in ovo should be between 0 and 1."
-    assert tb_shares["share_in_ovo"].between(0, 1).all(), error
-
-    return tb_shares
-
-
 def estimate_chickens_killed(tb: Table) -> Table:
     """Estimate the number of hens and male chickens killed each year from the number of laying hens."""
     # Hens killed each year: all hens in the flock are replaced (and killed) every WEEKS_IN_LAY weeks.
     tb["hens_killed"] = tb["laying_hens"] * 52 / WEEKS_IN_LAY
-    # Male chicks hatched alongside the female chicks that replace those hens.
-    males = tb["hens_killed"] * MALES_PER_FEMALE
+    # Male chicks hatched alongside the female chicks that replace those hens (assuming one male hatches per female).
+    males = tb["hens_killed"]
     # Male embryos removed before hatching thanks to in-ovo sexing.
     tb["male_embryos_removed"] = males * tb["share_in_ovo"]
     # Male chickens killed, either as day-old chicks, or later on if they were raised for meat.
@@ -291,7 +221,7 @@ def sanity_check_outputs(tb: Table, tb_qcl: Table) -> None:
     assert (tb["hens_killed"] <= tb["laying_hens"]).all(), error
 
     error = "Male chickens killed should never exceed the number of male chicks hatched."
-    assert (tb["male_chickens_killed"] <= tb["hens_killed"] * MALES_PER_FEMALE * (1 + 1e-6)).all(), error
+    assert (tb["male_chickens_killed"] <= tb["hens_killed"] * (1 + 1e-6)).all(), error
 
     error = "The share of males spared should be between 0 and 100."
     assert tb["share_of_males_spared"].between(0, 100).all(), error

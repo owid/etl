@@ -80,3 +80,21 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
+  share_of_hens_sexed_in_ovo:
+    title: Share of laying hens sexed in ovo, by country
+    variables:
+      share_of_hens_sexed_in_ovo:
+        title: Share of laying hens sexed in ovo
+        unit: "%"
+        short_unit: "%"
+        processing_level: major
+        description_processing: |-
+          Each estimate is assigned to the calendar year of its date. For the countries that the producer reports directly, the share is the producer's central estimate, or the midpoint of its range if there is no central estimate.
+
+          For the European Union, the producer only publishes a total. The number of in-ovo sexed hens in the EU (taken from the producer where given, and otherwise estimated as their share of all hens times the number of laying hens in the EU reported by FAOSTAT) is allocated among the member countries that have banned the culling of male chicks, in proportion to their number of laying hens, from the year before each ban took effect. Germany is included from the start of the series, since the technology was first rolled out for its market.
+
+          FAOSTAT has no data on laying hens for some countries in some years. Those gaps are filled by repeating the latest reported value, for at most five years.
+
+          All other countries and years are assigned a share of zero, since in-ovo sexing is not used there.
+        display:
+          numDecimalPlaces: 1
