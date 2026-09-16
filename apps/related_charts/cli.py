@@ -7,6 +7,16 @@ for every chart (or a single one) and writes them to the `related_charts`
 MySQL table with `reviewer='production'`, where they are consumed by the
 site baker for the "Related charts" section on data pages.
 
+What we write is a *candidate pool*, not a final list: the site displays five
+and re-ranks the pool first, putting charts that share a topic tag (then an
+area) with the source chart ahead of the rest. Coviews alone rank the most
+viewed charts highly everywhere, so the pool needs to be deep enough for the
+topical candidates to be in it. Measured against a coviews snapshot, five
+same-tag candidates exist within the top 6 for 72% of charts, within the top 10
+for 85%, and within the top 20 for 91% — hence the default below. Ranking lives
+in `getRelatedChartsForChart` (owid-grapher, db/model/Chart.ts) and can be
+changed with a re-bake; changing the pool size needs a run of this CLI.
+
 Use the wizard app `related_charts` to eyeball the quality of recommendations.
 """
 
@@ -176,8 +186,8 @@ def write_recommendations(engine, recommended_df: pd.DataFrame, charts: pd.DataF
 @click.option(
     "--top",
     type=int,
-    default=6,
-    help="Pick the top N related charts.",
+    default=20,
+    help="Store the top N candidates per chart. The site re-ranks this pool and shows fewer.",
 )
 @click.option(
     "--regularization", type=float, default=0.001, help="Factor by which to penalize charts with high pageviews."
