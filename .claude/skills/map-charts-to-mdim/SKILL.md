@@ -605,8 +605,8 @@ them:
 ## Lessons
 
 After a real run, fold anything the matcher or these docs got wrong back into
-this SKILL.md (and check whether the sibling `map-explorer-to-mdim` /
-`review-explorer-mdim-mapping` skills need the same fix).
+this SKILL.md (and check whether the sibling `map-explorer-to-mdim` skill, including
+its own `build_review.py`, needs the same fix).
 
 - **Same-y charts vanishing into `none` is the matcher's blind spot** — when a
   reviewer reports a "clear equivalent" the run missed, diff the two sides'

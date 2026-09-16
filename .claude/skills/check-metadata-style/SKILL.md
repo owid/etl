@@ -1,13 +1,21 @@
 ---
 name: check-metadata-style
-description: Check user-facing indicator and chart metadata (titles, subtitles, descriptions, description_key/WYSK, display names) against OWID's Writing and Style Guide. Use when the user mentions the style guide, writing guide, chart copy quality, title/subtitle/WYSK review, or after editing any .meta.yml under etl/steps/data/ — garden or grapher. Most user-facing text is authored in garden and inherited by grapher; this skill reads the resolved metadata off the built grapher dataset, so garden-authored text is in scope.
+description: >-
+  Check user-facing indicator and chart metadata (titles, subtitles, descriptions,
+  description_key/WYSK, display names) against OWID's Writing and Style Guide, after a
+  mechanical pass for whitespace artifacts left by Jinja templates (double spaces, stray
+  newlines, leading or trailing whitespace). Use when the user mentions the style guide,
+  writing guide, chart copy quality, title/subtitle/WYSK review, spacing, whitespace or Jinja
+  rendering, or after editing any .meta.yml under etl/steps/data/, garden or grapher. Most
+  user-facing text is authored in garden and inherited by grapher; this skill reads the
+  resolved metadata off the built grapher dataset, so garden-authored text is in scope.
 metadata:
   internal: true
 ---
 
 # Check Metadata Style
 
-Audit a dataset's user-facing text against OWID's Writing and Style Guide. Flags fields that break the rules and offers to rewrite them.
+Audit a dataset's user-facing text in two passes: a mechanical one for whitespace artifacts left by Jinja templates, then a rule-driven one against OWID's Writing and Style Guide. Flags fields that break the rules and offers to rewrite them.
 
 The text itself is usually authored in the **garden** `.meta.yml` (`description_key`/WYSK, `description_short`, `title`, `display.name`) and inherited by grapher; a smaller share is set or overridden in the grapher step. This skill reads the **resolved** metadata off the built grapher dataset, so it covers both — you point it at the grapher step, and any fix it proposes goes back to whichever layer authored the field.
 
@@ -16,6 +24,7 @@ Rules live in [STYLE_GUIDE.md](STYLE_GUIDE.md) next to this file — a committed
 ## When to use
 
 - After editing a `.meta.yml` under `etl/steps/data/` — **garden or grapher**.
+- After editing Jinja templates in a `.meta.yml` (`<%- if %>`, `<<variable>>`, `{definitions.xxx}`), or when the user asks to check for spacing or whitespace issues in metadata.
 - When the user asks to check chart copy / titles / subtitles / descriptions / WYSK against the style guide.
 - As part of pre-PR QA for a dataset update.
 
@@ -58,7 +67,7 @@ If the file is missing, rebuild it from Notion via the refresh flow in step 1 (t
 
 ### 3. Collect user-facing strings from the step
 
-Prefer the **rendered** (post-Jinja) metadata from the built catalog, so template artifacts are included in the check.
+Prefer the **rendered** (post-Jinja) metadata from the built catalog, so template artifacts are included in the check. The same collected strings feed both passes (steps 4 and 5).
 
 Accept the step path in any of these forms and normalize it before loading:
 
@@ -90,6 +99,7 @@ for table_name in ds.table_names:
 
         put('title', getattr(m, 'title', None))
         put('description_short', getattr(m, 'description_short', None))
+        put('description_processing', getattr(m, 'description_processing', None))  # whitespace pass only
 
         dk = getattr(m, 'description_key', None) or []
         if isinstance(dk, str):  # modern format: one free-form markdown string
@@ -120,6 +130,15 @@ for table_name in ds.table_names:
         if entry['fields']:
             rows.append(entry)
 
+# Step 4: whitespace artifacts in the rendered strings
+ws = [(r['table'], r['variable'], k, v) for r in rows for k, v in r['fields'].items()
+      if isinstance(v, str) and ('  ' in v or v != v.strip() or '\n' in v)]
+print(f'WHITESPACE ISSUES: {len(ws)}')
+for t, var, k, v in ws:
+    print(f'  {t}.{var}.{k}: {v[:150]!r}')
+print('---')
+
+# Step 5: strings for the style audit
 print(json.dumps(rows, indent=2, ensure_ascii=False))
 "
 ```
@@ -130,6 +149,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 |---|---|
 | `title` | Variable short title; shows in the catalog and some chart views |
 | `description_short` | One-liner rendered under chart titles |
+| `description_processing` | Processing note on data pages; collected for the whitespace pass only, the style rules skip it |
 | `description_key[i]` | Key information on chart data pages (markdown string, or legacy bullet list) |
 | `display.name` | Series label in chart legends |
 | `presentation.title_public` | Public-facing chart title |
@@ -147,7 +167,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 - `description_from_producer` — verbatim text from the source, not OWID copy.
 - `citation_full` — follows the producer's requested citation, so its wording and capitalization are theirs, not ours to restyle. (Dash typography is the one exception: a spaced hyphen separating producer from data product is an en dash everywhere, per the style guide.)
 - `unit`, `short_unit`, `processing_level`, internal names — not user-facing prose.
-- `description_long`, `description_processing` — technical, de-prioritized (re-enable later if needed).
+- `description_long` — technical, de-prioritized (re-enable later if needed). `description_processing` is collected, but only the whitespace pass reads it.
 
 **Fallback if the dataset isn't built:**
 
@@ -157,7 +177,7 @@ Origin fields (`origins[i].attribution`, `origins[i].producer`) live in the snap
 
 **Parse the garden `.meta.yml`, not just the grapher one.** Most datasets author their user-facing text in garden and have a thin or absent grapher `.meta.yml`, so reading only the grapher layer here finds nothing and reports a clean bill of health on unaudited text. Read both (`etl/steps/data/garden/<ns>/<version>/<dataset>.meta.yml` and the grapher one if it exists) and note that grapher values override garden ones on the same field.
 
-Warn the user that Jinja templates (`<<var>>`, `{definitions.xxx}`, `<%- ... -%>`) and garden→grapher inheritance are **not** resolved in this fallback path, so template-generated violations will be missed. Suggest building the step first:
+Warn the user that Jinja templates (`<<var>>`, `{definitions.xxx}`, `<%- ... -%>`) and garden→grapher inheritance are **not** resolved in this fallback path, so template-generated violations will be missed and the whitespace pass (step 4) has nothing to check. Suggest building the step first:
 
 ```bash
 .venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher
@@ -165,7 +185,26 @@ Warn the user that Jinja templates (`<<var>>`, `{definitions.xxx}`, `<%- ... -%>
 
 Drop `--only` here on purpose: when the catalog is missing, upstream meadow/garden outputs are usually missing too, and `--only` would skip them and fail on missing inputs.
 
-### 4. Evaluate each string against the guide
+### 4. Mechanical pass: whitespace artifacts
+
+Read the `WHITESPACE ISSUES` block the step-3 script printed. Every hit is a template defect that only shows in the rendered text, never in the YAML:
+
+| Pattern | Example | Why it's a problem |
+|---------|---------|-------------------|
+| Double space | `Share of  children` | Jinja `if/else` block left extra whitespace |
+| Leading whitespace | ` Share of children` | Template newline rendered as leading space |
+| Trailing whitespace | `Share of children ` | Template block left trailing space |
+| Embedded newline | `Share of\nchildren` | Multi-line Jinja block not properly trimmed |
+
+Report them grouped by table and field, showing the rendered value with `repr()` so the whitespace is visible. The fix is in the template, not in the rendered string:
+
+- Use `<%-` and `-%>` trim markers instead of `<%` and `%>` to strip whitespace around control blocks.
+- Use a `|-` YAML block scalar for multi-line definitions to control trailing newlines.
+- Check `{definitions.xxx}` references: the definition itself may carry leading or trailing whitespace.
+
+The template usually lives in the **garden** `.meta.yml` even when you read the grapher dataset; edit the layer that authored it. If the block is empty, say so and move on.
+
+### 5. Evaluate each string against the guide
 
 Claude reads `STYLE_GUIDE.md` and checks every collected string. Keep the evaluation **rule-driven**: cite the specific section/heading of the guide, not a generic "doesn't sound right".
 
@@ -186,7 +225,7 @@ Group the blocks by variable for readability. End with a summary count.
 
 If no violations are found, say so and list the fields that were inspected — the user should know what was checked, not just that nothing came up.
 
-### 5. Offer to fix
+### 6. Offer to fix
 
 Match the pattern in [check-metadata-typos](../check-metadata-typos/SKILL.md) §4–5:
 
@@ -206,9 +245,9 @@ with open(meta_yml_path, 'w') as f:
 
 Origin fields are set in the snapshot `.dvc` (`meta.origin.*`) — or, occasionally, by the step's own code after it loads the snapshot. Check which before editing, and edit that one. Producer-prescribed attributions stay out of **Fix all**.
 
-If a violation only shows up in the rendered output because of a Jinja definition (e.g. the issue is inside `{definitions.foo}`), flag it for manual fix — don't auto-rewrite the definition without asking.
+If a violation only shows up in the rendered output because of a Jinja definition (e.g. the issue is inside `{definitions.foo}`), flag it for manual fix — don't auto-rewrite the definition without asking. Whitespace artifacts from step 4 always go this route: propose the trim marker or block-scalar change in the template and let the user confirm.
 
-### 6. Verify
+### 7. Verify
 
 After fixes:
 
@@ -216,7 +255,7 @@ After fixes:
    ```bash
    .venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher --force --only
    ```
-2. Re-run steps 3–4 of this skill on the same step. Expect zero violations.
+2. Re-run steps 3–5 of this skill on the same step. Expect zero whitespace issues and zero violations.
 3. Run `make check` to confirm no lint/format regressions from the YAML edits.
 
 ---
@@ -224,7 +263,7 @@ After fixes:
 ## Notes
 
 - **No persistent output.** Analysis results stay in-conversation: no report `.md`, no scripts under `scripts/`. The only persistent file tied to this skill is `STYLE_GUIDE.md` (the committed rulebook).
-- **Current step only.** If the user asks to audit the whole catalog, say the skill is scoped to one step and suggest running it per dataset.
+- **Current step only.** If the user asks to audit the whole catalog, say the skill is scoped to one step and suggest running it per dataset. (The former `check-metadata-spacing` skill, folded into step 4 here, offered a scan of all active garden steps; that option is gone, run this per dataset instead.)
 - **Keep `STYLE_GUIDE.md` in sync with Notion.** The header's `Last synced from Notion` date is checked on every run (step 1); when it is more than two weeks old the skill refreshes the snapshot — Notion MCP first, manual markdown export as fallback — and the refresh is committed via a PR. Between syncs the skill stays deterministic and offline-capable by always auditing against the committed file.
 - **Archive-aware.** If the provided step path is under `dag/archive/*.yml`, point that out and confirm the user still wants to check it.
 - **Don't hallucinate rules.** If `STYLE_GUIDE.md` doesn't say something, don't flag it. Prefer false negatives over false positives.

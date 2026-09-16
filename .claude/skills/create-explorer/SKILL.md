@@ -9,9 +9,9 @@ metadata:
 
 Explorers are OWID's multi-dimensional dashboards (e.g. `ourworldindata.org/explorers/food-prices`). They're authored as YAML in this repo and published by ETL at `viz://explorer/<ns>/latest/<short>`.
 
-This skill is the explorer-flavored sibling of `/create-multidim`. They use the same engine (`paths.create_chart` for multidims, `paths.create_explorer` for explorers) and the same YAML schema for `dimensions` / `views` / `definitions.common_views`. The differences are:
+This skill is the explorer-flavored sibling of `/create-chart`. They use the same engine (`paths.create_chart` for charts and multidims, `paths.create_explorer` for explorers) and the same YAML schema for `dimensions` / `views` / `definitions.common_views`. The differences are:
 
-| | Multidim | Explorer |
+| | Chart / multidim | Explorer |
 |---|---|---|
 | Channel | `viz://chart/...` | `viz://explorer/...` |
 | Step file location | `etl/steps/viz/chart/<ns>/latest/` | `etl/steps/viz/explorer/<ns>/latest/` |
@@ -25,7 +25,7 @@ If you're modifying an existing explorer (adjusting chart text, swapping a catal
 
 ## When to use this skill
 
-- After the `/migrate-explorer-grapher` skill has produced (or already located) the upstream snapshot/meadow/garden/grapher chain, and now needs the explorer step.
+- After the `/migrate-explorer-to-etl` skill has produced (or already located) the upstream snapshot/meadow/garden/grapher chain, and now needs the explorer step.
 - For a brand-new explorer where the data is already in ETL (skip directly to step 1).
 - When porting an existing explorer's view layout (e.g. full-YAML → table-driven, or moving FAUST text from per-view YAML up into indicator metadata).
 

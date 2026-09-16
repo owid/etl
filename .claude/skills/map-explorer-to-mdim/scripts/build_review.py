@@ -1,103 +1,144 @@
-"""Generate a self-contained HTML to review a chart → MDIM view mapping.
+"""Generate a self-contained HTML to review an explorer → MDIM view mapping.
 
-Consumes the output of ``extract_and_match.py`` (the ``ai/<name>-charts-mdim-mapping``
-folder, specifically ``mapping_proposal.csv``) and renders a single HTML file where
-a human steps through each (chart, proposed MDIM view) pair side-by-side and
-approves / flags the match. Decisions persist in the browser ``localStorage`` and
-can be mirrored to a JSON file on disk (Chrome/Edge File System Access) or
-restored via Import.
-
-Unlike the explorer reviewer (``map-explorer-to-mdim/scripts/build_review.py``), every row has its
-own left-hand URL (each chart is its own /grapher/<slug> page), and no
-``mapping_rules.py`` is involved — the proposal CSV is self-contained. Rows without
-a proposed target (ambiguous / near-miss / none / conflict) show their candidate
-info instead of a right-hand iframe, so they can be triaged into ``overrides.csv``.
-
-Both panes are rendered against one base URL: by default the host recorded by
-``extract_and_match.py`` in ``_sources.json`` (i.e. the environment the mapping
-was extracted from — a staging-extracted mapping is reviewed against staging,
-not production). ``--host`` overrides it.
+Step 4 of the ``map-explorer-to-mdim`` skill. Consumes that skill's output (the
+``ai/<slug>-mdim-mapping`` folder, containing ``mapping_proposal.csv``,
+``mapping_rules.py``, and ``multidim_<short>_views.csv``) and renders a single
+HTML file where a human can step through each (explorer view, proposed MDIM
+view) pair side-by-side and approve / flag the match. Decisions persist in the
+browser ``localStorage`` and can also be mirrored to a JSON file on disk
+(Chrome/Edge File System Access) or restored via Import.
 
 Usage::
 
-    .venv/bin/python .claude/skills/map-charts-to-mdim/scripts/build_review.py \\
-        --mapping-dir ai/<name>-charts-mdim-mapping \\
+    .venv/bin/python .claude/skills/map-explorer-to-mdim/scripts/build_review.py \\
+        --mapping-dir ai/<slug>-mdim-mapping \\
+        --explorer-slug <slug> \\
+        --mdim-slug <short>=<published-grapher-slug> \\
+        [--mdim-slug ...] \\
         [--host https://ourworldindata.org] \\
-        [--output ai/<name>_chart_mdim_review.html]
+        [--output ai/<slug>_view_review.html] \\
+        [--no-coverage]
+
+The ``--mdim-slug`` argument maps each MDIM short name (as listed in ``MDIMS``
+in ``mapping_rules.py``) to the published Grapher slug used in URLs like
+``{host}/grapher/<slug>``. The skill cannot derive the slug automatically
+without DB access, so it is required up front.
 """
 
 import argparse
 import csv
+import importlib.util
 import json
-from collections import Counter
+from collections import defaultdict
 from pathlib import Path
-from urllib.parse import urlparse
 
 
-def recorded_host(mapping_dir: Path) -> tuple[str, str] | None:
-    """Host the mapping was extracted against, as recorded in _sources.json."""
-    src = mapping_dir / "_sources.json"
-    if src.exists():
-        host = (json.loads(src.read_text()).get("host") or "").rstrip("/")
-        if host:
-            return host, f"recorded at extraction in {src.name}"
-    return None
+def load_rules(mapping_dir: Path):
+    """Load EXPLORER_DIMENSIONS and MDIMS from the mapping_rules.py the user wrote."""
+    rules_path = mapping_dir / "mapping_rules.py"
+    if not rules_path.exists():
+        raise SystemExit(f"Not found: {rules_path}. Run the map-explorer-to-mdim skill first.")
+    spec = importlib.util.spec_from_file_location("mapping_rules", rules_path)
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    for attr in ("EXPLORER_DIMENSIONS", "MDIMS"):
+        if not hasattr(mod, attr):
+            raise SystemExit(f"mapping_rules.py is missing `{attr}`")
+    return mod
 
 
-def parse_proposal(mapping_dir: Path) -> list[dict]:
+def parse_mapping(mapping_dir: Path, explorer_dim_names: list[str], mdim_shorts: list[str]) -> list[dict]:
+    """Parse mapping_proposal.csv into the normalized record schema."""
     proposal = mapping_dir / "mapping_proposal.csv"
     if not proposal.exists():
-        raise SystemExit(f"Not found: {proposal}. Run extract_and_match.py from map-charts-to-mdim first.")
-    with open(proposal) as f:
-        rows = list(csv.DictReader(f))
+        raise SystemExit(f"Not found: {proposal}. Run build_mapping.py from map-explorer-to-mdim first.")
+    rows = list(csv.DictReader(open(proposal)))
     if not rows:
         raise SystemExit(f"{proposal} has no data rows.")
 
-    records = []
+    cols = list(rows[0].keys())
+    # Identify wide MDIM dim columns by `<short>_` prefix; ignore non-dim columns.
+    # Try the longest short first so that overlapping prefixes (e.g. `deaths` vs
+    # `deaths_by_age`) attach to the most specific MDIM.
+    mdim_dim_cols: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    reserved = {"id", "target_mdim", "target_view_id", "shared_target_explorer_ids"}
+    reserved |= {f"dimension_{i + 1}" for i in range(len(explorer_dim_names))}
+    shorts_by_length = sorted(mdim_shorts, key=len, reverse=True)
+    for c in cols:
+        if c in reserved:
+            continue
+        for short in shorts_by_length:
+            prefix = f"{short}_"
+            if c.startswith(prefix):
+                mdim_dim_cols[short].append((c, c[len(prefix):]))
+                break
+
+    records: list[dict] = []
     for r in rows:
-        target_url = (r.get("target_url") or "").strip()
-        target_path = ""
-        if target_url:
-            p = urlparse(target_url)
-            target_path = p.path + (f"?{p.query}" if p.query else "")
+        explorer_params = {}
+        for i, name in enumerate(explorer_dim_names, start=1):
+            v = (r.get(f"dimension_{i}") or "").strip()
+            if v:
+                explorer_params[name] = v
+
+        target = (r.get("target_mdim") or "").strip()
+        dims: dict[str, str] = {}
+        for col, dim_slug in mdim_dim_cols.get(target, []):
+            v = (r.get(col) or "").strip()
+            if v:
+                dims[dim_slug] = v
+
         records.append(
             {
-                "id": (r.get("chart_id") or "").strip(),
-                "chart_slug": (r.get("chart_slug") or "").strip(),
-                "chart_title": (r.get("chart_title") or "").strip(),
-                "chart_path": f"/grapher/{(r.get('chart_slug') or '').strip()}",
-                "quality": (r.get("match_quality") or "").strip(),
-                # Part of the decision fingerprint: an approval is made on a specific
-                # version of the source chart, not just on its id.
-                "config_md5": (r.get("chart_config_md5") or "").strip(),
-                "target_mdim": (r.get("target_mdim_slug") or "").strip(),
+                "id": (r.get("id") or "").strip(),
+                "explorer_params": explorer_params,
+                "target_mdim": target,
                 "view_id": (r.get("target_view_id") or "").strip(),
-                # The target-side half of the fingerprint: an approval is also made on a
-                # specific rendering of the target view, not just on its slot in the MDIM.
-                "view_config_md5": (r.get("target_view_config_md5") or "").strip(),
-                "target_path": target_path,
-                "shared_with": (r.get("shared_target_chart_ids") or "").strip(),
-                "conflict": (r.get("conflict") or "").strip(),
-                "candidates": (r.get("candidate_view_ids") or "").strip(),
-                "near_miss": (r.get("near_miss_detail") or "").strip(),
-                "csv_note": (r.get("note") or "").strip(),
+                "dims": dims,
+                "shared_with": (r.get("shared_target_explorer_ids") or "").strip(),
             }
         )
     return records
 
 
-def coverage_report(records: list[dict]) -> None:
+def coverage_report(records: list[dict], mapping_dir: Path, mdim_shorts: list[str]) -> None:
+    """Print a pre-build summary of mapping coverage."""
     print("─" * 66)
     print("COVERAGE")
     print("─" * 66)
-    counts = Counter(r["quality"] for r in records)
-    print(f"  charts: {len(records)}   |   " + "  ".join(f"{q}: {n}" for q, n in counts.most_common()))
-    with_target = [r for r in records if r["target_path"]]
-    distinct_targets = {(r["target_mdim"], r["view_id"]) for r in with_target}
-    shared = [r for r in with_target if r["shared_with"]]
-    conflicted = [r for r in with_target if r["conflict"]]
-    print(f"  with a proposed target: {len(with_target)}   |   distinct MDIM views: {len(distinct_targets)}")
-    print(f"  many-to-one rows: {len(shared)}   |   conflicts: {len(conflicted)}")
+    print(f"  mapping rows: {len(records)}   |   distinct explorer views: {len({r['id'] for r in records})}")
+
+    distinct_targets = {(r["target_mdim"], r["view_id"]) for r in records if r["target_mdim"] and r["view_id"]}
+    shared_rows = [r for r in records if r["shared_with"]]
+    print(f"  distinct MDIM targets: {len(distinct_targets)}   |   many-to-one rows: {len(shared_rows)}")
+
+    unresolved = [r for r in records if not r["view_id"]]
+    if unresolved:
+        print(f"  ⚠ unresolved rows (no target_view_id): {len(unresolved)}")
+        for r in unresolved[:5]:
+            print(f"      id={r['id']} {r['explorer_params']}")
+        if len(unresolved) > 5:
+            print(f"      … and {len(unresolved) - 5} more")
+
+    print()
+    targeted: dict[str, set[str]] = defaultdict(set)
+    for r in records:
+        if r["target_mdim"] and r["view_id"]:
+            targeted[r["target_mdim"]].add(r["view_id"])
+    for short in mdim_shorts:
+        f = mapping_dir / f"multidim_{short}_views.csv"
+        if not f.exists():
+            print(f"  MDIM '{short}': multidim_{short}_views.csv missing — skipping unmapped check")
+            continue
+        all_ids = {row["id"] for row in csv.DictReader(open(f))}
+        used = targeted.get(short, set())
+        unmapped = all_ids - used
+        print(f"  MDIM '{short}': {len(used)}/{len(all_ids)} views targeted; {len(unmapped)} never targeted")
+        for vid in sorted(unmapped)[:5]:
+            print(f"      {vid}")
+        if len(unmapped) > 5:
+            print(f"      … and {len(unmapped) - 5} more")
     print("─" * 66)
 
 
@@ -140,27 +181,20 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   main { padding: 14px 16px 90px; }
   .meta { display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; margin-bottom: 10px; font-size: 13px; }
   .meta .rowid { font-weight: 700; }
-  .quality-tag { font-weight: 600; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); }
-  .quality-tag.exact { color: var(--green); border-color: #b6e3c6; background: #f0fbf4; }
-  .quality-tag.forced { color: var(--blue); }
-  .quality-tag.ambiguous, .quality-tag.near_miss { color: var(--amber); border-color: #f0dca6; background: #fdf8ec; }
-  .quality-tag.none, .quality-tag.skipped { color: var(--muted); }
   .status-tag { font-weight: 600; }
   .status-tag.approved { color: var(--green); }
   .status-tag.flagged { color: var(--amber); }
-  .conflict-line { color: var(--red); font-size: 13px; margin-bottom: 8px; }
   .panes { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 900px) { .panes { grid-template-columns: 1fr; } }
   .pane { background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
   .pane h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted);
              margin: 0; padding: 8px 12px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; }
   .pane .sel { padding: 8px 12px; font-size: 14px; }
+  .pane .sel .chips { margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap; }
   .pane .sel code { background: #f1f3f6; border-radius: 5px; padding: 1px 6px; font-size: 12px; }
   .pane .url { padding: 0 12px 8px; font-size: 11px; }
   .pane .url a { color: var(--blue); text-decoration: none; word-break: break-all; }
   .pane iframe { width: 100%; height: 540px; border: 0; border-top: 1px solid var(--line); background: #fff; }
-  .pane .info { padding: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted);
-                min-height: 540px; white-space: pre-wrap; word-break: break-word; }
   footer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--line);
            padding: 10px 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .nav { display: flex; gap: 6px; align-items: center; }
@@ -201,18 +235,17 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   </div>
   <div class="filters">
     <span>Show:</span>
-    <span class="chip active" data-f="all"       onclick="setFilter('all')">All</span>
-    <span class="chip"        data-f="todo"      onclick="setFilter('todo')">To review</span>
-    <span class="chip"        data-f="approved"  onclick="setFilter('approved')">Approved</span>
-    <span class="chip"        data-f="flagged"   onclick="setFilter('flagged')">Flagged</span>
-    <span class="chip"        data-f="matched"   onclick="setFilter('matched')">With target</span>
-    <span class="chip"        data-f="unmatched" onclick="setFilter('unmatched')">No target</span>
+    <span class="chip active" data-f="all"      onclick="setFilter('all')">All</span>
+    <span class="chip"        data-f="todo"     onclick="setFilter('todo')">To review</span>
+    <span class="chip"        data-f="approved" onclick="setFilter('approved')">Approved</span>
+    <span class="chip"        data-f="flagged"  onclick="setFilter('flagged')">Flagged</span>
     <span class="spacer"></span>
     <button class="ghost" onclick="resetAll()">Reset all decisions</button>
   </div>
   <div class="settings" id="settings">
-    <p class="warn">Host used to build both panes. Default points to production. Edit it to compare against a
-       staging server (e.g. <code>http://staging-site-&lt;branch&gt;</code>). Paths and query params come from the mapping.</p>
+    <p class="warn">URL prefixes used to build the side-by-side charts. Defaults point to production. Edit them
+       to compare against a staging server (e.g. swap the host for your <code>staging-site-&lt;branch&gt;</code>).
+       Dimension query params are appended automatically.</p>
     <div id="settings-fields"></div>
   </div>
 </header>
@@ -220,25 +253,23 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 <main>
   <div class="meta">
     <span class="rowid" id="m-rowid"></span>
-    <span class="quality-tag" id="m-quality"></span>
     <span id="m-mdim"></span>
+    <span id="m-viewid" style="color:var(--muted)"></span>
     <span id="m-shared" style="color:var(--muted)"></span>
     <span class="status-tag" id="m-status"></span>
   </div>
-  <div class="conflict-line" id="m-conflict"></div>
   <div class="panes">
     <div class="pane">
-      <h2><span>Old chart</span><span id="chart-label"></span></h2>
-      <div class="sel" id="chart-sel"></div>
-      <div class="url" id="chart-url"></div>
-      <iframe id="chart-frame" loading="lazy"></iframe>
+      <h2><span>Old explorer</span><span id="explorer-label"></span></h2>
+      <div class="sel" id="exp-sel"></div>
+      <div class="url" id="exp-url"></div>
+      <iframe id="exp-frame" loading="lazy"></iframe>
     </div>
     <div class="pane">
-      <h2><span>New MDIM view</span><span id="mdim-name"></span></h2>
+      <h2><span>New MDIM</span><span id="mdim-name"></span></h2>
       <div class="sel" id="mdim-sel"></div>
       <div class="url" id="mdim-url"></div>
-      <iframe id="mdim-frame" loading="lazy" style="display:none"></iframe>
-      <div class="info" id="mdim-info" style="display:none"></div>
+      <iframe id="mdim-frame" loading="lazy"></iframe>
     </div>
   </div>
 </main>
@@ -260,37 +291,17 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 <script>
 const RECORDS = __RECORDS__;
 const DEFAULT_ENDPOINTS = __ENDPOINTS__;
-const REVIEW_NAME = __REVIEW_NAME__;
-const LS_DEC = "chart_mdim_review_v1__" + REVIEW_NAME;
-const LS_EP  = "chart_mdim_endpoints_v1__" + REVIEW_NAME;
+const EXPLORER_SLUG = __EXPLORER_SLUG__;
+const LS_DEC = "review_decisions_v1__" + EXPLORER_SLUG;
+const LS_EP  = "review_endpoints_v1__" + EXPLORER_SLUG;
+
+document.getElementById("explorer-label").textContent = EXPLORER_SLUG;
 
 let endpoints = loadEndpoints();
 let decisions = JSON.parse(localStorage.getItem(LS_DEC) || "{}");
 let filter = "all";
 let order = RECORDS.map((_, i) => i);
 let pos = 0;
-
-// A decision is bound to the proposal it was made on: when a re-run of the extractor
-// changes a chart's proposed target OR edits either end of the pair, the saved
-// approval/flag must not carry over. Both config md5s are in the fingerprint because a
-// reviewer approves a specific version of the source chart AND a specific rendering of
-// the target view, not just their ids — and once the mapping is regenerated, preflight's
-// own md5 checks compare the new proposal against the DB and so cannot see that drift
-// either. The target view's *config id* is deliberately not in here: grapher keys view
-// configs on the dimension-derived view id and updates the row in place on re-export, so
-// the id survives content changes and only ever changes together with view_id above.
-function fp(rec) { return (rec.target_mdim || "") + "::" + (rec.view_id || "") + "::" + (rec.config_md5 || "") + "::" + (rec.view_config_md5 || ""); }
-(function pruneStaleDecisions() {
-  let n = 0;
-  for (const rec of RECORDS) {
-    const d = decisions[String(rec.id)];
-    if (d && d.target !== fp(rec)) { delete decisions[String(rec.id)]; n++; }
-  }
-  if (n) {
-    localStorage.setItem(LS_DEC, JSON.stringify(decisions));
-    setTimeout(() => toast(n + " saved decision(s) cleared — their proposed target changed since they were made."), 400);
-  }
-})();
 
 // --- persistence -----------------------------------------------------------
 // localStorage is the always-on store: every decision is saved immediately and
@@ -337,7 +348,7 @@ async function linkSaveFile() {
   }
   try {
     const h = await window.showSaveFilePicker({
-      suggestedName: REVIEW_NAME + "_chart_mdim_review.json",
+      suggestedName: EXPLORER_SLUG + "_view_review.json",
       types: [{ description: "JSON", accept: { "application/json": [".json"] } }],
     });
     fileHandle = h; autoSaveActive = true;
@@ -377,21 +388,15 @@ function importJSON(file) {
     try {
       const data = JSON.parse(r.result);
       const rows = Array.isArray(data) ? data : [];
-      const byId = {};
-      for (const rec of RECORDS) byId[String(rec.id)] = rec;
-      let n = 0, skipped = 0;
+      let n = 0;
       for (const row of rows) {
-        if (!(row && row.id != null && (row.status || row.note))) continue;
-        const rec = byId[String(row.id)];
-        // Must stay in step with fp() — a shorter fingerprint here silently skips every row.
-        const rowFp = (row.target_mdim || "") + "::" + (row.view_id || "") + "::" + (row.config_md5 || "") + "::" + (row.view_config_md5 || "");
-        if (!rec || rowFp !== fp(rec)) { skipped++; continue; }  // chart gone, target changed, or either end edited
-        decisions[String(row.id)] = { status: row.status || null, note: row.note || "", target: rowFp };
-        n++;
+        if (row && row.id != null && (row.status || row.note)) {
+          decisions[String(row.id)] = { status: row.status || null, note: row.note || "" };
+          n++;
+        }
       }
       persist(); render();
-      toast("Imported " + n + " decisions from " + file.name + "." +
-            (skipped ? " Skipped " + skipped + " (chart missing or its proposed target changed)." : ""));
+      toast("Imported " + n + " decisions from " + file.name + ".");
     } catch (e) {
       toast("Couldn't read that file: " + e.message);
     }
@@ -413,11 +418,12 @@ function saveEndpoints() {
   render();
 }
 function buildEndpointInputs() {
+  // Build the Settings panel inputs dynamically from the endpoints keys.
   const root = document.getElementById("settings-fields");
   root.innerHTML = "";
   for (const k of Object.keys(DEFAULT_ENDPOINTS)) {
     const label = document.createElement("label");
-    label.textContent = "Host";
+    label.textContent = (k === "explorer" ? "Explorer prefix" : "MDIM prefix · " + k);
     const input = document.createElement("input");
     input.id = "ep-" + k;
     input.value = endpoints[k];
@@ -428,20 +434,23 @@ function buildEndpointInputs() {
 }
 function toggleSettings() { document.getElementById("settings").classList.toggle("open"); }
 
-function withHideControls(path) {
-  return endpoints.host.replace(/\/$/, "") + path + (path.includes("?") ? "&" : "?") + "hideControls=true";
+function qs(params) {
+  return Object.entries(params).map(([k, v]) => encodeURIComponent(k) + "=" + encodeURIComponent(v)).join("&");
 }
-function chartUrl(rec) { return withHideControls(rec.chart_path); }
-function mdimUrl(rec) { return rec.target_path ? withHideControls(rec.target_path) : ""; }
+function explorerUrl(rec) {
+  return endpoints.explorer + "?" + qs(Object.assign({ hideControls: "true" }, rec.explorer_params));
+}
+function mdimUrl(rec) {
+  const base = endpoints[rec.target_mdim];
+  if (!base) return "about:blank#missing-endpoint-for-" + rec.target_mdim;
+  return base + "?" + qs(Object.assign({ hideControls: "true" }, rec.dims));
+}
 
 function applyFilter() {
   order = RECORDS.map((_, i) => i).filter((i) => {
-    const rec = RECORDS[i];
-    const st = (decisions[rec.id] || {}).status || null;
+    const st = (decisions[RECORDS[i].id] || {}).status || null;
     if (filter === "all") return true;
     if (filter === "todo") return !st;
-    if (filter === "matched") return !!rec.target_path;
-    if (filter === "unmatched") return !rec.target_path;
     return st === filter;
   });
   if (order.length === 0) order = [0];
@@ -471,10 +480,10 @@ function fillJump() {
     const r = RECORDS[idx];
     const st = (decisions[r.id] || {}).status;
     const mark = st === "approved" ? "✓ " : st === "flagged" ? "⚠ " : "";
-    const target = r.target_path ? (r.target_mdim + ":" + r.view_id) : ("(" + r.quality + ")");
+    const summary = Object.values(r.explorer_params).slice(0, 3).join(" · ");
     const o = document.createElement("option");
     o.value = k;
-    o.textContent = `${mark}#${r.id} · ${r.chart_slug} → ${target}`;
+    o.textContent = `${mark}#${r.id} · ${summary}`;
     sel.appendChild(o);
   });
   sel.value = pos;
@@ -487,44 +496,27 @@ function render() {
   const rec = RECORDS[order[pos]];
   const dec = decisions[rec.id] || {};
 
-  document.getElementById("m-rowid").textContent = `Row ${pos + 1} / ${order.length}  ·  chart #${rec.id}`;
-  const qEl = document.getElementById("m-quality");
-  qEl.textContent = rec.quality;
-  qEl.className = "quality-tag " + rec.quality;
-  document.getElementById("m-mdim").innerHTML = rec.target_path
-    ? `→ <b>${rec.target_mdim}</b> <span style="color:var(--muted)">(view ${rec.view_id})</span>` : "";
-  document.getElementById("m-shared").textContent = rec.shared_with ? `(shared with chart ids: ${rec.shared_with})` : "";
+  document.getElementById("m-rowid").textContent = `Row ${pos + 1} / ${order.length}  ·  mapping #${rec.id}`;
+  document.getElementById("m-mdim").innerHTML = `→ <b>${rec.target_mdim}</b> MDIM`;
+  document.getElementById("m-viewid").textContent = rec.view_id ? `(mdim view ${rec.view_id})` : "";
+  document.getElementById("m-shared").textContent = rec.shared_with ? `(shared with ids: ${rec.shared_with})` : "";
   const stEl = document.getElementById("m-status");
   stEl.textContent = dec.status ? (dec.status === "approved" ? "✓ approved" : "⚠ flagged") : "";
   stEl.className = "status-tag " + (dec.status || "");
-  document.getElementById("m-conflict").textContent = rec.conflict ? "⛔ " + rec.conflict : "";
 
-  document.getElementById("chart-label").textContent = rec.chart_slug;
-  document.getElementById("chart-sel").innerHTML = rec.chart_title;
-  const cUrl = chartUrl(rec);
-  document.getElementById("chart-url").innerHTML = `<a href="${cUrl}" target="_blank" rel="noopener">open ↗ ${cUrl}</a>`;
-  setFrame("chart-frame", cUrl);
+  const ep = rec.explorer_params;
+  document.getElementById("exp-sel").innerHTML =
+    `<div class="chips">${Object.entries(ep).map(([k, v]) => chip(k, v)).join(" ")}</div>`;
+  const eUrl = explorerUrl(rec);
+  document.getElementById("exp-url").innerHTML = `<a href="${eUrl}" target="_blank" rel="noopener">open ↗ ${eUrl}</a>`;
+  setFrame("exp-frame", eUrl);
 
-  const frame = document.getElementById("mdim-frame");
-  const info = document.getElementById("mdim-info");
-  if (rec.target_path) {
-    document.getElementById("mdim-name").textContent = rec.target_mdim;
-    document.getElementById("mdim-sel").innerHTML = chip("view", rec.view_id);
-    const mUrl = mdimUrl(rec);
-    document.getElementById("mdim-url").innerHTML = `<a href="${mUrl}" target="_blank" rel="noopener">open ↗ ${mUrl}</a>`;
-    frame.style.display = ""; info.style.display = "none";
-    setFrame("mdim-frame", mUrl);
-  } else {
-    document.getElementById("mdim-name").textContent = "no target";
-    document.getElementById("mdim-sel").innerHTML = "";
-    document.getElementById("mdim-url").innerHTML = "";
-    frame.style.display = "none"; info.style.display = "";
-    const bits = [];
-    if (rec.candidates) bits.push("Candidates:\n" + rec.candidates.split(" | ").join("\n"));
-    if (rec.near_miss) bits.push("Near misses:\n" + rec.near_miss.split(" | ").join("\n"));
-    if (rec.csv_note) bits.push("Note: " + rec.csv_note);
-    info.textContent = bits.join("\n\n") || "No MDIM view shares this chart's indicators.";
-  }
+  document.getElementById("mdim-name").textContent = rec.target_mdim;
+  document.getElementById("mdim-sel").innerHTML =
+    `<div class="chips">${Object.entries(rec.dims).map(([k, v]) => chip(k, v)).join(" ")}</div>`;
+  const mUrl = mdimUrl(rec);
+  document.getElementById("mdim-url").innerHTML = `<a href="${mUrl}" target="_blank" rel="noopener">open ↗ ${mUrl}</a>`;
+  setFrame("mdim-frame", mUrl);
 
   document.getElementById("note").value = dec.note || "";
   updateCounts();
@@ -547,7 +539,6 @@ function decide(status) {
   const nextId = (status && pos < order.length - 1) ? RECORDS[order[pos + 1]].id : null;
   const cur = decisions[rec.id] || {};
   cur.status = status;
-  cur.target = fp(rec);
   decisions[rec.id] = cur;
   persist();
   if (nextId !== null) {
@@ -561,7 +552,6 @@ function saveNote(v) {
   const rec = RECORDS[order[pos]];
   const cur = decisions[rec.id] || {};
   cur.note = v;
-  cur.target = fp(rec);
   decisions[rec.id] = cur;
   persist();
 }
@@ -574,12 +564,11 @@ function exportRows() {
   return RECORDS.map((r) => {
     const d = decisions[r.id] || {};
     return {
-      id: r.id, chart_slug: r.chart_slug, quality: r.quality,
-      target_mdim: r.target_mdim, view_id: r.view_id, config_md5: r.config_md5,
-      view_config_md5: r.view_config_md5,
-      shared_with: r.shared_with, conflict: r.conflict,
+      id: r.id, target_mdim: r.target_mdim, view_id: r.view_id,
+      explorer_params: r.explorer_params, mdim_dims: r.dims,
+      shared_with: r.shared_with,
       status: d.status || "", note: d.note || "",
-      chart_url: chartUrl(r), mdim_url: mdimUrl(r),
+      explorer_url: explorerUrl(r), mdim_url: mdimUrl(r),
     };
   });
 }
@@ -588,14 +577,14 @@ function download(name, text, type) {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href);
 }
-function exportJSON() { download(REVIEW_NAME + "_chart_mdim_review.json", JSON.stringify(exportRows(), null, 2), "application/json"); }
+function exportJSON() { download(EXPLORER_SLUG + "_view_review.json", JSON.stringify(exportRows(), null, 2), "application/json"); }
 function exportCSV() {
   const rows = exportRows();
-  const cols = ["id", "chart_slug", "quality", "target_mdim", "view_id", "config_md5", "view_config_md5", "status", "note", "shared_with", "conflict", "chart_url", "mdim_url"];
+  const cols = ["id", "target_mdim", "view_id", "status", "note", "shared_with", "explorer_url", "mdim_url"];
   const esc = (v) => `"${String(v).replace(/"/g, '""')}"`;
   const lines = [cols.join(",")];
   for (const r of rows) lines.push(cols.map((c) => esc(r[c])).join(","));
-  download(REVIEW_NAME + "_chart_mdim_review.csv", lines.join("\n"), "text/csv");
+  download(EXPLORER_SLUG + "_view_review.csv", lines.join("\n"), "text/csv");
 }
 
 document.addEventListener("keydown", (e) => {
@@ -616,52 +605,68 @@ updateSaveStatus();
 """
 
 
-def render_html(records: list[dict], endpoints: dict[str, str], output_path: Path, name: str) -> None:
-    title = f"{name} · chart → MDIM review"
+def render_html(records: list[dict], endpoints: dict[str, str], output_path: Path, explorer_slug: str) -> None:
+    title = f"{explorer_slug} · explorer → MDIM review"
     html = (
         HTML_TEMPLATE.replace("__TITLE__", title)
         .replace("__RECORDS__", json.dumps(records))
         .replace("__ENDPOINTS__", json.dumps(endpoints))
-        .replace("__REVIEW_NAME__", json.dumps(name))
+        .replace("__EXPLORER_SLUG__", json.dumps(explorer_slug))
     )
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(html, encoding="utf-8")
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Build the self-contained HTML to review a chart → MDIM mapping.")
+    ap = argparse.ArgumentParser(description="Build the self-contained HTML to review an explorer → MDIM mapping.")
     ap.add_argument("--mapping-dir", required=True, type=Path,
-                    help="Folder produced by map-charts-to-mdim (contains mapping_proposal.csv).")  # fmt: skip
-    ap.add_argument("--host", default=None,
-                    help="Base URL for both panes (default: the host the mapping was extracted "
-                         "against, from _sources.json; production if that record is missing).")  # fmt: skip
+                    help="Folder produced by the map-explorer-to-mdim skill (contains mapping_proposal.csv, mapping_rules.py).")
+    ap.add_argument("--explorer-slug", required=True,
+                    help="Explorer slug, e.g. 'natural-disasters' (used in the explorer URL).")
+    ap.add_argument("--mdim-slug", action="append", default=[],
+                    metavar="<short>=<grapher-slug>",
+                    help="Published Grapher slug per MDIM short name. Repeat for each MDIM in mapping_rules.MDIMS. "
+                         "Example: --mdim-slug deaths=natural-disasters-deaths")
+    ap.add_argument("--host", default="https://ourworldindata.org",
+                    help="Base URL for both panes (default: production).")
     ap.add_argument("--output", type=Path, default=None,
-                    help="Output HTML path (default: ai/<mapping-dir name>_chart_mdim_review.html).")  # fmt: skip
+                    help="Output HTML path (default: ai/<explorer_slug>_view_review.html).")
     ap.add_argument("--no-coverage", action="store_true", help="Skip the coverage report.")
     args = ap.parse_args()
 
     if not args.mapping_dir.exists():
         raise SystemExit(f"Mapping directory not found: {args.mapping_dir}")
 
-    records = parse_proposal(args.mapping_dir)
+    rules = load_rules(args.mapping_dir)
+    records = parse_mapping(args.mapping_dir, rules.EXPLORER_DIMENSIONS, rules.MDIMS)
+
     if not args.no_coverage:
-        coverage_report(records)
+        coverage_report(records, args.mapping_dir, rules.MDIMS)
 
-    # Review against the environment the mapping came from — defaulting to production
-    # would silently show different charts/MDIMs for a staging-extracted mapping.
-    if args.host:
-        host, provenance = args.host.rstrip("/"), "--host"
-    else:
-        host, provenance = recorded_host(args.mapping_dir) or ("https://ourworldindata.org", "production fallback — no host recorded in _sources.json")  # fmt: skip
-    print(f"pane host: {host}  ({provenance})")
+    mdim_slugs: dict[str, str] = {}
+    for spec in args.mdim_slug:
+        if "=" not in spec:
+            raise SystemExit(f"--mdim-slug must be '<short>=<grapher-slug>', got: {spec}")
+        short, slug = spec.split("=", 1)
+        mdim_slugs[short.strip()] = slug.strip()
 
-    name = args.mapping_dir.name.replace("-", "_")
-    endpoints = {"host": host}
-    output_path = args.output or Path(f"ai/{name}_chart_mdim_review.html")
-    render_html(records, endpoints, output_path, name)
+    missing = [s for s in rules.MDIMS if s not in mdim_slugs]
+    if missing:
+        raise SystemExit(
+            f"\nMissing --mdim-slug for: {missing}\n"
+            f"Provide one --mdim-slug <short>=<grapher-slug> per MDIM in mapping_rules.MDIMS.\n"
+            f"Example: --mdim-slug deaths=natural-disasters-deaths"
+        )
+
+    endpoints = {"explorer": f"{args.host.rstrip('/')}/explorers/{args.explorer_slug}"}
+    for short, slug in mdim_slugs.items():
+        endpoints[short] = f"{args.host.rstrip('/')}/grapher/{slug}"
+
+    output_path = args.output or Path(f"ai/{args.explorer_slug.replace('-', '_')}_view_review.html")
+    render_html(records, endpoints, output_path, args.explorer_slug)
     size_kb = output_path.stat().st_size // 1024
-    print(f"\nWrote {output_path} ({len(records)} chart rows, {size_kb} KB)")
-    print("Open in a browser to review. Decisions auto-save to localStorage.")
+    print(f"\nWrote {output_path} ({len(records)} view pairs, {size_kb} KB)")
+    print(f"Open in a browser to review. Decisions auto-save to localStorage.")
 
 
 if __name__ == "__main__":

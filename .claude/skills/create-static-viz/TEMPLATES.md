@@ -5,7 +5,7 @@ re-deriving it through Figma MCP calls every time.
 
 - **File:** `Charts (2026)`, file key `s6Sv60bakebRRW2TxsMQbF`
 - **Page:** `📑 Templates`, node `798:54`
-- **Re-verify with:** `/create-figma-chart`'s [`scripts/verify_templates.js`](../create-figma-chart/scripts/verify_templates.js)
+- **Re-verify with:** `/create-figma-chart`'s `scripts/verify_templates.js`
   — it checks the shared geometry (sizes, content box, header band, footer position and growth) for all
   ten templates and returns an `ok`/`DRIFT` verdict. Use `get_metadata` on `798:54` for the per-slot
   positions it does not cover, and `get_screenshot` on a frame for colors. **Run it every refresh —
@@ -55,7 +55,7 @@ The same Templates page also holds a `"SMALL" Charts` section (heading `25344:12
 302 px wide with a **free height**. Those are article thumbnails for the `chart-rows` and
 `pull-chart` gdoc blocks, and they are **not** built by an `viz://static` step — their
 geometry comes from a grapher `imType=thumbnail` export, handled entirely by
-[`/create-figma-chart`](../create-figma-chart/SMALL-CHARTS.md).
+`/create-figma-chart` (its SMALL-CHARTS.md).
 
 So do not add a `"small"` entry to `scripts/verify_static_viz.py`'s `TEMPLATE_RATIOS`. It would be
 wrong twice: wrong pipeline, and a *ratio* check on a frame whose height is chosen per chart.

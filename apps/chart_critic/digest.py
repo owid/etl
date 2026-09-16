@@ -22,12 +22,14 @@ from __future__ import annotations
 import functools
 import json
 import re
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
 from slack_sdk.errors import SlackClientError
 from structlog import get_logger
 
+from apps.chart_critic.bundle import GRAPHER_URL
 from apps.chart_critic.critic import claim_tokens, format_views, same_claim
 from etl.paths import CACHE_DIR
 
@@ -37,28 +39,63 @@ if TYPE_CHECKING:
 log = get_logger()
 
 STATE_PATH = CACHE_DIR / "chart_critic" / "digest_state.json"
-SLACK_CHANNEL = "C03NV9Z3YSV"  # #we-need-to-correct-it
+SLACK_CHANNEL = "C087DMCTYM9"  # #chart-reviews
 ADMIN_URL = "https://admin.owid.io"
 
 # Accounts that turn up as a chart's last editor without a person behind them.
 SERVICE_ACCOUNTS = {"etl@ourworldindata.org"}
 
-# Matches #analytics-bites, the other daily owidbot post in this workspace: a severity dot, then
-# facts separated by wide middots. Consistency is worth more than a bespoke shape — people learn
-# one scanning pattern.
+# A finding is laid out the way #chart-reviews already lays out its daily post: the chart's title,
+# the chart itself, a row of actions, a bold question addressed to someone, the facts in a
+# blockquote, and a tick to close it. Readers of that channel have learned to scan that shape and
+# to tick when they are done — a bespoke shape asks them to learn a second one for nothing.
 SEVERITY_DOT = {"high": ":red_circle:", "medium": ":large_orange_circle:", "low": ":large_yellow_circle:"}
+
+# The channel's other posts ask a closed question — "Keep it online, or archive it?" — which is
+# what makes them answerable in one reply. A finding gets the same treatment.
+ASK = "*Is this a real error, or is the chart fine?*"
+
+# How the channel closes a post, and why an unticked finding is not a lost one.
+TICK = ":white_check_mark:  Tick when it's been checked."
 
 # On every finding rather than once in the lead. The lead says what the sweep was; this says what
 # the claim is worth, and it is the finding that gets forwarded, quoted and replied to on its own.
 # Plain italics, no nested code span: Slack mrkdwn renders nested formatting unreliably.
 CAVEAT = "_A chart-critic claim to check, not a confirmed error._"
 
-# What a person reads over coffee. If the sweep found more, the ranking is the deliverable.
-MAX_FINDINGS = 5
+# What a person reads over coffee, and now also what a low-traffic channel can absorb:
+# #chart-reviews carries two or three posts a day with one default reviewer, and a finding held
+# back is not dropped — it is not stamped either, so it comes back tomorrow if it still stands.
+MAX_FINDINGS = 3
 
-# The digest file is the record of what was sent, and a digest is now several messages. They are
-# joined by this marker so the file shows the split that the channel will see.
+# The digest file is the record of what was sent, and a digest is several messages, some of which
+# land in a thread rather than in the channel. They are joined by these markers so the file shows
+# the split the channel will see.
 MESSAGE_SEPARATOR = "\n\n----- next message -----\n\n"
+THREAD_SEPARATOR = "\n\n----- in thread -----\n\n"
+
+
+@dataclass
+class DigestMessage:
+    """One Slack message, with whatever is posted underneath it in its own thread."""
+
+    text: str
+    thread: list[str] = field(default_factory=list)
+
+
+def render(messages: list[DigestMessage]) -> str:
+    """The digest as one text, for the ``--digest`` file and the console.
+
+    The file is the record of what was sent, so it shows the split the channel will see: where
+    one message ends and the next begins, and which text lands in a thread rather than in the
+    channel itself.
+    """
+    return MESSAGE_SEPARATOR.join(THREAD_SEPARATOR.join([m.text, *m.thread]) for m in messages)
+
+
+def post_count(messages: list[DigestMessage]) -> int:
+    """How many Slack calls posting this digest takes — parents and thread replies alike."""
+    return sum(1 + len(m.thread) for m in messages)
 
 
 def changed_slugs(days: int = 1, include_data_updates: bool = False) -> list[str]:
@@ -366,28 +403,88 @@ def _chart_title(result: dict[str, Any]) -> str:
     return result["slug"]
 
 
+def _thumbnail(url: str) -> str:
+    """The chart's own render, as a bare URL for Slack to unfurl into the message.
+
+    The one thing the digest lacked that every other #chart-reviews post has. A claim about a
+    chart is adjudicated by looking at the chart, and a link alone makes everybody click.
+
+    Built from the finding's URL rather than from the slug, so the picture is the *view* the claim
+    is about — an mdim view, a country selection, the map tab — and not the chart's default. The
+    thumbnail endpoint honours grapher query parameters, so this renders what the model was shown.
+    """
+    base, _, params = url.partition("?")
+    slug = base.rsplit("/", 1)[-1]
+    return f"{GRAPHER_URL}/thumbnail/{slug}.png" + (f"?{params}" if params else "")
+
+
+def _evidence(issue: dict[str, Any], model: str) -> str:
+    """The argument behind the claim, as a thread reply.
+
+    ``evidence`` and ``reader_impact`` are two of the five things the model is asked for on every
+    finding, and the digest used to compute both and post neither: they were visible only in the
+    HTML report, which nobody in the channel opens. They are exactly what someone needs in order
+    to *disagree* with a claim, so they belong one click away rather than nowhere.
+
+    In the thread rather than in the message, which is what the channel's own daily post does and
+    what keeps the message scannable: the parent is the decision, the reply is the argument, and
+    only someone who disputes the claim has to read the argument.
+
+    Confidence and the model ride along here for the same reason. They are per-finding facts —
+    how sure the model was, and which model it was — that a lead message posted once cannot carry,
+    and they are what makes "advisory only" a statement rather than a disclaimer.
+    """
+    lines: list[str] = []
+    if evidence := issue.get("evidence"):
+        lines += ["*Evidence*", str(evidence)]
+    if impact := issue.get("reader_impact"):
+        lines += ["*A reader would conclude*", str(impact)]
+    lines.append(
+        f"_Advisory only · {issue.get('confidence', 'unknown')} confidence · generated by "
+        f"{model or 'an LLM'} from the chart, its metadata and its values._"
+    )
+    return "\n".join(lines)
+
+
 def _format_finding(
-    result: dict[str, Any], issue: dict[str, Any], facts: dict[str, dict[str, Any]] | None = None
-) -> str:
-    """One finding as its own message: a linked bold title, the claim in a sentence, a footer of
-    severity, readership, an admin edit link and whoever last edited the chart, and the caveat.
+    result: dict[str, Any],
+    issue: dict[str, Any],
+    facts: dict[str, dict[str, Any]] | None = None,
+    model: str = "",
+) -> DigestMessage:
+    """One finding as its own message, in the shape the channel already uses: the chart's title,
+    the chart, a row of actions, the question being asked and who is being asked it, the claim,
+    the facts in a blockquote, and the tick that closes it — with the evidence in the thread.
 
     Self-contained on purpose. It is read next to the lead message but it is also what someone
     quotes, forwards or replies to on its own, so it carries the link, the edit action and — the
     part that would otherwise be left behind in the lead — what the claim is actually worth.
     """
     chart = (facts or {}).get(result["slug"]) or {}
-    url = issue.get("url") or f"https://ourworldindata.org/grapher/{result['slug']}"
-    dot = SEVERITY_DOT.get(issue.get("severity", "low"), ":large_yellow_circle:")
-    footer = [f"{dot} {issue.get('severity', 'low')} · {issue.get('kind', 'chart')}-level"]
-    if views := format_views(result.get("views")):
-        footer.append(views)
+    url = issue.get("url") or f"{GRAPHER_URL}/{result['slug']}"
+    lines = [_chart_title(result), _thumbnail(url)]
+
+    # A multi-dim view has no chart id, so it gets no edit link — there is no single chart to
+    # edit. The live link is always there, and is what the tick is taken against.
+    actions = [f":chart_with_upwards_trend:  <{url}|View live chart>"]
     if chart_id := chart.get("chart_id"):
-        footer.append(f"<{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit chart>")
-    if editor := chart.get("editor_mention"):
-        footer.append(f"last edited by {editor}")
-    claim = issue.get("claim", "").rstrip(".")
-    return f"*<{url}|{_chart_title(result)}>*\n{claim}.\n{'   ·   '.join(footer)}\n{CAVEAT}"
+        actions.append(f":pencil2:  <{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit in admin>")
+    lines.append("      ".join(actions))
+
+    # The ask, and who is being asked. Near the top rather than in the footer: a finding whose
+    # only mention sits at the end of a middot-separated footer does not read as addressed to
+    # anyone, and a finding addressed to nobody gets read and forgotten.
+    editor = chart.get("editor_mention")
+    lines.append(ASK + (f"   {editor}   ·   _You last edited this chart._" if editor else ""))
+
+    lines.append(issue.get("claim", "").rstrip(".") + ".")
+
+    dot = SEVERITY_DOT.get(issue.get("severity", "low"), ":large_yellow_circle:")
+    lines.append(f"> *Severity:*  {dot} {issue.get('severity', 'low')}  ·  {issue.get('kind', 'chart')}-level")
+    if views := format_views(result.get("views")):
+        lines.append(f"> *Readership:*  {views}")
+    lines.append(f"{TICK}   ·   {CAVEAT}")
+    return DigestMessage("\n".join(lines), [_evidence(issue, model)])
 
 
 def format_slack(
@@ -398,9 +495,10 @@ def format_slack(
     window_days: int | None = None,
     facts: dict[str, dict[str, Any]] | None = None,
     cost: float = 0.0,
-) -> list[str]:
+    model: str = "",
+) -> list[DigestMessage]:
     """The digest as separate Slack mrkdwn messages — single asterisks for bold, in the shape
-    #analytics-bites uses.
+    #chart-reviews uses.
 
     A lead message saying what was swept and what it cost, then **one message per finding**. The
     findings used to be one message, which gave the whole digest a single thread: every reply
@@ -408,6 +506,11 @@ def format_slack(
     could not be acknowledged without noise for the rest. One message each gives every claim its
     own thread, which is where the adjudication belongs. The lead stays separate rather than
     riding on the first finding, so the first finding is not privileged.
+
+    The lead is the one part with no counterpart in that channel, where each post stands alone.
+    It earns its place by carrying what no single finding can: what the sweep looked at, how much
+    of it was reviewed, and what that cost. Everything that *is* per-finding — the model, its
+    confidence, the caveat — sits on the finding instead.
     """
     if not findings:
         return []
@@ -432,13 +535,12 @@ def format_slack(
     # charts were all already reviewed reads as $0.00 — the cache doing its job, not an error.
     spend = f"${cost:,.2f}" if cost >= 0.01 else "<$0.01"
     lead.append(
-        "_Posted by `etl chart-critic` — an LLM reading each chart, its metadata and its values. "
-        f"Reviewing {reviewed} chart{'s' if reviewed != 1 else ''} cost {spend}._"
+        f"_Posted by `etl chart-critic`. Reviewing {reviewed} chart{'s' if reviewed != 1 else ''} cost {spend}._"
     )
     if incomplete:
         lead.append(f"_{incomplete} chart(s) could not be reviewed, so treat this as incomplete._")
 
-    return ["\n".join(lead)] + [_format_finding(result, issue, facts) for result, issue in shown]
+    return [DigestMessage("\n".join(lead))] + [_format_finding(result, issue, facts, model) for result, issue in shown]
 
 
 def stamp(
