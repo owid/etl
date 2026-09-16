@@ -1,40 +1,35 @@
 """Bespoke viz step that generates JSON files for the IHME GBD treemap visualization.
 
 This step combines the GBD treemap datasets and generates:
+* `metadata.json`, the feed's provenance, derived from the garden columns (see `etl.viz.bespoke`)
 * A metadata JSON file with categories, dimensions, and time ranges
 * Individual data JSON files per entity
 
-Outputs:
-* Files are uploaded to S3 and made publicly available at:
-  * https://owid-public.owid.io/data/gbd/causes-of-death.metadata.json
-  * https://owid-public.owid.io/data/gbd/causes-of-death.<entityId>.json
-
+The files are written to the step's output folder; the framework syncs that folder to the R2 path
+of the environment being built, so the feed is served at
+`<root>/v1/bespoke/ihme_gbd/latest/gbd_treemap_json/causes-of-death.metadata.json` and
+`.../causes-of-death.<entityId>.json` -- `api.ourworldindata.org` on production, and
+`api-staging.owid.io/<env>` on a staging server or a laptop.
 """
 
 import json
-from pathlib import Path
 
-from owid.catalog import Table, s3_utils
+from owid.catalog import Table
 from owid.catalog import processing as pr
 from structlog import get_logger
 from tqdm.auto import tqdm
 
-from etl import config
 from etl.helpers import PathFinder
-from etl.paths import VIZ_DIR
+from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
 
 # Initialize logger.
 log = get_logger()
-
-# S3 bucket name and folder where dataset files will be stored.
-S3_BUCKET_NAME = "owid-public"
-S3_DATA_DIR = Path("data/gbd")
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def create_metadata_json(tb_filtered: Table) -> tuple[dict, dict]:
+def create_metadata_json(tb_filtered: Table, source: str) -> tuple[dict, dict]:
     """Create the metadata JSON structure."""
     # Get unique values for mappings
     countries = sorted(tb_filtered["country"].unique())
@@ -142,7 +137,7 @@ def create_metadata_json(tb_filtered: Table) -> tuple[dict, dict]:
     # Create metadata JSON
     metadata = {
         "timeRange": {"start": int(tb_filtered["year"].min()), "end": int(tb_filtered["year"].max())},
-        "source": "IHME, Global Burden of Disease (2025)",
+        "source": source,
         "categories": categories_list,
         "dimensions": {"entities": entities, "ageGroups": age_groups, "sexes": sex_list, "variables": variables},
     }
@@ -179,31 +174,16 @@ def create_entity_data_json(tb_filtered: Table, country: str, mappings: dict) ->
     return data
 
 
-def save_and_upload_json(data: dict, filename: str, s3_data_dir: Path) -> None:
-    """Save JSON data to local file and upload to S3.
+def save_json(data: dict, filename: str) -> None:
+    """Write one JSON file of the feed into the step's output folder.
 
     Args:
         data: Dictionary to save as JSON
         filename: Name of the file (e.g., "causes-of-death.1.json")
-        s3_data_dir: S3 directory path (within bucket)
     """
-    # Create export directory using paths
-    export_dir = VIZ_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
-    export_dir.mkdir(parents=True, exist_ok=True)
-
-    # Create full paths
-    local_file = export_dir / filename
-    s3_path = s3_data_dir / filename
-
-    # Save locally
-    with open(local_file, "w") as f:
+    paths.output_dir.mkdir(parents=True, exist_ok=True)
+    with open(paths.output_dir / filename, "w") as f:
         json.dump(data, f, indent=2)
-
-    # Upload to S3
-    if not config.GRAPHER_ENABLED:
-        tqdm.write(f"[not uploaded, no --grapher] {local_file} -> s3://{S3_BUCKET_NAME}/{s3_path}")
-    else:
-        s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_path)}", local_file, public=True, downloadable=True)
 
 
 def run() -> None:
@@ -229,26 +209,33 @@ def run() -> None:
     #
     log.info("Creating metadata and data JSON files.")
 
+    # The feed's provenance, from the origins of the data it is built on, rather than a source
+    # string typed in here that goes stale the next time GBD is updated.
+    feed_metadata = build_feed_metadata(
+        title="Causes of death",
+        columns={"Deaths": tb_filtered["value"]},
+        update_period_days=ds_garden.metadata.update_period_days,
+    )
+    write_feed_metadata(paths.output_dir, feed_metadata)
+
     # Create metadata
-    metadata, mappings = create_metadata_json(tb_filtered)
+    metadata, mappings = create_metadata_json(tb_filtered, source=feed_metadata["feed"]["citation"])
 
     #
-    # Generate and upload JSON files.
+    # Write the JSON files. The framework syncs the output folder to R2 afterwards.
     #
-    log.info(f"Creating and uploading {len(mappings['countries']) + 1} JSON files.")
+    log.info(f"Creating {len(mappings['countries']) + 1} JSON files.")
 
-    # Save and upload metadata file
-    save_and_upload_json(metadata, "causes-of-death.metadata.json", S3_DATA_DIR)
+    save_json(metadata, "causes-of-death.metadata.json")
 
-    # Save and upload entity data files
     country_to_id = {country: i + 1 for i, country in enumerate(mappings["countries"])}
     for country in tqdm(mappings["countries"], desc="Processing entities"):
         entity_id = country_to_id[country]
         data = create_entity_data_json(tb_filtered, country, mappings)
-        save_and_upload_json(data, f"causes-of-death.{entity_id}.json", S3_DATA_DIR)
+        save_json(data, f"causes-of-death.{entity_id}.json")
 
     log.info(
-        f"""Successfully created and uploaded {len(mappings["countries"]) + 1} files:
+        f"""Successfully created {len(mappings["countries"]) + 1} files:
         - 1 metadata file
         - {len(mappings["countries"])} entity data files
         - {len(metadata["dimensions"]["variables"])} variables
