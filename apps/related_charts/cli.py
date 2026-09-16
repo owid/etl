@@ -11,11 +11,20 @@ What we write is a *candidate pool*, not a final list: the site displays five
 and re-ranks the pool first, putting charts that share a topic tag (then an
 area) with the source chart ahead of the rest. Coviews alone rank the most
 viewed charts highly everywhere, so the pool needs to be deep enough for the
-topical candidates to be in it. Measured against a coviews snapshot, five
-same-tag candidates exist within the top 6 for 72% of charts, within the top 10
-for 85%, and within the top 20 for 91% — hence the default below. Ranking lives
-in `getRelatedChartsForChart` (owid-grapher, db/model/Chart.ts) and can be
-changed with a re-bake; changing the pool size needs a run of this CLI.
+topical candidates to be in it.
+
+For the median chart a pool of 6 is already enough (5 same-tag candidates sit
+within the top 6 for 86% of tagged charts, within the top 10 for 93%, and only
+94% by 20). The pool size is set by the popular charts instead, because those
+are the ones that render this section and the ones whose top candidates are
+crowded out by site-wide hubs: across the ten data pages currently using the
+new design, the share of displayed recommendations sharing a topic tag with
+their source chart goes 46% / 62% / 84% / 92% at pool sizes 6 / 10 / 20 / 30.
+Hence 20 — deep enough for those pages, cheap for the rest (~85k rows).
+
+Ranking lives in `getRelatedChartsForChart` (owid-grapher, db/model/Chart.ts)
+and can be changed with a re-bake; changing the pool size needs a run of this
+CLI.
 
 Use the wizard app `related_charts` to eyeball the quality of recommendations.
 """
