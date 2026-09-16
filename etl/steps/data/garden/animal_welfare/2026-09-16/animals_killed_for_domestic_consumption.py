@@ -83,33 +83,17 @@ SLAUGHTERED_ANIMALS_ELEMENT_CODES = ["005320", "005321"]
 # QCL element code for meat production, in tonnes.
 PRODUCTION_ELEMENT_CODE = "005510"
 
-# Plausible range of carcass weight (in kg per animal) for the world average of each group.
-# These are tight, because a world average outside them would mean the method is broken.
-EXPECTED_WORLD_CARCASS_WEIGHT_RANGES = {
-    "cattle_and_buffaloes": (100, 400),
-    "sheep_and_goats": (8, 35),
-    "pigs": (50, 130),
-    "poultry": (0.8, 3),
-}
-
-# Plausible range of carcass weight (in kg per animal) for an individual country.
-# These are much wider, because breeds and slaughter ages genuinely differ a lot between countries (e.g. cattle
-# carcasses average ~450kg in Japan and ~55kg in Bangladesh in the 1970s). A country-year outside these ranges is
-# treated as unreliable, and the world average is used instead.
-EXPECTED_CARCASS_WEIGHT_RANGES = {
+# Range of carcass weight (in kg per animal) accepted for an individual country.
+# NOTE: This affects the output, it is not just a check. A country-year whose carcass weight falls outside its
+# group's range is treated as unreliable, and the world average is used for it instead.
+# The ranges are wide, because breeds and slaughter ages genuinely differ a lot between countries: cattle
+# carcasses average ~450kg in Japan and averaged ~55kg in Bangladesh in the 1970s.
+ACCEPTED_CARCASS_WEIGHT_RANGES = {
     "cattle_and_buffaloes": (30, 550),
     "sheep_and_goats": (3, 70),
     "pigs": (8, 220),
     "poultry": (0.3, 6),
 }
-
-# Maximum fraction of country-year-group carcass weights that may come from the world average instead of the
-# country's own data. Most countries that import their meat have no slaughter data of their own.
-MAXIMUM_FRACTION_OF_FALLBACK_CARCASS_WEIGHTS = 0.15
-
-# Maximum relative difference accepted between the world number of animals implied by domestic supply and the
-# world number of animals slaughtered reported by QCL.
-MAXIMUM_WORLD_DISCREPANCY = 0.15
 
 # Countries in FAOSTAT that have no population data.
 COUNTRIES_WITHOUT_POPULATION = ["Sudan (former)"]
@@ -151,10 +135,20 @@ def prepare_carcass_weights(tb_qcl: Table) -> Table:
 
 
 def sanity_check_world_carcass_weights(tb_weights: Table) -> None:
+    # Range of carcass weight (in kg per animal) expected for the world average of each group. These are much
+    # tighter than the ranges accepted for individual countries, because a world average outside them would mean
+    # the method is broken.
+    expected_ranges = {
+        "cattle_and_buffaloes": (100, 400),
+        "sheep_and_goats": (8, 35),
+        "pigs": (50, 130),
+        "poultry": (0.8, 3),
+    }
+
     tb_world = tb_weights[tb_weights["country"] == "World"]
     error = "World carcass weights are missing; FAOSTAT QCL may no longer include a World aggregate."
     assert len(tb_world) > 0, error
-    for animal_group, (minimum, maximum) in EXPECTED_WORLD_CARCASS_WEIGHT_RANGES.items():
+    for animal_group, (minimum, maximum) in expected_ranges.items():
         weights = tb_world[tb_world["animal_group"] == animal_group]["carcass_weight"].dropna()
         error = (
             f"World carcass weight for {animal_group} is outside the expected range "
@@ -209,7 +203,7 @@ def estimate_animals_killed(tb_supply: Table, tb_weights: Table) -> Table:
     ).merge(tb_world_weights, on=["year", "animal_group"], how="left")
 
     # Discard country carcass weights that fall outside the plausible range for their group.
-    for animal_group, (minimum, maximum) in EXPECTED_CARCASS_WEIGHT_RANGES.items():
+    for animal_group, (minimum, maximum) in ACCEPTED_CARCASS_WEIGHT_RANGES.items():
         implausible = (tb["animal_group"] == animal_group) & ~tb["carcass_weight"].between(minimum, maximum)
         tb.loc[implausible, "carcass_weight"] = float("nan")
 
@@ -217,12 +211,16 @@ def estimate_animals_killed(tb_supply: Table, tb_weights: Table) -> Table:
     tb["uses_world_carcass_weight"] = tb["carcass_weight"].isna()
     tb["carcass_weight"] = tb["carcass_weight"].fillna(tb["world_carcass_weight"])
 
+    # Maximum fraction of country-year-groups that may take the world carcass weight instead of their own.
+    # Only used for the sanity check below: most countries that import their meat have no slaughter data at all.
+    maximum_fraction_of_fallbacks = 0.15
+
     fraction_of_fallbacks = tb["uses_world_carcass_weight"].mean()
     error = (
         f"{fraction_of_fallbacks:.1%} of carcass weights fall back on the world average, more than the expected "
-        f"{MAXIMUM_FRACTION_OF_FALLBACK_CARCASS_WEIGHTS:.0%}. FAOSTAT QCL coverage may have changed."
+        f"{maximum_fraction_of_fallbacks:.0%}. FAOSTAT QCL coverage may have changed."
     )
-    assert fraction_of_fallbacks <= MAXIMUM_FRACTION_OF_FALLBACK_CARCASS_WEIGHTS, error
+    assert fraction_of_fallbacks <= maximum_fraction_of_fallbacks, error
 
     for element in MEAT_ELEMENTS.values():
         tb[element] = tb[element] * 1000 / tb["carcass_weight"]
@@ -233,6 +231,10 @@ def estimate_animals_killed(tb_supply: Table, tb_weights: Table) -> Table:
 
 
 def sanity_check_animals_killed(tb: Table, tb_weights: Table) -> None:
+    # Maximum relative difference accepted between the world number of animals implied by domestic supply and the
+    # world number of animals slaughtered reported by QCL.
+    maximum_world_discrepancy = 0.15
+
     error = "Negative numbers of animals killed."
     assert (tb[list(MEAT_ELEMENTS.values())].fillna(0) >= 0).all().all(), error
 
@@ -247,9 +249,9 @@ def sanity_check_animals_killed(tb: Table, tb_weights: Table) -> None:
     error = (
         f"World animals implied by domestic supply differ from QCL animals slaughtered by up to "
         f"{discrepancy.max():.1%} (worst: {worst['animal_group']} in {worst['year']}), more than the expected "
-        f"{MAXIMUM_WORLD_DISCREPANCY:.0%}."
+        f"{maximum_world_discrepancy:.0%}."
     )
-    assert discrepancy.max() <= MAXIMUM_WORLD_DISCREPANCY, error
+    assert discrepancy.max() <= maximum_world_discrepancy, error
 
 
 def warn_on_food_exceeding_domestic_supply(tb: Table) -> None:
