@@ -217,12 +217,16 @@ def test_force_clears_stale_frames_and_keeps_other_files(tmp_path):
     for name, content in theirs.items():
         assert (sketch_dir / name).read_bytes() == content, f"{name} is not the scaffold's to delete"
 
-    # The verifier scans every SVG in a directory, so the hand-made one is moved out before that check.
-    (sketch_dir / "hand_edit.svg").rename(tmp_path / "hand_edit.svg")
+    assert str(sketch_dir / "demo") in again.stdout, "the printed verify command names a frame stem, not the dir"
     assert run(sketch_dir / "sketch.py").returncode == 0
-    verify = run(VERIFY, sketch_dir, "--template", "mobile-square", "--expect-gid", "line__placeholder")
+
+    # Per frame stem, with the hand-made SVG still sitting there — the documented workflow.
+    verify = run(VERIFY, sketch_dir / "demo", "--template", "mobile-square", "--expect-gid", "line__placeholder")
     assert verify.returncode == 0, verify.stdout + verify.stderr
-    assert verify.stdout.count("OK   ") == 1 and "demo_mobile.svg" not in verify.stdout, "only the new frame is seen"
+    assert verify.stdout.count("OK   ") == 1 and "hand_edit" not in verify.stdout, "only this frame is checked"
+    # And the reason the stem form is what we print: the directory form trips over files we preserved.
+    whole_dir = run(VERIFY, sketch_dir, "--template", "mobile-square", "--expect-gid", "line__placeholder")
+    assert whole_dir.returncode != 0 and "hand_edit" in whole_dir.stdout + whole_dir.stderr
 
 
 @pytest.mark.parametrize("years", [["2018/19", "2019/20", "2020/21"], ["2000-01-01", "2010-01-01", "2020-01-01"]])
@@ -242,6 +246,27 @@ def test_source_native_year_labels_still_render(tmp_path, years):
     assert rendered.returncode == 0, rendered.stderr
     verify = run(VERIFY, out_root / "periods", "--template", "horizontal", "--expect-gid", "line__placeholder")
     assert verify.returncode == 0, verify.stdout + verify.stderr
+
+
+def test_first_scaffold_keeps_files_it_did_not_generate(tmp_path):
+    """Nothing in the directory is the scaffold's until it has written a sketch there.
+
+    The old chart being refreshed is often saved in first, and it can carry the slug's own name.
+    """
+    out_root = tmp_path / "sketches"
+    sketch_dir = out_root / "demo"
+    sketch_dir.mkdir(parents=True)
+    csv = sketch_dir / "demo.csv"
+    frame().to_csv(csv, index=False)
+    theirs = {"demo.svg": b"<svg>the old chart</svg>", "demo.png": b"the old chart, as a png"}
+    for name, content in theirs.items():
+        (sketch_dir / name).write_bytes(content)
+
+    scaffold = run(NEW_SKETCH, "--slug", "demo", "--data", csv, "--template", "horizontal", "--out-root", out_root)
+    assert scaffold.returncode == 0, scaffold.stderr
+    assert "Cleared stale frames" not in scaffold.stdout
+    for name, content in theirs.items():
+        assert (sketch_dir / name).read_bytes() == content, f"{name} was not generated here, so it must survive"
 
 
 def test_data_already_in_the_sketch_dir_is_left_in_place(tmp_path):

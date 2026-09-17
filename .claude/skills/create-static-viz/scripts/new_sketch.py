@@ -78,8 +78,10 @@ Data: `$DATA_FILE`. Provenance: FILL IN where the file came from (a URL, a graph
 catalogPath), so promotion knows which dataset to point the step at.
 
 Render:  .venv/bin/python $SKETCH_PATH
-Verify:  .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py $SKETCH_DIR \
+Verify:  .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py $SKETCH_STEM \
              --template $FIRST_TEMPLATE --expect-gid line__placeholder
+         One stem per frame, not the directory: anything else you keep here — the old chart, a
+         reference export — is not this sketch's to verify.
 Then read the PNG.
 
 Figma handoff
@@ -403,7 +405,9 @@ def main() -> int:
         print(f"error: {sketch_path} exists; pass --force to overwrite", file=sys.stderr)
         return 2
     # A stale frame from an earlier render would pass the verifier, which scans every SVG in the dir.
-    cleared = clear_frames(sketch_dir, args.slug) if sketch_dir.exists() else []
+    # Only a sketch being replaced has frames to clear: on a first scaffold every file here is someone
+    # else's, including one already named `<slug>.svg` — the old chart, kept to compare against.
+    cleared = clear_frames(sketch_dir, args.slug) if sketch_path.is_file() else []
     sketch_dir.mkdir(parents=True, exist_ok=True)
     data_copy = sketch_dir / args.data.name
     if not (data_copy.exists() and data_copy.samefile(args.data)):
@@ -419,7 +423,7 @@ def main() -> int:
             SOURCE_LITERAL=py_literal(args.source),
             AUTHOR_LITERAL=py_literal(args.author or git_user_name() or "[Name of author]"),
             SKETCH_PATH=doc_text(display_path(sketch_path)),
-            SKETCH_DIR=doc_text(display_path(sketch_dir)),
+            SKETCH_STEM=doc_text(display_path(sketch_dir / args.slug)),
             FIRST_TEMPLATE=args.templates[0],
             LAYOUTS_BLOCK=layouts_block(args.slug, args.templates),
             DATE=date.today().isoformat(),
@@ -438,10 +442,13 @@ def main() -> int:
     )
     print("Next:")
     print(f"  .venv/bin/python {display_path(sketch_path)}")
-    print(
-        f"  .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py {display_path(sketch_dir)} "
-        f"--template {args.templates[0]} --expect-gid line__placeholder"
-    )
+    # One stem per frame rather than the directory: the verifier scans every SVG it is given, and this
+    # directory may hold images that are not this sketch's — the old chart, a reference export.
+    for name, template in zip(output_names(args.slug, args.templates), args.templates):
+        print(
+            f"  .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py "
+            f"{display_path(sketch_dir / name)} --template {template} --expect-gid line__placeholder"
+        )
     print(f"  read {display_path(sketch_dir / (args.slug + '.png'))}")
     return 0
 

@@ -97,9 +97,14 @@ are in, or the sketch imports another checkout's `etl.viz.static`.
 ## 3 — Verify, and read the PNG
 
 ```bash
-.venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py ai/static-viz-sketches/<slug> \
-    --template <first template> --expect-gid <data layer> [--expect-gid ...]
+.venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py ai/static-viz-sketches/<slug>/<frame> \
+    --template <that frame's template> --expect-gid <data layer> [--expect-gid ...]
 ```
+
+One **frame stem** per run — `<slug>`, `<slug>_mobile`, … — which is what `new_sketch.py` prints. Not the
+directory: the verifier checks every SVG it is handed, and a sketch directory legitimately holds images
+that are not this sketch's — the old chart you are refreshing, a reference export — which would fail on
+gids, a missing sibling PNG or the frame ratio.
 
 The scaffold passes with `--expect-gid line__placeholder`; once `build()` is real, pass the real data
 layers (`line__<Entity>`, `label__<Entity>`, …) — without them the naming check proves only that *some*
