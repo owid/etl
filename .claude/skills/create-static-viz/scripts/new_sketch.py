@@ -361,7 +361,7 @@ def main() -> int:
     parser.add_argument(
         "--force",
         action="store_true",
-        help="overwrite an existing sketch: rewrite sketch.py and clear its rendered frames; other files stay",
+        help="overwrite an existing sketch.py; the frames it rendered are cleared too, every other file stays",
     )
     args = parser.parse_args()
 
@@ -372,16 +372,19 @@ def main() -> int:
         return 2
 
     sketch_dir = args.out_root / args.slug
-    if sketch_dir.exists() and not args.force:
-        print(f"error: {sketch_dir} exists; pass --force to overwrite", file=sys.stderr)
+    sketch_path = sketch_dir / "sketch.py"
+    # The directory may already exist without being a sketch: SKETCHING.md §0 pulls the data into it first.
+    if sketch_path.exists() and not args.force:
+        print(f"error: {sketch_path} exists; pass --force to overwrite", file=sys.stderr)
         return 2
-    # A stale frame from an earlier scaffold would pass the verifier, which scans every SVG in the dir.
-    cleared = clear_frames(sketch_dir) if sketch_dir.exists() else []
+    # A stale frame from an earlier render would pass the verifier, which scans every SVG in the dir.
+    cleared = clear_frames(sketch_dir, args.slug) if sketch_dir.exists() else []
     sketch_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(args.data, sketch_dir / args.data.name)
+    data_copy = sketch_dir / args.data.name
+    if not (data_copy.exists() and data_copy.samefile(args.data)):
+        shutil.copy2(args.data, data_copy)
 
     title = args.title or args.slug.replace("_", " ").capitalize()
-    sketch_path = sketch_dir / "sketch.py"
     sketch_path.write_text(
         SCAFFOLD.substitute(
             TITLE=doc_text(title),
@@ -476,15 +479,21 @@ def doc_text(value: str) -> str:
     return value.replace("\\", "\\\\").replace('"""', '\\"\\"\\"')
 
 
-def clear_frames(sketch_dir: Path) -> list[Path]:
-    """Remove the rendered frames — each SVG and its sibling PNG — and return what was removed.
+def frame_stems(slug: str) -> list[str]:
+    """Every output stem the scaffold can emit for `slug`: unsuffixed, plus one per template suffix."""
+    return [slug, *(f"{slug}_{t.replace('-', '_')}" for t in sorted(TEMPLATES))]
 
-    Only the pairs `export_frame` emits go: a reference image or notes the person left beside the
-    sketch are not this script's to delete.
+
+def clear_frames(sketch_dir: Path, slug: str) -> list[Path]:
+    """Remove the frames the scaffold itself rendered for `slug`, and return what was removed.
+
+    Only stems the scaffold can emit go. A reference image, a hand-edited SVG or notes the person left
+    beside the sketch are not this script's to delete, whatever their extension — the directory is
+    gitignored, so nothing removed here comes back.
     """
     removed = []
-    for svg in sorted(sketch_dir.glob("*.svg")):
-        for frame in (svg, svg.with_suffix(".png")):
+    for stem in frame_stems(slug):
+        for frame in (sketch_dir / f"{stem}.svg", sketch_dir / f"{stem}.png"):
             if frame.is_file():
                 frame.unlink()
                 removed.append(frame)

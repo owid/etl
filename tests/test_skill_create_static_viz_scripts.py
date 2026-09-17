@@ -188,19 +188,49 @@ def test_force_clears_stale_frames_and_keeps_other_files(tmp_path):
     sketch_dir = out_root / "demo"
     assert run(sketch_dir / "sketch.py").returncode == 0
     assert (sketch_dir / "demo_mobile.svg").is_file()
-    (sketch_dir / "reference.png").write_bytes(b"an old chart, kept for comparison")
-    (sketch_dir / "notes.md").write_text("keep me")
+    theirs = {
+        "reference.png": b"an old chart",
+        "hand_edit.svg": b"<svg/>",
+        "hand_edit.png": b"png",
+        "notes.md": b"keep",
+    }
+    for name, content in theirs.items():
+        (sketch_dir / name).write_bytes(content)
 
     again = run(NEW_SKETCH, *common, "--template", "mobile-square", "--force")
     assert again.returncode == 0, again.stderr
     assert "Cleared stale frames" in again.stdout
-    assert not list(sketch_dir.glob("*.svg")) and not (sketch_dir / "demo_mobile.png").exists()
-    assert (sketch_dir / "reference.png").is_file() and (sketch_dir / "notes.md").is_file(), "not ours to delete"
+    for stem in ("demo", "demo_mobile"):
+        assert not (sketch_dir / f"{stem}.svg").exists() and not (sketch_dir / f"{stem}.png").exists(), stem
+    for name, content in theirs.items():
+        assert (sketch_dir / name).read_bytes() == content, f"{name} is not the scaffold's to delete"
 
+    # The verifier scans every SVG in a directory, so the hand-made one is moved out before that check.
+    (sketch_dir / "hand_edit.svg").rename(tmp_path / "hand_edit.svg")
     assert run(sketch_dir / "sketch.py").returncode == 0
     verify = run(VERIFY, sketch_dir, "--template", "mobile-square", "--expect-gid", "line__placeholder")
     assert verify.returncode == 0, verify.stdout + verify.stderr
     assert verify.stdout.count("OK   ") == 1 and "demo_mobile.svg" not in verify.stdout, "only the new frame is seen"
+
+
+def test_data_already_in_the_sketch_dir_is_left_in_place(tmp_path):
+    """SKETCHING.md section 0 pulls the data into the sketch dir before scaffolding: no --force, no self-copy."""
+    out_root = tmp_path / "sketches"
+    sketch_dir = out_root / "demo"
+    sketch_dir.mkdir(parents=True)
+    data = sketch_dir / "data.csv"
+    frame().to_csv(data, index=False)
+    before = data.read_bytes()
+
+    first = run(NEW_SKETCH, "--slug", "demo", "--data", data, "--template", "horizontal", "--out-root", out_root)
+    assert first.returncode == 0, first.stderr
+    assert data.read_bytes() == before and (sketch_dir / "sketch.py").is_file()
+    assert run(sketch_dir / "sketch.py").returncode == 0
+
+    second = run(NEW_SKETCH, "--slug", "demo", "--data", data, "--template", "horizontal", "--out-root", out_root)
+    assert second.returncode == 2 and "sketch.py exists" in second.stderr, (
+        "an existing sketch.py is what --force guards"
+    )
 
 
 # --- promote_sketch.py -----------------------------------------------------------------------------

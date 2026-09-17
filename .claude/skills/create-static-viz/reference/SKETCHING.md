@@ -38,7 +38,9 @@ render honest.
 ## 0 — When the input is an indicator or a chart: pull the data first
 
 One-off, into the sketch dir, and record where it came from in the sketch's docstring (the
-`Provenance` line), so promotion knows which dataset to point the step at:
+`Provenance` line), so promotion knows which dataset to point the step at. The scaffold accepts a
+`--data` file that already sits in `ai/static-viz-sketches/<slug>/` and leaves it in place — an existing
+directory is not an existing sketch; only an existing `sketch.py` asks for `--force`:
 
 ```bash
 # a grapher chart's data — every entity, whatever the URL's country=/time= say; filter in the sketch
