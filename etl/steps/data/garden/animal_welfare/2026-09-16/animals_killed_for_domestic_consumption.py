@@ -123,16 +123,44 @@ def prepare_carcass_weights(tb_qcl: Table) -> Table:
     tb["animal_group"] = tb["item_code"].map(qcl_item_code_to_group)
 
     # Sum the species of each group, separately for the number of animals slaughtered and the meat produced.
+    # A group's slaughter count is only usable if every species that reports meat production also reports how
+    # many animals were slaughtered. FAOSTAT often publishes one without the other (Estonia reports 23,000 tonnes
+    # of chicken meat but no chicken slaughter count), and summing what is there would understate the group, or
+    # even claim a country slaughters no animals at all.
+    species_with_production = set(
+        map(
+            tuple,
+            tb[(tb["element_code"] == PRODUCTION_ELEMENT_CODE) & (tb["value"] > 0)][
+                ["country", "year", "animal_group", "item_code"]
+            ].values,
+        )
+    )
+    species_with_slaughter = set(
+        map(
+            tuple,
+            tb[tb["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES) & tb["value"].notna()][
+                ["country", "year", "animal_group", "item_code"]
+            ].values,
+        )
+    )
+    groups_missing_a_species = {key[:3] for key in species_with_production - species_with_slaughter}
+
     tb_slaughtered = (
         tb[tb["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES)]
         .groupby(["country", "year", "animal_group"], observed=True, as_index=False)
-        .agg({"value": "sum"})
+        .agg({"value": lambda values: values.sum(min_count=1)})
         .rename(columns={"value": "slaughtered_animals"}, errors="raise")
     )
+    incomplete = [
+        key in groups_missing_a_species
+        for key in map(tuple, tb_slaughtered[["country", "year", "animal_group"]].values)
+    ]
+    tb_slaughtered.loc[incomplete, "slaughtered_animals"] = float("nan")
+
     tb_production = (
         tb[tb["element_code"] == PRODUCTION_ELEMENT_CODE]
         .groupby(["country", "year", "animal_group"], observed=True, as_index=False)
-        .agg({"value": "sum"})
+        .agg({"value": lambda values: values.sum(min_count=1)})
         .rename(columns={"value": "production_tonnes"}, errors="raise")
     )
     tb_weights = tb_slaughtered.merge(tb_production, on=["country", "year", "animal_group"], how="outer")
