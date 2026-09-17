@@ -86,18 +86,6 @@ SLAUGHTERED_ANIMALS_ELEMENT_CODES = ["005320", "005321"]
 # QCL element code for meat production, in tonnes.
 PRODUCTION_ELEMENT_CODE = "005510"
 
-# Range of carcass weight (in kg per animal) accepted for an individual country.
-# NOTE: This affects the output, it is not just a check. A country-year whose carcass weight falls outside its
-# group's range is treated as unreliable, and the world average is used for it instead.
-# The ranges are wide, because breeds and slaughter ages genuinely differ a lot between countries: cattle
-# carcasses average ~450kg in Japan and averaged ~55kg in Bangladesh in the 1970s.
-ACCEPTED_CARCASS_WEIGHT_RANGES = {
-    "cattle_and_buffaloes": (30, 550),
-    "sheep_and_goats": (3, 70),
-    "pigs": (8, 220),
-    "poultry": (0.3, 6),
-}
-
 # Countries in FAOSTAT that have no population data.
 COUNTRIES_WITHOUT_POPULATION = ["Sudan (former)"]
 
@@ -241,12 +229,7 @@ def estimate_animals_killed(tb_supply: Table, tb_weights: Table) -> Table:
         how="left",
     ).merge(tb_world_weights, on=["year", "animal_group"], how="left")
 
-    # Discard country carcass weights that fall outside the plausible range for their group.
-    for animal_group, (minimum, maximum) in ACCEPTED_CARCASS_WEIGHT_RANGES.items():
-        implausible = (tb["animal_group"] == animal_group) & ~tb["carcass_weight"].between(minimum, maximum)
-        tb.loc[implausible, "carcass_weight"] = float("nan")
-
-    # Fall back on the world carcass weight where the country has none.
+    # Fall back on the world carcass weight where the country reports no slaughter of its own.
     tb["uses_world_carcass_weight"] = tb["carcass_weight"].isna()
     tb["carcass_weight"] = tb["carcass_weight"].fillna(tb["world_carcass_weight"])
 
