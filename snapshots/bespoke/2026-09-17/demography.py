@@ -3,28 +3,25 @@
 The feed is a folder of JSON files: `demography.metadata.json`, which lists every entity and the
 file name (`slug`) that carries it, plus one `demography.<slug>.data.json` per entity. They were
 built from World Population Prospects 2024 outside the ETL and uploaded by hand to
-`owid-public.owid.io`, which is where this script reads them from -- the producer publishes no
-equivalent of them.
+`s3://owid-public/bespoke/demography/`, which is where this script reads them from -- the producer
+publishes no equivalent of them.
 
-The zip is written deterministically (entries sorted, timestamps fixed), so re-running this against
-an unchanged feed produces the same file and leaves the snapshot alone.
+Only the entities the index names are captured. The upload also carries eight data files the index
+does not list -- Vatican and seven UN development groupings -- which the visualization resolves
+entity names through the index and so can never reach.
 
     etls bespoke/2026-09-17/demography
+
+See `etl.viz.bespoke_capture` for why this exists and when it should go.
 """
 
 import json
-import zipfile
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from structlog import get_logger
-from tqdm.auto import tqdm
-
 from etl.helpers import PathFinder
-from etl.http import session
+from etl.viz.bespoke_capture import fetch_feed_file, fetch_feed_files, write_feed_zip
 
-log = get_logger()
 paths = PathFinder(__file__)
 
 # Where the feed is served from today. It is an Our World in Data host, not the producer's.
@@ -32,24 +29,6 @@ BASE_URL = "https://owid-public.owid.io/bespoke/demography"
 
 # The file that indexes the rest of the feed.
 INDEX_FILENAME = "demography.metadata.json"
-
-# Fixed timestamp for every zip entry, so the archive's bytes depend only on the feed's contents.
-# The value is the earliest one the zip format can store.
-ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
-
-
-def fetch_json(filename: str) -> bytes:
-    """Fetch one file of the feed, and return its bytes unaltered.
-
-    The bytes are kept rather than the parsed object: the point of this snapshot is that the feed
-    can be republished from the ETL byte-for-byte, and a re-serialization would not be.
-    """
-    response = session.get(f"{BASE_URL}/{filename}", timeout=60)
-    response.raise_for_status()
-    # Parse only to check the file is intact -- a truncated download is otherwise indistinguishable
-    # from a small country.
-    json.loads(response.content)
-    return response.content
 
 
 def sanity_check_index(index: dict) -> None:
@@ -73,33 +52,18 @@ def sanity_check_files(files: dict[str, bytes], index: dict) -> None:
     assert not tiny, f"Suspiciously small entity files: {tiny}"
 
 
-def write_zip(files: dict[str, bytes], path: Path) -> None:
-    """Write the feed into a zip whose bytes depend only on the feed's contents."""
-    with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
-        for name in sorted(files):
-            info = zipfile.ZipInfo(name, date_time=ZIP_TIMESTAMP)
-            info.compress_type = zipfile.ZIP_DEFLATED
-            # Default permissions; ZipInfo() would otherwise take them from the running process.
-            info.external_attr = 0o644 << 16
-            archive.writestr(info, files[name])
-
-
 def run(upload: bool = True) -> None:
     snap = paths.init_snapshot()
 
-    index_content = fetch_json(INDEX_FILENAME)
+    index_content = fetch_feed_file(BASE_URL, INDEX_FILENAME)
     index = json.loads(index_content)
     sanity_check_index(index)
 
     filenames = [f"demography.{slug}.data.json" for slug in sorted(index["slugs"].values())]
-    log.info("demography.fetching_feed", n_files=len(filenames) + 1, base_url=BASE_URL)
-    with ThreadPoolExecutor(max_workers=16) as executor:
-        contents = list(tqdm(executor.map(fetch_json, filenames), total=len(filenames), desc="demography feed"))
-
-    files = {INDEX_FILENAME: index_content, **dict(zip(filenames, contents))}
+    files = {INDEX_FILENAME: index_content, **fetch_feed_files(BASE_URL, filenames)}
     sanity_check_files(files, index)
 
     with TemporaryDirectory() as temp_dir:
         path = Path(temp_dir) / "demography.zip"
-        write_zip(files, path)
+        write_feed_zip(files, path)
         snap.create_snapshot(filename=path, upload=upload)

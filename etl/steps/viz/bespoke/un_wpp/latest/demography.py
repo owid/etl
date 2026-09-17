@@ -1,9 +1,10 @@
 """Bespoke viz step publishing the JSON feed for the demography visualization.
 
 Unlike the other bespoke feeds, this one is not built from a garden table: it unpacks the snapshot
-that captured the feed as it was hand-published at `owid-public.owid.io`, so that the same bytes are
-served from the same place as every other feed. What comes out is `demography.metadata.json`, which
-lists every entity and the file name carrying it, plus one `demography.<slug>.data.json` per entity.
+that captured the feed as it was hand-published under `s3://owid-public/bespoke/`, so that the same
+bytes are served from the same place as every other feed. What comes out is
+`demography.metadata.json`, which lists every entity and the file name carrying it, plus one
+`demography.<slug>.data.json` per entity.
 
 The files go to the step's output folder; the framework syncs that folder to the R2 path of the
 environment being built, so the feed is served at
@@ -22,11 +23,11 @@ Run without --grapher to skip the upload and only write the local files:
 """
 
 import json
-import zipfile
 
 from structlog import get_logger
 
 from etl.helpers import PathFinder
+from etl.viz.bespoke_capture import unpack_feed_zip
 
 log = get_logger()
 paths = PathFinder(__file__)
@@ -37,15 +38,10 @@ INDEX_FILENAME = "demography.metadata.json"
 
 def run() -> None:
     snap = paths.load_snapshot("demography")
-
-    paths.output_dir.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(snap.path) as archive:
-        names = sorted(archive.namelist())
-        for name in names:
-            (paths.output_dir / name).write_bytes(archive.read(name))
+    names = unpack_feed_zip(snap.path, paths.output_dir)
 
     # The visualization resolves every data file through the index, so a feed whose index names a
-    # file the zip doesn't carry would fail only for whoever picked that entity.
+    # file the snapshot doesn't carry would fail only for whoever picked that entity.
     index = json.loads((paths.output_dir / INDEX_FILENAME).read_text())
     expected = {INDEX_FILENAME} | {f"demography.{slug}.data.json" for slug in index["slugs"].values()}
     assert set(names) == expected, f"The snapshot's files don't match its index: {sorted(set(names) ^ expected)}"

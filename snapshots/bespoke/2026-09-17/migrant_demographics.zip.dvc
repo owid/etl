@@ -12,9 +12,9 @@ meta:
     version_producer: 2020 - POP/DB/MIG/Stock/Rev.2020
     title_snapshot: International Migrant Stock - feed of the migrant-demographics visualization
     description_snapshot: |-
-      Our World in Data built this file from International Migrant Stock 2020 outside of the ETL, and published it by hand so that the "migrant-demographics" bespoke visualization could fetch it. It carries, per entity and year, the migrant stock by sex and five-year age band alongside the total resident population on the same bands (taken from World Population Prospects), from which the visualization derives the native-born population. Entities without a World Population Prospects population estimate, and entities reporting no migrant stock in any year, were dropped when the file was built.
+      Our World in Data built this bundle of JSON files from International Migrant Stock 2020 outside of the ETL, and published it by hand so that the "migrant-demographics" bespoke visualization could fetch it. The bundle holds one file per entity, carrying that entity's migrant stock by sex and five-year age band alongside the total resident population on the same bands (taken from World Population Prospects), from which the visualization derives the native-born population. An index names the age bands, the years, and every entity with the code of the file that carries it. Entities without a World Population Prospects population estimate, and entities reporting no migrant stock in any year, were dropped when the bundle was built.
 
-      This snapshot captures the file exactly as it was being served, so that the feed can be published from the ETL without a byte of it changing. It is an interim measure: once the feed is built from the garden datasets behind those two sources, this snapshot has no reason to exist.
+      This snapshot captures those files exactly as they were being served, so that the feed can be published from the ETL without a byte of it changing. It is an interim measure: once the feed is built from the garden datasets behind those two sources, this snapshot has no reason to exist.
 
     # Citation
     producer: United Nations Department of Economic and Social Affairs
@@ -24,9 +24,6 @@ meta:
 
     # Files
     url_main: https://www.un.org/development/desa/pd/content/international-migrant-stock
-    # Our World in Data's own copy, not the producer's file: this snapshot exists to capture the
-    # hand-published feed as served, and the producer publishes no equivalent of it.
-    url_download: https://owid-public.owid.io/bespoke/migrant-demographics/migrant-demographics.json
     date_accessed: "2026-09-17"
 
     # License
@@ -34,6 +31,6 @@ meta:
       name: CC BY 3.0 IGO
       url: https://www.un.org/development/desa/pd/content/international-migrant-stock
 outs:
-  - md5: dee320b82eec6d5ff4572d0c1dd8498d
-    size: 588866
-    path: migrant_demographics.json
+  - md5: 3508e7a55318258d5f84b4db23d28a43
+    size: 311942
+    path: migrant_demographics.zip
