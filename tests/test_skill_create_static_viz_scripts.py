@@ -8,6 +8,7 @@ refusals: a sketch whose markers are gone must not be promoted quietly.
 """
 
 import ast
+import re
 import shutil
 import subprocess
 import sys
@@ -178,6 +179,15 @@ def test_quoted_arguments_become_valid_literals(tmp_path):
     assert f"# {title}" in (repo / "dag/static_viz.yml").read_text(), "the DAG comment is the title, unescaped"
 
 
+def add_layout_variant(sketch_path: Path, name: str) -> None:
+    """Copy the first LAYOUTS entry under `name`, the way section 4 says to try a variant."""
+    source = sketch_path.read_text()
+    first = re.search(r'^(    "[a-z0-9_]+": \{\n(?:.*?\n)*?    \},\n)', source, re.MULTILINE)
+    assert first, "could not find a LAYOUTS entry to copy"
+    variant = re.sub(r'^    "[a-z0-9_]+":', f'    "{name}":', first.group(1), count=1)
+    sketch_path.write_text(source.replace(first.group(1), first.group(1) + variant, 1))
+
+
 def test_force_clears_stale_frames_and_keeps_other_files(tmp_path):
     csv = tmp_path / "demo.csv"
     frame().to_csv(csv, index=False)
@@ -186,8 +196,10 @@ def test_force_clears_stale_frames_and_keeps_other_files(tmp_path):
     first = run(NEW_SKETCH, *common, "--template", "horizontal", "--template", "mobile")
     assert first.returncode == 0, first.stderr
     sketch_dir = out_root / "demo"
+    # A section-4 variant: another LAYOUTS key, added by hand, rendering a pair of its own.
+    add_layout_variant(sketch_dir / "sketch.py", "demo_narrow")
     assert run(sketch_dir / "sketch.py").returncode == 0
-    assert (sketch_dir / "demo_mobile.svg").is_file()
+    assert (sketch_dir / "demo_mobile.svg").is_file() and (sketch_dir / "demo_narrow.svg").is_file()
     theirs = {
         "reference.png": b"an old chart",
         "hand_edit.svg": b"<svg/>",
@@ -200,7 +212,7 @@ def test_force_clears_stale_frames_and_keeps_other_files(tmp_path):
     again = run(NEW_SKETCH, *common, "--template", "mobile-square", "--force")
     assert again.returncode == 0, again.stderr
     assert "Cleared stale frames" in again.stdout
-    for stem in ("demo", "demo_mobile"):
+    for stem in ("demo", "demo_mobile", "demo_narrow"):
         assert not (sketch_dir / f"{stem}.svg").exists() and not (sketch_dir / f"{stem}.png").exists(), stem
     for name, content in theirs.items():
         assert (sketch_dir / name).read_bytes() == content, f"{name} is not the scaffold's to delete"
@@ -211,6 +223,25 @@ def test_force_clears_stale_frames_and_keeps_other_files(tmp_path):
     verify = run(VERIFY, sketch_dir, "--template", "mobile-square", "--expect-gid", "line__placeholder")
     assert verify.returncode == 0, verify.stdout + verify.stderr
     assert verify.stdout.count("OK   ") == 1 and "demo_mobile.svg" not in verify.stdout, "only the new frame is seen"
+
+
+@pytest.mark.parametrize("years", [["2018/19", "2019/20", "2020/21"], ["2000-01-01", "2010-01-01", "2020-01-01"]])
+def test_source_native_year_labels_still_render(tmp_path, years):
+    """A `year` column may carry the source's own period labels; converting them is a garden job.
+
+    The scaffold's promise is that it renders as scaffolded, so it must fall back to plain ticks
+    instead of raising when the axis is not whole years.
+    """
+    data = tmp_path / "periods.csv"
+    pd.DataFrame({"country": ["France"] * 3, "year": years, "value": [1.5, 2.5, 4.0]}).to_csv(data, index=False)
+    out_root = tmp_path / "sketches"
+    scaffold = run(NEW_SKETCH, "--slug", "periods", "--data", data, "--template", "horizontal", "--out-root", out_root)
+    assert scaffold.returncode == 0, scaffold.stderr
+
+    rendered = run(out_root / "periods" / "sketch.py")
+    assert rendered.returncode == 0, rendered.stderr
+    verify = run(VERIFY, out_root / "periods", "--template", "horizontal", "--expect-gid", "line__placeholder")
+    assert verify.returncode == 0, verify.stdout + verify.stderr
 
 
 def test_data_already_in_the_sketch_dir_is_left_in_place(tmp_path):

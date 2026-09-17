@@ -42,6 +42,10 @@ DEFAULT_OUT_ROOT = REPO_ROOT / "ai" / "static-viz-sketches"
 DATA_SUFFIXES = {".csv", ".xlsx", ".xls", ".parquet", ".feather"}
 # A slug becomes a filename stem now and a step `short_name` later, so it follows the step rule.
 SLUG = re.compile(r"^[a-z0-9][a-z0-9_]*$")
+# The `LAYOUTS` registry of an existing sketch, and the frame names it declares. A §4 variant is a key
+# a person adds by hand, so the file being replaced is the only thing that knows what it rendered.
+LAYOUTS_REGISTRY = re.compile(r"^LAYOUTS = \{$(.*?)^\}$", re.MULTILINE | re.DOTALL)
+LAYOUTS_KEY = re.compile(r'^\s+"([A-Za-z0-9_]+)":\s*\{', re.MULTILINE)
 
 # Per-template slot positions in template px from the top edge, transcribed from TEMPLATES.md for the
 # templates' placeholder two-line subtitle. `note_y` is the desktop `Note:` row; mobile has none.
@@ -91,6 +95,7 @@ Scaffolded $DATE by new_sketch.py.
 """
 
 import logging
+import math
 from pathlib import Path
 
 import matplotlib
@@ -289,10 +294,11 @@ def build(tb: Table, layout: dict, source: str) -> plt.Figure:
     ax.tick_params(axis="y", length=0)
     x, y = placeholder_series(tb)
     ax.plot(x, y, color="C0", linewidth=2, gid="line__placeholder")
-    if "year" in tb.columns:
-        ticks = nice_year_ticks(int(min(x)), int(max(x)))
+    years = integer_years(x) if "year" in tb.columns else None
+    if years:
+        ticks = nice_year_ticks(min(years), max(years))
         ax.set_xticks(ticks)
-        ax.set_xlim(min(ticks[0], min(x)), max(ticks[-1], max(x)))
+        ax.set_xlim(min(ticks[0], min(years)), max(ticks[-1], max(years)))
 
     # Guides: the band's outline and a label saying what to replace. They leave with the placeholder.
     band_h = layout["chart_bottom_y"] - layout["chart_top_y"]
@@ -320,6 +326,25 @@ def build(tb: Table, layout: dict, source: str) -> plt.Figure:
         gid="guide__label",
     )
     return fig
+
+
+def integer_years(values: list) -> list[int] | None:
+    """`values` as whole years, or None when they are not years at all.
+
+    A `year` column may hold the source's own period labels — fiscal years ("2020/21"), dates, week
+    codes — and those are a garden job, not a sketch one. Round year ticks are drawn only when the
+    axis really is years; anything else keeps matplotlib's own ticks so the sketch still renders.
+    """
+    years = []
+    for value in values:
+        try:
+            year = float(value)
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(year) or year != int(year):
+            return None
+        years.append(int(year))
+    return years or None
 
 
 def placeholder_series(tb: Table) -> tuple[list, list]:
@@ -479,20 +504,31 @@ def doc_text(value: str) -> str:
     return value.replace("\\", "\\\\").replace('"""', '\\"\\"\\"')
 
 
-def frame_stems(slug: str) -> list[str]:
-    """Every output stem the scaffold can emit for `slug`: unsuffixed, plus one per template suffix."""
-    return [slug, *(f"{slug}_{t.replace('-', '_')}" for t in sorted(TEMPLATES))]
+def frame_stems(sketch_dir: Path, slug: str) -> list[str]:
+    """Every output stem whose frames the scaffold owns here: `slug` and its per-template suffixes,
+    plus every `LAYOUTS` key of the sketch being replaced.
+
+    A §4 variant is a key someone adds by hand, and it renders a pair of its own, so the file being
+    replaced is the only thing that can say what it emitted.
+    """
+    stems = {slug, *(f"{slug}_{t.replace('-', '_')}" for t in TEMPLATES)}
+    existing = sketch_dir / "sketch.py"
+    if existing.is_file():
+        registry = LAYOUTS_REGISTRY.search(existing.read_text())
+        if registry:
+            stems.update(LAYOUTS_KEY.findall(registry.group(1)))
+    return sorted(stems)
 
 
 def clear_frames(sketch_dir: Path, slug: str) -> list[Path]:
-    """Remove the frames the scaffold itself rendered for `slug`, and return what was removed.
+    """Remove the frames the scaffold itself rendered here, and return what was removed.
 
-    Only stems the scaffold can emit go. A reference image, a hand-edited SVG or notes the person left
+    Only stems the scaffold owns go. A reference image, a hand-edited SVG or notes the person left
     beside the sketch are not this script's to delete, whatever their extension — the directory is
     gitignored, so nothing removed here comes back.
     """
     removed = []
-    for stem in frame_stems(slug):
+    for stem in frame_stems(sketch_dir, slug):
         for frame in (sketch_dir / f"{stem}.svg", sketch_dir / f"{stem}.png"):
             if frame.is_file():
                 frame.unlink()
