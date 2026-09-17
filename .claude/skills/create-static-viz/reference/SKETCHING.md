@@ -70,6 +70,11 @@ is the unsuffixed frame; each further one gets the verifier's suffix (`<slug>_mo
 desktop/mobile pair is one directory. The slug follows the step rule (snake_case) because it becomes
 the step's `short_name`; a slug ending in a template hint (`_mobile`, `_square`, …) is refused.
 
+Keep the old chart you are refreshing under a name of its own (`old_<name>.png`). The frames are written
+as `<slug>.svg/.png`, so if the directory already holds one of those names the scaffold refuses rather
+than hand you a render command that would overwrite it — `--force` takes the names knowingly. Nothing
+else in the directory is ever touched.
+
 What the scaffold carries, and why (each line is a promotion marker `promote_sketch.py` looks for):
 
 | Line | Now | On promotion |

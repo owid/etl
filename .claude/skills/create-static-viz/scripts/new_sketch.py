@@ -388,7 +388,10 @@ def main() -> int:
     parser.add_argument(
         "--force",
         action="store_true",
-        help="overwrite an existing sketch.py; the frames it rendered are cleared too, every other file stays",
+        help=(
+            "overwrite an existing sketch.py, clearing the frames it rendered; on a first scaffold, take "
+            "frame names that files already in the directory hold. Every other file stays"
+        ),
     )
     args = parser.parse_args()
 
@@ -404,9 +407,30 @@ def main() -> int:
     if sketch_path.exists() and not args.force:
         print(f"error: {sketch_path} exists; pass --force to overwrite", file=sys.stderr)
         return 2
+    # On a first scaffold every file here is someone else's, including one already named `<slug>.svg` —
+    # the old chart, kept to compare against. Leaving it in place is not enough: the render command
+    # printed below writes exactly these names, so a collision has to be settled before it is offered.
+    if not sketch_path.is_file():
+        taken = [
+            path
+            for name in output_names(args.slug, args.templates)
+            for path in (sketch_dir / f"{name}.svg", sketch_dir / f"{name}.png")
+            if path.is_file()
+        ]
+        if taken and not args.force:
+            print(
+                f"error: {sketch_dir} already holds {', '.join(p.name for p in taken)}, and this sketch's "
+                "frames are written under those names",
+                file=sys.stderr,
+            )
+            print(
+                "       rename them (an old chart is usually kept as `old_<name>`), or pass --force to take "
+                "the names — rendering would overwrite them, and this directory is gitignored",
+                file=sys.stderr,
+            )
+            return 2
     # A stale frame from an earlier render would pass the verifier, which scans every SVG in the dir.
-    # Only a sketch being replaced has frames to clear: on a first scaffold every file here is someone
-    # else's, including one already named `<slug>.svg` — the old chart, kept to compare against.
+    # Only a sketch being replaced has frames to clear.
     cleared = clear_frames(sketch_dir, args.slug) if sketch_path.is_file() else []
     sketch_dir.mkdir(parents=True, exist_ok=True)
     data_copy = sketch_dir / args.data.name

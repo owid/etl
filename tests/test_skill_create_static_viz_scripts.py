@@ -248,10 +248,12 @@ def test_source_native_year_labels_still_render(tmp_path, years):
     assert verify.returncode == 0, verify.stdout + verify.stderr
 
 
-def test_first_scaffold_keeps_files_it_did_not_generate(tmp_path):
+def test_first_scaffold_refuses_to_take_a_name_a_file_already_holds(tmp_path):
     """Nothing in the directory is the scaffold's until it has written a sketch there.
 
     The old chart being refreshed is often saved in first, and it can carry the slug's own name.
+    Leaving it in place is not enough: the frames are written under that name, so the collision has
+    to be settled before a render command is offered — the directory is gitignored.
     """
     out_root = tmp_path / "sketches"
     sketch_dir = out_root / "demo"
@@ -261,12 +263,41 @@ def test_first_scaffold_keeps_files_it_did_not_generate(tmp_path):
     theirs = {"demo.svg": b"<svg>the old chart</svg>", "demo.png": b"the old chart, as a png"}
     for name, content in theirs.items():
         (sketch_dir / name).write_bytes(content)
+    common = ("--slug", "demo", "--data", csv, "--template", "horizontal", "--out-root", out_root)
 
-    scaffold = run(NEW_SKETCH, "--slug", "demo", "--data", csv, "--template", "horizontal", "--out-root", out_root)
-    assert scaffold.returncode == 0, scaffold.stderr
-    assert "Cleared stale frames" not in scaffold.stdout
+    refused = run(NEW_SKETCH, *common)
+    assert refused.returncode == 2
+    assert "demo.svg" in refused.stderr and "demo.png" in refused.stderr and "--force" in refused.stderr
+    assert not (sketch_dir / "sketch.py").exists(), "a refusal writes nothing"
     for name, content in theirs.items():
-        assert (sketch_dir / name).read_bytes() == content, f"{name} was not generated here, so it must survive"
+        assert (sketch_dir / name).read_bytes() == content
+
+    # Renamed out of the way, the scaffold proceeds — and the old chart survives the render too.
+    for name in theirs:
+        (sketch_dir / name).rename(sketch_dir / f"old_{name}")
+    assert run(NEW_SKETCH, *common).returncode == 0
+    assert run(sketch_dir / "sketch.py").returncode == 0
+    for name, content in theirs.items():
+        assert (sketch_dir / f"old_{name}").read_bytes() == content, "renamed, so never the scaffold's"
+    assert (sketch_dir / "demo.svg").is_file(), "the frame is written under the slug's own name"
+
+
+def test_first_scaffold_takes_the_names_with_force(tmp_path):
+    """--force is how the person says the collision is theirs to accept."""
+    out_root = tmp_path / "sketches"
+    sketch_dir = out_root / "demo"
+    sketch_dir.mkdir(parents=True)
+    csv = sketch_dir / "demo.csv"
+    frame().to_csv(csv, index=False)
+    (sketch_dir / "demo.svg").write_bytes(b"<svg>the old chart</svg>")
+    (sketch_dir / "keep_me.svg").write_bytes(b"<svg>not a frame name</svg>")
+
+    forced = run(
+        NEW_SKETCH, "--slug", "demo", "--data", csv, "--template", "horizontal", "--out-root", out_root, "--force"
+    )
+    assert forced.returncode == 0, forced.stderr
+    assert (sketch_dir / "sketch.py").is_file()
+    assert (sketch_dir / "keep_me.svg").read_bytes() == b"<svg>not a frame name</svg>", "still not ours"
 
 
 def test_data_already_in_the_sketch_dir_is_left_in_place(tmp_path):
