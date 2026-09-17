@@ -69,6 +69,9 @@ ANIMAL_GROUPS = {
 # Name of the column with the sum of all animal groups.
 TOTAL_GROUP = "land_animals"
 
+# Name of the metric counting animals slaughtered in a country, regardless of where their meat is consumed.
+SLAUGHTERED_METRIC = "slaughtered"
+
 # FBS elements giving the meat supplied to a country, in tonnes.
 # "Domestic supply" is production + imports - exports - stock variation, and includes waste and non-food uses.
 # "Food" is the part of that supply that reaches people.
@@ -97,6 +100,14 @@ ACCEPTED_CARCASS_WEIGHT_RANGES = {
 
 # Countries in FAOSTAT that have no population data.
 COUNTRIES_WITHOUT_POPULATION = ["Sudan (former)"]
+
+
+def column_name(animal_group: str, metric: str) -> str:
+    """Name of the output column for an animal group and a metric."""
+    if metric == SLAUGHTERED_METRIC:
+        return f"{animal_group}_slaughtered"
+
+    return f"{animal_group}_killed_{metric}"
 
 
 def prepare_carcass_weights(tb_qcl: Table) -> Table:
@@ -293,6 +304,18 @@ def run() -> None:
 
     sanity_check_animals_killed(tb=tb, tb_weights=tb_weights)
 
+    # Add the number of animals actually slaughtered in each country, to compare against the numbers killed for
+    # its own consumption. Merge on the outside, so that countries reporting slaughter but no meat supply (or the
+    # other way around) keep the metric they do have.
+    tb = tb.merge(
+        tb_weights[["country", "year", "animal_group", "slaughtered_animals"]].rename(
+            columns={"slaughtered_animals": SLAUGHTERED_METRIC}, errors="raise"
+        ),
+        on=["country", "year", "animal_group"],
+        how="outer",
+    )
+    metrics = list(MEAT_ELEMENTS.values()) + [SLAUGHTERED_METRIC]
+
     # FAOSTAT already includes aggregates (OWID regions, and FAO's own). Drop them all, and build our own
     # aggregates as sums of member countries, so that a region's total is the sum of what its members consume.
     tb = tb[
@@ -305,26 +328,31 @@ def run() -> None:
     tb = tb.pivot(
         index=["country", "year"],
         columns="animal_group",
-        values=list(MEAT_ELEMENTS.values()),
+        values=metrics,
         join_column_levels_with="_",
     )
     # NOTE: Sum the groups that are informed, rather than requiring all of them. Otherwise a country that is
     # missing one group (e.g. Turkey, whose pig meat supply is discarded for being negative) would have no total
     # at all, and would then be missing from region totals while still counting towards each region's per-group
     # totals.
-    for element in MEAT_ELEMENTS.values():
-        columns = [f"{element}_{animal_group}" for animal_group in ANIMAL_GROUPS]
-        tb[f"{element}_{TOTAL_GROUP}"] = tb[columns].sum(axis=1, min_count=1)
+    for metric in metrics:
+        columns = [f"{metric}_{animal_group}" for animal_group in ANIMAL_GROUPS]
+        tb[f"{metric}_{TOTAL_GROUP}"] = tb[columns].sum(axis=1, min_count=1)
 
-    # Rename columns to "<group>_killed_<element>".
     tb = tb.rename(
         columns={
-            f"{element}_{animal_group}": f"{animal_group}_killed_{element}"
-            for element in MEAT_ELEMENTS.values()
+            f"{metric}_{animal_group}": column_name(animal_group=animal_group, metric=metric)
+            for metric in metrics
             for animal_group in list(ANIMAL_GROUPS) + [TOTAL_GROUP]
         },
         errors="raise",
     )
+
+    # The outer merge above can leave country-years with no data at all in either dataset.
+    tb = tb.dropna(
+        subset=[column_name(animal_group=group, metric=metric) for group in ANIMAL_GROUPS for metric in metrics],
+        how="all",
+    ).reset_index(drop=True)
 
     # Add region aggregates and per capita indicators.
     tb = paths.regions.add_aggregates(tb=tb, regions=REGIONS)
