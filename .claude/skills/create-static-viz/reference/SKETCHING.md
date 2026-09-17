@@ -72,8 +72,10 @@ the step's `short_name`; a slug ending in a template hint (`_mobile`, `_square`,
 
 Keep the old chart you are refreshing under a name of its own (`old_<name>.png`). The frames are written
 as `<slug>.svg/.png`, so if the directory already holds one of those names the scaffold refuses rather
-than hand you a render command that would overwrite it — `--force` takes the names knowingly. Nothing
-else in the directory is ever touched.
+than hand you a render command that would overwrite it — `--force` takes the names knowingly. The same
+rule covers the data file: re-passing the copy that is already there (§0) is nothing to do, but a
+*different* file under that name is refused. The scaffold owns a name only once it has written a sketch
+here; nothing else in the directory is ever touched.
 
 What the scaffold carries, and why (each line is a promotion marker `promote_sketch.py` looks for):
 

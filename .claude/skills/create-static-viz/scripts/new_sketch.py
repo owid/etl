@@ -429,12 +429,23 @@ def main() -> int:
                 file=sys.stderr,
             )
             return 2
+    # `--data` says which file to copy in, not which file at the destination may be replaced. The data
+    # pull of §0 lands here, so the same file arriving again is nothing to do — but a different one
+    # under that name is someone else's until they say otherwise.
+    data_copy = sketch_dir / args.data.name
+    data_is_here = data_copy.is_file() and data_copy.samefile(args.data)
+    if data_copy.is_file() and not data_is_here and not args.force:
+        print(f"error: {sketch_dir} already holds a different {args.data.name}", file=sys.stderr)
+        print(
+            "       rename it, or pass --force to replace it — this directory is gitignored",
+            file=sys.stderr,
+        )
+        return 2
     # A stale frame from an earlier render would pass the verifier, which scans every SVG in the dir.
     # Only a sketch being replaced has frames to clear.
     cleared = clear_frames(sketch_dir, args.slug) if sketch_path.is_file() else []
     sketch_dir.mkdir(parents=True, exist_ok=True)
-    data_copy = sketch_dir / args.data.name
-    if not (data_copy.exists() and data_copy.samefile(args.data)):
+    if not data_is_here:
         shutil.copy2(args.data, data_copy)
 
     title = args.title or args.slug.replace("_", " ").capitalize()

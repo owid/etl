@@ -300,6 +300,32 @@ def test_first_scaffold_takes_the_names_with_force(tmp_path):
     assert (sketch_dir / "keep_me.svg").read_bytes() == b"<svg>not a frame name</svg>", "still not ours"
 
 
+def test_first_scaffold_refuses_to_replace_a_different_data_file(tmp_path):
+    """`--data` says which file to copy in, not which file at the destination may be replaced."""
+    out_root = tmp_path / "sketches"
+    sketch_dir = out_root / "demo"
+    sketch_dir.mkdir(parents=True)
+    theirs = b"country,year,value\nFrance,1900,42.0\n"
+    (sketch_dir / "data.csv").write_bytes(theirs)
+    incoming = tmp_path / "elsewhere" / "data.csv"
+    incoming.parent.mkdir()
+    frame().to_csv(incoming, index=False)
+    common = ("--slug", "demo", "--data", incoming, "--template", "horizontal", "--out-root", out_root)
+
+    refused = run(NEW_SKETCH, *common)
+    assert refused.returncode == 2
+    assert "data.csv" in refused.stderr and "--force" in refused.stderr
+    assert (sketch_dir / "data.csv").read_bytes() == theirs
+    assert not (sketch_dir / "sketch.py").exists(), "a refusal writes nothing"
+
+    # --force is how the replacement is accepted; the sketch then renders from the incoming file.
+    forced = run(NEW_SKETCH, *common, "--force")
+    assert forced.returncode == 0, forced.stderr
+    assert (sketch_dir / "data.csv").read_bytes() != theirs
+    assert run(sketch_dir / "sketch.py").returncode == 0
+    assert (sketch_dir / "demo.svg").is_file()
+
+
 def test_data_already_in_the_sketch_dir_is_left_in_place(tmp_path):
     """SKETCHING.md section 0 pulls the data into the sketch dir before scaffolding: no --force, no self-copy."""
     out_root = tmp_path / "sketches"
