@@ -182,24 +182,40 @@ def test_the_same_data_finding_on_a_chart_sharing_an_indicator_is_not_news():
     assert len(digest.new_findings([_result("b", "chart", "The subtitle is wrong.")], state, facts)) == 1
 
 
-def test_both_old_state_formats_still_suppress_what_they_recorded():
-    """The file on the runner is the only record of what the channel has seen, so the two earlier
-    formats — the claim's words in the key, then a list of claims per key — are read, not dropped."""
+def test_a_chart_posted_over_its_data_is_not_posted_again_over_its_text():
+    """What `agricultural-output-dollars` did on 2026-09-17: one post for a title that contradicts
+    its indicator, one a second later for a step in the world series. Whoever opens the first is
+    already looking at the chart the second is about."""
+    facts = {"a": {"chart_id": 1, "indicators": ["grapher/faostat/faostat_qv#value"], "editor_mention": None}}
+    result = _result("a", "data", "The world series steps up in 1992.")
+    result["issues"].append(result["issues"][0] | {"kind": "chart", "claim": "The title contradicts the indicator."})
+    assert len(digest.new_findings([result], {}, facts)) == 1
+
+
+def test_all_old_state_formats_still_suppress_what_they_recorded():
+    """The file on the runner is the only record of what the channel has seen, so the three earlier
+    formats — the claim's words in the key, then a list of claims per key, then the finding's level
+    in the key — are read, not dropped."""
     legacy = {
         "oil-prices-inflation-adjusted:chart:constant-indicator-metadata-price-specifie-state-subtitle-while": "2026-09-03",
         "grapher/energy/energy_mix#coal_share:data:coal-share-exceed": "2026-09-04",
         "ozone:data": [{"words": ["daily", "mean"], "date": "2026-09-10"}, {"words": ["serie"], "date": "2026-09-16"}],
+        "stratospheric-ozone-concentration:chart": "2026-09-15",
     }
     assert digest._upgrade(legacy) == {
-        "oil-prices-inflation-adjusted:chart": "2026-09-03",
-        "grapher/energy/energy_mix#coal_share:data": "2026-09-04",
-        "ozone:data": "2026-09-16",
+        "oil-prices-inflation-adjusted": "2026-09-03",
+        "grapher/energy/energy_mix#coal_share": "2026-09-04",
+        "ozone": "2026-09-16",
+        "stratospheric-ozone-concentration": "2026-09-15",
     }
     state = digest._upgrade(legacy)
     assert digest.new_findings([_result("ozone", "data", "Anything at all.")], state, today=date(2026, 9, 17)) == []
+    # Recorded over its data yesterday, raised over its text today: still the same chart.
+    empty = _result("stratospheric-ozone-concentration", "chart", "The chart renders empty.")
+    assert digest.new_findings([empty], state, today=date(2026, 9, 17)) == []
 
 
 def test_stamp_records_the_day_under_every_key():
     facts = {"a": {"chart_id": 1, "indicators": ["grapher/x#y", "grapher/x#z"], "editor_mention": None}}
     state = digest.stamp(digest.new_findings([_result("a", "data")], {}, facts), {}, facts, today=date(2026, 9, 17))
-    assert state == {"grapher/x#y:data": "2026-09-17", "grapher/x#z:data": "2026-09-17"}
+    assert state == {"grapher/x#y": "2026-09-17", "grapher/x#z": "2026-09-17", "a": "2026-09-17"}

@@ -8,8 +8,10 @@ and much harder deduplication.
 
 Three things keep the digest worth reading, and all three are about restraint:
 
-- **It deduplicates by indicator, not by chart.** One bad column of one ETL step produced the same
-  finding on three separate charts; a dataset refresh would produce it on hundreds.
+- **It deduplicates by indicator as well as by chart.** One bad column of one ETL step produced the
+  same finding on three separate charts; a dataset refresh would produce it on hundreds. And one
+  chart is one post whatever is wrong with it: a defect in its text and a defect in its data are
+  not two things to a reader who opens it.
 - **It remembers which charts it has posted**, and does not post the same chart or indicator
   again for a week. Recognising the same *claim* across days was tried first, by comparing the
   words of the two claims, and the model rewords too freely for that: a finding ticked on Monday
@@ -298,17 +300,22 @@ def _dedup_keys(slug: str, issue: dict[str, Any], facts: dict[str, dict[str, Any
     identical finding still takes two of the digest slots. Matching on *any* shared indicator is
     what "one defective column is one finding" actually requires.
 
-    Chart-level findings stay keyed by slug: a wrong subtitle really is specific to that chart
-    even when the data behind it is shared.
+    The chart's own slug is always a key, a data-level finding's indicators additionally. Keying a
+    data finding by indicator alone, and separating the two levels by ``kind``, let one chart take
+    two slots of the same digest: ``agricultural-output-dollars`` was posted at 08:44 for a
+    title that contradicts its indicator (chart-level) and again a second later for a step in the
+    world series (data-level). Whoever opens the first post is looking at the chart the second one
+    is about, so the second is at best a duplicate — "the same chart should not be popping multiple
+    times for different issues".
 
-    The key carries nothing of the claim itself. It used to — first the claim's significant words,
-    then a word-overlap comparison against the claims already posted — and the model rewords a
-    finding freely enough that the same defect came back as new the day after it was ticked. What
-    is remembered now is only that this chart or indicator was posted, and when.
+    The key carries nothing of the claim itself, and nothing of its level either. It used to carry
+    the claim — first the claim's significant words, then a word-overlap comparison against the
+    claims already posted — and the model rewords a finding freely enough that the same defect came
+    back as new the day after it was ticked. What is remembered now is only that this chart or
+    indicator was posted, and when.
     """
-    kind = str(issue.get("kind", ""))
-    indicators = _indicators(facts, slug) if kind == "data" else []
-    return [f"{i}:{kind}" for i in indicators] or [f"{slug}:{kind}"]
+    indicators = _indicators(facts, slug) if str(issue.get("kind", "")) == "data" else []
+    return [*indicators, slug]
 
 
 def load_state() -> dict[str, str]:
@@ -322,17 +329,30 @@ def load_state() -> dict[str, str]:
     return _upgrade(raw) if isinstance(raw, dict) else {}
 
 
-def _upgrade(raw: dict[str, Any]) -> dict[str, str]:
-    """Read the two older state formats as well as the current one.
+def _strip_kind(key: str) -> str:
+    """A key as :func:`_dedup_keys` writes it now, from any key an older run wrote.
 
-    The file on the runner is the only record of what the channel has seen, so neither is
-    dropped. The first format put the claim's words in the key — ``<key>:<eight-words>`` mapped
-    to a date; the second mapped the key to a list of ``{"words", "date"}`` claims. Both reduce to
-    the same thing here: the latest date anything was posted under the key.
+    Every earlier format ended the key with the finding's level, and the level is no longer part
+    of identity — a chart posted yesterday over its data has to be recognised today when the
+    finding is about its text.
+    """
+    slug, sep, kind = key.rpartition(":")
+    return slug if sep and kind in {"data", "chart"} else key
+
+
+def _upgrade(raw: dict[str, Any]) -> dict[str, str]:
+    """Read the three older state formats as well as the current one.
+
+    The file on the runner is the only record of what the channel has seen, so none is dropped.
+    The first format put the claim's words in the key — ``<key>:<eight-words>`` mapped to a date;
+    the second mapped the key to a list of ``{"words", "date"}`` claims; the third dropped the
+    claim but kept the finding's level, as ``<key>:data`` or ``<key>:chart``. All reduce to the
+    same thing here: the latest date anything was posted under the key.
     """
     state: dict[str, str] = {}
 
     def seen(key: str, day: str) -> None:
+        key = _strip_kind(key)
         if key and day:
             state[key] = max(state.get(key, ""), day)
 
