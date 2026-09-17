@@ -42,9 +42,12 @@ One-off, into the sketch dir, and record where it came from in the sketch's docs
 `--data` file that already sits in `ai/static-viz-sketches/<slug>/` and leaves it in place — an existing
 directory is not an existing sketch; only an existing `sketch.py` asks for `--force`:
 
-```bash
-# a grapher chart's data — every entity, whatever the URL's country=/time= say; filter in the sketch
-curl -sL "https://ourworldindata.org/grapher/<slug>.csv?v=1&csvType=full&useColumnShortNames=true" -o data.csv
+```python
+from pathlib import Path
+from etl.http import session   # a grapher chart's data; the shared session tags the traffic as ETL's
+r = session.get("https://ourworldindata.org/grapher/<slug>.csv?v=1&csvType=full&useColumnShortNames=true")
+r.raise_for_status()
+Path("data.csv").write_bytes(r.content)   # every entity, whatever the URL's country=/time= say; filter in the sketch
 ```
 
 ```python

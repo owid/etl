@@ -39,6 +39,8 @@ STATIC_IMPORT = re.compile(r"^from etl\.viz\.static import (\([^)]*\)|[^\n]+)$",
 HELPERS_IMPORT = re.compile(r"^from etl\.helpers import ([^\n(]+)$", re.MULTILINE)
 # The scaffold's `TITLE = <string literal>` line, in either quote style (`ruff format` picks one).
 TITLE_LINE = re.compile(r"""^TITLE = ("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')$""", re.MULTILINE)
+# The first key of the scaffold's LAYOUTS registry: the slug, which names the unsuffixed frame.
+LAYOUTS_FIRST_KEY = re.compile(r'^LAYOUTS = \{\n\s+"([a-z0-9_]+)": \{', re.MULTILINE)
 
 
 class PromoteError(Exception):
@@ -96,6 +98,7 @@ def promote(args: argparse.Namespace) -> int:
         raise PromoteError(f"{args.step} is already in {DAG_FILE}")
 
     source = sketch_path.read_text()
+    check_slug(source, short_name)
     promoted, manual = rewrite_source(source)
     comment = args.comment or sketch_title(source) or short_name
     new_dag_text = dag_text.rstrip("\n") + "\n\n" + dag_block(args.step, args.deps, comment)
@@ -119,7 +122,8 @@ def promote(args: argparse.Namespace) -> int:
     for i, item in enumerate(
         manual
         + [
-            f"run `.venv/bin/etlr {args.step}`, then `verify_static_viz.py {rel_target.parent} --template <name> --expect-gid <data layer>`, then `make check`",
+            f"run `.venv/bin/etlr {args.step}`, then `verify_static_viz.py {rel_target.parent} --template <name> --expect-gid <data layer>`"
+            " (the commit hook runs `make check`; do not run it separately)",
             "now run the normal flow: Steps 1-2 (resolve the dependency, check for newer data) and 5-9, plus "
             "/owid-staff:create-figma-chart's finalize mode on the sketch frame",
             "do not commit the sketch's own PNG/SVG: the step re-renders its pair next to the .py",
@@ -141,6 +145,21 @@ def resolve_sketch_dir(given: Path, repo_root: Path) -> Path:
 
 def current_branch(repo_root: Path) -> str:
     return subprocess.check_output(["git", "branch", "--show-current"], cwd=repo_root, text=True).strip()
+
+
+def check_slug(source: str, short_name: str) -> None:
+    """The slug becomes the step's short_name (new_sketch.py's own rule): the frames and the LAYOUTS
+    keys carry it, and only the file is renamed here, so a different `--step` short name would leave
+    the step and its Figma handoff under two identities."""
+    m = LAYOUTS_FIRST_KEY.search(source)
+    if not m:
+        raise PromoteError("cannot read the slug from the LAYOUTS registry — is this a new_sketch.py scaffold?")
+    if m.group(1) != short_name:
+        raise PromoteError(
+            f"the sketch's slug is {m.group(1)!r} but --step names {short_name!r}: the slug becomes the step's "
+            "short_name (its frames and LAYOUTS keys carry it). Use --step .../"
+            f"{m.group(1)}, or re-scaffold under the new slug."
+        )
 
 
 def sketch_title(source: str) -> str | None:

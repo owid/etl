@@ -309,3 +309,13 @@ def test_promote_refuses_a_step_already_in_the_dag(tmp_path, sketch):
     result = promote(sketch, repo)
     assert result.returncode == 2 and "already in" in result.stderr
     assert not (repo / "etl/steps/viz/static/demo").exists()
+
+
+def test_promote_refuses_a_short_name_that_differs_from_the_slug(tmp_path, sketch):
+    """The frames and LAYOUTS keys carry the slug; only the file would be renamed, leaving two identities."""
+    repo = make_repo(tmp_path, "feature")
+    step = "viz://static/demo/2026-09-17/other"
+    result = run(PROMOTE, sketch, "--step", step, "--dep", DEPS[0], "--repo-root", repo)
+    assert result.returncode == 2 and "slug is 'demo'" in result.stderr and "'other'" in result.stderr
+    assert not list((repo / "etl/steps/viz/static").iterdir()), "nothing may be written on a refusal"
+    assert (repo / "dag/static_viz.yml").read_text() == SEED_DAG
