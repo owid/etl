@@ -1,5 +1,7 @@
 """The digest's message shape and who each finding gets addressed to."""
 
+from datetime import date, timedelta
+
 from apps.chart_critic import digest
 
 
@@ -130,29 +132,41 @@ def test_a_slack_outage_falls_back_to_the_plain_name(monkeypatch):
 
 
 def test_a_reworded_repeat_of_a_posted_finding_is_not_posted_again():
-    """The two wordings below are what the model actually said on consecutive days about
-    `oil-prices-inflation-adjusted`, and the second was posted because the state key carried the
-    claim's words. They are one finding."""
+    """What the model said on consecutive days about `stratospheric-ozone-concentration`, the
+    second the morning after the first had been ticked. They share 7 of 23 significant words, so
+    comparing claims let it through; remembering the chart does not need to compare them."""
     yesterday = _result(
-        "oil-prices-inflation-adjusted",
-        "chart",
-        "The subtitle states prices are in constant 2023 US$, while the indicator metadata specifies constant 2025 US$.",
+        "ozone",
+        "data",
+        "The indicator's short description contradicts its title and the chart note by describing the metric as "
+        "the 'Minimum of the daily mean ozone' rather than the average of daily minimums.",
     )
     today = _result(
-        "oil-prices-inflation-adjusted",
-        "chart",
-        "The chart subtitle states prices are measured in constant 2023 US$, contradicting the indicator metadata base year of 2025.",
+        "ozone",
+        "data",
+        "The series and indicator are mislabeled as 'Minimum daily mean', whereas the metric is actually the "
+        "average daily minimum ozone concentration over the 21 Sep – 16 Oct period.",
     )
-    state = digest.stamp(digest.new_findings([yesterday], {}), {})
-    assert digest.new_findings([today], state) == []
+    state = digest.stamp(digest.new_findings([yesterday], {}), {}, today=date(2026, 9, 16))
+    assert digest.new_findings([today], state, today=date(2026, 9, 17)) == []
 
 
-def test_two_different_findings_on_one_chart_both_get_posted():
-    """Dedup is per claim, not per chart — a second, unrelated problem is still news."""
+def test_a_second_problem_on_a_posted_chart_waits_for_the_cooldown():
+    """One post per chart: the chart is already up for review. After the cooldown it is news again."""
     subtitle = _result("a", "chart", "The subtitle says the values are age-standardized but they are not.")
     empty = _result("a", "chart", "The chart opens with no entity selected, so a reader sees an empty chart.")
-    state = digest.stamp(digest.new_findings([subtitle], {}), {})
-    assert len(digest.new_findings([empty], state)) == 1
+    posted_on = date(2026, 9, 1)
+    state = digest.stamp(digest.new_findings([subtitle], {}), {}, today=posted_on)
+    assert digest.new_findings([empty], state, today=posted_on + timedelta(days=digest.COOLDOWN_DAYS)) == []
+    assert len(digest.new_findings([empty], state, today=posted_on + timedelta(days=digest.COOLDOWN_DAYS + 1))) == 1
+
+
+def test_one_finding_per_chart_within_a_run_and_the_best_one_goes():
+    result = _result("a", "chart", "Low: a naming inconsistency.")
+    result["issues"][0]["severity"] = "low"
+    result["issues"].append(result["issues"][0] | {"severity": "high", "claim": "High: the unit is wrong."})
+    ((_, issue),) = digest.new_findings([result], {})
+    assert issue["claim"] == "High: the unit is wrong."
 
 
 def test_the_same_data_finding_on_a_chart_sharing_an_indicator_is_not_news():
@@ -164,18 +178,28 @@ def test_the_same_data_finding_on_a_chart_sharing_an_indicator_is_not_news():
     state = digest.stamp(digest.new_findings([_result("a", "data", claim)], {}, facts), {}, facts)
     reworded = "Coal share for the United Kingdom is above 100% in 1913, an impossible value for a share."
     assert digest.new_findings([_result("b", "data", reworded)], state, facts) == []
+    # A chart-level finding on the second chart is about that chart, not the shared column.
+    assert len(digest.new_findings([_result("b", "chart", "The subtitle is wrong.")], state, facts)) == 1
 
 
-def test_the_old_state_format_still_suppresses_what_it_recorded():
-    """The file on the runner is the only record of what the channel has seen, so the previous
-    format — the claim's words baked into the key — is read rather than dropped."""
+def test_both_old_state_formats_still_suppress_what_they_recorded():
+    """The file on the runner is the only record of what the channel has seen, so the two earlier
+    formats — the claim's words in the key, then a list of claims per key — are read, not dropped."""
     legacy = {
-        "oil-prices-inflation-adjusted:chart:constant-indicator-metadata-price-specifie-state-subtitle-while": "2026-09-03"
+        "oil-prices-inflation-adjusted:chart:constant-indicator-metadata-price-specifie-state-subtitle-while": "2026-09-03",
+        "grapher/energy/energy_mix#coal_share:data:coal-share-exceed": "2026-09-04",
+        "ozone:data": [{"words": ["daily", "mean"], "date": "2026-09-10"}, {"words": ["serie"], "date": "2026-09-16"}],
+    }
+    assert digest._upgrade(legacy) == {
+        "oil-prices-inflation-adjusted:chart": "2026-09-03",
+        "grapher/energy/energy_mix#coal_share:data": "2026-09-04",
+        "ozone:data": "2026-09-16",
     }
     state = digest._upgrade(legacy)
-    today = _result(
-        "oil-prices-inflation-adjusted",
-        "chart",
-        "The chart subtitle states prices are measured in constant 2023 US$, contradicting the indicator metadata base year of 2025.",
-    )
-    assert digest.new_findings([today], state) == []
+    assert digest.new_findings([_result("ozone", "data", "Anything at all.")], state, today=date(2026, 9, 17)) == []
+
+
+def test_stamp_records_the_day_under_every_key():
+    facts = {"a": {"chart_id": 1, "indicators": ["grapher/x#y", "grapher/x#z"], "editor_mention": None}}
+    state = digest.stamp(digest.new_findings([_result("a", "data")], {}, facts), {}, facts, today=date(2026, 9, 17))
+    assert state == {"grapher/x#y:data": "2026-09-17", "grapher/x#z:data": "2026-09-17"}
