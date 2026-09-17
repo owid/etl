@@ -3,6 +3,7 @@ name: profile-etl-step
 description: Profile and optimize ETL step performance — CPU time, memory usage, and I/O bottlenecks. Use when an ETL step is slow, uses too much memory, or when the user asks to profile, optimize, or speed up a step. Covers profiling commands, categorical dtype optimization, vectorization, SUBSET filtering for fast dev runs, and iterative diagnose→fix→reprofile workflow.
 metadata:
   internal: true
+  owner: Marigold
 ---
 
 # ETL Step Profiling & Optimization

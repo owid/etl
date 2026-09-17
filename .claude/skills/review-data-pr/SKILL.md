@@ -3,6 +3,7 @@ name: review-data-pr
 description: Review an OWID ETL data update PR end-to-end — runs the pipeline, compares snapshot fields against the previous version, verifies links, audits indicator metadata coverage, and cross-checks workflow items from /update-dataset. Trigger when the user asks to "review this PR", "review the data PR", or invokes this on an open dataset-update branch.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Review Data PR

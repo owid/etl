@@ -3,6 +3,7 @@ name: edit-faust-metadata
 description: Edit user-facing chart and indicator text (FAUST — Title, Subtitle, Footnote — plus description_short, description_key, units, display.name, attribution_short, entity selection, and any other user-facing metadata) from a conversational request in the terminal. Accepts a chart or MDim referenced by live link, staging preview link, admin link, bare slug, chart id, or indicator catalogPath. Routes each edit to the right layer (garden .meta.yml, MDim yaml/py, or chart config via the admin API — ALWAYS on staging, never production), reports the blast radius on other charts/MDim views/explorers before applying shared-metadata changes, and ships via a PR with an automated @codex review loop. Trigger on "change the subtitle of <link> to …", "fix the footnote on this MDim view", "edit the units / description_key / selected countries of …", or any pasted grapher/staging/admin link plus an edit request. Also covers the legacy audit mode ("dump/audit the FAUST for dataset X", "review the text of all views in this MDim") — a Markdown dump + compare workflow for massive changes, entered ONLY on explicit request.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Edit FAUST & metadata
