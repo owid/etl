@@ -424,6 +424,36 @@ def test_promote_refuses_a_step_already_in_the_dag(tmp_path, sketch):
     assert not (repo / "etl/steps/viz/static/demo").exists()
 
 
+@pytest.mark.parametrize("via", ["title", "comment"])
+def test_a_multiline_comment_cannot_write_into_the_dag(tmp_path, via):
+    """Only a comment's first line carries the `#`; an indented continuation would become a step key."""
+    base = tmp_path / "src"
+    base.mkdir()
+    csv = base / "demo.csv"
+    frame().to_csv(csv, index=False)
+    multiline = "Demo\n  injected_key: [ohno]"
+    out_root = tmp_path / "sketches"
+    scaffold = run(
+        NEW_SKETCH,
+        *("--slug", "demo", "--data", csv, "--template", "horizontal", "--out-root", out_root),
+        *(("--title", multiline) if via == "title" else ()),
+    )
+    assert scaffold.returncode == 0, scaffold.stderr
+
+    repo = make_repo(tmp_path, "feature")
+    extra = ("--comment", multiline) if via == "comment" else ()
+    result = promote(out_root / "demo", repo, *extra)
+    assert result.returncode == 0, result.stderr
+
+    dag_text = (repo / "dag/static_viz.yml").read_text()
+    steps = yaml.safe_load(dag_text)["steps"]
+    assert set(steps) == {"viz://static/x/2026-01-01/existing", STEP}, f"injected keys: {sorted(steps)}"
+    assert "# Demo injected_key: [ohno]" in dag_text, "folded onto the comment's single line"
+    assert [line for line in dag_text.splitlines() if "injected_key" in line] == ["  # Demo injected_key: [ohno]"], (
+        "the text may appear only inside the comment"
+    )
+
+
 def test_promote_refuses_a_short_name_that_differs_from_the_slug(tmp_path, sketch):
     """The frames and LAYOUTS keys carry the slug; only the file would be renamed, leaving two identities."""
     repo = make_repo(tmp_path, "feature")

@@ -100,10 +100,10 @@ def promote(args: argparse.Namespace) -> int:
     source = sketch_path.read_text()
     check_slug(source, short_name)
     promoted, manual = rewrite_source(source)
-    comment = args.comment or sketch_title(source) or short_name
+    comment = one_line(args.comment or sketch_title(source) or "") or short_name
     new_dag_text = dag_text.rstrip("\n") + "\n\n" + dag_block(args.step, args.deps, comment)
     new_steps = yaml.safe_load(new_dag_text)["steps"]
-    assert set(steps) <= set(new_steps) and new_steps[args.step] == args.deps, (
+    assert set(new_steps) == set(steps) | {args.step} and new_steps[args.step] == args.deps, (
         "the DAG append changed more than it added"
     )
 
@@ -160,6 +160,15 @@ def check_slug(source: str, short_name: str) -> None:
             "short_name (its frames and LAYOUTS keys carry it). Use --step .../"
             f"{m.group(1)}, or re-scaffold under the new slug."
         )
+
+
+def one_line(text: str) -> str:
+    """Fold `text` onto a single line, so what is emitted as a comment cannot be read as YAML.
+
+    A DAG comment is one line by construction: only its first line would carry the `#`, and an
+    indented continuation would otherwise land in `steps` as a key of its own.
+    """
+    return " ".join(text.split())
 
 
 def sketch_title(source: str) -> str | None:
