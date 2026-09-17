@@ -21,6 +21,7 @@ The first `--template` produces `<slug>.svg/.png`; each further one produces `<s
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import shutil
 import string
@@ -59,7 +60,9 @@ SLOTS: dict[str, dict[str, float | bool | None]] = {
 }
 
 # `string.Template` rather than str.format: the emitted Python is full of braces. Raw so backslash
-# escapes reach the sketch verbatim.
+# escapes reach the sketch verbatim. The `*_LITERAL` slots take a ready-made Python string literal
+# (`py_literal`), the docstring slots plain text (`doc_text`): the arguments are the person's own words
+# and may hold quotes or backslashes.
 SCAFFOLD = string.Template(
     r'''"""$TITLE — a static-viz sketch.
 
@@ -105,15 +108,15 @@ apply_svg_rcparams()
 paths = SketchPaths(__file__)  # PROMOTE: becomes PathFinder(__file__)
 
 # The file this sketch draws from, copied next to it by new_sketch.py.
-DATA_FILE = Path(__file__).with_name("$DATA_FILE")  # PROMOTE: delete; the step loads from the catalog
+DATA_FILE = Path(__file__).with_name($DATA_FILE_LITERAL)  # PROMOTE: delete; the step loads from the catalog
 
-TITLE = "$TITLE"
+TITLE = $TITLE_LITERAL
 SUBTITLE = "What the chart shows, in one sentence."
 NOTE = ""  # desktop templates only; mobile has no Note slot (TEMPLATES.md)
-# PROMOTE: replace by source_citation(tb["<column>"]) from etl.viz.static — a CSV carries no origins,
-# a garden table does.
-SOURCE = "$SOURCE"
-AUTHOR = "$AUTHOR"
+# The Data source string: a CSV carries no origins, a garden table does. run() reads it once.
+# PROMOTE: delete, once run() derives the citation with source_citation.
+SOURCE = $SOURCE_LITERAL
+AUTHOR = $AUTHOR_LITERAL
 
 # Exact template strings (TEMPLATES.md -> Exact strings the templates use).
 TAGLINE = "OurWorldinData.org — Research and data to make progress against the world’s largest problems."
@@ -191,8 +194,10 @@ def run() -> None:
     tb = load_data()
     paths.log.info(f"Loaded {len(tb)} rows; columns: {list(tb.columns)}")
     sanity_check_inputs(tb)
+    # PROMOTE: source = source_citation(tb["<column>"]) — here, after load_data(), where `tb` exists.
+    source = SOURCE
     for name, layout in LAYOUTS.items():
-        fig = build(tb, layout)
+        fig = build(tb, layout, source)
         export_frame(paths, fig, name, template=layout["template"])
         plt.close(fig)
 
@@ -227,7 +232,7 @@ def px_to_pt(px: float) -> float:
     return px * POINTS_PER_PIXEL
 
 
-def build(tb: Table, layout: dict) -> plt.Figure:
+def build(tb: Table, layout: dict, source: str) -> plt.Figure:
     """Draw one frame. Replace this placeholder wholesale with the chart; the guides go with it.
 
     As shipped it proves the round trip: the frame is at the template's proportions, every text slot
@@ -257,7 +262,7 @@ def build(tb: Table, layout: dict) -> plt.Figure:
     fig.text(fx(margin), fy(layout["subtitle_y"]), SUBTITLE, fontsize=px_to_pt(SLOT_PX["subtitle"]), color=TEXT_COLOR, gid="subtitle", **left)
     if layout["full_footer"] and NOTE:
         fig.text(fx(margin), fy(layout["note_y"]), f"Note: {NOTE}", fontsize=px_to_pt(SLOT_PX["note"]), color=FOOTER_COLOR, gid="note", **left)
-    fig.text(fx(margin), fy(layout["source_y"]), f"Data source: {SOURCE}", fontsize=px_to_pt(source_px), color=FOOTER_COLOR, gid="data-source", **left)
+    fig.text(fx(margin), fy(layout["source_y"]), f"Data source: {source}", fontsize=px_to_pt(source_px), color=FOOTER_COLOR, gid="data-source", **left)
     if layout["full_footer"]:
         fig.text(fx(margin), fy(layout["footer_y"]), TAGLINE, fontsize=px_to_pt(footer_px), color=FOOTER_COLOR, gid="tagline", **left)
         fig.text(fx(width_px - margin), fy(layout["footer_y"]), LICENSE, fontsize=px_to_pt(footer_px), color=FOOTER_COLOR, gid="license", ha="right", va="top")
@@ -353,7 +358,11 @@ def main() -> int:
     parser.add_argument(
         "--out-root", type=Path, default=DEFAULT_OUT_ROOT, help=f"parent dir (default {DEFAULT_OUT_ROOT})"
     )
-    parser.add_argument("--force", action="store_true", help="overwrite an existing sketch dir")
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="overwrite an existing sketch: rewrite sketch.py and clear its rendered frames; other files stay",
+    )
     args = parser.parse_args()
 
     problems = validate(args.slug, args.data, args.templates)
@@ -366,24 +375,31 @@ def main() -> int:
     if sketch_dir.exists() and not args.force:
         print(f"error: {sketch_dir} exists; pass --force to overwrite", file=sys.stderr)
         return 2
+    # A stale frame from an earlier scaffold would pass the verifier, which scans every SVG in the dir.
+    cleared = clear_frames(sketch_dir) if sketch_dir.exists() else []
     sketch_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(args.data, sketch_dir / args.data.name)
 
+    title = args.title or args.slug.replace("_", " ").capitalize()
     sketch_path = sketch_dir / "sketch.py"
     sketch_path.write_text(
         SCAFFOLD.substitute(
-            TITLE=args.title or args.slug.replace("_", " ").capitalize(),
-            DATA_FILE=args.data.name,
-            SOURCE=args.source,
-            AUTHOR=args.author or git_user_name() or "[Name of author]",
-            SKETCH_PATH=display_path(sketch_path),
-            SKETCH_DIR=display_path(sketch_dir),
+            TITLE=doc_text(title),
+            TITLE_LITERAL=py_literal(title),
+            DATA_FILE=doc_text(args.data.name),
+            DATA_FILE_LITERAL=py_literal(args.data.name),
+            SOURCE_LITERAL=py_literal(args.source),
+            AUTHOR_LITERAL=py_literal(args.author or git_user_name() or "[Name of author]"),
+            SKETCH_PATH=doc_text(display_path(sketch_path)),
+            SKETCH_DIR=doc_text(display_path(sketch_dir)),
             FIRST_TEMPLATE=args.templates[0],
             LAYOUTS_BLOCK=layouts_block(args.slug, args.templates),
             DATE=date.today().isoformat(),
         )
     )
     ruff_format(sketch_path)
+    if cleared:
+        print(f"Cleared stale frames: {', '.join(p.name for p in cleared)}")
 
     print(
         f"Scaffolded {display_path(sketch_path)} (data: {args.data.name}; frames: {', '.join(output_names(args.slug, args.templates))})"
@@ -444,6 +460,35 @@ def layouts_block(slug: str, templates: list[str]) -> str:
             f"    }},\n"
         )
     return "LAYOUTS = {\n" + "".join(entries) + "}"
+
+
+def py_literal(value: str) -> str:
+    """A double-quoted Python string literal for `value`, whatever quotes or backslashes it holds.
+
+    JSON's string escapes are a subset of Python's, so `json.dumps` is exact; `ruff format` then picks
+    the quote style.
+    """
+    return json.dumps(value, ensure_ascii=False)
+
+
+def doc_text(value: str) -> str:
+    """`value` as it can sit inside the scaffold's (non-raw, triple-double-quoted) docstring."""
+    return value.replace("\\", "\\\\").replace('"""', '\\"\\"\\"')
+
+
+def clear_frames(sketch_dir: Path) -> list[Path]:
+    """Remove the rendered frames — each SVG and its sibling PNG — and return what was removed.
+
+    Only the pairs `export_frame` emits go: a reference image or notes the person left beside the
+    sketch are not this script's to delete.
+    """
+    removed = []
+    for svg in sorted(sketch_dir.glob("*.svg")):
+        for frame in (svg, svg.with_suffix(".png")):
+            if frame.is_file():
+                frame.unlink()
+                removed.append(frame)
+    return removed
 
 
 def display_path(path: Path) -> str:

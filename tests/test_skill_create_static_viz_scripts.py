@@ -7,6 +7,7 @@ temp dir from a three-row CSV and the sketch is rendered as a subprocess with th
 refusals: a sketch whose markers are gone must not be promoted quietly.
 """
 
+import ast
 import shutil
 import subprocess
 import sys
@@ -102,6 +103,9 @@ def test_scaffold_carries_the_promotion_markers(sketch):
     source = (sketch / "sketch.py").read_text()
     assert source.count("paths = SketchPaths(__file__)") == 1
     assert 'SOURCE = "Demo (2026)"' in source and "source_citation" in source
+    assert source.index("def run()") < source.index("source = SOURCE") < source.index("def load_data()"), (
+        "the citation swap happens inside run(), where tb exists — not at module level"
+    )
     assert "Figma handoff" in source, "the docstring section the Figma sketch mode fills in"
     assert source.index("def run()") < source.index("def load_data()"), "helpers go below run()"
     assert '"demo": {' in source and '"demo_mobile": {' in source
@@ -140,6 +144,63 @@ def test_excel_and_parquet_inputs_render(tmp_path, suffix):
     rendered = run(out_root / "demo" / "sketch.py")
     assert rendered.returncode == 0, rendered.stderr
     assert (out_root / "demo" / "demo.svg").is_file()
+
+
+def test_quoted_arguments_become_valid_literals(tmp_path):
+    """Title, source, author and filename are the person's own words: quotes and backslashes must survive."""
+    title, source, author = 'Share reporting "good" health', 'Producer\'s "survey" (2026)', 'J. "Jo" O\'Neil \\ Co'
+    data = tmp_path / "demo's data.csv"
+    frame().to_csv(data, index=False)
+    out_root = tmp_path / "sketches"
+    scaffold = run(
+        NEW_SKETCH,
+        *("--slug", "demo", "--data", data, "--template", "horizontal", "--out-root", out_root),
+        *("--title", title, "--source", source, "--author", author),
+    )
+    assert scaffold.returncode == 0, scaffold.stderr
+    sketch_dir = out_root / "demo"
+
+    module = ast.parse((sketch_dir / "sketch.py").read_text())  # a SyntaxError here is the bug
+    constants = {
+        target.id: node.value.value
+        for node in module.body
+        if isinstance(node, ast.Assign) and isinstance(node.value, ast.Constant)
+        for target in node.targets
+        if isinstance(target, ast.Name)
+    }
+    assert (constants["TITLE"], constants["SOURCE"], constants["AUTHOR"]) == (title, source, author)
+    rendered = run(sketch_dir / "sketch.py")
+    assert rendered.returncode == 0, rendered.stderr  # DATA_FILE resolved to the quoted filename
+
+    repo = make_repo(tmp_path, "feature")
+    result = promote(sketch_dir, repo)
+    assert result.returncode == 0, result.stderr
+    assert f"# {title}" in (repo / "dag/static_viz.yml").read_text(), "the DAG comment is the title, unescaped"
+
+
+def test_force_clears_stale_frames_and_keeps_other_files(tmp_path):
+    csv = tmp_path / "demo.csv"
+    frame().to_csv(csv, index=False)
+    out_root = tmp_path / "sketches"
+    common = ("--slug", "demo", "--data", csv, "--out-root", out_root)
+    first = run(NEW_SKETCH, *common, "--template", "horizontal", "--template", "mobile")
+    assert first.returncode == 0, first.stderr
+    sketch_dir = out_root / "demo"
+    assert run(sketch_dir / "sketch.py").returncode == 0
+    assert (sketch_dir / "demo_mobile.svg").is_file()
+    (sketch_dir / "reference.png").write_bytes(b"an old chart, kept for comparison")
+    (sketch_dir / "notes.md").write_text("keep me")
+
+    again = run(NEW_SKETCH, *common, "--template", "mobile-square", "--force")
+    assert again.returncode == 0, again.stderr
+    assert "Cleared stale frames" in again.stdout
+    assert not list(sketch_dir.glob("*.svg")) and not (sketch_dir / "demo_mobile.png").exists()
+    assert (sketch_dir / "reference.png").is_file() and (sketch_dir / "notes.md").is_file(), "not ours to delete"
+
+    assert run(sketch_dir / "sketch.py").returncode == 0
+    verify = run(VERIFY, sketch_dir, "--template", "mobile-square", "--expect-gid", "line__placeholder")
+    assert verify.returncode == 0, verify.stdout + verify.stderr
+    assert verify.stdout.count("OK   ") == 1 and "demo_mobile.svg" not in verify.stdout, "only the new frame is seen"
 
 
 # --- promote_sketch.py -----------------------------------------------------------------------------

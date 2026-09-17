@@ -18,6 +18,7 @@ path — or create the worktree with `--share-data`, which symlinks `ai/` in.
 from __future__ import annotations
 
 import argparse
+import ast
 import re
 import subprocess
 import sys
@@ -36,7 +37,8 @@ PATHS_LINE = re.compile(r"^paths = SketchPaths\(__file__\)(?:\s*#.*)?$", re.MULT
 # Single-line or parenthesised (`[^)]` spans newlines), as ruff may have wrapped it.
 STATIC_IMPORT = re.compile(r"^from etl\.viz\.static import (\([^)]*\)|[^\n]+)$", re.MULTILINE)
 HELPERS_IMPORT = re.compile(r"^from etl\.helpers import ([^\n(]+)$", re.MULTILINE)
-TITLE_LINE = re.compile(r'^TITLE = "(.*)"$', re.MULTILINE)
+# The scaffold's `TITLE = <string literal>` line, in either quote style (`ruff format` picks one).
+TITLE_LINE = re.compile(r"""^TITLE = ("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')$""", re.MULTILINE)
 
 
 class PromoteError(Exception):
@@ -95,7 +97,7 @@ def promote(args: argparse.Namespace) -> int:
 
     source = sketch_path.read_text()
     promoted, manual = rewrite_source(source)
-    comment = args.comment or (TITLE_LINE.search(source).group(1) if TITLE_LINE.search(source) else short_name)
+    comment = args.comment or sketch_title(source) or short_name
     new_dag_text = dag_text.rstrip("\n") + "\n\n" + dag_block(args.step, args.deps, comment)
     new_steps = yaml.safe_load(new_dag_text)["steps"]
     assert set(steps) <= set(new_steps) and new_steps[args.step] == args.deps, (
@@ -139,6 +141,12 @@ def resolve_sketch_dir(given: Path, repo_root: Path) -> Path:
 
 def current_branch(repo_root: Path) -> str:
     return subprocess.check_output(["git", "branch", "--show-current"], cwd=repo_root, text=True).strip()
+
+
+def sketch_title(source: str) -> str | None:
+    """The sketch's TITLE, unescaped — it may hold quotes, which the scaffold writes as a literal."""
+    m = TITLE_LINE.search(source)
+    return ast.literal_eval(m.group(1)) if m else None
 
 
 def rewrite_source(source: str) -> tuple[str, list[str]]:
@@ -187,7 +195,9 @@ def rewrite_source(source: str) -> tuple[str, list[str]]:
         )
     if re.search(r"^SOURCE = ", source, re.MULTILINE):
         manual.append(
-            'replace `SOURCE = "..."` by `source_citation(tb["<column>"])` and add it to the etl.viz.static import'
+            'in `run()`, replace `source = SOURCE` by `source_citation(tb["<column>"])` — after `load_data()`, '
+            "inside `run()`, never at module level where `tb` does not exist yet — add `source_citation` to "
+            "the etl.viz.static import, then delete the `SOURCE` constant"
         )
     if "# PROMOTE" in source:
         manual.append("drop the `# PROMOTE` comments once each edit is done")

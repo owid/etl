@@ -71,7 +71,7 @@ What the scaffold carries, and why (each line is a promotion marker `promote_ske
 |---|---|---|
 | `paths = SketchPaths(__file__)` | writes next to the sketch | `paths = PathFinder(__file__)` — the script swaps it |
 | `load_data()` reads `DATA_FILE` as a `Table(..., underscore=True)` | garden-style column names from day one | `paths.load_dataset(...).read(...)` — you swap it |
-| `SOURCE = "<Producer> (<year>)"` | a CSV carries no origins | `source_citation(tb[...])` — you swap it |
+| `SOURCE = "<Producer> (<year>)"`, read once in `run()` as `source = SOURCE` | a CSV carries no origins | `source = source_citation(tb[...])` in `run()`, after `load_data()` — you swap it, then delete the constant |
 | `LAYOUTS`, font stacks, grapher greys, `BAND_INSET` | transcribed from TEMPLATES.md and WRITING-THE-STEP.md | unchanged; re-verify the band against the live template (TEMPLATES.md's own rule) |
 
 Then write `build()`. Everything in [WRITING-THE-STEP.md](WRITING-THE-STEP.md) about the handoff
@@ -162,9 +162,10 @@ If the data is not in ETL, `/create-dataset` first (Step 2's routing table), so 
 It refuses to write on `master`/`main`, copies `sketch.py` to `etl/steps/viz/static/<ns>/<version>/<short>.py`,
 swaps the `paths` line and the import, appends the DAG entry to `dag/static_viz.yml`, and prints the two
 edits that need you: the loader (`paths.load_dataset(...).read(...)`, then delete `DATA_FILE`) and the
-source (`source_citation(tb[...])`). Without `--share-data`, pass the sketch dir as an **absolute** path —
-it lives in the main checkout's `ai/`, which the worktree does not have. `--dry-run` shows the plan from
-any branch.
+source (`source = source_citation(tb[...])` in `run()`, after the loader — `tb` exists only there, so the
+swap never goes at module level; then delete the `SOURCE` constant). Without `--share-data`, pass the
+sketch dir as an **absolute** path — it lives in the main checkout's `ai/`, which the worktree does not
+have. `--dry-run` shows the plan from any branch.
 
 ## 8 — Then the normal flow
 
