@@ -460,8 +460,9 @@ rewrite it as "set X to Y, because Z": the reader wants to reproduce the state, 
 
 ## Step 9 — PR and the review chain
 
-The branch, worktree and draft PR already exist from Step 4. **Run `make check` before committing** —
-the step is ordinary ETL code and has to be formatted, linted and typechecked like any other. Then
+The branch, worktree and draft PR already exist from Step 4. **Let the pre-commit hook run `make check`
+when you commit** — the step is ordinary ETL code and has to be formatted, linted and typechecked like
+any other. Then
 commit the step plus its committed PNG/SVG, push, and fill in the PR body — whose **first line is the
 attribution blockquote**, `> _Written by Claude <model name> — @<handle> at the wheel._`, because the
 body goes out under a human's identity. It is required on every comment you post to the PR afterwards
