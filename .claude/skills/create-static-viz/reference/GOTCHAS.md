@@ -98,7 +98,7 @@
 
 ## `label__` is a prefix, and a suffix reads as unnamed
 
-`/create-figma-chart`'s rows resolve a text node through its naming ancestors with
+`/owid-staff:create-figma-chart`'s rows resolve a text node through its naming ancestors with
 `/^(annotation|label)__/`, so a group named the other way round — `ghana__label`, `country__label` —
 is invisible to every one of them. It fails silently, and worse, it fails *quietly*: a chart carrying
 26 country labels on the frame's own background had `label-contrast-on-background` report "no

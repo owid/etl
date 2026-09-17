@@ -12,13 +12,18 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pytest
 
+from etl import paths as etl_paths
+from etl.helpers import PathFinder
 from etl.viz.static import (
     PIXELS_PER_INCH,
+    REPRODUCIBLE_METADATA,
     SVG_HASHSALT,
     TEMPLATES,
+    SketchPaths,
     apply_svg_rcparams,
     export_frame,
     nice_year_ticks,
+    save_fig,
     source_citation,
     unclip,
 )
@@ -57,6 +62,58 @@ class _Paths:
 
     def export_fig(self, fig, filename, extensions, **kwargs):
         self.calls.append((filename, tuple(extensions), kwargs))
+
+
+def test_sketch_paths_mirrors_the_pathfinder_surface(tmp_path):
+    # A sketch is written in the exact shape of a step, so promotion is a one-line swap of this object
+    # for PathFinder(__file__). The dir is the slug: the file is always sketch.py.
+    p = SketchPaths(tmp_path / "my_slug" / "sketch.py")
+    assert p.directory == tmp_path / "my_slug"
+    assert p.short_name == "my_slug"
+    assert callable(p.log.info)
+
+
+def test_sketch_paths_export_frame_writes_both_files_reproducibly(tmp_path):
+    """The round trip a sketch relies on, without a subprocess: real files, real stamps stripped."""
+    apply_svg_rcparams()
+    sketch_dir = tmp_path / "demo"
+    sketch_dir.mkdir()
+    p = SketchPaths(sketch_dir / "sketch.py")
+    fig = plt.figure(figsize=TEMPLATES["horizontal"].figsize)
+    fig.text(0.5, 0.5, "hello", gid="title")
+    export_frame(p, fig, "chart", template="horizontal")
+    plt.close(fig)
+
+    svg = (sketch_dir / "chart.svg").read_text()
+    assert (sketch_dir / "chart.png").exists()
+    assert "<text" in svg, "svg.fonttype must be 'none' so the copy stays editable"
+    assert "<dc:date>" not in svg and "<dc:creator>" not in svg, "the version stamp must be stripped"
+
+    from PIL import Image
+
+    assert "Software" not in Image.open(sketch_dir / "chart.png").info
+
+
+def test_save_fig_merges_metadata_over_the_defaults(tmp_path):
+    fig = plt.figure(figsize=(2, 1))
+    written = save_fig(tmp_path, fig, "x", ["svg"], metadata={"Title": "hello"})
+    plt.close(fig)
+    assert written == [tmp_path / "x.svg"]
+    svg = written[0].read_text()
+    assert "<dc:title>hello</dc:title>" in svg, "a caller's metadata must survive the merge"
+    assert "<dc:date>" not in svg, "…without re-introducing the stamp the defaults strip"
+    assert REPRODUCIBLE_METADATA["svg"]["Date"] is None
+
+
+def test_pathfinder_export_fig_delegates_to_save_fig(monkeypatch):
+    """The mutation guard for the refactor: a local loop reintroduced in helpers.py fails this."""
+    pf = PathFinder(str(etl_paths.STEP_DIR / "viz/static/who/2026-08-07/height_for_age.py"))
+    recorded = []
+    monkeypatch.setattr("etl.viz.static.save_fig", lambda *a, **k: recorded.append((a, k)))
+    fig = plt.figure(figsize=(2, 1))
+    pf.export_fig(fig, "x", ["svg"], transparent=True)
+    plt.close(fig)
+    assert recorded == [((pf.directory, fig, "x", ["svg"]), {"log": pf.log, "transparent": True})]
 
 
 def test_apply_svg_rcparams_sets_both():

@@ -1,6 +1,16 @@
 ---
 name: create-static-viz
-description: Build or refresh an OWID static visualization end to end — resolve what data it needs from an old static viz image, an indicator, or a grapher chart; check both the ETL catalog and the producer's own site for a newer release and route to /create-dataset or /update-dataset when one exists; write the viz://static matplotlib step that emits Figma-ready SVG and PNG at the static-chart templates' proportions; then hand off to /create-figma-chart. Trigger when the user asks to "refresh this static viz", "remake this chart as a static image", "create a static viz", pastes an old static viz image or filename and asks for a better version, or picks up a viz from the static-viz refresh queue.
+description: >-
+  Build or refresh an OWID static visualization end to end — resolve what data it needs from an old
+  static viz image, an indicator, or a grapher chart; check both the ETL catalog and the producer's own
+  site for a newer release and route to /create-dataset or /update-dataset when one exists; write the
+  viz://static matplotlib step that emits Figma-ready SVG and PNG at the static-chart templates'
+  proportions; then hand off to /owid-staff:create-figma-chart. Sketch mode: prototype a NEW static viz
+  from a CSV/Excel/parquet file (or a quick data pull) in a gitignored scratch dir, iterate visually in
+  matplotlib and Figma, then promote it to a viz://static step. Trigger when the user asks to "refresh
+  this static viz", "remake this chart as a static image", "create a static viz", "sketch a static viz
+  from this CSV", "brainstorm a chart from this data", pastes an old static viz image or filename and
+  asks for a better version, or picks up a viz from the static-viz refresh queue.
 metadata:
   internal: true
 ---
@@ -13,10 +23,10 @@ actually pick up, and getting that SVG into the Charts file.
 
 **Model check:** the session context names the running model. On **Fable**, recommend re-running on
 **Opus** (or **Sonnet** for a mechanical re-render) before starting, and continue only on the user's
-say-so — same rule as `/create-figma-chart`.
+say-so — same rule as `/owid-staff:create-figma-chart`.
 
 > **Paired skill — an update here may oblige an update there, and the reverse.**
-> `/create-figma-chart` owns everything that happens inside Figma,
+> `/owid-staff:create-figma-chart` owns everything that happens inside Figma,
 > and this skill hands off to it at Step 7. The two share a contract that lives half in each file, so
 > **when you change something on this list, check the other skill in the same session and update it
 > too — or state explicitly that you checked and no change was needed.** Neither side may drift
@@ -32,6 +42,9 @@ say-so — same rule as `/create-figma-chart`.
 > | Which text slots this step fills vs. leaves to the template | this skill | that skill's Step 6 |
 > | Type and palette — this step sets neither | that skill | this skill defers to it |
 > | The design vocabulary (per chart type, labeling, colors) | that skill's `GUIDELINES.md` | both |
+> | The sketch dir `ai/static-viz-sketches/<slug>/`, what its SVG carries, and the `Figma handoff` docstring section that records the page | this skill ([reference/SKETCHING.md](reference/SKETCHING.md)) | that skill's sketch mode, local-SVG route |
+> | The sketch marker — page `… [sketch]`, frame `<slug>--sketch`; no sketch carries the bare website slug | that skill | this skill reports it |
+> | Finalize mode as the re-entry point once a sketch is promoted | that skill | this skill's Sketch mode, §8 |
 >
 > The asymmetry worth remembering: **this skill owns the data, the geometry and the proportions; that
 > one owns the type and the palette.** A change that crosses that line belongs in both files. In
@@ -60,8 +73,11 @@ The step-by-step detail lives in [`reference/`](reference/) and is read *at* tha
 |---|---|---|
 | [reference/WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md) | Step 4 | The handoff contract, grapher's axis and tick treatment, encoding diagrams, desktop/mobile pairing, text slots, labelling many categories, Figma-surviving anchors, the assertions to write. |
 | [reference/GOTCHAS.md](reference/GOTCHAS.md) | Its **Data** section at Step 1, before any column is used; the rest on an error, or grep by symptom | Data, layout and workflow pitfalls. |
+| [reference/SKETCHING.md](reference/SKETCHING.md) | Sketch mode, instead of Steps 1–4 | Data pull, scaffold, render, verify, the Figma sketch handoff, iterating, promotion to a step. |
 
-**Size budget, enforced by `--structure`: this spine under 30 KB, TEMPLATES.md under 25 KB.** Both are read on every
+**Size budget, enforced by `--structure`: this spine under 33 KB, TEMPLATES.md under 25 KB.** (Raised
+once from 30 KB on 2026-09-17 to land Sketch mode and its contract rows — the spine sat 56 bytes under
+the old cap. The discipline is unchanged.) Both are read on every
 run, so a paragraph added here costs every future viz — new detail belongs in the reference file for
 its step. After editing any doc in this skill:
 
@@ -91,7 +107,7 @@ turn 80% of the cost rather than 46%.
 Reads always; writes only when they target different pages. If the Figma tools arrive deferred —
 a harness setting, not an environment — load the ones you need in a single `ToolSearch`, taking the
 prefix from your own session's tool list rather than assuming one; skip that where
-they are already loaded. `/create-figma-chart` → **Round-trip budget** has the full
+they are already loaded. `/owid-staff:create-figma-chart` → **Round-trip budget** has the full
 rule and the list of what is genuinely serial.
 
 **What this skill does not decide:** colors, fonts, background, the logo, and any visual treatment
@@ -162,9 +178,29 @@ Any one of:
 - **An indicator** — a catalogPath, or a description of one.
 - **A grapher chart** — live URL, staging URL, admin edit URL, bare slug, or chart id.
 - **Just a description** of the chart wanted, plus a source.
+- **A data file** — CSV, Excel or parquet, for a **sketch** of a new viz: see Sketch mode below.
+- **"Sketch", "brainstorm" or "prototype" plus an indicator or chart** — pull its data to a CSV first,
+  then Sketch mode.
 
 Optionally: the article or topic page the viz belongs to, and a reference page in the Charts file
-to work like (`/create-figma-chart` has a whole mode for that).
+to work like (`/owid-staff:create-figma-chart` has a whole mode for that).
+
+## Sketch mode — a data file in, no ETL until the visuals settle
+
+For a **new** static viz that starts from data rather than from an existing viz. The input decides the
+mode — a data file, or a sketch/brainstorm/prototype ask, is a sketch; say so in one line, with what it
+skips, and proceed. **Read [reference/SKETCHING.md](reference/SKETCHING.md) and follow it instead of
+Steps 1–4.** In short: `scripts/new_sketch.py` scaffolds `ai/static-viz-sketches/<slug>/sketch.py`
+(gitignored) in the exact shape of a `viz://static` step, around a copy of the data file; render it
+with `.venv/bin/python`, run the verifier and read the PNG as in Step 5, iterate (variants are extra
+`LAYOUTS` keys), hand the SVG to `/owid-staff:create-figma-chart`'s **sketch mode** and iterate there
+too; once the visuals settle, `scripts/promote_sketch.py` turns the sketch into a real step.
+**Skipped — say so to the user every time:** the branch, worktree and PR, the DAG entry, Step 2's
+newer-data check, the tracker question, the review chain. Promotion runs all of them: Steps 1–2, then
+5–9, plus that skill's **finalize mode** on the sketch frame. Not skipped: the verifier, reading the
+PNG, and **offering promotion and finalize at the end of every sketch reply** — people may not know the
+checks exist. A Data Insight image is not a static-viz sketch — it is sketched in that skill directly,
+from the grapher chart.
 
 ## Step 1 — Resolve the input to data
 
@@ -286,7 +322,7 @@ Put the whole proposal in front of the user at once, and get an explicit go-ahea
   under CC BY-NC-SA is not automatically redistributable as CC-BY, so ask rather than filling the
   slot.
 
-This mirrors `/create-figma-chart`'s single-checkpoint rule, for the same reason: everything after
+This mirrors `/owid-staff:create-figma-chart`'s single-checkpoint rule, for the same reason: everything after
 here is expensive to redo.
 
 ## Step 4 — Write the `viz://static` step
@@ -343,7 +379,7 @@ Then, in this order:
 Show the render. When a design choice is genuinely open, **measure the options and offer the
 numbers**, not adjectives — see the [panel-aspect gotcha](reference/GOTCHAS.md) under Layout for why.
 
-## Step 7 — Hand off to `/create-figma-chart`
+## Step 7 — Hand off to `/owid-staff:create-figma-chart`
 
 Give it the local SVG path. That skill's Step 1/3 cover the local-file route: there is nothing to
 export, and none of the `.metadata.json` text sourcing applies because the text is already in the
@@ -382,7 +418,7 @@ does.
 Note what a `gid` actually produces: matplotlib writes `<g id="label__Ghana"><text/></g>`, so Figma
 imports a GROUP named `label__Ghana` holding a TEXT named `Ghana` — the name lands on the wrapper,
 never on the painted node, and a series arrives with Figma's own "Clip path group" wrappers between
-the named group and the vector. That is fine and expected; `/create-figma-chart`'s rows resolve
+the named group and the vector. That is fine and expected; `/owid-staff:create-figma-chart`'s rows resolve
 through the naming ancestor. Set the `gid` on the artist and don't try to name the glyph itself.
 
 ## Step 8 — Record the Figma handoff in the step's docstring
@@ -424,8 +460,9 @@ rewrite it as "set X to Y, because Z": the reader wants to reproduce the state, 
 
 ## Step 9 — PR and the review chain
 
-The branch, worktree and draft PR already exist from Step 4. **Run `make check` before committing** —
-the step is ordinary ETL code and has to be formatted, linted and typechecked like any other. Then
+The branch, worktree and draft PR already exist from Step 4. **Let the pre-commit hook run `make check`
+when you commit** — the step is ordinary ETL code and has to be formatted, linted and typechecked like
+any other. Then
 commit the step plus its committed PNG/SVG, push, and fill in the PR body — whose **first line is the
 attribution blockquote**, `> _Written by Claude <model name> — @<handle> at the wheel._`, because the
 body goes out under a human's identity. It is required on every comment you post to the PR afterwards
