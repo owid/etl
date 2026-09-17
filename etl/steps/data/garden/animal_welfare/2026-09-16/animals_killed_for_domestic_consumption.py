@@ -355,7 +355,10 @@ def run() -> None:
     ).reset_index(drop=True)
 
     # Add region aggregates and per capita indicators.
-    tb = paths.regions.add_aggregates(tb=tb, regions=REGIONS)
+    # NOTE: Require at least one informed country per year. The consumption metrics come from FAO's Food Balance
+    # Sheets, which stop a year earlier than the production data, so without this every region would sum a year of
+    # missing values into a hard zero, and the curves would plunge to zero in the final year.
+    tb = paths.regions.add_aggregates(tb=tb, regions=REGIONS, min_num_values_per_year=1)
     tb = paths.regions.add_per_capita(
         tb=tb, regions=REGIONS, expected_countries_without_population=COUNTRIES_WITHOUT_POPULATION
     )
