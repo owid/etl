@@ -69,7 +69,7 @@ views:
             color: "#6D3E91"
     config:
       title: Land animals killed for food
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat that the country itself consumes. The difference is due to trade in meat.
+      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. Trade explains the gap with the first line; meat that is wasted or used for purposes other than food explains the gap between the last two.
   - dimensions:
       animal: land_animals
       per_capita: per_capita
@@ -89,7 +89,7 @@ views:
             color: "#6D3E91"
     config:
       title: Land animals killed for food, per person
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat that the country itself consumes. The difference is due to trade in meat.
+      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. Trade explains the gap with the first line; meat that is wasted or used for purposes other than food explains the gap between the last two.
   - dimensions:
       animal: cattle_and_buffaloes
       per_capita: total
@@ -109,7 +109,7 @@ views:
             color: "#6D3E91"
     config:
       title: Cattle and buffaloes killed for food
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat that the country itself consumes. The difference is due to trade in meat.
+      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. Trade explains the gap with the first line; meat that is wasted or used for purposes other than food explains the gap between the last two.
   - dimensions:
       animal: cattle_and_buffaloes
       per_capita: per_capita
@@ -129,7 +129,7 @@ views:
             color: "#6D3E91"
     config:
       title: Cattle and buffaloes killed for food, per person
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat that the country itself consumes. The difference is due to trade in meat.
+      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. Trade explains the gap with the first line; meat that is wasted or used for purposes other than food explains the gap between the last two.
   - dimensions:
       animal: sheep_and_goats
       per_capita: total
@@ -149,7 +149,7 @@ views:
             color: "#6D3E91"
     config:
       title: Sheep and goats killed for food
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat that the country itself consumes. The difference is due to trade in meat.
+      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. Trade explains the gap with the first line; meat that is wasted or used for purposes other than food explains the gap between the last two.
   - dimensions:
       animal: sheep_and_goats
       per_capita: per_capita
@@ -169,7 +169,7 @@ views:
             color: "#6D3E91"
     config:
       title: Sheep and goats killed for food, per person
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat that the country itself consumes. The difference is due to trade in meat.
+      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. Trade explains the gap with the first line; meat that is wasted or used for purposes other than food explains the gap between the last two.
   - dimensions:
       animal: pigs
       per_capita: total
@@ -189,7 +189,7 @@ views:
             color: "#6D3E91"
     config:
       title: Pigs killed for food
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat that the country itself consumes. The difference is due to trade in meat.
+      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. Trade explains the gap with the first line; meat that is wasted or used for purposes other than food explains the gap between the last two.
   - dimensions:
       animal: pigs
       per_capita: per_capita
@@ -209,7 +209,7 @@ views:
             color: "#6D3E91"
     config:
       title: Pigs killed for food, per person
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat that the country itself consumes. The difference is due to trade in meat.
+      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. Trade explains the gap with the first line; meat that is wasted or used for purposes other than food explains the gap between the last two.
   - dimensions:
       animal: poultry
       per_capita: total
@@ -229,7 +229,7 @@ views:
             color: "#6D3E91"
     config:
       title: Poultry killed for food
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat that the country itself consumes. The difference is due to trade in meat.
+      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. Trade explains the gap with the first line; meat that is wasted or used for purposes other than food explains the gap between the last two.
   - dimensions:
       animal: poultry
       per_capita: per_capita
@@ -249,4 +249,4 @@ views:
             color: "#6D3E91"
     config:
       title: Poultry killed for food, per person
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat that the country itself consumes. The difference is due to trade in meat.
+      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. Trade explains the gap with the first line; meat that is wasted or used for purposes other than food explains the gap between the last two.
