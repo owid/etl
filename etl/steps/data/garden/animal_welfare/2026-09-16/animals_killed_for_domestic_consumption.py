@@ -189,7 +189,15 @@ def run() -> None:
         columns={"animals_per_tonne": "world_animals_per_tonne"}, errors="raise"
     )
     tb = tb.merge(world_rates, on=["year", "animal_group"], how="left")
+    uses_world_rate = tb["animals_per_tonne"].isna() & tb["killed_domestic_supply"].notna()
     tb["animals_per_tonne"] = tb["animals_per_tonne"].fillna(tb["world_animals_per_tonne"])
+
+    # Canary: if a future FAOSTAT release stopped publishing slaughter counts, every country would quietly fall
+    # back on the world rate and nothing else in this step would notice.
+    error = (
+        f"{uses_world_rate.mean():.1%} of country-year-groups use the world rate; FAOSTAT coverage may have changed."
+    )
+    assert uses_world_rate.mean() <= 0.15, error
 
     for element in MEAT_ELEMENTS.values():
         tb[element] = tb[element] * tb["animals_per_tonne"]
