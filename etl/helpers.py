@@ -983,17 +983,6 @@ class PathFinder:
 
         return explorer
 
-    # Metadata that makes an exported figure reproducible, per format. matplotlib stamps the
-    # timestamp and its own version into every file, so without this an unchanged figure re-rendered
-    # under a new matplotlib produces a diff with no pixel change — measured on 3.10.8 -> 3.10.9,
-    # which rewrote all ten committed static_viz outputs and altered nothing but `<dc:title>` and
-    # PNG `Software`. A byte diff should mean the picture changed.
-    # `Title` cannot be nulled: the SVG backend type-checks it and raises on None.
-    _REPRODUCIBLE_METADATA = {
-        "svg": {"Date": None, "Creator": None},
-        "png": {"Software": None},
-    }
-
     def export_fig(self, fig, filename: str, extensions: list[str], **kwargs) -> None:
         """Export a matplotlib figure to multiple formats.
 
@@ -1005,18 +994,11 @@ class PathFinder:
             than replacing them, so a caller can add fields without re-introducing the version
             stamp.
         """
-        for ext in extensions:
-            path = self.directory / f"{filename}.{ext}"
-            save_kwargs = {
-                "fname": path,
-                "format": ext,
-                **kwargs,
-            }
-            defaults = self._REPRODUCIBLE_METADATA.get(ext)
-            if defaults is not None:
-                save_kwargs["metadata"] = {**defaults, **(kwargs.get("metadata") or {})}
-            fig.savefig(**save_kwargs)
-            self.log.info(f"Saved chart to {path}")
+        # Lazy on purpose: `etl.viz.static` imports matplotlib, a dev-group dependency, and this
+        # module is imported by every step. Only `viz://static` steps ever reach this line.
+        from etl.viz.static import save_fig
+
+        save_fig(self.directory, fig, filename, extensions, log=self.log, **kwargs)
 
 
 def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:
