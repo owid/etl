@@ -534,20 +534,34 @@ def _realistic_app():
 
 
 @pytest.fixture
-def fake_admin_api_real_schema(monkeypatch):
-    """Like `fake_admin_api`, but validating against the grapher schema vendored in the repo."""
-    import apps.wizard.app_pages.chart_diff.conflict_resolver as cr
-    from etl.files import read_json_schema
-    from etl.paths import SCHEMAS_DIR
+def fake_admin_api_schema_with_defaults(monkeypatch):
+    """Like `fake_admin_api`, but with a schema whose properties carry defaults.
 
-    schema = read_json_schema(SCHEMAS_DIR / "grapher-schema.011.json")
+    The real grapher schema fills ~38 top-level defaults; a handful of them is enough to
+    catch a validator that writes defaults into the config it validates.
+    """
+    import apps.wizard.app_pages.chart_diff.conflict_resolver as cr
+
+    schema = {
+        "type": "object",
+        "properties": {
+            "$schema": {"type": "string"},
+            "title": {"type": "string"},
+            "subtitle": {"type": "string"},
+            "dimensions": {"type": "array"},
+            "hasMapTab": {"type": "boolean", "default": False},
+            "chartTypes": {"type": "array", "default": ["LineChart"]},
+            "minTime": {"type": "string", "default": "earliest"},
+            "tab": {"type": "string", "default": "chart"},
+        },
+    }
     FakeAdminAPI.calls = []
     monkeypatch.setattr(cr, "AdminAPI", FakeAdminAPI)
     monkeypatch.setattr(cr, "get_schema_from_url", lambda url: schema)
     return FakeAdminAPI
 
 
-def test_resolving_does_not_fill_the_config_with_schema_defaults(fake_admin_api_real_schema):
+def test_resolving_does_not_fill_the_config_with_schema_defaults(fake_admin_api_schema_with_defaults):
     """Resolving a conflict changes the conflicted fields and nothing else.
 
     Validation used to double as a transformation: it filled in every schema default, which wrote
@@ -560,7 +574,7 @@ def test_resolving_does_not_fill_the_config_with_schema_defaults(fake_admin_api_
     at = at.button[0].click().run()
 
     assert at.exception == []
-    config = fake_admin_api_real_schema.calls[0]["config"]
+    config = fake_admin_api_schema_with_defaults.calls[0]["config"]
     assert config["title"] == "Production title"
     # Exactly the fields the chart had, no more.
     assert set(config) == {"$schema", "dimensions", "subtitle", "title"}
