@@ -168,10 +168,11 @@ expected outcome for most charts."""
 # subtitle states prices are measured in constant 2023 US$" are one claim — so identity has to
 # survive rewording rather than be a hash of the sentence.
 #
-# One definition, used in the two places that have to agree: merging the repeat passes of a
-# single run, and recognising in the digest what has already been posted. They disagreed for a
-# while, and the consequence reached the channel — a finding merged across passes within a run
-# was posted again the next day under its new wording, on a chart that had been fixed in between.
+# Used only to merge the repeat passes of a single run, where the passes describe the same bundle
+# and overlap is high. The digest used the same test to recognise across days what it had already
+# posted, and there it failed: after an edit the model rewords a finding far more, and one ticked
+# on Monday came back on Tuesday at 0.30. Across days the digest now remembers the chart, not the
+# claim — see ``digest.COOLDOWN_DAYS``.
 CLAIM_OVERLAP = 0.4
 
 

@@ -221,8 +221,6 @@ def _merge(issues: list[dict[str, Any]], new: dict[str, Any]) -> None:
 
     The model rewords freely between passes — "life expectancy of around 18–20 years" and
     "under 20 years" are one finding — so matching on a prefix counts them separately.
-    :func:`critic.same_claim` is the shared notion of "the same finding", and the digest
-    recognises what it has already posted with the same test.
     """
     tokens = claim_tokens(new["claim"])
     for existing in issues:
