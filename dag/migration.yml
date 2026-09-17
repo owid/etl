@@ -121,6 +121,12 @@ steps:
   viz://bespoke/un_migration/latest/migration_stock_flows_json:
     - data://garden/demography/2024-07-15/population
     - data://garden/un/2025-03-18/migration_stock_flows
+
+  # UN DESA migrant-demographics JSON feed. Republished from a snapshot of the feed as it was
+  # hand-uploaded, rather than built from garden, until the step is rewritten on top of the
+  # migrant-stock and population datasets.
+  viz://bespoke/un_migration/latest/migrant_demographics:
+    - snapshot://bespoke/2026-09-17/migrant_demographics.zip
   data://meadow/migration/2026-07-22/us_lawful_permanent_residents:
     - snapshot://migration/2026-07-22/yearbook_lawful_permanent_residents_2024.xlsx
     - snapshot://migration/2026-07-22/yearbook_lawful_permanent_residents_2020.zip
