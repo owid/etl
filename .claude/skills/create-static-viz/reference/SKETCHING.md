@@ -138,15 +138,20 @@ Two kinds of change, two homes:
 Nothing in this loop runs a gate. **Every reply in it ends by offering the next step in plain words**,
 because the person may not know either exists — and **the first time, say what the steps are**:
 
-> *"This is still a sketch: nothing has been checked and it is not in ETL. When the visuals are
-> settled, say **promote** and I'll: put the data through a proper ETL step, so the chart can be
-> re-rendered whenever the data updates; check for a newer release of the data; verify the numbers,
-> the source line and every piece of text against the data and our style guide; and run the Figma
-> checks on the frame — type, layout, colours, lines and annotations, and that the frame still matches
-> its template — before it is renamed for the website."*
+> *"This is still a sketch: the chart lives in a scratch folder, nothing has been checked, and the
+> data is not in ETL — so nobody else can rebuild this chart and it will not follow the data when the
+> source updates. When the visuals are settled, say **promote** and I'll **create the ETL steps for
+> it**: the data gets steps of its own, so the chart re-renders whenever the data updates and anyone
+> can see where its numbers came from. Then I check whether the source has published anything newer,
+> verify the numbers, the source line and every piece of text against the data and our style guide,
+> and run the Figma checks on the frame — type, layout, colours, lines and annotations, and that the
+> frame still matches its template — before it is renamed for the website."*
 
-After that, one line is enough — *"Still a sketch: say promote when you're happy with it."* — but never
-none. When they sound done, propose starting promotion now. The loop ends when they say yes.
+After that, one line is enough — *"Still a sketch and not in ETL: say promote when you're happy with
+it and I'll create the ETL steps."* — but never none. **When they sound done** ("looks good", "that's
+it", "ship it"), don't wait to be asked: propose creating the ETL steps now, and start on a yes. If
+the data is not in ETL at all, say that promotion begins by adding the dataset (§7). The loop ends
+when they say yes.
 
 ## 7 — Promote
 
