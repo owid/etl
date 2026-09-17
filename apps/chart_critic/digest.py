@@ -10,9 +10,11 @@ Three things keep the digest worth reading, and all three are about restraint:
 
 - **It deduplicates by indicator, not by chart.** One bad column of one ETL step produced the same
   finding on three separate charts; a dataset refresh would produce it on hundreds.
-- **It remembers what it has posted**, and remembers it by what the claim says rather than by how
-  it was worded — the model rewords freely, and a state file keyed on the sentence let day two
-  repeat day one anyway. Without either, the channel learns to skip the digest inside a week.
+- **It remembers which charts it has posted**, and does not post the same chart or indicator
+  again for a week. Recognising the same *claim* across days was tried first, by comparing the
+  words of the two claims, and the model rewords too freely for that: a finding ticked on Monday
+  came back reworded on Tuesday after the chart was edited. A chart already under review does not
+  need a second post to say so. Without either, the channel learns to skip the digest inside a week.
 - **It says nothing when there is nothing.** No daily heartbeat. A digest that only speaks when it
   has something is one people keep reading.
 """
@@ -23,14 +25,14 @@ import functools
 import json
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any
 
 from slack_sdk.errors import SlackClientError
 from structlog import get_logger
 
 from apps.chart_critic.bundle import GRAPHER_URL
-from apps.chart_critic.critic import claim_tokens, format_views, same_claim
+from apps.chart_critic.critic import format_views
 from etl.paths import CACHE_DIR
 
 if TYPE_CHECKING:
@@ -67,6 +69,11 @@ CAVEAT = "_A chart-critic claim to check, not a confirmed error._"
 # #chart-reviews carries two or three posts a day with one default reviewer, and a finding held
 # back is not dropped — it is not stamped either, so it comes back tomorrow if it still stands.
 MAX_FINDINGS = 3
+
+# How long a chart or indicator stays out of the digest once a finding on it has been posted.
+# Long enough that a fix, a tick and the re-review the edit itself triggers all fall inside it;
+# short enough that a chart which goes wrong again a few weeks later is news again.
+COOLDOWN_DAYS = 7
 
 # The digest file is the record of what was sent, and a digest is several messages, some of which
 # land in a thread rather than in the channel. They are joined by these markers so the file shows
@@ -283,35 +290,29 @@ def _indicators(facts: dict[str, dict[str, Any]] | None, slug: str) -> list[str]
 
 
 def _dedup_keys(slug: str, issue: dict[str, Any], facts: dict[str, dict[str, Any]] | None = None) -> list[str]:
-    """Every identity under which this finding should be recognised, across days and charts.
+    """Every identity under which this finding is recognised, across days and charts.
 
     One key per indicator for a data-level finding, rather than one key for the chart's whole
     indicator set. The set was the obvious thing to hash and it does not work: a defective column
     read alone by chart A and alongside another column by chart B yields ``A`` and ``A|B``, so the
-    identical finding still takes two of the five digest slots. Matching on *any* shared indicator
-    is what "one defective column is one finding" actually requires.
+    identical finding still takes two of the digest slots. Matching on *any* shared indicator is
+    what "one defective column is one finding" actually requires.
 
     Chart-level findings stay keyed by slug: a wrong subtitle really is specific to that chart
     even when the data behind it is shared.
 
-    The key deliberately carries no part of the claim. It used to carry the claim's significant
-    words, which made the key change whenever the model reworded the same finding — and it rewords
-    constantly, so a claim posted yesterday came back as a new key today and was posted again.
-    What the claim *says* is compared separately, with :func:`critic.same_claim`, so two different
-    problems on charts sharing an indicator still do not collapse into each other.
+    The key carries nothing of the claim itself. It used to — first the claim's significant words,
+    then a word-overlap comparison against the claims already posted — and the model rewords a
+    finding freely enough that the same defect came back as new the day after it was ticked. What
+    is remembered now is only that this chart or indicator was posted, and when.
     """
     kind = str(issue.get("kind", ""))
     indicators = _indicators(facts, slug) if kind == "data" else []
     return [f"{i}:{kind}" for i in indicators] or [f"{slug}:{kind}"]
 
 
-def load_state() -> dict[str, list[dict[str, Any]]]:
-    """What has been posted, as ``{key: [{"words": [...], "date": "YYYY-MM-DD"}, ...]}``.
-
-    The words are :func:`critic.claim_tokens` of the claim, kept rather than a hash of it because
-    recognising the same finding tomorrow means comparing what it says, not whether it was worded
-    identically.
-    """
+def load_state() -> dict[str, str]:
+    """When each chart or indicator was last posted, as ``{key: "YYYY-MM-DD"}``."""
     if not STATE_PATH.exists():
         return {}
     try:
@@ -321,58 +322,62 @@ def load_state() -> dict[str, list[dict[str, Any]]]:
     return _upgrade(raw) if isinstance(raw, dict) else {}
 
 
-def _upgrade(raw: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
-    """Read the older state format as well as the current one.
+def _upgrade(raw: dict[str, Any]) -> dict[str, str]:
+    """Read the two older state formats as well as the current one.
 
-    The first format put the claim's words *in* the key —
-    ``<indicator-or-slug>:<kind>:<eight-words>`` mapped to a date — which is the bug this
-    replaced. But the file is the only record of what the channel has already seen, so the old
-    keys are read back into the current shape rather than dropped: their words become the claim
-    they stood for, and yesterday's findings stay suppressed instead of all being posted once more
-    on the day this ships.
-
-    Matching against a migrated entry is weaker than against a current one, because the old key
-    kept only the eight alphabetically-first words of five characters or more: the stored words
-    are a diluted sample of the claim, so a *reworded* repeat of a pre-migration finding can
-    still slip through once. That resolves itself — every finding posted from now on is recorded
-    in full — and it is a better floor than dropping the file and re-posting everything in it.
+    The file on the runner is the only record of what the channel has seen, so neither is
+    dropped. The first format put the claim's words in the key — ``<key>:<eight-words>`` mapped
+    to a date; the second mapped the key to a list of ``{"words", "date"}`` claims. Both reduce to
+    the same thing here: the latest date anything was posted under the key.
     """
-    state: dict[str, list[dict[str, Any]]] = {}
+    state: dict[str, str] = {}
+
+    def seen(key: str, day: str) -> None:
+        if key and day:
+            state[key] = max(state.get(key, ""), day)
+
     for key, value in raw.items():
         if isinstance(value, list):
-            state.setdefault(key, []).extend(value)
-            continue
-        head, _, words = str(key).rpartition(":")
-        if head:
-            state.setdefault(head, []).append({"words": [w for w in words.split("-") if w], "date": str(value)})
+            for claim in value:
+                seen(str(key), str(claim.get("date", "")) if isinstance(claim, dict) else "")
+        elif isinstance(value, str) and str(key).count(":") >= 2:
+            seen(str(key).rpartition(":")[0], value)
+        elif isinstance(value, str):
+            seen(str(key), value)
     return state
 
 
-def save_state(state: dict[str, list[dict[str, Any]]]) -> None:
+def save_state(state: dict[str, str]) -> None:
     STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
     STATE_PATH.write_text(json.dumps(state, indent=1, sort_keys=True))
 
 
+def _today() -> date:
+    return datetime.now(timezone.utc).date()
+
+
 def new_findings(
     results: list[dict[str, Any]],
-    state: dict[str, list[dict[str, Any]]],
+    state: dict[str, str],
     facts: dict[str, dict[str, Any]] | None = None,
+    today: date | None = None,
 ) -> list[tuple[dict[str, Any], dict[str, Any]]]:
-    """Findings not posted before, best first.
+    """Findings on charts and indicators not posted in the last :data:`COOLDOWN_DAYS`, best first.
 
     Deduplicated by indicator for data-level findings and by chart for chart-level ones — pass
     ``facts`` from :func:`chart_facts` to get the former; without it everything falls back to
     per-chart, which over-reports.
 
-    "Already posted" is a question about what the claim says, not about how it was worded, so a
-    finding is suppressed when its claim overlaps one already recorded under any of its keys —
-    the same test :func:`cli._merge` uses to fold the repeat passes of a single run together.
+    One finding per chart or indicator, in the run as well as across days: a chart that is
+    already up for review does not need a second message saying so, and the best finding on it
+    (highest severity, then most read) is the one that goes. A second, different problem on the
+    same chart waits for the cooldown to pass — a smaller cost than what this replaced, where the
+    same problem reworded came back the morning after it was ticked.
     """
+    day = today or _today()
+    cutoff = (day - timedelta(days=COOLDOWN_DAYS)).isoformat()
+    posted = {key: when for key, when in state.items() if when >= cutoff}
     out: list[tuple[dict[str, Any], dict[str, Any]]] = []
-    # What each key has already seen, from the state file and from this run's own findings.
-    seen: dict[str, list[set[str]]] = {
-        key: [set(claim.get("words") or []) for claim in claims] for key, claims in state.items()
-    }
     order = {"high": 0, "medium": 1, "low": 2}
     ranked = sorted(
         ((r, i) for r in results for i in r["issues"]),
@@ -380,13 +385,12 @@ def new_findings(
     )
     for result, issue in ranked:
         keys = _dedup_keys(result["slug"], issue, facts)
-        tokens = claim_tokens(issue.get("claim", ""))
-        # A match under any one key counts as already-known: the same defect on a second chart
-        # sharing one indicator is not news, even though the two charts are not the same chart.
-        if any(same_claim(tokens, before) for key in keys for before in seen.get(key, [])):
+        # A match under any one key counts as already-known: the same indicator on a second chart
+        # is not news, even though the two charts are not the same chart.
+        if any(key in posted for key in keys):
             continue
         for key in keys:
-            seen.setdefault(key, []).append(tokens)
+            posted[key] = day.isoformat()
         out.append((result, issue))
     return out
 
@@ -545,20 +549,15 @@ def format_slack(
 
 def stamp(
     findings: list[tuple[dict[str, Any], dict[str, Any]]],
-    state: dict[str, list[dict[str, Any]]],
+    state: dict[str, str],
     facts: dict[str, dict[str, Any]] | None = None,
-) -> dict[str, list[dict[str, Any]]]:
+    today: date | None = None,
+) -> dict[str, str]:
     """Record what was posted. ``facts`` must be the same mapping :func:`new_findings` used —
-    a claim written per-chart and looked up per-indicator matches nothing, and the digest would
-    re-post every finding every day."""
-    today = datetime.now(timezone.utc).date().isoformat()
+    a finding keyed per-chart here and looked up per-indicator tomorrow matches nothing, and the
+    digest would re-post every finding every day."""
+    day = (today or _today()).isoformat()
     for result, issue in findings[:MAX_FINDINGS]:
-        tokens = claim_tokens(issue.get("claim", ""))
         for key in _dedup_keys(result["slug"], issue, facts):
-            claims = state.setdefault(key, [])
-            # The same claim can arrive under a key that already holds a reworded version of it,
-            # from an earlier day or from another chart sharing the indicator. Recording it again
-            # would grow the file without changing any answer.
-            if not any(same_claim(tokens, set(claim.get("words") or [])) for claim in claims):
-                claims.append({"words": sorted(tokens), "date": today})
+            state[key] = day
     return state
