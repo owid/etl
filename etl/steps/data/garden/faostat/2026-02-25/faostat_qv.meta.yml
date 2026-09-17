@@ -23,6 +23,12 @@ tables:
           numDecimalPlaces: 2
         presentation:
           title_public: Gross production value of the agricultural sector
+      agriculture__00002051__gross_production_value__000058__constant_2014_2016_usd:
+        display:
+          name: Gross production value of the agricultural sector
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Gross production value of the agricultural sector
       food__00002054__gross_production_value__000058__constant_2014_2016_usd:
         display:
           name: Gross production value of food
