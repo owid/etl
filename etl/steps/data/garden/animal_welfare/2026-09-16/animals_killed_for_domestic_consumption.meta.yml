@@ -1,0 +1,328 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Animal Welfare
+  description_processing_consumption: &description_processing_consumption |-
+    - The number of animals is estimated by dividing the meat supplied to each country, reported by the UN Food and Agriculture Organization (FAO) in its Food Balance Sheets, by the average carcass weight of an animal in that group, country and year.
+    - The average carcass weight is calculated from FAO's production data, as the meat produced divided by the number of animals slaughtered. Both quantities are measured in carcass weight, so they can be divided directly.
+    - Where a country does not report the number of animals it slaughters, or where the resulting carcass weight is implausible, the world average carcass weight for that group and year is used instead. This mostly affects countries that import nearly all of their meat.
+    - Unlike the number of animals slaughtered in a country, this measure attributes animals to the country whose consumption they supply, rather than to the country where they were killed.
+    - Meat from horses, camels, rabbits, game and other minor categories is not included, because FAO does not report the number of these animals slaughtered consistently enough to estimate a carcass weight.
+    - This method follows van der Laan, S., Breeman, G., & Scherer, L. (2024), "Animal Lives Affected by Meat Consumption Trends in the G20 Countries", extended from the G20 countries to all countries.
+
+dataset:
+  title: Land animals killed for domestic consumption
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  animals_killed_for_domestic_consumption:
+    variables:
+      cattle_and_buffaloes_slaughtered:
+        title: Cattle and buffaloes slaughtered
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Number of cattle and buffaloes slaughtered in each country, wherever their meat is eventually consumed.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for cattle and buffaloes are summed.
+        display:
+          numDecimalPlaces: 0
+      cattle_and_buffaloes_slaughtered_per_capita:
+        title: Cattle and buffaloes slaughtered, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Number of cattle and buffaloes slaughtered in each country per person, wherever their meat is eventually consumed.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for cattle and buffaloes are summed.
+        display:
+          numDecimalPlaces: 2
+      cattle_and_buffaloes_killed_domestic_supply:
+        title: Cattle and buffaloes killed for domestic consumption
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Estimated number of cattle and buffaloes killed to supply the meat consumed in each country, after accounting for trade. Includes meat that is wasted or used for purposes other than food.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 0
+      cattle_and_buffaloes_killed_domestic_supply_per_capita:
+        title: Cattle and buffaloes killed for domestic consumption, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Estimated number of cattle and buffaloes killed per person to supply the meat consumed in each country, after accounting for trade. Includes meat that is wasted or used for purposes other than food.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 2
+      cattle_and_buffaloes_killed_food:
+        title: Cattle and buffaloes killed for food available for consumption
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Estimated number of cattle and buffaloes killed to supply the meat available to consumers in each country, after accounting for trade.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 0
+      cattle_and_buffaloes_killed_food_per_capita:
+        title: Cattle and buffaloes killed for food available for consumption, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Estimated number of cattle and buffaloes killed per person to supply the meat available to consumers in each country, after accounting for trade.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 2
+      sheep_and_goats_slaughtered:
+        title: Sheep and goats slaughtered
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Number of sheep and goats slaughtered in each country, wherever their meat is eventually consumed.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for sheep and goats are summed.
+        display:
+          numDecimalPlaces: 0
+      sheep_and_goats_slaughtered_per_capita:
+        title: Sheep and goats slaughtered, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Number of sheep and goats slaughtered in each country per person, wherever their meat is eventually consumed.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for sheep and goats are summed.
+        display:
+          numDecimalPlaces: 2
+      sheep_and_goats_killed_domestic_supply:
+        title: Sheep and goats killed for domestic consumption
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Estimated number of sheep and goats killed to supply the meat consumed in each country, after accounting for trade. Includes meat that is wasted or used for purposes other than food.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 0
+      sheep_and_goats_killed_domestic_supply_per_capita:
+        title: Sheep and goats killed for domestic consumption, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Estimated number of sheep and goats killed per person to supply the meat consumed in each country, after accounting for trade. Includes meat that is wasted or used for purposes other than food.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 2
+      sheep_and_goats_killed_food:
+        title: Sheep and goats killed for food available for consumption
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Estimated number of sheep and goats killed to supply the meat available to consumers in each country, after accounting for trade.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 0
+      sheep_and_goats_killed_food_per_capita:
+        title: Sheep and goats killed for food available for consumption, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Estimated number of sheep and goats killed per person to supply the meat available to consumers in each country, after accounting for trade.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 2
+      pigs_slaughtered:
+        title: Pigs slaughtered
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Number of pigs slaughtered in each country, wherever their meat is eventually consumed.
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+      pigs_slaughtered_per_capita:
+        title: Pigs slaughtered, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Number of pigs slaughtered in each country per person, wherever their meat is eventually consumed.
+        processing_level: minor
+        display:
+          numDecimalPlaces: 2
+      pigs_killed_domestic_supply:
+        title: Pigs killed for domestic consumption
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Estimated number of pigs killed to supply the meat consumed in each country, after accounting for trade. Includes meat that is wasted or used for purposes other than food.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 0
+      pigs_killed_domestic_supply_per_capita:
+        title: Pigs killed for domestic consumption, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Estimated number of pigs killed per person to supply the meat consumed in each country, after accounting for trade. Includes meat that is wasted or used for purposes other than food.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 2
+      pigs_killed_food:
+        title: Pigs killed for food available for consumption
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Estimated number of pigs killed to supply the meat available to consumers in each country, after accounting for trade.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 0
+      pigs_killed_food_per_capita:
+        title: Pigs killed for food available for consumption, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Estimated number of pigs killed per person to supply the meat available to consumers in each country, after accounting for trade.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 2
+      poultry_slaughtered:
+        title: Poultry slaughtered
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Number of poultry birds slaughtered in each country, wherever their meat is eventually consumed.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for chickens, ducks, geese and guinea fowl, turkeys, and pigeons and other birds are summed.
+        display:
+          numDecimalPlaces: 0
+      poultry_slaughtered_per_capita:
+        title: Poultry slaughtered, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Number of poultry birds slaughtered in each country per person, wherever their meat is eventually consumed.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for chickens, ducks, geese and guinea fowl, turkeys, and pigeons and other birds are summed.
+        display:
+          numDecimalPlaces: 2
+      poultry_killed_domestic_supply:
+        title: Poultry killed for domestic consumption
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Estimated number of poultry birds killed to supply the meat consumed in each country, after accounting for trade. Includes meat that is wasted or used for purposes other than food.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 0
+      poultry_killed_domestic_supply_per_capita:
+        title: Poultry killed for domestic consumption, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Estimated number of poultry birds killed per person to supply the meat consumed in each country, after accounting for trade. Includes meat that is wasted or used for purposes other than food.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 2
+      poultry_killed_food:
+        title: Poultry killed for food available for consumption
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Estimated number of poultry birds killed to supply the meat available to consumers in each country, after accounting for trade.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 0
+      poultry_killed_food_per_capita:
+        title: Poultry killed for food available for consumption, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Estimated number of poultry birds killed per person to supply the meat available to consumers in each country, after accounting for trade.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 2
+      land_animals_slaughtered:
+        title: Land animals slaughtered
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Number of land animals slaughtered in each country, wherever their meat is eventually consumed.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for cattle, buffaloes, sheep, goats, pigs, chickens, ducks, geese and guinea fowl, turkeys, and pigeons and other birds are summed.
+        display:
+          numDecimalPlaces: 0
+      land_animals_slaughtered_per_capita:
+        title: Land animals slaughtered, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Number of land animals slaughtered in each country per person, wherever their meat is eventually consumed.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for cattle, buffaloes, sheep, goats, pigs, chickens, ducks, geese and guinea fowl, turkeys, and pigeons and other birds are summed.
+        display:
+          numDecimalPlaces: 2
+      land_animals_killed_domestic_supply:
+        title: Land animals killed for domestic consumption
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Estimated number of land animals killed to supply the meat consumed in each country, after accounting for trade. Includes meat that is wasted or used for purposes other than food.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 0
+      land_animals_killed_domestic_supply_per_capita:
+        title: Land animals killed for domestic consumption, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Estimated number of land animals killed per person to supply the meat consumed in each country, after accounting for trade. Includes meat that is wasted or used for purposes other than food.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 2
+      land_animals_killed_food:
+        title: Land animals killed for food available for consumption
+        unit: animals
+        short_unit: ''
+        description_short: |-
+          Estimated number of land animals killed to supply the meat available to consumers in each country, after accounting for trade.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 0
+      land_animals_killed_food_per_capita:
+        title: Land animals killed for food available for consumption, per person
+        unit: animals per person
+        short_unit: ''
+        description_short: |-
+          Estimated number of land animals killed per person to supply the meat available to consumers in each country, after accounting for trade.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        display:
+          numDecimalPlaces: 2
