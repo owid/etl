@@ -16,7 +16,7 @@ dataset:
     - 2026-09-10:
       - New release on the total energy supply methodology, replacing the substitution method used until the 2025 release (see above).
       - Every column is renamed to one grammar, `<source>_<domain>_<measure>` with the unit last (for example `hydro_energy_twh`, `hydro_electricity_share_pct`, `coal_production_twh`). The `column_mapping` table lists the previous name of each column, and the columns that are new or no longer published.
-      - New columns: fossil fuel imports, exports, net imports and reserves; production and consumption in physical units (tonnes and cubic meters); reserves-to-production ratios; solar and wind combined; traditional biomass; shares of total energy supply including traditional biomass.
+      - New columns: fossil fuel imports, exports, net imports and reserves; production and consumption in physical units (tonnes and cubic meters); solar and wind combined. Indicators with values for the World only (traditional biomass, shares including traditional biomass, reserves-to-production ratios) are left to the energy mix and fossil fuels datasets.
       - The regional aggregates defined by the U.S. Energy Information Administration and the Shift Dataportal (for example "Africa (EIA)", "OECD (Shift)") and the Energy Institute's residual regions (for example "Other Africa (EI)") are no longer included; the Energy Institute's and Ember's main regions are.
       - The dataset moved from the owid/energy-data GitHub repository to this catalog page, and is no longer published as JSON. The previous release stays available, unchanged, at https://owid-public.owid.io/data/energy/owid-energy-data.csv (also .xlsx and .json).
     - 2026-04-27:
