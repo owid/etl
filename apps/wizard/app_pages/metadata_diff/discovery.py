@@ -76,10 +76,18 @@ log = get_logger()
 # config/indicator flag instead. Real PRs touch a handful; a regions or FAOSTAT update can flag many.
 MAX_MDIMS_RESOLVED = 25
 
-# The `export://<kind>/...` segments that publish the two products this tool reviews. A recipe name is
-# only unique within its kind, so every scope test names the kind it is asking about.
-MDIM_EXPORT_KIND = "multidim"
-EXPLORER_EXPORT_KIND = "explorers"
+# The `viz://<kind>/...` segments that publish the two products this tool reviews. A recipe name is
+# only unique within its kind, so every scope test names the kind it is asking about. Both kinds used to
+# be `export://multidim` and `export://explorers`; they moved to `viz://` with the rest of the recipes
+# that publish a product rather than a dataset, which is why the scope names below still say "export".
+MDIM_EXPORT_KIND = "chart"
+EXPLORER_EXPORT_KIND = "explorer"
+
+# The step schemes whose recipes publish a product instead of a dataset: `viz://` (charts, explorers,
+# static images, bespoke viz) and `export://` (GitHub, R2). A recipe URI is `<scheme>://<kind>/<ns>/...`,
+# and its file lives under `etl/steps/<scheme>/<kind>/<ns>/...`.
+RECIPE_SCHEMES = ("viz", "export")
+RECIPE_URI_PREFIXES = tuple(f"{scheme}://" for scheme in RECIPE_SCHEMES)
 
 
 @dataclass
@@ -138,7 +146,7 @@ def _dataset_of(catalog_path: str) -> str:
     return "/".join(_catalog_path_parts(catalog_path)[:3])
 
 
-_CHANNEL_PREFIXES = ("grapher", "garden", "meadow", "snapshot", "export")
+_CHANNEL_PREFIXES = ("grapher", "garden", "meadow", "snapshot", "viz", "export")
 
 
 def _catalog_path_parts(catalog_path: str) -> list[str]:
@@ -218,7 +226,7 @@ def branch_scope() -> BranchScope:
         log.warning("metadata_diff.git_narrowing_unavailable", error=str(e))
         return BranchScope(available=False)
 
-    datasets = {p for p in paths if not p.startswith("export://")} | _shared_step_file_datasets(files_changed)
+    datasets = {p for p in paths if "://" not in p} | _shared_step_file_datasets(files_changed)
     # Only recipes the DAG still builds. A retired recipe left in the tree derives a URI that publishes
     # nothing, yet still *reads* like the product it used to build, and `_export_scope_names` takes the
     # names out of its source: `explorers/wash/2024-02-15/water_and_sanitation.py` is in no DAG but still
@@ -304,19 +312,31 @@ def _shared_step_file_datasets(files_changed: dict[str, Any]) -> set[str]:
 
 
 def _active_export_uris() -> set[str]:
-    """The `export://` steps the DAG actually builds."""
+    """The `viz://` / `export://` steps the DAG actually builds."""
     from etl.dag_helpers import load_dag
 
-    return {s for s in load_dag() if s.startswith("export://")}
+    return {s for s in load_dag() if s.startswith(RECIPE_URI_PREFIXES)}
+
+
+def _uri_parts(recipe_uri: str) -> tuple[str, str]:
+    """`viz://chart/un/latest/un_wpp` -> `("viz", "chart/un/latest/un_wpp")`."""
+    scheme, _, rel = recipe_uri.partition("://")
+    return scheme, rel.strip("/")
+
+
+def _recipe_step_file(recipe_uri: str) -> Path:
+    """Where a recipe URI's step file lives: `viz://chart/un/latest/x` -> `etl/steps/viz/chart/un/latest/x.py`."""
+    scheme, rel = _uri_parts(recipe_uri)
+    return STEP_DIR / scheme / f"{rel}.py"
 
 
 def _shared_export_recipe_uris(files_changed: dict[str, Any]) -> set[str]:
-    """`export://` URIs of the recipes a changed *shared* file in an export folder feeds.
+    """`viz://` / `export://` URIs of the recipes a changed *shared* file in a recipe folder feeds.
 
-    The export mirror of `_shared_step_file_datasets`, and the same blind spot: a recipe's helpers are not
-    recipes. `explorers/un/latest/un_wpp.py` imports its siblings `utils.py` and `view_edits.py`, and
+    The recipe mirror of `_shared_step_file_datasets`, and the same blind spot: a recipe's helpers are not
+    recipes. `explorer/un/latest/un_wpp.py` imports its siblings `utils.py` and `view_edits.py`, and
     reads `map_brackets.yml`; none of the three is a step, so `get_directly_changed_export_uris` derives
-    `export://explorers/un/latest/utils` — a recipe that exists in no DAG and publishes nothing. The
+    `viz://explorer/un/latest/utils` — a recipe that exists in no DAG and publishes nothing. The
     explorer's own text then belongs to nobody in this branch, and the review files every difference in it
     as baseline lag: the one bucket where a reviewer will not look for their own edit.
 
@@ -336,17 +356,18 @@ def _shared_export_recipe_uris(files_changed: dict[str, Any]) -> set[str]:
         path = Path(file_path)
         if path.suffix not in (".py", ".yml", ".yaml"):
             continue
-        try:
-            rel = (BASE_DIR / path).relative_to(STEP_DIR / "export")
-        except ValueError:
-            continue
-        own = f"export://{(rel.parent / rel.name.split('.')[0]).as_posix()}"
-        folder = rel.parent.as_posix()
-        # Only a `kind/namespace/version` folder has sibling recipes to credit.
-        if own in dag_uris or folder.count("/") != 2:
-            continue
-        siblings = {u for u in dag_uris if u.startswith(f"export://{folder}/")}
-        out |= _recipes_using(rel.name, siblings) or siblings
+        for scheme in RECIPE_SCHEMES:
+            try:
+                rel = (BASE_DIR / path).relative_to(STEP_DIR / scheme)
+            except ValueError:
+                continue  # Not this scheme's step root; try the next one.
+            own = f"{scheme}://{(rel.parent / rel.name.split('.')[0]).as_posix()}"
+            folder = rel.parent.as_posix()
+            # Only a `kind/namespace/version` folder has sibling recipes to credit.
+            if own not in dag_uris and folder.count("/") == 2:
+                siblings = {u for u in dag_uris if u.startswith(f"{scheme}://{folder}/")}
+                out |= _recipes_using(rel.name, siblings) or siblings
+            break
     return out
 
 
@@ -368,7 +389,7 @@ def _recipes_using(file_name: str, recipe_uris: set[str]) -> set[str]:
     out: set[str] = set()
     for uri in recipe_uris:
         try:
-            source = (STEP_DIR / "export" / f"{uri[len('export://') :]}.py").read_text()
+            source = _recipe_step_file(uri).read_text()
         except OSError:
             # A recipe whose file we cannot read tells us nothing either way; leave it to the fallback.
             continue
@@ -378,14 +399,14 @@ def _recipes_using(file_name: str, recipe_uris: set[str]) -> set[str]:
 
 
 def _export_namespace(export_uri: str) -> str:
-    """The namespace an export recipe lives in: `export://multidim/ihme_gbd/latest/x` -> `ihme_gbd`."""
-    parts = export_uri[len("export://") :].lstrip("/").split("/")
+    """The namespace a recipe lives in: `viz://chart/ihme_gbd/latest/x` -> `ihme_gbd`."""
+    parts = _uri_parts(export_uri)[1].split("/")
     return parts[1] if len(parts) > 1 else ""
 
 
 def _export_kind(export_uri: str) -> str:
-    """The product an export recipe publishes, from its URI: `export://multidim/...` -> `multidim`."""
-    return export_uri[len("export://") :].lstrip("/").split("/")[0]
+    """The product a recipe publishes, from its URI: `viz://chart/...` -> `chart`."""
+    return _uri_parts(export_uri)[1].split("/")[0]
 
 
 # Where a collection recipe names what it publishes: `paths.create_collection(short_name=...)`, or the
@@ -399,18 +420,17 @@ def _emitted_collection_names(source: str) -> set[str]:
 
 
 def _export_scope_names(export_uri: str) -> set[str]:
-    """What an `export://` URI can be matched against — its step file name *and* what it publishes.
+    """What a recipe URI can be matched against — its step file name *and* what it publishes.
 
-    An export URI is `export://explorers/<ns>/<version>/<short>`, whose tail is the recipe's **file
+    A recipe URI is `viz://explorer/<ns>/<version>/<short>`, whose tail is the recipe's **file
     name**. That is usually also the explorer slug or the MDim catalogPath tail, but not always:
-    `explorers/emissions/latest/ipcc_scenarios.py` publishes `ipcc-scenarios`, and
-    `multidim/un/latest/un_wpp.py` publishes `population-and-demography`. Matching on the file name
+    `explorer/emissions/latest/ipcc_scenarios.py` publishes `ipcc-scenarios`, and
+    `chart/un/latest/un_wpp.py` publishes `population-and-demography`. Matching on the file name
     alone files a recipe edit of those as baseline lag and drops it from the review, so read the names
     the recipe emits and accept either.
     """
-    rel = export_uri[len("export://") :].rstrip("/")
-    names = {rel.split("/")[-1]}
-    step_file = STEP_DIR / "export" / f"{rel}.py"
+    names = {_uri_parts(export_uri)[1].split("/")[-1]}
+    step_file = _recipe_step_file(export_uri)
     if step_file.exists():
         names |= _emitted_collection_names(step_file.read_text())
     elif not step_file.with_suffix(".config.yml").exists():
@@ -1126,7 +1146,7 @@ def mdim_changes_df(
 
     scope = scope if scope is not None else branch_scope()
     if scope.available:
-        # An MDim's own recipe changing (`export://multidim/.../<short>`) is the other way this branch can
+        # An MDim's own recipe changing (`viz://chart/.../<short>`) is the other way this branch can
         # move its texts, so a config change counts when the recipe is ours.
         own_recipe = df["catalogPath"].map(lambda cp: scope.covers_mdim(str(cp)))
         df["in_branch"] = mdim_in_branch(df, own_recipe)

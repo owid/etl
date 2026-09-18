@@ -495,12 +495,12 @@ def _notes_markdown(rows: list[dict[str, Any]], index: dict[str, dict[str, str]]
 # asks for an override, not a revert, and each surface is overridden in a different place.
 _OVERRIDE_LEVER = {
     "mdims": (
-        "override the field on those views in the MDim's export step (`view.metadata[...]` under "
-        "`etl/steps/export/multidim/`), which leaves the garden text alone for everything else"
+        "override the field on those views in the MDim's viz step (`view.metadata[...]` under "
+        "`etl/steps/viz/chart/`), which leaves the garden text alone for everything else"
     ),
     "explorers": (
-        "set the text on those views in the explorer's own export step (under "
-        "`etl/steps/export/explorers/`), which leaves the garden text alone for everything else"
+        "set the text on those views in the explorer's own viz step (under "
+        "`etl/steps/viz/explorer/`), which leaves the garden text alone for everything else"
     ),
     "charts": (
         "give those charts their own text — `presentation.grapher_config` in the garden step for a chart "

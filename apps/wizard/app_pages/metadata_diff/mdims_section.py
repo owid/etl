@@ -94,7 +94,7 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
             )
         st.markdown(
             head + ".",
-            help="Either the metadata of an indicator they use changed, or their own export recipe did — "
+            help="Either the metadata of an indicator they use changed, or their own viz recipe did — "
             "most text edits are authored in the garden step and reach an MDim through indicator metadata, "
             "leaving its config identical.",
         )
@@ -334,7 +334,7 @@ def _render_other(others: list[str]) -> None:
         return
     with st.expander(f"🕓 {len(others)} other MDim(s) differ from {BASELINE_NAME} — not from this branch"):
         st.caption(
-            "Their config differs, but neither their export recipe nor the indicators they use are touched "
+            "Their config differs, but neither their viz recipe nor the indicators they use are touched "
             "by this branch. Open one from Chart Diff's MDIMs section if you want the config diff."
         )
         st.markdown("\n".join(f"- `{cp}`" for cp in others))

@@ -535,14 +535,14 @@ def test_branch_scope_separates_data_steps_from_export_recipes():
 
 
 def test_export_scope_is_per_kind_not_per_name():
-    """A recipe name is only unique within its export kind, and `migration_flows` exists in both.
+    """A recipe name is only unique within its kind, and `migration_flows` exists in both.
 
-    `export/multidim/migration/latest/migration_flows.py` and
-    `export/explorers/migration/latest/migration_flows.py` both exist, so a name-only scope would let an
+    `viz/chart/migration/latest/migration_flows.py` and
+    `viz/explorer/migration/latest/migration_flows.py` both exist, so a name-only scope would let an
     edit to the MDim recipe vouch for every differing view of the unrelated explorer.
     """
-    assert _export_kind("export://multidim/migration/latest/migration_flows") == MDIM_EXPORT_KIND
-    assert _export_kind("export://explorers/migration/latest/migration_flows") == EXPLORER_EXPORT_KIND
+    assert _export_kind("viz://chart/migration/latest/migration_flows") == MDIM_EXPORT_KIND
+    assert _export_kind("viz://explorer/migration/latest/migration_flows") == EXPLORER_EXPORT_KIND
 
     scope = BranchScope(export_products={(MDIM_EXPORT_KIND, "migration_flows")})
     assert scope.covers_export(MDIM_EXPORT_KIND, "migration_flows")
@@ -1010,11 +1010,9 @@ def test_export_products_only_covers_recipes_the_branch_edited():
     from etl.io import get_directly_changed_export_uris
 
     data_step = "etl/steps/data/garden/wb/2026-06-26/world_bank_pip.meta.yml"
-    recipe = "etl/steps/export/multidim/wb/latest/poverty_pip.py"
+    recipe = "etl/steps/viz/chart/wb/latest/poverty_pip.py"
 
-    assert get_directly_changed_export_uris({data_step: "M", recipe: "M"}) == [
-        "export://multidim/wb/latest/poverty_pip"
-    ]
+    assert get_directly_changed_export_uris({data_step: "M", recipe: "M"}) == ["viz://chart/wb/latest/poverty_pip"]
     # A branch touching only a data step claims no export recipe at all.
     assert get_directly_changed_export_uris({data_step: "M"}) == []
 
@@ -1168,7 +1166,7 @@ def test_export_scope_is_per_namespace_not_just_per_name():
     to one vouch for the other. On a lagging staging server that presents a whole MDim's worth of
     config-level text nobody in the PR wrote as this branch's work.
     """
-    assert _export_namespace("export://multidim/ihme_gbd/latest/air_pollution") == "ihme_gbd"
+    assert _export_namespace("viz://chart/ihme_gbd/latest/air_pollution") == "ihme_gbd"
     assert mdim_namespace("grapher/ihme_gbd/latest/air_pollution#air_pollution") == "ihme_gbd"
 
     scope = BranchScope(
@@ -1196,17 +1194,15 @@ def test_shared_export_helper_credits_its_sibling_recipes():
     from apps.wizard.app_pages.metadata_diff.discovery import _export_scope_names, _shared_export_recipe_uris
 
     for helper in ("utils.py", "view_edits.py", "map_brackets.yml"):
-        reached = _shared_export_recipe_uris({f"etl/steps/export/explorers/un/latest/{helper}": "M"})
-        assert reached == {"export://explorers/un/latest/un_wpp"}, helper
+        reached = _shared_export_recipe_uris({f"etl/steps/viz/explorer/un/latest/{helper}": "M"})
+        assert reached == {"viz://explorer/un/latest/un_wpp"}, helper
 
     # And the recipe it credits answers to the slug the explorer actually publishes under.
-    assert "population-and-demography" in _export_scope_names("export://explorers/un/latest/un_wpp")
+    assert "population-and-demography" in _export_scope_names("viz://explorer/un/latest/un_wpp")
 
     # A file that *is* a recipe, and a config companion resolving to one, need no expansion.
-    assert _shared_export_recipe_uris({"etl/steps/export/explorers/un/latest/un_wpp.py": "M"}) == set()
-    assert (
-        _shared_export_recipe_uris({"etl/steps/export/explorers/un/latest/un_wpp.sex_ratio.config.yml": "M"}) == set()
-    )
+    assert _shared_export_recipe_uris({"etl/steps/viz/explorer/un/latest/un_wpp.py": "M"}) == set()
+    assert _shared_export_recipe_uris({"etl/steps/viz/explorer/un/latest/un_wpp.sex_ratio.config.yml": "M"}) == set()
     # Files outside an export folder are not ours to expand.
     assert _shared_export_recipe_uris({"apps/wizard/app_pages/metadata_diff/core.py": "M"}) == set()
 
@@ -1223,12 +1219,12 @@ def test_shared_export_helper_credits_only_the_recipes_that_use_it():
     from apps.wizard.app_pages.metadata_diff.discovery import _recipes_using, _shared_export_recipe_uris
 
     for helper in ("utils.py", "view_edits.py", "map_brackets.yml"):
-        reached = _shared_export_recipe_uris({f"etl/steps/export/multidim/un/latest/{helper}": "M"})
-        assert reached == {"export://multidim/un/latest/un_wpp"}, helper
+        reached = _shared_export_recipe_uris({f"etl/steps/viz/chart/un/latest/{helper}": "M"})
+        assert reached == {"viz://chart/un/latest/un_wpp"}, helper
 
     # "No recipe names it" means "cannot tell" — a helper reached only via another helper falls back to
     # the whole folder, keeping the reviewer's own edit visible rather than dropping it.
-    siblings = {"export://multidim/un/latest/child_labor", "export://multidim/un/latest/hazardous_work"}
+    siblings = {"viz://chart/un/latest/child_labor", "viz://chart/un/latest/hazardous_work"}
     assert _recipes_using("utils.py", siblings) == set()
 
 
@@ -1372,8 +1368,8 @@ def test_too_many_draft_mdims_reports_a_ceiling_instead_of_a_truncated_count():
 def test_a_retired_export_recipe_does_not_claim_the_live_product():
     """A recipe file left in the tree after its DAG entry moved on publishes nothing — and must vouch for nothing.
 
-    `etl/steps/export/explorers/wash/2024-02-15/water_and_sanitation.py` is in no DAG; only
-    `export://explorers/wash/latest/water_and_sanitation` is. The derived URI still reads like the live
+    `etl/steps/viz/explorer/wash/2024-02-15/water_and_sanitation.py` is in no DAG; only
+    `viz://explorer/wash/latest/water_and_sanitation` is. The derived URI still reads like the live
     product, because the scope names are taken from the recipe's own source, so editing the retired file put
     `water-and-sanitation` in scope and filed the live explorer's baseline lag as this branch's work — the
     one bucket a reviewer will not search for their own edit in.
@@ -1384,8 +1380,8 @@ def test_a_retired_export_recipe_does_not_claim_the_live_product():
     from apps.wizard.app_pages.metadata_diff.discovery import _active_export_uris, _export_scope_names
 
     active = _active_export_uris()
-    assert "export://explorers/wash/latest/water_and_sanitation" in active
-    retired = "export://explorers/wash/2024-02-15/water_and_sanitation"
+    assert "viz://explorer/wash/latest/water_and_sanitation" in active
+    retired = "viz://explorer/wash/2024-02-15/water_and_sanitation"
     assert retired not in active
     # The retired recipe really does still answer to the live explorer's name — hence the filter.
     assert "water-and-sanitation" in _export_scope_names(retired)
@@ -1401,16 +1397,22 @@ def test_filtering_to_active_export_recipes_drops_no_real_recipe():
     with no script at all. Deriving the universe from scripts alone reported every one of those as a
     recipe the filter had invented.
     """
-    from apps.wizard.app_pages.metadata_diff.discovery import _active_export_uris, _export_scope_names
+    from apps.wizard.app_pages.metadata_diff.discovery import (
+        RECIPE_SCHEMES,
+        _active_export_uris,
+        _export_scope_names,
+        _recipe_step_file,
+    )
     from etl.paths import STEP_DIR
 
     active = _active_export_uris()
     derived = set()
-    for path in (STEP_DIR / "export").rglob("*"):
-        if path.suffix not in (".py", ".yml", ".yaml") or path.name == "__init__.py":
-            continue
-        rel = path.relative_to(STEP_DIR / "export")
-        derived.add("export://" + (rel.parent / rel.name.split(".")[0]).as_posix())
+    for scheme in RECIPE_SCHEMES:
+        for path in (STEP_DIR / scheme).rglob("*"):
+            if path.suffix not in (".py", ".yml", ".yaml") or path.name == "__init__.py":
+                continue
+            rel = path.relative_to(STEP_DIR / scheme)
+            derived.add(f"{scheme}://" + (rel.parent / rel.name.split(".")[0]).as_posix())
     # Every active step is reachable from a file in the tree, so the filter keeps all of them.
     assert active <= derived
     assert active & derived == active
@@ -1419,8 +1421,7 @@ def test_filtering_to_active_export_recipes_drops_no_real_recipe():
     yaml_only = [
         uri
         for uri in active
-        if not (STEP_DIR / "export" / f"{uri.removeprefix('export://')}.py").exists()
-        and (STEP_DIR / "export" / f"{uri.removeprefix('export://')}.config.yml").exists()
+        if not _recipe_step_file(uri).exists() and _recipe_step_file(uri).with_suffix(".config.yml").exists()
     ]
     for uri in yaml_only:
         assert uri.rsplit("/", 1)[-1] in _export_scope_names(uri)
@@ -3407,7 +3408,7 @@ def test_refusing_one_surface_asks_for_an_override_not_a_revert():
     # The file stays as it is, and the lever named is the MDim one.
     assert "leave `etl/steps/data/garden/wb/2026-06-26/world_bank_pip.meta.yml` as it is" in doc
     assert "to keep it off MDims:" in doc and "view.metadata" in doc
-    assert "etl/steps/export/explorers/" not in doc, "only the refused surface's lever is named"
+    assert "etl/steps/viz/explorer/" not in doc, "only the refused surface's lever is named"
     assert "Fine on the charts, too long for a view." in doc
 
 

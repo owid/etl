@@ -9,7 +9,7 @@ Two limits are stated in the UI rather than papered over:
 
 - Explorer views render **no data page**, so a WYSK / `description_key` edit is invisible to their
   readers. It is not a change this section can show, and that absence is itself the finding.
-- `full` is written when the explorer's export step runs. If indicator metadata changed but the explorer
+- `full` is written when the explorer's viz step runs. If indicator metadata changed but the explorer
   has not been rebuilt on this server, its stored text is still the old one and nothing appears here.
 """
 
@@ -236,7 +236,7 @@ def _render_other(other: dict[str, list[ViewDiff]]) -> None:
     n_views = sum(len(v) for v in other.values())
     with st.expander(f"🕓 {n_views} other explorer view(s) differ from {BASELINE_NAME} — not from this branch"):
         st.caption(
-            "These views differ, but neither their explorer's export recipe nor the indicators they render "
+            "These views differ, but neither their explorer's viz recipe nor the indicators they render "
             "are touched by this branch — normally master having moved on since this server was created. "
             "Listed for completeness."
         )
@@ -248,6 +248,6 @@ def _scope_caption() -> None:
     st.caption(
         "Compared from each view's **resolved** config, so text inherited from indicator metadata is "
         "included. Two things this cannot show: explorer views have **no data page**, so a WYSK edit never "
-        "reaches their readers; and a view's stored text only refreshes when the explorer's export step "
+        "reaches their readers; and a view's stored text only refreshes when the explorer's viz step "
         "re-runs on this server. Legacy CSV-backed explorers have no view rows at all."
     )
