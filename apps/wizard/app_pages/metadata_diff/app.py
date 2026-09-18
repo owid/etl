@@ -45,7 +45,6 @@ from apps.wizard.app_pages.metadata_diff.render import (
     st_stale_server_banner,
 )
 from apps.wizard.app_pages.metadata_diff.review_state import verdict_counts
-from apps.wizard.utils.components import st_title_with_expert
 from etl.config import OWID_ENV
 
 log = get_logger()
@@ -109,9 +108,8 @@ def main() -> None:
     assert OWID_ENV.env_remote != "production", "Metadata Diff must run on a staging server, not production."
     source_engine, target_engine = get_engines()
 
-    st_title_with_expert(
-        title="Metadata Diff",
-        icon=":material/difference:",
+    st.title(
+        ":material/difference: Metadata Diff",
         help=f"""
 **Metadata Diff** compares the metadata texts end users see — chart titles, subtitles and footnotes,
 `description_short`, and *What you should know about this data* — between your

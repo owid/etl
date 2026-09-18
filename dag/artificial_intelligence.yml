@@ -1,9 +1,9 @@
 steps:
   ###########  UPDATED MONTHLY #############################################################################
   # FrontierMath Benchmark (EPOCH)
-  data://grapher/artificial_intelligence/2026-01-30/frontiermath:
-    - data://garden/artificial_intelligence/2026-01-30/frontiermath:
-      - data://meadow/artificial_intelligence/2026-01-30/frontiermath:
+  data://grapher/artificial_intelligence/2026-09-07/frontiermath:
+    - data://garden/artificial_intelligence/2026-09-07/frontiermath:
+      - data://meadow/artificial_intelligence/2026-09-07/frontiermath:
         - snapshot://artificial_intelligence/2026-01-30/epoch_benchmark_data.zip
 
   # Stack Overflow Developer Survey – AI tool usage

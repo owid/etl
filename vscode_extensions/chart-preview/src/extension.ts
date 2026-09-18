@@ -23,7 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const filePath = editor.document.uri.fsPath;
 		if (filePath.includes('/steps/data/') && (filePath.endsWith('.py') || filePath.endsWith('.meta.yml'))) {
 			openPreview(filePath, datasetStrategy);
-		} else if (filePath.endsWith('.chart.yml') || (filePath.includes('/export/multidim/') && (filePath.endsWith('.config.yml') || filePath.endsWith('.py')))) {
+		} else if (filePath.endsWith('.chart.yml') || (filePath.includes('/viz/chart/') && (filePath.endsWith('.config.yml') || filePath.endsWith('.py')))) {
 			openPreview(filePath, chartStrategy);
 		} else {
 			vscode.window.showErrorMessage('Not a previewable file (expected a data step .py/.meta.yml or .chart.yml)');
@@ -105,7 +105,7 @@ function getContainerName(branch: string): string {
  * Falls back to the filename if no slug field is found.
  *
  * For mdim charts, also builds the full catalogPath by inserting the version
- * from the step path (matching GraphStep._create_multidim_collection logic):
+ * from the step path (matching how PathFinder derives the catalog path):
  *   slug "covid/covid#covid_cases" + version "latest" → "covid/latest/covid#covid_cases"
  */
 async function parseChartYml(filePath: string, wsRoot: string): Promise<{ stepUri: string; slug: string; catalogPath?: string }> {
@@ -136,11 +136,11 @@ async function parseChartYml(filePath: string, wsRoot: string): Promise<{ stepUr
 }
 
 /**
- * Extract export step URI / catalog path / chart info from an export/multidim file path.
+ * Extract viz step URI / catalog path / chart info from a viz/chart file path.
  * Supports both .config.yml and .py files.
- * Catalog path defaults to namespace/version/name#name (matching PathFinder.create_collection).
+ * Catalog path defaults to namespace/version/name#name (matching PathFinder.create_chart).
  *
- * For collections with `dimensions: []` (single-chart case) the ETL pushes to the chart
+ * For charts with `dimensions: []` (single-chart case) the ETL pushes to the chart
  * admin endpoint, not the multi-dim one. New charts are created as unpublished drafts,
  * so preview them through the admin Grapher route (`admin/grapher/{slug}`), which can
  * render unpublished charts.
@@ -154,8 +154,8 @@ async function parseExportMultidim(
 	filePath: string,
 	wsRoot: string,
 ): Promise<{ stepUri: string; catalogPath: string; isChart: boolean; chartSlug: string }> {
-	const exportDir = path.join(wsRoot, 'etl', 'steps', 'export', 'multidim');
-	const rel = path.relative(exportDir, filePath);
+	const chartDir = path.join(wsRoot, 'etl', 'steps', 'viz', 'chart');
+	const rel = path.relative(chartDir, filePath);
 	const stepPath = rel.replace(/\.(config\.yml|py)$/, '');
 	const shortName = path.basename(stepPath);
 	const catalogPath = `${stepPath}#${shortName}`;
@@ -184,7 +184,7 @@ async function parseExportMultidim(
 	}
 
 	const isChart = hasEmptyDimensions && !hasPy;
-	return { stepUri: `export://multidim/${stepPath}`, catalogPath, isChart, chartSlug };
+	return { stepUri: `viz://chart/${stepPath}`, catalogPath, isChart, chartSlug };
 }
 
 /**
@@ -300,11 +300,11 @@ const chartStrategy: PreviewStrategy = {
 		let etlArgs: string[];
 		let fileName: string;
 
-		if (filePath.includes('/export/multidim/')) {
+		if (filePath.includes('/viz/chart/')) {
 			const parsed = await parseExportMultidim(filePath, wsRoot);
 			stepUri = parsed.stepUri;
 			if (parsed.isChart) {
-				// Zero-dim collection → ETL pushed a regular chart. Use the admin preview
+				// Zero-dim chart → ETL pushed a regular chart. Use the admin preview
 				// route so newly-created unpublished charts render too.
 				stagingUrl = `http://${containerName}/admin/grapher/${parsed.chartSlug}`;
 				isMdim = true;
@@ -312,7 +312,7 @@ const chartStrategy: PreviewStrategy = {
 				stagingUrl = `http://${containerName}/admin/grapher/${encodeURIComponent(parsed.catalogPath)}`;
 				isMdim = true;
 			}
-			etlArgs = [stepUri, '--export', '--watch', '--private'];
+			etlArgs = [stepUri, '--grapher', '--watch', '--private'];
 			fileName = path.basename(filePath).replace(/\.(config\.yml|py)$/, '');
 		} else {
 			const parsed = await parseChartYml(filePath, wsRoot);

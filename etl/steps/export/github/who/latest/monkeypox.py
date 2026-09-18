@@ -25,5 +25,6 @@ def run(dest_dir: str) -> None:
         file_path="owid-monkeypox-data.csv",
         commit_message="data(mpx): automated update",
         branch="main",
-        dry_run=not config.MONKEYPOX_COMMIT,
+        # Commits only with both the --export permission and the explicit opt-in of the cron script.
+        dry_run=not (config.EXPORT_ENABLED and config.MONKEYPOX_COMMIT),
     )

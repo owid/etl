@@ -35,10 +35,6 @@ class UIProducerAnalytics:
         }
         # Configure individual columns with specific settings.
         grid_options = make_grid(self.df, columns, selection=True)
-        # grid_options["autoSizeStrategy"] = {
-        #     "type": "fitCellContents",
-        #     "skipHeader": False,
-        # }
 
         # st.write(grid_options)
         # Custom CSS to ensure the table stretches across the page.
@@ -56,12 +52,10 @@ class UIProducerAnalytics:
             # height=500,
             width="100%",
             update_mode=GridUpdateMode.MODEL_CHANGED,
-            fit_columns_on_grid_load=True,  # Automatically adjust columns when the grid loads.
             allow_unsafe_jscode=True,
             theme="streamlit",
             custom_css=custom_css,
             # excel_export_mode=ExcelExportMode.MANUAL,  # Doesn't work?
-            # columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS,
         )
 
         # Get the selected producers from the first table.

@@ -3,6 +3,7 @@ name: create-snapshot
 description: Create a new snapshot (DVC file, plus a Python script only when one is needed) from a url_main and optional url_download. Fetches the page, extracts metadata with AI, confirms with user, writes files, and runs the snapshot. Use when the user wants to add a new data source or create a snapshot from a URL.
 metadata:
   internal: true
+  owner: antea04
 ---
 
 # Create Snapshot
@@ -200,7 +201,7 @@ After writing the files, run:
   ```
 
   Route the finding by where the pattern came from. The script templates in step 3 are variants of `apps/wizard/etl_steps/cookiecutter/snapshot/`, which is where the current practices are supposed to live — so a hit on a line that came from the template means the **template** is stale, and fixing only the generated file leaves every future snapshot carrying it. Fix it upstream in the cookiecutter (and in this skill's copy of it) as well as in the file you just wrote.
-- **Optional deeper pass — adversarial source verification**: [`/adversarial-data-review`](../adversarial-data-review/SKILL.md) goes beyond "the links resolve" and *reads* the producer's documentation behind them, checking every `.dvc` claim (description accuracy, counts, `date_published`, license, citation) against what the docs actually say — its Phase 0 is the slice that applies at snapshot stage (the data cross-checks need a built garden dataset, e.g. via `/create-dataset`). Don't run it by default — it fetches docs and runs web searches, so it can consume many tokens; offer it when the source looks unreliable (no version labels, self-published, or the page and file seem to disagree).
+- **Optional deeper pass — adversarial source verification**: [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) goes beyond "the links resolve" and *reads* the producer's documentation behind them, checking every `.dvc` claim (description accuracy, counts, `date_published`, license, citation) against what the docs actually say — its Phase 0 is the slice that applies at snapshot stage (the data cross-checks need a built garden dataset, e.g. via `/create-dataset`). Don't run it by default — it fetches docs and runs web searches, so it can consume many tokens; offer it when the source looks unreliable (no version labels, self-published, or the page and file seem to disagree).
 
 ### 6. Report to the user
 

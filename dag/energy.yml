@@ -30,7 +30,7 @@ steps:
   #
   # Energy prices explorer
   #
-  export://multidim/energy/latest/energy_prices:
+  viz://chart/energy/latest/energy_prices:
     # Energy prices
     - data://grapher/energy/2025-02-03/energy_prices:
       - data://garden/energy/2025-02-03/energy_prices:
@@ -53,7 +53,7 @@ steps:
   #
   # Impacts of energy production explorer.
   #
-  export://explorers/energy/latest/impacts_of_energy_sources:
+  viz://explorer/energy/latest/impacts_of_energy_sources:
     # UNECE - Life Cycle Assessment of Electricity Generation Options.
     - data://grapher/unece/2026-05-04/life_cycle_assessment_of_electricity:
       - data://garden/unece/2026-05-04/life_cycle_assessment_of_electricity:
@@ -109,7 +109,7 @@ steps:
     - data://garden/energy/2026-06-30/energy_mix
   data://grapher/energy/2026-06-30/carbon_intensity_of_energy:
     - data://garden/energy/2026-06-30/carbon_intensity_of_energy
-  export://multidim/energy/latest/energy_mix:
+  viz://chart/energy/latest/energy_mix:
     - data://grapher/energy/2026-06-30/energy_mix
     # Carbon intensity view: sourced from the dedicated carbon_intensity_of_energy step (TES basis),
     # so the energy_mix subtree stays on a single Statistical Review version.
@@ -131,7 +131,7 @@ steps:
         - snapshot://papers/2026-06-30/etemad_luciani.csv
   data://grapher/energy/2026-06-30/fossil_fuels:
     - data://garden/energy/2026-06-30/fossil_fuels
-  export://multidim/energy/latest/fossil_fuels:
+  viz://chart/energy/latest/fossil_fuels:
     - data://grapher/energy/2026-06-30/fossil_fuels
   #
   # IRENA - Renewable energy statistics.
@@ -273,7 +273,7 @@ steps:
         - snapshot://uk_desnz/2026-09-01/uk_electricity_capacity_and_generation.xlsx
   data://grapher/energy/2026-06-30/electricity_mix:
     - data://garden/energy/2026-06-30/electricity_mix
-  export://multidim/energy/latest/electricity_mix:
+  viz://chart/energy/latest/electricity_mix:
     - data://grapher/energy/2026-06-30/electricity_mix
   #
   # Energy: global historical electricity scaling.

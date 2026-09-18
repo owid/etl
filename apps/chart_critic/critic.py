@@ -1,6 +1,6 @@
 """Ask a model whether a published chart would mislead a reader.
 
-The prompt is doing the work here, so the three things it must contain are worth stating:
+The prompt is doing the work here, so what it must contain is worth stating:
 
 1. **Today's date.** Without it the model reasons from its own sense of "now" and flags recent
    data as future-dated. That produced a false positive on ``weekly-growth-covid-deaths``
@@ -15,6 +15,18 @@ The prompt is doing the work here, so the three things it must contain are worth
    to make a judgement rather than hedge.
 4. **A reader-impact field.** A finding that cannot name what a reader would wrongly conclude
    is usually noise, and asking for it up front suppresses more of it than any threshold.
+5. **That our own documentation of the data outranks the model's suspicion.** The bundle carries
+   the indicator's key facts and processing notes, which is where a genuine-but-alarming value is
+   explained; a discontinuity the metadata accounts for is documented, not a finding. This is the
+   route a false positive is closed by — see ``COLUMN_FIELDS`` in ``bundle.py``. Deliberately
+   stated as a rule about the metadata and not as a list of cases: an earlier draft named the
+   Central African Republic here, which suppressed that one chart by name and would have taught
+   nothing about the next one.
+6. **The one case that is named.** The post-Soviet break in producers' aggregates is not a false
+   positive — the 1992 step really is there and really does mislead — but it is in the source, in
+   every aggregate built from it, and the answer every time it is raised is that nothing will be
+   done. It is named exactly because the rule above would be the wrong shape for it: generalising
+   it to coverage discontinuities at large would silence the ones we did cause and could fix.
 
 What this catches that statistical detection cannot: an error that is stable over time and
 statistically unremarkable, where the only tell is knowing something about the world. The
@@ -26,6 +38,7 @@ tests are ``apps/anomalist``'s job and are deliberately not duplicated here.
 from __future__ import annotations
 
 import datetime as dt
+import re
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -35,14 +48,14 @@ from apps.chart_critic.bundle import Bundle
 
 # Tested defaults. The flash tier is enough: on the SDG 16.2.2 case both flash and flash-lite
 # identified the swap from the render alone, and flash-lite did it for ~$0.0002 a call.
-DEFAULT_MODEL = "google:gemini-3.7-flash"
+DEFAULT_MODEL = "google:gemini-3.8-flash"
 CHEAP_MODEL = "google:gemini-3.1-flash-lite"
 
 # Fallback prices in $ per million tokens (input, output), from Google's published rates.
 # `genai_prices` (used by apps.utils.llms.costs) does not carry these models yet; drop an entry
-# here once it does, and note that gemini-3.7-flash doubles to 1.50/7.50 on 2027-01-01.
+# here once it does, and note that gemini-3.8-flash doubles to 1.50/7.50 on 2027-01-01.
 FALLBACK_PRICES = {
-    "google:gemini-3.7-flash": (0.75, 3.75),
+    "google:gemini-3.8-flash": (0.75, 3.75),
     "google:gemini-3.1-flash-lite": (0.10, 0.40),
 }
 
@@ -133,9 +146,23 @@ A change in how something was *measured* is different, and worth flagging: a sur
 a rebased index or a source switch produces a jump that a reader will read as a real-world
 trend. Say so when a discontinuity looks like an artefact of measurement rather than an event.
 
+One discontinuity is the exception, because it is already known and nothing will be done about
+it: producers' world and regional aggregates exclude the Soviet Union before 1992 and count its
+successor states from 1992 onwards, so a global or European series can step up around 1991-1992.
+Say nothing about that step. This covers the post-Soviet coverage break and nothing else — any
+other change in which countries a series covers is still worth flagging.
+
 For each issue, set chart_params to the grapher query parameters that put the problem on
 screen — the entity and time range you are talking about — so a reviewer sees it immediately
 rather than the chart's default view.
+
+The indicator's key facts and processing notes are our own documentation of the data, written
+for readers. They are where a value that looks impossible is explained — a crisis adjustment
+added on top of a modelled series, a survey redesign, a deliberate aggregation. An extreme value
+or a discontinuity that the metadata accounts for is documented rather than wrong: say nothing
+about it. Judge it against what the metadata actually says, not against whether the number looks
+extreme — an explanation that does not cover the value you are looking at is not a licence to
+dismiss it.
 
 Your knowledge of definitions and thresholds may be out of date, and the chart's own metadata
 is more current than you are. Do not flag a definition, a poverty line, a classification or a
@@ -145,6 +172,34 @@ that the International Poverty Line is not $3 per day, when it was revised to ex
 
 Do not invent problems. An ordinary chart has no issues, and returning an empty list is the
 expected outcome for most charts."""
+
+
+# How much of a claim's significant words two findings must share to be the same finding. The
+# model rewords freely — "the subtitle states prices are in constant 2023 US$" and "the chart
+# subtitle states prices are measured in constant 2023 US$" are one claim — so identity has to
+# survive rewording rather than be a hash of the sentence.
+#
+# Used only to merge the repeat passes of a single run, where the passes describe the same bundle
+# and overlap is high. The digest used the same test to recognise across days what it had already
+# posted, and there it failed: after an edit the model rewords a finding far more, and one ticked
+# on Monday came back on Tuesday at 0.30. Across days the digest now remembers the chart, not the
+# claim — see ``digest.COOLDOWN_DAYS``.
+CLAIM_OVERLAP = 0.4
+
+
+def claim_tokens(claim: str) -> set[str]:
+    """The significant words of a claim, crudely singular-folded.
+
+    Without the folding, "the unit for all three indicators is incorrectly set to 'doses'" and
+    "the indicator unit is incorrectly set to 'doses'" scored below the threshold and were
+    reported as two findings.
+    """
+    return {w.rstrip("s") for w in re.findall(r"[a-z0-9]{4,}", claim.lower())}
+
+
+def same_claim(tokens: set[str], other: set[str]) -> bool:
+    """Whether two claims, reduced to :func:`claim_tokens`, say the same thing."""
+    return len(tokens & other) / max(len(tokens | other), 1) >= CLAIM_OVERLAP
 
 
 def issue_params(target_params: str, issue: dict) -> str:

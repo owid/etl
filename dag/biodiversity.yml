@@ -34,7 +34,7 @@ steps:
   #
   # Habitat loss
   #
-  export://explorers/biodiversity/latest/habitat_loss:
+  viz://explorer/biodiversity/latest/habitat_loss:
     - data://grapher/biodiversity/2021-01-01/habitat_loss:
         - data://garden/biodiversity/2021-01-01/habitat_loss:
             - snapshot://biodiversity/2021-01-01/habitat_loss.feather
@@ -67,7 +67,7 @@ steps:
   #
   # Fish stocks explorer.
   #
-  export://explorers/biodiversity/latest/fish_stocks:
+  viz://explorer/biodiversity/latest/fish_stocks:
     #
     # Fish stocks (RAM Legacy).
     #

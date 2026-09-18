@@ -2,7 +2,7 @@ meta:
   origin:
     producer: OECD
     title: 'Education at a Glance 2017: OECD Indicators'
-    title_snapshot: 'Education at a Glance 2017: OECD Indicators - Relative earnings of adults, by educational attainment'
+    title_snapshot: 'Education at a Glance 2017: OECD Indicators – Relative earnings of adults, by educational attainment'
     description_snapshot: |-
       The year of reference is 2015 for all countries except: Denmark (2014), Finland (2014), Belgium (2014), Italy (2013), Canada (2014), Netherlands (2014), Japan (2012), Spain (2014), France (2013), Luxembourg (2014), Poland (2014), and Lithuania (2014).
 

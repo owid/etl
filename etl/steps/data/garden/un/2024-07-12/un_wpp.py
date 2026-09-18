@@ -17,7 +17,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Use this to process a subset of data. Set a comma-separated list of countries. For example:
-# SUBSET='France,Germany' etlr un/2024-07-12/un_wpp --private
+# SUBSET='France,Germany' etlr un/2024-07-12/un_wpp
 SUBSET = os.environ.get("SUBSET")
 
 YEAR_SPLIT = 2024
@@ -476,11 +476,21 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     tb_x = tb_x.groupby(COLUMNS_INDEX, as_index=False, observed=True)["deaths"].sum()
     tb_limits = tb.loc[tb["age"].isin(["0", "100+"])].copy()
 
-    # Combine
-    tb = pr.concat([tb_total, tb_5, tb_10, tb_x, tb_limits], ignore_index=True)
+    # Combine the age-disaggregated groups (the totals are added back after corrections, below)
+    tb = pr.concat([tb_5, tb_10, tb_x, tb_limits], ignore_index=True)
 
     # Scale
     tb["deaths"] *= 1000
+    tb_total["deaths"] *= 1000
+
+    # Blank known upstream errors in the age distribution (see un_wpp.corrections.yml). Applied to the
+    # age-disaggregated rows only, on purpose: the errors misdistribute a year's deaths across age
+    # brackets while preserving its total, so `tb_total` (summed from the same source rows) is correct
+    # and must keep its values.
+    tb = paths.apply_corrections(tb)
+
+    # Add the totals back
+    tb = pr.concat([tb_total, tb], ignore_index=True)
 
     # Merge
     tb = tb.merge(tb_rate, on=COLUMNS_INDEX, how="outer")

@@ -525,7 +525,7 @@ def set_dimensions(tb: Table) -> Table:
 
 
 def check_duplicate_index(tb: Table) -> Table:
-    """Some indicators have duplicate values. The typical reason is multiple providers of
+    """Some indicators have duplicate values. The typical reason is multiple producers of
     data (like surveys) or multiple measurement types with different comments.
     If this happens, warn and remove the duplicates. This is potentially dangerous, but it
     doesn't happen that often. We could also take average of the values as an alternative.

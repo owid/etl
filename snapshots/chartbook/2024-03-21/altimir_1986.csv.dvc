@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Income distribution estimates in Argentina (1953-1980)
+    title: Income distribution estimates in Argentina (1953–1980)
     description: >-
       This study attempts to close the gap
       between certain analytical methods and
@@ -27,7 +27,7 @@ meta:
       the least participation of the lowest income
       sectors.
     date_published: "1986-03-01"
-    title_snapshot: Income distribution estimates in Argentina (1953-1980) - Gini coefficients
+    title_snapshot: Income distribution estimates in Argentina (1953–1980) – Gini coefficients
     description_snapshot: |-
       This snapshot extracts the data from Table 7, Estimación de la distribución nacional de los ingresos [Estimation of the national income distribution], in the columns Distribución del ingreso de los hogares [Household income distribution]. Only Gini estimates are extracted.
 

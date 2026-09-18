@@ -33,7 +33,30 @@ GRAPHER_URL = "https://ourworldindata.org/grapher"
 
 # Fields worth showing the model. The long forms (titleLong, citationLong, fullMetadata) add
 # tokens without adding judgement.
-COLUMN_FIELDS = ("titleShort", "descriptionShort", "unit", "shortUnit", "timespan", "type", "conversionFactor")
+#
+# ``descriptionKey`` and ``descriptionProcessing`` are here for one specific reason: they are where
+# OWID documents the data that *looks* wrong and is not. The critic filed the Central African
+# Republic's life expectancy oscillating between 14.7 and 57.4 years as an error (owid/etl#6779);
+# it is the UN's deliberate crisis-mortality adjustment, and the investigation ended in
+# owid/etl#6813 writing that explanation into the indicator's key facts — for readers, who hit the
+# same spike. Showing the model those fields closes the loop: the answer to a false positive is to
+# document the data, and the documentation is then what stops it being raised again. The
+# alternative, a list of findings to suppress, would be maintained for the critic alone and would
+# leave the reader with the unexplained spike.
+#
+# Measured over eight charts: ~520 extra input tokens each, about $0.0004 a chart. The render
+# dominates the bill by an order of magnitude.
+COLUMN_FIELDS = (
+    "titleShort",
+    "descriptionShort",
+    "descriptionKey",
+    "descriptionProcessing",
+    "unit",
+    "shortUnit",
+    "timespan",
+    "type",
+    "conversionFactor",
+)
 CHART_FIELDS = ("title", "subtitle", "note", "xAxisLabel", "yAxisLabel")
 
 # Cap how many indicators of a wide chart get summarised, so a 100-column chart cannot blow up

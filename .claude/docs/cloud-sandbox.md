@@ -16,7 +16,7 @@ For agent sessions running in a Claude Code cloud sandbox
   the grapher feather still build. Upserts, chart-diff and the admin happen on
   the PR's staging server after you push.
 
-- **`PREFER_DOWNLOAD=1 .venv/bin/etlr <step> --private`** fetches published
+- **`PREFER_DOWNLOAD=1 .venv/bin/etlr <step>`** fetches published
   upstream datasets instead of rebuilding the chain inside the VM. Not usable for
   the step you're building — it isn't in the catalog yet.
 

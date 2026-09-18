@@ -29,7 +29,7 @@ from owid.catalog import Table, s3_utils
 from structlog import get_logger
 from tqdm.auto import tqdm
 
-from etl.config import DRY_RUN
+from etl import config
 from etl.helpers import PathFinder
 
 # Initialize logger.
@@ -108,8 +108,8 @@ def run() -> None:
             # Path (within bucket) to S3 file.
             s3_file = S3_DATA_DIR / file_name
 
-            if DRY_RUN:
-                tqdm.write(f"[DRY RUN] Would upload file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
+            if not config.EXPORT_ENABLED:
+                tqdm.write(f"[not uploaded, no --export] {local_file} -> S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
             else:
                 tqdm.write(f"Uploading file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
                 # Upload file to S3

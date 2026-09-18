@@ -18,6 +18,8 @@ definitions:
     short_unit: <% if 'rate' in indicator  %>%<% else %><%- endif -%>
     description_key:
       - |-
+        In countries hit by a humanitarian crisis, the UN IGME fits its trend with the crisis years set aside and then adds the crisis deaths back, so a few countries show a sharp one-year spike: Rwanda in 1994, Somalia in 2011, the Central African Republic in 2009, 2019 and 2022. For the Central African Republic these come from mortality surveys compiled by [Gang et al. (2023)](https://doi.org/10.1186/s13031-023-00514-z). They are all-cause excess deaths, added for the years each survey was run rather than spread across the longer period the surveys point to.
+      - |-
         <% if indicator == "Stillbirths per 100 births" %>
         - **Definition threshold varies**: A stillbirth generally refers to the birth of a baby showing no signs of life after a certain number of weeks of gestation, with the [ICD-11](https://icd.who.int/en) setting the cutoff at 22 weeks.
         - **Subcategories exist**: ICD-11 distinguishes between “early gestation stillbirth” (22–27 weeks) and “late gestation stillbirth” (28+ weeks).

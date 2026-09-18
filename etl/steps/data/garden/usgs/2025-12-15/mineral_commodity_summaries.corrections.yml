@@ -7,7 +7,7 @@
   action: override
   value: null
   reason: Zinc mine reserves for Australia in 2022 are unreasonably high (much larger than the world total).
-  provider: USGS
+  producer: USGS
   status: open
 
 - indicator: production|Asbestos|Mine|tonnes
@@ -16,5 +16,5 @@
   action: override
   value: null
   reason: Asbestos mine production for Kazakhstan in 2020 is reported as 27400, but BGS reports 227400, which is consistent with prior and posterior years; the USGS value looks like a data-entry error.
-  provider: USGS
+  producer: USGS
   status: open

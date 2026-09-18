@@ -787,9 +787,6 @@ steps:
   data://grapher/fisheries/2018-03-08/fishery_catch_breakdown__pauly_and_zeller__2016:
     - data://garden/fisheries/2018-03-08/fishery_catch_breakdown__pauly_and_zeller__2016:
         - snapshot://fisheries/2018-03-08/fishery_catch_breakdown__pauly_and_zeller__2016.feather
-  data-private://grapher/oecd/2020-11-05/time_use_across_activities__oecd_gender_data__2020:
-    - data-private://garden/oecd/2020-11-05/time_use_across_activities__oecd_gender_data__2020:
-        - snapshot-private://oecd/2020-11-05/time_use_across_activities__oecd_gender_data__2020.feather
   data://grapher/health/2018-04-19/mental_health_as_risk_factor_for_substance_use__swendsen_et_al__2010:
     - data://garden/health/2018-04-19/mental_health_as_risk_factor_for_substance_use__swendsen_et_al__2010:
         - snapshot://health/2018-04-19/mental_health_as_risk_factor_for_substance_use__swendsen_et_al__2010.feather

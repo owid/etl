@@ -2,7 +2,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: OECD Family Database - Share of Births Outside Marriage
+    title: OECD Family Database – Share of Births Outside Marriage
     description: |-
       Data on children born outside of marriage from the OECD Family Database. The OECD Family Database provides cross-national indicators on family outcomes and family policies across the OECD countries, its enhanced engagement partners and EU member states.
     date_published: '2025-09-03'

@@ -7,7 +7,7 @@ meta:
 
       These data provide novel insights into regime change over the past 120 years, illustrating the value of developing a unified framework for studying regime transformation. Such transformations, while meaningfully altering the qualities of the regime, only produce a regime transition about 32% of the time. The majority of episodes either end before a transition takes place or do not have the potential for such a transition (i.e. constituted further democratization in democratic regimes or further autocratization in autocratic regimes).
     citation_full: |-
-      Seraphine Maerz, Amanda Edgell, Joshua Krusell, Laura Maxwell, Sebastian Hellmeier. 'ERT - Episodes of Regime Transformation R package'. Varieties of Democracy (V-Dem) Project. 2026. https://www.v-dem.net/en/ and https://github.com/vdeminstitute/ERT
+      Seraphine Maerz, Amanda Edgell, Joshua Krusell, Laura Maxwell, Sebastian Hellmeier. 'ERT – Episodes of Regime Transformation R package'. Varieties of Democracy (V-Dem) Project. 2026. https://www.v-dem.net/en/ and https://github.com/vdeminstitute/ERT
     attribution: Episodes of Regime Transformation (2026)
     version_producer: v16
     url_main: https://v-dem.net/data/ert-dataset/

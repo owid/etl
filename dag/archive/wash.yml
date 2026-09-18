@@ -25,3 +25,6 @@ steps:
   # archived; last active in c886d68ebf5c on 2026-07-16
   data://meadow/wash/2024-02-15/bathing_water:
     - snapshot://wash/2024-02-15/bathing_water.zip
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/wash/latest/water_and_sanitation:
+    - data://grapher/wash/2025-12-08/household

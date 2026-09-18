@@ -1,1 +1,7 @@
 steps:
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/corruption/latest/enterprise_surveys:
+    - data://grapher/wb/2025-05-12/enterprise_surveys
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/corruption/latest/corruption_barometer:
+    - data://grapher/corruption/2025-05-12/corruption_barometer

@@ -8,7 +8,7 @@ meta:
       IHME researchers forecasted population from 2018 to 2100 for 195 countries and territories. They produced these using estimates from the Global Burden of Disease Study (GBD) 2017 and forecasts for fertility, migration, and mortality rates. This dataset includes the following: past estimates for population and deaths; forecasts for population, deaths, life expectancy, live births, total fertility rate(TFR), and migration; and annual life tables for 2018-2100. The projections for population, deaths, life expectancy, live births, total fertility rate (TFR) each include a reference scenario as well as four alternative scenarios that reflect faster or slower trajectories for two key drivers of fertility rates:education of females and access to modern reproductive health services, measured using contraceptive met need.
     date_published: "2020-07-14"
     version_producer: May 01, 2020
-    title_snapshot: "Fertility, mortality, migration, and population scenarios - Population forecast, reference scenario"
+    title_snapshot: "Fertility, mortality, migration, and population scenarios – Population forecast, reference scenario"
     description_snapshot: |-
       Population forecast, reference scenario only, all ages and both sexes: 2018-2100
 

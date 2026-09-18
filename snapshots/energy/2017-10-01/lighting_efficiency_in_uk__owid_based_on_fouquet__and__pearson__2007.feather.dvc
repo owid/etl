@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: Fouquet and Pearson
-    title: Seven Centuries of Energy Services - The Price and Use of Light in the United Kingdom (1300-2000)
+    title: Seven Centuries of Energy Services – The Price and Use of Light in the United Kingdom (1300–2000)
     description: |-
       Data was calculated by OWID based on published figures by Fouquet and Pearson (2006). Calculated as the weighted-average efficiency of lighting in the United Kingdom. Calculated based on percentage share and efficiency data of lighting sources from Fouquet and Pearson (2006). Data represents the national average efficiency, calculated as the sum of (% share * efficiency) of each source.
 

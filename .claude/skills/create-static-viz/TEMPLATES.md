@@ -5,7 +5,7 @@ re-deriving it through Figma MCP calls every time.
 
 - **File:** `Charts (2026)`, file key `s6Sv60bakebRRW2TxsMQbF`
 - **Page:** `📑 Templates`, node `798:54`
-- **Re-verify with:** `/create-figma-chart`'s [`scripts/verify_templates.js`](../create-figma-chart/scripts/verify_templates.js)
+- **Re-verify with:** `/owid-staff:create-figma-chart`'s `scripts/verify_templates.js`
   — it checks the shared geometry (sizes, content box, header band, footer position and growth) for all
   ten templates and returns an `ok`/`DRIFT` verdict. Use `get_metadata` on `798:54` for the per-slot
   positions it does not cover, and `get_screenshot` on a frame for colors. **Run it every refresh —
@@ -22,10 +22,10 @@ laid out against stale numbers still renders and still passes every contract che
 matches the frame it gets pasted into.
 
 The page's own instructions frame (`798:151`) states the workflow: *"Copy/paste the template you
-want to use and edit it in a new page"*, *"Page name: Date + Chart title"*. `/create-figma-chart`
+want to use and edit it in a new page"*, *"Page name: Date + Chart title"*. `/owid-staff:create-figma-chart`
 implements that naming as `YYYYMMDD <Title> (<Creator>)`.
 
-**Division of labor with `/create-figma-chart`, since both skills read this same Figma page.** This
+**Division of labor with `/owid-staff:create-figma-chart`, since both skills read this same Figma page.** This
 file owns the **measurements** — every slot's position and size, the derived positions, unit
 conversions, colors, exact strings — because a matplotlib step has to reproduce them with no Figma
 call. That skill owns the **operations**: which node to clone, the single band a chart is fitted
@@ -44,7 +44,7 @@ you learn something new, add it to the file that owns that side rather than to b
 
 Do not confuse the 540×540 mobile frame with `DI_Template` (`6799:1859`) or
 `InstagramPost_Template_English` (`798:161`), which are also 540×540. The tells, per
-`/create-figma-chart`: frame fill (`DI_Template` is `#ffffff`, static mobile is cream) and the
+`/owid-staff:create-figma-chart`: frame fill (`DI_Template` is `#ffffff`, static mobile is cream) and the
 license wording (`CC BY` on DI and Instagram, `Licensed under CC-BY by the author […]` on static).
 Footer row count does not separate them: DI carries one row, static mobile and IG square two.
 
@@ -53,9 +53,9 @@ Footer row count does not separate them: DI carries one row, static mobile and I
 The same Templates page also holds a `"SMALL" Charts` section (heading `25344:1235`) with
 `small-chart-template-guided` (`25344:1357`) and `small-chart-template-pull` (`25344:1391`), both
 302 px wide with a **free height**. Those are article thumbnails for the `chart-rows` and
-`pull-chart` gdoc blocks, and they are **not** built by an `export://static_viz` step — their
+`pull-chart` gdoc blocks, and they are **not** built by an `viz://static` step — their
 geometry comes from a grapher `imType=thumbnail` export, handled entirely by
-[`/create-figma-chart`](../create-figma-chart/SMALL-CHARTS.md).
+`/owid-staff:create-figma-chart` (its SMALL-CHARTS.md).
 
 So do not add a `"small"` entry to `scripts/verify_static_viz.py`'s `TEMPLATE_RATIOS`. It would be
 wrong twice: wrong pipeline, and a *ratio* check on a frame whose height is chosen per chart.
@@ -66,7 +66,7 @@ All values in template pixels, y measured **from the top edge** as Figma reports
 margin is **16 px** on all four frames, so content width is `frame width − 32`.
 
 Font sizes are in template px, measured off the live templates on **2026-08-17**. They matter to a
-step twice over: the emitted SVG should read like the template it is sized to, and `/create-figma-chart`
+step twice over: the emitted SVG should read like the template it is sized to, and `/owid-staff:create-figma-chart`
 fills these same slots when the SVG is imported.
 
 ### Horizontal — 850 × 638
@@ -102,7 +102,7 @@ side. Both the padding and that difference are gone.
 
 > **Wrapper figures re-verified 2026-08-19; the slot table above was not.** The wrapper ids, the 118
 > header bottom and the removal of the padding come from the same measurement pass as
-> `/create-figma-chart`'s node map. The per-slot `y` values still date from 2026-08-17 and sit within
+> `/owid-staff:create-figma-chart`'s node map. The per-slot `y` values still date from 2026-08-17 and sit within
 > ~0.4 px of it (the footer rows derive as 559 / 591 / 609 against the tabled 558.62 / 590.62 /
 > 608.62) — immaterial for emitting an SVG, but re-measure before trusting them for anything tighter.
 
@@ -198,7 +198,7 @@ derived **82.48** against a measured 70, and the 12.48 px gap between them was t
 figures now fall out of the same formula.
 
 > **The header is a flat auto-layout of `[title, subtitle]` with the logo as a SIBLING**, not a child
-> of a title row (`/create-figma-chart`'s SKILL.md → node map). A sibling contributes nothing to the
+> of a title row (`/owid-staff:create-figma-chart`'s SKILL.md → node map). A sibling contributes nothing to the
 > header's height, so `logo_px` is 0, the `max(…, logo_px)` cap does not apply, a one-line title *does*
 > shrink the header by a line, and there is no logo surplus to land between the title and the subtitle.
 > The logo constrains **width** instead: the title node is sized narrower than the content box to clear
@@ -225,6 +225,25 @@ first row's ink** (Horizontal's footer starts at 559, which is the `Note:` row).
 that edge. This used to need a correction: the footer frame started 16 px above its `Note:` ink, and
 insetting from the frame's `y` then inset twice and left a visibly loose bottom. If you measure that
 gap again, the wrappers have been re-padded — re-verify before compensating for it.
+
+**Take those two edges from the template's own frames, not from line-height arithmetic.**
+`verify_page.js`'s `gap` row measures the plot against the header auto-layout's *bottom* and the
+footer auto-layout's *top* — the numbers `verify_templates.js` prints — so a band derived instead as
+`subtitle_y + n × line_px` and `note_bottom − n × line_px` is judged against datums it never used.
+Measured on the 2026 Vertical template, that arithmetic landed **4.35 px below** the header frame's
+bottom and **3.01 px above** the footer frame's top, which is line-box slack rather than anything
+visible: a `BAND_INSET` of 14 then reads as `gap` **18.35 / 17.01** against the 12–16 target, on a
+page whose spacing looks right and whose own assertion says 14. **Inset from the frame edges**, and
+the row passes: the same measurement that explains the 4.35 and the 3.01 is what makes a 14 px inset
+off those datums read as `gap` 14. What you must not do is "fix" a failing row by shrinking the inset
+without knowing which datum you are shrinking from — that moves the plot to satisfy a number measured
+from somewhere else.
+
+`gap` is a live row, so a failure is a real discrepancy and not explanatory noise: a band derived from
+line-height arithmetic is a defect to correct, not a caveat to record. One frame predates this —
+the time-use chart built in #6678 ships at 18.35 / 17.01, which is the measurement above and is
+pending a design decision on whether to re-cut it. That is one named, dated exception, not a licence:
+new work insets from the frame edges and passes.
 
 **Draw the step's own copies of these slots at the sizes in the table, not at sizes that merely look
 right.** It is tempting to set the step's title and subtitle a size or two smaller — nothing in the
@@ -266,11 +285,26 @@ A step decides its layout from strings it measures in its own font, and the temp
 strings in Playfair Display and Lato. So every line count it predicts is an estimate, and the error
 does not point one way:
 
-| At the same pixel size | vs. a step measuring in Arial/DejaVu |
-|---|---|
-| Lato, 11 px | **2.4 % narrower** |
-| Lato, 16 px | 0.8 % narrower |
-| Playfair Display SemiBold, 25 px | **3.2 % wider** |
+**First, make the font the step MEASURES be the font it DRAWS — they are not the same by default.**
+`FontProperties()` with no family resolves `font.family`/`font.sans-serif`, and seaborn's `set_style`
+rewrites that list to an Arial-first one. So a step that wraps its title before calling `set_style`
+measures matplotlib's DejaVu default and then draws Arial, and the two are **~15 % apart** — far more
+than any allowance below, and in the direction that makes a slot look full when it is not. Name the
+stack, set it at import, and pass it to every `FontProperties`; then the percentages below are the whole
+of the correction.
+
+| At the same pixel size | vs. **Arial** (what these steps draw) | vs. **DejaVu Sans** (matplotlib's default) |
+|---|---|---|
+| Lato Regular, 11 px | **2.4 % narrower** | ~15 % narrower |
+| Lato Regular, 16 px | 0.8 % narrower | 15.1 % narrower |
+| Lato **Bold**, 11 px, in a mixed-weight row | **6.6 % narrower** | 26 % narrower |
+| Playfair Display SemiBold, 25 px | **3.2 % wider** | 9.6 % narrower |
+
+Two things that table is easy to under-read. The **bold** row is not a rounding of the regular one:
+Arial Bold sets 6.6 % wider than Lato Bold, so a footer row of mixed weights measured with the regular
+allowance is rejected by its own step while setting correctly in the frame — measured at 828 px against
+an 818 px row where the frame sets it in 798. And the columns are per *installed* font: check which one
+`findfont` actually returns on the machine building the step rather than assuming Arial is there.
 
 **Do not "wrap a bit early to be safe".** It reads as prudent and it is not: the footer rows are sized
 so the template just fits them, so wrapping 6 % early broke both onto second lines the frame does not
@@ -305,7 +339,7 @@ lines at 12 px where a step's smaller footer took two.
   template px in an inch, which is what makes every slot figure in this file convert by a plain
   `px / 100`; matplotlib then writes the SVG root in points, so the 850 × 638 frame saves as
   `612pt × 459.36pt`, which Figma reads at the CSS 96 px per inch and imports at 0.96× the template
-  (816 × 612.48). Correct that with one uniform rescale on import (`/create-figma-chart` Step 7) — never
+  (816 × 612.48). Correct that with one uniform rescale on import (`/owid-staff:create-figma-chart` Step 7) — never
   by inflating `figsize`, which would instead put the slot conversion and every point-denominated font
   size in this file out by 1.39×.
 - One line of text occupies roughly `1.3 × fontsize` in points, i.e. `1.8 × fontsize` in template

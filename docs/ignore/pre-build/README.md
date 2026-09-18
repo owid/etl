@@ -58,7 +58,7 @@ python docs/ignore/pre-build/bake_metadata_reference.py
 
 **Outputs**:
 - `docs/architecture/metadata/reference/index.md` (Metadata reference for Dataset, Table, Indicator, Origin)
-- `docs/architecture/metadata/reference/collections.md` (Collections reference for MDIMs)
+- `docs/architecture/metadata/reference/charts.md` (Charts reference for charts and multidims)
 
 ---
 
