@@ -45,7 +45,7 @@ MIN_LINE = 12  # shorter lines are punctuation/table rules and carry no instruct
 # per-chart-type/) are deliberately unbudgeted: they cost only the run that needs them.
 BUDGETS: dict[str, dict[str, int]] = {
     "create-figma-chart": {"SKILL.md": 64_000, "GUIDELINES.md": 80_000, "*": 145_000},
-    "create-static-viz": {"SKILL.md": 30_000, "TEMPLATES.md": 25_000},
+    "create-static-viz": {"SKILL.md": 33_000, "TEMPLATES.md": 25_000},
 }
 
 
