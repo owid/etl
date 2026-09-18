@@ -1,0 +1,79 @@
+grapher_schema: "011"
+
+title:
+  title: Chickens killed to produce eggs
+  title_variant: ""
+topic_tags:
+  - Animal Welfare
+
+default_selection:
+  - World
+
+default_dimensions:
+  metric: total
+
+definitions:
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/animal-welfare
+        subtitle: Around half of the estimated total are hens, killed when their egg production declines. The other half are male chicks, which in most countries are killed within a day of hatching.
+        note: Estimates assume that each laying hen reported by FAOSTAT is killed after 62 weeks of laying. The estimated number of male embryos removed before hatching through in-ovo sexing is subtracted.
+        hasMapTab: true
+        tab: map
+        chartTypes: ["LineChart", "DiscreteBar"]
+        yAxis:
+          min: 0
+
+dimensions:
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: total
+        name: Total
+      - slug: per_capita
+        name: Per person
+      - slug: per_1000_eggs
+        name: Per 1,000 eggs
+
+views:
+  - dimensions:
+      metric: total
+    indicators:
+      y:
+        - catalogPath: chickens_killed_for_eggs#chickens_killed
+    config:
+      title: Chickens killed to produce eggs
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          # The leading 0 closes the bottom bracket, and the trailing 1 makes the top bracket open-ended.
+          customNumericValues: [0, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, 1000000000, 1]
+
+  - dimensions:
+      metric: per_capita
+    indicators:
+      y:
+        - catalogPath: chickens_killed_for_eggs#chickens_killed_per_capita
+    config:
+      title: Chickens killed to produce eggs per person
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          # The leading 0 closes the bottom bracket, and the trailing 1 makes the top bracket open-ended.
+          customNumericValues: [0, 0.5, 1, 1.5, 2, 2.5, 3, 4, 1]
+
+  - dimensions:
+      metric: per_1000_eggs
+    indicators:
+      y:
+        - catalogPath: chickens_killed_for_eggs#chickens_killed_per_1000_eggs
+    config:
+      title: Chickens killed to produce eggs per 1,000 eggs
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          # The leading 0 closes the bottom bracket, and the trailing 1 makes the top bracket open-ended.
+          customNumericValues: [0, 5, 7.5, 10, 12.5, 15, 20, 30, 1]
