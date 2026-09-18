@@ -1,0 +1,33 @@
+# TODO: Refresh for the September 2026 PIP release, then delete this block.
+# Cloned from the March 2026 vintage by `etl update` — every field below still describes it.
+#   - url_download:     the filename embeds the vintage and year span
+#                       (`GlobalDist1000bins_1990_2026_20260324_2021_01_02_PROD.dta`). Find the
+#                       new file at https://datacatalog.worldbank.org/search/dataset/0064304
+#                       and keep it consistent with GLOBAL_DIST_1000BINS_URL in the
+#                       world_bank_pip snapshot script — they must be the same vintage.
+#   - description:      "years 1990 to 2026" -> the new end year
+#   - version_producer: Version 6 -> the new version
+#   - citation_full / attribution: "March 2026" -> the new release month
+#   - date_published:   2026-03-30 -> the new release date
+meta:
+  origin:
+    producer: Mahler, Yonzan and Lakner
+    title: 1000 Binned Global Distribution
+    description: |-
+      This dataset contains a distribution of global welfare for the years 1990 to 2026. For each year, the dataset contains 1000 welfare (income or consumption) bins per country. The dataset reports the following variables: _code_—ISO 3-letter country code, World Bank regions, _regionpcn_—[regional classification](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#regionsandcountries) previously used in PIP, _quantile_—rank of the bin with 1 being the lowest welfare bin and 1000 the highest welfare bin, _welf_—average daily household per capita welfare values of each bin in 2021 PPP USD, and _pop_—population of the bin in millions. The welfare values are based on [lineup methodology](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html) in PIP.
+
+      Disclaimer:
+
+      The data should not be used in lieu of the full survey data, or in lieu of the poverty and inequality statistics that are estimated directly from the survey data. For these purposes, users should use the estimates available in the Poverty and Inequality Platform (PIP). The poverty and inequality statistics published in PIP are estimated directly from the survey data. For example, the binned database would result in a lower level of within-country inequality, since it does not account for the inequality within each bin.
+    citation_full: |-
+      Mahler, Daniel Gerszon; Yonzan, Nishant; Lakner, Christoph (2022). The Impact of COVID-19 on Global Inequality and Poverty. Policy Research Working Papers; 10198. © World Bank, Washington, DC. https://openknowledge.worldbank.org/entities/publication/54fae299-8800-585f-9f18-a42514f8d83b updated with Poverty and Inequality Platform (March 2026).
+    attribution: Lakner et al. (2022) (updated using World Bank PIP in March 2026)
+    version_producer: Version 6
+    url_main: https://datacatalog.worldbank.org/search/dataset/0064304
+    url_download: |-
+      https://datacatalogfiles.worldbank.org/ddh-published/0064304/DR0094424/GlobalDist1000bins_1990_2026_20260324_2021_01_02_PROD.dta
+    date_accessed: '2026-09-22'
+    date_published: '2026-03-30'
+    license:
+      name: CC BY 3.0 IGO DEED
+      url: https://datacatalog.worldbank.org/search/dataset/0064304/1000-Binned-Global-Distribution
