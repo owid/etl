@@ -14,11 +14,13 @@ import pyarrow.feather as feather
 import pyarrow.parquet as pq
 from owid.catalog.api.legacy import CHANNEL, LocalCatalog
 from owid.catalog.core.datasets import SUPPORTED_FORMATS, Dataset
+from owid.catalog.core.docs import ordered_table_names
 from owid.catalog.core.meta import TableMeta, VariableMeta
 from owid.catalog.schema_org import (
     DEFAULT_CATALOG_BASE_URL,
     ENTITY_TIME_DIMENSIONS,
     TableSchemaInput,
+    dataset_keywords,
     dataset_to_schema_org,
 )
 from structlog import get_logger
@@ -185,27 +187,24 @@ def build_catalog_page_artifacts(
                 jsonld = None
         if jsonld is None:
             result.skipped.append(quality)
-            if not dry_run:
-                _remove_if_exists(Path(ds.path) / DATASET_JSONLD_FILENAME)
-                _remove_if_exists(target_dir / DATASET_JSONLD_FILENAME)
         else:
             result.emitted.append(catalog_path)
             result.emitted_entries.append(entry)
             if quality.warnings or quality.table_warnings:
                 result.warnings.append(quality)
-            if not dry_run:
-                # The dataset used to be served at its dated catalog-folder path; that location is
-                # no longer written to, so clean up anything left over from a prior publish.
-                _remove_if_exists(Path(ds.path) / DATASET_JSONLD_FILENAME)
-                target_dir.mkdir(parents=True, exist_ok=True)
-                with open(target_dir / DATASET_JSONLD_FILENAME, "w") as ostream:
-                    json.dump(jsonld, ostream, indent=2, ensure_ascii=False)
-                    ostream.write("\n")
+        if not dry_run:
+            # The dataset used to be served at its dated catalog-folder path; that location is no longer
+            # written to, so clean up anything left over from a prior publish. A JSON-LD that failed its
+            # gates this time must not linger at the short key either.
+            _remove_if_exists(Path(ds.path) / DATASET_JSONLD_FILENAME)
+            if jsonld is None:
+                _remove_if_exists(target_dir / DATASET_JSONLD_FILENAME)
 
         if dry_run:
             result.pages.append(catalog_path)
             result.page_entries.append(entry)
         else:
+            # The page writer also writes the JSON-LD, so that its file list is the manifest's.
             try:
                 page_files = write_page_files(
                     ds,
@@ -214,7 +213,8 @@ def build_catalog_page_artifacts(
                     short_key=entry.short_key,
                     version=entry.version,
                     base_url=base_url,
-                    jsonld_written=jsonld is not None,
+                    jsonld=jsonld,
+                    topics=dataset_keywords(tables),
                 )
             except Exception as error:  # noqa: BLE001 - one broken dataset must not stop the whole publish.
                 log.error("catalog_pages.page_failed", dataset=catalog_path, error=str(error))
@@ -223,8 +223,6 @@ def build_catalog_page_artifacts(
             result.pages.append(catalog_path)
             result.page_entries.append(entry)
             result.page_keys.extend(page_files.keys)
-            if jsonld is not None:
-                result.page_keys.append(f"{entry.short_key}/{DATASET_JSONLD_FILENAME}")
 
         sitemap_entries.append(
             SitemapEntry(
@@ -374,9 +372,11 @@ def find_inactive_dataset_entries(
 
 
 def load_table_schema_inputs(ds: Dataset) -> list[TableSchemaInput]:
+    """The dataset's tables as JSON-LD inputs, main table first (the same order as the manifest and the page)."""
     tables = []
     dataset_path = Path(ds.path)
-    for meta_path in ds._metadata_files:
+    order = {name: index for index, name in enumerate(ordered_table_names(ds))}
+    for meta_path in sorted(ds._metadata_files, key=lambda path: order.get(Path(path).name.split(".")[0], len(order))):
         table_meta = _load_table_meta(Path(meta_path))
         if not table_meta.short_name:
             continue

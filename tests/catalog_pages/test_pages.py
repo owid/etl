@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
-from owid.catalog import Dataset, DatasetMeta, License, Origin, Table, VariableMeta
+from owid.catalog import Dataset, DatasetMeta, License, Origin, Table, VariableMeta, VariablePresentationMeta
 from owid.catalog.api.legacy import LocalCatalog
 
 from etl.catalog_pages.artifacts import build_catalog_page_artifacts
@@ -55,7 +55,11 @@ def _add_dataset(
         tb = tb.set_index(["country", "year"])
         tb.metadata.title = f"{name} table"
         tb._fields["hydro_energy_twh"] = VariableMeta(
-            title="Hydropower", description_short="Energy from hydropower.", unit="terawatt-hours", origins=[ORIGIN]
+            title="Hydropower",
+            description_short="Energy from hydropower.",
+            unit="terawatt-hours",
+            origins=[ORIGIN],
+            presentation=VariablePresentationMeta(topic_tags=["Energy"]),
         )
         ds.add(tb)
     ds.save()
@@ -79,6 +83,7 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
         "dataset.jsonld",
         "manifest.json",
         "owid_energy.csv",
+        "owid_energy.parquet",
         "owid_energy.xlsx",
         "readme.md",
         "sources.csv",
@@ -117,27 +122,51 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     sources = pd.read_csv(page_dir / "sources.csv")
     assert sources["label"].tolist() == ["Example Producer – Original dataset (2025)"]
     assert manifest["jsonld"] == "dataset.jsonld"
+    # The primary topic gives the page its way back to the charts.
+    assert manifest["topics"] == ["Energy"]
+    assert manifest["explore_url"] == "https://ourworldindata.org/search?q=Energy&resultType=all"
     assert manifest["tables"] == [
         {"name": "owid_energy", "title": "owid_energy table", "description": None, "rows": 2, "columns": 3}
     ]
     files = {entry["name"]: entry for entry in manifest["files"]}
-    assert set(files) == {
-        "owid_energy.csv",
-        "owid_energy.xlsx",
-        "codebook.csv",
-        "sources.csv",
-        "readme.md",
-        "owid_energy.feather",
+    assert {name: entry["role"] for name, entry in files.items()} == {
+        "owid_energy.csv": "data",
+        "owid_energy.parquet": "data",
+        "owid_energy.xlsx": "bundle",
+        "codebook.csv": "documentation",
+        "sources.csv": "documentation",
+        "readme.md": "documentation",
+        "owid_energy.feather": "archive",
     }
     csv = files["owid_energy.csv"]
     assert csv["format"] == "csv"
     assert csv["table"] == "owid_energy"
     assert csv["url"] == "https://catalog.ourworldindata.org/energy/owid_energy/owid_energy.csv"
     assert csv["size_bytes"] == (page_dir / "owid_energy.csv").stat().st_size > 0
+    parquet = files["owid_energy.parquet"]
+    assert parquet["table"] == "owid_energy"
+    assert pd.read_parquet(page_dir / "owid_energy.parquet").columns.tolist() == ["country", "year", "hydro_energy_twh"]
     feather = files["owid_energy.feather"]
     assert feather["versioned"] is True
     assert feather["url"] == f"https://catalog.ourworldindata.org/{catalog_path}/owid_energy.feather"
     assert all(entry["url"].startswith("https://") for entry in manifest["files"])
+
+    # The JSON-LD lists the same data files as the manifest, so search engines see the downloads the page has.
+    jsonld = json.loads((page_dir / "dataset.jsonld").read_text())
+    assert [entry["name"] for entry in jsonld["distribution"]] == [
+        "owid_energy.csv",
+        "owid_energy.parquet",
+        "owid_energy.xlsx",
+        "owid_energy.feather",
+    ]
+    assert jsonld["distribution"][0] == {
+        "@type": "DataDownload",
+        "name": "owid_energy.csv",
+        "encodingFormat": "text/csv",
+        "contentUrl": "https://catalog.ourworldindata.org/energy/owid_energy/owid_energy.csv",
+        "contentSize": str(csv["size_bytes"]),
+    }
+    assert jsonld["variableMeasured"][-1]["identifier"] == "hydro_energy_twh"
 
     sitemap = (data_dir / "sitemap.xml").read_text()
     assert "<loc>https://catalog.ourworldindata.org/energy/owid_energy/</loc>" in sitemap
@@ -154,9 +183,16 @@ def test_build_writes_one_csv_per_table(tmp_path: Path) -> None:
     page_dir = data_dir / "energy" / "owid_energy"
     assert (page_dir / "owid_energy.csv").exists()
     assert (page_dir / "extra_1.csv").exists()
+    assert (page_dir / "extra_1.parquet").exists()
     manifest = json.loads((page_dir / "manifest.json").read_text())
     # The main table (named after the dataset) comes first.
     assert [table["name"] for table in manifest["tables"]] == ["owid_energy", "extra_1"]
+    # A multi-table dataset still has the variables of its main table and every table's files at the top level
+    # of its JSON-LD, which is what Dataset Search reads.
+    jsonld = json.loads((page_dir / "dataset.jsonld").read_text())
+    assert [variable["identifier"] for variable in jsonld["variableMeasured"]] == ["hydro_energy_twh"]
+    assert {entry["name"] for entry in jsonld["distribution"]} >= {"owid_energy.csv", "extra_1.csv", "extra_1.parquet"}
+    assert [part["identifier"] for part in jsonld["hasPart"]] == ["owid_energy", "extra_1"]
     codebook = pd.read_csv(page_dir / "codebook.csv")
     assert codebook.columns.tolist()[:2] == ["table", "column"]
 

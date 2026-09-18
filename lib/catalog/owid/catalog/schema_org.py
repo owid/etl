@@ -146,7 +146,7 @@ def dataset_to_schema_org(
     if based_on:
         result["isBasedOn"] = based_on
 
-    keywords = _keywords(tables)
+    keywords = dataset_keywords(tables)
     if keywords:
         result["keywords"] = keywords
 
@@ -158,18 +158,30 @@ def dataset_to_schema_org(
     if spatial_coverage:
         result["spatialCoverage"] = spatial_coverage
 
-    if len(tables) == 1:
-        table = tables[0]
-        variables = _variable_measured(table)
+    # The top-level Dataset always carries `variableMeasured` and `distribution`: Google Dataset Search reads
+    # the files and columns of a record from there, and never descends into `hasPart`. For a single-table
+    # dataset that is the table itself. For a multi-table dataset the main table (the one named after the
+    # dataset, else the first) supplies the variables, every table contributes its files, and the tables are
+    # additionally described one by one in `hasPart`.
+    if tables:
+        main_table = _main_table(tables, dataset_meta)
+        variables = _variable_measured(main_table)
         if variables:
             result["variableMeasured"] = variables
-        distributions = _distributions(file_base_url, table)
+        distributions = [entry for table in tables for entry in _distributions(file_base_url, table)]
         if distributions:
             result["distribution"] = distributions
-    elif tables:
+    if len(tables) > 1:
         result["hasPart"] = [_table_dataset(dataset_url, file_base_url, table, dataset_meta) for table in tables]
 
     return _drop_empty(result)
+
+
+def _main_table(tables: list[TableSchemaInput], dataset_meta: DatasetMeta) -> TableSchemaInput:
+    for table in tables:
+        if table.short_name == dataset_meta.short_name:
+            return table
+    return tables[0]
 
 
 def table_description(table: TableSchemaInput, dataset_meta: DatasetMeta) -> str | None:
@@ -461,7 +473,7 @@ def _spatial_coverage(tables: list[TableSchemaInput]) -> str | None:
     return None
 
 
-def _keywords(tables: list[TableSchemaInput]) -> list[str]:
+def dataset_keywords(tables: list[TableSchemaInput]) -> list[str]:
     """Topic tags ordered by how many variables carry each one, most-tagged first.
 
     Column order would put whichever tag the first column happens to carry in front (e.g.

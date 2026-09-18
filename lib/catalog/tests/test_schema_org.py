@@ -193,7 +193,10 @@ def test_multi_table_dataset_uses_has_part() -> None:
         tables=tables,
     )
 
-    assert "variableMeasured" not in jsonld
+    # The top level keeps what Dataset Search reads: the variables of the main table (no table is named after
+    # the dataset here, so the first one) and the files of every table.
+    assert [variable["identifier"] for variable in jsonld["variableMeasured"]] == ["value"]
+    assert [entry["name"] for entry in jsonld["distribution"]] == ["table_a.feather", "table_b.feather"]
     assert [part["identifier"] for part in jsonld["hasPart"]] == ["table_a", "table_b"]
     # @id uses the short page_path...
     assert jsonld["hasPart"][0]["@id"] == "https://catalog.ourworldindata.org/example/example_dataset/#table-table_a"
