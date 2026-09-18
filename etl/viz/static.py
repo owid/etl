@@ -27,22 +27,37 @@ Typical use:
         tb = paths.load_dataset("population").read("historical")
         fig = build(tb, source_citation(tb["population"]))
         export_frame(paths, fig, paths.short_name, template="horizontal")
+
+A sketch outside `etl/steps` — a prototype rendered from a local data file before any ETL step
+exists (`.claude/skills/create-static-viz/reference/SKETCHING.md`) — swaps only the `paths` line
+and the loader, so promoting it to a step is a two-line edit:
+
+    from etl.viz.static import SketchPaths, TEMPLATES, apply_svg_rcparams, export_frame
+
+    paths = SketchPaths(__file__)
+
+    def run() -> None:
+        tb = load_data()  # reads the file next to the sketch
+        fig = build(tb, "Producer (2026)")
+        export_frame(paths, fig, paths.short_name, template="horizontal")
 """
 
 from __future__ import annotations
 
 from collections.abc import Iterable
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, NamedTuple
 
 import matplotlib
+import structlog
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle only matters for type checkers
     from etl.helpers import PathFinder
 
 # A template pixel is 0.72pt, and these figures are built at 100 template px per inch. Figma imports
 # at 96px/in, so a figure saved at this scale arrives 0.96x and needs one uniform rescale in
-# `/create-figma-chart` Step 7 — never a bigger `figsize`, which would put the slot conversion and
-# every point-denominated font size out by 1.39x.
+# `/owid-staff:create-figma-chart` Step 7 — never a bigger `figsize`, which would put the slot
+# conversion and every point-denominated font size out by 1.39x.
 PIXELS_PER_INCH = 100
 
 # Deterministic SVG output: without a fixed salt, matplotlib's internal ids change between runs and
@@ -107,8 +122,70 @@ def unclip(fig: Any) -> None:
         artist.set_clip_on(False)
 
 
+# Metadata that makes an exported figure reproducible, per format. matplotlib stamps the
+# timestamp and its own version into every file, so without this an unchanged figure re-rendered
+# under a new matplotlib produces a diff with no pixel change — measured on 3.10.8 -> 3.10.9,
+# which rewrote all ten committed static_viz outputs and altered nothing but `<dc:title>` and
+# PNG `Software`. A byte diff should mean the picture changed.
+# `Title` cannot be nulled: the SVG backend type-checks it and raises on None.
+REPRODUCIBLE_METADATA: dict[str, dict[str, None]] = {
+    "svg": {"Date": None, "Creator": None},
+    "png": {"Software": None},
+}
+
+
+def save_fig(
+    directory: Path,
+    fig: Any,
+    filename: str,
+    extensions: Iterable[str],
+    *,
+    log: Any = None,
+    **kwargs: Any,
+) -> list[Path]:
+    """Save `fig` as `<directory>/<filename>.<ext>` for each extension, stripping matplotlib's stamps.
+
+    This is the save discipline `PathFinder.export_fig` applies, lifted here so a sketch outside
+    `etl/steps` gets the same reproducible output. A ``metadata`` kwarg is merged over the
+    per-format defaults rather than replacing them, so a caller can add fields without
+    re-introducing the version stamp. Returns the paths written.
+    """
+    written: list[Path] = []
+    for ext in extensions:
+        path = Path(directory) / f"{filename}.{ext}"
+        save_kwargs: dict[str, Any] = {"fname": path, "format": ext, **kwargs}
+        defaults = REPRODUCIBLE_METADATA.get(ext)
+        if defaults is not None:
+            save_kwargs["metadata"] = {**defaults, **(kwargs.get("metadata") or {})}
+        fig.savefig(**save_kwargs)
+        if log is not None:
+            log.info(f"Saved chart to {path}")
+        written.append(path)
+    return written
+
+
+class SketchPaths:
+    """`PathFinder` stand-in for a sketch that lives outside `etl/steps`.
+
+    Exposes the surface a `viz://static` step touches — `.directory`, `.short_name`, `.log` and
+    `.export_fig` — so a sketch is written in the exact shape of a step and promoting it swaps this
+    one line for `PathFinder(__file__)`. There is no DAG, no dependencies and no `load_dataset`: a
+    sketch loads its own file.
+    """
+
+    def __init__(self, __file__: str | Path):
+        self.f = Path(__file__).resolve()
+        self.directory = self.f.parent
+        # The sketch directory is the slug; the file is always `sketch.py`, so its stem says nothing.
+        self.short_name = self.directory.name
+        self.log = structlog.get_logger(sketch=self.short_name)
+
+    def export_fig(self, fig: Any, filename: str, extensions: list[str], **kwargs: Any) -> None:
+        save_fig(self.directory, fig, filename, extensions, log=self.log, **kwargs)
+
+
 def export_frame(
-    paths: PathFinder,
+    paths: PathFinder | SketchPaths,
     fig: Any,
     short_name: str,
     *,
@@ -126,8 +203,8 @@ def export_frame(
       opaque `patch_1` in the SVG paints over it — a defect `verify_static_viz.py` does not check
       for and which looks identical in the PNG.
 
-    Both come out reproducible — `PathFinder.export_fig` strips matplotlib's version stamp — so a
-    byte diff on a committed output means the picture changed, not that matplotlib was upgraded.
+    Both come out reproducible — `save_fig` strips matplotlib's version stamp — so a byte diff on a
+    committed output means the picture changed, not that matplotlib was upgraded.
 
     `template` is optional and only validates: it asserts the figure's `figsize` matches that
     template, catching a `figsize` typo or a stray `bbox_inches="tight"` before the file is written.

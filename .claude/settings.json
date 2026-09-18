@@ -23,7 +23,8 @@
       "source": {
         "source": "github",
         "repo": "owid/skills-private"
-      }
+      },
+      "autoUpdate": true
     }
   },
   "enabledPlugins": {

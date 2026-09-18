@@ -48,3 +48,5 @@ faostat_rl,007208,Share in Agricultural land,Share in agricultural land,Percent,
 faostat_rl,007209,Share in Land area,Share in land area,Percent,%,percent,%,,,,,0,0
 faostat_rp,005157,Agricultural Use,Agricultural use,Tonnes,t,tonnes,t,,Amount used in the agricultural sector in the year,,,0,0
 faostat_rp,005159,Use per area of cropland,Use per area of cropland,Kilograms per hectare,kg/ha,kilograms per hectare,kg/ha,,,,,0,0
+faostat_qv,000057,Gross Production Value (current thousand US$),Gross production value,thousand US Dollar,1000 USD,current US$,$,1000,,,,0,0
+faostat_qv,000058,Gross Production Value (constant 2014-2016 thousand US$),Gross production value,thousand US Dollar,1000 USD,constant 2014-2016 US$,$,1000,,,,0,0
