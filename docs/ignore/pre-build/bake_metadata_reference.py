@@ -6,9 +6,9 @@ by mkdocs-gen-files plugin. Run this before building docs with Zensical.
 """
 
 from etl.docs import (
-    render_collection,
-    render_collection_view_config,
-    render_collection_view_metadata,
+    render_chart,
+    render_chart_view_config,
+    render_chart_view_metadata,
     render_dataset,
     render_indicator,
     render_origin,
@@ -60,27 +60,27 @@ def generate_metadata_reference():
 
 
 ############################################################
-# COLLECTIONS (MULTIDIM)
+# CHARTS (MULTIDIM)
 ############################################################
 
-header_collections = """---
+header_charts = """---
 tags:
-  - Collections
+  - Charts
   - Multidim
   - Explorers
 icon: material/api
 ---
 
-# Collections reference
+# Charts reference
 
 !!! warning "AI-Generated Documentation"
     This documentation was generated with AI assistance and is currently under construction. The content is dynamically generated from `schemas/multidim-schema.json`. If you notice any inconsistencies or missing information, please check the source schema file or report the issue.
 
-Multi-dimensional collections (MDIMs) are interactive data explorers that allow users to explore datasets across multiple dimensions. This reference documents the schema structure for defining collections.
+Charts and multidims are defined in ETL by a config that names their dimensions, views and metadata. This reference documents that schema.
 
 <div class="grid cards" markdown>
 
-- __[Collection](#collection)__ - Main collection configuration
+- __[Chart](#chart)__ - Main chart configuration
 - __[View Config](#viewconfig)__ - Chart and visualization configuration
 - __[View Metadata](#viewmetadata)__ - Data presentation metadata
 
@@ -89,15 +89,15 @@ Multi-dimensional collections (MDIMs) are interactive data explorers that allow 
 """
 
 
-def generate_collections_reference():
-    """Generate collections reference"""
-    output_path = DOCS_DIR / "architecture/metadata/reference/collections.md"
+def generate_charts_reference():
+    """Generate charts reference"""
+    output_path = DOCS_DIR / "architecture/metadata/reference/charts.md"
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    text_collection = render_collection(level=2)
-    text_view_config = render_collection_view_config(level=2)
-    text_view_metadata = render_collection_view_metadata(level=2)
-    text = header_collections + text_collection + text_view_config + text_view_metadata
+    text_chart = render_chart(level=2)
+    text_view_config = render_chart_view_config(level=2)
+    text_view_metadata = render_chart_view_metadata(level=2)
+    text = header_charts + text_chart + text_view_config + text_view_metadata
 
     with open(output_path, "w") as f:
         f.write(text)
@@ -116,7 +116,7 @@ def main():
     print()
 
     generate_metadata_reference()
-    generate_collections_reference()
+    generate_charts_reference()
 
     print()
     print("✓ All dynamic documentation files generated successfully!")

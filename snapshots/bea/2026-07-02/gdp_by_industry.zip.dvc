@@ -4,7 +4,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: GDP by Industry
-    title_snapshot: GDP by Industry - Value added by industry
+    title_snapshot: GDP by Industry – Value added by industry
     description: |-
       An industry-by-industry breakdown of gross domestic product. In addition to showing each industry's contribution to the U.S. economy, known as its value added, these statistics include industries' compensation of employees, gross operating surplus, and taxes.
 

@@ -599,3 +599,16 @@ steps:
   # archived; last active in e2c57887abcb on 2026-09-07
   export://explorers/lis/latest/inequality_lis:
     - data://grapher/lis/2026-06-12/luxembourg_income_study
+  # archived; last active in 9ecc2c84d6a9 on 2026-09-17
+  data://garden/lis/2026-06-12/luxembourg_income_study:
+    - data://meadow/lis/2026-06-12/luxembourg_income_study
+  # archived; last active in 9ecc2c84d6a9 on 2026-09-17
+  data://meadow/lis/2026-06-12/luxembourg_income_study:
+    - snapshot://lis/2026-06-12/lis_relative_poverty.csv
+    - snapshot://lis/2026-06-12/lis_percentiles.csv
+    - snapshot://lis/2026-06-12/lis_incomes.csv
+    - snapshot://lis/2026-06-12/lis_inequality.csv
+    - snapshot://lis/2026-06-12/lis_absolute_poverty.csv
+  # archived; last active in 9ecc2c84d6a9 on 2026-09-17
+  data://grapher/lis/2026-06-12/luxembourg_income_study:
+    - data://garden/lis/2026-06-12/luxembourg_income_study

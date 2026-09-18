@@ -30,7 +30,7 @@ def _correction(**overrides):
         "indicator": "value",
         "action": "drop",
         "reason": "Test reason.",
-        "provider": "Test provider.",
+        "producer": "Test producer.",
         "status": "open",
     }
     base.update(overrides)
@@ -164,7 +164,7 @@ def test_load_corrections_accepts_column_reference_match(tmp_path):
         "  match: {country: Belgium, year: 2025, value: {column: free_range}}\n"
         "  action: drop\n"
         "  reason: r\n"
-        "  provider: p\n"
+        "  producer: p\n"
         "  status: open\n"
     )
     corrections = load_corrections(p)
@@ -240,7 +240,7 @@ def test_load_corrections_validates(tmp_path):
         "  years: [2006]\n"
         "  action: drop\n"
         "  reason: r\n"
-        "  provider: p\n"
+        "  producer: p\n"
         "  status: open\n"
     )
     corrections = load_corrections(p)
@@ -251,7 +251,7 @@ def test_load_corrections_rejects_missing_required_field(tmp_path):
     p = tmp_path / "x.corrections.yml"
     # Missing 'reason'.
     p.write_text(
-        "- indicator: value\n  entity: Panama\n  years: [2006]\n  action: drop\n  provider: p\n  status: open\n"
+        "- indicator: value\n  entity: Panama\n  years: [2006]\n  action: drop\n  producer: p\n  status: open\n"
     )
     with pytest.raises(AssertionError, match="missing required 'reason'"):
         load_corrections(p)
@@ -416,7 +416,7 @@ def test_load_corrections_rejects_both_entity_and_match(tmp_path):
         "  match: {value: 4.5}\n"
         "  action: drop\n"
         "  reason: r\n"
-        "  provider: p\n"
+        "  producer: p\n"
         "  status: open\n"
     )
     with pytest.raises(AssertionError, match="exactly one of"):

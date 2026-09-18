@@ -3,6 +3,7 @@ name: review-data-pr
 description: Review an OWID ETL data update PR end-to-end — runs the pipeline, compares snapshot fields against the previous version, verifies links, audits indicator metadata coverage, and cross-checks workflow items from /update-dataset. Trigger when the user asks to "review this PR", "review the data PR", or invokes this on an open dataset-update branch.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Review Data PR
@@ -56,7 +57,7 @@ When it's a restructure:
 - **Don't expect the auto-Indicator-Upgrader to have remapped charts.** When short_names differ entirely, the upgrader has nothing to match on. Look for a hand-curated v1 title → v2 title mapping table in the PR description (or a follow-up PR thread). 🟡 if charts on the old chain are still published but no mapping plan exists.
 - **Don't expect a `.py` step copy from the old version.** Step files should be authored from scratch, not produced by `etl update` rename. If the new step files look mechanically renamed (same logic, just version-bumped strings), flag 🟡 — the author may have skipped restructure-specific decisions.
 - **A chart remapped onto a successor indicator needs a config-vs-shape check.** Verify its pinned `selectedEntityNames` exist in the successor's data (v1 regional aggregates often don't — expect the garden step to rebuild them, mirroring the retired step's method), that pinned `yAxis` bounds don't clip the new range, and that the subtitle doesn't still describe the old construction. Any of the three broken: 🔴 (the default view renders empty, clipped, or mislabeled).
-- **Slack + `/latest` drafts are not expected in the PR body at all.** `/update-dataset` keeps them in the author's `workbench/` (steps 9 / 9b, owned by `/data-updates-comms` and `/data-update-announcement`), so their absence from the PR is correct — don't flag it.
+- **Slack + `/latest` drafts are not expected in the PR body at all.** `/update-dataset` keeps them in the author's `workbench/` (steps 9 / 9b, owned by `/draft-data-update-slack-post` and `/owid-staff:draft-data-update-post`), so their absence from the PR is correct — don't flag it.
 
 ### 4. Run the full pipeline end-to-end
 
@@ -137,7 +138,7 @@ Run after the §4 pipeline build. Three checks:
 
 1. **Garden log warnings.** Re-run the garden step capturing output and scan for the three stable warning strings:
    ```bash
-   .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --private --force --only \
+   .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --force --only \
        > /tmp/<short_name>_harmon.log 2>&1
    rg -n "missing values in mapping\.|unused values in mapping\.|Unknown country names in excluded countries file:" /tmp/<short_name>_harmon.log
    ```
@@ -209,7 +210,7 @@ Any `NULL` row is a 🔴.
 
 ### 10. Metadata quality skills
 
-Run `/check-metadata-typos`, `/check-metadata-spacing`, `/check-metadata-style` against the new garden + grapher `.meta.yml` files. See `/update-dataset` § 6b for the full procedure (typos / spacing / style + a manual clarity checklist for general-audience readability — apply that checklist here too). Report findings as 🟡 (or 🔴 if a violation breaks rendering or makes the text outright misleading).
+Run `/check-metadata-typos` and `/check-metadata-style` against the new garden + grapher `.meta.yml` files. See `/update-dataset` § 6b for the full procedure (typos / whitespace + style / a manual clarity checklist for general-audience readability — apply that checklist here too). Report findings as 🟡 (or 🔴 if a violation breaks rendering or makes the text outright misleading).
 
 Also grep the metadata **prose** for numbers carried over from the previous release (country counts, category counts, year ranges in `description_key`/descriptions): validated fields are covered by checks, prose numbers are not — a panel-composition change (dropped country, new category set) silently strands them (see `/update-dataset` Guardrails, "Grep metadata prose"). Stale prose count: 🟡.
 
@@ -225,9 +226,9 @@ Five further prose checks from `/update-dataset` § 6b that the skills don't aut
 
 ### 10b. Adversarial data review (optional to run — always offer it)
 
-`/update-dataset` § 6c-bis offers an adversarial factual review via [`/adversarial-data-review`](../adversarial-data-review/SKILL.md) — optional to *run* because it's token-heavy (~25–45 web calls), so **a missing report is not a finding**; don't flag its absence. If the author didn't run it, **you MUST offer it to the user** as an optional add-on to this review (name the token cost; in review context it runs in that skill's spot-check scope, not the full author scope) — surfacing this offer is mandatory, never silently skip it — and recommend accepting when the update carries red flags: large unexplained value churn, an in-place source revision, a producer new to us, or editorial claims riding on specific values. Run it on opt-in.
+`/update-dataset` § 6c-bis offers an adversarial factual review via [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) — optional to *run* because it's token-heavy (~25–45 web calls), so **a missing report is not a finding**; don't flag its absence. If the author didn't run it, **you MUST offer it to the user** as an optional add-on to this review (name the token cost; in review context it runs in that skill's spot-check scope, not the full author scope) — surfacing this offer is mandatory, never silently skip it — and recommend accepting when the update carries red flags: large unexplained value churn, an in-place source revision, a producer new to us, or editorial claims riding on specific values. Run it on opt-in.
 
-When the PR body (or `workbench/<short_name>/update-context.yml`) does reference an `ai/adversarial-review-<short_name>-<date>.md` report, verify the **outcome**: its 🔴 findings must be resolved — metadata edited, or a `<short_name>.corrections.yml` added with `reason`/`provider`/`status` filled in. Then spot-check independently — don't take the report's word for it: re-verify 2–3 of its findings and 2–3 anchor values (World total + one major country, latest year) against an independent source yourself, following that skill's independence rules (a different producer measuring the same quantity; never OWID republishers or mirrors of the same producer). A value you confirm wrong that the report missed or waved through is 🔴.
+When the PR body (or `workbench/<short_name>/update-context.yml`) does reference an `ai/adversarial-review-<short_name>-<date>.md` report, verify the **outcome**: its 🔴 findings must be resolved — metadata edited, or a `<short_name>.corrections.yml` added with `reason`/`producer`/`status` filled in. Then spot-check independently — don't take the report's word for it: re-verify 2–3 of its findings and 2–3 anchor values (World total + one major country, latest year) against an independent source yourself, following that skill's independence rules (a different producer measuring the same quantity; never OWID republishers or mirrors of the same producer). A value you confirm wrong that the report missed or waved through is 🔴.
 
 ### 10c. Referencing-prose check
 
@@ -293,7 +294,7 @@ After excluding the dataset's own chain, any remaining hits are downstream consu
 
 **Silent-breakage check (when consumers were repointed in this PR).** Mirrors `/update-dataset` § "Silent-breakage check". If the PR bumps downstream consumers to the new version (rather than deferring them), a consumer can still build green while quietly losing data — a region aggregate that goes NaN, a reclassified country that disappears, a join that stops matching. A green pipeline run does **not** prove coverage held. Verify with the two existing instruments:
 
-1. **Downstream builds:** check the **`buildkite/etl-automated-staging-environment`** status on the PR — the staging bake runs `etl run ... --modified --continue-on-failure`, which re-raises the first failure at the end, so any consumer crash turns the check red. A red check is a 🔴 in itself, and it also means the data-diff report **under-reports** (dependents of the failed step are skipped, stay stale in the catalog, and diff as unchanged) — don't accept report verdicts until the check is green. `.venv/bin/etlr --modified --private --dry-run` lists the affected scope locally when you need the list.
+1. **Downstream builds:** check the **`buildkite/etl-automated-staging-environment`** status on the PR — the staging bake runs `etl run ... --modified --continue-on-failure`, which re-raises the first failure at the end, so any consumer crash turns the check red. A red check is a 🔴 in itself, and it also means the data-diff report **under-reports** (dependents of the failed step are skipped, stay stale in the catalog, and diff as unchanged) — don't accept report verdicts until the check is green. `.venv/bin/etlr --modified --dry-run` lists the affected scope locally when you need the list.
 2. **Value changes:** open owidbot's **data-diff** HTML report (`https://catalog.ourworldindata.org/diffs/<sanitized_branch>/data-diff.html`, easiest via the **full report** link in owidbot's PR comment — the path keeps the branch name's dots and underscores and replaces only characters outside `[A-Za-z0-9._-]` (e.g. `/`) with `-` — unlike the staging *subdomain*, which does replace `.`/`_`) — staging (new dep) vs production (old dep) — and read its verdicts rather than scanning the diff: every red **"− lost N data point(s)"** entry in the "Top changes" list and every dataset with a red coverage chip is a coverage loss to triage (legitimate churn vs. a silent drop); 🔴-tier datasets (median anomaly score ≥ 15%) get a review, 🟡 a skim, 🟢 is noise. The 📝 metadata-only filter separates pure metadata edits. Locally: `.venv/bin/etl diff REMOTE data/ --changed --include garden --output-html data-diff.html`. (Local build+diff only for small fan-outs; at foundational-dataset scale — hundreds of downstream steps — use owidbot's hosted report and treat any local rebuild as a one-time gate, ~35 min / ~7 GB.) Then run the **full-report audit probes** from `/update-dataset` § "Silent-breakage check" over all changed datasets: structural changes / "World" rows / raw-country rows / >30%-of-rows indicators / **wipe-vs-edge for every coverage loss**. An entity losing *all* its rows is the bug signature — classically a stale pinned-country requirement nulling a whole income-group aggregate after a reclassification (build-time `ValueError` since the geo guard, but verify) — while sparse-edge losses are membership churn.
 
 Any downstream build failure, dropped table/column/entity, or all-NaN series is a 🔴 (the update silently dropped data downstream) unless the author has already triaged it in the PR body. If consumers were **deferred** to a follow-up PR, these checks belong to that PR — here just confirm the "Downstream dependencies" list is complete.

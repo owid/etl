@@ -1,10 +1,10 @@
 meta:
   origin:
-    title: "Global Terrorism Database (2020-2021)"
+    title: "Global Terrorism Database (2020–2021)"
     date_published: "2022"
     producer: National Consortium for the Study of Terrorism and Responses to Terrorism (START)
     citation_full: |-
-      START (National Consortium for the Study of Terrorism and Responses to Terrorism). (2022). Global Terrorism Database, 1970 - 2020 [data file]. https://www.start.umd.edu/gtd
+      START (National Consortium for the Study of Terrorism and Responses to Terrorism). (2022). Global Terrorism Database, 1970–2020 [data file]. https://www.start.umd.edu/gtd
     attribution_short: GTD
     url_main: https://www.start.umd.edu/gtd/
     date_accessed: '2023-07-20'

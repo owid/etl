@@ -630,7 +630,7 @@ views:
   # the mortality trajectory is shared across all three. The source file
   # (WPP2024_GEN_F01_DEMOGRAPHIC_INDICATORS_FULL.xlsx) publishes the same mortality
   # values against each fertility variant. We keep all three variants wired up here
-  # so the collection honestly reflects what UN WPP publishes, even though the chart
+  # so the multidim honestly reflects what UN WPP publishes, even though the chart
   # looks unchanged when the user toggles the scenario.
   - dimensions:
       indicator: infant_mortality_rate

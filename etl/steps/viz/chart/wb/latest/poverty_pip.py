@@ -1,4 +1,5 @@
 from etl.helpers import PathFinder
+from etl.viz import filter_columns_by_dimension_choices
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -23,38 +24,31 @@ DIMENSIONS_CONFIG = {
 # etlr multidim
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # load table using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("world_bank_pip")
     tb = ds.read("poverty", load_data=False)
 
-    # Remove unwanted dimensions.
-    # NOTE: This is a temporary solution until we figure out how to deal with missing dimensions.
-    columns_to_keep = []
-    for column in tb.drop(columns=["country", "year"]).columns:
-        # Keep only indicators for a specific PPP year, and then remove that dimension.
-        if ("ppp_version" in tb[column].metadata.dimensions) and tb[column].metadata.dimensions[
-            "ppp_version"
-        ] == PPP_YEAR:
-            columns_to_keep.append(column)
-            tb[column].metadata.dimensions.pop("ppp_version")
+    # Keep only indicators for a specific PPP year, and drop that dimension.
+    tb = filter_columns_by_dimension_choices(tb, {"ppp_version": PPP_YEAR})
 
-        # Remove dimensions that are not needed.
-        for dimension in ["welfare_type"]:
-            if dimension in tb[column].metadata.dimensions:
-                tb[column].metadata.dimensions.pop(dimension)
-    tb = tb[columns_to_keep]
+    # Remove dimensions that are not needed.
+    for column in tb.columns:
+        dimensions = tb[column].metadata.dimensions
+        if dimensions:
+            for dimension in ["welfare_type"]:
+                dimensions.pop(dimension, None)
 
     # Get all survey_comparability values except "No spells" for spell views
     survey_comp_values = set()
     for col in tb.columns:
-        if "survey_comparability" in tb[col].metadata.dimensions:
+        if tb[col].metadata.dimensions and "survey_comparability" in tb[col].metadata.dimensions:
             survey_comp_values.add(tb[col].metadata.dimensions["survey_comparability"])
     survey_comp_spells = [v for v in survey_comp_values if v != "No spells"]
 
     # Create mdim
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         short_name="poverty_pip",
         tb=tb,

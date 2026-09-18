@@ -87,7 +87,7 @@ dimensions:
       - slug: stages
         name: By stage of supply chain
 
-# Most views are produced by `paths.create_collection(tb=[tb_poore, tb_clark], ...)` and
+# Most views are produced by `paths.create_chart(tb=[tb_poore, tb_clark], ...)` and
 # `c.group_views(...)` in food_footprints.py. The single hand-listed view below is the
 # 8-indicator lifecycle-stage stacked bar — it draws from a third dataset
 # (food_emissions_by_life_cycle_stage) and doesn't fit the auto-expansion shape.

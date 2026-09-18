@@ -12,13 +12,13 @@ meta:
       This makes the MPI and its linked information platform invaluable as an analytical tool to identify the most vulnerable people – the poorest among the poor, revealing poverty patterns within countries and over time, enabling policy makers to target resources and design policies more effectively.
 
       The global MPI was developed by OPHI with the UN Development Programme (UNDP) for inclusion in UNDP’s flagship Human Development Report in 2010. It has been published annually by OPHI and in the HDRs ever since.
-    title_snapshot: Global Multidimensional Poverty Index (MPI) - Harmonized over time (HOT)
+    title_snapshot: Global Multidimensional Poverty Index (MPI) – Harmonized over time (HOT)
     description_snapshot: |-
       This dataset contains harmonized over time (HOT) estimates. This harmonization seeks to make two or more MPI estimations comparable by aligning the indicator definitions in each survey.
     citation_full: |-
       - Alkire, S., Mishra, R., Selden, L. and Suppa, N. (2025). A methodological note on the global Multidimensional Poverty Index (MPI) 2025: Changes over time results for 88 countries, OPHI MPI Methodological Note 63, Oxford Poverty and Human Development Initiative (OPHI), University of Oxford.
       - Alkire, S., Mishra, R., Selden, L. and Suppa, N. (2025). The Global Multidimensional Poverty Index (MPI) 2025. Disaggregation Results and Methodological Note. OPHI MPI Methodological Note 62, Oxford Poverty and Human Development Initiative, University of Oxford.
-    attribution: Alkire et al. (2025) - The Global Multidimensional Poverty Index (MPI) 2025
+    attribution: Alkire et al. (2025) – The Global Multidimensional Poverty Index (MPI) 2025
     version_producer: '2025'
     url_main: https://ophi.org.uk/global-mpi
     url_download: https://cloud-ophi.qeh.ox.ac.uk/index.php/s/nmrnMs2oaLNDKx7/download?path=%2F&files=GMPI_HOT_2025_puf.csv

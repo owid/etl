@@ -22,7 +22,7 @@
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["indicator", "action", "reason", "provider", "status"],
+    "required": ["indicator", "action", "reason", "producer", "status"],
     "properties": {
       "indicator": {
         "type": "string",
@@ -91,19 +91,19 @@
         "minLength": 1,
         "description": "Why this is a known error (human-readable)."
       },
-      "provider": {
+      "producer": {
         "type": "string",
         "minLength": 1,
-        "description": "The upstream data provider."
+        "description": "The upstream data producer."
       },
       "status": {
         "enum": ["open", "reported", "acknowledged", "fixed_upstream"],
-        "description": "Reporting status with the provider."
+        "description": "Reporting status with the producer."
       },
       "reported": {
         "type": "string",
         "format": "date",
-        "description": "Date we reported the error to the provider (optional)."
+        "description": "Date we reported the error to the producer (optional)."
       }
     },
     "oneOf": [

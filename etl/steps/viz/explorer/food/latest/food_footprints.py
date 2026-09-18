@@ -8,7 +8,7 @@ Two upstream tables back the explorer:
   biodiversity columns ignored)
 
 Each column is tagged with `m.dimensions = {view_type, impact, unit, by_stage}` and a unifying
-`m.original_short_name = "footprint"`, so `paths.create_collection(tb=[poore, clark], ...)`
+`m.original_short_name = "footprint"`, so `paths.create_chart(tb=[poore, clark], ...)`
 auto-expands 35 single-indicator views. `c.group_views(...)` then adds 4 facet views
 (`impact=all_impacts`, one per unit) and 5 compare-units views (`unit=compare_units`, one per
 impact), all on the Specific-food-products side. `c.drop_views(...)` removes the equivalent
@@ -67,7 +67,7 @@ def tag_dimensions(tb, view_type: str, impact_map: dict, unit_map: dict):
     """Set `m.dimensions` and `m.original_short_name` on every footprint column.
 
     Untagged columns (e.g. Clark's biodiversity_*, which the explorer doesn't show) are left
-    alone and ignored by `create_collection`'s expander.
+    alone and ignored by `create_explorer`'s expander.
     """
     # Declare dimension slots on the table-level metadata so the expander can find them.
     if isinstance(tb.metadata.dimensions, list):
@@ -133,7 +133,7 @@ UNIT_NOUN = {
 
 def _dim(view, key):
     """Safe accessor — `view.d.<key>` raises AttributeError on missing keys, which can
-    happen for views emitted by `combine_collections` (e.g. the auto-added `collection__slug`
+    happen for views emitted by `combine_charts` (e.g. the auto-added `chart__slug`
     dim) or for any future grouped view that drops a dimension. Reading from
     `view.dimensions` directly with `.get()` keeps the lambdas robust."""
     return view.dimensions.get(key)
@@ -196,7 +196,7 @@ POORE_UNITS = ["per_kg", "per_100g_protein", "per_1000kcal"]  # no per_100g_fat
 
 
 def run() -> None:
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     ds_poore = paths.load_dataset("environmental_impacts_of_food__poore__and__nemecek__2018")
     tb_poore = ds_poore.read("environmental_impacts_of_food__poore__and__nemecek__2018", load_data=False)
@@ -208,7 +208,7 @@ def run() -> None:
 
     # Per-table dimensions: each table only carries values for its own view_type and the
     # units it actually has columns for (Poore has no per_100g_fat).
-    c = paths.create_collection(
+    c = paths.create_explorer(
         config=config,
         tb=[tb_poore, tb_clark],
         indicator_names="footprint",
@@ -227,7 +227,6 @@ def run() -> None:
             },
         ],
         short_name="food-footprints",
-        explorer=True,
     )
 
     # Group views:

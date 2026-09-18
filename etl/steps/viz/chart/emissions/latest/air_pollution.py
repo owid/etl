@@ -1,5 +1,5 @@
 """
-This collection was created as a proof of concept. It can be deleted if not used.
+This chart was created as a proof of concept. It can be deleted if not used.
 """
 
 from owid.catalog.meta import TableDimension
@@ -12,7 +12,7 @@ paths = PathFinder(__file__)
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Load (flattened) table from grapher channel with dimension metadata
     tb = paths.load_dataset("ceds_air_pollutants").read("ceds_air_pollutants", load_data=False)
@@ -26,8 +26,8 @@ def run() -> None:
         },
     )
 
-    # Create collection
-    c = paths.create_collection(
+    # Create chart
+    c = paths.create_chart(
         config=config,
         tb=tb,
     )

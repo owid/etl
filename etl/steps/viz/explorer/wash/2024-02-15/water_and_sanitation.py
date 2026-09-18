@@ -11,13 +11,12 @@ def run() -> None:
     # Load inputs.
     #
     # Load grapher config from YAML
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
-    # Create collection
-    c = paths.create_collection(
+    # Create chart
+    c = paths.create_explorer(
         config=config,
         short_name="water-and-sanitation",
-        explorer=True,
     )
 
     # Edit display

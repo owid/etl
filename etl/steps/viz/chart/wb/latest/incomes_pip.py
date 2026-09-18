@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from etl.helpers import PathFinder
+from etl.viz import filter_columns_by_dimension_choices
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -22,7 +23,7 @@ DIMENSIONS_CONFIG = {
 PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences in living costs between countries."
 
 # Set x (population) and color (region) indicators needed by the Marimekko tab.
-# Given in short form (`table#column`); `Collection.save` resolves them against the step's
+# Given in short form (`table#column`); `Chart.save` resolves them against the step's
 # dependencies, so the dataset versions are not hardcoded here.
 POPULATION_PATH = "historical#population_historical"
 REGION_PATH = "regions#owid_region"
@@ -44,41 +45,34 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Default collection config
-    config = paths.load_collection_config()
+    # Default chart config
+    config = paths.load_config()
 
     # Load grapher dataset.
     ds = paths.load_dataset("world_bank_pip")
     tb = ds.read("incomes", load_data=False)
 
-    # Remove unwanted dimensions.
-    # NOTE: This is a temporary solution until we figure out how to deal with missing dimensions.
-    columns_to_keep = []
-    for column in tb.drop(columns=["country", "year"]).columns:
-        # Keep only indicators for a specific PPP year, and then remove that dimension.
-        if ("ppp_version" in tb[column].metadata.dimensions) and tb[column].metadata.dimensions[
-            "ppp_version"
-        ] == PPP_YEAR:
-            columns_to_keep.append(column)
-            tb[column].metadata.dimensions.pop("ppp_version")
+    # Keep only indicators for a specific PPP year, and drop that dimension.
+    tb = filter_columns_by_dimension_choices(tb, {"ppp_version": PPP_YEAR})
 
-        # Remove dimensions that are not needed.
-        for dimension in ["welfare_type"]:
-            if dimension in tb[column].metadata.dimensions:
-                tb[column].metadata.dimensions.pop(dimension)
-    tb = tb[columns_to_keep]
+    # Remove dimensions that are not needed.
+    for column in tb.columns:
+        dimensions = tb[column].metadata.dimensions
+        if dimensions:
+            for dimension in ["welfare_type"]:
+                dimensions.pop(dimension, None)
 
     # Get all survey_comparability values except "No spells" for spell views
     survey_comp_values = set()
     for col in tb.columns:
-        if "survey_comparability" in tb[col].metadata.dimensions:
+        if tb[col].metadata.dimensions and "survey_comparability" in tb[col].metadata.dimensions:
             survey_comp_values.add(tb[col].metadata.dimensions["survey_comparability"])
     survey_comp_spells = [v for v in survey_comp_values if v != "No spells"]
 
     #
-    # Create collection object
+    # Create chart object
     #
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         short_name="incomes_pip",
         tb=tb,

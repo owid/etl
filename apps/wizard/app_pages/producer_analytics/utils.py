@@ -55,6 +55,9 @@ def make_grid(df: pd.DataFrame, column_config, selection: bool = False):
         # domLayout="autoHeight",
         enableCellTextSelection=True,
         suppressSizeToFit=False,  # Allows dynamic resizing to fit.
+        # Fit the columns to the grid width on load. Set here rather than through AgGrid's `fit_columns_on_grid_load`
+        # (deprecated) or `columns_auto_size_mode` (ignored by streamlit-aggrid 1.1.x when gridOptions are passed).
+        autoSizeStrategy={"type": "fitGridWidth"},
     )
 
     gb.configure_default_column(

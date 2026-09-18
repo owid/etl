@@ -1,6 +1,7 @@
 """Multidim export for LIS incomes across the distribution."""
 
 from etl.helpers import PathFinder
+from etl.viz import filter_columns_by_dimension_choices
 
 paths = PathFinder(__file__)
 
@@ -28,25 +29,22 @@ NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured bot
 
 
 def run() -> None:
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     ds = paths.load_dataset("luxembourg_income_study")
     tb = ds.read("incomes", load_data=False)
 
     # Filter to "square root" equivalence_scale and remove that dimension
-    columns_to_keep = []
-    for column in tb.drop(columns=["country", "year"]).columns:
-        dims = tb[column].metadata.dimensions
-        if dims and dims.get("equivalence_scale") == EQUIVALENCE_SCALE:
-            columns_to_keep.append(column)
-            dims.pop("equivalence_scale")
-            # Convert integer decile values to clean strings (e.g. 1 -> "1", not "1.0")
-            if "decile" in dims and isinstance(dims["decile"], (int, float)):
-                dims["decile"] = str(int(dims["decile"]))
-    tb = tb[columns_to_keep]
+    tb = filter_columns_by_dimension_choices(tb, {"equivalence_scale": EQUIVALENCE_SCALE})
 
-    # Create collection
-    c = paths.create_collection(
+    # Convert integer decile values to clean strings (e.g. 1 -> "1", not "1.0")
+    for column in tb.columns:
+        dims = tb[column].metadata.dimensions
+        if dims and "decile" in dims and isinstance(dims["decile"], (int, float)):
+            dims["decile"] = str(int(dims["decile"]))
+
+    # Create chart
+    c = paths.create_chart(
         config=config,
         short_name="incomes_lis",
         tb=tb,

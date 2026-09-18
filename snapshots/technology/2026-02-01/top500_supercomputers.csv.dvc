@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: TOP500 Supercomputer Lists (1993-2025)
+    title: TOP500 Supercomputer Lists (1993–2025)
     description: |-
       The TOP500 project ranks and details the 500 most powerful non-distributed computer systems in the world. The project was started in 1993 and publishes an updated list of the supercomputers twice a year (June and November). This dataset combines all TOP500 lists from 1993 to 2025, including computational performance benchmarks, system specifications, and rankings.
     date_published: "2025"

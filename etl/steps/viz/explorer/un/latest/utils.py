@@ -1,9 +1,9 @@
 """The functions below are a bit more specific to this step, so maybe harder to generalize."""
 
-from typing import Any, cast
+from typing import Any
 
-from etl.collection.explorer import Explorer
 from etl.helpers import PathFinder
+from etl.viz.explorer import Explorer
 
 # Projection variants in UN WPP. Order matters: it's the order in which y-indicators
 # are concatenated when grouping with estimates. Estimates come first (solid line),
@@ -38,13 +38,12 @@ class ExplorerCreator:
         return self.tbs["proj"][table_name]
 
     def create_manual(self, config: dict[str, Any], **kwargs) -> Explorer:
-        explorer = self.paths.create_collection(
+        explorer = self.paths.create_explorer(
             config=config,
             indicator_as_dimension=True,
-            explorer=True,
             **kwargs,
         )
-        return cast(Explorer, explorer)
+        return explorer
 
     def create(
         self,
@@ -66,11 +65,10 @@ class ExplorerCreator:
         # Explorer with projections
         dimensions_ = {**dimensions, **(dimensions_proj or {"variant": ["medium", "high", "low"]})}
 
-        explorer = self.paths.create_collection(
+        explorer = self.paths.create_explorer(
             tb=[tb, tb_proj],
             dimensions=[dimensions, dimensions_],
             indicator_as_dimension=True,
-            explorer=True,
             **kwargs,
         )
 
@@ -110,11 +108,10 @@ class ExplorerCreator:
         # Include all four variants as separate single-indicator views
         dimensions_all = {**dimensions, "variant": ["estimates", *projection_variants]}
 
-        explorer = self.paths.create_collection(
+        explorer = self.paths.create_explorer(
             tb=tb,
             dimensions=dimensions_all,
             indicator_as_dimension=True,
-            explorer=True,
             **kwargs,
         )
 
@@ -144,4 +141,4 @@ class ExplorerCreator:
             drop_dimensions_if_single_choice=False,
         )
 
-        return cast(Explorer, explorer)
+        return explorer

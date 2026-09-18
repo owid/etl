@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical mumps deaths in the United States - Centers for Disease Control and Prevention
+    title: Historical mumps deaths in the United States – Centers for Disease Control and Prevention
     description: |-
       Data on historical mumps deaths in the United States, compiled from a selection of sources from the US CDC.
 
@@ -26,11 +26,11 @@ meta:
 
       Reported Incidence of Notifiable Diseases in the United States, 1970. Morbidity and Mortality Vol. 19, No. 53 (1971)
 
-      Compressed Mortality, 1968-1978 - CDC Wonder (ICD-8)
+      Compressed Mortality, 1968-1978 – CDC Wonder (ICD-8)
 
-      Compressed Mortality, 1979-1998 - CDC Wonder (ICD-9)
+      Compressed Mortality, 1979-1998 – CDC Wonder (ICD-9)
 
-      Underlying Cause of Death, 1999-2020 - CDC WONDER (ICD-10)
+      Underlying Cause of Death, 1999-2020 – CDC WONDER (ICD-10)
 
     # Files
     url_main: https://wonder.cdc.gov/ucd-icd10.html

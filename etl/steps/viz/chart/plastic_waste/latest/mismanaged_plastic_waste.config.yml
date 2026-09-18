@@ -44,7 +44,7 @@ dimensions:
         name: "Disposal"
         description: "Pollution from uncontrolled disposal sites"
       - slug: "collection_system"
-        name: "Collection system"
+        name: "Chart system"
         description: "Pollution during collection and transport"
       - slug: "rejects"
         name: "Rejects"

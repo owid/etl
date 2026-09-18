@@ -222,8 +222,8 @@ steps:
   # garden step; the dropdown definition lives next to it in food_trade.items.yaml.
   data://garden/faostat/2026-05-07/food_trade:
     - data://garden/faostat/2026-05-07/faostat_tm
-  # S3 export step: load the garden table and write a metadata JSON plus one JSON per product
-  # under s3://owid-public/data/food-trade/, for the bespoke viz to fetch.
+  # Bespoke feed: load the garden table and write a metadata JSON plus one JSON per product,
+  # synced to the environment's v1/bespoke path for the bespoke viz to fetch.
   viz://bespoke/faostat/latest/food_trade:
     - data://garden/faostat/2026-05-07/food_trade
   ######################################################################################################################

@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Preventive cancer screenings - program data
+    title: Preventive cancer screenings – program data
     description: |-
       Administrative data from national cancer screening programs in European countries, for three cancers: breast cancer (ICD-10 code C50), cervical cancer (C53), and colorectal cancer (C18-C21, malignant neoplasms of the colon, rectosigmoid junction, rectum, anus and anal canal).
 
@@ -15,7 +15,7 @@ meta:
     # Citation
     producer: Eurostat
     citation_full: |-
-      European Commission, Eurostat, Preventive cancer screenings - program data, https://doi.org/10.2908/HLTH_PS_PREV [2026-09-02]
+      European Commission, Eurostat, Preventive cancer screenings – program data, https://doi.org/10.2908/HLTH_PS_PREV [2026-09-02]
 
     # Files
     url_main: https://ec.europa.eu/eurostat/databrowser/view/hlth_ps_prev/default/table?lang=en

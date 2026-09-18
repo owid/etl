@@ -82,9 +82,9 @@ SEX_KEYWORDS = {"both_sexes": "both", "male": "male", "female": "female"}
 
 
 def run() -> None:
-    """Main function to process literacy rates data and create collection."""
+    """Main function to process literacy rates data and create chart."""
     # Load inputs
-    config = paths.load_collection_config()
+    config = paths.load_config()
     ds = paths.load_dataset("education_sdgs")
     tb = ds.read("education_sdgs", load_data=False)
 
@@ -97,8 +97,8 @@ def run() -> None:
     # Adjust dimensions
     tb = adjust_dimensions(tb)
 
-    # Create collection
-    c = paths.create_collection(
+    # Create chart
+    c = paths.create_chart(
         config=config,
         tb=tb,
         common_view_config=MULTIDIM_CONFIG,
@@ -139,7 +139,7 @@ def run() -> None:
             }
         edit_indicator_displays(view)
 
-    # Save collection
+    # Save chart
     c.save()
 
 
@@ -225,7 +225,7 @@ def adjust_dimensions(tb):
     return tb
 
 
-def create_grouped_views(collection):
+def create_grouped_views(chart):
     """Add grouped views for gender and age group comparisons."""
     view_metadata = {
         "presentation": {"title_public": "{title}"},
@@ -235,7 +235,7 @@ def create_grouped_views(collection):
         "subtitle": "{subtitle}",
     }
 
-    collection.group_views(
+    chart.group_views(
         groups=[
             {
                 "dimension": "sex",

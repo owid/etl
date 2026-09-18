@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: Fouquin and Hugot
-    title: 'Two Centuries of Bilateral Trade and Gravity Data: 1827-2014'
+    title: 'Two Centuries of Bilateral Trade and Gravity Data: 1827–2014'
     description: |-
       Due to the long-run nature of Fouquin and Hugot (CEPII 2016) time series, GDP estimates are compiled using a variety of sources. The top five sources, which together make up more than a third of the dataset (approx 11,864 observations out of 31,541) are from the following sources: World Bank (2015) (8513 obs); Mitchell (2017a,b,c) (1714); Barbieri and Keshik (2012) (1037 obs); Smits et al (2014) (335 obs); and Dincecco and Prado (2013) (265 obs).
 

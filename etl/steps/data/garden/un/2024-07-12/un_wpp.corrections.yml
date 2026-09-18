@@ -1,4 +1,4 @@
-# Known errors in UN WPP 2024 that we blank locally until the provider fixes them.
+# Known errors in UN WPP 2024 that we blank locally until the producer fixes them.
 # See etl/data_corrections.py for the format; `etl corrections --charts` inventories them.
 #
 # Australia's deaths-by-age distribution is broken for 2022 and 2023. In the source file
@@ -44,7 +44,7 @@
   reason: >-
     Deaths at ages 15-19 in Australia are reported as 8 for 2022, against 460-475 a year for
     2015-2021; the guard for the 2022 age distribution below.
-  provider: United Nations, World Population Prospects
+  producer: United Nations, World Population Prospects
   status: open
 
 - indicator: deaths
@@ -55,7 +55,7 @@
   reason: >-
     Deaths at ages 15-19 in Australia are reported as 43 for 2023, against 460-475 a year for
     2015-2021; the guard for the 2023 age distribution below.
-  provider: United Nations, World Population Prospects
+  producer: United Nations, World Population Prospects
   status: open
 
 - indicator: deaths
@@ -67,5 +67,5 @@
     Australia's deaths-by-age distribution is unusable for 2022 and 2023 — every single year of age
     from 9 to 39 is floored at 1-2 deaths while ages 55-64 and 70-94 are inflated by up to 135%,
     though the bands still sum to the correct annual total.
-  provider: United Nations, World Population Prospects
+  producer: United Nations, World Population Prospects
   status: open

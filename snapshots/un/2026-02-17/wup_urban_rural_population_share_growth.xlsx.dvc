@@ -3,13 +3,13 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: World Urbanization Prospects 2025 - Average Annual Rate of Change of Percentage Urban and Rural by National Definition
+    title: World Urbanization Prospects 2025 – Average Annual Rate of Change of Percentage Urban and Rural by National Definition
     description: |-
       Average annual rate of change of the percentage of population living in urban and rural areas based on national definitions. The dataset provides the rate of change in urbanization levels by region, subregion, country and area from 1950 to 2050.
 
       National definitions of "urban" vary considerably from country to country. Criteria such as population size, population density, type of economic activity, physical characteristics, level of infrastructure, or a combination of these may be used to define urban areas.
     date_published: "2025"
-    title_snapshot: World Urbanization Prospects 2025 - Urbanization Rate of Change (File 17)
+    title_snapshot: World Urbanization Prospects 2025 – Urbanization Rate of Change (File 17)
     description_snapshot: |-
       File 17 contains the average annual rate of change of the percentage urban and rural by national definitions. Data are presented in three sheets: Rural, Urban, and Total, showing how quickly urbanization levels are changing each year from 1950 to 2050.
 

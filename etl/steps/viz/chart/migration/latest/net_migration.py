@@ -4,8 +4,8 @@ paths = PathFinder(__file__)
 
 
 def run() -> None:
-    c = paths.create_collection(
-        config=paths.load_collection_config(),
+    c = paths.create_chart(
+        config=paths.load_config(),
         short_name="net_migration",
     )
     c.save()

@@ -10,7 +10,7 @@ meta:
     # Citation
     producer: Eurostat
     citation_full: |-
-      Eurostat - Use of generative AI tools by individuals (2026).
+      Eurostat – Use of generative AI tools by individuals (2026).
 
     # Files
     url_main: https://ec.europa.eu/eurostat/databrowser/view/isoc_ai_iaiu/default/table?lang=en

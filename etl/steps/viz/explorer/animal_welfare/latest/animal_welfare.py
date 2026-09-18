@@ -3,8 +3,8 @@
 import re
 from copy import deepcopy
 
-from etl.collection import expand_config
 from etl.helpers import PathFinder
+from etl.viz import expand_config
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -63,7 +63,7 @@ def run() -> None:
     tb = ds.read("animals_used_for_food")
 
     # Load grapher config from YAML.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     #
     # Process data.
@@ -323,10 +323,9 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new explorer.
-    c = paths.create_collection(
+    c = paths.create_explorer(
         config=config,
         short_name="animal-welfare",
-        explorer=True,
     )
 
     # Save explorer.

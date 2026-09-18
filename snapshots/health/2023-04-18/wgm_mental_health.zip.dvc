@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: Wellcome and Gallup
-    title: Wellcome Global Monitor 2020 - Mental health
+    title: Wellcome Global Monitor 2020 – Mental health
     description: |-
       Wellcome conducted the first Global Monitor – the largest-ever study of public attitudes to science and health – in 2018. The first wave covered topics such as whether people trust science, scientists and information about health, and attitudes towards the safety and efficacy of vaccines – a focus which has since proved incredibly forward-thinking.
 
@@ -19,7 +19,7 @@ meta:
       Note 1: Data for answers where the demographic group had less than 100 participants are filtered out.
 
       Note 2: Empty answers have been filtered out. Empty answers may appear because the question was not applicable to the respondent or the respondent did not answer the question.
-    citation_full: 'Wellcome, The Gallup Organization Ltd. (2021). Wellcome Global Monitor 2020 - Mental health.'
+    citation_full: 'Wellcome, The Gallup Organization Ltd. (2021). Wellcome Global Monitor 2020 – Mental health.'
     attribution_short: WGM
     url_main: https://wellcome.org/reports/wellcome-global-monitor-mental-health/2020
     url_download: https://cms.wellcome.org/sites/default/files/2021-11/wgm_full_wave2_public_file.zip

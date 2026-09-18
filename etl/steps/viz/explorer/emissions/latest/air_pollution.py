@@ -7,7 +7,7 @@ Single upstream table backs the explorer:
 The grapher step already tags each column with `m.dimensions = {pollutant, sector}` using
 display values ("BC" / "Agriculture"). This step rewrites those to URL-friendly slugs and
 adds a `per_capita` slot derived from `original_short_name` (`emissions` vs
-`emissions_per_capita`). `paths.create_collection(...)` then auto-expands 198 single-
+`emissions_per_capita`). `paths.create_chart(...)` then auto-expands 198 single-
 indicator views.
 
 `c.group_views(...)` adds:
@@ -69,7 +69,7 @@ SECTORS_REAL = [v for v in SECTOR_SLUG.values() if v != "all_sectors"]
 
 
 def _dim(view, key):
-    """Safe accessor — robust to missing keys (e.g. the auto-added `collection__slug`)."""
+    """Safe accessor — robust to missing keys (e.g. the auto-added `chart__slug`)."""
     return view.dimensions.get(key)
 
 
@@ -129,7 +129,7 @@ def _default_view(view) -> bool:
 
 
 def run() -> None:
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     ds = paths.load_dataset("ceds_air_pollutants")
     tb = ds.read("ceds_air_pollutants", load_data=False)
@@ -150,7 +150,7 @@ def run() -> None:
             "per_capita": "per_capita" if is_per_capita else "total",
         }
 
-    c = paths.create_collection(
+    c = paths.create_explorer(
         config=config,
         tb=tb,
         indicator_names="emissions",
@@ -160,10 +160,9 @@ def run() -> None:
             "per_capita": ["total", "per_capita"],
         },
         short_name="air-pollution",
-        explorer=True,
     )
 
-    # Pull slug→display-name from the collection so titles stay in sync with the
+    # Pull slug→display-name from the chart so titles stay in sync with the
     # dropdown labels users see in the explorer.
     breakdown_title = _build_breakdown_title(c.get_choice_names("pollutant"))
 

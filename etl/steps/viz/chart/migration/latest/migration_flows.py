@@ -22,14 +22,14 @@ MULTIDIM_CONFIG = {
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # load table using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("migration_stock_flows")
     tb = ds.read("migrant_stock_dest_origin", load_data=False)
 
-    # Create collection
-    c = paths.create_collection(
+    # Create chart
+    c = paths.create_chart(
         config=config,
         tb=tb,
         short_name="migration-flows",

@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: ICBP SURVMARK-2 - Cancer Survival Rates
+    title: ICBP SURVMARK-2 – Cancer Survival Rates
     description: |-
       ICBP SURVMARK-2 provides data on cancer survival, incidence, and mortality within the second phase of the International Cancer Benchmarking Partnership (ICBP).
 

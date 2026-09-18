@@ -4,7 +4,7 @@ Single upstream table — `grapher/minerals/.../minerals` — with one column pe
 (metric, mineral, type, unit) combination. Each column's metadata title encodes
 those four pieces as `metric|commodity|sub_commodity|unit`. This step parses
 that title, lifts the four pieces onto `m.dimensions`, and lets
-`paths.create_collection(tb=tb, ...)` auto-expand one view per column.
+`paths.create_chart(tb=tb, ...)` auto-expand one view per column.
 
 The explorer is the YAML-driven sibling of `viz://chart/minerals/latest/minerals`
 (see `etl/steps/viz/chart/minerals/latest/minerals.py`); the construction
@@ -60,7 +60,7 @@ def _column_from_view(view) -> str | None:
 
 
 def run() -> None:
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     ds = paths.load_dataset("minerals")
     tb = ds.read("minerals")
@@ -103,7 +103,7 @@ def run() -> None:
     missing = COLUMNS_WITHOUT_MAP_TAB - set(tb.columns)
     assert not missing, f"COLUMNS_WITHOUT_MAP_TAB references unknown columns: {missing}"
 
-    c = paths.create_collection(
+    c = paths.create_explorer(
         config=config,
         tb=tb,
         indicator_names=["value"],
@@ -114,7 +114,6 @@ def run() -> None:
             "type": type_names,
         },
         short_name="minerals",
-        explorer=True,
     )
 
     def _has_map_tab(view) -> bool:

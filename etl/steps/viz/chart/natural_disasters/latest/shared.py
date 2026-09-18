@@ -14,7 +14,7 @@ from collections.abc import Callable
 
 from owid.catalog import Table
 
-from etl.collection.model.view import Indicator
+from etl.viz.chart.model.view import Indicator
 
 ########################################################################################################################
 # Last fully-reported year for which EM-DAT data is complete enough to display.

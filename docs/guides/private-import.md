@@ -8,7 +8,7 @@ icon: lucide/lock
 
 # Private datasets
 
-While most of the data at OWID is publicly available, some datasets are added to our catalog with some restrictions. These include datasets that are not redistributable, or that are not meant to be shared with the public. This can happen due to a strict license by the data provider, or because the data is still in a draft stage and not ready for public consumption.
+While most of the data at OWID is publicly available, some datasets are added to our catalog with some restrictions. These include datasets that are not redistributable, or that are not meant to be shared with the public. This can happen due to a strict license by the data producer, or because the data is still in a draft stage and not ready for public consumption.
 
 Various privacy configurations are available:
 
@@ -70,10 +70,10 @@ data-private://grapher/ihme_gbd/2024-06-10/leading_causes_deaths:
 
 ## Running private ETL
 
-To run a private step, you need to use the `--private` flag. Otherwise, private steps are not detected by `etl` command:
+Private steps run like any other step; `etl run` includes them by default. To leave them out (for instance without access to the private bucket), pass `--public-only`, which also skips the steps downstream of them:
 
 ```
-etl run run [step-name] --private
+etl run [step-name] --public-only
 ```
 
 ## Bringing private data to public

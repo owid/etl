@@ -3,6 +3,7 @@ name: add-gdp-scatter
 description: Add a scatter view (with GDP per capita on x) to existing OWID charts via the admin API, mirroring the admin UI's "Add scatter type" defaults, then retire the old standalone "X vs. GDP per capita" charts by redirecting their slugs to that scatter view. Trigger when the user pastes a table with columns `chart_admin_url`, `target_chart_admin_url`, `gdp_source` (part 1), or a list of `{grapher_url, target_chart_url}` pairs to redirect (part 2).
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # add-gdp-scatter

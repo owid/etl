@@ -11,13 +11,12 @@ def run() -> None:
     # Load inputs.
     #
     # Load grapher config from YAML
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Create explorer
-    c = paths.create_collection(
+    c = paths.create_explorer(
         config=config,
         short_name="habitat-loss",
-        explorer=True,
     )
 
     c.save()
