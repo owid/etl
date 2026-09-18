@@ -15,6 +15,7 @@ description: >-
   embedded charts", "we're sunsetting these charts in favour of the MDIM", or similar.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Map charts to MDIM views (redirect proposal)

@@ -3,6 +3,7 @@ name: update-wildfires-data
 description: Update OWID's GWIS weekly wildfires data (climate/*/weekly_wildfires) on its own, outside the monthly climate batch. A start-to-finish runbook covering the version bump, the snapshot, the checks, the chart remap on staging, and archiving. Also explains the source's weekly grid and why its most recent point is always an undercount. Use when the user wants to refresh wildfires data, run the weekly fire-season update, or asks why our wildfire numbers lag or keep being revised.
 metadata:
   internal: true
+  owner: pabloarosado
 ---
 
 # Wildfires update (weekly, in season)

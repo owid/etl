@@ -3,6 +3,7 @@ name: develop-vscode-extension
 description: Develop, build, and test VSCode extensions in this repo. Use when editing extension source code, compiling TypeScript, packaging .vsix files, or installing extensions for testing.
 metadata:
   internal: true
+  owner: Marigold
 ---
 
 # VSCode Extension Development
