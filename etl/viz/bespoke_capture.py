@@ -1,17 +1,18 @@
 """Capturing and republishing a bespoke feed that was published by hand.
 
-`demography` and `migrant-demographics` were built outside the ETL and uploaded to
-`s3://owid-public/bespoke/`, which is why they were the only bespoke bundles whose data did not come
-out of the pipeline. Until they are built from garden, their `viz://bespoke` steps republish a
-capture of those uploads: a snapshot script fetches the feed as it is served and writes it into one
-zip, and the step unpacks that zip into its output folder for the framework to sync (`etl.viz.bespoke`).
+`migrant-demographics` was built outside the ETL and uploaded to `s3://owid-public/bespoke/`, which
+is why it is the last bespoke bundle whose data does not come out of the pipeline. Until it is built
+from garden, its `viz://bespoke` step republishes a capture of that upload: a snapshot script fetches
+the feed as it is served and writes it into one zip, and the step unpacks that zip into its output
+folder for the framework to sync (`etl.viz.bespoke`).
 
-Both feeds have the same shape -- an index file naming every entity and the file that carries it,
-plus one file per entity -- so the fetching, the zip, and the unpacking live here. What differs is
-how each index names its data files, which is the snapshot script's business.
+The module is written for a feed of that shape -- an index file naming every entity and the file that
+carries it, plus one file per entity -- so the fetching, the zip, and the unpacking live here, while
+how the index names its data files stays the snapshot script's business. `demography` was captured
+the same way until it was rewritten on top of the `un_wpp` garden dataset.
 
 Everything in this module exists for that interim arrangement, and should be deleted with it once
-both feeds are built from garden.
+the feed is built from garden.
 """
 
 from __future__ import annotations
