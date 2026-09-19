@@ -3,6 +3,7 @@ name: create-snapshot
 description: Create a new snapshot (DVC file, plus a Python script only when one is needed) from a url_main and optional url_download. Fetches the page, extracts metadata with AI, confirms with user, writes files, and runs the snapshot. Use when the user wants to add a new data source or create a snapshot from a URL.
 metadata:
   internal: true
+  owner: antea04
 ---
 
 # Create Snapshot

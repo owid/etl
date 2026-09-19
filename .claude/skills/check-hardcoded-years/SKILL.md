@@ -3,6 +3,7 @@ name: check-hardcoded-years
 description: Audit every surface that renders a dataset's indicators — charts, map tabs, MDim views, explorer views, narrative charts, and article embeds/links with time= parameters — for hardcoded time bounds (minTime/maxTime/timelineMinTime/timelineMaxTime/map.time pinned to a number instead of "earliest"/"latest"/absent) and grade each pin against the indicators' actual latest data point. A pinned maxTime silently hides newly added years after every dataset update until a human bumps it by hand. Runs in dataset mode (all surfaces carrying one dataset's indicators — the standard audit in /update-dataset step 7) or site-wide via the public Datasette. Use when the user asks to "check for hardcoded years/times", "find pinned minTime/maxTime", or wants to know which charts won't show newly added data.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Check Hardcoded Years (pinned time bounds)

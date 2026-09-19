@@ -3,6 +3,7 @@ name: remap-ghost-variables
 description: Fix ghost variable warnings by remapping charts from old to new variable IDs. Use when ETL grapher step shows "Variables used in charts will not be deleted automatically", when indicator short_names were renamed and charts still reference old variables, or when the user mentions ghost variables, orphaned indicators, or chart variable remapping.
 metadata:
   internal: true
+  owner: Marigold
 ---
 
 # Remapping Ghost Variables

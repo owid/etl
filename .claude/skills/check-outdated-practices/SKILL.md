@@ -3,6 +3,7 @@ name: check-outdated-practices
 description: Check ETL step files for outdated coding patterns and offer to fix them. Use when user mentions outdated practices, legacy code patterns, modernizing steps, or wants to check code quality of ETL steps.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Check Outdated Practices

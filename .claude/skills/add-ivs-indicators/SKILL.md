@@ -3,6 +3,7 @@ name: add-ivs-indicators
 description: Add new survey question codes (e.g. C001, D059, H002_01, Y022, E268, G055) to OWID's values-survey pipeline WITHOUT bumping the version — either the Integrated Values Surveys table (integrated_values_surveys, WVS+EVS merged) or the World Values Survey table (world_values_survey, WVS-only questions). Both tables live in the same ivs/<version> garden+grapher dataset. Use when the user wants to add IVS/WVS/EVS questions, extend integrated_values_surveys or world_values_survey, or says "add these codes to IVS" / "add these WVS questions".
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Add indicators to the values-survey pipeline (IVS / WVS, no version bump)

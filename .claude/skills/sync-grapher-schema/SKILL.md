@@ -11,6 +11,7 @@ triggers:
   - complete the bot schema PR
 metadata:
   internal: true
+  owner: lucasrodes
 ---
 
 # Sync Grapher Schema

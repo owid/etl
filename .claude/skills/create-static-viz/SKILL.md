@@ -13,6 +13,7 @@ description: >-
   asks for a better version, or picks up a viz from the static-viz refresh queue.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Create or refresh a static visualization
