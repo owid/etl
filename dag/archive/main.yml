@@ -1384,3 +1384,4 @@ include:
   - dag/archive/geography.yml
 
   - dag/archive/static_viz.yml
+  - dag/archive/energy_legacy.yml

@@ -1,4 +1,4 @@
-from etl.catalog_jsonld.sitemap import SitemapEntry, sitemap_xml
+from etl.catalog_pages.sitemap import SitemapEntry, sitemap_xml
 
 
 def test_sitemap_xml_includes_lastmod_for_date_shaped_versions() -> None:

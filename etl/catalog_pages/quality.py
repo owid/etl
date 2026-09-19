@@ -17,6 +17,10 @@ from owid.catalog.schema_org import TableSchemaInput, license_to_url, table_desc
 RESERVED_ROOT_NAMES = {"robots.txt", "jsonld_quality_report.json"}
 
 
+# Blockers that also stop the dataset page files (not just the JSON-LD side product).
+PAGE_BLOCKERS = {"private_dataset", "non_redistributable", "reserved_namespace", "duplicate_short_key"}
+
+
 @dataclass
 class DatasetQualityResult:
     catalog_path: str
@@ -26,7 +30,18 @@ class DatasetQualityResult:
 
     @property
     def is_eligible(self) -> bool:
+        """Whether the JSON-LD side product may be emitted (every gate passes)."""
         return not self.blockers
+
+    @property
+    def is_page_eligible(self) -> bool:
+        """Whether the dataset page files may be published.
+
+        Only the gates about the dataset itself apply: it must be public, redistributable, and not collide with
+        another dataset or a reserved name. Gates about metadata completeness (title, description, license,
+        provenance) only decide whether ``dataset.jsonld`` is emitted; the page renders whatever metadata exists.
+        """
+        return not (set(self.blockers) & PAGE_BLOCKERS)
 
 
 def is_reserved_namespace(namespace: str) -> bool:
