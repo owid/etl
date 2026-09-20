@@ -20,6 +20,7 @@ default_dimensions:
 definitions:
   common_views:
     - config:
+        originUrl: ourworldindata.org/animal-welfare
         hasMapTab: true
         tab: chart
         yAxis:
