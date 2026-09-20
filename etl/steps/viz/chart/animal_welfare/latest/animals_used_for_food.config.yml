@@ -2,7 +2,6 @@ grapher_schema: "011"
 
 title:
   title: Animals used for food
-  title_variant: by animal, and by how they are counted
 topic_tags:
   - Animal Welfare
 default_selection:
@@ -31,14 +30,14 @@ dimensions:
     slug: metric
     choices:
       - slug: killed_in_country
-        name: Animals killed in a country
-        description: Animals slaughtered within the country, wherever their meat is eventually eaten
+        name: Killed in the country
+        description: Includes animals whose meat is exported
       - slug: killed_for_consumption
-        name: Animals killed for a country's consumption
-        description: Animals killed to supply the food the country itself consumes, after accounting for trade
+        name: Killed for consumption
+        description: Adjusted for trade in meat
       - slug: alive
-        name: Animals alive at any given time
-        description: Animals kept in the country at a given moment, rather than counted over a year
+        name: Live animals
+        description: Kept at a given moment, not counted over a year
   - name: Animal
     slug: animal
     choices:
@@ -138,35 +137,35 @@ views:
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_slaughtered"
+        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_killed_in_country"
   - dimensions:
       metric: killed_in_country
       animal: cattle_and_buffaloes
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_slaughtered"
+        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_killed_in_country"
   - dimensions:
       metric: killed_in_country
       animal: sheep_and_goats
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_slaughtered"
+        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_killed_in_country"
   - dimensions:
       metric: killed_in_country
       animal: pigs
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#pigs_slaughtered"
+        - catalogPath: "animals_killed_for_domestic_consumption#pigs_killed_in_country"
   - dimensions:
       metric: killed_in_country
       animal: poultry
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#poultry_slaughtered"
+        - catalogPath: "animals_killed_for_domestic_consumption#poultry_killed_in_country"
   - dimensions:
       metric: killed_in_country
       animal: cattle
@@ -313,35 +312,35 @@ views:
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_killed_domestic_supply"
+        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_killed_for_domestic_supply"
   - dimensions:
       metric: killed_for_consumption
       animal: cattle_and_buffaloes
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_killed_domestic_supply"
+        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_killed_for_domestic_supply"
   - dimensions:
       metric: killed_for_consumption
       animal: sheep_and_goats
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_killed_domestic_supply"
+        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_killed_for_domestic_supply"
   - dimensions:
       metric: killed_for_consumption
       animal: pigs
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#pigs_killed_domestic_supply"
+        - catalogPath: "animals_killed_for_domestic_consumption#pigs_killed_for_domestic_supply"
   - dimensions:
       metric: killed_for_consumption
       animal: poultry
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#poultry_killed_domestic_supply"
+        - catalogPath: "animals_killed_for_domestic_consumption#poultry_killed_for_domestic_supply"
   - dimensions:
       metric: alive
       animal: cattle
@@ -467,35 +466,35 @@ views:
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_slaughtered_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_killed_in_country_per_capita"
   - dimensions:
       metric: killed_in_country
       animal: cattle_and_buffaloes
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_slaughtered_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_killed_in_country_per_capita"
   - dimensions:
       metric: killed_in_country
       animal: sheep_and_goats
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_slaughtered_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_killed_in_country_per_capita"
   - dimensions:
       metric: killed_in_country
       animal: pigs
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#pigs_slaughtered_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#pigs_killed_in_country_per_capita"
   - dimensions:
       metric: killed_in_country
       animal: poultry
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#poultry_slaughtered_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#poultry_killed_in_country_per_capita"
   - dimensions:
       metric: killed_in_country
       animal: cattle
@@ -642,35 +641,35 @@ views:
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_killed_domestic_supply_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_killed_for_domestic_supply_per_capita"
   - dimensions:
       metric: killed_for_consumption
       animal: cattle_and_buffaloes
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_killed_domestic_supply_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_killed_for_domestic_supply_per_capita"
   - dimensions:
       metric: killed_for_consumption
       animal: sheep_and_goats
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_killed_domestic_supply_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_killed_for_domestic_supply_per_capita"
   - dimensions:
       metric: killed_for_consumption
       animal: pigs
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#pigs_killed_domestic_supply_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#pigs_killed_for_domestic_supply_per_capita"
   - dimensions:
       metric: killed_for_consumption
       animal: poultry
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#poultry_killed_domestic_supply_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#poultry_killed_for_domestic_supply_per_capita"
   - dimensions:
       metric: alive
       animal: cattle

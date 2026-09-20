@@ -2,7 +2,6 @@ grapher_schema: "011"
 
 title:
   title: Animals killed for food
-  title_variant: where they are slaughtered vs. where their meat is eaten
 topic_tags:
   - Animal Welfare
 default_selection:
@@ -55,158 +54,148 @@ views:
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_slaughtered"
+        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_killed_in_country"
           display:
-            name: Slaughtered in the country
+            name: Killed in the country
             color: "#B13507"
-        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_killed_domestic_supply"
+        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_killed_for_domestic_supply"
           display:
-            name: Killed for its own consumption
+            name: Killed for consumption
             color: "#286BBB"
     config:
       title: Land animals killed for food
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. The difference is due to trade in meat.
   - dimensions:
       animal: land_animals
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_slaughtered_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_killed_in_country_per_capita"
           display:
-            name: Slaughtered in the country
+            name: Killed in the country
             color: "#B13507"
-        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_killed_domestic_supply_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_killed_for_domestic_supply_per_capita"
           display:
-            name: Killed for its own consumption
+            name: Killed for consumption
             color: "#286BBB"
     config:
       title: Land animals killed for food, per person
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. The difference is due to trade in meat.
   - dimensions:
       animal: cattle_and_buffaloes
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_slaughtered"
+        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_killed_in_country"
           display:
-            name: Slaughtered in the country
+            name: Killed in the country
             color: "#B13507"
-        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_killed_domestic_supply"
+        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_killed_for_domestic_supply"
           display:
-            name: Killed for its own consumption
+            name: Killed for consumption
             color: "#286BBB"
     config:
       title: Cattle and buffaloes killed for food
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. The difference is due to trade in meat.
   - dimensions:
       animal: cattle_and_buffaloes
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_slaughtered_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_killed_in_country_per_capita"
           display:
-            name: Slaughtered in the country
+            name: Killed in the country
             color: "#B13507"
-        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_killed_domestic_supply_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_killed_for_domestic_supply_per_capita"
           display:
-            name: Killed for its own consumption
+            name: Killed for consumption
             color: "#286BBB"
     config:
       title: Cattle and buffaloes killed for food, per person
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. The difference is due to trade in meat.
   - dimensions:
       animal: sheep_and_goats
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_slaughtered"
+        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_killed_in_country"
           display:
-            name: Slaughtered in the country
+            name: Killed in the country
             color: "#B13507"
-        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_killed_domestic_supply"
+        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_killed_for_domestic_supply"
           display:
-            name: Killed for its own consumption
+            name: Killed for consumption
             color: "#286BBB"
     config:
       title: Sheep and goats killed for food
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. The difference is due to trade in meat.
   - dimensions:
       animal: sheep_and_goats
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_slaughtered_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_killed_in_country_per_capita"
           display:
-            name: Slaughtered in the country
+            name: Killed in the country
             color: "#B13507"
-        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_killed_domestic_supply_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_killed_for_domestic_supply_per_capita"
           display:
-            name: Killed for its own consumption
+            name: Killed for consumption
             color: "#286BBB"
     config:
       title: Sheep and goats killed for food, per person
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. The difference is due to trade in meat.
   - dimensions:
       animal: pigs
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#pigs_slaughtered"
+        - catalogPath: "animals_killed_for_domestic_consumption#pigs_killed_in_country"
           display:
-            name: Slaughtered in the country
+            name: Killed in the country
             color: "#B13507"
-        - catalogPath: "animals_killed_for_domestic_consumption#pigs_killed_domestic_supply"
+        - catalogPath: "animals_killed_for_domestic_consumption#pigs_killed_for_domestic_supply"
           display:
-            name: Killed for its own consumption
+            name: Killed for consumption
             color: "#286BBB"
     config:
       title: Pigs killed for food
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. The difference is due to trade in meat.
   - dimensions:
       animal: pigs
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#pigs_slaughtered_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#pigs_killed_in_country_per_capita"
           display:
-            name: Slaughtered in the country
+            name: Killed in the country
             color: "#B13507"
-        - catalogPath: "animals_killed_for_domestic_consumption#pigs_killed_domestic_supply_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#pigs_killed_for_domestic_supply_per_capita"
           display:
-            name: Killed for its own consumption
+            name: Killed for consumption
             color: "#286BBB"
     config:
       title: Pigs killed for food, per person
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. The difference is due to trade in meat.
   - dimensions:
       animal: poultry
       per_capita: total
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#poultry_slaughtered"
+        - catalogPath: "animals_killed_for_domestic_consumption#poultry_killed_in_country"
           display:
-            name: Slaughtered in the country
+            name: Killed in the country
             color: "#B13507"
-        - catalogPath: "animals_killed_for_domestic_consumption#poultry_killed_domestic_supply"
+        - catalogPath: "animals_killed_for_domestic_consumption#poultry_killed_for_domestic_supply"
           display:
-            name: Killed for its own consumption
+            name: Killed for consumption
             color: "#286BBB"
     config:
       title: Poultry killed for food
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. The difference is due to trade in meat.
   - dimensions:
       animal: poultry
       per_capita: per_capita
     indicators:
       y:
-        - catalogPath: "animals_killed_for_domestic_consumption#poultry_slaughtered_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#poultry_killed_in_country_per_capita"
           display:
-            name: Slaughtered in the country
+            name: Killed in the country
             color: "#B13507"
-        - catalogPath: "animals_killed_for_domestic_consumption#poultry_killed_domestic_supply_per_capita"
+        - catalogPath: "animals_killed_for_domestic_consumption#poultry_killed_for_domestic_supply_per_capita"
           display:
-            name: Killed for its own consumption
+            name: Killed for consumption
             color: "#286BBB"
     config:
       title: Poultry killed for food, per person
-      subtitle: Animals slaughtered within a country, compared with the number killed to supply the meat it consumes. The difference is due to trade in meat.

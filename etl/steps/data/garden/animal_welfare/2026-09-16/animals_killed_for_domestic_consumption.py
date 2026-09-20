@@ -1,13 +1,13 @@
 """Estimate the number of land animals killed to supply each country's own consumption of meat.
 
-Our other indicators (animal_welfare/*/animals_used_for_food) count animals where they are slaughtered. That
+Our other indicators (animal_welfare/*/animals_used_for_food) count animals where they are killed. That
 attributes exported meat to the exporting country, so big exporters look worse than their diets warrant, and big
 importers look better. Here we instead attribute animals to the country that consumes the meat:
 
-    animals killed for consumption = animals slaughtered * (meat supplied / meat produced)
+    animals killed for consumption = animals killed in the country * (meat supplied / meat produced)
 
-Both quantities come from FAOSTAT: the meat supplied from the Food Balance Sheets, the animals slaughtered and the
-meat produced from QCL. Countries that slaughter no animals of their own have no ratio, so for them the meat
+Both quantities come from FAOSTAT: the meat supplied from the Food Balance Sheets, the animals killed and the
+meat produced from QCL. Countries that kill no animals of their own have no ratio, so for them the meat
 supplied is converted at the world average number of animals per tonne.
 
 This follows the approach of van der Laan, S., Breeman, G., & Scherer, L. (2024). Animal Lives Affected by Meat
@@ -67,7 +67,7 @@ TOTAL_GROUP = "land_animals"
 # FBS elements giving the meat supplied to a country, in tonnes.
 # "Domestic supply" is production + imports - exports - stock variation, and includes waste and non-food uses.
 # "Food" is the part of that supply that reaches people.
-MEAT_ELEMENTS = {"005301": "killed_domestic_supply", "005142": "killed_food"}
+MEAT_ELEMENTS = {"005301": "killed_for_domestic_supply", "005142": "killed_for_food"}
 
 # QCL element codes for "Producing or slaughtered animals" (mammals and poultry have different codes assigned).
 SLAUGHTERED_ANIMALS_ELEMENT_CODES = ["005320", "005321"]
@@ -80,7 +80,7 @@ COUNTRIES_WITHOUT_POPULATION = ["Sudan (former)"]
 
 
 def prepare_animals_per_tonne(tb_qcl: Table) -> Table:
-    """Number of animals slaughtered, and animals slaughtered per tonne of meat, for each group, country and year."""
+    """Number of animals killed, and animals killed per tonne of meat, for each group, country and year."""
     qcl_item_code_to_group = {
         item_code: group for group, info in ANIMAL_GROUPS.items() for item_code in info["qcl_item_codes"]
     }
@@ -90,7 +90,7 @@ def prepare_animals_per_tonne(tb_qcl: Table) -> Table:
 
     tb = (
         tb[tb["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES)][keys + ["value"]]
-        .rename(columns={"value": "slaughtered"}, errors="raise")
+        .rename(columns={"value": "killed_in_country"}, errors="raise")
         .merge(
             tb[tb["element_code"] == PRODUCTION_ELEMENT_CODE][keys + ["value"]].rename(
                 columns={"value": "production"}, errors="raise"
@@ -105,19 +105,19 @@ def prepare_animals_per_tonne(tb_qcl: Table) -> Table:
     # species enters the denominator that is missing from the numerator. The slaughter count is left empty unless
     # every species producing meat reports one, since a partial sum understates the group (and Estonia's poultry
     # would otherwise read as zero).
-    tb["paired_slaughtered"] = tb["slaughtered"].where(tb["production"].notna())
-    tb["paired_production"] = tb["production"].where(tb["slaughtered"].notna())
-    tb["complete"] = tb["slaughtered"].notna() | (tb["production"].fillna(0) == 0)
+    tb["paired_killed"] = tb["killed_in_country"].where(tb["production"].notna())
+    tb["paired_production"] = tb["production"].where(tb["killed_in_country"].notna())
+    tb["complete"] = tb["killed_in_country"].notna() | (tb["production"].fillna(0) == 0)
 
     tb = tb.groupby(["country", "year", "animal_group"], observed=True, as_index=False).agg(
-        slaughtered=("slaughtered", lambda values: values.sum(min_count=1)),
+        killed_in_country=("killed_in_country", lambda values: values.sum(min_count=1)),
         complete=("complete", "all"),
-        paired_slaughtered=("paired_slaughtered", "sum"),
+        paired_killed=("paired_killed", "sum"),
         paired_production=("paired_production", "sum"),
     )
-    tb.loc[~tb["complete"], "slaughtered"] = float("nan")
-    tb["animals_per_tonne"] = tb["paired_slaughtered"] / tb["paired_production"].replace(0, float("nan"))
-    tb = tb.drop(columns=["complete", "paired_slaughtered", "paired_production"], errors="raise")
+    tb.loc[~tb["complete"], "killed_in_country"] = float("nan")
+    tb["animals_per_tonne"] = tb["paired_killed"] / tb["paired_production"].replace(0, float("nan"))
+    tb = tb.drop(columns=["complete", "paired_killed", "paired_production"], errors="raise")
 
     return tb
 
@@ -161,13 +161,15 @@ def sanity_check(tb: Table, tb_rates: Table) -> None:
     assert (tb[list(MEAT_ELEMENTS.values())].fillna(0) >= 0).all().all(), "Negative numbers of animals killed."
 
     # Main correctness check: at world level the animals implied by domestic supply should roughly match the
-    # animals QCL says were slaughtered. They differ only by stock changes and FBS residuals.
+    # animals QCL says were killed. They differ only by stock changes and FBS residuals.
     compared = (
-        tb[tb["country"] == "World"][["year", "animal_group", "killed_domestic_supply"]]
-        .merge(world[["year", "animal_group", "slaughtered"]], on=["year", "animal_group"], how="inner")
+        tb[tb["country"] == "World"][["year", "animal_group", "killed_for_domestic_supply"]]
+        .merge(world[["year", "animal_group", "killed_in_country"]], on=["year", "animal_group"], how="inner")
         .dropna()
     )
-    discrepancy = abs(compared["killed_domestic_supply"] - compared["slaughtered"]) / compared["slaughtered"]
+    discrepancy = (
+        abs(compared["killed_for_domestic_supply"] - compared["killed_in_country"]) / compared["killed_in_country"]
+    )
     assert discrepancy.max() <= 0.15, f"World totals differ from QCL slaughter by up to {discrepancy.max():.1%}."
 
 
@@ -184,12 +186,12 @@ def run() -> None:
     tb_rates = prepare_animals_per_tonne(tb_qcl=tb_qcl)
     tb = prepare_meat_supply(tb_fbsc=tb_fbsc).merge(tb_rates, on=["country", "year", "animal_group"], how="outer")
 
-    # Countries that slaughter no animals of their own have no rate; convert their meat at the world's.
+    # Countries that kill no animals of their own have no rate; convert their meat at the world's.
     world_rates = tb_rates[tb_rates["country"] == "World"][["year", "animal_group", "animals_per_tonne"]].rename(
         columns={"animals_per_tonne": "world_animals_per_tonne"}, errors="raise"
     )
     tb = tb.merge(world_rates, on=["year", "animal_group"], how="left")
-    uses_world_rate = tb["animals_per_tonne"].isna() & tb["killed_domestic_supply"].notna()
+    uses_world_rate = tb["animals_per_tonne"].isna() & tb["killed_for_domestic_supply"].notna()
     tb["animals_per_tonne"] = tb["animals_per_tonne"].fillna(tb["world_animals_per_tonne"])
 
     # Canary: if a future FAOSTAT release stopped publishing slaughter counts, every country would quietly fall
@@ -213,7 +215,7 @@ def run() -> None:
     ].reset_index(drop=True)
 
     # Move animal groups into columns, and add the total across groups.
-    metrics = list(MEAT_ELEMENTS.values()) + ["slaughtered"]
+    metrics = list(MEAT_ELEMENTS.values()) + ["killed_in_country"]
     tb = tb.pivot(index=["country", "year"], columns="animal_group", values=metrics, join_column_levels_with="_")
     # NOTE: Sum the groups that are informed, rather than requiring all of them. Otherwise a country missing one
     # group would have no total at all, while still counting towards each region's per-group totals.
