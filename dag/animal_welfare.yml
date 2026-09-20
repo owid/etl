@@ -115,6 +115,11 @@ steps:
   #
   # Banning of chick culling — chart authored in ETL.
   #
+  # Animals used for food, by animal and by how they are counted.
+  viz://chart/animal_welfare/latest/animals_used_for_food:
+    - data://grapher/animal_welfare/2026-03-03/animals_used_for_food
+    - data://grapher/animal_welfare/2026-09-16/animals_killed_for_domestic_consumption
+    - data://grapher/faostat/2026-02-25/faostat_qcl
   # Production-based vs consumption-based animals killed (temporary comparison chart).
   viz://chart/animal_welfare/latest/animals_killed_production_vs_consumption:
     - data://grapher/animal_welfare/2026-09-16/animals_killed_for_domestic_consumption

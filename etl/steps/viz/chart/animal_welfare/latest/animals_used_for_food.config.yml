@@ -1,0 +1,806 @@
+grapher_schema: "011"
+
+title:
+  title: Animals used for food
+  title_variant: by animal, and by how they are counted
+topic_tags:
+  - Animal Welfare
+default_selection:
+  - World
+  - United States
+  - China
+  - India
+  - Brazil
+  - United Kingdom
+  - Spain
+default_dimensions:
+  metric: killed_in_country
+  animal: land_animals
+  per_capita: total
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: chart
+        yAxis:
+          min: 0
+
+dimensions:
+  - name: Metric
+    slug: metric
+    choices:
+      - slug: killed_in_country
+        name: Animals killed in a country
+        description: Animals slaughtered within the country, wherever their meat is eventually eaten
+      - slug: killed_for_consumption
+        name: Animals killed for a country's consumption
+        description: Animals killed to supply the food the country itself consumes, after accounting for trade
+      - slug: alive
+        name: Animals alive at any given time
+        description: Animals kept in the country at a given moment, rather than counted over a year
+  - name: Animal
+    slug: animal
+    choices:
+      - slug: land_animals
+        name: All land animals
+        group: Meat
+      - slug: cattle_and_buffaloes
+        name: Cattle and buffaloes
+        group: Meat
+      - slug: sheep_and_goats
+        name: Sheep and goats
+        group: Meat
+      - slug: pigs
+        name: Pigs
+        group: Meat
+      - slug: poultry
+        name: Poultry
+        group: Meat
+      - slug: cattle
+        name: Cattle
+        group: Meat
+      - slug: buffaloes
+        name: Buffaloes
+        group: Meat
+      - slug: sheep
+        name: Sheep
+        group: Meat
+      - slug: goats
+        name: Goats
+        group: Meat
+      - slug: chickens
+        name: Chickens
+        group: Meat
+      - slug: ducks
+        name: Ducks
+        group: Meat
+      - slug: turkeys
+        name: Turkeys
+        group: Meat
+      - slug: geese
+        name: Geese
+        group: Meat
+      - slug: pigeons
+        name: Pigeons
+        group: Meat
+      - slug: rabbits
+        name: Rabbits
+        group: Meat
+      - slug: horses
+        name: Horses
+        group: Meat
+      - slug: donkeys
+        name: Donkeys
+        group: Meat
+      - slug: mules
+        name: Mules
+        group: Meat
+      - slug: camels
+        name: Camels
+        group: Meat
+      - slug: other_camelids
+        name: Other camelids
+        group: Meat
+      - slug: other_rodents
+        name: Other rodents
+        group: Meat
+      - slug: game_animals
+        name: Game animals
+        group: Meat
+      - slug: farmed_fish
+        name: Farmed fish
+        group: Fish
+      - slug: wild_caught_fish
+        name: Wild-caught fish
+        group: Fish
+      - slug: farmed_crustaceans
+        name: Farmed crustaceans
+        group: Fish
+      - slug: laying_hens
+        name: Chickens used for eggs
+        group: Eggs
+      - slug: milk_cattle
+        name: Cattle used for milk
+        group: Milk
+  - name: Count
+    slug: per_capita
+    choices:
+      - slug: total
+        name: Total number
+      - slug: per_capita
+        name: Per person
+
+views:
+  - dimensions:
+      metric: killed_in_country
+      animal: land_animals
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_slaughtered"
+  - dimensions:
+      metric: killed_in_country
+      animal: cattle_and_buffaloes
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_slaughtered"
+  - dimensions:
+      metric: killed_in_country
+      animal: sheep_and_goats
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_slaughtered"
+  - dimensions:
+      metric: killed_in_country
+      animal: pigs
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#pigs_slaughtered"
+  - dimensions:
+      metric: killed_in_country
+      animal: poultry
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#poultry_slaughtered"
+  - dimensions:
+      metric: killed_in_country
+      animal: cattle
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_cattle__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: buffaloes
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_buffaloes__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: sheep
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_sheep__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: goats
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_goats__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: chickens
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_chickens__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: ducks
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_ducks__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: turkeys
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_turkeys__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: geese
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_geese__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: pigeons
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_pigeons__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: rabbits
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_rabbits__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: horses
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_horses__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: donkeys
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_donkeys__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: mules
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_mules__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: camels
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_camels__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: other_camelids
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_other_camelids__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: other_rodents
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_other_rodents__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: game_animals
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed__metric_animals_killed__animal_game_animals__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: farmed_fish
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_farmed_fish__metric_animals_killed__animal_farmed_fish__per_capita_false__estimate_midpoint"
+  - dimensions:
+      metric: killed_in_country
+      animal: wild_caught_fish
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_wild_fish__metric_animals_killed__animal_wild_caught_fish__per_capita_false__estimate_midpoint"
+  - dimensions:
+      metric: killed_in_country
+      animal: farmed_crustaceans
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_farmed_crustaceans__metric_animals_killed__animal_farmed_crustaceans__per_capita_false__estimate_midpoint"
+  - dimensions:
+      metric: killed_for_consumption
+      animal: land_animals
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_killed_domestic_supply"
+  - dimensions:
+      metric: killed_for_consumption
+      animal: cattle_and_buffaloes
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_killed_domestic_supply"
+  - dimensions:
+      metric: killed_for_consumption
+      animal: sheep_and_goats
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_killed_domestic_supply"
+  - dimensions:
+      metric: killed_for_consumption
+      animal: pigs
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#pigs_killed_domestic_supply"
+  - dimensions:
+      metric: killed_for_consumption
+      animal: poultry
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#poultry_killed_domestic_supply"
+  - dimensions:
+      metric: alive
+      animal: cattle
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_cattle__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: buffaloes
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_buffaloes__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: sheep
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_sheep__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: goats
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_goats__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: chickens
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_chickens__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: ducks
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_ducks__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: turkeys
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_turkeys__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: geese
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_geese__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: rabbits
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_rabbits__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: horses
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_horses__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: donkeys
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_donkeys__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: mules
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_mules__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: camels
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_camels__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: other_camelids
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_other_camelids__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: other_rodents
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_other_rodents__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: pigs
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_pigs__per_capita_false__estimate"
+  - dimensions:
+      metric: alive
+      animal: poultry
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive__metric_animals_alive__animal_poultry__per_capita_false__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: land_animals
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_slaughtered_per_capita"
+  - dimensions:
+      metric: killed_in_country
+      animal: cattle_and_buffaloes
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_slaughtered_per_capita"
+  - dimensions:
+      metric: killed_in_country
+      animal: sheep_and_goats
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_slaughtered_per_capita"
+  - dimensions:
+      metric: killed_in_country
+      animal: pigs
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#pigs_slaughtered_per_capita"
+  - dimensions:
+      metric: killed_in_country
+      animal: poultry
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#poultry_slaughtered_per_capita"
+  - dimensions:
+      metric: killed_in_country
+      animal: cattle
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_cattle__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: buffaloes
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_buffaloes__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: sheep
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_sheep__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: goats
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_goats__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: chickens
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_chickens__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: ducks
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_ducks__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: turkeys
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_turkeys__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: geese
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_geese__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: pigeons
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_pigeons__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: rabbits
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_rabbits__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: horses
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_horses__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: donkeys
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_donkeys__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: mules
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_mules__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: camels
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_camels__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: other_camelids
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_other_camelids__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: other_rodents
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_other_rodents__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: game_animals
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_killed_per_capita__metric_animals_killed__animal_game_animals__per_capita_true__estimate"
+  - dimensions:
+      metric: killed_in_country
+      animal: farmed_fish
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_farmed_fish_per_capita__metric_animals_killed__animal_farmed_fish__per_capita_true__estimate_midpoint"
+  - dimensions:
+      metric: killed_in_country
+      animal: wild_caught_fish
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_wild_fish_per_capita__metric_animals_killed__animal_wild_caught_fish__per_capita_true__estimate_midpoint"
+  - dimensions:
+      metric: killed_in_country
+      animal: farmed_crustaceans
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_farmed_crustaceans_per_capita__metric_animals_killed__animal_farmed_crustaceans__per_capita_true__estimate_midpoint"
+  - dimensions:
+      metric: killed_for_consumption
+      animal: land_animals
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#land_animals_killed_domestic_supply_per_capita"
+  - dimensions:
+      metric: killed_for_consumption
+      animal: cattle_and_buffaloes
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#cattle_and_buffaloes_killed_domestic_supply_per_capita"
+  - dimensions:
+      metric: killed_for_consumption
+      animal: sheep_and_goats
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#sheep_and_goats_killed_domestic_supply_per_capita"
+  - dimensions:
+      metric: killed_for_consumption
+      animal: pigs
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#pigs_killed_domestic_supply_per_capita"
+  - dimensions:
+      metric: killed_for_consumption
+      animal: poultry
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_killed_for_domestic_consumption#poultry_killed_domestic_supply_per_capita"
+  - dimensions:
+      metric: alive
+      animal: cattle
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_cattle__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: buffaloes
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_buffaloes__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: sheep
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_sheep__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: goats
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_goats__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: chickens
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_chickens__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: ducks
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_ducks__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: turkeys
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_turkeys__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: geese
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_geese__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: rabbits
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_rabbits__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: horses
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_horses__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: donkeys
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_donkeys__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: mules
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_mules__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: camels
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_camels__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: other_camelids
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_other_camelids__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: other_rodents
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_other_rodents__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: pigs
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_pigs__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: poultry
+      per_capita: per_capita
+    indicators:
+      y:
+        - catalogPath: "animals_used_for_food#n_animals_alive_per_capita__metric_animals_alive__animal_poultry__per_capita_true__estimate"
+  - dimensions:
+      metric: alive
+      animal: laying_hens
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "faostat_qcl/faostat_qcl_flat#eggs_from_hens__00001062__laying__005313__animals"
+  - dimensions:
+      metric: alive
+      animal: milk_cattle
+      per_capita: total
+    indicators:
+      y:
+        - catalogPath: "faostat_qcl/faostat_qcl_flat#raw_milk_of_cattle__00000882__milk_animals__005318__animals"
