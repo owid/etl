@@ -4,7 +4,7 @@ meta:
     title: Poverty projections from World Bank PIP
     description: |-
       This dataset was created using the March 2026 vintage of [Poverty and Inequality Platform](https://pip.worldbank.org/home) (PIP). This dataset contains a series of country-level and global-level poverty rate projections up to 2050, updating the projections reported in [Poverty, Prosperity, and Planet Report (2024)](https://www.worldbank.org/en/publication/poverty-prosperity-and-planet). The methodology and the reproducibility package for the projections can be found [here](https://reproducibility.worldbank.org/catalog/250).
-    title_snapshot: Poverty projections from World Bank PIP - Country-level historical and projected poverty rates
+    title_snapshot: Poverty projections from World Bank PIP – Country-level historical and projected poverty rates
     description_snapshot: |-
       Historical poverty rates from 1981 to 2026 from PIP and projected poverty rates from 2027 to 2050.
     citation_full: |-

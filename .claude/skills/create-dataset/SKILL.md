@@ -8,6 +8,7 @@ description: >-
   build a working dataset first, then ask the person to review and correct.
 metadata:
   internal: true
+  owner: Marigold
 ---
 
 # Create a dataset
@@ -126,14 +127,14 @@ Scaffold the three steps with `/create-etl-steps` (DAG file = the topic that bes
 - **Meadow** — load the snapshot, rename the entity column to `country` if needed, cast low-cardinality string columns (`country`, dims) to `category`, `tb.format(["country", "year"])` (or `["country", "date"]`, plus any dims). Keep it light.
 - **Garden** — `paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)`, then `tb.format(...)`. Add `sanity_check_inputs` / `sanity_check_outputs` if the step does more than load-and-format (see CLAUDE.md "Sanity checks"); ground every threshold in the built data and pick value bounds from the by-indicator-type table in `/update-dataset` §5b-bis, then negative-test the checks. Don't strip origins — follow the metadata-preserving patterns in CLAUDE.md (`pr.concat`, no `np.where`, etc.).
 - **Grapher** — pass the garden table through unchanged.
-- **Metadata** (`<short_name>.meta.yml` in garden) — generate it with `/owid-metadata-generation`, then verify it against the mandatory-fields checklist in `/update-dataset` §6c. Fill `title`, `unit`, `short_unit`, `description_short`, `description_key` (free-form markdown prose; non-empty), `display.name`, `display.numDecimalPlaces`, `display.tolerance` per indicator; `topic_tags` and `processing_level` in `definitions.common`; `presentation.attribution_short` explicitly under `definitions.common.presentation` — it does **not** inherit from the origin's `attribution_short`. In the `dataset` block, set `update_period_days` plus `owners`: the user is the new dataset's first owner — resolve their canonical OWID name from `git config user.name` via `etl.owners.resolve_owner` (must match the `schemas/dataset-schema.json` enum; add the mapping in `etl/owners.py` + an enum row if missing), mirroring `/update-dataset` step 1a-bis. Use the units you inferred in Step 1; mark anything uncertain so it shows up in the review.
+- **Metadata** (`<short_name>.meta.yml` in garden) — generate it with `/generate-metadata`, then verify it against the mandatory-fields checklist in `/update-dataset` §6c. Fill `title`, `unit`, `short_unit`, `description_short`, `description_key` (free-form markdown prose; non-empty), `display.name`, `display.numDecimalPlaces`, `display.tolerance` per indicator; `topic_tags` and `processing_level` in `definitions.common`; `presentation.attribution_short` explicitly under `definitions.common.presentation` — it does **not** inherit from the origin's `attribution_short`. In the `dataset` block, set `update_period_days` plus `owners`: the user is the new dataset's first owner — resolve their canonical OWID name from `git config user.name` via `etl.owners.resolve_owner` (must match the `schemas/dataset-schema.json` enum; add the mapping in `etl/owners.py` + an enum row if missing), mirroring `/update-dataset` step 1a-bis. Use the units you inferred in Step 1; mark anything uncertain so it shows up in the review.
 - **Outdated-practices check** — run `/check-outdated-practices` on every new step file (including any helper modules, and the Step 4 snapshot `.py` if one was written) and fix findings before the first run, per `/update-dataset` step 1b — run the skill, don't eyeball the patterns.
 - **DAG form** — write the new chain in the nested (compact) DAG form (grapher → garden → meadow → snapshot declared inline; example in `/update-dataset` "Removing the old version & reordering the DAG", step 4) and verify it parses: `.venv/bin/python -c "from etl.dag_helpers import load_dag; load_dag()"`.
 
 ### Step 6 — Run the chain and harmonize countries
 
 ```bash
-.venv/bin/etlr <namespace>/<version>/<short_name> --private
+.venv/bin/etlr <namespace>/<version>/<short_name>
 ```
 
 Fix whatever breaks (trace upstream, never mask). The most common task is **country harmonization**: the garden run logs unmatched country names that need mapping into `<short_name>.countries.json`.
@@ -147,7 +148,7 @@ from owid.catalog import Dataset
 import pandas as pd
 
 # Needs the regions dataset built locally:
-#   .venv/bin/etlr data://garden/regions/2023-01-01/regions --private
+#   .venv/bin/etlr data://garden/regions/2023-01-01/regions
 tb_regions = Dataset(str(sorted(Path("data/garden/regions").glob("*/regions"))[-1]))["regions"]
 canonical = set(tb_regions["name"].dropna().astype(str))
 alias_map = {}
@@ -170,20 +171,20 @@ After the garden step builds, also run the **garden-output entity check** from `
 Then build and upload the grapher step to staging — target the `grapher/...` path (no `--only`, so the `grapher://` MySQL upsert step actually runs):
 
 ```bash
-STAGING=<branch> .venv/bin/etlr grapher/<namespace>/<version>/<short_name> --grapher --private
+STAGING=<branch> .venv/bin/etlr grapher/<namespace>/<version>/<short_name> --grapher
 ```
 
 Confirm the upsert actually succeeded before moving on: it should print the dataset's admin URL / id (`…/admin/datasets/<id>`). **Capture that `<id>`** — you'll hand it to the user in Step 7. If the upsert errored or printed no dataset, fix it now rather than handing over a link that won't resolve.
 
 ### Step 6b — Adversarial fact-check of data and metadata (optional — offer it in the handoff)
 
-Optionally run [`/adversarial-data-review`](../adversarial-data-review/SKILL.md) on `garden/<namespace>/<version>/<short_name>`. It's not part of the default build because it can consume many tokens (~12–20 web calls even for a small dataset) — mention it as an offer in the Step 7 handoff ("I can also fact-check the data and metadata against the source's documentation and independent sources — say the word") and run it when the user opts in, or proactively when the build surfaced red flags (values that look implausible, a source page contradicting the file).
+Optionally run [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) on `garden/<namespace>/<version>/<short_name>`. It's not part of the default build because it can consume many tokens (~12–20 web calls even for a small dataset) — mention it as an offer in the Step 7 handoff ("I can also fact-check the data and metadata against the source's documentation and independent sources — say the word") and run it when the user opts in, or proactively when the build surfaced red flags (values that look implausible, a source page contradicting the file).
 
 When it runs: since the dataset is brand-new (no charts yet, few indicators), review **all** indicators. This catches the two things the Step 7 review table can't: metadata you inferred that the source's own documentation contradicts (units, definitions, scope), and values the *source itself* got wrong (unit slips, wrong-year rows) — verified against independent sources online. Fold the findings into the handoff in plain language ("I double-checked the numbers against <independent source> — X and Y match; Z looks off, here's why"), and route confirmed source errors to `<short_name>.corrections.yml` per that skill's routing table rather than editing the data inline.
 
 ### Step 7 — Commit, push, and hand off for review
 
-1. **Quality pass before handoff.** Run **all five checks** from `/update-dataset` §6b on the new garden + grapher `.meta.yml` files — `/check-metadata-typos`, `/check-metadata-spacing`, `/check-metadata-style`, the general-audience clarity checklist, and the **dimension sweep**. Include the Step 4 `.dvc` in the `/check-metadata-typos` scope: its `description` / `title` / `citation_full` are user-facing too, and no other check spell-checks them (`/create-snapshot` step 5 makes the same pass for a standalone snapshot — keep the two consistent). Leave `citation_full` alone unless the producer's own page has the word right; it is verbatim producer text whenever a piece of user-facing text is shared across sibling variants — Jinja over a dimension (the long-format case Step 1 item 5 detects) *or* a `definitions:` key that several indicator blocks reuse, which a wide-format file with one column per subgroup produces without any extra-dimension column to detect. A sentence written for one variant renders on all its siblings, where what each view already restricts can make it false; render the text per variant and read each output as a reader of that chart. A brand-new dataset is exactly where such shared text gets written for the first time, so it needs the sweep as much as an update does. Then run the link-verification loop from `/update-dataset` §6c on every URL in the new `.dvc` and `.meta.yml` files, including its anchor-fragment pass for URLs with `#…` (a curl non-2xx is a *signal*, not proof — escalate WebFetch → Wayback availability API, and per §6c no automated signal is decisive: a link failing every automated check goes to the user for a browser confirmation, never auto-marked broken or replaced). After any `.meta.yml` edit, re-run the affected step (`--grapher` for grapher) so the built catalog and staging reflect it.
+1. **Quality pass before handoff.** Run **all four checks** from `/update-dataset` §6b on the new garden + grapher `.meta.yml` files — `/check-metadata-typos`, `/check-metadata-style` (its first pass covers Jinja spacing), the general-audience clarity checklist, and the **dimension sweep**. Include the Step 4 `.dvc` in the `/check-metadata-typos` scope: its `description` / `title` / `citation_full` are user-facing too, and no other check spell-checks them (`/create-snapshot` step 5 makes the same pass for a standalone snapshot — keep the two consistent). Leave `citation_full` alone unless the producer's own page has the word right; it is verbatim producer text whenever a piece of user-facing text is shared across sibling variants — Jinja over a dimension (the long-format case Step 1 item 5 detects) *or* a `definitions:` key that several indicator blocks reuse, which a wide-format file with one column per subgroup produces without any extra-dimension column to detect. A sentence written for one variant renders on all its siblings, where what each view already restricts can make it false; render the text per variant and read each output as a reader of that chart. A brand-new dataset is exactly where such shared text gets written for the first time, so it needs the sweep as much as an update does. Then run the link-verification loop from `/update-dataset` §6c on every URL in the new `.dvc` and `.meta.yml` files, including its anchor-fragment pass for URLs with `#…` (a curl non-2xx is a *signal*, not proof — escalate WebFetch → Wayback availability API, and per §6c no automated signal is decisive: a link failing every automated check goes to the user for a browser confirmation, never auto-marked broken or replaced). After any `.meta.yml` edit, re-run the affected step (`--grapher` for grapher) so the built catalog and staging reflect it.
 2. Run `make check`, confirm you're still on the work branch (`git branch --show-current` — a branch switch in the user's IDE silently moves your shell too), then commit and push:
    ```bash
    git add .

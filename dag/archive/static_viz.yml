@@ -1,0 +1,21 @@
+steps:
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://static_viz/population/2026-02-05/population_billion_milestones:
+    - data://garden/demography/2024-07-15/population
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://static_viz/population/2026-01-26/world_population_growth:
+    - data://garden/demography/2024-07-15/population
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://static_viz/oecd/2026-08-14/time_use_by_country:
+    - data://garden/oecd/2026-08-14/time_use
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://static_viz/population/2026-02-02/world_population_long_run:
+    - data://grapher/demography/2025-10-22/life_expectancy
+    - data://grapher/demography/2024-07-15/population
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://static_viz/population/2026-02-03/pop_doubling:
+    - data://garden/demography/2024-07-18/population_doubling_times
+    - data://garden/demography/2024-07-15/population
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://static_viz/who/2026-08-07/height_for_age:
+    - data://garden/who/2026-08-07/height_for_age

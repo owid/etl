@@ -9,7 +9,6 @@ from pathlib import Path
 
 import pandas as pd
 import requests
-from owid.datautils.io import df_to_file
 
 from etl.snapshot import Snapshot
 
@@ -45,5 +44,4 @@ def run(upload: bool = True) -> None:
     df_all = pd.concat(dataframes, ignore_index=True)
 
     # Write the combined file, add it to DVC and upload it to R2.
-    df_to_file(df_all, file_path=snap.path)
-    snap.dvc_add(upload=upload)
+    snap.create_snapshot(data=df_all, upload=upload)

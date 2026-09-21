@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: WHO Mortality Database
-    title: WHO Mortality Database - Vaccine Preventable
+    title: WHO Mortality Database – Vaccine Preventable
     description: |-
       The WHO mortality database is a collection death registration data including cause-of-death information from member states.
 

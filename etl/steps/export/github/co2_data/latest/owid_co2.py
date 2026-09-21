@@ -15,7 +15,6 @@ Outputs that will be committed to a branch in the co2-data repository:
 
 """
 
-import os
 import re
 import tempfile
 from pathlib import Path
@@ -25,6 +24,7 @@ import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
 
+from etl import config
 from etl.git_api_helpers import GithubApiRepo
 from etl.helpers import PathFinder
 from etl.paths import BASE_DIR
@@ -254,10 +254,10 @@ def run() -> None:
         log.warning("You are on master branch, using dry mode.")
         dry_run = True
     else:
-        # Load DRY_RUN from env or use False as default.
-        dry_run = bool(int(os.environ.get("DRY_RUN", 0)))
+        # Without --export, build the files but don't commit them.
+        dry_run = not config.EXPORT_ENABLED
         if dry_run:
-            log.info(f"Dry run mode: Would commit files to branch {branch}")
+            log.info(f"No --export: would commit files to branch {branch}")
         else:
             log.info(f"Committing files to branch {branch}")
 

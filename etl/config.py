@@ -8,6 +8,7 @@ only important for OWID staff.
 """
 
 import asyncio
+import json
 import logging
 import os
 import pwd
@@ -28,7 +29,7 @@ from joblib import Memory  # 0.08
 from sqlalchemy.engine import Engine  # 0.07
 from sqlalchemy.orm import Session  # ~ 0.07
 
-from etl.paths import BASE_DIR, CACHE_DIR
+from etl.paths import BASE_DIR, CACHE_DIR, SCHEMAS_DIR
 
 log = structlog.get_logger()
 
@@ -204,6 +205,14 @@ if STAGING is not None:
     DB_HOST = get_container_name(STAGING)
     DATA_API_ENV = get_container_name(STAGING)
 
+# A blank DB_HOST is a misconfiguration, never a default: `env.get` returns "" only when the key
+# is present and empty, and neither branch above can produce that (`load_STAGING` maps "" to None,
+# `get_container_name` always returns a "staging-site-..." string). On a staging server it means
+# the container's .env was read while being rewritten. Caught here so it fails on one readable
+# line instead of a SQLAlchemy traceback ending in `Can't connect to MySQL server on ''`, which
+# names no step and looks like an outage rather than a config problem.
+assert DB_HOST, "DB_HOST is set but empty. Expected a hostname; check the .env this process loaded."
+
 
 # if running against live, use s3://owid-api, otherwise use s3://owid-api-staging
 # Cloudflare workers running on https://api.ourworldindata.org/ and https://api-staging.owid.io/ will use them
@@ -253,11 +262,18 @@ CONTINUE_ON_FAILURE = env.get("CONTINUE_ON_FAILURE", "0") in ("True", "true", "1
 # if set, skip the actual garden step and only apply the metadata
 INSTANT = env.get("INSTANT", "0") in ("True", "true", "1")
 
-# if set, always upload grapher data & metadata JSON files even if checksums match
-FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
+# Upload grapher data & metadata JSON files even if their checksums match. Set by `etlr --force`.
+FORCE_UPLOAD: bool = False
 
-# if set, export steps will not upload/commit files (e.g. S3, GitHub)
-DRY_RUN = env.get("DRY_RUN", "0") in ("True", "true", "1")
+# Write permissions, set by `etlr` from its --grapher / --export flags (see `etl.command.main`, which
+# `etl browser` and fasttrack call directly, so they get the same gating).
+# A step whose destination is gated builds its output locally and skips the upsert/upload when its
+# permission is off: chart, explorer and bespoke steps under GRAPHER_ENABLED, export:// steps under
+# EXPORT_ENABLED. Outside `etlr` (a notebook calling `chart.save()`, a step module run directly)
+# nothing is gated, hence the defaults. `etlr` also exports them to the environment so that a step
+# run in a subprocess sees the same permissions.
+GRAPHER_ENABLED = env.get("GRAPHER_ENABLED", "1") in ("True", "true", "1")
+EXPORT_ENABLED = env.get("EXPORT_ENABLED", "1") in ("True", "true", "1")
 
 # Filter to speed up development - works as regex for both data processing and grapher upload
 # - In data steps: filters data rows by matching against relevant columns (e.g. causes, indicators)
@@ -297,6 +313,8 @@ SENTRY_DSN = env.get("SENTRY_DSN")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
 ANTHROPIC_API_KEY = env.get("ANTHROPIC_API_KEY", None)
+# NOTE: Nothing imports this constant, but the env var is read straight from the environment by
+# pydantic-ai's Google provider (chart-critic defaults to a Gemini model) and by scripts/vocabulary.
 GOOGLE_API_KEY = env.get("GOOGLE_API_KEY", None)
 
 OWIDBOT_ACCESS_TOKEN = env.get("OWIDBOT_ACCESS_TOKEN", None)
@@ -319,8 +337,48 @@ GITHUB_API_URL = f"{GITHUB_API_BASE}/pulls"
 # Skip SSL verify
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
-# Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.011.json"
+# Upstream alias that always serves the newest published grapher chart-config schema. Used only to
+# *discover* a new version at bump time (`scripts/generate_schema_types.py --bump-version`, and the
+# scheduled sync workflow). Never resolve it at run time: its `properties.$schema.const` names one
+# concrete version, so it can't validate a config pinned at an older one, and stamping it on our
+# output would claim configs match a version we haven't vendored, validated or generated types for.
+GRAPHER_SCHEMA_LATEST_URL = "https://files.ourworldindata.org/schemas/grapher-schema.latest.json"
+
+_GRAPHER_SCHEMA_FILE_RE = re.compile(r"^grapher-schema\.\d{3}\.json$")
+
+
+def vendored_grapher_schema_id() -> str:
+    """`$id` of the grapher chart-config schema this repo vendors.
+
+    The vendored file under `schemas/` is the single source of truth for the version: it is what
+    `multidim-schema.json` / `explorer-schema.json` `$ref`, what `schema_types.py` is generated
+    from, and what ETL validates configs against offline. Reading its own `$id` instead of
+    repeating the version here means the constant can never name a version we don't have on disk.
+    """
+    vendored = sorted(p for p in SCHEMAS_DIR.glob("grapher-schema.*.json") if _GRAPHER_SCHEMA_FILE_RE.match(p.name))
+    if len(vendored) != 1:
+        raise RuntimeError(
+            f"Expected exactly one vendored grapher schema (grapher-schema.NNN.json) in {SCHEMAS_DIR}, "
+            f"found {[p.name for p in vendored]}. A version bump replaces the file rather than adding "
+            "one — run `python scripts/generate_schema_types.py --bump-version`."
+        )
+
+    path = vendored[0]
+    schema_id = json.loads(path.read_text()).get("$id")
+    if not isinstance(schema_id, str) or schema_id.rsplit("/", 1)[-1] != path.name:
+        raise RuntimeError(
+            f"Vendored {path.name} declares `$id` {schema_id!r}, which doesn't match its filename. "
+            "Grapher keys config migrations on the `$id`, and ETL resolves `$schema` URLs to local "
+            "files by basename, so the two must agree. Re-vendor with "
+            "`python scripts/generate_schema_types.py --refresh`."
+        )
+    return schema_id
+
+
+# Grapher chart-config schema version this repo is built against — the default `$schema` for
+# indicator-level `presentation.grapher_config`, and the version a new chart config should pin.
+# Derived from the vendored copy (see above); bump it with `--bump-version`, never by hand.
+DEFAULT_GRAPHER_SCHEMA = vendored_grapher_schema_id()
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
@@ -398,6 +456,7 @@ class OWIDEnv:
     _env_local: OWIDEnvType | None
     conf: Config
     _engine: Engine | None
+    _engine_pid: int | None
 
     def __init__(
         self,
@@ -408,8 +467,9 @@ class OWIDEnv:
         self._env_remote = None
         # Local environment: environment where the code is running
         self._env_local = None  # "production", "staging", "dev"
-        # Engine (cached)
+        # Engine (cached per process, see `engine`)
         self._engine = None
+        self._engine_pid = None
 
     @property
     def env(self) -> OWIDEnvType:
@@ -493,11 +553,19 @@ class OWIDEnv:
 
     @property
     def engine(self) -> Engine:
-        """Get engine for env."""
+        """Get engine for env.
+
+        Cached per process: a step forked by `etlr` inherits this object from its parent, but not
+        usable DB sockets (the child closes every inherited file descriptor), so an engine created
+        in the parent must not be reused in the child. `etl.db.get_engine` memoizes by pid for the
+        same reason.
+        """
         from etl.db import get_engine
 
-        if self._engine is None:
+        pid = os.getpid()
+        if self._engine is None or self._engine_pid != pid:
             self._engine = get_engine(self.conf.__dict__)
+            self._engine_pid = pid
         return self._engine
 
     @property
@@ -640,7 +708,7 @@ class OWIDEnv:
         """Get indicator admin url."""
         return f"{self.admin_site}/datapage-preview/{variable_id}/"
 
-    def collection_preview(self, catalog_path: str):
+    def chart_preview(self, catalog_path: str):
         encoded_path = quote(catalog_path, safe="")
         return f"{self.admin_site}/grapher/{encoded_path}/"
 
@@ -723,12 +791,10 @@ for env_var in env_vars:
 
 # Get Metabase credentials and parameters (for more information, visit the analytics repos).
 METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
-METABASE_API_KEY_ADMIN = os.environ.get("METABASE_API_KEY_ADMIN")
 METABASE_URL = os.environ.get("METABASE_URL")
 # Semantic layer = the `prod_semantic` dataset on the "Data warehouse (BigQuery)" connection (id 3).
 # The old DuckDB semantic-layer connection (id 2) was retired (owid/analytics#735).
 METABASE_SEMANTIC_LAYER_DATABASE_ID = 3
-METABASE_URL_LOCAL = os.environ.get("METABASE_URL", "http://localhost:3000")
 METABASE_URL = os.environ.get("METABASE_URL", "http://metabase.owid.io")
 
 ########################################################################################################################
@@ -738,13 +804,11 @@ FORCE_DATASETTE = (not METABASE_API_KEY) or (not METABASE_URL)
 # Get Notion credentials.
 NOTION_API_KEY = os.environ.get("NOTION_API_KEY")
 NOTION_IMPACT_HIGHLIGHTS_TABLE_URL = os.environ.get("NOTION_IMPACT_HIGHLIGHTS_TABLE_URL")
-NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL = os.environ.get("NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL")
+NOTION_DATA_PRODUCERS_CONTACTS_TABLE_URL = os.environ.get("NOTION_DATA_PRODUCERS_CONTACTS_TABLE_URL")
+NOTION_DATA_PRODUCER_INTERACTIONS_TABLE_URL = os.environ.get("NOTION_DATA_PRODUCER_INTERACTIONS_TABLE_URL")
 
 # Google drive IDs for folders, docs and sheets, for the data producer reports project.
 # NOTE: Here we fill all variables with "" if not found to simplify type checks (this way we ensure they are strings).
 DATA_PRODUCER_REPORT_FOLDER_ID = os.environ.get("DATA_PRODUCER_REPORT_FOLDER_ID", "")
 DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID = os.environ.get("DATA_PRODUCER_REPORT_TEMPLATE_DOC_ID", "")
 DATA_PRODUCER_REPORT_STATUS_SHEET_ID = os.environ.get("DATA_PRODUCER_REPORT_STATUS_SHEET_ID", "")
-
-# MCP server
-OWID_MCP_SERVER_URL = env.get("OWID_MCP_SERVER_URL", "https://mcp.owid.io/mcp")

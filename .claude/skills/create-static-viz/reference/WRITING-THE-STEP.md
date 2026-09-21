@@ -1,4 +1,4 @@
-# Step 4 — Write the `export://static_viz` step
+# Step 4 — Write the `viz://static` step
 
 > Read at Step 4, once you know which chart you are building.  Part of [`/create-static-viz`](../SKILL.md); the spine has the step order.
 
@@ -17,9 +17,9 @@
 > not your current directory, so confirm where you are before editing and again before committing:
 > `git branch --show-current`.
 
-Path `etl/steps/export/static_viz/<namespace>/<version>/<short_name>.py`, DAG entry in
+Path `etl/steps/viz/static/<namespace>/<version>/<short_name>.py`, DAG entry in
 `dag/static_viz.yml` (a flat `steps:` map, one comment line per step, keyed by the full
-`export://` URI with its garden/grapher deps as the value).
+`viz://static/...` URI with its garden/grapher deps as the value).
 
 ### The Figma handoff contract
 
@@ -183,7 +183,7 @@ matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
 
 Naming Lato first costs nothing and buys a lot downstream: **Figma renders the import in the
 template's own typeface on arrival**, so the parked reference copy looks like the deliverable, and
-`/create-figma-chart`'s font pass — plus the anchor pass that exists only to undo that face change —
+`/owid-staff:create-figma-chart`'s font pass — plus the anchor pass that exists only to undo that face change —
 becomes a no-op. Without it Figma resolves none of `Arial, Helvetica, DejaVu Sans` and substitutes
 **Inter**, which is wider: one 850-wide chart overran its canvas by 39px that way. Verify it rather
 than assuming — the emitted stack is one grep, and the faces the import lands in are one read:

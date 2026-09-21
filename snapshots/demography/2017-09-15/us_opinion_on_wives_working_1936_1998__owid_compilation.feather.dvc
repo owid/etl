@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: Fogli and Veldkamp and GSS
-    title: US opinion on wives working 1936-1998
+    title: US opinion on wives working 1936–1998
     description: |-
       An OWID compilation of US public opinion data on married women working, combining two sources. For 1936-1970, data is taken from Fogli and Veldkamp (2011); the question asked varies slightly across the underlying surveys, see their appendix (B.2 Survey data) for more detail. For 1972-1998, data is taken from the General Social Survey (GSS), where respondents answered the question "Do you approve or disapprove of a married woman earning money in business or industry if she has a husband capable of supporting her?"
     citation_full: 'Fogli, A. and Veldkamp, L. (2011). Nature or nurture? Learning and the geography of female labor force participation. And General Social Survey (GSS), NORC at the University of Chicago.'

@@ -6,11 +6,11 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: "Italian children at work, 1881-1961"
+    title: "Italian children at work, 1881–1961"
     description: |-
       This World Bank Working Paper provides long-run estimates of child labor in Italy from 1881 to 1961, drawing on historical census data to construct sector-specific child work participation rates by age and sex.
     date_published: "2007"
-    title_snapshot: "Italian children at work, 1881-1961 - Child labor in Italy by sector"
+    title_snapshot: "Italian children at work, 1881–1961 – Child labor in Italy by sector"
     description_snapshot: |-
       Table 4, taken from the working paper on child labor in Italy.
 

@@ -2,7 +2,7 @@ steps:
   #
   # World Bank Enterprise Surveys
   #
-  export://multidim/corruption/latest/enterprise_surveys:
+  viz://chart/corruption/latest/enterprise_surveys:
     - data://grapher/wb/2025-05-12/enterprise_surveys:
       - data://garden/wb/2025-05-12/enterprise_surveys:
         - data://meadow/wb/2025-05-12/enterprise_surveys:
@@ -25,7 +25,7 @@ steps:
   #
   # Corruption Barometer
   #
-  export://multidim/corruption/latest/corruption_barometer:
+  viz://chart/corruption/latest/corruption_barometer:
     - data://grapher/corruption/2025-05-12/corruption_barometer:
       - data://garden/corruption/2025-05-12/corruption_barometer:
         - data://meadow/corruption/2025-05-12/corruption_barometer:

@@ -17,7 +17,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Use this to process a subset of data. Set a comma-separated list of countries. For example:
-# SUBSET='France,Germany' etlr un/2024-07-12/un_wpp --private
+# SUBSET='France,Germany' etlr un/2024-07-12/un_wpp
 SUBSET = os.environ.get("SUBSET")
 
 YEAR_SPLIT = 2024

@@ -7,7 +7,6 @@ import click
 import pandas as pd
 import pdfplumber
 import requests
-from owid.datautils.io import df_to_file
 
 from etl.snapshot import Snapshot
 
@@ -46,8 +45,7 @@ def main(upload: bool) -> None:
             # Merging extracted tables based on the 'country' column.
 
             # Saving the merged dataframe to a file and updating the DVC.
-            df_to_file(df_statins, file_path=snap.path)
-            snap.dvc_add(upload=upload)
+            snap.create_snapshot(data=df_statins, upload=upload)
 
 
 def extract_statin_use_table(response):

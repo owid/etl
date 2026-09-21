@@ -6,5 +6,5 @@
   action: override
   value: 14.2
   reason: Source value for China 2023 was incorrect; IFR revised it to 142 robots per 10,000 employees (forwarded to us; the image with the new data is paywalled).
-  provider: International Federation of Robotics
+  producer: International Federation of Robotics
   status: acknowledged

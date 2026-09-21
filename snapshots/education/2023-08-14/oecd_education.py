@@ -5,7 +5,6 @@ from pathlib import Path
 
 import click
 import pandas as pd
-from owid.datautils.io import df_to_file
 
 from etl.snapshot import Snapshot
 
@@ -87,11 +86,8 @@ def main(upload: bool) -> None:
         all_dfs, df_ed_years, on=["year", "country_or_region", "average_years_of_education"], how="outer"
     )
 
-    # Save the merged dataset to the snapshot path
-    df_to_file(all_dfs, file_path=snap.path)
-
-    # Add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
+    # Save the merged dataset, add file to DVC and upload to S3.
+    snap.create_snapshot(data=all_dfs, upload=upload)
 
 
 def read_excel_data(filepath, format_type):

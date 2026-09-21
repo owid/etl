@@ -6,7 +6,7 @@ the file decides which chart every push lands on — getting it wrong either aba
 creates a duplicate. This command writes it for you, in the two situations that come up:
 
     # Brand-new chart: mint a UUIDv7 (same shape as the ones grapher generates).
-    etl chart-config-id new etl/steps/export/multidim/animal_welfare/latest/my_chart.config.yml
+    etl chart-config-id new etl/steps/viz/chart/animal_welfare/latest/my_chart.config.yml
 
     # Existing chart moving into ETL: take the UUID from the chart already in grapher,
     # identified by slug or by the numeric id from the admin URL.
@@ -28,9 +28,9 @@ from ruamel.yaml.comments import CommentedMap
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
-from etl.collection.chart_upsert import new_chart_config_id
 from etl.config import OWID_ENV, OWIDEnv
 from etl.files import ruamel_dump, ruamel_load
+from etl.viz.chart.upsert import new_chart_config_id
 
 console = Console()
 
@@ -40,10 +40,10 @@ FIELD = "chart_config_id"
 def _load_config(path: Path) -> CommentedMap:
     """Read the config YAML and refuse anything that isn't a single-chart config.
 
-    `chart_config_id` identifies one chart, so it is only meaningful on a collection that pushes
+    `chart_config_id` identifies one chart, so it is only meaningful on a chart that pushes
     as one chart: no dimensions and exactly one view. Mdims — including the ones that declare
     `dimensions: []` in the YAML and fill dimensions/views programmatically — are identified by
-    their catalog path instead, and `Collection.validate_chart_config_id()` rejects the field on
+    their catalog path instead, and `Chart.validate_chart_config_id()` rejects the field on
     them.
     """
     # `ruamel_load` is annotated as returning a plain dict, but in round-trip mode it hands back a
@@ -58,7 +58,7 @@ def _load_config(path: Path) -> CommentedMap:
         raise click.ClickException(
             f"{path} is not a single-chart config (expected `dimensions: []` and exactly one view, "
             f"got {len(dimensions or [])} dimensions and {len(views or [])} views). Multi-dimensional "
-            f"collections are identified by their catalog path and must not declare `{FIELD}`."
+            f"charts are identified by their catalog path and must not declare `{FIELD}`."
         )
     return config
 

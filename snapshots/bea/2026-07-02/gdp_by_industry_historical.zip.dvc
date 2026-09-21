@@ -3,8 +3,8 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: GDP by Industry (Historical, 1947-1997)
-    title_snapshot: GDP by Industry (Historical, 1947-1997) - Value added by industry
+    title: GDP by Industry (Historical, 1947–1997)
+    title_snapshot: GDP by Industry (Historical, 1947–1997) – Value added by industry
     description: |-
       Historical GDP-by-industry statistics for 1947-1997 on a NAICS (North American Industry Classification System) basis, produced when the Bureau of Economic Analysis extended its GDP-by-industry statistics back to 1947. The dataset includes annual estimates of value added by industry, gross output by industry, intermediate inputs by industry, and KLEMS statistics. These estimates cover the period before BEA's current annual industry accounts, which begin in 1997.
     description_snapshot: |-

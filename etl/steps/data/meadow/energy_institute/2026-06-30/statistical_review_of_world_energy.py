@@ -520,12 +520,12 @@ def run() -> None:
         tb_prices[column].metadata.origins[
             0
         ].attribution = (
-            f"Energy Institute based on S&P Global Platts - Statistical Review of World Energy ({year_published})"
+            f"Energy Institute based on S&P Global Platts – Statistical Review of World Energy ({year_published})"
         )
         tb_prices[column].metadata.origins[
             0
         ].citation_full = (
-            f"Energy Institute based on S&P Global Platts - Statistical Review of World Energy ({year_published})"
+            f"Energy Institute based on S&P Global Platts – Statistical Review of World Energy ({year_published})"
         )
         tb_prices[column].metadata.licenses.append(License(name=f"© S&P Global Inc. {year_published}"))
 

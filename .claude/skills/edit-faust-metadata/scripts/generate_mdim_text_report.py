@@ -16,7 +16,7 @@ JSON config shape (list of objects):
     [
       {
         "name": "incomes_pip",
-        "config_path": "export/multidim/wb/latest/incomes_pip/incomes_pip.config.json",
+        "config_path": "viz/chart/wb/latest/incomes_pip/incomes_pip.config.json",
         "collapse_dims": ["period"]
       },
       ...
@@ -60,22 +60,22 @@ from _common import (  # noqa: E402
 MDIMS: list[dict[str, Any]] = [
     {
         "name": "incomes_pip",
-        "config_path": BASE_DIR / "export/multidim/wb/latest/incomes_pip/incomes_pip.config.json",
+        "config_path": BASE_DIR / "viz/chart/wb/latest/incomes_pip/incomes_pip.config.json",
         "collapse_dims": ["period"],
     },
     {
         "name": "gini_pip",
-        "config_path": BASE_DIR / "export/multidim/wb/latest/gini_pip/gini_pip.config.json",
+        "config_path": BASE_DIR / "viz/chart/wb/latest/gini_pip/gini_pip.config.json",
         "collapse_dims": [],
     },
     {
         "name": "gini_lis",
-        "config_path": BASE_DIR / "export/multidim/lis/latest/gini_lis/gini_lis.config.json",
+        "config_path": BASE_DIR / "viz/chart/lis/latest/gini_lis/gini_lis.config.json",
         "collapse_dims": [],
     },
     {
         "name": "incomes_wid",
-        "config_path": BASE_DIR / "export/multidim/wid/latest/incomes_wid/incomes_wid.config.json",
+        "config_path": BASE_DIR / "viz/chart/wid/latest/incomes_wid/incomes_wid.config.json",
         "collapse_dims": [],
     },
 ]

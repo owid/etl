@@ -282,12 +282,12 @@ def candidate_files_for_mdim(catalog_path: str) -> list[str]:
     """From '<ns>/<ver>/<short>#<short>' (with or without channel prefix) find the MDim step files."""
     path_part = catalog_path.split("#", 1)[0]
     parts = path_part.split("/")
-    if parts and parts[0] in ("grapher", "multidim", "export"):
+    if parts and parts[0] in ("grapher", "multidim", "export", "viz", "chart"):
         parts = parts[1:]
     if len(parts) < 3:
         return []
     ns, ver, short = parts[0], parts[1], parts[2]
-    step_dir = REPO_ROOT / "etl/steps/export/multidim" / ns / ver
+    step_dir = REPO_ROOT / "etl/steps/viz/chart" / ns / ver
     if not step_dir.exists():
         return []
     return sorted(str(p.relative_to(REPO_ROOT)) for p in step_dir.glob(f"{short}*") if p.suffix in (".py", ".yml"))

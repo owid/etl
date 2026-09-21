@@ -11,7 +11,7 @@ source's four top-level categories and the ten were only ever summed back up to 
 reconstruction accurate to 3e-05 minutes of columns this table already has, and none of its 33
 indicators was used by any chart. What the chart does on top of the source is a single addition
 (unpaid work plus the small "other" category), which is a presentation choice and lives in
-`export://static_viz/oecd/2026-08-14/time_use_by_country`.
+`viz://static/oecd/2026-08-14/time_use_by_country`.
 
 Some countries leave part of a top-level category unallocated to any sub-activity — Poland 37
 minutes a day of unpaid work and Japan 22, which is 15-18% of the category — so a top-level total is

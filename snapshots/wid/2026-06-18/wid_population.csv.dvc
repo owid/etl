@@ -4,7 +4,7 @@ meta:
     title: World Inequality Database (WID)
     description: |-
       The World Inequality Database (WID.world) aims to provide open and convenient access to the most extensive available database on the historical evolution of the world distribution of income and wealth, both within countries and between countries.
-    title_snapshot: World Inequality Database (WID) - Population
+    title_snapshot: World Inequality Database (WID) – Population
     description_snapshot: |-
       WID's population counts (indicator npopul): the number of adults (aged 20 and over, WID age code 992) and the total population (all ages, code 999), counted as individuals, for every country and year.
 

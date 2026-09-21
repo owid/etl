@@ -2,7 +2,7 @@ meta:
   origin:
     producer: Food and Agriculture Organization of the United Nations
     title: Food Security Indicators
-    title_snapshot: Food Security Indicators - Prevalence of undernourishment in developing countries
+    title_snapshot: Food Security Indicators – Prevalence of undernourishment in developing countries
     description_snapshot: |-
       The prevalence of undernourishment expresses the probability that a randomly selected individual from the population consumes an amount of calories that is insufficient to cover her/his energy requirement for an active and healthy life. The indicator is computed by comparing a probability distribution of habitual daily dietary energy consumption with a threshold level called the minimum dietary energy requirement. Both are based on the notion of an average individual in the reference population.
 

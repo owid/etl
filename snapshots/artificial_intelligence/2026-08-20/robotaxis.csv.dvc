@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: California Public Utilities Commission
-    title: CPUC AV Passenger Service Deployment programs - Quarterly Reports
+    title: CPUC AV Passenger Service Deployment programs – Quarterly Reports
     description: |-
       The dataset contains quarterly reports submitted to the California Public Utilities Commission (CPUC) by carriers in the Autonomous Vehicle Passenger Service Deployment programs. Reports cover Autonomous Vehicle passenger service operations statewide and include disaggregated incident records.
     citation_full: |-

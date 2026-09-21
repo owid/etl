@@ -52,7 +52,6 @@ CHANNEL = Literal[
     "examples",
     "explorers",
     "external",
-    "multidim",
 ]
 
 # all pandas nullable dtypes
