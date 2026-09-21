@@ -26,6 +26,7 @@ def run() -> None:
     origins = tb["value"].origins
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = clean_data(tb)
+    tb = paths.apply_corrections(tb)
 
     # Calculate derived metrics
     tb_agg, tb_cause, tb_global, tb_global_cause = calculate_derived_metrics(tb, origins)
@@ -120,8 +121,6 @@ def reason_for_stockout(tb: Table, origin: Origin) -> Table:
     ]
     # Dropping rows where the values are 'Yes' or 'No' as they are incorrect
     tb_cause = tb_cause[~tb_cause["value"].isin(["Yes", "No"])]
-    # Fix typo in the data
-    tb_cause["value"] = tb_cause["value"].replace("Inaccurtae forecasts", "Inaccurate forecasts")
 
     tb_agg = (
         tb_cause.assign(yes="Yes")

@@ -63,7 +63,7 @@ In addition to our compact dataset, we provide individual datasets with all our 
 
 All our COVID-19 data pipelines are specified in [:fontawesome-brands-github: our DAG](https://github.com/owid/etl/blob/master/dag/covid.yml).
 
-### Data providers
+### Data producers
 
 The data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the data source in our database, and you should always check the license of any such third-party data before use.
 

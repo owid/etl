@@ -2,7 +2,7 @@
 definitions:
   others:
     zero_day: &zero_day
-      yearIsDay: true
+      timeInterval: day
       zeroDay: 2020-01-01
 
   common:

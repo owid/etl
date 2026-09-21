@@ -100,15 +100,15 @@ tables:
         short_unit: "%"
         description_short: |-
           <% if indicator == "Living with two parents" %>
-          The percentage of children aged 0-17 living with two parents.
+          Percentage of children aged 0-17 living with two parents.
           <% elif indicator == "Two married parents" %>
-          The percentage of children aged 0-17 living with two married parents.
+          Percentage of children aged 0-17 living with two married parents.
           <% elif indicator == "Two cohabiting parents" %>
-          The percentage of children aged 0-17 living with two cohabiting parents.
+          Percentage of children aged 0-17 living with two cohabiting parents.
           <% elif indicator == "Living with a single parent" %>
-          The percentage of children aged 0-17 living with a single parent.
+          Percentage of children aged 0-17 living with a single parent.
           <% elif indicator == "Other" %>
-          The percentage of children aged 0-17 in other family arrangements.
+          Percentage of children aged 0-17 in other family arrangements.
           <% endif %>
         description_from_producer: |-
           <% if indicator == "Living with two parents" %>

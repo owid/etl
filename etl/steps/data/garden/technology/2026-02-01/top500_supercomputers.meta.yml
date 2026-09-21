@@ -14,7 +14,7 @@ tables:
     variables:
       computational_capacity_fastest_supercomputer:
         title: Computational capacity of the fastest supercomputer
-        description_short: The number of [floating-point operations](#dod:flop) carried out per second by the fastest supercomputer in any given year. This is expressed in gigaflops, equivalent to 10⁹ floating-point operations per second.
+        description_short: Number of [floating-point operations](#dod:flop) carried out per second by the fastest supercomputer in any given year. This is expressed in gigaflops, equivalent to 10⁹ floating-point operations per second.
         unit: gigaflops per second
         short_unit: Gflop/s
         processing_level: major

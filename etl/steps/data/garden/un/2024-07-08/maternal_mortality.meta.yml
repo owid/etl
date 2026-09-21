@@ -32,7 +32,7 @@ definitions:
     - proportion of births attended by a skilled health worker (SAB).
 
     The MMEIG has developed a method to adjust existing data in order to take into account these data quality issues and ensure the comparability of different data sources.
-    This method involves assessment of data for underreporting and, where necessary, adjustment for incompleteness and misclassification of deaths as well as development of estimates through statistical modelling for countries with no reliable national level data.
+    This method involves assessment of data for underreporting and, where necessary, adjustment for incompleteness and misclassification of deaths as well as development of estimates through statistical modeling for countries with no reliable national level data.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -48,7 +48,7 @@ tables:
     variables:
       births:
         title: Estimated live births
-        description_short: The estimated number of live births in a given year.
+        description_short: Estimated number of live births in a given year.
         unit: births
         short_unit: ""
         display:
@@ -83,7 +83,7 @@ tables:
       lifetime_risk:
         title: Lifetime risk of maternal death
         description_short: |-
-          The probability for one woman to die from a maternal cause during her reproductive lifespan.
+          Probability for one woman to die from a maternal cause during her reproductive lifespan.
         unit: percent
         short_unit: "%"
         display:
@@ -103,7 +103,7 @@ tables:
       pm:
         title: Proportion of deaths due to maternal causes
         description_short: |-
-          The proportion of deaths among women of reproductive age (15-49 years old) that are due to maternal causes.
+          Proportion of deaths among women of reproductive age (15-49 years old) that are due to maternal causes.
         unit: "%"
         short_unit: "%"
         display:
@@ -113,7 +113,7 @@ tables:
       hiv_related_indirect_maternal_deaths:
         title: Estimated HIV-related indirect maternal deaths
         description_short: |-
-          The estimated number of indirect maternal deaths and late maternal deaths caused by the aggravating effects of pregnancy on HIV.
+          Estimated number of indirect maternal deaths and late maternal deaths caused by the aggravating effects of pregnancy on HIV.
         unit: deaths
         short_unit: ""
         display:
@@ -124,7 +124,7 @@ tables:
       hiv_related_indirect_mmr:
         title: Estimated HIV-related indirect maternal mortality ratio
         description_short: |-
-          The maternal mortality ratio (MMR) of estimated maternal deaths caused by the aggravating effects of pregnancy on HIV.
+          Maternal mortality ratio (MMR) of estimated maternal deaths caused by the aggravating effects of pregnancy on HIV.
         unit: deaths per 100,000 live births
         short_unit: ""
         display:
@@ -135,7 +135,7 @@ tables:
       hiv_related_indirect_percentage:
         title: Estimated proportion of HIV-related maternal deaths
         description_short: |-
-          The proportion of estimated maternal deaths caused by the aggravating effects of pregnancy on HIV.
+          Proportion of estimated maternal deaths caused by the aggravating effects of pregnancy on HIV.
         unit: "%"
         short_unit: "%"
         display:
@@ -145,7 +145,7 @@ tables:
           - {definitions.description_methodology}
       maternal_deaths:
         title: Estimated maternal deaths
-        description_short: The estimated number of maternal deaths in a given year.
+        description_short: Estimated number of maternal deaths in a given year.
         unit: deaths
         short_unit: ""
         display:

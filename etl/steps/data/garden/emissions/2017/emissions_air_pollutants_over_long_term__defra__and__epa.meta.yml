@@ -36,10 +36,10 @@ tables:
         title: PM₂.₅ (Index)
         unit: (1970/1990 = 100)
       sulphur_dioxide__index:
-        title: Sulphur dioxide (Index)
+        title: Sulfur dioxide (Index)
         unit: (1970 = 100)
       sulphur_dioxide__so2:
-        title: Sulphur dioxide (SO₂)
+        title: Sulfur dioxide (SO₂)
         unit: million tonnes
     dimensions:
       - name: year

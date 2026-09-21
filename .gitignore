@@ -13,6 +13,7 @@ __pycache__
 etl/scripts/countries-regions/intermediate
 /data
 export/*
+viz/*
 .env
 .env.*
 *.dot
@@ -31,7 +32,7 @@ playground.ipynb
 docs/_build
 docs/.vscode
 
-ai/
+ai
 *.xlsx
 *.zip
 *.dta
@@ -61,10 +62,10 @@ vscode_extensions/*/out/
 .claude/scheduled_tasks.lock
 CLAUDE.local.md
 
-workbench/
+workbench
 
 
-docs/architecture/metadata/reference/collections.md
+docs/architecture/metadata/reference/charts.md
 docs/architecture/metadata/reference/index.md
 docs/api/example-usage.md
 docs/api/catalog-api.md

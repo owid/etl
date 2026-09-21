@@ -27,7 +27,7 @@ tables:
         title: Birth rate
         unit: births per 1,000 people
         description_short: |-
-          The total number of births per 1,000 people in a given year.
+          Total number of births per 1,000 people in a given year.
         description_key:
           - |-
             This indicator has been constructed by combining data from two sources:
@@ -48,7 +48,7 @@ tables:
         title: Birth rate (historical)
         unit: births per 1,000 people
         description_short: |-
-          The total number of births per 1,000 people in a given year.
+          Total number of births per 1,000 people in a given year.
         description_key:
           - |-
             This indicator has been constructed by combining data from two sources:

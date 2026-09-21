@@ -14,7 +14,7 @@ from owid.catalog.utils import underscore
 from structlog import getLogger
 
 from etl.grapher import helpers as gh
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder, create_dataset, end_with_punctuation
 
 log = getLogger()
 # Get paths and naming conventions for current step.
@@ -191,7 +191,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
 
     tb["meta"] = VariableMeta(
         title=tb["variable_name_meta"].iloc[0],
-        description_short=series_description,
+        description_short=end_with_punctuation(series_description),
         description_from_producer=str(source_desc),
         origins=[origin],
         unit=tb["long_unit"].iloc[0].lower(),

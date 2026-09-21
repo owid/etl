@@ -5,7 +5,7 @@ definitions:
       topic_tags:
         - Tuberculosis
     description_key:
-      - Death rates are standardised using the 2012 population of England and Wales.
+      - Death rates are standardized using the 2012 population of England and Wales.
     unit: deaths per 1,000 population
 
 # Learn more about the available fields:

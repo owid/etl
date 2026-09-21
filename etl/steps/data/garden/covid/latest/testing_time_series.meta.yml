@@ -28,7 +28,7 @@ tables:
           conversionFactor: 100
           includeInTable: true
           name: Cumulative positivity rate
-          yearIsDay: true
+          timeInterval: day
         short_unit: '%'
       cumulative_tests_per_case:
         title: cumulative_tests_per_case
@@ -39,7 +39,7 @@ tables:
         display:
           includeInTable: true
           name: Tests per confirmed case – total
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       new_tests:
         title: new_tests
@@ -196,7 +196,7 @@ tables:
             Zimbabwe: tests performed
           includeInTable: true
           name: New tests
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       new_tests_7day_smoothed:
         title: new_tests_7day_smoothed
@@ -363,7 +363,7 @@ tables:
             Zimbabwe: tests performed
           includeInTable: true
           name: Daily tests (7-day smoothed)
-          yearIsDay: true
+          timeInterval: day
       new_tests_per_thousand:
         title: new_tests_per_thousand
         unit: ''
@@ -519,7 +519,7 @@ tables:
             Zimbabwe: tests performed
           includeInTable: true
           name: New tests per thousand
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       new_tests_per_thousand_7day_smoothed:
         title: new_tests_per_thousand_7day_smoothed
@@ -687,7 +687,7 @@ tables:
             Zimbabwe: tests performed
           includeInTable: true
           name: Daily tests per thousand people (7-day smoothed)
-          yearIsDay: true
+          timeInterval: day
       short_term_positivity_rate:
         title: short_term_positivity_rate
         unit: '%'
@@ -695,7 +695,7 @@ tables:
           conversionFactor: 100
           includeInTable: true
           name: Short-term positivity rate
-          yearIsDay: true
+          timeInterval: day
         short_unit: '%'
       short_term_tests_per_case:
         title: short_term_tests_per_case
@@ -712,14 +712,14 @@ tables:
         display:
           includeInTable: true
           name: Tests per confirmed case – daily
-          yearIsDay: true
+          timeInterval: day
       testing_observations:
         title: testing_observations
         description: Countries for which we attempted to find data are not included.
         unit: ''
         display:
           name: Number of testing observations
-          yearIsDay: true
+          timeInterval: day
       total_tests:
         title: total_tests
         unit: ''
@@ -876,7 +876,7 @@ tables:
           includeInTable: true
           name: Total tests
           numDecimalPlaces: 0
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       total_tests_per_thousand:
         title: total_tests_per_thousand
@@ -1033,5 +1033,5 @@ tables:
             Zimbabwe: tests performed
           includeInTable: true
           name: Total tests per thousand
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'

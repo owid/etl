@@ -81,13 +81,13 @@ tables:
         unit: "constant 2022 US$"
         short_unit: $
       budget_prog:
-        title: Budget required for programme costs to treat drug-susceptible TB
-        description_short: Budget required for programme costs to treat drug-susceptible tuberculosis.
+        title: Budget required for program costs to treat drug-susceptible TB
+        description_short: Budget required for program costs to treat drug-susceptible tuberculosis.
         unit: "constant 2022 US$"
         short_unit: "$"
       cf_prog:
-        title: Expected funding for programme costs to treat drug-susceptible TB
-        description_short: Expected funding for programme costs to treat drug-susceptible tuberculosis.
+        title: Expected funding for program costs to treat drug-susceptible TB
+        description_short: Expected funding for program costs to treat drug-susceptible tuberculosis.
         unit: "constant 2022 US$"
         short_unit: "$"
       budget_sld:
@@ -101,13 +101,13 @@ tables:
         unit: "constant 2022 US$"
         short_unit: "$"
       budget_mdrmgt:
-        title: Budget required for programme costs to treat drug-resistant TB
-        description_short: Budget required for programme costs to treat drug-resistant tuberculosis.
+        title: Budget required for program costs to treat drug-resistant TB
+        description_short: Budget required for program costs to treat drug-resistant tuberculosis.
         unit: "constant 2022 US$"
         short_unit: "$"
       cf_mdrmgt:
-        title: Expected funding for programme costs to treat drug-resistant TB
-        description_short: Expected funding for programme costs to treat drug-resistant tuberculosis.
+        title: Expected funding for program costs to treat drug-resistant TB
+        description_short: Expected funding for program costs to treat drug-resistant tuberculosis.
         unit: "constant 2022 US$"
         short_unit: "$"
       budget_tpt:
@@ -197,7 +197,7 @@ tables:
         short_unit: "$"
       budget_gap:
         title: Budget gap
-        description_short: The gap between the total budget required and the total expected funding from all sources.
+        description_short: Gap between the total budget required and the total expected funding from all sources.
         unit: "constant 2022 US$"
         short_unit: "$"
         processing_level: major

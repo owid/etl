@@ -2,7 +2,7 @@
 definitions:
   zero_day: &zero_day
     zeroDay: "2020-01-01"
-    yearIsDay: true
+    timeInterval: day
   common:
     presentation:
       topic_tags:

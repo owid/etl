@@ -27,7 +27,7 @@ import git
 import pandas as pd
 from structlog import get_logger
 
-from etl.config import DRY_RUN
+from etl import config
 from etl.git_api_helpers import GithubApiRepo
 from etl.helpers import PathFinder
 from etl.paths import BASE_DIR
@@ -275,7 +275,8 @@ def run() -> None:
     #
     # Check if we're on master branch (if so, force dry run)
     branch = git.Repo(BASE_DIR).active_branch.name
-    dry_run = DRY_RUN or (branch == "master")
+    # Without --export, build the files but don't commit them.
+    dry_run = not config.EXPORT_ENABLED or (branch == "master")
 
     if branch == "master":
         log.warning("You are on master branch, using dry mode.")

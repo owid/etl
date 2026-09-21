@@ -3,7 +3,7 @@ import time
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-from apps.anomalist.anomalist_api import anomaly_detection
+from apps.anomalist.anomalist_api import anomaly_detection, sample_variable_ids
 from apps.anomalist.cli import load_datasets_new_ids
 from apps.wizard.app_pages.anomalist.utils import load_variable_mapping
 from apps.wizard.utils.io import get_new_grapher_datasets_and_their_previous_versions
@@ -43,12 +43,11 @@ def run(branch: str) -> None:
     q = """SELECT id FROM variables WHERE datasetId IN %(dataset_ids)s"""
     variable_ids = list(read_sql(q, source_engine, params={"dataset_ids": datasets_new_ids})["id"])
 
-    # Limit to MAX_VARIABLES if there are too many, using deterministic hash-based selection
+    # Limit to MAX_VARIABLES if there are too many, sampling them deterministically.
     if len(variable_ids) > MAX_VARIABLES:
-        # Sort by hash of variable ID for deterministic selection
-        variable_ids_sorted = sorted(variable_ids, key=lambda x: hash(x))
-        variable_ids = variable_ids_sorted[:MAX_VARIABLES]
-        log.info(f"Limited to {MAX_VARIABLES} variables from {len(variable_ids_sorted)} total variables")
+        n_total = len(variable_ids)
+        variable_ids = sample_variable_ids(variable_ids, MAX_VARIABLES)
+        log.info(f"Sampled {MAX_VARIABLES} of {n_total} variables; the rest are not checked for anomalies")
 
     # Load variable mapping. Pass the new->old dataset pairs so the mapping can be inferred (or
     # enriched) by shortName — the indicator upgrader only persists mappings for charted

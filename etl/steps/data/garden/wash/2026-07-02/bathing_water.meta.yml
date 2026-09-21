@@ -1,0 +1,91 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Clean Water
+      attribution_short: EEA
+    processing_level: major
+    description_processing: The EEA provides quality data for each bathing site separately, we aggregate this data to the country level and calculate the number and percentage of bathing sites with excellent water quality.
+  inland_water_site: &inland_water_site |-
+    Inland bathing water sites are areas of water, such as lakes or rivers, that are used by the public for bathing and are not by the sea or ocean.
+  coastal_water_site: &coastal_water_site |-
+    Coastal bathing water sites are areas of water by the sea or ocean that are used by the public for bathing.
+  excellent_water_quality: &excellent_water_quality |-
+    Excellent water quality means that contamination levels of E. coli and intestinal enterococci are below a strict threshold. The thresholds are as follows:
+  e_coli_coastal: &e_coli_coastal |-
+    Escherichia coli (E. coli): The E. coli count must not exceed 250 cfu (colony-forming units) per 100 ml of water in more than 95% of the samples taken over a period of four bathing seasons. This means that in at least 95% of the samples, the E. coli levels must be below this threshold.
+  intestinal_enterococci_coastal: &intestinal_enterococci_coastal |-
+    Intestinal enterococci: The count for intestinal enterococci must not exceed 100 cfu per 100 ml of water in more than 95% of the samples taken over a period of four bathing seasons.
+  e_coli_inland: &e_coli_inland |-
+    Escherichia coli (E. coli): The E. coli count must not exceed 500 cfu (colony-forming units) per 100 ml of water in more than 95% of the samples taken over a period of four bathing seasons. This means that in at least 95% of the samples, the E. coli levels must be below this threshold.
+  intestinal_enterococci_inland: &intestinal_enterococci_inland |-
+    Intestinal enterococci: The count for intestinal enterococci must not exceed 200 cfu per 100 ml of water in more than 95% of the samples taken over a period of four bathing seasons.
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Fiona Spooner
+    - Tuna Acisu
+
+
+tables:
+  bathing_water:
+    variables:
+      sdg_14_40_nr_c:
+        title: Number of coastal bathing sites
+        description_short: *coastal_water_site
+        unit: sites
+        display:
+          numDecimalPlaces: 0
+      sdg_14_40_nr_ex_c:
+        title: Number of coastal bathing sites with excellent water quality
+        description_short: Number of bathing water sites by the sea or ocean that are of excellent quality. This means contamination levels of certain bacteria are below a strict threshold.
+        unit: sites
+        description_key:
+          - *coastal_water_site
+          - *excellent_water_quality
+          - *e_coli_coastal
+          - *intestinal_enterococci_coastal
+        display:
+          numDecimalPlaces: 0
+      sdg_14_40_pct_ex_c:
+        title: Percentage of coastal bathing sites with excellent water quality
+        description_short: Share of bathing water sites by the sea or ocean that are of excellent quality. This means contamination levels of certain bacteria are below a strict threshold.
+        description_key:
+          - *coastal_water_site
+          - *excellent_water_quality
+          - *e_coli_coastal
+          - *intestinal_enterococci_coastal
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      sdg_14_40_nr_in:
+        title: Number of inland bathing sites
+        description_short: *inland_water_site
+        unit: sites
+        display:
+          numDecimalPlaces: 0
+      sdg_14_40_nr_ex_in:
+        title: Number of inland bathing sites with excellent water quality
+        description_short: Number of bathing water sites in lakes or rivers that are of excellent quality. This means contamination levels of certain bacteria are below a strict threshold.
+        unit: sites
+        description_key:
+          - *inland_water_site
+          - *excellent_water_quality
+          - *e_coli_inland
+          - *intestinal_enterococci_inland
+        display:
+          numDecimalPlaces: 0
+      sdg_14_40_pct_ex_in:
+        title: Percentage of inland bathing sites with excellent water quality
+        description_short: Share of bathing water sites in lakes or rivers that are of excellent quality. This means contamination levels of certain bacteria are below a strict threshold.
+        description_key:
+          - *inland_water_site
+          - *excellent_water_quality
+          - *e_coli_inland
+          - *intestinal_enterococci_inland
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1

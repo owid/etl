@@ -1,12 +1,24 @@
+import pickle
 import tempfile
 import zipfile
 from pathlib import Path
-from unittest.mock import MagicMock
+from textwrap import dedent
+from types import SimpleNamespace
+from unittest.mock import MagicMock, patch
 
 import pytest
-from owid.catalog import Origin
+from owid.catalog import Origin, s3_utils
 
-from etl.snapshot import SnapshotArchive, SnapshotMeta, _parse_snapshot_path
+from etl import config, paths
+from etl.files import checksum_file, ruamel_load
+from etl.snapshot import (
+    PrivateSnapshotAccessError,
+    Snapshot,
+    SnapshotArchive,
+    SnapshotMeta,
+    SnapshotNotFoundException,
+    _parse_snapshot_path,
+)
 
 
 @pytest.fixture
@@ -149,6 +161,145 @@ def test_parse_snapshot_path():
         _parse_snapshot_path(path)
 
 
+DVC_TEMPLATE = """meta:
+  origin:
+    producer: Producer
+    title: Test dataset
+    date_published: "2024-01-01"
+    url_main: https://example.com
+    date_accessed: "2024-01-02"
+    license:
+      name: CC BY 4.0
+      url: https://example.com/license
+outs:
+  - md5: {md5}
+    size: 1
+    path: test.csv
+"""
+
+# md5 of the data file written by the `snapshot` fixture.
+DATA_MD5 = "e5ebd4c02cefbe7955977c67ada242b7"
+
+
+@pytest.fixture
+def snapshot(monkeypatch):
+    """A Snapshot backed by a temporary snapshots/ and data/ tree, whose .dvc records a stale md5."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+        monkeypatch.setattr(paths, "SNAPSHOTS_DIR", tmpdir / "snapshots")
+        monkeypatch.setattr(paths, "DATA_DIR", tmpdir / "data")
+
+        dvc_path = paths.SNAPSHOTS_DIR / "ns/2024-01-01/test.csv.dvc"
+        dvc_path.parent.mkdir(parents=True)
+        dvc_path.write_text(DVC_TEMPLATE.format(md5="0" * 32))
+
+        data_path = paths.DATA_DIR / "snapshots/ns/2024-01-01/test.csv"
+        data_path.parent.mkdir(parents=True)
+        data_path.write_text("a,b\n1,2\n")
+
+        yield Snapshot("ns/2024-01-01/test.csv")
+
+
+class TestDvcAdd:
+    """Tests for Snapshot.dvc_add, which must never re-upload an object already on R2.
+
+    Snapshot keys are content-addressed, and the bucket lock policy on owid-snapshots rejects
+    overwrites with ObjectLockedByBucketPolicy.
+    """
+
+    @pytest.fixture(autouse=True)
+    def uploads(self, monkeypatch):
+        """Record calls to s3_utils.upload instead of hitting R2."""
+        calls = []
+        monkeypatch.setattr("etl.snapshot.s3_utils.upload", lambda *args, **kwargs: calls.append(args))
+        return calls
+
+    def test_uploads_when_missing_from_remote(self, snapshot, uploads, monkeypatch):
+        monkeypatch.setattr(Snapshot, "_snapshot_exists_on_remote", lambda self, md5: False)
+
+        snapshot.dvc_add(upload=True)
+
+        assert len(uploads) == 1
+        assert uploads[0][0] == f"s3://owid-snapshots/{DATA_MD5[:2]}/{DATA_MD5[2:]}"
+        assert ruamel_load(snapshot.metadata_path.read_text())["outs"][0]["md5"] == DATA_MD5
+
+    def test_skips_upload_when_already_on_remote_but_dvc_is_stale(self, snapshot, uploads, monkeypatch):
+        """The autoupdate case: the new md5 only exists on an open PR branch, so the local .dvc
+        still holds master's older md5 even though the file is already on R2."""
+        monkeypatch.setattr(Snapshot, "_snapshot_exists_on_remote", lambda self, md5: True)
+
+        snapshot.dvc_add(upload=True)
+
+        assert uploads == []
+        # The .dvc is still brought up to date, otherwise the snapshot would never be recorded.
+        assert ruamel_load(snapshot.metadata_path.read_text())["outs"][0]["md5"] == DATA_MD5
+
+    def test_no_op_when_dvc_matches_and_file_is_on_remote(self, snapshot, uploads, monkeypatch):
+        snapshot.metadata_path.write_text(DVC_TEMPLATE.format(md5=DATA_MD5))
+        monkeypatch.setattr(Snapshot, "_snapshot_exists_on_remote", lambda self, md5: True)
+        before = snapshot.metadata_path.read_text()
+
+        snapshot.dvc_add(upload=True)
+
+        assert uploads == []
+        # Nothing changed, so the .dvc is left untouched rather than round-tripped through ruamel.
+        assert snapshot.metadata_path.read_text() == before
+
+    def test_reuploads_when_dvc_matches_but_file_is_missing_from_remote(self, snapshot, uploads, monkeypatch):
+        snapshot.metadata_path.write_text(DVC_TEMPLATE.format(md5=DATA_MD5))
+        monkeypatch.setattr(Snapshot, "_snapshot_exists_on_remote", lambda self, md5: False)
+
+        snapshot.dvc_add(upload=True)
+
+        assert len(uploads) == 1
+
+    def test_skips_everything_without_upload(self, snapshot, uploads, monkeypatch):
+        monkeypatch.setattr(Snapshot, "_snapshot_exists_on_remote", lambda self, md5: False)
+
+        snapshot.dvc_add(upload=False)
+
+        assert uploads == []
+
+
+# The snapshot the autoupdate build kept failing on: it is updated daily behind a long-lived PR, so
+# its local .dvc regularly holds an older md5 than the object already stored on R2.
+EPOCH_URI = "artificial_intelligence/2025-03-12/epoch_compute_intensive.csv"
+
+
+@pytest.mark.integration
+def test_dvc_add_skips_upload_of_snapshot_already_on_r2():
+    """Against real R2 and the real producer: never re-upload a snapshot that is already stored.
+
+    Reproduces the state that made the autoupdate build fail with ObjectLockedByBucketPolicy — the
+    downloaded content is unchanged, so its md5 is already on R2, but the local .dvc still holds an
+    older md5 and therefore can't be used to detect that.
+
+    Skips rather than passes when that state can't be reached, so a skip is never mistaken for a
+    verified run. Downloads into data/snapshots/ and restores the .dvc afterwards; never writes to
+    R2 — a genuine upload would need a brand new object in a locked production bucket.
+    """
+    snap = Snapshot(EPOCH_URI)
+    snap.download_from_source()
+
+    md5 = checksum_file(snap.path)
+    assert snap.metadata.outs is not None
+    if md5 == snap.metadata.outs[0]["md5"]:
+        pytest.skip(f"local .dvc already records the current content ({md5}), nothing to reproduce")
+    if not s3_utils.object_exists(f"s3://{config.R2_SNAPSHOTS_PUBLIC}/{md5[:2]}/{md5[2:]}"):
+        pytest.skip(f"content is new ({md5}), so dvc_add should upload it; not writing to production R2")
+
+    original_dvc = snap.metadata_path.read_text()
+    try:
+        with patch.object(s3_utils, "upload", side_effect=AssertionError("re-uploaded an object already on R2")):
+            snap.dvc_add(upload=True)
+
+        # The .dvc must still be brought up to date, or the snapshot would never be recorded.
+        # Checked on the file rather than snap.metadata, which is only read at construction.
+        assert ruamel_load(snap.metadata_path.read_text())["outs"][0]["md5"] == md5
+    finally:
+        snap.metadata_path.write_text(original_dvc)
+
+
 def test_snapshot_to_yaml():
     d = SnapshotMeta(
         namespace="aviation_safety_network",
@@ -165,3 +316,105 @@ def test_snapshot_to_yaml():
         "version": "2023-04-18",
         "origin": {"title": "Aviation Statistics by Period", "producer": "Producer"},
     }
+
+
+def test_metadata_save_leaves_a_dvc_with_unquoted_dates_untouched(tmp_path, monkeypatch):
+    """An unchanged .dvc must survive `save()` byte for byte, unquoted dates included.
+
+    `yaml.safe_load` parses `date_accessed: 2023-10-05` into a `datetime.date` while `Origin` keeps
+    it as a string, so the "nothing changed" check used to always miss and rewrite the file —
+    reflowing long lines and re-indenting `outs` for no reason. `create_snapshot` calls `save()` on
+    every run, so those diffs surfaced in whichever dataset update happened to come next.
+    """
+    monkeypatch.setattr(paths, "SNAPSHOTS_DIR", tmp_path)
+    dvc_path = tmp_path / "namespace" / "2023-10-05" / "dataset.csv.dvc"
+    dvc_path.parent.mkdir(parents=True)
+    original = dedent("""\
+        meta:
+          origin:
+            title: A title long enough that a rewrite would wrap it onto a second line of its own
+            producer: Producer
+            citation_full: Producer (2023)
+            url_main: https://example.org/data
+            date_published: 2023-10-01
+            date_accessed: 2023-10-05
+            license:
+              name: CC BY 4.0
+        outs:
+        - md5: a9bae94a60b04dea8b889d16f23c0ca9
+          size: 1632
+          path: dataset.csv
+        """)
+    dvc_path.write_text(original)
+
+    snap = Snapshot("namespace/2023-10-05/dataset.csv")
+    snap.metadata.save()
+    assert dvc_path.read_text() == original
+
+    # A genuine change is still written out.
+    snap.metadata.origin.date_accessed = "2023-11-20"  # ty: ignore
+    snap.metadata.save()
+    assert "date_accessed: '2023-11-20'" in dvc_path.read_text()
+    assert "md5: a9bae94a60b04dea8b889d16f23c0ca9" in dvc_path.read_text()
+
+
+def test_private_snapshot_says_how_to_get_access_or_skip(monkeypatch, tmp_path):
+    """A credentials failure on a private snapshot names the bucket and --public-only; a missing
+    object is left alone, so it still reads as "not uploaded" rather than "no access"."""
+    from botocore.exceptions import ClientError, EndpointConnectionError, NoCredentialsError
+    from owid.catalog import s3_utils
+
+    from etl.snapshot import PrivateSnapshotAccessError, Snapshot
+
+    snap = Snapshot("dummy/2020-01-01/dummy.csv")
+    monkeypatch.setattr(type(snap), "path", property(lambda self: tmp_path / "dummy.csv"))
+    snap.metadata = SimpleNamespace(is_public=False)  # ty: ignore[invalid-assignment]
+
+    def fail_with(error):
+        def _download(*args, **kwargs):
+            raise error
+
+        monkeypatch.setattr(s3_utils, "download", _download)
+
+    def client_error(code):
+        return s3_utils.UploadError(ClientError({"Error": {"Code": code}}, "HeadObject"))
+
+    # No credentials configured at all, and a stray AWS_PROFILE shadowing the R2 ones.
+    for error in [NoCredentialsError(), client_error("400"), client_error("AccessDenied")]:
+        fail_with(error)
+        with pytest.raises(PrivateSnapshotAccessError) as exc:
+            snap._download_dvc_file("abc123")
+        assert "owid-snapshots-private" in str(exc.value)
+        assert "--public-only" in str(exc.value)
+
+    # A genuinely missing object is not an access problem: the original error survives.
+    fail_with(client_error("404"))
+    with pytest.raises(s3_utils.UploadError):
+        snap._download_dvc_file("abc123")
+
+    # Neither is an unreachable endpoint, even though it is a BotoCoreError like NoCredentialsError.
+    fail_with(EndpointConnectionError(endpoint_url="https://r2.example"))
+    with pytest.raises(EndpointConnectionError):
+        snap._download_dvc_file("abc123")
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        SnapshotNotFoundException("dummy/2020-01-01/dummy.csv", "abc123"),
+        PrivateSnapshotAccessError("dummy/2020-01-01/dummy.csv", "R2 returned 400"),
+    ],
+    ids=lambda e: type(e).__name__,
+)
+def test_snapshot_errors_survive_a_process_boundary(error):
+    """Steps run in worker processes, so these have to be able to come back from one.
+
+    An exception whose `__init__` takes more arguments than reach `self.args` cannot be rebuilt by
+    the default `BaseException.__reduce__`, and unpickling it raises TypeError inside the
+    ProcessPoolExecutor result reader instead — killing the pool and failing every step that was
+    left with BrokenProcessPool — which a nightly rebuild once spent 546MB of log reporting.
+    """
+    revived = pickle.loads(pickle.dumps(error))
+
+    assert type(revived) is type(error)
+    assert str(revived) == str(error)

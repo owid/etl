@@ -11,5 +11,5 @@
   # telling us to remove the entry. 1,000,000 sits safely between the buggy and fixed magnitudes.
   expect: {gt: 1000000}
   reason: UNWTO reports Taiwan's domestic short-term hotel guests in units while every other country reports in thousands, making the value ~1000× too large after the garden ×1000 conversion.
-  provider: UNWTO
+  producer: UNWTO
   status: open

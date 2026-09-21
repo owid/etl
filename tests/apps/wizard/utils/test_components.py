@@ -1,9 +1,12 @@
+import json
+import re
 from unittest.mock import patch
 
+import numpy as np
 import pytest
 import streamlit as st
 
-from apps.wizard.utils.components import url_persist
+from apps.wizard.utils.components import GRAPHER_PACKAGE_URL, _grapher_html, url_persist
 
 
 @pytest.fixture
@@ -153,3 +156,35 @@ def test_url_persist_invalid_option_raises_value_error(mock_component, mock_quer
             wrapped(key="color", options=["blue", "green"])
 
         assert "not in options" in str(exc_info.value)
+
+
+class MockEnv:
+    """The only two OWIDEnv attributes `_grapher_html` reads."""
+
+    base_site = "http://staging-site-my-branch"
+    indicators_url = "https://api-staging.owid.io/staging-site-my-branch/v1/indicators"
+
+
+def test_grapher_html_mounts_the_grapher_package():
+    """The chart is rendered by the published `@ourworldindata/grapher` bundle, fed the
+    env's own data API and a config that survives the round-trip to JSON."""
+    html = _grapher_html(
+        {"title": "Life expectancy", "dimensions": [{"property": "y", "variableId": np.int64(42)}]},
+        MockEnv(),
+        height=480,
+    )  # ty: ignore[invalid-argument-type]
+
+    assert f'import {{ GrapherLoader }} from "{GRAPHER_PACKAGE_URL}/grapher.standalone.min.js"' in html
+    assert f'href="{GRAPHER_PACKAGE_URL}/grapher.css"' in html
+    assert f'dataApiUrl: "{MockEnv.indicators_url}/"' in html
+    assert "height: 480px" in html
+
+    match = re.search(r"config: (\{.*\}),\n", html)
+    assert match is not None, "config is not embedded as a single-line JSON object"
+    config = json.loads(match.group(1))
+
+    # numpy ints (which come out of the grapher DB) must not break serialization
+    assert config["dimensions"] == [{"property": "y", "variableId": 42}]
+    # Grapher builds its share / embed / edit links from these
+    assert config["adminBaseUrl"] == MockEnv.base_site
+    assert config["bakedGrapherURL"] == f"{MockEnv.base_site}/grapher"

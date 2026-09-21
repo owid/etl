@@ -1,0 +1,40 @@
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  energy_balances:
+    title: Energy balances
+    variables:
+      value:
+        title: Energy flow
+        unit: terajoules
+        short_unit: TJ
+        description_short: |-
+          Value of the energy flow (given by the transaction dimension) of the given commodity, expressed in terajoules.
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+  share_of_final_energy_consumed_by_agriculture_forestry_and_fishing:
+    title: Share of final energy consumed by agriculture, forestry and fishing
+    variables:
+      share_of_final_energy_consumed_by_agriculture_forestry_and_fishing:
+        title: Share of final energy consumption used by agriculture, forestry and fishing
+        unit: "%"
+        short_unit: "%"
+        processing_level: major
+        description_short: |-
+          Energy consumed by agriculture, forestry and fishing as a percentage of total final energy consumption.
+        description_key:
+          - This indicator measures the energy directly consumed by agriculture, forestry and fishing, such as fuels and electricity. It does not include energy embedded in inputs like fertilizers or machinery.
+        description_processing: |-
+          - We compute this indicator by dividing the energy consumed by agriculture, forestry and fishing by total final energy consumption (which excludes non-energy uses of fuels).
+          - For regions, we sum both flows across the countries that report agricultural energy use, and then take the ratio. Regional values are only shown for years when those countries account for at least 70% of the region's reported final energy consumption.
+          - We exclude a small number of country-years in the most recent years of data where agricultural energy use collapses due to incomplete source data (for example, India in 2023).
+        presentation:
+          topic_tags:
+            - Agricultural Production
+            - Energy
+        display:
+          numDecimalPlaces: 1

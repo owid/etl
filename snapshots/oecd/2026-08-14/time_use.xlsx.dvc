@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: OECD
+    title: OECD Time Use Database
+    description: |-
+      The OECD Time Use Database provides information on how women and men spend their time. Data are currently available for 30 OECD countries. Differences in survey features, the number of diary days sampled, and the categorization of activities may all affect the cross-country comparability of results. To improve the comparison of time use across countries, the samples are restricted to populations aged 15-64 and activities are aggregated into five main categories: (1) Unpaid work; (2) Paid work or study; (3) Personal care; (4) Leisure; and (5) Other time use. Bulgaria, Croatia, China, India, and South Africa are also included.
+    citation_full: OECD (2026). OECD Time Use Database. https://www.oecd.org/en/data/datasets/time-use-database.html
+    attribution_short: OECD
+    url_main: https://www.oecd.org/en/data/datasets/time-use-database.html
+    url_download: https://www.oecd.org/content/dam/oecd/en/data/datasets/time-use-database/OECD-time-use-database-updates.xlsx
+    date_accessed: '2026-08-14'
+    date_published: '2026-04-30'
+    license:
+      name: OECD Terms and Conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: fe7d069c2620fd091b311686607390cb
+    size: 376009
+    path: time_use.xlsx

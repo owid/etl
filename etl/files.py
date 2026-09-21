@@ -429,7 +429,7 @@ def read_json_schema(path: Path | str) -> dict[str, Any]:
 def get_schema_from_url(schema_url: str) -> dict:
     """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
 
-    https://files.ourworldindata.org/schemas/grapher-schema.010.json
+    https://files.ourworldindata.org/schemas/grapher-schema.011.json
 
     More details on available versions can be found
     at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema

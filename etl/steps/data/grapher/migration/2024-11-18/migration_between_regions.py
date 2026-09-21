@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
         tb[col].m.unit = "people"
         tb[col].m.short_unit = ""
         tb[col].m.title = f"Migration to {col}"
-        tb[col].m.description_short = f"Number of migrants to {col}"
+        tb[col].m.description_short = f"Number of migrants to {col}."
 
     tb = tb.reset_index()
 

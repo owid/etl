@@ -3,6 +3,7 @@ import io
 import pandas as pd
 import pytest
 from fastmcp import Client
+from fastmcp.exceptions import ToolError
 from mcp.types import TextContent
 
 from owid_mcp.server import mcp
@@ -441,6 +442,7 @@ async def test_run_sql_invalid_column_error():
         # Use raise_on_error=False to get the error in the result instead of raising an exception
         output = await client.call_tool("run_sql", {"query": sql_query})
         error = output.structured_content["error"]  # ty: ignore
+        # We rewrite Datasette/DuckDB's raw binder error into our own friendly message.
         assert "column 'abc' does not exist" in error.lower()
 
 
@@ -453,4 +455,27 @@ async def test_run_sql_syntax_error():
 
         output = await client.call_tool("run_sql", {"query": sql_query})
         error = output.structured_content["error"]  # ty: ignore
-        assert "invalid expression" in error.lower() or "unexpected token" in error.lower()
+        # No special enrichment for generic syntax errors — passed through from Datasette/DuckDB.
+        assert "syntax error" in error.lower() or "parser error" in error.lower()
+
+
+@pytest.mark.asyncio
+async def test_fetch_chart_data_unknown_slug():
+    """Test that an unknown chart slug returns an actionable error, not a masked one."""
+    async with Client(mcp) as client:
+        with pytest.raises(ToolError) as exc_info:
+            await client.call_tool("fetch_chart_data", {"id": "this-chart-slug-does-not-exist"})
+
+        message = str(exc_info.value)
+        assert "this-chart-slug-does-not-exist" in message
+        assert "search_chart" in message
+
+
+@pytest.mark.asyncio
+async def test_fetch_chart_image_unknown_slug():
+    """Test that fetch_chart_image reports an unknown slug the same way as fetch_chart_data."""
+    async with Client(mcp) as client:
+        with pytest.raises(ToolError) as exc_info:
+            await client.call_tool("fetch_chart_image", {"id": "this-chart-slug-does-not-exist"})
+
+        assert "search_chart" in str(exc_info.value)

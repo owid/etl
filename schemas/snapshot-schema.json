@@ -6,6 +6,29 @@
     "meta": {
       "type": "object",
       "additionalProperties": false,
+      "comment": "A license must live under `origin.license`, not as a top-level `meta.license` (nor the legacy `meta.license_name` / `meta.license_url`, which SnapshotMeta.load_from_yaml also funnels into the top-level license). Those are deprecated SnapshotMeta-level fields that do not travel with the origin. Enforce this by forbidding `origin` together with any top-level license field (legacy `source:`-based snapshots have no `origin`, so they keep their own license location).",
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "origin",
+              "license"
+            ]
+          },
+          {
+            "required": [
+              "origin",
+              "license_name"
+            ]
+          },
+          {
+            "required": [
+              "origin",
+              "license_url"
+            ]
+          }
+        ]
+      },
       "properties": {
         "name": {
           "type": "string"

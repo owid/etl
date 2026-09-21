@@ -15,6 +15,7 @@ dataset:
 
   owners:
     - Pablo Arriagada
+    - Edouard Mathieu
 tables:
   generative_ai_use:
     variables:

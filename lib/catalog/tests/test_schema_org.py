@@ -60,8 +60,7 @@ def test_single_table_dataset_flattens_table_metadata() -> None:
         "name": "Our World in Data",
         "url": "https://ourworldindata.org",
     }
-    # The origin has no DOI in its citation, so no related-article citation is emitted;
-    # the producer is still credited via isBasedOn below.
+    # citation is deliberately never emitted; the producer is credited via isBasedOn below.
     assert "citation" not in jsonld
     assert jsonld["isBasedOn"]["url"] == "https://example.com/source"
     assert jsonld["keywords"] == ["Biodiversity"]
@@ -420,7 +419,7 @@ def test_plain_description_strips_detail_on_demand_links() -> None:
     assert variable["description"] == "Measured in terawatt-hours."
 
 
-def test_citation_extracts_dois_and_leads_with_most_used_origin() -> None:
+def test_no_citation_emitted_and_is_based_on_leads_with_most_used_origin() -> None:
     main_origin = Origin(
         producer="Global Carbon Project",
         attribution="Global Carbon Budget (2025)",
@@ -435,24 +434,14 @@ def test_citation_extracts_dois_and_leads_with_most_used_origin() -> None:
         producer="Various sources",
         attribution="Population based on various sources (2024)",
         title="Population",
-        # No DOI: helper source stays out of citation, but keeps its isBasedOn entry.
         citation_full="Population is based on various sources: https://ourworldindata.org/population-sources",
         url_main="https://example.com/population",
     )
-    doi_prefix_origin = Origin(
-        producer="Bolt and van Zanden",
-        title="Maddison Project Database",
-        date_published="2024-04-26",
-        # "DOI: <id>" form (no doi.org URL) must be recognized too.
-        citation_full='Bolt and van Zanden (2024), "Maddison style estimates". DOI: 10.1111/joes.12618.',
-        url_main="https://example.com/maddison",
-    )
     # The helper origin backs the *first* column; the main origin backs the remaining
-    # columns. Citation must still lead with the main origin, not follow column order.
+    # columns. isBasedOn must still lead with the main origin, not follow column order.
     variables = {"population": VariableMeta(title="Population", origins=[helper_origin])}
     for name in ("co2", "co2_per_capita"):
         variables[name] = VariableMeta(title=name, origins=[main_origin])
-    variables["gdp"] = VariableMeta(title="gdp", origins=[doi_prefix_origin])
     table = TableSchemaInput(
         short_name="owid_co2",
         metadata=TableMeta(short_name="owid_co2", title="CO2", description="Table description"),
@@ -471,10 +460,73 @@ def test_citation_extracts_dois_and_leads_with_most_used_origin() -> None:
         "name": "Our World in Data",
         "url": "https://ourworldindata.org",
     }
-    assert jsonld["citation"] == [
-        "Global Carbon Budget (2025). https://doi.org/10.5194/essd-17-965-2025",
-        # Attribution missing: fall back to producer (year of date_published).
-        "Bolt and van Zanden (2024). https://doi.org/10.1111/joes.12618",
-    ]
+    # citation is deliberately never emitted, even though the main origin's citation_full
+    # carries a DOI: a mined citation list kept misrepresenting auxiliary sources as the
+    # dataset's primary reference. isBasedOn carries the source credit.
+    assert "citation" not in jsonld
     assert jsonld["isBasedOn"][0]["url"] == "https://globalcarbonbudget.org"
     assert {item["url"] for item in jsonld["isBasedOn"]} >= {"https://example.com/population"}
+
+
+def test_dataset_level_license_wins_over_origin_license() -> None:
+    """A dataset-level license declared in .meta.yml describes the compiled artifact and must
+    take precedence over per-source origin licenses (owid_co2 used to advertise GCB's ICOS
+    data license just because GCB is its most-referenced origin)."""
+    origin = Origin(
+        producer="Global Carbon Project",
+        title="Global Carbon Budget",
+        license=License(name="ICOS", url="https://www.icos-cp.eu/data-services/about-data-portal/data-license"),
+    )
+    table = TableSchemaInput(
+        short_name="owid_co2",
+        metadata=TableMeta(short_name="owid_co2", title="CO2", description="Table description"),
+        variables={"co2": VariableMeta(title="CO2", origins=[origin])},
+        formats=["feather"],
+    )
+    kwargs: dict = dict(
+        dataset_path="garden/emissions/2025-12-04/owid_co2",
+        page_path="emissions/owid_co2",
+        tables=[table],
+    )
+
+    jsonld = dataset_to_schema_org(
+        dataset_meta=DatasetMeta(
+            short_name="owid_co2",
+            title="CO2 dataset",
+            description="Dataset description",
+            licenses=[License(name="CC BY 4.0", url="https://creativecommons.org/licenses/by/4.0/")],
+        ),
+        **kwargs,
+    )
+    assert jsonld["license"] == "https://creativecommons.org/licenses/by/4.0/"
+
+    # Without a dataset-level license, the most-referenced origin's license is the fallback.
+    jsonld = dataset_to_schema_org(
+        dataset_meta=DatasetMeta(short_name="owid_co2", title="CO2 dataset", description="Dataset description"),
+        **kwargs,
+    )
+    assert jsonld["license"] == "https://www.icos-cp.eu/data-services/about-data-portal/data-license"
+
+
+def test_keywords_ordered_by_variable_count_not_column_order() -> None:
+    """keywords[0] is treated as the dataset's primary topic (e.g. by the landing page's
+    charts link), so the most-tagged topic must lead even when a helper column comes first."""
+    gdp_tag = VariablePresentationMeta(topic_tags=["Economic Growth"])
+    co2_tag = VariablePresentationMeta(topic_tags=["CO2 & Greenhouse Gas Emissions"])
+    origin = Origin(producer="Example Producer", title="Origin title")
+    variables = {"gdp": VariableMeta(title="gdp", origins=[origin], presentation=gdp_tag)}
+    for name in ("co2", "co2_per_capita", "cumulative_co2"):
+        variables[name] = VariableMeta(title=name, origins=[origin], presentation=co2_tag)
+    table = TableSchemaInput(
+        short_name="owid_co2",
+        metadata=TableMeta(short_name="owid_co2", title="CO2"),
+        variables=variables,
+        formats=["feather"],
+    )
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/emissions/2025-12-04/owid_co2",
+        page_path="emissions/owid_co2",
+        dataset_meta=DatasetMeta(short_name="owid_co2", title="CO2 dataset", description="Dataset description"),
+        tables=[table],
+    )
+    assert jsonld["keywords"] == ["CO2 & Greenhouse Gas Emissions", "Economic Growth"]

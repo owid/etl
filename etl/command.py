@@ -9,8 +9,10 @@ import re
 import resource
 import sys
 import time
+import traceback
 from collections.abc import Callable, Iterator, MutableMapping
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
+from concurrent.futures.process import BrokenProcessPool
 from contextlib import contextmanager
 from functools import partial
 from graphlib import TopologicalSorter
@@ -40,6 +42,34 @@ DAG = dict[str, set[str]]
 # if the number of open files allowed is less than this, increase it
 LIMIT_NOFILE = 4096
 
+# Failures of the run in progress, as (step name, traceback), so it can end with a recap of them
+# all. Both runners report into it from the main process; `print_failure_recap` empties it.
+STEP_FAILURES: list[tuple[str, str]] = []
+
+
+# The help groups the options by the question each answers. Keyed by command path: the `etlr`
+# entry point and `etl run` are the same command.
+click.rich_click.OPTION_GROUPS = {  # ty: ignore[invalid-assignment]
+    command: [
+        {"name": "Select steps", "options": ["--modified", "--only", "--exclude", "--public-only"]},
+        {"name": "Write permissions", "options": ["--grapher", "--export"]},
+        {
+            "name": "Run",
+            "options": [
+                "--dry-run",
+                "--force",
+                "--workers",
+                "--continue-on-failure",
+                "--prefer-download",
+                "--subset",
+                "--watch",
+            ],
+        },
+        {"name": "Debug", "options": ["--debug"]},
+    ]
+    for command in ("etlr", "etl run")
+}
+
 
 @click.command(name="run")
 @click.option(
@@ -51,43 +81,36 @@ LIMIT_NOFILE = 4096
     "--force",
     "-f",
     is_flag=True,
-    help="Re-run the steps even if they appear done and up-to-date",
+    help="Re-run the steps even if they appear done and up-to-date, and re-upload grapher data & metadata files even if their checksums match.",
+)
+@click.option(
+    "--public-only",
+    is_flag=True,
+    help="Skip private steps (`data-private://`, `snapshot-private://`) and everything downstream of them. Private steps run by default.",
 )
 @click.option(
     "--private",
     "-p",
     is_flag=True,
-    help="Run private steps.",
+    hidden=True,
+    help="Deprecated no-op: private steps run by default.",
 )
 @click.option(
-    "--grapher/--no-grapher",
-    "-g/-ng",
-    default=False,
-    type=bool,
-    help="Upsert datasets from grapher channel to DB _(OWID staff only, DB access required)_",
-)
-@click.option(
-    "--export/--no-export",
-    default=False,
-    type=bool,
-    help="Run export steps like saving explorer _(OWID staff only, access required)_",
-)
-@click.option(
-    "--ipdb",
+    "--grapher",
+    "-g",
     is_flag=True,
-    help="Run the debugger on uncaught exceptions.",
+    help="Allow writes to the grapher DB and R2 of the targeted environment (your local DB, or a staging server with `STAGING=1`): grapher:// upserts run, and viz:// steps publish what they build. Steps matched by a pattern need it to be selected at all; a step named by its full URI is always selected, and without the flag it only builds locally. _(OWID staff only)_",
+)
+@click.option(
+    "--export",
+    is_flag=True,
+    help="Allow export:// steps to write to their shared destinations (GitHub, public R2), which have no staging equivalent. Same selection rule as --grapher: needed for pattern matches, optional for a step named by its URI, which then only builds locally. _(OWID staff only)_",
 )
 @click.option(
     "--only",
     "-o",
     is_flag=True,
     help="Only run the selected step (no upstream dependencies).",
-)
-@click.option(
-    "--exact-match",
-    "-x",
-    is_flag=True,
-    help="Steps should exactly match the arguments (if so, pass the steps with their full name, e.g. 'data://garden/.../step_name').",
 )
 @click.option(
     "--exclude",
@@ -97,6 +120,7 @@ LIMIT_NOFILE = 4096
 @click.option(
     "--dag-path",
     type=click.Path(exists=True),
+    hidden=True,
     help="Path to DAG yaml file",
     default=paths.DEFAULT_DAG_FILE,
 )
@@ -108,20 +132,6 @@ LIMIT_NOFILE = 4096
     default=1,
 )
 @click.option(
-    "--use-threads/--no-threads",
-    "-t/-nt",
-    type=bool,
-    help="Use threads when checking dirty steps and upserting to MySQL. Turn off when debugging.",
-    default=True,
-)
-@click.option(
-    "--strict/--no-strict",
-    "-s/-ns",
-    is_flag=True,
-    help="Force strict or lax validation on DAG steps (e.g. checks for primary keys in data steps).",
-    default=None,
-)
-@click.option(
     "--watch",
     is_flag=True,
     help="Run ETL infinitely and update changed files.",
@@ -129,20 +139,21 @@ LIMIT_NOFILE = 4096
 @click.option(
     "--continue-on-failure",
     is_flag=True,
+    envvar="CONTINUE_ON_FAILURE",
+    show_envvar=True,
     help="Continue running remaining steps if a step fails (steps depending on failed step will be skipped).",
-)
-@click.option(
-    "--force-upload",
-    is_flag=True,
-    help="Always upload grapher data & metadata JSON files even if checksums match.",
 )
 @click.option(
     "--prefer-download",
     is_flag=True,
+    envvar="PREFER_DOWNLOAD",
+    show_envvar=True,
     help="Prefer downloading datasets from catalog instead of building them.",
 )
 @click.option(
     "--subset",
+    envvar="SUBSET",
+    show_envvar=True,
     help="Filter to speed up development - works as regex for both data processing and grapher upload.",
 )
 @click.option(
@@ -150,6 +161,11 @@ LIMIT_NOFILE = 4096
     "-m",
     is_flag=True,
     help="Only run steps whose files changed vs origin/master (committed or not), plus their downstream steps. Combine with STEPS to further narrow by pattern. On the master branch there's nothing to diff against, so this runs all selected steps (i.e. a no-op filter).",
+)
+@click.option(
+    "--debug",
+    is_flag=True,
+    help="Run steps in this process, single-threaded, and open ipdb on an uncaught exception.",
 )
 @click.argument(
     "steps",
@@ -160,27 +176,24 @@ def main_cli(
     steps: list[str],
     dry_run: bool = False,
     force: bool = False,
+    public_only: bool = False,
     private: bool = False,
     grapher: bool = False,
     export: bool = False,
-    ipdb: bool = False,
     only: bool = False,
-    exact_match: bool = False,
     exclude: str | None = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
     workers: int = 1,
-    use_threads: bool = True,
-    strict: bool | None = None,
     watch: bool = False,
     continue_on_failure: bool = False,
-    force_upload: bool = False,
     prefer_download: bool = False,
     subset: str | None = None,
     modified: bool = False,
+    debug: bool = False,
 ) -> None:
     """Generate datasets by running their corresponding ETL steps.
 
-    Run all ETL steps in the DAG matching the value of `STEPS`. A match is a dataset with an uri that contains the value of any of the words in `STEPS`.
+    Run all ETL steps in the DAG matching the value of `STEPS`. A match is a dataset with an uri that contains the value of any of the words in `STEPS`; a full step URI (e.g. `data://garden/.../step_name`) selects exactly that step.
 
     **Example 1**: Run steps matching "mars" in the DAG file:
 
@@ -207,12 +220,13 @@ def main_cli(
     config.enable_structlog_filtering()
     config.enable_sentry()
 
-    # in watch mode, run steps in-process (no subprocess) so exceptions propagate and the loop continues
-    if watch:
+    # In watch and debug mode, run steps in-process (no fork or subprocess) so exceptions propagate.
+    if watch or debug:
         config.DEBUG = True
 
-    # make everything single threaded, useful for debugging
-    if not use_threads:
+    # Debugging: everything in one process and one thread, so that ipdb can take over on an exception.
+    if debug:
+        config.IPDB_ENABLED = True  # ty: ignore[invalid-assignment][invalid-assignment]
         config.GRAPHER_INSERT_WORKERS = 1
         config.DIRTY_STEPS_WORKERS = 1
         workers = 1
@@ -221,19 +235,16 @@ def main_cli(
     if workers > 1:
         config.GRAPHER_INSERT_WORKERS = config.GRAPHER_INSERT_WORKERS // workers
 
-    # Set CONTINUE_ON_FAILURE from CLI flag
     if continue_on_failure:
         config.CONTINUE_ON_FAILURE = continue_on_failure
 
-    # Set FORCE_UPLOAD from CLI flag
-    if force_upload:
-        config.FORCE_UPLOAD = force_upload
+    # A forced re-run also re-uploads the grapher data & metadata files whose checksums match.
+    if force:
+        config.FORCE_UPLOAD = True
 
-    # Set PREFER_DOWNLOAD from CLI flag
     if prefer_download:
         config.PREFER_DOWNLOAD = prefer_download
 
-    # Set SUBSET from CLI flag
     if subset:
         config.SUBSET = subset
 
@@ -249,35 +260,41 @@ def main_cli(
             # This lets staging-site-master do a full build with the same command as feature branches.
             click.echo("On master branch: --modified runs all selected steps (no diff filter).")
         else:
-            steps = _modified_steps(includes=steps, exact_match=exact_match)
-            if not steps:
-                click.echo("No steps modified relative to origin/master.")
-                return
-            # `--modified` surfaces modified export steps (multidim/explorer recipes) by design, but
-            # they're only buildable in export mode. When a branch edits only such a recipe (e.g. a
-            # single `<explorer>.<key>.config.yml`), the modified set is export-only; without this we
-            # would exclude it downstream and crash with "No steps matched". Enable export (which also
-            # un-excludes the grapher deps the export step needs) so the explorer actually rebuilds.
-            if not export and any(s.startswith("export://") for s in steps):
-                export = True
-                click.echo("Detected modified export step(s); enabling --export for this run.")
-            click.echo(f"Restricting to {len(steps)} step(s) modified vs origin/master.")
-            # We matched modified catalog paths as substrings, so disable exact matching downstream.
-            exact_match = False
+            from etl.git_helpers import get_changed_files
+
+            # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
+            files_changed = get_changed_files(include_diff=False)
+            global_changes = _global_checksum_inputs_changed(files_changed)
+            if global_changes:
+                # These files aren't under etl/steps/ or snapshots/, so _modified_steps would see
+                # nothing changed - but DataStep.checksum_input() bakes pd.__version__ and
+                # config.ETL_EPOCH into every step's checksum, so a change here makes every step
+                # dirty regardless of which step files were touched. Don't filter in that case.
+                click.echo(
+                    f"Detected changes to {', '.join(global_changes)}, which affect every step's "
+                    "checksum (pandas version / ETL_EPOCH); --modified runs all selected steps "
+                    "(no diff filter)."
+                )
+            else:
+                # Modified viz:// and export:// steps come back as full URIs, so they are selected
+                # even without their flag (and then only build locally), see `construct_subdag`.
+                steps = _modified_steps(includes=steps, files_changed=files_changed)
+                if not steps:
+                    click.echo("No steps modified relative to origin/master.")
+                    return
+                click.echo(f"Restricting to {len(steps)} step(s) modified vs origin/master.")
 
     kwargs = dict(
         includes=steps,
         dry_run=dry_run,
         force=force,
-        private=private,
+        private=not public_only,
         grapher=grapher,
         export=export,
         only=only,
-        exact_match=exact_match,
         excludes=exclude.split(",") if exclude else None,
         dag_path=dag_path,
         workers=workers,
-        strict=strict,
     )
 
     if watch:
@@ -292,18 +309,25 @@ def main_cli(
             mode_label = "instant (metadata only)" if is_yaml else "full"
             print(f"--- File changed: {changed_file.name} [{mode_label}]", flush=True)
 
-        if ipdb:
+        if debug:
             from ipdb import launch_ipdb_on_exception
 
-            config.IPDB_ENABLED = True  # ty: ignore[invalid-assignment][invalid-assignment]
-            config.GRAPHER_INSERT_WORKERS = 1
-            config.DIRTY_STEPS_WORKERS = 1
-            kwargs["workers"] = 1
             with launch_ipdb_on_exception():
                 main(**kwargs)  # ty: ignore
         else:
+            from etl.steps import StepFailedError
+
             try:
                 main(**kwargs)  # ty: ignore
+            except StepFailedError:
+                if not watch:
+                    # Exit rather than re-raise: the recap in the finally below reports every failed
+                    # step with its traceback, and a re-raise would add nothing but executor
+                    # plumbing (_RemoteTraceback and future.result frames) on top of it — which is
+                    # what CI would then show you instead of the recap.
+                    raise SystemExit(1) from None
+                print("--- step_failed", flush=True)
+                continue
             except Exception:
                 if not watch:
                     raise
@@ -312,6 +336,9 @@ def main_cli(
                 traceback.print_exc()
                 print("--- step_failed", flush=True)
                 continue
+            finally:
+                # In a finally, so every way a run can end goes through it. No-op when nothing failed.
+                print_failure_recap()
             if watch:
                 print("--- Dataset rebuild complete", flush=True)
 
@@ -331,42 +358,74 @@ def _current_branch_name() -> str | None:
         return None
 
 
-def _modified_steps(includes: list[str], exact_match: bool = False) -> list[str]:
+# Repo-wide files that, per `DataStep.checksum_input()` (etl/steps/__init__.py), get baked into
+# *every* step's checksum on top of the step's own files: the pandas version (root pyproject.toml /
+# uv.lock pin it) and config.ETL_EPOCH (etl/config.py). A change to any of these makes every step
+# dirty regardless of which step files a branch touched, so a plain git-diff of step files misses it.
+_GLOBAL_CHECKSUM_FILES = {"pyproject.toml", "uv.lock", "etl/config.py"}
+
+
+def _global_checksum_inputs_changed(files_changed: dict[str, dict[str, str]]) -> list[str]:
+    """Return which repo-wide, all-steps-checksum-affecting files changed vs origin/master."""
+    return sorted(f for f in _GLOBAL_CHECKSUM_FILES if f in files_changed)
+
+
+def _modified_steps(
+    includes: list[str],
+    files_changed: dict[str, dict[str, str]] | None = None,
+) -> list[str]:
     """Return catalog paths of steps that changed vs origin/master, plus their downstream steps.
 
     Reuses the same machinery as chart-diff (`get_changed_files` + `get_all_changed_catalog_paths`),
     so the selection matches what chart-diff considers affected. If `includes` is non-empty, the
     result is narrowed to changed paths that also match one of those patterns.
 
-    Export steps (e.g. `export://multidim/...`) are included too, so `--modified` can pick the
+    Viz and export steps (e.g. `viz://chart/...`) are included too, so `--modified` can pick the
     multidims/explorers a branch affects via their upstream data steps. Data steps are returned
-    URI-less (e.g. "garden/foo/bar"); export steps keep their full URI so `export://...` patterns
+    URI-less (e.g. "garden/foo/bar"); viz/export steps keep their full URI so `viz://...` patterns
     match them.
+
+    :param files_changed: Pass in an already-fetched `get_changed_files()` result to avoid
+        recomputing it (callers that also need to check `_global_checksum_inputs_changed` first).
     """
     from etl.git_helpers import get_changed_files
     from etl.io import get_all_changed_catalog_paths
 
-    # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
-    changed_paths = get_all_changed_catalog_paths(get_changed_files(include_diff=False), include_export=True)
+    if files_changed is None:
+        # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
+        files_changed = get_changed_files(include_diff=False)
+    changed_paths = get_all_changed_catalog_paths(files_changed, include_export=True)
 
     # Narrow to those also matching the explicit STEPS arguments.
     if includes:
-        if exact_match:
-            # changed_paths are URI-less for data steps (e.g. "garden/foo/bar") but full URIs for
-            # export steps; exact-match includes are full step URIs (e.g. "data://garden/foo/bar").
-            # Compare on the scheme-less path part of both sides.
-            wanted = {i.split("://", 1)[-1] for i in includes}
-            changed_paths = [p for p in changed_paths if p.split("://", 1)[-1] in wanted]
-        else:
-            patterns = [re.compile(p) for p in includes]
-            changed_paths = [p for p in changed_paths if any(pat.search(p) for pat in patterns)]
+        # Data and snapshot steps come back scheme-less (`garden/foo/bar`), so a full URI include
+        # (`data://garden/foo/bar`) is matched on its path. Viz and export steps keep their full URI, and so
+        # do their includes: `viz://explorer` must not become the bare `explorer`, which would also match
+        # data paths such as `explorers/wb/latest/world_bank_pip`.
+        # And as in `filter_to_subgraph`, an include that names a changed step in full selects that step
+        # only, not `.../foo_extended` as well.
+        changed = set(changed_paths)
+        wanted = [_strip_data_scheme(p) for p in includes]
+        patterns = [re.compile(p) for p in wanted if p not in changed]
+        changed_paths = [p for p in changed_paths if p in wanted or any(pat.search(p) for pat in patterns)]
 
     return changed_paths
 
 
+# The schemes `get_all_changed_catalog_paths` strips from changed steps; viz:// and export:// are kept.
+_DATA_SCHEMES = ("data://", "data-private://", "snapshot://", "snapshot-private://")
+
+
+def _strip_data_scheme(include: str) -> str:
+    for scheme in _DATA_SCHEMES:
+        if include.startswith(scheme):
+            return include[len(scheme) :]
+    return include
+
+
 def _find_closest_matches(includes_str: str, dag: DAG) -> None:
     """Find and print closest matches for misspelled step names."""
-    print(f"No steps matched `{includes_str}`; check the spelling or try with the `--private` flag.\nClosest matches:")
+    print(f"No steps matched `{includes_str}`; check the spelling.\nClosest matches:")
     # NOTE: We could use a better edit distance to find the closest matches.
     for match in difflib.get_close_matches(includes_str, list(dag), n=5, cutoff=0.0):
         print(match)
@@ -377,7 +436,7 @@ def main(
     includes: list[str],
     dry_run: bool = False,
     force: bool = False,
-    private: bool = False,
+    private: bool = True,
     grapher: bool = False,
     export: bool = False,
     only: bool = False,
@@ -392,6 +451,14 @@ def main(
     """
     from etl import config
     from etl.steps import compile_steps
+
+    # Write permissions for the steps (see `config.GRAPHER_ENABLED`). Set here rather than in `main_cli`
+    # so that programmatic callers (`etl browser`, fasttrack) get the same gating as the command line.
+    # Also exported to the environment, for a step that runs in a subprocess rather than a fork.
+    config.GRAPHER_ENABLED = grapher
+    config.EXPORT_ENABLED = export
+    environ["GRAPHER_ENABLED"] = "1" if grapher else "0"
+    environ["EXPORT_ENABLED"] = "1" if export else "0"
 
     if grapher:
         sanity_check_db_settings(grapher_user_id=config.GRAPHER_USER_ID)
@@ -417,6 +484,9 @@ def main(
     # Compile subdag into Step objects
     steps = compile_steps(full_dag, subdag)
 
+    if not grapher:
+        _drop_grapher_dependencies(steps)
+
     # Run the steps we have selected and everything upstream of them
     run_steps(
         steps=steps,
@@ -427,6 +497,16 @@ def main(
         workers=workers,
         strict=strict,
     )
+
+
+def _drop_grapher_dependencies(steps: "list[Step]") -> None:
+    """Without --grapher the grapher:// upserts don't run (see `construct_subdag`), so a viz step must
+    not depend on them: `compile_steps` resolves dependencies from the full DAG, and a GrapherStep's
+    `is_dirty` asks the DB whether its upsert happened."""
+    from etl.steps import GrapherStep
+
+    for step in steps:
+        step.dependencies = [dep for dep in step.dependencies if not isinstance(dep, GrapherStep)]
 
 
 def sanity_check_db_settings(grapher_user_id) -> None:
@@ -445,9 +525,9 @@ def construct_full_dag(dag: DAG) -> DAG:
     # Make sure we don't have both public and private steps in the same DAG
     _check_public_private_steps(dag)
 
-    # For export:// steps, add the grapher:// steps that are needed to upsert data to DB.
+    # For viz:// steps, add the grapher:// steps that are needed to upsert their inputs to DB.
     for step in list(dag.keys()):
-        if step.startswith("export://multidim/") or step.startswith("export://explorers/"):
+        if step.startswith("viz://"):
             for dep in list(dag[step]):
                 if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep):
                     dag[step].add(re.sub(r"^(data|data-private)://", "grapher://", dep))
@@ -467,10 +547,18 @@ def construct_subdag(
     excludes: list[str] | None = None,
     grapher: bool = False,
     export: bool = False,
-    private: bool = False,
+    private: bool = True,
     only: bool = False,
     exact_match: bool = False,
 ) -> "DAG":
+    """Select the steps to run: the includes, their dependencies, minus the excludes.
+
+    Naming selects, flags permit. An include that names a gated step type (`grapher://...`,
+    `viz://...`, `export://...`) selects those steps whether or not their flag is passed; without
+    the flag, viz and export steps only build locally (see `config.GRAPHER_ENABLED`), and grapher://
+    upserts are left out with a note. A plain pattern (`energy`, `.*`) skips the gated types unless
+    their flag is passed, so a broad run never writes to a DB or a shared bucket by accident.
+    """
     from etl.steps import filter_to_subgraph
 
     orig_includes = includes
@@ -478,38 +566,76 @@ def construct_subdag(
     # Include everything when no arguments provided
     if not includes:
         includes = [".*"]
-    if not excludes:
-        excludes = []
+    excludes = list(excludes or [])
 
-    # Export steps
-    if not export:
-        excludes.append("export://.*")
-
-    # Grapher steps
-    if not grapher and not export:
-        excludes.append("grapher://.*")
-
-    # Exclude private steps
     if not private:
         excludes.append("private://.*")
 
-    # Get subdag based on includes and excludes
-    subdag = filter_to_subgraph(dag, includes=includes, excludes=excludes, only=only, exact_match=exact_match)
+    # A gated type matched by a pattern is skipped without its flag.
+    gate_excludes = []
+    if not grapher:
+        gate_excludes.append(_prefix_pattern(GRAPHER_FLAG_PREFIXES))
+    if not export:
+        gate_excludes.append(_prefix_pattern(EXPORT_FLAG_PREFIXES))
+
+    named = [i for i in includes if i.startswith(GATED_PREFIXES)]
+    patterns = [i for i in includes if not i.startswith(GATED_PREFIXES)]
+
+    subdag: DAG = {}
+    if patterns:
+        subdag = filter_to_subgraph(
+            dag, includes=patterns, excludes=excludes + gate_excludes, only=only, exact_match=exact_match
+        )
+    if named:
+        for step, deps in filter_to_subgraph(
+            dag, includes=named, excludes=excludes, only=only, exact_match=exact_match
+        ).items():
+            subdag[step] = subdag.get(step, set()) | deps
+
+    if not private:
+        # The exclusion also drops the public steps downstream of a private one. Fine for a pattern (the
+        # rest still runs), but a step named in full should not vanish silently.
+        dropped = sorted(i for i in includes if i in dag and i not in subdag)
+        if dropped:
+            click.secho(
+                f"Skipping {len(dropped)} named step(s) with --public-only, private or depending on a private step: "
+                + ", ".join(dropped),
+                fg="yellow",
+            )
+
+    if not grapher:
+        # A named viz step brings its grapher:// dependencies (the upserts of its inputs) along, and a
+        # named grapher:// step selects itself; neither may run without the permission.
+        skipped = sorted(step for step in subdag if step.startswith("grapher://"))
+        if skipped:
+            subdag = {step: deps - set(skipped) for step, deps in subdag.items() if step not in skipped}
+            shown = ", ".join(skipped[:3]) + (f" and {len(skipped) - 3} more" if len(skipped) > 3 else "")
+            click.secho(f"Skipping {len(skipped)} grapher:// upsert(s) without --grapher: {shown}", fg="yellow")
 
     if not subdag:
-        # If no steps are found, the most likely case is that the step passed as argument was misspelled.
-        # Print a short error message, show a list of the closest matches, and exit.
+        # Most likely the argument was misspelled; a gated step named by its URI is always selected.
         _find_closest_matches(" ".join(orig_includes or []), dag)
         sys.exit(1)
 
     return subdag
 
 
+# Step types gated by each flag. grapher:// upserts and viz:// steps write to the grapher DB (and R2)
+# of the targeted environment; export:// steps write to shared destinations (GitHub, public R2).
+GRAPHER_FLAG_PREFIXES = ("grapher://", "viz://")
+EXPORT_FLAG_PREFIXES = ("export://",)
+GATED_PREFIXES = GRAPHER_FLAG_PREFIXES + EXPORT_FLAG_PREFIXES
+
+
+def _prefix_pattern(prefixes: tuple[str, ...]) -> str:
+    return "^(?:" + "|".join(re.escape(p) for p in prefixes) + ")"
+
+
 def run_steps(
     steps: "list[Step]",
     dry_run: bool = False,
     force: bool = False,
-    private: bool = False,
+    private: bool = True,
     only: bool = False,
     workers: int = 1,
     strict: bool | None = None,
@@ -602,11 +728,13 @@ def exec_steps(steps: "list[Step]", strict_after: Any, continue_on_failure: bool
                 # log which step failed and re-raise the exception, otherwise it gets lost
                 # in logs and we don't know which step failed
                 log.error("step_failed", step=str(step))
+                # Report before deciding what to do with it: only the first exception is ever
+                # re-raised, and it carries no traceback of its own worth printing.
+                _report_step_failure(str(step), e)
                 if continue_on_failure:
                     failing_steps.append(step)
                     exceptions.append(e)
                     skipped_steps.append(step)
-                    click.echo(click.style(f"--- FAILED {step}", fg="red"))
                     continue
                 else:
                     raise e
@@ -619,8 +747,6 @@ def exec_steps(steps: "list[Step]", strict_after: Any, continue_on_failure: bool
         _write_execution_times(execution_times)
 
     if continue_on_failure and exceptions:
-        for step, exception in zip(failing_steps, exceptions):
-            log.error("step_exception", step=str(step), exception=str(exception))
         # Raise the first exception
         raise exceptions[0]
 
@@ -702,9 +828,6 @@ def exec_graph_parallel(
     :param use_threads: Flag indicating whether to use threads instead of processes for parallel execution.
     :param kwargs: Additional keyword arguments to be passed to the function.
     """
-    import structlog
-
-    log = structlog.get_logger()
     topological_sorter = TopologicalSorter(exec_graph)
     topological_sorter.prepare()
 
@@ -753,7 +876,25 @@ def exec_graph_parallel(
                     try:
                         future.result()
                         topological_sorter.done(task)
-                    except Exception as e:
+                    except KeyboardInterrupt:
+                        raise
+                    # Catch BaseException, not Exception: a step that somehow raises SystemExit would
+                    # otherwise end the run without ever naming the step or printing its traceback.
+                    except BaseException as e:
+                        # Report the failure right away, on top of the recap at the end of the run:
+                        # on a long build you want to see it while the run is still going.
+                        _report_step_failure(task, e)
+
+                        # A dead pool cannot run the steps that are left, so --continue-on-failure
+                        # has nothing to continue with: every remaining future resolves to this
+                        # same BrokenProcessPool. Worse, they resolve to the very same exception
+                        # *object*, and each `future.result()` above appends its frames to that
+                        # object's traceback — so failure N prints N copies of them. A nightly
+                        # rebuild once reported 1210 of these and wrote 5.9M lines (546MB), past
+                        # the size Buildkite will serve a log at. Stop at the first one.
+                        if isinstance(e, BrokenProcessPool):
+                            raise
+
                         if continue_on_failure:
                             failed_tasks.add(task)
                             skipped_tasks.add(
@@ -761,14 +902,11 @@ def exec_graph_parallel(
                             )  # Failed tasks should also be considered skipped for dependency checking
                             exceptions.append(e)
                             topological_sorter.done(task)  # Mark as done so execution can continue
-                            print(f"--- Failed {task} - {click.style('FAILED', fg='red')}")
                         else:
                             raise e
 
         # If we collected exceptions during CONTINUE_ON_FAILURE mode, raise the first one
         if continue_on_failure and exceptions:
-            for exception in exceptions:
-                log.error("step_exception", exception=str(exception))
             raise exceptions[0]
 
 
@@ -785,6 +923,63 @@ def _create_expected_time_message(
         return ""
     else:
         return prepend_message + partial_message + append_message
+
+
+def _report_step_failure(step_name: str, e: BaseException) -> None:
+    """Print a failed step's traceback, and keep it for the recap at the end of the run.
+
+    Header and traceback go out as one write to one stream: Buildkite reads stdout and stderr
+    through separate pipes and merges them in whatever order its readers get there, so output split
+    across the two comes out interleaved however carefully each is flushed. "+++" opens a log group
+    that is expanded by default, unlike the "---" the other headers use.
+    """
+    from etl.steps import StepFailedError
+
+    # A StepFailedError's message carries the traceback from the child process that ran the step.
+    # Rendering the exception itself would only add executor plumbing (_RemoteTraceback frames).
+    if isinstance(e, StepFailedError):
+        failure = str(e)
+    else:
+        failure = "".join(traceback.format_exception(type(e), e, e.__traceback__)).rstrip()
+
+    STEP_FAILURES.append((step_name, failure))
+    print(f"+++ Failed {step_name}\n{failure}", flush=True)
+
+
+def print_failure_recap() -> None:
+    """Reprint every failure of this run, and forget them.
+
+    Each was printed as it happened, but by the end of a build they are thousands of lines up the
+    log — and the tail is what gets read, being what Buildkite puts in its error box.
+
+    Steps that failed the same way share one traceback here. When something upstream of the steps
+    themselves breaks — a dead worker pool, an unreachable database — every step fails with the
+    identical text, and reprinting it once per step is what turns a recap into a log nobody can
+    open. Every failed step is still named, in the `steps_failed` list at the end.
+    """
+    if not STEP_FAILURES:
+        return
+
+    import structlog
+
+    # Group by traceback, first-seen order. A dict keyed on the text does both in one pass.
+    by_failure: dict[str, list[str]] = {}
+    for step_name, failure in STEP_FAILURES:
+        by_failure.setdefault(failure, []).append(step_name)
+
+    # ">>>" for the individual steps: "---"/"+++" would each open a log group of their own and
+    # split the recap up, whereas these stay inside the recap's own group.
+    blocks = [f"+++ {len(STEP_FAILURES)} step(s) failed"]
+    for failure, step_names in by_failure.items():
+        header = f">>> Failed {step_names[0]}"
+        if len(step_names) > 1:
+            header += f" — and {len(step_names) - 1} more step(s) with an identical traceback"
+        blocks.append(f"{header}\n{failure}")
+    print("\n".join(blocks), flush=True)
+
+    # The step list at the very end is what you feed back into `etl run`.
+    structlog.get_logger().error("steps_failed", steps=sorted(step_name for step_name, _ in STEP_FAILURES))
+    STEP_FAILURES.clear()
 
 
 def _exec_step_job(
@@ -897,7 +1092,7 @@ def _validate_private_steps(steps: "list[Step]") -> None:
     for step in steps:
         for dep in step.dependencies:
             if not dep.is_public:
-                raise ValueError(f"Public step {step} depends on private step {dep}. Use --private flag.")
+                raise ValueError(f"Public step {step} depends on private step {dep}. Drop --public-only to run it.")
 
 
 def _is_private_step(step_name: str) -> bool:

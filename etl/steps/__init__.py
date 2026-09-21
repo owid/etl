@@ -34,7 +34,6 @@ from owid import catalog
 from owid.catalog import s3_utils
 from owid.catalog.api.utils import DEFAULT_CATALOG_URL
 from owid.catalog.core.datasets import DEFAULT_FORMATS
-from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 from tqdm import tqdm
 
@@ -43,7 +42,6 @@ from etl import config, files, git_helpers, paths
 from etl.config import OWID_ENV, TLS_VERIFY
 from etl.db import get_engine
 from etl.grapher import helpers as gh
-from etl.grapher import model as gm
 from etl.helpers import get_metadata_path
 from etl.snapshot import Snapshot
 
@@ -53,6 +51,19 @@ DAG = dict[str, set[str]]
 
 # Dictionary to store metadata changes for each dataset if INSTANT flag is set
 INSTANT_METADATA_DIFF = {}
+
+
+class StepFailedError(Exception):
+    """A step's code raised in the child process (fork or subprocess) that ran it.
+
+    The message carries the child's traceback, since the exception itself has none worth printing:
+    its own frames are the runner's, and across a process pool they arrive wrapped in
+    `_RemoteTraceback` plumbing.
+
+    This must be a regular Exception rather than a `sys.exit(exit_code)`: the runners catch
+    `Exception` to log which step failed and to honour `--continue-on-failure`, and a `SystemExit`
+    would sail past those handlers and end the run without naming the step or printing anything.
+    """
 
 
 def compile_steps(
@@ -138,8 +149,16 @@ def filter_to_subgraph(
     elif exact_match:
         included = set(includes_list) & available_steps
     else:
-        compiled_includes = [re.compile(p) for p in includes_list]
-        included = {s for s in available_steps if any(p.search(s) for p in compiled_includes)}
+        included = set()
+        for pattern in includes_list:
+            if pattern in all_steps:
+                # A full step name selects that step only: read as a regex, `data://garden/x/2024-01-01/foo`
+                # would also pull in `.../foo_extended`.
+                included.add(pattern)
+            else:
+                compiled = re.compile(pattern)
+                included.update(s for s in available_steps if compiled.search(s))
+        included &= available_steps
 
     if only:
         # Only include explicitly selected nodes, but filter out excluded steps
@@ -231,6 +250,9 @@ def parse_step(step_name: str, dag: dict[str, Any]) -> "Step":
 
     elif step_type == "export":
         step = ExportStep(path, dependencies)
+
+    elif step_type == "viz":
+        step = VizStep(path, dependencies)
 
     elif step_type == "data-private":
         step = DataStepPrivate(path, dependencies)
@@ -682,9 +704,18 @@ class DataStep(Step):
         else:
             self._run_py_subprocess()
 
+    def _child_failure_message(self, traceback_path: Path, exit_code: int) -> str:
+        """Describe a failed child: the traceback it left behind, if it got that far, and the step."""
+        try:
+            child_traceback = traceback_path.read_text().rstrip() + "\n"
+        except OSError:
+            child_traceback = ""
+        return f"{child_traceback}Step {self} failed with exit code {exit_code}"
+
     def _run_py_fork(self) -> None:
         """Run the step in a forked child process (Linux only)."""
         import resource
+        import tempfile
         import traceback
 
         # Apply the same virtual-memory limit that prlimit would enforce
@@ -695,6 +726,12 @@ class DataStep(Step):
                 )
             except ValueError:
                 pass  # not all systems support RLIMIT_AS
+
+        # Somewhere for the child to leave its traceback; see the child branch below. Created here
+        # so the name is unique per run and both processes know it.
+        traceback_fd, traceback_file = tempfile.mkstemp(prefix="etl-step-traceback-", suffix=".txt")
+        os.close(traceback_fd)
+        traceback_path = Path(traceback_file)
 
         # Flush before forking to prevent the child from inheriting (and
         # potentially re-flushing) buffered output from the parent, which
@@ -730,18 +767,31 @@ class DataStep(Step):
                 run_module_run(step_module, self._dest_dir.as_posix())
                 os._exit(0)
             except BaseException:
-                traceback.print_exc()
+                # Hand the traceback to the parent through a file rather than writing it to the
+                # stdout this child shares with its siblings. A traceback easily exceeds PIPE_BUF,
+                # above which a write is neither atomic nor guaranteed to complete in one call, so
+                # concurrent children would interleave into an unreadable mix. The parent puts it in
+                # StepFailedError's message, and the runners print one failure at a time, labelled
+                # with the step it belongs to.
+                try:
+                    traceback_path.write_text(traceback.format_exc())
+                except OSError:
+                    # Last resort, interleaved or not: never lose the traceback.
+                    traceback.print_exc()
                 os._exit(1)
         else:
             # ---------- parent process ----------
-            _, status = os.waitpid(pid, 0)
-            if os.WIFEXITED(status):
-                exit_code = os.WEXITSTATUS(status)
-                if exit_code != 0:
-                    sys.exit(exit_code)
-            elif os.WIFSIGNALED(status):
-                sig = os.WTERMSIG(status)
-                raise Exception(f"Step {self} was killed by signal {sig}")
+            try:
+                _, status = os.waitpid(pid, 0)
+                if os.WIFEXITED(status):
+                    exit_code = os.WEXITSTATUS(status)
+                    if exit_code != 0:
+                        raise StepFailedError(self._child_failure_message(traceback_path, exit_code))
+                elif os.WIFSIGNALED(status):
+                    sig = os.WTERMSIG(status)
+                    raise Exception(f"Step {self} was killed by signal {sig}")
+            finally:
+                traceback_path.unlink(missing_ok=True)
 
     def _run_py_subprocess(self) -> None:
         """Run the step in a new subprocess (fallback for non-Linux or debug mode)."""
@@ -769,7 +819,7 @@ class DataStep(Step):
         try:
             subprocess.check_call(args, env=env)
         except subprocess.CalledProcessError as e:
-            sys.exit(e.returncode)
+            raise StepFailedError(f"Step {self} failed with exit code {e.returncode} (traceback above)") from e
 
     def _download_dataset_from_catalog(self) -> bool:
         """Download the dataset from the catalog if the checksums match. Return True if successful."""
@@ -1076,7 +1126,7 @@ class GrapherStep(Step):
             # cleaning up ghost resources could be unsuccessful if someone renamed short_name of a variable
             # and remapped it in chart-sync. In that case, we cannot delete old variables because they are still
             # needed for remapping. However, we can delete it on next ETL run
-            success = self._cleanup_ghost_resources(engine, dataset_upsert_results, catalog_paths)
+            success = self._delete_ghost_variables(admin_api, preloaded_checksums, catalog_paths)
 
             # set checksum and updatedAt timestamps after all data got inserted
             if success:
@@ -1094,33 +1144,31 @@ class GrapherStep(Step):
         """Checksum of a grapher step is the same as checksum of the underyling data://grapher step."""
         return self.data_step.checksum_input()
 
-    @classmethod
-    def _cleanup_ghost_resources(
-        cls,
-        engine: Engine,
-        dataset_upsert_results,
+    @staticmethod
+    def _delete_ghost_variables(
+        admin_api: AdminAPI,
+        preloaded_checksums: dict,
         catalog_paths: list[str],
     ) -> bool:
         """
-        Cleanup all ghost variables that weren't upserted
+        Remove the dataset's variables that this run didn't upsert.
+
         NOTE: we can't just remove all dataset variables before starting this step because
         there could be charts that use them and we can't remove and recreate with a new ID
 
-        Return True if cleanup was successfull, False otherwise.
+        `preloaded_checksums` was read before the upserts, so it holds exactly the variables
+        that already existed; anything created during this run isn't in it and can't be
+        mistaken for a ghost.
+
+        Return True if cleanup was successful, False otherwise.
         """
         import etl.grapher.to_db as db
 
-        # convert catalog_paths to variable_ids
-        with Session(engine) as session:
-            upserted_variable_ids = list(gm.Variable.catalog_paths_to_variable_ids(session, catalog_paths).values())
+        upserted = set(catalog_paths)
+        ghost_variable_ids = [row["id"] for path, row in preloaded_checksums.items() if path not in upserted]
 
-        # Try to cleanup ghost variables, but make sure to raise an error if they are used
-        # in any chart
-        success = db.cleanup_ghost_variables(
-            engine,
-            dataset_upsert_results.dataset_id,
-            upserted_variable_ids,
-        )
+        # Try to delete them, but make sure to raise an error if they are used in any chart
+        success = db.delete_ghost_variables(admin_api, ghost_variable_ids)
 
         # TODO: cleanup origins that are not used by any variable. We can do it in batch
         return success
@@ -1128,40 +1176,85 @@ class GrapherStep(Step):
 
 class ExportStep(DataStep):
     """
-    A step which exports something once. For instance committing to a Github repository
-    or upserting an Explorer to DB.
+    A step which ships files to a shared, environment-less destination, e.g. committing to a
+    GitHub repository or uploading to R2. Its recipe lives in `etl/steps/export/<channel>/...`.
+
+    Runs with `--export`, which grants the write (`config.EXPORT_ENABLED`); named without it, the
+    step builds its files locally and skips the upload, see `publishes`.
     """
 
     path: str
     dependencies: list[Step]
+    # Step type: the URI scheme and the folder under `etl/steps/`.
+    step_type = "export"
 
     def __init__(self, path: str, dependencies: list[Step]) -> None:
         self.dependencies = dependencies
         self.path = path
 
     def __str__(self) -> str:
-        return f"export://{self.path}"
+        return f"{self.step_type}://{self.path}"
+
+    def can_execute(self, archive_ok: bool = True) -> bool:
+        sp = self._search_path
+        if not archive_ok and "/archive/" in sp.as_posix():
+            return False
+
+        return super().can_execute(archive_ok=archive_ok)
 
     def run(self) -> None:
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 
+        # An output folder without index.json (an interrupted run, or a file dropped there by
+        # something else) would make create_dataset refuse to run; start from scratch instead.
+        self._clean_partial_output()
+
         from etl.helpers import create_dataset
 
-        # Create folder for the dataset, export step can save files there
+        # Create folder for the dataset, the step can save files there
         ds = create_dataset(self._dest_dir, tables=[])
 
-        sp = self._search_path
-        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
-            if config.DEBUG:
-                DataStep._run_py_isolated(self)  # ty: ignore
-            else:
-                DataStep._run_py(self)  # ty: ignore
+        self._run_recipe()
+
+        if not self.publishes:
+            # Leave the checksum unrecorded, so that the next run with the flag rebuilds and publishes.
+            log.warning(
+                "step.built_locally_only",
+                step=str(self),
+                hint=f"pass {self.permission_flag} to publish; the step stays dirty until then",
+            )
+            return
+
+        self._publish()
 
         # save checksum (only update index.json, don't call ds.save() which iterates
-        # table_names and would pick up custom JSON files written by the export script)
+        # table_names and would pick up custom JSON files written by the step)
         ds.metadata.source_checksum = self.checksum_input()
         ds.metadata.save(ds._index_file)
+
+    # The etlr flag that grants this step's write.
+    permission_flag = "--export"
+
+    @property
+    def publishes(self) -> bool:
+        """Whether this run may write to the step's destination. Off, the recipe still runs (the steps
+        check the same `config` switch before uploading), but nothing leaves the machine."""
+        return config.EXPORT_ENABLED
+
+    def _publish(self) -> None:
+        """Ship what the recipe wrote, for step types whose destination the framework owns.
+
+        A no-op for `export://` steps: they write to destinations of their own choosing (a GitHub
+        repo, a public R2 path) from inside the recipe, which is why they exist as a separate step
+        type at all.
+        """
+
+    def _run_recipe(self) -> None:
+        if config.DEBUG:
+            DataStep._run_py_isolated(self)  # ty: ignore
+        else:
+            DataStep._run_py(self)  # ty: ignore
 
     def checksum_output(self) -> str:
         # output checksum is checksum of all ingredients
@@ -1169,11 +1262,81 @@ class ExportStep(DataStep):
 
     @property
     def _search_path(self) -> Path:
-        return paths.STEP_DIR / "export" / self.path
+        return paths.STEP_DIR / self.step_type / self.path
 
     @property
     def _dest_dir(self) -> Path:
         return paths.EXPORT_DIR / self.path.lstrip("/")
+
+
+class VizStep(ExportStep):
+    """
+    A step which produces a visualization. Its channel says which kind:
+
+    - `viz://chart/...`: a chart or an MDIM (a chart is an MDIM with `dimensions: []`), upserted to the grapher DB.
+    - `viz://explorer/...`: an explorer, upserted to the grapher DB.
+    - `viz://static/...`: a static image (PNG/SVG), written next to the recipe.
+    - `viz://bespoke/...`: a bespoke interactive visualization, whose data feed is uploaded to R2.
+
+    Recipes live in `etl/steps/viz/<channel>/...`; local outputs go to `viz/<channel>/...`. Every viz
+    step runs under `--grapher`, which grants the write (`config.GRAPHER_ENABLED`); named without it,
+    the step builds its output locally (the chart config under `viz/`, the bespoke feed) and skips
+    the upsert or upload, see `etl.command.construct_subdag`. Static steps only write local files,
+    so they publish regardless. A bespoke step's own upload is the framework's job (`_publish`), so
+    its feed lands in the R2 path of the environment being built, like every other output.
+    """
+
+    step_type = "viz"
+    permission_flag = "--grapher"
+
+    @property
+    def publishes(self) -> bool:
+        return config.GRAPHER_ENABLED or self.channel == "static"
+
+    def _publish(self) -> None:
+        """Sync a bespoke feed to the environment's R2 path.
+
+        Chart and explorer steps publish from inside their recipe (`chart.save()` upserts to the
+        grapher DB) and static steps only ever write local files. A bespoke step just writes JSON
+        into its output folder, and the framework ships it -- see `etl.viz.bespoke`.
+        """
+        if self.channel != "bespoke":
+            return
+
+        from etl.viz.bespoke import sync_feed
+
+        sync_feed(self.path, self._dest_dir)
+
+    def can_execute(self, archive_ok: bool = True) -> bool:
+        return super().can_execute(archive_ok=archive_ok) or self._is_chart_yaml_only()
+
+    def _run_recipe(self) -> None:
+        sp = self._search_path
+        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
+            super()._run_recipe()
+        elif self._is_chart_yaml_only():
+            # YAML-only chart/MDIM: no .py, just a .config.yml. Run the default
+            # boilerplate (load_config → create_chart → save).
+            self._run_chart_yaml_only(sp)
+
+    def _is_chart_yaml_only(self) -> bool:
+        """True if this is a `viz://chart/...` step backed only by a `.config.yml`."""
+        if self.channel != "chart":
+            return False
+        return self._search_path.with_suffix(".config.yml").exists()
+
+    def _run_chart_yaml_only(self, search_path: Path) -> None:
+        from etl.helpers import PathFinder
+
+        # Synthesise the `.py` path PathFinder expects; the file doesn't need to exist,
+        # PathFinder only parses namespace/version/short_name out of the path components.
+        paths_ = PathFinder(str(search_path.with_suffix(".py")))
+        chart = paths_.create_chart(config=paths_.load_config())
+        chart.save()
+
+    @property
+    def _dest_dir(self) -> Path:
+        return paths.VIZ_DIR / self.path.lstrip("/")
 
 
 @dataclass

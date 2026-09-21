@@ -10,9 +10,9 @@ meta:
     url_main: http://fishcount.org.uk/
     date_published: '2024'
     date_accessed: 2024-12-12
-  license:
-    name: CC BY 4.0
-    url: https://fishcount.org.uk/estimates/farmedfishes/data01/fishcount_global_farmed_fish_estimate.php
+    license:
+      name: CC BY 4.0
+      url: https://fishcount.org.uk/estimates/farmedfishes/data01/fishcount_global_farmed_fish_estimate.php
 outs:
   - md5: dc87fdd756f9c444fc659af48c51dac9
     size: 18243

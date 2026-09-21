@@ -288,7 +288,10 @@ def add_cum_metrics(df: Table) -> Table:
     )
 
     # round the cumulative p-scores to 2 digits
-    df["cum_p_proj_all_ages"] = df["cum_p_proj_all_ages"].round(2)
+    # NOTE: the groupby-apply above hands back object columns, and `Series.round` rejects object
+    # dtype from pandas 2.3 on. Pandas 2.2 accepted it and returned the values untouched, so this
+    # rounding never actually happened.
+    df["cum_p_proj_all_ages"] = pr.to_numeric(df["cum_p_proj_all_ages"]).round(2)
     return df
 
 

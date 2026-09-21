@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: European Environment Agency
+    title: European Bathing Water Quality
+    description: |-
+      This data shows the number and proportion of coastal and inland bathing waters with excellent quality. The Bathing Water Directive requires Member States to identify and assess the quality of all inland and marine bathing waters and to classify these waters as 'poor', 'sufficient', 'good' or 'excellent'.
+
+      More information and metadata available at:
+      https://sdi.eea.europa.eu/catalogue/datahub/api/records/070d9baa-448d-4168-8514-7dadb3ad876d/formatters/xsl-view
+    citation_full: European Environment Agency (2026). State of Bathing Waters in 2025.
+    attribution_short: EEA
+    url_main: https://www.eea.europa.eu/en/analysis/maps-and-charts/state-of-bathing-waters-in-2025
+    url_download: https://sdi.eea.europa.eu/datashare/s/mBEEM7LmkgwEFKR/download
+    date_accessed: '2026-07-02'
+    date_published: '2026-06-02'
+    license:
+      name: CC BY 4.0
+      url: https://www.eea.europa.eu/en/legal-notice#copyright-notice
+outs:
+  - md5: abbeb0bbf88c2412e3ee7ad3b1834572
+    size: 43403760
+    path: bathing_water.zip

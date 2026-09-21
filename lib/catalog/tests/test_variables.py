@@ -11,10 +11,17 @@ from owid.catalog.core.indicators import (
     License,
     Variable,
     combine_indicators_metadata,
+    combine_indicators_processing_level,
     get_unique_licenses_from_indicators,
     get_unique_origins_from_indicators,
 )
 from owid.catalog.core.meta import VariableMeta, VariablePresentationMeta
+
+# description_key of the indicators defined in conftest.py.
+DESCRIPTION_KEY_A = "- Key description point 1 of Indicator 1\n- Common key description point"
+DESCRIPTION_KEY_B = (
+    "- Key description point 1 of Indicator 2\n- Common key description point\n- Key description point 2 of Indicator 2"
+)
 
 
 def test_create_empty_variable() -> None:
@@ -83,12 +90,7 @@ def test_create_new_variable_as_sum_of_other_two(table_1, origins, licenses) -> 
     # Since "a" and "b" have different title and description, "c" should have no title or description.
     assert tb1["c"].metadata.title is None
     assert tb1["c"].metadata.description is None
-    assert tb1["c"].metadata.description_key == [
-        "Key description point 1 of Indicator 1",
-        "Common key description point",
-        "Key description point 1 of Indicator 2",
-        "Key description point 2 of Indicator 2",
-    ]
+    assert tb1["c"].metadata.description_key == f"{DESCRIPTION_KEY_A}\n\n{DESCRIPTION_KEY_B}"
     assert tb1["c"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["c"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.
@@ -162,12 +164,7 @@ def test_create_new_variable_as_product_of_other_two(table_1, origins, licenses)
     assert (tb1["e"] == pd.Series([4, 10, 18])).all()
     assert tb1["e"].metadata.title is None
     assert tb1["e"].metadata.description is None
-    assert tb1["e"].metadata.description_key == [
-        "Key description point 1 of Indicator 1",
-        "Common key description point",
-        "Key description point 1 of Indicator 2",
-        "Key description point 2 of Indicator 2",
-    ]
+    assert tb1["e"].metadata.description_key == f"{DESCRIPTION_KEY_A}\n\n{DESCRIPTION_KEY_B}"
     assert tb1["e"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["e"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.
@@ -187,12 +184,7 @@ def test_create_new_variable_as_product_of_other_three(table_1, origins, license
     assert (tb1["f"] == pd.Series([20, 70, 162])).all()
     assert tb1["f"].metadata.title is None
     assert tb1["f"].metadata.description is None
-    assert tb1["f"].metadata.description_key == [
-        "Key description point 1 of Indicator 1",
-        "Common key description point",
-        "Key description point 1 of Indicator 2",
-        "Key description point 2 of Indicator 2",
-    ]
+    assert tb1["f"].metadata.description_key == f"{DESCRIPTION_KEY_A}\n\n{DESCRIPTION_KEY_B}"
     assert tb1["f"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["f"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of all variables.
@@ -210,12 +202,7 @@ def test_create_new_variable_as_division_of_other_two(table_1, origins, licenses
     assert (tb1["g"] == pd.Series([0.25, 0.40, 0.50])).all()
     assert tb1["g"].metadata.title is None
     assert tb1["g"].metadata.description is None
-    assert tb1["g"].metadata.description_key == [
-        "Key description point 1 of Indicator 1",
-        "Common key description point",
-        "Key description point 1 of Indicator 2",
-        "Key description point 2 of Indicator 2",
-    ]
+    assert tb1["g"].metadata.description_key == f"{DESCRIPTION_KEY_A}\n\n{DESCRIPTION_KEY_B}"
     assert tb1["g"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["g"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.
@@ -233,13 +220,8 @@ def test_create_new_variable_as_floor_division_of_other_two(table_1, origins, li
     assert (tb1["h"] == pd.Series([4, 2, 2])).all()
     assert tb1["h"].metadata.title is None
     assert tb1["h"].metadata.description is None
-    # Note that the order of key description points should be first b and then a.
-    assert tb1["h"].metadata.description_key == [
-        "Key description point 1 of Indicator 2",
-        "Common key description point",
-        "Key description point 2 of Indicator 2",
-        "Key description point 1 of Indicator 1",
-    ]
+    # Note that the order of key descriptions should be first b and then a.
+    assert tb1["h"].metadata.description_key == f"{DESCRIPTION_KEY_B}\n\n{DESCRIPTION_KEY_A}"
     assert tb1["h"].metadata.origins == [origins[2], origins[3], origins[1]]
     assert tb1["h"].metadata.licenses == [licenses[2], licenses[3], licenses[1]]
     # Processing level should be the highest of the two variables.
@@ -257,12 +239,7 @@ def test_create_new_variable_as_module_division_of_other_two(table_1, origins, l
     assert (tb1["i"] == pd.Series([1, 2, 3])).all()
     assert tb1["i"].metadata.title is None
     assert tb1["i"].metadata.description is None
-    assert tb1["i"].metadata.description_key == [
-        "Key description point 1 of Indicator 1",
-        "Common key description point",
-        "Key description point 1 of Indicator 2",
-        "Key description point 2 of Indicator 2",
-    ]
+    assert tb1["i"].metadata.description_key == f"{DESCRIPTION_KEY_A}\n\n{DESCRIPTION_KEY_B}"
     assert tb1["i"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["i"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.
@@ -298,12 +275,7 @@ def test_create_new_variables_as_another_variable_to_the_power_of_another_variab
     assert (tb1["k"] == pd.Series([1, 32, 729])).all()
     assert tb1["k"].metadata.title is None
     assert tb1["k"].metadata.description is None
-    assert tb1["k"].metadata.description_key == [
-        "Key description point 1 of Indicator 1",
-        "Common key description point",
-        "Key description point 1 of Indicator 2",
-        "Key description point 2 of Indicator 2",
-    ]
+    assert tb1["k"].metadata.description_key == f"{DESCRIPTION_KEY_A}\n\n{DESCRIPTION_KEY_B}"
     assert tb1["k"].metadata.origins == [origins[2], origins[1], origins[3]]
     assert tb1["k"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
     # Processing level should be the highest of the two variables.
@@ -646,3 +618,38 @@ def test_variable_to_frame_with_custom_name() -> None:
     # Note: Metadata is not automatically copied when renaming via name parameter
     # This is consistent with pandas Series.to_frame() behavior
     # If you need to preserve metadata when renaming, copy it manually after conversion
+
+
+def test_combine_indicators_processing_level_with_jinja_templates() -> None:
+    # The dataset schema allows unrendered Jinja templates in processing_level (they render per
+    # dimension at grapher time), so combining indicators must not choke on them.
+    template = '<% if sector == "Non-humanitarian aid" %>major<% else %>minor<%- endif -%>'
+
+    def _var(processing_level: str):
+        v = Variable([1, 2], name="v")
+        v.metadata.processing_level = processing_level  # type: ignore[assignment]
+        return v
+
+    # Identical templates (e.g. comparing two versions of the same column) are kept.
+    assert combine_indicators_processing_level([_var(template), _var(template)]) == template
+    # A template counts as the highest level it can render: maybe-major + minor -> major
+    # (understating would mislabel licensing downstream).
+    assert combine_indicators_processing_level([_var(template), _var("minor")]) == "major"
+    only_minor = '<% if sector == "X" %>minor<% else %>minor<%- endif -%>'
+    assert combine_indicators_processing_level([_var(only_minor), _var("minor")]) == "minor"
+    # Level names inside statement tags (conditions) never render, so they don't count.
+    tricky = '<% if sector == "major donors" %>minor<% else %>minor<% endif %>'
+    assert combine_indicators_processing_level([_var(tricky), _var("minor")]) == "minor"
+    # When the output is routed through a variable, the output text names no level: fall back to
+    # a whole-source scan, deliberately overstating rather than understating.
+    routed = '<% set level = "major" if sector == "x" else "minor" %><< level >>'
+    assert combine_indicators_processing_level([_var(routed), _var("minor")]) == "major"
+    # Different templates with no literals combine to the highest renderable level.
+    assert combine_indicators_processing_level([_var(template), _var(only_minor)]) == "major"
+    # Templates that spell out no known level can't be combined.
+    assert combine_indicators_processing_level([_var("<% weird %>"), _var("<% weirder %>")]) is None
+    # Literal levels behave as before.
+    assert combine_indicators_processing_level([_var("minor"), _var("major")]) == "major"
+    # Unknown literal levels still fail loudly.
+    with pytest.raises(AssertionError):
+        combine_indicators_processing_level([_var("mjor")])

@@ -22,7 +22,7 @@ from etl.config import ENV_GRAPHER_USER_ID, OWID_ENV, OWIDEnv
 from etl.db import get_engine
 from etl.git_helpers import get_changed_files
 from etl.grapher import io as gio
-from etl.grapher.model import Anomaly, Variable
+from etl.grapher.model import Variable
 from etl.version_tracker import VersionTracker
 
 log = structlog.get_logger()
@@ -68,19 +68,6 @@ def load_variables_display_in_dataset(
     indicators_display = {i.id: _display_slug(i) for i in indicators}
 
     return indicators_display
-
-
-@st.cache_data
-def get_variable_uris(indicators: list[Variable], only_slug: bool | None = False) -> list[str]:
-    if only_slug:
-        return [o.catalog_path.table_variable or "" for o in indicators]
-    return [o.catalogPath or "" for o in indicators]
-
-
-@st.cache_data
-def load_dataset_uris_new_in_server() -> list[str]:
-    """Load URIs of datasets that are new in staging server."""
-    return gio.load_dataset_uris()
 
 
 @st.cache_data
@@ -135,16 +122,6 @@ def load_variable_data(
         variable=variable,
         owid_env=_owid_env,
     )
-
-
-@st.cache_data
-def load_anomalies_in_dataset(
-    dataset_ids: list[int],
-    _owid_env: OWIDEnv = OWID_ENV,
-) -> list[Anomaly]:
-    """Load Anomaly objects that belong to a dataset with URI `dataset_uri`."""
-    with Session(_owid_env.engine) as session:
-        return Anomaly.load_anomalies(session, dataset_ids)
 
 
 @st.cache_data(show_spinner=False)

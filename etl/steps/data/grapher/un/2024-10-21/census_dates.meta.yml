@@ -17,12 +17,12 @@ tables:
     variables:
       years_since_last_census:
         title: Years since last census
-        description_short: The number of years since the last census of this country
+        description_short: Number of years since the last census of this country.
         unit: years
         short_unit: ""
       last_census:
         title: Year of the last census
-        description_short: Year of the last census in this country
+        description_short: Year of the last census in this country.
         unit: year
         short_unit: ""
       recent_census:

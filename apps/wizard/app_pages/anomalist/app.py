@@ -37,9 +37,7 @@ from apps.wizard.utils.chart_config import bake_chart_config
 from apps.wizard.utils.components import (
     Pagination,
     grapher_chart,
-    st_horizontal,
     st_multiselect_wider,
-    st_title_with_expert,
     tag_in_md,
     url_persist,
 )
@@ -229,7 +227,7 @@ def ask_llm_for_summary(df: pd.DataFrame):
     # Ask LLM for summary
     client = OpenAIWrapper()
 
-    # Prepare messages for Insighter
+    # Prepare messages for the LLM
     messages = [
         {
             "role": "system",
@@ -586,10 +584,7 @@ create_tables()
 
 # 1/ PAGE TITLE
 # Show title
-st_title_with_expert(
-    "Anomalist",
-    icon=":material/planner_review:",
-)
+st.title(":material/planner_review: Anomalist")
 
 # 2/ DATASET FORM
 # Ask user to select datasets. By default, we select the new datasets (those that are new in the current PR compared to master).
@@ -827,7 +822,7 @@ if st.session_state.anomalist_df is not None:
                     key="anomalist_filter_anomaly_types",
                 )
         with col2:
-            with st_horizontal():
+            with st.container(horizontal=True, vertical_alignment="bottom"):
                 url_persist(st.number_input)(
                     "Min year",
                     value=YEAR_MIN,
@@ -876,7 +871,7 @@ if st.session_state.anomalist_df is not None:
     # Show anomalies with time and version changes
     if not df.empty:
         # Top option buttons
-        with st_horizontal():
+        with st.container(horizontal=True):
             # LLM summary option
             llm_ask(df)
             download_anomalies(df)
@@ -890,16 +885,15 @@ if st.session_state.anomalist_df is not None:
         pagination = Pagination(
             items=items,
             items_per_page=items_per_page,
-            pagination_key="pagination-demo",
+            pagination_key="pagination-anomalist",
         )
 
         # Show items (only current page)
         for item in pagination.get_page_items():
             show_anomaly_compact(index=item[0], df=item[1])
 
-        # Show controls only if needed
-        if len(items) > items_per_page:
-            pagination.show_controls(mode="bar")
+        # Show controls (hidden automatically if there is a single page)
+        pagination.show_controls()
 else:
     st.success("Ha! We did not find any no anomalies in the selected datasets! What were the odds of that?")
 # Reset state

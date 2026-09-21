@@ -768,7 +768,7 @@ tables:
         title: Share of deaths from terrorism
         unit: '%'
         short_unit: '%'
-        description_short: The percentage of all deaths that are due to [terrorism](#dod:terrorism).
+        description_short: Percentage of all deaths that are due to [terrorism](#dod:terrorism).
         description_key:
           - The percentage of deaths due to terrorism is derived by comparing the confirmed fatalities data from the Global Terrorism Database to the overall mortality figures obtained from the 2022 UN World Population Prospects data.
           - *desc_uncertainty

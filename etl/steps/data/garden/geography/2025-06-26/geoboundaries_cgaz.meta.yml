@@ -20,12 +20,12 @@ tables:
       territory_code:
         title: Territory code
         unit: ""
-        description_short: "Identification code of the territory"
+        description_short: "Identification code of the territory."
       territory_type:
         title: Type of the territory
         unit: ""
-        description_short: "Territory might be a sovereign state (ADM0) or in dispute (DISP)"
+        description_short: "Territory might be a sovereign state (ADM0) or in dispute (DISP)."
       geometry:
         title: Geometry of territory
         unit: ""
-        description_short: "Geometry of the territory (from shape file)"
+        description_short: "Geometry of the territory (from shape file)."

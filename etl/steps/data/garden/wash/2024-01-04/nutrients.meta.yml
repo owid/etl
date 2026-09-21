@@ -13,7 +13,7 @@ definitions:
     display:
       numDecimalPlaces: 2
     unit: |-
-      <% if unit == "mg/L" %>milligrams per litre<% elif unit == "ug/L" %>micrograms per litre<% elif unit == "m" %>metres<%- endif -%>
+      <% if unit == "mg/L" %>milligrams per liter<% elif unit == "ug/L" %>micrograms per liter<% elif unit == "m" %>meters<%- endif -%>
     short_unit: |-
       <<unit>>
     processing_level: minor

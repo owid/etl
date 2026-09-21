@@ -1,0 +1,38 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Energy
+        - CO2 & Greenhouse Gas Emissions
+    unit: grams of CO₂ per kilowatt-hour
+    short_unit: gCO₂/kWh
+    description_processing: |-
+      - Carbon intensity of energy is calculated by dividing fossil CO₂ emissions (from the Global Carbon Budget) by total energy supply (from our energy mix dataset), expressed in grams of CO₂ per kilowatt-hour.
+
+dataset:
+  title: Carbon intensity of energy
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+tables:
+  carbon_intensity_of_energy:
+    variables:
+      emissions_total_per_unit_energy:
+        title: Carbon intensity of energy
+        description_short: Fossil carbon dioxide (CO₂) emissions per unit of [total energy supply](#dod:total-energy-supply), measured in grams of CO₂ per [kilowatt-hour](#dod:watt-hours).
+        display:
+          name: Carbon intensity of energy
+          # Axis and tooltip read "412 g", matching the carbon intensity of electricity chart; the
+          # full "grams of CO₂ per kilowatt-hour" stays in the unit and the subtitle.
+          shortUnit: g
+        presentation:
+          title_public: '{tables.carbon_intensity_of_energy.variables.emissions_total_per_unit_energy.title}'
+      emissions_total_including_land_use_change_per_unit_energy:
+        title: Carbon intensity of energy (including land-use change)
+        description_short: Fossil and land-use-change carbon dioxide (CO₂) emissions per unit of [total energy supply](#dod:total-energy-supply), measured in grams of CO₂ per [kilowatt-hour](#dod:watt-hours).
+        display:
+          name: Carbon intensity of energy (including land-use change)
+          shortUnit: g
+        presentation:
+          title_public: '{tables.carbon_intensity_of_energy.variables.emissions_total_including_land_use_change_per_unit_energy.title}'

@@ -22,8 +22,8 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Number of countries as of 2024
-NUM_COUNTRIES_2024 = 179
+# Number of countries that V-Dem lists in the most recent year of the data
+NUM_COUNTRIES_LAST_YEAR = 179
 
 # REGION AGGREGATES
 REGIONS = {
@@ -406,9 +406,11 @@ def append_citation_full(tb: Table) -> Table:
 def estimate_share_countries(tb: Table, num_countries_last) -> Table:
     """Estimate the share of countries with a certain property."""
     # NOTE: The count of countries only considers *actually* existing countries, and skips imputed countries. That's due to how `aggregate.run` has implemented that. Therefore, we can estimate the share of countries easily by num_countries_women_ever / total_countries * 100. No need to worry about counting imputed countries!
-    # The share is estimated relative to the number of countries as of 2024, which is a different strategy compared to the rest of indicators. That's because the framing is "looking backwards at the history of current countris".
+    # The share is estimated relative to the number of countries in the most recent year of the data, which is a different strategy compared to the rest of indicators. That's because the framing is "looking backwards at the history of current countries".
 
-    assert num_countries_last == NUM_COUNTRIES_2024, "The number of countries should be 179 as of 2024."
+    assert num_countries_last == NUM_COUNTRIES_LAST_YEAR, (
+        f"Expected {NUM_COUNTRIES_LAST_YEAR} countries in the most recent year of the data, found {num_countries_last}."
+    )
 
     columns_rename = {
         "num_countries_wom_hoe_ever": "share_countries_wom_hoe_ever",
@@ -437,7 +439,7 @@ def estimate_share_countries(tb: Table, num_countries_last) -> Table:
     # tb_share["share_countries_wom_hoe_ever_demelect"] /= tb_share["total_countries"] * 0.01
     tb_share = tb_share.drop(columns=["total_countries"])
 
-    # Option 2: Share of countries relative to number of countries as of 2024
+    # Option 2: Share of countries relative to number of countries in the most recent year of the data
     tb_share["share_countries_wom_hoe_ever"] /= num_countries_last * 0.01
     tb_share["share_countries_wom_hoe_ever_demelect"] /= num_countries_last * 0.01
 

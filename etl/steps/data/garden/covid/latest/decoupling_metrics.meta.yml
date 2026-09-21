@@ -39,7 +39,7 @@ tables:
         unit: '%'
         display:
           numDecimalPlaces: 1
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
         short_unit: '%'
       confirmed_deaths:
@@ -47,7 +47,7 @@ tables:
         unit: '%'
         display:
           numDecimalPlaces: 1
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
         short_unit: '%'
       hospital_flow:
@@ -55,7 +55,7 @@ tables:
         unit: '%'
         display:
           numDecimalPlaces: 1
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
         short_unit: '%'
       hospital_stock:
@@ -63,7 +63,7 @@ tables:
         unit: '%'
         display:
           numDecimalPlaces: 1
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
         short_unit: '%'
       icu_flow:
@@ -71,7 +71,7 @@ tables:
         unit: '%'
         display:
           numDecimalPlaces: 1
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
         short_unit: '%'
       icu_stock:
@@ -79,6 +79,6 @@ tables:
         unit: '%'
         display:
           numDecimalPlaces: 1
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-01'
         short_unit: '%'

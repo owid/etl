@@ -8,7 +8,7 @@ import time
 from collections.abc import Callable, Iterable
 from functools import cache
 from pathlib import Path
-from typing import Any, Literal, overload
+from typing import Any, Literal
 
 import deprecated
 import pandas as pd
@@ -26,14 +26,14 @@ from owid.catalog.core.tables import (
 from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
 
 from etl import paths
-from etl.collection import Collection, CollectionSet
-from etl.collection.core.create import Listable, create_collection
-from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
 from etl.dag_helpers import load_dag
 from etl.data_corrections import apply_corrections, build_audit, load_corrections, write_audit
 from etl.data_helpers.geo import Regions
 from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
+from etl.viz import Chart, ChartSet
+from etl.viz.chart.core.create import Listable, create_chart
+from etl.viz.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
 
 log = structlog.get_logger()
 
@@ -197,6 +197,32 @@ def get_metadata_path(dest_dir: str) -> Path:
     return N.metadata_path
 
 
+def end_with_punctuation(text: str | None) -> str | None:
+    """Append a period to text that doesn't already end with punctuation.
+
+    Our style guide requires chart subtitles — and `description_short`, which Grapher
+    falls back to for the subtitle — to end with punctuation. Use this on text taken
+    verbatim from a producer, where we relay their wording but still want the sentence
+    to close properly. Don't use it on text we author ourselves: write the period.
+
+    A closing quote or bracket after the punctuation counts as ending with it, so
+    `… agree with?"` and `… (per 100,000 people).` are both left alone.
+
+    Text taken straight out of a table column can be a pandas missing value rather
+    than `None` (`pd.NA` raises on `bool()`), so anything that isn't a string is
+    handed back untouched.
+    """
+    if not isinstance(text, str) or not text:
+        return text
+    stripped = text.rstrip()
+    if not stripped:
+        return text
+    # a trailing quote/bracket may sit after the punctuation mark
+    if stripped.rstrip("\"'”’)]")[-1:] in {".", "!", "?"}:
+        return text
+    return stripped + "."
+
+
 def render_yaml_metadata(ds: catalog.Dataset) -> None:
     """Render Jinja templates in metadata for all tables in a dataset.
 
@@ -314,6 +340,19 @@ class PathFinder:
         return self.f.stem
 
     @property
+    def output_dir(self) -> Path:
+        """Folder a `viz://` or `export://` step writes its files to.
+
+        It is the folder the framework then publishes: for a `viz://bespoke` step, everything
+        written here is synced to the environment's R2 feed path (see `etl.viz.bespoke`).
+        """
+        assert self.step_type in ("viz", "export"), (
+            f"Only viz:// and export:// steps have an output folder, not {self.step_type}://"
+        )
+        root = paths.VIZ_DIR if self.step_type == "viz" else paths.EXPORT_DIR
+        return root / self.channel / self.namespace / self.version / self.short_name
+
+    @property
     def country_mapping_path(self) -> Path:
         return self.directory / (self.short_name + ".countries.json")
 
@@ -345,15 +384,8 @@ class PathFinder:
         return self.directory / (self.short_name + ".meta.yml")
 
     @property
-    def collection_path(self) -> Path:
-        """TODO: worth aligning with `metadata_path` (add missing '.meta'), maybe even just deprecate this and use `metadata_path`."""
-        assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
-        return self.directory / (self.short_name + ".yml")
-
-    @property
     def config_path(self) -> Path:
-        """Config file. Used in `multidim` and `explorer` ETL steps."""
-        # assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
+        """Config file. Used in `viz://chart` and `viz://explorer` ETL steps."""
         return self.directory / (self.short_name + ".config.yml")
 
     @property
@@ -438,8 +470,8 @@ class PathFinder:
         # Suffix to add to, e.g. "data" if step is private.
         is_private_suffix = "-private" if is_private else ""
 
-        if step_type == "export":
-            step_name = f"export://{channel}/{namespace}/{version}/{short_name}"
+        if step_type in ("export", "viz"):
+            step_name = f"{step_type}://{channel}/{namespace}/{version}/{short_name}"
         elif channel == "snapshot":
             # match also on snapshot short_names without extension
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
@@ -469,7 +501,7 @@ class PathFinder:
         if channel_type.startswith(("snapshot",)):
             channel = channel_type
             namespace, version, short_name = path.split("/")
-        elif channel_type.startswith(("data", "export")):
+        elif channel_type.startswith(("data", "export", "viz")):
             channel, namespace, version, short_name = path.split("/")
         else:
             raise WrongStepName
@@ -588,8 +620,8 @@ class PathFinder:
         namespace: str | None = None,
         version: str | int | None = None,
         is_private: bool | None = None,
-    ) -> catalog.Dataset | Snapshot | CollectionSet:
-        """Load a (dataset or export) dependency, given its attributes (at least its short name)."""
+    ) -> catalog.Dataset | Snapshot | ChartSet:
+        """Load a (dataset or chart) dependency, given its attributes (at least its short name)."""
         dependency_step_name = self.get_dependency_step_name(
             step_type=step_type,
             short_name=short_name,
@@ -601,13 +633,13 @@ class PathFinder:
         dependency = self._get_attributes_from_step_name(step_name=dependency_step_name)
         if dependency["channel"] == "snapshot":
             dataset = Snapshot(f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}")
-        elif (step_type == "export") and (dependency["channel"] in ("multidim", "explorers")):
-            collection_path = (
-                paths.EXPORT_DIR
+        elif (step_type == "viz") and (dependency["channel"] in ("chart", "explorer")):
+            viz_path = (
+                paths.VIZ_DIR
                 / dependency["channel"]
                 / f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}"
             )
-            return CollectionSet(collection_path)
+            return ChartSet(viz_path)
         else:
             dataset_path = (
                 paths.DATA_DIR
@@ -643,21 +675,21 @@ class PathFinder:
         assert isinstance(dataset, catalog.Dataset)
         return dataset
 
-    def load_collectionset(
+    def load_chartset(
         self,
         short_name: str | None = None,
         namespace: str | None = None,
         version: str | int | None = None,
-        channel: Literal["multidim", "explorers"] = "multidim",
-    ) -> CollectionSet:
+        channel: Literal["chart", "explorer"] = "chart",
+    ) -> ChartSet:
         cs = self.load_dependency(
-            step_type="export",
+            step_type="viz",
             short_name=short_name or self.short_name,
             channel=channel,
             namespace=namespace,
             version=version,
         )
-        assert isinstance(cs, CollectionSet)
+        assert isinstance(cs, ChartSet)
         return cs
 
     def init_snapshot(self, filename: str | None = None) -> Snapshot:
@@ -711,10 +743,6 @@ class PathFinder:
             raise AttributeError(f"There was a problem loading config from {path}, please review!. Original error: {e}")
         return config
 
-    def load_collection_config(self, filename: str | None = None, path: str | Path | None = None) -> dict[str, Any]:
-        """Replace code to use `self.load_config`."""
-        return self.load_config(filename, path)
-
     def create_dataset(
         self,
         tables: Iterable[catalog.Table],
@@ -746,8 +774,7 @@ class PathFinder:
             repack=repack,
         )
 
-    @overload
-    def create_collection(
+    def create_chart(
         self,
         config: dict[str, Any],
         short_name: str | None = None,
@@ -759,64 +786,30 @@ class PathFinder:
         indicator_as_dimension: bool = False,
         choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
         catalog_path_full: bool = False,
-        *,  # Force keyword-only arguments after this
-        explorer: Literal[True],
-    ) -> Explorer: ...
+    ) -> Chart:
+        """Create a chart (or multidim) with the given configuration and data.
 
-    @overload
-    def create_collection(
-        self,
-        config: dict[str, Any],
-        short_name: str | None = None,
-        tb: list[Table] | Table | None = None,
-        indicator_names: Listable[list[str] | None] | str = None,
-        dimensions: Listable[list[str] | dict[str, list[str] | str] | None] = None,
-        common_view_config: Listable[dict[str, Any] | None] = None,
-        indicators_slug: str | None = None,
-        indicator_as_dimension: bool = False,
-        choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
-        catalog_path_full: bool = False,
-        *,  # Force keyword-only arguments after this
-        explorer: Literal[False] = False,
-    ) -> Collection: ...
+        This function creates a Chart based on the provided configuration and table data. It supports both single and multiple table inputs with flexible indicator and dimension specification.
 
-    def create_collection(
-        self,
-        config: dict[str, Any],
-        short_name: str | None = None,
-        tb: list[Table] | Table | None = None,
-        indicator_names: Listable[list[str] | None] | str = None,
-        dimensions: Listable[list[str] | dict[str, list[str] | str] | None] = None,
-        common_view_config: Listable[dict[str, Any] | None] = None,
-        indicators_slug: str | None = None,
-        indicator_as_dimension: bool = False,
-        choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
-        catalog_path_full: bool = False,
-        explorer: bool = False,
-    ) -> Explorer | Collection:
-        """Create a collection with the given configuration and data.
+        You can create a chart purely based on manually crafted configuration (via YAML) by just using the `config` parameter, or you can provide a table (`tb`) with data to be expanded for the given indicators and dimensions. You can also combine both approaches, where the configuration from `config` will overwrite that automatically generated from the table data.
 
-        This function creates a Collection based on the provided configuration and table data. It supports both single and multiple table inputs with flexible indicator and dimension specification.
-
-        You can create a collection purely based on manually crafted configuration (via YAML) by just using the `config` parameter, or you can provide a table (`tb`) with data to be expanded for the given indicators and dimensions. You can also combine both approaches, where the configuration from `config` will overwrite that automatically generated from the table data.
-
-        A typical strategy is to define the high-level collection configuration and dimension specifications (e.g. dimension names, description, etc.) in the YAML file, and then use the `tb` parameter to automatically expand dimensional indicators.
+        A typical strategy is to define the high-level chart configuration and dimension specifications (e.g. dimension names, description, etc.) in the YAML file, and then use the `tb` parameter to automatically expand dimensional indicators.
 
         Note: You can also expand multiple tables by passing a list of `Table` objects to the `tb` parameter.
 
         Parameters
         ----------
         config : dict[str, Any]
-            Configuration YAML dictionary for the explorer/collection. Typically loaded from a YAML file with `paths.load_collection_config()`.
+            Configuration YAML dictionary for the chart. Typically loaded from a YAML file with `paths.load_config()`.
 
         short_name : str | None, default None
-            Short name of the Collection. Defaults to the short name of the step.
+            Short name of the Chart. Defaults to the short name of the step.
 
         tb : list[Table] | Table | None, default None
-            Table object(s) with dimensional data. It can be a single `Table` or list of `Table`. The function will programmatically generate the collection configuration based on the available indicators in `tb`. To customize which indicators and dimensions to expand, refer to the `indicator_names` and `dimensions` parameters.
+            Table object(s) with dimensional data. It can be a single `Table` or list of `Table`. The function will programmatically generate the chart configuration based on the available indicators in `tb`. To customize which indicators and dimensions to expand, refer to the `indicator_names` and `dimensions` parameters.
 
         indicator_names : Listable[list[str] | None] | str, default None
-            Specifies which indicators from the table(s) to expand for the collection. Multiple formats supported:
+            Specifies which indicators from the table(s) to expand for the chart. Multiple formats supported:
 
                 * `None`: All indicators from `tb` are used (also applies when `tb` is list).
                 * `str`: Only the indicator with given name is used (also applies when `tb` is list).
@@ -839,7 +832,7 @@ class PathFinder:
             Custom slug for indicators. Uses a default name if not provided.
 
         indicator_as_dimension : bool, default False
-            If True, the indicator name is treated as a dimension. This means that the indicator will be included in the dimensions of the collection, allowing it to be used as a filter or in views.
+            If True, the indicator name is treated as a dimension. This means that the indicator will be included in the dimensions of the chart, allowing it to be used as a filter or in views.
 
         choice_renames : Listable[dict[str, dict[str, str] | Callable] | None], default None
             Rename the display names of dimension choices. Multiple formats supported:
@@ -850,29 +843,89 @@ class PathFinder:
                     returns the new name for given slug (returns None to keep original).
 
             When ``tb`` is a list:
-                * **Single dict** (common): applied to the final combined collection
+                * **Single dict** (common): applied to the final combined chart
                   after all combining and YAML overrides, so these renames take
-                  precedence. Choice slugs should match the final collection's slugs.
+                  precedence. Choice slugs should match the final chart's slugs.
                 * **List of dicts** (per-table): each element corresponds to a table in
-                  ``tb``. Renames are applied per sub-collection (can trigger conflict
+                  ``tb``. Renames are applied per sub-chart (can trigger conflict
                   detection), then remapped to the final slugs and re-applied.
 
         catalog_path_full : bool, default False
             If True, it uses full catalog path. If False, uses shorter version (e.g., `table#indicator` or `dataset/table#indicator`).
 
-        explorer : bool, default False
-            Use this flag to create an explorer (True).
-
         Returns
         -------
-        Explorer | Collection
-            Returns an Explorer or MDIM Collection based on the provided configuration and data.
+        Chart
+            A single chart when `dimensions` is empty, a multidim otherwise.
 
         Notes
         -----
         When `tb` is a list of tables, the parameters `indicator_names`, `dimensions`, `common_view_config`, and `choice_renames` can also be lists where each element corresponds to a table in `tb`. List lengths must match `tb` length. If these parameters are not lists, the same value is applied to all tables.
         """
-        return create_collection(
+        return self._create_viz(
+            config=config,
+            short_name=short_name,
+            tb=tb,
+            indicator_names=indicator_names,
+            dimensions=dimensions,
+            common_view_config=common_view_config,
+            indicators_slug=indicators_slug,
+            indicator_as_dimension=indicator_as_dimension,
+            choice_renames=choice_renames,
+            catalog_path_full=catalog_path_full,
+            explorer=False,
+        )
+
+    def create_explorer(
+        self,
+        config: dict[str, Any],
+        short_name: str | None = None,
+        tb: list[Table] | Table | None = None,
+        indicator_names: Listable[list[str] | None] | str = None,
+        dimensions: Listable[list[str] | dict[str, list[str] | str] | None] = None,
+        common_view_config: Listable[dict[str, Any] | None] = None,
+        indicators_slug: str | None = None,
+        indicator_as_dimension: bool = False,
+        choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
+        catalog_path_full: bool = False,
+    ) -> Explorer:
+        """Create an explorer with the given configuration and data.
+
+        Explorers are built on the chart model, so the parameters are those of `create_chart`
+        (see its docstring). The result is an `Explorer`, whose `.save()` upserts it to the
+        grapher DB as an explorer.
+        """
+        explorer = self._create_viz(
+            config=config,
+            short_name=short_name,
+            tb=tb,
+            indicator_names=indicator_names,
+            dimensions=dimensions,
+            common_view_config=common_view_config,
+            indicators_slug=indicators_slug,
+            indicator_as_dimension=indicator_as_dimension,
+            choice_renames=choice_renames,
+            catalog_path_full=catalog_path_full,
+            explorer=True,
+        )
+        assert isinstance(explorer, Explorer)
+        return explorer
+
+    def _create_viz(
+        self,
+        config: dict[str, Any],
+        short_name: str | None,
+        tb: list[Table] | Table | None,
+        indicator_names: Listable[list[str] | None] | str,
+        dimensions: Listable[list[str] | dict[str, list[str] | str] | None],
+        common_view_config: Listable[dict[str, Any] | None],
+        indicators_slug: str | None,
+        indicator_as_dimension: bool,
+        choice_renames: Listable[dict[str, dict[str, str] | Callable] | None],
+        catalog_path_full: bool,
+        explorer: bool,
+    ) -> Chart:
+        return create_chart(
             config_yaml=config,
             dependencies=self.dependencies,
             catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{short_name or self.short_name}",
@@ -888,7 +941,7 @@ class PathFinder:
         )
 
     @deprecated.deprecated(
-        reason="We should slowly migrate to YAML-based explorers, and use `paths.create_collection` instead."
+        reason="We should slowly migrate to YAML-based explorers, and use `paths.create_explorer` instead."
     )
     def create_explorer_legacy(
         self,
@@ -897,7 +950,7 @@ class PathFinder:
         df_columns: pd.DataFrame | None = None,
         reset: bool = False,
     ) -> ExplorerLegacy:
-        """NOTE: We should slowly migrate to YAML-based explorers, and use `paths.create_collection` instead.
+        """NOTE: We should slowly migrate to YAML-based explorers, and use `paths.create_explorer` instead.
 
         This function is used to create an Explorer object using the legacy configuration.
 
@@ -937,19 +990,15 @@ class PathFinder:
         :param filename: The base filename (without extension).
         :param extensions: List of file extensions to export (e.g., ["png", "svg"]).
         :param kwargs: Additional keyword arguments to pass to fig.savefig().
+            A ``metadata`` dict is merged over the reproducible defaults for that format rather
+            than replacing them, so a caller can add fields without re-introducing the version
+            stamp.
         """
-        for ext in extensions:
-            path = self.directory / f"{filename}.{ext}"
-            save_kwargs = {
-                "fname": path,
-                "format": ext,
-                **kwargs,
-            }
-            if ext == "svg":
-                # Remove date metadata for SVG to keep files clean
-                save_kwargs["metadata"] = {"Date": None}
-            fig.savefig(**save_kwargs)
-            self.log.info(f"Saved chart to {path}")
+        # Lazy on purpose: `etl.viz.static` imports matplotlib, a dev-group dependency, and this
+        # module is imported by every step. Only `viz://static` steps ever reach this line.
+        from etl.viz.static import save_fig
+
+        save_fig(self.directory, fig, filename, extensions, log=self.log, **kwargs)
 
 
 def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:

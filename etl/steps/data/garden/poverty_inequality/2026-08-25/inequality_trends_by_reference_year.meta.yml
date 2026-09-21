@@ -1,0 +1,144 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Inequality
+      attribution_short: World Bank; WID
+    processing_level: major
+  description_metrics: &description_metrics |-
+    Metrics are computed directly from the harmonized 109-bin distributions, identically for both sources: the Gini coefficient (from the Lorenz curve; a slight underestimate since bins carry no within-bin inequality), and three Generalized Entropy indices whose parameter α sets the sensitivity to the top versus the bottom of the distribution — GE(0), the mean log deviation (bottom-sensitive, with zero incomes floored at $0.01/day); GE(1), the Theil index; and GE(2) (top-sensitive).
+  description_latest_year: &description_latest_year |-
+    The latest year is the last year covered by both sources; note it is a nowcast/extrapolated year on both sides (PIP lines up surveys to it, WID extrapolates to it).
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Inequality trends by reference year (PIP vs WID)
+  update_period_days: 180
+  owners:
+    - Pablo Arriagada
+  description: |-
+    Is income inequality rising everywhere? Inequality metrics computed on identical definitions from the harmonized PIP and WID income distributions, and, for every reference year compared against the latest year, the number of countries (and share of the covered population) where inequality has risen, fallen or stayed stable, plus the average change. In the reference-year tables, the year dimension IS the reference year.
+
+tables:
+  inequality_metrics:
+    title: Inequality metrics from the harmonized distributions
+    description: *description_metrics
+    variables:
+      gini:
+        title: Gini coefficient
+        unit: ""
+        description_short: Gini coefficient computed from the 109-bin distribution, between 0 (equality) and 1.
+        description_processing: *description_metrics
+      mean_log_deviation:
+        title: Mean log deviation (GE(0))
+        unit: ""
+        description_short: Generalized Entropy index with α=0, more sensitive to the bottom of the distribution.
+        description_processing: *description_metrics
+      theil_index:
+        title: Theil index (GE(1))
+        unit: ""
+        description_short: Generalized Entropy index with α=1.
+        description_processing: *description_metrics
+      generalized_entropy_2:
+        title: Generalized Entropy index GE(2)
+        unit: ""
+        description_short: Generalized Entropy index with α=2, more sensitive to the top of the distribution.
+        description_processing: *description_metrics
+
+  inequality_change_by_country:
+    title: Change in inequality since each reference year, by country
+    description: |-
+      Change in each inequality metric from every reference year to the latest common year, per country and series. The year dimension is the REFERENCE year. Countries are classified as rising/falling/stable using a ±5% relative-change band.
+    variables:
+      value_in_reference_year:
+        title: Metric value in the reference year
+        unit: ""
+        description_short: Value of the inequality metric in the reference year.
+      value_in_latest_year:
+        title: Metric value in the latest year
+        unit: ""
+        description_short: Value of the inequality metric in the latest common year.
+        description_key:
+          - *description_latest_year
+      change:
+        title: Change since the reference year
+        unit: ""
+        description_short: Metric value in the latest year minus its value in the reference year.
+      relative_change:
+        title: Relative change since the reference year
+        unit: ""
+        description_short: Change divided by the metric's value in the reference year.
+      direction:
+        title: Direction of change
+        unit: ""
+        description_short: Rising, falling, or stable (relative change within ±5%) since the reference year.
+      latest_year:
+        title: Latest year compared against
+        unit: ""
+        description_short: Latest common year of the two sources, which every reference year is compared against.
+      population:
+        title: Population in the latest year
+        unit: people
+        description_short: Country population in the latest year, from Our World in Data's population series (the yardstick the harmonized distributions are weighted by), used as the weight in aggregations.
+
+  inequality_change_by_reference_year:
+    title: Countries with rising, falling and stable inequality, by reference year
+    description: |-
+      For each reference year (the year dimension), compared against the latest common year: how many countries have seen inequality rise, fall or stay stable (within a ±5% relative-change band), what share of the covered population they hold, and the average change — unweighted and population-weighted. Aggregated over the common PIP-and-WID sample of countries, which is identical for every reference year.
+    variables:
+      latest_year:
+        title: Latest year compared against
+        unit: ""
+        description_short: Latest common year of the two sources, which every reference year is compared against.
+        description_key:
+          - *description_latest_year
+      num_countries_rising:
+        title: Countries with rising inequality
+        unit: countries
+        description_short: Number of countries where the metric rose by more than 5% between the reference year and the latest year.
+      num_countries_falling:
+        title: Countries with falling inequality
+        unit: countries
+        description_short: Number of countries where the metric fell by more than 5% between the reference year and the latest year.
+      num_countries_stable:
+        title: Countries with stable inequality
+        unit: countries
+        description_short: Number of countries where the metric changed by 5% or less between the reference year and the latest year.
+      num_countries:
+        title: Countries in the comparison
+        unit: countries
+        description_short: Number of countries in the common PIP-and-WID sample, identical for every reference year.
+      population_share_rising:
+        title: Population share living where inequality is rising
+        unit: ""
+        description_short: Share of the covered population (at the latest year) living in countries where the metric rose by more than 5%.
+      population_share_falling:
+        title: Population share living where inequality is falling
+        unit: ""
+        description_short: Share of the covered population (at the latest year) living in countries where the metric fell by more than 5%.
+      population_share_stable:
+        title: Population share living where inequality is stable
+        unit: ""
+        description_short: Share of the covered population (at the latest year) living in countries where the metric changed by 5% or less.
+      population_covered:
+        title: Population covered
+        unit: people
+        description_short: Total population of the common sample at the latest year, from Our World in Data's population series.
+      average_change:
+        title: Average change since the reference year
+        unit: ""
+        description_short: Unweighted average across countries of the metric's change from the reference year to the latest year.
+      average_change_population_weighted:
+        title: Population-weighted average change since the reference year
+        unit: ""
+        description_short: Population-weighted average across countries of the metric's change from the reference year to the latest year.
+      average_relative_change:
+        title: Average relative change since the reference year
+        unit: ""
+        description_short: Unweighted average across countries of the metric's relative change since the reference year.
+      average_relative_change_population_weighted:
+        title: Population-weighted average relative change since the reference year
+        unit: ""
+        description_short: Population-weighted average across countries of the metric's relative change since the reference year.

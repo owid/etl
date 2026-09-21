@@ -196,7 +196,10 @@ def run() -> None:
 
     tb_mm["nyt_over_under"] = tb_mm["nyt_share"] / tb_mm["deaths_share"]
     # set values smaller 1 to negative reciprocal
-    tb_mm.loc[tb_mm["nyt_over_under"] < 1, "nyt_over_under"] = (
+    # NOTE: the ratio comes out as object dtype, and `Series.round` rejects that from pandas 2.3
+    # on. Pandas 2.2 accepted it and returned the values untouched, so this rounding never
+    # actually happened.
+    tb_mm.loc[tb_mm["nyt_over_under"] < 1, "nyt_over_under"] = pr.to_numeric(
         -1 / tb_mm.loc[tb_mm["nyt_over_under"] < 1, "nyt_over_under"]
     ).round(2)
 

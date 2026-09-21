@@ -9,6 +9,8 @@ definitions:
     processing_level: major
   description_key: |-
     <% if cause == "Conflict and terrorism" %>When precise information is unavailable, IHME splits the impacts of conflict and terrorism evenly across years, and across countries based on their populations.<% endif %>
+  description_processing: |-
+    <% if cause == "Infectious diseases" %> This was calculated by subtracting 'Maternal and neonatal disorders' and 'Nutritional deficiencies' from 'Communicable, maternal, neonatal and nutritional diseases'.<% endif %>
   annotation: |-
     <% if cause == 'Maternal disorders' %>United States: Values from 2003–2017 affected by measurement change<%- endif -%>
 

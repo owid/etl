@@ -1,0 +1,86 @@
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions:
+  common:
+    unit: people
+    short_unit: ""
+    display:
+      numDecimalPlaces: 0
+    presentation:
+      topic_tags:
+        - Migration
+  counting_changes: |-
+    The way immigrants were counted by the US government has changed over time.
+    - **1820–1867:** the figures count every foreign national who arrived by ship at a US seaport, including temporary visitors and people passing through, because no distinction was yet made between immigrants and other travelers.
+    - **1868–1891:** the figures count only foreign nationals who arrived intending to settle, because the government now separated genuine immigrants from temporary visitors and stopped counting the visitors.
+    - **1892 onward:** the figures count only foreign nationals formally inspected and admitted for permanent residence, so people who arrived but were turned away at inspection are no longer included, and the count reflects a legal admission rather than a simple arrival.
+    - Immigrants entering overland from Canada and Mexico were not fully counted **until 1908**.
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Edouard Mathieu
+
+tables:
+  us_lawful_permanent_residents:
+    variables:
+      immigrants:
+        title: People granted permanent residency in the United States
+        description_key: |-
+          {definitions.counting_changes}
+        presentation:
+          grapher_config:
+            note: Counts the year residency was granted, not the year someone arrived. Many recipients lived in the US for years beforehand — on temporary visas, as refugees, or without legal status. People who never obtain legal status are not included.
+      immigrants_per_1000:
+        title: People granted permanent residency in the United States, per 1,000 people in the population
+        unit: per 1,000 people
+        description_key: |-
+          {definitions.counting_changes}
+        description_processing: |-
+          We calculated this indicator by dividing the number of people granted permanent residency by the population of the United States, using the [long-run population data](https://ourworldindata.org/population-sources) published by Our World in Data.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          grapher_config:
+            note: Counts the year residency was granted, not the year someone arrived. Many recipients lived in the US for years beforehand — on temporary visas, as refugees, or without legal status. People who never obtain legal status are not included.
+
+  by_country_of_origin:
+    variables:
+      immigrants:
+        title: People granted permanent residency in the United States, by country of origin
+        description_key: |-
+          {definitions.counting_changes}
+
+          Country borders have changed over this period, so a country's figures may not always refer to the same area.
+          - The source reports some countries together for part of the period, such as Austria-Hungary and Norway-Sweden.
+          - Russia refers to the Russian Empire until 1920, the Soviet Union until 1990, and a group of post-Soviet countries in the 1990s.
+          - Czechoslovakia includes Czechia and Slovakia; Yugoslavia includes its successor countries; Korea includes both North and South Korea; Canada includes Newfoundland, which was a separate territory until it joined Canada in 1949.
+
+          Entities like "Asia (not specified)" cover people known to come from a region but from a country the source does not list separately. "America (not specified)" covers people from the Americas who cannot be split between North and South America, and "Not specified" those whose origin was not recorded.
+        display:
+          timeInterval: decade
+          entityAnnotationsMap: |-
+            Korea: includes North & South
+            Czechoslovakia: includes Czechia & Slovakia
+            Yugoslavia: includes successor countries
+        presentation:
+          grapher_config:
+            note: Counts the year residency was granted, not the year someone arrived. Many recipients lived in the US for years beforehand — on temporary visas, as refugees, or without legal status. People who never obtain legal status are not included. Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in.
+
+  by_region_of_origin:
+    variables:
+      immigrants:
+        title: People granted permanent residency in the United States, by region of origin
+        description_key: |-
+          {definitions.counting_changes}
+
+          "Not specified" covers people whose origin was not recorded, and a small number of people from the Americas whom the source does not assign to a specific country.
+        description_processing: |-
+          We calculated these regional totals from the source's country-level data, grouping countries into regions as defined by Our World in Data. They can differ from the source's own regional totals: for example, we count Caribbean and Central American countries as part of North America.
+        processing_level: major
+        display:
+          timeInterval: decade
+        presentation:
+          grapher_config:
+            note: Counts the year residency was granted, not the year someone arrived. Many recipients lived in the US for years beforehand — on temporary visas, as refugees, or without legal status. People who never obtain legal status are not included. Before 1906, people were counted by their country of origin; from 1906 onward, by the country they last lived in.

@@ -1,0 +1,59 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      attribution_short: WHO
+      attribution: World Health Organization (2026)
+      topic_tags:
+        - Global Health
+        - Diarrheal Diseases
+        - Neglected Tropical Diseases
+    description_processing: |-
+      - This dataset is compiled from two sources published by the World Health Organization (WHO):
+        - Data from 1949-1999 comes from the WHO Global Health Observatory (GHO).
+        - Between 2000-2016 data from the GHO is supplemented with data from the WHO Cholera Dashboard.
+        - Data from 2017-2024 comes from the [WHO Cholera Dashboard](https://worldhealthorg.shinyapps.io/Cholera/).
+      - The regional aggregates are calculated by Our World in Data by summing the country-level data for all countries in the region. Cholera case fatality rates are calculated by dividing the number of reported deaths by the number of reported cases.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  owners:
+    - Tuna Acisu
+
+
+tables:
+  cholera_cases_and_deaths:
+    variables:
+      cholera_case_fatality_rate:
+        title: Cholera case fatality rate
+        description_short: Percentage of reported [cholera](#dod:cholera) cases that result in death. Testing and reporting is limited in many countries.
+        description_key:
+          - WHO calculates case fatality rates based on the numbers of cases and deaths as reported by national authorities.
+          - The case fatality rate is the number of reported deaths, divided by the number of reported cases, shown as a percentage.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
+      cholera_reported_cases:
+        title: Reported cholera cases
+        description_short: Number of [cholera](#dod:cholera) cases which have been reported to the WHO by local authorities. As testing and reporting is limited in many countries, this is likely to be an underestimate of the true number of cholera cases.
+        description_key:
+          - These statistics include cholera cases confirmed clinically, epidemiologically, or by laboratory investigation.
+          - As not every case of cholera is confirmed and reported to the WHO, these numbers are likely to be an underestimate of the true number of cholera cases.
+          - In outbreak situations, cases of acute watery diarrhea caused by other pathogens may be reported as cholera cases when laboratory confirmation is not available or feasible for all suspected cases.
+        unit: reported cases
+        display:
+          numDecimalPlaces: 0
+      cholera_deaths:
+        title: Reported cholera deaths
+        description_short: Number of deaths from [cholera](#dod:cholera) reported to the WHO. As testing and reporting is limited in many countries, this is likely to be an underestimate of the true number of deaths from cholera.
+        description_key:
+          - As not every death from cholera is confirmed and reported to the WHO, these numbers are likely to be an underestimate of the true number of deaths from cholera.
+          - In outbreak situations, deaths from acute watery diarrhea caused by other pathogens may be reported as cholera deaths when laboratory confirmation is not available or feasible for all suspected cases.
+        unit: reported deaths
+        display:
+          numDecimalPlaces: 0
+

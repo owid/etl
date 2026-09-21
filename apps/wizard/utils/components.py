@@ -1,14 +1,11 @@
-import hashlib
 import json
-import random
-import re
+import os
 import urllib.parse
 from collections.abc import Callable
-from contextlib import contextmanager
 from copy import deepcopy
 from functools import wraps
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 import numpy as np
 import streamlit as st
@@ -24,61 +21,14 @@ from etl.grapher.model import Variable
 
 log = get_logger()
 
-HORIZONTAL_STYLE = """<style class="hide-element">
-    /* Hides the style container and removes the extra spacing */
-    .element-container:has(.hide-element) {{
-        display: none;
-    }}
-    /*
-        The selector for >.element-container is necessary to avoid selecting the whole
-        body of the streamlit app, which is also a stVerticalBlock.
-    */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) {{
-        display: flex;
-        flex-direction: row !important;
-        flex-wrap: wrap;
-        gap: 1rem;
-        align-items: {vertical_alignment};
-        justify-content: {justify_content};
-    }}
-    /* Override the default width of selectboxes in horizontal layout */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) select {{
-        min-width: 200px;  /* Set a minimum width for selectboxes */
-        max-width: 400px;  /* Optional: Set a max-width to avoid overly wide selectboxes */
-    }}
-    /* Buttons and their parent container all have a width of 704px, which we need to override */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) div {{
-        width: auto !important; /* Previously set to max-content */
-    }}
-</style>
-"""
-
-
-def _generate_6char_hash():
-    random_input = str(random.random()).encode()  # Random input as bytes
-    hash_object = hashlib.sha256(random_input)  # Generate hash
-    return hash_object.hexdigest()[:6]  # Return first 6 characters of the hash
-
-
-@contextmanager
-def st_horizontal(vertical_alignment="baseline", justify_content="flex-start", hash_string=None):
-    """This is not very efficient, and is OK for few elements. If you want to use it several times (e.g. for loop) consider an alternative.
-
-    Example alternatives:
-        - If you want a row of buttons, consider using st.pills or st.segmented_control.
-        - In the general case, you can just use st.columns
-    """
-    if hash_string is None:
-        hash_string = _generate_6char_hash()
-    h_style = HORIZONTAL_STYLE.format(
-        hash=hash_string,
-        vertical_alignment=vertical_alignment,
-        justify_content=justify_content,
-    )
-    st.markdown(h_style, unsafe_allow_html=True)
-    with st.container():
-        st.markdown(f'<span class="hide-element horizontal-marker-{hash_string}"></span>', unsafe_allow_html=True)
-        yield
+# Grapher is consumed as a published npm package (`@ourworldindata/grapher`). The built
+# bundles of every release are also served on our Tailnet, which is all a browser needs —
+# unlike the npm registry, these URLs require no auth token. Set GRAPHER_PACKAGE_URL to
+# pin a version (e.g. .../ourworldindata/grapher/v0.1.0) instead of tracking the latest.
+GRAPHER_PACKAGE_URL = os.environ.get(
+    "GRAPHER_PACKAGE_URL",
+    "https://owid-packages.tail6e23.ts.net/ourworldindata/grapher/latest",
+).rstrip("/")
 
 
 def default_converter(o):
@@ -155,34 +105,12 @@ def grapher_chart_from_url(chart_url: str, height=600):
 def explorer_chart(
     base_url: str, explorer_slug: str, view: dict, height: int = 600, default_display: str | None = None
 ):
-    # First HTML definition with parameters
-    url = f"{base_url}/{explorer_slug}"
-
-    params = {
-        # "Metric": "Confirmed cases",
-        # "Frequency": "7-day average",
-        # "Relative to population": "false",
-        # "country": "COD~BDI~UGA~CAF",
-        "hideControls": "true",
-        **view,
-    }
-    if default_display is not None:
-        dd = default_display.lower()
-        if dd in ["map", "table", "chart"]:
-            params["tab"] = dd
-
-    query_string = "?" + urllib.parse.urlencode(params)
-
-    HTML = f"""
-    <!-- Redirect to the external URL -->
-    <meta http-equiv="refresh" content="0; url={url}{query_string}">
-    """
-
-    # Render the HTML
-    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # ty: ignore
+    """Embed an explorer view in an iframe."""
+    return mdim_chart(f"{base_url}/{explorer_slug}", view=view, height=height, default_display=default_display)
 
 
 def mdim_chart(url: str, view: dict, height: int = 600, default_display: str | None = None):
+    """Embed an MDIM (or explorer) view in an iframe."""
     params = {
         "hideControls": "true",
         **view,
@@ -194,13 +122,34 @@ def mdim_chart(url: str, view: dict, height: int = 600, default_display: str | N
 
     query_string = "?" + urllib.parse.urlencode(params)
 
-    HTML = f"""
-    <!-- Redirect to the external URL -->
-    <meta http-equiv="refresh" content="0; url={url}{query_string}">
-    """
+    return st.iframe(f"{url}{query_string}", height=height, width=int(1.6 * height))
 
-    # Render the HTML
-    return st.components.v1.html(HTML, height=height, width=1.6 * height)  # ty: ignore
+
+def _grapher_html(chart_config: dict[str, Any], owid_env: OWIDEnv, height: int = 600) -> str:
+    """Build the HTML that mounts a Grapher chart with the `@ourworldindata/grapher` package."""
+    config = deepcopy(chart_config)
+
+    # Env-specific URLs Grapher uses for its share / embed / edit links.
+    config["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
+    config["adminBaseUrl"] = owid_env.base_site
+
+    return f"""
+    <link rel="stylesheet" href="https://ourworldindata.org/fonts.css" />
+    <link rel="stylesheet" href="{GRAPHER_PACKAGE_URL}/grapher.css" />
+    <style>
+        html, body {{ margin: 0; padding: 0; }}
+        /* The chart fills its container, so the container needs an explicit size. */
+        #grapher {{ width: 100%; height: {height}px; }}
+    </style>
+    <div id="grapher"></div>
+    <script type="module">
+        import {{ GrapherLoader }} from "{GRAPHER_PACKAGE_URL}/grapher.standalone.min.js";
+        GrapherLoader.fromApi({{
+            config: {json.dumps(config, default=default_converter)},
+            dataApiUrl: "{owid_env.indicators_url}/",
+        }}).mount(document.getElementById("grapher"));
+    </script>
+    """
 
 
 def _chart_html(chart_config: dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
@@ -213,26 +162,7 @@ def _chart_html(chart_config: dict[str, Any], owid_env: OWIDEnv, height=600, **k
     owid_env : OWIDEnv
         Environment configuration. This is needed to access the correct API (changes between servers).
     """
-    chart_config_tmp = deepcopy(chart_config)
-
-    chart_config_tmp["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
-    chart_config_tmp["adminBaseUrl"] = owid_env.base_site
-    chart_config_tmp["dataApiUrl"] = f"{owid_env.indicators_url}/"
-
-    HTML = f"""
-    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
-    <div class="StandaloneGrapherOrExplorerPage">
-        <main>
-            <figure data-grapher-src></figure>
-        </main>
-        <script> document.cookie = "isAdmin=true;max-age=31536000" </script>
-        <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
-        <script type="module">
-            var jsonConfig = {json.dumps(chart_config_tmp, default=default_converter)}; window.renderSingleGrapherOnGrapherPage({{ config: jsonConfig, dataApiUrl: "{owid_env.data_api_url}/v1/indicators/", catalogUrl: "{owid_env.catalog_url}" }});
-        </script>
-    </div>
-    """
+    HTML = _grapher_html(chart_config, owid_env, height=height)
 
     components.html(HTML, height=height, width=int(1.6 * height), **kwargs)
 
@@ -255,23 +185,10 @@ def tag_in_md(tag_name: str, color: str, icon: str | None = None):
         return f":{color}-background[{tag_name}]"
 
 
-def st_tag(tag_name: str, color: str, icon: str):
-    """Create a custom HTML tag.
-
-    Parameters
-    ----------
-    tag_name : str
-        Tag name.
-    color : str
-        Color of the tag. Must be replaced with any of the following supported colors: blue, green, orange, red, violet, gray/grey, rainbow
-    icon: str
-        Icon of the tag. Can be material (e.g. ':material/upgrade:') or emoji (e.g. '🪄').
-    """
-    st.markdown(tag_in_md(tag_name, color, icon))
-
-
 class Pagination:
     """Use pagination to show a list of items in Streamlit.
+
+    Thin wrapper around `st.pagination` that also slices the item list to the current page.
 
     Example:
 
@@ -279,20 +196,15 @@ class Pagination:
         # Function to render item
         ...
 
-    # Parameters
-    items = []
-    items_per_page = 10
-
     # Define pagination
     pagination = Pagination(
         items=items,
-        items_per_page=items_per_page,
-        pagination_key="pagination-demo",
+        items_per_page=10,
+        pagination_key="pagination-example",
     )
 
-    # Show controls only if needed
-    if len(items) > items_per_page:
-        pagination.show_controls(mode="bar")
+    # Show controls (hidden automatically if there is a single page)
+    pagination.show_controls()
 
     # Show items (only current page)
     for item in pagination.get_page_items():
@@ -305,8 +217,7 @@ class Pagination:
         items: list[Any],
         items_per_page: int,
         pagination_key: str,
-        on_click: Callable | None = None,
-        save_in_query: bool = False,
+        on_change: Callable | None = None,
     ):
         """Construct Pagination.
 
@@ -318,108 +229,58 @@ class Pagination:
             Number of items per page.
         pagination_key : str
             Key to store the current page in session state.
-        on_click : Optional[Callable], optional
-            Action to perform when interacting with any of the buttons, by default None
-        save_in_query : bool, optional
-            Whether to save the current page in the query string, by default False
+        on_change : Optional[Callable], optional
+            Action to perform when the page changes, by default None
         """
         self.items = items
         self.items_per_page = items_per_page
         self.pagination_key = pagination_key
-        self.save_in_query = save_in_query
-        # Action to perform when interacting with any of the buttons.
-        ## Example: Change the value of certain state in session_state
-        self.on_click = on_click
-        # Initialize session state for the current page
-        if self.pagination_key not in st.session_state:
-            # Get page from query parameters
-            if self.save_in_query and self.pagination_key in st.query_params:
-                self.page = int(st.query_params[self.pagination_key])
-            else:
-                self.page = 1
+        self.on_change = on_change
 
     @property
-    def page(self):
-        value = st.session_state[self.pagination_key]
-        return value
-
-    @page.setter
-    def page(self, value):
-        st.session_state[self.pagination_key] = value
+    def page(self) -> int:
+        return st.session_state.get(self.pagination_key, 1)
 
     @property
     def total_pages(self) -> int:
-        return (len(self.items) - 1) // self.items_per_page + 1
+        return max(1, (len(self.items) - 1) // self.items_per_page + 1)
 
     def get_page_items(self) -> list[Any]:
-        page = self.page
-        start_idx = (page - 1) * self.items_per_page
+        start_idx = (self.page - 1) * self.items_per_page
         end_idx = start_idx + self.items_per_page
         return self.items[start_idx:end_idx]
 
-    def show_controls(self, mode: Literal["buttons", "bar"] = "buttons") -> None:
-        if mode == "bar":
-            self.show_controls_bar()
-        elif mode == "buttons":
-            self.show_controls_buttons()
+    def show_controls(self, position: str = "top") -> None:
+        """Show pagination controls.
+
+        Can be called more than once per page (e.g. above and below the item list) — pass a
+        distinct `position` for each call; all copies stay in sync. The "top" copy's key is
+        the canonical page state.
+        """
+        if self.total_pages == 1:
+            return
+        # If the item list shrank (e.g. filters changed), the remembered page may be out of range.
+        if self.page > self.total_pages:
+            st.session_state[self.pagination_key] = 1
+
+        if position == "top":
+            key = self.pagination_key
         else:
-            raise ValueError("Mode must be either 'buttons' or 'bar'.")
+            key = f"{self.pagination_key}--{position}"
+            # Mirror the canonical page before instantiating this copy.
+            st.session_state[key] = self.page
 
-    def show_controls_buttons(self):
-        # Pagination controls
-        # col1, col2, col3 = st.columns([1, 1, 1], vertical_alignment="center")
+        def _on_change():
+            # Keep the canonical key in sync when a secondary copy is used (no-op for "top").
+            st.session_state[self.pagination_key] = st.session_state[key]
+            if self.on_change:
+                self.on_change()
 
-        with st.container(border=True):
-            with st_horizontal():
-                # with col1:
-                key = f"previous-{self.pagination_key}"
-                if self.page > 1:
-                    if st.button("⏮️ Previous", key=key):
-                        self.page -= 1
-                        if self.on_click is not None:
-                            self.on_click()
-                        st.rerun()
-                else:
-                    st.button("⏮️ Previous", disabled=True, key=key)
-
-                s = st.empty()
-
-                # with col3:
-                key = f"next-{self.pagination_key}"
-                if self.page < self.total_pages:
-                    if st.button("Next ⏭️", key=key):
-                        self.page += 1
-                        if self.on_click is not None:
-                            self.on_click()
-                        st.rerun()
-                else:
-                    st.button("Next ⏭️", disabled=True, key=key)
-
-                # with col2:
-                s.text(f"Page {self.page} of {self.total_pages}")
-
-    def show_controls_bar(self) -> None:
-        def _change_page():
-            # Internal action
-            if self.save_in_query:
-                if self.page == 1:
-                    st.query_params.pop(self.pagination_key)
-                else:
-                    st.query_params.update({self.pagination_key: self.page})
-
-            # External action
-            if self.on_click is not None:
-                self.on_click()
-
-        with st_horizontal():
-            st.number_input(
-                label=f"**Go to page** (results per page: {self.items_per_page}; total pages: {self.total_pages})",
-                min_value=1,
-                max_value=self.total_pages,
-                # value=self.page,
-                on_change=_change_page,
-                key=self.pagination_key,
-            )
+        st.pagination(
+            self.total_pages,
+            key=key,
+            on_change=_on_change,
+        )
 
 
 def st_multiselect_wider(num_px: int = 1000):
@@ -436,20 +297,6 @@ def st_multiselect_wider(num_px: int = 1000):
 
 def st_info(text):
     st.info(text, icon=":material/info:")
-
-
-def config_style_html() -> None:
-    """Increase font-size of expander headers."""
-    st.markdown(
-        """
-    <style>
-    .streamlit-expanderHeader {
-        font-size: x-large;
-    }
-    </style>
-    """,
-        unsafe_allow_html=True,
-    )
 
 
 def st_wizard_page_link(alias: str, border: bool = False, **kwargs) -> None:
@@ -473,169 +320,6 @@ def st_wizard_page_link(alias: str, border: bool = False, **kwargs) -> None:
         st.warning(f"App must be run via `make wizard` to display link to `{alias}`.")
 
 
-def st_title_with_expert(title: str, icon: str | None = None, **kwargs):
-    container = st.container(border=False, horizontal=True, vertical_alignment="bottom")
-    if icon is not None:
-        title = f"{icon} {title}"
-    with container:
-        st.title(title, **kwargs)
-        st_wizard_page_link(
-            alias="expert",
-            label=":rainbow[**Ask the Expert**]",
-            help="Ask the expert any documentation question!",
-            width="content",
-            border=False,
-        )
-
-
-# ---------------------------------------------------------------------------
-# st_wizard_card — native replacement for the legacy `streamlit_card` component.
-# Renders a clickable card (background image + dark overlay + centered label and
-# optional caption) using only st.container + st.page_link, styled via CSS
-# targeting the container's `st-key-wcard-<slug>` class. Used on the Wizard
-# home page and any other page that needs image-tile navigation.
-#
-# `!important` is kept only where Streamlit's own themed styles would otherwise
-# win on specificity (background, color, border, text-decoration).
-# The whole card is clickable: `a::after` stretches an invisible overlay over
-# the card; the caption sits above it with `pointer-events: none` so clicks on
-# the caption fall through to the anchor below.
-# ---------------------------------------------------------------------------
-_WIZARD_CARD_CSS = """
-<style>
-div[class*="st-key-wcard-"] {
-    position: relative;
-    min-height: var(--card-h, 80px);
-    border-radius: 8px;
-    overflow: hidden;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    transition: filter 120ms ease, transform 120ms ease;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: stretch;
-}
-div[class*="st-key-wcard-"]:hover {
-    filter: brightness(1.15);
-    transform: translateY(-1px);
-}
-/* Inner Streamlit wrappers: transparent, full width */
-div[class*="st-key-wcard-"] [data-testid="stVerticalBlock"],
-div[class*="st-key-wcard-"] [data-testid="stElementContainer"],
-div[class*="st-key-wcard-"] [data-testid="stPageLink"],
-div[class*="st-key-wcard-"] .stPageLink {
-    background: transparent !important;
-    border: none !important;
-    width: 100%;
-    gap: 0.1rem;
-}
-/* The page_link anchor: content sits naturally; ::after is the whole-card
-   invisible hit target so clicks anywhere navigate. */
-div[class*="st-key-wcard-"] a {
-    background: transparent !important;
-    border: none !important;
-    text-decoration: none !important;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 0.15rem 0.75rem;
-}
-div[class*="st-key-wcard-"] a::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-}
-/* All text inside the card → white, centered */
-div[class*="st-key-wcard-"] a,
-div[class*="st-key-wcard-"] a *,
-div[class*="st-key-wcard-"] [data-testid="stCaptionContainer"] * {
-    color: #fff !important;
-    text-align: center;
-    margin: 0;
-}
-div[class*="st-key-wcard-"] a p,
-div[class*="st-key-wcard-"] a strong {
-    font-weight: 700;
-    font-size: 1.3rem;
-    line-height: 1.2;
-}
-/* Caption stays visible above the hit overlay, but clicks pass through */
-div[class*="st-key-wcard-"] [data-testid="stCaptionContainer"] {
-    position: relative;
-    z-index: 2;
-    pointer-events: none;
-    padding: 0 0.75rem;
-}
-div[class*="st-key-wcard-"] [data-testid="stCaptionContainer"] * {
-    font-weight: 600;
-    font-size: 0.9rem;
-    line-height: 1.2;
-}
-</style>
-"""
-
-
-def _wizard_card_slug(s: str) -> str:
-    """Turn an entrypoint path into a stable CSS-safe key suffix."""
-    return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
-
-
-def _wizard_card_css_url(image_url: str) -> str:
-    """Escape a URL for use inside a CSS ``url('...')`` expression."""
-    return image_url.replace("\\", "\\\\").replace("'", "%27")
-
-
-def st_wizard_card(
-    entrypoint: str,
-    title: str,
-    image_url: str,
-    caption: str = "",
-    height: int = 80,
-) -> None:
-    """Render a clickable image-tile card that links to ``entrypoint``.
-
-    A native replacement for ``streamlit_card.card`` — no React iframe, uses
-    ``st.page_link`` for real multi-page navigation, styled with CSS. The
-    entire card is clickable, not just the title.
-
-    Parameters
-    ----------
-    entrypoint
-        Page path accepted by ``st.page_link`` (e.g. ``"apps/wizard/etl_steps/snapshot.py"``).
-    title
-        Card title (rendered as a bold white label).
-    image_url
-        URL used as the card's background image (a dark overlay is blended on top).
-    caption
-        Optional caption rendered below the title.
-    height
-        Minimum card height in pixels.
-    """
-    # Shared CSS is idempotent; emit on every call so it is present on every rerun.
-    st.markdown(_WIZARD_CARD_CSS, unsafe_allow_html=True)
-    key = f"wcard-{_wizard_card_slug(entrypoint)}"
-    overlay = "linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55))"
-    bg = f"{overlay}, url('{_wizard_card_css_url(image_url)}')" if image_url else overlay
-    st.markdown(
-        f"<style>div.st-key-{key} {{ --card-h: {height}px; background-image: {bg}; }}</style>",
-        unsafe_allow_html=True,
-    )
-    with st.container(border=False, key=key):
-        try:
-            st.page_link(entrypoint, label=f"**{title}**")
-        except streamlit.errors.StreamlitPageNotFoundError:
-            # Not running as a multi-page app (e.g. `streamlit run home.py`).
-            st.markdown(f"**{title}**")
-        if caption:
-            st.caption(caption)
-
-
 def preview_file(
     file_path: str | Path, prefix: str = "File", language: str = "python", custom_header: str | None = None
 ) -> None:
@@ -651,11 +335,6 @@ def preview_file(
 def st_toast_error(message: str) -> None:
     """Show error message."""
     st.toast(f"❌ :red[{message}]")
-
-
-def st_toast_success(message: str) -> None:
-    """Show success message."""
-    st.toast(f"✅ :green[{message}]")
 
 
 def update_query_params(key: str, side_effect: Callable[[], None] | None = None):

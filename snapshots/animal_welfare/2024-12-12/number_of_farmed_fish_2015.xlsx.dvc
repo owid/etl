@@ -11,9 +11,9 @@ meta:
     url_download: http://fishcount.org.uk/studydatascreens2/2015/Farmed-fishes-2015.xlsx
     date_published: '2016'
     date_accessed: 2024-12-12
-  license:
-    name: CC BY 4.0
-    url: https://fishcount.org.uk/estimates/farmedfishes/data01/fishcount_global_farmed_fish_estimate.php
+    license:
+      name: CC BY 4.0
+      url: https://fishcount.org.uk/estimates/farmedfishes/data01/fishcount_global_farmed_fish_estimate.php
 outs:
   - md5: 8766421d56b0d4c350d6db47b5a43d6f
     size: 240536

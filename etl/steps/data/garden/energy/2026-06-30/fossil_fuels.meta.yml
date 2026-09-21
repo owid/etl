@@ -1,0 +1,575 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Energy
+        - Fossil Fuels
+    description_processing: |-
+      - Fossil fuel production is taken from the Energy Institute's Statistical Review of World Energy (from 1965), extended before then with Etemad & Luciani's historical estimates (1900-1979) and, for coal, with Vaclav Smil (2017) for the World and the NIC / Fouquet historical dataset for the United Kingdom (before 1900). It is extended to countries not covered by the Statistical Review, and to recent years, with the U.S. Energy Information Administration's data.
+      - Fossil fuel consumption in energy units comes from the Energy Institute's Statistical Review of World Energy, extended to countries it does not cover, and to recent years, with the U.S. Energy Information Administration's data. Global consumption before 1965 is given by global production.
+      - Fossil fuel production, proved reserves, trade (imports, exports, and net imports), and consumption — all in physical units — come from the U.S. Energy Information Administration.
+
+dataset:
+  title: Fossil fuels
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+tables:
+  fossil_fuels:
+    variables:
+      coal_consumption_per_capita_kwh:
+        title: Coal consumption per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_consumption_per_capita_kwh.title}'
+      coal_consumption_per_capita_tonnes:
+        title: Coal consumption per capita (tonnes)
+        unit: tonnes per person
+        short_unit: t
+        description_short: Measured in tonnes per person.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_consumption_per_capita_tonnes.title}'
+      coal_consumption_tonnes:
+        title: Coal consumption (tonnes)
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_consumption_tonnes.title}'
+      coal_consumption_twh:
+        title: Coal consumption
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours).
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_consumption_twh.title}'
+      coal_exports_per_capita_tonnes:
+        title: Coal exports per capita
+        unit: tonnes per person
+        short_unit: t
+        description_short: Measured in tonnes per person.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_exports_per_capita_tonnes.title}'
+      coal_exports_tonnes:
+        title: Coal exports
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_exports_tonnes.title}'
+      coal_imports_per_capita_tonnes:
+        title: Coal imports per capita
+        unit: tonnes per person
+        short_unit: t
+        description_short: Measured in tonnes per person.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_imports_per_capita_tonnes.title}'
+      coal_imports_tonnes:
+        title: Coal imports
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_imports_tonnes.title}'
+      coal_net_imports_per_capita_tonnes:
+        title: Coal net imports per capita
+        unit: tonnes per person
+        short_unit: t
+        description_short: Measured in tonnes per person. Net imports are imports minus exports; negative values indicate that the country exports more than it imports.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_net_imports_per_capita_tonnes.title}'
+      coal_net_imports_tonnes:
+        title: Coal net imports
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes. Net imports are imports minus exports; negative values indicate that the country exports more than it imports.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_net_imports_tonnes.title}'
+      coal_production_annual_change_pct:
+        title: Annual change in coal production (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in coal production relative to the previous year.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_production_annual_change_pct.title}'
+      coal_production_annual_change_twh:
+        title: Annual change in coal production
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in coal production relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_production_annual_change_twh.title}'
+      coal_production_per_capita_kwh:
+        title: Coal production per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_production_per_capita_kwh.title}'
+      coal_production_per_capita_tonnes:
+        title: Coal production per capita (tonnes)
+        unit: tonnes per person
+        short_unit: t
+        description_short: Measured in tonnes per person.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_production_per_capita_tonnes.title}'
+      coal_production_tonnes:
+        title: Coal production (tonnes)
+        unit: tonnes
+        short_unit: t
+        description_short: Measured in tonnes.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_production_tonnes.title}'
+      coal_production_twh:
+        title: Coal production
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours).
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_production_twh.title}'
+      coal_reserves_per_capita_tonnes:
+        title: Coal reserves per capita
+        unit: tonnes per person
+        short_unit: t
+        description_short: Proved reserves, measured in tonnes per person, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_reserves_per_capita_tonnes.title}'
+      coal_reserves_to_production_ratio:
+        title: Coal reserves-to-production ratio
+        unit: years
+        short_unit: years
+        description_short: Number of years that proved reserves of coal would last if production continued at its current rate.
+        description_processing: |-
+          - The reserves-to-production ratio is calculated by Our World in Data as the Energy Institute Statistical Review of World Energy's proved reserves divided by its production of the same fossil fuel in the same year.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_reserves_to_production_ratio.title}'
+      coal_reserves_tonnes:
+        title: Coal reserves
+        unit: tonnes
+        short_unit: t
+        description_short: Proved reserves, measured in tonnes, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information.
+        display:
+          name: Coal
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.coal_reserves_tonnes.title}'
+      gas_consumption_m3:
+        title: Gas consumption (cubic meters)
+        unit: cubic meters
+        short_unit: m³
+        description_short: Measured in cubic meters.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_consumption_m3.title}'
+      gas_consumption_per_capita_kwh:
+        title: Gas consumption per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_consumption_per_capita_kwh.title}'
+      gas_consumption_per_capita_m3:
+        title: Gas consumption per capita (cubic meters)
+        unit: cubic meters per person
+        short_unit: m³
+        description_short: Measured in cubic meters per person.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_consumption_per_capita_m3.title}'
+      gas_consumption_twh:
+        title: Gas consumption
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours).
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_consumption_twh.title}'
+      gas_exports_m3:
+        title: Gas exports
+        unit: cubic meters
+        short_unit: m³
+        description_short: Measured in cubic meters.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_exports_m3.title}'
+      gas_exports_per_capita_m3:
+        title: Gas exports per capita
+        unit: cubic meters per person
+        short_unit: m³
+        description_short: Measured in cubic meters per person.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_exports_per_capita_m3.title}'
+      gas_imports_m3:
+        title: Gas imports
+        unit: cubic meters
+        short_unit: m³
+        description_short: Measured in cubic meters.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_imports_m3.title}'
+      gas_imports_per_capita_m3:
+        title: Gas imports per capita
+        unit: cubic meters per person
+        short_unit: m³
+        description_short: Measured in cubic meters per person.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_imports_per_capita_m3.title}'
+      gas_net_imports_m3:
+        title: Gas net imports
+        unit: cubic meters
+        short_unit: m³
+        description_short: Measured in cubic meters. Net imports are imports minus exports; negative values indicate that the country exports more than it imports.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_net_imports_m3.title}'
+      gas_net_imports_per_capita_m3:
+        title: Gas net imports per capita
+        unit: cubic meters per person
+        short_unit: m³
+        description_short: Measured in cubic meters per person. Net imports are imports minus exports; negative values indicate that the country exports more than it imports.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_net_imports_per_capita_m3.title}'
+      gas_production_annual_change_pct:
+        title: Annual change in gas production (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in gas production relative to the previous year. Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_production_annual_change_pct.title}'
+      gas_production_annual_change_twh:
+        title: Annual change in gas production
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in gas production relative to the previous year, measured in [terawatt-hours](#dod:watt-hours). Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_production_annual_change_twh.title}'
+      gas_production_m3:
+        title: Gas production (cubic meters)
+        unit: cubic meters
+        short_unit: m³
+        description_short: Measured in cubic meters. Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_production_m3.title}'
+      gas_production_per_capita_kwh:
+        title: Gas production per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_production_per_capita_kwh.title}'
+      gas_production_per_capita_m3:
+        title: Gas production per capita (cubic meters)
+        unit: cubic meters per person
+        short_unit: m³
+        description_short: Measured in cubic meters per person. Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_production_per_capita_m3.title}'
+      gas_production_twh:
+        title: Gas production
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours). Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_production_twh.title}'
+      gas_reserves_m3:
+        title: Gas reserves
+        unit: cubic meters
+        short_unit: m³
+        description_short: Proved reserves, measured in cubic meters, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_reserves_m3.title}'
+      gas_reserves_per_capita_m3:
+        title: Gas reserves per capita
+        unit: cubic meters per person
+        short_unit: m³
+        description_short: Proved reserves, measured in cubic meters per person, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_reserves_per_capita_m3.title}'
+      gas_reserves_to_production_ratio:
+        title: Gas reserves-to-production ratio
+        unit: years
+        short_unit: years
+        description_short: Number of years that proved reserves of gas would last if production continued at its current rate.
+        description_processing: |-
+          - The reserves-to-production ratio is calculated by Our World in Data as the Energy Institute Statistical Review of World Energy's proved reserves divided by its production of the same fossil fuel in the same year.
+        display:
+          name: Gas
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.gas_reserves_to_production_ratio.title}'
+      oil_consumption_m3:
+        title: Oil consumption (cubic meters)
+        unit: cubic meters
+        short_unit: m³
+        description_short: Measured in cubic meters. Includes all petroleum products and other liquid fuels, such as biofuels.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_consumption_m3.title}'
+      oil_consumption_per_capita_kwh:
+        title: Oil consumption per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Includes refined petroleum products and other liquid fuels.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_consumption_per_capita_kwh.title}'
+      oil_consumption_per_capita_m3:
+        title: Oil consumption per capita (cubic meters)
+        unit: cubic meters per person
+        short_unit: m³
+        description_short: Measured in cubic meters per person. Includes all petroleum products and other liquid fuels, such as biofuels.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_consumption_per_capita_m3.title}'
+      oil_consumption_twh:
+        title: Oil consumption
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours). Includes refined petroleum products and other liquid fuels.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_consumption_twh.title}'
+      oil_exports_m3:
+        title: Oil exports
+        unit: cubic meters
+        short_unit: m³
+        description_short: Measured in cubic meters. Includes crude oil and lease condensate; refined petroleum products are not included.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_exports_m3.title}'
+      oil_exports_per_capita_m3:
+        title: Oil exports per capita
+        unit: cubic meters per person
+        short_unit: m³
+        description_short: Measured in cubic meters per person. Includes crude oil and lease condensate; refined petroleum products are not included.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_exports_per_capita_m3.title}'
+      oil_imports_m3:
+        title: Oil imports
+        unit: cubic meters
+        short_unit: m³
+        description_short: Measured in cubic meters. Includes crude oil and lease condensate; refined petroleum products are not included.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_imports_m3.title}'
+      oil_imports_per_capita_m3:
+        title: Oil imports per capita
+        unit: cubic meters per person
+        short_unit: m³
+        description_short: Measured in cubic meters per person. Includes crude oil and lease condensate; refined petroleum products are not included.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_imports_per_capita_m3.title}'
+      oil_net_imports_m3:
+        title: Oil net imports
+        unit: cubic meters
+        short_unit: m³
+        description_short: Measured in cubic meters. Net imports are imports minus exports; negative values indicate that the country exports more than it imports. Includes crude oil and lease condensate; refined petroleum products are not included.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_net_imports_m3.title}'
+      oil_net_imports_per_capita_m3:
+        title: Oil net imports per capita
+        unit: cubic meters per person
+        short_unit: m³
+        description_short: Measured in cubic meters per person. Net imports are imports minus exports; negative values indicate that the country exports more than it imports. Includes crude oil and lease condensate; refined petroleum products are not included.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_net_imports_per_capita_m3.title}'
+      oil_production_annual_change_pct:
+        title: Annual change in oil production (%)
+        unit: '%'
+        short_unit: '%'
+        description_short: Percentage change in oil production relative to the previous year.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_production_annual_change_pct.title}'
+      oil_production_annual_change_twh:
+        title: Annual change in oil production
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Change in oil production relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_production_annual_change_twh.title}'
+      oil_production_m3:
+        title: Oil production (cubic meters)
+        unit: cubic meters
+        short_unit: m³
+        description_short: Measured in cubic meters. Includes crude oil and lease condensate.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_production_m3.title}'
+      oil_production_per_capita_kwh:
+        title: Oil production per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Includes crude oil, condensates, natural gas liquids, and other liquid fuels.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_production_per_capita_kwh.title}'
+      oil_production_per_capita_m3:
+        title: Oil production per capita (cubic meters)
+        unit: cubic meters per person
+        short_unit: m³
+        description_short: Measured in cubic meters per person. Includes crude oil and lease condensate.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_production_per_capita_m3.title}'
+      oil_production_twh:
+        title: Oil production
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours). Includes crude oil, condensates, natural gas liquids, and other liquid fuels.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_production_twh.title}'
+      oil_reserves_m3:
+        title: Oil reserves
+        unit: cubic meters
+        short_unit: m³
+        description_short: Proved reserves, measured in cubic meters, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information. Includes crude oil and lease condensate.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_reserves_m3.title}'
+      oil_reserves_per_capita_m3:
+        title: Oil reserves per capita
+        unit: cubic meters per person
+        short_unit: m³
+        description_short: Proved reserves, measured in cubic meters per person, are generally those quantities that can be recovered in the future from known reservoirs under existing economic and operating conditions, according to geological and engineering information. Includes crude oil and lease condensate.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_reserves_per_capita_m3.title}'
+      oil_reserves_to_production_ratio:
+        title: Oil reserves-to-production ratio
+        unit: years
+        short_unit: years
+        description_short: Number of years that proved reserves of oil would last if production continued at its current rate.
+        description_processing: |-
+          - The reserves-to-production ratio is calculated by Our World in Data as the Energy Institute Statistical Review of World Energy's proved reserves divided by its production of the same fossil fuel in the same year.
+        display:
+          name: Oil
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.oil_reserves_to_production_ratio.title}'
+      total_consumption_per_capita_kwh:
+        title: Fossil fuel consumption per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Fossil fuels include coal, oil, and gas.
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.total_consumption_per_capita_kwh.title}'
+      total_consumption_twh:
+        title: Fossil fuel consumption
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours). Fossil fuels include coal, oil, and gas.
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.total_consumption_twh.title}'
+      total_production_per_capita_kwh:
+        title: Fossil fuel production per capita
+        unit: kilowatt-hours per person
+        short_unit: kWh
+        description_short: Measured in [kilowatt-hours](#dod:watt-hours) per person. Fossil fuels include coal, oil, and gas.
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.total_production_per_capita_kwh.title}'
+      total_production_twh:
+        title: Fossil fuel production
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: Measured in [terawatt-hours](#dod:watt-hours). Fossil fuels include coal, oil, and gas.
+        display:
+          name: Fossil fuels
+        presentation:
+          title_public: '{tables.fossil_fuels.variables.total_production_twh.title}'

@@ -3,7 +3,7 @@ definitions:
   title: Wealth share of the top 1%
   unit: "%"
   short_unit: "%"
-  description_short: The share of wealth owned by the richest 1% of the population.
+  description_short: Share of wealth owned by the richest 1% of the population.
   display:
     name: Wealth share of the top 1%
     numDecimalPlaces: 1

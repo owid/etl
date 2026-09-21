@@ -4,6 +4,7 @@
 
 import datetime as dt
 import random
+import types
 from typing import Any, Literal, Union
 
 _MOCK_STRINGS = [
@@ -108,6 +109,10 @@ def mock(_type: type) -> Any:
 
     elif getattr(_type, "__origin__", None) == Union:
         return mock(random.choice(_type.__args__))  # ty: ignore
+
+    elif isinstance(_type, types.UnionType):
+        # PEP 604 unions, e.g. `str | list[str]`
+        return mock(random.choice(_type.__args__))
 
     elif _type is type(None):
         return None

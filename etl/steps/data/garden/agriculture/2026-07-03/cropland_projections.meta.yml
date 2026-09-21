@@ -1,0 +1,58 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Land Use
+    unit: hectares
+    short_unit: ha
+    processing_level: major
+    display:
+      numDecimalPlaces: 0
+    description_processing: |-
+      - Values correspond to the world totals published in Table 4.12 of the report, converted from million hectares to hectares.
+      - The projections start from a 2012 base year (1,567 million hectares, shared by the three scenarios), which is not shown in charts, to avoid overlapping with the observed data.
+  # Shared bullets, and descriptions of each scenario (condensed from Chapter 2 of the report, FAO 2018).
+  description_key_cropland: &description-key-cropland |-
+    Cropland — called "arable land" in the source — is the physical area used to grow crops, including both temporary and permanent crops.
+  description_key_gaps: &description-key-gaps |-
+    Projections are based on simulations with FAO's Global Agriculture Perspectives System (GAPS) model, starting from a 2012 base year.
+  description_key_bau: &description-key-bau |-
+    In the Business As Usual scenario, the world develops according to socio-economic, technological and environmental patterns that fail to address many challenges of food and agriculture, despite efforts to achieve Sustainable Development Goal targets. Economic growth is moderate but uneven across countries, and policies provide only limited incentives to move towards sustainability.
+  description_key_tss: &description-key-tss |-
+    In the Towards Sustainability scenario, more inclusive societies and more resource-efficient food production systems ensure universal progress towards Sustainable Development Goal targets. Food is mostly produced with environmentally sustainable methods, and greenhouse gas emissions are drastically reduced.
+  description_key_sss: &description-key-sss |-
+    In the Stratified Societies scenario, societies are structured in separate layers: self-protected elite classes do not feel the urgency to conserve natural resources or mitigate climate change, while increased poverty, food insecurity and poor nutrition lead to the over-exploitation of natural resources.
+
+dataset:
+  title: Cropland projections to 2050
+  update_period_days: 0
+  owners:
+    - Pablo Rosado
+
+tables:
+  cropland_projections:
+    variables:
+      cropland_business_as_usual:
+        title: Projected cropland under the Business As Usual scenario
+        description_short: |-
+          Projected area of land used to grow crops, under FAO's "Business As Usual" scenario, where historical trends in food and agriculture continue.
+        description_key:
+          - *description-key-cropland
+          - *description-key-gaps
+          - *description-key-bau
+      cropland_towards_sustainability:
+        title: Projected cropland under the Towards Sustainability scenario
+        description_short: |-
+          Projected area of land used to grow crops, under FAO's "Towards Sustainability" scenario, where food and agriculture systems shift towards more sustainable practices.
+        description_key:
+          - *description-key-cropland
+          - *description-key-gaps
+          - *description-key-tss
+      cropland_stratified_societies:
+        title: Projected cropland under the Stratified Societies scenario
+        description_short: |-
+          Projected area of land used to grow crops, under FAO's "Stratified Societies" scenario, where inequalities across and within countries increase.
+        description_key:
+          - *description-key-cropland
+          - *description-key-gaps
+          - *description-key-sss

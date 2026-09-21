@@ -25,7 +25,7 @@ definitions:
   description_refugee: |-
     Refugees include individuals recognized under the 1951 Convention relating to the Status of Refugees, its 1967 Protocol, the 1969 Organization of African Unity (OAU) Convention Governing the Specific Aspects of Refugee Problems in Africa, the refugee definition contained in the 1984 Cartagena Declaration on Refugees as incorporated into national laws, those recognized in accordance with the UNHCR Statute, individuals granted complementary forms of protection, and those enjoying temporary protection. The refugee population also includes people in refugee-like situations.
   description_host_community: |-
-    Host community refers to a community that hosts large populations of refugees or internally displaced persons, whether in camps, integrated into households, or independently. UNHCR reports on host communities in countries with substantive programmes focusing on sharing the burden of hosting large refugee populations, as set out in the Global Compact on Refugees.
+    Host community refers to a community that hosts large populations of refugees or internally displaced persons, whether in camps, integrated into households, or independently. UNHCR reports on host communities in countries with substantive programs focusing on sharing the burden of hosting large refugee populations, as set out in the Global Compact on Refugees.
   description_other_concern: |-
     Other groups or persons of concern refers to individuals who do not necessarily fall directly into any of the other groups (refugees, asylum-seekers, stateless persons, internally displaced persons) but to whom UNHCR has extended its protection and/or assistance services, based on humanitarian or other special grounds.
 
@@ -207,7 +207,7 @@ tables:
         description_short: Newly [resettled refugees](#dod:resettlement) by the country of origin, which is the country the refugee originally fled from. Resettlement enables refugees to relocate to another country which has agreed to admit them with a legal status ensuring international protection and ultimately permanent residence.
         description_from_producer: "{definitions.description_resettlement}"
       naturalisation_origin:
-        title: Naturalised refugees by country of origin
+        title: Naturalized refugees by country of origin
         description_short: |-
           [Naturalized](#dod:naturalization) [refugees](#dod:refugee) by the country of origin per calendar year.
         description_from_producer: |-
@@ -226,7 +226,7 @@ tables:
         description_short: Newly [resettled refugees](#dod:resettlement) by the country they resettle in. Resettlement enables refugees to relocate to another country which has agreed to admit them with a legal status ensuring international protection and ultimately permanent residence.
         description_from_producer: "{definitions.description_resettlement}"
       naturalisation_dest:
-        title: Naturalised refugees by country of naturalization
+        title: Naturalized refugees by country of naturalization
         description_short: "[Naturalized](#dod:naturalization) [refugees](#dod:refugee) by the country of naturalization per calendar year."
         description_from_producer: "{definitions.description_naturalization}"
       resettlement_per_100k_origin:

@@ -60,7 +60,7 @@ def run() -> None:
     # Prepare display metadata.
     date_earliest = tb["year"].astype(str).min()
     for column in tb.drop(columns=["country", "year", "group"]).columns:
-        tb[column].metadata.display["yearIsDay"] = True
+        tb[column].metadata.display["timeInterval"] = "day"
         tb[column].metadata.display["zeroDay"] = date_earliest
 
     # Convert year column into a number of days since the earliest date in the table.

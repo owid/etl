@@ -21,45 +21,49 @@ tables:
         title: Birth rate, on a monthly basis
         unit: births per 1,000 people
         description_short: |-
-          The total number of births per 1,000 people in a given month.
+          Total number of births per 1,000 people in a given month.
         display:
           name: |-
             Birth rate
 
+          timeInterval: month
       birth_rate_per_day:
         title: Birth rate per day, on a monthly basis
         unit: births per million people
         description_short: |-
-          The average daily number of births, per million people, calculated monthly.
+          Average daily number of births, per million people, calculated monthly.
         display:
           name: |-
             Birth rate, per day
 
+          timeInterval: month
       birth_rate_lead_9months:
         title: Birth rate, on a monthly basis, by estimated month of conception
         unit: births per 1,000 people
         description_short: |-
-          The total number of births per 1,000 people in a given month.
+          Total number of births per 1,000 people in a given month.
         display:
           name: |-
             Birth rate
 
+          timeInterval: month
       birth_rate_per_day_lead_9months:
         title: Birth rate per day, on a monthly basis, by estimated month of conception
         unit: births per 1,000 people
         description_short: |-
-          The average daily number of births, per million people, calculated monthly.
+          Average daily number of births, per million people, calculated monthly.
         display:
           name: |-
             Birth rate, per day
 
+          timeInterval: month
   birth_rate_month:
     variables:
       birth_rate:
         title: Birth rate, in << month >>
         unit: births per 1,000 people
         description_short: |-
-          The total number of births per 1,000 people in <<month>>.
+          Total number of births per 1,000 people in <<month>>.
         display:
           numDecimalPlaces: 1
           name: |-
@@ -69,7 +73,7 @@ tables:
         title: Birth rate per day, in << month >>
         unit: births per million people
         description_short: |-
-          The average daily number of births, per million people, calculated for <<month>>.
+          Average daily number of births, per million people, calculated for <<month>>.
         display:
           name: |-
             Birth rate, per day
@@ -90,7 +94,7 @@ tables:
         title: Peak birth rate per day, on a monthly basis
         unit: births per million people
         description_short: |-
-          The highest average daily number of births, per million people, recorded in the given year.
+          Highest average daily number of births, per million people, recorded in the given year.
         display:
           name: |-
             Daily birth rate in the peak month
@@ -109,7 +113,7 @@ tables:
         title: Peak birth rate per day, on a monthly basis, in 9 months
         unit: births per million people
         description_short: |-
-          The highest average daily number of births, per million people, recorded in the given year.
+          Highest average daily number of births, per million people, recorded in the given year.
         display:
           name: |-
             Maximum birth rate, per day

@@ -1,0 +1,21 @@
+meta:
+  origin:
+    producer: World Bank
+    title: Worldwide Bureaucracy Indicators (WWBI)
+    description: |-
+      The Worldwide Bureaucracy Indicators (WWBI) database is a unique cross-national dataset on public sector employment and wages that aims to fill an information gap, thereby helping researchers, development practitioners, and policymakers gain a better understanding of the personnel dimensions of state capability, the footprint of the public sector within the overall labor market, and the fiscal implications of the public sector wage bill. The dataset is derived from administrative data and household surveys, thereby complementing existing, expert perception-based approaches.
+
+      The WWBI includes 302 indicators that are estimated from microdata drawn from the labor force and household surveys and augmented with administrative data for 202 economies in five categories: the demographics of the private and public sector workforces; public sector wage premiums; relative wages and pay compression ratios, gender pay gaps; and the public sector wage bill. The micro and administrative data utilized in the construction of the WWBI are drawn from data catalogs housing surveys conducted by national statistical organizations (NSO) or multilateral organization data teams. Together, these provide an important, albeit narrow, picture of the skills and incentives of bureaucrats. Indicators on public employment track key demographic characteristics including the size of the public sector workforce (in absolute and relative numbers), their age, and distributions across genders, industries, occupations, income quintiles, and academic qualifications. Variables on compensation capture both the competitiveness of public sector wages (compared to the private sector) as well as wage differentials across industry or occupation of employment, genders, education, and income quintiles within the public and private sectors as well as pay compression ratios in public and private sectors. The indicators on the size of the wage bill offer a glimpse into the structure and affordability of the public sector within the larger economy.
+    citation_full: World Bank. 2025. Worldwide Bureaucracy Indicators version 6.0.
+    version_producer: Version 6
+    url_main: https://datacatalog.worldbank.org/search/dataset/0038132/worldwide-bureaucracy-indicators
+    url_download: https://databank.worldbank.org/data/download/WWBI_CSV.zip
+    date_accessed: '2026-07-14'
+    date_published: '2025-02-28'
+    license:
+      name: CC BY 4.0
+      url: https://datacatalog.worldbank.org/search/dataset/0038132/worldwide-bureaucracy-indicators
+outs:
+  - md5: 5c3ab9700706ad7e46bfeb4a58db9d67
+    size: 11811785
+    path: worldwide_bureaucracy_indicators.zip

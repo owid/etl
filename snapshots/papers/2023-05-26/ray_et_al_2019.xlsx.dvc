@@ -19,7 +19,7 @@ meta:
   date_accessed: 2023-05-26
   is_public: true
   description: |
-    Ray et al. (2019) modelled the impact of observed climate change on yields of the top ten global crops. These ten crops account for ~83% of global kilocalorie production.
+    Ray et al. (2019) modeled the impact of observed climate change on yields of the top ten global crops. These ten crops account for ~83% of global kilocalorie production.
 
     The impact of climate change on crop yields is calculated as the difference between actual observed yields under current climate conditions and the yields that would have been achieved until historical climate conditions.
 

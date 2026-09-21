@@ -56,6 +56,8 @@ PPP_DEVIATIONS_SOURCE_TO_USE = {
     "Bolivia (urban)": Source.NONE,  # We don't want urban/rural splits.
     "British Virgin Islands": Source.WDI,  # only defined by WDI
     "Brunei": Source.WDI,  # only defined by WDI
+    "Bulgaria": Source.WDI,  # Bulgaria adopted the Euro on 2026-01-01. WDI reflects this change (old Lev-denominated
+    # value / the fixed 1.95583 BGN-per-EUR peg matches the new WDI value almost exactly), while PIP doesn't yet.
     "Cambodia": Source.WDI,  # only defined by WDI
     "Cayman Islands": Source.WDI,  # only defined by WDI
     "China (rural)": Source.NONE,  # prefer WDI's value for China, as PIP only has urban & rural population

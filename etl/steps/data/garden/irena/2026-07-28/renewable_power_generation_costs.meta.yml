@@ -1,0 +1,87 @@
+definitions:
+  common:
+    processing_level: major
+    description_processing: |-
+      - The resulting costs are compiled from three IRENA reports: Renewable Power Generation Costs in 2025 (primarily for data from 2010 onwards), Renewable Power Generation Costs in 2024 (for country series not included in the latest report), and Renewable Power Generation Costs in 2023 (for data prior to 2010, not included in later reports). Wherever reports overlap, the most recent one is used.
+      - Data from older reports (expressed in constant US dollars of an earlier year) was converted to constant {LATEST_YEAR} US dollars using the [US GDP deflator (linked series)](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD?locations=US), to account for the effects of US dollar inflation. This matches the producer's own convention when moving between dollar base years.
+    presentation:
+      topic_tags:
+        - Energy
+  # Display short unit to show in charts of costs per kilowatt-hour.
+  displayShortUnit: &display-short-unit-usd-per-kwh "$"
+
+dataset:
+  update_period_days: 365
+
+  owners:
+    - Pablo Rosado
+tables:
+  renewable_power_generation_costs:
+    title: Renewable power generation costs
+    common:
+      description_key:
+        - Levelized cost of energy (LCOE) estimates the average cost per unit of energy generated across the lifetime of a new power plant. It is measured in US$ per kilowatt-hour.
+      unit: "constant {LATEST_YEAR} US$ per kilowatt-hour"
+      short_unit: "$/kWh"
+    variables:
+      bioenergy:
+        title: Bioenergy levelized cost of energy
+        display:
+          name: Bioenergy
+          shortUnit: *display-short-unit-usd-per-kwh
+        presentation:
+          title_public: Bioenergy levelized cost of energy
+      concentrated_solar_power:
+        title: Concentrated solar power levelized cost of energy
+        display:
+          name: Concentrated solar power
+          shortUnit: *display-short-unit-usd-per-kwh
+        presentation:
+          title_public: Concentrated solar power levelized cost of energy
+      geothermal:
+        title: Geothermal levelized cost of energy
+        display:
+          name: Geothermal
+          shortUnit: *display-short-unit-usd-per-kwh
+        presentation:
+          title_public: Geothermal levelized cost of energy
+      hydropower:
+        title: Hydropower levelized cost of energy
+        display:
+          name: Hydropower
+          shortUnit: *display-short-unit-usd-per-kwh
+        presentation:
+          title_public: Hydropower levelized cost of energy
+      offshore_wind:
+        title: Offshore wind levelized cost of energy
+        display:
+          name: Offshore wind
+          shortUnit: *display-short-unit-usd-per-kwh
+        presentation:
+          title_public: Offshore wind levelized cost of energy
+      onshore_wind:
+        title: Onshore wind levelized cost of energy
+        display:
+          name: Onshore wind
+          shortUnit: *display-short-unit-usd-per-kwh
+        presentation:
+          title_public: Onshore wind levelized cost of energy
+      solar_photovoltaic:
+        title: Solar photovoltaic levelized cost of energy
+        display:
+          name: Solar photovoltaic
+          shortUnit: *display-short-unit-usd-per-kwh
+        presentation:
+          title_public: Solar photovoltaic levelized cost of energy
+  solar_photovoltaic_module_prices:
+    title: Solar photovoltaic module prices
+    variables:
+      cost:
+        title: Solar photovoltaic module prices
+        unit: "constant {LATEST_YEAR} US$ per watt"
+        short_unit: "$/W"
+        description_processing: |-
+          - This data is taken from the Renewable Power Generation Costs in 2024 report, the last one to provide a global solar photovoltaic module price index. Later reports discontinued that index (they only provide yearly prices from 2020 onwards, for specific module technologies sold in Europe), so this series ends in 2024.
+          - The data (expressed in constant 2024 US dollars) was converted to constant {LATEST_YEAR} US dollars using the [US GDP deflator (linked series)](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD?locations=US), to account for the effects of US dollar inflation.
+        display:
+          shortUnit: "$"

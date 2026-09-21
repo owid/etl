@@ -40,7 +40,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "js-yaml": "^4.2.0"
+    "js-yaml": "^4.3.1"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
@@ -52,5 +52,11 @@
     "eslint": "^9.39.4",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "brace-expansion@1": "^1.1.16",
+    "brace-expansion@2": "^2.1.2",
+    "brace-expansion@5": "^5.0.7",
+    "shell-quote": "^1.10.0"
   }
 }

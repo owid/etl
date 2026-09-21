@@ -35,30 +35,30 @@ tables:
         unit: ''
         display:
           includeInTable: true
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       num_sequences_cumulative:
         title: num_sequences_cumulative
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       num_sequences_cumulative_per_1m:
         title: num_sequences_cumulative_per_1M
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       num_sequences_per_1m:
         title: num_sequences_per_1M
         unit: ''
         display:
           includeInTable: true
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       variant_dominant:
         title: variant_dominant
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'

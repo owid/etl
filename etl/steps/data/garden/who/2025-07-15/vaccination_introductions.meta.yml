@@ -108,7 +108,7 @@ definitions:
     <%- elif description == "IPV (Inactivated polio vaccine)" %>
     Polio is a highly infectious viral disease. The polio virus invades the nervous system and can cause irreversible paralysis.
     <%- elif description == "Measles-containing vaccine second dose" %>
-    Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhoea, and severe respiratory infections such as pneumonia.
+    Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia.
     <%- elif description == "YF (Yellow fever) vaccine" %>
     Only countries with endemic yellow fever require the vaccine in routine immunization programs. Yellow fever is caused by a mosquito-transmitted virus, symptoms include fever, chills, headache, backache, and muscle ache.
     <%- elif description == "Mumps vaccine" %>
@@ -168,7 +168,7 @@ tables:
     variables:
       countries:
         title: Number of countries that are administering {definitions.vaccine_name}
-        description_short: The number of countries that are administering {definitions.vaccine_name} to either the entire country, regions of the country, adolescents or specific risk groups.
+        description_short: Number of countries that are administering {definitions.vaccine_name} to either the entire country, regions of the country, adolescents or specific risk groups.
         unit: "countries"
         description_key:
           - "{definitions.vaccine_description_key}"

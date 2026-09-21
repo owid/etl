@@ -16,7 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 from owid.catalog.api.models import ResponseSet
 from owid.catalog.api.utils import _loading_data_from_api, session
 from owid.catalog.core.charts import ChartTable, ChartTableMeta
-from owid.catalog.core.meta import Origin, VariableMeta
+from owid.catalog.core.meta import Origin, VariableMeta, description_key_to_string
 
 if TYPE_CHECKING:
     from owid.catalog.api import Client
@@ -376,10 +376,15 @@ def _build_variable_meta(col_info: dict[str, Any]) -> VariableMeta:
         )
         origins.append(origin)
 
+    description_key = col_info.get("descriptionKey")
+    # Metadata written before description_key became a string carries lists.
+    if isinstance(description_key, list):
+        description_key = description_key_to_string(description_key)
+
     return VariableMeta(
         title=col_info.get("titleShort"),
         description_short=col_info.get("descriptionShort"),
-        description_key=col_info.get("descriptionKey", []),
+        description_key=description_key,
         description_processing=col_info.get("descriptionProcessing"),
         unit=col_info.get("unit"),
         short_unit=col_info.get("shortUnit"),

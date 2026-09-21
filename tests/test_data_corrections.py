@@ -2,6 +2,7 @@
 
 import json
 
+import pandas as pd
 import pytest
 import yaml
 from owid.catalog import Table
@@ -29,7 +30,7 @@ def _correction(**overrides):
         "indicator": "value",
         "action": "drop",
         "reason": "Test reason.",
-        "provider": "Test provider.",
+        "producer": "Test producer.",
         "status": "open",
     }
     base.update(overrides)
@@ -97,6 +98,121 @@ def test_override_requires_value():
         _validate_correction(_correction(action="override", match={"value": 10.0}), "<test>")
 
 
+def test_match_column_reference_matches_across_columns():
+    # A `match` value of {column: <name>} compares against another column of the same row instead
+    # of a literal — e.g. dropping a row where two columns happen to hold the same (spurious) value.
+    tb = Table(
+        {
+            "country": ["Belgium", "Belgium", "France"],
+            "year": [2024, 2025, 2025],
+            "barn": [5.0, 3.0, 3.0],
+            "free_range": [5.0, 3.0, 4.0],
+        }
+    )
+    out = apply_corrections(
+        tb,
+        [
+            _correction(
+                indicator="barn",
+                action="drop",
+                match={"country": "Belgium", "year": 2025, "value": {"column": "free_range"}},
+            )
+        ],
+    )
+    assert list(zip(out["country"], out["year"])) == [("Belgium", 2024), ("France", 2025)]
+
+
+def test_match_column_reference_no_match_when_columns_differ():
+    tb = Table({"country": ["Belgium"], "year": [2025], "barn": [5.0], "free_range": [7.0]})
+    with pytest.raises(AssertionError, match="matched no rows"):
+        apply_corrections(
+            tb,
+            [
+                _correction(
+                    indicator="barn",
+                    action="drop",
+                    match={"country": "Belgium", "year": 2025, "value": {"column": "free_range"}},
+                )
+            ],
+        )
+
+
+def test_match_column_reference_missing_column_raises():
+    tb = _make_table()
+    with pytest.raises(KeyError, match="not found"):
+        apply_corrections(tb, [_correction(action="drop", match={"value": {"column": "does_not_exist"}})])
+
+
+def test_validate_rejects_malformed_match_column_reference():
+    from etl.data_corrections import _validate_correction
+
+    with pytest.raises(AssertionError, match="column"):
+        _validate_correction(_correction(action="drop", match={"value": {"col": "free_range"}}), "<test>")
+
+
+def test_validate_rejects_column_reference_as_override_value():
+    from etl.data_corrections import _validate_correction
+
+    with pytest.raises(AssertionError, match="column"):
+        _validate_correction(_correction(action="override", match={"value": 10.0}, value={"column": "other"}), "<test>")
+
+
+def test_load_corrections_accepts_column_reference_match(tmp_path):
+    p = tmp_path / "x.corrections.yml"
+    p.write_text(
+        "- indicator: barn\n"
+        "  match: {country: Belgium, year: 2025, value: {column: free_range}}\n"
+        "  action: drop\n"
+        "  reason: r\n"
+        "  producer: p\n"
+        "  status: open\n"
+    )
+    corrections = load_corrections(p)
+    assert corrections[0]["match"]["value"] == {"column": "free_range"}
+
+
+def test_build_audit_handles_column_reference_match():
+    from etl.data_corrections import build_audit
+
+    tb = Table(
+        {
+            "country": ["Belgium", "France"],
+            "year": [2025, 2025],
+            "barn": [5.0, 3.0],
+            "free_range": [5.0, 4.0],
+        }
+    )
+    records = build_audit(
+        tb,
+        [
+            _correction(
+                indicator="barn",
+                action="drop",
+                match={"country": "Belgium", "year": 2025, "value": {"column": "free_range"}},
+            )
+        ],
+    )
+    assert records[0]["entities"][0]["entity"] == "Belgium"
+
+
+def test_match_ignores_missing_values_in_other_rows():
+    # A `match` correction must not blow up when other rows of the same column hold pandas' NA
+    # sentinel (e.g. a nullable "string" dtype column) — comparing NA to the match target should
+    # read as "no match", not raise `TypeError: boolean value of NA is ambiguous`.
+    tb = Table(
+        {
+            "country": ["Panama", "France", "France"],
+            "year": [2006, 2006, 2016],
+            "value": pd.array(["-1", pd.NA, "Inaccurtae forecasts"], dtype="string"),
+        }
+    )
+    out = apply_corrections(
+        tb,
+        [_correction(action="override", match={"value": "Inaccurtae forecasts"}, value="Inaccurate forecasts")],
+    )
+    assert out.loc[out["country"] == "France", "value"].tolist()[-1] == "Inaccurate forecasts"
+
+
 def test_flag_is_a_noop_on_data():
     tb = _make_table()
     out = apply_corrections(tb, [_correction(action="flag", entity="Panama", years=[2006])])
@@ -124,7 +240,7 @@ def test_load_corrections_validates(tmp_path):
         "  years: [2006]\n"
         "  action: drop\n"
         "  reason: r\n"
-        "  provider: p\n"
+        "  producer: p\n"
         "  status: open\n"
     )
     corrections = load_corrections(p)
@@ -135,7 +251,7 @@ def test_load_corrections_rejects_missing_required_field(tmp_path):
     p = tmp_path / "x.corrections.yml"
     # Missing 'reason'.
     p.write_text(
-        "- indicator: value\n  entity: Panama\n  years: [2006]\n  action: drop\n  provider: p\n  status: open\n"
+        "- indicator: value\n  entity: Panama\n  years: [2006]\n  action: drop\n  producer: p\n  status: open\n"
     )
     with pytest.raises(AssertionError, match="missing required 'reason'"):
         load_corrections(p)
@@ -261,6 +377,26 @@ def test_build_audit_captures_scale_before_after():
     assert ent["affected"] == [[2006, 10.0, 5.0], [2016, 20.0, 10.0]]
 
 
+def test_build_audit_skips_non_integer_year_labels():
+    from etl.data_corrections import build_audit
+
+    # Some tables carry non-integer year labels for rows unrelated to the correction (e.g. a
+    # reporting-period range like "1872-6") — those points should be dropped, not raise.
+    tb = Table(
+        {
+            "country": ["France", "France", "France"],
+            "year": ["1872-6", "2006", "2016"],
+            "value": [5.0, 10.0, 20.0],
+        }
+    )
+    records = build_audit(tb, [_correction(action="scale", factor=0.5, entity="France", years="all")])
+    ent = records[0]["entities"][0]
+    # The "1872-6" row is dropped from both the full series and (since `years: all` also matches it)
+    # the affected points, while the two integer-year rows are kept.
+    assert ent["series"] == [[2006, 10.0], [2016, 20.0]]
+    assert ent["affected"] == [[2006, 10.0, 5.0], [2016, 20.0, 10.0]]
+
+
 def test_audit_path_is_under_data_tree():
     from etl.data_corrections import audit_path_for
     from etl.paths import STEP_DIR
@@ -280,7 +416,7 @@ def test_load_corrections_rejects_both_entity_and_match(tmp_path):
         "  match: {value: 4.5}\n"
         "  action: drop\n"
         "  reason: r\n"
-        "  provider: p\n"
+        "  producer: p\n"
         "  status: open\n"
     )
     with pytest.raises(AssertionError, match="exactly one of"):

@@ -1,11 +1,38 @@
+import hashlib
 import os
-from unittest.mock import patch
+import re
+import shutil
+from unittest.mock import MagicMock, patch
 
+import numpy as np
 import pandas as pd
 import pytest
 from owid.catalog import Dataset, DatasetMeta, Table
+from owid.catalog.core.meta import Origin
 
-from etl.datadiff import DatasetDiff
+from etl.datadiff import (
+    DatasetDiff,
+    RemoteDataset,
+    _changed_include_regex,
+    _changed_records,
+    _dataset_files_match,
+    _diff_lines,
+    _is_code_column,
+    _is_superseded_remote_predecessor,
+    _table_metadata_dict,
+)
+from etl.datadiff_report import (
+    HTML_SAMPLE_ROW_BUDGET,
+    ColumnDiffResult,
+    DatasetDiffResult,
+    DiffReport,
+    TableDiffResult,
+    ValueDiff,
+    _render_value_diff,
+    _tier,
+    _tier_chip,
+    render_html,
+)
 
 
 def _create_datasets(tmp_path):
@@ -68,7 +95,1092 @@ def test_new_data(tmp_path):
         "[white]= Dataset [b]garden/n/v/ds[/b]",
         "\t[white]= Table [b]tab[/b]",
         "\t\t[yellow]~ Dim [b]country[/b]",
-        "\t\t\t\t[violet]+ New values: 1 / 3 (33.33%)\n\t\t\t\t[violet]  country\n\t\t\t\t[violet]       FR",
+        "\t\t\t\t[violet]+ New values: 1 / 3 (33.33%)",
+        "\t\t\t\t[violet]  country",
+        "\t\t\t\t[violet]       FR",
         "\t\t[yellow]~ Column [b]a[/b] (new [u]data[/u], changed [u]data[/u])",
-        "\t\t\t\t[violet]+ New values: 1 / 3 (33.33%)\n\t\t\t\t[violet]  country  a\n\t\t\t\t[violet]       FR  3\n\t\t\t\t[violet]~ Changed values: 1 / 3 (33.33%)\n\t\t\t\t[violet]  country  a -  a +\n\t\t\t\t[violet]       US    3    2",
+        "\t\t\t\t[violet]+ New values: 1 / 3 (33.33%)",
+        "\t\t\t\t[violet]  country  a",
+        "\t\t\t\t[violet]       FR  3",
+        "\t\t\t\t[violet]~ Changed values: 1 / 3 (33.33%)",
+        "\t\t\t\t[violet]  country  a -  a +",
+        "\t\t\t\t[violet]       US    3    2",
     ]
+
+
+@pytest.mark.filterwarnings("ignore:Table `tab` does not have a primary_key")
+@patch.dict(os.environ, {"OWID_STRICT": ""})
+def test_structured_result(tmp_path):
+    """The structured `result` mirrors the printed summary, even without verbose."""
+    ds_a, ds_b = _create_datasets(tmp_path)
+
+    tab_a = Table({"country": ["UK", "US"], "a": [1, 3]}, short_name="tab")
+    tab_b = Table({"country": ["UK", "US", "FR"], "a": [1, 2, 3]}, short_name="tab")
+
+    ds_a.add(tab_a)
+    ds_b.add(tab_b)
+
+    differ = DatasetDiff(ds_a, ds_b, print=lambda x: None, details=True)
+    differ.summary()
+    res = differ.result
+
+    assert res.path == "garden/n/v/ds"
+    assert res.change_kind == "changed"
+
+    (tab,) = res.tables
+    assert tab.kind == "identical"  # table metadata unchanged
+
+    dim = next(c for c in tab.columns if c.is_dim)
+    assert dim.name == "country"
+    assert [v.kind for v in dim.value_diffs] == ["new"]
+
+    col = next(c for c in tab.columns if not c.is_dim)
+    assert col.name == "a"
+    assert col.changes == ["new data", "changed data"]
+    value_diffs = {v.kind: v for v in col.value_diffs}
+    assert value_diffs["new"].count == 1
+    assert value_diffs["new"].total == 3
+    assert value_diffs["new"].sample == [{"country": "FR", "a": "3"}]
+    # Numeric changed samples carry an "anomaly score" (BARD) display column, sorted by it.
+    assert value_diffs["changed"].sample == [{"country": "US", "a -": "3", "a +": "2", "anomaly score": "20%"}]
+    assert value_diffs["changed"].sorted_by_score
+    # 3 -> 2: BARD = |3-2| / (3+2) = 0.2
+    assert value_diffs["changed"].median_bard == pytest.approx(0.2)
+
+    # JSON round-trip
+    report = DiffReport(datasets=[res], skipped_cascade=2)
+    report2 = DiffReport.from_json(report.to_json())
+    assert report2.to_json() == report.to_json()
+    assert report2.n_changed == 1
+    assert report2.n_identical == 0
+    assert report2.status == "changed"
+
+
+def test_changed_records_sorts_numeric_by_change_size():
+    both = pd.DataFrame(
+        {
+            "country": ["small", "big", "from_zero"],
+            "a -": [100.0, 100.0, 0.0],
+            "a +": [101.0, 250.0, 5.0],  # BARD ≈ 0.005, 0.43, 1.0
+        }
+    )
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
+    assert sorted_by_score
+    # Biggest changes (by anomaly score = BARD) first; growth from zero is maximal (score 1).
+    assert [r["country"] for r in records] == ["from_zero", "big", "small"]
+    assert [r["anomaly score"] for r in records] == ["100%", "43%", "0.50%"]
+    # Median BARD across all changed rows: median(0.005, 0.43, 1.0) ≈ 0.43.
+    assert median_bard == pytest.approx(150 / 350, abs=1e-6)
+    assert (appeared, disappeared) == (0, 0)
+
+    # A sample larger than the limit keeps only the biggest movers.
+    top, _, _, _, _, _ = _changed_records(both, "a", limit=2)
+    assert [r["country"] for r in top] == ["from_zero", "big"]
+
+
+def test_changed_records_non_numeric_falls_back_to_random_sample():
+    both = pd.DataFrame({"country": ["UK", "US"], "a -": ["x", "y"], "a +": ["y", "z"]})
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
+    assert not sorted_by_score
+    assert median_bard is None
+    assert (appeared, disappeared) == (0, 0)
+    assert all("anomaly score" not in r for r in records)
+    assert len(records) == 2
+
+
+def test_changed_records_appeared_and_disappeared_excluded_from_score():
+    """A value appearing or disappearing (NaN on one side) is a coverage event, not a revision --
+    e.g. the newest year in a new dataset version, or a slow-cadence indicator's "latest"
+    datapoint shifting to a new year. It's excluded from BARD/the median entirely (not scored 0
+    or 1) and tallied separately, unlike a genuine both-sided revision."""
+    both = pd.DataFrame(
+        {
+            "year": [2022, 2023, 2024],
+            "a -": [10.0, 7.0, float("nan")],
+            "a +": [5.0, float("nan"), 20.0],  # 2022: revised (BARD 1/3); 2023: disappeared; 2024: appeared
+        }
+    )
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
+    assert sorted_by_score
+    labels = {r["year"]: r["anomaly score"] for r in records}
+    assert labels["2022"] == "33%"
+    assert labels["2023"] == "disappeared"
+    assert labels["2024"] == "appeared"
+    # Median is computed only over the one revised row.
+    assert median_bard == pytest.approx(1 / 3, abs=1e-6)
+    assert (appeared, disappeared) == (1, 1)
+    # Revised rows rank first; appeared/disappeared come after regardless of magnitude.
+    assert [r["year"] for r in records][0] == "2022"
+
+
+def test_changed_records_all_appeared_disappeared_score_zero_median():
+    """A column with zero genuine revisions (all changes are coverage churn) scores 0, not the
+    non-numeric fallback of 1 -- otherwise a WDI-style "add a new year" update would still pin
+    every such column's severity to maximal."""
+    both = pd.DataFrame({"year": [2024, 2024], "a -": [float("nan"), float("nan")], "a +": [20.0, 30.0]})
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
+    assert median_bard == 0.0
+    assert (appeared, disappeared) == (2, 0)
+    assert all(r["anomaly score"] == "appeared" for r in records)
+
+
+@pytest.mark.filterwarnings("ignore:Table `tab` does not have a primary_key")
+@patch.dict(os.environ, {"OWID_STRICT": ""})
+def test_new_year_data_not_scored_as_anomaly(tmp_path):
+    """End-to-end WDI-style case: a wide table's row index for the newest year already exists
+    (via another column that has data for it), but this column's own data for that year is new.
+    That should not inflate the column's median anomaly score."""
+    ds_a, ds_b = _create_datasets(tmp_path)
+
+    tab_a = Table({"country": ["US", "US"], "year": [2023, 2024], "a": [10.0, None], "b": [1, 1]}, short_name="tab")
+    tab_b = Table({"country": ["US", "US"], "year": [2023, 2024], "a": [10.0, 20.0], "b": [1, 1]}, short_name="tab")
+
+    ds_a.add(tab_a)
+    ds_b.add(tab_b)
+
+    differ = DatasetDiff(ds_a, ds_b, print=lambda x: None, details=True)
+    differ.summary()
+    res = differ.result
+
+    (tab,) = res.tables
+    col = next(c for c in tab.columns if c.name == "a")
+    (changed,) = [v for v in col.value_diffs if v.kind == "changed"]
+    assert changed.median_bard == 0.0
+
+
+def _changed_col(name, median_bard, is_dim=False):
+    return ColumnDiffResult(
+        name=name,
+        kind="changed",
+        is_dim=is_dim,
+        changes=["changed data"],
+        value_diffs=[ValueDiff(kind="changed", count=10, total=100, median_bard=median_bard)],
+    )
+
+
+def _changed_ds(path, median_bard):
+    return DatasetDiffResult(
+        path=path,
+        kind="identical",
+        tables=[TableDiffResult(name="t", kind="identical", columns=[_changed_col("a", median_bard)])],
+    )
+
+
+def test_severity_tiers():
+    assert _changed_ds("garden/n/v/x", 0.5).tier == "large"
+    assert _changed_ds("garden/n/v/x", 0.05).tier == "moderate"
+    assert _changed_ds("garden/n/v/x", 0.002).tier == "small"
+    assert DatasetDiffResult(path="garden/n/v/x", kind="identical").tier == "none"
+    # Errors and removed datasets are always large.
+    assert DatasetDiffResult(path="garden/n/v/x", kind="identical", error="boom").tier == "large"
+    assert DatasetDiffResult(path="garden/n/v/x", kind="removed").tier == "large"
+
+
+def test_coverage_loss_forces_large_tier():
+    # A dim with removed values = entities that disappeared -> coverage loss -> 🔴, even though
+    # the value change itself is tiny.
+    dim = ColumnDiffResult(
+        name="country",
+        kind="changed",
+        is_dim=True,
+        value_diffs=[
+            ValueDiff(kind="removed", count=2, total=100, sample=[{"country": "Vietnam"}, {"country": "Philippines"}])
+        ],
+    )
+    ds = DatasetDiffResult(
+        path="garden/n/v/x",
+        kind="identical",
+        tables=[TableDiffResult(name="t", kind="identical", columns=[dim, _changed_col("a", 0.001)])],
+    )
+    assert ds.has_coverage_loss
+    assert ds.removed_row_count == 2
+    assert ds.removed_labels == ["Vietnam", "Philippines"]
+    assert ds.tier == "large"
+
+    # The coverage chip is rendered on the dataset summary line, and the rollup tier chip is
+    # colored by the forced 🔴 tier (not the severity-derived 🟡/🟢) so the row matches the
+    # filters -- its count breakdown still reflects the actual column ("a" is "small").
+    html = render_html(DiffReport(datasets=[ds]))
+    assert "row(s) removed" in html
+    assert "Vietnam" in html
+    assert 'class="chip tier large">🟢 1 column(s) changed' in html
+
+
+def test_triage_aids_gate_on_content():
+    # Each triage element renders only when it can discriminate.
+    # (Assert on rendered elements, not bare class names — those always appear in the stylesheet.)
+
+    # One dataset, ONE indicator: nothing to rank — no watch list, no tier strip; chips only.
+    tiny = DiffReport(datasets=[_changed_ds("garden/n/v/a", 0.5)])
+    html_tiny = render_html(tiny)
+    assert "Top changes" not in html_tiny
+    assert '<div class="tier-strip">' not in html_tiny
+    assert "anomaly score" in html_tiny
+
+    # One dataset, MANY indicators: the Indicators list ranks them (that's where it helps most),
+    # but the singleton Datasets sub-list and the "Of the 1 dataset" strip stay hidden.
+    many_cols = DiffReport(
+        datasets=[
+            DatasetDiffResult(
+                path="garden/n/v/wide",
+                kind="identical",
+                tables=[
+                    TableDiffResult(
+                        name="t",
+                        kind="identical",
+                        columns=[_changed_col(f"c{i}", 0.5 - i * 0.1) for i in range(4)],
+                    )
+                ],
+            )
+        ]
+    )
+    html_many = render_html(many_cols)
+    assert ">Indicators<" in html_many
+    assert ">Datasets<" not in html_many
+    assert '<div class="tier-strip">' not in html_many
+
+    big = DiffReport(datasets=[_changed_ds(f"garden/n/v/d{i}", 0.5 - i * 0.1) for i in range(4)])
+    html_big = render_html(big)
+    assert "Top changes" in html_big
+    assert '<div class="tier-strip">' in html_big
+    # Watch-list entries link to the column detail blocks (anchor present in both places).
+    assert 'href="#c-garden-n-v-d0-t-a"' in html_big
+    assert 'id="c-garden-n-v-d0-t-a"' in html_big
+    # Both perspectives: a Datasets sub-list (linking to dataset blocks) and an Indicators one.
+    assert ">Datasets<" in html_big and ">Indicators<" in html_big
+    assert 'href="#d-garden-n-v-d0"' in html_big
+    assert 'id="d-garden-n-v-d0"' in html_big
+
+
+def test_filter_attributes():
+    # The filter box matches on names only, via data-search (path + tables + changed columns);
+    # data-tier feeds the tier dropdown.
+    ds = _changed_ds("garden/n/v/a", 0.5)
+    html = render_html(DiffReport(datasets=[ds]))
+    assert 'data-search="garden/n/v/a t a"' in html
+    assert 'data-tier="large"' in html
+    assert 'id="match-count"' in html
+    # No identical datasets -> the show-identical toggle is dropped entirely; a single tier ->
+    # the tier dropdown is dropped too (a filter with one choice is dead weight).
+    assert 'id="show-identical"' not in html
+    assert 'id="tier-filter"' not in html
+
+    # With identical datasets, the toggle carries the count so its effect is discoverable; with
+    # two tiers present, the dropdown appears offering exactly those (with counts).
+    mixed = DiffReport(
+        datasets=[
+            ds,
+            _changed_ds("garden/n/v/b", 0.05),
+            DatasetDiffResult(path="garden/n/v/same", kind="identical"),
+        ]
+    )
+    html_mixed = render_html(mixed)
+    assert "show 1 identical dataset<" in html_mixed
+    assert 'id="tier-filter"' in html_mixed
+    assert "all dataset tiers" in html_mixed
+    assert "🔴 large (1)" in html_mixed and "🟡 moderate (1)" in html_mixed
+    assert "🟢 small" not in html_mixed.split('id="tier-filter"')[1].split("</select>")[0]
+
+    # The indicator tier dropdown follows the same rules, counting non-dim changed columns;
+    # column blocks carry data-tier for it to filter on.
+    assert 'id="ind-tier-filter"' in html_mixed
+    assert "all indicator tiers" in html_mixed
+    assert '<div class="col changed" id="c-garden-n-v-a-t-a" data-tier="large">' in html_mixed
+    # Single-tier report -> no indicator dropdown either.
+    assert 'id="ind-tier-filter"' not in html
+
+
+def test_top_changes_show_more():
+    # 12 changed datasets: the Datasets watch list shows 10 and hides 2 behind "show 2 more";
+    # 12 indicators fit within the visible limit (15), so only one toggle renders.
+    report = DiffReport(datasets=[_changed_ds(f"garden/n/v/d{i:02d}", 0.9 - i * 0.01) for i in range(12)])
+    html = render_html(report)
+    assert html.count('<button class="show-more"') == 1
+    assert 'data-more="2">show 2 more</button>' in html
+    # The hidden entries carry the extra class and are the lowest-ranked ones.
+    assert html.count('<li class="extra">') == 2
+    assert 'class="extra"><span class="ti">🔴</span> <a href="#d-garden-n-v-d11"' in html
+
+
+def test_headline_counts_datasets():
+    one = DiffReport(datasets=[_changed_ds("garden/n/v/a", 0.5)])
+    assert "❌ Found differences in the compared dataset" in render_html(one)
+
+    mixed = DiffReport(
+        datasets=[
+            _changed_ds("garden/n/v/a", 0.5),
+            DatasetDiffResult(path="garden/n/v/b", kind="identical"),
+        ]
+    )
+    assert "❌ Found differences in 1 of 2 compared datasets" in render_html(mixed)
+
+    clean = DiffReport(datasets=[DatasetDiffResult(path="garden/n/v/b", kind="identical")])
+    assert "✅ No differences found in the compared dataset" in render_html(clean)
+
+    all_changed = DiffReport(datasets=[_changed_ds(f"garden/n/v/d{i}", 0.5) for i in range(3)])
+    assert "❌ Found differences in all 3 compared datasets" in render_html(all_changed)
+
+
+def test_top_changes_lists_data_losses_first():
+    # A dataset that lost rows (removed dim values) plus bigger-magnitude changed datasets:
+    # the loss entry must lead the watch list and say explicitly that data points are gone.
+    dim = ColumnDiffResult(
+        name="country",
+        kind="changed",
+        is_dim=True,
+        value_diffs=[ValueDiff(kind="removed", count=111, total=1000, sample=[{"country": "Low-income countries"}])],
+    )
+    lossy = DatasetDiffResult(
+        path="garden/n/v/lossy",
+        kind="identical",
+        tables=[TableDiffResult(name="t", kind="identical", columns=[dim, _changed_col("a", 0.02)])],
+    )
+    others = [_changed_ds(f"garden/n/v/d{i}", 0.9) for i in range(3)]
+    html = render_html(DiffReport(datasets=[*others, lossy]))
+
+    assert "lost 111 data point(s): Low-income countries" in html
+    # The loss entry leads the Indicators list, even though other datasets have larger changes.
+    ind_start = html.index(">Indicators<")
+    assert html.index("lossy", ind_start) < html.index("garden/n/v/d0", ind_start)
+    # And the lossy dataset (🔴 via coverage loss) leads the Datasets list despite its small severity.
+    ds_start = html.index(">Datasets<")
+    assert html.index("lossy", ds_start) < html.index("garden/n/v/d0", ds_start)
+
+
+def test_report_sorts_by_severity():
+    """Datasets, tables and columns render biggest-differences-first."""
+
+    col = _changed_col
+
+    # Table/column order in the model is deliberately "small change first".
+    ds_small = DatasetDiffResult(
+        path="garden/n/v/small",
+        kind="identical",
+        tables=[TableDiffResult(name="t", kind="identical", columns=[col("a", 0.01)])],
+    )
+    ds_big = DatasetDiffResult(
+        path="garden/n/v/big",
+        kind="identical",
+        tables=[
+            TableDiffResult(name="minor", kind="identical", columns=[col("x", 0.05)]),
+            TableDiffResult(name="major", kind="identical", columns=[col("tiny", 0.02), col("huge", 0.9)]),
+        ],
+    )
+    html = render_html(DiffReport(datasets=[ds_small, ds_big]))
+
+    # Dataset with the biggest change first.
+    assert html.index("garden/n/v/big") < html.index("garden/n/v/small")
+    # Within a dataset, the most-changed table first; within a table, the most-changed column
+    # first. (Match the rendered markup, not bare names — those also occur in data-search attrs.)
+    assert html.index("Table <b>major</b>") < html.index("Table <b>minor</b>")
+    assert html.index("major.huge") < html.index("major.tiny")
+    # Severity levels: dataset takes the max of its tables.
+    assert ds_big.severity == pytest.approx(0.9)
+    assert ds_small.severity == pytest.approx(0.01)
+
+
+@pytest.mark.filterwarnings("ignore:Table `tab` does not have a primary_key")
+@patch.dict(os.environ, {"OWID_STRICT": ""})
+def test_dataset_files_match_covers_metadata(tmp_path):
+    """The checksum-cascade fast path must not skip datasets whose table metadata changed."""
+    ds_a, _ = _create_datasets(tmp_path)
+    tab = Table({"country": ["UK"], "a": [1]}, short_name="tab")
+    ds_a.add(tab)
+
+    # "remote" is a frozen copy of the dataset as currently published
+    remote_dir = tmp_path / "remote"
+    shutil.copytree(ds_a.path, remote_dir)
+    ds_remote = RemoteDataset(ds_a.metadata, ["tab"])
+
+    def fake_head(url, timeout=None):
+        resp = MagicMock()
+        remote_file = remote_dir / url.rsplit("/", 1)[1]
+        if remote_file.exists():
+            resp.status_code = 200
+            resp.headers = {"ETag": f'"{hashlib.md5(remote_file.read_bytes()).hexdigest()}"'}
+        else:
+            resp.status_code = 404
+            resp.headers = {}
+        return resp
+
+    with patch("etl.datadiff.http_session.head", side_effect=fake_head):
+        # nothing changed -> skip is allowed
+        assert _dataset_files_match(ds_a, ds_remote)
+
+        # metadata-only change (feather untouched) -> must NOT be skipped
+        meta_json = tmp_path / "catalog_a" / "ds" / "tab.meta.json"
+        meta_json.write_text(meta_json.read_text().replace("{", '{"description": "new", ', 1))
+        assert not _dataset_files_match(ds_a, ds_remote)
+
+
+@pytest.mark.filterwarnings("ignore:Table `tab` does not have a primary_key")
+@patch.dict(os.environ, {"OWID_STRICT": ""})
+def test_render_html(tmp_path):
+    ds_a, ds_b = _create_datasets(tmp_path)
+
+    tab_a = Table({"country": ["UK", "US"], "a": [1, 3]}, short_name="tab")
+    tab_b = Table({"country": ["UK", "US", "FR"], "a": [1, 2, 3]}, short_name="tab")
+
+    ds_a.add(tab_a)
+    ds_b.add(tab_b)
+
+    differ = DatasetDiff(ds_a, ds_b, print=lambda x: None, details=True)
+    differ.summary()
+
+    html = render_html(DiffReport(datasets=[differ.result], skipped_cascade=2))
+
+    assert "❌ Found differences" in html
+    assert "garden/n/v/ds" in html
+    assert "Changed values" in html
+    # old/new sample values are rendered in the table
+    assert ">US<" in html
+    assert "2 more dataset(s) skipped" in html
+
+
+def test_sample_note_in_header():
+    # Truncated samples announce it up front, in the header line — not below the table.
+    col = ColumnDiffResult(
+        name="a",
+        kind="changed",
+        changes=["changed data"],
+        value_diffs=[
+            ValueDiff(
+                kind="changed",
+                count=18479,
+                total=119537,
+                sample=[{"country": "FR", "a -": "1", "a +": "2", "anomaly score": "33%"}],
+                sorted_by_score=True,
+                median_bard=0.2,
+            )
+        ],
+    )
+    ds = DatasetDiffResult(
+        path="garden/n/v/x", kind="identical", tables=[TableDiffResult(name="t", kind="identical", columns=[col])]
+    )
+    html = render_html(DiffReport(datasets=[ds]))
+    assert '(15.46%) <span class="head-note">— showing the 1 most anomalous rows</span>' in html
+
+
+def test_metadata_only_changes_are_not_tiered():
+    # A metadata-only change is not an anomaly: no tier, no score chip, no tier-strip count —
+    # it surfaces as "metadata-only" instead.
+    meta_only = DatasetDiffResult(
+        path="garden/n/v/meta",
+        kind="identical",
+        tables=[
+            TableDiffResult(
+                name="t",
+                kind="identical",
+                columns=[
+                    ColumnDiffResult(name="a", kind="changed", changes=["changed metadata"], meta_diff="- x\n+ y")
+                ],
+            )
+        ],
+    )
+    assert meta_only.change_kind == "changed"
+    assert meta_only.severity == 0.0
+    assert meta_only.tier == "none"
+
+    others = [_changed_ds(f"garden/n/v/d{i}", 0.5) for i in range(3)]
+    html = render_html(DiffReport(datasets=[*others, meta_only]))
+    # Strip total matches the headline (4 differing datasets) and lists the metadata-only one.
+    assert "Of the 4 datasets with differences" in html
+    assert "📝 1 metadata-only" in html
+    # The watch list labels it honestly instead of a 0% anomaly score.
+    assert "metadata-only changes" in html
+    # Its dataset row carries no score chip and a filterable "meta" category, which both
+    # dropdowns offer as an option.
+    assert 'data-tier="meta" data-search="garden/n/v/meta t a"' in html
+    assert html.count('<option value="meta">📝 metadata-only (1)</option>') == 2
+
+
+def test_structural_changes_are_not_metadata_only():
+    # A removed column is coverage loss (🔴) — classifying it "meta" would let the tier filter
+    # hide it. Added/removed tables and columns carry no value_diffs but are structural.
+    removed_col = DatasetDiffResult(
+        path="garden/n/v/dropped_col",
+        kind="identical",
+        tables=[
+            TableDiffResult(
+                name="t",
+                kind="identical",
+                columns=[ColumnDiffResult(name="gone", kind="removed")],
+            )
+        ],
+    )
+    assert not removed_col.is_metadata_only
+    assert removed_col.has_coverage_loss
+    assert removed_col.tier == "large"
+    html = render_html(DiffReport(datasets=[removed_col]))
+    assert 'data-tier="large"' in html
+    assert 'data-tier="meta"' not in html
+
+    new_table = DatasetDiffResult(
+        path="garden/n/v/new_table",
+        kind="identical",
+        tables=[TableDiffResult(name="extra", kind="new", columns=[ColumnDiffResult(name="a", kind="new")])],
+    )
+    assert not new_table.is_metadata_only
+
+
+def _sampled_ds(path, n_diffs, rows_per_diff):
+    sample = [{"country": f"c{i}", "year": "2020", "x -": "1", "x +": "2"} for i in range(rows_per_diff)]
+    cols = [
+        ColumnDiffResult(
+            name=f"col{j}",
+            kind="changed",
+            changes=["changed data"],
+            value_diffs=[ValueDiff(kind="changed", count=rows_per_diff, total=10_000, sample=list(sample))],
+        )
+        for j in range(n_diffs)
+    ]
+    return DatasetDiffResult(
+        path=path, kind="identical", tables=[TableDiffResult(name="t", kind="identical", columns=cols)]
+    )
+
+
+def test_html_sample_rows_capped_on_huge_reports():
+    # 1,200 value diffs x 100 rows = 120,000 sampled rows — over the budget, so each diff
+    # renders only its first rows with an explicit note.
+    report = DiffReport(datasets=[_sampled_ds(f"garden/n/v/ds{i}", n_diffs=120, rows_per_diff=100) for i in range(10)])
+    html = render_html(report)
+    per_diff = max(5, HTML_SAMPLE_ROW_BUDGET // 1200)
+    assert "of 100 sampled — display capped" in html
+    # The first rows survive, anything past the cap is dropped.
+    assert ">c0<" in html
+    assert f">c{per_diff - 1}<" in html
+    assert f">c{per_diff}<" not in html
+
+    # A small report keeps its full samples, with no cap note.
+    small = DiffReport(datasets=[_sampled_ds("garden/n/v/small", n_diffs=2, rows_per_diff=100)])
+    small_html = render_html(small)
+    assert "display capped" not in small_html
+    assert "c99" in small_html
+
+
+def _wdi_like_origin(i, version_producer="124", date_accessed="2026-02-27"):
+    """An origin shaped like WDI's: same title/title_snapshot and a giant shared description
+    across every one of a dataset's ~1500 origins (one per indicator), but a distinct
+    producer/url_main per indicator."""
+    return Origin(
+        producer=f"Producer {i % 5}",
+        title="World Development Indicators",
+        title_snapshot=None,
+        description="shared boilerplate " * 50,
+        citation_full=f"Citation for indicator {i}",
+        url_main=f"https://example.org/indicator/{i}",
+        version_producer=version_producer,
+        date_accessed=date_accessed,
+    )
+
+
+def _table_with_origins(origins):
+    tb = Table(pd.DataFrame({f"col{i}": [1, 2, 3] for i in range(len(origins))}))
+    tb.metadata.dataset = DatasetMeta(title="x", short_name="x")
+    tb.metadata.short_name = "test"
+    for i, origin in enumerate(origins):
+        tb[f"col{i}"].metadata.origins = [origin]
+    return tb
+
+
+def test_table_metadata_diff_stays_small_when_only_a_few_origin_fields_change():
+    # Regression test for a huge (tens-of-thousands-of-lines) table metadata diff on datasets
+    # like WDI, where every column's origin shares the same title/title_snapshot (only
+    # producer/url_main differ per indicator). The old origin sort key `(title, title_snapshot)`
+    # was then a no-op tied to `set()`'s arbitrary iteration order, so two independently-built
+    # tables serialized their origins in unrelated orders and the line-level diff saw the whole
+    # list as reshuffled: every origin — including unchanged fields like the shared description —
+    # rendered as removed+added instead of just the couple of lines that actually changed.
+    n = 50
+    origins_a = [_wdi_like_origin(i) for i in range(n)]
+    # Only version_producer/date_accessed actually changed; simulate a differently-ordered
+    # `set()` iteration (e.g. from a different column order) by shuffling before sorting.
+    origins_b = [Origin(**{**o.to_dict(), "version_producer": "125", "date_accessed": "2026-07-14"}) for o in origins_a]
+    origins_b_shuffled = list(reversed(origins_b))
+
+    tab_a = _table_with_origins(origins_a)
+    tab_b = _table_with_origins(origins_b_shuffled)
+
+    diff_lines = _diff_lines(_table_metadata_dict(tab_a), _table_metadata_dict(tab_b))
+
+    # Only the couple of genuinely-changed scalar fields per origin should show up, not the shared
+    # description/citation/producer boilerplate. With the old sort key (tied on title/title_snapshot
+    # alone) this same input renders ~1,500 lines (every origin fully replaced); a content-based
+    # sort keeps it near the true minimum of 2 fields x 50 origins x 2 (old+new) = 200 lines.
+    assert len(diff_lines) < 250
+    assert not any("shared boilerplate" in line for line in diff_lines)
+    assert not any("Citation for indicator" in line for line in diff_lines)
+
+
+def test_changed_include_regex_does_not_match_paths_as_substrings():
+    # Regression test: a bare `"|".join(catalog_paths)` regex lets one changed dataset's
+    # short_name match as a *prefix* of another, unrelated dataset's short_name — e.g.
+    # "wb/2026-07-01/income_groups" (a real dependency pulled in by --changed) matching inside
+    # ".../income_groups_aggregations" (an untouched, unrelated dataset). That sweeps the
+    # unrelated dataset into the comparison scope, and since it's not actually part of the
+    # changed set (and often isn't built locally either), `etl diff` reports it as falsely
+    # "removed".
+    catalog_paths = ["garden/worldbank_wdi/2026-07-14/wdi", "garden/wb/2026-07-01/income_groups"]
+    # The local catalog matches against the full absolute directory path, not the bare
+    # "channel/namespace/version/short_name" the remote catalog uses — the regex must match both.
+    local_dir = "/repo/data/garden/wb/2026-07-01/income_groups"
+    local_dir_unrelated = "/repo/data/garden/wb/2026-07-01/income_groups_aggregations"
+
+    # No user-supplied --include: the regex is the bare catalog-paths list.
+    pattern = _changed_include_regex(None, catalog_paths)
+    assert re.search(pattern, "garden/wb/2026-07-01/income_groups")
+    assert not re.search(pattern, "garden/wb/2026-07-01/income_groups_aggregations")
+    assert re.search(pattern, local_dir)
+    assert not re.search(pattern, local_dir_unrelated)
+
+    # With a user-supplied --include, both conditions must hold: the path matches --include AND
+    # is one of the changed catalog paths.
+    pattern_with_include = _changed_include_regex("garden", catalog_paths)
+    assert re.search(pattern_with_include, "garden/wb/2026-07-01/income_groups")
+    assert not re.search(pattern_with_include, "garden/wb/2026-07-01/income_groups_aggregations")
+    # A path that matches --include but isn't a changed catalog path is still excluded.
+    assert not re.search(pattern_with_include, "garden/other/2020-01-01/unrelated")
+    # A changed catalog path that doesn't match --include (wrong channel) is excluded too.
+    meadow_only = _changed_include_regex(
+        "garden", ["garden/worldbank_wdi/2026-07-14/wdi", "meadow/wb/2026-07-01/income_groups"]
+    )
+    assert not re.search(meadow_only, "meadow/wb/2026-07-01/income_groups")
+
+
+def test_diff_lines_wraps_long_lines_so_a_trailing_change_stays_small():
+    # Regression test: a long single-line YAML string (e.g. a producer `citation_full`, which
+    # `yaml_dump`'s own `width` doesn't wrap — that only applies to folded/plain scalars, not
+    # literal block scalars) that differs only in its last few words used to make the *entire*
+    # line register as changed, duplicating the whole paragraph in both the removed and added
+    # sides. A single such boilerplate citation repeated across WDI's ~1,500 origins, each only
+    # differing in a trailing "Accessed on <date>", is what blew the table metadata diff up to
+    # megabytes. Wrapping before the line-level diff keeps only the truly-changed chunk.
+    boilerplate = "AQUASTAT - FAO's Global Information System on Water and Agriculture, " * 3
+    old = {"citation_full": f"{boilerplate}Accessed on 2026-02-27."}
+    new = {"citation_full": f"{boilerplate}Accessed on 2026-07-14."}
+
+    diff_lines = _diff_lines(old, new)
+
+    assert len(diff_lines) == 2
+    assert not any("Global Information System" in line for line in diff_lines)
+    assert any("2026-02-27" in line for line in diff_lines)
+    assert any("2026-07-14" in line for line in diff_lines)
+
+
+def test_is_superseded_remote_predecessor():
+    # Regression test (caught in review): a changed dataset's predecessor version is added to the
+    # shared --include filter so the REMOTE fetch includes it (`_match_dataset` then falls back to
+    # it when diffing the new local version against something). But the predecessor's own path is
+    # *also* a key of path_to_ds_a (from REMOTE) and would otherwise get its own entry in the
+    # union-of-keys comparison loop. If it isn't *also* built locally — the normal case when only
+    # the new version was run — comparing it against nothing reports it as a false "removed
+    # dataset", reintroducing the exact bug this scoping exists to avoid.
+    new_only_locally = {"garden/worldbank_wdi/2026-07-14/wdi": object()}
+
+    # The predecessor isn't built locally, but a newer version of the same dataset is: it's
+    # reachable as _match_dataset's fallback for that newer path and needs no standalone entry.
+    assert _is_superseded_remote_predecessor("garden/worldbank_wdi/2026-02-27/wdi", new_only_locally)
+
+    # The predecessor *is* also built locally: it gets its own (normal, exact-match) comparison,
+    # so it must not be suppressed.
+    both_built_locally = {**new_only_locally, "garden/worldbank_wdi/2026-02-27/wdi": object()}
+    assert not _is_superseded_remote_predecessor("garden/worldbank_wdi/2026-02-27/wdi", both_built_locally)
+
+    # A genuinely removed dataset (no newer local version of the same channel/namespace/short_name
+    # exists at all) must still be reported as removed, not silently suppressed.
+    assert not _is_superseded_remote_predecessor("garden/worldbank_wdi/2026-02-27/wdi", {})
+    assert not _is_superseded_remote_predecessor(
+        "garden/worldbank_wdi/2026-02-27/wdi", {"garden/other/2024-01-01/other": object()}
+    )
+
+
+def test_numeric_column_with_sentinel_is_scored():
+    """A numeric column carrying a non-numeric sentinel must still be scored on its numeric rows.
+
+    Real case: `imf/trade.china_imports_share_of_gdp` stores the literal string "China" on
+    China's own rows (the ratio is meaningless there), which makes the whole column `category`
+    dtype. A dtype-only gate sent it to the unscoreable path, where severity defaults to 1.0 —
+    so a column whose genuine revisions were ~0.3% was reported as the worst anomaly (100%) in
+    the whole diff, above real 1.6% changes.
+    """
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001, 2002, 2003],
+            "a -": pd.Categorical(["0.7529", "0.8127", "China", "2.4390"]),
+            "a +": pd.Categorical(["0.7627", "0.8027", "China", "2.4305"]),
+        }
+    )
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
+
+    assert sorted_by_score, "a sentinel-carrying numeric column should be score-sorted like any numeric one"
+    assert median_bard is not None, "severity must be measured, not the non-numeric 1.0 fallback"
+    assert median_bard < 0.01, f"tiny revisions should score near zero, got {median_bard}"
+    # The sentinel rows coerce to NaN on both sides, so they are neither revisions nor coverage events.
+    assert (appeared, disappeared) == (0, 0)
+    assert len(records) == 4
+
+
+def test_genuinely_categorical_column_stays_unscored():
+    """A column with no numeric content at all keeps the unscoreable path (median_bard None),
+    so the report labels it "not scored" rather than inventing a number."""
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.Categorical(["estimate", "estimate"]),
+            "a +": pd.Categorical(["projection", "projection"]),
+        }
+    )
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
+
+    assert not sorted_by_score
+    assert median_bard is None
+    assert (appeared, disappeared) == (0, 0)
+    assert len(records) == 2
+
+
+def test_unscored_column_reports_not_scored_instead_of_100_percent():
+    """The 1.0 severity fallback must not be rendered as a measured "median anomaly score 100%"."""
+    categorical = ColumnDiffResult(
+        name="status",
+        kind="changed",
+        changes=["changed data"],
+        value_diffs=[ValueDiff(kind="changed", count=2, total=2, median_bard=None)],
+    )
+    numeric = ColumnDiffResult(
+        name="gdp",
+        kind="changed",
+        changes=["changed data"],
+        value_diffs=[ValueDiff(kind="changed", count=2, total=2, median_bard=1.0)],
+    )
+
+    assert not categorical.is_scored
+    assert numeric.is_scored
+
+    chip = _tier_chip(categorical.severity, categorical.kind, scored=categorical.is_scored)
+    assert "not scored" in chip and "100%" not in chip
+    # A genuine, measured 100% still says so.
+    assert "median anomaly score 100%" in _tier_chip(numeric.severity, numeric.kind, scored=numeric.is_scored)
+
+
+def test_sentinel_to_sentinel_row_is_not_counted_as_coverage():
+    """A row that is non-numeric on both sides is neither a revision nor a coverage event.
+
+    A sentinel whose text changes ("China" -> "n/a"), or a gap filled with a sentinel, coerces to
+    NaN on both sides. Nothing numeric appeared, disappeared or moved, so the row must not be
+    labeled "disappeared" in the sample while `disappeared_count` stays zero.
+    """
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001, 2002, 2003],
+            "a -": pd.Categorical(["0.7529", "China", "1.5000", None]),
+            "a +": pd.Categorical(["0.7627", "n/a", "China", "China"]),
+        }
+    )
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
+
+    assert sorted_by_score
+    assert median_bard is not None and median_bard < 0.01
+    # Only the numeric-to-sentinel row (1.5 -> "China") is a genuine coverage loss.
+    assert (appeared, disappeared) == (0, 1)
+    labels = sorted(r["anomaly score"] for r in records)
+    assert labels == ["0.65%", "disappeared", "not scored", "not scored"], labels
+
+
+def test_column_scored_when_only_one_side_is_numeric():
+    """Numeric content on either side is enough — a whole side can legitimately be sentinels.
+
+    `both` holds only the rows that changed, so a version that drops (or introduces) a sentinel
+    convention changes exactly the sentinel rows: one side is then entirely non-numeric. Judging
+    that side on its own would call the indicator categorical and give it maximal severity — the
+    failure the coercion exists to remove. It is a pure coverage event and scores as one.
+    """
+    dropped_sentinel = pd.DataFrame(
+        {
+            "year": [2000, 2001, 2002],
+            "a -": pd.Categorical(["China", "China", "China"]),
+            "a +": pd.Categorical(["0.7529", "0.8127", "2.4390"]),
+        }
+    )
+    records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(dropped_sentinel, "a")
+    assert sorted_by_score
+    assert median_bard == 0.0, "no revisions to score, but that is a measured zero, not the 1.0 fallback"
+    assert (appeared, disappeared) == (3, 0)
+    assert all(r["anomaly score"] == "appeared" for r in records)
+
+    # And the mirror image: numbers replaced by a sentinel is a coverage loss.
+    added_sentinel = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.Categorical(["1.5000", "2.5000"]),
+            "a +": pd.Categorical(["China", "China"]),
+        }
+    )
+    _, sorted_by_score, median_bard, appeared, disappeared, _ = _changed_records(added_sentinel, "a")
+    assert sorted_by_score and median_bard == 0.0
+    assert (appeared, disappeared) == (0, 2)
+
+
+def test_zero_padded_codes_stay_unscored():
+    """Identifiers that only look numeric must not be parsed into quantities.
+
+    Meadow tables carry ISO numeric country codes and the like as strings. Coercing them would
+    report "004" -> "008" as a BARD anomaly, so a column holding any zero-padded value is treated
+    as a code column — including the values in it that happen to need no padding.
+    """
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.Categorical(["004", "100"]),
+            "a +": pd.Categorical(["008", "112"]),
+        }
+    )
+    _, sorted_by_score, median_bard, appeared, disappeared, _ = _changed_records(both, "a")
+    assert not sorted_by_score
+    assert median_bard is None
+    assert (appeared, disappeared) == (0, 0)
+
+    # Decimals below one are not zero-padding: a real quantity keeps its score.
+    decimals = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.Categorical(["0.7500", "0"]),
+            "a +": pd.Categorical(["0.8000", "0.1"]),
+        }
+    )
+    _, sorted_by_score, median_bard, _, _, _ = _changed_records(decimals, "a")
+    assert sorted_by_score and median_bard is not None
+
+
+def test_code_column_classified_on_full_column_not_changed_rows():
+    """The padded codes proving a column is coded may all sit on rows that didn't change.
+
+    `both` holds only changed rows, so if "004" stays "004" and only "100" -> "112" moves, the
+    frame carries no evidence of coding at all. `_is_code_column` therefore reads the full column
+    and the verdict is passed in.
+    """
+    full_column = pd.Series(pd.Categorical(["004", "100"]))
+    assert _is_code_column(full_column)
+    assert not _is_code_column(pd.Series(pd.Categorical(["0.75", "China"])))
+    assert not _is_code_column(pd.Series([0.75, 1.25]))
+
+    both = pd.DataFrame({"year": [2001], "a -": pd.Categorical(["100"]), "a +": pd.Categorical(["112"])})
+    # Without the full-column verdict the changed rows look like a plain quantity.
+    assert _changed_records(both, "a")[1:] == (True, pytest.approx(0.0566, abs=1e-3), 0, 0, 0)
+    assert _changed_records(both, "a", is_code_column=True)[1:] == (False, None, 0, 0, 0)
+
+
+def test_infinities_are_treated_as_sentinels_not_scored():
+    """An infinity must not poison the column's median and drop it out of the report.
+
+    `pd.to_numeric` parses "Inf", and a float column can hold one outright. BARD returns NaN for
+    it, `median_bard` becomes NaN, and `_tier` reads NaN as no tier — so the column silently loses
+    its chip and its place in the watch list. Infinities are blanked to NaN and handled like any
+    other unmeasurable value instead.
+    """
+    for side in (pd.Categorical(["Inf", "2.0"]), [float("inf"), 2.0]):
+        both = pd.DataFrame({"year": [2000, 2001], "a -": side, "a +": [1.0, 2.5]})
+        records, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(both, "a")
+        assert sorted_by_score
+        assert median_bard == pytest.approx(0.1111, abs=1e-3), "the median must come from the finite revision only"
+        assert (appeared, disappeared) == (1, 0)
+        assert not any("nan" in r["anomaly score"] for r in records)
+        assert _tier(median_bard) != "none"
+
+
+def test_non_numeric_dtypes_stay_unscored():
+    """A dtype that can't hold a number at all keeps the unscoreable path."""
+    both = pd.DataFrame(
+        {
+            "year": [2000, 2001],
+            "a -": pd.to_datetime(["2000-01-01", "2001-01-01"]),
+            "a +": pd.to_datetime(["2000-02-01", "2001-02-01"]),
+        }
+    )
+    _, sorted_by_score, median_bard, appeared, disappeared, _ = _changed_records(both, "a")
+    assert not sorted_by_score
+    assert median_bard is None
+    assert (appeared, disappeared) == (0, 0)
+
+
+def test_coverage_only_numeric_column_is_still_scored():
+    """A numeric column with only removed rows has a measured severity, so it is not "not scored".
+
+    Its `value_diffs` hold no `changed` entry at all; the absence of one is not evidence that the
+    column is categorical, and its severity (the share of rows lost) was measured, not defaulted.
+    """
+    coverage_only = ColumnDiffResult(
+        name="gdp",
+        kind="changed",
+        changes=["changed data"],
+        value_diffs=[ValueDiff(kind="removed", count=1, total=4)],
+    )
+
+    assert coverage_only.is_scored
+    chip = _tier_chip(coverage_only.severity, coverage_only.kind, scored=coverage_only.is_scored)
+    assert "not scored" not in chip
+
+
+def test_sentinel_only_edit_keeps_the_column_numeric():
+    """Editing the sentinel of a numeric column must not reclassify the column as categorical.
+
+    If the numeric rows are unchanged, the only changed row is `"China" -> "N/A"` and `both` holds
+    no number on either side — yet the full columns prove the indicator is numeric-with-sentinels.
+    Without that verdict the column takes the 1.0 fallback and tops the report.
+    """
+    both = pd.DataFrame({"year": [2000], "a -": pd.Categorical(["China"]), "a +": pd.Categorical(["N/A"])})
+
+    assert _changed_records(both, "a")[1:] == (False, None, 0, 0, 0)
+
+    _, sorted_by_score, median_bard, appeared, disappeared, not_scored = _changed_records(
+        both, "a", is_numeric_column=True
+    )
+    assert sorted_by_score
+    assert median_bard == 0.0, "no revision to score, but not the maximal fallback either"
+    assert (appeared, disappeared, not_scored) == (0, 0, 1)
+
+
+def test_breakdown_counts_not_scored_rows_separately():
+    """The HTML breakdown must agree with the row labels rather than inferring revisions.
+
+    Deriving revised as `count - appeared - disappeared` counted the not-scored rows as revisions.
+    """
+    v = ValueDiff(
+        kind="changed", count=4, total=10, median_bard=0.05, appeared_count=0, disappeared_count=1, not_scored_count=2
+    )
+    breakdown = re.search(r"\((\d[^)]*)\)</span>", _render_value_diff(v))
+    assert breakdown and breakdown.group(1) == "1 revised, 1 disappeared, 2 not scored"
+
+    # Nothing left to revise: the "0 revised" bit is dropped rather than printed.
+    only_sentinels = ValueDiff(kind="changed", count=2, total=10, median_bard=0.0, not_scored_count=2)
+    breakdown = re.search(r"\((\d[^)]*)\)</span>", _render_value_diff(only_sentinels))
+    assert breakdown and breakdown.group(1) == "2 not scored"
+
+
+def test_sentinel_only_dataset_is_not_summarized_as_new_data():
+    """A dataset whose only change is an edited sentinel added nothing, so don't say it did.
+
+    Such a change scores zero on both the anomaly and the coverage axis, which used to drop it
+    into the "new data only" bucket in the summary strip and the dataset watch list.
+    """
+    ds = DatasetDiffResult(
+        path="garden/n/v/ds",
+        kind="identical",
+        tables=[
+            TableDiffResult(
+                name="tab",
+                kind="identical",
+                columns=[
+                    ColumnDiffResult(
+                        name="a",
+                        kind="changed",
+                        changes=["changed data"],
+                        value_diffs=[ValueDiff(kind="changed", count=1, total=10, median_bard=0.0, not_scored_count=1)],
+                    )
+                ],
+            )
+        ],
+    )
+    assert ds.not_scored_count == 1
+    assert ds.severity == 0.0
+
+    # A second dataset, so the summary strip and the watch list have enough entries to render.
+    other = DatasetDiffResult(
+        path="garden/n/v/other",
+        kind="identical",
+        tables=[
+            TableDiffResult(
+                name="tab",
+                kind="identical",
+                columns=[
+                    ColumnDiffResult(
+                        name="a",
+                        kind="changed",
+                        changes=["changed data"],
+                        value_diffs=[ValueDiff(kind="changed", count=1, total=10, median_bard=0.5)],
+                    )
+                ],
+            )
+        ],
+    )
+
+    html = render_html(DiffReport(datasets=[ds, other]))
+    assert "new data only" not in html
+    assert "non-numeric value changes only" in html
+    assert "1 non-numeric-only" in html
+    assert "new-data-only" not in html
+
+
+def test_finite_and_numeric_content_are_cheap_on_nullable_dtypes():
+    """Column classification must not scale like a masked-array op.
+
+    `_finite` used to be `s.where(np.isfinite(s))`, which on pandas' nullable dtypes (what garden
+    tables are full of) cost ~34 ms per 15k-row column — per column *per side*. On a WDI-sized
+    table that is ~2 minutes of pure classification for one dataset, and it pushed a whole
+    owidbot data-diff run from under a minute to tens of minutes.
+    """
+    import time
+
+    from etl.datadiff import _finite, _has_numeric_content
+
+    values = np.arange(200_000, dtype="float32")
+    values[5] = np.nan
+    s = pd.Series(values, dtype="Float32")
+
+    t0 = time.perf_counter()
+    for _ in range(10):
+        _finite(s)
+        _has_numeric_content(s)
+    elapsed = time.perf_counter() - t0
+
+    # The old implementation took >0.3s for this loop; a generous ceiling still catches a
+    # regression to masked-array semantics without being flaky on a loaded machine.
+    assert elapsed < 0.5, f"classification got slow again: {elapsed:.3f}s for 10 iterations"
+
+
+def test_finite_blanks_infinities_on_nullable_and_plain_dtypes():
+    """The numpy path must keep `_finite`'s contract: infinities out, NaN and values preserved."""
+    from etl.datadiff import _finite
+
+    for dtype in ("Float64", "float64"):
+        s = pd.Series([1.0, np.inf, -np.inf, np.nan, 2.5], dtype=dtype)
+        out = _finite(s)
+        assert out.notna().tolist() == [True, False, False, False, True]
+        assert out.iloc[0] == 1.0 and out.iloc[4] == 2.5
+        assert list(out.index) == list(s.index)
+
+
+def test_categorical_coercion_matches_row_wise_parsing():
+    """The category-indexed fast path must equal parsing every row (the previous behavior)."""
+    from etl.datadiff import _as_comparable_floats
+
+    raw = ["1.5", "China", "2.5", None, "1.5", "Inf"]
+    cat = pd.Series(raw, dtype="category")
+    expected = pd.to_numeric(pd.Series(raw, dtype="object"), errors="coerce").astype("float64")
+    expected = expected.where(np.isfinite(expected))
+
+    got = _as_comparable_floats(cat)
+    assert got is not None
+    pd.testing.assert_series_equal(got, expected, check_names=False, check_dtype=False)
+
+
+def test_all_missing_categorical_does_not_crash():
+    """An all-missing categorical has no categories, so there is nothing to index into.
+
+    `np.where` evaluates both branches eagerly, so indexing an empty category array raised
+    IndexError and aborted the whole data-diff — reachable whenever one dataset version adds
+    values to a column the other has entirely empty. Row-wise coercion returned all-NaN.
+    """
+    from etl.datadiff import _as_comparable_floats, _has_numeric_content
+
+    s = pd.Series([None, None, None], dtype="category")
+    # No categories at all, and every row's code is the -1 "missing" sentinel.
+    assert s.cat.categories.empty
+    assert s.cat.codes.tolist() == [-1, -1, -1]
+
+    out = _as_comparable_floats(s)
+    assert out is not None
+    assert out.isna().all()
+    assert len(out) == 3
+    assert list(out.index) == list(s.index)
+    # No numeric content, but crucially: no exception.
+    assert _has_numeric_content(s) is False

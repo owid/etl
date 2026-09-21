@@ -1,0 +1,50 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Migration
+    processing_level: minor
+    short_unit: ""
+    display:
+      numDecimalPlaces: 0
+
+dataset:
+  # The UN last published migrants by age in the 2020 revision; the 2024 revision reports them by
+  # sex and by origin only. Until a revision brings the age breakdown back, there is nothing to
+  # update, and this is the interval between the last two revisions that carried it.
+  update_period_days: 1461
+  owners:
+    - Mojmír Vinkler
+    - Tuna Acisu
+
+tables:
+  migrant_stock_age_sex:
+    variables:
+      migrant_stock:
+        title: International migrant stock by age and sex
+        unit: "migrants"
+        description_short: |-
+          Number of people living in a given country who were born in another country, by five-year age band and sex.
+        description_from_producer: |-
+          International migrant stock at mid-year by age and sex and by region, country or area of destination, 1990-2020.
+
+          The estimates of the number (or "stock") of international migrants disaggregated by age and sex are based on national statistics, in most cases obtained from population censuses. Additionally, population registers and nationally representative surveys provided information on the number and composition of international migrants.
+        description_key:
+          - An international migrant is someone living in a country other than the one they were born in. People who moved within their own country are not counted.
+          - The UN reports the estimates for mid-year, in five-year steps from 1990 to 2020.
+          - The oldest band, 75+, is open-ended and covers everyone aged 75 and over.
+          - Where a country reports no migrants for a year, the UN leaves the figure out rather than recording a zero. It does this for the years before South Sudan, Montenegro and Curaçao existed as separate countries, and for Taiwan in every year.
+      population:
+        title: Resident population by age and sex
+        unit: "people"
+        description_short: |-
+          Total number of people living in a given country, by five-year age band and sex, both those born there and those born abroad.
+        description_from_producer: |-
+          Total population at mid-year by age and sex and by region, country or area of destination, 1990-2020 (thousands).
+        description_key:
+          - The UN publishes this alongside the migrant stock so that the two can be compared band by band. Subtracting one from the other gives the population born in the country.
+          - The figures are interpolations from the World Population Prospects, not counts, so they should not be read to person-level precision.
+          - The UN reports no population for 34 small territories, and publishes a zero for them rather than leaving the figure out.
+        description_processing: |-
+          - The UN publishes these figures in thousands, to three decimal places. They are multiplied by 1,000 and rounded to whole people.

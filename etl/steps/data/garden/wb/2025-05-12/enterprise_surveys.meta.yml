@@ -50,7 +50,7 @@ tables:
 
       bribery_depth__pct_of_public_transactions_where_a_gift_or_informal_payment_was_requested:
         title: Share of firm interactions with public services that included a bribe request
-        description_short: The percentage of firm interactions—out of six types of applications for public services—that involved a bribe request, including for import or operating licenses, construction permits, utility connections, and dealings with tax officials.
+        description_short: Percentage of firm interactions—out of six types of applications for public services—that involved a bribe request, including for import or operating licenses, construction permits, utility connections, and dealings with tax officials.
         description_from_producer: |-
           The depth of bribery is the percentage of instances in which a firm was either expected or requested to provide a gift or informal payment during applications for public services, licenses, or permits. This measure is based on six survey questions covering firm interactions involving an import license, operating license, construction permit, water connection, electrical connection, or dealings with tax officials. For the purpose of computation, a refusal to answer any of these questions is treated as an affirmative response.
         description_key:
@@ -191,7 +191,7 @@ tables:
 
       percent_of_firms_identifying_corruption_as_a_major_or_very_severe_constraint:
         title: Share of firms reporting corruption as a major constraint
-        description_short: The percentage of businesses that say corruption is a major or very serious problem for their operations.
+        description_short: Percentage of businesses that say corruption is a major or very serious problem for their operations.
         description_from_producer: |-
           Percentage of firms that identify corruption as either a "major" or "very severe" obstacle to the current operations of their business.
         description_key:

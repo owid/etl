@@ -1,0 +1,71 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Child Labor
+      attribution_short: Carter and Sutch
+    description_key:
+      - This data shows the share of children and youths aged 10-15 in the United States who are recorded as working (as a percentage of all children in that age bracket). The data is based on population censuses, with some adjustments to make the figures comparable across censuses.
+    description_processing: |-
+      Only the "Youths, 10-15 yrs" rows of the source's Table 1 are used, keeping both the originally published census rates and the authors' corrected rates by sex.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Incidence of child work in the United States, 1870-1930
+  update_period_days: 0
+  owners:
+    - Bertha Rohenkohl
+
+tables:
+  child_work_incidence_us:
+    variables:
+      incidence_boys:
+        title: Incidence of child work among boys aged 10-15 (as published)
+        presentation:
+          title_public: Incidence of child work among boys aged 10-15
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of boys aged 10-15 in the United States recorded as working, as originally published in the census.
+        display:
+          name: Boys (as published)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      incidence_girls:
+        title: Incidence of child work among girls aged 10-15 (as published)
+        presentation:
+          title_public: Incidence of child work among girls aged 10-15
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of girls aged 10-15 in the United States recorded as working, as originally published in the census.
+        display:
+          name: Girls (as published)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      corrected_incidence_boys:
+        title: Incidence of child work among boys aged 10-15 (corrected)
+        presentation:
+          title_public: Incidence of child work among boys aged 10-15 (corrected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of boys aged 10-15 in the United States recorded as working, after correcting the 1880 census undercount.
+        display:
+          name: Boys (corrected)
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      corrected_incidence_girls:
+        title: Incidence of child work among girls aged 10-15 (corrected)
+        presentation:
+          title_public: Incidence of child work among girls aged 10-15 (corrected)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of girls aged 10-15 in the United States recorded as working, after correcting the 1880 census undercount.
+        display:
+          name: Girls (corrected)
+          numDecimalPlaces: 1
+          tolerance: 5

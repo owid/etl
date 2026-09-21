@@ -1593,7 +1593,9 @@ def add_regional_aggregates(tb, columns_agg):
             "Oceania": ["Australia", "New Zealand"],
             "High-income countries": ["United States", "Germany", "Japan", "United Kingdom", "France"],
             "Upper-middle-income countries": ["China", "Brazil", "Mexico", "South Africa", "Indonesia"],
-            "Lower-middle-income countries": ["India", "Pakistan", "Bangladesh", "Philippines", "Nigeria", "Kenya"],
+            # NOTE: FY2027 (2025 GNI) moved the Philippines to upper-middle income; a "must-have" country
+            # that is no longer a member of its group nulls the whole aggregate, so it was removed here.
+            "Lower-middle-income countries": ["India", "Pakistan", "Bangladesh", "Nigeria", "Kenya"],
             "Low-income countries": ["Ethiopia", "Uganda"],
         },
     )

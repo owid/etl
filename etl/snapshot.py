@@ -1,3 +1,4 @@
+import datetime as dt
 import re
 import tempfile
 import time
@@ -22,8 +23,7 @@ from owid.catalog.core.meta import (
     TableMeta,
     pruned_json,
 )
-from owid.datautils import dataframes
-from owid.datautils.io import decompress_file
+from owid.datautils.io import decompress_file, df_to_file
 from owid.repack import to_safe_types
 from tenacity import Retrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
@@ -37,15 +37,78 @@ log = structlog.get_logger()
 class SnapshotNotFoundException(Exception):
     """Raised when a snapshot file is not found on the remote server.
 
-    This is a plain Exception subclass (no unpicklable attributes) so it can
-    safely travel across process boundaries in ProcessPoolExecutor workers.
+    `__reduce__` is what lets this cross a process boundary, and it is not optional. An exception
+    whose `__init__` takes more arguments than it passes to `super().__init__()` cannot be
+    unpickled: the default `BaseException.__reduce__` rebuilds it as `cls(*self.args)`, and
+    `self.args` holds only the single formatted message. The parent process then raises
+    `TypeError: ... missing 1 required positional argument` inside the `ProcessPoolExecutor`
+    result reader, which kills the pool and fails every remaining step with `BrokenProcessPool`.
     """
 
     def __init__(self, uri: str, md5: str) -> None:
+        self.uri = uri
+        self.md5 = md5
         super().__init__(
             f"Snapshot file not found on the remote server: {uri} (md5: {md5}). "
             f"Have you run `etls {uri} --upload` to upload it?"
         )
+
+    def __reduce__(self):
+        return (self.__class__, (self.uri, self.md5))
+
+
+class PrivateSnapshotAccessError(Exception):
+    """Raised when a private snapshot cannot be downloaded for want of R2 credentials.
+
+    Private snapshots hold data OWID may not redistribute, so anyone outside OWID hits this as
+    soon as a step they asked for depends on one. Boto's own message ("Unable to locate
+    credentials", or a bare 400) says nothing about which bucket, or about the way out.
+
+    Carries `__reduce__` so it survives the trip back from a worker process, for the reason spelled
+    out on `SnapshotNotFoundException`.
+    """
+
+    def __init__(self, uri: str, reason: str) -> None:
+        self.uri = uri
+        self.reason = reason
+        super().__init__(
+            f"No access to private snapshot {uri} ({reason}). It lives in the "
+            f"{config.R2_SNAPSHOTS_PRIVATE} bucket, which needs OWID credentials: R2_ACCESS_KEY and "
+            f"R2_SECRET_KEY in .env, or an `owid-r2` section in ~/.config/rclone/rclone.conf. "
+            f"Without them, run `etlr <steps> --public-only` to build only the steps that need no "
+            f"private data."
+        )
+
+    def __reduce__(self):
+        return (self.__class__, (self.uri, self.reason))
+
+
+# R2 answers a request signed with an unusable key with 400, not the 403 that S3 would return, so
+# a plain status check isn't enough to tell "your credentials are wrong" from "that object is
+# missing" (404). Everything here means the credentials are absent, wrong, or not allowed to read.
+_R2_ACCESS_ERROR_CODES = frozenset({"400", "401", "403", "AccessDenied", "InvalidAccessKeyId", "SignatureDoesNotMatch"})
+
+
+def _r2_access_denied_reason(error: Exception) -> str | None:
+    """Why this failure is a credentials problem, or None if it is something else.
+
+    `s3_utils.download` wraps botocore's `ClientError` in an `UploadError`, so the status code sits
+    on the wrapped exception. Missing credentials never reach the wire and surface as a
+    credentials `BotoCoreError` instead (`NoCredentialsError`, or `ProfileNotFound` when a stray
+    AWS_PROFILE shadows the R2 ones). Other `BotoCoreError`s (an unreachable endpoint, a timeout) are
+    not access problems and keep their own message.
+    """
+    from botocore.exceptions import ClientError, NoCredentialsError, PartialCredentialsError, ProfileNotFound
+
+    if isinstance(error, (NoCredentialsError, PartialCredentialsError, ProfileNotFound)):
+        return str(error)
+
+    inner = error.args[0] if error.args else None
+    if isinstance(inner, ClientError):
+        code = str(inner.response.get("Error", {}).get("Code", ""))
+        if code in _R2_ACCESS_ERROR_CODES:
+            return f"R2 returned {code}"
+    return None
 
 
 class SnapshotArchive:
@@ -208,19 +271,19 @@ class Snapshot:
         """Path to metadata file."""
         return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
+    def _r2_url(self, md5: str) -> str:
+        """R2 URL of the content-addressed object holding the given md5."""
+        bucket = config.R2_SNAPSHOTS_PUBLIC if self.metadata.is_public else config.R2_SNAPSHOTS_PRIVATE
+        return f"s3://{bucket}/{md5[:2]}/{md5[2:]}"
+
     def _snapshot_exists_on_remote(self, md5: str) -> bool:
-        """Check if snapshot file exists on R2 without downloading it."""
-        if self.metadata.is_public:
-            url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
-            try:
-                resp = requests.head(url, timeout=10)
-                return resp.status_code == 200
-            except requests.RequestException:
-                return False
-        else:
-            # For private snapshots, assume it exists if md5 matches — we can't
-            # easily do a HEAD request on S3 without more setup
-            return True
+        """Check if snapshot file exists on R2 without downloading it.
+
+        Asks the R2 API rather than the public snapshots.owid.io URL, whose CDN can serve a stale
+        404 for an object that was only just written. This is only used by `dvc_add`, which needs
+        R2 credentials anyway.
+        """
+        return s3_utils.object_exists(self._r2_url(md5))
 
     def _download_dvc_file(self, md5: str) -> None:
         """Download file from remote to self.path."""
@@ -236,8 +299,16 @@ class Snapshot:
                     raise SnapshotNotFoundException(self.uri, md5) from None
                 raise
         else:
+            from botocore.exceptions import BotoCoreError
+
             download_url = f"s3://{config.R2_SNAPSHOTS_PRIVATE}/{md5[:2]}/{md5[2:]}"
-            s3_utils.download(download_url, str(self.path))
+            try:
+                s3_utils.download(download_url, str(self.path))
+            except (s3_utils.UploadError, BotoCoreError) as e:
+                reason = _r2_access_denied_reason(e)
+                if reason is None:
+                    raise
+                raise PrivateSnapshotAccessError(self.uri, reason) from e
 
         # Check if file was downloaded correctly. This should never happen
         downloaded_md5 = checksum_file(self.path)
@@ -346,19 +417,27 @@ class Snapshot:
         # Get metadata file
         with open(self.metadata_path) as f:
             meta = ruamel_load(f)
+        dvc_md5_matches = bool(meta.get("outs")) and meta["outs"][0]["md5"] == md5
 
-        # If the file already exists with the same md5, verify it's actually on R2 before skipping
-        if meta.get("outs") and meta["outs"][0]["md5"] == md5:
-            if self._snapshot_exists_on_remote(md5):
+        # Snapshot keys are content-addressed, so a key that already exists holds byte-identical
+        # content and there is nothing to upload. Ask R2 rather than trusting the local .dvc file:
+        # the two disagree whenever the md5 lives on a branch we don't have checked out (autoupdate
+        # PRs are built via the GitHub API, see apps/autoupdate/cli.py) or when an earlier run
+        # uploaded the file but died before committing its .dvc. Re-uploading used to be a harmless
+        # overwrite, but the bucket lock policy on owid-snapshots now rejects it with
+        # ObjectLockedByBucketPolicy.
+        if self._snapshot_exists_on_remote(md5):
+            if dvc_md5_matches:
                 log.info("File already exists with the same md5, skipping upload", snapshot=self.uri)
                 return
-            else:
+            log.info("File already exists on R2 under this md5, skipping upload", snapshot=self.uri)
+        else:
+            if dvc_md5_matches:
                 log.warning("File md5 matches .dvc metadata but is missing from R2, re-uploading", snapshot=self.uri)
 
-        # Upload to S3
-        bucket = config.R2_SNAPSHOTS_PUBLIC if self.metadata.is_public else config.R2_SNAPSHOTS_PRIVATE
-        assert self.metadata.is_public is not None
-        s3_utils.upload(f"s3://{bucket}/{md5[:2]}/{md5[2:]}", str(self.path), public=self.metadata.is_public)
+            # Upload to S3
+            assert self.metadata.is_public is not None
+            s3_utils.upload(self._r2_url(md5), str(self.path), public=self.metadata.is_public)
 
         self.m._update_metadata_file({"outs": [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]})
 
@@ -393,7 +472,7 @@ class Snapshot:
             self.path.write_bytes(Path(filename).read_bytes())
         elif data is not None:
             # Copy dataframe to snapshots data folder.
-            dataframes.to_file(data, file_path=self.path)
+            df_to_file(data, file_path=self.path)
         elif self.metadata.origin and self.metadata.origin.url_download:
             # Create snapshot by downloading data from a URL with retry logic.
             for attempt in range(1, download_retries + 1):
@@ -681,6 +760,22 @@ class Snapshot:
             return tb
 
 
+def _dates_as_strings(value: Any) -> Any:
+    """Recursively coerce dates to strings, the way the metadata classes store them.
+
+    `yaml.safe_load` parses an unquoted `date_accessed: 2026-03-20` into a `datetime.date`, while
+    `Origin` keeps its date fields as ISO strings. Comparing a freshly loaded .dvc against
+    `SnapshotMeta._meta_to_dict()` without this would always differ on those fields.
+    """
+    if isinstance(value, dict):
+        return {k: _dates_as_strings(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_dates_as_strings(v) for v in value]
+    if isinstance(value, dt.date):
+        return str(value)
+    return value
+
+
 @pruned_json
 @dataclass
 class SnapshotMeta(MetaBase):
@@ -697,6 +792,11 @@ class SnapshotMeta(MetaBase):
     name: str | None = None
     description: str | None = None
 
+    # DEPRECATED top-level license. The license belongs under `origin.license` so it travels with
+    # the origin (and reaches Grapher's per-origin metadata). This field only exists for backward
+    # compatibility; new snapshots must set `meta.origin.license`, not `meta.license`. Enforced by
+    # `tests/test_metadata_schemas.py::test_snapshot_license_lives_under_origin` and the `not`
+    # constraint in `schemas/snapshot-schema.json`.
     license: License | None = None
 
     access_notes: str | None = None
@@ -804,8 +904,9 @@ class SnapshotMeta(MetaBase):
             # NOTE: meta does not have `outs` field, it's reset when saving
             meta = self._meta_to_dict()
 
-            # No change, keep the file as is
-            if yaml["meta"] == meta:
+            # No change, keep the file as is. Rewriting would reformat the whole file (re-wrapping
+            # long lines, re-indenting `outs`) for no reason.
+            if _dates_as_strings(yaml["meta"]) == _dates_as_strings(meta):
                 return
 
             # Otherwise update the file

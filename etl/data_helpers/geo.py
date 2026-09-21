@@ -370,6 +370,51 @@ def add_region_aggregates(
     if countries_that_must_have_data is None:
         countries_that_must_have_data = []
 
+    # Guard against a silent-null failure mode: if a "must-have" country is not actually a member of the
+    # region, the subset check below can never pass, so the region's aggregate is silently set to NaN and
+    # dropped — and downstream indicators that divide by it lose that region/group with no error at all.
+    # This typically happens after a reclassification (e.g. the World Bank moves a country to a different
+    # income group, or a country leaves a region's member list). Fail loudly so the caller fixes the list.
+    if isinstance(countries_that_must_have_data, list) and countries_that_must_have_data:
+        _must_have_non_members = [c for c in countries_that_must_have_data if c not in set(countries_in_region)]
+        if _must_have_non_members:
+            # With a fractional requirement (frac_countries_that_must_have_data < 1), non-members only
+            # make the aggregate impossible when even full data for every member in the list can't reach
+            # the threshold; a satisfiable stale pin is a warning, not an error.
+            _max_achievable_frac = 1 - len(_must_have_non_members) / len(countries_that_must_have_data)
+            _required_frac = (
+                1.0 if frac_countries_that_must_have_data is None else min(frac_countries_that_must_have_data, 1.0)
+            )
+            if _max_achievable_frac < _required_frac:
+                raise ValueError(
+                    f"add_region_aggregates: for region {region!r}, countries_that_must_have_data contains "
+                    f"{_must_have_non_members}, which are not members of the region. With the required "
+                    f"coverage ({_required_frac:.0%} of the list), the aggregate is impossible to compute, "
+                    f"so it would be silently set to NaN and dropped. This usually means the country was "
+                    f"reclassified (e.g. it changed income group) or left the region — remove it from "
+                    f"countries_that_must_have_data, or move it to the group it now belongs to."
+                )
+            log.warning(
+                f"add_region_aggregates: for region {region!r}, countries_that_must_have_data contains "
+                f"non-members {_must_have_non_members}. The fractional requirement "
+                f"({_required_frac:.0%}) is still satisfiable, but these entries are stale — "
+                f"remove them or move them to the group they now belong to. They are excluded from "
+                f"the must-have check so they don't inflate its denominator."
+            )
+            # A non-member can never have data within the region subset; leaving it in the list
+            # would penalize every year through the denominator of the fraction check (years that
+            # a cleaned list would keep get silently nulled). Check against members only.
+            countries_that_must_have_data = [
+                c for c in countries_that_must_have_data if c not in _must_have_non_members
+            ]
+
+    # Validate the threshold up front — the per-group check below can be skipped entirely (e.g. an
+    # empty must-have list), which must not silently accept an invalid fraction.
+    if frac_countries_that_must_have_data is not None and frac_countries_that_must_have_data > 1:
+        raise ValueError(
+            f"`frac_countries_that_must_have_data` must be between 0 and 1, got {frac_countries_that_must_have_data}."
+        )
+
     if index_columns is None:
         index_columns = [country_col, year_col]
 
@@ -384,14 +429,15 @@ def add_region_aggregates(
     df_countries = df[df[country_col].isin(countries_in_region)]
 
     def _check_countries_must_have_data(countries):
+        # An empty must-have list is no constraint — it can be empty as passed by the caller, or
+        # become empty after stale non-members are excluded above; either way the fraction check
+        # below would divide by zero.
+        if not countries_that_must_have_data:
+            return True
         # Get set of countries with data
         countries_with_data = set(list(countries))
         if frac_countries_that_must_have_data is None:
             return set(countries_that_must_have_data).issubset(countries_with_data)
-        elif frac_countries_that_must_have_data > 1:
-            raise ValueError(
-                f"`frac_countries_that_must_have_data` must be between 0 and 1, got {frac_countries_that_must_have_data}."
-            )
         else:
             # If a fraction of countries that must have data is defined, check that the fraction of countries that
             # have data is larger than the defined fraction.

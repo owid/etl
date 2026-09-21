@@ -28,7 +28,7 @@ tables:
         title: Average income or consumption
         unit: international-$ in 2021 prices
         short_unit: $
-        description_short: The mean after tax income or consumption per year within each of the 1000 bins of the distribution.
+        description_short: Mean after tax income or consumption per year within each of the 1000 bins of the distribution.
         processing_level: major
         description_key:
           - The data is measured in international-$ at 2021 prices – this adjusts for inflation and for differences in the cost of living between countries.
@@ -45,4 +45,4 @@ tables:
         title: Population
         unit: people
         short_unit: ""
-        description_short: The number of people in each of the 1000 bins of the distribution. It should correspond to roughly 1/1000 of the total population of the country in the given year.
+        description_short: Number of people in each of the 1000 bins of the distribution. It should correspond to roughly 1/1000 of the total population of the country in the given year.

@@ -28,6 +28,7 @@ dataset:
 
   owners:
     - Pablo Arriagada
+    - Edouard Mathieu
 tables:
   yougov_robots:
     variables:

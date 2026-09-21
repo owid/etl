@@ -14,7 +14,7 @@ tables:
         title: new_people_vaccinated_smoothed
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       new_people_vaccinated_smoothed_per_hundred:
         title: new_people_vaccinated_smoothed_per_hundred
@@ -23,7 +23,7 @@ tables:
         title: new_vaccinations
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       new_vaccinations_smoothed:
         title: new_vaccinations_smoothed
@@ -33,7 +33,7 @@ tables:
         unit: ''
         display:
           includeInTable: true
-          yearIsDay: true
+          timeInterval: day
       new_vaccinations_smoothed_per_million:
         title: new_vaccinations_smoothed_per_million
         description: Not all countries report vaccination data on a daily basis. To generate this series we assume that vaccination
@@ -42,7 +42,7 @@ tables:
         unit: ''
         display:
           includeInTable: true
-          yearIsDay: true
+          timeInterval: day
       people_fully_vaccinated:
         title: people_fully_vaccinated
         unit: ''
@@ -52,7 +52,7 @@ tables:
             Upper middle income: Data for China reported at irregular intervals
             Asia: Data for China reported at irregular intervals
           includeInTable: true
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       people_fully_vaccinated_per_hundred:
         title: people_fully_vaccinated_per_hundred
@@ -63,14 +63,14 @@ tables:
             Upper middle income: Data for China reported at irregular intervals
             Asia: Data for China reported at irregular intervals
           includeInTable: true
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       people_unvaccinated:
         title: people_unvaccinated
         unit: ''
         display:
           includeInTable: true
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       people_vaccinated:
         title: people_vaccinated
@@ -81,7 +81,7 @@ tables:
             Upper middle income: Data for China reported at irregular intervals
             Asia: Data for China reported at irregular intervals
           includeInTable: true
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       people_vaccinated_per_hundred:
         title: people_vaccinated_per_hundred
@@ -93,26 +93,26 @@ tables:
             Upper middle income: Data for China reported at irregular intervals
             Asia: Data for China reported at irregular intervals
           includeInTable: true
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       share_of_boosters:
         title: share_of_boosters
         unit: ''
         display:
           includeInTable: true
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       total_boosters:
         title: total_boosters
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       total_boosters_per_hundred:
         title: total_boosters_per_hundred
         unit: ''
         display:
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       total_vaccinations:
         title: total_vaccinations
@@ -121,11 +121,11 @@ tables:
           includeInTable: true
           name: Cumulative COVID-19 vaccinations
           numDecimalPlaces: 0
-          yearIsDay: true
+          timeInterval: day
       total_vaccinations_per_hundred:
         title: total_vaccinations_per_hundred
         unit: ''
         display:
           includeInTable: true
           name: Cumulative COVID-19 vaccinations per 100 people
-          yearIsDay: true
+          timeInterval: day

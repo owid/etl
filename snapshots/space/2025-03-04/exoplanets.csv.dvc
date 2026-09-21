@@ -19,9 +19,9 @@ meta:
     url_main: https://exoplanetarchive.ipac.caltech.edu/index.html
     url_download: |-
       https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+distinct+pl_name,disc_year,discoverymethod+from+ps&format=csv
-  license:
-    name: Public domain
-    url: https://exoplanetarchive.ipac.caltech.edu/docs/acknowledge.html
+    license:
+      name: Public domain
+      url: https://exoplanetarchive.ipac.caltech.edu/docs/acknowledge.html
 outs:
   - md5: 5812b4068640cb533208b24c20c5e44c
     size: 183063

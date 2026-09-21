@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Any, cast
 
 import numpy as np
+import pandas as pd
 import streamlit as st
 from owid.catalog import Dataset
 from sentry_sdk import capture_exception
@@ -33,10 +34,9 @@ from typing_extensions import Self
 from wfork_streamlit_profiler import Profiler
 
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
-from etl.config import OWID_ENV, SENTRY_DSN, enable_sentry
+from etl.config import SENTRY_DSN, enable_sentry
 from etl.dag_helpers import load_dag
 from etl.db import read_sql
-from etl.metadata_export import main as metadata_export
 from etl.paths import (
     APPS_DIR,
     DAG_DIR,
@@ -145,7 +145,7 @@ class classproperty(property):
 class AppState:
     """Management of state variables shared across different apps."""
 
-    steps: list[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data", "collection"]
+    steps: list[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data", "chart"]
     dataset_edit: dict[str, Dataset | None] = {
         "snapshot": None,
         "meadow": None,
@@ -153,7 +153,7 @@ class AppState:
         "grapher": None,
         "express": None,
         "data": None,
-        "collection": None,
+        "chart": None,
     }
     _previous_step: str | None = None
 
@@ -399,35 +399,6 @@ def load_instructions() -> str:
         return f.read()
 
 
-def _check_env() -> bool:
-    """Check if environment variables are set correctly."""
-    ok = True
-    for env_name in ("GRAPHER_USER_ID", "DB_USER", "DB_NAME", "DB_HOST"):
-        if getattr(OWID_ENV.conf, env_name) is None:
-            ok = False
-            st.warning(f"Environment variable `{env_name}` not found, do you have it in your `.env` file?")
-
-    if ok:
-        st.success("`.env` configured correctly")
-    return ok
-
-
-def _show_environment():
-    """Show environment variables."""
-    st.info(
-        f"""
-    **Environment variables**:
-
-    ```
-    GRAPHER_USER_ID: {OWID_ENV.conf.GRAPHER_USER_ID}
-    DB_USER: {OWID_ENV.conf.DB_USER}
-    DB_NAME: {OWID_ENV.conf.DB_NAME}
-    DB_HOST: {OWID_ENV.conf.DB_HOST}
-    ```
-    """
-    )
-
-
 def clean_empty_dict(d: dict[str, Any] | list[Any]) -> dict[str, Any] | list[Any]:
     """Remove empty values from dict.
 
@@ -491,26 +462,6 @@ def set_states(states_values: dict[str, Any], logging: bool = False, also_if_not
             st.session_state[key] = st.session_state.get(key, value)
         else:
             st.session_state[key] = value
-
-
-def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | None = None, output: str = "") -> str:
-    """Export metadata of a dataset.
-
-    The metadata of the dataset may have changed in run time.
-    """
-    # Handle inputs
-    if dataset:
-        dataset_path = str(dataset.path)
-    elif dataset_path is None:
-        raise ValueError("Either a dataset or a dataset_path must be provided.")
-
-    output_path = metadata_export(
-        path=dataset_path,
-        output=output,  # Will assign the default value
-        show=False,
-        decimals="auto",
-    )
-    return output_path
 
 
 def enable_sentry_for_streamlit():
@@ -595,16 +546,6 @@ def as_valid_json(s):
             return s
 
 
-def as_list(s):
-    """Return `s` as a list if applicable."""
-    if isinstance(s, str):
-        try:
-            return ast.literal_eval(s)
-        except (ValueError, SyntaxError):
-            return s
-    return s
-
-
 @cache
 def is_running_in_streamlit():
     """Check if running in Streamlit."""
@@ -627,6 +568,16 @@ def _canon(x):
     if isinstance(x, np.ndarray):
         # stable, hashable representation for numpy arrays
         return ("__np__", x.dtype.str, x.shape, x.tobytes())
+    if isinstance(x, (pd.DataFrame, pd.Series, pd.Index)):
+        # Content-based key. Falling through to the __dict__ branch below would build a key out of
+        # the internal BlockManager, whose repr contains the object's memory address - so the key
+        # would differ on every call, never hit the cache, and grow the cache without bound.
+        return (
+            "__pandas__",
+            x.__class__.__qualname__,
+            tuple(map(str, getattr(x, "columns", ()))),
+            _canon(pd.util.hash_pandas_object(x, index=True).to_numpy()),
+        )
     # Fallback: try dataclasses/objects with __dict__
     if hasattr(x, "__dict__"):
         return ("__obj__", x.__class__.__qualname__, _canon(vars(x)))
@@ -635,12 +586,12 @@ def _canon(x):
 
 
 def cache_all(f):
-    """A caching decorator that works for unhashable types (lists, dicts)."""
+    """A caching decorator that works for unhashable types (lists, dicts).
 
-    @cache
-    def _cached(key):
-        args_c, kwargs_c = key
-        return f(*args_c, **dict(kwargs_c))
+    The canonical form of the arguments is used as the cache key only; the wrapped function is
+    always called with the original arguments.
+    """
+    results = {}
 
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -648,7 +599,9 @@ def cache_all(f):
             tuple(_canon(a) for a in args),
             tuple(sorted((k, _canon(v)) for k, v in kwargs.items())),
         )
-        return _cached(key)
+        if key not in results:
+            results[key] = f(*args, **kwargs)
+        return results[key]
 
     return wrapper
 

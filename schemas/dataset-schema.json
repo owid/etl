@@ -612,30 +612,37 @@
                 },
                 "description_key": {
                   "title": "Indicator's key information",
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        ]
                       }
-                    ]
-                  },
-                  "description": "List of key pieces of information about the indicator.",
+                    }
+                  ],
+                  "description": "Key information about the indicator as free-form markdown text. A YAML list of bullet points is also accepted and converted to a markdown list on load.",
                   "requirement_level": "recommended (for curated indicators)",
                   "guidelines": [
                     [
-                      "Must be a list of one or more short paragraphs.",
+                      "Must be free-form markdown text with the key information about the indicator, or a list of bullet points.",
                       {
                         "type": "list",
                         "value": [
-                          "Each paragraph must start with a capital letter.",
-                          "Each paragraph must end with a period."
+                          "The text is rendered as markdown (paragraphs, links and lists are supported).",
+                          "A YAML list is authoring sugar for a markdown list; each bullet must start with a capital letter and end with a period."
                         ]
                       }
                     ],
@@ -939,7 +946,7 @@
                           "Should only be used if the indicator's title is ambiguous (e.g. if there are multiple indicators with the same title)."
                         ],
                         [
-                          "Should not reference the data provider. For that, instead, use `attribution_short`."
+                          "Should not reference the data producer. For that, instead, use `attribution_short`."
                         ]
                       ],
                       "examples": [
@@ -973,6 +980,9 @@
                           "Must join multiple attributions by a `;`."
                         ],
                         [
+                          "Must separate a producer from a data product with a spaced en dash (–), not a hyphen."
+                        ],
+                        [
                           "Must not end in a period (and must **not** end in `;`)."
                         ],
                         [
@@ -984,7 +994,7 @@
                       ],
                       "requirement_level": "optional",
                       "examples": [
-                        "Energy Institute - Statistical Review of World Energy (2023); Ember (2022)"
+                        "Energy Institute – Statistical Review of World Energy (2023); Ember (2022)"
                       ],
                       "examples_bad": [
                         [
@@ -1791,6 +1801,13 @@
                         "includedEntityNames": {
                           "type": "array",
                           "description": "Entities that should be included (opposite of excludedEntityNames). If empty, all available entities are used.",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "inapplicableEntityNames": {
+                          "type": "array",
+                          "description": "Entities the indicator's data can't apply to by construction, e.g. Mexico for \"Where do Mexican emigrants live?\". On the map, they are excluded from the color scale and rendered in a dedicated pattern.",
                           "items": {
                             "type": "string"
                           }

@@ -7,7 +7,7 @@ from typing import Any
 
 import git
 import pandas as pd
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
@@ -35,6 +35,18 @@ EXCLUDE_METADATA_CHANGES = [
     "grapher/climate/.*/surface_temperature_annual_average",
     "grapher/artificial_intelligence/.*/epoch",
 ]
+
+# Config fields that are environment- or bookkeeping-specific, so a difference in them is not a
+# difference in the chart. Used both when comparing configs and when resolving conflicts, so that
+# the conflict resolver does not ask users to "resolve" e.g. a version number.
+CONFIG_KEYS_IGNORE = (
+    "id",
+    "isPublished",
+    "bakedGrapherURL",
+    "adminBaseUrl",
+    "dataApiUrl",
+    "version",
+)
 
 
 @dataclass
@@ -87,9 +99,10 @@ class ChartDiffScores:
 
         relevance = 0
         for w, r, p in zip(weights, regularization, params):
-            if p is not None:
-                assert p > 0 or p == 0, f"p={p} should be >= 0"
-                relevance += w * p / r
+            if p is None or pd.isna(p):
+                continue
+            assert p >= 0, f"p={p} should be >= 0"
+            relevance += w * p / r
 
         relevance /= sum(weights)
         self._relevance = relevance
@@ -128,6 +141,53 @@ class ArticleRef:
             return "0"
 
 
+def same_config_uuid(a: str | None, b: str | None) -> bool:
+    """Compare two config UUIDs (`charts.configId`) case-insensitively.
+
+    UUIDs are case-insensitive identifiers, and the grapher admin accepts a
+    caller-supplied one in any case, so DB values may differ in case across
+    environments while naming the same chart.
+    """
+    return bool(a) and bool(b) and a.lower() == b.lower()  # type: ignore[union-attr]
+
+
+def _same_chart_across_envs(source_chart: gm.Chart, target_chart: gm.Chart) -> bool:
+    """Return true when source and target refer to the same logical chart."""
+    # The config UUID (charts.configId) is the chart's stable identity: rows
+    # copied from production keep it, and chart-sync carries it along when
+    # creating a chart on production. It's the strongest signal we have.
+    if same_config_uuid(source_chart.configId, target_chart.configId):
+        return True
+    if source_chart.etlConfigCatalogPath and source_chart.etlConfigCatalogPath == target_chart.etlConfigCatalogPath:
+        return True
+    # Legacy fallback for charts synced before config UUIDs were carried
+    # across environments: same numeric id and same creation time.
+    return source_chart.id == target_chart.id and source_chart.createdAt == target_chart.createdAt
+
+
+def _is_cross_env_twin(source_chart: gm.Chart, target_chart: gm.Chart | None) -> bool:
+    """True when production minted its own row (with a different numeric id) for
+    a staging chart — matched by config UUID or catalogPath instead."""
+    if target_chart is None or source_chart.id == target_chart.id:
+        return False
+    if same_config_uuid(source_chart.configId, target_chart.configId):
+        return True
+    return bool(
+        source_chart.etlConfigCatalogPath and source_chart.etlConfigCatalogPath == target_chart.etlConfigCatalogPath
+    )
+
+
+def _target_updated_at_for_review(source_chart: gm.Chart, target_chart: gm.Chart | None) -> dt.datetime | None:
+    """Timestamp key used for approvals/conflicts.
+
+    Cross-environment twins did not exist in production when the staging chart
+    was reviewed, so their approvals were recorded with targetUpdatedAt=NULL.
+    """
+    if target_chart is None or _is_cross_env_twin(source_chart, target_chart):
+        return None
+    return target_chart.updatedAt
+
+
 class ChartDiff:
     # Chart in source environment
     source_chart: gm.Chart
@@ -147,7 +207,6 @@ class ChartDiff:
         target_chart: gm.Chart | None,
         approval: gm.ChartDiffApprovals | None,
         conflict: gm.ChartDiffConflicts | None,
-        # approval_status: gm.CHART_DIFF_STATUS | str,
         modified_checksum: pd.DataFrame | None = None,
         edited_in_staging: bool | None = None,
         tags_edited: bool | None = None,
@@ -155,7 +214,7 @@ class ChartDiff:
         chart_views: float | None = None,
         score_indicators_anomalies: float | None = None,
         article_refs: list[ArticleRef] | None = None,
-        df_approvals: pd.DataFrame | None = None,
+        staging_created_at: dt.datetime | None = None,
     ):
         """Constructor of ChartDiff.
 
@@ -167,18 +226,15 @@ class ChartDiff:
         self.conflict = conflict
         self.error = error
         if target_chart:
-            assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
+            assert _same_chart_across_envs(source_chart, target_chart), (
+                "Mismatch between source and target chart identities!"
+            )
         self.chart_id = source_chart.id
         self.modified_checksum = modified_checksum
         self.edited_in_staging = edited_in_staging
         self.tags_edited = tags_edited
-
-        # Get revisions
-        if df_approvals is None:
-            self.df_approvals = pd.DataFrame()
-        else:
-            self.df_approvals = df_approvals
-        self.last_chart_revision_approved = None
+        # Creation time of the staging server (used to detect edits in production)
+        self._staging_created_at = staging_created_at
 
         # Analytics, anomalies and other scores
         self.article_refs = article_refs if article_refs else []
@@ -291,8 +347,15 @@ class ChartDiff:
                 return False
 
             # Check if chart has been edited in production
-            with Session(OWID_ENV.engine) as session:
-                chart_edited_in_prod = self.target_chart.updatedAt > get_staging_creation_time(session)
+            if self._staging_created_at is not None:
+                staging_created_at = self._staging_created_at
+            else:
+                # Fallback for ChartDiff objects created outside of `from_charts_df`.
+                with Session(OWID_ENV.engine) as session:
+                    staging_created_at = get_staging_creation_time(session)
+            chart_edited_in_prod = self.target_chart.updatedAt > staging_created_at
+            if _is_cross_env_twin(self.source_chart, self.target_chart):
+                chart_edited_in_prod = False
 
             # If edited, check if conflict was resolved
             if chart_edited_in_prod:
@@ -335,9 +398,6 @@ class ChartDiff:
                 if self.tags_edited:
                     self._change_types.append("tags")
 
-                # TODO: Should uncomment this maybe?
-                # assert self._change_types != [], "No changes detected!"
-
         return self._change_types
 
     @classmethod
@@ -350,17 +410,16 @@ class ChartDiff:
         ignore_conflicts: bool = False,
         skip_analytics: bool = False,
     ) -> list["ChartDiff"]:
-        """Get chart diffs from chart ids.
-
-        NOTE: I am a bit confused. I see we have df_charts, which has already some information on whether the
-        metadata, data, config fields were edited. However, we estimate this again with all the checksums code. Couldn't we just use the info from df_charts?
-        """
+        """Get chart diffs from chart ids."""
 
         # Return empty list if no chart difference is found
         if df_charts.empty:
             return []
 
         chart_ids = list(set(df_charts.index))
+
+        # Staging server creation time (computed once, reused by all diffs to detect conflicts)
+        staging_created_at = get_staging_creation_time(source_session)
 
         # Get charts from SOURCE db and save them in memory as dictionaries: chart_id -> chart
         source_charts = gm.Chart.load_charts(source_session, chart_ids=chart_ids)
@@ -371,11 +430,10 @@ class ChartDiff:
         target_charts = cls._get_target_charts(target_session, source_charts)
 
         # Get approval status
-        # approval_statuses = cls._get_approval_statuses(source_session, chart_ids, source_charts, target_charts)
         approvals = cls._get_approvals(source_session, chart_ids, source_charts, target_charts, ignore_conflicts)
 
         # Get conflicts
-        conflicts = cls._get_conflicts(source_session, chart_ids, target_charts)
+        conflicts = cls._get_conflicts(source_session, chart_ids, source_charts, target_charts)
 
         # Get checksums
         checksums_diff = cls._get_checksums(source_session, target_session, chart_ids)
@@ -384,25 +442,24 @@ class ChartDiff:
         slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # ty: ignore
 
         # Get chart views, anomalies, and articles (skip if not needed for performance)
-        if skip_analytics:
-            chart_views_all = {}
-            chart_anomalies_all = {}
-            article_refs_all = {}
-        else:
-            # Get chart views
-            chart_views_all = get_chart_views_cached(chart_ids)
-
-            # Anomalies
-            chart_anomalies_all = get_chart_anomalies_cached(chart_ids)
-
-            # Articles
-            article_refs_all = get_chart_in_article_views_cached(chart_ids)
-
-        # Get approvals
-        df_approvals_all = read_sql(
-            "SELECT * FROM chart_diff_approvals WHERE chartId IN %(chart_ids)s",
-            params={"chart_ids": chart_ids},
-        )
+        # NOTE: These rely on external services (Metabase/Datasette, Anomalist tables). A failure there
+        # should degrade the scores, not break chart-diff entirely.
+        chart_views_all: dict[int, float] = {}
+        chart_anomalies_all: dict[int, float] = {}
+        article_refs_all: dict[int, list[ArticleRef]] = {}
+        if not skip_analytics:
+            try:
+                chart_views_all = get_chart_views_cached(chart_ids)
+            except Exception as e:
+                log.warning(f"Could not fetch chart views, skipping: {e}")
+            try:
+                chart_anomalies_all = get_chart_anomalies_cached(chart_ids)
+            except Exception as e:
+                log.warning(f"Could not fetch anomaly scores, skipping: {e}")
+            try:
+                article_refs_all = get_chart_in_article_views_cached(chart_ids)
+            except Exception as e:
+                log.warning(f"Could not fetch article references, skipping: {e}")
 
         # Build chart diffs
         chart_diffs = []
@@ -412,14 +469,14 @@ class ChartDiff:
 
             ## Checks
             if target_chart:
-                assert source_chart.createdAt == target_chart.createdAt, "CreatedAt mismatch!"
+                assert _same_chart_across_envs(source_chart, target_chart), "Chart identity mismatch!"
 
             # Approval
             assert chart_id in approvals, f"Approval not found for chart {chart_id}"
             approval = approvals[chart_id]
 
             # Conflict
-            assert chart_id in approvals, f"Conflict not found for chart {chart_id}"
+            assert chart_id in conflicts, f"Conflict not found for chart {chart_id}"
             conflict = conflicts[chart_id]
 
             # Checksums
@@ -449,9 +506,6 @@ class ChartDiff:
             # Article refs
             article_refs = article_refs_all.get(chart_id, [])
 
-            # Get approval history
-            df_approvals = df_approvals_all[df_approvals_all["chartId"] == chart_id]
-
             # Build Chart Diff object
             chart_diff: ChartDiff = cls(
                 source_chart=source_chart,
@@ -465,11 +519,8 @@ class ChartDiff:
                 chart_views=chart_views_score,
                 score_indicators_anomalies=chart_anomalies_score,
                 article_refs=article_refs,
-                df_approvals=df_approvals,
+                staging_created_at=staging_created_at,
             )
-
-            # Add last revision
-            chart_diff.set_last_approved_chart_revision(source_session)
 
             chart_diffs.append(chart_diff)
 
@@ -535,14 +586,18 @@ class ChartDiff:
             approval = gm.ChartDiffApprovals(
                 chartId=self.chart_id,
                 sourceUpdatedAt=self.source_chart.updatedAt,
-                targetUpdatedAt=None if self.is_new else self.target_chart.updatedAt,  # ty: ignore
+                # Must match the lookup in `_get_approvals`: catalog-path twins
+                # key on a NULL target timestamp (prod minted its own row), so
+                # record the same NULL here rather than the twin's updatedAt.
+                targetUpdatedAt=_target_updated_at_for_review(self.source_chart, self.target_chart),  # ty: ignore
                 status=status,  # ty: ignore
             )
             session.add(approval)
             session.commit()
 
-            # Add approval to object
+            # Update object so that in-memory state reflects the DB without a page reload
             self.approval = approval
+            self._approval_status = status
 
     def set_conflict_to_resolved(self, session: Session) -> None:
         """Update the state of the chart diff."""
@@ -560,8 +615,9 @@ class ChartDiff:
         session.add(conflict)
         session.commit()
 
-        # Add conflict to object
+        # Update object so that in-memory state reflects the DB without a page reload
         self.conflict = conflict
+        self._in_conflict = False
 
     def configs_are_equal(self) -> bool:
         """Compare two chart configs, ignoring version, id and isPublished."""
@@ -586,15 +642,26 @@ class ChartDiff:
         """Get all chart slugs. Use `slugs` to filter slugs as this can be slow otherwise."""
         if slugs is not None:
             where = "WHERE slug IN %(slugs)s"
+            where_configs = "AND cc.slug IN %(slugs)s"
             params = {"slugs": tuple(slugs)}
         else:
             where = ""
+            where_configs = ""
             params = {}
 
         slugs_redirects = set(
             read_sql(f"SELECT slug FROM chart_slug_redirects {where}", target_session, params=params)["slug"]
         )
-        slugs = set(read_sql(f"SELECT slug FROM chart_configs {where}", target_session, params=params)["slug"])
+        # A chart_configs row only holds a *chart's* slug if a chart points at it. Without the join
+        # we also pick up slugs from config rows nothing owns, and report them as taken.
+        slugs = set(
+            read_sql(
+                "SELECT cc.slug FROM chart_configs cc JOIN charts c ON c.configId = cc.id "
+                f"WHERE cc.slug IS NOT NULL {where_configs}",
+                target_session,
+                params=params,
+            )["slug"]
+        )
         return slugs | slugs_redirects
 
     @staticmethod
@@ -609,21 +676,44 @@ class ChartDiff:
         def _charts_are_equivalent_envs(s_chart, t_chart):
             # It can happen that both charts have the same ID, but are completely different (this
             # happens when two charts are created independently on two servers). If they
-            # have same createdAt then they are the same chart.
-            return not (t_chart and (s_chart.createdAt != t_chart.createdAt))
+            # have same createdAt then they are the same chart. ETL-authored
+            # charts can also be matched by their stable catalogPath.
+            return t_chart is not None and _same_chart_across_envs(s_chart, t_chart)
 
         chart_ids = source_charts.keys()
 
         if target_session is not None:
             try:
-                target_charts = gm.Chart.load_charts(target_session, chart_ids=chart_ids)
+                target_charts_list = gm.Chart.load_charts(target_session, chart_ids=chart_ids)
             except NoResultFound:
                 target_charts = {}
             else:
                 target_charts = {
                     chart.id: chart if _charts_are_equivalent_envs(source_charts[chart.id], chart) else None
-                    for chart in target_charts
+                    for chart in target_charts_list
                 }
+            # Charts created on staging and synced to production keep their
+            # config UUID (charts.configId) but get a fresh numeric id there.
+            # Match still-unmatched charts by config UUID first, then by
+            # catalogPath for ETL-authored charts synced before config UUIDs
+            # were carried across environments.
+            for source_chart_id, source_chart in source_charts.items():
+                if target_charts.get(source_chart_id) is not None:
+                    continue
+
+                stmt = select(gm.Chart).where(gm.Chart.configId == source_chart.configId)
+                twin = target_session.scalars(stmt).one_or_none()
+                if twin is not None:
+                    target_charts[source_chart_id] = twin
+                    continue
+
+                if source_chart.etlConfigCatalogPath:
+                    try:
+                        target_charts[source_chart_id] = gm.Chart.load_chart(
+                            target_session, catalog_path=source_chart.etlConfigCatalogPath
+                        )
+                    except NoResultFound:
+                        pass
         else:
             target_charts = {}
         return target_charts
@@ -645,10 +735,9 @@ class ChartDiff:
             # Normal timestamp-based lookup
             target_updated_ats = []
             for chart_id in chart_ids:
-                if target_charts.get(chart_id) is not None:
-                    target_updated_ats.append(target_charts[chart_id].updatedAt)  # ty: ignore
-                else:
-                    target_updated_ats.append(None)
+                target_updated_ats.append(
+                    _target_updated_at_for_review(source_charts[chart_id], target_charts.get(chart_id))
+                )
 
             approvals = gm.ChartDiffApprovals.latest_chart_approval_batch(
                 source_session,
@@ -661,13 +750,14 @@ class ChartDiff:
         return approvals
 
     @staticmethod
-    def _get_conflicts(source_session, chart_ids, target_charts) -> dict[int, gm.ChartDiffConflicts | None]:
+    def _get_conflicts(
+        source_session, chart_ids, source_charts, target_charts
+    ) -> dict[int, gm.ChartDiffConflicts | None]:
         target_updated_ats = []
         for chart_id in chart_ids:
-            if target_charts.get(chart_id) is not None:
-                target_updated_ats.append(target_charts[chart_id].updatedAt)  # ty: ignore
-            else:
-                target_updated_ats.append(None)
+            target_updated_ats.append(
+                _target_updated_at_for_review(source_charts[chart_id], target_charts.get(chart_id))
+            )
         conflicts = gm.ChartDiffConflicts.get_conflict_batch(
             source_session,
             chart_ids,
@@ -693,14 +783,6 @@ class ChartDiff:
 
         return checksums_diff
 
-    def set_last_approved_chart_revision(self, session):
-        if not self.is_approved and not self.df_approvals.empty:
-            df_approvals_past = self.df_approvals.loc[self.df_approvals["status"] == "approved"]
-            if not df_approvals_past.empty:
-                timestamp = df_approvals_past["updatedAt"].max()
-                # Find the revision that was approved
-                self.last_chart_revision_approved = self.get_last_chart_revision(session, timestamp)
-
 
 class ChartDiffsLoader:
     """Detect charts that differ between staging and production and load them."""
@@ -718,10 +800,6 @@ class ChartDiffsLoader:
         with Session(self.source_engine) as source_session:
             with Session(self.target_engine) as target_session:
                 return modified_charts_on_staging(source_session, target_session, chart_ids=chart_ids)
-
-    @property
-    def chart_ids_all(self):
-        return set(self.df.index[self.df.any(axis=1)])
 
     def get_charts_df(
         self,
@@ -751,7 +829,7 @@ class ChartDiffsLoader:
         ignore_conflicts: bool = False,
         skip_analytics: bool = False,
     ) -> list[ChartDiff]:
-        """Optimised version of get_diffs."""
+        """Get chart diffs with the selected change types."""
         if chart_ids:
             assert sync, "If chart_ids are provided, sync must be True."
         if sync:
@@ -922,8 +1000,8 @@ def _modified_chart_configs_on_staging(
     base_q = """
     select
         c.id as chartId,
-        MD5(CONCAT(cc.full, IFNULL(isInheritanceEnabled, 0))) as chartChecksum,
-        cc.full as chartConfig,
+        MD5(CONCAT(cc.config, IFNULL(isInheritanceEnabled, 0))) as chartChecksum,
+        cc.config as chartConfig,
         isInheritanceEnabled
     from charts as c
     join chart_configs as cc on c.configId = cc.id
@@ -1055,20 +1133,6 @@ def _modified_tags_on_staging(
     return diff[["tagsEdited"]]
 
 
-def get_chart_id_slug_pairs(session: Session) -> set[tuple[int, str]]:
-    """Get all (chart_id, slug) pairs from a database as a set for efficient operations."""
-    from sqlalchemy import text
-
-    query = text("""
-    SELECT c.id, cc.slug
-    FROM charts c
-    JOIN chart_configs cc ON c.configId = cc.id
-    WHERE cc.slug IS NOT NULL
-    """)
-    result = session.execute(query).fetchall()
-    return set((row[0], row[1]) for row in result)
-
-
 def get_deleted_charts(source_session: Session, target_session: Session) -> list[dict]:
     """Get charts that exist in target but not in source (deleted charts).
 
@@ -1175,14 +1239,50 @@ def get_chart_diffs_from_grapher(
     return chart_diffs
 
 
+# Bookkeeping keys of an authored layer: grapher writes them itself, so their presence says
+# nothing about anyone having edited the chart.
+_PATCH_BOOKKEEPING_KEYS = ("id", "version", "$schema")
+
+
+def patch_paths_lost_by_sync(
+    target_patch: dict[str, Any] | None, source_patch: dict[str, Any] | None, _prefix: str = ""
+) -> list[str]:
+    """Fields of the target's authored layer that syncing the source over it would drop.
+
+    Chart-sync writes the source chart's config to the target, where the server re-diffs it into
+    the target's authored layer. That layer is then derived entirely from the source, so anything
+    only the target carries is lost. On a chart the branch created, the target's layer starts out
+    holding only the bootstrap `slug`, so anything beyond that was authored in the target's admin.
+
+    Nested fields are compared field by field, not as whole objects: the two sides can each hold a
+    different corner of the same object (`yAxis.min` in the target, `yAxis.max` in the source), and
+    reporting only `yAxis` as shared would let the target's half be dropped silently.
+
+    A field both sides carry is not reported. The source wins there by design, and that difference
+    is the change the reviewer approved in chart-diff — a slug renamed on staging, say.
+    """
+    target_patch = target_patch or {}
+    source_patch = source_patch or {}
+    lost = []
+    for key, target_value in target_patch.items():
+        # Bookkeeping only appears at the top level, and grapher writes it, not a person.
+        if not _prefix and key in _PATCH_BOOKKEEPING_KEYS:
+            continue
+        path = f"{_prefix}{key}"
+        if key not in source_patch:
+            lost.append(path)
+        elif isinstance(target_value, dict) and isinstance(source_patch[key], dict):
+            lost.extend(patch_paths_lost_by_sync(target_value, source_patch[key], f"{path}."))
+    return sorted(lost)
+
+
 def configs_are_equal(config_1: dict[str, Any], config_2: dict[str, Any], verbose=False) -> bool:
     """Compare two chart configs, ignoring certain fields."""
     assert "isInheritanceEnabled" in config_1, "isInheritanceEnabled must be in config_1"
     assert "isInheritanceEnabled" in config_2, "isInheritanceEnabled must be in config_2"
 
-    exclude_keys = ("id", "isPublished", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl", "version")
-    config_1 = {k: v for k, v in config_1.items() if k not in exclude_keys}
-    config_2 = {k: v for k, v in config_2.items() if k not in exclude_keys}
+    config_1 = {k: v for k, v in config_1.items() if k not in CONFIG_KEYS_IGNORE}
+    config_2 = {k: v for k, v in config_2.items() if k not in CONFIG_KEYS_IGNORE}
 
     # Use pretty print to convert dicts to strings for comparison
     config_1_str = pprint.pformat(config_1, sort_dicts=True)

@@ -2,6 +2,7 @@ from unittest import mock
 
 import numpy as np
 import pandas as pd
+import pytest
 from owid.catalog import (
     DatasetMeta,
     Table,
@@ -191,21 +192,77 @@ def test_long_to_wide():
     assert wide["deaths__age_26_30"].m.title == "Deaths - Age: 26-30"
 
 
-def test__validate_description_key():
-    # Test case 2: description_key with all single-character strings
-    description_key = ["a", "b", "c"]
-    col = "column2"
-    try:
-        gh._validate_description_key(description_key, col)
-    except AssertionError as e:
-        assert str(e) == f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
-    else:
-        assert False, "AssertionError not raised for description_key with all single-character strings"
+def _dated_table() -> Table:
+    df = pd.DataFrame(
+        {
+            "country": ["France", "France", "France"],
+            "date": ["2020-01-01", "2020-02-01", "2020-03-01"],
+            "value": [1.0, 2.0, 3.0],
+        }
+    )
+    return Table(df)
 
-    # Test case 3: Valid description_key
-    description_key = ["key1", "key2", "key3"]
-    col = "column3"
-    try:
-        gh._validate_description_key(description_key, col)
-    except AssertionError:
-        assert False, f"AssertionError raised for valid description_key: {description_key}"
+
+def test_adapt_table_with_dates_defaults_to_day():
+    tb = gh.adapt_table_with_dates_to_grapher(_dated_table())
+    assert tb["value"].m.display["timeInterval"] == "day"
+    assert tb["value"].m.display["zeroDay"] == "2020-01-01"
+    # Dates become days-since-zeroDay integers, whatever the interval.
+    assert tb["year"].tolist() == [0, 31, 60]
+
+
+def test_adapt_table_with_dates_explicit_interval_wins():
+    tb = _dated_table()
+    tb["value"].metadata.display = {"timeInterval": "week"}
+    tb = gh.adapt_table_with_dates_to_grapher(tb, time_interval="month")
+    assert tb["value"].m.display["timeInterval"] == "month"
+
+
+def test_adapt_table_with_dates_preserves_declared_interval():
+    # Grapher steps call this implicitly with no time_interval; an interval declared in metadata
+    # must survive rather than being overwritten with "day".
+    tb = _dated_table()
+    tb["value"].metadata.display = {"timeInterval": "month"}
+    tb = gh.adapt_table_with_dates_to_grapher(tb)
+    assert tb["value"].m.display["timeInterval"] == "month"
+
+
+class _FakeDataset:
+    """Minimal stand-in for catalog.Dataset: grapher_checks only needs a title and its tables."""
+
+    def __init__(self, tables):
+        self.metadata = DatasetMeta(title="Test dataset")
+        self._tables = tables
+
+    def __iter__(self):
+        return iter(self._tables)
+
+
+def test_grapher_checks_rejects_missing_year():
+    # A row with no year is not plottable, and its NA used to survive all the way to the MySQL
+    # upsert, where it failed with an unattributable "boolean value of NA is ambiguous".
+    df = pd.DataFrame(
+        {
+            "country": ["France", "France"],
+            "year": pd.array([2020, None], dtype="Int64"),
+            "value": [1, 2],
+        }
+    )
+    tb = Table(df.set_index(["country", "year"]), short_name="tb")
+
+    with pytest.raises(AssertionError, match="1 row\\(s\\) with a missing `year`"):
+        gh.grapher_checks(_FakeDataset([tb]))
+
+
+def test_grapher_checks_rejects_missing_date():
+    df = pd.DataFrame(
+        {
+            "country": ["France", "France"],
+            "date": pd.to_datetime(pd.Series(["2020-01-01", None])),
+            "value": [1, 2],
+        }
+    )
+    tb = Table(df.set_index(["country", "date"]), short_name="tb")
+
+    with pytest.raises(AssertionError, match="1 row\\(s\\) with a missing `date`"):
+        gh.grapher_checks(_FakeDataset([tb]))

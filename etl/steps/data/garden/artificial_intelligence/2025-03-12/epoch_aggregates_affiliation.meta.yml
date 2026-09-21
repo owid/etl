@@ -27,6 +27,7 @@ dataset:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
   owners:
     - Lucas Rodés-Guirao
+    - Edouard Mathieu
 tables:
   epoch_aggregates_affiliation:
     variables:

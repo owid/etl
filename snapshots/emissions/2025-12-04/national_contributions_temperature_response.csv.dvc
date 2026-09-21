@@ -14,7 +14,7 @@ meta:
       Warming in response to cumulative CO2-equivalent emissions is estimated using the transient climate response to cumulative carbon emissions (TCRE) approach, with best-estimate value of TCRE taken from the IPCC AR6 (Forster et al., 2021, Canadell et al., 2021). 'Warming' is specifically the change in global mean surface temperature (GMST).
 
       The data files provide emissions, cumulative emissions and the GMST response by country, gas (CO2, CH4, N2O or 3-GHG total) and source (fossil emissions, land use emissions or the total).
-    title_snapshot: National contributions to climate change - Temperature response
+    title_snapshot: National contributions to climate change – Temperature response
     citation_full: |-
       Jones, Matthew W., Glen P. Peters, Thomas Gasser, Robbie M. Andrew, Clemens Schwingshackl, Johannes Gütschow, Richard A. Houghton, Pierre Friedlingstein, Julia Pongratz, and Corinne Le Quéré. “National Contributions to Climate Change Due to Historical Emissions of Carbon Dioxide, Methane and Nitrous Oxide”. Scientific Data. Zenodo, November 13, 2025. https://doi.org/10.5281/zenodo.16640595.
     version_producer: '2025.1'

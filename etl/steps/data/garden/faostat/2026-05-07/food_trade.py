@@ -12,15 +12,18 @@ The display items shown in the dropdown are curated in
 to their names. Most items have a single code, so the rollup is a direct integer-code
 filter against `item_code`.
 
-A few items combine several codes: FAO splits some commodities into a primary
-product and a mechanically-derived form whose trade is reported separately
-(beef bone-in + boneless, almonds in-shell + shelled, milled + broken rice,
-raw + refined sugar), and the primary code alone captures only a fraction of
+Some items combine several codes: FAO splits some commodities into a primary
+product and a mechanically-derived form or preservation state whose trade is
+reported separately (beef bone-in + boneless, almonds in-shell + shelled,
+milled + broken rice, raw + refined sugar, fresh + dried figs, fresh +
+preserved olives), and the primary code alone captures only a fraction of
 the traded weight. For these we sum the trade of all the item's codes to
 recover the full bilateral flow. Summing the *trade* does not double-count (the
-codes are distinct shipments under distinct customs headings). A combined item
-is identified in the output by `100000 + its first code`, so its id is never
-mistaken for a single FAO commodity.
+codes are distinct shipments under distinct customs headings). Extracted or
+milled derivatives (flour, starch, oil, juice) are never folded into the crop;
+they stay separate items. A combined item is identified in the output by
+`100000 + its first code`, so its id is never mistaken for a single FAO
+commodity.
 
 For each (exporter, importer, item) the trade matrix typically has two
 reports — one from each side — that can disagree. We default to the

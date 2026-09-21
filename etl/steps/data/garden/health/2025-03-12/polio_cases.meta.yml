@@ -18,9 +18,9 @@ tables:
     variables:
       cases:
         title: Reported polio cases
-        description_short: The number of reported polio cases in the United States in a given year.
+        description_short: Number of reported polio cases in the United States in a given year.
         unit: cases
       case_rate:
         title: Reported polio cases per 100,000 people
-        description_short: The number of reported polio cases per 100,000 people in the United States in a given year.
+        description_short: Number of reported polio cases per 100,000 people in the United States in a given year.
         unit: cases per 100,000 people

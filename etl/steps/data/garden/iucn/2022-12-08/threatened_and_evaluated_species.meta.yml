@@ -7,7 +7,7 @@ tables:
         display:
           name: Number of described species
           numDecimalPlaces: 0
-        description_short: The total number of known/described species. This does not mean these species have been assessed for their extinction risk level.
+        description_short: Total number of known/described species. This does not mean these species have been assessed for their extinction risk level.
       number_of_species_evaluated_for_the_iucn_red_list:
         title: Number of species evaluated for the IUCN Red List
         unit: species

@@ -70,6 +70,7 @@ tables:
           name: Excess mortality P-scores, 5-year average baseline, all ages
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       p_avg_0_14:
         title: p_avg_0_14
         # title: Excess mortality P-scores (5-year average baseline, 0–14)
@@ -80,16 +81,18 @@ tables:
           name: Ages 0–14
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       p_avg_15_64:
         title: p_avg_15_64
         # title: Excess mortality P-scores (5-year average baseline, 15–64)
         unit: "%"
         short_unit: "%"
-        description_short: P-scores using projected baseline for ages 15–64
+        description_short: P-scores using projected baseline for ages 15–64.
         display:
           name: Ages 15–64
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       p_avg_65_74:
         title: p_avg_65_74
         # title: Excess mortality P-scores (5-year average baseline, 65–74)
@@ -100,6 +103,7 @@ tables:
           name: Ages 65–74
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       p_avg_75_84:
         title: p_avg_75_84
         # title: Excess mortality P-scores (5-year average baseline, 75–84)
@@ -110,6 +114,7 @@ tables:
           name: Ages 75–84
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       p_avg_85p:
         title: p_avg_85p
         # title: Excess mortality P-scores (5-year average baseline, 85+)
@@ -122,21 +127,23 @@ tables:
           numDecimalPlaces: 0
 
       # p_proj_*
+          timeInterval: week
       p_proj_all_ages:
         title: p_proj_all_ages
         # title: Excess mortality P-scores (projected baseline, all ages)
         unit: "%"
         short_unit: "%"
-        description_short: P-scores using projected baseline for all ages
+        description_short: P-scores using projected baseline for all ages.
         display:
           name: Excess mortality P-scores, projected baseline, all ages.
           includeInTable: true
           tolerance: 30
           numDecimalPlaces: 0
+          timeInterval: week
         presentation:
           grapher_config:
             title: "Excess mortality: Deaths from all causes compared to projection based on previous years"
-            subtitle: The percentage difference between the reported number of weekly or monthly deaths in 2020–2022 and the projected number of deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
+            subtitle: Percentage difference between the reported number of weekly or monthly deaths in 2020–2022 and the projected number of deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
             hasMapTab: true
             <<: *color_scale_percent
       p_proj_0_14:
@@ -149,6 +156,7 @@ tables:
           name: Ages 0–14
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       p_proj_15_64:
         title: p_proj_15_64
         # title: Excess mortality P-scores (projected baseline, 15–64)
@@ -159,6 +167,7 @@ tables:
           name: Ages 15–64
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       p_proj_65_74:
         title: p_proj_65_74
         # title: Excess mortality P-scores (projected baseline, 65–74)
@@ -169,6 +178,7 @@ tables:
           name: Ages 65–74
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       p_proj_75_84:
         title: p_proj_75_84
         # title: Excess mortality P-scores (projected baseline, 75–84)
@@ -179,6 +189,7 @@ tables:
           name: Ages 75–84
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       p_proj_85p:
         title: p_proj_85p
         # title: Excess mortality P-scores (projected baseline, 85+)
@@ -189,119 +200,141 @@ tables:
           name: Ages 85+
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       deaths_2010_all_ages:
         title: deaths_2010_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2010.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2010.
+        display:
+          timeInterval: week
       deaths_2011_all_ages:
         title: deaths_2011_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2011.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2011.
+        display:
+          timeInterval: week
       deaths_2012_all_ages:
         title: deaths_2012_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2012.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2012.
+        display:
+          timeInterval: week
       deaths_2013_all_ages:
         title: deaths_2013_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2013.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2013.
+        display:
+          timeInterval: week
       deaths_2014_all_ages:
         title: deaths_2014_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2014.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2014.
+        display:
+          timeInterval: week
       deaths_2015_all_ages:
         title: deaths_2015_all_ages
         # title: Number of deaths (weekly or monthly, 2015)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2015.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2015.
         display:
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       deaths_2016_all_ages:
         title: deaths_2016_all_ages
         # title: Number of deaths (weekly or monthly, 2016)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2016.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2016.
         display:
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       deaths_2017_all_ages:
         title: deaths_2017_all_ages
         # title: Number of deaths (weekly or monthly, 2017)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2017.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2017.
         display:
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       deaths_2018_all_ages:
         title: deaths_2018_all_ages
         # title: Number of deaths (weekly or monthly, 2018)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2018.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2018.
         display:
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       deaths_2019_all_ages:
         title: deaths_2019_all_ages
         # title: Number of deaths (weekly or monthly, 2019)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2019.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2019.
         display:
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       deaths_2020_all_ages:
         title: deaths_2020_all_ages
         # title: Number of deaths (weekly or monthly, 2020)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2020.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2020.
         display:
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       deaths_2021_all_ages:
         title: deaths_2021_all_ages
         # title: Number of deaths (weekly or monthly, 2021)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2021.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2021.
         display:
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       deaths_2022_all_ages:
         title: deaths_2022_all_ages
         # title: Number of deaths (weekly or monthly, 2022)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2022.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2022.
         display:
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       deaths_2023_all_ages:
         title: deaths_2023_all_ages
         # title: Number of deaths (weekly or monthly, 2022)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2023.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2023.
         display:
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       deaths_2024_all_ages:
         title: deaths_2024_all_ages
         # title: Number of deaths (weekly or monthly, 2022)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2024.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2024.
         display:
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       deaths_2025_all_ages:
         title: deaths_2025_all_ages
         # title: Number of deaths (weekly or monthly, 2022)
         unit: "deaths"
-        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2025.
+        description_short: Reported number of weekly or monthly deaths from all causes for all ages in 2025.
         display:
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       deaths_since_2020_all_ages:
         title: deaths_since_2020_all_ages
         # title: Number of deaths (weekly or monthly, 2020–2022)
@@ -312,27 +345,31 @@ tables:
           numDecimalPlaces: 0
 
       # other metrics
+          timeInterval: week
       excess_proj_all_ages:
         title: excess_proj_all_ages
         # title: Excess deaths (projected, all ages)
         unit: "deaths"
-        description_short: The number of excess deaths; calculated as reported deaths minus projected deaths.
+        description_short: Number of excess deaths; calculated as reported deaths minus projected deaths.
         display:
           includeInTable: true
+          timeInterval: week
       excess_per_million_proj_all_ages:
         title: excess_per_million_proj_all_ages
         # title: Excess deaths per million people (projected, all ages)
         unit: ""
-        description_short: The number of excess deaths per million people in the population; calculated as reported deaths minus projected deaths.
+        description_short: Number of excess deaths per million people in the population; calculated as reported deaths minus projected deaths.
         display:
           includeInTable: true
+          timeInterval: week
       average_deaths_2015_2019_all_ages:
         title: average_deaths_2015_2019_all_ages
         # title: Average number of deaths (2015–2019, all ages)
         unit: ""
-        description_short: The average number of weekly or monthly deaths from all causes for all ages over the years 2015–2019.
+        description_short: Average number of weekly or monthly deaths from all causes for all ages over the years 2015–2019.
         display:
           includeInTable: true
+          timeInterval: week
       projected_deaths_since_2020_all_ages:
         title: projected_deaths_since_2020_all_ages
         # title: Projected number of deaths (2020–2022, all ages)
@@ -342,19 +379,21 @@ tables:
           name: Projected, 2020
           includeInTable: true
           numDecimalPlaces: 0
+          timeInterval: week
       cum_excess_proj_all_ages:
         title: cum_excess_proj_all_ages
         # title: Cumulative excess of deaths (projected, all ages)
         unit: "deaths"
-        description_short: The cumulative number of excess deaths; cumulated starting 1 January 2020.
+        description_short: Cumulative number of excess deaths; cumulated starting 1 January 2020.
         display:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
+          timeInterval: week
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years"
-            subtitle: The cumulative difference between the reported number of deaths since 1 January 2020 and the projected number of deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
+            subtitle: Cumulative difference between the reported number of deaths since 1 January 2020 and the projected number of deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
             hasMapTab: true
             map:
               colorScale:
@@ -374,9 +413,10 @@ tables:
         title: cum_proj_deaths_all_ages
         # title: Cumulative number of deaths (projected, all ages)
         unit: ""
-        description_short: The cumulative number of projected deaths; cumulated starting 1 January 2020
+        description_short: Cumulative number of projected deaths; cumulated starting 1 January 2020.
         display:
           includeInTable: true
+          timeInterval: week
       cum_p_proj_all_ages:
         title: cum_p_proj_all_ages
         # title: Cumulative p-score (projected, all ages)
@@ -388,25 +428,27 @@ tables:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
+          timeInterval: week
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative deaths from all causes compared to projection based on previous years"
-            subtitle: The percentage difference between the cumulative number of deaths since 1 January 2020 and the cumulative projected deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
+            subtitle: Percentage difference between the cumulative number of deaths since 1 January 2020 and the cumulative projected deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
             hasMapTab: true
             <<: *color_scale_percent
       cum_excess_per_million_proj_all_ages:
         title: cum_excess_per_million_proj_all_ages
         # title: Cumulative excess deaths per million people (projected, all ages)
         unit: "deaths per million people"
-        description_short: The cumulative number of excess deaths per million people in the population; cumulated starting 1 January 2020.
+        description_short: Cumulative number of excess deaths per million people in the population; cumulated starting 1 January 2020.
         display:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
+          timeInterval: week
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years, per million people"
-            subtitle: The cumulative difference between the reported number of deaths since 1 January 2020 and the projected number of deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
+            subtitle: Cumulative difference between the reported number of deaths since 1 January 2020 and the projected number of deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
             map:
               colorScale:
                 <<: *color_scale_counts
@@ -425,28 +467,31 @@ tables:
       time:
         title: Time
         unit: ""
-        description_short: The week or month number in the year.
+        description_short: Week or month number in the year.
         display:
           includeInTable: true
+          timeInterval: week
       time_unit:
         title: Time unit
         unit: ""
         description_short: Denotes whether the “time” column values are weekly or monthly.
         display:
           includeInTable: true
+          timeInterval: week
       cum_excess_proj_all_ages_last12m:
         title: cum_excess_proj_all_ages_last12m
         # title: Cumulative excess of deaths (projected, all ages)
         unit: "deaths"
-        description_short: The cumulative number of excess deaths in the last 12 months.
+        description_short: Cumulative number of excess deaths in the last 12 months.
         display:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
+          timeInterval: week
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years"
-            subtitle: The cumulative difference between the reported number of deaths since 1 January 2020 and the projected number of deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
+            subtitle: Cumulative difference between the reported number of deaths since 1 January 2020 and the projected number of deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
             hasMapTab: true
             map:
               colorScale:
@@ -466,15 +511,16 @@ tables:
         title: cum_excess_per_million_proj_all_ages_last12m
         # title: Cumulative excess deaths per million people (projected, all ages)
         unit: "deaths per million people"
-        description_short: The cumulative number of excess deaths per million people in the population, in the last 12 months.
+        description_short: Cumulative number of excess deaths per million people in the population, in the last 12 months.
         display:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
+          timeInterval: week
         presentation:
           grapher_config:
             title: "Excess mortality: Cumulative number of deaths from all causes compared to projection based on previous years, per million people"
-            subtitle: The cumulative difference between the reported number of deaths since 1 January 2020 and the projected number of deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
+            subtitle: Cumulative difference between the reported number of deaths since 1 January 2020 and the projected number of deaths for the same period based on previous years. The reported number might not count all deaths that occurred due to incomplete coverage and delays in reporting.
             hasMapTab: true
             map:
               colorScale:

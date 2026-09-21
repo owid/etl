@@ -123,7 +123,7 @@ def test_variable_metadata():
             "unit": "people per km²",
         },
         "id": 525715,
-        "descriptionKey": ["Population density"],
+        "descriptionKey": "Population density",
         "name": "Population density",
         "nonRedistributable": False,
         "origins": [{"descriptionSnapshot": "Origin A"}, {"descriptionSnapshot": "Origin B"}],

@@ -23,7 +23,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The probability that a male will live longer than a female if both are randomly selected from the population at birth.
+          Probability that a male will live longer than a female if both are randomly selected from the population at birth.
         description_processing: |-
           This was calculated using scripts from Bergeron-Boucher et al. (2022).
 

@@ -26,6 +26,12 @@ icon: lucide/sparkles
 
 At the moment it is mostly useful for updating datasets.
 
+!!! tip "No local setup? Use Claude Code on the web"
+
+    You can create simple datasets entirely from your browser (or phone) with
+    [Claude Code on the web](claude-code-web.md) — no VSCode or terminal
+    required.
+
 !!! warning "Work in Progress"
 
     This AI workflow is actively evolving! Updating a dataset was a proof of concept, and we're continuously improving Claude's capabilities and documentation based on real-world usage.

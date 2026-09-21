@@ -25,7 +25,7 @@ tables:
           entityAnnotationsMap: 'Hungary: patients on ventilator'
           name: Current number of COVID-19 patients in ICU
           numDecimalPlaces: 0
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       daily_icu_occupancy_per_million:
         title: Daily ICU occupancy per million
@@ -34,7 +34,7 @@ tables:
           entityAnnotationsMap: 'Hungary: patients on ventilator'
           name: Number of COVID-19 patients in ICU per million
           numDecimalPlaces: 2
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       daily_hospital_occupancy:
         title: Daily hospital occupancy
@@ -43,7 +43,7 @@ tables:
         display:
           name: Number of COVID-19 patients in hospital
           numDecimalPlaces: 0
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       daily_hospital_occupancy_per_million:
         title: Daily hospital occupancy per million
@@ -52,7 +52,7 @@ tables:
         display:
           name: Number of COVID-19 patients in hospital per million
           numDecimalPlaces: 2
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       weekly_new_icu_admissions:
         title: Weekly new ICU admissions
@@ -61,7 +61,7 @@ tables:
           entityAnnotationsMap: 'Hungary: patients on ventilator'
           name: Weekly new ICU admissions for COVID-19
           numDecimalPlaces: 0
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       weekly_new_icu_admissions_per_million:
         title: Weekly new ICU admissions per million
@@ -69,7 +69,7 @@ tables:
         display:
           name: Weekly new ICU admissions for COVID-19 per million
           numDecimalPlaces: 2
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       weekly_new_hospital_admissions:
         title: Weekly new hospital admissions
@@ -77,7 +77,7 @@ tables:
         display:
           name: Weekly new hospital admissions for COVID-19
           numDecimalPlaces: 0
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'
       weekly_new_hospital_admissions_per_million:
         title: Weekly new hospital admissions per million
@@ -85,5 +85,5 @@ tables:
         display:
           name: Weekly new hospital admissions for COVID-19 per million
           numDecimalPlaces: 2
-          yearIsDay: true
+          timeInterval: day
           zeroDay: '2020-01-21'

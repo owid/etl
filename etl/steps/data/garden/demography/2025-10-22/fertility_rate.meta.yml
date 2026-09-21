@@ -21,7 +21,7 @@ tables:
       fertility_rate:
         title: Fertility rate (period)
         description_short: |-
-          The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality.
+          Average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality.
         description_key:
           - Assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
           - Does not account for potential changes in social, economic, or health conditions that could affect fertility rates.
@@ -42,7 +42,7 @@ tables:
       fertility_rate_hist:
         title: Fertility rate (period), historical
         description_short: |-
-          The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality.
+          Average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality.
         description_key:
           - Assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
           - Does not account for potential changes in social, economic, or health conditions that could affect fertility rates.
@@ -59,7 +59,7 @@ tables:
     variables:
       asfr:
         title: "Fertility rate, by age - Year: << year_as_dimension >>"
-        description_short: The average number of children a woman would have at each age if she experienced the fertility rates of year << year_as_dimension >>.
+        description_short: Average number of children a woman would have at each age if she experienced the fertility rates of year << year_as_dimension >>.
         unit: births per women
         description_processing: |-
           The fertility data is constructed by combining data from multiple sources:

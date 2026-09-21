@@ -6,289 +6,346 @@ tables:
         unit: '%'
         display:
           name: Share of positive tests - All types of surveillance
+          timeInterval: week
         short_unit: '%'
       pcnt_possentinel:
         title: pcnt_possentinel
         unit: '%'
         display:
           name: Share of positive tests - Sentinel surveillance
+          timeInterval: week
         short_unit: '%'
       pcnt_posnonsentinel:
         title: pcnt_posnonsentinel
         unit: '%'
         display:
           name: Share of positive tests - Non-sentinel surveillance
+          timeInterval: week
         short_unit: '%'
       ah1n12009combined_zfilled:
         title: ah1n12009combined_zfilled
         unit: confirmed cases
         display:
           name: A H1N12009
+          timeInterval: week
       ah1combined_zfilled:
         title: ah1combined_zfilled
         unit: confirmed cases
         display:
           name: A H1
+          timeInterval: week
       ah3combined_zfilled:
         title: ah3combined_zfilled
         unit: confirmed cases
         display:
           name: A H3
+          timeInterval: week
       ah5combined_zfilled:
         title: ah5combined_zfilled
         unit: confirmed cases
         display:
           name: A H5
+          timeInterval: week
       ah7n9combined_zfilled:
         title: ah7n9combined_zfilled
         unit: confirmed cases
         display:
           name: A H7N9
+          timeInterval: week
       a_no_subtypecombined_zfilled:
         title: a_no_subtypecombined_zfilled
         unit: confirmed cases
         display:
           name: A (unknown subtype)
+          timeInterval: week
       bviccombined_zfilled:
         title: bviccombined_zfilled
         unit: confirmed cases
         display:
           name: B Victoria
+          timeInterval: week
       byamcombined_zfilled:
         title: byamcombined_zfilled
         unit: confirmed cases
         display:
           name: B Yamagata
+          timeInterval: week
       bnotdeterminedcombined_zfilled:
         title: bnotdeterminedcombined_zfilled
         unit: confirmed cases
         display:
           name: B (unknown lineage)
+          timeInterval: week
       ah1n12009sentinel_zfilled:
         title: ah1n12009sentinel_zfilled
         unit: confirmed cases
         display:
           name: A H1N12009
+          timeInterval: week
       ah3sentinel_zfilled:
         title: ah3sentinel_zfilled
         unit: confirmed cases
         display:
           name: A H3
+          timeInterval: week
       a_no_subtypesentinel_zfilled:
         title: a_no_subtypesentinel_zfilled
         unit: confirmed cases
         display:
           name: A (unknown subtype)
+          timeInterval: week
       bvicsentinel_zfilled:
         title: bvicsentinel_zfilled
         unit: confirmed cases
         display:
           name: B Victoria
+          timeInterval: week
       byamsentinel_zfilled:
         title: byamsentinel_zfilled
         unit: confirmed cases
         display:
           name: B Yamagata
+          timeInterval: week
       bnotdeterminedsentinel_zfilled:
         title: bnotdeterminedsentinel_zfilled
         unit: confirmed cases
         display:
           name: B (unknown lineage)
+          timeInterval: week
       ah1n12009nonsentinel_zfilled:
         title: ah1n12009nonsentinel_zfilled
         unit: confirmed cases
         display:
           name: A H1N12009
+          timeInterval: week
       ah3nonsentinel_zfilled:
         title: ah3nonsentinel_zfilled
         unit: confirmed cases
         display:
           name: A H3
+          timeInterval: week
       a_no_subtypenonsentinel_zfilled:
         title: a_no_subtypenonsentinel_zfilled
         unit: confirmed cases
         display:
           name: A (unknown subtype)
+          timeInterval: week
       bvicnonsentinel_zfilled:
         title: bvicnonsentinel_zfilled
         unit: confirmed cases
         display:
           name: B Victoria
+          timeInterval: week
       byamnonsentinel_zfilled:
         title: byamnonsentinel_zfilled
         unit: confirmed cases
         display:
           name: B Yamagata
+          timeInterval: week
       bnotdeterminednonsentinel_zfilled:
         title: bnotdeterminednonsentinel_zfilled
         unit: confirmed cases
         display:
           name: B (unknown lineage)
+          timeInterval: week
       inf_allcombined:
         title: inf_allcombined
         unit: confirmed cases
         display:
           name: All strains - All types of surveillance
+          timeInterval: week
       inf_allsentinel:
         title: inf_allsentinel
         unit: confirmed cases
         display:
           name: All strains - Sentinel surveillance
+          timeInterval: week
       inf_allnonsentinel:
         title: inf_allnonsentinel
         unit: confirmed cases
         display:
           name: All strains - Non-sentinel surveillance
+          timeInterval: week
       reported_ari_cases:
         title: reported_ari_cases
         unit: reported cases
         display:
           name: Cases of acute respiratory infections
+          timeInterval: week
       reported_ili_cases:
         title: reported_ili_cases
         unit: reported cases
         display:
           name: Cases of influenza-like illnesses
+          timeInterval: week
       reported_sari_cases:
         title: reported_sari_cases
         unit: reported cases
         display:
           name: Cases of severe acute respiratory infections
+          timeInterval: week
       inf_asentinel:
         title: inf_asentinel
         unit: confirmed cases
         display:
           name: Influenza A - Sentinel surveillance
+          timeInterval: week
       inf_anonsentinel:
         title: inf_anonsentinel
         unit: confirmed cases
         display:
           name: Influenza A - Non-sentinel surveillance
+          timeInterval: week
       inf_acombined:
         title: inf_acombined
         unit: confirmed cases
         display:
           name: Influenza A - All types of surveillance
+          timeInterval: week
       ah1n12009sentinel:
         title: ah1n12009sentinel
         unit: confirmed cases
         display:
           name: A H1N12009 - Sentinel surveillance
+          timeInterval: week
       ah1n12009nonsentinel:
         title: ah1n12009nonsentinel
         unit: confirmed cases
         display:
           name: A H1N12009 - Non-sentinel surveillance
+          timeInterval: week
       ah1n12009combined:
         title: ah1n12009combined
         unit: confirmed cases
         display:
           name: A H1N12009 - All types of surveillance
+          timeInterval: week
       ah1combined:
         title: ah1combined
         unit: confirmed cases
         display:
           name: A H1 - All types of surveillance
+          timeInterval: week
       ah3sentinel:
         title: ah3sentinel
         unit: confirmed cases
         display:
           name: A H3 - Sentinel surveillance
+          timeInterval: week
       ah3nonsentinel:
         title: ah3nonsentinel
         unit: confirmed cases
         display:
           name: A H3 - Non-sentinel surveillance
+          timeInterval: week
       ah3combined:
         title: ah3combined
         unit: confirmed cases
         display:
           name: A H3 - All types of surveillance
+          timeInterval: week
       ah5combined:
         title: ah5combined
         unit: confirmed cases
         display:
           name: A H5 - All types of surveillance
+          timeInterval: week
       ah7n9combined:
         title: ah7n9combined
         unit: confirmed cases
         display:
           name: A H7N9 - All types of surveillance
+          timeInterval: week
       a_no_subtypesentinel:
         title: a_no_subtypesentinel
         unit: confirmed cases
         display:
           name: A (unknown subtype) - Sentinel surveillance
+          timeInterval: week
       a_no_subtypenonsentinel:
         title: a_no_subtypenonsentinel
         unit: confirmed cases
         display:
           name: A (unknown subtype) - Non-sentinel surveillance
+          timeInterval: week
       a_no_subtypecombined:
         title: a_no_subtypecombined
         unit: confirmed cases
         display:
           name: A (unknown subtype) - All types of surveillance
+          timeInterval: week
       inf_bsentinel:
         title: inf_bsentinel
         unit: confirmed cases
         display:
           name: Influenza B - Sentinel surveillance
+          timeInterval: week
       inf_bnonsentinel:
         title: inf_bnonsentinel
         unit: confirmed cases
         display:
           name: Influenza B - Non-sentinel surveillance
+          timeInterval: week
       inf_bcombined:
         title: inf_bcombined
         unit: confirmed cases
         display:
           name: Influenza B - All types of surveillance
+          timeInterval: week
       bvicsentinel:
         title: bvicsentinel
         unit: confirmed cases
         display:
           name: B Victoria - Sentinel surveillance
+          timeInterval: week
       bvicnonsentinel:
         title: bvicnonsentinel
         unit: confirmed cases
         display:
           name: B Victoria - Non-sentinel surveillance
+          timeInterval: week
       bviccombined:
         title: bviccombined
         unit: confirmed cases
         display:
           name: B Victoria - All types of surveillance
+          timeInterval: week
       byamsentinel:
         title: byamsentinel
         unit: confirmed cases
         display:
           name: B Yamagata - Sentinel surveillance
+          timeInterval: week
       byamnonsentinel:
         title: byamnonsentinel
         unit: confirmed cases
         display:
           name: B Yamagata - Non-sentinel surveillance
+          timeInterval: week
       byamcombined:
         title: byamcombined
         unit: confirmed cases
         display:
           name: B Yamagata - All types of surveillance
+          timeInterval: week
       bnotdeterminedsentinel:
         title: bnotdeterminedsentinel
         unit: confirmed cases
         display:
           name: B (unknown lineage) - Sentinel surveillance
+          timeInterval: week
       bnotdeterminednonsentinel:
         title: bnotdeterminednonsentinel
         unit: confirmed cases
         display:
           name: B (unknown lineage) - Non-sentinel surveillance
+          timeInterval: week
       bnotdeterminedcombined:
         title: bnotdeterminedcombined
         unit: confirmed cases
         display:
           name: B (unknown lineage) - All types of surveillance
+          timeInterval: week
   flu_monthly:
     variables:
       pcnt_poscombined:
@@ -296,286 +353,343 @@ tables:
         unit: '%'
         display:
           name: Share of positive tests - All types of surveillance
+          timeInterval: month
         short_unit: '%'
       pcnt_possentinel:
         title: pcnt_possentinel
         unit: '%'
         display:
           name: Share of positive tests - Sentinel surveillance
+          timeInterval: month
         short_unit: '%'
       pcnt_posnonsentinel:
         title: pcnt_posnonsentinel
         unit: '%'
         display:
           name: Share of positive tests - Non-sentinel surveillance
+          timeInterval: month
         short_unit: '%'
       ah1n12009combined_zfilled:
         title: ah1n12009combined_zfilled
         unit: confirmed cases
         display:
           name: A H1N12009
+          timeInterval: month
       ah1combined_zfilled:
         title: ah1combined_zfilled
         unit: confirmed cases
         display:
           name: A H1
+          timeInterval: month
       ah3combined_zfilled:
         title: ah3combined_zfilled
         unit: confirmed cases
         display:
           name: A H3
+          timeInterval: month
       ah5combined_zfilled:
         title: ah5combined_zfilled
         unit: confirmed cases
         display:
           name: A H5
+          timeInterval: month
       ah7n9combined_zfilled:
         title: ah7n9combined_zfilled
         unit: confirmed cases
         display:
           name: A H7N9
+          timeInterval: month
       a_no_subtypecombined_zfilled:
         title: a_no_subtypecombined_zfilled
         unit: confirmed cases
         display:
           name: A (unknown subtype)
+          timeInterval: month
       bviccombined_zfilled:
         title: bviccombined_zfilled
         unit: confirmed cases
         display:
           name: B Victoria
+          timeInterval: month
       byamcombined_zfilled:
         title: byamcombined_zfilled
         unit: confirmed cases
         display:
           name: B Yamagata
+          timeInterval: month
       bnotdeterminedcombined_zfilled:
         title: bnotdeterminedcombined_zfilled
         unit: confirmed cases
         display:
           name: B (unknown lineage)
+          timeInterval: month
       ah1n12009sentinel_zfilled:
         title: ah1n12009sentinel_zfilled
         unit: confirmed cases
         display:
           name: A H1N12009
+          timeInterval: month
       ah3sentinel_zfilled:
         title: ah3sentinel_zfilled
         unit: confirmed cases
         display:
           name: A H3
+          timeInterval: month
       a_no_subtypesentinel_zfilled:
         title: a_no_subtypesentinel_zfilled
         unit: confirmed cases
         display:
           name: A (unknown subtype)
+          timeInterval: month
       bvicsentinel_zfilled:
         title: bvicsentinel_zfilled
         unit: confirmed cases
         display:
           name: B Victoria
+          timeInterval: month
       byamsentinel_zfilled:
         title: byamsentinel_zfilled
         unit: confirmed cases
         display:
           name: B Yamagata
+          timeInterval: month
       bnotdeterminedsentinel_zfilled:
         title: bnotdeterminedsentinel_zfilled
         unit: confirmed cases
         display:
           name: B (unknown lineage)
+          timeInterval: month
       ah1n12009nonsentinel_zfilled:
         title: ah1n12009nonsentinel_zfilled
         unit: confirmed cases
         display:
           name: A H1N12009
+          timeInterval: month
       ah3nonsentinel_zfilled:
         title: ah3nonsentinel_zfilled
         unit: confirmed cases
         display:
           name: A H3
+          timeInterval: month
       a_no_subtypenonsentinel_zfilled:
         title: a_no_subtypenonsentinel_zfilled
         unit: confirmed cases
         display:
           name: A (unknown subtype)
+          timeInterval: month
       bvicnonsentinel_zfilled:
         title: bvicnonsentinel_zfilled
         unit: confirmed cases
         display:
           name: B Victoria
+          timeInterval: month
       byamnonsentinel_zfilled:
         title: byamnonsentinel_zfilled
         unit: confirmed cases
         display:
           name: B Yamagata
+          timeInterval: month
       bnotdeterminednonsentinel_zfilled:
         title: bnotdeterminednonsentinel_zfilled
         unit: confirmed cases
         display:
           name: B (unknown lineage)
+          timeInterval: month
       inf_allcombined:
         title: inf_allcombined
         unit: confirmed cases
         display:
           name: All strains - All types of surveillance
+          timeInterval: month
       inf_allsentinel:
         title: inf_allsentinel
         unit: confirmed cases
         display:
           name: All strains - Sentinel surveillance
+          timeInterval: month
       inf_allnonsentinel:
         title: inf_allnonsentinel
         unit: confirmed cases
         display:
           name: All strains - Non-sentinel surveillance
+          timeInterval: month
       reported_ari_cases:
         title: reported_ari_cases
         unit: reported cases
         display:
           name: Reported cases of acute respiratory infections
+          timeInterval: month
       reported_ili_cases:
         title: reported_ili_cases
         unit: reported cases
         display:
           name: Reported cases of influenza-like illnesses
+          timeInterval: month
       reported_sari_cases:
         title: reported_sari_cases
         unit: reported cases
         display:
           name: Reported cases of severe acute respiratory infections
+          timeInterval: month
       inf_asentinel:
         title: inf_asentinel
         unit: confirmed cases
         display:
           name: Influenza A - Sentinel surveillance
+          timeInterval: month
       inf_anonsentinel:
         title: inf_anonsentinel
         unit: confirmed cases
         display:
           name: Influenza A - Non-sentinel surveillance
+          timeInterval: month
       inf_acombined:
         title: inf_acombined
         unit: confirmed cases
         display:
           name: Influenza A - All types of surveillance
+          timeInterval: month
       ah1n12009sentinel:
         title: ah1n12009sentinel
         unit: confirmed cases
         display:
           name: A H1N12009 - Sentinel surveillance
+          timeInterval: month
       ah1n12009nonsentinel:
         title: ah1n12009nonsentinel
         unit: confirmed cases
         display:
           name: A H1N12009 - Non-sentinel surveillance
+          timeInterval: month
       ah1n12009combined:
         title: ah1n12009combined
         unit: confirmed cases
         display:
           name: A H1N12009 - All types of surveillance
+          timeInterval: month
       ah1combined:
         title: ah1combined
         unit: confirmed cases
         display:
           name: A H1 - All types of surveillance
+          timeInterval: month
       ah3sentinel:
         title: ah3sentinel
         unit: confirmed cases
         display:
           name: A H3 - Sentinel surveillance
+          timeInterval: month
       ah3nonsentinel:
         title: ah3nonsentinel
         unit: confirmed cases
         display:
           name: A H3 - Non-sentinel surveillance
+          timeInterval: month
       ah3combined:
         title: ah3combined
         unit: confirmed cases
         display:
           name: A H3 - All types of surveillance
+          timeInterval: month
       ah5combined:
         title: ah5combined
         unit: confirmed cases
         display:
           name: A H5 - All types of surveillance
+          timeInterval: month
       ah7n9combined:
         title: ah7n9combined
         unit: confirmed cases
         display:
           name: A H7N9 - All types of surveillance
+          timeInterval: month
       a_no_subtypesentinel:
         title: a_no_subtypesentinel
         unit: confirmed cases
         display:
           name: A (unknown subtype) - Sentinel surveillance
+          timeInterval: month
       a_no_subtypenonsentinel:
         title: a_no_subtypenonsentinel
         unit: confirmed cases
         display:
           name: A (unknown subtype) - Non-sentinel surveillance
+          timeInterval: month
       a_no_subtypecombined:
         title: a_no_subtypecombined
         unit: confirmed cases
         display:
           name: A (unknown subtype) - All types of surveillance
+          timeInterval: month
       inf_bsentinel:
         title: inf_bsentinel
         unit: confirmed cases
         display:
           name: Influenza B - Sentinel surveillance
+          timeInterval: month
       inf_bnonsentinel:
         title: inf_bnonsentinel
         unit: confirmed cases
         display:
           name: Influenza B - Non-sentinel surveillance
+          timeInterval: month
       inf_bcombined:
         title: inf_bcombined
         unit: confirmed cases
         display:
           name: Influenza B - All types of surveillance
+          timeInterval: month
       byamsentinel:
         title: byamsentinel
         unit: confirmed cases
         display:
           name: B Yamagata - Sentinel surveillance
+          timeInterval: month
       byamnonsentinel:
         title: byamnonsentinel
         unit: confirmed cases
         display:
           name: B Yamagata - Non-sentinel surveillance
+          timeInterval: month
       byamcombined:
         title: byamcombined
         unit: confirmed cases
         display:
           name: B Yamagata - All types of surveillance
+          timeInterval: month
       bvicsentinel:
         title: bvicsentinel
         unit: confirmed cases
         display:
           name: B Victoria - Sentinel surveillance
+          timeInterval: month
       bvicnonsentinel:
         title: bvicnonsentinel
         unit: confirmed cases
         display:
           name: B Victoria - Non-sentinel surveillance
+          timeInterval: month
       bviccombined:
         title: bviccombined
         unit: confirmed cases
         display:
           name: B Victoria - All types of surveillance
+          timeInterval: month
       bnotdeterminedsentinel:
         title: bnotdeterminedsentinel
         unit: confirmed cases
         display:
           name: B (unknown lineage)  - Sentinel surveillance
+          timeInterval: month
       bnotdeterminednonsentinel:
         title: bnotdeterminednonsentinel
         unit: confirmed cases
         display:
           name: B (unknown lineage) - Non-sentinel surveillance
+          timeInterval: month
       bnotdeterminedcombined:
         title: bnotdeterminedcombined
         unit: confirmed cases
         display:
           name: B (unknown lineage) - All types of surveillance
+          timeInterval: month

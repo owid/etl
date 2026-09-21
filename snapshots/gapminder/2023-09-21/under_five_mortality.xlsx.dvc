@@ -19,11 +19,8 @@ meta:
     date_accessed: "2023-09-21"
     date_published: "2020-01-30"
     license:
-      name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
+      name: CC BY 4.0
       url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit
-  license:
-    name: CC BY 4.0
-    url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit
 outs:
   - md5: 611505656a3bbd4312b50c1d1a7eff79
     size: 1522938

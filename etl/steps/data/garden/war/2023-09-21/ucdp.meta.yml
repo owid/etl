@@ -195,7 +195,7 @@ tables:
           At least one interstate, intrastate, or extrasystemic conflict event took place in this country in a given year.
 
           <%- elif conflict_type == "intrastate (internationalized)" -%>
-          At least one internationalised intrastate conflict event took place in this country in a given year.
+          At least one internationalized intrastate conflict event took place in this country in a given year.
 
           <%- elif conflict_type == "intrastate (non-internationalized)" -%>
           At least one non-internationalized intrastate conflict event took place in this country in a given year.

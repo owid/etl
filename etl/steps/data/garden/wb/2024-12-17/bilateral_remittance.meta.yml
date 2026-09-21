@@ -21,7 +21,7 @@ tables:
       remittance_flows:
         title: Estimated bilateral remittance flows
         description_short: |-
-          The estimated bilateral remittance outflows out of <<country_origin>>. These estimates use migrant stocks, host country incomes, and origin country incomes.
+          Estimated bilateral remittance outflows out of <<country_origin>>. These estimates use migrant stocks, host country incomes, and origin country incomes.
         description_key:
           - |-
             <% if country_origin in ['India', 'Pakistan'] %>

@@ -7,7 +7,7 @@ steps:
         - snapshot://lgbt_rights/2026-05-11/lgbti_national_policy_dataset.csv
       - data://garden/regions/2023-01-01/regions
       - data://garden/demography/2024-07-15/population
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/wb/2026-07-01/income_groups
 
   # Equaldex dataset
   data://grapher/lgbt_rights/2026-05-14/equaldex:
@@ -18,7 +18,7 @@ steps:
         - snapshot://lgbt_rights/2026-05-14/equaldex_current.csv
       - data://garden/demography/2024-07-15/population
       - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/wb/2026-07-01/income_groups
       - data://garden/countries/2023-09-25/isd
 
   # Homosexuality criminalization data from Mignot (2025)
@@ -26,7 +26,7 @@ steps:
     - data://garden/lgbt_rights/2026-06-15/criminalization_mignot:
       - data://garden/demography/2024-07-15/population
       - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2025-07-01/income_groups
+      - data://garden/wb/2026-07-01/income_groups
       - data://meadow/lgbt_rights/2026-06-15/criminalization_mignot:
         - snapshot://lgbt_rights/2026-06-15/criminalization_mignot.csv
 
@@ -52,6 +52,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/pew/2026-06-03/same_sex_marriage
     - data://garden/demography/2024-07-15/population
-    - data://garden/wb/2025-07-01/income_groups
+    - data://garden/wb/2026-07-01/income_groups
   data://grapher/pew/2026-06-03/same_sex_marriage:
     - data://garden/pew/2026-06-03/same_sex_marriage
