@@ -99,7 +99,7 @@ EXTRACT_COUNTRY_PERCENTILES = True
 # vintage (e.g. `20260324_2021`), which must match the PIP API release used for the rest of the data.
 GLOBAL_DIST_1000BINS_URL = (
     "https://datacatalogfiles.worldbank.org/ddh-published/0064304/DR0094424/"
-    "GlobalDist1000bins_1990_2026_20260324_2021_01_02_PROD.dta"
+    "GlobalDist1000bins_1990_2026_20260922_2021_01_02_PROD.dta"
 )
 # The bins file is published for 2021 PPP only, so regional percentiles/relative poverty are
 # produced for 2021 PPP. (Country data still covers every PPP version in POVLINES_DICT.)
