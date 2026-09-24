@@ -37,6 +37,8 @@ tables:
         description_key:
           - |-
             {definitions.description_key}
+        description_processing: |-
+          - {definitions.description_processing}
         presentation:
           grapher_config:
             note: |-
