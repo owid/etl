@@ -1,0 +1,417 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Animal Welfare
+  description_processing_consumption: &description_processing_consumption |-
+    - The number of animals is estimated by scaling the animals slaughtered in each country by the ratio of the meat supplied to that country, reported by the UN Food and Agriculture Organization (FAO) in its Food Balance Sheets, to the meat it produced.
+    - Countries that slaughter no animals of their own have no such ratio, so their meat supply is converted at the world average number of animals per tonne.
+    - Imported meat is converted at the importing country's own number of animals per tonne, so countries whose animals are unusually large or small are over- or understated.
+    - Meat from horses, camels, rabbits, game and other minor categories is not included.
+    - This follows the method of van der Laan, S., Breeman, G., & Scherer, L. (2024), "Animal Lives Affected by Meat Consumption Trends in the G20 Countries", extended from the G20 countries to all countries.
+
+dataset:
+  title: Land animals killed for domestic consumption
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  animals_killed_for_domestic_consumption:
+    variables:
+      cattle_and_buffaloes_killed_in_country:
+        title: Cattle and buffaloes slaughtered for meat
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of production, not consumption.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for cattle and buffaloes are summed.
+        presentation:
+          title_public: Cattle and buffaloes slaughtered for meat
+        display:
+          name: Cattle and buffaloes
+          unit: animals
+          numDecimalPlaces: 0
+      cattle_and_buffaloes_killed_in_country_per_capita:
+        title: Cattle and buffaloes slaughtered for meat per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of production, not consumption.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for cattle and buffaloes are summed.
+        presentation:
+          title_public: Cattle and buffaloes slaughtered for meat per person
+        display:
+          name: Cattle and buffaloes
+          unit: animals per person
+          numDecimalPlaces: 2
+      cattle_and_buffaloes_killed_for_domestic_supply:
+        title: Cattle and buffaloes slaughtered for meat supplied to the country
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Cattle and buffaloes slaughtered for meat supplied to the country
+        display:
+          name: Cattle and buffaloes
+          unit: animals
+          numDecimalPlaces: 0
+      cattle_and_buffaloes_killed_for_domestic_supply_per_capita:
+        title: Cattle and buffaloes slaughtered for meat supplied to the country per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Cattle and buffaloes slaughtered for meat supplied to the country per person
+        display:
+          name: Cattle and buffaloes
+          unit: animals per person
+          numDecimalPlaces: 2
+      cattle_and_buffaloes_killed_for_food:
+        title: Cattle and buffaloes slaughtered for meat eaten in the country
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Cattle and buffaloes slaughtered for meat eaten in the country
+        display:
+          name: Cattle and buffaloes
+          unit: animals
+          numDecimalPlaces: 0
+      cattle_and_buffaloes_killed_for_food_per_capita:
+        title: Cattle and buffaloes slaughtered for meat eaten in the country per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Cattle and buffaloes slaughtered for meat eaten in the country per person
+        display:
+          name: Cattle and buffaloes
+          unit: animals per person
+          numDecimalPlaces: 2
+      sheep_and_goats_killed_in_country:
+        title: Sheep and goats slaughtered for meat
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of production, not consumption.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for sheep and goats are summed.
+        presentation:
+          title_public: Sheep and goats slaughtered for meat
+        display:
+          name: Sheep and goats
+          unit: animals
+          numDecimalPlaces: 0
+      sheep_and_goats_killed_in_country_per_capita:
+        title: Sheep and goats slaughtered for meat per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of production, not consumption.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for sheep and goats are summed.
+        presentation:
+          title_public: Sheep and goats slaughtered for meat per person
+        display:
+          name: Sheep and goats
+          unit: animals per person
+          numDecimalPlaces: 2
+      sheep_and_goats_killed_for_domestic_supply:
+        title: Sheep and goats slaughtered for meat supplied to the country
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Sheep and goats slaughtered for meat supplied to the country
+        display:
+          name: Sheep and goats
+          unit: animals
+          numDecimalPlaces: 0
+      sheep_and_goats_killed_for_domestic_supply_per_capita:
+        title: Sheep and goats slaughtered for meat supplied to the country per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Sheep and goats slaughtered for meat supplied to the country per person
+        display:
+          name: Sheep and goats
+          unit: animals per person
+          numDecimalPlaces: 2
+      sheep_and_goats_killed_for_food:
+        title: Sheep and goats slaughtered for meat eaten in the country
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Sheep and goats slaughtered for meat eaten in the country
+        display:
+          name: Sheep and goats
+          unit: animals
+          numDecimalPlaces: 0
+      sheep_and_goats_killed_for_food_per_capita:
+        title: Sheep and goats slaughtered for meat eaten in the country per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Sheep and goats slaughtered for meat eaten in the country per person
+        display:
+          name: Sheep and goats
+          unit: animals per person
+          numDecimalPlaces: 2
+      pigs_killed_in_country:
+        title: Pigs slaughtered for meat
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of production, not consumption.
+        processing_level: minor
+        presentation:
+          title_public: Pigs slaughtered for meat
+        display:
+          name: Pigs
+          unit: animals
+          numDecimalPlaces: 0
+      pigs_killed_in_country_per_capita:
+        title: Pigs slaughtered for meat per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of production, not consumption.
+        processing_level: minor
+        presentation:
+          title_public: Pigs slaughtered for meat per person
+        display:
+          name: Pigs
+          unit: animals per person
+          numDecimalPlaces: 2
+      pigs_killed_for_domestic_supply:
+        title: Pigs slaughtered for meat supplied to the country
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Pigs slaughtered for meat supplied to the country
+        display:
+          name: Pigs
+          unit: animals
+          numDecimalPlaces: 0
+      pigs_killed_for_domestic_supply_per_capita:
+        title: Pigs slaughtered for meat supplied to the country per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Pigs slaughtered for meat supplied to the country per person
+        display:
+          name: Pigs
+          unit: animals per person
+          numDecimalPlaces: 2
+      pigs_killed_for_food:
+        title: Pigs slaughtered for meat eaten in the country
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Pigs slaughtered for meat eaten in the country
+        display:
+          name: Pigs
+          unit: animals
+          numDecimalPlaces: 0
+      pigs_killed_for_food_per_capita:
+        title: Pigs slaughtered for meat eaten in the country per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Pigs slaughtered for meat eaten in the country per person
+        display:
+          name: Pigs
+          unit: animals per person
+          numDecimalPlaces: 2
+      poultry_killed_in_country:
+        title: Poultry slaughtered for meat
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of production, not consumption.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for chickens, ducks, geese and guinea fowl, turkeys, and pigeons and other birds are summed.
+        presentation:
+          title_public: Poultry slaughtered for meat
+        display:
+          name: Poultry
+          unit: animals
+          numDecimalPlaces: 0
+      poultry_killed_in_country_per_capita:
+        title: Poultry slaughtered for meat per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of production, not consumption.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for chickens, ducks, geese and guinea fowl, turkeys, and pigeons and other birds are summed.
+        presentation:
+          title_public: Poultry slaughtered for meat per person
+        display:
+          name: Poultry
+          unit: animals per person
+          numDecimalPlaces: 2
+      poultry_killed_for_domestic_supply:
+        title: Poultry slaughtered for meat supplied to the country
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Poultry slaughtered for meat supplied to the country
+        display:
+          name: Poultry
+          unit: animals
+          numDecimalPlaces: 0
+      poultry_killed_for_domestic_supply_per_capita:
+        title: Poultry slaughtered for meat supplied to the country per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Poultry slaughtered for meat supplied to the country per person
+        display:
+          name: Poultry
+          unit: animals per person
+          numDecimalPlaces: 2
+      poultry_killed_for_food:
+        title: Poultry slaughtered for meat eaten in the country
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Poultry slaughtered for meat eaten in the country
+        display:
+          name: Poultry
+          unit: animals
+          numDecimalPlaces: 0
+      poultry_killed_for_food_per_capita:
+        title: Poultry slaughtered for meat eaten in the country per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Poultry slaughtered for meat eaten in the country per person
+        display:
+          name: Poultry
+          unit: animals per person
+          numDecimalPlaces: 2
+      land_animals_killed_in_country:
+        title: Land animals slaughtered for meat
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of production, not consumption.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for cattle, buffaloes, sheep, goats, pigs, chickens, ducks, geese and guinea fowl, turkeys, and pigeons and other birds are summed.
+        presentation:
+          title_public: Land animals slaughtered for meat
+        display:
+          name: Land animals
+          unit: animals
+          numDecimalPlaces: 0
+      land_animals_killed_in_country_per_capita:
+        title: Land animals slaughtered for meat per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of production, not consumption.
+        processing_level: minor
+        description_processing: |-
+          FAO reports each species separately; the numbers for cattle, buffaloes, sheep, goats, pigs, chickens, ducks, geese and guinea fowl, turkeys, and pigeons and other birds are summed.
+        presentation:
+          title_public: Land animals slaughtered for meat per person
+        display:
+          name: Land animals
+          unit: animals per person
+          numDecimalPlaces: 2
+      land_animals_killed_for_domestic_supply:
+        title: Land animals slaughtered for meat supplied to the country
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Land animals slaughtered for meat supplied to the country
+        display:
+          name: Land animals
+          unit: animals
+          numDecimalPlaces: 0
+      land_animals_killed_for_domestic_supply_per_capita:
+        title: Land animals slaughtered for meat supplied to the country per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Land animals slaughtered for meat supplied to the country per person
+        display:
+          name: Land animals
+          unit: animals per person
+          numDecimalPlaces: 2
+      land_animals_killed_for_food:
+        title: Land animals slaughtered for meat eaten in the country
+        unit: animals
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Land animals slaughtered for meat eaten in the country
+        display:
+          name: Land animals
+          unit: animals
+          numDecimalPlaces: 0
+      land_animals_killed_for_food_per_capita:
+        title: Land animals slaughtered for meat eaten in the country per person
+        unit: animals per person
+        short_unit: ''
+        description_short: Based on the country of consumption, not production.
+        processing_level: major
+        description_processing: *description_processing_consumption
+        presentation:
+          title_public: Land animals slaughtered for meat eaten in the country per person
+        display:
+          name: Land animals
+          unit: animals per person
+          numDecimalPlaces: 2
