@@ -14,7 +14,7 @@ def run() -> None:
     ds_garden = paths.load_dataset("ethnologue")
 
     # Read table from garden dataset.
-    tb = ds_garden["languages_by_status"]
+    tb = ds_garden.read("languages_by_status", reset_index=False)
     #
     # Save outputs.
     #
