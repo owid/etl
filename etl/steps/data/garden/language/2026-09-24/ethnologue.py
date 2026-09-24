@@ -23,9 +23,9 @@ def run() -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("ethnologue")
     # Read table from meadow dataset.
-    tb_country_codes = ds_meadow["country_codes"].reset_index()
-    tb_language_codes = ds_meadow["language_codes"].reset_index()
-    tb_language_index = ds_meadow["language_index"].reset_index()
+    tb_country_codes = ds_meadow.read("country_codes")
+    tb_language_codes = ds_meadow.read("language_codes")
+    tb_language_index = ds_meadow.read("language_index")
     sanity_check_inputs(tb_country_codes, tb_language_codes, tb_language_index)
     # Store the origins to add back to indicators later
     origins = tb_country_codes["country"].metadata.origins
