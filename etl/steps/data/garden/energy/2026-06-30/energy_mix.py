@@ -8,7 +8,6 @@ added (Maddison). Traditional biomass (Smil, World only) is kept separate from T
 
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
-from shared import EXCLUDED_PROVIDER_REGIONS
 
 from etl.data_helpers.geo import add_gdp_to_table
 from etl.helpers import PathFinder
@@ -22,6 +21,25 @@ TWH_TO_KWH = 1e9
 
 # Countries whose data have to be removed since they were identified as outliers.
 OUTLIERS = ["Gibraltar"]
+
+# Aggregates the EIA garden step builds under OWID region names. They are never used here: a region's total must
+# come from the same producer as its sources, or its shares mix two denominators.
+EIA_OWID_AGGREGATES = [
+    "Africa",
+    "Asia",
+    "Europe",
+    "North America",
+    "Oceania",
+    "South America",
+    "Low-income countries",
+    "Lower-middle-income countries",
+    "Upper-middle-income countries",
+    "High-income countries",
+    "World",
+]
+
+# Maximum deviation from 100% of the sum of the shares of the exclusive sources, in percentage points.
+MAX_SHARE_SUM_DEVIATION_PCT = 2
 
 # Indicators that must not carry the producer's description, because it describes only one of the
 # inputs that go into them (see where this is applied, at the end of run()).
@@ -306,9 +324,10 @@ def extend_total_with_eia(tb: Table, tb_eia: Table) -> Table:
     )
     tb_eia = tb_eia.dropna(subset=["total_energy_supply_twh"]).reset_index(drop=True)
 
-    # Drop EIA's own regional aggregates (marked with an "(EIA)" suffix): region totals come from the
-    # Statistical Review (OWID regions); EIA is used only to extend country coverage.
-    tb_eia = tb_eia[~tb_eia["country"].str.contains("(EIA)", regex=False)].reset_index(drop=True)
+    # Drop EIA's own regional aggregates (marked with an "(EIA)" suffix) and the OWID-named ones its garden step
+    # builds: region totals come from the Statistical Review only; EIA is used only to extend country coverage.
+    is_aggregate = tb_eia["country"].str.contains("(EIA)", regex=False) | tb_eia["country"].isin(EIA_OWID_AGGREGATES)
+    tb_eia = tb_eia[~is_aggregate].reset_index(drop=True)
 
     # Combine, prioritizing the Statistical Review *per value*: keep its total energy supply where it has
     # one, fall back to EIA where it is missing, and add EIA-only country-years. Using a plain concat +
@@ -424,6 +443,16 @@ def sanity_check_outputs(tb: Table) -> None:
         col = f"{source}_share_pct"
         valid = tb[col].dropna()
         assert (valid >= -0.01).all() and (valid <= 100.01).all(), f"{col} out of [0, 100]."
+    # Wherever all exclusive sources are reported, their shares must add up to ~100%. This catches a share whose
+    # numerator and denominator come from different producers.
+    exclusive = [f"{source}_share_pct" for source in SR_SOURCES.values()]
+    complete = tb[exclusive].notna().all(axis=1)
+    share_sum = tb.loc[complete, exclusive].sum(axis=1)
+    off = tb.loc[complete][(share_sum - 100).abs() > MAX_SHARE_SUM_DEVIATION_PCT]
+    assert off.empty, "Shares of the exclusive sources do not add up to ~100%: " + "; ".join(
+        f"{country} ({group['year'].min()}-{group['year'].max()})"
+        for country, group in off.groupby("country", observed=True)
+    )
     # World total energy supply for the latest year should be in a plausible range (~600 EJ ~= 167000 TWh).
     world_latest = tb[(tb["country"] == "World")].sort_values("year").iloc[-1]
     assert 140000 < world_latest["total_energy_supply_twh"] < 200000, (
@@ -482,10 +511,6 @@ def run() -> None:
 
     # Remove outliers.
     tb = tb[~tb["country"].isin(OUTLIERS)].reset_index(drop=True)
-
-    # Remove residual and undefined provider regions (kept in the Statistical Review garden as
-    # aggregation inputs, but meaningless to readers).
-    tb = tb[~tb["country"].isin(EXCLUDED_PROVIDER_REGIONS)].reset_index(drop=True)
 
     # Sanity checks.
     sanity_check_outputs(tb=tb)
