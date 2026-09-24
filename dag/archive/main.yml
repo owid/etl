@@ -1347,6 +1347,12 @@ steps:
   # archived; last active in e2c57887abcb on 2026-09-07
   export://multidim/owid/latest/ig_countries:
     - data-private://grapher/owid/latest/ig_countries
+  # archived; last active in 46e84ce73f67 on 2026-09-24
+  data-private://grapher/language/2025-09-03/ethnologue:
+    - data-private://garden/language/2025-09-03/ethnologue:
+      - data-private://meadow/language/2025-09-03/ethnologue:
+        - snapshot-private://language/2025-09-03/ethnologue.zip
+      - data://garden/regions/2023-01-01/regions
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
