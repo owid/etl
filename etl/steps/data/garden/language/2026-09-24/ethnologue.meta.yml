@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - State Capacity
+      attribution_short: SIL International
     processing_level: major
     display:
       numDecimalPlaces: 0
