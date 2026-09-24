@@ -1,0 +1,100 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Animal Welfare
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  in_ovo_sexing_market_penetration:
+    title: In-ovo sexing market penetration
+    variables:
+      share_of_commercial_hens_sexed_in_ovo:
+        title: Share of commercial laying hens sexed in ovo
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      share_of_commercial_hens_sexed_in_ovo_low:
+        title: Share of commercial laying hens sexed in ovo (lower bound)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      share_of_commercial_hens_sexed_in_ovo_high:
+        title: Share of commercial laying hens sexed in ovo (upper bound)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      share_of_all_hens_sexed_in_ovo:
+        title: Share of all laying hens sexed in ovo
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      share_of_all_hens_sexed_in_ovo_low:
+        title: Share of all laying hens sexed in ovo (lower bound)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      share_of_all_hens_sexed_in_ovo_high:
+        title: Share of all laying hens sexed in ovo (upper bound)
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      hens_sexed_in_ovo:
+        title: Number of commercial laying hens sexed in ovo
+        unit: hens
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      hens_sexed_in_ovo_low:
+        title: Number of commercial laying hens sexed in ovo (lower bound)
+        unit: hens
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      hens_sexed_in_ovo_high:
+        title: Number of commercial laying hens sexed in ovo (upper bound)
+        unit: hens
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      female_chicks_produced_with_in_ovo_sexing:
+        title: Number of female chicks produced with in-ovo sexing
+        unit: chicks
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      cumulative_male_embryos_removed:
+        title: Cumulative number of male embryos removed before hatching
+        unit: embryos
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+  share_of_hens_sexed_in_ovo:
+    title: Share of laying hens sexed in ovo, by country
+    variables:
+      share_of_hens_sexed_in_ovo:
+        title: Share of laying hens sexed in ovo
+        unit: "%"
+        short_unit: "%"
+        processing_level: major
+        description_processing: |-
+          Each estimate is assigned to the calendar year of its date. For the countries that the producer reports directly, the share is the producer's central estimate, or the midpoint of its range if there is no central estimate.
+
+          For the European Union, the producer only publishes a total. The number of in-ovo sexed hens in the EU (taken from the producer where given, and otherwise estimated as their share of all hens times the number of laying hens in the EU reported by FAOSTAT) is allocated among the member countries that have banned the culling of male chicks, in proportion to their number of laying hens, from the year before each ban took effect. Germany is included from the start of the series, since the technology was first rolled out for its market.
+
+          FAOSTAT has no data on laying hens for some countries in some years. Those gaps are filled by repeating the latest reported value, for at most five years.
+
+          All other countries and years are assigned a share of zero, since in-ovo sexing is not used there.
+        display:
+          numDecimalPlaces: 1
