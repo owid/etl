@@ -31,8 +31,19 @@ from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # ty: ignore
 from pandas.core.series import Series
 
 from owid.catalog.api.utils import session, storage_options_for_http
-from owid.catalog.core import indicators, utils, warnings
+from owid.catalog.core import docs, indicators, utils, warnings
 from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, TableMeta, VariableMeta
+
+# Columns of Table.codebook, in order.
+CODEBOOK_COLUMNS = [
+    "column",
+    "title",
+    "description",
+    "unit",
+    "source",
+    "description_key",
+    "description_processing",
+]
 
 log = structlog.get_logger()
 
@@ -357,17 +368,15 @@ class Table(pd.DataFrame):
     def codebook(self) -> pd.DataFrame:
         """Generate a human-readable codebook for this table.
 
-        Creates a DataFrame summarizing all variables in the table with their
-        titles, descriptions, units, and source attributions.
+        One row per column (index columns included) with its title, short description, unit, the
+        short labels of its sources, and the longer texts: what you should know about the indicator
+        (``description_key``) and how we processed it (``description_processing``), both as markdown.
+        The source labels match the ``label`` column of :attr:`sources`, which carries the full
+        details (URLs, licenses, citations).
 
         Returns:
-            DataFrame with columns:
-
-                - column: Column name (including index columns)
-                - title: Title from metadata (title_public > display.name > title)
-                - description: Short description of the indicator
-                - unit: Unit of measurement with short unit in parentheses
-                - source: Formatted source attribution with URLs
+            DataFrame with columns ``column``, ``title``, ``description``, ``unit``, ``source``,
+            ``description_key``, ``description_processing``.
 
         Example:
             ```python
@@ -375,76 +384,36 @@ class Table(pd.DataFrame):
             print(codebook.to_markdown())
             ```
         """
-        # Initialize lists to store the codebook information.
-        columns = []
-        titles = []
-        descriptions = []
-        units = []
-        sources = []
-
-        # Use all_columns to include both index and regular columns.
+        rows = []
         for column in self.all_columns:
-            # Use get_column_or_index to access both regular and index columns.
             md = self.get_column_or_index(column).metadata
-            columns.append(column)
-
-            # Determine the best title to use.
-            # Priority: presentation.title_public > display.name > title
-            title = md.title or ""
-            if md.presentation and md.presentation.title_public:
-                title = md.presentation.title_public
-            elif md.display and "name" in md.display:
-                title = md.display["name"]
-
-            titles.append(title)
-
-            # Use short description.
-            descriptions.append(md.description_short or "")
-
-            # Prepare indicator's unit, including short_unit if available.
             unit = md.unit or ""
             if md.short_unit and md.short_unit != md.unit:
                 unit += f" ({md.short_unit})"
-            units.append(unit)
+            rows.append(
+                {
+                    "column": column,
+                    "title": docs.variable_title(column, md),
+                    "description": utils.remove_details_on_demand(md.description_short or ""),
+                    "unit": unit,
+                    "source": docs.column_source_labels(list(md.origins)),
+                    "description_key": docs.description_key_text(md) or "",
+                    "description_processing": utils.remove_details_on_demand(md.description_processing or ""),
+                }
+            )
+        return pd.DataFrame(rows, columns=CODEBOOK_COLUMNS)
 
-            # Gather unique origins of current variable.
-            unique_sources = []
-            for origin in md.origins:
-                # Construct the source name from the origin's attribution.
-                # If not defined, build it using the default format "Producer - Data product (year)".
-                if origin.attribution:
-                    source_name = origin.attribution
-                else:
-                    # Build default format
-                    source_name = origin.producer
-                    if origin.title or origin.title_snapshot:
-                        source_name += f" - {origin.title or origin.title_snapshot}"
-                    if origin.date_published:
-                        # Extract year from date_published (can be YYYY or YYYY-MM-DD)
-                        year = str(origin.date_published).split("-")[0]
-                        source_name += f" ({year})"
+    @property
+    def sources(self) -> pd.DataFrame:
+        """One row per unique origin used by any column of this table.
 
-                # Add URL at the end of the source in brackets.
-                if origin.url_main:
-                    source_name += f" [{origin.url_main}]"
-
-                # Add the source to the list of unique sources.
-                if source_name not in unique_sources:
-                    unique_sources.append(source_name)
-
-            # Concatenate all sources.
-            sources_combined = "; ".join(unique_sources)
-            sources.append(sources_combined)
-
-        # Apply remove_details_on_demand to all descriptions at once.
-        descriptions = [utils.remove_details_on_demand(desc) for desc in descriptions]
-
-        # Create a DataFrame with the codebook.
-        codebook = pd.DataFrame(
-            {"column": columns, "title": titles, "description": descriptions, "unit": units, "source": sources}
-        )
-
-        return codebook
+        Columns: ``label`` (as printed in the codebook's ``source`` column), ``producer``, ``title``,
+        ``description``, ``date_published``, ``date_accessed``, ``url_main``, ``url_download``,
+        ``citation_full``, ``license_name``, ``license_url``. Origins that render identically are
+        one row; rows are ordered by how many columns reference them.
+        """
+        origins = {column: list(self.get_column_or_index(column).metadata.origins) for column in self.all_columns}
+        return docs.sources_frame(origins)
 
     def to_excel(
         self,
@@ -456,8 +425,8 @@ class Table(pd.DataFrame):
     ) -> None:
         """Save table to Excel file with optional metadata codebook.
 
-        Exports the table data to an Excel file, optionally including a separate
-        sheet with the codebook metadata.
+        Exports the table data to an Excel file, optionally including a codebook sheet
+        and a ``sources`` sheet with the details of every origin.
 
         Args:
             excel_writer: File path or ExcelWriter object to save to.
@@ -477,12 +446,14 @@ class Table(pd.DataFrame):
             super().to_excel(excel_writer, sheet_name=sheet_name, **kwargs)
             if with_metadata:
                 self.codebook.to_excel(excel_writer, sheet_name=metadata_sheet_name, index=False)
+                self.sources.to_excel(excel_writer, sheet_name="sources", index=False)
         else:
             # If excel_writer is a file path, create a new ExcelWriter context.
             with pd.ExcelWriter(excel_writer) as writer:  # ty: ignore
                 super().to_excel(writer, sheet_name=sheet_name, **kwargs)
                 if with_metadata:
                     self.codebook.to_excel(writer, sheet_name=metadata_sheet_name, index=False)
+                    self.sources.to_excel(writer, sheet_name="sources", index=False)
 
     def to_feather(
         self,
