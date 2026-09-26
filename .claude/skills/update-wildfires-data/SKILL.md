@@ -49,19 +49,16 @@ Throughout, `<old>` is the current version folder (e.g. `2026-07-27`) and `<new>
 ```
 
 This copies the step files into `<new>` folders and **appends** new entries to the end of
-`dag/climate.yml`, leaving the old ones in place. Three manual fixes, all needed:
+`dag/climate.yml`, leaving the old ones in place. One manual fix is needed:
 
-- Move the new dag entries into the place of the old wildfires block, preserving its nesting and
-  its `# Global Wildfire Information System - Weekly wildfires.` comment header, and delete the
-  appended block at the end of the file.
-- Delete the old step files, but **not** the old snapshot folder yet:
-  `git rm -r etl/steps/data/{meadow,garden,grapher}/climate/<old>`.
-- `snapshots/climate/<old>/` has to stay on disk until step 3 has run, because the snapshot script
-  compares row counts against the most recent *earlier* version. Delete it too early and step 3
-  dies with `.dvc file is missing 'outs' field. Have you run the snapshot?`. If that happens,
-  restore it with
-  `git show HEAD:snapshots/climate/<old>/weekly_wildfires.csv.dvc > snapshots/climate/<old>/weekly_wildfires.csv.dvc`,
-  run step 3, then delete it.
+- Move the new dag entries into the wildfires block, right below the old entries, with the same
+  nesting as the old block (the appended entries lose it). Then delete the appended block at the
+  end of the file.
+
+Keep the old version (its dag entries, step files and snapshot folder) until the review is done.
+It is removed in [step 9](#9-after-review-retire-the-old-version-then-merge). The old snapshot is
+needed anyway: the snapshot script compares row counts against the most recent *earlier* version,
+so step 3 dies with `.dvc file is missing 'outs' field. Have you run the snapshot?` if it is gone.
 
 ### 3. Fetch the snapshot
 
@@ -69,8 +66,7 @@ This copies the step files into `<new>` folders and **appends** new entries to t
 .venv/bin/etls climate/<new>/weekly_wildfires
 ```
 
-Around 6 minutes, and it prints no progress until it finishes. Once it has, delete the old
-snapshot folder: `git rm -r snapshots/climate/<old>`.
+Around 6 minutes (sometimes over 10), and it prints no progress until it finishes.
 
 ### 4. Build the rest of the chain
 
@@ -86,19 +82,13 @@ asserts run here; if one fires, see [Checks](#checks-that-must-pass) below.
 Run the three checks in [Checks](#checks-that-must-pass). Do not skip the per-country coverage
 one: it is the only thing standing between a partial fetch and understated regional aggregates.
 
-### 6. Commit, archive, push
+### 6. Commit and push
 
 ```bash
-make check                       # format, lint, typecheck
-git add -A && git commit -m "📊 Update weekly wildfires data to <new>"
-.venv/bin/etl archive-dag        # reads COMMITTED history, so commit first
-git add dag/archive/climate.yml && git commit -m "🔨 Archive the superseded <old> wildfires steps"
+git add dag/climate.yml etl/steps/data/{meadow,garden,grapher}/climate/<new> snapshots/climate/<new>
+git commit -m "📊 Update weekly wildfires data to <new>"   # the pre-commit hook runs make check
 git push -u origin <branch>
 ```
-
-`archive-dag` should add exactly the six `<old>` wildfires steps. If it sweeps in unrelated steps
-somebody else left un-archived, `git checkout` those lines to keep the PR scoped, and never
-hand-edit the archive file.
 
 ### 7. Remap the charts on staging (do not skip this)
 
@@ -163,17 +153,35 @@ print(env.read_sql("""
 The `<old>` rows must all read 0 and the `<new>` rows must carry the charts (2 / 7 / 5 / 2 for
 `weekly_wildfires` / `by_year` / `by_week` / `by_week_average`).
 
-### 8. Verify on staging, then merge
+### 8. Verify on staging
 
 ```bash
-curl -s "http://staging-site-<branch>/grapher/weekly-area-burnt-by-wildfires.csv" | awk -F, '{print $3}' | sort -u | tail -2
+curl -s "http://staging-site-<branch>/grapher/weekly-area-burnt-by-wildfires.csv" | awk -F, 'NR>1{print $3}' | sort -u | tail -1
 ```
 
-The last date should be the new bin, and production's should still be the old one. Then open
+The last value is an ISO week label (e.g. `2026-W39`). On staging it should be the new bin's week,
+and on production (`https://ourworldindata.org/grapher/...`) still the previous one. Then open
 Chart Diff, enable "Show all charts", and read it with the next section in mind.
 
 **No separate announcement.** Wildfire refreshes ride on the monthly climate announcement;
 one post per weekly refresh would flood #data-updates-comms.
+
+### 9. After review: retire the old version, then merge
+
+Once the review is done, remove the `<old>` version and archive it:
+
+```bash
+# Delete the six <old> wildfires entries from dag/climate.yml, then:
+git rm -r etl/steps/data/{meadow,garden,grapher}/climate/<old> snapshots/climate/<old>
+git add dag/climate.yml && git commit -m "🔨 Remove the superseded <old> wildfires steps"
+.venv/bin/etl archive-dag        # reads COMMITTED history, so commit first
+git add dag/archive/climate.yml && git commit -m "🔨 Archive the superseded <old> wildfires steps"
+git push
+```
+
+`archive-dag` should add exactly the six `<old>` wildfires steps. If it sweeps in unrelated steps
+somebody else left un-archived, `git checkout` those lines to keep the PR scoped, and never
+hand-edit the archive file. Then merge.
 
 ## How to read what changed
 
