@@ -4,14 +4,14 @@ steps:
     - data://meadow/democracy/2026-03-17/vdem:
         - snapshot://democracy/2026-03-17/vdem.zip
     - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
+    - data://garden/demography/2026-05-28/population
   data://grapher/democracy/2026-03-17/vdem:
     - data://garden/democracy/2026-03-17/vdem
 
   # Episodes of Regime Transition (2026)
   data://grapher/democracy/2026-03-18/ert:
     - data://garden/democracy/2026-03-18/ert:
-        - data://garden/demography/2024-07-15/population
+        - data://garden/demography/2026-05-28/population
         - data://meadow/democracy/2026-03-18/ert:
             - snapshot://democracy/2026-03-18/ert.csv
         - data://garden/regions/2023-01-01/regions
@@ -19,7 +19,7 @@ steps:
   # Freedom House (2026)
   data://grapher/democracy/2026-03-23/fh:
     - data://garden/democracy/2026-03-23/fh:
-        - data://garden/demography/2024-07-15/population
+        - data://garden/demography/2026-05-28/population
         - data://meadow/democracy/2026-03-23/fh:
             - snapshot://democracy/2026-03-23/fh_ratings.xlsx
             - snapshot://democracy/2024-05-16/fh_scores.xlsx
@@ -32,7 +32,7 @@ steps:
         - data://meadow/democracy/2026-03-27/bti:
             - snapshot://democracy/2026-03-27/bti.xlsx
         - data://garden/regions/2023-01-01/regions
-        - data://garden/demography/2024-07-15/population
+        - data://garden/demography/2026-05-28/population
 
   # Lexical Index (2026)
   data://grapher/democracy/2026-04-02/lexical_index:
@@ -40,7 +40,7 @@ steps:
         - data://garden/regions/2023-01-01/regions
         - data://meadow/democracy/2026-04-02/lexical_index:
             - snapshot://democracy/2026-04-02/lexical_index.xlsx
-        - data://garden/demography/2024-07-15/population
+        - data://garden/demography/2026-05-28/population
 
   # EIU (2025)
   data://grapher/democracy/2025-03-05/eiu:
@@ -51,7 +51,7 @@ steps:
             - snapshot://democracy/2024-05-22/eiu_2022.csv
             - snapshot://democracy/2024-05-22/eiu_2023.csv
             - snapshot://democracy/2025-03-05/eiu_2024.csv
-        - data://garden/demography/2024-07-15/population
+        - data://garden/demography/2026-05-28/population
         - data://garden/regions/2023-01-01/regions
 
   # Polity (2020)
