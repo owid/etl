@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from etl.catalog_helpers import last_date_accessed
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -11,7 +11,7 @@ paths = PathFinder(__file__)
 CURRENT_YEAR = datetime.now().year
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -113,8 +113,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(
-        dest_dir,
+    ds_grapher = paths.create_dataset(
         tables=[tb],
         default_metadata=ds_grapher.metadata,
         yaml_params={
