@@ -1,12 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-import pandas as pd
 from owid.catalog import Table
 
 from etl.catalog_helpers import last_date_accessed
-from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -113,7 +111,7 @@ def sanity_check_outputs(tb: Table, summed_columns: list[str]) -> None:
         assert excl[column].dropna().between(0, 100).all(), f"'{column}' is outside 0-100% for {EUROPE_EXCL_RUSSIA}."
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -122,9 +120,6 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["weekly_wildfires"].reset_index()
-
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
 
     # Load the FAOSTAT dataset which contains data related to area burnt
     ds_faostat = paths.load_dataset("faostat_rl")
@@ -148,8 +143,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    tb = paths.regions.harmonize_names(
+        tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
     tb_pivot = tb.pivot(
         index=["country", "month_day", "year"], columns="indicator", values="value", join_column_levels_with="_"
@@ -168,18 +163,17 @@ def run(dest_dir: str) -> None:
     tb_pivot = tb_pivot[cols_to_keep + ["country", "month_day", "year"]]
 
     # Create a date column
-    tb_pivot["date"] = pd.to_datetime(tb_pivot["year"].astype(str) + "-" + tb_pivot["month_day"].astype(str))
+    tb_pivot["date"] = pr.to_datetime(tb_pivot["year"].astype(str) + "-" + tb_pivot["month_day"].astype(str))
     tb_pivot = tb_pivot.drop(columns=["year", "month_day"])
     # Check the source's coverage while the table still holds only countries.
     sanity_check_inputs(tb_pivot, indicators=cols_to_keep)
 
     aggregations = {agg: "sum" for agg in cols_to_keep}
     # Add region aggregates.
-    tb_pivot = geo.add_regions_to_table(
+    tb_pivot = paths.regions.add_aggregates(
         tb_pivot,
         aggregations=aggregations,
         regions=REGIONS,
-        ds_regions=ds_regions,
         min_num_values_per_year=1,
         year_col="date",
     )
@@ -200,7 +194,7 @@ def run(dest_dir: str) -> None:
     tb["share_area_ha_cumulative"] = (tb["area_ha_cumulative"] / tb["total_area_ha"]) * 100
 
     tb = tb.drop(columns=["total_area_ha"])
-    tb = tb.set_index(["country", "date"], verify_integrity=True)
+    tb = tb.format(["country", "date"], underscore=False, short_name=paths.short_name)
 
     sanity_check_outputs(tb, summed_columns=cols_to_keep)
 
@@ -208,10 +202,8 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb],
-        check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
         yaml_params={"date_accessed": last_date_accessed(tb), "year": last_date_accessed(tb)[-4:]},
     )
