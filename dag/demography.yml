@@ -391,7 +391,6 @@ steps:
   ########################################################################
   # BESPOKE VISUALIZATIONS
   ########################################################################
-  # UN WPP demography JSON feed. Republished from a snapshot of the feed as it was hand-uploaded,
-  # rather than built from garden, until the step is rewritten on top of un_wpp.
+  # UN WPP demography JSON feed.
   viz://bespoke/un_wpp/latest/demography:
-    - snapshot://bespoke/2026-09-17/demography.zip
+    - data://garden/un/2024-07-12/un_wpp

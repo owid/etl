@@ -3,6 +3,7 @@ name: fact-check-dataset
 description: Adversarially review an ETL dataset's data and metadata for factual accuracy — verifies metadata claims against the producer's own documentation (fetched from the links in snapshot .dvc files and metadata texts) and cross-checks anomalous plus anchor values against independent sources online, to catch unit errors, wrong-year values, and hard-to-detect mistakes made by the source itself. Use when the user asks to "adversarially review a dataset", "fact-check this dataset", "verify the data against the source", "cross-check the values", or as the factual-accuracy step inside /update-dataset, /create-dataset, and /review-data-pr.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Adversarial data review

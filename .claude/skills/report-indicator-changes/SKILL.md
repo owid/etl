@@ -3,6 +3,7 @@ name: report-indicator-changes
 description: Draft a short update message to a topic-owner reviewer after landing substantial dataset or chart changes on staging. The message lists the indicator changes with staging admin links, surfaces open design questions with option tables, and closes with a Chart Diff sign-off CTA. The output is markdown so the user can paste it into either Slack or a GitHub PR comment. Use after a dataset redesign or restructure when the iteration with the reviewer is back-and-forth and you need them to verify on staging before merge. Not for the canonical comms announcement — for that, see `draft-data-update-slack-post`.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Report indicator changes to a topic-owner reviewer

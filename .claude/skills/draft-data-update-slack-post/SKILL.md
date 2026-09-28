@@ -11,6 +11,7 @@ description: >-
   ourworldindata.org/latest, use /owid-staff:draft-data-update-post (owid/skills-private) instead.
 metadata:
   internal: true
+  owner: pabloarosado
 ---
 
 # Data update communications draft

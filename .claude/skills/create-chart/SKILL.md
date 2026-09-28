@@ -14,6 +14,7 @@ allowed-tools:
   - "Bash(mkdir:*)"
 metadata:
   internal: true
+  owner: lucasrodes
 ---
 
 # Creating charts from ETL

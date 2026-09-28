@@ -40,7 +40,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "js-yaml": "^4.3.1"
+    "js-yaml": "^4.3.2"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
@@ -57,6 +57,7 @@
     "brace-expansion@1": "^1.1.16",
     "brace-expansion@2": "^2.1.2",
     "brace-expansion@5": "^5.0.7",
+    "@humanfs/node": "^0.16.8",
     "shell-quote": "^1.10.0"
   }
 }

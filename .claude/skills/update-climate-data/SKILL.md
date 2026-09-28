@@ -3,6 +3,7 @@ name: update-climate-data
 description: Run OWID's monthly climate data update. Bumps all updateable climate-namespace datasets to one common version in a single PR with one announcement, skipping the frozen sources. Use when the user wants to update climate data or run the monthly climate update. For a wildfires-only refresh during fire season, use the update-wildfires-data skill instead.
 metadata:
   internal: true
+  owner: pabloarosado
 ---
 
 # Climate update (monthly umbrella update)

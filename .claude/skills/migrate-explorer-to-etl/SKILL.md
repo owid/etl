@@ -14,6 +14,7 @@ metadata:
   internal: true
   status: temporary
   sunset: "retire when owid/etl#6513 closes and no explorer remains outside ETL"
+  owner: lucasrodes
 ---
 
 # Migrate an explorer into ETL

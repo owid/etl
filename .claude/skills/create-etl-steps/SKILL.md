@@ -8,6 +8,7 @@ triggers:
   - scaffold etl steps
 metadata:
   internal: true
+  owner: antea04
 ---
 
 # Create ETL Steps

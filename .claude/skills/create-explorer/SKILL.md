@@ -3,6 +3,7 @@ name: create-explorer
 description: Author or modify an Our World in Data explorer (multi-dimensional dashboard with dropdown selectors, published from ETL via `viz://explorer/<ns>/latest/<short>`). Trigger when the user wants to build a new explorer, add/remove views or dimensions on an existing one, change the explorer's chart text or selection defaults, or finish an explorer migration once the snapshot/garden/grapher chain is already in place.
 metadata:
   internal: true
+  owner: lucasrodes
 ---
 
 # Creating an Explorer

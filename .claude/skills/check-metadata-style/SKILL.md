@@ -11,6 +11,7 @@ description: >-
   resolved metadata off the built grapher dataset, so garden-authored text is in scope.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Check Metadata Style
