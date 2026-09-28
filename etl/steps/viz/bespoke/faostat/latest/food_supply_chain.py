@@ -61,7 +61,7 @@ STAGES = [
     ("feed", "Animal feed", "out"),
     ("animal_products", "Livestock, dairy, eggs and fish", "in"),
     ("tourist_consumption", "Tourist consumption", "out"),
-    ("residuals", "Residuals and balancing", "out"),
+    ("data_adjustments", "Data adjustments", "out"),
     ("food", "Food available to eat", "total"),
 ]
 # Decimal places kept per unit.

@@ -11,7 +11,8 @@ definitions:
       - Stock variation is derived as production plus imports minus exports minus domestic supply, since FAOSTAT only reports it from 2010 onward.
       - Only individual items are summed; FAO's aggregate items (such as "Cereals" or "Vegetal Products") are left out to avoid double counting. Three items with no food energy are left out: "Palm kernels" (which carries the oil palm harvest; the oil palm enters the chain as palm oil and palm kernel oil), non-food alcohol and aquatic mammals.
       - Production of items made from other items (vegetable oils, sugar and sweeteners, alcoholic beverages, butter, cream, fish oils and other processed products) is netted against processing, so that no calorie is counted twice.
-      - FAOSTAT rounds tonnages to the nearest thousand, so its balances do not close exactly; the gap is folded into residuals so that the chain lands exactly on food available for consumption.
+      - FAOSTAT rounds tonnages to the nearest thousand, so its balances do not close exactly; the gap is folded into data adjustments so that the chain lands exactly on food available for consumption.
+      - The world as a whole does not trade, but the sum of the imports reported by all countries differs from the sum of their exports. For the world, exports are set equal to imports, which FAO considers the better-documented side, and the difference is added to data adjustments.
       - All stages are divided by the same population series, from Our World in Data's population dataset, and by 365 days. Regions (the world, continents and income groups) are built by summing the member countries with an FAO balance in that year, and divided by the population of those same countries; a region is left empty in years when those countries hold less than 80% of its population.
 
 dataset:
@@ -68,15 +69,15 @@ tables:
       tourist_consumption:
         title: Tourist consumption
         description_short: Food consumed by visitors from other countries. Only reported by FAOSTAT from 2010 onward.
-      residuals:
-        title: Residuals
-        description_short: The statistical discrepancies in the balance, including the rounding of FAOSTAT's tonnages. Can be negative.
+      data_adjustments:
+        title: Data adjustments
+        description_short: The statistical discrepancies in the balance, including the rounding of FAOSTAT's tonnages and, for the world, the difference between imports and exports. Can be negative.
       food:
         title: Food available for consumption
         description_short: Food available for human consumption, before waste at retail and in households.
       balancing_difference:
         title: Balancing difference
-        description_short: The gap by which FAOSTAT's rounded balances fail to close, in the unit of the table. It is included in residuals; this column only records its size.
+        description_short: The gap by which FAOSTAT's rounded balances fail to close, in the unit of the table. It is included in data adjustments; this column only records its size.
   protein:
     title: Food supply chain in grams of protein (Food Balance Sheets method)
     common:

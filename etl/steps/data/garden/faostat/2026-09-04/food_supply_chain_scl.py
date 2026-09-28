@@ -46,8 +46,12 @@ ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
 6. Fish and seafood are not in SCL. The FBS fish items are spliced in, with their FBS densities under the same rules,
    for the entities and years that SCL covers.
 
-7. FAOSTAT rounds tonnages, so balances do not close exactly. The gap is folded into "residuals" so the chain lands
-   exactly on "food"; its size is kept in "balancing_difference".
+7. FAOSTAT rounds tonnages, so balances do not close exactly. The gap is folded into FAO's own "residuals", and the
+   stage is called "data_adjustments", so the chain lands exactly on "food"; its size is kept in "balancing_difference".
+   The world does not trade with anyone, but World imports and exports (sums of what countries report) differ. World
+   exports are set equal to World imports, which FAO considers the better-documented side (FAO 2025, Food Balance
+   Sheets and Supply Utilization Accounts Resource Handbook, section 6.1), and the difference goes to
+   "data_adjustments". Other regions do trade with the rest of the world and are left as they are.
 
 8. Regions. FAO's own regional aggregates are dropped, and SCL has no other region rows. OWID regions (World,
    continents, income groups) are built here from the member countries that have an SCL balance that year: every
@@ -166,7 +170,7 @@ STAGES = [
     "feed",
     "animal_products",
     "tourist_consumption",
-    "residuals",
+    "data_adjustments",
     "food",
     "balancing_difference",
 ]
@@ -179,13 +183,15 @@ SUBTRACTED_STAGES = [
     "processing_net",
     "feed",
     "tourist_consumption",
-    "residuals",
+    "data_adjustments",
 ]
 FIRST_YEAR = 2010
 # SCL carries population as an item; it is not a commodity.
 POPULATION_ITEM_CODE = "00000001"
 IDENTITY_RELATIVE_TOLERANCE = 0.01
 IDENTITY_ABSOLUTE_TOLERANCE_TONNES = 2000
+# Maximum difference between World imports and exports, relative to imports, before they are set equal.
+MAX_WORLD_TRADE_GAP = 0.2
 # FBS "Grand Total" item, to compare our food stage with FAO's published food supply.
 FBS_TOTAL_ITEM_CODE = "00002901"
 HUNDRED_GRAMS_PER_TONNE = 10_000
@@ -527,6 +533,7 @@ def build_chain(tb: Table) -> Table:
 
     chain["processing_net"] = chain["processing"] - chain["processed_production"]
     chain = chain.drop(columns=["processing", "processed_production"])
+    chain = chain.rename(columns={"residuals": "data_adjustments"})
 
     chain_end = chain["crop_production"]
     for stage in STAGES[1:]:
@@ -534,7 +541,16 @@ def build_chain(tb: Table) -> Table:
             continue
         chain_end = chain_end - chain[stage] if stage in SUBTRACTED_STAGES else chain_end + chain[stage]
     chain["balancing_difference"] = chain["food"] - chain_end
-    chain["residuals"] = chain["residuals"] - chain["balancing_difference"]
+    chain["data_adjustments"] = chain["data_adjustments"] - chain["balancing_difference"]
+
+    # World exports set equal to World imports; the difference goes to data adjustments.
+    world = chain["country"] == "World"
+    trade_gap = chain.loc[world, "imports"] - chain.loc[world, "exports"]
+    assert (trade_gap.abs() < MAX_WORLD_TRADE_GAP * chain.loc[world, "imports"]).all(), (
+        f"World imports and exports differ by up to {100 * (trade_gap / chain.loc[world, 'imports']).abs().max():.1f}%."
+    )
+    chain.loc[world, "exports"] = chain.loc[world, "imports"]
+    chain.loc[world, "data_adjustments"] = chain.loc[world, "data_adjustments"] - trade_gap
 
     # Per person per day (assumption 9): the entity's population, or, for regions, that of the summed members.
     assert chain["population"].notnull().all() and (chain["population"] > 0).all(), "Missing population."
@@ -547,7 +563,7 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
     assert tb.columns[tb.isna().all()].empty, "Output has fully-nan columns."
     assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows."
     for stage in [
-        s for s in STAGES if s not in ["stock_variation", "residuals", "processing_net", "balancing_difference"]
+        s for s in STAGES if s not in ["stock_variation", "data_adjustments", "processing_net", "balancing_difference"]
     ]:
         # FAO occasionally reports a negative flow (Iraq 2010 wheat exports, for one); small negatives are tolerated.
         assert (tb[stage].fillna(0) >= -0.01 * tb["food"].abs()).all(), (
@@ -559,6 +575,8 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
             continue
         chain_end = chain_end - tb[stage] if stage in SUBTRACTED_STAGES else chain_end + tb[stage]
     assert (chain_end - tb["food"]).abs().max() < 1e-3 * tb["food"].abs().max(), "Chain does not land on food."
+    world_trade = tb.loc[tb["country"] == "World", ["imports", "exports"]]
+    assert (world_trade["imports"] == world_trade["exports"]).all(), f"World imports and exports differ ({nutrient})."
 
     world = tb[tb["country"] == "World"].set_index("year")
     # Our food stage against FAO's published food supply (the FBS "Grand Total"), for World.
