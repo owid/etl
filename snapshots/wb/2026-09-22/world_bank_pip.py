@@ -30,7 +30,7 @@ To run this code from scratch,
     - Check if you need to update the poverty lines in the function `poverty_lines_countries`.
         - Check the list of countries without percentile data. It will show up as a list in the output (_These countries are available in a common query but not in the percentile file:_)
         - Open
-            https://api.worldbank.org/pip/v1/pip?country=LCA&year=all&povline=150&fill_gaps=false&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&identity=PROD&format=csv
+            https://api.worldbank.org/pip/v1/pip?country=LCA&year=all&povline=190&fill_gaps=false&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&identity=PROD&format=csv
         - And see if any of the `headcount` values is lower than 0.99. If so, you need to add more poverty lines to the function.
     - Run the code. It extracts the data AND creates both snapshots in one go (no separate upload
       scripts). You have two options to see the output, in the terminal or in the background:
@@ -122,7 +122,7 @@ def poverty_lines_countries():
     between_30_and_55_dollars = list(range(3000, 5500, 10))
     between_55_and_80_dollars = list(range(5500, 8000, 10))
     between_80_and_100_dollars = list(range(8000, 10000, 10))
-    between_100_and_150_dollars = list(range(10000, 15000, 10))
+    between_100_and_190_dollars = list(range(10000, 19000, 10))
 
     # povlines is all these lists together
     povlines = (
@@ -134,7 +134,7 @@ def poverty_lines_countries():
         + between_30_and_55_dollars
         + between_55_and_80_dollars
         + between_80_and_100_dollars
-        + between_100_and_150_dollars
+        + between_100_and_190_dollars
     )
 
     return povlines
