@@ -37,15 +37,24 @@ log = structlog.get_logger()
 class SnapshotNotFoundException(Exception):
     """Raised when a snapshot file is not found on the remote server.
 
-    This is a plain Exception subclass (no unpicklable attributes) so it can
-    safely travel across process boundaries in ProcessPoolExecutor workers.
+    `__reduce__` is what lets this cross a process boundary, and it is not optional. An exception
+    whose `__init__` takes more arguments than it passes to `super().__init__()` cannot be
+    unpickled: the default `BaseException.__reduce__` rebuilds it as `cls(*self.args)`, and
+    `self.args` holds only the single formatted message. The parent process then raises
+    `TypeError: ... missing 1 required positional argument` inside the `ProcessPoolExecutor`
+    result reader, which kills the pool and fails every remaining step with `BrokenProcessPool`.
     """
 
     def __init__(self, uri: str, md5: str) -> None:
+        self.uri = uri
+        self.md5 = md5
         super().__init__(
             f"Snapshot file not found on the remote server: {uri} (md5: {md5}). "
             f"Have you run `etls {uri} --upload` to upload it?"
         )
+
+    def __reduce__(self):
+        return (self.__class__, (self.uri, self.md5))
 
 
 class PrivateSnapshotAccessError(Exception):
@@ -55,11 +64,13 @@ class PrivateSnapshotAccessError(Exception):
     soon as a step they asked for depends on one. Boto's own message ("Unable to locate
     credentials", or a bare 400) says nothing about which bucket, or about the way out.
 
-    Plain Exception subclass (no unpicklable attributes) so it can safely travel across process
-    boundaries in ProcessPoolExecutor workers, as `SnapshotNotFoundException` does.
+    Carries `__reduce__` so it survives the trip back from a worker process, for the reason spelled
+    out on `SnapshotNotFoundException`.
     """
 
     def __init__(self, uri: str, reason: str) -> None:
+        self.uri = uri
+        self.reason = reason
         super().__init__(
             f"No access to private snapshot {uri} ({reason}). It lives in the "
             f"{config.R2_SNAPSHOTS_PRIVATE} bucket, which needs OWID credentials: R2_ACCESS_KEY and "
@@ -67,6 +78,9 @@ class PrivateSnapshotAccessError(Exception):
             f"Without them, run `etlr <steps> --public-only` to build only the steps that need no "
             f"private data."
         )
+
+    def __reduce__(self):
+        return (self.__class__, (self.uri, self.reason))
 
 
 # R2 answers a request signed with an unusable key with 400, not the 403 that S3 would return, so

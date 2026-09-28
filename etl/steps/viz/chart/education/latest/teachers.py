@@ -1,10 +1,10 @@
-"""Create multidimensional collection for qualified and trained teachers data.
+"""Create multidimensional chart for qualified and trained teachers data.
 
 This module processes teacher qualification data from two sources:
 - UNESCO (education_sdgs): Academic qualifications of teachers
 - World Bank WDI: Pedagogical training of teachers
 
-It creates a multidimensional collection with grouped views comparing:
+It creates a multidimensional chart with grouped views comparing:
 1. Different education levels (side-by-side)
 2. Qualified vs trained teachers (side-by-side)
 """
@@ -121,8 +121,8 @@ TEACHER_TYPE_DESCRIPTION_KEY = [
 
 
 def run() -> None:
-    """Main function to process teachers data and create collection."""
-    config = paths.load_collection_config()
+    """Main function to process teachers data and create chart."""
+    config = paths.load_config()
     tbs_adjusted = []
 
     # Process both UNESCO (qualified) and World Bank (trained) teacher datasets
@@ -139,18 +139,18 @@ def run() -> None:
             tb = adjust_dimensions(tb, dataset_name)
             tbs_adjusted.append(tb)
 
-    # Create the base multidimensional collection
-    collection = paths.create_collection(
+    # Create the base multidimensional chart
+    chart = paths.create_chart(
         config=config,
         tb=tbs_adjusted,
         common_view_config=MULTIDIM_CONFIG,
     )
 
     # Add grouped views for side-by-side comparisons
-    create_grouped_views(collection)
+    create_grouped_views(chart)
 
     # Clean up indicator display names for better chart labels and set view metadata
-    for view in collection.views:
+    for view in chart.views:
         level = view.dimensions["level"]
         teacher_type = view.dimensions["teacher_type"]
         if level == "level_side_by_side" or teacher_type == "teacher_type_side_by_side":
@@ -164,7 +164,7 @@ def run() -> None:
 
         edit_indicator_displays(view)
 
-    collection.save()
+    chart.save()
 
 
 def get_teacher_columns(tb, dataset_name):
@@ -232,7 +232,7 @@ def adjust_dimensions(tb, dataset_name):
         # Set common metadata
         tb[col].metadata.original_short_name = "teachers_qualified_trained"
 
-        # Add dimensional metadata for multidimensional collection
+        # Add dimensional metadata for multidimensional chart
         tb[col].metadata.dimensions = {
             "level": extract_level(col, dataset_name),
             "teacher_type": teacher_type,
@@ -249,7 +249,7 @@ def adjust_dimensions(tb, dataset_name):
     return tb
 
 
-def create_grouped_views(collection):
+def create_grouped_views(chart):
     """Add grouped views for side-by-side comparisons.
 
     Creates two types of grouped views:
@@ -279,7 +279,7 @@ def create_grouped_views(collection):
             "subtitle": generate_subtitle_by_dimensions(view),
         }
 
-    collection.group_views(
+    chart.group_views(
         groups=[
             {
                 # Group 1: Compare qualified vs trained teachers side-by-side

@@ -7,7 +7,7 @@ approves / flags the match. Decisions persist in the browser ``localStorage`` an
 can be mirrored to a JSON file on disk (Chrome/Edge File System Access) or
 restored via Import.
 
-Unlike the explorer reviewer (``review-explorer-mdim-mapping``), every row has its
+Unlike the explorer reviewer (``map-explorer-to-mdim/scripts/build_review.py``), every row has its
 own left-hand URL (each chart is its own /grapher/<slug> page), and no
 ``mapping_rules.py`` is involved — the proposal CSV is self-contained. Rows without
 a proposed target (ambiguous / near-miss / none / conflict) show their candidate

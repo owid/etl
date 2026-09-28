@@ -5,7 +5,7 @@ re-deriving it through Figma MCP calls every time.
 
 - **File:** `Charts (2026)`, file key `s6Sv60bakebRRW2TxsMQbF`
 - **Page:** `📑 Templates`, node `798:54`
-- **Re-verify with:** `/create-figma-chart`'s [`scripts/verify_templates.js`](../create-figma-chart/scripts/verify_templates.js)
+- **Re-verify with:** `/owid-staff:create-figma-chart`'s `scripts/verify_templates.js`
   — it checks the shared geometry (sizes, content box, header band, footer position and growth) for all
   ten templates and returns an `ok`/`DRIFT` verdict. Use `get_metadata` on `798:54` for the per-slot
   positions it does not cover, and `get_screenshot` on a frame for colors. **Run it every refresh —
@@ -22,10 +22,10 @@ laid out against stale numbers still renders and still passes every contract che
 matches the frame it gets pasted into.
 
 The page's own instructions frame (`798:151`) states the workflow: *"Copy/paste the template you
-want to use and edit it in a new page"*, *"Page name: Date + Chart title"*. `/create-figma-chart`
+want to use and edit it in a new page"*, *"Page name: Date + Chart title"*. `/owid-staff:create-figma-chart`
 implements that naming as `YYYYMMDD <Title> (<Creator>)`.
 
-**Division of labor with `/create-figma-chart`, since both skills read this same Figma page.** This
+**Division of labor with `/owid-staff:create-figma-chart`, since both skills read this same Figma page.** This
 file owns the **measurements** — every slot's position and size, the derived positions, unit
 conversions, colors, exact strings — because a matplotlib step has to reproduce them with no Figma
 call. That skill owns the **operations**: which node to clone, the single band a chart is fitted
@@ -44,7 +44,7 @@ you learn something new, add it to the file that owns that side rather than to b
 
 Do not confuse the 540×540 mobile frame with `DI_Template` (`6799:1859`) or
 `InstagramPost_Template_English` (`798:161`), which are also 540×540. The tells, per
-`/create-figma-chart`: frame fill (`DI_Template` is `#ffffff`, static mobile is cream) and the
+`/owid-staff:create-figma-chart`: frame fill (`DI_Template` is `#ffffff`, static mobile is cream) and the
 license wording (`CC BY` on DI and Instagram, `Licensed under CC-BY by the author […]` on static).
 Footer row count does not separate them: DI carries one row, static mobile and IG square two.
 
@@ -55,7 +55,7 @@ The same Templates page also holds a `"SMALL" Charts` section (heading `25344:12
 302 px wide with a **free height**. Those are article thumbnails for the `chart-rows` and
 `pull-chart` gdoc blocks, and they are **not** built by an `viz://static` step — their
 geometry comes from a grapher `imType=thumbnail` export, handled entirely by
-[`/create-figma-chart`](../create-figma-chart/SMALL-CHARTS.md).
+`/owid-staff:create-figma-chart` (its SMALL-CHARTS.md).
 
 So do not add a `"small"` entry to `scripts/verify_static_viz.py`'s `TEMPLATE_RATIOS`. It would be
 wrong twice: wrong pipeline, and a *ratio* check on a frame whose height is chosen per chart.
@@ -66,7 +66,7 @@ All values in template pixels, y measured **from the top edge** as Figma reports
 margin is **16 px** on all four frames, so content width is `frame width − 32`.
 
 Font sizes are in template px, measured off the live templates on **2026-08-17**. They matter to a
-step twice over: the emitted SVG should read like the template it is sized to, and `/create-figma-chart`
+step twice over: the emitted SVG should read like the template it is sized to, and `/owid-staff:create-figma-chart`
 fills these same slots when the SVG is imported.
 
 ### Horizontal — 850 × 638
@@ -102,7 +102,7 @@ side. Both the padding and that difference are gone.
 
 > **Wrapper figures re-verified 2026-08-19; the slot table above was not.** The wrapper ids, the 118
 > header bottom and the removal of the padding come from the same measurement pass as
-> `/create-figma-chart`'s node map. The per-slot `y` values still date from 2026-08-17 and sit within
+> `/owid-staff:create-figma-chart`'s node map. The per-slot `y` values still date from 2026-08-17 and sit within
 > ~0.4 px of it (the footer rows derive as 559 / 591 / 609 against the tabled 558.62 / 590.62 /
 > 608.62) — immaterial for emitting an SVG, but re-measure before trusting them for anything tighter.
 
@@ -198,7 +198,7 @@ derived **82.48** against a measured 70, and the 12.48 px gap between them was t
 figures now fall out of the same formula.
 
 > **The header is a flat auto-layout of `[title, subtitle]` with the logo as a SIBLING**, not a child
-> of a title row (`/create-figma-chart`'s SKILL.md → node map). A sibling contributes nothing to the
+> of a title row (`/owid-staff:create-figma-chart`'s SKILL.md → node map). A sibling contributes nothing to the
 > header's height, so `logo_px` is 0, the `max(…, logo_px)` cap does not apply, a one-line title *does*
 > shrink the header by a line, and there is no logo surplus to land between the title and the subtitle.
 > The logo constrains **width** instead: the title node is sized narrower than the content box to clear
@@ -339,7 +339,7 @@ lines at 12 px where a step's smaller footer took two.
   template px in an inch, which is what makes every slot figure in this file convert by a plain
   `px / 100`; matplotlib then writes the SVG root in points, so the 850 × 638 frame saves as
   `612pt × 459.36pt`, which Figma reads at the CSS 96 px per inch and imports at 0.96× the template
-  (816 × 612.48). Correct that with one uniform rescale on import (`/create-figma-chart` Step 7) — never
+  (816 × 612.48). Correct that with one uniform rescale on import (`/owid-staff:create-figma-chart` Step 7) — never
   by inflating `figsize`, which would instead put the slot conversion and every point-denominated font
   size in this file out by 1.39×.
 - One line of text occupies roughly `1.3 × fontsize` in points, i.e. `1.8 × fontsize` in template

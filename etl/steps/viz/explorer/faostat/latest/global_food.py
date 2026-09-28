@@ -7,8 +7,8 @@ from typing import Any
 from owid.catalog.utils import underscore
 from structlog import get_logger
 
-from etl.collection import combine_config_dimensions, expand_config
 from etl.helpers import PathFinder
+from etl.viz import combine_config_dimensions, expand_config
 
 # Initialize log.
 log = get_logger()
@@ -286,8 +286,11 @@ ELEMENT_CODES_QCL = [
     "005417",  # Yield (kilograms per animal).
     "005424",  # Yield (kilograms per animal).
     "005513",  # Eggs produced (eggs).
+    "5513pc",  # Eggs produced per capita (eggs per capita).
     "005313",  # Laying (animals).
+    "5313pc",  # Laying per capita (animals per capita).
     "005318",  # Milk animals (animals).
+    "5318pc",  # Milk animals per capita (animals per capita).
 ]
 
 # Elements from faostat_fbsc to include.
@@ -471,7 +474,7 @@ def run():
     tb_fbsc = ds_fbsc.read("faostat_fbsc_flat", load_data=False)
 
     # Load grapher config from YAML.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     #
     # Process data.
@@ -551,10 +554,9 @@ def run():
     # Save outputs.
     #
     # Initialize a new explorer.
-    c = paths.create_collection(
+    c = paths.create_explorer(
         config=config,
         short_name="global-food",
-        explorer=True,
     )
 
     # Save explorer.

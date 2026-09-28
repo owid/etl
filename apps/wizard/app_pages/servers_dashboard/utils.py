@@ -33,7 +33,7 @@ PERSISTENT_CONTAINERS = {"staging-site-master"}
 COMMIT_LOOKUP_FAILED = "Unable to retrieve"
 
 
-@st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes to avoid hammering the server
+@st.cache_data(ttl=300, show_spinner=False, refresh_mode="background")  # 5 min; stale value served while refreshing
 def fetch_host_memory_stats(host: str = "gaia-1") -> tuple[dict | None, str | None]:
     """
     Fetch host memory statistics from the LXC host.
@@ -105,7 +105,7 @@ def fetch_host_memory_stats(host: str = "gaia-1") -> tuple[dict | None, str | No
         return None, error_msg
 
 
-@st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes to avoid hammering the server
+@st.cache_data(ttl=300, show_spinner=False, refresh_mode="background")  # 5 min; stale value served while refreshing
 def fetch_lxc_servers_data(host: str = "gaia-1") -> tuple[pd.DataFrame | None, str | None]:
     """
     Fetch LXC server information from the specified host.
@@ -790,7 +790,7 @@ def _fetch_prs(repo_name: str, params: str, headers: dict, max_pages: int) -> li
     return prs
 
 
-@st.cache_data(ttl=300, show_spinner=False)  # Cache for 5 minutes alongside the server data
+@st.cache_data(ttl=300, show_spinner=False, refresh_mode="background")  # 5 min; stale value served while refreshing
 def fetch_server_owners() -> dict[str, str]:
     """
     Map each staging server's container name to the GitHub login of its PR author.

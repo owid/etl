@@ -88,7 +88,7 @@ templates ship -- setting `characters` propagates the first character's style ov
 | Title | `TITLE` | template's Playfair |
 | Subtitle | `SUBTITLE` | Lato Regular |
 | `Note:` (desktop only) | `build_note(...)` | `Note:` Bold, rest Regular |
-| `Data source:` | `Data source: ` + `source_citation(...)` from `etl.static_viz` | `Data source:` Bold, rest Regular |
+| `Data source:` | `Data source: ` + `source_citation(...)` from `etl.viz.static` | `Data source:` Bold, rest Regular |
 | Tagline (desktop) | leave the template's | -- |
 | License | `Licensed under ` / `CC-BY` / ` by the author ` / `AUTHOR` | Medium / Bold / Medium / Bold |
 
@@ -173,7 +173,7 @@ from matplotlib.ticker import FuncFormatter
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
-from etl.static_viz import PIXELS_PER_INCH, apply_svg_rcparams, export_frame, source_citation
+from etl.viz.static import PIXELS_PER_INCH, apply_svg_rcparams, export_frame, source_citation
 
 # Figma-editable text, deterministic ids. Must run before any figure is created.
 apply_svg_rcparams()

@@ -145,7 +145,7 @@ class classproperty(property):
 class AppState:
     """Management of state variables shared across different apps."""
 
-    steps: list[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data", "collection"]
+    steps: list[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data", "chart"]
     dataset_edit: dict[str, Dataset | None] = {
         "snapshot": None,
         "meadow": None,
@@ -153,7 +153,7 @@ class AppState:
         "grapher": None,
         "express": None,
         "data": None,
-        "collection": None,
+        "chart": None,
     }
     _previous_step: str | None = None
 

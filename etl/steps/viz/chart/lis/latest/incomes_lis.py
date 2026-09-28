@@ -1,7 +1,7 @@
 """Multidim export for LIS incomes across the distribution."""
 
-from etl.collection import filter_columns_by_dimension_choices
 from etl.helpers import PathFinder
+from etl.viz import filter_columns_by_dimension_choices
 
 paths = PathFinder(__file__)
 
@@ -29,7 +29,7 @@ NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured bot
 
 
 def run() -> None:
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     ds = paths.load_dataset("luxembourg_income_study")
     tb = ds.read("incomes", load_data=False)
@@ -43,8 +43,8 @@ def run() -> None:
         if dims and "decile" in dims and isinstance(dims["decile"], (int, float)):
             dims["decile"] = str(int(dims["decile"]))
 
-    # Create collection
-    c = paths.create_collection(
+    # Create chart
+    c = paths.create_chart(
         config=config,
         short_name="incomes_lis",
         tb=tb,

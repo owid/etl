@@ -16,8 +16,8 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Default collection config
-    config = paths.load_collection_config()
+    # Default chart config
+    config = paths.load_config()
 
     # Load grapher dataset.
     ds = paths.load_dataset("enterprise_surveys")
@@ -30,9 +30,9 @@ def run() -> None:
     tb = tb.drop(columns=cols_to_drop)
 
     tb = adjust_dimensions_corruption(tb)
-    # Create collection object
+    # Create chart object
     #
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         tb=tb,
         common_view_config=MULTIDIM_CONFIG,

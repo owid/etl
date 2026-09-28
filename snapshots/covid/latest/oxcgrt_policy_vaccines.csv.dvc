@@ -26,7 +26,7 @@ meta:
       These indices are a measure of how many of the relevant policy types a government has acted upon, and to what degree. The index cannot say whether a government's policy has been implemented effectively.
 
       Because of the complexity of the dataset, it is published across 27 CSV files. Our technical documentation (https://github.com/OxCGRT/covid-policy-dataset/blob/main/documentation_and_codebook.md) contains all the information users need to navigate and use the data.
-    title_snapshot: Government Response Tracker (OxCGRT) - Vaccines
+    title_snapshot: Government Response Tracker (OxCGRT) – Vaccines
     description_snapshot: |-
       The `vaccines_full` files contain our raw data for the vaccine indicators V1-V4 over 226 variables (where each of the 4 indicators has a separate variable recording the policy for each of the 52 population categories).
 

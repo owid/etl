@@ -17,7 +17,7 @@ MOBILITY_CONFIG_DEFAULT = {
 
 
 def run() -> None:
-    # PART 1: Collections entirely from YAML files (no programmatic config extracted from table)
+    # PART 1: Charts entirely from YAML files (no programmatic config extracted from table)
     filenames = [
         "covid.cases.yml",
         "covid.deaths.yml",
@@ -35,21 +35,21 @@ def run() -> None:
     for fname in filenames:
         ## Load config
         paths.log.info(fname)
-        config = paths.load_collection_config(fname)
+        config = paths.load_config(fname)
 
-        ## Create and save collection
-        c = paths.create_collection(config=config, short_name=fname_to_short_name(fname))
+        ## Create and save chart
+        c = paths.create_chart(config=config, short_name=fname_to_short_name(fname))
         c.save()
 
-    # PART 2: Collection hybridly generated (YAML file + programmatic config)
+    # PART 2: Chart hybridly generated (YAML file + programmatic config)
     ## Load data
     ds = paths.load_dataset("google_mobility")
     tb = ds.read("google_mobility", load_data=False)
 
-    ## Create and save collection
+    ## Create and save chart
     fname = "covid.mobility.yml"
-    c = paths.create_collection(
-        config=paths.load_collection_config("covid.mobility.yml"),
+    c = paths.create_chart(
+        config=paths.load_config("covid.mobility.yml"),
         short_name=fname_to_short_name("covid.mobility.yml"),
         tb=tb,
         common_view_config=MOBILITY_CONFIG_DEFAULT,

@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: European database of sales of veterinary microbial agents (ESVAC) - population corrected units
+    title: European database of sales of veterinary microbial agents (ESVAC) – population corrected units
     description: |-
       The European database of sales of veterinary antimicrobial agents provides public access to the data the European Surveillance of Veterinary Antimicrobial consumption (ESVAC) project collects on the sales of veterinary antimicrobials in Member States of the European Union and European Economic Area.
 

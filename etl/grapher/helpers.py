@@ -713,8 +713,13 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             else:
                 year = tab.index.get_level_values("year")
             assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {year.dtype}"
+            _validate_time_column_not_null(tab, year, "year")
         elif {"date", "country"} <= set(tab.all_columns):
-            pass
+            if "date" in tab.columns:
+                date = tab["date"]
+            else:
+                date = tab.index.get_level_values("date")
+            _validate_time_column_not_null(tab, date, "date")
         else:
             raise AssertionError("Table must have columns country and year or date.")
 
@@ -760,6 +765,22 @@ TIME_INTERVALS = {"day", "week", "month", "quarter", "year", "decade"}
 # decode them first. "decade" is deliberately absent -- it codes a representative
 # calendar year, not an offset.
 SUB_YEARLY_TIME_INTERVALS = {"day", "week", "month", "quarter"}
+
+
+def _validate_time_column_not_null(tab: Table, time_values: Any, col: str) -> None:
+    """Reject rows whose time column is missing.
+
+    A row with no time is not plottable, and nothing downstream rejects it: `year` keeps a
+    nullable integer dtype, so the dtype check above passes and the NA travels all the way to
+    the MySQL upsert, where `calculate_checksum_metadata` sorts the unique years and dies with
+    `TypeError: boolean value of NA is ambiguous` -- a traceback that says nothing about which
+    dataset or which rows are at fault. Fail here instead, at the step that produced them.
+    """
+    missing = pd.isna(time_values)
+    assert not missing.any(), (
+        f"Table `{tab.metadata.short_name}` has {int(missing.sum())} row(s) with a missing `{col}`. "
+        f"Drop them upstream (usually in garden) or give them a time value."
+    )
 
 
 def _validate_time_interval(tab: Table, col: str) -> None:

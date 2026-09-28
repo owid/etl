@@ -24,8 +24,8 @@ def run() -> None:
     ds = paths.load_dataset("corruption_barometer")
     tb = ds.read("corruption_barometer")
 
-    # Create collection
-    c = paths.create_collection(
+    # Create chart
+    c = paths.create_chart(
         config=config,
         tb=tb,
         dimensions={

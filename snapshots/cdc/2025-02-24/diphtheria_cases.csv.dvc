@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical diphtheria cases in the United States - Centers for Disease Control and Prevention
+    title: Historical diphtheria cases in the United States – Centers for Disease Control and Prevention
     description: |-
       Data on historical diphtheria cases in the United States, compiled from a selection of sources from the US CDC.
 
@@ -54,13 +54,13 @@ meta:
     # Citation
     producer: Centers for Disease Control and Prevention
     citation_full: |-
-      Public Health Reports, Vol. 53, No. 44 - Health Conditions in the United States as Indicated by Mortality Rates, 1929-38. Centers for Disease Control and Prevention (CDC), US Public Health Service.
+      Public Health Reports, Vol. 53, No. 44 – Health Conditions in the United States as Indicated by Mortality Rates, 1929-38. Centers for Disease Control and Prevention (CDC), US Public Health Service.
 
       Morbidity and Mortality Weekly Report Annual Supplement Summary 1993 Vol. 42, No. 53 by the Centers for Disease Control and Prevention (CDC), US Public Health Service.
 
-      Summary of Notifiable Diseases - Centers for Disease Control and Prevention (CDC), US Public Health Service, United States, 1994-2015
+      Summary of Notifiable Diseases – Centers for Disease Control and Prevention (CDC), US Public Health Service, United States, 1994-2015
 
-      National Notifiable Diseases Surveillance System (NNDSS) - Centers for Disease Control and Prevention (CDC), (2016-2022)
+      National Notifiable Diseases Surveillance System (NNDSS) – Centers for Disease Control and Prevention (CDC), (2016-2022)
 
     # Files
     url_main: https://wonder.cdc.gov/nndss-annual-summary.html

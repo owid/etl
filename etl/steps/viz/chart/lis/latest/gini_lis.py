@@ -23,12 +23,12 @@ NEW_DESCRIPTION_KEY_BEFORE_VS_AFTER = "This data is based on income measured bot
 
 
 def run() -> None:
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     ds = paths.load_dataset("luxembourg_income_study")
     tb = ds.read("inequality", load_data=False)
 
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         short_name="gini_lis",
         tb=tb,

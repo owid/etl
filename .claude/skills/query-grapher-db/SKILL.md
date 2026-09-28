@@ -3,6 +3,7 @@ name: query-grapher-db
 description: Query the grapher MySQL database (local dev, a branch's staging server, or production via the public Datasette) and verify indicators and charts on a staging server. Use when you need to run SQL against grapher, find which charts use an indicator, assess the blast radius of a data fix, or check that a chart/indicator renders correctly on staging-site-<branch>.
 metadata:
   internal: true
+  owner: Marigold
 ---
 
 # Querying grapher MySQL and verifying charts on staging

@@ -46,7 +46,7 @@ def run() -> None:
     # Load inputs.
     #
     # Load configuration from adjacent yaml file.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Load minerals grapher dataset and read its main table.
     ds = paths.load_dataset("minerals")
@@ -113,8 +113,8 @@ def run() -> None:
         "yAxis": {"min": 0},
     }
 
-    # Create collection
-    c = paths.create_collection(
+    # Create chart
+    c = paths.create_chart(
         config=config,
         tb=tb,
         indicator_names=["value"],

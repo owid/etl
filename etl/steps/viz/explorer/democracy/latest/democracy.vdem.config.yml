@@ -1,4 +1,4 @@
-# Mini-explorer for vdem indicators (used by democracy.py with combine_collections).
+# Mini-explorer for vdem indicators (used by democracy.py with combine_charts).
 # Carries only the views whose `dataset` dimension maps to this upstream source.
 # FAUST (title, subtitle, note, map config, etc.) lives in the indicator's
 # `presentation.grapher_config` in the corresponding garden meta.yml — Grapher

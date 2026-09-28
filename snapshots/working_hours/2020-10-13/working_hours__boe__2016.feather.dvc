@@ -2,7 +2,7 @@ meta:
   origin:
     producer: Bank of England
     title: A millennium of macroeconomic data
-    title_snapshot: A millennium of macroeconomic data - Hours worked
+    title_snapshot: A millennium of macroeconomic data – Hours worked
     description_snapshot: |-
       The data series joins together numerous sources and is considered tentative by its authors, especially before 1770. For a detailed list of underlying sources, assumptions, and adjustments, see the worksheet titled "A54. Hours worked 1260-2016," available from the Bank of England's "A Millennium of Macroeconomic Data."
     citation_full: Bank of England (2016). A millennium of macroeconomic data.

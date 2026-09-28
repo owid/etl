@@ -25,15 +25,15 @@ MULTIDIM_CONFIG = {
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Add views for all dimensions
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("vaccination_introductions")
     tb = ds.read("vaccination_introductions", load_data=False)
 
-    # Create and save collection
-    c = paths.create_collection(
+    # Create and save chart
+    c = paths.create_chart(
         config=config,
         tb=tb,
         indicator_names=["intro"],

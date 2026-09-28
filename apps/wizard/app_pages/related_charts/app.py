@@ -11,9 +11,7 @@ from apps.wizard.app_pages.related_charts import data, scoring
 from apps.wizard.utils import embeddings as emb
 from apps.wizard.utils.components import (
     st_cache_data,
-    st_horizontal,
     st_multiselect_wider,
-    st_title_with_expert,
     url_persist,
 )
 from etl import paths
@@ -208,12 +206,12 @@ top_100_charts = sorted(charts, key=lambda x: x.views_365d, reverse=True)[:100] 
 # SIDEBAR / SEARCH
 ########################################################################################################################
 
-st_title_with_expert("Related charts", icon=":material/search:")
+st.title(":material/search: Related charts")
 
 col1, col2 = st.columns(2)
 with col2:
     st_multiselect_wider()
-    with st_horizontal():
+    with st.container(horizontal=True):
         random_chart = st.button("Random chart", help="Pick a random chart, weighted by views.")
         random_100_chart = st.button("Random top 100 chart", help="Pick a random chart from the top 100 charts.")
 

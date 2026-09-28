@@ -3,9 +3,9 @@ meta:
     producer: Ember
     title: European Wholesale Electricity Price Data
     description: Wholesale day-ahead electricity price data for European countries.
-    title_snapshot: European Wholesale Electricity Price Data - Monthly
+    title_snapshot: European Wholesale Electricity Price Data – Monthly
     citation_full: |-
-      Ember - European Wholesale Electricity Price Data. Based on data from European Network of Transmission System Operators (ENTSO-E), United Kingdom's Electricity Market Reform (EMR), and Ireland's Single Electricity Market Operator (SEMOpx).
+      Ember – European Wholesale Electricity Price Data. Based on data from European Network of Transmission System Operators (ENTSO-E), United Kingdom's Electricity Market Reform (EMR), and Ireland's Single Electricity Market Operator (SEMOpx).
     url_main: https://ember-energy.org/data/european-wholesale-electricity-price-data/
     url_download: |-
       https://storage.googleapis.com/emb-prod-bkt-publicdata/public-downloads/price/outputs/european_wholesale_electricity_price_data_monthly.csv

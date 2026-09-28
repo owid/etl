@@ -74,26 +74,26 @@ steps:
   #
   # Luxembourg Income Study
   #
-  data://grapher/lis/2026-06-12/luxembourg_income_study:
-    - data://garden/lis/2026-06-12/luxembourg_income_study:
-      - data://meadow/lis/2026-06-12/luxembourg_income_study:
-        - snapshot://lis/2026-06-12/lis_absolute_poverty.csv
-        - snapshot://lis/2026-06-12/lis_inequality.csv
-        - snapshot://lis/2026-06-12/lis_incomes.csv
-        - snapshot://lis/2026-06-12/lis_relative_poverty.csv
-        - snapshot://lis/2026-06-12/lis_percentiles.csv
+  data://grapher/lis/2026-09-18/luxembourg_income_study:
+    - data://garden/lis/2026-09-18/luxembourg_income_study:
+      - data://meadow/lis/2026-09-18/luxembourg_income_study:
+        - snapshot://lis/2026-09-18/lis_absolute_poverty.csv
+        - snapshot://lis/2026-09-18/lis_inequality.csv
+        - snapshot://lis/2026-09-18/lis_incomes.csv
+        - snapshot://lis/2026-09-18/lis_relative_poverty.csv
+        - snapshot://lis/2026-09-18/lis_percentiles.csv
   viz://explorer/lis/latest/poverty_lis:
-    - data://grapher/lis/2026-06-12/luxembourg_income_study
+    - data://grapher/lis/2026-09-18/luxembourg_income_study
   viz://explorer/lis/latest/inequality_lis:
-    - data://grapher/lis/2026-06-12/luxembourg_income_study
+    - data://grapher/lis/2026-09-18/luxembourg_income_study
   viz://explorer/lis/latest/incomes_lis:
-    - data://grapher/lis/2026-06-12/luxembourg_income_study
+    - data://grapher/lis/2026-09-18/luxembourg_income_study
   viz://chart/lis/latest/gini_lis:
-    - data://grapher/lis/2026-06-12/luxembourg_income_study
+    - data://grapher/lis/2026-09-18/luxembourg_income_study
   viz://chart/lis/latest/relative_poverty_lis:
-    - data://grapher/lis/2026-06-12/luxembourg_income_study
+    - data://grapher/lis/2026-09-18/luxembourg_income_study
   viz://chart/lis/latest/incomes_lis:
-    - data://grapher/lis/2026-06-12/luxembourg_income_study
+    - data://grapher/lis/2026-09-18/luxembourg_income_study
 
   # Inequality comparison data
   data://grapher/poverty_inequality/2025-01-22/inequality_comparison:

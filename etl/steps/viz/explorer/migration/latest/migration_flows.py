@@ -14,7 +14,7 @@ DISPLAY_SETTINGS = {
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Add views for all dimensions
     ds = paths.load_dataset("migration_stock_flows")
@@ -28,14 +28,13 @@ def run() -> None:
         "note": 'For most countries, immigrant means "born in another country". Someone who has gained citizenship in the country they live in is still counted as an immigrant if they were born elsewhere. For some countries, place of birth information is not available; in this case citizenship is used to define whether someone counts as an immigrant.',
     }
 
-    c = paths.create_collection(
+    c = paths.create_explorer(
         config=config,
         tb=tb,
         indicator_names=["migrants"],
         dimensions=["country_select", "metric", "gender"],
         common_view_config=common_view_config,
         short_name="migration-flows",
-        explorer=True,
     )
     c.sort_choices({"country_select": lambda x: sorted(x)})
 

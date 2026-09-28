@@ -3,8 +3,8 @@ from typing import Any
 from owid.catalog.utils import underscore
 from pandas import DataFrame
 
-from etl.collection.model.view import View
 from etl.helpers import PathFinder
+from etl.viz.chart.model.view import View
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -171,7 +171,7 @@ def run() -> None:
     #
     # Process data.
     #
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Define common view configuration
     common_view_config = {
@@ -190,7 +190,7 @@ def run() -> None:
 
     # Create standard line/map views
     dimensions = ["frequency", "source", "consumer", "price_component", "unit"]
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         tb=[
             tb_annual.loc[:, use_cols_annual],

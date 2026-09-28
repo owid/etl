@@ -183,7 +183,7 @@ matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
 
 Naming Lato first costs nothing and buys a lot downstream: **Figma renders the import in the
 template's own typeface on arrival**, so the parked reference copy looks like the deliverable, and
-`/create-figma-chart`'s font pass — plus the anchor pass that exists only to undo that face change —
+`/owid-staff:create-figma-chart`'s font pass — plus the anchor pass that exists only to undo that face change —
 becomes a no-op. Without it Figma resolves none of `Arial, Helvetica, DejaVu Sans` and substitutes
 **Inter**, which is wider: one 850-wide chart overran its canvas by 39px that way. Verify it rather
 than assuming — the emitted stack is one grep, and the faces the import lands in are one read:

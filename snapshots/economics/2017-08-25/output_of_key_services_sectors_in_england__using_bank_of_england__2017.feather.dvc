@@ -2,7 +2,7 @@ meta:
   origin:
     producer: Bank of England
     title: A millennium of macroeconomic data
-    title_snapshot: A millennium of macroeconomic data - Output of key services sectors in England
+    title_snapshot: A millennium of macroeconomic data – Output of key services sectors in England
     description_snapshot: |-
       This dataset is produced using 'A5. Service Sector 1270-1870' sheet in BoE dataset. For each variables, output figures are indexed those in year 1700 (i.e. 1700 = 100), and they are measured on a log scale.
     citation_full: Broadberry, S., Campbell, B. M., Klein, A., Overton, M., and Van Leeuwen, B. (2015). British Economic Growth, 1270–1870. Cambridge University Press, as compiled in the Bank of England's "A millennium of macroeconomic data" (2017).

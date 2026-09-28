@@ -6,7 +6,7 @@ meta:
       Data is taken from the OECD's Corporate Tax Statistics Database (CTSD). The database compiles data relating to four main categories: i) corporate tax revenues; ii) corporate effective tax rates; iii) statutory corporate income tax rates; and iv) tax incentives related to innovation.
 
       Further information on the CTSD is available on the [OECD's website](http://www.oecd.org/tax/tax-policy/corporate-tax-statistics-database.htm).
-    title_snapshot: Corporate Tax Statistics Database - Corporate income tax
+    title_snapshot: Corporate Tax Statistics Database – Corporate income tax
     citation_full: OECD (2019). Corporate Tax Statistics Database. Organisation for Economic Co-operation and Development.
     url_main: https://stats.oecd.org/Index.aspx?DataSetCode=CTS_CIT
     date_accessed: '2019-05-04'

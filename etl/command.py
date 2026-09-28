@@ -12,6 +12,7 @@ import time
 import traceback
 from collections.abc import Callable, Iterator, MutableMapping
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
+from concurrent.futures.process import BrokenProcessPool
 from contextlib import contextmanager
 from functools import partial
 from graphlib import TopologicalSorter
@@ -884,6 +885,16 @@ def exec_graph_parallel(
                         # on a long build you want to see it while the run is still going.
                         _report_step_failure(task, e)
 
+                        # A dead pool cannot run the steps that are left, so --continue-on-failure
+                        # has nothing to continue with: every remaining future resolves to this
+                        # same BrokenProcessPool. Worse, they resolve to the very same exception
+                        # *object*, and each `future.result()` above appends its frames to that
+                        # object's traceback — so failure N prints N copies of them. A nightly
+                        # rebuild once reported 1210 of these and wrote 5.9M lines (546MB), past
+                        # the size Buildkite will serve a log at. Stop at the first one.
+                        if isinstance(e, BrokenProcessPool):
+                            raise
+
                         if continue_on_failure:
                             failed_tasks.add(task)
                             skipped_tasks.add(
@@ -940,16 +951,30 @@ def print_failure_recap() -> None:
 
     Each was printed as it happened, but by the end of a build they are thousands of lines up the
     log — and the tail is what gets read, being what Buildkite puts in its error box.
+
+    Steps that failed the same way share one traceback here. When something upstream of the steps
+    themselves breaks — a dead worker pool, an unreachable database — every step fails with the
+    identical text, and reprinting it once per step is what turns a recap into a log nobody can
+    open. Every failed step is still named, in the `steps_failed` list at the end.
     """
     if not STEP_FAILURES:
         return
 
     import structlog
 
+    # Group by traceback, first-seen order. A dict keyed on the text does both in one pass.
+    by_failure: dict[str, list[str]] = {}
+    for step_name, failure in STEP_FAILURES:
+        by_failure.setdefault(failure, []).append(step_name)
+
     # ">>>" for the individual steps: "---"/"+++" would each open a log group of their own and
     # split the recap up, whereas these stay inside the recap's own group.
     blocks = [f"+++ {len(STEP_FAILURES)} step(s) failed"]
-    blocks += [f">>> Failed {step_name}\n{failure}" for step_name, failure in STEP_FAILURES]
+    for failure, step_names in by_failure.items():
+        header = f">>> Failed {step_names[0]}"
+        if len(step_names) > 1:
+            header += f" — and {len(step_names) - 1} more step(s) with an identical traceback"
+        blocks.append(f"{header}\n{failure}")
     print("\n".join(blocks), flush=True)
 
     # The step list at the very end is what you feed back into `etl run`.

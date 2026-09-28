@@ -2,7 +2,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: OECD Family Database - Marriage and Divorce Rates
+    title: OECD Family Database – Marriage and Divorce Rates
     description: |-
       Marriage and divorce rates data from the OECD Family Database, including mean age at marriage. The OECD Family Database provides cross-national indicators on family outcomes and family policies across the OECD countries, its enhanced engagement partners and EU member states.
 

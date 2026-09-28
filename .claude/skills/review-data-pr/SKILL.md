@@ -3,6 +3,7 @@ name: review-data-pr
 description: Review an OWID ETL data update PR end-to-end — runs the pipeline, compares snapshot fields against the previous version, verifies links, audits indicator metadata coverage, and cross-checks workflow items from /update-dataset. Trigger when the user asks to "review this PR", "review the data PR", or invokes this on an open dataset-update branch.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Review Data PR
@@ -56,7 +57,7 @@ When it's a restructure:
 - **Don't expect the auto-Indicator-Upgrader to have remapped charts.** When short_names differ entirely, the upgrader has nothing to match on. Look for a hand-curated v1 title → v2 title mapping table in the PR description (or a follow-up PR thread). 🟡 if charts on the old chain are still published but no mapping plan exists.
 - **Don't expect a `.py` step copy from the old version.** Step files should be authored from scratch, not produced by `etl update` rename. If the new step files look mechanically renamed (same logic, just version-bumped strings), flag 🟡 — the author may have skipped restructure-specific decisions.
 - **A chart remapped onto a successor indicator needs a config-vs-shape check.** Verify its pinned `selectedEntityNames` exist in the successor's data (v1 regional aggregates often don't — expect the garden step to rebuild them, mirroring the retired step's method), that pinned `yAxis` bounds don't clip the new range, and that the subtitle doesn't still describe the old construction. Any of the three broken: 🔴 (the default view renders empty, clipped, or mislabeled).
-- **Slack + `/latest` drafts are not expected in the PR body at all.** `/update-dataset` keeps them in the author's `workbench/` (steps 9 / 9b, owned by `/data-updates-comms` and `/data-update-announcement`), so their absence from the PR is correct — don't flag it.
+- **Slack + `/latest` drafts are not expected in the PR body at all.** `/update-dataset` keeps them in the author's `workbench/` (steps 9 / 9b, owned by `/draft-data-update-slack-post` and `/owid-staff:draft-data-update-post`), so their absence from the PR is correct — don't flag it.
 
 ### 4. Run the full pipeline end-to-end
 
@@ -209,7 +210,9 @@ Any `NULL` row is a 🔴.
 
 ### 10. Metadata quality skills
 
-Run `/check-metadata-typos`, `/check-metadata-spacing`, `/check-metadata-style` against the new garden + grapher `.meta.yml` files. See `/update-dataset` § 6b for the full procedure (typos / spacing / style + a manual clarity checklist for general-audience readability — apply that checklist here too). Report findings as 🟡 (or 🔴 if a violation breaks rendering or makes the text outright misleading).
+Run `/check-metadata-typos` and `/check-metadata-style` against the new garden + grapher `.meta.yml` files. See `/update-dataset` § 6b for the full procedure (typos / whitespace + style / a manual clarity checklist for general-audience readability — apply that checklist here too). Report findings as 🟡 (or 🔴 if a violation breaks rendering or makes the text outright misleading).
+
+**Did the PR change reader-facing text?** If so, open the **Metadata Diff** Wizard page on the PR's staging server (`http://staging-site-<container_branch>/etl/wizard/metadata-diff`) and grade the edits there. It lists every chart, MDim view and explorer view each edit lands on — the only view of a garden text change's actual reach, since inherited text produces no config diff at all. A wording you would reject is 🟡 (🔴 when the new text is misleading or contradicts what the view shows): reject it in the page and hand the author the exported `metadata-rejections.md`, which already names the edit, the garden `.meta.yml` and the dataset owner. Check two things before trusting the counts — the page's 🚧 stale-server banner (a dataset the server is behind on reports its diffs *backwards*) and whether the grapher step reached that server at all. Author side: the QA hand-off in `/update-dataset`.
 
 Also grep the metadata **prose** for numbers carried over from the previous release (country counts, category counts, year ranges in `description_key`/descriptions): validated fields are covered by checks, prose numbers are not — a panel-composition change (dropped country, new category set) silently strands them (see `/update-dataset` Guardrails, "Grep metadata prose"). Stale prose count: 🟡.
 
@@ -225,7 +228,7 @@ Five further prose checks from `/update-dataset` § 6b that the skills don't aut
 
 ### 10b. Adversarial data review (optional to run — always offer it)
 
-`/update-dataset` § 6c-bis offers an adversarial factual review via [`/adversarial-data-review`](../adversarial-data-review/SKILL.md) — optional to *run* because it's token-heavy (~25–45 web calls), so **a missing report is not a finding**; don't flag its absence. If the author didn't run it, **you MUST offer it to the user** as an optional add-on to this review (name the token cost; in review context it runs in that skill's spot-check scope, not the full author scope) — surfacing this offer is mandatory, never silently skip it — and recommend accepting when the update carries red flags: large unexplained value churn, an in-place source revision, a producer new to us, or editorial claims riding on specific values. Run it on opt-in.
+`/update-dataset` § 6c-bis offers an adversarial factual review via [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) — optional to *run* because it's token-heavy (~25–45 web calls), so **a missing report is not a finding**; don't flag its absence. If the author didn't run it, **you MUST offer it to the user** as an optional add-on to this review (name the token cost; in review context it runs in that skill's spot-check scope, not the full author scope) — surfacing this offer is mandatory, never silently skip it — and recommend accepting when the update carries red flags: large unexplained value churn, an in-place source revision, a producer new to us, or editorial claims riding on specific values. Run it on opt-in.
 
 When the PR body (or `workbench/<short_name>/update-context.yml`) does reference an `ai/adversarial-review-<short_name>-<date>.md` report, verify the **outcome**: its 🔴 findings must be resolved — metadata edited, or a `<short_name>.corrections.yml` added with `reason`/`producer`/`status` filled in. Then spot-check independently — don't take the report's word for it: re-verify 2–3 of its findings and 2–3 anchor values (World total + one major country, latest year) against an independent source yourself, following that skill's independence rules (a different producer measuring the same quantity; never OWID republishers or mirrors of the same producer). A value you confirm wrong that the report missed or waved through is 🔴.
 
@@ -336,8 +339,8 @@ Structure the review with:
 5. **🔴 Blockers** — must-fix before merge
 6. **🟡 Suggestions** — nice-to-have
 7. **🟢 Informational** — observations, no action needed
-8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, etc. (The Slack + `/latest` drafts live in `workbench/`, not the PR — don't expect them here.)
-9. **What's still open** — carried forward from the PR body, covering the categories in `.claude/docs/open-items.md` plus the update workflow's fourth one (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
+8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, whether the QA hand-off included Metadata Diff when the PR changed reader-facing text, etc. (The Slack + `/latest` drafts live in `workbench/`, not the PR — don't expect them here.)
+9. **What's still open** — carried forward from the PR body, covering the categories in `.claude/docs/open-items.md` plus the update workflow's fourth one (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Unactioned Metadata Diff rejections belong here — nothing in the merge enforces them. Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
 
 **Check the PR body doesn't leave pending work unmentioned.** A PR whose description lists only what was done, while the session left content edits pending, audits unrun, or a follow-up PR's scope undefined, is missing the one artifact that survives after the chat is gone — flag it 🟡. Judge it on whether a reader can tell what's outstanding, not on whether it uses any particular headings or wording. Work that was deliberately handed off needs a locator in the body too, not just a description: an item the next person can't act on without redoing the analysis isn't handed off.
 

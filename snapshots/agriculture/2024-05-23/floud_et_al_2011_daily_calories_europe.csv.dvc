@@ -4,7 +4,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: The Changing Body
-    title_snapshot: The Changing Body - Daily calories in Western Europe
+    title_snapshot: The Changing Body – Daily calories in Western Europe
     description: |-
       This dataset contains the estimates on the daily caloric intake in the United States (Table 6.6) and Western Europe (Table 5.5) of "The Changing Body", by Floud et al. (2011).
     date_published: "2011-03-31"

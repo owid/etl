@@ -5,7 +5,7 @@ meta:
     description: |-
       The UCDP Candidate Events Dataset (UCDP Candidate) is based on UCDP Georeferenced Event Dataset (UCDP GED), but published at a monthly release cycle. It makes available monthly releases of candidate events data with not more than a month's lag globally. See [codebook](https://ucdp.uu.se/downloads/candidateged/ucdp-candidate-codebook1.5.pdf) for similarities and differences between the two products, as well as other relevant notes.
 
-    title_snapshot: Candidate Events Dataset (January - June 2026)
+    title_snapshot: Candidate Events Dataset (January – June 2026)
     description_snapshot: |-
       This is the second (Q2) quarterly export in 2026, covering events from January to June 2026.
     citation_full: |-

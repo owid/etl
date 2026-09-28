@@ -7,7 +7,7 @@ meta:
 
       You can find more about Ember's methodology in [this document](https://files.ember-energy.org/public-downloads/ember_electricity_data_methodology.pdf).
     citation_full: |-
-      Ember - Yearly Electricity Data Europe (2026).
+      Ember – Yearly Electricity Data Europe (2026).
 
       Most of the data is taken from the European Commission's Eurostat annual data.
     attribution_short: Ember

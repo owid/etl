@@ -1,4 +1,4 @@
-"""Bespoke viz step producing the S3 JSON feed for the FAOSTAT food-trade Sankey viz.
+"""Bespoke viz step producing the JSON feed for the FAOSTAT food-trade Sankey viz.
 
 Loads the `food_trade` garden table and writes two kinds of files:
 
@@ -14,30 +14,28 @@ the viz: pick a product, fetch one JSON, render. The metadata's
 `productsByEntity` map lets the viz pre-compute "what can this country be
 the exporter / importer of?" without loading every product file.
 
-Output URLs:
-    https://owid-public.owid.io/data/food-trade/food-trade.metadata.json
-    https://owid-public.owid.io/data/food-trade/food-trade.<product_id>.json
+It also writes `metadata.json`, the feed's provenance derived from the garden columns (see
+`etl.viz.bespoke`).
 
+The files go to the step's output folder; the framework syncs that folder to the R2 path of the
+environment being built, so the feed is served at
+`<root>/v1/bespoke/faostat/latest/food_trade/food-trade.metadata.json` and
+`.../food-trade.<product_id>.json` -- `api.ourworldindata.org` on production, and
+`api-staging.owid.io/<env>` on a staging server or a laptop.
 """
 
 import json
-from pathlib import Path
 
 import pandas as pd
-from owid.catalog import s3_utils
 from structlog import get_logger
 from tqdm.auto import tqdm
 
-from etl import config
 from etl.helpers import PathFinder
-from etl.paths import VIZ_DIR
+from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
 
 log = get_logger()
 paths = PathFinder(__file__)
 
-# Public S3 bucket and prefix.
-S3_BUCKET_NAME = "owid-public"
-S3_DATA_DIR = Path("data/food-trade")
 FILE_SLUG = "food-trade"
 
 # Decimal places kept for tonnage values written to the JSON files. Trade
@@ -83,20 +81,11 @@ def _build_products_by_entity(df: pd.DataFrame, entity_to_id: dict, product_to_i
     return out
 
 
-def _save_and_upload(data: dict, filename: str) -> None:
-    """Write JSON locally and upload to S3 (skipping the upload without --grapher)."""
-    export_dir = VIZ_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
-    export_dir.mkdir(parents=True, exist_ok=True)
-    local_file = export_dir / filename
-    s3_path = f"s3://{S3_BUCKET_NAME}/{S3_DATA_DIR / filename}"
-
-    with open(local_file, "w") as f:
+def _save(data: dict, filename: str) -> None:
+    """Write one JSON file of the feed into the step's output folder."""
+    paths.output_dir.mkdir(parents=True, exist_ok=True)
+    with open(paths.output_dir / filename, "w") as f:
         json.dump(data, f, separators=(",", ":"))
-
-    if not config.GRAPHER_ENABLED:
-        tqdm.write(f"[not uploaded, no --grapher] {local_file} -> {s3_path}")
-    else:
-        s3_utils.upload(s3_path, local_file, public=True, downloadable=True)
 
 
 def run() -> None:
@@ -106,10 +95,14 @@ def run() -> None:
     ds = paths.load_dataset("food_trade")
     tb = ds.read("food_trade", safe_types=False)
 
-    # Source attribution for the metadata JSON is read from the `value`
-    # column's origin (TM snapshot) — the default grapher "producer (year)"
-    # form — so it stays in sync with the dataset's metadata.
-    source = tb["value"].metadata.origins[0].attribution
+    # The feed's provenance, derived from the origins of the data it is built on, in the same
+    # shape the MDIM download packages publish.
+    feed_metadata = build_feed_metadata(
+        title="Food trade",
+        columns={"Bilateral trade flow": tb["value"]},
+        update_period_days=ds.metadata.update_period_days,
+    )
+    write_feed_metadata(paths.output_dir, feed_metadata)
 
     df = pd.DataFrame(tb)
     for col in ("exporter", "importer", "item"):
@@ -144,7 +137,7 @@ def run() -> None:
     #
     metadata = {
         "year": year,
-        "source": source,
+        "source": feed_metadata["feed"]["citation"],
         "dimensions": {
             "entities": [{"id": entity_to_id[c], "name": c} for c in countries],
             "products": [{"id": product_to_id[p], "name": p} for p in products],
@@ -152,7 +145,7 @@ def run() -> None:
         "productsByEntity": _build_products_by_entity(df, entity_to_id, product_to_id),
     }
     log.info("food_trade.write_metadata", n_entities=len(countries), n_products=len(products))
-    _save_and_upload(metadata, f"{FILE_SLUG}.metadata.json")
+    _save(metadata, f"{FILE_SLUG}.metadata.json")
 
     #
     # Write one file per product.
@@ -160,4 +153,4 @@ def run() -> None:
     log.info("food_trade.write_per_product", n_files=len(products))
     for product in tqdm(products, desc="food_trade per-product JSON"):
         data = _build_product_data(df, product, entity_to_id)
-        _save_and_upload(data, f"{FILE_SLUG}.{product_to_id[product]}.json")
+        _save(data, f"{FILE_SLUG}.{product_to_id[product]}.json")

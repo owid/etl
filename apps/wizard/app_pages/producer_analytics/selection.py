@@ -3,7 +3,6 @@
 import streamlit as st
 
 from apps.wizard.app_pages.producer_analytics.utils import AUXILIARY_STEPS, MIN_DATE, TODAY
-from apps.wizard.utils.components import st_horizontal
 
 
 def render_selection():
@@ -12,7 +11,7 @@ def render_selection():
             f"Select a custom date range (note that this metric started to be recorded on {MIN_DATE.strftime('%Y-%m-%d')})."
         )
 
-        with st_horizontal(vertical_alignment="center"):
+        with st.container(horizontal=True, vertical_alignment="bottom"):
             # Create input fields for minimum and maximum dates.
             min_date = st.date_input(
                 "Select minimum date",

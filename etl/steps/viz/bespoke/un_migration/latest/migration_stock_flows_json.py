@@ -1,37 +1,34 @@
 """Bespoke viz step that generates JSON files for the UN migration flows visualization.
 
 This step reads the migration_stock_flows garden dataset and generates:
+* `metadata.json`, the feed's provenance, derived from the garden columns (see `etl.viz.bespoke`)
 * A metadata JSON file with entity/gender dimensions and time range
 * Individual data JSON files per country/entity
 
 Each per-country file contains all pairwise immigrant and emigrant stocks for
 that country, encoded as parallel arrays indexed by entity IDs from the metadata.
 
-Outputs:
-* Files are saved locally and (with --grapher) uploaded to S3 at:
-  * https://owid-public.owid.io/data/migration/migration-stock-flows.metadata.json
-  * https://owid-public.owid.io/data/migration/migration-stock-flows.<entityId>.json
+The files are written to the step's output folder; the framework syncs that folder to the R2 path
+of the environment being built, so the feed is served at
+`<root>/v1/bespoke/un_migration/latest/migration_stock_flows_json/migration-stock-flows.metadata.json`
+and `.../migration-stock-flows.<entityId>.json` -- `api.ourworldindata.org` on production, and
+`api-staging.owid.io/<env>` on a staging server or a laptop.
 
-Run without --grapher to skip the S3 upload and only write the local files:
+Run without --grapher to skip the upload and only write the local files:
   .venv/bin/etlr viz://bespoke/un_migration/latest/migration_stock_flows_json
 """
 
 import json
-from pathlib import Path
 
 import pandas as pd
-from owid.catalog import Table, s3_utils
+from owid.catalog import Table
 from structlog import get_logger
 from tqdm.auto import tqdm
 
-from etl import config
 from etl.helpers import PathFinder
-from etl.paths import VIZ_DIR
+from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
 
 log = get_logger()
-
-S3_BUCKET_NAME = "owid-public"
-S3_DATA_DIR = Path("data/migration/")
 
 # Region/aggregate names to exclude from the visualization output.
 REGIONS = [
@@ -92,7 +89,7 @@ GENDER_MAP = {
 POPULATION_YEARS = [1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024]
 
 
-def create_metadata_json(tb: Table, tb_pop: Table) -> tuple[dict, dict]:
+def create_metadata_json(tb: Table, tb_pop: Table, source: str) -> tuple[dict, dict]:
     """Build the metadata JSON and return it alongside lookup dicts."""
     # All entities = union of destinations and origins
     all_entities = sorted(set(tb["country_destination"].unique()) | set(tb["country_origin"].unique()))
@@ -134,7 +131,7 @@ def create_metadata_json(tb: Table, tb_pop: Table) -> tuple[dict, dict]:
     metadata = {
         "timeRange": {"start": int(tb["year"].min()), "end": int(tb["year"].max())},
         "years": sorted(tb["year"].unique().tolist()),
-        "source": "UN DESA, International Migrant Stock (2024)",
+        "source": source,
         "dimensions": {
             "entities": entities,
             "genders": genders,
@@ -178,24 +175,11 @@ def create_entity_data_json(tb: Table, entity: str, mappings: dict) -> dict:
     }
 
 
-def save_and_upload_json(data: dict, filename: str) -> None:
-    """Write JSON locally and upload to S3 (only with --grapher)."""
-    export_dir = VIZ_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
-    export_dir.mkdir(parents=True, exist_ok=True)
-
-    local_file = export_dir / filename
-    s3_path = S3_DATA_DIR / filename
-
-    with open(local_file, "w") as f:
-        if not config.GRAPHER_ENABLED:
-            json.dump(data, f, indent=2)
-        else:
-            json.dump(data, f, separators=(",", ":"))
-
-    if not config.GRAPHER_ENABLED:
-        tqdm.write(f"[not uploaded, no --grapher] {local_file} -> s3://{S3_BUCKET_NAME}/{s3_path}")
-    else:
-        s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_path)}", local_file, public=True, downloadable=True)
+def save_json(data: dict, filename: str) -> None:
+    """Write one JSON file of the feed into the step's output folder."""
+    paths.output_dir.mkdir(parents=True, exist_ok=True)
+    with open(paths.output_dir / filename, "w") as f:
+        json.dump(data, f, separators=(",", ":"))
 
 
 def run() -> None:
@@ -218,12 +202,21 @@ def run() -> None:
     # Build metadata + entity file.
     #
     log.info("Creating metadata JSON.")
-    metadata, mappings = create_metadata_json(tb, tb_pop)
+    # The feed's provenance, from the origins of the data it is built on, rather than a source
+    # string typed in here that goes stale the next time the dataset is updated.
+    feed_metadata = build_feed_metadata(
+        title="Migrant stocks by origin and destination",
+        columns={"Migrants": tb["migrants"]},
+        update_period_days=ds_garden.metadata.update_period_days,
+    )
+    write_feed_metadata(paths.output_dir, feed_metadata)
+
+    metadata, mappings = create_metadata_json(tb, tb_pop, source=feed_metadata["feed"]["citation"])
 
     total_files = len(mappings["entities"]) + 1
-    log.info(f"Creating and {'uploading' if config.GRAPHER_ENABLED else 'not uploading'} {total_files} JSON files.")
+    log.info(f"Creating {total_files} JSON files.")
 
-    save_and_upload_json(metadata, "migration-stock-flows.metadata.json")
+    save_json(metadata, "migration-stock-flows.metadata.json")
 
     #
     # Per-entity files.
@@ -232,8 +225,6 @@ def run() -> None:
     for entity in tqdm(mappings["entities"], desc="Processing entities"):
         entity_id = entity_to_id[entity]
         data = create_entity_data_json(tb, entity, mappings)
-        save_and_upload_json(data, f"migration-stock-flows.{entity_id}.json")
+        save_json(data, f"migration-stock-flows.{entity_id}.json")
 
-    log.info(
-        f"Done. Created {total_files} files: 1 metadata + {len(mappings['entities'])} entity files. (uploaded={config.GRAPHER_ENABLED})"
-    )
+    log.info(f"Done. Created {total_files} files: 1 metadata + {len(mappings['entities'])} entity files.")

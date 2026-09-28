@@ -14,7 +14,7 @@ Below is a list of some of the most common guides to get you started. Use the le
 
     ***
 
-    Create or update datasets. Keep downstream charts up-to-date. Create collections. Etc.
+    Create or update datasets. Keep downstream charts up-to-date. Create charts and explorers. Etc.
 
 -   **:fontawesome-solid-hat-wizard: &nbsp; [Wizard](wizard)**
 

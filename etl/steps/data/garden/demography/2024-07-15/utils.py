@@ -93,9 +93,9 @@ GAPMINDER_SG_ORIGINS = [
     Origin(
         producer="Gapminder",
         title="Systema Globalis",
-        citation_full="Gapminder - Systema Globalis (2023)",
+        citation_full="Gapminder – Systema Globalis (2023)",
         url_main="https://github.com/open-numbers/ddf--gapminder--systema_globalis",
-        attribution="Gapminder - Systema Globalis (2022)",
+        attribution="Gapminder – Systema Globalis (2022)",
         attribution_short="Gapminder",
         date_accessed="2023-03-31",
         date_published="2023-02-21",  # ty: ignore

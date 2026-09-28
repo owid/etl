@@ -6,11 +6,11 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: "The Evolution of Child Labor in Portugal, 1850-2001"
+    title: "The Evolution of Child Labor in Portugal, 1850–2001"
     description: |-
       This paper traces the long-run evolution of child labor in Portugal from 1850 to 2001, drawing on historical census and labor force data to examine activity, employment, and unemployment rates among children and youth aged 10-19.
     date_published: "2017"
-    title_snapshot: "The Evolution of Child Labor in Portugal, 1850-2001 - Child and youth labor indicators"
+    title_snapshot: "The Evolution of Child Labor in Portugal, 1850–2001 – Child and youth labor indicators"
     description_snapshot: |-
       Table 1, taken from the journal article on the long-run evolution of child labor in Portugal.
 

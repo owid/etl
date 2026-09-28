@@ -223,10 +223,10 @@ from matplotlib.textpath import TextPath
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
-from etl.static_viz import TEMPLATES, apply_svg_rcparams, export_frame
+from etl.viz.static import TEMPLATES, apply_svg_rcparams, export_frame
 
 # Non-path text so the SVG stays editable in Figma, and a fixed hash salt so it is reproducible.
-# Both come from `etl.static_viz`, which this step used to set by hand with the same two values.
+# Both come from `etl.viz.static`, which this step used to set by hand with the same two values.
 apply_svg_rcparams()
 
 paths = PathFinder(__file__)

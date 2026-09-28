@@ -2,7 +2,7 @@ meta:
   origin:
     producer: Eurostat (2025)
     title: material_footprint_end_use_eu
-    citation_full: Eurostat (2025). Material footprints - details by final use of products.
+    citation_full: Eurostat (2025). Material footprints – details by final use of products.
     url_main: https://ec.europa.eu/eurostat/databrowser/product/page/ENV_AC_RMEFD
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vQZwthumPTInpogYnu4OLSR9xxSbglTx87pkN4hzCTp5JRLK5XTKSiJKstqjoj0xnqektGI_DMnOiEh/pub?output=csv

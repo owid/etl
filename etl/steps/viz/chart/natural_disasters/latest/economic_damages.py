@@ -70,7 +70,7 @@ def run() -> None:
     #
     # Load inputs.
     #
-    config = paths.load_collection_config()
+    config = paths.load_config()
     ds = paths.load_dataset("natural_disasters")
     tb_yearly = ds.read("natural_disasters_yearly", load_data=False)
     tb_decadal = ds.read("natural_disasters_decadal", load_data=False)
@@ -86,7 +86,7 @@ def run() -> None:
     tb_yearly = prepare_table(tb_yearly, "yearly", "annual", indicators)
     tb_decadal = prepare_table(tb_decadal, "decadal", "decadal", indicators)
 
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         tb=[tb_yearly, tb_decadal],
         indicator_names="value",
