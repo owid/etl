@@ -150,7 +150,8 @@ def test_readme_sections(tmp_path):
     assert "Retrieved from: https://www.energyinst.org/statistical-review/" in readme
     assert "License: © Energy Institute 2026 (https://www.energyinst.org/terms)" in readme
     assert "Citation: Energy Institute - Statistical Review of World Energy (2026)." in readme
-    assert "## License\n\nThis dataset is published under CC BY 4.0" in readme
+    assert "## License\n\nOur World in Data collects and republishes this data" in readme
+    assert "published under" not in readme
     assert (
         "## How to cite this dataset\n\nEnergy Institute (2026); Population based on various sources (2024) – with "
         "minor processing by Our World in Data.\n"

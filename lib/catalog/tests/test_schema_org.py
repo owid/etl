@@ -471,44 +471,49 @@ def test_no_citation_emitted_and_is_based_on_leads_with_most_used_origin() -> No
     assert {item["url"] for item in jsonld["isBasedOn"]} >= {"https://example.com/population"}
 
 
-def test_dataset_level_license_wins_over_origin_license() -> None:
-    """A dataset-level license declared in .meta.yml describes the compiled artifact and must
-    take precedence over per-source origin licenses (owid_co2 used to advertise GCB's ICOS
-    data license just because GCB is its most-referenced origin)."""
-    origin = Origin(
-        producer="Global Carbon Project",
-        title="Global Carbon Budget",
-        license=License(name="ICOS", url="https://www.icos-cp.eu/data-services/about-data-portal/data-license"),
-    )
+def test_license_lists_source_licenses_not_dataset_license() -> None:
+    """OWID republishes data produced by others, so the record advertises the original sources'
+    licenses. A dataset-level license in .meta.yml is not a license of the data and is ignored."""
+    icos = License(name="ICOS", url="https://www.icos-cp.eu/data-services/about-data-portal/data-license")
+    cc_by = License(name="CC BY 4.0", url="https://creativecommons.org/licenses/by/4.0/")
+    gcb = Origin(producer="Global Carbon Project", title="Global Carbon Budget", license=icos)
+    population = Origin(producer="Various sources", title="Population", license=cc_by)
     table = TableSchemaInput(
         short_name="owid_co2",
         metadata=TableMeta(short_name="owid_co2", title="CO2", description="Table description"),
-        variables={"co2": VariableMeta(title="CO2", origins=[origin])},
+        variables={
+            "co2": VariableMeta(title="CO2", origins=[gcb]),
+            "co2_per_capita": VariableMeta(title="CO2 per capita", origins=[gcb, population]),
+        },
         formats=["feather"],
     )
-    kwargs: dict = dict(
+
+    jsonld = dataset_to_schema_org(
         dataset_path="garden/emissions/2025-12-04/owid_co2",
         page_path="emissions/owid_co2",
+        dataset_meta=DatasetMeta(
+            short_name="owid_co2", title="CO2 dataset", description="Dataset description", licenses=[cc_by]
+        ),
         tables=[table],
     )
+    # Most-referenced source first, each license once.
+    assert jsonld["license"] == [icos.url, cc_by.url]
 
+    single = TableSchemaInput(
+        short_name="owid_co2",
+        metadata=TableMeta(short_name="owid_co2", title="CO2", description="Table description"),
+        variables={"co2": VariableMeta(title="CO2", origins=[gcb])},
+        formats=["feather"],
+    )
     jsonld = dataset_to_schema_org(
+        dataset_path="garden/emissions/2025-12-04/owid_co2",
+        page_path="emissions/owid_co2",
         dataset_meta=DatasetMeta(
-            short_name="owid_co2",
-            title="CO2 dataset",
-            description="Dataset description",
-            licenses=[License(name="CC BY 4.0", url="https://creativecommons.org/licenses/by/4.0/")],
+            short_name="owid_co2", title="CO2 dataset", description="Dataset description", licenses=[cc_by]
         ),
-        **kwargs,
+        tables=[single],
     )
-    assert jsonld["license"] == "https://creativecommons.org/licenses/by/4.0/"
-
-    # Without a dataset-level license, the most-referenced origin's license is the fallback.
-    jsonld = dataset_to_schema_org(
-        dataset_meta=DatasetMeta(short_name="owid_co2", title="CO2 dataset", description="Dataset description"),
-        **kwargs,
-    )
-    assert jsonld["license"] == "https://www.icos-cp.eu/data-services/about-data-portal/data-license"
+    assert jsonld["license"] == icos.url
 
 
 def test_keywords_ordered_by_variable_count_not_column_order() -> None:

@@ -173,7 +173,6 @@ def write_page_files(
         "title": dataset_title(ds.metadata, [ds.read(name, load_data=False) for name in ordered_table_names(ds)]),
         "description": ds.metadata.description,
         "published_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
-        "license": _license(ds),
         "readme": README_FILENAME,
         "codebook": CODEBOOK_FILENAME,
         "sources": SOURCES_FILENAME,
@@ -214,13 +213,6 @@ def jsonld_distributions(files: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for entry in files
         if entry["role"] in (ROLE_DATA, ROLE_BUNDLE, ROLE_ARCHIVE)
     ]
-
-
-def _license(ds: Dataset) -> dict[str, str | None] | None:
-    if ds.metadata.licenses:
-        license = ds.metadata.licenses[0]
-        return {"name": license.name, "url": license.url}
-    return None
 
 
 def remove_page_files(ds: Dataset, target_dir: Path) -> None:

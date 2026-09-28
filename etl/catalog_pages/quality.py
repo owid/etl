@@ -112,7 +112,7 @@ def assess_dataset_quality(
     if not _has_description(dataset_meta):
         result.blockers.append("missing_description")
 
-    if not _has_license_url(dataset_meta, tables):
+    if not _has_license_url(tables):
         result.blockers.append("missing_license_url")
 
     if not _has_provenance(tables):
@@ -153,9 +153,8 @@ def _has_description(dataset_meta: DatasetMeta) -> bool:
     return bool(dataset_meta.description)
 
 
-def _has_license_url(dataset_meta: DatasetMeta, tables: list[TableSchemaInput]) -> bool:
-    if any(license_to_url(license) for license in dataset_meta.licenses):
-        return True
+def _has_license_url(tables: list[TableSchemaInput]) -> bool:
+    # Only source licenses count: the JSON-LD advertises those, never a dataset-level license.
     for table in tables:
         for variable in table.variables.values():
             if license_to_url(variable.license):

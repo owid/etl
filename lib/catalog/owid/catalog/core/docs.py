@@ -41,6 +41,12 @@ SOURCES_COLUMNS = [
 OWID_ATTRIBUTION = "Our World in Data"
 MAX_ATTRIBUTIONS_IN_SHORT_CITATION = 3
 
+LICENSE_NOTE = (
+    "Our World in Data collects and republishes this data; it is not the original producer. The licenses of "
+    "the original sources still apply, and each source above lists its own. It is your responsibility to check "
+    "that your use of the data is permitted by them, and to credit the sources correctly."
+)
+
 # Paragraph shared with the README of chart downloads on ourworldindata.org.
 PROCESSING_NOTE = (
     "Our World in Data is almost never the original producer of the data. Almost all of the data we use has "
@@ -368,19 +374,9 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
         ]
         parts += [_source_section(origin) for origin in origins]
 
-    parts += ["## License", ""]
-    if meta.licenses:
-        for license in meta.licenses:
-            text = license.name or ""
-            if license.url:
-                text += f" ({license.url})" if text else license.url
-            parts.append(f"This dataset is published under {text}.")
-        parts.append("")
-    parts += [
-        "The data is derived from the sources above, whose own licenses apply to the underlying data. Please "
-        "credit them alongside Our World in Data.",
-        "",
-    ]
+    # No dataset-wide license statement: OWID republishes data produced by others, so the original
+    # sources' licenses are what governs reuse, and a single blanket license here would misstate that.
+    parts += ["## License", "", LICENSE_NOTE, ""]
 
     parts += ["## How to cite this dataset", ""]
     processing_level = (

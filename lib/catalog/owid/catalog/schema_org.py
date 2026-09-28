@@ -87,7 +87,7 @@ def dataset_to_schema_org(
     title = _dataset_title(dataset_meta, tables)
     description = _dataset_description(dataset_meta)
     origins = _unique_origins(tables)
-    license_url = _license_url(dataset_meta, origins, tables)
+    license_urls = _license_urls(origins, tables)
 
     result: dict[str, Any] = {
         "@context": "https://schema.org/",
@@ -126,8 +126,8 @@ def dataset_to_schema_org(
         date_modified = _first_valid_date([resolved_version])
         if date_modified:
             result["dateModified"] = date_modified
-    if license_url:
-        result["license"] = license_url
+    if license_urls:
+        result["license"] = license_urls[0] if len(license_urls) == 1 else license_urls
 
     # Creator is the author of this artifact (the OWID-processed dataset), matching how
     # compiled datasets are marked up elsewhere (HuggingFace, Zenodo, Google's own examples).
@@ -388,30 +388,21 @@ def _unique_origins(tables: list[TableSchemaInput]) -> list[Origin]:
     return [origins[key] for key in order]
 
 
-def _license_url(dataset_meta: DatasetMeta, origins: list[Origin], tables: list[TableSchemaInput]) -> str | None:
-    # The record describes the OWID-compiled dataset, so a dataset-level license declared in
-    # its .meta.yml (e.g. CC BY for owid_co2, matching its GitHub repo) speaks for the whole
-    # artifact and wins. Origin licenses are a per-source fallback: the "first" one is just
-    # the most-referenced source's license, which can misrepresent the compilation (owid_co2
-    # used to advertise GCB's ICOS data license).
-    for license in dataset_meta.licenses:
-        url = _license_to_url(license)
-        if url:
-            return url
-    for origin in origins:
-        url = _license_to_url(origin.license)
-        if url:
-            return url
+def _license_urls(origins: list[Origin], tables: list[TableSchemaInput]) -> list[str]:
+    # OWID republishes data produced by others, so what governs reuse is the licenses of the original
+    # sources, not a license of the compilation. A dataset-level license in the .meta.yml is therefore
+    # ignored here; the record lists every distinct source license, most-referenced source first.
+    urls: list[str] = []
+    candidates: list[License | None] = [origin.license for origin in origins]
     for table in tables:
         for variable in table.variables.values():
-            url = _license_to_url(variable.license)
-            if url:
-                return url
-            for license in variable.licenses:
-                url = _license_to_url(license)
-                if url:
-                    return url
-    return None
+            candidates.append(variable.license)
+            candidates.extend(variable.licenses)
+    for license in candidates:
+        url = _license_to_url(license)
+        if url and url not in urls:
+            urls.append(url)
+    return urls
 
 
 def license_to_url(license: License | None) -> str | None:

@@ -115,7 +115,8 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     assert manifest["title"] == "Energy dataset"
     assert manifest["description"].startswith("Dataset description.")
     assert manifest["published_at"].endswith("Z")
-    assert manifest["license"] == {"name": "CC BY 4.0", "url": "https://creativecommons.org/licenses/by/4.0/"}
+    # No dataset-wide license: the sources' own licenses apply (listed in sources.csv).
+    assert "license" not in manifest
     assert manifest["readme"] == "readme.md"
     assert manifest["codebook"] == "codebook.csv"
     assert manifest["sources"] == "sources.csv"
