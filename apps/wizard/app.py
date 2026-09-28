@@ -1,8 +1,7 @@
 """Entry page.
 
-This is the page that is loaded when the app is started. It redirects to the home page, unless an argument is passed. E.g. `etlwiz charts` will redirect to the charts page.
-
-NOTE: This only works with >1.35 (nightly) version of Streamlit.
+This is the page that is loaded when the app is started. It builds the multi-page navigation from
+`apps/wizard/config/config.yml` and runs the selected page (Home by default).
 """
 
 import streamlit as st
@@ -20,81 +19,35 @@ if args.debug:
 # Enable Sentry if SENTRY_DSN is in .env
 utils.enable_sentry_for_streamlit()
 
+
 ###########################################
 # DEFINE PAGES
 ###########################################
+def _page(item: dict, url_path: str | None = None, default: bool = False) -> st.Page:
+    """Navigation entry for a config item: an external URL becomes a plain link, a script a page."""
+    entrypoint = str(item["entrypoint"])
+    if entrypoint.startswith(("http://", "https://")):
+        return st.Page(page=entrypoint, title=item["title"], icon=item["icon"])
+    return st.Page(page=entrypoint, title=item["title"], icon=item["icon"], url_path=url_path, default=default)
+
+
 pages = {}
 
-
-# Initial apps (etl steps)
-pages_ = []
-for step in WIZARD_CONFIG["main"].values():
-    entrypoint = str(step["entrypoint"])
-    if entrypoint.startswith(("http://", "https://")):
-        # External URLs are shown as plain links in the navigation menu.
-        pages_.append(
-            st.Page(
-                page=entrypoint,
-                title=step["title"],
-                icon=step["icon"],
-            )
-        )
-    else:
-        pages_.append(
-            st.Page(
-                page=entrypoint,
-                title=step["title"],
-                icon=step["icon"],
-                url_path=step["title"].lower(),
-                default=step["title"] == "Home",
-            )
-        )
-pages["Overview"] = pages_
-
-# ETL steps
-pages_ = []
-for step in WIZARD_CONFIG["etl"]["steps"].values():
-    if step["enable"]:
-        pages_.append(
-            st.Page(
-                page=str(step["entrypoint"]),
-                title=step["title"],
-                icon=step["icon"],
-                url_path=step["alias"],
-            )
-        )
-pages[WIZARD_CONFIG["etl"]["title"]] = pages_
+# Overview: home page and top-level links
+pages["Overview"] = [
+    _page(item, url_path=item["title"].lower(), default=item["title"] == "Home")
+    for item in WIZARD_CONFIG["main"].values()
+]
 
 # Sections
 for section in WIZARD_CONFIG["sections"]:
     apps = [app for app in section["apps"] if app["enable"]]
     if apps:
-        pages_ = []
-        for app in apps:
-            pages_.append(
-                st.Page(
-                    page=str(app["entrypoint"]),
-                    title=app["title"],
-                    icon=app["icon"],
-                    url_path=app["alias"],
-                )
-            )
-        pages[section["title"]] = pages_
+        pages[section["title"]] = [_page(app, url_path=app["alias"]) for app in apps]
 
 # Legacy
 if ("legacy" in WIZARD_CONFIG) and ("apps" in WIZARD_CONFIG["legacy"]):
-    pages_ = []
-    for app in WIZARD_CONFIG["legacy"]["apps"]:
-        if app["enable"]:
-            pages_.append(
-                st.Page(
-                    page=str(app["entrypoint"]),
-                    title=app["title"],
-                    icon=app["icon"],
-                    url_path=app["alias"],
-                )
-            )
-    pages["Legacy"] = pages_
+    pages["Legacy"] = [_page(app, url_path=app["alias"]) for app in WIZARD_CONFIG["legacy"]["apps"] if app["enable"]]
 
 ###########################################
 # RUN PAGES

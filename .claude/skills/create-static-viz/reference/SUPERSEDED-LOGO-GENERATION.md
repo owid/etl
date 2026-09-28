@@ -58,5 +58,5 @@ re-measured.** They are the padded, logo-capped generation's: two-line/two-line 
 on either 850-wide frame (the current templates measure **118**), and a one-line/one-line clone
 **82.48** on Vertical (the live clone of the day measured 82.47) or **76.48** on Horizontal, where the
 current structure puts Static Vertical at **70**. Take the two-line/two-line end from
-`/create-figma-chart`'s node map, and measure the one-line/one-line end on a live clone before
+`/owid-staff:create-figma-chart`'s node map, and measure the one-line/one-line end on a live clone before
 calibrating against it.

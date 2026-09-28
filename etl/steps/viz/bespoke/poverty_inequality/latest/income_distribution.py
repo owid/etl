@@ -1,30 +1,27 @@
-"""Export the thousand-bins income distribution data to S3.
+"""Export the thousand-bins income distribution data for our bespoke income distribution chart.
 
-This data is then used for our bespoke income distribution chart.
+This step uses the thousand_bins_distribution dataset dependency as its basis, and writes one
+JSON file per year plus `metadata.json`, the feed's provenance derived from the garden columns
+(see `etl.viz.bespoke`).
 
-This step uses the thousand_bins_distribution dataset dependency as its basis.
+The files are written to the step's output folder; the framework syncs that folder to the R2 path
+of the environment being built, so the feed is served at
+`<root>/v1/bespoke/poverty_inequality/latest/income_distribution/income-distribution.<year>.json`
+-- `api.ourworldindata.org` on production, and `api-staging.owid.io/<env>` on a staging server or
+a laptop.
 
-Output:
-* https://owid-public.owid.io/data/poverty-inequality/income-distribution.<year>.json
-
-Run without --grapher to skip the S3 upload and only write the local export file.
+Run without --grapher to skip the upload and only write the local files.
 """
 
 import json
-from pathlib import Path
 
 import pandas as pd
-from owid.catalog import Table, s3_utils
+from owid.catalog import Table
 from tqdm.auto import tqdm
 
-from etl import config
 from etl.data_helpers.misc import round_to_sig_figs
 from etl.helpers import PathFinder
-from etl.paths import VIZ_DIR
-
-# S3 bucket name and folder where dataset files will be stored.
-S3_BUCKET_NAME = "owid-public"
-S3_DATA_DIR = Path("data/poverty-inequality")
+from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -87,25 +84,11 @@ def create_distribution_json(tb_export: pd.DataFrame, year: int) -> dict:
     }
 
 
-def save_and_upload_json(data: dict, filename: str, s3_data_dir: Path) -> None:
-    """Save JSON data to local file and upload to S3."""
-    # Create export directory using paths.
-    export_dir = VIZ_DIR / paths.channel / paths.namespace / paths.version / paths.short_name
-    export_dir.mkdir(parents=True, exist_ok=True)
-
-    # Create full paths.
-    local_file = export_dir / filename
-    s3_path = s3_data_dir / filename
-
-    # Save locally.
-    with open(local_file, "w") as f:
+def save_json(data: dict, filename: str) -> None:
+    """Write one JSON file of the feed into the step's output folder."""
+    paths.output_dir.mkdir(parents=True, exist_ok=True)
+    with open(paths.output_dir / filename, "w") as f:
         json.dump(data, f, separators=(",", ":"))
-
-    # Upload to S3.
-    if not config.GRAPHER_ENABLED:
-        paths.log.info(f"[not uploaded, no --grapher] {local_file} -> s3://{S3_BUCKET_NAME}/{s3_path}")
-    else:
-        s3_utils.upload(f"s3://{S3_BUCKET_NAME}/{str(s3_path)}", local_file, public=True, downloadable=True)
 
 
 def run() -> None:
@@ -115,6 +98,16 @@ def run() -> None:
     paths.log.info("Loading thousand_bins_distribution dataset.")
     ds_garden = paths.load_dataset("thousand_bins_distribution")
     tb = ds_garden.read("thousand_bins_distribution", reset_index=False, safe_types=False)
+
+    # The feed's provenance, derived from the origins of the data it is built on.
+    write_feed_metadata(
+        paths.output_dir,
+        build_feed_metadata(
+            title="Income distribution",
+            columns={"Average income or consumption": tb["avg"], "Population": tb["pop"]},
+            update_period_days=ds_garden.metadata.update_period_days,
+        ),
+    )
 
     #
     # Prepare data.
@@ -129,6 +122,6 @@ def run() -> None:
     paths.log.info(f"Creating {len(years)} income distribution JSON files.")
     for year in tqdm(years, desc="Processing years"):
         data = create_distribution_json(tb_export, year=year)
-        save_and_upload_json(data, f"income-distribution.{year}.json", S3_DATA_DIR)
+        save_json(data, f"income-distribution.{year}.json")
 
     paths.log.info(f"Successfully created {len(years)} income distribution JSON files.")

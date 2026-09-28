@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate TypedDict classes from JSON schemas for better typing in Collection model.
+Generate TypedDict classes from JSON schemas for better typing in Chart model.
 
 This script reads the multidim, grapher, and dataset schemas and generates
 static TypedDict classes that provide autocompletion and type checking.
@@ -11,7 +11,7 @@ Usage:
     python scripts/generate_schema_types.py --refresh       # re-download the SAME version, then regenerate
     python scripts/generate_schema_types.py --bump-version  # move to a NEWER version, then regenerate
 
-This will update etl/collection/model/schema_types.py with the latest types.
+This will update etl/viz/chart/model/schema_types.py with the latest types.
 
 The grapher schema is read from a vendored copy in `schemas/` (committed to the repo) so that
 generation is deterministic and offline. `--refresh` and `--bump-version` are the only modes that
@@ -29,7 +29,7 @@ Which one to use:
   from whichever file is vendored.
 
 NOTE: hand-written types that are not derived from any JSON schema belong in
-`etl/collection/model/params.py`, NOT in the generated file (they would be lost on
+`etl/viz/chart/model/params.py`, NOT in the generated file (they would be lost on
 regeneration). The only exception is `VIEW_CONFIG_EXTRA_FIELDS` below, which injects
 legacy fields into ViewConfig that the schemas don't know about.
 """
@@ -47,7 +47,7 @@ from typing import Any
 from etl.config import DEFAULT_GRAPHER_SCHEMA, GRAPHER_SCHEMA_LATEST_URL, vendored_grapher_schema_id
 from etl.paths import SCHEMAS_DIR
 
-OUTPUT_PATH = Path(__file__).parent.parent / "etl" / "collection" / "model" / "schema_types.py"
+OUTPUT_PATH = Path(__file__).parent.parent / "etl" / "viz" / "chart" / "model" / "schema_types.py"
 
 # Schemas whose `$ref`s name the vendored grapher schema by filename, and so have to be repointed
 # when the vendored version changes.
@@ -427,7 +427,7 @@ class TypedDictGenerator:
         # Assemble file content
         lines = [
             '"""',
-            "Generated TypedDict schemas for Collection model.",
+            "Generated TypedDict schemas for Chart model.",
             "",
             "This file is auto-generated from JSON schemas. Do not edit manually.",
             "Run `python scripts/generate_schema_types.py` to regenerate.",
@@ -587,7 +587,7 @@ def bump_vendored_schema() -> bool:
         "     `oneOf` escape hatches, the extra `WorldMap` chart type, the ETL-only\n"
         "     `data`/`includedEntities` properties). `test_grapher_config_schema_sync` fails until\n"
         "     this is done.\n"
-        "  3. Do NOT bump the `grapher_schema` pins in existing collection configs — those record\n"
+        "  3. Do NOT bump the `grapher_schema` pins in existing chart configs — those record\n"
         "     what each config was authored against, and are what lets grapher migrate them.\n"
     )
     return True
@@ -673,7 +673,7 @@ def main():
 
     print(f"Generated schema types in {OUTPUT_PATH}")
     print("Import in your code with:")
-    print("from etl.collection.model.schema_types import ViewConfig, ViewMetadata")
+    print("from etl.viz.chart.model.schema_types import ViewConfig, ViewMetadata")
 
 
 if __name__ == "__main__":

@@ -10,17 +10,17 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Default collection config
-    config = paths.load_collection_config()
+    # Default chart config
+    config = paths.load_config()
 
     # Load grapher dataset.
     ds = paths.load_dataset("wdi")
     tb = ds.read("wdi", load_data=False)
 
     #
-    # Create collection object
+    # Create chart object
     #
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         short_name="labor_force_participation_rate",
     )

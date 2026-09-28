@@ -1,4 +1,4 @@
-"""Create multidimensional collection for share of women teachers data."""
+"""Create multidimensional chart for share of women teachers data."""
 
 import re
 
@@ -63,8 +63,8 @@ EDUCATION_LEVELS = {
 
 
 def run() -> None:
-    """Main function to process women teachers data and create collection."""
-    config = paths.load_collection_config()
+    """Main function to process women teachers data and create chart."""
+    config = paths.load_config()
 
     ds = paths.load_dataset("education_opri")
     tb = ds.read("education_opri", load_data=False)
@@ -73,15 +73,15 @@ def run() -> None:
     tb = tb.loc[:, ID_COLUMNS + women_teacher_cols].copy()
     tb = adjust_dimensions(tb)
 
-    collection = paths.create_collection(
+    chart = paths.create_chart(
         config=config,
         tb=[tb],
         common_view_config=MULTIDIM_CONFIG,
     )
 
-    create_grouped_views(collection)
+    create_grouped_views(chart)
 
-    for view in collection.views:
+    for view in chart.views:
         level = view.dimensions["level"]
         if level == "level_side_by_side":
             view.metadata = {
@@ -94,7 +94,7 @@ def run() -> None:
 
         edit_indicator_displays(view)
 
-    collection.save()
+    chart.save()
 
 
 def get_women_teacher_columns(tb):
@@ -134,7 +134,7 @@ def adjust_dimensions(tb):
     return tb
 
 
-def create_grouped_views(collection):
+def create_grouped_views(chart):
     """Add grouped views for education level comparisons."""
 
     def get_view_metadata(view):
@@ -151,7 +151,7 @@ def create_grouped_views(collection):
             "subtitle": generate_subtitle_by_dimensions(view),
         }
 
-    collection.group_views(
+    chart.group_views(
         groups=[
             {
                 "dimension": "level",

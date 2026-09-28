@@ -22,6 +22,11 @@ The prompt is doing the work here, so what it must contain is worth stating:
    stated as a rule about the metadata and not as a list of cases: an earlier draft named the
    Central African Republic here, which suppressed that one chart by name and would have taught
    nothing about the next one.
+6. **The one case that is named.** The post-Soviet break in producers' aggregates is not a false
+   positive — the 1992 step really is there and really does mislead — but it is in the source, in
+   every aggregate built from it, and the answer every time it is raised is that nothing will be
+   done. It is named exactly because the rule above would be the wrong shape for it: generalising
+   it to coverage discontinuities at large would silence the ones we did cause and could fix.
 
 What this catches that statistical detection cannot: an error that is stable over time and
 statistically unremarkable, where the only tell is knowing something about the world. The
@@ -141,6 +146,12 @@ A change in how something was *measured* is different, and worth flagging: a sur
 a rebased index or a source switch produces a jump that a reader will read as a real-world
 trend. Say so when a discontinuity looks like an artefact of measurement rather than an event.
 
+One discontinuity is the exception, because it is already known and nothing will be done about
+it: producers' world and regional aggregates exclude the Soviet Union before 1992 and count its
+successor states from 1992 onwards, so a global or European series can step up around 1991-1992.
+Say nothing about that step. This covers the post-Soviet coverage break and nothing else — any
+other change in which countries a series covers is still worth flagging.
+
 For each issue, set chart_params to the grapher query parameters that put the problem on
 screen — the entity and time range you are talking about — so a reviewer sees it immediately
 rather than the chart's default view.
@@ -168,10 +179,11 @@ expected outcome for most charts."""
 # subtitle states prices are measured in constant 2023 US$" are one claim — so identity has to
 # survive rewording rather than be a hash of the sentence.
 #
-# One definition, used in the two places that have to agree: merging the repeat passes of a
-# single run, and recognising in the digest what has already been posted. They disagreed for a
-# while, and the consequence reached the channel — a finding merged across passes within a run
-# was posted again the next day under its new wording, on a chart that had been fixed in between.
+# Used only to merge the repeat passes of a single run, where the passes describe the same bundle
+# and overlap is high. The digest used the same test to recognise across days what it had already
+# posted, and there it failed: after an edit the model rewords a finding far more, and one ticked
+# on Monday came back on Tuesday at 0.30. Across days the digest now remembers the chart, not the
+# claim — see ``digest.COOLDOWN_DAYS``.
 CLAIM_OVERLAP = 0.4
 
 

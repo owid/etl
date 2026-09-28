@@ -221,8 +221,6 @@ def _merge(issues: list[dict[str, Any]], new: dict[str, Any]) -> None:
 
     The model rewords freely between passes — "life expectancy of around 18–20 years" and
     "under 20 years" are one finding — so matching on a prefix counts them separately.
-    :func:`critic.same_claim` is the shared notion of "the same finding", and the digest
-    recognises what it has already posted with the same test.
     """
     tokens = claim_tokens(new["claim"])
     for existing in issues:
@@ -409,13 +407,16 @@ def _review_one(
     "digest_out",
     type=click.Path(dir_okay=False, path_type=Path),
     default=None,
-    help="Write the Slack-ready digest messages here (the lead plus one per finding), and record them as posted.",
+    help=(
+        "Write the Slack-ready digest messages here — the lead, one per finding, and each finding's "
+        "evidence as it will be posted in that finding's thread — and record them as posted."
+    ),
 )
 @click.option(
     "--post",
     is_flag=True,
     help=(
-        "Post the digest to #we-need-to-correct-it instead of only writing it. For scheduled runs, "
+        "Post the digest to #chart-reviews instead of only writing it. For scheduled runs, "
         "where there is no human between the file and the channel. Needs SLACK_API_TOKEN."
     ),
 )
@@ -601,13 +602,13 @@ def cli(
             window_days=changed_since,
             facts=facts,
             cost=sum(r["cost"] for r in results),
+            model=model,
         )
-        digest_out.write_text(digest.MESSAGE_SEPARATOR.join(messages))
+        digest_out.write_text(digest.render(messages))
         if messages:
-            console.print(
-                f"\n[bold]digest ({len(fresh)} new finding(s), {len(messages)} message(s)) → {digest_out}[/bold]"
-            )
-            console.print(digest.MESSAGE_SEPARATOR.join(messages))
+            posts = digest.post_count(messages)
+            console.print(f"\n[bold]digest ({len(fresh)} new finding(s), {posts} message(s)) → {digest_out}[/bold]")
+            console.print(digest.render(messages))
             if post:
                 # Post before recording, so a failed post is re-attempted tomorrow rather than
                 # marked delivered. Duplicating a finding is a smaller harm than dropping one.
@@ -627,15 +628,16 @@ def cli(
         raise SystemExit(2)
 
 
-def _post_digest(messages: list[str]) -> None:
-    """Send the digest to the channel as separate messages, or fail the run.
+def _post_digest(messages: list[digest.DigestMessage]) -> None:
+    """Send the digest to the channel, or fail the run.
 
-    In order, one call each: the lead first, then a message per finding, so each finding owns
-    the thread that hangs off it. A failure part-way leaves the earlier messages posted and the
-    state unrecorded, so tomorrow re-posts the whole digest — the same trade the caller makes.
+    In order, one call each: the lead first, then a message per finding with that finding's
+    evidence posted underneath it in its own thread, so the argument sits under the claim it
+    argues for. A failure part-way leaves the earlier messages posted and the state unrecorded,
+    so tomorrow re-posts the whole digest — the same trade the caller makes.
 
     Paced at Slack's documented ``chat.postMessage`` rate of one message per second per channel.
-    A digest is at most six messages, so this costs a run five seconds and takes the burst — and
+    A digest is at most seven calls, so this costs a run six seconds and takes the burst — and
     the partial post a 429 mid-loop would leave behind — off the table.
 
     Deliberately not tolerant of a missing token: ``send_slack_message`` prints to stdout when
@@ -648,11 +650,19 @@ def _post_digest(messages: list[str]) -> None:
 
     if not config.SLACK_API_TOKEN:
         raise click.ClickException("--post needs SLACK_API_TOKEN; refusing to silently print instead")
-    for i, message in enumerate(messages):
-        if i:
+    posted = 0
+    for message in messages:
+        if posted:
             time.sleep(POST_INTERVAL_SECONDS)
-        send_slack_message(digest.SLACK_CHANNEL, message)
-    console.print(f"[green]posted {len(messages)} message(s) to {digest.SLACK_CHANNEL}[/green]")
+        # Slack keys a thread on its parent's own timestamp, so a reply needs the response of the
+        # message just posted — there is nothing to thread against before it exists.
+        parent = send_slack_message(digest.SLACK_CHANNEL, message.text)
+        posted += 1
+        for reply in message.thread:
+            time.sleep(POST_INTERVAL_SECONDS)
+            send_slack_message(digest.SLACK_CHANNEL, reply, thread_ts=parent["ts"])
+            posted += 1
+    console.print(f"[green]posted {posted} message(s) to {digest.SLACK_CHANNEL}[/green]")
 
 
 def _print_summary(results: list[dict[str, Any]], model: str) -> bool:

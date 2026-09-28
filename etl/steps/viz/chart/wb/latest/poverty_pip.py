@@ -1,5 +1,5 @@
-from etl.collection import filter_columns_by_dimension_choices
 from etl.helpers import PathFinder
+from etl.viz import filter_columns_by_dimension_choices
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -24,7 +24,7 @@ DIMENSIONS_CONFIG = {
 # etlr multidim
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # load table using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("world_bank_pip")
@@ -48,7 +48,7 @@ def run() -> None:
     survey_comp_spells = [v for v in survey_comp_values if v != "No spells"]
 
     # Create mdim
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         short_name="poverty_pip",
         tb=tb,

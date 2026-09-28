@@ -387,3 +387,10 @@ steps:
     - data://garden/wb/2026-07-01/income_groups
   data://grapher/demography/2024-12-06/wittgenstein_human_capital:
     - data://garden/demography/2024-12-06/wittgenstein_human_capital
+
+  ########################################################################
+  # BESPOKE VISUALIZATIONS
+  ########################################################################
+  # UN WPP demography JSON feed.
+  viz://bespoke/un_wpp/latest/demography:
+    - data://garden/un/2024-07-12/un_wpp

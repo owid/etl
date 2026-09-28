@@ -33,7 +33,7 @@ def run() -> None:
     # Load inputs.
     #
     # Load configuration from adjacent yaml file
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     # Load grapher dataset
     ds_grapher = paths.load_dataset("cottom_plastic_waste")
@@ -51,8 +51,8 @@ def run() -> None:
             if "original_short_name" in details:
                 tb[col].m.original_short_name = details["original_short_name"]
 
-    # Create collection - this will automatically generate views from dimensions
-    c = paths.create_collection(
+    # Create chart - this will automatically generate views from dimensions
+    c = paths.create_chart(
         config=config,
         tb=tb,
         indicator_names=["waste_generation"],

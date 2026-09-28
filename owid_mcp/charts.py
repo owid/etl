@@ -1,4 +1,5 @@
 import io
+import logging
 import urllib.parse
 from typing import Any
 
@@ -6,6 +7,7 @@ import httpx
 import pandas as pd
 import structlog
 from fastmcp import FastMCP
+from fastmcp.exceptions import ToolError
 from fastmcp.utilities.types import Image
 from mcp.types import ImageContent
 from pydantic import BaseModel
@@ -54,6 +56,21 @@ INSTRUCTIONS = (
 mcp = FastMCP()
 
 
+def _raise_for_unknown_slug(resp: httpx.Response, chart_id: str) -> None:
+    """Turn a 404 from grapher into an actionable error for the caller.
+
+    A slug that doesn't exist is the caller's mistake, not a server fault. Raising
+    `ToolError` passes the message through to the client instead of FastMCP's masked
+    "Error calling tool ...", and the WARNING level keeps it out of Sentry — Sentry
+    files an issue for every tool error FastMCP logs at ERROR, which is its default.
+    """
+    if resp.status_code == 404:
+        raise ToolError(
+            f"No OWID chart with slug {chart_id!r}. Use `search_chart` to find a valid slug.",
+            log_level=logging.WARNING,
+        )
+
+
 async def _fetch_chart_data_impl(
     chart_id: str, time: str | None = None, countries: str | None = None
 ) -> ChartDataResult:
@@ -79,6 +96,7 @@ async def _fetch_chart_data_impl(
 
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT, headers=HEADERS) as client:
         resp = await client.get(fetch_url)
+        _raise_for_unknown_slug(resp, chart_id)
         resp.raise_for_status()
         csv_content = resp.text
 
@@ -175,6 +193,7 @@ async def fetch_chart_image(id: str, time: str | None = None, countries: str | N
     try:
         async with httpx.AsyncClient(timeout=HTTP_TIMEOUT, headers=HEADERS) as client:
             resp = await client.get(png_url)
+            _raise_for_unknown_slug(resp, id)
             resp.raise_for_status()
             png_bytes = resp.content
 
@@ -182,6 +201,8 @@ async def fetch_chart_image(id: str, time: str | None = None, countries: str | N
         img_obj = Image(data=png_bytes, format="png")
         return img_obj.to_image_content()
 
+    except ToolError:
+        raise
     except Exception as exc:
         log.warning("chart.fetch_image.error", url=png_url, error=str(exc))
         raise ValueError(f"Failed to download PNG: {exc}")

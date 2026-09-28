@@ -2,17 +2,17 @@
 
 Each per-source `democracy.<key>.config.yml` carries only `metric` + `sub_metric`
 dimensions plus its views. The `dataset` dimension is added automatically by
-`combine_collections` via `collection_dimension_slug` — each mini's
+`combine_charts` via `chart_dimension_slug` — each mini's
 `short_name` becomes the dataset choice slug, with display names provided by
-`collection_choices_names`.
+`chart_choices_names`.
 
 Indicator FAUST and `display.*` live in the indicator's garden meta.yml —
 Grapher inherits them at chart render time, so most views are just
 `dimensions.{metric, sub_metric}` + `indicators.y[catalogPath]`.
 """
 
-from etl.collection import combine_collections
 from etl.helpers import PathFinder
+from etl.viz import combine_charts
 
 paths = PathFinder(__file__)
 
@@ -44,22 +44,21 @@ TOP_CONFIG = {
 
 def run() -> None:
     explorers = [
-        paths.create_collection(
-            config=paths.load_collection_config(f"democracy.{slug}.config.yml"),
+        paths.create_explorer(
+            config=paths.load_config(f"democracy.{slug}.config.yml"),
             short_name=slug,  # becomes the `dataset` dim choice slug after combine
-            explorer=True,
         )
         for slug in SOURCES.keys()
     ]
 
-    final = combine_collections(
-        collections=explorers,
-        collection_name="democracy",
+    final = combine_charts(
+        charts=explorers,
+        chart_name="democracy",
         config={"config": TOP_CONFIG},
-        force_collection_dimension=True,
-        collection_dimension_slug="dataset",
-        collection_dimension_name="Dataset",
-        collection_choices_names=[name for name in SOURCES.values()],
+        force_chart_dimension=True,
+        chart_dimension_slug="dataset",
+        chart_dimension_name="Dataset",
+        chart_choices_names=[name for name in SOURCES.values()],
     )
 
     final.save(tolerate_extra_indicators=True)

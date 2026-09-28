@@ -32,8 +32,8 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Default collection config
-    config = paths.load_collection_config()
+    # Default chart config
+    config = paths.load_config()
 
     # Load grapher dataset.
     ds = paths.load_dataset("world_inequality_database")
@@ -53,9 +53,9 @@ def run() -> None:
     tb = tb[columns_to_keep]
 
     #
-    # Create collection object
+    # Create chart object
     #
-    c = paths.create_collection(
+    c = paths.create_chart(
         config=config,
         short_name="incomes_wid",
         tb=tb,

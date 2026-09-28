@@ -9,15 +9,14 @@ def run() -> None:
     #
     # Load inputs.
     #
-    config = paths.load_collection_config()
+    config = paths.load_config()
 
     #
     # Save outputs.
     #
-    c = paths.create_collection(
+    c = paths.create_explorer(
         config=config,
         short_name="impacts-of-energy-sources",
-        explorer=True,
     )
 
     c.save(tolerate_extra_indicators=True)
