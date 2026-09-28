@@ -59,7 +59,7 @@ For detailed documentation, see:
 - **[API Reference](https://docs.owid.io/projects/etl/libraries/catalog/api/)**: ChartsAPI, IndicatorsAPI, TablesAPI
 - **[Data Structures](https://docs.owid.io/projects/etl/libraries/catalog/structures/)**: Dataset, Table, Variable, metadata handling
 - **[Full Documentation](https://docs.owid.io/projects/etl/libraries/catalog/intro/)**: Complete library documentation
-- **[Agent skill](skills/owid-catalog/SKILL.md)**: guide for AI agents using the library for data analysis
+- **[Agent skill](https://github.com/owid/etl/blob/master/lib/catalog/skills/owid-catalog/SKILL.md)**: guide for AI agents using the library for data analysis
 
 ## Architecture
 
