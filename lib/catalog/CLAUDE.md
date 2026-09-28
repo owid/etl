@@ -292,6 +292,7 @@ Releases are **not** automatic: the version in `pyproject.toml` is bumped by han
 
 ## Important Notes
 
+- `skills/owid-catalog/SKILL.md` documents the `search()` / `fetch()` / `ResponseSet` API for AI agents doing analysis with the library, so update it in the same PR when that API changes
 - Python 3.11+ required — see `requires-python` in `pyproject.toml` for the supported range
 - This library is experimental - APIs may change
 - Extends ruff configuration from parent `../../pyproject.toml`
