@@ -332,9 +332,9 @@ def _fetch_percentiles(version: int) -> pd.DataFrame:
     # These URLs were copied from https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
     # NOTE: Check if these links are still valid for the new PIP release. If not, update them to the new links.
     if version == PPP_VERSIONS[0]:
-        url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090251/world_100bin_revised.csv"
+        url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090251/world_100bin.csv"
     elif version == PPP_VERSIONS[1]:
-        url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090357/world_100bin_revised.csv"
+        url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090357/world_100bin.csv"
     else:
         raise ValueError(f"Version {version} is not supported")
 
