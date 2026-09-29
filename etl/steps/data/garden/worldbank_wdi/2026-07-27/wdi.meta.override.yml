@@ -563,7 +563,7 @@ tables:
         description_key:
           - An Internet user is defined by the International Telecommunication Union as anyone who has accessed the Internet from any location in the last three months.
           - This can be from any type of device, including a computer, mobile phone, personal digital assistant, games machine, digital TV, and other technological devices.
-          - "We calculated the figures for [Africa, Asia, Europe, North America, South America, and Oceania](https://ourworldindata.org/world-region-map-definitions#our-world-in-data) ourselves, and only show a year for a continent if countries with data make up at least 90% of its population."
+          - "We calculated the figures for Africa, Asia, Europe, North America, South America, and Oceania [ourselves](https://ourworldindata.org/world-region-map-definitions#our-world-in-data), and only show a year for a continent if countries with data make up at least 90% of its population."
         description_processing: |-
           For Africa, Asia, Europe, North America, South America, and Oceania, we calculated the share ourselves, using [our definition of the continents](https://ourworldindata.org/world-region-map-definitions#our-world-in-data). For each continent and year, we took the average of the shares of the countries with data, weighted by each country's population. This assumes that countries without data have the same share as the rest of their continent.
 
@@ -655,7 +655,7 @@ tables:
           - An Internet user is defined by the International Telecommunication Union as anyone who has accessed the Internet from any location in the last three months.
           - This can be from any type of device, including a computer, mobile phone, personal digital assistant, games machine, digital TV, and other technological devices.
           - Figures for the world and for the World Bank's regions and income groups come from the World Bank.
-          - "We calculated the figures for [Africa, Asia, Europe, North America, South America, and Oceania](https://ourworldindata.org/world-region-map-definitions#our-world-in-data) ourselves, and only show a year for a continent if countries with data make up at least 90% of its population."
+          - "We calculated the figures for Africa, Asia, Europe, North America, South America, and Oceania [ourselves](https://ourworldindata.org/world-region-map-definitions#our-world-in-data), and only show a year for a continent if countries with data make up at least 90% of its population."
         processing_level: major
         display:
           name: Number of people using the Internet
