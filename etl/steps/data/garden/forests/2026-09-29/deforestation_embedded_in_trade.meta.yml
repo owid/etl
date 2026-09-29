@@ -1,6 +1,8 @@
 definitions:
   common:
     processing_level: minor
+  flows: &flows
+    processing_level: major
     description_processing: |-
       The source reports flows for 161 individual commodities. We sum them into the source's 9 commodity groups.
 
@@ -13,12 +15,14 @@ tables:
   deforestation_embedded_in_trade:
     variables:
       deforestation_risk:
+        <<: *flows
         title: Deforestation risk embedded in trade
         unit: hectares
         short_unit: ha
         description_short: |-
           Deforestation in the producer country attributed to the commodities consumed in the consumer country, amortized over five years.
       deforestation_emissions:
+        <<: *flows
         title: Deforestation emissions embedded in trade
         unit: tonnes of CO₂
         short_unit: t CO₂
