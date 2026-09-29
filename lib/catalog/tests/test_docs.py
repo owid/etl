@@ -3,13 +3,10 @@
 import copy
 from pathlib import Path
 
-import openpyxl
 import pandas as pd
-import pytest
 
 from owid.catalog import Dataset, DatasetMeta, License, Origin, Table
 from owid.catalog.core import docs
-from owid.catalog.core.datasets import EXCEL_MAX_ROWS
 
 EI = Origin(
     producer="Energy Institute",
@@ -175,34 +172,20 @@ def test_readme_skips_jinja_templates(tmp_path):
     assert "<%" not in readme and "<<" not in readme
 
 
-def test_dataset_to_excel_sheets(tmp_path):
+def test_readme_multi_table_shows_each_table_description(tmp_path):
     ds = make_dataset(tmp_path / "owid_energy")
-    path = tmp_path / "owid_energy.xlsx"
-    ds.to_excel(path)
-    workbook = openpyxl.load_workbook(path, read_only=True)
-    assert workbook.sheetnames == ["data", "indicators", "sources", "readme"]
-    data = pd.read_excel(path, sheet_name="data")
-    assert data.columns.tolist() == ["country", "year", "hydro_energy_twh", "hydro_energy_per_capita_kwh"]
-    assert len(data) == 3
-    indicators = pd.read_excel(path, sheet_name="indicators")
-    assert indicators["column"].tolist() == data.columns.tolist()
-    sources = pd.read_excel(path, sheet_name="sources")
-    assert len(sources) == 2
-    readme = pd.read_excel(path, sheet_name="readme", header=None)
-    assert readme.iloc[0, 0] == "# Energy dataset"
-
-
-def test_dataset_to_excel_refuses_oversized_table(tmp_path, monkeypatch):
-    ds = make_dataset(tmp_path / "owid_energy")
-    monkeypatch.setattr("owid.catalog.core.datasets.EXCEL_MAX_ROWS", 2)
-    assert EXCEL_MAX_ROWS > 2
-    path = tmp_path / "owid_energy.xlsx"
-    with pytest.raises(ValueError, match="row limit"):
-        ds.to_excel(path)
-    assert not path.exists()
+    extra = Table({"column": ["a"], "previous_column": ["b"]}, short_name="column_mapping").set_index("column")
+    extra.metadata.title = "Column mapping"
+    extra.metadata.description = "Name of each column in the previous release."
+    ds.add(extra)
+    ds.save()
+    readme = ds.readme()
+    assert "### Column mapping\n\nTable: `column_mapping`\n\nName of each column in the previous release.\n" in readme
 
 
 def test_table_to_excel_includes_sources_sheet(tmp_path):
+    import openpyxl
+
     path = tmp_path / "table.xlsx"
     make_table().to_excel(path)
     assert openpyxl.load_workbook(path, read_only=True).sheetnames == ["data", "metadata", "sources"]

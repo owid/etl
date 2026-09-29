@@ -79,14 +79,14 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     assert result.emitted == [catalog_path]
     page_dir = data_dir / "energy" / "owid_energy"
     assert sorted(path.name for path in page_dir.iterdir()) == [
-        "codebook.csv",
         "dataset.jsonld",
         "manifest.json",
+        "owid_energy.codebook.csv",
         "owid_energy.csv",
         "owid_energy.parquet",
+        "owid_energy.sources.csv",
         "owid_energy.xlsx",
         "readme.md",
-        "sources.csv",
     ]
     assert sorted(result.page_keys) == sorted(
         f"energy/owid_energy/{name}" for name in page_filenames(Dataset(data_dir / catalog_path))
@@ -95,7 +95,7 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     data = pd.read_csv(page_dir / "owid_energy.csv")
     assert data.columns.tolist() == ["country", "year", "hydro_energy_twh"]
     assert len(data) == 2
-    codebook = pd.read_csv(page_dir / "codebook.csv")
+    codebook = pd.read_csv(page_dir / "owid_energy.codebook.csv")
     assert codebook["column"].tolist() == ["country", "year", "hydro_energy_twh"]
     assert (
         codebook.set_index("column").loc["hydro_energy_twh", "source"] == "Example Producer – Original dataset (2025)"
@@ -118,27 +118,39 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     # No dataset-wide license: the sources' own licenses apply (listed in sources.csv).
     assert "license" not in manifest
     assert manifest["readme"] == "readme.md"
-    assert manifest["codebook"] == "codebook.csv"
-    assert manifest["sources"] == "sources.csv"
-    sources = pd.read_csv(page_dir / "sources.csv")
+    assert "codebook" not in manifest and "sources" not in manifest
+    sources = pd.read_csv(page_dir / "owid_energy.sources.csv")
     assert sources["label"].tolist() == ["Example Producer – Original dataset (2025)"]
+    workbook = pd.ExcelFile(page_dir / "owid_energy.xlsx")
+    assert workbook.sheet_names == ["data", "codebook", "sources"]
+    assert pd.read_excel(workbook, "data").columns.tolist() == ["country", "year", "hydro_energy_twh"]
     assert manifest["jsonld"] == "dataset.jsonld"
     # The primary topic gives the page its way back to the charts.
     assert manifest["topics"] == ["Energy"]
     assert manifest["explore_url"] == "https://ourworldindata.org/search?q=Energy&resultType=all"
     assert manifest["tables"] == [
-        {"name": "owid_energy", "title": "owid_energy table", "description": None, "rows": 2, "columns": 3}
+        {
+            "name": "owid_energy",
+            "title": "owid_energy table",
+            "description": None,
+            "rows": 2,
+            "columns": 3,
+            "codebook": "owid_energy.codebook.csv",
+            "sources": "owid_energy.sources.csv",
+        }
     ]
     files = {entry["name"]: entry for entry in manifest["files"]}
     assert {name: entry["role"] for name, entry in files.items()} == {
         "owid_energy.csv": "data",
         "owid_energy.parquet": "data",
-        "owid_energy.xlsx": "bundle",
-        "codebook.csv": "documentation",
-        "sources.csv": "documentation",
+        "owid_energy.xlsx": "data",
+        "owid_energy.codebook.csv": "documentation",
+        "owid_energy.sources.csv": "documentation",
         "readme.md": "documentation",
         "owid_energy.feather": "archive",
     }
+    assert files["owid_energy.codebook.csv"]["table"] == "owid_energy"
+    assert "table" not in files["readme.md"]
     csv = files["owid_energy.csv"]
     assert csv["format"] == "csv"
     assert csv["table"] == "owid_energy"
@@ -194,8 +206,14 @@ def test_build_writes_one_csv_per_table(tmp_path: Path) -> None:
     assert [variable["identifier"] for variable in jsonld["variableMeasured"]] == ["hydro_energy_twh"]
     assert {entry["name"] for entry in jsonld["distribution"]} >= {"owid_energy.csv", "extra_1.csv", "extra_1.parquet"}
     assert [part["identifier"] for part in jsonld["hasPart"]] == ["owid_energy", "extra_1"]
-    codebook = pd.read_csv(page_dir / "codebook.csv")
-    assert codebook.columns.tolist()[:2] == ["table", "column"]
+    # Each table has its own codebook and sources; there is no dataset-wide codebook.
+    assert not (page_dir / "codebook.csv").exists()
+    for name in ["owid_energy", "extra_1"]:
+        codebook = pd.read_csv(page_dir / f"{name}.codebook.csv")
+        assert codebook.columns.tolist()[0] == "column"
+        assert (page_dir / f"{name}.sources.csv").exists()
+        assert (page_dir / f"{name}.xlsx").exists()
+    assert [table["codebook"] for table in manifest["tables"]] == ["owid_energy.codebook.csv", "extra_1.codebook.csv"]
 
 
 def test_page_is_written_even_when_jsonld_gates_fail(tmp_path: Path) -> None:

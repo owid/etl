@@ -1,4 +1,4 @@
-"""Public page files for a catalog dataset: data files, codebook, README and manifest.
+"""Public page files for a catalog dataset: per table its data, codebook and sources; per dataset a README and a manifest.
 
 The files are written into the dataset's stable folder ``<namespace>/<short_name>/`` of the catalog, next to
 the ``dataset.jsonld`` side product. The Cloudflare Worker that serves ``catalog.ourworldindata.org`` renders the
@@ -25,18 +25,20 @@ log = get_logger()
 MANIFEST_VERSION = 1
 MANIFEST_FILENAME = "manifest.json"
 README_FILENAME = "readme.md"
-CODEBOOK_FILENAME = "codebook.csv"
-SOURCES_FILENAME = "sources.csv"
 DATASET_JSONLD_FILENAME = "dataset.jsonld"
 # Formats every table is published in, at the stable URL: CSV for anyone, parquet for anyone with a dataframe
-# library (a fraction of the CSV's size, and it keeps the column types).
-TABLE_FORMATS = ("csv", "parquet")
+# library (a fraction of the CSV's size, and it keeps the column types), and an Excel workbook with the table,
+# its codebook and its sources as sheets.
+TABLE_FORMATS = ("csv", "parquet", "xlsx")
+# Documentation files written next to each table.
+TABLE_DOCUMENTATION = ("codebook.csv", "sources.csv")
+# Rows an Excel sheet can hold; a longer table gets no workbook rather than a truncated one.
+EXCEL_MAX_ROWS = 1_048_576
 # Dated catalog files (immutable) that the manifest links to when they exist on disk.
 VERSIONED_FORMATS = ("parquet", "feather")
-# What each file is for, so the page can group them: the data itself, one bundle with everything, the
-# documentation, and the immutable dated copies.
+# What each file is for, so the page can group them: the data itself, the documentation, and the immutable
+# dated copies.
 ROLE_DATA = "data"
-ROLE_BUNDLE = "bundle"
 ROLE_DOCUMENTATION = "documentation"
 ROLE_ARCHIVE = "archive"
 ENCODING_FORMATS = {
@@ -52,7 +54,8 @@ class PageFiles:
     """Files written for one dataset page, as keys relative to the catalog root."""
 
     keys: list[str] = field(default_factory=list)
-    xlsx_skipped: str | None = None
+    # Tables that got no workbook, with the reason.
+    xlsx_skipped: dict[str, str] = field(default_factory=dict)
 
 
 def page_url(base_url: str, short_key: str) -> str:
@@ -61,10 +64,8 @@ def page_url(base_url: str, short_key: str) -> str:
 
 def page_filenames(ds: Dataset) -> list[str]:
     """Every file a dataset page can own in its stable folder, so that a stale page can be removed in full."""
-    names = [f"{name}.{format}" for name in ordered_table_names(ds) for format in TABLE_FORMATS]
-    names += [f"{ds.metadata.short_name}.xlsx", CODEBOOK_FILENAME, SOURCES_FILENAME, README_FILENAME, MANIFEST_FILENAME]
-    names.append(DATASET_JSONLD_FILENAME)
-    return names
+    names = [f"{name}.{suffix}" for name in ordered_table_names(ds) for suffix in TABLE_FORMATS + TABLE_DOCUMENTATION]
+    return names + [README_FILENAME, MANIFEST_FILENAME, DATASET_JSONLD_FILENAME]
 
 
 def write_page_files(
@@ -78,7 +79,7 @@ def write_page_files(
     jsonld: dict[str, Any] | None = None,
     topics: list[str] | None = None,
 ) -> PageFiles:
-    """Write the data files, codebook, README, manifest and JSON-LD of a dataset into ``catalog_dir / short_key``.
+    """Write the data files, documentation, README, manifest and JSON-LD of a dataset into ``catalog_dir / short_key``.
 
     ``jsonld`` is the Schema.org record built from the dataset's metadata (``None`` when the dataset failed a
     JSON-LD gate). It is written next to the manifest with its ``distribution`` replaced by the manifest's own
@@ -110,43 +111,37 @@ def write_page_files(
         if not versioned:
             result.keys.append(f"{short_key}/{name}")
 
-    # One CSV and one parquet per table; the download filename is the table name, which says what the file is
-    # once detached from our folders.
+    # Per table: the data as CSV, parquet and Excel workbook, its codebook and its sources. The download filename
+    # is the table name, which says what the file is once detached from our folders.
     tables: list[dict[str, Any]] = []
     for name in ordered_table_names(ds):
-        table = ds[name]
-        flat = pd.DataFrame(table.reset_index(drop=not table.primary_key))
+        table = ds[name].reset_index(drop=not ds[name].primary_key)
+        flat = pd.DataFrame(table)
         flat.to_csv(target_dir / f"{name}.csv", index=False)
         register(f"{name}.csv", "csv", ROLE_DATA, table=name)
         flat.to_parquet(target_dir / f"{name}.parquet", index=False)
         register(f"{name}.parquet", "parquet", ROLE_DATA, table=name)
-        tables.append(
-            {
-                "name": name,
-                "title": table.metadata.title,
-                "description": table.metadata.description,
-                "rows": int(len(flat)),
-                "columns": int(len(flat.columns)),
-            }
-        )
-
-    # One workbook with every table, the codebook, the sources and the README. Refused, not truncated, when a
-    # table exceeds Excel's row limit.
-    xlsx_name = f"{ds.metadata.short_name}.xlsx"
-    xlsx_path = target_dir / xlsx_name
-    try:
-        ds.to_excel(xlsx_path)
-        register(xlsx_name, "xlsx", ROLE_BUNDLE)
-    except ValueError as error:
-        result.xlsx_skipped = str(error)
-        log.warning("catalog_pages.xlsx_skipped", dataset=catalog_path, reason=str(error))
-        if xlsx_path.exists():
-            xlsx_path.unlink()
-
-    ds.codebook.to_csv(target_dir / CODEBOOK_FILENAME, index=False)
-    register(CODEBOOK_FILENAME, "csv", ROLE_DOCUMENTATION)
-    ds.sources.to_csv(target_dir / SOURCES_FILENAME, index=False)
-    register(SOURCES_FILENAME, "csv", ROLE_DOCUMENTATION)
+        entry: dict[str, Any] = {
+            "name": name,
+            "title": table.metadata.title,
+            "description": table.metadata.description,
+            "rows": int(len(flat)),
+            "columns": int(len(flat.columns)),
+            "codebook": f"{name}.codebook.csv",
+            "sources": f"{name}.sources.csv",
+        }
+        if len(flat) > EXCEL_MAX_ROWS:
+            reason = f"{len(flat):,} rows exceed Excel's limit of {EXCEL_MAX_ROWS:,}"
+            result.xlsx_skipped[name] = entry["xlsx_skipped"] = reason
+            log.warning("catalog_pages.xlsx_skipped", dataset=catalog_path, table=name, reason=reason)
+        else:
+            table.to_excel(target_dir / f"{name}.xlsx", sheet_name="data", metadata_sheet_name="codebook", index=False)
+            register(f"{name}.xlsx", "xlsx", ROLE_DATA, table=name)
+        table.codebook.to_csv(target_dir / entry["codebook"], index=False)
+        register(entry["codebook"], "csv", ROLE_DOCUMENTATION, table=name)
+        table.sources.to_csv(target_dir / entry["sources"], index=False)
+        register(entry["sources"], "csv", ROLE_DOCUMENTATION, table=name)
+        tables.append(entry)
 
     (target_dir / README_FILENAME).write_text(ds.readme(url=url))
     register(README_FILENAME, "md", ROLE_DOCUMENTATION)
@@ -174,9 +169,7 @@ def write_page_files(
         "description": ds.metadata.description,
         "published_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "readme": README_FILENAME,
-        "codebook": CODEBOOK_FILENAME,
-        "sources": SOURCES_FILENAME,
-        # First entry is the main table (the one named after the dataset).
+        # First entry is the main table (the one named after the dataset). Each carries its own codebook and sources.
         "tables": tables,
         "files": files,
     }
@@ -185,8 +178,6 @@ def write_page_files(
     if topics:
         manifest["topics"] = topics
         manifest["explore_url"] = explore_url(topics[0])
-    if result.xlsx_skipped:
-        manifest["xlsx_skipped"] = result.xlsx_skipped
     with open(target_dir / MANIFEST_FILENAME, "w") as ostream:
         json.dump(manifest, ostream, indent=2, ensure_ascii=False)
         ostream.write("\n")
@@ -211,7 +202,7 @@ def jsonld_distributions(files: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "contentSize": str(entry["size_bytes"]),
         }
         for entry in files
-        if entry["role"] in (ROLE_DATA, ROLE_BUNDLE, ROLE_ARCHIVE)
+        if entry["role"] in (ROLE_DATA, ROLE_ARCHIVE)
     ]
 
 

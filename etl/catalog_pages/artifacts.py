@@ -100,7 +100,7 @@ def build_catalog_page_artifacts(
     The files are written to a stable, version-agnostic short-key tree
     (``catalog_dir / "<namespace>" / "<dataset>" / ...``) rather than inside the dataset's own dated catalog
     folder, so the public page URL doesn't change every time the dataset gets a new version. Each page has
-    one CSV per table, an XLSX workbook, ``codebook.csv``, ``readme.md`` and ``manifest.json`` (see
+    per table its CSV, parquet, workbook, codebook and sources, plus ``readme.md`` and ``manifest.json`` (see
     :mod:`etl.catalog_pages.pages`), and, when the dataset passes every quality gate, ``dataset.jsonld``. When ``only`` is given, restrict generation to
     datasets whose ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist);
     otherwise only datasets that opt in via ``DatasetMeta.jsonld`` are considered.

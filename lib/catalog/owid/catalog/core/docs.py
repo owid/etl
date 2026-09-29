@@ -358,6 +358,9 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
             parts += [f"### {table_title}", ""]
             if table.metadata.short_name:
                 parts += [f"Table: `{table.metadata.short_name}`", ""]
+            table_description = _clean_text(table.metadata.description)
+            if table_description:
+                parts += [table_description, ""]
             level = 4
         for column in table.all_columns:
             column_meta = table.get_column_or_index(column).metadata
