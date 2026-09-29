@@ -29,6 +29,14 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Offices for which we count countries that ever had a woman leader: head of state, head of
+# government, and chief executive.
+OFFICES_EVER = ["hos", "hog", "hoe"]
+# Their country counts, which get a share-of-countries counterpart but no population counterpart.
+COLUMNS_COUNTS_EVER = [
+    f"num_countries_wom_{office}_ever{suffix}" for office in OFFICES_EVER for suffix in ["", "_demelect"]
+]
+
 # REGION DEFINITIONS FOR AGGREGATION
 # Defines which countries belong to each region, including historical entities
 # that may not be in standard regional classifications
@@ -324,7 +332,9 @@ def make_table_countries_counts(tb: Table, ds_regions: Dataset) -> Table:
     tb_ = add_regions_and_global_aggregates(tb_, ds_regions)
 
     # Sanity check on output shape
-    assert tb_.shape[1] == 60, f"Unexpected number of columns {tb_.shape[1]}."
+    # NOTE: 60 -> 72 when the head-of-state and head-of-government "ever had a woman leader"
+    # indicators were added: four indicators, each expanded into yes / no / unknown.
+    assert tb_.shape[1] == 72, f"Unexpected number of columns {tb_.shape[1]}."
 
     # Wide to long format
     tb_ = from_wide_to_long(tb_)
@@ -494,7 +504,9 @@ def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: 
     )
 
     # Sanity check on output shape
-    assert tb_.shape[1] == 61, f"Unexpected number of columns {tb_.shape[1]}."
+    # NOTE: 61 -> 73 for the same reason as in make_table_countries_counts. All six "ever had a
+    # woman leader" indicators are dropped again further down, since none has a population variant.
+    assert tb_.shape[1] == 73, f"Unexpected number of columns {tb_.shape[1]}."
 
     # Long format
     tb_ = from_wide_to_long(tb_)
@@ -511,10 +523,12 @@ def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: 
             "num_countries_years_in_electdem": "population_years_in_electdem",
             "num_countries_years_in_libdem": "population_years_in_libdem",
             "num_countries_natelect": "population_natelect",
-            "num_countries_wom_hoe_ever": "population_wom_hoe_ever",
-            "num_countries_wom_hoe_ever_demelect": "population_wom_hoe_ever_demelect",
         }
     )
+
+    # The "ever had a woman leader" indicators are counted by country and as a share of countries,
+    # but not by population.
+    tb_ = tb_.drop(columns=[c for c in COLUMNS_COUNTS_EVER if c in tb_.columns])
 
     # Remove some dimensions
     tb_.loc[
@@ -1078,26 +1092,25 @@ def make_table_with_dummies(tb: Table, people_living_in: bool = False) -> Table:
             "has_na": False,
             "has_na_once_expanded": True,
         },
-        {
-            "name": "wom_hoe_ever",
-            "name_new": "num_countries_wom_hoe_ever",
-            "values_expected": {
-                "0": "no",
-                "1": "yes",
-            },
-            "has_na": True,
-            "has_na_once_expanded": True,
-        },
-        {
-            "name": "wom_hoe_ever_dem",
-            "name_new": "num_countries_wom_hoe_ever_demelect",
-            "values_expected": {
-                "0": "no",
-                "1": "yes",
-            },
-            "has_na": True,
-            "has_na_once_expanded": True,
-        },
+        # "Ever had a woman leader", for each of the three offices, counting all women and then only
+        # the democratically elected ones. Generated rather than written out so the six cannot drift
+        # apart. NOTE: the democratically elected variant is suffixed `_dem` at country level but
+        # `_demelect` in the counts; that mismatch is inherited from the published chief-executive
+        # indicators and is kept so they hold on to their variable IDs.
+        *[
+            {
+                "name": f"wom_{office}_ever{suffix_indicator}",
+                "name_new": f"num_countries_wom_{office}_ever{suffix_count}",
+                "values_expected": {
+                    "0": "no",
+                    "1": "yes",
+                },
+                "has_na": True,
+                "has_na_once_expanded": True,
+            }
+            for office in OFFICES_EVER
+            for suffix_indicator, suffix_count in [("", ""), ("_dem", "_demelect")]
+        ],
     ]
 
     # Convert to string

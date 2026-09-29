@@ -8,6 +8,20 @@ from owid.catalog import Table
 
 from etl.data_helpers import geo
 
+# The three leadership offices, and for each the V-Dem flag giving the gender of whoever held it at
+# any point during the year, plus the flag saying whether the office was filled through multi-party
+# elections. Used to build the "ever had a woman leader" indicators.
+OFFICES = {
+    "hos": {"gender": "v2exfemhos", "elected": "v2elmulpar_osp_hos"},
+    "hog": {"gender": "v2exfemhog", "elected": "v2elmulpar_osp_hog"},
+    "hoe": {"gender": "v2exfemhoe", "elected": "electmulpar_hoe_row_owid"},
+}
+
+
+def _column_anytime(office: str) -> str:
+    """Name of the working column holding the gender of an office's holder at any point in the year."""
+    return f"wom_{office}_anytime"
+
 
 def run(tb: Table, country_mapping_path) -> Table:
     # %% Initial cleaning
@@ -69,11 +83,13 @@ def run(tb: Table, country_mapping_path) -> Table:
     tb = estimate_gender_hoe_indicator(tb)
     # Estimate gender of HOG. Basically, when missing and HOS=HOG, then use the gender of HOS.
     tb.loc[(tb["wom_hos_vdem"].notna()) & (tb["v2exhoshog"] == 1), "wom_hog_vdem"] = tb["wom_hos_vdem"]
+    # Same, for the flags that refer to any point during the year rather than to December 31.
+    tb = estimate_gender_leaders_anytime(tb)
     tb = tb.drop(columns=["v2exhoshog"])
 
     # %% Gender indicators (2)
-    # Estimate if a country ever had a female HOE
-    tb = estimate_hoe_ever_female(tb)
+    # Estimate if a country ever had a female HOS, HOG or HOE (and whether she was elected)
+    tb = estimate_ever_female_indicators(tb)
 
     return tb
 
@@ -841,8 +857,9 @@ def drop_columns(tb: Table) -> Table:
             "v2elmulpar_osp_ex",
             "v2elmulpar_osp_ex",
             "v2elmulpar_osp_leg",
-            "v2elmulpar_osp_hos",
-            "v2elmulpar_osp_hog",
+            # NOTE: v2elmulpar_osp_hos and v2elmulpar_osp_hog used to be dropped here, but the
+            # "ever had a woman leader" indicators need them. They are dropped in
+            # estimate_ever_female_indicators instead, once those are built.
             "v2elmulpar_osp_exleg",
             "v2cltrnslw_osp",
             "v2clacjstm_osp",
@@ -1131,35 +1148,133 @@ def estimate_gender_hoe_indicator(tb: Table) -> Table:
     return tb
 
 
-def estimate_hoe_ever_female(tb):
-    tb["wom_hoe_ever"] = tb["v2exfemhoe"].fillna(0.5)
-    tb["wom_hoe_ever"] = tb.groupby("country")["wom_hoe_ever"].cummax()
-    tb["wom_hoe_ever"] = tb["wom_hoe_ever"].replace(0.5, np.nan).astype("Int64")
+def estimate_gender_leaders_anytime(tb: Table) -> Table:
+    """Gender of each leader at any point during the year, with unclear cases read as a man.
 
-    # Estimate if a country ever had a female HOE democratically elected: `regime_row_owid` is democracy AND `v2exfemhoe`
-    # Create masks for the conditions
-    regime_is_democratic = tb["regime_row_owid"].isin([2, 3])  # Democratic regimes
-    regime_is_not_democratic = tb["regime_row_owid"].isin([0, 1])  # Non-democratic regimes
-    mask_both_1 = (tb["v2exfemhoe"] == 1) & regime_is_democratic
-    mask_both_0 = regime_is_not_democratic | (tb["v2exfemhoe"] == 0)
+    The `wom_*_vdem` indicators refer to whoever held the office on December 31. These working
+    columns are their counterparts referring to any point during the year, so that a woman who held
+    the office for only part of a year still counts.
 
-    # Initialize with NaN
-    tb["wom_hoe_ever_dem"] = np.nan
+    Two adjustments are needed. First, V-Dem only fills the head-of-government columns when the head
+    of government is a different person from the head of state; when they are the same person
+    (`v2exhoshog` = 1) it codes that person under the head-of-state columns only. So the
+    head-of-state gender is carried over, exactly as it already is for the December 31 flags.
 
-    # Set values based on masks
-    tb.loc[mask_both_1, "wom_hoe_ever_dem"] = 1
-    tb.loc[mask_both_0, "wom_hoe_ever_dem"] = 0
+    Second, whatever gender is still unrecorded is read as a man, which keeps the cumulative
+    indicators decisive and can only understate how many countries had a woman leader. Most such
+    years name the officeholder but leave the gender field empty — 70 people in all, every one of
+    them a man; the rest are collective bodies or successions of short-lived officeholders that
+    V-Dem could not code. This is applied to these working columns alone, so the published
+    year-by-year gender indicators still report an unrecorded gender as missing.
+    """
+    for office, columns in OFFICES.items():
+        tb[_column_anytime(office)] = tb[columns["gender"]].astype("float64")
 
-    # Fill forward
-    tb["wom_hoe_ever_dem"] = tb["wom_hoe_ever_dem"].fillna(0.5)
-    tb["wom_hoe_ever_dem"] = tb.groupby("country")["wom_hoe_ever_dem"].cummax()
-    tb["wom_hoe_ever_dem"] = tb["wom_hoe_ever_dem"].replace(0.5, np.nan).astype("Int64")
+    # Carry the head-of-state gender over to the head of government where one person holds both.
+    mask = (tb[_column_anytime("hos")].notna()) & (tb["v2exhoshog"] == 1)
+    tb.loc[mask, _column_anytime("hog")] = tb.loc[mask, _column_anytime("hos")]
 
-    # Set old countries to NaN
-    countries_last = tb.loc[tb["year"] == tb["year"].max(), "country"].unique()
-    tb.loc[~tb["country"].isin(countries_last), ["wom_hoe_ever", "wom_hoe_ever_dem"]] = np.nan
+    # V-Dem's own head-of-state and head-of-government flags never contradict each other when the
+    # two offices are held by the same person, so the carry-over cannot overwrite anything.
+    both = (tb["v2exhoshog"] == 1) & tb["v2exfemhos"].notna() & tb["v2exfemhog"].notna()
+    assert (tb.loc[both, "v2exfemhos"] == tb.loc[both, "v2exfemhog"]).all(), (
+        "V-Dem reports different genders for the head of state and head of government while the two are the same person."
+    )
+
+    # Without that carry-over most head-of-government years would be missing, and the fill below
+    # would silently turn them all into men.
+    missing = tb[_column_anytime("hog")].isna().mean()
+    assert missing < 0.1, f"Gender of the head of government is still missing for {missing:.0%} of observations."
+
+    for office in OFFICES:
+        tb[_column_anytime(office)] = tb[_column_anytime(office)].fillna(0)
 
     return tb
+
+
+def _flag_ever_female(tb: Table, column_src: str, column_out: str) -> Table:
+    """Turn a yearly 0/1 flag into "a woman had held the office by this year", per country.
+
+    The input carries no missing values, since every unclear case is read conservatively upstream,
+    so a plain running maximum settles each country-year as either yes or no.
+    """
+    assert not tb[column_src].isna().any(), f"`{column_src}` has missing values, which would spread."
+    tb[column_out] = tb.groupby("country", observed=True)[column_src].cummax().astype("Int64")
+    return tb
+
+
+def estimate_ever_female_indicators(tb: Table) -> Table:
+    """Estimate whether a country ever had a woman leader, for each of the three offices.
+
+    Two indicators per office:
+
+    - `wom_<office>_ever`: a woman held the office in that year or any earlier one.
+    - `wom_<office>_ever_dem`: same, but only counting years where the office was filled through
+      multi-party elections *and* the country was an electoral or liberal democracy. Both conditions
+      are needed. Requiring only democracy would count hereditary monarchs — Elizabeth II in the
+      United Kingdom, Margrethe II in Denmark — as democratically elected women heads of state.
+      Requiring only multi-party elections would count Isabella II of Spain, who reigned by
+      inheritance alongside an elected legislature.
+
+    Every unclear case is read conservatively, so each country-year comes out as either yes or no,
+    and the indicators can only understate how many countries had a woman leader.
+    """
+    # An unrecorded regime counts as non-democratic, so test for democracy rather than against it.
+    is_democracy = tb["regime_row_owid"].isin([2, 3])
+
+    columns = []
+    for office, office_columns in OFFICES.items():
+        column_woman = _column_anytime(office)
+        column_ever = f"wom_{office}_ever"
+        column_ever_dem = f"{column_ever}_dem"
+
+        tb = _flag_ever_female(tb, column_woman, column_ever)
+
+        # Likewise, an unrecorded way of filling the office counts as not elected.
+        was_elected = tb[office_columns["elected"]] == 1
+        tb[column_ever_dem] = ((tb[column_woman] == 1) & was_elected & is_democracy).astype("float64")
+        tb = _flag_ever_female(tb, column_ever_dem, column_ever_dem)
+
+        columns += [column_ever, column_ever_dem]
+
+    # Only report for countries that V-Dem still lists in the last year of the data, since the
+    # question is about the history of countries that exist today.
+    countries_last = tb.loc[tb["year"] == tb["year"].max(), "country"].unique()
+    tb.loc[~tb["country"].isin(countries_last), columns] = np.nan
+
+    sanity_check_ever_female(tb, columns)
+
+    # These only existed to build the indicators above.
+    tb = tb.drop(columns=[_column_anytime(office) for office in OFFICES] + ["v2elmulpar_osp_hos", "v2elmulpar_osp_hog"])
+
+    return tb
+
+
+def sanity_check_ever_female(tb: Table, columns: list[str]) -> None:
+    """Check the "ever had a woman leader" indicators."""
+    countries_last = tb.loc[tb["year"] == tb["year"].max(), "country"].unique()
+    is_current = tb["country"].isin(countries_last)
+
+    for column in columns:
+        assert set(tb[column].dropna().unique()) <= {0, 1}, f"`{column}` has values other than 0 and 1."
+
+        # Reading every unclear case conservatively leaves no country-year undecided, so the only
+        # empty values belong to countries V-Dem no longer lists.
+        assert not tb.loc[is_current, column].isna().any(), f"`{column}` leaves country-years undecided."
+        assert tb.loc[~is_current, column].isna().all(), (
+            f"`{column}` reports countries that V-Dem does not list in the last year of the data."
+        )
+
+        # Once a woman has held the office, every later year must stay flagged.
+        flagged = tb[column].fillna(0).groupby(tb["country"], observed=True).cummax()
+        assert (tb.loc[flagged == 1, column] == 1).all(), f"`{column}` stops being 1 after a woman held the office."
+
+        # A woman cannot have been democratically elected to an office she never held.
+        if column.endswith("_ever_dem"):
+            column_plain = column.removesuffix("_dem")
+            assert not ((tb[column] == 1) & (tb[column_plain] == 0)).any(), (
+                f"`{column}` is 1 where `{column_plain}` is 0, which is impossible."
+            )
 
 
 # %%
