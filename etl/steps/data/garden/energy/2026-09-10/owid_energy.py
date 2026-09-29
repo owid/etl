@@ -1,8 +1,4 @@
-"""OWID Energy dataset: one wide table combining the energy mix, the electricity mix and the fossil fuels tables.
-
-The dictionaries below map every column of each input table to its name in the output (None means the column is not
-published). PREVIOUS_COLUMNS maps the names of the release before 2026-09-10 to the new names.
-"""
+"""OWID Energy dataset: one wide table combining the energy mix, the electricity mix and the fossil fuels tables."""
 
 import numpy as np
 from owid.catalog import Origin, Table
