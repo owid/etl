@@ -41,7 +41,7 @@ def run() -> None:
             tb, country_col=column, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
         )
 
-    # Sum the source's 161 commodities into its 9 commodity groups.
+    # Sum the source's commodities into its commodity groups.
     tb = tb.groupby(INDEX_COLUMNS, observed=True)[VALUE_COLUMNS].sum().reset_index()
 
     tb = tb.format(INDEX_COLUMNS)
