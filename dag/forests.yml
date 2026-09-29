@@ -86,7 +86,6 @@ steps:
     - snapshot://forests/2026-09-29/deforestation_embedded_in_trade.csv
   data://garden/forests/2026-09-29/deforestation_embedded_in_trade:
     - data://meadow/forests/2026-09-29/deforestation_embedded_in_trade
-    - data://garden/regions/2023-01-01/regions
   # Files read by the bespoke viz: a manifest plus one JSON per country, synced to the environment's v1/bespoke path.
   viz://bespoke/forests/latest/deforestation_trade:
     - data://garden/forests/2026-09-29/deforestation_embedded_in_trade

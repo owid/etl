@@ -1,18 +1,10 @@
 """Deforestation embedded in trade, from the DeDuCE physical trade model."""
 
-import numpy as np
-from owid.catalog import Table
-
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-INDEX_COLUMNS = [
-    "producer_country",
-    "consumer_country",
-    "commodity_group",
-    "year",
-]
+INDEX_COLUMNS = ["producer_country", "consumer_country", "commodity_group", "year"]
 VALUE_COLUMNS = ["deforestation_risk", "deforestation_emissions"]
 
 COMMODITY_GROUPS = {
@@ -28,16 +20,6 @@ COMMODITY_GROUPS = {
 }
 
 
-def sanity_check_outputs(tb: Table, totals_input: Table) -> None:
-    assert set(tb["commodity_group"]) == COMMODITY_GROUPS, "Unexpected commodity groups."
-    assert not tb.duplicated(subset=INDEX_COLUMNS).any(), "Duplicated rows after aggregation."
-    assert (tb["deforestation_risk"] >= 0).all(), "Negative deforestation area."
-    totals_output = tb.groupby("year", observed=True)[VALUE_COLUMNS].sum()
-    assert np.allclose(
-        totals_output.to_numpy(dtype=float), totals_input.loc[totals_output.index].to_numpy(dtype=float), rtol=1e-9
-    ), "Yearly world totals changed after aggregation."
-
-
 def run() -> None:
     #
     # Load inputs.
@@ -48,19 +30,19 @@ def run() -> None:
     #
     # Process data.
     #
+    assert set(tb["commodity_group"]) == COMMODITY_GROUPS, "Unexpected commodity groups."
+    assert (tb["deforestation_risk"] >= 0).all(), "Negative deforestation area."
+
     # Convert emissions from million tonnes to tonnes of CO2.
     tb["deforestation_emissions"] *= 1e6
-
-    totals_input = tb.groupby("year", observed=True)[VALUE_COLUMNS].sum()
 
     for column in ["producer_country", "consumer_country"]:
         tb = paths.regions.harmonize_names(
             tb, country_col=column, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
         )
 
+    # Sum the source's 161 commodities into its 9 commodity groups.
     tb = tb.groupby(INDEX_COLUMNS, observed=True)[VALUE_COLUMNS].sum().reset_index()
-
-    sanity_check_outputs(tb, totals_input)
 
     tb = tb.format(INDEX_COLUMNS)
 

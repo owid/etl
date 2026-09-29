@@ -47,14 +47,12 @@ def run() -> None:
     ds = paths.load_dataset("deforestation_embedded_in_trade")
     tb = ds.read("deforestation_embedded_in_trade")
 
-    write_feed_metadata(
-        paths.output_dir,
-        build_feed_metadata(
-            title="Deforestation embedded in trade",
-            columns={"Deforestation risk embedded in trade": tb["deforestation_risk"]},
-            update_period_days=ds.metadata.update_period_days,
-        ),
+    metadata = build_feed_metadata(
+        title="Deforestation embedded in trade",
+        columns={"Deforestation risk embedded in trade": tb["deforestation_risk"]},
+        update_period_days=ds.metadata.update_period_days,
     )
+    write_feed_metadata(paths.output_dir, metadata)
 
     #
     # Assign 1-based alphabetical ids to entities and commodity groups.
@@ -84,7 +82,7 @@ def run() -> None:
         {
             "timeRange": {"start": years[0], "end": years[-1]},
             "years": years,
-            "source": json.loads((paths.output_dir / "metadata.json").read_text())["feed"]["citation"],
+            "source": metadata["feed"]["citation"],
             "dimensions": {
                 "entities": [{"id": entity_id[c], "name": c} for c in countries],
                 "commodityGroups": [{"id": group_id[g], "name": g} for g in groups],
