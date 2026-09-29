@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: Commodity-driven deforestation, associated carbon emissions and trade
     description: |-
-      Physical trade model file of the DeDuCE dataset. In the producer's words: "Presents estimates of bilateral links between countries of production and countries of apparent consumption for commodities driving deforestation. Values are presented in terms of amortized deforestation area (in ha/yr) and associated net emissions from losses in above-ground, below-ground and soil (incl. peat drainage) carbon (in MtCO2/yr). [...] As FAOSTAT does not provide bilateral trade data for leather and wood products, these items are excluded from this dataset. [...] The values here do not include estimates of products indirectly embodied in the production of other products (e.g., feed in meat products, biofuels used in industrial processes). To limit the size of the dataset, we include the links cumulatively making up (per year) 99.9% of the total positive values of attributed deforestation area."
+      Deforestation embedded in bilateral trade of agricultural commodities, from the DeDuCE physical trade model. Amortized deforestation area (ha) and associated net emissions (MtCO2), by producer country, consumer country, commodity and year.
     date_published: "2026-03-11"
     version_producer: "2.1"
 
