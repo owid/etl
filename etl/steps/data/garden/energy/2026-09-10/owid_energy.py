@@ -9,21 +9,21 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-# Columns that identify a row or give context, kept first in the output.
 CONTEXT_COLUMNS = ["country", "year", "iso_code", "population", "gdp"]
 
-# Energy mix (total energy supply): the domain `energy` is added to every source column.
+# For now, keep only the columns that were in the previous release (None means the column is not published).
+# Energy mix.
 ENERGY_MIX_COLUMNS = {
     "biofuels_annual_change_pct": "biofuels_energy_annual_change_pct",
     "biofuels_annual_change_twh": "biofuels_energy_annual_change_twh",
     "biofuels_per_capita_kwh": "biofuels_energy_per_capita_kwh",
-    "biofuels_share_including_biomass_pct": None,  # World only.
+    "biofuels_share_including_biomass_pct": None,
     "biofuels_share_pct": "biofuels_energy_share_pct",
     "biofuels_twh": "biofuels_energy_twh",
     "coal_annual_change_pct": "coal_energy_annual_change_pct",
     "coal_annual_change_twh": "coal_energy_annual_change_twh",
     "coal_per_capita_kwh": "coal_energy_per_capita_kwh",
-    "coal_share_including_biomass_pct": None,  # World only.
+    "coal_share_including_biomass_pct": None,
     "coal_share_pct": "coal_energy_share_pct",
     "coal_twh": "coal_energy_twh",
     "fossil_fuels_annual_change_pct": "fossil_fuels_energy_annual_change_pct",
@@ -34,13 +34,13 @@ ENERGY_MIX_COLUMNS = {
     "gas_annual_change_pct": "gas_energy_annual_change_pct",
     "gas_annual_change_twh": "gas_energy_annual_change_twh",
     "gas_per_capita_kwh": "gas_energy_per_capita_kwh",
-    "gas_share_including_biomass_pct": None,  # World only.
+    "gas_share_including_biomass_pct": None,
     "gas_share_pct": "gas_energy_share_pct",
     "gas_twh": "gas_energy_twh",
     "hydro_annual_change_pct": "hydro_energy_annual_change_pct",
     "hydro_annual_change_twh": "hydro_energy_annual_change_twh",
     "hydro_per_capita_kwh": "hydro_energy_per_capita_kwh",
-    "hydro_share_including_biomass_pct": None,  # World only.
+    "hydro_share_including_biomass_pct": None,
     "hydro_share_pct": "hydro_energy_share_pct",
     "hydro_twh": "hydro_energy_twh",
     "low_carbon_energy_annual_change_pct": "low_carbon_energy_annual_change_pct",
@@ -51,19 +51,19 @@ ENERGY_MIX_COLUMNS = {
     "nuclear_annual_change_pct": "nuclear_energy_annual_change_pct",
     "nuclear_annual_change_twh": "nuclear_energy_annual_change_twh",
     "nuclear_per_capita_kwh": "nuclear_energy_per_capita_kwh",
-    "nuclear_share_including_biomass_pct": None,  # World only.
+    "nuclear_share_including_biomass_pct": None,
     "nuclear_share_pct": "nuclear_energy_share_pct",
     "nuclear_twh": "nuclear_energy_twh",
     "oil_annual_change_pct": "oil_energy_annual_change_pct",
     "oil_annual_change_twh": "oil_energy_annual_change_twh",
     "oil_per_capita_kwh": "oil_energy_per_capita_kwh",
-    "oil_share_including_biomass_pct": None,  # World only.
+    "oil_share_including_biomass_pct": None,
     "oil_share_pct": "oil_energy_share_pct",
     "oil_twh": "oil_energy_twh",
     "other_renewables_annual_change_pct": "other_renewables_energy_annual_change_pct",
     "other_renewables_annual_change_twh": "other_renewables_energy_annual_change_twh",
     "other_renewables_per_capita_kwh": "other_renewables_energy_per_capita_kwh",
-    "other_renewables_share_including_biomass_pct": None,  # World only.
+    "other_renewables_share_including_biomass_pct": None,
     "other_renewables_share_pct": "other_renewables_energy_share_pct",
     "other_renewables_twh": "other_renewables_energy_twh",
     "renewables_annual_change_pct": "renewables_energy_annual_change_pct",
@@ -71,15 +71,15 @@ ENERGY_MIX_COLUMNS = {
     "renewables_per_capita_kwh": "renewables_energy_per_capita_kwh",
     "renewables_share_pct": "renewables_energy_share_pct",
     "renewables_twh": "renewables_energy_twh",
-    "solar_and_wind_annual_change_pct": None,  # Not in the previous release.
-    "solar_and_wind_annual_change_twh": None,  # Not in the previous release.
-    "solar_and_wind_per_capita_kwh": None,  # Not in the previous release.
-    "solar_and_wind_share_pct": None,  # Not in the previous release.
-    "solar_and_wind_twh": None,  # Not in the previous release.
+    "solar_and_wind_annual_change_pct": None,
+    "solar_and_wind_annual_change_twh": None,
+    "solar_and_wind_per_capita_kwh": None,
+    "solar_and_wind_share_pct": None,
+    "solar_and_wind_twh": None,
     "solar_annual_change_pct": "solar_energy_annual_change_pct",
     "solar_annual_change_twh": "solar_energy_annual_change_twh",
     "solar_per_capita_kwh": "solar_energy_per_capita_kwh",
-    "solar_share_including_biomass_pct": None,  # World only.
+    "solar_share_including_biomass_pct": None,
     "solar_share_pct": "solar_energy_share_pct",
     "solar_twh": "solar_energy_twh",
     "total_energy_supply_annual_change_pct": "total_energy_supply_annual_change_pct",
@@ -87,21 +87,21 @@ ENERGY_MIX_COLUMNS = {
     "total_energy_supply_per_capita_kwh": "total_energy_supply_per_capita_kwh",
     "total_energy_supply_per_gdp_kwh_per_dollar": "total_energy_supply_per_gdp_kwh_per_dollar",
     "total_energy_supply_twh": "total_energy_supply_twh",
-    "traditional_biomass_share_including_biomass_pct": None,  # World only.
-    "traditional_biomass_twh": None,  # World only.
+    "traditional_biomass_share_including_biomass_pct": None,
+    "traditional_biomass_twh": None,
     "wind_annual_change_pct": "wind_energy_annual_change_pct",
     "wind_annual_change_twh": "wind_energy_annual_change_twh",
     "wind_per_capita_kwh": "wind_energy_per_capita_kwh",
-    "wind_share_including_biomass_pct": None,  # World only.
+    "wind_share_including_biomass_pct": None,
     "wind_share_pct": "wind_energy_share_pct",
     "wind_twh": "wind_energy_twh",
 }
 
-# Electricity mix (annual table): renamed from the older grammar of that table.
+# Electricity mix.
 ELECTRICITY_MIX_COLUMNS = {
     "bioenergy_generation__twh": "bioenergy_electricity_twh",
     "bioenergy_share_of_electricity__pct": "bioenergy_electricity_share_pct",
-    "bioenergy_stacked_generation__twh": None,  # Zero-filled copy for stacked charts.
+    "bioenergy_stacked_generation__twh": None,
     "co2_intensity__gco2_kwh": "electricity_carbon_intensity_gco2eq_per_kwh",
     "coal_generation__twh": "coal_electricity_twh",
     "coal_share_of_electricity__pct": "coal_electricity_share_pct",
@@ -120,11 +120,11 @@ ELECTRICITY_MIX_COLUMNS = {
     "oil_share_of_electricity__pct": "oil_electricity_share_pct",
     "other_renewables_excluding_bioenergy_generation__twh": "other_renewables_excluding_bioenergy_electricity_twh",
     "other_renewables_excluding_bioenergy_share_of_electricity__pct": "other_renewables_excluding_bioenergy_electricity_share_pct",
-    "other_renewables_generation__twh": None,  # Includes bioenergy in the years where the source does not separate them.
+    "other_renewables_generation__twh": None,
     "other_renewables_including_bioenergy_generation__twh": "other_renewables_including_bioenergy_electricity_twh",
     "other_renewables_including_bioenergy_share_of_electricity__pct": "other_renewables_including_bioenergy_electricity_share_pct",
     "per_capita_bioenergy_generation__kwh": "bioenergy_electricity_per_capita_kwh",
-    "per_capita_bioenergy_stacked_generation__kwh": None,  # Zero-filled copy for stacked charts.
+    "per_capita_bioenergy_stacked_generation__kwh": None,
     "per_capita_coal_generation__kwh": "coal_electricity_per_capita_kwh",
     "per_capita_fossil_generation__kwh": "fossil_fuels_electricity_per_capita_kwh",
     "per_capita_gas_generation__kwh": "gas_electricity_per_capita_kwh",
@@ -133,19 +133,19 @@ ELECTRICITY_MIX_COLUMNS = {
     "per_capita_nuclear_generation__kwh": "nuclear_electricity_per_capita_kwh",
     "per_capita_oil_generation__kwh": "oil_electricity_per_capita_kwh",
     "per_capita_other_renewables_excluding_bioenergy_generation__kwh": "other_renewables_excluding_bioenergy_electricity_per_capita_kwh",
-    "per_capita_other_renewables_generation__kwh": None,  # Includes bioenergy in the years where the source does not separate them.
+    "per_capita_other_renewables_generation__kwh": None,
     "per_capita_other_renewables_including_bioenergy_generation__kwh": "other_renewables_including_bioenergy_electricity_per_capita_kwh",
     "per_capita_renewable_generation__kwh": "renewables_electricity_per_capita_kwh",
-    "per_capita_solar_and_wind_generation__kwh": None,  # Not in the previous release.
+    "per_capita_solar_and_wind_generation__kwh": None,
     "per_capita_solar_generation__kwh": "solar_electricity_per_capita_kwh",
     "per_capita_total_demand__kwh": "electricity_demand_per_capita_kwh",
     "per_capita_total_generation__kwh": "electricity_generation_per_capita_kwh",
     "per_capita_wind_generation__kwh": "wind_electricity_per_capita_kwh",
-    "population": None,  # Added again below, for every row.
+    "population": None,
     "renewable_generation__twh": "renewables_electricity_twh",
     "renewable_share_of_electricity__pct": "renewables_electricity_share_pct",
-    "solar_and_wind_generation__twh": None,  # Not in the previous release.
-    "solar_and_wind_share_of_electricity__pct": None,  # Not in the previous release.
+    "solar_and_wind_generation__twh": None,
+    "solar_and_wind_share_of_electricity__pct": None,
     "solar_generation__twh": "solar_electricity_twh",
     "solar_share_of_electricity__pct": "solar_electricity_share_pct",
     "total_demand__twh": "electricity_demand_twh",
@@ -157,71 +157,69 @@ ELECTRICITY_MIX_COLUMNS = {
     "wind_share_of_electricity__pct": "wind_electricity_share_pct",
 }
 
-# Fossil fuels: production, trade, reserves, and consumption in physical units.
-# Consumption in energy units is not published: for countries it is identical to the energy mix columns
-# (`coal_energy_twh`, ...), and for the World before 1965 the two tables differ.
+# Fossil fuels.
 FOSSIL_FUELS_COLUMNS = {
-    "coal_consumption_per_capita_kwh": None,  # Same as the energy mix column for countries; differs for the World before 1965.
-    "coal_consumption_per_capita_tonnes": None,  # Not in the previous release.
-    "coal_consumption_tonnes": None,  # Not in the previous release.
-    "coal_consumption_twh": None,  # Same as the energy mix column for countries; differs for the World before 1965.
-    "coal_exports_per_capita_tonnes": None,  # Not in the previous release.
-    "coal_exports_tonnes": None,  # Not in the previous release.
-    "coal_imports_per_capita_tonnes": None,  # Not in the previous release.
-    "coal_imports_tonnes": None,  # Not in the previous release.
-    "coal_net_imports_per_capita_tonnes": None,  # Not in the previous release.
-    "coal_net_imports_tonnes": None,  # Not in the previous release.
+    "coal_consumption_per_capita_kwh": None,
+    "coal_consumption_per_capita_tonnes": None,
+    "coal_consumption_tonnes": None,
+    "coal_consumption_twh": None,
+    "coal_exports_per_capita_tonnes": None,
+    "coal_exports_tonnes": None,
+    "coal_imports_per_capita_tonnes": None,
+    "coal_imports_tonnes": None,
+    "coal_net_imports_per_capita_tonnes": None,
+    "coal_net_imports_tonnes": None,
     "coal_production_annual_change_pct": "coal_production_annual_change_pct",
     "coal_production_annual_change_twh": "coal_production_annual_change_twh",
     "coal_production_per_capita_kwh": "coal_production_per_capita_kwh",
-    "coal_production_per_capita_tonnes": None,  # Not in the previous release.
-    "coal_production_tonnes": None,  # Not in the previous release.
+    "coal_production_per_capita_tonnes": None,
+    "coal_production_tonnes": None,
     "coal_production_twh": "coal_production_twh",
-    "coal_reserves_per_capita_tonnes": None,  # Not in the previous release.
-    "coal_reserves_to_production_ratio": None,  # World only.
-    "coal_reserves_tonnes": None,  # Not in the previous release.
-    "gas_consumption_m3": None,  # Not in the previous release.
-    "gas_consumption_per_capita_kwh": None,  # Same as the energy mix column for countries; differs for the World before 1965.
-    "gas_consumption_per_capita_m3": None,  # Not in the previous release.
-    "gas_consumption_twh": None,  # Same as the energy mix column for countries; differs for the World before 1965.
-    "gas_exports_m3": None,  # Not in the previous release.
-    "gas_exports_per_capita_m3": None,  # Not in the previous release.
-    "gas_imports_m3": None,  # Not in the previous release.
-    "gas_imports_per_capita_m3": None,  # Not in the previous release.
-    "gas_net_imports_m3": None,  # Not in the previous release.
-    "gas_net_imports_per_capita_m3": None,  # Not in the previous release.
+    "coal_reserves_per_capita_tonnes": None,
+    "coal_reserves_to_production_ratio": None,
+    "coal_reserves_tonnes": None,
+    "gas_consumption_m3": None,
+    "gas_consumption_per_capita_kwh": None,
+    "gas_consumption_per_capita_m3": None,
+    "gas_consumption_twh": None,
+    "gas_exports_m3": None,
+    "gas_exports_per_capita_m3": None,
+    "gas_imports_m3": None,
+    "gas_imports_per_capita_m3": None,
+    "gas_net_imports_m3": None,
+    "gas_net_imports_per_capita_m3": None,
     "gas_production_annual_change_pct": "gas_production_annual_change_pct",
     "gas_production_annual_change_twh": "gas_production_annual_change_twh",
-    "gas_production_m3": None,  # Not in the previous release.
+    "gas_production_m3": None,
     "gas_production_per_capita_kwh": "gas_production_per_capita_kwh",
-    "gas_production_per_capita_m3": None,  # Not in the previous release.
+    "gas_production_per_capita_m3": None,
     "gas_production_twh": "gas_production_twh",
-    "gas_reserves_m3": None,  # Not in the previous release.
-    "gas_reserves_per_capita_m3": None,  # Not in the previous release.
-    "gas_reserves_to_production_ratio": None,  # World only.
-    "oil_consumption_m3": None,  # Not in the previous release.
-    "oil_consumption_per_capita_kwh": None,  # Same as the energy mix column for countries; differs for the World before 1965.
-    "oil_consumption_per_capita_m3": None,  # Not in the previous release.
-    "oil_consumption_twh": None,  # Same as the energy mix column for countries; differs for the World before 1965.
-    "oil_exports_m3": None,  # Not in the previous release.
-    "oil_exports_per_capita_m3": None,  # Not in the previous release.
-    "oil_imports_m3": None,  # Not in the previous release.
-    "oil_imports_per_capita_m3": None,  # Not in the previous release.
-    "oil_net_imports_m3": None,  # Not in the previous release.
-    "oil_net_imports_per_capita_m3": None,  # Not in the previous release.
+    "gas_reserves_m3": None,
+    "gas_reserves_per_capita_m3": None,
+    "gas_reserves_to_production_ratio": None,
+    "oil_consumption_m3": None,
+    "oil_consumption_per_capita_kwh": None,
+    "oil_consumption_per_capita_m3": None,
+    "oil_consumption_twh": None,
+    "oil_exports_m3": None,
+    "oil_exports_per_capita_m3": None,
+    "oil_imports_m3": None,
+    "oil_imports_per_capita_m3": None,
+    "oil_net_imports_m3": None,
+    "oil_net_imports_per_capita_m3": None,
     "oil_production_annual_change_pct": "oil_production_annual_change_pct",
     "oil_production_annual_change_twh": "oil_production_annual_change_twh",
-    "oil_production_m3": None,  # Not in the previous release.
+    "oil_production_m3": None,
     "oil_production_per_capita_kwh": "oil_production_per_capita_kwh",
-    "oil_production_per_capita_m3": None,  # Not in the previous release.
+    "oil_production_per_capita_m3": None,
     "oil_production_twh": "oil_production_twh",
-    "oil_reserves_m3": None,  # Not in the previous release.
-    "oil_reserves_per_capita_m3": None,  # Not in the previous release.
-    "oil_reserves_to_production_ratio": None,  # World only.
-    "total_consumption_per_capita_kwh": None,  # Same as the energy mix column for countries; differs for the World before 1965.
-    "total_consumption_twh": None,  # Same as the energy mix column for countries; differs for the World before 1965.
-    "total_production_per_capita_kwh": None,  # Not in the previous release.
-    "total_production_twh": None,  # Not in the previous release.
+    "oil_reserves_m3": None,
+    "oil_reserves_per_capita_m3": None,
+    "oil_reserves_to_production_ratio": None,
+    "total_consumption_per_capita_kwh": None,
+    "total_consumption_twh": None,
+    "total_production_per_capita_kwh": None,
+    "total_production_twh": None,
 }
 
 # Names in the release before 2026-09-10 (owid-energy-data.csv), mapped to the new names.
@@ -439,8 +437,6 @@ def sanity_check(tb: Table) -> None:
     assert tb.codebook["column"].tolist() == tb.columns.tolist(), "Codebook and data columns differ."
     for old_name in ["burma", "macedonia", "swaziland", "czech republic"]:
         assert old_name not in set(tb["country"].str.lower()), f"Deprecated country name: {old_name}"
-    # Values that pin the methodology: on the total energy supply basis, the World's hydro is far below the
-    # substitution-method figure (about 4,300 TWh in 2024 instead of about 11,000 TWh).
     world_2024 = tb[(tb["country"] == "World") & (tb["year"] == 2024)]
     assert len(world_2024) == 1
     assert 3000 < world_2024["hydro_energy_twh"].item() < 6000, "World hydro 2024 is not on the TES basis."
