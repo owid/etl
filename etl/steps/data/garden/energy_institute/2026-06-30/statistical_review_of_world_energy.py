@@ -868,6 +868,16 @@ def sanity_check_outputs(tb: Table) -> None:
         f"its sources ({sources_sum:.1f} EJ); deviation is {deviation:.1f}%."
     )
 
+    # For hydro, solar and wind, the producer's energy figure is its electricity generation (its method applies no
+    # conversion efficiency to them), so the two columns must agree wherever both are reported.
+    for source in ["hydro", "solar", "wind"]:
+        energy, electricity = tb[f"{source}_consumption_twh"], tb[f"{source}_electricity_generation_twh"]
+        informed = energy.notna() & electricity.notna()
+        off = tb[informed & ((energy - electricity).abs() > (1e-3 * energy.abs()).clip(lower=0.01))]
+        assert off.empty, f"{source}: energy and electricity generation disagree for: " + "; ".join(
+            f"{row['country']} {row['year']}" for _, row in off.iterrows()
+        )
+
     # Region aggregates should have been created.
     expected_regions = {"Africa", "Asia", "Europe", "North America", "South America", "Oceania"}
     missing_regions = expected_regions - set(tb["country"])
