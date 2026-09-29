@@ -257,7 +257,7 @@ REGIONS = {
             "Other Europe (EI)",
         ],
     },
-    # NOTE: "Other South and Central America (EI)" spans both North and South America, so it is assigned to neither. See OTHER_REGIONS_MADE_OF_ASSIGNED_REGIONS.
+    # NOTE: "Other South and Central America (EI)" spans both North and South America, so it is assigned to neither. See FINER_REGIONS_OF_OTHER_SOUTH_AND_CENTRAL_AMERICA.
     "South America": {
         "additional_members": [
             "Other South America (EI)",
@@ -281,15 +281,13 @@ REGIONS = {
     "High-income countries": {},
 }
 
-# "Other South and Central America (EI)" is, in most indicators, exactly the sum of three finer regions that REGIONS
-# already assigns ("Other South America (EI)" to South America; "Other Caribbean (EI)" and "Central America (EI)" to
-# North America). In those indicators nothing in it is missing from our aggregates, so it must not cause their removal.
-OTHER_REGIONS_MADE_OF_ASSIGNED_REGIONS = {
-    "Other South and Central America (EI)": [
-        "Other South America (EI)",
-        "Other Caribbean (EI)",
-        "Central America (EI)",
-    ],
+# "Other South and Central America (EI)" is the sum of three finer regions that REGIONS already assigns: "Other South
+# America (EI)" to South America, and "Other Caribbean (EI)" and "Central America (EI)" to North America. In a column
+# where a continent's own finer regions are reported, every country of that continent is already in its aggregate, so
+# fix_issues_with_other_regions must not remove it there.
+FINER_REGIONS_OF_OTHER_SOUTH_AND_CENTRAL_AMERICA = {
+    "South America": ["Other South America (EI)"],
+    "North America": ["Other Caribbean (EI)", "Central America (EI)"],
 }
 
 # Regions that don't need to be included as part of other region aggregates (unlike, e.g. "Other Africa (EI)", which needs to be added to "Africa").
@@ -587,22 +585,6 @@ def fix_missing_nuclear_energy_data(tb: Table) -> Table:
     return tb
 
 
-def columns_where_region_is_sum_of_parts(tb: Table, region: str, parts: list[str]) -> set[str]:
-    """Columns in which `region` equals the sum of `parts` in every year it is informed."""
-    columns = [column for column in tb.columns if column not in ("country", "year")]
-    values = tb[tb["country"] == region].set_index("year")[columns]
-    sum_of_parts = tb[tb["country"].isin(parts)].groupby("year", observed=True)[columns].sum(min_count=1)
-    sum_of_parts = sum_of_parts.reindex(values.index)
-    result = set()
-    for column in columns:
-        informed = values[column].notna()
-        if informed.any() and sum_of_parts.loc[informed, column].notna().all():
-            difference = (values.loc[informed, column] - sum_of_parts.loc[informed, column]).abs().max()
-            if difference <= 1e-4 * values.loc[informed, column].abs().max():
-                result.add(column)
-    return result
-
-
 def fix_issues_with_other_regions(tb: Table) -> Table:
     tb = tb.copy()
     # Dictionary of "Other *" regions, and the OWID regions with which they may overlap.
@@ -623,18 +605,32 @@ def fix_issues_with_other_regions(tb: Table) -> Table:
     max_percentage_deviation = 15
     # Remove aggregates in columns for which an overlapping "Other *" region has a significant contribution, compared to the aggregate.
     for other_region, owid_regions in ei_regions_and_overlapping_owid_regions.items():
-        # Skip the columns where this region is already fully assigned through finer regions.
-        parts = OTHER_REGIONS_MADE_OF_ASSIGNED_REGIONS.get(other_region, [])
-        fully_assigned = (
-            columns_where_region_is_sum_of_parts(tb=tb, region=other_region, parts=parts) if parts else set()
-        )
-        if parts:
-            assert "total_energy_supply_ej" in fully_assigned, f"{other_region} is no longer the sum of {parts}."
         tb_other = tb[(tb["country"] == other_region)].fillna(0).reset_index(drop=True)
+        if other_region == "Other South and Central America (EI)":
+            # Subtract the finer regions that are reported, so that only the part not yet assigned to any continent is
+            # compared below.
+            finer_regions_all = sum(FINER_REGIONS_OF_OTHER_SOUTH_AND_CENTRAL_AMERICA.values(), [])
+            reported = tb[tb["country"].isin(finer_regions_all)].drop(columns=["country"]).groupby("year").sum()
+            reported = reported.reindex(tb_other["year"]).fillna(0).reset_index(drop=True)
+            tb_other[reported.columns] = (tb_other[reported.columns] - reported).clip(lower=0)
         for continent in owid_regions:
+            # Columns where the continent's own finer regions are reported, so nothing of it is missing.
+            finer_regions = []
+            if other_region == "Other South and Central America (EI)":
+                finer_regions = FINER_REGIONS_OF_OTHER_SOUTH_AND_CENTRAL_AMERICA[continent]
+            covered = set()
+            if finer_regions:
+                reported = (
+                    tb[tb["country"].isin(finer_regions)]
+                    .drop(columns=["year"])
+                    .groupby("country", observed=True)
+                    .count()
+                )
+                if len(reported) == len(finer_regions):
+                    covered = {column for column in reported.columns if (reported[column] > 0).all()}
             tb_continent = tb[(tb["country"] == continent)].fillna(0).reset_index(drop=True)
             for column in tb.drop(columns=["country", "year"]).columns:
-                if column in fully_assigned:
+                if column in covered:
                     continue
                 remove_aggregate = False
                 # Define the minimum magnitude of values that we care about (the indicator's range in the continent divided by fraction_of_range).
