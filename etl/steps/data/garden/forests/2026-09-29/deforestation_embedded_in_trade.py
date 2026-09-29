@@ -3,7 +3,7 @@
 Produces two tables:
 
   * `deforestation_embedded_in_trade`: bilateral flows of amortized deforestation risk (hectares)
-    and associated emissions (million tonnes of CO2), summed from the source's 161 commodities
+    and associated emissions (tonnes of CO2), summed from the source's 161 commodities
     into its 9 commodity groups, indexed by producer country, consumer country, commodity group
     and year.
   * `countries`: the source's ISO code and region ("country group") of each country. The source
@@ -100,6 +100,10 @@ def run() -> None:
     tb = ds_meadow.read("deforestation_embedded_in_trade", safe_types=False)
 
     sanity_check_inputs(tb)
+
+    # Convert emissions from million tonnes to tonnes of CO2.
+    tb["deforestation_emissions"] *= 1e6
+
     totals_input = tb.groupby("year", observed=True)[VALUE_COLUMNS].sum()
 
     #

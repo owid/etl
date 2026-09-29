@@ -20,8 +20,8 @@ tables:
           Deforestation in the producer country attributed to the commodities consumed in the consumer country, amortized over five years.
       deforestation_emissions:
         title: Deforestation emissions embedded in trade
-        unit: million tonnes of CO₂
-        short_unit: Mt CO₂
+        unit: tonnes of CO₂
+        short_unit: t CO₂
         description_short: |-
           Net emissions from the deforestation in the producer country attributed to the commodities consumed in the consumer country, amortized over five years. Includes losses of above-ground, below-ground and soil carbon, and peat drainage.
   countries:
