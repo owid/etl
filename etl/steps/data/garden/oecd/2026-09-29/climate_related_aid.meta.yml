@@ -48,6 +48,8 @@ tables:
           - *key_commitments
           - *key_world
         description_processing: *processing_dollars
+        presentation:
+          title_public: "Climate-related aid given: climate mitigation only"
         display:
           name: "Aid given: mitigation only"
           numDecimalPlaces: 0
@@ -64,6 +66,8 @@ tables:
           - *key_splits
           - *key_commitments
         description_processing: *processing_pct
+        presentation:
+          title_public: "Climate-related aid given: climate mitigation only (% of total aid given)"
         display:
           name: "Aid given: mitigation only (% of total aid)"
           numDecimalPlaces: 1
@@ -81,6 +85,8 @@ tables:
           - *key_commitments
           - *key_world
         description_processing: *processing_dollars
+        presentation:
+          title_public: "Climate-related aid given: climate adaptation only"
         display:
           name: "Aid given: adaptation only"
           numDecimalPlaces: 0
@@ -97,6 +103,8 @@ tables:
           - *key_splits
           - *key_commitments
         description_processing: *processing_pct
+        presentation:
+          title_public: "Climate-related aid given: climate adaptation only (% of total aid given)"
         display:
           name: "Aid given: adaptation only (% of total aid)"
           numDecimalPlaces: 1
@@ -114,6 +122,8 @@ tables:
           - *key_commitments
           - *key_world
         description_processing: *processing_dollars
+        presentation:
+          title_public: "Climate-related aid given: both climate mitigation and adaptation"
         display:
           name: "Aid given: mitigation and adaptation"
           numDecimalPlaces: 0
@@ -130,6 +140,8 @@ tables:
           - *key_splits
           - *key_commitments
         description_processing: *processing_pct
+        presentation:
+          title_public: "Climate-related aid given: both climate mitigation and adaptation (% of total aid given)"
         display:
           name: "Aid given: mitigation and adaptation (% of total aid)"
           numDecimalPlaces: 1
@@ -147,6 +159,8 @@ tables:
           - *key_commitments
           - *key_world
         description_processing: *processing_dollars
+        presentation:
+          title_public: "Climate-related aid given: climate as main objective"
         display:
           name: "Aid given: climate as main objective"
           numDecimalPlaces: 0
@@ -163,6 +177,8 @@ tables:
           - *key_splits
           - *key_commitments
         description_processing: *processing_pct
+        presentation:
+          title_public: "Climate-related aid given: climate as main objective (% of total aid given)"
         display:
           name: "Aid given: climate as main objective (% of total aid)"
           numDecimalPlaces: 1
@@ -180,6 +196,8 @@ tables:
           - *key_commitments
           - *key_world
         description_processing: *processing_dollars
+        presentation:
+          title_public: "Climate-related aid given: climate as secondary objective"
         display:
           name: "Aid given: climate as secondary objective"
           numDecimalPlaces: 0
@@ -196,6 +214,8 @@ tables:
           - *key_splits
           - *key_commitments
         description_processing: *processing_pct
+        presentation:
+          title_public: "Climate-related aid given: climate as secondary objective (% of total aid given)"
         display:
           name: "Aid given: climate as secondary objective (% of total aid)"
           numDecimalPlaces: 1
@@ -216,6 +236,8 @@ tables:
           - *key_commitments
           - *key_world
         description_processing: *processing_dollars
+        presentation:
+          title_public: "Climate-related aid received: climate mitigation only"
         display:
           name: "Aid received: mitigation only"
           numDecimalPlaces: 0
@@ -232,6 +254,8 @@ tables:
           - *key_splits
           - *key_commitments
         description_processing: *processing_pct
+        presentation:
+          title_public: "Climate-related aid received: climate mitigation only (% of total aid received)"
         display:
           name: "Aid received: mitigation only (% of total aid)"
           numDecimalPlaces: 1
@@ -249,6 +273,8 @@ tables:
           - *key_commitments
           - *key_world
         description_processing: *processing_dollars
+        presentation:
+          title_public: "Climate-related aid received: climate adaptation only"
         display:
           name: "Aid received: adaptation only"
           numDecimalPlaces: 0
@@ -265,6 +291,8 @@ tables:
           - *key_splits
           - *key_commitments
         description_processing: *processing_pct
+        presentation:
+          title_public: "Climate-related aid received: climate adaptation only (% of total aid received)"
         display:
           name: "Aid received: adaptation only (% of total aid)"
           numDecimalPlaces: 1
@@ -282,6 +310,8 @@ tables:
           - *key_commitments
           - *key_world
         description_processing: *processing_dollars
+        presentation:
+          title_public: "Climate-related aid received: both climate mitigation and adaptation"
         display:
           name: "Aid received: mitigation and adaptation"
           numDecimalPlaces: 0
@@ -298,6 +328,8 @@ tables:
           - *key_splits
           - *key_commitments
         description_processing: *processing_pct
+        presentation:
+          title_public: "Climate-related aid received: both climate mitigation and adaptation (% of total aid received)"
         display:
           name: "Aid received: mitigation and adaptation (% of total aid)"
           numDecimalPlaces: 1
@@ -315,6 +347,8 @@ tables:
           - *key_commitments
           - *key_world
         description_processing: *processing_dollars
+        presentation:
+          title_public: "Climate-related aid received: climate as main objective"
         display:
           name: "Aid received: climate as main objective"
           numDecimalPlaces: 0
@@ -331,6 +365,8 @@ tables:
           - *key_splits
           - *key_commitments
         description_processing: *processing_pct
+        presentation:
+          title_public: "Climate-related aid received: climate as main objective (% of total aid received)"
         display:
           name: "Aid received: climate as main objective (% of total aid)"
           numDecimalPlaces: 1
@@ -348,6 +384,8 @@ tables:
           - *key_commitments
           - *key_world
         description_processing: *processing_dollars
+        presentation:
+          title_public: "Climate-related aid received: climate as secondary objective"
         display:
           name: "Aid received: climate as secondary objective"
           numDecimalPlaces: 0
@@ -364,6 +402,8 @@ tables:
           - *key_splits
           - *key_commitments
         description_processing: *processing_pct
+        presentation:
+          title_public: "Climate-related aid received: climate as secondary objective (% of total aid received)"
         display:
           name: "Aid received: climate as secondary objective (% of total aid)"
           numDecimalPlaces: 1

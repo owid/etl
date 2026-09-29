@@ -24,3 +24,7 @@ meta:
     license:
       name: "CC BY 4.0"
       url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: 0a58ee922ebff5ce21931c01bce8d534
+    size: 256973
+    path: climate_related_aid_received.csv
