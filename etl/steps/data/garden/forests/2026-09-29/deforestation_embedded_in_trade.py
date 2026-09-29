@@ -8,9 +8,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 INDEX_COLUMNS = [
-    "producer_region",
     "producer_country",
-    "consumer_region",
     "consumer_country",
     "commodity_group",
     "year",

@@ -5,12 +5,10 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 COLUMNS = {
-    "Producer country group": "producer_region",
     "Producer country": "producer_country",
     "Year": "year",
     "Commodity group": "commodity_group",
     "Commodity": "commodity",
-    "Consumer country group": "consumer_region",
     "Consumer country": "consumer_country",
     "Deforestation risk, amortized (ha)": "deforestation_risk",
     "Deforestation emissions incl. peat drainage, amortized (MtCO2)": "deforestation_emissions",
