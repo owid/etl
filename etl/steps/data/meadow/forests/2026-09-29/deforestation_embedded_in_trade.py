@@ -32,7 +32,7 @@ def run() -> None:
     #
     tb = tb.rename(columns=COLUMNS, errors="raise")
 
-    tb = tb.format(["producer_country", "consumer_country", "commodity", "year"], short_name=paths.short_name)
+    tb = tb.format(["producer_country", "consumer_country", "commodity", "year"])
 
     #
     # Save outputs.

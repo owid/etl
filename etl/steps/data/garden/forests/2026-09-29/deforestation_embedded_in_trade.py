@@ -122,7 +122,7 @@ def run() -> None:
 
     sanity_check_outputs(tb, tb_countries, totals_input)
 
-    tb = tb.format(["producer_country", "consumer_country", "commodity_group", "year"], short_name=paths.short_name)
+    tb = tb.format(["producer_country", "consumer_country", "commodity_group", "year"])
     tb_countries = tb_countries.format(["country"], short_name="countries")
 
     #
