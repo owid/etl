@@ -257,7 +257,7 @@ REGIONS = {
             "Other Europe (EI)",
         ],
     },
-    # NOTE: There is also "Other S. & Cent. America" (renamed "Other South and Central America (EI)"), which spans both North America and South America and so is assigned to neither. In most indicators it is exactly the sum of three finer residual regions that are assigned below ("Other South America (EI)", "Other Caribbean (EI)" and "Central America (EI)"), so nothing in it is missing from either aggregate; see ROLLUP_REGIONS. Where it is not (e.g. reserves, electricity generation by fuel), part of it is genuinely unassigned, and fix_issues_with_other_regions removes the aggregate for South America (and idem for North America) where that part is significant.
+    # NOTE: "Other South and Central America (EI)" spans both North and South America, so it is assigned to neither. See OTHER_REGIONS_MADE_OF_ASSIGNED_REGIONS.
     "South America": {
         "additional_members": [
             "Other South America (EI)",
@@ -281,46 +281,16 @@ REGIONS = {
     "High-income countries": {},
 }
 
-# Residual regions that are rollups of finer residual regions already assigned in REGIONS. In a column where the
-# rollup equals the sum of its components, nothing in it is unassigned, so it must not trigger the removal of an
-# aggregate in fix_issues_with_other_regions.
-ROLLUP_REGIONS = {
+# "Other South and Central America (EI)" is, in most indicators, exactly the sum of three finer regions that REGIONS
+# already assigns ("Other South America (EI)" to South America; "Other Caribbean (EI)" and "Central America (EI)" to
+# North America). In those indicators nothing in it is missing from our aggregates, so it must not cause their removal.
+OTHER_REGIONS_MADE_OF_ASSIGNED_REGIONS = {
     "Other South and Central America (EI)": [
         "Other South America (EI)",
         "Other Caribbean (EI)",
         "Central America (EI)",
     ],
 }
-# Maximum difference between a rollup and the sum of its components, as a fraction of the rollup's largest value in
-# the column, for the rollup to count as decomposed. Where they agree, they agree to floating-point precision.
-ROLLUP_TOLERANCE = 1e-4
-# Column in which every rollup must decompose. It is the headline series, so a release that stops publishing the
-# finer regions fails here instead of quietly deleting region aggregates.
-ROLLUP_MUST_DECOMPOSE_IN = "total_energy_supply_ej"
-
-# Provider regions removed from the output, after being used as inputs to our region aggregates (the meadow table
-# keeps all of them). They are the producer's residual buckets: whatever it did not itemize for that indicator, so
-# their composition changes from one column to another, and the same entity would mean different things on
-# different charts. "Middle East and Africa (EI)" is a stray row (three indicators, one year). The producer's
-# defined regions and organizations (e.g. "Africa (EI)", "Eastern Africa (EI)", OECD, Non-OECD) are kept.
-EXCLUDED_PROVIDER_REGIONS = [
-    "Middle East and Africa (EI)",
-    "Other Africa (EI)",
-    "Other Asia Pacific (EI)",
-    "Other CIS (EI)",
-    "Other Caribbean (EI)",
-    "Other Eastern Africa (EI)",
-    "Other Europe (EI)",
-    "Other Middle Africa (EI)",
-    "Other Middle East (EI)",
-    "Other North America (EI)",
-    "Other Northern Africa (EI)",
-    "Other South America (EI)",
-    "Other South and Central America (EI)",
-    "Other Southern Africa (EI)",
-    "Other Western Africa (EI)",
-    "Rest of World (EI)",
-]
 
 # Regions that don't need to be included as part of other region aggregates (unlike, e.g. "Other Africa (EI)", which needs to be added to "Africa").
 REGIONS_NOT_ASSIGNED_TO_OTHER_REGIONS = [
@@ -617,25 +587,20 @@ def fix_missing_nuclear_energy_data(tb: Table) -> Table:
     return tb
 
 
-def find_columns_where_rollup_decomposes(tb: Table, rollup: str, components: list[str]) -> set[str]:
-    """Columns in which a rollup "Other *" region equals the sum of its finer regions, wherever it is informed."""
+def columns_where_region_is_sum_of_parts(tb: Table, region: str, parts: list[str]) -> set[str]:
+    """Columns in which `region` equals the sum of `parts` in every year it is informed."""
     columns = [column for column in tb.columns if column not in ("country", "year")]
-    values = tb[tb["country"] == rollup].set_index("year")[columns]
-    parts = (
-        tb[tb["country"].isin(components)]
-        .groupby("year", observed=True)[columns]
-        .sum(min_count=1)
-        .reindex(values.index)
-    )
-    decomposes = set()
+    values = tb[tb["country"] == region].set_index("year")[columns]
+    sum_of_parts = tb[tb["country"].isin(parts)].groupby("year", observed=True)[columns].sum(min_count=1)
+    sum_of_parts = sum_of_parts.reindex(values.index)
+    result = set()
     for column in columns:
         informed = values[column].notna()
-        if not informed.any() or parts.loc[informed, column].isna().any():
-            continue
-        difference = (values.loc[informed, column] - parts.loc[informed, column]).abs().max()
-        if difference <= ROLLUP_TOLERANCE * values.loc[informed, column].abs().max():
-            decomposes.add(column)
-    return decomposes
+        if informed.any() and sum_of_parts.loc[informed, column].notna().all():
+            difference = (values.loc[informed, column] - sum_of_parts.loc[informed, column]).abs().max()
+            if difference <= 1e-4 * values.loc[informed, column].abs().max():
+                result.add(column)
+    return result
 
 
 def fix_issues_with_other_regions(tb: Table) -> Table:
@@ -658,16 +623,13 @@ def fix_issues_with_other_regions(tb: Table) -> Table:
     max_percentage_deviation = 15
     # Remove aggregates in columns for which an overlapping "Other *" region has a significant contribution, compared to the aggregate.
     for other_region, owid_regions in ei_regions_and_overlapping_owid_regions.items():
-        # Columns where the "Other *" region is the sum of finer regions already assigned to an OWID region, so
-        # nothing in it is unassigned and the check below does not apply (see ROLLUP_REGIONS).
-        fully_assigned = set()
-        if other_region in ROLLUP_REGIONS:
-            fully_assigned = find_columns_where_rollup_decomposes(
-                tb=tb, rollup=other_region, components=ROLLUP_REGIONS[other_region]
-            )
-            assert ROLLUP_MUST_DECOMPOSE_IN in fully_assigned, (
-                f"{other_region} is no longer the sum of {ROLLUP_REGIONS[other_region]} in {ROLLUP_MUST_DECOMPOSE_IN}."
-            )
+        # Skip the columns where this region is already fully assigned through finer regions.
+        parts = OTHER_REGIONS_MADE_OF_ASSIGNED_REGIONS.get(other_region, [])
+        fully_assigned = (
+            columns_where_region_is_sum_of_parts(tb=tb, region=other_region, parts=parts) if parts else set()
+        )
+        if parts:
+            assert "total_energy_supply_ej" in fully_assigned, f"{other_region} is no longer the sum of {parts}."
         tb_other = tb[(tb["country"] == other_region)].fillna(0).reset_index(drop=True)
         for continent in owid_regions:
             tb_continent = tb[(tb["country"] == continent)].fillna(0).reset_index(drop=True)
@@ -955,9 +917,13 @@ def run() -> None:
     # Sanity-check the output data.
     sanity_check_outputs(tb=tb)
 
-    # Remove residual and undefined provider regions (inputs to the aggregates above, but with no stable meaning
-    # for readers; see EXCLUDED_PROVIDER_REGIONS).
-    tb = tb[~tb["country"].isin(EXCLUDED_PROVIDER_REGIONS)].reset_index(drop=True)
+    # Remove the producer's residual regions ("Other Africa (EI)", "Rest of World (EI)", ...): they hold whatever it
+    # did not itemize for each indicator, so their composition varies by column. They were needed as inputs to the
+    # aggregates above, and the meadow table keeps them.
+    is_residual = (tb["country"].str.startswith("Other ") & tb["country"].str.endswith("(EI)")) | tb["country"].isin(
+        ["Rest of World (EI)", "Middle East and Africa (EI)"]
+    )
+    tb = tb[~is_residual].reset_index(drop=True)
 
     # Convert gas reserves from trillion cubic meters to cubic meters. Done here rather than in the
     # grapher step because it changes the values, and it is the unit every consumer wants: the
