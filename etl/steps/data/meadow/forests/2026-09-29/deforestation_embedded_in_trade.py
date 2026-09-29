@@ -6,13 +6,11 @@ paths = PathFinder(__file__)
 
 COLUMNS = {
     "Producer country group": "producer_region",
-    "Producer country ISO": "producer_iso_code",
     "Producer country": "producer_country",
     "Year": "year",
     "Commodity group": "commodity_group",
     "Commodity": "commodity",
     "Consumer country group": "consumer_region",
-    "Consumer country ISO": "consumer_iso_code",
     "Consumer country": "consumer_country",
     "Deforestation risk, amortized (ha)": "deforestation_risk",
     "Deforestation emissions incl. peat drainage, amortized (MtCO2)": "deforestation_emissions",
@@ -30,7 +28,7 @@ def run() -> None:
     #
     # Process data.
     #
-    tb = tb.rename(columns=COLUMNS, errors="raise")
+    tb = tb.rename(columns=COLUMNS, errors="raise")[list(COLUMNS.values())]
 
     tb = tb.format(["producer_country", "consumer_country", "commodity", "year"])
 

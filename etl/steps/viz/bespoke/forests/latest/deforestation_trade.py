@@ -1,8 +1,8 @@
 """Bespoke viz step writing the JSON files read by the deforestation-trade sankey.
 
   * `metadata.json`: provenance derived from the garden metadata (see `etl.viz.bespoke`).
-  * `deforestation-trade.metadata.json`: years, entities (with the source's ISO code and region),
-    commodity groups, and world totals per year.
+  * `deforestation-trade.metadata.json`: years, entities (with the source's region), commodity
+    groups, and world totals per year.
   * `deforestation-trade.<entityId>.json`: one per entity, with an `imports` block (flows consumed
     by the entity; partners are the producing countries) and an `exports` block (flows produced by
     the entity; partners are the consuming countries). Each block has parallel arrays `partners`,
@@ -60,10 +60,10 @@ def run() -> None:
     #
     # Assign 1-based alphabetical ids to entities and commodity groups.
     #
-    producers = tb[["producer_country", "producer_iso_code", "producer_region"]].rename(columns=lambda c: c[9:])
-    consumers = tb[["consumer_country", "consumer_iso_code", "consumer_region"]].rename(columns=lambda c: c[9:])
+    producers = tb[["producer_country", "producer_region"]].rename(columns=lambda c: c[9:])
+    consumers = tb[["consumer_country", "consumer_region"]].rename(columns=lambda c: c[9:])
     entities = pd.concat([producers, consumers]).drop_duplicates().sort_values("country").reset_index(drop=True)
-    assert not entities["country"].duplicated().any(), "A country has more than one ISO code or region."
+    assert not entities["country"].duplicated().any(), "A country has more than one region."
     entities["id"] = entities.index + 1
     entity_id = dict(zip(entities["country"], entities["id"]))
 
@@ -92,8 +92,7 @@ def run() -> None:
             "source": json.loads((paths.output_dir / "metadata.json").read_text())["feed"]["citation"],
             "dimensions": {
                 "entities": [
-                    {"id": int(row.id), "name": row.country, "iso": row.iso_code, "region": row.region}
-                    for row in entities.itertuples()
+                    {"id": int(row.id), "name": row.country, "region": row.region} for row in entities.itertuples()
                 ],
                 "commodityGroups": [{"id": group_id[g], "name": g} for g in groups],
             },

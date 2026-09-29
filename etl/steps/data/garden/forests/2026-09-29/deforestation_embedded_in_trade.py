@@ -1,7 +1,4 @@
-"""Deforestation embedded in trade, from the DeDuCE physical trade model.
-
-The source's 161 commodities are summed into its 9 commodity groups.
-"""
+"""Deforestation embedded in trade, from the DeDuCE physical trade model."""
 
 import numpy as np
 from owid.catalog import Table
@@ -12,10 +9,8 @@ paths = PathFinder(__file__)
 
 INDEX_COLUMNS = [
     "producer_region",
-    "producer_iso_code",
     "producer_country",
     "consumer_region",
-    "consumer_iso_code",
     "consumer_country",
     "commodity_group",
     "year",
