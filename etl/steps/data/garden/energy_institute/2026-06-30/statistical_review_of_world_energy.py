@@ -299,17 +299,12 @@ ROLLUP_TOLERANCE = 1e-4
 ROLLUP_MUST_DECOMPOSE_IN = "total_energy_supply_ej"
 
 # Provider regions removed from the output, after being used as inputs to our region aggregates (the meadow table
-# keeps all of them). They are residual buckets of the producer's table layout ("Other Western Africa (EI)") or
-# slices with no definition in our regions dataset. A residual bucket has no fixed composition: it holds whichever
-# countries lack individual data for that indicator, so the same entity would mean different things on different
-# charts. The defined "(EI)" regions and self-explanatory organizations (OECD, OPEC) are kept.
+# keeps all of them). They are the producer's residual buckets: whatever it did not itemize for that indicator, so
+# their composition changes from one column to another, and the same entity would mean different things on
+# different charts. "Middle East and Africa (EI)" is a stray row (three indicators, one year). The producer's
+# defined regions and organizations (e.g. "Africa (EI)", "Eastern Africa (EI)", OECD, Non-OECD) are kept.
 EXCLUDED_PROVIDER_REGIONS = [
-    "Central America (EI)",
-    "Eastern Africa (EI)",
-    "Middle Africa (EI)",
     "Middle East and Africa (EI)",
-    "Non-OECD (EI)",
-    "Non-OPEC (EI)",
     "Other Africa (EI)",
     "Other Asia Pacific (EI)",
     "Other CIS (EI)",
@@ -325,7 +320,6 @@ EXCLUDED_PROVIDER_REGIONS = [
     "Other Southern Africa (EI)",
     "Other Western Africa (EI)",
     "Rest of World (EI)",
-    "Western Africa (EI)",
 ]
 
 # Regions that don't need to be included as part of other region aggregates (unlike, e.g. "Other Africa (EI)", which needs to be added to "Africa").
