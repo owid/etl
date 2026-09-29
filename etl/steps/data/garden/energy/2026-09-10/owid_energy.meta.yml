@@ -3,7 +3,7 @@ dataset:
   jsonld: true
   title: Energy dataset
   description: |-
-    Our World in Data's complete energy dataset: one wide table with, for each country and year, total energy supply and the energy mix (by source, in energy units, per capita, as shares and as annual changes), the electricity mix (generation by source, demand, trade, emissions and carbon intensity), and fossil fuel production, trade, reserves and consumption in physical units. Population and GDP are included so that per capita and per GDP indicators can be recomputed.
+    Our World in Data's complete energy dataset: one wide table with, for each country and year, total energy supply and the energy mix (by source, in energy units, per capita, as shares and as annual changes), the electricity mix (generation by source, demand, trade, emissions and carbon intensity), and fossil fuel production. Population and GDP are included so that per capita and per GDP indicators can be recomputed.
 
     It is compiled from the Energy Institute's Statistical Review of World Energy, Ember's electricity data, the U.S. Energy Information Administration and several historical reconstructions, with population from Our World in Data's population dataset and GDP from the Maddison Project Database.
 
@@ -17,7 +17,6 @@ dataset:
       - Updated the Energy Institute Statistical Review of World Energy.
       - Primary energy is now measured as total energy supply instead of using the substitution method.
       - Renamed all columns for consistency (see the `column_mapping` table for the previous names).
-      - Added fossil fuel production, consumption, trade and reserves in physical units.
       - Removed regions defined by EIA and the Shift Dataportal, and "Other *" regions from the Energy Institute.
     - 2026-04-27:
       - Update Ember's yearly electricity data, after they updated their Global electricity data.
@@ -130,8 +129,4 @@ tables:
       previous_column:
         title: Previous column
         unit: ""
-        description_short: Name of the column in the previous release. Empty for new columns.
-      status:
-        title: Status
-        unit: ""
-        description_short: One of "unchanged", "renamed" or "new".
+        description_short: Name of the column in the previous release.
