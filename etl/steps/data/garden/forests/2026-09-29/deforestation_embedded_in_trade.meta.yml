@@ -17,10 +17,10 @@ tables:
         unit: hectares
         short_unit: ha
         description_short: |-
-          Deforestation in the producer country attributed to the commodities consumed in the consumer country, amortized over five years.
+          Deforestation in the producer country attributed to the commodities consumed in the consumer country, spread evenly over the five years after the forest was cleared.
       deforestation_emissions:
         title: Deforestation emissions embedded in trade
         unit: tonnes of CO₂
         short_unit: t CO₂
         description_short: |-
-          Net emissions from the deforestation in the producer country attributed to the commodities consumed in the consumer country, amortized over five years. Includes losses of above-ground, below-ground and soil carbon, and peat drainage.
+          Net emissions from the deforestation in the producer country attributed to the commodities consumed in the consumer country, spread evenly over the five years after the forest was cleared. Includes losses of above-ground, below-ground and soil carbon, and peat drainage.
