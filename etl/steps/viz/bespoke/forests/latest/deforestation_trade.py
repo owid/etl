@@ -11,9 +11,8 @@
 Only hectares are published; the sankey does not show emissions.
 """
 
-import json
-
 import pandas as pd
+from owid.datautils.io.json import save_json
 
 from etl.helpers import PathFinder
 from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
@@ -22,6 +21,8 @@ paths = PathFinder(__file__)
 
 FILE_SLUG = "deforestation-trade"
 NUM_DECIMALS = 1
+# Compact JSON, as the other bespoke steps write it.
+JSON_KWARGS = {"separators": (",", ":"), "ensure_ascii": False}
 
 
 def build_block(flows: pd.DataFrame, years: list[int]) -> dict:
@@ -32,12 +33,6 @@ def build_block(flows: pd.DataFrame, years: list[int]) -> dict:
         "groups": [int(group) for _, group in wide.index],
         "values": [[None if pd.isna(v) else float(v) for v in row] for row in wide.itertuples(index=False)],
     }
-
-
-def save(data: dict, filename: str) -> None:
-    paths.output_dir.mkdir(parents=True, exist_ok=True)
-    with open(paths.output_dir / filename, "w") as f:
-        json.dump(data, f, separators=(",", ":"), ensure_ascii=False)
 
 
 def run() -> None:
@@ -78,7 +73,7 @@ def run() -> None:
     #
     # Write the metadata JSON and one file per entity.
     #
-    save(
+    save_json(
         {
             "timeRange": {"start": years[0], "end": years[-1]},
             "years": years,
@@ -89,13 +84,15 @@ def run() -> None:
             },
             "worldTotals": [round(float(v), NUM_DECIMALS) for v in flows.groupby("year")["value"].sum().reindex(years)],
         },
-        f"{FILE_SLUG}.metadata.json",
+        paths.output_dir / f"{FILE_SLUG}.metadata.json",
+        **JSON_KWARGS,
     )
 
     for entity in entity_id.values():
         imports = flows[flows["consumer"] == entity].rename(columns={"producer": "partner"})
         exports = flows[flows["producer"] == entity].rename(columns={"consumer": "partner"})
-        save(
+        save_json(
             {"imports": build_block(imports, years), "exports": build_block(exports, years)},
-            f"{FILE_SLUG}.{entity}.json",
+            paths.output_dir / f"{FILE_SLUG}.{entity}.json",
+            **JSON_KWARGS,
         )
