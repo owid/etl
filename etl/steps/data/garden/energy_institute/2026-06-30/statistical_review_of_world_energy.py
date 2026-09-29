@@ -913,23 +913,12 @@ def run() -> None:
     # Sanity-check the output data.
     sanity_check_outputs(tb=tb)
 
-    # Remove the producer's residual regions ("Other Africa (EI)", "Rest of World (EI)", ...), which hold whatever it
-    # did not itemize for each indicator, so their composition varies by column, and the producer's regions that have
-    # no definition in our regions dataset. All of them were needed as inputs to the aggregates above, and the meadow
-    # table keeps them.
-    is_removed = (tb["country"].str.startswith("Other ") & tb["country"].str.endswith("(EI)")) | tb["country"].isin(
-        [
-            "Central America (EI)",
-            "Eastern Africa (EI)",
-            "Middle Africa (EI)",
-            "Middle East and Africa (EI)",
-            "Non-OECD (EI)",
-            "Non-OPEC (EI)",
-            "Rest of World (EI)",
-            "Western Africa (EI)",
-        ]
-    )
-    tb = tb[~is_removed].reset_index(drop=True)
+    # Keep only the producer's regions that our regions dataset defines (so that charts can show what they contain),
+    # plus OECD and OPEC. The rest ("Other Africa (EI)", "Non-OECD (EI)", ...) were needed as inputs to the aggregates
+    # above, and the meadow table keeps them.
+    is_ei_region = tb["country"].str.endswith("(EI)")
+    is_kept = tb["country"].isin(set(paths.regions.tb_regions["name"]) | {"OECD (EI)", "OPEC (EI)"})
+    tb = tb[~is_ei_region | is_kept].reset_index(drop=True)
 
     # Convert gas reserves from trillion cubic meters to cubic meters. Done here rather than in the
     # grapher step because it changes the values, and it is the unit every consumer wants: the
