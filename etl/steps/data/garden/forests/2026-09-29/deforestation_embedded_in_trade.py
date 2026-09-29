@@ -35,6 +35,7 @@ def run() -> None:
 
     # Convert emissions from million tonnes to tonnes of CO2.
     tb["deforestation_emissions"] *= 1e6
+    assert 1e8 < tb["deforestation_emissions"].max() < 1e10, "Emissions are not in tonnes of CO2."
 
     for column in ["producer_country", "consumer_country"]:
         tb = paths.regions.harmonize_names(
