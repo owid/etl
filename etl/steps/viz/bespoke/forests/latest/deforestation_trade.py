@@ -1,8 +1,8 @@
-"""Bespoke viz step producing the JSON feed for the deforestation-trade sankey.
+"""Bespoke viz step producing the JSON files read by the deforestation-trade sankey.
 
 Loads the `deforestation_embedded_in_trade` garden dataset and writes:
 
-  * `metadata.json`, the feed's provenance derived from the garden columns (see `etl.viz.bespoke`);
+  * `metadata.json`, the provenance of the bespoke viz, derived from the garden columns (see `etl.viz.bespoke`);
   * `deforestation-trade.metadata.json`, the manifest: the years, the entities (with the source's
     ISO code and region), the commodity groups, and the worldwide hectares per year;
   * `deforestation-trade.<entityId>.json`, one file per entity, with an `imports` block (flows
@@ -15,7 +15,7 @@ Loads the `deforestation_embedded_in_trade` garden dataset and writes:
 Only hectares are published; the sankey does not show emissions.
 
 The files go to the step's output folder; the framework syncs that folder to the R2 path of the
-environment being built, so the feed is served at
+environment being built, so the files are served at
 `<root>/v1/bespoke/forests/latest/deforestation_trade/deforestation-trade.metadata.json` and
 `.../deforestation-trade.<entityId>.json` -- `api.ourworldindata.org` on production, and
 `api-staging.owid.io/<env>` on a staging server or a laptop.
@@ -69,12 +69,12 @@ def run() -> None:
     tb = ds.read("deforestation_embedded_in_trade", safe_types=False)
     tb_countries = ds.read("countries", safe_types=False)
 
-    feed_metadata = build_feed_metadata(
+    viz_metadata = build_feed_metadata(
         title="Deforestation embedded in trade",
         columns={"Deforestation risk embedded in trade": tb["deforestation_risk"]},
         update_period_days=ds.metadata.update_period_days,
     )
-    write_feed_metadata(paths.output_dir, feed_metadata)
+    write_feed_metadata(paths.output_dir, viz_metadata)
 
     df = pd.DataFrame(tb)[["producer_country", "consumer_country", "commodity_group", "year", "deforestation_risk"]]
     for col in ("producer_country", "consumer_country", "commodity_group"):
@@ -103,7 +103,7 @@ def run() -> None:
     manifest = {
         "timeRange": {"start": years[0], "end": years[-1]},
         "years": years,
-        "source": feed_metadata["feed"]["citation"],
+        "source": viz_metadata["feed"]["citation"],
         "dimensions": {
             "entities": [
                 {
