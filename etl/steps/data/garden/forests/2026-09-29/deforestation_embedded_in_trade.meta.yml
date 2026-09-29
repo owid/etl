@@ -18,20 +18,12 @@ tables:
         short_unit: ha
         description_short: |-
           Deforestation in the producer country attributed to the commodities consumed in the consumer country, amortized over five years.
-        description_key:
-          - Values are amortized over five years, so a single clearing event is spread over the five years after it. They should not be read as the area cleared in a given year.
-          - Flows are estimated with a physical trade model that links countries of production to countries of apparent consumption through direct trade in agricultural commodities. The estimates reflect national averages, so they measure exposure to deforestation risk, not sourcing from specific cleared areas.
-          - Only the largest flows are included, those that together make up 99.9% of each year's attributed deforestation area.
       deforestation_emissions:
         title: Deforestation emissions embedded in trade
         unit: million tonnes of CO₂
         short_unit: Mt CO₂
         description_short: |-
           Net emissions from the deforestation in the producer country attributed to the commodities consumed in the consumer country, amortized over five years. Includes losses of above-ground, below-ground and soil carbon, and peat drainage.
-        description_key:
-          - Values are amortized over five years, so a single clearing event is spread over the five years after it. They should not be read as the emissions from the area cleared in a given year.
-          - Values can be negative when the carbon stock of the land use replacing the forest (for example, tree crops) exceeds the carbon lost from clearing it.
-          - Only the largest flows are included, those that together make up 99.9% of each year's attributed deforestation area.
   countries:
     variables:
       iso_code:
