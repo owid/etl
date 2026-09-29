@@ -44,8 +44,9 @@ def run() -> None:
     write_feed_metadata(paths.output_dir, metadata)
 
     #
-    # Assign 1-based alphabetical ids to entities and commodity groups.
+    # Process data.
     #
+    # Assign 1-based alphabetical ids to entities and commodity groups.
     countries = sorted(set(tb["producer_country"]) | set(tb["consumer_country"]))
     entity_id = {name: i + 1 for i, name in enumerate(countries)}
 
@@ -65,7 +66,7 @@ def run() -> None:
     )
 
     #
-    # Write the metadata JSON and one file per entity.
+    # Save outputs.
     #
     save_json(
         {
