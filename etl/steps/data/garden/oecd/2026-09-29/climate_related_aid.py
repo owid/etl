@@ -23,6 +23,7 @@ DOLLAR_COLUMNS = [
     "climate_overlap_dollars",
     "climate_principal_dollars",
     "climate_significant_dollars",
+    "climate_total_dollars",
     "other_aid_dollars",
 ]
 SHARE_COLUMNS = [column.replace("_dollars", "_pct") for column in DOLLAR_COLUMNS]
@@ -49,6 +50,9 @@ def sanity_check_inputs(tb: Table) -> None:
     assert ((total_by_objective - total_by_significance).abs() <= SPLIT_TOLERANCE_DOLLARS).all(), (
         f"In {table_name}, mitigation-only + adaptation-only + overlap does not match principal + significant."
     )
+    assert ((tb["climate_total_dollars"] - total_by_significance).abs() <= SPLIT_TOLERANCE_DOLLARS).all(), (
+        f"In {table_name}, the climate-related total does not match principal + significant."
+    )
 
 
 def sanity_check_outputs(tb_given: Table, tb_received: Table) -> None:
@@ -62,6 +66,9 @@ def sanity_check_outputs(tb_given: Table, tb_received: Table) -> None:
         total_share = tb[["climate_principal_pct", "climate_significant_pct", "other_aid_pct"]].sum(axis=1)
         assert total_share.between(99.8, 100.2).all(), (
             f"Climate-related and other aid shares don't add to 100% in {table_name}."
+        )
+        assert (tb["climate_total_pct"] + tb["other_aid_pct"]).between(99.8, 100.2).all(), (
+            f"Total climate-related and other aid shares don't add to 100% in {table_name}."
         )
         assert "World" in set(tb.index.get_level_values("country")), f"World is missing in {table_name}."
         # World is the biggest entity every year; a larger country value would point to a unit or mapping error.

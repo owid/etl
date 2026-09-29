@@ -14,7 +14,7 @@ definitions:
   key_bilateral: &key_bilateral |-
     Only bilateral aid that can be allocated to recipients is included — it excludes general budget support, debt relief, administrative costs, and refugee costs in donor countries. Contributions to multilateral institutions, such as the World Bank, UN agencies, and climate funds, are not included.
   key_splits: &key_splits |-
-    Each activity is counted once. There are two ways to split the same total: by objective (mitigation only, adaptation only, or both), and by importance (climate as a main or a secondary objective). Adding indicators from both splits would double-count aid. Either split plus aid not targeting climate change adds up to total aid.
+    Each activity is counted once. There are two ways to split the same total: by objective (mitigation only, adaptation only, or both), and by importance (climate as a main or a secondary objective). Adding indicators from both splits would double-count aid. Both splits add up to total climate-related aid, and total climate-related aid plus aid not targeting climate change adds up to total aid.
   key_commitments: &key_commitments |-
     Amounts are commitments — the money donors have pledged in a given year — not the money actually spent that year.
   key_world: &key_world |-
@@ -218,6 +218,43 @@ tables:
           title_public: "Climate-related aid given: climate as secondary objective (% of total aid given)"
         display:
           name: "Aid given: climate as secondary objective (% of total aid)"
+          numDecimalPlaces: 1
+          tolerance: 1
+      climate_total_dollars:
+        title: "Climate-related aid given: total"
+        unit: "constant 2024 US$"
+        short_unit: "$"
+        description_short: "Bilateral aid that targets climate change mitigation, adaptation, or both, given by each donor. This data is adjusted for inflation and expressed in constant 2024 US dollars."
+        description_key:
+          - "Includes all aid activities marked as targeting climate change mitigation, adaptation, or both, as either a principal or a significant objective. Activities that target both are counted once."
+          - *key_rio_markers
+          - *key_bilateral
+          - *key_splits
+          - *key_commitments
+          - *key_world
+        description_processing: *processing_dollars
+        presentation:
+          title_public: "Climate-related aid given"
+        display:
+          name: "Aid given: climate-related total"
+          numDecimalPlaces: 0
+          tolerance: 1
+      climate_total_pct:
+        title: "Climate-related aid given: total (% of total aid given)"
+        unit: "%"
+        short_unit: "%"
+        description_short: "Bilateral aid that targets climate change mitigation, adaptation, or both, as a share of the total bilateral allocable aid given by each donor."
+        description_key:
+          - "Includes all aid activities marked as targeting climate change mitigation, adaptation, or both, as either a principal or a significant objective. Activities that target both are counted once."
+          - *key_rio_markers
+          - *key_bilateral
+          - *key_splits
+          - *key_commitments
+        description_processing: *processing_pct
+        presentation:
+          title_public: "Share of aid given that is climate-related"
+        display:
+          name: "Aid given: climate-related total (% of total aid)"
           numDecimalPlaces: 1
           tolerance: 1
       other_aid_dollars:
@@ -443,6 +480,43 @@ tables:
           title_public: "Climate-related aid received: climate as secondary objective (% of total aid received)"
         display:
           name: "Aid received: climate as secondary objective (% of total aid)"
+          numDecimalPlaces: 1
+          tolerance: 1
+      climate_total_dollars:
+        title: "Climate-related aid received: total"
+        unit: "constant 2024 US$"
+        short_unit: "$"
+        description_short: "Bilateral aid that targets climate change mitigation, adaptation, or both, received by each recipient. This data is adjusted for inflation and expressed in constant 2024 US dollars."
+        description_key:
+          - "Includes all aid activities marked as targeting climate change mitigation, adaptation, or both, as either a principal or a significant objective. Activities that target both are counted once."
+          - *key_rio_markers
+          - *key_bilateral
+          - *key_splits
+          - *key_commitments
+          - *key_world
+        description_processing: *processing_dollars
+        presentation:
+          title_public: "Climate-related aid received"
+        display:
+          name: "Aid received: climate-related total"
+          numDecimalPlaces: 0
+          tolerance: 1
+      climate_total_pct:
+        title: "Climate-related aid received: total (% of total aid received)"
+        unit: "%"
+        short_unit: "%"
+        description_short: "Bilateral aid that targets climate change mitigation, adaptation, or both, as a share of the total bilateral allocable aid received by each recipient."
+        description_key:
+          - "Includes all aid activities marked as targeting climate change mitigation, adaptation, or both, as either a principal or a significant objective. Activities that target both are counted once."
+          - *key_rio_markers
+          - *key_bilateral
+          - *key_splits
+          - *key_commitments
+        description_processing: *processing_pct
+        presentation:
+          title_public: "Share of aid received that is climate-related"
+        display:
+          name: "Aid received: climate-related total (% of total aid)"
           numDecimalPlaces: 1
           tolerance: 1
       other_aid_dollars:
