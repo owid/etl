@@ -70,9 +70,8 @@
   value: null
   expect: {eq: 0}
   reason: >-
-    Total energy supply is reported as exactly zero from 1965 to 1970, with real figures from 1971, the year of
-    independence. The territory used energy before that, so the zeros stand for years the producer does not cover.
-    This is the only entity with a total of exactly zero.
+    Total energy supply is reported as exactly zero from 1965 to 1970 and as 0.047 EJ from 1971 onwards. We read the
+    zeros as years the producer does not cover rather than as measurements.
   producer: Energy Institute
   status: open
 
@@ -83,7 +82,6 @@
   value: null
   expect: {eq: 0}
   reason: >-
-    The same placeholder years report zero hydropower, although the Kaptai dam had been generating since 1962 and
-    the producer reports 0.175 TWh for 1971, its first covered year.
+    Hydro is reported as zero in the same years and as 0.175 TWh from 1971 onwards. Removed together with the total.
   producer: Energy Institute
   status: open
