@@ -9,7 +9,7 @@ dataset:
 
     Regions follow [Our World in Data's definitions](https://ourworldindata.org/world-region-map-definitions). Regions as defined by the original sources are also included, with the source in brackets: for example, "Europe (EI)" is Europe as defined by the Energy Institute, and "Europe (Ember)" as defined by Ember.
 
-    All energy indicators follow the total energy supply methodology of the Statistical Review, which counts electricity from nuclear and renewable sources by its physical energy content. Earlier releases of this dataset used the substitution method, which scaled that electricity up to the amount of fossil fuel that would have been needed to generate it. The two methods are not comparable: under total energy supply, hydro, wind and solar are roughly 60% lower than in the previous release, nuclear (counted by the heat produced in the reactor) is roughly 20% higher, fossil fuels and biofuels are unchanged, and total energy supply is roughly 5% lower, so the shares of fossil fuels are higher.
+    Energy is now measured as total energy supply, in line with the methodology adopted by our sources. Previous releases of this dataset used the substitution method, so figures from the two releases are not directly comparable. [Read more about this change in how we measure primary energy](https://ourworldindata.org/primary-energy-measurement-change).
 
     ## Changelog
 
