@@ -11,7 +11,7 @@ previous release (the `owid-energy-data.csv` file), so that users can migrate.
 """
 
 import numpy as np
-from owid.catalog import Table
+from owid.catalog import Origin, Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers.geo import add_gdp_to_table
@@ -379,6 +379,38 @@ def rename_columns(tb: Table, columns: dict[str, str | None]) -> Table:
     return tb[["country", "year"] + list(kept)].rename(columns=kept, errors="raise")
 
 
+def improve_index_columns_metadata(tb: Table, regions_version: str) -> Table:
+    """Set the metadata of the country, year and ISO code columns.
+
+    The country and year columns are index columns, which the metadata yaml cannot reach, and they arrive with the
+    origins of every input table merged together. Replace those with a single origin pointing to our region definitions.
+    The ISO code column comes from our regions table, which has no origins, so add the ISO 3166 standard as its origin.
+    """
+    regions_origin = Origin(
+        producer="Our World in Data",
+        title="Regions",
+        date_published=regions_version,
+        url_main="https://ourworldindata.org/world-region-map-definitions",
+    )
+    tb["country"].metadata.title = "Country"
+    tb["country"].metadata.description_short = "Country or region."
+    tb["country"].metadata.unit = ""
+    tb["country"].metadata.origins = [regions_origin]
+    tb["year"].metadata.title = "Year"
+    tb["year"].metadata.description_short = "Year of observation."
+    tb["year"].metadata.unit = ""
+    tb["year"].metadata.origins = [regions_origin]
+    tb["iso_code"].metadata.origins = [
+        Origin(
+            producer="International Organization for Standardization",
+            title="ISO 3166 Country Codes",
+            date_published=regions_version,
+            url_main="https://www.iso.org/iso-3166-country-codes.html",
+        )
+    ]
+    return tb
+
+
 def sanity_check(tb: Table) -> None:
     columns = tb.columns
     assert list(columns[: len(CONTEXT_COLUMNS)]) == CONTEXT_COLUMNS, "Context columns should come first."
@@ -437,11 +469,7 @@ def run() -> None:
     tb = tb[CONTEXT_COLUMNS + data_columns]
     tb = tb.dropna(subset=data_columns, how="all").reset_index(drop=True)
 
-    # The key columns are not data: give them a plain title and no sources.
-    tb["country"].metadata.title = "Country"
-    tb["country"].metadata.description_short = "Country or region."
-    tb["country"].metadata.origins = []
-    tb["year"].metadata.origins = []
+    tb = improve_index_columns_metadata(tb, regions_version=ds_regions.metadata.version)
 
     sanity_check(tb)
 
