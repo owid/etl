@@ -461,42 +461,56 @@ def run() -> None:
     #
     # Load data.
     #
+    # Load the relevant datasets and read their main tables.
     tb_energy_mix = paths.load_dataset("energy_mix").read("energy_mix")
-    # The electricity mix dataset also has a monthly table; only the annual one is used.
     tb_electricity_mix = paths.load_dataset("electricity_mix").read("electricity_mix")
     tb_fossil_fuels = paths.load_dataset("fossil_fuels").read("fossil_fuels")
+
+    # Load auxiliary datasets and read their main tables.
     ds_gdp = paths.load_dataset("maddison_project_database")
     ds_regions = paths.load_dataset("regions")
 
     #
     # Process data.
     #
+    # Rename indicators conveniently.
     tb_energy_mix = rename_columns(tb_energy_mix, ENERGY_MIX_COLUMNS)
     tb_electricity_mix = rename_columns(tb_electricity_mix, ELECTRICITY_MIX_COLUMNS)
     tb_fossil_fuels = rename_columns(tb_fossil_fuels, FOSSIL_FUELS_COLUMNS)
+
+    # Combine all tables.
     tb = pr.multi_merge([tb_energy_mix, tb_electricity_mix, tb_fossil_fuels], on=["country", "year"], how="outer")
 
-    # Add ISO codes (empty for regions and other aggregates), population and GDP.
+    # Add auxiliary columns (ISO codes, population and GDP).
     tb_regions = ds_regions["regions"].reset_index()[["name", "iso_alpha3"]]
     tb_regions = tb_regions.rename(columns={"name": "country", "iso_alpha3": "iso_code"})
     tb = pr.merge(tb, tb_regions, on="country", how="left")
     tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
     tb = add_gdp_to_table(tb=tb, ds_gdp=ds_gdp)
 
-    # Context columns first, then everything else in alphabetical order; drop rows without any data.
+    # Sort columns so that index and auxiliary ones are first, and then all other columns in alphabetical order.
     data_columns = sorted(column for column in tb.columns if column not in CONTEXT_COLUMNS)
     tb = tb[CONTEXT_COLUMNS + data_columns]
+
+    # Drop rows with no data.
     tb = tb.dropna(subset=data_columns, how="all").reset_index(drop=True)
 
+    # Improve metadata of index columns (country, year, and ISO code).
     tb = improve_index_columns_metadata(tb, regions_version=ds_regions.metadata.version)
 
+    # Run sanity checks.
     sanity_check(tb)
 
+    # Improve table format.
     tb = tb.format(["country", "year"], short_name=paths.short_name, sort_columns=False)
+
+    # Create auxiliary table with the mapping of indicator names.
+    # NOTE: This table should be deleted on the next major update. It is relevant only after the current refactor.
     tb_mapping = create_column_mapping_table(tb)
 
     #
     # Save outputs.
     #
+    # Create new dataset.
     ds_garden = paths.create_dataset(tables=[tb, tb_mapping])
     ds_garden.save()
