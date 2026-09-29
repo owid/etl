@@ -1,14 +1,9 @@
 """Bespoke viz step writing the JSON files read by the deforestation-trade sankey.
 
-  * `metadata.json`: provenance derived from the garden metadata (see `etl.viz.bespoke`).
-  * `deforestation-trade.metadata.json`: years, entities, commodity groups, and world totals per year.
-  * `deforestation-trade.<entityId>.json`: one per entity, with an `imports` block (flows consumed
-    by the entity; partners are the producing countries) and an `exports` block (flows produced by
-    the entity; partners are the consuming countries). Each block has parallel arrays `partners`,
-    `groups` and `values`, where `values[i]` is aligned to `years` and `null` means no data.
-    Domestic flows appear in both blocks.
-
-Only hectares are published; the sankey does not show emissions.
+* `metadata.json`: provenance derived from the garden metadata (see `etl.viz.bespoke`).
+* `deforestation-trade.metadata.json`: years, entities, commodity groups, and world totals per year.
+* `deforestation-trade.<entityId>.json`: the entity's imports and exports, by partner and commodity
+  group, with one value per year.
 """
 
 import pandas as pd
@@ -21,7 +16,6 @@ paths = PathFinder(__file__)
 
 FILE_SLUG = "deforestation-trade"
 NUM_DECIMALS = 1
-# Compact JSON, as the other bespoke steps write it.
 JSON_KWARGS = {"separators": (",", ":"), "ensure_ascii": False}
 
 
@@ -75,14 +69,13 @@ def run() -> None:
     #
     save_json(
         {
-            "timeRange": {"start": years[0], "end": years[-1]},
             "years": years,
             "source": metadata["feed"]["citation"],
             "dimensions": {
                 "entities": [{"id": entity_id[c], "name": c} for c in countries],
                 "commodityGroups": [{"id": group_id[g], "name": g} for g in groups],
             },
-            "worldTotals": [round(float(v), NUM_DECIMALS) for v in flows.groupby("year")["value"].sum().reindex(years)],
+            "worldTotals": [round(float(v), NUM_DECIMALS) for v in flows.groupby("year")["value"].sum()],
         },
         paths.output_dir / f"{FILE_SLUG}.metadata.json",
         **JSON_KWARGS,
