@@ -80,3 +80,13 @@ steps:
       - snapshot://papers/2025-05-23/he_2025.csv
       - snapshot://papers/2025-05-08/soo_bae_et_al_2012.csv
       - snapshot://usda_fs/2025-05-07/forest_share.csv
+
+  # Deforestation embedded in trade (DeDuCE physical trade model), feeding the bespoke deforestation sankey.
+  data://meadow/forests/2026-09-29/deforestation_embedded_in_trade:
+    - snapshot://forests/2026-09-29/deforestation_embedded_in_trade.csv
+  data://garden/forests/2026-09-29/deforestation_embedded_in_trade:
+    - data://meadow/forests/2026-09-29/deforestation_embedded_in_trade
+    - data://garden/regions/2023-01-01/regions
+  # Bespoke feed: a manifest plus one JSON per country, synced to the environment's v1/bespoke path.
+  viz://bespoke/forests/latest/deforestation_trade:
+    - data://garden/forests/2026-09-29/deforestation_embedded_in_trade

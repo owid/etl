@@ -1,0 +1,35 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Commodity-driven deforestation, associated carbon emissions and trade
+    description: |-
+      Estimates of commodity-driven deforestation and associated carbon emissions for 2001-2023, produced by the Deforestation Driver and Carbon Emission (DeDuCE) model, which combines remote sensing data on forest loss and land use with agricultural statistics to attribute deforestation to the expansion of cropland, pastures and forest plantations, and to the commodities produced on this land. The record also contains estimates of the deforestation embodied in the production, exports, imports and consumption of agricultural commodities by country, year and commodity for 2005-2023, derived using a physical trade model and a hybrid (physical-monetary) trade model.
+
+      This snapshot contains only the physical trade model file. It presents bilateral links between countries of production and countries of apparent consumption for the commodities driving deforestation, as amortized deforestation area (in hectares per year) and associated net emissions from losses in above-ground, below-ground and soil carbon, including peat drainage (in million tonnes of CO2 per year). The physical trade model covers direct trade in agricultural commodities in their primary form and up to the level of processing covered in FAOSTAT's trade data. It excludes leather and wood products, for which FAOSTAT provides no bilateral trade data, as well as forest plantations, and it does not include indirect flows of embodied deforestation in other products that use these agricultural commodities as inputs (for example, feed in meat products, or biodiesel produced from palm oil). To limit the size of the dataset, the producers include only the links that cumulatively make up, per year, 99.9% of the total positive attributed deforestation area.
+
+      Net negative deforestation emissions reflect situations where the carbon stock of the replacing land use (for example, tree crops) exceeds the gross carbon loss from forest clearing.
+    date_published: "2026-03-11"
+    version_producer: "2.1"
+
+    # Citation
+    producer: Singh et al.
+    citation_full: |-
+      - Singh, C., Persson, U. M., Croft, S., Kastner, T., & West, C. D. (2024). Commodity-driven deforestation, associated carbon emissions and trade 2001–2023 (Version 2.1) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.10633818
+      - DeDuCE model: Singh, C., & Persson, U. M. (2026). Global patterns of commodity-driven deforestation and associated carbon emissions. Nature Food, 7(2), 138–151. https://doi.org/10.1038/s43016-026-01305-4
+      - Physical trade model: Kastner, T., Kastner, M., & Nonhebel, S. (2011). Tracing distant environmental impacts of agricultural products from a consumer perspective. Ecological Economics, 70(6), 1032–1040. https://doi.org/10.1016/j.ecolecon.2011.01.012
+
+    # Files
+    url_main: https://zenodo.org/records/18953516
+    url_download: https://zenodo.org/records/18953516/files/2.%20Physical%20trade%20model_Deforestation%20embedded%20in%20global%20supply%20chains%20(2001-2023).csv?download=1
+    date_accessed: "2026-09-29"
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://zenodo.org/records/18953516
+outs:
+  - md5: b790e19c165417e450d717be41cdb8ad
+    size: 61452506
+    path: deforestation_embedded_in_trade.csv
