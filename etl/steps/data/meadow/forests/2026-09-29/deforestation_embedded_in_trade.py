@@ -19,18 +19,6 @@ COLUMNS = {
     "Consumption": "consumption",
 }
 
-CATEGORICAL_COLUMNS = [
-    "producer_region",
-    "producer_iso_code",
-    "producer_country",
-    "commodity_group",
-    "commodity",
-    "consumer_region",
-    "consumer_iso_code",
-    "consumer_country",
-    "consumption",
-]
-
 
 def run() -> None:
     #
@@ -42,10 +30,7 @@ def run() -> None:
     #
     # Process data.
     #
-    assert set(tb.columns) == set(COLUMNS), f"Unexpected columns in the source file: {sorted(tb.columns)}"
-    tb = tb.rename(columns=COLUMNS)
-    for column in CATEGORICAL_COLUMNS:
-        tb[column] = tb[column].astype("category")
+    tb = tb.rename(columns=COLUMNS, errors="raise")
 
     tb = tb.format(["producer_country", "consumer_country", "commodity", "year"], short_name=paths.short_name)
 
