@@ -235,7 +235,7 @@ FOSSIL_FUELS_COLUMNS = {
 }
 
 # Names in the release before 2026-09-10 (owid-energy-data.csv), mapped to the new names.
-# Remove this dictionary and the column_mapping table in the next update: they document a one-off renaming.
+# Remove this dictionary and create_column_mapping_table in the next update: they document a one-off renaming.
 PREVIOUS_COLUMNS = {
     "country": "country",
     "year": "year",
@@ -412,6 +412,24 @@ def improve_index_columns_metadata(tb: Table, regions_version: str) -> Table:
     return tb
 
 
+def create_column_mapping_table(tb: Table) -> Table:
+    """Table with the name each column had in the release before 2026-09-10.
+
+    Every column had a previous name (nothing was added). Remove this function, its call and PREVIOUS_COLUMNS in
+    the next update: they document a one-off renaming.
+    """
+    columns = list(tb.reset_index().columns)
+    previous_names = {new: old for old, new in PREVIOUS_COLUMNS.items()}
+    assert set(columns) == set(previous_names), "Every column must have a name in the release before 2026-09-10."
+    tb_mapping = Table(
+        {"column": columns, "previous_column": [previous_names[column] for column in columns]},
+        short_name="column_mapping",
+    )
+    tb_mapping["column"].metadata.title = "Column"
+    tb_mapping["column"].metadata.description_short = "Name of the column in the current release."
+    return tb_mapping.format(["column"], short_name="column_mapping", sort_columns=False)
+
+
 def sanity_check(tb: Table) -> None:
     columns = tb.columns
     assert list(columns[: len(CONTEXT_COLUMNS)]) == CONTEXT_COLUMNS, "Context columns should come first."
@@ -474,18 +492,8 @@ def run() -> None:
 
     sanity_check(tb)
 
-    # Table with the name each column had in the release before 2026-09-10 (every column had one; nothing was added).
-    previous_names = {new: old for old, new in PREVIOUS_COLUMNS.items()}
-    assert set(tb.columns) == set(previous_names), "Every column must have a name in the release before 2026-09-10."
-    tb_mapping = Table(
-        {"column": list(tb.columns), "previous_column": [previous_names[column] for column in tb.columns]},
-        short_name="column_mapping",
-    )
-    tb_mapping["column"].metadata.title = "Column"
-    tb_mapping["column"].metadata.description_short = "Name of the column in the current release."
-
     tb = tb.format(["country", "year"], short_name=paths.short_name, sort_columns=False)
-    tb_mapping = tb_mapping.format(["column"], short_name="column_mapping", sort_columns=False)
+    tb_mapping = create_column_mapping_table(tb)
 
     #
     # Save outputs.
