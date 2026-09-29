@@ -23,6 +23,7 @@ DOLLAR_COLUMNS = [
     "climate_overlap_dollars",
     "climate_principal_dollars",
     "climate_significant_dollars",
+    "other_aid_dollars",
 ]
 SHARE_COLUMNS = [column.replace("_dollars", "_pct") for column in DOLLAR_COLUMNS]
 
@@ -56,9 +57,11 @@ def sanity_check_outputs(tb_given: Table, tb_received: Table) -> None:
         # Shares are of each entity's own total bilateral allocable ODA, so they can't exceed 100%.
         # NOTE: A few "Melanesia unspecified" rows exceed 100% in the source file; those rows are excluded in garden.
         assert (tb[SHARE_COLUMNS] <= 100).all().all(), f"Share above 100% in {table_name}."
-        # Climate-related aid is a subset of total ODA, so principal + significant can't exceed 100% either.
-        assert (tb["climate_principal_pct"] + tb["climate_significant_pct"] <= 100.5).all(), (
-            f"Total climate-related share above 100% in {table_name}."
+        # Climate-related aid (principal + significant) plus other aid is the entity's total aid, so shares add to 100%.
+        # NOTE: Shares are rounded to two decimals in the source file; the widest spread found is 99.99-100.1%.
+        total_share = tb[["climate_principal_pct", "climate_significant_pct", "other_aid_pct"]].sum(axis=1)
+        assert total_share.between(99.8, 100.2).all(), (
+            f"Climate-related and other aid shares don't add to 100% in {table_name}."
         )
         assert "World" in set(tb.index.get_level_values("country")), f"World is missing in {table_name}."
         # World is the biggest entity every year; a larger country value would point to a unit or mapping error.
@@ -67,11 +70,18 @@ def sanity_check_outputs(tb_given: Table, tb_received: Table) -> None:
         assert (max_by_year <= world.reindex(max_by_year.index)).all(), f"An entity exceeds World in {table_name}."
 
     # World is the same deduplicated total, whether it is seen from the donor or the recipient side.
+    climate_columns = [column for column in DOLLAR_COLUMNS if column != "other_aid_dollars"]
     world_given = tb_given.xs("World", level="country")[DOLLAR_COLUMNS]
     world_received = tb_received.xs("World", level="country")[DOLLAR_COLUMNS]
-    assert ((world_given - world_received).abs() <= SPLIT_TOLERANCE_DOLLARS).all().all(), (
-        "World totals differ between the donor and recipient tables."
-    )
+    assert (
+        ((world_given[climate_columns] - world_received[climate_columns]).abs() <= SPLIT_TOLERANCE_DOLLARS).all().all()
+    ), "World climate-related totals differ between the donor and recipient tables."
+    # NOTE: For aid not targeting climate change, the donor and recipient views of World differ slightly (up to ~0.13%
+    # in 2007-2024), because OECD's totals by donor don't perfectly match its totals summed by recipient.
+    relative_gap = (world_given["other_aid_dollars"] - world_received["other_aid_dollars"]).abs() / world_received[
+        "other_aid_dollars"
+    ]
+    assert (relative_gap < 0.002).all(), "World aid not targeting climate differs by more than 0.2% between tables."
 
     # The donors file covers every donor (including EU Institutions), so donors must add up to World.
     donors = tb_given.drop("World", level="country")["climate_principal_dollars"].groupby(level="year").sum()
