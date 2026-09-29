@@ -98,9 +98,6 @@ dataset:
     - 2020-09-09:
       - The first version of this dataset was made available.
   update_period_days: 365
-  licenses:
-    - name: CC BY 4.0
-      url: https://creativecommons.org/licenses/by/4.0/
   owners:
     - Pablo Rosado
 tables:
