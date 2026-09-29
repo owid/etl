@@ -9,16 +9,16 @@ dataset:
 
     Regions follow [Our World in Data's definitions](https://ourworldindata.org/world-region-map-definitions). Regions as defined by the original sources are also included, with the source in brackets: for example, "Europe (EI)" is Europe as defined by the Energy Institute, and "Europe (Ember)" as defined by Ember.
 
-    Energy is now measured as total energy supply, in line with the methodology adopted by our sources. Previous releases of this dataset used the substitution method, so figures from the two releases are not directly comparable. [Read more about this change in how we measure primary energy](https://ourworldindata.org/primary-energy-measurement-change).
+    Energy is now measured as total energy supply, in line with the methodology adopted by our sources. Previous releases of this dataset used the substitution method, so figures from the two releases are not directly comparable. [Read more about this change in how we measure primary energy](https://ourworldindata.org/primary-energy-measurement-change). The previous release remains available in the [energy-data GitHub repository](https://github.com/owid/energy-data).
 
     ## Changelog
 
     - 2026-09-10:
+      - Updated the Energy Institute Statistical Review of World Energy.
       - Primary energy is now measured as total energy supply instead of using the substitution method.
       - Renamed all columns for consistency (see the `column_mapping` table for the previous names).
       - Added fossil fuel production, consumption, trade and reserves in physical units.
       - Removed regions defined by EIA and the Shift Dataportal, and "Other *" regions from the Energy Institute.
-      - Moved the dataset from GitHub to this catalog page. The previous release stays available at https://owid-public.owid.io/data/energy/owid-energy-data.csv.
     - 2026-04-27:
       - Update Ember's yearly electricity data, after they updated their Global electricity data.
     - 2026-01-26:
