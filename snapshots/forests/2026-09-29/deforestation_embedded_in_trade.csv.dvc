@@ -12,9 +12,11 @@ meta:
     # Citation
     producer: Singh et al.
     citation_full: |-
-      - Singh, C., Persson, U. M., Croft, S., Kastner, T., & West, C. D. (2024). Commodity-driven deforestation, associated carbon emissions and trade 2001–2023 (Version 2.1) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.10633818
-      - DeDuCE model: Singh, C., & Persson, U. M. (2026). Global patterns of commodity-driven deforestation and associated carbon emissions. Nature Food, 7(2), 138–151. https://doi.org/10.1038/s43016-026-01305-4
-      - Physical trade model: Kastner, T., Kastner, M., & Nonhebel, S. (2011). Tracing distant environmental impacts of agricultural products from a consumer perspective. Ecological Economics, 70(6), 1032–1040. https://doi.org/10.1016/j.ecolecon.2011.01.012
+      Singh, C., Persson, U. M., Croft, S., Kastner, T., & West, C. D. (2024). Commodity-driven deforestation, associated carbon emissions and trade 2001-2023 (Version 2.1) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.10633818
+
+      Methodology:
+        - DeDuCE model: Singh, C., & Persson, U. M. (2026). Global patterns of commodity-driven deforestation and associated carbon emissions. Nature Food, 7(2), 138-151. https://doi.org/10.1038/s43016-026-01305-4
+        - Physical trade model: Kastner, T., Kastner, M., & Nonhebel, S. (2011). Tracing distant environmental impacts of agricultural products from a consumer perspective. Ecological Economics, 70(6), 1032-1040. https://doi.org/10.1016/j.ecolecon.2011.01.012
 
     # Files
     url_main: https://zenodo.org/records/18953516
