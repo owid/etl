@@ -1,13 +1,7 @@
 """OWID Energy dataset: one wide table combining the energy mix, the electricity mix and the fossil fuels tables.
 
-All three inputs follow the Total Energy Supply methodology of the 2026 Statistical Review. Regions (for ISO
-codes), population and GDP (Maddison Project Database) are added as context columns.
-
-Column names follow one grammar, `<source>_<domain>_<measure>`, with the unit last and no abbreviations:
-`hydro_energy_twh`, `hydro_energy_share_pct`, `hydro_electricity_per_capita_kwh`, `coal_production_twh`.
-The dictionaries below map every column of every input table to its name in the output; None means the
-column is not published. A second table, `column_mapping`, records the name each column had in the
-release before 2026-09-10 (the `owid-energy-data.csv` file), so that users can migrate. No column was added or removed.
+The dictionaries below map every column of each input table to its name in the output (None means the column is not
+published). PREVIOUS_COLUMNS maps the names of the release before 2026-09-10 to the new names.
 """
 
 import numpy as np
