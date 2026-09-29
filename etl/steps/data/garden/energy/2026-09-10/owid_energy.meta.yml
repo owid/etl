@@ -124,9 +124,9 @@ tables:
         description_short: Total real gross domestic product, adjusted for inflation and differences in the cost of living between countries.
   column_mapping:
     title: Column mapping
-    description: Name of each column of the dataset in the previous release (the owid-energy-data.csv file), to help migrate to the new names.
+    description: Name of each column of the dataset in the release before 2026-09-10 (the owid-energy-data.csv file), to help migrate to the new names.
     variables:
       previous_column:
         title: Previous column
         unit: ""
-        description_short: Name of the column in the previous release.
+        description_short: Name of the column in the release before 2026-09-10.

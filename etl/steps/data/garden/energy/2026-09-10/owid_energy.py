@@ -7,7 +7,7 @@ Column names follow one grammar, `<source>_<domain>_<measure>`, with the unit la
 `hydro_energy_twh`, `hydro_energy_share_pct`, `hydro_electricity_per_capita_kwh`, `coal_production_twh`.
 The dictionaries below map every column of every input table to its name in the output; None means the
 column is not published. A second table, `column_mapping`, records the name each column had in the
-previous release (the `owid-energy-data.csv` file), so that users can migrate. No column was added or removed.
+release before 2026-09-10 (the `owid-energy-data.csv` file), so that users can migrate. No column was added or removed.
 """
 
 import numpy as np
@@ -234,7 +234,8 @@ FOSSIL_FUELS_COLUMNS = {
     "total_production_twh": None,  # Not in the previous release.
 }
 
-# Names in the previous release of the dataset (owid-energy-data.csv), mapped to the new names.
+# Names in the release before 2026-09-10 (owid-energy-data.csv), mapped to the new names.
+# Remove this dictionary and the column_mapping table in the next update: they document a one-off renaming.
 PREVIOUS_COLUMNS = {
     "country": "country",
     "year": "year",
@@ -473,9 +474,9 @@ def run() -> None:
 
     sanity_check(tb)
 
-    # Table with the name each column had in the previous release (every column had one; nothing was added).
+    # Table with the name each column had in the release before 2026-09-10 (every column had one; nothing was added).
     previous_names = {new: old for old, new in PREVIOUS_COLUMNS.items()}
-    assert set(tb.columns) == set(previous_names), "Every column must have a name in the previous release."
+    assert set(tb.columns) == set(previous_names), "Every column must have a name in the release before 2026-09-10."
     tb_mapping = Table(
         {"column": list(tb.columns), "previous_column": [previous_names[column] for column in tb.columns]},
         short_name="column_mapping",
