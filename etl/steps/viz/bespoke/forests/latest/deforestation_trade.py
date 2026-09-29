@@ -76,7 +76,7 @@ def run() -> None:
     )
 
     #
-    # Write the manifest and one file per entity.
+    # Write the metadata JSON and one file per entity.
     #
     save(
         {
