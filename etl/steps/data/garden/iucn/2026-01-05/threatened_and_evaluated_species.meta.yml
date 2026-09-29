@@ -44,7 +44,6 @@ tables:
               - Crustaceans
               - Arachnids
             entityType: taxonomic group
-            entityTypePlural: taxonomic groups
             hideTimeline: true
             baseColorScheme: owid-distinct
       evaluated_species:
