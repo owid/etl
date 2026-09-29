@@ -11,7 +11,7 @@ previous release (the `owid-energy-data.csv` file), so that users can migrate.
 """
 
 import numpy as np
-from owid.catalog import Origin, Table
+from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers.geo import add_gdp_to_table
@@ -437,31 +437,11 @@ def run() -> None:
     tb = tb[CONTEXT_COLUMNS + data_columns]
     tb = tb.dropna(subset=data_columns, how="all").reset_index(drop=True)
 
-    # Metadata of the context columns.
-    regions_origin = Origin(producer="Our World in Data", title="Regions", date_published=ds_regions.metadata.version)
+    # The key columns are not data: give them a plain title and no sources.
     tb["country"].metadata.title = "Country"
     tb["country"].metadata.description_short = "Country or region."
-    tb["country"].metadata.unit = ""
-    tb["country"].metadata.origins = [regions_origin]
-    tb["year"].metadata.title = "Year"
-    tb["year"].metadata.description_short = "Year of observation."
-    tb["year"].metadata.unit = ""
-    tb["year"].metadata.origins = [regions_origin]
-    tb["iso_code"].metadata.title = "ISO code"
-    tb[
-        "iso_code"
-    ].metadata.description_short = (
-        "ISO 3166-1 alpha-3 three-letter country code. Empty for regions and other aggregates."
-    )
-    tb["iso_code"].metadata.unit = ""
-    tb["iso_code"].metadata.origins = [
-        Origin(
-            producer="International Organization for Standardization",
-            title="ISO 3166 Country Codes",
-            date_published=ds_regions.metadata.version,
-            url_main="https://www.iso.org/iso-3166-country-codes.html",
-        )
-    ]
+    tb["country"].metadata.origins = []
+    tb["year"].metadata.origins = []
 
     sanity_check(tb)
 
@@ -479,15 +459,6 @@ def run() -> None:
     tb_mapping.loc[tb_mapping["previous_column"] == tb_mapping["column"], "status"] = "unchanged"
     tb_mapping["column"].metadata.title = "Column"
     tb_mapping["column"].metadata.description_short = "Name of the column in the current release."
-    tb_mapping["previous_column"].metadata.title = "Previous column"
-    tb_mapping[
-        "previous_column"
-    ].metadata.description_short = "Name of the column in the previous release. Empty for new columns."
-    tb_mapping["status"].metadata.title = "Status"
-    tb_mapping["status"].metadata.description_short = 'One of "unchanged", "renamed" or "new".'
-    for column in tb_mapping.columns:
-        tb_mapping[column].metadata.unit = ""
-        tb_mapping[column].metadata.origins = []
 
     tb = tb.format(["country", "year"], short_name=paths.short_name, sort_columns=False)
     tb_mapping = tb_mapping.format(["column"], short_name="column_mapping", sort_columns=False)

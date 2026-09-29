@@ -109,6 +109,10 @@ tables:
     title: Energy dataset
     description: One row per country (or region) and year, with every indicator as a column.
     variables:
+      iso_code:
+        title: ISO code
+        unit: ""
+        description_short: ISO 3166-1 alpha-3 three-letter country code. Empty for regions and other aggregates.
       population:
         title: Population
         unit: people
@@ -122,3 +126,12 @@ tables:
   column_mapping:
     title: Column mapping
     description: Name of each column of the dataset in the previous release (the owid-energy-data.csv file), to help migrate to the new names.
+    variables:
+      previous_column:
+        title: Previous column
+        unit: ""
+        description_short: Name of the column in the previous release. Empty for new columns.
+      status:
+        title: Status
+        unit: ""
+        description_short: One of "unchanged", "renamed" or "new".
