@@ -17,4 +17,3 @@ def run(upload: bool = True, path_to_file: str | None = None) -> None:
 
     # Save snapshot from local file.
     snap.create_snapshot(filename=path_to_file, upload=upload)
-

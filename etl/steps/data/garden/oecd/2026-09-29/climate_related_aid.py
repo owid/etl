@@ -34,18 +34,20 @@ SPLIT_TOLERANCE_DOLLARS = 1e5
 
 def sanity_check_inputs(tb: Table) -> None:
     table_name = tb.metadata.short_name
-    assert set(tb.columns) == {"country", "year", *DOLLAR_COLUMNS, *SHARE_COLUMNS}, f"Unexpected columns in {table_name}."
+    assert set(tb.columns) == {"country", "year", *DOLLAR_COLUMNS, *SHARE_COLUMNS}, (
+        f"Unexpected columns in {table_name}."
+    )
     assert not tb.duplicated(subset=["country", "year"]).any(), f"Duplicate (country, year) rows in {table_name}."
     assert tb[DOLLAR_COLUMNS + SHARE_COLUMNS].notnull().all().all(), f"Missing values in {table_name}."
     assert (tb[DOLLAR_COLUMNS + SHARE_COLUMNS] >= 0).all().all(), f"Negative values in {table_name}."
     # Both splits of the deduplicated climate-related total must agree.
-    total_by_objective = tb[["climate_mitigation_only_dollars", "climate_adaptation_only_dollars", "climate_overlap_dollars"]].sum(
-        axis=1
-    )
+    total_by_objective = tb[
+        ["climate_mitigation_only_dollars", "climate_adaptation_only_dollars", "climate_overlap_dollars"]
+    ].sum(axis=1)
     total_by_significance = tb[["climate_principal_dollars", "climate_significant_dollars"]].sum(axis=1)
-    assert (
-        (total_by_objective - total_by_significance).abs() <= SPLIT_TOLERANCE_DOLLARS
-    ).all(), f"In {table_name}, mitigation-only + adaptation-only + overlap does not match principal + significant."
+    assert ((total_by_objective - total_by_significance).abs() <= SPLIT_TOLERANCE_DOLLARS).all(), (
+        f"In {table_name}, mitigation-only + adaptation-only + overlap does not match principal + significant."
+    )
 
 
 def sanity_check_outputs(tb_given: Table, tb_received: Table) -> None:
@@ -55,9 +57,9 @@ def sanity_check_outputs(tb_given: Table, tb_received: Table) -> None:
         # NOTE: A few "Melanesia unspecified" rows exceed 100% in the source file; those rows are excluded in garden.
         assert (tb[SHARE_COLUMNS] <= 100).all().all(), f"Share above 100% in {table_name}."
         # Climate-related aid is a subset of total ODA, so principal + significant can't exceed 100% either.
-        assert (
-            tb["climate_principal_pct"] + tb["climate_significant_pct"] <= 100.5
-        ).all(), f"Total climate-related share above 100% in {table_name}."
+        assert (tb["climate_principal_pct"] + tb["climate_significant_pct"] <= 100.5).all(), (
+            f"Total climate-related share above 100% in {table_name}."
+        )
         assert "World" in set(tb.index.get_level_values("country")), f"World is missing in {table_name}."
         # World is the biggest entity every year; a larger country value would point to a unit or mapping error.
         world = tb.xs("World", level="country")["climate_principal_dollars"]
@@ -67,9 +69,9 @@ def sanity_check_outputs(tb_given: Table, tb_received: Table) -> None:
     # World is the same deduplicated total, whether it is seen from the donor or the recipient side.
     world_given = tb_given.xs("World", level="country")[DOLLAR_COLUMNS]
     world_received = tb_received.xs("World", level="country")[DOLLAR_COLUMNS]
-    assert (
-        (world_given - world_received).abs() <= SPLIT_TOLERANCE_DOLLARS
-    ).all().all(), "World totals differ between the donor and recipient tables."
+    assert ((world_given - world_received).abs() <= SPLIT_TOLERANCE_DOLLARS).all().all(), (
+        "World totals differ between the donor and recipient tables."
+    )
 
     # The donors file covers every donor (including EU Institutions), so donors must add up to World.
     donors = tb_given.drop("World", level="country")["climate_principal_dollars"].groupby(level="year").sum()
@@ -99,7 +101,9 @@ def run() -> None:
         # as a donor, and "World" is kept as given (it includes all unspecified rows and EU Institutions).
         # Both tables share one mapping file (donors and recipients are mostly different countries), so warnings about
         # unused mappings or excluded entities absent from one of the tables would be expected noise.
-        tb = paths.regions.harmonize_names(tb=tb, warn_on_unused_countries=False, warn_on_unknown_excluded_countries=False)
+        tb = paths.regions.harmonize_names(
+            tb=tb, warn_on_unused_countries=False, warn_on_unknown_excluded_countries=False
+        )
 
         # Improve table format.
         tables.append(tb.format(["country", "year"], short_name=table_name))
