@@ -78,6 +78,15 @@ REGIONS = [
 # Define the fraction of allowed NaNs per year for the population weighted aggregations
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
+# OWID continents added to the Internet users indicators (the World Bank only publishes its own regions).
+INTERNET_USERS_CONTINENTS = [region for region in REGIONS if region != "World"]
+
+# A continent-year of Internet users is only kept if the countries with data are home to at least this share of the
+# continent's population. Countries without data are counted at the continent's average, so this bounds how much of
+# the figure rests on that assumption. At 0.9 it drops 2025 (at most 62% coverage, in Asia), 1991-1995 for most
+# continents, and Oceania 2002-2004 (Australia missing); it keeps Asia 2021-2023 (92%, Pakistan missing).
+INTERNET_USERS_MIN_FRAC_POPULATION = 0.9
+
 
 def run() -> None:
     log.info("wdi.start")
@@ -893,6 +902,9 @@ def add_internet_users(tb: Table) -> Table:
     countries, which means every entity the World Bank publishes a share for -- including World and
     its regional and income aggregates -- gets a count on the World Bank's own definition, and the
     coverage of the newest year does not affect the aggregates.
+
+    OWID continents, which the World Bank does not publish, are added on top (see
+    `add_continents_to_internet_users`).
     """
     tb = tb.reset_index()
 
@@ -908,12 +920,79 @@ def add_internet_users(tb: Table) -> Table:
     world_max = tb.loc[tb["country"] == "World", "it_net_user_zs_number"].max()
     assert 1e9 < world_max < 1e10, f"World Internet users ({world_max:.3g}) is outside the expected billions."
 
+    tb = add_continents_to_internet_users(tb)
+
     tb = tb.format(["country", "year"])
 
     # Add description from producer to the new indicator (which contains relevant information).
     tb["it_net_user_zs_number"].metadata.description_from_producer = tb[
         "it_net_user_zs"
     ].metadata.description_from_producer
+
+    return tb
+
+
+def add_continents_to_internet_users(tb: Table) -> Table:
+    """
+    Add OWID continents to the share and number of people using the Internet.
+
+    A continent's share is the population-weighted average of the shares of its countries with data, which
+    amounts to counting countries without data at the continent's average. Its number is that share times the
+    continent's full population. A continent-year is dropped when the countries with data are home to less than
+    INTERNET_USERS_MIN_FRAC_POPULATION of its population.
+
+    Continents are computed from countries only. World and the World Bank's regions keep the World Bank's own
+    figures, so the continents do not add up exactly to World.
+    """
+    columns = ["it_net_user_zs", "it_net_user_zs_number"]
+    metadata = {column: tb[column].metadata for column in columns}
+
+    # The continents must not exist yet for these indicators, otherwise they would be silently overwritten below.
+    # (The rows themselves may exist, from the population-weighted GDP aggregates.)
+    is_continent = tb["country"].isin(INTERNET_USERS_CONTINENTS)
+    assert tb.loc[is_continent, columns].isnull().all().all(), "WDI now publishes Internet users for OWID continents."
+
+    # Aggregate the share, weighting each country by its WDI population. The population dataset gives the
+    # continent's total population for the coverage condition, so countries missing from WDI entirely (e.g. Taiwan)
+    # count as not covered.
+    tb_continents = paths.regions.add_aggregates(
+        tb=tb.loc[~is_continent, ["country", "year", "it_net_user_zs", "sp_pop_totl"]],
+        regions=INTERNET_USERS_CONTINENTS,
+        aggregations={"it_net_user_zs": "mean_weighted_by_sp_pop_totl"},
+        min_frac_population=INTERNET_USERS_MIN_FRAC_POPULATION,
+        warn_on_missing_population=False,
+    )
+    tb_continents = tb_continents.loc[
+        tb_continents["country"].isin(INTERNET_USERS_CONTINENTS), ["country", "year", "it_net_user_zs"]
+    ].dropna(subset=["it_net_user_zs"])
+
+    # Apply the share to the continent's full population, including countries without data or missing from WDI.
+    tb_continents = paths.regions.add_population(tb=tb_continents, population_col="population")
+    tb_continents["it_net_user_zs_number"] = tb_continents["it_net_user_zs"] / 100 * tb_continents["population"]
+
+    # Check the continents against the World Bank's World, over the years where every continent has data (and the
+    # World Bank has a World figure, which it only does from 2005). They measure the same thing, so they should add up
+    # to within a few percent of it (they differ by the population used and by how each fills countries without data).
+    tb_continents_sum = tb_continents.pivot(index="year", columns="country", values="it_net_user_zs_number").dropna()
+    tb_world = tb.loc[tb["country"] == "World"].set_index("year")["it_net_user_zs_number"]
+    ratio = (tb_continents_sum.sum(axis=1) / tb_world.reindex(tb_continents_sum.index)).astype(float).dropna()
+    assert len(ratio) >= 10, f"Only {len(ratio)} years to compare the continents against World."
+    assert ratio.between(0.95, 1.05).all(), (
+        f"Continents do not add up to World (ratio {ratio.min():.3f}-{ratio.max():.3f})."
+    )
+
+    # Fill the continents in.
+    tb = pr.merge(
+        tb,
+        tb_continents[["country", "year"] + columns],
+        on=["country", "year"],
+        how="outer",
+        suffixes=("", "_continent"),
+    )
+    for column in columns:
+        tb[column] = tb[column].fillna(tb[f"{column}_continent"])
+        tb[column].metadata = metadata[column]
+    tb = tb.drop(columns=[f"{column}_continent" for column in columns])
 
     return tb
 

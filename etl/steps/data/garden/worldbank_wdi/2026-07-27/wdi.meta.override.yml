@@ -563,7 +563,9 @@ tables:
         description_key:
           - An Internet user is defined by the International Telecommunication Union as anyone who has accessed the Internet from any location in the last three months.
           - This can be from any type of device, including a computer, mobile phone, personal digital assistant, games machine, digital TV, and other technological devices.
-        processing_level: minor
+          - We calculated the continent figures ourselves, counting countries without data at their continent's average and leaving out years when those countries are home to more than 1 in 10 of the continent's people.
+        description_processing: We calculated the share for continents as the average of the shares of the countries with data, weighted by their population.
+        processing_level: major
         presentation:
           title_public: Share of the population using the Internet
           # title_variant: WDI
@@ -632,11 +634,12 @@ tables:
         unit: 'people'
         short_unit: ''
         description_short: Number of people who used the Internet in the last three months.
-        description_processing: We calculated the number of Internet users by multiplying the share of the population using the Internet by the total population, both published in the World Development Indicators.
+        description_processing: We calculated the number of Internet users by multiplying the share of the population using the Internet by the total population, both published in the World Development Indicators. For continents, we multiplied the continent's share by its total population.
         description_key:
           - An Internet user is defined by the International Telecommunication Union as anyone who has accessed the Internet from any location in the last three months.
           - This can be from any type of device, including a computer, mobile phone, personal digital assistant, games machine, digital TV, and other technological devices.
-          - Regional and global figures come from the World Bank's own aggregates, so they follow the World Bank's definitions of those groups rather than ours.
+          - Figures for the world and for the World Bank's regions and income groups come from the World Bank.
+          - We calculated the continent figures ourselves, counting countries without data at their continent's average and leaving out years when those countries are home to more than 1 in 10 of the continent's people.
         processing_level: major
         display:
           name: Number of people using the Internet
@@ -661,13 +664,12 @@ tables:
             map:
               timeTolerance: 5
             selectedEntityNames:
-              - South Asia (WB)
-              - North America (WB)
-              - Sub-Saharan Africa (WB)
-              - East Asia and Pacific (WB)
-              - Middle East, North Africa, Afghanistan and Pakistan (WB)
-              - Europe and Central Asia (WB)
-              - Latin America and Caribbean (WB)
+              - Africa
+              - Asia
+              - Europe
+              - North America
+              - South America
+              - Oceania
               - World
 
       sh_sta_stnt_zs:
