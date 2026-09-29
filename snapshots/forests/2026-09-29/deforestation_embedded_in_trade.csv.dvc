@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: Commodity-driven deforestation, associated carbon emissions and trade
     description: |-
-      Deforestation embedded in bilateral trade of agricultural commodities, from the DeDuCE physical trade model. Amortized deforestation area (ha) and associated net emissions (MtCO2), by producer country, consumer country, commodity and year.
+      Deforestation embedded in bilateral trade of agricultural commodities, from the DeDuCE physical trade model.
     date_published: "2026-03-11"
     version_producer: "2.1"
 
