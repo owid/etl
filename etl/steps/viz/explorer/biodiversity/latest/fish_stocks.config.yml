@@ -5,6 +5,7 @@ config:
   hasMapTab: false
   hideAnnotationFieldsInTitle: true
   entityType: fish stock
+  entityTypePlural: fish stocks
   originUrl: https://ourworldindata.org/
   selection:
     - Albacore tuna North Pacific Ocean
