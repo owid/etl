@@ -9,8 +9,7 @@ added (Maddison). Traditional biomass (Smil, World only) is kept separate from T
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
-from etl.data_helpers import geo
-from etl.data_helpers.geo import add_gdp_to_table
+from etl.data_helpers.geo import REGIONS, add_gdp_to_table
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -309,7 +308,7 @@ def extend_total_with_eia(tb: Table, tb_eia: Table) -> Table:
     # Drop EIA's own regional aggregates (marked with an "(EIA)" suffix) and the OWID regions its garden step builds:
     # a region's total must come from the same producer as its sources, so EIA only extends country coverage.
     is_aggregate = tb_eia["country"].str.contains("(EIA)", regex=False) | tb_eia["country"].isin(
-        list(geo.REGIONS) + ["World"]
+        list(REGIONS) + ["World"]
     )
     tb_eia = tb_eia[~is_aggregate].reset_index(drop=True)
 
