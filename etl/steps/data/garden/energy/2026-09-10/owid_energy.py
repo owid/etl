@@ -82,11 +82,11 @@ ENERGY_MIX_COLUMNS = {
     "solar_share_including_biomass_pct": None,
     "solar_share_pct": "solar_energy_share_pct",
     "solar_twh": "solar_energy_twh",
-    "total_energy_supply_annual_change_pct": "total_energy_supply_annual_change_pct",
-    "total_energy_supply_annual_change_twh": "total_energy_supply_annual_change_twh",
-    "total_energy_supply_per_capita_kwh": "total_energy_supply_per_capita_kwh",
-    "total_energy_supply_per_gdp_kwh_per_dollar": "total_energy_supply_per_gdp_kwh_per_dollar",
-    "total_energy_supply_twh": "total_energy_supply_twh",
+    "total_energy_supply_annual_change_pct": "total_energy_annual_change_pct",
+    "total_energy_supply_annual_change_twh": "total_energy_annual_change_twh",
+    "total_energy_supply_per_capita_kwh": "total_energy_per_capita_kwh",
+    "total_energy_supply_per_gdp_kwh_per_dollar": "total_energy_per_gdp_kwh_per_dollar",
+    "total_energy_supply_twh": "total_energy_twh",
     "traditional_biomass_share_including_biomass_pct": None,
     "traditional_biomass_twh": None,
     "wind_annual_change_pct": "wind_energy_annual_change_pct",
@@ -149,7 +149,7 @@ ELECTRICITY_MIX_COLUMNS = {
     "solar_generation__twh": "solar_electricity_twh",
     "solar_share_of_electricity__pct": "solar_electricity_share_pct",
     "total_demand__twh": "electricity_demand_twh",
-    "total_electricity_share_of_primary_energy__pct": "electricity_share_of_total_energy_supply_pct",
+    "total_electricity_share_of_primary_energy__pct": "electricity_share_of_total_energy_pct",
     "total_emissions__mtco2": "electricity_emissions_mtco2eq",
     "total_generation__twh": "electricity_generation_twh",
     "total_net_imports__twh": "electricity_net_imports_twh",
@@ -254,11 +254,11 @@ PREVIOUS_COLUMNS = {
     "electricity_demand": "electricity_demand_twh",
     "electricity_demand_per_capita": "electricity_demand_per_capita_kwh",
     "electricity_generation": "electricity_generation_twh",
-    "electricity_share_energy": "electricity_share_of_total_energy_supply_pct",
-    "energy_cons_change_pct": "total_energy_supply_annual_change_pct",
-    "energy_cons_change_twh": "total_energy_supply_annual_change_twh",
-    "energy_per_capita": "total_energy_supply_per_capita_kwh",
-    "energy_per_gdp": "total_energy_supply_per_gdp_kwh_per_dollar",
+    "electricity_share_energy": "electricity_share_of_total_energy_pct",
+    "energy_cons_change_pct": "total_energy_annual_change_pct",
+    "energy_cons_change_twh": "total_energy_annual_change_twh",
+    "energy_per_capita": "total_energy_per_capita_kwh",
+    "energy_per_gdp": "total_energy_per_gdp_kwh_per_dollar",
     "fossil_cons_change_pct": "fossil_fuels_energy_annual_change_pct",
     "fossil_cons_change_twh": "fossil_fuels_energy_annual_change_twh",
     "fossil_elec_per_capita": "fossil_fuels_electricity_per_capita_kwh",
@@ -330,7 +330,7 @@ PREVIOUS_COLUMNS = {
     "other_renewables_share_elec_exc_biofuel": "other_renewables_excluding_bioenergy_electricity_share_pct",
     "other_renewables_share_energy": "other_renewables_energy_share_pct",
     "per_capita_electricity": "electricity_generation_per_capita_kwh",
-    "primary_energy_consumption": "total_energy_supply_twh",
+    "primary_energy_consumption": "total_energy_twh",
     "renewables_cons_change_pct": "renewables_energy_annual_change_pct",
     "renewables_cons_change_twh": "renewables_energy_annual_change_twh",
     "renewables_consumption": "renewables_energy_twh",
@@ -440,7 +440,7 @@ def sanity_check(tb: Table) -> None:
     world_2024 = tb[(tb["country"] == "World") & (tb["year"] == 2024)]
     assert len(world_2024) == 1
     assert 3000 < world_2024["hydro_energy_twh"].item() < 6000, "World hydro 2024 is not on the TES basis."
-    assert 150000 < world_2024["total_energy_supply_twh"].item() < 190000
+    assert 150000 < world_2024["total_energy_twh"].item() < 190000
 
 
 def run() -> None:
