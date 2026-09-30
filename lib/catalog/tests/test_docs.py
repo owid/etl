@@ -155,9 +155,9 @@ def test_readme_sections(tmp_path):
         "- Source code:\n  - https://github.com/owid/etl/tree/master/etl/steps/data/garden/energy/2026-09-10/"
     )
     # The page's sections, in the page's order: data (one block per table), processing, license.
-    assert "## Data\n\n### energy\n\nTable: `energy`\n\n3 rows × 4 columns.\n\n#### How to cite\n\n" in readme
+    assert "## Data\n\n### energy\n\nTable: `energy`\n\n3 rows × 4 columns.\n\n#### How to cite this data\n\n" in readme
     assert (
-        "#### How to cite\n\nEnergy Institute (2026); Population based on various sources (2024) – with minor "
+        "#### How to cite this data\n\nEnergy Institute (2026); Population based on various sources (2024) – with minor "
         "processing by Our World in Data.\n"
     ) in readme
     assert "#### Indicators\n\n##### Country\n" in readme

@@ -372,7 +372,7 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
         parts += [f"{len(table):,} rows × {len(list(table.all_columns))} columns.", ""]
         citation = table_citation(table)
         if citation:
-            parts += ["#### How to cite", "", f"{citation}.", ""]
+            parts += ["#### How to cite this data", "", f"{citation}.", ""]
         parts += ["#### Indicators", ""]
         origins_by_column: dict[str, list[Origin]] = {}
         for column in table.all_columns:
