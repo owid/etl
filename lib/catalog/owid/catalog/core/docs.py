@@ -364,7 +364,7 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
     parts += ["## License", "", LICENSE_NOTE, ""]
 
     # The ways in beyond the download buttons, one per line: the stable data URLs (readable from any tool that
-    # opens a URL), the dated copies that never change, and the source code of the step. The catalog page lists
+    # opens a URL), the pipeline's files of this version, and the source code of the step. The catalog page lists
     # the same items.
     items: list[str] = []
     catalog_path = (
@@ -384,11 +384,10 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
             items += [f"    - {url}{name}.{suffix}" for suffix in formats + ("codebook.csv", "sources.csv")]
             if base:
                 items.append(
-                    f"  - Links to this version ({meta.version}). They always give you the same data, even if there "
-                    "are newer releases:"
+                    f"  - Links to this version ({meta.version}). They stay on it when newer versions are released:"
                 )
                 items += [
-                    f"    - {base}{catalog_path}/{name}.{suffix}" for suffix in formats + ("feather", "meta.json")
+                    f"    - {base}{catalog_path}/{name}.{suffix}" for suffix in ("parquet", "feather", "meta.json")
                 ]
     if meta.channel and meta.namespace and meta.version:
         items += ["- Source code:", f"  - {ETL_STEPS_URL}{meta.channel}/{meta.namespace}/{meta.version}/"]

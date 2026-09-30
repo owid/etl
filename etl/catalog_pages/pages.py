@@ -9,7 +9,6 @@ metadata by ``owid.catalog``. The manifest contract (version 1) is shared with t
 from __future__ import annotations
 
 import json
-import shutil
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -34,14 +33,14 @@ DATASET_JSONLD_FILENAME = "dataset.jsonld"
 TABLE_FORMATS = ("csv", "parquet", "xlsx")
 # Documentation files written next to each table.
 TABLE_DOCUMENTATION = ("codebook.csv", "sources.csv")
-# Dated catalog files (immutable) that the manifest links to. The CSV and Excel are copies the page writer puts
-# next to the pipeline's own parquet, feather and metadata, so that every format has a permanent link.
-VERSIONED_SUFFIXES = {"csv": "csv", "xlsx": "xlsx", "parquet": "parquet", "feather": "feather", "meta.json": "json"}
-VERSIONED_COPIES = ("csv", "xlsx")
+# Files of the dataset's dated catalog folder that the manifest links to, as a link to one version. They are the
+# pipeline's own files, published with the dataset; the page writer never writes into that folder, which belongs
+# to the pipeline (a CSV there would become one of the dataset's data files, and change its checksum).
+VERSIONED_SUFFIXES = {"parquet": "parquet", "feather": "feather", "meta.json": "json"}
 # Formats that count as a download of the data in the JSON-LD (the dated metadata file is not one).
 DATA_FORMATS = ("csv", "parquet", "feather", "xlsx")
-# What each file is for, so the page can group them: the data itself, the documentation, and the immutable
-# dated copies.
+# What each file is for, so the page can group them: the data itself, the documentation, and the dated files of
+# one version.
 ROLE_DATA = "data"
 ROLE_DOCUMENTATION = "documentation"
 ROLE_ARCHIVE = "archive"
@@ -113,11 +112,9 @@ def write_page_files(
         if versioned:
             entry["versioned"] = True
         files.append(entry)
+        # Dated files are uploaded with the dataset itself, not by the page.
         if not versioned:
             result.keys.append(f"{short_key}/{name}")
-        elif name.rsplit(".", 1)[-1] in VERSIONED_COPIES:
-            # The pipeline's own dated files are uploaded with the dataset; the page writer's copies are not.
-            result.keys.append(f"{catalog_path}/{name}")
 
     # Per table: the data as CSV, parquet and Excel workbook, its codebook and its sources. The download filename
     # is the table name, which says what the file is once detached from our folders.
@@ -161,16 +158,9 @@ def write_page_files(
     (target_dir / README_FILENAME).write_text(ds.readme(url=url))
     register(README_FILENAME, "md", ROLE_DOCUMENTATION)
 
-    # Immutable, dated copies of the tables: every format the page offers, plus the pipeline's own files.
+    # Links to this version: the pipeline's own dated files, where they exist.
     dated_dir = catalog_dir / catalog_path
-    dated_dir.mkdir(parents=True, exist_ok=True)
     for name in ordered_table_names(ds):
-        for suffix in VERSIONED_COPIES:
-            source = target_dir / f"{name}.{suffix}"
-            if source.exists():
-                shutil.copyfile(source, dated_dir / f"{name}.{suffix}")
-            else:
-                (dated_dir / f"{name}.{suffix}").unlink(missing_ok=True)
         for suffix, format in VERSIONED_SUFFIXES.items():
             if (dated_dir / f"{name}.{suffix}").exists():
                 register(f"{name}.{suffix}", format, ROLE_ARCHIVE, table=name, versioned=True)
@@ -215,7 +205,7 @@ def explore_url(topic: str) -> str:
 
 def jsonld_distributions(files: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Schema.org ``DataDownload`` entries for the data files of a page: the tables in every format, at the
-    stable URL, plus the dated copies. The documentation files are not data and stay out."""
+    stable URL, plus the dated files of this version. The documentation files are not data and stay out."""
     return [
         {
             "@type": "DataDownload",

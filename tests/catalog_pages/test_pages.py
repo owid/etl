@@ -150,16 +150,14 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
         "owid_energy.sources.csv": "documentation",
         "readme.md": "documentation",
     }
-    # Every format has a dated, permanent copy: the page's CSV and Excel next to the pipeline's own files.
+    # The links to this version are the pipeline's own dated files; the page writes nothing into that folder,
+    # which belongs to the pipeline, and uploads nothing there.
     assert {name: entry["role"] for name, entry in dated.items()} == {
-        "owid_energy.csv": "archive",
-        "owid_energy.xlsx": "archive",
         "owid_energy.feather": "archive",
         "owid_energy.meta.json": "archive",
     }
-    assert (data_dir / catalog_path / "owid_energy.csv").read_bytes() == (page_dir / "owid_energy.csv").read_bytes()
-    assert f"{catalog_path}/owid_energy.csv" in result.page_keys
-    assert f"{catalog_path}/owid_energy.feather" not in result.page_keys
+    assert not list((data_dir / catalog_path).glob("*.csv")) and not list((data_dir / catalog_path).glob("*.xlsx"))
+    assert not [key for key in result.page_keys if key.startswith(f"{catalog_path}/")]
     assert files["owid_energy.codebook.csv"]["table"] == "owid_energy"
     assert "table" not in files["readme.md"]
     csv = files["owid_energy.csv"]
@@ -184,8 +182,6 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     assert [entry["name"] for entry in jsonld["distribution"]] == [
         "owid_energy.csv",
         "owid_energy.parquet",
-        "owid_energy.xlsx",
-        "owid_energy.csv",
         "owid_energy.xlsx",
         "owid_energy.feather",
     ]
@@ -257,16 +253,15 @@ def test_table_too_long_for_excel_gets_no_workbook_and_an_older_one_is_removed(t
     data_dir = tmp_path / "data"
     catalog_path = _add_dataset(data_dir)
     page_dir = data_dir / "energy" / "owid_energy"
-    dated_dir = data_dir / catalog_path
     # Two rows plus the header fit exactly.
     monkeypatch.setattr("owid.catalog.core.docs.EXCEL_MAX_ROWS", 3)
     build_catalog_page_artifacts(catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)})
-    assert (page_dir / "owid_energy.xlsx").exists() and (dated_dir / "owid_energy.xlsx").exists()
+    assert (page_dir / "owid_energy.xlsx").exists()
 
-    # The header takes one row, so two data rows no longer fit; the workbooks of the earlier build must go.
+    # The header takes one row, so two data rows no longer fit; the workbook of the earlier build must go.
     monkeypatch.setattr("owid.catalog.core.docs.EXCEL_MAX_ROWS", 2)
     build_catalog_page_artifacts(catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)})
-    assert not (page_dir / "owid_energy.xlsx").exists() and not (dated_dir / "owid_energy.xlsx").exists()
+    assert not (page_dir / "owid_energy.xlsx").exists()
     manifest = json.loads((page_dir / "manifest.json").read_text())
     assert manifest["tables"][0]["xlsx_skipped"] == "2 rows plus the header exceed Excel's limit of 2"
     assert not [entry for entry in manifest["files"] if entry["format"] == "xlsx"]
