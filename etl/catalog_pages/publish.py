@@ -92,34 +92,13 @@ def build_and_publish_catalog_pages(
     # build left behind after re-versioning to a dated one): only the dated path, never the short key, which
     # the active version legitimately owns instead.
     delete_keys.extend(f"{entry.catalog_path}/{DATASET_JSONLD_FILENAME}" for entry in result.superseded_entries)
-    # Files an active page no longer writes (a renamed table, a dropped format) would otherwise stay live under
-    # its short key, so everything under a served short key that is not written now is removed.
-    prune_prefixes = sorted({f"{entry.short_key}/" for entry in result.page_entries})
 
-    sync_page_files(connect_r2(), bucket, catalog_dir, keys, delete_keys=delete_keys, prune_prefixes=prune_prefixes)
-
-
-def list_remote_keys(s3: Any, bucket: str, prefix: str) -> list[str]:
-    keys: list[str] = []
-    kwargs: dict[str, Any] = {"Bucket": bucket, "Prefix": prefix}
-    while True:
-        response = s3.list_objects_v2(**kwargs)
-        keys.extend(entry["Key"] for entry in response.get("Contents", []))
-        if not response.get("IsTruncated"):
-            return keys
-        kwargs["ContinuationToken"] = response["NextContinuationToken"]
+    sync_page_files(connect_r2(), bucket, catalog_dir, keys, delete_keys=delete_keys)
 
 
 def sync_page_files(
-    s3: Any,
-    bucket: str,
-    catalog_dir: Path,
-    keys: list[str],
-    delete_keys: list[str] | None = None,
-    prune_prefixes: list[str] | None = None,
+    s3: Any, bucket: str, catalog_dir: Path, keys: list[str], delete_keys: list[str] | None = None
 ) -> None:
-    """Upload the page files that changed, delete the given stale keys, and delete every remote file under the
-    prune prefixes that is not among the keys."""
     futures = []
     with concurrent.futures.ThreadPoolExecutor() as executor:
         for key in keys:
@@ -141,11 +120,11 @@ def sync_page_files(
                 )
             )
 
-        stale = [key for key in delete_keys or [] if key not in keys and get_remote_checksum(s3, bucket, key)]
-        for prefix in prune_prefixes or []:
-            stale += [key for key in list_remote_keys(s3, bucket, prefix) if key not in keys and key not in stale]
-        for key in stale:
-            print(f"  DEL {key}")
-            futures.append(executor.submit(s3.delete_object, Bucket=bucket, Key=key))
+        for key in delete_keys or []:
+            if key in keys:
+                continue
+            if get_remote_checksum(s3, bucket, key) is not None:
+                print(f"  DEL {key}")
+                futures.append(executor.submit(s3.delete_object, Bucket=bucket, Key=key))
 
         concurrent.futures.wait(futures)

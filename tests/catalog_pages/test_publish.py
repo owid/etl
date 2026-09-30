@@ -34,9 +34,6 @@ class FakeS3:
     def delete_object(self, Bucket: str, Key: str) -> None:
         self.deleted.append(Key)
 
-    def list_objects_v2(self, Bucket: str, Prefix: str) -> dict[str, Any]:
-        return {"Contents": [{"Key": key} for key in self.remote_md5 if key.startswith(Prefix)], "IsTruncated": False}
-
 
 def _add_eligible_dataset(
     data_dir: Path,
@@ -105,19 +102,6 @@ def test_sync_page_files_uploads_new_and_deletes_stale(tmp_path: Path) -> None:
     assert unchanged_key not in s3.deleted
 
 
-def test_sync_page_files_prunes_files_no_longer_written_under_an_active_page(tmp_path: Path) -> None:
-    kept_key = "energy/owid_energy/owid_energy.csv"
-    (tmp_path / "energy" / "owid_energy").mkdir(parents=True)
-    (tmp_path / kept_key).write_text("a,b\n1,2\n")
-    renamed_key = "energy/owid_energy/old_table.csv"
-    other_dataset_key = "energy/owid_energy_extra/old_table.csv"
-    s3 = FakeS3(remote_md5={kept_key: "0" * 32, renamed_key: "1" * 32, other_dataset_key: "2" * 32})
-
-    sync_page_files(s3, "test-bucket", tmp_path, [kept_key], prune_prefixes=["energy/owid_energy/"])
-
-    assert s3.deleted == [renamed_key]
-
-
 def test_sync_page_files_skips_delete_for_local_file_not_on_remote(tmp_path: Path) -> None:
     s3 = FakeS3(remote_md5={})
     sync_page_files(s3, "test-bucket", tmp_path, [], delete_keys=["never/existed/dataset.jsonld"])
@@ -133,10 +117,9 @@ def test_build_and_publish_catalog_pages_uses_short_keys_and_deletes_old_dated_p
 
     captured: dict[str, Any] = {}
 
-    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None, prune_prefixes=None):
+    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None):
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
-        captured["prune_prefixes"] = prune_prefixes
 
     monkeypatch.setattr("etl.catalog_pages.publish.connect_r2", lambda: object())
     monkeypatch.setattr("etl.catalog_pages.publish.sync_page_files", fake_sync_page_files)
@@ -152,8 +135,6 @@ def test_build_and_publish_catalog_pages_uses_short_keys_and_deletes_old_dated_p
     assert f"emissions/owid_co2/{DATASET_JSONLD_FILENAME}" not in captured["delete_keys"]
     # ...but the old dated catalog-path location is, so it doesn't linger as duplicate content.
     assert f"{co2_path}/{DATASET_JSONLD_FILENAME}" in captured["delete_keys"]
-    # Whatever else a prior publish left under the short key goes too.
-    assert captured["prune_prefixes"] == ["emissions/owid_co2/"]
 
 
 def test_build_and_publish_catalog_pages_deletes_short_key_for_skipped_dataset(tmp_path: Path, monkeypatch) -> None:
@@ -166,10 +147,9 @@ def test_build_and_publish_catalog_pages_deletes_short_key_for_skipped_dataset(t
 
     captured: dict[str, Any] = {}
 
-    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None, prune_prefixes=None):
+    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None):
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
-        captured["prune_prefixes"] = prune_prefixes
 
     monkeypatch.setattr("etl.catalog_pages.publish.connect_r2", lambda: object())
     monkeypatch.setattr("etl.catalog_pages.publish.sync_page_files", fake_sync_page_files)
@@ -195,10 +175,9 @@ def test_build_and_publish_catalog_pages_deletes_both_locations_for_archived_dat
 
     captured: dict[str, Any] = {}
 
-    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None, prune_prefixes=None):
+    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None):
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
-        captured["prune_prefixes"] = prune_prefixes
 
     monkeypatch.setattr("etl.catalog_pages.publish.connect_r2", lambda: object())
     monkeypatch.setattr("etl.catalog_pages.publish.sync_page_files", fake_sync_page_files)
@@ -222,10 +201,9 @@ def test_build_and_publish_catalog_pages_deletes_dated_path_for_superseded_versi
 
     captured: dict[str, Any] = {}
 
-    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None, prune_prefixes=None):
+    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None):
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
-        captured["prune_prefixes"] = prune_prefixes
 
     monkeypatch.setattr("etl.catalog_pages.publish.connect_r2", lambda: object())
     monkeypatch.setattr("etl.catalog_pages.publish.sync_page_files", fake_sync_page_files)
