@@ -10,7 +10,7 @@ from typing import Any
 
 from owid.catalog.core.datasets import CHANNEL
 from owid.catalog.core.meta import DatasetMeta
-from owid.catalog.schema_org import TableSchemaInput, license_to_url, table_description
+from owid.catalog.schema_org import TableSchemaInput, table_description
 
 # Root-level file/dir names that live directly under catalog_dir and must not be
 # shadowed by a short-key namespace segment.
@@ -38,7 +38,7 @@ class DatasetQualityResult:
         """Whether the dataset page files may be published.
 
         Only the gates about the dataset itself apply: it must be public, redistributable, and not collide with
-        another dataset or a reserved name. Gates about metadata completeness (title, description, license,
+        another dataset or a reserved name. Gates about metadata completeness (title, description,
         provenance) only decide whether ``dataset.jsonld`` is emitted; the page renders whatever metadata exists.
         """
         return not (set(self.blockers) & PAGE_BLOCKERS)
@@ -112,9 +112,6 @@ def assess_dataset_quality(
     if not _has_description(dataset_meta):
         result.blockers.append("missing_description")
 
-    if not _has_license_url(tables):
-        result.blockers.append("missing_license_url")
-
     if not _has_provenance(tables):
         result.blockers.append("missing_provenance")
 
@@ -151,19 +148,6 @@ def _has_description(dataset_meta: DatasetMeta) -> bool:
     # TableMeta.description (a mostly-internal field) counts as the dataset having a
     # description of its own — only an explicit dataset.description does.
     return bool(dataset_meta.description)
-
-
-def _has_license_url(tables: list[TableSchemaInput]) -> bool:
-    # Only source licenses count: the JSON-LD advertises those, never a dataset-level license.
-    for table in tables:
-        for variable in table.variables.values():
-            if license_to_url(variable.license):
-                return True
-            if any(license_to_url(license) for license in variable.licenses):
-                return True
-            if any(license_to_url(origin.license) for origin in variable.origins):
-                return True
-    return False
 
 
 def _has_provenance(tables: list[TableSchemaInput]) -> bool:

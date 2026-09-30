@@ -115,7 +115,7 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     assert manifest["title"] == "Energy dataset"
     assert manifest["description"].startswith("Dataset description.")
     assert manifest["published_at"].endswith("Z")
-    # No dataset-wide license: the sources' own licenses apply (listed in sources.csv).
+    # No license statement anywhere: OWID republishes data produced by others.
     assert "license" not in manifest
     assert manifest["readme"] == "readme.md"
     assert "codebook" not in manifest and "sources" not in manifest

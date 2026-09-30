@@ -87,7 +87,6 @@ def dataset_to_schema_org(
     title = _dataset_title(dataset_meta, tables)
     description = _dataset_description(dataset_meta)
     origins = _unique_origins(tables)
-    license_urls = _license_urls(origins, tables)
 
     result: dict[str, Any] = {
         "@context": "https://schema.org/",
@@ -126,9 +125,6 @@ def dataset_to_schema_org(
         date_modified = _first_valid_date([resolved_version])
         if date_modified:
             result["dateModified"] = date_modified
-    if license_urls:
-        result["license"] = license_urls[0] if len(license_urls) == 1 else license_urls
-
     # Creator is the author of this artifact (the OWID-processed dataset), matching how
     # compiled datasets are marked up elsewhere (HuggingFace, Zenodo, Google's own examples).
     # Upstream producers keep credit in isBasedOn (name + URL) and citation.
@@ -388,23 +384,6 @@ def _unique_origins(tables: list[TableSchemaInput]) -> list[Origin]:
     return [origins[key] for key in order]
 
 
-def _license_urls(origins: list[Origin], tables: list[TableSchemaInput]) -> list[str]:
-    # OWID republishes data produced by others, so what governs reuse is the licenses of the original
-    # sources, not a license of the compilation. A dataset-level license in the .meta.yml is therefore
-    # ignored here; the record lists every distinct source license, most-referenced source first.
-    urls: list[str] = []
-    candidates: list[License | None] = [origin.license for origin in origins]
-    for table in tables:
-        for variable in table.variables.values():
-            candidates.append(variable.license)
-            candidates.extend(variable.licenses)
-    for license in candidates:
-        url = _license_to_url(license)
-        if url and url not in urls:
-            urls.append(url)
-    return urls
-
-
 def license_to_url(license: License | None) -> str | None:
     """Return a resolvable license URL, including canonical URLs for known license names."""
     if not license:
@@ -414,10 +393,6 @@ def license_to_url(license: License | None) -> str | None:
     if license.name:
         return KNOWN_LICENSE_URLS.get(license.name.strip())
     return None
-
-
-def _license_to_url(license: License | None) -> str | None:
-    return license_to_url(license)
 
 
 def _is_based_on(origins: list[Origin]) -> list[dict[str, Any]] | dict[str, Any] | None:

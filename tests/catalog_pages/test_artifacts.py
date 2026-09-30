@@ -106,7 +106,7 @@ def test_build_catalog_page_artifacts_writes_dataset_jsonld_sitemap_and_report(t
     assert jsonld["url"] == "https://catalog.ourworldindata.org/example/example_dataset/"
     assert jsonld["identifier"] == "garden/example/2025-01-01/example_dataset"
     assert jsonld["version"] == "2025-01-01"
-    assert jsonld["license"] == "https://creativecommons.org/licenses/by/4.0/"
+    assert "license" not in jsonld
     assert jsonld["temporalCoverage"] == "2020"
     assert jsonld["variableMeasured"][0]["identifier"] == "value"
     sitemap = (data_dir / "sitemap.xml").read_text()

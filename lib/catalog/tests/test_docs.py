@@ -121,8 +121,6 @@ def test_sources_deduplicates_and_orders_by_usage():
     ]
     ei = sources.set_index("label").loc["Energy Institute – Statistical Review of World Energy (2026)"]
     assert ei["url_main"] == "https://www.energyinst.org/statistical-review/"
-    assert ei["license_name"] == "© Energy Institute 2026"
-    assert ei["license_url"] == "https://www.energyinst.org/terms"
     assert ei["date_accessed"] == "2026-07-02"
 
 
@@ -173,7 +171,7 @@ def test_readme_sections(tmp_path):
     assert readme.index("described by its producer") < readme.index("Notes on our processing step")
     assert "#### Sources\n\n##### Energy Institute – Statistical Review of World Energy (2026)" in readme
     assert "Retrieved from: https://www.energyinst.org/statistical-review/" in readme
-    assert "License: © Energy Institute 2026 (https://www.energyinst.org/terms)" in readme
+    assert "License:" not in readme.split("## License")[0]
     assert "Citation: Energy Institute - Statistical Review of World Energy (2026)." in readme
     assert "## License\n\nOur World in Data collects and republishes this data" in readme
     assert "published under" not in readme

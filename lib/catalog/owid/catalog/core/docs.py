@@ -32,8 +32,6 @@ SOURCES_COLUMNS = [
     "url_main",
     "url_download",
     "citation_full",
-    "license_name",
-    "license_url",
 ]
 
 # Citations follow the same rules as the chart downloads on ourworldindata.org (owid-grapher,
@@ -47,8 +45,9 @@ ETL_STEPS_URL = "https://github.com/owid/etl/tree/master/etl/steps/data/"
 
 LICENSE_NOTE = (
     "Our World in Data collects and republishes this data; it is not the original producer. The licenses of "
-    "the original sources still apply, and each source above lists its own. It is your responsibility to check "
-    "that your use of the data is permitted by them, and to credit the sources correctly."
+    "the original sources still apply; each source above links to the producer's site, where its terms are "
+    "stated. It is your responsibility to check that your use of the data is permitted by them, and to credit "
+    "the sources correctly."
 )
 
 PROCESSING_NOTE = (
@@ -100,8 +99,6 @@ def _origin_key(origin: Origin) -> tuple[Any, ...]:
         origin.url_main,
         origin.url_download,
         origin.citation_full,
-        origin.license.name if origin.license else None,
-        origin.license.url if origin.license else None,
     )
 
 
@@ -133,8 +130,6 @@ def sources_frame(origins_by_column: dict[str, list[Origin]]) -> pd.DataFrame:
                 "url_main": origin.url_main,
                 "url_download": origin.url_download,
                 "citation_full": origin.citation_full,
-                "license_name": origin.license.name if origin.license else None,
-                "license_url": origin.license.url if origin.license else None,
             }
         )
     return pd.DataFrame(rows, columns=SOURCES_COLUMNS)
@@ -283,11 +278,6 @@ def _source_section(origin: Origin, level: int = 3) -> str:
         facts.append(f"Retrieved from: {origin.url_main}")
     if origin.url_download:
         facts.append(f"Download: {origin.url_download}")
-    if origin.license and (origin.license.name or origin.license.url):
-        license_text = origin.license.name or ""
-        if origin.license.url:
-            license_text += f" ({origin.license.url})" if license_text else origin.license.url
-        facts.append(f"License: {license_text}")
     lines += [f"{fact}  " for fact in facts]
     lines.append("")
     citation = _clean_text(origin.citation_full)
