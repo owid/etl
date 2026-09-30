@@ -29,7 +29,6 @@ from structlog import get_logger
 from etl.catalog_pages.pages import (
     DATASET_JSONLD_FILENAME,
     page_build_checksum,
-    remove_page_files,
     write_page_files,
 )
 from etl.catalog_pages.quality import (
@@ -134,7 +133,6 @@ def build_catalog_page_artifacts(
     for entry in result.archived_entries:
         if not dry_run:
             _remove_if_exists(catalog_dir / entry.catalog_path / DATASET_JSONLD_FILENAME)
-            remove_page_files(Dataset(catalog_dir / entry.catalog_path), output_dir / entry.namespace / entry.dataset)
     for entry in result.superseded_entries:
         # Its short key is legitimately owned by the active version emitted elsewhere in this
         # same build (or by nothing, if that active version is itself quality-skipped) — only
@@ -155,7 +153,6 @@ def build_catalog_page_artifacts(
         # previously published artifacts are left untouched.
         if only is None and not ds.metadata.jsonld:
             continue
-        target_dir = output_dir / entry.namespace / entry.dataset
         tables = load_table_schema_inputs(ds)
         quality = assess_dataset_quality(
             catalog_path=catalog_path,
@@ -165,13 +162,11 @@ def build_catalog_page_artifacts(
             duplicate_short_key=catalog_path in duplicate_catalog_paths,
         )
         if not quality.is_page_eligible:
-            # The dataset must not be served at all: remove every page file, locally here and on R2 in the
-            # publish step.
+            # The dataset must not be served at all: the publish step removes every page file from R2.
             result.skipped.append(quality)
             result.skipped_entries.append(entry)
             if not dry_run:
                 _remove_if_exists(Path(ds.path) / DATASET_JSONLD_FILENAME)
-                remove_page_files(ds, target_dir)
             continue
 
         # The JSON-LD side product has stricter gates than the page: metadata must be complete, and no Jinja
@@ -202,47 +197,35 @@ def build_catalog_page_artifacts(
                 result.warnings.append(quality)
         if not dry_run:
             # The dataset used to be served at its dated catalog-folder path; that location is no longer
-            # written to, so clean up anything left over from a prior publish. A JSON-LD that failed its
-            # gates this time must not linger at the short key either.
+            # written to, so clean up anything left over from a prior publish.
             _remove_if_exists(Path(ds.path) / DATASET_JSONLD_FILENAME)
-            if jsonld is None:
-                _remove_if_exists(target_dir / DATASET_JSONLD_FILENAME)
 
-        if dry_run:
-            result.pages.append(catalog_path)
-            result.page_entries.append(entry)
-        else:
             build_checksum = page_build_checksum(
                 ds, short_key=entry.short_key, base_url=base_url, has_jsonld=jsonld is not None
             )
             if published_build_checksum and published_build_checksum(entry.short_key) == build_checksum:
-                result.pages.append(catalog_path)
-                result.page_entries.append(entry)
                 result.pages_unchanged.append(catalog_path)
-                sitemap_entries.append(_sitemap_entry(entry, base_url))
-                continue
-            # The page writer also writes the JSON-LD, so that its file list is the manifest's.
-            try:
-                page_files = write_page_files(
-                    ds,
-                    output_dir=output_dir,
-                    catalog_dir=catalog_dir,
-                    catalog_path=catalog_path,
-                    short_key=entry.short_key,
-                    version=entry.version,
-                    base_url=base_url,
-                    jsonld=jsonld,
-                    topics=dataset_keywords(tables),
-                    build_checksum=build_checksum,
-                )
-            except Exception as error:  # noqa: BLE001 - one broken dataset must not stop the whole publish.
-                log.error("catalog_pages.page_failed", dataset=catalog_path, error=str(error))
-                result.page_failures[catalog_path] = str(error)
-                continue
-            result.pages.append(catalog_path)
-            result.page_entries.append(entry)
-            result.page_keys.extend(page_files.keys)
-
+            else:
+                # The page writer also writes the JSON-LD, so that its file list is the manifest's.
+                try:
+                    page_files = write_page_files(
+                        ds,
+                        output_dir=output_dir,
+                        catalog_path=catalog_path,
+                        short_key=entry.short_key,
+                        version=entry.version,
+                        base_url=base_url,
+                        jsonld=jsonld,
+                        topics=dataset_keywords(tables),
+                        build_checksum=build_checksum,
+                    )
+                except Exception as error:  # noqa: BLE001 - one broken dataset must not stop the whole publish.
+                    log.error("catalog_pages.page_failed", dataset=catalog_path, error=str(error))
+                    result.page_failures[catalog_path] = str(error)
+                    continue
+                result.page_keys.extend(page_files.keys)
+        result.pages.append(catalog_path)
+        result.page_entries.append(entry)
         sitemap_entries.append(_sitemap_entry(entry, base_url))
 
     if not dry_run:

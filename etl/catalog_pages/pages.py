@@ -9,7 +9,7 @@ metadata by ``owid.catalog``. The manifest contract (version 1) is shared with t
 
 from __future__ import annotations
 
-import hashlib
+import functools
 import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -17,11 +17,14 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
 
+import owid.catalog
 import pandas as pd
-from owid.catalog import Dataset, schema_org
-from owid.catalog.core import docs, tables
+from owid.catalog import Dataset
+from owid.catalog.core import docs
 from owid.catalog.core.docs import dataset_title, fits_in_excel, ordered_table_names, table_citation
 from structlog import get_logger
+
+from etl import files as etl_files
 
 log = get_logger()
 
@@ -39,7 +42,7 @@ TABLE_DOCUMENTATION = ("codebook.csv", "sources.csv")
 # pipeline's own files, published with the dataset (a CSV among them only when the step saves one); the page
 # writer never writes into that folder, which belongs to the pipeline (a CSV there would become one of the
 # dataset's data files, and change its checksum).
-VERSIONED_SUFFIXES = {"csv": "csv", "parquet": "parquet", "feather": "feather", "meta.json": "json"}
+VERSIONED_SUFFIXES = {suffix: "json" if suffix == "meta.json" else suffix for suffix in docs.VERSIONED_SUFFIXES}
 # Formats that count as a download of the data in the JSON-LD (the dated metadata file is not one).
 DATA_FORMATS = ("csv", "parquet", "feather", "xlsx")
 # What each file is for, so the page can group them: the data itself, the documentation, and the dated files of
@@ -82,18 +85,21 @@ def page_build_checksum(ds: Dataset, *, short_key: str, base_url: str, has_jsonl
     whether the page has a JSON-LD. A page whose fingerprint matches the published manifest's ``build_checksum`` is
     left as it is, so a publish only rebuilds the pages of datasets that changed.
     """
-    code = [Path(__file__), Path(docs.__file__), Path(tables.__file__), Path(schema_org.__file__)]
-    code += sorted(Path(__file__).parent.glob("*.py"))
-    parts = [ds.checksum(), short_key, base_url.rstrip("/"), str(has_jsonld)]
-    parts += [hashlib.md5(path.read_bytes()).hexdigest() for path in dict.fromkeys(code)]
-    return hashlib.md5(",".join(parts).encode()).hexdigest()
+    parts = [ds.checksum(), short_key, base_url.rstrip("/"), str(has_jsonld), _code_checksum()]
+    return etl_files.checksum_str(",".join(parts))
+
+
+@functools.cache
+def _code_checksum() -> str:
+    """Checksum of the code that renders page files: all of owid.catalog, and this package."""
+    code = sorted(Path(owid.catalog.__file__).parent.rglob("*.py")) + sorted(Path(__file__).parent.glob("*.py"))
+    return etl_files.checksum_str(",".join(etl_files.checksum_file(path) for path in code))
 
 
 def write_page_files(
     ds: Dataset,
     *,
     output_dir: Path,
-    catalog_dir: Path,
     catalog_path: str,
     short_key: str,
     version: str,
@@ -104,8 +110,7 @@ def write_page_files(
 ) -> PageFiles:
     """Write the data files, documentation, README, manifest and JSON-LD of a dataset into ``output_dir / short_key``.
 
-    The dataset is read from ``catalog_dir``, which is never written to: its dated folder ``catalog_path`` only
-    supplies the links to this version. ``build_checksum`` (see :func:`page_build_checksum`) is recorded in the
+    The dataset's own folder is never written to: it only supplies the links to this version. ``build_checksum`` (see :func:`page_build_checksum`) is recorded in the
     manifest, for the next publish to compare against.
 
     ``jsonld`` is the Schema.org record built from the dataset's metadata (``None`` when the dataset failed a
@@ -122,7 +127,7 @@ def write_page_files(
     files: list[dict[str, Any]] = []
 
     def register(name: str, format: str, role: str, table: str | None = None, versioned: bool = False) -> None:
-        path = (catalog_dir / catalog_path / name) if versioned else (target_dir / name)
+        path = (Path(ds.path) / name) if versioned else (target_dir / name)
         entry: dict[str, Any] = {
             "name": name,
             "format": format,
@@ -167,8 +172,6 @@ def write_page_files(
             reason = f"{len(flat):,} rows plus the header exceed Excel's limit of {docs.EXCEL_MAX_ROWS:,}"
             result.xlsx_skipped[name] = entry["xlsx_skipped"] = reason
             log.warning("catalog_pages.xlsx_skipped", dataset=catalog_path, table=name, reason=reason)
-            # A workbook left by an earlier build, when the table was smaller, must not be served as current.
-            (target_dir / f"{name}.xlsx").unlink(missing_ok=True)
         else:
             table.to_excel(target_dir / f"{name}.xlsx", sheet_name="data", metadata_sheet_name="codebook", index=False)
             register(f"{name}.xlsx", "xlsx", ROLE_DATA, table=name)
@@ -182,10 +185,9 @@ def write_page_files(
     register(README_FILENAME, "md", ROLE_DOCUMENTATION)
 
     # Links to this version: the pipeline's own dated files, where they exist.
-    dated_dir = catalog_dir / catalog_path
     for name in ordered_table_names(ds):
         for suffix, format in VERSIONED_SUFFIXES.items():
-            if (dated_dir / f"{name}.{suffix}").exists():
+            if (Path(ds.path) / f"{name}.{suffix}").exists():
                 register(f"{name}.{suffix}", format, ROLE_ARCHIVE, table=name, versioned=True)
 
     if jsonld is not None:
@@ -242,10 +244,3 @@ def jsonld_distributions(files: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for entry in files
         if entry["role"] in (ROLE_DATA, ROLE_ARCHIVE) and entry["format"] in DATA_FORMATS
     ]
-
-
-def remove_page_files(ds: Dataset, target_dir: Path) -> None:
-    for name in page_filenames(ds):
-        path = target_dir / name
-        if path.exists():
-            path.unlink()

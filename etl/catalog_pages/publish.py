@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import concurrent.futures
+import functools
 import json
 import tempfile
 from pathlib import Path
@@ -17,6 +18,8 @@ from etl import config, files
 from etl.catalog_pages.artifacts import (
     QUALITY_REPORT_FILENAME,
     SITEMAP_FILENAME,
+    JsonLdBuildResult,
+    LatestDatasetPath,
     build_catalog_page_artifacts,
 )
 from etl.catalog_pages.pages import DATASET_JSONLD_FILENAME, MANIFEST_FILENAME, page_filenames
@@ -49,54 +52,36 @@ def build_and_publish_catalog_pages(
     archived on-disk builds (see :func:`etl.catalog_pages.artifacts.latest_dataset_paths`).
     Defaults to the real DAG; tests should pass an explicit set instead.
     """
-    with tempfile.TemporaryDirectory(prefix="catalog-pages-") as output_dir:
-        _build_and_publish(
-            output_dir=Path(output_dir),
-            bucket=bucket,
+    with tempfile.TemporaryDirectory(prefix="catalog-pages-") as tmp:
+        output_dir = Path(tmp)
+        s3 = None if dry_run else connect_r2()
+        result = build_catalog_page_artifacts(
+            output_dir=output_dir,
             catalog_dir=catalog_dir,
             channel=channel,
             dry_run=dry_run,
             base_url=base_url,
             only=only,
             active_steps=active_steps,
+            published_build_checksum=functools.partial(published_build_checksum, s3, bucket) if s3 else None,
         )
+        if dry_run:
+            print(
+                f"Catalog pages dry run: would write pages for {len(result.pages)} datasets, emit JSON-LD for "
+                f"{len(result.emitted)}, skip {len(result.skipped)}, warn {len(result.warnings)}"
+            )
+            return
+        sync_page_files(s3, bucket, output_dir, *_page_keys(result, catalog_dir))
 
 
-def _build_and_publish(
-    *,
-    output_dir: Path,
-    bucket: str,
-    catalog_dir: Path,
-    channel: CHANNEL,
-    dry_run: bool,
-    base_url: str,
-    only: set[str] | None,
-    active_steps: set[str] | None,
-) -> None:
-    s3 = None if dry_run else connect_r2()
-    result = build_catalog_page_artifacts(
-        output_dir=output_dir,
-        catalog_dir=catalog_dir,
-        channel=channel,
-        dry_run=dry_run,
-        base_url=base_url,
-        only=only,
-        active_steps=active_steps,
-        published_build_checksum=(lambda short_key: published_build_checksum(s3, bucket, short_key)) if s3 else None,
-    )
-    if dry_run:
-        print(
-            f"Catalog pages dry run: would write pages for {len(result.pages)} datasets, emit JSON-LD for "
-            f"{len(result.emitted)}, skip {len(result.skipped)}, warn {len(result.warnings)}"
-        )
-        return
-
+def _page_keys(result: JsonLdBuildResult, catalog_dir: Path) -> tuple[list[str], list[str]]:
+    """The keys to upload and the keys to delete (when they exist on R2) after a build."""
     # Datasets are served at their stable "<namespace>/<dataset>" short key rather than their dated catalog
     # path. Every page file written this time is synced (unchanged pages wrote none); the sitemap and quality
     # report live at the root.
     keys = list(result.page_keys) + [SITEMAP_FILENAME, QUALITY_REPORT_FILENAME]
 
-    def short_key_files(entry: Any) -> list[str]:
+    def short_key_files(entry: LatestDatasetPath) -> list[str]:
         ds = Dataset(catalog_dir / entry.catalog_path)
         return [f"{entry.short_key}/{name}" for name in page_filenames(ds)]
 
@@ -104,12 +89,12 @@ def _build_and_publish(
     # longer written locally (superseded by the short key above), but a prior publish may
     # still have left it live on R2, which would otherwise sit around as duplicate content.
     delete_keys = [f"{entry.catalog_path}/{DATASET_JSONLD_FILENAME}" for entry in result.page_entries]
-    # A page-eligible dataset that failed a JSON-LD gate keeps its page but loses its JSON-LD.
-    delete_keys.extend(
-        f"{entry.short_key}/{DATASET_JSONLD_FILENAME}"
-        for entry in result.page_entries
-        if entry not in result.emitted_entries
-    )
+    # A rebuilt page owns only the files it wrote this time; anything else a prior build left at its short key goes
+    # (a JSON-LD that failed its gates now, a workbook for a table that outgrew Excel). The sync never deletes a key
+    # it uploads.
+    for entry in result.page_entries:
+        if entry.catalog_path not in result.pages_unchanged:
+            delete_keys.extend(short_key_files(entry))
     # Datasets that newly failed a page gate (e.g. non_redistributable) must stop being served: delete both
     # the stale dated-path JSON-LD and every page file a prior publish may have written at the short key.
     delete_keys.extend(f"{entry.catalog_path}/{DATASET_JSONLD_FILENAME}" for entry in result.skipped_entries)
@@ -128,7 +113,7 @@ def _build_and_publish(
     # the active version legitimately owns instead.
     delete_keys.extend(f"{entry.catalog_path}/{DATASET_JSONLD_FILENAME}" for entry in result.superseded_entries)
 
-    sync_page_files(s3, bucket, output_dir, keys, delete_keys=delete_keys)
+    return keys, [key for key in dict.fromkeys(delete_keys) if key not in keys]
 
 
 def published_build_checksum(s3: Any, bucket: str, short_key: str) -> str | None:
@@ -152,38 +137,28 @@ def sync_page_files(
     """
     manifests = [key for key in keys if key.endswith(f"/{MANIFEST_FILENAME}")]
     others = [key for key in keys if key not in manifests]
+    deletes = [key for key in dict.fromkeys(delete_keys or []) if key not in keys]
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [_upload_if_changed(executor, s3, bucket, local_dir, key) for key in others]
-        for key in delete_keys or []:
-            if key in keys:
-                continue
-            if get_remote_checksum(s3, bucket, key) is not None:
-                print(f"  DEL {key}")
-                futures.append(executor.submit(s3.delete_object, Bucket=bucket, Key=key))
-        _raise_on_failure(futures)
-        _raise_on_failure([_upload_if_changed(executor, s3, bucket, local_dir, key) for key in manifests])
+        futures = [executor.submit(_upload_if_changed, s3, bucket, local_dir, key) for key in others]
+        futures += [executor.submit(_delete_if_exists, s3, bucket, key) for key in deletes]
+        for future in futures:
+            future.result()
+        for future in [executor.submit(_upload_if_changed, s3, bucket, local_dir, key) for key in manifests]:
+            future.result()
 
 
-def _upload_if_changed(
-    executor: concurrent.futures.Executor, s3: Any, bucket: str, local_dir: Path, key: str
-) -> concurrent.futures.Future | None:
+def _upload_if_changed(s3: Any, bucket: str, local_dir: Path, key: str) -> None:
     local_path = local_dir / key
     if not local_path.exists():
-        return None
+        return
     checksum = files.checksum_file(local_path)
     if checksum == get_remote_checksum(s3, bucket, key):
-        return None
+        return
     print(f"  PUT {key}")
-    return executor.submit(
-        s3.upload_file,
-        local_path.as_posix(),
-        bucket,
-        key,
-        ExtraArgs={"ACL": "public-read", "Metadata": {"md5": checksum}},
-    )
+    s3.upload_file(local_path.as_posix(), bucket, key, ExtraArgs={"ACL": "public-read", "Metadata": {"md5": checksum}})
 
 
-def _raise_on_failure(futures: list[concurrent.futures.Future | None]) -> None:
-    for future in futures:
-        if future is not None:
-            future.result()
+def _delete_if_exists(s3: Any, bucket: str, key: str) -> None:
+    if get_remote_checksum(s3, bucket, key) is not None:
+        print(f"  DEL {key}")
+        s3.delete_object(Bucket=bucket, Key=key)

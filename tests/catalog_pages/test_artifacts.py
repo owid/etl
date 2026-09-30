@@ -254,9 +254,6 @@ def test_build_catalog_page_artifacts_cleans_up_dataset_archived_with_no_replace
     LocalCatalog(data_dir, channels=("garden",)).reindex()
     stale_dated = data_dir / archived / "dataset.jsonld"
     stale_dated.write_text('{"from": "before archiving"}')
-    stale_short_key = data_dir / "emissions" / "owid_co2" / "dataset.jsonld"
-    stale_short_key.parent.mkdir(parents=True)
-    stale_short_key.write_text('{"from": "before archiving"}')
 
     result = build_catalog_page_artifacts(
         output_dir=data_dir,
@@ -270,7 +267,6 @@ def test_build_catalog_page_artifacts_cleans_up_dataset_archived_with_no_replace
     assert result.skipped == []
     assert [entry.catalog_path for entry in result.archived_entries] == [archived]
     assert not stale_dated.exists()
-    assert not stale_short_key.exists()
 
 
 def test_build_catalog_page_artifacts_archived_multi_table_dataset_yields_one_entry(tmp_path: Path) -> None:
@@ -352,27 +348,6 @@ def test_build_catalog_page_artifacts_omits_lastmod_for_non_date_version(tmp_pat
     sitemap = (data_dir / "sitemap.xml").read_text()
     assert "<loc>https://catalog.ourworldindata.org/emissions/owid_co2/</loc>" in sitemap
     assert "<lastmod>" not in sitemap
-
-
-def test_build_catalog_page_artifacts_removes_short_key_artifact_when_dataset_becomes_ineligible(
-    tmp_path: Path,
-) -> None:
-    """A dataset emitted at its short key by a prior build must have that local artifact removed
-    once it fails a quality gate, so an ineligible dataset can't keep a stale public JSON-LD."""
-    data_dir = tmp_path / "data"
-    path = _add_eligible_dataset(data_dir, namespace="wb", dataset="restricted", non_redistributable=True)
-    LocalCatalog(data_dir, channels=("garden",)).reindex()
-    stale_short_key = data_dir / "wb" / "restricted" / "dataset.jsonld"
-    stale_short_key.parent.mkdir(parents=True)
-    stale_short_key.write_text('{"from": "a prior build"}')
-
-    result = build_catalog_page_artifacts(
-        output_dir=data_dir, catalog_dir=data_dir, channel="garden", active_steps={_step_uri(path)}
-    )
-
-    assert result.emitted == []
-    assert [entry.short_key for entry in result.skipped_entries] == ["wb/restricted"]
-    assert not stale_short_key.exists()
 
 
 def test_build_catalog_page_artifacts_blocks_reserved_namespace(tmp_path: Path) -> None:

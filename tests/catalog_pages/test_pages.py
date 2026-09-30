@@ -7,6 +7,7 @@ from owid.catalog.api.legacy import LocalCatalog
 
 from etl.catalog_pages.artifacts import build_catalog_page_artifacts
 from etl.catalog_pages.pages import MANIFEST_VERSION, page_filenames
+from etl.catalog_pages.publish import _page_keys
 
 ORIGIN = Origin(
     producer="Example Producer",
@@ -276,20 +277,22 @@ def test_dataset_saved_as_csv_gets_a_dated_csv_link(tmp_path: Path) -> None:
 def test_table_too_long_for_excel_gets_no_workbook_and_an_older_one_is_removed(tmp_path: Path, monkeypatch) -> None:
     data_dir = tmp_path / "data"
     catalog_path = _add_dataset(data_dir)
-    page_dir = data_dir / "energy" / "owid_energy"
     # Two rows plus the header fit exactly.
     monkeypatch.setattr("owid.catalog.core.docs.EXCEL_MAX_ROWS", 3)
     build_catalog_page_artifacts(
-        output_dir=data_dir, catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
+        output_dir=tmp_path / "first", catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
     )
-    assert (page_dir / "owid_energy.xlsx").exists()
+    assert (tmp_path / "first" / "energy" / "owid_energy" / "owid_energy.xlsx").exists()
 
     # The header takes one row, so two data rows no longer fit; the workbook of the earlier build must go.
     monkeypatch.setattr("owid.catalog.core.docs.EXCEL_MAX_ROWS", 2)
-    build_catalog_page_artifacts(
-        output_dir=data_dir, catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
+    result = build_catalog_page_artifacts(
+        output_dir=tmp_path / "second", catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
     )
+    page_dir = tmp_path / "second" / "energy" / "owid_energy"
     assert not (page_dir / "owid_energy.xlsx").exists()
+    # The published workbook of the earlier build is deleted from R2.
+    assert "energy/owid_energy/owid_energy.xlsx" in _page_keys(result, data_dir)[1]
     manifest = json.loads((page_dir / "manifest.json").read_text())
     assert manifest["tables"][0]["xlsx_skipped"] == "2 rows plus the header exceed Excel's limit of 2"
     assert not [entry for entry in manifest["files"] if entry["format"] == "xlsx"]
@@ -297,14 +300,9 @@ def test_table_too_long_for_excel_gets_no_workbook_and_an_older_one_is_removed(t
     assert ".xlsx" not in (page_dir / "readme.md").read_text()
 
 
-def test_non_redistributable_dataset_gets_no_page_and_stale_files_are_removed(tmp_path: Path) -> None:
+def test_non_redistributable_dataset_gets_no_page_and_its_published_files_are_deleted(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     catalog_path = _add_dataset(data_dir)
-    build_catalog_page_artifacts(
-        output_dir=data_dir, catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
-    )
-    page_dir = data_dir / "energy" / "owid_energy"
-    assert (page_dir / "manifest.json").exists()
 
     ds = Dataset(data_dir / catalog_path)
     ds.metadata.non_redistributable = True
@@ -312,9 +310,11 @@ def test_non_redistributable_dataset_gets_no_page_and_stale_files_are_removed(tm
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
     result = build_catalog_page_artifacts(
-        output_dir=data_dir, catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
+        output_dir=tmp_path / "pages", catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
     )
 
     assert result.pages == []
     assert [item.catalog_path for item in result.skipped] == [catalog_path]
-    assert not any(page_dir.iterdir())
+    assert not (tmp_path / "pages" / "energy").exists()
+    delete_keys = _page_keys(result, data_dir)[1]
+    assert {"energy/owid_energy/manifest.json", "energy/owid_energy/owid_energy.csv"} <= set(delete_keys)

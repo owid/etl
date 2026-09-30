@@ -41,6 +41,10 @@ SOURCES_COLUMNS = [
 OWID_ATTRIBUTION = "Our World in Data"
 MAX_ATTRIBUTIONS_IN_SHORT_CITATION = 3
 
+# Files of a table in its dataset's dated catalog folder that are linked as "this version", when they exist: the
+# pipeline's own files (a CSV only when the step saves one).
+VERSIONED_SUFFIXES = ("csv", "parquet", "feather", "meta.json")
+
 # Where the code of every data step lives, followed by the step's channel, namespace and version.
 ETL_STEPS_URL = "https://github.com/owid/etl/tree/master/etl/steps/data/"
 
@@ -385,11 +389,7 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
             items += [f"    - {url}{name}.{suffix}" for suffix in formats + ("codebook.csv", "sources.csv")]
             # The files the pipeline published for this version, whichever of them exist (a CSV only when the
             # step saves one).
-            dated = [
-                suffix
-                for suffix in ("csv", "parquet", "feather", "meta.json")
-                if (Path(dataset.path) / f"{name}.{suffix}").exists()
-            ]
+            dated = [suffix for suffix in VERSIONED_SUFFIXES if (Path(dataset.path) / f"{name}.{suffix}").exists()]
             if base and dated:
                 items.append(
                     f"  - Links to this version ({meta.version}). They keep pointing at this version after newer releases:"
