@@ -468,7 +468,7 @@ def run() -> None:
     tb = pr.multi_merge([tb_energy_mix, tb_electricity_mix, tb_fossil_fuels], on=["country", "year"], how="outer")
 
     # Add auxiliary columns (ISO codes, population and GDP).
-    tb_regions = ds_regions["regions"].reset_index()[["name", "iso_alpha3"]]
+    tb_regions = ds_regions.read("regions")[["name", "iso_alpha3"]]
     tb_regions = tb_regions.rename(columns={"name": "country", "iso_alpha3": "iso_code"})
     tb = pr.merge(tb, tb_regions, on="country", how="left")
     tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
