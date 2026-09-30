@@ -253,6 +253,25 @@ def test_page_is_written_even_when_jsonld_gates_fail(tmp_path: Path) -> None:
     assert "energy/owid_energy/dataset.jsonld" not in result.page_keys
 
 
+def test_table_too_long_for_excel_gets_no_workbook_and_an_older_one_is_removed(tmp_path: Path, monkeypatch) -> None:
+    data_dir = tmp_path / "data"
+    catalog_path = _add_dataset(data_dir)
+    page_dir = data_dir / "energy" / "owid_energy"
+    dated_dir = data_dir / catalog_path
+    # Two rows plus the header fit exactly.
+    monkeypatch.setattr("etl.catalog_pages.pages.EXCEL_MAX_ROWS", 3)
+    build_catalog_page_artifacts(catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)})
+    assert (page_dir / "owid_energy.xlsx").exists() and (dated_dir / "owid_energy.xlsx").exists()
+
+    # The header takes one row, so two data rows no longer fit; the workbooks of the earlier build must go.
+    monkeypatch.setattr("etl.catalog_pages.pages.EXCEL_MAX_ROWS", 2)
+    build_catalog_page_artifacts(catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)})
+    assert not (page_dir / "owid_energy.xlsx").exists() and not (dated_dir / "owid_energy.xlsx").exists()
+    manifest = json.loads((page_dir / "manifest.json").read_text())
+    assert manifest["tables"][0]["xlsx_skipped"] == "2 rows plus the header exceed Excel's limit of 2"
+    assert not [entry for entry in manifest["files"] if entry["format"] == "xlsx"]
+
+
 def test_non_redistributable_dataset_gets_no_page_and_stale_files_are_removed(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     catalog_path = _add_dataset(data_dir)

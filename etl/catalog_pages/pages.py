@@ -33,7 +33,7 @@ DATASET_JSONLD_FILENAME = "dataset.jsonld"
 TABLE_FORMATS = ("csv", "parquet", "xlsx")
 # Documentation files written next to each table.
 TABLE_DOCUMENTATION = ("codebook.csv", "sources.csv")
-# Rows an Excel sheet can hold; a longer table gets no workbook rather than a truncated one.
+# Rows an Excel sheet can hold, header included; a longer table gets no workbook rather than a truncated one.
 EXCEL_MAX_ROWS = 1_048_576
 # Dated catalog files (immutable) that the manifest links to. The CSV and Excel are copies the page writer puts
 # next to the pipeline's own parquet, feather and metadata, so that every format has a permanent link.
@@ -144,10 +144,12 @@ def write_page_files(
         citation = table_citation(table)
         if citation:
             entry["citation"] = citation
-        if len(flat) > EXCEL_MAX_ROWS:
-            reason = f"{len(flat):,} rows exceed Excel's limit of {EXCEL_MAX_ROWS:,}"
+        if len(flat) + 1 > EXCEL_MAX_ROWS:
+            reason = f"{len(flat):,} rows plus the header exceed Excel's limit of {EXCEL_MAX_ROWS:,}"
             result.xlsx_skipped[name] = entry["xlsx_skipped"] = reason
             log.warning("catalog_pages.xlsx_skipped", dataset=catalog_path, table=name, reason=reason)
+            # A workbook left by an earlier build, when the table was smaller, must not be served as current.
+            (target_dir / f"{name}.xlsx").unlink(missing_ok=True)
         else:
             table.to_excel(target_dir / f"{name}.xlsx", sheet_name="data", metadata_sheet_name="codebook", index=False)
             register(f"{name}.xlsx", "xlsx", ROLE_DATA, table=name)
@@ -165,8 +167,11 @@ def write_page_files(
     dated_dir.mkdir(parents=True, exist_ok=True)
     for name in ordered_table_names(ds):
         for suffix in VERSIONED_COPIES:
-            if (target_dir / f"{name}.{suffix}").exists():
-                shutil.copyfile(target_dir / f"{name}.{suffix}", dated_dir / f"{name}.{suffix}")
+            source = target_dir / f"{name}.{suffix}"
+            if source.exists():
+                shutil.copyfile(source, dated_dir / f"{name}.{suffix}")
+            else:
+                (dated_dir / f"{name}.{suffix}").unlink(missing_ok=True)
         for suffix, format in VERSIONED_SUFFIXES.items():
             if (dated_dir / f"{name}.{suffix}").exists():
                 register(f"{name}.{suffix}", format, ROLE_ARCHIVE, table=name, versioned=True)
