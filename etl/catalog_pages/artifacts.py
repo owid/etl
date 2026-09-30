@@ -272,6 +272,8 @@ def latest_dataset_paths(
     is in the set. Matching is version-agnostic so it survives data re-versioning. Allowlist
     entries that match no dataset are logged as a warning (typo / renamed dataset).
     """
+    # A dataset made private after its page was published drops out here, so nothing deletes that page: it is
+    # removed by hand (see docs/guides/private-import.md), which is rare enough not to automate.
     df = frame.loc[(frame["channel"] == channel) & (frame["is_public"] == True)].copy()  # noqa: E712
     if df.empty:
         if only:
