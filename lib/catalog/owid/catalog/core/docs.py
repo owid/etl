@@ -384,7 +384,7 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
             name = table.metadata.short_name
             items.append(f"- {table.metadata.title or name}")
             items.append("  - Links to the latest data. They always give you the newest release:")
-            items += [f"    - {url}{name}.{suffix}" for suffix in ("csv", "xlsx", "parquet")]
+            items += [f"    - {url}{name}.{suffix}" for suffix in ("csv", "xlsx", "parquet", "codebook.csv", "sources.csv")]
             if base:
                 items.append(
                     f"  - Links to this version ({meta.version}). They always give you the same data, even if there "
