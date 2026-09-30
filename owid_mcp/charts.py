@@ -61,8 +61,8 @@ def _raise_for_caller_error(resp: httpx.Response, chart_id: str) -> None:
 
     - 404: the slug doesn't exist.
     - 403: the chart exists but its data is non-redistributable (e.g. IHME, EIU), so
-      grapher refuses the CSV download. Its JSON body explains why; pass that on so the
-      caller can point the user at the interactive chart instead.
+      grapher refuses the CSV download with a JSON reason; pass that on so the caller
+      can point the user at the interactive chart instead.
 
     Neither is a server fault. Raising `ToolError` passes the message through to the
     client instead of FastMCP's masked "Error calling tool ...", and the WARNING level
@@ -75,13 +75,17 @@ def _raise_for_caller_error(resp: httpx.Response, chart_id: str) -> None:
             log_level=logging.WARNING,
         )
     if resp.status_code == 403:
+        # Only grapher's own JSON refusal is expected; any other 403 (e.g. a Cloudflare
+        # block of our server) is a real fault and should reach Sentry via raise_for_status.
         try:
-            reason = resp.json().get("error")
+            body = resp.json()
         except ValueError:
-            reason = None
+            return
+        reason = body.get("error") if isinstance(body, dict) else None
+        if not reason:
+            return
         raise ToolError(
-            f"Data for OWID chart {chart_id!r} can't be downloaded: "
-            f"{reason or 'access forbidden'} "
+            f"Data for OWID chart {chart_id!r} can't be downloaded: {reason} "
             f"Link the user to the interactive chart instead: https://ourworldindata.org/grapher/{chart_id}",
             log_level=logging.WARNING,
         )
