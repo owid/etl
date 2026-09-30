@@ -479,3 +479,25 @@ async def test_fetch_chart_image_unknown_slug():
             await client.call_tool("fetch_chart_image", {"id": "this-chart-slug-does-not-exist"})
 
         assert "search_chart" in str(exc_info.value)
+
+
+@pytest.mark.asyncio
+async def test_fetch_chart_data_non_redistributable():
+    """Test that a chart whose data grapher refuses to share returns grapher's reason, not a masked error."""
+    async with Client(mcp) as client:
+        with pytest.raises(ToolError) as exc_info:
+            await client.call_tool("fetch_chart_data", {"id": "annual-number-of-deaths-by-cause"})
+
+        message = str(exc_info.value)
+        assert "non-redistributable" in message
+        assert "https://ourworldindata.org/grapher/annual-number-of-deaths-by-cause" in message
+
+
+@pytest.mark.asyncio
+async def test_fetch_chart_data_follows_redirect():
+    """Test that a renamed chart slug is followed to its new location."""
+    async with Client(mcp) as client:
+        output = await client.call_tool(
+            "fetch_chart_data", {"id": "share-electricity-renewables", "time": "2020..2020", "countries": "DEU"}
+        )
+        assert output.structured_content["metadata"]["rows"] > 0  # ty: ignore
