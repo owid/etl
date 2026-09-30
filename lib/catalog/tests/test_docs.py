@@ -147,7 +147,6 @@ def test_readme_sections(tmp_path):
         "    - https://catalog.ourworldindata.org/energy/owid_energy/energy.codebook.csv\n"
         "    - https://catalog.ourworldindata.org/energy/owid_energy/energy.sources.csv\n"
         "  - Links to this version (2026-09-10). They keep pointing at this version after newer releases:\n"
-        "    - https://catalog.ourworldindata.org/garden/energy/2026-09-10/owid_energy/energy.parquet\n"
         "    - https://catalog.ourworldindata.org/garden/energy/2026-09-10/owid_energy/energy.feather\n"
         "    - https://catalog.ourworldindata.org/garden/energy/2026-09-10/owid_energy/energy.meta.json\n"
         "- Source code:\n  - https://github.com/owid/etl/tree/master/etl/steps/data/garden/energy/2026-09-10/"
@@ -204,6 +203,21 @@ def test_readme_omits_excel_links_for_a_table_too_long_for_a_sheet(tmp_path, mon
     readme = ds.readme(url=url)
     assert ".xlsx" not in readme
     assert f"    - {url}energy.csv\n    - {url}energy.parquet\n    - {url}energy.codebook.csv\n" in readme
+
+
+def test_readme_lists_the_version_files_that_exist(tmp_path):
+    ds = make_dataset(tmp_path / "owid_energy")
+    url = "https://catalog.ourworldindata.org/energy/owid_energy/"
+    dated = "https://catalog.ourworldindata.org/garden/energy/2026-09-10/owid_energy/energy"
+    # Saved as feather only: no CSV or parquet link for this version.
+    readme = ds.readme(url=url)
+    assert f"    - {dated}.feather\n    - {dated}.meta.json\n" in readme
+    assert f"{dated}.csv" not in readme and f"{dated}.parquet" not in readme
+    # A step that saves a CSV too gets a CSV link, first.
+    ds.add(make_table(), formats=["feather", "csv"])
+    ds.save()
+    readme = ds.readme(url=url)
+    assert f"    - {dated}.csv\n    - {dated}.feather\n    - {dated}.meta.json\n" in readme
 
 
 def test_readme_multi_table_shows_each_table_description(tmp_path):

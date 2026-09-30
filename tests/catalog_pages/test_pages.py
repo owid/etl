@@ -249,6 +249,28 @@ def test_page_is_written_even_when_jsonld_gates_fail(tmp_path: Path) -> None:
     assert "energy/owid_energy/dataset.jsonld" not in result.page_keys
 
 
+def test_dataset_saved_as_csv_gets_a_dated_csv_link(tmp_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    catalog_path = _add_dataset(data_dir)
+    ds = Dataset(data_dir / catalog_path)
+    ds.add(ds["owid_energy"], formats=["feather", "csv"])
+    ds.save()
+    LocalCatalog(data_dir, channels=("garden",)).reindex()
+
+    result = build_catalog_page_artifacts(
+        catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
+    )
+
+    page_dir = data_dir / "energy" / "owid_energy"
+    manifest = json.loads((page_dir / "manifest.json").read_text())
+    dated = {entry["name"]: entry for entry in manifest["files"] if entry.get("versioned")}
+    assert set(dated) == {"owid_energy.csv", "owid_energy.feather", "owid_energy.meta.json"}
+    assert dated["owid_energy.csv"]["role"] == "archive" and dated["owid_energy.csv"]["format"] == "csv"
+    assert f"https://catalog.ourworldindata.org/{catalog_path}/owid_energy.csv" in (page_dir / "readme.md").read_text()
+    # The pipeline's CSV is uploaded with the dataset, not by the page.
+    assert not [key for key in result.page_keys if key.startswith(f"{catalog_path}/")]
+
+
 def test_table_too_long_for_excel_gets_no_workbook_and_an_older_one_is_removed(tmp_path: Path, monkeypatch) -> None:
     data_dir = tmp_path / "data"
     catalog_path = _add_dataset(data_dir)

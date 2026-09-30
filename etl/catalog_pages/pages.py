@@ -34,9 +34,10 @@ TABLE_FORMATS = ("csv", "parquet", "xlsx")
 # Documentation files written next to each table.
 TABLE_DOCUMENTATION = ("codebook.csv", "sources.csv")
 # Files of the dataset's dated catalog folder that the manifest links to, as a link to one version. They are the
-# pipeline's own files, published with the dataset; the page writer never writes into that folder, which belongs
-# to the pipeline (a CSV there would become one of the dataset's data files, and change its checksum).
-VERSIONED_SUFFIXES = {"parquet": "parquet", "feather": "feather", "meta.json": "json"}
+# pipeline's own files, published with the dataset (a CSV among them only when the step saves one); the page
+# writer never writes into that folder, which belongs to the pipeline (a CSV there would become one of the
+# dataset's data files, and change its checksum).
+VERSIONED_SUFFIXES = {"csv": "csv", "parquet": "parquet", "feather": "feather", "meta.json": "json"}
 # Formats that count as a download of the data in the JSON-LD (the dated metadata file is not one).
 DATA_FORMATS = ("csv", "parquet", "feather", "xlsx")
 # What each file is for, so the page can group them: the data itself, the documentation, and the dated files of

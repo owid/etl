@@ -7,6 +7,7 @@ hand-written text living in step code.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
@@ -382,13 +383,18 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
             items.append(f"- {table.metadata.title or name}")
             items.append("  - Links to the latest data. They always give you the newest release:")
             items += [f"    - {url}{name}.{suffix}" for suffix in formats + ("codebook.csv", "sources.csv")]
-            if base:
+            # The files the pipeline published for this version, whichever of them exist (a CSV only when the
+            # step saves one).
+            dated = [
+                suffix
+                for suffix in ("csv", "parquet", "feather", "meta.json")
+                if (Path(dataset.path) / f"{name}.{suffix}").exists()
+            ]
+            if base and dated:
                 items.append(
                     f"  - Links to this version ({meta.version}). They keep pointing at this version after newer releases:"
                 )
-                items += [
-                    f"    - {base}{catalog_path}/{name}.{suffix}" for suffix in ("parquet", "feather", "meta.json")
-                ]
+                items += [f"    - {base}{catalog_path}/{name}.{suffix}" for suffix in dated]
     if meta.channel and meta.namespace and meta.version:
         items += ["- Source code:", f"  - {ETL_STEPS_URL}{meta.channel}/{meta.namespace}/{meta.version}/"]
     if items:
