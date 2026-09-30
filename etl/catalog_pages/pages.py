@@ -9,6 +9,7 @@ metadata by ``owid.catalog``. The manifest contract (version 1) is shared with t
 from __future__ import annotations
 
 import json
+import shutil
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,7 +18,7 @@ from urllib.parse import urlencode
 
 import pandas as pd
 from owid.catalog import Dataset
-from owid.catalog.core.docs import dataset_title, ordered_table_names
+from owid.catalog.core.docs import dataset_title, ordered_table_names, table_citation
 from structlog import get_logger
 
 log = get_logger()
@@ -34,8 +35,12 @@ TABLE_FORMATS = ("csv", "parquet", "xlsx")
 TABLE_DOCUMENTATION = ("codebook.csv", "sources.csv")
 # Rows an Excel sheet can hold; a longer table gets no workbook rather than a truncated one.
 EXCEL_MAX_ROWS = 1_048_576
-# Dated catalog files (immutable) that the manifest links to when they exist on disk.
-VERSIONED_FORMATS = ("parquet", "feather")
+# Dated catalog files (immutable) that the manifest links to. The CSV and Excel are copies the page writer puts
+# next to the pipeline's own parquet, feather and metadata, so that every format has a permanent link.
+VERSIONED_SUFFIXES = {"csv": "csv", "xlsx": "xlsx", "parquet": "parquet", "feather": "feather", "meta.json": "json"}
+VERSIONED_COPIES = ("csv", "xlsx")
+# Formats that count as a download of the data in the JSON-LD (the dated metadata file is not one).
+DATA_FORMATS = ("csv", "parquet", "feather", "xlsx")
 # What each file is for, so the page can group them: the data itself, the documentation, and the immutable
 # dated copies.
 ROLE_DATA = "data"
@@ -46,6 +51,7 @@ ENCODING_FORMATS = {
     "parquet": "application/vnd.apache.parquet",
     "feather": "application/vnd.apache.arrow.file",
     "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "json": "application/json",
 }
 
 
@@ -110,6 +116,9 @@ def write_page_files(
         files.append(entry)
         if not versioned:
             result.keys.append(f"{short_key}/{name}")
+        elif name.rsplit(".", 1)[-1] in VERSIONED_COPIES:
+            # The pipeline's own dated files are uploaded with the dataset; the page writer's copies are not.
+            result.keys.append(f"{catalog_path}/{name}")
 
     # Per table: the data as CSV, parquet and Excel workbook, its codebook and its sources. The download filename
     # is the table name, which says what the file is once detached from our folders.
@@ -130,6 +139,11 @@ def write_page_files(
             "codebook": f"{name}.codebook.csv",
             "sources": f"{name}.sources.csv",
         }
+        # How to cite the table, in the short form used on the charts; a table without origins (documentation of
+        # the dataset itself) gets none.
+        citation = table_citation(table)
+        if citation:
+            entry["citation"] = citation
         if len(flat) > EXCEL_MAX_ROWS:
             reason = f"{len(flat):,} rows exceed Excel's limit of {EXCEL_MAX_ROWS:,}"
             result.xlsx_skipped[name] = entry["xlsx_skipped"] = reason
@@ -146,11 +160,16 @@ def write_page_files(
     (target_dir / README_FILENAME).write_text(ds.readme(url=url))
     register(README_FILENAME, "md", ROLE_DOCUMENTATION)
 
-    # Immutable, dated copies of the tables as they live in the catalog.
+    # Immutable, dated copies of the tables: every format the page offers, plus the pipeline's own files.
+    dated_dir = catalog_dir / catalog_path
+    dated_dir.mkdir(parents=True, exist_ok=True)
     for name in ordered_table_names(ds):
-        for format in VERSIONED_FORMATS:
-            if (catalog_dir / catalog_path / f"{name}.{format}").exists():
-                register(f"{name}.{format}", format, ROLE_ARCHIVE, table=name, versioned=True)
+        for suffix in VERSIONED_COPIES:
+            if (target_dir / f"{name}.{suffix}").exists():
+                shutil.copyfile(target_dir / f"{name}.{suffix}", dated_dir / f"{name}.{suffix}")
+        for suffix, format in VERSIONED_SUFFIXES.items():
+            if (dated_dir / f"{name}.{suffix}").exists():
+                register(f"{name}.{suffix}", format, ROLE_ARCHIVE, table=name, versioned=True)
 
     if jsonld is not None:
         jsonld = {**jsonld, "distribution": jsonld_distributions(files)}
@@ -202,7 +221,7 @@ def jsonld_distributions(files: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "contentSize": str(entry["size_bytes"]),
         }
         for entry in files
-        if entry["role"] in (ROLE_DATA, ROLE_ARCHIVE)
+        if entry["role"] in (ROLE_DATA, ROLE_ARCHIVE) and entry["format"] in DATA_FORMATS
     ]
 
 

@@ -3,8 +3,6 @@
 import copy
 from pathlib import Path
 
-import pandas as pd
-
 from owid.catalog import Dataset, DatasetMeta, License, Origin, Table
 from owid.catalog.core import docs
 
@@ -43,6 +41,7 @@ def make_table() -> Table:
     tb["hydro_energy_twh"].metadata.unit = "terawatt-hours"
     tb["hydro_energy_twh"].metadata.short_unit = "TWh"
     tb["hydro_energy_twh"].metadata.origins = [EI]
+    tb["hydro_energy_twh"].metadata.description_from_producer = "Hydroelectric output, gross."
     tb["hydro_energy_twh"].metadata.description_processing = "Converted from exajoules."
     tb["hydro_energy_per_capita_kwh"].metadata.title = "Hydropower per capita"
     tb["hydro_energy_per_capita_kwh"].metadata.unit = "kilowatt-hours per person"
@@ -56,6 +55,7 @@ def make_dataset(path: Path) -> Dataset:
     ds = Dataset.create_empty(
         path,
         DatasetMeta(
+            channel="garden",
             namespace="energy",
             short_name="owid_energy",
             version="2026-09-10",
@@ -88,8 +88,10 @@ def test_codebook_uses_short_source_labels():
         "title",
         "description",
         "unit",
+        "date_range",
         "source",
         "description_key",
+        "description_from_producer",
         "description_processing",
     ]
     assert codebook["column"].tolist() == ["country", "year", "hydro_energy_twh", "hydro_energy_per_capita_kwh"]
@@ -97,7 +99,10 @@ def test_codebook_uses_short_source_labels():
     assert hydro["title"] == "Hydropower"
     assert hydro["description"] == "Energy from hydropower."
     assert hydro["unit"] == "terawatt-hours (TWh)"
+    assert hydro["date_range"] == "2020–2021"
+    assert codebook.set_index("column").loc["hydro_energy_per_capita_kwh", "date_range"] == "2020–2020"
     assert hydro["source"] == "Energy Institute – Statistical Review of World Energy (2026)"
+    assert hydro["description_from_producer"] == "Hydroelectric output, gross."
     assert hydro["description_processing"] == "Converted from exajoules."
     assert hydro["description_key"] == ""
     per_capita = codebook.set_index("column").loc["hydro_energy_per_capita_kwh"]
@@ -130,29 +135,49 @@ def test_codebook_labels_match_sources_labels():
 def test_readme_sections(tmp_path):
     ds = make_dataset(tmp_path / "owid_energy")
     readme = ds.readme(url="https://catalog.ourworldindata.org/energy/owid_energy/")
-    assert readme.startswith("# Energy dataset\n")
-    assert "https://catalog.ourworldindata.org/energy/owid_energy/" in readme
+    assert readme.startswith("# Energy dataset\n\n## About this dataset\n\nKey energy metrics.\n")
+    assert "This file documents" not in readme
     assert "## Changelog" in readme
-    assert "## How we process data at Our World in Data" in readme
-    assert "### Hydropower\n\nEnergy from hydropower.\n" in readme
-    assert "Column: `hydro_energy_twh`" in readme
-    assert "Unit: terawatt-hours (TWh)" in readme
+    assert readme.rstrip().endswith(
+        "## Advanced download options\n\n"
+        "- Catalog page:\n  - https://catalog.ourworldindata.org/energy/owid_energy/\n"
+        "- energy\n"
+        "  - Links to the latest data. They always give you the newest release:\n"
+        "    - https://catalog.ourworldindata.org/energy/owid_energy/energy.csv\n"
+        "    - https://catalog.ourworldindata.org/energy/owid_energy/energy.xlsx\n"
+        "    - https://catalog.ourworldindata.org/energy/owid_energy/energy.parquet\n"
+        "  - Links to this version (2026-09-10). They always give you the same data, even if there are newer releases:\n"
+        "    - https://catalog.ourworldindata.org/garden/energy/2026-09-10/owid_energy/energy.csv\n"
+        "    - https://catalog.ourworldindata.org/garden/energy/2026-09-10/owid_energy/energy.xlsx\n"
+        "    - https://catalog.ourworldindata.org/garden/energy/2026-09-10/owid_energy/energy.parquet\n"
+        "    - https://catalog.ourworldindata.org/garden/energy/2026-09-10/owid_energy/energy.feather\n"
+        "    - https://catalog.ourworldindata.org/garden/energy/2026-09-10/owid_energy/energy.meta.json\n"
+        "- Source code:\n  - https://github.com/owid/etl/tree/master/etl/steps/data/garden/energy/2026-09-10/"
+    )
+    # The page's sections, in the page's order: data (one block per table), processing, license.
+    assert "## Data\n\n### energy\n\nTable: `energy`\n\n3 rows × 4 columns.\n\n#### How to cite\n\n" in readme
+    assert (
+        "#### How to cite\n\nEnergy Institute (2026); Population based on various sources (2024) – with minor "
+        "processing by Our World in Data.\n"
+    ) in readme
+    assert "#### Indicators\n\n##### Country\n" in readme
+    assert "##### Hydropower\n\nEnergy from hydropower.\n" in readme
     assert "Column: `hydro_energy_twh`  \nUnit: terawatt-hours (TWh)  \nDate range: 2020–2021" in readme
     # The per-capita column has no 2021 value, so its range is shorter than the table's.
     assert "Column: `hydro_energy_per_capita_kwh`  \nUnit: kilowatt-hours per person  \nDate range: 2020–2020" in readme
     assert "Sources: Energy Institute – Statistical Review of World Energy (2026)" in readme
-    assert "#### Notes on our processing step for this indicator\n\nConverted from exajoules." in readme
-    assert "## Sources\n" in readme
-    assert "### Energy Institute – Statistical Review of World Energy (2026)" in readme
+    assert "###### How is this data described by its producer?\n\nHydroelectric output, gross." in readme
+    assert "###### Notes on our processing step for this indicator\n\nConverted from exajoules." in readme
+    assert readme.index("described by its producer") < readme.index("Notes on our processing step")
+    assert "#### Sources\n\n##### Energy Institute – Statistical Review of World Energy (2026)" in readme
     assert "Retrieved from: https://www.energyinst.org/statistical-review/" in readme
     assert "License: © Energy Institute 2026 (https://www.energyinst.org/terms)" in readme
     assert "Citation: Energy Institute - Statistical Review of World Energy (2026)." in readme
     assert "## License\n\nOur World in Data collects and republishes this data" in readme
     assert "published under" not in readme
-    assert (
-        "## How to cite this dataset\n\nEnergy Institute (2026); Population based on various sources (2024) – with "
-        "minor processing by Our World in Data.\n"
-    ) in readme
+    assert "How to cite this dataset" not in readme
+    order = ["## About this dataset", "## Data", "## How we process data", "## License", "## Advanced download options"]
+    assert [readme.index(heading) for heading in order] == sorted(readme.index(heading) for heading in order)
     assert "[dataset]" not in readme
     assert "Last updated" not in readme
     # Nothing unrendered leaks through.
@@ -167,7 +192,7 @@ def test_readme_skips_jinja_templates(tmp_path):
     ds.add(tb)
     ds.save()
     readme = ds.readme()
-    assert "### hydro_energy_twh\n" in readme
+    assert "##### hydro_energy_twh\n" in readme
     assert "Templated" not in readme
     assert "<%" not in readme and "<<" not in readme
 
@@ -181,6 +206,7 @@ def test_readme_multi_table_shows_each_table_description(tmp_path):
     ds.save()
     readme = ds.readme()
     assert "### Column mapping\n\nTable: `column_mapping`\n\nName of each column in the previous release.\n" in readme
+    assert "#### Sources\n\nThis table has no external sources: its columns document the dataset itself." in readme
 
 
 def test_table_to_excel_includes_sources_sheet(tmp_path):

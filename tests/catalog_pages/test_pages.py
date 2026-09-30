@@ -88,7 +88,7 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
         "owid_energy.xlsx",
         "readme.md",
     ]
-    assert sorted(result.page_keys) == sorted(
+    assert sorted(key for key in result.page_keys if key.startswith("energy/")) == sorted(
         f"energy/owid_energy/{name}" for name in page_filenames(Dataset(data_dir / catalog_path))
     )
 
@@ -101,10 +101,10 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
         codebook.set_index("column").loc["hydro_energy_twh", "source"] == "Example Producer – Original dataset (2025)"
     )
     readme = (page_dir / "readme.md").read_text()
-    assert readme.startswith("# Energy dataset\n")
-    assert "https://catalog.ourworldindata.org/energy/owid_energy/" in readme
+    assert readme.startswith("# Energy dataset\n\n## About this dataset\n")
+    assert "- Catalog page:\n  - https://catalog.ourworldindata.org/energy/owid_energy/" in readme
     assert "## Changelog" in readme
-    assert "### Example Producer – Original dataset (2025)" in readme
+    assert "##### Example Producer – Original dataset (2025)" in readme
 
     manifest = json.loads((page_dir / "manifest.json").read_text())
     assert manifest["manifest_version"] == MANIFEST_VERSION
@@ -137,9 +137,11 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
             "columns": 3,
             "codebook": "owid_energy.codebook.csv",
             "sources": "owid_energy.sources.csv",
+            "citation": "Example Producer (2025) – with minor processing by Our World in Data",
         }
     ]
-    files = {entry["name"]: entry for entry in manifest["files"]}
+    files = {entry["name"]: entry for entry in manifest["files"] if not entry.get("versioned")}
+    dated = {entry["name"]: entry for entry in manifest["files"] if entry.get("versioned")}
     assert {name: entry["role"] for name, entry in files.items()} == {
         "owid_energy.csv": "data",
         "owid_energy.parquet": "data",
@@ -147,8 +149,17 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
         "owid_energy.codebook.csv": "documentation",
         "owid_energy.sources.csv": "documentation",
         "readme.md": "documentation",
-        "owid_energy.feather": "archive",
     }
+    # Every format has a dated, permanent copy: the page's CSV and Excel next to the pipeline's own files.
+    assert {name: entry["role"] for name, entry in dated.items()} == {
+        "owid_energy.csv": "archive",
+        "owid_energy.xlsx": "archive",
+        "owid_energy.feather": "archive",
+        "owid_energy.meta.json": "archive",
+    }
+    assert (data_dir / catalog_path / "owid_energy.csv").read_bytes() == (page_dir / "owid_energy.csv").read_bytes()
+    assert f"{catalog_path}/owid_energy.csv" in result.page_keys
+    assert f"{catalog_path}/owid_energy.feather" not in result.page_keys
     assert files["owid_energy.codebook.csv"]["table"] == "owid_energy"
     assert "table" not in files["readme.md"]
     csv = files["owid_energy.csv"]
@@ -159,16 +170,22 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     parquet = files["owid_energy.parquet"]
     assert parquet["table"] == "owid_energy"
     assert pd.read_parquet(page_dir / "owid_energy.parquet").columns.tolist() == ["country", "year", "hydro_energy_twh"]
-    feather = files["owid_energy.feather"]
+    feather = dated["owid_energy.feather"]
     assert feather["versioned"] is True
+    meta_json = dated["owid_energy.meta.json"]
+    assert meta_json["versioned"] is True and meta_json["format"] == "json"
+    assert meta_json["url"] == f"https://catalog.ourworldindata.org/{catalog_path}/owid_energy.meta.json"
     assert feather["url"] == f"https://catalog.ourworldindata.org/{catalog_path}/owid_energy.feather"
     assert all(entry["url"].startswith("https://") for entry in manifest["files"])
 
     # The JSON-LD lists the same data files as the manifest, so search engines see the downloads the page has.
     jsonld = json.loads((page_dir / "dataset.jsonld").read_text())
+    # The dated metadata file is not a download of the data, so it stays out of the JSON-LD.
     assert [entry["name"] for entry in jsonld["distribution"]] == [
         "owid_energy.csv",
         "owid_energy.parquet",
+        "owid_energy.xlsx",
+        "owid_energy.csv",
         "owid_energy.xlsx",
         "owid_energy.feather",
     ]

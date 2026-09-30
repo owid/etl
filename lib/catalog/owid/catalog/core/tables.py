@@ -40,8 +40,10 @@ CODEBOOK_COLUMNS = [
     "title",
     "description",
     "unit",
+    "date_range",
     "source",
     "description_key",
+    "description_from_producer",
     "description_processing",
 ]
 
@@ -370,13 +372,14 @@ class Table(pd.DataFrame):
 
         One row per column (index columns included) with its title, short description, unit, the
         short labels of its sources, and the longer texts: what you should know about the indicator
-        (``description_key``) and how we processed it (``description_processing``), both as markdown.
+        (``description_key``), how its producer describes it (``description_from_producer``) and how we
+        processed it (``description_processing``), all as markdown.
         The source labels match the ``label`` column of :attr:`sources`, which carries the full
         details (URLs, licenses, citations).
 
         Returns:
-            DataFrame with columns ``column``, ``title``, ``description``, ``unit``, ``source``,
-            ``description_key``, ``description_processing``.
+            DataFrame with columns ``column``, ``title``, ``description``, ``unit``, ``date_range``, ``source``,
+            ``description_key``, ``description_from_producer``, ``description_processing``.
 
         Example:
             ```python
@@ -396,8 +399,10 @@ class Table(pd.DataFrame):
                     "title": docs.variable_title(column, md),
                     "description": utils.remove_details_on_demand(md.description_short or ""),
                     "unit": unit,
+                    "date_range": docs.year_range(self, column) or "",
                     "source": docs.column_source_labels(list(md.origins)),
                     "description_key": docs.description_key_text(md) or "",
+                    "description_from_producer": utils.remove_details_on_demand(md.description_from_producer or ""),
                     "description_processing": utils.remove_details_on_demand(md.description_processing or ""),
                 }
             )

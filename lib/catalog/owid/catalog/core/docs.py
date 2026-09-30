@@ -41,6 +41,9 @@ SOURCES_COLUMNS = [
 OWID_ATTRIBUTION = "Our World in Data"
 MAX_ATTRIBUTIONS_IN_SHORT_CITATION = 3
 
+# Where the code of every data step lives, followed by the step's channel, namespace and version.
+ETL_STEPS_URL = "https://github.com/owid/etl/tree/master/etl/steps/data/"
+
 LICENSE_NOTE = (
     "Our World in Data collects and republishes this data; it is not the original producer. The licenses of "
     "the original sources still apply, and each source above lists its own. It is your responsibility to check "
@@ -49,15 +52,12 @@ LICENSE_NOTE = (
 
 # Paragraph shared with the README of chart downloads on ourworldindata.org.
 PROCESSING_NOTE = (
-    "Our World in Data is almost never the original producer of the data. Almost all of the data we use has "
-    "been compiled by others. If you want to reuse data, it is your responsibility to ensure that you adhere "
-    "to the sources' license and to credit them correctly. Please note that a single time series may have "
-    "more than one source, for example when we stitch together data from different time periods by different "
-    "producers, or when we calculate per capita metrics using population data from a second source.\n\n"
     "Preparing this data involves several processing steps. Depending on the data, this can include "
     "standardizing country names and world region definitions, converting units, calculating derived "
-    "indicators such as per capita measures, as well as adding or adapting metadata such as the name or the "
-    "description given to an indicator.\n"
+    "indicators such as per capita measures, and adding or adapting metadata such as the name or the "
+    "description given to an indicator. An indicator can therefore draw on more than one source, for example "
+    "when we stitch together data from different periods by different producers, or when we calculate per "
+    "capita measures using population data from a second source.\n\n"
     "[Read about our data pipeline](https://docs.owid.io/projects/etl/)."
 )
 
@@ -244,7 +244,7 @@ def _unit(meta: VariableMeta) -> str:
     return unit
 
 
-def _year_range(table: Table, column: str) -> str | None:
+def year_range(table: Table, column: str) -> str | None:
     """First and last year (or date) for which the column has data."""
     for time_column in ("year", "date"):
         if time_column not in table.all_columns:
@@ -272,9 +272,9 @@ def _indicator_section(name: str, meta: VariableMeta, table: Table, level: int) 
     unit = _unit(meta)
     if unit:
         facts.append(f"Unit: {unit}")
-    year_range = _year_range(table, name)
-    if year_range:
-        facts.append(f"Date range: {year_range}")
+    date_range = year_range(table, name)
+    if date_range:
+        facts.append(f"Date range: {date_range}")
     if meta.origins:
         facts.append(f"Sources: {column_source_labels(meta.origins)}")
     lines += [f"{fact}  " for fact in facts]
@@ -282,14 +282,17 @@ def _indicator_section(name: str, meta: VariableMeta, table: Table, level: int) 
     key = description_key_text(meta)
     if key:
         lines += [f"{heading}# What you should know about this indicator", "", key, ""]
+    from_producer = _clean_text(meta.description_from_producer)
+    if from_producer:
+        lines += [f"{heading}# How is this data described by its producer?", "", from_producer, ""]
     processing = _clean_text(meta.description_processing)
     if processing:
         lines += [f"{heading}# Notes on our processing step for this indicator", "", processing, ""]
     return "\n".join(lines)
 
 
-def _source_section(origin: Origin) -> str:
-    lines = [f"### {origin_label(origin)}", ""]
+def _source_section(origin: Origin, level: int = 3) -> str:
+    lines = [f"{'#' * level} {origin_label(origin)}", ""]
     description = _clean_text(origin.description or origin.description_snapshot)
     if description:
         lines += [description, ""]
@@ -335,62 +338,88 @@ def dataset_title(meta: DatasetMeta, tables: list[Table]) -> str:
     return meta.short_name or "Dataset"
 
 
+def table_citation(table: Table) -> str | None:
+    """How to cite one table, in the short form used on the charts; None for a table without origins."""
+    metas = [table.get_column_or_index(column).metadata for column in table.all_columns]
+    origins = unique_origins({column: list(meta.origins) for column, meta in zip(table.all_columns, metas)})
+    if not origins:
+        return None
+    level = "major" if any(meta.processing_level == "major" for meta in metas) else "minor"
+    return citation_short(origins, processing_level=level)
+
+
 def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None) -> str:
-    """Markdown README for a dataset, built from its metadata and that of its tables."""
+    """Markdown README for a dataset: the catalog page as a text file, with the same sections in the same order.
+
+    "About this dataset" (the description, with its changelog), then "Data" with one block per table (how to cite
+    it, its indicators, its sources), then the processing note, the license and the advanced download options.
+    """
     meta = dataset.metadata
     title = dataset_title(meta, tables)
     parts = [f"# {title}", ""]
-    if url:
-        parts += [f"This file documents the dataset published at {url}.", ""]
     description = _clean_text(meta.description)
     if description:
-        parts += [description, ""]
+        parts += ["## About this dataset", "", description, ""]
 
-    parts += ["## How we process data at Our World in Data", "", PROCESSING_NOTE, ""]
-
-    parts += ["## Detailed information about the data", ""]
-    multi_table = len(tables) > 1
-    origins_by_column: dict[str, list[Origin]] = {}
+    parts += ["## Data", ""]
     for table in tables:
-        level = 3
-        if multi_table:
-            table_title = table.metadata.title or table.metadata.short_name or "table"
-            parts += [f"### {table_title}", ""]
-            if table.metadata.short_name:
-                parts += [f"Table: `{table.metadata.short_name}`", ""]
-            table_description = _clean_text(table.metadata.description)
-            if table_description:
-                parts += [table_description, ""]
-            level = 4
+        parts += [f"### {table.metadata.title or table.metadata.short_name or 'table'}", ""]
+        if table.metadata.short_name:
+            parts += [f"Table: `{table.metadata.short_name}`", ""]
+        table_description = _clean_text(table.metadata.description)
+        if table_description:
+            parts += [table_description, ""]
+        parts += [f"{len(table):,} rows × {len(list(table.all_columns))} columns.", ""]
+        citation = table_citation(table)
+        if citation:
+            parts += ["#### How to cite", "", f"{citation}.", ""]
+        parts += ["#### Indicators", ""]
+        origins_by_column: dict[str, list[Origin]] = {}
         for column in table.all_columns:
             column_meta = table.get_column_or_index(column).metadata
-            parts.append(_indicator_section(column, column_meta, table, level))
-            origins_by_column[f"{table.metadata.short_name}.{column}"] = list(column_meta.origins)
+            parts.append(_indicator_section(column, column_meta, table, 5))
+            origins_by_column[column] = list(column_meta.origins)
+        origins = unique_origins(origins_by_column)
+        parts += ["#### Sources", ""]
+        if origins:
+            parts += [_source_section(origin, level=5) for origin in origins]
+        else:
+            parts += ["This table has no external sources: its columns document the dataset itself.", ""]
 
-    origins = unique_origins(origins_by_column)
-    if origins:
-        parts += [
-            "## Sources",
-            "",
-            "These are the sources behind the data in this dataset. Each indicator above names the ones it draws on.",
-            "",
-        ]
-        parts += [_source_section(origin) for origin in origins]
-
+    parts += ["## How we process data", "", PROCESSING_NOTE, ""]
     # No dataset-wide license statement: OWID republishes data produced by others, so the original
     # sources' licenses are what governs reuse, and a single blanket license here would misstate that.
     parts += ["## License", "", LICENSE_NOTE, ""]
 
-    parts += ["## How to cite this dataset", ""]
-    processing_level = (
-        "major"
-        if any(
-            table.get_column_or_index(column).metadata.processing_level == "major"
-            for table in tables
-            for column in table.all_columns
-        )
-        else "minor"
+    # The ways in beyond the download buttons, one per line: the stable data URLs (readable from any tool that
+    # opens a URL), the dated copies that never change, and the source code of the step. The catalog page lists
+    # the same items.
+    items: list[str] = []
+    catalog_path = (
+        f"{meta.channel}/{meta.namespace}/{meta.version}/{meta.short_name}"
+        if meta.channel and meta.namespace and meta.version and meta.short_name
+        else None
     )
-    # The short form only: each source carries its own full citation in the Sources section.
-    parts += [f"{citation_short(origins, processing_level=processing_level)}.", ""]
+    if url:
+        items += ["- Catalog page:", f"  - {url}"]
+        short_key = f"{meta.namespace}/{meta.short_name}/"
+        base = url[: -len(short_key)] if catalog_path and url.endswith(short_key) else None
+        for table in tables:
+            name = table.metadata.short_name
+            items.append(f"- {table.metadata.title or name}")
+            items.append("  - Links to the latest data. They always give you the newest release:")
+            items += [f"    - {url}{name}.{suffix}" for suffix in ("csv", "xlsx", "parquet")]
+            if base:
+                items.append(
+                    f"  - Links to this version ({meta.version}). They always give you the same data, even if there "
+                    "are newer releases:"
+                )
+                items += [
+                    f"    - {base}{catalog_path}/{name}.{suffix}"
+                    for suffix in ("csv", "xlsx", "parquet", "feather", "meta.json")
+                ]
+    if meta.channel and meta.namespace and meta.version:
+        items += ["- Source code:", f"  - {ETL_STEPS_URL}{meta.channel}/{meta.namespace}/{meta.version}/"]
+    if items:
+        parts += ["## Advanced download options", ""] + items + [""]
     return "\n".join(parts).rstrip() + "\n"
