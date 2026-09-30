@@ -20,6 +20,8 @@ if TYPE_CHECKING:
     from owid.catalog.core.tables import Table
 
 # Columns of the sources table, in order.
+# Rows an Excel sheet can hold, header included; a longer table gets no workbook rather than a truncated one.
+EXCEL_MAX_ROWS = 1_048_576
 SOURCES_COLUMNS = [
     "label",
     "producer",
@@ -324,6 +326,10 @@ def table_citation(table: Table) -> str | None:
     return citation_short(origins, processing_level=level)
 
 
+def fits_in_excel(table: Table) -> bool:
+    return len(table) + 1 <= EXCEL_MAX_ROWS
+
+
 def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None) -> str:
     """Markdown README for a dataset: the catalog page as a text file, with the same sections in the same order.
 
@@ -382,19 +388,17 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
         base = url[: -len(short_key)] if catalog_path and url.endswith(short_key) else None
         for table in tables:
             name = table.metadata.short_name
+            formats = ("csv", "xlsx", "parquet") if fits_in_excel(table) else ("csv", "parquet")
             items.append(f"- {table.metadata.title or name}")
             items.append("  - Links to the latest data. They always give you the newest release:")
-            items += [
-                f"    - {url}{name}.{suffix}" for suffix in ("csv", "xlsx", "parquet", "codebook.csv", "sources.csv")
-            ]
+            items += [f"    - {url}{name}.{suffix}" for suffix in formats + ("codebook.csv", "sources.csv")]
             if base:
                 items.append(
                     f"  - Links to this version ({meta.version}). They always give you the same data, even if there "
                     "are newer releases:"
                 )
                 items += [
-                    f"    - {base}{catalog_path}/{name}.{suffix}"
-                    for suffix in ("csv", "xlsx", "parquet", "feather", "meta.json")
+                    f"    - {base}{catalog_path}/{name}.{suffix}" for suffix in formats + ("feather", "meta.json")
                 ]
     if meta.channel and meta.namespace and meta.version:
         items += ["- Source code:", f"  - {ETL_STEPS_URL}{meta.channel}/{meta.namespace}/{meta.version}/"]

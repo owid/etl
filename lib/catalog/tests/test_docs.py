@@ -199,6 +199,17 @@ def test_readme_skips_jinja_templates(tmp_path):
     assert "<%" not in readme and "<<" not in readme
 
 
+def test_readme_omits_excel_links_for_a_table_too_long_for_a_sheet(tmp_path, monkeypatch):
+    ds = make_dataset(tmp_path / "owid_energy")
+    url = "https://catalog.ourworldindata.org/energy/owid_energy/"
+    assert f"    - {url}energy.xlsx\n" in ds.readme(url=url)
+    # The table has three rows; with the header they no longer fit.
+    monkeypatch.setattr("owid.catalog.core.docs.EXCEL_MAX_ROWS", 3)
+    readme = ds.readme(url=url)
+    assert ".xlsx" not in readme
+    assert f"    - {url}energy.csv\n    - {url}energy.parquet\n    - {url}energy.codebook.csv\n" in readme
+
+
 def test_readme_multi_table_shows_each_table_description(tmp_path):
     ds = make_dataset(tmp_path / "owid_energy")
     extra = Table({"column": ["a"], "previous_column": ["b"]}, short_name="column_mapping").set_index("column")
