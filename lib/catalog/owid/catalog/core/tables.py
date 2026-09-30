@@ -390,15 +390,12 @@ class Table(pd.DataFrame):
         rows = []
         for column in self.all_columns:
             md = self.get_column_or_index(column).metadata
-            unit = md.unit or ""
-            if md.short_unit and md.short_unit != md.unit:
-                unit += f" ({md.short_unit})"
             rows.append(
                 {
                     "column": column,
                     "title": docs.variable_title(column, md),
                     "description": utils.remove_details_on_demand(md.description_short or ""),
-                    "unit": unit,
+                    "unit": docs.unit_label(md),
                     "date_range": docs.year_range(self, column) or "",
                     "source": docs.column_source_labels(list(md.origins)),
                     "description_key": docs.description_key_text(md) or "",

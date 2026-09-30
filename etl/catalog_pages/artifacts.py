@@ -271,7 +271,7 @@ def latest_dataset_paths(
     if df.empty:
         if only:
             for dataset_key in sorted(only):
-                log.warning("catalog_jsonld.allowlist_entry_unmatched", dataset=dataset_key, channel=channel)
+                log.warning("catalog_pages.allowlist_entry_unmatched", dataset=dataset_key, channel=channel)
         return []
     if active_steps is None:
         active_steps = graph_nodes(load_dag())
@@ -282,7 +282,7 @@ def latest_dataset_paths(
     if df.empty:
         if only:
             for dataset_key in sorted(only):
-                log.warning("catalog_jsonld.allowlist_entry_unmatched", dataset=dataset_key, channel=channel)
+                log.warning("catalog_pages.allowlist_entry_unmatched", dataset=dataset_key, channel=channel)
         return []
     df["dataset_path"] = df["path"].map(lambda p: str(p).rsplit("/", 1)[0])
     df = df.sort_values("version")
@@ -292,7 +292,7 @@ def latest_dataset_paths(
         latest = latest.copy()
         latest["dataset_key"] = latest["namespace"].astype(str).str.cat(latest["dataset"].astype(str), sep="/")
         for dataset_key in sorted(only - set(latest["dataset_key"])):
-            log.warning("catalog_jsonld.allowlist_entry_unmatched", dataset=dataset_key, channel=channel)
+            log.warning("catalog_pages.allowlist_entry_unmatched", dataset=dataset_key, channel=channel)
         latest = latest[latest["dataset_key"].isin(only)]
 
     entries = [

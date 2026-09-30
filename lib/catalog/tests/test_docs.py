@@ -234,10 +234,3 @@ def test_citations_follow_grapher_rules():
     assert docs.citation_short(origins[:2], processing_level="minor") == (
         "Energy Institute (2026); Population based on various sources (2024) – with minor processing by Our World in Data"
     )
-    long = docs.citation_long("Energy dataset", origins, processing_level="major", url="https://example.org/")
-    assert long == (
-        "Energy Institute (2026); Population based on various sources (2024); Smil (2017); Bolt and van Zanden (2024) – "
-        "with major processing by Our World in Data. “Energy dataset” [dataset]. Energy Institute, “Statistical Review of "
-        "World Energy”; Various sources, “Population”; Smil, “Energy Transitions 2nd edition”; Bolt and van Zanden, "
-        "“Maddison Project Database” [original data]. Retrieved from https://example.org/."
-    )

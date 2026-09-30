@@ -308,7 +308,7 @@ def test_build_catalog_page_artifacts_only_unmatched_entry_warns_and_emits_nothi
 
     assert result.emitted == []
     assert (data_dir / "sitemap.xml").read_text().count("<url>") == 0
-    warnings = [entry for entry in logs if entry["event"] == "catalog_jsonld.allowlist_entry_unmatched"]
+    warnings = [entry for entry in logs if entry["event"] == "catalog_pages.allowlist_entry_unmatched"]
     assert [entry["dataset"] for entry in warnings] == ["wb/does_not_exist"]
 
 

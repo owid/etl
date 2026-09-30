@@ -1,4 +1,4 @@
-"""Quality gates for catalog JSON-LD generation."""
+"""Quality gates for catalog dataset pages and their JSON-LD side product."""
 
 from __future__ import annotations
 

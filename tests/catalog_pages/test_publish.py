@@ -7,7 +7,7 @@ from owid.catalog import Dataset, DatasetMeta, License, Origin, Table, VariableM
 from owid.catalog.api.legacy import LocalCatalog
 
 from etl.catalog_pages.artifacts import DATASET_JSONLD_FILENAME, QUALITY_REPORT_FILENAME, SITEMAP_FILENAME
-from etl.catalog_pages.publish import build_and_publish_catalog_pages, sync_jsonld_artifacts
+from etl.catalog_pages.publish import build_and_publish_catalog_pages, sync_page_files
 
 
 def _step_uri(catalog_path: str) -> str:
@@ -16,7 +16,7 @@ def _step_uri(catalog_path: str) -> str:
 
 
 class FakeS3:
-    """Minimal stand-in for the boto3 S3 client used by sync_jsonld_artifacts."""
+    """Minimal stand-in for the boto3 S3 client used by sync_page_files."""
 
     def __init__(self, remote_md5: dict[str, str] | None = None) -> None:
         self.remote_md5 = dict(remote_md5 or {})
@@ -75,7 +75,7 @@ def _add_eligible_dataset(
     return f"garden/{namespace}/{version}/{dataset}"
 
 
-def test_sync_jsonld_artifacts_uploads_new_and_deletes_stale(tmp_path: Path) -> None:
+def test_sync_page_files_uploads_new_and_deletes_stale(tmp_path: Path) -> None:
     catalog_dir = tmp_path
     new_key = "emissions/owid_co2/dataset.jsonld"
     (catalog_dir / "emissions" / "owid_co2").mkdir(parents=True)
@@ -93,9 +93,7 @@ def test_sync_jsonld_artifacts_uploads_new_and_deletes_stale(tmp_path: Path) -> 
     # The stale key must actually exist on "remote" for a delete to be meaningful/observable.
     s3 = FakeS3(remote_md5={unchanged_key: unchanged_md5, stale_key: "deadbeefdeadbeefdeadbeefdeadbeef"})
 
-    sync_jsonld_artifacts(
-        s3, "test-bucket", catalog_dir, [new_key, unchanged_key], delete_keys=[stale_key, unchanged_key]
-    )
+    sync_page_files(s3, "test-bucket", catalog_dir, [new_key, unchanged_key], delete_keys=[stale_key, unchanged_key])
 
     assert s3.uploaded == [new_key]
     # unchanged_key matches the remote checksum, so it's neither re-uploaded nor deleted (it's
@@ -104,9 +102,9 @@ def test_sync_jsonld_artifacts_uploads_new_and_deletes_stale(tmp_path: Path) -> 
     assert unchanged_key not in s3.deleted
 
 
-def test_sync_jsonld_artifacts_skips_delete_for_local_file_not_on_remote(tmp_path: Path) -> None:
+def test_sync_page_files_skips_delete_for_local_file_not_on_remote(tmp_path: Path) -> None:
     s3 = FakeS3(remote_md5={})
-    sync_jsonld_artifacts(s3, "test-bucket", tmp_path, [], delete_keys=["never/existed/dataset.jsonld"])
+    sync_page_files(s3, "test-bucket", tmp_path, [], delete_keys=["never/existed/dataset.jsonld"])
     assert s3.deleted == []
 
 
@@ -119,12 +117,12 @@ def test_build_and_publish_catalog_pages_uses_short_keys_and_deletes_old_dated_p
 
     captured: dict[str, Any] = {}
 
-    def fake_sync_jsonld_artifacts(s3, bucket, catalog_dir, keys, delete_keys=None):
+    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None):
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
 
     monkeypatch.setattr("etl.catalog_pages.publish.connect_r2", lambda: object())
-    monkeypatch.setattr("etl.catalog_pages.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
+    monkeypatch.setattr("etl.catalog_pages.publish.sync_page_files", fake_sync_page_files)
 
     build_and_publish_catalog_pages(
         bucket="test-bucket", catalog_dir=data_dir, channel="garden", active_steps={_step_uri(co2_path)}
@@ -149,12 +147,12 @@ def test_build_and_publish_catalog_pages_deletes_short_key_for_skipped_dataset(t
 
     captured: dict[str, Any] = {}
 
-    def fake_sync_jsonld_artifacts(s3, bucket, catalog_dir, keys, delete_keys=None):
+    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None):
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
 
     monkeypatch.setattr("etl.catalog_pages.publish.connect_r2", lambda: object())
-    monkeypatch.setattr("etl.catalog_pages.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
+    monkeypatch.setattr("etl.catalog_pages.publish.sync_page_files", fake_sync_page_files)
 
     build_and_publish_catalog_pages(
         bucket="test-bucket", catalog_dir=data_dir, channel="garden", active_steps={_step_uri(restricted_path)}
@@ -177,12 +175,12 @@ def test_build_and_publish_catalog_pages_deletes_both_locations_for_archived_dat
 
     captured: dict[str, Any] = {}
 
-    def fake_sync_jsonld_artifacts(s3, bucket, catalog_dir, keys, delete_keys=None):
+    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None):
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
 
     monkeypatch.setattr("etl.catalog_pages.publish.connect_r2", lambda: object())
-    monkeypatch.setattr("etl.catalog_pages.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
+    monkeypatch.setattr("etl.catalog_pages.publish.sync_page_files", fake_sync_page_files)
 
     build_and_publish_catalog_pages(bucket="test-bucket", catalog_dir=data_dir, channel="garden", active_steps=set())
 
@@ -203,12 +201,12 @@ def test_build_and_publish_catalog_pages_deletes_dated_path_for_superseded_versi
 
     captured: dict[str, Any] = {}
 
-    def fake_sync_jsonld_artifacts(s3, bucket, catalog_dir, keys, delete_keys=None):
+    def fake_sync_page_files(s3, bucket, catalog_dir, keys, delete_keys=None):
         captured["keys"] = keys
         captured["delete_keys"] = delete_keys
 
     monkeypatch.setattr("etl.catalog_pages.publish.connect_r2", lambda: object())
-    monkeypatch.setattr("etl.catalog_pages.publish.sync_jsonld_artifacts", fake_sync_jsonld_artifacts)
+    monkeypatch.setattr("etl.catalog_pages.publish.sync_page_files", fake_sync_page_files)
 
     build_and_publish_catalog_pages(
         bucket="test-bucket", catalog_dir=data_dir, channel="garden", active_steps={_step_uri(current_path)}

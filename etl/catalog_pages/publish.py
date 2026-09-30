@@ -93,10 +93,10 @@ def build_and_publish_catalog_pages(
     # the active version legitimately owns instead.
     delete_keys.extend(f"{entry.catalog_path}/{DATASET_JSONLD_FILENAME}" for entry in result.superseded_entries)
 
-    sync_jsonld_artifacts(connect_r2(), bucket, catalog_dir, keys, delete_keys=delete_keys)
+    sync_page_files(connect_r2(), bucket, catalog_dir, keys, delete_keys=delete_keys)
 
 
-def sync_jsonld_artifacts(
+def sync_page_files(
     s3: Any, bucket: str, catalog_dir: Path, keys: list[str], delete_keys: list[str] | None = None
 ) -> None:
     futures = []

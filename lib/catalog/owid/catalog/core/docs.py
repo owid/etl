@@ -36,8 +36,7 @@ SOURCES_COLUMNS = [
 
 # Citations follow the same rules as the chart downloads on ourworldindata.org (owid-grapher,
 # packages/@ourworldindata/utils/src/metadataHelpers.ts): attributions are the origin's attribution
-# or "Producer (year)"; more than three of them are shortened to the first one "and other sources";
-# the long form names the dataset in curly quotes followed by [dataset] and the original data after it.
+# or "Producer (year)"; more than three of them are shortened to the first one "and other sources".
 OWID_ATTRIBUTION = "Our World in Data"
 MAX_ATTRIBUTIONS_IN_SHORT_CITATION = 3
 
@@ -50,7 +49,6 @@ LICENSE_NOTE = (
     "that your use of the data is permitted by them, and to credit the sources correctly."
 )
 
-# Paragraph shared with the README of chart downloads on ourworldindata.org.
 PROCESSING_NOTE = (
     "Preparing this data involves several processing steps. Depending on the data, this can include "
     "standardizing country names and world region definitions, converting units, calculating derived "
@@ -189,29 +187,6 @@ def citation_short(origins: list[Origin], processing_level: str = "major") -> st
     return f"{text} – {phrase}" if phrase else text
 
 
-def citation_long(title: str, origins: list[Origin], processing_level: str = "major", url: str | None = None) -> str:
-    """Long citation, in the format of the chart downloads on ourworldindata.org."""
-    attributions = attribution_labels(origins)
-    phrase = _processing_phrase(attributions, processing_level)
-    attribution_text = "; ".join(attributions)
-    if phrase:
-        attribution_text += f" – {phrase}"
-    originals: list[str] = []
-    for origin in origins:
-        origin_title = origin.title or origin.title_snapshot
-        if origin.version_producer and origin_title:
-            origin_title = f"{origin_title} {origin.version_producer}"
-        text = ", ".join(part for part in [origin.producer, f"“{origin_title}”" if origin_title else None] if part)
-        if text and text not in originals:
-            originals.append(text)
-    parts = [f"{attribution_text}.", f"“{title}” [dataset]."]
-    if originals:
-        parts.append(f"{'; '.join(originals)} [original data].")
-    if url:
-        parts.append(f"Retrieved from {url}.")
-    return " ".join(parts)
-
-
 def variable_title(name: str, meta: VariableMeta) -> str:
     """Best human title for a column, falling back to its name when the title is a Jinja template."""
     if meta.presentation and meta.presentation.title_public and not _uses_jinja(meta.presentation.title_public):
@@ -237,7 +212,8 @@ def description_key_text(meta: VariableMeta) -> str | None:
     return _clean_text(key)
 
 
-def _unit(meta: VariableMeta) -> str:
+def unit_label(meta: VariableMeta) -> str:
+    """The unit with its short form in brackets, e.g. "terawatt-hours (TWh)"."""
     unit = meta.unit or ""
     if meta.short_unit and meta.short_unit != meta.unit:
         unit += f" ({meta.short_unit})"
@@ -269,7 +245,7 @@ def _indicator_section(name: str, meta: VariableMeta, table: Table, level: int) 
     if description:
         lines += [description, ""]
     facts = [f"Column: `{name}`"]
-    unit = _unit(meta)
+    unit = unit_label(meta)
     if unit:
         facts.append(f"Unit: {unit}")
     date_range = year_range(table, name)

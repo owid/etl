@@ -54,8 +54,6 @@ CHANNEL = Literal[
     "external",
 ]
 
-# Hard limits of the xlsx format.
-
 # all pandas nullable dtypes
 NULLABLE_DTYPES = [f"{sign}{typ}{size}" for typ in ("Int", "Float") for sign in ("", "U") for size in (8, 16, 32, 64)]
 
@@ -331,9 +329,9 @@ class Dataset:
     def readme(self, url: str | None = None) -> str:
         """Markdown README for this dataset, rendered from its metadata and that of its tables.
 
-        Sections: title and dataset description, how we process data, one block per indicator
-        (title, description, unit, date range, sources, processing notes), one block per source,
-        license, and how to cite. ``url`` is where the dataset is published, when known.
+        The catalog page as a text file: the description, then one block per table (how to cite it,
+        its indicators, its sources), the processing note, the license and the download links.
+        ``url`` is where the dataset is published, when known.
         """
         return docs.render_readme(self, [self[name] for name in docs.ordered_table_names(self)], url=url)
 
