@@ -1,13 +1,15 @@
 """Public page files for a catalog dataset: per table its data, codebook and sources; per dataset a README and a manifest.
 
-The files are written into the dataset's stable folder ``<namespace>/<short_name>/`` of the catalog, next to
-the ``dataset.jsonld`` side product. The Cloudflare Worker that serves ``catalog.ourworldindata.org`` renders the
+The files are published at the dataset's stable key ``<namespace>/<short_name>/`` of the catalog bucket, next to
+the ``dataset.jsonld`` side product. They are built in a folder of their own, never in the local catalog, whose
+top level holds only channels. The Cloudflare Worker that serves ``catalog.ourworldindata.org`` renders the
 dataset page from ``manifest.json`` and ``readme.md``; everything in them is derived from the dataset's own
 metadata by ``owid.catalog``. The manifest contract (version 1) is shared with the Worker: keep both sides equal.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -16,8 +18,8 @@ from typing import Any
 from urllib.parse import urlencode
 
 import pandas as pd
-from owid.catalog import Dataset
-from owid.catalog.core import docs
+from owid.catalog import Dataset, schema_org
+from owid.catalog.core import docs, tables
 from owid.catalog.core.docs import dataset_title, fits_in_excel, ordered_table_names, table_citation
 from structlog import get_logger
 
@@ -73,9 +75,24 @@ def page_filenames(ds: Dataset) -> list[str]:
     return names + [README_FILENAME, MANIFEST_FILENAME, DATASET_JSONLD_FILENAME]
 
 
+def page_build_checksum(ds: Dataset, *, short_key: str, base_url: str, has_jsonld: bool) -> str:
+    """Fingerprint of everything a dataset's page files are made from.
+
+    It covers the dataset's data and metadata, the code that renders the page files, where they are published and
+    whether the page has a JSON-LD. A page whose fingerprint matches the published manifest's ``build_checksum`` is
+    left as it is, so a publish only rebuilds the pages of datasets that changed.
+    """
+    code = [Path(__file__), Path(docs.__file__), Path(tables.__file__), Path(schema_org.__file__)]
+    code += sorted(Path(__file__).parent.glob("*.py"))
+    parts = [ds.checksum(), short_key, base_url.rstrip("/"), str(has_jsonld)]
+    parts += [hashlib.md5(path.read_bytes()).hexdigest() for path in dict.fromkeys(code)]
+    return hashlib.md5(",".join(parts).encode()).hexdigest()
+
+
 def write_page_files(
     ds: Dataset,
     *,
+    output_dir: Path,
     catalog_dir: Path,
     catalog_path: str,
     short_key: str,
@@ -83,8 +100,13 @@ def write_page_files(
     base_url: str,
     jsonld: dict[str, Any] | None = None,
     topics: list[str] | None = None,
+    build_checksum: str | None = None,
 ) -> PageFiles:
-    """Write the data files, documentation, README, manifest and JSON-LD of a dataset into ``catalog_dir / short_key``.
+    """Write the data files, documentation, README, manifest and JSON-LD of a dataset into ``output_dir / short_key``.
+
+    The dataset is read from ``catalog_dir``, which is never written to: its dated folder ``catalog_path`` only
+    supplies the links to this version. ``build_checksum`` (see :func:`page_build_checksum`) is recorded in the
+    manifest, for the next publish to compare against.
 
     ``jsonld`` is the Schema.org record built from the dataset's metadata (``None`` when the dataset failed a
     JSON-LD gate). It is written next to the manifest with its ``distribution`` replaced by the manifest's own
@@ -93,7 +115,7 @@ def write_page_files(
     ``topics`` are the dataset's topic tags, most-tagged first; the first one is the dataset's primary topic
     and gives the page its link back to the charts on ourworldindata.org.
     """
-    target_dir = catalog_dir / short_key
+    target_dir = output_dir / short_key
     target_dir.mkdir(parents=True, exist_ok=True)
     url = page_url(base_url, short_key)
     result = PageFiles()
@@ -119,7 +141,7 @@ def write_page_files(
 
     # Per table: the data as CSV, parquet and Excel workbook, its codebook and its sources. The download filename
     # is the table name, which says what the file is once detached from our folders.
-    tables: list[dict[str, Any]] = []
+    table_entries: list[dict[str, Any]] = []
     for name in ordered_table_names(ds):
         table = ds[name].reset_index(drop=not ds[name].primary_key)
         flat = pd.DataFrame(table)
@@ -154,7 +176,7 @@ def write_page_files(
         register(entry["codebook"], "csv", ROLE_DOCUMENTATION, table=name)
         table.sources.to_csv(target_dir / entry["sources"], index=False)
         register(entry["sources"], "csv", ROLE_DOCUMENTATION, table=name)
-        tables.append(entry)
+        table_entries.append(entry)
 
     (target_dir / README_FILENAME).write_text(ds.readme(url=url))
     register(README_FILENAME, "md", ROLE_DOCUMENTATION)
@@ -184,7 +206,7 @@ def write_page_files(
         "published_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "readme": README_FILENAME,
         # First entry is the main table (the one named after the dataset). Each carries its own codebook and sources.
-        "tables": tables,
+        "tables": table_entries,
         "files": files,
     }
     if jsonld is not None:
@@ -192,6 +214,8 @@ def write_page_files(
     if topics:
         manifest["topics"] = topics
         manifest["explore_url"] = explore_url(topics[0])
+    if build_checksum:
+        manifest["build_checksum"] = build_checksum
     with open(target_dir / MANIFEST_FILENAME, "w") as ostream:
         json.dump(manifest, ostream, indent=2, ensure_ascii=False)
         ostream.write("\n")

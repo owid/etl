@@ -72,7 +72,7 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     catalog_path = _add_dataset(data_dir)
 
     result = build_catalog_page_artifacts(
-        catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
+        output_dir=data_dir, catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
     )
 
     assert result.pages == [catalog_path]
@@ -204,7 +204,9 @@ def test_build_writes_one_csv_per_table(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     catalog_path = _add_dataset(data_dir, tables=2)
 
-    build_catalog_page_artifacts(catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)})
+    build_catalog_page_artifacts(
+        output_dir=data_dir, catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
+    )
 
     page_dir = data_dir / "energy" / "owid_energy"
     assert (page_dir / "owid_energy.csv").exists()
@@ -235,7 +237,7 @@ def test_page_is_written_even_when_jsonld_gates_fail(tmp_path: Path) -> None:
     catalog_path = _add_dataset(data_dir, description=None)
 
     result = build_catalog_page_artifacts(
-        catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
+        output_dir=data_dir, catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
     )
 
     assert result.pages == [catalog_path]
@@ -258,7 +260,7 @@ def test_dataset_saved_as_csv_gets_a_dated_csv_link(tmp_path: Path) -> None:
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
     result = build_catalog_page_artifacts(
-        catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
+        output_dir=data_dir, catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
     )
 
     page_dir = data_dir / "energy" / "owid_energy"
@@ -277,12 +279,16 @@ def test_table_too_long_for_excel_gets_no_workbook_and_an_older_one_is_removed(t
     page_dir = data_dir / "energy" / "owid_energy"
     # Two rows plus the header fit exactly.
     monkeypatch.setattr("owid.catalog.core.docs.EXCEL_MAX_ROWS", 3)
-    build_catalog_page_artifacts(catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)})
+    build_catalog_page_artifacts(
+        output_dir=data_dir, catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
+    )
     assert (page_dir / "owid_energy.xlsx").exists()
 
     # The header takes one row, so two data rows no longer fit; the workbook of the earlier build must go.
     monkeypatch.setattr("owid.catalog.core.docs.EXCEL_MAX_ROWS", 2)
-    build_catalog_page_artifacts(catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)})
+    build_catalog_page_artifacts(
+        output_dir=data_dir, catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
+    )
     assert not (page_dir / "owid_energy.xlsx").exists()
     manifest = json.loads((page_dir / "manifest.json").read_text())
     assert manifest["tables"][0]["xlsx_skipped"] == "2 rows plus the header exceed Excel's limit of 2"
@@ -294,7 +300,9 @@ def test_table_too_long_for_excel_gets_no_workbook_and_an_older_one_is_removed(t
 def test_non_redistributable_dataset_gets_no_page_and_stale_files_are_removed(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     catalog_path = _add_dataset(data_dir)
-    build_catalog_page_artifacts(catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)})
+    build_catalog_page_artifacts(
+        output_dir=data_dir, catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
+    )
     page_dir = data_dir / "energy" / "owid_energy"
     assert (page_dir / "manifest.json").exists()
 
@@ -304,7 +312,7 @@ def test_non_redistributable_dataset_gets_no_page_and_stale_files_are_removed(tm
     LocalCatalog(data_dir, channels=("garden",)).reindex()
 
     result = build_catalog_page_artifacts(
-        catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
+        output_dir=data_dir, catalog_dir=data_dir, channel="garden", active_steps={_step_uri(catalog_path)}
     )
 
     assert result.pages == []

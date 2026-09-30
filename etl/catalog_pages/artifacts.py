@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -27,6 +28,7 @@ from structlog import get_logger
 
 from etl.catalog_pages.pages import (
     DATASET_JSONLD_FILENAME,
+    page_build_checksum,
     remove_page_files,
     write_page_files,
 )
@@ -70,10 +72,12 @@ class LatestDatasetPath:
 class JsonLdBuildResult:
     """What a build produced: page files (``pages``, ``page_keys``) and the JSON-LD side product (``emitted``)."""
 
-    # Datasets whose page files (data, codebook, README, manifest) were written, and the keys of those files.
+    # Datasets that have a page (data, codebook, README, manifest), and the keys of the files written this time.
     pages: list[str] = field(default_factory=list)
     page_entries: list[LatestDatasetPath] = field(default_factory=list)
     page_keys: list[str] = field(default_factory=list)
+    # Pages whose build checksum matches the published one: nothing was written for them, and their files stay.
+    pages_unchanged: list[str] = field(default_factory=list)
     # Datasets that were page-eligible but whose files could not be written; keep their published page.
     page_failures: dict[str, str] = field(default_factory=dict)
     # Datasets whose dataset.jsonld was emitted (a subset of the pages: every JSON-LD quality gate passed).
@@ -88,18 +92,22 @@ class JsonLdBuildResult:
 
 def build_catalog_page_artifacts(
     *,
+    output_dir: Path,
     catalog_dir: Path = DATA_DIR,
     channel: CHANNEL = "garden",
     base_url: str = DEFAULT_CATALOG_BASE_URL,
     dry_run: bool = False,
     only: set[str] | None = None,
     active_steps: set[str] | None = None,
+    published_build_checksum: Callable[[str], str | None] | None = None,
 ) -> JsonLdBuildResult:
     """Generate the page files of every opted-in dataset, plus sitemap and JSON-LD quality report, locally.
 
-    The files are written to a stable, version-agnostic short-key tree
-    (``catalog_dir / "<namespace>" / "<dataset>" / ...``) rather than inside the dataset's own dated catalog
-    folder, so the public page URL doesn't change every time the dataset gets a new version. Each page has
+    The datasets are read from ``catalog_dir``, and the files are written into ``output_dir``, laid out as they
+    are published: a stable, version-agnostic short-key tree (``output_dir / "<namespace>" / "<dataset>" / ...``),
+    so the public page URL doesn't change every time the dataset gets a new version. ``published_build_checksum``
+    returns the build checksum recorded in a page's published manifest, given its short key; a page whose
+    checksum is unchanged is not rebuilt. Each page has
     per table its CSV, parquet, workbook, codebook and sources, plus ``readme.md`` and ``manifest.json`` (see
     :mod:`etl.catalog_pages.pages`), and, when the dataset passes every quality gate, ``dataset.jsonld``. When ``only`` is given, restrict generation to
     datasets whose ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist);
@@ -126,7 +134,7 @@ def build_catalog_page_artifacts(
     for entry in result.archived_entries:
         if not dry_run:
             _remove_if_exists(catalog_dir / entry.catalog_path / DATASET_JSONLD_FILENAME)
-            remove_page_files(Dataset(catalog_dir / entry.catalog_path), catalog_dir / entry.namespace / entry.dataset)
+            remove_page_files(Dataset(catalog_dir / entry.catalog_path), output_dir / entry.namespace / entry.dataset)
     for entry in result.superseded_entries:
         # Its short key is legitimately owned by the active version emitted elsewhere in this
         # same build (or by nothing, if that active version is itself quality-skipped) — only
@@ -147,7 +155,7 @@ def build_catalog_page_artifacts(
         # previously published artifacts are left untouched.
         if only is None and not ds.metadata.jsonld:
             continue
-        target_dir = catalog_dir / entry.namespace / entry.dataset
+        target_dir = output_dir / entry.namespace / entry.dataset
         tables = load_table_schema_inputs(ds)
         quality = assess_dataset_quality(
             catalog_path=catalog_path,
@@ -204,10 +212,20 @@ def build_catalog_page_artifacts(
             result.pages.append(catalog_path)
             result.page_entries.append(entry)
         else:
+            build_checksum = page_build_checksum(
+                ds, short_key=entry.short_key, base_url=base_url, has_jsonld=jsonld is not None
+            )
+            if published_build_checksum and published_build_checksum(entry.short_key) == build_checksum:
+                result.pages.append(catalog_path)
+                result.page_entries.append(entry)
+                result.pages_unchanged.append(catalog_path)
+                sitemap_entries.append(_sitemap_entry(entry, base_url))
+                continue
             # The page writer also writes the JSON-LD, so that its file list is the manifest's.
             try:
                 page_files = write_page_files(
                     ds,
+                    output_dir=output_dir,
                     catalog_dir=catalog_dir,
                     catalog_path=catalog_path,
                     short_key=entry.short_key,
@@ -215,6 +233,7 @@ def build_catalog_page_artifacts(
                     base_url=base_url,
                     jsonld=jsonld,
                     topics=dataset_keywords(tables),
+                    build_checksum=build_checksum,
                 )
             except Exception as error:  # noqa: BLE001 - one broken dataset must not stop the whole publish.
                 log.error("catalog_pages.page_failed", dataset=catalog_path, error=str(error))
@@ -224,21 +243,24 @@ def build_catalog_page_artifacts(
             result.page_entries.append(entry)
             result.page_keys.extend(page_files.keys)
 
-        sitemap_entries.append(
-            SitemapEntry(
-                url=f"{base_url.rstrip('/')}/{entry.short_key}/",
-                # Non-date versions (e.g. "latest") carry no real modification date; omit
-                # lastmod rather than stamping the build date, which would falsely mark the
-                # page as modified on every publish.
-                lastmod=entry.version if _VERSION_DATE_RE.match(entry.version) else None,
-            )
-        )
+        sitemap_entries.append(_sitemap_entry(entry, base_url))
 
     if not dry_run:
-        (catalog_dir / SITEMAP_FILENAME).write_text(sitemap_xml(sitemap_entries))
-        (catalog_dir / QUALITY_REPORT_FILENAME).write_text(json.dumps(quality_report(result), indent=2) + "\n")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        (output_dir / SITEMAP_FILENAME).write_text(sitemap_xml(sitemap_entries))
+        (output_dir / QUALITY_REPORT_FILENAME).write_text(json.dumps(quality_report(result), indent=2) + "\n")
 
     return result
+
+
+def _sitemap_entry(entry: LatestDatasetPath, base_url: str) -> SitemapEntry:
+    return SitemapEntry(
+        url=f"{base_url.rstrip('/')}/{entry.short_key}/",
+        # Non-date versions (e.g. "latest") carry no real modification date; omit
+        # lastmod rather than stamping the build date, which would falsely mark the
+        # page as modified on every publish.
+        lastmod=entry.version if _VERSION_DATE_RE.match(entry.version) else None,
+    )
 
 
 def _remove_if_exists(path: Path) -> None:
@@ -415,6 +437,7 @@ def quality_report(result: JsonLdBuildResult) -> dict[str, Any]:
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "summary": {
             "pages": len(result.pages),
+            "pages_unchanged": len(result.pages_unchanged),
             "page_failures": len(result.page_failures),
             "emitted": len(result.emitted),
             "skipped": len(result.skipped),
@@ -422,6 +445,7 @@ def quality_report(result: JsonLdBuildResult) -> dict[str, Any]:
             "archived": len(result.archived_entries),
         },
         "pages": result.pages,
+        "pages_unchanged": result.pages_unchanged,
         "page_failures": result.page_failures,
         "emitted": result.emitted,
         "skipped": [_quality_to_record(item, include_blockers=True) for item in result.skipped],

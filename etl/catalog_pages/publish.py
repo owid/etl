@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import concurrent.futures
+import json
+import tempfile
 from pathlib import Path
 from typing import Any
 
+from botocore.exceptions import ClientError
 from owid.catalog import Dataset
 from owid.catalog.api.legacy import CHANNEL
 from owid.catalog.s3_utils import connect_r2
@@ -16,7 +19,7 @@ from etl.catalog_pages.artifacts import (
     SITEMAP_FILENAME,
     build_catalog_page_artifacts,
 )
-from etl.catalog_pages.pages import DATASET_JSONLD_FILENAME, page_filenames
+from etl.catalog_pages.pages import DATASET_JSONLD_FILENAME, MANIFEST_FILENAME, page_filenames
 from etl.paths import DATA_DIR
 from etl.publish import get_remote_checksum
 
@@ -31,7 +34,11 @@ def build_and_publish_catalog_pages(
     only: set[str] | None = None,
     active_steps: set[str] | None = None,
 ) -> None:
-    """Build the page files of every opted-in dataset locally and sync them to R2.
+    """Build the page files of every opted-in dataset in a temporary folder and sync them to R2.
+
+    Page files are never written into ``catalog_dir``, whose top level holds only channels. A page whose build checksum
+    matches the one in its published manifest is not rebuilt, so rerunning a publish only rebuilds the pages of
+    datasets that changed.
 
     When ``only`` is given, restrict generation to datasets whose
     ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist).
@@ -42,13 +49,40 @@ def build_and_publish_catalog_pages(
     archived on-disk builds (see :func:`etl.catalog_pages.artifacts.latest_dataset_paths`).
     Defaults to the real DAG; tests should pass an explicit set instead.
     """
+    with tempfile.TemporaryDirectory(prefix="catalog-pages-") as output_dir:
+        _build_and_publish(
+            output_dir=Path(output_dir),
+            bucket=bucket,
+            catalog_dir=catalog_dir,
+            channel=channel,
+            dry_run=dry_run,
+            base_url=base_url,
+            only=only,
+            active_steps=active_steps,
+        )
+
+
+def _build_and_publish(
+    *,
+    output_dir: Path,
+    bucket: str,
+    catalog_dir: Path,
+    channel: CHANNEL,
+    dry_run: bool,
+    base_url: str,
+    only: set[str] | None,
+    active_steps: set[str] | None,
+) -> None:
+    s3 = None if dry_run else connect_r2()
     result = build_catalog_page_artifacts(
+        output_dir=output_dir,
         catalog_dir=catalog_dir,
         channel=channel,
         dry_run=dry_run,
         base_url=base_url,
         only=only,
         active_steps=active_steps,
+        published_build_checksum=(lambda short_key: published_build_checksum(s3, bucket, short_key)) if s3 else None,
     )
     if dry_run:
         print(
@@ -58,7 +92,8 @@ def build_and_publish_catalog_pages(
         return
 
     # Datasets are served at their stable "<namespace>/<dataset>" short key rather than their dated catalog
-    # path. Every page file written locally is synced; the sitemap and quality report live at the root.
+    # path. Every page file written this time is synced (unchanged pages wrote none); the sitemap and quality
+    # report live at the root.
     keys = list(result.page_keys) + [SITEMAP_FILENAME, QUALITY_REPORT_FILENAME]
 
     def short_key_files(entry: Any) -> list[str]:
@@ -93,38 +128,62 @@ def build_and_publish_catalog_pages(
     # the active version legitimately owns instead.
     delete_keys.extend(f"{entry.catalog_path}/{DATASET_JSONLD_FILENAME}" for entry in result.superseded_entries)
 
-    sync_page_files(connect_r2(), bucket, catalog_dir, keys, delete_keys=delete_keys)
+    sync_page_files(s3, bucket, output_dir, keys, delete_keys=delete_keys)
+
+
+def published_build_checksum(s3: Any, bucket: str, short_key: str) -> str | None:
+    """The build checksum in a page's published manifest, or None when there is no page yet (or no checksum)."""
+    try:
+        obj = s3.get_object(Bucket=bucket, Key=f"{short_key}/{MANIFEST_FILENAME}")
+    except ClientError as error:
+        if error.response.get("Error", {}).get("Code") in ("NoSuchKey", "404"):
+            return None
+        raise
+    return json.loads(obj["Body"].read()).get("build_checksum")
 
 
 def sync_page_files(
-    s3: Any, bucket: str, catalog_dir: Path, keys: list[str], delete_keys: list[str] | None = None
+    s3: Any, bucket: str, local_dir: Path, keys: list[str], delete_keys: list[str] | None = None
 ) -> None:
-    futures = []
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        for key in keys:
-            local_path = catalog_dir / key
-            if not local_path.exists():
-                continue
-            checksum = files.checksum_file(local_path)
-            remote_checksum = get_remote_checksum(s3, bucket, key)
-            if checksum == remote_checksum:
-                continue
-            print(f"  PUT {key}")
-            futures.append(
-                executor.submit(
-                    s3.upload_file,
-                    local_path.as_posix(),
-                    bucket,
-                    key,
-                    ExtraArgs={"ACL": "public-read", "Metadata": {"md5": checksum}},
-                )
-            )
+    """Upload the changed files among ``keys`` from ``local_dir`` and delete the existing ``delete_keys``.
 
+    Manifests go up last, once every other upload and delete has succeeded: a published manifest carries the
+    build checksum that lets the next publish skip its page, so it must never get ahead of the page's files.
+    """
+    manifests = [key for key in keys if key.endswith(f"/{MANIFEST_FILENAME}")]
+    others = [key for key in keys if key not in manifests]
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = [_upload_if_changed(executor, s3, bucket, local_dir, key) for key in others]
         for key in delete_keys or []:
             if key in keys:
                 continue
             if get_remote_checksum(s3, bucket, key) is not None:
                 print(f"  DEL {key}")
                 futures.append(executor.submit(s3.delete_object, Bucket=bucket, Key=key))
+        _raise_on_failure(futures)
+        _raise_on_failure([_upload_if_changed(executor, s3, bucket, local_dir, key) for key in manifests])
 
-        concurrent.futures.wait(futures)
+
+def _upload_if_changed(
+    executor: concurrent.futures.Executor, s3: Any, bucket: str, local_dir: Path, key: str
+) -> concurrent.futures.Future | None:
+    local_path = local_dir / key
+    if not local_path.exists():
+        return None
+    checksum = files.checksum_file(local_path)
+    if checksum == get_remote_checksum(s3, bucket, key):
+        return None
+    print(f"  PUT {key}")
+    return executor.submit(
+        s3.upload_file,
+        local_path.as_posix(),
+        bucket,
+        key,
+        ExtraArgs={"ACL": "public-read", "Metadata": {"md5": checksum}},
+    )
+
+
+def _raise_on_failure(futures: list[concurrent.futures.Future | None]) -> None:
+    for future in futures:
+        if future is not None:
+            future.result()
