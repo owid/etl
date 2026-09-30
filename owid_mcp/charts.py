@@ -56,17 +56,33 @@ INSTRUCTIONS = (
 mcp = FastMCP()
 
 
-def _raise_for_unknown_slug(resp: httpx.Response, chart_id: str) -> None:
-    """Turn a 404 from grapher into an actionable error for the caller.
+def _raise_for_caller_error(resp: httpx.Response, chart_id: str) -> None:
+    """Turn a grapher response the caller can't fix by retrying into an actionable error.
 
-    A slug that doesn't exist is the caller's mistake, not a server fault. Raising
-    `ToolError` passes the message through to the client instead of FastMCP's masked
-    "Error calling tool ...", and the WARNING level keeps it out of Sentry — Sentry
-    files an issue for every tool error FastMCP logs at ERROR, which is its default.
+    - 404: the slug doesn't exist.
+    - 403: the chart exists but its data is non-redistributable (e.g. IHME, EIU), so
+      grapher refuses the CSV download. Its JSON body explains why; pass that on so the
+      caller can point the user at the interactive chart instead.
+
+    Neither is a server fault. Raising `ToolError` passes the message through to the
+    client instead of FastMCP's masked "Error calling tool ...", and the WARNING level
+    keeps it out of Sentry — Sentry files an issue for every tool error FastMCP logs at
+    ERROR, which is its default.
     """
     if resp.status_code == 404:
         raise ToolError(
             f"No OWID chart with slug {chart_id!r}. Use `search_chart` to find a valid slug.",
+            log_level=logging.WARNING,
+        )
+    if resp.status_code == 403:
+        try:
+            reason = resp.json().get("error")
+        except ValueError:
+            reason = None
+        raise ToolError(
+            f"Data for OWID chart {chart_id!r} can't be downloaded: "
+            f"{reason or 'access forbidden'} "
+            f"Link the user to the interactive chart instead: https://ourworldindata.org/grapher/{chart_id}",
             log_level=logging.WARNING,
         )
 
@@ -94,9 +110,9 @@ async def _fetch_chart_data_impl(
     query_string = urllib.parse.urlencode(query_params)
     fetch_url = f"{csv_url}?{query_string}"
 
-    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT, headers=HEADERS) as client:
+    async with httpx.AsyncClient(timeout=HTTP_TIMEOUT, headers=HEADERS, follow_redirects=True) as client:
         resp = await client.get(fetch_url)
-        _raise_for_unknown_slug(resp, chart_id)
+        _raise_for_caller_error(resp, chart_id)
         resp.raise_for_status()
         csv_content = resp.text
 
@@ -191,9 +207,9 @@ async def fetch_chart_image(id: str, time: str | None = None, countries: str | N
     png_url = f"{png_url}?{query_string}"
 
     try:
-        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT, headers=HEADERS) as client:
+        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT, headers=HEADERS, follow_redirects=True) as client:
             resp = await client.get(png_url)
-            _raise_for_unknown_slug(resp, id)
+            _raise_for_caller_error(resp, id)
             resp.raise_for_status()
             png_bytes = resp.content
 
