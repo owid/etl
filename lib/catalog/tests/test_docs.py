@@ -146,7 +146,7 @@ def test_readme_sections(tmp_path):
         "    - https://catalog.ourworldindata.org/energy/owid_energy/energy.parquet\n"
         "    - https://catalog.ourworldindata.org/energy/owid_energy/energy.codebook.csv\n"
         "    - https://catalog.ourworldindata.org/energy/owid_energy/energy.sources.csv\n"
-        "  - Links to this version (2026-09-10). They stay on it when newer versions are released:\n"
+        "  - Links to this version (2026-09-10). They keep pointing at this version after newer releases:\n"
         "    - https://catalog.ourworldindata.org/garden/energy/2026-09-10/owid_energy/energy.parquet\n"
         "    - https://catalog.ourworldindata.org/garden/energy/2026-09-10/owid_energy/energy.feather\n"
         "    - https://catalog.ourworldindata.org/garden/energy/2026-09-10/owid_energy/energy.meta.json\n"

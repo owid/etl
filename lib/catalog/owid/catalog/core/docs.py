@@ -384,7 +384,7 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
             items += [f"    - {url}{name}.{suffix}" for suffix in formats + ("codebook.csv", "sources.csv")]
             if base:
                 items.append(
-                    f"  - Links to this version ({meta.version}). They stay on it when newer versions are released:"
+                    f"  - Links to this version ({meta.version}). They keep pointing at this version after newer releases:"
                 )
                 items += [
                     f"    - {base}{catalog_path}/{name}.{suffix}" for suffix in ("parquet", "feather", "meta.json")
