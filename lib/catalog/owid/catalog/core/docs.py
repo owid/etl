@@ -7,6 +7,7 @@ hand-written text living in step code.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
@@ -39,6 +40,10 @@ SOURCES_COLUMNS = [
 # or "Producer (year)"; more than three of them are shortened to the first one "and other sources".
 OWID_ATTRIBUTION = "Our World in Data"
 MAX_ATTRIBUTIONS_IN_SHORT_CITATION = 3
+
+# Files of a table in its dataset's dated catalog folder that are linked as "this version", when they exist: the
+# pipeline's own files (a CSV only when the step saves one).
+VERSIONED_SUFFIXES = ("csv", "parquet", "feather", "meta.json")
 
 # Where the code of every data step lives, followed by the step's channel, namespace and version.
 ETL_STEPS_URL = "https://github.com/owid/etl/tree/master/etl/steps/data/"
@@ -364,7 +369,7 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
     parts += ["## License", "", LICENSE_NOTE, ""]
 
     # The ways in beyond the download buttons, one per line: the stable data URLs (readable from any tool that
-    # opens a URL), the dated copies that never change, and the source code of the step. The catalog page lists
+    # opens a URL), the pipeline's files of this version, and the source code of the step. The catalog page lists
     # the same items.
     items: list[str] = []
     catalog_path = (
@@ -382,14 +387,14 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
             items.append(f"- {table.metadata.title or name}")
             items.append("  - Links to the latest data. They always give you the newest release:")
             items += [f"    - {url}{name}.{suffix}" for suffix in formats + ("codebook.csv", "sources.csv")]
-            if base:
+            # The files the pipeline published for this version, whichever of them exist (a CSV only when the
+            # step saves one).
+            dated = [suffix for suffix in VERSIONED_SUFFIXES if (Path(dataset.path) / f"{name}.{suffix}").exists()]
+            if base and dated:
                 items.append(
-                    f"  - Links to this version ({meta.version}). They always give you the same data, even if there "
-                    "are newer releases:"
+                    f"  - Links to this version ({meta.version}). They keep pointing at this version after newer releases:"
                 )
-                items += [
-                    f"    - {base}{catalog_path}/{name}.{suffix}" for suffix in formats + ("feather", "meta.json")
-                ]
+                items += [f"    - {base}{catalog_path}/{name}.{suffix}" for suffix in dated]
     if meta.channel and meta.namespace and meta.version:
         items += ["- Source code:", f"  - {ETL_STEPS_URL}{meta.channel}/{meta.namespace}/{meta.version}/"]
     if items:
