@@ -497,6 +497,6 @@ def run() -> None:
     #
     # Save outputs.
     #
-    # Create new dataset.
-    ds_garden = paths.create_dataset(tables=[tb, tb_mapping])
+    # Create new dataset, saving the tables as CSV too, so that each version keeps a CSV link on the catalog page.
+    ds_garden = paths.create_dataset(tables=[tb, tb_mapping], formats=["feather", "parquet", "csv"])
     ds_garden.save()
