@@ -174,3 +174,20 @@ def test_check_changelog_requires_entry_for_new_version():
     )
     with pytest.raises(ValueError, match="no entry for version 2026-09-10"):
         check_changelog(metadata)
+
+
+def test_create_dataset_does_not_inherit_another_datasets_changelog(tmp_path):
+    parent = catalog.DatasetMeta(
+        short_name="owid_energy",
+        version="2026-09-10",
+        changelog=[{"date": "2026-09-10", "changes": ["Updated."]}],
+    )
+    tb = catalog.Table({"country": ["Spain"], "year": [2020], "a": [1.0]}, short_name="derived").format(
+        ["country", "year"]
+    )
+    # A dataset built from another one's metadata gets no changelog, so it isn't checked against the parent's either.
+    ds = create_dataset(tmp_path / "garden/example/2026-12-01/derived", [tb], default_metadata=parent)
+    assert ds.metadata.changelog == []
+    # A step that keeps the short name (like the dataset's own grapher step) keeps it.
+    ds = create_dataset(tmp_path / "garden/example/2026-09-10/owid_energy", [tb], default_metadata=parent)
+    assert [entry.date for entry in ds.metadata.changelog] == ["2026-09-10"]

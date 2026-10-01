@@ -16,7 +16,7 @@ import structlog
 from owid import catalog
 from owid.catalog import CHANNEL, DatasetMeta, Table
 from owid.catalog.core.datasets import DEFAULT_FORMATS, FileFormat
-from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS
+from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, is_iso_date
 from owid.catalog.core.tables import (
     combine_tables_description,
     combine_tables_title,
@@ -127,7 +127,12 @@ def create_dataset(
     # create new dataset with new metadata
     ds = catalog.Dataset.create_empty(dest_dir, metadata=default_metadata)
 
+    inherited_short_name = ds.metadata.short_name
     ds = _set_metadata_from_dest_dir(ds, dest_dir)
+    # A changelog is the release history of one dataset: a dataset built from another one's metadata doesn't inherit
+    # it (its grapher step, which keeps the short name, does).
+    if inherited_short_name and inherited_short_name != ds.metadata.short_name:
+        ds.metadata.changelog = []
 
     meta_path = get_metadata_path(str(dest_dir))
 
@@ -201,7 +206,7 @@ def check_changelog(metadata: DatasetMeta) -> None:
     `.meta.yml` fails here until someone writes down what the release changed. A changelog may also have entries newer
     than the version, for releases that refreshed data without bumping it.
     """
-    if not metadata.changelog or not metadata.version or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", metadata.version):
+    if not metadata.changelog or not metadata.version or not is_iso_date(metadata.version):
         return
     latest = max(entry.date for entry in metadata.changelog)
     if latest < metadata.version:
