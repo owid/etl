@@ -74,9 +74,7 @@ OWNER_TEAM_PAGES = {
     "Max Roser": "https://ourworldindata.org/team/max-roser",
     "Pablo Arriagada": "https://ourworldindata.org/team/pablo-arriagada",
     "Pablo Rosado": "https://ourworldindata.org/team/pablo-rosado",
-    "Saloni Dattani": "https://ourworldindata.org/team/saloni-dattani",
     "Tuna Acisu": "https://ourworldindata.org/team/tuna-acisu",
-    "Veronika Samborska": "https://ourworldindata.org/team/veronika-samborska",
 }
 
 
