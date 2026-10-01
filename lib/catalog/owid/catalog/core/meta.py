@@ -690,15 +690,23 @@ class ChangelogEntry(MetaBase):
     """
 
     date: str
-    changes: list[str] = field(default_factory=list)
+    changes: list[str]
+
+
+def _is_iso_date(text: str) -> bool:
+    # The round trip also rejects the other forms `fromisoformat` accepts, like `20260910`.
+    try:
+        return dt.date.fromisoformat(text).isoformat() == text
+    except ValueError:
+        return False
 
 
 def parse_changelog(value: Any) -> list[ChangelogEntry]:
     """Normalize a changelog to a list of `ChangelogEntry`, whatever it was read from.
 
     A `.meta.yml` gives mappings (dynamic_yaml proxies, not plain dicts), with unquoted dates parsed by YAML as
-    `datetime.date`; a saved `index.json` gives dicts with string dates. Dates are stored as `YYYY-MM-DD` strings, and anything else fails here, at the step
-    that sets it, rather than in whatever renders it later.
+    `datetime.date`; a saved `index.json` gives dicts with string dates. Dates are stored as `YYYY-MM-DD` strings,
+    and anything else fails here, at the step that sets it, rather than in whatever renders it later.
     """
     if value is None:
         return []
@@ -718,9 +726,8 @@ def parse_changelog(value: Any) -> list[ChangelogEntry]:
             date = date.date()
         if isinstance(date, dt.date):
             date = date.isoformat()
-        if not isinstance(date, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date):
+        if not isinstance(date, str) or not _is_iso_date(date):
             raise ValueError(f"Changelog entry date must be a YYYY-MM-DD date, got {date!r}.")
-        dt.date.fromisoformat(date)
         changes = entry.get("changes") or []
         if (
             not isinstance(changes, Sequence)

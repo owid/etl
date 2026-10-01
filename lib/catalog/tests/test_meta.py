@@ -429,6 +429,7 @@ def test_changelog_from_yaml_round_trips(tmp_path):
         "- 2026-09-10: New methodology.",
         [{"date": "2026-13-01", "changes": ["New methodology."]}],
         [{"date": "September 2026", "changes": ["New methodology."]}],
+        [{"date": "20260910", "changes": ["New methodology."]}],
         [{"date": "2026-09-10"}],
         [{"date": "2026-09-10", "changes": "New methodology."}],
         [{"date": "2026-09-10", "changes": ["New methodology."], "note": "unknown field"}],

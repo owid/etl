@@ -157,7 +157,9 @@ Please follow [the guidelines in our FAQ](https://ourworldindata.org/faqs#how-sh
 
     # The changelog lives in the garden dataset's metadata; it must cover the latest update of its main inputs too.
     error = "Update the changelog in the garden owid_co2.meta.yml to add the latest update."
-    assert max(entry.date for entry in changelog) >= max([gcb_version, jones_version, owid_co2_version]), error
+    assert max((entry.date for entry in changelog), default="") >= max(
+        [gcb_version, jones_version, owid_co2_version]
+    ), error
 
     return readme
 
