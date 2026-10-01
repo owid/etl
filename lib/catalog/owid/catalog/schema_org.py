@@ -27,6 +27,15 @@ MAX_DIMENSION_VALUES_LISTED = 40
 # Dimensions that every table has and that are already conveyed by temporalCoverage /
 # spatialCoverage — not worth a PropertyValue of their own.
 ENTITY_TIME_DIMENSIONS = {"country", "year", "date"}
+# Google's Dataset rich results reject (as a critical issue) a `description` longer than this.
+MAX_DESCRIPTION_LENGTH = 5000
+# A `## Changelog` section in a description runs until the next level-2 heading or the end of the text.
+CHANGELOG_SECTION = re.compile(r"^##\s+Changelog\b.*?(?=^##\s|\Z)", re.MULTILINE | re.DOTALL | re.IGNORECASE)
+OWID_ORGANIZATION = {
+    "@type": "Organization",
+    "name": "Our World in Data",
+    "url": "https://ourworldindata.org",
+}
 KNOWN_LICENSE_URLS = {
     "CC BY 4.0": "https://creativecommons.org/licenses/by/4.0/",
     "CC-BY 4.0": "https://creativecommons.org/licenses/by/4.0/",
@@ -85,7 +94,7 @@ def dataset_to_schema_org(
     resolved_version = version or dataset_meta.version
 
     title = _dataset_title(dataset_meta, tables)
-    description = _dataset_description(dataset_meta)
+    description = _summary(_dataset_description(dataset_meta))
     origins = _unique_origins(tables)
 
     result: dict[str, Any] = {
@@ -96,12 +105,7 @@ def dataset_to_schema_org(
         "identifier": dataset_path,
         "name": title,
         "description": description,
-        "publisher": {
-            "@type": "Organization",
-            "name": "Our World in Data",
-            "url": "https://ourworldindata.org",
-            "logo": DEFAULT_LOGO_URL,
-        },
+        "publisher": {**OWID_ORGANIZATION, "logo": DEFAULT_LOGO_URL},
         "includedInDataCatalog": {
             "@type": "DataCatalog",
             "name": "Our World in Data catalog",
@@ -128,11 +132,7 @@ def dataset_to_schema_org(
     # Creator is the author of this artifact (the OWID-processed dataset), matching how
     # compiled datasets are marked up elsewhere (HuggingFace, Zenodo, Google's own examples).
     # Upstream producers keep credit in isBasedOn (name + URL) and citation.
-    result["creator"] = {
-        "@type": "Organization",
-        "name": "Our World in Data",
-        "url": "https://ourworldindata.org",
-    }
+    result["creator"] = OWID_ORGANIZATION
 
     date_published = _first_valid_date(origin.date_published for origin in origins)
     if date_published:
@@ -208,10 +208,12 @@ def _table_dataset(
         "@id": f"{dataset_url}#table-{table.short_name}",
         "name": name,
         "identifier": table.short_name,
+        # Google validates every nested Dataset on its own, so each table repeats the top-level creator.
+        "creator": OWID_ORGANIZATION,
     }
     description = table_description(table, dataset_meta)
     if description:
-        result["description"] = description
+        result["description"] = _summary(description)
 
     variables = _variable_measured(table)
     if variables:
@@ -362,6 +364,23 @@ def _dataset_description(dataset_meta: DatasetMeta) -> str:
         f"Dataset '{dataset_meta.short_name}' has no description set. "
         "Add `dataset.description` to its .meta.yml — it must not be guessed from indicator origins."
     )
+
+
+def _summary(description: str) -> str:
+    """Fit a description to what Dataset Search accepts: no changelog, at most ``MAX_DESCRIPTION_LENGTH`` characters.
+
+    A changelog is release history rather than a summary of the data (the landing page shows it in a section of its
+    own), and it is what pushes long descriptions past the limit. Anything still too long is cut at the last paragraph
+    break, or failing that the last word, that fits.
+    """
+    description = CHANGELOG_SECTION.sub("", description).strip()
+    if len(description) <= MAX_DESCRIPTION_LENGTH:
+        return description
+    cut = description[: MAX_DESCRIPTION_LENGTH - 1]
+    paragraph_end = cut.rfind("\n\n")
+    if paragraph_end > 0:
+        return cut[:paragraph_end].rstrip()
+    return cut.rsplit(" ", 1)[0].rstrip() + "…"
 
 
 def _unique_origins(tables: list[TableSchemaInput]) -> list[Origin]:

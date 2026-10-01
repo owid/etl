@@ -516,3 +516,36 @@ def test_keywords_ordered_by_variable_count_not_column_order() -> None:
         tables=[table],
     )
     assert jsonld["keywords"] == ["CO2 & Greenhouse Gas Emissions", "Economic Growth"]
+
+
+def test_description_drops_changelog_and_fits_dataset_search_limit() -> None:
+    changelog = "## Changelog\n\n" + "\n".join(f"- 2026-01-{day:02d}: Updated the data." for day in range(1, 29)) * 10
+    description = f"Intro paragraph about the data.\n\n{changelog}\n\n## Notes\n\nA closing note."
+    table = TableSchemaInput(
+        short_name="column_mapping",
+        metadata=TableMeta(short_name="column_mapping"),
+        variables={"value": VariableMeta(title="Value")},
+        formats=["feather"],
+    )
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/example/2025-01-01/example_dataset",
+        page_path="example/example_dataset",
+        dataset_meta=DatasetMeta(namespace="example", short_name="example_dataset", description=description),
+        tables=[table, TableSchemaInput(short_name="other", metadata=TableMeta(short_name="other"), variables={})],
+    )
+
+    assert jsonld["description"] == "Intro paragraph about the data.\n\n## Notes\n\nA closing note."
+    # Google validates nested Datasets on their own: the table falling back to the dataset description gets the
+    # same summary, and repeats the creator.
+    assert jsonld["hasPart"][0]["description"] == jsonld["description"]
+    assert jsonld["hasPart"][0]["creator"] == jsonld["creator"]
+
+    long_description = "\n\n".join(["word " * 200] * 10)
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/example/2025-01-01/example_dataset",
+        page_path="example/example_dataset",
+        dataset_meta=DatasetMeta(namespace="example", short_name="example_dataset", description=long_description),
+        tables=[table],
+    )
+    assert len(jsonld["description"]) <= 5000
+    assert long_description.startswith(jsonld["description"])
