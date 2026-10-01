@@ -49,7 +49,7 @@ def test_single_table_dataset_flattens_table_metadata() -> None:
     assert jsonld["@id"] == "https://catalog.ourworldindata.org/biodiversity/cherry_blossom/#dataset"
     # identifier documents the real, dated catalog location.
     assert jsonld["identifier"] == "garden/biodiversity/2025-04-07/cherry_blossom"
-    assert jsonld["license"] == "https://creativecommons.org/licenses/by/4.0/"
+    assert "license" not in jsonld
     assert jsonld["dateModified"] == "2025-04-07"
     assert jsonld["thumbnailUrl"] == "https://ourworldindata.org/owid-logo.svg"
     assert jsonld["publisher"]["logo"] == "https://ourworldindata.org/owid-logo.svg"
@@ -193,7 +193,10 @@ def test_multi_table_dataset_uses_has_part() -> None:
         tables=tables,
     )
 
-    assert "variableMeasured" not in jsonld
+    # The top level keeps what Dataset Search reads: the variables of the main table (no table is named after
+    # the dataset here, so the first one) and the files of every table.
+    assert [variable["identifier"] for variable in jsonld["variableMeasured"]] == ["value"]
+    assert [entry["name"] for entry in jsonld["distribution"]] == ["table_a.feather", "table_b.feather"]
     assert [part["identifier"] for part in jsonld["hasPart"]] == ["table_a", "table_b"]
     # @id uses the short page_path...
     assert jsonld["hasPart"][0]["@id"] == "https://catalog.ourworldindata.org/example/example_dataset/#table-table_a"
@@ -468,44 +471,27 @@ def test_no_citation_emitted_and_is_based_on_leads_with_most_used_origin() -> No
     assert {item["url"] for item in jsonld["isBasedOn"]} >= {"https://example.com/population"}
 
 
-def test_dataset_level_license_wins_over_origin_license() -> None:
-    """A dataset-level license declared in .meta.yml describes the compiled artifact and must
-    take precedence over per-source origin licenses (owid_co2 used to advertise GCB's ICOS
-    data license just because GCB is its most-referenced origin)."""
-    origin = Origin(
-        producer="Global Carbon Project",
-        title="Global Carbon Budget",
-        license=License(name="ICOS", url="https://www.icos-cp.eu/data-services/about-data-portal/data-license"),
-    )
+def test_no_license_is_declared_even_when_sources_and_dataset_have_one() -> None:
+    """OWID republishes data produced by others, so the record makes no license claim; the sources' own
+    terms are what applies, and a dataset-level license in .meta.yml is not a license of the data."""
+    icos = License(name="ICOS", url="https://www.icos-cp.eu/data-services/about-data-portal/data-license")
+    cc_by = License(name="CC BY 4.0", url="https://creativecommons.org/licenses/by/4.0/")
+    gcb = Origin(producer="Global Carbon Project", title="Global Carbon Budget", license=icos)
     table = TableSchemaInput(
         short_name="owid_co2",
         metadata=TableMeta(short_name="owid_co2", title="CO2", description="Table description"),
-        variables={"co2": VariableMeta(title="CO2", origins=[origin])},
+        variables={"co2": VariableMeta(title="CO2", origins=[gcb], license=cc_by)},
         formats=["feather"],
     )
-    kwargs: dict = dict(
+    jsonld = dataset_to_schema_org(
         dataset_path="garden/emissions/2025-12-04/owid_co2",
         page_path="emissions/owid_co2",
+        dataset_meta=DatasetMeta(
+            short_name="owid_co2", title="CO2 dataset", description="Dataset description", licenses=[cc_by]
+        ),
         tables=[table],
     )
-
-    jsonld = dataset_to_schema_org(
-        dataset_meta=DatasetMeta(
-            short_name="owid_co2",
-            title="CO2 dataset",
-            description="Dataset description",
-            licenses=[License(name="CC BY 4.0", url="https://creativecommons.org/licenses/by/4.0/")],
-        ),
-        **kwargs,
-    )
-    assert jsonld["license"] == "https://creativecommons.org/licenses/by/4.0/"
-
-    # Without a dataset-level license, the most-referenced origin's license is the fallback.
-    jsonld = dataset_to_schema_org(
-        dataset_meta=DatasetMeta(short_name="owid_co2", title="CO2 dataset", description="Dataset description"),
-        **kwargs,
-    )
-    assert jsonld["license"] == "https://www.icos-cp.eu/data-services/about-data-portal/data-license"
+    assert "license" not in jsonld
 
 
 def test_keywords_ordered_by_variable_count_not_column_order() -> None:

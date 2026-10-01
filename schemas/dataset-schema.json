@@ -406,7 +406,7 @@
         "jsonld": {
           "type": "boolean",
           "title": "Publish catalog landing page / JSON-LD",
-          "description": "Opt this dataset into the public catalog landing page with Schema.org Dataset JSON-LD (`etl d publish --jsonld`). Canary rollout of the catalog-discovery project; the dataset must also pass the JSON-LD quality gates."
+          "description": "Opt this dataset into a public catalog page at `catalog.ourworldindata.org/<namespace>/<short_name>/`, with its tables as CSV, Excel and parquet, their codebooks and sources, a README, and a Schema.org JSON-LD (`etl d publish --jsonld`). Only public, redistributable datasets get a page. Making a published dataset private does not remove its page: delete its files under `<namespace>/<short_name>/` in the catalog bucket by hand."
         },
         "licenses": {
           "type": "array",

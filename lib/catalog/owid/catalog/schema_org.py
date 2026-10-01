@@ -87,7 +87,6 @@ def dataset_to_schema_org(
     title = _dataset_title(dataset_meta, tables)
     description = _dataset_description(dataset_meta)
     origins = _unique_origins(tables)
-    license_url = _license_url(dataset_meta, origins, tables)
 
     result: dict[str, Any] = {
         "@context": "https://schema.org/",
@@ -126,9 +125,6 @@ def dataset_to_schema_org(
         date_modified = _first_valid_date([resolved_version])
         if date_modified:
             result["dateModified"] = date_modified
-    if license_url:
-        result["license"] = license_url
-
     # Creator is the author of this artifact (the OWID-processed dataset), matching how
     # compiled datasets are marked up elsewhere (HuggingFace, Zenodo, Google's own examples).
     # Upstream producers keep credit in isBasedOn (name + URL) and citation.
@@ -146,7 +142,7 @@ def dataset_to_schema_org(
     if based_on:
         result["isBasedOn"] = based_on
 
-    keywords = _keywords(tables)
+    keywords = dataset_keywords(tables)
     if keywords:
         result["keywords"] = keywords
 
@@ -158,18 +154,30 @@ def dataset_to_schema_org(
     if spatial_coverage:
         result["spatialCoverage"] = spatial_coverage
 
-    if len(tables) == 1:
-        table = tables[0]
-        variables = _variable_measured(table)
+    # The top-level Dataset always carries `variableMeasured` and `distribution`: Google Dataset Search reads
+    # the files and columns of a record from there, and never descends into `hasPart`. For a single-table
+    # dataset that is the table itself. For a multi-table dataset the main table (the one named after the
+    # dataset, else the first) supplies the variables, every table contributes its files, and the tables are
+    # additionally described one by one in `hasPart`.
+    if tables:
+        main_table = _main_table(tables, dataset_meta)
+        variables = _variable_measured(main_table)
         if variables:
             result["variableMeasured"] = variables
-        distributions = _distributions(file_base_url, table)
+        distributions = [entry for table in tables for entry in _distributions(file_base_url, table)]
         if distributions:
             result["distribution"] = distributions
-    elif tables:
+    if len(tables) > 1:
         result["hasPart"] = [_table_dataset(dataset_url, file_base_url, table, dataset_meta) for table in tables]
 
     return _drop_empty(result)
+
+
+def _main_table(tables: list[TableSchemaInput], dataset_meta: DatasetMeta) -> TableSchemaInput:
+    for table in tables:
+        if table.short_name == dataset_meta.short_name:
+            return table
+    return tables[0]
 
 
 def table_description(table: TableSchemaInput, dataset_meta: DatasetMeta) -> str | None:
@@ -376,32 +384,6 @@ def _unique_origins(tables: list[TableSchemaInput]) -> list[Origin]:
     return [origins[key] for key in order]
 
 
-def _license_url(dataset_meta: DatasetMeta, origins: list[Origin], tables: list[TableSchemaInput]) -> str | None:
-    # The record describes the OWID-compiled dataset, so a dataset-level license declared in
-    # its .meta.yml (e.g. CC BY for owid_co2, matching its GitHub repo) speaks for the whole
-    # artifact and wins. Origin licenses are a per-source fallback: the "first" one is just
-    # the most-referenced source's license, which can misrepresent the compilation (owid_co2
-    # used to advertise GCB's ICOS data license).
-    for license in dataset_meta.licenses:
-        url = _license_to_url(license)
-        if url:
-            return url
-    for origin in origins:
-        url = _license_to_url(origin.license)
-        if url:
-            return url
-    for table in tables:
-        for variable in table.variables.values():
-            url = _license_to_url(variable.license)
-            if url:
-                return url
-            for license in variable.licenses:
-                url = _license_to_url(license)
-                if url:
-                    return url
-    return None
-
-
 def license_to_url(license: License | None) -> str | None:
     """Return a resolvable license URL, including canonical URLs for known license names."""
     if not license:
@@ -411,10 +393,6 @@ def license_to_url(license: License | None) -> str | None:
     if license.name:
         return KNOWN_LICENSE_URLS.get(license.name.strip())
     return None
-
-
-def _license_to_url(license: License | None) -> str | None:
-    return license_to_url(license)
 
 
 def _is_based_on(origins: list[Origin]) -> list[dict[str, Any]] | dict[str, Any] | None:
@@ -461,7 +439,7 @@ def _spatial_coverage(tables: list[TableSchemaInput]) -> str | None:
     return None
 
 
-def _keywords(tables: list[TableSchemaInput]) -> list[str]:
+def dataset_keywords(tables: list[TableSchemaInput]) -> list[str]:
     """Topic tags ordered by how many variables carry each one, most-tagged first.
 
     Column order would put whichever tag the first column happens to carry in front (e.g.

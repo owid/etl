@@ -76,6 +76,10 @@ Private steps run like any other step; `etl run` includes them by default. To le
 etl run [step-name] --public-only
 ```
 
+## Making public data private
+
+Set `meta.is_public` to `false` in the snapshot DVC file, and switch the steps to `data-private://` in the DAG. If the dataset has a public catalog page (`jsonld: true` in its garden `.meta.yml`), the page is not removed for you: its CSV, Excel and parquet files stay public under `catalog.ourworldindata.org/<namespace>/<short_name>/` until you delete that folder from the catalog bucket (`r2:owid-catalog/<namespace>/<short_name>/`).
+
 ## Bringing private data to public
 
 If you want to make a private step public simply follow the steps below:
