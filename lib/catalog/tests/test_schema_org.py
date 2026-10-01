@@ -549,3 +549,13 @@ def test_description_drops_changelog_and_fits_dataset_search_limit() -> None:
     )
     assert len(jsonld["description"]) <= 5000
     assert long_description.startswith(jsonld["description"])
+
+    # An early paragraph break doesn't shrink the description to a stub: the cut falls back to the last word.
+    early_break = "Short intro.\n\n" + "word " * 2000
+    jsonld = dataset_to_schema_org(
+        dataset_path="garden/example/2025-01-01/example_dataset",
+        page_path="example/example_dataset",
+        dataset_meta=DatasetMeta(namespace="example", short_name="example_dataset", description=early_break),
+        tables=[table],
+    )
+    assert 4000 < len(jsonld["description"]) <= 5000

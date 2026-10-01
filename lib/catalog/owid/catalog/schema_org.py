@@ -132,7 +132,7 @@ def dataset_to_schema_org(
     # Creator is the author of this artifact (the OWID-processed dataset), matching how
     # compiled datasets are marked up elsewhere (HuggingFace, Zenodo, Google's own examples).
     # Upstream producers keep credit in isBasedOn (name + URL) and citation.
-    result["creator"] = OWID_ORGANIZATION
+    result["creator"] = {**OWID_ORGANIZATION}
 
     date_published = _first_valid_date(origin.date_published for origin in origins)
     if date_published:
@@ -209,7 +209,7 @@ def _table_dataset(
         "name": name,
         "identifier": table.short_name,
         # Google validates every nested Dataset on its own, so each table repeats the top-level creator.
-        "creator": OWID_ORGANIZATION,
+        "creator": {**OWID_ORGANIZATION},
     }
     description = table_description(table, dataset_meta)
     if description:
@@ -371,14 +371,14 @@ def _summary(description: str) -> str:
 
     A changelog is release history rather than a summary of the data (the landing page shows it in a section of its
     own), and it is what pushes long descriptions past the limit. Anything still too long is cut at the last paragraph
-    break, or failing that the last word, that fits.
+    break that fits, unless that would drop more than half the allowed length, in which case it is cut at the last word.
     """
     description = CHANGELOG_SECTION.sub("", description).strip()
     if len(description) <= MAX_DESCRIPTION_LENGTH:
         return description
     cut = description[: MAX_DESCRIPTION_LENGTH - 1]
     paragraph_end = cut.rfind("\n\n")
-    if paragraph_end > 0:
+    if paragraph_end > MAX_DESCRIPTION_LENGTH // 2:
         return cut[:paragraph_end].rstrip()
     return cut.rsplit(" ", 1)[0].rstrip() + "…"
 
