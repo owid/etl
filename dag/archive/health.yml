@@ -1188,3 +1188,8 @@ steps:
     - data://garden/cancer/2025-02-17/gco_cancer_survival:
       - data://meadow/cancer/2025-02-17/gco_cancer_survival:
         - snapshot://cancer/2025-02-17/gco_cancer_survival.csv
+  # archived; last active in 701c713aa830 on 2026-10-01
+  data://grapher/who/2024-03-24/self_inflicted_injuries:
+    - data://garden/who/2024-03-24/self_inflicted_injuries:
+      - data://meadow/who/2024-03-24/self_inflicted_injuries:
+        - snapshot://who/2024-03-24/self_inflicted_injuries.csv
