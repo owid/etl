@@ -357,6 +357,9 @@
               "Should ideally contain just one or a few paragraphs, that describe its content succinctly."
             ],
             [
+              "Should not contain the dataset's release history: put it in `changelog` instead."
+            ],
+            [
               "Should be used only to override the automatic description (which usually is the description of the containing table). For example, use it when the dataset contains multiple tables."
             ]
           ]
