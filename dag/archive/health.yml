@@ -1188,3 +1188,8 @@ steps:
     - data://garden/cancer/2025-02-17/gco_cancer_survival:
       - data://meadow/cancer/2025-02-17/gco_cancer_survival:
         - snapshot://cancer/2025-02-17/gco_cancer_survival.csv
+  # archived; last active in 701c713aa830 on 2026-10-01
+  data://grapher/who/2025-08-06/icd_codes:
+    - data://garden/who/2025-08-06/icd_codes:
+      - data://meadow/who/2025-08-06/icd_codes:
+        - snapshot://who/2025-08-06/icd_codes.zip
