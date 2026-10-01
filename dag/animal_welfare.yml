@@ -105,6 +105,26 @@ steps:
   data://grapher/animal_welfare/2026-03-03/land_animals_killed_for_food:
     - data://garden/faostat/2026-02-25/faostat_qcl
   #
+  # In-ovo sexing market penetration.
+  #
+  data://garden/animal_welfare/2026-09-14/in_ovo_sexing_market_penetration:
+    - data://meadow/animal_welfare/2026-09-14/in_ovo_sexing_market_penetration:
+      - snapshot://animal_welfare/2026-09-14/in_ovo_sexing_market_penetration.csv
+    - data://garden/faostat/2026-02-25/faostat_qcl
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Chickens killed for eggs (OWID estimate based on FAOSTAT and in-ovo sexing market penetration).
+  #
+  data://grapher/animal_welfare/2026-09-14/chickens_killed_for_eggs:
+    - data://garden/animal_welfare/2026-09-14/chickens_killed_for_eggs:
+      - data://garden/faostat/2026-02-25/faostat_qcl
+      - data://garden/animal_welfare/2026-09-14/in_ovo_sexing_market_penetration
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
+  viz://chart/animal_welfare/latest/chickens_killed_for_eggs:
+    - data://grapher/animal_welfare/2026-09-14/chickens_killed_for_eggs
+  #
   # Banning of chick culling — chart authored in ETL.
   #
   viz://chart/animal_welfare/latest/banning_of_chick_culling:
