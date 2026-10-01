@@ -1,3 +1,5 @@
+import pytest
+
 from owid.catalog.core.meta import DatasetMeta, License, Origin, TableMeta, VariableMeta, VariablePresentationMeta
 from owid.catalog.schema_org import TableSchemaInput, dataset_to_schema_org, license_to_url, table_description
 
@@ -540,22 +542,10 @@ def test_description_drops_changelog_and_fits_dataset_search_limit() -> None:
     assert jsonld["hasPart"][0]["description"] == jsonld["description"]
     assert jsonld["hasPart"][0]["creator"] == jsonld["creator"]
 
-    long_description = "\n\n".join(["word " * 200] * 10)
-    jsonld = dataset_to_schema_org(
-        dataset_path="garden/example/2025-01-01/example_dataset",
-        page_path="example/example_dataset",
-        dataset_meta=DatasetMeta(namespace="example", short_name="example_dataset", description=long_description),
-        tables=[table],
-    )
-    assert len(jsonld["description"]) <= 5000
-    assert long_description.startswith(jsonld["description"])
-
-    # An early paragraph break doesn't shrink the description to a stub: the cut falls back to the last word.
-    early_break = "Short intro.\n\n" + "word " * 2000
-    jsonld = dataset_to_schema_org(
-        dataset_path="garden/example/2025-01-01/example_dataset",
-        page_path="example/example_dataset",
-        dataset_meta=DatasetMeta(namespace="example", short_name="example_dataset", description=early_break),
-        tables=[table],
-    )
-    assert 4000 < len(jsonld["description"]) <= 5000
+    with pytest.raises(ValueError, match="Google Dataset Search rejects descriptions over 5000"):
+        dataset_to_schema_org(
+            dataset_path="garden/example/2025-01-01/example_dataset",
+            page_path="example/example_dataset",
+            dataset_meta=DatasetMeta(namespace="example", short_name="example_dataset", description="word " * 1001),
+            tables=[table],
+        )

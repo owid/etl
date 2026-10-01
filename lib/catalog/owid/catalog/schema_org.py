@@ -94,7 +94,7 @@ def dataset_to_schema_org(
     resolved_version = version or dataset_meta.version
 
     title = _dataset_title(dataset_meta, tables)
-    description = _summary(_dataset_description(dataset_meta))
+    description = _summary(_dataset_description(dataset_meta), node=f"dataset '{dataset_path}'")
     origins = _unique_origins(tables)
 
     result: dict[str, Any] = {
@@ -213,7 +213,7 @@ def _table_dataset(
     }
     description = table_description(table, dataset_meta)
     if description:
-        result["description"] = _summary(description)
+        result["description"] = _summary(description, node=f"table '{table.short_name}'")
 
     variables = _variable_measured(table)
     if variables:
@@ -366,21 +366,20 @@ def _dataset_description(dataset_meta: DatasetMeta) -> str:
     )
 
 
-def _summary(description: str) -> str:
-    """Fit a description to what Dataset Search accepts: no changelog, at most ``MAX_DESCRIPTION_LENGTH`` characters.
+def _summary(description: str, *, node: str) -> str:
+    """Return a description without its changelog, raising if it is still too long for Dataset Search.
 
     A changelog is release history rather than a summary of the data (the landing page shows it in a section of its
-    own), and it is what pushes long descriptions past the limit. Anything still too long is cut at the last paragraph
-    break that fits, unless that would drop more than half the allowed length, in which case it is cut at the last word.
+    own), and it is what pushes long descriptions past the limit. Anything still over ``MAX_DESCRIPTION_LENGTH`` makes
+    Google reject the whole record as invalid, and no automatic cut would read well, so its author must shorten it.
     """
     description = CHANGELOG_SECTION.sub("", description).strip()
-    if len(description) <= MAX_DESCRIPTION_LENGTH:
-        return description
-    cut = description[: MAX_DESCRIPTION_LENGTH - 1]
-    paragraph_end = cut.rfind("\n\n")
-    if paragraph_end > MAX_DESCRIPTION_LENGTH // 2:
-        return cut[:paragraph_end].rstrip()
-    return cut.rsplit(" ", 1)[0].rstrip() + "…"
+    if len(description) > MAX_DESCRIPTION_LENGTH:
+        raise ValueError(
+            f"The JSON-LD description of {node} is {len(description)} characters long (without its changelog), but "
+            f"Google Dataset Search rejects descriptions over {MAX_DESCRIPTION_LENGTH}. Shorten it in the metadata."
+        )
+    return description
 
 
 def _unique_origins(tables: list[TableSchemaInput]) -> list[Origin]:
