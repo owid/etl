@@ -162,9 +162,10 @@ def sanity_check_feed(entities: list[str], continent_of: dict[str, str], series_
         assert recent["country"].nunique() >= 100, f"{key} covers only {recent['country'].nunique()} countries since 2015."
 
 
-def indicator_entry(variable: Variable, tb: Table, update_period_days: int | None, label: str) -> dict:
+def indicator_entry(series: Series, tb: Table, ds: Dataset) -> dict:
     """The manifest's block for one series: what the bundle needs to read and cite the column."""
-    api = variable_meta_to_api_dict(variable, update_period_days=update_period_days, default_title=label)
+    variable = tb["value"]
+    api = variable_meta_to_api_dict(variable, update_period_days=ds.metadata.update_period_days, default_title=series.label)
     display = api.get("display") or {}
     # Every origin the column carries, in order: a column built from several reports (the EIU index) or
     # with population-weighted aggregates (also the EIU index) has more than one, and the modal lists them.
@@ -183,7 +184,8 @@ def indicator_entry(variable: Variable, tb: Table, update_period_days: int | Non
         "descriptionKey": api.get("descriptionKey"),
         "origins": origins,
         "timespan": f"{int(tb['year'].min())}-{int(tb['year'].max())}",
-        "catalogPath": f"{variable.metadata.dataset_path()}/{variable.name}" if hasattr(variable.metadata, "dataset_path") else None,
+        # The garden column the series is read from, as `channel/namespace/version/dataset/table#column`.
+        "catalogPath": f"{ds.metadata.uri}/{series.table}#{series.column}",
     }
 
 
@@ -258,10 +260,7 @@ def run() -> None:
         "continents": CONTINENTS,
         "entities": [{"name": name, "continent": CONTINENTS.index(continent_of[name])} for name in entities],
         "indicators": {
-            series.key: indicator_entry(
-                series_rows[series.key]["value"], series_rows[series.key],
-                datasets[series.dataset].metadata.update_period_days, series.label,
-            )
+            series.key: indicator_entry(series, series_rows[series.key], datasets[series.dataset])
             for series in SERIES
         },
         "dataFile": DATA_FILENAME,
