@@ -80,7 +80,7 @@ def mock(_type: type) -> Any:
             return None
         if args and args[0].__name__ == "ChangelogEntry":
             # its date must be a real YYYY-MM-DD date
-            return [args[0](date=_random_date().isoformat(), changes=[mock(str)]) for i in range(random.randint(1, 4))]
+            return [args[0](date=_random_date().isoformat(), changes=[mock(str)]) for _ in range(random.randint(1, 4))]
 
         # e.g. List[int] or list[int]
         if args:

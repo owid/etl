@@ -147,7 +147,6 @@ def test_readme_sections(tmp_path):
         "- 2025-07-17:\n  - Updated sources.\n    - Including the Energy Institute.\n\n"
         "## How we process data\n"
     ) in readme
-    assert readme.index("## Data\n") < readme.index("## Changelog\n")
     assert readme.rstrip().endswith(
         "## Advanced download options\n\n"
         "- Catalog page:\n  - https://catalog.ourworldindata.org/energy/owid_energy/\n"

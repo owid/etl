@@ -728,7 +728,7 @@ def parse_changelog(value: Any) -> list[ChangelogEntry]:
             date = date.isoformat()
         if not isinstance(date, str) or not _is_iso_date(date):
             raise ValueError(f"Changelog entry date must be a YYYY-MM-DD date, got {date!r}.")
-        changes = entry.get("changes") or []
+        changes = entry.get("changes")
         if (
             not isinstance(changes, Sequence)
             or isinstance(changes, str)

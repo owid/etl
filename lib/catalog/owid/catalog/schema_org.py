@@ -92,7 +92,7 @@ def dataset_to_schema_org(
     resolved_version = version or dataset_meta.version
 
     title = _dataset_title(dataset_meta, tables)
-    description = _summary(_dataset_description(dataset_meta), node=f"dataset '{dataset_path}'")
+    description = _checked_description(_dataset_description(dataset_meta), node=f"dataset '{dataset_path}'")
     origins = _unique_origins(tables)
 
     result: dict[str, Any] = {
@@ -211,7 +211,7 @@ def _table_dataset(
     }
     description = table_description(table, dataset_meta)
     if description:
-        result["description"] = _summary(description, node=f"table '{table.short_name}'")
+        result["description"] = _checked_description(description, node=f"table '{table.short_name}'")
 
     variables = _variable_measured(table)
     if variables:
@@ -364,12 +364,11 @@ def _dataset_description(dataset_meta: DatasetMeta) -> str:
     )
 
 
-def _summary(description: str, *, node: str) -> str:
+def _checked_description(description: str, *, node: str) -> str:
     """Return a description, raising if it is too long for Dataset Search.
 
     Anything over ``MAX_DESCRIPTION_LENGTH`` makes Google reject the whole record as invalid, and no automatic cut would
-    read well, so its author must shorten it. A dataset's release history belongs in ``DatasetMeta.changelog``, which
-    the landing page shows in a section of its own and which never enters the description.
+    read well, so its author must shorten it.
     """
     description = description.strip()
     if len(description) > MAX_DESCRIPTION_LENGTH:
