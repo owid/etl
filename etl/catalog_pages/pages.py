@@ -57,6 +57,27 @@ ENCODING_FORMATS = {
     "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     "json": "application/json",
 }
+# Live team-page URLs for dataset owners that have one (checked by hand); owners without an
+# entry render unlinked on the page, as on data pages. The map lives in this package rather
+# than etl/owners.py because only this package is covered by _code_checksum, so editing it
+# here republishes the pages.
+OWNER_TEAM_PAGES = {
+    "Bastian Herre": "https://ourworldindata.org/team/bastian-herre",
+    "Bertha Rohenkohl": "https://ourworldindata.org/team/bertha-rohenkohl",
+    "Charlie Giattino": "https://ourworldindata.org/team/charlie-giattino",
+    "Edouard Mathieu": "https://ourworldindata.org/team/edouard-mathieu",
+    "Esteban Ortiz-Ospina": "https://ourworldindata.org/team/esteban-ortiz-ospina",
+    "Fiona Spooner": "https://ourworldindata.org/team/fiona-spooner",
+    "Hannah Ritchie": "https://ourworldindata.org/team/hannah-ritchie",
+    "Joe Hasell": "https://ourworldindata.org/team/joe-hasell",
+    "Lucas Rodés-Guirao": "https://ourworldindata.org/team/lucas-rodes-guirao",
+    "Max Roser": "https://ourworldindata.org/team/max-roser",
+    "Pablo Arriagada": "https://ourworldindata.org/team/pablo-arriagada",
+    "Pablo Rosado": "https://ourworldindata.org/team/pablo-rosado",
+    "Saloni Dattani": "https://ourworldindata.org/team/saloni-dattani",
+    "Tuna Acisu": "https://ourworldindata.org/team/tuna-acisu",
+    "Veronika Samborska": "https://ourworldindata.org/team/veronika-samborska",
+}
 
 
 @dataclass
@@ -213,6 +234,12 @@ def write_page_files(
     }
     if jsonld is not None:
         manifest["jsonld"] = DATASET_JSONLD_FILENAME
+    # First owner is the accountable one; names without a team page carry no url.
+    if ds.metadata.owners:
+        manifest["owners"] = [
+            {"name": name, "url": OWNER_TEAM_PAGES[name]} if name in OWNER_TEAM_PAGES else {"name": name}
+            for name in ds.metadata.owners
+        ]
     if topics:
         manifest["topics"] = topics
         manifest["explore_url"] = explore_url(topics[0])

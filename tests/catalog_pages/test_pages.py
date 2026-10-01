@@ -45,6 +45,7 @@ def _add_dataset(
             description=description,
             licenses=[License(name="CC BY 4.0", url="https://creativecommons.org/licenses/by/4.0/")],
             jsonld=True,
+            owners=["Pablo Rosado", "Mojmír Vinkler"],
         ),
     )
     for index in range(tables):
@@ -126,6 +127,11 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     assert workbook.sheet_names == ["data", "codebook", "sources"]
     assert pd.read_excel(workbook, "data").columns.tolist() == ["country", "year", "hydro_energy_twh"]
     assert manifest["jsonld"] == "dataset.jsonld"
+    # Owners in order, first the accountable one; a name without a team page carries no url.
+    assert manifest["owners"] == [
+        {"name": "Pablo Rosado", "url": "https://ourworldindata.org/team/pablo-rosado"},
+        {"name": "Mojmír Vinkler"},
+    ]
     # The primary topic gives the page its way back to the charts.
     assert manifest["topics"] == ["Energy"]
     assert manifest["explore_url"] == "https://ourworldindata.org/search?q=Energy&resultType=all"
