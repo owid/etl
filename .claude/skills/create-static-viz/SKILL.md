@@ -58,8 +58,9 @@ say-so — same rule as `/owid-staff:create-figma-chart`.
 > before choosing a form or deciding what to label: the point is not to style anything here, it is to
 > avoid emitting a structure the Figma pass then has to undo (a legend that should have been direct
 > labels, a category count that cannot be labeled in place). That file also indexes the design team's
-> **DI Chart Library** (`pltrHXyVLg2XaNq4AvxPaK`, **read-only**) — 272 finished charts filed by chart
-> type, which is the closest thing to precedent for whatever you are about to draw.
+> **DI Chart Library** (`pltrHXyVLg2XaNq4AvxPaK`, **read-only**) — 288 finished charts on 2026-10-01,
+> filed by chart type (dumbbell plots now have a page of their own; `GUIDELINES.md` keeps the current
+> per-page counts), which is the closest thing to precedent for whatever you are about to draw.
 
 Two companions in this directory:
 
