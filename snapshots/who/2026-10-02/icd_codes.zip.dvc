@@ -13,3 +13,7 @@ meta:
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/copyright
+outs:
+  - md5: c6fc0cda115be1a3a0f9e3bd5f0b17a1
+    size: 223741
+    path: icd_codes.zip

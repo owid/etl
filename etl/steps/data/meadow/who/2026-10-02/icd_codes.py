@@ -19,7 +19,12 @@ def run() -> None:
 
     # Load data from snapshot.
     zf = zipfile.ZipFile(snap.path)
-    tb = pr.read_excel(zf.open("list_ctry_years_feb2025.xlsx"), skiprows=7)
+    # WHO names the file after the release month (list_ctry_years_feb2026.xls), so it changes with
+    # every update, and the extension has changed between releases too. Find it instead of
+    # hardcoding it, but insist on exactly one so a restructured archive fails loudly.
+    spreadsheets = [name for name in zf.namelist() if name.lower().endswith((".xls", ".xlsx"))]
+    assert len(spreadsheets) == 1, f"Expected exactly one spreadsheet in the archive, found {zf.namelist()}"
+    tb = pr.read_excel(zf.open(spreadsheets[0]), skiprows=7)
     tb = tb[["name", "Year", "Icd"]]
     tb = tb.rename(columns={"name": "country", "Year": "year", "Icd": "icd"})
     tb = tb.drop_duplicates()
