@@ -1680,7 +1680,7 @@ tables:
         description_processing: |-
           {definitions.description_processing_main_poverty}
         description_from_producer: |-
-          The mean is the average monthly household per capita income or consumption expenditure from the survey in <<ppp_version>> PPP.
+          The average daily household per capita income or consumption expenditure from the survey in <<ppp_version>> PPP
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -1738,7 +1738,7 @@ tables:
         description_processing: |-
           {definitions.description_processing_main_poverty}
         description_from_producer: |-
-          The median of monthly household per capita income or consumption expenditure from the survey in <<ppp_version>> PPP.
+          The median of daily household per capita income or consumption expenditure from the survey in <<ppp_version>> PPP
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
