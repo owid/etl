@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from owid.catalog.core.meta import DatasetMeta, License, Origin, TableMeta, VariableMeta, VariablePresentationMeta
@@ -520,9 +522,10 @@ def test_keywords_ordered_by_variable_count_not_column_order() -> None:
     assert jsonld["keywords"] == ["CO2 & Greenhouse Gas Emissions", "Economic Growth"]
 
 
-def test_description_drops_changelog_and_fits_dataset_search_limit() -> None:
-    changelog = "## Changelog\n\n" + "\n".join(f"- 2026-01-{day:02d}: Updated the data." for day in range(1, 29)) * 10
-    description = f"Intro paragraph about the data.\n\n{changelog}\n\n## Notes\n\nA closing note."
+def test_description_leaves_out_changelog_and_fits_dataset_search_limit() -> None:
+    description = "Intro paragraph about the data.\n\n## Notes\n\nA closing note."
+    # A long release history lives in its own field, so it never pushes the description past the limit.
+    changelog = [{"date": f"2026-01-{day:02d}", "changes": ["Updated the data."] * 10} for day in range(1, 29)]
     table = TableSchemaInput(
         short_name="column_mapping",
         metadata=TableMeta(short_name="column_mapping"),
@@ -532,11 +535,14 @@ def test_description_drops_changelog_and_fits_dataset_search_limit() -> None:
     jsonld = dataset_to_schema_org(
         dataset_path="garden/example/2025-01-01/example_dataset",
         page_path="example/example_dataset",
-        dataset_meta=DatasetMeta(namespace="example", short_name="example_dataset", description=description),
+        dataset_meta=DatasetMeta(
+            namespace="example", short_name="example_dataset", description=description, changelog=changelog
+        ),
         tables=[table, TableSchemaInput(short_name="other", metadata=TableMeta(short_name="other"), variables={})],
     )
 
-    assert jsonld["description"] == "Intro paragraph about the data.\n\n## Notes\n\nA closing note."
+    assert jsonld["description"] == description
+    assert "Updated the data" not in json.dumps(jsonld)
     # Google validates nested Datasets on their own: the table falling back to the dataset description gets the
     # same summary, and repeats the creator.
     assert jsonld["hasPart"][0]["description"] == jsonld["description"]

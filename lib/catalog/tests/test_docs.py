@@ -60,7 +60,11 @@ def make_dataset(path: Path) -> Dataset:
             short_name="owid_energy",
             version="2026-09-10",
             title="Energy dataset",
-            description="Key energy metrics.\n\n## Changelog\n\n- 2026-09-10: New methodology.",
+            description="Key energy metrics.",
+            changelog=[
+                {"date": "2025-07-17", "changes": ["Updated sources.\n- Including the Energy Institute."]},
+                {"date": "2026-09-10", "changes": ["New methodology.", "Renamed columns."]},
+            ],
             licenses=[License(name="CC BY 4.0", url="https://creativecommons.org/licenses/by/4.0/")],
         ),
     )
@@ -135,7 +139,15 @@ def test_readme_sections(tmp_path):
     readme = ds.readme(url="https://catalog.ourworldindata.org/energy/owid_energy/")
     assert readme.startswith("# Energy dataset\n\n## About this dataset\n\nKey energy metrics.\n")
     assert "This file documents" not in readme
-    assert "## Changelog" in readme
+    # The changelog is its own section, after the data and newest release first; not part of the description.
+    assert "## About this dataset\n\nKey energy metrics.\n\n## Data\n" in readme
+    assert (
+        "## Changelog\n\n"
+        "- 2026-09-10:\n  - New methodology.\n  - Renamed columns.\n"
+        "- 2025-07-17:\n  - Updated sources.\n    - Including the Energy Institute.\n\n"
+        "## How we process data\n"
+    ) in readme
+    assert readme.index("## Data\n") < readme.index("## Changelog\n")
     assert readme.rstrip().endswith(
         "## Advanced download options\n\n"
         "- Catalog page:\n  - https://catalog.ourworldindata.org/energy/owid_energy/\n"

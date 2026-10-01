@@ -8,6 +8,7 @@ from owid import catalog
 from etl import paths
 from etl.helpers import (
     PathFinder,
+    check_changelog,
     create_dataset,
     end_with_punctuation,
 )
@@ -147,3 +148,29 @@ def test_PathFinder_viz_step_names():
         )
         == "viz://explorer/war/latest/conflict_data_source"
     )
+
+
+@pytest.mark.parametrize(
+    "version, dates",
+    [
+        ("2026-09-10", ["2026-09-10", "2025-07-17"]),
+        # A data refresh released without bumping the version is newer than it.
+        ("2025-12-04", ["2026-06-01", "2025-12-04"]),
+        # Only dated versions are releases.
+        ("latest", ["2025-07-17"]),
+        # No changelog, nothing to keep up to date.
+        ("2026-09-10", []),
+    ],
+)
+def test_check_changelog_passes(version, dates):
+    check_changelog(
+        catalog.DatasetMeta(version=version, changelog=[{"date": date, "changes": ["Updated."]} for date in dates])
+    )
+
+
+def test_check_changelog_requires_entry_for_new_version():
+    metadata = catalog.DatasetMeta(
+        short_name="owid_energy", version="2026-09-10", changelog=[{"date": "2025-07-17", "changes": ["Updated."]}]
+    )
+    with pytest.raises(ValueError, match="no entry for version 2026-09-10"):
+        check_changelog(metadata)

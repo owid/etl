@@ -15,13 +15,13 @@ Outputs that will be committed to a branch in the co2-data repository:
 
 """
 
-import re
 import tempfile
 from pathlib import Path
 
 import git
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import ChangelogEntry, Table
+from owid.catalog.core.docs import render_changelog
 from structlog import get_logger
 
 from etl import config
@@ -37,7 +37,7 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-def prepare_readme() -> str:
+def prepare_readme(changelog: list[ChangelogEntry]) -> str:
     # NOTE: In a future update, we could figure out a way to generate the main content of the README from the table's metadata (possibly with the help of VersionTracker).
     # origins = {origin.title_snapshot or origin.title: origin for origin in set(sum([tb[column].metadata.origins for column in tb.columns], []))}
     df = VersionTracker().steps_df
@@ -125,62 +125,7 @@ Additionally, to construct indicators per capita, per GDP, and per unit energy, 
 
 ## Changelog
 
-- 2026-06-01:
-  - Update dataset to use the latest EIA's International Energy Data.
-  - Changed the units of the carbon intensity of energy indicators from kilograms to grams of CO₂ per kilowatt-hour.
-- 2025-12-04:
-  - Update greenhouse gases using the latest data from Jones et al. (2025).
-- 2025-11-13:
-  - Updated dataset to use the latest version of the Global Carbon Budget (2025).
-- 2024-11-21:
-  - Updated dataset (and codebook) to use the latest version of the Global Carbon Budget (2024), and Jones et al. (2024) (version 2024.2).
-  - Now methane, nitrous oxide, and total greenhouse gas emissions data come from Jones et al. (2024), instead of Climate Watch, to provide a wider data coverage.
-- 2024-06-20:
-  - Update data from the Statistical Review of World Energy.
-  - Update data from the Maddison Project Database.
-- 2024-04-10:
-  - Updated dataset and codebook to use the latest version of the data on National contributions to climate change (Jones et al. (2024)).
-- 2023-12-28:
-  - Enhanced codebook (improved descriptions, added units, updated sources).
-  - Updated primary energy consumption (to update metadata, nothing has changed in the data).
-- 2023-12-05:
-  - Updated dataset (and codebook) to use the latest version of the Global Carbon Budget (2023).
-    - In this version, "International transport" has been replaced by "International aviation" and "International shipping". Also, some overseas territories have no data in this version. More details on the changes can be found in the pdf file hosted [here](https://zenodo.org/records/10177738).
-- 2023-11-08:
-  - Updated CO2 emissions data to use the latest emissions by sector from Climate Watch (2023).
-  - Update codebook accordingly.
-- 2023-10-16:
-  - Improved codebook.
-  - Fixed issue related to consumption-based emissions in Africa, and Palau emissions.
-- 2023-07-10:
-  - Updated primary energy consumption and other indicators relying on energy data, to use the latest Statistical Review of World Energy by the Energy Institute.
-  - Renamed countries 'East Timor' and 'Faroe Islands'.
-- 2023-05-04:
-  - Added indicators `share_of_temperature_change_from_ghg`, `temperature_change_from_ch4`, `temperature_change_from_co2`, `temperature_change_from_ghg`, and `temperature_change_from_n2o` using data from Jones et al. (2023).
-- 2022-11-11:
-  - Updated CO2 emissions data with the newly released Global Carbon Budget (2022) by the Global Carbon Project.
-  - Added various new indicators related to national land-use change emissions.
-  - Added the emissions of the 1991 Kuwaiti oil fires in Kuwait's emissions (while also keeping 'Kuwaiti Oil Fires (GCP)' as a separate entity), to properly account for these emissions in the aggregate of Asia.
-  - Applied minor changes to entity names (e.g. "Asia (excl. China & India)" -> "Asia (excl. China and India)").
-- 2022-09-06:
-  - Updated data on primary energy consumption (from BP & EIA) and greenhouse gas emissions by sector (from CAIT).
-  - Refactored code, since now this repository simply loads the data, generates the output files, and uploads them to the cloud; the code to generate the dataset is now in our [etl repository](https://github.com/owid/etl).
-  - Minor changes in the codebook.
-- 2022-04-15:
-  - Updated primary energy consumption data.
-  - Updated CO2 data to include aggregations for the different country income levels.
-- 2022-02-24:
-  - Updated greenhouse gas emissions data from CAIT Climate Data Explorer.
-  - Included two new columns in dataset: total greenhouse gases excluding land-use change and forestry, and the same as per capita values.
-- 2021-11-05:
-  - Updated CO2 emissions data with the newly released Global Carbon Budget (v2021).
-- 2021-09-16:
-  - Fixed data quality issues in CO2 emissions indicators (emissions less than 0, missing data for Eswatini, ...).
-  - Replaced all input CSVs with data retrieved directly from ourworldindata.org.
-- 2021-02-08:
-  - Updated this dataset with the latest annual release from the Global Carbon Project.
-- 2020-08-07:
-  - The first version of this dataset was made available.
+{render_changelog(changelog)}
 
 ## Data processing
 
@@ -210,9 +155,9 @@ Please follow [the guidelines in our FAQ](https://ourworldindata.org/faqs#how-sh
 
 """
 
-    log_dates = re.findall("\d{4}-\d{2}-\d{2}", readme.split("Changelog\n")[-1])
-    error = "Update the change log to add the latest update."
-    assert max(log_dates) >= max([gcb_version, jones_version, owid_co2_version]), error
+    # The changelog lives in the garden dataset's metadata; it must cover the latest update of its main inputs too.
+    error = "Update the changelog in the garden owid_co2.meta.yml to add the latest update."
+    assert max(entry.date for entry in changelog) >= max([gcb_version, jones_version, owid_co2_version]), error
 
     return readme
 
@@ -243,7 +188,7 @@ def run() -> None:
     # Process data.
     #
     # Create a README file.
-    readme = prepare_readme()
+    readme = prepare_readme(changelog=ds_gcp.metadata.changelog)
 
     #
     # Save outputs.

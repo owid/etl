@@ -393,3 +393,47 @@ def test_combined_description_key_survives_as_markdown():
     # The single-key case returns its input, which must be wrapped too.
     single = get_unique_description_key_points_from_indicators([indicator_with("c", "- Already a string.")])
     assert isinstance(single, meta.Markdown)
+
+
+def test_changelog_from_yaml_round_trips(tmp_path):
+    metapath = tmp_path / "meta.yml"
+    # Unquoted dates, as authors write them: YAML parses them as dates, the changelog stores them as strings.
+    metapath.write_text(
+        "dataset:\n"
+        "  changelog:\n"
+        "    - date: 2026-09-10\n"
+        "      changes:\n"
+        "        - New methodology.\n"
+        "        - |-\n"
+        "          Renamed columns.\n"
+        "          - See the mapping table.\n"
+    )
+    d = meta.DatasetMeta()
+    d.update_from_yaml(metapath)
+    assert d.changelog == [
+        meta.ChangelogEntry(
+            date="2026-09-10", changes=["New methodology.", "Renamed columns.\n- See the mapping table."]
+        )
+    ]
+    assert d.to_dict()["changelog"] == [
+        {"date": "2026-09-10", "changes": ["New methodology.", "Renamed columns.\n- See the mapping table."]}
+    ]
+    assert meta.DatasetMeta.from_dict(json.loads(json.dumps(d.to_dict()))) == d
+    # An empty changelog is pruned, so datasets without one keep their metadata (and checksums) unchanged.
+    assert "changelog" not in meta.DatasetMeta().to_dict()
+
+
+@pytest.mark.parametrize(
+    "changelog",
+    [
+        "- 2026-09-10: New methodology.",
+        [{"date": "2026-13-01", "changes": ["New methodology."]}],
+        [{"date": "September 2026", "changes": ["New methodology."]}],
+        [{"date": "2026-09-10"}],
+        [{"date": "2026-09-10", "changes": "New methodology."}],
+        [{"date": "2026-09-10", "changes": ["New methodology."], "note": "unknown field"}],
+    ],
+)
+def test_changelog_rejects_malformed_entries(changelog):
+    with pytest.raises((TypeError, ValueError)):
+        meta.DatasetMeta(changelog=changelog)

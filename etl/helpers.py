@@ -185,11 +185,30 @@ def create_dataset(
     if meta_override_path.exists():
         ds.update_metadata(meta_override_path, if_origins_exist=if_origins_exist, extra_variables=extra_variables)
 
+    check_changelog(ds.metadata)
+
     # run grapher checks
     if ds.metadata.channel == "grapher" and run_grapher_checks:
         grapher_checks(ds)
 
     return ds
+
+
+def check_changelog(metadata: DatasetMeta) -> None:
+    """A dataset that keeps a changelog must have an entry for its own version.
+
+    A new version is a new release for the people reading the changelog, so a step copied to a new version with its
+    `.meta.yml` fails here until someone writes down what the release changed. A changelog may also have entries newer
+    than the version, for releases that refreshed data without bumping it.
+    """
+    if not metadata.changelog or not metadata.version or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", metadata.version):
+        return
+    latest = max(entry.date for entry in metadata.changelog)
+    if latest < metadata.version:
+        raise ValueError(
+            f"The changelog of dataset {metadata.short_name} has no entry for version {metadata.version} (latest entry: "
+            f"{latest}). Add one to `dataset.changelog` in its .meta.yml, saying what this release changed."
+        )
 
 
 def get_metadata_path(dest_dir: str) -> Path:
