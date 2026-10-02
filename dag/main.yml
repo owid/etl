@@ -655,6 +655,9 @@ steps:
         - snapshot://un/2026-07-31/un_sdg.feather
       - snapshot://un/2026-07-31/un_sdg_dimension.json
       - snapshot://un/2026-07-31/un_sdg_unit.csv
+  # USA PPI New Nonresidential Building Construction (US Bureau of Labor Statistics)
+  data://garden/bls/2026-10-02/us_ppi_construction:
+    - snapshot://bls/2026-10-02/us_ppi_construction.csv
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
