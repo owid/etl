@@ -1,8 +1,8 @@
 """Bespoke viz step that generates JSON files for the UN migration flows visualization.
 
 This step reads the migration_stock_flows garden dataset and generates:
-* `metadata.json`, the feed's provenance, derived from the garden columns (see `etl.viz.bespoke`)
-* A metadata JSON file with entity/gender dimensions and time range
+* A metadata JSON file with entity/gender dimensions and time range, plus the feed's provenance,
+  derived from the garden columns (see `etl.viz.bespoke`)
 * Individual data JSON files per country/entity
 
 Each per-country file contains all pairwise immigrant and emigrant stocks for
@@ -26,7 +26,7 @@ from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
-from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
+from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
 
 log = get_logger()
 
@@ -209,14 +209,13 @@ def run() -> None:
         columns={"Migrants": tb["migrants"]},
         update_period_days=ds_garden.metadata.update_period_days,
     )
-    write_feed_metadata(paths.output_dir, feed_metadata)
 
-    metadata, mappings = create_metadata_json(tb, tb_pop, source=feed_metadata["feed"]["citation"])
+    metadata, mappings = create_metadata_json(tb, tb_pop, source=feed_metadata["attribution"])
 
     total_files = len(mappings["entities"]) + 1
     log.info(f"Creating {total_files} JSON files.")
 
-    save_json(metadata, "migration-stock-flows.metadata.json")
+    save_json(add_feed_metadata(metadata, feed_metadata), "migration-stock-flows.metadata.json")
 
     #
     # Per-entity files.

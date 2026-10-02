@@ -4,7 +4,8 @@ config:
   isPublished: true
   hasMapTab: false
   hideAnnotationFieldsInTitle: true
-  entityType: food
+  entityType: food product
+  entityTypePlural: food products
   wpBlockId: "52428"
   originUrl: https://ourworldindata.org/environmental-impacts-of-food
   selection:
