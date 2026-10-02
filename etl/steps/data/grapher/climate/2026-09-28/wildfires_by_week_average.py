@@ -43,9 +43,9 @@ def run() -> None:
     # Loop through each group of indicators and apply the same calculations
     for group in column_groups:
         # Select columns that contain the group name and a year between 2003 (minimum value in
-        # emissions; 2012 in area burnt) and CURRENT_YEAR - 2, inclusive.
+        # emissions; 2012 in area burnt) and CURRENT_YEAR - 1, inclusive.
         group_columns = [
-            col for col in tb.columns if group in col and "2003" <= col.split("_")[1] <= str(CURRENT_YEAR - 2)
+            col for col in tb.columns if group in col and "2003" <= col.split("_")[1] <= str(CURRENT_YEAR - 1)
         ]
 
         tb_grouped = tb[group_columns + ["country", "year"]]
@@ -53,11 +53,9 @@ def run() -> None:
         # Sort the group columns by year
         group_columns_sorted = sorted(group_columns, key=lambda x: int(x.split("_")[1]))
 
-        # Calculate the average until current year - 2
-        tb[f"{group}_until_current_year_minus_2"] = tb[group_columns_sorted].sum(axis=1)
-        tb[f"avg_{group}_until_current_year_minus_2"] = tb[f"{group}_until_current_year_minus_2"] / len(
-            group_columns_sorted
-        )
+        # Calculate the average until current year - 1
+        tb[f"sum_{group}"] = tb[group_columns_sorted].sum(axis=1)
+        tb[f"avg_{group}"] = tb[f"sum_{group}"] / len(group_columns_sorted)
 
         # Process data for each country
         for country in tb["country"].unique():
@@ -80,12 +78,12 @@ def run() -> None:
             tb.loc[tb["country"] == country, f"lower_bound_{group}"] = country_rows[min_col]
 
         # Drop original columns as they are used in a different dataset and not needed here
-        tb = tb.drop(columns=[f"{group}_until_current_year_minus_2"] + group_columns)
+        tb = tb.drop(columns=[f"sum_{group}"] + group_columns)
 
         # Dynamically set origins based on the group
         origin_column = f"_{CURRENT_YEAR}_{group}"  # Dynamically set based on group name
         if origin_column in tb.columns:  # Check if the origin column exists
-            for col in [f"avg_{group}_until_current_year_minus_2", f"upper_bound_{group}", f"lower_bound_{group}"]:
+            for col in [f"avg_{group}", f"upper_bound_{group}", f"lower_bound_{group}"]:
                 tb[col].origins = tb[origin_column].origins
 
     # Only keep the columns with the averages and bounds as the other variables exist in the wildfires_by_week dataset.
@@ -93,16 +91,16 @@ def run() -> None:
         [
             "country",
             "year",
-            "avg_area_ha_cumulative_until_current_year_minus_2",
+            "avg_area_ha_cumulative",
             "upper_bound_area_ha_cumulative",
             "lower_bound_area_ha_cumulative",
-            "avg_share_cumulative_area_until_current_year_minus_2",
+            "avg_share_cumulative_area",
             "upper_bound_share_cumulative_area",
             "lower_bound_share_cumulative_area",
-            "avg_co2_cumulative_until_current_year_minus_2",
+            "avg_co2_cumulative",
             "upper_bound_co2_cumulative",
             "lower_bound_co2_cumulative",
-            "avg_pm2_5_cumulative_until_current_year_minus_2",
+            "avg_pm2_5_cumulative",
             "upper_bound_pm2_5_cumulative",
             "lower_bound_pm2_5_cumulative",
         ]
@@ -119,7 +117,7 @@ def run() -> None:
         yaml_params={
             "date_accessed": last_date_accessed(tb),
             "year": last_date_accessed(tb)[-4:],
-            "max_year": CURRENT_YEAR - 2,
+            "max_year": CURRENT_YEAR - 1,
         },
     )
     ds_grapher.save()

@@ -75,7 +75,7 @@ tables:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
 
-        avg_area_ha_cumulative_until_current_year_minus_2:
+        avg_area_ha_cumulative:
           title: Average cumulative area burnt by wildfires between 2012 and {max_year}
           unit: *unit_wildfires
           short_unit: *short_unit_wildfires
@@ -114,7 +114,7 @@ tables:
             name: Minimum
             numDecimalPlaces: 0
 
-        avg_share_cumulative_area_until_current_year_minus_2:
+        avg_share_cumulative_area:
           title: Average cumulative share of the total land area burnt by wildfires between 2012 and {max_year}
           unit: *unit_share
           short_unit: *short_unit_share
@@ -156,7 +156,7 @@ tables:
             name: Minimum
             numDecimalPlaces: 2
 
-        avg_co2_cumulative_until_current_year_minus_2:
+        avg_co2_cumulative:
           title: Average weekly cumulative carbon dioxide emissions from wildfires between 2003 and {max_year}
           unit: *unit_emissions
           short_unit: *short_unit_emissions
@@ -195,7 +195,7 @@ tables:
             name: Minimum
             numDecimalPlaces: 0
 
-        avg_pm2_5_cumulative_until_current_year_minus_2:
+        avg_pm2_5_cumulative:
           title: Average weekly cumulative PM2.5 emissions from wildfires between 2003 and {max_year}
           unit: *unit_emissions
           short_unit: *short_unit_emissions
