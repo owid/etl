@@ -311,11 +311,21 @@ definitions:
 
   description_processing_relative_poverty: |-
     <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country and year and calculate a relative poverty line — in this case <<poverty_line>>. For countries, we then run a specific query on the PIP API to return the share of the population below that line. For regions, we calculate the share below that line from the World Bank's [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304), which provides 1,000 welfare bins per country and year.
+    Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country or region and year and calculate a relative poverty line — in this case <<poverty_line>>. For countries, we then run a specific query on the PIP API to return the share of the population below that line. For regions, we calculate the share below that line from the World Bank's [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304), which provides 1,000 welfare bins per country and year.
+
+    <% endif %>
+
+  description_processing_median_regions: |-
+    <% if ppp_version == 2021 and welfare_type == "income or consumption" and (survey_comparability is not defined or survey_comparability == "No spells") and (table is not defined or table != "Income or consumption intra/extrapolated") %>
+
+    Regional medians are calculated from the World Bank's [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304), as the 50th percentile of the pooled distribution of all countries in each region.
     <%- endif %>
 
+  description_processing_thr_regions: |-
+    Regional thresholds are calculated from the World Bank's [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304), which splits each country's population into 1,000 equal-sized groups and reports the average income or consumption of each. We pool these groups for all countries in each region, rank them from poorest to richest, and estimate each threshold by interpolating between the groups' averages.
+
   description_processing_thr: |-
-    Income and consumption thresholds by decile are not directly available in the World Bank PIP API. We extract the metric primarily from [auxiliary percentiles data provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646). Missing country values are calculated by running multiple queries on the API to obtain the closest poverty line to each threshold. Regional thresholds are calculated from the World Bank's [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304): we pool the binned distributions of all countries in each region, order the population by welfare, and read the welfare level at each percentile.
+    Income and consumption thresholds by decile are not directly available in the World Bank PIP API. We extract the metric primarily from [auxiliary percentiles data provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646). Missing country values are calculated by running multiple queries on the API to obtain the closest poverty line to each threshold. {definitions.description_processing_thr_regions}
 
   # NOTE: Modify depending on the final data structure
   description_processing_share_90_99: |-
@@ -325,7 +335,10 @@ definitions:
     Income and consumption averages by decile are not directly available in the World Bank PIP API. We calculate the metric by multiplying the share of each decile by the mean income or consumption of the distribution and dividing by the population share of the decile (10%).
 
   description_processing_thr_percentiles: |-
-    We calculate missing country values of thresholds by running multiple queries on the API to obtain the closest poverty line to each threshold, and merge them with the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles). Regional thresholds are built from the World Bank's [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304) by pooling the binned distributions of all countries in each region and reading the welfare level at each percentile.
+    We calculate missing country values of thresholds by running multiple queries on the API to obtain the closest poverty line to each threshold, and merge them with the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles). {definitions.description_processing_thr_regions}
+
+  description_processing_avg_share_percentiles: |-
+    For countries, this data comes from the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles). For regions, we calculate it from the World Bank's [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304): we pool the binned distributions of all countries in each region, rank the population by income or consumption, and calculate the average and the share of total income or consumption held by each percentile.
 
   description_processing_palma_ratio: |-
     The Palma ratio is not directly available in the World Bank PIP API. We calculate the metric by dividing the income share of the richest 10% by the income share of the poorest 40%. Both these values are available in the API.
@@ -1737,6 +1750,8 @@ tables:
           - "{definitions.description_key_ppp}"
         description_processing: |-
           {definitions.description_processing_main_poverty}
+
+          {definitions.description_processing_median_regions}
         description_from_producer: |-
           The median of daily household per capita income or consumption expenditure from the survey in <<ppp_version>> PPP
         display:
@@ -2172,6 +2187,8 @@ tables:
           - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
           - "{definitions.description_key_ppp}"
+        description_processing: |-
+          {definitions.description_processing_avg_share_percentiles}
         display:
           name: Average (percentile <<percentile>>)
           numDecimalPlaces: 2
@@ -2185,6 +2202,8 @@ tables:
         description_key:
           - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_avg_share_percentiles}
         display:
           name: Share (percentile <<percentile>>)
           numDecimalPlaces: 1
