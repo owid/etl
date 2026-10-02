@@ -5,11 +5,10 @@ Reads whichever food supply chain garden dataset is the step's dependency in the
 bespoke-visualization feeds (food trade, causes of death):
 
   * one metadata JSON at `food-supply-chain.metadata.json`: the method, the sources, the year range, the stages of
-    the chain in order (with a label and whether the bar adds to or takes from the chain), the units, and the
-    entity id-to-name mapping;
+    the chain in order (with a label and whether the bar adds to or takes from the chain), the units, the
+    entity id-to-name mapping, and the feed's provenance derived from the garden columns (see `etl.viz.bespoke`);
   * one JSON per entity at `food-supply-chain.<entity_id>.json`, with the years and, for each unit (energy,
-    protein, mass), one array per stage aligned with the years;
-  * `metadata.json`, the feed's provenance derived from the garden columns (see `etl.viz.bespoke`).
+    protein, mass), one array per stage aligned with the years.
 
 Reshaping only; all logic lives in the garden steps. Values are FAO's sign convention: stages listed with
 "direction": "out" are magnitudes to subtract along the chain (a negative value there adds back), and the chain
@@ -25,7 +24,7 @@ import json
 from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
-from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
+from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
 
 paths = PathFinder(__file__)
 
@@ -93,7 +92,6 @@ def run() -> None:
         },
         update_period_days=ds.metadata.update_period_days,
     )
-    write_feed_metadata(paths.output_dir, feed_metadata)
 
     #
     # Metadata: entities get 1-based alphabetical ids, as in the other bespoke exports.
@@ -109,7 +107,7 @@ def run() -> None:
         "stages": [{"key": key, "name": name, "direction": direction} for key, name, direction in STAGES],
         "dimensions": {"entities": [{"id": entity_to_id[name], "name": name} for name in entities]},
     }
-    _save(metadata, f"{FILE_SLUG}.metadata.json")
+    _save(add_feed_metadata(metadata, feed_metadata), f"{FILE_SLUG}.metadata.json")
 
     #
     # One file per entity: years, then for each unit one array per stage aligned with the years.
