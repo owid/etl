@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import pandas as pd
+from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
 
@@ -34,7 +34,7 @@ def run() -> None:
     tb["country"] = "United States"
 
     # Create date column for monthly data
-    tb["date"] = pd.to_datetime(
+    tb["date"] = pr.to_datetime(
         tb["year"].astype(str) + "-" + tb["month"].fillna(1).astype(int).astype(str).str.zfill(2) + "-01"
     )
     tb["date"].metadata.origins = tb["year"].metadata.origins

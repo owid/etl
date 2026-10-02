@@ -1,6 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-import pandas as pd
+from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
 
@@ -46,7 +46,7 @@ def run() -> None:
     tb = tb[tb["date_str"].str.match(date_pattern, na=False)]
 
     # Convert to datetime - format is "MMM-YY"
-    tb["date"] = pd.to_datetime(tb["date_str"], format="%b-%y")
+    tb["date"] = pr.to_datetime(tb["date_str"], format="%b-%y")
 
     # Drop temporary columns
     tb = tb.drop(columns=["Date", "date_str"])
