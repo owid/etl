@@ -261,6 +261,10 @@ Two ways this goes wrong, both worth a 🟡:
 
 A claim deliberately left unchanged is a perfectly good outcome — a data insight whose chart is a static image
 cannot have its text updated alone without desyncing it from the picture. Look for the reason, not for a fix.
+The exception is a **narrative chart's own title or subtitle**: it renders live data, so with `maxTime: "latest"`
+an unbounded claim in it is already wrong on staging. Spot-check each narrative chart carrying the dataset's
+variables (`AdminAPI.get_narrative_chart(id)["configFull"]`); an unbounded claim the new data contradicts, with
+neither a retitle nor a `maxTime` pin applied on staging, is a 🟡.
 
 ### 11. DAG checks
 

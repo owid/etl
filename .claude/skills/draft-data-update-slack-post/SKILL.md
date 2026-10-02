@@ -208,7 +208,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
    - Output path: `ai/data-update-comms.md` by default, or `workbench/<short_name>/slack-announcement.md` when invoked from `update-dataset` step 9.
    - Use the canonical format in the Output format section below — no example lines, no `[filled]` / `[prompt]` tags, no inline instructions. If a field can't be filled mechanically, write `[missing — <what's needed>]` inside the fenced block and stop.
 
-9. **Show the user the file path** and stop. Do **not** post to Slack — that's a human action. The user copy-pastes from the Markdown file into the Slack form.
+9. **Show the user the file path** and stop. In a git worktree, give the absolute path: a relative link opens the main checkout's copy, which may be a previous update's draft. Do **not** post to Slack — that's a human action. The user copy-pastes from the Markdown file into the Slack form.
 
 ## Output format
 
