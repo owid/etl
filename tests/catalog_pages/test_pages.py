@@ -30,7 +30,7 @@ def _add_dataset(
     namespace: str = "energy",
     dataset: str = "owid_energy",
     version: str = "2026-09-10",
-    description: str | None = "Dataset description.\n\n## Changelog\n\n- 2026-09-10: First release.",
+    description: str | None = "Dataset description.",
     tables: int = 1,
 ) -> str:
     dataset_dir = data_dir / "garden" / namespace / version / dataset
@@ -43,6 +43,7 @@ def _add_dataset(
             short_name=dataset,
             title="Energy dataset",
             description=description,
+            changelog=[{"date": version, "changes": ["First release."]}],
             licenses=[License(name="CC BY 4.0", url="https://creativecommons.org/licenses/by/4.0/")],
             jsonld=True,
             owners=["Pablo Rosado", "Mojmír Vinkler"],
@@ -105,7 +106,7 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     readme = (page_dir / "readme.md").read_text()
     assert readme.startswith("# Energy dataset\n\n## About this dataset\n")
     assert "- Catalog page:\n  - https://catalog.ourworldindata.org/energy/owid_energy/" in readme
-    assert "## Changelog" in readme
+    assert "## Changelog\n\n- 2026-09-10:\n  - First release.\n" in readme
     assert "##### Example Producer – Original dataset (2025)" in readme
 
     manifest = json.loads((page_dir / "manifest.json").read_text())
@@ -185,6 +186,8 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
 
     # The JSON-LD lists the same data files as the manifest, so search engines see the downloads the page has.
     jsonld = json.loads((page_dir / "dataset.jsonld").read_text())
+    # The changelog is a section of the page, not part of the description search engines show.
+    assert jsonld["description"] == "Dataset description."
     # The dated metadata file is not a download of the data, so it stays out of the JSON-LD.
     assert [entry["name"] for entry in jsonld["distribution"]] == [
         "owid_energy.csv",

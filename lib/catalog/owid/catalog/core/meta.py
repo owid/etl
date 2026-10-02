@@ -8,6 +8,7 @@ import dataclasses
 import datetime as dt
 import json
 import re
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
 from typing import Any, Literal, NewType, NoReturn, NotRequired, Required, Self, TypedDict, TypeVar
@@ -681,6 +682,66 @@ class VariableMeta(MetaBase):
 
 @pruned_json
 @dataclass(eq=False)
+class ChangelogEntry(MetaBase):
+    """One release of a dataset in its changelog: the date of the release and what it changed.
+
+    Each change is a markdown bullet; a change spanning several lines keeps its extra lines (e.g. a nested list)
+    under its own bullet when rendered.
+    """
+
+    date: str
+    changes: list[str]
+
+
+def _is_iso_date(text: str) -> bool:
+    # The round trip also rejects the other forms `fromisoformat` accepts, like `20260910`.
+    try:
+        return dt.date.fromisoformat(text).isoformat() == text
+    except ValueError:
+        return False
+
+
+def parse_changelog(value: Any) -> list[ChangelogEntry]:
+    """Normalize a changelog to a list of `ChangelogEntry`, whatever it was read from.
+
+    A `.meta.yml` gives mappings (dynamic_yaml proxies, not plain dicts), with unquoted dates parsed by YAML as
+    `datetime.date`; a saved `index.json` gives dicts with string dates. Dates are stored as `YYYY-MM-DD` strings,
+    and anything else fails here, at the step that sets it, rather than in whatever renders it later.
+    """
+    if value is None:
+        return []
+    if not isinstance(value, Sequence) or isinstance(value, str):
+        raise TypeError(f"Dataset changelog must be a list of entries, got {type(value).__name__}.")
+    entries = []
+    for entry in value:
+        if isinstance(entry, ChangelogEntry):
+            entry = entry.to_dict()
+        if not isinstance(entry, Mapping):
+            raise TypeError(f"Changelog entry must be a mapping with `date` and `changes`, got {entry!r}.")
+        unknown = set(entry) - {"date", "changes"}
+        if unknown:
+            raise ValueError(f"Changelog entry has unknown fields {sorted(unknown)}: {entry!r}.")
+        date = entry.get("date")
+        if isinstance(date, dt.datetime):
+            date = date.date()
+        if isinstance(date, dt.date):
+            date = date.isoformat()
+        if not isinstance(date, str) or not _is_iso_date(date):
+            raise ValueError(f"Changelog entry date must be a YYYY-MM-DD date, got {date!r}.")
+        changes = entry.get("changes")
+        if (
+            not isinstance(changes, Sequence)
+            or isinstance(changes, str)
+            or not changes
+            or not all(isinstance(c, str) and c.strip() for c in changes)
+        ):
+            raise ValueError(f"Changelog entry {date} must list its changes as non-empty strings.")
+        entries.append(ChangelogEntry(date=date, changes=[c.strip() for c in changes]))
+    return entries
+
+
+@pruned_json
+@dataclass(eq=False)
 class DatasetMeta(MetaBase):
     """
     The metadata for this entire dataset kept in JSON (e.g. mydataset/index.json).
@@ -711,9 +772,17 @@ class DatasetMeta(MetaBase):
     jsonld: bool = False
     # OWID team members who maintain this dataset; first entry is the accountable owner
     owners: list[str] = field(default_factory=list)
+    # what each release of the dataset changed, for its users (rendered in the README and on the catalog page)
+    changelog: list[ChangelogEntry] = field(default_factory=list)
 
     # an md5 checksum of the ingredients used to make this dataset
     source_checksum: str | None = None
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        # `.meta.yml` fields are applied with a plain `setattr`, so normalize the changelog on every assignment
+        if name == "changelog":
+            value = parse_changelog(value)
+        super().__setattr__(name, value)
 
     def _params_yaml(self) -> dict:
         """Parameters passed to YAML for dynamic interpolation."""
