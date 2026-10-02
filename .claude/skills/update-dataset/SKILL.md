@@ -719,6 +719,21 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      Check the **title separately from the body** (it comes from a different field, see above) — a body can be
      correctly hedged while the title states the bare multiple, and the title is what readers see in feeds and
      social cards.
+     **Narrative charts carry claims of their own, and they go stale on staging, not later.** A narrative
+     chart's pinned `title`/`subtitle` often restates the post's headline ("…has grown 5-fold since late
+     2022"), but unlike a static image it renders live data: with `maxTime: "latest"` it draws the new months
+     under the old claim the moment the remap lands. Read its merged config
+     (`AdminAPI.get_narrative_chart(id)["configFull"]`) and recompute any claim in it. The fix belongs in this
+     PR, with sign-off since it's reader-facing: either retitle it to the new figure, or pin its `maxTime` to
+     the period the claim describes so it stays a dated snapshot. Decide one or the other, never both. Route a
+     retitle through `/edit-faust-metadata` (it owns narrative-chart text and its blast radius); a `maxTime`
+     pin goes straight to staging. When the parent is a chart, either edit reaches production with it once
+     the parent's Chart Diff is approved. Chart-sync only carries narrative children of synced *charts*, so a
+     narrative chart parented to an MDim view (`parentMultiDimXChartConfigId`) never syncs: make the same
+     edit on production in the admin after merge, and keep it in the PR's open items until it's done. The
+     data insight that embeds it is still the author's call.
+     (Data center construction: narrative chart 348 kept "5-fold" over data showing ~6x, while the data
+     insight around it showed a frozen PNG that still matched.)
      **A static image changes the remedy, not the finding — and the sweep's `kind` cannot tell you which you
      have.** `kind=embed` means the surface *holds* the chart by slug (a data insight's front-matter
      `grapher-url`, an announcement's `cta` button); it says nothing about what the reader sees, and both of
@@ -838,7 +853,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      ```bash
      gh pr comment <pr_number> --body "@codex review"
      ```
-   - At the end of the update, tell the user, with a **markdown link to the saved file** so they can click through to open it: `"Slack announcement drafted at [workbench/<short_name>/slack-announcement.md](workbench/<short_name>/slack-announcement.md). Please review and post it to #data-updates-comms."` Always render the path as a markdown link `[…](…)`, not as inline-code — the chat UI renders it as clickable that way. (Slack can't be auto-posted — the user posts it.)
+   - At the end of the update, tell the user, with a **markdown link to the saved file** so they can click through to open it: `"Slack announcement drafted at [workbench/<short_name>/slack-announcement.md](workbench/<short_name>/slack-announcement.md). Please review and post it to #data-updates-comms."` Always render the path as a markdown link `[…](…)`, not as inline-code — the chat UI renders it as clickable that way. (Slack can't be auto-posted — the user posts it.) **In a git worktree, link by absolute path** (`/…/.claude/worktrees/<name>/workbench/<short_name>/slack-announcement.md`): a relative link resolves against the editor's workspace root, i.e. the main checkout, whose gitignored `workbench/` can still hold the previous update's draft, so the user reads stale text. The same goes for every workbench or `ai/` artifact you hand over, including 9b's draft. (Data center construction: the user opened the July draft, "Released: 2026-07-01", instead of the October one.)
 
 9b) Data update post (for OWID /latest)
    - Run the `/owid-staff:draft-data-update-post` skill in **Mode A**, with `workbench/<short_name>/update-context.yml` and `workbench/<short_name>/slack-announcement.md` as input. That skill is the canonical owner of the CMS format, the house style, the CTA link rules, the Google Doc creation and styling, and the handoff wording. Do not duplicate any of it here.
@@ -849,11 +864,13 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - **Do not put the post in the PR at all** — no embed and no pointer. Like the Slack draft, it stays in `workbench/`.
 
 10) Codex review: address comments and resolve threads
-   - **Codex's delivery channel depends on the verdict — poll both.** A **clean pass** arrives as an *issue comment* ("Didn't find any major issues") from `chatgpt-codex-connector[bot]`, with zero inline comments and no formal review object. A review **with findings** arrives as a formal review ("💡 Codex Review") with inline comments, and *no* issue comment. A watcher polling only one channel waits forever on the other outcome — treat a hit on either as completion.
+   - **Codex's delivery channel depends on the verdict — poll both.** A **clean pass** arrives as an *issue comment* ("Didn't find any major issues") from `chatgpt-codex-connector[bot]`, with zero inline comments and no formal review object. A review **with findings** arrives as a formal review ("💡 Codex Review") with inline comments, and *no* issue comment. A watcher polling only one channel waits forever on the other outcome — treat a hit on either as completion. A third clean-pass shape: the automatic review on **opening or marking ready** can end with only a 👍 reaction on the PR and no comment at all — it counts only when the reacting login starts with `chatgpt-codex-connector` and it is stamped after the trigger. When the `codex-pull-request-review-summary` issue comment is present, it is the most direct completion signal: it is edited in place, and its table row shows `✅ Completed` with the reviewed commit, which must match your HEAD.
    - Wait ~60 seconds after posting `@codex review`, then poll both channels:
      ```bash
      gh api repos/owid/etl/issues/<pr_number>/comments | python3 -m json.tool   # clean-pass summary lands here
      gh api repos/owid/etl/pulls/<pr_number>/comments | python3 -m json.tool    # findings land here as inline comments
+     gh api --paginate repos/owid/etl/issues/<pr_number>/reactions \
+       --jq '.[] | select(.content == "+1" and (.user.login | startswith("chatgpt-codex-connector"))) | .created_at'   # bare-👍 clean pass
      ```
    - **Codex posts in one of two places — always check both.** When it finds issues, it leaves *inline review comments* (the endpoint above) with resolvable threads. When it finds **nothing**, it posts a single top-level **PR (issue) comment** instead — no inline comments, no threads — e.g. "Codex Review: Didn't find any major issues. Keep it up!". So if the inline-comments endpoint is empty, check the issue comments before concluding Codex hasn't run yet. A third shape exists: a findings review whose finding lives **only in the review body** (no inline comments, no resolvable threads) — list `gh api repos/owid/etl/pulls/<n>/reviews` and read each new review's `body`; polling only the two comment endpoints misses it (there is no thread to resolve — reply via a normal PR comment instead):
      ```bash
