@@ -149,7 +149,9 @@ feed_metadata = build_feed_metadata(
     columns={"Deaths": tb["value"]},
     update_period_days=ds_garden.metadata.update_period_days,
 )
-save_json(add_feed_metadata(manifest, feed_metadata), "causes-of-death.metadata.json")
+# `manifest` is the bundle's own data index, e.g. {"dimensions": ..., "timeRange": ...}.
+with open(paths.output_dir / "causes-of-death.metadata.json", "w") as f:
+    json.dump(add_feed_metadata(manifest, feed_metadata), f)
 ```
 
 `add_feed_metadata` raises if a manifest key clashes with a metadata field.

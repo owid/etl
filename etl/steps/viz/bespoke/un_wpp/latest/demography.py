@@ -299,4 +299,4 @@ def run() -> None:
         sanity_check_entity(entity, data)
         save_json(data, f"demography.{slugify(entity)}.data.json")
 
-    log.info("demography.written", n_files=len(entities) + 2, n_entities=len(entities), dest=str(paths.output_dir))
+    log.info("demography.written", n_files=len(entities) + 1, n_entities=len(entities), dest=str(paths.output_dir))

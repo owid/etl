@@ -58,8 +58,6 @@ def test_variable_meta_to_api_dict(table):
     assert api["descriptionShort"] == "Number of deaths."
     assert api["processingLevel"] == "minor"
     assert api["updatePeriodDays"] == 365
-    # Inferred from the values, as a grapher upsert would.
-    assert api["type"] == "float"
     assert api["origins"][0]["producer"] == "IHME, Global Burden of Disease"
     assert api["origins"][0]["citationFull"] == "Global Burden of Disease Collaborative Network (2024)."
     # Grapher-only presentation fields don't travel with a feed.
@@ -139,6 +137,8 @@ def test_build_feed_metadata_of_several_columns(table):
     # No single description or unit to show for a feed combining several columns.
     assert "unit" not in metadata
     assert "descriptionShort" not in metadata
+    # The processing level combines: one minor column and one without a level is minor.
+    assert metadata["processingLevel"] == "minor"
 
 
 def test_build_feed_metadata_keeps_a_license_without_url(table):
@@ -151,6 +151,13 @@ def test_build_feed_metadata_keeps_a_license_without_url(table):
     assert metadata["origins"][0]["license"] == {"name": "CC BY 4.0", "url": ""}
 
 
+def test_build_feed_metadata_refuses_a_license_without_name(table):
+    table._fields["value"].origins = [Origin(producer="P", title="T", license=License(url="https://p.org/terms"))]
+
+    with pytest.raises(ValueError, match="no name"):
+        bespoke.build_feed_metadata("Causes of death", {"Deaths": table["value"]})
+
+
 def test_add_feed_metadata(table):
     metadata = bespoke.build_feed_metadata("Causes of death", {"Deaths": table["value"]})
 
@@ -158,7 +165,7 @@ def test_add_feed_metadata(table):
     assert merged["dimensions"] == {}
     assert merged["title"] == "Causes of death"
 
-    with pytest.raises(AssertionError, match="title"):
+    with pytest.raises(ValueError, match="title"):
         bespoke.add_feed_metadata({"title": "Manifest title"}, metadata)
 
 

@@ -148,14 +148,15 @@ def sync_feed(step_path: str, local_dir: Path, max_workers: int = 20) -> FeedLoc
 #
 
 # Fields only a single-column feed gets: a feed combining several columns has no one
-# description or unit to show.
+# description, unit or time span to show.
 SINGLE_COLUMN_FIELDS = (
     "descriptionShort",
     "descriptionKey",
+    "descriptionFromProducer",
     "descriptionProcessing",
-    "processingLevel",
     "unit",
     "shortUnit",
+    "timespan",
 )
 
 
@@ -183,8 +184,11 @@ def build_feed_metadata(
     for api in apis:
         for origin in api.get("origins") or []:
             if "license" in origin:
-                # A producer that states no license URL leaves it unset, which serializes to no key;
-                # grapher's schema requires the key and rejects the whole file without it.
+                # Grapher's schema requires both keys and rejects the whole file without either. A
+                # producer that states no license URL legitimately leaves it unset; a license with
+                # no name is a metadata error to fix in the snapshot.
+                if not origin["license"].get("name"):
+                    raise ValueError(f"Origin {origin.get('title')!r} has a license with no name: {origin['license']}")
                 origin["license"] = {"url": "", **origin["license"]}
             if origin not in origins:
                 origins.append(origin)
@@ -195,6 +199,12 @@ def build_feed_metadata(
         "attribution": format_attributions(_uniq([get_attribution(IndicatorColumn(api)) for api in apis])),
         "origins": origins,
         "updatePeriodDays": update_period_days,
+        # The feed is as processed as its most processed column.
+        "processingLevel": "major"
+        if any(api.get("processingLevel") == "major" for api in apis)
+        else "minor"
+        if any(api.get("processingLevel") == "minor" for api in apis)
+        else None,
     }
     if len(apis) == 1:
         metadata |= {field: apis[0].get(field) for field in SINGLE_COLUMN_FIELDS}
@@ -209,7 +219,8 @@ def add_feed_metadata(manifest: dict, metadata: dict) -> dict:
     grapher's parse of the whole file, so a clash is an error.
     """
     clash = manifest.keys() & metadata.keys()
-    assert not clash, f"Manifest keys {sorted(clash)} clash with the feed's metadata fields"
+    if clash:
+        raise ValueError(f"Manifest keys {sorted(clash)} clash with the feed's metadata fields")
     return {**manifest, **metadata}
 
 
@@ -248,13 +259,6 @@ def variable_meta_to_api_dict(
     api["shortName"] = variable.name
     if update_period_days is not None:
         api["updatePeriodDays"] = update_period_days
-    if api.get("type") is None:
-        # Garden columns rarely set `type` -- a grapher step infers it at upsert time, from the
-        # stringified values it writes to the DB. Same call here, so a feed says what the DB would.
-        # Imported here to keep the framework's publish path off the grapher/sqlalchemy import chain.
-        from etl.grapher.model import Variable as GrapherVariable
-
-        api["type"] = GrapherVariable.infer_type(variable.dropna().astype(str))
 
     dropped, api = _drop_unrendered_templates(api)
     if api.get("name") is None and default_title is not None:

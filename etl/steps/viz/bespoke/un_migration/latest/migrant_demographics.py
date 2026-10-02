@@ -199,7 +199,7 @@ def run() -> None:
 
     log.info(
         "migrant_demographics.written",
-        n_files=len(entities) + 2,
+        n_files=len(entities) + 1,
         n_entities=len(entities),
         dest=str(paths.output_dir),
     )
