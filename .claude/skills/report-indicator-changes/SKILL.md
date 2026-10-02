@@ -1,8 +1,9 @@
 ---
 name: report-indicator-changes
-description: Draft a short update message to a topic-owner reviewer after landing substantial dataset or chart changes on staging. The message lists the indicator changes with staging admin links, surfaces open design questions with option tables, and closes with a Chart Diff sign-off CTA. The output is markdown so the user can paste it into either Slack or a GitHub PR comment. Use after a dataset redesign or restructure when the iteration with the reviewer is back-and-forth and you need them to verify on staging before merge. Not for the canonical comms announcement — for that, see `data-updates-comms`.
+description: Draft a short update message to a topic-owner reviewer after landing substantial dataset or chart changes on staging. The message lists the indicator changes with staging admin links, surfaces open design questions with option tables, and closes with a Chart Diff sign-off CTA. The output is markdown so the user can paste it into either Slack or a GitHub PR comment. Use after a dataset redesign or restructure when the iteration with the reviewer is back-and-forth and you need them to verify on staging before merge. Not for the canonical comms announcement — for that, see `draft-data-update-slack-post`.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Report indicator changes to a topic-owner reviewer
@@ -16,7 +17,7 @@ This skill drafts the kind of message you send to a topic owner when a dataset u
 - The conversation will likely iterate over multiple rounds (round 1 = list changes, round 2 = reply to their feedback, round 3 = pick between alternatives, etc.).
 
 **Don't use this skill for**:
-- The canonical comms-manager Slack form (audience-facing announcement for the OWID communications channel) — use [`data-updates-comms`](../data-updates-comms/SKILL.md) for that. Different audience, different shape.
+- The canonical comms-manager Slack form (audience-facing announcement for the OWID communications channel) — use [`draft-data-update-slack-post`](../draft-data-update-slack-post/SKILL.md) for that. Different audience, different shape.
 - Routine PR review handoffs — those just need a PR description.
 - One-off questions that don't need a structured update.
 
@@ -140,5 +141,5 @@ Read these before drafting a new round for a different dataset — the patterns 
 ## Cross-references
 
 - [`update-dataset`](../update-dataset/SKILL.md) — for the upstream pipeline work that produces the changes being reported here.
-- [`data-updates-comms`](../data-updates-comms/SKILL.md) — for the canonical comms-manager-facing Slack announcement once everything is merged.
+- [`draft-data-update-slack-post`](../draft-data-update-slack-post/SKILL.md) — for the canonical comms-manager-facing Slack announcement once everything is merged.
 - [`check-chart-preview`](../check-chart-preview/SKILL.md) — for visually verifying a chart on staging before sending the message.

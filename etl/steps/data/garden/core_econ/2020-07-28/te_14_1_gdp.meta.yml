@@ -10,7 +10,7 @@ tables:
         unit: '%'
         description: The underlying real GDP per capita is in 2011US$ with multiple benchmarks.
       government_revenue__as_a_per_cent_of_gnp:
-        title: Government revenue (as a per cent of GNP)
+        title: Government revenue (as a percent of GNP)
         unit: '%'
     dimensions:
       - name: year

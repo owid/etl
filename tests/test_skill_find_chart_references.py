@@ -229,3 +229,42 @@ def test_mdim_raw_url_branch_emits_a_reference(mod, monkeypatch):
     # the fragment is not a parameter and must not leak into the query string.
     assert ref["query_string"] == "tab=map"
     assert ref["where_path"] == "/an-article"
+
+
+def test_link_only_data_insight_gets_its_data_insights_path(mod, monkeypatch):
+    """A data insight reached through posts_gdocs_links must point at /data-insights/<slug>.
+
+    Only insights holding the chart in front matter went through the data-insight sweep, so one
+    that merely linked the chart came back with `/<slug>`, which 404s on the live site.
+    """
+
+    def fake_read_sql(sql, params=None):
+        return pd.DataFrame(
+            [
+                {
+                    "gdoc_id": "g1",
+                    "post_slug": "an-insight",
+                    "post_type": "data-insight",
+                    "published": 1,
+                    "target": "a-chart",
+                    "queryString": "",
+                    "componentType": "span-link",
+                    "text": "this chart",
+                },
+                {
+                    "gdoc_id": "g2",
+                    "post_slug": "an-article",
+                    "post_type": "article",
+                    "published": 1,
+                    "target": "a-chart",
+                    "queryString": "",
+                    "componentType": "chart",
+                    "text": "",
+                },
+            ]
+        )
+
+    monkeypatch.setattr(mod.OWID_ENV, "read_sql", fake_read_sql)
+    refs = mod.sweep_gdoc_links({"a-chart": {"id": 1}})
+    paths = {r["where"]: r["where_path"] for r in refs}
+    assert paths == {"an-insight": "/data-insights/an-insight", "an-article": "/an-article"}

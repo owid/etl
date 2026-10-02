@@ -3,6 +3,7 @@ name: edit-faust-metadata
 description: Edit user-facing chart and indicator text (FAUST — Title, Subtitle, Footnote — plus description_short, description_key, units, display.name, attribution_short, entity selection, and any other user-facing metadata) from a conversational request in the terminal. Accepts a chart or MDim referenced by live link, staging preview link, admin link, bare slug, chart id, or indicator catalogPath. Routes each edit to the right layer (garden .meta.yml, MDim yaml/py, or chart config via the admin API — ALWAYS on staging, never production), reports the blast radius on other charts/MDim views/explorers before applying shared-metadata changes, and ships via a PR with an automated @codex review loop. Trigger on "change the subtitle of <link> to …", "fix the footnote on this MDim view", "edit the units / description_key / selected countries of …", or any pasted grapher/staging/admin link plus an edit request. Also covers the legacy audit mode ("dump/audit the FAUST for dataset X", "review the text of all views in this MDim") — a Markdown dump + compare workflow for massive changes, entered ONLY on explicit request.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Edit FAUST & metadata
@@ -55,7 +56,7 @@ Accepted references:
 | Live chart URL | `https://ourworldindata.org/grapher/life-expectancy?country=FRA` | chart (slug) |
 | Staging chart URL | `http://staging-site-my-branch/grapher/life-expectancy` | chart (slug) |
 | Admin chart edit URL | `https://admin.owid.io/admin/charts/104/edit` | chart (id) |
-| Admin collection/MDim preview URL | `.../admin/grapher/wb%2Flatest%2Fincomes_pip%23incomes_pip?indicator=mean` | mdim / mdim-view |
+| Admin chart/MDim preview URL | `.../admin/grapher/wb%2Flatest%2Fincomes_pip%23incomes_pip?indicator=mean` | mdim / mdim-view |
 | Bare slug | `life-expectancy` | chart or mdim |
 | Chart id | `104` | chart |
 | Indicator catalogPath | `grapher/wb/2026-03-24/world_bank_pip/incomes#mean__...` | indicator |
@@ -76,13 +77,13 @@ Notes baked into the resolver — don't re-derive them by hand:
 
 Primitives:
 
-- **Explicitly set at chart level** ⇔ the key exists in `chart_configs.patch`. Never judge this from `full` — `full` has every inherited value merged in, so an inherited title looks identical to an override there (`etl/indicator_upgrade/indicator_update.py:207`).
-- **Inheritable** ⇔ the chart's primary y variable has an ETL grapher config (`variables.grapherConfigIdETL IS NOT NULL`) and that config carries the field.
+- **Explicitly set at chart level** ⇔ the key exists in the authored layer (the `chart_configs` row named by `patchConfigId`). Never judge this from the rendered config — that has every inherited value merged in, so an inherited title looks identical to an override there (`etl/indicator_upgrade/indicator_update.py:207`).
+- **Inheritable** ⇔ the chart's primary y variable has an ETL grapher config (`variables.patchConfigIdETL IS NOT NULL`) and that config carries the field.
 
 Three routes:
 
 - **(a) Indicator ETL metadata** — edit the garden `.meta.yml` → rebuild garden+grapher → `STAGING=1 etlr grapher://grapher/<ns>/<ver>/<ds> --grapher` to upsert to staging. **Check for a `<short_name>.meta.override.yml` next to the meta.yml first** — the ETL merges it on top of the built metadata automatically (`etl/steps/__init__.py`), and datasets that carry one (WDI is the flagship: `wdi.meta.override.yml`) auto-generate their main `.meta.yml`, so manual curation MUST go into the override file — an edit to the auto-generated file builds fine but is silently lost on the next regeneration. The resolver lists the override file first when it exists.
-- **(b) MDim step files** — edit the MDim `.config.yml` / `.py` → `STAGING=1 .venv/bin/etlr export://multidim/<ns>/<ver>/<name> --export --private`.
+- **(b) MDim step files** — edit the MDim `.config.yml` / `.py` → `STAGING=1 .venv/bin/etlr viz://chart/<ns>/<ver>/<name> --grapher`.
 - **(c) Chart config on staging** — `scripts/update_chart_config.py` (guarded, staging-only; see below). Reaches production only via chart-diff approval + chart-sync after merge.
 
 **Default rule: inherited fields get fixed in the ETL files, never patched via the admin API.** If the rendered text comes from the indicator's metadata or an MDim's step files, the edit belongs in those files — routes (a)/(b). File edits are the durable source of truth: they survive rebuilds and dataset updates, reach every surface, and go through code review. A route-(c) patch on an inherited field creates a chart-level override that shadows the source from then on — the chart silently stops tracking future metadata improvements. Reserve route (c) for fields that are genuinely chart-level (already in the patch, or with no inheritance path) or for a deliberate, user-confirmed decision to scope a change to one chart.
@@ -102,11 +103,11 @@ Three routes:
 2. Not overridden → inherited from the view's primary y indicator → **route (a)** (the grapher upsert refreshes the view; nothing extra needed on the MDim), or scope down to a new view-level override (**route b**) if the blast radius shows the indicator is shared.
 3. Never write `multi_dim_x_chart_configs` or PUT MDim configs directly — they're rebuilt from the step files on every export.
 
-**Target = MDim (whole collection):** top-level `title`, `default_selection`, `common_view_config`, config-level `definitions` → **route (b)**.
+**Target = MDim (whole chart):** top-level `title`, `default_selection`, `common_view_config`, config-level `definitions` → **route (b)**.
 
 **Target = indicator:** → **route (a)**; blast radius on its variable ids.
 
-**Narrative charts** (rare): their config is a patch over the parent chart. Edit via `AdminAPI(OWIDEnv.from_staging(branch)).get_narrative_chart(id)` / `update_narrative_chart(id, cfg)` — and audit `configFull`, never the bare `patch` (it lacks every inherited field). Note `configFull` **is** the stored `chart_configs.full` (the materialized parent+patch merge, not a live one): it goes stale when the parent is edited without the child being re-saved — see the narrative-children section below for the re-save that fixes that. When a narrative chart is affected *indirectly* — because you edited its parent's FAUST — follow [Narrative-chart children of an edited FAUST field](#narrative-chart-children-of-an-edited-faust-field).
+**Narrative charts** (rare): their config is a patch over the parent chart. Edit via `AdminAPI(OWIDEnv.from_staging(branch)).get_narrative_chart(id)` / `update_narrative_chart(id, cfg)` — and audit `configFull`, never the bare `patch` (it lacks every inherited field). Note `configFull` **is** the stored rendered config (the materialized parent+patch merge, not a live one): it goes stale when the parent is edited without the child being re-saved — see the narrative-children section below for the re-save that fixes that. When a narrative chart is affected *indirectly* — because you edited its parent's FAUST — follow [Narrative-chart children of an edited FAUST field](#narrative-chart-children-of-an-edited-faust-field).
 
 ## Writing new text into a garden `.meta.yml` (route a)
 
@@ -118,7 +119,7 @@ Match the file's own authoring pattern before writing a single sentence — your
   - keep the new, better wording but place it **under the existing key's name**, replacing that key's text.
 
   The second reaches every indicator already referencing that key, so **blast-radius the shared key first** — `blast_radius.py --anchor <key> --meta-file <path>` expands a definitions key to its variables — and report which surfaces the reworded text lands on. Also check the new wording still fits the key's *name* and the distinction it encodes: a key called `…_national_estimates` should not end up asserting the data is harmonized.
-- **Read the whole rendered list before adding to it — new text must not read as redundant.** This applies to any field but bites hardest on `description_key`, where bullets are read as a set under `description_short` and the chart's title/subtitle. Render the existing bullets for the view being edited (not the raw YAML — a Jinja branch may already say your sentence for that dimension value) and ask what the new one adds. If it only says an existing bullet more fully, edit that bullet instead of adding a second; if it repeats another bullet at the same level of detail, drop it. Expanding `description_short` is fine and often expected — that one-sentence summary is meant to be unpacked here; the thing to avoid is a bullet that restates it without going further. Field-by-field style rules, including this one, are in [`owid-metadata-generation`](../owid-metadata-generation/SKILL.md).
+- **Read the whole rendered list before adding to it — new text must not read as redundant.** This applies to any field but bites hardest on `description_key`, where bullets are read as a set under `description_short` and the chart's title/subtitle. Render the existing bullets for the view being edited (not the raw YAML — a Jinja branch may already say your sentence for that dimension value) and ask what the new one adds. If it only says an existing bullet more fully, edit that bullet instead of adding a second; if it repeats another bullet at the same level of detail, drop it. Expanding `description_short` is fine and often expected — that one-sentence summary is meant to be unpacked here; the thing to avoid is a bullet that restates it without going further. Field-by-field style rules, including this one, are in [`generate-metadata`](../generate-metadata/SKILL.md).
 - **Then widen the search past the file, to the other datasets carrying the same text.** Metadata boilerplate travels: the same source caveat, classification note, or methodology sentence is often pasted into several datasets' `.meta.yml` (and mirrored in MDim `.py` constants). Search a few **distinctive 5–8 word fragments** of the text across `etl/steps/` — near-duplicates differ by a word or two, so one long exact-match search finds nothing while three short ones find everything:
 
   ```bash
@@ -159,7 +160,7 @@ It sweeps: **charts** (with `--field`, charts shielded by their own patch overri
 
 - the **indicators** carrying the edit, with how many charts each feeds, so a lopsided distribution is visible;
 - **charts** as links, each annotated with the indicator it comes through, published state included;
-- **MDim views** as links — the reader URL with the view's dimension query string, plus the admin collection preview;
+- **MDim views** as links — the reader URL with the view's dimension query string, plus the admin chart preview;
 - **explorers** as links, with the number of affected views in each;
 - **narrative charts** as admin links, marking the ones shielded by their own override;
 - **article references**, which change what readers see even though the embeds keep working.
@@ -180,7 +181,7 @@ If the beyond-target count is zero, skip the ask and proceed. When the report li
 
 Changing a chart's title/subtitle/note — whether via the indicator's ETL metadata (route a) or the chart's patch (route c) — also reaches its narrative-chart children. Check them with the same logic as `/update-dataset` step 7's stale-FAUST pass. For every child the blast radius lists (`narrative_charts.parentChartId`, plus `parentMultiDimXChartConfigId` when the parent is an MDim view):
 
-1. **Child inherits the field** (key absent from its patch — blast radius lists it as affected): the child will pick up the parent's new text, but **not immediately** — its `chart_configs.full` (which is also what `get_narrative_chart(id)["configFull"]` returns) is rematerialized only when the child itself is saved, so the stored config *and* the render keep serving the old text until then. Force re-derivation by re-saving the child's **stored patch** unchanged — `AdminAPI(OWIDEnv.from_staging(branch)).update_narrative_chart(id, patch)`; never re-PUT the fetched `configFull`, which submits the stale full and pins the old text into the child's patch as an override (mechanics in `/update-dataset` step 7's narrative-chart notes). Then verify with a fresh `get_narrative_chart(id)["configFull"]` read and list the child at the checkpoint so the user can eyeball the new text in the narrative framing.
+1. **Child inherits the field** (key absent from its patch — blast radius lists it as affected): the child will pick up the parent's new text, but **not immediately** — its rendered config (which is also what `get_narrative_chart(id)["configFull"]` returns) is rematerialized only when the child itself is saved, so the stored config *and* the render keep serving the old text until then. Force re-derivation by re-saving the child's **stored patch** unchanged — `AdminAPI(OWIDEnv.from_staging(branch)).update_narrative_chart(id, patch)`; never re-PUT the fetched `configFull`, which submits the stale full and pins the old text into the child's patch as an override (mechanics in `/update-dataset` step 7's narrative-chart notes). Then verify with a fresh `get_narrative_chart(id)["configFull"]` read and list the child at the checkpoint so the user can eyeball the new text in the narrative framing.
 2. **Child overrides the field** (blast radius marks it shielded): compare its override against the parent's **pre-edit** text using `_find_stale_faust_overrides(child_patch, pre_edit_parent_config)` from `apps/indicator_upgrade/upgrade.py` (near-identical after markdown-link stripping = stale; substantially different = intentional). The pre-edit parent config MUST be the snapshot taken in workflow step 6, **before** the edit was applied — comparing against the already-updated parent makes a child that froze the old wording look "substantially different" and misclassifies the stale copy as an intentional rewrite:
    - **Stale copy** — the child froze the parent's old text at creation time and no longer tracks it. Propose setting the child's field to the parent's **new exact text**, which drops the key out of the patch and restores inheritance. **Always ask the user before changing it** — narrative-chart text is reader-facing editorial content; never fold the child fix silently into the parent edit. Apply via `AdminAPI.update_narrative_chart` on staging.
    - **Intentional rewrite** — leave it, but flag it at the checkpoint if the parent's new text now contradicts the child's framing (e.g. the parent's subtitle changed a definition the child's rewrite still states the old way).
@@ -197,35 +198,35 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
 3. Wait for staging readiness: retry `OWIDEnv.from_staging(branch).read_sql("SELECT 1")` (builds take a few minutes).
 4. Run `resolve_target.py` with the DB; pick the route via the decision tree.
 5. Run `blast_radius.py` per the rules above; ask the user if other surfaces are affected.
-6. Apply the edit. **If the blast radius listed narrative-chart children, snapshot each parent's pre-edit rendered config FIRST** — the narrative-children pass compares against this, and after the edit the pre-edit text is gone. Save `chart_configs.full` from the staging DB to a scratch file, using the query that matches the parent type: for a chart parent (child listed via `parentChartId`), `SELECT cc.full FROM charts c JOIN chart_configs cc ON cc.id = c.configId WHERE c.id = <id>`; for an MDim-view parent (child listed via `parentMultiDimXChartConfigId`), `SELECT cc.full FROM multi_dim_x_chart_configs mx JOIN chart_configs cc ON cc.id = mx.chartConfigId WHERE mx.id = <mx_id>` (the child's `parent_view` / the view's `mx_id` in the blast-radius `--json` output). MDim view configs can be thin — if the edited field is absent from the view's `full` because it inherits from the indicator, also record the field's pre-edit rendered text from the staging indicator metadata API before editing. Then:
+6. Apply the edit. **If the blast radius listed narrative-chart children, snapshot each parent's pre-edit rendered config FIRST** — the narrative-children pass compares against this, and after the edit the pre-edit text is gone. Save the rendered config from the staging DB to a scratch file, using the query that matches the parent type: for a chart parent (child listed via `parentChartId`), `SELECT cc.config FROM charts c JOIN chart_configs cc ON cc.id = c.configId WHERE c.id = <id>`; for an MDim-view parent (child listed via `parentMultiDimXChartConfigId`), `SELECT cc.config FROM multi_dim_x_chart_configs mx JOIN chart_configs cc ON cc.id = mx.chartConfigId WHERE mx.id = <mx_id>` (the child's `parent_view` / the view's `mx_id` in the blast-radius `--json` output). MDim view configs can be thin — if the edited field is absent from the view's rendered config because it inherits from the indicator, also record the field's pre-edit rendered text from the staging indicator metadata API before editing. Then:
    - route (a): edit the garden `.meta.yml`, following the style rules below;
    - route (b): edit the MDim yaml/py (mind mirror constants);
    - route (c): `update_chart_config.py --branch <b> --chart-id <id> --set ... [--dry-run first]`.
 7. Reflect on staging **without committing**:
-   - route (a): `.venv/bin/etlr garden/<ns>/<ver>/<ds> grapher/<ns>/<ver>/<ds> --private` then `STAGING=1 .venv/bin/etlr grapher://grapher/<ns>/<ver>/<ds> --grapher` (the MySQL upsert takes ~50 s+/dataset — warn the user; the automatic rebuild after the eventual push re-does it harmlessly). Needed because the staging auto-rebuild only sees *pushed* code.
-   - route (b): `STAGING=1 .venv/bin/etlr export://multidim/<ns>/<ver>/<name> --export --private`.
+   - route (a): `.venv/bin/etlr garden/<ns>/<ver>/<ds> grapher/<ns>/<ver>/<ds>` then `STAGING=1 .venv/bin/etlr grapher://grapher/<ns>/<ver>/<ds> --grapher` (the MySQL upsert takes ~50 s+/dataset — warn the user; the automatic rebuild after the eventual push re-does it harmlessly). Needed because the staging auto-rebuild only sees *pushed* code.
+   - route (b): `STAGING=1 .venv/bin/etlr viz://chart/<ns>/<ver>/<name> --grapher`.
    - route (c): already live on staging.
 8. Run the metadata quality checks scoped to the edit (next section); fix findings and re-run the affected steps.
-9. Verify on staging (section after); show the user the preview links.
-10. **CHECKPOINT** — show: the `git diff` (routes a/b) and/or the chart-patch JSON diff (route c), staging preview links (strip the `.tail6e23.ts.net` suffix from admin links), the blast-radius summary, and any unresolved check findings. **Wait for the user's explicit go-ahead.**
+9. Verify on staging (section after); show the user the preview links, Metadata Diff included — it is the only view of every surface the edit reaches.
+10. **CHECKPOINT** — show: the `git diff` (routes a/b) and/or the chart-patch JSON diff (route c), staging preview links (strip the `.tail6e23.ts.net` suffix from admin links), the blast-radius summary (link Metadata Diff's `?diff-type=blast` beside it once the grapher step is on staging — the same claim, verified against what the server actually renders), and any unresolved check findings. **Wait for the user's explicit go-ahead.**
 11. After the go-ahead, hands-off:
     - `make check`;
     - commit `🔨🤖 <description>` with `Co-Authored-By: Claude <model name> <noreply@anthropic.com>`;
     - first push needs the upstream: `git push -u origin <branch>`, then verify `gh pr view --json files` is non-empty;
     - PR description via `gh pr edit` — first line is the attribution blockquote (`> _Written by Claude <model name> — @<handle> at the wheel._`), then: what changed and why (public facts only), the blast-radius summary, any route-(c) DB-only edits (they have **no file diff** — describe them explicitly and note they ride to production via chart-diff approval), and any `#dod:` follow-ups ("create in admin");
-    - if the PR has committed files: post a bare `@codex review` comment, record its exact timestamp, and spawn the `pr-babysitter` skill's background agent to watch CI, judge/fix findings, reply + resolve threads;
+    - if the PR has committed files: post a bare `@codex review` comment, record its exact timestamp, and spawn the `babysit-pr` skill's background agent to watch CI, judge/fix findings, reply + resolve threads;
     - if the PR is DB-only (zero committed files): skip Codex entirely and tell the user the path to production is chart-diff approval in the Wizard + merge;
     - **suggest a human reviewer from the dataset's owners.** Read `dataset.owners` in the garden `.meta.yml` of every dataset the edit touches (first entry = accountable owner). More than one candidate → show the options and let the user choose, never pick for them; exactly one → name them and ask to confirm; the only owner being the user directing the work → say so instead of proposing a self-review. Add with `gh pr edit <n> --add-reviewer <handle>`, resolving handles from CLAUDE.md's team table (never guess a handle — a wrong one pings a real person). Carry the ask forward as an open item until it's requested or declined.
 
 ## Metadata quality checks (before the checkpoint)
 
-**Style rules for writing text** live in `.claude/skills/owid-metadata-generation/SKILL.md` — follow its field-by-field guidelines whenever composing new text (description_short must not repeat the title; plain language, expand acronyms; description_key ordered data-specific → methodology → caveats; curly apostrophes; American English; per-field guidance in `schemas/definitions.json`).
+**Style rules for writing text** live in `.claude/skills/generate-metadata/SKILL.md` — follow its field-by-field guidelines whenever composing new text (description_short must not repeat the title; plain language, expand acronyms; description_key ordered data-specific → methodology → caveats; curly apostrophes; American English; per-field guidance in `schemas/definitions.json`).
 
-**The check suite** is also defined there (see "Metadata quality checks" in that SKILL — the canonical list, mirroring `/update-dataset` §6b/§6c): typos (`/check-metadata-typos`), Jinja spacing (`/check-metadata-spacing`), style guide (`/check-metadata-style`), the manual clarity checklist, link + `#dod:` verification, the dimension sweep, and adversarial claims verification (`/adversarial-data-review`).
+**The check suite** is also defined there (see "Metadata quality checks" in that SKILL — the canonical list, mirroring `/update-dataset` §6b/§6c): typos (`/check-metadata-typos`), Jinja spacing and style guide (`/check-metadata-style`), the manual clarity checklist, link + `#dod:` verification, the dimension sweep, and adversarial claims verification (`/fact-check-dataset`).
 
 Scoping rules specific to this skill:
 
-- **Adversarial claims verification is MANDATORY here, but only on the metadata being added or edited — never on the data.** Run `/adversarial-data-review` scoped to the new/changed text: treat every added or edited sentence as a claim and verify it against the producer's documentation (fetch what's behind the links in the edited text and the dataset's snapshot `.dvc` — the link check only proves URLs resolve; this reads what they say). Skip the skill's data-value cross-checks, anomaly scans, and indicator prioritization entirely — no data changed. Unedited metadata is out of scope too. This keeps the pass cheap (a handful of web calls) while catching the failure mode nothing else covers: text that is well-formed, well-styled, and factually wrong (stale methodology attributions, scope overclaims, misread units in prose).
+- **Adversarial claims verification is MANDATORY here, but only on the metadata being added or edited — never on the data.** Run `/fact-check-dataset` scoped to the new/changed text: treat every added or edited sentence as a claim and verify it against the producer's documentation (fetch what's behind the links in the edited text and the dataset's snapshot `.dvc` — the link check only proves URLs resolve; this reads what they say). Skip the skill's data-value cross-checks, anomaly scans, and indicator prioritization entirely — no data changed. Unedited metadata is out of scope too. This keeps the pass cheap (a handful of web calls) while catching the failure mode nothing else covers: text that is well-formed, well-styled, and factually wrong (stale methodology attributions, scope overclaims, misread units in prose).
 
 - **Dimension sweep — every sentence must hold at every dimension value it renders on.** Text written for the view the user pointed at then renders on all the sibling views of a dimensional indicator (Jinja over `<dim>`, or a `definitions:` key several variants reference). Render it for every value the indicator takes (recipe in the route-(a) section above) and read each output as a reader of *that* chart, asking what the view already restricts: a caveat that the data doesn't control for X is wrong on the variant grouped **by** X; a scope word like "all employees" overclaims on a variant filtered to a subgroup; a sentence about a toggle is wrong on views that exist for only one choice of that dimension (see also item 4 of [Target-driven description_key restructuring](#target-driven-description_key-restructuring-across-sibling-mdims)). Prefer fixing it by qualifying the wording so it's true everywhere — often one word, and nothing extra to maintain — and add a Jinja branch or a view-level override only when the qualified version loses something the reader needs. Run it before the checkpoint: automated reviewers catch this class reliably, so a sweep of your own saves a review round.
 - **Pin-coupling check — the mirror of [`check-hardcoded-years`](../check-hardcoded-years/SKILL.md)' deliberate-pin signal.** That audit refuses to bump a time pin when the pin's value lives in the FAUST text; this skill edits the text side of the same coupling, so check it from here too, in both directions. (i) When the edited text names a year or a figure the chart's current window produces ("increased 12-fold", "more than 95%", a ratio in the title, "the past three decades"), read the config's `minTime`/`maxTime`/`map.time` before shipping: changing the words without the pin — or leaving words that a pin bump has already invalidated — breaks the pairing that audit deliberately preserves. Scan for **numbers, not just years**: "grown 300%" names no year but is entirely determined by the pinned endpoint. (ii) When *adding* text, an endpoint-dependent figure creates a new coupling that silently goes stale at the next data update — prefer phrasing that survives updates ("has increased more than tenfold" only if it stays true with more years), and where the figure is the point, say so in the PR body so the next update cycle's audit knows the pin↔text pair is deliberate.
@@ -235,22 +236,24 @@ Scoping rules specific to this skill:
 
 ## Verifying on staging
 
+- **Everything this branch changed, everywhere it lands**: the **Metadata Diff** Wizard page — `/etl/wizard/metadata-diff` on this branch's staging server (resolve the host with `get_container_name`, never by hand) — diffs the *rendered* texts (title/subtitle/footnote, `description_short`, WYSK) against production/`staging-site-master` and lists every chart, MDim view and explorer view each edit reaches. This is the broad check; the bullets below are the narrow spot-checks for one field at a time. Two limits: it needs the grapher step uploaded to this server (`STAGING=1 .venv/bin/etlr grapher://grapher/<path> --grapher`), and its scope is the branch's *changed step files* ∩ *datasets rebuilt here* — so it covers routes (a) and (b), but **not** a route-(c) staging-only chart-config edit, which changes no step file and shows up in **chart-diff** instead. Details in `/generate-metadata`, "Reviewing the change on staging (Metadata Diff)".
 - **Chart text without a browser**: `curl -s http://staging-site-<branch>/grapher/<slug>.svg | grep -o '<new text fragment>'` — the server-side render carries title/subtitle/note.
 - **Indicator fields**: `https://api-staging.owid.io/staging-site-<branch>/v1/indicators/<id>.metadata.json` (path prefix is the full container name, not the bare branch — a wrong prefix silently serves another environment).
-- **MDim views**: the resolver's per-view collection-preview URL (`/admin/grapher/<urlquoted catalogPath>?dim=choice...`).
+- **MDim views**: the resolver's per-view chart-preview URL (`/admin/grapher/<urlquoted catalogPath>?dim=choice...`).
 - **Visual QA**: hand off to the `check-chart-preview` skill for a screenshot.
-- **Big text changes**: re-run the report scripts in indicator-list mode and diff against the previous output (see dump mode below).
+- **Big text changes**: Metadata Diff (first bullet) covers this once the branch is on staging. Without a staging server, re-run the report scripts in indicator-list mode and diff against the previous output (see dump mode below).
 - **Jinja-templated definitions**: after editing shared `definitions`, rebuild garden AND grapher before reading anything — the report scripts and ad-hoc reads use the grapher channel, and a stale channel shows pre-edit metadata. Spot-check several rendered variants; dimension comparisons are type-sensitive (`decile == 5` vs `decile == "5"` — copy the comparison form from a working definition in the same file).
 
 ## Path to production
 
 - Route (a)/(b) file edits deploy when the PR merges (normal ETL deploy).
 - Route (c) staging chart edits appear in **chart-diff**; they are synced to production by chart-sync only after approval in the Wizard + merge. Remind the user of the pending approval.
+- **Text has no approval gate.** Route (a)/(b) text ships with the merge, and **Metadata Diff** is where it gets reviewed — a rejection there changes nothing by itself, it exports `metadata-rejections.md` for whoever owns the dataset. Route (c) config edits are the ones chart-diff actually gates.
 - Never point a write at `admin.owid.io` or the production DB. The guard in `update_chart_config.py` enforces this; don't work around it.
 
 ### Close with what's still open
 
-End the checkpoint and the final hand-off by saying what's still open — a line or two in chat, written out in the PR body when there is one. `.claude/docs/open-items.md` lists what tends to get dropped. This skill's usual danglers: `#dod:` terms to create in admin and editorial calls on pin-coupled text (waiting on someone else), the checkpoint diff itself and route-(c) chart-diff approval in the Wizard (waiting on a decision — easy to leave dangling because the merge doesn't force it), and checks scoped out or staging surfaces not previewed (nobody checked it).
+End the checkpoint and the final hand-off by saying what's still open — a line or two in chat, written out in the PR body when there is one. `.claude/docs/open-items.md` lists what tends to get dropped. This skill's usual danglers: `#dod:` terms to create in admin and editorial calls on pin-coupled text (waiting on someone else), the checkpoint diff itself, route-(c) chart-diff approval in the Wizard, and any Metadata Diff rejection still unactioned (waiting on a decision — easy to leave dangling because the merge doesn't force it), and checks scoped out or staging surfaces not previewed (nobody checked it).
 
 ## The guarded chart editor (route c)
 
@@ -275,9 +278,9 @@ Scripts (shared helpers in `scripts/_common.py`: grapher-channel metadata loader
 - `scripts/generate_mdim_text_report.py` — MDim view mode (supports `collapse_dims` and placeholder parametrization).
 - `scripts/grapher_dataset_mode.py` — grapher-dataset mode (iterates every indicator column) and indicator-list mode (`--indicators <cp> <cp> ...` or `--indicators-file <path>`).
 
-Rebuilding the MDim `.config.json` is done via `etlr <mdim> --export --private` — there is no DB-bypass helper. Change detection handles the common case: nothing changed → ~2 s; garden `.meta.yml`, garden data, or MDim yaml/py changed → etlr rebuilds only the affected steps.
+Rebuilding the MDim `.config.json` is done via `etlr viz://chart/<ns>/<ver>/<name>` without `--grapher`: the step then writes the local config and skips the DB upsert (and the `grapher://grapher/<dataset>` upserts of its inputs), which is all the report needs. Change detection handles the common case: nothing changed → ~2 s; garden `.meta.yml`, garden data, or MDim yaml/py changed → etlr rebuilds only the affected steps.
 
-Do **not** add `--grapher` unless you specifically need to re-upload indicator data/metadata to MySQL — it triggers a `grapher://grapher/<dataset>` upload step that can take ~50 s per dataset and isn't needed for the report (the script reads metadata directly from the local grapher-channel feather files). Do **not** add `--only` when you want garden/MDim edits to take effect — it skips upstream rebuilds by design; use `--only --force` only to re-run just the MDim step without touching anything upstream.
+Do **not** add `--only` when you want garden/MDim edits to take effect — it skips upstream rebuilds by design; use `--only --force` only to re-run just the MDim step without touching anything upstream.
 
 ### Fields reported
 
@@ -294,7 +297,7 @@ Never report Axis titles or Units in the default output (keep the report skimmab
 
 | Input kind | Example | Source of per-entity text |
 |---|---|---|
-| MDim export | `wb/latest/incomes_pip#incomes_pip` | `export/multidim/<ns>/<ver>/<name>/<name>.config.json`, plus grapher-channel inheritance for each view's primary `y` indicator |
+| MDim export | `wb/latest/incomes_pip#incomes_pip` | `viz/chart/<ns>/<ver>/<name>/<name>.config.json`, plus grapher-channel inheritance for each view's primary `y` indicator |
 | Grapher/garden dataset | `data/grapher/wb/2026-03-24/world_bank_pip` | iterate columns across all tables; all text is `[inherited]` |
 | Hand-picked indicators | `grapher/wb/2026-03-24/world_bank_pip/incomes#share__...` | same, filtered to the listed columns |
 
@@ -334,9 +337,9 @@ Total views: **N**   (for MDims)
 
 1. **Grapher-channel metadata loading**: `Dataset(data/grapher/<ns>/<ver>/<ds>).read(<table>, safe_types=False)[<col>].metadata`.
 
-1a. **`description_key` arrives as a markdown STRING, not a list**: the grapher channel serializes it via `owid.catalog.core.meta.description_key_to_string` — multiple bullets become one string joined as `"- b1\n- b2\n…"`, a single bullet becomes plain prose (datasets built before the change still carry lists). `scripts/_common.py:description_key_as_list()` normalizes both forms back into a bullet list; both report modes route through it. The same trap hits **MDim step code** that asserts/replaces bullets from `tb[col].metadata.description_key`: `OLD_TEXT in list(dk)` silently iterates characters on the string form and the assertion fails (or, worse, a `for b in dk` loop explodes bullets into characters). Normalize first (see `_description_key_bullets` in `incomes_pip.py` / `gini_lis.py` / `gini_wid.py`), then do list-membership asserts and per-bullet swaps; setting either a list or a markdown string back on `view.metadata["description_key"]` is accepted (`Collection` converts lists via `_convert_description_key_lists`).
+1a. **`description_key` arrives as a markdown STRING, not a list**: the grapher channel serializes it via `owid.catalog.core.meta.description_key_to_string` — multiple bullets become one string joined as `"- b1\n- b2\n…"`, a single bullet becomes plain prose (datasets built before the change still carry lists). `scripts/_common.py:description_key_as_list()` normalizes both forms back into a bullet list; both report modes route through it. The same trap hits **MDim step code** that asserts/replaces bullets from `tb[col].metadata.description_key`: `OLD_TEXT in list(dk)` silently iterates characters on the string form and the assertion fails (or, worse, a `for b in dk` loop explodes bullets into characters). Normalize first (see `_description_key_bullets` in `incomes_pip.py` / `gini_lis.py` / `gini_wid.py`), then do list-membership asserts and per-bullet swaps; setting either a list or a markdown string back on `view.metadata["description_key"]` is accepted (`Chart` converts lists via `_convert_description_key_lists`).
 
-2. **Rebuilding the MDim `.config.json`**: use `etlr export://multidim/<ns>/<ver>/<name> --export --private`. This runs `Collection.save()` (`validate_indicators_in_db` + `save_config_local` + `upsert_to_db` — admin-API upsert, not a big data push). If the command errors with a MySQL connection-refused trace, surface that to the user and stop — don't monkey-patch around it.
+2. **Rebuilding the MDim `.config.json`**: use `etlr viz://chart/<ns>/<ver>/<name>` (no `--grapher`). `Chart.save()` then stops after `save_config_local`, skipping `validate_indicators_in_db` and `upsert_to_db`, so the report never needs the DB.
 
 3. **Description-key dedup with auto slugs**: collect unique bullets into a per-file legend, auto-generate a short slug from the first ~3 non-stopword content words of each bullet (kebab-case), disambiguate collisions with `-2`/`-3` suffixes. Each view references bullets by their slugs, rendered as sub-bullets.
 
@@ -364,7 +367,7 @@ Total views: **N**   (for MDims)
 4. Run the appropriate script:
    - **MDim config rebuild**:
      ```
-     .venv/bin/etlr export://multidim/wb/latest/incomes_pip --export --private
+     .venv/bin/etlr viz://chart/wb/latest/incomes_pip --grapher
      ```
    - **MDim mode** — edit the `MDIMS` list at the top of `scripts/generate_mdim_text_report.py` or pass `--config <json>`:
      ```
@@ -395,8 +398,8 @@ Two cases warrant a confirmation before silently editing the metadata to match:
 Before doing the field-by-field comparison, refresh everything the live config depends on. Skipping a step leaves a stale catalog, which produces phantom drift that isn't real:
 
 ```
-.venv/bin/etlr garden/<ns>/<ver>/<ds> grapher/<ns>/<ver>/<ds> --private --force --only
-.venv/bin/etlr multidim/<ns>/<ver>/<mdim> --export --only --private --force
+.venv/bin/etlr garden/<ns>/<ver>/<ds> grapher/<ns>/<ver>/<ds> --force --only
+.venv/bin/etlr chart/<ns>/<ver>/<mdim> --grapher --only --force
 ```
 
 Run both upstream steps — `garden --only` alone does NOT refresh the grapher channel, and the FAUST scripts read from grapher, not garden.
@@ -431,9 +434,9 @@ A recurring large-scale workflow: the user pastes an edited FAUST report as the 
 
 When you change an MDim `.py` (reorder indicators, flip a choice order, change which y-indicator is primary) and need to prove the rendered FAUST is **unchanged except for the intended diff**, diff two auto-generated reports instead of eyeballing one. This is the right check whenever a change shifts the **primary y-indicator** (`y[0]`), because that's what drives inheritance.
 
-`config_path` accepts **any** JSON path, not just the live `export/multidim/.../<name>.config.json` — so point two runs at two config snapshots:
+`config_path` accepts **any** JSON path, not just the live `viz/chart/.../<name>.config.json` — so point two runs at two config snapshots:
 
-1. Build the baseline config (e.g. `git checkout origin/master -- <step>.py && etlr <mdim> --export --grapher`) and copy its `<name>.config.json` to `/tmp/cfg_before/`. Restore your branch, rebuild, copy to `/tmp/cfg_after/`. (Note: `git checkout … -- a.py b.py` won't word-split an unquoted `$files` var in zsh — pass the paths literally or use an array.)
+1. Build the baseline config (e.g. `git checkout origin/master -- <step>.py && etlr <mdim> --grapher`) and copy its `<name>.config.json` to `/tmp/cfg_before/`. Restore your branch, rebuild, copy to `/tmp/cfg_after/`. (Note: `git checkout … -- a.py b.py` won't word-split an unquoted `$files` var in zsh — pass the paths literally or use an array.)
 2. Run the report against each snapshot:
    ```
    echo '[{"name":"gini_lis_BEFORE","config_path":"/tmp/cfg_before/gini_lis.json","collapse_dims":[]}]' > /tmp/fb.json
@@ -443,6 +446,8 @@ When you change an MDim `.py` (reorder indicators, flip a choice order, change w
    ```
 3. Diff, stripping the BEFORE/AFTER name token: `diff <(sed 's/BEFORE//g' ai/gini_lis_BEFORE.md) <(sed 's/AFTER//g' ai/gini_lis_AFTER.md)`. Byte-identical = all six fields render the same.
 
+Metadata Diff does not replace this. It answers "what changed, and where does it land" on a server that has the build; this answers "prove nothing changed" offline, byte for byte, before anything is pushed.
+
 The FAUST diff only covers user-facing **text**. It will NOT catch indicator-order-only changes (e.g. a Dumbbell arrow direction or a series-color swap that follows column order) — pair it with a structural diff of the two `.config.json` files when order matters.
 
 ## Things to avoid
@@ -450,12 +455,12 @@ The FAUST diff only covers user-facing **text**. It will NOT catch indicator-ord
 - Do NOT fall back to `title` / `title_public` / `display.name` / `description_short` when resolving chart Title / Subtitle / Footnote. Use `grapher_config` only.
 - Do NOT report `description_processing` in dump mode; the user explicitly doesn't care about it for FAUST review.
 - Do NOT load metadata from the garden channel; it exposes pre-template Jinja text and unflattened dimensions. Always use the grapher channel.
-- Do NOT judge "explicitly set at chart level" from `chart_configs.full` — only `patch` distinguishes overrides from inherited values.
+- Do NOT judge "explicitly set at chart level" from the rendered config — only the authored layer (`patchConfigId`) distinguishes overrides from inherited values.
 - Do NOT write new text inline under a variable in a `.meta.yml` whose text lives in `definitions:`, and do NOT add a definition that near-duplicates one the file already has — check for an existing key first, and blast-radius it before reusing its name.
 - Do NOT write to production — no `admin.owid.io` writes, no prod DB writes, ever. All chart edits go to the branch's staging server and ride chart-diff to production.
 - Do NOT call `AdminAPI.put_grapher_config` or `put_mdim_config` by hand — the ETL files are the source of truth and the next rebuild overwrites DB-side edits.
 - Do NOT hand-build `staging-site-<branch>` hostnames — use `get_container_name` / `OWIDEnv.from_staging`.
-- Do NOT monkey-patch around a MySQL outage by calling `Collection.save_config_local()` directly or stubbing out `validate_indicators_in_db` / `upsert_to_db`. If MySQL is down, stop and tell the user.
+- Do NOT monkey-patch around a MySQL outage by calling `Chart.save_config_local()` directly or stubbing out `validate_indicators_in_db` / `upsert_to_db`. If MySQL is down, stop and tell the user.
 - Do NOT produce HTML `<details>` blocks or tables in dump-mode reports — the preferred format is a flat Markdown outline with bullet fields.
 - Do NOT suggest dump + compare mode — only enter it on explicit request.
 
@@ -463,8 +468,8 @@ The FAUST diff only covers user-facing **text**. It will NOT catch indicator-ord
 
 - `.claude/projects/-Users-parriagadap-etl/memory/faust_definition.md` — FAUST = Footnote, Axis titles, Units, Subtitle, Title.
 - `.claude/projects/-Users-parriagadap-etl/memory/feedback_chart_faust_inheritance.md` — the inheritance rule, with the caveat about `grapher_config` not being universally populated.
-- `.claude/skills/owid-metadata-generation/SKILL.md` — writing style rules + the canonical metadata-check suite.
-- `.claude/skills/pr-babysitter/SKILL.md` — the Codex review→fix→resolve background loop (step 11).
+- `.claude/skills/generate-metadata/SKILL.md` — writing style rules + the canonical metadata-check suite.
+- `.claude/skills/babysit-pr/SKILL.md` — the Codex review→fix→resolve background loop (step 11).
 - `.claude/skills/check-chart-preview/SKILL.md` — visual QA on staging.
 - `.claude/skills/check-empty-entities/SKILL.md` — entity-availability lookups for selection edits.
 - `apps/chart_sync/admin_api.py` — the AdminAPI client the scripts build on.

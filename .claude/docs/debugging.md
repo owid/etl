@@ -17,7 +17,7 @@ print(f"Null values: {df.DATE.isnull().sum()}")
 ```
 
 - Compare snapshot file sizes and date ranges
-- External providers may truncate or discontinue data feeds
+- External producers may truncate or discontinue data feeds
 - Check history: `git log --oneline --follow snapshots/dataset.csv.dvc`
 
 ### 2. Trace Through Pipeline

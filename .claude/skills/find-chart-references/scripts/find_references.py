@@ -103,6 +103,16 @@ COLUMNS = [
 ]  # fmt: skip
 
 
+def gdoc_path(r: dict) -> str:
+    """Public path of a posts_gdocs row: data insights live under /data-insights/, the rest at the root.
+
+    A data insight that only links a chart (rather than holding it in its `grapher-url`) reaches
+    the report through the article sweeps, and `/<slug>` 404s for it.
+    """
+    slug = r["post_slug"]
+    return f"/data-insights/{slug}" if r.get("post_type") == "data-insight" else f"/{slug}"
+
+
 def rec(subject_type, subject, subject_id, surface, kind, where, where_path="", *,
         surface_id=None, config_id=None, context="", query_string="", text="",
         published=True) -> dict:  # fmt: skip
@@ -236,7 +246,7 @@ def sweep_gdoc_links(by_slug: dict[str, dict]) -> list[dict]:
                 "gdoc",
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
-                f"/{r['post_slug']}",
+                gdoc_path(r),
                 surface_id=r["gdoc_id"],
                 context=f"{component or 'unknown'} ({r['post_type']})",
                 query_string=r["queryString"],
@@ -289,7 +299,7 @@ def sweep_articles_placing_narrative_charts(findings: list[dict]) -> list[dict]:
                 "gdoc (narrative chart)",
                 EMBED,
                 r["post_slug"],
-                f"/{r['post_slug']}",
+                gdoc_path(r),
                 surface_id=r["gdoc_id"],
                 # The parenthesized type is load-bearing: `reference_report.page_type` reads it
                 # to pick the public base, and a data insight or author page is not served at
@@ -371,7 +381,7 @@ def sweep_gdoc_url_links(by_slug: dict[str, dict]) -> list[dict]:
                 "gdoc (url link)",
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
-                f"/{r['post_slug']}",
+                gdoc_path(r),
                 surface_id=r["gdoc_id"],
                 context=f"{component or 'unknown'} ({r['post_type']})",
                 query_string=url_query(target, r["queryString"] or ""),
@@ -441,7 +451,8 @@ def sweep_narrative_charts_of_charts(by_slug: dict[str, dict]) -> list[dict]:
                 r["name"],
                 f"/admin/narrative-charts/{r['id']}/edit",
                 surface_id=int(r["id"]),
-                # NOTE: chart_configs.full for a narrative chart is materialized and lags a
+                # NOTE: a narrative chart's rendered config (chart_configs.config for the row
+                # named by chartConfigId) is materialized and lags a
                 # parent edit. To inspect one, use AdminAPI.get_narrative_chart(id)["configFull"]
                 # rather than reading this row directly.
                 config_id=r["chartConfigId"],
@@ -530,6 +541,75 @@ def sweep_key_charts(by_slug: dict[str, dict]) -> list[dict]:
     ]
 
 
+# Every featured metric, keyed by nothing but its URL string, so all three subject types match
+# it in Python. Read once: a run can ask for charts, MDIMs and explorers in the same pass.
+_FEATURED_METRICS: list[dict] | None = None
+
+
+def featured_metric_rows() -> list[dict]:
+    """The whole `featured_metrics` table, with its parent tag name.
+
+    Read whole and filtered in Python, not joined or `LIKE`-matched, because the only handle a
+    row carries is a URL: `LIKE '%/grapher/<slug>%'` cannot tell `/grapher/foo` from
+    `/grapher/foo-bar`, and `SUBSTRING_INDEX(url, '/', -1)` — the wizard search-comparison
+    app's spelling — returns `slug?a=b` whenever there is a query string, i.e. most MDIM and
+    all explorer rows. A few hundred rows in total.
+    """
+    global _FEATURED_METRICS
+    if _FEATURED_METRICS is None:
+        df = OWID_ENV.read_sql(
+            "SELECT fm.id, fm.url, fm.ranking, fm.incomeGroup, fm.boostInSearch, "
+            "       t.name AS tag, t.id AS tag_id "
+            "FROM featured_metrics fm JOIN tags t ON t.id = fm.parentTagId "
+            "ORDER BY t.name, fm.ranking"
+        )
+        _FEATURED_METRICS = df.to_dict("records")
+    return _FEATURED_METRICS
+
+
+def sweep_featured_metrics(subject_type: str, by_pathname: dict[str, tuple]) -> list[dict]:
+    """Topic-page featured-metric slots holding any of these pathnames.
+
+    An editorial slot on a topic page, so `render` like a key chart — but held by URL rather
+    than an id, and **a redirect does not rescue it**. The row is resolved only when Algolia
+    indexes, by exact pathname AND exact query-param map, against published records. Retiring
+    what it names therefore empties the slot silently, and re-adding the old URL is then
+    refused (creating a row validates that the slug resolves to something *published*), so it
+    must be swapped by hand before the migration.
+
+    Matching is on pathname alone for the same reason: for an MDIM or explorer the row's query
+    string IS the view, so a params-equal test would drop the rows a migration most needs to
+    see — those whose params no longer name a live view. They travel in `query_string` instead,
+    for the caller to compare with the machinery it already has.
+
+    `by_pathname` maps each pathname reaching the subject to its `(subject, subject_id)`, so a
+    chart subject can pass every old slug alongside the current one.
+    """
+    out = []
+    for r in featured_metric_rows():
+        url = unwrap_redirect(r["url"])
+        hit = by_pathname.get(url_pathname(url))
+        if hit is None:
+            continue
+        subject, subject_id = hit
+        boost = " boostInSearch" if r["boostInSearch"] else ""
+        out.append(
+            rec(
+                subject_type,
+                subject,
+                subject_id,
+                "featured metric",
+                RENDER,
+                r["tag"],
+                "/admin/featured-metrics",
+                surface_id=int(r["id"]),
+                context=f"ranking={r['ranking']} incomeGroup={r['incomeGroup']}{boost}",
+                query_string=url_query(url),
+            )  # fmt: skip
+        )
+    return out
+
+
 # There is deliberately no WordPress sweep. The `posts` mirror is dead: every published row
 # that links a chart 404s on the live site, and none of those slugs exists as a published
 # gdoc, so they are not migrated content the gdoc sweeps already cover. The sweep that used
@@ -574,7 +654,7 @@ def sweep_charts_of_indicators(variable_ids: list[int]) -> list[dict]:
     """
     df = OWID_ENV.read_sql(
         "SELECT DISTINCT cd.variableId, c.id AS chart_id, cc.id AS config_id, cc.slug, "
-        "       COALESCE(cc.full->>'$.isPublished', 'false') = 'true' AS published, "
+        "       COALESCE(cc.config->>'$.isPublished', 'false') = 'true' AS published, "
         "       c.isInheritanceEnabled AS inheritance "
         "FROM chart_dimensions cd JOIN charts c ON c.id = cd.chartId "
         "JOIN chart_configs cc ON cc.id = c.configId WHERE cd.variableId IN %(ids)s ORDER BY cc.slug",
@@ -793,7 +873,7 @@ def sweep_explorer_views_of_indicators(variable_ids: list[int]) -> list[dict]:
 
     views = OWID_ENV.read_sql(
         "SELECT ev.explorerSlug, ev.viewId, ev.dimensions, ev.chartConfigId, "
-        "       cc.full->'$.dimensions' AS config_dimensions "
+        "       cc.config->'$.dimensions' AS config_dimensions "
         "FROM explorer_views ev JOIN chart_configs cc ON cc.id = ev.chartConfigId "
         "WHERE ev.explorerSlug IN %(s)s ORDER BY ev.explorerSlug, ev.viewId",
         params={"s": tuple(published)},
@@ -889,7 +969,7 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
                 "gdoc",
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
-                f"/{r['post_slug']}",
+                gdoc_path(r),
                 surface_id=r["gdoc_id"],
                 context=f"{component or 'unknown'} ({r['post_type']})",
                 query_string=r["queryString"],
@@ -927,7 +1007,7 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
                 "gdoc (url link)",
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
-                f"/{r['post_slug']}",
+                gdoc_path(r),
                 surface_id=r["gdoc_id"],
                 context=f"raw URL, {component or 'unknown'} ({r['post_type']})",
                 # A raw URL carries its parameters in the target itself, so this SELECT omits
@@ -968,6 +1048,11 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
     )
     for r in redirects.to_dict("records"):
         out.append(rec("mdim", slug, mdim_id, "redirect", LINK, r["source"], r["source"], context="redirects here"))
+
+    # An MDIM's featured-metric rows live under `/grapher/<slug>`, same namespace as a chart's:
+    # multi-dims are served from `/grapher/`, so one pathname covers both. A row with no query
+    # string names the MDIM's default view.
+    out += sweep_featured_metrics("mdim", {f"/grapher/{slug}": (slug, mdim_id)})
     return out
 
 
@@ -1003,7 +1088,7 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
                 "gdoc",
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
-                f"/{r['post_slug']}",
+                gdoc_path(r),
                 surface_id=r["gdoc_id"],
                 context=f"{component or 'unknown'} ({r['post_type']})",
                 query_string=r["queryString"],
@@ -1044,7 +1129,7 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
                 "gdoc (url link)",
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
-                f"/{r['post_slug']}",
+                gdoc_path(r),
                 surface_id=r["gdoc_id"],
                 context=f"raw URL, {component or 'unknown'} ({r['post_type']})",
                 # As in the MDIM pass: a raw URL carries its parameters in the target, so the
@@ -1056,6 +1141,7 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
         )
 
     out += sweep_explorer_inbound_redirects(explorer)
+    out += sweep_featured_metrics("explorer", {f"/explorers/{explorer}": (explorer, None)})
     return out
 
 
@@ -1106,17 +1192,27 @@ def sweep_containers_for_articles(mdim_rows: list[dict], explorer_rows: list[dic
     and carries the same `country=`/`time=` pins the downstream audits grade — so walk
     the containers too. Rows keep their container as the subject: the reference is to
     the page, not to any one indicator inside it.
+
+    Article surfaces AND the containers' featured-metric slots are kept. The narrative-chart
+    and redirect rows these sweeps also return are dropped, because the indicator path emits
+    those itself and keeping them here would double-count.
     """
     mdims = sorted({f["where_path"].rsplit("/", 1)[-1] for f in mdim_rows if f["where_path"]})
     explorers = sorted({f["surface_id"] for f in explorer_rows if f["surface_id"]})
     if not mdims and not explorers:
         return []
     print(f"  transitive: sweeping articles for {len(mdims)} MDIM(s) and {len(explorers)} explorer(s)")
+    # Featured metrics ride along with the article surfaces. The filter exists to drop the
+    # narrative-chart and redirect rows these sweeps also return, because the indicator path
+    # emits those elsewhere and they would double-count — but nothing else emits a CONTAINER's
+    # featured-metric rows, so filtering them out left an indicator reachable only through a
+    # featured MDIM/explorer view reporting a false clean.
+    kept = (*GDOC_SURFACES, "featured metric")
     out = []
     for slug in mdims:
-        out += [f for f in sweep_mdim_subject(slug) if f["surface"] in GDOC_SURFACES]
+        out += [f for f in sweep_mdim_subject(slug) if f["surface"] in kept]
     for slug in explorers:
-        out += [f for f in sweep_explorer_subject(slug) if f["surface"] in GDOC_SURFACES]
+        out += [f for f in sweep_explorer_subject(slug) if f["surface"] in kept]
     return out
 
 
@@ -1211,7 +1307,12 @@ def add_admin_urls(findings: list[dict]) -> None:
     """
     admin = admin_base()
     for f in findings:
-        if f["surface"] == "narrative chart" and f["surface_id"]:
+        if f["surface"] == "featured metric":
+            # The editable object is the slot, not the chart it names — and the swap is done
+            # on one page for every row. Checked before the subject_type fallbacks below,
+            # which would otherwise send a chart's featured-metric row to the chart editor.
+            f["admin_url"] = f"{admin}/featured-metrics"
+        elif f["surface"] == "narrative chart" and f["surface_id"]:
             f["admin_url"] = f"{admin}/narrative-charts/{f['surface_id']}/edit"
         elif f["surface"] == "chart" and f["surface_id"]:
             f["admin_url"] = f"{admin}/charts/{f['surface_id']}/edit"
@@ -1470,6 +1571,9 @@ def main() -> int:
         findings += sweep_data_insights(by_slug)
         findings += sweep_static_viz(by_slug)
         findings += sweep_key_charts(by_slug)
+        # Keyed on every slug that reaches the chart, current and old alike: a featured metric
+        # added before a rename still holds the old one, and it is matched literally.
+        findings += sweep_featured_metrics("chart", {f"/grapher/{s}": (s, v["id"]) for s, v in by_slug.items()})
 
     if variable_ids:
         print(f"indicator subjects: {len(variable_ids)} variable(s)")
@@ -1491,6 +1595,9 @@ def main() -> int:
                 findings += sweep_gdoc_url_links(hop)
                 findings += sweep_data_insights(hop)
                 findings += sweep_narrative_charts_of_charts(hop)
+                # A chart rendering one of these indicators can also hold a featured-metric
+                # slot, which no other hop reaches.
+                findings += sweep_featured_metrics("chart", {f"/grapher/{s}": (s, v["id"]) for s, v in hop.items()})
             # A narrative chart can hang off an MDIM view instead of a chart, so the
             # chart hop alone leaves those configs unaudited.
             findings += sweep_narrative_charts_of_mdim_views(mdim_hits)
@@ -1503,9 +1610,9 @@ def main() -> int:
             findings += sweep_containers_for_articles(mdim_hits, explorer_hits)
         else:
             caveats.append(
-                "`--transitive` was not passed, so no article, data-insight or narrative-chart "
-                "surface was swept for the indicator subjects — only the charts, MDIM views and "
-                "explorer views that render them directly."
+                "`--transitive` was not passed, so no article, data-insight, narrative-chart or "
+                "featured-metric surface was swept for the indicator subjects — only the charts, "
+                "MDIM views and explorer views that render them directly."
             )
 
     # `--transitive` only has a second hop to make from an indicator. Passing it with just an

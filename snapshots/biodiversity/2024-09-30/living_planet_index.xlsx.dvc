@@ -9,7 +9,7 @@ meta:
 
       The index value is measured relative to species' populations in 1970 (i.e. 1970 = 1).
 
-      To calculate an LPI, a generalised additive modelling framework is used to determine the underlying trend in each population time-series. Average rates of change are then calculated and aggregated to the species level. For the global LPI, the method of aggregation has recently been revised to include a weighting system which gives trends from more species-rich systems, realms and groups more weight in the final index.
+      To calculate an LPI, a generalized additive modeling framework is used to determine the underlying trend in each population time-series. Average rates of change are then calculated and aggregated to the species level. For the global LPI, the method of aggregation has recently been revised to include a weighting system which gives trends from more species-rich systems, realms and groups more weight in the final index.
     date_published: "2024-10-10"
 
     # Citation

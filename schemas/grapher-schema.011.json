@@ -2,8 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
   "required": [
-    "$schema",
-    "dimensions"
+    "$schema"
   ],
   "type": "object",
   "description": "Our World In Data grapher configuration. Most of the fields can be left empty\nand will be filled with reasonable default values.\n",
@@ -249,6 +248,14 @@
     "includedEntityNames": {
       "type": "array",
       "description": "Entities that should be included (opposite of excludedEntityNames).\nIf empty, all available entities are used. If set, all entities not specified here are excluded.\nexcludedEntityNames are evaluated afterwards and can still remove entities even if they were included before.\n",
+      "default": [],
+      "items": {
+        "type": "string"
+      }
+    },
+    "inapplicableEntityNames": {
+      "type": "array",
+      "description": "Entities the indicator's data can't apply to by construction, e.g. Mexico for\n\"Where do Mexican emigrants live?\". On the map, they are excluded from the\ncolor scale and rendered in a dedicated pattern.\n",
       "default": [],
       "items": {
         "type": "string"
@@ -723,7 +730,7 @@
     },
     "sortBy": {
       "type": "string",
-      "description": "Sort criterion (used by discrete bar, stacked discrete bar, marimekko, and dumbbell charts).\n- column: sort by the value of a specific column, identified by sortColumnSlug\n- total: sort by the total across all columns\n- entityName: sort alphabetically by entity name\n- custom: preserve the specified entity order\n- change: sort by the change between the start and end values (dumbbell charts only)\n- startValue: sort by the start value (dumbbell charts only)\n- endValue: sort by the end value (dumbbell charts only)\n",
+      "description": "Sort criterion (used by discrete bar, stacked discrete bar, and dumbbell charts).\n- column: sort by the value of a specific column, identified by sortColumnSlug\n- total: sort by the total across all columns\n- entityName: sort alphabetically by entity name\n- custom: preserve the specified entity order\n- change: sort by the change between the start and end values (dumbbell charts only)\n- startValue: sort by the start value (dumbbell charts only)\n- endValue: sort by the end value (dumbbell charts only)\n",
       "default": "total",
       "enum": [
         "column",
@@ -938,7 +945,6 @@
         "BinaryMapPaletteC",
         "BinaryMapPaletteD",
         "BinaryMapPaletteE",
-        "BinaryMapPaletteF",
         "SingleColorGradientDenim",
         "SingleColorGradientTeal",
         "SingleColorGradientPurple",

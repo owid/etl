@@ -6,7 +6,6 @@ import pandas as pd
 import streamlit as st
 
 from apps.wizard.utils.cached import execute_bash_command
-from apps.wizard.utils.components import st_horizontal
 from etl.config import OWID_ENV
 
 # Current date.
@@ -30,7 +29,7 @@ def render_operations():
 def render_action_update():
     """Render container with "Update" action."""
     st.markdown("##### Update steps")
-    with st_horizontal(vertical_alignment="center"):
+    with st.container(horizontal=True, vertical_alignment="center"):
         with st.popover("More settings", icon=":material/settings:"):
             dry_run_update = st.toggle(
                 "Dry run",
@@ -79,7 +78,7 @@ def render_action_update():
 
 def render_action_execute(steps_df: pd.DataFrame):
     st.markdown("##### Execute steps")
-    with st_horizontal(vertical_alignment="center"):
+    with st.container(horizontal=True, vertical_alignment="center"):
         with st.popover("More settings", icon=":material/settings:"):
             dry_run_etl = st.toggle(
                 "Dry run",

@@ -136,7 +136,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Includes funding for childcare, early education, youth assistance, residential facilities, and family services like center-based care and home help.
-        description_from_producer: Includes the direct financing or subsidisation of childcare and early childhood education facilities, public childcare support through earmarked payments to parents, public spending on assistance for young people and residential facilities, and public spending on family services, including centre-based facilities and home help services for families in need.
+        description_from_producer: Includes the direct financing or subsidization of childcare and early childhood education facilities, public childcare support through earmarked payments to parents, public spending on assistance for young people and residential facilities, and public spending on family services, including center-based facilities and home help services for families in need.
         presentation:
           title_public: Services and in-kind benefits for families as a % of GDP
         display:

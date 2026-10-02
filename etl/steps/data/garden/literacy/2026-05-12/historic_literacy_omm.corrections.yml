@@ -5,5 +5,5 @@
   years: [2019]
   action: drop
   reason: UNESCO's adult literacy rate for Cote d'Ivoire in 2019 is a likely error (inconsistent with the surrounding series).
-  provider: UNESCO Institute for Statistics
+  producer: UNESCO Institute for Statistics
   status: open

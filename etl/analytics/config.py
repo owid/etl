@@ -21,6 +21,11 @@ MAX_DATASETTE_N_ROWS = 10000
 # resolved. See owid/analytics#735 (DuckDB → BigQuery migration).
 SEMANTIC_LAYER_SCHEMA = "prod_semantic"
 
+# Schema (BigQuery dataset) where the GA4 aggregates live, on the same connection. The grapher-view
+# aggregate used to be copied into the semantic layer as well; owid/analytics#987 consolidated the two
+# into `prod_ga4.grapher_views_detailed` and deleted the semantic copy.
+GA_SCHEMA = "prod_ga4"
+
 # Base OWID URL, used to find views in articles and topic pages.
 OWID_BASE_URL = "https://ourworldindata.org/"
 

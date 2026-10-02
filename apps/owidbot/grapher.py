@@ -54,7 +54,6 @@ def run(branch: str, head_sha: str | None = None) -> str:
     )
 
     body = f"""
-- **Site-screenshots:** https://github.com/owid/site-screenshots/compare/{branch}
 - **SVG tester:** {make_report_url(container_name)}
 
 <details open>

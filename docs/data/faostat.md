@@ -313,7 +313,7 @@ which there is new data (let us call the new dataset version to be created `YYYY
 10. Run the explorers step, to update the global food explorer.
 
     ```bash
-    etl run explorers/faostat/latest/global_food --export
+    etl run viz://explorer/faostat/latest/global_food --grapher
     ```
 
 11. Update titles and descriptions of snapshot origins (to use the custom dataset titles and descriptions defined in garden). Also, attributions will be added to origins.

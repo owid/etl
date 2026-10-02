@@ -8,13 +8,13 @@ meta:
       The Community Emissions Data System (CEDS) produces consistent estimates of global air emissions species (BC, CO, CO2, NH3, NMVOC, NOx, OC, SO2) over the industrial era (1750 - present) along with CH4 and N2O over recent decades.
     date_published: "2024-07-08"
     version_producer: v_2024_07_08
-    title_snapshot: Community Emissions Data System - Bunkers
+    title_snapshot: Community Emissions Data System – Bunkers
     description_snapshot: |-
       Supplementary data on bunker emissions of air pollutants by country, year, sector, and pollutant.
 
     # Citation
     producer: Hoesly et al.
-    attribution: Hoesly et al. (2024) - Community Emissions Data System (CEDS)
+    attribution: Hoesly et al. (2024) – Community Emissions Data System (CEDS)
     citation_full: |-
       Hoesly, R., Smith, S. J., Prime, N., Ahsan, H., Suchyta, H., O'Rourke, P., Crippa, M., Klimont, Z., Guizzardi, D., Behrendt, J., Feng, L., Harkins, C., McDonald, B., Mott, A., McDuffie, A., Nicholson, M., & Wang, S. (2024). CEDS v_2024_07_08 Release Emission Data (v_2024_07_08) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.12803197
 

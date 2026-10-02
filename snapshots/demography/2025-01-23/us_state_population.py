@@ -11,7 +11,6 @@ import click
 import pandas as pd
 import requests
 from dotenv import load_dotenv
-from owid.datautils.io import df_to_file
 
 from etl.paths import BASE_DIR
 from etl.snapshot import Snapshot
@@ -101,9 +100,8 @@ def main(upload: bool) -> None:
 
     snap = Snapshot(f"demography/{SNAPSHOT_VERSION}/us_state_population.csv")
     pop_data = download_state_level_population_data()
-    df_to_file(pop_data, file_path=snap.path)
-    # Download data from source, add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
+    # Save data, add file to DVC and upload to S3.
+    snap.create_snapshot(data=pop_data, upload=upload)
 
 
 if __name__ == "__main__":

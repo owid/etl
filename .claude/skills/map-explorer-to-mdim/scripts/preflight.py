@@ -265,7 +265,7 @@ def chart_slug_collisions(slugs: list[str]) -> set[str]:
 
 def target_state(catalog_paths: set[str]) -> dict[str, dict]:
     """{catalogPath -> {id, slug, published, views, md5}} where `views` maps a view's dimension
-    signature to its `fullConfigId`, and `md5` that config id to the config's current `fullMd5`.
+    signature to its `fullConfigId`, and `md5` that config id to the config's current `configMd5`.
 
     The view map is what makes target-side staleness detectable. Checking only that the MDIM
     row exists and is published passes an MDIM that was rebuilt, re-sliced or re-slugged after
@@ -309,13 +309,13 @@ def target_state(catalog_paths: set[str]) -> dict[str, dict]:
 
 
 def view_config_md5s(config_ids: set[str]) -> dict[str, str]:
-    """{chart_configs.id -> fullMd5} for a set of MDIM view configs."""
+    """{chart_configs.id -> configMd5} for a set of MDIM view configs."""
     if not config_ids:
         return {}
     df = OWID_ENV.read_sql(
-        "SELECT id, fullMd5 FROM chart_configs WHERE id IN %(ids)s", params={"ids": tuple(sorted(config_ids))}
+        "SELECT id, configMd5 FROM chart_configs WHERE id IN %(ids)s", params={"ids": tuple(sorted(config_ids))}
     )
-    return dict(zip(df["id"], df["fullMd5"]))
+    return dict(zip(df["id"], df["configMd5"]))
 
 
 def expected_row(rule, targets: dict[str, dict]) -> tuple[int | None, str | None]:
@@ -358,7 +358,7 @@ def revalidate_targets(rules, targets: dict[str, dict]) -> tuple[list, list, lis
             missing_views.append((rule.source_view_id, rule.view_id, rule.target_dims, unstorable))
             continue
         # A view naming a `fullConfigId` with no live row in `chart_configs` (or a row carrying
-        # no `fullMd5`) is a BROKEN target, not an unchanged one. Checked before the drift
+        # no `configMd5`) is a BROKEN target, not an unchanged one. Checked before the drift
         # comparison and independently of whether a rendering was recorded, because the two
         # absences mean opposite things: nothing recorded on our side is merely unknown, while
         # nothing live is a target that cannot serve — and the endpoint would reject that row
@@ -748,7 +748,7 @@ def main() -> int:
                     BLOCKER,
                     slug,
                     f"{len(broken_configs)} target view(s) name a chart config that is missing from "
-                    f"`chart_configs`, or that carries no fullMd5 — the view cannot be stored as a redirect "
+                    f"`chart_configs`, or that carries no configMd5 — the view cannot be stored as a redirect "
                     f"target, so the endpoint would reject those rows AFTER creating the ones before them, with "
                     f"no bulk undo. e.g. {sample}. Rebuild the MDIM, then re-extract and re-review.",
                 )

@@ -11,6 +11,7 @@ This module contains:
 """
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -348,6 +349,39 @@ ADDED_TITLE_TO_WIDE_TABLE = " - Flattened table indexed by country-year."
 
 
 # Shared functions.
+def check_that_magnitude_prefixes_are_converted(elements_metadata: Table) -> None:
+    """Check that a magnitude prefix dropped from an element's unit was absorbed by a unit factor.
+
+    FAO reports many elements in thousands or millions (e.g. "thousand US Dollar", "thousand Hectares").
+    When custom_elements_and_units.csv restates one of those in plain units, the values have to be
+    multiplied by the matching factor. If the factor is ever cleared or lost, the step would still
+    complete, publishing values off by three or six orders of magnitude under a unit that claims
+    otherwise.
+    """
+    magnitudes = {"thousand": 1e3, "million": 1e6, "billion": 1e9}
+
+    def _magnitude(unit: str | None) -> tuple[str | None, float]:
+        for word, factor in magnitudes.items():
+            if re.search(rf"\b{word}s?\b", str(unit or "").lower()):
+                return word, factor
+        return None, 1.0
+
+    for _, element in elements_metadata.iterrows():
+        fao_magnitude, factor = _magnitude(element["fao_unit"])
+        owid_magnitude, _ = _magnitude(element["owid_unit"])
+        # Only elements whose unit drops FAO's prefix need a factor.
+        if (fao_magnitude is None) or (owid_magnitude is not None):
+            continue
+        declared = element["owid_unit_factor"]
+        error = (
+            f"Element {element['element_code']} of {element['dataset']} is reported by FAO in "
+            f"'{element['fao_unit']}' but stored as '{element['owid_unit']}', dropping the "
+            f"'{fao_magnitude}' prefix. Set owid_unit_factor to {factor:.0f} in "
+            f"custom_elements_and_units.csv, otherwise values are off by that factor."
+        )
+        assert pd.notnull(declared) and float(declared) == factor, error
+
+
 def check_that_countries_are_well_defined(tb: Table) -> None:
     """Apply sanity checks related to the definition of countries.
 
@@ -1635,6 +1669,7 @@ def clean_data(
     if len(items_metadata) > 0 and len(elements_metadata) > 0:
         # This is not fulfilled for faostat_qv since the last update.
         # Use custom names for items, elements and units (and keep original names in "fao_*" columns).
+        check_that_magnitude_prefixes_are_converted(elements_metadata)
         tb = add_custom_names_and_descriptions(tb, items_metadata, elements_metadata)
 
         # Multiply data values by their corresponding unit factor, if any was given, and then drop unit_factor column.
@@ -2345,6 +2380,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "005313",  # Laying (animals).
                 assert unit == "animals"
                 title = f"Laying animals to produce {item.lower()}"
+                num_decimal_places = 0
             elif element_code == "005513":
                 # "005513",  # Eggs produced (eggs).
                 assert unit == "eggs"
@@ -2354,8 +2390,11 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "005318",  # Milk animals (animals).
                 assert unit == "animals"
                 title = f"Number of animals used to produce {item.lower()}"
-            elif element_code == "005111":
+                num_decimal_places = 0
+            elif element_code in ["005111", "005112", "005114"]:
                 # "005111",  # Stocks (animals)
+                # "005112",  # Stocks (thousand animals, converted to animals)
+                # "005114",  # Stocks (number, e.g. beehives, converted to animals)
                 assert unit == "animals"
                 title = f"Live {item.lower()}"
                 num_decimal_places = 0

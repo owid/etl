@@ -3,6 +3,7 @@ name: review-data-pr
 description: Review an OWID ETL data update PR end-to-end — runs the pipeline, compares snapshot fields against the previous version, verifies links, audits indicator metadata coverage, and cross-checks workflow items from /update-dataset. Trigger when the user asks to "review this PR", "review the data PR", or invokes this on an open dataset-update branch.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Review Data PR
@@ -56,7 +57,7 @@ When it's a restructure:
 - **Don't expect the auto-Indicator-Upgrader to have remapped charts.** When short_names differ entirely, the upgrader has nothing to match on. Look for a hand-curated v1 title → v2 title mapping table in the PR description (or a follow-up PR thread). 🟡 if charts on the old chain are still published but no mapping plan exists.
 - **Don't expect a `.py` step copy from the old version.** Step files should be authored from scratch, not produced by `etl update` rename. If the new step files look mechanically renamed (same logic, just version-bumped strings), flag 🟡 — the author may have skipped restructure-specific decisions.
 - **A chart remapped onto a successor indicator needs a config-vs-shape check.** Verify its pinned `selectedEntityNames` exist in the successor's data (v1 regional aggregates often don't — expect the garden step to rebuild them, mirroring the retired step's method), that pinned `yAxis` bounds don't clip the new range, and that the subtitle doesn't still describe the old construction. Any of the three broken: 🔴 (the default view renders empty, clipped, or mislabeled).
-- **Slack + `/latest` drafts are not expected in the PR body at all.** `/update-dataset` keeps them in the author's `workbench/` (steps 9 / 9b, owned by `/data-updates-comms` and `/data-update-announcement`), so their absence from the PR is correct — don't flag it.
+- **Slack + `/latest` drafts are not expected in the PR body at all.** `/update-dataset` keeps them in the author's `workbench/` (steps 9 / 9b, owned by `/draft-data-update-slack-post` and `/owid-staff:draft-data-update-post`), so their absence from the PR is correct — don't flag it.
 
 ### 4. Run the full pipeline end-to-end
 
@@ -137,7 +138,7 @@ Run after the §4 pipeline build. Three checks:
 
 1. **Garden log warnings.** Re-run the garden step capturing output and scan for the three stable warning strings:
    ```bash
-   .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --private --force --only \
+   .venv/bin/etlr data://garden/<namespace>/<new_version>/<short_name> --force --only \
        > /tmp/<short_name>_harmon.log 2>&1
    rg -n "missing values in mapping\.|unused values in mapping\.|Unknown country names in excluded countries file:" /tmp/<short_name>_harmon.log
    ```
@@ -154,6 +155,8 @@ If the garden step doesn't use the harmonizer at all (no `.countries.json`; `cou
 Cheap and worth doing on any PR more than a few days old. A branch serves *its own* snapshot of every other dataset, so if another update merged to `master` meanwhile, the branch's staging is behind on that dataset — and any chart combining both differs from production on two axes. Approving it syncs the stale config back and **reverts the other update** on a published chart. Nothing flags this: CI is green and the chart renders.
 
 Check `git log HEAD..origin/master --oneline` for `📊` dataset commits; for each, look for charts carrying indicators from both datasets and compare **every** dimension's dataset version, staging vs production — not just the dimension this PR touches. The fix is merging `master` in and remapping the affected charts' foreign dimensions; charts using *only* the other dataset are out of chart-diff scope and never sync, so they're correctly left alone. 🔴 if a shared chart would regress.
+
+**The same revert hits a single chart edited on production after the staging server was built.** The indicator upgrade saves the staging copy, which predates that edit, so approving the diff syncs the old config back and undoes it. For the upgraded charts, compare production's `charts.updatedAt` against the last pre-upgrade revision on staging (`chart_revisions`); a production edit newer than that must be restored on staging before approval. 🔴 if an approved diff would revert one. (Also why `etl approve` approves nothing after an upgrade, and how to compare configs fairly: `/update-dataset`, Final QA.)
 
 ### 8d. Empty-entity audit (optional to run — always offer it)
 
@@ -209,7 +212,9 @@ Any `NULL` row is a 🔴.
 
 ### 10. Metadata quality skills
 
-Run `/check-metadata-typos`, `/check-metadata-spacing`, `/check-metadata-style` against the new garden + grapher `.meta.yml` files. See `/update-dataset` § 6b for the full procedure (typos / spacing / style + a manual clarity checklist for general-audience readability — apply that checklist here too). Report findings as 🟡 (or 🔴 if a violation breaks rendering or makes the text outright misleading).
+Run `/check-metadata-typos` and `/check-metadata-style` against the new garden + grapher `.meta.yml` files. See `/update-dataset` § 6b for the full procedure (typos / whitespace + style / a manual clarity checklist for general-audience readability — apply that checklist here too). Report findings as 🟡 (or 🔴 if a violation breaks rendering or makes the text outright misleading).
+
+**Did the PR change reader-facing text?** If so, open the **Metadata Diff** Wizard page on the PR's staging server (`http://staging-site-<container_branch>/etl/wizard/metadata-diff`) and grade the edits there. It lists every chart, MDim view and explorer view each edit lands on — the only view of a garden text change's actual reach, since inherited text produces no config diff at all. A wording you would reject is 🟡 (🔴 when the new text is misleading or contradicts what the view shows): reject it in the page and hand the author the exported `metadata-rejections.md`, which already names the edit, the garden `.meta.yml` and the dataset owner. Check two things before trusting the counts — the page's 🚧 stale-server banner (a dataset the server is behind on reports its diffs *backwards*) and whether the grapher step reached that server at all. Author side: the QA hand-off in `/update-dataset`.
 
 Also grep the metadata **prose** for numbers carried over from the previous release (country counts, category counts, year ranges in `description_key`/descriptions): validated fields are covered by checks, prose numbers are not — a panel-composition change (dropped country, new category set) silently strands them (see `/update-dataset` Guardrails, "Grep metadata prose"). Stale prose count: 🟡.
 
@@ -225,13 +230,41 @@ Five further prose checks from `/update-dataset` § 6b that the skills don't aut
 
 ### 10b. Adversarial data review (optional to run — always offer it)
 
-`/update-dataset` § 6c-bis offers an adversarial factual review via [`/adversarial-data-review`](../adversarial-data-review/SKILL.md) — optional to *run* because it's token-heavy (~25–45 web calls), so **a missing report is not a finding**; don't flag its absence. If the author didn't run it, **you MUST offer it to the user** as an optional add-on to this review (name the token cost; in review context it runs in that skill's spot-check scope, not the full author scope) — surfacing this offer is mandatory, never silently skip it — and recommend accepting when the update carries red flags: large unexplained value churn, an in-place source revision, a producer new to us, or editorial claims riding on specific values. Run it on opt-in.
+`/update-dataset` § 6c-bis offers an adversarial factual review via [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) — optional to *run* because it's token-heavy (~25–45 web calls), so **a missing report is not a finding**; don't flag its absence. If the author didn't run it, **you MUST offer it to the user** as an optional add-on to this review (name the token cost; in review context it runs in that skill's spot-check scope, not the full author scope) — surfacing this offer is mandatory, never silently skip it — and recommend accepting when the update carries red flags: large unexplained value churn, an in-place source revision, a producer new to us, or editorial claims riding on specific values. Run it on opt-in.
 
-When the PR body (or `workbench/<short_name>/update-context.yml`) does reference an `ai/adversarial-review-<short_name>-<date>.md` report, verify the **outcome**: its 🔴 findings must be resolved — metadata edited, or a `<short_name>.corrections.yml` added with `reason`/`provider`/`status` filled in. Then spot-check independently — don't take the report's word for it: re-verify 2–3 of its findings and 2–3 anchor values (World total + one major country, latest year) against an independent source yourself, following that skill's independence rules (a different producer measuring the same quantity; never OWID republishers or mirrors of the same producer). A value you confirm wrong that the report missed or waved through is 🔴.
+When the PR body (or `workbench/<short_name>/update-context.yml`) does reference an `ai/adversarial-review-<short_name>-<date>.md` report, verify the **outcome**: its 🔴 findings must be resolved — metadata edited, or a `<short_name>.corrections.yml` added with `reason`/`producer`/`status` filled in. Then spot-check independently — don't take the report's word for it: re-verify 2–3 of its findings and 2–3 anchor values (World total + one major country, latest year) against an independent source yourself, following that skill's independence rules (a different producer measuring the same quantity; never OWID republishers or mirrors of the same producer). A value you confirm wrong that the report missed or waved through is 🔴.
+
+### 10c. Referencing-prose check
+
+`/update-dataset` step 7 asks the author to read the prose of every surface citing the dataset — articles, data
+insights, and especially titles — for quantitative claims the update invalidates. As reviewer, check the PR body
+records an outcome for it: either a clean verdict, or a named list of claims with what was decided (handed to
+content, or deliberately left with a reason). A clean verdict has to say three things to be acceptable: **what was
+checked** — no unbounded claim, and, on an update that revised any named period (a restatement, a corrected date),
+no bounded claim touching a revised observation; the outcome must state which kind of update it was, since on an
+append-only update bounded claims are out of scope; **what was swept** — the surfaces from `find-chart-references`;
+and **what was not** — the sweep's coverage gaps (the script prints them and writes them with `--gaps-json`; a
+chart nested in an article layout container, or a data insight holding its chart outside `grapher-url`, can be
+missing from its list). A blanket "nothing stale" with none of that is the first failure mode below in mild form —
+ask what was checked and swept.
+
+Two ways this goes wrong, both worth a 🟡:
+
+- **Nothing recorded at all** on a dataset with articles or data insights citing it. The sweep is cheap once
+  `find-chart-references` has run, and a headline multiple is the most-read number we publish.
+- **A time-bounded claim reported as stale on an append-only update.** "By late 2025 it had reached $62
+  billion" is untouched by a newly added quarter; only unbounded claims ("has grown 1,300-fold", "now accounts
+  for over 90%") re-point at the newest data. Flagging the former on an update that only appended periods
+  suggests the claims were compared against the latest value rather than read. The exemption does not apply
+  when the update *revised* a named period (a restatement, a corrected date) — then a bounded claim can be
+  genuinely stale, and reporting it is correct.
+
+A claim deliberately left unchanged is a perfectly good outcome — a data insight whose chart is a static image
+cannot have its text updated alone without desyncing it from the picture. Look for the reason, not for a fix.
 
 ### 11. DAG checks
 
-The remove-and-reorder procedure is in `/update-dataset` § "Removing the old version & reordering the DAG". As reviewer, verify the **outcome** (the archive dag is regenerated separately by `etl archive-dag`, so don't expect the old version under `dag/archive/` in this PR):
+The remove-and-reorder procedure is in `/update-dataset` § "Removing the old version & reordering the DAG". Its two halves land at different times: the old **dag entries** are removed and archived during the update, but the old **step files** stay on disk until this review is signed off — the consecutive-version comparison (`compare-previous-version` VS Code extension) diffs same-named files across `YYYY-MM-DD` sibling folders on the filesystem and never reads the dag. Old step files already deleted at review time = 🟡 — ask the author to restore them until sign-off (deleting them is the final commit before merge). For the dag itself, verify the **outcome** (the old entries should be under `dag/archive/` already, regenerated by `etl archive-dag`):
 
 ```bash
 rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"   # should be empty (old version removed from active dag)
@@ -265,7 +298,7 @@ After excluding the dataset's own chain, any remaining hits are downstream consu
 
 **Silent-breakage check (when consumers were repointed in this PR).** Mirrors `/update-dataset` § "Silent-breakage check". If the PR bumps downstream consumers to the new version (rather than deferring them), a consumer can still build green while quietly losing data — a region aggregate that goes NaN, a reclassified country that disappears, a join that stops matching. A green pipeline run does **not** prove coverage held. Verify with the two existing instruments:
 
-1. **Downstream builds:** check the **`buildkite/etl-automated-staging-environment`** status on the PR — the staging bake runs `etl run ... --modified --continue-on-failure`, which re-raises the first failure at the end, so any consumer crash turns the check red. A red check is a 🔴 in itself, and it also means the data-diff report **under-reports** (dependents of the failed step are skipped, stay stale in the catalog, and diff as unchanged) — don't accept report verdicts until the check is green. `.venv/bin/etlr --modified --private --dry-run` lists the affected scope locally when you need the list.
+1. **Downstream builds:** check the **`buildkite/etl-automated-staging-environment`** status on the PR — the staging bake runs `etl run ... --modified --continue-on-failure`, which re-raises the first failure at the end, so any consumer crash turns the check red. A red check is a 🔴 in itself, and it also means the data-diff report **under-reports** (dependents of the failed step are skipped, stay stale in the catalog, and diff as unchanged) — don't accept report verdicts until the check is green. `.venv/bin/etlr --modified --dry-run` lists the affected scope locally when you need the list.
 2. **Value changes:** open owidbot's **data-diff** HTML report (`https://catalog.ourworldindata.org/diffs/<sanitized_branch>/data-diff.html`, easiest via the **full report** link in owidbot's PR comment — the path keeps the branch name's dots and underscores and replaces only characters outside `[A-Za-z0-9._-]` (e.g. `/`) with `-` — unlike the staging *subdomain*, which does replace `.`/`_`) — staging (new dep) vs production (old dep) — and read its verdicts rather than scanning the diff: every red **"− lost N data point(s)"** entry in the "Top changes" list and every dataset with a red coverage chip is a coverage loss to triage (legitimate churn vs. a silent drop); 🔴-tier datasets (median anomaly score ≥ 15%) get a review, 🟡 a skim, 🟢 is noise. The 📝 metadata-only filter separates pure metadata edits. Locally: `.venv/bin/etl diff REMOTE data/ --changed --include garden --output-html data-diff.html`. (Local build+diff only for small fan-outs; at foundational-dataset scale — hundreds of downstream steps — use owidbot's hosted report and treat any local rebuild as a one-time gate, ~35 min / ~7 GB.) Then run the **full-report audit probes** from `/update-dataset` § "Silent-breakage check" over all changed datasets: structural changes / "World" rows / raw-country rows / >30%-of-rows indicators / **wipe-vs-edge for every coverage loss**. An entity losing *all* its rows is the bug signature — classically a stale pinned-country requirement nulling a whole income-group aggregate after a reclassification (build-time `ValueError` since the geo guard, but verify) — while sparse-edge losses are membership churn.
 
 Any downstream build failure, dropped table/column/entity, or all-NaN series is a 🔴 (the update silently dropped data downstream) unless the author has already triaged it in the PR body. If consumers were **deferred** to a follow-up PR, these checks belong to that PR — here just confirm the "Downstream dependencies" list is complete.
@@ -277,11 +310,11 @@ Verify the author completed each post-step item from `/update-dataset`. The proc
 | Item | Verify by |
 |---|---|
 | Indicator upgrade ran (§7) | `make query SQL="SELECT COUNT(*) FROM chart_dimensions cd JOIN variables v ON cd.variableId=v.id WHERE v.catalogPath LIKE '%<ns>/<new_v>/%'"` — non-zero |
-| Explorers / MDims re-exported (§7) | Only if the DAG has `export://explorers/...` or `export://multidim/...` steps for this dataset (`rg -e "export://explorers/.*/<short_name>" -e "export://multidim/.*/<short_name>" dag/ -g "*.yml"`). The indicator-upgrader never touches these, so run the two staging queries from `/update-dataset` §7 (old-version references in `explorer_variables` / `multi_dim_x_chart_configs`) — both must return empty. A hit = 🔴, the export step wasn't re-run. |
+| Explorers / MDims re-exported (§7) | Only if the DAG has `viz://explorer/...` or `viz://chart/...` steps for this dataset (`rg -e "viz://explorer/.*/<short_name>" -e "viz://chart/.*/<short_name>" dag/ -g "*.yml"`). The indicator-upgrader never touches these, so run the two staging queries from `/update-dataset` §7 (old-version references in `explorer_variables` / `multi_dim_x_chart_configs`) — both must return empty. A hit = 🔴, the viz step wasn't re-run. |
 | Hardcoded-time-bounds audit ran (§7 / §8e) | Standard author-side step. Spot-check per §8e: numeric `maxTime`/`map.time`/`timelineMaxTime` pins among the dataset's staging chart configs vs the new indicators' latest time — non-deliberate pins below it must be fixed on staging or documented in the PR body. Skipped audit or an unfixed, undocumented pin = 🟡. |
 | Chart-diff bot result | PR comments include `<!--chart-diff-start-->` block ✅. A diff that shifts **every** historical year/region by a tiny amount is usually **upstream-dataset drift** (the live data was built against an older population/regions/income_groups snapshot), not a regression — don't flag it as a 🔴; the real change should be isolable by rebuilding the old version on the current catalog (see `/update-dataset` §5). |
 | Scheduled-issue workflow checked (§6d) | An `update-*.yml` in `owid/owid-issues` covers this dataset — exact name `update-<namespace>-<short_name>.yml`, fuzzy filename, or group workflow (check `~/owid-issues/.github/workflows/`, cloning the repo first if absent — a filename-only `gh api …/contents` listing can't verify cron/body or find group workflows); its cron is consistent with `update_period_days` + the release cadence evident from the PR (and fires *after* the producer's release window, not before); the issue body tells the next updater to run `/update-dataset <short_name>` (space-separated short names for group workflows). Missing workflow for a ≥annual dataset, a cron that contradicts the observed cadence, a stale body, or a workflow file missing its `.yml` extension (Actions never runs it) = 🟡. |
-| Pinned chart FAUST not stale (§ Guardrails) | Only when the PR changed methodology/scope wording in indicator metadata (`grapher_config.note`, deflator/source claims): for each affected chart, read `chart_configs.patch` on staging — a chart overriding `title`/`subtitle`/`note` keeps the old text regardless of the metadata fix. Stale method/scope claim on a published chart's pinned FAUST = 🔴 (reader-facing contradiction with the data page). |
+| Pinned chart FAUST not stale (§ Guardrails) | Only when the PR changed methodology/scope wording in indicator metadata (`grapher_config.note`, deflator/source claims): for each affected chart, read the authored layer (the `chart_configs` row named by `patchConfigId`) on staging — a chart overriding `title`/`subtitle`/`note` keeps the old text regardless of the metadata fix. Stale method/scope claim on a published chart's pinned FAUST = 🔴 (reader-facing contradiction with the data page). |
 | Narrative-chart stale-FAUST sweep ran (§7) | Only when narrative charts carry the dataset's variables (query `narrative_charts` joined via parent `chart_dimensions` on staging). The upgrader warns only about charts visited in its own run, so the author must sweep **all** of them (`_find_stale_faust_overrides` + a plain grep of the patches for old unit/base-year strings — see `/update-dataset` §7). Cheap outcome check: grep the narrative patches on staging for the *previous* release's unit/base-year strings (e.g. "constant <old base year> US$") — a hit on a published narrative chart = 🔴; narrative charts present but no sweep evidence in the PR = 🟡. |
 | `@codex review` posted (§9) | `gh pr view <num> --json comments` shows the trigger comment + a Codex review |
 | Codex threads resolved (§10) | Write the query to a file and pass `-F query=@file.graphql` (see GraphQL note below) — list `reviewThreads(first:20){ nodes { isResolved } }`; all `isResolved: true`. |
@@ -308,8 +341,8 @@ Structure the review with:
 5. **🔴 Blockers** — must-fix before merge
 6. **🟡 Suggestions** — nice-to-have
 7. **🟢 Informational** — observations, no action needed
-8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, etc. (The Slack + `/latest` drafts live in `workbench/`, not the PR — don't expect them here.)
-9. **What's still open** — carried forward from the PR body, covering the categories in `.claude/docs/open-items.md` plus the update workflow's fourth one (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
+8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, whether the QA hand-off included Metadata Diff when the PR changed reader-facing text, etc. (The Slack + `/latest` drafts live in `workbench/`, not the PR — don't expect them here.)
+9. **What's still open** — carried forward from the PR body, covering the categories in `.claude/docs/open-items.md` plus the update workflow's fourth one (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Unactioned Metadata Diff rejections belong here — nothing in the merge enforces them. Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
 
 **Check the PR body doesn't leave pending work unmentioned.** A PR whose description lists only what was done, while the session left content edits pending, audits unrun, or a follow-up PR's scope undefined, is missing the one artifact that survives after the chat is gone — flag it 🟡. Judge it on whether a reader can tell what's outstanding, not on whether it uses any particular headings or wording. Work that was deliberately handed off needs a locator in the body too, not just a description: an item the next person can't act on without redoing the analysis isn't handed off.
 

@@ -17,7 +17,7 @@ definitions:
 
   text_per_capita_calculation: &text_per_capita_calculation Per-capita values are calculated by dividing the total annual value by the relevant population (for example, the population of a country, region or income group).
 
-  text_macroplastic_definition: &text_macroplastic_definition This data covers only macroplastics, which are plastic pieces larger than 5 millimetres.
+  text_macroplastic_definition: &text_macroplastic_definition This data covers only macroplastics, which are plastic pieces larger than 5 millimeters.
 
   text_pollution_definition: &text_pollution_definition Plastic pollution is plastic that is no longer contained because it escapes from collection, disposal, or recycling and enters the environment.
 
@@ -220,7 +220,7 @@ definitions:
 
   text_collection_delivery_interpretation: &text_collection_delivery_interpretation Low delivery rates can indicate limited capacity or unreliable service, even where collection services exist.
 
-  text_no_collection_derived: &text_no_collection_derived It is derived from the modelled collection coverage and population estimates produced by the [SPOT model](https://www.nature.com/articles/s41586-024-07758-6), which first fills gaps in municipal waste data using statistical predictions, then simulates how plastic flows through waste systems and quantifies uncertainty in those estimates. The model generates results for around 50,700 municipalities, which are then aggregated to country and regional totals.
+  text_no_collection_derived: &text_no_collection_derived It is derived from the modeled collection coverage and population estimates produced by the [SPOT model](https://www.nature.com/articles/s41586-024-07758-6), which first fills gaps in municipal waste data using statistical predictions, then simulates how plastic flows through waste systems and quantifies uncertainty in those estimates. The model generates results for around 50,700 municipalities, which are then aggregated to country and regional totals.
 
   desc_key_plastic_pollution_shares_burn: &desc_key_plastic_pollution_shares_burn
     - This indicator shows the estimated share of global plastic waste emitted via open burning from municipal sources such as households, shops, and offices, attributed to each country or region.
@@ -250,7 +250,7 @@ definitions:
 
   desc_key_collection_delivery: &desc_key_collection_delivery
     - Collection delivery shows the share of generated municipal waste that is actually collected and transported to treatment or disposal facilities.
-    - It differs from collection coverage by measuring realised performance, not just whether services are available.
+    - It differs from collection coverage by measuring realized performance, not just whether services are available.
     - *text_collection_delivery_interpretation
     - *text_model_uncertainty
 

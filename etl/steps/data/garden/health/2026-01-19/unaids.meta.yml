@@ -84,11 +84,11 @@ tables:
           Number of <<sex+' ' if sex != 'total' else ''>>people <<'aged ' + age + ' ' if age != 'total' else ''>>dying from AIDS-related causes, <<estimate>> estimate.
           <%- endif %>
         description_from_producer: |-
-          The number of people dying from AIDS-related causes can be obtained using a variety of measures, including through a vital registration system adjusted for misreporting, as part of a facility- or population-based survey that may include verbal autopsy and through mathematical modelling using such tools as Spectrum. Modelling tools typically use demographic data, HIV prevalence from survey and surveillance, the number of people receiving antiretroviral therapy, HIV incidence and assumptions around survival patterns to estimate the number of people dying. In some instances, data from vital reporting systems and estimates of underreporting and misclassification also may be incorporated into these models to derive estimates of the number of AIDS-related deaths.
+          The number of people dying from AIDS-related causes can be obtained using a variety of measures, including through a vital registration system adjusted for misreporting, as part of a facility- or population-based survey that may include verbal autopsy and through mathematical modeling using such tools as Spectrum. Modeling tools typically use demographic data, HIV prevalence from survey and surveillance, the number of people receiving antiretroviral therapy, HIV incidence and assumptions around survival patterns to estimate the number of people dying. In some instances, data from vital reporting systems and estimates of underreporting and misclassification also may be incorporated into these models to derive estimates of the number of AIDS-related deaths.
 
           The source of the estimate is requested. Countries providing the number of people dying from AIDS-related causes derived from a source other than Spectrum should provide any accompanying estimates of uncertainty around this number and upload an electronic copy of the report describing how the number was calculated.
 
-          Countries should preferably report a modelled estimate rather than one derived from their vital registration system unless this system has been recently evaluated as one of high quality. Users can now opt to use their Spectrum estimate or enter nationally representative population-level data. If Spectrum estimates are chosen, the values will be pulled directly from the software once the national file is finalized.
+          Countries should preferably report a modeled estimate rather than one derived from their vital registration system unless this system has been recently evaluated as one of high quality. Users can now opt to use their Spectrum estimate or enter nationally representative population-level data. If Spectrum estimates are chosen, the values will be pulled directly from the software once the national file is finalized.
         description_key:
           - AIDS-related deaths are estimated using multiple methods, including vital registration systems, surveys with verbal autopsies, and mathematical modeling tools like Spectrum.
           - Mathematical models integrate various data sources, such as demographic data, HIV prevalence, antiretroviral therapy coverage, and survival assumptions, sometimes incorporating adjustments for misreporting.
@@ -103,7 +103,7 @@ tables:
         description_short: |-
           Total number of <<sex+' ' if sex != 'total' else ''>>people <<'aged ' + age + ' ' if age != 'total' else ''>>who have died from AIDS-related causes, per 100 000 people. This is the <<estimate.lower() >> estimate.
         description_from_producer: |-
-          The number of people dying from AIDS-related causes can be obtained using a variety of measures, including through a vital registration system adjusted for misreporting, as part of a facility- or population-based survey that may include verbal autopsy and through mathematical modelling using such tools as Spectrum. Modelling tools typically use demographic data, HIV prevalence from survey and surveillance, the number of people receiving antiretroviral therapy, HIV incidence and assumptions around survival patterns to estimate the number of people dying. In some instances, data from vital reporting systems and estimates of underreporting and misclassification also may be incorporated into these models to derive estimates of the number of AIDS-related deaths.
+          The number of people dying from AIDS-related causes can be obtained using a variety of measures, including through a vital registration system adjusted for misreporting, as part of a facility- or population-based survey that may include verbal autopsy and through mathematical modeling using such tools as Spectrum. Modeling tools typically use demographic data, HIV prevalence from survey and surveillance, the number of people receiving antiretroviral therapy, HIV incidence and assumptions around survival patterns to estimate the number of people dying. In some instances, data from vital reporting systems and estimates of underreporting and misclassification also may be incorporated into these models to derive estimates of the number of AIDS-related deaths.
 
           More details:
           - Consolidated guidelines on person-centred HIV strategic information: strengthening routine data for impact. Geneva: World Health Organization; 2022 (https://web.archive.org/web/20250201130605/https://www.who.int/publications/i/item/9789240055315)
@@ -402,11 +402,11 @@ tables:
         description_from_producer: |-
           The mother-to-child transmission probability differs with the antiretroviral drug regimen received and infant-feeding practices. The transmission can be calculated by using the Spectrum model.
 
-          The Spectrum computer programme uses the information on:
+          The Spectrum computer program uses the information on:
 
           a. the distribution of HIV-positive pregnant women receiving different antiretroviral regimens prior to and during delivery (peripartum) by CD4 category of the mother
           b. the distribution of women and children receiving antiretrovirals after delivery (postpartum) by CD4 category of the mother.
-          c. the percent of infants who are not breastfeeding in PMTCT programmes by age of the child
+          c. the percent of infants who are not breastfeeding in PMTCT programs by age of the child
           d. mother-to-child transmission of HIV probabilities based on various categories of antiretroviral drug regimen and infant feeding practices
 
           The estimated national transmission rate is reported in the PMTCT summary display in Spectrum. This variable can also be calculated using the variables in Spectrum on “New HIV infections” for children 0-14 years and dividing this by the variable “Women in need of PMTCT”
@@ -446,7 +446,7 @@ tables:
 
           Strategies for directly measuring HIV incidence include longitudinal follow-up and repeat testing among individuals who do not have HIV infection and estimation using a laboratory test for recent HIV infection and clinical data in the population. Longitudinal monitoring is often costly and difficult to perform at a population level. Laboratory testing of individuals to determine the recency of infection also raises cost and complexity challenges since a nationally representative population-based survey is typically required to obtain estimates.
 
-          Indirect methods most frequently rely on estimates constructed from mathematical modelling tools, such as Spectrum or the AIDS Epidemic Model. These models may incorporate geographical and population-specific HIV surveys, surveillance, case reporting, mortality, programme and clinical data and, in some instances, assumptions about risk behavior and HIV transmission. In some instances, countries may wish to triangulate these data with other sources of estimates of the number of people newly infected, including from serial population-based HIV prevalence estimates or estimates of HIV prevalence in young, recently exposed populations.
+          Indirect methods most frequently rely on estimates constructed from mathematical modeling tools, such as Spectrum or the AIDS Epidemic Model. These models may incorporate geographical and population-specific HIV surveys, surveillance, case reporting, mortality, program and clinical data and, in some instances, assumptions about risk behavior and HIV transmission. In some instances, countries may wish to triangulate these data with other sources of estimates of the number of people newly infected, including from serial population-based HIV prevalence estimates or estimates of HIV prevalence in young, recently exposed populations.
 
           Note that case-based surveillance systems capturing newly reported people acquiring HIV infection should not be used as a direct source of estimating the number of people newly infected with HIV in the reporting year. Because of reporting delays and under-diagnosis, newly reported cases may not reflect the actual rate of people becoming newly infected. This information may be useful, however, for triangulation or validation purposes, especially when combined with tests for the recency of HIV infection.
 
@@ -845,7 +845,7 @@ tables:
         title: Needles and syringes distributed per person who inject drugs
         unit: needles per person
         description_short: |-
-          Number of needles and syringes distributed per person who injects drugs per year by needle-syringe programmes.
+          Number of needles and syringes distributed per person who injects drugs per year by needle-syringe programs.
         description_key:
           - Injecting drug use is a significant route of HIV transmission globally. Addressing HIV transmission through injecting drug use is crucial in reducing the overall HIV burden.
           - Needle-syringe programs are a key health sector intervention recommended by the World Health Organization (WHO) for HIV and hepatitis C prevention and treatment among key populations, as outlined in the [2022 Consolidated guidelines on HIV prevention](https://www.who.int/publications/i/item/9789240052390), diagnosis, treatment, and care for key populations.
@@ -1018,7 +1018,7 @@ tables:
         description_from_producer: |-
           Discrimination is a human rights violation and is prohibited by international human rights law and most national constitutions. In the context of HIV, discrimination refers to unfair or unjust treatment of an individual (either through actions or by failure to act) based on his or her real or perceived HIV status. Discrimination exacerbates risks and deprives people of their rights and entitlements, thus fueling the HIV epidemic.
 
-          Stigma is the attribution of undesirable characteristics to an individual or group that reduces their status in the eyes of society. It frequently drives experiences of discrimination. The indicator measures HIV-related discrimination experienced in health-care settings. HIV is often associated with a range of behaviours that are viewed as socially deviant or immoral, such as injecting drug use and sexual promiscuity. Because of these underlying societal beliefs, people living with HIV often are viewed as shameful and are thought to be responsible for having contracted HIV. This shaming process has repercussions beyond the individual because it greatly reduces incentives to be tested for HIV or, in the event the test result is positive, to disclose HIV status to sexual partners or family members.
+          Stigma is the attribution of undesirable characteristics to an individual or group that reduces their status in the eyes of society. It frequently drives experiences of discrimination. The indicator measures HIV-related discrimination experienced in health-care settings. HIV is often associated with a range of behaviors that are viewed as socially deviant or immoral, such as injecting drug use and sexual promiscuity. Because of these underlying societal beliefs, people living with HIV often are viewed as shameful and are thought to be responsible for having contracted HIV. This shaming process has repercussions beyond the individual because it greatly reduces incentives to be tested for HIV or, in the event the test result is positive, to disclose HIV status to sexual partners or family members.
 
           The health sector is one of the main settings where people living with HIV—and those perceived to be living with HIV—experience discrimination. This indicator directly measures discrimination experienced by people living with HIV when seeking services in health-care settings.
 
@@ -1062,15 +1062,15 @@ tables:
         unit: constant 2019 US$
         short_unit: "$"
         description_key:
-          - "This indicator captures in-country HIV programme expenditures from various financing sources (e.g., domestic, international, etc.), ensuring standardized tracking of how much is spent and where."
+          - "This indicator captures in-country HIV program expenditures from various financing sources (e.g., domestic, international, etc.), ensuring standardized tracking of how much is spent and where."
         description_from_producer: |-
-          The indicator to be reported is total and subtotal HIV expenditures by services or programme categories and by financing sources. There are eight core sub-indicators that map to this reporting. These are outlined under Annex 3.
+          The indicator to be reported is total and subtotal HIV expenditures by services or program categories and by financing sources. There are eight core sub-indicators that map to this reporting. These are outlined under Annex 3.
 
-          By the end of 2020, the international and domestic resource availability for the HIV response reached an estimated US$ 21.5 billion (in constant 2019 dollars) in low- and middle-income countries. Achieving country and global targets requires increased focus, resources, programme effectiveness and efficiency to provide the HIV care, treatment and prevention to reduce HIV incidence and extend life.
+          By the end of 2020, the international and domestic resource availability for the HIV response reached an estimated US$ 21.5 billion (in constant 2019 dollars) in low- and middle-income countries. Achieving country and global targets requires increased focus, resources, program effectiveness and efficiency to provide the HIV care, treatment and prevention to reduce HIV incidence and extend life.
 
           It is critical to identify long-term, sustainable financing sources, including domestic resource mobilization, to maintain and build upon the success achieved. However, filling the financing gap and pursuing efficient resource allocation can only be achieved by assessing and managing the resources available and their use.
 
-          The quantification of financing flows and expenditures helps to examine the questions of who benefits from HIV programmes and to determine the current state of allocations for HIV programmes and services that focus on key or other specific populations.
+          The quantification of financing flows and expenditures helps to examine the questions of who benefits from HIV programs and to determine the current state of allocations for HIV programs and services that focus on key or other specific populations.
 
           The vast majority of the AIDS Spending Categories (or ASCs, per National AIDS Spending Assessment [NASA] classifications) or the sub-indicators are drawn from existing frameworks and are now structured around the 2021 Political Declaration on Ending AIDS. The resource needs for low- and middle-income countries resulted in a target to mobilize at least US$ 29 billion (in constant 2019 US dollars) by 2025.
 
@@ -1110,16 +1110,16 @@ tables:
               <%- endif %>
 
       condoms_distributed_pp:
-        title: Condoms distributed per person in prevention programmes for <<group>>
+        title: Condoms distributed per person in prevention programs for <<group>>
         # title: Condoms distributed per person in prevention programmes for men who have sex with men
         # title: Condoms distributed per person in prevention programmes for sex workers
         unit: condoms per person
-        description_short: Number of condoms distributed per person in prevention programmes for <<group>>.
+        description_short: Number of condoms distributed per person in prevention programs for <<group>>.
         presentation:
-          title_public: Condoms distributed per person in prevention programmes
+          title_public: Condoms distributed per person in prevention programs
           title_variant: << group >>
           grapher_config:
-            title: Condoms distributed in prevention programmes for <<group>>
+            title: Condoms distributed in prevention programs for <<group>>
             hasMapTab: true
             tab: map
             map:
@@ -1130,7 +1130,7 @@ tables:
         unit: people
         description_short: "Estimates of the size of the population of <<group>>."
         description_from_producer: |-
-          Programme planning for key populations can be more efficient if the size of these populations can be accurately estimated. The figures enable national AIDS programmes, health ministries, donors and not-for-profit and multilateral organizations to efficiently allocate resources to adequately meet the prevention needs of specific populations at higher risk. Size estimates are also important for modelling the HIV epidemic.
+          Program planning for key populations can be more efficient if the size of these populations can be accurately estimated. The figures enable national AIDS programs, health ministries, donors and not-for-profit and multilateral organizations to efficiently allocate resources to adequately meet the prevention needs of specific populations at higher risk. Size estimates are also important for modeling the HIV epidemic.
 
           To better understand the size estimates submitted, we request that the following additional information be included in the comment box:
 
@@ -1138,7 +1138,7 @@ tables:
           - Method to derive the size estimate.
           - Site-specific estimates for all available estimates.
 
-          In keeping with efforts to provide more granular data presentations, the latter will offer the opportunity for mapping denominator data with programme data if they are collected in the same survey areas.
+          In keeping with efforts to provide more granular data presentations, the latter will offer the opportunity for mapping denominator data with program data if they are collected in the same survey areas.
 
           If there are subnational data available, please provide the disaggregation by administrative area, city, or site in the space provided. You may also upload an Excel spreadsheet of these data instead of entering them in the online tool. Submit the digital version of any available size estimation reports using the upload tool.
 
@@ -1173,9 +1173,9 @@ tables:
 
           Denominator: Estimated number of people living with HIV with incident TB cases
 
-          For the numerator: Facility antiretroviral therapy registers and reports; programme monitoring tools. Count the total number of HIV-positive new and relapse TB patients who were started on TB treatment (as recorded in the TB register) and antiretroviral therapy, or those already on antiretroviral therapy (as recorded in the antiretroviral therapy register). The information should be reconciled quarterly and annually with the TB registers in the relevant basic management units before consolidation and reporting.
+          For the numerator: Facility antiretroviral therapy registers and reports; program monitoring tools. Count the total number of HIV-positive new and relapse TB patients who were started on TB treatment (as recorded in the TB register) and antiretroviral therapy, or those already on antiretroviral therapy (as recorded in the antiretroviral therapy register). The information should be reconciled quarterly and annually with the TB registers in the relevant basic management units before consolidation and reporting.
 
-          For the denominator: Programme data and estimates of the number of people living with HIV with incident TB. WHO calculates annual estimates of the number of people living with HIV with incident TB. The denominator become available only in August of the reporting year and do not need to be provided at the time of reporting. The estimates for 2023 are available at https://www.who.int/teams/global-tuberculosis-programme/data
+          For the denominator: Program data and estimates of the number of people living with HIV with incident TB. WHO calculates annual estimates of the number of people living with HIV with incident TB. The denominator become available only in August of the reporting year and do not need to be provided at the time of reporting. The estimates for 2023 are available at https://www.who.int/teams/global-tuberculosis-programme/data
 
           More details: https://indicatorregistry.unaids.org/indicator/co-management-of-tuberculosis-and-hiv-treatment
         description_key:
@@ -1230,7 +1230,7 @@ tables:
           Denominator: Number of respondents tested for both HIV and one or both hepatitis B and C
 
           Strengths and weaknesses:
-          Probability-based estimates of coinfection with HIV and hepatitis C virus or HIV and hepatitis B virus among key populations are generally unavailable, although several biobehavioural surveys have conducted hepatitis antibody testing. Improving knowledge about coinfection will help to improve treatment programmes and help to maximize the survival of the affected populations. The numbers of people coinfected are likely to be small, with the possible exception of people who inject drugs, so the confidence intervals will be large.
+          Probability-based estimates of coinfection with HIV and hepatitis C virus or HIV and hepatitis B virus among key populations are generally unavailable, although several biobehavioural surveys have conducted hepatitis antibody testing. Improving knowledge about coinfection will help to improve treatment programs and help to maximize the survival of the affected populations. The numbers of people coinfected are likely to be small, with the possible exception of people who inject drugs, so the confidence intervals will be large.
 
           More details: https://indicatorregistry.unaids.org/indicator/viral-hepatitis-among-key-populations
         presentation:
@@ -1259,9 +1259,9 @@ tables:
           Three randomized controlled trials have shown that male circumcision provided by well-trained health professionals in properly equipped settings is safe and can reduce the risk of acquiring HIV. Other benefits of medical male circumcision include the reduced risk of some other STIs, including human papillomavirus, the cause of cervical cancer. The World Health Organization (WHO) and UNAIDS recommendations emphasize that voluntary medical male circumcision should continue to be provided as an additional efficacious HIV prevention option within combination prevention for adolescents 15 years and older and adult men in settings with generalized epidemics to reduce the risk of heterosexually acquired HIV infection. Voluntary medical male circumcision services should be provided as part of a package of prevention interventions including safer sex education, condom education and provision, HIV testing and linkages to care and treatment, and management of sexually transmitted infections.
 
           Strengths and weaknesses:
-          A programme may or may not change the rate of male circumcision. For example, changing societal norms not caused by a programme may lead to changing rates of male circumcision. This indicator measures the total change in the population, regardless of the reasons.
+          A program may or may not change the rate of male circumcision. For example, changing societal norms not caused by a program may lead to changing rates of male circumcision. This indicator measures the total change in the population, regardless of the reasons.
 
-          Existing population-based surveys (such as Demographic and Health Surveys) may not accurately measure true male circumcision status because people may lack knowledge of what male circumcision is, be confused about their circumcision status or perceive the social desirability of circumcision status. Other approaches to determining circumcision status might be used: for example, using photographs or drawings (drawings may be more culturally appropriate), prompts or even direct examination. Modelling how changing rates of male circumcision can potential affect HIV incidence requires accurate knowledge of male circumcision status over time.
+          Existing population-based surveys (such as Demographic and Health Surveys) may not accurately measure true male circumcision status because people may lack knowledge of what male circumcision is, be confused about their circumcision status or perceive the social desirability of circumcision status. Other approaches to determining circumcision status might be used: for example, using photographs or drawings (drawings may be more culturally appropriate), prompts or even direct examination. Modeling how changing rates of male circumcision can potential affect HIV incidence requires accurate knowledge of male circumcision status over time.
 
           More details: https://indicatorregistry.unaids.org/indicator/male-circumcision-prevalence
         presentation:
@@ -1354,7 +1354,7 @@ tables:
         description_short: |-
           Percentage of << "women" if sex == "female" else "men" if sex == "male" else "men and women" >> aged <<age if age != "total" else "15-49">> years who believe that a husband is justified in hitting or beating his wife for.
         description_from_producer: |-
-          Gender inequality continues to stand in the way of global goals to end AIDS by 2030. Inequitable gender norms that confine women and men to specific roles in society - together with gender disparities in education and employment - greatly limit HIV prevention strategies among women, girls, and gender and sexual minorities. Fear, experiences of violence and power imbalances in relationships also increase vulnerability to HIV among these groups, limiting their access to HIV services and reducing their adherence to HIV prevention or treatment technologies. This leaves them disproportionately affected by HIV. Scaling up programmes to increase gender equity and intensifying efforts to achieve gender equality is therefore critical for ending AIDS as a global public health threat by 2030.
+          Gender inequality continues to stand in the way of global goals to end AIDS by 2030. Inequitable gender norms that confine women and men to specific roles in society - together with gender disparities in education and employment - greatly limit HIV prevention strategies among women, girls, and gender and sexual minorities. Fear, experiences of violence and power imbalances in relationships also increase vulnerability to HIV among these groups, limiting their access to HIV services and reducing their adherence to HIV prevention or treatment technologies. This leaves them disproportionately affected by HIV. Scaling up programs to increase gender equity and intensifying efforts to achieve gender equality is therefore critical for ending AIDS as a global public health threat by 2030.
 
           Calculation: Numerator / Denominator, where
 
@@ -1392,7 +1392,7 @@ tables:
         description_from_producer: |-
           This indicator assesses progress towards increasing the capacity of women and adolescent girls to access sexual and reproductive health services and being able to exercise their right to control and freely decide on matters related to their sexuality and sexual and reproductive health. It reflects the right of women and adolescent girls to decide whether and when to have children and having the methods to implement this decision.
 
-          This indicator is also used to measure progress towards Sustainable Development Goals target 3.7, which aims to ensure universal access to sexual and reproductive health-care services, including for family planning, information and education, and integrating reproductive health into national strategies and programmes by 2030.
+          This indicator is also used to measure progress towards Sustainable Development Goals target 3.7, which aims to ensure universal access to sexual and reproductive health-care services, including for family planning, information and education, and integrating reproductive health into national strategies and programs by 2030.
 
           Sexual and reproductive health services are also an entry point for HIV prevention, treatment, care and support services, and their integration will be key to ensuring the sustainability of HIV-related services.
 
@@ -1487,7 +1487,7 @@ tables:
 
           Denominator: Number of respondents living with HIV
 
-          Method of measurement: Behavioural surveillance or other special surveys.
+          Method of measurement: Behavioral surveillance or other special surveys.
 
           More details: https://indicatorregistry.unaids.org/indicator/antiretroviral-therapy-coverage-among-people-living-hiv-key-populations-e
         presentation:
@@ -1515,9 +1515,9 @@ tables:
           Avoidance of health care among {definitions.gam_groups.other} because of stigma and discrimination.
           <% endif %>
         description_from_producer: |-
-          Discrimination is a human rights violation and is prohibited by international human rights law and most national constitutions. In the context of HIV, discrimination refers to unfair or unjust treatment of an individual (either through actions or by failure to act) based on his or her real or perceived HIV status. Discrimination exacerbates risks and deprives people of their rights and entitlements, thus fueling the HIV epidemic. HIV-related stigma refers to negative beliefs, feelings and attitudes towards people living with HIV, groups associated with people living with HIV (e.g., the families of people living with HIV) and other key populations at higher risk of HIV infection, such as people who inject drugs, sex workers, gay men and other men who have sex with men and transgender people. In addition to HIV-related stigma, people from key populations experience further discrimination because of the stigma relating to same-sex attraction and sexual behaviour, engagement in sex work, drug use and non-conforming or diverse gender expression.
+          Discrimination is a human rights violation and is prohibited by international human rights law and most national constitutions. In the context of HIV, discrimination refers to unfair or unjust treatment of an individual (either through actions or by failure to act) based on his or her real or perceived HIV status. Discrimination exacerbates risks and deprives people of their rights and entitlements, thus fueling the HIV epidemic. HIV-related stigma refers to negative beliefs, feelings and attitudes towards people living with HIV, groups associated with people living with HIV (e.g., the families of people living with HIV) and other key populations at higher risk of HIV infection, such as people who inject drugs, sex workers, gay men and other men who have sex with men and transgender people. In addition to HIV-related stigma, people from key populations experience further discrimination because of the stigma relating to same-sex attraction and sexual behavior, engagement in sex work, drug use and non-conforming or diverse gender expression.
 
-          This indicator is important for providing a measure of the proportion of members of key populations who have avoided accessing general healthcare services, due to fear of stigma and discrimination. Related reasons for avoiding such services may include (but are not limited to) the following: a lack (or perceived lack of) confidentiality within health-care settings; negative attitudes and behaviours among health-care providers; and fears of disclosing or hinting at individual behaviours and sexual preference/orientation.
+          This indicator is important for providing a measure of the proportion of members of key populations who have avoided accessing general healthcare services, due to fear of stigma and discrimination. Related reasons for avoiding such services may include (but are not limited to) the following: a lack (or perceived lack of) confidentiality within health-care settings; negative attitudes and behaviors among health-care providers; and fears of disclosing or hinting at individual behaviors and sexual preference/orientation.
 
           Data related to the avoidance of health-care services are important in measuring the proportion of key populations who are not fulfilling their basic health-care needs (such as routine medical check-ups) and thus may be less likely to attend health-care settings for more specialized services and care (such as HIV testing, treatment and medical care). This indicator is important for understanding and addressing the barriers to achieving the 95-95-95 targets among members of key populations. Data from this indicator directly measure fear of stigma or discrimination.
 
@@ -1599,13 +1599,13 @@ tables:
 
         description_from_producer: |-
           <% if group == "men who have sex with men" %>
-          Condoms can substantially reduce the risk of sexually transmitting HIV. Consistently and correctly using condoms is therefore important for men who have sex with men because of the high risk of HIV transmission during unprotected anal sex. In addition, men who have anal sex with other men may also have female partners, who could become infected as well. Condom use with the most recent male partner is considered a reliable indicator of longer-term behaviour.
+          Condoms can substantially reduce the risk of sexually transmitting HIV. Consistently and correctly using condoms is therefore important for men who have sex with men because of the high risk of HIV transmission during unprotected anal sex. In addition, men who have anal sex with other men may also have female partners, who could become infected as well. Condom use with the most recent male partner is considered a reliable indicator of longer-term behavior.
 
           Note: countries with generalized epidemics may also have a concentrated subepidemic among gay men and other men who have sex with men. If so, calculating and reporting on this indicator for this population would be valuable.
 
-          Method of measurement: Behavioural surveillance or other special surveys
+          Method of measurement: Behavioral surveillance or other special surveys
 
-          In a behavioural survey of a sample of gay men and other men who have sex with men, respondents are asked about sexual partnerships in the past six months, about anal sex within these partnerships and about condom use when they last had anal sex. Condom use applies whether the respondent is the receptive and insertive partner.
+          In a behavioral survey of a sample of gay men and other men who have sex with men, respondents are asked about sexual partnerships in the past six months, about anal sex within these partnerships and about condom use when they last had anal sex. Condom use applies whether the respondent is the receptive and insertive partner.
 
           Whenever possible, data for gay men and other men who have sex with men should be collected with civil society organizations that have worked closely with this population in the field.
 
@@ -1613,9 +1613,9 @@ tables:
 
           More details: https://indicatorregistry.unaids.org/indicator/men-who-have-sex-men-condom-use
           <%- elif (("transgender" in group) or ("transwoman" in group) or ("transman" in group)) %>
-          Condoms can substantially reduce the risk of sexually transmitting HIV. Consistently and correctly using condoms is therefore important for transgender people, particularly trans-women, because of the high risk of HIV transmission during unprotected anal sex. Condom use with the most recent penetrative sex partner is considered a reliable indicator of longer-term behaviour.
+          Condoms can substantially reduce the risk of sexually transmitting HIV. Consistently and correctly using condoms is therefore important for transgender people, particularly trans-women, because of the high risk of HIV transmission during unprotected anal sex. Condom use with the most recent penetrative sex partner is considered a reliable indicator of longer-term behavior.
 
-          Method of measurement: Behavioural surveillance or other special surveys
+          Method of measurement: Behavioral surveillance or other special surveys
 
           Respondents are asked the following question: "Did you use a condom during your most recent sexual intercourse or anal sex?"
 
@@ -1628,7 +1628,7 @@ tables:
 
           Note: countries with generalized epidemics may also have a concentrated subepidemic among people who inject drugs. If so, calculating and reporting on this indicator for this population would be valuable.
 
-          Method of measurement: Behavioural surveillance or other special surveys
+          Method of measurement: Behavioral surveillance or other special surveys
 
           People who inject drugs are asked the following sequence of questions:
 
@@ -1648,7 +1648,7 @@ tables:
 
           Note: countries with generalized epidemics may also have a concentrated subepidemic among sex workers. If so, calculating and reporting on this indicator for this population would be valuable.
 
-          Method of measurement: Behavioural surveillance or other special surveys
+          Method of measurement: Behavioral surveillance or other special surveys
 
           Respondents are asked the following question: "Did you use a condom with your most recent client with whom you had sexual intercourse?"
 
@@ -1713,7 +1713,7 @@ tables:
            either "Would you buy fresh vegetables from a shopkeeper or vendor if you knew that this person had HIV?" AND/OR "Do you think that children living with HIV should be able to attend school with children who are HIV negative?"
           <%- endif %>
         description_from_producer: |-
-          Discrimination is a human rights violation prohibited by international human rights law and most national constitutions. Discrimination in the context of HIV refers to unfair or unjust treatment (an act or an omission) of an individual based on his or her real or perceived HIV status. Discrimination exacerbates risks and deprives people of their rights and entitlements, fuelling the HIV epidemic. This indicator does not directly measure discrimination but rather measures discriminatory attitudes that may result in discriminatory acts (or omissions). One item in the indicator measures the potential support by respondents for discrimination that takes place at an institution and the other measures social distancing or behavioural expressions of prejudice. The composite indicator can be monitored as a measure of a key manifestation of HIV-related stigma and the potential for HIV-related discrimination within the general population. This indicator could provide further understanding and improve interventions in HIV discrimination by: showing change over time in the percentage of people with discriminatory attitudes; allowing comparisons between national, provincial, state and more local administrations; and indicating priority areas for action.
+          Discrimination is a human rights violation prohibited by international human rights law and most national constitutions. Discrimination in the context of HIV refers to unfair or unjust treatment (an act or an omission) of an individual based on his or her real or perceived HIV status. Discrimination exacerbates risks and deprives people of their rights and entitlements, fuelling the HIV epidemic. This indicator does not directly measure discrimination but rather measures discriminatory attitudes that may result in discriminatory acts (or omissions). One item in the indicator measures the potential support by respondents for discrimination that takes place at an institution and the other measures social distancing or behavioral expressions of prejudice. The composite indicator can be monitored as a measure of a key manifestation of HIV-related stigma and the potential for HIV-related discrimination within the general population. This indicator could provide further understanding and improve interventions in HIV discrimination by: showing change over time in the percentage of people with discriminatory attitudes; allowing comparisons between national, provincial, state and more local administrations; and indicating priority areas for action.
 
           Method of measurement: Population-based surveys (Demographic and Health Survey, AIDS Indicator Survey, Multiple Indicator Cluster Survey or other representative survey). This indicator is constructed from responses to the following questions in a general population survey from respondents who have heard of HIV.
 
@@ -1756,7 +1756,7 @@ tables:
 
           Reducing HIV stigma and discrimination experienced by key populations is critical for increasing HIV testing, uptake of and adherence to antiretroviral therapy, and viral suppression, all of which will improve their health outcomes.
 
-          Method of measurement: Behavioural surveillance or other special surveys. This indicator is constructed based on the number of people who report that one or more of three experiences has happened to them in the last six months because of their key population status:
+          Method of measurement: Behavioral surveillance or other special surveys. This indicator is constructed based on the number of people who report that one or more of three experiences has happened to them in the last six months because of their key population status:
 
           - Have you ever felt excluded from family activities because you [sell sex; have sex with men; inject drugs; are transgender]? (no; yes, in the last six months; yes, but not in the last six months; don't know).
 
@@ -1791,7 +1791,7 @@ tables:
           Sex workers, gay men and other men who have sex with men, people who inject drugs, transgender people and people in prisons and other closed settings typically have higher HIV prevalence than the general population in all  epidemic contexts. Addressing HIV among these populations is an important component of the national response.
 
           <% if group == "prisoners" %>
-          This indicator is calculated using data from HIV tests conducted by prisons and other closed settings. HIV testing programme data are acceptable. Conducting surveys can be challenging and should therefore not be relied on. Testing should be conducted only with the consent of the people in prisons and other closed settings.
+          This indicator is calculated using data from HIV tests conducted by prisons and other closed settings. HIV testing program data are acceptable. Conducting surveys can be challenging and should therefore not be relied on. Testing should be conducted only with the consent of the people in prisons and other closed settings.
           <% else %>
           A-D.This indicator is calculated using data from HIV tests conducted among respondents in the sentinel site(s) or participants in biobehavioural surveys. The sentinel surveillance sites used for calculating this indicator should remain constant to allow for tracking changes over time.
           <% endif %>
@@ -1818,12 +1818,12 @@ tables:
               <%- endif %>
 
       hiv_programmes_coverage:
-        title: "Coverage (%) of HIV prevention programmes - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
+        title: "Coverage (%) of HIV prevention programs - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
         unit: "%"
         description_short: |-
           Percentage of {definitions.gam_groups.variable} reporting having received a combined set (at least two) of HIV prevention interventions in the past three months.
         description_from_producer: |-
-          Successfully confronting the HIV epidemic requires combining preventive behaviour and antiretroviral therapy. Coverage with evidence-informed prevention programming is a critical component of the response, the importance of which is reflected in the UNAIDS Strategy.
+          Successfully confronting the HIV epidemic requires combining preventive behavior and antiretroviral therapy. Coverage with evidence-informed prevention programming is a critical component of the response, the importance of which is reflected in the UNAIDS Strategy.
 
           Calculated as: Numerator/denominator
 
@@ -1833,9 +1833,9 @@ tables:
 
           Method of measurement: Percentage of respondents who report receiving at least two of the following HIV prevention services from a non-governmental organization, health-care provider or other sources.
 
-          - In the past three months, have you been given condoms and lubricant (for example, through an outreach service, drop-in centre or sexual health clinic)?
+          - In the past three months, have you been given condoms and lubricant (for example, through an outreach service, drop-in center or sexual health clinic)?
 
-          - In the past three months, have you received counselling on condom use and safe sex (for example, through an outreach service, drop-in centre or sexual health clinic)?
+          - In the past three months, have you received counseling on condom use and safe sex (for example, through an outreach service, drop-in center or sexual health clinic)?
 
           - Have you been tested for sexually transmitted infections in the past three months (sex workers, transgender people and gay men and other men who have sex with men)?
 
@@ -1843,7 +1843,7 @@ tables:
 
           More details: https://indicatorregistry.unaids.org/indicator/coverage-hiv-prevention-programmes-among-key-populations-d
         presentation:
-          title_public: Share of people in HIV prevention programmes
+          title_public: Share of people in HIV prevention programs
           title_variant: |-
             <<group>>
             <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
@@ -1854,7 +1854,7 @@ tables:
             <%- endif %>
           grapher_config:
             title: |-
-              Share of people in HIV prevention programmes, <<group>>
+              Share of people in HIV prevention programs, <<group>>
               <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
               , <<sex>>s
               <%- endif %>
@@ -1868,9 +1868,9 @@ tables:
         description_short: |-
           Percentage of {definitions.gam_groups.variable} who report having tested negative for HIV in the past 12 months, or who know that they are living with HIV.
         description_from_producer: |-
-          Ensuring that people living with HIV receive the care and treatment required to live healthy, productive lives and reduce the chance of transmitting HIV, requires that they know their HIV status. In many countries, targeting testing and counselling for locations and populations with the highest HIV burden is the most efficient way to reach people living with HIV and ensure that they know their HIV status. This indicator captures the effectiveness of HIV testing interventions in reaching populations at higher risk of HIV infection.
+          Ensuring that people living with HIV receive the care and treatment required to live healthy, productive lives and reduce the chance of transmitting HIV, requires that they know their HIV status. In many countries, targeting testing and counseling for locations and populations with the highest HIV burden is the most efficient way to reach people living with HIV and ensure that they know their HIV status. This indicator captures the effectiveness of HIV testing interventions in reaching populations at higher risk of HIV infection.
 
-          Method of measurement: Behavioural surveillance or other special surveys
+          Method of measurement: Behavioral surveillance or other special surveys
 
           Respondents are asked the following questions:
 
@@ -1985,7 +1985,7 @@ tables:
           Denominator: Total number of respondents from a key population group.
 
           Method of measurement:
-          Behavioural surveillance or other special surveys. Indicators A-D are constructed from responses to the following questions among respondents who report belonging to a key population group (i.e., sex workers, gay men and other men who have sex with men, people who inject drugs and transgender people).
+          Behavioral surveillance or other special surveys. Indicators A-D are constructed from responses to the following questions among respondents who report belonging to a key population group (i.e., sex workers, gay men and other men who have sex with men, people who inject drugs and transgender people).
 
           (1) In the last 12 months, how many times has anyone physically hurt you, such as hit or choked you or threatened you with a knife or other weapon (this has not happened in the last 12 months, once, 2-5 times, 6-10 times, 10 or more times, don't know, refuse to answer)?
 

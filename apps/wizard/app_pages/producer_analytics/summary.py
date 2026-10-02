@@ -30,7 +30,7 @@ class UISummary:
         for _, row in (
             self.ui_charts.analytics["df_top_10_total_views"].sort_values("renders", ascending=False).iterrows()
         ):
-            df_summary_str += f"{row['renders']:9,}" + " - " + row["grapher"] + "\n"
+            df_summary_str += f"{row['renders']:9,}" + " - " + row["chart_url"] + "\n"
 
         # Define the content to copy.
         summary = f"""Analytics of charts using data by {producers_selected_str} between {min_date} and {max_date}:

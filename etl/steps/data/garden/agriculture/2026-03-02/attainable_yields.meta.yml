@@ -43,7 +43,7 @@ tables:
       abaca__manila_hemp__raw_yield:
         title: Abaca manila hemp raw yield
       agave_fibres__raw__n_e_c__yield:
-        title: Agave fibres raw n.e.c. yield
+        title: Agave fibers raw n.e.c. yield
       almond_yield:
         title: Almond yield
       apples_yield:
@@ -139,9 +139,9 @@ tables:
       eggplants_yield:
         title: Eggplants yield
       fibre_crops__fibre_equivalent_yield:
-        title: Fibre crops fibre equivalent yield
+        title: Fiber crops fiber equivalent yield
       fibre_crops_yield:
-        title: Fibre crops yield
+        title: Fiber crops yield
       figs_yield:
         title: Figs yield
       flax__raw_or_retted_yield:
@@ -181,7 +181,7 @@ tables:
       karite_nuts_yield:
         title: Karite nuts yield
       kenaf__and_other_textile_bast_fibres__raw_or_retted_yield:
-        title: Kenaf and other textile bast fibres raw or retted yield
+        title: Kenaf and other textile bast fibers raw or retted yield
       kiwi_yield:
         title: Kiwi yield
       kola_nuts_yield:

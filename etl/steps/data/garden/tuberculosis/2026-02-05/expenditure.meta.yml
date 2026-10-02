@@ -10,7 +10,7 @@ definitions:
     unit: "constant 2022 US$"
     short_unit: "$"
 dataset:
-  title: Global Tuberculosis Report - Expenditure and Utilisation
+  title: Global Tuberculosis Report - Expenditure and Utilization
   owners:
     - Fiona Spooner
 tables:
@@ -57,13 +57,13 @@ tables:
         description_short: Funding received for drugs to treat drug-susceptible tuberculosis.
         description_from_producer: Funding received for drugs to treat drug-susceptible TB (US Dollars)
       exp_prog:
-        title: Expenditure on programme costs to treat drug-susceptible tuberculosis
-        description_short: Actual expenditure on programme costs to treat drug-susceptible tuberculosis.
-        description_from_producer: Actual expenditure on programme costs to treat drug-susceptible TB (US Dollars)
+        title: Expenditure on program costs to treat drug-susceptible tuberculosis
+        description_short: Actual expenditure on program costs to treat drug-susceptible tuberculosis.
+        description_from_producer: Actual expenditure on program costs to treat drug-susceptible TB (US Dollars)
       rcvd_prog:
-        title: Funding received for programme costs to treat drug-susceptible tuberculosis
-        description_short: Funding received for programme costs to treat drug-susceptible tuberculosis.
-        description_from_producer: Funding received for programme costs to treat drug-susceptible TB (US Dollars)
+        title: Funding received for program costs to treat drug-susceptible tuberculosis
+        description_short: Funding received for program costs to treat drug-susceptible tuberculosis.
+        description_from_producer: Funding received for program costs to treat drug-susceptible TB (US Dollars)
       exp_sld:
         title: Expenditure on drugs to treat drug-resistant tuberculosis
         description_short: Actual expenditure on drugs to treat drug-resistant tuberculosis.
@@ -73,13 +73,13 @@ tables:
         description_short: Funding received for drugs to treat drug-resistant tuberculosis.
         description_from_producer: Funding received for drugs to treat drug-resistant TB (US Dollars)
       exp_mdrmgt:
-        title: Expenditure on programme costs to treat drug-resistant tuberculosis
-        description_short: Actual expenditure on programme costs to treat drug-resistant tuberculosis.
-        description_from_producer: Actual expenditure on programme costs to treat drug-resistant TB (US Dollars)
+        title: Expenditure on program costs to treat drug-resistant tuberculosis
+        description_short: Actual expenditure on program costs to treat drug-resistant tuberculosis.
+        description_from_producer: Actual expenditure on program costs to treat drug-resistant TB (US Dollars)
       rcvd_mdrmgt:
-        title: Funding received for programme costs to treat drug-resistant tuberculosis
-        description_short: Funding received for programme costs to treat drug-resistant tuberculosis.
-        description_from_producer: Funding received for programme costs to treat drug-resistant TB (US Dollars)
+        title: Funding received for program costs to treat drug-resistant tuberculosis
+        description_short: Funding received for program costs to treat drug-resistant tuberculosis.
+        description_from_producer: Funding received for program costs to treat drug-resistant TB (US Dollars)
       exp_tpt:
         title: Expenditure on tuberculosis preventive treatment
         description_short: Actual expenditure on tuberculosis preventive treatment.

@@ -46,4 +46,4 @@ tables:
           - "No target"
           - "Net-zero achieved or pledged"
         description_processing: |-
-          A country is labelled as having a net-zero target if it appears in the Net Zero Tracker with a target that has a defined status and target year. Countries the tracker assessed as having no target are labelled "No target". Countries the tracker does not cover are left blank (shown as missing on charts), so that "no target" is distinguishable from "no data".
+          A country is labeled as having a net-zero target if it appears in the Net Zero Tracker with a target that has a defined status and target year. Countries the tracker assessed as having no target are labeled "No target". Countries the tracker does not cover are left blank (shown as missing on charts), so that "no target" is distinguishable from "no data".

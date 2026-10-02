@@ -126,7 +126,7 @@ def stale_charts(entries: list[dict]) -> dict[str, str]:
     if not ids:
         return {}
     df = OWID_ENV.read_sql(
-        "SELECT c.id, cc.slug, cc.fullMd5 AS config_md5 FROM charts c "
+        "SELECT c.id, cc.slug, cc.configMd5 AS config_md5 FROM charts c "
         "JOIN chart_configs cc ON cc.id = c.configId WHERE c.id IN %(ids)s",
         params={"ids": ids},
     )
@@ -160,7 +160,7 @@ def unpublished_sources(entries: list[dict]) -> set[str]:
         return set()
     df = OWID_ENV.read_sql(
         "SELECT c.id FROM charts c JOIN chart_configs cc ON cc.id = c.configId "
-        "WHERE c.id IN %(ids)s AND COALESCE(cc.full->>'$.isPublished', 'false') <> 'true'",
+        "WHERE c.id IN %(ids)s AND COALESCE(cc.config->>'$.isPublished', 'false') <> 'true'",
         params={"ids": ids},
     )
     down = {int(i) for i in df["id"]}
@@ -274,7 +274,7 @@ def stale_targets(entries: list[dict]) -> dict[str, str]:
     if recorded_md5:
         live_md5 = dict(
             OWID_ENV.read_sql(
-                "SELECT id, fullMd5 FROM chart_configs WHERE id IN %(ids)s",
+                "SELECT id, configMd5 FROM chart_configs WHERE id IN %(ids)s",
                 params={"ids": tuple(recorded_md5)},
             ).itertuples(index=False, name=None)
         )
@@ -525,6 +525,13 @@ def embed_references(redirects: list[dict]) -> dict[int, str]:
     Pure SQL, so this works with read-only credentials (the admin references API needs
     ADMIN_API_KEY). Counts only — audit_references.py does the full sweep with
     replacement URLs.
+
+    **Featured metrics are deliberately not counted here.** The audit marks them RED but keeps
+    them out of its embed count, so the two still classify identically (the rule in SKILL.md).
+    A featured metric is a topic-page slot keyed by URL, not a rendered copy of the config, so
+    it is exempt for the same reason `key chart` is: no page breaks and no article edit fixes
+    it. Not free, though — the slot empties and cannot be re-created afterwards — which is why
+    the audit gives it its own section and says to swap it *before* the CLI runs.
     """
     ids = tuple(r["chart"]["id"] for r in redirects)
     if not ids:

@@ -3,6 +3,7 @@ import io
 import pandas as pd
 import pytest
 from fastmcp import Client
+from fastmcp.exceptions import ToolError
 from mcp.types import TextContent
 
 from owid_mcp.server import mcp
@@ -50,7 +51,7 @@ async def test_fetch_indicator_data_tool():
         result = await client.call_tool("fetch_indicator_data", {"indicator_id": 2118})
         assert result is not None
         assert isinstance(result.content, list)
-        assert len(result.content) == 1
+        assert len(result.content) == 2  # data + shutdown notice
 
         # Check the tool result content
         content = result.content[0]
@@ -88,7 +89,7 @@ async def test_fetch_indicator_data_tool_for_entity():
         result = await client.call_tool("fetch_indicator_data", {"indicator_id": 2118, "entity": "USA"})
         assert result is not None
         assert isinstance(result.content, list)
-        assert len(result.content) == 1
+        assert len(result.content) == 2  # data + shutdown notice
 
         # Check the tool result content
         content = result.content[0]
@@ -114,7 +115,7 @@ async def test_fetch_indicator_metadata_tool():
         result = await client.call_tool("fetch_indicator_metadata", {"indicator_id": 2118})
         assert result is not None
         assert isinstance(result.content, list)
-        assert len(result.content) == 1
+        assert len(result.content) == 2  # data + shutdown notice
 
         # Check the tool result content
         content = result.content[0]
@@ -456,3 +457,58 @@ async def test_run_sql_syntax_error():
         error = output.structured_content["error"]  # ty: ignore
         # No special enrichment for generic syntax errors — passed through from Datasette/DuckDB.
         assert "syntax error" in error.lower() or "parser error" in error.lower()
+
+
+@pytest.mark.asyncio
+async def test_fetch_chart_data_unknown_slug():
+    """Test that an unknown chart slug returns an actionable error, not a masked one."""
+    async with Client(mcp) as client:
+        with pytest.raises(ToolError) as exc_info:
+            await client.call_tool("fetch_chart_data", {"id": "this-chart-slug-does-not-exist"})
+
+        message = str(exc_info.value)
+        assert "this-chart-slug-does-not-exist" in message
+        assert "search_chart" in message
+
+
+@pytest.mark.asyncio
+async def test_fetch_chart_image_unknown_slug():
+    """Test that fetch_chart_image reports an unknown slug the same way as fetch_chart_data."""
+    async with Client(mcp) as client:
+        with pytest.raises(ToolError) as exc_info:
+            await client.call_tool("fetch_chart_image", {"id": "this-chart-slug-does-not-exist"})
+
+        assert "search_chart" in str(exc_info.value)
+
+
+@pytest.mark.asyncio
+async def test_fetch_chart_data_non_redistributable():
+    """Test that a chart whose data grapher refuses to share returns grapher's reason, not a masked error."""
+    async with Client(mcp) as client:
+        with pytest.raises(ToolError) as exc_info:
+            await client.call_tool("fetch_chart_data", {"id": "annual-number-of-deaths-by-cause"})
+
+        message = str(exc_info.value)
+        assert "non-redistributable" in message
+        assert "https://ourworldindata.org/grapher/annual-number-of-deaths-by-cause" in message
+
+
+@pytest.mark.asyncio
+async def test_fetch_chart_data_follows_redirect():
+    """Test that a renamed chart slug is followed to its new location."""
+    async with Client(mcp) as client:
+        output = await client.call_tool(
+            "fetch_chart_data", {"id": "share-electricity-renewables", "time": "2020..2020", "countries": "DEU"}
+        )
+        assert output.structured_content["metadata"]["rows"] > 0  # ty: ignore
+
+
+@pytest.mark.asyncio
+async def test_tool_results_carry_shutdown_notice():
+    """Test that every tool result tells the caller about the shutdown exactly once, even on cache hits."""
+    async with Client(mcp) as client:
+        assert "github.com/owid/skills" in (client.initialize_result.instructions or "")
+        for _ in range(2):  # the second call is served from the response cache
+            output = await client.call_tool("search_chart", {"query": "population"})
+            notices = [c for c in output.content if isinstance(c, TextContent) and "github.com/owid/skills" in c.text]
+            assert len(notices) == 1

@@ -10,7 +10,6 @@ import pandas as pd
 import structlog
 from dotenv import load_dotenv
 from media_deaths_queries import create_full_queries, create_queries
-from owid.datautils.io import df_to_file
 
 from etl.snapshot import Snapshot
 
@@ -136,10 +135,8 @@ def run(upload: bool) -> None:
     # Initialize a new snapshot.
     snap = Snapshot(f"media_cloud/{SNAPSHOT_VERSION}/media_deaths.csv")
 
-    df_to_file(df=mentions_df, file_path=snap.path)  # ty: ignore
-
     # Save snapshot.
-    snap.create_snapshot(upload=upload)
+    snap.create_snapshot(data=mentions_df, upload=upload)
 
 
 if __name__ == "__main__":

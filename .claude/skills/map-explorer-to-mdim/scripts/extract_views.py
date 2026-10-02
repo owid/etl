@@ -167,13 +167,13 @@ def default_view(views: list[dict], view_configs: list[dict]) -> dict:
 
 
 def view_config_md5s(config_ids: list[str]) -> dict[str, str]:
-    """{chart_configs.id -> fullMd5} for a set of MDIM view configs."""
+    """{chart_configs.id -> configMd5} for a set of MDIM view configs."""
     if not config_ids:
         return {}
     df = OWID_ENV.read_sql(
-        "SELECT id, fullMd5 FROM chart_configs WHERE id IN %(ids)s", params={"ids": tuple(sorted(set(config_ids)))}
+        "SELECT id, configMd5 FROM chart_configs WHERE id IN %(ids)s", params={"ids": tuple(sorted(set(config_ids)))}
     )
-    return dict(zip(df["id"], df["fullMd5"]))
+    return dict(zip(df["id"], df["configMd5"]))
 
 
 def write_mdim_csv(out: Path, short: str, prefix: str, dim_slugs, rows) -> Path:

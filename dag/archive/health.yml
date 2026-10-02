@@ -1159,3 +1159,32 @@ steps:
     - data://garden/cardiovascular_diseases/2025-10-21/esc:
       - data://meadow/cardiovascular_diseases/2025-10-21/esc:
         - snapshot://cardiovascular_diseases/2025-10-21/esc.csv
+  # archived; last active in 98daa87b24a7 on 2026-09-02
+  data://grapher/health/2024-08-23/eurostat_cancer:
+    - data://garden/health/2024-08-23/eurostat_cancer:
+      - data://meadow/health/2024-08-23/eurostat_cancer:
+        - snapshot://health/2024-08-23/eurostat_cancer.csv
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/ihme_gbd/latest/air_pollution:
+    - data-private://grapher/ihme_gbd/2026-02-07/gbd_risk_deaths
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/who/latest/influenza:
+    - data://grapher/who/latest/flu
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/who/latest/monkeypox:
+    - data://grapher/who/latest/monkeypox
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://s3/ihme_gbd/latest/gbd_treemap_json:
+    - data-private://garden/ihme_gbd/2025-11-18/gbd_child_treemap
+    - data://garden/ihme_gbd/2025-10-13/gbd_treemap
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/health/latest/vaccination_coverage:
+    - data://grapher/who/2025-07-15/vaccination_coverage
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/health/latest/vaccination_introductions:
+    - data://grapher/who/2025-07-15/vaccination_introductions
+  # archived; last active in ae169d2bd32f on 2026-09-08
+  data://grapher/cancer/2025-02-17/gco_cancer_survival:
+    - data://garden/cancer/2025-02-17/gco_cancer_survival:
+      - data://meadow/cancer/2025-02-17/gco_cancer_survival:
+        - snapshot://cancer/2025-02-17/gco_cancer_survival.csv

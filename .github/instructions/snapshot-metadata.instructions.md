@@ -4,7 +4,7 @@ applyTo: "**/snapshots/**/*.dvc"
 
 ## Overview
 
-A Snapshot is a picture of a data product (e.g. a data CSV file) provided by an upstream data provider at a particular point in time. It is the entrypointto ETL and where we define metadata attributes of that picture. This is fundamental to ensure that the data is properly documented and that the metadata is propagated to the rest of the system.
+A Snapshot is a picture of a data product (e.g. a data CSV file) provided by an upstream data producer at a particular point in time. It is the entry point to ETL and where we define metadata attributes of that picture. This is fundamental to ensure that the data is properly documented and that the metadata is propagated to the rest of the system.
 
 ## Instructions
 

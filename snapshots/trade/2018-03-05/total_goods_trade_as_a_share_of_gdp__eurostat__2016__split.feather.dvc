@@ -2,7 +2,7 @@ meta:
   origin:
     producer: Eurostat
     title: International trade in goods
-    title_snapshot: International trade in goods - Total goods trade as a share of GDP (split)
+    title_snapshot: International trade in goods – Total goods trade as a share of GDP (split)
     description_snapshot: |-
       Eurostat data reports goods exports in millions of euros to the rest of the world. To calculate the total value of goods exports to the world, we convert the total value of exports into USD using the average yearly USD/euro exchange rate produced by the European Central Bank available at: http://sdw.ecb.europa.eu/browseSelection.do?removeItem=&mergeFilter=&ec=&rc=&EXR_SUFFIX.18=A&oc=&df=true&DATASET=0&dc=&CURRENCY.18=USD&node=9691296&showHide=&pb=&removedItemList=&activeTab=&FREQ.18=A&legendRef=reference
 

@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: Critical Minerals Dataset
     description: |-
-      In its first release, this dataset provides demand projection results for 37 key metals and minerals that are critical to the clean energy sector under different scenarios and technology cases, including 12 alternative cases modeling the impact of different technologies or consumer behaviours.
+      In its first release, this dataset provides demand projection results for 37 key metals and minerals that are critical to the clean energy sector under different scenarios and technology cases, including 12 alternative cases modeling the impact of different technologies or consumer behaviors.
       This edition is also updated with long-term supply projections for mining and refining of several key minerals.
     date_published: "2024-05-17"
 

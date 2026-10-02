@@ -7,8 +7,8 @@ our access logs.
 Use this for calls that hit **OWID-owned infrastructure** (e.g. the data
 catalog, grapher, files.ourworldindata.org, search.owid.io, Datasette,
 admin API). Do not use it for calls to third-party hosts (GitHub, Notion,
-Slack, source-data providers in ``snapshots/``, etc.) — those should keep
-the default UA or use whatever the provider expects.
+Slack, data producers in ``snapshots/``, etc.) — those should keep
+the default UA or use whatever the producer expects.
 
 Usage
 -----

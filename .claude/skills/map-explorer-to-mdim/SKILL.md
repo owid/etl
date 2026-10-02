@@ -5,13 +5,17 @@ description: >-
   explorer's views to the views of one or more replacement MDIMs, writes ONE
   apply-ready JSON payload per explorer for the admin bulk-redirect endpoint, audits
   every article that links or embeds each explorer (with the view each link will land
-  on), preflights every validation the endpoint performs — including site redirects
-  that would block it — and covers retiring the explorer's ETL step afterwards.
+  on) plus the featured metrics pointing at it, preflights every validation the endpoint
+  performs — including site redirects that would block it — and covers retiring the
+  explorer's ETL step afterwards.
   Trigger when the user says "map explorer <slug> to mdim(s) <...>", "suggest
   explorer->MDIM redirects", "we're sunsetting the <slug> explorer, map its views to
-  the new multidims", "redirect these explorers to MDIMs", or similar.
+  the new multidims", "redirect these explorers to MDIMs", "review the explorer->MDIM
+  mapping", "build a review tool for the <slug> migration", "make a side-by-side HTML so
+  <reviewer> can sign off", or similar.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Map an explorer's views to MDIM views (redirect proposal)
@@ -215,9 +219,56 @@ didn't resolve to a real MDIM view (fix the rules and re-run until there are no 
 ### 4. Review
 
 Sanity-check the flagged rows and the judgment calls (approximate type matches, aggregate
-collapses, MDIM choices with no explorer source). `/review-explorer-mdim-mapping` renders the
-pairs side by side with approve/flag controls for a topic owner; corrections go through
-`mapping_rules.py` and a rebuild, not the HTML.
+collapses, MDIM choices with no explorer source). For a topic owner's sign-off, build the
+side-by-side review page: each explorer view on the left, the MDIM view it will redirect to on
+the right, with approve/flag controls.
+
+```bash
+.venv/bin/python .claude/skills/map-explorer-to-mdim/scripts/build_review.py \
+    --mapping-dir ai/<slug>-mdim-mapping \
+    --explorer-slug <slug> \
+    --mdim-slug <short_1>=<grapher_slug_1> \
+    --mdim-slug <short_2>=<grapher_slug_2> \
+    [--host https://ourworldindata.org] \
+    [--output ai/<slug>_view_review.html] \
+    [--no-coverage]
+```
+
+`--mdim-slug` maps each MDIM short name in `mapping_rules.MDIMS` to its published Grapher slug
+(the `/grapher/<slug>` part of the URL, not the catalogPath). `_sources.json` records the slugs
+extraction saw, and `multi_dim_data_pages.slug` has them if you have DB access; otherwise ask.
+The default host is production; for MDIMs that only exist on a staging branch pass
+`--host https://staging-site-<branch>`.
+
+The script prints a coverage summary before writing the HTML: rows, distinct MDIM targets,
+many-to-one collapses, unresolved rows, MDIM views never targeted. Read it; it is the fastest way
+to spot a mapping gap the reviewer cannot see by eye.
+
+What the reviewer gets: one pair at a time in iframes, the selection shown as chips above each
+chart, Approve / Flag / Clear with an optional note, keyboard navigation (`←` `→`, `a`, `f`, `c`),
+filters and live counts. Decisions auto-save to the browser's `localStorage`, can be mirrored to
+a JSON file on disk (Chrome/Edge), and Import merges another reviewer's export. The file is
+self-contained: send it directly, or publish it to vibe.owid.io with
+`/owid-staff:create-vibe-app` (from the `owid-staff` plugin, auto-installed here) when the whole
+team needs a link.
+
+When the reviewer is done, ask for the exported JSON (or the auto-saved one): every row carries
+`status` (`approved` / `flagged` / blank) and `note`. Approved rows are ready to wire up; flagged
+rows need a second pass with the user. Corrections go through `mapping_rules.py` and a rebuild
+(step 3), never through the HTML.
+
+Gotchas:
+
+- `localStorage` is per browser and per file path, so switching machine loses the decisions
+  unless they were exported or mirrored to disk.
+- Single-choice MDIM dimensions are pruned from the URLs, matching the wide block of
+  `mapping_proposal.csv`; do not add them back by hand.
+- Explorer URL parameters are display names (`Disaster Type=Floods`), which is what the
+  `dimension_1..N` columns hold. `hideControls=true` is appended to both sides; "open ↗" shows
+  the view with its controls.
+- A mapping hand-made in another schema (for example a colleague's multi-block CSV) must be
+  converted to `mapping_proposal.csv` plus `mapping_rules.py` first; a one-off adapter in `ai/`
+  is fine.
 
 ### 5. Audit what references the explorers (ALWAYS offer; run when the user says yes)
 
@@ -238,6 +289,28 @@ attention rather than a URL swap.
 embedded explorer breaks the moment the redirect is **created**, not later at unpublish,
 because the embed renders by fetching the explorer page and parsing it. So the 🔴 rows are
 migrated *before* step 7, not after.
+
+The report also carries a **⭐ Featured metrics** section — the one surface where this skill's
+usual "a link survives the 302" reasoning inverts. A featured metric is a topic-page slot held by
+URL, resolved only when Algolia indexes, matching pathname *and* exact params against published
+records. So it does not survive: it empties silently, and cannot be re-added once the explorer is
+gone. Hence step 5b.
+
+### 5b. Swap the featured metrics (before the redirect — it cannot be undone after)
+
+Work the ⭐ section of `references.md`, by hand at `/admin/featured-metrics`. These are editorial
+slots, so ask whoever owns the topic before repointing their rail.
+
+Per row — add the MDIM view under the **same tag and income group**, drag it to the old ranking,
+delete the old row, then re-apply *boost in search* if it was on. One explorer view can hold
+several rows: the key is (URL, tag, income group). Full procedure:
+`docs/guides/data-work/redirect-to-mdims.md`.
+
+**Why here and not after step 7:** creating the redirect darkens the explorer on the spot, and
+adding a featured metric requires a *published* slug. Once the redirect exists, no replacement is
+accepted and no record of the ranking survives. Unlike an embed, which breaks visibly, this fails
+quietly. The replacement is the **bare MDIM view**, not the redirect target — the admin strips
+reader params on paste and never validates the dimension params.
 
 ### 6. Preflight (read-only, gated)
 
@@ -284,6 +357,12 @@ with different targets invalidates that advice while the explorer's own referenc
 reference digest — stay identical. This is the one staleness with no second chance: an operator
 who repoints an embed at the wrong view leaves it no longer naming the explorer, so no later
 sweep can ever surface the mistake. Preflight blocks on it before the reference gate reports.
+
+!!! note "An audit folder predating a surface reads as drifted, and should"
+    The digest hashes the findings, so **adding a surface to `find-chart-references` invalidates
+    every recorded `referenceDigests`** — most recently when featured metrics were added.
+    Preflight blocks on an audit folder from before that, which is correct: it really is missing
+    rows. Re-run `audit_references.py` rather than reading it as a bug.
 
 **Unverifiable is a blocker, not a warning**, in all three cases — no extraction pair, no
 `mapping.json`, no reference digest. A warning does not reach the exit code, so `Ready` would
@@ -361,6 +440,7 @@ handoff, since the same operator pastes the payload.
 | **`admin_bulk_payload.json`** | build | **the apply unit** — one per explorer, paste into the admin modal |
 | `references.csv` / `references.md` | audit | combined across explorers, in `--out` |
 | `bulk_redirects.json` | preflight `--record` | combined record; **not postable** |
+| `ai/<slug>_view_review.html` | review | self-contained side-by-side HTML with approve/flag controls, for the topic owner |
 
 ## Notes & gotchas
 

@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: World Bank
-    title: World Development Indicators - Land under cereal production
+    title: World Development Indicators – Land under cereal production
     description: |-
       The World Bank's World Development Indicators (WDI) is a compilation of relevant, high-quality, and internationally comparable statistics about global development.
 
@@ -11,7 +11,7 @@ meta:
 
       The land under cereal production index measures annual land use for cereal production as an index to land use in 1961, the first year of the original dataset. This index was calculated by dividing land used for cereals (which is measured in hectares) in any given year by land use in 1961. 1961 = 100. Values >100 indicate an increase in land use vs. 1961, and values <100 indicate a decrease.
       World/global figures from this World Bank dataset include boundary issues for land under cereal production prior to 1991: this data does not include land within the Former Soviet Union (USSR) and therefore underestimates global land use. To aim to correct for this, we have summed the total land area of production for all countries within the former USSR from 1992, and have added this value to the global total for all years from 1961-1991. Data from 1991 onwards has not been changed.
-    citation_full: World Bank (2017). World Development Indicators - Land under cereal production (hectares).
+    citation_full: World Bank (2017). World Development Indicators – Land under cereal production (hectares).
     url_main: http://data.worldbank.org/data-catalog/world-development-indicators
     date_accessed: '2017-07-18'
     date_published: '2017'

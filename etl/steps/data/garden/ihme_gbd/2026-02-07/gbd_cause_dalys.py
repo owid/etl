@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import processing as pr
 from shared import add_regional_aggregates
 
 from etl.helpers import PathFinder
@@ -48,6 +49,9 @@ def run() -> None:
     # Shorten the metric name for DALYs
     tb["measure"] = "DALYs"
 
+    # add infectious diseases by subtracting maternal and neonatal diseases, and nutritional deficiencies from communicable diseases
+    tb = add_infectious_diseases(tb)
+
     # Drop the measure column
     tb = tb.drop(columns="measure")
 
@@ -68,3 +72,40 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_infectious_diseases(tb):
+    """
+    Separate out communicable diseases from maternal and neonatal diseases, and nutritional deficiencies
+    """
+
+    broad_level_group = ["Communicable, maternal, neonatal, and nutritional diseases"]
+    maternal_neonatal_nutritional = ["Maternal and neonatal disorders", "Nutritional deficiencies"]
+
+    tb_broad = tb[tb["cause"].isin(broad_level_group)]
+    assert len(tb_broad) > 0, "No rows found for 'Communicable, maternal, neonatal, and nutritional diseases'"
+
+    tb_maternal_neonatal_nutritional = tb[tb["cause"].isin(maternal_neonatal_nutritional)]
+    assert len(tb_maternal_neonatal_nutritional["cause"].unique()) == len(maternal_neonatal_nutritional), (
+        "Not all elements of 'maternal_neonatal_nutritional' are present in tb['cause']"
+    )
+    tb_maternal_neonatal_nutritional = (
+        tb_maternal_neonatal_nutritional.groupby(["country", "age", "metric", "year"], observed=True)["value"]
+        .sum()
+        .reset_index()
+    )
+
+    tb_combine = pr.merge(
+        tb_broad,
+        tb_maternal_neonatal_nutritional,
+        on=["country", "year", "age", "metric"],
+        suffixes=("", "_maternal_neonatal_nutritional"),
+    )
+    tb_infectious = tb_combine.copy()
+    tb_infectious["cause"] = "Infectious diseases"
+    tb_infectious["value"] = tb_infectious["value"] - tb_infectious["value_maternal_neonatal_nutritional"]
+    tb_infectious = tb_infectious.drop(columns="value_maternal_neonatal_nutritional")
+    assert all(tb_infectious["value"] >= 0), "Negative values found in 'value' column"
+
+    tb = pr.concat([tb, tb_infectious], ignore_index=True)
+    return tb

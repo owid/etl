@@ -67,7 +67,7 @@ tables:
           For years where data from both sources is available, we prioritize the UN IGME data. See [this page](https://docs.google.com/spreadsheets/d/1SaeXxXXeBAATXH3HTmonyPiBd7j0laE6GBUlcboTgYk/edit) for more details on which source is used for each data point.
 
 
-          In the Gapminder dataset we remove rows where the source is labelled as "Guesstimate" or "Model based on Life Expectancy" to try and ensure we use the best available data.
+          In the Gapminder dataset we remove rows where the source is labeled as "Guesstimate" or "Model based on Life Expectancy" to try and ensure we use the best available data.
 
 
           We remove data for Austria before 1830 from the Gapminder dataset, as there is a jump in 1830 that is likely an error.

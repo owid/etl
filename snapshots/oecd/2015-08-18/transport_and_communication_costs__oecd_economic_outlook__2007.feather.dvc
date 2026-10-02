@@ -2,7 +2,7 @@ meta:
   origin:
     producer: OECD
     title: 'Economic Globalisation: Origins and Consequences'
-    title_snapshot: 'Economic Globalisation: Origins and Consequences - Transport and communication costs'
+    title_snapshot: 'Economic Globalisation: Origins and Consequences – Transport and communication costs'
     description_snapshot: |-
       Sea fright corresponds to average international freight charges per tonne. Passenger air transport corresponds to average airline revenue per passenger mile until 2000 spliced to US import air passenger fares afterwards. International calls correspond to cost of a three-minute call from New York to London.
     citation_full: 'OECD (2007). Economic Globalisation: Origins and Consequences. OECD Insights.'

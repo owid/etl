@@ -21,7 +21,7 @@ import pandas as pd
 import yaml
 from owid.repack import to_safe_types
 
-from owid.catalog.core import tables, utils
+from owid.catalog.core import docs, tables, utils
 from owid.catalog.core.meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta, VariableMeta
 from owid.catalog.core.properties import metadata_property
 
@@ -52,7 +52,6 @@ CHANNEL = Literal[
     "examples",
     "explorers",
     "external",
-    "multidim",
 ]
 
 # all pandas nullable dtypes
@@ -326,6 +325,15 @@ class Dataset:
 
             with open(table_meta_path, "w") as f:
                 json.dump(table_meta, f, indent=2, default=str)
+
+    def readme(self, url: str | None = None) -> str:
+        """Markdown README for this dataset, rendered from its metadata and that of its tables.
+
+        The catalog page as a text file: the description, then one block per table (how to cite it,
+        its indicators, its sources), the processing note, the license and the download links.
+        ``url`` is where the dataset is published, when known.
+        """
+        return docs.render_readme(self, [self[name] for name in docs.ordered_table_names(self)], url=url)
 
     def update_metadata(
         self,
