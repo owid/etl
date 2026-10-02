@@ -273,6 +273,10 @@ def sweep_articles_placing_narrative_charts(findings: list[dict]) -> list[dict]:
     referencing the name does not affect readers but does affect the operator: it is the thing
     that surprises you at delete time, and it is carried with `published` so a consumer can rank
     it below the live ones rather than confuse the two.
+
+    A data insight can also place a narrative chart through its front matter
+    (`content->>'$."narrative-chart"'`), which writes no `posts_gdocs_links` row, so that key is
+    read too. Missing it hid the insight carrying a narrative chart's own title claim.
     """
     names = sorted({str(f["where"]) for f in findings if f["surface"] == "narrative chart" and f.get("where")})
     if not names:
@@ -284,9 +288,22 @@ def sweep_articles_placing_narrative_charts(findings: list[dict]) -> list[dict]:
         "WHERE pgl.linkType = 'narrative-chart' AND pgl.target IN %(n)s ORDER BY pgl.target, pg.slug",
         params={"n": tuple(names)},
     )
+    df_front_matter = OWID_ENV.read_sql(
+        "SELECT target, gdoc_id, post_slug, post_type, published, queryString FROM ("
+        "  SELECT pg.content->>'$.\"narrative-chart\"' AS target, pg.id AS gdoc_id, pg.slug AS post_slug,"
+        "         pg.type AS post_type, pg.published, '' AS queryString"
+        "  FROM posts_gdocs pg WHERE pg.type = 'data-insight'"
+        "    AND pg.content->>'$.\"narrative-chart\"' IS NOT NULL"
+        ") t WHERE target IN %(n)s ORDER BY target, post_slug",
+        params={"n": tuple(names)},
+    )
+    seen = {(r["target"], r["gdoc_id"]) for r in df.to_dict("records")}
+    rows = df.to_dict("records") + [
+        r for r in df_front_matter.to_dict("records") if (r["target"], r["gdoc_id"]) not in seen
+    ]
     by_name = {str(f["where"]): f for f in findings if f["surface"] == "narrative chart"}
     out = []
-    for r in df.to_dict("records"):
+    for r in rows:
         parent = by_name[r["target"]]
         out.append(
             rec(
@@ -1414,7 +1431,7 @@ NOT_SEARCHED = [
     "Indicator-level `presentation.grapher_config`, which lives in garden/grapher `.meta.yml` "
     "rather than the DB — invisible here, and it fans out to every thin MDIM/explorer view that "
     "inherits it. Needs a repo grep.",
-    "Data insights that record the reference somewhere other than `grapher-url`.",
+    "Data insights that record the reference somewhere other than `grapher-url` or `narrative-chart`.",
     "Charts nested inside article layout containers, which may produce no `posts_gdocs_links` row at all.",
 ]
 
