@@ -177,6 +177,8 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
    The `datasetProducts` query parameter matches against the grapher **`datasets.name`** field (the dataset row's `name` column in MySQL — same value visible in the OWID admin's dataset list). When garden's `gho.meta.yml` sets a `dataset.title` override, that becomes `datasets.name` on upload. Otherwise it falls through to the snapshot origin's title.
 
+   **An update that spans several grapher datasets gets one link covering all of them:** join each dataset's `datasets.name` with `~` (`?datasetProducts=<name 1>~<name 2>`, each part `quote_plus`-encoded). Resolve every name the same way as below — companion datasets often carry titles of their own that differ from the main one's.
+
    So the resolution order is:
 
    1. Garden `.meta.yml` → `dataset.title` (if set as override). **This is the most common case** — most large datasets carry a curated title like `Global Health Observatory - World Health Organization` or `World Bank Poverty and Inequality Platform (PIP)`.
