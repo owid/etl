@@ -268,3 +268,40 @@ def test_link_only_data_insight_gets_its_data_insights_path(mod, monkeypatch):
     refs = mod.sweep_gdoc_links({"a-chart": {"id": 1}})
     paths = {r["where"]: r["where_path"] for r in refs}
     assert paths == {"an-insight": "/data-insights/an-insight", "an-article": "/an-article"}
+
+
+def test_data_insight_placing_narrative_chart_in_front_matter_is_found(mod, monkeypatch):
+    """A data insight naming a narrative chart in its front matter writes no posts_gdocs_links
+    row, so the placement hop must read the front-matter key as well — once per placement.
+    """
+
+    def fake_read_sql(sql, params=None):
+        if "posts_gdocs_links" in sql:
+            return pd.DataFrame(
+                [
+                    {
+                        "target": "nc-a",
+                        "gdoc_id": "article-1",
+                        "post_slug": "an-article",
+                        "post_type": "article",
+                        "published": 1,
+                        "componentType": "narrative-chart",
+                        "text": "",
+                        "queryString": "",
+                    }
+                ]
+            )
+        return pd.DataFrame(
+            [
+                {"target": "nc-a", "gdoc_id": "di-1", "post_slug": "an-insight", "post_type": "data-insight", "published": 1, "queryString": ""},
+                # Also linked through the table: must not be reported twice.
+                {"target": "nc-a", "gdoc_id": "article-1", "post_slug": "an-article", "post_type": "article", "published": 1, "queryString": ""},
+            ]
+        )  # fmt: skip
+
+    monkeypatch.setattr(mod.OWID_ENV, "read_sql", fake_read_sql)
+    findings = [mod.rec("chart", "a-chart", 1, "narrative chart", mod.LINK, "nc-a", surface_id=348)]
+    refs = mod.sweep_articles_placing_narrative_charts(findings)
+    paths = sorted((r["where"], r["where_path"]) for r in refs)
+    assert paths == [("an-article", "/an-article"), ("an-insight", "/data-insights/an-insight")]
+    assert all(r["surface"] == "gdoc (narrative chart)" and r["subject"] == "nc-a" for r in refs)

@@ -699,7 +699,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      the right source, not an exhaustive one: it states the surfaces it structurally cannot see (`--gaps-json`,
      or the `COVERAGE GAP:` lines), and two of them bite this audit in particular — a chart nested inside an
      article layout container may leave no `posts_gdocs_links` row, and a data insight that records its chart
-     anywhere other than `grapher-url` is invisible. Carry those gaps into the outcome: "no stale claims" is a
+     anywhere other than `grapher-url` (or its narrative chart anywhere other than `narrative-chart`) is invisible. Carry those gaps into the outcome: "no stale claims" is a
      verdict on the surfaces swept, never on the site, so record it as "none in the N surfaces swept; not
      swept: …". When a surface you know cites the dataset is missing from the list (an article the content
      team named, a post the chart's own page links to), read it by hand and say so. For each
