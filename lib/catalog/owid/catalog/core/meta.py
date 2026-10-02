@@ -693,7 +693,7 @@ class ChangelogEntry(MetaBase):
     changes: list[str]
 
 
-def is_iso_date(text: str) -> bool:
+def _is_iso_date(text: str) -> bool:
     # The round trip also rejects the other forms `fromisoformat` accepts, like `20260910`.
     try:
         return dt.date.fromisoformat(text).isoformat() == text
@@ -726,7 +726,7 @@ def parse_changelog(value: Any) -> list[ChangelogEntry]:
             date = date.date()
         if isinstance(date, dt.date):
             date = date.isoformat()
-        if not isinstance(date, str) or not is_iso_date(date):
+        if not isinstance(date, str) or not _is_iso_date(date):
             raise ValueError(f"Changelog entry date must be a YYYY-MM-DD date, got {date!r}.")
         changes = entry.get("changes")
         if (

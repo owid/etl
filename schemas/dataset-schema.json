@@ -418,7 +418,7 @@
           "requirement_level": "optional",
           "guidelines": [
             "Use it for datasets whose users follow them from release to release (e.g. the energy and CO2 datasets), not for every dataset.",
-            "Once a dataset has a changelog, every new version needs an entry dated on or after the version: the step fails otherwise.",
+            "Entries are optional: add one only for a release that changed something its users should know about, not for every new version.",
             "Each change should say what changed for users of the data (new sources, methodology, renamed or removed columns, fixed issues), in a short sentence ending with a period."
           ],
           "items": {

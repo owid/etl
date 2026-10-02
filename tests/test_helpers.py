@@ -8,7 +8,6 @@ from owid import catalog
 from etl import paths
 from etl.helpers import (
     PathFinder,
-    check_changelog,
     create_dataset,
     end_with_punctuation,
 )
@@ -150,32 +149,6 @@ def test_PathFinder_viz_step_names():
     )
 
 
-@pytest.mark.parametrize(
-    "version, dates",
-    [
-        ("2026-09-10", ["2026-09-10", "2025-07-17"]),
-        # A data refresh released without bumping the version is newer than it.
-        ("2025-12-04", ["2026-06-01", "2025-12-04"]),
-        # Only dated versions are releases.
-        ("latest", ["2025-07-17"]),
-        # No changelog, nothing to keep up to date.
-        ("2026-09-10", []),
-    ],
-)
-def test_check_changelog_passes(version, dates):
-    check_changelog(
-        catalog.DatasetMeta(version=version, changelog=[{"date": date, "changes": ["Updated."]} for date in dates])
-    )
-
-
-def test_check_changelog_requires_entry_for_new_version():
-    metadata = catalog.DatasetMeta(
-        short_name="owid_energy", version="2026-09-10", changelog=[{"date": "2025-07-17", "changes": ["Updated."]}]
-    )
-    with pytest.raises(ValueError, match="no entry for version 2026-09-10"):
-        check_changelog(metadata)
-
-
 def test_create_dataset_does_not_inherit_another_datasets_changelog(tmp_path):
     parent = catalog.DatasetMeta(
         short_name="owid_energy",
@@ -185,7 +158,7 @@ def test_create_dataset_does_not_inherit_another_datasets_changelog(tmp_path):
     tb = catalog.Table({"country": ["Spain"], "year": [2020], "a": [1.0]}, short_name="derived").format(
         ["country", "year"]
     )
-    # A dataset built from another one's metadata gets no changelog, so it isn't checked against the parent's either.
+    # A dataset built from another one's metadata doesn't present the parent's release history as its own.
     ds = create_dataset(tmp_path / "garden/example/2026-12-01/derived", [tb], default_metadata=parent)
     assert ds.metadata.changelog == []
     # A step that keeps the short name (like the dataset's own grapher step) keeps it.
