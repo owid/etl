@@ -1347,6 +1347,13 @@ steps:
   # archived; last active in e2c57887abcb on 2026-09-07
   export://multidim/owid/latest/ig_countries:
     - data-private://grapher/owid/latest/ig_countries
+  # archived; last active in 701c713aa830 on 2026-10-01
+  data://grapher/missing_data/2024-03-26/who_md_suicides:
+    - data://garden/missing_data/2024-03-26/who_md_suicides:
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/demography/2023-03-31/population
+      - data://garden/who/2024-03-24/self_inflicted_injuries
+      - data://garden/wb/2026-07-01/income_groups
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

@@ -6,6 +6,7 @@ definitions:
     processing_level: minor
 dataset:
   title: WHO Mortality Database - Homicides
+  update_period_days: 365
 
   owners:
     - Fiona Spooner

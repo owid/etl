@@ -137,13 +137,6 @@ steps:
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
         - data://garden/who/2025-04-17/mortality_database
-  # Suicides based on WHO Mortality Database
-  data://garden/who/2024-03-24/self_inflicted_injuries:
-    - data://meadow/who/2024-03-24/self_inflicted_injuries:
-        - snapshot://who/2024-03-24/self_inflicted_injuries.csv
-  data://grapher/who/2024-03-24/self_inflicted_injuries:
-    - data://garden/who/2024-03-24/self_inflicted_injuries
-
   # Global Mental Health Countdown
   data://grapher/health/2024-03-21/gmh_countdown:
     - data://garden/health/2024-03-21/gmh_countdown:
