@@ -725,9 +725,10 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      under the old claim the moment the remap lands. Read its merged config
      (`AdminAPI.get_narrative_chart(id)["configFull"]`) and recompute any claim in it. The fix belongs in this
      PR, with sign-off since it's reader-facing: either retitle it to the new figure, or pin its `maxTime` to
-     the period the claim describes so it stays a dated snapshot. Decide one or the other, never both, and
-     apply it on staging; it reaches production with its parent chart, so the parent's Chart Diff must be
-     approved. The data insight that embeds it is still the author's call.
+     the period the claim describes so it stays a dated snapshot. Decide one or the other, never both. Route a
+     retitle through `/edit-faust-metadata` (it owns narrative-chart text and its blast radius); a `maxTime`
+     pin goes straight to staging. Either reaches production with its parent chart, so the parent's Chart
+     Diff must be approved. The data insight that embeds it is still the author's call.
      (Data center construction: narrative chart 348 kept "5-fold" over data showing ~6x, while the data
      insight around it showed a frozen PNG that still matched.)
      **A static image changes the remedy, not the finding — and the sweep's `kind` cannot tell you which you
@@ -860,11 +861,13 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - **Do not put the post in the PR at all** — no embed and no pointer. Like the Slack draft, it stays in `workbench/`.
 
 10) Codex review: address comments and resolve threads
-   - **Codex's delivery channel depends on the verdict — poll both.** A **clean pass** arrives as an *issue comment* ("Didn't find any major issues") from `chatgpt-codex-connector[bot]`, with zero inline comments and no formal review object. A review **with findings** arrives as a formal review ("💡 Codex Review") with inline comments, and *no* issue comment. A watcher polling only one channel waits forever on the other outcome — treat a hit on either as completion. A third clean-pass shape: the automatic review on **opening or marking ready** can end with only a 👍 reaction on the PR (`gh api repos/owid/etl/issues/<n>/reactions`) and no comment at all. The `codex-pull-request-review-summary` issue comment is the reliable completion signal in every case: its table row shows `✅ Completed` with the reviewed commit, which must match your HEAD.
+   - **Codex's delivery channel depends on the verdict — poll both.** A **clean pass** arrives as an *issue comment* ("Didn't find any major issues") from `chatgpt-codex-connector[bot]`, with zero inline comments and no formal review object. A review **with findings** arrives as a formal review ("💡 Codex Review") with inline comments, and *no* issue comment. A watcher polling only one channel waits forever on the other outcome — treat a hit on either as completion. A third clean-pass shape: the automatic review on **opening or marking ready** can end with only a 👍 reaction on the PR and no comment at all — it counts only when the reacting login starts with `chatgpt-codex-connector` and it is stamped after the trigger. When the `codex-pull-request-review-summary` issue comment is present, it is the most direct completion signal: it is edited in place, and its table row shows `✅ Completed` with the reviewed commit, which must match your HEAD.
    - Wait ~60 seconds after posting `@codex review`, then poll both channels:
      ```bash
      gh api repos/owid/etl/issues/<pr_number>/comments | python3 -m json.tool   # clean-pass summary lands here
      gh api repos/owid/etl/pulls/<pr_number>/comments | python3 -m json.tool    # findings land here as inline comments
+     gh api --paginate repos/owid/etl/issues/<pr_number>/reactions \
+       --jq '.[] | select(.content == "+1" and (.user.login | startswith("chatgpt-codex-connector"))) | .created_at'   # bare-👍 clean pass
      ```
    - **Codex posts in one of two places — always check both.** When it finds issues, it leaves *inline review comments* (the endpoint above) with resolvable threads. When it finds **nothing**, it posts a single top-level **PR (issue) comment** instead — no inline comments, no threads — e.g. "Codex Review: Didn't find any major issues. Keep it up!". So if the inline-comments endpoint is empty, check the issue comments before concluding Codex hasn't run yet. A third shape exists: a findings review whose finding lives **only in the review body** (no inline comments, no resolvable threads) — list `gh api repos/owid/etl/pulls/<n>/reviews` and read each new review's `body`; polling only the two comment endpoints misses it (there is no thread to resolve — reply via a normal PR comment instead):
      ```bash
