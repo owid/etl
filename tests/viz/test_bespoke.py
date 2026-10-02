@@ -1,9 +1,7 @@
 """Tests for the framework half of `viz://bespoke` steps."""
 
-from datetime import date
 from pathlib import Path
 
-import pandas as pd
 import pytest
 from owid.catalog import Origin, Table, VariableMeta, VariablePresentationMeta
 
@@ -103,35 +101,55 @@ def test_variable_meta_drops_a_fully_templated_list(table):
 
 
 def test_build_feed_metadata(table):
+    table._fields["value"].description_key = ["Deaths are counted by underlying cause.", "Includes all ages."]
+
     metadata = bespoke.build_feed_metadata(
         title="Causes of death",
         columns={"Deaths": table["value"]},
         update_period_days=1460,
-        build_date=date(2026, 9, 11),
     )
 
-    assert metadata["feed"]["title"] == "Causes of death"
+    # Grapher's `BespokeMetadata` fields, at the top level.
+    assert metadata["title"] == "Causes of death"
     # The source line grapher would put under a chart built on this column, rather than a string
     # typed into the step.
-    assert metadata["feed"]["citation"] == "IHME, Global Burden of Disease (2024)"
-    assert metadata["dateGenerated"] == "2026-09-11"
+    assert metadata["attribution"] == "IHME, Global Burden of Disease (2024)"
+    assert metadata["origins"][0]["producer"] == "IHME, Global Burden of Disease"
+    assert metadata["updatePeriodDays"] == 1460
+    # A single-column feed also gets the column's description and unit.
+    assert metadata["descriptionShort"] == "Number of deaths."
+    assert metadata["descriptionKey"] == "- Deaths are counted by underlying cause.\n- Includes all ages."
+    assert metadata["processingLevel"] == "minor"
+    assert metadata["unit"] == "deaths"
+    # An empty short unit is left out rather than published as "".
+    assert "shortUnit" not in metadata
 
-    column = metadata["columns"]["Deaths"]
-    assert column["titleShort"] == "Deaths"
-    assert column["unit"] == "deaths"
-    assert column["lastUpdated"] == "2025-10-21"
-    assert column["citationShort"].endswith("with minor processing by Our World in Data")
-    # No variable in the grapher DB to point at.
-    assert "owidVariableId" not in column
-    assert "fullMetadata" not in column
+
+def test_build_feed_metadata_of_several_columns(table):
+    table["population"] = 67e6
+    table._fields["population"] = VariableMeta(title="Population", unit="people", origins=[ORIGIN])
+
+    metadata = bespoke.build_feed_metadata(
+        title="Causes of death",
+        columns={"Deaths": table["value"], "Population": table["population"]},
+    )
+
+    # Origins shared by the columns are listed once.
+    assert len(metadata["origins"]) == 1
+    # No single description or unit to show for a feed combining several columns.
+    assert "unit" not in metadata
+    assert "descriptionShort" not in metadata
 
 
-def test_write_feed_metadata(tmp_path, table):
+def test_add_feed_metadata(table):
     metadata = bespoke.build_feed_metadata("Causes of death", {"Deaths": table["value"]})
-    path = bespoke.write_feed_metadata(tmp_path / "feed", metadata)
 
-    assert path.name == "metadata.json"
-    assert pd.read_json(path).index.tolist()  # parses as JSON
+    merged = bespoke.add_feed_metadata({"dimensions": {}, "source": "x"}, metadata)
+    assert merged["dimensions"] == {}
+    assert merged["title"] == "Causes of death"
+
+    with pytest.raises(AssertionError, match="title"):
+        bespoke.add_feed_metadata({"title": "Manifest title"}, metadata)
 
 
 class _FakeClient:

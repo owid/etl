@@ -14,7 +14,7 @@ the viz: pick a product, fetch one JSON, render. The metadata's
 `productsByEntity` map lets the viz pre-compute "what can this country be
 the exporter / importer of?" without loading every product file.
 
-It also writes `metadata.json`, the feed's provenance derived from the garden columns (see
+The metadata JSON also carries the feed's provenance, derived from the garden columns (see
 `etl.viz.bespoke`).
 
 The files go to the step's output folder; the framework syncs that folder to the R2 path of the
@@ -31,7 +31,7 @@ from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
-from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
+from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
 
 log = get_logger()
 paths = PathFinder(__file__)
@@ -95,14 +95,12 @@ def run() -> None:
     ds = paths.load_dataset("food_trade")
     tb = ds.read("food_trade", safe_types=False)
 
-    # The feed's provenance, derived from the origins of the data it is built on, in the same
-    # shape the MDIM download packages publish.
+    # The feed's provenance, derived from the origins of the data it is built on.
     feed_metadata = build_feed_metadata(
         title="Food trade",
         columns={"Bilateral trade flow": tb["value"]},
         update_period_days=ds.metadata.update_period_days,
     )
-    write_feed_metadata(paths.output_dir, feed_metadata)
 
     df = pd.DataFrame(tb)
     for col in ("exporter", "importer", "item"):
@@ -137,7 +135,7 @@ def run() -> None:
     #
     metadata = {
         "year": year,
-        "source": feed_metadata["feed"]["citation"],
+        "source": feed_metadata["attribution"],
         "dimensions": {
             "entities": [{"id": entity_to_id[c], "name": c} for c in countries],
             "products": [{"id": product_to_id[p], "name": p} for p in products],
@@ -145,7 +143,7 @@ def run() -> None:
         "productsByEntity": _build_products_by_entity(df, entity_to_id, product_to_id),
     }
     log.info("food_trade.write_metadata", n_entities=len(countries), n_products=len(products))
-    _save(metadata, f"{FILE_SLUG}.metadata.json")
+    _save(add_feed_metadata(metadata, feed_metadata), f"{FILE_SLUG}.metadata.json")
 
     #
     # Write one file per product.

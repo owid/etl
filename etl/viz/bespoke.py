@@ -19,9 +19,9 @@ Two things it gives a feed that a per-step `s3_utils.upload()` call could not:
   `workers/owid-api-staging/src/index.ts` in owid/cloudflare-workers), so a staging server that
   never ran the step serves production's feed.
 
-* **Metadata derived from the garden data** (`build_feed_metadata`), so the source line a
-  reader sees under a bespoke viz is the dataset's own origins rather than a string typed into
-  the step that goes stale the next time the dataset is updated.
+* **Metadata derived from the garden data** (`build_feed_metadata`), so the methods-and-sources
+  box a reader sees under a bespoke viz is the dataset's own origins rather than a string typed
+  into the step that goes stale the next time the dataset is updated.
 """
 
 from __future__ import annotations
@@ -29,21 +29,18 @@ from __future__ import annotations
 import concurrent.futures
 import mimetypes
 from dataclasses import dataclass
-from datetime import date, timezone
 from pathlib import Path
 
 import humps
-import pandas as pd
 from owid.catalog import Variable, s3_utils
 from structlog import get_logger
 
 from etl import config
 from etl.viz.chart.download_package_format import (
     IndicatorColumn,
-    dumps_like_json_stringify,
     format_attributions,
     get_attribution,
-    metadata_column_entry,
+    normalize_description_key,
 )
 
 log = get_logger()
@@ -51,9 +48,6 @@ log = get_logger()
 # The dataset index that `ExportStep.run` writes next to the feed. It records the step's
 # checksum for etl's own change detection and means nothing to a browser.
 INDEX_FILE = "index.json"
-
-# The file `build_feed_metadata` is written to, and the name the bundles fetch.
-METADATA_FILENAME = "metadata.json"
 
 
 @dataclass(frozen=True)
@@ -144,61 +138,75 @@ def sync_feed(step_path: str, local_dir: Path, max_workers: int = 20) -> FeedLoc
 #
 # Derived metadata
 #
-# The feed's provenance, built from the garden columns it is made of, in the shape the MDIM
-# download package already publishes (`download_package.py`): a top-level block with a title and
-# a citation, and one entry per column. The formatting is grapher's own, via the port in
-# `download_package_format.py`, so a source line under a bespoke viz reads like a source line
+# The feed's provenance, built from the garden columns it is made of, in the shape of grapher's
+# `BespokeMetadata` (`packages/@ourworldindata/types/src/domainTypes/BespokeMetadata.ts` in
+# owid-grapher). It goes into the top level of the manifest the bundle already fetches
+# (`<slug>.metadata.json`, the registry's `metadataFilename`), which is also the file grapher
+# reads for the methods-and-sources box -- so one file serves both. The source line is grapher's
+# own formatting, via the port in `download_package_format.py`, so it reads like the source line
 # under a chart.
 #
+
+# Fields only a single-column feed gets: a feed combining several columns has no one
+# description or unit to show.
+SINGLE_COLUMN_FIELDS = (
+    "descriptionShort",
+    "descriptionKey",
+    "descriptionProcessing",
+    "processingLevel",
+    "unit",
+    "shortUnit",
+)
 
 
 def build_feed_metadata(
     title: str,
     columns: dict[str, Variable],
     update_period_days: int | None = None,
-    build_date: date | None = None,
 ) -> dict:
-    """Build the feed's `metadata.json` content from the columns it is built from.
+    """The feed's provenance as `BespokeMetadata` fields, derived from the columns it is built from.
 
     `columns` maps the name a reader sees to the garden column carrying the metadata, e.g.
-    `{"Deaths": tb["value"]}` -- the same role the long display name plays in an MDIM download
-    package. Most bespoke feeds are built from a single long table, so that is usually one entry;
-    the mapping exists for the feeds that combine several. The key also stands in as the title
-    when the column's own title is a Jinja template a garden table can't render.
+    `{"Deaths": tb["value"]}`. Most bespoke feeds are built from a single long table, so that is
+    usually one entry; the mapping exists for the feeds that combine several. The key also stands
+    in as the title when the column's own title is a Jinja template a garden table can't render.
 
-    `update_period_days` comes from the garden dataset (`ds.metadata.update_period_days`) and is
-    only used to derive `nextUpdate`.
+    `update_period_days` comes from the garden dataset (`ds.metadata.update_period_days`).
+    Merge the result into the feed's manifest with `add_feed_metadata`.
     """
-    build_date = build_date or pd.Timestamp.now(tz=timezone.utc).date()
+    apis = [
+        variable_meta_to_api_dict(variable, update_period_days=update_period_days, default_title=name)
+        for name, variable in columns.items()
+    ]
 
-    entries = {}
-    attributions = []
-    for name, variable in columns.items():
-        col = IndicatorColumn(
-            variable_meta_to_api_dict(variable, update_period_days=update_period_days, default_title=name)
-        )
-        attributions.append(get_attribution(col))
-        # No variable id and no `fullMetadata` URL: a bespoke feed is built from garden tables,
-        # whose columns have no variable in the grapher DB to point at. Both keys drop out.
-        entries[name] = metadata_column_entry(col, None, None, build_date)
+    origins = []
+    for api in apis:
+        for origin in api.get("origins") or []:
+            if origin not in origins:
+                origins.append(origin)
 
-    return {
-        "feed": {
-            "title": title,
-            # The "Source: ..." line, as grapher composes it for a chart built on these columns.
-            "citation": format_attributions(_uniq(attributions)),
-        },
-        "columns": entries,
-        "dateGenerated": build_date.isoformat(),
+    metadata = {
+        "title": title,
+        # The "Source: ..." line, as grapher composes it for a chart built on these columns.
+        "attribution": format_attributions(_uniq([get_attribution(IndicatorColumn(api)) for api in apis])),
+        "origins": origins,
+        "updatePeriodDays": update_period_days,
     }
+    if len(apis) == 1:
+        metadata |= {field: apis[0].get(field) for field in SINGLE_COLUMN_FIELDS}
+        metadata["descriptionKey"] = normalize_description_key(metadata["descriptionKey"])
+    return {key: value for key, value in metadata.items() if value not in (None, "", [])}
 
 
-def write_feed_metadata(dest_dir: Path, metadata: dict, filename: str = METADATA_FILENAME) -> Path:
-    """Write `build_feed_metadata`'s output into the step's output folder."""
-    dest_dir.mkdir(parents=True, exist_ok=True)
-    path = dest_dir / filename
-    path.write_text(dumps_like_json_stringify(metadata))
-    return path
+def add_feed_metadata(manifest: dict, metadata: dict) -> dict:
+    """The manifest with `build_feed_metadata`'s fields merged into its top level.
+
+    A manifest key named like a metadata field would be silently overwritten, or would break
+    grapher's parse of the whole file, so a clash is an error.
+    """
+    clash = manifest.keys() & metadata.keys()
+    assert not clash, f"Manifest keys {sorted(clash)} clash with the feed's metadata fields"
+    return {**manifest, **metadata}
 
 
 # Markers of a metadata value that is still a Jinja template. The templates in a `.meta.yml` are
@@ -264,7 +272,7 @@ def _drop_unrendered_templates(value: dict, path: str = "") -> tuple[list[str], 
 
     Lists are walked too, element by element: `description_key` is a list of bullets, and a
     dataset that templates one of them (gbd_treemap does) would otherwise have the template text
-    joined into markdown by `metadata_column_entry` and published as a bullet.
+    joined into markdown by `normalize_description_key` and published as a bullet.
     """
     dropped = []
     kept = {}
@@ -300,9 +308,9 @@ def _uniq(values: list[str]) -> list[str]:
 
 __all__ = [
     "FeedLocation",
+    "add_feed_metadata",
     "build_feed_metadata",
     "feed_location",
     "sync_feed",
     "variable_meta_to_api_dict",
-    "write_feed_metadata",
 ]

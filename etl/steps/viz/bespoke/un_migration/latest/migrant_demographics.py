@@ -5,8 +5,8 @@ The feed is built from the `migrant_stock_age_sex` garden dataset, and comes out
 visualization shows, and every entity with the code naming its file, plus one
 `migrant-demographics.<code>.json` per entity holding that entity's migrant stock by sex and
 five-year age band (`m`/`f`) alongside the resident population on the same bands (`pm`/`pf`), which
-the visualization subtracts one from the other to get the population born in the country. Alongside
-them goes `metadata.json`, the feed's provenance derived from the garden columns
+the visualization subtracts one from the other to get the population born in the country. The
+metadata JSON also carries the feed's provenance derived from the garden columns
 (see `etl.viz.bespoke`).
 
 Entities are named by their UN M49 location code rather than by a slug, because that is the file
@@ -30,7 +30,7 @@ from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
-from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
+from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
 
 log = get_logger()
 paths = PathFinder(__file__)
@@ -174,25 +174,22 @@ def run() -> None:
         },
         update_period_days=ds_garden.metadata.update_period_days,
     )
-    write_feed_metadata(paths.output_dir, feed_metadata)
 
-    save_json(
-        {
-            "meta": {
-                "title": FEED_TITLE,
-                "source": feed_metadata["feed"]["citation"],
-                "unit": "persons",
-                "note": FEED_NOTE,
-            },
-            "ageBands": AGE_GROUPS,
-            "years": years,
-            "entities": [
-                {"code": int(code), "name": country}
-                for code, country in zip(entities["location_code"], entities["country"])
-            ],
+    manifest = {
+        "meta": {
+            "title": FEED_TITLE,
+            "source": feed_metadata["attribution"],
+            "unit": "persons",
+            "note": FEED_NOTE,
         },
-        INDEX_FILENAME,
-    )
+        "ageBands": AGE_GROUPS,
+        "years": years,
+        "entities": [
+            {"code": int(code), "name": country}
+            for code, country in zip(entities["location_code"], entities["country"])
+        ],
+    }
+    save_json(add_feed_metadata(manifest, feed_metadata), INDEX_FILENAME)
 
     for code, country in tqdm(
         zip(entities["location_code"], entities["country"]), total=len(entities), desc="Writing entity files"

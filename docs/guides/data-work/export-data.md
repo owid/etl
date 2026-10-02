@@ -139,20 +139,20 @@ environment doesn't have, so a staging server that never ran the step serves pro
 Files that the run no longer produces are deleted from the feed, so a dropped entity doesn't linger.
 Without `--grapher` the step writes its files and skips the sync.
 
-`etl.viz.bespoke.build_feed_metadata()` derives the feed's provenance — the source line, citations,
-last and next update — from the garden columns the feed is built on, in the shape the MDIM download
-packages publish, so it doesn't have to be typed into the step and go stale at the next data update:
+`etl.viz.bespoke.build_feed_metadata()` derives the feed's provenance (title, source line, origins, update period and, for a single-column feed, descriptions and unit) from the garden columns the feed is built on, so it doesn't have to be typed into the step and go stale at the next data update. The fields are grapher's `BespokeMetadata`, and they go into the top level of the feed's manifest (`<slug>.metadata.json`, the file the bundle's registry entry names as `metadataFilename`). The bundle reads its data index from that file, and grapher reads the methods-and-sources box from it:
 
 ```python
-from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
+from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
 
 feed_metadata = build_feed_metadata(
     title="Causes of death",
-    columns={"deaths": tb["value"]},
+    columns={"Deaths": tb["value"]},
     update_period_days=ds_garden.metadata.update_period_days,
 )
-write_feed_metadata(paths.output_dir, feed_metadata)
+save_json(add_feed_metadata(manifest, feed_metadata), "causes-of-death.metadata.json")
 ```
+
+`add_feed_metadata` raises if a manifest key clashes with a metadata field.
 
 ## Exporting data to GitHub
 

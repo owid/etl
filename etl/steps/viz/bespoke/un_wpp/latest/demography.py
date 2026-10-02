@@ -4,7 +4,7 @@ The feed is built from the `un_wpp` garden dataset, and comes out as `demography
 which lists every entity and the file name carrying it, plus one `demography.<slug>.data.json` per
 entity holding that entity's population by age and sex, age-specific fertility rates, deaths by age
 and sex, and net migration rate -- as estimates up to `LAST_ESTIMATE_YEAR`, and as the UN's medium
-projection variant after it. Alongside them goes `metadata.json`, the feed's provenance derived
+projection variant after it. `demography.metadata.json` also carries the feed's provenance derived
 from the garden columns (see `etl.viz.bespoke`).
 
 The files go to the step's output folder; the framework syncs that folder to the R2 path of the
@@ -28,7 +28,7 @@ from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
-from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
+from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
 
 log = get_logger()
 paths = PathFinder(__file__)
@@ -258,21 +258,19 @@ def run() -> None:
 
     # The feed's provenance, from the origins of the data it is built on, rather than a source
     # string typed in here that goes stale the next time the dataset is updated.
-    write_feed_metadata(
-        paths.output_dir,
-        build_feed_metadata(
-            title="Population, fertility, deaths and migration",
-            columns={
-                "Population": metadata_column(tb_population, "population"),
-                "Fertility rate": metadata_column(tb_fertility, "fertility_rate"),
-                "Deaths": metadata_column(tb_deaths, "deaths"),
-                "Net migration rate": metadata_column(tb_migration, "net_migration_rate"),
-            },
-            update_period_days=ds_garden.metadata.update_period_days,
-        ),
+    feed_metadata = build_feed_metadata(
+        title="Population, fertility, deaths and migration",
+        columns={
+            "Population": metadata_column(tb_population, "population"),
+            "Fertility rate": metadata_column(tb_fertility, "fertility_rate"),
+            "Deaths": metadata_column(tb_deaths, "deaths"),
+            "Net migration rate": metadata_column(tb_migration, "net_migration_rate"),
+        },
+        update_period_days=ds_garden.metadata.update_period_days,
     )
 
-    save_json({"countries": entities, "slugs": {entity: slugify(entity) for entity in entities}}, INDEX_FILENAME)
+    manifest = {"countries": entities, "slugs": {entity: slugify(entity) for entity in entities}}
+    save_json(add_feed_metadata(manifest, feed_metadata), INDEX_FILENAME)
 
     for entity in tqdm(entities, desc="Writing entity files"):
         data = {
