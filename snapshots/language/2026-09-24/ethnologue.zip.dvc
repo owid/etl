@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Summer Institute of Linguistics (SIL) International
+    title: Ethnologue
+    description: |-
+      Ethnologue is a comprehensive reference work cataloging the world’s languages, providing data on over 7,000 living languages, including their distribution, number of speakers, and classification. It serves as a key resource for linguists, educators, and researchers interested in global linguistic diversity.
+    citation_full: |-
+      Eberhard, David M., Gary F. Simons, and Alison J. Robinson (eds.). 2026. Ethnologue: Languages of the World. Twenty-ninth edition. Dallas, Texas: SIL Global. Online version: https://www.ethnologue.com/codes/.
+    url_main: https://www.ethnologue.com/codes/
+    date_accessed: '2026-09-24'
+    date_published: '2026-02-17'
+    license:
+      name: © 2026 SIL Global
+      url: https://www.ethnologue.com/codes/#terms-of-use
+  is_public: false
+outs:
+  - md5: c25a3f5ffa0ecfc65e7af6211795ee93
+    size: 485875
+    path: ethnologue.zip
