@@ -26,12 +26,11 @@ To run this code from scratch,
         rm -rf .cache/*
     - (If needed) Delete the files in R2:
         rclone delete r2:owid-private/cache/pip_api --fast-list --transfers 32 --checkers 32 --verbose
-    - Update GLOBAL_DIST_1000BINS_URL to the bins file matching the new PIP release (see its NOTE).
-    - Check if you need to update the poverty lines in the function `poverty_lines_countries`.
-        - Check the list of countries without percentile data. It will show up as a list in the output (_These countries are available in a common query but not in the percentile file:_)
-        - Open
-            https://api.worldbank.org/pip/v1/pip?country=LCA&year=all&povline=150&fill_gaps=false&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&identity=PROD&format=csv
-        - And see if any of the `headcount` values is lower than 0.99. If so, you need to add more poverty lines to the function.
+    - Review the "PARAMETERS TO REVIEW ON EVERY PIP RELEASE" block below the imports. Every
+      release-dependent link and setting is there, with instructions for checking it.
+    - Do not push to the branch while the extraction runs: each push redeploys the staging server,
+      and the deploy's `make docs.build` wipes `.cache/`, where this script keeps its working files.
+      Commit on the server and push once the run has finished.
     - Run the code. It extracts the data AND creates both snapshots in one go (no separate upload
       scripts). You have two options to see the output, in the terminal or in the background:
         etls wb/{version}/world_bank_pip
@@ -53,7 +52,6 @@ import time
 from multiprocessing.pool import ThreadPool
 from pathlib import Path
 
-import click
 import numpy as np
 import pandas as pd
 import requests
@@ -78,43 +76,51 @@ log = get_logger()
 
 memory = Memory(CACHE_DIR, verbose=0)
 
-# Basic parameters to use in the functions
-MAX_REPEATS = 15
-TIMEOUT = 500
-FILL_GAPS = "false"
-# NOTE: Although the number of workers is set to MAX_WORKERS, the actual number of workers for regional queries is half of that, because the API (`pip-grp`) is less able to handle concurrent requests.
-MAX_WORKERS = 2
-TOLERANCE_PERCENTILES = 1
+########################################################################################################
+# PARAMETERS TO REVIEW ON EVERY PIP RELEASE
+########################################################################################################
 
-# Set to False to skip percentile extraction (e.g. when percentile source links haven't been updated yet).
-# When False, the script will still generate key indicators, relative poverty, and filled data,
-# but will skip: percentile construction, median patching, and decile threshold merging.
-EXTRACT_COUNTRY_PERCENTILES = True
-
-# Select live (1) or internal (0) API
-LIVE_API = 1
-
-# URL of the World Bank's "1000 Binned Global Distribution" file (2021 PPP), used to build
-# regional percentiles and regional relative poverty directly, instead of running thousands of
-# `pip-grp` API queries. Each row is a (country, year, bin) with the bin's average welfare (`welf`,
-# 2021 PPP/day) and population (`pop`, millions).
-# NOTE: Update this link on every new PIP release. Find the latest file at
-# https://datacatalog.worldbank.org/search/dataset/0064304 — the file name embeds the release
-# vintage (e.g. `20260324_2021`), which must match the PIP API release used for the rest of the data.
+# "1000 Binned Global Distribution" file, used to build regional percentiles, medians and relative
+# poverty. Latest file: https://datacatalog.worldbank.org/search/dataset/0064304
+# The file name embeds the release vintage (e.g. `20260922_2021`), which must match the PIP API release.
+# It is the same file as `url_download` in thousand_bins_distribution.dta.dvc: update both together.
 GLOBAL_DIST_1000BINS_URL = (
     "https://datacatalogfiles.worldbank.org/ddh-published/0064304/DR0094424/"
-    "GlobalDist1000bins_1990_2026_20260324_2021_01_02_PROD.dta"
+    "GlobalDist1000bins_1990_2026_20260922_2021_01_02_PROD.dta"
 )
-# The bins file is published for 2021 PPP only, so regional percentiles/relative poverty are
-# produced for 2021 PPP. (Country data still covers every PPP version in POVLINES_DICT.)
+# PPP version of the bins file. Regional data is produced for this PPP version only.
 BINS_PPP_VERSION = 2021
 
+# Official country percentile files, one per PPP version. Latest files:
+# https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
+# These are often the last files the World Bank updates in a release.
+PERCENTILES_URLS = {
+    2017: "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090251/world_100bin.csv",
+    2021: "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090357/world_100bin.csv",
+}
 
-# Constants
+# Set to False if the percentile files are not yet updated for the new release. The run then still
+# generates key indicators, relative poverty and filled data, but skips percentile construction,
+# median patching and decile threshold merging.
+EXTRACT_COUNTRY_PERCENTILES = True
+
+# Poverty lines for key indicators, in cents, per PPP version. The second value in each list is the
+# international poverty line. Keep the most recent PPP version second.
+POVLINES_DICT = {
+    2017: [100, 215, 365, 500, 685, 700, 1000, 2000, 3000, 4000],
+    2021: [100, 300, 420, 500, 700, 830, 1000, 2000, 3000, 4000],
+}
+
+
 def poverty_lines_countries():
     """
-    These poverty lines are used to calculate percentiles for countries that are not in the percentile file.
-    # NOTE: In future updates, check if these poverty lines are enough for the extraction
+    Poverty lines, in cents, used to construct percentiles for countries missing from the percentile file.
+
+    Check that they reach high enough: the run output lists those countries after "These countries are
+    available in a common query but not in the percentile file". For each one, query the highest line here
+    (for LCA and $190):
+        https://api.worldbank.org/pip/v1/pip?country=LCA&year=all&povline=190&fill_gaps=false&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&identity=PROD&format=csv
+    If any `headcount` is below 0.99, extend the top range.
     """
     # Define poverty lines and their increase
 
@@ -126,7 +132,7 @@ def poverty_lines_countries():
     between_30_and_55_dollars = list(range(3000, 5500, 10))
     between_55_and_80_dollars = list(range(5500, 8000, 10))
     between_80_and_100_dollars = list(range(8000, 10000, 10))
-    between_100_and_150_dollars = list(range(10000, 15000, 10))
+    between_100_and_190_dollars = list(range(10000, 19000, 10))
 
     # povlines is all these lists together
     povlines = (
@@ -138,19 +144,23 @@ def poverty_lines_countries():
         + between_30_and_55_dollars
         + between_55_and_80_dollars
         + between_80_and_100_dollars
-        + between_100_and_150_dollars
+        + between_100_and_190_dollars
     )
 
     return povlines
 
 
-# Define poverty lines for key indicators, depending on the PPP version.
-# It includes the international poverty line, lower and upper-middle income lines, and some other lines.
-# NOTE: Define this dictionary to show the most recent PPP prices second
-POVLINES_DICT = {
-    2017: [100, 215, 365, 500, 685, 700, 1000, 2000, 3000, 4000],
-    2021: [100, 300, 420, 500, 700, 830, 1000, 2000, 3000, 4000],
-}
+########################################################################################################
+# DERIVED VALUES AND TECHNICAL SETTINGS (no need to review on a release)
+########################################################################################################
+
+# Basic parameters to use in the functions
+MAX_REPEATS = 15
+TIMEOUT = 500
+FILL_GAPS = "false"
+# NOTE: Although the number of workers is set to MAX_WORKERS, the actual number of workers for regional queries is half of that, because the API (`pip-grp`) is less able to handle concurrent requests.
+MAX_WORKERS = 2
+TOLERANCE_PERCENTILES = 1
 
 # Define international poverty lines as the second value in each list in POVLINES_DICT
 INTERNATIONAL_POVERTY_LINES = {ppp_year: poverty_lines[1] for ppp_year, poverty_lines in POVLINES_DICT.items()}
@@ -181,15 +191,7 @@ OLD_REGIONS = [
 # POV_LINES_COUNTRIES = [1, 1000, 25000, 50000]
 
 
-@click.command()
-@click.option(
-    "--live-api/--internal-api",
-    default=True,
-    type=bool,
-    help="Select live (1) or internal (0) API",
-)
-@click.option("--upload/--skip-upload", default=True, type=bool, help="Create and upload the snapshots to S3")
-def run(live_api: bool, upload: bool) -> None:
+def run(upload: bool = True, live_api: bool = True) -> None:
     if live_api:
         wb_api = WB_API("https://api.worldbank.org/pip/v1")
     else:
@@ -341,16 +343,10 @@ def _fetch_csv(url: str) -> pd.DataFrame:
 
 @memory.cache
 def _fetch_percentiles(version: int) -> pd.DataFrame:
-    # These URLs were copied from https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
-    # NOTE: Check if these links are still valid for the new PIP release. If not, update them to the new links.
-    if version == PPP_VERSIONS[0]:
-        url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090251/world_100bin_revised.csv"
-    elif version == PPP_VERSIONS[1]:
-        url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090357/world_100bin_revised.csv"
-    else:
+    if version not in PERCENTILES_URLS:
         raise ValueError(f"Version {version} is not supported")
 
-    _df_percentiles = pd.read_csv(url)
+    _df_percentiles = pd.read_csv(PERCENTILES_URLS[version])
 
     # # Drop  Unnamed: 0 column (it sometimes appears in the files)
     # _df_percentiles = _df_percentiles.drop(columns=["Unnamed: 0"])

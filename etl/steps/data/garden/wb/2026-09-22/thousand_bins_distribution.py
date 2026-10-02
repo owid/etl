@@ -18,16 +18,6 @@ REGIONS_MAPPING = {
     "SSF": "Sub-Saharan Africa",
 }
 
-REGIONS_MAPPING_OLD = {
-    "EAP": "East Asia and Pacific",
-    "ECA": "Europe and Central Asia",
-    "LAC": "Latin America and Caribbean",
-    "MNA": "Middle East and North Africa",
-    "OHI": "Other high income countries",
-    "SAR": "South Asia",
-    "SSA": "Sub-Saharan Africa",
-}
-
 
 def run() -> None:
     #
@@ -52,7 +42,7 @@ def run() -> None:
     tb = paths.regions.harmonize_names(tb=tb)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.format(["country", "year", "region", "region_old", "quantile"])
+    tb = tb.format(["country", "year", "region", "quantile"])
 
     #
     # Save outputs.
@@ -68,7 +58,7 @@ def rename_columns_regions_and_multiply_pop(tb: Table, regions_mapping: dict) ->
     """Rename columns, regions and multiply pop by 1,000,000."""
     # Rename columns
     tb = tb.rename(
-        columns={"region_code": "region", "regionpcn_code": "region_old", "welf": "avg", "code": "country"},
+        columns={"region_code": "region", "welf": "avg", "code": "country"},
         errors="raise",
     )
 
@@ -78,17 +68,11 @@ def rename_columns_regions_and_multiply_pop(tb: Table, regions_mapping: dict) ->
     )
     tb["region"] = tb["region"].map(REGIONS_MAPPING)
 
-    # Rename region_old column with REGIONS_MAPPING_OLD. Assert that all regions are mapped.
-    assert set(tb["region_old"].unique()) == set(REGIONS_MAPPING_OLD.keys()), (
-        f"There are undefined regions in `region_old`: {set(tb['region_old'].unique()) - set(REGIONS_MAPPING_OLD.keys())}"
-    )
-    tb["region_old"] = tb["region_old"].map(REGIONS_MAPPING_OLD)
-
     # Multiply pop by 1,000,000
     tb["pop"] *= 1e6
 
-    # Drop region_name and regionpcn_name columns. Also drop pipvintage column as it is not needed
-    tb = tb.drop(columns=["region_name", "regionpcn_name", "pipvintage"])
+    # Drop region_name column. Also drop pipvintage column as it is not needed
+    tb = tb.drop(columns=["region_name", "pipvintage"])
 
     return tb
 

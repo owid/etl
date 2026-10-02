@@ -25,7 +25,6 @@ def run() -> None:
             "code",
             "year",
             "region_code",
-            "regionpcn_code",
             "quantile",
         ]
     )
