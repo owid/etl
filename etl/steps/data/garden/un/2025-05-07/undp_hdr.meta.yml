@@ -15,6 +15,12 @@ definitions:
   description_key_gni: Gross national income (GNI) is a measure of the total income earned by residents of a country or region each year. It is calculated as gross domestic product (GDP) plus net income received from abroad (such as wages earned abroad and returns on foreign investments). GDP represents the total economic output of a country or region, while GNI represents the income received by its residents, wherever it is generated.
   description_key_gni_per_capita: GNI per capita is GNI divided by population, representing the average national income per person. This indicator provides information on economic growth and income levels from 1990.
   description_key_gni_per_capita_by_sex: GNI is not measured separately by sex, so these figures are based on estimates of earned income by sex made by the UNDP. Total GNI is split by sex using data on the ratio of female to male wages and female and male shares of the economically active population. To get GNI per capita by sex, each share is divided by that sex’s population.
+  description_key_gni_per_capita_total_or_by_sex: |-
+    <% if sex == 'total' %>
+    {definitions.description_key_gni_per_capita}
+    <%- else %>
+    {definitions.description_key_gni_per_capita_by_sex}
+    <%- endif %>
   description_key_international_dollars: This data is expressed in constant international dollars at 2021 prices to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
 
   description_short_gni: Total income earned by residents of a country or region, including income earned abroad.
@@ -481,7 +487,7 @@ tables:
           {definitions.description_short_gni_per_capita} {definitions.ppp_adjustment}<% if sex != "total" %> Only <<sex>> population is considered.<% endif %>
         description_key:
           - "{definitions.description_key_gni}"
-          - "<% if sex == 'total' %>{definitions.description_key_gni_per_capita}<% else %>{definitions.description_key_gni_per_capita_by_sex}<% endif %>"
+          - "{definitions.description_key_gni_per_capita_total_or_by_sex}"
           - "{definitions.description_key_international_dollars}"
         description_from_producer: |-
           UNDP relies on IMF (2023), UNDESA (2023), United Nations Statistics Division (2023), World Bank (2023).
