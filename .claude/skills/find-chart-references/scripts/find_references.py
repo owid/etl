@@ -103,6 +103,16 @@ COLUMNS = [
 ]  # fmt: skip
 
 
+def gdoc_path(r: dict) -> str:
+    """Public path of a posts_gdocs row: data insights live under /data-insights/, the rest at the root.
+
+    A data insight that only links a chart (rather than holding it in its `grapher-url`) reaches
+    the report through the article sweeps, and `/<slug>` 404s for it.
+    """
+    slug = r["post_slug"]
+    return f"/data-insights/{slug}" if r.get("post_type") == "data-insight" else f"/{slug}"
+
+
 def rec(subject_type, subject, subject_id, surface, kind, where, where_path="", *,
         surface_id=None, config_id=None, context="", query_string="", text="",
         published=True) -> dict:  # fmt: skip
@@ -236,7 +246,7 @@ def sweep_gdoc_links(by_slug: dict[str, dict]) -> list[dict]:
                 "gdoc",
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
-                f"/{r['post_slug']}",
+                gdoc_path(r),
                 surface_id=r["gdoc_id"],
                 context=f"{component or 'unknown'} ({r['post_type']})",
                 query_string=r["queryString"],
@@ -289,7 +299,7 @@ def sweep_articles_placing_narrative_charts(findings: list[dict]) -> list[dict]:
                 "gdoc (narrative chart)",
                 EMBED,
                 r["post_slug"],
-                f"/{r['post_slug']}",
+                gdoc_path(r),
                 surface_id=r["gdoc_id"],
                 # The parenthesized type is load-bearing: `reference_report.page_type` reads it
                 # to pick the public base, and a data insight or author page is not served at
@@ -371,7 +381,7 @@ def sweep_gdoc_url_links(by_slug: dict[str, dict]) -> list[dict]:
                 "gdoc (url link)",
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
-                f"/{r['post_slug']}",
+                gdoc_path(r),
                 surface_id=r["gdoc_id"],
                 context=f"{component or 'unknown'} ({r['post_type']})",
                 query_string=url_query(target, r["queryString"] or ""),
@@ -959,7 +969,7 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
                 "gdoc",
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
-                f"/{r['post_slug']}",
+                gdoc_path(r),
                 surface_id=r["gdoc_id"],
                 context=f"{component or 'unknown'} ({r['post_type']})",
                 query_string=r["queryString"],
@@ -997,7 +1007,7 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
                 "gdoc (url link)",
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
-                f"/{r['post_slug']}",
+                gdoc_path(r),
                 surface_id=r["gdoc_id"],
                 context=f"raw URL, {component or 'unknown'} ({r['post_type']})",
                 # A raw URL carries its parameters in the target itself, so this SELECT omits
@@ -1078,7 +1088,7 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
                 "gdoc",
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
-                f"/{r['post_slug']}",
+                gdoc_path(r),
                 surface_id=r["gdoc_id"],
                 context=f"{component or 'unknown'} ({r['post_type']})",
                 query_string=r["queryString"],
@@ -1119,7 +1129,7 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
                 "gdoc (url link)",
                 LINK if component.startswith("span-") else EMBED,
                 r["post_slug"],
-                f"/{r['post_slug']}",
+                gdoc_path(r),
                 surface_id=r["gdoc_id"],
                 context=f"raw URL, {component or 'unknown'} ({r['post_type']})",
                 # As in the MDIM pass: a raw URL carries its parameters in the target, so the
