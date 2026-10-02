@@ -199,20 +199,53 @@ Set in `definitions.common`, override per-variable as needed.
 
 ```yaml
 # Jinja example: dimensional variable with conditional descriptions
+definitions:
+  description_short_time_spent: |-
+    <% if who_category == "Alone" %>
+    Time spent alone, by gender and age.
+    <%- else %>
+    Time spent with <<who_category.lower()>>, by gender and age.
+    <%- endif %>
+
 variables:
   time_spent:
     title: Time spent with <<who_category>> throughout life
     unit: hours per day
     short_unit: h
-    description_short: |-
-      <% if who_category == "Alone" %>
-      Time spent alone, by gender and age.
-      <% else %>
-      Time spent with <<who_category.lower()>>, by gender and age.
-      <%- endif -%>
+    description_short: "{definitions.description_short_time_spent}"
     display:
       name: With <<who_category>>
 ```
+
+**Write Jinja conditionals in `definitions:`, with the condition first and each branch on its own line, and call them by name from the variable.** This applies whenever the conditional picks a whole value: a full field, or a `description_key` bullet. Keep the `<% if %>` out of the variable block itself, so the variable stays a short list of `{definitions.…}` references. Put each `<% if %>` / `<%- elif %>` / `<%- else %>` / `<%- endif %>` tag on its own line, with what it renders underneath, so a reviewer reads condition → text without scanning one long line:
+
+```yaml
+definitions:
+  description_key_gni_per_capita: GNI per capita is GNI divided by population, …
+  description_key_gni_per_capita_by_sex: GNI is not measured separately by sex, …
+  description_key_gni_per_capita_total_or_by_sex: |-
+    <% if sex == 'total' %>
+    {definitions.description_key_gni_per_capita}
+    <%- else %>
+    {definitions.description_key_gni_per_capita_by_sex}
+    <%- endif %>
+
+tables:
+  undp_hdr_sex:
+    variables:
+      gni_pc:
+        description_key:
+          - "{definitions.description_key_gni}"
+          - "{definitions.description_key_gni_per_capita_total_or_by_sex}"
+```
+
+❌ `- "<% if sex == 'total' %>{definitions.a}<% else %>{definitions.b}<% endif %>"`, a one-line conditional inside the variable.
+
+Name the conditional definition after what it chooses between (`…_total_or_by_sex`), not after one of the branches. Splitting the tags over several lines renders exactly like the one-line form. The Jinja environment sets `trim_blocks` and `lstrip_blocks`, and the rendered text is stripped (`owid.catalog.core.jinja`), so the tag lines and their newlines disappear. `{definitions.…}` references resolve before Jinja runs, so a definition can wrap other definitions. Each branch must still be a single line, because a wrapped branch puts a real newline into the text.
+
+**Dash the closing tags: `<%- elif %>`, `<%- else %>`, `<%- endif %>`.** `trim_blocks` removes the newline *after* a tag but not the one that ends the branch line *before* it. As a whole value that newline is stripped anyway. But once the definition is spliced into a longer string (`Intro {definitions.x} outro.`), the plain form renders `Intro A\n outro.`, and the `-` is what gives `Intro A outro.`. Since a definition can be reused anywhere, dash them by default. Leave the opening `<% if %>` undashed, because `<%-` there would also eat the space before it and glue the text together. If text follows the conditional, keep it on the `<%- endif %>` line (`<%- endif %> Outro.`): on the next line it gets glued on as `AOutro.`.
+
+The exception is a fragment inside a sentence or a title, such as `title: GNI per capita<% if sex != "total" %> (<<sex>>)<% endif %>`. Splitting that one leaves a line break or stray indentation in the rendered text, so keep it inline. Short fragments like this can still live in a definition (`among_sex: <% if sex == "males" %> among men<% elif … %><% endif %>`) when several fields reuse them. When you restructure an existing conditional, render every dimension value before and after to confirm nothing changed (the text-neutrality recipe in `.claude/skills/edit-faust-metadata/SKILL.md`).
 
 **A sentence written with one breakdown in mind renders on all the others**, where the view's own filtering can make it false. Sweep every dimension value before shipping — check 6 of the quality suite below.
 
