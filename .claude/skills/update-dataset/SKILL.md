@@ -727,8 +727,11 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      PR, with sign-off since it's reader-facing: either retitle it to the new figure, or pin its `maxTime` to
      the period the claim describes so it stays a dated snapshot. Decide one or the other, never both. Route a
      retitle through `/edit-faust-metadata` (it owns narrative-chart text and its blast radius); a `maxTime`
-     pin goes straight to staging. Either reaches production with its parent chart, so the parent's Chart
-     Diff must be approved. The data insight that embeds it is still the author's call.
+     pin goes straight to staging. When the parent is a chart, either edit reaches production with it once
+     the parent's Chart Diff is approved. Chart-sync only carries narrative children of synced *charts*, so a
+     narrative chart parented to an MDim view (`parentMultiDimXChartConfigId`) never syncs: make the same
+     edit on production in the admin after merge, and keep it in the PR's open items until it's done. The
+     data insight that embeds it is still the author's call.
      (Data center construction: narrative chart 348 kept "5-fold" over data showing ~6x, while the data
      insight around it showed a frozen PNG that still matched.)
      **A static image changes the remedy, not the finding — and the sweep's `kind` cannot tell you which you

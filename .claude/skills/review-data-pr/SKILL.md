@@ -265,7 +265,9 @@ The exception is a **narrative chart's own title or subtitle**: it renders live 
 an unbounded claim in it is already wrong on staging. Spot-check each narrative chart carrying the dataset's
 variables (`AdminAPI.get_narrative_chart(id)["configFull"]`); an unbounded claim the new data contradicts, with
 neither a retitle nor a `maxTime` pin applied on staging, is a 🔴 — `/update-dataset` requires the fix in
-this PR.
+this PR. If the narrative chart's parent is an MDim view, chart-sync won't carry the staging fix to
+production, so the PR's open items must also list the same edit on production after merge; a staging-only
+fix with no such item is a 🟡.
 
 ### 11. DAG checks
 
