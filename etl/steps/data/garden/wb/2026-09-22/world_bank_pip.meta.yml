@@ -813,8 +813,6 @@ tables:
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
-        description_from_producer: |-
-          Number of people living on less than a day at <<ppp_version>> PPP is calculated by multiplying the poverty rate and the population. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
         display:
           name: Share of population not in poverty (above {definitions.poverty_line_a_day})
           numDecimalPlaces: 1
@@ -864,6 +862,8 @@ tables:
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
+        description_from_producer: |-
+          Number of people living on less than {definitions.poverty_line_a_day} at <<ppp_version>> PPP is calculated by multiplying the poverty rate and the population. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -1120,7 +1120,7 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         description_from_producer: |-
-          Poverty gap at a day (<<ppp_version>> PPP) is the mean shortfall in income or consumption from the poverty line a day (counting the nonpoor as having zero shortfall), expressed as a percentage of the poverty line. This measure reflects the depth of poverty as well as its incidence. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
+          Poverty gap at {definitions.poverty_line_a_day} (<<ppp_version>> PPP) is the mean shortfall in income or consumption from the poverty line {definitions.poverty_line_a_day} (counting the nonpoor as having zero shortfall), expressed as a percentage of the poverty line. This measure reflects the depth of poverty as well as its incidence. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -1206,7 +1206,7 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         description_from_producer: |-
-          The square of Poverty gap. Poverty gap at a day (<<ppp_version>> PPP) is the mean shortfall in income or consumption from the poverty line a day (counting the nonpoor as having zero shortfall), expressed as a percentage of the poverty line. This measure reflects the depth of poverty as well as its incidence. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
+          The square of Poverty gap. Poverty gap at {definitions.poverty_line_a_day} (<<ppp_version>> PPP) is the mean shortfall in income or consumption from the poverty line {definitions.poverty_line_a_day} (counting the nonpoor as having zero shortfall), expressed as a percentage of the poverty line. This measure reflects the depth of poverty as well as its incidence. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
