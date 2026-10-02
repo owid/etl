@@ -182,6 +182,10 @@ def build_feed_metadata(
     origins = []
     for api in apis:
         for origin in api.get("origins") or []:
+            if "license" in origin:
+                # A producer that states no license URL leaves it unset, which serializes to no key;
+                # grapher's schema requires the key and rejects the whole file without it.
+                origin["license"] = {"url": "", **origin["license"]}
             if origin not in origins:
                 origins.append(origin)
 

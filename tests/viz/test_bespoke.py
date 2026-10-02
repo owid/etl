@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import pytest
-from owid.catalog import Origin, Table, VariableMeta, VariablePresentationMeta
+from owid.catalog import License, Origin, Table, VariableMeta, VariablePresentationMeta
 
 from etl import config
 from etl.viz import bespoke
@@ -139,6 +139,16 @@ def test_build_feed_metadata_of_several_columns(table):
     # No single description or unit to show for a feed combining several columns.
     assert "unit" not in metadata
     assert "descriptionShort" not in metadata
+
+
+def test_build_feed_metadata_keeps_a_license_without_url(table):
+    """Grapher's schema requires `license.url`, and rejects the whole file when it is missing."""
+    origin = Origin(producer="P", title="T", license=License(name="CC BY 4.0"))
+    table._fields["value"].origins = [origin]
+
+    metadata = bespoke.build_feed_metadata("Causes of death", {"Deaths": table["value"]})
+
+    assert metadata["origins"][0]["license"] == {"name": "CC BY 4.0", "url": ""}
 
 
 def test_add_feed_metadata(table):
