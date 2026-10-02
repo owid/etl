@@ -78,6 +78,9 @@ def mock(_type: type) -> Any:
         args = getattr(_type, "__args__", ())
         if args and args[0].__name__ == "TableDimension":
             return None
+        if args and args[0].__name__ == "ChangelogEntry":
+            # its date must be a real YYYY-MM-DD date
+            return [args[0](date=_random_date().isoformat(), changes=[mock(str)]) for _ in range(random.randint(1, 4))]
 
         # e.g. List[int] or list[int]
         if args:
