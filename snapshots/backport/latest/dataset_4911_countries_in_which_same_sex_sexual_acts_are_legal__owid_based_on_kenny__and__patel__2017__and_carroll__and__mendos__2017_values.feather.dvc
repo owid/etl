@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4911
+    date_accessed: 2023-08-10 08:01:12.139108
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Countries in which same-sex sexual acts are legal – OWID based on Kenny &
+    Patel (2017) and Carroll & Mendos (2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 76b047d1a192cd765e081888f581482c
+  size: 8010
+  path: 
+    dataset_4911_countries_in_which_same_sex_sexual_acts_are_legal__owid_based_on_kenny__and__patel__2017__and_carroll__and__mendos__2017_values.feather

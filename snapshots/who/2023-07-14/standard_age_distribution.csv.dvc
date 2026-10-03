@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: World Health Organization
+    title: 'Age standardization of rates: a new WHO standard'
+    citation_full: 'Ahmad OB, Boschi-Pinto C, Lopez AD, Murray CJ, Lozano R, Inoue M (2001). Age standardization of rates: a new WHO standard. World Health Organization.'
+    attribution_short: WHO
+    url_main: https://web.archive.org/web/20220119054432/https://www.who.int/healthinfo/paper31.pdf
+    date_accessed: '2023-07-14'
+    date_published: '2001'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+wdir: ../../../data/snapshots/who/2023-07-14
+outs:
+  - md5: 5c6bc0b649c343483f4c8d07fbb540c5
+    size: 333
+    path: standard_age_distribution.csv

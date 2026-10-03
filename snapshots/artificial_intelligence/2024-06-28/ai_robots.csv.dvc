@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: AI Index Report
+    description: |-
+      The AI Index Report tracks, collates, distills, and visualizes data related to artificial intelligence (AI). The mission is to provide unbiased, rigorously vetted, broadly sourced data to enable policymakers, researchers, executives, journalists, and the general public to develop a more thorough and nuanced understanding of the complex field of AI.
+    date_published: "2024"
+    title_snapshot: AI Index Report - Data on Robots
+
+    description_snapshot: |-
+      Data on the installation and operation of industrial robots, which are defined as an “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications.”
+
+    # Citation
+    producer: International Federation of Robotics via AI Index
+    citation_full: |-
+      Nestor Maslej, Loredana Fattorini, Raymond Perrault, Vanessa Parli, Anka Reuel, Erik Brynjolfsson, John Etchemendy, Katrina Ligett, Terah Lyons, James Manyika, Juan Carlos Niebles, Yoav Shoham, Russell Wald, and Jack Clark, “The AI Index 2024 Annual Report,” AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2024.
+    attribution_short: AI Index
+
+    # Files
+    url_main: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
+    date_accessed: 2024-06-28
+    # License
+    license:
+      name: CC BY-ND 4.0
+      url: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
+outs:
+  - md5: 93a9eb2ca9ede420ea4b59e192cd7e94
+    size: 2953
+    path: ai_robots.csv

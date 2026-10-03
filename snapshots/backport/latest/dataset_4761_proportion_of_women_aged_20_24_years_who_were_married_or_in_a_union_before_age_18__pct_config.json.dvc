@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4761
+    date_accessed: 2023-08-16 07:30:23.066289
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4761_proportion_of_women_aged_20_24_years_who_were_married_or_in_a_union_before_age_18__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 13872eac0446eb5525daa05936efbb9a
+  size: 7444
+  path: 
+    dataset_4761_proportion_of_women_aged_20_24_years_who_were_married_or_in_a_union_before_age_18__pct_config.json

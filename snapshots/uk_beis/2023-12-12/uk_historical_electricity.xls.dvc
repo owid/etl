@@ -1,0 +1,30 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: UK's historical electricity data
+    description: |-
+      The historical electricity data in the United Kingdom comes from the Digest of UK Energy Statistics (DUKES), published by the UK's Department for Business, Energy & Industrial Strategy (BEIS).
+    date_published: 2023-07-27
+
+    # Citation
+    producer: Department for Business, Energy & Industrial Strategy of the UK
+    citation_full: |-
+      The historical electricity data in the United Kingdom (2023) comes from the Digest of UK Energy Statistics (DUKES), published by the UK's Department for Business, Energy & Industrial Strategy (BEIS).
+    attribution_short: DUKES
+
+    # Files
+    url_main: https://www.gov.uk/government/statistical-data-sets/historical-electricity-data
+    url_download: 
+      https://assets.publishing.service.gov.uk/media/64c104811e10bf000d17cf1e/Electricity_since_1920.xlsx
+    date_accessed: 2023-12-12
+
+    # License
+    license:
+      name: Open Government Licence v3.0
+      url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+
+wdir: ../../../data/snapshots/uk_beis/2023-12-12
+outs:
+- md5: fd9712290cc121d9e033f87465f20611
+  size: 139292
+  path: uk_historical_electricity.xls

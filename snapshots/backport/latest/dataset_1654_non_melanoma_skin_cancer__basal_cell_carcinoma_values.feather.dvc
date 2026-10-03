@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1654
+    date_accessed: 2023-08-16 10:30:30.324950
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Non-melanoma skin cancer (basal-cell carcinoma)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c9c28851b1756d7ec2f15f2d29e9f6aa
+  size: 702810
+  path: dataset_1654_non_melanoma_skin_cancer__basal_cell_carcinoma_values.feather

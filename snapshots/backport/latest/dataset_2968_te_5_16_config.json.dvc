@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/2968
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2968_te_5_16
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: 74754a7b9539ea0645e3890efa5de372
+    size: 3318
+    path: dataset_2968_te_5_16_config.json

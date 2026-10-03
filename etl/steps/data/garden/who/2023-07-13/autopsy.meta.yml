@@ -1,0 +1,13 @@
+dataset:
+  owners:
+    - Fiona Spooner
+tables:
+  autopsy:
+    variables:
+      value:
+        title: Autopsy rate (%) for all deaths
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Autopsy rate
+          numDecimalPlaces: 1

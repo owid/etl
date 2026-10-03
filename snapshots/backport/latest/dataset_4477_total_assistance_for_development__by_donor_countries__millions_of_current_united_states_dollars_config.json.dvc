@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4477
+    date_accessed: 2023-08-16 10:32:14.072458
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4477_total_assistance_for_development__by_donor_countries__millions_of_current_united_states_dollars
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9cb21bf939aab217dbd3d90383a1a7e6
+  size: 1927
+  path: 
+    dataset_4477_total_assistance_for_development__by_donor_countries__millions_of_current_united_states_dollars_config.json

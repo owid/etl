@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/788
+    date_accessed: 2023-08-16 08:47:41.358979
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_788_prices__exchange_rates__annual__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7cee9575a5ddc6d693176a32e1424306
+  size: 3354
+  path: dataset_788_prices__exchange_rates__annual__fao__2017_config.json

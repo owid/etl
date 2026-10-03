@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4463
+    date_accessed: 2023-08-14 14:41:47.379761
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Growth rates of household expenditure or income per capita among the bottom
+    40 per cent of the population (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 68f22992a7773498928eaf64cc33dbad
+  size: 9314
+  path: 
+    dataset_4463_growth_rates_of_household_expenditure_or_income_per_capita_among_the_bottom_40_per_cent_of_the_population__pct_values.feather

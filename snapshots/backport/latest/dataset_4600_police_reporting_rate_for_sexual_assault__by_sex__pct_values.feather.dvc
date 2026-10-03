@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4600
+    date_accessed: 2023-08-16 10:41:43.176674
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Police reporting rate for sexual assault, by sex (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a52e543e3a3081ae13309266d457b828
+  size: 7690
+  path: 
+    dataset_4600_police_reporting_rate_for_sexual_assault__by_sex__pct_values.feather

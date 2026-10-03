@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1437
+    date_accessed: 2023-08-14 14:37:16.516704
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1437_down_syndrome (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ca38c25a8a1d24bad0269b5082084b4f
+  size: 28957
+  path: dataset_1437_down_syndrome_config.json

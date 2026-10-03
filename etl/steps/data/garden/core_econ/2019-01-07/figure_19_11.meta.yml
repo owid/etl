@@ -1,0 +1,26 @@
+dataset:
+  title: Figure_19.11
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_19_11:
+    variables:
+      cross_sectional_inequality__gini_coefficient:
+        title: Cross-sectional inequality (Gini coefficient)
+        unit: ''
+      intergenerational_inequality__intergenerational_elasticity:
+        title: Intergenerational inequality (intergenerational elasticity)
+        unit: ''
+        description: Intergenerational inequality is measured by the intergenerational elasticity.
+      size:
+        title: Size
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

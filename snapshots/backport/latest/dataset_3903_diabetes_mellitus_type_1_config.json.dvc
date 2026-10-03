@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3903
+    date_accessed: 2023-08-16 08:20:03.974748
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3903_diabetes_mellitus_type_1 (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 173b9c1e303495a050d3204a9381fa9c
+  size: 31837
+  path: dataset_3903_diabetes_mellitus_type_1_config.json

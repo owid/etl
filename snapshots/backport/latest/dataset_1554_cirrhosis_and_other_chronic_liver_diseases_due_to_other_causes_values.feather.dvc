@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1554
+    date_accessed: 2023-08-14 05:42:07.707423
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Cirrhosis and other chronic liver diseases due to other causes
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e3b37802e9b47d96f8fbf3c79dd957d4
+  size: 2012082
+  path: 
+    dataset_1554_cirrhosis_and_other_chronic_liver_diseases_due_to_other_causes_values.feather

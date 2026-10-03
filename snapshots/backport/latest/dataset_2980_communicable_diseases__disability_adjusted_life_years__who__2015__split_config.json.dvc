@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2980
+    date_accessed: 2023-08-16 10:05:38.009405
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2980_communicable_diseases__disability_adjusted_life_years__who__2015__split
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f99e7c41a9745039ed69a5c5c0d59267
+  size: 2143
+  path: 
+    dataset_2980_communicable_diseases__disability_adjusted_life_years__who__2015__split_config.json

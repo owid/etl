@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1549
+    date_accessed: 2023-08-16 10:21:48.054373
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1549_other_chronic_respiratory_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: de3de022fa311d415a79b1e404ba5634
+  size: 32135
+  path: dataset_1549_other_chronic_respiratory_diseases_config.json

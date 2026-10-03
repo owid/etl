@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1961
+    date_accessed: 2023-08-16 07:27:30.711310
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1961_indicator_of_food_price_anomalies (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6c86adee72730cac19b319f5ea25834c
+  size: 5480
+  path: dataset_1961_indicator_of_food_price_anomalies_config.json

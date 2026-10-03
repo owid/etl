@@ -1,0 +1,219 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Biodiversity
+        - Fish & Overfishing
+    unit: whales
+    processing_level: minor
+    description_from_producer: |-
+      - The year is the "defined catch year," usually the year in which all catches were taken. For Antarctic operations it is defined as the start of the season (e.g. for the 1985/86 Antarctic Season the year is 1985).
+      - The country is the country of the operating company.
+      - All numbers include lost whales (whales that were injured or killed but then lost at sea).
+  catch_types: &catch_types
+    - "*Commercial* catches are those taken for commercial purposes, including those taken under objection or reservation."
+    - "*Aboriginal substinence* catches are those taken by indigenous peoples for subsistence. This means the meat and other products from the whales are used for food, shelter, clothing, and tools, and are not sold or traded."
+    - "*Illegal* catches are those taken in violation of IWC regulations, such as by non-member countries or in protected areas."
+    - "*Special permit* catches are those taken under a special permit issued by the IWC for scientific research or other purposes."
+    - "*Commercial under objection* catches are those taken by countries that have lodged an objection to the moratorium on commercial whaling, but are still subject to IWC regulations."
+    - "*Commercial under reservation* catches are those taken by countries that have lodged a reservation to the moratorium on commercial whaling, but are still subject to IWC regulations."
+    - "*No catch* indicates that no whales were caught."
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  # Total catches by country and year (all catch types combined)
+  whaling_total_catches:
+    variables:
+      total_whales_caught_total:
+        title: Total whales caught
+        description_short: Annual number of whales caught by whalers across all species. Includes Fin, Humpback, Sei, Bryde's, Minke, Gray, Bowhead, Right, and Sperm Whales.
+        display:
+          name: Total whales caught
+          numDecimalPlaces: 0
+      blue_whales_caught_total:
+        title: Blue whales caught
+        description_short: Annual number of blue whales (*Balaenoptera musculus*) caught by whalers.
+        display:
+          name: Blue whales caught
+          numDecimalPlaces: 0
+      pygmy_blue_whales_caught_total:
+        title: Pygmy blue whales caught
+        description_short: Annual number of pygmy blue whales (*Balaenoptera musculus brevicauda*) caught by whalers.
+        display:
+          name: Pygmy blue whales caught
+          numDecimalPlaces: 0
+      fin_whales_caught_total:
+        title: Fin whales caught
+        description_short: Annual number of fin whales (*Balaenoptera physalus*) caught by whalers.
+        display:
+          name: Fin whales caught
+          numDecimalPlaces: 0
+      sperm_whales_caught_total:
+        title: Sperm whales caught
+        description_short: Annual number of sperm whales (*Physeter macrocephalus*) caught by whalers.
+        display:
+          name: Sperm whales caught
+          numDecimalPlaces: 0
+      humpback_whales_caught_total:
+        title: Humpback whales caught
+        description_short: Annual number of humpback whales (*Megaptera novaeangliae*) caught by whalers.
+        display:
+          name: Humpback whales caught
+          numDecimalPlaces: 0
+      sei_whales_caught_total:
+        title: Sei whales caught
+        description_short: Annual number of sei whales (*Balaenoptera borealis*) caught by whalers.
+        display:
+          name: Sei whales caught
+          numDecimalPlaces: 0
+      brydes_whales_caught_total:
+        title: Bryde's whales caught
+        description_short: Annual number of Bryde's whales (*Balaenoptera edeni*) caught by whalers.
+        display:
+          name: Bryde's whales caught
+          numDecimalPlaces: 0
+      common_minke_whales_caught_total:
+        title: Common minke whales caught
+        description_short: Annual number of common minke whales (*Balaenoptera acutorostrata*) caught by whalers.
+        display:
+          name: Common minke whales caught
+          numDecimalPlaces: 0
+      antarctic_minke_whales_caught_total:
+        title: Antarctic minke whales caught
+        description_short: Annual number of Antarctic minke whales (*Balaenoptera bonaerensis*) caught by whalers.
+        display:
+          name: Antarctic minke whales caught
+          numDecimalPlaces: 0
+      gray_whales_caught_total:
+        title: Gray whales caught
+        description_short: Annual number of gray whales (*Eschrichtius robustus*) caught by whalers.
+        display:
+          name: Gray whales caught
+          numDecimalPlaces: 0
+      bowhead_whales_caught_total:
+        title: Bowhead whales caught
+        description_short: Annual number of bowhead whales (*Balaena mysticetus*) caught by whalers.
+        display:
+          name: Bowhead whales caught
+          numDecimalPlaces: 0
+      right_whales_caught_total:
+        title: Right whales caught
+        description_short: Annual number of right whales (*Eubalaena* spp.) caught by whalers.
+        display:
+          name: Right whales caught
+          numDecimalPlaces: 0
+      unspecified_large_whales_caught_total:
+        title: Unspecified large whales caught
+        description_short: Annual number of large whales caught by whalers where the species was not recorded.
+        display:
+          name: Unspecified large whales caught
+          numDecimalPlaces: 0
+
+  # Catches by country, year, and catch type
+  whaling_total_catches_type:
+    variables:
+      total_whales_caught:
+        title: Total whales caught
+        description_short: Annual number of whales caught by whalers, by catch type. Includes Fin, Humpback, Sei, Bryde's, Minke, Gray, Bowhead, Right, and Sperm Whales.
+        description_key: *catch_types
+        display:
+          name: Total whales caught
+          numDecimalPlaces: 0
+      blue_whales_caught:
+        title: Blue whales caught
+        description_short: Annual number of blue whales (*Balaenoptera musculus*) caught by whalers.
+        description_key: *catch_types
+        display:
+          name: Blue whales caught
+          numDecimalPlaces: 0
+      pygmy_blue_whales_caught:
+        title: Pygmy blue whales caught
+        description_short: Annual number of pygmy blue whales (*Balaenoptera musculus brevicauda*) caught by whalers.
+        description_key: *catch_types
+        display:
+          name: Pygmy blue whales caught
+          numDecimalPlaces: 0
+      fin_whales_caught:
+        title: Fin whales caught
+        description_short: Annual number of fin whales (*Balaenoptera physalus*) caught by whalers.
+        description_key: *catch_types
+        display:
+          name: Fin whales caught
+          numDecimalPlaces: 0
+      sperm_whales_caught:
+        title: Sperm whales caught
+        description_short: Annual number of sperm whales (*Physeter macrocephalus*) caught by whalers.
+        description_key: *catch_types
+        display:
+          name: Sperm whales caught
+          numDecimalPlaces: 0
+      humpback_whales_caught:
+        title: Humpback whales caught
+        description_short: Annual number of humpback whales (*Megaptera novaeangliae*) caught by whalers.
+        description_key: *catch_types
+        display:
+          name: Humpback whales caught
+          numDecimalPlaces: 0
+      sei_whales_caught:
+        title: Sei whales caught
+        description_short: Annual number of sei whales (*Balaenoptera borealis*) caught by whalers.
+        description_key: *catch_types
+        display:
+          name: Sei whales caught
+          numDecimalPlaces: 0
+      brydes_whales_caught:
+        title: Bryde's whales caught
+        description_short: Annual number of Bryde's whales (*Balaenoptera edeni*) caught by whalers.
+        description_key: *catch_types
+        display:
+          name: Bryde's whales caught
+          numDecimalPlaces: 0
+      common_minke_whales_caught:
+        title: Common minke whales caught
+        description_short: Annual number of common minke whales (*Balaenoptera acutorostrata*) caught by whalers.
+        description_key: *catch_types
+        display:
+          name: Common minke whales caught
+          numDecimalPlaces: 0
+      antarctic_minke_whales_caught:
+        title: Antarctic minke whales caught
+        description_short: Annual number of Antarctic minke whales (*Balaenoptera bonaerensis*) caught by whalers.
+        description_key: *catch_types
+        display:
+          name: Antarctic minke whales caught
+          numDecimalPlaces: 0
+      gray_whales_caught:
+        title: Gray whales caught
+        description_short: Annual number of gray whales (*Eschrichtius robustus*) caught by whalers.
+        description_key: *catch_types
+        display:
+          name: Gray whales caught
+          numDecimalPlaces: 0
+      bowhead_whales_caught:
+        title: Bowhead whales caught
+        description_short: Annual number of bowhead whales (*Balaena mysticetus*) caught by whalers.
+        description_key: *catch_types
+        display:
+          name: Bowhead whales caught
+          numDecimalPlaces: 0
+      right_whales_caught:
+        title: Right whales caught
+        description_short: Annual number of right whales (*Eubalaena* spp.) caught by whalers.
+        description_key: *catch_types
+        display:
+          name: Right whales caught
+          numDecimalPlaces: 0
+      unspecified_large_whales_caught:
+        title: Unspecified large whales caught
+        description_short: Annual number of large whales caught by whalers where the species was not recorded.
+        description_key: *catch_types
+        display:
+          name: Unspecified large whales caught
+          numDecimalPlaces: 0

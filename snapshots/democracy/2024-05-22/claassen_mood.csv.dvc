@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Democratic Mood
+    description: |-
+      Democratic mood measures the extent to which the public of a given country supports a democratic political system and opposes any autocratic alternatives. In contrast to satisfaction with democracy, democratic mood captures principled support for democracy. It is measured by applying a Bayesian latent variable model to aggregated survey data from a wide variety of cross-national survey projects. The latest update provides estimates for 141 countries, with estimates beginning in 1988 (for some cases) and ranging until 2020.
+
+      The Bayesian model is developed and described in this article (http://doi.org/10.1017/pan.2018.32). The mood estimates are extended and applied in several additional articles (https://doi.org/10.1111/ajps.12452, https://doi.org/10.1017/S0003055419000558, https://doi.org/10.1177/00104140211036042). This choropleth shows democratic mood in 2020.
+
+    date_published: "2022-06-01"
+
+    # Citation
+    producer: Claassen
+    citation_full: |-
+      Claassen C. Estimating Smooth Country–Year Panels of Public Opinion. Political Analysis. 2019;27(1):1-20. doi:10.1017/pan.2018.32
+
+    # Files
+    url_main: http://chrisclaassen.com/data.html
+    url_download: http://chrisclaassen.com/docs/mood_est_v5.csv
+    date_accessed: 2024-05-22
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+
+outs:
+  - md5: 1d35e793bdbb1c4c589b71d0c30dbc5b
+    size: 295725
+    path: claassen_mood.csv

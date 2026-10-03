@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: OECD
+    title: OECD Statistics
+    citation_full: OECD (2019). OECD Statistics.
+    url_main: https://stats.oecd.org
+    date_accessed: '2019-01-26'
+    date_published: '2019'
+  is_public: false
+outs:
+  - md5: 3d4c8e15550e6b801a9f94739cc0554f
+    size: 4658
+    path: te_16_14.feather

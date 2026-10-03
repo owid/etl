@@ -1,0 +1,18 @@
+dataset:
+  title: Countries where DHS surveys were ongoing before termination
+  description: Countries where the Demographic and Health Surveys were ongoing in 2025 before termination.
+  licenses:
+    - {}
+tables:
+  countries_dhs_surveys_ongoing_before_termination:
+    variables:
+      dhs_survey_status:
+        title: DHS survey status
+        unit: ''
+        description: |-
+          The status of the national Demographic and Health Surveys being conducted in the country in 2025. 'Commencing' means the survey was due to start in 2025; 'fieldwork incomplete' means the data collection had commenced but was incomplete; 'fieldwork complete, final report unavailable' means the data collection had been completed but the report and analysis had not been complete or published.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

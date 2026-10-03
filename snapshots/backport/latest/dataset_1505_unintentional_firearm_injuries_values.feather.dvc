@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1505
+    date_accessed: 2023-08-10 14:32:41.917161
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Unintentional firearm injuries
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0620e461aa5e02be427fab5ddc9d63ad
+  size: 2012058
+  path: dataset_1505_unintentional_firearm_injuries_values.feather

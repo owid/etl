@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3909
+    date_accessed: 2023-08-16 08:40:59.682562
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3909_blindness_and_vision_impairment (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e2d5ea888a3d86f71ea8d72d1579653a
+  size: 16910
+  path: dataset_3909_blindness_and_vision_impairment_config.json

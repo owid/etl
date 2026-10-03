@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2544
+    date_accessed: 2023-08-14 15:05:05.734836
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2544_public_sector__taxation_and_market_regulation__table_iii_3_self_employed_social_security_contribution_rates
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5f6fff5492f905a786f91b1229d9ca11
+  size: 85298
+  path: 
+    dataset_2544_public_sector__taxation_and_market_regulation__table_iii_3_self_employed_social_security_contribution_rates_config.json

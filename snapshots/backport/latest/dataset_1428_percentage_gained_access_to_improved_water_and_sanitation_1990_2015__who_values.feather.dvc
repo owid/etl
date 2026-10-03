@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1428
+    date_accessed: 2023-08-16 10:08:18.123811
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Percentage gained access to improved water and sanitation 1990-2015 - WHO
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 69353b3926a32bfd628e46db278cb02e
+  size: 6666
+  path: 
+    dataset_1428_percentage_gained_access_to_improved_water_and_sanitation_1990_2015__who_values.feather

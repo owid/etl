@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1065
+    date_accessed: 2023-08-14 05:33:25.894766
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank Global Findex - Poverty: Poverty rates'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 05b5480c61396598475669096728dea1
+  size: 7938
+  path: dataset_1065_world_bank_global_findex__poverty__poverty_rates_values.feather

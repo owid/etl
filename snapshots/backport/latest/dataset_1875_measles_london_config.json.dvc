@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1875
+    date_accessed: 2023-08-10 09:25:11.836453
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1875_measles_london
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b91d9eb8c784ec9e78127f3c588b68b0
+  size: 1580
+  path: dataset_1875_measles_london_config.json

@@ -1,0 +1,27 @@
+dataset:
+  title: Clio-Infra - Biological Standards of Living - Baten and Blum (2015)
+  owners:
+    - Aibek Aldabergenov  # backport
+tables:
+  clio_infra__biological_standards_of_living__baten_and_blum__2015:
+    variables:
+      height__baten_and_blum_2015:
+        title: Height (Baten and Blum 2015)
+        unit: cm
+        short_unit: cm
+        description_short: Heights by birth decade and country, both before and after 1800.
+      height_gini__baten_and_blum_2015:
+        title: Height Gini (Baten and Blum 2015)
+        unit: Gini
+        short_unit: Gini
+        description_short: |-
+          Proxy for inequality of human health and welfare. The higher a country's gini coefficient, the greater the degree of inequality.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

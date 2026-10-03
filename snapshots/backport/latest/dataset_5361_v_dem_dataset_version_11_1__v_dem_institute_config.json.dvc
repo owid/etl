@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5361
+    date_accessed: 2023-08-16 09:29:37.769934
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5361_v_dem_dataset_version_11_1__v_dem_institute
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d94e395cab899780b5dc71d31431dbc4
+  size: 855034
+  path: dataset_5361_v_dem_dataset_version_11_1__v_dem_institute_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2979
+    date_accessed: 2023-08-11 07:52:56.172365
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Death magnitude (PITF) (split)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c97fee13529f42fb2a352d509735d547
+  size: 7090
+  path: dataset_2979_death_magnitude__pitf__split_values.feather

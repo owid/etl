@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2632
+    date_accessed: 2023-08-16 07:19:56.800084
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2632_education_and_training__educational_attainment_and_labour_force_status
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5f5d35cb13d22226246a279c59709077
+  size: 88072
+  path: 
+    dataset_2632_education_and_training__educational_attainment_and_labour_force_status_config.json

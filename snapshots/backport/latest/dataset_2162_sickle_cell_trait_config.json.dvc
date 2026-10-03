@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2162
+    date_accessed: 2023-08-16 08:29:03.844042
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2162_sickle_cell_trait (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7dd1f1f9232082600bc5cf30eff22acd
+  size: 32578
+  path: dataset_2162_sickle_cell_trait_config.json

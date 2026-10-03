@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2047
+    date_accessed: 2023-08-14 15:11:49.290240
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Average tariffs faced by developing countries, least developed countries and
+    small island developing States
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 819f3fcb56bc4e8df3bc4f8781c0f134
+  size: 6474
+  path: 
+    dataset_2047_average_tariffs_faced_by_developing_countries__least_developed_countries_and_small_island_developing_states_values.feather

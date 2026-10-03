@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1767
+    date_accessed: 2023-08-14 14:33:14.822794
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1767_occupational_exposure_to_formaldehyde (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e3e2d7b97eee7e69990ae98e4350713f
+  size: 22388
+  path: dataset_1767_occupational_exposure_to_formaldehyde_config.json

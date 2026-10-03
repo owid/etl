@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2654
+    date_accessed: 2023-08-16 10:09:10.175741
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Social Protection and Well-being - Social Expenditure - Reference series
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2c08ea3c98d0e4d0a8db45076188f3c6
+  size: 28226
+  path: 
+    dataset_2654_social_protection_and_well_being__social_expenditure__reference_series_values.feather

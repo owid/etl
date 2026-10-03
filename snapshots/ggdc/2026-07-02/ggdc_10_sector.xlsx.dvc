@@ -1,0 +1,35 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: GGDC 10-Sector Database
+    description: |-
+      The GGDC 10-Sector Database provides a long-run internationally comparable dataset on sectoral productivity performance in Africa, Asia, and Latin America. Variables covered in the data set are annual series of value added, output deflators, and persons employed for 10 broad sectors.
+
+      The GGDC 10-Sector Database gives sector detail to the historical macro data in Maddison (2003) from 1950 onwards. It consists of series for 11 countries in Africa, 11 countries in Asia, 2 countries in the Middle East and North Africa, and 9 in Latin-America. For comparison, we have also added data for the US and several European countries.
+
+      It should be stressed that the estimates for the total economy are aggregated across sectors and that, because of adjustments at the sector level, the aggregate results are not fully consistent with the national accounts aggregates (see the sources and methods document). Also note that value added data in this database are expressed in local currencies.
+    date_published: "2015-01-01"
+    version_producer: 2014 release, updated January 2015
+
+    # Citation
+    producer: Timmer et al.
+    citation_full: |-
+      Timmer, M. P., de Vries, G. J., & de Vries, K. (2015). “Patterns of Structural Change in Developing Countries.” . In J. Weiss, & M. Tribe (Eds.), Routledge Handbook of Industry and Development. (pp. 65-83). Routledge.
+    attribution: Timmer et al. – GGDC 10-Sector Database 2014
+    attribution_short: GGDC 10-Sector Database
+
+    # Files
+    url_main: https://www.rug.nl/ggdc/structuralchange/previous-sector-database/10-sector-2014
+    url_download: https://www.rug.nl/ggdc/docs/10sd_jan15_2014.xlsx
+    date_accessed: '2026-07-02'
+
+    # License
+    license:
+      name: Free to use with citation
+      url: https://www.rug.nl/ggdc/structuralchange/previous-sector-database/10-sector-2014
+outs:
+  - md5: a6977dd3c4895d5a4ac56b4713b7614f
+    size: 1299476
+    path: ggdc_10_sector.xlsx

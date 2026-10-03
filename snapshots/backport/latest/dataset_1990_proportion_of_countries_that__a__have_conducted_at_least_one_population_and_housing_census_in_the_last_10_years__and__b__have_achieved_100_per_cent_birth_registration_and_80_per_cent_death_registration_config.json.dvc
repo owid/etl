@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1990
+    date_accessed: 2023-08-16 08:28:48.583398
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1990_proportion_of_countries_that__a__have_conducted_at_least_one_population_and_housing_census_in_the_last_10_years__and__b__have_achieved_100_per_cent_birth_registration_and_80_per_cent_death_registration
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7615ca1b56aafcee445928a11c392d2a
+  size: 8766
+  path: 
+    dataset_1990_proportion_of_countries_that__a__have_conducted_at_least_one_population_and_housing_census_in_the_last_10_years__and__b__have_achieved_100_per_cent_birth_registration_and_80_per_cent_death_registration_config.json

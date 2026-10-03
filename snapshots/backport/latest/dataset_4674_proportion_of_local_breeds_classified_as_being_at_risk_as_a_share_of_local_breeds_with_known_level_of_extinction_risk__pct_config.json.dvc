@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4674
+    date_accessed: 2023-08-16 07:26:28.441157
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4674_proportion_of_local_breeds_classified_as_being_at_risk_as_a_share_of_local_breeds_with_known_level_of_extinction_risk__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 41d5136b5e8f50b04724d922c1b47e41
+  size: 11966
+  path: 
+    dataset_4674_proportion_of_local_breeds_classified_as_being_at_risk_as_a_share_of_local_breeds_with_known_level_of_extinction_risk__pct_config.json

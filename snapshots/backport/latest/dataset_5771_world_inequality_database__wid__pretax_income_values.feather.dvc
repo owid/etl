@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5771
+    date_accessed: 2023-08-16 10:10:57.376100
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Inequality Database (WID) - Pretax income
+  description: Will be updated after WID's revision of the method to merge long run
+    series for some countries (esp. Europe). Several countries do not have data before
+    1981 because of this.
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f8f8d3e4727b493e6e7f91acf3560b33
+  size: 1961786
+  path: dataset_5771_world_inequality_database__wid__pretax_income_values.feather

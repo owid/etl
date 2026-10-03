@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The development of income distribution and income poverty in the old federal states from 1962 to 1988
+    description: |-
+      Share living below 50% of the median for disposable household income in West Germany from 1962 to 1988
+    date_published: "1997"
+
+    # Citation
+    producer: Becker
+    citation_full: |-
+      - Becker, I. (1997). Die Entwicklung der Einkommensverteilung und der Einkommensarmut in den alten Bundesländern von 1962 bis 1988 [The development of income distribution and income poverty in the old federal states between 1962 and 1988] in Becker, I. and Hauser, R., editors, Einkommensverteilung und Armut : Deutschland auf dem Weg zur Vierfünftel-Gessellschaft? [Income distribution and poverty: Is Germany on the way to a four-fifths society?], Campus, Frankfurt.
+
+    # Files
+    url_main: https://cir.nii.ac.jp/crid/1130282270435391616
+    date_accessed: 2024-10-24
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://cir.nii.ac.jp/crid/1130282270435391616
+
+outs:
+  - md5: 0c10d2ceae902324f9af7863f95bc826
+    size: 142
+    path: becker_1997_germany_relative_poverty.csv

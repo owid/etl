@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2174
+    date_accessed: 2023-08-16 09:53:56.176866
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Zika virus
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 72bfafd58c143c0489d9deb6d237a214
+  size: 218882
+  path: dataset_2174_zika_virus_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1641
+    date_accessed: 2023-08-14 14:33:25.891276
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Urinary diseases and male infertility
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d0d2c1e525ccd154b84b79b7f7ba42cd
+  size: 2012058
+  path: dataset_1641_urinary_diseases_and_male_infertility_values.feather

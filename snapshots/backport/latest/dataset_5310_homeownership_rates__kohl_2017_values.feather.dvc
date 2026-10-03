@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5310
+    date_accessed: 2023-08-16 09:54:24.183880
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Homeownership rates (Kohl 2017)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 881cd278d0125b09d0d9dea4859d9062
+  size: 18970
+  path: dataset_5310_homeownership_rates__kohl_2017_values.feather

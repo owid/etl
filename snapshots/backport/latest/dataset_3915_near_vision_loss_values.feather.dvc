@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3915
+    date_accessed: 2023-08-10 14:50:01.011782
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Near vision loss
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f91c1c44b8351f4d6c08652ec6c3d624
+  size: 1011346
+  path: dataset_3915_near_vision_loss_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1813
+    date_accessed: 2023-08-16 08:39:04.466221
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1813_alcohol_use (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 97790785812a3548528778b46b528283
+  size: 21865
+  path: dataset_1813_alcohol_use_config.json

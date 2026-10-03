@@ -1,0 +1,28 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5026
+    date_accessed: 2023-08-16 09:47:50.966597
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emissions - Agriculture: Manure left on Pasture'
+  description: GHG emissions from manure left on pastures consist of direct and indirect
+    nitrous oxide (N2O) emissions from manure nitrogen (N) left on pastures by grazing
+    livestock. Specifically, N2O is produced by microbial processes of nitrification
+    and de-nitrification taking place on the deposition site (direct emissions), and
+    after volatilization/re-deposition and leaching processes (indirect emissions).  The
+    FAOSTAT emissions database is computed following Tier 1 IPCC 2006 Guidelines for
+    National GHG Inventories vol. 4, ch. 10 and 11 (http://www.ipcc-nggip.iges.or.jp/public/2006gl/vol4.html).
+    GHG emissions are provided by country, regions and special groups, with global
+    coverage, relative to the period 1961-present (with annual updates) and with projections
+    for 2030 and 2050, expressed as direct, indirect and total Gg N2O and Gg CO2eq,
+    by livestock species (asses, buffaloes, camels, cattle (dairy and non-dairy),
+    chickens (broilers and layers), ducks, goats, horses, llamas, mules, sheep, swine
+    (breeding, market), turkeys) and by species aggregates (all animals, camels and
+    llamas, cattle, chickens, mules and asses, poultry birds, sheep and goats, swine).
+    Implied emission factor for N2O and N content in manure are also provided.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7355fdc0a4e4c0fb7879e652c7da6571
+  size: 13021570
+  path: dataset_5026_emissions__agriculture__manure_left_on_pasture_values.feather

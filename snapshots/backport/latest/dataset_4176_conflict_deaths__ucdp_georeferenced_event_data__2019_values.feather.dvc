@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4176
+    date_accessed: 2023-08-16 08:41:11.272698
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Conflict deaths – UCDP Georeferenced Event Data (2019)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 38740dc532fe3890da1a67d058279568
+  size: 34634
+  path: dataset_4176_conflict_deaths__ucdp_georeferenced_event_data__2019_values.feather

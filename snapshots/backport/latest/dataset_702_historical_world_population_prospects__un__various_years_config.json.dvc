@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/702
+    date_accessed: 2023-08-10 07:45:30.823272
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_702_historical_world_population_prospects__un__various_years
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5d5018fe4f7644c236565168a20c4c93
+  size: 10367
+  path: dataset_702_historical_world_population_prospects__un__various_years_config.json

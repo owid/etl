@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2035
+    date_accessed: 2023-08-14 05:45:33.263112
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of urban population living in slums, informal settlements or inadequate
+    housing
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9281c62bf1a389b73296823ffd9fe50a
+  size: 12562
+  path: 
+    dataset_2035_proportion_of_urban_population_living_in_slums__informal_settlements_or_inadequate_housing_values.feather

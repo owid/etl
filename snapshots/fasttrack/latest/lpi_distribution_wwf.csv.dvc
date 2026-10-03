@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: |-
+      Deinet S, Marconi V, Freeman R, Puleston H, McRae L. Living Planet Report 2024 Technical Supplement: Living Planet Index. ZSL, 2024.
+    title: lpi_distribution_wwf
+    citation_full: |-
+      Deinet S, Marconi V, Freeman R, Puleston H, McRae L. Living Planet Report 2024 Technical Supplement: Living Planet Index. ZSL, 2024.
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTI2UmQ2KHg8QFdOqcsEeQXykSFVrOALWTWFkKW6ABdrOkkUJ5lsouRl7y8MSiI3p5eTYYLYt5wCfzW/pub?output=csv
+    date_accessed: '2024-10-04'
+  name: Living Planet Index distributions (WWF, 2024)
+  description: ''
+  license: {}
+outs:
+  - md5: b69b441b5379d0c1457c4029ffdea27a
+    size: 205
+    path: lpi_distribution_wwf.csv

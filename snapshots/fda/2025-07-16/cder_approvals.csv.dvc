@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "CDER New Molecular Entity (NME) Drug and New Biologic Approvals"
+    description: |-
+      This dataset provides a listing of all new drugs approved from 1985 – 2024 and regulated by the Center for Drug Evaluation and Research (CDER). The listed drugs include both small molecule drugs approved under a New Drug Application (NDA) and new biological products approved under a Biologics License Application (BLA). The product information, indications, and regulatory characteristics described in the compilation reflect the state of each application at the time of original marketing approval.
+
+      This dataset is a subset of all drugs approved by the FDA, as it does not include any biologics approved by the Center for Biologics Evaluation and Research (CBER) such as vaccines, allergenic products, or blood and blood components. It also does not include generic drugs or reformulations of existing drugs.
+    date_published: "2025"
+
+    # Citation
+    producer: US Food and Drug Administration
+    citation_full: |-
+      Compilation of CDER New Molecular Entity (NME) Drug and New Biologic Approvals, United States Food and Drug Administration, https://www.fda.gov/drugs/drug-approvals-and-databases/compilation-cder-new-molecular-entity-nme-drug-and-new-biologic-approvals, (2025)
+    attribution_short: FDA
+
+    # Files
+    url_main: https://www.fda.gov/drugs/drug-approvals-and-databases/compilation-cder-new-molecular-entity-nme-drug-and-new-biologic-approvals
+    url_download: https://www.fda.gov/media/177921/download?attachment
+    date_accessed: '2025-07-16'
+
+    # License
+    license:
+      name: CC0
+      url: https://open.fda.gov/license/
+outs:
+  - md5: 14ff3b5fabd195862303b10a2e98aff5
+    size: 538000
+    path: cder_approvals.csv

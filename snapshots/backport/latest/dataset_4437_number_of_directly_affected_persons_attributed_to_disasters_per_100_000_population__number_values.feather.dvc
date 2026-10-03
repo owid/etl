@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4437
+    date_accessed: 2023-08-16 09:33:50.248948
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of directly affected persons attributed to disasters per 100,000 population
+    (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 41bcab7922fd9c33ae71489a741212c6
+  size: 16586
+  path: 
+    dataset_4437_number_of_directly_affected_persons_attributed_to_disasters_per_100_000_population__number_values.feather

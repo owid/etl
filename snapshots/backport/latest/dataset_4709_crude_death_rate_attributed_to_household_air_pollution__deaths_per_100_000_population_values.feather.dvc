@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4709
+    date_accessed: 2023-08-14 15:38:30.772675
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Crude death rate attributed to household air pollution (deaths per 100,000
+    population)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 883f47ce9549e849721003642c35f514
+  size: 11834
+  path: 
+    dataset_4709_crude_death_rate_attributed_to_household_air_pollution__deaths_per_100_000_population_values.feather

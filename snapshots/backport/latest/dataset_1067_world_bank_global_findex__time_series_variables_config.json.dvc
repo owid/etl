@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1067
+    date_accessed: 2023-08-16 10:22:22.890292
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1067_world_bank_global_findex__time_series_variables
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 56e049afbc472b8fc13f7de78e7268ae
+  size: 136785
+  path: dataset_1067_world_bank_global_findex__time_series_variables_config.json

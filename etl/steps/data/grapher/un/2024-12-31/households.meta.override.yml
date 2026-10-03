@@ -1,0 +1,9 @@
+tables:
+  households:
+    variables:
+      single_parent_with_children_separate:
+        title: Share of single-parent households
+        display:
+          name: Share of single-parent households
+        presentation:
+          title_public: Share of single-parent households

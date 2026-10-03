@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5003
+    date_accessed: 2023-08-14 14:36:30.811053
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5003_agri_environmental_indicators__fertilizers_indicators
+    (archived)
+  description: The data describe the use of chemical and mineral fertilizers per area
+    of cropland (which corresponds to the sum of arable land and permanent crops)
+    at national, regional, and global level in a time series from 2002 to 2017
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d127452e4b8bd13d5f48efa66f312e07
+  size: 4628
+  path: dataset_5003_agri_environmental_indicators__fertilizers_indicators_config.json

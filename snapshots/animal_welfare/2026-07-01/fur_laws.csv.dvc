@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: Fur Free Alliance
+    title: Fur banning
+    description: Legal status of fur farming around the world.
+    citation_full: Overview national fur legislation, Fur Free Alliance (2026).
+    url_main: https://www.furfreealliance.com/fur-bans/
+    url_download: https://docs.google.com/spreadsheets/d/e/2PACX-1vQdZEyJfdG9ErXc6ynqK9j6fD7yU957urqiATFHuz0xbW0kSBZJb5NUeAoSvEhahRnOcraN1smSykrE/pub?output=csv
+    date_accessed: '2026-07-01'
+    date_published: '2026-07-01'
+    license:
+      name: CC BY 4.0
+      url: https://www.furfreealliance.com/fur-bans/
+outs:
+  - md5: 126547a7007334f3aff14c1cffb7bd14
+    size: 44836
+    path: fur_laws.csv

@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Total Whaling Catches (IWC)
+    description: |-
+      List of annual whale catches by the International Whaling Commission. Includes catches since the moratorium came into place in the 1985/6 Antarctic Season.  No blue whales (including pygmy blue whales) or right whales have been caught since the moratorium took effect and therefore neither species is listed in the catches.
+    date_published: "2026"
+
+    # Citation
+    producer: International Whaling Commission (IWC)
+    citation_full: |-
+      International Whaling Commission (2026), "Total Catches." IWC, iwc.int/management-and-conservation/whaling/total-catches
+    attribution_short: IWC
+
+    # Files
+    url_main: https://iwc.int/management-and-conservation/whaling/total-catches
+    # direct download doesn't work (403 error), but this is the URL that the file is downloaded from when clicking the download button on the webpage
+    url_download: https://iwc.int/total-catches20.download
+    date_accessed: "2026-05-29"
+
+    # License
+    license:
+      name: Copyright © International Whaling Commission 2026
+      url: https://iwc.int/management-and-conservation/whaling/total-catches
+
+outs:
+  - md5: f50c2809b46160904ea016272ce2a1a0
+    size: 93436
+    path: whaling_total_catches.xlsx

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/907
+    date_accessed: 2023-08-16 07:28:31.369695
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank EdStats - Laber
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b7bd7580f4c0abd75d9fe0b18df27b09
+  size: 17026
+  path: dataset_907_world_bank_edstats__laber_values.feather

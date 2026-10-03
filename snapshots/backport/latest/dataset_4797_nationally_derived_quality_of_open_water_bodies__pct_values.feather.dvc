@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4797
+    date_accessed: 2023-08-16 08:17:41.323654
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Nationally derived quality of open water bodies(%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c18463b93e69edd9b210151be4331933
+  size: 6810
+  path: dataset_4797_nationally_derived_quality_of_open_water_bodies__pct_values.feather

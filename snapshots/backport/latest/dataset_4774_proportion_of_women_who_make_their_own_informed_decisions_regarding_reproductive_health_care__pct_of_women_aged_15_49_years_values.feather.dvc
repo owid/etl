@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4774
+    date_accessed: 2023-08-11 07:12:38.485818
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of women who make their own informed decisions regarding reproductive
+    health care (% of women aged 15-49 years)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2fae958ababf6b34d6ded343ade3abdf
+  size: 8290
+  path: 
+    dataset_4774_proportion_of_women_who_make_their_own_informed_decisions_regarding_reproductive_health_care__pct_of_women_aged_15_49_years_values.feather

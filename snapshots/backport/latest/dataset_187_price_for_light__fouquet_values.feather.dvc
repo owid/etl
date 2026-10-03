@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/187
+    date_accessed: 2023-08-10 08:58:54.300843
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Price for Light – Fouquet
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 09df8ad6384c6db08d33a667f1ca3d56
+  size: 12882
+  path: dataset_187_price_for_light__fouquet_values.feather

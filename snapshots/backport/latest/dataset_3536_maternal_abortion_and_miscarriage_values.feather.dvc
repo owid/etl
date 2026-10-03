@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3536
+    date_accessed: 2023-08-11 07:35:43.901394
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Maternal abortion and miscarriage
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6410a9d939ba28c55d0e7a7a29062561
+  size: 1499498
+  path: dataset_3536_maternal_abortion_and_miscarriage_values.feather

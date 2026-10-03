@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1925
+    date_accessed: 2023-08-16 08:47:02.484775
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Total gross official disbursements for medical research and basic heath sectors
+    - OECD
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 434e0f9af1e71bfc3b19c07a1dfdd51c
+  size: 27082
+  path: 
+    dataset_1925_total_gross_official_disbursements_for_medical_research_and_basic_heath_sectors__oecd_values.feather

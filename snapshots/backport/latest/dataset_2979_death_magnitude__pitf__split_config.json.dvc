@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2979
+    date_accessed: 2023-08-11 07:52:48.371522
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2979_death_magnitude__pitf__split (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 116e2dd06e3e16f498b5860cfff9278c
+  size: 2227
+  path: dataset_2979_death_magnitude__pitf__split_config.json

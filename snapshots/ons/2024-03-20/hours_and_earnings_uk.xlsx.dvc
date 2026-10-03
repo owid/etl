@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Annual Survey of Hours and Earnings time series of selected estimates
+    description: |-
+      Selected annual estimates of earnings and paid hours worked by UK employees using ASHE data from 1997 to 2023.
+    date_published: "2023-11-01"
+
+    # Citation
+    producer: Office for National Statistics (ONS)
+    citation_full: |-
+      Office for National Statistics (ONS), released 1 November 2023, ONS website, dataset, Annual Survey of Hours and Earnings time series of selected estimates, UK. Retrieved 20 March 2024.
+    attribution_short: ONS
+
+    # Files
+    url_main: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/ashe1997to2015selectedestimates
+    url_download: https://www.ons.gov.uk/file?uri=/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/ashe1997to2015selectedestimates/current/selectedestimates19972023.xlsx
+    date_accessed: 2024-03-20
+
+    # License
+    license:
+      name: Open Government Licence v3.0
+      url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+
+outs:
+  - md5: ea8210e7d85c6f913a417dcdc856079e
+    size: 278446
+    path: hours_and_earnings_uk.xlsx

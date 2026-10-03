@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: Corak
+    title: 'Inequality from generation to generation: the United States in comparison'
+    citation_full: 'Miles Corak. 2013. ''Inequality from Generation to Generation: The United States in Comparison.'' In The Economics of Inequality, Poverty, and Discrimination in the 21st Century, edited by Robert S. Rycroft. Santa Barbara, CA: Greenwood Pub Group.'
+    url_main: https://milescorak.files.wordpress.com/2012/01/inequality-from-generation-to-generation-the-united-states-in-comparison-v3.pdf
+    date_accessed: '2019-01-07'
+    date_published: '2013'
+  is_public: false
+outs:
+  - md5: 6b858f15140ef086eb3dd7348ebff9ef
+    size: 4466
+    path: figure_19_11.feather

@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Hours of work
+    description: |-
+      With the aim of promoting international comparability, statistics presented on ILOSTAT are based on standard international definitions wherever feasible and may differ from official national figures. This series is based on the 13th ICLS definitions. For time series comparability, it includes countries that have implemented the 19th ICLS standards, for which data are also available in the Work Statistics -- 19th ICLS (WORK) database. Data on hours of work are presented, whenever possible, on the basis of the average number of hours of work per week, and with reference to hours worked in the main (paid) job regardless of working time arrangements (e.g. full-time and part-time). Data disaggregated by economic activity are provided according to the latest version of the International Standard Industrial Classification of All Economic Activities (ISIC) available for that year. Data may have been regrouped from national classifications, which may not be strictly compatible with ISIC. Data disaggregated by level of education are provided on the highest level of education completed, classified according to the International Standard Classification of Education (ISCED). Data may have been regrouped from national classifications, which may not be strictly compatible with ISCED. For more information, refer to the Wages and Working Time Statistics (COND) database description.
+
+      Data by sex includes data on both sexes (total), men (male) and women (female). Economic activity based on the International Standard Industrial Classification of All Economic Activities (ISIC). Educational attainment based on the International Standard Classification of Education (ISCED). Categories include less than basic (less than primary education), basic (primary and lower secondary education), intermediate (upper secondary and post-secondary non-tertiary education) and advanced (short-cycle tertiary education, bachelor's, master's and doctoral or equivalent levels).
+    date_published: 2023-09-09
+    # Citation
+    producer: International Labour Organization
+    citation_full: Hours of work. International Labour Organization. ILO modelled
+      estimates database, ILOSTAT. https://ilostat.ilo.org/data/.
+    attribution_short: ILOSTAT
+
+    # Files
+    url_main: https://ilostat.ilo.org/data/
+    url_download:
+      https://www.ilo.org/shinyapps/bulkexplorer18/session/7b39b17ad4d1b311e23c3828be5d8d58/download/download?w=
+
+    date_accessed: 2023-09-19
+
+    # License
+    license:
+      url: https://www.ilo.org/global/copyright/lang--en/index.htm
+      name: CC BY 4.0
+
+wdir: ../../../data/snapshots/ilostat/2023-09-19
+outs:
+- md5: fde82278c8406080615e366bfd682bc3
+  size: 496638602
+  path: average_work_hours.csv

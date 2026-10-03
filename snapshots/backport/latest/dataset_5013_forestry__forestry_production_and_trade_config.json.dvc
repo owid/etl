@@ -1,0 +1,24 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5013
+    date_accessed: 2023-08-14 05:49:03.434544
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5013_forestry__forestry_production_and_trade
+    (archived)
+  description: 'The database contains data on the production and trade in roundwood
+    and primary  wood and paper products for all countries and territories in the
+    world.The main types of primary forest products included in are: roundwood, sawnwood,
+    wood-based panels, pulp, and paper and paperboard. These products are detailed
+    further. The definitions are available. The database contains details of the following
+    topics:- Roundwood removals (production) by type of wood and assortment- Production
+    and trade in roundwood, woodfuel and other basic products- Industrial roundwood
+    by assortment and species- Sawnwood, panels and other primary products- Pulp and
+    paper & paperboard.More detailed information on wood products, including definitions,
+    can be found at  http://www.fao.org/forestry/statistics/80572/en/'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b9c55f7ba2f6b086bee5cedae50fac1d
+  size: 624036
+  path: dataset_5013_forestry__forestry_production_and_trade_config.json

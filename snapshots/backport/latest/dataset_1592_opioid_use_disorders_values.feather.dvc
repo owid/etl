@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1592
+    date_accessed: 2023-08-16 10:29:21.050483
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Opioid use disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9fc63e09760dfcf0be94f674215e8e05
+  size: 1427938
+  path: dataset_1592_opioid_use_disorders_values.feather

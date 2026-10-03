@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Bordo et al. and Federal Reserve Bank of St. Louis
+    title: Inflation before 1950 and CPI after 1950
+    description: |-
+      In the chart, two years in which deflation occurred have been omitted. If the two observations in which deflation (falling prices) occurred are included in the regression in absolute values—reflecting the fact that it is changes in prices that are unpopular—then the relationship shown in the figure is stronger. The R-squared is 0.42 compared to 0.36, and the coefficient on inflation is still negative and significant.
+    citation_full: 'Inflation before 1950: Michael Bordo, Barry Eichengreen, Daniela Klingebiel, and Maria Soledad Martinez-Peria. 2001. ''Is the crisis problem growing more severe?''. Economic Policy 16 (32) (April): pp. 52–82; CPI after 1950: Federal Reserve Bank of St. Louis. 2015. FRED.'
+    url_main: http://www.jstor.org/stable/3601034?__redirected
+    url_download: http://research.stlouisfed.org/fred2/series/CPALTT01USA661S
+    date_accessed: '2019-03-01'
+    date_published: '2015'
+  is_public: false
+outs:
+  - md5: 9a834c4e4a4f4111bfdd300ea9d9f8cd
+    size: 3194
+    path: te_15_1_inflation.feather

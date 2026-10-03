@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4814
+    date_accessed: 2023-08-16 09:49:12.820953
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Countries with users/communities participating in planning programs in rural
+    drinking-water supply, by level of participation (3 = High; 2 = Moderate; 1 =
+    Low; 0 = NA)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b0e24e4713c136b2d4f5672f31ec866e
+  size: 12250
+  path: 
+    dataset_4814_countries_with_users_communities_participating_in_planning_programs_in_rural_drinking_water_supply__by_level_of_participation__3__high__2__moderate__1__low__0__na_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4254
+    date_accessed: 2023-08-16 08:49:49.297401
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of child deaths 1950-2017 (IHME, 2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 004ed669de61ef91ae48ba323b13cffa
+  size: 21898
+  path: dataset_4254_number_of_child_deaths_1950_2017__ihme__2017_values.feather

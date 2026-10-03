@@ -1,0 +1,20 @@
+dataset:
+  title: Figure1.3b
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure1_3b:
+    variables:
+      lumen_hours_per_hour_of_labor_from_1800:
+        title: Lumen-hours per hour of labor from 1800
+        unit: ''
+        description: 'Units of measurement: Lumen-hours per hour of labor'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

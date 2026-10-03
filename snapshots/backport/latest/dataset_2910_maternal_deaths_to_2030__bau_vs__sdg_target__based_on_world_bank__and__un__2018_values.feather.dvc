@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2910
+    date_accessed: 2023-08-10 15:01:30.941307
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Maternal deaths to 2030 (BAU vs. SDG Target) - based on World Bank & UN (2018)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 80f6aeec263dbbbacac3e19d8eed836c
+  size: 46026
+  path: 
+    dataset_2910_maternal_deaths_to_2030__bau_vs__sdg_target__based_on_world_bank__and__un__2018_values.feather

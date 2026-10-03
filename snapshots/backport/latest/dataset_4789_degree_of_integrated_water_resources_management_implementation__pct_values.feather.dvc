@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4789
+    date_accessed: 2023-08-14 05:47:59.643072
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Degree of integrated water resources management implementation (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b67a64c94a455cf221c92b1f96cd8237
+  size: 12186
+  path: 
+    dataset_4789_degree_of_integrated_water_resources_management_implementation__pct_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5417
+    date_accessed: 2023-08-16 08:23:40.201284
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Disasters Severity
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0bcbcb83e258c2ee798dc3b8a5704fce
+  size: 407186
+  path: dataset_5417_disasters_severity_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/5326
+    date_accessed: 2026-03-05 12:33:02.481447+00:00
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5326_farm_size_distribution__lowder_et_al__2016
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: 16761bc5dce96f76253e8fbf06cd1011
+    size: 22772
+    path: dataset_5326_farm_size_distribution__lowder_et_al__2016_config.json

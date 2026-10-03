@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5376
+    date_accessed: 2023-08-10 08:25:49.984754
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5376_national_net_zero_targets__net_zero_tracker
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a365f8b82a41b357a23537ac5915e083
+  size: 4669
+  path: dataset_5376_national_net_zero_targets__net_zero_tracker_config.json

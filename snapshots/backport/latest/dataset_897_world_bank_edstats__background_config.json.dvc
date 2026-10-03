@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/897
+    date_accessed: 2023-08-16 10:42:02.245189
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_897_world_bank_edstats__background (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 38b36e59cab085e8f47755c8531bba5c
+  size: 3429
+  path: dataset_897_world_bank_edstats__background_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/794
+    date_accessed: 2023-08-14 15:09:30.422569
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Inputs: Employment Indicators - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2f67ade4f4c882e6685c0d82e562cbd2
+  size: 181754
+  path: dataset_794_inputs__employment_indicators__fao__2017_values.feather

@@ -1,0 +1,12 @@
+meta:
+  origin:
+    producer: Arroyo Abad and Lindert
+    title: Fiscal redistribution in the Americas since the mid-nineteenth century
+    citation_full: 'Arroyo Abad, L. and P. Lindert (2016). "Fiscal Redistribution in the Americas since the Mid-Nineteenth Century" in Latin American Inequality in the Long Run, edited by L. Bertola and J. Williamson, forthcoming.'
+    url_main: http://gpih.ucdavis.edu
+    date_accessed: '2016-09-21'
+    date_published: '2016'
+outs:
+  - md5: e91460131e1e78f3faf5d4d6734040c2
+    size: 8386
+    path: tax_composition__arroyo_abad__and_p__lindert__2016.feather

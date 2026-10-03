@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1597
+    date_accessed: 2023-08-16 10:42:27.286582
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1597_other_urinary_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fb3d1cc7731172578e35bfead89dcc61
+  size: 31655
+  path: dataset_1597_other_urinary_diseases_config.json

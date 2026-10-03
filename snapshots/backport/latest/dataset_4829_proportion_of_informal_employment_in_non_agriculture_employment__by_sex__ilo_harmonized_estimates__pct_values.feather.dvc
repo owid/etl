@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4829
+    date_accessed: 2023-08-16 09:41:16.274001
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of informal employment in non-agriculture employment, by sex (ILO
+    harmonized estimates) (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 82b39f465d8fac24fea179771738edcb
+  size: 12546
+  path: 
+    dataset_4829_proportion_of_informal_employment_in_non_agriculture_employment__by_sex__ilo_harmonized_estimates__pct_values.feather

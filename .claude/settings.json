@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(find:*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/scripts/remote_setup.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "extraKnownMarketplaces": {
+    "owid-skills-private": {
+      "source": {
+        "source": "github",
+        "repo": "owid/skills-private"
+      },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": {
+    "owid-staff@owid-skills-private": true
+  }
+}

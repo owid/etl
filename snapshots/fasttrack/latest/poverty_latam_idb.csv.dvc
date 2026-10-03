@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Chang, Evans and Rivas Herrera (2024). Inter-American Development Bank.
+    title: Ten Findings about Poverty in Latin America and the Caribbean
+    url_main: |-
+      https://publications.iadb.org/en/publications/english/viewer/Ten-Findings-about-Poverty-in-Latin-America-and-the-Caribbean.pdf
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTIAGQG9u1dOW28aoixn3CAKaN56PuGTKZK8dKkrgMgCFieKRjHDiMVyFrppcF0FPoDznCCj8Bqgo1x/pub?output=csv
+    date_accessed: '2025-02-04'
+  name: Number of people in poverty in Latin America and Caribbean countries
+  description: ''
+  license: {}
+outs:
+  - md5: d7f994b9efe053a841df8f3a8a418454
+    size: 358
+    path: poverty_latam_idb.csv

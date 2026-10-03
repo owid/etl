@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1964
+    date_accessed: 2023-08-14 05:50:16.288983
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Adolescent birth rate (aged 10-14 years; aged 15-19 years) per 1,000 women
+    in that age group
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bed0be4fe384e34a7bf1bd9efb004736
+  size: 19794
+  path: 
+    dataset_1964_adolescent_birth_rate__aged_10_14_years__aged_15_19_years__per_1_000_women_in_that_age_group_values.feather

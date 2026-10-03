@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2008
+    date_accessed: 2023-08-10 14:39:09.279999
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2008_number_of_new_hiv_infections_per_1_000_uninfected_population__by_sex__age_and_key_populations
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eb60f389fcd9c47dfa4741392a4dd29d
+  size: 7968
+  path: 
+    dataset_2008_number_of_new_hiv_infections_per_1_000_uninfected_population__by_sex__age_and_key_populations_config.json

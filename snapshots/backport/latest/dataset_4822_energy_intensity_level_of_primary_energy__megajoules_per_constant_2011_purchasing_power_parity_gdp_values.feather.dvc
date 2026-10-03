@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4822
+    date_accessed: 2023-08-16 09:22:20.913867
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Energy intensity level of primary energy (megajoules per constant 2011 purchasing
+    power parity GDP)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d18593e062d42f00245f03c7918a35d6
+  size: 29338
+  path: 
+    dataset_4822_energy_intensity_level_of_primary_energy__megajoules_per_constant_2011_purchasing_power_parity_gdp_values.feather

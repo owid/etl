@@ -1,0 +1,26 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Energy statistics, prices of natural gas and electricity
+    date_published: "2024-11-04"
+
+    # Citation
+    producer: Eurostat
+    citation_full: |-
+      Eurostat - Energy statistics, prices of natural gas and electricity (2024).
+
+    # Files
+    url_main: https://ec.europa.eu/eurostat/web/energy/database
+    date_accessed: 2024-11-05
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ec.europa.eu/eurostat/web/main/help/copyright-notice
+
+outs:
+  - md5: 285787159fb3f598db8c0fb0ba67eb2c
+    size: 8286547
+    path: gas_and_electricity_prices.zip

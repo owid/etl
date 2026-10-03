@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2855
+    date_accessed: 2023-08-10 07:42:02.241251
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2855_life_expectation_by_sex_at_ages_0__15__and_45__owid_based_on_hacker__2010__and_the_us_social_security_administration__2017
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 591f2f70ff2f59ae320254ea2d22659d
+  size: 9496
+  path: 
+    dataset_2855_life_expectation_by_sex_at_ages_0__15__and_45__owid_based_on_hacker__2010__and_the_us_social_security_administration__2017_config.json

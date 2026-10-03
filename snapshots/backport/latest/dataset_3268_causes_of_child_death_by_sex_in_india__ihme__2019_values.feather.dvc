@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3268
+    date_accessed: 2023-08-14 11:01:23.122360
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Causes of child death by sex in India (IHME, 2019)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d62cf2a57729aa99a0fb5d769bac17c3
+  size: 6946
+  path: dataset_3268_causes_of_child_death_by_sex_in_india__ihme__2019_values.feather

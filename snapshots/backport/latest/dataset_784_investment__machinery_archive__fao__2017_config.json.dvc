@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/784
+    date_accessed: 2023-08-16 09:44:50.480598
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_784_investment__machinery_archive__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5e283fa72483bdcb29d7fabc76e3bd77
+  size: 28494
+  path: dataset_784_investment__machinery_archive__fao__2017_config.json

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4505
+    date_accessed: 2023-08-14 14:40:12.841522
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of destroyed or damaged health facilities attributed to disasters (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 165b6b617cc5c7b35e058b2c0803308a
+  size: 11938
+  path: 
+    dataset_4505_number_of_destroyed_or_damaged_health_facilities_attributed_to_disasters__number_values.feather

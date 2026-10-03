@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Air Quality Life Index (AQLI)
+    description: |-
+      The Air Quality Life Index (AQLI) by the Energy Policy Institute at the University of Chicago showcases the potential for life expectancy gains if air pollution levels were reduced. Fine particle pollution (PM2.5) shortens people's lives when they breathe them in, the AQLI projects how many more years people could live if pollution was reduced to meet the World Health Organization's guidelines (an annual exposure of 5 µg/m3). Using global, satellite-derived data, the AQLI provides a detailed picture of air pollution levels and their health impact around the world, tracking changes from 1998 to 2022. This information can be used to inform policies and actions that aim to improve air quality and public health.
+    date_published: "2026-03-29"
+
+    # Citation
+    producer: Energy Policy Institute at the University of Chicago (EPIC)
+    citation_full: |-
+      Air Quality Life Index (AQLI) by the Energy Policy Institute at the University of Chicago (https://aqli.epic.uchicago.edu/) (2024)
+    attribution_short: AQLI
+
+    # Files
+    url_main: https://aqli.epic.uchicago.edu/
+    url_download: https://github.com/aqli-epic/aqli-update/raw/main/AQLI%20Annual%20Update%202026%20data/gadm0.zip
+    date_accessed: "2026-03-30"
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://github.com/aqli-epic/aqli-update/tree/main?tab=CC-BY-4.0-1-ov-file#
+
+outs:
+  - md5: f50feac61a16ec3e4ebef952423e2b20
+    size: 85471
+    path: air_quality_life_index.zip

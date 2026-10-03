@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3628
+    date_accessed: 2023-08-14 15:35:41.776586
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Headache disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e9e67d2f7a1e28a8b9ec6888bd1af31d
+  size: 1807818
+  path: dataset_3628_headache_disorders_values.feather

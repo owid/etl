@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4861
+    date_accessed: 2023-08-16 07:14:31.016720
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4861_proportion_of_medium_and_high_tech_industry_value_added_in_total_value_added__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c01b5772cbc2d0307e87f015d25635d2
+  size: 1884
+  path: 
+    dataset_4861_proportion_of_medium_and_high_tech_industry_value_added_in_total_value_added__pct_config.json

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4449
+    date_accessed: 2023-08-10 14:58:33.597501
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Direct agriculture loss attributed to disasters, by hazard type (millions
+    of current United States dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 12dface4c2913cc5d0144a0429ec1ec0
+  size: 59474
+  path: 
+    dataset_4449_direct_agriculture_loss_attributed_to_disasters__by_hazard_type__millions_of_current_united_states_dollars_values.feather

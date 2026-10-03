@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1775
+    date_accessed: 2023-08-14 15:43:53.700879
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1775_child_wasting (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 16c6129afaddf1c653229677394fde77
+  size: 21802
+  path: dataset_1775_child_wasting_config.json

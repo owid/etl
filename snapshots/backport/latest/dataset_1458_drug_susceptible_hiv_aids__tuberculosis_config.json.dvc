@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1458
+    date_accessed: 2023-08-16 10:05:32.689719
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1458_drug_susceptible_hiv_aids__tuberculosis
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eaf40df001c83ca58a4e0d434e2451d1
+  size: 32378
+  path: dataset_1458_drug_susceptible_hiv_aids__tuberculosis_config.json

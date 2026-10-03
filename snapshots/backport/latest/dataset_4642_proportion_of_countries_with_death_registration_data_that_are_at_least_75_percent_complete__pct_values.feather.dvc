@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4642
+    date_accessed: 2023-08-16 08:29:08.666128
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of countries with death registration data that are at least 75
+    percent complete (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f9445ac8da0c52632ef40c37774e5fac
+  size: 7226
+  path: 
+    dataset_4642_proportion_of_countries_with_death_registration_data_that_are_at_least_75_percent_complete__pct_values.feather

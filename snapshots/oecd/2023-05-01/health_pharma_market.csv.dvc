@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: OECD
+    title: 'Health: Pharmaceutical Market'
+    description: |-
+      The OECD Health Database offers the most comprehensive source of comparable statistics on health and health systems across OECD countries. It is an essential tool to carry out comparative analyses and draw lessons from international comparisons of diverse health systems.
+
+      This dataset is a subset of all the metrics in the database. More details at https://stats.oecd.org/OECDStat_Metadata/ShowMetadata.ashx?Dataset=HEALTH_PHMC&Lang=en
+    citation_full: 'OECD (2022). Health: Pharmaceutical Market.'
+    url_main: https://stats.oecd.org/
+    date_accessed: '2023-05-01'
+    date_published: '2022-07-04'
+    license:
+      name: OECD terms and conditions
+      url: https://www.oecd.org/termsandconditions/
+  is_public: true
+outs:
+  - md5: b5581344c20b17084f278bf4a57e6a4a
+    size: 9726240
+    path: health_pharma_market.csv

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1865
+    date_accessed: 2023-08-10 15:05:39.418408
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1865_labour_productivity (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 175dad01437b2d457b0a9dca1b83ff36
+  size: 3881
+  path: dataset_1865_labour_productivity_config.json

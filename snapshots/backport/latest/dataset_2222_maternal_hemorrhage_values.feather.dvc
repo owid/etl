@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2222
+    date_accessed: 2023-08-16 07:27:36.368470
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Maternal hemorrhage
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 73b0d8e5b8c5103d40b8913e73db765e
+  size: 1498898
+  path: dataset_2222_maternal_hemorrhage_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/819
+    date_accessed: 2023-08-16 10:13:09.680422
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_819_production__crops_processed__fao__2017 (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ee00d9b7de2d5f8a651cead6350e0071
+  size: 21373
+  path: dataset_819_production__crops_processed__fao__2017_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1066
+    date_accessed: 2023-08-10 14:30:34.819320
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank Global Findex - Health: Population: Structure'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7c6ec108fe38f91958d42dc86ebe54f1
+  size: 12210
+  path: 
+    dataset_1066_world_bank_global_findex__health__population__structure_values.feather

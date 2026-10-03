@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1764
+    date_accessed: 2023-08-14 15:55:51.719424
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Diet low in vegetables
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: aede89614f5b54c0892f89542aa6674e
+  size: 962874
+  path: dataset_1764_diet_low_in_vegetables_values.feather

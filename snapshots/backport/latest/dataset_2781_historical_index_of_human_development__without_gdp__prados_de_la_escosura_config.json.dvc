@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2781
+    date_accessed: 2023-08-10 09:38:16.341530
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2781_historical_index_of_human_development__without_gdp__prados_de_la_escosura
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 49f7062e49aaa7a7d3844546b6e45314
+  size: 2333
+  path: 
+    dataset_2781_historical_index_of_human_development__without_gdp__prados_de_la_escosura_config.json

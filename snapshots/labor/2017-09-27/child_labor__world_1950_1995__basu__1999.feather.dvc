@@ -1,0 +1,12 @@
+meta:
+  origin:
+    producer: Basu
+    title: 'Child labor: cause, consequence, and cure, with remarks on international labor standards'
+    citation_full: 'Basu, Kaushik (1999). Child labor: cause, consequence, and cure, with remarks on international labor standards. Journal of Economic Literature, 37(3): 1083-1119.'
+    url_main: http://www.jstor.org/stable/2564873
+    date_accessed: '2017-09-27'
+    date_published: '1999'
+outs:
+  - md5: fe5f7955d866a760910b660bfcde3523
+    size: 3066
+    path: child_labor__world_1950_1995__basu__1999.feather

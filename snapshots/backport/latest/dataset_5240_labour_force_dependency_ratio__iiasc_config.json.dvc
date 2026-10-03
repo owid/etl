@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/5240
+    date_accessed: 2026-03-06 07:45:24.746667+00:00
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5240_labour_force_dependency_ratio__iiasc
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: 3a37f0f901b7490cca592d2ac6cbb478
+    size: 4823
+    path: dataset_5240_labour_force_dependency_ratio__iiasc_config.json

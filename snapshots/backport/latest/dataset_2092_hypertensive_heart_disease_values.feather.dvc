@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2092
+    date_accessed: 2023-08-14 16:10:17.591394
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Hypertensive heart disease
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 84936d1c73fd33e36fa9395abfa6e5c9
+  size: 760666
+  path: dataset_2092_hypertensive_heart_disease_values.feather

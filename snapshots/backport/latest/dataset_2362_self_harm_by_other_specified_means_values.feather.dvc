@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2362
+    date_accessed: 2023-08-11 07:54:57.746951
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Self-harm by other specified means
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 10fb32e185b3545af89033527ae781fb
+  size: 1807850
+  path: dataset_2362_self_harm_by_other_specified_means_values.feather

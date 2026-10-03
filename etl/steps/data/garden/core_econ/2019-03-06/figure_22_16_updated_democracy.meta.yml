@@ -1,0 +1,21 @@
+dataset:
+  title: Figure 22.16_updated_democracy
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_22_16_updated_democracy:
+    variables:
+      years_of_democracy_up_to_2017:
+        title: Years of democracy up to 2017
+        unit: ''
+        description: |-
+          Democracy start dates when women gain the ability to vote in elections so long as the majority of the population is enfranchised (ex. SA waits until 1994) democracy cannot start during colonial rule or under a dictatorship or one-party state
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

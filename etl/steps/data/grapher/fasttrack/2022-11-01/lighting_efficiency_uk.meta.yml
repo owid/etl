@@ -1,0 +1,18 @@
+dataset:
+  title: Lighting efficiency and shares in the UK
+  description: ''
+  licenses:
+    - {}
+tables:
+  lighting_efficiency_uk:
+    variables:
+      share_of_lighting_uk:
+        title: share_of_lighting_uk
+        unit: '%'
+        short_unit: '%'
+        description: The share of lighting in the UK that was provided by each source.
+      efficiency_lighting_uk:
+        title: efficiency_lighting_uk
+        unit: lumen-hours per kWh
+        description: |-
+          The efficiency of lighting measures the output of light per unit of energy. It's measured in lumen-hours per kilowatt-hour (kWh).

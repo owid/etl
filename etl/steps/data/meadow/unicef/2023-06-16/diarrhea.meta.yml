@@ -1,0 +1,10 @@
+tables:
+  diarrhea:
+    variables:
+      value:
+        title: value
+        unit: '%'
+        short_unit: '%'
+      indicator:
+        title: indicator
+        unit: ''

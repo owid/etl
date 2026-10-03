@@ -1,0 +1,23 @@
+meta:
+  namespace: usda_nass
+  short_name: us_corn_yields
+  name: Long-term corn yields in United States
+  version: 2023-04-20
+  publication_date: 2023-04-17
+  source_name: USDA National Agricultural Statistics Service (NASS)
+  source_published_by: National Agricultural Statistics Service of the United States
+    Department of Agriculture (USDA/NASS)
+  url: https://quickstats.nass.usda.gov/
+  source_data_url:
+  file_extension: csv
+  license_url: https://www.nass.usda.gov/Data_and_Statistics/Citation_Request/index.php
+  license_name: Public domain
+  date_accessed: 2023-04-20
+  is_public: true
+  description: |
+
+wdir: ../../../data/snapshots/usda_nass/2023-04-20
+outs:
+- md5: 64c60aed25959e091416ea65c7d8a6ff
+  size: 26797
+  path: us_corn_yields.csv

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1462
+    date_accessed: 2023-08-10 14:46:15.026933
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1462_myocarditis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0df32511917dfa961ac9c68ef3541b8a
+  size: 31215
+  path: dataset_1462_myocarditis_config.json

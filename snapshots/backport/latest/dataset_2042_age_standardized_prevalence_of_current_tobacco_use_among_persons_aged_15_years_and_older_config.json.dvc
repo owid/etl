@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2042
+    date_accessed: 2023-08-14 10:58:45.471792
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2042_age_standardized_prevalence_of_current_tobacco_use_among_persons_aged_15_years_and_older
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 42cb903c361531c6f540c6a7195f60fd
+  size: 3485
+  path: 
+    dataset_2042_age_standardized_prevalence_of_current_tobacco_use_among_persons_aged_15_years_and_older_config.json

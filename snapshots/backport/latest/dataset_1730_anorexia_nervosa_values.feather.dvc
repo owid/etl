@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1730
+    date_accessed: 2023-08-14 14:45:37.012873
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Anorexia nervosa
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 408c185b149c34751d9f5260d5cd7066
+  size: 1089098
+  path: dataset_1730_anorexia_nervosa_values.feather

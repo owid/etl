@@ -1,0 +1,30 @@
+dataset:
+  title: DRAFT Try fast-track in-donor costs
+  description: ''
+tables:
+  try_fast_track_in_donor_costs:
+    variables:
+      i_a_4__experts_and_other_technical_assistance:
+        title: I.A.4. Experts and other technical assistance
+        unit: ''
+      i_a_5__scholarships_and_student_costs_in_donor_countries:
+        title: I.A.5. Scholarships and student costs in donor countries
+        unit: ''
+      i_a_6__debt_relief:
+        title: I.A.6. Debt relief
+        unit: ''
+      i_a_7__administrative_costs_not_included_elsewhere:
+        title: I.A.7. Administrative costs not included elsewhere
+        unit: ''
+      i_a_8_1__development_awareness:
+        title: I.A.8.1. Development awareness
+        unit: ''
+      i_a_8_2__refugees_in_donor_countries:
+        title: I.A.8.2. Refugees in donor countries
+        unit: ''
+      unnamed__8:
+        title: 'Unnamed: 8'
+        unit: ''
+      unnamed__9:
+        title: 'Unnamed: 9'
+        unit: ''

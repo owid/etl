@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/638
+    date_accessed: 2023-08-16 09:47:58.368360
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Interpolated total population by broad age group, region, subregion and country,
+    annually for 1950-2100 (thousands) - UN Population Division (2017)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d86d76c9ce36daf396b6007244b0a5b7
+  size: 12370418
+  path: 
+    dataset_638_interpolated_total_population_by_broad_age_group__region__subregion_and_country__annually_for_1950_2100__thousands__un_population_division__2017_values.feather

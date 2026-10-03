@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3622
+    date_accessed: 2023-08-16 09:33:21.800709
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3622_benign_and_in_situ_cervical_and_uterine_neoplasms
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8c97b6554db0b2f94637cb4e0dca735d
+  size: 34024
+  path: dataset_3622_benign_and_in_situ_cervical_and_uterine_neoplasms_config.json

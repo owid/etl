@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2029
+    date_accessed: 2023-08-16 10:12:06.155703
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Maternal mortality ratio
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 592ad7f6b8f222f52e213e4c3abfab1b
+  size: 51906
+  path: dataset_2029_maternal_mortality_ratio_values.feather

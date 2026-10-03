@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2571
+    date_accessed: 2023-08-14 05:39:47.864700
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2571_environment__wastewater_treatment__pct_population_connected
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7fd7bc328b9ae9ccbd0728e23c553de5
+  size: 33986
+  path: 
+    dataset_2571_environment__wastewater_treatment__pct_population_connected_config.json

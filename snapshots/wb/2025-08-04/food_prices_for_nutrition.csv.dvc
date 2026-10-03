@@ -1,0 +1,21 @@
+meta:
+  origin:
+    producer: Herforth et al. (2022), adapted by World Bank
+    title: Food Prices for Nutrition
+    description: |-
+      Food Prices for Nutrition provides indicators on the cost and affordability of healthy diets in each country, showing the population's physical and economic access to sufficient quantities of locally available items for an active and healthy life. It also provides indicators on the cost and affordability of an energy-sufficient diet and of a nutrient-adequate diet. These indicators are explained in detail in [the Food Prices for Nutrition DataHub](https://www.worldbank.org/foodpricesfornutrition).
+    citation_full: |-
+      - World Bank (2025), Food Prices for Nutrition database, version 4.0, updated 30 July 2025. Washington, DC: The World Bank. https://doi.org/10.57966/41AN-KY81
+      - FAO (2025), Cost and Affordability of a Healthy Diet database, updated 28 July 2025. Rome, FAO. https://www.fao.org/faostat/en/#data/CAHD
+    attribution: FAO and World Bank (2025), using data and methods from Herforth et al. (2022)
+    version_producer: '4.0'
+    url_main: https://databank.worldbank.org/source/food-prices-for-nutrition
+    date_accessed: '2025-08-04'
+    date_published: '2025-07-30'
+    license:
+      name: CC BY 4.0
+      url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+outs:
+  - md5: 7cd7b25a7ca54f6d8d245bfa9f898fa7
+    size: 807090
+    path: food_prices_for_nutrition.csv

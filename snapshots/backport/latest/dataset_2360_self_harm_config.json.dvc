@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2360
+    date_accessed: 2023-08-16 08:13:57.445105
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2360_self_harm (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 63764460557af0ffd34e880ca77c79d0
+  size: 32242
+  path: dataset_2360_self_harm_config.json

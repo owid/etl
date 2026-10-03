@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2188
+    date_accessed: 2023-08-16 08:17:19.408002
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2188_vascular_intestinal_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6e01f9fd7835964638bcf4b4e6fbf0a6
+  size: 33082
+  path: dataset_2188_vascular_intestinal_disorders_config.json

@@ -1,0 +1,31 @@
+meta:
+  namespace: demography
+  short_name: population_education_wittgenstein
+  name: Population size by education level (Wittgenstein Centre, 2018)
+  version: 2023-04-07
+  publication_year: 2018
+  source_name: Wittgenstein Centre (2018)
+  source_published_by: Wittgenstein Centre for Demography and Global Human Capital
+    (WIC) Wittgenstein Centre Data Explorer. Version 2.0 2018
+  url: www.wittgensteincentre.org/dataexplorer
+  source_data_url:
+  file_extension: csv
+  license_url:
+  license_name: Unknown
+  date_accessed: 2023-04-07
+  is_public: true
+  description: |
+    This dataset presents a set of different scenarios of future population and human capital trends in 201 countries of the world to 2100. The result of the population projections by levels of educational attainment were published in 2018 in Lutz, Goujon, KC, Stonawski, and Stilianakis (Eds.) (2018) (https://ec.europa.eu/jrc/en/publication/demographic-and-human-capital-scenarios-21st-century-2018-assessment-201-countries). They provide an update of the projections (scope, coverage and quality) presented in Lutz, Butz and KC in 2014 (https://global.oup.com/academic/product/world-population-and-human-capital-in-the-twenty-first-century-9780198703167?cc=at&lang=en&), based on the work of a large team of researchers at the Wittgenstein Centre for Demography and Global Human Capital and at other institutions.
+
+    The present version (2.0) benefited from the partnership with the Joint Research Centre in the Centre of Expertise on Population and Migration (CEPAM). On top of the assumptions about future trends in fertility, mortality, and education, the projections study the effect of several migration assumptions applied to the context of the set of Shared Socioeconomic Pathways (SSP) scenarios related to the Intergovernmental Panel on Climate Change (IPCC).
+
+    The new version also includes the reconstruction of population by levels of educational attainment from 1950 to 2015 for 185 countries. More information in Speringer et al. 2019 (https://www.oeaw.ac.at/fileadmin/subsites/Institute/VID/IMG/Publications/Working_Papers/WP2019_02.pdf).
+
+    Data for 1950 to 2015: Based on UN Population Division, World Population Prospects 2017 (http://esa.un.org/wpp/documentation/WPP%202010%20publications.htm).
+
+    Only Medium (SSP2) scenario: This middle-of-the-road scenario can also be seen as the most likely path for each country. It combines all countries with medium fertility with medium mortality, medium migration, and the Global Education Trend (GET) education scenario.
+wdir: ../../../data/snapshots/demography/2023-04-07
+outs:
+- md5: d8c47c4d57f057cadd71f1905d2c1b4c
+  size: 2048434
+  path: population_education_wittgenstein.csv

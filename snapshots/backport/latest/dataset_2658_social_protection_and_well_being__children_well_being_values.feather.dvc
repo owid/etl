@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2658
+    date_accessed: 2023-08-14 15:22:03.300537
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Social Protection and Well-being - Children Well Being
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 15da777b0e6ded63a1ac4615540c3861
+  size: 56074
+  path: 
+    dataset_2658_social_protection_and_well_being__children_well_being_values.feather

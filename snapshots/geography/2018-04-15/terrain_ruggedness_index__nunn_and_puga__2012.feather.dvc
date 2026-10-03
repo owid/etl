@@ -1,0 +1,12 @@
+meta:
+  origin:
+    producer: Nunn and Puga
+    title: 'Ruggedness: The blessing of bad geography in Africa'
+    citation_full: 'Nunn, N., and Puga, D. (2012). "Ruggedness: The blessing of bad geography in Africa." Review of Economics and Statistics, 94(1), 20–36.'
+    url_main: https://diegopuga.org/data/rugged/
+    date_accessed: '2018-04-15'
+    date_published: '2012'
+outs:
+  - md5: 5a47b400e49c908f3fee15d4f9edfd1e
+    size: 7714
+    path: terrain_ruggedness_index__nunn_and_puga__2012.feather

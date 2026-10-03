@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1015
+    date_accessed: 2023-08-16 10:50:26.755350
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Mobile Bank Accounts by Region - GSMA (2019)
+  description: GSMA Mobile Money Metrics is an interactive tool that provides a comprehensive
+    set of global metrics for the industry by combining unique data sources that the
+    GSMA Mobile Money programme has been collecting and analysing since its inception.
+    Mobile Money Metrics is designed to support the efforts of mobile money providers
+    and the wider international development community to deliver on the ambition of
+    achieving greater financial inclusion, financial empowerment and economic growth.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0e5dad477b549d2981c6b30671739149
+  size: 7370
+  path: dataset_1015_mobile_bank_accounts_by_region__gsma__2019_values.feather

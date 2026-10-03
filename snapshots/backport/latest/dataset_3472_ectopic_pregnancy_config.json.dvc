@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3472
+    date_accessed: 2023-08-14 15:32:11.501929
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3472_ectopic_pregnancy (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 12f6daeabfe158c0ae344fa8c78f3861
+  size: 32680
+  path: dataset_3472_ectopic_pregnancy_config.json

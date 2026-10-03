@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/5150
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: TE-22.2
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: 0b2cb4abc7b83c09456ecb56ea14944b
+    size: 11466
+    path: dataset_5150_te_22_2_values.feather

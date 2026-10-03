@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2199
+    date_accessed: 2023-08-14 15:26:17.759003
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Motorcyclist road injuries
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f312575ebd145133535ee91a8dc5a9ee
+  size: 2116402
+  path: dataset_2199_motorcyclist_road_injuries_values.feather

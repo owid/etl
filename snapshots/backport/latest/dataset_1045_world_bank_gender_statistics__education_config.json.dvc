@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1045
+    date_accessed: 2023-08-11 07:40:13.192263
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1045_world_bank_gender_statistics__education
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0a75a5b9da08cb0f6c393c5827fe7680
+  size: 261949
+  path: dataset_1045_world_bank_gender_statistics__education_config.json

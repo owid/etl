@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2038
+    date_accessed: 2023-08-14 08:50:39.767482
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of people requiring interventions against neglected tropical diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 967e6d003e8de9d353c07d5e8bf0ad9d
+  size: 10306
+  path: 
+    dataset_2038_number_of_people_requiring_interventions_against_neglected_tropical_diseases_values.feather

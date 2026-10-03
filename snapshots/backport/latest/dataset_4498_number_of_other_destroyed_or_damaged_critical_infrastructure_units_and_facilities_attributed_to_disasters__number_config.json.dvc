@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4498
+    date_accessed: 2023-08-14 11:02:14.810424
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4498_number_of_other_destroyed_or_damaged_critical_infrastructure_units_and_facilities_attributed_to_disasters__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e672d57dec4bfbc7a41d9504394b3738
+  size: 11075
+  path: 
+    dataset_4498_number_of_other_destroyed_or_damaged_critical_infrastructure_units_and_facilities_attributed_to_disasters__number_config.json

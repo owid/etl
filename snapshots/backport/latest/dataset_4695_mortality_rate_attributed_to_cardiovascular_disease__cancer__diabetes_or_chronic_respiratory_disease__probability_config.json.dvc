@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4695
+    date_accessed: 2023-08-11 07:17:28.843875
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4695_mortality_rate_attributed_to_cardiovascular_disease__cancer__diabetes_or_chronic_respiratory_disease__probability
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1fb3d3180527e9bf8b36c7aa876e342a
+  size: 12703
+  path: 
+    dataset_4695_mortality_rate_attributed_to_cardiovascular_disease__cancer__diabetes_or_chronic_respiratory_disease__probability_config.json

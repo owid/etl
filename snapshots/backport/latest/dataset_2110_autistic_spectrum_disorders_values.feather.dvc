@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2110
+    date_accessed: 2023-08-14 14:52:09.805978
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Autistic spectrum disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0b1d6b3b4118fad816b49a724e638fa1
+  size: 1498354
+  path: dataset_2110_autistic_spectrum_disorders_values.feather

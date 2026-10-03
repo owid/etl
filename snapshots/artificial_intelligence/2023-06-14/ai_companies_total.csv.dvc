@@ -1,0 +1,26 @@
+meta:
+  namespace: artificial_intelligence
+  short_name: ai_companies_total
+  name: Number of Newly Funded AI Companies in the World (AI Index, 2023)
+  version: '2023-06-14'
+  publication_year: 2023
+  publication_date: '2023-03-20'
+  source_name: NetBase Quid (2022) via AI Index (2023)
+  source_published_by: NetBase Quid (2022) via the AI Index 2023 Annual Report, AI
+    Index Steering Committee, Institute for Human-Centered AI, Stanford University,
+    Stanford, CA, April 2023
+  url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
+  source_data_url: https://drive.google.com/uc?export=download&id=1NlaJl4uq1oIcz2fnijxsooKNdFbZokwN
+  file_extension: csv
+  license_url:
+    https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
+  license_name: Public domain
+  date_accessed: 2023-06-19
+  is_public: true
+  description: |
+    Data from NetBase Quid via AI Index (2023) on newly funded AI companies in the World.
+wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
+outs:
+- md5: 01f9220c316a930a97ed3ba7ac740ba2
+  size: 140
+  path: ai_companies_total.csv

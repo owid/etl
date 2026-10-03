@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5395
+    date_accessed: 2023-08-16 07:26:38.281790
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: United Nations Sustainable Development Goals - United Nations (2021-10)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 613919ac8cf1ed33cb2588974b7124b0
+  size: 10170250
+  path: 
+    dataset_5395_united_nations_sustainable_development_goals__united_nations__2021_10_values.feather

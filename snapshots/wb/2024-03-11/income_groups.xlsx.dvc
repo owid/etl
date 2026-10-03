@@ -1,0 +1,19 @@
+meta:
+  origin:
+    title: Income Classifications
+    date_published: 2023-06-30
+    producer: World Bank
+    citation_full: |-
+      World Bank - Income classifications (2023).
+    url_main: https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups
+    # Note that the World Bank uses the same link every year, even if the data changes.
+    url_download: https://datacatalogfiles.worldbank.org/ddh-published/0037712/DR0090754/OGHIST.xlsx
+    date_accessed: 2024-03-11
+    license:
+      name: Creative Commons BY 4.0
+      url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+wdir: ../../../data/snapshots/wb/2024-03-11
+outs:
+  - md5: 39b24a541ca085424b42795ed747948e
+    size: 115839
+    path: income_groups.xlsx

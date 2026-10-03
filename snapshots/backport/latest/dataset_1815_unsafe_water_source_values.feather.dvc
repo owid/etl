@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1815
+    date_accessed: 2023-08-16 08:25:11.006931
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Unsafe water source
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5f063d8a1e8e0c2b21bc9f4fbe0e670a
+  size: 1381098
+  path: dataset_1815_unsafe_water_source_values.feather

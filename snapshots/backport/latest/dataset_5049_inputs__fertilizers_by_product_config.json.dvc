@@ -1,0 +1,19 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5049
+    date_accessed: 2023-08-16 10:39:34.296133
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5049_inputs__fertilizers_by_product (archived)
+  description: 'The Fertilizers by Product dataset contains information on product
+    amounts for the Production, Trade, Agriculture Use and Other Uses of chemical
+    and mineral fertilizers products, over the time series 2002-present. The fertilizer
+    statistics data are validated separately for a set of over thirty individual products.
+    Both straight and compound fertilizers are included.     Detailed information
+    on Fertilizers by Product Methodology at: http://fenixservices.fao.org/faostat/static/documents/RFB/RFB_EN_README.pdf'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: feb5f736238482302163731cddee5f7b
+  size: 181787
+  path: dataset_5049_inputs__fertilizers_by_product_config.json

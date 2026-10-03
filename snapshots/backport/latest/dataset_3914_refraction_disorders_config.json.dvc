@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3914
+    date_accessed: 2023-08-16 08:18:29.395523
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3914_refraction_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4c414d57e4508a1d2b292eafbf256214
+  size: 16679
+  path: dataset_3914_refraction_disorders_config.json

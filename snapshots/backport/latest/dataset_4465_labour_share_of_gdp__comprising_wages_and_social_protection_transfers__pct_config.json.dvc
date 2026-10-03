@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4465
+    date_accessed: 2023-08-16 09:30:47.353392
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4465_labour_share_of_gdp__comprising_wages_and_social_protection_transfers__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3d72c7f76f3f17bf4b999f08ac86f46d
+  size: 8758
+  path: 
+    dataset_4465_labour_share_of_gdp__comprising_wages_and_social_protection_transfers__pct_config.json

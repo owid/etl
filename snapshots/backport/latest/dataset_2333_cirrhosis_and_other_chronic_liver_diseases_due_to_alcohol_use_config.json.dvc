@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2333
+    date_accessed: 2023-08-16 08:02:51.424665
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2333_cirrhosis_and_other_chronic_liver_diseases_due_to_alcohol_use
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7666e01c12218b457e8086fd5a48cd51
+  size: 34426
+  path: 
+    dataset_2333_cirrhosis_and_other_chronic_liver_diseases_due_to_alcohol_use_config.json

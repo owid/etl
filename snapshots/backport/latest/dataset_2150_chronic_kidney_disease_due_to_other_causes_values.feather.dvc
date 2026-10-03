@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2150
+    date_accessed: 2023-08-14 05:39:00.512454
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Chronic kidney disease due to other causes
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4af2c547c76b2363ebf91c1901df6336
+  size: 2116418
+  path: dataset_2150_chronic_kidney_disease_due_to_other_causes_values.feather

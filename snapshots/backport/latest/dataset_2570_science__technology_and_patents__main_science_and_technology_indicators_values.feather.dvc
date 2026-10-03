@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2570
+    date_accessed: 2023-08-14 15:06:43.037749
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Science, Technology and Patents - Main Science and Technology Indicators
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d00c8bf93281f195b93dc19fa33ede72
+  size: 724530
+  path: 
+    dataset_2570_science__technology_and_patents__main_science_and_technology_indicators_values.feather

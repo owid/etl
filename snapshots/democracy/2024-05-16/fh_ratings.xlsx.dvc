@@ -1,0 +1,64 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Freedom in the World
+    description: |-
+      The Freedom in the World report is composed of numerical ratings and supporting descriptive texts for 195 countries and 15 territories. External analysts assess 210 countries and territories, using a combination of on-the-ground research, consultations with local contacts, and information from news articles, nongovernmental organizations, governments, and a variety of other sources. Expert advisers and regional specialists then vet the analysts’ conclusions. The final product represents the consensus of the analysts, advisers, and Freedom House staff.
+
+      For each country and territory, Freedom in the World analyzes the electoral process, political pluralism and participation, the functioning of the government, freedom of expression and of belief, associational and organizational rights, the rule of law, and personal autonomy and individual rights.
+
+    date_published: "2024-02-01"
+    title_snapshot: Freedom in the World - Country and Territory Ratings and Statuses, 1973-2024
+    description_snapshot: |-
+      These worksheets list all country ratings and statuses since the annual Freedom in the World survey was first compiled to cover the year 1972.
+
+      **METHODOLOGY**:
+
+      Until 2003, countries and territories whose combined average ratings for PR and CL fell between 1.0 and 2.5 were designated Free; between 3.0 and 5.5 Partly Free, and between 5.5 and 7.0 Not Free. Beginning with the ratings for 2003, countries whose combined average ratings fall between 3.0 and 5.0 are Partly Free, and those between 5.5 and 7.0 are Not Free. Other methodological changes have been effected periodically. For detailed discussions of each edition's methodology and any changes, please consult the methodology essays published with each edition. Please refer to the full methodology for more details: https://freedomhouse.org/reports/freedom-world/freedom-world-research-methodology
+
+      **COUNTRY NOTES AND CLARIFICATIONS**
+
+      Several countries have become independent, separated into two or more countries, or merged with a neighboring state. Scores for such countries are given only for the period of their existence as independent states.
+
+      1. In the 1973 edition, South Africa was rated as White(2,3 Free) and Black(5,6 Not Free).
+
+      2. For Yugoslavia, ratings from edition 2000 to 2003 were for the country that remained following the departures between 1991 and 1992 of Slovenia, Croatia, Macedonia, and Bosnia-Herzegovina. In February 2003, the Yugoslav parliament adopted a constitutional charter establishing the state of Serbia and Montenegro. Beginning with the 2004 edition, Yugoslavia is listed as "Serbia and Montenegro." The State Union of Serbia and Montenegro dissolved when Montenegro withdrew in June 2006, making Serbia an independent state. Thus, the ratings for Serbia and Montenegro are listed separately beginning with the 2007 edition. Kosovo was first listed as a territory beginning in 1993-94 edition. Since the 2010 edition, it is listed as an independent country.
+
+      3. South Sudan was first listed as an independent country in the 2012 edition after officially separating from Sudan in July 2011.
+
+      4. The former Zaire is listed under Congo (Kinshasa), and the former Western Samoa is listed under Samoa.
+
+      **TERRITORY NOTES AND CLARIFICATIONS**
+
+      Territories have been added to and eliminated from the survey at various times.
+
+      1. Northern Cyprus was listed as a country in the survey from edition 1982 to edition 1991-92, and has been listed as a territory since the 1992-93 edition of the survey.
+
+      2. In the 1995-96 edition of the survey, West Bank and Gaza Strip were considered as one unit. Beginning with the 1996-97 edition a distinction was made between the Israeli-Occupied Territories and the Palestinian Authority Administered Territories. This followed the transfer of administrative authority over portions of the West Bank and Gaza from Israel to the Palestinian Authority with the sighing of the Oslo II agreement in September 1995. Beginning with the 2011 edition, the territories are divided along geographical, rather than shifting jurisdictional, lines, with one report for the West Bank and one for the Gaza Strip
+
+      3. Chechnya was rated separately from the 1998-99 edition through the 2009 edition; since then, developments in this jurisdiction have been addressed in the Russia report.
+
+      4. Puerto Rico was rated separately from the 1975 edition to the 2016 edition; since then, developments in this jurisdiction have been addressed in the United States report.
+
+
+    # Citation
+    producer: Freedom House
+    citation_full: |-
+      House, Freedom. "Freedom in the world. Freedom House." (2021).
+
+    # Files
+    url_main: https://freedomhouse.org/report/freedom-world
+    url_download: https://freedomhouse.org/sites/default/files/2024-02/Country_and_Territory_Ratings_and_Statuses_FIW_1973-2024.xlsx
+    date_accessed: 2024-05-16
+
+    # License
+    license:
+      name: Freedom House 2024
+      url: https://freedomhouse.org/about-us/content-permissions
+
+outs:
+  - md5: ff5a8ffc0b8ef99eb3fa1b9877eb2a66
+    size: 202350
+    path: fh_ratings.xlsx

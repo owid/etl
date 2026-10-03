@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3244
+    date_accessed: 2023-08-10 08:42:55.245890
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3244_figure_19_1_earnings_inequality
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 621c6d7a18b942320fc291a5348a8136
+  size: 2033
+  path: dataset_3244_figure_19_1_earnings_inequality_config.json

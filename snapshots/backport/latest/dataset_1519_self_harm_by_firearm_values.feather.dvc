@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1519
+    date_accessed: 2023-08-14 05:51:26.835653
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Self-harm by firearm
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eb04baf1444b656a3bdffdd7d1288afc
+  size: 1701042
+  path: dataset_1519_self_harm_by_firearm_values.feather

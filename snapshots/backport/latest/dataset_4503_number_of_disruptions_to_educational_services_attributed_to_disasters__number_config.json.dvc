@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4503
+    date_accessed: 2023-08-14 15:12:03.780676
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4503_number_of_disruptions_to_educational_services_attributed_to_disasters__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7f89d313e5621d24c1dec9991c7dd3fc
+  size: 10967
+  path: 
+    dataset_4503_number_of_disruptions_to_educational_services_attributed_to_disasters__number_config.json

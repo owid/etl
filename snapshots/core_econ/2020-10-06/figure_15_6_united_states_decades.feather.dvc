@@ -1,0 +1,12 @@
+meta:
+  origin:
+    producer: Core Econ
+    title: 'Figure 15.6 United States decades'
+    citation_full: 'Core Econ. Figure 15.6 United States decades.'
+    date_accessed: '2020-10-06'
+    date_published: '2020'
+  is_public: false
+outs:
+  - md5: ecc04cda047ac904b142ad7ac8cf19bd
+    size: 3418
+    path: figure_15_6_united_states_decades.feather

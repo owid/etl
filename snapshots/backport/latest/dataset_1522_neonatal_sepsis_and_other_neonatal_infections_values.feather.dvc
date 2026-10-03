@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1522
+    date_accessed: 2023-08-16 10:11:30.045991
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Neonatal sepsis and other neonatal infections
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 663430328c7fbdf4f7bbf545ac282637
+  size: 1381130
+  path: dataset_1522_neonatal_sepsis_and_other_neonatal_infections_values.feather

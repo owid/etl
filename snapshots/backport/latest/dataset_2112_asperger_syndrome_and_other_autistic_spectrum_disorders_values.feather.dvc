@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2112
+    date_accessed: 2023-08-14 15:43:38.109044
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Asperger syndrome and other autistic spectrum disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8abab227d8ded15afdf6b0691f858679
+  size: 1574362
+  path: 
+    dataset_2112_asperger_syndrome_and_other_autistic_spectrum_disorders_values.feather

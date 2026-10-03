@@ -1,0 +1,26 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5021
+    date_accessed: 2023-08-16 07:18:26.042483
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5021_emissions__agriculture__burning__savanna
+    (archived)
+  description: 'Greenhouse Gas (GHG) emissions from burning of savanna consist of
+    methane (CH4) and nitrous oxide (N2O) gases produced from the burning of vegetation
+    biomass in the following five land cover types: Savanna, Woody Savanna, Open Shrublands,
+    Closed Shrublands, and Grasslands.   The FAOSTAT emissions database is computed
+    following Tier 1 IPCC 2006 Guidelines for National GHG Inventories (http://www.ipcc-nggip.iges.or.jp/public/2006gl/vol4.html).
+    GHG emissions are provided by country, regions and special groups, with global
+    coverage, relative to the period 1990-present (with annual updates), expressed
+    as Gg CH4, Gg N2O, Gg CO2eq and Gg CO2eq from both CH4 and N2O, by land cover
+    class (savanna, woody savanna, closed shrubland, open shrubland, grassland) and
+    by aggregates (all categories, savanna and woody savanna, closed and open shrubland).
+    Implied emission factors for N2O and CH4  as well activity data (burned area and
+    biomass burned) are also provided.'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: df190cb2a091fc0781328ba3fd6dcab9
+  size: 123113
+  path: dataset_5021_emissions__agriculture__burning__savanna_config.json

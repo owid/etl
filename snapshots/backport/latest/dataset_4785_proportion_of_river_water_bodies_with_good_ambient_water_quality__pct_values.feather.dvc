@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4785
+    date_accessed: 2023-08-16 08:20:49.052770
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of river water bodies with good ambient water quality (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9599b95c2a5c933b27f9af60d2edc691
+  size: 7394
+  path: 
+    dataset_4785_proportion_of_river_water_bodies_with_good_ambient_water_quality__pct_values.feather

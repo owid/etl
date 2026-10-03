@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Urbanization Prospects Dataset
+    title_snapshot: World Urbanization Prospects Dataset - Size Class of Urban Settlement
+
+    description: |-
+      This dataset is derived from the World Urbanization Prospects, providing comprehensive data on global urbanization trends, including population figures, urban and rural population distributions, and projections for future urban growth.
+    date_published: '2018'  # Replace with the year of dataset creation
+
+    # Citation
+    producer: United Nations, Department of Economic and Social Affairs, Population
+      Division
+    citation_full: |-
+      United Nations, Department of Economic and Social Affairs, Population Division (2018). World Urbanization Prospects: The 2018 Revision, Online Edition.
+    attribution_short: United Nations
+
+    # Files
+    url_main: https://population.un.org/wup/Download/
+    date_accessed: 2024-01-17  # Replace with the actual date of access
+    url_download: https://population.un.org/wup/Download/Files/WUP2018-F17a-City_Size_Class.xls
+
+    # License
+    license:
+      name: CC BY 3.0 IGO
+      url: http://creativecommons.org/licenses/by/3.0/igo/
+
+wdir: ../../../data/snapshots/un/2024-01-17
+outs:
+- md5: ca326b340e189807b9b7ac0ce223bdca
+  size: 1857024
+  path: urban_agglomerations_size_class.xls

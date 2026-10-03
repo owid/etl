@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1992
+    date_accessed: 2023-08-16 08:32:40.732307
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Dollar value of financial and technical assistance (including through North-South,
+    South-South and triangular cooperation) committed to developing countries
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a971c63ab9b32465223c9f06d8778283
+  size: 25098
+  path: 
+    dataset_1992_dollar_value_of_financial_and_technical_assistance__including_through_north_south__south_south_and_triangular_cooperation__committed_to_developing_countries_values.feather

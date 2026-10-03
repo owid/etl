@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5524
+    date_accessed: 2023-08-10 15:02:44.884204
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5524_ghg_emissions_by_country_and_sector__cait__2021
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5cbf101a0fba57ed11c50b8c6325d56d
+  size: 26352
+  path: dataset_5524_ghg_emissions_by_country_and_sector__cait__2021_config.json

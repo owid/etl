@@ -1,0 +1,49 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Uncategorized
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 0
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Fiona Spooner
+    - Lucas Rodés-Guirao
+tables:
+  nat_earth_110:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      latitude_centroid:
+        title: Latitude
+        description_short: Latitude of the centroid of the country.
+        unit: degrees
+        short_unit: °
+        display:
+          numDecimalPlaces: 2
+          tolerance: 20
+        presentation:
+          grapher_config:
+            note: |-
+              The latitude is given of the [centroid](#dod:centroid) of the country.
+      absolute_latitude:
+        title: Absolute latitude
+        description_short: Absolute value of the latitude of the centroid of the country.
+        unit: degrees from the equator
+        short_unit: °
+        display:
+          numDecimalPlaces: 2
+          tolerance: 20
+        presentation:
+          grapher_config:
+            note: |-
+              The latitude is given of the [centroid](#dod:centroid) of the country.
+

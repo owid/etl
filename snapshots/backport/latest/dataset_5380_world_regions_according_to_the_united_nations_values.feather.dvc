@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5380
+    date_accessed: 2023-08-10 09:13:24.893433
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: world-regions-according-to-the-united-nations
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 53a2a00df7aeb74e959907d1941dcd59
+  size: 15058
+  path: dataset_5380_world_regions_according_to_the_united_nations_values.feather

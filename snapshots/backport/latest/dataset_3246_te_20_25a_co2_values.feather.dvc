@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/3246
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: TE-20.25a_CO2
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: 75bf25b7bd7fb58f713c72db3e66afe8
+    size: 12418
+    path: dataset_3246_te_20_25a_co2_values.feather

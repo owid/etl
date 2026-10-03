@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2309
+    date_accessed: 2023-08-11 07:54:14.755436
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Protein-energy malnutrition
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 96e01598f0d44eb5cba3b19e0016f3be
+  size: 2116410
+  path: dataset_2309_protein_energy_malnutrition_values.feather

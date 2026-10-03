@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2621
+    date_accessed: 2023-08-14 05:56:28.591959
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Education and Training - Graduation rates and entry rates
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ac6559e45e4289f7e183ce6dd91d654e
+  size: 65346
+  path: 
+    dataset_2621_education_and_training__graduation_rates_and_entry_rates_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/306
+    date_accessed: 2023-08-16 09:41:28.651662
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Government Spending – Roine, Vlachos, Waldenström (2009) and US Historical
+    Tables (2016)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d4d51a0f06e5e1089a311aee42c4328a
+  size: 15346
+  path: 
+    dataset_306_government_spending__roine__vlachos__waldenstrom__2009__and_us_historical_tables__2016_values.feather

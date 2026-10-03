@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1601
+    date_accessed: 2023-08-16 08:30:04.329594
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1601_endometriosis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5c4db64c171d68d12e1d0e6b5f5f7a0e
+  size: 24287
+  path: dataset_1601_endometriosis_config.json

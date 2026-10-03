@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4590
+    date_accessed: 2023-08-16 08:42:59.155228
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Countries that adopt and implement constitutional, statutory and/or policy
+    guarantees for public access to information
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 042ca3883f4a92b5d6a9b0679968017f
+  size: 10722
+  path: 
+    dataset_4590_countries_that_adopt_and_implement_constitutional__statutory_and_or_policy_guarantees_for_public_access_to_information_values.feather

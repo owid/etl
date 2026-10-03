@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5243
+    date_accessed: 2023-08-16 10:01:50.548022
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5243_oecd_collective_bargaining_coverage (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 933003511b6cb4802dfd6c9a0d5691eb
+  size: 1546
+  path: dataset_5243_oecd_collective_bargaining_coverage_config.json

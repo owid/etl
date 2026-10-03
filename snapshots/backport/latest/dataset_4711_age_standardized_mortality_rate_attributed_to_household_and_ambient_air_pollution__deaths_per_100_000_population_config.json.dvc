@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4711
+    date_accessed: 2023-08-10 14:39:06.041848
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4711_age_standardized_mortality_rate_attributed_to_household_and_ambient_air_pollution__deaths_per_100_000_population
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 08bef56f663ceb0002ec57bdd569313d
+  size: 12454
+  path: 
+    dataset_4711_age_standardized_mortality_rate_attributed_to_household_and_ambient_air_pollution__deaths_per_100_000_population_config.json

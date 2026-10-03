@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2106
+    date_accessed: 2023-08-14 14:52:11.411169
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2106_anxiety_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fed221c00b3d438d3da26dd88cffc6bd
+  size: 32578
+  path: dataset_2106_anxiety_disorders_config.json

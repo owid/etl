@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1799
+    date_accessed: 2023-08-14 15:27:37.239943
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1799_childhood_sexual_abuse (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7e182d17594c6827bf1755141fcdfdb5
+  size: 21968
+  path: dataset_1799_childhood_sexual_abuse_config.json

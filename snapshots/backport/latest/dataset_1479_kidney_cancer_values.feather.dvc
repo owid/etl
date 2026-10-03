@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1479
+    date_accessed: 2023-08-16 09:27:12.966937
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Kidney cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a959ee70bda6a5e8eb7c1d485a45a0b6
+  size: 2012034
+  path: dataset_1479_kidney_cancer_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5436
+    date_accessed: 2023-08-10 09:10:51.199377
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5436_biosafety_level_4_facilities
+  description: 
+    https://github.com/owid/notebooks/tree/main/EdouardMathieu/2021_12_bsl4_facilities_world_map
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fec48d4de692fb8fbc84155ef87ab15a
+  size: 2240
+  path: dataset_5436_biosafety_level_4_facilities_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5755
+    date_accessed: 2023-08-16 09:47:35.761974
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Vegetable oil yields (FAO)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 463cc3964b64d28100b287011260bea2
+  size: 673698
+  path: dataset_5755_vegetable_oil_yields__fao_values.feather

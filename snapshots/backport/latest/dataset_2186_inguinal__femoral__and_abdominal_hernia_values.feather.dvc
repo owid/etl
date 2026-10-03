@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2186
+    date_accessed: 2023-08-14 15:45:14.313995
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Inguinal, femoral, and abdominal hernia
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8c3bf5c3224cf1466506861cd2b17384
+  size: 2116418
+  path: dataset_2186_inguinal__femoral__and_abdominal_hernia_values.feather

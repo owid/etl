@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4203
+    date_accessed: 2023-08-10 09:23:34.638234
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4203_percentage_of_children_under_5_with_symptoms_of_pneumonia_taken_for_care_to_a_health_provider
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dabd7df5faee949d305ef45bab317cab
+  size: 1852
+  path: 
+    dataset_4203_percentage_of_children_under_5_with_symptoms_of_pneumonia_taken_for_care_to_a_health_provider_config.json

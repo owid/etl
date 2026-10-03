@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4646
+    date_accessed: 2023-08-14 05:47:13.977218
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Net official development assistance (ODA) to landlocked developing countries
+    from OECD-DAC countries, by donor countries (millions of constant 2017 United
+    States dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9110125e5675bd55ee93eb9a93eec167
+  size: 11514
+  path: 
+    dataset_4646_net_official_development_assistance__oda__to_landlocked_developing_countries_from_oecd_dac_countries__by_donor_countries__millions_of_constant_2017_united_states_dollars_values.feather

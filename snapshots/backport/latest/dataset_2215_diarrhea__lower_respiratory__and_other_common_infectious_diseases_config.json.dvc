@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2215
+    date_accessed: 2023-08-14 15:09:51.426871
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2215_diarrhea__lower_respiratory__and_other_common_infectious_diseases
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 20ec8a5a565a033e248e7dc0cbcf68b7
+  size: 34597
+  path: 
+    dataset_2215_diarrhea__lower_respiratory__and_other_common_infectious_diseases_config.json

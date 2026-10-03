@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2269
+    date_accessed: 2023-08-16 07:55:45.913417
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2269_pneumoconiosis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 414f3ae2ae20c4a33bfea44143a3e217
+  size: 32452
+  path: dataset_2269_pneumoconiosis_config.json

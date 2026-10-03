@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1944
+    date_accessed: 2023-08-16 10:08:01.902716
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Volume of official development assistance flows for scholarships by sector
+    and type of study
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fa57f9d2dc26545951928c2b131876c5
+  size: 19658
+  path: 
+    dataset_1944_volume_of_official_development_assistance_flows_for_scholarships_by_sector_and_type_of_study_values.feather

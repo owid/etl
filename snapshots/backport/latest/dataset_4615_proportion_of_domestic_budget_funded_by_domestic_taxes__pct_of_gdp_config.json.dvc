@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4615
+    date_accessed: 2023-08-16 08:52:23.070542
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4615_proportion_of_domestic_budget_funded_by_domestic_taxes__pct_of_gdp
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ac94bcce7e25510e230802fe6c5f7ba8
+  size: 15540
+  path: 
+    dataset_4615_proportion_of_domestic_budget_funded_by_domestic_taxes__pct_of_gdp_config.json

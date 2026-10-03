@@ -1,0 +1,21 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4996
+    date_accessed: 2023-08-11 07:37:35.687566
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'ASTI R&D Indicators: ASTI-Researchers'
+  description: ASTI collects primary time-series data on agricultural research capacity
+    and spending levels through national survey rounds in over 80 low-and middle-income
+    countries. Data collection is carried out by country focal points, who distribute
+    survey forms to all agencies known to conduct agricultural research in a given
+    country, including government, nonprofit, and higher education agencies. Private-for
+    profit sector coverage is limited, and hence excluded from this dataset. More
+    detailed country- and regional-level data on agricultural research capacity, investment,
+    and outputs are available on www.asti.cgiar.org/data.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: aef3321791c853c226ba573751c44841
+  size: 22130
+  path: dataset_4996_asti_r_and_d_indicators__asti_researchers_values.feather

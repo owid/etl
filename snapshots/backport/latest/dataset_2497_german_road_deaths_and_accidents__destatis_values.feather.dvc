@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/2497
+    date_accessed: 2026-03-10 09:26:09.917900+00:00
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: German road deaths and accidents - destatis
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: 60e506830480bb9616251521ca32e66b
+    size: 7242
+    path: dataset_2497_german_road_deaths_and_accidents__destatis_values.feather

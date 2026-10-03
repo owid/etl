@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1637
+    date_accessed: 2023-08-16 09:46:27.759556
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1637_chronic_kidney_disease_due_to_diabetes_mellitus
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 15a2fcc9142da432bb3e6af3a2c550e1
+  size: 32658
+  path: dataset_1637_chronic_kidney_disease_due_to_diabetes_mellitus_config.json

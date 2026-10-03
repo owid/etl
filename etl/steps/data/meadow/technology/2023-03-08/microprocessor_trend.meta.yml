@@ -1,0 +1,11 @@
+dataset: {}
+
+tables:
+  microprocessor_trend:
+    variables:
+      transistors:
+        title: Transistors per microprocessor
+        unit: transistors
+        short_unit:
+        display:
+          numDecimalPlaces: 0

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2370
+    date_accessed: 2023-08-16 08:16:21.441202
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Cervical cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d7d0248f0ceb430849ff05ec4f7619ec
+  size: 1499290
+  path: dataset_2370_cervical_cancer_values.feather

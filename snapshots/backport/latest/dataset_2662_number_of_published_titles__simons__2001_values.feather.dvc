@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2662
+    date_accessed: 2023-08-10 14:48:15.393639
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of published titles - Simons (2001)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cc716ec964668bee7d4f5ba3da692304
+  size: 10754
+  path: dataset_2662_number_of_published_titles__simons__2001_values.feather

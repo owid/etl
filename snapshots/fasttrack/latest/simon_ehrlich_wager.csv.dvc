@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: United States Geological Survey (2024). National Minerals Information Center.
+    title: simon_ehrlich_wager
+    citation_full: United States Geological Survey (2024). National Minerals Information Center.
+    url_main: https://www.usgs.gov/centers/national-minerals-information-center
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQTzqENO5c0zIZxWmmKP1LaztzZ1xxDHYEuJ0ld7bPxSlR0fQ3ankaNW-AkXselyDXDW84nSrYuOiAO/pub?output=csv
+    date_accessed: '2024-11-01'
+  name: Material prices and Simon-Ehrlich wager (USGS)
+  description: ''
+  license: {}
+outs:
+  - md5: b4f501e36fe4e849924692f2361f6ee2
+    size: 20373
+    path: simon_ehrlich_wager.csv

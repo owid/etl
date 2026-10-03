@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2601
+    date_accessed: 2023-08-16 08:11:47.875495
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Labour - World Indicators of Skills for Employment
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4a71b67e2be1e9df2dc9c2b0e30c9e9c
+  size: 1367410
+  path: dataset_2601_labour__world_indicators_of_skills_for_employment_values.feather

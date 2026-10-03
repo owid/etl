@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/836
+    date_accessed: 2023-08-10 14:32:32.135914
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_836_asti_r_and_d_indicators__asti_expenditures__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7b558a23e5d65e0c392d4134f70d3d6a
+  size: 4536
+  path: dataset_836_asti_r_and_d_indicators__asti_expenditures__2017_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2433
+    date_accessed: 2023-08-11 07:52:48.324172
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2433_population (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 88b4289968d38d4515e9570f8a8b5e0e
+  size: 12855
+  path: dataset_2433_population_config.json

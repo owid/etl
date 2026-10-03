@@ -1,0 +1,19 @@
+dataset:
+  title: TE-16.1
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_16_1:
+    variables:
+      unemployment_rate__pct:
+        title: Unemployment rate (%)
+        unit: '%'
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: AI Performance on Language Tasks
+    date_published: 2024-03-22
+    description_snapshot: |
+      MMLU (Massive Multitask Language Understanding) is a new benchmark designed to measure knowledge acquired during pretraining by evaluating models exclusively in zero-shot and few-shot settings. This makes the benchmark more challenging and more similar to how we evaluate humans. The benchmark covers 57 subjects across STEM, the humanities, the social sciences, and more. It ranges in difficulty from an elementary level to an advanced professional level, and it tests both world knowledge and problem solving ability. Subjects range from traditional areas, such as mathematics and history, to more specialized areas like law and ethics. The granularity and breadth of the subjects makes the benchmark ideal for identifying a model’s blind spots.
+
+    # Citation
+    producer: Papers with Code
+    citation_full: Multi-task Language Understanding on MMLU. Papers with Code (2024)
+
+    # Files
+    url_main: https://paperswithcode.com/sota/multi-task-language-understanding-on-mmlu
+    url_download: https://paperswithcode.com/sota/multi-task-language-understanding-on-mmlu
+    date_accessed: 2024-03-22
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by-sa/4.0/
+
+
+
+outs:
+  - md5: 8c1e6fbef33aae9d280a80e26c62bc08
+    size: 135060
+    path: papers_with_code_language.html

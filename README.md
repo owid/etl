@@ -1,0 +1,31 @@
+![](https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13%20|%203.14-blue.svg)
+
+# etl
+
+_The compute graph for Our World in Data's data processing._
+
+| Check | Status |
+| --- | --- |
+| Unit tests | [![Build status](https://badge.buildkite.com/061a630a7e2e6e7d64177b58b9915c4361ffef91852e952fe1.svg)](https://buildkite.com/our-world-in-data/etl-unit-tests) |
+| Public datasets | [![Build status](https://badge.buildkite.com/a7e503c815e669b5a8ad61314209c3767034757ff9736c3633.svg)](https://buildkite.com/our-world-in-data/etl-build-public-datasets-master) |
+| Nightly rebuild | [![Build status](https://badge.buildkite.com/6af24847cee4cc7348247c554dbbf4f0e12be2f6e7eb50cf6f.svg)](https://buildkite.com/our-world-in-data/etl-full-private-rebuild-nightly-master) |
+| Documentation | [![Documentation Status](https://readthedocs.org/projects/owid-etl/badge/?version=latest)](https://owid-etl.readthedocs.io/?badge=latest) |
+
+
+## Documentation
+
+See: https://docs.owid.io/projects/etl/
+
+## Libraries
+
+This repository includes several Python libraries published to PyPI:
+
+| Package | Description | PyPI | Docs |
+| ------- | ----------- | ---- | ---- |
+| [owid-catalog](lib/catalog/) | Core data types for managing OWID data (Dataset, Table, Variable) | [![PyPI](https://img.shields.io/pypi/v/owid-catalog?logo=Python&logoColor=white&color=blue)](https://pypi.org/project/owid-catalog/) | [Docs](https://docs.owid.io/projects/etl/libraries/catalog/intro/) |
+| [owid-repack](lib/repack/) | Pack DataFrames into memory-efficient data types | [![PyPI](https://img.shields.io/pypi/v/owid-repack?logo=Python&logoColor=white&color=blue)](https://pypi.org/project/owid-repack/) | [Docs](https://docs.owid.io/projects/etl/libraries/repack/) |
+
+<hr>
+<p align='center'>
+🪷 <i>There is no extract, there is no load, there is only transform.</i>
+</p>

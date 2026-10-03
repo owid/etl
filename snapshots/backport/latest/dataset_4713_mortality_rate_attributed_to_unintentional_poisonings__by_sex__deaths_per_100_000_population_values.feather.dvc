@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4713
+    date_accessed: 2023-08-16 09:37:57.165477
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Mortality rate attributed to unintentional poisonings, by sex (deaths per
+    100,000 population)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2fd9eb2683bbd81c0cca6ef49427ab83
+  size: 21978
+  path: 
+    dataset_4713_mortality_rate_attributed_to_unintentional_poisonings__by_sex__deaths_per_100_000_population_values.feather

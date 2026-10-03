@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4800
+    date_accessed: 2023-08-11 07:54:22.109519
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Nationally derived quantity of groundwater (millions of cubic metres per annum)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7fe145827b4d6f191860dbd01d559b90
+  size: 6474
+  path: 
+    dataset_4800_nationally_derived_quantity_of_groundwater__millions_of_cubic_metres_per_annum_values.feather

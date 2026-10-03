@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+"""
+Generate Swagger-like markdown documentation from OpenAPI specification.
+
+This script converts an OpenAPI YAML spec into a beautiful, interactive-looking
+markdown file compatible with Zensical/Material for MkDocs.
+
+Called from: make docs.pre
+Input: Fetched from owid/owid-grapher repository on GitHub (docs/search-api.openapi.yaml)
+Output: docs/api/search-api.md
+"""
+
+from pathlib import Path
+
+from .openapi_to_markdown import generate_markdown  # ty: ignore
+from .openapi_utils import load_openapi_spec_from_github  # ty: ignore
+
+
+def main():
+    """Generate Search API documentation from OpenAPI spec."""
+    repo_root = Path(__file__).parent.parent.parent.parent
+    output_path = repo_root / "docs" / "api" / "search-api.md"
+
+    print("Fetching OpenAPI spec from GitHub (owid/owid-grapher)...")
+    spec = load_openapi_spec_from_github(
+        org="owid",
+        repo="owid-grapher",
+        file_path="docs/search-api.openapi.yaml",
+    )
+
+    print("Generating markdown documentation...")
+    markdown = generate_markdown(spec)
+
+    # The upstream OpenAPI description points at `../data/index.md#indicator-search`,
+    # which doesn't exist on our docs site. Redirect to the Semantic Search API page
+    # in this repo.
+    markdown = markdown.replace(
+        "[Data API](../data/index.md#indicator-search)",
+        "[Semantic Search API](semantic-search-api.md)",
+    )
+
+    print(f"Writing documentation to {output_path}...")
+    output_path.write_text(markdown)
+
+    print("✓ Search API documentation generated successfully!")
+
+
+if __name__ == "__main__":
+    main()

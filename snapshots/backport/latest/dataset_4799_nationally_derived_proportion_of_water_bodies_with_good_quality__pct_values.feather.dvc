@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4799
+    date_accessed: 2023-08-16 10:19:40.190844
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Nationally derived proportion of water bodies with good quality (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 85c6fe035518a016ac64b768dc3904b4
+  size: 7026
+  path: 
+    dataset_4799_nationally_derived_proportion_of_water_bodies_with_good_quality__pct_values.feather

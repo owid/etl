@@ -1,0 +1,70 @@
+"""Load a snapshot and create a meadow dataset."""
+
+from etl.helpers import PathFinder
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
+RENAME_COLUMNS = {
+    "REF_AREA:Geographic area": "country",
+    "INDICATOR:Indicator": "indicator",
+    "AGE:Current age": "age",
+    "TIME_PERIOD:Time period": "year",
+    "OBS_VALUE:Observation Value": "value",
+    "STAT_POP:Statistical Population": "stat_pop",
+    "UNIT_MEASURE:Unit of measure": "unit",
+    "UNIT_MULTIPLIER:Unit multiplier": "unit_multiplier",
+    "DATA_SOURCE:Data Source": "data_source",
+}
+
+COLUMNS_TO_KEEP = [
+    "REF_AREA:Geographic area",
+    "INDICATOR:Indicator",
+    "AGE:Current age",
+    "TIME_PERIOD:Time period",
+    "OBS_VALUE:Observation Value",
+    "STAT_POP:Statistical Population",
+    "UNIT_MEASURE:Unit of measure",
+    "UNIT_MULTIPLIER:Unit multiplier",
+    "DATA_SOURCE:Data Source",
+]
+
+UNIT_MAP = {"3: Thousands": 1000, "0: Units": 1}
+
+
+def run() -> None:
+    #
+    # Load inputs.
+    #
+    # Retrieve snapshot.
+    snap = paths.load_snapshot("child_migration.csv")
+
+    # Load data from snapshot.
+    tb = snap.read()
+
+    # Rename columns.
+    tb = tb[COLUMNS_TO_KEEP]
+    tb = tb.rename(columns=RENAME_COLUMNS, errors="raise")
+
+    # multiply by unit multiplier
+    # NA is one because it should not affect the value when multiplying
+    tb["unit_multiplier"] = tb["unit_multiplier"].map(UNIT_MAP).fillna(1)
+    tb["value"] = tb["value"].replace("<1", "0").astype("Float64") * tb["unit_multiplier"]
+
+    # filter only on age 0-17
+    tb = tb[tb["age"] == "Y0T17: Under 18 years old"]
+
+    # drop unneeded columns
+    tb = tb.drop(columns=["unit_multiplier", "age"])
+
+    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
+    tb = tb.format(["country", "year", "indicator", "stat_pop"])
+
+    #
+    # Save outputs.
+    #
+    # Initialize a new meadow dataset.
+    ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
+
+    # Save meadow dataset.
+    ds_meadow.save()

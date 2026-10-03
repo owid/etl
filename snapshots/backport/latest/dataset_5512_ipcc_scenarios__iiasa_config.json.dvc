@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5512
+    date_accessed: 2023-08-14 16:06:10.554125
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5512_ipcc_scenarios__iiasa
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 891e0b0ce0093405f4ee96bf2a97b730
+  size: 90609
+  path: dataset_5512_ipcc_scenarios__iiasa_config.json

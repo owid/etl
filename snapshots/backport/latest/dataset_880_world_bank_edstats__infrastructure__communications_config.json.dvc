@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/880
+    date_accessed: 2023-08-16 10:11:56.099555
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_880_world_bank_edstats__infrastructure__communications
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1b31f26afd8aca4de19a721756d287f8
+  size: 4846
+  path: dataset_880_world_bank_edstats__infrastructure__communications_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3110
+    date_accessed: 2023-08-16 09:21:53.373800
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3110_global_primary_energy_share__smil__and__bp
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 35032b2df1f46fe5e4b2281e7e1a9018
+  size: 9255
+  path: dataset_3110_global_primary_energy_share__smil__and__bp_config.json

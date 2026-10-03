@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2169
+    date_accessed: 2023-08-16 10:31:02.860127
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2169_chronic_myeloid_leukemia (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0fc41e043fe7ed767771bce899600da3
+  size: 32872
+  path: dataset_2169_chronic_myeloid_leukemia_config.json

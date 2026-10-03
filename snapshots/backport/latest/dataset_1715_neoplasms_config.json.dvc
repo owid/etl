@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1715
+    date_accessed: 2023-08-16 10:37:59.238835
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1715_neoplasms (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a34cf696a1a7ca288d91e99b953d6b94
+  size: 31677
+  path: dataset_1715_neoplasms_config.json

@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Crop productivity in southern Africa is stagnant despite moderate climate trends"
+    description: |-
+      This dataset contains the supplementary materials accompanying the paper "Crop productivity in southern Africa is stagnant despite moderate climate trends".
+    date_published: "2025-05-22"
+    version_producer: v2
+
+    # Citation
+    producer: Lobell Lab
+    citation_full: |-
+      Lee, R. (2025). LobellLab/southern-africa-trends. Zenodo. https://doi.org/10.5281/zenodo.15492669
+
+    # Files
+    url_main: https://zenodo.org/records/15492669
+    url_download: https://zenodo.org/records/15492669/files/southern-africa-trends.zip?download=1
+    date_accessed: '2025-10-15'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://zenodo.org/records/15492669
+outs:
+  - md5: ee748d38b936a9966386f8c30163f5fe
+    size: 57868742
+    path: crop_yields_in_southern_africa.zip

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4837
+    date_accessed: 2023-08-16 07:17:36.321361
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Unemployment rate, by sex and age (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6e2c84354093029c3e8645560822153a
+  size: 81546
+  path: dataset_4837_unemployment_rate__by_sex_and_age__pct_values.feather

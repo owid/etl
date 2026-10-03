@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1435
+    date_accessed: 2023-08-16 08:52:51.807049
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Congenital heart anomalies
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9aed7a0d83358fee44227dd060989a70
+  size: 1855194
+  path: dataset_1435_congenital_heart_anomalies_values.feather

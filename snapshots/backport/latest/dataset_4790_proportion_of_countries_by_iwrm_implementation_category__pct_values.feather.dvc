@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4790
+    date_accessed: 2023-08-16 07:56:52.262108
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of countries by IWRM implementation category (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c847c325ffcada29db86cbeb3cb08aca
+  size: 6866
+  path: 
+    dataset_4790_proportion_of_countries_by_iwrm_implementation_category__pct_values.feather

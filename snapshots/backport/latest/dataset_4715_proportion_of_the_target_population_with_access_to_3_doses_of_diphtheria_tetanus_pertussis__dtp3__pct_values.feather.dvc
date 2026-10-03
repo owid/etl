@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4715
+    date_accessed: 2023-08-16 08:15:15.325626
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of the target population with access to 3 doses of diphtheria-tetanus-pertussis
+    (DTP3) (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c7ed5fb4e574dfe4a1ea11cfdb8cf0af
+  size: 25882
+  path: 
+    dataset_4715_proportion_of_the_target_population_with_access_to_3_doses_of_diphtheria_tetanus_pertussis__dtp3__pct_values.feather

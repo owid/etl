@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4677
+    date_accessed: 2023-08-14 05:33:29.105495
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Agriculture share of Government Expenditure (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e695010cbcc9ae23be58dae6f884d30a
+  size: 29802
+  path: dataset_4677_agriculture_share_of_government_expenditure__pct_values.feather

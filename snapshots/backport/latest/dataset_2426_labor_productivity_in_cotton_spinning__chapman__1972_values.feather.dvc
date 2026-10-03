@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2426
+    date_accessed: 2023-08-14 05:39:32.457094
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Labor productivity in cotton spinning (Chapman (1972))
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5c8260e694eac48b3f793475336019de
+  size: 6330
+  path: dataset_2426_labor_productivity_in_cotton_spinning__chapman__1972_values.feather

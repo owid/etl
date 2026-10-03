@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4441
+    date_accessed: 2023-08-14 15:48:17.792401
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4441_number_of_missing_persons_due_to_disaster__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f2d49d94cc2c15eba61bff4ce6af7681
+  size: 10105
+  path: dataset_4441_number_of_missing_persons_due_to_disaster__number_config.json

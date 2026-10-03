@@ -1,0 +1,25 @@
+meta:
+  origin:
+    title: Statistical Review of World Energy
+    title_snapshot: Statistical Review of World Energy - Key data
+    description: |-
+      The Energy Institute Statistical Review of World Energy analyses data on world energy markets from the prior year.
+    producer: Energy Institute
+    attribution: Energy Institute - Statistical Review of World Energy (2023)
+    attribution_short: Energy Institute
+    citation_full: |-
+      Energy Institute - Statistical Review of World Energy (2023).
+    date_accessed: 2023-12-12
+    date_published: 2023-06-26
+    url_main: https://www.energyinst.org/statistical-review/
+    url_download:
+      https://www.energyinst.org/__data/assets/excel_doc/0007/1055545/EI-stats-review-all-data.xlsx
+    license:
+      name: © Energy Institute 2023
+      url: https://web.archive.org/web/20230626200231/https://www.energyinst.org/__data/assets/pdf_file/0004/1055542/EI_Stat_Review_PDF_single-2.pdf
+
+wdir: ../../../data/snapshots/energy_institute/2023-12-12
+outs:
+- md5: 2a9d445459baf300aba1cb8c3687a47f
+  size: 3358439
+  path: statistical_review_of_world_energy.xlsx

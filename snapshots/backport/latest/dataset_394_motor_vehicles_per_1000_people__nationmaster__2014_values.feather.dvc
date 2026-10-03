@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/394
+    date_accessed: 2023-08-14 05:36:51.084762
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Motor vehicles per 1000 people - NationMaster (2014)
+  description: Number of private motor vehicles per 1000 people in 2014- NationMaster
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6e4324cb81efba09ede1bbededf77456
+  size: 12490
+  path: dataset_394_motor_vehicles_per_1000_people__nationmaster__2014_values.feather

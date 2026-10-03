@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4438
+    date_accessed: 2023-08-16 07:58:24.303831
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number damaged dwellings attributed to disasters, by hazard type (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: aa14b2ca04d3c1f0c93848677e5326fe
+  size: 72266
+  path: 
+    dataset_4438_number_damaged_dwellings_attributed_to_disasters__by_hazard_type__number_values.feather

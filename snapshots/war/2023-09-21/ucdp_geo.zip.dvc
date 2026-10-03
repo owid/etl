@@ -1,0 +1,35 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Georeferenced Event Dataset
+    date_published: '2023'
+    description: |-
+      This dataset is UCDP's most disaggregated dataset, covering individual events of organized violence (phenomena of lethal violence occurring at a given time and place). These events are sufficiently fine-grained to be geo-coded down to the level of individual villages, with temporal durations disaggregated to single, individual days.
+
+      You can find more notes at https://web.archive.org/web/20230618115833/https://ucdp.uu.se/downloads/ged/ged231.pdf
+    version_producer: v23.1
+
+    # Citation
+    producer: Uppsala Conflict Data Program
+    citation_full: |-
+      Davies, Shawn, Therese Pettersson & Magnus Öberg (2023). Organized violence 1989-2022 and the return of conflicts between states?. Journal of Peace Research 60(4).
+
+      Sundberg, Ralph, and Erik Melander, 2013, “Introducing the UCDP Georeferenced Event Dataset”, Journal of Peace Research, vol.50, no.4, 523-532
+
+    attribution_short: UCDP
+
+    # Files
+    url_main: https://ucdp.uu.se/downloads/index.html
+    url_download: https://ucdp.uu.se/downloads/ged/ged231-csv.zip
+    date_accessed: 2023-09-21
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+
+wdir: ../../../data/snapshots/war/2023-09-21
+outs:
+- md5: d48f537fe6ef7922caaf579fc8da6788
+  size: 26587114
+  path: ucdp_geo.zip

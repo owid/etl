@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: De Sanjosé et al.
+    title: Burden of Human Papillomavirus (HPV)-Related Cancers Attributable to HPVs 6/11/16/18/31/33/45/52 and 58
+    description: |-
+      A global study examining the fraction of cancers attributable to different types of HPV. The study analyzed 18,247 samples of cancers of the genitals, anus, and head and neck, from 50 countries. Researchers tested for HPV DNA, and for cancers other than cervical cancer, they also looked for specific biomarkers of HPV infection. This dataset shows the estimated fraction of global cancers of each type that is attributable to HPV DNA or biomarkers (in Table 2 and 3 of the study).
+    citation_full: |-
+      De Sanjosé, S., Serrano, B., Tous, S., Alejo, M., Lloveras, B., Quirós, B., Clavero, O., Vidal, A., Ferrándiz-Pulido, C., Pavón, M. Á., Holzinger, D., Halec, G., Tommasino, M., Quint, W., Pawlita, M., Muñoz, N., Bosch, F. X., Alemany, L., RIS HPV TT, VVAP and Head and Neck study groups, & Kulkarni, A. (2018). Burden of Human Papillomavirus (HPV)-Related Cancers Attributable to HPVs 6/11/16/18/31/33/45/52 and 58. JNCI Cancer Spectrum, 2(4), pky045. https://doi.org/10.1093/jncics/pky045
+    url_main: https://doi.org/10.1093/jncics/pky045
+    url_download: |-
+      gAAAAABnA_J7h8xuTNajR7yiP1hqq0yEXZeVpDwoJbgnVcytQQYqwpgVDMuVtTVv2n_Zqv7HejDhlYQ9VvlsYKyK4sIll8EgzG8grKhq-q_UCPm6bbnlhFJKmM6W8mPzhgBgpELqiOOcPwUPP4UOwOvk00jnP_PCCDE953QNclZMkaQ3KEHImuFlu4pksElsPNK1DK8NlHE_YcMrpNhCYOKXASTjIVkipLmUVZlskU1h7u6oiHMhxQd8kTrDGh_IysM0Qr7AT_Dr
+    date_accessed: '2024-10-07'
+    date_published: '2019'
+  name: Burden of Human Papillomavirus (HPV)-Related Cancers Attributable to HPVs 6/11/16/18/31/33/45/52 and 58
+  description: |-
+    A global study examining the fraction of cancers attributable to different types of HPV. The study analyzed 18,247 samples of cancers of the genitals, anus, and head and neck, from 50 countries. Researchers tested for HPV DNA, and for cancers other than cervical cancer, they also looked for specific biomarkers of HPV infection. This dataset shows the estimated fraction of global cancers of each type that is attributable to HPV DNA or biomarkers (in Table 2 and 3 of the study).
+  license: {}
+  is_public: false
+outs:
+  - md5: a51b6dea80e44d15da1d65dd04d7d218
+    size: 421
+    path: de_sanjose_2019_hpv_cancers.csv

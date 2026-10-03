@@ -1,0 +1,152 @@
+# List specifying how to impute specific country.
+#
+# As an example:
+#
+# - country: Panama
+#   country_impute: Colombia
+#   year_min: 1832
+#   year_max: 1902
+#
+# This means that we want to inherit the classifications for Panama from Colombia between 1832 and 1902.
+#
+# We note that `country` can also be a list of countries.
+
+# Federal Republic of Central America
+- country:
+    - Guatemala
+    - Honduras
+    - El Salvador
+    - Nicaragua
+    - Costa Rica
+  country_impute: Federal Republic of Central America
+  year_min: 1824
+  year_max: 1838
+# Czechoslovakia
+- country:
+    - Slovakia
+    - Czechia
+  country_impute: Czechoslovakia
+  year_min: 1918
+  year_max: 1992
+# Korea
+## Korea from Japan Colonisation (1910 - 1945)?
+- country:
+    - South Korea
+    - North Korea
+  country_impute: Korea (former)
+  year_min: 1800
+  year_max: 1910
+# Great Colombia
+- country:
+    - Venezuela
+    - Ecuador
+    - Panama
+    - Colombia
+  country_impute: Great Colombia
+  year_min: 1821
+  year_max: 1830
+# Colombia
+- country: Panama
+  country_impute: Colombia
+  year_min: 1832
+  year_max: 1902
+# Yugoslavia
+- country:
+    - Slovenia
+    - Croatia
+    - Montenegro
+    - Serbia
+    - Bosnia and Herzegovina
+    - Kosovo
+    - North Macedonia
+  country_impute: Yugoslavia
+  year_min: 1921
+  year_max: 1990
+# Serbia and Montenegro
+- country:
+    - Serbia
+    - Montenegro
+    - Kosovo
+  country_impute: Serbia and Montenegro
+  year_min: 1991
+  year_max: 2005
+# Serbia (with Kosovo)
+- country: Kosovo
+  country_impute: Serbia
+  year_min: 2006
+  year_max: 2011
+# USSR
+- country: Russia
+  country_impute: USSR
+  year_min: 1922
+  year_max: 1991
+- country:
+    - Ukraine
+    - Belarus
+    - Azerbaijan
+    - Armenia
+    - Georgia
+    - Turkmenistan
+    - Uzbekistan
+    - Kazakhstan
+    - Tajikistan
+    - Kyrgyzstan
+  country_impute: USSR
+  year_min: 1922
+  year_max: 1991
+- country:
+    - Lithuania
+    - Latvia
+    - Estonia
+  country_impute: USSR
+  year_min: 1941
+  year_max: 1991
+- country: Moldova
+  country_impute: USSR
+  year_min: 1940
+  year_max: 1991
+
+# Russian Empire
+- country:
+    - Belarus
+    - Georgia
+    - Turkmenistan
+    - Kazakhstan
+  country_impute: Russia
+  year_min: 1800
+  year_max: 1921
+- country: Tajikistan
+  country_impute: Russia
+  year_min: 1868
+  year_max: 1921
+- country: Kyrgyzstan
+  country_impute: Russia
+  year_min: 1868
+  year_max: 1921
+- country: Uzbekistan
+  country_impute: Russia
+  year_min: 1865
+  year_max: 1911
+- country: Moldova
+  country_impute: Russia
+  year_min: 1800
+  year_max: 1919
+- country: Azerbaijan
+  country_impute: Russia
+  year_min: 1813
+  year_max: 1921
+
+# Ethopia
+- country:
+    - Eritrea
+    - Ethiopia
+  country_impute: Ethiopia (former)
+  year_min: 1952
+  year_max: 1992
+# Pakistan
+- country:
+    - Pakistan
+    - Bangladesh
+  country_impute: Pakistan (former)
+  year_min: 1947
+  year_max: 1971

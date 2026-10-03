@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2589
+    date_accessed: 2023-08-16 09:37:29.742498
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2589_labour__average_annual_hours_actually_worked_per_worker
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9335f62127e7dba53201602374932787
+  size: 5654
+  path: dataset_2589_labour__average_annual_hours_actually_worked_per_worker_config.json

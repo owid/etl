@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1978
+    date_accessed: 2023-08-16 10:27:20.141622
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of women of reproductive age (aged 15-49 years) who have their
+    need for family planning satisfied with modern methods
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 147c124727628faa9063f40abf0976c5
+  size: 14498
+  path: 
+    dataset_1978_proportion_of_women_of_reproductive_age__aged_15_49_years__who_have_their_need_for_family_planning_satisfied_with_modern_methods_values.feather

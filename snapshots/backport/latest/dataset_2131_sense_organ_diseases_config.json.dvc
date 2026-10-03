@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2131
+    date_accessed: 2023-08-16 08:36:30.379502
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2131_sense_organ_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3e2e148d31d911e5f86403dc51224152
+  size: 32704
+  path: dataset_2131_sense_organ_diseases_config.json

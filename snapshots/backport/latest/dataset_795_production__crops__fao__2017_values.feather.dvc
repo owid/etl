@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/795
+    date_accessed: 2023-08-14 16:05:06.643573
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Production: Crops - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a4a9847243bed01d38d7913e2acfae53
+  size: 10400346
+  path: dataset_795_production__crops__fao__2017_values.feather

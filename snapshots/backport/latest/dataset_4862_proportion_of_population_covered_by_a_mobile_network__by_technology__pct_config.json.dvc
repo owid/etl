@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4862
+    date_accessed: 2023-08-16 10:09:59.456906
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4862_proportion_of_population_covered_by_a_mobile_network__by_technology__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 21b81d7e9f67d69344abb03210151589
+  size: 3560
+  path: 
+    dataset_4862_proportion_of_population_covered_by_a_mobile_network__by_technology__pct_config.json

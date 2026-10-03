@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1970
+    date_accessed: 2023-08-16 09:50:50.638437
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1970_number_of_countries_that_adopt_and_implement_national_disaster_risk_reduction_strategies_in_line_with_the_sendai_framework_for_disaster_risk_reduction_2015_2030
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ff3aff4f437d022b960898e0ed2eb3b3
+  size: 6173
+  path: 
+    dataset_1970_number_of_countries_that_adopt_and_implement_national_disaster_risk_reduction_strategies_in_line_with_the_sendai_framework_for_disaster_risk_reduction_2015_2030_config.json

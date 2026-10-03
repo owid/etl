@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4656
+    date_accessed: 2023-08-14 15:34:04.627719
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of fixed Internet broadband subscriptions, by speed (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: efd007494be1a247d5a9245b65a7e948
+  size: 50178
+  path: 
+    dataset_4656_number_of_fixed_internet_broadband_subscriptions__by_speed__number_values.feather

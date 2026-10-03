@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/798
+    date_accessed: 2023-08-14 14:36:51.957557
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_798_prices__producer_price_indices__annual__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8d2a4fe89b454da2e54c0ee317326780
+  size: 256257
+  path: dataset_798_prices__producer_price_indices__annual__fao__2017_config.json

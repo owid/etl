@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2639
+    date_accessed: 2023-08-14 15:31:28.187115
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2639_health__non_medical_determinants_of_health
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9b9b5711b2f6d635d7c82c1a7e5df079
+  size: 13318
+  path: dataset_2639_health__non_medical_determinants_of_health_config.json

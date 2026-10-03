@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/6007
+    date_accessed: 2023-08-16 07:28:36.447793
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_6007_global_health_observatory__age_standardized_suicide_rates__who__invented
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 05e2ae47574e676e4026a0f910eed23f
+  size: 3765
+  path: 
+    dataset_6007_global_health_observatory__age_standardized_suicide_rates__who__invented_config.json

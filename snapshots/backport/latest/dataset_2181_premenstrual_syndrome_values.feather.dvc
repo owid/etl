@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2181
+    date_accessed: 2023-08-14 14:35:38.584485
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Premenstrual syndrome
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b57d262930275195d192cff05e26016d
+  size: 1036242
+  path: dataset_2181_premenstrual_syndrome_values.feather

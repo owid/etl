@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/828
+    date_accessed: 2023-08-10 14:31:13.664319
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'ASTI R&D Indicators: ASTI-Researchers (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 829096683c32c7c95b0cc4c2d9e160be
+  size: 16354
+  path: dataset_828_asti_r_and_d_indicators__asti_researchers__2017_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4528
+    date_accessed: 2023-08-16 10:39:43.788647
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Compliance with the Montreal Protocol on hazardous waste and other chemicals
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b83f1218647d29cfc6cc0c2a086461cd
+  size: 12946
+  path: 
+    dataset_4528_compliance_with_the_montreal_protocol_on_hazardous_waste_and_other_chemicals_values.feather

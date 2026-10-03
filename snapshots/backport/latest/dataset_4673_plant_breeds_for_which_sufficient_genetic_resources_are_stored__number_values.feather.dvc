@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4673
+    date_accessed: 2023-08-16 08:50:59.535377
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Plant breeds for which sufficient genetic resources are stored (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7d895f156a25628bc7fdd9eef0de8e65
+  size: 15938
+  path: 
+    dataset_4673_plant_breeds_for_which_sufficient_genetic_resources_are_stored__number_values.feather

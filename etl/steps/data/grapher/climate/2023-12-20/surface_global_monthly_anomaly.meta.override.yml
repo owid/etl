@@ -1,0 +1,20 @@
+tables:
+  surface_global_monthly_anomaly:
+    variables:
+      temperature_anomaly:
+        description_short: The deviation of a specific year's average surface temperature from the 1991-2020 mean, in degrees
+          Celsius.
+        description_processing: |-
+            - Temperature measured in kelvin was converted to degrees Celsius (°C) by subtracting 273.15.
+
+            - Initially, the temperature dataset is provided with specific coordinates in terms of longitude and latitude. To tailor this data to each country, we utilize geographical boundaries as defined by the World Bank. The method involves trimming the global temperature dataset to match the exact geographical shape of each country. To correct for potential distortions caused by the Earth's curvature on a flat map, we apply a latitude-based weighting. This step is essential for maintaining accuracy, especially in high-latitude regions where distortion is more pronounced. The result of this process is a latitude-weighted average temperature for each nation.
+
+            - It's important to note, however, that due to the resolution constraints of the Copernicus dataset, this methodology might not be as effective for countries with very small landmasses. In these cases, the process may not yield reliable data.
+
+            - The derived 2-meter temperature readings for each country are calculated based on administrative borders, encompassing all land surface types within these defined areas. As a result, temperatures over oceans and seas are not included in these averages, focusing the data primarily on terrestrial environments.
+
+            - Global temperature averages and anomalies are calculated over all land and ocean surfaces.
+
+            - The temperature anomaly is calculated by comparing the average surface temperature of a specific time period (e.g., a particular year or month) to the mean surface temperature of the same period from 1991 to 2020.
+
+            - The reason for using the 1991-2020 period as the reference mean is that it is the standard reference period used by our data source, the Copernicus Climate Change Service. This period is also adopted by the UK Met Office. This approach ensures consistency in identifying climate variations over time.

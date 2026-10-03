@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4008
+    date_accessed: 2023-08-14 05:43:36.255209
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Gastroesophageal reflux disease
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3449276f7730d2fd2f06acec11cb191a
+  size: 702794
+  path: dataset_4008_gastroesophageal_reflux_disease_values.feather

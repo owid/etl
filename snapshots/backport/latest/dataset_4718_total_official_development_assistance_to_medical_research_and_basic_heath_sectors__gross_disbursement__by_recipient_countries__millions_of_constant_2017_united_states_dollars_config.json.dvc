@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4718
+    date_accessed: 2023-08-10 14:45:50.966179
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4718_total_official_development_assistance_to_medical_research_and_basic_heath_sectors__gross_disbursement__by_recipient_countries__millions_of_constant_2017_united_states_dollars
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8fc4d5e57cb828b668820d50b95eefb3
+  size: 2172
+  path: 
+    dataset_4718_total_official_development_assistance_to_medical_research_and_basic_heath_sectors__gross_disbursement__by_recipient_countries__millions_of_constant_2017_united_states_dollars_config.json

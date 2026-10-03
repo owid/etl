@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4247
+    date_accessed: 2023-08-14 15:13:47.767259
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4247_wealth_as_percent_national_income_by_wealth_type__piketty__2014
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2796188f26fad88b73d633cbc0945778
+  size: 5835
+  path: 
+    dataset_4247_wealth_as_percent_national_income_by_wealth_type__piketty__2014_config.json

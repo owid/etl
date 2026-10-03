@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4667
+    date_accessed: 2023-08-14 15:24:37.575959
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4667_children_moderately_or_severely_overweight__millions
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7dc6debe20d77d183e7c6768bace26b2
+  size: 3488
+  path: dataset_4667_children_moderately_or_severely_overweight__millions_config.json

@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: COVID-19, new registrations and deaths during the pandemic in Sweden
+    description: |-
+      Statistics about covid-19 and the corona pandemic in Sweden.
+
+      Since the corona pandemic, the National Board of Health and Welfare has followed and shown the situation in health care linked to covid-19. Here you will find all diagrams that have been published before.
+
+
+    date_published: "2024-01-18"
+
+    # Citation
+    producer: Government of Sweden, Socialstyrelsen
+    citation_full: |-
+      Socialstyrelsen. (2024). Tidigare publicerad statistik om covid-19. https://www.socialstyrelsen.se/statistik-och-data/statistik/alla-statistikamnen/lagesbild-covid-19-influensa-och-rs-statistik/tidigare-publicerad-statistik/
+
+    # Files
+    url_main: https://www.socialstyrelsen.se/statistik-och-data/statistik/alla-statistikamnen/lagesbild-covid-19-influensa-och-rs-statistik/tidigare-publicerad-statistik/
+    date_accessed: 2024-08-12
+
+    # License
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: 9c7069e8d95f1378aaf2c5226aeeef50
+    size: 56637
+    path: sweden_covid.csv

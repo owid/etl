@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: Garbinti, Goupille-Lebret, Piketty (2021)
+    title: 'Accounting for Wealth-Inequality Dynamics: Methods, Estimates, and Simulations for France'
+    url_download: |-
+      gAAAAABqRPOJ4N5hgXQeE_9I-gd3epN3EpJBgXonUquSKOFcgAO4Nm3rQigmIvp_DE068Rm1P7rmYlMxodZg6aGt12787Hsz3qCUIyfV3X4RSVKah9aWT7p6nNny9ZrmwZo4ibTh7mO55v4WqW5HvaBDxrz8or6Oa3qROMEwhBxhZttc1s7yjRV6Hsx2oaU39_BID2rIvyni1qK9wyaKKa-JbIMB_hSUz7IaQzOLFbDX7UHggraKd_QKGfSL3uDOMS2njnlSHWJL
+    date_accessed: '2026-07-01'
+  name: DRAFT France wealth distribution share top 1
+  description: ''
+  license: {}
+  is_public: false
+outs:
+  - md5: cb53b1a1e7b5dab9d8d0ad200cc39e10
+    size: 1991
+    path: france_wealth_share_top1.csv

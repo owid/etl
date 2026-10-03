@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: Unknown
+    title: Unknown
+    citation_full: Unknown.
+    version_producer: Local CSV
+    url_download: gAAAAABkPnvjWjkvLdUrfVlCfL7LlME4D9o29z3V_9ugnqMLIGzV_z-9UedVSfUjHrVKypEPt7Lj4u8Y3KMqG1lAQBfhpkYbVg==
+    date_accessed: '2023-04-18'
+    date_published: '2023'
+  is_public: false
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: ff3a6e764ec49942e727fe73e207d705
+  size: 8238
+  path: compare_wid_and_pip_inequality_data_1980_vs_2018__joe_temp.csv

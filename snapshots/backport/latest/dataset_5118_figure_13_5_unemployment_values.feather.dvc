@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5118
+    date_accessed: 2023-08-16 10:18:22.540884
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Figure_13.5_unemployment
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bf1adb0d9342b4ebb8767399a5d9129f
+  size: 10514
+  path: dataset_5118_figure_13_5_unemployment_values.feather

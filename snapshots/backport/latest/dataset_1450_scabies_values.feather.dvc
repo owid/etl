@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1450
+    date_accessed: 2023-08-16 08:42:34.420445
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Scabies
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 340029d62f63e4ff168d7591ec7b8a93
+  size: 1011338
+  path: dataset_1450_scabies_values.feather

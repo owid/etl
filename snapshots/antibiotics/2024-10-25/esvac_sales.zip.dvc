@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: European database of sales of veterinary microbial agents (ESVAC)
+    description: |-
+      The European database of sales of veterinary antimicrobial agents provides public access to the data the European Surveillance of Veterinary Antimicrobial consumption (ESVAC) project collects on the sales of veterinary antimicrobials in Member States of the European Union and European Economic Area.
+    date_published: "2023-11-20"
+
+    # Citation
+    producer: European Medicines Agency
+    citation_full: |-
+      European Medicines Agency, European Surveillance of Veterinary Antimicrobial Consumption, 2022. 'Sales of veterinary antimicrobial agents in 31 European countries in 2022' (EMA/299538/2023).
+    attribution_short: ESVAC
+
+    # Files
+    url_main: https://esvacbi.ema.europa.eu/analytics/saw.dll?Dashboard
+    date_accessed: 2024-10-25
+
+    # License
+    license:
+      name: © EMA
+      url: https://www.ema.europa.eu/en/about-us/about-website/legal-notice
+outs:
+  - md5: 5d7d149554df9028baed8a300f7dcd93
+    size: 8392889
+    path: esvac_sales.zip

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5416
+    date_accessed: 2023-08-10 08:06:00.918171
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Solar and wind projections
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 53c4fbbaaf20c2d83e6c1ecb45edc4ac
+  size: 10330
+  path: dataset_5416_solar_and_wind_projections_values.feather

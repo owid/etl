@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2685
+    date_accessed: 2023-08-11 07:39:28.864470
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2685_world_health_statistics (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d4bae568376765b20d1d81bf591ff809
+  size: 134766
+  path: dataset_2685_world_health_statistics_config.json

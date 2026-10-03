@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/654
+    date_accessed: 2023-08-16 07:16:43.207338
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_654_dietary_macronutrient_compositions__fao__2017
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fe667e5408ebd996bba98ed75061140a
+  size: 10686
+  path: dataset_654_dietary_macronutrient_compositions__fao__2017_config.json

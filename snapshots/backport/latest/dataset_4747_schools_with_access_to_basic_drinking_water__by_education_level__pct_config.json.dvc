@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4747
+    date_accessed: 2023-08-11 07:17:29.150287
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4747_schools_with_access_to_basic_drinking_water__by_education_level__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c7b1d56e258bf9fd8387b44b83160e18
+  size: 3499
+  path: 
+    dataset_4747_schools_with_access_to_basic_drinking_water__by_education_level__pct_config.json

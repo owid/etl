@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/825
+    date_accessed: 2023-08-11 07:43:59.783102
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Production: Live Animals - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d2e66e3d0e85d9568497a7b5ba225b06
+  size: 400210
+  path: dataset_825_production__live_animals__fao__2017_values.feather

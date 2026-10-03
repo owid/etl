@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2208
+    date_accessed: 2023-08-16 09:50:23.545042
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Latent tuberculosis infection
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ac7727ef612b8816754ca7240f81944b
+  size: 1069218
+  path: dataset_2208_latent_tuberculosis_infection_values.feather

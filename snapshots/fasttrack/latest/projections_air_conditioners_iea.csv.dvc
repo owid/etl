@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: International Energy Agency (IEA). Future of Cooling.
+    title: projections_air_conditioners_iea
+    citation_full: International Energy Agency (IEA). Future of Cooling.
+    url_main: https://www.iea.org/data-and-statistics/charts/global-air-conditioner-stock-1990-2050
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQy1z1uDJPyKY18x9jPGVu6PL5lrLKW5snSQ0SadV8QWkD1VBjfoFLPdhMD6C5kHdFwKakZ6aO5lFbe/pub?output=csv
+    date_accessed: '2024-05-29'
+  name: Projections of air conditioning units (IEA, 2018)
+  description: Projected number of air conditioning units.
+  license: {}
+outs:
+  - md5: 1b65f973fb5b209ffad8528056eabd76
+    size: 15037
+    path: projections_air_conditioners_iea.csv

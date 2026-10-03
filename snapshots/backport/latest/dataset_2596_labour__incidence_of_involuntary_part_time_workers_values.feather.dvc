@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2596
+    date_accessed: 2023-08-16 10:03:07.505957
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Labour - Incidence of involuntary part time workers
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1ae6b84cfeded62fd36ef91a836cbc22
+  size: 27314
+  path: dataset_2596_labour__incidence_of_involuntary_part_time_workers_values.feather

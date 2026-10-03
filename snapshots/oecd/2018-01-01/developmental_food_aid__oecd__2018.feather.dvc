@@ -1,0 +1,12 @@
+meta:
+  origin:
+    producer: OECD
+    title: Developmental food aid
+    citation_full: Developmental Food Aid (2018). OECD.
+    date_accessed: '2018-01-01'
+    date_published: '2018'
+  is_public: false
+outs:
+  - md5: 86f6425117a74bf372ed0a9c54886af9
+    size: 16178
+    path: developmental_food_aid__oecd__2018.feather

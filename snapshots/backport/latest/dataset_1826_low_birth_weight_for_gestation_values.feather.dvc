@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1826
+    date_accessed: 2023-08-16 09:41:48.583593
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Low birth weight for gestation
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f60f81a4a2be7afe5785eb72dee6f6b8
+  size: 961642
+  path: dataset_1826_low_birth_weight_for_gestation_values.feather

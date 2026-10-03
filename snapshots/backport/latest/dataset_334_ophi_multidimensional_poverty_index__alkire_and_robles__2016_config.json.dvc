@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/334
+    date_accessed: 2023-08-16 08:36:13.992654
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_334_ophi_multidimensional_poverty_index__alkire_and_robles__2016
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e49bdb607d1dc561680d449a3063ffd4
+  size: 5850
+  path: 
+    dataset_334_ophi_multidimensional_poverty_index__alkire_and_robles__2016_config.json

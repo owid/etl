@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2626
+    date_accessed: 2023-08-11 07:39:01.669454
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Education and Training - Teachers' statutory salaries
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9aca4f3dbcdc00cc122fd331f3398067
+  size: 11218
+  path: dataset_2626_education_and_training__teachers_statutory_salaries_values.feather

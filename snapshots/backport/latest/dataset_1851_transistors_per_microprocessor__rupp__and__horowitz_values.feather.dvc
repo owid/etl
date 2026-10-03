@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1851
+    date_accessed: 2023-08-16 09:54:59.540783
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Transistors per microprocessor - Rupp & Horowitz
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8937323aec26212253f82ee1f30b4af3
+  size: 6474
+  path: dataset_1851_transistors_per_microprocessor__rupp__and__horowitz_values.feather

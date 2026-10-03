@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1461
+    date_accessed: 2023-08-16 07:15:25.625066
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1461_latent_tuberculosis_infection (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 534a2f17a78e06f298eaed215c6c3bfd
+  size: 16817
+  path: dataset_1461_latent_tuberculosis_infection_config.json

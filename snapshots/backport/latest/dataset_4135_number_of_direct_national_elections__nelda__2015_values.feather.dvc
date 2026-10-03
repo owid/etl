@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4135
+    date_accessed: 2023-08-14 14:50:15.798310
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of direct national elections — NELDA (2015)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b4cee3c205c9cc1e76b7632a005b981b
+  size: 20690
+  path: dataset_4135_number_of_direct_national_elections__nelda__2015_values.feather

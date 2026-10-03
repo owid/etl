@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4522
+    date_accessed: 2023-08-16 10:20:46.080869
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4522_material_footprint_per_unit_of_gdp__by_type_of_raw_material__kilograms_per_constant_2010_united_states_dollar
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 164bd459c54b5e398320c0763f4a269b
+  size: 8681
+  path: 
+    dataset_4522_material_footprint_per_unit_of_gdp__by_type_of_raw_material__kilograms_per_constant_2010_united_states_dollar_config.json

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2614
+    date_accessed: 2023-08-16 10:21:30.535738
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Prices and Purchasing Power Parities - Purchasing Power Parities for GDP and
+    related indicators
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3155b8831c1e657e80e71265ba11fdcb
+  size: 12482
+  path: 
+    dataset_2614_prices_and_purchasing_power_parities__purchasing_power_parities_for_gdp_and_related_indicators_values.feather

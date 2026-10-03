@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2028
+    date_accessed: 2023-08-16 10:48:27.233566
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2028_proportion_of_adults__15_years_and_older__with_an_account_at_a_bank_or_other_financial_institution_or_with_a_mobile_money_service_provider
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 390e89a070d2980fa465d73a66e7de91
+  size: 2917
+  path: 
+    dataset_2028_proportion_of_adults__15_years_and_older__with_an_account_at_a_bank_or_other_financial_institution_or_with_a_mobile_money_service_provider_config.json

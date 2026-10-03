@@ -1,0 +1,22 @@
+dataset:
+  title: Figure_16.3
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_16_3:
+    variables:
+      capital_per_worker__1985_ppp_dollar:
+        title: Capital per worker (1985 PPP $)
+        unit: ''
+      gdp_per_worker__1985_ppp_dollar:
+        title: GDP per worker (1985 PPP $)
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

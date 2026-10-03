@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: US Bureau of Labor Statistics and International Labour Organization
+    title: International labor comparisons and ILOSTAT Database
+    description: International Labour Organization, ILOSTAT database accessed through The World Bank indicators.
+    citation_full: |-
+      US Bureau of Labor Statistics (2004). International Labor Comparisons (ILC). Updated 14 October; International Labour Association (2018). ILOSTAT Database.
+    url_main: https://www.bls.gov/fls/
+    date_accessed: '2019-01-26'
+    date_published: '2018'
+  is_public: false
+outs:
+  - md5: 24b5190c490879e977c651038e10128b
+    size: 7786
+    path: te_16_18.feather

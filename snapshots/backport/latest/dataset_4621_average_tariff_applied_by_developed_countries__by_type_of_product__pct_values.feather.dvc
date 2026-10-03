@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4621
+    date_accessed: 2023-08-16 10:01:33.314234
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Average tariff applied by developed countries, by type of product (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e0f62bc48e7c7905cfc74b01eaad2bda
+  size: 146602
+  path: 
+    dataset_4621_average_tariff_applied_by_developed_countries__by_type_of_product__pct_values.feather

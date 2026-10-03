@@ -1,0 +1,15 @@
+tables:
+  affordable_housing_database:
+    variables:
+      share:
+        description_key:
+          - Countries use different definitions and data collection methods and are harmonized to the extent possible.
+          - Data for the United Kingdom only considers England.
+          - Data for Ireland refers to October of each year.
+          - Data for the United Kingdom refers to households in Q2 (April-June) of each year.
+          - |-
+            Data refers to point-in-time data (collected at one point in time), except for Austria, Latvia and Slovenia, which refers to flow data (collected at a given period of time).
+          - |-
+            More details about definitions, methodology and comparability issues can be found in the [OECD Population Experiencing Homelessness documentation](https://www.oecd.org/els/family/HC3-1-Population-experiencing-homelessness.pdf).
+          - |-
+            For more information on the statistical definitions for each country, please check the [OECD's Country Notes on Homelessness data](https://www.oecd.org/social/homelessness-country-notes.htm).

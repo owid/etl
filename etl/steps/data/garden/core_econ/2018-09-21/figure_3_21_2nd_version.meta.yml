@@ -1,0 +1,49 @@
+dataset:
+  title: Figure 3.21 2nd version
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_3_21_2nd_version:
+    variables:
+      lifetime_discretionary_hours__1880:
+        title: Lifetime Discretionary Hours - 1880
+        unit: ''
+        description: Discretionary hours exclude hours used for sleep, meals and hygiene.
+      lifetime_discretionary_hours__1995:
+        title: Lifetime Discretionary Hours - 1995
+        unit: ''
+        description: Discretionary hours exclude hours used for sleep, meals and hygiene.
+      lifetime_discretionary_hours__2040:
+        title: Lifetime Discretionary Hours - 2040
+        unit: ''
+        description: Discretionary hours exclude hours used for sleep, meals and hygiene.
+      lifetime_leisure_hours__1880:
+        title: Lifetime Leisure Hours - 1880
+        unit: ''
+      lifetime_leisure_hours__1995:
+        title: Lifetime Leisure Hours - 1995
+        unit: ''
+      lifetime_leisure_hours__2040:
+        title: Lifetime Leisure Hours - 2040
+        unit: ''
+      lifetime_work_hours__1880:
+        title: Lifetime Work Hours  - 1880
+        unit: ''
+        description: Work hours include paid work, travel to and from work, and household chores.
+      lifetime_work_hours__2040:
+        title: Lifetime Work Hours  - 2040
+        unit: ''
+        description: Work hours include paid work, travel to and from work, and household chores.
+      lifetime_work_hours__1995:
+        title: Lifetime Work Hours - 1995
+        unit: ''
+        description: Work hours include paid work, travel to and from work, and household chores.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

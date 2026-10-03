@@ -1,0 +1,12 @@
+dataset:
+  title: DRAFT graduation_aid_returns_table
+  description: ''
+tables:
+  graduation_aid_returns_table:
+    variables:
+      graduation_program_cost:
+        title: Graduation Program Cost
+        unit: ''
+      returns_three_years_after_the_transfer:
+        title: Returns three years after the transfer
+        unit: ''

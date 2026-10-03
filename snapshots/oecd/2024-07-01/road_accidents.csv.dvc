@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Annual road fatalities, injured, injury crashes
+    description: |-
+      Road accidents are measured in terms of the number of persons injured and deaths due to road accidents, whether immediate or within 30 days of the accident, and excluding suicides involving the use of road motor vehicles. A road motor vehicle is a road vehicle fitted with an engine as the sole means of propulsion and one that is normally used to carry people or goods, or for towing, on the road. This includes buses, coaches, trolleys, tramways (streetcars) and road vehicles used to transport goods and to transport passengers. Road motor vehicles are attributed to the countries where they are registered, while deaths are attributed to the countries in which they occur. This indicator is measured in number of accidents, number of persons, per million inhabitants and million vehicles. 
+    date_published: "2023"
+    version_producer: 2023
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2024), Road accidents (indicator). doi: 10.1787/2fe1b899-en (Accessed on 01 July 2024)
+    attribution_short: OECD
+
+    # Files
+    url_main: https://data.oecd.org/transport/road-accidents.htm
+    url_download: https://sdmx.oecd.org/public/rest/data/OECD.ITF,DSD_TRENDS@DF_TRENDSSAFETY,1.0/all?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: 2024-07-01
+
+    # License
+    license:
+      name: ""
+      url: https://www.oecd.org/termsandconditions.html
+
+outs:
+  - md5: fe6a0df7389ec3fd698bba3a6253d8ee
+    size: 1643494
+    path: road_accidents.csv

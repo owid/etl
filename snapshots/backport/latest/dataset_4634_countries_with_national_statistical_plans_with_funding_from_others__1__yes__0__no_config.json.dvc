@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4634
+    date_accessed: 2023-08-11 07:56:31.088961
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4634_countries_with_national_statistical_plans_with_funding_from_others__1__yes__0__no
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6b38c919161d05297767c42a81c2e859
+  size: 5139
+  path: 
+    dataset_4634_countries_with_national_statistical_plans_with_funding_from_others__1__yes__0__no_config.json

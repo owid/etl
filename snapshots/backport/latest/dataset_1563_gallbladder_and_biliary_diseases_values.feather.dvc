@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1563
+    date_accessed: 2023-08-14 11:01:48.499155
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Gallbladder and biliary diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: edc712d1e3362e68529e3a85080a5bde
+  size: 2012058
+  path: dataset_1563_gallbladder_and_biliary_diseases_values.feather

@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Greenhouse gas emissions by sector
+    date_published: 2023-04-21
+    description: |-
+      Climate Watch Historical Emissions data contains sector-level greenhouse gas (GHG) emissions data for 194 countries and the European Union for the period 1990-2020, including emissions of the six major GHGs from most major sources and sinks. Non-CO₂ emissions are expressed in CO₂ equivalents using 100-year global warming potential values from the Intergovernmental Panel on Climate Change (IPCC) Fourth Assessment Report.
+
+      More information about their data sources and methodology can be found in their [FAQ page](https://www.climatewatchdata.org/about/faq/ghg). Specifically, the definitions of all Climate Watch data sectors and their methodology are explained in [this document](https://wri-sites.s3.us-east-1.amazonaws.com/climatewatch.org/www.climatewatch.org/climate-watch/wri_metadata/CW_GHG_Method_Note.pdf).
+
+    # Citation
+    producer: Climate Watch
+    citation_full: |-
+      Climate Watch. 2022. Washington, DC: World Resources Institute (WRI). Available online at: https://www.climatewatchdata.org
+
+      Climate Watch data are derived from several sources.
+      - Data on land-Use change and forestry, and agriculture, are sourced from the Food and Agriculture Organization of the United Nations, FAOSTAT Emissions Database.
+      - Data on greenhouse gas emissions from fuel combustion are sourced from the OECD/IEA.
+    attribution_short: Climate Watch
+
+    # Files
+    url_main: https://www.climatewatchdata.org/data-explorer/historical-emissions
+    date_accessed: 2023-10-31
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.climatewatchdata.org/about/permissions
+
+wdir: ../../../data/snapshots/climate_watch/2023-10-31
+outs:
+- md5: e73609fb6ad7f9b502d2846a5d95cb4c
+  size: 3766559
+  path: emissions_by_sector.gz

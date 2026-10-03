@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1695
+    date_accessed: 2023-08-11 07:38:12.802566
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Caries of deciduous teeth
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ab8a6b9bd9c44c36869033f3e922c9b8
+  size: 548130
+  path: dataset_1695_caries_of_deciduous_teeth_values.feather

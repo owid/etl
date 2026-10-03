@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4442
+    date_accessed: 2023-08-14 08:15:04.404323
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4442_number_of_deaths_and_missing_persons_attributed_to_disasters__by_hazard_type__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6795ba97755a9007080f3f9fbb34f6c4
+  size: 155050
+  path: 
+    dataset_4442_number_of_deaths_and_missing_persons_attributed_to_disasters__by_hazard_type__number_config.json

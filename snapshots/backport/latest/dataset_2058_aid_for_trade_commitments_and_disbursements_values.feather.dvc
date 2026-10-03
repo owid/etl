@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2058
+    date_accessed: 2023-08-10 15:06:09.524479
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Aid for Trade commitments and disbursements
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d9c3d30a73f1e4782db23b863c366900
+  size: 29890
+  path: dataset_2058_aid_for_trade_commitments_and_disbursements_values.feather

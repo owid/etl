@@ -1,0 +1,26 @@
+meta:
+  namespace: artificial_intelligence
+  short_name: yougov_jobs
+  name: AI Effects on Job Market (YouGov Survey, 2023)
+  version: '2023-06-08'
+  publication_year: 2023
+
+  publication_date: '2023-03-16'
+  source_name: YouGov (2023)
+  source_published_by: AI Effects on Job Market (YouGov Survey, 2023)
+  url:
+    https://docs.cdn.yougov.com/0jv1wfqlmo/results_AI%20Effects%20on%20Job%20Market.pdf
+  source_data_url:
+    https://docs.cdn.yougov.com/0jv1wfqlmo/results_AI%20Effects%20on%20Job%20Market.pdf
+  file_extension: pdf
+  license_url:
+  license_name: Public domain
+  date_accessed: 2023-06-08
+  is_public: true
+  description: |
+    Survey conducted on 2000 U.S. adults between March 9 - 16, 2023 on what people think the effects of AI will be on job markets.
+wdir: ../../../data/snapshots/artificial_intelligence/2023-06-08
+outs:
+- md5: c60316c453bc5d40e6b037de3590c2c4
+  size: 256324
+  path: yougov_jobs.pdf

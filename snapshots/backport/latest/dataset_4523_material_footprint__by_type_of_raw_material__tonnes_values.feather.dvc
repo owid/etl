@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4523
+    date_accessed: 2023-08-10 14:42:44.523718
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Material footprint, by type of raw material (tonnes)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5ebc57af9662c3893c803bfd48f19b73
+  size: 6522
+  path: dataset_4523_material_footprint__by_type_of_raw_material__tonnes_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2122
+    date_accessed: 2023-08-14 16:04:23.682327
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Chronic kidney disease due to hypertension
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3adf46a4c8605d41182786148b225cce
+  size: 2116426
+  path: dataset_2122_chronic_kidney_disease_due_to_hypertension_values.feather

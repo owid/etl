@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1515
+    date_accessed: 2023-08-16 09:43:27.740064
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1515_foreign_body_in_other_body_part (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 859bde9dabb673c2fdd732796de74fa1
+  size: 32015
+  path: dataset_1515_foreign_body_in_other_body_part_config.json

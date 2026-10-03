@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2532
+    date_accessed: 2023-08-16 10:27:57.856623
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Industry and Services - Internal tourism consumption
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 078f54dcded572e8d9bef2b1b8df5a6a
+  size: 61970
+  path: dataset_2532_industry_and_services__internal_tourism_consumption_values.feather

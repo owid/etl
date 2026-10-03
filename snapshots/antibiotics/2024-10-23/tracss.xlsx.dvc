@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Database for Tracking Antimicrobial Resistance (AMR) Country Self- Assessment Survey (TrACSS)
+    description: |-
+      TrACSS monitors the implementation of multisectoral AMR national action plans. It was jointly developed by the Quadripartite (FAO, UNEP, WHO and WOAH) and is administered annually by the WHO.
+    date_published: "2024"
+
+    # Citation
+    producer: FAO, UNEP, WHO and WOAH
+    citation_full: |-
+      FAO, UNEP, WHO and WOAH (2024). Global Database for Tracking AMR Country Self Assessment Survey (TrACSS)
+    attribution_short: FAO, UNEP, WHO and WOAH
+
+    # Files
+    url_main: https://new.amrcountryprogress.org/
+    url_download: https://new.amrcountryprogress.org/uploads/TrACSS_Survey_2024_Dataset_v2.xlsx
+    date_accessed: 2024-10-23
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://new.amrcountryprogress.org/
+
+outs:
+  - md5: 590f4ba739cf001abfee3c9afb0c313d
+    size: 211504
+    path: tracss.xlsx

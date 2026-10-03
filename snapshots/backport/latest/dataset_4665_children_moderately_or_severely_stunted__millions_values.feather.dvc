@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4665
+    date_accessed: 2023-08-16 07:23:14.881125
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Children moderately or severely stunted (millions)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ccb2336c92f583bfa14b3097c8bef4cd
+  size: 17178
+  path: dataset_4665_children_moderately_or_severely_stunted__millions_values.feather

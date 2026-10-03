@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2195
+    date_accessed: 2023-08-16 07:29:38.292696
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2195_multiple_sclerosis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5cb790962b79f572a646fc2b737fbf6e
+  size: 32620
+  path: dataset_2195_multiple_sclerosis_config.json

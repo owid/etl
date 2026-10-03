@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3218
+    date_accessed: 2023-08-16 09:24:59.517803
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Inequality in human development indices - UNDP (2019)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7abfa10d07352cbe7359b9f8931a9526
+  size: 13882
+  path: dataset_3218_inequality_in_human_development_indices__undp__2019_values.feather

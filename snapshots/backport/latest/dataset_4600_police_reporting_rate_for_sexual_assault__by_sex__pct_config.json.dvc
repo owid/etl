@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4600
+    date_accessed: 2023-08-16 10:40:59.561823
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4600_police_reporting_rate_for_sexual_assault__by_sex__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 816c4b2ff65a66105848a14a483fa254
+  size: 10712
+  path: dataset_4600_police_reporting_rate_for_sexual_assault__by_sex__pct_config.json

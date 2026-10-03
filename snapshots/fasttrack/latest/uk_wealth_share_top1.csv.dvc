@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: Alvaredo, Atkinson, Morelli (2017)
+    title: Top Wealth Shares in the UK over more than a Century
+    url_download: |-
+      gAAAAABqQ_R0aMl0Pxwyd9IpoVZ6MQss4eLETOqr8MxCxhr65PKlgoVOwUJIn0mP3ixXkm8tX22SQQF4AdSPxW4HGTXwA4bazxXnu6S8bkT_Jxv3QQEqZH9NyXKeCJ_gxw31zg2tnLS67wID8Gi21iXuL5w_aljVx9BbBFEO7ZnSdWRSRIT3GF_j3TPFP9vhfPg_Y0O6CLCKFX2KyGAHH9jS1aDCCwPA_VH9UXf0ufDWhLRjQYWYJjWdrU9fWkT8SSnZDaWB70U5
+    date_accessed: '2026-06-30'
+  name: DRAFT UK wealth distribution share top 1
+  description: ''
+  license: {}
+  is_public: false
+outs:
+  - md5: 8c1720ada7d3c9b687572b400edfb54a
+    size: 2644
+    path: uk_wealth_share_top1.csv

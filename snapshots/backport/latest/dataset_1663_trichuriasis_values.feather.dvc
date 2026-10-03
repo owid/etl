@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1663
+    date_accessed: 2023-08-16 08:38:16.419432
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Trichuriasis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4fdb91577f16d44a3b4d04ddfd03152e
+  size: 717354
+  path: dataset_1663_trichuriasis_values.feather

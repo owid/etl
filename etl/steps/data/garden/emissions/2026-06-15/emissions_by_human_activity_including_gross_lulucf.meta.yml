@@ -1,0 +1,46 @@
+definitions:
+  description_processing: |-
+    Emissions are categorized by human activity following the approach of the "emissions by human activity" dataset, which is based on Climate Watch's emissions by sector.
+
+    The "Growing food" activity, however, is replaced with gross agriculture-and-land-use emissions from Jones et al. (national contributions). Climate Watch's land-use-change-and-forestry emissions are net, so global land-use CO₂ is close to zero, which understates the climate impact of land use. Jones et al. report the gross land component (land-use-change CO₂ plus agricultural CH₄ and N₂O), which we convert to CO₂ equivalents using IPCC AR5 100-year global warming potentials (CH₄ = 28, N₂O = 265), to match the convention Climate Watch uses for the other activities.
+  common:
+    presentation:
+      topic_tags:
+        - CO2 & Greenhouse Gas Emissions
+    processing_level: major
+    display:
+      numSignificantFigures: 3
+    description_processing: "{definitions.description_processing}"
+
+
+dataset:
+  title: Greenhouse gas emissions by human activity (including gross land-use emissions)
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  # Five activities, with other fuel combustion, waste and fugitive emissions folded into the activities above.
+  emissions_by_human_activity_including_gross_lulucf:
+    title: Emissions by human activity (including gross land-use emissions)
+    variables:
+      co2_emissions:
+        title: Carbon dioxide emissions by human activity (including gross land-use emissions)
+        unit: "tonnes"
+        short_unit: "t"
+      ghg_emissions:
+        title: Greenhouse gas emissions by human activity (including gross land-use emissions)
+        unit: "tonnes of CO₂ equivalent"
+        short_unit: "t CO₂e"
+  # Same as above, but with other fuel combustion, waste and fugitive emissions shown as a separate "Other" activity.
+  emissions_by_human_activity_including_gross_lulucf_including_other:
+    title: Emissions by human activity (including gross land-use emissions and an "Other" activity)
+    variables:
+      co2_emissions:
+        title: Carbon dioxide emissions by human activity (including gross land-use emissions and an "Other" activity)
+        unit: "tonnes"
+        short_unit: "t"
+      ghg_emissions:
+        title: Greenhouse gas emissions by human activity (including gross land-use emissions and an "Other" activity)
+        unit: "tonnes of CO₂ equivalent"
+        short_unit: "t CO₂e"

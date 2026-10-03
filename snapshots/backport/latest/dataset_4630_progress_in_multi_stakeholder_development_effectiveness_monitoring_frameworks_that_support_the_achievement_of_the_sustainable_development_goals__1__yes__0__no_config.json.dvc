@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4630
+    date_accessed: 2023-08-16 07:54:52.905619
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4630_progress_in_multi_stakeholder_development_effectiveness_monitoring_frameworks_that_support_the_achievement_of_the_sustainable_development_goals__1__yes__0__no
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 696ae62bc6c1d4215050ffd283933966
+  size: 21053
+  path: 
+    dataset_4630_progress_in_multi_stakeholder_development_effectiveness_monitoring_frameworks_that_support_the_achievement_of_the_sustainable_development_goals__1__yes__0__no_config.json

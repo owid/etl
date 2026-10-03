@@ -1,0 +1,25 @@
+meta:
+  namespace: tourism
+  short_name: unwto_gdp
+  name: Tourism Direct GDP (UNWTO and OECD, 2023)
+  version: 2023-05-09
+  publication_year: 2023
+  publication_date: 2023-03-15
+  source_name: UNWTO and OECD
+  source_published_by: UNWTO in cooperation with the OECD
+  url: https://www.unwto.org/tourism-statistics/economic-contribution-SDG
+  source_data_url: https://webunwto.s3.eu-west-1.amazonaws.com/s3fs-public/2023-03/indicator_8.9.1_march2023_update.xlsx
+  file_extension: xlsx
+  license_url: https://www.unwto.org/copyright
+  license_name: Creative Commons BY 4.0
+  date_accessed: 2023-05-09
+  is_public: true
+  description: |
+    UNWTO Department of Statistics data on the Sustainable Development Goals indicators 8.9.1 and 12.b.1, included in the Global Indicator Framework. Data collection started in 2019 and provides data from 2008 onwards, the latest update took place on 15 March 2023. Indicator 8.9.1 on Tourism Direct GDP helps to monitor Target 8.9 which calls on countries “to promote sustainable tourism” under Goal 8 on decent Work and Economic Growth. The data collection is done in cooperation with the OECD.
+
+
+wdir: ../../../data/snapshots/tourism/2023-05-09
+outs:
+- md5: 8d750b6f4c55f6a689eb4db0715adad4
+  size: 95678
+  path: unwto_gdp.xlsx

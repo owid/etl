@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2053
+    date_accessed: 2023-08-11 07:11:58.494640
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of population with primary reliance on clean fuels and technology
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: aafd501dfbe122917ed9fb006ea515b0
+  size: 9602
+  path: 
+    dataset_2053_proportion_of_population_with_primary_reliance_on_clean_fuels_and_technology_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1818
+    date_accessed: 2023-08-14 05:56:55.195588
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Household air pollution from solid fuels
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f6c11c4ab50f6d0b8a152cd49a665b75
+  size: 1381114
+  path: dataset_1818_household_air_pollution_from_solid_fuels_values.feather

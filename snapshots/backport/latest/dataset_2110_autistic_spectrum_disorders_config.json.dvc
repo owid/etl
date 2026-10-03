@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2110
+    date_accessed: 2023-08-14 14:48:27.198059
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2110_autistic_spectrum_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a909cfc5f165db852d7f1936ce86be48
+  size: 33001
+  path: dataset_2110_autistic_spectrum_disorders_config.json

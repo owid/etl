@@ -1,0 +1,29 @@
+dataset:
+  title: TE-15.13
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_15_13:
+    variables:
+      inflation_rate__pct:
+        title: Inflation rate (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Index, base year is 2015=100.
+      unemployment_rate__pct:
+        title: Unemployment rate (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

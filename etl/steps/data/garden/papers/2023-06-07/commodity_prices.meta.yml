@@ -1,0 +1,125 @@
+dataset:
+  title: Real Commodity Price Index since 1850 - Jacks (2016)
+tables:
+  commodity_prices:
+    variables:
+      aluminum:
+        title: Aluminum
+        unit: ''
+      barley:
+        title: Barley
+        unit: ''
+      bauxite:
+        title: Bauxite
+        unit: ''
+      beef:
+        title: Beef
+        unit: ''
+      chromium:
+        title: Chromium
+        unit: ''
+      coal:
+        title: Coal
+        unit: ''
+      cocoa:
+        title: Cocoa
+        unit: ''
+      coffee:
+        title: Coffee
+        unit: ''
+      copper:
+        title: Copper
+        unit: ''
+      corn:
+        title: Corn
+        unit: ''
+      cotton:
+        title: Cotton
+        unit: ''
+      cottonseed:
+        title: Cottonseed
+        unit: ''
+      gold:
+        title: Gold
+        unit: ''
+      hides:
+        title: Hides
+        unit: ''
+      iron_ore:
+        title: Iron ore
+        unit: ''
+      lamb:
+        title: Lamb
+        unit: ''
+      lead:
+        title: Lead
+        unit: ''
+      manganese:
+        title: Manganese
+        unit: ''
+      natural_gas:
+        title: Natural gas
+        unit: ''
+      nickel:
+        title: Nickel
+        unit: ''
+      palm_oil:
+        title: Palm oil
+        unit: ''
+      peanuts:
+        title: Peanuts
+        unit: ''
+      petroleum:
+        title: Petroleum
+        unit: ''
+      phosphate:
+        title: Phosphate
+        unit: ''
+      platinum:
+        title: Platinum
+        unit: ''
+      pork:
+        title: Pork
+        unit: ''
+      potash:
+        title: Potash
+        unit: ''
+      rice:
+        title: Rice
+        unit: ''
+      rubber:
+        title: Rubber
+        unit: ''
+      rye:
+        title: Rye
+        unit: ''
+      silver:
+        title: Silver
+        unit: ''
+      steel:
+        title: Steel
+        unit: ''
+      sugar:
+        title: Sugar
+        unit: ''
+      sulfur:
+        title: Sulfur
+        unit: ''
+      tea:
+        title: Tea
+        unit: ''
+      tin:
+        title: Tin
+        unit: ''
+      tobacco:
+        title: Tobacco
+        unit: ''
+      wheat:
+        title: Wheat
+        unit: ''
+      wool:
+        title: Wool
+        unit: ''
+      zinc:
+        title: Zinc
+        unit: ''

@@ -1,0 +1,20 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5046
+    date_accessed: 2023-08-11 07:35:02.429268
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Production: Livestock Processed'
+  description: 'The dataset covers the following commodities: Butter and ghee, sheep
+    milk; Butter of goat milk; Butter, buffalo milk; Butter, cow milk; Cheese of goat
+    milk; Cheese, buffalo milk; Cheese, sheep milk; Cheese, skimmed cow milk; Cheese,
+    whole cow milk; Cream fresh; Ghee, butteroil of cow milk; Ghee, of buffalo milk;
+    Lard; Milk, dry buttermilk; Milk, skimmed condensed; Milk, skimmed cow; Milk,
+    skimmed dried; Milk, skimmed evaporated; Milk, whole condensed; Milk, whole dried;
+    Milk, whole evaporated; Silk raw; Tallow; Whey, condensed; Whey, dry; Yoghurt.'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 37bd5ef537605e5bed551ead6bfecf62
+  size: 402690
+  path: dataset_5046_production__livestock_processed_values.feather

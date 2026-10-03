@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/653
+    date_accessed: 2023-08-16 08:51:33.546895
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_653_crude_oil_consumption_vs__price__bp_statistics__2016
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 170feb75d5e050b1af6b69eb0c7a645b
+  size: 3301
+  path: dataset_653_crude_oil_consumption_vs__price__bp_statistics__2016_config.json

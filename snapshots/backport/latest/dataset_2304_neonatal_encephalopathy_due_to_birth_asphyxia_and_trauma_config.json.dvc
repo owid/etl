@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2304
+    date_accessed: 2023-08-16 08:38:01.659627
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2304_neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eae42d77da9a62aedca079761ac896b8
+  size: 34267
+  path: 
+    dataset_2304_neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma_config.json

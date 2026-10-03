@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/5356
+    date_accessed: 2026-03-06 07:44:54.279234+00:00
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5356_fish_discards__un_fao
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: a0ef9a1be92d75c5348a0584d14b0583
+    size: 5387
+    path: dataset_5356_fish_discards__un_fao_config.json

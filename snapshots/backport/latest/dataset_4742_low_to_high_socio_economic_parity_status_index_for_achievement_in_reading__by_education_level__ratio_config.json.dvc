@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4742
+    date_accessed: 2023-08-16 10:03:13.790695
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4742_low_to_high_socio_economic_parity_status_index_for_achievement_in_reading__by_education_level__ratio
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4e64c7974e3e7d469baf6de857b23c06
+  size: 7112
+  path: 
+    dataset_4742_low_to_high_socio_economic_parity_status_index_for_achievement_in_reading__by_education_level__ratio_config.json

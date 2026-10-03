@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3624
+    date_accessed: 2023-08-16 10:17:50.670370
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3624_non_rheumatic_calcific_aortic_valve_disease
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 298f7105b24e7819b2b7103ca566aebc
+  size: 33772
+  path: dataset_3624_non_rheumatic_calcific_aortic_valve_disease_config.json

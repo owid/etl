@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4247
+    date_accessed: 2023-08-14 15:13:51.481326
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Wealth as percent national income by wealth type – Piketty (2014)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 321ae66f222acda6abff13d275897316
+  size: 9346
+  path: 
+    dataset_4247_wealth_as_percent_national_income_by_wealth_type__piketty__2014_values.feather

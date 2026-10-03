@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1790
+    date_accessed: 2023-08-16 07:27:50.541449
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Diet high in sugar-sweetened beverages
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 27c2a7cce828337ef72054179b0c4865
+  size: 961162
+  path: dataset_1790_diet_high_in_sugar_sweetened_beverages_values.feather

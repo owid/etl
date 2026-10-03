@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4567
+    date_accessed: 2023-08-11 07:18:00.511074
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4567_proportion_of_forest_area_within_legally_established_protected_areas__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ab2bb0eeebc4cde42d8e2b7ef43b9053
+  size: 28887
+  path: 
+    dataset_4567_proportion_of_forest_area_within_legally_established_protected_areas__pct_config.json

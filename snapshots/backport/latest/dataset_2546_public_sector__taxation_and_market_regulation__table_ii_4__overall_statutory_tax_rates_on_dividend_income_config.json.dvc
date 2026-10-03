@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2546
+    date_accessed: 2023-08-16 08:40:26.578357
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2546_public_sector__taxation_and_market_regulation__table_ii_4__overall_statutory_tax_rates_on_dividend_income
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8109dd44d36dcad6a403391c40d9a89f
+  size: 12566
+  path: 
+    dataset_2546_public_sector__taxation_and_market_regulation__table_ii_4__overall_statutory_tax_rates_on_dividend_income_config.json

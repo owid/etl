@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/808
+    date_accessed: 2023-08-16 09:38:55.100827
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emergency Response: Food Aid Shipments (WFP) - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b8c70771ef9f12cf367e2c567c09e849
+  size: 198754
+  path: 
+    dataset_808_emergency_response__food_aid_shipments__wfp__fao__2017_values.feather

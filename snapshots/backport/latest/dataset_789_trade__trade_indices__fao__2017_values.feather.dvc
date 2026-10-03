@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/789
+    date_accessed: 2023-08-16 10:27:49.410705
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Trade: Trade Indices - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9fe60c7c5bafe71c51a94940b9ec1c6a
+  size: 662154
+  path: dataset_789_trade__trade_indices__fao__2017_values.feather

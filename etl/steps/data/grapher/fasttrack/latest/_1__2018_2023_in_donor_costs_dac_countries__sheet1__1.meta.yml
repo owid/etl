@@ -1,0 +1,27 @@
+dataset:
+  title: DRAFT 1 – 2018-2023 In-donor costs DAC countries - Sheet1 (1)
+  description: ''
+tables:
+  _1__2018_2023_in_donor_costs_dac_countries__sheet1__1:
+    variables:
+      debt_relief:
+        title: Debt Relief
+        unit: ''
+      students:
+        title: Students
+        unit: ''
+      refugees:
+        title: Refugees
+        unit: ''
+      development_awareness:
+        title: Development Awareness
+        unit: ''
+      administrative:
+        title: Administrative
+        unit: ''
+      research:
+        title: Research
+        unit: ''
+      total:
+        title: Total
+        unit: ''

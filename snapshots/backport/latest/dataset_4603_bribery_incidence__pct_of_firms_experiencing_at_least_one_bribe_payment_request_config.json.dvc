@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4603
+    date_accessed: 2023-08-14 05:40:58.414556
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4603_bribery_incidence__pct_of_firms_experiencing_at_least_one_bribe_payment_request
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 366fe2ec0cddcf79013d740a1fa584d6
+  size: 11546
+  path: 
+    dataset_4603_bribery_incidence__pct_of_firms_experiencing_at_least_one_bribe_payment_request_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1766
+    date_accessed: 2023-08-11 07:12:16.128452
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Diet low in nuts and seeds
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fe03fc9ae1c4254ecc434a2b841d12d6
+  size: 962186
+  path: dataset_1766_diet_low_in_nuts_and_seeds_values.feather

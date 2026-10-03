@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3439
+    date_accessed: 2023-08-16 09:59:35.130221
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3439_other_malignant_neoplasms (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3df245c5e3e0060ad54c3704be8299e6
+  size: 33016
+  path: dataset_3439_other_malignant_neoplasms_config.json

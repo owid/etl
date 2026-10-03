@@ -1,0 +1,23 @@
+dataset:
+  title: TE-3.2_time
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_3_2_time:
+    variables:
+      free_time_per_capita:
+        title: Free time per capita
+        unit: ''
+        description: |-
+          Annual hours worked per worker are the total annual hours worked divided over the average number of people in employment. Free time per capita is calculated by subtracting the total annual hours worked per worker from the total hours in a year (365*24).
+
+          Countries with less than 1 million population have been deleted (Luxembourg).
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

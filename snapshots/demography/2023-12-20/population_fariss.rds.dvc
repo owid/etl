@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Latent Estimates of Historic Population
+    description: |-
+      Gross Domestic Product (GDP), GDP per capita, and population are central to the study of politics and economics broadly, and conflict processes in particular. Despite the prominence of these variables in empirical research, existing data lack historical coverage and are assumed to be measured without error. We develop a latent variable modeling framework that expands data coverage (1500 A.D--2018 A.D) and, by making use of multiple indicators for each variable, provides a principled framework to estimate uncertainty for values for all country-year variables relative to one another. Expanded temporal coverage of estimates provides new insights about the relationship between development and democracy, conflict, repression, and health. We also demonstrate how to incorporate uncertainty in observational models. Results show that the relationship between repression and development is weaker than models that do not incorporate uncertainty suggest. Future extensions of the latent variable model can address other forms of systematic measurement error with new data, new measurement theory, or both.
+    date_published: 2022-02-18
+    version_producer: 1
+
+    # Citation
+    producer: Fariss et al.
+    citation_full: |-
+      Fariss, Christopher J., Therese Anders, Jonathan N. Markowitz, and Miriam Barnum. “New Estimates of Over 500 Years of Historic GDP and Population Data.” Journal of Conflict Resolution, (February 2022). https://doi.org/10.1177/00220027211054432. doi: 10.1177/00220027211054432
+
+    # Files
+    url_main: https://dataverse.harvard.edu/dataverse/LatentGDP
+    date_accessed: 2023-12-20
+
+    # License
+    license:
+      name: CC0
+      url: https://dataverse.org/best-practices/dataverse-community-norms
+
+wdir: ../../../data/snapshots/demography/2023-12-20
+outs:
+- md5: 258f1f7e290de674d26a0095158e106b
+  size: 12117890
+  path: population_fariss.rds

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1786
+    date_accessed: 2023-08-16 10:26:14.377967
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1786_occupational_exposure_to_secondhand_smoke
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 433e3a6a5969190c597e4d426f86dec1
+  size: 22503
+  path: dataset_1786_occupational_exposure_to_secondhand_smoke_config.json

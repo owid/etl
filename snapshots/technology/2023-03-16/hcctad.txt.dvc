@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Comin and Hobijn
+    title: Cross-Country Technological Adoption – Making the Theories Face the Facts
+    description: |-
+      The Historical Cross Country Technology Adoption Dataset (HCCTAD) is a dataset collected by Diego Comin (NYU) and Bart Hobijn (Federal Reserve Bank of New York), to allow for the analysis of the adoption patterns of some of the major technologies introduced in the past 250 years across the world's leading industrialized economies.
+    citation_full: 'Comin, D. and Hobijn, B. (2004). Cross-Country Technological Adoption: Making the Theories Face the Facts. Journal of Monetary Economics, 51(1), 39–83.'
+    url_main: https://www.nber.org/research/data/historical-cross-country-technology-adoption-hccta-dataset
+    url_download: https://www.nber.org/hccta/hcctad.txt
+    date_accessed: '2023-03-16'
+    date_published: '2004-01-01'
+  is_public: true
+outs:
+  - md5: 4c50a1fef4a9174cab0cf548feeccc7f
+    size: 1572981
+    path: hcctad.txt

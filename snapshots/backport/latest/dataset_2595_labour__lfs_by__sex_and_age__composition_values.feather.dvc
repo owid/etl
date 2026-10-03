@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2595
+    date_accessed: 2023-08-16 10:15:41.180806
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Labour - LFS by  sex and age - composition
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 814fbd66925ad999228d57ffb6a817e0
+  size: 908314
+  path: dataset_2595_labour__lfs_by__sex_and_age__composition_values.feather

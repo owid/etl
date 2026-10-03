@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1595
+    date_accessed: 2023-08-10 14:51:05.209694
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other drug use disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5f4815368d6c7ebc5b48e15a5c541656
+  size: 1557338
+  path: dataset_1595_other_drug_use_disorders_values.feather

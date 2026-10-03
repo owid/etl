@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2426
+    date_accessed: 2023-08-14 05:39:17.320924
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2426_labor_productivity_in_cotton_spinning__chapman__1972
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 84326ca37dda4b3de63e70a15bc62f54
+  size: 3015
+  path: dataset_2426_labor_productivity_in_cotton_spinning__chapman__1972_config.json

@@ -1,0 +1,450 @@
+#
+#  publish.py
+#  etl
+#
+
+import concurrent.futures
+import re
+import sys
+from collections.abc import Iterable, Iterator
+from http.client import IncompleteRead
+from pathlib import Path
+from typing import Any, cast
+from urllib.error import HTTPError
+
+import pandas as pd
+import rich_click as click
+from botocore.client import ClientError
+from owid.catalog.api.legacy import CHANNEL, LocalCatalog
+from owid.catalog.api.utils import INDEX_FORMATS
+from owid.catalog.core.datasets import FileFormat
+from owid.catalog.s3_utils import connect_r2
+
+from etl import config, files
+from etl.http import STORAGE_OPTIONS
+from etl.paths import DATA_DIR
+
+config.enable_sentry()
+
+
+class CannotPublish(Exception):
+    pass
+
+
+@click.command(name="publish")
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    help="Preview the datasets to sync without actually publishing them.",
+)
+@click.option(
+    "--private",
+    "-p",
+    is_flag=True,
+    default=False,
+    help="Publish private catalog.",
+)
+@click.option(
+    "--bucket",
+    "-b",
+    type=str,
+    help="Bucket name.",
+    default=config.R2_BUCKET,
+)
+@click.option(
+    "--channel",
+    "-c",
+    multiple=True,
+    type=click.Choice(CHANNEL.__args__),
+    default=CHANNEL.__args__,
+    help="Publish only selected channel (subfolder of data/), push all by default.",
+)
+@click.option(
+    "--jsonld",
+    is_flag=True,
+    default=False,
+    help="Generate and publish the public page files (CSV, XLSX, codebook, README, manifest) and the "
+    "Schema.org JSON-LD side product for catalog datasets that opt in via `dataset: jsonld: true` "
+    "in their metadata.",
+)
+@click.option(
+    "--jsonld-base-url",
+    type=str,
+    default="https://catalog.ourworldindata.org",
+    help="Base URL to use in generated manifest, README, JSON-LD and sitemap URLs.",
+)
+@click.option(
+    "--jsonld-only",
+    multiple=True,
+    help="Restrict page generation to these datasets, as '<namespace>/<dataset>' "
+    "(repeatable). Overrides the metadata opt-in: listed datasets are considered even "
+    "without `dataset: jsonld: true`.",
+)
+def publish_cli(
+    dry_run: bool,
+    private: bool,
+    bucket: str,
+    channel: Iterable[CHANNEL],
+    jsonld: bool,
+    jsonld_base_url: str,
+    jsonld_only: tuple[str, ...],
+) -> None:
+    """Publish the generated data catalog to S3."""
+    return publish(
+        dry_run=dry_run,
+        private=private,
+        bucket=bucket,
+        channel=channel,
+        jsonld=jsonld,
+        jsonld_base_url=jsonld_base_url,
+        jsonld_only=jsonld_only,
+    )
+
+
+def publish(
+    dry_run: bool = False,
+    private: bool = False,
+    bucket: str = config.R2_BUCKET,
+    channel: Iterable[CHANNEL] = CHANNEL.__args__,
+    jsonld: bool = False,
+    jsonld_base_url: str = "https://catalog.ourworldindata.org",
+    jsonld_only: Iterable[str] = (),
+) -> None:
+    catalog = Path(DATA_DIR)
+    if not dry_run and not private:
+        raise Exception(
+            "You cannot publish public catalog yet, only private catalogs with flag --private are supported"
+        )
+    for c in channel:
+        sanity_checks(catalog, channel=c)
+
+    for c in channel:
+        sync_catalog_to_s3(bucket, catalog, channel=c, dry_run=dry_run, private_bucket=config.R2_BUCKET_PRIVATE)
+
+    if jsonld:
+        from etl.catalog_pages.publish import build_and_publish_catalog_pages
+
+        jsonld_allowlist = set(jsonld_only) or None
+        for c in channel:
+            if c == "garden":
+                build_and_publish_catalog_pages(
+                    bucket=bucket,
+                    catalog_dir=catalog,
+                    channel=c,
+                    dry_run=dry_run,
+                    base_url=jsonld_base_url,
+                    only=jsonld_allowlist,
+                )
+
+
+def sanity_checks(catalog: Path, channel: CHANNEL) -> None:
+    for format in INDEX_FORMATS:
+        if not (catalog / _channel_path(channel, format)).exists():
+            print(
+                "ERROR: catalog has not been fully indexed, refusing to publish",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+
+
+def sync_catalog_to_s3(
+    bucket: str, catalog: Path, channel: CHANNEL, dry_run: bool = False, private_bucket: str | None = None
+) -> None:
+    s3 = connect_r2()
+    if is_catalog_up_to_date(s3, bucket, catalog, channel):
+        print(f"Catalog's channel {channel} is up to date!")
+        return
+
+    print(f"Syncing datasets from channel {channel}")
+    sync_datasets(s3, bucket, catalog, channel, dry_run=dry_run, private_bucket=private_bucket)
+    if not dry_run:
+        update_catalog(s3, bucket, catalog, channel)
+
+
+def is_catalog_up_to_date(s3: Any, bucket: str, catalog: Path, channel: CHANNEL) -> bool:
+    """The catalog file is synced last -- if it is the same as our local one, then all the remote
+    files will be the same as our local ones too."""
+    # note: we only check the md5 of the first index format, not all of them
+    format = INDEX_FORMATS[0]
+    remote = get_remote_checksum(s3, bucket, _channel_path(channel, format).as_posix())
+    local = files.checksum_file(catalog / _channel_path(channel, format))
+    return remote == local
+
+
+def sync_datasets(
+    s3: Any,
+    bucket: str,
+    catalog: Path,
+    channel: CHANNEL,
+    delete_datasets: bool = False,
+    dry_run: bool = False,
+    private_bucket: str | None = None,
+) -> None:
+    """Go dataset by dataset and check if each one needs updating.
+    :param delete_datasets: if True, delete datasets from S3 that are not in the local catalog
+    :param private_bucket: bucket for private data files (metadata stays in public bucket)
+    """
+    existing = get_published_checksums(bucket, channel)
+
+    to_delete = set(existing)
+    local = LocalCatalog(catalog)
+    print("Datasets to sync:")
+    for ds in local.iter_datasets(channel):
+        # ignore datasets with no tables
+        if len(ds._data_files) == 0:
+            continue
+
+        path = Path(ds.path).relative_to(catalog).as_posix()
+        if path in to_delete:
+            to_delete.remove(path)
+
+        published_checksum = existing.get(path)
+        if published_checksum == ds.checksum():
+            continue
+
+        print("-", path, "(private)" if not ds.metadata.is_public else "")
+        if not dry_run:
+            sync_folder(
+                s3,
+                bucket,
+                catalog,
+                catalog / path,
+                path,
+                public=ds.metadata.is_public,
+                private_bucket=private_bucket,
+            )
+
+    if delete_datasets:
+        print("Datasets to delete:")
+        for path in to_delete:
+            print("-", path)
+            if not dry_run:
+                delete_dataset(s3, bucket, path)
+
+
+def is_metadata_file(filename: str) -> bool:
+    """Check if a file is a metadata file (should stay in public bucket for discoverability)."""
+    return filename.endswith(".meta.json") or filename.endswith("index.json")
+
+
+def sync_folder(
+    s3: Any,
+    bucket: str,
+    catalog: Path,
+    local_folder: Path,
+    dest_path: str,
+    delete: bool = True,
+    public: bool = True,
+    private_bucket: str | None = None,
+) -> None:
+    """
+    Perform a content-based sync of a local folder with a "folder" on an S3 bucket,
+    by comparing checksums and only uploading files that have changed.
+
+    For private datasets (public=False):
+    - Metadata files (.meta.json, index.json) go to the public bucket for discoverability
+    - Data files (.feather, .parquet, .csv) go to the private bucket
+    """
+    # make sure we're not syncing other folders with the same prefix
+    if not dest_path.endswith("/"):
+        dest_path += "/"
+
+    # For private datasets, we need to check both buckets for existing files
+    existing = {o["Key"]: object_md5(s3, bucket, o["Key"], o) for o in walk_s3(s3, bucket, dest_path)}
+    existing_private: dict[str, str | None] = {}
+    if private_bucket and not public:
+        existing_private = {
+            o["Key"]: object_md5(s3, private_bucket, o["Key"], o) for o in walk_s3(s3, private_bucket, dest_path)
+        }
+
+    # some datasets like `open_numbers/open_numbers/latest/gapminder__gapminder_world`
+    # have huge number of tables, upload them in parallel
+    futures = []
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        for filename in files.walk(local_folder):
+            checksum = files.checksum_file(filename)
+            rel_filename = filename.relative_to(catalog).as_posix()
+
+            # Determine target bucket: metadata files always go to public bucket,
+            # data files for private datasets go to private bucket.
+            # For private datasets, .meta.json is also duplicated to the private
+            # bucket so that PREFER_DOWNLOAD can get everything from one bucket.
+            if public or is_metadata_file(rel_filename):
+                target_bucket = bucket
+                existing_checksum = existing.get(rel_filename)
+            else:
+                target_bucket = private_bucket or bucket
+                existing_checksum = existing_private.get(rel_filename)
+
+            if checksum != existing_checksum:
+                bucket_label = f"[{target_bucket}]" if target_bucket != bucket else ""
+                print(f"  PUT {rel_filename} {bucket_label}")
+                ExtraArgs: dict[str, Any] = {"Metadata": {"md5": checksum}}
+                # Only set public-read ACL for files going to public bucket
+                if target_bucket == bucket:
+                    ExtraArgs["ACL"] = "public-read"
+                futures.append(
+                    executor.submit(
+                        s3.upload_file,
+                        filename.as_posix(),
+                        target_bucket,
+                        rel_filename,
+                        ExtraArgs=ExtraArgs,
+                    )
+                )
+
+            # Duplicate .meta.json to private bucket for private datasets
+            if (
+                not public
+                and private_bucket
+                and is_metadata_file(rel_filename)
+                and not rel_filename.endswith("index.json")
+            ):
+                private_checksum = existing_private.get(rel_filename)
+                if checksum != private_checksum:
+                    print(f"  PUT {rel_filename} [{private_bucket}]")
+                    futures.append(
+                        executor.submit(
+                            s3.upload_file,
+                            filename.as_posix(),
+                            private_bucket,
+                            rel_filename,
+                            ExtraArgs={"Metadata": {"md5": checksum}},
+                        )
+                    )
+
+            # Track which files we've seen for deletion purposes
+            if rel_filename in existing:
+                del existing[rel_filename]
+            if rel_filename in existing_private:
+                del existing_private[rel_filename]
+
+        if delete:
+            # Delete stale files from public bucket
+            for rel_filename in existing:
+                print("  DEL", rel_filename)
+                futures.append(executor.submit(s3.delete_object, Bucket=bucket, Key=rel_filename))
+            # Delete stale files from private bucket
+            if private_bucket and not public:
+                for rel_filename in existing_private:
+                    print(f"  DEL {rel_filename} [{private_bucket}]")
+                    futures.append(executor.submit(s3.delete_object, Bucket=private_bucket, Key=rel_filename))
+
+        concurrent.futures.wait(futures)
+
+
+def object_md5(s3: Any, bucket: str, key: str, obj: dict[str, Any]) -> str | None:
+    maybe_md5 = obj["ETag"].strip('"')
+    if re.match("^[0-9a-f]{32}$", maybe_md5):
+        return cast(str, maybe_md5)
+
+    return cast(
+        str | None,
+        s3.head_object(Bucket=bucket, Key=key).get("Metadata", {}).get("md5"),
+    )
+
+
+def walk_s3(s3: Any, bucket: str, path: str) -> Iterator[dict[str, Any]]:
+    objs = s3.list_objects(Bucket=bucket, Prefix=path, MaxKeys=100)
+    yield from objs.get("Contents", [])
+
+    while objs["IsTruncated"] and objs.get("Contents"):
+        # If the response does not include the NextMarker element and it is truncated, we can
+        # use the value of the last Key element in the response as the marker parameter
+        marker = objs.get("NextMarker", objs["Contents"][-1]["Key"])
+        objs = s3.list_objects(Bucket=bucket, Prefix=path, Marker=marker)
+        yield from objs["Contents"]
+
+
+def delete_dataset(s3: Any, bucket: str, relative_path: str) -> None:
+    # make sure we're not syncing other folders with the same prefix
+    if not relative_path.endswith("/"):
+        relative_path += "/"
+
+    to_delete = [o["Key"] for o in walk_s3(s3, bucket, relative_path)]
+    while to_delete:
+        chunk = to_delete[:1000]
+        s3.delete_objects(
+            Bucket=bucket,
+            Delete={"Objects": [{"Key": key} for key in chunk], "Quiet": True},
+        )
+        to_delete = to_delete[1000:]
+
+
+def update_catalog(s3: Any, bucket: str, catalog: Path, channel: CHANNEL) -> None:
+    for format in INDEX_FORMATS:
+        catalog_filename = catalog / _channel_path(channel, format)
+        s3.upload_file(
+            catalog_filename.as_posix(),
+            bucket,
+            _channel_path(channel, format).as_posix(),
+            ExtraArgs={"ACL": "public-read"},
+        )
+
+    s3.upload_file(
+        (catalog / "catalog.meta.json").as_posix(),
+        bucket,
+        "catalog.meta.json",
+        ExtraArgs={"ACL": "public-read"},
+    )
+
+
+def get_published_checksums(bucket: str, channel: CHANNEL) -> dict[str, str]:
+    "Get the checksum of every dataset that's been published."
+    format = INDEX_FORMATS[0]
+    uri = f"https://{bucket.replace('owid-', '')}.owid.io/{_channel_path(channel, format)}"
+    try:
+        existing = read_frame(uri)
+        existing["path"] = existing["path"].apply(lambda p: p.rsplit("/", 1)[0])
+        existing = existing[["path", "checksum"]].drop_duplicates().set_index("path").checksum.to_dict()
+    except HTTPError:
+        existing = {}  # ty: ignore
+    except IncompleteRead as e:
+        print(f"ERROR: error when reading {uri}: {e}", file=sys.stderr)
+        raise e
+
+    return cast(dict[str, str], existing)
+
+
+def get_remote_checksum(s3: Any, bucket: str, path: str) -> str | None:
+    try:
+        obj = s3.head_object(Bucket=bucket, Key=path)
+    except ClientError as e:
+        if "Not Found" in e.args[0]:
+            return None
+
+        raise
+
+    return object_md5(s3, bucket, path, obj)
+
+
+def _channel_path(channel: CHANNEL, format: FileFormat) -> Path:
+    return Path(f"catalog-{channel}.{format}")
+
+
+def read_frame(uri: str, max_retries: int = 3) -> pd.DataFrame:  # ty: ignore
+    is_remote = uri.startswith("http://") or uri.startswith("https://")
+    read_kwargs = {"storage_options": STORAGE_OPTIONS} if is_remote else {}
+    retries = 0
+    while retries <= max_retries:
+        try:
+            if uri.endswith(".feather"):
+                return cast(pd.DataFrame, pd.read_feather(uri, **read_kwargs))
+
+            elif uri.endswith(".parquet"):
+                return cast(pd.DataFrame, pd.read_parquet(uri, **read_kwargs))
+
+            elif uri.endswith(".csv"):
+                return pd.read_csv(uri, **read_kwargs)
+
+            else:
+                raise ValueError(f"Unknown format for {uri}")
+        except IncompleteRead as e:
+            retries += 1
+            if retries > max_retries:
+                raise e
+
+
+if __name__ == "__main__":
+    publish_cli()

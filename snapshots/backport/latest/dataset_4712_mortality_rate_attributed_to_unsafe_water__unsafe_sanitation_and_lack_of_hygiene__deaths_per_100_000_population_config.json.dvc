@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4712
+    date_accessed: 2023-08-14 16:04:02.865629
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4712_mortality_rate_attributed_to_unsafe_water__unsafe_sanitation_and_lack_of_hygiene__deaths_per_100_000_population
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c4deb9a7db88fb421dc35795b797e2f7
+  size: 9008
+  path: 
+    dataset_4712_mortality_rate_attributed_to_unsafe_water__unsafe_sanitation_and_lack_of_hygiene__deaths_per_100_000_population_config.json

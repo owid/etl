@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Child migration"
+    description: |-
+      Collection of data from different sources on the topic of migration, consolidated by UNICEF. This data includes information on migrants, refugees, asylum seekers, and internally displaced children, all under 18 years old.
+
+    date_published: "2025"
+
+    # Citation
+    producer: UNICEF
+    citation_full: |-
+      Child migration, UNICEF, 2025 (https://data.unicef.org/topic/child-migration-and-displacement/migration/#data)
+
+    # Files
+    url_main: https://data.unicef.org/topic/child-migration-and-displacement/migration/#data
+    date_accessed: '2026-01-07'
+
+    # License
+    license:
+      name: CC BY-NC 3.0 IGO
+      url: https://data.unicef.org/topic/child-migration-and-displacement/migration/#data
+outs:
+  - md5: bdfe95b21036f240a761d0e43e526ef1
+    size: 31217927
+    path: child_migration.csv

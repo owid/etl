@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Marriage Rates in the United States
+    description: |-
+      Marriage license data is collected locally and reported to NVSS via the Vital Statistics Cooperative Program. Coverage varies by year and state: Alaska and Hawaii were included from 1959 and 1960, respectively, while California, Louisiana, and Georgia had exclusions in specific years. Population counts for non-reporting states are excluded from rate calculations for those years. Reports and data are available on the CDC and NCHS websites.
+    date_published: "2020"
+
+    # Citation
+    producer: Centers for Disease Control and Prevention
+    citation_full: |-
+      Curtin, S., & Sutton, P. D. (2020). Marriage rates in the United States, 1900–2018. Centers for Disease Control and Prevention.
+    attribution_short: CDC
+
+    # Files
+    url_main: https://www.cdc.gov/nchs/data/hestat/marriage_rate_2018/marriage_rate_2018.pdf
+    url_download: https://www.cdc.gov/nchs/data/hestat/marriage_rate_2018/marriage_rate_2018.pdf
+    date_accessed: 2025-01-22
+
+    # License
+    license:
+      name: Public domain
+      url: https://stacks.cdc.gov/Content%20and%20Copyright
+
+outs:
+  - md5: aaee923897ef4cc3402c103109753ef8
+    size: 250763
+    path: marriages.pdf

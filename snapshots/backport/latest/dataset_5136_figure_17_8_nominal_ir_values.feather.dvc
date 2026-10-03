@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/5136
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Figure_17.8_nominal_ir
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: 91da32d853dc8192fc798988018e929b
+    size: 7258
+    path: dataset_5136_figure_17_8_nominal_ir_values.feather

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5279
+    date_accessed: 2023-08-10 09:11:20.688393
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Global Health Observatory - World Health Organization (2021.03)
+  description: This is a temporary dataset until the automated bulk import script
+    is run.
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ceb765ac485f2dfe11e0112f3a10e000
+  size: 321074
+  path: 
+    dataset_5279_global_health_observatory__world_health_organization__2021_03_values.feather

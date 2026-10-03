@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1720
+    date_accessed: 2023-08-16 09:51:11.456647
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1720_liver_cancer_due_to_hepatitis_c (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 198f31638a754904da1ae8f40706b0ee
+  size: 29632
+  path: dataset_1720_liver_cancer_due_to_hepatitis_c_config.json

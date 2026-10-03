@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3198
+    date_accessed: 2023-08-10 08:58:03.115760
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: TE-16.16
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eb9d75faf744e9dac46429127f561fa5
+  size: 7410
+  path: dataset_3198_te_16_16_values.feather

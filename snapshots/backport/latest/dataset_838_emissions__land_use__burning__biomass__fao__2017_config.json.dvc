@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/838
+    date_accessed: 2023-08-14 16:01:27.703771
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_838_emissions__land_use__burning__biomass__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b02985b1fec9947c17830e3e6abd1ece
+  size: 67760
+  path: dataset_838_emissions__land_use__burning__biomass__fao__2017_config.json

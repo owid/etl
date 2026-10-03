@@ -1,0 +1,184 @@
+steps:
+  #
+  # Andrew - CO2 mitigation curves.
+  #
+  data://garden/andrew/2019-12-03/co2_mitigation_curves:
+    - data://meadow/andrew/2019-12-03/co2_mitigation_curves:
+      - snapshot://andrew/2019-12-03/co2_mitigation_curves_1p5celsius.csv
+      - snapshot://andrew/2019-12-03/co2_mitigation_curves_2celsius.csv
+  data://grapher/andrew/2019-12-03/co2_mitigation_curves_1p5celsius:
+    - data://garden/andrew/2019-12-03/co2_mitigation_curves
+  data://grapher/andrew/2019-12-03/co2_mitigation_curves_2celsius:
+    - data://garden/andrew/2019-12-03/co2_mitigation_curves
+  #
+  # Net zero tracker.
+  #
+  data://grapher/emissions/2026-07-13/net_zero_tracker:
+    - data://garden/emissions/2026-07-13/net_zero_tracker:
+      - data://meadow/emissions/2026-07-13/net_zero_tracker:
+        - snapshot://emissions/2026-07-13/net_zero_tracker.xlsx
+  #
+  # Global Warming Potential factors (IPCC, 2021).
+  #
+  data://grapher/emissions/2023-11-06/global_warming_potential_factors:
+    - data://garden/emissions/2023-11-06/global_warming_potential_factors:
+      - data://meadow/emissions/2023-11-06/global_warming_potential_factors:
+        - snapshot://emissions/2023-11-06/global_warming_potential_factors.csv
+  #
+  # Emissions - CO2 dataset.
+  #
+  # NOTE: The following step should be run after the github step, which is why the latter is added as a dependency.
+  export://s3/co2_data/latest/owid_co2:
+    - data://garden/emissions/2025-12-04/owid_co2
+    - export://github/co2_data/latest/owid_co2:
+      - data://garden/emissions/2025-12-04/owid_co2
+  #
+  # Hoesly et al. (2024): CEDS air pollutants
+  #
+  data://grapher/emissions/2025-02-12/ceds_air_pollutants:
+    - data://garden/emissions/2025-02-12/ceds_air_pollutants:
+      - data://meadow/emissions/2025-02-12/ceds_air_pollutants:
+        - snapshot://emissions/2025-02-12/ceds_air_pollutants__detailed.zip
+        - snapshot://emissions/2025-02-12/ceds_air_pollutants__bunkers.zip
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
+  #
+  # Emissions - Air pollution explorer
+  #
+  viz://explorer/emissions/latest/air_pollution:
+    - data://grapher/emissions/2025-02-12/ceds_air_pollutants
+  viz://chart/emissions/latest/air_pollution:
+    - data://grapher/emissions/2025-02-12/ceds_air_pollutants
+  #
+
+  # CO₂ and greenhouse gas emissions explorer.
+  #
+  viz://explorer/emissions/latest/co2:
+    - data://grapher/gcp/2025-11-13/global_carbon_budget
+    - data://grapher/emissions/2025-12-04/national_contributions
+
+  #
+  # GCP - Global Carbon Budget.
+  #
+  data://garden/gcp/2025-11-13/global_carbon_budget:
+    - data://garden/wb/2026-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/energy/2026-05-05/primary_energy_consumption
+    - data://meadow/gcp/2025-11-13/global_carbon_budget:
+      - snapshot://gcp/2025-11-13/global_carbon_budget_fossil_co2_emissions.csv
+      - snapshot://gcp/2025-11-13/global_carbon_budget_land_use_change_emissions.xlsx
+      - snapshot://gcp/2025-11-13/global_carbon_budget_global_emissions.xlsx
+      - snapshot://gcp/2025-11-13/global_carbon_budget_national_emissions.xlsx
+  #
+  # GCP - Global Carbon Budget.
+  #
+  data://grapher/gcp/2025-11-13/global_carbon_budget:
+    - data://garden/gcp/2025-11-13/global_carbon_budget
+  #
+  # IPCC - Emission Factor Database.
+  #
+  data://grapher/emissions/2025-11-26/emission_factors:
+    - data://garden/emissions/2025-11-26/emission_factors:
+      - data://meadow/emissions/2025-11-26/emission_factors:
+        - snapshot://emissions/2025-11-26/emission_factors.xlsx
+      # IPCC - Electricity emission factors.
+      - data://meadow/emissions/2025-11-26/electricity_emission_factors:
+        - snapshot://emissions/2025-11-26/technology_specific_cost_and_performance_parameters.pdf
+  #
+  # Jones et al. - National contributions to climate change.
+  #
+  data://garden/emissions/2025-12-04/national_contributions:
+    - data://meadow/emissions/2025-12-04/national_contributions:
+      - snapshot://emissions/2025-12-04/national_contributions_temperature_response.csv
+      - snapshot://emissions/2025-12-04/national_contributions_annual_emissions.csv
+      - snapshot://emissions/2025-12-04/national_contributions_cumulative_emissions.csv
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2026-07-01/income_groups
+  #
+  # Jones et al. - National contributions to climate change.
+  #
+  data://grapher/emissions/2025-12-04/national_contributions:
+    - data://garden/emissions/2025-12-04/national_contributions
+  #
+  # Emissions - CO2 dataset.
+  #
+  data://garden/emissions/2025-12-04/owid_co2:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/emissions/2025-12-04/national_contributions
+    - data://garden/energy/2026-05-05/primary_energy_consumption
+    - data://garden/gcp/2025-11-13/global_carbon_budget
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+    - data://garden/demography/2024-07-15/population
+  #
+  # Decoupling of GDP and CO2.
+  #
+  data://garden/emissions/2026-03-05/gdp_and_co2_decoupling:
+    - data://garden/worldbank_wdi/2026-07-27/wdi
+    - data://garden/gcp/2025-11-13/global_carbon_budget
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Decoupling of GDP and CO2.
+  #
+  data://grapher/emissions/2026-03-05/gdp_and_co2_decoupling:
+    - data://garden/emissions/2026-03-05/gdp_and_co2_decoupling
+  #
+  # Decoupling of GDP and CO2.
+  #
+  data://external/emissions/2026-03-05/gdp_and_co2_decoupling:
+    - data://garden/emissions/2026-03-05/gdp_and_co2_decoupling
+  #
+  # Climate Watch - Greenhouse gas emissions by sector.
+  #
+  data://garden/climate_watch/2026-02-10/emissions_by_sector:
+    - data://garden/wb/2026-07-01/income_groups
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/climate_watch/2026-02-10/emissions_by_sector:
+      - snapshot://climate_watch/2026-02-10/emissions_by_sector.gz
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Climate Watch - Greenhouse gas emissions by sector.
+  #
+  data://grapher/climate_watch/2026-02-10/emissions_by_sector:
+    - data://garden/climate_watch/2026-02-10/emissions_by_sector
+  #
+  # Emissions - Greenhouse gas emissions by human activity.
+  #
+  # Electricity shown as its own activity (Climate Watch only).
+  data://grapher/emissions/2026-06-15/emissions_by_human_activity:
+    - data://garden/emissions/2026-06-15/emissions_by_human_activity:
+      - data://garden/climate_watch/2026-02-10/emissions_by_sector
+  # Electricity redistributed into the activities that consume it (adds UN electricity-consumption data).
+  data://grapher/emissions/2026-06-15/emissions_by_human_activity_splitting_electricity:
+    - data://garden/emissions/2026-06-15/emissions_by_human_activity_splitting_electricity:
+      - data://garden/emissions/2026-06-15/emissions_by_human_activity
+      - data://garden/un/2026-02-11/energy_statistics_database
+  # As above, but "Growing food" uses gross agriculture-and-land-use emissions from Jones et al. (AR5).
+  data://grapher/emissions/2026-06-15/emissions_by_human_activity_including_gross_lulucf:
+    - data://garden/emissions/2026-06-15/emissions_by_human_activity_including_gross_lulucf:
+      - data://garden/emissions/2026-06-15/emissions_by_human_activity
+      - data://garden/emissions/2025-12-04/national_contributions
+  data://grapher/emissions/2026-06-15/emissions_by_human_activity_including_gross_lulucf_splitting_electricity:
+    - data://garden/emissions/2026-06-15/emissions_by_human_activity_including_gross_lulucf_splitting_electricity:
+      - data://garden/emissions/2026-06-15/emissions_by_human_activity_including_gross_lulucf
+      - data://garden/un/2026-02-11/energy_statistics_database
+  #
+  # RFF - World Carbon Pricing.
+  #
+  data://grapher/rff/2026-06-10/world_carbon_pricing:
+    - data://garden/rff/2026-06-10/world_carbon_pricing:
+      # The IPCC codes lookup is loaded from a dedicated snapshot pinned to an old commit of the ECP
+      # repo, since the file was removed from upstream during the 2026 restructure.
+      - data://meadow/rff/2026-06-10/world_carbon_pricing:
+        - snapshot://rff/2026-06-10/world_carbon_pricing.zip
+        - snapshot://rff/2026-06-10/ipcc_codes.csv
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  data://grapher/rff/2026-06-10/emissions_weighted_carbon_price:
+    - data://garden/rff/2026-06-10/emissions_weighted_carbon_price:
+      - data://meadow/rff/2026-06-10/emissions_weighted_carbon_price:
+        - snapshot://rff/2026-06-10/emissions_weighted_carbon_price.zip

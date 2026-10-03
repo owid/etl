@@ -1,0 +1,5 @@
+.venv
+__pycache__
+.coverage
+dist
+.DS_Store

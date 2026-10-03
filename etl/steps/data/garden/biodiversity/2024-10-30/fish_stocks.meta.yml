@@ -1,0 +1,118 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Fish & Overfishing
+    description_processing: |-
+      We use the data as published by the RAM Legacy Stock Assessment Database, with no further transformations beyond renaming the entity column to "country" so it fits Our World in Data's standard schema. Each entity is an individual fish stock, not a country.
+    display:
+      numDecimalPlaces: 2
+
+  unit_tonnes: &unit_tonnes
+    unit: tonnes
+    short_unit: t
+
+dataset:
+  update_period_days: 0
+  title: Fish stocks (RAM Legacy)
+
+tables:
+  fish_stocks:
+    variables:
+      general_total_biomass:
+        title: Total biomass (general)
+        <<: *unit_tonnes
+      general_total_catch:
+        title: Total catch (general)
+        <<: *unit_tonnes
+      general_exploitation_rate:
+        title: Exploitation rate (general)
+        unit: ""
+      biomass_relative_to_msy:
+        title: Biomass relative to maximum sustainable yield
+        unit: ""
+      harvest_relative_to_preferred_rate:
+        title: Harvest relative to preferred rate
+        unit: ""
+      biomass_relative_to_preferred_management_rate:
+        title: Biomass relative to preferred management rate
+        unit: ""
+      harvest_rate_relative_to_management_target:
+        title: Harvest rate relative to management target
+        unit: ""
+      total_biomass:
+        title: Total biomass
+        <<: *unit_tonnes
+      spawning_stock_biomass:
+        title: Spawning stock biomass
+        <<: *unit_tonnes
+      total_number:
+        title: Total number of individuals
+        unit: individuals
+      recruits:
+        title: Recruits
+        unit: individuals
+      total_catch:
+        title: Total catch
+        <<: *unit_tonnes
+      total_landings:
+        title: Total landings
+        <<: *unit_tonnes
+      recreational_catch:
+        title: Recreational catch
+        <<: *unit_tonnes
+      fishing_mortality:
+        title: Fishing mortality
+        unit: ""
+      exploitation_rate:
+        title: Exploitation rate
+        unit: ""
+      total_biomass_relative_to_msy:
+        title: Total biomass relative to maximum sustainable yield
+        unit: ""
+      spawning_stock_relative_to_msy:
+        title: Spawning stock relative to maximum sustainable yield
+        unit: ""
+      number_relative_to_msy:
+        title: Abundance relative to maximum sustainable yield
+        unit: ""
+      fishing_mortality_relative_to_msy:
+        title: Fishing mortality relative to maximum sustainable yield
+        unit: ""
+      exploitation_rate_relative_to_msy:
+        title: Exploitation rate relative to maximum sustainable yield
+        unit: ""
+      catch_relative_to_msy:
+        title: Catch relative to maximum sustainable yield
+        unit: ""
+      catch_relative_to_mean_catch:
+        title: Catch relative to mean catch
+        unit: ""
+      total_biomass_relative_to_management_target:
+        title: Total biomass relative to management target
+        unit: ""
+      spawning_stock_relative_to_management_target:
+        title: Spawning stock relative to management target
+        unit: ""
+      fishing_mortality_relative_to_management_target:
+        title: Fishing mortality relative to management target
+        unit: ""
+      catch_corresponding_to_total_allowable_advised:
+        title: Catch corresponding to total allowable advised
+        <<: *unit_tonnes
+      total_allowable_catch:
+        title: Total allowable catch
+        <<: *unit_tonnes
+      scientific_advice_for_catch_limit:
+        title: Scientific advice for catch limit
+        <<: *unit_tonnes
+      survey_biomass:
+        title: Survey biomass
+        <<: *unit_tonnes
+      catch_per_unit_effort:
+        title: Catch per unit effort
+        unit: ""
+      fishing_effort:
+        title: Fishing effort
+        unit: ""

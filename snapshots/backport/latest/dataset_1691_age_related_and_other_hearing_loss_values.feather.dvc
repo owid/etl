@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1691
+    date_accessed: 2023-08-16 08:28:16.808708
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Age-related and other hearing loss
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c0adafa218f1e43a6e4bec6134f20bcf
+  size: 1011362
+  path: dataset_1691_age_related_and_other_hearing_loss_values.feather

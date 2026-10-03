@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2317
+    date_accessed: 2023-08-16 08:45:22.143157
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Cirrhosis and other chronic liver diseases due to hepatitis B
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 18eeeefdbc71c15530512cc27daed409
+  size: 2116442
+  path: 
+    dataset_2317_cirrhosis_and_other_chronic_liver_diseases_due_to_hepatitis_b_values.feather

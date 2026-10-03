@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4153
+    date_accessed: 2023-08-16 09:40:41.408678
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Attitudes to Vaccines - Wellcome Trust (2019)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3d289294f47deaf8468b1e8ccdd40c2e
+  size: 22202
+  path: dataset_4153_attitudes_to_vaccines__wellcome_trust__2019_values.feather

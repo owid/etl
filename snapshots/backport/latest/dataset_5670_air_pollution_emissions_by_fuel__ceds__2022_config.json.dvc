@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5670
+    date_accessed: 2023-08-14 16:01:03.397145
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5670_air_pollution_emissions_by_fuel__ceds__2022
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2c54aec595387cc483706916353c0b1c
+  size: 46295
+  path: dataset_5670_air_pollution_emissions_by_fuel__ceds__2022_config.json

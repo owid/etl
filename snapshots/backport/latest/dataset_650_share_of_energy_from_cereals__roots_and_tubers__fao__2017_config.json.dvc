@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/650
+    date_accessed: 2023-08-14 15:45:08.447180
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_650_share_of_energy_from_cereals__roots_and_tubers__fao__2017
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4cacdaa975fe19fd5387c0f7d5422e82
+  size: 2182
+  path: 
+    dataset_650_share_of_energy_from_cereals__roots_and_tubers__fao__2017_config.json

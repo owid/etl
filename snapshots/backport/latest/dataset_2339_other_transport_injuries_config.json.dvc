@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2339
+    date_accessed: 2023-08-16 08:14:25.906724
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2339_other_transport_injuries (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f7c664ad2b2619a7d6859e957f42022b
+  size: 32872
+  path: dataset_2339_other_transport_injuries_config.json

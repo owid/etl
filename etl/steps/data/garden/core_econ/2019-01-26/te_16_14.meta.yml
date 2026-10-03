@@ -1,0 +1,25 @@
+dataset:
+  title: TE-16.14
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_16_14:
+    variables:
+      employees_covered_by_union_wage_bargains__latest_available_year_in_the_ictwss_database__2016:
+        title: Employees covered by union wage bargains (latest available year in the ICTWSS Database (2016))
+        unit: '%'
+      unemployment_rate__2000_2017_average__pct:
+        title: Unemployment rate (2000-2017 average, %)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

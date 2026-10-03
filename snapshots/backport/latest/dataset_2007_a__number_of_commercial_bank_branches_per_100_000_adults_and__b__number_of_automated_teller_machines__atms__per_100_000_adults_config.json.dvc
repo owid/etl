@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2007
+    date_accessed: 2023-08-10 14:39:57.510271
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2007_a__number_of_commercial_bank_branches_per_100_000_adults_and__b__number_of_automated_teller_machines__atms__per_100_000_adults
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d2edfc6911628fa3894cd46b6b55c349
+  size: 3702
+  path: 
+    dataset_2007_a__number_of_commercial_bank_branches_per_100_000_adults_and__b__number_of_automated_teller_machines__atms__per_100_000_adults_config.json

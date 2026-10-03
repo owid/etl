@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Jonathan Fink-Jensen, IISH Data Collection
+    title: Book Titles per Capita
+    description: |-
+      Number of new book titles published per year, per million inhabitants, for countries over the period 1500–2009. Compiled from a combination of datasets and publications on book production for different regions and periods, including CLIO Infra data.
+    citation_full: 'Fink-Jensen, Jonathan (2015). Book Titles per Capita. IISH Data Collection. https://datasets.iisg.amsterdam/dataset.xhtml?persistentId=hdl:10622/AOQMAZ'
+    attribution_short: Fink-Jensen (2015)
+    url_main: https://datasets.iisg.amsterdam/dataset.xhtml?persistentId=hdl:10622/AOQMAZ
+    url_download: https://datasets.iisg.amsterdam/api/access/datafile/18
+    date_accessed: '2026-07-16'
+    date_published: '2015-12-13'
+    license:
+      name: CC0 1.0
+      url: https://creativecommons.org/publicdomain/zero/1.0
+outs:
+  - md5: b746d1121c264a7185da2c50ca9979d5
+    size: 185568
+    path: clio_infra__human_capital.xlsx

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2687
+    date_accessed: 2023-08-16 09:24:49.095945
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2687_mortality_and_global_health_estimates (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0cd4def77d9f32d56ef051ca4ce0ce2f
+  size: 581070
+  path: dataset_2687_mortality_and_global_health_estimates_config.json

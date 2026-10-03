@@ -1,0 +1,23 @@
+meta:
+  namespace: imf
+  short_name: world_economic_outlook
+  name: World Economic Outlook (IMF, 2023)
+  version: '2023-05-02'
+  publication_date: '2023-04-11'
+  source_name: International Monetary Fund (2023)
+  source_published_by: International Monetary Fund, World Economic Outlook, April
+    2023
+  url: https://www.imf.org/en/Publications/WEO/weo-database/2023/April
+  source_data_url: https://www.imf.org/-/media/Files/Publications/WEO/WEO-Database/2023/WEOApr2023all.ashx
+  file_extension: xls
+  license_url: https://www.imf.org/external/terms.htm
+  license_name: IMF Copyright and Usage
+  date_accessed: 2023-05-02
+  is_public: true
+  description: |
+    The World Economic Outlook (WEO) database contains selected macroeconomic data series from the statistical appendix of the World Economic Outlook report, which presents the IMF staff's analysis and projections of economic developments at the global level, in major country groups, and many individual countries. The WEO is released in April and September/October each year.
+wdir: ../../../data/snapshots/imf/2023-05-02
+outs:
+- md5: 0f459ac7a294fcf15e32bdc51504b904
+  size: 19875956
+  path: world_economic_outlook.xls

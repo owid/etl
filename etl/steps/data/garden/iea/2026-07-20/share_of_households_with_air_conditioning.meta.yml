@@ -1,0 +1,32 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+      attribution_short: IEA
+    processing_level: minor
+    description_processing: |-
+      The main time series (2015 onwards) for China, Europe, India, Japan, Southeast Asia and the United States comes from the IEA's 2026 commentary on cooling and electricity demand. We supplemented it with the IEA's 2018 estimates for Brazil, Mexico, Saudi Arabia, South Africa and South Korea, which are only available for that single year.
+
+dataset:
+  update_period_days: 365
+  # IEA data is non-redistributable, so the data download is disabled on charts.
+  non_redistributable: true
+  owners:
+    - Hannah Ritchie
+
+tables:
+  share_of_households_with_air_conditioning:
+    variables:
+      share_of_households_with_air_conditioning:
+        title: Share of households with air conditioning
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of households equipped with air conditioning.
+        description_key:
+          - Air conditioning ownership has been rising across major economies, driven by growing incomes in hot-climate countries and by more frequent and intense heatwaves.
+          - Values for regions ("Europe" and "Southeast Asia") are the IEA's own regional estimates and are not aggregated by Our World in Data from individual countries.
+        display:
+          numDecimalPlaces: 0
+          tolerance: 5

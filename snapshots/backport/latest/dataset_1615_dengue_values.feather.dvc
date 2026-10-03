@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1615
+    date_accessed: 2023-08-14 08:14:46.622813
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Dengue
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1e053e8998b13864c99fdd66f71a50ba
+  size: 1341834
+  path: dataset_1615_dengue_values.feather

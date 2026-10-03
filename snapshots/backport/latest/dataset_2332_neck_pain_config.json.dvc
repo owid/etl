@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2332
+    date_accessed: 2023-08-14 15:26:13.720791
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2332_neck_pain (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 729280fc7fc6013ecc3ae84ab96eef86
+  size: 32242
+  path: dataset_2332_neck_pain_config.json

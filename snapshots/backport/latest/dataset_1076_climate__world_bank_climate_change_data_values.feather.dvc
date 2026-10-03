@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1076
+    date_accessed: 2023-08-16 09:40:52.992098
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Climate - World Bank Climate Change Data
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 789d3ac536fb8826869cdaea88bd5f0d
+  size: 12890
+  path: dataset_1076_climate__world_bank_climate_change_data_values.feather

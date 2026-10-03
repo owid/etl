@@ -1,0 +1,24 @@
+meta:
+  namespace: homicide
+  short_name: unodc
+  name: United Nations Office on Drugs and Crime - Intentional Homicide Victims
+  version: 2023-01-27
+  publication_year: 2023
+  publication_date: 2023-01-26
+  source_name: United Nations Office on Drugs and Crime (2022)
+  source_published_by: UNODC (2022), UNODC Research, Data Portal, Intentional Homicide.
+    https://dataunodc.un.org/dp-intentional-homicide-victims
+  url: https://dataunodc.un.org/dp-intentional-homicide-victims
+  source_data_url: https://dataunodc.un.org/sites/dataunodc.un.org/files/data_cts_intentional_homicide.xlsx
+  file_extension: xlsx
+  license_url: https://www.un.org/en/about-us/terms-of-use
+  license_name:
+  date_accessed: 2023-01-27
+  is_public: true
+  description: |
+
+wdir: ../../../data/snapshots/homicide/2023-01-27
+outs:
+- md5: 3c510e43e2833f859989489de99cdc59
+  size: 4202480
+  path: unodc.xlsx

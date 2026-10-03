@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1607
+    date_accessed: 2023-08-14 14:32:14.737781
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1607_malaria (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ec626d3b52f9f56fc3898851c00225ee
+  size: 31240
+  path: dataset_1607_malaria_config.json

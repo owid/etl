@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: Unknown
+    title: Unknown
+    citation_full: DRAFT who_standard_pop.
+    attribution_short: DRAFT who_standard_pop
+    version_producer: Local CSV
+    url_download: gAAAAABkK_Ivu_Je_oySMG3rgLckjjugFOOG9jhgajTBIwUJ87fOQX3EcGZdjwRpsHoFeZBCGlbef41qF0k0cvf-8OSrcTED0w==
+    date_accessed: '2023-04-04'
+    date_published: '2023'
+  is_public: false
+outs:
+- md5: cc14c66a73f7db992f0b39fe1d0db45e
+  size: 611
+  path: who_standard_pop.csv

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2653
+    date_accessed: 2023-08-14 05:33:58.507165
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Social Protection and Well-being - Family Database
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dac8d5c6d956b9466bdb060adf6363d9
+  size: 108594
+  path: dataset_2653_social_protection_and_well_being__family_database_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1816
+    date_accessed: 2023-08-16 10:37:20.651193
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Unsafe sanitation
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 03ec2c817eec5886f90cc32d04075039
+  size: 1381090
+  path: dataset_1816_unsafe_sanitation_values.feather

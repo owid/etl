@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/815
+    date_accessed: 2023-08-14 14:35:25.594647
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_815_agri_environmental_indicators__soil__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0b98234509e20c6051bb0a849fa3bdce
+  size: 13598
+  path: dataset_815_agri_environmental_indicators__soil__fao__2017_config.json

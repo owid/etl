@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2613
+    date_accessed: 2023-08-14 15:00:17.238387
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Prices and Purchasing Power Parities - Consumer Prices
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d17369b4dfcc6ef2b6698d39baeeffc1
+  size: 14266
+  path: 
+    dataset_2613_prices_and_purchasing_power_parities__consumer_prices_values.feather

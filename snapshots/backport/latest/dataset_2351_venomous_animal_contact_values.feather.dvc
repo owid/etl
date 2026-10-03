@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2351
+    date_accessed: 2023-08-10 14:44:39.518983
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Venomous animal contact
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f5f1999e97432a047183446fd8ffefad
+  size: 2116402
+  path: dataset_2351_venomous_animal_contact_values.feather

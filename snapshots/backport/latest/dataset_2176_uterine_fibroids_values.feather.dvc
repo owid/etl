@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2176
+    date_accessed: 2023-08-16 07:53:45.019981
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Uterine fibroids
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 00368100eeee2fd05ed86014fc0276ee
+  size: 1499282
+  path: dataset_2176_uterine_fibroids_values.feather

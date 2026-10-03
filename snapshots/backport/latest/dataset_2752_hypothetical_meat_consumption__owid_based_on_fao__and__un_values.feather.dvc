@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2752
+    date_accessed: 2023-08-14 15:15:44.848830
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Hypothetical meat consumption - OWID based on FAO & UN
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 71b6188a0c7157cd25b173494f80d3d3
+  size: 77658
+  path: 
+    dataset_2752_hypothetical_meat_consumption__owid_based_on_fao__and__un_values.feather

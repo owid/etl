@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: Bureau of Justice Statistics
+    title: NCVS Victimization Analysis Tool
+    citation_full: Bureau of Justice Statistics (2017). NCVS Victimization Analysis Tool.
+    attribution_short: BJS
+    url_main: https://www.bjs.gov
+    date_accessed: '2017-10-24'
+    date_published: '2017'
+outs:
+  - md5: 9fed602ddcb13eeb04933b9c332530ed
+    size: 3594
+    path: violent_victimization__us_bureau_of_justice_statistics__2017.feather

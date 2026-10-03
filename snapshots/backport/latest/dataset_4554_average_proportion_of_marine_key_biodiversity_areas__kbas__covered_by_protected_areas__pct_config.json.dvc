@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4554
+    date_accessed: 2023-08-14 05:45:20.925176
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4554_average_proportion_of_marine_key_biodiversity_areas__kbas__covered_by_protected_areas__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c932940aa6791b16e11b7166b01c110f
+  size: 44464
+  path: 
+    dataset_4554_average_proportion_of_marine_key_biodiversity_areas__kbas__covered_by_protected_areas__pct_config.json

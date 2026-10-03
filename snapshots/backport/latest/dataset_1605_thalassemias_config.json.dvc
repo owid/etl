@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1605
+    date_accessed: 2023-08-16 10:01:46.317569
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1605_thalassemias (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3ced5c904dd5d4a737b979c2c9a213a6
+  size: 31255
+  path: dataset_1605_thalassemias_config.json

@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Gini coefficient for Canada (Love, 1979)
+    description: |-
+      Gini coefficient. Inequality is measured for gross family income for non-farm families.
+    date_published: "1979"
+
+    # Citation
+    producer: Love
+    citation_full: |-
+      Love, R, 1979, Income distribution and inequality in Canada, Table A.3. Ministry of Supply and Services, Ottawa.
+
+    # Files
+    url_main: https://search.worldcat.org/title/5989297
+    date_accessed: 2024-08-09
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://search.worldcat.org/title/5989297
+
+outs:
+  - md5: a5a7c48d5360572ac550e86dd0e7d8f0
+    size: 86
+    path: love_1979_canada.csv

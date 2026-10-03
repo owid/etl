@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4472
+    date_accessed: 2023-08-14 16:04:07.021378
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4472_net_open_position_in_foreign_exchange_to_capital__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e76025be5e79db4b12f7ba4d88ce7c26
+  size: 14755
+  path: dataset_4472_net_open_position_in_foreign_exchange_to_capital__pct_config.json

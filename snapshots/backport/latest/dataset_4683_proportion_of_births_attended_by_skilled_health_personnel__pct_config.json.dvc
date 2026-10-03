@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4683
+    date_accessed: 2023-08-16 10:42:51.256539
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4683_proportion_of_births_attended_by_skilled_health_personnel__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 51f2b3d144690aaf7678cbd34ed2ff40
+  size: 10575
+  path: 
+    dataset_4683_proportion_of_births_attended_by_skilled_health_personnel__pct_config.json

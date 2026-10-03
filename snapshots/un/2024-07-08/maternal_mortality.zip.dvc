@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Trends in maternal mortality
+    description: |-
+      The United Nations Maternal Mortality Estimation Inter-Agency Group (MMEIG) – comprising WHO, the United Nations Children’s Fund (UNICEF), the United Nations Population Fund (UNFPA), the World Bank Group and the United Nations Department of Economic and Social Affairs, Population Division (UNDESA/Population Division) has collaborated with external technical experts on a new round of estimates covering 2000 to 2020, in addition to the previous data covering 1985 to 2000. The estimates represent the most up to date, internationally-comparable MMEIG estimates of maternal mortality, using refined input data and methods from previous rounds.
+    date_published: "2023-02-23"
+    version_producer: 2020
+
+    # Citation
+    producer: UN MMEIG (WHO, UNICEF, UNFPA, World Bank Group and UNDESA/ Population Division)
+    citation_full: |-
+      Trends in maternal mortality 2000 to 2020: estimates by WHO, UNICEF, UNFPA, World Bank Group and UNDESA/ Population Division. Geneva: World Health Organization; 2023. Licence: CC BY-NC-SA 3.0 IGO.
+    attribution: UN MMEIG (2023) #to shorten source in viz
+    attribution_short: UN MMEIG
+
+    # Files
+    url_main: https://www.who.int/publications/i/item/9789240068759
+    url_download: https://srhdpeuwpubsa.blob.core.windows.net/whdh/SRHIHS/Gold/data.zip
+    date_accessed: 2024-07-08
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO.
+      url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/deed.en
+
+outs:
+  - md5: 631499029d2f5030952d11901cac96e0
+    size: 8707339
+    path: maternal_mortality.zip

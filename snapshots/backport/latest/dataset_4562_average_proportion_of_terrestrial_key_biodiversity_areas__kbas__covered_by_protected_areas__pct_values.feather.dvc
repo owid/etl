@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4562
+    date_accessed: 2023-08-14 15:15:45.327944
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Average proportion of Terrestrial Key Biodiversity Areas (KBAs) covered by
+    protected areas (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8941a7b0904336fbf746f96728b36ed4
+  size: 43186
+  path: 
+    dataset_4562_average_proportion_of_terrestrial_key_biodiversity_areas__kbas__covered_by_protected_areas__pct_values.feather

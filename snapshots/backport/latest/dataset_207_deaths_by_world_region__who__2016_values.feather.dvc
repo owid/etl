@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/207
+    date_accessed: 2023-08-16 09:56:28.744050
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Deaths by World Region - WHO (2016)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 794e64a59c4779f0256a6f4eb4a7379b
+  size: 6386
+  path: dataset_207_deaths_by_world_region__who__2016_values.feather

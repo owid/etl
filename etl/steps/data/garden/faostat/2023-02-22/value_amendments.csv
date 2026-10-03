@@ -1,0 +1,10 @@
+dataset,spurious_value,new_value
+faostat_fs,"<0.1","0.1"
+faostat_fs,"<2.5","2.5"
+faostat_fs,"<0.5","0.5"
+faostat_sdgb,"<0.1","0.1"
+faostat_sdgb,"<0.5","0.5"
+faostat_sdgb,"<2.5","2.5"
+faostat_sdgb,"<100","100"
+faostat_sdgb,"Nan",
+faostat_sdgb,"N",

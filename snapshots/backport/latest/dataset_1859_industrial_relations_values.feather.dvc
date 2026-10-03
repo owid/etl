@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1859
+    date_accessed: 2023-08-14 14:32:40.970739
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Industrial relations
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f60b2b553da887deab4e6c876d651147
+  size: 15786
+  path: dataset_1859_industrial_relations_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/997
+    date_accessed: 2023-08-16 08:03:59.331384
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Decomposition of Gender Wage Gap 2010 - Blau and Kahn (2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 54e5b78a7b3e5ccb4e6a679f7df62188
+  size: 6266
+  path: 
+    dataset_997_decomposition_of_gender_wage_gap_2010__blau_and_kahn__2017_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/941
+    date_accessed: 2023-08-14 15:15:23.795711
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Technology Adoption - Multiple sources compiled by Our World in Data
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6b8b0c842b1e9ffa620ee089f6c22d18
+  size: 12562
+  path: 
+    dataset_941_technology_adoption__multiple_sources_compiled_by_our_world_in_data_values.feather

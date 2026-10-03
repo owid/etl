@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/634
+    date_accessed: 2023-08-11 07:36:08.528605
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_634_total_population__both_sexes_combined__by_single_age__region__subregion_and_country__annually_for_1950_2100__thousands__un_population_division__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2fe6d4808b4d90fb98638b375de2160b
+  size: 170970
+  path: 
+    dataset_634_total_population__both_sexes_combined__by_single_age__region__subregion_and_country__annually_for_1950_2100__thousands__un_population_division__2017_config.json

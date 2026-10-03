@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2020
+    date_accessed: 2023-08-16 09:54:42.219722
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of fish stocks within biologically sustainable levels
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6c7014edaa87ed724c7fe0af6ccdcfea
+  size: 6778
+  path: 
+    dataset_2020_proportion_of_fish_stocks_within_biologically_sustainable_levels_values.feather

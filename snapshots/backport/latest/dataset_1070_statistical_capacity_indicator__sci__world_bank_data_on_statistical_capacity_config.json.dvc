@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1070
+    date_accessed: 2023-08-10 07:48:07.696713
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1070_statistical_capacity_indicator__sci__world_bank_data_on_statistical_capacity
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 038748de14ec1eb80fd37bf333146cbf
+  size: 56110
+  path: 
+    dataset_1070_statistical_capacity_indicator__sci__world_bank_data_on_statistical_capacity_config.json

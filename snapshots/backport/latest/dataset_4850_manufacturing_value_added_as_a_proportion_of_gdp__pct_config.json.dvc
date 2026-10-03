@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4850
+    date_accessed: 2023-08-14 15:30:30.739965
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4850_manufacturing_value_added_as_a_proportion_of_gdp__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2f8307ce7b6004194c643d0551ea7715
+  size: 8085
+  path: dataset_4850_manufacturing_value_added_as_a_proportion_of_gdp__pct_config.json

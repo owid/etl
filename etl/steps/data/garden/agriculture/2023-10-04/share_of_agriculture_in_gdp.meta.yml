@@ -1,0 +1,38 @@
+dataset:
+  title: Share of agriculture in GDP at current prices (Herrendorf et al. and GGDC-10 data) (split)
+tables:
+  share_of_agriculture_in_gdp:
+    variables:
+      share_of_agriculture_in_gdp_at_current_prices__herrendorf_et_al__and_ggdc_10_data:
+        title: Share of agriculture in GDP at current prices (Herrendorf et al. and GGDC-10 data)
+        description: Historical estimates of value added by economic sector, at current prices (expressed as share of total
+          value added at current prices)
+        unit: '% GDP'
+        short_unit: '%'
+      share_of_employment_in_agriculture__herrendorf_et_al__and_ggdc_10_data:
+        title: Share of employment in agriculture (Herrendorf et al. and GGDC-10 data)
+        description: Historical estimates of employment shares by economic sector.
+        unit: '%'
+        short_unit: '%'
+      share_of_employment_in_industry__herrendorf_et_al__and_ggdc_10_data:
+        title: Share of employment in industry (Herrendorf et al. and GGDC-10 data)
+        description: Historical estimates of employment shares by economic sector.
+        unit: '%'
+        short_unit: '%'
+      share_of_employment_in_services__herrendorf_et_al__and_ggdc_10_data:
+        title: Share of employment in services (Herrendorf et al. and GGDC-10 data)
+        description: Historical estimates of employment shares by economic sector.
+        unit: '%'
+        short_unit: '%'
+      share_of_industry_in_gdp_at_current_prices__herrendorf_et_al__and_ggdc_10_data:
+        title: Share of industry in GDP at current prices (Herrendorf et al. and GGDC-10 data)
+        description: Historical estimates of value added by economic sector, at current prices (expressed as share of total
+          value added at current prices)
+        unit: '% GDP'
+        short_unit: '%'
+      share_of_services_in_gdp_at_current_prices__herrendorf_et_al__and_ggdc_10_data:
+        title: Share of services in GDP at current prices (Herrendorf et al. and GGDC-10 data)
+        description: Historical estimates of value added by economic sector, at current prices (expressed as share of total
+          value added at current prices)
+        unit: '% GDP'
+        short_unit: '%'

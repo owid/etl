@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/561
+    date_accessed: 2023-08-14 15:38:14.487726
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_561_world_development_indicators__education (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e79133086cb51ca89f24e507bd90e628
+  size: 456118
+  path: dataset_561_world_development_indicators__education_config.json

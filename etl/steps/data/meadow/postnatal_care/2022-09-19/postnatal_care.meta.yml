@@ -1,0 +1,7 @@
+tables:
+  postnatal_care:
+    variables:
+      postnatal_care_coverage:
+        title: postnatal_care_coverage
+        short_unit: '%'
+        unit: '%'

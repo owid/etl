@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4143
+    date_accessed: 2023-08-16 07:16:29.598349
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Conflict deaths by country – UCDP (2019)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c2bdccf75a8de6f077b3291afa55e649
+  size: 17650
+  path: dataset_4143_conflict_deaths_by_country__ucdp__2019_values.feather

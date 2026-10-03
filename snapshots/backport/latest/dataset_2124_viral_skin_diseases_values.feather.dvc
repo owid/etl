@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2124
+    date_accessed: 2023-08-14 14:41:09.771738
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Viral skin diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e24c83a2b7cd95e4c0d1e2dc8e124c5d
+  size: 2116394
+  path: dataset_2124_viral_skin_diseases_values.feather

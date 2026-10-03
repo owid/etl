@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/897
+    date_accessed: 2023-08-16 10:42:42.857591
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank EdStats - Background
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b289c243cc41128ca889c6f44ee42032
+  size: 16730
+  path: dataset_897_world_bank_edstats__background_values.feather

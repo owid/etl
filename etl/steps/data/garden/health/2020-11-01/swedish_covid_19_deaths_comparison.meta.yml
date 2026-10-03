@@ -1,0 +1,21 @@
+dataset:
+  title: Swedish COVID-19 deaths comparison
+  owners:
+    - Edouard Mathieu  # backport
+tables:
+  swedish_covid_19_deaths_comparison:
+    variables:
+      new_deaths_smoothed:
+        title: new_deaths_smoothed
+        unit: ''
+        display:
+          timeInterval: day
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

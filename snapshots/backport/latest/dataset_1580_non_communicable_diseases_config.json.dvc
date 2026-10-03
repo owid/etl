@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1580
+    date_accessed: 2023-08-16 08:46:33.209865
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1580_non_communicable_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b1acfa4cf9ed01ab8d1bf4dc4d72457f
+  size: 31775
+  path: dataset_1580_non_communicable_diseases_config.json

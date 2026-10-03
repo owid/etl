@@ -1,0 +1,13 @@
+meta:
+  is_public: false
+  origin:
+    producer: Hsu et al.
+    title: The 2014 Environmental Performance Index
+    citation_full: 'Hsu, A., J. Emerson, M. Levy, A. de Sherbinin, L. Johnson, O. Malik, J. Schwartz, and M. Jaiteh. (2014). The 2014 Environmental Performance Index. New Haven, CT: Yale Center for Environmental Law and Policy.'
+    url_main: http://www.epi.yale.edu
+    date_accessed: '2019-03-06'
+    date_published: '2014'
+outs:
+  - md5: 7a048d7caf86bb814dc711be636d1e3d
+    size: 6266
+    path: te_20_25b_env.feather

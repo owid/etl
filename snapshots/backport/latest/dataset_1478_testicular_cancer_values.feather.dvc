@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1478
+    date_accessed: 2023-08-16 10:10:05.958272
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Testicular cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 60d86acce863e43585220752c1b3bf30
+  size: 1389898
+  path: dataset_1478_testicular_cancer_values.feather

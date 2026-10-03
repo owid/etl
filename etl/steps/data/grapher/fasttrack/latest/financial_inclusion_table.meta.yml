@@ -1,0 +1,20 @@
+dataset:
+  title: DRAFT financial_inclusion_table
+  description: ''
+tables:
+  financial_inclusion_table:
+    variables:
+      mobilemoneyaccount:
+        title: MobileMoneyAccount
+        unit: ''
+      bankaccount:
+        title: BankAccount
+        unit: ''
+      phoneownership:
+        title: PhoneOwnership
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

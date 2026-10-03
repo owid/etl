@@ -1,0 +1,30 @@
+meta:
+  name: Influenza A/H5N1 cases and deaths (Kucharski et al., 2015)
+  publication_year: 2015
+
+  publication_date: '2015-04-10'
+  source_name: Kucharski et al. (2015)
+  source_published_by: >-
+    Kucharski AJ, Edmunds WJ. Characterizing the Transmission
+    Potential of Zoonotic Infections from Minor Outbreaks. PLOS Computational Biology
+    2015 DOI: 10.1371/journal.pcbi.1004154
+  url: https://github.com/adamkucharski/subcritical_chains/
+  source_data_url: 
+    https://github.com/adamkucharski/subcritical_chains/raw/master/data/H5N1_list_2006_2014.xlsx
+  license_url: https://github.com/adamkucharski/subcritical_chains/blob/master/LICENSE
+  license_name: GPL-2.0 license
+  date_accessed: 2023-08-14
+  is_public: true
+  description: >-
+    This dataset is published along with the authors' paper.
+
+
+    It includes cluster data used in the main analysis, as well as a line list of
+    A/H5N1 cases reported globally
+    between 2006-2014. These case reports were collated from Fiebig et al. (2011)
+    and WHO.
+wdir: ../../../data/snapshots/health/2023-08-14
+outs:
+- md5: 48d7612c5a91467daa917ac849e3f2aa
+  size: 96625
+  path: avian_influenza_h5n1_kucharski.xlsx

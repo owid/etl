@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2648
+    date_accessed: 2023-08-10 14:50:26.591320
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Social Protection and Well-being - Gender, Institutions and Development Database
+    2014 (GID-DB)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: be94b234f8f51141e1cfa0c342a6ccfa
+  size: 22642
+  path: 
+    dataset_2648_social_protection_and_well_being__gender__institutions_and_development_database_2014__gid_db_values.feather

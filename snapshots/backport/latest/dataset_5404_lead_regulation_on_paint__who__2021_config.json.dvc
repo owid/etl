@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5404
+    date_accessed: 2023-08-14 05:51:27.461165
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5404_lead_regulation_on_paint__who__2021
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6a6f0fad4d52681632d267eb6d66eefe
+  size: 2175
+  path: dataset_5404_lead_regulation_on_paint__who__2021_config.json

@@ -1,0 +1,25 @@
+meta:
+  namespace: artificial_intelligence
+  short_name: yougov_end_of_humanity
+  name: AI and the End of Humanity (YouGov, 2023)
+  version: '2023-06-08'
+  publication_year: 2023
+  publication_date: '2023-04-03'
+  source_name: YouGov
+  source_published_by: YouGov
+  url:
+    https://today.yougov.com/topics/technology/articles-reports/2023/04/14/ai-nuclear-weapons-world-war-humanity-poll
+  source_data_url:
+    https://docs.cdn.yougov.com/bfoyxp7p28/results_AI%20and%20the%20End%20of%20Humanity.pdf
+  file_extension: pdf
+  license_url:
+  license_name: Public domain
+  date_accessed: 2023-06-08
+  is_public: true
+  description: |
+    This poll was conducted online on April 7 - 11, 2023 among 1,000 U.S. adult citizens. Respondents were selected from YouGov’s opt-in panel using sample matching.
+wdir: ../../../data/snapshots/artificial_intelligence/2023-06-08
+outs:
+- md5: ce9a53fd403dcf529e3fb893684a6a64
+  size: 250634
+  path: yougov_end_of_humanity.pdf

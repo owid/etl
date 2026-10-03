@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3336
+    date_accessed: 2023-08-14 16:04:20.886052
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Childhood maltreatment
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 61f46fab5baca3f2e8fdcd8b371284cb
+  size: 1173506
+  path: dataset_3336_childhood_maltreatment_values.feather

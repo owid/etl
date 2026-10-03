@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4577
+    date_accessed: 2023-08-16 07:23:51.312356
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4577_countries_that_are_contracting_parties_to_the_international_treaty_on_plant_genetic_resources_for_food_and_agriculture__pgrfa__1__yes__0__no
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 585e7bbd96eb5728966eac0d38bc63bd
+  size: 14942
+  path: 
+    dataset_4577_countries_that_are_contracting_parties_to_the_international_treaty_on_plant_genetic_resources_for_food_and_agriculture__pgrfa__1__yes__0__no_config.json

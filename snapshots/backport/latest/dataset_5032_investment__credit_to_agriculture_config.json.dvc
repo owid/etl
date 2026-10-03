@@ -1,0 +1,22 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5032
+    date_accessed: 2023-08-16 08:31:48.300276
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5032_investment__credit_to_agriculture (archived)
+  description: The Credit to Agriculture dataset provides national data for over 100
+    countries on the amount of loans provided by the private/commercial banking sector
+    to producers in agriculture, forestry and fisheries, including household producers,
+    cooperatives, and agro-businesses. For some countries, the three subsectors of
+    agriculture, forestry, and fishing are completely specified. In other cases, complete
+    disaggregations are not available. The dataset also provides statistics on the
+    total credit to all industries, indicators on the share of credit to agricultural
+    producers, and an agriculture orientation index (the agriculture share of credit,
+    over the agriculture share of GDP).
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3bc505a95b6a990f7b1210e22edb0636
+  size: 11185
+  path: dataset_5032_investment__credit_to_agriculture_config.json

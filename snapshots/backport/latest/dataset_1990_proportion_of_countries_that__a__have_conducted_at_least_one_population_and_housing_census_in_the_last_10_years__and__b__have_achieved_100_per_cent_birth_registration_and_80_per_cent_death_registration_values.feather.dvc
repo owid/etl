@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1990
+    date_accessed: 2023-08-16 08:29:25.425939
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of countries that (a) have conducted at least one population and
+    housing census in the last 10 years; and (b) have achieved 100 per cent birth
+    registration and 80 per cent death registration
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b146628c24d169e885065cd9c8e7aa12
+  size: 15642
+  path: 
+    dataset_1990_proportion_of_countries_that__a__have_conducted_at_least_one_population_and_housing_census_in_the_last_10_years__and__b__have_achieved_100_per_cent_birth_registration_and_80_per_cent_death_registration_values.feather

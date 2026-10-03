@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1596
+    date_accessed: 2023-08-16 10:09:31.574701
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Urolithiasis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d6795ecd35084ccfc1dc800650783c99
+  size: 1855178
+  path: dataset_1596_urolithiasis_values.feather

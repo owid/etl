@@ -1,0 +1,11 @@
+dataset:
+  sources:
+
+tables:
+  zijdeman_et_al_2015:
+    variables:
+      life_expectancy:
+        title: Life expectancy (at birth)
+        unit: years
+        short_unit: years
+        description: Life expectancy at birth.

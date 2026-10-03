@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2075
+    date_accessed: 2023-08-14 16:10:25.555843
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Guinea Worm Cases - WHO (2018)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fb0fd4cd4cd778f7a6f45e9db96def5d
+  size: 9042
+  path: dataset_2075_guinea_worm_cases__who__2018_values.feather

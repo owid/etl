@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5290
+    date_accessed: 2023-08-16 08:34:52.342554
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5290_tax_rate_on_labor_income__prescott__2004
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 13074c49393bc3cda3898a7f414cf827
+  size: 2201
+  path: dataset_5290_tax_rate_on_labor_income__prescott__2004_config.json

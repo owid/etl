@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5473
+    date_accessed: 2023-08-14 10:58:45.191654
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_5473_ihme__global_burden_of_disease__mental_health__institute_for_health_metrics_and_evaluation__2021_09
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a81eb652042a3b3f35ee7e105712d897
+  size: 136987
+  path: 
+    dataset_5473_ihme__global_burden_of_disease__mental_health__institute_for_health_metrics_and_evaluation__2021_09_config.json

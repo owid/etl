@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4637
+    date_accessed: 2023-08-10 14:51:12.270484
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Dollar value of all resources made available to strengthen statistical capacity
+    in developing countries (current United States dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: aeabea656ae1ddb76a06ce6e134887d1
+  size: 23962
+  path: 
+    dataset_4637_dollar_value_of_all_resources_made_available_to_strengthen_statistical_capacity_in_developing_countries__current_united_states_dollars_values.feather

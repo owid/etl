@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/928
+    date_accessed: 2023-08-16 08:26:04.721410
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_928_global_population_trends__us_census_bureau__2017
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 24ce6003b1c078986a9a49596c76000a
+  size: 2084
+  path: dataset_928_global_population_trends__us_census_bureau__2017_config.json

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/500
+    date_accessed: 2023-08-14 16:00:48.133608
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_500_investment_in_renewables_by_technology__irena__2017
+    (archived)
+  description: Investment in renewable energy by technology (measured in billions
+    USD per year)
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 28b0aa267fb275b7eeb0d47c4dc473ca
+  size: 6679
+  path: dataset_500_investment_in_renewables_by_technology__irena__2017_config.json

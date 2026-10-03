@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1748
+    date_accessed: 2023-08-10 14:47:49.241571
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Low back pain
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cb68aeb46671c475249e3490523b6a4c
+  size: 857194
+  path: dataset_1748_low_back_pain_values.feather

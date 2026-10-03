@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4579
+    date_accessed: 2023-08-16 10:15:30.569885
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Total official development assistance for biodiversity, by donor countries
+    (millions of constant 2017 United States dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d1b53bb11f924cccd161a362409b4acf
+  size: 10906
+  path: 
+    dataset_4579_total_official_development_assistance_for_biodiversity__by_donor_countries__millions_of_constant_2017_united_states_dollars_values.feather
