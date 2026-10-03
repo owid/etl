@@ -1,0 +1,71 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: people
+    short_unit: ""
+    processing_level: minor
+    display:
+      numDecimalPlaces: 0
+    presentation:
+      topic_tags:
+        - Fish & Overfishing
+      attribution_short: FAO
+    description_processing: |-
+      - FAO reports the 2000s and the 2010s as decade averages. We assign that average value to its midpoint year (2005 and 2015, respectively). All other years refer to single years.
+
+dataset:
+  title: Employment in fisheries and aquaculture
+  update_period_days: 730
+  owners:
+    - Pablo Rosado
+
+tables:
+  employment_in_fisheries_and_aquaculture:
+    variables:
+      total:
+        title: Number of people employed in fisheries and aquaculture
+        description_short: Number of people employed in the primary sector of fisheries and aquaculture, as full-time, part-time, occasional or unspecified workers.
+        display:
+          name: Fisheries and aquaculture
+        presentation:
+          title_public: Number of people employed in fisheries and aquaculture
+        description_key:
+          - The primary sector covers people who catch or farm aquatic animals. It excludes workers in processing, trade and other downstream activities.
+          - Workers are counted whether they are employed full-time, part-time, occasionally, or with an unspecified working-time status.
+      aquaculture:
+        title: Number of people employed in aquaculture
+        description_short: Number of people employed in aquaculture, the farming of aquatic animals.
+        display:
+          name: Aquaculture
+        presentation:
+          title_public: Number of people employed in aquaculture
+      capture_fisheries:
+        title: Number of people employed in capture fisheries
+        description_short: Number of people employed catching wild aquatic animals, combining inland and marine fisheries.
+        description_processing: Capture fisheries is calculated as the sum of inland fisheries and marine fisheries.
+        processing_level: major
+        display:
+          name: Capture fisheries
+        presentation:
+          title_public: Number of people employed in capture fisheries
+      inland_fisheries:
+        title: Number of people employed in inland fisheries
+        description_short: Number of people employed catching wild aquatic animals in inland waters, such as rivers and lakes.
+        display:
+          name: Inland fisheries
+        presentation:
+          title_public: Number of people employed in inland fisheries
+      marine_fisheries:
+        title: Number of people employed in marine fisheries
+        description_short: Number of people employed catching wild aquatic animals in marine waters, such as seas and oceans.
+        display:
+          name: Marine fisheries
+        presentation:
+          title_public: Number of people employed in marine fisheries
+      unspecified:
+        title: Number of people employed in an unspecified fisheries or aquaculture subsector
+        description_short: Number of workers in the primary sector of fisheries and aquaculture who could not be assigned to a specific subsector.
+        display:
+          name: Unspecified
+        presentation:
+          title_public: Number of people employed in an unspecified fisheries or aquaculture subsector

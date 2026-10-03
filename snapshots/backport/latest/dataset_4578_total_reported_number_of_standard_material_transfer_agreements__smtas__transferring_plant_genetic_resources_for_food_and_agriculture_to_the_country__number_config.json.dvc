@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4578
+    date_accessed: 2023-08-16 08:00:27.947172
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4578_total_reported_number_of_standard_material_transfer_agreements__smtas__transferring_plant_genetic_resources_for_food_and_agriculture_to_the_country__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cf0358b39db61a735fafce169caef997
+  size: 14974
+  path: 
+    dataset_4578_total_reported_number_of_standard_material_transfer_agreements__smtas__transferring_plant_genetic_resources_for_food_and_agriculture_to_the_country__number_config.json

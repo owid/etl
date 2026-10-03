@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1963
+    date_accessed: 2023-08-16 08:32:36.637076
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Total net official development assistance to medical research and basic health
+    sectors
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 99ee902202be233d34f836bfc1437ca8
+  size: 29834
+  path: 
+    dataset_1963_total_net_official_development_assistance_to_medical_research_and_basic_health_sectors_values.feather

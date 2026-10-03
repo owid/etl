@@ -1,0 +1,20 @@
+dataset:
+  title: DRAFT JOE OECD IDD data on before and after tax inequality
+  description: ''
+  licenses:
+    - {}
+tables:
+  draft_joe_idd_oecd:
+    variables:
+      gini_disposable_working_age:
+        title: gini_disposable_working_age
+        unit: ''
+      gini_market_working_age:
+        title: gini_market_working_age
+        unit: ''
+      gini_disposable_total:
+        title: gini_disposable_total
+        unit: ''
+      gini_market_total:
+        title: gini_market_total
+        unit: ''

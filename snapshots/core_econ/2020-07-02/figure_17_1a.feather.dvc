@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: Almunia et al.
+    title: 'From Great Depression to Great Credit Crisis: similarities, differences and lessons'
+    citation_full: "Miguel Almunia, Agustin Benetrix, Barry Eichengreen, Kevin H. O'Rourke, and Gisela Rua. 2010. 'From Great Depression to Great Credit Crisis: Similarities, Differences and Lessons.' Economic Policy 25 (62): pp. 219-65."
+    url_main: https://www.nber.org/papers/w15524
+    date_accessed: '2020-07-02'
+    date_published: '2010'
+  is_public: false
+outs:
+  - md5: b4cfb2c24ffe2d16bc11bcb6acf9fb8d
+    size: 4506
+    path: figure_17_1a.feather

@@ -1,0 +1,9 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/626
+    date_accessed: 2023-08-16 08:05:37.523869
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Migration - Quality of Government (2017)
+  description: This is a dataset imported by the automated fetcher

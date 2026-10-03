@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5653
+    date_accessed: 2023-08-16 10:08:31.730678
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5653_penn_world_table_version_10_0 (archived)
+  description: 'Previous updates: 2 Jul 2013 (8.0), 13 Apr 2015 (8.1), 9 Jun 2016
+    (9.0), 11 Apr 2019 (9.1), 14 Jan 2021 (10.0). With this is mind there may be an
+    update on 2023 or 2024'
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eb980989d2f4ce33a6b8cb22cb3b4545
+  size: 27953
+  path: dataset_5653_penn_world_table_version_10_0_config.json

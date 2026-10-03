@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: Chen et al.
+    title: 'Globalisation, technological progress and changes in regulations and institutions: which impact on the rise of earnings inequality in OECD countries?'
+    citation_full: 'Wen-Hao Chen, Michael Förster, and Ana Llena-Nozal. 2013. ''Globalisation, Technological Progress and Changes in Regulations and Institutions: Which Impact on the Rise of Earnings Inequality in OECD Countries?''. Working Paper Series 597. LIS.'
+    url_main: http://www.lisdatacenter.org/wps/liswps/597.pdf
+    date_accessed: '2019-01-07'
+    date_published: '2013'
+  is_public: false
+outs:
+  - md5: 386d7a73d1382e336ec37b1da7e2cdfe
+    size: 4058
+    path: figure_19_11_2.feather

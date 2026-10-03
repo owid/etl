@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: International Union for Conservation of Nature Red List of Threatened Species
+    title: IUCN Red List Summary Statistics Table 1a
+    description: |-
+      Number of species evaluated in relation to the overall number of described species, and numbers of threatened species by major groups of organisms.
+    citation_full: |-
+      International Union for Conservation of Nature. 2025. The IUCN Red List of Threatened Species. Version 2025-1. https://www.iucnredlist.org. Accessed on [27 March 2025]
+    attribution_short: IUCN
+    url_main: https://nc.iucnredlist.org/redlist/content/attachment_files/2025-1_RL_Table_1a.pdf
+    date_accessed: "2026-01-05"
+    date_published: "2025-10-10"
+    license:
+      name: © International Union for Conservation of Nature and Natural Resources
+      url: https://www.iucnredlist.org/terms/terms-of-use
+outs:
+  - md5: e9f645801c9dbbcb063e9fbd255572f9
+    size: 823
+    path: threatened_and_evaluated_species.csv

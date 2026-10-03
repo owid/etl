@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5766
+    date_accessed: 2023-08-11 07:17:29.150381
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5766_land_use_for_biofuels
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: beb2199699b7763834c09a051728d938
+  size: 51504
+  path: dataset_5766_land_use_for_biofuels_config.json

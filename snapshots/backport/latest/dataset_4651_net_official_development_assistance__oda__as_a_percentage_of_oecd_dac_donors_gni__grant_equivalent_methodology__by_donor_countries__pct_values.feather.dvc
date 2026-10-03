@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4651
+    date_accessed: 2023-08-10 14:31:10.546875
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Net official development assistance (ODA) as a percentage of OECD-DAC donors'
+    GNI (grant equivalent methodology), by donor countries (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4e9e2e4a8d5f3dc245e845dc9ee35edd
+  size: 7266
+  path: 
+    dataset_4651_net_official_development_assistance__oda__as_a_percentage_of_oecd_dac_donors_gni__grant_equivalent_methodology__by_donor_countries__pct_values.feather

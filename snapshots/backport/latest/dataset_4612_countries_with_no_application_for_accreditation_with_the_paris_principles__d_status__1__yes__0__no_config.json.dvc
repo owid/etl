@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4612
+    date_accessed: 2023-08-16 07:27:43.538399
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4612_countries_with_no_application_for_accreditation_with_the_paris_principles__d_status__1__yes__0__no
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 51e97ef55ab08a4616d3a25f0c478fbf
+  size: 1950
+  path: 
+    dataset_4612_countries_with_no_application_for_accreditation_with_the_paris_principles__d_status__1__yes__0__no_config.json

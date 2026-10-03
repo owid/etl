@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5192
+    date_accessed: 2023-08-10 09:42:48.984933
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5192_global_health_indicators__number_of_people__2020
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 663e36ea6078de35ac7eac6bfe3a2499
+  size: 22745
+  path: dataset_5192_global_health_indicators__number_of_people__2020_config.json

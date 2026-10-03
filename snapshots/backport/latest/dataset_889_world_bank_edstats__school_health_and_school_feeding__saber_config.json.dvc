@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/889
+    date_accessed: 2023-08-14 05:49:10.405087
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_889_world_bank_edstats__school_health_and_school_feeding__saber
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 509191e8a23aaa82eade2917fa25f14f
+  size: 14304
+  path: 
+    dataset_889_world_bank_edstats__school_health_and_school_feeding__saber_config.json

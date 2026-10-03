@@ -1,0 +1,26 @@
+dataset:
+  title: TE-13.4
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_13_4:
+    variables:
+      log_of_real_gdp_per_capita_in_2011_usd:
+        title: Log of real GDP per capita in 2011 US$
+        unit: $
+        description: |-
+          Measure of real GDP per capita accounts for inflation, i.e. changes in the price level, and is suitable for cross-country income comparisons.
+      real_gdp_per_capita_in_2011_usd:
+        title: Real GDP per capita in 2011 US$
+        unit: $
+        description: |-
+          Measure of real GDP per capita accounts for inflation, i.e. changes in the price level, and is suitable for cross-country income comparisons.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

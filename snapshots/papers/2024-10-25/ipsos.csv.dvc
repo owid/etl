@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Perils of perception, prejudice, and conspiracy theories
+    description: |-
+      Ipsos survey for the 20th edition of the Entretiens de Royaumont. Survey conducted among 10,000 people on the Ipsos Digital platform from 22 to 25 November 2023
+    date_published: "2023-12-01"
+
+    # Citation
+    producer: World Inequality Database , Ipsos
+    citation_full: |-
+      Perils of perception, prejudice, and conspiracy theories. World Inequality Database , Ipsos (2023).
+    attribution_short: Ipsos
+
+    # Files
+    url_main: https://www.ipsos.com/sites/default/files/ct/news/documents/2023-12/ipsos-perils-perception-prejudice-conspiracy-theories-december-2023.pdf
+    date_accessed: 2024-10-25
+
+    # License
+    license:
+      name: CC BY 4.0
+
+outs:
+  - md5: 06bb44fcf39d1dfa5c44aab4c4d6b69d
+    size: 325
+    path: ipsos.csv

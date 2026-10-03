@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2044
+    date_accessed: 2023-08-14 15:50:39.461715
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of children under 5 years of age who are developmentally on track
+    in health, learning and psychosocial well-being, by sex
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: df9fbf872241dc221080b73580df6e6b
+  size: 8922
+  path: 
+    dataset_2044_proportion_of_children_under_5_years_of_age_who_are_developmentally_on_track_in_health__learning_and_psychosocial_well_being__by_sex_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2528
+    date_accessed: 2023-08-14 15:21:20.822318
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Industry and Services - ANBERD: business enterprise R&D broken down by industry
+    (ISIC Rev. 4)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a9db81be56afbc935336d76fa97ee271
+  size: 68338
+  path: 
+    dataset_2528_industry_and_services__anberd__business_enterprise_r_and_d_broken_down_by_industry__isic_rev__4_values.feather

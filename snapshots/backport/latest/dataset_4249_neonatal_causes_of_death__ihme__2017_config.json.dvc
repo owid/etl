@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4249
+    date_accessed: 2023-08-16 09:52:22.679304
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4249_neonatal_causes_of_death__ihme__2017 (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b3ebe361531ad04fae97bcf2b3cda853
+  size: 45724
+  path: dataset_4249_neonatal_causes_of_death__ihme__2017_config.json

@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Inequality data for Australia in Ingles (1981)
+    description: |-
+      Gini coefficient from gross household income in Australia.
+    date_published: "1981"
+
+    # Citation
+    producer: Ingles
+    citation_full: |-
+      Ingles, D, 1981, Statistics on the distribution of income and wealth in Australia, Table 4. Research Paper no 14, Department of Social Security, Canberra. 
+
+    # Files
+    url_main: https://search.worldcat.org/title/9944323
+    date_accessed: 2024-08-02
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://search.worldcat.org/title/9944323
+
+outs:
+  - md5: 94950f23157d3124f8cd0a9e98f4821c
+    size: 80
+    path: ingles_1981_australia.csv

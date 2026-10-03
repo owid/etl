@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2254
+    date_accessed: 2023-08-16 07:54:44.841986
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2254_mesothelioma (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4210473559b925df520991731e9c4198
+  size: 32368
+  path: dataset_2254_mesothelioma_config.json

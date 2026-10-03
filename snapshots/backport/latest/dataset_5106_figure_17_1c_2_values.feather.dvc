@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/5106
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Figure_17.1c-2
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: 22aac55756263bf0a424863482025837
+    size: 6242
+    path: dataset_5106_figure_17_1c_2_values.feather

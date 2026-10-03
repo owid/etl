@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/905
+    date_accessed: 2023-08-14 16:00:43.089354
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank EdStats - Health: Mortality'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0591606ed7b5f46982487ab0b2ba0f7e
+  size: 51938
+  path: dataset_905_world_bank_edstats__health__mortality_values.feather

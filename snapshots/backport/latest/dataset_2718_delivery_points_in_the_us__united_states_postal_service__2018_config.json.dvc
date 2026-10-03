@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2718
+    date_accessed: 2023-08-16 09:57:22.593559
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2718_delivery_points_in_the_us__united_states_postal_service__2018
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0f32efad5ef28f91418ac9e7e637f34a
+  size: 5812
+  path: 
+    dataset_2718_delivery_points_in_the_us__united_states_postal_service__2018_config.json

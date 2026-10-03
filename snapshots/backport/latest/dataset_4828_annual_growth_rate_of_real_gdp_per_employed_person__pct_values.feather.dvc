@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4828
+    date_accessed: 2023-08-16 07:27:36.087117
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Annual growth rate of real GDP per employed person (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: aa6d556fc2ea58a17964d0af42a036a6
+  size: 27050
+  path: 
+    dataset_4828_annual_growth_rate_of_real_gdp_per_employed_person__pct_values.feather

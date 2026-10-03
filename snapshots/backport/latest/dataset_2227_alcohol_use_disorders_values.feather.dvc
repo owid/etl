@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2227
+    date_accessed: 2023-08-16 09:58:08.034882
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Alcohol use disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e88207c658880973f92b8f9a44773773
+  size: 2116402
+  path: dataset_2227_alcohol_use_disorders_values.feather

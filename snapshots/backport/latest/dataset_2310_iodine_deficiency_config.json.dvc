@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2310
+    date_accessed: 2023-08-14 08:50:00.015489
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2310_iodine_deficiency (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b2772618498fc14a493eded3329ba789
+  size: 32578
+  path: dataset_2310_iodine_deficiency_config.json

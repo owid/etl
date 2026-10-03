@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2559
+    date_accessed: 2023-08-14 15:23:11.039029
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2559_demography_and_population__international_migration_database
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 643ac66d9a5a88e668e6daa9b66a40d6
+  size: 16672
+  path: 
+    dataset_2559_demography_and_population__international_migration_database_config.json

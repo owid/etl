@@ -1,0 +1,74 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - War & Peace
+    description_processing: |-
+      In the original data, the provider defines a period with constant peace scale level with year, month and day.
+
+      Therefore, in the same year the peace scale level of the relationship between two countries can change. In such cases, we assign a single peace scale level per year, based on the one that was more prominent during that year.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 1000
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  peace_diehl:
+    variables:
+      peace_scale_level:
+        title: Peace scale level
+        unit: ""
+        description_short: "Describes different levels of peace: severe rivalry, lesser rivalry, negative peace, warm peace, and security community respectively."
+        processing_level: minor
+        description_processing: |-
+          The peace scale levels are encoded using float numbers in the range of 0 to 1:
+
+            - 0: severe rivalry
+            - 0.25: lesser rivalry
+            - 0.5: negative peace
+            - 0.75: warm peace
+            - 1: security community
+
+  peace_diehl_agg:
+    variables:
+      severe_rivalry:
+        title: Number of countries with 'severe rivalry' relationship
+        description_short: Number of countries that have a peace scale relationship labeled as 'severe rivalry'.
+        unit: countries
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+      lesser_rivalry:
+        title: Number of countries with 'lesser rivalry' relationship
+        description_short: Number of countries that have a peace scale relationship labeled as 'lesser rivalry'.
+        unit: countries
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+      negative_peace:
+        title: Number of countries with 'negative peace' relationship
+        description_short: Number of countries that have a peace scale relationship labeled as 'negative peace'.
+        unit: countries
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+      positive_peace:
+        title: Number of countries with 'positive peace' relationship
+        description_short: Number of countries that have a peace scale relationship labeled as 'positive peace'.
+        unit: countries
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+      security_community:
+        title: Number of countries with 'security community' relationship
+        description_short: Number of countries that have a peace scale relationship labeled as 'security community'.
+        unit: countries
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0

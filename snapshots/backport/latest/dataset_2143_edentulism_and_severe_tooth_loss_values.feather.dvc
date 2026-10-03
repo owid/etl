@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2143
+    date_accessed: 2023-08-14 05:50:00.537641
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Edentulism and severe tooth loss
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2056e35f85cb758618934ef9bd493bb0
+  size: 1499306
+  path: dataset_2143_edentulism_and_severe_tooth_loss_values.feather

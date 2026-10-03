@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4241
+    date_accessed: 2023-08-10 09:49:55.430717
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Raised Blood Pressure Prevalence - NCD RisC (2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b5b1dd823add74d2d0a601aeb5fe7b5d
+  size: 289682
+  path: dataset_4241_raised_blood_pressure_prevalence__ncd_risc__2017_values.feather

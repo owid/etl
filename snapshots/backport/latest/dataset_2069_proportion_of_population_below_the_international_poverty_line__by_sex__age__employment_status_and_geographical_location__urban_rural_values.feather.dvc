@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2069
+    date_accessed: 2023-08-16 09:48:52.734293
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of population below the international poverty line, by sex, age,
+    employment status and geographical location (urban/rural)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 35392485fc5bf6362c3135dcc38f8a39
+  size: 123874
+  path: 
+    dataset_2069_proportion_of_population_below_the_international_poverty_line__by_sex__age__employment_status_and_geographical_location__urban_rural_values.feather

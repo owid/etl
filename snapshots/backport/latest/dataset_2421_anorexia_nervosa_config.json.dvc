@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2421
+    date_accessed: 2023-08-14 14:28:35.574940
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2421_anorexia_nervosa (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d6ddc0b35057be3b17fe9ddbfae7889e
+  size: 83685
+  path: dataset_2421_anorexia_nervosa_config.json

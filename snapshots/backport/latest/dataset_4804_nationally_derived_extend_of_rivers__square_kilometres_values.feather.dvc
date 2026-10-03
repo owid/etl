@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4804
+    date_accessed: 2023-08-16 08:21:55.556179
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Nationally derived extend of rivers (square kilometres)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6a1dca1757ee12396c54091a105db186
+  size: 6690
+  path: 
+    dataset_4804_nationally_derived_extend_of_rivers__square_kilometres_values.feather

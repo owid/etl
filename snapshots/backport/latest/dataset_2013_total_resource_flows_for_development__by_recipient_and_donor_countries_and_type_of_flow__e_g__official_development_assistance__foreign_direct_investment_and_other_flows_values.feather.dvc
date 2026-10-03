@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2013
+    date_accessed: 2023-08-14 05:49:06.488244
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Total resource flows for development, by recipient and donor countries and
+    type of flow (e.g. official development assistance, foreign direct investment
+    and other flows)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ecace025509c3142e8155e3c85077093
+  size: 25266
+  path: 
+    dataset_2013_total_resource_flows_for_development__by_recipient_and_donor_countries_and_type_of_flow__e_g__official_development_assistance__foreign_direct_investment_and_other_flows_values.feather

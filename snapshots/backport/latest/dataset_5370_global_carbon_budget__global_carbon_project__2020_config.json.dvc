@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5370
+    date_accessed: 2023-08-14 15:43:36.280783
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5370_global_carbon_budget__global_carbon_project__2020
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 99a2dba24bbf409423365898991a996c
+  size: 93213
+  path: dataset_5370_global_carbon_budget__global_carbon_project__2020_config.json

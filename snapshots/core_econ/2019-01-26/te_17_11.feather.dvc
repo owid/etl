@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: The Conference Board
+    title: Total Economy Database
+    description: Underlying GDP per hour data is in 2017 US$.
+    citation_full: The Conference Board Total Economy Database, 2018.
+    url_main: https://www.conference-board.org/data/economydatabase/index.cfm?id=27762
+    date_accessed: '2019-01-26'
+    date_published: '2018'
+    version_producer: '2018'
+  is_public: false
+outs:
+  - md5: fe1a4a4c02ffa337408c03f5a9e932d1
+    size: 7282
+    path: te_17_11.feather

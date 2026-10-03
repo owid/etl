@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2583
+    date_accessed: 2023-08-10 14:45:24.884963
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environment - Environmentally Adjusted Multifactor Productivity
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f3e3f6b9ec45e82acf4abe30079123bc
+  size: 70810
+  path: 
+    dataset_2583_environment__environmentally_adjusted_multifactor_productivity_values.feather

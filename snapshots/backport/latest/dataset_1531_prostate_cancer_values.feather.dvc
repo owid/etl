@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1531
+    date_accessed: 2023-08-16 10:31:44.393520
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Prostate cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3b1e6572bc70613aff74ffb450ee394e
+  size: 1389906
+  path: dataset_1531_prostate_cancer_values.feather

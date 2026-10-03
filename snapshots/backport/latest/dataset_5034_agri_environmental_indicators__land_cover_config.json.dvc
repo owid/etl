@@ -1,0 +1,22 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5034
+    date_accessed: 2023-08-14 15:55:24.916808
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5034_agri_environmental_indicators__land_cover
+    (archived)
+  description: "The FAOSTAT domain Land Cover under the Agri-Environmental Indicators
+    section contains land cover information organized by the land cover classes of
+    the international standard system for Environmental and Economic Accounting Central
+    Framework (SEEA CF). The land cover information is compiled from publicly available
+    Global Land Cover (GLC) maps: a) the International Geosphere-Biosphere Programme
+    (IGBP)-MODIS land cover type (2001\x962012) and the European Spatial Agency (ESA)
+    Climate Change Initiative (CCI) annual land cover maps (1992\x962015) produced
+    by the Université catholique de Louvain (UCL)-Geomatics."
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f07275dcddcd4b6e049853f62a90c426
+  size: 43831
+  path: dataset_5034_agri_environmental_indicators__land_cover_config.json

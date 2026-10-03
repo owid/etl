@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1043
+    date_accessed: 2023-08-11 07:58:51.398344
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank Gender Statistics - Private Sector & Trade
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2afb47326592dc19ba08956f61299bbe
+  size: 64258
+  path: 
+    dataset_1043_world_bank_gender_statistics__private_sector__and__trade_values.feather

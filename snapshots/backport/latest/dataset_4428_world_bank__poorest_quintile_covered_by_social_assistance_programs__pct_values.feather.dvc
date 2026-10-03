@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4428
+    date_accessed: 2023-08-10 14:41:23.664610
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: '[World Bank] Poorest quintile covered by social assistance programs (%)'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2003ef514578f5371c8f128410f55223
+  size: 14130
+  path: 
+    dataset_4428_world_bank__poorest_quintile_covered_by_social_assistance_programs__pct_values.feather

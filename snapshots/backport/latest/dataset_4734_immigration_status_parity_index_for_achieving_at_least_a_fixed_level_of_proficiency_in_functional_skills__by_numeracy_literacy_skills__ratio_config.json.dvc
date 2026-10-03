@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4734
+    date_accessed: 2023-08-16 10:35:37.407142
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4734_immigration_status_parity_index_for_achieving_at_least_a_fixed_level_of_proficiency_in_functional_skills__by_numeracy_literacy_skills__ratio
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 219f62e3e862ccfe22a8a0dca4a3438c
+  size: 6414
+  path: 
+    dataset_4734_immigration_status_parity_index_for_achieving_at_least_a_fixed_level_of_proficiency_in_functional_skills__by_numeracy_literacy_skills__ratio_config.json

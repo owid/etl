@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4773
+    date_accessed: 2023-08-14 05:48:13.294921
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of women who make their own informed decisions regarding contraceptive
+    use (% of women aged 15-49 years)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f08870b9440b2e122370980454c0c223
+  size: 8258
+  path: 
+    dataset_4773_proportion_of_women_who_make_their_own_informed_decisions_regarding_contraceptive_use__pct_of_women_aged_15_49_years_values.feather

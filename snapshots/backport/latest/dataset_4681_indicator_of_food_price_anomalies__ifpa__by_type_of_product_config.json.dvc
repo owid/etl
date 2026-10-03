@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4681
+    date_accessed: 2023-08-16 07:15:43.494022
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4681_indicator_of_food_price_anomalies__ifpa__by_type_of_product
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ca3f2f08e77da966777b77cbe11fda98
+  size: 5029
+  path: 
+    dataset_4681_indicator_of_food_price_anomalies__ifpa__by_type_of_product_config.json

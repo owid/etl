@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1960
+    date_accessed: 2023-08-10 14:50:47.463590
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1960_harmful_use_of_alcohol__defined_according_to_the_national_context_as_alcohol_per_capita_consumption__aged_15_years_and_older__within_a_calendar_year_in_litres_of_pure_alcohol
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a0ed9365ebbc9bece437beec2a4a80c4
+  size: 4744
+  path: 
+    dataset_1960_harmful_use_of_alcohol__defined_according_to_the_national_context_as_alcohol_per_capita_consumption__aged_15_years_and_older__within_a_calendar_year_in_litres_of_pure_alcohol_config.json

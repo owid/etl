@@ -1,0 +1,7 @@
+tables:
+  air_pollution_ceds:
+    variables:
+      nox:
+        title: Nitrogen oxide (NOx)
+        display:
+          numDecimalPlaces: 0

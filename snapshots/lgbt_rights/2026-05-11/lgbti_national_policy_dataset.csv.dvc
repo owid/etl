@@ -1,0 +1,40 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: LGBTI National Policy Dataset
+    description: >-
+      The LGBTI National Policy Dataset (Version 2.0) is a country-year-policy panel dataset tracking the
+      adoption, scope, and enforcement of LGBTI-related policies across 197 countries from 1991 to 2025. The
+      dataset is distributed in long format, where each row represents a single country in a single year for one
+      specific policy-status combination. It is designed for use in comparative political research, policy diffusion
+      analysis, and quantitative cross-national studies of LGBTI rights.
+
+
+      The dataset covers 27 distinct policy areas organized into 54 policy-status combinations (each policy
+      paired with two mutually exclusive status directions). Of these 54 combinations, 36 contain substantive
+      data; the remaining 18 are structural placeholders with all-zero values, included to maintain a fully
+      balanced panel suitable for econometric methods.
+    date_published: "2026-03-23"
+    version_producer: "2.0"
+
+    # Citation
+    producer: Velasco
+    citation_full: |-
+      Velasco, Kristopher. 2026. "LGBTI National Policy Dataset, Version 2.0." [Dataset].
+    attribution_short: Velasco
+
+    # Files
+    url_main: https://osf.io/wta9p/overview
+    date_accessed: "2026-05-11"
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://osf.io/wta9p/overview
+
+outs:
+  - md5: 3e2105195ea42f8ca7b3de4929c9a294
+    size: 40464107
+    path: lgbti_national_policy_dataset.csv

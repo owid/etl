@@ -1,0 +1,37 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Carbon Pricing Database
+    description: |-
+      This dataset contains information on carbon pricing mechanisms (carbon taxes or cap-and-trade) introduced around the world since 1990. To date, it is the most comprehensive attempt at providing a consistent-across-jurisdiction description of carbon pricing mechanisms in terms of their sectoral (and fuel) coverage as well as the associated price signal.
+
+      It covers national and sub-national economic mechanisms relating to carbon emissions, and was developed from several key sources: Most notably, policy documents from countries and regions themselves. Secondly, from other sources such as the International Carbon Action Partnership.
+    date_published: 2023-10-04
+
+    # Citation
+    producer: Resources for the Future
+    citation_full: |-
+      Dolphin, G., Xiahou, Q. World carbon pricing database: sources and methods. Sci Data 9, 573 (2022). The article is available in Open Access at [https://doi.org/10.1038/s41597-022-01659-x](https://doi.org/10.1038/s41597-022-01659-x).
+
+      Supported by Resources for the Future.
+    attribution: Dolphin and Xiahou (2022)
+    attribution_short: RFF
+
+    # Files
+    url_main: https://github.com/g-dolphin/WorldCarbonPricingDatabase/
+    url_download:
+      https://github.com/g-dolphin/WorldCarbonPricingDatabase/archive/refs/heads/master.zip
+    date_accessed: 2023-10-19
+
+    # License
+    license:
+      name: CC BY-NC-ND 4.0
+      url: https://github.com/g-dolphin/WorldCarbonPricingDatabase/
+
+wdir: ../../../data/snapshots/rff/2023-10-19
+outs:
+- md5: 4426663dc1e81bd36b86968f374b4fea
+  size: 25858827
+  path: world_carbon_pricing.zip

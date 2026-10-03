@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1508
+    date_accessed: 2023-08-14 15:08:01.423066
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1508_adverse_effects_of_medical_treatment (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e09f0614c583a832781eefb6a8bf930f
+  size: 32215
+  path: dataset_1508_adverse_effects_of_medical_treatment_config.json

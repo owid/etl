@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2064
+    date_accessed: 2023-08-14 15:12:23.511700
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Direct economic loss attributed to disasters in relation to global gross domestic
+    product (GDP)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d5b3350eb675fce54c269a0d8dda4ee1
+  size: 6282
+  path: 
+    dataset_2064_direct_economic_loss_attributed_to_disasters_in_relation_to_global_gross_domestic_product__gdp_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5641
+    date_accessed: 2023-08-11 07:59:38.078234
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Space-Track - Number of objects in space
+  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/space_track
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 24b143a76c861341e8fd882a7c0d30e0
+  size: 8410
+  path: dataset_5641_space_track__number_of_objects_in_space_values.feather

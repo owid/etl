@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4456
+    date_accessed: 2023-08-14 11:02:06.994168
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Direct economic loss in the housing sector attributed to disasters (millions
+    of current United States dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bb1bc0a79d8a1d1e1a18bd49a9b78301
+  size: 17314
+  path: 
+    dataset_4456_direct_economic_loss_in_the_housing_sector_attributed_to_disasters__millions_of_current_united_states_dollars_values.feather

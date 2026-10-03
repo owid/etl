@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/289
+    date_accessed: 2023-08-10 08:26:14.249585
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_289_human_capital_in_long_run__lee_lee__2016
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e191c5932ceeab0ecfa4c34e375ee330
+  size: 11614
+  path: dataset_289_human_capital_in_long_run__lee_lee__2016_config.json

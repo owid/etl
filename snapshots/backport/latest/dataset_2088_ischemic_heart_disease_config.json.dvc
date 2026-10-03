@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2088
+    date_accessed: 2023-08-14 15:59:02.657882
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2088_ischemic_heart_disease (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 652689250fb6f94c8ee3e480f916d12c
+  size: 32788
+  path: dataset_2088_ischemic_heart_disease_config.json

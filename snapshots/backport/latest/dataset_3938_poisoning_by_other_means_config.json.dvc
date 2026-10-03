@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3938
+    date_accessed: 2023-08-14 16:07:57.156008
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3938_poisoning_by_other_means (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f0c8b96dd95f87ab12f799cf740ca35e
+  size: 31837
+  path: dataset_3938_poisoning_by_other_means_config.json

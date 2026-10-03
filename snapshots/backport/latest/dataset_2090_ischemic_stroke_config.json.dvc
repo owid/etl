@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2090
+    date_accessed: 2023-08-16 09:20:32.107607
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2090_ischemic_stroke (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b1074b154b7f6caf5659d00674d4d15a
+  size: 32494
+  path: dataset_2090_ischemic_stroke_config.json

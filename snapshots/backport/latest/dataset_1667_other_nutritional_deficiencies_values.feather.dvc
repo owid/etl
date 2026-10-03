@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1667
+    date_accessed: 2023-08-14 16:07:44.038841
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other nutritional deficiencies
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d10c52614589921f4e9d9259ecd25d61
+  size: 2012058
+  path: dataset_1667_other_nutritional_deficiencies_values.feather

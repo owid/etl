@@ -1,0 +1,161 @@
+import numpy as np
+import owid.catalog.processing as pr
+import pandas as pd
+from owid.catalog import Table
+
+from etl.helpers import PathFinder
+
+REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
+
+
+def create_omms(tables_dict: dict[str, Table], paths: PathFinder) -> None:
+    #  Adding a global total for Yaws - adding to existing variable
+    add_global_yaws(tables_dict, paths)
+    # Adding a variables for neonatal cases per million
+    add_neonatal_tetanus_cases_per_mil(tables_dict, paths)
+    # Adding the % of people without access to clean cooking fuels (100 - existing variable)
+    add_percentage_without_clean_cooking_fuels(tables_dict)
+    # Adding the number of people without access to clean cooking fuels (population in year - existing variable)
+    add_population_without_clean_cooking_fuels(tables_dict, paths)
+
+    add_global_total_leprosy(tables_dict, paths)
+
+    add_both_sexes_for_pneumonia(tables_dict)
+
+    add_trachoma_and_onchocerciasis_aggregate(tables_dict, paths)
+    add_vehicles_per_1000(tables_dict, paths)
+
+
+def add_trachoma_and_onchocerciasis_aggregate(tables_dict: dict[str, Table], paths: PathFinder) -> None:
+    indicator_names = [
+        "Population in areas that warrant treatment with antibiotics, facial cleanliness and environmental improvement for elimination of trachoma as a public health problem",
+        "Number of people who received treatment with antibiotics for trachoma",
+        "Number of people operated for trachomatous trichiasis",
+        "Estimated number of individuals in the country requiring preventive chemotherapy for onchocerciasis",
+        "Reported number of individuals treated for onchocerciasis",
+    ]
+    for indicator_name in indicator_names:
+        tb = tables_dict[indicator_name]
+        tb = tb.reset_index()
+        # Add global and regional totals
+        tb = paths.regions.add_aggregates(tb=tb, regions=REGIONS, min_num_values_per_year=1)
+        tb = tb.format(["country", "year"])
+        tables_dict[indicator_name] = tb
+
+
+def add_both_sexes_for_pneumonia(tables_dict: dict[str, Table]) -> None:
+    """We miss `both sexes` for pneumonia. Calculate it by averaging estimates for both sexes."""
+    indicator_name = "Children aged < 5 years with pneumonia symptoms taken to a health facility (%)"
+    col = "children_aged__lt__5_years_with_pneumonia_symptoms_taken_to_a_health_facility__pct"
+    tb = tables_dict[indicator_name]
+
+    # create `both sexes` by averaging males and females (this is not ideal as both populations might
+    # not be equal, but we don't have that data)
+    tb = tb.query("sex.notnull()")
+    both_sexes_avg = tb[[col]].groupby(["year", "country"], observed=True).mean().reset_index()
+    both_sexes_avg["sex"] = "both sexes"
+    for col in tb.index.names:
+        if col not in ("year", "country", "sex"):
+            both_sexes_avg[col] = np.nan
+
+    both_sexes_avg = both_sexes_avg.set_index(tb.index.names)
+
+    tb = pd.concat([tb, both_sexes_avg]).copy_metadata(tb)
+
+    tables_dict[indicator_name] = tb
+
+
+def add_population_without_clean_cooking_fuels(tables_dict: dict[str, Table], paths: PathFinder) -> None:
+    indicator_name = "Population with primary reliance on clean fuels and technologies for cooking (in millions)"
+    col = "population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__in_millions"
+    new_col = "population_without_primary_reliance_on_clean_fuels_and_technologies_for_cooking__in_millions"
+
+    tb = tables_dict[indicator_name]
+
+    # Add population
+    tb = paths.regions.add_population(tb=tb.reset_index(), warn_on_missing_countries=False)
+
+    # Calculate the number of people without access to clean cooking fuels
+    tb[new_col] = tb["population"] / 1000000 - tb[col]
+
+    # Some estimates could be negative because WHO uses slightly different population estimates, limit them to 0
+    tb[new_col] = tb[new_col].clip(lower=0)
+
+    # Drop rows that aren't Total from the new column
+    tb.loc[tb.residence_area_type != "Total", new_col] = np.nan
+
+    # Add units
+    tb[col].m.unit = "persons"
+    tb[new_col].m.unit = "persons"
+
+    tables_dict[indicator_name] = tb.drop(columns=["population"]).set_index(["year", "country", "residence_area_type"])
+
+
+def add_percentage_without_clean_cooking_fuels(tables_dict: dict[str, Table]) -> None:
+    indicator_name = "Proportion of population with primary reliance on clean fuels and technologies for cooking (%)"
+    col = "proportion_of_population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__pct"
+    new_col = "proportion_of_population_without_primary_reliance_on_clean_fuels_and_technologies_for_cooking__pct"
+
+    tb = tables_dict[indicator_name]
+
+    tb[new_col] = 100 - tb[col]
+
+
+def _add_global_total(tb: Table, paths: PathFinder) -> Table:
+    """Add global total. Table shouldn't contain regional data."""
+
+    # If the table already contains a global total, return it
+    if "World" in tb.index.get_level_values("country"):
+        return tb
+
+    # Exclude regions from the sum
+    country_names = paths.regions.tb_regions.query('region_type == "country"').name
+    total = tb[tb.index.get_level_values("country").isin(country_names)]
+
+    # Calculate global total
+    global_total = total.groupby(["year"]).sum().assign(country="World").set_index("country", append=True)
+
+    # Append to the original table
+    return pr.concat([tb.reset_index(), global_total.reset_index()]).set_index(tb.index.names)
+
+
+def add_global_yaws(tables_dict: dict[str, Table], paths: PathFinder) -> None:
+    indicator_name = "Number of cases of yaws reported"
+    tables_dict[indicator_name] = _add_global_total(tables_dict[indicator_name], paths)
+
+
+def add_global_total_leprosy(tables_dict: dict[str, Table], paths: PathFinder) -> None:
+    indicator_name = "Number of new leprosy cases"
+    tables_dict[indicator_name] = _add_global_total(tables_dict[indicator_name], paths)
+
+
+def add_neonatal_tetanus_cases_per_mil(tables_dict: dict[str, Table], paths: PathFinder) -> None:
+    indicator_name = "Neonatal tetanus - number of reported cases"
+    tb = tables_dict[indicator_name]
+
+    # Add population
+    tb = paths.regions.add_population(tb=tb.reset_index(), warn_on_missing_countries=False)
+
+    # We don't have precise population estimates for WHO regions, drop them
+    tb = tb.dropna(subset=["population"])
+
+    tb["neonatal_tetanus__number_of_reported_cases_per_million"] = (
+        tb["neonatal_tetanus__number_of_reported_cases"] / tb["population"] * 1000000
+    ).round(2)
+
+    tables_dict[indicator_name] = tb.drop(columns=["population"]).set_index(["year", "country"])
+
+
+def add_vehicles_per_1000(tables_dict: dict[str, Table], paths: PathFinder) -> None:
+    # Merge
+    indicator_name = "Number of registered vehicles"
+    tb = tables_dict[indicator_name]
+    tb = paths.regions.add_population(tb=tb.reset_index(), warn_on_missing_countries=False)
+
+    tb = tb.dropna(subset=["population"])
+    tb["number_of_registered_vehicles_per_thousand"] = (
+        tb["number_of_registered_vehicles"] / tb["population"] * 1000
+    ).round(2)
+    tb = tb.drop(columns=["residence_area_type"])
+
+    tables_dict[indicator_name] = tb.drop(columns=["population"]).set_index(["year", "country"])

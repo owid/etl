@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1586
+    date_accessed: 2023-08-14 15:15:32.735780
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Multiple sclerosis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f1d1b308508262ac16e1e4d42a56ec63
+  size: 1544322
+  path: dataset_1586_multiple_sclerosis_values.feather

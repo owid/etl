@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4775
+    date_accessed: 2023-08-16 08:30:18.670847
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4775_proportion_of_women_who_make_their_own_informed_decisions_regarding_sexual_relations__pct_of_women_aged_15_49_years
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 266714abb2c0494f49800cb5bc189e34
+  size: 12936
+  path: 
+    dataset_4775_proportion_of_women_who_make_their_own_informed_decisions_regarding_sexual_relations__pct_of_women_aged_15_49_years_config.json

@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: DNA Sequencing Costs
+    description: |-
+      The National Human Genome Research Institute (NHGRI) tracks the costs associated with DNA sequencing at the centers it funds. The cost-accounting data is summarized relative to two metrics: (1) "Cost per Megabase of DNA Sequence" - the cost of determining one megabase (Mb; a million bases) of DNA sequence of a specified quality; (2) "Cost per Genome" - the cost of sequencing a human-sized genome.
+    date_published: 2022-05-01
+
+    # Citation
+    producer: National Human Genome Research Institute
+    citation_full: |-
+      Wetterstrand KA. DNA Sequencing Costs: Data from the NHGRI Genome Sequencing Program (GSP) Available at: www.genome.gov/sequencingcostsdata.
+    attribution_short: NHGRI
+
+    # Files
+    url_main: https://www.genome.gov/about-genomics/fact-sheets/DNA-Sequencing-Costs-Data
+    url_download: 
+      https://www.genome.gov/sites/default/files/media/files/2023-05/Sequencing_Cost_Data_Table_May2022.xls
+    date_accessed: 2023-11-28
+
+    # License
+    license:
+      name: Public domain
+      url: https://www.genome.gov/about-nhgri/Policies-Guidance/Copyright
+
+wdir: ../../../data/snapshots/technology/2023-11-28
+outs:
+- md5: 26917b399e620fdf293fd9232accba65
+  size: 86016
+  path: dna_sequencing.xls

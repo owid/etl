@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4552
+    date_accessed: 2023-08-11 07:39:14.903612
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Coverage of protected areas in relation to marine areas (Exclusive Economic
+    Zones) (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 038c5c25ecff9eef7085268353d23295
+  size: 15762
+  path: 
+    dataset_4552_coverage_of_protected_areas_in_relation_to_marine_areas__exclusive_economic_zones__pct_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2768
+    date_accessed: 2023-08-10 14:49:34.405224
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Ozone-depleting emissions index - EEA
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ac32b7959079400a1b58a9041402f305
+  size: 6554
+  path: dataset_2768_ozone_depleting_emissions_index__eea_values.feather

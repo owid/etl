@@ -1,0 +1,11 @@
+dataset:
+  title: Number of people in poverty in Latin America and Caribbean countries
+  description: ''
+  licenses:
+    - {}
+tables:
+  poverty_latam_idb:
+    variables:
+      number_of_people:
+        title: Number of people in households with an income per person below $3.65 a day
+        unit: people

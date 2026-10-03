@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4679
+    date_accessed: 2023-08-11 07:12:46.211886
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Agricultural export subsidies (millions of current United States dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 104e3baf2ad9a04ddd0f8c9724f1bea0
+  size: 6906
+  path: 
+    dataset_4679_agricultural_export_subsidies__millions_of_current_united_states_dollars_values.feather

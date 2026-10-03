@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2646
+    date_accessed: 2023-08-10 14:45:39.723498
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2646_health__social_protection (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9017b94c6519b5fb0f88c76f93b64b5f
+  size: 8862
+  path: dataset_2646_health__social_protection_config.json

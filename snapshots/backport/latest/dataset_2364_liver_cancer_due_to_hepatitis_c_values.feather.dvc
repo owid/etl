@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2364
+    date_accessed: 2023-08-10 14:48:34.540478
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Liver cancer due to hepatitis C
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 286e46f61fc8f4178b7534c5b45b54d7
+  size: 1807834
+  path: dataset_2364_liver_cancer_due_to_hepatitis_c_values.feather

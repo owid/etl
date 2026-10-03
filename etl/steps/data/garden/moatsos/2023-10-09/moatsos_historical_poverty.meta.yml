@@ -1,0 +1,42 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+definitions:
+  common:
+    processing_level: major
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Pablo Arriagada
+tables:
+  moatsos_historical_poverty:
+    variables:
+      headcount_190_smooth:
+        presentation:
+          title_public: Number of people living in extreme poverty
+          title_variant: Long-run estimates
+
+      headcount_ratio_190_smooth:
+        presentation:
+          title_public: Share of population living in extreme poverty
+          title_variant: Long-run estimates
+
+      headcount_cbn:
+        presentation:
+          title_public: Number of people living in extreme poverty
+          title_variant: Long-run estimates - Cost of basic needs
+
+      headcount_ratio_cbn:
+        presentation:
+          title_public: Share of population living in extreme poverty
+          title_variant: Long-run estimates - Cost of basic needs
+
+
+

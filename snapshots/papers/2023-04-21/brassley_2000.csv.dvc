@@ -1,0 +1,26 @@
+meta:
+  namespace: papers
+  short_name: brassley_2000
+  name: Long-term crop yields in UK, Brassley (2000)
+  version: 2023-04-21
+  publication_year: 2000
+  source_name: Brassley (2000)
+  source_published_by: Brassley, P. (2000). Output and technical change in twentieth-century
+    British agriculture. The Agricultural History Review, 60-84.
+  url: https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf
+  source_data_url:
+  file_extension: csv
+  license_url: https://www.bahs.org.uk/open_access_policy.html
+  license_name: Copyright British Agricultural History Society, 2023. All rights reserved
+  date_accessed: 2023-04-21
+  is_public: true
+  description: |
+    Data manually extracted from the paper "Output and technical change in twentieth-century
+    British agriculture", by Brassley (2000). Specifically, the data was extracted from Table 4 "Crop yields, Great Britain (to 1914) / UK (tonnes per hectare)".
+
+    The data is based on the book "A hundred Years of British food and farming: a statistical survey", by H. F. Marks (ed. D. K. Britton, 1989).
+wdir: ../../../data/snapshots/papers/2023-04-21
+outs:
+- md5: 7088630146c68adecfbb3e70cde89666
+  size: 245
+  path: brassley_2000.csv

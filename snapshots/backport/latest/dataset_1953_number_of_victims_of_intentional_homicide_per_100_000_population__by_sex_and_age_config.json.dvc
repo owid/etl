@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1953
+    date_accessed: 2023-08-16 08:16:50.970974
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1953_number_of_victims_of_intentional_homicide_per_100_000_population__by_sex_and_age
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bc4c5487963b5db02aae821034498b2a
+  size: 4951
+  path: 
+    dataset_1953_number_of_victims_of_intentional_homicide_per_100_000_population__by_sex_and_age_config.json

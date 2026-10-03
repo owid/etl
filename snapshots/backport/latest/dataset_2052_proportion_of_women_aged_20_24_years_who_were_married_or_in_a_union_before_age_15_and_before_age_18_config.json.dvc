@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2052
+    date_accessed: 2023-08-11 07:45:19.103890
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2052_proportion_of_women_aged_20_24_years_who_were_married_or_in_a_union_before_age_15_and_before_age_18
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 99a53ff8edcc22cebe4b82c4655f0717
+  size: 3287
+  path: 
+    dataset_2052_proportion_of_women_aged_20_24_years_who_were_married_or_in_a_union_before_age_15_and_before_age_18_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/629
+    date_accessed: 2023-08-16 10:19:18.258393
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Public Economy - Quality of Government (2017)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8ad39f0753c6db801b9c5d0b4326c074
+  size: 4148746
+  path: dataset_629_public_economy__quality_of_government__2017_values.feather

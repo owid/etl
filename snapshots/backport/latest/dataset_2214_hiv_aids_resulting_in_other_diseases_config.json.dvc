@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2214
+    date_accessed: 2023-08-16 08:31:41.460188
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2214_hiv_aids_resulting_in_other_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 630393f181b25b7851b9d222130a4455
+  size: 33376
+  path: dataset_2214_hiv_aids_resulting_in_other_diseases_config.json

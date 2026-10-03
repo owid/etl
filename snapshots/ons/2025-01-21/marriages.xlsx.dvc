@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Marriages in England and Wales
+    description: |-
+      Number of marriages that took place in England and Wales by age, sex, previous partnership status and civil or religious ceremony.
+
+    date_published: "2024-06-20"
+
+    # Citation
+    producer: UK Office for National Statistics
+    citation_full: |-
+      Office for National Statistics (ONS), released 06 June 2020, ONS website, dataset, Marriages in England and Wales, UK. Retrieved 21 January 2025.
+    attribution_short: UK ONS
+
+    # Files
+    url_main: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/datasets/marriagesinenglandandwales2013
+    url_download: https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/datasets/marriagesinenglandandwales2013/2021and2022/marriagesworkbook20212022final.xlsx
+    date_accessed: 2025-01-21
+
+    # License
+    license:
+      name: Open Government Licence v3.0
+      url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/datasets/marriagesinenglandandwales2013
+outs:
+  - md5: 575dae27814b9734c7e7e542ffd67a92
+    size: 698419
+    path: marriages.xlsx

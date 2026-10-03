@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/659
+    date_accessed: 2023-08-10 08:58:35.517547
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_659_owid_country_to_who_regions
+  description: WHO groups countries in different regions, and provides information
+    on various variables according to this classification. This dataset changes country
+    names to OWID names and matches them to WHO regions.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a0367591483d5c11496771b4e16502bc
+  size: 1875
+  path: dataset_659_owid_country_to_who_regions_config.json

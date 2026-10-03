@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2675
+    date_accessed: 2023-08-14 15:23:03.017295
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Gender Inequality Index - Human Development Report (2015)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ce1382f85195e135682ac941c130a96a
+  size: 19322
+  path: 
+    dataset_2675_gender_inequality_index__human_development_report__2015_values.feather

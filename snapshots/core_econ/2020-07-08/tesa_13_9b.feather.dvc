@@ -1,0 +1,12 @@
+meta:
+  is_public: false
+  origin:
+    producer: World Bank
+    title: World Bank National Accounts data
+    citation_full: World Bank National Accounts data.
+    date_accessed: '2020-07-08'
+    date_published: '2020'
+outs:
+  - md5: 84960c42f75761b8cd12cad693c9effd
+    size: 7546
+    path: tesa_13_9b.feather

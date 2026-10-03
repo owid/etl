@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1718
+    date_accessed: 2023-08-10 13:06:40.757411
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1718_liver_cancer (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1e3aa984733db92cbd04e0947386a63b
+  size: 29018
+  path: dataset_1718_liver_cancer_config.json

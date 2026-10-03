@@ -1,0 +1,30 @@
+meta:
+  namespace: tourism
+  short_name: unwto
+  name: UNWTO Tourism Statistics Database
+  version: 2023-05-04
+  publication_year: 2023
+  publication_date: 2023-01-25
+  source_name: UNWTO
+  source_published_by: World Tourism Organization, 2023
+  url: https://www.unwto.org/tourism-statistics/key-tourism-statistics
+  source_data_url: https://webunwto.s3.eu-west-1.amazonaws.com/s3fs-public/2023-03/unwto-all-data-download_032023.xlsx
+  file_extension: xlsx
+  license_url: https://www.unwto.org/copyright
+  license_name: Creative Commons BY 4.0
+  date_accessed: 2023-05-04
+  is_public: true
+  description: |
+    The United Nations World Tourism Organization (UNWTO) collects data from countries through
+        annual questionnaires that follow the International Recommendations for Tourism Statistics (IRTS 2008)
+        standard, a framework approved by the United Nations. The data covers various aspects of tourism,
+        such as Inbound Tourism (including Arrivals by region, main purpose, and mode of transport, as well as
+        Accommodation and Tourism expenditure in the country), Domestic Tourism (including Trips and Accommodation),
+        Outbound Tourism (including Departures and Tourism expenditure in other countries),
+        Tourism Industries (such as Accommodation in hotels and similar establishments),
+        and Employment (including the number of employees in tourism industries).
+wdir: ../../../data/snapshots/tourism/2023-05-04
+outs:
+- md5: 496d8267e4148d2b47b32397764e65fe
+  size: 3518717
+  path: unwto.xlsx

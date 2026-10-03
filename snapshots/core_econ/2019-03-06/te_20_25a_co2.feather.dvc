@@ -1,0 +1,13 @@
+meta:
+  is_public: false
+  origin:
+    producer: World Bank
+    title: World Development Indicators
+    citation_full: 'The World Bank (2018). World Development Indicators. The World Bank.'
+    url_main: https://databank.worldbank.org/data/reports.aspx?source=2&series=EN.ATM.CO2E.PC#
+    date_accessed: '2019-03-06'
+    date_published: '2018'
+outs:
+  - md5: d6dd33fa641e4376570323d82939108e
+    size: 6770
+    path: te_20_25a_co2.feather

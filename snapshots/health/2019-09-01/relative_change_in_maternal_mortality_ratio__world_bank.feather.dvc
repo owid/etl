@@ -1,0 +1,12 @@
+meta:
+  origin:
+    producer: World Bank
+    title: Relative change in maternal mortality ratio
+    citation_full: World Bank (2020).
+    date_accessed: '2019-09-01'
+    date_published: '2020'
+  is_public: false
+outs:
+  - md5: aa1c7343dc9532d0c9bf9c3ced6749c9
+    size: 8082
+    path: relative_change_in_maternal_mortality_ratio__world_bank.feather

@@ -1,0 +1,24 @@
+meta:
+  name: Food Prices for Nutrition
+  publication_year: 2023
+
+  publication_date: '2023-07-01'
+  source_name: World Bank, adapted from Herforth et al. (2022)
+  source_published_by: |
+    World Bank, adapted from Herforth, A., Venkat, A., Bai, Y., Costlow, L., Holleman, C. & Masters, W.A. 2022. Methods and options to monitor globally the cost and affordability of a healthy diet. Background paper for The State of Food Security and Nutrition in the World 2022. Rome, FAO.
+  url: https://databank.worldbank.org/source/food-prices-for-nutrition
+  source_data_url:
+  license_url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+  license_name: Creative Commons Attribution 4.0 International License
+  file_extension: csv
+  date_accessed: 2023-07-24
+  is_public: true
+  description: |
+    Food Prices for Nutrition provides indicators on the cost and affordability of healthy diets in each country, showing the population's physical and economic access to sufficient quantities of locally available items for an active and healthy life. It also provides indicators on the cost and affordability of an energy-sufficient diet and of a nutrient-adequate diet. These indicators are explained in detail in the Food Prices for Nutrition DataHub here: https://www.worldbank.org/foodpricesfornutrition.
+
+    Version 2.0 uses income and international poverty line data from the World Bank's Poverty and Inequality Platform (PIP) that are based on 2017 purchasing power parities (PPPs), published by the International Comparison Program, for the following diet affordability indicators: (i) ratio of the cost of the diet to the food poverty line, set at 52 percent of the 2017 PPP-based international poverty line of $2.15 per person per day; and (ii) the share and volume of the population that cannot afford the diet, based on national income distributions expressed in 2017 PPP dollars. Note that data on the Cost and Affordability of a Healthy Diet indicators reported in the State of Food Security and Nutrition in the World 2023 correspond to those data in Version 2.0.
+wdir: ../../../data/snapshots/wb/2023-07-24
+outs:
+- md5: 7f34bb7f7b08cacc0481af3c9d6eb579
+  size: 1722886
+  path: food_prices_for_nutrition.csv

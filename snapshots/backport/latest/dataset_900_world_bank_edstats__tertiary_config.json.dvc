@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/900
+    date_accessed: 2023-08-16 08:42:07.662457
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_900_world_bank_edstats__tertiary (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f8b365aa50544f1679f79b3746481aa6
+  size: 234010
+  path: dataset_900_world_bank_edstats__tertiary_config.json

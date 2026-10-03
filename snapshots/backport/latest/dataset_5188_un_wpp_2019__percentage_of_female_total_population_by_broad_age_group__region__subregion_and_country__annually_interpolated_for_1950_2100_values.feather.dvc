@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5188
+    date_accessed: 2023-08-10 14:42:42.765445
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: UN WPP 2019 - Percentage of female total population by broad age group, region,
+    subregion and country, annually interpolated for 1950-2100
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4d123cde82f68099ecb5e4dd61fd1709
+  size: 9635114
+  path: 
+    dataset_5188_un_wpp_2019__percentage_of_female_total_population_by_broad_age_group__region__subregion_and_country__annually_interpolated_for_1950_2100_values.feather

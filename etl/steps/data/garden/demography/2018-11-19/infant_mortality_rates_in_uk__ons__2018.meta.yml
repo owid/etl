@@ -1,0 +1,32 @@
+tables:
+  infant_mortality_rates_in_uk__ons__2018:
+    variables:
+      infant_mortality__under_1_year:
+        title: Infant mortality (under 1 year)
+        unit: ''
+        display:
+          name: deaths per 1,000 total births
+      neonatal_mortality__less_than_28_days:
+        title: Neonatal mortality (less than 28 days)
+        unit: deaths per 1,000 live births
+        display:
+          name: Neonatal mortality (less than 28 days)
+      perinatal_mortality__stillbirths_and_early_neonatal:
+        title: Perinatal mortality (stillbirths and early neonatal)
+        unit: deaths per 1,000 total births
+        display:
+          name: Perinatal mortality (stillbirths and early neonatal)
+      postneonatal_mortality__aged_28_days_to_1_year:
+        title: Postneonatal mortality (aged 28 days to 1 year)
+        unit: deaths per 1,000 live births
+        display:
+          name: Postneonatal mortality (aged 28 days to 1 year)
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

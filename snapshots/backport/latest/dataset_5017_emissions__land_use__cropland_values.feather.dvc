@@ -1,0 +1,22 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5017
+    date_accessed: 2023-08-16 10:00:02.329502
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emissions - Land Use: Cropland'
+  description: Greenhouse gas (GHG) emissions in the domain "Cropland" are currently
+    limited to CO2 emissions from cropland organic soils. They are those associated
+    with carbon losses from drained histosols under cropland.  The FAOSTAT emissions
+    database is computed following Tier 1 IPCC 2006 Guidelines for National GHG Inventories
+    (http://www.ipcc-nggip.iges.or.jp/public/2006gl/vol5.html) applied to geospatial
+    data. GHG emissions are provided by country, region and special groups, with global
+    coverage, relative to the period 1990-2016 (with annual updates), expressed as
+    net emissions/removal Gg CO2 and Gg CO2eq. Implied emission factor for C, net
+    stock change Gg C and activity data (area) are also provided.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ef6b086acf3fb0926335b2643284ef6a
+  size: 60986
+  path: dataset_5017_emissions__land_use__cropland_values.feather

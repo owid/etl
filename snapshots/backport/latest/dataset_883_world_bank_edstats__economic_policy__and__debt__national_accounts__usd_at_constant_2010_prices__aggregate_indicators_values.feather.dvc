@@ -1,0 +1,10 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/883
+    date_accessed: 2023-08-16 08:06:02.187484
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank EdStats - Economic Policy & Debt: National accounts: US$ at constant 2010 prices: Aggregate indicators'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false

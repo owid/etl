@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1471
+    date_accessed: 2023-08-16 08:25:23.256905
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Intestinal infectious diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 30cf4198d32da940116086dc5358db95
+  size: 1915970
+  path: dataset_1471_intestinal_infectious_diseases_values.feather

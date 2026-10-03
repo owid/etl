@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4458
+    date_accessed: 2023-08-14 15:26:33.052562
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4458_score_of_adoption_and_implementation_of_national_drr_strategies_in_line_with_the_sendai_framework
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 88abf3a5a508fc7d5191f70f6347abb7
+  size: 11065
+  path: 
+    dataset_4458_score_of_adoption_and_implementation_of_national_drr_strategies_in_line_with_the_sendai_framework_config.json

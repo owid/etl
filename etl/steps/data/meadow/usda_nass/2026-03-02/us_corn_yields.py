@@ -1,0 +1,54 @@
+"""Load a snapshot and create a meadow dataset."""
+
+from etl.helpers import PathFinder
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
+# Columns to select from data, and how to rename them.
+COLUMNS = {
+    "Year": "year",
+    "Value": "corn_yield",
+}
+
+
+def run() -> None:
+    #
+    # Load inputs.
+    #
+    # Retrieve snapshot and read its data.
+    snap = paths.load_snapshot("us_corn_yields.csv")
+    tb = snap.read()
+
+    #
+    # Process data.
+    #
+    # Sanity check.
+    error = "Data does not have the expected characteristics."
+    assert tb[
+        ["Program", "Period", "Geo Level", "State", "Commodity", "Data Item", "Domain", "Domain Category"]
+    ].drop_duplicates().values.tolist() == [
+        [
+            "SURVEY",
+            "YEAR",
+            "NATIONAL",
+            "US TOTAL",
+            "CORN",
+            "CORN, GRAIN - YIELD, MEASURED IN BU / ACRE",
+            "TOTAL",
+            "NOT SPECIFIED",
+        ]
+    ], error
+
+    # Select and rename required columns, and add a country column.
+    tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise").assign(**{"country": "United States"})
+
+    # Set an appropriate index and sort conveniently.
+    tb = tb.format()
+
+    #
+    # Save outputs.
+    #
+    # Create a new meadow dataset.
+    ds_meadow = paths.create_dataset(tables=[tb])
+    ds_meadow.save()

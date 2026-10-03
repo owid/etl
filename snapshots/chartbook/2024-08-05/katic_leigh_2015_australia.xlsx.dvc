@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Top Wealth Shares in Australia 1915–2012
+    description: |-
+      Combining data from surveys, inheritance tax records, and rich lists, we estimate top wealth shares for Australia from World War I until the present day. We find that the top 1 percent share declined by two-thirds from 1915 until the late 1960s, and rose from the late 1970s to 2010. The recent increase is sharpest at the top of the distribution, with the top 0.001 percent wealth share tripling from 1984 to 2012. The trend in top wealth shares is similar to that in Australian top income shares (though the drop in the first half of the twentieth century is larger for wealth than income shares). Since the early twentieth century, top wealth shares in Australia have been lower than in the U.K. and U.S.
+    date_published: "2015-01-20"
+
+    # Citation
+    producer: Katic and Leigh
+    citation_full: |-
+      Katic, P. and Leigh, A. (2016), Top Wealth Shares in Australia 1915–2012, Tables A1 and A2. Review of Income and Wealth, 62: 209-222. https://doi.org/10.1111/roiw.12177
+
+    # Files
+    url_main: https://onlinelibrary.wiley.com/doi/abs/10.1111/roiw.12177
+    date_accessed: 2024-08-05
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://onlinelibrary.wiley.com/doi/abs/10.1111/roiw.12177
+
+outs:
+  - md5: 45295467e15a2d16bf72c0cf2c9edd39
+    size: 4115777
+    path: katic_leigh_2015_australia.xlsx

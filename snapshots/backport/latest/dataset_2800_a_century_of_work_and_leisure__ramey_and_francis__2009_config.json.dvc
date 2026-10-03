@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2800
+    date_accessed: 2023-08-10 07:42:02.175379
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2800_a_century_of_work_and_leisure__ramey_and_francis__2009
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 797d7dfe0132dd3d6f8f148373d85116
+  size: 5822
+  path: dataset_2800_a_century_of_work_and_leisure__ramey_and_francis__2009_config.json

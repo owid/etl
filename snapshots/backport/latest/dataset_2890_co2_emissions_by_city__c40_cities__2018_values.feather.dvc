@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2890
+    date_accessed: 2023-08-10 09:03:50.231998
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: CO2 emissions by city - C40 Cities (2018)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cae4ab4435215b6e52973245f74e8ae3
+  size: 8322
+  path: dataset_2890_co2_emissions_by_city__c40_cities__2018_values.feather

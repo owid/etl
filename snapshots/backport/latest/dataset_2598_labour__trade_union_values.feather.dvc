@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2598
+    date_accessed: 2023-08-14 14:32:27.298831
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Labour - Trade Union
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5d4d0665b97805b9a278647dd1de0cfb
+  size: 18698
+  path: dataset_2598_labour__trade_union_values.feather

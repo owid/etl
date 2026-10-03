@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5447
+    date_accessed: 2023-08-14 10:58:45.051228
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5447_global_agricultural_land__ellis_et_al__2021
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f4119a0cbaee62c857d43c1c43f58241
+  size: 4352
+  path: dataset_5447_global_agricultural_land__ellis_et_al__2021_config.json

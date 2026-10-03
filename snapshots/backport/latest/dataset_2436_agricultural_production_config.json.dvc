@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2436
+    date_accessed: 2023-08-14 05:37:56.601524
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2436_agricultural_production (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e759208987130462282d5265df140522
+  size: 9487
+  path: dataset_2436_agricultural_production_config.json

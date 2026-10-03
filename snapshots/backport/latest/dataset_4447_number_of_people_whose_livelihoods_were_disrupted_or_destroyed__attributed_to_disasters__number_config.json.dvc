@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4447
+    date_accessed: 2023-08-14 05:44:02.450526
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4447_number_of_people_whose_livelihoods_were_disrupted_or_destroyed__attributed_to_disasters__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 53238e96cf0db219ab4f7c94b794c534
+  size: 10335
+  path: 
+    dataset_4447_number_of_people_whose_livelihoods_were_disrupted_or_destroyed__attributed_to_disasters__number_config.json

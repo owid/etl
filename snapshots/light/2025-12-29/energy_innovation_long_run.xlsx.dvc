@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "A Historical Perspective on Energy Innovation"
+    description: |-
+      Data on the evolution of lighting prices, efficiency of lighting technology, transport technology, stationary power provision, and consumer surplus in the long run.
+    date_published: "2026"
+
+    # Citation
+    producer: Fouquet
+    citation_full: |-
+      - Fouquet, R. (2026). A Historical Perspective on Energy Innovation: Energy Transitions, Efficiency Improvements, Rebound Effects and Consumer Welfare Impacts in Anadon, L.D., Sagar, A., Verdolini, E., and Malhotra, A. (ed.) Handbook on Energy Innovation. Edward Elgar Publications. Cheltenham, UK, and Northampton, MA, USA.
+      - Fouquet, R. and P.J.G. Pearson (2006). Seven centuries of energy services: the price and use of lighting in the United Kingdom (1300-2000). The Energy Journal 27(1) 139-77.
+    attribution: Fouquet (2026); Fouquet and Pearson (2006)
+
+    # Files
+    url_main: https://www.jstor.org/stable/23296980
+    date_accessed: '2025-12-29'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.jstor.org/stable/23296980
+outs:
+  - md5: 1b349bcd23d6dbe5a199eade32370054
+    size: 793809
+    path: energy_innovation_long_run.xlsx

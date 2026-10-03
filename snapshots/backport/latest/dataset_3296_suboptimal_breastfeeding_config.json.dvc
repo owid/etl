@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3296
+    date_accessed: 2023-08-16 08:25:42.612664
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3296_suboptimal_breastfeeding (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b5c73d4efc05e18e113c1154def35bea
+  size: 22074
+  path: dataset_3296_suboptimal_breastfeeding_config.json

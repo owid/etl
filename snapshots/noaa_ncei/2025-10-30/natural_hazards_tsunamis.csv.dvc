@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: National Geophysical Data Center / World Data Service
+    title: Global Historical Tsunami Database
+    description: |-
+      The Global Historical Tsunami Database provides information on tsunamis from 2100 BC to the present in the the Atlantic, Indian, and Pacific Oceans; and the Mediterranean and Caribbean Seas. The database provides information on the tsunami source such as the date, time, and location of the source event; cause and validity of the source, tsunami magnitude and intensity; maximum water height; the total number of fatalities, injuries, houses destroyed, and houses damaged; total damage estimate (in U.S. dollars). The database also provides information on the runups (the locations where tsunami waves were observed by eyewitnesses, reconnaissance surveys, tide gauges, and deep-ocean sensors) such as name, location, arrival time, maximum water height and inundation distance, and socio-economic data (deaths, injuries, damage) for the specific runup location.
+    citation_full: |-
+      National Geophysical Data Center / World Data Service: NCEI/WDS Global Historical Tsunami Database. NOAA National Centers for Environmental Information. doi:10.7289/V5PN93H7
+      The data can be accessed via [the NCEI/WDS Global Historical Tsunami Database](https://www.ngdc.noaa.gov/hazel/view/hazards/tsunami/event-search/) or via [the Natural Hazards API](https://www.ngdc.noaa.gov/hazel/view/swagger#/Tsunami%20Events).
+    attribution_short: NGDC/WDS
+    url_main: http://dx.doi.org/10.7289/V5PN93H7
+    date_accessed: '2025-10-30'
+    # I couldn't find a publication date, but it seems to still be regularly updated, the last event is on 2025-09-18, and can be seen by going to
+    # https://www.ngdc.noaa.gov/hazel/view/hazards/tsunami/event-data
+    # and scrolling down.
+    date_published: '2025-10-30'
+    license:
+      name: CC BY 4.0
+      url: https://data.noaa.gov/metaview/page?xml=NOAA/NESDIS/NGDC/MGG/Hazards/iso/xml/G012153.xml&view=getDataView
+outs:
+  - md5: 7276ac2bd952a89740c46946f6e9f7ab
+    size: 423638
+    path: natural_hazards_tsunamis.csv

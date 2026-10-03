@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2396
+    date_accessed: 2023-08-16 10:05:57.835345
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other infectious diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6a0be2d9e9c1343309ffe50670ec5502
+  size: 1686738
+  path: dataset_2396_other_infectious_diseases_values.feather

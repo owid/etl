@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2678
+    date_accessed: 2023-08-16 09:23:55.691539
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Health systems
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 70cb2ceddbc81ed785eedb81db4183df
+  size: 200594
+  path: dataset_2678_health_systems_values.feather

@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: US Bureau of Labor Statistics
+    title: Current Population Survey
+    citation_full: US Bureau of Labor Statistics (2014).
+    url_main: http://www.bls.gov/cps/
+    date_accessed: '2020-07-29'
+    date_published: '2014'
+  is_public: false
+outs:
+  - md5: 778b9f70deaedd8a55e0dea0d825cb27
+    size: 6722
+    path: figure_17_28_unemployment.feather

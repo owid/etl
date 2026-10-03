@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2261
+    date_accessed: 2023-08-16 08:05:12.413596
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Gout
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 64068a9677e033989550a2bb6f4e155f
+  size: 1498626
+  path: dataset_2261_gout_values.feather

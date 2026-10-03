@@ -1,0 +1,15 @@
+dataset:
+  title: DRAFT AidData China Fasttrack - Sheet1
+  description: ''
+tables:
+  aiddata_china_fasttrack__sheet1:
+    variables:
+      i_a_4__experts_and_other_technical_assistance:
+        title: I.A.4. Experts and other technical assistance
+        unit: ''
+      i_a_5__scholarships_and_student_costs_in_donor_countries:
+        title: I.A.5. Scholarships and student costs in donor countries
+        unit: ''
+      vague:
+        title: Vague
+        unit: ''

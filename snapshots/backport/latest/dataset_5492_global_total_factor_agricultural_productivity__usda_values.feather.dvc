@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5492
+    date_accessed: 2023-08-16 09:34:05.192915
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Global total factor agricultural productivity (USDA)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8386ff36f546cf4e3fb1c85d8e7ecb20
+  size: 6562
+  path: dataset_5492_global_total_factor_agricultural_productivity__usda_values.feather

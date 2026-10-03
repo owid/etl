@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1882
+    date_accessed: 2023-08-10 14:31:49.933168
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Share of employment in the financial sector (GGDC, 2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b8cf83fc7f8374971bb5aac7aee6c3e5
+  size: 24818
+  path: 
+    dataset_1882_share_of_employment_in_the_financial_sector__ggdc__2017_values.feather

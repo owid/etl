@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4173
+    date_accessed: 2023-08-16 10:28:39.371154
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Users by social media platform (Statista and TNW (2019))
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7f306b8f3d2a9635c88a7220efdecee5
+  size: 7602
+  path: 
+    dataset_4173_users_by_social_media_platform__statista_and_tnw__2019_values.feather

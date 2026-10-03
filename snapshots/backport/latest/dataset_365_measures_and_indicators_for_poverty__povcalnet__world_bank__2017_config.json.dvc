@@ -1,0 +1,20 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/365
+    date_accessed: 2023-08-09 14:51:26.816783
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_365_measures_and_indicators_for_poverty__povcalnet__world_bank__2017
+  description: |-
+    Includes previous dataset:
+
+    - Cost of filling the poverty gap in int-$ 2011 - Povcal created on the 8th March 2017
+    - New Poverty headcount absolute number, by regions - Povcal
+    - Share of World Population living in Absolute Poverty 1981-2030 - PovcalNe
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2de030e399e6d63be51ca0135b2821aa
+  size: 8574
+  path: 
+    dataset_365_measures_and_indicators_for_poverty__povcalnet__world_bank__2017_config.json

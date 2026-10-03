@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5365
+    date_accessed: 2023-08-16 10:22:53.723430
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Climate impacts (multiple sources)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ddee5a705fff6d081e69b792edd03e6c
+  size: 16434
+  path: dataset_5365_climate_impacts__multiple_sources_values.feather

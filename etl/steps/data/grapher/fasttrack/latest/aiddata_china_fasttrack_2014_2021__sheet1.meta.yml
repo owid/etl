@@ -1,0 +1,15 @@
+dataset:
+  title: DRAFT AidData China Fasttrack 2014-2021 - Sheet1
+  description: ''
+tables:
+  aiddata_china_fasttrack_2014_2021__sheet1:
+    variables:
+      oof:
+        title: OOF
+        unit: ''
+      oda:
+        title: ODA
+        unit: ''
+      vague:
+        title: Vague
+        unit: ''

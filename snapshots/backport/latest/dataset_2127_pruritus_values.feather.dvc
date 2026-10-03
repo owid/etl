@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2127
+    date_accessed: 2023-08-16 09:23:54.298264
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Pruritus
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cda6d07f9aa932010b6f2d9a8de175d1
+  size: 2116386
+  path: dataset_2127_pruritus_values.feather

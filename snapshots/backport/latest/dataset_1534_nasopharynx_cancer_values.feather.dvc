@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1534
+    date_accessed: 2023-08-14 15:25:33.548240
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Nasopharynx cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5344be9d5ea0e61e9846d7a8619bda04
+  size: 1701346
+  path: dataset_1534_nasopharynx_cancer_values.feather

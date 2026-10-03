@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1444
+    date_accessed: 2023-08-14 15:55:15.911326
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other congenital birth defects
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e41e1b53dc36709f626b3f2413718df0
+  size: 1855194
+  path: dataset_1444_other_congenital_birth_defects_values.feather

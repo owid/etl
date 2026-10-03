@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4528
+    date_accessed: 2023-08-16 10:38:56.918429
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4528_compliance_with_the_montreal_protocol_on_hazardous_waste_and_other_chemicals
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f0570f86da7fded17563f73ba72877bf
+  size: 16989
+  path: 
+    dataset_4528_compliance_with_the_montreal_protocol_on_hazardous_waste_and_other_chemicals_config.json

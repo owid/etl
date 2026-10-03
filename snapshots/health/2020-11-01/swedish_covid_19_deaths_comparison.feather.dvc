@@ -1,0 +1,12 @@
+meta:
+  origin:
+    producer: Various sources
+    title: Swedish COVID-19 deaths comparison
+    citation_full: Swedish COVID-19 deaths comparison.
+    date_accessed: '2020-11-01'
+    date_published: '2020-11-01'
+  is_public: false
+outs:
+  - md5: f4b58b31fd3fc505be5d1c90667b1366
+    size: 3098
+    path: swedish_covid_19_deaths_comparison.feather

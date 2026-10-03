@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4794
+    date_accessed: 2023-08-14 15:14:10.562494
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4794_nationally_derived_total_extent__square_kilometres
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ac34d34a6afe4cba17c233f39735e365
+  size: 1806
+  path: dataset_4794_nationally_derived_total_extent__square_kilometres_config.json

@@ -1,0 +1,40 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Human Mortality Database, by country
+    description: |-
+      The Human Mortality Database (HMD) is a research resource that provides detailed mortality and population data for national populations with high-quality vital statistics. It includes original calculations of death rates and life tables, as well as the underlying data — such as birth counts, death counts, and census-based population estimates — used to produce these metrics.
+
+      Its scope is limited to countries with virtually complete death registration and census coverage, mostly wealthy and industrialized nations. The database’s core mission is to document the historical rise in human longevity and support research into its causes and implications. HMD follows a rigorous, uniform methodology focused on transparency, reproducibility, and comparability, while acknowledging limitations such as age misreporting and data coverage issues.
+
+      Each country’s dataset is curated and quality-checked by dedicated researchers, ensuring reliability for demographic and public health analysis.
+
+    description_snapshot: |-
+      HMD data by country. This contains the raw data, including their "input data", which HMD defines as:
+
+      The Input Database houses the raw data that are the basis for all HMD calculations. Input data files for each population are accessible from the country page.
+
+    date_published: "2025-09-25"
+    # Citation
+    producer: Human Mortality Database
+    citation_full: |-
+      HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, Berkeley (USA), and French Institute for Demographic Studies (France). Available at www.mortality.org (data downloaded on 2025-10-22, DOI: 10.4054/HMD.Countries.20250925).
+
+
+      See also the methods protocol:
+      Wilmoth, J. R., Andreev, K., Jdanov, D., Glei, D. A., Riffe, T., Boe, C., Bubenheim, M., Philipov, D., Shkolnikov, V., Vachon, P., Winant, C., & Barbieri, M. (2021). Methods protocol for the human mortality database (v6). [Available online](https://www.mortality.org/File/GetDocument/Public/Docs/MethodsProtocolV6.pdf) (needs log in to mortality.org).
+    attribution_short: HMD
+    # Files
+    url_main: https://www.mortality.org/Data/ZippedDataFiles
+    date_accessed: '2025-10-22'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.mortality.org/Data/UserAgreement
+outs:
+  - md5: b69fd936ae5a2822f0d93f089ccbc2f0
+    size: 371934068
+    path: hmd_country.zip

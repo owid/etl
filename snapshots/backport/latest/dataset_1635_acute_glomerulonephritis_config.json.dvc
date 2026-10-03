@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1635
+    date_accessed: 2023-08-10 15:01:19.661730
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1635_acute_glomerulonephritis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d637bdeeb31a09a4e2af24a9946af2c9
+  size: 31735
+  path: dataset_1635_acute_glomerulonephritis_config.json

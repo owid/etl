@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2102
+    date_accessed: 2023-08-11 07:57:44.183598
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2102_depressive_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 018d7499d7940d16c99a52d30b388f5c
+  size: 32704
+  path: dataset_2102_depressive_disorders_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2511
+    date_accessed: 2023-08-14 15:15:20.248441
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Mental health services across incomes - Wang et al. (2007)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e7ce53eadf0e668dee73581b276bd294
+  size: 7650
+  path: 
+    dataset_2511_mental_health_services_across_incomes__wang_et_al__2007_values.feather

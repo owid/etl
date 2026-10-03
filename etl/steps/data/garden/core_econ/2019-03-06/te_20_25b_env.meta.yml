@@ -1,0 +1,20 @@
+dataset:
+  title: TE-20.25b_env
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_20_25b_env:
+    variables:
+      environmental_performance_index__2018:
+        title: Environmental Performance Index (2018)
+        unit: ''
+        description: The index rises with better quality of the local environment.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

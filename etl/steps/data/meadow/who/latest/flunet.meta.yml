@@ -1,0 +1,110 @@
+tables:
+  flunet:
+    variables:
+      whoregion:
+        title: WHO Region
+        description: WHO regions (AFR, AMR, EMR, EUR, SEAR, WPR)
+      fluseason:
+        title: Flu season
+        description: Reporting season (NH=northern hemisphere, SH=southern hemisphere, YR=year-round reporting)
+      hemisphere:
+        title: Hemisphere
+        description: Hemisphere (NH=northern hemisphere, SH=southern hemisphere)
+      itz:
+        title: Influenza Transmission Zone
+        description: https://cdn.who.int/media/docs/default-source/influenza/influenza-transmission-zones20180914.pdf
+      country_code:
+        title: country_code
+        description: ISO3 country codes
+      country:
+        title: Country name
+        description: Country, area or territory name
+      iso_weekstartdate:
+        title: ISO week start date
+      iso_year:
+        title: Year
+      iso_week:
+        title: Week
+      mmwr_weekstartdate:
+        title: Morbidity and Mortality Weekly Report start date
+      mmwr_year:
+        title: Morbidity and Mortality Weekly Report year
+      mmwr_week:
+        title: Morbidity and Mortality Weekly Report week
+      origin_source:
+        title: Source
+        description: Surveillance site type (NONSENTINEL/SENTINEL/NOTDEFINED)
+      spec_processed_nb:
+        title: Number of specimens processed for influenza
+        description: Number of specimens processed for influenza with any kind of method
+      spec_received_nb:
+        title: Number of specimens received for influenza
+        description: Number of specimens received at the laboratory in the reporting week (can be different from the week in which the sample has been taken)
+      ah1n12009:
+        title: Number of A(H1N1)2009 detections
+      ah1:
+        title: Number of A(H1) detections (other than A(H1N1)pdm09)
+      ah3:
+        title: Number of A(H3) detections
+      ah5:
+        title: Number of A(H5) detections
+      ah7n9:
+        title: Number of A(H7N9) detections
+      anotsubtyped:
+        title: Number of not subtyped influenza A detections
+      anotsubtypable:
+        title: Number of unsubtypable influenza A detections
+      aother_subtype:
+        title: Number of other influenza A subtype detections
+      aother_subtype_details:
+        title: Name for A other subtype(s) detected cases
+      inf_a:
+        title: Number of influenza A detections (all subtypes)
+      bvic_2del:
+        title: Number of B (Victoria lineage) 2-deletion detections
+      bvic_3del:
+        title: Number of B (Victoria lineage) 3-deletion detections
+      bvic_nodel:
+        title: Number of B (Victoria lineage) detections (deletions not specified)
+      bvic_delunk:
+        title: Number of B (Victoria lineage) detections (deletions unknown)
+      byam:
+        title: Number of B (Yamagata lineage) detections
+      bnotdetermined:
+        title: Number of influenza B detections (lineage not determined)
+      inf_b:
+        title: Number of influenza B detections (all subtypes)
+      inf_all:
+        title: Number of influenza detections (all types)
+      inf_negative:
+        title: Number of influenza negatives
+      ili_activity:
+        title: "ILI activity (1 - No report / 2 - No activity /3 - Sporadic acitivity / 4 - Local activity / 5 -  Regional activity / 6 - Widespread activity)"
+      adeno:
+        title: Number of Adeno virus detections
+      boca:
+        title: Number of Boca virus detections
+      human_corona:
+        title: Number of human corona virus detections (not SARS-CoV-2)
+      metapneumo:
+        title: Number of Metapneumo virus detections
+      parainfluenza:
+        title: Number of Parainfluenza virus detections
+      rhino:
+        title: Number of Rhino virus detections
+      rsv:
+        title: Number of Respiratory Syncytial Virus (RSV) detections
+      otherrespvirus:
+        title: Number of other respiratory virus detections
+      other_respvirus_details:
+        title: List of other respiratory viruses detected (if any)
+      lab_result_comment:
+        title: Laboratory result comments
+      wcr_comment:
+        title: Weekly country report (WCR)
+      iso2:
+        title: ISO2 country code
+      isoyw:
+        title: Year and week (ISO8601)
+      mmwryw:
+        title: Year and week (MMWR)

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3732
+    date_accessed: 2023-08-16 10:14:02.777650
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other urinary diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b4dcc86fad9a1b02b9e5c068bd6d24e5
+  size: 14714
+  path: dataset_3732_other_urinary_diseases_values.feather

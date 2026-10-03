@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/5463
+    date_accessed: 2026-03-05 09:34:45.736284+00:00
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environmental impact of milks (Poore and Nemecek, 2018)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: c9c0e6f6a868ecf04b8ddebf323d3645
+    size: 6506
+    path: dataset_5463_environmental_impact_of_milks__poore_and_nemecek__2018_values.feather

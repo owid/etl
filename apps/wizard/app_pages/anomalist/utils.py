@@ -1,0 +1,188 @@
+"""Utils for chart revision tool."""
+
+import time
+from enum import Enum
+
+import pandas as pd
+import streamlit as st
+from sqlalchemy import select
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session
+from structlog import get_logger
+
+import etl.grapher.model as gm
+from apps.anomalist.anomalist_api import add_auxiliary_scores, combine_and_reduce_scores_df
+from apps.wizard.utils.db import WizardDB
+from apps.wizard.utils.io import get_new_grapher_datasets_and_their_previous_versions
+from etl.config import OWID_ENV, OWIDEnv
+from etl.db import get_engine
+
+# Logger
+log = get_logger()
+
+
+class AnomalyTypeEnum(Enum):
+    TIME_CHANGE = "time_change"
+    UPGRADE_CHANGE = "upgrade_change"
+    UPGRADE_MISSING = "upgrade_missing"
+    GP_OUTLIER = "gp_outlier"
+    # AI = "ai"  # Uncomment if needed
+
+
+def infer_variable_mapping(dataset_id_new: int, dataset_id_old: int, engine: Engine | None = None) -> dict[int, int]:
+    engine = engine or get_engine()
+    with Session(engine) as session:
+        variables_new = gm.Variable.load_variables_in_datasets(session=session, dataset_ids=[dataset_id_new])
+        variables_old = gm.Variable.load_variables_in_datasets(session=session, dataset_ids=[dataset_id_old])
+    # Create a mapping from old ids to new variable ids for variables whose shortNames are identical in the old and new versions.
+    _variables = {variable.shortName: variable.id for variable in variables_new}
+    variable_mapping = {
+        old_variable.id: _variables[old_variable.shortName]
+        for old_variable in variables_old
+        if old_variable.shortName in _variables
+    }
+    return variable_mapping
+
+
+@st.cache_data(show_spinner=False)
+@st.spinner("Retrieving datasets...", show_time=True)
+def get_datasets_and_mapping_inputs() -> tuple[dict[int, str], dict[int, str], dict[int, int]]:
+    t = time.time()
+    # Get all datasets from DB.
+    df_datasets = gm.Dataset.load_all_datasets(columns=["id", "name"])
+
+    # Initialize DB engine.
+    engine = get_engine()
+    with Session(engine) as session:
+        # Ensure the 'anomalies' table exists.
+        gm.Anomaly.create_table(engine, if_exists="skip")
+
+        # Get list of datasets for which anomalies have already been detected (if any).
+        dataset_ids_with_anomalies = sorted(set(session.scalars(select(gm.Anomaly.datasetId)).all()))
+
+        # Detect local files that correspond to new or modified grapher steps, identify their corresponding grapher dataset ids, and the grapher dataset id of the previous version (if any).
+        # NOTE: this is quite slow taking ~4s, it would be faster to reuse function `_load_datasets_new_ids` from owidbot/anomalist.py
+        dataset_new_and_old = get_new_grapher_datasets_and_their_previous_versions(session=session)
+
+    # List new dataset ids.
+    # Add datasets with already detected anomalies (if any).
+    datasets_new_ids = list(dataset_new_and_old) + dataset_ids_with_anomalies
+
+    # Load mapping created by indicator upgrader (if any).
+    variable_mapping = load_variable_mapping(datasets_new_ids, dataset_new_and_old)
+
+    # For convenience, create a dataset name "[id] Name".
+    df_datasets["id_name"] = (
+        "[" + df_datasets["id"].astype(str) + "] " + df_datasets["name"]  # ty: ignore[unsupported-operator]
+    )
+    # List all grapher datasets.
+    datasets_all = (
+        df_datasets[["id", "id_name"]].set_index("id").squeeze().to_dict()  # ty: ignore[unresolved-attribute]
+    )
+    # List new datasets.
+    datasets_new = {k: v for k, v in datasets_all.items() if k in datasets_new_ids}
+
+    log.info("get_datasets_and_mapping_inputs", t=time.time() - t)
+
+    return datasets_all, datasets_new, variable_mapping  # ty: ignore
+
+
+def keep_mapping_for_compared_versions(
+    mapping: pd.DataFrame, dataset_new_and_old: dict[int, int | None] | None
+) -> pd.DataFrame:
+    """Keep only the indicator-upgrader pairs that map a new dataset to the version it replaces.
+
+    The upgrader's table accumulates a row per upgrade ever performed, and `get_variable_mapping`
+    deliberately composes chains of them — a chart still pinned to a three-versions-old indicator
+    has to be remappable to the newest one. That composition is wrong as an anomaly baseline: a
+    dataset updated N times contributes N generations of old indicators, all pointing at the same
+    new one (keyed by `id_old`, so none of them collide), and the upgrade detectors flag an
+    entity-year as lost if *any* generation had it. Losses inherited from earlier releases then get
+    reported as though this update caused them — which is what they mean by `upgrade_missing`
+    ("used to exist in old version", singular).
+    """
+    if mapping.empty or not dataset_new_and_old:
+        return mapping
+
+    compared = {(new, old) for new, old in dataset_new_and_old.items() if old is not None}
+    if not compared:
+        return mapping
+
+    keep = [
+        (row.dataset_id_new, row.dataset_id_old) in compared
+        for row in mapping[["dataset_id_new", "dataset_id_old"]].itertuples()
+    ]
+    n_dropped = len(mapping) - sum(keep)
+    if n_dropped > 0:
+        log.info(
+            f"Dropped {n_dropped} indicator-upgrader pairs that compare against a version other than the one "
+            f"being replaced (kept {sum(keep)})."
+        )
+
+    return mapping[keep]
+
+
+def load_variable_mapping(
+    datasets_new_ids: list[int],
+    dataset_new_and_old: dict[int, int | None] | None = None,
+    engine: Engine | None = None,
+) -> dict[int, int]:
+    # Infer a mapping by shortName for each new dataset and its previous version (if known).
+    # This is combined with the indicator upgrader's mapping below: the upgrader only persists
+    # mappings for indicators used in charts, so on its own it can silently restrict the upgrade
+    # detectors (upgrade_missing / upgrade_change) to a fraction of the dataset's indicators.
+    inferred_mapping: dict[int, int] = dict()
+    if dataset_new_and_old:
+        for dataset_id_new, dataset_id_old in dataset_new_and_old.items():
+            if dataset_id_old is None:
+                continue
+            # Infer (assuming no names have changed).
+            inferred_mapping.update(infer_variable_mapping(dataset_id_new, dataset_id_old, engine=engine))
+
+    mapping = WizardDB.get_variable_mapping_raw()
+    mapping = keep_mapping_for_compared_versions(mapping, dataset_new_and_old)
+    if len(mapping) > 0:
+        log.info("Using variable mapping created by indicator upgrader.")
+        # Set of ids of new datasets that appear in the mapping generated by indicator upgrader.
+        datasets_new_mapped = set(mapping["dataset_id_new"])
+        # Set of ids of expected new datasets.
+        datasets_new_expected = set(datasets_new_ids)
+        # Sanity check.
+        if not (datasets_new_mapped <= datasets_new_expected):
+            log.error(
+                f"Indicator upgrader mapped indicators to new datasets ({datasets_new_mapped}) that are not among the datasets detected as new in the code ({datasets_new_expected}). Look into this."
+            )
+        # Create a mapping dictionary, enriched with inferred pairs for indicators the upgrader
+        # didn't map (explicit upgrader entries take precedence over inferred ones).
+        explicit_mapping = mapping.set_index("id_old")["id_new"].to_dict()
+        n_enriched = len(set(inferred_mapping) - set(explicit_mapping))
+        if n_enriched > 0:
+            log.info(f"Enriching indicator-upgrader mapping with {n_enriched} pairs inferred by shortName.")
+        variable_mapping = {**inferred_mapping, **explicit_mapping}
+    elif inferred_mapping:
+        log.info("Inferring variable mapping (since no mapping was created by indicator upgrader).")
+        variable_mapping = inferred_mapping
+    else:
+        # No mapping available.
+        variable_mapping = dict()
+
+    return variable_mapping  # ty: ignore
+
+
+def create_tables(_owid_env: OWIDEnv = OWID_ENV):
+    """Create all required tables.
+
+    If exist, nothing is created.
+    """
+    gm.Anomaly.create_table(_owid_env.engine, if_exists="skip")
+
+
+@st.cache_data(show_spinner=False)
+def get_scores(anomalies: list[gm.Anomaly]) -> pd.DataFrame:
+    """Combine and reduce scores dataframe."""
+    df = combine_and_reduce_scores_df(anomalies)
+
+    # Add a population score, an analytics (views last 14 days) score, and a weighted score.
+    df = add_auxiliary_scores(df=df)
+
+    return df

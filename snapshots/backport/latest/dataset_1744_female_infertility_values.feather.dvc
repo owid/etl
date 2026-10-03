@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1744
+    date_accessed: 2023-08-16 07:58:13.900697
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Female infertility
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2ebd389c1c23e6739d681b2157890094
+  size: 393970
+  path: dataset_1744_female_infertility_values.feather

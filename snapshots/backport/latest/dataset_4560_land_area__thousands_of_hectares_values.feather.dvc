@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4560
+    date_accessed: 2023-08-11 07:35:11.026336
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Land area (thousands of hectares)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8c1ee07755c21c684adb32ff14ed2a29
+  size: 16274
+  path: dataset_4560_land_area__thousands_of_hectares_values.feather

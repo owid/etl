@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2530
+    date_accessed: 2023-08-14 14:36:58.778404
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Industry and Services - Inbound tourism
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f90d45cd5d01dc37d4ee773e0a0f78ce
+  size: 39794
+  path: dataset_2530_industry_and_services__inbound_tourism_values.feather

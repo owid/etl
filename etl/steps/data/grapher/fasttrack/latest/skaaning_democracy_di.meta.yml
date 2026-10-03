@@ -1,0 +1,21 @@
+dataset:
+  title: DRAFT skaaning_democracy_DI
+  description: ''
+tables:
+  skaaning_democracy_di:
+    variables:
+      universal_right_to_vote:
+        title: universal_right_to_vote
+        unit: ''
+      parliament_and_government_elected:
+        title: parliament_and_government_elected
+        unit: ''
+      multi_party_elections:
+        title: multi_party_elections
+        unit: ''
+      competitive_elections:
+        title: competitive_elections
+        unit: ''
+      free_expression_and_association:
+        title: free_expression_and_association
+        unit: ''

@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: AI Performance on Math Problems
+    date_published: 2024-03-22
+    description_snapshot: |
+      Problem Solving on MATH dataset of 12,500 challenging competition mathematics problems. Each problem in MATH has a full step-by-step solution which can be used to teach models to generate answer derivations and explanations.
+
+    # Citation
+    producer: Papers with Code
+    citation_full: Math Word Problem Solving on MATH. Papers with Code (2024)
+
+    # Files
+    url_main: https://paperswithcode.com/sota/math-word-problem-solving-on-math
+    url_download: https://paperswithcode.com/sota/math-word-problem-solving-on-math
+    date_accessed: 2024-03-22
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by-sa/4.0/
+
+
+outs:
+  - md5: a8799fcf965f058ccb4d38aa2b0c469d
+    size: 149502
+    path: papers_with_code_math.html

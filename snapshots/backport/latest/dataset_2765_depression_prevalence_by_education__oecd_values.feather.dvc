@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/2765
+    date_accessed: 2026-03-10 09:26:56.545589+00:00
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Depression prevalence by education - OECD
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: 159a6f126f01cf7a0034bb47b5bd69ac
+    size: 8434
+    path: dataset_2765_depression_prevalence_by_education__oecd_values.feather

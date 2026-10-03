@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Extreme poverty projections up to 2030
+    description: |-
+      This World Bank dataset shows projections in the share in extreme poverty by region up to 2030. 
+    date_published: "2022-11-30"
+
+    # Citation
+    producer: World Bank
+    citation_full: |-
+      Marta Schoch, Nishant Yonzan, Ruth Hill And Christoph Lakner (2022). To end extreme poverty, getting back to pre-COVID-19 reduction rates is not enough. Retrieved from https://blogs.worldbank.org/en/developmenttalk/end-extreme-poverty-getting-back-pre-covid-19-reduction-rates-not-enough
+
+    # Files
+    url_main: https://blogs.worldbank.org/en/developmenttalk/end-extreme-poverty-getting-back-pre-covid-19-reduction-rates-not-enough
+    date_accessed: 2024-06-26
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+
+outs:
+  - md5: ab6437725a78c87588a23c7682ba6ca8
+    size: 3793
+    path: poverty_projections_share_regions.csv

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/626
+    date_accessed: 2023-08-16 08:04:53.747825
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_626_migration__quality_of_government__2017 (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7691534f4c6dd1883bd8909ce0bf0d9a
+  size: 16917
+  path: dataset_626_migration__quality_of_government__2017_config.json

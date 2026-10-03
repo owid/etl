@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2858
+    date_accessed: 2023-08-14 08:15:19.029279
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Malaria deaths - IHME (2016)
+  description: This includes the World Bank world region aggregations
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5151832bb015c82596384dbcfdadbd47
+  size: 37746
+  path: dataset_2858_malaria_deaths__ihme__2016_values.feather

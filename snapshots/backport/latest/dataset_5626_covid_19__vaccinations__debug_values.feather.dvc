@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5626
+    date_accessed: 2023-08-16 08:46:54.935907
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: COVID-19 - Vaccinations (debug)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 10dfe9bcf67ad0070604eba127fc1c5c
+  size: 3945202
+  path: dataset_5626_covid_19__vaccinations__debug_values.feather

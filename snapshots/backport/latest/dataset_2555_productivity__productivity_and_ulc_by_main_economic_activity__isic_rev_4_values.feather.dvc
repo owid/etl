@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2555
+    date_accessed: 2023-08-11 07:11:55.463445
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Productivity - Productivity and ULC by main economic activity (ISIC Rev.4)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 64d44296ab392217dd89f0d2ee09dca4
+  size: 617266
+  path: 
+    dataset_2555_productivity__productivity_and_ulc_by_main_economic_activity__isic_rev_4_values.feather

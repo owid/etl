@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4680
+    date_accessed: 2023-08-14 05:50:42.874975
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Consumer Food Price Index
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e0641b9e604c7379277def5083a9232c
+  size: 12890
+  path: dataset_4680_consumer_food_price_index_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2246
+    date_accessed: 2023-08-16 08:39:56.205238
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Malignant skin melanoma
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 311fb48ac4e023dd54911d7af8378260
+  size: 1499298
+  path: dataset_2246_malignant_skin_melanoma_values.feather

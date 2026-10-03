@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1778
+    date_accessed: 2023-08-14 15:42:33.943441
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1778_diet_low_in_calcium (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0b15bf353ab6eaaf4116f76e20628ff0
+  size: 21884
+  path: dataset_1778_diet_low_in_calcium_config.json

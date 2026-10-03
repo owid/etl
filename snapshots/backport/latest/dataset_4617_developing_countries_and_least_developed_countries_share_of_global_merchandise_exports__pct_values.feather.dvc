@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4617
+    date_accessed: 2023-08-14 15:24:32.985402
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Developing countries’ and least developed countries’ share of global merchandise
+    exports (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9606f1323568084052f8d9f419c0fea1
+  size: 13938
+  path: 
+    dataset_4617_developing_countries_and_least_developed_countries_share_of_global_merchandise_exports__pct_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4151
+    date_accessed: 2023-08-16 08:21:43.504133
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Expected Years of Schooling - UNDP (2018)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ea0ec862cd4a3b221f80f19623d8f46f
+  size: 27714
+  path: dataset_4151_expected_years_of_schooling__undp__2018_values.feather

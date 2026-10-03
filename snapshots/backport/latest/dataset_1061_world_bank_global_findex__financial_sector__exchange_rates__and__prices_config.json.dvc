@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1061
+    date_accessed: 2023-08-14 14:45:20.768701
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1061_world_bank_global_findex__financial_sector__exchange_rates__and__prices
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1ee89b2f32c551a42aa210c53ef54070
+  size: 2300
+  path: 
+    dataset_1061_world_bank_global_findex__financial_sector__exchange_rates__and__prices_config.json

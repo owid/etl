@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2758
+    date_accessed: 2023-08-16 08:15:24.788188
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2758_rate_of_internationally_observed_elections__hyde_and_marinov__2012
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ebd02626446b2f95c106893421ab5834
+  size: 8164
+  path: 
+    dataset_2758_rate_of_internationally_observed_elections__hyde_and_marinov__2012_config.json

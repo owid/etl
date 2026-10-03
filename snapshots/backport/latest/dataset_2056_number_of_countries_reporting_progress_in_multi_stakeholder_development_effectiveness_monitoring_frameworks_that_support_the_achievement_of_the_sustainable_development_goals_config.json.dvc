@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2056
+    date_accessed: 2023-08-11 07:36:00.450682
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2056_number_of_countries_reporting_progress_in_multi_stakeholder_development_effectiveness_monitoring_frameworks_that_support_the_achievement_of_the_sustainable_development_goals
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 61bb498ecf002868f02fc5d013e14786
+  size: 4226
+  path: 
+    dataset_2056_number_of_countries_reporting_progress_in_multi_stakeholder_development_effectiveness_monitoring_frameworks_that_support_the_achievement_of_the_sustainable_development_goals_config.json

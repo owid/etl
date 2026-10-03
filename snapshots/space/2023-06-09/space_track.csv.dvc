@@ -1,0 +1,26 @@
+meta:
+  namespace: space
+  short_name: space_track
+  name: Number of objects in space (United States Space Force, 2023)
+  version: '2023-06-09'
+  publication_year: 2023
+  source_name: United States Space Force (2023)
+  source_published_by: 18th Space Defense Squadron, United States Space Force
+  url: https://www.space-track.org/
+  source_data_url:
+  file_extension: csv
+  license_url: https://www.space-track.org/documentation#user_agree
+  license_name: Space-Track.org  User Agreement
+  date_accessed: 2023-06-09
+  is_public: true
+  description: |
+    This dataset is extracted from Space-Track.org, a website maintained by the 18th Space Defense Squadron of the United States Space Force.
+
+    The original data includes information on more than 50,000 space objects tracked over time, including their launch date and decay date (if they have reentered the Earth's atmosphere).
+
+    In our charts, low Earth orbit is defined by a periapsis altitude below 2,000 kilometers; medium Earth orbit between 2,000 and 35,586 kilometers; geostationary orbit between 35,586 and 35,986 kilometers; high Earth orbit above 35,986 kilometers.
+wdir: ../../../data/snapshots/space/2023-06-09
+outs:
+- md5: 414d6b8141faf7c5d46dd8f2f93e33ce
+  size: 32035807
+  path: space_track.csv

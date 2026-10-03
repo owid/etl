@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/3227
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: TE-13.19a_Capital
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: 0c23436691c8edf6d577db18131c5b78
+    size: 7010
+    path: dataset_3227_te_13_19a_capital_values.feather

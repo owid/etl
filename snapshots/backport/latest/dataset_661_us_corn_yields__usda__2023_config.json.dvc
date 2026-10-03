@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/661
+    date_accessed: 2023-08-11 07:44:52.842702
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_661_us_corn_yields__usda__2023 (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 402421b0a9b667473c68298ff9b567c8
+  size: 1901
+  path: dataset_661_us_corn_yields__usda__2023_config.json

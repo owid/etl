@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5392
+    date_accessed: 2023-08-16 08:48:36.901728
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: International Monetary Fund - World Economic Outlook
+  description: https://github.com/owid/importers/tree/master/imf_weo
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 19f7378bd09bdf2802645f53c713dd7d
+  size: 53450
+  path: dataset_5392_international_monetary_fund__world_economic_outlook_values.feather

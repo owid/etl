@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4857
+    date_accessed: 2023-08-14 15:28:33.016439
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Carbon dioxide emissions per unit of manufacturing value added (kilogrammes
+    of CO2 per constant 2010 United States dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ae00b1c410755e31b3c8bca03e266976
+  size: 22610
+  path: 
+    dataset_4857_carbon_dioxide_emissions_per_unit_of_manufacturing_value_added__kilogrammes_of_co2_per_constant_2010_united_states_dollars_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2218
+    date_accessed: 2023-08-14 15:46:32.461691
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other meningitis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0485e38b07780679789526930e2fbe3a
+  size: 2116402
+  path: dataset_2218_other_meningitis_values.feather

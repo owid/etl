@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1827
+    date_accessed: 2023-08-16 07:28:46.165824
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Low birth weight and short gestation
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0e12f5f3e454444ae769ed4bf96999a5
+  size: 961642
+  path: dataset_1827_low_birth_weight_and_short_gestation_values.feather

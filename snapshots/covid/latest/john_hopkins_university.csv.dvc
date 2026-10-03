@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: COVID-19, JHU CSSE Dataset
+    description: |-
+      This is the data repository for the 2019 Novel Coronavirus Visual Dashboard operated by the Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE). Also, Supported by ESRI Living Atlas Team and the Johns Hopkins University Applied Physics Lab (JHU APL).
+
+
+      For the historic of changes and modifications to the data, refer to https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data. For more details, refer to https://github.com/CSSEGISandData/COVID-19/tree/master.
+    date_published: "2023-03-09"
+
+    # Citation
+    producer: Johns Hopkins University
+    citation_full: |-
+      Data:
+      COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University. Available at https://github.com/CSSEGISandData/COVID-19.
+
+      Paper:
+      Dong E, Du H, Gardner L. An interactive web-based dashboard to track COVID-19 in real time. Lancet Inf Dis. 20(5):533-534. doi: 10.1016/S1473-3099(20)30120-1
+
+    # Files
+    url_main: https://github.com/CSSEGISandData/COVID-19
+    url_download: https://github.com/owid/covid-19-data/raw/master/public/data/jhu/COVID-19%20-%20Johns%20Hopkins%20University.csv
+    date_accessed: 2024-07-31
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://systems.jhu.edu/research/public-health/2019-ncov-map-faqs/
+
+outs:
+  - md5: cfc5b191ee6eab7e13aabe1d4fb0b609
+    size: 49277226
+    path: john_hopkins_university.csv

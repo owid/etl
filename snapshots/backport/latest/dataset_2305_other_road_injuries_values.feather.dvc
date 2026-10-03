@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2305
+    date_accessed: 2023-08-16 08:19:00.298328
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other road injuries
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f5f3c2972a4c035ac3c56299d5514192
+  size: 2116402
+  path: dataset_2305_other_road_injuries_values.feather

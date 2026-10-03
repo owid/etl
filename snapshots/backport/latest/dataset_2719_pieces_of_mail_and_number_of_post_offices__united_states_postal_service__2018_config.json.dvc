@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2719
+    date_accessed: 2023-08-14 14:28:36.369808
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2719_pieces_of_mail_and_number_of_post_offices__united_states_postal_service__2018
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bfb9990806ab0603a599f2f01c1cf4fd
+  size: 3507
+  path: 
+    dataset_2719_pieces_of_mail_and_number_of_post_offices__united_states_postal_service__2018_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1549
+    date_accessed: 2023-08-16 10:22:31.876511
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other chronic respiratory diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d11bd03fc507a4b0a0cc6436783dad00
+  size: 2012058
+  path: dataset_1549_other_chronic_respiratory_diseases_values.feather

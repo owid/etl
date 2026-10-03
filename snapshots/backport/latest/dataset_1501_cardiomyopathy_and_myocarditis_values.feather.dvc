@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1501
+    date_accessed: 2023-08-14 14:41:12.958914
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Cardiomyopathy and myocarditis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8d157e4fb182bbe41b525194da2c63f9
+  size: 2012050
+  path: dataset_1501_cardiomyopathy_and_myocarditis_values.feather

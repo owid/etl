@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1045
+    date_accessed: 2023-08-11 07:40:43.573085
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank Gender Statistics - Education
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: da658b311928e59dafa15a14e2ae9e64
+  size: 1584090
+  path: dataset_1045_world_bank_gender_statistics__education_values.feather

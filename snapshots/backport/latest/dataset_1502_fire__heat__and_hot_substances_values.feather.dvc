@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1502
+    date_accessed: 2023-08-14 15:28:10.912048
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Fire, heat, and hot substances
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8db1046b1d89a6250fcd447e6c0225c6
+  size: 2012058
+  path: dataset_1502_fire__heat__and_hot_substances_values.feather

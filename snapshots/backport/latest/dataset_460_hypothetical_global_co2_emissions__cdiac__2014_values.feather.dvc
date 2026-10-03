@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/460
+    date_accessed: 2023-08-10 08:10:13.520613
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Hypothetical global CO2 emissions - CDIAC (2014)
+  description: Hypothetical global CO2 emissions if everyone had the average per capita
+    footprint of a given country in 2014
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8ed243ded74388ab46821fb0f483fb91
+  size: 13618
+  path: dataset_460_hypothetical_global_co2_emissions__cdiac__2014_values.feather

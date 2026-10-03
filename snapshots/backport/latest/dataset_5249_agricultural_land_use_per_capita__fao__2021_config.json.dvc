@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5249
+    date_accessed: 2023-08-11 07:42:32.621445
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5249_agricultural_land_use_per_capita__fao__2021
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 37aeba5ff144a44c26eb6d01c854a7fa
+  size: 9992
+  path: dataset_5249_agricultural_land_use_per_capita__fao__2021_config.json

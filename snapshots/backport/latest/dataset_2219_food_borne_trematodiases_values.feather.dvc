@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2219
+    date_accessed: 2023-08-16 07:59:12.621558
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Food-borne trematodiases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d953a2a854be5a350bc6fce50c56e614
+  size: 359242
+  path: dataset_2219_food_borne_trematodiases_values.feather

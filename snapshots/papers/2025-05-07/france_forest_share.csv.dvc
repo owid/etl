@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Mather A.S., Fairbairn J., and Needle C.J.
+    title: "The course and drivers of the forest transition: The case of France"
+    citation_full: |-
+      A.S. Mather, J. Fairbairn, C.L. Needle, The course and drivers of the forest transition: The case of France, Journal of Rural Studies, Volume 15, Issue 1, 1999.
+    attribution_short: Mather et al.
+    url_main: |-
+      https://www.sciencedirect.com/science/article/abs/pii/S0743016798000230
+    date_accessed: "2025-05-07"
+    date_published: "1999-01-01"
+    license:
+      name: Copyright © 1998 Published by Elsevier Ltd
+      url: https://www.elsevier.com/legal/elsevier-website-terms-and-conditions
+outs:
+  - md5: 587f44d3d920a29b0562cacecbf1512d
+    size: 2295
+    path: france_forest_share.csv

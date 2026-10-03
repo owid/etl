@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1989
+    date_accessed: 2023-08-14 05:45:02.233302
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1989_number_of_deaths__missing_persons_and_directly_affected_persons_attributed_to_disasters_per_100_000_population
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 77ad09a467bb9b9232492e4ffbf5a12b
+  size: 11358
+  path: 
+    dataset_1989_number_of_deaths__missing_persons_and_directly_affected_persons_attributed_to_disasters_per_100_000_population_config.json

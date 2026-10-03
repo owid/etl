@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4821
+    date_accessed: 2023-08-16 07:14:29.661743
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4821_renewable_energy_share_in_the_total_final_energy_consumption__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b49ddcc1f0f4efa70f61c2e253e4a239
+  size: 12730
+  path: 
+    dataset_4821_renewable_energy_share_in_the_total_final_energy_consumption__pct_config.json

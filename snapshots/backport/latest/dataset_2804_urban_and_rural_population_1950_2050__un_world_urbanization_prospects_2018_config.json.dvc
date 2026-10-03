@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2804
+    date_accessed: 2023-08-16 07:27:00.628284
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2804_urban_and_rural_population_1950_2050__un_world_urbanization_prospects_2018
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 623eef4596a34e8f72ee8d74267c2bfc
+  size: 2728
+  path: 
+    dataset_2804_urban_and_rural_population_1950_2050__un_world_urbanization_prospects_2018_config.json

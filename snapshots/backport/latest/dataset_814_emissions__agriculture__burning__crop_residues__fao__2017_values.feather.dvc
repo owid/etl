@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/814
+    date_accessed: 2023-08-14 16:01:18.029478
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emissions - Agriculture: Burning - Crop Residues - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 892b672b8ab8312b8e09741ddeb893be
+  size: 1407474
+  path: 
+    dataset_814_emissions__agriculture__burning__crop_residues__fao__2017_values.feather

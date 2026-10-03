@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/804
+    date_accessed: 2023-08-14 15:04:59.731525
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_804_inputs__pesticides_trade__fao__2017 (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f266b2a042d367105413e45d27cf8844
+  size: 228835
+  path: dataset_804_inputs__pesticides_trade__fao__2017_config.json

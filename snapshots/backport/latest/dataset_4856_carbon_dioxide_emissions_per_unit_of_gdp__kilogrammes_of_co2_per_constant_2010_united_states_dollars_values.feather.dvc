@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4856
+    date_accessed: 2023-08-16 07:30:06.269580
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Carbon dioxide emissions per unit of GDP (kilogrammes of CO2 per constant
+    2010 United States dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a0340dc2796f9a2827ab16b119753d4e
+  size: 21138
+  path: 
+    dataset_4856_carbon_dioxide_emissions_per_unit_of_gdp__kilogrammes_of_co2_per_constant_2010_united_states_dollars_values.feather

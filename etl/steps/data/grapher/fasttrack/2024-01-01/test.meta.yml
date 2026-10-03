@@ -1,0 +1,11 @@
+dataset:
+  title: test
+  description: ''
+  licenses:
+    - {}
+tables:
+  test:
+    variables:
+      test:
+        title: test
+        unit: ''

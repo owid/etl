@@ -1,0 +1,39 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl//architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Bank Official Boundaries
+    description: |-
+      The World Bank Official Boundaries dataset provides World Bank-approved administrative boundaries (Admin 0) including international boundaries, disputed areas, coastlines, lakes and a guide to help with their usage.
+
+      Boundaries are available as an ESRI GeoDatabase, in GeoJSON, a shapefile, and API endpoints for interactive maps. This dataset is crucial for research and planning in various international contexts, offering accurate and up-to-date boundary information.
+
+      World Bank staff must receive clearance for any map created using this data for an external audience by submitting it to the World Bank Cartography Unit. This ensures that all representations are accurate and meet the organization's standards for external communication.
+
+    date_published: 2020-03-19
+
+    # Citation
+    producer: World Bank
+    citation_full: |-
+      World Bank. 2020. World Bank Official Boundaries. Version 2.
+
+    # Files
+    url_main:
+      https://datacatalog.worldbank.org/search/dataset/0038272/World-Bank-Official-Boundaries
+    url_download:
+      https://datacatalogfiles.worldbank.org/ddh-published/0038272/DR0046659/wb_countries_admin0_10m.zip?versionId=2023-11-27T15:22:14.9386101Z
+    date_accessed: 2023-09-22
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://datacatalog.worldbank.org/public-licenses?fragment=cc
+
+
+
+wdir: ../../../data/snapshots/countries/2023-12-27
+outs:
+- md5: e591bf540190e47bf8db22a820c85bba
+  size: 6304345
+  path: world_bank.zip

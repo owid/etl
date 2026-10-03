@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2648
+    date_accessed: 2023-08-10 14:50:06.991073
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2648_social_protection_and_well_being__gender__institutions_and_development_database_2014__gid_db
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0e63ff5ef5fe86fe10558baad4d6b6bb
+  size: 23580
+  path: 
+    dataset_2648_social_protection_and_well_being__gender__institutions_and_development_database_2014__gid_db_config.json

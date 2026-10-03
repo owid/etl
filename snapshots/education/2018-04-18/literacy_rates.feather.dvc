@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Cross-country literacy rates
+    description: >
+      This dataset combines long-run cross-country literacy rates from several sources
+      including the World Bank's WDI, CIA Factbook, and other historical data series.
+      Key sources include Buringh & Van Zanden (2009) for data before 1800, Broadberry
+      and O'Rourke (2010) for 1820 and 1870, and van Zanden et al. (2014) for global
+      estimates from 1820-2000. It also includes recent estimates for high-income
+      countries and available 2016 data from the CIA World Factbook. Note that the
+      sources may have discrepancies and different underlying methodologies, and thus
+      year-to-year changes should be interpreted cautiously.
+    # Citation
+    producer: Various sources
+    citation_full: 'Literacy rates (World Bank, CIA World Factbook, and other sources)'
+    # Files
+    url_main: https://data.worldbank.org/indicator/SE.ADT.LITR.ZS
+    date_accessed: 2018-04-18
+    date_published: '2018'
+wdir: ../../../data/snapshots/education/2018-04-18
+outs:
+- md5: 1fccefc6026cd4c0161aa08b2bf7551e
+  size: 17602
+  path: literacy_rates.feather

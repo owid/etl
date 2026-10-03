@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4791
+    date_accessed: 2023-08-10 14:33:25.422866
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4791_proportion_of_transboundary_basins__river_and_lake_basins_and_aquifers__with_an_operational_arrangement_for_water_cooperation__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 130872a5e08bbf225286e9a260498edd
+  size: 28260
+  path: 
+    dataset_4791_proportion_of_transboundary_basins__river_and_lake_basins_and_aquifers__with_an_operational_arrangement_for_water_cooperation__pct_config.json

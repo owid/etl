@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4836
+    date_accessed: 2023-08-10 15:04:17.211951
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4836_average_hourly_earnings_of_managers__isco_08__local_currency
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2a4d3e2d493f5e752573d0d02f1544c3
+  size: 70746
+  path: 
+    dataset_4836_average_hourly_earnings_of_managers__isco_08__local_currency_config.json

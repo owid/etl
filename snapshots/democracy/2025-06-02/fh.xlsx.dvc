@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Freedom in the World
+    description: |-
+      The Freedom in the World report is composed of numerical ratings and supporting descriptive texts for 195 countries and 15 territories. External analysts assess 210 countries and territories, using a combination of on-the-ground research, consultations with local contacts, and information from news articles, nongovernmental organizations, governments, and a variety of other sources. Expert advisers and regional specialists then vet the analysts' conclusions. The final product represents the consensus of the analysts, advisers, and Freedom House staff.
+
+      For each country and territory, Freedom in the World analyzes the electoral process, political pluralism and participation, the functioning of the government, freedom of expression and of belief, associational and organizational rights, the rule of law, and personal autonomy and individual rights.
+
+    date_published: "2025-02-01"
+    title_snapshot: Freedom in the World - Aggregate Category and Subcategory Scores, 2013-2025
+    description_snapshot: |-
+      The same indicators were present from FIW2013 through FIW2018.
+
+      In FIW2018, Add A (Additional Discretionary Question A) was eliminated, and Add B (Additional Discretionary Question B) was renamed Add Q.
+
+      For data-analysis purposes, Freedom in the World divides countries and territories into six world regions: Africa, the Americas, Asia-Pacific, Eurasia, Europe, and the Middle East. Prior to the 2022 edition, the countries of North Africa were grouped with the Middle East rather than the rest of Africa.
+    # Citation
+    producer: Freedom House
+    citation_full: |-
+      Freedom House. Freedom in the World 2025: The Uphill Battle to Safeguard Rights. Washington, DC: Freedom House, 2025. Online: https://freedomhouse.org/sites/default/files/2025-03/FITW_World2025digitalN.pdf
+    # Files
+    url_main: https://freedomhouse.org/report/freedom-world
+    url_download: https://freedomhouse.org/sites/default/files/2025-02/All_data_FIW_2013-2024.xlsx
+    date_accessed: "2025-06-02"
+
+    # License
+    license:
+      name: Freedom House 2025
+      url: https://freedomhouse.org/about-us/content-permissions
+outs:
+  - md5: 1c13a78a9a5122720b596435b2b98042
+    size: 499762
+    path: fh.xlsx

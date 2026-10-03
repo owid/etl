@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3733
+    date_accessed: 2023-08-16 09:27:25.590398
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other intestinal infectious diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b727a4cd6da61bf55bffaeb6ca7ae68a
+  size: 14722
+  path: dataset_3733_other_intestinal_infectious_diseases_values.feather

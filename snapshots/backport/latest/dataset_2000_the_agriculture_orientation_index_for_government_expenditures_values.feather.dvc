@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2000
+    date_accessed: 2023-08-16 07:26:15.395798
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: The agriculture orientation index for government expenditures
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7af59bd391546031cc0e1edf699e514c
+  size: 19362
+  path: 
+    dataset_2000_the_agriculture_orientation_index_for_government_expenditures_values.feather

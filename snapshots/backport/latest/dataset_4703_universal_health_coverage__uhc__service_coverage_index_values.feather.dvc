@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4703
+    date_accessed: 2023-08-10 14:47:00.450713
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Universal health coverage (UHC) service coverage index
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 007b8808bc92abd0c4f3d144961e98e9
+  size: 12402
+  path: 
+    dataset_4703_universal_health_coverage__uhc__service_coverage_index_values.feather

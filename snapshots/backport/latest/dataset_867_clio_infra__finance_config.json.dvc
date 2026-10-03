@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/867
+    date_accessed: 2023-08-16 08:13:01.568147
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_867_clio_infra__finance (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 939a49dffcc061d03f28a5dec9daf2e4
+  size: 7441
+  path: dataset_867_clio_infra__finance_config.json

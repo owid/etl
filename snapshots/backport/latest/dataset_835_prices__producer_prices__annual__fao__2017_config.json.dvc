@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/835
+    date_accessed: 2023-08-11 07:36:36.714732
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_835_prices__producer_prices__annual__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 331badd5771627ddf5a5636bbbb5abba
+  size: 696693
+  path: dataset_835_prices__producer_prices__annual__fao__2017_config.json

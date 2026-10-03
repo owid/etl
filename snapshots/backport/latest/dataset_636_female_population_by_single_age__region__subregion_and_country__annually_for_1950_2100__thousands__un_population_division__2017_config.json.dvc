@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/636
+    date_accessed: 2023-08-16 07:15:47.331198
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_636_female_population_by_single_age__region__subregion_and_country__annually_for_1950_2100__thousands__un_population_division__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 45dcc2049bd4a84e0f375d688919637c
+  size: 166916
+  path: 
+    dataset_636_female_population_by_single_age__region__subregion_and_country__annually_for_1950_2100__thousands__un_population_division__2017_config.json

@@ -1,0 +1,19 @@
+meta:
+  namespace: aviation_safety_network
+  short_name: aviation_statistics
+  name: Aviation statistics
+  source_name: Aviation Safety Network
+  publication_year: 2022
+  publication_date: 2022-10-14
+  url: https://aviation-safety.net/statistics/
+  source_data_url:
+  file_extension: csv
+  license_url: https://aviation-safety.net/about/usage33.php
+  license_name: Copyright Aviation Safety Network
+  date_accessed: 2022-10-14
+  description: |
+wdir: ../../../data/snapshots/aviation_safety_network/2022-10-14
+outs:
+- md5: 9be7b55ed60b9831b6a251ca1f2b3130
+  size: 4928
+  path: aviation_statistics.csv

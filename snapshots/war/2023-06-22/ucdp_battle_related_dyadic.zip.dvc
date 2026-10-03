@@ -1,0 +1,23 @@
+meta:
+  name: Battle-Related Deaths Dataset version 23.1, Dyadic version (UCDP, 2023)
+  publication_year: 2023
+  publication_date:
+  source_name: UCDP (2023)
+  source_published_by: Davies, Shawn, Therese Pettersson & Magnus Öberg (2023). Organized
+    violence 1989-2022, and the return of conflict between states. Journal of Peace
+    Research 60(4).
+  url: https://ucdp.uu.se/downloads/index.html
+  source_data_url: https://ucdp.uu.se/downloads/brd/ucdp-brd-dyadic-231-csv.zip
+  license_url:
+  license_name:
+  date_accessed: 2023-06-22
+  is_public: true
+  description: |
+    This file contains a dyad-year dataset with information on the number of battle-related deaths in the conflicts from 1989-2021 that appear in the UCDP/PRIO Armed Conflict Dataset.
+
+    You can find more notes at https://web.archive.org/web/20230624051617/https://ucdp.uu.se/downloads/brd/ucdp-brd-codebook-231.pdf
+wdir: ../../../data/snapshots/war/2023-06-22
+outs:
+- md5: 6c73abb31671ae68dd1bd4a049143ade
+  size: 41509
+  path: ucdp.battle_related_dyadic.zip

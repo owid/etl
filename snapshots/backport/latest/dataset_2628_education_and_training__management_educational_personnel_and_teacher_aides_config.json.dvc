@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2628
+    date_accessed: 2023-08-16 10:13:08.941177
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2628_education_and_training__management_educational_personnel_and_teacher_aides
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 18e15abb552e7cd06511c4ae7db0e7d9
+  size: 141358
+  path: 
+    dataset_2628_education_and_training__management_educational_personnel_and_teacher_aides_config.json

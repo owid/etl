@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2695
+    date_accessed: 2023-08-10 14:59:11.726832
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Health Equity Monitor
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6e7324ae817d9e54f1df505c02073723
+  size: 113594
+  path: dataset_2695_health_equity_monitor_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3902
+    date_accessed: 2023-08-14 05:35:37.861624
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3902_diabetes_and_kidney_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a7beef3a885a0824ff583db89604c2d9
+  size: 31997
+  path: dataset_3902_diabetes_and_kidney_diseases_config.json

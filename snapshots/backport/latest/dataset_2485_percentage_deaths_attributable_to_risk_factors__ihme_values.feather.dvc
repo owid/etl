@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2485
+    date_accessed: 2023-08-14 14:55:27.020327
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Percentage deaths attributable to risk factors - IHME
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ec8227f6dc4edc3aaf3aecc69196f99d
+  size: 8394
+  path: dataset_2485_percentage_deaths_attributable_to_risk_factors__ihme_values.feather

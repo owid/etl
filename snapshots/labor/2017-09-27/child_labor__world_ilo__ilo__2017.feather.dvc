@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: International Labour Organization
+    title: Marking progress against child labour
+    citation_full: International Labour Organization (2017). Marking progress against child labour.
+    attribution_short: ILO
+    url_main: http://www.ilo.org/global/statistics-and-databases/lang--en/index.htm
+    date_accessed: '2017-09-27'
+    date_published: '2017'
+outs:
+  - md5: 07dbed10c12ce30d3aa298eb00101709
+    size: 6530
+    path: child_labor__world_ilo__ilo__2017.feather

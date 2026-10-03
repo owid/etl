@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/5145
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Figure_17.28_budget_balance
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: f765fe563451bfd6de790d097e39a5d3
+    size: 7362
+    path: dataset_5145_figure_17_28_budget_balance_values.feather

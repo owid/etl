@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5300
+    date_accessed: 2023-08-16 08:20:35.368200
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Antidepressant consumption per capita (OECD, 2021)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 718fb2d4ddb405cb4840169ffd35cd30
+  size: 8466
+  path: dataset_5300_antidepressant_consumption_per_capita__oecd__2021_values.feather

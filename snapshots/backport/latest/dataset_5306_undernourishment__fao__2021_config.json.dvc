@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5306
+    date_accessed: 2023-08-14 05:56:44.203936
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5306_undernourishment__fao__2021 (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d38c5ef0fd4b9ca01bcaa70b932cc417
+  size: 2423
+  path: dataset_5306_undernourishment__fao__2021_config.json

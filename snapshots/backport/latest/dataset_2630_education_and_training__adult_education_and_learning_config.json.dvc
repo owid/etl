@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2630
+    date_accessed: 2023-08-10 14:50:39.136373
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2630_education_and_training__adult_education_and_learning
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f85a05e36ffb941017e1aafb6fd3e7f9
+  size: 5737
+  path: dataset_2630_education_and_training__adult_education_and_learning_config.json

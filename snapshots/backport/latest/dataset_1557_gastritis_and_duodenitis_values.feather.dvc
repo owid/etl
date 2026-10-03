@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1557
+    date_accessed: 2023-08-16 09:57:52.348505
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Gastritis and duodenitis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d871ec481a4e413d40be5a7242212645
+  size: 2012050
+  path: dataset_1557_gastritis_and_duodenitis_values.feather

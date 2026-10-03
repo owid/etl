@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1460
+    date_accessed: 2023-08-14 15:18:13.238844
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Extensively drug-resistant HIV/AIDS - Tuberculosis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 81f485108e34ae3c794e6505b9a3e787
+  size: 1918530
+  path: dataset_1460_extensively_drug_resistant_hiv_aids__tuberculosis_values.feather

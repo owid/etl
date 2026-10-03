@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/4103
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4103_figure_19_1__version2
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: 201f25338c81e4e8a3da5a69c7d3b2ed
+    size: 2647
+    path: dataset_4103_figure_19_1__version2_config.json

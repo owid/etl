@@ -1,0 +1,60 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: GDELT Event Database
+    description: |-
+      GDELT 2.0 is an index over global society, an open dataset that attempts to make human society itself “computable,” leveraging the enormous power of Google Cloud to fundamentally reimagine how we study the human world in realtime at a planetary scale.
+
+      GDELT 2.0 might be one of the largest and most ambitious platforms ever created for monitoring our global world. From realtime translation of the world’s news in 65 languages, to measurement of more than 2,300 emotions and themes from every article, to a massive inventory of the media of the non-Western world, GDELT 2.0 is poised to redefine how we understand and interact with our global world, transcending language barriers and reaching deeply into the reactions and emotional resonance of world events. In essence, within 15 minutes of GDELT monitoring a news report breaking anywhere the world, it has translated it, processed it to identify all events, counts, quotes, people, organizations, locations, themes, emotions, relevant imagery, video, and embedded social media posts, placed it into global context, and made all of this available via a live open metadata firehose enabling open research on the planet itself.
+
+      The data was retrieved from Big Query, using the following query:
+
+      WITH events_combined AS (
+        SELECT
+          GLOBALEVENTID event_id,
+          SQLDATE event_date,
+          SourceURL source_url,
+          ARRAY[Actor1CountryCode, Actor2CountryCode] countries
+        FROM `gdelt-bq.gdeltv2.events`
+      ),
+
+      events_unrolled AS (
+        SELECT DISTINCT
+          event_id,
+          event_date,
+          source_url,
+          country
+        FROM events_combined
+        CROSS JOIN UNNEST (countries) country
+      )
+
+      select
+        -- convert 20160517 to 2016
+        CAST(SUBSTR(CAST(event_date AS STRING), 1, 4) AS INT64) year,
+        country,
+        count(*) num_events
+      from events_unrolled
+      group by year, country
+    date_published: "2024"
+    version_producer: 2.0
+
+    # Citation
+    producer: GDELT
+    citation_full: |-
+      Leetaru, K. (2015). GDELT 2.0: Global Dataset of Events, Location, and Tone, 1979-2015. Retrieved from https://blog.gdeltproject.org/gdelt-2-0-our-global-world-in-realtime/, via Big Query.
+
+    # Files
+    url_main: https://blog.gdeltproject.org/gdelt-2-0-our-global-world-in-realtime/
+    date_accessed: 2024-05-23
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.gdeltproject.org/about.html#termsofuse
+
+outs:
+  - md5: 8b478c7acc95960e98c565fcb665adb6
+    size: 56609
+    path: gdelt_v2.csv

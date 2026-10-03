@@ -1,0 +1,244 @@
+"""Cached functions.
+
+For DB-related ones, the pattern can be a bit confusing:
+- apps.wizard.utils.cached makes use of etl.grapher.io
+- etl.grapher.io makes use of etl.grapher.model
+"""
+
+import json
+import logging
+import subprocess
+from typing import Any
+
+import pandas as pd
+import streamlit as st
+import structlog
+from owid.catalog import Client
+from sqlalchemy.orm import Session
+
+import etl.grapher.model as gm
+from apps.utils.map_datasets import get_grapher_changes
+from etl.config import ENV_GRAPHER_USER_ID, OWID_ENV, OWIDEnv
+from etl.db import get_engine
+from etl.git_helpers import get_changed_files
+from etl.grapher import io as gio
+from etl.grapher.model import Variable
+from etl.version_tracker import VersionTracker
+
+log = structlog.get_logger()
+
+# silence WARNING streamlit.runtime.caching.cache_data_api: No runtime found, using MemoryCacheStorageManager
+logging.getLogger("streamlit.runtime.caching.cache_data_api").setLevel(logging.ERROR)
+
+
+@st.cache_data
+def load_entity_ids(entity_ids: list[int] | None = None):
+    return gio.load_entity_mapping(entity_ids)
+
+
+@st.cache_data(show_spinner=False)
+def execute_bash_command(cmd):
+    """Execute a command and get its output."""
+    try:
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True, shell=True)
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        return e.stderr
+
+
+@st.cache_data
+def load_variables_display_in_dataset(
+    dataset_uri: list[str] | None = None,
+    dataset_id: list[int] | None = None,
+    only_slug: bool | None = False,
+    _owid_env: OWIDEnv = OWID_ENV,
+) -> dict[int, str]:
+    """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
+    indicators = gio.load_variables_in_dataset(
+        dataset_uri=dataset_uri,
+        dataset_id=dataset_id,
+        owid_env=_owid_env,
+    )
+
+    def _display_slug(o) -> str:
+        if only_slug:
+            return o.catalog_path.table_variable or ""
+        return o.catalogPath or ""
+
+    indicators_display = {i.id: _display_slug(i) for i in indicators}
+
+    return indicators_display
+
+
+@st.cache_data
+def load_dataset_uris() -> list[str]:
+    return gio.load_dataset_uris()
+
+
+@st.cache_data
+def indicators_used_in_charts(indicator_ids: list[int]) -> list[int]:
+    return gio.filter_indicators_used_in_charts(indicator_ids)
+
+
+@st.cache_data
+def load_variables_in_dataset(
+    dataset_uri: list[str] | None = None,
+    dataset_id: list[int] | None = None,
+    _owid_env: OWIDEnv = OWID_ENV,
+) -> list[Variable]:
+    """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
+    return gio.load_variables_in_dataset(
+        dataset_uri=dataset_uri,
+        dataset_id=dataset_id,
+        owid_env=_owid_env,
+    )
+
+
+@st.cache_data
+def load_variable_metadata(
+    catalog_path: str | None = None,
+    variable_id: int | None = None,
+    variable: Variable | None = None,
+    _owid_env: OWIDEnv = OWID_ENV,
+) -> dict[str, Any]:
+    return gio.load_variable_metadata(
+        catalog_path=catalog_path,
+        variable_id=variable_id,
+        variable=variable,
+        owid_env=_owid_env,
+    )
+
+
+@st.cache_data
+def load_variable_data(
+    catalog_path: str | None = None,
+    variable_id: int | None = None,
+    variable: Variable | None = None,
+    _owid_env: OWIDEnv = OWID_ENV,
+) -> pd.DataFrame:
+    return gio.load_variable_data(
+        catalog_path=catalog_path,
+        variable_id=variable_id,
+        variable=variable,
+        owid_env=_owid_env,
+    )
+
+
+@st.cache_data(show_spinner=False)
+def get_datasets_from_version_tracker() -> tuple[pd.DataFrame, list[dict[str, Any]]]:
+    """Get dataset info from version tracker (ETL)."""
+    # Get steps_df
+    vt = VersionTracker()
+    assert vt.connect_to_db, "Can't connect to database! You need to be connected to run this tool."
+    steps_df = vt.steps_df
+
+    # Get file changes -> Infer dataset migrations
+    files_changed = get_changed_files()
+    grapher_changes = get_grapher_changes(files_changed, steps_df)
+
+    # Only keep grapher steps
+    steps_df_grapher = steps_df.loc[
+        steps_df["channel"] == "grapher", ["namespace", "identifier", "step", "db_dataset_name", "db_dataset_id"]
+    ]
+    # Remove unneeded text from 'step' (e.g. '*/grapher/'), no need for fuzzymatch!
+    steps_df_grapher["step_reduced"] = steps_df_grapher["step"].str.split("grapher/").str[-1]
+
+    # Keep only those that are in DB (we need them to be in DB, otherwise indicator upgrade won't work since charts wouldn't be able to reference to non-db-existing indicator IDs)
+    steps_df_grapher = steps_df_grapher.dropna(subset="db_dataset_id")
+    assert steps_df_grapher.isna().sum().sum() == 0
+    # Column rename
+    steps_df_grapher = steps_df_grapher.rename(
+        columns={
+            "db_dataset_name": "name",
+            "db_dataset_id": "id",
+        }
+    )
+    return steps_df_grapher, grapher_changes
+
+
+@st.cache_data(show_spinner=False)
+def load_latest_population():
+    candidates = Client().tables.search(table="population", namespace="demography", dataset="population")
+
+    # Pick highest version available
+    population = candidates.latest(by="version").fetch()
+
+    population = population.reset_index()[["country", "year", "population"]].rename(
+        columns={"country": "entity_name"}, errors="raise"
+    )
+
+    return population
+
+
+@st.cache_data
+def get_tailscale_ip_to_user_map():
+    """Get the mapping of Tailscale IPs to github usernames."""
+    proc = subprocess.run(["tailscale", "status", "--json"], capture_output=True, text=True)
+
+    if proc.returncode != 0:
+        log.warning(f"Error getting Tailscale status: {proc.stderr}")
+        return {}
+
+    status = json.loads(proc.stdout)
+    ip_to_user = {}
+
+    # Map user IDs to display names
+    user_id_to_name = {}
+    for user_id, user_info in status.get("User", {}).items():
+        if "LoginName" in user_info:
+            user_id_to_name[int(user_id)] = user_info["LoginName"]
+
+    # Map IPs to user display names
+    for peer in status.get("Peer", {}).values():
+        user_id = peer.get("UserID")
+        login_name = user_id_to_name.get(user_id)
+        if login_name:
+            for ip in peer.get("TailscaleIPs", []):
+                ip_to_user[ip] = login_name
+
+    return ip_to_user
+
+
+########################################################################
+# TODO: Functions below do not use CACHE, and should be moved elsewhere
+########################################################################
+def get_grapher_user_from_ip(user_ip: str | None = None) -> gm.User:
+    """Get the Grapher user associated with the given Tailscale IP address.
+
+    If no IP is given, it'll try to extract it from the header context.
+    """
+    # Get ip if none is given
+    if user_ip is None:
+        user_ip = st.context.headers.get("X-Forwarded-For")
+
+    # Get Tailscale IP-to-User mapping
+    ip_to_user_map = get_tailscale_ip_to_user_map()
+
+    # Get the Tailscale display name / github username associated with the client's IP address
+    github_username = ip_to_user_map.get(user_ip)
+
+    if not github_username:
+        raise ValueError(f"No Github username found for IP address {user_ip}")
+
+    with Session(get_engine()) as session:
+        return gm.User.load_user(session, github_username=github_username)
+
+
+def get_grapher_user_from_env() -> gm.User:
+    """Get the Grapher user based on the environment variable.
+
+    This function is typically used when working in localhost.
+    """
+    # Use local env variable if user_ip is not provided (when on localhost)
+    with Session(get_engine()) as session:
+        assert ENV_GRAPHER_USER_ID, "GRAPHER_USER_ID is not set!"
+        return gm.User.load_user(session, id=int(ENV_GRAPHER_USER_ID))
+
+
+def get_grapher_user() -> gm.User:
+    """Get the Grapher user based on IP if working on staging server or from env
+    if working locally."""
+    if OWID_ENV.env_local == "dev":
+        return get_grapher_user_from_env()
+    else:
+        return get_grapher_user_from_ip()

@@ -1,0 +1,23 @@
+meta:
+  namespace: artificial_intelligence
+  short_name: papers_with_code_language
+  name: Multi-task Language Understanding (Papers With Code, 2023)
+  version: '2023-06-14'
+  publication_year: 2023
+  source_name: Papers With Code (2023)
+  source_published_by: Papers With Code
+  url: https://paperswithcode.com/sota/multi-task-language-understanding-on-mmlu
+  source_data_url: https://paperswithcode.com/sota/multi-task-language-understanding-on-mmlu
+  file_extension: html
+  license_url: https://creativecommons.org/licenses/by-sa/4.0/
+  license_name: CC BY-SA 4.0
+  date_accessed: 2023-06-14
+  is_public: true
+  description: |-
+    MMLU (Massive Multitask Language Understanding) is a new benchmark designed to measure knowledge acquired during pretraining by evaluating models exclusively in zero-shot and few-shot settings. This makes the benchmark more challenging and more similar to how we evaluate humans. The benchmark covers 57 subjects across STEM, the humanities, the social sciences, and more. It ranges in difficulty from an elementary level to an advanced professional level, and it tests both world knowledge and problem solving ability. Subjects range from traditional areas, such as mathematics and history, to more specialized areas like law and ethics. The granularity and breadth of the subjects makes the benchmark ideal for identifying a model’s blind spots.
+
+wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
+outs:
+- md5: 107778828abeda9a7480553ff432f23c
+  size: 125529
+  path: papers_with_code_language.html

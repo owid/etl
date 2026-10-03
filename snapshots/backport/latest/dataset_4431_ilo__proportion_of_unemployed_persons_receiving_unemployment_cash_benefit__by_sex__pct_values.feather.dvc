@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4431
+    date_accessed: 2023-08-10 14:44:12.067314
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: '[ILO] Proportion of unemployed persons receiving unemployment cash benefit,
+    by sex (%)'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5eb29f45c9c0684869b68ba0726f0175
+  size: 14066
+  path: 
+    dataset_4431_ilo__proportion_of_unemployed_persons_receiving_unemployment_cash_benefit__by_sex__pct_values.feather

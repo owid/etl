@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3903
+    date_accessed: 2023-08-16 08:20:49.768664
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Diabetes mellitus type 1
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2084ce4dec5258356ab5f75731de50da
+  size: 2012042
+  path: dataset_3903_diabetes_mellitus_type_1_values.feather

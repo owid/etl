@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2187
+    date_accessed: 2023-08-14 15:12:46.926955
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Inflammatory bowel disease
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c1acd58c6992f82a4986ddf74ebbffcb
+  size: 2116402
+  path: dataset_2187_inflammatory_bowel_disease_values.feather

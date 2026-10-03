@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2522
+    date_accessed: 2023-08-10 08:37:04.679425
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Sanitation
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8d9fde24184a79c9ed30d1eefd3e75fb
+  size: 1171594
+  path: dataset_2522_sanitation_values.feather

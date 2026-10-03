@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3073
+    date_accessed: 2023-08-16 10:43:24.604280
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: V-Dem Dataset Version 8 - V-Dem Institute
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c2ba76b21c217499f9525b7dfb04b6f1
+  size: 39959410
+  path: dataset_3073_v_dem_dataset_version_8__v_dem_institute_values.feather

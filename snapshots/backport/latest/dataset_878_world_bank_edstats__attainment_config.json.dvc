@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/878
+    date_accessed: 2023-08-16 09:35:55.479767
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_878_world_bank_edstats__attainment (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dec2cda8fd3a7560f8f7ba9522eada79
+  size: 1266395
+  path: dataset_878_world_bank_edstats__attainment_config.json

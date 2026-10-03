@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2603
+    date_accessed: 2023-08-10 14:38:10.141267
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2603_labour__strictness_of_employment_protection__temporary_contracts
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6617e9fc13c40b489945c00ae163db94
+  size: 3188
+  path: 
+    dataset_2603_labour__strictness_of_employment_protection__temporary_contracts_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1736
+    date_accessed: 2023-08-14 15:50:07.994061
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Dysthymia
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cddd03d282bce59d5f8b4510443e596e
+  size: 1011338
+  path: dataset_1736_dysthymia_values.feather

@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4524
+    date_accessed: 2023-08-14 05:40:35.674702
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4524_domestic_material_consumption_per_capita__by_type_of_raw_material__tonnes
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 58460650d5377e518a96f15aa5df8121
+  size: 37312
+  path: 
+    dataset_4524_domestic_material_consumption_per_capita__by_type_of_raw_material__tonnes_config.json

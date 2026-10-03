@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2030
+    date_accessed: 2023-08-16 10:35:32.211586
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Under-five mortality rate
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8f42bc89440c92486f89cc39eaf634b8
+  size: 49306
+  path: dataset_2030_under_five_mortality_rate_values.feather

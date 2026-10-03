@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1955
+    date_accessed: 2023-08-16 08:16:45.991153
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1955_fixed_internet_broadband_subscriptions_per_100_inhabitants__by_speed
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a1d5ad548e138e63ce589f00f0f29c48
+  size: 9325
+  path: 
+    dataset_1955_fixed_internet_broadband_subscriptions_per_100_inhabitants__by_speed_config.json

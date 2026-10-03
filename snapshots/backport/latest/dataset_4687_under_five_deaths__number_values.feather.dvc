@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4687
+    date_accessed: 2023-08-14 15:55:58.092328
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Under-five deaths (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2d6b5cdf4ca31a0cf9f9a97d3da0b995
+  size: 54962
+  path: dataset_4687_under_five_deaths__number_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1074
+    date_accessed: 2023-08-14 05:57:46.269608
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank Poverty and Equity database - Health: Population: Structure'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b6d16fa7fee47b792264b377a252638d
+  size: 58562
+  path: 
+    dataset_1074_world_bank_poverty_and_equity_database__health__population__structure_values.feather

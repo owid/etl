@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2189
+    date_accessed: 2023-08-14 15:06:23.386657
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2189_gallbladder_and_biliary_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7589662c7796f25aa328eac1a73f5ba1
+  size: 33208
+  path: dataset_2189_gallbladder_and_biliary_diseases_config.json

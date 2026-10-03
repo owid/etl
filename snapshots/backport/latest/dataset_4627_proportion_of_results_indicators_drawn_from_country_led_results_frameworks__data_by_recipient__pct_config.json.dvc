@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4627
+    date_accessed: 2023-08-11 07:43:20.342262
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4627_proportion_of_results_indicators_drawn_from_country_led_results_frameworks__data_by_recipient__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9d8b6dc615a64c773e9dcda95520be02
+  size: 15919
+  path: 
+    dataset_4627_proportion_of_results_indicators_drawn_from_country_led_results_frameworks__data_by_recipient__pct_config.json

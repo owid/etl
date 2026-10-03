@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/913
+    date_accessed: 2023-08-14 15:12:58.255440
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank EdStats - Post-Secondary/Non-Tertiary
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c2a10e8c7b299206a80cab2f938980f5
+  size: 134714
+  path: dataset_913_world_bank_edstats__post_secondary_non_tertiary_values.feather

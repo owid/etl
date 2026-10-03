@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The development of income distribution and income poverty in the old federal states from 1962 to 1988
+    description: |-
+      Gini coefficient for disposable household income in West Germany from 1962 to 1988
+    date_published: "1997"
+
+    # Citation
+    producer: Becker
+    citation_full: |-
+      - Becker, I. (1997). Die Entwicklung der Einkommensverteilung und der Einkommensarmut in den alten Bundesländern von 1962 bis 1988 [The development of income distribution and income poverty in the old federal states between 1962 and 1988] in Becker, I. and Hauser, R., editors, Einkommensverteilung und Armut : Deutschland auf dem Weg zur Vierfünftel-Gessellschaft? [Income distribution and poverty: Is Germany on the way to a four-fifths society?], Campus, Frankfurt.
+      - Hauser, R. and Becker, I. (2001). Einkommensverteilung im Querschnitt und im Zeitverlauf 1973-1998 [Income distribution in cross-section and over time 1973-1998], Bundesministerium für Arbeit und Sozialordnung, Bonn.
+    attribution: Becker (1997); Hauser and Becker (2001)
+
+    # Files
+    url_main: https://cir.nii.ac.jp/crid/1130282270435391616
+    date_accessed: 2024-08-19
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://cir.nii.ac.jp/crid/1130282270435391616
+
+outs:
+  - md5: 44738a11f786805bccb7d5c816333d63
+    size: 111
+    path: becker_1997_germany.csv

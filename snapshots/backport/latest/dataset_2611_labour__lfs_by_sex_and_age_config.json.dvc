@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2611
+    date_accessed: 2023-08-14 16:11:16.823792
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2611_labour__lfs_by_sex_and_age (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a4b13abc3ac11b50a032190fd40acd7f
+  size: 268466
+  path: dataset_2611_labour__lfs_by_sex_and_age_config.json

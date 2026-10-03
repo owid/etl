@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/560
+    date_accessed: 2023-08-14 16:00:11.833256
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Development Indicators - Social Protection & Labor
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 709f7b6dea5a4bab3925c50f84437dd8
+  size: 2933898
+  path: 
+    dataset_560_world_development_indicators__social_protection__and__labor_values.feather

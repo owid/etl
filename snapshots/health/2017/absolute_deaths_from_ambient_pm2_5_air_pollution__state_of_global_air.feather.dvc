@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: Health Effects Institute
+    title: State of Global Air 2017
+    description: Absolute number of deaths per year from ambient particulate matter air pollution.
+    citation_full: Health Effects Institute (2017). State of Global Air 2017.
+    url_main: https://www.stateofglobalair.org
+    date_accessed: '2017-04-07'
+    date_published: '2017'
+outs:
+  - md5: 6064ae893a597f84369d54230e5785a1
+    size: 9234
+    path: absolute_deaths_from_ambient_pm2_5_air_pollution__state_of_global_air.feather

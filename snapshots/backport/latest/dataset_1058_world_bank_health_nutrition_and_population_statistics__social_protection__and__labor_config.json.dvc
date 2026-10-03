@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1058
+    date_accessed: 2023-08-16 08:03:02.564422
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1058_world_bank_health_nutrition_and_population_statistics__social_protection__and__labor
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 750a036239c17e3fb2f99c9c8de7a18c
+  size: 29456
+  path: 
+    dataset_1058_world_bank_health_nutrition_and_population_statistics__social_protection__and__labor_config.json

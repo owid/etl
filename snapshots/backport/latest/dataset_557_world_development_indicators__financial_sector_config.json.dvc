@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/557
+    date_accessed: 2023-08-10 14:32:04.667932
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_557_world_development_indicators__financial_sector
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 125c89e741e7727ba8a682e60df39cca
+  size: 137872
+  path: dataset_557_world_development_indicators__financial_sector_config.json

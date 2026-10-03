@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/1031
+    date_accessed: 2026-03-05 11:02:11.505597+00:00
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1031_genuine_saving_estimates_by_various_measures__blum__ducoing__mclaughlin__2017
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: b5ee4634c4f4b12d23beda09d56da077
+    size: 6652
+    path: dataset_1031_genuine_saving_estimates_by_various_measures__blum__ducoing__mclaughlin__2017_config.json

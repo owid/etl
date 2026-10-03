@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1879
+    date_accessed: 2023-08-10 09:46:27.275941
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1879_education_data_deprivation__gem_report__2017_18__uis__2017
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 23bc3b798422f93e0500fbf086d2dfaf
+  size: 4447
+  path: 
+    dataset_1879_education_data_deprivation__gem_report__2017_18__uis__2017_config.json

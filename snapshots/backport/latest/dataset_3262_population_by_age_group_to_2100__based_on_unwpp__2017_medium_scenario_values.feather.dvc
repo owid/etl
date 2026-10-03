@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3262
+    date_accessed: 2023-08-14 16:08:05.916994
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Population by age group to 2100 (based on UNWPP, 2017 medium scenario)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cd36026219907df1966c8344699dc448
+  size: 1445850
+  path: 
+    dataset_3262_population_by_age_group_to_2100__based_on_unwpp__2017_medium_scenario_values.feather

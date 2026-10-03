@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4655
+    date_accessed: 2023-08-16 08:35:38.755762
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Debt service as a proportion of exports of goods and services (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 27e57347fc47cc823370bf0658043b7c
+  size: 36146
+  path: 
+    dataset_4655_debt_service_as_a_proportion_of_exports_of_goods_and_services__pct_values.feather

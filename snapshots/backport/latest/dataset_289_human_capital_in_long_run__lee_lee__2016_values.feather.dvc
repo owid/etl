@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/289
+    date_accessed: 2023-08-10 08:26:44.987224
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Human Capital in Long-Run - Lee-Lee (2016)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6297d7f6f0df673ddfb2be4c22091786
+  size: 120522
+  path: dataset_289_human_capital_in_long_run__lee_lee__2016_values.feather

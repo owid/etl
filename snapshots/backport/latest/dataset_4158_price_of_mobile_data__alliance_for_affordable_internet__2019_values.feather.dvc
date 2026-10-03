@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4158
+    date_accessed: 2023-08-14 14:46:03.140387
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Price of mobile data - Alliance for Affordable Internet (2019)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 61ac53edfc1f5036a01f1ca5c2381825
+  size: 7618
+  path: 
+    dataset_4158_price_of_mobile_data__alliance_for_affordable_internet__2019_values.feather

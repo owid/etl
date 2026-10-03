@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1650
+    date_accessed: 2023-08-16 08:27:01.039482
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Chronic lymphoid leukemia
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 166e70b6c657209ba4af5e0fd38cc60e
+  size: 1389890
+  path: dataset_1650_chronic_lymphoid_leukemia_values.feather

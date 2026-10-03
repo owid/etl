@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1467
+    date_accessed: 2023-08-16 10:02:54.417911
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: HIV/AIDS
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6fffe73aaea4d74a72ba9661f467136a
+  size: 2012034
+  path: dataset_1467_hiv_aids_values.feather

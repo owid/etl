@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1088
+    date_accessed: 2023-08-16 08:50:05.033947
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank The Atlas of Social Protection: Indicators of Resilience and Equity
+    - Country context'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 62cb4bf4ede76a90e2183006f96c64e7
+  size: 876994
+  path: 
+    dataset_1088_world_bank_the_atlas_of_social_protection__indicators_of_resilience_and_equity__country_context_values.feather

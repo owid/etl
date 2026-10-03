@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/236
+    date_accessed: 2023-08-16 09:38:46.958324
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Bourguignon and Morrison (2002) and World Bank (PovcalNet) (2015)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 561d552d15a83e1f8f3eac4663470b74
+  size: 6618
+  path: 
+    dataset_236_bourguignon_and_morrison__2002__and_world_bank__povcalnet__2015_values.feather

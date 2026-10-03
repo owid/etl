@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Trust questions in the Arab Barometer dataset
+    description: |-
+      Arab Barometer gives voice to the opinions and concerns of ordinary citizens across the Arab world. It is the first and largest project of its kind: their surveys have been conducted one or more times in Algeria, Bahrain, Egypt, Iraq, Jordan, Kuwait, Lebanon, Libya, Morocco, Palestine, Saudi Arabia, Sudan, Tunisia, Qatar, and Yemen.
+    date_published: 2022
+
+    # Citation
+    producer: Arab Barometer
+    citation_full: |-
+      'Arab Barometer (2022). Data downloads: Stata files 2009-2022. Retrieved 07-08-2023 from https://www.arabbarometer.org/survey-data/data-downloads/'
+
+    # Files
+    url_main: https://www.arabbarometer.org/
+    date_accessed: 2023-08-09
+
+    # License
+    license:
+      name: Reprints, Permissions & Use Policy
+      url: https://www.arabbarometer.org/policies/
+
+wdir: ../../../data/snapshots/survey/2023-08-09
+outs:
+- md5: 207137b862850522789e0a18205dd4f9
+  size: 1255
+  path: arab_barometer_trust.csv

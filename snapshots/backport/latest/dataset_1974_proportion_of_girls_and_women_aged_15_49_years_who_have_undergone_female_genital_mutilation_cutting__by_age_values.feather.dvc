@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1974
+    date_accessed: 2023-08-10 14:58:26.209241
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of girls and women aged 15-49 years who have undergone female genital
+    mutilation/cutting, by age
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c562c92bfcf8a0a8b3d16f649ec2bf2c
+  size: 7818
+  path: 
+    dataset_1974_proportion_of_girls_and_women_aged_15_49_years_who_have_undergone_female_genital_mutilation_cutting__by_age_values.feather

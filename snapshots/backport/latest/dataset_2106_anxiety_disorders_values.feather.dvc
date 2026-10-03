@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2106
+    date_accessed: 2023-08-14 14:55:10.460826
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Anxiety disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0adbd85f2a5c7149ac95502b5218c3e0
+  size: 2116394
+  path: dataset_2106_anxiety_disorders_values.feather

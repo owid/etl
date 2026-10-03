@@ -1,0 +1,992 @@
+,0
+0,% age 15+
+1,% age 15+
+2,% age 15+
+3,% age 15+
+4,% age 15+
+5,% age 15+
+6,% age 15+
+7,% age 15+
+8,% age 15+
+9,% age 15+
+10,% age 15+
+11,% age 15+
+12,% age 15+
+13,% age 15+
+14,% age 15+
+15,% age 15+
+16,% age 15+
+17,% age 15+
+18,% age 15+
+19,% age 15+
+20,% age 15+
+21,% age 15+
+22,% age 15+
+23,% age 15+
+24,% age 15+
+25,% age 15+
+26,% age 15+
+27,% age 15+
+28,% age 15+
+29,% age 15+
+30,% age 15+
+31,% age 15+
+32,% age 15+
+33,% age 15+
+34,% age 15+
+35,% age 15+
+36,% age 15+
+37,% age 15+
+38,% age 15+
+39,% age 15+
+40,% age 15+
+41,% age 15+
+42,% age 15+
+43,% age 15+
+44,% age 15+
+45,% age 15+
+46,% age 15+
+47,% age 15+
+48,% age 15+
+49,% age 15+
+50,% age 15+
+51,% age 15+
+52,% age 15+
+53,% age 15+
+54,% age 15+
+55,% age 15+
+56,% age 15+
+57,% age 15+
+58,% age 15+
+59,% age 15+
+60,% age 15+
+61,% age 15+
+62,% age 15+
+63,% age 15+
+64,% age 15+
+65,% age 15+
+66,% age 15+
+67,% age 15+
+68,% age 15+
+69,"% able to raise funds, age 15+"
+70,"% able to raise funds, age 15+"
+71,"% able to raise funds, age 15+"
+72,"% able to raise funds, age 15+"
+73,"% able to raise funds, age 15+"
+74,"% able to raise funds, age 15+"
+75,"% able to raise funds, age 15+"
+76,"% able to raise funds, age 15+"
+77,"% able to raise funds, age 15+"
+78,"% able to raise funds, age 15+"
+79,"% able to raise funds, age 15+"
+80,"% able to raise funds, age 15+"
+81,"% able to raise funds, age 15+"
+82,"% able to raise funds, age 15+"
+83,"% able to raise funds, age 15+"
+84,"% able to raise funds, age 15+"
+85,"% able to raise funds, age 15+"
+86,"% able to raise funds, age 15+"
+87,% age 15+
+88,% age 15+
+89,% age 15+
+90,% age 15+
+91,% age 15+
+92,% age 15+
+93,% age 15+
+94,% age 15+
+95,% age 15+
+96,% age 15+
+97,% age 15+
+98,% age 15+
+99,% age 15+
+100,% age 15+
+101,% age 15+
+102,% age 15+
+103,% age 15+
+104,% age 15+
+105,% age 15+
+106,% age 15+
+107,% age 15+
+108,% age 15+
+109,% age 15+
+110,"% with an account, age 15+"
+111,% age 15+
+112,% age 15+
+113,% age 15+
+114,% age 15+
+115,% age 15+
+116,% age 15+
+117,% age 15+
+118,% age 15+
+119,% age 15+
+120,% age 15+
+121,% age 15+
+122,% age 15+
+123,annual %
+124,% of population ages 15+
+125,% of population ages 15+
+126,% of population ages 15+
+127,% age 15+
+128,% age 15+
+129,% age 15+
+130,% age 15+
+131,% age 15+
+132,% age 15+
+133,% age 15+
+134,% age 15+
+135,% age 15+
+136,
+137,
+138,
+139,years
+140,years
+141,years
+142,
+143,
+144,
+145,
+146,
+147,
+148,
+149,
+150,
+151,
+152,
+153,
+154,
+155,
+156,
+157,
+158,
+159,
+160,
+161,
+162,
+163,% of firms
+164,% of firms
+165,% of GNI per capita
+166,% of GNI per capita
+167,% of GNI per capita
+168,days
+169,days
+170,days
+171,
+172,
+173,
+174,
+175,% of total directors
+176,
+177,% of total directors
+178,
+179,% of total business owners
+180,
+181,% of total business owners
+182,
+183,% of sole proprietors
+184,
+185,% of sole proprietors
+186,% age 15+
+187,% age 15+
+188,% age 15+
+189,current US$
+190,annual %
+191,current US$
+192,constant 2015 US$
+193,current US$
+194,current US$
+195,current international $
+196,% of females ages 15-24
+197,
+198,% of males ages 15-24
+199,% of people ages 15-24
+200,% of females ages 15 and above
+201,% of males ages 15 and above
+202,% of people ages 15 and above
+203,
+204,
+205,
+206,
+207,%
+208,%
+209,%
+210,%
+211,%
+212,%
+213,%
+214,%
+215,% gross
+216,% gross
+217,% gross
+218,
+219,
+220,
+221,% of relevant age group
+222,% of relevant age group
+223,% of relevant age group
+224,%
+225,%
+226,%
+227,% female
+228,% gross
+229,% gross
+230,% gross
+231,% of relevant age group
+232,% net
+233,% net
+234,% net
+235,% of official school-age population
+236,% of official school-age population
+237,% of official school-age population
+238,% of cohort
+239,% of cohort
+240,% female
+241,% of primary school age children
+242,% of primary school age children
+243,% of primary school age children
+244,
+245,
+246,
+247,% of primary school age
+248,years
+249,years
+250,years
+251,% of relevant age group
+252,% of relevant age group
+253,% of relevant age group
+254,%
+255,%
+256,%
+257,%
+258,%
+259,%
+260,%
+261,%
+262,%
+263,% of total secondary enrolment
+264,% female
+265,%
+266,
+267,% female
+268,% of total secondary enrolment
+269,% gross
+270,% gross
+271,% gross
+272,% net
+273,% net
+274,% net
+275,%
+276,%
+277,%
+278,% female
+279,%
+280,%
+281,%
+282,%
+283,%
+284,%
+285,%
+286,%
+287,%
+288,%
+289,%
+290,%
+291,%
+292,%
+293,%
+294,% gross
+295,% gross
+296,% gross
+297,%
+298,%
+299,%
+300,%
+301,%
+302,%
+303,%
+304,%
+305,%
+306,%
+307,% female
+308,% of GDP per capita
+309,% of GDP per capita
+310,% of GDP
+311,
+312,
+313,
+314,
+315,
+316,
+317,
+318,
+319,
+320,
+321,
+322,
+323,
+324,% of households
+325,% of households
+326,% of households
+327,% of households
+328,% of households
+329,% of households
+330,% of households
+331,% of households
+332,% of households
+333,% of households
+334,% of households
+335,
+336,% of women age 15-49
+337,% of women age 15-49
+338,% of women age 15-49
+339,% of women age 15-49
+340,% of women age 15-49
+341,% of women age 15-49
+342,% of women age 15-49
+343,% of women age 15-49
+344,% of women age 15-49
+345,% of women age 15-49
+346,% of women age 15-49
+347,% of women age 15-49
+348,% of women age 15-49
+349,% of women age 15-49
+350,% of women age 15-49
+351,% of women age 15-49
+352,% of women age 15-49
+353,% of women age 15-49
+354,% of women age 15-49
+355,% of women age 15-49
+356,% of women age 15-49
+357,% of women age 15-49
+358,% of women age 15-49
+359,
+360,
+361,%
+362,%
+363,% of total
+364,
+365,%
+366,%
+367,%
+368,
+369,
+370,
+371,
+372,
+373,
+374,
+375,
+376,
+377,
+378,
+379,
+380,
+381,
+382,
+383,
+384,
+385,
+386,
+387,
+388,
+389,
+390,
+391,% of women and girls ages 15-49 living in rural areas who had a menstrual period within the last year
+392,% of women and girls ages 15-49 living in urban areas who had a menstrual period within the last year
+393,% of women and girls ages 15-49 who had a menstrual period within the last year
+394,% of women and girls ages 15-49 living in rural areas who had a menstrual period within the last year
+395,% of women and girls ages 15-49 living in urban areas who had a menstrual period within the last year
+396,% of women and girls ages 15-49 who had a menstrual period within the last year
+397,% of women and girls ages 15-49 living in rural areas who had a menstrual period within the last year
+398,% of women and girls ages 15-49 living in urban areas who had a menstrual period within the last year
+399,% of women and girls ages 15-49 who had a menstrual period within the last year
+400,
+401,
+402,
+403,% of women age 15-49
+404,% of women age 15-49
+405,% of women age 15-49
+406,% of women age 15-49
+407,% of women age 15-49
+408,% of women age 15-49
+409,% of men
+410,% of men
+411,% of men
+412,% of men
+413,% of men
+414,% of men
+415,% of women age 15-49
+416,% of women age 15-49
+417,% of women age 15-49
+418,% of women age 15-49
+419,% of women age 15-49
+420,% of women age 15-49
+421,% of men
+422,% of men
+423,% of men
+424,% of men
+425,% of men
+426,% of men
+427,% of women age 15-49
+428,% of women age 15-49
+429,% of women age 15-49
+430,% of women age 15-49
+431,% of women age 15-49
+432,% of women age 15-49
+433,% of men
+434,% of men
+435,% of men
+436,% of men
+437,% of men
+438,% of men
+439,% of women age 15-49
+440,% of women age 15-49
+441,% of women age 15-49
+442,% of women age 15-49
+443,% of women age 15-49
+444,% of women age 15-49
+445,% of men
+446,% of men
+447,% of men
+448,% of men
+449,% of men
+450,% of men
+451,% of women age 15-49
+452,% of women age 15-49
+453,% of women age 15-49
+454,% of women age 15-49
+455,% of women age 15-49
+456,% of women age 15-49
+457,% of men
+458,% of men
+459,% of men
+460,% of men
+461,% of men
+462,% of men
+463,% of women age 15-49
+464,% of women age 15-49
+465,% of women age 15-49
+466,% of women age 15-49
+467,% of women age 15-49
+468,% of women age 15-49
+469,% of men
+470,% of men
+471,% of men
+472,% of men
+473,% of men
+474,% of men
+475,% of women age 15-49
+476,% of women age 15-49
+477,% of women age 15-49
+478,% of women age 15-49
+479,% of women age 15-49
+480,% of women age 15-49
+481,% of men
+482,% of men
+483,% of men
+484,% of men
+485,% of men
+486,% of men
+487,% of women age 15-49
+488,% of women age 15-49
+489,% of women age 15-49
+490,% of women age 15-49
+491,% of women age 15-49
+492,% of women age 15-49
+493,% of men
+494,% of men
+495,% of men
+496,% of men
+497,% of men
+498,% of men
+499,
+500,
+501,% of international migrant stock
+502,% of women ages 15+
+503,% of men ages 15+
+504,
+505,%
+506,%
+507,%
+508,%
+509,%
+510,%
+511,%
+512,%
+513,%
+514,%
+515,%
+516,%
+517,%
+518,%
+519,%
+520,%
+521,%
+522,%
+523,%
+524,%
+525,%
+526,%
+527,%
+528,%
+529,%
+530,%
+531,%
+532,%
+533,%
+534,%
+535,%
+536,%
+537,%
+538,%
+539,%
+540,%
+541,% of women ages 20-24
+542,% of men ages 20-24
+543,% of women ages 15-19
+544,% of men ages 15-19
+545,% of 24 hour day
+546,% of 24 hour day
+547,% of ever-partnered women ages 15-49
+548,% of women ages 15-49
+549,%
+550,%
+551,%
+552,%
+553,%
+554,%
+555,%
+556,%
+557,%
+558,%
+559,%
+560,%
+561,%
+562,%
+563,%
+564,%
+565,%
+566,%
+567,% of ever-married women ages 15-49 who have ever experienced any physical or sexual violence
+568,% of ever-married women ages 15-49 who have ever experienced any physical or sexual violence
+569,% of ever-married women ages 15-49
+570,% of ever-married women ages 15-49 who have ever experienced any physical or sexual violence
+571,% of ever-married women ages 15-49
+572,% of ever-married women ages 15-49
+573,% of ever-married women ages 15-49
+574,% of ever-married women ages 15-49
+575,% of ever-married women ages 15-49
+576,% of ever-married women ages 15-49
+577,% of ever-married women ages 15-49
+578,% of ever-married women ages 15-49
+579,% of currently married women age 15-49 who have been married only once
+580,% of currently married women age 15-49 who have been married only once
+581,% of currently married women age 15-49 who have been married only once
+582,% of currently married women age 15-49 who have been married only once
+583,% of currently married women age 15-49 who have been married only once
+584,% of ever-partnered women ages 15-49
+585,%
+586,%
+587,%
+588,%
+589,%
+590,%
+591,%
+592,%
+593,%
+594,%
+595,%
+596,%
+597,%
+598,%
+599,%
+600,%
+601,%
+602,%
+603,% of women ages 15-49
+604,% of women ages 15-49
+605,% of women ages 15-49
+606,liters
+607,liters
+608,liters
+609,% of women ages 15-49
+610,% of women ages 15-49
+611,% ages 15-49
+612,% ages 15-49
+613,% of female population ages 0-4
+614,% of male population ages 0-4
+615,% of population ages 0-4
+616,% of female population ages 5-14
+617,% of male population ages 5-14
+618,% of population ages 5-14
+619,% of female population ages 15-59
+620,% of male population ages 15-59
+621,% of population ages 15-59
+622,% of female population ages 60+
+623,% of male population ages 60+
+624,% of population ages 60+
+625,% of female population
+626,% of male population
+627,% of total
+628,
+629,
+630,
+631,% of female population ages 0-4
+632,% of male population ages 0-4
+633,% of population ages 0-4
+634,% of female population ages 5-14
+635,% of male population ages 5-14
+636,% of population ages 5-14
+637,% of female population ages 15-59
+638,% of male population ages 15-59
+639,% of population ages 15-59
+640,% of female population ages 60+
+641,% of male population ages 60+
+642,% of population ages 60+
+643,% of female population
+644,% of male population
+645,% of total
+646,
+647,
+648,% of female population ages 0-4
+649,% of male population ages 0-4
+650,% of population ages 0-4
+651,% of female population ages 5-14
+652,% of male population ages 5-14
+653,% of population ages 5-14
+654,% of female population ages 15-59
+655,% of male population ages 15-59
+656,% of population ages 15-59
+657,% of female population ages 60+
+658,% of male population ages 60+
+659,% of population ages 60+
+660,% of female population
+661,% of male population
+662,% of total
+663,
+664,%
+665,"per 1,000 live births"
+666,"per 1,000 live births"
+667,"per 1,000 live births"
+668,%
+669,%
+670,%
+671,"per 1,000 total births"
+672,% of births
+673,% of married women with demand for family planning
+674,% of married women with demand for family planning
+675,% of births
+676,% of births
+677,% ages 15-24
+678,
+679,
+680,% ages 15-24
+681,% of adult females living with HIV
+682,% of adult males living with HIV
+683,"per 1,000 uninfected female population ages 15-49"
+684,"per 1,000 uninfected male population ages 15-49"
+685,"per 1,000 uninfected female population ages 15-24"
+686,"per 1,000 uninfected male population ages 15-24"
+687,"per 1,000 uninfected population ages 15-24"
+688,"per 1,000 uninfected population ages 15-49"
+689,
+690,
+691,% of pregnant women living with HIV
+692,% of children ages 12-23 months
+693,% of children ages 12-23 months
+694,% of pregnant women
+695,
+696,days
+697,
+698,
+699,
+700,%
+701,days
+702,
+703,days
+704,days
+705,%
+706,% of women attending antenatal care
+707,% of adults
+708,% of female adults
+709,% of male adults
+710,days
+711,
+712,"per 100,000 female population"
+713,"per 100,000 male population"
+714,"per 100,000 population"
+715,% of pregnant women
+716,%
+717,% of total
+718,% of women ages 15-49 who have heard about FGM
+719,% of men who have heard about FGM
+720,% of women ages 15-49 who have heard about FGM
+721,% of men who have heard about FGM
+722,%
+723,%
+724,%
+725,%
+726,%
+727,%
+728,% of children under 5
+729,% of children under 5
+730,% of children under 5
+731,
+732,
+733,% of female population ages 18+
+734,% of male population ages 18+
+735,% of rural population
+736,% of urban population
+737,% of population
+738,% of female adults
+739,% of male adults
+740,% of adults
+741,% of children under 5
+742,% of children under 5
+743,% of children under 5
+744,"per 100,000 population"
+745,"per 100,000 female population"
+746,"per 100,000 male population"
+747,% of children under 5
+748,% of children under 5
+749,% of children under 5
+750,"per 100,000 female population"
+751,"per 100,000 male population"
+752,"per 100,000 population"
+753,"per 100,000 female population"
+754,"per 100,000 male population"
+755,"per 100,000 population"
+756,"per 100,000 female population"
+757,"per 100,000 male population"
+758,"per 100,000 population"
+759,% of children under 5
+760,% of children under 5
+761,% of children under 5
+762,% of children under 5
+763,% of children under 5
+764,% of children under 5
+765,% of population
+766,
+767,% of population
+768,% of female employment
+769,% of male employment
+770,% of total employment
+771,%
+772,%
+773,%
+774,%
+775,%
+776,%
+777,% of female employment
+778,% of male employment
+779,% of total employment
+780,% of female employment
+781,% of male employment
+782,% of total employment
+783,%
+784,%
+785,%
+786,%
+787,%
+788,%
+789,%
+790,% of employment
+791,% of employment
+792,% of female employment
+793,% of male employment
+794,% of total employment
+795,% of female employment
+796,% of male employment
+797,% of total employment
+798,% of female employment
+799,% of male employment
+800,% of total employment
+801,% of total non-agricultural employment
+802,% of total non-agricultural employment
+803,% of female employment
+804,% of male employment
+805,% of total employment
+806,% of female children ages 7-14
+807,% of male children ages 7-14
+808,% of children ages 7-14
+809,%
+810,%
+811,%
+812,%
+813,%
+814,%
+815,% of female population ages 15-64
+816,% of male population ages 15-64
+817,% of total population ages 15-64
+818,% of female working-age population with advanced education
+819,% of male working-age population with advanced education
+820,% of total working-age population with advanced education
+821,% of female working-age population with basic education
+822,% of male working-age population with basic education
+823,% of total working-age population with basic education
+824,% of female population ages 15+
+825,% of female population ages 15+
+826,%
+827,%
+828,% of male population ages 15+
+829,% of male population ages 15+
+830,% of total population ages 15+
+831,% of total population ages 15+
+832,% of female working-age population with intermediate education
+833,% of male working-age population with intermediate education
+834,% of total working-age population with intermediate education
+835,% of total male employment
+836,% of total part time employment
+837,% of total employment
+838,
+839,% of total labor force
+840,
+841,
+842,% of female labor force ages 15-24
+843,% of female labor force ages 15-24
+844,% ages 15-24
+845,% ages 15-24
+846,% of male labor force ages 15-24
+847,% of male labor force ages 15-24
+848,% of total labor force ages 15-24
+849,% of total labor force ages 15-24
+850,% of female labor force with advanced education
+851,% of male labor force with advanced education
+852,% of total labor force with advanced education
+853,% of female labor force with basic education
+854,% of male labor force with basic education
+855,% of total labor force with basic education
+856,% of female labor force with intermediate education
+857,% of male labor force with intermediate education
+858,% of total labor force with intermediate education
+859,% of female youth population
+860,% of male youth population
+861,% of youth population
+862,% of female labor force
+863,% of female labor force
+864,% of male labor force
+865,% of male labor force
+866,% of total labor force
+867,% of total labor force
+868,
+869,"per 1,000 female adults"
+870,"per 1,000 male adults"
+871,"per 1,000 people"
+872,"per 1,000 people"
+873,% of married women ages 15-49
+874,% of married women ages 15-49
+875,"per 1,000 live births"
+876,"per 1,000 live births"
+877,"per 1,000 live births"
+878,
+879,
+880,
+881,
+882,
+883,
+884,
+885,
+886,% of cohort
+887,% of cohort
+888,
+889,% of households with a female head
+890,% of women ages 20-24
+891,% of women ages 20-24
+892,% of women ages 15-19 who have had children or are currently pregnant
+893,
+894,
+895,
+896,
+897,
+898,% of total population
+899,
+900,
+901,
+902,
+903,
+904,
+905,
+906,
+907,
+908,% of total population
+909,
+910,
+911,
+912,
+913,
+914,
+915,
+916,
+917,
+918,
+919,
+920,
+921,
+922,
+923,
+924,
+925,
+926,
+927,
+928,
+929,
+930,
+931,
+932,% of total population
+933,
+934,
+935,
+936,
+937,
+938,
+939,
+940,
+941,
+942,
+943,
+944,
+945,
+946,
+947,
+948,
+949,
+950,
+951,
+952,% of working-age population
+953,
+954,
+955,% of total population
+956,
+957,%
+958,%
+959,%
+960,% of total
+961,% of total
+962,% of total population
+963,% of total
+964,% of total population
+965,% of total
+966,% of married women ages 15-49
+967,%
+968,%
+969,%
+970,%
+971,%
+972,%
+973,%
+974,%
+975,%
+976,%
+977,%
+978,%
+979,%
+980,%
+981,%
+982,
+983,
+984,
+985,
+986,%
+987,%
+988,"per 100,000 female"
+989,"per 100,000 male"
+990,"per 100,000 people"

@@ -1,0 +1,32 @@
+dataset:
+  owners:
+    - Lucas Rodés-Guirao
+tables:
+  wmd:
+    variables:
+      # entity:
+      #   description: "Country, nation or region name."
+      # time:
+      #   description: "Number of the month or week."
+      # time_unit:
+      #   description: "Time unit can be either 'monthly' or 'weekly', depending on the country."
+      # age:
+      #   description: "Age group. This is always 'all_ages' for this dataset."
+      _2015:
+        description: "The reported number of weekly deaths from all causes for all ages in 2015."
+      _2016:
+        description: "The reported number of weekly deaths from all causes for all ages in 2016."
+      _2017:
+        description: "The reported number of weekly deaths from all causes for all ages in 2017."
+      _2018:
+        description: "The reported number of weekly deaths from all causes for all ages in 2018."
+      _2019:
+        description: "The reported number of weekly deaths from all causes for all ages in 2019."
+      _2020:
+        description: "The reported number of weekly deaths from all causes for all ages in 2020."
+      _2021:
+        description: "The reported number of weekly deaths from all causes for all ages in 2021."
+      _2022:
+        description: "The reported number of weekly deaths from all causes for all ages in 2022."
+      _2023:
+        description: "The reported number of weekly deaths from all causes for all ages in 2023."

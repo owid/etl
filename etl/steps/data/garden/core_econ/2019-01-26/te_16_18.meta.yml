@@ -1,0 +1,22 @@
+dataset:
+  title: TE-16.18
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  te_16_18:
+    variables:
+      industry_share_of_total_employment__pct:
+        title: Industry share of total employment (%)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

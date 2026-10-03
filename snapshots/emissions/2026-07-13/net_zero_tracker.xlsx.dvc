@@ -1,0 +1,21 @@
+meta:
+  origin:
+    producer: Net Zero Tracker
+    title: Net Zero Tracker
+    description: |-
+      The Net Zero Tracker aims to increase transparency and accountability of net zero targets pledged by nations, states and regions, cities and companies. It collects data on targets set and on many factors that indicate the integrity of those targets — essentially, how serious the entity setting the target is about meaningfully cutting its net emissions to zero.
+    citation_full: |-
+      Net Zero Tracker. Energy and Climate Intelligence Unit, Data-Driven EnviroLab, NewClimate Institute, Oxford Net Zero. 2026.
+      John Lang, Camilla Hyslop, Diego Manya, Sybrig Smit, Peter Chalkley, John Bervin Galang, Frances Green, Thomas Hale, Frederic Hans, Nick Hay, Angel Hsu, Takeshi Kuramochi, Steve Smith.
+    attribution_short: Net Zero Tracker
+    url_main: https://zerotracker.net/
+    url_download: https://download.zerotracker.net/csv/current_current-snapshot_2026-07-12_06-40-08.xlsx
+    date_accessed: '2026-07-13'
+    date_published: '2026-07-12'
+    license:
+      name: CC BY-NC 4.0
+      url: https://zerotracker.net/data-terms-of-use
+outs:
+  - md5: 9bb285cd9ff4dde19c0f2d3c3e4a2309
+    size: 3589185
+    path: net_zero_tracker.xlsx

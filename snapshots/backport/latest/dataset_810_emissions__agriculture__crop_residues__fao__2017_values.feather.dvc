@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/810
+    date_accessed: 2023-08-14 15:48:44.183630
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emissions - Agriculture: Crop Residues - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ffb5e75fb8627959462f8c2832a7ff70
+  size: 3525330
+  path: dataset_810_emissions__agriculture__crop_residues__fao__2017_values.feather

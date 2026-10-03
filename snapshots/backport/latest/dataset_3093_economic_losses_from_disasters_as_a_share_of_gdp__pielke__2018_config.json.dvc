@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/3093
+    date_accessed: 2026-03-05 13:26:56.896623+00:00
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3093_economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: 8b21e5e3d4d1be8989ee772dfe1944c1
+    size: 9099
+    path: dataset_3093_economic_losses_from_disasters_as_a_share_of_gdp__pielke__2018_config.json

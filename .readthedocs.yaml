@@ -1,0 +1,15 @@
+version: 2
+
+build:
+  os: ubuntu-24.04
+  tools:
+    python: "3.10"
+  commands:
+    # Install dependencies
+    - pip install -U uv
+    - uv sync --all-extras
+    # Build docs using Makefile target
+    - make docs.build
+    # Move docs to expected location by RTD
+    - mkdir -p _readthedocs
+    - cp -r site/ _readthedocs/html/

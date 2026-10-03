@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2420
+    date_accessed: 2023-08-16 07:26:37.524656
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2420_eating_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 894f70214c59ad7918cd0dab2dd3faf2
+  size: 83685
+  path: dataset_2420_eating_disorders_config.json

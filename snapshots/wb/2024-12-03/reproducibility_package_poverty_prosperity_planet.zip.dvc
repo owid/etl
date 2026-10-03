@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Reproducibility package for Poverty, Prosperity and Planet Report 2024
+    description: |-
+      The World Bank has set a clear mission: ending extreme poverty and boosting shared prosperity on a livable planet. This new edition of the biennial series, previously titled Poverty and Shared Prosperity, assesses the three components of the mission and emphasizes that reducing poverty and increasing shared prosperity must be achieved without high costs to the environment. The current polycrisis—where the multiple crises of slow economic growth, increased fragility, climate risks, and heightened uncertainty have come together at the same time—makes national development strategies and international cooperation difficult. This overview summarizes the progress toward achieving these goals, outlines promising pathways to speed up the progress on multiple fronts, and proposes priorities tailored to countries at various levels of poverty, income, and environmental vulnerability. Offering the first post-COVID-19 (Coronavirus) pandemic assessment of global progress on this interlinked agenda, the report finds that global poverty reduction has resumed but at a pace slower than before the COVID-19 crisis. It also provides evidence that the number of countries with high levels of income inequality has declined considerably during the past two decades, but the pace of improvements in shared prosperity has slowed and that inequality remains high in Latin America and the Caribbean and in Sub-Saharan Africa. The report also finds evidence of countries’ increasing ability to manage natural hazards where there has been progress in poverty reduction and shared prosperity; but in the poorest settings, the report finds that climate risks are significantly higher.
+    date_published: "2024-09-26"
+
+    # Citation
+    producer: Lakner et al.
+    citation_full: |-
+      Lakner, C., Genoni, M. E., Stemmler, H., Yonzan, N., & Tetteh Baah, S. K. (2024). Reproducibility package for Poverty, Prosperity and Planet Report 2024. World Bank. https://doi.org/10.60572/KGE4-CX54
+    attribution: Lakner et al. (2024). Reproducibility package for Poverty, Prosperity and Planet Report 2024
+
+    # Files
+    url_main: https://reproducibility.worldbank.org/index.php/catalog/189/
+    url_download: https://reproducibility.worldbank.org/index.php/catalog/189/download/552/FR_WLD_2024_198.zip
+    date_accessed: 2024-12-03
+
+    # License
+    license:
+      name: Modified BSD3
+      url: https://reproducibility.worldbank.org/index.php/catalog/189/#project_desc_container1674844764972
+
+outs:
+  - md5: 3a942e2ccc863f67d4879250d7468e57
+    size: 91787338
+    path: reproducibility_package_poverty_prosperity_planet.zip

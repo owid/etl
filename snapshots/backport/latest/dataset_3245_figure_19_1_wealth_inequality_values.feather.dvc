@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3245
+    date_accessed: 2023-08-10 09:08:33.416243
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Figure 19.1_Wealth inequality
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c2453da98f2040d97f569431adfa3a78
+  size: 6258
+  path: dataset_3245_figure_19_1_wealth_inequality_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1572
+    date_accessed: 2023-08-14 15:21:55.034595
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1572_motor_vehicle_road_injuries (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 726b4de5b04a0a46b2183dada7f60c4d
+  size: 31922
+  path: dataset_1572_motor_vehicle_road_injuries_config.json

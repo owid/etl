@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1980
+    date_accessed: 2023-08-14 05:55:31.437410
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Neonatal mortality rate
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e8a81dc340bcbe360ec12df76c0a5cbe
+  size: 31642
+  path: dataset_1980_neonatal_mortality_rate_values.feather

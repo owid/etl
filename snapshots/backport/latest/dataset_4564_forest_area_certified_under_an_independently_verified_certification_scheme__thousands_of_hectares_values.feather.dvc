@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4564
+    date_accessed: 2023-08-14 14:35:28.675626
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Forest area certified under an independently verified certification scheme
+    (thousands of hectares)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8e7fedcc0a6aa47a4438d6ad72c94c7a
+  size: 21354
+  path: 
+    dataset_4564_forest_area_certified_under_an_independently_verified_certification_scheme__thousands_of_hectares_values.feather

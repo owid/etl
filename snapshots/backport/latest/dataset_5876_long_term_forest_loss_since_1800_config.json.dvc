@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5876
+    date_accessed: 2023-08-10 09:00:07.684140
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5876_long_term_forest_loss_since_1800
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bb7d880161bb63e3fd2f665587784bfc
+  size: 1450
+  path: dataset_5876_long_term_forest_loss_since_1800_config.json

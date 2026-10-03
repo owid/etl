@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2344
+    date_accessed: 2023-08-16 08:26:39.363988
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Poisonings
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1191a7d966e9ba77606f0ee5e82082c1
+  size: 2116386
+  path: dataset_2344_poisonings_values.feather

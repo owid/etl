@@ -1,0 +1,28 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Inflation, consumer prices (annual %) - United States (2010 = 100)
+    description: |-
+      Inflation as measured by the consumer price index reflects the annual percentage change in the cost to the average consumer of acquiring a basket of goods and services that may be fixed or changed at specified intervals, such as yearly. The Laspeyres formula is generally used.
+    date_published: latest
+
+    # Citation
+    producer: World Bank
+    citation_full: Inflation, consumer prices (World Bank)
+    attribution_short: World Bank
+
+    # Files
+    url_main: https://api.worldbank.org/v2/country/us/indicator/FP.CPI.TOTL?
+    url_download: https://api.worldbank.org/v2/country/us/indicator/FP.CPI.TOTL?
+    date_accessed: 2023-09-19
+
+    # License
+    license:
+      url:
+        https://databank.worldbank.org/reports.aspx?source=2&type=metadata&series=FP.CPI.TOTL.ZG
+      name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
+wdir: ../../../data/snapshots/wb/2023-09-19
+outs:
+- md5: c66f547b69d1bf43fc58d17702244ece
+  size: 1100
+  path: us_cpi.csv

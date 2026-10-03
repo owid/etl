@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4426
+    date_accessed: 2023-08-14 15:49:18.065528
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4426_ilo__proportion_of_poor_population_receiving_social_assistance_cash_benefit__by_sex__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1be6a3722baeecb760cf71eee8cebf48
+  size: 1908
+  path: 
+    dataset_4426_ilo__proportion_of_poor_population_receiving_social_assistance_cash_benefit__by_sex__pct_config.json

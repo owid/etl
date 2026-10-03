@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2199
+    date_accessed: 2023-08-14 15:23:39.415713
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2199_motorcyclist_road_injuries (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9ff0bf404e5fc57e54b5684deacdb535
+  size: 32956
+  path: dataset_2199_motorcyclist_road_injuries_config.json

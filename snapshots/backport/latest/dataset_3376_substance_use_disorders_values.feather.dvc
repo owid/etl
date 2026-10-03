@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3376
+    date_accessed: 2023-08-11 07:44:24.057006
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Substance use disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e393b040e0baa98be476b89fe79880ce
+  size: 4961738
+  path: dataset_3376_substance_use_disorders_values.feather

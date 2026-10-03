@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2299
+    date_accessed: 2023-08-14 05:54:06.093443
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Maternal hypertensive disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c507ef4f6233cece897e80ab98aa9f17
+  size: 1499498
+  path: dataset_2299_maternal_hypertensive_disorders_values.feather

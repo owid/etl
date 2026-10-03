@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2718
+    date_accessed: 2023-08-16 09:58:06.626465
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Delivery points in the US - United States Postal Service (2018)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5553dda05c35f4909133f3b3f154d734
+  size: 7906
+  path: 
+    dataset_2718_delivery_points_in_the_us__united_states_postal_service__2018_values.feather

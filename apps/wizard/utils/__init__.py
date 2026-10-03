@@ -1,0 +1,610 @@
+"""General utils.
+
+TODO: Should probably re-order this file and split it into multiple files.
+    - Ideally we want to leave front-end stuff here.
+    - More backendy stuff should be moved to apps/utils.
+
+    IF a tool here is used by something outside of Wizard domains, then we should place it elsewhere.
+    At the moment, I'm moving things to apps/utils/. But I could see this going elsewhere under etl/.
+
+    Also, can imagine apps/wizard/ being renamed to just wizard/, and stuff other than wizard should be either (i) deleted or (ii) migrated elsewhere in etl/.
+"""
+
+import argparse
+import ast
+import datetime as dt
+import json
+import re
+import sys
+from collections.abc import Callable, Mapping
+from datetime import date
+from functools import cache, wraps
+from pathlib import Path
+from typing import Any, cast
+
+import numpy as np
+import pandas as pd
+import streamlit as st
+from owid.catalog import Dataset
+from sentry_sdk import capture_exception
+from sqlalchemy.orm import Session
+from streamlit.runtime.runtime import Runtime
+from structlog import get_logger
+from typing_extensions import Self
+from wfork_streamlit_profiler import Profiler
+
+from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
+from etl.config import SENTRY_DSN, enable_sentry
+from etl.dag_helpers import load_dag
+from etl.db import read_sql
+from etl.paths import (
+    APPS_DIR,
+    DAG_DIR,
+    LATEST_POPULATION_VERSION,
+    LATEST_REGIONS_VERSION,
+    STEPS_GARDEN_DIR,
+    STEPS_GRAPHER_DIR,
+    STEPS_MEADOW_DIR,
+)
+
+__all__ = [
+    "load_wizard_defaults",
+    "update_wizard_defaults_from_form",
+]
+
+# Logger
+log = get_logger()
+
+# TTL for cached functions
+TTL_DEFAULT = "2h"
+
+# Path to variable configs
+DAG_WIZARD_PATH = DAG_DIR / "wizard.yml"
+
+# Load latest dataset versions
+DATASET_POPULATION_URI = f"data://garden/demography/{LATEST_POPULATION_VERSION}/population"
+DATASET_REGIONS_URI = f"data://garden/regions/{LATEST_REGIONS_VERSION}/regions"
+
+# Date today
+DATE_TODAY = dt.date.today().strftime("%Y-%m-%d")
+
+# Get current directory
+CURRENT_DIR = Path(__file__).parent.parent
+
+# Wizard path
+WIZARD_DIR = APPS_DIR / "wizard"
+
+# Dummy data
+DUMMY_DATA = {
+    "namespace": "dummy",
+    "short_name": "dummy",
+    "version": "2020-01-01",
+    "snapshot_version": "2020-01-01",
+    "title": "Data product title",
+    "description": "This\nis\na\ndummy\ndataset",
+    "file_extension": "csv",
+    "date_published": "2020-01-01",
+    "producer": "Dummy producer",
+    "citation_full": "Dummy producer citation",
+    "url_download": "https://raw.githubusercontent.com/owid/etl/master/apps/wizard/dummy_data.csv",
+    "url_main": "https://www.url-dummy.com/",
+    "license_name": "MIT dummy license",
+}
+# Cache for staging creation times (keyed by session bind string)
+_staging_creation_time_cache: dict[str, Any] = {}
+
+
+def start_profiler() -> Profiler:
+    """Usage:
+    ```
+    # after imports and before any other code
+    PROFILER = start_profiler()
+
+    # app code
+    ...
+
+    # at the end of the app
+    PROFILER.stop()
+    """
+    profiler = Profiler()
+    profiler.start()
+    return profiler
+
+
+def get_namespaces(step_type: str) -> list[str]:
+    """Get list with namespaces.
+
+    Looks for namespaces in `etl/steps/data/<step_type>/`.
+    """
+    match step_type:
+        case "meadow":
+            folders = sorted(item for item in STEPS_MEADOW_DIR.iterdir() if item.is_dir())
+        case "garden":
+            folders = sorted(item for item in STEPS_GARDEN_DIR.iterdir() if item.is_dir())
+        case "grapher":
+            folders = sorted(item for item in STEPS_GRAPHER_DIR.iterdir() if item.is_dir())
+        case "all":
+            folders = sorted(
+                item
+                for item in [*STEPS_MEADOW_DIR.iterdir(), *STEPS_GARDEN_DIR.iterdir(), *STEPS_GRAPHER_DIR.iterdir()]
+                if item.is_dir()
+            )
+        case _:
+            raise ValueError(f"Step {step_type} not in ['meadow', 'garden', 'grapher'].")
+    namespaces = sorted(set(folder.name for folder in folders))
+    return namespaces
+
+
+class classproperty(property):
+    """Decorator."""
+
+    def __get__(self, owner_self: Self, owner_cls: Self):  # ty: ignore[invalid-method-override]
+        return self.fget(owner_cls)  # ty: ignore
+
+
+class AppState:
+    """Management of state variables shared across different apps."""
+
+    steps: list[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data", "chart"]
+    dataset_edit: dict[str, Dataset | None] = {
+        "snapshot": None,
+        "meadow": None,
+        "garden": None,
+        "grapher": None,
+        "express": None,
+        "data": None,
+        "chart": None,
+    }
+    _previous_step: str | None = None
+
+    def __init__(self: "AppState") -> None:
+        """Construct variable."""
+        self.step = st.session_state["step_name"]
+        self._init_steps()
+
+    def _init_steps(self: "AppState") -> None:
+        # Initiate dictionary
+        if "steps" not in st.session_state:
+            st.session_state["steps"] = {}
+        for step in self.steps:
+            if step not in st.session_state["steps"]:
+                st.session_state["steps"][step] = {}
+        # Initiate default
+        self.default_steps = {step: {} for step in self.steps}
+
+        # Load config from .wizard
+        defaults = load_wizard_defaults()
+        # Add defaults (these are used when not value is found in current or previous step)
+        self.default_steps["snapshot"]["snapshot_version"] = DATE_TODAY
+        self.default_steps["snapshot"]["origin.date_accessed"] = DATE_TODAY
+
+        self.default_steps["express"]["snapshot_version"] = DATE_TODAY
+        self.default_steps["express"]["version"] = DATE_TODAY
+
+        self.default_steps["data"]["snapshot_version"] = DATE_TODAY
+        self.default_steps["data"]["version"] = DATE_TODAY
+
+        self.default_steps["meadow"]["version"] = DATE_TODAY
+        self.default_steps["meadow"]["snapshot_version"] = DATE_TODAY
+        self.default_steps["meadow"]["generate_notebook"] = defaults["template"]["meadow"]["generate_notebook"]
+
+        self.default_steps["garden"]["version"] = DATE_TODAY
+        self.default_steps["garden"]["meadow_version"] = DATE_TODAY
+        self.default_steps["garden"]["generate_notebook"] = defaults["template"]["garden"]["generate_notebook"]
+
+        self.default_steps["grapher"]["version"] = DATE_TODAY
+        self.default_steps["grapher"]["garden_version"] = DATE_TODAY
+
+    def _check_step(self: "AppState") -> None:
+        """Check that the value for step is valid."""
+        if self.step is None or self.step not in self.steps:
+            raise ValueError(f"Step {self.step} not in {self.steps}.")
+
+    def reset_dataset_to_edit(self: "AppState") -> None:
+        """Set dataset to edit."""
+        self.dataset_edit[self.step] = None
+
+    def set_dataset_to_edit(self: "AppState", ds: Dataset) -> None:
+        """Set dataset to edit."""
+        self.dataset_edit[self.step] = ds
+
+    def get_variables_of_step(self: "AppState") -> dict[str, Any]:
+        """Get variables of a specific step.
+
+        Variables are assumed to have keys `step.NAME`, based on the keys given in the widgets within a form.
+        """
+        return {
+            cast(str, k): v for k, v in st.session_state.items() if isinstance(k, str) and k.startswith(f"{self.step}.")
+        }
+
+    def update(self: "AppState") -> None:
+        """Update global variables of step.
+
+        This is expected to be called when submitting the step's form.
+        """
+        self._check_step()
+        print(f"Updating {self.step}...")
+        st.session_state["steps"][self.step] = self.get_variables_of_step()
+
+    def update_from_form(self, form: Any) -> None:
+        self._check_step()
+        st.session_state["steps"][self.step] = form.model_dump()
+
+    @property
+    def state_step(self: "AppState") -> dict[str, Any]:
+        """Get state variables of step."""
+        self._check_step()
+        return st.session_state["steps"][self.step]
+
+    def default_value(
+        self: "AppState",
+        key: str,
+        previous_step: str | None = None,
+        default_last: str | bool | int | date | None = "",
+    ) -> str | bool | int:
+        """Get the default value of a variable.
+
+        This is useful when setting good defaults in widgets (e.g. text_input).
+
+        Priority of default value is:
+            - Check if there is a value stored for this field in the current step.
+            - If not, check if there is a value stored for this field in the previous step.
+            - If not, use value given by `default_last`.
+        """
+        self._check_step()
+        # Get name of previous step
+        if previous_step is None:
+            previous_step = self.previous_step
+        # (1) Get value stored for this field (in current step)
+        # st.write(f"KEY: {key}")
+        value_step = self.state_step.get(key)
+        # st.write(f"value_step: {value_step}")
+        if value_step is not None:
+            # st.code(1)
+            return value_step
+        # (2) If none, check if previous step has a value and use that one, otherwise (3) use empty string.
+        key = key.replace(f"{self.step}.", f"{previous_step}.")
+        value_previous_step = st.session_state["steps"][previous_step].get(key)
+        # st.write(f"value_previous_step: {value_previous_step}")
+        if value_previous_step is not None:
+            # st.code(2)
+            return value_previous_step
+        # (3) If none, use self.default_steps
+        value_defaults = self.default_steps[self.step].get(key)
+        # st.write(f"value_defaults: {value_defaults}")
+        if value_defaults is not None:
+            # st.code(3)
+            return value_defaults
+        # (4) Use default_last as last resource
+        if default_last is None:
+            raise ValueError(
+                f"No value found for {key} in current, previous or defaults. Must provide a valid `default_value`!"
+            )
+        # st.code(4)
+        return cast(str | bool | int, default_last)
+
+    def display_error(self: "AppState", key: str) -> None:
+        """Get error message for a given key."""
+        if "errors" in self.state_step:
+            # print("KEY:", key)
+            if msg := self.state_step.get("errors", {}).get(key, ""):
+                # print(msg)
+                st.error(msg)
+
+    @property
+    def previous_step(self: "AppState") -> str | None:
+        """Get the name of the previous step.
+
+        E.g. 'snapshot' is the step prior to 'meadow', etc.
+        """
+        if self._previous_step is None:
+            self._check_step()
+            if self.step not in {"explorer", "express", "data"}:
+                idx = max(self.steps.index(self.step) - 1, 0)
+                self._previous_step = self.steps[idx]
+            elif self.step in {"express", "data"}:
+                self._previous_step = "snapshot"
+        return self._previous_step
+
+    @property
+    def vars(self):
+        return {
+            str(k).replace(f"{self.step}.", ""): v
+            for k, v in dict(st.session_state).items()
+            if str(k).startswith(f"{self.step}.")
+        }
+
+    def st_widget(
+        self: "AppState",
+        st_widget: Callable,
+        default_last: str | bool | int | date | None = "",
+        dataset_field_name: str | None = None,
+        default_value: str | bool | int | date | None = None,
+        index_if_value_is_none: int | None = 0,
+        **kwargs: str | int | list[str] | date | Callable | None,
+    ) -> None:
+        """Wrap a streamlit widget with a default value."""
+        key = cast(str, kwargs["key"])
+        # Get default value (either from previous edits, or from previous steps)
+        if default_value is None:
+            if self.dataset_edit[self.step] is not None:
+                if dataset_field_name:
+                    default_value = getattr(self.dataset_edit[self.step], dataset_field_name, "")
+                else:
+                    default_value = getattr(self.dataset_edit[self.step].metadata, key, "")  # ty: ignore
+            else:
+                default_value = self.default_value(key, default_last=default_last)
+        # Change key name, to be stored it in general st.session_state
+        kwargs["key"] = f"{self.step}.{key}"
+        # Special behaviour for multiselect
+        if "multiselect" not in str(st_widget):
+            # Default value for selectbox (and other widgets with selectbox-like behavior)
+            if "options" in kwargs:
+                options = cast(list[str], kwargs["options"])
+                index = options.index(default_value) if default_value in options else index_if_value_is_none  # ty: ignore
+                kwargs["index"] = index
+            # Default value for other widgets (if none is given)
+            elif (
+                ("value" not in kwargs)
+                or ("value" in kwargs and kwargs.get("value") is None)
+                or self.dataset_edit[self.step]
+            ):
+                kwargs["value"] = default_value
+        elif "default" not in kwargs:
+            kwargs["default"] = default_value
+        # Create widget
+        widget = st_widget(**kwargs)
+        # Show error message
+        self.display_error(key)
+        return widget
+
+    @classproperty
+    def args(cls: "AppState") -> argparse.Namespace:
+        """Get arguments passed from command line."""
+        return parse_args_from_cmd()
+
+
+def parse_args_from_cmd() -> argparse.Namespace:
+    """Get arguments passed from command line."""
+    if "args" in st.session_state:
+        return st.session_state["args"]
+    else:
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--debug", action="store_true")
+        # parser.add_argument("--phase")
+        parser.add_argument("--run-checks", action="store_true")
+        parser.add_argument("--dummy-data", action="store_true")
+        args = parser.parse_args()
+        st.session_state["args"] = args
+    return st.session_state["args"]
+
+
+def extract(error_message: str) -> list[Any]:
+    """Get field name that caused the error."""
+    rex = r"'(.*)' is a required property"
+    return re.findall(rex, error_message)[0]
+
+
+def preview_dag_additions(dag_content: str, dag_path: str | Path, prefix: str = "File", expanded: bool = False) -> None:
+    """Preview DAG additions."""
+    if dag_content:
+        with st.expander(f"{prefix}: `{dag_path}`", expanded=expanded):
+            st.code(dag_content, "yaml")
+
+
+@cache
+def load_instructions() -> str:
+    """Load snapshot step instruction text."""
+    with open(CURRENT_DIR / f"{st.session_state['step_name']}.md") as f:
+        return f.read()
+
+
+def clean_empty_dict(d: dict[str, Any] | list[Any]) -> dict[str, Any] | list[Any]:
+    """Remove empty values from dict.
+
+    REference: https://stackoverflow.com/a/27974027/5056599
+    """
+    if isinstance(d, dict):
+        return {k: v for k, v in ((k, clean_empty_dict(v)) for k, v in d.items()) if v}
+    if isinstance(d, list):
+        return [v for v in map(clean_empty_dict, d) if v]
+    return d
+
+
+def get_datasets_in_etl(
+    dag: dict[str, Any] | None = None,
+    dag_path: Path | None = None,
+    snapshots: bool = False,
+    prefixes: list[str] | None = None,
+    prefix_priorities: list[str] | None = None,
+) -> Any:
+    """Show a selectbox with all datasets available."""
+    # Load dag
+    if dag is None:
+        if dag_path is not None:
+            dag = load_dag(dag_path)
+        else:
+            dag = load_dag()
+
+    # Define list with options
+    if snapshots:
+        options = sorted(list(set(dag.keys()) | set([dd for d in dag.values() for dd in d])))
+    else:
+        options = sorted(list(dag.keys()))
+    ## Optional: Show some options first based on their prefix. E.g. Show those that are Meadow (i.e. start with 'data://meadow') first.
+    if prefix_priorities:
+        options, options_left = [], options
+        for prefix in prefix_priorities:
+            options_ = [o for o in options_left if o.startswith(f"{prefix}/")]
+            options.extend(sorted(options_))
+            options_left = [o for o in options_left if o not in options_]
+        options.extend(options_left)
+
+    # Show only datasets that start with a given prefix
+    if prefixes:
+        options = [o for o in options if any(o.startswith(prefix) for prefix in prefixes)]
+    # Discard snapshots if flag is enabled
+    if not snapshots:
+        options = [o for o in options if not o.startswith("snapshot://")]
+
+    return options
+
+
+def set_states(states_values: dict[str, Any], logging: bool = False, also_if_not_exists: bool = False) -> None:
+    """Set states from any key in dictionary.
+
+    Set logging to true to log the state changes
+    """
+    for key, value in states_values.items():
+        if logging and (st.session_state[key] != value):
+            print(f"{key}: {st.session_state[key]} -> {value}")
+        if also_if_not_exists:
+            st.session_state[key] = st.session_state.get(key, value)
+        else:
+            st.session_state[key] = value
+
+
+def enable_sentry_for_streamlit():
+    """Enable Sentry for streamlit. Uses this workaround
+    https://github.com/streamlit/streamlit/issues/3426#issuecomment-1848429254
+    """
+    # Quit if SENTRY_DSN is not set
+    if not SENTRY_DSN:
+        return
+
+    enable_sentry()
+
+    error_util = sys.modules["streamlit.error_util"]
+    original_handler = error_util.handle_uncaught_app_exception
+
+    def sentry_handler(exception: Exception) -> None:
+        """Pass the provided exception through to Sentry."""
+        capture_exception(exception)
+        return original_handler(exception)
+
+    # Streamlit doesn't have exception hook, hack it by patching
+    # all places where handle_uncaught_app_exception is called
+    modules_to_patch = [
+        "streamlit.runtime.scriptrunner.exec_code",
+        "streamlit.error_util",
+    ]
+
+    for module_name in modules_to_patch:
+        module = sys.modules[module_name]
+        module.handle_uncaught_app_exception = sentry_handler  # ty: ignore
+
+
+def _get_staging_creation_time(session: Session):
+    """Get staging server creation time.
+
+    Use the earliest creation time across all tables. Individual tables can be
+    rebuilt by migrations (for example ALTER TABLE), which updates their
+    information_schema create_time and makes a table allowlist too fragile.
+    """
+    query_ts = """
+    SELECT MIN(create_time) as min_create_time
+    FROM information_schema.tables
+    WHERE table_schema = DATABASE()
+    """
+    df = read_sql(query_ts, session)
+    assert len(df) == 1 and df["min_create_time"].notna().all(), (
+        "Failed to get staging server creation time. Make sure the staging server was properly set up."
+    )
+    create_time = df["min_create_time"].item()
+    return create_time
+
+
+def get_staging_creation_time(session: Session):
+    """Get staging server creation time."""
+    # Create a unique key for a session to avoid conflicts when working with multiple staging servers.
+    key = str(session.bind)
+    if key not in _staging_creation_time_cache:
+        _staging_creation_time_cache[key] = _get_staging_creation_time(session)
+    return _staging_creation_time_cache[key]
+
+
+def default_converter(o):
+    if isinstance(o, np.integer):  # ignore
+        return int(o)
+    else:
+        raise TypeError(f"Object of type {o.__class__.__name__} is not JSON serializable")
+
+
+def as_valid_json(s):
+    """Return `s` as a dictionary if applicable."""
+    try:
+        # First, try to parse the string directly as JSON
+        return json.loads(s)
+    except json.JSONDecodeError:
+        try:
+            # If that fails, use ast.literal_eval to handle mixed quotes
+            python_obj = ast.literal_eval(s)
+
+            # Convert the Python object to a JSON string and then back to a Python object
+            return json.loads(json.dumps(python_obj))
+        except (ValueError, SyntaxError):
+            return s
+
+
+@cache
+def is_running_in_streamlit():
+    """Check if running in Streamlit."""
+    return Runtime.exists()
+
+
+def _canon(x):
+    # Fast paths first
+    if x is None or isinstance(x, (int, float, str, bytes, bool)):
+        return x
+    if isinstance(x, tuple):
+        return tuple(_canon(v) for v in x)
+    if isinstance(x, list):
+        return tuple(_canon(v) for v in x)
+    if isinstance(x, set):
+        return frozenset(_canon(v) for v in x)
+    if isinstance(x, Mapping):
+        # sort by key for deterministic ordering
+        return tuple(sorted((k, _canon(v)) for k, v in x.items()))
+    if isinstance(x, np.ndarray):
+        # stable, hashable representation for numpy arrays
+        return ("__np__", x.dtype.str, x.shape, x.tobytes())
+    if isinstance(x, (pd.DataFrame, pd.Series, pd.Index)):
+        # Content-based key. Falling through to the __dict__ branch below would build a key out of
+        # the internal BlockManager, whose repr contains the object's memory address - so the key
+        # would differ on every call, never hit the cache, and grow the cache without bound.
+        return (
+            "__pandas__",
+            x.__class__.__qualname__,
+            tuple(map(str, getattr(x, "columns", ()))),
+            _canon(pd.util.hash_pandas_object(x, index=True).to_numpy()),
+        )
+    # Fallback: try dataclasses/objects with __dict__
+    if hasattr(x, "__dict__"):
+        return ("__obj__", x.__class__.__qualname__, _canon(vars(x)))
+    # Last resort: use repr (only if you accept collisions when repr changes)
+    return ("__repr__", repr(x))
+
+
+def cache_all(f):
+    """A caching decorator that works for unhashable types (lists, dicts).
+
+    The canonical form of the arguments is used as the cache key only; the wrapped function is
+    always called with the original arguments.
+    """
+    results = {}
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        key = (
+            tuple(_canon(a) for a in args),
+            tuple(sorted((k, _canon(v)) for k, v in kwargs.items())),
+        )
+        if key not in results:
+            results[key] = f(*args, **kwargs)
+        return results[key]
+
+    return wrapper
+
+
+# Enable sentry when apps.wizard.utils is loaded
+enable_sentry_for_streamlit()

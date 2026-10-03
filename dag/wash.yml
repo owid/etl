@@ -1,0 +1,21 @@
+steps:
+  ## European Environment Agency - Water Information System for Europe
+  data://grapher/wash/2024-01-04/nutrients:
+    - data://garden/wash/2024-01-04/nutrients:
+      - data://meadow/wash/2024-01-04/nutrients:
+        - snapshot://wash/2024-01-04/nutrients.zip
+        - snapshot://wash/2024-02-15/nutrients_europe.csv
+
+  # WHO/UNICEF JMP WASH (2025 update)
+  data://garden/wash/2025-12-08/household:
+    - snapshot://wash/2025-12-08/definitions.xlsx
+    - data://meadow/wash/2025-12-08/household:
+      - snapshot://wash/2025-12-08/household.xlsx
+  viz://explorer/wash/latest/water_and_sanitation:
+    - data://grapher/wash/2025-12-08/household:
+      - data://garden/wash/2025-12-08/household
+
+  # European Bathing Water Quality - European Environment Agency
+  data://grapher/wash/2026-07-02/bathing_water:
+    - data://garden/wash/2026-07-02/bathing_water:
+        - snapshot://wash/2026-07-02/bathing_water.zip

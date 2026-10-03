@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4620
+    date_accessed: 2023-08-10 14:32:07.555489
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Developing countries’ and least developed countries’ share of global services
+    imports (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 76d4bab12cf51f7b246ba006c75984a6
+  size: 13946
+  path: 
+    dataset_4620_developing_countries_and_least_developed_countries_share_of_global_services_imports__pct_values.feather

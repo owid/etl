@@ -1,0 +1,26 @@
+meta:
+  namespace: ihme
+  short_name: sdg
+  name: Sustainable Development Goals (IHME, 2022)
+  version: '2023-05-05'
+  publication_year: 2022
+  publication_date: '2022-09-12'
+  source_name: Institute of Health Metrics and Evaluation (2022)
+  source_published_by: 'Institute for Health Metrics and Evaluation (IHME). Health-related
+    SDGs. Seattle, WA: IHME, University of Washington, 2022. Available from https://api.healthdata.org/sdg/v1/docs'
+  url: https://api.healthdata.org/sdg/v1/docs
+  source_data_url:
+  file_extension: csv
+  license_url: https://www.healthdata.org/data-tools-practices/data-practices/terms-and-conditions
+  license_name: IHME Free-of-charge non-commercial user agreement
+  date_accessed: 2023-05-05
+  is_public: false
+  description: |
+    IHME produced estimates and forecasts for 13 of the SDG indicators included in the Goalkeepers Report.
+
+    The full description of the methods used to produce the data can be found here: https://www.gatesfoundation.org/goalkeepers/report/2022-report/data-sources/#ExploretheIndicatorPages
+wdir: ../../../data/snapshots/ihme/2023-05-05
+outs:
+- md5: 8117e96debed567fc203e2aa9388d6f9
+  size: 91145121
+  path: sdg.csv

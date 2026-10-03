@@ -1,0 +1,14 @@
+meta:
+  origin:
+    producer: CPB Netherlands Bureau for Economic Policy Analysis
+    title: World Trade Monitor
+    description: The 7 countries in the sample are France, Germany, UK, Poland, Sweden, Japan, UK and US. The average discount rate for the sample in the global financial crisis period is weighted by 2008 GDP.
+    citation_full: "CPB Netherlands Bureau for Economic Policy Analysis. 2015. 'World Trade Monitor.'"
+    url_main: https://www.cpb.nl/en/worldtrademonitor
+    date_accessed: '2020-07-02'
+    date_published: '2015'
+  is_public: false
+outs:
+  - md5: baaf66d31dd286d9ee55383ece4a7868
+    size: 4594
+    path: figure_17_1b.feather

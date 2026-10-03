@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2711
+    date_accessed: 2023-08-16 08:48:13.905976
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2711_ihme_sdg (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 52f4d694c702be4e66d22ffb95b618e2
+  size: 136085
+  path: dataset_2711_ihme_sdg_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2067
+    date_accessed: 2023-08-14 14:36:30.028711
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Unemployment rate, by sex, age and persons with disabilities
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3138dc0952081693e3fa8fa91db9c29c
+  size: 98058
+  path: 
+    dataset_2067_unemployment_rate__by_sex__age_and_persons_with_disabilities_values.feather

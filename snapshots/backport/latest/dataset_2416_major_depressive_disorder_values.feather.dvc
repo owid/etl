@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2416
+    date_accessed: 2023-08-14 15:08:49.702379
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Major depressive disorder
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8ac33ff2e28eaeb6ccff31a7b62d1a45
+  size: 5540234
+  path: dataset_2416_major_depressive_disorder_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1533
+    date_accessed: 2023-08-14 16:09:10.778224
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1533_lip_and_oral_cavity_cancer (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6cf166308196cc7ab918106960cbe5de
+  size: 27184
+  path: dataset_1533_lip_and_oral_cavity_cancer_config.json

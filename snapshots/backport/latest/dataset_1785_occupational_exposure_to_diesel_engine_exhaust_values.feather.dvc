@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1785
+    date_accessed: 2023-08-16 09:49:51.462532
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Occupational exposure to diesel engine exhaust
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c57625dec9b98bf65f6821aeb2be2ac5
+  size: 961170
+  path: dataset_1785_occupational_exposure_to_diesel_engine_exhaust_values.feather

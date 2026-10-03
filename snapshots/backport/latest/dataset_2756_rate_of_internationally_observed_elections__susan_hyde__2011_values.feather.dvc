@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2756
+    date_accessed: 2023-08-16 10:40:13.364078
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Rate of internationally observed elections - Susan Hyde (2011)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bbe6035aa7a8fd51f7a4e35286b4be57
+  size: 6874
+  path: 
+    dataset_2756_rate_of_internationally_observed_elections__susan_hyde__2011_values.feather

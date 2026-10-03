@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5119
+    date_accessed: 2023-08-14 15:25:06.615800
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Figure_13.5_GDP
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8d55efdf17c43c088d4dbc34acc90b05
+  size: 10514
+  path: dataset_5119_figure_13_5_gdp_values.feather

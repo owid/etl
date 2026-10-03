@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2347
+    date_accessed: 2023-08-16 10:37:30.290011
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2347_unintentional_suffocation (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5f67c1326303159a8a19db4bc788f045
+  size: 32917
+  path: dataset_2347_unintentional_suffocation_config.json

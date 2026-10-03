@@ -1,0 +1,23 @@
+dataset:
+  title: DRAFT gov_torture_kill
+  description: ''
+tables:
+  gov_torture_kill:
+    variables:
+      gov_torture_kill:
+        title: gov_torture_kill
+        unit: ''
+      gov_kill:
+        title: gov_kill
+        unit: ''
+      not_tort_kill:
+        title: not_tort_kill
+        unit: ''
+      not_kill:
+        title: not_kill
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

@@ -1,0 +1,94 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Economic Growth
+  description_processing_splice: |-
+    This indicator combines two sources: recent estimates from the World Bank's World Development Indicators, and a compilation of historical sources built by Our World in Data, based on the dataset published by Herrendorf, Rogerson and Valentinyi (2014) and updated with the GGDC 10-Sector Database (January 2015 release). For each country, World Bank data is used from its first available year onwards; historical sources only inform earlier years. To preserve a consistent series between the historical estimates and the World Bank data available from 1991 onwards, the years 1986-1990 are not included.
+  description_processing_shares: |-
+    This indicator combines two series published by the World Bank's World Development Indicators: ILO-modeled employment shares, available from 1991 onwards, and — for France, Italy, the Netherlands, Poland and the United Kingdom — employment shares around 1980 from an archived edition, which the World Bank later replaced with the ILO-modeled series.
+  description_key_archive: |-
+    For five European countries (France, Italy, the Netherlands, Poland and the United Kingdom), earlier values around 1980 come from an archived edition of the World Development Indicators, which the World Bank later replaced with the ILO-modeled series.
+  description_key_employment_concepts: |-
+    Historical estimates count the number of persons engaged in each sector, based on national historical statistics. Recent estimates (from 1991) are ILO-modeled estimates published by the World Bank, based on employment of people aged 15 and over.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Long-run data on employment by economic sector
+  update_period_days: 365
+
+tables:
+  structural_transformation_omm:
+    variables:
+      share_employed_agriculture:
+        title: Share of employment in agriculture
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of working people employed in agriculture, including hunting, forestry and fishing.
+        description_key:
+          - Recent estimates (from 1991) are ILO-modeled estimates published by the World Bank, measuring agricultural employment as a share of total employment.
+          - "{definitions.description_key_archive}"
+          - For the same five countries, benchmark estimates between 1300 and 1800 come from Broadberry and Gardner (2013); these measure the share of the total labor force, which also includes unemployed people.
+        description_processing: |-
+          {definitions.description_processing_shares}
+
+          For the same five countries, benchmark estimates of the share of the labor force employed in agriculture between 1300 and 1800 come from Broadberry and Gardner (2013).
+        presentation:
+          topic_tags:
+            - Employment in Agriculture
+            - Economic Growth
+          title_public: Share of employment in agriculture
+        display:
+          name: Agriculture
+          numDecimalPlaces: 1
+      share_employed_industry:
+        title: Share of employment in industry
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of working people employed in industry, including mining, manufacturing and construction.
+        description_key:
+          - Recent estimates (from 1991) are ILO-modeled estimates published by the World Bank, measuring industrial employment as a share of total employment.
+          - "{definitions.description_key_archive}"
+        description_processing: |-
+          {definitions.description_processing_shares}
+        display:
+          name: Industry
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of employment in industry
+      share_employed_services:
+        title: Share of employment in services
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of working people employed in services.
+        description_key:
+          - Recent estimates (from 1991) are ILO-modeled estimates published by the World Bank, measuring services employment as a share of total employment.
+          - "{definitions.description_key_archive}"
+        description_processing: |-
+          {definitions.description_processing_shares}
+        display:
+          name: Services
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of employment in services
+      number_employed_agriculture:
+        title: Number of people employed in agriculture
+        unit: people
+        description_short: Number of people working in agriculture, including hunting, forestry and fishing.
+        description_key:
+          - "{definitions.description_key_employment_concepts}"
+        description_processing: |-
+          {definitions.description_processing_splice}
+
+          For recent years, the number is calculated as the World Bank's agricultural share of employment multiplied by the total number of employed people, which is derived in turn from the ILO-modeled employment-to-population ratio and the United Nations estimate of the population aged 15 and over.
+        presentation:
+          topic_tags:
+            - Employment in Agriculture
+            - Economic Growth
+          title_public: Number of people employed in agriculture
+        display:
+          name: Agriculture
+          numDecimalPlaces: 0

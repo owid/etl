@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "International Database"
+    description: |-
+      The International Database (IDB) is a global demographic dataset produced by the U.S. Census Bureau that provides population estimates and projections for countries and areas worldwide (generally those with populations ≥ 5,000). For each country/area, it includes total population, population by age and sex (often by single year of age), and key components of population change—fertility, mortality, and net international migration—reported for midyear (July 1). Coverage typically runs from an initial/base year (which can vary by country) through 2100, and the IDB also provides metadata describing the source data used to produce the estimates and projections. For subnational areas, the IDB provides population by age and sex.
+    date_published: "2025-12-01"
+    # Citation
+    producer: US Census
+    citation_full: |-
+      U.S. Census Bureau, “International Database (IDB): World Population Estimates and Projections,” last updated December 2025, accessed February 4, 2026, https://www.census.gov/programs-surveys/international-programs/about/idb.html.
+
+    # Files
+    url_main: https://www.census.gov/programs-surveys/international-programs/about/idb.html
+    url_download: https://www.census.gov/data-tools/demo/data/idb/dataset/idbzip.zip
+    date_accessed: '2026-02-04'
+
+    # License
+    license:
+      name: Public Domain (U.S. Government work)
+      url: https://www.usa.gov/government-copyright
+outs:
+  - md5: 776f8c44b1b9f989dc3d08e7054266f9
+    size: 79743572
+    path: census_us_idb.zip

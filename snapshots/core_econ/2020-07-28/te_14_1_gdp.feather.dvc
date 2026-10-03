@@ -1,0 +1,14 @@
+meta:
+  origin:
+    producer: Maddison Project Database
+    title: Maddison Project Database
+    citation_full: 'Maddison Project Database, version 2018. Bolt, Jutta, Robert Inklaar, Herman de Jong and Jan Luiten van Zanden (2018), "Rebasing ''Maddison'': new income comparisons and the shape of long-run economic development", Maddison Project Working paper 10.'
+    version_producer: '2018'
+    url_main: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2018
+    date_accessed: '2020-07-28'
+    date_published: '2018'
+  is_public: false
+outs:
+  - md5: c1bb6c941801e1c8aee9339901bf0a3e
+    size: 6162
+    path: te_14_1_gdp.feather

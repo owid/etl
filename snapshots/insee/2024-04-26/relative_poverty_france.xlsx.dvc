@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Poverty rates by poverty line
+    description: |-
+      Public statistics in France about relative poverty.
+    date_published: "2023-11-14"
+
+    # Citation
+    producer: National Institute of Statistics and Economic Studies
+    citation_full: |-
+      INSEE (2023) Taux de pauvreté selon le seuil de pauvreté. Données annuelles de 1975 à 2021 [Poverty rates by poverty line. Annual data from 1975 to 2021]. Retrieved from https://www.insee.fr/fr/statistiques/2408282 on 26 April 2024.
+    attribution_short: INSEE
+
+    # Files
+    url_main: https://www.insee.fr/fr/statistiques/2408282
+    url_download: https://www.insee.fr/fr/statistiques/fichier/2408282/reve-pauv-taux-seuil.xlsx
+    date_accessed: 2024-04-26
+
+    # License
+    license:
+      name: Mentions légales et crédits [Legal notices and credits]
+      url: https://www.insee.fr/fr/information/2008466
+
+outs:
+  - md5: 5cadaf8ff95502aa51f8947ccb567504
+    size: 33183
+    path: relative_poverty_france.xlsx

@@ -1,0 +1,25 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5018
+    date_accessed: 2023-08-14 15:37:30.536204
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5018_emissions__agriculture__enteric_fermentation
+    (archived)
+  description: Greenhouse gas (GHG) emissions from enteric fermentation consist of
+    methane gas produced in digestive systems of ruminants and to a lesser extent
+    of non-ruminants.  The FAOSTAT emissions database is computed following Tier 1
+    IPCC 2006 Guidelines for National GHG Inventories vol. 4, ch. 10 and 11 (http://www.ipcc-nggip.iges.or.jp/public/2006gl/vol4.html).
+    GHG emissions are provided by country, regions and special groups, with global
+    coverage, relative to the period 1961-present (with annual updates) and with projections
+    for 2030 and 2050, expressed both as Gg CH4 and Gg CO2eq, by livestock species
+    (asses, buffaloes, camels, cattle (dairy and non-dairy), goats, horses, llamas,
+    mules, sheep, swine (breeding and market)) and by species aggregates (all animals,
+    camels and llamas, cattle, mules and asses, sheep and goats, swine). Implied emission
+    factor for CH4 and activity data are also provided.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2114ed9ce3720c3cd2895ed3408bcdd4
+  size: 114528
+  path: dataset_5018_emissions__agriculture__enteric_fermentation_config.json

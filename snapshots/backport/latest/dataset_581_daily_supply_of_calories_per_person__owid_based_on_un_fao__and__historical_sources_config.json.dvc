@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/581
+    date_accessed: 2023-08-10 07:44:30.931920
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5a4e0ac618be8690edb5c98303792462
+  size: 2650
+  path: 
+    dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources_config.json

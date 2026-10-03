@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1747
+    date_accessed: 2023-08-16 09:29:52.585953
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1747_low_back_and_neck_pain (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4adfc84b9da1f4e685b8b9d8009a08a1
+  size: 16673
+  path: dataset_1747_low_back_and_neck_pain_config.json

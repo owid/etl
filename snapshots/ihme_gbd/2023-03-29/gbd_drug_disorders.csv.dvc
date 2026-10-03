@@ -1,0 +1,24 @@
+meta:
+  namespace: ihme_gbd
+  short_name: gbd_drug_disorders
+  name: Global Burden of Disease Study 2019 (GBD 2019)
+  version: 2023-03-29
+  publication_year: 2020
+  source_name: IHME, Global Burden of Disease (2019)
+  source_published_by: 'Global Burden of Disease Collaborative Network. Global Burden
+    of Disease Study 2019 (GBD 2019) Results. Seattle, United States: Institute for
+    Health Metrics and Evaluation (IHME), 2020. Available from https://vizhub.healthdata.org/gbd-results/'
+  url: https://vizhub.healthdata.org/gbd-results/
+  source_data_url:
+  file_extension: csv
+  license_url: https://www.healthdata.org/data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
+  license_name: Free-of-Charge Non-Commercial-User Agreement
+  date_accessed: 2023-03-29
+  is_public: false
+  description: |
+
+wdir: ../../../data/snapshots/ihme_gbd/2023-03-29
+outs:
+- md5: 01ca5dba357f1155695ed7905635b16a
+  size: 930972
+  path: gbd_drug_disorders.csv

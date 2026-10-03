@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1884
+    date_accessed: 2023-08-16 09:45:01.631480
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Lost school grants - Reinikka and Svensson (2004)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 91ed86654047aa70aeb67ecc18e16c8a
+  size: 6314
+  path: dataset_1884_lost_school_grants__reinikka_and_svensson__2004_values.feather

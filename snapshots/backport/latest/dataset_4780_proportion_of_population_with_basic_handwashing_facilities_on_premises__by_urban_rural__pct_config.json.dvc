@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4780
+    date_accessed: 2023-08-16 08:18:45.931069
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4780_proportion_of_population_with_basic_handwashing_facilities_on_premises__by_urban_rural__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dea4314347ef1d0a969f1910c5279d45
+  size: 18243
+  path: 
+    dataset_4780_proportion_of_population_with_basic_handwashing_facilities_on_premises__by_urban_rural__pct_config.json

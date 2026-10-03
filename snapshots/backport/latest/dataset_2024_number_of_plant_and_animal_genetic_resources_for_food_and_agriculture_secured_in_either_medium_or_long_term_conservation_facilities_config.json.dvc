@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2024
+    date_accessed: 2023-08-16 07:59:58.911535
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2024_number_of_plant_and_animal_genetic_resources_for_food_and_agriculture_secured_in_either_medium_or_long_term_conservation_facilities
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6ad1c0668a0c816c6824920dafb92841
+  size: 13060
+  path: 
+    dataset_2024_number_of_plant_and_animal_genetic_resources_for_food_and_agriculture_secured_in_either_medium_or_long_term_conservation_facilities_config.json

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/496
+    date_accessed: 2023-08-16 07:22:22.059342
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_496_access_to_financial_account_or_services__pct__world_bank__2014
+  description: Proportion of the population with access to an account or financial
+    service, either in the form of a financial institution or mobile money-service
+    provider
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7455d592563906ebec470157bef368c6
+  size: 5421
+  path: 
+    dataset_496_access_to_financial_account_or_services__pct__world_bank__2014_config.json

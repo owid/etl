@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2034
+    date_accessed: 2023-08-11 07:35:34.171065
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Research and development expenditure as a proportion of GDP
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d150e497291f0fd171df4bbfdf173e92
+  size: 18154
+  path: 
+    dataset_2034_research_and_development_expenditure_as_a_proportion_of_gdp_values.feather

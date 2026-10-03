@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4860
+    date_accessed: 2023-08-16 09:56:15.796853
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4860_total_official_flows_for_infrastructure__by_recipient_countries__millions_of_constant_2017_united_states_dollars
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 88e358719b0e5631731ffb05aed351a0
+  size: 1987
+  path: 
+    dataset_4860_total_official_flows_for_infrastructure__by_recipient_countries__millions_of_constant_2017_united_states_dollars_config.json

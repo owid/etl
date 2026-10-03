@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4433
+    date_accessed: 2023-08-14 14:40:01.500308
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: '[ILO] Proportion of employed population covered in the event of work injury,
+    by sex (%)'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a8a1731659470985a99011236d496ebc
+  size: 7986
+  path: 
+    dataset_4433_ilo__proportion_of_employed_population_covered_in_the_event_of_work_injury__by_sex__pct_values.feather

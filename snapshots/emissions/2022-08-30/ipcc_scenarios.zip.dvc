@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: |-
+      Riahi et al. (2017). The Shared Socioeconomic Pathways and their energy, land use, and greenhouse gas emissions implications: An overview, Global Environmental Change
+    # NOTE: there's a newer version 3.0 available at https://data.ece.iiasa.ac.at/ssp/#/login?redirect=%2Fdownloads
+    version_producer: 2.0
+    title: |-
+      IPCC Scenarios
+    citation_full: |-
+      Keywan Riahi, Detlef P. van Vuuren, Elmar Kriegler, Jae Edmonds, Brian C. O’Neill, Shinichiro Fujimori, Nico Bauer, Katherine Calvin, Rob Dellink, Oliver Fricko, Wolfgang Lutz, Alexander Popp, Jesus Crespo Cuaresma, Samir KC, Marian Leimbach, Leiwen Jiang, Tom Kram, Shilpa Rao, Johannes Emmerling, Kristie Ebi, Tomoko Hasegawa, Petr Havlík, Florian Humpenöder, Lara Aleluia Da Silva, Steve Smith, Elke Stehfest, Valentina Bosetti, Jiyong Eom, David Gernaat, Toshihiko Masui, Joeri Rogelj, Jessica Strefler, Laurent Drouet, Volker Krey, Gunnar Luderer, Mathijs Harmsen, Kiyoshi Takahashi, Lavinia Baumstark, Jonathan C. Doelman, Mikiko Kainuma, Zbigniew Klimont, Giacomo Marangoni, Hermann Lotze-Campen, Michael Obersteiner, Andrzej Tabeau, Massimo Tavoni.
+      The Shared Socioeconomic Pathways and their energy, land use, and greenhouse gas emissions implications: An overview, Global Environmental Change, Volume 42, Pages 153-168, 2017, ISSN 0959-3780, DOI:110.1016/j.gloenvcha.2016.05.009
+    url_main: https://tntcat.iiasa.ac.at/SspDb/dsd
+    date_accessed: '2022-08-30'
+    date_published: '2022-08-30'
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: 8f1b73ea72c4693e9bc38a3c6d67f0f5
+    size: 16976150
+    path: ipcc_scenarios.zip

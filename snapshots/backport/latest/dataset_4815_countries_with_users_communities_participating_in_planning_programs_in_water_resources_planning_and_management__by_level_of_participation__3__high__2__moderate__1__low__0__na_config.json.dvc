@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4815
+    date_accessed: 2023-08-14 15:00:27.245052
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4815_countries_with_users_communities_participating_in_planning_programs_in_water_resources_planning_and_management__by_level_of_participation__3__high__2__moderate__1__low__0__na
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dbbd7cde2692fdf01a6f7b6dfb5a60e5
+  size: 2177
+  path: 
+    dataset_4815_countries_with_users_communities_participating_in_planning_programs_in_water_resources_planning_and_management__by_level_of_participation__3__high__2__moderate__1__low__0__na_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2526
+    date_accessed: 2023-08-14 15:28:21.751386
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: General Statistics - Key Short-Term Economic Indicators
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d369596dbebc74de28476b296b91363f
+  size: 22434
+  path: 
+    dataset_2526_general_statistics__key_short_term_economic_indicators_values.feather

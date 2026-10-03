@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1771
+    date_accessed: 2023-08-16 09:56:01.879357
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Occupational exposure to sulfuric acid
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 35dd6d20df6c34b08d344ec7963b9cad
+  size: 961162
+  path: dataset_1771_occupational_exposure_to_sulfuric_acid_values.feather

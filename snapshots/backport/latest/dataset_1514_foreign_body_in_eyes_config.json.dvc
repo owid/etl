@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1514
+    date_accessed: 2023-08-16 07:15:30.653957
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1514_foreign_body_in_eyes (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6edea951e446c5eac0bce13949544b20
+  size: 16628
+  path: dataset_1514_foreign_body_in_eyes_config.json

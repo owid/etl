@@ -1,0 +1,37 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Babies per woman (total fertility rate)
+    description: |-
+      **Sources:**
+
+      — 1800 to 1950 (and in some cases also years after 1950): Gapminder v6 which were compiled and documented by Mattias Lindgren, see previous versions further down on this page.
+
+      — 1950 to 2014: In most cases we use the latest UN estimates from World Population Prospects 2017 published in the file with Annually interpolated demographic indicators, called WPP2017_INT_F01_ANNUAL_DEMOGRAPHIC_INDICATORS.xlsx , accessed on September 2, 2017.
+
+      — 2015 – 2099: We use the UN forecast of future fertility rate in all countries, called median fertility variant.
+    date_published: 2017-12-12
+    version_producer: v12
+
+    # Citation
+    producer: Gapminder
+    citation_full: Free data from www.gapminder.org
+    attribution_short: Gapminder
+
+    # Files
+    url_main: https://www.gapminder.org/data/documentation/gd008/
+    url_download: https://github.com/Gapminder-Indicators/tfr/raw/master/tfr-by-gapminder.xlsx
+    date_accessed: 2023-09-22
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit
+
+wdir: ../../../data/snapshots/gapminder/2023-09-22
+outs:
+  - md5: 66745048d5fda22a615d0a69a4d07e6a
+    size: 394538
+    path: total_fertility_rate.xlsx

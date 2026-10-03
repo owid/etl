@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5316
+    date_accessed: 2023-08-14 05:36:48.014875
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5316_weekly_working_hours__ilo__2021 (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2f6e29ff73dd001a468c2271734a9330
+  size: 26954
+  path: dataset_5316_weekly_working_hours__ilo__2021_config.json

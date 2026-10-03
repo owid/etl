@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1455
+    date_accessed: 2023-08-14 10:59:45.230983
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1455_conflict_and_terrorism (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1aff01e8904ee0ec93a9ef7abd8b464d
+  size: 31702
+  path: dataset_1455_conflict_and_terrorism_config.json

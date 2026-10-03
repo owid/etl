@@ -1,0 +1,9 @@
+dataset:
+  title: DRAFT 3 – ODA per refugee - Sheet1
+  description: ''
+tables:
+  _3__oda_per_refugee__sheet1:
+    variables:
+      idrc_oda_per_recipient__2022_23__2022_usd_thousands:
+        title: IDRC ODA per recipient, 2022-23 (2022 USD thousands)
+        unit: ''

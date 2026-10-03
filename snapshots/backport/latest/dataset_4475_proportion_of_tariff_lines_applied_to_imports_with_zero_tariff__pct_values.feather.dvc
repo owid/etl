@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4475
+    date_accessed: 2023-08-16 08:27:56.815541
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of tariff lines applied to imports with zero-tariff (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 797956291e2e7a767b51b78b08771f07
+  size: 74474
+  path: 
+    dataset_4475_proportion_of_tariff_lines_applied_to_imports_with_zero_tariff__pct_values.feather

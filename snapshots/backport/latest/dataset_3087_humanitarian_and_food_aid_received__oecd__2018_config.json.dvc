@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3087
+    date_accessed: 2023-08-16 09:51:09.333108
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3087_humanitarian_and_food_aid_received__oecd__2018
+    (archived)
+  description: For OECD Report - do not delete.
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 48f5dd4ece0aa2355c961361917801d6
+  size: 6923
+  path: dataset_3087_humanitarian_and_food_aid_received__oecd__2018_config.json

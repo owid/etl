@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3288
+    date_accessed: 2023-08-10 13:05:57.677883
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3288_air_pollution (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 004885b44770c1e202df473a85d1c069
+  size: 21779
+  path: dataset_3288_air_pollution_config.json

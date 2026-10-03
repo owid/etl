@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+# Download the file from: https://ghdx.healthdata.org/record/global-burden-disease-study-2021-gbd-2021-cause-rei-and-location-hierarchies
+# Select - Cause Hierarchy [XLSX]
+meta:
+  is_public: false
+  origin:
+    # Data product / Snapshot
+    title: Global Burden of Disease, Cause Hierarchy
+    description: |-
+      The hierarchy of diseases and injuries included in the Global Burden of Disease Study.
+    date_published: "2025-10-23"
+    # Citation
+    producer: "IHME, Global Burden of Disease"
+    citation_full: |-
+      "Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2023 (GBD 2023) Results. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2025. Available from https://vizhub.healthdata.org/gbd-results/."
+    attribution_short: "IHME-GBD"
+    # Files
+    url_main: https://vizhub.healthdata.org/gbd-results/
+    url_download: https://ghdx.healthdata.org/sites/default/files/record-attached-files/IHME_GBD_2023_HIERARCHIES_Y2025M10D23.XLSX
+    date_accessed: "2026-02-07"
+
+    # License
+    license:
+      name: Free-of-Charge Non-commercial User Agreement
+      url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
+outs:
+  - md5: 88d8b7d1f76104d2bf0c670d6e886f22
+    size: 27755
+    path: cause_hierarchy.csv

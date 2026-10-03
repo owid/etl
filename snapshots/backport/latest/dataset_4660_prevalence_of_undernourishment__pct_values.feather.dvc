@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4660
+    date_accessed: 2023-08-14 05:58:23.933749
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Prevalence of undernourishment (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 90295d488f2557d9321bb8d43556f2ca
+  size: 21354
+  path: dataset_4660_prevalence_of_undernourishment__pct_values.feather

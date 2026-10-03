@@ -1,0 +1,37 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5014
+    date_accessed: 2023-08-16 07:24:02.106156
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5014_food_security__suite_of_food_security_indicators
+    (archived)
+  description: 'For detailed description of the indicators below see attached document:
+    Average Dietary Supply Adequacy; Average Value of Food Production; Share of Dietary
+    Energy Supply Derived from Cereals, Roots and Tubers; Average Protein Supply;
+    Average Supply of Protein of Animal Origin; Rail lines Density (per 100 square
+    km of land area); Percentage of Population Using At Least Basic Drinking Water
+    Sources; Percentage of Population Using Safely Managed Drinking Water Sources;
+    Percentage of Population Using At Least Basic Sanitation Services; Percentage
+    of Population Using Safely Managed Sanitation Services; Cereal Import Dependency
+    Ratio; Percent of Arable Land Equipped for Irrigation; Value of Food Imports in
+    Total Merchandise Exports; Political Stability and Absence of Violence; Domestic
+    Food Price Volatility Index; Per capita food production variability; Per Capita
+    Food Supply Variability; Prevalence of Undernourishment; Prevalence of Severe
+    Food Insecurity; Prevalence of Moderate or Severe Food Insecurity; Children aged
+    <5 years wasted (%); Children aged <5 years stunted (%); Children aged <5 years
+    overweight (%); Percentage of Adult Obesity; Prevalence of Anaemia among Women
+    of Reproductive Age; Prevalence of Exclusive Breastfeeding among Infants 0-5 Months
+    of Age; Prevalence of Low Birthweight; Number of Undernourished People; Number
+    of Severely Food Insecure People; Prevalence of Moderately or Severely Food Insecure
+    People; Minimum Dietary Energy Requirement (MDER); Average Dietary Energy Requirement
+    (ADER); Coefficient of Variation of Habitual Caloric Consumption Distribution
+    (CV); Skewness of Habitual Caloric Consumption Distribution (SK); Incidence of
+    Caloric Losses at Retail Distribution Level; Dietary Energy Supply (DES); Average
+    Fat Supply'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1e3815ba40e182b057bb0a3a989f581a
+  size: 97950
+  path: dataset_5014_food_security__suite_of_food_security_indicators_config.json

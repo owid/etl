@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: OECD
+    title: Level of GDP per capita and productivity
+    citation_full: OECD. Level of GDP per capita and productivity.
+    url_main: https://stats.oecd.org/Index.aspx?DataSetCode=PDB_LV
+    date_accessed: '2022-07-01'
+    date_published: '2022'
+  is_public: false
+outs:
+  - md5: a50c17a9c32c046b4d38409dba8960a1
+    size: 3490
+    path: te_3_2_gdp.feather

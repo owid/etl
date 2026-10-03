@@ -1,0 +1,497 @@
+# This file contains the API queries used to get country mentions from the Guardian API Platform.
+# This file was initially generated programmatically with get_country_queries_from_scratch(), and then edited manually.
+queries:
+  - country: Afghanistan
+    query: ("Afghanistan")
+  - country: Aland Islands
+    query: ("Åland Islands" "Ã\x81EEland Islands" "Aland Islands" "Åland")
+  - country: Albania
+    query: ("Albania")
+  - country: Algeria
+    query: ("Algeria")
+  - country: American Samoa
+    query: ("American Samoa")
+  - country: Andorra
+    query: ("Andorra")
+  - country: Angola
+    query: ("Angola")
+  - country: Anguilla
+    query: ("Anguilla")
+  - country: Antigua and Barbuda
+    query: ("Antigua and Barbuda" "Antigua & Barb.")
+  - country: Argentina
+    query: ("Argentina")
+  - country: Armenia
+    query: ("Armenia")
+  - country: Aruba
+    query: ("Aruba")
+  - country: Australia
+    query: ("Australia" "Autralia")
+  - country: Austria
+    query: ("Austria" "Österreich" "Oesterreich" "vienna") AND NOT ("Australia")
+  - country: Azerbaijan
+    query: ("Azerbaijan")
+  - country: Bahamas
+    query: ("Bahamas" "The Bahamas" "Bahamas, The")
+  - country: Bahrain
+    query: ("Bahrain")
+  - country: Bangladesh
+    query: ("Bangladesh" "East Bengal")
+  - country: Barbados
+    query: ("Barbados")
+  - country: Belarus
+    query: ("Belarus" "Belorussia" "Byelorussia" "BSSR")
+  - country: Belgium
+    query: ("Belgium" "België" "Belgique" "Belgien")
+  - country: Belize
+    query: ("Belize")
+  - country: Benin
+    query: ("Benin" "Dahomey") AND NOT ("Annette Bening")
+  - country: Bermuda
+    query: ("Bermuda")
+  - country: Bhutan
+    query: ("Bhutan")
+  - country: Bolivia
+    query: ("Bolivia, Plurinational State Of" "Bolivia")
+  - country: Bonaire Sint Eustatius and Saba
+    query: ("St Eustatius" "Sint Eustatius" "Bonaire" "Bonaire Sint Eustatius and Saba" "Caribbean Netherlands" "Bonaire, Saint Eustatius And Saba" "Bonaire, Sint Eustatius and Saba" "BES Islands" "Netherlands Antilles") AND NOT ("Spain" "Valencia")
+  - country: Bosnia and Herzegovina
+    query: ("Bosnia & Herzegovina" "Bosnia and Herzegovina" "Bosnia Herzegovina" "Bosnia-Herzegovina" "Bosnia" "Bsnia.&Hrzgvna.")
+  - country: Botswana
+    query: ("Botswana" "Bechuanaland")
+  - country: Bouvet Island
+    query: ("Bouvet Island")
+  - country: Brazil
+    query: ("Brazil")
+  - country: British Indian Ocean Territory
+    query: ("British Indian Ocean Territory")
+  - country: British Virgin Islands
+    query: ("Virgin Islands, British" "Br.Virgin Is." "British Virgin Islands" "UK Virgin Islands")
+  - country: Brunei
+    query: ("Brunei Darussalam" "Brunei")
+  - country: Bulgaria
+    query: ("Bulgaria")
+  - country: Burkina Faso
+    query: ("Burkina Faso" "Upper Volta")
+  - country: Burundi
+    query: ("Burundi")
+  - country: Cambodia
+    query: ("Cambodia" "Kampuchea")
+  - country: Cameroon
+    query: ("Cameroon")
+  - country: Canada
+    query: ("Canada" "Toronto" "Montreal" "Vancouver" "Ottawa")
+  - country: Cape Verde
+    query: ("Cabo Verde" "Cape Verde")
+  - country: Cayman Islands
+    query: ("Cayman Islands")
+  - country: Central African Republic
+    query: ("Central African Rep." "Central African Republic")
+  - country: Chad
+    query: ("Chad") AND NOT ("Chadwick Boseman" "Chad Johnson" "Gurinder Chadha" "Chad Michael Murray")
+  - country: Chile
+    query: ("Chile")
+  - country: China
+    query: ("China, mainland" "China" "Beijing" "Shanghai" "chinese") AND NOT ("china plate" "bone china" "porcelain" "china shop")
+  - country: Christmas Island
+    query: ("Christmas Isl." "Christmas Island")
+  - country: Cocos Island
+    query: ("Cocos Islands" "Cocos Island")
+  - country: Colombia
+    query: ("Colombia")
+  - country: Comoros
+    query: ("Comoros")
+  - country: Congo
+    query: ("Congo Brazzaville" "Congo-Brazzaville" "Republic of Congo" "Congo, Rep." "Congo") AND NOT ("DR Congo" "Democratic Republic of Congo" "Kinshasa" "Democratic Republic of the Congo")
+  - country: Cook Islands
+    query: ("Cook Islands")
+  - country: Costa Rica
+    query: ("Costa Rica")
+  - country: Croatia
+    query: ("Croatia")
+  - country: Cuba
+    query: ("Cuba")
+  - country: Curacao
+    query: ("Curacao" "Curaçao")
+  - country: Cyprus
+    query: ("Cyprus") AND NOT ("Northern Cyprus" "Turkish Cyprus" "North Cyprus")
+  - country: Czech Republic
+    query: ("Czechia" "Czech Rep." "Czech Republic" "Czechoslovakia")
+  - country: Democratic Republic of Congo
+    query: ("Zaire/ Congo , Dem. Rep." "Congo, The Democratic Republic Of The" "Congo-Kinshasa" "Democratic Republic of the Congo" "D.R. of the Congo" "Congo, Democratic Republic" "Congo, Dem. Rep." "Democratic Republic of Congo")
+  - country: Denmark
+    query: ("Denmark" "Danmark" "copenhagen")
+  - country: Djibouti
+    query: ("Djibouti" "French Somalia")
+  - country: Dominica
+    query: ("Dominica") AND NOT ("Dominican Republic" "Dominican")
+  - country: Dominican Republic
+    query: ("Dominican Rep." "Dominican Republic")
+  - country: Ecuador
+    query: ("Ecuador")
+  - country: Egypt
+    query: ("Egypt, Arab Rep." "Egypt")
+  - country: El Salvador
+    query: ("El Salvador")
+  - country: Equatorial Guinea
+    query: ("Equatorial Guinea" "Eq. Guinea")
+  - country: Eritrea
+    query: ("Eritrea")
+  - country: Estonia
+    query: ("Estonia")
+  - country: Eswatini
+    query: ("Swaziland" "Eswatini")
+  - country: Ethiopia
+    query: ("Ethiopia" "Abyssinia")
+  - country: Falkland Islands
+    query: ("Falkland Is." "Malvinas" "Falkland Islands")
+  - country: Faroe Islands
+    query: ("Faroe Islands" "Faeroe Islands")
+  - country: Fiji
+    query: ("Fiji")
+  - country: Finland
+    query: ("Finland" "Suomi")
+  - country: France
+    query: ("France" "Paris" "French Republic")
+  - country: French Guiana
+    query: ("French Guyana" "French Guiana")
+  - country: French Polynesia
+    query: ("French Polynesia")
+  - country: French Southern Territories
+    query: ("French Southern Territories")
+  - country: Gabon
+    query: ("Gabon")
+  - country: Gambia
+    query: ("Gambia, The" "Gambia")
+  - country: Georgia
+    query: ("Georgia") AND NOT ("senator" "Australia" "Georgia Gould" "Georgia Stanway" "University of Georgia" "Georgia Bradburn" "South Georgia" "Georgia Voll" "State" "America" "American" "Americans" "United States" "the US" "Washington" "football" "player" "goal" "score" "director" "actor" "actress" "movie")
+  - country: Germany
+    query: ("Germany" "Deutschland" "Berlin")
+  - country: Ghana
+    query: ("Ghana")
+  - country: Gibraltar
+    query: ("Gibraltar")
+  - country: Greece
+    query: ("Greece" "athens" "Hellas" "Ellada" "Hellenic Republic")
+  - country: Greenland
+    query: ("Greenland")
+  - country: Grenada
+    query: ("Grenada")
+  - country: Guadeloupe
+    query: ("Guadaloupe" "Guadeloupe")
+  - country: Guam
+    query: ("Guam")
+  - country: Guatemala
+    query: ("Guatemala")
+  - country: Guernsey
+    query: ("Guernsey")
+  - country: Guinea
+    query: ("Guinea") AND NOT ("Equatorial Guinea" "Guinea-Bissau" "Eq. Guinea" "Papua New Guinea")
+  - country: Guinea-Bissau
+    query: ("Guinea-Bissau" "Guinea Bissau")
+  - country: Guyana
+    query: ("Guyana" "Guiana") AND NOT ("French Guiana" "French Guyana")
+  - country: Haiti
+    query: ("Haiti") AND NOT ("Bernard Haitink")
+  - country: Heard Island and McDonald Islands
+    query: ("Heard Island and McDonald Islands" "Heard and McDonald Islands" "Heard and McDonald Isl." "McDonald Islands" "Heard Island")
+  - country: Honduras
+    query: ("Honduras")
+  - country: Hong Kong
+    query: ("Hong Kong S.A.R. of China" "China, Hong Kong SAR" "Hong Kong, China" "Hong Kong SAR" "China Hong Kong SAR" "Hong Kong SAR, China" "Hong Kong")
+  - country: Hungary
+    query: ("Hungary" "Magyarország")
+  - country: Iceland
+    query: ("Iceland" "Reykjavík" "Reykjavik")
+  - country: India
+    query: ("India" "Bharat" "New Delhi" "Taj Mahal" "Mumbai" "Kerala" "Kolkata") AND NOT ("Indiana" "Indianapolis" "Indiana Jones" "Indiana State" "Indiana University")
+  - country: Indonesia
+    query: ("Indonesia" "Bali" "Jakarta")
+  - country: Iran
+    query: ("Iran, Islamic Republic Of" "Iran, Isl.Rep.of" "Iran, Islamic Rep." "Iran" "Persia")
+  - country: Iraq
+    query: ("Iraq")
+  - country: Ireland
+    query: ("Ireland, Republic of" "Ireland" "Éire" "Eire")
+  - country: Isle of Man
+    query: ("Isle of Man")
+  - country: Israel
+    query: ("Israel")
+  - country: Italy
+    query: ("Italy" "Italia" "Napoli" "Rome" "Roma")
+  - country: Ivory Coast
+    query: ("Ivory Coast" "Cote d\'Ivoire" "Côte d\'Ivoire" "D\'Ivoire" "d\'Ivoire")
+  - country: Jamaica
+    query: ("Jamaica")
+  - country: Japan
+    query: ("Japan" "Nippon" "Nihon" "Tokyo")
+  - country: Jersey
+    query: ("Jersey") AND NOT ("United States" "the US" "American" "Americans" "State" "America" "New Jersey" "Washington" "football" "player" "goal" "score" "director" "actor" "actress" "movie")
+  - country: Jordan
+    query: ("Jordan" "Transjordan" "Amman") AND NOT ("Michael Jordan" "Jordan Peterson" "Jordan Peele" "Air Jordan" "America" "American" "Americans" "United States" "the US" "Washington" "Jordan Pickford" "Jordan Henderson" "football" "player" "goal" "score" "director" "actor" "actress" "movie")
+  - country: Kazakhstan
+    query: ("Kazakhstan")
+  - country: Kenya
+    query: ("Kenya")
+  - country: Kiribati
+    query: ("Kiribati")
+  - country: Kosovo
+    query: ("Kosovo" "XKX")
+  - country: Kuwait
+    query: ("Kuwait")
+  - country: Kyrgyzstan
+    query: ("Kyrgyz Republic" "Kyrgyzstan" "Kirghizia")
+  - country: Laos
+    query: ("Lao" "Lao PDR" "Laos" "Lao People's DR" "Lao People's Democratic Republic")
+  - country: Latvia
+    query: ("Latvia")
+  - country: Lebanon
+    query: ("Lebanon")
+  - country: Lesotho
+    query: ("Lesotho" "Basutoland")
+  - country: Liberia
+    query: ("Liberia")
+  - country: Libya
+    query: ("Libya" "Libyan A.J.")
+  - country: Liechtenstein
+    query: ("Liechtenstein")
+  - country: Lithuania
+    query: ("Lithuania")
+  - country: Luxembourg
+    query: ("Luxembourg")
+  - country: Macau
+    query: ("Macao" "China, Macao SAR" "Macao SAR, China" "Macau")
+  - country: Madagascar
+    query: ("Madagascar")
+  - country: Malawi
+    query: ("Malawi" "Nyasaland")
+  - country: Malaysia
+    query: ("Malaysia" "Malaya" "Federated Malay States" "Malayan Union")
+  - country: Maldives
+    query: ("Maldives")
+  - country: Mali
+    query: ("Mali") AND NOT ("Zayn Malik" "Malika" "Russell Maliphant" "Shahid Malik" "Tara Malik")
+  - country: Malta
+    query: ("Malta")
+  - country: Marshall Islands
+    query: ("Marshall Islands")
+  - country: Martinique
+    query: ("Martinique")
+  - country: Mauritania
+    query: ("Mauritania")
+  - country: Mauritius
+    query: ("Mauritius")
+  - country: Mayotte
+    query: ("Mayotte")
+  - country: Mexico
+    query: ("Mexico")
+  - country: Micronesia (country)
+    query: ("Micronesia, Fed. Sts." "Micronesia")
+  - country: Moldova
+    query: ("Moldova" "Moldavia" "Republic of Moldova" "Rep. of Moldova" "Moldova, Republic of")
+  - country: Monaco
+    query: ("Monaco")
+  - country: Mongolia
+    query: ("Mongolia")
+  - country: Montenegro
+    query: ("Montenegro")
+  - country: Montserrat
+    query: ("Montserrat")
+  - country: Morocco
+    query: ("Morocco")
+  - country: Mozambique
+    query: ("Mozambique")
+  - country: Myanmar
+    query: ("Burma" "Myanmar")
+  - country: Namibia
+    query: ("Namibia" "German South West Africa")
+  - country: Nauru
+    query: ("Nauru")
+  - country: Nepal
+    query: ("Nepal")
+  - country: Netherlands
+    query: ("Netherlands" "Holland" "Nederland" "amsterdam")
+  - country: New Caledonia
+    query: ("New Caledonia")
+  - country: New Zealand
+    query: ("New Zealand")
+  - country: Nicaragua
+    query: ("Nicaragua")
+  - country: Niger
+    query: ("Niger") AND NOT ("Nigeria")
+  - country: Nigeria
+    query: ("Nigeria")
+  - country: Niue
+    query: ("Niue")
+  - country: Norfolk Island
+    query: ("Norfolk Island" "Norfolk Isl.")
+  - country: North Korea
+    query: ("Dem.Rep.,Korea" "North Korea" "D.P.R. of Korea" "Democratic People's Republic of Korea" "Korea, Dem. P.R. of" "Korea, Dem. People's Rep." "DPRK" "pyongyang") AND NOT ("South Korea" "Republic of Korea" "Korea, Rep.")
+  - country: North Macedonia
+    query: ("North Macedonia" "TFYR Macedonia" "TFYR of Macedonia" "Macedonia" "Macedonia, The Former Yugoslav Republic Of" "Macedonia, FYR")
+  - country: Northern Mariana Islands
+    query: ("Northern Mariana Islands" "Northern Mariana")
+  - country: Norway
+    query: ("Norway" "Norge")
+  - country: Oman
+    query: ("Oman" "Muscat")
+  - country: Pakistan
+    query: ("Pakistan")
+  - country: Palau
+    query: ("Palau")
+  - country: Palestine
+    query: ("State of Palestine" "Gaza Strip" "Palestinian Territories" "Occupied Palestinian Territory" "WBG" "Palestine" "Gaza" "Palestine, State of" "West Bank and Gaza" "Occupied Palestinian Terr.")
+  - country: Panama
+    query: ("Panama")
+  - country: Papua New Guinea
+    query: ("Papua New Guinea")
+  - country: Paraguay
+    query: ("Paraguay")
+  - country: Peru
+    query: ("Peru")
+  - country: Philippines
+    query: ("Philippines")
+  - country: Pitcairn
+    query: ("Pitcairn")
+  - country: Poland
+    query: ("Poland")
+  - country: Portugal
+    query: ("Portugal" "República Portuguesa")
+  - country: Puerto Rico
+    query: ("Puerto Rico")
+  - country: Qatar
+    query: ("Qatar" "Doha")
+  - country: Reunion
+    query: ("Reunion" "Réunion")
+  - country: Romania
+    query: ("Romania" "ROM")
+  - country: Russia
+    query: ("Russia" "Russian Federation" "Russian Fed." "Soviet Union" "USSR" "RSFSR" "Moscow")
+  - country: Rwanda
+    query: ("Rwanda")
+  - country: Saint Barthelemy
+    query: ("Saint Barthélemy" "Saint Barthelemy" "St Barth" "St. Barts" "St Barts" "St. Barth" "Gustavia")
+  - country: Saint Kitts and Nevis
+    query: ("Saint Kitts and Nevis" "St. Kitts - Nevis" "St. Kitts and Nevis" "Kitts and Nevis" "St.Kitts & Nevis")
+  - country: Saint Martin (French part)
+    query: ("Saint Martin" "St Martin" "St. Martin")
+  - country: Saint Pierre and Miquelon
+    query: ("St.Pierre e Michelon" "St. Pierre & Miquelon" "St.Pierre & Miq." "Saint Pierre and Miquelon" "Pierre-et-Miquelon" "Saint Pierre & Miquelon" "St Pierre and Miquelon")
+  - country: Saint Vincent and the Grenadines
+    query: ("Saint Vincent and the Grenadines" "Saint Vincent/Grenadines" "St. Vincent and the Grenadines" "St. Vincent & Grenadines" "St.Vin. & Gren.")
+  - country: Samoa
+    query: ("Samoa" "Western Samoa") AND NOT ("American Samoa")
+  - country: San Marino
+    query: ("San Marino")
+  - country: Sao Tome and Principe
+    query: ("Sao Tome & Pr." "Sao Tome and Principe" "Sao Tome e Principe" "São Tomé and Príncipe")
+  - country: Saudi Arabia
+    query: ("Saudi Arabia" "Kingdom of Saudi Arabia")
+  - country: Senegal
+    query: ("Senegal")
+  - country: Serbia
+    query: ("Serbia" "Federal Republic of Yugoslavia")
+  - country: Seychelles
+    query: ("Seychelles")
+  - country: Sierra Leone
+    query: ("Sierra Leone")
+  - country: Singapore
+    query: ("Singapore")
+  - country: Sint Maarten (Dutch part)
+    query: ("Sint Maarten" "St Maarten" "St. Maarten")
+  - country: Slovakia
+    query: ("Slovak Republic" "Slovakia" "Czechoslovakia")
+  - country: Slovenia
+    query: ("Slovenia")
+  - country: Solomon Islands
+    query: ("Solomon Islands")
+  - country: Somalia
+    query: ("Somalia")
+  - country: South Africa
+    query: ("South Africa" "S. Africa" "S Africa")
+  - country: South Georgia and the South Sandwich Islands
+    query: ("South Georgia and the South Sandwich Islands" "South Georgia & South Sandwich Islands" "South Georgia" "South Sandwich Islands")
+  - country: South Korea
+    query: ("South Korea" "Korea, Rep." "Korea, Republic Of" "ROK" "S. Korea" "S Korea" "seoul") AND NOT ("North Korea" "Democratic People's Republic of Korea" "DPRK" "D.P.R. of Korea")
+  - country: South Sudan
+    query: ("South Sudan" "Southern Sudan" "S. Sudan")
+  - country: Spain
+    query: ("Spain" "España" "Reino de España")
+  - country: Sri Lanka
+    query: ("Sri Lanka" "Ceylon")
+  - country: Saint Helena
+    query: ("St. Helena" "Saint Helena" "Saint Helena, Ascension and Tristan da Cunha")
+  - country: Saint Lucia
+    query: ("Saint Lucia" "St. Lucia")
+  - country: Sudan
+    query: ("Sudan") AND NOT ("South Sudan" "Southern Sudan" "S. Sudan")
+  - country: Suriname
+    query: ("Suriname")
+  - country: Sweden
+    query: ("Sweden" "Sverige" "stockholm")
+  - country: Switzerland
+    query: ("Switzerland" "Schweiz" "Suisse" "Svizzera" "Svizra" "Swiss Confederation")
+  - country: Syria
+    query: ("Syria" "Syrian Arab Rep." "Syrian Arab Republic" "damascus")
+  - country: Taiwan
+    query: ("China, Taiwan Province of" "Taiwan, Province Of China" "Taiwan" "Taiwan, China" "Chinese Taipei")
+  - country: Tajikistan
+    query: ("Tajikistan")
+  - country: Tanzania
+    query: ("Tanzania, United Republic Of" "United Republic of Tanzania" "Tanzania, the United Republic of" "U.R. Tanzania" "Tanzania" "Tanganyika" "Zanzibar")
+  - country: Thailand
+    query: ("Thailand" "Siam")
+  - country: East Timor
+    query: ("Timor-Leste" "Timor Leste" "East Timor")
+  - country: Togo
+    query: ("Togo")
+  - country: Tokelau
+    query: ("Tokelau" "Nukunonu" "Fakaofo" "Atafu")
+  - country: Tonga
+    query: ("Tonga")
+  - country: Trinidad and Tobago
+    query: ("Trin. & Tobago" "Trinidad and Tobago" "Trinidad & Tobago")
+  - country: Tunisia
+    query: ("Tunisia")
+  - country: Turkey
+    query: ("istanbul" "ankara" "Turkiye" "Türkiye" "The Republic of Türkiye" "Turkey") AND NOT ("turkey dinner" "turkey bird" "cold turkey" "turkey shoot" "talk turkey")
+  - country: Turkmenistan
+    query: ("Turkmenistan")
+  - country: Turks and Caicos Islands
+    query: ("Turks and Caicos Islands" "Turk Island" "Turks & Caicos")
+  - country: Tuvalu
+    query: ("Tuvalu")
+  - country: United Kingdom
+    query: ("United Kingdom of Great Britain and Northern Ireland" "United Kingdom" "the UK" "London" "Scotland" "Wales" "Northern Ireland") AND NOT ("Ukraine")
+  - country: United States
+    query: ("the US" "Washington" "United States of America" "United States" "USA" "New York" "Texas" "California" "Florida" "los angeles" "hawaii"  "miami" "boston" "chicago" "seattle")
+  - country: Uganda
+    query: ("Uganda")
+  - country: Ukraine
+    query: ("Ukraine" "kyiv" "kiev")
+  - country: United Arab Emirates
+    query: ("U.Arab Emirates" "United Arab Emirates" "UAE" "United Arab Em" "Trucial States" "Trucial Coast" "Dubai" "Abu Dhabi")
+  - country: Uruguay
+    query: ("Uruguay")
+  - country: United States Virgin Islands
+    query: ("U.S. Virgin Is." "Virgin Islands, U.S." "U.S. Virgin Islands" "United States Virgin Islands" "Us Virgin Islands")
+  - country: Uzbekistan
+    query: ("Uzbekistan")
+  - country: Vanuatu
+    query: ("Vanuatu")
+  - country: Vatican
+    query: ("Papal States" "Holy See" "Vatican")
+  - country: Venezuela
+    query: ("Venezuela" "Venezuela, Bolivarian Republic Of" "Venezuela, RB")
+  - country: Vietnam
+    query: ("Viet Nam" "Vietnam" "Viet Cong" "Saigon")
+  - country: Wallis and Futuna
+    query: ("Wallis and Futuna" "Wallis & Futuna" "Futuna")
+  - country: Western Sahara
+    query: ("Spanish Sahara" "Western Sahara")
+  - country: Yemen
+    query: ("Yemen" "Yemen, Rep.")
+  - country: Zambia
+    query: ("Zambia" "Northern Rhodesia")
+  - country: Zimbabwe
+    query: ("Zimbabwe" "Southern Rhodesia")

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/153
+    date_accessed: 2023-08-16 08:38:19.460503
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_153_economic_freedom_of_the_world__fraser_institute__2018
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f548b062e024c0b735342ab85ce24787
+  size: 4242
+  path: dataset_153_economic_freedom_of_the_world__fraser_institute__2018_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/3240
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: TE-15.1_inflation
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: 7a086936ded1e92e2c513cfd159cd9db
+    size: 6562
+    path: dataset_3240_te_15_1_inflation_values.feather

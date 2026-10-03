@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://admin.owid.io/admin/datasets/1871
+    date_accessed: 2026-03-05 10:57:58.332271+00:00
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1871_womens_weekly_earnings_as_a_percentage_of_mens__bureau_of_labor_statistics__2017
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+  - md5: 474cfbbf3dadf1085e9886d37b05b335
+    size: 2349
+    path: dataset_1871_womens_weekly_earnings_as_a_percentage_of_mens__bureau_of_labor_statistics__2017_config.json

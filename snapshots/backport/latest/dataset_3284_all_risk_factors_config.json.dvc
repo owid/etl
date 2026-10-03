@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3284
+    date_accessed: 2023-08-14 14:46:02.129563
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3284_all_risk_factors (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c36bfdc7c21fa3ab9dcf65cc945bb84f
+  size: 21876
+  path: dataset_3284_all_risk_factors_config.json

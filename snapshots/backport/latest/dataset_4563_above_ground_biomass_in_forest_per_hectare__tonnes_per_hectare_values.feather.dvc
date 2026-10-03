@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4563
+    date_accessed: 2023-08-14 05:36:26.790643
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Above-ground biomass in forest per hectare (tonnes per hectare)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0a9488d75c06646eed6b4248f2079551
+  size: 18290
+  path: 
+    dataset_4563_above_ground_biomass_in_forest_per_hectare__tonnes_per_hectare_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/830
+    date_accessed: 2023-08-11 07:43:44.152517
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_830_agri_environmental_indicators__air_and_climate_change__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1ca73d61e620c350df1b4c5cec405c72
+  size: 3991
+  path: 
+    dataset_830_agri_environmental_indicators__air_and_climate_change__fao__2017_config.json

@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Charting the “Rise of the West”: Manuscripts and Printed Books in Europe, A Long-Term Perspective from the Sixth through Eighteenth Centuries"
+    description: |-
+     This paper presents estimates of the production of manuscripts and printed books in Western Europe over a span of thirteen centuries. To estimate literacy levels, the authors first calculate book consumption per capita, then convert these figures into literacy rates using two key inputs: historical trends in book prices and an assumed elasticity of demand for books. The book price data are sourced from the work of Jan Luiten van Zanden and Gregory Clark, while the elasticity of demand—reflecting how book consumption responds to price changes—is set at 1.4, based on contemporary economic literature. This method assumes that lower book prices made books more accessible, which in turn helped to increase literacy rates.
+    date_published: "2009"
+
+    # Citation
+    producer: Buringh and van Zanden
+    citation_full: |-
+      Buringh, E., & van Zanden, J. L. (2009). Charting the “Rise of the West”: Manuscripts and printed books in Europe, a long‐term perspective from the sixth through the eighteenth centuries. The Journal of Economic History, 69(2), 409–445. https://doi.org/10.1017/S0022050709000837
+
+    # Files
+    url_main: https://www.researchgate.net/publication/46544350_Charting_the_Rise_of_the_West_Manuscripts_and_Printed_Books_in_Europe_A_Long-Term_Perspective_from_the_Sixth_through_Eighteenth_Centuries
+    url_download: https://www.researchgate.net/profile/Jan-Zanden/publication/46544350_Charting_the_Rise_of_the_West_Manuscripts_and_Printed_Books_in_Europe_A_Long-Term_Perspective_from_the_Sixth_through_Eighteenth_Centuries/links/00b49528a18ffc6638000000/Charting-the-Rise-of-the-West-Manuscripts-and-Printed-Books-in-Europe-A-Long-Term-Perspective-from-the-Sixth-through-Eighteenth-Centuries.pdf?_tp=eyJjb250ZXh0Ijp7ImZpcnN0UGFnZSI6InB1YmxpY2F0aW9uIiwicGFnZSI6InB1YmxpY2F0aW9uIn19
+    date_accessed: '2025-06-09'
+
+    # License
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: 2b09553d94f6b28fdc86335e466cbbed
+    size: 723820
+    path: literacy_1451_1800.pdf

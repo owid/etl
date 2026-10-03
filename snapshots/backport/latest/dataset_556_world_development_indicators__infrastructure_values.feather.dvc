@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/556
+    date_accessed: 2023-08-14 05:42:57.224574
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Development Indicators - Infrastructure
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1900c3f971abb1134a3155a782b2e611
+  size: 1175218
+  path: dataset_556_world_development_indicators__infrastructure_values.feather

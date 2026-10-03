@@ -1,0 +1,27 @@
+dataset:
+  title: DRAFT 2 – 2023 In-donor individual countries - Sheet1
+  description: ''
+tables:
+  _2__2023_in_donor_individual_countries__sheet1:
+    variables:
+      debt_relief:
+        title: Debt_Relief
+        unit: ''
+      in_donor_student_costs:
+        title: In_Donor_Student_Costs
+        unit: ''
+      in_donor_refugee_costs:
+        title: In_Donor_Refugee_Costs
+        unit: ''
+      development_awareness:
+        title: Development_Awareness
+        unit: ''
+      administrative_costs:
+        title: Administrative_Costs
+        unit: ''
+      in_donor_research:
+        title: In_Donor_Research
+        unit: ''
+      total:
+        title: Total
+        unit: ''

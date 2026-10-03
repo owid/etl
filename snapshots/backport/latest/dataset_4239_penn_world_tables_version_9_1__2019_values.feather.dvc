@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4239
+    date_accessed: 2023-08-16 08:29:04.714753
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Penn World Tables version 9.1 (2019)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d1b01d954d00dab461c80585ee0aec84
+  size: 2990610
+  path: dataset_4239_penn_world_tables_version_9_1__2019_values.feather

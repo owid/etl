@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4459
+    date_accessed: 2023-08-10 14:41:45.519621
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4459_number_of_local_governments_that_adopt_and_implement_local_drr_strategies_in_line_with_national_strategies__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c1309d91066cab68fc07b8cc60f324e3
+  size: 11654
+  path: 
+    dataset_4459_number_of_local_governments_that_adopt_and_implement_local_drr_strategies_in_line_with_national_strategies__number_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/582
+    date_accessed: 2023-08-10 09:39:36.807975
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_582_daily_protein_supply__fao__2017
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c21c6bc4431ca3b6b5060735660cbaa1
+  size: 4994
+  path: dataset_582_daily_protein_supply__fao__2017_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2562
+    date_accessed: 2023-08-14 15:48:40.630011
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Agriculture and Fisheries - Fisheries Support Estimate
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f8c283ef404e2b8690b377ea0e05db4c
+  size: 36978
+  path: 
+    dataset_2562_agriculture_and_fisheries__fisheries_support_estimate_values.feather

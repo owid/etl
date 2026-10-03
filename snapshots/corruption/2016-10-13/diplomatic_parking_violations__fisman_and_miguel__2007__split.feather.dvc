@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: Fisman and Miguel
+    title: 'Corruption, norms, and legal enforcement: Evidence from diplomatic parking tickets'
+    citation_full: 'Fisman, R., & Miguel, E. (2007). Corruption, norms, and legal enforcement: Evidence from diplomatic parking tickets. Journal of Political Economy, 115(6), 1020-1048.'
+    url_main: https://web.archive.org/web/20170705082223/http://projects.iq.harvard.edu/gov2126/files/fisman_miguel_parkingtickets.pdf
+    date_accessed: '2016-10-13'
+    date_published: '2007'
+  is_public: false
+outs:
+  - md5: 3611eea05aa3a4c5953573c291cec125
+    size: 5746
+    path: diplomatic_parking_violations__fisman_and_miguel__2007__split.feather

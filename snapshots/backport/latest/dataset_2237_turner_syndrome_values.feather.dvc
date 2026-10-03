@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2237
+    date_accessed: 2023-08-16 10:43:59.028809
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Turner syndrome
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4d6041dc5e5a9e2622f86bb1dad7dc5f
+  size: 1489562
+  path: dataset_2237_turner_syndrome_values.feather

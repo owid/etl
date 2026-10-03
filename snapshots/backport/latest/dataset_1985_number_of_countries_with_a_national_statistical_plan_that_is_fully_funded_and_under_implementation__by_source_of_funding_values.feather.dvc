@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1985
+    date_accessed: 2023-08-16 10:15:49.647223
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of countries with a national statistical plan that is fully funded
+    and under implementation, by source of funding
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a247a3979430fdc4c85f8ed16ed54bd5
+  size: 13010
+  path: 
+    dataset_1985_number_of_countries_with_a_national_statistical_plan_that_is_fully_funded_and_under_implementation__by_source_of_funding_values.feather

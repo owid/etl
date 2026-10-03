@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4786
+    date_accessed: 2023-08-16 08:24:46.824174
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4786_proportion_of_bodies_of_water_with_good_ambient_water_quality__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 67bf181b8522ac097709770cfe968e38
+  size: 19192
+  path: 
+    dataset_4786_proportion_of_bodies_of_water_with_good_ambient_water_quality__pct_config.json

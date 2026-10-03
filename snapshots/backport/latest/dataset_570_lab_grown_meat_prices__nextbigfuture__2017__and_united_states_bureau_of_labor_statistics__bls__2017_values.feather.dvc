@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/570
+    date_accessed: 2023-08-16 10:02:54.564439
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Lab-grown meat prices - NextBigFuture (2017) and United States Bureau of Labor
+    Statistics (BLS) (2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5c5a7d4ca8d10415e82ce247842d9326
+  size: 6226
+  path: 
+    dataset_570_lab_grown_meat_prices__nextbigfuture__2017__and_united_states_bureau_of_labor_statistics__bls__2017_values.feather

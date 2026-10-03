@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1814
+    date_accessed: 2023-08-16 09:35:42.847174
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1814_drug_use (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 36e413cf5fc7fc7356e82208a981805f
+  size: 21804
+  path: dataset_1814_drug_use_config.json

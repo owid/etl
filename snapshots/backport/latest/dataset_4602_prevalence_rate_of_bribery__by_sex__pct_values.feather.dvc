@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4602
+    date_accessed: 2023-08-16 10:17:44.691459
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Prevalence rate of bribery, by sex (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 688f180f402209b9dcb4d8ae31f3ffb4
+  size: 8122
+  path: dataset_4602_prevalence_rate_of_bribery__by_sex__pct_values.feather

@@ -1,0 +1,230 @@
+"""Load a garden dataset and create a grapher dataset."""
+
+import owid.catalog.processing as pr
+from owid.catalog import Table
+
+from etl.helpers import PathFinder
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
+
+def prepare_maize_and_wheat_in_the_context_of_the_ukraine_war(tb_maize_and_wheat: Table) -> Table:
+    # Prepare groupings that will be shown in a stacked discrete bar chart.
+    # Ukraine and Russia exports of maize and wheat.
+    ukraine_and_russia_exports = (
+        tb_maize_and_wheat[tb_maize_and_wheat["country"] == "Ukraine"][["year", "maize_exports", "wheat_exports"]]
+        .merge(
+            tb_maize_and_wheat[tb_maize_and_wheat["country"] == "Russia"][["year", "maize_exports", "wheat_exports"]],
+            on="year",
+            suffixes=(" Ukraine", " Russia"),
+        )
+        .assign(**{"country": "Ukraine and Russia exports"})
+    )
+    # EU and UK maize and wheat used for animal feed.
+    eu_and_uk_feed = (
+        tb_maize_and_wheat[tb_maize_and_wheat["country"] == "European Union (27)"][
+            ["year", "maize_animal_feed", "wheat_animal_feed"]
+        ]
+        .merge(
+            tb_maize_and_wheat[tb_maize_and_wheat["country"] == "United Kingdom"][
+                ["year", "maize_animal_feed", "wheat_animal_feed"]
+            ],
+            on="year",
+            suffixes=(" EU", " UK"),
+        )
+        .assign(**{"country": "EU and UK animal feed"})
+    )
+    # EU and UK maize and wheat devoted to other uses (predominantly biofuels).
+    eu_and_uk_biofuels = (
+        tb_maize_and_wheat[tb_maize_and_wheat["country"] == "European Union (27)"][
+            ["year", "maize_other_uses", "wheat_other_uses"]
+        ]
+        .merge(
+            tb_maize_and_wheat[tb_maize_and_wheat["country"] == "United Kingdom"][
+                ["year", "maize_other_uses", "wheat_other_uses"]
+            ],
+            on="year",
+            suffixes=(" EU", " UK"),
+        )
+        .assign(**{"country": "EU and UK biofuels"})
+    )
+    # US maize and wheat used for animal feed.
+    us_feed = (
+        tb_maize_and_wheat[tb_maize_and_wheat["country"] == "United States"][
+            ["year", "maize_animal_feed", "wheat_animal_feed"]
+        ]
+        .rename(
+            columns={"maize_animal_feed": "maize_animal_feed US", "wheat_animal_feed": "wheat_animal_feed US"},
+            errors="raise",
+        )
+        .assign(**{"country": "US animal feed"})
+    )
+    # US maize and wheat devoted to other uses (predominantly biofuels).
+    us_biofuels = (
+        tb_maize_and_wheat[tb_maize_and_wheat["country"] == "United States"][
+            ["year", "maize_other_uses", "wheat_other_uses"]
+        ]
+        .rename(
+            columns={"maize_other_uses": "maize_other_uses US", "wheat_other_uses": "wheat_other_uses US"},
+            errors="raise",
+        )
+        .assign(**{"country": "US biofuels"})
+    )
+
+    # Combine all groupings.
+    combined = pr.concat(
+        [ukraine_and_russia_exports, eu_and_uk_feed, eu_and_uk_biofuels, us_feed, us_biofuels], ignore_index=True
+    )
+
+    # Set an appropriate index and sort conveniently.
+    combined = combined.format(["country", "year"], sort_columns=True)
+
+    # Adapt metadata.
+    column_titles = {
+        "maize_exports_ukraine": "Maize exported by Ukraine",
+        "maize_exports_russia": "Maize exported by Russia",
+        "wheat_exports_ukraine": "Wheat exported by Ukraine",
+        "wheat_exports_russia": "Wheat exported by Russia",
+        "maize_animal_feed_eu": "Maize used for animal feed in the EU",
+        "maize_animal_feed_uk": "Maize used for animal feed in the UK",
+        "maize_animal_feed_us": "Maize used for animal feed in the US",
+        "wheat_animal_feed_eu": "Wheat used for animal feed in the EU",
+        "wheat_animal_feed_uk": "Wheat used for animal feed in the UK",
+        "wheat_animal_feed_us": "Wheat used for animal feed in the US",
+        "maize_other_uses_eu": "Maize used for biofuels in the EU",
+        "maize_other_uses_uk": "Maize used for biofuels in the UK",
+        "maize_other_uses_us": "Maize used for biofuels in the US",
+        "wheat_other_uses_eu": "Wheat used for biofuels in the EU",
+        "wheat_other_uses_uk": "Wheat used for biofuels in the UK",
+        "wheat_other_uses_us": "Wheat used for biofuels in the US",
+    }
+    combined.metadata.short_name = "maize_and_wheat_in_the_context_of_the_ukraine_war"
+    for column in combined.columns:
+        combined[column].metadata.title = column_titles[column]
+        combined[column].metadata.unit = "tonnes"
+        combined[column].metadata.short_unit = "t"
+
+    return combined
+
+
+def prepare_fertilizer_share_of_exports(tb_fertilizer_exports: Table) -> Table:
+    """Pivot fertilizer export shares from long to wide format for the fertilizer MDim."""
+    tb = tb_fertilizer_exports.reset_index()
+
+    # Keep only the share_of_exports column.
+    tb = tb[["country", "year", "item", "share_of_exports"]]
+
+    # Pivot: one column per nutrient.
+    tb = tb.pivot(index=["country", "year"], columns="item", values="share_of_exports")
+
+    # Rename columns to match MDim naming conventions.
+    tb = tb.rename(
+        columns={
+            "Nitrogen": "nitrogen_share_of_global_exports",
+            "Phosphate": "phosphate_share_of_global_exports",
+            "Potash": "potash_share_of_global_exports",
+        },
+        errors="raise",
+    )
+
+    # Set metadata.
+    nutrient_labels = {
+        "nitrogen": "Nitrogen (N)",
+        "phosphate": "Phosphate (P₂O₅)",
+        "potash": "Potash (K₂O)",
+    }
+    for column in tb.columns:
+        nutrient = column.split("_")[0]
+        tb[column].metadata.title = f"{nutrient_labels[nutrient]} fertilizer: share of global exports"
+        tb[column].metadata.unit = "%"
+        tb[column].metadata.short_unit = "%"
+
+    tb = tb.reset_index()
+    tb.columns.name = None
+    tb = tb.format(["country", "year"], short_name="fertilizer_share_of_exports")
+
+    return tb
+
+
+def run() -> None:
+    #
+    # Load inputs.
+    #
+    # Load garden dataset.
+    ds_garden = paths.load_dataset("additional_variables")
+
+    # Read tables from garden dataset.
+    tb_arable_land_per_crop_output = ds_garden.read("arable_land_per_crop_output", reset_index=False)
+    tb_area_used_per_crop_type = ds_garden.read("area_used_per_crop_type")
+    tb_sustainable_and_overexploited_fish = ds_garden.read(
+        "share_of_sustainable_and_overexploited_fish", reset_index=False
+    )
+    tb_land_spared_by_increased_crop_yields = ds_garden.read("land_spared_by_increased_crop_yields", reset_index=False)
+    tb_food_available_for_consumption = ds_garden.read("food_available_for_consumption", reset_index=False)
+    tb_macronutrient_compositions = ds_garden.read("macronutrient_compositions", reset_index=False)
+    tb_fertilizers = ds_garden.read("fertilizers", reset_index=False)
+    tb_vegetable_oil_yields = ds_garden.read("vegetable_oil_yields", reset_index=False)
+    tb_agriculture_land_use_evolution = ds_garden.read("agriculture_land_use_evolution", reset_index=False)
+    tb_hypothetical_meat_consumption = ds_garden.read("hypothetical_meat_consumption", reset_index=False)
+    tb_hypothetical_animals_slaughtered = ds_garden.read("hypothetical_animals_slaughtered", reset_index=False)
+    tb_cereal_allocation = ds_garden.read("cereal_allocation", reset_index=False)
+    tb_maize_and_wheat = ds_garden.read("maize_and_wheat", reset_index=True)
+    tb_fertilizer_exports = ds_garden.read("fertilizer_exports", reset_index=False)
+    tb_net_exports_as_share_of_supply = ds_garden.read("net_exports_as_share_of_supply", reset_index=False)
+    tb_milk_per_animal = ds_garden.read("milk_per_animal", reset_index=False)
+
+    #
+    # Process data.
+    #
+    # To insert table into grapher DB, change "item" column to "country" (which will be changed back in the admin).
+    tb_area_used_per_crop_type = tb_area_used_per_crop_type.rename(columns={"item": "country"}, errors="raise").format(
+        ["country", "year"]
+    )
+
+    # For land spared by increased crop yields, for the moment we only need global data, by crop type.
+    # And again, change "item" to "country" to fit grapher DB needs.
+    tb_land_spared_by_increased_crop_yields = tb_land_spared_by_increased_crop_yields.reset_index()
+    tb_land_spared_by_increased_crop_yields = (
+        tb_land_spared_by_increased_crop_yields.loc[tb_land_spared_by_increased_crop_yields["country"] == "World"]
+        .drop(columns=["country"], errors="raise")
+        .rename(columns={"item": "country"}, errors="raise")
+        .format(["country", "year"])
+    )
+
+    # Prepare maize and what data in the context of the Ukraine war.
+    tb_maize_and_wheat_in_the_context_of_the_ukraine_war = prepare_maize_and_wheat_in_the_context_of_the_ukraine_war(
+        tb_maize_and_wheat=tb_maize_and_wheat
+    )
+
+    # Prepare fertilizer share of global exports for the fertilizer MDim.
+    tb_fertilizer_share_of_exports = prepare_fertilizer_share_of_exports(tb_fertilizer_exports=tb_fertilizer_exports)
+
+    #
+    # Save outputs.
+    #
+    # Create a new grapher dataset.
+    ds_grapher = paths.create_dataset(
+        tables=[
+            tb_arable_land_per_crop_output,
+            tb_area_used_per_crop_type,
+            tb_sustainable_and_overexploited_fish,
+            tb_land_spared_by_increased_crop_yields,
+            tb_food_available_for_consumption,
+            tb_macronutrient_compositions,
+            tb_fertilizers,
+            tb_vegetable_oil_yields,
+            tb_agriculture_land_use_evolution,
+            tb_hypothetical_meat_consumption,
+            tb_hypothetical_animals_slaughtered,
+            tb_cereal_allocation,
+            tb_maize_and_wheat_in_the_context_of_the_ukraine_war,
+            tb_fertilizer_share_of_exports,
+            tb_net_exports_as_share_of_supply,
+            tb_milk_per_animal,
+        ],
+        default_metadata=ds_garden.metadata,
+    )
+
+    # Save changes in the new grapher dataset.
+    ds_grapher.save()

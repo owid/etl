@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2050
+    date_accessed: 2023-08-16 09:39:55.361962
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2050_debt_service_as_a_proportion_of_exports_of_goods_and_services
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f5ec938adfc08864471790d9f4d13bc5
+  size: 2197
+  path: 
+    dataset_2050_debt_service_as_a_proportion_of_exports_of_goods_and_services_config.json

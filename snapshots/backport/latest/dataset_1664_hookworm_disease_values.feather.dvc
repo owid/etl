@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1664
+    date_accessed: 2023-08-16 10:34:05.791958
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Hookworm disease
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2528db82cb8481f1845d274e8d2f001c
+  size: 744762
+  path: dataset_1664_hookworm_disease_values.feather

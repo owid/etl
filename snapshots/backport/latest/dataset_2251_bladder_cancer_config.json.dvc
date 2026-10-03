@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2251
+    date_accessed: 2023-08-10 14:30:04.339518
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2251_bladder_cancer (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 05b3421eadf8643a9952b63bb7d2e636
+  size: 32452
+  path: dataset_2251_bladder_cancer_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1784
+    date_accessed: 2023-08-16 10:47:16.903060
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Occupational exposure to chromium
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a6e10a5858130cfb31faf2d84f459434
+  size: 961154
+  path: dataset_1784_occupational_exposure_to_chromium_values.feather

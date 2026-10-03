@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/892
+    date_accessed: 2023-08-16 09:50:16.319269
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_892_world_bank_edstats__school_finance__saber
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 50b3d03c04fea72866969f4b3b4d0141
+  size: 28450
+  path: dataset_892_world_bank_edstats__school_finance__saber_config.json

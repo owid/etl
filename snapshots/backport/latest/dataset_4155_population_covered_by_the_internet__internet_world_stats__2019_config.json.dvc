@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4155
+    date_accessed: 2023-08-16 08:38:09.542830
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4155_population_covered_by_the_internet__internet_world_stats__2019
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b4e7fab3c7539db06e027b4399763f84
+  size: 2052
+  path: 
+    dataset_4155_population_covered_by_the_internet__internet_world_stats__2019_config.json

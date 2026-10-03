@@ -1,0 +1,26 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: LPAC Database, Long-term Trends in Paternal Age at Childbirth
+    description: |-
+      The research article investigates long-term trends in paternal age at childbirth, revealing a U-shaped pattern across various countries. While recent increases in paternal age have raised concerns about offspring health, the study demonstrates that current levels are not unprecedented. The authors highlight the need for further research to understand the interplay between biological and social factors influencing offspring health outcomes at both individual and population levels, including the impact of medical advancements and changing social norms. A significant knowledge gap exists regarding the interaction of maternal and paternal age effects. Finally, a product advertisement promotes a medium to improve pregnancy chances by supporting embryo-endometrial communication.
+    date_published: "2024-04-03"
+    # Citation
+    producer: Willführ and Klüsener
+    citation_full: |-
+      Willführ, K. P., Fox, J. F., & Voland, E. (2024). 26. Historical Family Reconstitution Databases in the Study of Kinship Influences on Demographic Outcomes. In Open Book Publishers (pp. 617–634). https://doi.org/10.11647/obp.0251.26
+
+    # Files
+    url_main: https://lpac-database.shinyapps.io/Data/
+    date_accessed: 2024-12-04
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/deed.en
+outs:
+  - md5: a3fc2cd51a9a0e638064b47b4fb99cb6
+    size: 928662
+    path: paternal_ages.rdata

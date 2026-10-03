@@ -1,0 +1,7 @@
+
+steps:
+  data://test/step_1:
+    - data://test/step_0
+
+include:
+  - tests/data/sub_dag.yml

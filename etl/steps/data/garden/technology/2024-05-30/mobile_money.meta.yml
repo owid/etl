@@ -1,0 +1,25 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Technological Change
+
+dataset:
+  update_period_days: 365
+
+tables:
+  mobile_money:
+    variables:
+      active_accounts_90d:
+        title: Active mobile money accounts
+        unit: active accounts
+        short_unit: ""
+        description_short: Mobile money accounts used to perform at least one mobile money payment during the last 90 days of each year.
+        description_key:
+          - "Mobile money accounts are financial accounts managed via mobile devices. They offer services like deposits, transfers, and payments, mainly in regions with limited banking access."
+          - "In this data, accounts are considered active when they have been used to perform at least one mobile money payment during the last 90 days of each year."
+          - "North America is not shown because mobile money accounts are not used across this region."
+        description_from_producer: "The number of customer accounts that have been used to perform at least one P2P payment, bill payment, bulk payment, cash in to account, cash out from account, merchant payments, international remittances or airtime top up from account during at least 90 days prior to end of the indicated months. Balance inquiries, PIN resets, and other transactions that do not involve the movement of value DO NOT qualify a customer account as active."
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0

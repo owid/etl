@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3090
+    date_accessed: 2023-08-11 07:41:11.172028
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Caloric production per unit arable area
+  description: Test for Hannah. Private. Do not share.
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3fa01ee08815206ced792c4b8e320575
+  size: 134546
+  path: dataset_3090_caloric_production_per_unit_arable_area_values.feather

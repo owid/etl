@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2059
+    date_accessed: 2023-08-14 15:23:43.358442
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2059_manufacturing_employment_as_a_proportion_of_total_employment
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 27d9f266d7b259801a72e07a07e6fb57
+  size: 2855
+  path: 
+    dataset_2059_manufacturing_employment_as_a_proportion_of_total_employment_config.json

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4610
+    date_accessed: 2023-08-16 08:02:36.890757
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of countries that applied for accreditation as independent National
+    Human Rights Institutions in compliance with the Paris Principles (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ea967369183473bb7ed28e391bf2d3f8
+  size: 7882
+  path: 
+    dataset_4610_proportion_of_countries_that_applied_for_accreditation_as_independent_national_human_rights_institutions_in_compliance_with_the_paris_principles__pct_values.feather

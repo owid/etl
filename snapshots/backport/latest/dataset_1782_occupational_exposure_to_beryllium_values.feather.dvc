@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1782
+    date_accessed: 2023-08-16 08:36:58.937359
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Occupational exposure to beryllium
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 61b2a4606cbaee2a47279ac0fca083de
+  size: 961154
+  path: dataset_1782_occupational_exposure_to_beryllium_values.feather

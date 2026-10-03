@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/634
+    date_accessed: 2023-08-11 07:37:34.569816
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Total population (both sexes combined) by single age, region, subregion and
+    country, annually for 1950-2100 (thousands) - UN Population Division (2017)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 61af8a8026e569d3519177aeb5c30fc4
+  size: 18447058
+  path: 
+    dataset_634_total_population__both_sexes_combined__by_single_age__region__subregion_and_country__annually_for_1950_2100__thousands__un_population_division__2017_values.feather

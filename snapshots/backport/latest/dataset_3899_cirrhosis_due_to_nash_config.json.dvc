@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3899
+    date_accessed: 2023-08-10 14:38:40.467793
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3899_cirrhosis_due_to_nash (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ac4f07d1455500e49a02c2eb3671feea
+  size: 26983
+  path: dataset_3899_cirrhosis_due_to_nash_config.json

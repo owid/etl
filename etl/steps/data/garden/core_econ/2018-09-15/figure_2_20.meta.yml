@@ -1,0 +1,23 @@
+dataset:
+  title: Figure 2.20
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_2_20:
+    variables:
+      population__millions:
+        title: Population (millions)
+        unit: ''
+      real_wage_index__1860__100:
+        title: Real wage index (1860 = 100)
+        unit: ''
+        description: London craftsman real wage rebased to 1865 = 100.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

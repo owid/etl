@@ -1,0 +1,23 @@
+dataset:
+  title: DRAFT housing_rents_indexed_2002
+  description: ''
+tables:
+  housing_rents_indexed_2002:
+    variables:
+      all_items_hicp:
+        title: All-items HICP
+        unit: ''
+      actual_rentals_for_housing:
+        title: Actual rentals for housing
+        unit: ''
+      inflation_adjusted_increase_in_rent:
+        title: Inflation-adjusted increase in rent
+        unit: ''
+      rent_index__2002__100:
+        title: Rent index (2002 = 100)
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

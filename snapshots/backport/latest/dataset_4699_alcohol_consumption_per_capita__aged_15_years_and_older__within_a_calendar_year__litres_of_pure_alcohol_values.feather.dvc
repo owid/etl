@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4699
+    date_accessed: 2023-08-16 07:20:28.862976
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Alcohol consumption per capita (aged 15 years and older) within a calendar
+    year (litres of pure alcohol)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4b8d4a113ac4d2cb8fcf3c39965fd263
+  size: 22842
+  path: 
+    dataset_4699_alcohol_consumption_per_capita__aged_15_years_and_older__within_a_calendar_year__litres_of_pure_alcohol_values.feather

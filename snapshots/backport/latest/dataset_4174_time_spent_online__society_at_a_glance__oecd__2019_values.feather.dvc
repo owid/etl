@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4174
+    date_accessed: 2023-08-14 15:56:44.219059
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Time spent online (Society at a Glance - OECD (2019))
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e582133bef4ab2f4401fd051c80935aa
+  size: 7674
+  path: dataset_4174_time_spent_online__society_at_a_glance__oecd__2019_values.feather

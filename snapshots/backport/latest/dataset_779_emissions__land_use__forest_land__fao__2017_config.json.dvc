@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/779
+    date_accessed: 2023-08-16 10:34:15.734161
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_779_emissions__land_use__forest_land__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e633eee68753d5fdb66eac45ac0d6bc2
+  size: 22031
+  path: dataset_779_emissions__land_use__forest_land__fao__2017_config.json

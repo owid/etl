@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4843
+    date_accessed: 2023-08-16 10:19:27.289779
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4843_non_fatal_occupational_injuries_among_employees__by_sex_and_migrant_status__per_100_000_employees
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 29f05a44c637edbd9cdf6033b5a672a0
+  size: 28629
+  path: 
+    dataset_4843_non_fatal_occupational_injuries_among_employees__by_sex_and_migrant_status__per_100_000_employees_config.json

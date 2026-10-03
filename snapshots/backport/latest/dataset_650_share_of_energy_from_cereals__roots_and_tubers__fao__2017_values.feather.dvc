@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/650
+    date_accessed: 2023-08-14 15:45:17.574467
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Share of energy from cereals, roots and tubers - FAO (2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a8687ae9bccf66a8b935fcf5a23e0880
+  size: 19474
+  path: 
+    dataset_650_share_of_energy_from_cereals__roots_and_tubers__fao__2017_values.feather

@@ -1,0 +1,14 @@
+meta:
+  origin:
+    producer: Federal Reserve Bank of St. Louis
+    title: FRED
+    citation_full: Federal Reserve Bank of St. Louis (2016). FRED.
+    attribution_short: FRED
+    url_main: https://fred.stlouisfed.org/series/NAEXKP01MXA657S
+    date_accessed: '2019-03-01'
+    date_published: '2016'
+  is_public: false
+outs:
+  - md5: 93b672a68362972c512a3df49f7003e9
+    size: 3370
+    path: te_13_19b_gdp.feather

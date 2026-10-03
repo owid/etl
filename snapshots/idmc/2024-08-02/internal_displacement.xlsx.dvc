@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Internal Displacement Database (GIDD)
+    description: |-
+      The Global Internal Displacement Database (GIDD) aims to provide comprehensive information on internal displacement worldwide. It covers all countries and territories for which IDMC has obtained data on situations of internal displacement, and provides data on situations of: Internal displacement associated with conflict and generalized violence (2009-2022) and displacement associated with sudden-onset natural hazard-related disasters (2008-2022).
+    date_published: "2024-05-14"
+    version_producer: 2024
+
+    # Citation
+    producer: Internal Displacement Monitoring Centre
+    citation_full: |-
+      Global Internal Displacement Database (GIDD), Internal displacement monitoring center, 2024 (www.internal-displacement.org)
+    attribution_short: IDMC
+
+    # Files
+    url_main: https://www.internal-displacement.org/database/displacement-data/
+    url_download: https://helix-tools-api.idmcdb.org/external-api/gidd/displacements/displacement-export/?release_environment=RELEASE&start_year=2008&end_year=2023&client_id=IDMCWSHSOLO009&release_environment=RELEASE
+    date_accessed: 2024-08-02
+
+    # License
+    license:
+      name: CC BY 3.0 IGO
+      url: https://www.internal-displacement.org/terms-of-use/
+
+outs:
+  - md5: fc00e59f00fc434ddd18fdf12ade753b
+    size: 355737
+    path: internal_displacement.xlsx

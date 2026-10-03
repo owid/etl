@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1864
+    date_accessed: 2023-08-14 15:14:28.716638
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1864_population_and_labour_force (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6ac380a430263d9a309665fe38f119c9
+  size: 16191
+  path: dataset_1864_population_and_labour_force_config.json

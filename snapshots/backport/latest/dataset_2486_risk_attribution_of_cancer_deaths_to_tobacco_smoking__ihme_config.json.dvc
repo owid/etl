@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2486
+    date_accessed: 2023-08-16 09:43:03.625036
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2486_risk_attribution_of_cancer_deaths_to_tobacco_smoking__ihme
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e8479fec088e5a7d869631785b274665
+  size: 2292
+  path: 
+    dataset_2486_risk_attribution_of_cancer_deaths_to_tobacco_smoking__ihme_config.json

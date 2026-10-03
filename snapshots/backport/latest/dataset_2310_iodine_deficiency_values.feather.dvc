@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2310
+    date_accessed: 2023-08-14 08:50:16.592563
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Iodine deficiency
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e2fdeb47dc4cfe3e5307457dbc4a2b3c
+  size: 2116402
+  path: dataset_2310_iodine_deficiency_values.feather

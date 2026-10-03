@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2669
+    date_accessed: 2023-08-10 08:53:37.357358
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2669_gender_preference_for_boss__gallup__2017
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c67cf6979a143cbcfe88cae7afbc5112
+  size: 7199
+  path: dataset_2669_gender_preference_for_boss__gallup__2017_config.json

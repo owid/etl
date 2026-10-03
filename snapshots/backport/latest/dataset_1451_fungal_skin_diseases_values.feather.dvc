@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1451
+    date_accessed: 2023-08-14 16:07:20.597608
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Fungal skin diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f997d11ee06e6920fae8f53e3ec50ca5
+  size: 1011354
+  path: dataset_1451_fungal_skin_diseases_values.feather

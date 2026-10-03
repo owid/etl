@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3973
+    date_accessed: 2023-08-10 14:34:24.190747
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Myelodysplastic, myeloproliferative, and other hematopoietic neoplasms
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 977ac7f09e30d53461bd7a4264985a78
+  size: 2012090
+  path: 
+    dataset_3973_myelodysplastic__myeloproliferative__and_other_hematopoietic_neoplasms_values.feather

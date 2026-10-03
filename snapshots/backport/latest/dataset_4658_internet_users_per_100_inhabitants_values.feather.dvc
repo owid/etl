@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4658
+    date_accessed: 2023-08-16 07:22:05.422094
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Internet users per 100 inhabitants
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c9265884ce66966a26a715ee00eb6147
+  size: 33650
+  path: dataset_4658_internet_users_per_100_inhabitants_values.feather

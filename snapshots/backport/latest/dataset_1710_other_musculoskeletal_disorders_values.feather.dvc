@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1710
+    date_accessed: 2023-08-16 09:53:28.392260
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other musculoskeletal disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 28fc7d9d61e4f20c353d40686b6bc539
+  size: 1701362
+  path: dataset_1710_other_musculoskeletal_disorders_values.feather

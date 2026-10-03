@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2550
+    date_accessed: 2023-08-14 05:41:02.376823
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2550_public_sector__taxation_and_market_regulation__table_i_4__marginal_personal_income_tax_and_social_security_contribution_rates_on_gross_labour_income
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6e99a692fa6bc9eed3ca5fa48f3d257b
+  size: 27027
+  path: 
+    dataset_2550_public_sector__taxation_and_market_regulation__table_i_4__marginal_personal_income_tax_and_social_security_contribution_rates_on_gross_labour_income_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/617
+    date_accessed: 2023-08-14 15:33:47.364787
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Education - Quality of Education (2017)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e470b5680082e0ecec87bf5047eccecf
+  size: 2080634
+  path: dataset_617_education__quality_of_education__2017_values.feather

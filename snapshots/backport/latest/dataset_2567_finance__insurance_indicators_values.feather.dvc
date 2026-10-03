@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2567
+    date_accessed: 2023-08-16 10:28:58.521038
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Finance - Insurance indicators
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: edb931ff60c05e6073a4b7b795782940
+  size: 18794
+  path: dataset_2567_finance__insurance_indicators_values.feather

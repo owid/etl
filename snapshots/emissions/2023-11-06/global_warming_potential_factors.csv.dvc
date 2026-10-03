@@ -1,0 +1,37 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: IPCC 6th Assessment Report, Working Group I, Chapter 7 Supplementary Material
+    description: |-
+      Global warming potential for a 100-year time horizon (GWP-100) for a selection of greenhouse gases.
+
+    date_published: 2021-08-09
+
+    # Citation
+    producer: IPCC
+    citation_full: |-
+      Working Group I (WGI) Contribution to the Sixth Assessment Report (AR6) of the Intergovernmental Panel on Climate Change (IPCC), Chapter 7: The Earth's Energy Budget, Climate Feedbacks, and Climate Sensitivity.
+
+      Data extracted from the Supplementary Materials, Table 7.SM.7: Greenhouse gas lifetimes, radiative efficiencies, global warming potentials (GWPs), global temperature potentials (GTPs) and cumulative global temperature potentials (CGTPs).
+
+      Forster, P., T. Storelvmo, K. Armour, W. Collins, J.-L. Dufresne, D. Frame, D.J. Lunt, T. Mauritsen, M.D. Palmer, M. Watanabe, M. Wild, and H. Zhang, 2021: The Earth's Energy Budget, Climate Feedbacks, and Climate Sensitivity. In Climate Change 2021: The Physical Science Basis. Contribution of Working Group I to the Sixth Assessment Report of the Intergovernmental Panel on Climate Change [Masson-Delmotte, V., P. Zhai, A. Pirani, S.L. Connors, C. Péan, S. Berger, N. Caud, Y. Chen, L. Goldfarb, M.I. Gomis, M. Huang, K. Leitzell, E. Lonnoy, J.B.R. Matthews, T.K. Maycock, T. Waterfield, O. Yelekçi, R. Yu, and B. Zhou (eds.)]. Cambridge University Press, Cambridge, United Kingdom and New York, NY, USA, pp. 923-1054, [doi: 10.1017/9781009157896.009](https://www.cambridge.org/core/books/climate-change-2021-the-physical-science-basis/earths-energy-budget-climate-feedbacks-and-climate-sensitivity/AE57C97E588FF3060C7C7E47DD4F3C6E).
+    attribution_short: IPCC
+
+    # Files
+    url_main: https://www.ipcc.ch/report/ar6/wg1/chapter/chapter-7/
+    url_download: 
+      https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WGI_Chapter07_SM.pdf
+    date_accessed: 2023-11-06
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.ipcc.ch/report/ar6/wg1/resources/data-access/
+
+wdir: ../../../data/snapshots/emissions/2023-11-06
+outs:
+- md5: 71d94db83502c78221b63670daab2cce
+  size: 173
+  path: global_warming_potential_factors.csv

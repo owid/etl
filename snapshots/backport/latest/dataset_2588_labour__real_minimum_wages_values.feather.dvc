@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2588
+    date_accessed: 2023-08-11 07:43:31.459145
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Labour - Real minimum wages
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 45afbb9c891d4e59ee8dee2d5efda5c8
+  size: 21266
+  path: dataset_2588_labour__real_minimum_wages_values.feather

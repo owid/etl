@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2098
+    date_accessed: 2023-08-10 14:47:20.316358
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2098_gonococcal_infection (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c61d84a71b75216019dc39e1c0d7844b
+  size: 32704
+  path: dataset_2098_gonococcal_infection_config.json

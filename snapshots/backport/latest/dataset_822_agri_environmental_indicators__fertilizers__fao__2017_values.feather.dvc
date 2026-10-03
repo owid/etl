@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/822
+    date_accessed: 2023-08-14 14:29:08.356904
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Agri-Environmental Indicators: Fertilizers - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 19025cb6c3d28ae24ca863ab03121f77
+  size: 49458
+  path: dataset_822_agri_environmental_indicators__fertilizers__fao__2017_values.feather

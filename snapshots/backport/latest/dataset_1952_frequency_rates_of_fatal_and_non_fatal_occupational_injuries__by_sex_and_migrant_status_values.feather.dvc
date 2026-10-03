@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1952
+    date_accessed: 2023-08-14 15:32:01.095125
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Frequency rates of fatal and non-fatal occupational injuries, by sex and migrant
+    status
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bc6b954ecbfdbfb96c4831dfc6ae0140
+  size: 14954
+  path: 
+    dataset_1952_frequency_rates_of_fatal_and_non_fatal_occupational_injuries__by_sex_and_migrant_status_values.feather

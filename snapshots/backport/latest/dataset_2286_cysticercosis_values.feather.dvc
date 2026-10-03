@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2286
+    date_accessed: 2023-08-14 05:37:37.174732
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Cysticercosis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8dbd24c851fec388b2135e383cdebafa
+  size: 590898
+  path: dataset_2286_cysticercosis_values.feather

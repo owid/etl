@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1615
+    date_accessed: 2023-08-14 08:14:26.668945
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1615_dengue (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e819e67da7388a0e032284d2bad4bcb3
+  size: 31015
+  path: dataset_1615_dengue_config.json

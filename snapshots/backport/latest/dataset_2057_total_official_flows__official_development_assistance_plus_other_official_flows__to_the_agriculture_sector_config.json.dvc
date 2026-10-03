@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2057
+    date_accessed: 2023-08-16 10:21:36.086803
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2057_total_official_flows__official_development_assistance_plus_other_official_flows__to_the_agriculture_sector
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5ff31af8c4345e925a036719aeb813f9
+  size: 2433
+  path: 
+    dataset_2057_total_official_flows__official_development_assistance_plus_other_official_flows__to_the_agriculture_sector_config.json

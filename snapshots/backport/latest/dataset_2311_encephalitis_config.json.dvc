@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2311
+    date_accessed: 2023-08-10 15:05:42.860223
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2311_encephalitis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6101ff156eb2464644ecc2e2cbf8bca3
+  size: 32368
+  path: dataset_2311_encephalitis_config.json

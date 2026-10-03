@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1947
+    date_accessed: 2023-08-16 10:43:41.054500
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Red List Index
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f9600b420770b1184026ccdc9a3d668e
+  size: 35690
+  path: dataset_1947_red_list_index_values.feather

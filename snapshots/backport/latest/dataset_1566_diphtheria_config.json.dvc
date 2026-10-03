@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1566
+    date_accessed: 2023-08-14 05:35:29.809641
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1566_diphtheria (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9b5dd14c09d2a2da4ce5e5d8b6b648d9
+  size: 28846
+  path: dataset_1566_diphtheria_config.json

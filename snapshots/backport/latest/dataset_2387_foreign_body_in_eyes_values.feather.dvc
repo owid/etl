@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2387
+    date_accessed: 2023-08-14 05:38:54.295945
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Foreign body in eyes
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b9c495cab960a4843ad5c47ef3b285a2
+  size: 2116394
+  path: dataset_2387_foreign_body_in_eyes_values.feather

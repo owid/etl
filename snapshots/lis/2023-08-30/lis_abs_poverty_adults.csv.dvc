@@ -1,0 +1,21 @@
+meta:
+  name: Luxembourg Income Study - Absolute poverty - Adult population (LIS, 2023)
+  publication_date: '2023-06-21'
+  source_name: Luxembourg Income Study (LIS)
+  source_published_by: Luxembourg Income Study (LIS) Database, http://www.lisdatacenter.org
+    (multiple countries; 1967-2021). Luxembourg, LIS.
+  url: https://www.lisdatacenter.org/our-data/lis-database/
+  source_data_url:
+  license_url:
+  license_name: ''
+  date_accessed: 2023-08-30
+  is_public: true
+  description: |
+    The Luxembourg Income Study Database (LIS) is the largest available income database of harmonized microdata collected from about 50 countries in Europe, North America, Latin America, Africa, Asia, and Australasia spanning five decades.
+
+    Harmonized into a common framework, LIS datasets contain household- and person-level data on labor income, capital income, pensions, public social benefits (excl. pensions) and private transfers, as well as taxes and contributions, demography, employment, and expenditures.
+wdir: ../../../data/snapshots/lis/2023-08-30
+outs:
+- md5: 2170ed603e6d3a92ef27c38f797cede6
+  size: 2692320
+  path: lis_abs_poverty_adults.csv

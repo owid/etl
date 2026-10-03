@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: COVID-19, Vaccinations (United States)
+    description: |-
+      Data on vaccinations against COVID-19, collected from the data updated daily by the United States Centers for Disease Control and Prevention.
+    date_published: "2023-05-12"
+
+    # Citation
+    producer: Centers for Disease Control and Prevention
+    citation_full: |-
+      Centers for Disease Control and Prevention. COVID Data Tracker. Atlanta, GA: U.S. Department of Health and Human Services, CDC; 2024, August 08. https://covid.cdc.gov/covid-data-tracker
+
+    # Files
+    url_main: https://covid.cdc.gov/covid-data-tracker/
+    date_accessed: 2024-08-08
+
+    # License
+    license:
+      name: Public Domain U.S. Government
+      url: https://www.usa.gov/government-copyright
+
+outs:
+  - md5: 7877905437942d5e4ca132fcb5233911
+    size: 23056670
+    path: vaccinations_us.csv

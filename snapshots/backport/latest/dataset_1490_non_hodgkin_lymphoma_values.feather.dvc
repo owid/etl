@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1490
+    date_accessed: 2023-08-14 16:06:35.606250
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Non-Hodgkin lymphoma
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 99ba394caf78d94df11b1909eabeb161
+  size: 2012042
+  path: dataset_1490_non_hodgkin_lymphoma_values.feather

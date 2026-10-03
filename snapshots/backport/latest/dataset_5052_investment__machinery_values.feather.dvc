@@ -1,0 +1,21 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5052
+    date_accessed: 2023-08-16 10:01:26.967729
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Investment: Machinery'
+  description: 'Important notice: FAOSTAT database on Agriculture Machinery is no
+    longer active. The latest online version of the database has as reference year
+    2009 (with data collected in year 2011). FAOSTAT database on Agriculture Machinery
+    provides statistical series on Agricultural Machinery and Equipment statistical
+    series referring to the following items: tractors, harvesters and threshers, irrigation
+    pumps, milking machines, hand tools, and soil machines. The database includes
+    estimates of agriculture machinery in use and value of import and export of agriculture
+    machinery.'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 304f665cb83871000af4936a4a53e49d
+  size: 743794
+  path: dataset_5052_investment__machinery_values.feather

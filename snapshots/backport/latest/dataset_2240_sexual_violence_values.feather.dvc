@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2240
+    date_accessed: 2023-08-16 10:31:35.141431
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Sexual violence
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 761f54ac04bb5f5c7910d1b8f8cfae69
+  size: 1069218
+  path: dataset_2240_sexual_violence_values.feather

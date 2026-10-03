@@ -1,0 +1,21 @@
+dataset:
+  title: Figure 22.17_democracy
+  owners:
+    - Gyorgy Attila Ruzicska  # backport
+tables:
+  figure_22_17_democracy:
+    variables:
+      years_of_democracy__2015:
+        title: Years of democracy (2015)
+        unit: ''
+        description: |-
+          Democracy started when women gained the ability to vote in elections so long as the majority of the population is enfranchised. Democracy could not start during colonial rule or under a dictatorship or one-party state.
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

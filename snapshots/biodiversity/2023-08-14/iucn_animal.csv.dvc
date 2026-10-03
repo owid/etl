@@ -1,0 +1,20 @@
+meta:
+  name: Number of animal species listed in each IUCN Red List Category by country
+  publication_year: 2022
+  source_name: IUCN (2022)
+  source_published_by:
+    IUCN. 2022. The IUCN Red List of Threatened Species. Version
+    2022-2. https://www.iucnredlist.org. Accessed on [14 August 2023]
+  url: https://www.iucnredlist.org/statistics
+  source_data_url:
+  license_url: https://www.iucnredlist.org/terms/terms-of-use
+  license_name: CC BY 4.0
+  date_accessed: 2023-08-14
+  is_public: true
+  description: |
+    The number of animal species (kingdom: Animalia) listed in each IUCN Red List Category by country. The data is from Table 6a in the Summary Statistics https://www.iucnredlist.org/statistics.
+wdir: ../../../data/snapshots/biodiversity/2023-08-14
+outs:
+  - md5: 4a28d770e5ebeacba62ca6aebdbd9fb3
+    size: 22265
+    path: iucn_animal.csv

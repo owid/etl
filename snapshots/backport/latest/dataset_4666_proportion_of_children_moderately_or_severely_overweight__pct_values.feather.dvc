@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4666
+    date_accessed: 2023-08-16 10:28:50.599237
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of children moderately or severely overweight (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7e1dedad3cb89da88e915b0fe6e1f460
+  size: 18314
+  path: 
+    dataset_4666_proportion_of_children_moderately_or_severely_overweight__pct_values.feather

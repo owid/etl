@@ -1,0 +1,60 @@
+steps:
+
+  #
+  # UN national defintions of urban agglomerations.
+  #
+
+  data://garden/un/2024-01-17/urban_agglomerations_definition:
+    - data://meadow/un/2024-01-17/urban_agglomerations_definition:
+      - snapshot://un/2024-01-17/urban_agglomerations_definition.xls
+  data://grapher/un/2024-01-17/urban_agglomerations_definition:
+    - data://garden/un/2024-01-17/urban_agglomerations_definition
+  data://grapher/un/2024-01-17/urban_agglomerations_definition_count:
+    - data://garden/un/2024-01-17/urban_agglomerations_definition_count:
+      - data://garden/un/2024-01-17/urban_agglomerations_definition
+
+
+  #
+  # GHSL countries
+  #
+  data://garden/urbanization/2025-12-10/ghsl_countries:
+    - data://meadow/urbanization/2025-12-10/ghsl_countries:
+      - snapshot://urbanization/2025-12-10/ghsl_countries.xlsx
+    - data://garden/wb/2026-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+
+  # GHSL countries multidim
+  viz://chart/urbanization/latest/cities_towns_rural_areas:
+    - data://grapher/urbanization/2025-12-10/ghsl_countries:
+      - data://garden/urbanization/2025-12-10/ghsl_countries
+
+  # GHSL urban centers
+  data://meadow/urbanization/2025-12-10/ghsl_urban_centers:
+    - snapshot://urbanization/2025-12-10/ghsl_urban_centers.xlsx
+  data://grapher/urbanization/2025-12-10/ghsl_urban_centers:
+    - data://garden/urbanization/2025-12-10/ghsl_urban_centers:
+      - data://meadow/urbanization/2025-12-10/ghsl_urban_centers
+      - data://garden/urbanization/2025-12-10/ghsl_countries
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/regions/2023-01-01/regions
+
+  #
+  # UN WUP National Definitions
+  #
+  data://grapher/un/2026-02-17/wup_national_definitions:
+    - data://garden/un/2026-02-17/wup_national_definitions:
+      - data://garden/hyde/2024-01-02/all_indicators
+      - data://meadow/un/2026-02-17/wup_national_definitions:
+        - snapshot://un/2026-02-17/wup_urban_rural_population.xlsx
+        - snapshot://un/2026-02-17/wup_urban_rural_population_share.xlsx
+        - snapshot://un/2026-02-17/wup_urban_rural_population_growth.xlsx
+        - snapshot://un/2026-02-17/wup_urban_rural_population_share_growth.xlsx
+
+  #
+  # SDG 11.2.1 - Access to Public Transport
+  #
+  data://grapher/urbanization/2026-03-02/sdg_11_2_1:
+    - data://garden/urbanization/2026-03-02/sdg_11_2_1:
+      - data://meadow/urbanization/2026-03-02/sdg_11_2_1:
+        - snapshot://urbanization/2026-03-02/sdg_11_2_1.xlsx
+      - data://meadow/urbanization/2025-12-10/ghsl_urban_centers

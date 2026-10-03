@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2238
+    date_accessed: 2023-08-14 15:38:09.128027
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Guinea worm disease
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7de713c57c6341e7c720da028622326e
+  size: 250562
+  path: dataset_2238_guinea_worm_disease_values.feather

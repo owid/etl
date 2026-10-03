@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5659
+    date_accessed: 2023-08-10 07:49:27.228155
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Democratic satisfaction - Claassen
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eaffa51b7d1eb7c0dcd8bf21e6e71846
+  size: 85474
+  path: dataset_5659_democratic_satisfaction__claassen_values.feather

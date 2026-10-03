@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/909
+    date_accessed: 2023-08-11 07:37:03.534928
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank EdStats - Health: Population: Structure'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2bcfc7164e74fbe9f00f6b5801a8e7f2
+  size: 773634
+  path: dataset_909_world_bank_edstats__health__population__structure_values.feather

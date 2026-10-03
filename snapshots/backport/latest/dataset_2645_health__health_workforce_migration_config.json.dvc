@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2645
+    date_accessed: 2023-08-16 10:20:13.164796
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2645_health__health_workforce_migration (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b7c05c92205223ad33413d7c88f8c52a
+  size: 11891
+  path: dataset_2645_health__health_workforce_migration_config.json

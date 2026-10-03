@@ -1,0 +1,20 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5048
+    date_accessed: 2023-08-16 08:49:14.404836
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5048_inputs__fertilizers_archive (archived)
+  description: The Fertilizer archive dataset containsinformation on the Production,
+    Trade  and Consumption of chemical and mineral fertilizers products, both in total
+    nutrients and in amount of product, over the time series 1961 to 2002.The datasetalso
+    contains data on Prices paid by farmers expressed in local currencies (as a consequence
+    no country aggregates are  available) for single fertilizer products. This dataset
+    is an archive and it is disseminated as it was in the previous FAOSTAT System.
+    No dataset updates made or to be made in the future.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8ec01ef08d914443b68a2bbe6eeaa331
+  size: 205825
+  path: dataset_5048_inputs__fertilizers_archive_config.json

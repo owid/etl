@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1495
+    date_accessed: 2023-08-14 14:41:19.479028
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Rheumatic heart disease
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: aa9ae1fe7efb9dc5cd1a17a3a768d92d
+  size: 2012050
+  path: dataset_1495_rheumatic_heart_disease_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/796
+    date_accessed: 2023-08-14 14:41:03.028469
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_796_emissions__agriculture__manure_left_on_pasture__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9d372564bbb9f8bcbbe03aa1e1da35be
+  size: 621744
+  path: 
+    dataset_796_emissions__agriculture__manure_left_on_pasture__fao__2017_config.json

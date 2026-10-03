@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2235
+    date_accessed: 2023-08-16 09:49:59.249028
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2235_orofacial_clefts (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c0c50714e4ef65c6c3dabc12697e2005
+  size: 32587
+  path: dataset_2235_orofacial_clefts_config.json

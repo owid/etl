@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3970
+    date_accessed: 2023-08-16 10:35:14.984860
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Invasive Non-typhoidal Salmonella (iNTS)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 467b09c871926de39c5651635680cad7
+  size: 2012058
+  path: dataset_3970_invasive_non_typhoidal_salmonella__ints_values.feather

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4563
+    date_accessed: 2023-08-14 05:36:09.630504
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4563_above_ground_biomass_in_forest_per_hectare__tonnes_per_hectare
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2decd73a12c67aae84c591cf5facb53c
+  size: 28870
+  path: 
+    dataset_4563_above_ground_biomass_in_forest_per_hectare__tonnes_per_hectare_config.json

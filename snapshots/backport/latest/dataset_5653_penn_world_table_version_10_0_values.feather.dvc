@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5653
+    date_accessed: 2023-08-16 10:09:17.905786
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Penn World Table version 10.0
+  description: 'Previous updates: 2 Jul 2013 (8.0), 13 Apr 2015 (8.1), 9 Jun 2016
+    (9.0), 11 Apr 2019 (9.1), 14 Jan 2021 (10.0). With this is mind there may be an
+    update on 2023 or 2024'
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fc2a7190a1c031ced39f0f17659c2869
+  size: 2284258
+  path: dataset_5653_penn_world_table_version_10_0_values.feather

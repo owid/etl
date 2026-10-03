@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2368
+    date_accessed: 2023-08-10 14:43:27.800768
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Tracheal, bronchus, and lung cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f86f081e42b283e4f504b0898299fbc8
+  size: 1499306
+  path: dataset_2368_tracheal__bronchus__and_lung_cancer_values.feather

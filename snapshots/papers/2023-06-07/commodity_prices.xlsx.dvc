@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Jacks
+    title: 'From Boom to Bust: A Typology of Real Commodity Prices in the Long Run'
+    description: |-
+      Commodity prices are given as a price index relative to real prices in 1900, where 1900 = 100.
+    citation_full: 'Jacks, D. S. (2019). From Boom to Bust: A Typology of Real Commodity Prices in the Long Run. Cliometrica, 13(2), 202–220.'
+    url_main: http://www.sfu.ca/~djacks/data/boombust/index.html
+    url_download: http://www.sfu.ca/~djacks/data/boombust/Real%20commodity%20prices,%201850-2020.xlsx
+    date_accessed: '2023-06-07'
+    date_published: '2020'
+    license:
+      name: Public domain
+      url: https://www.sfu.ca/~djacks/data/boombust/index.html
+  is_public: true
+outs:
+- md5: bb0d8a1db96c40e4ab9e181987bac28a
+  size: 175669
+  path: commodity_prices.xlsx

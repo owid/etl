@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/820
+    date_accessed: 2023-08-16 10:23:31.940163
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Inputs: Fertilizers - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3593f7ca799ef38d1ae5322d9c2f2e44
+  size: 415650
+  path: dataset_820_inputs__fertilizers__fao__2017_values.feather

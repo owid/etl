@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2373
+    date_accessed: 2023-08-14 15:11:27.078345
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2373_colon_and_rectum_cancer (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0eca2e05e97c34b72a1b062a68d59466
+  size: 32830
+  path: dataset_2373_colon_and_rectum_cancer_config.json
