@@ -1,8 +1,0 @@
-tables:
-  dummy:
-    variables:
-      dummy_variable:
-        title: Dummy test mojmir 2
-        display:
-          numDecimalPlaces: 12
-        description_processing: ''

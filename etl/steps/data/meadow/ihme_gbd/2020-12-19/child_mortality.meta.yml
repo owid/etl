@@ -1,5 +1,0 @@
-tables:
-  child_mortality:
-    variables:
-      value:
-        title: Value

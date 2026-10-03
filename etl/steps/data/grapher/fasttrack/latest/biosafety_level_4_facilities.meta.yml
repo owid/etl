@@ -1,8 +1,0 @@
-dataset:
-  title: DRAFT Biosafety level 4 facilities
-tables:
-  biosafety_level_4_facilities:
-    variables:
-      bsl4_facilities:
-        title: bsl4_facilities
-        unit: ''

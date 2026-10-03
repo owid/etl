@@ -1,8 +1,0 @@
-tables:
-  faostat_tm:
-    variables:
-      value:
-        title: Bilateral trade flow value
-        unit: ""
-      flag:
-        title: FAOSTAT data flag

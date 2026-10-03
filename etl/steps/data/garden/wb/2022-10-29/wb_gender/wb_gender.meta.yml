@@ -1,6 +1,0 @@
-tables:
-  wb_gender:
-    title: Gender Statistics (World Bank)
-    description: |
-      All the variables provided in the World Bank Gender Statistics dataset.
-    variables:
