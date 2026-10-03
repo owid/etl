@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Air pollution — explore by country</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+/* Typography and chart chrome follow the original OWID-style prototype. */
+:root { --ink:#303030; --muted:#666; --line:#e5e5e5; --navy:#002147; }
+* { box-sizing:border-box; }
+body { margin:0; color:var(--ink); font:16px/1.5 "Lato",sans-serif; background:#f7f7f7; }
+main { max-width:1600px; margin:18px auto 36px; padding:30px 32px 24px; background:#fff; border:1px solid #eee; }
+.chart-header { position:relative; padding-right:118px; }
+h1 { font:700 clamp(28px,3vw,42px)/1.2 "Playfair Display",Georgia,serif; margin:0 0 10px; letter-spacing:-.4px; }
+.title-year { font:700 .72em "Lato",sans-serif; color:#818181; white-space:nowrap; }
+.logo { position:absolute; right:0; top:2px; background:var(--navy); color:white; font-size:18px; line-height:1.05; font-weight:700; text-align:center; padding:9px 10px 8px; border-bottom:4px solid #d71920; text-decoration:none; }
+p { margin:8px 0; }
+.intro { color:#5b5b5b; font-size:18px; line-height:1.5; max-width:1150px; }
+.view-controls { display:flex; align-items:center; justify-content:space-between; gap:16px; margin:26px 0 20px; }
+nav { display:flex; gap:3px; border:1px solid var(--line); padding:3px; border-radius:4px; }
+nav a { color:#777; text-decoration:none; padding:6px 16px; font-weight:700; }
+nav a[aria-current] { color:#23466b; background:#dbe5f0; border-radius:2px; }
+button,select { font:inherit; color:#555; background:white; border:1px solid #d5d5d5; border-radius:3px; padding:7px 11px; }
+button { cursor:pointer; } button:hover { background:#ededed; } button:disabled { opacity:.5; cursor:default; }
+button:focus-visible,select:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var(--navy); outline-offset:3px; }
+.country-select { max-width:270px; color:var(--navy); }
+.split { display:grid; grid-template-columns:1fr 1.12fr; background:white; }
+.panel { min-width:0; position:relative; }
+.panel+.panel { border-left:1px solid var(--line); }
+.panel-head { min-height:88px; padding:8px 20px 16px; display:flex; justify-content:space-between; gap:10px; }
+.panel-head h2 { font:700 19px/1.3 "Lato",sans-serif; margin:0 0 6px; color:#444; }
+.hint { font-size:13px; color:var(--muted); }
+.map { height:490px; background:#fff; }
+.leaflet-container { font-family:"Lato",sans-serif; background:#fff; }
+.leaflet-control-zoom { box-shadow:none!important; border:1px solid #ddd!important; }
+.leaflet-control-zoom a { color:#666!important; font-weight:400!important; }
+.leaflet-control-attribution { font-size:10px!important; color:#888; }
+.panel-foot { padding:12px 20px; min-height:50px; font-size:13px; color:var(--muted); }
+.empty { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:450; background:#fff; padding:24px; text-align:center; width:80%; max-width:350px; color:#888; font-size:17px; pointer-events:none; }
+.legend { display:flex; align-items:center; justify-content:center; gap:24px; margin:20px auto 12px; max-width:1150px; padding:0 12px; }
+.legend-title { font-size:13px; color:#666; min-width:115px; }
+.scale { flex:1; display:flex; padding-top:32px; }
+.bin { flex:1; min-width:0; position:relative; font-size:12px; color:#666; height:18px; }
+.bin-label { position:absolute; left:0; bottom:22px; transform:translateX(-50%); white-space:nowrap; }
+.bin:nth-child(even) .bin-label { bottom:40px; }
+.swatch { height:16px; border:1px solid #b5aaa1; border-right:0; }
+.bin:last-child .swatch { border-right:1px solid #b5aaa1; clip-path:polygon(0 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,0 100%); }
+.no-data { font-size:12px; color:#777; white-space:nowrap; align-self:flex-end; display:flex; align-items:center; gap:7px; }
+.no-data::before { content:""; width:20px; height:14px; display:inline-block; background:#dce2e8; border:1px solid #b5b5b5; }
+.toolbar { display:flex; align-items:center; gap:18px; margin:22px 0 24px; }
+#play { min-width:78px; height:42px; border:0; background:#f2f2f2; }
+.timeline-bound { color:#666; font-size:16px; }
+input[type=range] { flex:1; min-width:80px; appearance:none; height:4px; background:#e5e5e5; border:0; border-radius:0; }
+input[type=range]::-webkit-slider-thumb { appearance:none; width:20px; height:20px; background:#999; border:2px solid white; border-radius:50%; cursor:pointer; }
+input[type=range]::-moz-range-thumb { width:17px; height:17px; background:#999; border:2px solid white; border-radius:50%; cursor:pointer; }
+.year { font-size:17px; font-weight:700; color:#666; min-width:42px; }
+.note { font-size:13px; color:var(--muted); margin-top:12px; max-width:1200px; }
+.source { font-size:14px; color:#666; border-top:1px solid var(--line); padding-top:16px; margin-top:18px; }
+a { color:var(--navy); }
+.status { color:#985534; }
+.leaflet-tooltip { font:13px/1.5 "Lato",sans-serif; border:1px solid #ccc; border-radius:2px; box-shadow:0 1px 4px #0002; }
+.leaflet-tile { image-rendering:pixelated; }
+.selected-value { font-size:20px; font-weight:700; color:#555; white-space:nowrap; }
+.badge { display:inline-block; color:#777; font-size:12px; }
+.detail-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.detail-actions button { font-size:12px; padding:3px 7px; }
+#hover-value { font-variant-numeric:tabular-nums; }
+@media(max-width:850px) {
+ main { margin:0; padding:20px 16px; border:0; }
+ .chart-header { padding-right:90px; } .logo { font-size:14px; padding:7px; }
+ .intro { font-size:16px; } .view-controls { flex-wrap:wrap; }
+ nav a { padding:6px 11px; } .country-select { max-width:100%; }
+ .split { grid-template-columns:1fr; } .panel+.panel { border-left:0; border-top:1px solid var(--line); }
+ .map { height:380px; } .panel-head { padding:16px 8px; } .panel-foot { padding:10px 8px; }
+ .legend { flex-wrap:wrap; gap:12px; padding:0 8px; } .legend-title { width:100%; }
+ .scale { flex-basis:100%; } .bin { font-size:10px; } .no-data { margin-left:auto; }
+ .toolbar { gap:10px; } .selected-value { font-size:16px; }
+}
+.overlay-controls { display:flex; align-items:center; gap:14px; padding:0 20px 10px; min-height:34px; font-size:13px; color:#666; flex-wrap:wrap; }
+.overlay-controls label { cursor:pointer; display:flex; align-items:center; gap:5px; }
+.overlay-controls input { accent-color:#002147; }
+#overlay-status { color:#985534; font-size:12px; }
+.city-marker { background:none; border:0; pointer-events:none!important; }
+.city-dot { position:absolute; width:5px; height:5px; border:1px solid white; border-radius:50%; background:#374b5e; box-shadow:0 0 1px #374b5e; }
+.city-label { position:absolute; left:9px; top:-7px; white-space:nowrap; max-width:175px; overflow:hidden; text-overflow:ellipsis; color:#243b50; font:700 12px/18px "Lato",sans-serif; text-shadow:0 1px 2px white,1px 0 2px white,0 -1px 2px white,-1px 0 2px white; }
+</style>
+<link rel="stylesheet" href="site_shell.css">
+</head>
+<body>
+<!-- SITE_SHELL -->
+<main>
+<h2 class="section-title">Explore country-wide and local air pollution levels</h2>
+
+<div class="view-controls country-controls"><div id="city-slot" class="city-slot"></div></div>
+<div class="split">
+<section class="panel" aria-label="Country averages">
+<div class="panel-head"><div><h2>Average exposure by country</h2><div class="hint">Annual population-weighted average concentration of fine particulate matter (PM2.5) in the air, measured in micrograms per cubic meter (µg/m³).</div></div></div>
+<div class="overlay-controls"><span>Select a country to explore local detail →</span></div>
+<div id="overview" class="map" role="region" aria-label="Select a country on the world map"></div>
+<div class="panel-foot" id="overview-caption">Click a country, or choose one from the list above.</div>
+</section>
+<section class="panel" aria-label="Country detail">
+<div class="panel-head"><div><h2 id="country-title">A closer look</h2><div class="hint">Fine resolution PM2.5 exposure (~1km x 1km), based on satellite imaging, ground monitors and simulations</div><div class="detail-actions"><button id="reset" hidden>Zoom to country level</button><button id="clear-selection" hidden>Clear selection</button><button id="retry" hidden>Retry loading</button></div></div><div id="country-mean" class="selected-value"></div></div>
+<div class="overlay-controls"><label><input id="show-cities" type="checkbox" checked disabled> Cities</label><label><input id="show-boundaries" type="checkbox" checked disabled> State / province boundaries</label><span id="overlay-status" role="status"></span></div>
+<div id="detail" class="map" role="region" aria-label="Fine-resolution pollution within the selected country"></div>
+<div class="empty" id="empty"><div id="city-picker" class="city-picker"><input id="city-search" aria-label="Select a country or city" placeholder="Select a country or city" list="city-options" autocomplete="off" disabled><datalist id="city-options"></datalist><span id="city-status" role="status"></span></div></div>
+<div class="panel-foot"><span id="hover-value"></span> <span class="status" id="status" role="status" aria-live="polite"></span></div>
+</section>
+</div>
+<div class="legend"><div class="legend-title">Annual mean PM2.5<br><strong>µg/m³</strong></div><div class="scale" id="scale"></div><div class="no-data">No data</div></div>
+<div class="toolbar"><button id="play" aria-label="Play timeline" disabled>▶ Play</button><span class="timeline-bound">1998</span><input id="year" aria-label="Year" type="range" min="1998" max="2024" value="2024" disabled><output class="year" id="year-label" for="year">2024</output></div>
+<p class="note"><strong>Includes natural sources.</strong> These estimates include mineral dust and sea salt as well as pollution from human activities. Country averages weight concentrations by where people live; grid cells show local concentrations. The WHO annual guideline is 5 µg/m³.</p>
+<p class="note">Country detail uses the same fine source resolution throughout 1998–2024. Zoom in to distinguish individual cells. Coverage extends from 60°S to 70°N; areas outside that range have no grid data. The initial view focuses on the largest landmass.</p>
+<p class="source"><strong>Data source:</strong> <a href="https://www.satpm.org/v6-gl-03" target="_blank" rel="noreferrer">SatPM V6.GL.03</a>, Atmospheric Composition Analysis Group. Country and state/province boundaries: GADM via AQLI. City labels: GHSL urban centres (2020), with larger centres prioritized where labels overlap. Prototype.</p>
+
+<section id="time-comparison" aria-labelledby="time-heading">
+<h2 id="time-heading" class="section-title">Explore air pollution levels over time</h2>
+<div class="time-controls"><div id="time-picker-slot"></div><button id="time-reset" hidden>Zoom to country level</button><button id="time-clear" hidden>Clear selection</button></div>
+<p id="time-notice" class="hint" role="status"></p>
+<div class="overlay-controls"><label><input id="time-show-cities" type="checkbox" checked disabled> Cities</label><label><input id="time-show-boundaries" type="checkbox" checked disabled> State / province boundaries</label><span id="time-overlay-status" role="status"></span></div>
+<div class="time-maps"><div id="time-empty" class="time-empty"><div id="time-picker" class="city-picker"><input id="time-search" aria-label="Select a country or city" list="time-options" placeholder="Select a country or city" autocomplete="off" disabled><datalist id="time-options"></datalist></div></div>
+<section class="panel"><div class="panel-head"><div><h2 id="time-title-left">Local air pollution in 1998</h2><div class="hint">Fine resolution PM2.5 exposure (~1km x 1km), based on satellite imaging, ground monitors and simulations</div></div></div><div id="time-map-left" class="map" aria-label="Left comparison map"></div><div class="panel-foot" id="time-status-left" role="status"></div></section><section class="panel"><div class="panel-head"><div><h2 id="time-title-right">Local air pollution in 2024</h2><div class="hint">Fine resolution PM2.5 exposure (~1km x 1km), based on satellite imaging, ground monitors and simulations</div></div></div><div id="time-map-right" class="map" aria-label="Right comparison map"></div><div class="panel-foot" id="time-status-right" role="status"></div></section></div><div class="legend"><div class="legend-title">Annual mean PM2.5<br><strong>µg/m³</strong></div><div class="scale" id="time-scale"></div><div class="no-data">No data</div></div>
+<div class="time-years"><label for="time-year-left">Left year: <output id="time-output-left">1998</output></label><label for="time-year-right">Right year: <output id="time-output-right">2024</output></label></div>
+<div class="dual-timeline"><div class="dual-track"></div><input id="time-year-left" type="range" min="1998" max="2024" step="1" value="1998" aria-label="Left map year" disabled><input id="time-year-right" type="range" min="1998" max="2024" step="1" value="2024" aria-label="Right map year" disabled></div><div class="time-years hint"><span>1998</span><span>2024</span></div>
+<p class="note">Both maps use the same concentration brackets and fine resolution across 1998–2024. Pan or zoom either map to move both views together. The two year handles can cross to compare years in either order.</p>
+<p class="source"><strong>Data source:</strong> SatPM V6.GL.03, Atmospheric Composition Analysis Group. Includes natural sources. Boundaries: GADM via AQLI. Cities: GHSL urban centres (2020).</p>
+</section>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+let data, overview, detail, polygons, selected = null, outline, tiles, playback, generation = 0;
+let tileErrors = 0, pending = false;
+let boundaryLayer, cityLayer, countryOverlay = null, overlayRequest;
+const overlayCache = new Map();
+function drawCities(){
+  if(!cityLayer)return;cityLayer.clearLayers();
+  if(!countryOverlay || !$('show-cities').checked)return;
+  const boxes=[], size=detail.getSize();
+  for(const city of countryOverlay.cities){
+    const location=L.latLng(city.lat,city.lon);
+    if(!detail.getBounds().contains(location))continue;
+    const point=detail.latLngToContainerPoint(location);
+    const width=Math.min(175,city.name.length*6.6), box=[point.x-5,point.y-12,point.x+width+15,point.y+14];
+    if(box[2]>size.x-4 || box[0]<4 || box[1]<4 || box[3]>size.y-4)continue;
+    if(boxes.some(b=>box[0]<b[2] && box[2]>b[0] && box[1]<b[3] && box[3]>b[1]))continue;
+    boxes.push(box);
+    const content=document.createElement('div'),dot=document.createElement('span'),label=document.createElement('span');
+    dot.className='city-dot';label.className='city-label';label.textContent=city.name;content.append(dot,label);
+    L.marker(location,{pane:'cityLabels',interactive:false,keyboard:false,icon:L.divIcon({className:'city-marker',html:content,iconSize:[6,6],iconAnchor:[3,3]})}).addTo(cityLayer);
+    if(boxes.length>=45)break;
+  }
+}
+function drawBoundaries(){
+  if(boundaryLayer){detail.removeLayer(boundaryLayer);boundaryLayer=null;}
+  if(countryOverlay && $('show-boundaries').checked){
+    boundaryLayer=L.geoJSON(countryOverlay.boundaries,{pane:'adminBoundaries',interactive:false,style:{color:'#526373',weight:.75,opacity:.6,fill:false}}).addTo(detail);
+  }
+}
+async function loadOverlays(feature){
+  if(overlayRequest)overlayRequest.abort();
+  countryOverlay=null;drawCities();drawBoundaries();
+  $('show-cities').disabled=false;$('show-boundaries').disabled=false;
+  $('overlay-status').textContent='Loading labels and boundaries…';
+  const id=feature.properties.id;
+  try{
+    let payload=overlayCache.get(id);
+    if(!payload){
+      overlayRequest=new AbortController();
+      const response=await fetch(`overlays/${id}.json`,{signal:overlayRequest.signal});
+      if(!response.ok)throw Error('Overlay request failed');payload=await response.json();
+      overlayCache.set(id,payload);if(overlayCache.size>8)overlayCache.delete(overlayCache.keys().next().value);
+    }
+    if(selected?.properties.id!==id)return;
+    countryOverlay=payload;drawBoundaries();drawCities();
+    $('overlay-status').textContent=payload.cities.length?'':'No urban centres in the city source for this country.';
+  }catch(error){if(error.name!=='AbortError' && selected?.properties.id===id)$('overlay-status').textContent='Labels and boundaries could not load. Reselect the country to retry.';}
+}
+const year = () => Number($('year').value);
+const average = f => f.properties.means[String(year())];
+const color = value => value == null ? '#dce2e8' : data.colors[data.brackets.filter(b => value >= b).length];
+const meanText = f => average(f) == null ? (f.properties.note ? 'No valid average' : 'No published average') : `${average(f).toFixed(1)} µg/m³`;
+function style(f) { return {fillColor:color(average(f)),fillOpacity:1,color:selected === f ? '#002147':'#999188',weight:selected === f ? 1.8:0.5}; }
+function stop(){clearTimeout(playback);playback=null;$('play').textContent='▶ Play';$('play').setAttribute('aria-label','Play timeline');}
+function schedule(){if(playback !== null) {clearTimeout(playback);playback=setTimeout(() => {if(year()===2024){stop();return;}$('year').value=year()+1;updateYear();},900);}}
+function loadTiles(){
+  generation++; const token=generation;
+
+  $('hover-value').textContent='';
+  if(tiles){detail.removeLayer(tiles);tiles=null;}
+  if(!selected)return;
+  pending=true;tileErrors=0;$('retry').hidden=true;$('status').textContent=`Loading ${year()}… First visits may take a moment.`;
+  const layer=L.tileLayer(`/${data.tile_path}/${selected.properties.id}/${year()}/{z}/{x}/{y}.png`, {tileSize:256,noWrap:true,maxZoom:12,maxNativeZoom:10,updateWhenIdle:true,keepBuffer:1,attribution:'SatPM V6.GL.03'});
+  const tilePixels = new Map();
+  layer.on('tileload',event=>{
+    if(token!==generation)return;
+    const canvas=document.createElement('canvas');canvas.width=256;canvas.height=256;
+    const context=canvas.getContext('2d',{willReadFrequently:true});context.drawImage(event.tile,0,0);
+    tilePixels.set(`${event.coords.z}/${event.coords.x}/${event.coords.y}`,context);
+  });
+  layer.on('tileunload',event=>tilePixels.delete(`${event.coords.z}/${event.coords.x}/${event.coords.y}`));
+  layer.readBracket=latlng=>{
+    const zoom=Math.min(10,Math.round(detail.getZoom()));
+    const point=detail.project(latlng,zoom), x=Math.floor(point.x/256),y=Math.floor(point.y/256);
+    const context=tilePixels.get(`${zoom}/${x}/${y}`);
+    if(!context)return undefined;
+    const pixel=context.getImageData(Math.floor(point.x-x*256),Math.floor(point.y-y*256),1,1).data;
+    if(!pixel[3])return null;
+    const hex='#'+Array.from(pixel.slice(0,3),v=>v.toString(16).padStart(2,'0')).join('');
+    const index=data.colors.indexOf(hex);
+    return index<0?null:index;
+  };
+  layer.on('tileerror' ,()=>{if(token===generation){tileErrors++;$('retry').hidden=false;$('status').textContent='Could not load detail. Check the local data server and retry.';stop();}});
+  layer.on('load',()=>{if(token===generation){pending=false;if(!tileErrors)$('status').textContent='';schedule();}});
+  tiles=layer;layer.addTo(detail);
+}
+function selectCountry(feature,city=null){
+  $('city-slot').append($('city-picker'));
+  $('city-search').value=city?city.label:feature.properties.name;
+  stop();selected=feature;$('empty').hidden=true;
+  const countryName=document.createElement('span');countryName.className='selected-country-name';countryName.textContent=feature.properties.name;
+  $('country-title').replaceChildren('Local air pollution in ',countryName);$('country-mean').textContent=meanText(feature);
+  $('country-mean').title='Population-weighted country average';
+  $('reset').hidden=false;$('clear-selection').hidden=false;
+  if(outline)detail.removeLayer(outline);
+  outline=L.geoJSON(feature,{style:{color:'#445d6c',weight:1,fill:false},interactive:false}).addTo(detail);
+  if(city)detail.setView([city.lat,city.lon],10,{animate:false});
+  else detail.fitBounds(feature.properties.bounds,{padding:[24,24],maxZoom:9,animate:false});
+  polygons.setStyle(style);loadTiles();loadOverlays(feature);
+}
+function clearSelection(){
+  stop();selected=null;generation++;pending=false;tileErrors=0;
+  if(overlayRequest){overlayRequest.abort();overlayRequest=null;}
+  if(tiles){detail.removeLayer(tiles);tiles=null;}
+  if(outline){detail.removeLayer(outline);outline=null;}
+  countryOverlay=null;drawCities();drawBoundaries();
+  $('city-search').value='';
+  $('city-search').dispatchEvent(new Event('input'));
+  $('empty').append($('city-picker'));$('empty').hidden=false;
+  $('country-title').textContent='A closer look';$('country-mean').textContent='';$('country-mean').title='';
+  for(const id of ['reset','retry','clear-selection'])$(id).hidden=true;
+  for(const id of ['status','hover-value','overlay-status'])$(id).textContent='';
+  for(const id of ['show-cities','show-boundaries']){$(id).disabled=true;$(id).checked=true;}
+  $('overview-caption').textContent='Click a country, or choose one from the list above.';
+  $('year').value=2024;updateYear();
+  detail.setView([15,0],2,{animate:false});
+  overview.fitBounds([[-57,-180],[75,180]],{padding:[8,8],maxZoom:1.5,animate:false});
+  $('city-search').focus({preventScroll:true});
+}
+function updateYear(){
+  $('year-label').textContent=year();
+  polygons.setStyle(style);polygons.eachLayer(layer=>layer.setTooltipContent(tooltip(layer.feature)));
+  if(selected){$('country-mean').textContent=meanText(selected);loadTiles();}else schedule();
+}
+function tooltip(f){const el=document.createElement('div');const title=document.createElement('strong');title.textContent=f.properties.name;el.append(title,document.createElement('br'),`${year()}: ${meanText(f)}`);if(f.properties.note)el.append(document.createElement('br'),f.properties.note);return el;}
+async function initCityPicker(){
+  const normalize=value=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  const entries=data.features.map(feature=>({label:feature.properties.name,search:normalize(feature.properties.name),feature}));
+  const input=$('city-search');
+  const populate=()=>{
+    const query=normalize(input.value);$('city-options').replaceChildren();
+    entries.filter(entry=>entry.search.includes(query)).slice(0,60).forEach(entry=>{
+      const option=document.createElement('option');option.value=entry.label;
+      option.textContent=entry.label;$('city-options').append(option);
+    });
+  };
+  input.addEventListener('input',()=>{
+    const entry=entries.find(entry=>entry.label===input.value);
+    if(entry)selectCountry(entry.feature,entry.city);else populate();
+  });
+  input.disabled=false;populate();
+  try {
+    const response=await fetch('cities.json');if(!response.ok)throw Error('City lookup unavailable');
+    const {cities}=await response.json();
+    const counts=new Map();cities.forEach(city=>{const key=`${city.name}, ${city.country}`;counts.set(key,(counts.get(key)||0)+1);});
+    cities.forEach(city=>{
+      const key=`${city.name}, ${city.country}`;
+      city.label=counts.get(key)>1?`${key} (${city.lat.toFixed(3)}°, ${city.lon.toFixed(3)}°)`:key;
+      const feature=data.features.find(f=>f.properties.id===city.country_id);
+      if(feature)entries.push({label:city.label,search:normalize(`${city.name} ${city.country}`),feature,city});
+    });
+    populate();
+  }catch(error){$('city-status').textContent='City lookup unavailable. Countries are still available.';console.error(error);}
+}
+async function init(){
+  const response=await fetch('countries.json',{cache:'no-store'});if(!response.ok)throw Error('Country data could not be loaded');data=await response.json();
+  overview=L.map('overview',{minZoom:0.5,zoomSnap:0.25,maxZoom:7,worldCopyJump:false,scrollWheelZoom:false}).setView([18,0],1);
+  detail=L.map('detail',{minZoom:2,maxZoom:12,worldCopyJump:false,scrollWheelZoom:true}).setView([15,0],2);
+  detail.createPane('adminBoundaries');detail.getPane('adminBoundaries').style.zIndex=450;detail.getPane('adminBoundaries').style.pointerEvents='none';
+  detail.createPane('cityLabels');detail.getPane('cityLabels').style.zIndex=650;detail.getPane('cityLabels').style.pointerEvents='none';
+  cityLayer=L.layerGroup().addTo(detail);
+  detail.on('moveend zoomend resize',drawCities);
+  $('show-cities').addEventListener('change',drawCities);$('show-boundaries').addEventListener('change',drawBoundaries);
+  polygons=L.geoJSON(data,{style,onEachFeature:(f,layer)=>{
+    layer.bindTooltip(tooltip(f));layer.on('click',()=>selectCountry(f));
+    layer.on('mouseover',()=>{layer.setStyle({weight:2,color:'#16324f'});$('overview-caption').textContent=`${f.properties.name} · ${meanText(f)} · ${year()}`;});
+    layer.on('mouseout',()=>{layer.setStyle(style(f));$('overview-caption').textContent='Click a country, or choose one from the list above.';});
+  }}).addTo(overview);
+  data.colors.forEach((c,i)=>{const bin=document.createElement('div');bin.className='bin';const swatch=document.createElement('div');swatch.className='swatch';swatch.style.background=c;const label=document.createElement('span');label.className='bin-label';label.textContent=`${i===0?0:data.brackets[i-1]}${i===data.colors.length-1?'+':''}`;bin.append(swatch,label);$('scale').append(bin);});
+  overview.fitBounds([[-57,-180],[75,180]],{padding:[8,8],maxZoom:1.5,animate:false});
+  initCityPicker();
+  $('year').disabled=false;$('play').disabled=false;
+  $('year').addEventListener('input',()=>{stop();updateYear();});
+  $('play').addEventListener('click',()=>{if(playback!==null){stop();return;}playback=0;$('play').textContent='❚❚ Pause';$('play').setAttribute('aria-label','Pause timeline');if(year()===2024){$('year').value=1998;updateYear();}else if(!pending)schedule();});
+  $('retry').addEventListener('click',loadTiles);
+  $('clear-selection').addEventListener('click',clearSelection);
+  $('reset').addEventListener('click',()=>detail.fitBounds(selected.properties.bounds,{padding:[24,24],maxZoom:9}));
+  detail.on('mousemove',e=>{
+    if(!selected || !tiles)return;
+    const index=tiles.readBracket(e.latlng);
+    if(index===undefined){$('hover-value').textContent='Loading map tile…';return;}
+    if(index===null){$('hover-value').textContent='No data at this location.';return;}
+    const lower=index===0?0:data.brackets[index-1];
+    const label=index===data.brackets.length?`${lower}+`:`${lower}–<${data.brackets[index]}`;
+    $('hover-value').textContent=`${label} µg/m³ · ${year()}`;
+  });
+  detail.on('mouseout',()=>{$('hover-value').textContent='';});
+}
+playback=null;init().catch(error=>{$('status').textContent=error.message;});
+</script><script src="time_comparison.js"></script>
+</body></html>
