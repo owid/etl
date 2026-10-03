@@ -3,7 +3,7 @@
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -40,12 +40,11 @@ def run() -> None:
     tb = tidy_age_dimension(tb)
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # Calculate death rates for  combined age groups.
-    # The death rate is per 100,000 population, so we reverse-calculate the population size.
-    tb["estimated_population"] = tb["number"] / tb["death_rate_per_100_000_population"] * 100000
-    tb = add_age_group_aggregate(tb, ["less than 1 year", "1-4 years"], "<5 years")
-    tb = add_age_group_aggregate(tb, ["less than 1 year", "1-4 years", "5-9 years"], "<10 years")
-    tb = tb.drop(columns=["estimated_population"])
+    # Death rates for combined age groups, using WHO's own population denominator
+    # (see implied_population for why it is read from the all-causes dataset).
+    tb_population = implied_population(paths.load_dataset("mortality_database"))
+    tb = add_age_group_aggregate(tb, tb_population, ["less than 1 year", "1-4 years"], "<5 years")
+    tb = add_age_group_aggregate(tb, tb_population, ["less than 1 year", "1-4 years", "5-9 years"], "<10 years")
 
     # Final validation BEFORE formatting
     log.info("Validating processed data")
@@ -64,37 +63,71 @@ def run() -> None:
     log.info("WHO cancer mortality database processing completed successfully")
 
 
-def add_age_group_aggregate(tb: Table, age_groups: list[str], label: str) -> Table:
+def implied_population(ds_mortality: Dataset) -> Table:
+    """Recover the population WHO used as the denominator, per country, year, sex and age group.
+
+    WHO publishes a death rate next to every death count, so the population it divided by is
+    recoverable as ``number / death_rate * 100,000``. That denominator describes the population,
+    not the cause, so it is the same whichever cause it is read from — but it is only recoverable
+    where the cause reported at least one death. Reading it from all causes combined, which nearly
+    every reporting country-year has, recovers it for ~99.9% of country-years; reading it from a
+    single cancer type recovers ~81%, because childhood cancer deaths are rare.
     """
-    Aggregates death numbers and recalculates death rates for a combined age group.
+    tb = ds_mortality.read("mortality_database", safe_types=False)
+    tb = tb[tb["cause"] == "All Causes"]
 
-    Parameters:
-    - tb (Table): Original table with disaggregated age group data.
-    - age_groups (list of str): List of age group labels to combine (e.g., ["less than 1 year", "1-4 years"]).
-    - label (str): New age group label to assign to the aggregated rows (e.g., "< 5 years").
+    rate = tb["death_rate_per_100_000_population"]
+    # A zero or missing rate carries no information about the population size.
+    tb["population"] = tb["number"] / rate.where(rate > 0) * 100_000
+    tb = tb.dropna(subset=["population"])
 
-    Returns:
-    - Table: Aggregated rows with updated death rate and age group label merged into the original table.
-    """
-    # Filter relevant age groups
-    tb_filtered = tb[tb["age_group"].isin(age_groups)].copy()
-
-    # Group by relevant dimensions and sum values
-    tb_filtered = tb_filtered.groupby(["country", "year", "sex", "cause", "icd10_codes"], as_index=False).agg(
-        {"number": "sum", "estimated_population": "sum"}
+    tb = tb[["country", "year", "sex", "age_group", "population"]]
+    assert not tb.duplicated(subset=["country", "year", "sex", "age_group"]).any(), (
+        "All-causes rows are not unique per country/year/sex/age group"
     )
-
-    # Recalculate the death rate for the new age group
-    death_rate = tb_filtered["number"] / tb_filtered["estimated_population"] * 100000
-    # Replace both NaN and infinite values with 0
-    tb_filtered["death_rate_per_100_000_population"] = death_rate.replace([np.inf, -np.inf], 0).fillna(0)
-
-    # Assign new age group label
-    tb_filtered["age_group"] = label
-
-    # Drop the helper column
-    tb = pr.concat([tb, tb_filtered])
     return tb
+
+
+def add_age_group_aggregate(tb: Table, tb_population: Table, age_groups: list[str], label: str) -> Table:
+    """Add a combined age group, summing deaths and population over the age groups it spans.
+
+    Every constituent age group must contribute both a death count and a population, otherwise the
+    aggregate is left missing: a partial numerator over a full denominator understates the rate,
+    and a full numerator over a partial denominator overstates it.
+    """
+    tb_bands = tb[tb["age_group"].isin(age_groups)]
+    tb_bands = pr.merge(tb_bands, tb_population, on=["country", "year", "sex", "age_group"], how="left")
+
+    keys = ["country", "year", "sex", "cause", "icd10_codes"]
+    grouped = tb_bands.groupby(keys, observed=True)[["number", "population"]]
+    # count() ignores NaN, so requiring one contribution per age group rejects any group where a
+    # band is absent, reports no deaths, or has no recoverable population.
+    tb_agg = grouped.sum(min_count=1).where(grouped.count() == len(age_groups)).reset_index()
+
+    tb_agg["death_rate_per_100_000_population"] = tb_agg["number"] / tb_agg["population"] * 100_000
+    tb_agg["age_group"] = label
+    tb_agg = tb_agg.drop(columns=["population"])
+
+    _validate_age_group_aggregate(tb_agg, label)
+
+    return pr.concat([tb, tb_agg])
+
+
+def _validate_age_group_aggregate(tb_agg: Table, label: str) -> None:
+    """A rate of exactly zero must mean zero deaths, never an unknown denominator."""
+    deaths = tb_agg["number"]
+    rate = tb_agg["death_rate_per_100_000_population"]
+
+    fabricated = tb_agg[(rate == 0) & (deaths > 0)]
+    assert len(fabricated) == 0, f"{label}: {len(fabricated)} rows report a death rate of 0 despite recording deaths"
+
+    log.info(
+        "add_age_group_aggregate",
+        age_group=label,
+        rows=len(tb_agg),
+        with_rate=int(rate.notna().sum()),
+        without_rate=int(rate.isna().sum()),
+    )
 
 
 def tidy_sex_dimension(tb: Table) -> Table:
