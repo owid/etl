@@ -1,0 +1,35 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+# NOTE: The Living Planet Report 2026 is embargoed until 2026-10-08. This snapshot is private (is_public: false)
+#  and its steps are data-private://. Make them public (drop is_public, switch dag URIs to data://) on/after 8 October 2026.
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Living Planet Index
+    description: |-
+      The Living Planet Index (LPI) is a measure of the state of global biological diversity based on population trends of vertebrate species from around the world. It tracks changes in the relative abundance of wildlife populations that have been consistently monitored in a specific area over time. All indices are weighted by species richness, giving species-rich taxonomic groups in terrestrial, marine and freshwater systems more weight than groups with fewer species. Using a method developed by ZSL and WWF, these species population trends are aggregated to produce indices of the state of biodiversity.
+
+      The index value is measured relative to species' populations in 1970 (i.e. 1970 = 1).
+
+      To calculate an LPI, a generalized additive modeling framework is used to determine the underlying trend in each population time-series. Average rates of change are then calculated and aggregated to the species level, and then combined into indices using a weighting system that gives trends from more species-rich systems, realms and groups more weight in the final index.
+    date_published: "2026-10-08"
+
+    # Citation
+    producer: World Wildlife Fund and Zoological Society of London
+    citation_full: |-
+      WWF (2026) Living Planet Report 2026. WWF, Gland, Switzerland.
+    attribution_short: WWF & ZSL
+
+    # Files
+    url_main: http://stats.livingplanetindex.org/
+    date_accessed: 2026-09-30
+
+    # License
+    license:
+      name: CC BY 4.0
+
+  is_public: false
+outs:
+  - md5: c55f00ebc36ef9038ef51b437453844c
+    size: 19654
+    path: living_planet_index.csv
