@@ -832,10 +832,10 @@ steps:
   data://grapher/who/2025-08-05/mortality_database_cancer:
     - data://garden/who/2025-08-05/mortality_database_cancer
   # WHO ICD codes
-  data://grapher/who/2025-08-06/icd_codes:
-    - data://garden/who/2025-08-06/icd_codes:
-        - data://meadow/who/2025-08-06/icd_codes:
-            - snapshot://who/2025-08-06/icd_codes.zip
+  data://grapher/who/2026-10-02/icd_codes:
+    - data://garden/who/2026-10-02/icd_codes:
+        - data://meadow/who/2026-10-02/icd_codes:
+            - snapshot://who/2026-10-02/icd_codes.zip
   # Suicides based on WHO Mortality Database
   data://grapher/who/2025-08-06/self_inflicted_injuries:
     - data://garden/who/2025-08-06/self_inflicted_injuries:
