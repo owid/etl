@@ -29,8 +29,6 @@ MAX_DIMENSION_VALUES_LISTED = 40
 ENTITY_TIME_DIMENSIONS = {"country", "year", "date"}
 # Google's Dataset rich results reject (as a critical issue) a `description` longer than this.
 MAX_DESCRIPTION_LENGTH = 5000
-# A `## Changelog` section in a description runs until the next level-2 heading or the end of the text.
-CHANGELOG_SECTION = re.compile(r"^##\s+Changelog\b.*?(?=^##\s|\Z)", re.MULTILINE | re.DOTALL | re.IGNORECASE)
 OWID_ORGANIZATION = {
     "@type": "Organization",
     "name": "Our World in Data",
@@ -94,7 +92,7 @@ def dataset_to_schema_org(
     resolved_version = version or dataset_meta.version
 
     title = _dataset_title(dataset_meta, tables)
-    description = _summary(_dataset_description(dataset_meta), node=f"dataset '{dataset_path}'")
+    description = _checked_description(_dataset_description(dataset_meta), node=f"dataset '{dataset_path}'")
     origins = _unique_origins(tables)
 
     result: dict[str, Any] = {
@@ -213,7 +211,7 @@ def _table_dataset(
     }
     description = table_description(table, dataset_meta)
     if description:
-        result["description"] = _summary(description, node=f"table '{table.short_name}'")
+        result["description"] = _checked_description(description, node=f"table '{table.short_name}'")
 
     variables = _variable_measured(table)
     if variables:
@@ -366,17 +364,16 @@ def _dataset_description(dataset_meta: DatasetMeta) -> str:
     )
 
 
-def _summary(description: str, *, node: str) -> str:
-    """Return a description without its changelog, raising if it is still too long for Dataset Search.
+def _checked_description(description: str, *, node: str) -> str:
+    """Return a description, raising if it is too long for Dataset Search.
 
-    A changelog is release history rather than a summary of the data (the landing page shows it in a section of its
-    own), and it is what pushes long descriptions past the limit. Anything still over ``MAX_DESCRIPTION_LENGTH`` makes
-    Google reject the whole record as invalid, and no automatic cut would read well, so its author must shorten it.
+    Anything over ``MAX_DESCRIPTION_LENGTH`` makes Google reject the whole record as invalid, and no automatic cut would
+    read well, so its author must shorten it.
     """
-    description = CHANGELOG_SECTION.sub("", description).strip()
+    description = description.strip()
     if len(description) > MAX_DESCRIPTION_LENGTH:
         raise ValueError(
-            f"The JSON-LD description of {node} is {len(description)} characters long (without its changelog), but "
+            f"The JSON-LD description of {node} is {len(description)} characters long, but "
             f"Google Dataset Search rejects descriptions over {MAX_DESCRIPTION_LENGTH}. Shorten it in the metadata."
         )
     return description

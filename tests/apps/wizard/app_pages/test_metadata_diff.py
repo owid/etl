@@ -52,6 +52,7 @@ from apps.wizard.app_pages.metadata_diff.discovery import (
 from apps.wizard.app_pages.metadata_diff.render import render_text_html
 from apps.wizard.app_pages.metadata_diff.review_state import surface_key
 from apps.wizard.app_pages.metadata_diff.usage import _indicator_ids_in_mdim_config
+from etl.paths import BASE_DIR
 
 
 def _view(dims, indicators=None, metadata=None):
@@ -3430,8 +3431,11 @@ def test_who_to_send_the_rejections_to_is_said_on_the_page_not_in_the_document()
     )
     from apps.wizard.app_pages.metadata_diff.review_section import _rejections_markdown, handover_sentence
 
-    # A real step in this repo, so the owner is read rather than invented.
-    directory = "etl/steps/data/garden/wb/2026-06-26/world_bank_pip"
+    # A real step in this repo, so the owner is read rather than invented. Its latest version, since
+    # superseded versions are deleted on every update.
+    garden_wb = BASE_DIR / "etl/steps/data/garden/wb"
+    (latest, *_) = sorted(garden_wb.glob("*/world_bank_pip.meta.yml"), reverse=True)
+    directory = str(latest.with_suffix("").with_suffix("").relative_to(BASE_DIR))
     owners = dataset_owners([directory])
     assert owners.get(directory), "this step records an owner in its own .meta.yml"
     owner = owners[directory][0]
@@ -3441,7 +3445,7 @@ def test_who_to_send_the_rejections_to_is_said_on_the_page_not_in_the_document()
         old="Mean income.",
         new="Mean income. In 2021 prices.",
         charts=[{"chartId": 1, "slug": "gdp", "has_data_page": True}],
-        catalog_paths={"grapher/wb/2026-06-26/world_bank_pip/world_bank_pip#mean"},
+        catalog_paths={f"grapher/wb/{latest.parent.name}/world_bank_pip/world_bank_pip#mean"},
     )
     summary = Summary(reach=[reach])
     surface = surface_key("item", "edit:charts")

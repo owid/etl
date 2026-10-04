@@ -5,7 +5,6 @@ import json
 import os
 from pathlib import Path
 
-import click
 import pandas as pd
 import requests
 from dotenv import load_dotenv
@@ -34,9 +33,7 @@ SERIES_IDS = [
 ]
 
 
-@click.command()
-@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-def main(upload: bool) -> None:
+def run(upload: bool = True) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"bls/{SNAPSHOT_VERSION}/us_ppi_construction.csv")
 

@@ -1347,6 +1347,9 @@ steps:
   # archived; last active in e2c57887abcb on 2026-09-07
   export://multidim/owid/latest/ig_countries:
     - data-private://grapher/owid/latest/ig_countries
+  # archived; last active in 1561731bf7ef on 2026-10-02
+  data://garden/bls/2026-08-18/us_ppi_construction:
+    - snapshot://bls/2026-08-18/us_ppi_construction.csv
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
