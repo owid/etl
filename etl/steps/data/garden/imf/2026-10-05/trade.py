@@ -63,13 +63,23 @@ def run() -> None:
     ds_meadow = paths.load_dataset("trade")
     ds_wdi = paths.load_dataset("wdi")
 
-    # Read table from meadow dataset (LONG format with 'indicator' & 'value')
-    tb_long = ds_meadow.read("trade")
+    # Read table from meadow dataset (LONG format with 'indicator' & 'value'), keeping categoricals for the ~5M rows.
+    tb_long = ds_meadow.read("trade", safe_types=False)
     sanity_check_inputs(tb_long)
 
-    # --- Harmonize & keep only the two indicators we actually use ----------------
+    # --- Keep only the two indicators we actually use, then harmonize ----------------
+    tb_long = tb_long[tb_long["indicator"].isin([EXPORT_COL, IMPORT_COL])]
+    # Downstream steps rely on string dtypes (pair labels, new region labels), so convert after filtering.
+    tb_long = tb_long.astype(
+        {
+            "country": "string[pyarrow]",
+            "indicator": "string[pyarrow]",
+            "counterpart_country": "string[pyarrow]",
+            "year": "Int64",
+            "value": "Float64",
+        }
+    )
     tb_long = _harmonize_countries(tb_long)
-    tb_long = tb_long[tb_long["indicator"].isin([EXPORT_COL, IMPORT_COL])].copy()
 
     # --- Give every series a row for every year (empty where there is no observation) ---------------
     tb_long = complete_series_years(tb_long)
