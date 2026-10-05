@@ -72,7 +72,7 @@ INDICATORS_NO_ORIGINS = [
     "wom_hoe_ever_dem",
     "wom_hos_ever_dem",
     "wom_hog_ever_dem",
-    "v2exfemhoe",
+    "femhoe_owid",
     "regime_imputed",
     "num_years_in_electdem_consecutive",
     "num_years_in_libdem_consecutive",
