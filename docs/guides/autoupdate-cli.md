@@ -96,17 +96,16 @@ Create an update script and save it in the [scripts/](https://github.com/owid/et
 --8<-- "scripts/update-covid-cases-deaths.sh"
 ```
 
-In the example above, you need to replace the code in line 14. Optionally, edit the text in lines 12 and 20 to better log the update.
+In the example above, replace the `uv run etls` line with your own snapshot, list the `.dvc` files it writes in `snapshot_files`, and set the commit message. Commit through `commit_and_push_snapshots` (from `scripts/commit-snapshots.sh`), not plain `git commit` and `git push`. It builds the commit on top of the latest `origin/master` without touching the shared checkout, refuses to push a change to any file outside `snapshot_files`, and fails the job if the push is rejected.
 
 ### Schedule update in Buildkite
 
-Finally, you need to schedule the regular update. To do so, go to [Buildkite](https://buildkite.com/our-world-in-data/etl-automatic-dataset-updates-master/settings/steps) and edit the instructions in the file.
-
-Simply add a
+Finally, schedule the update by adding a step to [`.buildkite/etl/automatic_dataset_updates.yml`](https://github.com/owid/ops/blob/main/.buildkite/etl/automatic_dataset_updates.yml) in owid/ops. The [Buildkite pipeline](https://buildkite.com/our-world-in-data/etl-automatic-dataset-updates-master) loads it from there. Include `*shared-checkout-lock`: the job writes to the same checkout that ETL deploys reset, so the two must not run at the same time.
 
 ```yaml
 - label: "Update <step>"
-    command:
+  <<: [*retry-settings, *shared-checkout-lock]
+  command:
     - "sudo su - owid -c 'bash /home/owid/etl/scripts/update-<step>.sh'"
 ```
 
