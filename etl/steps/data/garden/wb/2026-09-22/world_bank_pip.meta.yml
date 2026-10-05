@@ -172,7 +172,7 @@ definitions:
   description_key_poverty_line: |-
     {macros}
     <% if poverty_line in poverty_line_ipl %>
-    The World Bank defines extreme poverty as living on less than {definitions.poverty_line_per_day}. This threshold, known as the ["International Poverty Line"](#dod:international-poverty-line), is set so that poverty can be compared across countries. This indicator plays an important and successful role in focusing the world's attention on the very poorest people. The UN uses this indicator to track progress towards [ending extreme poverty by 2030](https://ourworldindata.org/sdgs/no-poverty).
+    The World Bank defines extreme poverty as living on less than {definitions.poverty_line_per_day}. This threshold, known as the [“International Poverty Line”](#dod:international-poverty-line), is set so that poverty can be compared across countries. This indicator plays an important and successful role in focusing the world’s attention on the very poorest people. The UN uses this indicator to track progress toward [ending extreme poverty by 2030](https://ourworldindata.org/sdgs/no-poverty).
     <%- elif poverty_line in poverty_line_lmic %>
     A poverty line of {definitions.poverty_line_per_day} represents definitions of national poverty lines in lower-middle-income countries.
     <%- elif poverty_line in poverty_line_umic %>
@@ -186,7 +186,7 @@ definitions:
   description_key_extreme_poverty_additional: |-
     {macros}
     <% if poverty_line in poverty_line_ipl %>
-    Two centuries ago, most of the world's population was extremely poor. Many believed that widespread poverty was inevitable. But this turned out to be wrong. Economic growth is possible, and poverty can decline. With this poverty line, we can track whether countries are leaving the worst poverty behind.
+    Two centuries ago, most of the world’s population was extremely poor. Many believed that widespread poverty was inevitable. But this turned out to be wrong. Economic growth is possible, and poverty can decline. With this poverty line, we can track whether countries are leaving the worst poverty behind.
     <%- endif %>
 
   description_key_ppp: |-
@@ -196,11 +196,11 @@ definitions:
 
   description_key_source_world_bank: |-
     <% if welfare_type is defined and welfare_type == "income" and (survey_comparability is not defined or survey_comparability == "No spells") %>
-    This data comes from the [World Bank's Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. Here we only include surveys measuring people's incomes after taxes and benefits. [Read more](#dod:read-more-income-consumption-pip).
+    This data comes from the [World Bank’s Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. Here we only include surveys measuring people’s incomes after taxes and benefits. [Read more](#dod:read-more-income-consumption-pip).
     <%- elif welfare_type is defined and welfare_type == "consumption" and (survey_comparability is not defined or survey_comparability == "No spells") %>
-    This data comes from the [World Bank's Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. Here we only include surveys measuring people's consumption — a different but [closely related](#dod:read-more-income-consumption-pip) measure to income.
+    This data comes from the [World Bank’s Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. Here we only include surveys measuring people’s consumption — a different but [closely related](#dod:read-more-income-consumption-pip) measure to income.
     <%- else %>
-    This data comes from the [World Bank's Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. To achieve wide coverage, it pools data from two kinds of surveys. For high-income countries, the data measures people's incomes after taxes and benefits. For most low- and middle-income countries, it instead measures their consumption — a different but [closely related](#dod:read-more-income-consumption-pip) measure.
+    This data comes from the [World Bank’s Poverty and Inequality Platform](https://pip.worldbank.org/), which is based on a large collection of national survey data. To achieve wide coverage, it pools data from two kinds of surveys. For high-income countries, the data measures people’s incomes after taxes and benefits. For most low- and middle-income countries, it instead measures their consumption — a different but [closely related](#dod:read-more-income-consumption-pip) measure.
     <%- endif %>
 
   description_key_not_market_income: In lower-income countries, many people produce food for their own use or exchange goods without money. This data accounts for that by estimating what these goods would have cost if bought in the market and adding that value to their consumption.
@@ -311,18 +311,18 @@ definitions:
 
   description_processing_relative_poverty: |-
     <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country or region and year and calculate a relative poverty line — in this case <<poverty_line>>. For countries, we then run a specific query on the PIP API to return the share of the population below that line. For regions, we calculate the share below that line from the World Bank's [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304), which provides 1,000 welfare bins per country and year.
+    Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country or region and year and calculate a relative poverty line — in this case <<poverty_line>>. For countries, we then run a specific query on the PIP API to return the share of the population below that line. For regions, we calculate the share below that line from the World Bank’s [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304), which provides 1,000 welfare bins per country and year.
 
     <% endif %>
 
   description_processing_median_regions: |-
     <% if ppp_version == 2021 and welfare_type == "income or consumption" and (survey_comparability is not defined or survey_comparability == "No spells") and (table is not defined or table != "Income or consumption intra/extrapolated") %>
 
-    Regional medians are calculated from the World Bank's [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304), as the 50th percentile of the pooled distribution of all countries in each region.
+    Regional medians are calculated from the World Bank’s [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304), as the 50th percentile of the pooled distribution of all countries in each region.
     <%- endif %>
 
   description_processing_thr_regions: |-
-    Regional thresholds are calculated from the World Bank's [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304), which splits each country's population into 1,000 equal-sized groups and reports the average income or consumption of each. We pool these groups for all countries in each region, rank them from poorest to richest, and estimate each threshold by interpolating between the groups' averages.
+    Regional thresholds are calculated from the World Bank’s [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304), which splits each country’s population into 1,000 equal-sized groups and reports the average income or consumption of each. We pool these groups for all countries in each region, rank them from poorest to richest, and estimate each threshold by interpolating between the groups’ averages.
 
   description_processing_thr: |-
     Income and consumption thresholds by decile are not directly available in the World Bank PIP API. We extract the metric primarily from [auxiliary percentiles data provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646). Missing country values are calculated by running multiple queries on the API to obtain the closest poverty line to each threshold. {definitions.description_processing_thr_regions}
@@ -338,7 +338,7 @@ definitions:
     We calculate missing country values of thresholds by running multiple queries on the API to obtain the closest poverty line to each threshold, and merge them with the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles). {definitions.description_processing_thr_regions}
 
   description_processing_avg_share_percentiles: |-
-    For countries, this data comes from the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles). For regions, we calculate it from the World Bank's [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304): we pool the binned distributions of all countries in each region, rank the population by income or consumption, and calculate the average and the share of total income or consumption held by each percentile.
+    For countries, this data comes from the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles). For regions, we calculate it from the World Bank’s [1000 Binned Global Distribution](https://datacatalog.worldbank.org/search/dataset/0064304): we pool the binned distributions of all countries in each region, rank the population by income or consumption, and calculate the average and the share of total income or consumption held by each percentile.
 
   description_processing_palma_ratio: |-
     The Palma ratio is not directly available in the World Bank PIP API. We calculate the metric by dividing the income share of the richest 10% by the income share of the poorest 40%. Both these values are available in the API.
@@ -2116,7 +2116,7 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         description_from_producer: |-
-          The poverty headcount ratio at societal poverty line is the percentage of a population living in poverty according to the World Bank's Societal Poverty Line. The Societal Poverty Line is expressed in purchasing power adjusted <<ppp_version>> U.S. dollars and defined as `max({definitions.ipl_for_societal_poverty_line}, {definitions.societal_poverty_line_intercept} + 0.5*Median)`. This means that when the national median is sufficiently low, the Societal Poverty line is equivalent to the extreme poverty line, {definitions.ipl_for_societal_poverty_line}. For countries with a sufficiently high national median, the Societal Poverty Line grows as countries’ median income grows.
+          The poverty headcount ratio at societal poverty line is the percentage of a population living in poverty according to the World Bank’s Societal Poverty Line. The Societal Poverty Line is expressed in purchasing power adjusted <<ppp_version>> US dollars and defined as `max({definitions.ipl_for_societal_poverty_line}, {definitions.societal_poverty_line_intercept} + 0.5*Median)`. This means that when the national median is sufficiently low, the Societal Poverty line is equivalent to the extreme poverty line, {definitions.ipl_for_societal_poverty_line}. For countries with a sufficiently high national median, the Societal Poverty Line grows as countries’ median income grows.
         display:
           name: Share of population in societal poverty
           numDecimalPlaces: 1
