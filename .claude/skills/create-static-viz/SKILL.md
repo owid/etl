@@ -77,9 +77,10 @@ The step-by-step detail lives in [`reference/`](reference/) and is read *at* tha
 | [reference/GOTCHAS.md](reference/GOTCHAS.md) | Its **Data** section at Step 1, before any column is used; the rest on an error, or grep by symptom | Data, layout and workflow pitfalls. |
 | [reference/SKETCHING.md](reference/SKETCHING.md) | Sketch mode, instead of Steps 1–4 | Data pull, scaffold, render, verify, the Figma sketch handoff, iterating, promotion to a step. |
 
-**Size budget, enforced by `--structure`: this spine under 33 KB, TEMPLATES.md under 25 KB.** (Raised
-once from 30 KB on 2026-09-17 to land Sketch mode and its contract rows — the spine sat 56 bytes under
-the old cap. The discipline is unchanged.) Both are read on every
+**Size budget, enforced by `--structure`: this spine under 34 KB, TEMPLATES.md under 25 KB.** (Raised
+from 30 KB on 2026-09-17 to land Sketch mode and its contract rows, and to 34 KB on 2026-10-05 to land
+the published-original handoff in Step 7 — the spine sat 11 bytes under 33 KB. The discipline is
+unchanged.) Both are read on every
 run, so a paragraph added here costs every future viz — new detail belongs in the reference file for
 its step. After editing any doc in this skill:
 
@@ -390,6 +391,12 @@ file. Its `upload_assets` import is already file-based.
 The one adaptation: its Steps 7–8 look up grapher's node names (`connectors`,
 `horizontal-grid-lines`, `datapoints__<Entity>`). Ours are the `gid`s from Step 4 — hand over the
 naming scheme along with the file.
+
+**On a refresh, hand over the published original too, to sit leftmost on the page.** Reviewers judge
+the new chart against what readers see now, not against the step's last render. Fetch it with
+`scripts/fetch_original_image.py <filename>`. It reads the `images` table and saves whatever format
+Cloudflare serves, usually JPEG. Upload it as a raster, set it to the desktop frame's width, and give it
+the layer name the script prints. It stays when old versions are cleared.
 
 **Three of that skill's geometry rows only mean anything once the import is cropped — and then they
 mean everything.** `box-alignment`, `gap` and `margins` read the chart frame's box, and an import
