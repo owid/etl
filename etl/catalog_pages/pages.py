@@ -1,11 +1,11 @@
-"""Public page files for a catalog dataset: per table its data, codebook and sources; per dataset a manifest.
+"""Public page files for a catalog dataset: per table its data, codebook and sources; per dataset a README and a manifest.
 
 The files are published at the dataset's stable key ``<namespace>/<short_name>/`` of the catalog bucket, next to
 the ``dataset.jsonld`` side product. They are built in a folder of their own, never in the local catalog, whose
 top level holds only channels. The Cloudflare Worker that serves ``catalog.ourworldindata.org`` renders the
-dataset page from ``manifest.json`` and the tables' codebooks and sources; everything in them is derived from the
-dataset's own metadata by ``owid.catalog``. The manifest contract (version 1) is shared with the Worker: keep both
-sides equal.
+dataset page from ``manifest.json`` and the tables' codebooks and sources; ``readme.md`` is a download of its own,
+which the page links to but does not read. Everything in them is derived from the dataset's own metadata by
+``owid.catalog``. The manifest contract (version 1) is shared with the Worker: keep both sides equal.
 """
 
 from __future__ import annotations
@@ -31,10 +31,8 @@ log = get_logger()
 
 MANIFEST_VERSION = 1
 MANIFEST_FILENAME = "manifest.json"
+README_FILENAME = "readme.md"
 DATASET_JSONLD_FILENAME = "dataset.jsonld"
-# Files earlier publishes wrote into a page's folder and this one no longer does. They stay among the files a page
-# can own, so the next publish of each page deletes them from R2.
-RETIRED_FILENAMES = ("readme.md",)
 # Formats every table is published in, at the stable URL: CSV for anyone, parquet for anyone with a dataframe
 # library (a fraction of the CSV's size, and it keeps the column types), and an Excel workbook with the table,
 # its codebook and its sources as sheets.
@@ -90,10 +88,14 @@ class PageFiles:
     xlsx_skipped: dict[str, str] = field(default_factory=dict)
 
 
+def page_url(base_url: str, short_key: str) -> str:
+    return f"{base_url.rstrip('/')}/{short_key}/"
+
+
 def page_filenames(ds: Dataset) -> list[str]:
     """Every file a dataset page can own in its stable folder, so that a stale page can be removed in full."""
     names = [f"{name}.{suffix}" for name in ordered_table_names(ds) for suffix in TABLE_FORMATS + TABLE_DOCUMENTATION]
-    return names + [MANIFEST_FILENAME, DATASET_JSONLD_FILENAME, *RETIRED_FILENAMES]
+    return names + [README_FILENAME, MANIFEST_FILENAME, DATASET_JSONLD_FILENAME]
 
 
 def page_build_checksum(ds: Dataset, *, short_key: str, base_url: str, has_jsonld: bool) -> str:
@@ -126,7 +128,7 @@ def write_page_files(
     topics: list[str] | None = None,
     build_checksum: str | None = None,
 ) -> PageFiles:
-    """Write the data files, documentation, manifest and JSON-LD of a dataset into ``output_dir / short_key``.
+    """Write the data files, documentation, README, manifest and JSON-LD of a dataset into ``output_dir / short_key``.
 
     The dataset's own folder is never written to: it only supplies the links to this version. ``build_checksum`` (see :func:`page_build_checksum`) is recorded in the
     manifest, for the next publish to compare against.
@@ -140,6 +142,7 @@ def write_page_files(
     """
     target_dir = output_dir / short_key
     target_dir.mkdir(parents=True, exist_ok=True)
+    url = page_url(base_url, short_key)
     result = PageFiles()
     files: list[dict[str, Any]] = []
 
@@ -174,7 +177,7 @@ def write_page_files(
         entry: dict[str, Any] = {
             "name": name,
             "title": table.metadata.title,
-            "description": table.metadata.description,
+            "description": docs._clean_text(table.metadata.description),
             "rows": int(len(flat)),
             "columns": int(len(flat.columns)),
             "codebook": f"{name}.codebook.csv",
@@ -197,6 +200,9 @@ def write_page_files(
         table.sources.to_csv(target_dir / entry["sources"], index=False)
         register(entry["sources"], "csv", ROLE_DOCUMENTATION, table=name)
         table_entries.append(entry)
+
+    (target_dir / README_FILENAME).write_text(ds.readme(url=url))
+    register(README_FILENAME, "md", ROLE_DOCUMENTATION)
 
     # Links to this version: the pipeline's own dated files, where they exist.
     for name in ordered_table_names(ds):
@@ -221,6 +227,7 @@ def write_page_files(
         # Markdown, as the page renders it: without details-on-demand links, and absent when it is a template.
         "description": docs._clean_text(ds.metadata.description),
         "published_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "readme": README_FILENAME,
         # First entry is the main table (the one named after the dataset). Each carries its own codebook and sources.
         "tables": table_entries,
         "files": files,
@@ -228,8 +235,7 @@ def write_page_files(
     # Newest release first, as the page lists them; each change is markdown.
     if ds.metadata.changelog:
         manifest["changelog"] = [
-            {"date": entry.date, "changes": list(entry.changes)}
-            for entry in sorted(ds.metadata.changelog, key=lambda entry: entry.date, reverse=True)
+            entry.to_dict() for entry in sorted(ds.metadata.changelog, key=lambda entry: entry.date, reverse=True)
         ]
     if jsonld is not None:
         manifest["jsonld"] = DATASET_JSONLD_FILENAME

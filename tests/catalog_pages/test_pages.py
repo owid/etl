@@ -6,7 +6,7 @@ from owid.catalog import Dataset, DatasetMeta, License, Origin, Table, VariableM
 from owid.catalog.api.legacy import LocalCatalog
 
 from etl.catalog_pages.artifacts import build_catalog_page_artifacts
-from etl.catalog_pages.pages import MANIFEST_VERSION, RETIRED_FILENAMES, page_filenames
+from etl.catalog_pages.pages import MANIFEST_VERSION, page_filenames
 from etl.catalog_pages.publish import _page_keys
 
 ORIGIN = Origin(
@@ -89,14 +89,11 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
         "owid_energy.parquet",
         "owid_energy.sources.csv",
         "owid_energy.xlsx",
+        "readme.md",
     ]
     assert sorted(key for key in result.page_keys if key.startswith("energy/")) == sorted(
-        f"energy/owid_energy/{name}"
-        for name in page_filenames(Dataset(data_dir / catalog_path))
-        if name not in RETIRED_FILENAMES
+        f"energy/owid_energy/{name}" for name in page_filenames(Dataset(data_dir / catalog_path))
     )
-    # A README an earlier publish left on R2 is deleted.
-    assert "energy/owid_energy/readme.md" in _page_keys(result, data_dir)[1]
 
     data = pd.read_csv(page_dir / "owid_energy.csv")
     assert data.columns.tolist() == ["country", "year", "hydro_energy_twh"]
@@ -106,6 +103,12 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     assert (
         codebook.set_index("column").loc["hydro_energy_twh", "source"] == "Example Producer – Original dataset (2025)"
     )
+    readme = (page_dir / "readme.md").read_text()
+    assert readme.startswith("# Energy dataset\n\n## About this dataset\n")
+    assert "- Catalog page:\n  - https://catalog.ourworldindata.org/energy/owid_energy/" in readme
+    assert "## Changelog\n\n- 2026-09-10:\n  - First release.\n" in readme
+    assert "##### Example Producer – Original dataset (2025)" in readme
+
     manifest = json.loads((page_dir / "manifest.json").read_text())
     assert manifest["manifest_version"] == MANIFEST_VERSION
     assert manifest["catalog_path"] == catalog_path
@@ -117,7 +120,7 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     assert manifest["published_at"].endswith("Z")
     # No license statement anywhere: OWID republishes data produced by others.
     assert "license" not in manifest
-    assert "readme" not in manifest
+    assert manifest["readme"] == "readme.md"
     assert manifest["changelog"] == [{"date": "2026-09-10", "changes": ["First release."]}]
     assert "codebook" not in manifest and "sources" not in manifest
     sources = pd.read_csv(page_dir / "owid_energy.sources.csv")
@@ -154,6 +157,7 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
         "owid_energy.xlsx": "data",
         "owid_energy.codebook.csv": "documentation",
         "owid_energy.sources.csv": "documentation",
+        "readme.md": "documentation",
     }
     # The links to this version are the pipeline's own dated files; the page writes nothing into that folder,
     # which belongs to the pipeline, and uploads nothing there.
@@ -164,6 +168,7 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     assert not list((data_dir / catalog_path).glob("*.csv")) and not list((data_dir / catalog_path).glob("*.xlsx"))
     assert not [key for key in result.page_keys if key.startswith(f"{catalog_path}/")]
     assert files["owid_energy.codebook.csv"]["table"] == "owid_energy"
+    assert "table" not in files["readme.md"]
     csv = files["owid_energy.csv"]
     assert csv["format"] == "csv"
     assert csv["table"] == "owid_energy"
@@ -274,6 +279,7 @@ def test_dataset_saved_as_csv_gets_a_dated_csv_link(tmp_path: Path) -> None:
     dated = {entry["name"]: entry for entry in manifest["files"] if entry.get("versioned")}
     assert set(dated) == {"owid_energy.csv", "owid_energy.feather", "owid_energy.meta.json"}
     assert dated["owid_energy.csv"]["role"] == "archive" and dated["owid_energy.csv"]["format"] == "csv"
+    assert f"https://catalog.ourworldindata.org/{catalog_path}/owid_energy.csv" in (page_dir / "readme.md").read_text()
     # The pipeline's CSV is uploaded with the dataset, not by the page.
     assert not [key for key in result.page_keys if key.startswith(f"{catalog_path}/")]
 
@@ -300,6 +306,8 @@ def test_table_too_long_for_excel_gets_no_workbook_and_an_older_one_is_removed(t
     manifest = json.loads((page_dir / "manifest.json").read_text())
     assert manifest["tables"][0]["xlsx_skipped"] == "2 rows plus the header exceed Excel's limit of 2"
     assert not [entry for entry in manifest["files"] if entry["format"] == "xlsx"]
+    # The README offers no workbook link either.
+    assert ".xlsx" not in (page_dir / "readme.md").read_text()
 
 
 def test_non_redistributable_dataset_gets_no_page_and_its_published_files_are_deleted(tmp_path: Path) -> None:

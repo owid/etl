@@ -1,4 +1,4 @@
-"""Publish catalog dataset pages (data files, codebook, sources, manifest, JSON-LD) to R2."""
+"""Publish catalog dataset pages (data files, codebook, README, manifest, JSON-LD) to R2."""
 
 from __future__ import annotations
 
