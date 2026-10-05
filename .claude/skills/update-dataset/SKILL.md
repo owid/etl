@@ -34,6 +34,7 @@ Assumptions:
 
 - [ ] Parse inputs and resolve: channel, namespace, version, short_name, old_version, branch
 - [ ] Clean workbench directory: delete `workbench/<short_name>` unless continuing existing update
+- [ ] Pipeline refresher: run `scripts/pipeline_overview.py`, brief the user on the chain (what each step does, external inputs, consumers, who last updated it) and give a provisional structure verdict — re-confirm it after the snapshot + meadow diffs (see 0b)
 - [ ] Run ETL update workflow via `etl-update` subagent (help → dry run → approval → real run)
 - [ ] Add yourself to `dataset.owners` in the new garden `.meta.yml` (don't reorder; preserve existing names and markers)
 - [ ] Catalog `# NOTE:` / `# TODO:` comments carried over from the old step files into `notes_to_check.md`
@@ -124,6 +125,26 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - If starting fresh: delete `workbench/<short_name>` directory if it exists
    - Create fresh `workbench/<short_name>` directory for artifacts
 
+0b) Pipeline refresher — brief the user before changing anything
+
+   The user may not have seen this dataset in a while, or someone else ran the last update. Before `etl update`, explain what the pipeline looks like now and whether this update is expected to change it.
+
+   1. Map the chain mechanically:
+      ```bash
+      .venv/bin/python .claude/skills/update-dataset/scripts/pipeline_overview.py <namespace>/<old_version>/<short_name> \
+          > workbench/<short_name>/pipeline_overview.md
+      ```
+      It lists every step of the chain (including older-version upstream steps and same-version siblings such as extra snapshots or helper gardens), each step's files, the inputs from outside the chain, the direct consumers (other data steps, `viz://` charts/MDims/explorers, `export://`; readers of a shared sibling such as a common snapshot are listed apart, as they don't consume this dataset), the garden `owners`, the commit that created the garden step (= the last update), and the previous version (archived, or still active mid-update). It also warns when a newer version is already active, which means you have the wrong `old_version`.
+   2. Skim the step scripts: the docstrings, `run()`, and the helper names are usually enough. Don't read every line of a 1,000-line garden.
+   3. Tell the user in **about 5–8 lines**, no more:
+      - the chain in one line (`snapshot (xlsx) → meadow → garden (+ income_groups_aggregations) → grapher`), plus the number of snapshots if there's more than one;
+      - what each non-trivial step does, in plain words ("meadow reshapes wide → long; garden harmonizes countries, adds population-weighted regional aggregates and per-capita columns");
+      - key external inputs (population, regions, income groups, other datasets) and who consumes the output (counted by type; name the `viz://` ones). The script only sees DAG steps, so when it lists none, say that admin-built charts still read the grapher dataset directly — don't let "no consumers" read as "unused";
+      - who did the last update and when (the creating commit, with its PR number). When the script says the step was *first built* (no earlier version, active or archived), say this is the dataset's first update and name who built it, not who "last updated" it.
+   4. Close with a **provisional structure verdict**: usually *"Expected: no structural change — drop-in version bump."* If there's already evidence of a restructure (the triggers in "When the update isn't a drop-in version bump": a renamed `short_name`, a new file format or schema, a changed indicator set, changed score semantics), name it. Sources: the scheduled-issue body, the producer's release notes, or the new file's column list if it's cheap to fetch.
+
+   Don't pause for approval here. Keep going unless a restructure is already visible, which is an existing stop condition. The verdict is provisional, because the real evidence (column sets, shape, row counts) only appears at steps 3–4. Re-confirm it there. Record the final verdict as `update_summary.pipeline_structure` in `update-context.yml`, and put one line in the PR Summary: `Pipeline structure: unchanged` or `Pipeline structure: changed — <what and why>`.
+
 1) Run ETL update command (etl-update subagent)
    - Inputs: `<namespace>/<old_version>/<short_name>` plus any required flags
    - **Pick the URI that matches what's actually changing:**
@@ -200,6 +221,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - Run, fix, re-run; produce diffs
    - Save diffs and summaries
    - **Watch for meadow input checks keyed on absolute row/column positions.** Producers quietly restructure their files (e.g. this session, the WB dropped the legend rows above the first country, shifting the row count 239→234 and moving "Afghanistan" from row 10 to row 5). Data extraction that keys off content (drop rows without an id, then melt) survives, but hardcoded `tb.loc[N]` / exact-row-count asserts break — update them to the new positions/counts and drop a `# NOTE` so the next maintainer re-checks. The break is the check doing its job; don't loosen it into uselessness.
+   - **Re-confirm the step-0b structure verdict.** The snapshot comparison and the meadow diff are the first real evidence of shape: added or removed columns, a wide ↔ long change, new dimensions, different files. If the verdict changes, tell the user in one line what changed, update `update_summary.pipeline_structure`, and switch to "When the update isn't a drop-in version bump". If it holds, say nothing until the PR line.
 
 5) Garden step repair/verify (step-fixer subagent, channel=garden)
    - Run, fix, re-run; produce diffs
@@ -797,6 +819,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
        eligible_from: <last_public_post + 6 months, or null if never posted>
        decision: <drafted | declined (cooldown) | n/a>
      update_summary:
+       pipeline_structure: <"unchanged" | "changed — <what and why>"> (from 0b, re-confirmed at step 4)
        snapshot_diff: <short summary or artifact path>
        meadow_diff: <short summary or artifact path>
        garden_diff: <short summary or artifact path>
@@ -908,7 +931,7 @@ Keep the PR-body draft under `workbench/<short_name>/` (or re-fetch it with `gh 
 
 At the end of the workflow, update the PR description with:
 - A **tracking-issue link** as the first line of the Summary — e.g. `Tracks: [owid/owid-issues#NNNN](https://github.com/owid/owid-issues/issues/NNNN)`. Most data updates have a corresponding `owid-issues` ticket; try to find it by searching the title or `<short_name>` first, and **ask the user for the issue number if you can't locate one** rather than skipping the link silently.
-- A summary of key changes at the top
+- A summary of key changes at the top, including the `Pipeline structure: …` line from step 0b
 - Collapsed `<details>` sections **only for the pipeline steps that changed in a non-obvious way**. Skip any step that's just the boilerplate generated by `etl update` — don't add a placeholder like "unchanged from boilerplate". The Summary already explains the why; per-step sections are only for the how, when the how isn't obvious from the diff.
 
 ## A long-lived branch silently regresses shared charts
