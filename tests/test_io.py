@@ -1,6 +1,7 @@
+from pathlib import Path
 from unittest.mock import patch
 
-from etl.io import get_all_changed_catalog_paths
+from etl.io import data_step_catalog_path, get_all_changed_catalog_paths
 
 
 @patch("etl.io.load_dag")
@@ -258,3 +259,39 @@ def test_get_all_changed_catalog_paths_skips_deleted_files(mock_load_dag):
         "etl/steps/viz/explorer/who/latest/influenza.py": {"status": "A", "diff": ""},
     }
     assert get_all_changed_catalog_paths(files_changed, include_export=True) == ["viz://explorer/who/latest/influenza"]
+
+
+@patch("etl.io.load_dag")
+def test_get_all_changed_catalog_paths_folder_step(mock_load_dag):
+    """A step written as a folder of modules resolves to the step, not to one path per module.
+
+    V-Dem's garden step is `vdem/__init__.py` plus `vdem/vdem_clean.py`, `vdem/vdem.meta.yml`, etc.
+    Suffix-stripping turned those into `garden/.../vdem/vdem_clean`, which matches no step, so
+    `--modified` (the staging build), chart-diff and datadiff all silently skipped the branch.
+    """
+    mock_load_dag.return_value = {
+        "data://garden/democracy/2026-03-17/vdem": set(),
+        "data://grapher/democracy/2026-03-17/vdem": {"data://garden/democracy/2026-03-17/vdem"},
+    }
+    files_changed = {
+        "etl/steps/data/garden/democracy/2026-03-17/vdem/__init__.py": "M",
+        "etl/steps/data/garden/democracy/2026-03-17/vdem/vdem_clean.py": "M",
+        "etl/steps/data/garden/democracy/2026-03-17/vdem/vdem.meta.yml": "M",
+    }
+
+    result = get_all_changed_catalog_paths(files_changed)
+
+    assert sorted(result) == ["garden/democracy/2026-03-17/vdem", "grapher/democracy/2026-03-17/vdem"]
+
+
+def test_data_step_catalog_path():
+    """Companion files of a flat step, and files inside a folder step, all map to the step itself."""
+    for rel in [
+        "garden/un/2024-07-12/un_wpp.py",
+        "garden/un/2024-07-12/un_wpp.meta.yml",
+        "garden/un/2024-07-12/un_wpp.countries.json",
+        "grapher/un/2024-07-12/un_wpp.meta.override.yml",
+        "garden/un/2024-07-12/un_wpp/__init__.py",
+        "garden/un/2024-07-12/un_wpp/population.py",
+    ]:
+        assert data_step_catalog_path(Path(rel)).split("/", 1)[1] == "un/2024-07-12/un_wpp", rel

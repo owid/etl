@@ -115,6 +115,18 @@ def get_directly_changed_export_uris(files_changed: dict[str, dict[str, str]]) -
     return uris
 
 
+def data_step_catalog_path(rel_step: Path) -> str:
+    """Catalog path (`channel/namespace/version/short_name`) of the data step a file belongs to.
+
+    `rel_step` is relative to `etl/steps/data/`. A step is either a set of flat files named after it
+    (`<short>.py`, `<short>.meta.yml`, `<short>.meta.override.yml`, ...) or a folder of modules
+    (`<short>/__init__.py`, `<short>/<module>.py`, ...); any file in that folder belongs to the step.
+    Raises ValueError for a file above the version level, which belongs to no single step.
+    """
+    channel, namespace, version, name = rel_step.parts[:4]
+    return f"{channel}/{namespace}/{version}/{name.split('.', 1)[0]}"
+
+
 def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]], include_export: bool = False) -> list[str]:
     """Get all changed steps and their downstream dependencies.
 
@@ -137,7 +149,7 @@ def get_all_changed_catalog_paths(files_changed: dict[str, dict[str, str]], incl
             if step_path.startswith("snapshots/"):
                 ds_path = abs_step_path.relative_to(SNAPSHOTS_DIR).with_suffix("").with_suffix("").as_posix()
             else:
-                ds_path = abs_step_path.relative_to(STEP_DIR / "data").with_suffix("").with_suffix("").as_posix()
+                ds_path = data_step_catalog_path(abs_step_path.relative_to(STEP_DIR / "data"))
             dataset_catalog_paths.append(ds_path)
         except ValueError:
             # Not a data/snapshot step. Viz and export steps are already collected above.
