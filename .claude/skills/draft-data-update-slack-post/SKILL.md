@@ -177,6 +177,8 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
    The `datasetProducts` query parameter matches against the grapher **`datasets.name`** field (the dataset row's `name` column in MySQL — same value visible in the OWID admin's dataset list). When garden's `gho.meta.yml` sets a `dataset.title` override, that becomes `datasets.name` on upload. Otherwise it falls through to the snapshot origin's title.
 
+   **An update that spans several grapher datasets gets one link covering all of them:** join each dataset's `datasets.name` with `~` (`?datasetProducts=<name 1>~<name 2>`, each part `quote_plus`-encoded). Resolve every name the same way as below — companion datasets often carry titles of their own that differ from the main one's.
+
    So the resolution order is:
 
    1. Garden `.meta.yml` → `dataset.title` (if set as override). **This is the most common case** — most large datasets carry a curated title like `Global Health Observatory - World Health Organization` or `World Bank Poverty and Inequality Platform (PIP)`.
@@ -206,7 +208,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
    - Output path: `ai/data-update-comms.md` by default, or `workbench/<short_name>/slack-announcement.md` when invoked from `update-dataset` step 9.
    - Use the canonical format in the Output format section below — no example lines, no `[filled]` / `[prompt]` tags, no inline instructions. If a field can't be filled mechanically, write `[missing — <what's needed>]` inside the fenced block and stop.
 
-9. **Show the user the file path** and stop. Do **not** post to Slack — that's a human action. The user copy-pastes from the Markdown file into the Slack form.
+9. **Show the user the file path** and stop. In a git worktree, give the absolute path: a relative link opens the main checkout's copy, which may be a previous update's draft. Do **not** post to Slack — that's a human action. The user copy-pastes from the Markdown file into the Slack form.
 
 ## Output format
 
