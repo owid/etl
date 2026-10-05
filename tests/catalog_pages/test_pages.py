@@ -121,6 +121,7 @@ def test_build_writes_page_files_and_manifest(tmp_path: Path) -> None:
     # No license statement anywhere: OWID republishes data produced by others.
     assert "license" not in manifest
     assert manifest["readme"] == "readme.md"
+    assert manifest["changelog"] == [{"date": "2026-09-10", "changes": ["First release."]}]
     assert "codebook" not in manifest and "sources" not in manifest
     sources = pd.read_csv(page_dir / "owid_energy.sources.csv")
     assert sources["label"].tolist() == ["Example Producer – Original dataset (2025)"]
