@@ -12,7 +12,7 @@ with the same method:
 - Entities with no population estimate for 1989 (e.g. East and West Germany, Abkhazia) are dropped.
 """
 
-from owid.catalog import Table
+from owid.catalog import Table, VariableMeta
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
@@ -71,6 +71,10 @@ def cumulative_deaths(tb: Table, last_year: int) -> Table:
         (tb["year"] >= FIRST_YEAR) & (tb["year"] <= last_year) & tb["conflict_type"].isin(CONFLICT_TYPES),
         ["country", "conflict_type", DEATHS_COLUMN],
     ]
+    # Keep only the origins of the yearly indicator. Its other metadata (e.g. chart titles templated on the
+    # `conflict_type` dimension) does not apply to these cumulative indicators, and would break the grapher upsert,
+    # since this table has no such dimension. Everything else comes from this step's own metadata file.
+    tb[DEATHS_COLUMN].metadata = VariableMeta(origins=tb[DEATHS_COLUMN].metadata.origins)
 
     tables = []
     for conflict_type, short in CONFLICT_TYPES.items():
@@ -143,6 +147,10 @@ def sanity_check_outputs(tb: Table) -> None:
     regions = tb.loc[tb["country"].str.endswith(REGION_SUFFIX), "all_deaths"]
     assert len(regions) == 5, f"Expected 5 UCDP regions, found {len(regions)}."
     assert abs(regions.sum() - world) <= 0.5, f"Regions add up to {regions.sum()}, the world total is {world}."
+
+    # No metadata may be inherited from the yearly indicator beyond its origins (see `cumulative_deaths`).
+    inherited = [col for col in tb.columns if tb[col].metadata.presentation is not None]
+    assert not inherited, f"Columns inherited presentation metadata from upstream: {inherited}"
 
     assert not tb["country"].duplicated().any(), "Duplicate entities in the output."
     assert tb.notna().all().all(), "Missing values in the output."
