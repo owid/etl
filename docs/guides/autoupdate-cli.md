@@ -96,7 +96,7 @@ Create an update script and save it in the [scripts/](https://github.com/owid/et
 --8<-- "scripts/update-covid-cases-deaths.sh"
 ```
 
-In the example above, replace the `uv run etls` line with your own snapshot, list the `.dvc` files it writes in `snapshot_files`, and set the commit message. Commit through `commit_and_push_snapshots` (from `scripts/commit-snapshots.sh`), not plain `git commit` and `git push`. It builds the commit on top of the latest `origin/master` without touching the shared checkout, refuses to push a change to any file outside `snapshot_files`, and fails the job if the push is rejected.
+In the example above, replace the `uv run etls` line with your own snapshot, list the `.dvc` files it writes in `snapshot_files`, and set the commit message. Commit through `commit_and_push_snapshots` (from `scripts/commit-snapshots.sh`), not plain `git commit` and `git push`. It skips the pre-commit hook, refuses to push a change to any file outside `snapshot_files`, and fails the job if the commit or the push fails.
 
 ### Schedule update in Buildkite
 
