@@ -96,7 +96,7 @@ NOTE = (
     "group and civilians, that causes at least 25 deaths during a year."
 )
 
-# Segments, in the order of the 2025 version (kept even where the ranking changed, see `run`).
+# Segments, largest first (the step warns when the data no longer ranks them this way, see `run`).
 # (key in the data, label, color sampled from the 2025 PNG, legend x in frame px)
 REGIONS = [
     ("Africa (UCDP)", "Africa", "#ad7bad", 53),
@@ -123,8 +123,9 @@ TYPES = [
         322,
         235,
     ),
-    ("nonstate_deaths", "Non-state conflicts:", "conflicts between non-state armed groups.", "#b6654a", 605, 223),
-    ("interstate_deaths", "Interstate conflicts:", "conflicts between states.", "#7588ad", 876, 223),
+    # Interstate before non-state since the 1989-2025 update, when interstate deaths overtook non-state deaths.
+    ("interstate_deaths", "Interstate conflicts:", "conflicts between states.", "#7588ad", 605, 223),
+    ("nonstate_deaths", "Non-state conflicts:", "conflicts between non-state armed groups.", "#b6654a", 876, 223),
 ]
 TOTAL_COLOR = "#d26d76"
 
@@ -169,27 +170,40 @@ def run() -> None:
     assert sum(regions) == world, f"regions sum to {sum(regions)}, world total is {world}"
     assert sum(types) == world, f"conflict types sum to {sum(types)}, world total is {world}"
 
-    # The 2025 version ordered segments by size. Keep its order (and so its colors and legend), but say
-    # when the ranking no longer matches it, so the choice is visible at review.
+    # Segments are ordered by size, largest first. The order is fixed here (legend positions depend on it),
+    # so say when the data no longer ranks them this way, to revisit it at the next update.
     for name, values in [("region", regions), ("type", types)]:
         if values != sorted(values, reverse=True):
             paths.log.warning(f"The {name} segments are no longer in descending order: {values}")
 
-    citation = source_citation(tb)
+    citation = source_citation(tb, last_year)
     fig = create_visualization(world, regions, types, last_year, citation)
     export_frame(paths, fig, paths.short_name)
     plt.close(fig)
 
 
-def source_citation(tb) -> str:
-    """Cite UCDP from the origins of the plotted indicator (it also carries the boundaries used for mapping)."""
-    citations = []
-    for origin in tb["all_deaths"].metadata.origins:
-        if origin.producer != "Uppsala Conflict Data Program":
-            continue
-        citations += [line.strip() for line in origin.citation_full.splitlines() if line.strip()]
+# Source line in the format of the 2025 version: full author names and page ranges, which the origins do not carry.
+# The yearly UCDP article ("Organized violence 1989-<year>") changes with every release; `source_citation` checks it.
+SOURCE = (
+    "Sundberg, Ralph, and Erik Melander, 2013, Introducing the UCDP Georeferenced Event Dataset. Journal of Peace "
+    "Research 50(4): 523-532; Davies, Shawn, Therése Pettersson, and Magnus Öberg. 2026. Organized violence "
+    "1989-2025, and violent political protests. Journal of Peace Research 63(4): 705-723."
+)
+
+
+def source_citation(tb, last_year: int) -> str:
+    """Return SOURCE, after checking it cites the UCDP article for the data's own release."""
+    citations = " ".join(
+        origin.citation_full
+        for origin in tb["all_deaths"].metadata.origins
+        if origin.producer == "Uppsala Conflict Data Program"
+    )
     assert citations, "no UCDP origin found on the plotted indicator"
-    return "; ".join(citations)
+    for text, name in [(citations, "the origin's citation"), (SOURCE, "SOURCE")]:
+        assert f"{FIRST_YEAR}–{last_year}" in text.replace("-", "–"), (
+            f"{name} does not cite the UCDP article for {FIRST_YEAR}-{last_year}: update SOURCE to the new release"
+        )
+    return SOURCE
 
 
 def format_deaths(value: int) -> str:

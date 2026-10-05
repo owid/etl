@@ -79,21 +79,21 @@ L 231.84 514.08
 z
 " style="fill: #b88454"/>
   </g>
-  <g id="legend__nonstate-chip">
+  <g id="legend__interstate-chip">
    <path d="M 435.6 532.08 
 L 453.6 532.08 
 L 453.6 514.08 
 L 435.6 514.08 
 z
-" style="fill: #b6654a"/>
+" style="fill: #7588ad"/>
   </g>
-  <g id="legend__interstate-chip">
+  <g id="legend__nonstate-chip">
    <path d="M 630.72 532.08 
 L 648.72 532.08 
 L 648.72 514.08 
 L 630.72 514.08 
 z
-" style="fill: #7588ad"/>
+" style="fill: #b6654a"/>
   </g>
   <g id="bar__total-all">
    <path d="M 38.88 254.16 
@@ -159,21 +159,21 @@ L 424.91167 599.04
 z
 " style="fill: #b88454"/>
   </g>
-  <g id="bar__type-nonstate">
+  <g id="bar__type-interstate">
    <path d="M 662.300217 690.48 
-L 737.489844 690.48 
-L 737.489844 599.04 
+L 758.570373 690.48 
+L 758.570373 599.04 
 L 662.300217 599.04 
 z
-" style="fill: #b6654a"/>
+" style="fill: #7588ad"/>
   </g>
-  <g id="bar__type-interstate">
-   <path d="M 737.489844 690.48 
+  <g id="bar__type-nonstate">
+   <path d="M 758.570373 690.48 
 L 833.76 690.48 
 L 833.76 599.04 
-L 737.489844 599.04 
+L 758.570373 599.04 
 z
-" style="fill: #7588ad"/>
+" style="fill: #b6654a"/>
   </g>
   <g id="total__rule">
    <path d="M 38.16 151.92 
@@ -250,20 +250,20 @@ L 38.16 701.28
   <g id="legend__onesided-3">
    <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="257.76" y="581.856244" transform="rotate(-0 257.76 581.856244)">against civilians.</text>
   </g>
-  <g id="legend__nonstate-0">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="461.52" y="527.856244" transform="rotate(-0 461.52 527.856244)">Non-state conflicts:</text>
-  </g>
-  <g id="legend__nonstate-1">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="461.52" y="545.856244" transform="rotate(-0 461.52 545.856244)">conflicts between</text>
-  </g>
-  <g id="legend__nonstate-2">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="461.52" y="563.856244" transform="rotate(-0 461.52 563.856244)">non-state armed groups.</text>
-  </g>
   <g id="legend__interstate-0">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="656.64" y="527.856244" transform="rotate(-0 656.64 527.856244)">Interstate conflicts:</text>
+   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="461.52" y="527.856244" transform="rotate(-0 461.52 527.856244)">Interstate conflicts:</text>
   </g>
   <g id="legend__interstate-1">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="656.64" y="545.856244" transform="rotate(-0 656.64 545.856244)">conflicts between states.</text>
+   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="461.52" y="545.856244" transform="rotate(-0 461.52 545.856244)">conflicts between states.</text>
+  </g>
+  <g id="legend__nonstate-0">
+   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="656.64" y="527.856244" transform="rotate(-0 656.64 527.856244)">Non-state conflicts:</text>
+  </g>
+  <g id="legend__nonstate-1">
+   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="656.64" y="545.856244" transform="rotate(-0 656.64 545.856244)">conflicts between</text>
+  </g>
+  <g id="legend__nonstate-2">
+   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="656.64" y="563.856244" transform="rotate(-0 656.64 563.856244)">non-state armed groups.</text>
   </g>
   <g id="label__total-all">
    <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #ffffff" x="817.92" y="213.719006" transform="rotate(-0 817.92 213.719006)">4.2m deaths</text>
@@ -289,11 +289,11 @@ L 38.16 701.28
   <g id="label__type-onesided">
    <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="437.87167" y="650.039006" transform="rotate(-0 437.87167 650.039006)">1.3m</text>
   </g>
-  <g id="label__type-nonstate">
-   <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="675.260217" y="650.039006" transform="rotate(-0 675.260217 650.039006)">400k</text>
-  </g>
   <g id="label__type-interstate">
-   <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="750.449844" y="650.039006" transform="rotate(-0 750.449844 650.039006)">510k</text>
+   <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="675.260217" y="650.039006" transform="rotate(-0 675.260217 650.039006)">510k</text>
+  </g>
+  <g id="label__type-nonstate">
+   <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="771.530373" y="650.039006" transform="rotate(-0 771.530373 650.039006)">400k</text>
   </g>
   <g id="footer__note-0">
    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="17.28" y="731.575912" transform="rotate(-0 17.28 731.575912)">Note:</text>
@@ -305,10 +305,10 @@ L 38.16 701.28
    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="17.28" y="750.295912" transform="rotate(-0 17.28 750.295912)">Source:</text>
   </g>
   <g id="footer__source-0-1">
-   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="55.173741" y="750.295912" transform="rotate(-0 55.173741 750.295912)">Davies, S., Pettersson, T., &amp; Öberg, M. (2026). Organized violence 1989–2025, and violent political protests. Journal of Peace Research. https://doi.org/10.1093/jopres/xjag046; Sundberg, Ralph and</text>
+   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="55.173741" y="750.295912" transform="rotate(-0 55.173741 750.295912)">Sundberg, Ralph, and Erik Melander, 2013, Introducing the UCDP Georeferenced Event Dataset. Journal of Peace Research 50(4): 523-532; Davies, Shawn, Therése Pettersson, and Magnus Öberg.</text>
   </g>
   <g id="footer__source-1-0">
-   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="17.28" y="763.255913" transform="rotate(-0 17.28 763.255913)">Erik Melander (2013) Introducing the UCDP Georeferenced Event Dataset. Journal of Peace Research 50(4).</text>
+   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="17.28" y="763.255913" transform="rotate(-0 17.28 763.255913)">2026. Organized violence 1989-2025, and violent political protests. Journal of Peace Research 63(4): 705-723.</text>
   </g>
   <g id="footer__tagline-0">
    <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="17.28" y="781.975912" transform="rotate(-0 17.28 781.975912)">OurWorldinData.org</text>
