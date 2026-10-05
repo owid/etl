@@ -1,0 +1,445 @@
+"""Deaths in armed conflicts since the end of the Cold War, by world region and conflict type.
+
+Static chart for the article "Millions have died in conflicts since the Cold War; most of them in Africa
+and intrastate conflicts" (ourworldindata.org/conflict-deaths-breakdown). It shows the total number of
+conflict deaths between 1989 and the latest year, as three bars that each sum to the same total:
+
+1. all armed conflicts,
+2. split by the world region where the deaths occurred (UCDP's regions),
+3. split by conflict type (intrastate, one-sided violence, non-state, interstate).
+
+Refresh of the 1989-2024 version (Charts (2025) Figma file `l8AusQOZfgaxJ0wVcMrTry`, page
+"20250724 Conflict deaths since the Cold War (Bastian)", frame `13530:9`, 1258 x 1119). The scope is a
+data update only, so the layout reproduces that frame: its size, its slot positions and its segment
+colors are copied from it (positions read with `get_metadata`, colors sampled from the published PNG).
+Positions below are in that frame's pixels, y measured from the top.
+
+Data: the cumulative numbers are the sum over 1989..latest year of UCDP's yearly "best" estimate of
+deaths in ongoing conflicts (`number_deaths_ongoing_conflicts`), the same quantity the grapher charts
+`cumulative-deaths-in-armed-conflicts*` publish. Summing the 2025-06-13 release over 1989-2024 reproduces
+those published charts exactly (World 3,929,873; every region and type matches), which is how the method
+was checked.
+
+Rounding follows the 2025 version: one decimal in millions at or above a million ("2.1m"), otherwise two
+significant figures in thousands ("750k").
+"""
+
+import logging
+from pathlib import Path
+
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties, findfont
+from matplotlib.patches import Rectangle
+from matplotlib.textpath import TextPath
+
+from etl.helpers import PathFinder
+from etl.viz.static import apply_svg_rcparams, export_frame
+
+paths = PathFinder(__file__)
+apply_svg_rcparams()
+
+# Fonts: emit Lato (what the template uses) and measure/draw with what is installed. See
+# `.claude/skills/create-static-viz/reference/WRITING-THE-STEP.md`.
+EMITTED_FONT_STACK = ["Lato", "Arial", "Helvetica", "Liberation Sans", "sans-serif"]
+MEASURED_FONT_STACK = ["Arial", "Helvetica", "Liberation Sans", "DejaVu Sans", "sans-serif"]
+matplotlib.rcParams["font.family"] = "sans-serif"
+matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
+_OPTIONAL_FACES = tuple({*EMITTED_FONT_STACK, *MEASURED_FONT_STACK})
+logging.getLogger("matplotlib.font_manager").addFilter(
+    lambda record: "Falling back" in record.getMessage()
+    or not any(f"Font family '{face}' not found" in record.getMessage() for face in _OPTIONAL_FACES)
+)
+_DRAWN_FACE = findfont(FontProperties(family=EMITTED_FONT_STACK))
+_MEASURED_FACE = findfont(FontProperties(family=MEASURED_FONT_STACK))
+assert _DRAWN_FACE == _MEASURED_FACE, f"draws {Path(_DRAWN_FACE).name}, measures {Path(_MEASURED_FACE).name}"
+
+# First year of UCDP's Georeferenced Event Dataset, and the start of the period the chart covers.
+FIRST_YEAR = 1989
+
+# Frame of the 2025 version.
+FRAME_W, FRAME_H = 1258, 1119
+MARGIN = 24
+PX_PER_INCH = 100
+PT_PER_PX = 0.72
+
+# Bars: left edge, full width (each bar sums to the same total), and height.
+BAR_X0, BAR_W, BAR_H = 54, 1104, 127
+BAR_TOPS = {"total": 226, "region": 512, "type": 832}
+# Thin vertical rule left of each bar, overhanging it by this much at both ends.
+RULE_X, RULE_OVERHANG = 53, 15
+# Value labels: padding inside a segment; the first label of a bar carries the unit.
+VALUE_PAD_FIRST, VALUE_PAD = 24, 18
+
+# Text sizes in frame px, read off the 2025 frame's text-node heights.
+SIZE = {
+    "title": 34,
+    "subtitle": 20,
+    "section": 22,
+    "section_sub": 20,
+    "legend": 19,
+    "value": 21,
+    "footer": 13,
+}
+
+TITLE_COLOR = "#2d2e2d"
+TEXT_COLOR = "#5b5b5b"
+FOOTER_COLOR = "#858585"
+RULE_COLOR = "#2d2e2d"
+VALUE_COLOR = "#ffffff"
+
+TITLE = "Deaths in armed conflicts since the end of the Cold War"
+TAGLINE = "OurWorldinData.org — Research and data to make progress against the world's largest problems."
+AUTHORS = ["Bastian Herre", "Klara Auerbach"]
+NOTE = (
+    "An armed conflict is defined here as a disagreement between organized groups, or between one organized "
+    "group and civilians, that causes at least 25 deaths during a year."
+)
+
+# Segments, in the order of the 2025 version (kept even where the ranking changed, see `run`).
+# (key in the data, label, color sampled from the 2025 PNG, legend x in frame px)
+REGIONS = [
+    ("Africa (UCDP)", "Africa", "#ad7bad", 53),
+    ("Middle East (UCDP)", "Middle East", "#c4a681", 176),
+    ("Asia and Oceania (UCDP)", "Asia & Oceania", "#619b98", 356),
+    ("Europe (UCDP)", "Europe", "#7588ad", 569),
+    ("Americas (UCDP)", "Americas", "#de9080", 703),
+]
+# (key in the data, bold term, definition, color, legend x, legend text width)
+TYPES = [
+    ("intrastate", "Intrastate conflicts:", "conflicts between a state and a non-state armed group.", "#985e62", 55, 215),
+    (
+        "one-sided violence",
+        "One-sided violence:",
+        "use of force by a state or non-state armed group against civilians.",
+        "#b88454",
+        322,
+        235,
+    ),
+    ("non-state conflict", "Non-state conflicts:", "conflicts between non-state armed groups.", "#b6654a", 605, 223),
+    ("interstate", "Interstate conflicts:", "conflicts between states.", "#7588ad", 876, 223),
+]
+TOTAL_COLOR = "#d26d76"
+
+# Section headings (top y of the text node) and legends.
+SECTIONS = {
+    "total": (169, "Total deaths from all armed conflicts", None),
+    "region": (
+        382,
+        "Deaths in armed conflicts by world region",
+        "Deaths are based on where they occurred, not what the person’s nationality was.",
+    ),
+    "type": (666, "Deaths in armed conflicts by conflict type", None),
+}
+REGION_LEGEND_Y = 454
+TYPE_LEGEND_Y = 714
+CHIP = 25
+CHIP_GAP = 11
+LEGEND_LINE_PX = 25
+
+# Header and footer.
+TITLE_Y = 24
+SUBTITLE_Y = 83
+SUBTITLE_LINE_PX = 26
+NOTE_Y = 1007
+SOURCE_Y = 1033
+FOOTER_LINE_PX = 18
+TAGLINE_Y = 1077
+
+
+def run() -> None:
+    ds = paths.load_dataset("ucdp")
+    tb = ds.read("ucdp")
+
+    last_year = int(tb["year"].max())
+    totals = cumulative_deaths(tb, last_year)
+    paths.log.info(f"Cumulative deaths {FIRST_YEAR}-{last_year}: {totals}")
+
+    world = totals[("World", "all")]
+    regions = [totals[(key, "all")] for key, *_ in REGIONS]
+    types = [totals[("World", key)] for key, *_ in TYPES]
+
+    # Each bar must sum to the total. Extrasystemic conflicts are not shown, so they must be zero.
+    assert sum(regions) == world, f"regions sum to {sum(regions)}, world total is {world}"
+    assert totals[("World", "extrasystemic")] == 0, "extrasystemic deaths are not shown but are not zero"
+    assert sum(types) == world, f"conflict types sum to {sum(types)}, world total is {world}"
+
+    # The 2025 version ordered segments by size. Keep its order (and so its colors and legend), but say
+    # when the ranking no longer matches it, so the choice is visible at review.
+    for name, values in [("region", regions), ("type", types)]:
+        if values != sorted(values, reverse=True):
+            paths.log.warning(f"The {name} segments are no longer in descending order: {values}")
+
+    citation = source_citation(tb)
+    fig = create_visualization(world, regions, types, last_year, citation)
+    export_frame(paths, fig, paths.short_name)
+    plt.close(fig)
+
+
+def cumulative_deaths(tb, last_year: int) -> dict[tuple[str, str], int]:
+    """Sum yearly deaths in ongoing conflicts over FIRST_YEAR..last_year, per region and conflict type."""
+    col = "number_deaths_ongoing_conflicts"
+    world = tb[(tb["country"] == "World") & (tb["conflict_type"] == "all")]
+    assert world.loc[world[col].notna(), "year"].min() == FIRST_YEAR, f"deaths data no longer starts in {FIRST_YEAR}"
+
+    entities = ["World"] + [key for key, *_ in REGIONS]
+    conflict_types = ["all", "extrasystemic"] + [key for key, *_ in TYPES]
+    tb = tb[(tb["year"] >= FIRST_YEAR) & (tb["year"] <= last_year)]
+    tb = tb[tb["country"].isin(entities) & tb["conflict_type"].isin(conflict_types)]
+
+    totals = {}
+    for (country, conflict_type), group in tb.groupby(["country", "conflict_type"], observed=True):
+        # Every year must be present: a missing year would silently shrink the cumulative total.
+        assert group["year"].nunique() == last_year - FIRST_YEAR + 1, f"missing years for {country}, {conflict_type}"
+        totals[(str(country), str(conflict_type))] = int(group[col].fillna(0).sum())
+    return totals
+
+
+def source_citation(tb) -> str:
+    """Cite UCDP from the origins of the plotted indicator (it also carries the boundaries used for mapping)."""
+    citations = []
+    for origin in tb["number_deaths_ongoing_conflicts"].metadata.origins:
+        if origin.producer != "Uppsala Conflict Data Program":
+            continue
+        citations += [line.strip() for line in origin.citation_full.splitlines() if line.strip()]
+    assert citations, "no UCDP origin found on the plotted indicator"
+    return "; ".join(citations)
+
+
+def format_deaths(value: int) -> str:
+    """'2.1m' at or above a million, otherwise two significant figures in thousands ('750k')."""
+    if value >= 1_000_000:
+        return f"{value / 1_000_000:.1f}m"
+    digits = len(str(value)) - 2
+    return f"{round(value, -digits) // 1000:.0f}k"
+
+
+# ---------------------------------------------------------------------------
+# Drawing
+# ---------------------------------------------------------------------------
+
+
+def create_visualization(world: int, regions: list[int], types: list[int], last_year: int, citation: str):
+    fig = plt.figure(figsize=(FRAME_W / PX_PER_INCH, FRAME_H / PX_PER_INCH))
+    fig.patch.set_facecolor("white")  # the PNG stays legible; the SVG is saved transparent
+
+    # Header.
+    text(fig, MARGIN, TITLE_Y, 48, TITLE, "title", color=TITLE_COLOR, gid="title")
+    subtitle = [
+        "Number of combatants and civilians who died due to fighting in armed conflicts between "
+        f"{FIRST_YEAR} and {last_year}.",
+        "This excludes deaths due to disease and starvation, which can make the death tolls much larger.",
+    ]
+    for i, line in enumerate(subtitle):
+        top = SUBTITLE_Y + i * SUBTITLE_LINE_PX
+        text(fig, MARGIN, top, SUBTITLE_LINE_PX, line, "subtitle", color=TEXT_COLOR, gid=f"subtitle-{i}")
+
+    # Section headings.
+    for key, (top, heading, sub) in SECTIONS.items():
+        text(fig, 53, top, 30, heading, "section", color=TITLE_COLOR, bold=True, gid=f"section__{key}")
+        if sub:
+            text(fig, 53, top + 30, 30, sub, "section_sub", color=TITLE_COLOR, gid=f"section__{key}-sub")
+
+    # Legends.
+    for key, label, color, x in [(k, lbl, c, x) for k, lbl, c, x in REGIONS]:
+        draw_chip(fig, x, REGION_LEGEND_Y, color, gid=f"legend__{slug(label)}-chip")
+        text(fig, x + CHIP + CHIP_GAP, REGION_LEGEND_Y - 1, 27, label, "legend", color=TITLE_COLOR, gid=f"legend__{slug(label)}")
+    for key, term, definition, color, x, width in TYPES:
+        draw_chip(fig, x, TYPE_LEGEND_Y, color, gid=f"legend__{slug(key)}-chip")
+        lines = [term] + wrap(definition, SIZE["legend"], width)
+        for i, line in enumerate(lines):
+            text(
+                fig,
+                x + CHIP + CHIP_GAP,
+                TYPE_LEGEND_Y + i * LEGEND_LINE_PX,
+                LEGEND_LINE_PX,
+                line,
+                "legend",
+                color=TITLE_COLOR,
+                gid=f"legend__{slug(key)}-{i}",
+            )
+        assert TYPE_LEGEND_Y + len(lines) * LEGEND_LINE_PX < BAR_TOPS["type"] - RULE_OVERHANG, f"{term} legend runs into the bar"
+
+    # Bars.
+    draw_bar(fig, "total", [("all", "World", TOTAL_COLOR, world)], world, unit_at="end")
+    draw_bar(fig, "region", [(slug(lbl), lbl, c, v) for (_, lbl, c, _), v in zip(REGIONS, regions)], world)
+    draw_bar(fig, "type", [(slug(k), k, c, v) for (k, _, _, c, _, _), v in zip(TYPES, types)], world)
+
+    draw_footer(fig, citation)
+    return fig
+
+
+def draw_bar(fig, name: str, segments: list[tuple[str, str, str, int]], total: int, unit_at: str = "start") -> None:
+    """One 100% bar: segments left to right, a value label in each, a rule on its left edge."""
+    top = BAR_TOPS[name]
+    rule = fig.add_artist(
+        plt.Line2D(
+            [fx(RULE_X)] * 2,
+            [fy(top - RULE_OVERHANG), fy(top + BAR_H + RULE_OVERHANG)],
+            color=RULE_COLOR,
+            linewidth=1 * PT_PER_PX,
+        )
+    )
+    rule.set_gid(f"{name}__rule")
+
+    x = float(BAR_X0)
+    for i, (key, _, color, value) in enumerate(segments):
+        width = BAR_W * value / total
+        fig.add_artist(
+            Rectangle(
+                (fx(x), fy(top + BAR_H)),
+                width / FRAME_W,
+                BAR_H / FRAME_H,
+                facecolor=color,
+                edgecolor="none",
+                gid=f"bar__{name}-{key}",
+            )
+        )
+
+        label = format_deaths(value) + (" deaths" if i == 0 else "")
+        label_w = text_width(label, SIZE["value"])
+        baseline = top + BAR_H / 2 + cap_height(SIZE["value"]) / 2
+        if unit_at == "end":
+            # The single-segment total bar carries its label at the right end, as in the 2025 version.
+            label_x, ha, label_color = x + width - 22, "right", VALUE_COLOR
+        elif label_w + 2 * VALUE_PAD <= width:  # padding on both sides
+            label_x, ha, label_color = x + (VALUE_PAD_FIRST if i == 0 else VALUE_PAD), "left", VALUE_COLOR
+        else:
+            # Too narrow for its label: only the last segment can carry it outside, in its own color.
+            assert i == len(segments) - 1, f"{name}: label {label!r} does not fit its {width:.0f}px segment"
+            label_x, ha, label_color = x + width + 6, "left", color
+        fig.text(
+            fx(label_x),
+            fy(baseline),
+            label,
+            fontsize=SIZE["value"] * PT_PER_PX,
+            color=label_color,
+            ha=ha,
+            va="baseline",
+            gid=f"label__{name}-{key}",
+        )
+        x += width
+
+    assert abs(x - (BAR_X0 + BAR_W)) < 1e-6, f"{name} bar does not fill its width"
+
+
+def draw_footer(fig, citation: str) -> None:
+    """Note, source (wrapped to the content width), then the tagline and license on one row."""
+    content_w = FRAME_W - 2 * MARGIN
+    runs_row(fig, MARGIN, NOTE_Y, [("Note: ", True), (NOTE, False)], gid="footer__note")
+    assert run_width("Note: ", True) + text_width(NOTE, SIZE["footer"]) <= content_w, "Note no longer fits one line"
+
+    lead = "Source: "
+    lines = wrap(citation, SIZE["footer"], content_w, first_indent=run_width(lead, True))
+    for i, line in enumerate(lines):
+        runs = [(lead, True), (line, False)] if i == 0 else [(line, False)]
+        runs_row(fig, MARGIN, SOURCE_Y + i * FOOTER_LINE_PX, runs, gid=f"footer__source-{i}")
+    assert SOURCE_Y + len(lines) * FOOTER_LINE_PX <= TAGLINE_Y, "Source runs into the tagline row"
+
+    runs_row(fig, MARGIN, TAGLINE_Y, [("OurWorldinData.org ", True), (TAGLINE.split(" ", 1)[1], False)], gid="footer__tagline")
+    license_text = f"Licensed under CC-BY by the authors {' and '.join(AUTHORS)}"
+    fig.text(
+        fx(FRAME_W - MARGIN),
+        fy(TAGLINE_Y + cap_height(SIZE["footer"])),
+        license_text,
+        fontsize=SIZE["footer"] * PT_PER_PX,
+        color=FOOTER_COLOR,
+        ha="right",
+        va="baseline",
+        gid="footer__license",
+    )
+    tagline_w = run_width("OurWorldinData.org ", True) + text_width(TAGLINE.split(" ", 1)[1], SIZE["footer"])
+    assert tagline_w + 20 + text_width(license_text, SIZE["footer"]) <= content_w, "tagline and license overlap"
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+def fx(x_px: float) -> float:
+    return x_px / FRAME_W
+
+
+def fy(y_px: float) -> float:
+    return 1 - y_px / FRAME_H
+
+
+def prop(size_px: float, bold: bool = False) -> FontProperties:
+    return FontProperties(family=MEASURED_FONT_STACK, size=size_px * PT_PER_PX, weight="bold" if bold else "normal")
+
+
+def text_width(s: str, size_px: float, bold: bool = False) -> float:
+    """Ink width of `s` in frame px."""
+    return TextPath((0, 0), s, prop=prop(size_px, bold)).get_extents().width / PT_PER_PX
+
+
+def run_width(s: str, bold: bool = False) -> float:
+    """Advance of a footer run, trailing space included (a sentinel glyph keeps it from being trimmed)."""
+    return text_width(s + "|", SIZE["footer"], bold) - text_width("|", SIZE["footer"], bold)
+
+
+def cap_height(size_px: float) -> float:
+    return TextPath((0, 0), "0", prop=prop(size_px)).get_extents().ymax / PT_PER_PX
+
+
+def text(fig, x: float, top: float, line_h: float, s: str, role: str, color: str, gid: str, bold: bool = False) -> None:
+    """One line of text in a slot whose top is `top`, on a baseline centred in its line box."""
+    size = SIZE[role]
+    baseline = top + line_h / 2 + cap_height(size) / 2
+    fig.text(
+        fx(x),
+        fy(baseline),
+        s,
+        fontsize=size * PT_PER_PX,
+        color=color,
+        fontweight="bold" if bold else "normal",
+        ha="left",
+        va="baseline",
+        gid=gid,
+    )
+
+
+def runs_row(fig, x: float, top: float, runs: list[tuple[str, bool]], gid: str) -> None:
+    """A footer row of bold/regular runs, laid out by advance. No run may start with a space."""
+    baseline = top + cap_height(SIZE["footer"])
+    for i, (s, bold) in enumerate(runs):
+        assert not s.startswith(" "), f"run {s!r} starts with a space"
+        fig.text(
+            fx(x),
+            fy(baseline),
+            s.rstrip(),
+            fontsize=SIZE["footer"] * PT_PER_PX,
+            color=FOOTER_COLOR,
+            fontweight="bold" if bold else "normal",
+            ha="left",
+            va="baseline",
+            gid=f"{gid}-{i}",
+        )
+        x += run_width(s, bold)
+
+
+def wrap(s: str, size_px: float, width_px: float, first_indent: float = 0) -> list[str]:
+    """Greedy wrap by measured width; the first line may be shortened by `first_indent`."""
+    lines: list[str] = []
+    line = ""
+    for word in s.split():
+        candidate = f"{line} {word}".strip()
+        available = width_px - (first_indent if not lines else 0)
+        if line and text_width(candidate, size_px) > available:
+            lines.append(line)
+            line = word
+        else:
+            line = candidate
+    lines.append(line)
+    return lines
+
+
+def draw_chip(fig, x: float, top: float, color: str, gid: str) -> None:
+    fig.add_artist(
+        Rectangle((fx(x), fy(top + CHIP)), CHIP / FRAME_W, CHIP / FRAME_H, facecolor=color, edgecolor="none", gid=gid)
+    )
+
+
+def slug(s: str) -> str:
+    return s.lower().replace(" & ", "-").replace(" ", "-")
