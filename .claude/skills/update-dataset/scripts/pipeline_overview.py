@@ -203,13 +203,16 @@ def print_history(dag: dict[str, set[str]], chain: list[str], namespace: str, ve
             print(f"- `update_period_days`: {dataset_block['update_period_days']}")
 
     files = [str(f.relative_to(paths.BASE_DIR)) for step in chain for f in step_files(step)]
-    garden_dir = str(paths.STEPS_GARDEN_DIR.relative_to(paths.BASE_DIR))
-    garden_script = next((f for f in files if f.startswith(garden_dir)), files[0] if files else None)
+    # The chain can hold an older same-name garden it reads from, so pick the garden at the requested version.
+    target_gardens = [s for s in chain if channel(s) == "garden" and step_key(s) == (namespace, version, short_name)]
+    garden_files = [str(f.relative_to(paths.BASE_DIR)) for s in target_gardens for f in step_files(s)]
+    garden_script = garden_files[0] if garden_files else (files[0] if files else None)
     if garden_script and (paths.BASE_DIR / garden_script).is_dir():
         garden_script = f"{garden_script}/__init__.py"
     archived = {v for v in versions_of(archived_steps(), namespace, short_name) if v < version}
-    # The old version stays active until the update archives it, so active older gardens count as predecessors too.
-    active_gardens = {s for s in graph_nodes(dag) if channel(s) == "garden" and s not in chain}
+    # The old version stays active until the update archives it (or as an upstream input), so active older
+    # gardens count as predecessors too — including ones inside the chain.
+    active_gardens = {s for s in graph_nodes(dag) if channel(s) == "garden"}
     active = {v for v in versions_of(active_gardens, namespace, short_name) if v < version}
     older = sorted(archived | active)
     created = git_log(["-n1", "--diff-filter=A"], [garden_script] if garden_script else [])
