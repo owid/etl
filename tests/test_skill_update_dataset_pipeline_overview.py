@@ -2,6 +2,7 @@
 
 Nothing under `.claude/` is linted or collected by CI, so these tests pin the DAG logic the
 refresher depends on: which steps count as the chain, which as siblings, and which stay outside.
+All step URIs are fictional, so the tests never depend on a real step that a future update archives.
 """
 
 import importlib.util
@@ -26,37 +27,38 @@ po = _load_module()
 
 
 def test_step_key():
-    assert po.step_key("snapshot://wb/2026-07-01/income_groups.xlsx") == ("wb", "2026-07-01", "income_groups")
-    assert po.step_key("snapshot://war/2025-06-13/ucdp_ged.zip") == ("war", "2025-06-13", "ucdp_ged")
-    assert po.step_key("data://garden/wb/2026-07-01/income_groups") == ("wb", "2026-07-01", "income_groups")
-    assert po.step_key("viz://chart/animal_welfare/latest/banning") == ("animal_welfare", "latest", "banning")
-    assert po.step_key("data://external/owid_grapher/latest") is None
+    assert po.step_key("snapshot://example/2001-01-01/dataset.xlsx") == ("example", "2001-01-01", "dataset")
+    assert po.step_key("snapshot://example/2001-01-01/dataset_part.zip") == ("example", "2001-01-01", "dataset_part")
+    assert po.step_key("snapshot-private://example/2001-01-01/dataset.csv") == ("example", "2001-01-01", "dataset")
+    assert po.step_key("data://garden/example/2001-01-01/dataset") == ("example", "2001-01-01", "dataset")
+    assert po.step_key("viz://chart/example/latest/chart") == ("example", "latest", "chart")
+    assert po.step_key("data://external/example/latest") is None
 
 
 def test_upstream_members_cross_version_chain_and_siblings():
     dag = {
-        # Old chains mix versions: a 2023-01-18 garden on a 2023-01-10 meadow on a 2023-01-09 snapshot.
-        "data://grapher/war/2023-01-18/clodfelter": {"data://garden/war/2023-01-18/clodfelter"},
-        "data://garden/war/2023-01-18/clodfelter": {
-            "data://meadow/war/2023-01-10/clodfelter",
-            "data://garden/war/2023-01-18/helper",
-            "data://garden/demography/2024-07-15/population",
+        # Old chains mix versions: a 2001-01-03 garden on a 2001-01-02 meadow on a 2001-01-01 snapshot.
+        "data://grapher/example/2001-01-03/dataset": {"data://garden/example/2001-01-03/dataset"},
+        "data://garden/example/2001-01-03/dataset": {
+            "data://meadow/example/2001-01-02/dataset",
+            "data://garden/example/2001-01-03/helper",
+            "data://garden/elsewhere/2001-01-01/population",
         },
-        "data://meadow/war/2023-01-10/clodfelter": {"snapshot://war/2023-01-09/clodfelter.csv"},
+        "data://meadow/example/2001-01-02/dataset": {"snapshot://example/2001-01-01/dataset.csv"},
         # Same-version helper with its own extra snapshot.
-        "data://garden/war/2023-01-18/helper": {"snapshot://war/2023-01-18/extra.csv"},
+        "data://garden/example/2001-01-03/helper": {"snapshot://example/2001-01-03/extra.csv"},
         # A different dataset in the namespace at another version: not part of the chain.
-        "data://garden/war/2024-01-01/other": {"data://garden/war/2023-01-18/clodfelter"},
+        "data://garden/example/2002-01-01/other": {"data://garden/example/2001-01-03/dataset"},
     }
-    seeds = [s for s in po.graph_nodes(dag) if po.step_key(s) == ("war", "2023-01-18", "clodfelter")]
-    members = po.find_upstream_members(dag, seeds, "war", "2023-01-18", "clodfelter")
+    seeds = [s for s in po.graph_nodes(dag) if po.step_key(s) == ("example", "2001-01-03", "dataset")]
+    members = po.find_upstream_members(dag, seeds, "example", "2001-01-03", "dataset")
 
     assert members == {
-        "data://grapher/war/2023-01-18/clodfelter",
-        "data://garden/war/2023-01-18/clodfelter",
-        "data://meadow/war/2023-01-10/clodfelter",
-        "snapshot://war/2023-01-09/clodfelter.csv",
-        "data://garden/war/2023-01-18/helper",
-        "snapshot://war/2023-01-18/extra.csv",
+        "data://grapher/example/2001-01-03/dataset",
+        "data://garden/example/2001-01-03/dataset",
+        "data://meadow/example/2001-01-02/dataset",
+        "snapshot://example/2001-01-01/dataset.csv",
+        "data://garden/example/2001-01-03/helper",
+        "snapshot://example/2001-01-03/extra.csv",
     }
     assert sorted(members, key=po.stage_order)[0].startswith("snapshot://")
