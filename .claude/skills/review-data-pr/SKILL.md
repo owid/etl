@@ -45,6 +45,15 @@ From the changed files, identify:
 
 ### 3b. Update shape — version bump vs restructure
 
+**Open with a short pipeline brief.** The reviewer is often seeing this dataset for the first time. Run the same overview that `/update-dataset` step 0b uses on the **new** version. Run it on the old version too while it's still active in the PR's DAG (the script only reads active steps), and compare the two chains:
+
+```bash
+.venv/bin/python .claude/skills/update-dataset/scripts/pipeline_overview.py <namespace>/<new_version>/<short_name>
+.venv/bin/python .claude/skills/update-dataset/scripts/pipeline_overview.py <namespace>/<old_version>/<short_name>  # if still active
+```
+
+Give the user about 5–8 lines: the chain, what each non-trivial step does, external inputs, consumers, and who did the previous update (`git log --diff-filter=A` on the old garden script, if the script can't reach it). Then compare against the author's `Pipeline structure: …` line in the PR Summary. If the line is missing, flag 🟡. If it says "unchanged" but any trigger below holds, flag 🔴.
+
 Before running the pipeline, classify the PR. If any of the following are true, you're reviewing a **restructure**, not a version bump, and several downstream checks apply differently:
 
 - The `short_name` changed (old version uses one name, new version uses another).
