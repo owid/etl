@@ -36,6 +36,8 @@ OFFICES_EVER = ["hos", "hog", "hoe"]
 COLUMNS_COUNTS_EVER = [
     f"num_countries_wom_{office}_ever{suffix}" for office in OFFICES_EVER for suffix in ["", "_demelect"]
 ]
+# The year-by-year counts of the leader's gender, which also have no population counterpart.
+COLUMNS_COUNTS_GENDER = [f"num_countries_{office}" for office in OFFICES_EVER]
 
 # REGION DEFINITIONS FOR AGGREGATION
 # Defines which countries belong to each region, including historical entities
@@ -514,9 +516,6 @@ def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: 
     # Rename columns
     tb_ = tb_.rename(
         columns={
-            "num_countries_hoe": "population_hoe",
-            "num_countries_hog": "population_hog",
-            "num_countries_hos": "population_hos",
             "num_countries_regime": "population_regime",
             "num_countries_regime_amb": "population_regime_amb",
             "num_countries_wom_parl": "population_wom_parl",
@@ -526,9 +525,11 @@ def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: 
         }
     )
 
-    # The "ever had a woman leader" indicators are counted by country and as a share of countries,
-    # but not by population.
-    tb_ = tb_.drop(columns=[c for c in COLUMNS_COUNTS_EVER if c in tb_.columns])
+    # The women-leader indicators are counted by country, and the cumulative ones also as a share of
+    # countries, but none of them by population. How many people live under a woman leader is not a
+    # question we report on, and the population counts kept imputed country-years that the country
+    # counts drop, so the two would have disagreed about which years exist at all.
+    tb_ = tb_.drop(columns=[c for c in COLUMNS_COUNTS_EVER + COLUMNS_COUNTS_GENDER if c in tb_.columns])
 
     # Remove some dimensions
     tb_.loc[

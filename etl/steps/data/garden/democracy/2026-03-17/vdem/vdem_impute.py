@@ -35,7 +35,7 @@ INDICATORS_AVOID_IMPUTE = [
     # having had a woman head of state from its first year in the data.
     "v2exfemhos",
     "v2exfemhog",
-    "v2exfemhoe",
+    "femhoe_owid",
     "wom_hos_vdem",
     "wom_hog_vdem",
     "wom_hoe_vdem",
@@ -46,12 +46,6 @@ INDICATORS_AVOID_IMPUTE = [
     "wom_hog_ever_dem",
     "wom_hoe_ever_dem",
 ]
-
-
-a = {
-    "lala",
-    "lele",
-}
 
 
 def run(tb: Table) -> Table:

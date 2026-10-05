@@ -14,7 +14,7 @@ from etl.data_helpers import geo
 OFFICES = {
     "hos": {"gender": "v2exfemhos", "elected": "v2elmulpar_osp_hos"},
     "hog": {"gender": "v2exfemhog", "elected": "v2elmulpar_osp_hog"},
-    "hoe": {"gender": "v2exfemhoe", "elected": "electmulpar_hoe_row_owid"},
+    "hoe": {"gender": "femhoe_owid", "elected": "electmulpar_hoe_row_owid"},
 }
 
 
@@ -1113,7 +1113,7 @@ def estimate_gender_hoe_indicator(tb: Table) -> Table:
     tb = _estimate_indicator(tb, "wom_hoe_vdem", "wom_hos_vdem", "wom_hog_vdem")
 
     # 2/ Was HOE female anytime of the year? (then use the original gender flags by V-Dem)
-    tb = _estimate_indicator(tb, "v2exfemhoe", "v2exfemhos", "v2exfemhog")
+    tb = _estimate_indicator(tb, "femhoe_owid", "v2exfemhos", "v2exfemhog")
 
     # Drop columns
     tb = tb.drop(

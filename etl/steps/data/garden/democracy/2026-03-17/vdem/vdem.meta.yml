@@ -165,6 +165,8 @@ definitions:
       For more details on the imputation methodology and which countries are affected, refer to [this file](https://github.com/owid/etl/blob/master/etl/steps/data/garden/democracy/2025-03-17/vdem/vdem.countries_impute.yml).
     description_conservative: |-
       Wherever the record is unclear, we read it the conservative way: an unrecorded gender as a man, an unrecorded political regime as non-democratic, and an unrecorded way of filling the office as not elected. Unclear genders sit almost entirely in the nineteenth century, where V-Dem either names the officeholder but leaves the gender field empty, or faced a collective body or a succession of short-lived officeholders it could not code. Every country-year therefore comes out as either yes or no, and these indicators can only understate how many countries had a woman leader.
+    description_only_current: |-
+      This indicator is only estimated for countries that V-Dem lists in the most recent year of the data.
     description_no_imputes: |-
       ### Data imputation
       Unlike most indicators in this dataset, this one is not extended back in time with the data of the historical entity a country was part of. Who led a country is a fact about that country rather than about the power that ruled its territory earlier, so the years before a country appears in V-Dem's data are left empty.
@@ -556,10 +558,6 @@ tables:
         title: Country had a woman head of state at least once
         description_short: |-
           Denotes whether a country ever had a woman head of state.
-        description_from_producer: |-
-          If the head of state is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
-
-          Indicator name: `v2exfemhos`
         description_processing: |-
           We derive this indicator as follows:
 
@@ -568,7 +566,7 @@ tables:
 
           {definitions.aux.description_conservative}
 
-          This indicator is only estimated for countries listed in V-Dem in the most recent year of the data.
+          {definitions.aux.description_only_current}
 
           {definitions.aux.description_no_imputes}
         unit: ""
@@ -584,13 +582,13 @@ tables:
           1) Take the gender of the head of state in a given year from V-Dem's `v2exfemhos` indicator, which refers to any point during the year rather than to December 31.
           2) If 1) evaluates to "female", the office was filled through multi-party elections, and the country was an electoral or liberal democracy, we assign the value 1 to the indicator for the given year and all following years.
 
-          Both conditions in 2) are required. Asking only whether the country was a democracy would count hereditary monarchs, since many democracies have an unelected head of state. Asking only whether the office was filled through multi-party elections would count monarchs of countries that had an elected legislature alongside a hereditary throne.
+          Both conditions in 2) are required, and for the head of state both do work. Asking only whether the country was a democracy would count hereditary monarchs, since many democracies have an unelected head of state. Asking only whether the office was filled through multi-party elections would count monarchs of countries that had an elected legislature alongside a hereditary throne. The election condition alone rules out 314 country-years across nine countries — the monarchs and governors-general of Australia, Barbados, Canada, Denmark, Luxembourg, the Netherlands, New Zealand, the Philippines and the United Kingdom.
 
-          To assess whether the office was filled through multi-party elections, we use V-Dem's `v2elmulpar_osp_hos` indicator. To assess whether the country was a democracy, we use our political regime classification, which is based on V-Dem's Regimes of the World indicator.
-
-          This indicator is only estimated for countries listed in V-Dem in the most recent year of the data.
+          To assess whether the office was filled through multi-party elections, we use V-Dem's `v2elmulpar_osp` together with `v2expathhs` and `v2expathhg`, following the approach by Lührmann et al. for their Regimes of the World data. To assess whether the country was a democracy, we use our political regime classification, which is also based on their work.
 
           {definitions.aux.description_conservative}
+
+          {definitions.aux.description_only_current}
 
           {definitions.aux.description_no_imputes}
         unit: ""
@@ -647,16 +645,6 @@ tables:
         title: Country had a woman head of government at least once
         description_short: |-
           Denotes whether a country ever had a woman head of government.
-        description_from_producer: |-
-          Question: What is the gender of the head of government?
-
-          Clarification: If the head of government is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
-
-          Responses:
-          0: Male
-          1: Female
-
-          Indicator name: `v2exfemhog`
         description_processing: |-
           We derive this indicator as follows:
 
@@ -666,7 +654,7 @@ tables:
 
           {definitions.aux.description_conservative}
 
-          This indicator is only estimated for countries listed in V-Dem in the most recent year of the data.
+          {definitions.aux.description_only_current}
 
           {definitions.aux.description_no_imputes}
         unit: ""
@@ -682,19 +670,19 @@ tables:
           1) Take the gender of the head of government in a given year from V-Dem's `v2exfemhog` indicator, which refers to any point during the year rather than to December 31. Where the head of state was also the head of government, given by V-Dem's `v2exhoshog` indicator, we use the gender of the head of state instead.
           2) If 1) evaluates to "female", the office was filled through multi-party elections, and the country was an electoral or liberal democracy, we assign the value 1 to the indicator for the given year and all following years.
 
-          Both conditions in 2) are required. Asking only whether the country was a democracy would count leaders who never stood for election. Asking only whether the office was filled through multi-party elections would count leaders of countries whose elections were neither free nor fair.
+          Both conditions in 2) are required by the definition, but for the head of government the election condition never binds: no country-year has a woman heading the government in an electoral or liberal democracy without the office having been filled through multi-party elections. A head of government in a democracy has in practice always come through an elected legislature or a direct election, so this indicator is settled by the regime classification alone. The condition does bite for the head of state, where it rules out monarchs and governors-general.
 
-          To assess whether the office was filled through multi-party elections, we use V-Dem's `v2elmulpar_osp_hog` indicator. To assess whether the country was a democracy, we use our political regime classification, which is based on V-Dem's Regimes of the World indicator.
-
-          This indicator is only estimated for countries listed in V-Dem in the most recent year of the data.
+          To assess whether the office was filled through multi-party elections, we use V-Dem's `v2elmulpar_osp` together with `v2expathhs` and `v2expathhg`, following the approach by Lührmann et al. for their Regimes of the World data. To assess whether the country was a democracy, we use our political regime classification, which is also based on their work.
 
           {definitions.aux.description_conservative}
+
+          {definitions.aux.description_only_current}
 
           {definitions.aux.description_no_imputes}
         unit: ""
 
       ## HOE female (custom)
-      v2exfemhoe:
+      femhoe_owid:
         title: Woman chief executive
         description_short: |-
           The variable denotes whether the chief executive of government in office is a woman at any time during the year.
@@ -757,9 +745,9 @@ tables:
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
 
-          This indicator is only estimated for countries that V-Dem lists in the most recent year of the data.
-
           {definitions.aux.description_conservative}
+
+          {definitions.aux.description_only_current}
 
           {definitions.aux.description_no_imputes}
         unit: ""
@@ -787,11 +775,13 @@ tables:
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
 
-          Both conditions in 2) are required. Asking only whether the country was a democracy would count leaders who never stood for election, such as hereditary monarchs. Asking only whether the office was filled through multi-party elections would count leaders of countries whose elections were neither free nor fair.
+          Both conditions in 2) are required by the definition, but the election condition rarely binds for the chief executive: it rules out three country-years, all in the Philippines, and changes no country's answer. Where the chief executive is the head of state, the condition is the one that keeps out monarchs; where it is the head of government, a democracy has in practice always filled the office through elections.
 
-          To assess whether the office was filled through multi-party elections, we use the V-Dem indicator `electmulpar_hoe_row_owid`, which is based on V-Dem indicator `v2elmulpar_osp_hoe`. To identify the years in which the country was an electoral or a liberal democracy, we use our political regime classification (`regime_row_owid`), which is based on V-Dem's "Regimes of the World" measure.
+          To assess whether the office was filled through multi-party elections, we use V-Dem's `v2elmulpar_osp` together with `v2expathhs` and `v2expathhg`, following the approach by Lührmann et al. for their Regimes of the World data. To assess whether the country was a democracy, we use our political regime classification, which is also based on their work.
 
           {definitions.aux.description_conservative}
+
+          {definitions.aux.description_only_current}
 
           {definitions.aux.description_no_imputes}
         unit: ""
@@ -3148,11 +3138,11 @@ tables:
           <%- endif -%>
         description_short: |-
           <%- if category == '-1' -%>
-          Countries for which we do not know whether they had ever had a woman chief executive while being a democracy, by the end of the given year.
+          Countries for which we do not know whether they had ever had a woman chief executive who took office through multi-party elections while the country was a democracy, by the end of the given year.
           <%- elif category == "yes" %>
-          Countries that had ever had a woman chief executive while being an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
+          Countries that had ever had a woman chief executive who took office through multi-party elections while the country was an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
           <%- elif category == "no" %>
-          Countries that had never had a woman chief executive while being an electoral or a liberal democracy, by the end of the given year.
+          Countries that had never had a woman chief executive who took office through multi-party elections while the country was an electoral or a liberal democracy, by the end of the given year.
           <%- endif -%>
 
       num_countries_wom_hos_ever:
@@ -3184,11 +3174,11 @@ tables:
           <%- endif -%>
         description_short: |-
           <%- if category == '-1' -%>
-          Countries for which we do not know whether they had ever had a woman head of state while being a democracy, by the end of the given year.
+          Countries for which we do not know whether they had ever had a woman head of state who took office through multi-party elections while the country was a democracy, by the end of the given year.
           <%- elif category == "yes" %>
-          Countries that had ever had a woman head of state while being an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
+          Countries that had ever had a woman head of state who took office through multi-party elections while the country was an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
           <%- elif category == "no" %>
-          Countries that had never had a woman head of state while being an electoral or a liberal democracy, by the end of the given year.
+          Countries that had never had a woman head of state who took office through multi-party elections while the country was an electoral or a liberal democracy, by the end of the given year.
           <%- endif -%>
 
       num_countries_wom_hog_ever:
@@ -3220,11 +3210,11 @@ tables:
           <%- endif -%>
         description_short: |-
           <%- if category == '-1' -%>
-          Countries for which we do not know whether they had ever had a woman head of government while being a democracy, by the end of the given year.
+          Countries for which we do not know whether they had ever had a woman head of government who took office through multi-party elections while the country was a democracy, by the end of the given year.
           <%- elif category == "yes" %>
-          Countries that had ever had a woman head of government while being an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
+          Countries that had ever had a woman head of government who took office through multi-party elections while the country was an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
           <%- elif category == "no" %>
-          Countries that had never had a woman head of government while being an electoral or a liberal democracy, by the end of the given year.
+          Countries that had never had a woman head of government who took office through multi-party elections while the country was an electoral or a liberal democracy, by the end of the given year.
           <%- endif -%>
 
   ##################################################################################################
@@ -3246,7 +3236,7 @@ tables:
         title: |-
           Share of countries that had a woman chief executive elected democratically
         description_short: |-
-          Share of today's countries that had ever had a woman chief executive while being an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
+          Share of today's countries that had ever had a woman chief executive who took office through multi-party elections while the country was an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
 
       share_countries_wom_hos_ever:
         title: |-
@@ -3258,7 +3248,7 @@ tables:
         title: |-
           Share of countries that had a woman head of state elected democratically
         description_short: |-
-          Share of today's countries that had ever had a woman head of state while being an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
+          Share of today's countries that had ever had a woman head of state who took office through multi-party elections while the country was an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
 
       share_countries_wom_hog_ever:
         title: |-
@@ -3270,7 +3260,7 @@ tables:
         title: |-
           Share of countries that had a woman head of government elected democratically
         description_short: |-
-          Share of today's countries that had ever had a woman head of government while being an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
+          Share of today's countries that had ever had a woman head of government who took office through multi-party elections while the country was an electoral or a liberal democracy, by the end of the given year. A woman counts for a given year if she held the office at any point during that year.
 
   ##################################################################################################
   ##################################################################################################
@@ -3292,28 +3282,6 @@ tables:
           People living in countries without regime (ambiguous) data
           <%- else -%>
           People living in << category.replace('cracy', 'cracies') >> (ambiguous)
-          <%- endif -%>
-
-      population_hoe:
-        title: |-
-          <%- if category == '-1' -%>
-          People living in countries in which chief executive's gender is unknown
-          <%- else -%>
-          People living in countries in which chief executive is a << category.lower() >>
-          <%- endif -%>
-      population_hog:
-        title: |-
-          <%- if category == '-1' -%>
-          People living in countries in which head of government's gender is unknown
-          <%- else -%>
-          People living in countries in which head of government is a << category.lower() >>
-          <%- endif -%>
-      population_hos:
-        title: |-
-          <%- if category == '-1' -%>
-          People living in countries in which head of state's gender is unknown
-          <%- else -%>
-          People living in countries in which head of state is a << category.lower() >>
           <%- endif -%>
 
       population_wom_parl:
