@@ -11,9 +11,9 @@ definitions:
   current_usd: &current_usd Values are expressed in **current US dollars**. They are not adjusted for inflation, so part of the increase over time may reflect rising prices rather than larger trade volumes.
 
   fob_basis: &fob_basis Exports are valued on an FOB basis (Free on Board). This means the values include the cost of the goods up to the exporter's border, but exclude transport and insurance costs after that point.
-  cif_basis: &cif_basis Imports are valued on a CIF basis (Cost, Insurance, and Freight). This means the values include the cost of the goods, as well as the transport and insurance costs to deliver them to the importing country's border.
+  cif_basis: &cif_basis Imports are valued on a CIF basis (Cost, Insurance, and Freight). This means the values include the cost of the goods, as well as the transport and insurance costs to deliver them to the importing country's border. Not every country records its imports this way; for some of those that don't, the IMF adds an estimate of these costs.
 
-  description_processing_partnerships: &description_processing_partnerships We calculated the share of bilateral, unilateral, and non-trading partnerships by examining all possible country pairs for each year. For each pair, we checked whether both countries reported trade with each other (bilateral), only one country reported trade (unilateral), or neither country reported trade (non-trading). We then counted the total number of partnerships in each category and calculated their shares as a percentage of all partnerships.
+  description_processing_partnerships: &description_processing_partnerships We calculated the share of bilateral, unilateral, and non-trading partnerships by examining all possible country pairs for each year. For each pair, we checked whether both countries reported trade in goods (exports or imports) worth more than $10,000 with each other (bilateral), only one of the two countries did (unilateral), or neither did (non-trading). We then counted the total number of partnerships in each category and calculated their shares as a percentage of all partnerships.
   description_processing_aggregates: &description_processing_aggregates Trade with continents, with Asia (excluding China), and with the World is the sum of trade with the individual countries in them, calculated by Our World in Data. It therefore leaves out trade the IMF cannot attribute to a specific partner country. Values for continents and for Asia (excluding China) as reporters are, likewise, the sum of the values of their member countries.
 
 dataset:
@@ -45,7 +45,7 @@ tables:
           - *goods_only
           - *current_usd
           - This indicator is useful for understanding the scale of trade relations and economic dependence on specific partner countries.
-          - The numbers reflect official trade statistics and may vary depending on reporting methods used by each country.
+          - The numbers come from official trade statistics reported by each country. For countries that report late or not at all, the IMF estimates the values from the data their trading partners report.
         presentation:
           title_public: |-
             <% if counterpart_country == 'Intraregional' %>
@@ -79,7 +79,7 @@ tables:
           - *goods_only
           - *current_usd
           - This indicator highlights the scale and direction of a country’s exports to major partners.
-          - The numbers reflect official trade statistics and may vary depending on reporting methods used by each country.
+          - The numbers come from official trade statistics reported by each country. For countries that report late or not at all, the IMF estimates the values from the data their trading partners report.
         presentation:
           title_public: |-
             <% if counterpart_country == 'Intraregional' %>
@@ -114,7 +114,10 @@ tables:
           - It highlights how central << counterpart_country >> is as a market for a country’s goods.
           - A higher percentage means the country depends more heavily on that partner for its export earnings.
           - This is particularly useful for spotting whether a country’s exports are diversified or concentrated.
-        description_processing: We calculated the share of exports to <<counterpart_country>> by dividing the value of FOB exports to that country by total FOB exports to the World, then multiplying by 100.
+        description_processing: |-
+          We calculated the share of exports to <<counterpart_country>> by dividing the value of FOB exports to that country by total FOB exports to the World, then multiplying by 100.
+
+          {definitions.description_processing_aggregates}
         presentation:
           title_public: |-
             <% if counterpart_country == 'Intraregional' %>
@@ -148,7 +151,10 @@ tables:
           - It highlights how central << counterpart_country >> is as a supplier of goods to the country.
           - A higher percentage means stronger dependence on that partner for imports.
           - This measure is useful for assessing the diversification of import sources and for spotting vulnerabilities in supply chains if reliance on a single partner is high.
-        description_processing: We calculated the share of imports from <<counterpart_country>> by dividing the value of CIF imports from that country by total CIF imports from the World, then multiplying by 100.
+        description_processing: |-
+          We calculated the share of imports from <<counterpart_country>> by dividing the value of CIF imports from that country by total CIF imports from the World, then multiplying by 100.
+
+          {definitions.description_processing_aggregates}
         presentation:
           title_public: |-
             <% if counterpart_country == 'Intraregional' %>
@@ -319,10 +325,10 @@ tables:
           <% if counterpart_country == 'Intraregional' %>
           Combined value of a country’s goods exports and imports that happens within the region, measured in current US dollars.
           <% elif counterpart_country != 'Intraregional' %>
-          Combined value of a country’s goods exports and imports, measured in current US dollars.
+          Combined value of a country’s goods exports to and imports from << counterpart_country >>, measured in current US dollars.
           <%- endif -%>
         description_key:
-          - This indicator shows the total value of a country’s international trade in goods, combining both exports and imports.
+          - This indicator shows the total value of a country’s trade in goods with a partner, combining both exports and imports.
           - *fob_basis
           - *cif_basis
           - *goods_only
@@ -352,10 +358,10 @@ tables:
         title: Share of country pairs with bilateral trade
         unit: "%"
         short_unit: "%"
-        description_short: Trade relationships are bilateral when countries both [import](#dod:merchandise-imports) from and [export](#dod:merchandise-exports) goods to each other.
+        description_short: A trade relationship between two countries is bilateral when both countries report trading goods ([imports](#dod:merchandise-imports) or [exports](#dod:merchandise-exports)) with each other.
         description_key:
-          - This indicator shows the share of country pairs that trade goods with each other in both directions.
-          - A pair is bilateral when both countries report importing from and exporting to the other.
+          - This indicator shows the share of country pairs in which both countries report trading goods with each other.
+          - A pair is bilateral when each of the two countries reports exports to or imports from the other worth more than $10,000 in a year.
           - *fob_basis
           - *cif_basis
           - *goods_only
@@ -370,10 +376,10 @@ tables:
         title: Share of country pairs with unilateral trade
         unit: "%"
         short_unit: "%"
-        description_short: Trade relationships are unilateral when only one country in the pair [imports](#dod:merchandise-imports) from or [exports](#dod:merchandise-exports) goods to the other country.
+        description_short: A trade relationship between two countries is unilateral when only one of them reports trading goods ([imports](#dod:merchandise-imports) or [exports](#dod:merchandise-exports)) with the other.
         description_key:
-          - This indicator shows the share of country pairs that trade goods with each other in only one direction.
-          - A pair is unilateral when only one country reports importing from or exporting to the other.
+          - This indicator shows the share of country pairs in which only one of the two countries reports trading goods with the other.
+          - A pair is unilateral when only one of the two countries reports exports to or imports from the other worth more than $10,000 in a year.
           - *fob_basis
           - *cif_basis
           - *goods_only
@@ -388,10 +394,10 @@ tables:
         title: Share of non-trading partnerships
         unit: "%"
         short_unit: "%"
-        description_short: Trade relationships are non-trading when neither country in the pair [imports](#dod:merchandise-imports) from or [exports](#dod:merchandise-exports) goods to the other country.
+        description_short: A pair of countries is non-trading when neither reports trading goods ([imports](#dod:merchandise-imports) or [exports](#dod:merchandise-exports)) with the other.
         description_key:
           - This indicator shows the share of country pairs that do not trade goods with each other.
-          - A pair is non-trading when neither country reports importing from or exporting to the other.
+          - A pair is non-trading when neither country reports exports to or imports from the other worth more than $10,000 in a year.
           - *fob_basis
           - *cif_basis
           - *goods_only
