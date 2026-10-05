@@ -100,6 +100,8 @@ def sanity_check_outputs(tb, tb_wto) -> None:
 
     # Rescaling must preserve the WTO's own year-on-year growth from the splice year onwards (including the splice).
     growth_combined = tb.set_index("year")["volume_index"].pct_change(fill_method=None).loc[SPLICE_YEAR + 1 :]
-    growth_wto = tb_wto.set_index("year")["volume_index"].sort_index().pct_change(fill_method=None).loc[SPLICE_YEAR + 1 :]
+    growth_wto = (
+        tb_wto.set_index("year")["volume_index"].sort_index().pct_change(fill_method=None).loc[SPLICE_YEAR + 1 :]
+    )
     max_dev = (growth_combined - growth_wto).abs().max()
     assert max_dev < 1e-6, f"Combined series distorts WTO annual growth (max deviation {max_dev})"
