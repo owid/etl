@@ -4369,8 +4369,10 @@ Q 127.57032 230.07918 132.929314 245.753019
 " style="fill: none; stroke: #5b5b5b; stroke-width: 0.8; stroke-linecap: round"/>
    </g>
    <g id="label__within-2-sd">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(53.951098 190.01616)">95.4% of children</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(53.951098 199.15458)">fall within the</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(53.951098 171.61296)">95.4% of children</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(53.951098 180.75138)">in the reference</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(53.951098 190.01616)">population fall</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(53.951098 199.15458)">within the</text>
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(53.951098 208.293)">shaded area</text>
    </g>
    <g id="leader__stunting-cutoff">
@@ -4379,10 +4381,10 @@ Q 127.170486 310.519161 127.170486 303.272791
 " style="fill: none; stroke: #5b5b5b; stroke-width: 0.8; stroke-linecap: round"/>
    </g>
    <g id="label__stunting-cutoff">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 328.559672)">Stunting cutoff:</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 337.925702)">roughly 2.3% of</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 347.165372)">children are below</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 356.303792)">this line</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 328.559672)">Stunting cutoff: a</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 337.799342)">child below this</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 346.937762)">line is too short for</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 356.076182)">their age.</text>
    </g>
   </g>
   <g id="axes_2">
@@ -8691,8 +8693,8 @@ L 377.28 202.356441
    <text style="font-size: 16px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #111111" transform="translate(11.52 40.335)">age 19</text>
   </g>
   <g id="subtitle">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 64.777925)">Growth standards (under age 5) and growth reference (ages 5 to 19) of the World</text>
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 75.71252)">Health Organization.</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 64.784225)">World Health Organization growth standards for healthy children under 5, and</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #555555" transform="translate(11.52 75.71126)">growth reference for ages 5 to 19.</text>
   </g>
   <g id="data-source">
    <text style="font-size: 8.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #888888" x="11.52" y="560.775195" transform="rotate(-0 11.52 560.775195)">Data source: World Health Organization (2006; 2007)</text>

@@ -32,8 +32,9 @@ Two versions are emitted, following the static-chart templates:
   source, the OurWorldinData.org tagline and the license line.
 - mobile, 540x824: panels side by side in the portrait frame, the same direct labels placed for its
   217px panels, footer reduced to Data source plus the license, which is all that template has room
-  for. It has no Note slot, which is why the in-plot stunting label carries the share of children
-  below the cutoff on both layouts.
+  for. It has no Note slot, which is why the in-plot stunting label says in plain words what stunted
+  means on both layouts. The 2.3% share below the cutoff is stated only in the desktop Note, where it can
+  be qualified as the reference population's.
 
 Both layouts put their panels side by side rather than stacked. Stacked in the portrait frame each
 panel is a 2:1 landscape box, about 222px of height for a 165 cm range, and the adolescent growth
@@ -299,15 +300,19 @@ BAND_TINT = 0.78
 # the data before the label ships.
 STUNTED_SHARE = 2.2750132
 
-# The two direct labels. The stunting one keeps its share rather than leaving it to the Note, because
-# the mobile template has no Note to put it in.
+# The two direct labels. The stunting one says what stunted means in plain words, which mobile has no
+# Note to carry. It deliberately leaves out the 2.3% share: out of context that reads as the share of
+# children who are stunted, when it is a property of the reference population only -- the Note states it
+# with that qualifier.
 MEDIAN_LABEL = "Median"
-STUNTING_LABEL = f"Stunting cutoff: roughly {STUNTED_SHARE:.1f}% of children are below this line"
+STUNTING_LABEL = "Stunting cutoff: a child below this line is too short for their age."
 
 # The share of children the band holds. A cut point is not a share: 2.3% of children fall below -2 SD
 # and the same share above +2 SD, so the band between them holds 100 - 2 x 2.3 = 95.4%. Carried from
 # STUNTED_SHARE's seven figures, since rounding 2.275 first would print 95.5%.
-BAND_LABEL = f"{100 - 2 * STUNTED_SHARE:.1f}% of children fall within the shaded area"
+# "In the reference population", the Note's own wording, so the share cannot be read as the share of all
+# children in the world -- the same misreading that keeps the 2.3% out of the stunting label.
+BAND_LABEL = f"{100 - 2 * STUNTED_SHARE:.1f}% of children in the reference population fall within the shaded area"
 
 # The leaders joining a label to its mark. The annotation grey and a 1px-class stroke, as the house
 # arrows take: the lighter #777777 used before all but vanished on the mobile frame, where the leaders
@@ -413,16 +418,16 @@ LAYOUTS = {
         "age_ticks": [0, 5, 10, 15, 19],
         # Where the stunting label attaches, in years, and how wide it may wrap, in template px. See
         # `draw_direct_labels` for why it sits where it does.
-        "stunting_label_age": 13,
-        "stunting_label_width": 110,
+        "stunting_label_age": 11.5,
+        "stunting_label_width": 130,
         # Length of the stunting label's leader, from the dashed line down to the label's top, in
         # points. Long enough to read as a line rather than a tick once the shrink at each end is spent.
-        "stunting_leader_pt": 18,
+        "stunting_leader_pt": 24,
         # The band label's bottom-left corner, as (age, cm), in the empty top-left of the Boys panel,
         # and the age its leader reaches into the band at.
-        "band_label_xy": (0.8, 147),
-        "band_label_target_age": 8.3,
-        "band_label_width": 125,
+        "band_label_xy": (0.8, 158),
+        "band_label_target_age": 10,
+        "band_label_width": 165,
         "title_fontsize": 16,
         "body_fontsize": LADDER_PT["body"],
         "footer_fontsize": 7.75,
@@ -461,12 +466,17 @@ LAYOUTS = {
 # Both layouts share this: one line on desktop, the template's two-line slot on mobile. It names WHO's
 # two products by what each is -- *standards* under 5, a *reference* from 5 to 19 -- rather than
 # merging them into one phrase, because the Note no longer explains the split and mobile has no Note.
+# "Healthy" is earned by the first half only: the under-fives standards come from children selected for
+# good health and nutrition, so it qualifies them and stops there. It describes the children, not a
+# range of heights -- 2.3% of those healthy children fall below the stunting cutoff.
 #
 # No geography word, deliberately. The under-fives standards earn one -- six countries, and WHO's own
 # claim that they apply to children everywhere -- but the 5-19 half is a reconstruction of a single
 # national sample, 22,917 US children measured between 1963 and 1975, so calling the whole range
 # 'global' over-claims on exactly that half.
-SUBTITLE = "Growth standards (under age 5) and growth reference (ages 5 to 19) of the World Health Organization."
+SUBTITLE = (
+    "World Health Organization growth standards for healthy children under 5, and growth reference for ages 5 to 19."
+)
 
 
 # One dash plus one gap, in POINTS: the dash units are multiples of the line width, so this is what
@@ -518,18 +528,18 @@ def run() -> None:
 
 
 def assert_threshold_is_a_fixed_percentile(tb: Table) -> None:
-    """Check the premise behind the share of children printed under the stunting threshold.
+    """Check the premise behind the shares the chart prints: 2.3% below the threshold, 95.4% in the band.
 
     The threshold is stated as a *share of children* while it is defined in *standard deviations*, and
     that conversion only holds because WHO's height-for-age standard sets the LMS skewness parameter L
     to 1 at every age, making the distribution normal. If a future revision introduced skewness, -2 SD
-    would become an age-varying centile and the label and the Note would silently misstate how many
+    would become an age-varying centile and the band label and the Note would silently misstate how many
     children fall below it -- a wrong number on a published chart, with nothing else to catch it.
     """
     skewness = tb["lms_l_skewness"].unique()
     assert set(skewness) == {1}, (
         f"Height-for-age is no longer a normal distribution (L = {skewness}), so -2 SD is no longer "
-        f"the {STUNTED_SHARE}th percentile that STUNTING_LABEL and the Note state."
+        f"the {STUNTED_SHARE}th percentile that BAND_LABEL and the Note are built on."
     )
 
     # The same claim checked against the percentile columns rather than the parameter: 2.275 sits
@@ -539,7 +549,7 @@ def assert_threshold_is_a_fixed_percentile(tb: Table) -> None:
     )
     assert not outside.any(), (
         f"-2 SD escapes the 1st-3rd percentile range in {int(outside.sum())} rows, so it is not the "
-        f"{STUNTED_SHARE}th percentile the stunting label states."
+        f"{STUNTED_SHARE}th percentile that BAND_LABEL and the Note are built on."
     )
 
     # The band is drawn as symmetric about the median, and the Note's "shaded area" reads as two

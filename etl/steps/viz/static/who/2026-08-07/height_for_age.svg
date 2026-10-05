@@ -4369,24 +4369,24 @@ L 311.61736 120.494286
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="311.61736" y="114.777086" transform="rotate(-0 311.61736 114.777086)">Median</text>
    </g>
    <g id="leader__within-2-sd">
-    <path d="M 150.15998 176.242342 
-Q 156.943295 185.02112 163.72661 193.799898 
+    <path d="M 178.647459 157.260139 
+Q 182.934613 167.191999 187.221768 177.12386 
 " style="fill: none; stroke: #5b5b5b; stroke-width: 0.8; stroke-linecap: round"/>
    </g>
    <g id="label__within-2-sd">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.071504 161.303315)">95.4% of children fall</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.071504 170.441735)">within the shaded area</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.071504 132.80179)">95.4% of children in the</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.071504 142.06657)">reference population fall within</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.071504 151.20499)">the shaded area</text>
    </g>
    <g id="leader__stunting-cutoff">
-    <path d="M 228.683811 195.814529 
-Q 228.683811 190.566688 228.683811 185.318847 
+    <path d="M 207.952789 217.577404 
+Q 207.952789 209.330102 207.952789 201.0828 
 " style="fill: none; stroke: #5b5b5b; stroke-width: 0.8; stroke-linecap: round"/>
    </g>
    <g id="label__stunting-cutoff">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(228.683811 206.606436)">Stunting cutoff:</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(228.683811 215.972466)">roughly 2.3% of</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(228.683811 225.212136)">children are below</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(228.683811 234.350556)">this line</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(207.952789 228.368671)">Stunting cutoff: a child</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(207.952789 237.608341)">below this line is too</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(207.952789 246.873121)">short for their age.</text>
    </g>
   </g>
   <g id="axes_2">
@@ -8698,7 +8698,7 @@ L 600.48 143.907154
    <text style="font-size: 16px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #111111" x="11.52" y="23.1675" transform="rotate(-0 11.52 23.1675)">Growth curves for boys and girls, from birth to age 19</text>
   </g>
   <g id="subtitle">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #555555" x="11.52" y="43.984225" transform="rotate(-0 11.52 43.984225)">Growth standards (under age 5) and growth reference (ages 5 to 19) of the World Health Organization.</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #555555" x="11.52" y="43.984225" transform="rotate(-0 11.52 43.984225)">World Health Organization growth standards for healthy children under 5, and growth reference for ages 5 to 19.</text>
   </g>
   <g id="note">
    <text style="font-size: 7.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #777777" transform="translate(11.52 408.121758)">Note: A child is considered stunted if their height is more than two standard deviations below the median for children of the same age, shown here by the lower edge of the</text>
