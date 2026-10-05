@@ -10,7 +10,7 @@ WHO_UNVACCINATED = "This chart shows the estimated number of one-year-olds who h
 WHO_VACCINATED = "This chart shows the estimated number of one-year-olds who have received vaccinations for different diseases. These are calculated by multiplying immunization coverage estimates published by the WHO and UNICEF with population counts from the United Nations World Population Prospects (UN WPP). For most vaccines, the denominator is the number of infants who survived their first year of life; for vaccines given at birth (hepatitis B birth dose and BCG), it is the number of live births."
 POPULATION_WEIGHT = "Global and regional vaccination coverage is calculated using population-weighted averages. In 2023, approximately 5% of countries did not report data, requiring extrapolation from their 2022 data to maintain complete global estimates."
 ESTIMATE_SOURCES = "These estimates combine several sources: official administrative data from health facilities, coverage surveys that meet WHO quality standards, and other relevant information like vaccine supply issues or schedule changes. The accuracy of these estimates depends on how complete and reliable each country’s reporting systems are."
-ALL_DISEASES = "The data compares vaccination coverage for multiple childhood infections: [Diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) (3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), [polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), [rotavirus](#dod:rotavirus) (final dose), [pneumococcal conjugate](#dod:pneumococcal-conjugate-vaccine) (3rd dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose). These are serious illnesses that can cause severe complications and even death, especially in young children. Vaccination is a critical tool for preventing these diseases and protecting public health."
+ALL_DISEASES = "The data compares vaccination coverage for multiple childhood infections: [Diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) (3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), [polio](#dod:polio) ([inactivated vaccine](#dod:inactivated-polio-vaccine), first dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), [rotavirus](#dod:rotavirus) (final dose), and [pneumococcal conjugate](#dod:pneumococcal-conjugate-vaccine) (final dose). It also includes the historical time series showing [polio](#dod:polio)  vaccination coverage. These are serious illnesses that can cause severe complications and even death, especially in young children. Vaccination is a critical tool for preventing these diseases and protecting public health."
 
 
 def run() -> None:
@@ -25,7 +25,7 @@ def run() -> None:
     tb = tb.drop(
         columns=[
             "coverage__antigen_yfv",
-            "coverage__antigen_mena_c",
+            "coverage__antigen_men_a_conj",
         ]
     )
 
@@ -67,7 +67,7 @@ def run() -> None:
             {
                 "dimension": "antigen",
                 "choice_new_slug": "comparison",
-                "choices": ["MCV1", "HEPB3", "DTPCV3", "IPV1", "POL3", "HIB3", "RCV1", "PCV3", "ROTAC"],
+                "choices": ["MCV1", "HEPB3", "DTPCV3", "IPV1", "POL3", "HIB3", "RCV1", "PCVC", "ROTAC"],
                 "view_config": {
                     "hasMapTab": False,
                     "addCountryMode": "change-country",
@@ -76,7 +76,7 @@ def run() -> None:
                     "selectedFacetStrategy": "entity",
                     "title": "{title}",
                     "subtitle": "{subtitle}",
-                    "note": "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) (3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), [polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), [rotavirus](#dod:rotavirus) (final dose), [pneumococcal conjugate](#dod:pneumococcal-conjugate-vaccine) (3rd dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose).",
+                    "note": "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) (3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), [polio](#dod:polio) (3rd dose, historical series), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), [rotavirus](#dod:rotavirus) (final dose), [pneumococcal conjugate](#dod:pneumococcal-conjugate-vaccine) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose).",
                 },
                 "view_metadata": {
                     "title": "{title}",
