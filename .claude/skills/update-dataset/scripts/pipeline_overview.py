@@ -1,7 +1,7 @@
 """Print a Markdown overview of a dataset's ETL pipeline, for the refresher at the start of /update-dataset.
 
 Lists, from the active DAG and the files on disk:
-  1. the chain: every step of `<namespace>/<version>/<short_name>` (all channels) and the same-short-name steps
+  1. the chain: every snapshot and data step of `<namespace>/<version>/<short_name>` and the same-short-name steps
      upstream of it at older versions, plus same-version sibling steps the chain depends on (extra snapshots,
      helper gardens like `income_groups_aggregations`);
   2. each step's files and its inputs from outside the chain (population, regions, other datasets);
@@ -29,6 +29,8 @@ from etl.steps import reverse_graph
 COMPANION_SUFFIXES = [".meta.yml", ".countries.json", ".excluded_countries.json", ".corrections.yml"]
 # Snapshot schemes (private snapshots live in the same `snapshots/` tree).
 SNAPSHOT_SCHEMES = ("snapshot", "snapshot-private")
+# Schemes that make up a chain; same-named viz:// and export:// steps are consumers, not chain members.
+CHAIN_SCHEMES = (*SNAPSHOT_SCHEMES, "data", "data-private")
 # Pipeline order used to sort the chain.
 STAGES = ["snapshot", "meadow", "garden", "grapher"]
 # Consumers listed by name before the rest are only counted.
@@ -45,7 +47,11 @@ def main() -> None:
     namespace, version, short_name = args.dataset.strip("/").split("/")
     dag = load_dag()
 
-    seeds = [step for step in graph_nodes(dag) if step_key(step) == (namespace, version, short_name)]
+    seeds = [
+        step
+        for step in graph_nodes(dag)
+        if step.partition("://")[0] in CHAIN_SCHEMES and step_key(step) == (namespace, version, short_name)
+    ]
     if not seeds:
         sys.exit(f"No active DAG step matches {args.dataset}.")
     members = find_upstream_members(dag, seeds, namespace, version, short_name)
