@@ -1,4 +1,4 @@
-"""Build the local page files (data, codebook, README, manifest) and JSON-LD of OWID catalog datasets."""
+"""Build the local page files (data, codebook, sources, manifest) and JSON-LD of OWID catalog datasets."""
 
 from __future__ import annotations
 
@@ -71,7 +71,7 @@ class LatestDatasetPath:
 class JsonLdBuildResult:
     """What a build produced: page files (``pages``, ``page_keys``) and the JSON-LD side product (``emitted``)."""
 
-    # Datasets that have a page (data, codebook, README, manifest), and the keys of the files written this time.
+    # Datasets that have a page (data, codebook, sources, manifest), and the keys of the files written this time.
     pages: list[str] = field(default_factory=list)
     page_entries: list[LatestDatasetPath] = field(default_factory=list)
     page_keys: list[str] = field(default_factory=list)
@@ -107,7 +107,7 @@ def build_catalog_page_artifacts(
     so the public page URL doesn't change every time the dataset gets a new version. ``published_build_checksum``
     returns the build checksum recorded in a page's published manifest, given its short key; a page whose
     checksum is unchanged is not rebuilt. Each page has
-    per table its CSV, parquet, workbook, codebook and sources, plus ``readme.md`` and ``manifest.json`` (see
+    per table its CSV, parquet, workbook, codebook and sources, plus ``manifest.json`` (see
     :mod:`etl.catalog_pages.pages`), and, when the dataset passes every quality gate, ``dataset.jsonld``. When ``only`` is given, restrict generation to
     datasets whose ``"<namespace>/<dataset>"`` is in the set (version-agnostic allowlist);
     otherwise only datasets that opt in via ``DatasetMeta.jsonld`` are considered.
