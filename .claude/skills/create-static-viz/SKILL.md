@@ -394,8 +394,8 @@ naming scheme along with the file.
 
 **On a refresh, hand over the published original too, to sit leftmost on the page.** Reviewers judge
 the new chart against what readers see now, not against the step's last render. Fetch it with
-`scripts/fetch_original_image.py <filename>`. It reads the `images` table and saves whatever format
-Cloudflare serves, usually JPEG. Upload it as a raster, set it to the desktop frame's width, and give it
+`.venv/bin/python .claude/skills/create-static-viz/scripts/fetch_original_image.py <filename>`.
+It reads the `images` table and saves whatever format Cloudflare serves, usually JPEG. Upload it as a raster, set it to the desktop frame's width, and give it
 the layer name the script prints. It stays when old versions are cleared.
 
 **Three of that skill's geometry rows only mean anything once the import is cropped — and then they
