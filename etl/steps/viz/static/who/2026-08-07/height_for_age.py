@@ -154,10 +154,13 @@ running from that corner up to the dashed line.
 header's bottom and the footer's first visible row (`footer.y + min(0, row.y)`). Never `rescale` here,
 which would move every font off its rank.
 
-The column snap is under a pixel and it is not optional. The crop measures ink, and the last x tick's
-1px stroke is centred on the plot's right edge, so the ink ends 0.5px past the column. Anything larger
-is a step defect, not something to absorb in Figma: the median's round cap once ran 1.8px past the edge,
-which is why `QUANTILE_LINES` are drawn with `solid_capstyle="butt"`. The left edge is the widest y
+The column snap is not optional, and the restyle script's own crop does not land it. That crop pads
+every stroke by half its weight on all four sides, caps or not, so the 3.61px median makes it report
+the chart 1.81px wider than the column on both layouts. Check the real edge with
+`absoluteRenderBounds` instead: it ends at 834.5 / 524.5, the last x tick's 1px stroke centred on the
+plot's edge, and that is what the snap absorbs. Anything past half a pixel is a step defect, not
+something to absorb in Figma: the median's round cap once really did run 1.8px past the edge, which is
+why `QUANTILE_LINES` are drawn with `solid_capstyle="butt"`. The left edge is the widest y
 tick label, whose width is Lato's in Figma and Arial's here; `LATO_OVER_MEASURED_ADVANCE` keeps that to
 a few tenths of a pixel.
 
@@ -306,8 +309,11 @@ STUNTING_LABEL = f"Stunting cutoff: roughly {STUNTED_SHARE:.1f}% of children are
 # STUNTED_SHARE's seven figures, since rounding 2.275 first would print 95.5%.
 BAND_LABEL = f"{100 - 2 * STUNTED_SHARE:.1f}% of children fall within the shaded area"
 
-# Length of the stunting label's leader, from the dashed line down to the label's top, in points.
-LEADER_PT = 14
+# The leaders joining a label to its mark. The annotation grey and a 1px-class stroke, as the house
+# arrows take: the lighter #777777 used before all but vanished on the mobile frame, where the leaders
+# end on the band's tint and the whole image is scaled down on a phone.
+LEADER_COLOR = "#5b5b5b"  # the annotation grey, as TEXT_COLOR
+LEADER_WIDTH = 0.8
 
 # Percentiles drawn as lines on top of the band, as (column, line width), so a specific centile
 # can be read off rather than only a range. Labelled directly in the Boys panel.
@@ -409,9 +415,12 @@ LAYOUTS = {
         # `draw_direct_labels` for why it sits where it does.
         "stunting_label_age": 13,
         "stunting_label_width": 110,
+        # Length of the stunting label's leader, from the dashed line down to the label's top, in
+        # points. Long enough to read as a line rather than a tick once the shrink at each end is spent.
+        "stunting_leader_pt": 18,
         # The band label's bottom-left corner, as (age, cm), in the empty top-left of the Boys panel,
         # and the age its leader reaches into the band at.
-        "band_label_xy": (0.8, 142),
+        "band_label_xy": (0.8, 147),
         "band_label_target_age": 8.3,
         "band_label_width": 125,
         "title_fontsize": 16,
@@ -438,7 +447,8 @@ LAYOUTS = {
         "age_ticks": [0, 5, 10, 15, 19],
         "stunting_label_age": 9.5,
         "stunting_label_width": 100,
-        "band_label_xy": (0.6, 151),
+        "stunting_leader_pt": 22,
+        "band_label_xy": (0.6, 160),
         "band_label_target_age": 10.2,
         "band_label_width": 100,
         "title_fontsize": 16,
@@ -682,8 +692,8 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float) -> None
         gid="label__within-2-sd",
         arrowprops={
             "arrowstyle": "-",
-            "color": MUTED_COLOR,
-            "linewidth": 0.8,
+            "color": LEADER_COLOR,
+            "linewidth": LEADER_WIDTH,
             "shrinkA": 2,
             "shrinkB": 0,
             # From the label's bottom-right corner, the point nearest the band, so the leader is a
@@ -698,7 +708,7 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float) -> None
     label = ax.annotate(
         wrap_to_width(STUNTING_LABEL, layout["stunting_label_width"], fontsize),
         xy=(stunting_age, height_at(STUNTING_COLUMN, stunting_age)),
-        xytext=(0, -LEADER_PT),
+        xytext=(0, -layout["stunting_leader_pt"]),
         textcoords="offset points",
         ha="left",
         va="top",
@@ -711,8 +721,8 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float) -> None
         # it the line runs from the middle of the text block, through the label.
         arrowprops={
             "arrowstyle": "-",
-            "color": MUTED_COLOR,
-            "linewidth": 0.8,
+            "color": LEADER_COLOR,
+            "linewidth": LEADER_WIDTH,
             "shrinkA": 2,
             "shrinkB": 3,
             "relpos": (0.0, 1.0),

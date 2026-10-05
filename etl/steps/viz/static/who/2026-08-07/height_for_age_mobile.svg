@@ -4364,25 +4364,25 @@ L 205.331645 169.87829
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="205.331645" y="164.16109" transform="rotate(-0 205.331645 164.16109)">Median</text>
    </g>
    <g id="leader__within-2-sd">
-    <path d="M 124.226281 235.847252 
-Q 128.577797 240.800136 132.929314 245.753019 
-" style="fill: none; stroke: #777777; stroke-width: 0.8; stroke-linecap: round"/>
+    <path d="M 122.211327 214.405341 
+Q 127.57032 230.07918 132.929314 245.753019 
+" style="fill: none; stroke: #5b5b5b; stroke-width: 0.8; stroke-linecap: round"/>
    </g>
    <g id="label__within-2-sd">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(53.951098 211.849395)">95.4% of children</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(53.951098 220.987815)">fall within the</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(53.951098 230.126235)">shaded area</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(53.951098 190.01616)">95.4% of children</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(53.951098 199.15458)">fall within the</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(53.951098 208.293)">shaded area</text>
    </g>
    <g id="leader__stunting-cutoff">
-    <path d="M 127.170486 309.769401 
-Q 127.170486 306.520224 127.170486 303.271047 
-" style="fill: none; stroke: #777777; stroke-width: 0.8; stroke-linecap: round"/>
+    <path d="M 127.170486 317.765531 
+Q 127.170486 310.519161 127.170486 303.272791 
+" style="fill: none; stroke: #5b5b5b; stroke-width: 0.8; stroke-linecap: round"/>
    </g>
    <g id="label__stunting-cutoff">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 320.559672)">Stunting cutoff:</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 329.925702)">roughly 2.3% of</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 339.165372)">children are below</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 348.303792)">this line</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 328.559672)">Stunting cutoff:</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 337.925702)">roughly 2.3% of</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 347.165372)">children are below</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(127.170486 356.303792)">this line</text>
    </g>
   </g>
   <g id="axes_2">
