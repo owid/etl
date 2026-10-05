@@ -146,7 +146,8 @@ on the next call, and a later coordinate patch would use anchors that the fit ha
 
 Anchors: y ticks by their right edge; the first x tick by its left and the last by its right, the rest
 centred; `label__median` by its bottom-right corner; `label__within-2-sd` by its bottom-left corner,
-lines left-aligned, with `leader__within-2-sd` running from its bottom-right corner into the band;
+lines left-aligned, with `leader__within-2-sd` running into the band from the end of its lowest
+near-full-width line (`leader_origin`);
 `label__stunting-cutoff` by its top-left corner, lines left-aligned, with `leader__stunting-cutoff`
 running from that corner up to the dashed line.
 
@@ -426,7 +427,7 @@ LAYOUTS = {
         # The band label's bottom-left corner, as (age, cm), in the empty top-left of the Boys panel,
         # and the age its leader reaches into the band at.
         "band_label_xy": (0.8, 158),
-        "band_label_target_age": 10,
+        "band_label_target_age": 10.6,
         "band_label_width": 165,
         "title_fontsize": 16,
         "body_fontsize": LADDER_PT["body"],
@@ -454,7 +455,7 @@ LAYOUTS = {
         "stunting_label_width": 100,
         "stunting_leader_pt": 22,
         "band_label_xy": (0.6, 160),
-        "band_label_target_age": 10.2,
+        "band_label_target_age": 10.8,
         "band_label_width": 100,
         "title_fontsize": 16,
         "body_fontsize": LADDER_PT["body"],
@@ -689,8 +690,10 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float) -> None
     )
 
     target_age = layout["band_label_target_age"]
+    band_text = wrap_to_width(BAND_LABEL, layout["band_label_width"], fontsize)
+    band_origin, band_gap = leader_origin(band_text, fontsize)
     band_label = ax.annotate(
-        wrap_to_width(BAND_LABEL, layout["band_label_width"], fontsize),
+        band_text,
         xy=(target_age, (height_at(MEDIAN_COLUMN, target_age) + height_at(BAND[1], target_age)) / 2),
         xytext=layout["band_label_xy"],
         textcoords="data",
@@ -705,11 +708,14 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float) -> None
             "arrowstyle": "-",
             "color": LEADER_COLOR,
             "linewidth": LEADER_WIDTH,
-            "shrinkA": 2,
+            "shrinkA": band_gap,
             "shrinkB": 0,
-            # From the label's bottom-right corner, the point nearest the band, so the leader is a
-            # short stub across the band's edge rather than a line across the empty corner.
-            "relpos": (1.0, 0.0),
+            # From the end of a line of the label's own text, so the leader visibly comes out of the
+            # words. The box's bottom-right corner is empty whenever the last line is the short one.
+            "relpos": band_origin,
+            # matplotlib otherwise clips the leader to the text's box plus 4pt of padding, so it starts
+            # on the box's edge -- below the short last lines -- rather than at the point chosen above.
+            "patchA": None,
         },
     )
     assert band_label.arrow_patch is not None
@@ -741,6 +747,26 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float) -> None
     )
     assert label.arrow_patch is not None
     label.arrow_patch.set_gid("leader__stunting-cutoff")
+
+
+def leader_origin(text: str, fontsize: float) -> tuple[tuple[float, float], float]:
+    """Where on a wrapped label a leader leaves it: a `relpos` fraction of the text's box, and the gap.
+
+    The end of the lowest line that runs within 15% of the label's full width: low, so the leader is
+    short on its way down to the band, and long, so the point it leaves from is the end of a word rather
+    than empty space beside a short last line. Widths are measured in the same face the wrap is.
+
+    The gap, in points, is a hair of clearance plus what that line grows by once Figma sets it in Lato,
+    which runs wider than the face measured here: the label is left-anchored, so the growth all lands
+    at the line's end, on top of the leader.
+    """
+    font = FontProperties(family=MEASURED_FONT_STACK, size=fontsize)
+    lines = text.split("\n")
+    widths = [TextPath((0, 0), line, prop=font).get_extents().width if line.strip() else 0.0 for line in lines]
+    widest = max(widths)
+    row = max(i for i, width in enumerate(widths) if width >= 0.85 * widest)
+    gap = 2 + (LATO_OVER_MEASURED_ADVANCE - 1) * widths[row]
+    return (widths[row] / widest, (len(lines) - row - 0.5) / len(lines)), gap
 
 
 def height_tick_label(value: float, _position: int | None = None) -> str:
