@@ -1350,6 +1350,13 @@ steps:
   # archived; last active in 1561731bf7ef on 2026-10-02
   data://garden/bls/2026-08-18/us_ppi_construction:
     - snapshot://bls/2026-08-18/us_ppi_construction.csv
+  # archived; last active in ef8804d984ca on 2026-10-05
+  data://grapher/imf/2025-07-08/trade:
+    - data://garden/imf/2025-07-08/trade:
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/worldbank_wdi/2026-07-27/wdi
+      - data://meadow/imf/2025-07-08/trade:
+        - snapshot://imf/2025-07-08/trade.csv
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
