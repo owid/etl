@@ -50,7 +50,8 @@ Figma
 The whole handoff, written out so it can be redone in a later session with nothing but this file.
 
 **Target.** File `Charts (2026)`, key `s6Sv60bakebRRW2TxsMQbF`. Page
-`20260812 Expected height of boys and girls, from birth to age 19 (Pablo A)`, sitting at the top of
+`20260812 Growth curves for boys and girls, from birth to age 19 (Pablo A)` (renamed from `Expected
+height of ...` when the title changed on 2026-10-05; same page, id `25284:5`), sitting at the top of
 the dated block -- insert after the `-----------` divider page, not at a counted index. Two frames,
 each named for the slug the website exports by, with a reference copy of this step's own render to
 their left:
@@ -68,19 +69,22 @@ the exported filename and in this table. Lost the ids? Search the file's page li
 pages are named `YYYYMMDD <Title> (<Creator>)` and this one is dated 20260812, the day it was first
 placed, which does not change when the chart is refreshed.
 
-**Import.** Upload with `upload_assets` and POST the file to the returned `submitUrl`
-(`curl -F "file=@<path>"`); never `createNodeFromSvg`, which caps at 50k characters. The upload lands
-on whatever page Figma has open, so move it. Then:
+**Import.** Upload each SVG TWICE with one `upload_assets` call (`count: 4` for both layouts) and POST
+the files to the returned `submitUrl`s (`curl -F "file=@<path>"`); never `createNodeFromSvg`, which caps
+at 50k characters. Then run `/create-figma-chart`'s `scripts/restyle_static_import.js` as one call, with
+`families: []` (colours are bound separately, below) and both body/dark text-parent patterns set to
+match nothing. Per frame it:
 
-1. Move the import's children out of its wrapper FRAME and delete the frame: it carries a white fill
-   that would cover the template's background, and `resize()` on it rewraps every text node.
-2. `rescale(100 / 96)`. matplotlib declares the root in points, Figma imports at 96px per inch, and
-   this figure is built at 100 template px per inch. `rescale(clone.width / imported.width)` is the
-   same number and self-correcting.
-3. Keep that group as the reference copy; `clone()` it for the working copy and append the clone to
-   the template frame. Rebuild from the reference, never by patching the working copy.
-4. From the working copy delete `patch_1`, `title`, `subtitle`, `note`, `data-source`, `tagline` and
-   `license`. The template's own slots carry those strings; left in place they are duplicated.
+1. rescales the import by `frameWidth / canvasWidth` -- 850 / 816 desktop, 540 / 518.4 mobile, i.e.
+   100 / 96: matplotlib declares the root in points, Figma imports at 96px per inch, and this figure is
+   built at 100 template px per inch;
+2. strips the unpainted `patch_N` background groups (they would set the chart's box to the artboard)
+   and the step's own `title`, `subtitle`, `note`, `data-source`, `tagline` and `license` copies, which
+   the template's slots replace;
+3. sets Lato, swaps the import into the frame as `chart` at the bottom of the z-order, removes the old
+   `chart`, crops it to its ink and snaps it onto the content column;
+4. parks the second upload, unstyled, to the frame's left as `<frame> — original SVG (unstyled)`.
+   Delete the previous reference copies first, or the new ones land on top of them.
 
 **Template text slots.** Fill them from this step's own constants, restoring the mixed weights the
 templates ship -- setting `characters` propagates the first character's style over the whole string:
@@ -101,11 +105,11 @@ tagline.
 Two positions are derived rather than the template's fixed y, because the template pins them for a
 two-line title and a two-line subtitle:
 
-- `subtitle.y = 16.216 + title.height + 6`. Reset `title.y = 16.216` first -- the desktop header is
-  not an auto-layout frame, so Figma re-centres a title that shrinks to one line.
-- `note.y = 591 - 4 - note.height`, so a fourth line eats into the chart area rather than the source
-  row. The 4 is `Frame 22`'s own `itemSpacing`; read it off the clone rather than typing it, since it
-  was 5.4 in the template's previous build. Mobile's header is auto-layout and needs neither.
+- Both headers (`Frame 20` desktop, `Frame 26` mobile) are now vertical auto-layout frames, so the
+  subtitle follows the title by itself, 6px under it.
+- Desktop's footer, `Frame 22`, hugs its rows and is pinned at its top, so a shorter note pulls the
+  source row up. Re-pin it after setting the note: `footer.y = 638 - 16 - footer.height`, which puts
+  the two-line note at the template's own y=559. Mobile's footer has no note and needs nothing.
 
 **Colors.** Bind each panel's median *and its threshold* to the library style, and derive that panel's
 bands from it; the library carries no tints. The gid names a group, so descend to its `VECTOR` children
@@ -145,21 +149,28 @@ lines left-aligned, with `leader__within-2-sd` running from its bottom-right cor
 `label__stunting-cutoff` by its top-left corner, lines left-aligned, with `leader__stunting-cutoff`
 running from that corner up to the dashed line.
 
-**Fit.** Centre the group in the band between the header's bottom and the footer's first visible row
-(`footer.y + min(0, source.y)`), then pin the group's box to the content box.
+**Fit.** After the restyle script's crop, set the `chart` frame's box to the content column
+(`resizeWithoutConstraints(header.width, h)`, `x = header.x`) and centre it in the band between the
+header's bottom and the footer's first visible row (`footer.y + min(0, row.y)`). Never `rescale` here,
+which would move every font off its rank.
 
-The pin is a fraction of a pixel and it is not optional. This step sizes the plot to the template,
-but it cannot land the left edge exactly: the ink starts at the widest y tick label, and that label's
-width is Lato's, set by Figma on import, where every width the step can measure is Arial's. The
-column is measured and scaled by `LATO_OVER_MEASURED_ADVANCE`, which leaves a few tenths of a pixel
-rather than the 5.92px a hand-tuned reservation left here until 2026-09-04. Close it with FITTING.md's
-stretch -- `group.resize(contentW, h)`, never a `rescale`, which would move every font off its rank,
-and never a squeeze, which rewraps labels.
+The column snap is under a pixel and it is not optional. The crop measures ink, and the last x tick's
+1px stroke is centred on the plot's right edge, so the ink ends 0.5px past the column. Anything larger
+is a step defect, not something to absorb in Figma: the median's round cap once ran 1.8px past the edge,
+which is why `QUANTILE_LINES` are drawn with `solid_capstyle="butt"`. The left edge is the widest y
+tick label, whose width is Lato's in Figma and Arial's here; `LATO_OVER_MEASURED_ADVANCE` keeps that to
+a few tenths of a pixel.
 
 **Audit before showing it.** Expect sizes {16, 14, 12} only, Lato Regular and Bold only, both medians
 *and both thresholds* reporting a bound style -- and each threshold reporting the same colour as its
 own median, which is the check that catches a stale band or threshold selector -- no ink outside
-16..W-16, and gaps of about 14 on desktop and 20 on mobile.
+16..W-16, and gaps of 13.4 / 13.4 on desktop and 19.67 / 19.67 on mobile (measured 2026-10-05).
+
+Two `verify_page.js` rows fail by design. Desktop `text-floor` flags the template's own tagline and
+license row, which ships at 11px. Mobile `gap` flags 19.67 against the 12-16 target: the plot is laid
+out from the template's chart-area rows, and its ink is shorter than the box reserved for it. The
+series, furniture and colour rows SKIP, because they key on grapher's layer names (`line__*`,
+`horizontal-grid-lines`), which this step does not emit.
 """
 
 import logging
@@ -912,9 +923,19 @@ def create_visualization(tb: Table, citation: str, layout: dict) -> plt.Figure:
             gid=f"{slug}__stunting-threshold",
         )
         # --- percentile lines on top of the band ---
+        # Butt caps, so the line ends on the plot's right edge. Seaborn's round cap runs half the stroke
+        # (1.8px) past it, which puts the chart's ink outside the template's content column in Figma.
         for column, line_width in QUANTILE_LINES:
             values = tb_sex[column].to_numpy()
-            ax.plot(age, values, color=color, linewidth=line_width, zorder=5, gid=f"{slug}__{column[-3:]}")
+            ax.plot(
+                age,
+                values,
+                color=color,
+                linewidth=line_width,
+                solid_capstyle="butt",
+                zorder=5,
+                gid=f"{slug}__{column[-3:]}",
+            )
 
         if ax is axes[0]:
             draw_direct_labels(ax, tb_sex, layout, LADDER_PT["label"])

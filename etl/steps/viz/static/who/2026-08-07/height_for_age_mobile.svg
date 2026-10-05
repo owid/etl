@@ -4358,7 +4358,7 @@ L 199.16006 170.521156
 L 203.259433 170.050528 
 L 205.331645 169.87829 
 L 205.331645 169.87829 
-" style="fill: none; stroke: #4c72b0; stroke-width: 2.6; stroke-linecap: round"/>
+" style="fill: none; stroke: #4c72b0; stroke-width: 2.6"/>
    </g>
    <g id="label__median">
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="205.331645" y="164.16109" transform="rotate(-0 205.331645 164.16109)">Median</text>
@@ -8683,7 +8683,7 @@ L 369.734446 202.555368
 L 375.906031 202.366139 
 L 377.28 202.356441 
 L 377.28 202.356441 
-" style="fill: none; stroke: #dd8452; stroke-width: 2.6; stroke-linecap: round"/>
+" style="fill: none; stroke: #dd8452; stroke-width: 2.6"/>
    </g>
   </g>
   <g id="title">
