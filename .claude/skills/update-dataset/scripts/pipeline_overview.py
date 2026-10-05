@@ -5,7 +5,8 @@ Lists, from the active DAG and the files on disk:
      upstream of it at older versions, plus same-version sibling steps the chain depends on (extra snapshots,
      helper gardens like `income_groups_aggregations`);
   2. each step's files and its inputs from outside the chain (population, regions, other datasets);
-  3. the direct consumers outside the chain (other data steps, viz://, export://);
+  3. the direct consumers of the chain (other data steps, viz://, export://), and separately the other readers of
+     the siblings (a shared snapshot's readers are not consumers of this dataset);
   4. history: garden `dataset.owners`, the last commits touching the chain's files, the previous version
      (archived, or still active during an update), and any newer active version.
 
@@ -71,7 +72,7 @@ def main() -> None:
             print_step(step, dag, members)
 
     print("\n## Direct consumers outside the chain\n")
-    print_consumers(dag, members)
+    print_consumers(dag, chain, siblings, members)
 
     print("\n## History\n")
     print_history(dag, chain, namespace, version, short_name)
@@ -160,23 +161,33 @@ def print_step(step: str, dag: dict[str, set[str]], members: set[str]) -> None:
         print(f"  - inputs from outside the chain: {', '.join(f'`{d}`' for d in external)}")
 
 
-def print_consumers(dag: dict[str, set[str]], members: set[str]) -> None:
+def print_consumers(dag: dict[str, set[str]], chain: list[str], siblings: list[str], members: set[str]) -> None:
     reverse = reverse_graph(dag)
-    consumers = sorted({c for m in members for c in reverse.get(m, set())} - members)
+    # Only readers of the chain consume this dataset; readers of a sibling (e.g. a shared snapshot) may be unrelated.
+    consumers = sorted({c for m in chain for c in reverse.get(m, set())} - members)
+    sibling_readers = sorted({c for m in siblings for c in reverse.get(m, set())} - members - set(consumers))
     note = "Charts built in the admin read the grapher dataset directly and are not counted here."
     if not consumers:
         print(f"No steps in the active DAG read this dataset. {note}")
-        return
+    else:
+        print_step_counts(consumers)
+        print(f"\n{note}")
+    if sibling_readers:
+        print("\nOther steps that read the siblings, not this dataset (shared inputs or companion datasets):\n")
+        print_step_counts(sibling_readers)
+
+
+def print_step_counts(steps: list[str]) -> None:
+    """Count steps by `scheme://channel`, then list the first MAX_CONSUMERS of them."""
     by_kind: dict[str, int] = {}
-    for consumer in consumers:
-        kind = f"{consumer.partition('://')[0]}://{channel(consumer)}"
+    for step in steps:
+        kind = f"{step.partition('://')[0]}://{channel(step)}"
         by_kind[kind] = by_kind.get(kind, 0) + 1
-    print(f"{len(consumers)} step(s): " + ", ".join(f"{n} {kind}" for kind, n in sorted(by_kind.items())) + "\n")
-    for consumer in consumers[:MAX_CONSUMERS]:
-        print(f"- `{consumer}`")
-    if len(consumers) > MAX_CONSUMERS:
-        print(f"- … and {len(consumers) - MAX_CONSUMERS} more")
-    print(f"\n{note}")
+    print(f"{len(steps)} step(s): " + ", ".join(f"{n} {kind}" for kind, n in sorted(by_kind.items())) + "\n")
+    for step in steps[:MAX_CONSUMERS]:
+        print(f"- `{step}`")
+    if len(steps) > MAX_CONSUMERS:
+        print(f"- … and {len(steps) - MAX_CONSUMERS} more")
 
 
 def print_history(dag: dict[str, set[str]], chain: list[str], namespace: str, version: str, short_name: str) -> None:
