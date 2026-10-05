@@ -182,12 +182,13 @@ def run() -> None:
     plt.close(fig)
 
 
-# Source line in the format of the 2025 version: full author names and page ranges, which the origins do not carry.
+# Source line in author-date style (periods after names and year, en dashes in ranges), with full author names and
+# page ranges, which the origins do not carry.
 # The yearly UCDP article ("Organized violence 1989-<year>") changes with every release; `source_citation` checks it.
 SOURCE = (
-    "Sundberg, Ralph, and Erik Melander, 2013, Introducing the UCDP Georeferenced Event Dataset. Journal of Peace "
-    "Research 50(4): 523-532; Davies, Shawn, Therése Pettersson, and Magnus Öberg. 2026. Organized violence "
-    "1989-2025, and violent political protests. Journal of Peace Research 63(4): 705-723."
+    "Sundberg, Ralph, and Erik Melander. 2013. Introducing the UCDP Georeferenced Event Dataset. Journal of Peace "
+    "Research 50(4): 523–532; Davies, Shawn, Therése Pettersson, and Magnus Öberg. 2026. Organized violence "
+    "1989–2025, and violent political protests. Journal of Peace Research 63(4): 705–723."
 )
 
 
