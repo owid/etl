@@ -20,6 +20,47 @@ numbers. It sums UCDP's yearly best estimates of deaths in ongoing conflicts fro
 
 Rounding follows the 2025 version: one decimal in millions at or above a million ("2.1m"), otherwise two
 significant figures in thousands ("750k").
+
+Segments are ordered largest first; since the 1989-2025 update interstate comes before non-state. The source
+line is author-date (periods after names and year, en dashes in ranges); `source_citation` fails the step when
+the UCDP article no longer matches the data's years, so update `SOURCE` at each release.
+
+Figma handoff (1989-2025 version)
+---------------------------------
+Where: Charts (2026) file `s6Sv60bakebRRW2TxsMQbF`, page "20261005 Conflict deaths since the Cold War (Bastian)"
+(`28739:11`), the first page below the `-----` divider. Left: the published 2025 PNG
+(`deaths-in-armed-conflicts-since-the-end-of-the-cold-war.png`, 1124 x 1000) resized to 1258 wide, layer
+"published-2025 (...)". Right, 100px gap: frame `deaths-in-armed-conflicts-since-the-end-of-the-cold-war-1989-2025`
+(`28740:6`), 1258 x 1119. The frame name is the exported filename; it must be new each update, since the image
+API rejects a duplicate name. No 2026 template is used: the frame keeps the 2025 frame's size and layout.
+
+To rebuild it:
+1. Import the SVG with `upload_assets` (never `createNodeFromSvg`). It arrives at 0.96x (1207.68 x 1074.24,
+   matplotlib writes points, Figma reads 96px/in): move `figure_1` into a new 1258 x 1119 frame, delete the import
+   wrapper frame, `rescale(1 / 0.96)`, place at (0, 0), then delete `patch_1` (the transparent canvas patch).
+2. Frame fill: library style "Website/Background/Beige" (key `6c0f33c0233038fdfc3b20e353ef0c12990df8e7`,
+   #fffbf5). The 2025 frame used #fbf9f3; the house style was chosen on purpose.
+3. Logo: instance of "Logos/Our World in Data/36px" (component key `73c2928eda2d1cdf891f472912f36c899ca2963b`),
+   rescaled to 94 wide, at (1140, 33), as in the 2025 frame.
+4. Restyle the text, by the gid of each text's parent group. Sizes and colors are the 2025 frame's:
+
+   | gid | Font | Size | Color |
+   |---|---|---|---|
+   | `title` | Playfair Display SemiBold | 40 | #2d2e2d |
+   | `subtitle-*` | Lato Regular | 22 | #58595b |
+   | `section__<bar>` | Lato Bold | 26 | #2d2e2d |
+   | `section__region-sub` | Lato Regular | 22 | #2d2e2d |
+   | `legend__<key>-0` (bold term) | Lato SemiBold | 22 | #2d2e2d |
+   | other `legend__*` | Lato Regular | 22 | #2d2e2d |
+   | `label__*` | Lato Medium | 26 | unchanged (white; the outside "250k" keeps its segment color) |
+   | footer rows | Lato Medium, labels in Lato Bold | 14 (18px line height) | #87898c |
+
+   Keep right-aligned texts (the total's label, the license) on their right edge when the font changes.
+5. Merge each footer row's runs into one text with mixed weights, in this order, because the runs were laid out
+   for the step's font: `footer__note` ("Note:" bold), `footer__source` (one 1210-wide text, "Source:" bold),
+   `footer__tagline` ("OurWorldinData.org" bold). In `footer__license`, bold "CC-BY" and the two author names.
+6. Then align to the 2025 frame: title top at y=24, footer rows down 4px (Note at y=1007, Source 1033,
+   tagline and license 1077). Every other text lands within 2px of the 2025 frame without adjustment.
 """
 
 import logging
