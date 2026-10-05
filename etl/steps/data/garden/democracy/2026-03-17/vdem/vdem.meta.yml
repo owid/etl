@@ -162,7 +162,7 @@ definitions:
 
       For example, V-Dem only provides regime data since Bangladesh's independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
 
-      For more details on the imputation methodology and which countries are affected, refer to [this file](https://github.com/owid/etl/blob/master/etl/steps/data/garden/democracy/2025-03-17/vdem/vdem.countries_impute.yml).
+      For more details on the imputation methodology and which countries are affected, refer to [this file](https://github.com/owid/etl/blob/master/etl/steps/data/garden/democracy/2026-03-17/vdem/vdem.countries_impute.yml).
     description_conservative: |-
       Wherever the record is unclear, we read it the conservative way: an unrecorded gender as a man, an unrecorded political regime as non-democratic, and an unrecorded way of filling the office as not elected. Unclear genders sit almost entirely in the nineteenth century, where V-Dem either names the officeholder but leaves the gender field empty, or faced a collective body or a succession of short-lived officeholders it could not code. Every country-year therefore comes out as either yes or no, and these indicators can only understate how many countries had a woman leader.
     description_only_current: |-
@@ -188,6 +188,9 @@ definitions:
 dataset:
   title: V-Dem Country-Year (Full + Others)
   update_period_days: 365
+  owners:
+    - Pablo Arriagada
+    - Bastian Herre
 
 tables:
   ##################################################################################################
