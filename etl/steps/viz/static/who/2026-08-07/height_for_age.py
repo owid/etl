@@ -475,7 +475,8 @@ LAYOUTS = {
 # national sample, 22,917 US children measured between 1963 and 1975, so calling the whole range
 # 'global' over-claims on exactly that half.
 SUBTITLE = (
-    "World Health Organization growth standards for healthy children under 5, and growth reference for ages 5 to 19."
+    # A no-break space keeps "under 5" on one line wherever a template wraps it, including Figma's slot.
+    "World Health Organization growth standards for healthy children under\u00a05, and growth reference for ages 5 to 19."
 )
 
 
@@ -790,7 +791,8 @@ def wrap_to_width(text: str, width_px: float, fontsize: float) -> str:
 
     lines: list[str] = []
     current = ""
-    for word in text.split():
+    # Split on plain spaces only, so a no-break space holds its words together.
+    for word in text.split(" "):
         candidate = f"{current} {word}".strip()
         if current and measure(candidate) > max_points:
             lines.append(current)
