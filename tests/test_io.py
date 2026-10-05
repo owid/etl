@@ -265,33 +265,38 @@ def test_get_all_changed_catalog_paths_skips_deleted_files(mock_load_dag):
 def test_get_all_changed_catalog_paths_folder_step(mock_load_dag):
     """A step written as a folder of modules resolves to the step, not to one path per module.
 
-    V-Dem's garden step is `vdem/__init__.py` plus `vdem/vdem_clean.py`, `vdem/vdem.meta.yml`, etc.
-    Suffix-stripping turned those into `garden/.../vdem/vdem_clean`, which matches no step, so
-    `--modified` (the staging build), chart-diff and datadiff all silently skipped the branch.
+    Such a step (V-Dem's garden step, for one) is `<short>/__init__.py` plus `<short>/<module>.py`,
+    `<short>/<short>.meta.yml`, etc. Suffix-stripping turned those into `garden/.../<short>/<module>`,
+    which matches no step, so `--modified` (the staging build), chart-diff and datadiff all silently
+    skipped the branch. Step names are made up and the DAG is mocked, so the test doesn't depend on
+    any real dataset or version.
     """
     mock_load_dag.return_value = {
-        "data://garden/democracy/2026-03-17/vdem": set(),
-        "data://grapher/democracy/2026-03-17/vdem": {"data://garden/democracy/2026-03-17/vdem"},
+        "data://garden/test_namespace/2020-01-01/folder_step": set(),
+        "data://grapher/test_namespace/2020-01-01/folder_step": {"data://garden/test_namespace/2020-01-01/folder_step"},
     }
     files_changed = {
-        "etl/steps/data/garden/democracy/2026-03-17/vdem/__init__.py": "M",
-        "etl/steps/data/garden/democracy/2026-03-17/vdem/vdem_clean.py": "M",
-        "etl/steps/data/garden/democracy/2026-03-17/vdem/vdem.meta.yml": "M",
+        "etl/steps/data/garden/test_namespace/2020-01-01/folder_step/__init__.py": "M",
+        "etl/steps/data/garden/test_namespace/2020-01-01/folder_step/folder_step_clean.py": "M",
+        "etl/steps/data/garden/test_namespace/2020-01-01/folder_step/folder_step.meta.yml": "M",
     }
 
     result = get_all_changed_catalog_paths(files_changed)
 
-    assert sorted(result) == ["garden/democracy/2026-03-17/vdem", "grapher/democracy/2026-03-17/vdem"]
+    assert sorted(result) == [
+        "garden/test_namespace/2020-01-01/folder_step",
+        "grapher/test_namespace/2020-01-01/folder_step",
+    ]
 
 
 def test_data_step_catalog_path():
     """Companion files of a flat step, and files inside a folder step, all map to the step itself."""
     for rel in [
-        "garden/un/2024-07-12/un_wpp.py",
-        "garden/un/2024-07-12/un_wpp.meta.yml",
-        "garden/un/2024-07-12/un_wpp.countries.json",
-        "grapher/un/2024-07-12/un_wpp.meta.override.yml",
-        "garden/un/2024-07-12/un_wpp/__init__.py",
-        "garden/un/2024-07-12/un_wpp/population.py",
+        "garden/test_namespace/2020-01-01/test_step.py",
+        "garden/test_namespace/2020-01-01/test_step.meta.yml",
+        "garden/test_namespace/2020-01-01/test_step.countries.json",
+        "grapher/test_namespace/2020-01-01/test_step.meta.override.yml",
+        "garden/test_namespace/2020-01-01/test_step/__init__.py",
+        "garden/test_namespace/2020-01-01/test_step/test_step_clean.py",
     ]:
-        assert data_step_catalog_path(Path(rel)).split("/", 1)[1] == "un/2024-07-12/un_wpp", rel
+        assert data_step_catalog_path(Path(rel)).split("/", 1)[1] == "test_namespace/2020-01-01/test_step", rel
