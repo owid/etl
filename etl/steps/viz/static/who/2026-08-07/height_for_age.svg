@@ -4366,7 +4366,7 @@ L 311.61736 120.494286
 " style="fill: none; stroke: #4c72b0; stroke-width: 2.6"/>
    </g>
    <g id="label__median">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="311.61736" y="114.777086" transform="rotate(-0 311.61736 114.777086)">Median</text>
+    <text style="font-weight: 700; font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #4c72b0" x="311.61736" y="114.789236" transform="rotate(-0 311.61736 114.789236)">Median</text>
    </g>
    <g id="leader__within-2-sd">
     <path d="M 179.48107 144.317991 

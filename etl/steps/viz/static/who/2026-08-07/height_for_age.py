@@ -120,8 +120,14 @@ The threshold has to be bound too, and to the same style as the median beside it
 in the panel's own colour on purpose -- colour says which panel a mark belongs to, style says which mark
 it is -- so binding only the median splits the pair in Figma: the median moves to the library colour
 while the threshold keeps matplotlib's `#4c72b0` / `#dd8452`. Binding a paint style leaves
-`dashPattern` alone, so the dash survives the binding. The direct labels and the stunting leader are
-not in this table: they stay the step's greys, which ranks them as annotation rather than data.
+`dashPattern` alone, so the dash survives the binding. `label__median` is bound too: it names a line,
+so it takes that line's colour and weight, the house convention for a line's own label. The two
+explanatory labels and their leaders are not in this table: they stay the step's greys, which ranks
+them as annotation rather than data.
+
+`label__median` sits on the band's tint, where Denim text measures about 4.0:1 against it, under the
+4.5:1 usually asked of 12px text (5.3:1 on the canvas). Accepted on purpose: moving the label off the
+band puts it 15 cm clear of the line it names.
 
 | Layer | Treatment |
 |---|---|
@@ -129,6 +135,7 @@ not in this table: they stay the step's greys, which ranks them as annotation ra
 | `girls___50` | `setStrokeStyleIdAsync` -> `Default Palette/Rusty Orange`, key `65bab597d085689b1ea82a69f4d785cb9212c234` |
 | `<sex>__stunting-threshold` | the same style as `<sex>___50` |
 | `<sex>__within-2-sd` | that style's color blended `BAND_TINT` (0.78) towards white |
+| `label__median` (Boys panel) | `setFillStyleIdAsync` on its TEXT -> `Default Palette/Denim` |
 
 Denim and Rusty Orange separate by dE 70 at worst; their grayscale seam is 1.14:1, which does not gate
 here because the two series sit in separate, text-titled panels. Which panel takes which is set by
@@ -142,7 +149,8 @@ on the next call, and a later coordinate patch would use anchors that the fit ha
 |---|---|---|
 | Facet titles (`Boys`, `Girls`) | 16 | Bold |
 | Tick labels, `Age in years` | 14 | `Age in years` Bold, ticks Regular |
-| Direct labels (`label__median`, `label__within-2-sd`, `label__stunting-cutoff`) | 12 | Regular |
+| `label__median` | 12 | Bold, in the line's colour |
+| Explanatory labels (`label__within-2-sd`, `label__stunting-cutoff`) | 12 | Regular |
 
 Anchors: y ticks by their right edge; the first x tick by its left and the last by its right, the rest
 centred; `label__median` by its bottom-right corner; `label__within-2-sd` by its bottom-left corner,
@@ -650,7 +658,7 @@ def tint(color, weight: float) -> tuple[float, float, float]:
     return (r + (1 - r) * weight, g + (1 - g) * weight, b + (1 - b) * weight)
 
 
-def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float) -> None:
+def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float, color) -> None:
     """Name the median, the band and the stunting threshold on the curves themselves.
 
     The median and stunting labels, and the band label's leader, are anchored to the data at an age
@@ -684,7 +692,10 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float) -> None
         ha="right",
         va="bottom",
         fontsize=fontsize,
-        color=TEXT_COLOR,
+        # The line's own label: its colour and bold, so it reads as the line's name. The two labels
+        # below explain the encoding and stay in the annotation grey.
+        color=color,
+        fontweight="bold",
         zorder=6,
         gid="label__median",
     )
@@ -986,7 +997,7 @@ def create_visualization(tb: Table, citation: str, layout: dict) -> plt.Figure:
             )
 
         if ax is axes[0]:
-            draw_direct_labels(ax, tb_sex, layout, LADDER_PT["label"])
+            draw_direct_labels(ax, tb_sex, layout, LADDER_PT["label"], color)
 
         # --- panel title, above the plot and left-aligned with it, as grapher labels a facet ---
         ax.set_title(
