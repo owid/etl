@@ -27,6 +27,8 @@ from etl.steps import reverse_graph
 
 # Companion files that sit next to a data step's script.
 COMPANION_SUFFIXES = [".meta.yml", ".countries.json", ".excluded_countries.json", ".corrections.yml"]
+# Snapshot schemes (private snapshots live in the same `snapshots/` tree).
+SNAPSHOT_SCHEMES = ("snapshot", "snapshot-private")
 # Pipeline order used to sort the chain.
 STAGES = ["snapshot", "meadow", "garden", "grapher"]
 # Consumers listed by name before the rest are only counted.
@@ -78,14 +80,14 @@ def stage_order(step: str) -> tuple[int, str]:
 def channel(step: str) -> str:
     """`snapshot`, `meadow`, `garden`, `grapher`, … — the scheme for snapshots, else the first path segment."""
     scheme, _, path = step.partition("://")
-    return scheme if scheme == "snapshot" else path.split("/")[0]
+    return "snapshot" if scheme in SNAPSHOT_SCHEMES else path.split("/")[0]
 
 
 def step_key(step: str) -> tuple[str, str, str] | None:
     """Return (namespace, version, short_name) of a step URI, or None if it doesn't have that shape."""
     scheme, _, path = step.partition("://")
     parts = path.split("/")
-    if scheme == "snapshot" and len(parts) == 3:
+    if scheme in SNAPSHOT_SCHEMES and len(parts) == 3:
         return parts[0], parts[1], parts[2].split(".")[0]
     if len(parts) == 4:
         return parts[1], parts[2], parts[3]
@@ -114,7 +116,7 @@ def find_upstream_members(
 def step_files(step: str) -> list[Path]:
     """Files on disk that define a step (script or package, plus companion files)."""
     scheme, _, path = step.partition("://")
-    if scheme == "snapshot":
+    if scheme in SNAPSHOT_SCHEMES:
         base = paths.SNAPSHOTS_DIR / path
         candidates = [base.with_name(base.name + ".dvc"), base.with_name(base.name.split(".")[0] + ".py")]
     elif scheme in ("data", "data-private"):
@@ -155,8 +157,9 @@ def print_step(step: str, dag: dict[str, set[str]], members: set[str]) -> None:
 def print_consumers(dag: dict[str, set[str]], members: set[str]) -> None:
     reverse = reverse_graph(dag)
     consumers = sorted({c for m in members for c in reverse.get(m, set())} - members)
+    note = "Charts built in the admin read the grapher dataset directly and are not counted here."
     if not consumers:
-        print("None — nothing else in the active DAG reads this dataset.")
+        print(f"No steps in the active DAG read this dataset. {note}")
         return
     by_kind: dict[str, int] = {}
     for consumer in consumers:
@@ -167,6 +170,7 @@ def print_consumers(dag: dict[str, set[str]], members: set[str]) -> None:
         print(f"- `{consumer}`")
     if len(consumers) > MAX_CONSUMERS:
         print(f"- … and {len(consumers) - MAX_CONSUMERS} more")
+    print(f"\n{note}")
 
 
 def print_history(dag: dict[str, set[str]], chain: list[str], namespace: str, version: str, short_name: str) -> None:
@@ -186,13 +190,15 @@ def print_history(dag: dict[str, set[str]], chain: list[str], namespace: str, ve
     garden_script = next((f for f in files if f.startswith(garden_dir)), files[0] if files else None)
     if garden_script and (paths.BASE_DIR / garden_script).is_dir():
         garden_script = f"{garden_script}/__init__.py"
+    older = sorted(v for v in versions_of(archived_steps(), namespace, short_name) if v < version)
     created = git_log(["-n1", "--diff-filter=A"], [garden_script] if garden_script else [])
-    print(f"- Garden step created (the last update): {created or '(not found)'}")
+    # Without an archived predecessor, the commit that created the garden step built the dataset, not updated it.
+    label = "the last update" if older else "first built — no earlier version, so this is its first update"
+    print(f"- Garden step created ({label}): {created or '(not found)'}")
     print("- Last commits touching the chain's files (often repo-wide sweeps, not updates):")
     for line in git_log([f"-n{N_COMMITS}"], files).splitlines() or ["(none found)"]:
         print(f"  - {line}")
 
-    older = sorted(v for v in versions_of(archived_steps(), namespace, short_name) if v < version)
     print(f"- Previous archived version: {older[-1] if older else '(none in dag/archive)'}")
 
     newer = sorted(v for v in versions_of(set(dag), namespace, short_name) if v > version)
@@ -203,12 +209,16 @@ def print_history(dag: dict[str, set[str]], chain: list[str], namespace: str, ve
 def git_log(options: list[str], files: list[str]) -> str:
     if not files:
         return ""
-    return subprocess.run(
+    result = subprocess.run(
         ["git", "log", *options, "--date=short", "--format=%h %ad %an — %s", "--", *files],
         capture_output=True,
         text=True,
         cwd=paths.BASE_DIR,
-    ).stdout.strip()
+    )
+    # An empty log must mean "no history", never "git could not read the history".
+    if result.returncode != 0:
+        raise RuntimeError(f"git log failed (exit {result.returncode}): {result.stderr.strip()}")
+    return result.stdout.strip()
 
 
 def versions_of(steps: set[str], namespace: str, short_name: str) -> set[str]:
