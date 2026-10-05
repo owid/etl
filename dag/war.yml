@@ -53,6 +53,13 @@ steps:
     - data://garden/countries/2024-08-27/gleditsch
   data://grapher/war/2026-06-10/ucdp:
     - data://garden/war/2026-06-10/ucdp
+  # UCDP: cumulative deaths since 1989, by conflict type
+  data://garden/war/2026-06-10/ucdp_cumulative:
+    - data://garden/war/2026-06-10/ucdp
+    - data://garden/countries/2024-08-27/gleditsch
+    - data://garden/demography/2024-07-15/population
+  data://grapher/war/2026-06-10/ucdp_cumulative:
+    - data://garden/war/2026-06-10/ucdp_cumulative
 
   # UCDP (+preview)
   viz://chart/war/latest/ucdp:

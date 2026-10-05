@@ -14,11 +14,9 @@ data update only, so the layout reproduces that frame: its size, its slot positi
 colors are copied from it (positions read with `get_metadata`, colors sampled from the published PNG).
 Positions below are in that frame's pixels, y measured from the top.
 
-Data: the cumulative numbers are the sum over 1989..latest year of UCDP's yearly "best" estimate of
-deaths in ongoing conflicts (`number_deaths_ongoing_conflicts`), the same quantity the grapher charts
-`cumulative-deaths-in-armed-conflicts*` publish. Summing the 2025-06-13 release over 1989-2024 reproduces
-those published charts exactly (World 3,929,873; every region and type matches), which is how the method
-was checked.
+Data: the cumulative deaths come from `garden/war/2026-06-10/ucdp_cumulative`, the dataset behind the
+grapher charts `cumulative-deaths-in-armed-conflicts*`, so the static and interactive charts show the same
+numbers. It sums UCDP's yearly best estimates of deaths in ongoing conflicts from 1989 to the latest year.
 
 Rounding follows the 2025 version: one decimal in millions at or above a million ("2.1m"), otherwise two
 significant figures in thousands ("750k").
@@ -105,19 +103,19 @@ REGIONS = [
     ("Europe (UCDP)", "Europe", "#7588ad", 569),
     ("Americas (UCDP)", "Americas", "#de9080", 703),
 ]
-# (key in the data, bold term, definition, color, legend x, legend text width)
+# (column in the data, bold term, definition, color, legend x, legend text width)
 TYPES = [
-    ("intrastate", "Intrastate conflicts:", "conflicts between a state and a non-state armed group.", "#985e62", 55, 215),
+    ("intrastate_deaths", "Intrastate conflicts:", "conflicts between a state and a non-state armed group.", "#985e62", 55, 215),
     (
-        "one-sided violence",
+        "onesided_deaths",
         "One-sided violence:",
         "use of force by a state or non-state armed group against civilians.",
         "#b88454",
         322,
         235,
     ),
-    ("non-state conflict", "Non-state conflicts:", "conflicts between non-state armed groups.", "#b6654a", 605, 223),
-    ("interstate", "Interstate conflicts:", "conflicts between states.", "#7588ad", 876, 223),
+    ("nonstate_deaths", "Non-state conflicts:", "conflicts between non-state armed groups.", "#b6654a", 605, 223),
+    ("interstate_deaths", "Interstate conflicts:", "conflicts between states.", "#7588ad", 876, 223),
 ]
 TOTAL_COLOR = "#d26d76"
 
@@ -148,20 +146,18 @@ TAGLINE_Y = 1077
 
 
 def run() -> None:
-    ds = paths.load_dataset("ucdp")
-    tb = ds.read("ucdp")
-
+    tb = paths.load_dataset("ucdp_cumulative").read("ucdp_cumulative")
+    assert tb["year"].nunique() == 1, "expected one row per entity, stamped with the latest year"
     last_year = int(tb["year"].max())
-    totals = cumulative_deaths(tb, last_year)
-    paths.log.info(f"Cumulative deaths {FIRST_YEAR}-{last_year}: {totals}")
+    tb = tb.set_index("country")
 
-    world = totals[("World", "all")]
-    regions = [totals[(key, "all")] for key, *_ in REGIONS]
-    types = [totals[("World", key)] for key, *_ in TYPES]
+    world = int(tb.loc["World", "all_deaths"])
+    regions = [int(tb.loc[key, "all_deaths"]) for key, *_ in REGIONS]
+    types = [int(tb.loc["World", column]) for column, *_ in TYPES]
+    paths.log.info(f"Cumulative deaths {FIRST_YEAR}-{last_year}: world {world}, regions {regions}, types {types}")
 
-    # Each bar must sum to the total. Extrasystemic conflicts are not shown, so they must be zero.
+    # Each bar must sum to the total.
     assert sum(regions) == world, f"regions sum to {sum(regions)}, world total is {world}"
-    assert totals[("World", "extrasystemic")] == 0, "extrasystemic deaths are not shown but are not zero"
     assert sum(types) == world, f"conflict types sum to {sum(types)}, world total is {world}"
 
     # The 2025 version ordered segments by size. Keep its order (and so its colors and legend), but say
@@ -176,29 +172,10 @@ def run() -> None:
     plt.close(fig)
 
 
-def cumulative_deaths(tb, last_year: int) -> dict[tuple[str, str], int]:
-    """Sum yearly deaths in ongoing conflicts over FIRST_YEAR..last_year, per region and conflict type."""
-    col = "number_deaths_ongoing_conflicts"
-    world = tb[(tb["country"] == "World") & (tb["conflict_type"] == "all")]
-    assert world.loc[world[col].notna(), "year"].min() == FIRST_YEAR, f"deaths data no longer starts in {FIRST_YEAR}"
-
-    entities = ["World"] + [key for key, *_ in REGIONS]
-    conflict_types = ["all", "extrasystemic"] + [key for key, *_ in TYPES]
-    tb = tb[(tb["year"] >= FIRST_YEAR) & (tb["year"] <= last_year)]
-    tb = tb[tb["country"].isin(entities) & tb["conflict_type"].isin(conflict_types)]
-
-    totals = {}
-    for (country, conflict_type), group in tb.groupby(["country", "conflict_type"], observed=True):
-        # Every year must be present: a missing year would silently shrink the cumulative total.
-        assert group["year"].nunique() == last_year - FIRST_YEAR + 1, f"missing years for {country}, {conflict_type}"
-        totals[(str(country), str(conflict_type))] = int(group[col].fillna(0).sum())
-    return totals
-
-
 def source_citation(tb) -> str:
     """Cite UCDP from the origins of the plotted indicator (it also carries the boundaries used for mapping)."""
     citations = []
-    for origin in tb["number_deaths_ongoing_conflicts"].metadata.origins:
+    for origin in tb["all_deaths"].metadata.origins:
         if origin.producer != "Uppsala Conflict Data Program":
             continue
         citations += [line.strip() for line in origin.citation_full.splitlines() if line.strip()]
@@ -245,7 +222,7 @@ def create_visualization(world: int, regions: list[int], types: list[int], last_
         draw_chip(fig, x, REGION_LEGEND_Y, color, gid=f"legend__{slug(label)}-chip")
         text(fig, x + CHIP + CHIP_GAP, REGION_LEGEND_Y - 1, 27, label, "legend", color=TITLE_COLOR, gid=f"legend__{slug(label)}")
     for key, term, definition, color, x, width in TYPES:
-        draw_chip(fig, x, TYPE_LEGEND_Y, color, gid=f"legend__{slug(key)}-chip")
+        draw_chip(fig, x, TYPE_LEGEND_Y, color, gid=f"legend__{slug(key.removesuffix('_deaths'))}-chip")
         lines = [term] + wrap(definition, SIZE["legend"], width)
         for i, line in enumerate(lines):
             text(
@@ -256,14 +233,14 @@ def create_visualization(world: int, regions: list[int], types: list[int], last_
                 line,
                 "legend",
                 color=TITLE_COLOR,
-                gid=f"legend__{slug(key)}-{i}",
+                gid=f"legend__{slug(key.removesuffix('_deaths'))}-{i}",
             )
         assert TYPE_LEGEND_Y + len(lines) * LEGEND_LINE_PX < BAR_TOPS["type"] - RULE_OVERHANG, f"{term} legend runs into the bar"
 
     # Bars.
     draw_bar(fig, "total", [("all", "World", TOTAL_COLOR, world)], world, unit_at="end")
     draw_bar(fig, "region", [(slug(lbl), lbl, c, v) for (_, lbl, c, _), v in zip(REGIONS, regions)], world)
-    draw_bar(fig, "type", [(slug(k), k, c, v) for (k, _, _, c, _, _), v in zip(TYPES, types)], world)
+    draw_bar(fig, "type", [(slug(k.removesuffix("_deaths")), k, c, v) for (k, _, _, c, _, _), v in zip(TYPES, types)], world)
 
     draw_footer(fig, citation)
     return fig

@@ -71,7 +71,7 @@ L 39.6 514.08
 z
 " style="fill: #985e62"/>
   </g>
-  <g id="legend__one-sided-violence-chip">
+  <g id="legend__onesided-chip">
    <path d="M 231.84 532.08 
 L 249.84 532.08 
 L 249.84 514.08 
@@ -79,7 +79,7 @@ L 231.84 514.08
 z
 " style="fill: #b88454"/>
   </g>
-  <g id="legend__non-state-conflict-chip">
+  <g id="legend__nonstate-chip">
    <path d="M 435.6 532.08 
 L 453.6 532.08 
 L 453.6 514.08 
@@ -151,7 +151,7 @@ L 38.88 599.04
 z
 " style="fill: #985e62"/>
   </g>
-  <g id="bar__type-one-sided-violence">
+  <g id="bar__type-onesided">
    <path d="M 424.91167 690.48 
 L 662.300217 690.48 
 L 662.300217 599.04 
@@ -159,7 +159,7 @@ L 424.91167 599.04
 z
 " style="fill: #b88454"/>
   </g>
-  <g id="bar__type-non-state-conflict">
+  <g id="bar__type-nonstate">
    <path d="M 662.300217 690.48 
 L 737.489844 690.48 
 L 737.489844 599.04 
@@ -238,25 +238,25 @@ L 38.16 701.28
   <g id="legend__intrastate-3">
    <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="65.52" y="581.856244" transform="rotate(-0 65.52 581.856244)">group.</text>
   </g>
-  <g id="legend__one-sided-violence-0">
+  <g id="legend__onesided-0">
    <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="257.76" y="527.856244" transform="rotate(-0 257.76 527.856244)">One-sided violence:</text>
   </g>
-  <g id="legend__one-sided-violence-1">
+  <g id="legend__onesided-1">
    <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="257.76" y="545.856244" transform="rotate(-0 257.76 545.856244)">use of force by a state or</text>
   </g>
-  <g id="legend__one-sided-violence-2">
+  <g id="legend__onesided-2">
    <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="257.76" y="563.856244" transform="rotate(-0 257.76 563.856244)">non-state armed group</text>
   </g>
-  <g id="legend__one-sided-violence-3">
+  <g id="legend__onesided-3">
    <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="257.76" y="581.856244" transform="rotate(-0 257.76 581.856244)">against civilians.</text>
   </g>
-  <g id="legend__non-state-conflict-0">
+  <g id="legend__nonstate-0">
    <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="461.52" y="527.856244" transform="rotate(-0 461.52 527.856244)">Non-state conflicts:</text>
   </g>
-  <g id="legend__non-state-conflict-1">
+  <g id="legend__nonstate-1">
    <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="461.52" y="545.856244" transform="rotate(-0 461.52 545.856244)">conflicts between</text>
   </g>
-  <g id="legend__non-state-conflict-2">
+  <g id="legend__nonstate-2">
    <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="461.52" y="563.856244" transform="rotate(-0 461.52 563.856244)">non-state armed groups.</text>
   </g>
   <g id="legend__interstate-0">
@@ -286,10 +286,10 @@ L 38.16 701.28
   <g id="label__type-intrastate">
    <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="56.16" y="650.039006" transform="rotate(-0 56.16 650.039006)">2.1m deaths</text>
   </g>
-  <g id="label__type-one-sided-violence">
+  <g id="label__type-onesided">
    <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="437.87167" y="650.039006" transform="rotate(-0 437.87167 650.039006)">1.3m</text>
   </g>
-  <g id="label__type-non-state-conflict">
+  <g id="label__type-nonstate">
    <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="675.260217" y="650.039006" transform="rotate(-0 675.260217 650.039006)">400k</text>
   </g>
   <g id="label__type-interstate">

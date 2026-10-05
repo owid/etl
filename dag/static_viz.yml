@@ -25,4 +25,4 @@ steps:
 
   # Deaths in armed conflicts since the end of the Cold War, by world region and conflict type (UCDP)
   viz://static/war/2026-10-05/deaths_in_armed_conflicts_since_cold_war:
-    - data://garden/war/2026-06-10/ucdp
+    - data://garden/war/2026-06-10/ucdp_cumulative
