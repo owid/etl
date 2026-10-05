@@ -6,8 +6,8 @@ Lists, from the active DAG and the files on disk:
      helper gardens like `income_groups_aggregations`);
   2. each step's files and its inputs from outside the chain (population, regions, other datasets);
   3. the direct consumers outside the chain (other data steps, viz://, export://);
-  4. history: garden `dataset.owners`, the last commits touching the chain's files, the previous archived
-     version, and any newer active version.
+  4. history: garden `dataset.owners`, the last commits touching the chain's files, the previous version
+     (archived, or still active during an update), and any newer active version.
 
 It reports structure only — Claude still reads the step code to explain what each step does.
 
@@ -190,16 +190,24 @@ def print_history(dag: dict[str, set[str]], chain: list[str], namespace: str, ve
     garden_script = next((f for f in files if f.startswith(garden_dir)), files[0] if files else None)
     if garden_script and (paths.BASE_DIR / garden_script).is_dir():
         garden_script = f"{garden_script}/__init__.py"
-    older = sorted(v for v in versions_of(archived_steps(), namespace, short_name) if v < version)
+    archived = {v for v in versions_of(archived_steps(), namespace, short_name) if v < version}
+    # The old version stays active until the update archives it, so active older gardens count as predecessors too.
+    active_gardens = {s for s in graph_nodes(dag) if channel(s) == "garden" and s not in chain}
+    active = {v for v in versions_of(active_gardens, namespace, short_name) if v < version}
+    older = sorted(archived | active)
     created = git_log(["-n1", "--diff-filter=A"], [garden_script] if garden_script else [])
-    # Without an archived predecessor, the commit that created the garden step built the dataset, not updated it.
+    # Without a predecessor, the commit that created the garden step built the dataset, not updated it.
     label = "the last update" if older else "first built — no earlier version, so this is its first update"
     print(f"- Garden step created ({label}): {created or '(not found)'}")
     print("- Last commits touching the chain's files (often repo-wide sweeps, not updates):")
     for line in git_log([f"-n{N_COMMITS}"], files).splitlines() or ["(none found)"]:
         print(f"  - {line}")
 
-    print(f"- Previous archived version: {older[-1] if older else '(none in dag/archive)'}")
+    if older:
+        state = "still active" if older[-1] in active else "archived"
+        print(f"- Previous version: {older[-1]} ({state})")
+    else:
+        print("- Previous version: (none, active or in dag/archive)")
 
     newer = sorted(v for v in versions_of(set(dag), namespace, short_name) if v > version)
     if newer:
