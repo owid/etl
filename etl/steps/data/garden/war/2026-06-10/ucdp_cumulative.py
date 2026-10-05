@@ -61,9 +61,7 @@ def run() -> None:
     #
     # Save outputs.
     #
-    ds_garden = paths.create_dataset(
-        tables=[tb], yaml_params={"first_year": FIRST_YEAR, "last_year": last_year}
-    )
+    ds_garden = paths.create_dataset(tables=[tb], yaml_params={"first_year": FIRST_YEAR, "last_year": last_year})
     ds_garden.save()
 
 

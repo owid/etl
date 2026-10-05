@@ -45,8 +45,10 @@ matplotlib.rcParams["font.family"] = "sans-serif"
 matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
 _OPTIONAL_FACES = tuple({*EMITTED_FONT_STACK, *MEASURED_FONT_STACK})
 logging.getLogger("matplotlib.font_manager").addFilter(
-    lambda record: "Falling back" in record.getMessage()
-    or not any(f"Font family '{face}' not found" in record.getMessage() for face in _OPTIONAL_FACES)
+    lambda record: (
+        "Falling back" in record.getMessage()
+        or not any(f"Font family '{face}' not found" in record.getMessage() for face in _OPTIONAL_FACES)
+    )
 )
 _DRAWN_FACE = findfont(FontProperties(family=EMITTED_FONT_STACK))
 _MEASURED_FACE = findfont(FontProperties(family=MEASURED_FONT_STACK))
@@ -105,7 +107,14 @@ REGIONS = [
 ]
 # (column in the data, bold term, definition, color, legend x, legend text width)
 TYPES = [
-    ("intrastate_deaths", "Intrastate conflicts:", "conflicts between a state and a non-state armed group.", "#985e62", 55, 215),
+    (
+        "intrastate_deaths",
+        "Intrastate conflicts:",
+        "conflicts between a state and a non-state armed group.",
+        "#985e62",
+        55,
+        215,
+    ),
     (
         "onesided_deaths",
         "One-sided violence:",
@@ -220,7 +229,16 @@ def create_visualization(world: int, regions: list[int], types: list[int], last_
     # Legends.
     for key, label, color, x in [(k, lbl, c, x) for k, lbl, c, x in REGIONS]:
         draw_chip(fig, x, REGION_LEGEND_Y, color, gid=f"legend__{slug(label)}-chip")
-        text(fig, x + CHIP + CHIP_GAP, REGION_LEGEND_Y - 1, 27, label, "legend", color=TITLE_COLOR, gid=f"legend__{slug(label)}")
+        text(
+            fig,
+            x + CHIP + CHIP_GAP,
+            REGION_LEGEND_Y - 1,
+            27,
+            label,
+            "legend",
+            color=TITLE_COLOR,
+            gid=f"legend__{slug(label)}",
+        )
     for key, term, definition, color, x, width in TYPES:
         draw_chip(fig, x, TYPE_LEGEND_Y, color, gid=f"legend__{slug(key.removesuffix('_deaths'))}-chip")
         lines = [term] + wrap(definition, SIZE["legend"], width)
@@ -235,12 +253,16 @@ def create_visualization(world: int, regions: list[int], types: list[int], last_
                 color=TITLE_COLOR,
                 gid=f"legend__{slug(key.removesuffix('_deaths'))}-{i}",
             )
-        assert TYPE_LEGEND_Y + len(lines) * LEGEND_LINE_PX < BAR_TOPS["type"] - RULE_OVERHANG, f"{term} legend runs into the bar"
+        assert TYPE_LEGEND_Y + len(lines) * LEGEND_LINE_PX < BAR_TOPS["type"] - RULE_OVERHANG, (
+            f"{term} legend runs into the bar"
+        )
 
     # Bars.
     draw_bar(fig, "total", [("all", "World", TOTAL_COLOR, world)], world, unit_at="end")
     draw_bar(fig, "region", [(slug(lbl), lbl, c, v) for (_, lbl, c, _), v in zip(REGIONS, regions)], world)
-    draw_bar(fig, "type", [(slug(k.removesuffix("_deaths")), k, c, v) for (k, _, _, c, _, _), v in zip(TYPES, types)], world)
+    draw_bar(
+        fig, "type", [(slug(k.removesuffix("_deaths")), k, c, v) for (k, _, _, c, _, _), v in zip(TYPES, types)], world
+    )
 
     draw_footer(fig, citation)
     return fig
@@ -313,7 +335,13 @@ def draw_footer(fig, citation: str) -> None:
         runs_row(fig, MARGIN, SOURCE_Y + i * FOOTER_LINE_PX, runs, gid=f"footer__source-{i}")
     assert SOURCE_Y + len(lines) * FOOTER_LINE_PX <= TAGLINE_Y, "Source runs into the tagline row"
 
-    runs_row(fig, MARGIN, TAGLINE_Y, [("OurWorldinData.org ", True), (TAGLINE.split(" ", 1)[1], False)], gid="footer__tagline")
+    runs_row(
+        fig,
+        MARGIN,
+        TAGLINE_Y,
+        [("OurWorldinData.org ", True), (TAGLINE.split(" ", 1)[1], False)],
+        gid="footer__tagline",
+    )
     license_text = f"Licensed under CC-BY by the authors {' and '.join(AUTHORS)}"
     fig.text(
         fx(FRAME_W - MARGIN),
