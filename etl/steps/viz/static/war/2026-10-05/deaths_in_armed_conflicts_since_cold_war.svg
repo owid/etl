@@ -191,133 +191,139 @@ L 38.16 701.28
 " style="fill: none; stroke: #2d2e2d; stroke-width: 0.72; stroke-linecap: square"/>
   </g>
   <g id="title">
-   <text style="font-size: 24.48px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="17.28" y="43.106963" transform="rotate(-0 17.28 43.106963)">Deaths in armed conflicts since the end of the Cold War</text>
+   <text style="font-size: 28.8px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="17.28" y="44.61525" transform="rotate(-0 17.28 44.61525)">Deaths in armed conflicts since the end of the Cold War</text>
   </g>
   <g id="subtitle-0">
-   <text style="font-size: 14.4px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="17.28" y="74.147625" transform="rotate(-0 17.28 74.147625)">Number of combatants and civilians who died due to fighting in armed conflicts between 1989 and 2025.</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="17.28" y="74.650387" transform="rotate(-0 17.28 74.650387)">Number of combatants and civilians who died due to fighting in armed conflicts between 1989 and 2025.</text>
   </g>
   <g id="subtitle-1">
-   <text style="font-size: 14.4px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="17.28" y="92.867625" transform="rotate(-0 17.28 92.867625)">This excludes deaths due to disease and starvation, which can make the death tolls much larger.</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="17.28" y="93.370387" transform="rotate(-0 17.28 93.370387)">This excludes deaths due to disease and starvation, which can make the death tolls much larger.</text>
   </g>
   <g id="section__total">
-   <text style="font-weight: 700; font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="38.16" y="138.010387" transform="rotate(-0 38.16 138.010387)">Total deaths from all armed conflicts</text>
+   <text style="font-weight: 700; font-size: 18.72px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="38.16" y="139.015913" transform="rotate(-0 38.16 139.015913)">Total deaths from all armed conflicts</text>
   </g>
   <g id="section__region">
-   <text style="font-weight: 700; font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="38.16" y="291.370387" transform="rotate(-0 38.16 291.370387)">Deaths in armed conflicts by world region</text>
+   <text style="font-weight: 700; font-size: 18.72px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="38.16" y="292.375912" transform="rotate(-0 38.16 292.375912)">Deaths in armed conflicts by world region</text>
   </g>
   <g id="section__region-sub">
-   <text style="font-size: 14.4px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="38.16" y="312.467625" transform="rotate(-0 38.16 312.467625)">Deaths are based on where they occurred, not what the person’s nationality was.</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="38.16" y="312.970387" transform="rotate(-0 38.16 312.970387)">Deaths are based on where they occurred, not what the person’s nationality was.</text>
   </g>
   <g id="section__type">
-   <text style="font-weight: 700; font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="38.16" y="495.850387" transform="rotate(-0 38.16 495.850387)">Deaths in armed conflicts by conflict type</text>
+   <text style="font-weight: 700; font-size: 18.72px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="38.16" y="496.855912" transform="rotate(-0 38.16 496.855912)">Deaths in armed conflicts by conflict type</text>
   </g>
   <g id="legend__africa">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="64.08" y="340.656244" transform="rotate(-0 64.08 340.656244)">Africa</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="64.08" y="341.410387" transform="rotate(-0 64.08 341.410387)">Africa</text>
   </g>
   <g id="legend__middle-east">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="152.64" y="340.656244" transform="rotate(-0 152.64 340.656244)">Middle East</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="152.64" y="341.410387" transform="rotate(-0 152.64 341.410387)">Middle East</text>
   </g>
   <g id="legend__asia-oceania">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="282.24" y="340.656244" transform="rotate(-0 282.24 340.656244)">Asia &amp; Oceania</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="282.24" y="341.410387" transform="rotate(-0 282.24 341.410387)">Asia &amp; Oceania</text>
   </g>
   <g id="legend__europe">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="435.6" y="340.656244" transform="rotate(-0 435.6 340.656244)">Europe</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="435.6" y="341.410387" transform="rotate(-0 435.6 341.410387)">Europe</text>
   </g>
   <g id="legend__americas">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="532.08" y="340.656244" transform="rotate(-0 532.08 340.656244)">Americas</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="532.08" y="341.410387" transform="rotate(-0 532.08 341.410387)">Americas</text>
   </g>
   <g id="legend__intrastate-0">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="65.52" y="527.856244" transform="rotate(-0 65.52 527.856244)">Intrastate conflicts:</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="65.52" y="529.114388" transform="rotate(-0 65.52 529.114388)">Intrastate conflicts:</text>
   </g>
   <g id="legend__intrastate-1">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="65.52" y="545.856244" transform="rotate(-0 65.52 545.856244)">conflicts between a state</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="65.52" y="548.122388" transform="rotate(-0 65.52 548.122388)">conflicts between a</text>
   </g>
   <g id="legend__intrastate-2">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="65.52" y="563.856244" transform="rotate(-0 65.52 563.856244)">and a non-state armed</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="65.52" y="567.130387" transform="rotate(-0 65.52 567.130387)">state and a non-state</text>
   </g>
   <g id="legend__intrastate-3">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="65.52" y="581.856244" transform="rotate(-0 65.52 581.856244)">group.</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="65.52" y="586.138387" transform="rotate(-0 65.52 586.138387)">armed group.</text>
   </g>
   <g id="legend__onesided-0">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="257.76" y="527.856244" transform="rotate(-0 257.76 527.856244)">One-sided violence:</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="257.76" y="529.114388" transform="rotate(-0 257.76 529.114388)">One-sided violence:</text>
   </g>
   <g id="legend__onesided-1">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="257.76" y="545.856244" transform="rotate(-0 257.76 545.856244)">use of force by a state or</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="257.76" y="548.122388" transform="rotate(-0 257.76 548.122388)">use of force by a state</text>
   </g>
   <g id="legend__onesided-2">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="257.76" y="563.856244" transform="rotate(-0 257.76 563.856244)">non-state armed group</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="257.76" y="567.130387" transform="rotate(-0 257.76 567.130387)">or non-state armed</text>
   </g>
   <g id="legend__onesided-3">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="257.76" y="581.856244" transform="rotate(-0 257.76 581.856244)">against civilians.</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="257.76" y="586.138387" transform="rotate(-0 257.76 586.138387)">group against civilians.</text>
   </g>
   <g id="legend__interstate-0">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="461.52" y="527.856244" transform="rotate(-0 461.52 527.856244)">Interstate conflicts:</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="461.52" y="529.114388" transform="rotate(-0 461.52 529.114388)">Interstate conflicts:</text>
   </g>
   <g id="legend__interstate-1">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="461.52" y="545.856244" transform="rotate(-0 461.52 545.856244)">conflicts between states.</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="461.52" y="548.122388" transform="rotate(-0 461.52 548.122388)">conflicts between</text>
+  </g>
+  <g id="legend__interstate-2">
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="461.52" y="567.130387" transform="rotate(-0 461.52 567.130387)">states.</text>
   </g>
   <g id="legend__nonstate-0">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="656.64" y="527.856244" transform="rotate(-0 656.64 527.856244)">Non-state conflicts:</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="656.64" y="529.114388" transform="rotate(-0 656.64 529.114388)">Non-state conflicts:</text>
   </g>
   <g id="legend__nonstate-1">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="656.64" y="545.856244" transform="rotate(-0 656.64 545.856244)">conflicts between</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="656.64" y="548.122388" transform="rotate(-0 656.64 548.122388)">conflicts between</text>
   </g>
   <g id="legend__nonstate-2">
-   <text style="font-size: 13.68px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="656.64" y="563.856244" transform="rotate(-0 656.64 563.856244)">non-state armed groups.</text>
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="656.64" y="567.130387" transform="rotate(-0 656.64 567.130387)">non-state armed</text>
+  </g>
+  <g id="legend__nonstate-3">
+   <text style="font-size: 15.84px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="656.64" y="586.138387" transform="rotate(-0 656.64 586.138387)">groups.</text>
   </g>
   <g id="label__total-all">
-   <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #ffffff" x="817.92" y="213.719006" transform="rotate(-0 817.92 213.719006)">4.2m deaths</text>
+   <text style="font-size: 18.72px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #ffffff" x="817.92" y="214.975912" transform="rotate(-0 817.92 214.975912)">4.2m deaths</text>
   </g>
   <g id="label__region-africa">
-   <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="56.16" y="419.639006" transform="rotate(-0 56.16 419.639006)">2.1m deaths</text>
+   <text style="font-size: 18.72px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="56.16" y="420.895912" transform="rotate(-0 56.16 420.895912)">2.1m deaths</text>
   </g>
   <g id="label__region-middle-east">
-   <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="454.663468" y="419.639006" transform="rotate(-0 454.663468 419.639006)">750k</text>
+   <text style="font-size: 18.72px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="454.663468" y="420.895912" transform="rotate(-0 454.663468 420.895912)">750k</text>
   </g>
   <g id="label__region-asia-oceania">
-   <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="594.721048" y="419.639006" transform="rotate(-0 594.721048 419.639006)">590k</text>
+   <text style="font-size: 18.72px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="594.721048" y="420.895912" transform="rotate(-0 594.721048 420.895912)">590k</text>
   </g>
   <g id="label__region-europe">
-   <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="706.031648" y="419.639006" transform="rotate(-0 706.031648 419.639006)">500k</text>
+   <text style="font-size: 18.72px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="706.031648" y="420.895912" transform="rotate(-0 706.031648 420.895912)">500k</text>
   </g>
   <g id="label__region-americas">
-   <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #de9080" x="838.08" y="419.639006" transform="rotate(-0 838.08 419.639006)">250k</text>
+   <text style="font-size: 18.72px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #de9080" x="838.08" y="420.895912" transform="rotate(-0 838.08 420.895912)">250k</text>
   </g>
   <g id="label__type-intrastate">
-   <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="56.16" y="650.039006" transform="rotate(-0 56.16 650.039006)">2.1m deaths</text>
+   <text style="font-size: 18.72px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="56.16" y="651.295912" transform="rotate(-0 56.16 651.295912)">2.1m deaths</text>
   </g>
   <g id="label__type-onesided">
-   <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="437.87167" y="650.039006" transform="rotate(-0 437.87167 650.039006)">1.3m</text>
+   <text style="font-size: 18.72px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="437.87167" y="651.295912" transform="rotate(-0 437.87167 651.295912)">1.3m</text>
   </g>
   <g id="label__type-interstate">
-   <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="675.260217" y="650.039006" transform="rotate(-0 675.260217 650.039006)">510k</text>
+   <text style="font-size: 18.72px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="675.260217" y="651.295912" transform="rotate(-0 675.260217 651.295912)">510k</text>
   </g>
   <g id="label__type-nonstate">
-   <text style="font-size: 15.12px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="771.530373" y="650.039006" transform="rotate(-0 771.530373 650.039006)">400k</text>
+   <text style="font-size: 18.72px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #ffffff" x="771.530373" y="651.295912" transform="rotate(-0 771.530373 651.295912)">400k</text>
   </g>
   <g id="footer__note-0">
-   <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="17.28" y="731.575912" transform="rotate(-0 17.28 731.575912)">Note:</text>
+   <text style="font-weight: 700; font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="17.28" y="732.078675" transform="rotate(-0 17.28 732.078675)">Note:</text>
   </g>
   <g id="footer__note-1">
-   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="43.884703" y="731.575912" transform="rotate(-0 43.884703 731.575912)">An armed conflict is defined here as a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year.</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="45.931219" y="732.078675" transform="rotate(-0 45.931219 732.078675)">An armed conflict is defined here as a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year.</text>
   </g>
   <g id="footer__source-0-0">
-   <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="17.28" y="750.295912" transform="rotate(-0 17.28 750.295912)">Source:</text>
+   <text style="font-weight: 700; font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="17.28" y="750.798675" transform="rotate(-0 17.28 750.798675)">Source:</text>
   </g>
   <g id="footer__source-0-1">
-   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="55.173741" y="750.295912" transform="rotate(-0 55.173741 750.295912)">Sundberg, Ralph, and Erik Melander, 2013, Introducing the UCDP Georeferenced Event Dataset. Journal of Peace Research 50(4): 523-532; Davies, Shawn, Therése Pettersson, and Magnus Öberg.</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="58.088644" y="750.798675" transform="rotate(-0 58.088644 750.798675)">Sundberg, Ralph, and Erik Melander, 2013, Introducing the UCDP Georeferenced Event Dataset. Journal of Peace Research 50(4): 523-532; Davies, Shawn, Therése Pettersson, and</text>
   </g>
   <g id="footer__source-1-0">
-   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="17.28" y="763.255913" transform="rotate(-0 17.28 763.255913)">2026. Organized violence 1989-2025, and violent political protests. Journal of Peace Research 63(4): 705-723.</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="17.28" y="763.758675" transform="rotate(-0 17.28 763.758675)">Magnus Öberg. 2026. Organized violence 1989-2025, and violent political protests. Journal of Peace Research 63(4): 705-723.</text>
   </g>
   <g id="footer__tagline-0">
-   <text style="font-weight: 700; font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="17.28" y="781.975912" transform="rotate(-0 17.28 781.975912)">OurWorldinData.org</text>
+   <text style="font-weight: 700; font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="17.28" y="782.478675" transform="rotate(-0 17.28 782.478675)">OurWorldinData.org</text>
   </g>
   <g id="footer__tagline-1">
-   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="109.482216" y="781.975912" transform="rotate(-0 109.482216 781.975912)">— Research and data to make progress against the world's largest problems.</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: start; fill: #858585" x="116.574694" y="782.478675" transform="rotate(-0 116.574694 782.478675)">— Research and data to make progress against the world's largest problems.</text>
   </g>
   <g id="footer__license">
-   <text style="font-size: 9.36px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #858585" x="888.48" y="781.975912" transform="rotate(-0 888.48 781.975912)">Licensed under CC-BY by the authors Bastian Herre and Klara Auerbach</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', 'Liberation Sans', sans-serif; text-anchor: end; fill: #858585" x="888.48" y="782.478675" transform="rotate(-0 888.48 782.478675)">Licensed under CC-BY by the authors Bastian Herre and Klara Auerbach</text>
   </g>
  </g>
 </svg>

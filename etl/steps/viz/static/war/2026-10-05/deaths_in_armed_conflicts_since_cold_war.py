@@ -71,15 +71,15 @@ RULE_X, RULE_OVERHANG = 53, 15
 # Value labels: padding inside a segment; the first label of a bar carries the unit.
 VALUE_PAD_FIRST, VALUE_PAD = 24, 18
 
-# Text sizes in frame px, read off the 2025 frame's text-node heights.
+# Text sizes in frame px, read off the 2025 frame's text nodes with `use_figma` (font sizes, not node heights).
 SIZE = {
-    "title": 34,
-    "subtitle": 20,
-    "section": 22,
-    "section_sub": 20,
-    "legend": 19,
-    "value": 21,
-    "footer": 13,
+    "title": 40,
+    "subtitle": 22,
+    "section": 26,
+    "section_sub": 22,
+    "legend": 22,
+    "value": 26,
+    "footer": 14,
 }
 
 TITLE_COLOR = "#2d2e2d"
@@ -143,7 +143,7 @@ REGION_LEGEND_Y = 454
 TYPE_LEGEND_Y = 714
 CHIP = 25
 CHIP_GAP = 11
-LEGEND_LINE_PX = 25
+LEGEND_LINE_PX = 26.4  # Lato's auto line height at 22px, as in the 2025 frame
 
 # Header and footer.
 TITLE_Y = 24
@@ -267,9 +267,8 @@ def create_visualization(world: int, regions: list[int], types: list[int], last_
                 color=TITLE_COLOR,
                 gid=f"legend__{slug(key.removesuffix('_deaths'))}-{i}",
             )
-        assert TYPE_LEGEND_Y + len(lines) * LEGEND_LINE_PX < BAR_TOPS["type"] - RULE_OVERHANG, (
-            f"{term} legend runs into the bar"
-        )
+        # As in the 2025 frame, the legend may reach the top of the rule, but not the bar itself.
+        assert TYPE_LEGEND_Y + len(lines) * LEGEND_LINE_PX < BAR_TOPS["type"], f"{term} legend runs into the bar"
 
     # Bars.
     draw_bar(fig, "total", [("all", "World", TOTAL_COLOR, world)], world, unit_at="end")
