@@ -15,6 +15,7 @@ dataset:
 
   owners:
     - Fiona Spooner
+    - Lucas Rodés-Guirao
 tables:
   mortality_database_cancer:
     variables:
@@ -58,6 +59,10 @@ tables:
         description_short: Reported deaths from << cause.lower() >> per 100,000 people in << sex.lower() >> aged << age_group.lower() >>.
         description_key: ["The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>."]
         unit: deaths per 100,000 people
+        description_processing: |-
+          <% if age_group == "<5 years" or age_group == "<10 years" %>
+          WHO does not publish a death rate for this combined age group. We add up the deaths it reports for each of the underlying age groups, and divide by the population WHO itself used as the denominator, which we recover from its reported death counts and rates for all causes combined. Where that population cannot be recovered for every underlying age group, we leave the rate missing rather than reporting it as zero.
+          <%- endif -%>
         display:
           numDecimalPlaces: 1
         presentation:
