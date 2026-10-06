@@ -20,12 +20,13 @@ tables:
         title: Total democracy score
         unit: ""
         description_short: |-
-          Freedom House's total democracy score is a 0-to-100 aggregate that adds up a country's points on 25 indicators of political rights (max 40) and civil liberties (max 60), creating a single snapshot of the freedoms people actually enjoy.
+          Freedom House’s freedom score captures the extent of free and fair elections, political pluralism and participation, a functioning government, freedom of expression and association, the rule of law, and personal autonomy. Higher scores indicate more freedom.
 
         description_key:
-          - It distills a detailed checklist—10 political-rights and 15 civil-liberties questions—into one intuitive figure, making complex governance data easy to grasp.
-          - The number is the gateway to Freedom House's headline categories Free, Partly Free, Not Free, so a small point swing can shift a country's global status.
-          - "Scores are re-evaluated each year: analysts adjust points only when real-world events warrant, allowing the metric to flag both rapid crackdowns and gradual reforms."
+          - This score, produced by Freedom House, is useful if you are interested in big and small differences in freedom, want scores for almost all countries, and prefer a definition of democracy that especially focuses on political and civil freedoms. For data that focuses on big differences in political systems or has a narrower or broader understanding of democracy, other sources will be more useful. You can explore these alternatives in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy?Dataset=Varieties+of+Democracy&Metric=Electoral+democracy&Sub-metric=Main+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
+          - The score is based mainly on assessments by Freedom House’s country and regional experts, and its own researchers.
+          - It is made up of 10 indicators of political rights (up to 40 points) and 15 indicators of civil liberties (up to 60 points).
+          - The score is used by Freedom House to classify countries as [not free, partly free, or free](https://ourworldindata.org/grapher/political-regime-fh).
         presentation:
           grapher_config:
             title: Freedom Score

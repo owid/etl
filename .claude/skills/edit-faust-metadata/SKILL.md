@@ -114,6 +114,22 @@ Three routes:
 Match the file's own authoring pattern before writing a single sentence — your diff should look like the rest of the file.
 
 - **A file that keeps its text in `definitions:` gets the new text there too, never inline under the variable.** When the `.meta.yml` declares its sentences as `definitions:` entries (anchors and/or Jinja `<% if dim == … %>` branches) and the variables reference them as `{definitions.<key>}`, add new text as new definitions **at the top of the file, next to the related definitions**, and reference them from the variable. Inline prose parses and renders fine, so nothing fails — it just leaves the file with two authoring styles and the text unreusable and un-Jinja-able. **The bigger the dataset, the more this matters:** in a `.meta.yml` with hundreds of variables, definitions-at-top is what keeps the file readable — all the prose lives in one place a reviewer can read end to end, and the variable blocks stay skimmable as short lists of references instead of walls of text. Default to it even for text used by a single variable. Slot each key where the definitions order already puts its neighbors (these files usually track table order), name it in the file's convention (`description_key_<topic>`), and keep the reference list's order so bullet order doesn't move. In a `|-` block scalar keep each bullet on one long line — a wrapped line inserts a real newline into the rendered text.
+- **Conditionals go in `definitions:` too, written condition-first over several lines; the variable only calls them by name.** When a bullet or field has to pick between texts by dimension, don't write `- "<% if sex == 'total' %>{definitions.a}<% else %>{definitions.b}<% endif %>"` under the variable. Add a definition next to the two texts it chooses between, named after the choice. Put each tag and each branch on its own line, and reference it from the variable:
+
+  ```yaml
+  definitions:
+    description_key_gni_per_capita_total_or_by_sex: |-
+      <% if sex == 'total' %>
+      {definitions.description_key_gni_per_capita}
+      <%- else %>
+      {definitions.description_key_gni_per_capita_by_sex}
+      <%- endif %>
+  # … under the variable:
+          description_key:
+            - "{definitions.description_key_gni_per_capita_total_or_by_sex}"
+  ```
+
+  It renders identically to the one-line form, because `trim_blocks`/`lstrip_blocks` and the final strip remove the tag lines. Dash the closing tags (`<%- elif %>`, `<%- else %>`, `<%- endif %>`) but not the opening `<% if %>`. Without the dash, the newline ending each branch survives whenever the definition is spliced into a longer string. Keep inline only the conditionals that sit inside a sentence or a title (`… per capita<% if sex != "total" %> (<<sex>>)<% endif %>`), where a line break would leak into the text. The full rule is in `.claude/skills/generate-metadata/SKILL.md` ("Write Jinja conditionals in `definitions:`"). Confirm with the per-dimension render below that the restructured bullet is byte-identical for every value.
 - **Before adding a definition, grep the existing ones for text that already says the same thing.** New text often duplicates a bullet the file already carries under a different name (a source/comparability caveat, a classification note) and that other indicators already reference. Reuse beats near-duplication, and there are two ways to get it — put both to the user, don't pick silently:
   - reference the existing key from the new variable (the new wording is dropped); or
   - keep the new, better wording but place it **under the existing key's name**, replacing that key's text.

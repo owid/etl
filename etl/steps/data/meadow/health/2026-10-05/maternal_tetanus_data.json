@@ -1,0 +1,415 @@
+[
+  {
+    "country": "Afghanistan",
+    "iso3": "AFG",
+    "elimination_status": "Not eliminated",
+    "elimination_year": null,
+    "source": "https://www.who.int/initiatives/maternal-and-neonatal-tetanus-elimination-(mnte)/progress-towards-global-mnt-elimination"
+  },
+  {
+    "country": "Angola",
+    "iso3": "AGO",
+    "elimination_status": "Not eliminated",
+    "elimination_year": null,
+    "source": "https://www.who.int/initiatives/maternal-and-neonatal-tetanus-elimination-(mnte)/progress-towards-global-mnt-elimination"
+  },
+  {
+    "country": "Bangladesh",
+    "iso3": "BGD",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2008,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Benin",
+    "iso3": "BEN",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2010,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Burkina Faso",
+    "iso3": "BFA",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2012,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Myanmar",
+    "iso3": "MMR",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2010,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Burundi",
+    "iso3": "BDI",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2009,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Cambodia",
+    "iso3": "KHM",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2015,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Cameroon",
+    "iso3": "CMR",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2012,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Central African Republic",
+    "iso3": "CAF",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2026,
+    "source": "https://www.who.int/initiatives/maternal-and-neonatal-tetanus-elimination-(mnte)/progress-towards-global-mnt-elimination; https://www.linkedin.com/posts/unicef-car_good-news-for-the-central-african-republic-activity-7507709040203001857-dMit/"
+  },
+  {
+    "country": "Chad",
+    "iso3": "TCD",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2019,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "China",
+    "iso3": "CHN",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2012,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Comoros",
+    "iso3": "COM",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2009,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Congo",
+    "iso3": "COG",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2009,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Cote d'Ivoire",
+    "iso3": "CIV",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2013,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Democratic Republic of Congo",
+    "iso3": "COD",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2019,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Egypt",
+    "iso3": "EGY",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2007,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Equatorial Guinea",
+    "iso3": "GNQ",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2016,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Eritrea",
+    "iso3": "ERI",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2003,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Ethiopia",
+    "iso3": "ETH",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2017,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Gabon",
+    "iso3": "GAB",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2013,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Ghana",
+    "iso3": "GHA",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2011,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Guinea",
+    "iso3": "GIN",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2024,
+    "source": "https://iris.who.int/handle/10665/379605"
+  },
+  {
+    "country": "Guinea-Bissau",
+    "iso3": "GNB",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2012,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Haiti",
+    "iso3": "HTI",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2017,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "India",
+    "iso3": "IND",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2015,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Indonesia",
+    "iso3": "IDN",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2016,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Iraq",
+    "iso3": "IRQ",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2013,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Kenya",
+    "iso3": "KEN",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2018,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Laos",
+    "iso3": "LAO",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2013,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Liberia",
+    "iso3": "LBR",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2011,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Madagascar",
+    "iso3": "MDG",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2014,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Malawi",
+    "iso3": "MWI",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2002,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Mali",
+    "iso3": "MLI",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2023,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Mauritania",
+    "iso3": "MRT",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2015,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Mozambique",
+    "iso3": "MOZ",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2010,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Namibia",
+    "iso3": "NAM",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2001,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Nepal",
+    "iso3": "NPL",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2005,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Niger",
+    "iso3": "NER",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2016,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Nigeria",
+    "iso3": "NGA",
+    "elimination_status": "Not eliminated",
+    "elimination_year": null,
+    "source": "https://www.who.int/initiatives/maternal-and-neonatal-tetanus-elimination-(mnte)/progress-towards-global-mnt-elimination"
+  },
+  {
+    "country": "Pakistan",
+    "iso3": "PAK",
+    "elimination_status": "Not eliminated",
+    "elimination_year": null,
+    "source": "https://www.who.int/initiatives/maternal-and-neonatal-tetanus-elimination-(mnte)/progress-towards-global-mnt-elimination"
+  },
+  {
+    "country": "Papua New Guinea",
+    "iso3": "PNG",
+    "elimination_status": "Not eliminated",
+    "elimination_year": null,
+    "source": "https://www.who.int/initiatives/maternal-and-neonatal-tetanus-elimination-(mnte)/progress-towards-global-mnt-elimination"
+  },
+  {
+    "country": "Philippines",
+    "iso3": "PHL",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2017,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Rwanda",
+    "iso3": "RWA",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2004,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Senegal",
+    "iso3": "SEN",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2011,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Sierra Leone",
+    "iso3": "SLE",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2013,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Somalia",
+    "iso3": "SOM",
+    "elimination_status": "Not eliminated",
+    "elimination_year": null,
+    "source": "https://www.who.int/initiatives/maternal-and-neonatal-tetanus-elimination-(mnte)/progress-towards-global-mnt-elimination"
+  },
+  {
+    "country": "South Africa",
+    "iso3": "ZAF",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2002,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "South Sudan",
+    "iso3": "SSD",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2025,
+    "source": "https://www.unicefusa.org/stories/maternal-and-neonatal-tetanus-eliminated-south-sudan-and-sudan; https://www.who.int/initiatives/maternal-and-neonatal-tetanus-elimination-(mnte)/progress-towards-global-mnt-elimination"
+  },
+  {
+    "country": "Sudan",
+    "iso3": "SDN",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2025,
+    "source": "https://www.unicefusa.org/stories/maternal-and-neonatal-tetanus-eliminated-south-sudan-and-sudan; https://www.who.int/initiatives/maternal-and-neonatal-tetanus-elimination-(mnte)/progress-towards-global-mnt-elimination"
+  },
+  {
+    "country": "Tanzania",
+    "iso3": "TZA",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2012,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Timor-Leste",
+    "iso3": "TLS",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2012,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Togo",
+    "iso3": "TGO",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2005,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Turkey",
+    "iso3": "TUR",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2009,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Uganda",
+    "iso3": "UGA",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2011,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Vietnam",
+    "iso3": "VNM",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2005,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Yemen",
+    "iso3": "YEM",
+    "elimination_status": "Not eliminated",
+    "elimination_year": null,
+    "source": "https://www.who.int/initiatives/maternal-and-neonatal-tetanus-elimination-(mnte)/progress-towards-global-mnt-elimination"
+  },
+  {
+    "country": "Zambia",
+    "iso3": "ZMB",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2007,
+    "source": "https://iris.who.int/handle/10665/378241"
+  },
+  {
+    "country": "Zimbabwe",
+    "iso3": "ZWE",
+    "elimination_status": "Eliminated",
+    "elimination_year": 2000,
+    "source": "https://iris.who.int/handle/10665/378241"
+  }
+]

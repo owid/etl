@@ -34,6 +34,7 @@ Assumptions:
 
 - [ ] Parse inputs and resolve: channel, namespace, version, short_name, old_version, branch
 - [ ] Clean workbench directory: delete `workbench/<short_name>` unless continuing existing update
+- [ ] Pipeline refresher: run `scripts/pipeline_overview.py`, brief the user on the chain (what each step does, external inputs, consumers, who last updated it) and give a provisional structure verdict — re-confirm it after the snapshot + meadow diffs (see 0b)
 - [ ] Run ETL update workflow via `etl-update` subagent (help → dry run → approval → real run)
 - [ ] Add yourself to `dataset.owners` in the new garden `.meta.yml` (don't reorder; preserve existing names and markers)
 - [ ] Catalog `# NOTE:` / `# TODO:` comments carried over from the old step files into `notes_to_check.md`
@@ -52,7 +53,7 @@ Assumptions:
 - [ ] Changelog: decide whether this release deserves an entry in `dataset.changelog` of the garden `.meta.yml`, dated with the new version, whether or not the dataset has a changelog yet. Entries are optional. They are release notes for the people who use the data, so capture only changes that matter to them, briefly. Show the user the draft before committing it.
 - [ ] Verify indicator-metadata coverage, `dataset.update_period_days`, snapshot DVC `date_published` and `citation_full` year (`etl update` copies both verbatim — bump to the producer's real release date / year, or to `date_accessed` / current year if the source doesn't publish one), and that all URLs resolve (HEAD-check) and every `#fragment` matches a real anchor in the target page (anchor pass, see 6c)
 - [ ] **Always suggest** the **optional** adversarial data & metadata review (`/fact-check-dataset`) — verify metadata claims against the producer's fetched documentation and cross-check values against independent sources. Surfacing this offer to the user is **mandatory every run** (even when you recommend skipping it); only the *run* is opt-in — it's heavy (~25–45 web calls), so skip by default and run on user opt-in or visible red flags (see 6c-bis)
-- [ ] Scheduled-issue workflow check (owid-issues): locate the dataset's `update-*.yml` (exact / fuzzy / group match), verify cron vs the observed release cadence + `update_period_days`, filename convention, and that the issue body says to run `/update-dataset <short_name>`; auto-fix body/title, ask before cron changes or new workflows — commits go straight to owid-issues main (see 6d)
+- [ ] Scheduled-issue workflow check (owid-issues, found via `OWID_ISSUES_DIR` in `.env`): locate the dataset's `update-*.yml` (exact / fuzzy / group match), verify cron vs the observed release cadence + `update_period_days`, filename convention, and that the issue body says to run `/update-dataset <short_name>` with no generic checklist; auto-fix body/title, ask before cron changes or new workflows — commits go straight to owid-issues main (see 6d)
 - [ ] Commit, push, and update PR description
 - [ ] Run indicator upgrade on staging and persist report
 - [ ] Run the hardcoded-time-bounds audit (`check-hardcoded-years`) after all remaps — numeric `minTime`/`maxTime`/`timelineMin/MaxTime`/`map.time` pins on every surface carrying the new indicators (charts, MDim/explorer views, narrative charts, article `time=` links), graded against the new data's latest time; a pin below it means the update is invisible on that surface — propose `"latest"` fixes with user sign-off (see step 7)
@@ -65,7 +66,7 @@ Assumptions:
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
 - [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: confirm the `buildkite/etl-automated-staging-environment` PR check is green (red = a consumer crashed on staging, and the report under-reports until it's fixed; `.venv/bin/etlr --modified --continue-on-failure` is the optional local equivalent for small fan-outs), then triage the data-diff report — every red "− lost N data point(s)" entry in its Top-changes list and every 🔴-tier dataset (see "Silent-breakage check" section) and run the full-report audit probes (structural / World / raw-country / >30% / wipe-vs-edge per loss)
 - [ ] Ask the user whether to remove the old version; if yes, remove+archive its DAG entries now and relocate the new entries into the old slot, but KEEP the old step files until review sign-off — the consecutive-version review diffs them from disk; deleting the files is the final commit before merge (see "Removing the old version & reordering the DAG") — don't forget this step
-- [ ] Hand off the QA links to the user (Anomalist + Chart Diff + Metadata Diff on the staging branch, plus the data-diff report) — this is the final step
+- [ ] Hand off the QA links to the user (Anomalist + Chart Diff + Metadata Diff on the staging branch, plus the data-diff report) together with the staging links to the 5 most-viewed data pages, and wait until the user has read those pages themselves — this is the final step (see "Final QA hand-off")
 
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
@@ -123,6 +124,26 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - Check if `workbench/<short_name>/progress.md` exists to determine if continuing existing update
    - If starting fresh: delete `workbench/<short_name>` directory if it exists
    - Create fresh `workbench/<short_name>` directory for artifacts
+
+0b) Pipeline refresher — brief the user before changing anything
+
+   The user may not have seen this dataset in a while, or someone else ran the last update. Before `etl update`, explain what the pipeline looks like now and whether this update is expected to change it.
+
+   1. Map the chain mechanically:
+      ```bash
+      .venv/bin/python .claude/skills/update-dataset/scripts/pipeline_overview.py <namespace>/<old_version>/<short_name> \
+          > workbench/<short_name>/pipeline_overview.md
+      ```
+      It lists every step of the chain (including older-version upstream steps and same-version siblings such as extra snapshots or helper gardens), each step's files, the inputs from outside the chain, the direct consumers (other data steps, `viz://` charts/MDims/explorers, `export://`; readers of a shared sibling such as a common snapshot are listed apart, as they don't consume this dataset), the garden `owners`, the commit that created the garden step (= the last update), and the previous version (archived, or still active mid-update). It also warns when a newer version is already active, which means you have the wrong `old_version`.
+   2. Skim the step scripts: the docstrings, `run()`, and the helper names are usually enough. Don't read every line of a 1,000-line garden.
+   3. Tell the user in **about 5–8 lines**, no more:
+      - the chain in one line (`snapshot (xlsx) → meadow → garden (+ income_groups_aggregations) → grapher`), plus the number of snapshots if there's more than one;
+      - what each non-trivial step does, in plain words ("meadow reshapes wide → long; garden harmonizes countries, adds population-weighted regional aggregates and per-capita columns");
+      - key external inputs (population, regions, income groups, other datasets) and who consumes the output (counted by type; name the `viz://` ones). The script only sees DAG steps, so when it lists none, say that admin-built charts still read the grapher dataset directly — don't let "no consumers" read as "unused";
+      - who did the last update and when (the creating commit, with its PR number). When the script says the step was *first built* (no earlier version, active or archived), say this is the dataset's first update and name who built it, not who "last updated" it.
+   4. Close with a **provisional structure verdict**: usually *"Expected: no structural change — drop-in version bump."* If there's already evidence of a restructure (the triggers in "When the update isn't a drop-in version bump": a renamed `short_name`, a new file format or schema, a changed indicator set, changed score semantics), name it. Sources: the scheduled-issue body, the producer's release notes, or the new file's column list if it's cheap to fetch.
+
+   Don't pause for approval here. Keep going unless a restructure is already visible, which is an existing stop condition. The verdict is provisional, because the real evidence (column sets, shape, row counts) only appears at steps 3–4. Re-confirm it there. Record the final verdict as `update_summary.pipeline_structure` in `update-context.yml`, and put one line in the PR Summary: `Pipeline structure: unchanged` or `Pipeline structure: changed — <what and why>`.
 
 1) Run ETL update command (etl-update subagent)
    - Inputs: `<namespace>/<old_version>/<short_name>` plus any required flags
@@ -187,10 +208,20 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
    **Hand-maintained snapshots + editorial data edits.** Some snapshots have no `url_download` — the `.py` prompts for `--path-to-file` and the docstring says the data was "provided by email" / curated by hand. When the update is a small editorial correction (the user gives you the facts directly, e.g. "country X did Y in year Z"), you can produce the new snapshot yourself: copy the *previous* version's data file (`data/snapshots/<ns>/<old_version>/<file>`), change only the specific cells, and **assert in a quick script exactly which rows/cells changed** (and that all others are byte-identical) before running `etls ... --path-to-file <edited>`. Then update the `.py` docstring to document the edit and bump the `.dvc` `date_published` / `citation_full` year (ask the user whether it's a new producer release or an OWID-applied edit — see step 6c). **Verify the user's stated facts against the existing data first** — some may already be encoded from a prior release (in this update, one of the two reported events was already in the live snapshot; only the other was a genuine change). Tell the user what's already present rather than blindly re-adding it.
 
+   **A file whose size moves a lot while its coverage stays put has changed shape — compare column sets
+   before running meadow.** The size is visible from a ranged GET or the `.dvc` long before the full
+   download; when it drops (or jumps) by a large share with the same entities and years, the producer has
+   usually added or removed columns. Diff the old and new column sets on the snapshot itself, and for any
+   column that disappeared, grep every consumer of the dataset — downstream steps (it may be an index key
+   there, not just a value), exports, and repos outside ETL that read those exports — before deciding how to
+   handle it. (A bins file came in 23% smaller with identical coverage: the producer had dropped a retired
+   regional classification that a downstream step used as a key column and an external deck read.)
+
 4) Meadow step repair/verify (step-fixer subagent, channel=meadow)
    - Run, fix, re-run; produce diffs
    - Save diffs and summaries
    - **Watch for meadow input checks keyed on absolute row/column positions.** Producers quietly restructure their files (e.g. this session, the WB dropped the legend rows above the first country, shifting the row count 239→234 and moving "Afghanistan" from row 10 to row 5). Data extraction that keys off content (drop rows without an id, then melt) survives, but hardcoded `tb.loc[N]` / exact-row-count asserts break — update them to the new positions/counts and drop a `# NOTE` so the next maintainer re-checks. The break is the check doing its job; don't loosen it into uselessness.
+   - **Re-confirm the step-0b structure verdict.** The snapshot comparison and the meadow diff are the first real evidence of shape: added or removed columns, a wide ↔ long change, new dimensions, different files. If the verdict changes, tell the user in one line what changed, update `update_summary.pipeline_structure`, and switch to "When the update isn't a drop-in version bump". If it holds, say nothing until the PR line.
 
 5) Garden step repair/verify (step-fixer subagent, channel=garden)
    - Run, fix, re-run; produce diffs
@@ -560,11 +591,15 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    Scope for an update: focus the metadata claim review on new/changed text, and the value cross-checks on the newly added data (latest wave/year) plus that skill's standard anchors; deep-review the top-viewed indicators + anomaly-flagged ones per its prioritization step. Apply its routing table: metadata fixes → edit and re-run the step; confirmed source errors → `<short_name>.corrections.yml`; unconfirmed suspicions → list under "Not covered in this PR" for the reviewer. Save the report path (`ai/adversarial-review-<short_name>-<date>.md`) in `update-context.yml` and summarize any 🔴/🟡 findings in the PR body. Run this before 6d/commit so the fixes land in this PR.
 
 6d) Scheduled-issue workflow check (owid-issues)
-   Every recurring data update is driven by a scheduled GitHub Actions workflow in the `owid/owid-issues` repo (`.github/workflows/update-*.yml`) that periodically opens a "Data update" issue. The conventions live in the Notion page ["Scheduled data issues"](https://app.notion.com/p/owid/Scheduled-data-issues-f166359059634634b0053f78101bca81): schedule anything updated at least once per year but less than daily; filename `update-{namespace}-{short_name}.yml`; a cron `schedule:` trigger + `imjohnbo/issue-bot` creating the issue. This step runs now because 6c just established the two cadence facts the cron must match — `dataset.update_period_days` and the producer's actual release rhythm (`source.release_date` / `next_release` in `update-context.yml`).
+   Every recurring data update is driven by a scheduled GitHub Actions workflow in the `owid/owid-issues` repo (`.github/workflows/update-*.yml`) that periodically opens a "Data update" issue. The conventions: schedule anything updated at least once per year but less than daily; filename `update-{namespace}-{short_name}.yml`; a cron `schedule:` trigger + `imjohnbo/issue-bot` creating the issue. This step runs now because 6c just established the two cadence facts the cron must match — `dataset.update_period_days` and the producer's actual release rhythm (`source.release_date` / `next_release` in `update-context.yml`).
 
    **Locate the workflow.** The filename convention is loosely followed in practice, so search in widening circles — a miss on the exact name proves nothing:
-   1. Use the local checkout `~/owid-issues` if present (`git -C ~/owid-issues pull` first); otherwise clone it (`gh repo clone owid/owid-issues ~/owid-issues`). Don't fall back to a `gh api …/contents` filename listing — the checks below need file *contents* (content grep for group workflows, cron/body/assignees parsing), and the commit step needs a working tree anyway.
-   2. Exact conventional name `update-<namespace>-<short_name>.yml` → fuzzy filename match (hyphen/underscore swaps, dataset-title words — e.g. `update-gallup-ai-indicator.yml` covers `gallup/ai_indicator`) → content grep (`rg -il "<short_name>|<namespace>|<title words>" ~/owid-issues/.github/workflows/`).
+   1. Find the user's local checkout through `OWID_ISSUES_DIR` in the etl repo's `.env`. A line in `.env` doesn't set a shell variable by itself, so read it into one first (quotes stripped): `OWID_ISSUES_DIR=$(sed -n 's/^OWID_ISSUES_DIR=//p' .env | tr -d "\"'")`. People keep their repos in different places, so never assume a path and never pick one yourself:
+      - **Set** → `git -C "$OWID_ISSUES_DIR" pull`, then use it.
+      - **Not set** → ask the user whether owid-issues is already cloned on this machine. If it is, ask for the path and append `OWID_ISSUES_DIR=<path>` to `.env`. If it isn't, offer to clone it, ask where (`gh repo clone owid/owid-issues <path>`), and append that path to `.env` once the clone is done.
+
+      Don't fall back to a `gh api …/contents` filename listing — the checks below need file *contents* (content grep for group workflows, cron/body/assignees parsing), and the commit step needs a working tree anyway. In the steps below, `$OWID_ISSUES_DIR` is that checkout.
+   2. Exact conventional name `update-<namespace>-<short_name>.yml` → fuzzy filename match (hyphen/underscore swaps, dataset-title words — e.g. `update-gallup-ai-indicator.yml` covers `gallup/ai_indicator`) → content grep (`rg -il "<short_name>|<namespace>|<title words>" "$OWID_ISSUES_DIR/.github/workflows/"`).
    3. **Group workflows count.** One workflow may cover a family of related datasets (e.g. `update-climate.yml` → `/update-climate-data`; the quarterly `update-war-ucdp-preview-q*.yml` set; an "… + OMM" title covering a derived chain). If a group workflow covers this dataset, verify that workflow — don't create a per-dataset duplicate.
 
    **If found, verify three things:**
@@ -584,9 +619,11 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
       ````
       For group workflows, keep it a **single command listing every member dataset** — `/update-dataset <short_name1> <short_name2>` — or point at the family skill (e.g. `/update-climate-data`). If the body lacks the `/update-dataset` pointer or references a renamed path, refresh it — body/title fixes are auto-applied and reported afterwards, no need to ask. Also check `assignees:` still points at the dataset's current owner; flag a mismatch, don't auto-change.
 
-   **If not found:** per the Notion rule, any dataset with `update_period_days` roughly in [2, 366] should have a scheduled issue (err on the side of scheduling too much). Propose creating one: copy an existing workflow as template (`imjohnbo/issue-bot@v3.3.6` shape; keep `close-previous: false` and its WARNING comment), cron shortly after the expected release window, `assignees:` = the GitHub handle of the human directing this update (team table in CLAUDE.md), filename per the convention, title/body per the template above. If this update touched several related datasets, propose **one grouped workflow** rather than several. **Creating a new workflow needs user sign-off.**
+      **No generic checklist in the body.** The update steps live in this skill, not in the issue. A generic to-do list ("Import the latest data from the source…", "Announce the update in #data-updates-comms") duplicates the skill and goes stale apart from it, so remove one if you find it, as part of the body fix. A list written for *this* dataset is different: some workflows carry steps no skill covers (the wildfires and UCDP workflows, for example). Keep those as they are and add the `/update-dataset` pointer around them.
 
-   **Committing.** Commit in `~/owid-issues` straight to `main` — the standing exception to the branch-first rule; no branch, no PR — with an emoji+🤖 message (e.g. `🔨🤖 Point <short_name> update issue at /update-dataset`), and push. Record the outcome (workflow file, cron, verdict, changes made) in `progress.md` and set `source.scheduled_issue_workflow` in `update-context.yml`. Nothing about this lands in the etl PR body beyond the existing tracking-issue link.
+   **If not found:** per the conventions above, any dataset with `update_period_days` roughly in [2, 366] should have a scheduled issue (err on the side of scheduling too much). Propose creating one: copy an existing workflow as template (`imjohnbo/issue-bot@v3.3.6` shape; keep `close-previous: false` and its WARNING comment), cron shortly after the expected release window, `assignees:` = the GitHub handle of the human directing this update (team table in CLAUDE.md), filename per the convention, title/body per the template above. If this update touched several related datasets, propose **one grouped workflow** rather than several. **Creating a new workflow needs user sign-off.**
+
+   **Committing.** Commit in `$OWID_ISSUES_DIR` straight to `main` — the standing exception to the branch-first rule; no branch, no PR — with an emoji+🤖 message (e.g. `🔨🤖 Point <short_name> update issue at /update-dataset`), and push. Record the outcome (workflow file, cron, verdict, changes made) in `progress.md` and set `source.scheduled_issue_workflow` in `update-context.yml`. Nothing about this lands in the etl PR body beyond the existing tracking-issue link.
 
 7) Indicator upgrade (optional, staging only)
    - First upload the new grapher dataset to the staging DB (required before the upgrader can detect it):
@@ -690,7 +727,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      the right source, not an exhaustive one: it states the surfaces it structurally cannot see (`--gaps-json`,
      or the `COVERAGE GAP:` lines), and two of them bite this audit in particular — a chart nested inside an
      article layout container may leave no `posts_gdocs_links` row, and a data insight that records its chart
-     anywhere other than `grapher-url` is invisible. Carry those gaps into the outcome: "no stale claims" is a
+     anywhere other than `grapher-url` (or its narrative chart anywhere other than `narrative-chart`) is invisible. Carry those gaps into the outcome: "no stale claims" is a
      verdict on the surfaces swept, never on the site, so record it as "none in the N surfaces swept; not
      swept: …". When a surface you know cites the dataset is missing from the list (an article the content
      team named, a post the chart's own page links to), read it by hand and say so. For each
@@ -710,6 +747,21 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      Check the **title separately from the body** (it comes from a different field, see above) — a body can be
      correctly hedged while the title states the bare multiple, and the title is what readers see in feeds and
      social cards.
+     **Narrative charts carry claims of their own, and they go stale on staging, not later.** A narrative
+     chart's pinned `title`/`subtitle` often restates the post's headline ("…has grown 5-fold since late
+     2022"), but unlike a static image it renders live data: with `maxTime: "latest"` it draws the new months
+     under the old claim the moment the remap lands. Read its merged config
+     (`AdminAPI.get_narrative_chart(id)["configFull"]`) and recompute any claim in it. The fix belongs in this
+     PR, with sign-off since it's reader-facing: either retitle it to the new figure, or pin its `maxTime` to
+     the period the claim describes so it stays a dated snapshot. Decide one or the other, never both. Route a
+     retitle through `/edit-faust-metadata` (it owns narrative-chart text and its blast radius); a `maxTime`
+     pin goes straight to staging. When the parent is a chart, either edit reaches production with it once
+     the parent's Chart Diff is approved. Chart-sync only carries narrative children of synced *charts*, so a
+     narrative chart parented to an MDim view (`parentMultiDimXChartConfigId`) never syncs: make the same
+     edit on production in the admin after merge, and keep it in the PR's open items until it's done. The
+     data insight that embeds it is still the author's call.
+     (Data center construction: narrative chart 348 kept "5-fold" over data showing ~6x, while the data
+     insight around it showed a frozen PNG that still matched.)
      **A static image changes the remedy, not the finding — and the sweep's `kind` cannot tell you which you
      have.** `kind=embed` means the surface *holds* the chart by slug (a data insight's front-matter
      `grapher-url`, an announcement's `cta` button); it says nothing about what the reader sees, and both of
@@ -724,6 +776,13 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      yourself** — it is reader-facing copy owned by whoever wrote it. Record the outcome (fixed / deliberately
      left, with the reason) in the PR's open items, so the next updater doesn't re-flag it — and say whether the
      update was append-only or revised named periods, since that decides whether bounded claims were in scope.
+     **Link every finding, so content can act on it without searching.** For each claim give the live page,
+     the Google Doc (`https://docs.google.com/document/d/<surface_id>/edit`), a scroll-to-text link that lands
+     on the sentence itself (`<live url>#:~:text=<url-encoded claim>`), and the chart whose numbers it cites. A
+     table of quotes and recomputed numbers without links sends the reader back to search for every row. The
+     sweep's `--markdown` report already builds the doc and scroll-to-text links; carry them into your own table
+     rather than dropping them. The same applies to every other reference list you hand to a person — empty
+     entities, hardcoded years, Codex follow-ups: name the surface *and* link it.
      (NVIDIA: a data insight's "1300-fold" title was right at publication and 1,562x after the update, while a
      sibling post bounded to "late 2025" needed nothing; a hand-rolled join found 4 of the 6 references.)
    - **Empty-entity audit (always suggest it after all remaps — only the *run* is optional).** **You MUST surface this option to the user on every update, without exception** — even when you recommend skipping the run, still tell the user it exists and let them decide; the token cost governs whether to *run* it, never whether to *mention* it. An upgrade can leave a view pinned to entities that have no data in the new indicators — it renders as an empty chart with no error anywhere. The **`check-empty-entities` skill** audits charts (entity selections + map `columnSlug`), MDim views, explorer views, narrative charts, and published-gdoc `country=` references, and grades every finding against production. It sweeps every surface the dataset touches, so the *run* can consume a lot of tokens on widely-charted datasets — skip the run by default, run on user opt-in, and actively *recommend* running it when the risk is real: many charts remapped, hand-curated (non-auto) mappings, a restructure, or indicators whose country coverage shrank. When it runs: a selection that had data on production and lost it on staging is a **regression from this update — fix it before merge** (remap the view or restore the entities); a gap identical on production is pre-existing — it still needs fixing (chart-config edit or content follow-up on the gdoc), just not necessarily in this PR, so list it in the PR body with a planned fix.
@@ -766,6 +825,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
        eligible_from: <last_public_post + 6 months, or null if never posted>
        decision: <drafted | declined (cooldown) | n/a>
      update_summary:
+       pipeline_structure: <"unchanged" | "changed — <what and why>"> (from 0b, re-confirmed at step 4)
        snapshot_diff: <short summary or artifact path>
        meadow_diff: <short summary or artifact path>
        garden_diff: <short summary or artifact path>
@@ -822,7 +882,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      ```bash
      gh pr comment <pr_number> --body "@codex review"
      ```
-   - At the end of the update, tell the user, with a **markdown link to the saved file** so they can click through to open it: `"Slack announcement drafted at [workbench/<short_name>/slack-announcement.md](workbench/<short_name>/slack-announcement.md). Please review and post it to #data-updates-comms."` Always render the path as a markdown link `[…](…)`, not as inline-code — the chat UI renders it as clickable that way. (Slack can't be auto-posted — the user posts it.)
+   - At the end of the update, tell the user, with a **markdown link to the saved file** so they can click through to open it: `"Slack announcement drafted at [workbench/<short_name>/slack-announcement.md](workbench/<short_name>/slack-announcement.md). Please review and post it to #data-updates-comms."` Always render the path as a markdown link `[…](…)`, not as inline-code — the chat UI renders it as clickable that way. (Slack can't be auto-posted — the user posts it.) **In a git worktree, link by absolute path** (`/…/.claude/worktrees/<name>/workbench/<short_name>/slack-announcement.md`): a relative link resolves against the editor's workspace root, i.e. the main checkout, whose gitignored `workbench/` can still hold the previous update's draft, so the user reads stale text. The same goes for every workbench or `ai/` artifact you hand over, including 9b's draft. (Data center construction: the user opened the July draft, "Released: 2026-07-01", instead of the October one.)
 
 9b) Data update post (for OWID /latest)
    - Run the `/owid-staff:draft-data-update-post` skill in **Mode A**, with `workbench/<short_name>/update-context.yml` and `workbench/<short_name>/slack-announcement.md` as input. That skill is the canonical owner of the CMS format, the house style, the CTA link rules, the Google Doc creation and styling, and the handoff wording. Do not duplicate any of it here.
@@ -833,11 +893,13 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - **Do not put the post in the PR at all** — no embed and no pointer. Like the Slack draft, it stays in `workbench/`.
 
 10) Codex review: address comments and resolve threads
-   - **Codex's delivery channel depends on the verdict — poll both.** A **clean pass** arrives as an *issue comment* ("Didn't find any major issues") from `chatgpt-codex-connector[bot]`, with zero inline comments and no formal review object. A review **with findings** arrives as a formal review ("💡 Codex Review") with inline comments, and *no* issue comment. A watcher polling only one channel waits forever on the other outcome — treat a hit on either as completion.
+   - **Codex's delivery channel depends on the verdict — poll both.** A **clean pass** arrives as an *issue comment* ("Didn't find any major issues") from `chatgpt-codex-connector[bot]`, with zero inline comments and no formal review object. A review **with findings** arrives as a formal review ("💡 Codex Review") with inline comments, and *no* issue comment. A watcher polling only one channel waits forever on the other outcome — treat a hit on either as completion. A third clean-pass shape: the automatic review on **opening or marking ready** can end with only a 👍 reaction on the PR and no comment at all — it counts only when the reacting login starts with `chatgpt-codex-connector` and it is stamped after the trigger. When the `codex-pull-request-review-summary` issue comment is present, it is the most direct completion signal: it is edited in place, and its table row shows `✅ Completed` with the reviewed commit, which must match your HEAD.
    - Wait ~60 seconds after posting `@codex review`, then poll both channels:
      ```bash
      gh api repos/owid/etl/issues/<pr_number>/comments | python3 -m json.tool   # clean-pass summary lands here
      gh api repos/owid/etl/pulls/<pr_number>/comments | python3 -m json.tool    # findings land here as inline comments
+     gh api --paginate repos/owid/etl/issues/<pr_number>/reactions \
+       --jq '.[] | select(.content == "+1" and (.user.login | startswith("chatgpt-codex-connector"))) | .created_at'   # bare-👍 clean pass
      ```
    - **Codex posts in one of two places — always check both.** When it finds issues, it leaves *inline review comments* (the endpoint above) with resolvable threads. When it finds **nothing**, it posts a single top-level **PR (issue) comment** instead — no inline comments, no threads — e.g. "Codex Review: Didn't find any major issues. Keep it up!". So if the inline-comments endpoint is empty, check the issue comments before concluding Codex hasn't run yet. A third shape exists: a findings review whose finding lives **only in the review body** (no inline comments, no resolvable threads) — list `gh api repos/owid/etl/pulls/<n>/reviews` and read each new review's `body`; polling only the two comment endpoints misses it (there is no thread to resolve — reply via a normal PR comment instead):
      ```bash
@@ -875,7 +937,7 @@ Keep the PR-body draft under `workbench/<short_name>/` (or re-fetch it with `gh 
 
 At the end of the workflow, update the PR description with:
 - A **tracking-issue link** as the first line of the Summary — e.g. `Tracks: [owid/owid-issues#NNNN](https://github.com/owid/owid-issues/issues/NNNN)`. Most data updates have a corresponding `owid-issues` ticket; try to find it by searching the title or `<short_name>` first, and **ask the user for the issue number if you can't locate one** rather than skipping the link silently.
-- A summary of key changes at the top
+- A summary of key changes at the top, including the `Pipeline structure: …` line from step 0b
 - Collapsed `<details>` sections **only for the pipeline steps that changed in a non-obvious way**. Skip any step that's just the boilerplate generated by `etl update` — don't add a placeholder like "unchanged from boilerplate". The Summary already explains the why; per-step sections are only for the how, when the how isn't obvious from the diff.
 
 ## A long-lived branch silently regresses shared charts
@@ -961,6 +1023,7 @@ After the ETL update, `etl update` appends the new version entries to the **bott
 
 - **Dag entries: remove and archive right away** (the usual edit dag → commit → `etl archive-dag` → commit sequence). `etl archive-dag` reconstructs from the committed dag history and doesn't care whether the step files exist, and the version tracker only warns about archived steps *missing* code — archived steps that still have code are fine (that's why the periodic ":bomb: Delete archived step/snapshot code" cleanup commits exist).
 - **Old step files (`.py`, `.meta.yml`, `.dvc`): keep them until the reviewer signs off**, then delete them as the final commit before merge. Don't modify them in the meantime — the extension diffs them verbatim, and any edit pollutes the consecutive-version comparison.
+  **Before that final commit, grep the tests for the old version's paths** (`rg "<ns>/<old_version>" tests/ apps/`). A test that reads a *real* step file — to pick up its `dataset.owners`, say — fails as soon as the file is gone, and the unit-test build is the only thing that notices. Point such tests at the latest version found by globbing rather than at a new hardcoded one, so the next update doesn't break them again, and run `make unittest` before pushing the deletion. Paths that only appear as string fixtures need nothing.
 
 The Final QA hand-off (Anomalist / Chart Diff / data-diff) is unaffected by either half (Anomalist's upgrade detectors need the old *grapher dataset* in the local catalog, not the step files or dag entries).
 
@@ -988,7 +1051,7 @@ Workflow when the user agrees:
 
 ## Final QA hand-off — Anomalist, Chart Diff, Metadata Diff and data-diff
 
-This is the **last step** of the pre-review work — the old step files are still on disk at this point (deleting them is the final commit after review sign-off; see "Removing the old version & reordering the DAG"). Don't auto-run these — they're human-judgment tools. Hand off the four links so the user can review and click through:
+This is the **last step** of the pre-review work — the old step files are still on disk at this point (deleting them is the final commit after review sign-off; see "Removing the old version & reordering the DAG"). Don't auto-run these — they're human-judgment tools. Hand off the four links so the user can review and click through, together with the 5 most-viewed data pages (see "The 5 most-viewed data pages" below):
 
 - **Anomalist** — flags variables whose new values diverge from the old version beyond statistical thresholds. Catches accidental scale changes, base-year rebases that propagated the wrong way, and silent drops.
   ```
@@ -1001,6 +1064,8 @@ This is the **last step** of the pre-review work — the old step files are stil
       --dataset-ids <new_dataset_id> --variable-mapping '<full json mapping>' --force
   ```
   Then spot-check the stored `anomalies.dfReduced` rows include indicators beyond the charted ones.
+
+  **Read `upgrade_missing` flags before calling them data loss.** The detector pairs old and new indicators by shortName, so when the producer re-splits a dimension that is part of the shortName — comparability spells renumbered, a category recoded — the points move from one indicator to its sibling and every move is flagged as missing. Check whether the flagged points reappear under a sibling indicator with identical values before reporting a loss; if they do, it is a relabel to describe in the PR body (and, when the producer's release notes don't mention it, a question for the producer).
 
   The upgrade detectors also need the **old** grapher dataset in the local catalog (`data/grapher/<ns>/<old_version>/<short>`) — the `FileNotFoundError` names the *new* dataset id, but the missing files are usually the old version's. If the old chain has already been removed from the DAG (so `etlr` can't rebuild it), fetch its files straight from the public catalog:
   ```bash
@@ -1042,6 +1107,9 @@ ENV_FILE_PROD=.env.live STAGING=<branch> .venv/bin/etl approve --allow-small-cha
 - `--allow-small-changes` additionally approves charts where the only remaining difference is a handful of small-magnitude value changes (typical source revisions) — tune with `--tolerance-pct` (default 1% relative change per point), `--tolerance-abs-floor` (default 1e-6, guards near-zero values), `--max-changed-points` (default 5 per dimension, above which it's sent to manual review regardless of magnitude), and `--max-new-points` (default 1000 per dimension — new-coverage points, e.g. a fresh year, are given a generous allowance since they're expected from a routine update, but an unexpectedly large coverage jump still gets sent to manual review). It still requires every other part of the chart's config (title, subtitle, everything but the dimension values) to be identical.
 - `--show-data-diff` prints the actual before/after values for skipped charts (per dimension: y/x/size/color) instead of just a hash mismatch — useful to see *why* a specific chart didn't qualify, or to sanity-check whether raising `--tolerance-pct` would be safe. Combine with `--chart-id <id>` to inspect one chart.
 - Whatever's left after `etl approve` is what's actually worth a human's attention in Chart Diff — genuine content changes, added/removed country-year coverage, or other config differences.
+- **After an indicator upgrade, `etl approve` approves nothing — not even charts whose config is untouched.** The upgrader saves each upgraded chart's config without the fields that equal a default: grapher's schema defaults, and every dimension `display` field the new indicator already sets. Production still carries them, so the strict equality fails on every upgraded chart, and `--allow-small-changes` fails the same way at its config pre-check. Before concluding a chart's config changed, compare with both layers filled back in, in this order: each dimension's `display` over its indicator's own display (`variables.display` plus `unit`/`shortUnit`), then the schema defaults. Filling only the schema defaults turns a missing `tolerance` into the default 0 and reports a change wherever the indicator sets 5.
+- **On a release that adds new observations, expect zero data-identical charts.** New survey-years or a new year touch every country-level indicator, so "approve where config and data are unchanged" is legitimately empty. The useful split is then *data changed, config unchanged* (quick to review in bulk) versus *config changed* (look at each); hand the user the second list with what changed in each.
+- **Check for production edits made after the staging server was created — approving reverts them.** Staging copied production when the branch's server was built; a colleague's edit to the same chart on production after that point is absent from the staging copy, and the upgrade's save carries the old config forward. Approving the diff then syncs the stale config back and silently undoes their edit. For every upgraded chart, compare production's `charts.updatedAt` against the last pre-upgrade revision on staging (`chart_revisions`); for any chart edited on production since, restore the edit on staging before approving.
 
 **Important: derive `<container_branch>` correctly.** The staging hostname is **not** simply `staging-site-<branch>`. The container name is produced by `get_container_name(branch)` in `etl/config.py`:
 
@@ -1062,12 +1130,42 @@ Tell the user something like: "Final QA: please review **[Anomalist](http://<con
 
 These pages need a fresh staging build, so they're only meaningful after the PR's grapher upload to staging has completed and the staging server has rebuilt. Metadata Diff is the one that *tells* you when the server is behind — a 🚧 banner naming each stale dataset and the `etlr grapher://grapher/<dataset> --grapher` that fixes it. Read that banner before trusting any count: a stale dataset reports its diffs backwards, showing its older text as this branch's change.
 
+**The 5 most-viewed data pages — a human read, not a check you run.** Most readers meet this dataset through a handful of pages, so those few deserve a person's full attention before the update ships. Find the 5 published charts using the new indicators with the most views over the past year. Run it against the branch's staging DB after the indicator upgrade, so the charts already point at the new version. Escape literal underscores in the path as `\_`, as in step 7. "Published" means the live `isPublished` flag in the config: `charts.publishedAt` is the first-publish date and stays set after a chart is unpublished. Use Python rather than `make query` here, because Make would swallow the `$` in `'$.isPublished'`:
+
+```bash
+STAGING=<branch> .venv/bin/python - <<'EOF'
+from etl.config import OWIDEnv
+
+df = OWIDEnv.from_staging("<branch>").read_sql(
+    """
+    SELECT DISTINCT cc.slug, COALESCE(ap.views_365d, 0) AS views_365d
+    FROM charts c
+    JOIN chart_configs cc ON cc.id = c.configId
+    JOIN chart_dimensions cd ON cd.chartId = c.id
+    JOIN variables v ON v.id = cd.variableId
+    LEFT JOIN analytics_pageviews ap
+      ON ap.url = CONCAT('https://ourworldindata.org/grapher/', cc.slug)
+      AND ap.day = (SELECT MAX(day) FROM analytics_pageviews)
+    WHERE v.catalogPath LIKE %(path)s
+      AND cc.config->>'$.isPublished' = 'true'
+    ORDER BY views_365d DESC
+    LIMIT 5
+    """,
+    params={"path": r"grapher/<namespace>/<new_version>/<short_name>/%"},
+)
+print(df.to_string(index=False))
+EOF
+```
+
+Give the user the 5 staging links (`http://<container_name>/grapher/<slug>`), most-viewed first with their yearly views, and ask them to open each page and read it the way a reader would: is this the best version of this page we can produce? Can anything be fixed, improved, rewritten or made clearer, so it introduces our readers to this data as well as it can? Don't pre-review these pages or offer your own verdict on them — the point is a person looking with fresh eyes, and an AI summary next to the links invites a skim. Then **wait** until the user says they've read all 5, make the changes they ask for, and only then close the hand-off. If the dataset has fewer than 5 published charts, hand over the ones it has.
+
 **Close every hand-off with an explicit list of what's still open — in the PR body, not just chat** (chat scrolls away; the PR is what the reviewer and future-you actually read). This is one of the two cases where the list is worth writing out formally rather than as a sentence; see `.claude/docs/open-items.md` for what tends to get dropped. An update generates far more loose ends than it closes; this workflow's usual danglers: content/gdoc edits, producer error reports and any Metadata Diff rejection still unactioned (handed off — `metadata-rejections.md` is addressed to the dataset owner and nothing in the merge enforces it), reader-facing config changes held for sign-off (awaiting a decision), audits offered but not run and anything the staging build didn't cover (nobody checked it) — plus a **fourth category, deferred to a follow-up PR**, where the two-PR pattern is in play (downstream consumers to repoint, old-version archiving, charts on retired indicators): that list is the follow-up PR's scope, so losing it means redoing the analysis.
 
 **Before closing out, confirm both optional heavier audits were suggested.** Two checks are opt-in to *run* but **mandatory to offer** — the adversarial data & metadata review (`/fact-check-dataset`, step 6c-bis) and the empty-entity audit (`check-empty-entities`, step 7). It's easy to skip past them in a long session, which is exactly the failure this guard exists to catch. If you reach this hand-off and haven't yet surfaced either one to the user, do it now: name the skill, say briefly what it would catch and why you did or didn't recommend running it, and let the user decide. Never let the update finish having silently omitted the offer.
 
 ## Guardrails and tips
 
+- **Don't push to the branch while a long-running snapshot extraction runs on its staging server.** Every push redeploys that server, and the deploy runs `make docs.build`, whose first command is `rm -rf site/ .cache/` — and `.cache/` is also ETL's `CACHE_DIR`, where extraction scripts keep intermediate files. The extraction then fails with a `FileNotFoundError` on a file it wrote seconds earlier. Hold every push (commit on the server if you must) until the run finishes, or run it from a separate checkout that does not share `.cache/` (an editable install pins `BASE_DIR`, so a second checkout reusing the main venv still writes into the main `.cache/`). Say so in the snapshot script's docstring when it is meant to run on staging.
 - **`END_YEAR` / "as of" framing for status/event datasets.** When a dataset records *events* (and derives a status time series) and its latest event year lags the release date, you face a choice: forward-fill the latest status to the release year, or stop the series at the last event year and note the "as of" date in metadata. **Prefer the latter** — forward-filling invents data points for years with no source information (and shifts an `END_YEAR`-style constant ripples through the whole series). Keep the series at the last real year and add the currency note to `description_processing` and a `description_key` bullet (e.g. "The legal status shown for each country reflects the situation as of <Month Year>."). Confirm the choice with the user; they may change their mind (in this update we forward-filled to the release year, then reverted to the last event year + an "as of" note).
 - **Converting a period label to a date: use the dates the producer states, don't re-derive their calendar.** Non-calendar periods (fiscal quarters, ISO weeks, crop or school years, survey waves) come with real start/end dates in the producer's own releases. A rule inferred from a few examples — "the last Sunday of the month", "the first Monday" — will fit most periods and quietly miss the rest, and this error survives every schema, bound and sum check, because the values are all correct and only the dates they sit on move. So pin the derivation: keep a handful of period-end dates quoted from the producer and assert the code reproduces them, the way a codebook's worked examples serve as test vectors. (NVIDIA's 52/53-week fiscal year: a last-Sunday-of-the-month rule dated 4 of 50 quarters a week early.)
 - **OECD SDMX dataflow versions bump on new releases — a pinned URL goes 404/`NoRecordsFound`.** The Data Explorer's "Developer API" links pin `df[vs]`/the REST path to a dataflow version (e.g. `DSD_SHA@DF_SHA,1.0`); when the producer publishes a new edition they may mint `1.1` and empty the old version, so last cycle's known-good URL returns `NoRecordsFound`. On that error, list versions with `GET /public/rest/dataflow/<agency>/<id>/all` and retry with the newest. For reader-facing links (url_main, /latest posts) prefer the **version-less** explorer deep link (`data-explorer.oecd.org/vis?df[ds]=DisseminateFinalDMZ&df[id]=<id>&df[ag]=<agency>`), which always resolves to the latest release; in the snapshot's `url_download`, pinning the version is fine (deterministic) — just expect to bump it each cycle.

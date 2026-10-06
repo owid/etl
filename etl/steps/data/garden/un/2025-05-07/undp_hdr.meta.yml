@@ -14,6 +14,11 @@ definitions:
   gni_per_capita: GNI per capita is GNI divided by population.
   ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
   ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+  # Revised WYSK bullets, used only by the total (both sexes) GNI per capita indicator. The female and male
+  # variants keep the original bullets above until they are reviewed separately.
+  description_key_gni: Gross national income (GNI) is a measure of the total income earned by residents of a country or region each year. It is calculated as gross domestic product (GDP) plus net income received from abroad (such as wages earned abroad and returns on foreign investments). GDP represents the total economic output of a country or region, while GNI represents the income received by its residents, wherever it is generated.
+  description_key_gni_per_capita: GNI per capita is GNI divided by population, representing the average national income per person. This indicator provides information on economic growth and income levels from 1990.
+  description_key_international_dollars: This data is expressed in constant international dollars at 2021 prices to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
 
   description_short_gni: Total income earned by residents of a country or region, including income earned abroad.
   description_short_gni_per_capita: Average income per person earned by residents of a country or region, including income earned abroad.
@@ -478,12 +483,12 @@ tables:
         description_short: |-
           {definitions.description_short_gni_per_capita} {definitions.ppp_adjustment}<% if sex != "total" %> Only <<sex>> population is considered.<% endif %>
         description_key:
-          - "{definitions.gni} {definitions.gni_per_capita}"
-          - This GNI per capita indicator provides information on economic growth and income levels from 1990.
-          - "{definitions.ppp_adjustment}"
-          - "{definitions.ppp_prices}"
-          - Higher GNI per capita typically signals greater average command over resources, but says little about distribution, non‑market production or environmental costs.
-          - Subject to revisions when PPP benchmarks are updated; omits remittances/leakages in informal economies; exchange‑rate mis‑measurement can bias cross‑country comparisons.
+          - "<% if sex == 'total' %>{definitions.description_key_gni}<% else %>{definitions.gni} {definitions.gni_per_capita}<% endif %>"
+          - "<% if sex == 'total' %>{definitions.description_key_gni_per_capita}<% else %>This GNI per capita indicator provides information on economic growth and income levels from 1990.<% endif %>"
+          - "<% if sex == 'total' %>{definitions.description_key_international_dollars}<% else %>{definitions.ppp_adjustment}<% endif %>"
+          - "<% if sex != 'total' %>{definitions.ppp_prices}<% endif %>"
+          - <% if sex != "total" %>Higher GNI per capita typically signals greater average command over resources, but says little about distribution, non‑market production or environmental costs.<% endif %>
+          - <% if sex != "total" %>Subject to revisions when PPP benchmarks are updated; omits remittances/leakages in informal economies; exchange‑rate mis‑measurement can bias cross‑country comparisons.<% endif %>
         description_from_producer: |-
           UNDP relies on IMF (2023), UNDESA (2023), United Nations Statistics Division (2023), World Bank (2023).
 

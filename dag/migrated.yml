@@ -715,9 +715,6 @@ steps:
   data-private://grapher/labor/2019-10-30/proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013:
     - data-private://garden/labor/2019-10-30/proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013:
         - snapshot-private://labor/2019-10-30/proportion_of_unemployed_using_specific_search_methods__bachmann_and_baumgarten__2013.feather
-  data://grapher/health/2018-02-16/year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018:
-    - data://garden/health/2018-02-16/year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018:
-        - snapshot://health/2018-02-16/year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018.feather
   data-private://grapher/economics/2018-12-03/gini_index_in_1980__1990__and__2015__gcip__2018:
     - data-private://garden/economics/2018-12-03/gini_index_in_1980__1990__and__2015__gcip__2018:
         - snapshot-private://economics/2018-12-03/gini_index_in_1980__1990__and__2015__gcip__2018.feather

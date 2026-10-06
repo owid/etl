@@ -7,15 +7,16 @@
 
 set -e
 
+source "$(dirname "$0")/commit-snapshots.sh"
+
 start_time=$(date +%s)
 
 echo '--- Update flunet'
 
 cd /home/owid/etl
 
-# Files this job owns. Several update-*.sh jobs run concurrently against this same
-# checkout, so we only ever stage, commit and revert these - `git add .` would sweep in
-# (and `git reset --hard` would destroy) another job's half-written snapshots.
+# Files this job owns: the only ones it commits, or reverts when a download fails.
+# commit_and_push_snapshots refuses to push a change to anything else.
 snapshot_files=(
     snapshots/who/latest/fluid.csv.dvc
     snapshots/who/latest/flunet.csv.dvc
@@ -32,9 +33,7 @@ then
     # commit to master will trigger ETL which is gonna run the step
     echo '--- Commit and push changes'
 
-    git add "${snapshot_files[@]}"
-    git commit -m ":robot: automatic flunet update" -- "${snapshot_files[@]}" || true
-    git push origin master -q || true
+    commit_and_push_snapshots ":robot: automatic flunet update" "${snapshot_files[@]}"
 else
     echo "At least one of the Python scripts returned a non-zero exit code. Reverting our files..."
     git checkout -- "${snapshot_files[@]}"

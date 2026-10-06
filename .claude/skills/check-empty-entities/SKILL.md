@@ -58,6 +58,7 @@ For every chart on the new dataset (`chart_dimensions` → `variables.datasetId`
 
 - `selectedEntityNames` must intersect the union of the chart's y-variables' entities-with-data. Zero overlap on a non-empty selection = the chart renders empty.
 - **Skip ScatterPlot and Marimekko** — they legitimately have no `selectedEntityNames` (they plot all entities). Detect them by shape, not by the `type` field: a chart with an `x` dimension renders as a scatter even when `type` is absent (reporting as the `LineChart` default). An **empty selection means every entity renders, not none** — so a bad value in such a chart is maximally visible, not hidden. (`share-of-rural-population-with-electricity-access-vs-…`, 0 selected + `minTime: latest`, is where a reader spotted Chad plotted at 100% rural electricity access.) Phrasing a report line as "corrected entity not in selection" for these charts is actively misleading.
+- **Skip map-only charts** — `chartTypes: []` with `hasMapTab: true` has no chart tab, so `selectedEntityNames` never renders and a dead or partly dead selection is harmless. Note that `[]` is *not* the absent-field case: an absent `chartTypes` defaults to `LineChart` and must still be checked. The map itself is still covered by §2.
 - A **missing/empty selection** on other chart types is only a finding if production's config differs — the upgrader never touches entity selections, so an empty selection is almost always pre-existing. Verify via public Datasette before flagging.
 - Also flag any y-variable whose entity list is entirely empty (a broken indicator, not just a broken view).
 
@@ -144,6 +145,8 @@ for _, row in cfgs.iterrows():
         ...  # broken indicator (zero entities) — a finding on EVERY chart type, so check before the scatter skip
     if types and types[0] in ("ScatterPlot", "Marimekko"):
         continue  # no pinned selection to check
+    if types == [] and cfg.get("hasMapTab"):
+        continue  # map-only: the selection never renders
     avail = set().union(*ents) if ents else set()
     if sel and not (set(sel) & avail):
         ...  # finding -> grade against production

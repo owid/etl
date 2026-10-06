@@ -1335,3 +1335,9 @@ steps:
     - data://garden/artificial_intelligence/2026-01-30/frontiermath:
       - data://meadow/artificial_intelligence/2026-01-30/frontiermath:
         - snapshot://artificial_intelligence/2026-01-30/epoch_benchmark_data.zip
+  # archived; last active in 1561731bf7ef on 2026-10-02
+  data://grapher/us_census_bureau/2026-08-18/datacenter_construction:
+    - data://garden/us_census_bureau/2026-08-18/datacenter_construction:
+      - data://garden/bls/2026-08-18/us_ppi_construction
+      - data://meadow/us_census_bureau/2026-08-18/datacenter_construction:
+        - snapshot://us_census_bureau/2026-08-18/datacenter_construction.xlsx
