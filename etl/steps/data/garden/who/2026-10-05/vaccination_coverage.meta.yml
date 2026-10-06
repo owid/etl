@@ -246,7 +246,7 @@ definitions:
     <%- elif antigen == "MEN_A_CONJ" %>
     Meningococcal (MEN_A_CONJ)
     <%- elif antigen == "POL3" %>
-    Polio (POL3, historical series)
+    Polio (Pol3, historical series)
     <%- endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/

@@ -636,12 +636,12 @@ steps:
             - data://garden/demography/2024-07-15/population
 
   # WHO Immunization coverage (previous version — kept for POL3 series in 2026 version)
-    - data://garden/who/2025-07-15/vaccination_coverage:
-        - data://garden/un/2024-07-12/un_wpp
-        - data://garden/wb/2026-07-01/income_groups
-        - data://garden/regions/2023-01-01/regions
-        - data://meadow/who/2025-07-15/vaccination_coverage
-        - data://garden/demography/2024-07-15/population
+  data://garden/who/2025-07-15/vaccination_coverage:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/wb/2026-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/who/2025-07-15/vaccination_coverage
+    - data://garden/demography/2024-07-15/population
 
   # WHO Vaccine Introductions
   viz://chart/health/latest/vaccination_introductions:

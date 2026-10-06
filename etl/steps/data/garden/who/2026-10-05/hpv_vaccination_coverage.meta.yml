@@ -10,6 +10,7 @@ definitions:
         hasMapTab: true
         hideAnnotationFieldsInTitle:
           time: true
+
   antigen_description_short: |-
     <% if antigen_description == "HPV Vaccination program coverage, first dose, females" %>
     Target population of women who received the first dose of HPV vaccine in the reporting year.
@@ -33,6 +34,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  title: HPV Vaccination Coverage - WHO Immunization Data
 
   owners:
     - Fiona Spooner
