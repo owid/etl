@@ -43,8 +43,6 @@ definitions:
     one-year-olds
     <%- elif antigen == "IPVC" %>
     one-year-olds
-    <%- elif antigen == "MCV2X2" %>
-    two-year-olds
     <%- elif antigen == "YFV" %>
     one-year-olds
     <%- elif antigen == "MEN_A_CONJ" %>
@@ -79,8 +77,6 @@ definitions:
     who have had the one dose of the inactivated polio vaccine
     <%- elif antigen == "IPVC" %>
     who have had the final recommended dose of the inactivated polio vaccine
-    <%- elif antigen == "MCV2X2" %>
-    who have had the two doses of the measles vaccine
     <%- elif antigen == "YFV" %>
     who have had the yellow fever vaccine
     <%- elif antigen == "MEN_A_CONJ" %>
@@ -115,8 +111,6 @@ definitions:
     who have not had the inactivated polio vaccine
     <%- elif antigen == "IPVC" %>
     who have not had the final recommended dose of the inactivated polio vaccine
-    <%- elif antigen == "MCV2X2" %>
-    who have not had two doses of of the measles vaccine
     <%- elif antigen == "YFV" %>
     who have not had the yellow fever vaccine
     <%- elif antigen == "MEN_A_CONJ" %>
@@ -151,8 +145,6 @@ definitions:
     the first dose of the inactivated polio vaccine
     <%- elif antigen == "IPVC" %>
     the final recommended dose (2nd or 3rd) of the inactivated polio vaccine
-    <%- elif antigen == "MCV2X2" %>
-    the second dose of the measles vaccine
     <%- elif antigen == "YFV" %>
     one dose of the yellow fever vaccine
     <%- elif antigen == "MEN_A_CONJ" %>
@@ -197,7 +189,7 @@ definitions:
     the combined Polio3 indicator has also been discontinued.
     <%- endif %>
   antigen_note: |-
-    <% if antigen in ["MCV2", "MCV2X2"] %>
+    <% if antigen == "MCV2" %>
       Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia. The recommended age for the second dose varies by country.
     <%- elif antigen == "MCV1" %>
       Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia.
@@ -249,8 +241,6 @@ definitions:
     Inactivated polio, first dose (IPV1)
     <%- elif antigen == "IPVC" %>
     Inactivated polio (IPVC)
-    <%- elif antigen == "MCV2X2" %>
-    Measles, second dose (MCV2X2)
     <%- elif antigen == "YFV" %>
     Yellow fever (YFV)
     <%- elif antigen == "MEN_A_CONJ" %>

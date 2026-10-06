@@ -28,11 +28,14 @@ DENOMINATOR = {
     # that reported IPV2). See https://www.who.int/docs/default-source/immunization/immunization-coverage/wuenic_notes.pdf
     "IPVC": "Surviving infants",  # the national annual number of infants surviving their first year of life
     "YFV": "Surviving infants",  # the national annual number of infants surviving their first year of life
-    "MCV2X2": "Two-year-olds",
     # NOTE: MENA_C was renamed to MEN_A_CONJ in the WHO 2025 Revision (2026-10-05 update), same
     "MEN_A_CONJ": "Surviving infants",  # the national annual number of infants surviving their first year of life
     # NOTE: POL3 discontinued by WHO -- see add_historical_polio() for detail.
     "POL3": "Surviving infants",  # the national annual number of infants surviving their first year of life
+    # NOTE: MCV2X2 ("measles, second dose, two-year-olds") was removed (2026-10-05 update) -- it has
+    # had no rows in the raw source in any version we have on disk, including the very first (2022)
+    # version of this step, which explicitly dropped it (`df[df["antigen"] != "MCV2X2"]`). Confirmed
+    # dead, not a newly-discontinued antigen.
 }
 
 # If the vaccine universally recommended in all countries by WHO and UNICEF, set to True.
@@ -54,7 +57,6 @@ UNIVERSAL = {
     "IPV1": True,  # Inactivated polio vaccine is recommended in all countries
     "IPVC": True,  # Inactivated polio vaccine is recommended in all countries
     "YFV": False,  # Yellow fever vaccine is recommended in countries with risk of yellow fever transmission
-    "MCV2X2": True,  # Measles second dose is recommended
     "MEN_A_CONJ": False,
     "POL3": True,  # historical/discontinued -- see add_historical_polio() for detail.
 }

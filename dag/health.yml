@@ -631,15 +631,11 @@ steps:
             - data://garden/wb/2026-07-01/income_groups
             - data://garden/regions/2023-01-01/regions
             - data://meadow/who/2026-10-05/vaccination_coverage
-            # NOTE: also depends on the PREVIOUS garden version to freeze in the historical POL3
-            # series (discontinued by WHO in the 2025 Revision, no longer present from this version
-            # onward) as "Polio (historical vaccine)" -- already harmonized/aggregated there, reused
-            # as published rather than recomputed. See the garden step for detail.
+            # NOTE: also depends on the PREVIOUS garden version for POL3 indicator ("Polio (historical series)"). See the garden step for more detail.
             - data://garden/who/2025-07-15/vaccination_coverage
             - data://garden/demography/2024-07-15/population
 
-  # WHO Immunization coverage (previous version — kept until old-version archiving, see /update-dataset)
-  data://grapher/who/2025-07-15/vaccination_coverage:
+  # WHO Immunization coverage (previous version — kept for POL3 series in 2026 version)
     - data://garden/who/2025-07-15/vaccination_coverage:
         - data://garden/un/2024-07-12/un_wpp
         - data://garden/wb/2026-07-01/income_groups
