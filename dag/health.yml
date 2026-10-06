@@ -1114,3 +1114,9 @@ steps:
         - data://garden/wb/2026-07-01/income_groups
         - data://meadow/who/2026-08-18/cholera_cases_and_deaths:
             - snapshot://who/2026-08-18/cholera_cases_and_deaths.xlsx
+  data://meadow/health/2026-10-05/maternal_tetanus:
+    - snapshot://health/2026-10-05/maternal_tetanus.pdf
+  data://garden/health/2026-10-05/maternal_tetanus:
+    - data://meadow/health/2026-10-05/maternal_tetanus
+  data://grapher/health/2026-10-05/maternal_tetanus:
+    - data://garden/health/2026-10-05/maternal_tetanus
