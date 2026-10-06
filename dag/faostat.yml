@@ -241,6 +241,8 @@ steps:
   # Supply Utilization Accounts method (2010 onward), which includes the feed by-products FBS lacks:
   data://garden/faostat/2026-09-04/food_supply_chain_scl:
     - data://garden/faostat/2026-02-25/faostat_scl
+    # The meadow (not garden) metadata is needed because only it carries the item-group table that tags each SCL item
+    # as crop, livestock or processed.
     - data://meadow/faostat/2026-02-25/faostat_metadata
     - data://garden/faostat/2026-02-25/faostat_fbsc
     - data://garden/demography/2024-07-15/population
