@@ -1130,10 +1130,31 @@ Tell the user something like: "Final QA: please review **[Anomalist](http://<con
 
 These pages need a fresh staging build, so they're only meaningful after the PR's grapher upload to staging has completed and the staging server has rebuilt. Metadata Diff is the one that *tells* you when the server is behind — a 🚧 banner naming each stale dataset and the `etlr grapher://grapher/<dataset> --grapher` that fixes it. Read that banner before trusting any count: a stale dataset reports its diffs backwards, showing its older text as this branch's change.
 
-**The 5 most-viewed data pages — a human read, not a check you run.** Most readers meet this dataset through a handful of pages, so those few deserve a person's full attention before the update ships. Find the 5 published charts using the new indicators with the most views over the past year (run on the branch, after the indicator upgrade, so the charts already point at the new version; escape literal underscores in the substituted parts as `\_`, as in step 7):
+**The 5 most-viewed data pages — a human read, not a check you run.** Most readers meet this dataset through a handful of pages, so those few deserve a person's full attention before the update ships. Find the 5 published charts using the new indicators with the most views over the past year. Run it against the branch's staging DB after the indicator upgrade, so the charts already point at the new version. Escape literal underscores in the path as `\_`, as in step 7. "Published" means the live `isPublished` flag in the config: `charts.publishedAt` is the first-publish date and stays set after a chart is unpublished. Use Python rather than `make query` here, because Make would swallow the `$` in `'$.isPublished'`:
 
 ```bash
-make query SQL="SELECT DISTINCT cc.slug, COALESCE(ap.views_365d, 0) AS views_365d FROM charts c JOIN chart_configs cc ON cc.id = c.configId JOIN chart_dimensions cd ON cd.chartId = c.id JOIN variables v ON v.id = cd.variableId LEFT JOIN analytics_pageviews ap ON ap.url = CONCAT('https://ourworldindata.org/grapher/', cc.slug) AND ap.day = (SELECT MAX(day) FROM analytics_pageviews) WHERE v.catalogPath LIKE 'grapher/<namespace>/<new_version>/<short_name>/%' AND c.publishedAt IS NOT NULL ORDER BY views_365d DESC LIMIT 5"
+STAGING=<branch> .venv/bin/python - <<'EOF'
+from etl.config import OWIDEnv
+
+df = OWIDEnv.from_staging("<branch>").read_sql(
+    """
+    SELECT DISTINCT cc.slug, COALESCE(ap.views_365d, 0) AS views_365d
+    FROM charts c
+    JOIN chart_configs cc ON cc.id = c.configId
+    JOIN chart_dimensions cd ON cd.chartId = c.id
+    JOIN variables v ON v.id = cd.variableId
+    LEFT JOIN analytics_pageviews ap
+      ON ap.url = CONCAT('https://ourworldindata.org/grapher/', cc.slug)
+      AND ap.day = (SELECT MAX(day) FROM analytics_pageviews)
+    WHERE v.catalogPath LIKE %(path)s
+      AND cc.config->>'$.isPublished' = 'true'
+    ORDER BY views_365d DESC
+    LIMIT 5
+    """,
+    params={"path": r"grapher/<namespace>/<new_version>/<short_name>/%"},
+)
+print(df.to_string(index=False))
+EOF
 ```
 
 Give the user the 5 staging links (`http://<container_name>/grapher/<slug>`), most-viewed first with their yearly views, and ask them to open each page and read it the way a reader would: is this the best version of this page we can produce? Can anything be fixed, improved, rewritten or made clearer, so it introduces our readers to this data as well as it can? Don't pre-review these pages or offer your own verdict on them — the point is a person looking with fresh eyes, and an AI summary next to the links invites a skim. Then **wait** until the user says they've read all 5, make the changes they ask for, and only then close the hand-off. If the dataset has fewer than 5 published charts, hand over the ones it has.
