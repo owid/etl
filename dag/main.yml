@@ -511,6 +511,13 @@ steps:
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2026-07-01/income_groups
 
+  # OECD Climate-related official development assistance (RioMarkers)
+  data://grapher/oecd/2026-10-07/climate_related_official_development_assistance:
+    - data://garden/oecd/2026-10-07/climate_related_official_development_assistance:
+      - data://meadow/oecd/2026-10-07/climate_related_official_development_assistance:
+        - snapshot://oecd/2026-10-07/climate_related_official_development_assistance.zip
+      - data://garden/demography/2024-07-15/population
+
   #
   # CORE Econ - Growth rate of GDP per capita and productivity
   #
