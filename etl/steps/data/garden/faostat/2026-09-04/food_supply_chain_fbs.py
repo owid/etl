@@ -7,14 +7,16 @@ table each:
     protein  grams of protein per person per day
     mass     kilograms per person per day (the balance in tonnes, with no conversion at all)
 
-ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
------------------------------------------------------
+ASSUMPTIONS THAT GO INTO THE CALCULATION
+-----------------------------------------
 1. The balance identity. For every item, country and year, FBS reports, in tonnes:
        production + imports - exports - stock variation
          = food + feed + seed + processing + other uses + losses + tourist consumption + residuals.
    FBS only reports stock variation from 2010 onward, so this step derives stock variation for all years from the
    identity, as production + imports - exports - domestic supply. Where FBS does report stock variation, the
    derived value is checked against the reported one.
+   When FBS does not report an element for an item (meat has no "seed", for example), the step treats the missing
+   element as zero, so that the identity can be evaluated for every item.
 
 2. Densities. The density of an item (kcal, or grams of protein, per 100 g) is derived from food use, per item,
    country and year. FBS reports the food supply of each item both as a nutrient (kilocalories, or grams of

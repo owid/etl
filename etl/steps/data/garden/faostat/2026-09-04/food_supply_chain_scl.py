@@ -19,8 +19,8 @@ Two differences make SCL preferable to FBS for this chain:
 The price is coverage: SCL starts in 2010 (FBS starts in 1961) and misses a few countries that FAO has not
 compiled (Japan, Sudan, Somalia and a few others).
 
-ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
------------------------------------------------------
+ASSUMPTIONS THAT GO INTO THE CALCULATION
+-----------------------------------------
 1. The balance identity. For every item, country and year, SCL reports, in tonnes:
        production + imports - exports - stock variation
          = food + feed + seed + processing + other uses + losses + tourist consumption + residuals.
@@ -60,9 +60,13 @@ ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
 4. Items nobody eats (cakes, brans, ethanol, refining residues) have no food use, so no density can be derived from
    the data. Each gets the energy and protein of the human food it would be if eaten: energy from USDA's food
    composition tables, protein of each cake from the Feedipedia feed tables. The values and sources are in
-   `food_supply_chain_scl.items.yml`. Items that are never food in any form (castor, tung, kapok, jojoba, wool
-   grease) get zero energy and protein, which removes them from every flow consistently. In the mass table every
-   item counts as it is.
+   `food_supply_chain_scl.items.yml`.
+   These fixed densities only apply to an item when less than 1% of the item's supply is eaten as food. The reason
+   is that a few hundred tonnes of soybean cake eaten somewhere would otherwise set the density of hundreds of
+   millions of tonnes of cake. An item on the list with a real food use (spirits, and wheat bran in some countries)
+   keeps its data-derived density instead.
+   Items that are never food in any form (castor, tung, kapok, jojoba, wool grease) get zero energy and protein,
+   which removes them from every flow consistently. In the mass table every item counts as it is.
 
 5. Crops that are not eaten as harvested (paddy rice, sugar cane, sugar beet, oil palm fruit, rapeseed, cotton
    seed). A density derived from food use measures the calories a human gets from eating the item; for these crops
