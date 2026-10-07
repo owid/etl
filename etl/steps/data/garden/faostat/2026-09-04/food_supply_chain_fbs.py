@@ -791,6 +791,50 @@ def sanity_check_partition(tb_fbsc: Table, items: Table) -> None:
         )
 
 
+def sanity_check_world_against_fao(tb: Table, tb_fbsc: Table, items: Table) -> None:
+    """Check assumption 11: our rebuilt World must match the World that FAO itself publishes.
+
+    We rebuild World by summing countries, instead of using FAO's own World row, because the chain needs its values
+    and its population to cover exactly the same countries. This check verifies, element by element and year by
+    year, in tonnes, that the rebuilt World stays very close to FAO's published World.
+    """
+    # FAO's own World, reshaped like our balance table: one row per (year, item), one column per element, in tonnes.
+    tonnes_codes = [code for code in ELEMENTS if code not in PER_CAPITA_ELEMENTS]
+    fao = tb_fbsc[
+        (tb_fbsc["country"].astype(str) == "World")
+        & tb_fbsc["item_code"].astype(str).isin(items.index)
+        & tb_fbsc["element_code"].astype(str).isin(tonnes_codes)
+    ][["year", "item_code", "element_code", "value"]].astype({"item_code": str, "value": float})
+    fao = fao.pivot(index=["year", "item_code"], columns="element_code", values="value")
+    fao = fao.rename(columns={code: name for code, name in ELEMENTS.items()}).fillna(0)
+    fao["stock_variation"] = fao["production"] + fao["imports"] - fao["exports"] - fao["domestic_supply"]
+    fao_by_year = fao.groupby("year").sum()
+    ours_by_year = tb[tb["country"] == "World"].groupby("year")[BALANCE_ELEMENTS].sum()
+
+    # Stock variation and residuals are small net quantities (additions and subtractions that almost cancel), so a
+    # ratio between two small numbers is meaningless; they are checked below by their absolute difference instead.
+    for element in [e for e in BALANCE_ELEMENTS if e not in ("stock_variation", "residuals")]:
+        # In years where FAO's World reports nothing for the element (tourist consumption before 2010), ours must
+        # report next to nothing too; a ratio is only meaningful in the other years.
+        fao_is_zero = fao_by_year[element] == 0
+        assert (ours_by_year[element][fao_is_zero].abs() < 0.005 * fao_by_year["food"][fao_is_zero]).all(), (
+            f"FAO's World reports no {element!r} in some years, but ours does."
+        )
+        ratio = ours_by_year[element][~fao_is_zero] / fao_by_year[element][~fao_is_zero]
+        # Measured 1961-2023: the ratio stays between 0.96 and 1.005. Our World can fall short of FAO's because
+        # FAO's World includes countries whose own data FAO does not publish for that year; in 2023 those countries
+        # (Japan, Sudan, Cuba and nine others, whose published data end in 2022 or earlier) hold 2.9% of World food.
+        assert ratio.between(0.95, 1.01).all(), (
+            f"Our World differs from FAO's World for {element!r}: ours/FAO ranges {ratio.min():.3f}-{ratio.max():.3f}."
+        )
+    for element in ["stock_variation", "residuals"]:
+        # Measured 1961-2023: the absolute difference stays below 0.04% of World food.
+        difference = (ours_by_year[element] - fao_by_year[element]).abs() / fao_by_year["food"]
+        assert (difference < 0.005).all(), (
+            f"Our World differs from FAO's World for {element!r} by up to {100 * difference.max():.2f}% of food."
+        )
+
+
 def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
     """Check one output table: shape, no negative magnitudes, the chain ends on food, and World matches FAO."""
     assert tb.columns[tb.isna().all()].empty, "Output has fully-nan columns."
@@ -862,6 +906,7 @@ def run() -> None:
     # Assumptions 11 and 12: OWID regions from member countries, dropping region-years with low coverage.
     tb = add_region_aggregates(tb)
     sanity_check_balance_identity(tb)
+    sanity_check_world_against_fao(tb, tb_fbsc=tb_fbsc, items=items)
 
     population = tb[["country", "year", "population"]].drop_duplicates()
     tables = []
