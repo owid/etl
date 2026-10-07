@@ -21,12 +21,99 @@ compiled (Japan, Sudan, Somalia and a few others).
 
 ASSUMPTIONS THAT GO INTO THE CALCULATION
 -----------------------------------------
-1. The balance identity. For every item, country and year, SCL reports, in tonnes:
+1. The balance identity.
+   >> Scale: major. The identity is the backbone of every table.
+
+   For every item, country and year, SCL reports, in tonnes:
        production + imports - exports - stock variation
          = food + feed + seed + processing + other uses + losses + tourist consumption + residuals.
-   This identity is checked item by item, not assumed.
+   Unlike FBS, SCL reports stock variation for every year, so nothing needs to be derived. The identity is checked
+   item by item, not assumed.
 
-2. Roles: where each item's production enters the chain.
+2. Missing elements are treated as zero.
+   >> Scale: minor. Bookkeeping that changes no values; it only lets the identity be evaluated for every item.
+
+   When SCL does not report an element for an item, the step treats the missing element as zero, so that the
+   identity can be evaluated for every item. This is safe for two reasons. First, FAO builds each balance as a
+   whole, estimating every element of the item together, so an element missing from a compiled balance is almost
+   always one that does not apply to the item, not lost data. Second, if an element with a real value were missing
+   and treated as zero, the two sides of the identity would not close for that item, and the step fails when more
+   than 1% of the item balances do not close.
+
+3. Densities.
+   >> Scale: major. This is the core assumption of the whole step: every calorie and every gram of protein in the
+   output is a tonnage multiplied by one of these densities.
+
+   SCL reports every element of the balance only in tonnes. The exception is food: for each item, country and year,
+   SCL also reports the food as calories (the element "Calories/Year") and as protein (the element "Proteins/Year").
+   To build the chain in calories and protein, every other element must be converted from tonnes, and the food
+   element is the only place the conversion factor can come from. The density of an item (kcal, or grams of
+   protein, per 100 g) is the food nutrient per year divided by the food tonnes per year. That density, derived
+   from the food element alone, is then used to convert every element of the item into the nutrient: production,
+   imports, exports, stock variation, seed, losses, other uses, processing, feed, tourist consumption and
+   residuals. Because every element of the item is converted with the same density, the identity of assumption 1
+   holds in calories and protein exactly as it holds in tonnes, and the chain ends exactly on "food" by
+   construction.
+   Besides calories and protein, the chain is also built in a third unit, mass. The mass table involves no density
+   calculation: SCL already reports every element as a mass, and the step only changes the unit from tonnes to
+   kilograms.
+
+4. Rejected and missing densities, and their fallbacks.
+   >> Scale: minor. Densities derived directly from the data cover about 66% of tonnage in energy (63% in protein);
+   the medians cover about 8% (12% in protein). The rest uses the fixed and the product-implied densities of
+   assumptions 6 and 7.
+
+   A density is rejected only when it is physically impossible: more energy than pure fat (920 kcal per 100 g), or
+   more than 100 g of protein per 100 g. Densities that are unusual but physically possible are kept as they are.
+   A density can also be missing entirely, when the item is not eaten in that country.
+   In both cases the step falls back to the country's median density for the item over all years, and then to the
+   item's median over all countries and years.
+
+5. Densities of exactly zero.
+   >> Scale: minor. A division by zero food gives a raw zero in 0.1% of cells in energy and 6.6% in protein; about
+   one zero in nine is spurious and gets a nonzero value from the medians.
+
+   A derived density of exactly zero gets a special treatment, because a zero can mean two things:
+   - A true zero: the item has none of the nutrient. Sugar and oils contain no protein, and FAO's own figures give
+     them a density of zero in every country and year.
+   - A spurious zero: a tiny amount of food was rounded down to zero in one country and year, for an item that
+     normally has a nonzero density.
+   To handle both correctly, the step never uses a zero directly. When the division gives exactly zero, the cell
+   takes the median density instead (the country's median for the item over all years, then the item's median over
+   all countries and years), and the zeros are included in those medians. For a true zero, every year is zero, so
+   the median is zero and the item correctly ends at zero. For a spurious zero, the median is the item's usual
+   value, so the cell gets that.
+
+6. Items nobody eats get fixed densities.
+   >> Scale: major for the stages "feed" and "processing_net". The fixed densities carry only 3.4% of tonnage, but
+   that tonnage is the oilseed cakes and brans whose presence is the main reason to use SCL at all.
+
+   Items nobody eats (cakes, brans, ethanol, refining residues) have no food use, so no density can be derived from
+   the data. Each gets the energy and protein of the human food it would be if eaten: energy from USDA's food
+   composition tables, protein of each cake from the Feedipedia feed tables. The values and sources are in
+   `food_supply_chain_scl.items.yml`.
+   These fixed densities only apply to an item when less than 1% of the item's supply is eaten as food. The reason
+   is that a few hundred tonnes of soybean cake eaten somewhere would otherwise set the density of hundreds of
+   millions of tonnes of cake. An item on the list with a real food use (spirits, and wheat bran in some countries)
+   keeps its data-derived density instead.
+   Items that are never food in any form (castor, tung, kapok, jojoba, wool grease) get zero energy and protein,
+   which removes them from every element consistently. In the mass table every item counts as it is.
+
+7. Crops that are not eaten as harvested get densities implied by their products.
+   >> Scale: major for the stage "crop_production". The product-implied densities carry 22% of tonnage: paddy rice,
+   sugar cane, sugar beet, oil palm fruit, rapeseed and cotton seed.
+
+   A density derived from food use measures the calories a human gets from eating the item; for these crops that is
+   the wrong measure, because almost the whole harvest goes to factories, and a factory extracts far more than a
+   human eating the crop raw (most of a chewed cane stalk is spat out; a mill takes nearly all of the sugar). The
+   density of these crops is therefore derived from the products made out of them: the calories in the family's
+   products, minus the calories of intermediate products processed further within the same family, divided by the
+   tonnes of the crop that went into processing. The ratio is computed for World each year and applied to every
+   country. The crop-to-product links are in the items file.
+
+8. Roles: where each item's production enters the chain.
+   >> Scale: major. Together with the densities, the roles are the shape of the chain: they decide which stage
+   every tonne of production lands in.
 
    Adding up the production of all items would count the same calories many times, because sugar is made from sugar
    cane and bread is made from wheat. To avoid double counting, each item has a role, and the role decides where the
@@ -44,87 +131,81 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    cotton, but seed cotton is a fibre crop and not an SCL item, so cotton seed is the first point in SCL where the
    calories of the cotton harvest exist.
 
-3. Densities. The density of an item (kcal, or grams of protein, per 100 g) is derived from food use: FAO's food
-   calories of the item ("Calories/Year") or food protein ("Proteins/Year"), divided by the food tonnes of the
-   item, per country and year. The same density is applied to every element of the item, so the identity of
-   assumption 1 holds in calories and protein exactly as it holds in tonnes.
-   A density is rejected only when it is physically impossible: more energy than pure fat (920 kcal per 100 g), or
-   more than 100 g of protein per 100 g. Rejected and missing densities fall back to the country's median for the
-   item over all years, and then to the item's median over all countries and years.
-   A derived density of exactly zero gets a special treatment, because a zero can mean two things:
-   - A true zero: the item has none of the nutrient. Sugar and oils contain no protein, and FAO's own figures give
-     them a density of zero in every country and year.
-   - A spurious zero: a tiny amount of food was rounded down to zero in one country and year, for an item that
-     normally has a nonzero density.
-   To handle both correctly, the step never uses a zero directly. When the division gives exactly zero, the cell
-   takes the median density instead (the country's median for the item over all years, then the item's median over
-   all countries and years), and the zeros are included in those medians. For a true zero, every year is zero, so
-   the median is zero and the item correctly ends at zero. For a spurious zero, the median is the item's usual
-   value, so the cell gets that.
-   Besides calories and protein, the chain is also built in a third unit, mass. The mass table involves no
-   density calculation:
-   SCL already reports every element as a mass, and the step only changes the unit from tonnes to kilograms.
+9. Fish and seafood are taken from FBS.
+   >> Scale: minor for World (fish production is 46 of the 631 kcal per person per day of animal products in 2023,
+   and 6 of the 43 g of protein); large for fishing nations.
 
-4. Items nobody eats (cakes, brans, ethanol, refining residues) have no food use, so no density can be derived from
-   the data. Each gets the energy and protein of the human food it would be if eaten: energy from USDA's food
-   composition tables, protein of each cake from the Feedipedia feed tables. The values and sources are in
-   `food_supply_chain_scl.items.yml`.
-   These fixed densities only apply to an item when less than 1% of the item's supply is eaten as food. The reason
-   is that a few hundred tonnes of soybean cake eaten somewhere would otherwise set the density of hundreds of
-   millions of tonnes of cake. An item on the list with a real food use (spirits, and wheat bran in some countries)
-   keeps its data-derived density instead.
-   Items that are never food in any form (castor, tung, kapok, jojoba, wool grease) get zero energy and protein,
-   which removes them from every element consistently. In the mass table every item counts as it is.
+   Fish and seafood are not in SCL. The FBS fish items are added, with their FBS densities under the same rules,
+   for the countries and years that SCL covers.
 
-5. Crops that are not eaten as harvested (paddy rice, sugar cane, sugar beet, oil palm fruit, rapeseed, cotton
-   seed). A density derived from food use measures the calories a human gets from eating the item; for these crops
-   that is the wrong measure, because almost the whole harvest goes to factories, and a factory extracts far more
-   than a human eating the crop raw (most of a chewed cane stalk is spat out; a mill takes nearly all of the
-   sugar). The density of these crops is therefore derived from the products made out of them: the calories in the
-   family's products, minus the calories of intermediate products processed further within the same family, divided
-   by the tonnes of the crop that went into processing. The ratio is computed for World each year and applied to
-   every country. The crop-to-product links are in the items file.
+10. The rounding gap goes to data adjustments.
+    >> Scale: minor.
 
-6. Fish and seafood are not in SCL. The FBS fish items are added, with their FBS densities under the same
-   rules, for the countries and years that SCL covers.
+    FAOSTAT rounds tonnages, so balances do not close exactly. The gap is added to FAO's own "residuals", and the
+    combined stage is called "data_adjustments", so that the chain ends exactly on "food". The size of the gap is
+    kept in "balancing_difference" for quality control.
 
-7. FAOSTAT rounds tonnages, so balances do not close exactly. The gap is added to FAO's own "residuals", and the
-   combined stage is called "data_adjustments", so that the chain ends exactly on "food". The size of the gap is
-   kept in "balancing_difference" for quality control.
-   The world does not trade with anyone, but World imports and exports (sums of what countries report) differ.
-   World exports are set equal to World imports, which FAO considers the better-documented side (FAO 2025, Food
-   Balance Sheets and Supply Utilization Accounts Resource Handbook, section 6.1), and the difference goes to
-   "data_adjustments". Other regions do trade with the rest of the world and are left as they are.
+11. World exports are set equal to World imports.
+    >> Scale: minor, and only for World: the trade gap is a few percent of imports.
 
-8. Regions. FAO's own regional aggregates are dropped, and OWID regions (World, continents, income groups) are
-   built from the member countries that have an SCL balance that year: every element and every food nutrient total is
-   summed over those countries (fish included, from the same countries), and the region's population is the sum of
-   those same countries' population. A country either has a full balance or none at all, so the elements and the
-   population always cover the same countries. A region-year is dropped when the countries with a balance hold less
-   than 80% of the region's population. "Low-income countries" is left out altogether: SCL never covers more than
-   80% of its population.
+    The world as a whole does not trade with anyone, so World imports and World exports should be equal. In the
+    data they differ, because each is the sum of what individual countries report. World exports are set equal to
+    World imports, which FAO considers the better-documented side (FAO 2025, Food Balance Sheets and Supply
+    Utilization Accounts Resource Handbook, section 6.1), and the difference goes to "data_adjustments". Other
+    regions do trade with the rest of the world and are left as they are.
 
-9. All stages are divided by that population and by 365 days.
+12. Regions.
+    >> Scale: major for the 10 region aggregates, which only exist through this assumption; no country's values
+    change.
+
+    FAO's own regional aggregates are dropped, and OWID regions (World, continents, income groups) are built from
+    the member countries that have an SCL balance that year: every element and every food nutrient total is summed
+    over those countries (fish included, from the same countries), and the region's population is the sum of those
+    same countries' population. A country either has a full balance or none at all, so the elements and the
+    population always cover the same countries.
+
+13. Low-coverage region-years are dropped, and "Low-income countries" is left out.
+    >> Scale: minor. It removes a few region-years and one region; no country's values change.
+
+    A region-year is dropped when the countries with a balance hold less than 80% of the region's population, so
+    that a value labeled "Africa" is never built from a small fraction of Africa. "Low-income countries" is left
+    out altogether: SCL never covers more than 80% of its population (Japan, Sudan, Somalia and a few others are
+    not compiled).
+
+14. All stages are divided by that population and by 365 days, to give values per person per day.
+    >> Scale: minor. A choice of unit, not of substance; it rescales all values equally.
 
 KNOWN PROBLEMS, NOT YET RESOLVED
 --------------------------------
-- Processing appears to create calories in some countries. In the normal case "processing_net" is positive:
-  factories lose some calories. But in Brazil, "processing_net" is about -650 kcal per person per day in 2023, as
-  if Brazilian factories created calories. Two inconsistencies cause this:
-  - Ethanol. The production of ethanol counts as factory output, valued at 700 kcal per 100 g (assumption 4). But
-    ethanol is not among the products used to derive the density of sugar cane (assumption 5), so the cane entering
+- Processing appears to create calories in some countries.
+  >> Scale: major for Brazil, about -650 kcal per person per day in 2023; small for World. Not fixed yet; the FBS
+  sibling has the same symptom with a different cause.
+
+  In the normal case "processing_net" is positive: factories lose some calories. But in Brazil, "processing_net" is
+  negative, as if Brazilian factories created calories. Two inconsistencies cause this:
+  - Ethanol. The production of ethanol counts as factory output, valued at 700 kcal per 100 g (assumption 6). But
+    ethanol is not among the products used to derive the density of sugar cane (assumption 7), so the cane entering
     the mills is never credited with the calories of the ethanol made from it. Calories come out that were never
     counted going in. Brazil, where a large share of the cane becomes ethanol, is the extreme case.
   - The soy family. Soybeans enter processing at their data-derived density (406 kcal per 100 g in Brazil), but the
-    outputs, cake at the fixed 330 (assumption 4) plus oil at 900, add up to about 6% more than the beans carried.
+    outputs, cake at the fixed 330 (assumption 6) plus oil at 900, add up to about 6% more than the beans carried.
     Brazil crushes so much soy that 6% is large.
-- The product-implied densities of assumption 5 are World-level ratios applied to every country. A country whose
-  product mix differs from the world average (again Brazil, with its ethanol) gets a density that does not match
+
+- The product-implied densities are World-level ratios applied to every country.
+  >> Scale: minor for World by construction; it distorts countries whose product mix differs from the world
+  average (again Brazil, with its ethanol).
+
+  A country whose product mix differs from the world average gets a density of assumption 7 that does not match
   what its own factories make.
-- The stage "feed" only counts feed that passes through the balance. Grass, pasture and forage are not SCL items,
-  so everything grazing animals eat from pasture enters the chain nowhere, and wild-caught fish count as animal
-  products with no feed at all. For fishing and grazing countries (Iceland, Mongolia, several island states),
-  "animal_products" can therefore exceed "feed".
+
+- The stage "feed" only counts feed that passes through the balance.
+  >> Scale: "animal_products" exceeds "feed" in 13% of country-years in energy and 22% in protein, mostly real free
+  inputs rather than errors; World is unaffected (feed 2,084 against 631 kcal in 2023, and 106 against 43 g of
+  protein).
+
+  Grass, pasture and forage are not SCL items, so everything grazing animals eat from pasture enters the chain
+  nowhere, and wild-caught fish count as animal products with no feed at all. For fishing and grazing countries
+  (Iceland, Mongolia, several island states), "animal_products" can therefore exceed "feed".
 """
 
 import numpy as np
@@ -161,7 +242,7 @@ ELEMENT_UNITS = {
     "Tonnes": [code for code in ELEMENTS if code != "000261"],
 }
 KCAL_PER_MILLION_KCAL = 1e6
-# FBS elements used for the fish items (see assumption 6).
+# FBS elements used for the fish items (see assumption 9).
 FBS_ELEMENTS = {
     "005511": "production",
     "005611": "imports",
@@ -261,12 +342,12 @@ KG_PER_TONNE = 1000
 GRAMS_PER_TONNE = 1_000_000
 # An item in the fixed-density list keeps its data-based density if more than this share of its supply is eaten as food.
 FIXED_DENSITY_MAX_FOOD_SHARE = 0.01
-# Minimum share of a region's population that must live in member countries with a balance (assumption 8).
+# Minimum share of a region's population that must live in member countries with a balance (assumption 13).
 MIN_FRACTION_POPULATION_COVERED = 0.8
-# Regions that lose some years to that rule (assumption 8); none once low-income countries are left out.
+# Regions that lose some years to that rule (assumption 13); none once low-income countries are left out.
 REGIONS_WITH_LOW_COVERAGE = set()
 DAYS_PER_YEAR = 365
-# OWID regions rebuilt in this step (assumption 8); the FAOSTAT garden step's rows for them, if any, are dropped.
+# OWID regions rebuilt in this step (assumption 12); the FAOSTAT garden step's rows for them, if any, are dropped.
 REGIONS = [
     "World",
     "Africa",
@@ -275,7 +356,7 @@ REGIONS = [
     "North America",
     "Oceania",
     "South America",
-    # "Low-income countries" is left out (assumption 8): SCL covers at most 80% of its population.
+    # "Low-income countries" is left out (assumption 13): SCL covers at most 80% of its population.
     "Lower-middle-income countries",
     "Upper-middle-income countries",
     "High-income countries",
@@ -378,7 +459,7 @@ def prepare_balance_table(tb: Table, roles: pd.Series, manual: dict) -> Table:
 
 
 def prepare_fish_table(tb_fbsc: Table, manual: dict, population: Table) -> Table:
-    """FBS fish items, reshaped like the SCL balance table (see assumption 6)."""
+    """FBS fish items, reshaped like the SCL balance table (see assumption 9)."""
     fish_items = {_pad_code(item["code"]): item for item in manual["fish_from_fbs"]}
     tb = tb_fbsc[
         tb_fbsc["item_code"].astype(str).isin(fish_items)
@@ -417,7 +498,7 @@ def prepare_fish_table(tb_fbsc: Table, manual: dict, population: Table) -> Table
 
 
 def add_region_aggregates(tb: Table) -> Table:
-    """Assumption 8: OWID regions as the sum of the member countries present each year, for the elements and the population."""
+    """Assumption 12: OWID regions as the sum of the member countries present each year, for the elements and the population."""
     assert not tb["country"].isin(REGIONS).any(), "Region rows must be dropped before aggregating."
     keys = ["country", "year", "item_code"]
     value_columns = [c for c in tb.columns if c not in keys + ["population"] and pd.api.types.is_numeric_dtype(tb[c])]
@@ -475,7 +556,7 @@ def fixed_density_map(tb: Table, manual: dict, nutrient: str) -> dict[str, float
 
 
 def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
-    """Densities per (country, year, item) for one nutrient, following assumptions 3 to 5."""
+    """Densities per (country, year, item) for one nutrient, following assumptions 3 to 7."""
     tb = tb.copy()
     config = NUTRIENTS[nutrient]
     if config["numerator"] is None:
@@ -500,7 +581,7 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
         default="none",
     )
 
-    # Assumption 4: items nobody eats, valued as human food; items that are never food, zero.
+    # Assumption 6: items nobody eats, valued as human food; items that are never food, zero.
     fixed = fixed_density_map(tb, manual, nutrient)
     for item in manual["never_food"]:
         fixed[_pad_code(item["code"])] = 0.0
@@ -515,7 +596,7 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
     never = tb["item_code"].isin([_pad_code(item["code"]) for item in manual["never_food"]])
     tb.loc[never, ["density", "density_source"]] = [0.0, "never_food"]
 
-    # Assumption 5: crops not eaten as harvested get the density implied by their products, from World each year.
+    # Assumption 7: crops not eaten as harvested get the density implied by their products, from World each year.
     world = tb[tb["country"] == "World"]
     for family in manual["output_implied_densities"]:
         crops = [_pad_code(c) for c in family["crops"]]
@@ -614,7 +695,7 @@ def build_chain(tb: Table) -> Table:
     chain.loc[world, "exports"] = chain.loc[world, "imports"]
     chain.loc[world, "data_adjustments"] = chain.loc[world, "data_adjustments"] - trade_gap
 
-    # Per person per day (assumption 9): the entity's population, or, for regions, that of the summed members.
+    # Per person per day (assumption 14): the entity's population, or, for regions, that of the summed members.
     assert chain["population"].notnull().all() and (chain["population"] > 0).all(), "Missing population."
     for stage in STAGES:
         chain[stage] = chain[stage] / chain["population"] / DAYS_PER_YEAR
