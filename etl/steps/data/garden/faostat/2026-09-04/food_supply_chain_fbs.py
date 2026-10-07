@@ -471,14 +471,6 @@ REGIONS = [
 
 
 # --------------------------------------------------------------------------------------------------------------------
-# Helpers.
-# --------------------------------------------------------------------------------------------------------------------
-def _pad_code(code: int) -> str:
-    # Item codes in the FAOSTAT garden tables are zero-padded to 8 characters ("00002511").
-    return str(code).zfill(8)
-
-
-# --------------------------------------------------------------------------------------------------------------------
 # The items file (assumption 7).
 # --------------------------------------------------------------------------------------------------------------------
 def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
@@ -497,15 +489,16 @@ def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
         assert item["role"] in ROLES, f"Unknown role in item: {item}"
         assert item.get("fao_group", "vegetal") in {"vegetal", "animal"}, f"Unknown fao_group in item: {item}"
     items = pd.DataFrame(config["included"])
-    items["item_code"] = items["code"].map(_pad_code)
+    # Item codes in the FAOSTAT garden tables are zero-padded to 8 characters ("00002511").
+    items["item_code"] = items["code"].astype(str).str.zfill(8)
     natural_group = items["role"].map({"crop": "vegetal", "processed": "vegetal", "animal": "animal"})
     if "fao_group" not in items.columns:
         items["fao_group"] = np.nan
     items["fao_group"] = items["fao_group"].fillna(natural_group)
     items = items.set_index("item_code", verify_integrity=True)
 
-    excluded = {_pad_code(item["code"]): item["name"] for item in config["excluded"]}
-    groups = {_pad_code(item["code"]): item["name"] for item in config["groups"]}
+    excluded = {str(item["code"]).zfill(8): item["name"] for item in config["excluded"]}
+    groups = {str(item["code"]).zfill(8): item["name"] for item in config["groups"]}
     all_codes = list(items.index) + list(excluded) + list(groups)
     assert len(all_codes) == len(set(all_codes)), "An item code appears in more than one list of the items file."
 
