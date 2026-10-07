@@ -5,16 +5,14 @@ definitions:
       topic_tags:
         - Food Supply
     description_processing: |-
-      - FAOSTAT Food Balance Sheets report every element of the food balance in tonnes, and only food available for consumption also in kilocalories and grams of protein. We convert flows reported in tonnes with a density (kilocalories, or grams of protein, per 100 grams) and sum the items into the stages of the chain; the mass table keeps the tonnes, expressed in kilograms per person per day.
-      - Energy and protein densities are calculated separately for each item, country or region, and year, by dividing reported food nutrients by food weight and expressing the result per 100 grams. Densities that cannot be calculated, are zero or negative, or exceed 920 kilocalories or 100 grams of protein per 100 grams are replaced by the item’s median density across years for the same country or region. If that median is unavailable, we use the item’s median across all available countries, regions, and years. These medians include zero densities but exclude missing, negative, and above-limit values.
-      - For energy and protein, we keep the reported food nutrient total wherever the directly derived density is accepted. Where a density is replaced, food is still calculated from tonnes using the replacement density. This preserves food nutrients that would otherwise be lost or distorted by the more coarsely rounded food tonnage.
-      - Stock variation is derived as production plus imports minus exports minus domestic supply, since FAOSTAT only reports it from 2010 onward.
-      - Only individual items are summed; FAO's aggregate items (such as "Cereals" or "Vegetal Products") are left out to avoid double counting. Three items are left out: "Palm kernels" (which carries the oil palm harvest; the oil palm enters the chain as palm oil and palm kernel oil, and the small amount of palm fruit and kernels eaten directly is lost), non-food alcohol and aquatic mammals.
-      - Production of processed products (vegetable oils, sugar and sweeteners, alcoholic beverages, butter, cream, fish oils, and other processed products) is subtracted from food entering processing to avoid double counting. Palm oil and palm kernel oil are exceptions: their production is counted as crop production.
-      - FAOSTAT reports rounded tonnages, which do not balance exactly. We retain food nutrients at their reported precision where the directly derived density is accepted, and include the gap between the other stages and food in data adjustments. This lets the chain end at food available for consumption without reducing the precision of the reported food nutrients.
-      - The world as a whole does not trade, but the sum of the imports reported by all countries differs from the sum of their exports. For the world, exports are set equal to imports, which FAO considers the better-documented side, and the difference is added to data adjustments.
-      - For the world, reported tourist consumption is moved to data adjustments, and the tourist consumption stage is set to zero. This leaves food available for consumption unchanged.
-      - All stages are divided by the same population series, from Our World in Data's population dataset, and by 365 days. Regions (the world, continents and income groups) are built by summing the member countries with an FAO balance in that year, and divided by the population of those same countries; a region is left empty in years when those countries hold less than 80% of its population.
+      - FAO's Food Balance Sheets record, in tonnes, how much of each food product a country produces, imports, exports, adds to stocks and uses for each purpose. Only the food available for people to eat is also given in calories and protein. To show every stage in calories and protein, we convert its tonnes using the calorie and protein content of each product. Values in kilograms are FAO's tonnes, without conversion.
+      - We calculate the calorie and protein content (per 100 grams) of each product, country and year from FAO's own figures, as the calories or protein in the food available to eat divided by its weight. Where this gives an impossible value (more than 920 kilocalories per 100 grams, the energy of pure fat, or more than 100 grams of protein per 100 grams), a value of zero, or no value, we use the median content of that product in the same country across all years, or, if there is none, its median across all countries and years.
+      - FAO reports stock changes only from 2010 onward. For earlier years, we calculate them as production plus imports, minus exports, minus domestic supply.
+      - We add up individual food products, not FAO's product groups such as "Cereals", which would count the same food twice. We leave out non-food alcohol, the meat of aquatic mammals, and "Palm kernels". In FAO's data, "Palm kernels" holds the whole oil palm harvest. We count the oil palm through palm oil and palm kernel oil instead, so the small amount of palm fruit and kernels eaten directly is not included.
+      - Processed products, such as vegetable oils, sugar, beer and butter, are made from products already counted in the chain. To avoid counting the same food twice, their production is subtracted from processing rather than added to production. Palm oil and palm kernel oil are the exception: they are counted as crop production.
+      - FAO rounds most tonnages to the nearest thousand tonnes, so the stages do not add up exactly. For food available to eat, we keep FAO's reported calories and protein, except where we replaced a product's calculated content. The remaining gap is added to FAO's own unexplained differences (which FAO calls residuals) and shown as data adjustments, so that the chain ends exactly at food available to eat.
+      - The world as a whole does not trade with anyone, but the imports reported by all countries do not add up to the same amount as their exports. For the world, we set exports equal to imports, which FAO considers the more reliable figure. Similarly, every visitor lives in some country, so we set the world's tourist consumption to zero. Both differences are added to data adjustments.
+      - All values are divided by population, from Our World in Data's population data, and by 365 days. Regions (the world, continents and income groups) add up the countries with FAO data in each year, and are divided by the population of those same countries. A region is left out in years when those countries hold less than 80% of its population.
 
 dataset:
   update_period_days: 365
@@ -30,55 +28,55 @@ tables:
     variables: &variables
       crop_production:
         title: Crop production
-        description_short: Domestic production of crops, including palm oil and palm kernel oil.
+        description_short: Crops harvested in the country, including palm oil and palm kernel oil.
         description_key:
-          - Crops are cereals, roots and tubers, sugar crops, pulses, nuts, oil crops, vegetables, fruit, stimulants, spices and aquatic plants, plus palm oil and palm kernel oil, which stand in for the oil palm harvest.
-          - Products made from crops (other vegetable oils, sugar, sweeteners, alcoholic beverages) are not included here; their production is netted against processing.
+          - Crops include cereals, roots and tubers, sugar crops, pulses, nuts, oil crops, vegetables, fruit, coffee, tea, cocoa, spices and seaweed. Palm oil and palm kernel oil are counted here in place of the oil palm harvest.
+          - Products made from crops, such as most vegetable oils, sugar and beer, are not counted here, because the crops they are made from already are. Their production is subtracted from processing.
       imports:
         title: Imports
-        description_short: Imports of all food items.
+        description_short: Food products bought from other countries.
       exports:
         title: Exports
-        description_short: Exports of all food items.
+        description_short: Food products sold to other countries.
       stock_variation:
         title: Stock variation
-        description_short: The net change in stocks of all food items. Positive values mean that stocks grew, taking from the supply.
+        description_short: Food products added to stocks, minus those taken out. Positive values mean stocks grew, so that food was not available for other uses that year.
       seed:
         title: Seed
         description_short: Crops used for planting, eggs used for hatching, and fish used as bait.
       losses:
         title: Losses
-        description_short: Food lost in the supply chain, between the farm and the retailer.
+        description_short: Food lost between the farm and the shop.
         description_key:
-          - FAOSTAT's "Losses" cover losses in storage, transport and processing. They do not include waste at retail or in households.
+          - These are losses in storage, transport and processing. They do not include food wasted in shops or households.
       other_uses:
         title: Other uses
-        description_short: Food items used for non-food purposes, such as biofuels, soap and other industrial uses.
+        description_short: Food products used for purposes other than food or feed, such as biofuels and soap.
       processing_net:
         title: Processing, net
-        description_short: Food items recorded as entering processing, minus production of items classified as processed products. Positive values mean inputs exceed outputs.
+        description_short: Food products sent to be processed, for example milled, crushed or brewed, minus the processed products made from them, such as oils, sugar and beer. Positive values mean more goes in than comes out.
         description_key:
-          - Oilseed cakes and other feed by-products are not items of the Food Balance Sheets, so what goes from oilseeds to cakes to animal feed appears here rather than under feed.
+          - When oilseeds such as soybeans are crushed for their oil, the solid remains, called oilseed cake, are mostly fed to animals. FAO's Food Balance Sheets do not record oilseed cake, so it appears here as lost in processing instead of as animal feed.
       feed:
         title: Feed
-        description_short: Food items fed to animals.
+        description_short: Food products fed to animals.
         description_key:
-          - Animals also eat grass, forage, crop residues and oilseed cakes, none of which are items of the Food Balance Sheets. Dividing animal products by feed therefore overstates the efficiency of livestock.
+          - Animals also eat grass, crop residues and oilseed cake, which are not counted here. Comparing animal products with feed therefore makes livestock look more efficient than they are.
       animal_products:
         title: Animal products
-        description_short: Domestic production of meat, offal, animal fats, milk, eggs, honey, fish and seafood.
+        description_short: Meat, offal, animal fats, milk, eggs, honey, fish and seafood produced in the country.
       tourist_consumption:
         title: Tourist consumption
-        description_short: Food consumed by visitors from other countries, reported from 2010 onward. For the world, this is set to zero and included in data adjustments.
+        description_short: Food eaten by visitors from other countries. FAO reports it from 2010 onward. For the world, it is set to zero.
       data_adjustments:
         title: Data adjustments
-        description_short: Statistical discrepancies, including rounding. For the world, this also includes the difference between imports and exports and reported tourist consumption. Values can be negative.
+        description_short: Differences that make the stages add up to the food available to eat, from FAO's own unexplained differences and from rounding in FAO's figures. For the world, it also includes the gap between imports and exports, and tourist consumption. Values can be negative.
       food:
         title: Food available for consumption
-        description_short: Food available for human consumption, before waste at retail and in households.
+        description_short: Food available for people to eat, before waste in shops and households.
       balancing_difference:
         title: Balancing difference
-        description_short: Gap between food available for consumption and the preceding stages of the balance, before adjustments made by OWID. It is included in data adjustments; this column only records its size.
+        description_short: The part of data adjustments that comes from rounding in FAO's figures.
   protein:
     title: Food supply chain in grams of protein (Food Balance Sheets method)
     common:
