@@ -1,18 +1,6 @@
 # Items of the FAOSTAT Food Balance Sheets (FBS) for the food supply chain step (FBS method).
-#
-# Every FBS item code in the input table must appear in exactly one of the three lists below; the step asserts this
-# and asserts that each code still carries the expected FAO name.
-#
-# Each chain item:
-#   code:   FAO FBS item code (as an integer; the garden table zero-pads it to 8 characters).
-#   name:   FAO item name, as given in the `fao_item` column of the garden table.
-#   role:   Where the item's production enters the chain (see the step's assumption 5):
-#             crop      -> "crop_production", the start of the chain.
-#             animal    -> "animal_products", added after feed is subtracted.
-#             processed -> netted against processing ("processing_net"): these are made from other items (oils,
-#                          sugar, alcoholic beverages, butter, cream), so their production is not a new input.
-#   fao_group (optional): "vegetal" or "animal", only where FAO's own grouping differs from the role's natural
-#           group. Used by the partition check.
+# The lists, the roles and the optional field "fao_group" are explained in `food_supply_chain_fbs.py`.
+# Every FBS item code must appear in exactly one of the three lists below; the step asserts this.
 included:
   # Cereals.
   - {code: 2511, name: "Wheat and products", role: crop}
