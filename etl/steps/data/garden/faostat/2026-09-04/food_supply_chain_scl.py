@@ -847,15 +847,20 @@ def run() -> None:
     #
     # Process data.
     #
+    # Assumption 12: FAO's own regional aggregates are dropped (OWID regions are built later from countries).
     tb_scl = tb_scl[~tb_scl["country"].astype(str).str.contains("(FAO)", regex=False)].reset_index(drop=True)
     tb_fbsc = tb_fbsc[~tb_fbsc["country"].astype(str).str.contains("(FAO)", regex=False)].reset_index(drop=True)
+    # Assumption 8: the role of every item, from FAO's item groups.
     roles = load_roles(tb_groups)
     sanity_check_inputs(tb_scl, roles=roles, manual=manual)
 
+    # Assumptions 1 and 2: the balance table, with missing elements as zero.
     tb = prepare_balance_table(tb_scl, roles=roles, manual=manual)
     population = tb[["country", "year", "population"]].drop_duplicates()
+    # Assumption 9: fish and seafood, taken from FBS.
     tb_fish = prepare_fish_table(tb_fbsc, manual=manual, population=population)
     tb = pr.concat([tb, tb_fish], ignore_index=True)
+    # Assumptions 12 and 13: OWID regions from member countries, dropping region-years with low coverage.
     tb = add_region_aggregates(tb)
     sanity_check_balance_identity(tb)
 

@@ -821,17 +821,20 @@ def run() -> None:
     #
     ds_fbsc = paths.load_dataset("faostat_fbsc")
     tb_fbsc = ds_fbsc.read("faostat_fbsc", safe_types=False)
+    # Assumption 7: every FBS item is classified in the items file.
     items, excluded, groups = load_items_config()
 
     #
     # Process data.
     #
-    # Keep OWID countries and regions; drop FAO's own regional aggregates, which duplicate them.
+    # Assumption 11: FAO's own regional aggregates are dropped (OWID regions are built later from countries).
     tb_fbsc = tb_fbsc[~tb_fbsc["country"].astype(str).str.contains("(FAO)", regex=False)].reset_index(drop=True)
     sanity_check_inputs(tb_fbsc, items=items, excluded=excluded, groups=groups)
     sanity_check_partition(tb_fbsc, items=items)
 
+    # Assumptions 1 to 3: the balance table, with derived stock variation and missing elements as zero.
     tb = prepare_balance_table(tb_fbsc, items=items)
+    # Assumptions 11 and 12: OWID regions from member countries, dropping region-years with low coverage.
     tb = add_region_aggregates(tb)
     sanity_check_balance_identity(tb)
 
