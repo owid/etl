@@ -628,10 +628,19 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
     """
     assert nutrient != "mass", "The mass table involves no density; it never goes through this function."
     tb = tb.copy()
-    config = NUTRIENTS[nutrient]
-    raw = config["to_per_100g"] * tb[config["numerator"]] / tb["food_tonnes_for_density"]
+    # The nutrient decides the ingredients (see NUTRIENTS): which food total is the numerator of the density, the
+    # factor that scales the ratio to "per 100 g", and the physical ceiling.
+    numerator = NUTRIENTS[nutrient]["numerator"]
+    to_per_100g = NUTRIENTS[nutrient]["to_per_100g"]
+    ceiling = NUTRIENTS[nutrient]["ceiling"]
+
+    # Assumption 3: the density is the food nutrient per year divided by the food tonnes per year.
+    raw = to_per_100g * tb[numerator] / tb["food_tonnes_for_density"]
+    # The pathologies of that division count as missing: division by zero tonnes (infinity), zero by zero (nan),
+    # and negative values.
     raw = raw.where(np.isfinite(raw) & (raw >= 0))
-    within_ceiling = raw.where(raw <= config["ceiling"])
+    # Assumption 4: a density above the physical ceiling is a broken FAOSTAT cell, and counts as missing too.
+    within_ceiling = raw.where(raw <= ceiling)
     # A density of exactly zero is real for oils and sugars (no protein), but it is also what a tiny food quantity
     # rounded to zero produces, so zeros are not used directly: they enter the medians, which come out as zero
     # for items that truly have none of the nutrient and as the usual value otherwise.
@@ -687,7 +696,7 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
             tonnes_in * HUNDRED_GRAMS_PER_TONNE
         )
         error = f"Implausible implied {nutrient} densities for {list(family['crops'].values())}: {implied.round(1).to_dict()}"
-        assert implied.between(0, config["ceiling"]).all(), error
+        assert implied.between(0, ceiling).all(), error
         mask = tb["item_code"].isin(crops)
         tb.loc[mask, "density"] = tb.loc[mask, "year"].map(implied)
         tb.loc[mask, "density_source"] = "implied_by_products"
