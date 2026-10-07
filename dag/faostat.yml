@@ -248,11 +248,11 @@ steps:
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2026-07-01/income_groups
-  # Bespoke viz step: a metadata JSON plus one JSON per entity under s3://owid-public/data/food-supply-chain/. The
-  # single garden dependency decides which method is published; switching method is a matter of changing that line.
-  viz://bespoke/faostat/latest/food_supply_chain:
+  # Bespoke viz step: a metadata JSON plus one JSON per entity, built with the Supply Utilization Accounts method,
+  # whose chain runs from 2010; the main source of the interactive waterfall.
+  viz://bespoke/faostat/latest/food_supply_chain_scl:
     - data://garden/faostat/2026-09-04/food_supply_chain_scl
-  # The same feed built with the Food Balance Sheets method, whose chain runs from 1961; made for the static
+  # The same files built with the Food Balance Sheets method, whose chain runs from 1961; made for the static
   # waterfall of the world in 1968 (the year The Population Bomb was published).
   viz://bespoke/faostat/latest/food_supply_chain_fbs:
     - data://garden/faostat/2026-09-04/food_supply_chain_fbs
