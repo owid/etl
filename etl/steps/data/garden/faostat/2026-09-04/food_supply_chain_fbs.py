@@ -793,6 +793,7 @@ def sanity_check_partition(tb_fbsc: Table, items: Table) -> None:
 
 
 def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
+    """Check one output table: shape, no negative magnitudes, the chain ends on food, and World matches FAO."""
     assert tb.columns[tb.isna().all()].empty, "Output has fully-nan columns."
     assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows."
     for stage in [
