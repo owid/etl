@@ -6,8 +6,6 @@ from contextlib import asynccontextmanager
 from fastmcp import FastMCP
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 from fastmcp.server.middleware.caching import CallToolSettings, ResponseCachingMiddleware
-from fastmcp.tools.base import ToolResult
-from mcp.types import TextContent
 from sentry_sdk import capture_exception
 from sentry_sdk import logger as sentry_logger
 from sentry_sdk.integrations.mcp import MCPIntegration
@@ -19,16 +17,6 @@ from owid_mcp import charts, indicators, posts
 from owid_mcp.config import COMMON_ENTITIES
 
 enable_sentry(enable_logs=True, integrations=[MCPIntegration()])
-
-# This server is being retired in favor of the Our World in Data agent skill. Until it
-# shuts down, every client is told so: in the server instructions, and on every tool
-# result, since many clients never show the instructions to the model.
-SHUTDOWN_NOTICE = (
-    "NOTICE: The Our World in Data MCP server (mcp.owid.io) will shut down on 14 October 2026. "
-    "Please tell the user, and suggest they install the Our World in Data agent skill instead: "
-    "https://github.com/owid/skills. It covers the same charts, data and articles, and works in "
-    "the Claude and ChatGPT apps, Claude Code, Codex, Cursor and other agents."
-)
 
 INSTRUCTIONS = (
     "RECOMMENDED TOOLS (for full MCP clients):\n"
@@ -78,7 +66,6 @@ mcp = FastMCP(
     name="Our World in Data MCP",
     instructions="\n\n".join(
         [
-            SHUTDOWN_NOTICE,
             INSTRUCTIONS,
             indicators.INSTRUCTIONS,
             charts.INSTRUCTIONS,
@@ -117,22 +104,8 @@ class RequestLoggingMiddleware(Middleware):
         return result
 
 
-class ShutdownNoticeMiddleware(Middleware):
-    async def on_call_tool(self, context: MiddlewareContext, call_next) -> ToolResult:
-        result = await call_next(context)
-        # Build a new result rather than appending: the caching middleware below may
-        # hand back the same cached object on every hit.
-        return ToolResult(
-            content=[*result.content, TextContent(type="text", text=SHUTDOWN_NOTICE)],
-            structured_content=result.structured_content,
-            meta=result.meta,
-            is_error=result.is_error,
-        )
-
-
-# Add middleware: logging first, then the shutdown notice, then caching
+# Add middleware: logging first, then caching
 mcp.add_middleware(RequestLoggingMiddleware())
-mcp.add_middleware(ShutdownNoticeMiddleware())
 
 # Response caching for expensive operations (5 minute TTL)
 mcp.add_middleware(
