@@ -803,7 +803,7 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
             f"Negative values in stage {stage!r} ({nutrient})."
         )
 
-    # The chain lands exactly on food once the rounding gap is folded into data adjustments.
+    # The chain must end exactly on food once the rounding gap has moved to data adjustments.
     chain_end = tb["crop_production"]
     for stage in STAGES[1:]:
         if stage in ["food", "balancing_difference"]:

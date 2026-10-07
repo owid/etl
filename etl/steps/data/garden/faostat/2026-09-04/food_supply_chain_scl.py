@@ -10,7 +10,7 @@ The chain is built three times, in three units, one table each:
 
 Two differences make SCL preferable to FBS for this chain:
 - SCL reports individual commodities, while FBS reports groups. SCL has "Wheat", "Wheat and meslin flour" and
-  "Bread" as three separate items; FBS folds all three into one item, "Wheat and products".
+  "Bread" as three separate items; FBS merges all three into one item, "Wheat and products".
 - SCL includes the by-products that FBS has no items for: oilseed cakes, brans, gluten feed. When oilseeds
   (soybeans, rapeseed, sunflower seeds) are crushed to extract their oil, the crushed solids that remain are called
   cake. Cake is rich in protein, and it is one of the main things the world feeds to its farm animals. With the
