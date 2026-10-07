@@ -634,11 +634,19 @@ steps:
             - data://garden/demography/2024-07-15/population
 
   # WHO Vaccine Introductions
+  data://grapher/who/2025-07-15/vaccination_introductions:
+    - data://garden/who/2025-07-15/vaccination_introductions:
+        - data://meadow/who/2025-07-15/vaccination_introductions:
+            - snapshot://who/2025-07-15/vaccination_introductions.xlsx
+
+  # WHO Vaccine Introductions - update
+  data://grapher/who/2026-10-07/vaccination_introductions:
+    - data://garden/who/2026-10-07/vaccination_introductions:
+        - data://meadow/who/2026-10-07/vaccination_introductions:
+            - snapshot://who/2026-10-07/vaccination_introductions.xlsx
+
   viz://chart/health/latest/vaccination_introductions:
-    - data://grapher/who/2025-07-15/vaccination_introductions:
-        - data://garden/who/2025-07-15/vaccination_introductions:
-            - data://meadow/who/2025-07-15/vaccination_introductions:
-                - snapshot://who/2025-07-15/vaccination_introductions.xlsx
+    - data://grapher/who/2026-10-07/vaccination_introductions
 
   #
   # US Pertussis cases - CDC
