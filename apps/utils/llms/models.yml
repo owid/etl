@@ -70,11 +70,12 @@ models:
       out: 25.0
   # Google models
   ## Cost: https://ai.google.dev/pricing
-  - name: "google-gla:gemini-3-flash-preview"
-    display_name: "Gemini 3 Flash [preview]"
+  # Doubles to 1.50 / 7.50 on 2027-01-01.
+  - name: "google-gla:gemini-3.8-flash"
+    display_name: "Gemini 3.8 Flash"
     cost:
-      in: 0.50
-      out: 3.0
+      in: 0.75
+      out: 3.75
   - name: "google-gla:gemini-3-pro-preview"
     display_name: "Gemini 3 (smartest) [preview]"
     cost:

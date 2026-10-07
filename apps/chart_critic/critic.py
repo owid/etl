@@ -228,10 +228,9 @@ def format_views(views_365d: int | float | None) -> str:
 def build_agent(model: str = DEFAULT_MODEL) -> Agent[None, Review]:
     """An agent with no system instructions — see :func:`prompt_parts` for why.
 
-    Temperature is left at the model default on purpose. Pinning it to 0 was measured as
-    *worse* for recall (one known finding went from 1/3 passes to 0/3) and it does not buy
-    reproducibility anyway: this model raises a genuine finding on some passes and not others
-    whatever the temperature. Repeat passes, not temperature, are the dial — see ``--repeat``.
+    No sampling settings: Gemini has ignored ``temperature``, ``top_p`` and ``top_k`` since
+    3.6 Flash, and upcoming models reject them. This model raises a genuine finding on some
+    passes and not others, so repeat passes are the recall dial — see ``--repeat``.
     """
     return Agent[None, Review](model=model, output_type=Review, retries=2)
 
