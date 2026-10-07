@@ -56,6 +56,10 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    rounded more coarsely than the figures used to derive its density. Where a density is replaced, food continues
    to use that replacement density and the food tonnage. Any gap between the converted stages and food goes to
    data adjustments (assumption 10).
+   FAO computes the food nutrients with one fixed factor per item: an item's density is the same in every country
+   and year (for example 334 kcal per 100 g for wheat grain, 348 for maize, 64 for potatoes). Nine pairs of country
+   and item are the only exceptions, such as milled rice in Bangladesh (360 kcal per 100 g instead of 349). A check
+   fails the step if this ever changes.
    Besides calories and protein, the chain is also built in a third unit, mass. The mass table involves no density
    calculation: SCL already reports every element as a mass, and the step only changes the unit from tonnes to
    kilograms.
@@ -359,6 +363,25 @@ MAX_WORLD_TRADE_GAP = 0.2
 # Safety limit for assumption 11: World tourist consumption is only set to zero while it is small (at most 0.21%
 # of food in practice); a larger share of food crashes the step instead.
 MAX_WORLD_TOURIST_CONSUMPTION = 0.005
+# FAO uses one calorie factor and one protein factor per item, the same in every country and year (checks
+# assumption 3). These are the only countries where FAO uses a factor of its own for an item.
+COUNTRY_SPECIFIC_NUTRIENT_FACTORS = {
+    ("Afghanistan", "Wheat and meslin flour"),
+    ("Bangladesh", "Rice, milled"),
+    ("Ethiopia", "Other vegetables provisionally preserved"),
+    ("Namibia", "Skim milk of cows"),
+    ("North Korea", "Rice, milled"),
+    ("Peru", "Cassava, fresh"),
+    ("Peru", "Meat of chickens, fresh or chilled"),
+    ("Peru", "Potatoes"),
+    ("Peru", "Rice, milled"),
+}
+# The factor check only uses food quantities of at least 1,000 tonnes; below that, FAO's rounding of the nutrient
+# totals moves the density by more than the tolerance. The tolerance is 1% of the item's factor, but never less than
+# 0.5 kcal or 0.05 g of protein per 100 g, for items with very small factors (such as tea).
+NUTRIENT_FACTOR_MIN_FOOD_TONNES = 1000
+NUTRIENT_FACTOR_RELATIVE_TOLERANCE = 0.01
+NUTRIENT_FACTOR_ABSOLUTE_TOLERANCE = {"energy": 0.5, "protein": 0.05}
 
 # Assumption 6, minor: an item in the fixed-density list keeps its data-derived density if more than this share of
 # its supply is eaten as food.
@@ -597,6 +620,31 @@ def add_region_aggregates(tb: Table) -> Table:
         f"Regions dropped for low coverage changed: {sorted(set(dropped['country']))}. Update the docstring."
     )
     return tb[tb["population"].notnull()].reset_index(drop=True)
+
+
+def sanity_check_nutrient_factors(tb: Table) -> None:
+    """Check that FAO uses one calorie factor and one protein factor per item, except for the listed countries.
+
+    Checks the fact stated in assumption 3, on countries only (before fish and regions are added).
+    """
+    # The European Union is kept as an entity, but it is an aggregate whose density mixes its members' factors.
+    tb = tb[(tb["food"] >= NUTRIENT_FACTOR_MIN_FOOD_TONNES) & (tb["country"] != "European Union (27)")]
+    deviating = set()
+    for nutrient in ["energy", "protein"]:
+        density = tb[NUTRIENTS[nutrient]["numerator"]] / (tb["food"] * HUNDRED_GRAMS_PER_TONNE)
+        rows = tb[density.notnull()]
+        density = density[density.notnull()]
+        # The factor of an item is its most common density across all countries and years.
+        factor = density.groupby(rows["fao_item"]).transform(lambda d: d.round(2).mode().iloc[0])
+        tolerance = np.maximum(
+            NUTRIENT_FACTOR_RELATIVE_TOLERANCE * factor, NUTRIENT_FACTOR_ABSOLUTE_TOLERANCE[nutrient]
+        )
+        off = (density - factor).abs() > tolerance
+        deviating |= set(zip(rows.loc[off, "country"], rows.loc[off, "fao_item"]))
+    assert deviating == COUNTRY_SPECIFIC_NUTRIENT_FACTORS, (
+        f"Country-specific FAO nutrient factors changed. New: {sorted(deviating - COUNTRY_SPECIFIC_NUTRIENT_FACTORS)}. "
+        f"Gone: {sorted(COUNTRY_SPECIFIC_NUTRIENT_FACTORS - deviating)}."
+    )
 
 
 def sanity_check_balance_identity(tb: Table) -> None:
@@ -917,6 +965,7 @@ def run() -> None:
 
     # Assumptions 1 and 2: the balance table, with missing elements as zero.
     tb = prepare_balance_table(tb_scl, roles=roles, manual=manual)
+    sanity_check_nutrient_factors(tb)
     population = tb[["country", "year", "population"]].drop_duplicates()
     # Assumption 9: fish and seafood, taken from FBS.
     tb_fish = prepare_fish_table(tb_fbsc, manual=manual, population=population)
