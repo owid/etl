@@ -232,7 +232,7 @@ steps:
   #
   # FAO's food balances with every element (production, trade, stock changes, seed, feed, processing, losses, food...)
   # converted to kilocalories, grams of protein and kilograms per person per day.
-  # Food Balance Sheets method (1961 onward), reproducing the prototype's assumptions:
+  # Food Balance Sheets method (1961 onward):
   data://garden/faostat/2026-09-04/food_supply_chain_fbs:
     - data://garden/faostat/2026-02-25/faostat_fbsc
     - data://garden/demography/2024-07-15/population

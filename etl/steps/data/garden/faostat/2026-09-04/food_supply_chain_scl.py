@@ -1,68 +1,118 @@
 """FAO Supply Utilization Accounts (SCL) as a chain of stages from crop production to food, per person per day.
 
-Same chain as `food_supply_chain_fbs` (crop production, trade, stock changes, seed, losses, other uses, processing,
-feed, animal products, food), built from the Supply Utilization Accounts instead of the Food Balance Sheets. SCL
-reports individual commodities rather than FBS's item groups, and it includes the by-products that FBS leaves out:
-oilseed cakes, brans, gluten feed. With those items present, what goes from oilseeds to cakes to animals appears
-under feed, where it belongs, instead of vanishing inside processing. The chain is built in three units, one table
-each: energy (kcal per person per day), protein (grams per person per day) and mass (kilograms per person per day,
-the balance in tonnes with no conversion at all).
+This step builds the same chain as `food_supply_chain_fbs`, but from FAO's Supply Utilization Accounts (SCL)
+instead of the Food Balance Sheets (FBS): crop production, plus imports, minus exports, stock changes, seed,
+losses, non-food uses, processing and animal feed, plus animal products, ending at the food available to eat.
+The chain is built three times, in three units, one table each:
+    energy   kilocalories per person per day
+    protein  grams of protein per person per day
+    mass     kilograms per person per day (the balance in tonnes, with no conversion at all)
+
+Two differences make SCL preferable to FBS for this chain:
+- SCL reports individual commodities, while FBS reports groups. SCL has "Wheat", "Wheat and meslin flour" and
+  "Bread" as three separate items; FBS folds all three into one item, "Wheat and products".
+- SCL includes the by-products that FBS has no items for: oilseed cakes, brans, gluten feed. When oilseeds
+  (soybeans, rapeseed, sunflower seeds) are crushed to extract their oil, the crushed solids that remain are called
+  cake. Cake is rich in protein, and it is one of the main things the world feeds to its farm animals. With the
+  cakes present as items, what goes from oilseeds to cakes to animals appears under feed, where it belongs; in FBS
+  the oilseeds that were sent to be crushed are counted under processing and the cake is never counted anywhere.
+The price is coverage: SCL starts in 2010 (FBS starts in 1961) and misses a few countries that FAO has not
+compiled (Japan, Sudan, Somalia and a few others).
 
 ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
 -----------------------------------------------------
-1. The balance identity. For every item, country and year, SCL reports (in tonnes)
+1. The balance identity. For every item, country and year, SCL reports, in tonnes:
        production + imports - exports - stock variation
          = food + feed + seed + processing + other uses + losses + tourist consumption + residuals.
-   This is checked item by item, not assumed.
+   This identity is checked item by item, not assumed.
 
-2. Roles. FAO's own item groups tag every SCL item as "Crops, primary", "Livestock primary", "Crops processed" or
-   "Livestock processed". Production enters the chain by role:
-     crop      -> "crop_production", the start of the chain;
-     animal    -> "animal_products", added after feed has been subtracted;
-     processed -> netted against processing: "processing_net" = processing - production of processed items, so
-                  that the bar shows only what goes into a factory and does not come out as a product.
-   One override, listed in the items file: cotton seed is treated as a crop, because the seed cotton it is ginned
-   from is a fibre crop and not in SCL.
+2. Roles: where each item's production enters the chain.
 
-3. Density of an item (kcal, or grams of protein, per 100 g) = food supply of the nutrient (FAO's "Calories/Year"
-   and "Proteins/Year", in kilocalories and tonnes) / food supply in tonnes, per item, country and year. The same density is applied to every
-   flow of the item, so the identity holds in the nutrient exactly as in tonnes and the chain closes by
-   construction. The only rejection rule is a physical ceiling (920 kcal, or 100 g of protein, per 100 g); rejected
-   cells fall back to the country's median for the item over all years, then to the item's median over all
-   countries and years. For mass there is no density: tonnes are converted to kilograms.
+   Adding up the production of all items would count the same calories many times, because sugar is made from sugar
+   cane and bread is made from wheat. To avoid double counting, each item has a role, and the role decides where the
+   production of the item goes. FAO's own item groups tag every SCL item as "Crops, primary", "Livestock primary",
+   "Crops processed" or "Livestock processed", which map to the three roles:
+   - "crop": the production of crops is the stage "crop_production", the start of the chain.
+   - "animal": animals eat crops, and the stage "feed" subtracts the calories of the crops that are fed to animals.
+     The stage "animal_products" then adds the calories of the meat, milk and eggs that the animals produce.
+     The production of animal items is that second stage.
+   - "processed": factories turn crops into sugar, oils, flour and other products. The stage "processing_net" is
+     the "processing" of all items (what is sent into factories) minus the "production" of processed items (what
+     comes out of factories as food), so the stage counts only the calories that enter factories and do not come
+     back as food.
+   One override, listed in the items file: cotton seed is treated as a crop. Cotton seed comes out of ginning seed
+   cotton, but seed cotton is a fibre crop and not an SCL item, so cotton seed is the first point in SCL where the
+   calories of the cotton harvest exist.
 
-4. Items nobody eats (cakes, brans, ethanol, refining residues) have no food figures to reverse-engineer from. They
-   get the energy and protein of the human food they would be if eaten: energy from USDA's food composition tables,
-   protein of each cake from the Feedipedia feed tables. Numbers and sources are in `food_supply_chain_scl.items.yml`. Items that are never food (castor, tung, kapok,
-   jojoba, wool grease) get zero energy and protein, which removes them from every flow consistently. In the mass
-   table every item counts as it is.
+3. Densities. The density of an item (kcal, or grams of protein, per 100 g) is derived from food use: FAO's food
+   calories of the item ("Calories/Year") or food protein ("Proteins/Year"), divided by the food tonnes of the
+   item, per country and year. The same density is applied to every flow of the item, so the identity of
+   assumption 1 holds in calories and protein exactly as it holds in tonnes.
+   A density is rejected only when it is physically impossible: more energy than pure fat (920 kcal per 100 g), or
+   more than 100 g of protein per 100 g. Rejected and missing densities fall back to the country's median for the
+   item over all years, and then to the item's median over all countries and years.
+   A derived density of exactly zero is never used directly, because a zero can mean two things: some items truly
+   have none of the nutrient (sugar and oils contain no protein), but a zero can also appear when a tiny amount of
+   food is rounded down to zero tonnes. Zeros therefore only enter through the medians: an item that truly has none
+   of the nutrient gets a median of zero, while an item with a spurious zero gets its usual value.
+   For mass there is no density: tonnes are converted to kilograms.
 
-5. Crops that are not eaten as harvested (paddy rice, sugar cane and beet, oil palm fruit, rapeseed, cotton seed)
-   have a food-based density that rests on a sliver of the crop, or none at all, and it is far below the products
-   they yield. Their density is derived from those products instead: the nutrient in the family's products, minus
-   that of intermediate products processed further within the family, over the tonnes of crop that went into
-   processing, for World each year, applied to every country. The crop-to-product links are in the items file.
+4. Items nobody eats (cakes, brans, ethanol, refining residues) have no food use, so no density can be derived from
+   the data. Each gets the energy and protein of the human food it would be if eaten: energy from USDA's food
+   composition tables, protein of each cake from the Feedipedia feed tables. The values and sources are in
+   `food_supply_chain_scl.items.yml`. Items that are never food in any form (castor, tung, kapok, jojoba, wool
+   grease) get zero energy and protein, which removes them from every flow consistently. In the mass table every
+   item counts as it is.
 
-6. Fish and seafood are not in SCL. The FBS fish items are spliced in, with their FBS densities under the same rules,
-   for the entities and years that SCL covers.
+5. Crops that are not eaten as harvested (paddy rice, sugar cane, sugar beet, oil palm fruit, rapeseed, cotton
+   seed). A density derived from food use measures the calories a human gets from eating the item; for these crops
+   that is the wrong measure, because almost the whole harvest goes to factories, and a factory extracts far more
+   than a human eating the crop raw (most of a chewed cane stalk is spat out; a mill takes nearly all of the
+   sugar). The density of these crops is therefore derived from the products made out of them: the calories in the
+   family's products, minus the calories of intermediate products processed further within the same family, divided
+   by the tonnes of the crop that went into processing. The ratio is computed for World each year and applied to
+   every country. The crop-to-product links are in the items file.
 
-7. FAOSTAT rounds tonnages, so balances do not close exactly. The gap is folded into FAO's own "residuals", and the
-   stage is called "data_adjustments", so the chain lands exactly on "food"; its size is kept in "balancing_difference".
-   The world does not trade with anyone, but World imports and exports (sums of what countries report) differ. World
-   exports are set equal to World imports, which FAO considers the better-documented side (FAO 2025, Food Balance
-   Sheets and Supply Utilization Accounts Resource Handbook, section 6.1), and the difference goes to
+6. Fish and seafood are not in SCL. The FBS fish items are spliced in, with their FBS densities under the same
+   rules, for the countries and years that SCL covers.
+
+7. FAOSTAT rounds tonnages, so balances do not close exactly. The gap is added to FAO's own "residuals", and the
+   combined stage is called "data_adjustments", so that the chain ends exactly on "food". The size of the gap is
+   kept in "balancing_difference" for quality control.
+   The world does not trade with anyone, but World imports and exports (sums of what countries report) differ.
+   World exports are set equal to World imports, which FAO considers the better-documented side (FAO 2025, Food
+   Balance Sheets and Supply Utilization Accounts Resource Handbook, section 6.1), and the difference goes to
    "data_adjustments". Other regions do trade with the rest of the world and are left as they are.
 
-8. Regions. FAO's own regional aggregates are dropped, and SCL has no other region rows. OWID regions (World,
-   continents, income groups) are built here from the member countries that have an SCL balance that year: every
-   flow and food nutrient total is summed over those countries (fish included, from the same countries), and the
-   region's population is the sum of those same countries' population. A country either has a full balance or none
-   at all, so numerator and denominator always cover the same countries; countries FAO has not compiled for SCL
-   (Japan, Sudan, Somalia and a few others) are in neither. A region-year is dropped when those countries hold less
+8. Regions. FAO's own regional aggregates are dropped, and OWID regions (World, continents, income groups) are
+   built from the member countries that have an SCL balance that year: every flow and every food nutrient total is
+   summed over those countries (fish included, from the same countries), and the region's population is the sum of
+   those same countries' population. A country either has a full balance or none at all, so the flows and the
+   population always cover the same countries. A region-year is dropped when the countries with a balance hold less
    than 80% of the region's population. "Low-income countries" is left out altogether: SCL never covers more than
    80% of its population.
 
-9. All stages are divided by that population and by 365 days. SCL covers 2010 onward.
+9. All stages are divided by that population and by 365 days.
+
+KNOWN PROBLEMS, NOT YET RESOLVED
+--------------------------------
+- Processing appears to create calories in some countries. In the normal case "processing_net" is positive:
+  factories lose some calories. But in Brazil, "processing_net" is about -650 kcal per person per day in 2023, as
+  if Brazilian factories created calories. Two inconsistencies cause this:
+  - Ethanol. The production of ethanol counts as factory output, valued at 700 kcal per 100 g (assumption 4). But
+    ethanol is not among the products used to derive the density of sugar cane (assumption 5), so the cane entering
+    the mills is never credited with the calories of the ethanol made from it. Calories come out that were never
+    counted going in. Brazil, where a large share of the cane becomes ethanol, is the extreme case.
+  - The soy family. Soybeans enter processing at their data-derived density (406 kcal per 100 g in Brazil), but the
+    outputs, cake at the fixed 330 (assumption 4) plus oil at 900, add up to about 6% more than the beans carried.
+    Brazil crushes so much soy that 6% is large.
+- The product-implied densities of assumption 5 are World-level ratios applied to every country. A country whose
+  product mix differs from the world average (again Brazil, with its ethanol) gets a density that does not match
+  what its own factories make.
+- The stage "feed" only counts feed that passes through the balance. Grass, pasture and forage are not SCL items,
+  so everything grazing animals eat from pasture enters the chain nowhere, and wild-caught fish count as animal
+  products with no feed at all. For fishing and grazing countries (Iceland, Mongolia, several island states),
+  "animal_products" can therefore exceed "feed".
 """
 
 import numpy as np

@@ -13,7 +13,7 @@
 #                          sugar, alcoholic beverages, butter, cream), so their production is not a new input.
 #   fao_group (optional): "vegetal" or "animal", only where FAO's own grouping differs from the role's natural
 #           group. Used by the partition check.
-items:
+included:
   # Cereals.
   - {code: 2511, name: "Wheat and products", role: crop}
   - {code: 2513, name: "Barley and products", role: crop}
@@ -145,7 +145,7 @@ excluded:
 
 # FAO's aggregate items. They sum their member items, so they must not be added to the chain (double counting);
 # three of them are used to check that the curated items partition the total.
-aggregate_groups:
+groups:
   - {code: 2901, name: "Grand Total"}
   - {code: 2903, name: "Vegetal Products"}
   - {code: 2905, name: "Cereals - Excluding Beer"}

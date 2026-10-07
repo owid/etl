@@ -1,67 +1,224 @@
 """FAOSTAT Food Balance Sheets (FBS) as a chain of stages from crop production to food, per person per day.
 
-This step reproduces, with ETL data and code, the method of the FBS-based waterfall prototype: FBS elements in
-tonnes are converted with per-item densities reverse-engineered from FBS itself, and summed into the stages of a
-chain from crop production to food available to eat. The chain is built three times, in three units, one table each:
+FBS elements in tonnes are converted with per-item densities reverse-engineered from FBS itself, and summed into the
+stages of a chain from crop production to food available to eat. The chain is built three times, in three units, one
+table each:
     energy   kilocalories per person per day
     protein  grams of protein per person per day
     mass     kilograms per person per day (the balance in tonnes, with no conversion at all)
 
 ASSUMPTIONS AND NUMBERS THAT GO INTO THE CALCULATION
 -----------------------------------------------------
-1. The balance identity. For every item, country and year, FBS reports (in tonnes)
+1. The balance identity. For every item, country and year, FBS reports, in tonnes:
        production + imports - exports - stock variation
          = food + feed + seed + processing + other uses + losses + tourist consumption + residuals.
-   Stock variation is derived as production + imports - exports - domestic supply, because FBS only reports it from
-   2010 onward; where reported, the derived value is checked against it.
+   FBS only reports stock variation from 2010 onward, so this step derives stock variation for all years from the
+   identity, as production + imports - exports - domestic supply. Where FBS does report stock variation, the
+   derived value is checked against the reported one.
 
-2. Density of an item (kcal, or grams of protein, per 100 g) = food supply of the nutrient per person per day x 365
-   / (food supply in kg per person per year x 10), per item, country and year. The same density is applied to every
-   element of the item, so the identity above holds in the nutrient exactly as in tonnes and the chain closes by
-   construction. For mass there is no density: tonnes are converted to kilograms.
+2. Densities. The density of an item (kcal, or grams of protein, per 100 g) is derived from food use, per item,
+   country and year. FBS reports the food supply of each item both as a nutrient (kilocalories, or grams of
+   protein, per person per day) and as a quantity (kilograms per person per year); the nutrient per year divided by
+   the quantity per year gives the density. The same density is applied to every element of the item, so the
+   identity of assumption 1 holds in calories and protein exactly as it holds in tonnes, and the chain ends exactly
+   on "food" by construction. For mass there is no density: tonnes are converted to kilograms.
 
-3. The only rejection rule for a density is a physical ceiling: nothing edible has more energy than pure fat
-   (920 kcal per 100 g) or more than 100 g of protein per 100 g. A density above the ceiling is a broken FAOSTAT cell
-   (FAO's nutrient and tonnage figures for the same item disagree). Such cells fall back to the country's median
-   density for the item over all years, then to the item's median over all countries and years. Nothing merely
-   unusual is second-guessed.
-   Consequence: where FAO's own figures are inconsistent (vegetable oils in the United States above all), the food
-   stage lands below FAO's published food supply.
+3. Rejected and missing densities, and their fallbacks.
 
-4. Items. Every FBS item code must appear in `food_supply_chain_fbs.items.yml`, as a chain item with a role, as an
-   excluded item, or as an aggregate group (which must not be added, to avoid double counting). Three items get
-   no nutrient at all, because nobody eats them and FAO gives them no food energy: "Palm kernels" (which carries the
-   whole oil palm harvest; the oil palm enters the chain as palm oil and palm kernel oil, tagged as crops),
-   "Alcohol, Non-Food" and "Meat, Aquatic Mammals". In the mass table, excluded items are left out too.
+   A density is rejected only when it is physically impossible: more energy than pure fat (920 kcal per 100 g), or
+   more than 100 g of protein per 100 g. An impossible density means FAO's nutrient and tonnage figures for that
+   item disagree. Densities that are unusual but physically possible are kept as they are.
 
-5. Production is split by the item's role, so that nothing is counted twice:
-     crop      -> "crop_production", the start of the chain;
-     animal    -> "animal_products", added after feed has been subtracted;
-     processed -> netted against the processing outflow: "processing_net" = processing - production of processed
-                  items (oils, sugar, alcoholic beverages, butter, cream, and others), so the bar shows only what goes
-                  into processing and does not come back as a product.
+   A density can also be missing entirely, when the item has no food use in that country.
 
-6. FAOSTAT rounds tonnages to 1,000 t, so its supply and uses sides do not close exactly. That gap is folded into
-   FAO's own "residuals", and the stage is called "data_adjustments", so that the chain lands exactly on "food". Its
-   size is kept in "balancing_difference" for quality control.
-   The world does not trade with anyone, but World imports and exports (sums of what countries report) differ. World
-   exports are set equal to World imports, which FAO considers the better-documented side (FAO 2025, Food Balance
-   Sheets and Supply Utilization Accounts Resource Handbook, section 6.1), and the difference goes to
-   "data_adjustments". Other regions do trade with the rest of the world and are left as they are.
+   In both cases the step falls back to the country's median density for the item over all years. If the country has
+   no valid density for the item in any year, it falls back to the item's median over all countries and years.
+   Every chain item has a valid density in at least one country and year, so this chain of fallbacks always ends with
+   a density; an assert fails the step if a FAOSTAT update ever breaks that.
 
-7. Regions. FAO's own regional aggregates and the FAOSTAT garden step's region rows are dropped. OWID regions (World,
-   continents, income groups) are rebuilt here from the member countries that have an FBS balance that year: every
-   element in tonnes and the food nutrient totals (per-capita food supply x population) are summed over those
+   A derived density of exactly zero is never used directly, because a zero can mean two things: some items truly
+   have none of the nutrient (sugar and oils contain no protein), but a zero can also appear when a tiny amount of
+   food is rounded down to zero tonnes. Zeros therefore only enter through the medians: an item that truly has none
+   of the nutrient gets a median of zero, while an item with a spurious zero gets its usual value.
+
+   Example of an impossible density: soybean oil in the United States in 2023.
+   - FAO reports the calories Americans get from soybean oil, and the tonnes of it they eat.
+   - Dividing one by the other should give the energy density of soybean oil: roughly 880 kcal per 100 g.
+   - Instead it gives 1,510, more than pure fat.
+   - The reason is an accounting mismatch in FAO's data. Part of the soybean oil is not eaten directly: that part is
+     turned into margarine and shortening (solid fats made from vegetable oil, used as spreads and in baking). FAO
+     records the tonnes of soybean oil that were turned into margarine and shortening under "processing", not under
+     "food". But the calories people get from eating the margarine and the shortening ARE counted inside the food
+     calories of soybean oil. In short: the food calories of soybean oil include margarine and shortening, while the
+     food tonnes of soybean oil exclude margarine and shortening. Dividing mismatched calories by mismatched tonnes
+     gives an energy density that is too high.
+   - FBS has no separate item for margarine, so the calories of margarine can only be counted inside the oil items.
+     FAO's Supply Utilization Accounts (SCL, the dataset behind the sibling step `food_supply_chain_scl`, which
+     builds this same chain with finer items) does have "Margarine and shortening" as a separate item, and in SCL
+     this impossible-density problem does not appear.
+   - The ceiling rejects that value, and the United States' median density for soybean oil (841) is used instead.
+   Vegetable oils are the main case of impossible densities, and the United States the most affected country.
+   Wherever this happens, our food stage comes out lower than FAO's published food supply.
+
+   The second fallback (the median over all countries and years) is the normal path for crops that are rarely eaten
+   as harvested, such as sugar cane, sugar beet and cottonseed: most countries never eat them raw, so no country
+   median exists. It covers about 10% of item balances, though only about 2% of tonnage, and the density comes from
+   the few countries that do eat the item raw.
+
+   Region aggregates (World, continents, income groups) are barely affected. A region's density is computed from its
+   members' summed food nutrients over their summed food tonnes, and in a whole region there is almost always some
+   country eating the item. World gets its densities from the data for 97-99% of its tonnage and never needs the
+   median over all countries.
+
+4. Items. Every item code in the FBS table must appear in `food_supply_chain_fbs.items.yml`, in exactly one of three
+   lists; an assert fails the step if FAO adds, removes or renames an item.
+
+   - "included": the items that make up the chain, each with a role (crop, animal or processed; see assumption 5).
+   - "excluded": items deliberately left out of the chain (see below).
+   - "groups": FAO's own totals, such as "Grand Total" and "Cereals - Excluding Beer". Each aggregate group
+     is the sum of items that are already in the chain, so adding the aggregate groups would count the same food
+     twice. Three of the aggregate groups are used to check that our chain items add up to FAO's totals.
+
+   Four items are excluded:
+   - "Population": not a food item.
+   - "Alcohol, Non-Food": industrial alcohol, never eaten, and FAO reports no food energy for industrial alcohol.
+   - "Meat, Aquatic Mammals": negligible production, and FAO reports no food energy for aquatic mammal meat anywhere.
+   - "Palm kernels": the oil palm is a tropical tree grown for its fruit. The flesh of the fruit is pressed into
+     palm oil, and the seed inside the fruit (the palm kernel) is pressed into palm kernel oil. Nobody eats the raw
+     fruit or the raw kernels; essentially the whole harvest becomes those two oils. In FBS, the whole harvest of
+     the oil palm is recorded under the item "Palm kernels" (FAO defines the item "Palm kernels" as the palm fruit
+     plus the palm kernels), and the item has zero food use, so no density can be derived for the item
+     "Palm kernels". The step therefore excludes the item "Palm kernels", and the oil palm harvest enters the chain
+     through the items "Palm Oil" and "Palmkernel Oil", which are tagged as crops rather than as processed
+     products, so that the calories of the oil palm start the chain in crop production.
+
+   The excluded items are left out of all three tables, the mass table included.
+
+5. Roles: where each item's production enters the chain.
+
+   Every item has a "production" flow, but simply adding up the production of all items would count the same calories
+   many times: sugar is made from sugar cane, so the production of sugar repeats calories already counted in the
+   production of sugar cane. To avoid double counting, each included item has a role, and the role decides where the
+   production of the item goes:
+
+   - "crop": a primary crop (wheat, potatoes, sugar cane). The production of crops is the stage "crop_production",
+     the start of the chain.
+   - "animal": an animal product (meat, milk, eggs). The chain accounts for animals in two stages.
+     First, the stage "feed" subtracts the calories of the crops that
+     are fed to animals. Then, the stage "animal_products" adds the calories of the meat, milk and eggs that the
+     animals produce. The production of animal items is that second stage. The two stages are far from equal, because
+     animals burn most of the calories they eat just by living; the gap between "feed" and "animal_products" is the
+     cost of producing animal products.
+     Note that the stage "feed" undercounts what animals actually eat: FBS only records the feed use of the items in
+     the food balance, and grass, pasture and forage crops (hay, silage) are not FBS items, so everything grazing
+     animals eat from pasture enters the chain nowhere. As a consequence, the chain can overstate how efficient
+     animals are at converting feed into meat, milk and eggs: the calories in "animal_products" can come close to, or
+     even exceed, the calories subtracted in "feed", because part of what the animals really ate (the grass) was
+     never subtracted. The distortion is largest for protein and for countries with much grazing livestock.
+   - "processed": an item made from other items. Sugar is made from sugar cane; vegetable oils are made from
+     oilseeds; beer is made from barley; butter and cream are made from milk.
+     Take sugar. The calories in sugar were already counted once, when the sugar cane was produced. Counting the
+     production of sugar as a new input would count the same calories twice. But the factories that turn cane into
+     sugar cannot be ignored either, because they lose calories along the way.
+     So the chain handles factories as one net stage, built from two FAOSTAT elements. The element "processing"
+     records what is sent into factories (the sugar cane sent to sugar mills, the oilseeds sent to crushers). The
+     element "production", for items whose role is "processed", records what comes out of the factories as food (the
+     sugar, the oils). The stage "processing_net" is the difference: the "processing" of all items minus the
+     "production" of processed items.
+     In the normal case, "processing_net" is positive: fewer food calories leave the factories than enter them,
+     because factories lose some calories (milling and crushing are not perfect) and because some calories become
+     products that are not food, such as ethanol.
+     In many countries and years, however, "processing_net" comes out negative, as if factories created calories.
+     This happens in 37% of country-years in energy. Brazil is the clearest case: about -670 kcal per person per day
+     in 2023, driven by sugar and soybean oil.
+
+     The cause is a structural flaw in the densities. Every density in this step is derived from food use: the
+     calories people got from eating an item, divided by the tonnes of the item they ate. That ratio measures how
+     many calories a human extracts from the item. For a crop that mostly goes to factories, that is the wrong
+     measure, because a factory extracts far more than a human.
+
+     Sugar cane in Brazil shows the problem. Nobody in Brazil eats raw sugar cane, so Brazil has no food use of
+     "Sugar cane" to derive a density from. As explained in assumption 3, the step then falls back to the median
+     density over all countries and years, and that median comes from the few countries where people chew raw cane
+     or drink its juice: 30 kcal per 100 g. The value is genuinely low, not an error: a person chewing cane extracts
+     only a small share of the calories in the stalk, because most of the stalk is fibre that is spat out or
+     discarded.
+     In reality, a mill extracts about 120 kg of sugar from each tonne of cane, so cane bought by mills contains at
+     least 43 kcal per 100 g. In the model, each tonne of cane entering the mills is counted at the chewing density,
+     30 kcal per 100 g (300,000 kcal per tonne), while the sugar coming out is counted at the well-measured density
+     of sugar (at least 430,000 kcal per tonne of cane processed). The model therefore understates the calories
+     entering the mills, and the understated calories reappear as calories created in processing.
+
+     This flaw distorts the stages "crop_production" and "processing_net" for crops that are mostly processed
+     (sugar cane, sugar beet, cottonseed, the oilseeds). The stage "food" is not affected, because the stage "food"
+     is computed directly from FAO's own food calories, with no density involved. The sibling step
+     `food_supply_chain_scl` avoids the flaw: there, the density of crops like sugar cane is derived from the
+     products made out of them, not from food use.
+
+6. Data adjustments. FAOSTAT rounds tonnages to the nearest 1,000 t, so the two sides of the balance identity do
+   not close exactly. The gap is added to FAO's own "residuals", and the combined stage is called
+   "data_adjustments", so that the chain ends exactly on "food". The size of the gap is kept in the column
+   "balancing_difference" for quality control.
+   The world as a whole does not trade with anyone, so World imports and World exports should be equal. In the data
+   they differ, because each is the sum of what individual countries report. World exports are set equal to World
+   imports, which FAO considers the better-documented side (FAO 2025, Food Balance Sheets and Supply Utilization
+   Accounts Resource Handbook, section 6.1), and the difference goes to "data_adjustments". Other regions do trade
+   with the rest of the world, so their imports and exports are left as they are.
+
+7. Regions. FAO publishes its own regional aggregates; this step drops them and builds OWID regions (World,
+   continents, income groups) instead, from the member countries that have an FBS balance that year. Every element
+   in tonnes, and the food nutrient totals (per-capita food supply times population), are summed over those
    countries, and the region's population is the sum of those same countries' population. A country either has a
-   full balance or none at all, so numerator and denominator always cover the same countries; countries FAO has not
-   compiled (Cuba and North Korea in recent years, and small states) are in neither. A region-year is dropped when
-   those countries hold less than 80% of the region's population; this removes "Low-income countries" before 2010 and
-   in 2023, and Oceania in 2002-2009 (Papua New Guinea missing).
+   full balance or no balance at all, so the summed flows and the summed population always cover the same
+   countries. Countries that FAO has not compiled (Cuba and North Korea in recent years, and small states) are in
+   neither.
+   A region-year is dropped when the countries with a balance hold less than 80% of the region's population, so
+   that a value labeled "Africa" is never built from a small fraction of Africa. This rule removes "Low-income
+   countries" before 2010 and in 2023, and Oceania in 2002-2009 (Papua New Guinea is missing in those years).
 
-8. All stages are divided by that population and by 365 days.
+8. All stages are divided by that population and by 365 days, to give values per person per day.
 
-Known limitations, inherited from FBS: oilseed cakes and other feed by-products are not FBS items, so what goes
-oilseed -> cake -> feed appears under processing, not feed; and FBS "Losses" stop at the retail shelf.
+KNOWN LIMITATIONS
+-----------------
+- Oilseed cakes and other feed by-products are not FBS items.
+
+  When oilseeds (soybeans, rapeseed, sunflower seeds) are crushed to extract their oil, the crushed solids that
+  remain are called cake. Cake is rich in protein, and it is one of the main things the world feeds to its farm
+  animals.
+
+  FBS splits the supply of the soybeans item across its uses, and most of those uses are counted correctly: beans
+  eaten by humans are under "food", beans fed whole to animals are under "feed", beans planted are under "seed".
+  The problem is the beans sent to be crushed, which are counted under "processing". The chain counts all the
+  calories and protein contained in those beans as entering the factories (the tonnes of beans multiplied by the
+  density of soybeans). But FBS has an item only for one of the two things that come out: the oil. The cake
+  is not an FBS item, so the calories and protein of the cake never come out of "processing" and never reach
+  "feed", even though in reality the cake is fed to animals.
+
+  The same calories are therefore wrong in two stages at once: "feed" is understated (the cake that animals eat is
+  not in it), and "processing_net" is overstated (the cake's calories are counted as if factories had destroyed
+  them). Worldwide, most soybeans are crushed, so the distortion is large. Together with the missing grass (see
+  assumption 5), the understatement of "feed" is so large in protein that "animal_products" exceeds "feed" in 71%
+  of country-years, World included, which is physically impossible. The sibling step `food_supply_chain_scl` has
+  the cakes as items and does not have this problem.
+- FBS items are groups, and the density of a group reflects the foods eaten in that country.
+
+  "Wheat and products" is one item covering wheat grain, flour, bread and pasta, so its density in a country is an
+  average over the wheat foods people eat there. Bread is about 40% water, so that average is well below the
+  density of raw grain. For a country that exports raw grain, production and exports are valued at the domestic
+  density, which understates them. Australia in 2023: the density of "Wheat and products" is 232 kcal per 100 g,
+  while raw wheat grain is about 339. Valued at 232, Australia's wheat production is about 9,900 kcal per person
+  per day; valued as grain, it would be about 14,500. The sibling step `food_supply_chain_scl` has wheat, flour and
+  bread as separate items and does not have this problem.
+
+- The input dataset (`faostat_fbsc`) combines two FAO datasets: FBSH (FAO's old methodology, 1961-2009) and FBS
+  (the new methodology, 2010 onward). At the World level the main stages are continuous across the join, with one
+  visible artifact: "tourist_consumption" only exists in the new methodology, so it is zero before 2010. The
+  combined dataset also keeps countries that FAO removed from its latest release (Japan and ten others, removed
+  "due to an ongoing review" since October 2025), by using the previous release for them.
+
+- FBS "Losses" only cover the supply chain, from the farm to the retail shelf. Food thrown away by households,
+  restaurants and retailers is not a loss in FBS; it stays inside "food". The stage "food" is therefore the food
+  available to eat, not the food actually eaten.
 """
 
 import numpy as np
@@ -211,15 +368,15 @@ def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
     """Load the curated items file: chain items (indexed by padded code), excluded items and aggregate groups."""
     with open(paths.side_file("food_supply_chain_fbs.items.yml")) as f:
         config = yaml.safe_load(f)
-    assert set(config) == {"items", "excluded", "aggregate_groups"}, "Unexpected top-level keys in items file."
+    assert set(config) == {"included", "excluded", "groups"}, "Unexpected top-level keys in items file."
 
-    for item in config["items"]:
+    for item in config["included"]:
         assert {"code", "name", "role"} <= set(item) <= {"code", "name", "role", "fao_group"}, (
             f"Unexpected keys: {item}"
         )
         assert item["role"] in ROLES, f"Unknown role in item: {item}"
         assert item.get("fao_group", "vegetal") in {"vegetal", "animal"}, f"Unknown fao_group in item: {item}"
-    items = pd.DataFrame(config["items"])
+    items = pd.DataFrame(config["included"])
     items["item_code"] = items["code"].map(_pad_code)
     natural_group = items["role"].map({"crop": "vegetal", "processed": "vegetal", "animal": "animal"})
     if "fao_group" not in items.columns:
@@ -228,7 +385,7 @@ def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
     items = items.set_index("item_code", verify_integrity=True)
 
     excluded = {_pad_code(item["code"]): item["name"] for item in config["excluded"]}
-    groups = {_pad_code(item["code"]): item["name"] for item in config["aggregate_groups"]}
+    groups = {_pad_code(item["code"]): item["name"] for item in config["groups"]}
     all_codes = list(items.index) + list(excluded) + list(groups)
     assert len(all_codes) == len(set(all_codes)), "An item code appears in more than one list of the items file."
 
