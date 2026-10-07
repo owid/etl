@@ -486,21 +486,22 @@ def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
         for item in config[key]:
             item["item_code"] = str(item.pop("code")).zfill(8)
 
-    for item in config["included"]:
-        assert {"item_code", "name", "role"} <= set(item) <= {"item_code", "name", "role", "fao_group"}, (
-            f"Unexpected keys: {item}"
-        )
-        assert item["role"] in ROLES, f"Unknown role in item: {item}"
-        assert item.get("fao_group", "vegetal") in {"vegetal", "animal"}, f"Unknown fao_group in item: {item}"
-    items = pd.DataFrame(config["included"])
-    items = items.set_index("item_code", verify_integrity=True)
+    # One row per included item, indexed by code; a duplicated code crashes here.
+    items = Table(pd.DataFrame(config["included"])).set_index("item_code", verify_integrity=True)
+    assert {"name", "role"} <= set(items.columns) <= {"name", "role", "fao_group"}, (
+        f"Unexpected keys in included items: {sorted(items.columns)}"
+    )
+    assert items["name"].notnull().all(), "An included item has no name."
+    assert items["role"].isin(ROLES).all(), f"Invalid roles: {sorted(set(items['role']) - ROLES)}"
+    if "fao_group" in items.columns:
+        assert items["fao_group"].dropna().isin({"vegetal", "animal"}).all(), "Invalid fao_group in an included item."
 
     excluded = {item["item_code"]: item["name"] for item in config["excluded"]}
     groups = {item["item_code"]: item["name"] for item in config["groups"]}
     all_codes = list(items.index) + list(excluded) + list(groups)
     assert len(all_codes) == len(set(all_codes)), "An item code appears in more than one list of the items file."
 
-    return Table(items), excluded, groups
+    return items, excluded, groups
 
 
 def sanity_check_inputs(tb: Table, items: Table, excluded: dict[str, str], groups: dict[str, str]) -> None:
