@@ -474,7 +474,7 @@ REGIONS = [
 # The items file (assumption 7).
 # --------------------------------------------------------------------------------------------------------------------
 def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
-    """Load the curated items file: chain items (indexed by padded code), excluded items and aggregate groups.
+    """Load the curated items file: chain items, excluded items and aggregate groups.
 
     Implements assumption 7.
     """
@@ -493,10 +493,16 @@ def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
         assert item["role"] in ROLES, f"Unknown role in item: {item}"
         assert item.get("fao_group", "vegetal") in {"vegetal", "animal"}, f"Unknown fao_group in item: {item}"
     items = pd.DataFrame(config["included"])
-    natural_group = items["role"].map({"crop": "vegetal", "processed": "vegetal", "animal": "animal"})
+    # The partition check compares our items against FAO's "Vegetal Products" and "Animal Products" totals, so every
+    # item needs a vegetal/animal classification ("fao_group"). By default it follows from the role: crops and
+    # processed items count as vegetal, animal items as animal. A few items carry an explicit "fao_group" in the
+    # items file because FAO classifies them against that default: butter, cream and fish oils are processed items
+    # that FAO counts as animal, honey is an animal item that FAO counts as vegetal, and seaweed is a crop that FAO
+    # counts as animal.
+    default_group = items["role"].map({"crop": "vegetal", "processed": "vegetal", "animal": "animal"})
     if "fao_group" not in items.columns:
         items["fao_group"] = np.nan
-    items["fao_group"] = items["fao_group"].fillna(natural_group)
+    items["fao_group"] = items["fao_group"].fillna(default_group)
     items = items.set_index("item_code", verify_integrity=True)
 
     excluded = {item["item_code"]: item["name"] for item in config["excluded"]}
