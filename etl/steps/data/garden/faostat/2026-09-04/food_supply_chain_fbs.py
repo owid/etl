@@ -304,6 +304,21 @@ KNOWN LIMITATIONS
   Food thrown away by households,
   restaurants and retailers is not a loss in FBS; it stays inside "food". The stage "food" is therefore the food
   available to eat, not the food actually eaten.
+
+THE WORLD IN 1968
+-----------------
+This dataset feeds a static waterfall of the world in 1968, the year The Population Bomb was published
+(https://en.wikipedia.org/wiki/The_Population_Bomb). The 1968 World chain is more reliable than the recent years,
+because the accounting problems listed above were smaller then:
+- Densities derived directly from the data cover 99% of World tonnage in 1968.
+- "data_adjustments" is about 1% of the food stage.
+- "processing_net" is a plausible loss (3% of the food stage in energy), not a gain.
+- "feed" exceeds "animal_products" both in energy (1,120 against 440 kcal per person per day) and in protein (34
+  against 27 g). In 2023 the protein side is inverted (39 fed, 45 returned), which is impossible; in 1968 there was
+  less trade and less industrial feed, so the missing cakes and the missing grass distort less.
+Two caveats remain. First, balances close slightly worse than in recent years: 0.4% of item balances are open in
+1968, against 0.01% in 2023, both far below the 2% cap. Second, in protein the processing stage carries 29% of the
+food stage, and part of that is cake protein that is really feed.
 """
 
 import numpy as np
