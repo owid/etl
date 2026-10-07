@@ -187,15 +187,22 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    "residuals", and the combined stage is called "data_adjustments", so that the chain ends exactly on "food". The
    size of the gap is kept in the column "balancing_difference" for quality control.
 
-10. World exports are set equal to World imports.
-   >> Scale: minor, and only for World: the trade gap is a few percent of imports.
+10. World exports are set equal to World imports, and World tourist consumption is set to zero.
+   >> Scale: minor, and only for World: the trade gap is a few percent of imports, and World tourist
+   consumption is at most 0.21% of food.
 
-   The world as a whole does not trade with anyone, so World imports
-    and World exports should be equal. In the data they differ, because each is the sum of what individual
-    countries report. World exports are set equal to World imports, which FAO considers the better-documented side
-    (FAO 2025, Food Balance Sheets and Supply Utilization Accounts Resource Handbook, section 6.1), and the
-    difference goes to "data_adjustments". Other regions do trade with the rest of the world, so their imports and
-    exports are left as they are.
+   The world as a whole does not trade with anyone, so World imports and World exports should be equal. In the
+   data they differ, because each is the sum of what individual countries report. World exports are set equal to
+   World imports, which FAO considers the better-documented side (FAO 2025, Food Balance Sheets and Supply
+   Utilization Accounts Resource Handbook, section 6.1), and the difference goes to "data_adjustments". Other
+   regions do trade with the rest of the world, so their imports and exports are left as they are.
+
+   World tourist consumption has the same problem as World trade. "tourist_consumption" is food eaten in a
+   country by people who live in another country. Every visitor lives in some country, so the world as a whole
+   has no visitors, and World tourist consumption should be zero. In the data it is not zero: from 2010 (the
+   first year FAO reports tourist consumption) it is 1 to 6 kcal per person per day, which is 0.04% to 0.21% of
+   World food. World tourist consumption is set to zero, and the removed amount goes to "data_adjustments".
+   Countries and other regions keep their tourist consumption, because for them food eaten by visitors is real.
 
 11. Regions.
    >> Scale: major for the 11 region aggregates, which only exist through this assumption; no country's values
@@ -433,6 +440,9 @@ IDENTITY_ABSOLUTE_TOLERANCE_TONNES = 2000
 # Safety limit for assumption 10: World trade is only equalized while the gap is small (about 5% in practice);
 # a gap above this share of imports crashes the step instead.
 MAX_WORLD_TRADE_GAP = 0.2
+# Safety limit for assumption 10: World tourist consumption is only set to zero while it is small (at most 0.21%
+# of food in practice); a larger share of food crashes the step instead.
+MAX_WORLD_TOURIST_CONSUMPTION = 0.005
 # Expected outcome of the coverage rule below; if a FAOSTAT update changes it, the step crashes so that the
 # docstring gets updated (checks assumption 12).
 REGIONS_WITH_LOW_COVERAGE = {"Low-income countries", "Oceania"}
@@ -752,6 +762,21 @@ def equalize_world_trade(chain: Table) -> Table:
     return chain
 
 
+def remove_world_tourist_consumption(chain: Table) -> Table:
+    """Set World tourist consumption to zero; the removed amount goes to "data_adjustments".
+
+    Implements assumption 10.
+    """
+    world = chain["country"] == "World"
+    tourist = chain.loc[world, "tourist_consumption"]
+    assert (tourist.abs() < MAX_WORLD_TOURIST_CONSUMPTION * chain.loc[world, "food"]).all(), (
+        f"World tourist consumption is up to {100 * (tourist / chain.loc[world, 'food']).abs().max():.2f}% of food."
+    )
+    chain.loc[world, "tourist_consumption"] = 0
+    chain.loc[world, "data_adjustments"] = chain.loc[world, "data_adjustments"] + tourist
+    return chain
+
+
 def per_person_per_day(chain: Table) -> Table:
     """Divide every stage by the entity's population and by 365 days.
 
@@ -924,8 +949,9 @@ def run() -> None:
         chain = sum_items_into_stages(converted, population=population)
         # Assumption 9: the rounding gap goes to data adjustments, so the chain ends exactly on food.
         chain = move_rounding_gap_to_adjustments(chain)
-        # Assumption 10: World exports are set equal to World imports.
+        # Assumption 10: World exports are set equal to World imports, and World tourist consumption is set to zero.
         chain = equalize_world_trade(chain)
+        chain = remove_world_tourist_consumption(chain)
         # Assumption 13: per person per day.
         chain = per_person_per_day(chain)
         sanity_check_outputs(chain, tb_fbsc=tb_fbsc, nutrient=nutrient)
