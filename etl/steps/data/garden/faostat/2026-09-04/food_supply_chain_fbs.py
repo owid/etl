@@ -460,12 +460,21 @@ REGIONS = [
 ]
 
 
+# --------------------------------------------------------------------------------------------------------------------
+# Helpers.
+# --------------------------------------------------------------------------------------------------------------------
 def _pad_code(code: int) -> str:
     return str(code).zfill(N_CHARACTERS_ITEM_CODE)
 
 
+# --------------------------------------------------------------------------------------------------------------------
+# The items file (assumption 7).
+# --------------------------------------------------------------------------------------------------------------------
 def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
-    """Load the curated items file: chain items (indexed by padded code), excluded items and aggregate groups."""
+    """Load the curated items file: chain items (indexed by padded code), excluded items and aggregate groups.
+
+    Implements assumption 7.
+    """
     with open(paths.side_file("food_supply_chain_fbs.items.yml")) as f:
         config = yaml.safe_load(f)
     assert set(config) == {"included", "excluded", "groups"}, "Unexpected top-level keys in items file."
@@ -493,6 +502,7 @@ def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
 
 
 def sanity_check_inputs(tb: Table, items: Table, excluded: dict[str, str], groups: dict[str, str]) -> None:
+    """Check assumption 7 (every FBS item code is in the items file, with its curated name) and the element units."""
     elements = tb[["element_code", "unit"]].drop_duplicates().set_index("element_code")["unit"]
     for unit, codes in ELEMENT_UNITS.items():
         for code in codes:
@@ -511,8 +521,15 @@ def sanity_check_inputs(tb: Table, items: Table, excluded: dict[str, str], group
     assert not renamed, f"FAO item name no longer matches the curated name (code: (expected, found)): {renamed}"
 
 
+# --------------------------------------------------------------------------------------------------------------------
+# The balance table (assumptions 1 to 3).
+# --------------------------------------------------------------------------------------------------------------------
 def prepare_balance_table(tb: Table, items: Table) -> Table:
-    """Reshape the FBS table to one row per (country, year, item) with one column per element, for chain items."""
+    """Reshape the FBS table to one row per (country, year, item) with one column per element, for chain items.
+
+    Implements assumptions 2 (derived stock variation) and 3 (missing elements are treated as zero); the rest is
+    reshaping, with no data decision.
+    """
     tb = tb[tb["item_code"].isin(items.index) & tb["element_code"].isin(ELEMENTS)].reset_index(drop=True)
     tb = tb[["country", "year", "item_code", "element_code", "value", "population_with_data"]].astype(
         {"country": str, "item_code": str, "value": float, "population_with_data": float}
@@ -553,8 +570,14 @@ def prepare_balance_table(tb: Table, items: Table) -> Table:
     return tb
 
 
+# --------------------------------------------------------------------------------------------------------------------
+# Regions (assumptions 11 and 12).
+# --------------------------------------------------------------------------------------------------------------------
 def add_region_aggregates(tb: Table) -> Table:
-    """Assumption 11: OWID regions as the sum of the member countries present each year, for the elements and the population."""
+    """Build the OWID region aggregates and drop the region-years with low population coverage.
+
+    Implements assumptions 11 and 12.
+    """
     assert not tb["country"].isin(REGIONS).any(), "Region rows must be dropped before aggregating."
     keys = ["country", "year", "item_code"]
     value_columns = [c for c in tb.columns if c not in keys + ["population"] and pd.api.types.is_numeric_dtype(tb[c])]
@@ -592,7 +615,7 @@ def add_region_aggregates(tb: Table) -> Table:
 
 
 def sanity_check_balance_identity(tb: Table) -> None:
-    """Check that FBS balances close in tonnes, and that the derived stock variation matches the reported one."""
+    """Check assumptions 1 to 3: FBS balances close in tonnes, and derived stock variation matches the reported one."""
     uses = tb[USES].sum(axis=1)
     tolerance = IDENTITY_RELATIVE_TOLERANCE * tb["domestic_supply"].abs() + IDENTITY_ABSOLUTE_TOLERANCE_TONNES
     share_open = ((tb["domestic_supply"] - uses).abs() > tolerance).mean()
@@ -608,8 +631,14 @@ def sanity_check_balance_identity(tb: Table) -> None:
     )
 
 
+# --------------------------------------------------------------------------------------------------------------------
+# Densities (assumptions 4 to 6).
+# --------------------------------------------------------------------------------------------------------------------
 def add_densities(tb: Table, nutrient: str) -> Table:
-    """Add `density` (nutrient per 100 g) and `density_source` for each (country, year, item). Assumptions 4 to 6."""
+    """Add `density` (nutrient per 100 g) and `density_source` for each (country, year, item).
+
+    Implements assumptions 4 (derivation), 5 (fallbacks) and 6 (zero treatment).
+    """
     tb = tb.copy()
     config = NUTRIENTS[nutrient]
     if config["numerator"] is None:
@@ -640,6 +669,7 @@ def add_densities(tb: Table, nutrient: str) -> Table:
 
 
 def sanity_check_densities(tb: Table, items: Table, nutrient: str) -> None:
+    """Check the scale promised in assumption 5: densities derived directly from the data cover >90% of tonnage."""
     ceiling = NUTRIENTS[nutrient]["ceiling"]
     assert (tb["density"] >= 0).all() and (tb["density"] <= ceiling).all(), f"{nutrient} densities out of range."
 
@@ -650,24 +680,41 @@ def sanity_check_densities(tb: Table, items: Table, nutrient: str) -> None:
     )
 
 
-def build_chain(tb: Table, nutrient: str) -> Table:
-    """Convert balance elements with the densities, sum items into stages, and express them per person per day."""
-    converted = tb[["country", "year"]].copy()
+# --------------------------------------------------------------------------------------------------------------------
+# The chain (assumptions 4, 8, 9, 10 and 13).
+# --------------------------------------------------------------------------------------------------------------------
+def convert_elements_to_nutrient(tb: Table) -> Table:
+    """Convert every element of every item from tonnes into the nutrient, with the item's density.
+
+    Implements the conversion half of assumption 4.
+    """
+    converted = tb[["country", "year", "role"]].copy()
     for element in BALANCE_ELEMENTS:
         converted[element] = tb[element] * HUNDRED_GRAMS_PER_TONNE * tb["density"]
+    return converted
+
+
+def sum_items_into_stages(converted: Table, population: Table) -> Table:
+    """Split the production of each item by its role, and sum all items into the stages of the chain.
+
+    Implements assumption 8. The output has one row per country and year, with one column per stage.
+    """
     for role, stage in ROLES.items():
-        converted[stage] = converted["production"].where(tb["role"] == role, 0)
-    converted = converted.drop(columns=["production"])
-
+        converted[stage] = converted["production"].where(converted["role"] == role, 0)
+    converted = converted.drop(columns=["production", "role"])
     chain = converted.groupby(["country", "year"], observed=True, as_index=False).sum(min_count=1)
-    chain = chain.merge(tb[["country", "year", "population"]].drop_duplicates(), on=["country", "year"], how="left")
-
-    # Assumption 8: processing net of the production of processed items.
+    chain = chain.merge(population, on=["country", "year"], how="left")
     chain["processing_net"] = chain["processing"] - chain["processed_production"]
     chain = chain.drop(columns=["processing", "processed_production"])
     chain = chain.rename(columns={"residuals": "data_adjustments"})
+    return chain
 
-    # Assumptions 9 and 10: fold FAO's rounding gap into data adjustments so that the chain lands exactly on food.
+
+def fold_rounding_gap_into_adjustments(chain: Table) -> Table:
+    """Add FAO's rounding gap to "data_adjustments", so that the chain ends exactly on "food".
+
+    Implements assumption 9. The size of the gap is kept in "balancing_difference" for quality control.
+    """
     chain_end = chain["crop_production"]
     for stage in STAGES[1:]:
         if stage in ["food", "balancing_difference"]:
@@ -675,8 +722,14 @@ def build_chain(tb: Table, nutrient: str) -> Table:
         chain_end = chain_end - chain[stage] if stage in SUBTRACTED_STAGES else chain_end + chain[stage]
     chain["balancing_difference"] = chain["food"] - chain_end
     chain["data_adjustments"] = chain["data_adjustments"] - chain["balancing_difference"]
+    return chain
 
-    # World exports set equal to World imports; the difference goes to data adjustments.
+
+def equalize_world_trade(chain: Table) -> Table:
+    """Set World exports equal to World imports; the difference goes to "data_adjustments".
+
+    Implements assumption 10.
+    """
     world = chain["country"] == "World"
     trade_gap = chain.loc[world, "imports"] - chain.loc[world, "exports"]
     assert (trade_gap.abs() < MAX_WORLD_TRADE_GAP * chain.loc[world, "imports"]).all(), (
@@ -684,16 +737,25 @@ def build_chain(tb: Table, nutrient: str) -> Table:
     )
     chain.loc[world, "exports"] = chain.loc[world, "imports"]
     chain.loc[world, "data_adjustments"] = chain.loc[world, "data_adjustments"] - trade_gap
+    return chain
 
-    # Per person per day (assumption 13): the entity's population, or, for regions, that of the summed members.
+
+def per_person_per_day(chain: Table) -> Table:
+    """Divide every stage by the entity's population and by 365 days.
+
+    Implements assumption 13. For regions, the population is that of the summed member countries (assumption 11).
+    """
     assert chain["population"].notnull().all() and (chain["population"] > 0).all(), "Missing population."
     for stage in STAGES:
         chain[stage] = chain[stage] / chain["population"] / DAYS_PER_YEAR
     return chain[["country", "year"] + STAGES]
 
 
+# --------------------------------------------------------------------------------------------------------------------
+# Output checks.
+# --------------------------------------------------------------------------------------------------------------------
 def sanity_check_partition(tb_fbsc: Table, items: Table) -> None:
-    """Check that food supply (kcal) summed over chain items reproduces FAO's own aggregate items, for World."""
+    """Check assumption 7: food supply (kcal) summed over chain items reproduces FAO's own totals, for World."""
     world = tb_fbsc[(tb_fbsc["country"] == "World") & (tb_fbsc["element_code"] == "0664pc")]
     world = world[["year", "item_code", "value"]].astype({"item_code": str, "value": float})
     fao = world.pivot(index="year", columns="item_code", values="value")
@@ -750,6 +812,9 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
     )
 
 
+# --------------------------------------------------------------------------------------------------------------------
+# Main.
+# --------------------------------------------------------------------------------------------------------------------
 def run() -> None:
     #
     # Load inputs.
@@ -770,12 +835,23 @@ def run() -> None:
     tb = add_region_aggregates(tb)
     sanity_check_balance_identity(tb)
 
+    population = tb[["country", "year", "population"]].drop_duplicates()
     tables = []
     for nutrient in NUTRIENTS:
+        # Assumptions 4 to 6: the density of every item, with its fallbacks and its zero treatment.
         tb_nutrient = add_densities(tb, nutrient=nutrient)
         if nutrient != "mass":
             sanity_check_densities(tb_nutrient, items=items, nutrient=nutrient)
-        chain = build_chain(tb_nutrient, nutrient=nutrient)
+        # Assumption 4 (conversion): every element of every item, from tonnes into the nutrient.
+        converted = convert_elements_to_nutrient(tb_nutrient)
+        # Assumption 8: production split by role, items summed into the stages of the chain.
+        chain = sum_items_into_stages(converted, population=population)
+        # Assumption 9: the rounding gap goes to data adjustments, so the chain ends exactly on food.
+        chain = fold_rounding_gap_into_adjustments(chain)
+        # Assumption 10: World exports are set equal to World imports.
+        chain = equalize_world_trade(chain)
+        # Assumption 13: per person per day.
+        chain = per_person_per_day(chain)
         sanity_check_outputs(chain, tb_fbsc=tb_fbsc, nutrient=nutrient)
         tables.append(chain.format(["country", "year"], short_name=nutrient))
 
