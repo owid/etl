@@ -51,11 +51,19 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    A density is rejected only when it is physically impossible: more energy than pure fat (920 kcal per 100 g), or
    more than 100 g of protein per 100 g. Rejected and missing densities fall back to the country's median for the
    item over all years, and then to the item's median over all countries and years.
-   A derived density of exactly zero is never used directly, because a zero can mean two things: some items truly
-   have none of the nutrient (sugar and oils contain no protein), but a zero can also appear when a tiny amount of
-   food is rounded down to zero tonnes. Zeros therefore only enter through the medians: an item that truly has none
-   of the nutrient gets a median of zero, while an item with a spurious zero gets its usual value.
-   For mass there is no density: tonnes are converted to kilograms.
+   A derived density of exactly zero gets a special treatment, because a zero can mean two things:
+   - A true zero: the item has none of the nutrient. Sugar and oils contain no protein, and FAO's own figures give
+     them a density of zero in every country and year.
+   - A spurious zero: a tiny amount of food was rounded down to zero in one country and year, for an item that
+     normally has a nonzero density.
+   To handle both correctly, the step never uses a zero directly. When the division gives exactly zero, the cell
+   takes the median density instead (the country's median for the item over all years, then the item's median over
+   all countries and years), and the zeros are included in those medians. For a true zero, every year is zero, so
+   the median is zero and the item correctly ends at zero. For a spurious zero, the median is the item's usual
+   value, so the cell gets that.
+   Besides calories and protein, the chain is also built in a third unit, mass. The mass table involves no
+   density calculation:
+   SCL already reports every element as a mass, and the step only changes the unit from tonnes to kilograms.
 
 4. Items nobody eats (cakes, brans, ethanol, refining residues) have no food use, so no density can be derived from
    the data. Each gets the energy and protein of the human food it would be if eaten: energy from USDA's food

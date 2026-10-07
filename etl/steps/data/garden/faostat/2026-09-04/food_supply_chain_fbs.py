@@ -13,11 +13,10 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
        production + imports - exports - stock variation
          = food + feed + seed + processing + other uses + losses + tourist consumption + residuals.
    FBS only reports stock variation from 2010 onward, so this step derives stock variation for all years from the
-   identity, as production + imports - exports - domestic supply. Where FBS does report stock variation (2010
-   onward), the derived value is checked against the reported one, per item, country and year. The two must agree
-   within 1% of the item's domestic supply, plus 2,000 tonnes: FAOSTAT rounds every element to the nearest 1,000
-   tonnes, and the identity adds about ten elements, so rounding alone can open a gap of a few thousand tonnes.
-   The step fails if more than 0.5% of the item balances disagree.
+   identity, as production + imports - exports - domestic supply. Where FBS reports stock variation (2010 onward),
+   a check verifies that the derived value agrees with the reported one.
+   Scale: the identity is the backbone of every table. Stock variation itself is a small stage: for World in
+   2023, 88 kcal per person per day, against a food stage of about 3,000.
 
 2. Missing elements are treated as zero. When FBS does not report an element for an item (meat has no "seed", for
    example), the step treats the missing element as zero, so that the identity can be evaluated for every item.
@@ -25,17 +24,24 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    together, so an element missing from a compiled balance is almost always one that does not apply to the item,
    not lost data. Second, if an element with a real value were missing and treated as zero, the two sides of the
    identity would not close for that item, and the step fails when more than 2% of the item balances do not close.
-   Only two kinds of missing element can escape that check: an element smaller than the tolerance above, which is
-   then also too small to change any result, and two missing elements on opposite sides of the balance that happen
-   to cancel each other, which FAO's way of building the balances makes extremely unlikely.
+   Scale: minor bookkeeping; it changes no values, it only lets the identity be evaluated for every item.
 
-3. Densities. The density of an item (kcal, or grams of protein, per 100 g) is derived from the item's food use:
-   the amount of the item that people eat. For each item, country and year, FBS reports that amount both as a
-   nutrient (kilocalories, or grams of protein, per person per day) and as a quantity (kilograms per person per
-   year); FAO calls these elements the food supply of the item. The nutrient per year divided by the quantity per
-   year gives the density. The same density is applied to every element of the item, so the
-   identity of assumption 1 holds in calories and protein exactly as it holds in tonnes, and the chain ends exactly
-   on "food" by construction. For mass there is no density: tonnes are converted to kilograms.
+3. Densities. FBS reports every element of the balance only in tonnes. The one exception is food: for each item,
+   country and year, FBS also reports the amount of the item that people eat as a nutrient (kilocalories per person
+   per day, or grams of protein per person per day) next to its quantity (kilograms per person per year). To build
+   the chain in calories and protein, every other element must be converted from tonnes, and the food element is
+   the only place the conversion factor can come from. The density of an item (kcal, or grams of protein, per
+   100 g) is the food nutrient per year divided by the food quantity per year. That density,
+   derived from the food element alone, is then used to convert every element of the item into the nutrient:
+   production, imports, exports, stock variation, seed, losses, other uses, processing, feed, tourist consumption
+   and residuals. Because every element of the item is converted with the same density, the identity of
+   assumption 1 holds in calories and protein exactly as it holds in tonnes, and the
+   chain ends exactly on "food" by construction.
+   Besides calories and protein, the chain is also built in a third unit, mass. The mass table involves no
+   density calculation:
+   FBS already reports every element as a mass, and the step only changes the unit from tonnes to kilograms.
+   Scale: major. This is the core assumption of the whole step: every calorie and every gram of protein in the
+   output is a tonnage multiplied by one of these densities.
 
 4. Rejected and missing densities, and their fallbacks.
 
@@ -50,10 +56,20 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    Every chain item has a valid density in at least one country and year, so this chain of fallbacks always ends with
    a density; an assert fails the step if a FAOSTAT update ever breaks that.
 
-   A derived density of exactly zero is never used directly, because a zero can mean two things: some items truly
-   have none of the nutrient (sugar and oils contain no protein), but a zero can also appear when a tiny amount of
-   food is rounded down to zero tonnes. Zeros therefore only enter through the medians: an item that truly has none
-   of the nutrient gets a median of zero, while an item with a spurious zero gets its usual value.
+   A derived density of exactly zero gets a special treatment, because a zero can mean two things:
+   - A true zero: the item has none of the nutrient. Sugar and oils contain no protein, and FAO's own figures give
+     them a density of zero in every country and year.
+   - A spurious zero: a tiny amount of food was rounded down to zero in one country and year, for an item that
+     normally has a nonzero density.
+   To handle both correctly, the step never uses a zero directly. When the division gives exactly zero, the cell
+   takes the median density instead (the country's median for the item over all years, then the item's median over
+   all countries and years), and the zeros are included in those medians. For a true zero, every year is zero, so
+   the median is zero and the item correctly ends at zero. For a spurious zero, the median is the item's usual
+   value, so the cell gets that.
+   Scale: minor, and bounded by a check. Densities derived directly from the data cover more than 90% of tonnage
+   (97-99% for World), and an assert fails the step below 90%. The medians cover the rest, mostly the crops not
+   eaten as harvested (10% of item balances, 2% of tonnage). The zero treatment touches 2% of protein cells and
+   0.1% of energy cells.
 
    Example of an impossible density: soybean oil in the United States in 2023.
    - FAO reports the calories Americans get from soybean oil, and the tonnes of it they eat.
@@ -72,7 +88,8 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
      this impossible-density problem does not appear.
    - The ceiling rejects that value, and the United States' median density for soybean oil (841) is used instead.
    Vegetable oils are the main case of impossible densities, and the United States the most affected country.
-   Wherever this happens, our food stage comes out lower than FAO's published food supply.
+   Wherever this happens, our food stage comes out lower than FAO's own published figure for the food available
+   to eat.
 
    The second fallback (the median over all countries and years) is the normal path for crops that are rarely eaten
    as harvested, such as sugar cane, sugar beet and cottonseed: most countries never eat them raw, so no country
@@ -169,15 +186,17 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
      `food_supply_chain_scl` avoids the flaw: there, the density of crops like sugar cane is derived from the
      products made out of them, not from food use.
 
-7. Data adjustments. FAOSTAT rounds tonnages to the nearest 1,000 t, so the two sides of the balance identity do
-   not close exactly. The gap is added to FAO's own "residuals", and the combined stage is called
-   "data_adjustments", so that the chain ends exactly on "food". The size of the gap is kept in the column
+7. Data adjustments. FAO publishes FBS tonnages rounded, mostly in units of 1,000 tonnes, so the two sides of the
+   balance identity do not close exactly. The gap is added to FAO's own "residuals", and the combined stage is
+   called "data_adjustments", so that the chain ends exactly on "food". The size of the gap is kept in the column
    "balancing_difference" for quality control.
    The world as a whole does not trade with anyone, so World imports and World exports should be equal. In the data
    they differ, because each is the sum of what individual countries report. World exports are set equal to World
    imports, which FAO considers the better-documented side (FAO 2025, Food Balance Sheets and Supply Utilization
    Accounts Resource Handbook, section 6.1), and the difference goes to "data_adjustments". Other regions do trade
    with the rest of the world, so their imports and exports are left as they are.
+   Scale: minor. For World, the rounding gap stays below 2% of the food stage, and the trade gap is a few percent
+   of imports.
 
 8. Regions. FAO publishes its own regional aggregates; this step drops them and builds OWID regions (World,
    continents, income groups) instead, from the member countries that have an FBS balance that year. Every element
@@ -189,8 +208,10 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    A region-year is dropped when the countries with a balance hold less than 80% of the region's population, so
    that a value labeled "Africa" is never built from a small fraction of Africa. This rule removes "Low-income
    countries" before 2010 and in 2023, and Oceania in 2002-2009 (Papua New Guinea is missing in those years).
+   Scale: affects only the 11 region aggregates; no country's values change.
 
 9. All stages are divided by that population and by 365 days, to give values per person per day.
+   Scale: all values, trivially: a choice of unit, not of substance.
 
 KNOWN LIMITATIONS
 -----------------
