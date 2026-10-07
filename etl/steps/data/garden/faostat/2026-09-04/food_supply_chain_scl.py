@@ -3,7 +3,8 @@
 This step builds the same chain as `food_supply_chain_fbs`, but from FAO's Supply Utilization Accounts (SCL)
 instead of the Food Balance Sheets (FBS): crop production, plus imports, minus exports, stock changes, seed,
 losses, non-food uses, processing and animal feed, plus animal products, ending at the food available to eat.
-The chain is built three times, in three units, one table each:
+Food keeps its reported calories and protein where the directly derived density is accepted and not overridden;
+otherwise it uses the replacement density. The chain is built three times, in three units, one table each:
     energy   kilocalories per person per day
     protein  grams of protein per person per day
     mass     kilograms per person per day (the balance in tonnes, with no conversion at all)
@@ -41,19 +42,20 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    than 1% of the item balances do not close.
 
 3. Densities.
-   >> Scale: major. This is the core assumption of the whole step: every calorie and every gram of protein in the
-   output is a tonnage multiplied by one of these densities.
+   >> Scale: major. These densities convert all stages other than directly reported food into calories and protein.
 
    SCL reports every element of the balance only in tonnes. The exception is food: for each item, country and year,
    SCL also reports the food as calories (the element "Calories/Year") and as protein (the element "Proteins/Year").
    To build the chain in calories and protein, every other element must be converted from tonnes, and the food
    element is the only place the conversion factor can come from. The density of an item (kcal, or grams of
    protein, per 100 g) is the food nutrient per year divided by the food tonnes per year. That density, derived
-   from the food element alone, is then used to convert every element of the item into the nutrient: production,
+   from the food element alone, is then used to convert the other elements of the item into the nutrient: production,
    imports, exports, stock variation, seed, losses, other uses, processing, feed, tourist consumption and
-   residuals. Because every element of the item is converted with the same density, the identity of assumption 1
-   holds in calories and protein exactly as it holds in tonnes, and the chain ends exactly on "food" by
-   construction.
+   residuals. Where this directly derived density is accepted and not overridden under assumptions 4 to 7, food
+   keeps its reported nutrient total. This matters for fish taken from FBS (assumption 9), whose food tonnage is
+   rounded more coarsely than the figures used to derive its density. Where a density is replaced, food continues
+   to use that replacement density and the food tonnage. Any gap between the converted stages and food goes to
+   data adjustments (assumption 10).
    Besides calories and protein, the chain is also built in a third unit, mass. The mass table involves no density
    calculation: SCL already reports every element as a mass, and the step only changes the unit from tonnes to
    kilograms.
@@ -70,14 +72,14 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    item's median over all countries and years.
 
 5. Densities of exactly zero.
-   >> Scale: minor. A division by zero food gives a raw zero in 0.1% of cells in energy and 6.6% in protein; about
+   >> Scale: minor. A zero reported nutrient gives a raw zero in 0.1% of cells in energy and 6.6% in protein; about
    one zero in nine is spurious and gets a nonzero value from the medians.
 
    A derived density of exactly zero gets a special treatment, because a zero can mean two things:
    - A true zero: the item has none of the nutrient. Sugar and oils contain no protein, and FAO's own figures give
      them a density of zero in every country and year.
-   - A spurious zero: a tiny amount of food was rounded down to zero in one country and year, for an item that
-     normally has a nonzero density.
+   - A spurious zero: a small reported nutrient amount was rounded down to zero despite a positive food quantity,
+     for an item that normally has a nonzero density.
    To handle both correctly, the step never uses a zero directly. When the division gives exactly zero, the cell
    takes the median density instead (the country's median for the item over all years, then the item's median over
    all countries and years), and the zeros are included in those medians. For a true zero, every year is zero, so
@@ -138,12 +140,15 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    Fish and seafood are not in SCL. The FBS fish items are added, with their FBS densities under the same rules,
    for the countries and years that SCL covers.
 
-10. The rounding gap goes to data adjustments.
-    >> Scale: minor.
+10. The gap between the preceding stages and food goes to data adjustments.
+    >> Scale: minor for World; rounded fish tonnages can have a larger effect in small countries.
 
-    FAOSTAT rounds tonnages, so balances do not close exactly. The gap is added to FAO's own "residuals", and the
-    combined stage is called "data_adjustments", so that the chain ends exactly on "food". The size of the gap is
-    kept in "balancing_difference" for quality control.
+    FAOSTAT rounds tonnages, so balances do not close exactly. Food nutrients are retained at their reported
+    precision where the direct density is accepted; the other stages still use the reported tonnages. This
+    matters especially for fish taken from FBS. The gap between those stages and food is included in
+    "data_adjustments", together with FAO's own "residuals", so that the chain ends exactly on "food".
+    Keeping the more precise food total changes this adjustment without changing the other flows. The size of
+    the gap is kept in "balancing_difference" for quality control.
 
 11. World exports are set equal to World imports, and World tourist consumption is set to zero.
     >> Scale: minor, and only for World: the trade gap is a few percent of imports, and World tourist
@@ -642,8 +647,8 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
     raw = raw.where(np.isfinite(raw) & (raw >= 0))
     # Assumption 4: a density above the physical ceiling is a broken FAOSTAT cell, and counts as missing too.
     within_ceiling = raw.where(raw <= ceiling)
-    # A density of exactly zero is real for oils and sugars (no protein), but it is also what a tiny food quantity
-    # rounded to zero produces, so zeros are not used directly: they enter the medians, which come out as zero
+    # A density of exactly zero is real for oils and sugars (no protein), but a small nutrient amount can also
+    # be rounded to zero, so zeros are not used directly: they enter the medians, which come out as zero
     # for items that truly have none of the nutrient and as the usual value otherwise.
     accepted = within_ceiling.where(within_ceiling > 0)
     country_median = within_ceiling.groupby([tb["country"], tb["item_code"]]).transform("median")
@@ -744,7 +749,7 @@ def sanity_check_processing_families(tb: Table, manual: dict, nutrient: str) -> 
 # The chain (assumptions 3, 8, 10, 11 and 14).
 # --------------------------------------------------------------------------------------------------------------------
 def convert_elements_to_nutrient(tb: Table, nutrient: str) -> Table:
-    """Convert every element of every item from tonnes into the nutrient, with the item's density.
+    """Convert elements from tonnes, retaining reported food nutrients where the direct density is accepted.
 
     Implements the conversion half of assumption 3.
     """
@@ -756,6 +761,10 @@ def convert_elements_to_nutrient(tb: Table, nutrient: str) -> Table:
     else:
         for element in BALANCE_ELEMENTS:
             converted[element] = tb[element] * HUNDRED_GRAMS_PER_TONNE * tb["density"]
+        # Fish from FBS has coarser food tonnage than the figures used to derive its density.
+        # Keep the reported nutrient total only where that density survives all checks and overrides.
+        direct = tb["density_source"] == "direct"
+        converted.loc[direct, "food"] = tb.loc[direct, NUTRIENTS[nutrient]["numerator"]]
     return converted
 
 
@@ -777,7 +786,7 @@ def sum_items_into_stages(converted: Table, population: Table) -> Table:
 
 
 def move_rounding_gap_to_adjustments(chain: Table) -> Table:
-    """Add FAO's rounding gap to "data_adjustments", so that the chain ends exactly on "food".
+    """Move the gap between converted stages and food to "data_adjustments", so that the chain ends on "food".
 
     Implements assumption 10. The size of the gap is kept in "balancing_difference" for quality control.
     """
@@ -928,7 +937,7 @@ def run() -> None:
             tb_nutrient = add_densities(tb, manual=manual, nutrient=nutrient)
             sanity_check_densities(tb_nutrient, nutrient=nutrient)
             sanity_check_processing_families(tb_nutrient, manual=manual, nutrient=nutrient)
-            # Assumption 3 (conversion): every element of every item, from tonnes into the nutrient.
+            # Assumption 3: convert tonnes, retaining reported food nutrients where the direct density is accepted.
             converted = convert_elements_to_nutrient(tb_nutrient, nutrient=nutrient)
         # Assumption 8: production split by role, items summed into the stages of the chain.
         chain = sum_items_into_stages(converted, population=population_by_entity)

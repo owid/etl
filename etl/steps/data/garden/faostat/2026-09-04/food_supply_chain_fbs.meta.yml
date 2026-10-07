@@ -5,13 +5,13 @@ definitions:
       topic_tags:
         - Food Supply
     description_processing: |-
-      - FAOSTAT Food Balance Sheets report every element of the food balance in tonnes, and only food available for consumption also in kilocalories and grams of protein. We convert each element of each item with a density (kilocalories, or grams of protein, per 100 grams) and sum the items into the stages of the chain; the mass table keeps the tonnes, expressed in kilograms per person per day.
-      - The energy density of each item, country and year is derived from the Food Balance Sheets themselves, as food supply in kilocalories divided by food supply in tonnes. Densities above the energy of pure fat (920 kilocalories per 100 grams) or above 100 grams of protein per 100 grams are treated as data errors and replaced by the country's median for the item, or failing that by the item's median across all countries and years.
-      - The same density is applied to every element of an item, so the balance (production plus imports, minus exports and stock changes, equals the sum of all uses) holds in kilocalories as it does in tonnes.
+      - FAOSTAT Food Balance Sheets report every element of the food balance in tonnes, and only food available for consumption also in kilocalories and grams of protein. We convert flows reported in tonnes with a density (kilocalories, or grams of protein, per 100 grams) and sum the items into the stages of the chain; the mass table keeps the tonnes, expressed in kilograms per person per day.
+      - The energy density of each item, country and year is derived from the Food Balance Sheets themselves, as food supply in kilocalories divided by food supply in tonnes. Densities above the energy of pure fat (920 kilocalories per 100 grams) or above 100 grams of protein per 100 grams are rejected as conversion factors and replaced by the country's median for the item, or failing that by the item's median across all countries and years.
+      - For energy and protein, we keep the reported food nutrient total wherever the directly derived density is accepted. Where a density is replaced, food is still calculated from tonnes using the replacement density. This preserves food nutrients that would otherwise be lost or distorted by the more coarsely rounded food tonnage.
       - Stock variation is derived as production plus imports minus exports minus domestic supply, since FAOSTAT only reports it from 2010 onward.
       - Only individual items are summed; FAO's aggregate items (such as "Cereals" or "Vegetal Products") are left out to avoid double counting. Three items with no food energy are left out: "Palm kernels" (which carries the oil palm harvest; the oil palm enters the chain as palm oil and palm kernel oil), non-food alcohol and aquatic mammals.
       - Production of items made from other items (vegetable oils, sugar and sweeteners, alcoholic beverages, butter, cream, fish oils and other processed products) is netted against processing, so that no calorie is counted twice.
-      - FAOSTAT rounds tonnages to the nearest thousand, so its balances do not close exactly; the gap is folded into data adjustments so that the chain lands exactly on food available for consumption.
+      - FAOSTAT reports rounded tonnages, which do not balance exactly. We retain food nutrients at their reported precision where the directly derived density is accepted, and include the gap between the other stages and food in data adjustments. This lets the chain end at food available for consumption without reducing the precision of the reported food nutrients.
       - The world as a whole does not trade, but the sum of the imports reported by all countries differs from the sum of their exports. For the world, exports are set equal to imports, which FAO considers the better-documented side, and the difference is added to data adjustments.
       - For the world, reported tourist consumption is moved to data adjustments, and the tourist consumption stage is set to zero. This leaves food available for consumption unchanged.
       - All stages are divided by the same population series, from Our World in Data's population dataset, and by 365 days. Regions (the world, continents and income groups) are built by summing the member countries with an FAO balance in that year, and divided by the population of those same countries; a region is left empty in years when those countries hold less than 80% of its population.
@@ -78,7 +78,7 @@ tables:
         description_short: Food available for human consumption, before waste at retail and in households.
       balancing_difference:
         title: Balancing difference
-        description_short: The gap by which FAOSTAT's rounded balances fail to close, in the unit of the table. It is included in data adjustments; this column only records its size.
+        description_short: Gap between food available for consumption and the preceding stages of the balance, before adjustments made by OWID. It is included in data adjustments; this column only records its size.
   protein:
     title: Food supply chain in grams of protein (Food Balance Sheets method)
     common:
