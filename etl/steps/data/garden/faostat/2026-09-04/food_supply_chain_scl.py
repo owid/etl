@@ -30,8 +30,8 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
 
    Adding up the production of all items would count the same calories many times, because sugar is made from sugar
    cane and bread is made from wheat. To avoid double counting, each item has a role, and the role decides where the
-   production of the item goes. FAO's own item groups tag every SCL item as "Crops, primary", "Livestock primary",
-   "Crops processed" or "Livestock processed", which map to the three roles:
+   production of the item goes. FAO's own item groups assign every SCL item to one of four groups ("Crops,
+   primary", "Livestock primary", "Crops processed" or "Livestock processed"), which map to the three roles:
    - "crop": the production of crops is the stage "crop_production", the start of the chain.
    - "animal": animals eat crops, and the stage "feed" subtracts the calories of the crops that are fed to animals.
      The stage "animal_products" then adds the calories of the meat, milk and eggs that the animals produce.
@@ -46,7 +46,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
 
 3. Densities. The density of an item (kcal, or grams of protein, per 100 g) is derived from food use: FAO's food
    calories of the item ("Calories/Year") or food protein ("Proteins/Year"), divided by the food tonnes of the
-   item, per country and year. The same density is applied to every flow of the item, so the identity of
+   item, per country and year. The same density is applied to every element of the item, so the identity of
    assumption 1 holds in calories and protein exactly as it holds in tonnes.
    A density is rejected only when it is physically impossible: more energy than pure fat (920 kcal per 100 g), or
    more than 100 g of protein per 100 g. Rejected and missing densities fall back to the country's median for the
@@ -66,7 +66,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    millions of tonnes of cake. An item on the list with a real food use (spirits, and wheat bran in some countries)
    keeps its data-derived density instead.
    Items that are never food in any form (castor, tung, kapok, jojoba, wool grease) get zero energy and protein,
-   which removes them from every flow consistently. In the mass table every item counts as it is.
+   which removes them from every element consistently. In the mass table every item counts as it is.
 
 5. Crops that are not eaten as harvested (paddy rice, sugar cane, sugar beet, oil palm fruit, rapeseed, cotton
    seed). A density derived from food use measures the calories a human gets from eating the item; for these crops
@@ -77,7 +77,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    by the tonnes of the crop that went into processing. The ratio is computed for World each year and applied to
    every country. The crop-to-product links are in the items file.
 
-6. Fish and seafood are not in SCL. The FBS fish items are spliced in, with their FBS densities under the same
+6. Fish and seafood are not in SCL. The FBS fish items are added, with their FBS densities under the same
    rules, for the countries and years that SCL covers.
 
 7. FAOSTAT rounds tonnages, so balances do not close exactly. The gap is added to FAO's own "residuals", and the
@@ -89,9 +89,9 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    "data_adjustments". Other regions do trade with the rest of the world and are left as they are.
 
 8. Regions. FAO's own regional aggregates are dropped, and OWID regions (World, continents, income groups) are
-   built from the member countries that have an SCL balance that year: every flow and every food nutrient total is
+   built from the member countries that have an SCL balance that year: every element and every food nutrient total is
    summed over those countries (fish included, from the same countries), and the region's population is the sum of
-   those same countries' population. A country either has a full balance or none at all, so the flows and the
+   those same countries' population. A country either has a full balance or none at all, so the elements and the
    population always cover the same countries. A region-year is dropped when the countries with a balance hold less
    than 80% of the region's population. "Low-income countries" is left out altogether: SCL never covers more than
    80% of its population.
@@ -409,7 +409,7 @@ def prepare_fish_table(tb_fbsc: Table, manual: dict, population: Table) -> Table
 
 
 def add_region_aggregates(tb: Table) -> Table:
-    """Assumption 8: OWID regions as the sum of the member countries present each year, for the flows and the population."""
+    """Assumption 8: OWID regions as the sum of the member countries present each year, for the elements and the population."""
     assert not tb["country"].isin(REGIONS).any(), "Region rows must be dropped before aggregating."
     keys = ["country", "year", "item_code"]
     value_columns = [c for c in tb.columns if c not in keys + ["population"] and pd.api.types.is_numeric_dtype(tb[c])]
@@ -539,7 +539,7 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
         tb.loc[mask, "density_source"] = "implied_by_products"
 
     unresolved = tb[tb["density"].isnull() & (tb[BALANCE_ELEMENTS].abs().sum(axis=1) > 0)]
-    error = f"Items with flows but no {nutrient} density (add them to the items file): " + str(
+    error = f"Items with nonzero elements but no {nutrient} density (add them to the items file): " + str(
         unresolved.groupby("fao_item")["production"].sum().sort_values(ascending=False).round(0).to_dict()
     )
     assert unresolved.empty, error
@@ -619,7 +619,7 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
     for stage in [
         s for s in STAGES if s not in ["stock_variation", "data_adjustments", "processing_net", "balancing_difference"]
     ]:
-        # FAO occasionally reports a negative flow (Iraq 2010 wheat exports, for one); small negatives are tolerated.
+        # FAO occasionally reports a negative element (Iraq 2010 wheat exports, for one); small negatives are tolerated.
         assert (tb[stage].fillna(0) >= -0.01 * tb["food"].abs()).all(), (
             f"Negative values in stage {stage!r} ({nutrient})."
         )

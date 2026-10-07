@@ -1,6 +1,6 @@
 """FAOSTAT Food Balance Sheets (FBS) as a chain of stages from crop production to food, per person per day.
 
-FBS elements in tonnes are converted with per-item densities reverse-engineered from FBS itself, and summed into the
+FBS elements in tonnes are converted with per-item densities derived from FBS itself, and summed into the
 stages of a chain from crop production to food available to eat. The chain is built three times, in three units, one
 table each:
     energy   kilocalories per person per day
@@ -13,19 +13,31 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
        production + imports - exports - stock variation
          = food + feed + seed + processing + other uses + losses + tourist consumption + residuals.
    FBS only reports stock variation from 2010 onward, so this step derives stock variation for all years from the
-   identity, as production + imports - exports - domestic supply. Where FBS does report stock variation, the
-   derived value is checked against the reported one.
-   When FBS does not report an element for an item (meat has no "seed", for example), the step treats the missing
-   element as zero, so that the identity can be evaluated for every item.
+   identity, as production + imports - exports - domestic supply. Where FBS does report stock variation (2010
+   onward), the derived value is checked against the reported one, per item, country and year. The two must agree
+   within 1% of the item's domestic supply, plus 2,000 tonnes: FAOSTAT rounds every element to the nearest 1,000
+   tonnes, and the identity adds about ten elements, so rounding alone can open a gap of a few thousand tonnes.
+   The step fails if more than 0.5% of the item balances disagree.
 
-2. Densities. The density of an item (kcal, or grams of protein, per 100 g) is derived from food use, per item,
-   country and year. FBS reports the food supply of each item both as a nutrient (kilocalories, or grams of
-   protein, per person per day) and as a quantity (kilograms per person per year); the nutrient per year divided by
-   the quantity per year gives the density. The same density is applied to every element of the item, so the
+2. Missing elements are treated as zero. When FBS does not report an element for an item (meat has no "seed", for
+   example), the step treats the missing element as zero, so that the identity can be evaluated for every item.
+   This is safe for two reasons. First, FAO builds each balance as a whole, estimating every element of the item
+   together, so an element missing from a compiled balance is almost always one that does not apply to the item,
+   not lost data. Second, if an element with a real value were missing and treated as zero, the two sides of the
+   identity would not close for that item, and the step fails when more than 2% of the item balances do not close.
+   Only two kinds of missing element can escape that check: an element smaller than the tolerance above, which is
+   then also too small to change any result, and two missing elements on opposite sides of the balance that happen
+   to cancel each other, which FAO's way of building the balances makes extremely unlikely.
+
+3. Densities. The density of an item (kcal, or grams of protein, per 100 g) is derived from the item's food use:
+   the amount of the item that people eat. For each item, country and year, FBS reports that amount both as a
+   nutrient (kilocalories, or grams of protein, per person per day) and as a quantity (kilograms per person per
+   year); FAO calls these elements the food supply of the item. The nutrient per year divided by the quantity per
+   year gives the density. The same density is applied to every element of the item, so the
    identity of assumption 1 holds in calories and protein exactly as it holds in tonnes, and the chain ends exactly
    on "food" by construction. For mass there is no density: tonnes are converted to kilograms.
 
-3. Rejected and missing densities, and their fallbacks.
+4. Rejected and missing densities, and their fallbacks.
 
    A density is rejected only when it is physically impossible: more energy than pure fat (920 kcal per 100 g), or
    more than 100 g of protein per 100 g. An impossible density means FAO's nutrient and tonnage figures for that
@@ -72,10 +84,10 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    country eating the item. World gets its densities from the data for 97-99% of its tonnage and never needs the
    median over all countries.
 
-4. Items. Every item code in the FBS table must appear in `food_supply_chain_fbs.items.yml`, in exactly one of three
+5. Items. Every item code in the FBS table must appear in `food_supply_chain_fbs.items.yml`, in exactly one of three
    lists; an assert fails the step if FAO adds, removes or renames an item.
 
-   - "included": the items that make up the chain, each with a role (crop, animal or processed; see assumption 5).
+   - "included": the items that make up the chain, each with a role (crop, animal or processed; see assumption 6).
    - "excluded": items deliberately left out of the chain (see below).
    - "groups": FAO's own totals, such as "Grand Total" and "Cereals - Excluding Beer". Each aggregate group
      is the sum of items that are already in the chain, so adding the aggregate groups would count the same food
@@ -91,17 +103,17 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
      the oil palm is recorded under the item "Palm kernels" (FAO defines the item "Palm kernels" as the palm fruit
      plus the palm kernels), and the item has zero food use, so no density can be derived for the item
      "Palm kernels". The step therefore excludes the item "Palm kernels", and the oil palm harvest enters the chain
-     through the items "Palm Oil" and "Palmkernel Oil", which are tagged as crops rather than as processed
-     products, so that the calories of the oil palm start the chain in crop production.
+     through the items "Palm Oil" and "Palmkernel Oil", which are given the role "crop" rather than the role
+     "processed", so that the calories of the oil palm start the chain in crop production.
 
    The excluded items are left out of all three tables, the mass table included.
 
-5. Roles: where each item's production enters the chain.
+6. Roles: where each item's production enters the chain.
 
-   Every item has a "production" flow, but simply adding up the production of all items would count the same calories
-   many times: sugar is made from sugar cane, so the production of sugar repeats calories already counted in the
-   production of sugar cane. To avoid double counting, each included item has a role, and the role decides where the
-   production of the item goes:
+   Every item has a "production" element, but simply adding up the production of all items would count the same
+   calories many times: sugar is made from sugar cane, so the production of sugar repeats calories already counted
+   in the production of sugar cane. To avoid double counting, each included item has a role, and the role decides
+   where the production of the item goes:
 
    - "crop": a primary crop (wheat, potatoes, sugar cane). The production of crops is the stage "crop_production",
      the start of the chain.
@@ -140,7 +152,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
      measure, because a factory extracts far more than a human.
 
      Sugar cane in Brazil shows the problem. Nobody in Brazil eats raw sugar cane, so Brazil has no food use of
-     "Sugar cane" to derive a density from. As explained in assumption 3, the step then falls back to the median
+     "Sugar cane" to derive a density from. As explained in assumption 4, the step then falls back to the median
      density over all countries and years, and that median comes from the few countries where people chew raw cane
      or drink its juice: 30 kcal per 100 g. The value is genuinely low, not an error: a person chewing cane extracts
      only a small share of the calories in the stalk, because most of the stalk is fibre that is spat out or
@@ -157,7 +169,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
      `food_supply_chain_scl` avoids the flaw: there, the density of crops like sugar cane is derived from the
      products made out of them, not from food use.
 
-6. Data adjustments. FAOSTAT rounds tonnages to the nearest 1,000 t, so the two sides of the balance identity do
+7. Data adjustments. FAOSTAT rounds tonnages to the nearest 1,000 t, so the two sides of the balance identity do
    not close exactly. The gap is added to FAO's own "residuals", and the combined stage is called
    "data_adjustments", so that the chain ends exactly on "food". The size of the gap is kept in the column
    "balancing_difference" for quality control.
@@ -167,18 +179,18 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    Accounts Resource Handbook, section 6.1), and the difference goes to "data_adjustments". Other regions do trade
    with the rest of the world, so their imports and exports are left as they are.
 
-7. Regions. FAO publishes its own regional aggregates; this step drops them and builds OWID regions (World,
+8. Regions. FAO publishes its own regional aggregates; this step drops them and builds OWID regions (World,
    continents, income groups) instead, from the member countries that have an FBS balance that year. Every element
    in tonnes, and the food nutrient totals (per-capita food supply times population), are summed over those
    countries, and the region's population is the sum of those same countries' population. A country either has a
-   full balance or no balance at all, so the summed flows and the summed population always cover the same
+   full balance or no balance at all, so the summed elements and the summed population always cover the same
    countries. Countries that FAO has not compiled (Cuba and North Korea in recent years, and small states) are in
    neither.
    A region-year is dropped when the countries with a balance hold less than 80% of the region's population, so
    that a value labeled "Africa" is never built from a small fraction of Africa. This rule removes "Low-income
    countries" before 2010 and in 2023, and Oceania in 2002-2009 (Papua New Guinea is missing in those years).
 
-8. All stages are divided by that population and by 365 days, to give values per person per day.
+9. All stages are divided by that population and by 365 days, to give values per person per day.
 
 KNOWN LIMITATIONS
 -----------------
@@ -199,7 +211,7 @@ KNOWN LIMITATIONS
   The same calories are therefore wrong in two stages at once: "feed" is understated (the cake that animals eat is
   not in it), and "processing_net" is overstated (the cake's calories are counted as if factories had destroyed
   them). Worldwide, most soybeans are crushed, so the distortion is large. Together with the missing grass (see
-  assumption 5), the understatement of "feed" is so large in protein that "animal_products" exceeds "feed" in 71%
+  assumption 6), the understatement of "feed" is so large in protein that "animal_products" exceeds "feed" in 71%
   of country-years, World included, which is physically impossible. The sibling step `food_supply_chain_scl` has
   the cakes as items and does not have this problem.
 - FBS items are groups, and the density of a group reflects the foods eaten in that country.
@@ -250,7 +262,7 @@ ELEMENTS = {
     "005171": "tourist_consumption",
     "005170": "residuals",
     "005142": "food",
-    # Food supply per capita (all divided by the same population), used only to reverse-engineer densities.
+    # Food supply per capita (all divided by the same population), used only to derive densities.
     "0664pc": "food_kcal_per_capita_per_day",
     "0674pc": "food_protein_g_per_capita_per_day",
     "0645pc": "food_kg_per_capita_per_year",
@@ -298,7 +310,7 @@ BALANCE_ELEMENTS = [
     "food",
 ]
 USES = ["food", "feed", "seed", "processing", "other_uses", "losses", "tourist_consumption", "residuals"]
-# Item roles (see assumption 5) and the stage their production goes to.
+# Item roles (see assumption 6) and the stage their production goes to.
 ROLES = {"crop": "crop_production", "animal": "animal_products", "processed": "processed_production"}
 # Output columns, in chain order, as magnitudes in FAO's sign convention; SUBTRACTED_STAGES are subtracted along the chain.
 STAGES = [
@@ -341,12 +353,12 @@ MAX_WORLD_TRADE_GAP = 0.2
 HUNDRED_GRAMS_PER_TONNE = 10_000
 KG_PER_TONNE = 1000
 GRAMS_PER_TONNE = 1_000_000
-# Minimum share of a region's population that must live in member countries with a balance (assumption 7).
+# Minimum share of a region's population that must live in member countries with a balance (assumption 8).
 MIN_FRACTION_POPULATION_COVERED = 0.8
-# Regions that lose some years to that rule (assumption 7); the docstring lists the years.
+# Regions that lose some years to that rule (assumption 8); the docstring lists the years.
 REGIONS_WITH_LOW_COVERAGE = {"Low-income countries", "Oceania"}
 DAYS_PER_YEAR = 365
-# OWID regions rebuilt in this step (assumption 7); the FAOSTAT garden step's rows for them, if any, are dropped.
+# OWID regions rebuilt in this step (assumption 8); the FAOSTAT garden step's rows for them, if any, are dropped.
 REGIONS = [
     "World",
     "Africa",
@@ -444,7 +456,7 @@ def prepare_balance_table(tb: Table, items: Table) -> Table:
     tb = tb.merge(population, on=["country", "year"], how="left")
     assert tb["population"].notnull().all(), "Some FBS rows have no population."
     # Food nutrient totals (kcal per year, tonnes of protein per year) and food tonnes, from FAO's per-capita food
-    # supply, so that they can be summed into regions. The density (assumption 2) is their ratio, so for a country
+    # supply, so that they can be summed into regions. The density (assumption 3) is their ratio, so for a country
     # the population cancels.
     tb["food_kcal_per_year"] = tb["food_kcal_per_capita_per_day"] * DAYS_PER_YEAR * tb["population"]
     tb["food_protein_tonnes_per_year"] = (
@@ -456,7 +468,7 @@ def prepare_balance_table(tb: Table, items: Table) -> Table:
 
 
 def add_region_aggregates(tb: Table) -> Table:
-    """Assumption 7: OWID regions as the sum of the member countries present each year, for the flows and the population."""
+    """Assumption 8: OWID regions as the sum of the member countries present each year, for the elements and the population."""
     assert not tb["country"].isin(REGIONS).any(), "Region rows must be dropped before aggregating."
     keys = ["country", "year", "item_code"]
     value_columns = [c for c in tb.columns if c not in keys + ["population"] and pd.api.types.is_numeric_dtype(tb[c])]
@@ -511,7 +523,7 @@ def sanity_check_balance_identity(tb: Table) -> None:
 
 
 def add_densities(tb: Table, nutrient: str) -> Table:
-    """Add `density` (nutrient per 100 g) and `density_source` for each (country, year, item). Assumptions 2 and 3."""
+    """Add `density` (nutrient per 100 g) and `density_source` for each (country, year, item). Assumptions 3 and 4."""
     tb = tb.copy()
     config = NUTRIENTS[nutrient]
     if config["numerator"] is None:
@@ -564,12 +576,12 @@ def build_chain(tb: Table, nutrient: str) -> Table:
     chain = converted.groupby(["country", "year"], observed=True, as_index=False).sum(min_count=1)
     chain = chain.merge(tb[["country", "year", "population"]].drop_duplicates(), on=["country", "year"], how="left")
 
-    # Assumption 5: processing net of the production of processed items.
+    # Assumption 6: processing net of the production of processed items.
     chain["processing_net"] = chain["processing"] - chain["processed_production"]
     chain = chain.drop(columns=["processing", "processed_production"])
     chain = chain.rename(columns={"residuals": "data_adjustments"})
 
-    # Assumption 6: fold FAO's rounding gap into data adjustments so that the chain lands exactly on food.
+    # Assumption 7: fold FAO's rounding gap into data adjustments so that the chain lands exactly on food.
     chain_end = chain["crop_production"]
     for stage in STAGES[1:]:
         if stage in ["food", "balancing_difference"]:
@@ -587,7 +599,7 @@ def build_chain(tb: Table, nutrient: str) -> Table:
     chain.loc[world, "exports"] = chain.loc[world, "imports"]
     chain.loc[world, "data_adjustments"] = chain.loc[world, "data_adjustments"] - trade_gap
 
-    # Per person per day (assumption 8): the entity's population, or, for regions, that of the summed members.
+    # Per person per day (assumption 9): the entity's population, or, for regions, that of the summed members.
     assert chain["population"].notnull().all() and (chain["population"] > 0).all(), "Missing population."
     for stage in STAGES:
         chain[stage] = chain[stage] / chain["population"] / DAYS_PER_YEAR
@@ -615,7 +627,7 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
     for stage in [
         s for s in STAGES if s not in ["stock_variation", "data_adjustments", "processing_net", "balancing_difference"]
     ]:
-        # FAO occasionally reports a negative flow (Iraq 2010 wheat exports, for one); small negatives are tolerated.
+        # FAO occasionally reports a negative element (Iraq 2010 wheat exports, for one); small negatives are tolerated.
         assert (tb[stage].fillna(0) >= -0.01 * tb["food"].abs()).all(), (
             f"Negative values in stage {stage!r} ({nutrient})."
         )
