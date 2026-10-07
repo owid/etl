@@ -1120,3 +1120,9 @@ steps:
     - data://meadow/health/2026-10-05/maternal_tetanus
   data://grapher/health/2026-10-05/maternal_tetanus:
     - data://garden/health/2026-10-05/maternal_tetanus
+
+  # Polio vaccine schedule - update
+  data://grapher/who/2026-10-07/polio_vaccine_schedule:
+    - data://garden/who/2026-10-07/polio_vaccine_schedule:
+        - data://meadow/who/2026-10-07/polio_vaccine_schedule:
+            - snapshot://who/2026-10-07/polio_vaccine_schedule.xlsx
