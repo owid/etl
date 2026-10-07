@@ -263,23 +263,13 @@ FBS_PER_CAPITA_ELEMENTS = ["0664pc", "0674pc", "0645pc"]
 POPULATION_ITEM_CODE = "00000001"
 # FBS "Grand Total" item, used only to compare our food stage with FAO's published food supply.
 FBS_TOTAL_ITEM_CODE = "00002901"
-# `numerator` is the food-nutrient column (kcal, or tonnes of protein); dividing it by food in tonnes and multiplying
-# by `to_per_100g` gives the density per 100 g (kcal / tonnes -> kcal per 100 g is / 1e4; tonnes of protein / tonnes
-# -> grams per 100 g is x 1e6 / 1e4).
+# `numerator` is the column holding the food nutrient total per year, already in the density's own unit
+# (kilocalories, or grams of protein); dividing it by the number of 100 g portions of food eaten per year gives the
+# density per 100 g. `ceiling` is the physical maximum density. Mass needs neither.
 NUTRIENTS = {
-    "energy": {
-        "numerator": "food_kcal_per_year",
-        "to_per_100g": 1 / 1e4,
-        "ceiling": 920,
-        "unit": "kilocalories per person per day",
-    },
-    "protein": {
-        "numerator": "food_protein_tonnes_per_year",
-        "to_per_100g": 1e6 / 1e4,
-        "ceiling": 100,
-        "unit": "grams of protein per person per day",
-    },
-    "mass": {"numerator": None, "to_per_100g": None, "ceiling": None, "unit": "kilograms per person per day"},
+    "energy": {"numerator": "food_kcal_per_year", "ceiling": 920, "unit": "kilocalories per person per day"},
+    "protein": {"numerator": "food_protein_g_per_year", "ceiling": 100, "unit": "grams of protein per person per day"},
+    "mass": {"numerator": None, "ceiling": None, "unit": "kilograms per person per day"},
 }
 BALANCE_ELEMENTS = [
     "production",
@@ -379,7 +369,7 @@ REGIONS = [
 BALANCE_COLUMNS = (
     ["country", "year", "item_code", "fao_item", "role"]
     + BALANCE_ELEMENTS
-    + ["food_kcal_per_year", "food_protein_tonnes_per_year", "food_tonnes_for_density"]
+    + ["food_kcal_per_year", "food_protein_g_per_year", "food_tonnes_for_density"]
 )
 
 
@@ -486,6 +476,8 @@ def prepare_balance_table(tb: Table, roles: pd.Series, manual: dict) -> Table:
         if element not in tb.columns:
             tb[element] = np.nan
     tb["food_kcal_per_year"] = tb["food_kcal_per_year"] * KCAL_PER_MILLION_KCAL
+    # FAO reports the food protein in tonnes; grams are the density's own unit.
+    tb["food_protein_g_per_year"] = tb.pop("food_protein_tonnes_per_year") * GRAMS_PER_TONNE
     tb[BALANCE_ELEMENTS] = tb[BALANCE_ELEMENTS].fillna(0)
     tb["fao_item"] = tb["item_code"].map(names)
     tb["role"] = tb["item_code"].map(roles)
@@ -540,9 +532,7 @@ def prepare_fish_table(tb_fbsc: Table, manual: dict, population: Table) -> Table
     # (kcal per year; tonnes of protein per year; tonnes of food) so that they can be summed into regions.
     tb = tb.merge(population, on=["country", "year"], how="inner")
     tb["food_kcal_per_year"] = tb["food_kcal_per_capita_per_day"] * DAYS_PER_YEAR * tb["population"]
-    tb["food_protein_tonnes_per_year"] = (
-        tb["food_protein_g_per_capita_per_day"] * DAYS_PER_YEAR * tb["population"] / GRAMS_PER_TONNE
-    )
+    tb["food_protein_g_per_year"] = tb["food_protein_g_per_capita_per_day"] * DAYS_PER_YEAR * tb["population"]
     tb["food_tonnes_for_density"] = tb["food_kg_per_capita_per_year"] * tb["population"] / KG_PER_TONNE
     return tb[BALANCE_COLUMNS + ["population"]]
 
@@ -628,14 +618,14 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
     """
     assert nutrient != "mass", "The mass table involves no density; it never goes through this function."
     tb = tb.copy()
-    # The nutrient decides the ingredients (see NUTRIENTS): which food total is the numerator of the density, the
-    # factor that scales the ratio to "per 100 g", and the physical ceiling.
+    # The nutrient decides the ingredients (see NUTRIENTS): which food total is the numerator of the density, and
+    # the physical ceiling.
     numerator = NUTRIENTS[nutrient]["numerator"]
-    to_per_100g = NUTRIENTS[nutrient]["to_per_100g"]
     ceiling = NUTRIENTS[nutrient]["ceiling"]
 
-    # Assumption 3: the density is the food nutrient per year divided by the food tonnes per year.
-    raw = to_per_100g * tb[numerator] / tb["food_tonnes_for_density"]
+    # Assumption 3: the density is the food nutrient eaten per year (kilocalories, or grams of protein) divided by
+    # the number of 100 g portions of food eaten per year.
+    raw = tb[numerator] / (tb["food_tonnes_for_density"] * HUNDRED_GRAMS_PER_TONNE)
     # The pathologies of that division count as missing: division by zero tonnes (infinity), zero by zero (nan),
     # and negative values.
     raw = raw.where(np.isfinite(raw) & (raw >= 0))

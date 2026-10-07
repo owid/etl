@@ -365,24 +365,13 @@ TOTAL_ITEM_CODE = "00002901"
 VEGETAL_ITEM_CODE = "00002903"
 ANIMAL_ITEM_CODE = "00002941"
 PARTITION_TOLERANCE = 0.01
-# The three units the chain is built in. `numerator` is the food-nutrient total the density is derived from (None
-# for mass); dividing it by food in tonnes and multiplying by `to_per_100g` gives the density per 100 g (kcal / tonnes
-# -> kcal per 100 g is / 1e4; tonnes of protein / tonnes -> grams per 100 g is x 1e6 / 1e4); `ceiling` is the
-# physical maximum density.
+# The three units the chain is built in. `numerator` is the column holding the food nutrient total per year, already
+# in the density's own unit (kilocalories, or grams of protein); dividing it by the number of 100 g portions of food
+# eaten per year gives the density per 100 g. `ceiling` is the physical maximum density. Mass needs neither.
 NUTRIENTS = {
-    "energy": {
-        "numerator": "food_kcal_per_year",
-        "to_per_100g": 1 / 1e4,
-        "ceiling": 920,
-        "unit": "kilocalories per person per day",
-    },
-    "protein": {
-        "numerator": "food_protein_tonnes_per_year",
-        "to_per_100g": 1e6 / 1e4,
-        "ceiling": 100,
-        "unit": "grams of protein per person per day",
-    },
-    "mass": {"numerator": None, "to_per_100g": None, "ceiling": None, "unit": "kilograms per person per day"},
+    "energy": {"numerator": "food_kcal_per_year", "ceiling": 920, "unit": "kilocalories per person per day"},
+    "protein": {"numerator": "food_protein_g_per_year", "ceiling": 100, "unit": "grams of protein per person per day"},
+    "mass": {"numerator": None, "ceiling": None, "unit": "kilograms per person per day"},
 }
 # Balance elements that are converted and summed over items.
 BALANCE_ELEMENTS = [
@@ -435,7 +424,6 @@ SUBTRACTED_STAGES = [
 # Unit conversions. Exact by definition; they change no data beyond the choice of unit (assumption 13).
 HUNDRED_GRAMS_PER_TONNE = 10_000
 KG_PER_TONNE = 1000
-GRAMS_PER_TONNE = 1_000_000
 DAYS_PER_YEAR = 365
 
 # Checks only; these thresholds change no data, they only decide when the step crashes.
@@ -566,9 +554,7 @@ def prepare_balance_table(tb: Table, items: Table) -> Table:
     # supply, so that they can be summed into regions. The density (assumption 4) is their ratio, so for a country
     # the population cancels.
     tb["food_kcal_per_year"] = tb["food_kcal_per_capita_per_day"] * DAYS_PER_YEAR * tb["population"]
-    tb["food_protein_tonnes_per_year"] = (
-        tb["food_protein_g_per_capita_per_day"] * DAYS_PER_YEAR * tb["population"] / GRAMS_PER_TONNE
-    )
+    tb["food_protein_g_per_year"] = tb["food_protein_g_per_capita_per_day"] * DAYS_PER_YEAR * tb["population"]
     # "food_tonnes_for_density" is a second food tonnage, besides the balance element "food": it is reconstructed
     # from FAO's per-capita figure, and it is used only as the denominator of the density. The density then has a
     # numerator and a denominator that both come from FAO's per-capita food supply figures, which share the same
@@ -658,14 +644,14 @@ def add_densities(tb: Table, nutrient: str) -> Table:
     """
     assert nutrient != "mass", "The mass table involves no density; it never goes through this function."
     tb = tb.copy()
-    # The nutrient decides the ingredients (see NUTRIENTS): which food total is the numerator of the density, the
-    # factor that scales the ratio to "per 100 g", and the physical ceiling.
+    # The nutrient decides the ingredients (see NUTRIENTS): which food total is the numerator of the density, and
+    # the physical ceiling.
     numerator = NUTRIENTS[nutrient]["numerator"]
-    to_per_100g = NUTRIENTS[nutrient]["to_per_100g"]
     ceiling = NUTRIENTS[nutrient]["ceiling"]
 
-    # Assumption 4: the density is the food nutrient per year divided by the food tonnes per year.
-    raw = to_per_100g * tb[numerator] / tb["food_tonnes_for_density"]
+    # Assumption 4: the density is the food nutrient eaten per year (kilocalories, or grams of protein) divided by
+    # the number of 100 g portions of food eaten per year.
+    raw = tb[numerator] / (tb["food_tonnes_for_density"] * HUNDRED_GRAMS_PER_TONNE)
     # The pathologies of that division count as missing: division by zero tonnes (infinity), zero by zero (nan),
     # and negative values.
     raw = raw.where(np.isfinite(raw) & (raw >= 0))
