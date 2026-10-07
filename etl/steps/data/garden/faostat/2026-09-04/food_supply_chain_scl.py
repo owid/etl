@@ -261,8 +261,7 @@ FBS_ELEMENTS = {
 FBS_PER_CAPITA_ELEMENTS = ["0664pc", "0674pc", "0645pc"]
 # SCL carries population as an item; it is not a commodity, so it is excluded from the balance table.
 POPULATION_ITEM_CODE = "00000001"
-# FBS "Grand Total" item, used only to compare our food stage with the food supply in `faostat_fbsc` (whose World
-# row is built by the upstream FAOSTAT garden pipeline).
+# FBS "Grand Total" item, used only to compare our food stage with FAO's own published World food supply.
 FBS_TOTAL_ITEM_CODE = "00002901"
 # `numerator` is the column holding the food nutrient total per year, already in the density's own unit
 # (kilocalories, or grams of protein); dividing it by the number of 100 g portions of food eaten per year gives the
@@ -831,8 +830,9 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
     assert (world_trade["imports"] == world_trade["exports"]).all(), f"World imports and exports differ ({nutrient})."
 
     world = tb[tb["country"] == "World"].set_index("year")
-    # Our food stage for World against the food supply of the FBS "Grand Total" item for World in `faostat_fbsc`,
-    # whose World row is built by the upstream FAOSTAT garden pipeline: an independent, upstream construction.
+    # Our food stage for World against FAO's own published World (the FBS "Grand Total" item in `faostat_fbsc`; FAO's
+    # World row is harmonized to "World", and the upstream pipeline builds no World of its own). Our World is rebuilt
+    # from countries, so this compares our construction against the producer's.
     fao_element = {"energy": "0664pc", "protein": "0674pc"}.get(nutrient)
     if fao_element is None:
         return
