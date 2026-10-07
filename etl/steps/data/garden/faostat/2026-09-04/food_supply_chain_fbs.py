@@ -224,6 +224,8 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
 KNOWN LIMITATIONS
 -----------------
 - Processing can appear to create calories.
+  >> Scale: major for countries like Brazil; small for World. Fixed in `food_supply_chain_scl` for sugar crops,
+  though SCL has its own processing problems (ethanol), listed in its docstring.
 
   In many countries and years, "processing_net" comes out negative, as if factories created calories.
   This happens in 37% of country-years in energy. Brazil is the clearest case: about -670 kcal per person per day
@@ -253,6 +255,8 @@ KNOWN LIMITATIONS
   products made out of them, not from food use.
 
 - Oilseed cakes and other feed by-products are not FBS items.
+  >> Scale: major for the stages "feed" and "processing_net", above all in protein. Fixed in
+  `food_supply_chain_scl`, which has the cakes as items.
 
   When oilseeds (soybeans, rapeseed, sunflower seeds) are crushed to extract their oil, the crushed solids that
   remain are called cake. Cake is rich in protein, and it is one of the main things the world feeds to its farm
@@ -273,6 +277,8 @@ KNOWN LIMITATIONS
   of country-years, World included, which is physically impossible. The sibling step `food_supply_chain_scl` has
   the cakes as items and does not have this problem.
 - FBS items are groups, and the density of a group reflects the foods eaten in that country.
+  >> Scale: major for the stage "crop_production" of countries that export raw crops. Fixed in
+  `food_supply_chain_scl`, which has individual items.
 
   "Wheat and products" is one item covering wheat grain, flour, bread and pasta, so its density in a country is an
   average over the wheat foods people eat there. Bread is about 40% water, so that average is well below the
@@ -282,13 +288,20 @@ KNOWN LIMITATIONS
   per day; valued as grain, it would be about 14,500. The sibling step `food_supply_chain_scl` has wheat, flour and
   bread as separate items and does not have this problem.
 
-- The input dataset (`faostat_fbsc`) combines two FAO datasets: FBSH (FAO's old methodology, 1961-2009) and FBS
+- The input dataset (`faostat_fbsc`) combines two FAO datasets.
+  >> Scale: minor. Not a flaw to fix; SCL does not have the issue only because SCL starts in 2010.
+
+  `faostat_fbsc` combines FBSH (FAO's old methodology, 1961-2009) and FBS
   (the new methodology, 2010 onward). At the World level the main stages are continuous across the join, with one
   visible artifact: "tourist_consumption" only exists in the new methodology, so it is zero before 2010. The
   combined dataset also keeps countries that FAO removed from its latest release (Japan and ten others, removed
   "due to an ongoing review" since October 2025), by using the previous release for them.
 
-- FBS "Losses" only cover the supply chain, from the farm to the retail shelf. Food thrown away by households,
+- FBS "Losses" only cover the supply chain, from the farm to the retail shelf.
+  >> Scale: a matter of interpretation, not an error. Not fixed in `food_supply_chain_scl`, which inherits the same
+  definition from FAO.
+
+  Food thrown away by households,
   restaurants and retailers is not a loss in FBS; it stays inside "food". The stage "food" is therefore the food
   available to eat, not the food actually eaten.
 """
