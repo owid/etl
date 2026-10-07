@@ -30,6 +30,6 @@ meta:
 
   is_public: false
 outs:
-  - md5: c55f00ebc36ef9038ef51b437453844c
-    size: 19654
+  - md5: 9f3f92e2d76c2934ea41e82449d16e7c
+    size: 24587
     path: living_planet_index.csv

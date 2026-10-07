@@ -7,7 +7,7 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Entities published by the producer (World, the five IPBES regions, and the freshwater system).
+# Entities published by the producer (World, the five IPBES regions, and the freshwater, marine and terrestrial systems).
 # The producer already uses OWID-style names, so no harmonization is needed.
 EXPECTED_ENTITIES = {
     "World",
@@ -17,6 +17,8 @@ EXPECTED_ENTITIES = {
     "Latin America and the Caribbean",
     "North America",
     "Freshwater",
+    "Marine",
+    "Terrestrial",
 }
 BASE_YEAR = 1970
 
