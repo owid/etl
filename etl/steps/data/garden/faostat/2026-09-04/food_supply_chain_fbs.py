@@ -249,10 +249,11 @@ KNOWN LIMITATIONS
   entering the mills, and the understated calories reappear as calories created in processing.
 
   This flaw distorts the stages "crop_production" and "processing_net" for crops that are mostly processed
-  (sugar cane, sugar beet, cottonseed, the oilseeds). The stage "food" is not affected, because the stage "food"
-  is computed directly from FAO's own food calories, with no density involved. The sibling step
-  `food_supply_chain_scl` avoids the flaw: there, the density of crops like sugar cane is derived from the
-  products made out of them, not from food use.
+  (sugar cane, sugar beet, cottonseed, the oilseeds). The stage "food" is barely affected, for a different reason:
+  the stage "food" is also food tonnes multiplied by the density, but for these crops the food tonnes are close
+  to zero (nobody eats them as harvested), so almost nothing of the wrong density reaches the stage "food".
+  The sibling step `food_supply_chain_scl` avoids the flaw: there, the density of crops like sugar cane is derived
+  from the products made out of them, not from food use.
 
 - Oilseed cakes and other feed by-products are not FBS items.
   >> Scale: major for the stages "feed" and "processing_net", above all in protein. Fixed in
@@ -329,9 +330,6 @@ from owid.catalog import Table
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
-
-# Number of characters of item codes in the FAOSTAT garden tables.
-N_CHARACTERS_ITEM_CODE = 8
 
 # FBS elements used by this step (garden element codes) and their short names in this step.
 ELEMENTS = {
@@ -464,7 +462,8 @@ REGIONS = [
 # Helpers.
 # --------------------------------------------------------------------------------------------------------------------
 def _pad_code(code: int) -> str:
-    return str(code).zfill(N_CHARACTERS_ITEM_CODE)
+    # Item codes in the FAOSTAT garden tables are zero-padded to 8 characters ("00002511").
+    return str(code).zfill(8)
 
 
 # --------------------------------------------------------------------------------------------------------------------

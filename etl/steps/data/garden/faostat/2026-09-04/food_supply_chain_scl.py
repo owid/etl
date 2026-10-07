@@ -218,8 +218,6 @@ from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
-N_CHARACTERS_ITEM_CODE = 8
-
 # SCL elements (garden element codes) and their short names in this step.
 ELEMENTS = {
     "005510": "production",
@@ -373,7 +371,8 @@ BALANCE_COLUMNS = (
 # Helpers.
 # --------------------------------------------------------------------------------------------------------------------
 def _pad_code(code: int) -> str:
-    return str(code).zfill(N_CHARACTERS_ITEM_CODE)
+    # Item codes in the FAOSTAT garden tables are zero-padded to 8 characters ("00002511").
+    return str(code).zfill(8)
 
 
 # --------------------------------------------------------------------------------------------------------------------
