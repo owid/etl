@@ -481,24 +481,26 @@ def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
     with open(paths.side_file("food_supply_chain_fbs.items.yml")) as f:
         config = yaml.safe_load(f)
     assert set(config) == {"included", "excluded", "groups"}, "Unexpected top-level keys in items file."
+    # Item codes in the FAOSTAT garden tables are zero-padded to 8 characters ("00002511"); pad every code once here.
+    for key in ("included", "excluded", "groups"):
+        for item in config[key]:
+            item["item_code"] = str(item.pop("code")).zfill(8)
 
     for item in config["included"]:
-        assert {"code", "name", "role"} <= set(item) <= {"code", "name", "role", "fao_group"}, (
+        assert {"item_code", "name", "role"} <= set(item) <= {"item_code", "name", "role", "fao_group"}, (
             f"Unexpected keys: {item}"
         )
         assert item["role"] in ROLES, f"Unknown role in item: {item}"
         assert item.get("fao_group", "vegetal") in {"vegetal", "animal"}, f"Unknown fao_group in item: {item}"
     items = pd.DataFrame(config["included"])
-    # Item codes in the FAOSTAT garden tables are zero-padded to 8 characters ("00002511").
-    items["item_code"] = items["code"].astype(str).str.zfill(8)
     natural_group = items["role"].map({"crop": "vegetal", "processed": "vegetal", "animal": "animal"})
     if "fao_group" not in items.columns:
         items["fao_group"] = np.nan
     items["fao_group"] = items["fao_group"].fillna(natural_group)
     items = items.set_index("item_code", verify_integrity=True)
 
-    excluded = {str(item["code"]).zfill(8): item["name"] for item in config["excluded"]}
-    groups = {str(item["code"]).zfill(8): item["name"] for item in config["groups"]}
+    excluded = {item["item_code"]: item["name"] for item in config["excluded"]}
+    groups = {item["item_code"]: item["name"] for item in config["groups"]}
     all_codes = list(items.index) + list(excluded) + list(groups)
     assert len(all_codes) == len(set(all_codes)), "An item code appears in more than one list of the items file."
 
