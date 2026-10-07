@@ -626,18 +626,25 @@ def add_region_aggregates(tb: Table) -> Table:
 
 def sanity_check_balance_identity(tb: Table) -> None:
     """Check assumptions 1 to 3: FBS balances close in tonnes, and derived stock variation matches the reported one."""
+    # One row of `tb` is one item balance (one item, one country, one year). A balance "closes" when its domestic
+    # supply equals the sum of its eight uses, within the tolerance (1% of domestic supply, plus 2,000 tonnes for
+    # FAO's rounding). In practice about 0.5% of balances do not close; above 2% something is structurally wrong.
     uses = tb[USES].sum(axis=1)
     tolerance = IDENTITY_RELATIVE_TOLERANCE * tb["domestic_supply"].abs() + IDENTITY_ABSOLUTE_TOLERANCE_TONNES
-    share_open = ((tb["domestic_supply"] - uses).abs() > tolerance).mean()
-    assert share_open < 0.02, (
-        f"Domestic supply differs from the sum of uses in {100 * share_open:.1f}% of item balances."
+    share_of_open_balances = ((tb["domestic_supply"] - uses).abs() > tolerance).mean()
+    assert share_of_open_balances < 0.02, (
+        f"Domestic supply differs from the sum of uses in {100 * share_of_open_balances:.1f}% of item balances."
     )
 
-    # Where FBS reports stock variation (2010 onward), it must match the derived one.
+    # Where FBS reports stock variation (2010 onward; a reported value of exactly zero cannot be told apart from a
+    # missing one and is skipped), the derived stock variation must match the reported one, within the same
+    # tolerance. In practice about 0.2% of balances mismatch; above 0.5% something is structurally wrong.
     reported = tb[tb["stock_variation_reported"] != 0]
-    mismatch = (reported["stock_variation"] - reported["stock_variation_reported"]).abs() > tolerance[reported.index]
-    assert mismatch.mean() < 0.005, (
-        f"Derived stock variation differs from the reported one in {100 * mismatch.mean():.2f}% of item balances."
+    is_mismatched = (reported["stock_variation"] - reported["stock_variation_reported"]).abs() > tolerance[
+        reported.index
+    ]
+    assert is_mismatched.mean() < 0.005, (
+        f"Derived stock variation differs from the reported one in {100 * is_mismatched.mean():.2f}% of item balances."
     )
 
 
