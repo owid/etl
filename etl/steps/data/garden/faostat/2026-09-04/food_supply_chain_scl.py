@@ -765,7 +765,7 @@ def sum_items_into_stages(converted: Table, population: Table) -> Table:
     return chain
 
 
-def fold_rounding_gap_into_adjustments(chain: Table) -> Table:
+def move_rounding_gap_to_adjustments(chain: Table) -> Table:
     """Add FAO's rounding gap to "data_adjustments", so that the chain ends exactly on "food".
 
     Implements assumption 10. The size of the gap is kept in "balancing_difference" for quality control.
@@ -904,7 +904,7 @@ def run() -> None:
         # Assumption 8: production split by role, items summed into the stages of the chain.
         chain = sum_items_into_stages(converted, population=population_by_entity)
         # Assumption 10: the rounding gap goes to data adjustments, so the chain ends exactly on food.
-        chain = fold_rounding_gap_into_adjustments(chain)
+        chain = move_rounding_gap_to_adjustments(chain)
         # Assumption 11: World exports are set equal to World imports.
         chain = equalize_world_trade(chain)
         # Assumption 14: per person per day.
