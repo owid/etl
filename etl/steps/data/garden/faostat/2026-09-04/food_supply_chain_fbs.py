@@ -86,8 +86,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
      this impossible-density problem does not appear.
    - The ceiling rejects that value, and the United States' median density for soybean oil (841) is used instead.
    Vegetable oils are the main case of impossible densities, and the United States the most affected country.
-   Wherever this happens, our food stage comes out lower than FAO's own published figure for the food available
-   to eat.
+   Wherever this happens, our food stage comes out lower than the food supply reported in `faostat_fbsc`.
 
    The second fallback (the median over all countries and years) is the normal path for crops that are rarely eaten
    as harvested, such as sugar cane, sugar beet and cottonseed: most countries never eat them raw, so no country
@@ -817,7 +816,9 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
     gap = (world["balancing_difference"] / world["food"]).abs()
     assert gap.max() < 0.02, f"FAO rounding gap for World is up to {100 * gap.max():.2f}% of food ({nutrient})."
 
-    # Our food stage against FAO's own food supply (its "Grand Total" item), for energy and protein.
+    # Our food stage for World against the food supply of the "Grand Total" item for World in `faostat_fbsc`. That
+    # reference World is built by the upstream FAOSTAT garden pipeline (FAO's own World row is not in `faostat_fbsc`),
+    # so the comparison is against an independent, upstream construction, not against this step's own logic.
     fao_element = {"energy": "0664pc", "protein": "0674pc"}.get(nutrient)
     if fao_element is None:
         return
