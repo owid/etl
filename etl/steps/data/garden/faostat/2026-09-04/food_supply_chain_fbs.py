@@ -280,17 +280,15 @@ KNOWN LIMITATIONS
   As a result, nutrients in oilseed cakes appear under "processing_net" rather than "feed". Grass and other feed
   sources are also absent, so these stages do not account for everything animals eat. The sibling step
   `food_supply_chain_scl` includes oilseed cakes as separate items.
-- FBS items are groups, and the density of a group reflects the foods eaten in that country.
-  >> Scale: major for the stage "crop_production" of countries that export raw crops. Fixed in
-  `food_supply_chain_scl`, which has individual items.
+- A group's conversion factor can differ from the nutrient content of the raw crop.
+  >> Scale: affects the interpretation of stages converted from tonnes.
 
-  "Wheat and products" is one item covering wheat grain, flour, bread and pasta, so its density in a country is an
-  average over the wheat foods people eat there. Bread is about 40% water, so that average is well below the
-  density of raw grain. For a country that exports raw grain, production and exports are valued at the domestic
-  density, which understates them. Australia in 2023: the density of "Wheat and products" is 232 kcal per 100 g,
-  while raw wheat grain is about 339. Valued at 232, Australia's wheat production is about 9,900 kcal per person
-  per day; valued as grain, it would be about 14,500. The sibling step `food_supply_chain_scl` has wheat, flour and
-  bread as separate items and does not have this problem.
+  FAO groups wheat grain, flour, bread and pasta under "Wheat and products", expressing their quantities as the
+  weight of wheat used to produce them. We derive a conversion factor from the group's food calories or protein
+  divided by its food quantity, and apply it to production, trade and other uses. The nutrients describe the
+  resulting foods, while the quantities are expressed as wheat equivalents, so this factor can differ from the
+  nutrient content of raw wheat. FAO describes this method in Food Balance Sheets: A Handbook, section IV.1:
+  https://www.fao.org/4/x9892e/X9892e04.htm
 
 - The input dataset (`faostat_fbsc`) combines two FAO datasets.
   >> Scale: minor. Not a flaw to fix; SCL does not have the issue only because SCL starts in 2010.
