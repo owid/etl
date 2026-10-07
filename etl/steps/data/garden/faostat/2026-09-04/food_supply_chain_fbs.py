@@ -569,6 +569,10 @@ def prepare_balance_table(tb: Table, items: Table) -> Table:
     tb["food_protein_tonnes_per_year"] = (
         tb["food_protein_g_per_capita_per_day"] * DAYS_PER_YEAR * tb["population"] / GRAMS_PER_TONNE
     )
+    # "food_tonnes_for_density" is a second food tonnage, besides the balance element "food": it is reconstructed
+    # from FAO's per-capita figure, and it is used only as the denominator of the density. The density then has a
+    # numerator and a denominator that both come from FAO's per-capita food supply figures, which share the same
+    # population and the same rounding, instead of mixing two differently rounded sources.
     tb["food_tonnes_for_density"] = tb["food_kg_per_capita_per_year"] * tb["population"] / KG_PER_TONNE
     tb = tb.drop(columns=[ELEMENTS[code] for code in PER_CAPITA_ELEMENTS])
     return tb

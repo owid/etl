@@ -493,6 +493,9 @@ def prepare_balance_table(tb: Table, roles: pd.Series, manual: dict) -> Table:
         assert override["role"] in ROLES, f"Unknown role in override: {override}"
         tb.loc[tb["item_code"] == _pad_code(override["code"]), "role"] = override["role"]
     assert tb["role"].notnull().all()
+    # "food_tonnes_for_density" is the denominator of the density. For SCL items it is simply the balance element
+    # "food" (SCL reports exact tonnes, so there is no rounding to avoid); the fish rows taken from FBS get a
+    # per-capita-derived value instead, in `prepare_fish_table`.
     tb["food_tonnes_for_density"] = tb["food"]
     tb = tb.merge(population, on=["country", "year"], how="left")
     assert tb["population"].notnull().all(), "Some SCL rows have no population."
