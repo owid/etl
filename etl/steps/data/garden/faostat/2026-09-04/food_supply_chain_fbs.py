@@ -359,6 +359,12 @@ ELEMENT_UNITS = {
     "kilograms per year per capita": ["0645pc"],
     "tonnes": [code for code in ELEMENTS if code not in PER_CAPITA_ELEMENTS],
 }
+# FAO's aggregate items ("Grand Total", "Vegetal Products", "Animal Products"), used only to check that the
+# included items reproduce FAO's totals (checks assumption 7).
+TOTAL_ITEM_CODE = "00002901"
+VEGETAL_ITEM_CODE = "00002903"
+ANIMAL_ITEM_CODE = "00002941"
+PARTITION_TOLERANCE = 0.01
 # The three units the chain is built in. `numerator` is the food-nutrient total the density is derived from (None
 # for mass); dividing it by food in tonnes and multiplying by `to_per_100g` gives the density per 100 g (kcal / tonnes
 # -> kcal per 100 g is / 1e4; tonnes of protein / tonnes -> grams per 100 g is x 1e6 / 1e4); `ceiling` is the
@@ -433,18 +439,12 @@ GRAMS_PER_TONNE = 1_000_000
 DAYS_PER_YEAR = 365
 
 # Checks only; these thresholds change no data, they only decide when the step crashes.
-# FAO's aggregate items ("Grand Total", "Vegetal Products", "Animal Products"), used to check that the included
-# items reproduce FAO's totals within PARTITION_TOLERANCE (checks assumption 7).
-TOTAL_ITEM_CODE = "00002901"
-VEGETAL_ITEM_CODE = "00002903"
-ANIMAL_ITEM_CODE = "00002941"
-PARTITION_TOLERANCE = 0.01
 # Tolerance of the identity check, per item balance: 1% of domestic supply plus FAO's rounding (checks
 # assumptions 1 to 3).
 IDENTITY_RELATIVE_TOLERANCE = 0.01
 IDENTITY_ABSOLUTE_TOLERANCE_TONNES = 2000
-# Tripwire of assumption 10: World trade is only equalized while the gap is small (about 5% in practice); a gap
-# above this share of imports crashes the step instead.
+# Safety limit for assumption 10: World trade is only equalized while the gap is small (about 5% in practice);
+# a gap above this share of imports crashes the step instead.
 MAX_WORLD_TRADE_GAP = 0.2
 # Expected outcome of the coverage rule below; if a FAOSTAT update changes it, the step crashes so that the
 # docstring gets updated (checks assumption 12).

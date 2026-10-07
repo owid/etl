@@ -259,6 +259,10 @@ FBS_ELEMENTS = {
     "0645pc": "food_kg_per_capita_per_year",
 }
 FBS_PER_CAPITA_ELEMENTS = ["0664pc", "0674pc", "0645pc"]
+# SCL carries population as an item; it is not a commodity, so it is excluded from the balance table.
+POPULATION_ITEM_CODE = "00000001"
+# FBS "Grand Total" item, used only to compare our food stage with FAO's published food supply.
+FBS_TOTAL_ITEM_CODE = "00002901"
 # `numerator` is the food-nutrient column (kcal, or tonnes of protein); dividing it by food in tonnes and multiplying
 # by `to_per_100g` gives the density per 100 g (kcal / tonnes -> kcal per 100 g is / 1e4; tonnes of protein / tonnes
 # -> grams per 100 g is x 1e6 / 1e4).
@@ -337,21 +341,17 @@ DAYS_PER_YEAR = 365
 
 # SCL covers 2010 onward; the FBS fish items of assumption 9 are cut to the same years.
 FIRST_YEAR = 2010
-# SCL carries population as an item; it is not a commodity, so it is excluded from the balance table.
-POPULATION_ITEM_CODE = "00000001"
 
 # Checks only; these thresholds change no data, they only decide when the step crashes.
 # Tolerance of the identity check, per item balance: 1% of the summed uses plus FAO's rounding (checks
 # assumptions 1 and 2).
 IDENTITY_RELATIVE_TOLERANCE = 0.01
 IDENTITY_ABSOLUTE_TOLERANCE_TONNES = 2000
-# FBS "Grand Total" item, used only to compare our food stage with FAO's published food supply.
-FBS_TOTAL_ITEM_CODE = "00002901"
 # Expected outcome of the coverage rule below; empty, because "Low-income countries" is left out altogether
 # (checks assumption 13).
 REGIONS_WITH_LOW_COVERAGE = set()
-# Tripwire of assumption 11: World trade is only equalized while the gap is small; a gap above this share of
-# imports crashes the step instead.
+# Safety limit for assumption 11: World trade is only equalized while the gap is small; a gap above this share
+# of imports crashes the step instead.
 MAX_WORLD_TRADE_GAP = 0.2
 
 # Assumption 6, minor: an item in the fixed-density list keeps its data-derived density if more than this share of
@@ -424,7 +424,8 @@ def load_roles(tb_groups: Table) -> pd.Series:
 
     Implements assumption 8 (the roles).
     """
-    groups = tb_groups[tb_groups["item_group"].astype(str) != "Grand Total"][["item_code", "item", "item_group"]].copy()
+    groups = tb_groups[tb_groups["item_group"].astype(str) != "Grand Total"]
+    groups = groups[["item_code", "item", "item_group"]].copy()
     groups["item_code"] = groups["item_code"].astype(int).map(_pad_code)
     groups["item_group"] = groups["item_group"].astype(str)
     assert not groups["item_code"].duplicated().any(), "An SCL item belongs to more than one FAO item group."
