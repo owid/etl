@@ -2,6 +2,7 @@
 definitions:
   common:
     presentation:
+      attribution_short: WHO/UNICEF
       topic_tags:
         - Vaccination
       grapher_config:
@@ -30,12 +31,11 @@ definitions:
     <%- elif antigen_description == "HPV Vaccination coverage by age 15, last dose, males" %>
     Population of boys turning 15 in the reporting year that received any time between age 9-14 the full recommended schedule of HPV vaccine.
     <%- endif %>
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+
 dataset:
   update_period_days: 365
+  # Add title to differentiate from main vaccine coverage dataset
   title: HPV Vaccination Coverage - WHO Immunization Data
-
   owners:
     - Fiona Spooner
     - Tuna Acisu

@@ -2,6 +2,7 @@
 definitions:
   common:
     presentation:
+      attribution_short: WHO/UNICEF
       topic_tags:
         - Vaccination
       grapher_config:
