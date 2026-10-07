@@ -493,10 +493,11 @@ def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
         assert item["role"] in ROLES, f"Unknown role in item: {item}"
         assert item.get("fao_group", "vegetal") in {"vegetal", "animal"}, f"Unknown fao_group in item: {item}"
     items = pd.DataFrame(config["included"])
-    # The partition check compares our items against FAO's "Vegetal Products" and "Animal Products" totals, so every
-    # item needs a vegetal/animal classification ("fao_group"). By default it follows from the role: crops and
+    # The function `sanity_check_partition`, defined further down, verifies that the food supply of our included
+    # items adds up to FAO's own "Vegetal Products" and "Animal Products" totals. For that comparison, every item
+    # needs a vegetal/animal classification ("fao_group"). By default it follows from the role: crops and
     # processed items count as vegetal, animal items as animal. A few items carry an explicit "fao_group" in the
-    # items file because FAO classifies them against that default: butter, cream and fish oils are processed items
+    # items file because FAO classifies them differently from that default: butter, cream and fish oils are processed items
     # that FAO counts as animal, honey is an animal item that FAO counts as vegetal, and seaweed is a crop that FAO
     # counts as animal.
     default_group = items["role"].map({"crop": "vegetal", "processed": "vegetal", "animal": "animal"})
