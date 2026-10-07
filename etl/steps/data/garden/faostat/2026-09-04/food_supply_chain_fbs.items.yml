@@ -97,7 +97,8 @@ included:
   - {code: 2656, name: "Beer", role: processed}
   - {code: 2657, name: "Beverages, Fermented", role: processed}
   - {code: 2658, name: "Beverages, Alcoholic", role: processed}
-  # Other processed vegetal products (no production reported; they enter through trade).
+  # Other processed vegetal products. Production is reported only in a few country-years; otherwise they enter
+  # through trade.
   - {code: 2680, name: "Infant food", role: processed}
   - {code: 2899, name: "Miscellaneous", role: processed}
   # Aquatic plants (seaweed). FAO groups them with animal products ("Aquatic Products, Other").
