@@ -572,23 +572,25 @@ def add_region_aggregates(tb: Table) -> Table:
         aggregations={c: "sum" for c in value_columns},
         min_num_values_per_year=1,
     )
+    # Assumption 13 rides on this call: min_frac_population gates the summed population itself, so a region-year
+    # whose members with a balance hold less than MIN_FRACTION_POPULATION_COVERED of the region's population (taken
+    # from the population dataset) comes back with a nan population.
     population = paths.regions.add_aggregates(
-        population, regions=REGIONS, index_columns=["country", "year"], aggregations={"population": "sum"}
+        population,
+        regions=REGIONS,
+        index_columns=["country", "year"],
+        aggregations={"population": "sum"},
+        min_frac_population=MIN_FRACTION_POPULATION_COVERED,
     )
     tb = flows.merge(item_attributes, on="item_code", how="left").merge(population, on=["country", "year"], how="left")
-    assert tb["population"].notnull().all(), "Some rows have no population after aggregating regions."
 
-    # A region-year whose members with a balance hold less than MIN_FRACTION_POPULATION_COVERED of the region's
-    # population is dropped, so that a label such as "Africa" is not carried by a fraction of Africa.
-    regions = population[population["country"].isin(REGIONS)]
-    regions = paths.regions.add_population(regions, population_col="region_population")
-    coverage = regions["population"] / regions["region_population"]
-    dropped = regions[coverage < MIN_FRACTION_POPULATION_COVERED]
+    # Drop the gated region-years, so that a value labeled "Africa" is never built from a small fraction of Africa.
+    dropped = tb.loc[tb["population"].isnull(), ["country", "year"]].drop_duplicates()
+    assert set(dropped["country"]) <= set(REGIONS), "A country lost its population in the region aggregation."
     assert set(dropped["country"]) == REGIONS_WITH_LOW_COVERAGE, (
         f"Regions dropped for low coverage changed: {sorted(set(dropped['country']))}. Update the docstring."
     )
-    keep = ~tb.set_index(["country", "year"]).index.isin(dropped.set_index(["country", "year"]).index)
-    return tb[keep].reset_index(drop=True)
+    return tb[tb["population"].notnull()].reset_index(drop=True)
 
 
 def sanity_check_balance_identity(tb: Table) -> None:
