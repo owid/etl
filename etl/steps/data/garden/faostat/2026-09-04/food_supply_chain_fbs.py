@@ -9,26 +9,36 @@ table each:
 
 ASSUMPTIONS THAT GO INTO THE CALCULATION
 -----------------------------------------
-1. The balance identity. For every item, country and year, FBS reports, in tonnes:
+1. The balance identity.
+   >> Scale: major. The identity is the backbone of every table.
+
+   For every item, country and year, FBS reports, in tonnes:
        production + imports - exports - stock variation
          = food + feed + seed + processing + other uses + losses + tourist consumption + residuals.
-   Scale: the identity is the backbone of every table.
 
-2. Derived stock variation. FBS only reports stock variation from 2010 onward, so this step derives stock variation
+2. Derived stock variation.
+   >> Scale: minor. Stock variation is a small stage; for World in 2023, 88 kcal per person per day, against a food
+   stage of about 3,000.
+
+   FBS only reports stock variation from 2010 onward, so this step derives stock variation
    for all years from the identity, as production + imports - exports - domestic supply. Where FBS reports stock
    variation (2010 onward), a check verifies that the derived value agrees with the reported one.
-   Scale: stock variation is a small stage; for World in 2023, 88 kcal per person per day, against a food stage of
-   about 3,000.
 
-3. Missing elements are treated as zero. When FBS does not report an element for an item (meat has no "seed", for
+3. Missing elements are treated as zero.
+   >> Scale: minor. Bookkeeping that changes no values; it only lets the identity be evaluated for every item.
+
+   When FBS does not report an element for an item (meat has no "seed", for
    example), the step treats the missing element as zero, so that the identity can be evaluated for every item.
    This is safe for two reasons. First, FAO builds each balance as a whole, estimating every element of the item
    together, so an element missing from a compiled balance is almost always one that does not apply to the item,
    not lost data. Second, if an element with a real value were missing and treated as zero, the two sides of the
    identity would not close for that item, and the step fails when more than 2% of the item balances do not close.
-   Scale: minor bookkeeping; it changes no values, it only lets the identity be evaluated for every item.
 
-4. Densities. FBS reports every element of the balance only in tonnes. The one exception is food: for each item,
+4. Densities.
+   >> Scale: major. This is the core assumption of the whole step: every calorie and every gram of protein in the
+   output is a tonnage multiplied by one of these densities.
+
+   FBS reports every element of the balance only in tonnes. The one exception is food: for each item,
    country and year, FBS also reports the amount of the item that people eat as a nutrient (kilocalories per person
    per day, or grams of protein per person per day) next to its quantity (kilograms per person per year). To build
    the chain in calories and protein, every other element must be converted from tonnes, and the food element is
@@ -42,10 +52,11 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    Besides calories and protein, the chain is also built in a third unit, mass. The mass table involves no
    density calculation:
    FBS already reports every element as a mass, and the step only changes the unit from tonnes to kilograms.
-   Scale: major. This is the core assumption of the whole step: every calorie and every gram of protein in the
-   output is a tonnage multiplied by one of these densities.
 
 5. Rejected and missing densities, and their fallbacks.
+   >> Scale: minor, and bounded by a check. Densities derived directly from the data cover more than 90% of tonnage
+   (97-99% for World), and an assert fails the step below 90%. The medians cover the rest, mostly the crops not
+   eaten as harvested (10% of item balances, 2% of tonnage).
 
    A density is rejected only when it is physically impossible: more energy than pure fat (920 kcal per 100 g), or
    more than 100 g of protein per 100 g. An impossible density means FAO's nutrient and tonnage figures for that
@@ -57,20 +68,6 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    no valid density for the item in any year, it falls back to the item's median over all countries and years.
    Every chain item has a valid density in at least one country and year, so this chain of fallbacks always ends with
    a density; an assert fails the step if a FAOSTAT update ever breaks that.
-
-6. Densities of exactly zero.
-
-   A derived density of exactly zero gets a special treatment, because a zero can mean two things:
-   - A true zero: the item has none of the nutrient. Sugar and oils contain no protein, and FAO's own figures give
-     them a density of zero in every country and year.
-   - A spurious zero: a tiny amount of food was rounded down to zero in one country and year, for an item that
-     normally has a nonzero density.
-   To handle both correctly, the step never uses a zero directly. When the division gives exactly zero, the cell
-   takes the median density instead (the country's median for the item over all years, then the item's median over
-   all countries and years), and the zeros are included in those medians. For a true zero, every year is zero, so
-   the median is zero and the item correctly ends at zero. For a spurious zero, the median is the item's usual
-   value, so the cell gets that.
-   Scale: minor. The zero treatment touches 2% of protein cells and 0.1% of energy cells.
 
    Example of an impossible density: soybean oil in the United States in 2023.
    - FAO reports the calories Americans get from soybean oil, and the tonnes of it they eat.
@@ -101,11 +98,26 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    members' summed food nutrients over their summed food tonnes, and in a whole region there is almost always some
    country eating the item. World gets its densities from the data for 97-99% of its tonnage and never needs the
    median over all countries.
-   Scale: minor, and bounded by a check. Densities derived directly from the data cover more than 90% of tonnage
-   (97-99% for World), and an assert fails the step below 90%. The medians cover the rest, mostly the crops not
-   eaten as harvested (10% of item balances, 2% of tonnage).
 
-7. Items. Every item code in the FBS table must appear in `food_supply_chain_fbs.items.yml`, in exactly one of three
+6. Densities of exactly zero.
+   >> Scale: minor. The zero treatment touches 2% of protein cells and 0.1% of energy cells.
+
+   A derived density of exactly zero gets a special treatment, because a zero can mean two things:
+   - A true zero: the item has none of the nutrient. Sugar and oils contain no protein, and FAO's own figures give
+     them a density of zero in every country and year.
+   - A spurious zero: a tiny amount of food was rounded down to zero in one country and year, for an item that
+     normally has a nonzero density.
+   To handle both correctly, the step never uses a zero directly. When the division gives exactly zero, the cell
+   takes the median density instead (the country's median for the item over all years, then the item's median over
+   all countries and years), and the zeros are included in those medians. For a true zero, every year is zero, so
+   the median is zero and the item correctly ends at zero. For a spurious zero, the median is the item's usual
+   value, so the cell gets that.
+
+7. Items.
+   >> Scale: major. The 95 included items are the whole dataset; the four excluded items carry a negligible share of
+   food energy (the oil palm harvest, recorded under "Palm kernels", re-enters through the two palm oils).
+
+   Every item code in the FBS table must appear in `food_supply_chain_fbs.items.yml`, in exactly one of three
    lists; an assert fails the step if FAO adds, removes or renames an item.
 
    - "included": the items that make up the chain, each with a role (crop, animal or processed; see assumption 8).
@@ -130,6 +142,8 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    The excluded items are left out of all three tables, the mass table included.
 
 8. Roles: where each item's production enters the chain.
+   >> Scale: major. Together with the densities, the roles are the shape of the chain: they decide which stage every
+   tonne of production lands in.
 
    Every item has a "production" element, but simply adding up the production of all items would count the same
    calories many times: sugar is made from sugar cane, so the production of sugar repeats calories already counted
@@ -165,40 +179,47 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
      products that are not food, such as ethanol.
      In many countries and years, however, "processing_net" comes out negative, as if factories created calories;
      what causes that is explained under KNOWN LIMITATIONS below.
-   Scale: major. Together with the densities, the roles are the shape of the chain: they decide which stage every
-   tonne of production lands in.
 
-9. The rounding gap goes to data adjustments. FAO publishes FBS tonnages rounded, mostly in units of 1,000
+9. The rounding gap goes to data adjustments.
+   >> Scale: minor. For World, the gap stays below 2% of the food stage.
+
+   FAO publishes FBS tonnages rounded, mostly in units of 1,000
    tonnes, so the two sides of the balance identity do not close exactly. The gap is added to FAO's own
    "residuals", and the combined stage is called "data_adjustments", so that the chain ends exactly on "food". The
    size of the gap is kept in the column "balancing_difference" for quality control.
-   Scale: minor. For World, the gap stays below 2% of the food stage.
 
-10. World exports are set equal to World imports. The world as a whole does not trade with anyone, so World imports
+10. World exports are set equal to World imports.
+   >> Scale: minor, and only for World: the trade gap is a few percent of imports.
+
+   The world as a whole does not trade with anyone, so World imports
     and World exports should be equal. In the data they differ, because each is the sum of what individual
     countries report. World exports are set equal to World imports, which FAO considers the better-documented side
     (FAO 2025, Food Balance Sheets and Supply Utilization Accounts Resource Handbook, section 6.1), and the
     difference goes to "data_adjustments". Other regions do trade with the rest of the world, so their imports and
     exports are left as they are.
-    Scale: minor, and only for World: the trade gap is a few percent of imports.
 
-11. Regions. FAO publishes its own regional aggregates; this step drops them and builds OWID regions (World,
+11. Regions.
+   >> Scale: major for the 11 region aggregates, which only exist through this assumption; no country's values
+   change.
+
+   FAO publishes its own regional aggregates; this step drops them and builds OWID regions (World,
     continents, income groups) instead, from the member countries that have an FBS balance that year. Every element
     in tonnes, and the food nutrient totals (per-capita food supply times population), are summed over those
     countries, and the region's population is the sum of those same countries' population. A country either has a
     full balance or no balance at all, so the summed elements and the summed population always cover the same
     countries. Countries that FAO has not compiled (Cuba and North Korea in recent years, and small states) are in
     neither.
-    Scale: affects only the 11 region aggregates; no country's values change.
 
-12. Low-coverage region-years are dropped. A region-year is dropped when the countries with a balance hold less
+12. Low-coverage region-years are dropped.
+   >> Scale: minor. It removes a few region-years; no country's values change.
+
+   A region-year is dropped when the countries with a balance hold less
     than 80% of the region's population, so that a value labeled "Africa" is never built from a small fraction of
     Africa. This rule removes "Low-income countries" before 2010 and in 2023, and Oceania in 2002-2009 (Papua New
     Guinea is missing in those years).
-    Scale: removes a few region-years; no country's values change.
 
 13. All stages are divided by that population and by 365 days, to give values per person per day.
-    Scale: all values, trivially: a choice of unit, not of substance.
+   >> Scale: minor. A choice of unit, not of substance; it rescales all values equally.
 
 KNOWN LIMITATIONS
 -----------------
