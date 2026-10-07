@@ -51,7 +51,7 @@ async def test_fetch_indicator_data_tool():
         result = await client.call_tool("fetch_indicator_data", {"indicator_id": 2118})
         assert result is not None
         assert isinstance(result.content, list)
-        assert len(result.content) == 1
+        assert len(result.content) == 2  # data + shutdown notice
 
         # Check the tool result content
         content = result.content[0]
@@ -89,7 +89,7 @@ async def test_fetch_indicator_data_tool_for_entity():
         result = await client.call_tool("fetch_indicator_data", {"indicator_id": 2118, "entity": "USA"})
         assert result is not None
         assert isinstance(result.content, list)
-        assert len(result.content) == 1
+        assert len(result.content) == 2  # data + shutdown notice
 
         # Check the tool result content
         content = result.content[0]
@@ -115,7 +115,7 @@ async def test_fetch_indicator_metadata_tool():
         result = await client.call_tool("fetch_indicator_metadata", {"indicator_id": 2118})
         assert result is not None
         assert isinstance(result.content, list)
-        assert len(result.content) == 1
+        assert len(result.content) == 2  # data + shutdown notice
 
         # Check the tool result content
         content = result.content[0]
@@ -501,3 +501,14 @@ async def test_fetch_chart_data_follows_redirect():
             "fetch_chart_data", {"id": "share-electricity-renewables", "time": "2020..2020", "countries": "DEU"}
         )
         assert output.structured_content["metadata"]["rows"] > 0  # ty: ignore
+
+
+@pytest.mark.asyncio
+async def test_tool_results_carry_shutdown_notice():
+    """Test that every tool result tells the caller about the shutdown exactly once, even on cache hits."""
+    async with Client(mcp) as client:
+        assert "github.com/owid/skills" in (client.initialize_result.instructions or "")
+        for _ in range(2):  # the second call is served from the response cache
+            output = await client.call_tool("search_chart", {"query": "population"})
+            notices = [c for c in output.content if isinstance(c, TextContent) and "github.com/owid/skills" in c.text]
+            assert len(notices) == 1
