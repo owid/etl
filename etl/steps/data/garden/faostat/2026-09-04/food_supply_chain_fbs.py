@@ -493,18 +493,6 @@ def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
         assert item["role"] in ROLES, f"Unknown role in item: {item}"
         assert item.get("fao_group", "vegetal") in {"vegetal", "animal"}, f"Unknown fao_group in item: {item}"
     items = pd.DataFrame(config["included"])
-    # The function `sanity_check_partition`, defined further down, verifies that the food supply of our included
-    # items adds up to FAO's own "Vegetal Products" and "Animal Products" totals. The classification built here is
-    # used only by that check; it never touches the output data. For the comparison, every item
-    # needs a vegetal/animal classification ("fao_group"). By default it follows from the role: crops and
-    # processed items count as vegetal, animal items as animal. A few items carry an explicit "fao_group" in the
-    # items file because FAO classifies them differently from that default: butter, cream and fish oils are processed items
-    # that FAO counts as animal, honey is an animal item that FAO counts as vegetal, and seaweed is a crop that FAO
-    # counts as animal.
-    default_group = items["role"].map({"crop": "vegetal", "processed": "vegetal", "animal": "animal"})
-    if "fao_group" not in items.columns:
-        items["fao_group"] = np.nan
-    items["fao_group"] = items["fao_group"].fillna(default_group)
     items = items.set_index("item_code", verify_integrity=True)
 
     excluded = {item["item_code"]: item["name"] for item in config["excluded"]}
@@ -771,10 +759,20 @@ def per_person_per_day(chain: Table) -> Table:
 # --------------------------------------------------------------------------------------------------------------------
 def sanity_check_partition(tb_fbsc: Table, items: Table) -> None:
     """Check assumption 7: food supply (kcal) summed over chain items reproduces FAO's own totals, for World."""
+    # The comparison needs every item classified as vegetal or animal ("fao_group"). By default the role decides:
+    # crops and processed items count as vegetal, animal items as animal. A few items carry an explicit "fao_group"
+    # in the items file because FAO classifies them differently from that default: butter, cream and fish oils are
+    # processed items that FAO counts as animal, honey is an animal item that FAO counts as vegetal, and seaweed is
+    # a crop that FAO counts as animal. The classification is used only by this check.
+    fao_group = items["role"].map({"crop": "vegetal", "processed": "vegetal", "animal": "animal"})
+    if "fao_group" in items.columns:
+        fao_group = items["fao_group"].fillna(fao_group)
+    fao_group = fao_group.rename("fao_group")
+
     world = tb_fbsc[(tb_fbsc["country"] == "World") & (tb_fbsc["element_code"] == "0664pc")]
     world = world[["year", "item_code", "value"]].astype({"item_code": str, "value": float})
     fao = world.pivot(index="year", columns="item_code", values="value")
-    curated = world[world["item_code"].isin(items.index)].merge(items[["fao_group"]].reset_index(), on="item_code")
+    curated = world[world["item_code"].isin(items.index)].merge(fao_group.reset_index(), on="item_code")
     ours = curated.pivot_table(index="year", columns="fao_group", values="value", aggfunc="sum")
     ours["total"] = ours["vegetal"] + ours["animal"]
     for group, code in {"total": TOTAL_ITEM_CODE, "vegetal": VEGETAL_ITEM_CODE, "animal": ANIMAL_ITEM_CODE}.items():
