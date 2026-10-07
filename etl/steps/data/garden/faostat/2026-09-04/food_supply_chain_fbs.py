@@ -488,13 +488,6 @@ def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
 
     # One row per included item, indexed by code; a duplicated code crashes here.
     items = Table(pd.DataFrame(config["included"])).set_index("item_code", verify_integrity=True)
-    assert {"name", "role"} <= set(items.columns) <= {"name", "role", "fao_group"}, (
-        f"Unexpected keys in included items: {sorted(items.columns)}"
-    )
-    assert items["name"].notnull().all(), "An included item has no name."
-    assert items["role"].isin(ROLES).all(), f"Invalid roles: {sorted(set(items['role']) - ROLES)}"
-    if "fao_group" in items.columns:
-        assert items["fao_group"].dropna().isin({"vegetal", "animal"}).all(), "Invalid fao_group in an included item."
 
     excluded = {item["item_code"]: item["name"] for item in config["excluded"]}
     groups = {item["item_code"]: item["name"] for item in config["groups"]}
@@ -506,6 +499,14 @@ def load_items_config() -> tuple[Table, dict[str, str], dict[str, str]]:
 
 def sanity_check_inputs(tb: Table, items: Table, excluded: dict[str, str], groups: dict[str, str]) -> None:
     """Check assumption 7 (every FBS item code is in the items file, with its curated name) and the element units."""
+    assert {"name", "role"} <= set(items.columns) <= {"name", "role", "fao_group"}, (
+        f"Unexpected keys in included items: {sorted(items.columns)}"
+    )
+    assert items["name"].notnull().all(), "An included item has no name."
+    assert items["role"].isin(ROLES).all(), f"Invalid roles: {sorted(set(items['role']) - ROLES)}"
+    if "fao_group" in items.columns:
+        assert items["fao_group"].dropna().isin({"vegetal", "animal"}).all(), "Invalid fao_group in an included item."
+
     elements = tb[["element_code", "unit"]].drop_duplicates().set_index("element_code")["unit"]
     for unit, codes in ELEMENT_UNITS.items():
         for code in codes:
