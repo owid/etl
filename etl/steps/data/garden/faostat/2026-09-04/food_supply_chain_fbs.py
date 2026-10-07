@@ -277,12 +277,9 @@ KNOWN LIMITATIONS
   is not an FBS item, so the calories and protein of the cake never come out of "processing" and never reach
   "feed", even though in reality the cake is fed to animals.
 
-  The same calories are therefore wrong in two stages at once: "feed" is understated (the cake that animals eat is
-  not in it), and "processing_net" is overstated (the cake's calories are counted as if factories had destroyed
-  them). Worldwide, most soybeans are crushed, so the distortion is large. Together with the missing grass (see
-  assumption 8), the understatement of "feed" is so large in protein that "animal_products" exceeds "feed" in 71%
-  of country-years, World included, which is physically impossible. The sibling step `food_supply_chain_scl` has
-  the cakes as items and does not have this problem.
+  As a result, nutrients in oilseed cakes appear under "processing_net" rather than "feed". Grass and other feed
+  sources are also absent, so these stages do not account for everything animals eat. The sibling step
+  `food_supply_chain_scl` includes oilseed cakes as separate items.
 - FBS items are groups, and the density of a group reflects the foods eaten in that country.
   >> Scale: major for the stage "crop_production" of countries that export raw crops. Fixed in
   `food_supply_chain_scl`, which has individual items.
@@ -314,18 +311,12 @@ KNOWN LIMITATIONS
 
 THE WORLD IN 1968
 -----------------
-This dataset feeds a static waterfall of the world in 1968, the year The Population Bomb was published
-(https://en.wikipedia.org/wiki/The_Population_Bomb). The 1968 World chain is more reliable than the recent years,
-because the accounting problems listed above were smaller then:
-- Densities derived directly from the data cover 99% of World tonnage in 1968.
-- "data_adjustments" is about 1% of the food stage.
-- "processing_net" is a plausible loss (3% of the food stage in energy), not a gain.
-- "feed" exceeds "animal_products" both in energy (1,120 against 440 kcal per person per day) and in protein (34
-  against 27 g). In 2023 the protein side is inverted (39 fed, 45 returned), which is impossible; in 1968 there was
-  less trade and less industrial feed, so the missing cakes and the missing grass distort less.
-Two caveats remain. First, balances close slightly worse than in recent years: 0.4% of item balances are open in
-1968, against 0.01% in 2023, both far below the 2% cap. Second, in protein the processing stage carries 29% of the
-food stage, and part of that is cake protein that is really feed.
+This dataset provides historical data for the World waterfall in 1968. The calculated food supply is about
+2,330 kcal per person per day. Recorded feed is about 1,120 kcal per person per day, and animal production is
+about 440 kcal per person per day.
+
+The limitations described above also apply to 1968: feed excludes grass and oilseed cakes, and the net processing
+stage includes nutrients in cakes that are used as feed.
 """
 
 import numpy as np

@@ -13,6 +13,7 @@ definitions:
       - Production of items made from other items (vegetable oils, sugar and sweeteners, alcoholic beverages, butter, cream, fish oils and other processed products) is netted against processing, so that no calorie is counted twice.
       - FAOSTAT rounds tonnages to the nearest thousand, so its balances do not close exactly; the gap is folded into data adjustments so that the chain lands exactly on food available for consumption.
       - The world as a whole does not trade, but the sum of the imports reported by all countries differs from the sum of their exports. For the world, exports are set equal to imports, which FAO considers the better-documented side, and the difference is added to data adjustments.
+      - For the world, reported tourist consumption is moved to data adjustments, and the tourist consumption stage is set to zero. This leaves food available for consumption unchanged.
       - All stages are divided by the same population series, from Our World in Data's population dataset, and by 365 days. Regions (the world, continents and income groups) are built by summing the member countries with an FAO balance in that year, and divided by the population of those same countries; a region is left empty in years when those countries hold less than 80% of its population.
 
 dataset:
@@ -68,10 +69,10 @@ tables:
         description_short: Domestic production of meat, offal, animal fats, milk, eggs, honey, fish and seafood.
       tourist_consumption:
         title: Tourist consumption
-        description_short: Food consumed by visitors from other countries. Only reported by FAOSTAT from 2010 onward.
+        description_short: Food consumed by visitors from other countries, reported from 2010 onward. For the world, this is set to zero and included in data adjustments.
       data_adjustments:
         title: Data adjustments
-        description_short: The statistical discrepancies in the balance, including the rounding of FAOSTAT's tonnages and, for the world, the difference between imports and exports. Can be negative.
+        description_short: Statistical discrepancies, including rounding. For the world, this also includes the difference between imports and exports and reported tourist consumption. Values can be negative.
       food:
         title: Food available for consumption
         description_short: Food available for human consumption, before waste at retail and in households.
