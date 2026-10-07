@@ -298,7 +298,10 @@ ITEM_GROUP_ROLES = {
     "Crops processed": "processed",
     "Livestock processed": "processed",
 }
-ROLES = {"crop": "crop_production", "animal": "animal_products", "processed": "processed_production"}
+# The three item roles of assumption 8. The production of crops starts the chain as "crop_production", the
+# production of animal items is added back as "animal_products", and the production of processed items is netted
+# against "processing" to give "processing_net".
+ROLES = {"crop", "animal", "processed"}
 STAGES = [
     "crop_production",
     "imports",
@@ -473,6 +476,7 @@ def prepare_balance_table(tb: Table, roles: pd.Series, manual: dict) -> Table:
     tb["fao_item"] = tb["item_code"].map(names)
     tb["role"] = tb["item_code"].map(roles)
     for override in manual["role_overrides"]:
+        assert override["role"] in ROLES, f"Unknown role in override: {override}"
         tb.loc[tb["item_code"] == _pad_code(override["code"]), "role"] = override["role"]
     assert tb["role"].notnull().all()
     tb["food_tonnes_for_density"] = tb["food"]
@@ -730,8 +734,9 @@ def sum_items_into_stages(converted: Table, population: Table) -> Table:
 
     Implements assumption 8. The output has one row per country and year, with one column per stage.
     """
-    for role, stage in ROLES.items():
-        converted[stage] = converted["production"].where(converted["role"] == role, 0)
+    converted["crop_production"] = converted["production"].where(converted["role"] == "crop", 0)
+    converted["animal_products"] = converted["production"].where(converted["role"] == "animal", 0)
+    converted["processed_production"] = converted["production"].where(converted["role"] == "processed", 0)
     converted = converted.drop(columns=["production", "role"])
     chain = converted.groupby(["country", "year"], as_index=False).sum(min_count=1)
     chain = chain.merge(population, on=["country", "year"], how="left")
