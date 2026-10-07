@@ -329,26 +329,39 @@ SUBTRACTED_STAGES = [
     "tourist_consumption",
     "data_adjustments",
 ]
-FIRST_YEAR = 2010
-# SCL carries population as an item; it is not a commodity.
-POPULATION_ITEM_CODE = "00000001"
-IDENTITY_RELATIVE_TOLERANCE = 0.01
-IDENTITY_ABSOLUTE_TOLERANCE_TONNES = 2000
-# Maximum difference between World imports and exports, relative to imports, before they are set equal.
-MAX_WORLD_TRADE_GAP = 0.2
-# FBS "Grand Total" item, to compare our food stage with FAO's published food supply.
-FBS_TOTAL_ITEM_CODE = "00002901"
+# Unit conversions. Exact by definition; they change no data beyond the choice of unit (assumption 14).
 HUNDRED_GRAMS_PER_TONNE = 10_000
 KG_PER_TONNE = 1000
 GRAMS_PER_TONNE = 1_000_000
-# An item in the fixed-density list keeps its data-based density if more than this share of its supply is eaten as food.
-FIXED_DENSITY_MAX_FOOD_SHARE = 0.01
-# Minimum share of a region's population that must live in member countries with a balance (assumption 13).
-MIN_FRACTION_POPULATION_COVERED = 0.8
-# Regions that lose some years to that rule (assumption 13); none once low-income countries are left out.
-REGIONS_WITH_LOW_COVERAGE = set()
 DAYS_PER_YEAR = 365
-# OWID regions rebuilt in this step (assumption 12); the FAOSTAT garden step's rows for them, if any, are dropped.
+
+# SCL covers 2010 onward; the FBS fish items of assumption 9 are cut to the same years.
+FIRST_YEAR = 2010
+# SCL carries population as an item; it is not a commodity, so it is excluded from the balance table.
+POPULATION_ITEM_CODE = "00000001"
+
+# Checks only; these thresholds change no data, they only decide when the step crashes.
+# Tolerance of the identity check, per item balance: 1% of the summed uses plus FAO's rounding (checks
+# assumptions 1 and 2).
+IDENTITY_RELATIVE_TOLERANCE = 0.01
+IDENTITY_ABSOLUTE_TOLERANCE_TONNES = 2000
+# FBS "Grand Total" item, used only to compare our food stage with FAO's published food supply.
+FBS_TOTAL_ITEM_CODE = "00002901"
+# Expected outcome of the coverage rule below; empty, because "Low-income countries" is left out altogether
+# (checks assumption 13).
+REGIONS_WITH_LOW_COVERAGE = set()
+# Tripwire of assumption 11: World trade is only equalized while the gap is small; a gap above this share of
+# imports crashes the step instead.
+MAX_WORLD_TRADE_GAP = 0.2
+
+# Assumption 6, minor: an item in the fixed-density list keeps its data-derived density if more than this share of
+# its supply is eaten as food.
+FIXED_DENSITY_MAX_FOOD_SHARE = 0.01
+# Assumption 13, minor: a region-year is dropped when the member countries with a balance hold less than this share
+# of the region's population.
+MIN_FRACTION_POPULATION_COVERED = 0.8
+# Assumption 12, major for the region aggregates: the OWID regions rebuilt in this step; the FAOSTAT garden step's
+# rows for them, if any, are dropped.
 REGIONS = [
     "World",
     "Africa",

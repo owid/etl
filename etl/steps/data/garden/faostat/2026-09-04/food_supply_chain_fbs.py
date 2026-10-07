@@ -398,7 +398,7 @@ USES = ["food", "feed", "seed", "processing", "other_uses", "losses", "tourist_c
 # production of animal items is added back as "animal_products", and the production of processed items is netted
 # against "processing" to give "processing_net".
 ROLES = {"crop", "animal", "processed"}
-# Output columns, in chain order, as magnitudes in FAO's sign convention; SUBTRACTED_STAGES are subtracted along the chain.
+# Output columns, in chain order, as magnitudes in FAO's sign convention; SUBTRACTED_STAGES subtract along the chain.
 STAGES = [
     "crop_production",
     "imports",
@@ -426,25 +426,35 @@ SUBTRACTED_STAGES = [
     "tourist_consumption",
     "data_adjustments",
 ]
-# FAO's aggregate items used to check that the curated items partition the total food supply.
+# Unit conversions. Exact by definition; they change no data beyond the choice of unit (assumption 13).
+HUNDRED_GRAMS_PER_TONNE = 10_000
+KG_PER_TONNE = 1000
+GRAMS_PER_TONNE = 1_000_000
+DAYS_PER_YEAR = 365
+
+# Checks only; these thresholds change no data, they only decide when the step crashes.
+# FAO's aggregate items ("Grand Total", "Vegetal Products", "Animal Products"), used to check that the included
+# items reproduce FAO's totals within PARTITION_TOLERANCE (checks assumption 7).
 TOTAL_ITEM_CODE = "00002901"
 VEGETAL_ITEM_CODE = "00002903"
 ANIMAL_ITEM_CODE = "00002941"
 PARTITION_TOLERANCE = 0.01
-# Tolerance for the identity checks in tonnes (relative to the item's domestic supply, plus FAO's rounding).
+# Tolerance of the identity check, per item balance: 1% of domestic supply plus FAO's rounding (checks
+# assumptions 1 to 3).
 IDENTITY_RELATIVE_TOLERANCE = 0.01
 IDENTITY_ABSOLUTE_TOLERANCE_TONNES = 2000
-# Maximum difference between World imports and exports, relative to imports, before they are set equal.
+# Tripwire of assumption 10: World trade is only equalized while the gap is small (about 5% in practice); a gap
+# above this share of imports crashes the step instead.
 MAX_WORLD_TRADE_GAP = 0.2
-HUNDRED_GRAMS_PER_TONNE = 10_000
-KG_PER_TONNE = 1000
-GRAMS_PER_TONNE = 1_000_000
-# Minimum share of a region's population that must live in member countries with a balance (assumption 12).
-MIN_FRACTION_POPULATION_COVERED = 0.8
-# Regions that lose some years to that rule (assumption 12); the docstring lists the years.
+# Expected outcome of the coverage rule below; if a FAOSTAT update changes it, the step crashes so that the
+# docstring gets updated (checks assumption 12).
 REGIONS_WITH_LOW_COVERAGE = {"Low-income countries", "Oceania"}
-DAYS_PER_YEAR = 365
-# OWID regions rebuilt in this step (assumption 11); the FAOSTAT garden step's rows for them, if any, are dropped.
+
+# Assumption 12, minor: a region-year is dropped when the member countries with a balance hold less than this share
+# of the region's population.
+MIN_FRACTION_POPULATION_COVERED = 0.8
+# Assumption 11, major for the region aggregates: the OWID regions rebuilt in this step; the FAOSTAT garden step's
+# rows for them, if any, are dropped.
 REGIONS = [
     "World",
     "Africa",
