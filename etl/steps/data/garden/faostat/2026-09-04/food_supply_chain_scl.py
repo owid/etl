@@ -626,13 +626,9 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
     Implements assumptions 3 (derivation), 4 (fallbacks), 5 (zero treatment), 6 (fixed) and 7 (implied by
     products).
     """
+    assert nutrient != "mass", "The mass table involves no density; it never goes through this function."
     tb = tb.copy()
     config = NUTRIENTS[nutrient]
-    if config["numerator"] is None:
-        tb["density"] = KG_PER_TONNE / HUNDRED_GRAMS_PER_TONNE
-        tb["density_source"] = "mass"
-        return tb
-
     raw = config["to_per_100g"] * tb[config["numerator"]] / tb["food_tonnes_for_density"]
     raw = raw.where(np.isfinite(raw) & (raw >= 0))
     within_ceiling = raw.where(raw <= config["ceiling"])
@@ -737,14 +733,19 @@ def sanity_check_processing_families(tb: Table, manual: dict, nutrient: str) -> 
 # --------------------------------------------------------------------------------------------------------------------
 # The chain (assumptions 3, 8, 10, 11 and 14).
 # --------------------------------------------------------------------------------------------------------------------
-def convert_elements_to_nutrient(tb: Table) -> Table:
+def convert_elements_to_nutrient(tb: Table, nutrient: str) -> Table:
     """Convert every element of every item from tonnes into the nutrient, with the item's density.
 
     Implements the conversion half of assumption 3.
     """
     converted = tb[["country", "year", "role"]].copy()
-    for element in BALANCE_ELEMENTS:
-        converted[element] = tb[element] * HUNDRED_GRAMS_PER_TONNE * tb["density"]
+    if nutrient == "mass":
+        # The mass table involves no density: tonnes are converted to kilograms, nothing else.
+        for element in BALANCE_ELEMENTS:
+            converted[element] = tb[element] * KG_PER_TONNE
+    else:
+        for element in BALANCE_ELEMENTS:
+            converted[element] = tb[element] * HUNDRED_GRAMS_PER_TONNE * tb["density"]
     return converted
 
 
@@ -890,13 +891,17 @@ def run() -> None:
     population_by_entity = tb[["country", "year", "population"]].drop_duplicates()
     tables = []
     for nutrient in NUTRIENTS:
-        # Assumptions 3 to 7: the density of every item, with its fallbacks, zero treatment, fixed and implied values.
-        tb_nutrient = add_densities(tb, manual=manual, nutrient=nutrient)
-        if nutrient != "mass":
+        if nutrient == "mass":
+            # The mass table involves no density: tonnes are converted to kilograms, nothing else.
+            converted = convert_elements_to_nutrient(tb, nutrient=nutrient)
+        else:
+            # Assumptions 3 to 7: the density of every item, with its fallbacks, zero treatment, fixed and implied
+            # values.
+            tb_nutrient = add_densities(tb, manual=manual, nutrient=nutrient)
             sanity_check_densities(tb_nutrient, nutrient=nutrient)
             sanity_check_processing_families(tb_nutrient, manual=manual, nutrient=nutrient)
-        # Assumption 3 (conversion): every element of every item, from tonnes into the nutrient.
-        converted = convert_elements_to_nutrient(tb_nutrient)
+            # Assumption 3 (conversion): every element of every item, from tonnes into the nutrient.
+            converted = convert_elements_to_nutrient(tb_nutrient, nutrient=nutrient)
         # Assumption 8: production split by role, items summed into the stages of the chain.
         chain = sum_items_into_stages(converted, population=population_by_entity)
         # Assumption 10: the rounding gap goes to data adjustments, so the chain ends exactly on food.
