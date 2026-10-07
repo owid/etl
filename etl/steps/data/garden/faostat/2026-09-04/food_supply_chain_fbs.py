@@ -108,8 +108,8 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    value, so the cell gets that.
 
 7. Items.
-   >> Scale: major. The 95 included items are the whole dataset; the four excluded items carry a negligible share of
-   food energy (the oil palm harvest, recorded under "Palm kernels", re-enters through the two palm oils).
+   >> Scale: major. The 95 included items are the whole dataset. The four excluded items carry at most 1.5% of a
+   country's food energy, all of it palm fruit and kernels eaten directly (see "Palm kernels" below).
 
    Every item code in the FBS table must appear in `food_supply_chain_fbs.items.yml`, in exactly one of three
    lists; an assert fails the step if FAO adds, removes or renames an item.
@@ -125,13 +125,16 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    - "Alcohol, Non-Food": industrial alcohol, never eaten, and FAO reports no food energy for industrial alcohol.
    - "Meat, Aquatic Mammals": negligible production, and FAO reports no food energy for aquatic mammal meat anywhere.
    - "Palm kernels": the oil palm is a tropical tree grown for its fruit. The flesh of the fruit is pressed into
-     palm oil, and the seed inside the fruit (the palm kernel) is pressed into palm kernel oil. Nobody eats the raw
-     fruit or the raw kernels; essentially the whole harvest becomes those two oils. In FBS, the whole harvest of
-     the oil palm is recorded under the item "Palm kernels" (FAO defines the item "Palm kernels" as the palm fruit
-     plus the palm kernels), and the item has zero food use, so no density can be derived for the item
-     "Palm kernels". The step therefore excludes the item "Palm kernels", and the oil palm harvest enters the chain
-     through the items "Palm Oil" and "Palmkernel Oil", which are given the role "crop" rather than the role
-     "processed", so that the calories of the oil palm start the chain in crop production.
+     palm oil, and the seed inside the fruit (the palm kernel) is pressed into palm kernel oil. Almost the whole
+     harvest becomes those two oils. In FBS, the whole harvest of the oil palm is recorded under the item "Palm
+     kernels" (FAO defines the item "Palm kernels" as the palm fruit plus the palm kernels). In 93% of the
+     country-years that grow oil palm, the item "Palm kernels" has no food use, so no density can be derived for
+     it. The step therefore excludes the item "Palm kernels", and the oil palm harvest enters the chain through the
+     items "Palm Oil" and "Palmkernel Oil", which are given the role "crop" rather than the role "processed", so
+     that the calories of the oil palm start the chain in crop production.
+     The cost of excluding "Palm kernels": some people do eat palm fruit and palm kernels directly, and that food
+     is lost. FAO reports food energy from "Palm kernels" in 19 countries. The largest share is in the Central
+     African Republic: 29 kcal per person per day, which is 1.5% of the country's food.
 
    The excluded items are left out of all three tables, the mass table included.
 

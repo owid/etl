@@ -58,8 +58,8 @@ included:
   - {code: 2573, name: "Sunflowerseed Oil", role: processed}
   - {code: 2574, name: "Rape and Mustard Oil", role: processed}
   - {code: 2575, name: "Cottonseed Oil", role: processed}
-  # Palm oil and palm kernel oil are the only oils tagged as crops: the item carrying the oil palm harvest has no
-  # food energy (see "Palm kernels" under excluded), so the oils are the first point where oil palm calories exist.
+  # Palm oil and palm kernel oil are the only oils tagged as crops: the item carrying the oil palm harvest is
+  # excluded (see "Palm kernels" under excluded), so the oils are the first point where oil palm calories exist.
   - {code: 2576, name: "Palmkernel Oil", role: crop}
   - {code: 2577, name: "Palm Oil", role: crop}
   - {code: 2578, name: "Coconut Oil", role: processed}
@@ -138,9 +138,10 @@ excluded:
   - code: 2562
     name: "Palm kernels"
     reason: >-
-      Carries the whole oil palm harvest (FAO defines it as "Oil, palm fruit" plus "Palm kernels") with zero food
-      use, so it has no food energy in FBS. The oil palm enters the chain as "Palm Oil" and "Palmkernel Oil", which
-      are tagged as crops.
+      Carries the whole oil palm harvest (FAO defines it as "Oil, palm fruit" plus "Palm kernels"). In 93% of the
+      country-years that grow oil palm, the item has no food use, so no density can be derived for it. The oil palm
+      enters the chain as "Palm Oil" and "Palmkernel Oil", which are tagged as crops. The palm fruit and kernels that
+      people eat directly are lost: at most 1.5% of a country's food calories (Central African Republic).
   - {code: 2768, name: "Meat, Aquatic Mammals", reason: Negligible production and no reported food energy anywhere.}
 
 # FAO's aggregate items. They sum their member items, so they must not be added to the chain (double counting);
