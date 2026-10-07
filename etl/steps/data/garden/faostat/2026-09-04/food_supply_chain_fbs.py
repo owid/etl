@@ -675,7 +675,7 @@ def add_densities(tb: Table, nutrient: str) -> Table:
     return tb
 
 
-def sanity_check_densities(tb: Table, items: Table, nutrient: str) -> None:
+def sanity_check_densities(tb: Table, nutrient: str) -> None:
     """Check the scale promised in assumption 5: densities derived directly from the data cover >90% of tonnage."""
     ceiling = NUTRIENTS[nutrient]["ceiling"]
     assert (tb["density"] >= 0).all() and (tb["density"] <= ceiling).all(), f"{nutrient} densities out of range."
@@ -870,7 +870,7 @@ def run() -> None:
         else:
             # Assumptions 4 to 6: the density of every item, with its fallbacks and its zero treatment.
             tb_nutrient = add_densities(tb, nutrient=nutrient)
-            sanity_check_densities(tb_nutrient, items=items, nutrient=nutrient)
+            sanity_check_densities(tb_nutrient, nutrient=nutrient)
             # Assumption 4 (conversion): every element of every item, from tonnes into the nutrient.
             converted = convert_elements_to_nutrient(tb_nutrient, nutrient=nutrient)
         # Assumption 8: production split by role, items summed into the stages of the chain.
