@@ -169,7 +169,7 @@ Which fields to fill, and when to leave them empty:
   ```
 
 - Tidy the end of the `.dvc`. The template's final `{%- endif -%}` leaves a whitespace-only line (`"  "`) after the license block, and for a private snapshot the file also ends without a final newline. Both parse fine as YAML, but committed files shouldn't carry either: drop the whitespace-only line and make sure the file ends with exactly one `\n`.
-- Add any `#` comments this skill calls for: the companion-files `# NOTE:` above `url_download` (step 6), and a one-line note when `citation_full`'s year deliberately differs from `date_published` (step 5).
+- Add any `#` comments this skill calls for: the companion-files `# NOTE:` above `url_download` (step 6), and a one-line note when `citation_full`'s year deliberately differs from `date_published` (step 5). In the `.dvc` and the `.py` alike, write anything the next update must check or change (a dataset version to bump, a release date that had to be inferred, a quirk of the source) as a `# NOTE:` comment, with the tag on its first line: `/update-dataset` step 1c collects `NOTE:` / `TODO:` comments and re-checks them, and misses plain ones (mirrored in `/create-dataset` Step 5).
 
 There is deliberately **no `outs:` block** — `snap.create_snapshot()` writes it with the real md5 and size when step 4 runs. Don't add a placeholder.
 
