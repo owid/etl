@@ -226,7 +226,9 @@ def run() -> None:
 
         # Names of recipients whose aid is not assigned to a single country.
         if short_name == "climate_related_oda_by_recipient":
-            is_not_assigned = tb["entity_code"].str.endswith("_X") & ~tb["entity_code"].isin(CODES_UNCLASSIFIED_BY_INCOME)
+            is_not_assigned = tb["entity_code"].str.endswith("_X") & ~tb["entity_code"].isin(
+                CODES_UNCLASSIFIED_BY_INCOME
+            )
             names_not_assigned = sorted(set(tb.loc[is_not_assigned, "country"]))
         tb = tb.drop(columns=["entity_code"])
 
@@ -244,7 +246,9 @@ def run() -> None:
         tables=list(tables.values()),
         default_metadata=ds_meadow.metadata,
         yaml_params={
-            "ENTITY_ANNOTATIONS_RECIPIENTS": "\n".join(f"{name}: {ANNOTATION_NOT_ASSIGNED}" for name in names_not_assigned)
+            "ENTITY_ANNOTATIONS_RECIPIENTS": "\n".join(
+                f"{name}: {ANNOTATION_NOT_ASSIGNED}" for name in names_not_assigned
+            )
         },
     )
 
