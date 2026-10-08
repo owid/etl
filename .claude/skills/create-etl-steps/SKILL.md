@@ -112,7 +112,7 @@ Notes on this call:
 - `generate_step` prints the context dictionary to stdout, and importing `apps.wizard` logs a `No runtime found, using MemoryCacheStorageManager` warning from Streamlit. Both are expected noise, not errors.
 - Use `/create-playground` if the user does want a playground notebook, rather than keeping the cookiecutter's copy.
 
-Files generated, after the playground removal: meadow `.py`; garden `.py`, `.meta.yml`, `.countries.json`, `.excluded_countries.json`; grapher `.py`. The `.excluded_countries.json` starts empty: delete it if harmonization excludes nothing (the step loads it only when it exists). Verify the notebook is gone — leaving one behind is the easiest thing to get wrong here, since two of the three channels ship it.
+Files generated, after the playground removal: meadow `.py`; garden `.py`, `.meta.yml`, `.countries.json`, `.excluded_countries.json`; grapher `.py`. Verify the notebook is gone — leaving one behind is the easiest thing to get wrong here, since two of the three channels ship it.
 
 ### 5. Add DAG entries
 
