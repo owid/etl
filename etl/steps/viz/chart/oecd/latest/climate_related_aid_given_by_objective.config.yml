@@ -32,6 +32,7 @@ views:
       hasMapTab: false
       chartTypes:
         - "StackedArea"
+        - "StackedBar"
       minTime: 2010
       selectedEntityNames:
         - "DAC members"
