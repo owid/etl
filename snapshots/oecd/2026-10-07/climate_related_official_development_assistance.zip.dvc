@@ -10,8 +10,8 @@ meta:
       In their reporting to the DAC CRS, donors are requested to indicate for each activity whether it targets environment and the Rio Conventions (biodiversity, climate change mitigation, climate change adaptation and desertification) or not. A scoring system of three values is used, in which aid activities are marked as targeting environment as the "principal" or "significant" objective, or not at all. The same activity can be marked for several objectives, so caution should be used to avoid double-counting.
 
       The markers on biodiversity, climate change mitigation and desertification were introduced in 1998, and the marker on climate change adaptation applies to flows from 2010 onwards.
-    # NOTE: The Data Explorer shows no release date; this is the version stamp of the dataflow's bulk files (v20260710).
-    date_published: "2026-07-10"
+    # NOTE: From the Data Explorer page: "Last updated: July 11, 2026 at 5:55:08 PM".
+    date_published: "2026-07-11"
 
     # Citation
     producer: "OECD"
