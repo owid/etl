@@ -12,8 +12,9 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Base year of the OECD's constant-price series. The OECD rebases it at every release, so when this assertion fires,
-# bump BOTH this constant and `definitions.inflation_year` in the garden .meta.yml.
+# Base year of the OECD's constant-price series.
+# NOTE: The OECD rebases it at every release, so when the assertion on it fails, bump BOTH this constant and
+# `definitions.inflation_year` in the garden .meta.yml.
 CONSTANT_PRICE_BASE_YEAR = 2024
 
 # Dimensions that the snapshot queries fix to a single value (see the snapshot scripts for all dimensions and codes).
