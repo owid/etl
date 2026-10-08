@@ -15,6 +15,7 @@ The snapshot is a zip with files from the OECD RioMarkers dataflow (all amounts 
 """
 
 import io
+import re
 import tempfile
 import time
 import zipfile
@@ -31,11 +32,19 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 # The dataflow is hosted externally, so the API serves it from the dcd-public endpoint (the public one returns errors).
+# NOTE: The OECD publishes new versions of the dataflow without notice, and a new version can be visible while it is
+# still being loaded (in October 2026, version 1.7 had a partial 2025 and, for the CRS, several years missing). So the
+# dataflow version is pinned to a complete release, and the script warns when a newer one exists. At every update,
+# check the newest version (complete years, same totals as the Data Explorer) before moving to it, and keep the CRS
+# snapshot (bilateral_official_development_assistance_commitments) on the same release.
+# The hierarchies of donors and recipients are always the latest versions, which have the latest income classification
+# of the World Bank. The garden step computes the totals of groups of recipients from their members, so they use the
+# same classification even when the dataflow links to an older hierarchy (version 1.6 links to recipients version 1.5).
 BASE_URL = "https://sdmx.oecd.org/dcd-public/rest"
-DATAFLOW = "OECD.DCD.FSD,DSD_RIOMRKR@DF_RIOMARKERS,1.6"
-URL_STRUCTURE = f"{BASE_URL}/dataflow/OECD.DCD.FSD/DSD_RIOMRKR@DF_RIOMARKERS/1.6?references=all"
-URL_RECIPIENT_GROUPS = f"{BASE_URL}/hierarchicalcodelist/OECD.DCD.FSD/HCL_DACRECIPIENTS/1.5"
-URL_DONOR_GROUPS = f"{BASE_URL}/hierarchicalcodelist/OECD.DCD.FSD/HCL_DACDONORS/1.6"
+AGENCY = "OECD.DCD.FSD"
+DATAFLOW_ID = "DSD_RIOMRKR@DF_RIOMARKERS"
+DATAFLOW_VERSION = "1.6"
+HIERARCHIES = {"recipient_groups.xml": "HCL_DACRECIPIENTS", "donor_groups.xml": "HCL_DACDONORS"}
 
 # Keys follow the dimension order DONOR.RECIPIENT.SECTOR.MEASURE.ALLOCABLE.MARKER.SCORE.FLOW_TYPE.PRICE_BASE.MD_DIM.MD_ID.UNIT_MEASURE
 # Markers: 10 (biodiversity), 20 (climate change mitigation), 30 (climate change adaptation), 40 (desertification),
@@ -74,14 +83,15 @@ def run(upload: bool = True) -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         path_zip = Path(temp_dir) / snap.path.name
         with zipfile.ZipFile(path_zip, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-            # Structure and hierarchies of donors and recipients.
-            for name, url in [
-                ("structure.xml", URL_STRUCTURE),
-                ("recipient_groups.xml", URL_RECIPIENT_GROUPS),
-                ("donor_groups.xml", URL_DONOR_GROUPS),
-            ]:
-                log.info(f"Downloading {name}.")
-                zf.writestr(name, fetch(url=url, params={}))
+            # Structure of the dataflow, and the latest hierarchies of donors and recipients.
+            warn_if_newer_version()
+            version = DATAFLOW_VERSION
+            url = f"{BASE_URL}/dataflow/{AGENCY}/{DATAFLOW_ID}/{version}?references=all"
+            zf.writestr("structure.xml", fetch(url=url, params={}))
+            for name, hierarchy in HIERARCHIES.items():
+                content = fetch(url=f"{BASE_URL}/hierarchicalcodelist/{AGENCY}/{hierarchy}/latest", params={})
+                log.info(f"Using {hierarchy} version {get_version(content=content, element='HierarchicalCodelist')}.")
+                zf.writestr(name, content)
 
             # Totals, for all years at once.
             for name, key in [
@@ -90,7 +100,7 @@ def run(upload: bool = True) -> None:
                 ("totals_by_sector.csv", KEY_TOTALS_BY_SECTOR),
             ]:
                 log.info(f"Downloading {name}.")
-                zf.writestr(name, fetch_data(key=key, params={}))
+                zf.writestr(name, fetch_data(version=version, key=key, params={}))
 
             # Years covered by the totals define the years to fetch at project level.
             years = sorted(_years_in_csv(zf.read("totals_by_donor.csv")))
@@ -101,7 +111,9 @@ def run(upload: bool = True) -> None:
             with zf.open("activities.csv", "w") as f:
                 for start in range(years[0], years[-1] + 1, YEARS_PER_REQUEST):
                     end = min(start + YEARS_PER_REQUEST - 1, years[-1])
-                    content = fetch_data(key=KEY_ACTIVITIES, params={"startPeriod": start, "endPeriod": end})
+                    content = fetch_data(
+                        version=version, key=KEY_ACTIVITIES, params={"startPeriod": start, "endPeriod": end}
+                    )
                     block_header, _, rows = content.partition(b"\n")
                     if header is None:
                         header = block_header
@@ -114,10 +126,27 @@ def run(upload: bool = True) -> None:
         snap.create_snapshot(filename=path_zip, upload=upload)
 
 
-def fetch_data(key: str, params: dict) -> bytes:
+def warn_if_newer_version() -> None:
+    """Warn when the OECD has published a version of the dataflow newer than the pinned one."""
+    latest = get_version(content=fetch(url=f"{BASE_URL}/dataflow/{AGENCY}/{DATAFLOW_ID}/latest", params={}))
+    log.info(f"Using dataflow version {DATAFLOW_VERSION}; the latest is {latest}.")
+    if latest != DATAFLOW_VERSION:
+        log.warning(
+            f"Dataflow version {latest} exists. Check that it is complete before moving DATAFLOW_VERSION to it."
+        )
+
+
+def get_version(content: bytes, element: str = "Dataflow") -> str:
+    """Version of the first element of a given type in an SDMX structure message."""
+    match = re.search(rf'<structure:{element} [^>]*version="([^"]+)"', content.decode("utf-8"))
+    assert match, f"No {element} found in the structure."
+    return match.group(1)
+
+
+def fetch_data(version: str, key: str, params: dict) -> bytes:
     """Fetch a data query from the OECD SDMX API as a flat CSV."""
     params = {"dimensionAtObservation": "AllDimensions", "format": "csvfile", **params}
-    return fetch(url=f"{BASE_URL}/data/{DATAFLOW}/{key}", params=params)
+    return fetch(url=f"{BASE_URL}/data/{AGENCY},{DATAFLOW_ID},{version}/{key}", params=params)
 
 
 def fetch(url: str, params: dict) -> bytes:

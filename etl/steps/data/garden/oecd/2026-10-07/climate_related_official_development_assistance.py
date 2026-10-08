@@ -36,6 +36,9 @@ DONOR_GROUPS = ["DAC_EC", "DAC", "DACEU", "DACEU_EC", "G7"]
 # are not countries or groups.
 CODES_UNSPECIFIED_KEPT = ["DPGC_X", "INC_X", "INCWB_X"]
 
+# World Bank income groups of recipients, whose members change every year.
+WORLD_BANK_INCOME_GROUPS = ["OLICWB", "LMICWB", "UMICWB", "HICSWB", "INCWB_X"]
+
 # The OECD uses the same name for the country of Micronesia and the region of Micronesia (in Oceania).
 NAMES_BY_CODE = {"O8": "Micronesia (OECD)"}
 
@@ -104,6 +107,8 @@ def run() -> None:
         if not code.endswith("_X") or code in CODES_UNSPECIFIED_KEPT
     )
     members_recipients = create_members(tb_groups=tb_groups, hierarchy="recipient", entity_codes=recipients)
+    # Codes of groups of recipients (as opposed to individual recipients, which are their own only member).
+    groups_recipients = set(tb_groups[tb_groups["hierarchy"] == "recipient"]["parent_code"])
 
     # Totals of each donor and group of donors (to all developing countries, all sectors), computed from the totals of
     # individual donors. Totals of each recipient and group of recipients (from all DAC members), as given by the OECD.
@@ -119,11 +124,25 @@ def run() -> None:
         columns=["value"],
     )
     sanity_check_donor_groups(tb_totals_given=tb_totals_given, tb_totals=tb_totals)
-    tb_totals_received = tb_totals[
-        (tb_totals["donor_code"] == CODE_ALL_DONORS)
-        & (tb_totals["sector_code"] == CODE_ALL_SECTORS)
-        & (tb_totals["recipient_code"].isin(recipients))
-    ].rename(columns={"recipient_code": "entity_code"})[["entity_code", "marker", "score", "year", "value"]]
+    # Totals of each recipient and group of recipients (from all DAC members). Groups are computed from their members, so
+    # they follow the latest hierarchy of recipients (the OECD's own group totals may use an older one).
+    tb_totals_by_recipient = tb_totals[
+        (tb_totals["donor_code"] == CODE_ALL_DONORS) & (tb_totals["sector_code"] == CODE_ALL_SECTORS)
+    ]
+    tb_totals_received = aggregate_by_members(
+        tb=tb_totals_by_recipient[~tb_totals_by_recipient["recipient_code"].isin(groups_recipients)],
+        code_column="recipient_code",
+        members=members_recipients,
+        keys=["marker", "score", "year"],
+        columns=["value"],
+    )
+    sanity_check_recipient_groups(
+        tb_computed=tb_totals_received,
+        tb_oecd=tb_totals_by_recipient.rename(columns={"recipient_code": "entity_code"}),
+        keys=["marker", "score", "year"],
+        name="bilateral allocable ODA",
+        expected_differences=WORLD_BANK_INCOME_GROUPS,
+    )
 
     # Total bilateral ODA (including activities outside the scope of the Rio markers), from the CRS. Donor groups are
     # computed from individual donors, as above.
@@ -137,9 +156,23 @@ def run() -> None:
         columns=["value"],
     )
     sanity_check_donor_groups_bilateral(tb_bilateral_given=tb_bilateral_given, tb_bilateral=tb_bilateral)
-    tb_bilateral_received = tb_bilateral[
-        (tb_bilateral["donor_code"] == CODE_ALL_DONORS) & tb_bilateral["recipient_code"].isin(recipients)
-    ].rename(columns={"recipient_code": "entity_code"})[["entity_code", "year", "value"]]
+    tb_bilateral_by_recipient = tb_bilateral[tb_bilateral["donor_code"] == CODE_ALL_DONORS]
+    tb_bilateral_received = aggregate_by_members(
+        tb=tb_bilateral_by_recipient[~tb_bilateral_by_recipient["recipient_code"].isin(groups_recipients)],
+        code_column="recipient_code",
+        members=members_recipients,
+        keys=["year"],
+        columns=["value"],
+    )
+    sanity_check_recipient_groups(
+        tb_computed=tb_bilateral_received,
+        tb_oecd=tb_bilateral_by_recipient.rename(columns={"recipient_code": "entity_code"}),
+        keys=["year"],
+        name="total bilateral ODA",
+        # NOTE: In the CRS, the OECD's total for recipients not classified by income (INC_X) also includes developing
+        # countries unspecified (DPGC_X), which its hierarchy (and the RioMarkers dataset) keep separate.
+        expected_differences=WORLD_BANK_INCOME_GROUPS + ["INC_X"],
+    )
 
     # Climate-related ODA given by each donor and group of donors, and received by each recipient and group.
     tb_given = create_climate_related_table(
@@ -404,6 +437,21 @@ def sanity_check_donor_groups_bilateral(tb_bilateral_given: Table, tb_bilateral:
     ].set_index("year")["value"]
     computed, oecd = computed.align(oecd, join="inner")
     assert close(computed, oecd), "Total bilateral ODA of all DAC members does not match the OECD totals."
+
+
+def sanity_check_recipient_groups(
+    tb_computed: Table, tb_oecd: Table, keys: list[str], name: str, expected_differences: list[str]
+) -> None:
+    """Groups of recipients computed from their members must match the OECD's own group totals, except for the World Bank
+    income groups, whose members change every year and which the OECD may compute with an older classification."""
+    computed = pd.DataFrame(tb_computed).set_index(["entity_code"] + keys)["value"].rename("computed")
+    oecd = pd.DataFrame(tb_oecd).set_index(["entity_code"] + keys)["value"].rename("oecd")
+    both = pd.concat([computed, oecd], axis=1, join="inner")
+    off = both[(both["computed"] - both["oecd"]).abs() > RELATIVE_TOLERANCE * both["oecd"].abs() + 0.01]
+    groups_off = set(off.index.get_level_values("entity_code"))
+    if groups_off:
+        log.warning(f"Groups of recipients whose {name} differs from the OECD's: {sorted(groups_off)}")
+    assert groups_off <= set(expected_differences), f"Unexpected differences in {name} for: {sorted(groups_off)}."
 
 
 def sanity_check_reconciliation(tb: Table) -> None:

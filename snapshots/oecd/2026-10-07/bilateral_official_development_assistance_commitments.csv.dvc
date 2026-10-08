@@ -6,7 +6,7 @@ meta:
     title: "CRS: Creditor Reporting System (flows)"
     description: |-
       This dataset provides readily available, granular data on who is giving what aid, to where, and for what purpose, on a flow basis. These data are comparable across all providers who report their activity-level statistics to the OECD.
-    # NOTE: From the Data Explorer page: "Last updated: August 03, 2026 at 11:55:16 AM".
+    # NOTE: From the Data Explorer page (dataflow version 1.6): "Last updated: August 03, 2026 at 11:55:16 AM".
     date_published: "2026-08-03"
 
     # Citation
