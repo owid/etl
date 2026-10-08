@@ -26,12 +26,27 @@ paths = PathFinder(__file__)
 # release, and the script warns when a newer one exists. At every update, check the newest version before moving to it,
 # and keep it on the same release as the RioMarkers snapshot (climate_related_official_development_assistance).
 BASE_URL = "https://sdmx.oecd.org/dcd-public/rest"
+# Publisher of the dataflow: the OECD's Development Co-operation Directorate (DCD), Financing for Sustainable Development
+# division (FSD).
 AGENCY = "OECD.DCD.FSD"
+# Dataflow (dataset) identifier: "<data structure>@<dataflow>".
 DATAFLOW_ID = "DSD_CRS@DF_CRS"
+# Version of the dataflow: a release of the dataset (its structure and data).
 DATAFLOW_VERSION = "1.6"
 
-# Keys follow the dimension order DONOR.RECIPIENT.SECTOR.MEASURE.CHANNEL.MODALITY.FLOW_TYPE.PRICE_BASE.MD_DIM.MD_ID.UNIT_MEASURE
-# ODA (100), all sectors (1000), all channels and modalities (_T), commitments (C), constant prices (Q), aggregates (_T).
+# Data queries select one or more codes for each dimension of the dataflow, separated by dots, in this order (an empty
+# position means all codes):
+#   1. DONOR: a donor code, e.g. GBR, or DAC_EC (all DAC members, i.e. DAC countries and EU institutions).
+#   2. RECIPIENT: a recipient code, e.g. IND, or DPGC (all developing countries).
+#   3. SECTOR: 1000 is all sectors.
+#   4. MEASURE: 100 is official development assistance (ODA).
+#   5. CHANNEL: channel of delivery (e.g. through NGOs or multilateral organizations); _T is all channels.
+#   6. MODALITY: type of aid (e.g. budget support, projects, refugees in donor countries); _T is all types.
+#   7. FLOW_TYPE: C is commitments (D would be disbursements).
+#   8. PRICE_BASE: Q is constant prices (of the base year in the data, 2024 in this release); V is current prices.
+#   9. MD_DIM: _T is totals (DD would be project-level rows).
+#  10. MD_ID: the project identifier (left empty, i.e. all).
+#  11. UNIT_MEASURE: USD (US dollars, in millions).
 KEYS = {
     # All donors, to all developing countries (DPGC).
     "by donor": ".DPGC.1000.100._T._T.C.Q._T..USD",

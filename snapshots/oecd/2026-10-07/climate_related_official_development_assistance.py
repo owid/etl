@@ -41,26 +41,54 @@ paths = PathFinder(__file__)
 # of the World Bank. The garden step computes the totals of groups of recipients from their members, so they use the
 # same classification even when the dataflow links to an older hierarchy (version 1.6 links to recipients version 1.5).
 BASE_URL = "https://sdmx.oecd.org/dcd-public/rest"
+# Publisher of the dataflow: the OECD's Development Co-operation Directorate (DCD), Financing for Sustainable Development
+# division (FSD).
 AGENCY = "OECD.DCD.FSD"
+# Dataflow (dataset) identifier: "<data structure>@<dataflow>".
 DATAFLOW_ID = "DSD_RIOMRKR@DF_RIOMARKERS"
+# Version of the dataflow: a release of the dataset (its structure and data).
 DATAFLOW_VERSION = "1.6"
+# Hierarchical codelists, which define the members of each group of recipients (regions, income groups, least developed
+# countries...) and of donors (DAC countries, G7...). They have their own versions.
 HIERARCHIES = {"recipient_groups.xml": "HCL_DACRECIPIENTS", "donor_groups.xml": "HCL_DACDONORS"}
 
-# Keys follow the dimension order DONOR.RECIPIENT.SECTOR.MEASURE.ALLOCABLE.MARKER.SCORE.FLOW_TYPE.PRICE_BASE.MD_DIM.MD_ID.UNIT_MEASURE
-# Markers: 10 (biodiversity), 20 (climate change mitigation), 30 (climate change adaptation), 40 (desertification),
-# 50 (environment).
-# Scores: 2 (principal), 1 (significant), 0 (screened, not targeted), 99 (not screened).
-# Totals of all sectors (1000), all scores and all markers, by donor (to all developing countries, DPGC) and by recipient
-# (from all DAC members, DAC_EC).
+# Data queries select one or more codes for each dimension of the dataflow, separated by dots, in this order (an empty
+# position means all codes, and "+" joins several codes):
+#   1. DONOR: a donor code, e.g. GBR, 4EU001 (EU institutions), or DAC_EC (all DAC members, i.e. DAC countries and EU
+#      institutions).
+#   2. RECIPIENT: a recipient code, e.g. IND, F6 (South of Sahara), LDC (least developed countries), DPGC (all
+#      developing countries), or DPGC_X (developing countries, unspecified: aid not assigned to any country or region).
+#   3. SECTOR: a DAC sector code, e.g. 230 (energy); 1000 is all sectors.
+#   4. MEASURE: 100 is official development assistance (ODA), the only option.
+#   5. ALLOCABLE: 2 is bilateral allocable aid (aid assigned to a recipient and a sector, which is what the Rio markers
+#      apply to), the only option.
+#   6. MARKER: 10 (biodiversity), 20 (climate change mitigation), 30 (climate change adaptation), 40 (desertification),
+#      50 (environment).
+#   7. SCORE: 2 (principal objective), 1 (significant objective), 0 (screened, not targeted), 99 (not screened).
+#   8. FLOW_TYPE: C is commitments, the only option.
+#   9. PRICE_BASE: Q is constant prices (of the base year in the data, 2024 in this release); V is current prices.
+#  10. MD_DIM: _T is totals; DD is project-level rows ("drilldown").
+#  11. MD_ID: the project identifier (left empty, i.e. all).
+#  12. UNIT_MEASURE: USD (US dollars, in millions).
+# Totals of all sectors, all markers and all scores, by donor (to all developing countries) and by recipient (from all DAC
+# members).
 KEY_TOTALS_BY_DONOR = ".DPGC.1000.100.2...C.Q._T..USD"
 KEY_TOTALS_BY_RECIPIENT = "DAC_EC..1000.100.2...C.Q._T..USD"
-# Totals by donor and sector, for the climate markers. Sectors are the DAC sectors (three-digit codes) and their groups.
+# Totals by donor and sector, for the climate markers: the DAC sectors (three-digit codes) and their groups.
 SECTORS = [
-    "1000", "450", "100", "110", "120", "130", "140", "150", "160", "200", "210", "220", "230", "240", "250", "300",
-    "310", "320", "331", "332", "400", "410", "430", "500", "520", "530", "600", "700", "720", "730", "740", "998",
+    "1000",  # All sectors
+    "450",  # Sector allocable
+    "100", "110", "120", "130", "140", "150", "160",  # Social infrastructure: education, health, population, water...
+    "200", "210", "220", "230", "240", "250",  # Economic infrastructure: transport, communications, energy, banking...
+    "300", "310", "320", "331", "332",  # Production: agriculture, industry, trade, tourism
+    "400", "410", "430",  # Multi-sector: general environment protection, other multisector
+    "500", "520", "530",  # Commodity aid: development food assistance, other commodity assistance
+    "600",  # Action relating to debt
+    "700", "720", "730", "740",  # Humanitarian aid: emergency response, reconstruction, disaster prevention
+    "998",  # Unallocated / unspecified
 ]  # fmt: skip
 KEY_TOTALS_BY_SECTOR = f".DPGC.{'+'.join(SECTORS)}.100.2.20+30..C.Q._T..USD"
-# Activities: all sectors at project level (DD), climate markers, principal and significant scores only.
+# Project-level rows of all donors, recipients and sectors, for the climate markers, principal and significant only.
 KEY_ACTIVITIES = "...100.2.20+30.1+2.C.Q.DD..USD"
 
 # The API allows only a few dozen downloads per hour, so activities are fetched in blocks of years (recent years are

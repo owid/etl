@@ -16,25 +16,24 @@ paths = PathFinder(__file__)
 # bump BOTH this constant and `definitions.inflation_year` in the garden .meta.yml.
 CONSTANT_PRICE_BASE_YEAR = 2024
 
-# Dimensions that the snapshot queries fix to a single value: ODA (100), bilateral allocable (2), commitments (C),
-# constant prices (Q), US dollars, in millions (unit multiplier 6).
+# Dimensions that the snapshot queries fix to a single value (see the snapshot scripts for all dimensions and codes).
 EXPECTED_FIXED_VALUES = {
-    "MEASURE": 100,
-    "ALLOCABLE": 2,
-    "FLOW_TYPE": "C",
-    "PRICE_BASE": "Q",
-    "UNIT_MEASURE": "USD",
-    "BASE_PER": CONSTANT_PRICE_BASE_YEAR,
-    "UNIT_MULT": 6,
+    "MEASURE": 100,  # Official development assistance (ODA)
+    "ALLOCABLE": 2,  # Bilateral allocable aid (assigned to a recipient and a sector)
+    "FLOW_TYPE": "C",  # Commitments
+    "PRICE_BASE": "Q",  # Constant prices
+    "UNIT_MEASURE": "USD",  # US dollars
+    "BASE_PER": CONSTANT_PRICE_BASE_YEAR,  # Base year of constant prices
+    "UNIT_MULT": 6,  # Unit multiplier: values are in millions (10^6)
 }
 
 # The same, for the totals of bilateral ODA from the Creditor Reporting System (CRS), which has no "allocable" dimension
-# but has channel and modality dimensions (all channels and modalities, "_T").
+# but has channel and modality dimensions.
 EXPECTED_FIXED_VALUES_CRS = {
     **{column: value for column, value in EXPECTED_FIXED_VALUES.items() if column != "ALLOCABLE"},
-    "SECTOR": 1000,
-    "CHANNEL": "_T",
-    "MODALITY": "_T",
+    "SECTOR": 1000,  # All sectors
+    "CHANNEL": "_T",  # All channels of delivery
+    "MODALITY": "_T",  # All types of aid
 }
 
 # Columns to keep from the data files, and their new names.

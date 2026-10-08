@@ -11,10 +11,13 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Rio markers (and the environment policy marker) included in the totals.
+# Rio markers (and the environment policy marker) included in the totals: 10 (biodiversity), 20 (climate change
+# mitigation), 30 (climate change adaptation), 40 (desertification), 50 (environment).
 MARKERS = [10, 20, 30, 40, 50]
 MARKER_MITIGATION = 20
 MARKER_ADAPTATION = 30
+# Scores of each project for each marker: 2 (principal objective), 1 (significant objective), 0 (screened, not
+# targeted), and 99 or empty (not screened).
 SCORE_PRINCIPAL = 2
 SCORE_SIGNIFICANT = 1
 
@@ -24,20 +27,37 @@ START_YEAR_ADAPTATION_MARKER = 2010
 # Rio markers were collected on a trial basis from 2004, and became a permanent part of the reporting in 2008.
 START_YEAR_PERMANENT_MARKERS = 2008
 
-# Codes of all developing countries, all DAC members, and all sectors.
+# Codes of all developing countries (as recipients), all DAC members (DAC countries and EU institutions, as donors),
+# and all sectors.
 CODE_ALL_RECIPIENTS = "DPGC"
 CODE_ALL_DONORS = "DAC_EC"
 CODE_ALL_SECTORS = "1000"
 
 # Groups of donors, defined in the OECD hierarchy of donors.
-DONOR_GROUPS = ["DAC_EC", "DAC", "DACEU", "DACEU_EC", "G7"]
+DONOR_GROUPS = [
+    "DAC_EC",  # DAC members: DAC countries and EU institutions
+    "DAC",  # DAC countries
+    "DACEU",  # DAC EU countries
+    "DACEU_EC",  # DAC EU countries and EU institutions
+    "G7",  # G7 countries
+]
 
-# Codes of recipients that are kept: everything except regional "unspecified" codes (e.g. "Africa, regional"), which
-# are not countries or groups.
-CODES_UNSPECIFIED_KEPT = ["DPGC_X", "INC_X", "INCWB_X"]
+# Codes of recipients that are kept: everything except regional "unspecified" codes (ending in "_X", e.g. "F_X",
+# Africa, regional), which are aid to a region not assigned to a country, not groups of countries.
+CODES_UNSPECIFIED_KEPT = [
+    "DPGC_X",  # Developing countries, unspecified (aid not assigned to any country or region)
+    "INC_X",  # Recipients not classified by income group (OECD)
+    "INCWB_X",  # Countries not classified by the World Bank
+]
 
 # World Bank income groups of recipients, whose members change every year.
-WORLD_BANK_INCOME_GROUPS = ["OLICWB", "LMICWB", "UMICWB", "HICSWB", "INCWB_X"]
+WORLD_BANK_INCOME_GROUPS = [
+    "OLICWB",  # Low-income countries
+    "LMICWB",  # Lower-middle-income countries
+    "UMICWB",  # Upper-middle-income countries
+    "HICSWB",  # High-income countries
+    "INCWB_X",  # Countries not classified by the World Bank
+]
 
 # The OECD uses the same name for the country of Micronesia and the region of Micronesia (in Oceania).
 NAMES_BY_CODE = {"O8": "Micronesia (OECD)"}
