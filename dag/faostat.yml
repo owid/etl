@@ -252,8 +252,8 @@ steps:
   # whose chain runs from 2010; the main source of the interactive waterfall.
   viz://bespoke/faostat/latest/food_supply_chain_scl:
     - data://garden/faostat/2026-09-04/food_supply_chain_scl
-  # The same files built with the Food Balance Sheets method, whose chain runs from 1961; made for the static
-  # waterfall of the world in 1968 (the year The Population Bomb was published).
-  viz://bespoke/faostat/latest/food_supply_chain_fbs:
+  # Static viz step: the same files built with the Food Balance Sheets method, whose chain runs from 1961, for the
+  # static waterfall of the world in 1968 (the year The Population Bomb was published).
+  viz://static/faostat/2026-09-04/food_supply_chain_fbs:
     - data://garden/faostat/2026-09-04/food_supply_chain_fbs
   ######################################################################################################################

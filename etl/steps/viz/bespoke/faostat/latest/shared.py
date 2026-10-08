@@ -1,4 +1,5 @@
-"""Common logic of the food supply chain bespoke viz steps.
+"""Common logic of the food supply chain viz steps: the bespoke step `food_supply_chain_scl` (interactive waterfall) and
+the static step `viz://static/faostat/2026-09-04/food_supply_chain_fbs` (waterfall of the world in 1968).
 
 Each step reads whichever food supply chain garden dataset is its dependency in the DAG (`food_supply_chain_fbs` or
 `food_supply_chain_scl`) and writes, in the shape of the other bespoke-visualization feeds (food trade, causes of
@@ -14,9 +15,10 @@ Reshaping only; all logic lives in the garden steps. Values are FAO's sign conve
 "direction": "out" are magnitudes to subtract along the chain (a negative value there adds back), and the chain
 lands exactly on "food".
 
-The files go to the step's output folder; the framework syncs that folder to the R2 path of the environment being
-built, so each feed is served at `<root>/v1/bespoke/faostat/latest/<step_name>/` -- `api.ourworldindata.org` on
-production, and `api-staging.owid.io/<env>` on a staging server or a laptop.
+The files go to the step's output folder. For the bespoke step, the framework syncs that folder to the R2 path of the
+environment being built, so each feed is served at `<root>/v1/bespoke/faostat/latest/<step_name>/` --
+`api.ourworldindata.org` on production, and `api-staging.owid.io/<env>` on a staging server or a laptop. The static
+step's files stay local.
 """
 
 import json
@@ -63,7 +65,8 @@ def _save(paths: PathFinder, data: dict, filename: str) -> None:
         json.dump(data, f, separators=(",", ":"))
 
 
-def build_feed(paths: PathFinder) -> None:
+def build_feed(paths: PathFinder, countries: list[str] | None = None, years: list[int] | None = None) -> None:
+    """Write the feed files; `countries` and `years`, if given, restrict them to those countries and years."""
     #
     # Load inputs: whichever of the two garden datasets is the dependency.
     #
@@ -72,6 +75,14 @@ def build_feed(paths: PathFinder) -> None:
     short_name = dependencies[0].split("/")[-1]
     ds = paths.load_dataset(short_name)
     tables = {nutrient: ds.read(nutrient) for nutrient in NUTRIENTS}
+    for nutrient, tb in tables.items():
+        if countries is not None:
+            assert set(countries) <= set(tb["country"].astype(str)), f"Countries missing in {nutrient!r}: {countries}"
+            tb = tb[tb["country"].astype(str).isin(countries)]
+        if years is not None:
+            assert set(years) <= set(tb["year"]), f"Years missing in {nutrient!r}: {years}"
+            tb = tb[tb["year"].isin(years)]
+        tables[nutrient] = tb.reset_index(drop=True)
 
     stage_keys = [key for key, _, _ in STAGES]
     for nutrient, tb in tables.items():
