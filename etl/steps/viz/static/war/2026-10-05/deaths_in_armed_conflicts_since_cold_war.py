@@ -67,6 +67,13 @@ Final frame (`28828:11`), all positions in frame px from the top left:
 - The Source in the final frame abbreviates first names ("Sundberg, R., and E. Melander. 2013. ..."), unlike
   `SOURCE` in this step. That was the design team's edit; keep the frame's form when updating it.
 
+Featured image for the article: frame `nature-of-armed-conflict-featured-image-1989-2025` (`28832:42`) on the same
+page, 1200 x 630, background "Website/Background/Beige", PNG export at 2x. Bars only, no text: three bars 1035px
+wide and 84px tall at x=82 and y = 73 / 273 / 473 (the 2025 featured image's geometry), with the same segments,
+order and fill styles as the final chart, each at 80% layer opacity. The 2025 image used its own muted colors at
+full opacity; 80% was chosen to come close to its strength (measured as CIELAB difference from the background,
+matching opacities per segment range from 60% to 85%). Rebuild it from the new shares at each update.
+
 To update it next time: duplicate the final frame, then for each bar set every segment's x and width from the new
 shares (and move its name and value label with it), replace the numbers and years in the texts, and update the
 Source to the new UCDP article. If the ranking of segments changes, reorder the segments together with their names,
