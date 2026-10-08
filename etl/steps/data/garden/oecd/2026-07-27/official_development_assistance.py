@@ -175,6 +175,17 @@ SECTORS_DAC5 = {
 }
 
 
+# Recipients whose aid is not assigned to a single country: aid to a region as a whole (e.g. "Africa, regional (OECD)"),
+# or to a broader group (e.g. "Developing countries, unspecified (OECD)").
+SUFFIXES_NOT_ASSIGNED = (", regional (OECD)", ", unspecified (OECD)")
+# Annotation shown next to their names in charts.
+ANNOTATION_NOT_ASSIGNED = "not assigned to a single country"
+# Regions whose total is the sum of their subregions and of the aid to the region as a whole (in the OECD's data).
+REGIONS_WITH_PARTS = {
+    "Africa (OECD)": ["North of Sahara (OECD)", "South of Sahara (OECD)", "Africa, regional (OECD)"],
+}
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -279,6 +290,7 @@ def run() -> None:
     tb = tb.replace([float("inf"), float("-inf")], None)
 
     sanity_check_outputs(tb=tb, subcomponent_list=INDONOR_SUBCOMPONENTS)
+    names_not_assigned = sanity_check_not_assigned(tb=tb)
 
     tb = tb.format(["country", "year", "donor", "sector"], short_name=paths.short_name)
     tb_dac2a = tb_dac2a.format(["country", "year", "donor"])
@@ -288,7 +300,12 @@ def run() -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = paths.create_dataset(
-        tables=[tb, tb_dac2a], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        tables=[tb, tb_dac2a],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
+        yaml_params={
+            "ENTITY_ANNOTATIONS_RECIPIENTS": "\n".join(f"{name}: {ANNOTATION_NOT_ASSIGNED}" for name in names_not_assigned)
+        },
     )
 
     # Save changes in the new garden dataset.
@@ -788,3 +805,28 @@ def sanity_check_outputs(tb: Table, subcomponent_list: list[str]) -> None:
             f"oda_indonor_{suffix} has a value in {sorted(incomplete_years)}, where the source "
             f"withdrew a component it reported the previous year."
         )
+
+
+def sanity_check_not_assigned(tb: Table) -> list[str]:
+    """Check the recipients whose aid is not assigned to a single country, and return their names.
+
+    Their aid is already included in the totals of their regions, which the metadata tells readers.
+    """
+    recipients = set(tb.loc[tb["oda_recipient"].notna(), "country"])
+    names_not_assigned = sorted(name for name in recipients if name.endswith(SUFFIXES_NOT_ASSIGNED))
+    assert "Africa, regional (OECD)" in names_not_assigned, "Africa, regional is missing from the recipients."
+    # Regional entities must not be named as whole regions.
+    assert not {"Central Asia (OECD)", "South Asia (OECD)"} & recipients, "A regional entity is named as a whole region."
+
+    # The total of a region includes the aid to the region as a whole.
+    tb_oda = tb[tb["oda_recipient"].notna()].pivot_table(
+        index=["donor", "year"], columns="country", values="oda_recipient", observed=True
+    )
+    for region, parts in REGIONS_WITH_PARTS.items():
+        both = tb_oda[[region] + parts].dropna()
+        difference = (both[parts].sum(axis=1) - both[region]).abs()
+        assert len(both) > 0 and (difference <= 1e-3 * both[region].abs() + 1e5).all(), (
+            f"{region} is not the sum of {parts}."
+        )
+
+    return names_not_assigned
