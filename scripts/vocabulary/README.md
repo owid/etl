@@ -214,18 +214,7 @@ The LLM is instructed to:
 
 ## Cost & Performance
 
-**Gemini 3 Flash Preview pricing (as of Feb 2025):**
-- Input: $0.0375 per 1M tokens
-- Output: $0.15 per 1M tokens
-
-**Gemini 2.5 Flash Lite pricing:**
-- Input: $0.015 per 1M tokens
-- Output: $0.06 per 1M tokens
-
-**Example performance:**
-- Single topic: ~2-4 seconds, $0.0001-0.0002
-- Multiple topics: Runs in parallel, ~4-6 seconds total, $0.0003-0.0006
-- All topics (~125): ~10-15 seconds, $0.02-0.05
+Each run ends with a cost estimate, computed from the per-model rates in `PRICING` (`vocabulary.py`). Models missing from it report their cost as unknown.
 
 ## Requirements
 

@@ -131,7 +131,7 @@ references written before a rename point at the old one):
 | articles | `posts_gdocs_links` (`grapher`, `guided-chart`) + `linkType='url'` scan | `embed` or `link` by `componentType` |
 | explorers | `explorer_charts` (by chart id) | `embed` |
 | narrative charts | `narrative_charts.parentChartId` | `link` (renders its own config) |
-| ↳ its placements | `posts_gdocs_links` where `linkType='narrative-chart'`, `target` = the name | `embed`, surface `gdoc (narrative chart)` |
+| ↳ its placements | `posts_gdocs_links` where `linkType='narrative-chart'`, `target` = the name; plus data insights whose front matter names it (`posts_gdocs.content->>'$."narrative-chart"'`), which write no link row | `embed`, surface `gdoc (narrative chart)` |
 | data insights | `posts_gdocs.content->>'$."grapher-url"'` | `embed` |
 | static viz | `static_viz.grapherSlug` | `embed` |
 | key charts | `chart_tags` where `keyChartLevel > 0` | `render` |
@@ -234,8 +234,8 @@ means UNKNOWN, not "nothing references it".
 - Indicator-level `presentation.grapher_config` lives in garden/grapher
   `.meta.yml`, not the DB. It is invisible here and needs a repo grep, and it fans
   out to every thin MDim/explorer view that inherits it.
-- Data insights are matched on `grapher-url`; one storing the reference elsewhere
-  is missed.
+- Data insights are matched on `grapher-url` (charts) and `narrative-chart` (narrative
+  charts) in their front matter; one storing the reference elsewhere is missed.
 - Article sweeps cover what `posts_gdocs_links` recorded — charts nested inside
   layout containers may not produce a row.
 - Public Datasette's `posts_gdocs_links` lags; verify article fixes against the

@@ -51,7 +51,7 @@ async def test_fetch_indicator_data_tool():
         result = await client.call_tool("fetch_indicator_data", {"indicator_id": 2118})
         assert result is not None
         assert isinstance(result.content, list)
-        assert len(result.content) == 1
+        assert len(result.content) == 2  # data + shutdown notice
 
         # Check the tool result content
         content = result.content[0]
@@ -89,7 +89,7 @@ async def test_fetch_indicator_data_tool_for_entity():
         result = await client.call_tool("fetch_indicator_data", {"indicator_id": 2118, "entity": "USA"})
         assert result is not None
         assert isinstance(result.content, list)
-        assert len(result.content) == 1
+        assert len(result.content) == 2  # data + shutdown notice
 
         # Check the tool result content
         content = result.content[0]
@@ -115,7 +115,7 @@ async def test_fetch_indicator_metadata_tool():
         result = await client.call_tool("fetch_indicator_metadata", {"indicator_id": 2118})
         assert result is not None
         assert isinstance(result.content, list)
-        assert len(result.content) == 1
+        assert len(result.content) == 2  # data + shutdown notice
 
         # Check the tool result content
         content = result.content[0]
@@ -501,3 +501,35 @@ async def test_fetch_chart_data_follows_redirect():
             "fetch_chart_data", {"id": "share-electricity-renewables", "time": "2020..2020", "countries": "DEU"}
         )
         assert output.structured_content["metadata"]["rows"] > 0  # ty: ignore
+
+
+@pytest.mark.asyncio
+async def test_tool_results_carry_shutdown_notice():
+    """Test that every tool result tells the caller about the shutdown exactly once, even on cache hits."""
+    async with Client(mcp) as client:
+        assert "github.com/owid/skills" in (client.instructions or "")
+        for _ in range(2):  # the second call is served from the response cache
+            output = await client.call_tool("search_chart", {"query": "population"})
+            notices = [c for c in output.content if isinstance(c, TextContent) and "github.com/owid/skills" in c.text]
+            assert len(notices) == 1
+
+
+@pytest.mark.asyncio
+async def test_tool_errors_carry_shutdown_notice():
+    """Test that a failing tool call also tells the caller about the shutdown, exactly once."""
+    async with Client(mcp) as client:
+        with pytest.raises(ToolError) as exc_info:
+            await client.call_tool("run_sql", {"query": "DELETE FROM charts"})
+        assert "Only SELECT statements are allowed" in str(exc_info.value)
+        assert str(exc_info.value).count("github.com/owid/skills") == 1
+
+
+@pytest.mark.asyncio
+async def test_connect_time_methods_succeed():
+    """Test the requests clients send on connect, whose middleware message is a plain dict rather than a model."""
+    # Connect the way today's clients do: the legacy initialize handshake, where ping exists.
+    async with Client(mcp, mode="legacy") as client:
+        assert await client.ping()
+        assert await client.list_resources() == []
+        assert await client.list_resource_templates() == []
+        assert await client.list_prompts() == []
