@@ -32,7 +32,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import humps
+import jinja2
 from owid.catalog import Variable, s3_utils
+from owid.catalog.core import jinja
 from structlog import get_logger
 
 from etl import config
@@ -224,12 +226,15 @@ def add_feed_metadata(manifest: dict, metadata: dict) -> dict:
     return {**manifest, **metadata}
 
 
-# Markers of a metadata value that is still a Jinja template. The templates in a `.meta.yml` are
-# rendered per dimension combination when a grapher step builds its wide tables, so the single
-# long column a bespoke feed reads still carries the template text (`gbd_treemap`'s title is
-# `<% if metric == ... %>`). Shipping that as an indicator title would be worse than shipping
-# nothing, so those fields are dropped -- with a warning, since a feed that wanted the title has
-# to get it from somewhere else.
+# Markers of a metadata value that is still a Jinja template. A grapher step renders the templates
+# of a `.meta.yml` with each column's dimensions, and a column without dimensions with none. A
+# bespoke feed reads garden columns, so it renders them here the same way, with no dimensions:
+# templates that do not depend on a dimension (population's `display.isProjection`, which travels
+# into every per-capita column) render normally. Templates that need a dimension, like
+# `gbd_treemap`'s title (`<% if metric == ... %>`), fail to render on the single long column a feed
+# reads. Shipping their template text as an indicator title would be worse than shipping nothing,
+# so those fields are dropped -- with a warning, since a feed that wanted the title has to get it
+# from somewhere else.
 JINJA_MARKERS = ("<%", "<<")
 
 # Presentation fields that exist only inside grapher and have no place in a feed's metadata.
@@ -260,7 +265,7 @@ def variable_meta_to_api_dict(
     if update_period_days is not None:
         api["updatePeriodDays"] = update_period_days
 
-    dropped, api = _drop_unrendered_templates(api)
+    dropped, api = _render_templates(api)
     if api.get("name") is None and default_title is not None:
         api["name"] = default_title
     if dropped:
@@ -275,8 +280,22 @@ def _is_template(value: object) -> bool:
     return isinstance(value, str) and any(marker in value for marker in JINJA_MARKERS)
 
 
-def _drop_unrendered_templates(value: dict, path: str = "") -> tuple[list[str], dict]:
-    """Drop every string field that is still a Jinja template, and report which ones went.
+def _render(item: object) -> object:
+    """A field's value with its Jinja template rendered without dimensions, or `_UNRENDERABLE`."""
+    if not _is_template(item):
+        return item
+    try:
+        return jinja._expand_jinja_text(item, {})  # ty: ignore[invalid-argument-type]
+    except jinja2.exceptions.UndefinedError:
+        # The template needs a dimension that a single column does not have.
+        return _UNRENDERABLE
+
+
+_UNRENDERABLE = object()
+
+
+def _render_templates(value: dict, path: str = "") -> tuple[list[str], dict]:
+    """Render every Jinja template field without dimensions, drop the ones that need a dimension, and report those.
 
     Lists are walked too, element by element: `description_key` is a list of bullets, and a
     dataset that templates one of them (gbd_treemap does) would otherwise have the template text
@@ -286,21 +305,24 @@ def _drop_unrendered_templates(value: dict, path: str = "") -> tuple[list[str], 
     kept = {}
     for key, item in value.items():
         name = f"{path}{key}"
-        if _is_template(item):
+        rendered = _render(item)
+        if rendered is _UNRENDERABLE:
             dropped.append(name)
-        elif isinstance(item, dict):
-            nested_dropped, nested = _drop_unrendered_templates(item, path=f"{name}.")
+        elif rendered is jinja._REMOVE_KEY:
+            continue
+        elif isinstance(rendered, dict):
+            nested_dropped, nested = _render_templates(rendered, path=f"{name}.")
             dropped += nested_dropped
             kept[key] = nested
-        elif isinstance(item, list):
-            templated = [i for i, element in enumerate(item) if _is_template(element)]
-            dropped += [f"{name}[{i}]" for i in templated]
-            remaining = [element for i, element in enumerate(item) if i not in set(templated)]
+        elif isinstance(rendered, list):
+            elements = [_render(element) for element in rendered]
+            dropped += [f"{name}[{i}]" for i, element in enumerate(elements) if element is _UNRENDERABLE]
+            remaining = [element for element in elements if element not in (_UNRENDERABLE, jinja._REMOVE_KEY)]
             # A list emptied by the filter is dropped rather than published as [].
             if remaining:
                 kept[key] = remaining
-        elif item is not None:
-            kept[key] = item
+        elif rendered is not None:
+            kept[key] = rendered
     return dropped, kept
 
 
