@@ -56,6 +56,8 @@ STAGES = [
 ]
 # Decimal places kept per unit.
 NUM_DECIMALS = {"energy": 1, "protein": 2, "mass": 4}
+# Largest size, as a share of food, of a stage that can be left out of the files as negligible.
+MAX_NEGLIGIBLE_STAGE_SHARE = 0.02
 
 
 def _save(paths: PathFinder, data: dict, filename: str) -> None:
@@ -69,10 +71,10 @@ def build_feed(
     paths: PathFinder,
     countries: list[str] | None = None,
     years: list[int] | None = None,
-    zero_stages_to_drop: list[str] | None = None,
+    negligible_stages_to_drop: list[str] | None = None,
 ) -> None:
     """Write the feed files; `countries` and `years`, if given, restrict them to those countries and years, and
-    `zero_stages_to_drop` lists stages left out of the files, which must be zero in all of them."""
+    `negligible_stages_to_drop` lists stages left out of the files, which must be negligible compared to food."""
     #
     # Load inputs: whichever of the two garden datasets is the dependency.
     #
@@ -89,12 +91,13 @@ def build_feed(
             assert set(years) <= set(tb["year"]), f"Years missing in {nutrient!r}: {years}"
             tb = tb[tb["year"].isin(years)]
         tables[nutrient] = tb.reset_index(drop=True)
-        for key in zero_stages_to_drop or []:
-            assert (tables[nutrient][key] == 0).all(), (
-                f"Stage {key!r} is not zero in {nutrient!r}, so it can't be dropped."
+        for key in negligible_stages_to_drop or []:
+            tb = tables[nutrient]
+            assert (tb[key].abs() <= MAX_NEGLIGIBLE_STAGE_SHARE * tb["food"]).all(), (
+                f"Stage {key!r} is not negligible in {nutrient!r}, so it can't be dropped."
             )
 
-    stages = [stage for stage in STAGES if stage[0] not in (zero_stages_to_drop or [])]
+    stages = [stage for stage in STAGES if stage[0] not in (negligible_stages_to_drop or [])]
     stage_keys = [key for key, _, _ in stages]
     for nutrient, tb in tables.items():
         assert set(stage_keys) <= set(tb.columns), (
