@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import pandas as pd
 from owid.catalog import Table
+from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.helpers import PathFinder
@@ -285,7 +285,7 @@ def create_members(tb_groups: Table, hierarchy: str, entity_codes: list[str]) ->
         return set().union(*(leaves(child) for child in children[code]))
 
     rows = [(code, member) for code in entity_codes for member in sorted(leaves(code))]
-    return Table(pd.DataFrame(rows, columns=["entity_code", "member_code"]))
+    return pr.read_from_records(rows, columns=["entity_code", "member_code"])
 
 
 def aggregate_by_members(tb: Table, code_column: str, members: Table, keys: list[str], columns: list[str]) -> Table:
@@ -421,9 +421,7 @@ def sanity_check_inputs(tb_totals: Table, tb_activities: Table) -> None:
         ("donor_code", {"recipient_code": CODE_ALL_RECIPIENTS, "sector_code": CODE_ALL_SECTORS}),
         ("recipient_code", {"donor_code": CODE_ALL_DONORS, "sector_code": CODE_ALL_SECTORS}),
     ]:
-        mask = pd.Series(True, index=tb_targeted.index)
-        for column, code in filters.items():
-            mask &= tb_targeted[column] == code
+        mask = tb_targeted[list(filters)].eq(list(filters.values())).all(axis=1)
         totals = tb_targeted[mask].groupby([by, "marker", "year"], observed=True)["value"].sum()
         sums = tb_activities.groupby([by, "marker", "year"], observed=True)["value"].sum()
         # Compare only individual donors or recipients (not groups).
@@ -464,11 +462,14 @@ def sanity_check_recipient_groups(
 ) -> None:
     """Groups of recipients computed from their members must match the OECD's own group totals, except for the World Bank
     income groups, whose members change every year and which the OECD may compute with an older classification."""
-    computed = pd.DataFrame(tb_computed).set_index(["entity_code"] + keys)["value"].rename("computed")
-    oecd = pd.DataFrame(tb_oecd).set_index(["entity_code"] + keys)["value"].rename("oecd")
-    both = pd.concat([computed, oecd], axis=1, join="inner")
-    off = both[(both["computed"] - both["oecd"]).abs() > RELATIVE_TOLERANCE * both["oecd"].abs() + 0.01]
-    groups_off = set(off.index.get_level_values("entity_code"))
+    columns = ["entity_code"] + keys + ["value"]
+    both = pr.merge(
+        tb_computed[columns], tb_oecd[columns], on=columns[:-1], how="inner", suffixes=("_computed", "_oecd")
+    )
+    off = both[
+        (both["value_computed"] - both["value_oecd"]).abs() > RELATIVE_TOLERANCE * both["value_oecd"].abs() + 0.01
+    ]
+    groups_off = set(off["entity_code"])
     if groups_off:
         log.warning(f"Groups of recipients whose {name} differs from the OECD's: {sorted(groups_off)}")
     assert groups_off <= set(expected_differences), f"Unexpected differences in {name} for: {sorted(groups_off)}."

@@ -3,7 +3,6 @@
 import xml.etree.ElementTree as ET
 import zipfile
 
-import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
@@ -126,14 +125,12 @@ def run() -> None:
             tb[column] = tb[column].astype("category")
 
     # Names of donors, recipients and sectors, and the hierarchy of sectors.
-    tb_codes = Table(extract_codelists(structure=structure)).copy_metadata(tb_totals)
+    tb_codes = snap.read_from_records(extract_codelists(structure=structure))
+    assert set(tb_codes["codelist"]) == set(CODELISTS.values()), "Missing codelists in the structure."
     # Hierarchy of groups of recipients and donors (each group with its direct children).
-    tb_groups = Table(
-        pd.concat([extract_hierarchy(root=root, kind=kind) for kind, root in groups.items()], ignore_index=True)
-    ).copy_metadata(tb_totals)
-    for tb in [tb_codes, tb_groups]:
-        for column in tb.columns:
-            tb[column].metadata.origins = tb_totals["value"].metadata.origins
+    tb_groups = snap.read_from_records(
+        [row for kind, root in groups.items() for row in extract_hierarchy(root=root, kind=kind)]
+    ).drop_duplicates()
 
     # Improve tables format.
     tables = [
@@ -154,7 +151,7 @@ def run() -> None:
     ds_meadow.save()
 
 
-def extract_codelists(structure: ET.Element) -> pd.DataFrame:
+def extract_codelists(structure: ET.Element) -> list[dict]:
     """Extract the English name and parent of every code in the relevant codelists."""
     rows = []
     for codelist in structure.iter(NS_STRUCTURE + "Codelist"):
@@ -171,12 +168,10 @@ def extract_codelists(structure: ET.Element) -> pd.DataFrame:
                     "parent_code": parent.get("id") if parent is not None else None,
                 }
             )
-    df = pd.DataFrame(rows)
-    assert set(df["codelist"]) == set(CODELISTS.values()), "Missing codelists in the structure."
-    return df
+    return rows
 
 
-def extract_hierarchy(root: ET.Element, kind: str) -> pd.DataFrame:
+def extract_hierarchy(root: ET.Element, kind: str) -> list[dict]:
     """Extract parent-child relations of the main hierarchy of a hierarchical codelist."""
     hierarchy = next(h for h in root.iter(NS_STRUCTURE + "Hierarchy") if h.get("id") == "H")
     rows = []
@@ -189,7 +184,7 @@ def extract_hierarchy(root: ET.Element, kind: str) -> pd.DataFrame:
             walk(child, code)
 
     walk(hierarchy, None)
-    return pd.DataFrame(rows).drop_duplicates()
+    return rows
 
 
 def sanity_check_fixed_dimensions(tb: Table, name: str, expected: dict) -> None:
