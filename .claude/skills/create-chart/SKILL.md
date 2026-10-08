@@ -19,8 +19,8 @@ metadata:
 
 # Creating charts from ETL
 
-A chart authored in ETL is a `viz://chart` step: a `.config.yml` next to a small Python step in
-`etl/steps/viz/chart/<namespace>/latest/`, registered in the DAG and pushed to the grapher DB with
+A chart authored in ETL is a `viz://chart` step: a `.config.yml` (plus a Python step only when it does real
+work) in `etl/steps/viz/chart/<namespace>/latest/`, registered in the DAG and pushed to the grapher DB with
 `--grapher`. The same step type covers two shapes:
 
 - **Single chart** — `dimensions: []` and exactly one view. Pushes as a plain Grapher chart with a slug,
@@ -35,11 +35,12 @@ interchangeable. Explorers (`viz://explorer`) are the sibling with their own ski
 
 ## Overview
 
-Every chart step needs three things:
+Every chart step needs:
 
-1. A **Python step** file (minimal boilerplate)
-2. A **config YAML** file (views, chart settings; dimensions for multidims)
-3. A **DAG entry** in the appropriate `dag/*.yml` file
+1. A **config YAML** file (views, chart settings; dimensions for multidims)
+2. A **DAG entry** in the appropriate `dag/*.yml` file
+3. A **Python step** file — *only* when the chart needs code beyond the YAML (see "Python file: only when it
+   does real work"). Like a snapshot that is just a `.dvc`, a chart can be just a `.config.yml`.
 
 ## Step 1: Identify the indicators
 
@@ -85,8 +86,8 @@ Ask one question: **does the reader need to switch between views?**
 
 ```
 etl/steps/viz/chart/{namespace}/latest/
-├── {short_name}.py
-└── {short_name}.config.yml
+├── {short_name}.config.yml
+└── {short_name}.py          # optional: only if the chart needs code (see below)
 ```
 
 Create the directory if it doesn't exist:
@@ -97,7 +98,10 @@ mkdir -p etl/steps/viz/chart/{namespace}/latest
 The chart's public slug is derived from the short name with underscores replaced by dashes
 (`banning_of_chick_culling` → `banning-of-chick-culling`).
 
-### Python file (same boilerplate for both shapes)
+### Python file: only when it does real work
+
+**Default: don't write one.** When the step has no `.py`, ETL runs this boilerplate itself
+(`VizStep._run_chart_yaml_only` in `etl/steps/__init__.py`), for single charts and multidims alike:
 
 ```python
 from etl.helpers import PathFinder
@@ -110,10 +114,26 @@ def run() -> None:
     c.save()
 ```
 
-This is sufficient for config-driven charts (explicit views in YAML). For more advanced patterns
-(programmatic view generation from table data, combining charts, grouping views, post-processing the config
-before saving — `banning_of_chick_culling.py` expands its map colors from the data), look at existing
-examples in `etl/steps/viz/chart/`.
+So a chart whose views are all written out in the YAML needs only the `.config.yml` and its DAG entry. A
+`.py` that contains exactly the boilerplate above is redundant: don't add one, and delete it when you find
+one.
+
+Write a `.py` when the chart needs something the YAML can't express, e.g.:
+
+- **Generating views from the data**: many dimension combinations built from a table's columns instead of
+  listed by hand (`paths.create_chart(tb=..., ...)`), often after filtering columns to the choices you want
+  (`etl/steps/viz/chart/wb/latest/incomes_pip.py`).
+- **Grouping or combining views**: `c.group_views(...)` to put several indicators on one view, or combining
+  several charts/datasets into one multidim (`incomes_pip.py`, the energy and education multidims).
+- **Config that depends on the data**: values only known after reading the dataset, e.g. map colors for every
+  category present in the data (`etl/steps/viz/chart/animal_welfare/latest/banning_of_chick_culling.py`).
+- **Text built in code**: per-view titles, subtitles or `description_key` assembled from metadata or a
+  pattern, when Jinja in the garden `.meta.yml` isn't enough.
+- **Editing views after they're created**: renaming, reordering or dropping views, or other post-processing
+  before `c.save()`.
+
+The `.py` must keep the same short name as the `.config.yml`, and `paths.load_config()` still loads the YAML,
+so the two work together: put what is static in the YAML and only the dynamic part in code.
 
 ### Config YAML file
 
