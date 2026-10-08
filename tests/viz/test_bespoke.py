@@ -64,22 +64,9 @@ def test_variable_meta_to_api_dict(table):
     assert "topicTags" not in api["presentation"]
 
 
-def test_variable_meta_renders_templates_without_dimensions(table):
-    """A template that does not depend on a dimension renders as the grapher step would render it for a
-    column without dimensions. Population's `isProjection` travels into every per-capita column."""
-    table._fields["value"].display = {
-        "isProjection": "<% if (variant is defined) and (variant != 'estimates') -%> true <%- else -%> false <%- endif -%>",
-        "numDecimalPlaces": 0,
-    }
-
-    api = bespoke.variable_meta_to_api_dict(table["value"])
-
-    assert api["display"] == {"isProjection": False, "numDecimalPlaces": 0}
-
-
 def test_variable_meta_drops_unrendered_templates(table):
-    """A long garden table's metadata can depend on dimensions -- it is rendered per dimension only when a
-    grapher step builds wide tables -- so template text that needs a dimension must not reach the feed."""
+    """A long garden table's metadata is still templated -- it is rendered per dimension only when a
+    grapher step builds wide tables -- so template text must not reach the feed."""
     table._fields["value"].title = "<% if metric == 'Number' %>Deaths<% endif %>"
     table._fields["value"].display = {"name": "<< cause >>", "numDecimalPlaces": 0}
 
