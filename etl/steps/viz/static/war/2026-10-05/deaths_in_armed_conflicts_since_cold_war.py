@@ -27,40 +27,51 @@ the UCDP article no longer matches the data's years, so update `SOURCE` at each 
 
 Figma handoff (1989-2025 version)
 ---------------------------------
+The published design is NOT this step's render. This step's SVG reproduces the 2025 layout (1258 x 1119) and was
+the starting point; the design team then redesigned it by hand at 850 wide (direct labels in place of legends, the
+Default Palette, smaller type), and the final frame was tuned from there. So at the next update, start from the
+final Figma frame and change its numbers, and use this step for the data, the rounding, the order and the texts.
+
 Where: Charts (2026) file `s6Sv60bakebRRW2TxsMQbF`, page "20261005 Conflict deaths since the Cold War (Bastian)"
-(`28739:11`), the first page below the `-----` divider. Left: the published 2025 PNG
-(`deaths-in-armed-conflicts-since-the-end-of-the-cold-war.png`, 1124 x 1000) resized to 1258 wide, layer
-"published-2025 (...)". Right, 100px gap: frame `deaths-in-armed-conflicts-since-the-end-of-the-cold-war-1989-2025`
-(`28740:6`), 1258 x 1119. The frame name is the exported filename; it must be new each update, since the image
-API rejects a duplicate name. No 2026 template is used: the frame keeps the 2025 frame's size and layout.
+(`28739:11`), the first page below the `-----` divider. Frames, left to right:
+- the published 2025 PNG (`deaths-in-armed-conflicts-since-the-end-of-the-cold-war.png`), for comparison;
+- `...-1989-2025-draft-1258` (`28740:6`): this step's SVG, restyled to the 2025 frame's type;
+- `...-1989-2025-before-final-tweaks` (`28806:5`): the design team's redesign, as handed over;
+- `deaths-in-armed-conflicts-since-the-end-of-the-cold-war-1989-2025` (`28828:11`): the FINAL frame, 850 x 736.
+Exactly one frame carries the bare name, because the frame name is the exported filename. Give it a new name at
+each update: the image API rejects a duplicate filename, and the old image must stay reachable.
 
-To rebuild it:
-1. Import the SVG with `upload_assets` (never `createNodeFromSvg`). It arrives at 0.96x (1207.68 x 1074.24,
-   matplotlib writes points, Figma reads 96px/in): move `figure_1` into a new 1258 x 1119 frame, delete the import
-   wrapper frame, `rescale(1 / 0.96)`, place at (0, 0), then delete `patch_1` (the transparent canvas patch).
-2. Frame fill: library style "Website/Background/Beige" (key `6c0f33c0233038fdfc3b20e353ef0c12990df8e7`,
-   #fffbf5). The 2025 frame used #fbf9f3; the house style was chosen on purpose.
-3. Logo: instance of "Logos/Our World in Data/36px" (component key `73c2928eda2d1cdf891f472912f36c899ca2963b`),
-   rescaled to 94 wide, at (1140, 33), as in the 2025 frame.
-4. Restyle the text, by the gid of each text's parent group. Sizes and colors are the 2025 frame's:
+Final frame (`28828:11`), all positions in frame px from the top left:
+- Background: style "Website/Background/Beige" (key `6c0f33c0233038fdfc3b20e353ef0c12990df8e7`). Logo: instance of
+  "Logos/Our World in Data/36px" (key `73c2928eda2d1cdf891f472912f36c899ca2963b`), 63 x 35 at (771, 16).
+- Header: an auto-layout frame at (16, 16), gap 6. Title: text style "Data Insights/Title" (Playfair Display
+  SemiBold 25/29). Subtitle: "Data Insights/Subtitle" (Lato Regular 16), two lines.
+- Bars span x = 23 to 828 (805px); a segment's width is 805 x its share of the world total. Each bar has a 0-wide
+  rule at x=23, about 6px above and below it. Tops and heights: total 141 (57), region 323 (58), type 483 (58). The bars
+  were made 4px taller than the redesign handed over, so that the gap above the Note is 14px.
+- Section headings: Lato Bold 16, fill "Data Insights/Title"; the region sub-heading Lato Regular 15, fill
+  "Data Insights/Subtitle".
+- Segment names sit directly above their segment, in its color, Lato Regular 15 (names that do not fit one line
+  wrap to two, bottom-aligned with the others). Value labels sit inside the segments, 12-13px from the left edge (18 on the total bar),
+  Lato Medium 15, fill "Instagram/Beige Background". Conflict-type definitions sit under the type bar at y=552,
+  Lato Regular 13, one per segment, starting at the segment's left edge.
+- Segment fills (Default Palette, by style name): total "Dusty Coral"; regions Africa "Mauve", Middle East "Camel",
+  Asia & Oceania "Teal", Europe "Denim", Americas "Peach"; types intrastate "Maroon", one-sided "Olive Green",
+  interstate "Purple", non-state "Dark Orange". Segment names use the darker variant of the same hue where the
+  palette has one (Africa "Dark Mauve", Middle East "Line and Slope Charts/Camel", Americas "Line and Slope
+  Charts/Peach"); the others reuse the segment's style.
+- Footer: Note and Source in one auto-layout frame (gap 4), Lato 12 with the labels in bold, fill
+  "Data Insights/Source"; it sits 4px above the tagline/license row (Lato 11), which ends 16px above the frame's
+  bottom edge. The license reads "Licensed under CC-BY by the authors Bastian Herre and Marwa Boukarim" (the
+  design changed considerably, so the credit follows the redesign) and wraps to two lines.
+- The Source in the final frame abbreviates first names ("Sundberg, R., and E. Melander. 2013. ..."), unlike
+  `SOURCE` in this step. That was the design team's edit; keep the frame's form when updating it.
 
-   | gid | Font | Size | Color |
-   |---|---|---|---|
-   | `title` | Playfair Display SemiBold | 40 | #2d2e2d |
-   | `subtitle-*` | Lato Regular | 22 | #58595b |
-   | `section__<bar>` | Lato Bold | 26 | #2d2e2d |
-   | `section__region-sub` | Lato Regular | 22 | #2d2e2d |
-   | `legend__<key>-0` (bold term) | Lato SemiBold | 22 | #2d2e2d |
-   | other `legend__*` | Lato Regular | 22 | #2d2e2d |
-   | `label__*` | Lato Medium | 26 | unchanged (white; the outside "250k" keeps its segment color) |
-   | footer rows | Lato Medium, labels in Lato Bold | 14 (18px line height) | #87898c |
-
-   Keep right-aligned texts (the total's label, the license) on their right edge when the font changes.
-5. Merge each footer row's runs into one text with mixed weights, in this order, because the runs were laid out
-   for the step's font: `footer__note` ("Note:" bold), `footer__source` (one 1210-wide text, "Source:" bold),
-   `footer__tagline` ("OurWorldinData.org" bold). In `footer__license`, bold "CC-BY" and the two author names.
-6. Then align to the 2025 frame: title top at y=24, footer rows down 4px (Note at y=1007, Source 1033,
-   tagline and license 1077). Every other text lands within 2px of the 2025 frame without adjustment.
+To update it next time: duplicate the final frame, then for each bar set every segment's x and width from the new
+shares (and move its name and value label with it), replace the numbers and years in the texts, and update the
+Source to the new UCDP article. If the ranking of segments changes, reorder the segments together with their names,
+labels, colors and definitions. Check that every value label still fits inside its segment, and that the gap above
+the Note stays within 12-16px.
 """
 
 import logging
