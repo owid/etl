@@ -28,6 +28,15 @@ EXPECTED_FIXED_VALUES = {
     "UNIT_MULT": 6,
 }
 
+# The same, for the totals of bilateral ODA from the Creditor Reporting System (CRS), which has no "allocable" dimension
+# but has channel and modality dimensions (all channels and modalities, "_T").
+EXPECTED_FIXED_VALUES_CRS = {
+    **{column: value for column, value in EXPECTED_FIXED_VALUES.items() if column != "ALLOCABLE"},
+    "SECTOR": 1000,
+    "CHANNEL": "_T",
+    "MODALITY": "_T",
+}
+
 # Columns to keep from the data files, and their new names.
 COLUMNS_TOTALS = {
     "DONOR": "donor_code",
@@ -75,6 +84,8 @@ def run() -> None:
     # Load data from snapshot.
     tables_totals = [snap.read_in_archive(file_name, low_memory=False) for file_name in FILES_TOTALS]
     tb_activities = snap.read_in_archive("activities.csv", low_memory=False)
+    snap_crs = paths.load_snapshot("bilateral_official_development_assistance_commitments.csv")
+    tb_bilateral = snap_crs.read(low_memory=False)
     with zipfile.ZipFile(snap.path) as zf:
         structure = ET.fromstring(zf.read("structure.xml"))
         groups = {kind: ET.fromstring(zf.read(file_name)) for file_name, kind in FILES_GROUPS.items()}
@@ -83,8 +94,19 @@ def run() -> None:
     # Process data.
     #
     for file_name, tb in zip(FILES_TOTALS, tables_totals):
-        sanity_check_fixed_dimensions(tb=tb, name=file_name)
-    sanity_check_fixed_dimensions(tb=tb_activities, name="activities.csv")
+        sanity_check_fixed_dimensions(tb=tb, name=file_name, expected=EXPECTED_FIXED_VALUES)
+    sanity_check_fixed_dimensions(tb=tb_activities, name="activities.csv", expected=EXPECTED_FIXED_VALUES)
+    sanity_check_fixed_dimensions(tb=tb_bilateral, name="CRS totals", expected=EXPECTED_FIXED_VALUES_CRS)
+
+    # Total bilateral ODA by donor and recipient. All DAC members to all developing countries appears in both queries.
+    tb_bilateral = tb_bilateral[["DONOR", "RECIPIENT", "TIME_PERIOD", "OBS_VALUE"]].rename(
+        columns={"DONOR": "donor_code", "RECIPIENT": "recipient_code", "TIME_PERIOD": "year", "OBS_VALUE": "value"},
+        errors="raise",
+    )
+    tb_bilateral = tb_bilateral.drop_duplicates()
+    assert not tb_bilateral.duplicated(subset=["donor_code", "recipient_code", "year"]).any(), (
+        "CRS queries disagree on overlapping values."
+    )
 
     # Combine totals, dropping rows that appear in more than one file.
     tb_totals = pr.concat(
@@ -119,6 +141,7 @@ def run() -> None:
         tb_activities.format(["activity_id"], short_name="activities"),
         tb_codes.format(["codelist", "code"], short_name="codes"),
         tb_groups.format(["hierarchy", "parent_code", "child_code"], short_name="groups"),
+        tb_bilateral.format(["donor_code", "recipient_code", "year"], short_name="bilateral_totals"),
     ]
 
     #
@@ -169,11 +192,11 @@ def extract_hierarchy(root: ET.Element, kind: str) -> pd.DataFrame:
     return pd.DataFrame(rows).drop_duplicates()
 
 
-def sanity_check_fixed_dimensions(tb: Table, name: str) -> None:
+def sanity_check_fixed_dimensions(tb: Table, name: str, expected: dict) -> None:
     """Check that the dimensions fixed by the snapshot queries (including the constant-price base year) are as expected."""
-    for column, expected in EXPECTED_FIXED_VALUES.items():
+    for column, value in expected.items():
         values = set(tb[column].unique())
-        assert values == {expected}, (
-            f"Unexpected values of {column} in {name}: {sorted(values)}. Expected {expected!r}. If the base year changed, "
+        assert values == {value}, (
+            f"Unexpected values of {column} in {name}: {sorted(values)}. Expected {value!r}. If the base year changed, "
             "update CONSTANT_PRICE_BASE_YEAR here AND `definitions.inflation_year` in the garden .meta.yml."
         )

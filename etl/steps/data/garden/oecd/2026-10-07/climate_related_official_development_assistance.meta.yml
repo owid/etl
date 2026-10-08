@@ -20,9 +20,7 @@ definitions:
   inflation_year: 2024
 
   # Short descriptions, following those of our main ODA dataset.
-  short_oda: "[Official development assistance (ODA)](#dod:oda) is defined as government aid designed to promote the economic development and welfare of developing countries."
   short_bilateral_allocable: "Bilateral allocable [ODA](#dod:oda) is aid from DAC members that is directly assigned to a recipient country or region and to a sector."
-  short_climate_related: "Climate-related [ODA](#dod:oda) is aid that targets climate change mitigation, adaptation, or both."
   short_commitments: Monetary aid is estimated as commitments.
   short_constant_usd: This data is expressed in US dollars. It is adjusted for inflation.
 
@@ -32,6 +30,8 @@ definitions:
   key_oda_list_of_countries_recipients: DAC country recipients are all low- and middle-income countries as defined by the World Bank, or least-developed countries as defined by the United Nations. All recipients are listed on [the OECD website](https://www.oecd.org/en/topics/sub-issues/oda-eligibility-and-conditions/dac-list-of-oda-recipients.html).
   key_bilateral_allocable: |-
     This data only covers bilateral allocable ODA from [DAC members](https://www.oecd.org/en/about/committees/development-assistance-committee.html): the major donor countries in the OECD and EU institutions. Bilateral allocable ODA is aid assigned to a recipient and a sector. It excludes donors' core contributions to multilateral organizations (such as the World Bank or the Green Climate Fund), as well as general budget support, debt relief, administrative costs, scholarships and student costs in donor countries, development awareness, and the costs of hosting refugees in donor countries. It also excludes aid from donors outside the DAC.
+  key_bilateral_total: |-
+    Total bilateral ODA includes bilateral allocable ODA and the aid that the Rio markers do not apply to: general budget support, debt relief, administrative costs, scholarships and student costs in donor countries, development awareness, and the costs of hosting refugees in donor countries. It excludes donors' core contributions to multilateral organizations, and aid from donors outside the DAC.
   key_rio_markers: |-
     Donors mark each aid project against the "Rio markers", which track aid that supports the goals of the three UN conventions agreed at the 1992 Earth Summit in Rio de Janeiro: on climate change (with separate markers for mitigation and adaptation), biological diversity, and desertification. A project is marked as targeting a goal as a "principal" objective (the project would not have been funded without it), as a "significant" objective (an explicit but secondary objective), or as "not targeted".
   key_climate_markers: |-
@@ -39,44 +39,26 @@ definitions:
   key_overlap: |-
     Many projects target both mitigation and adaptation. To avoid counting them twice, we classify each project only once: as targeting mitigation only, adaptation only, or both. Similarly, a project has climate as its principal objective if it is marked as principal for mitigation or adaptation, and as a significant objective otherwise.
   key_upper_bound: |-
-    Projects are counted at their full value, even when the objective is only significant. The OECD considers this an upper bound of the aid that targets each objective. When reporting their climate finance to the UN, many donors count only a share of these projects.
+    Projects are counted at their full value, even when climate is only a significant objective. The OECD considers this an upper bound of climate-related aid. When reporting their climate finance to the UN, many donors count only a share of these projects.
   key_commitments: |-
     The data is reported as commitments. This refers to aid that has been pledged, and is different from disbursements, which is aid ultimately given. The Rio markers describe the objectives of projects when they are designed, so the OECD applies them to commitments. A multi-year project is counted in full in the year it is committed, so values can change a lot from one year to the next.
   key_adaptation_marker: |-
     The marker for climate change adaptation was introduced in 2009 and applies to aid from 2010 onwards. Before then, the climate marker also covered some adaptation projects, so climate-related aid can only be split into mitigation and adaptation from 2010.
   key_not_screened: |-
-    Projects that donors did not assess against a marker ("not screened") are not counted as targeting it. A large share of aid was not screened before the markers became a permanent part of the reporting in 2008, and especially before 2011.
+    Projects that donors did not assess against the climate markers ("not screened") are counted as non-climate aid. A large share of aid was not screened before the markers became a permanent part of the reporting in 2008, and especially before 2011.
   key_constant_usd: The OECD adjusts this data for inflation and expresses it in constant {definitions.inflation_year} US$. It makes this adjustment using annual average market exchange rates and GDP deflators for each donor country. For more information on the methodology, visit [the OECD's documentation](https://www.oecd.org/content/oecd/en/data/insights/data-explainers/2024/10/resources-for-reporting-development-finance-statistics.html) on DAC deflators.
-  key_marker: |-
-    <% if marker == "Biodiversity" %>
-    Biodiversity-related projects contribute to the objectives of the Convention on Biological Diversity: conserving biodiversity, using its components sustainably, and sharing fairly the benefits of using genetic resources.
-    <% elif marker == "Climate change mitigation" %>
-    Climate change mitigation projects contribute to stabilizing greenhouse gas concentrations in the atmosphere, by reducing or limiting emissions or by increasing their removal by carbon sinks.
-    <% elif marker == "Climate change adaptation" %>
-    Climate change adaptation projects aim to reduce the vulnerability of people and ecosystems to the current and expected impacts of climate change, by making them more resilient. This marker applies to aid from 2010 onwards.
-    <% elif marker == "Desertification" %>
-    Desertification-related projects aim to combat desertification or reduce the effects of drought in arid, semi-arid and dry sub-humid areas, by preventing or reducing land degradation, or by rehabilitating or reclaiming degraded land.
-    <% elif marker == "Environment" %>
-    Environment-related projects aim to improve the physical or biological environment of the recipient, or to integrate environmental concerns into development objectives. The environment marker is a broader policy marker: it is always marked whenever a project targets biodiversity, climate change mitigation, or desertification.
-    <%- endif -%>
-  key_one_marker: |-
-    The same project can target several objectives, so values for different markers should not be added up.
-  key_sector: |-
-    The sector refers to the area of the recipient's economy or society that the project intends to support, according to the OECD's classification. Climate-related projects can be in any sector: for example, a project to build roads that withstand floods is in "Transport and storage".
 
   # Processing descriptions.
   processing_climate: |-
     We combined the mitigation and adaptation markers of each project to count it only once. Projects marked as targeting both objectives (as a principal or significant objective) are counted as "mitigation and adaptation", and the others as "mitigation only" or "adaptation only". Projects with climate as the principal objective are those marked as principal for mitigation or adaptation; the remaining climate-related projects have climate as a significant objective.
   processing_non_climate: |-
     We calculated non-climate-related ODA as bilateral allocable ODA minus climate-related ODA.
+  processing_outside_rio_markers: |-
+    We calculated this indicator as total bilateral ODA, from the OECD Creditor Reporting System, minus bilateral allocable ODA, from the OECD RioMarkers dataset. Donors can only record cancellations of commitments made in earlier years as a single negative amount, which falls in this category, so it can be negative (for example, for Australia in 2009 and 2010).
   processing_share: |-
     We calculated this indicator by dividing by bilateral allocable ODA, expressed as a percentage.
-  processing_share_sector: |-
-    We calculated this indicator by dividing by bilateral allocable ODA in the same sector, expressed as a percentage.
-  processing_share_of_all_sectors: |-
-    We calculated this indicator by dividing by climate-related ODA in all sectors, expressed as a percentage.
-  processing_per_capita: |-
-    We calculated this indicator by dividing by the population of each country. We use a long-run population dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
+  processing_share_bilateral_total: |-
+    We calculated this indicator by dividing by total bilateral ODA, from the OECD Creditor Reporting System, expressed as a percentage.
   processing_donor_groups: |-
     We calculated aggregates for groups of donors (such as DAC countries or G7 countries) by summing the indicator across the donors that the OECD includes in each group.
   processing_recipient_groups: |-
@@ -91,6 +73,24 @@ dataset:
 tables:
   climate_related_oda_by_donor:
     variables:
+      oda_bilateral_total:
+        title: "Total bilateral ODA by donor"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "Bilateral [ODA](#dod:oda) from DAC members, including aid that is not assigned to a recipient or sector. {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_bilateral_total}"
+          - "{definitions.key_commitments}"
+          - "{definitions.key_constant_usd}"
+        processing_level: major
+        description_processing: "{definitions.processing_donor_groups}"
+        presentation:
+          title_public: "Total bilateral ODA by donor"
+        display:
+          name: "Total bilateral ODA"
+          numDecimalPlaces: 0
       oda_bilateral_allocable:
         title: "Bilateral allocable ODA by donor"
         unit: "constant {definitions.inflation_year} US$"
@@ -108,6 +108,24 @@ tables:
           title_public: "Bilateral allocable ODA by donor"
         display:
           name: "Bilateral allocable ODA"
+          numDecimalPlaces: 0
+      oda_bilateral_outside_rio_markers:
+        title: "Bilateral ODA by donor outside the scope of the Rio markers"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "Bilateral [ODA](#dod:oda) that the Rio markers do not apply to, such as general budget support, administrative costs, and the costs of hosting refugees in donor countries. {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_bilateral_total}"
+          - "{definitions.key_commitments}"
+          - "{definitions.key_constant_usd}"
+        processing_level: major
+        description_processing: "{definitions.processing_outside_rio_markers}\n\n{definitions.processing_donor_groups}"
+        presentation:
+          title_public: "Bilateral ODA by donor outside the scope of the Rio markers"
+        display:
+          name: "Outside the scope of the Rio markers"
           numDecimalPlaces: 0
       climate_related:
         title: "Climate-related ODA by donor"
@@ -293,14 +311,15 @@ tables:
         display:
           name: "Climate-related"
           numDecimalPlaces: 1
-      mitigation_only_share:
-        title: "Climate-related ODA by donor - Mitigation only (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
+      climate_related_share_of_bilateral_total:
+        title: "Climate-related ODA by donor (% of total bilateral ODA)"
+        unit: "% of total bilateral ODA"
         short_unit: "%"
-        description_short: "Climate-related [ODA](#dod:oda) that targets climate change mitigation, but not adaptation, as a share of bilateral allocable ODA. {definitions.short_commitments}"
+        description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of total bilateral ODA. {definitions.short_commitments}"
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_bilateral_allocable}"
+          - "{definitions.key_bilateral_total}"
           - "{definitions.key_rio_markers}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
@@ -310,130 +329,32 @@ tables:
           - "{definitions.key_not_screened}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_donor_groups}"
+        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share_bilateral_total}\n\n{definitions.processing_donor_groups}"
         presentation:
-          title_public: "Climate-related ODA by donor - Mitigation only (% of bilateral allocable ODA)"
+          title_public: "Climate-related ODA by donor (% of total bilateral ODA)"
         display:
-          name: "Mitigation only"
-          numDecimalPlaces: 1
-      adaptation_only_share:
-        title: "Climate-related ODA by donor - Adaptation only (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Climate-related [ODA](#dod:oda) that targets climate change adaptation, but not mitigation, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor - Adaptation only (% of bilateral allocable ODA)"
-        display:
-          name: "Adaptation only"
-          numDecimalPlaces: 1
-      mitigation_and_adaptation_share:
-        title: "Climate-related ODA by donor - Mitigation and adaptation (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Climate-related [ODA](#dod:oda) that targets both climate change mitigation and adaptation, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor - Mitigation and adaptation (% of bilateral allocable ODA)"
-        display:
-          name: "Mitigation and adaptation"
-          numDecimalPlaces: 1
-      climate_principal_objective_share:
-        title: "Climate-related ODA by donor - Climate as principal objective (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Climate-related [ODA](#dod:oda) for projects whose principal objective is climate change mitigation or adaptation, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor - Climate as principal objective (% of bilateral allocable ODA)"
-        display:
-          name: "Climate as principal objective"
-          numDecimalPlaces: 1
-      climate_significant_objective_share:
-        title: "Climate-related ODA by donor - Climate as significant objective (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Climate-related [ODA](#dod:oda) for projects that target climate change mitigation or adaptation as a significant, but not principal, objective, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor - Climate as significant objective (% of bilateral allocable ODA)"
-        display:
-          name: "Climate as significant objective"
-          numDecimalPlaces: 1
-      non_climate_share:
-        title: "Non-climate-related ODA by donor (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that does not target climate change mitigation or adaptation, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Non-climate-related ODA by donor (% of bilateral allocable ODA)"
-        display:
-          name: "Non-climate-related"
+          name: "Climate-related"
           numDecimalPlaces: 1
 
   climate_related_oda_by_recipient:
     variables:
+      oda_bilateral_total:
+        title: "Total bilateral ODA by recipient"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "Bilateral [ODA](#dod:oda) from DAC members, including aid that is not assigned to a recipient or sector. {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_bilateral_total}"
+          - "{definitions.key_commitments}"
+          - "{definitions.key_constant_usd}"
+        processing_level: minor
+        presentation:
+          title_public: "Total bilateral ODA by recipient"
+        display:
+          name: "Total bilateral ODA"
+          numDecimalPlaces: 0
       oda_bilateral_allocable:
         title: "Bilateral allocable ODA by recipient"
         unit: "constant {definitions.inflation_year} US$"
@@ -445,8 +366,7 @@ tables:
           - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_recipient_groups}"
+        processing_level: minor
         presentation:
           title_public: "Bilateral allocable ODA by recipient"
         display:
@@ -475,144 +395,6 @@ tables:
         display:
           name: "Climate-related"
           numDecimalPlaces: 0
-      mitigation_only:
-        title: "Climate-related ODA by recipient - Mitigation only"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Climate-related [ODA](#dod:oda) that targets climate change mitigation, but not adaptation. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Climate-related ODA by recipient - Mitigation only"
-        display:
-          name: "Mitigation only"
-          numDecimalPlaces: 0
-      adaptation_only:
-        title: "Climate-related ODA by recipient - Adaptation only"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Climate-related [ODA](#dod:oda) that targets climate change adaptation, but not mitigation. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Climate-related ODA by recipient - Adaptation only"
-        display:
-          name: "Adaptation only"
-          numDecimalPlaces: 0
-      mitigation_and_adaptation:
-        title: "Climate-related ODA by recipient - Mitigation and adaptation"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Climate-related [ODA](#dod:oda) that targets both climate change mitigation and adaptation. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Climate-related ODA by recipient - Mitigation and adaptation"
-        display:
-          name: "Mitigation and adaptation"
-          numDecimalPlaces: 0
-      climate_principal_objective:
-        title: "Climate-related ODA by recipient - Climate as principal objective"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Climate-related [ODA](#dod:oda) for projects whose principal objective is climate change mitigation or adaptation. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Climate-related ODA by recipient - Climate as principal objective"
-        display:
-          name: "Climate as principal objective"
-          numDecimalPlaces: 0
-      climate_significant_objective:
-        title: "Climate-related ODA by recipient - Climate as significant objective"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Climate-related [ODA](#dod:oda) for projects that target climate change mitigation or adaptation as a significant, but not principal, objective. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Climate-related ODA by recipient - Climate as significant objective"
-        display:
-          name: "Climate as significant objective"
-          numDecimalPlaces: 0
-      non_climate:
-        title: "Non-climate-related ODA by recipient"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that does not target climate change mitigation or adaptation. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_non_climate}\n\n{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Non-climate-related ODA by recipient"
-        display:
-          name: "Non-climate-related"
-          numDecimalPlaces: 0
       climate_related_share:
         title: "Climate-related ODA by recipient (% of bilateral allocable ODA)"
         unit: "% of bilateral allocable ODA"
@@ -636,14 +418,15 @@ tables:
         display:
           name: "Climate-related"
           numDecimalPlaces: 1
-      mitigation_only_share:
-        title: "Climate-related ODA by recipient - Mitigation only (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
+      climate_related_share_of_bilateral_total:
+        title: "Climate-related ODA by recipient (% of total bilateral ODA)"
+        unit: "% of total bilateral ODA"
         short_unit: "%"
-        description_short: "Climate-related [ODA](#dod:oda) that targets climate change mitigation, but not adaptation, as a share of bilateral allocable ODA. {definitions.short_commitments}"
+        description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of total bilateral ODA. {definitions.short_commitments}"
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_bilateral_allocable}"
+          - "{definitions.key_bilateral_total}"
           - "{definitions.key_rio_markers}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
@@ -653,831 +436,9 @@ tables:
           - "{definitions.key_not_screened}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_recipient_groups}"
+        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share_bilateral_total}\n\n{definitions.processing_recipient_groups}"
         presentation:
-          title_public: "Climate-related ODA by recipient - Mitigation only (% of bilateral allocable ODA)"
-        display:
-          name: "Mitigation only"
-          numDecimalPlaces: 1
-      adaptation_only_share:
-        title: "Climate-related ODA by recipient - Adaptation only (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Climate-related [ODA](#dod:oda) that targets climate change adaptation, but not mitigation, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Climate-related ODA by recipient - Adaptation only (% of bilateral allocable ODA)"
-        display:
-          name: "Adaptation only"
-          numDecimalPlaces: 1
-      mitigation_and_adaptation_share:
-        title: "Climate-related ODA by recipient - Mitigation and adaptation (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Climate-related [ODA](#dod:oda) that targets both climate change mitigation and adaptation, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Climate-related ODA by recipient - Mitigation and adaptation (% of bilateral allocable ODA)"
-        display:
-          name: "Mitigation and adaptation"
-          numDecimalPlaces: 1
-      climate_principal_objective_share:
-        title: "Climate-related ODA by recipient - Climate as principal objective (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Climate-related [ODA](#dod:oda) for projects whose principal objective is climate change mitigation or adaptation, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Climate-related ODA by recipient - Climate as principal objective (% of bilateral allocable ODA)"
-        display:
-          name: "Climate as principal objective"
-          numDecimalPlaces: 1
-      climate_significant_objective_share:
-        title: "Climate-related ODA by recipient - Climate as significant objective (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Climate-related [ODA](#dod:oda) for projects that target climate change mitigation or adaptation as a significant, but not principal, objective, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Climate-related ODA by recipient - Climate as significant objective (% of bilateral allocable ODA)"
-        display:
-          name: "Climate as significant objective"
-          numDecimalPlaces: 1
-      non_climate_share:
-        title: "Non-climate-related ODA by recipient (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that does not target climate change mitigation or adaptation, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Non-climate-related ODA by recipient (% of bilateral allocable ODA)"
-        display:
-          name: "Non-climate-related"
-          numDecimalPlaces: 1
-      oda_bilateral_allocable_per_capita:
-        title: "Bilateral allocable ODA per capita by recipient"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Bilateral allocable [ODA](#dod:oda) from DAC members, divided by population. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_oda_list_of_countries_recipients}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_per_capita}"
-        presentation:
-          title_public: "Bilateral allocable ODA per capita by recipient"
-        display:
-          name: "Bilateral allocable ODA"
-          numDecimalPlaces: 2
-      climate_related_per_capita:
-        title: "Climate-related ODA per capita by recipient"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both, divided by population. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_per_capita}"
-        presentation:
-          title_public: "Climate-related ODA per capita by recipient"
+          title_public: "Climate-related ODA by recipient (% of total bilateral ODA)"
         display:
           name: "Climate-related"
-          numDecimalPlaces: 2
-      mitigation_only_per_capita:
-        title: "Climate-related ODA per capita by recipient - Mitigation only"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Climate-related [ODA](#dod:oda) that targets climate change mitigation, but not adaptation, divided by population. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_per_capita}"
-        presentation:
-          title_public: "Climate-related ODA per capita by recipient - Mitigation only"
-        display:
-          name: "Mitigation only"
-          numDecimalPlaces: 2
-      adaptation_only_per_capita:
-        title: "Climate-related ODA per capita by recipient - Adaptation only"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Climate-related [ODA](#dod:oda) that targets climate change adaptation, but not mitigation, divided by population. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_per_capita}"
-        presentation:
-          title_public: "Climate-related ODA per capita by recipient - Adaptation only"
-        display:
-          name: "Adaptation only"
-          numDecimalPlaces: 2
-      mitigation_and_adaptation_per_capita:
-        title: "Climate-related ODA per capita by recipient - Mitigation and adaptation"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Climate-related [ODA](#dod:oda) that targets both climate change mitigation and adaptation, divided by population. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_per_capita}"
-        presentation:
-          title_public: "Climate-related ODA per capita by recipient - Mitigation and adaptation"
-        display:
-          name: "Mitigation and adaptation"
-          numDecimalPlaces: 2
-
-  rio_markers_oda_by_donor:
-    variables:
-      oda_targeting_marker:
-        title: "ODA by donor targeting <<marker.lower()>>"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets <<marker.lower()>> as a principal or significant objective. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_marker}"
-          - "{definitions.key_one_marker}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "ODA by donor targeting <<marker.lower()>>"
-        display:
-          name: "<<marker>>"
-          numDecimalPlaces: 0
-      oda_targeting_marker_share:
-        title: "ODA by donor targeting <<marker.lower()>> (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets <<marker.lower()>> as a principal or significant objective, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_marker}"
-          - "{definitions.key_one_marker}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_share}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "ODA by donor targeting <<marker.lower()>> (% of bilateral allocable ODA)"
-        display:
-          name: "<<marker>>"
-          numDecimalPlaces: 1
-      oda_targeting_marker_principal:
-        title: "ODA by donor targeting <<marker.lower()>> - Principal objective"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets <<marker.lower()>> as a principal objective. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_marker}"
-          - "{definitions.key_one_marker}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "ODA by donor targeting <<marker.lower()>> - Principal objective"
-        display:
-          name: "<<marker>> - Principal objective"
-          numDecimalPlaces: 0
-      oda_targeting_marker_principal_share:
-        title: "ODA by donor targeting <<marker.lower()>> - Principal objective (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets <<marker.lower()>> as a principal objective, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_marker}"
-          - "{definitions.key_one_marker}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_share}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "ODA by donor targeting <<marker.lower()>> - Principal objective (% of bilateral allocable ODA)"
-        display:
-          name: "<<marker>> - Principal objective"
-          numDecimalPlaces: 1
-      oda_targeting_marker_significant:
-        title: "ODA by donor targeting <<marker.lower()>> - Significant objective"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets <<marker.lower()>> as a significant, but not principal, objective. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_marker}"
-          - "{definitions.key_one_marker}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "ODA by donor targeting <<marker.lower()>> - Significant objective"
-        display:
-          name: "<<marker>> - Significant objective"
-          numDecimalPlaces: 0
-      oda_targeting_marker_significant_share:
-        title: "ODA by donor targeting <<marker.lower()>> - Significant objective (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets <<marker.lower()>> as a significant, but not principal, objective, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_marker}"
-          - "{definitions.key_one_marker}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_share}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "ODA by donor targeting <<marker.lower()>> - Significant objective (% of bilateral allocable ODA)"
-        display:
-          name: "<<marker>> - Significant objective"
-          numDecimalPlaces: 1
-      not_screened_share:
-        title: "ODA by donor not screened for <<marker.lower()>> (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Bilateral allocable [ODA](#dod:oda) for projects that donors did not assess against the <<marker.lower()>> marker, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_marker}"
-          - "{definitions.key_one_marker}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_share}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "ODA by donor not screened for <<marker.lower()>> (% of bilateral allocable ODA)"
-        display:
-          name: "Not screened for <<marker.lower()>>"
-          numDecimalPlaces: 1
-
-  rio_markers_oda_by_recipient:
-    variables:
-      oda_targeting_marker:
-        title: "ODA by recipient targeting <<marker.lower()>>"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets <<marker.lower()>> as a principal or significant objective. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_marker}"
-          - "{definitions.key_one_marker}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: minor
-        presentation:
-          title_public: "ODA by recipient targeting <<marker.lower()>>"
-        display:
-          name: "<<marker>>"
-          numDecimalPlaces: 0
-      oda_targeting_marker_share:
-        title: "ODA by recipient targeting <<marker.lower()>> (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets <<marker.lower()>> as a principal or significant objective, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_marker}"
-          - "{definitions.key_one_marker}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_share}"
-        presentation:
-          title_public: "ODA by recipient targeting <<marker.lower()>> (% of bilateral allocable ODA)"
-        display:
-          name: "<<marker>>"
-          numDecimalPlaces: 1
-      oda_targeting_marker_principal:
-        title: "ODA by recipient targeting <<marker.lower()>> - Principal objective"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets <<marker.lower()>> as a principal objective. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_marker}"
-          - "{definitions.key_one_marker}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: minor
-        presentation:
-          title_public: "ODA by recipient targeting <<marker.lower()>> - Principal objective"
-        display:
-          name: "<<marker>> - Principal objective"
-          numDecimalPlaces: 0
-      oda_targeting_marker_principal_share:
-        title: "ODA by recipient targeting <<marker.lower()>> - Principal objective (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets <<marker.lower()>> as a principal objective, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_marker}"
-          - "{definitions.key_one_marker}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_share}"
-        presentation:
-          title_public: "ODA by recipient targeting <<marker.lower()>> - Principal objective (% of bilateral allocable ODA)"
-        display:
-          name: "<<marker>> - Principal objective"
-          numDecimalPlaces: 1
-      oda_targeting_marker_significant:
-        title: "ODA by recipient targeting <<marker.lower()>> - Significant objective"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets <<marker.lower()>> as a significant, but not principal, objective. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_marker}"
-          - "{definitions.key_one_marker}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: minor
-        presentation:
-          title_public: "ODA by recipient targeting <<marker.lower()>> - Significant objective"
-        display:
-          name: "<<marker>> - Significant objective"
-          numDecimalPlaces: 0
-      oda_targeting_marker_significant_share:
-        title: "ODA by recipient targeting <<marker.lower()>> - Significant objective (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets <<marker.lower()>> as a significant, but not principal, objective, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_marker}"
-          - "{definitions.key_one_marker}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_share}"
-        presentation:
-          title_public: "ODA by recipient targeting <<marker.lower()>> - Significant objective (% of bilateral allocable ODA)"
-        display:
-          name: "<<marker>> - Significant objective"
-          numDecimalPlaces: 1
-      not_screened_share:
-        title: "ODA by recipient not screened for <<marker.lower()>> (% of bilateral allocable ODA)"
-        unit: "% of bilateral allocable ODA"
-        short_unit: "%"
-        description_short: "Bilateral allocable [ODA](#dod:oda) for projects that donors did not assess against the <<marker.lower()>> marker, as a share of bilateral allocable ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_marker}"
-          - "{definitions.key_one_marker}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_share}"
-        presentation:
-          title_public: "ODA by recipient not screened for <<marker.lower()>> (% of bilateral allocable ODA)"
-        display:
-          name: "Not screened for <<marker.lower()>>"
-          numDecimalPlaces: 1
-
-  climate_related_oda_by_donor_and_sector:
-    variables:
-      oda_bilateral_allocable:
-        title: "Bilateral allocable ODA by donor and sector (<<sector>>)"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Bilateral allocable [ODA](#dod:oda) given that is <<sector.lower()>>. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_oda_list_of_countries_recipients}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_sector}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Bilateral allocable ODA by donor and sector (<<sector>>)"
-        display:
-          name: "Bilateral allocable ODA"
-          numDecimalPlaces: 0
-      climate_related:
-        title: "Climate-related ODA by donor and sector (<<sector>>)"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both, given that is <<sector.lower()>>. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_sector}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor and sector (<<sector>>)"
-        display:
-          name: "Climate-related"
-          numDecimalPlaces: 0
-      climate_related_share:
-        title: "Climate-related ODA by donor and sector (<<sector>>) (% of bilateral allocable ODA in the sector)"
-        unit: "% of bilateral allocable ODA in the sector"
-        short_unit: "%"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of bilateral allocable ODA in the sector <<sector.lower()>>. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_sector}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share_sector}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor and sector (<<sector>>) (% of bilateral allocable ODA in the sector)"
-        display:
-          name: "Climate-related"
-          numDecimalPlaces: 1
-      mitigation_only:
-        title: "Climate-related ODA by donor and sector (<<sector>>) - Mitigation only"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Climate-related [ODA](#dod:oda) that targets climate change mitigation, but not adaptation, given that is <<sector.lower()>>. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_sector}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor and sector (<<sector>>) - Mitigation only"
-        display:
-          name: "Mitigation only"
-          numDecimalPlaces: 0
-      mitigation_only_share:
-        title: "Climate-related ODA by donor and sector (<<sector>>) - Mitigation only (% of bilateral allocable ODA in the sector)"
-        unit: "% of bilateral allocable ODA in the sector"
-        short_unit: "%"
-        description_short: "Climate-related [ODA](#dod:oda) that targets climate change mitigation, but not adaptation, as a share of bilateral allocable ODA in the sector <<sector.lower()>>. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_sector}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share_sector}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor and sector (<<sector>>) - Mitigation only (% of bilateral allocable ODA in the sector)"
-        display:
-          name: "Mitigation only"
-          numDecimalPlaces: 1
-      adaptation_only:
-        title: "Climate-related ODA by donor and sector (<<sector>>) - Adaptation only"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Climate-related [ODA](#dod:oda) that targets climate change adaptation, but not mitigation, given that is <<sector.lower()>>. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_sector}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor and sector (<<sector>>) - Adaptation only"
-        display:
-          name: "Adaptation only"
-          numDecimalPlaces: 0
-      adaptation_only_share:
-        title: "Climate-related ODA by donor and sector (<<sector>>) - Adaptation only (% of bilateral allocable ODA in the sector)"
-        unit: "% of bilateral allocable ODA in the sector"
-        short_unit: "%"
-        description_short: "Climate-related [ODA](#dod:oda) that targets climate change adaptation, but not mitigation, as a share of bilateral allocable ODA in the sector <<sector.lower()>>. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_sector}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share_sector}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor and sector (<<sector>>) - Adaptation only (% of bilateral allocable ODA in the sector)"
-        display:
-          name: "Adaptation only"
-          numDecimalPlaces: 1
-      mitigation_and_adaptation:
-        title: "Climate-related ODA by donor and sector (<<sector>>) - Mitigation and adaptation"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Climate-related [ODA](#dod:oda) that targets both climate change mitigation and adaptation, given that is <<sector.lower()>>. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_sector}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor and sector (<<sector>>) - Mitigation and adaptation"
-        display:
-          name: "Mitigation and adaptation"
-          numDecimalPlaces: 0
-      mitigation_and_adaptation_share:
-        title: "Climate-related ODA by donor and sector (<<sector>>) - Mitigation and adaptation (% of bilateral allocable ODA in the sector)"
-        unit: "% of bilateral allocable ODA in the sector"
-        short_unit: "%"
-        description_short: "Climate-related [ODA](#dod:oda) that targets both climate change mitigation and adaptation, as a share of bilateral allocable ODA in the sector <<sector.lower()>>. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_sector}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share_sector}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor and sector (<<sector>>) - Mitigation and adaptation (% of bilateral allocable ODA in the sector)"
-        display:
-          name: "Mitigation and adaptation"
-          numDecimalPlaces: 1
-      non_climate:
-        title: "Non-climate-related ODA by donor and sector (<<sector>>)"
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that does not target climate change mitigation or adaptation, given that is <<sector.lower()>>. {definitions.short_commitments} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_sector}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_non_climate}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Non-climate-related ODA by donor and sector (<<sector>>)"
-        display:
-          name: "Non-climate-related"
-          numDecimalPlaces: 0
-      non_climate_share:
-        title: "Non-climate-related ODA by donor and sector (<<sector>>) (% of bilateral allocable ODA in the sector)"
-        unit: "% of bilateral allocable ODA in the sector"
-        short_unit: "%"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that does not target climate change mitigation or adaptation, as a share of bilateral allocable ODA in the sector <<sector.lower()>>. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_sector}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_non_climate}\n\n{definitions.processing_share_sector}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Non-climate-related ODA by donor and sector (<<sector>>) (% of bilateral allocable ODA in the sector)"
-        display:
-          name: "Non-climate-related"
-          numDecimalPlaces: 1
-      climate_related_share_of_all_sectors:
-        title: "Climate-related ODA by donor and sector (<<sector>>) (% of climate-related ODA)"
-        unit: "% of climate-related ODA"
-        short_unit: "%"
-        description_short: "Climate-related [ODA](#dod:oda) given that is <<sector.lower()>>, as a share of all climate-related ODA. {definitions.short_commitments}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_rio_markers}"
-          - "{definitions.key_climate_markers}"
-          - "{definitions.key_overlap}"
-          - "{definitions.key_upper_bound}"
-          - "{definitions.key_commitments}"
-          - "{definitions.key_adaptation_marker}"
-          - "{definitions.key_not_screened}"
-          - "{definitions.key_sector}"
-          - "{definitions.key_constant_usd}"
-        processing_level: major
-        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share_of_all_sectors}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor and sector (<<sector>>) (% of climate-related ODA)"
-        display:
-          name: "<<sector>>"
           numDecimalPlaces: 1

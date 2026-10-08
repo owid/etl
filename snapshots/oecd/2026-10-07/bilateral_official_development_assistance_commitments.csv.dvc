@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "CRS: Creditor Reporting System (flows)"
+    description: |-
+      This dataset provides readily available, granular data on who is giving what aid, to where, and for what purpose, on a flow basis. These data are comparable across all providers who report their activity-level statistics to the OECD.
+    # NOTE: The Data Explorer shows no release date; this is the latest version stamp of the dataflow's bulk files (v20260803).
+    date_published: "2026-08-03"
+
+    # Citation
+    producer: "OECD"
+    citation_full: |-
+      OECD (2026). CRS: Creditor Reporting System (flows). OECD Data Explorer.
+
+    # Files
+    url_main: https://data-explorer.oecd.org/vis?lc=en&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_CRS%40DF_CRS&df[ag]=OECD.DCD.FSD
+    # NOTE: There is no single download file; the snapshot script queries the OECD SDMX API.
+    date_accessed: 2026-10-08
+
+    # License
+    license:
+      name: "OECD Terms & conditions"
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: 3c15bce097462797b2666ac93ac77b31
+    size: 1106860
+    path: bilateral_official_development_assistance_commitments.csv
