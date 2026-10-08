@@ -304,7 +304,9 @@ def run() -> None:
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
         yaml_params={
-            "ENTITY_ANNOTATIONS_RECIPIENTS": "\n".join(f"{name}: {ANNOTATION_NOT_ASSIGNED}" for name in names_not_assigned)
+            "ENTITY_ANNOTATIONS_RECIPIENTS": "\n".join(
+                f"{name}: {ANNOTATION_NOT_ASSIGNED}" for name in names_not_assigned
+            )
         },
     )
 
@@ -816,7 +818,9 @@ def sanity_check_not_assigned(tb: Table) -> list[str]:
     names_not_assigned = sorted(name for name in recipients if name.endswith(SUFFIXES_NOT_ASSIGNED))
     assert "Africa, regional (OECD)" in names_not_assigned, "Africa, regional is missing from the recipients."
     # Regional entities must not be named as whole regions.
-    assert not {"Central Asia (OECD)", "South Asia (OECD)"} & recipients, "A regional entity is named as a whole region."
+    assert not {"Central Asia (OECD)", "South Asia (OECD)"} & recipients, (
+        "A regional entity is named as a whole region."
+    )
 
     # The total of a region includes the aid to the region as a whole.
     tb_oda = tb[tb["oda_recipient"].notna()].pivot_table(
