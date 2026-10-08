@@ -30,22 +30,20 @@ steps:
         - snapshot://biodiversity/2024-09-30/living_planet_index_completeness.csv
 
   # Living Planet Index (2026 release).
-  # NOTE: Embargoed until 2026-10-08, hence private. Switch to data:// / snapshot:// (and drop is_public: false
-  #  from the snapshot .dvc files) on/after that date.
-  data-private://grapher/biodiversity/2026-09-30/living_planet_index:
-    - data-private://garden/biodiversity/2026-09-30/living_planet_index:
-        - data-private://meadow/biodiversity/2026-09-30/living_planet_index:
-            - snapshot-private://biodiversity/2026-09-30/living_planet_index.csv
+  data://grapher/biodiversity/2026-09-30/living_planet_index:
+    - data://garden/biodiversity/2026-09-30/living_planet_index:
+        - data://meadow/biodiversity/2026-09-30/living_planet_index:
+            - snapshot://biodiversity/2026-09-30/living_planet_index.csv
 
-  # LPI - Share of populations increasing or decreasing (2026 release, embargoed until 2026-10-08)
-  data-private://grapher/biodiversity/2026-09-30/living_planet_index_share:
-    - data-private://garden/biodiversity/2026-09-30/living_planet_index_share:
-        - snapshot-private://biodiversity/2026-09-30/living_planet_index_share.csv
+  # LPI - Share of populations increasing or decreasing (2026 release)
+  data://grapher/biodiversity/2026-09-30/living_planet_index_share:
+    - data://garden/biodiversity/2026-09-30/living_planet_index_share:
+        - snapshot://biodiversity/2026-09-30/living_planet_index_share.csv
 
-  # LPI - Completeness: species included in the index (2026 release, embargoed until 2026-10-08)
-  data-private://grapher/biodiversity/2026-09-30/living_planet_index_completeness:
-    - data-private://garden/biodiversity/2026-09-30/living_planet_index_completeness:
-        - snapshot-private://biodiversity/2026-09-30/living_planet_index_completeness.csv
+  # LPI - Completeness: species included in the index (2026 release)
+  data://grapher/biodiversity/2026-09-30/living_planet_index_completeness:
+    - data://garden/biodiversity/2026-09-30/living_planet_index_completeness:
+        - snapshot://biodiversity/2026-09-30/living_planet_index_completeness.csv
 
   #
 
