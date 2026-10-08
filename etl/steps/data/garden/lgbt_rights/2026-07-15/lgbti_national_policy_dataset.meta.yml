@@ -44,7 +44,7 @@ definitions:
     From the original dataset's two separate indicators — one for sexual orientation and one for gender identity — we combined them into a single categorical indicator with five categories: both protected, sexual orientation only, gender identity only, no protection, and "Varies by region" (any partial subnational coverage in either dimension).
 
   description_key_so_gi_partial_note: |-
-    "Varies by region" also covers asymmetric cases where one dimension is fully unprotected and the other is partially protected across subnational jurisdictions — e.g. a federal country where some states have hate-crime protections for sexual orientation but none for gender identity.
+    "Varies by region" also covers asymmetric cases where one dimension is fully unprotected and the other is partially protected across subnational jurisdictions — e.g. a federal country where some states or provinces protect sexual orientation but none protect gender identity.
   derivation_gac: |-
     From the original dataset's four indicators for gender-affirming care (adults covered, adults restricted, minors covered, minors restricted), we combined them into a single categorical indicator capturing whether care is publicly funded or legally restricted for adults and for minors. The salient national policy states keep their own category, while the rarer one-group-only states are merged into "Covered for adults or minors only" and "Restricted for adults or minors only"; only country-years with subnational variation or contradictory same-year coding are grouped as "Varies by region or other".
   derivation_gmc: |-
