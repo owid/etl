@@ -183,12 +183,6 @@ steps:
             - snapshot://health/2024-04-12/polio_free_countries.csv
         - data://garden/regions/2023-01-01/regions
 
-  # Polio vaccine schedule - update
-  data://grapher/who/2025-01-13/polio_vaccine_schedule:
-    - data://garden/who/2025-01-13/polio_vaccine_schedule:
-        - data://meadow/who/2025-01-13/polio_vaccine_schedule:
-            - snapshot://who/2025-01-13/polio_vaccine_schedule.xlsx
-
   # Polio GPEI funding
   data://grapher/health/2024-04-22/gpei_funding:
     - data://garden/health/2024-04-22/gpei_funding:
