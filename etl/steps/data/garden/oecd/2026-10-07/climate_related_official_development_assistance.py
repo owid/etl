@@ -42,13 +42,15 @@ DONOR_GROUPS = [
     "G7",  # G7 countries
 ]
 
-# Codes of recipients that are kept: everything except regional "unspecified" codes (ending in "_X", e.g. "F_X",
-# Africa, regional), which are aid to a region not assigned to a country, not groups of countries.
-CODES_UNSPECIFIED_KEPT = [
-    "DPGC_X",  # Developing countries, unspecified (aid not assigned to any country or region)
+# Codes ending in "_X" are aid to a region as a whole (e.g. "F_X", Africa, regional), or to developing countries in
+# general ("DPGC_X"), that is not assigned to a single country. These are the exceptions: recipients that are not
+# classified by income group.
+CODES_UNCLASSIFIED_BY_INCOME = [
     "INC_X",  # Recipients not classified by income group (OECD)
     "INCWB_X",  # Countries not classified by the World Bank
 ]
+# Annotation shown next to the names of entities whose aid is not assigned to a single country.
+ANNOTATION_NOT_ASSIGNED = "not assigned to a single country"
 
 # World Bank income groups of recipients, whose members change every year.
 WORLD_BANK_INCOME_GROUPS = [
@@ -121,11 +123,7 @@ def run() -> None:
     # Define the donors and recipients (and their groups) to include, and the codes in the data that belong to each.
     donors = sorted(set(tb_totals["donor_code"]) - {CODE_ALL_DONORS})
     members_donors = create_members(tb_groups=tb_groups, hierarchy="donor", entity_codes=donors + DONOR_GROUPS)
-    recipients = sorted(
-        code
-        for code in set(tb_totals[tb_totals["donor_code"] == CODE_ALL_DONORS]["recipient_code"])
-        if not code.endswith("_X") or code in CODES_UNSPECIFIED_KEPT
-    )
+    recipients = sorted(set(tb_totals[tb_totals["donor_code"] == CODE_ALL_DONORS]["recipient_code"]))
     members_recipients = create_members(tb_groups=tb_groups, hierarchy="recipient", entity_codes=recipients)
     # Codes of groups of recipients (as opposed to individual recipients, which are their own only member).
     groups_recipients = set(tb_groups[tb_groups["hierarchy"] == "recipient"]["parent_code"])
@@ -221,22 +219,34 @@ def run() -> None:
     for short_name, tb in tables.items():
         tb["country"] = tb["entity_code"].map(names)
         assert tb["country"].notna().all(), f"Codes without names in {short_name}."
-        tb = tb.drop(columns=["entity_code"])
 
         # Harmonize country names.
         # NOTE: The same mapping covers donors and recipients, so each table uses only part of it.
         tb = paths.regions.harmonize_names(tb=tb, warn_on_unused_countries=False)
 
+        # Names of recipients whose aid is not assigned to a single country.
+        if short_name == "climate_related_oda_by_recipient":
+            is_not_assigned = tb["entity_code"].str.endswith("_X") & ~tb["entity_code"].isin(CODES_UNCLASSIFIED_BY_INCOME)
+            names_not_assigned = sorted(set(tb.loc[is_not_assigned, "country"]))
+        tb = tb.drop(columns=["entity_code"])
+
         # Improve table format.
         tables[short_name] = tb.format(["country", "year"], short_name=short_name)
 
     sanity_check_outputs(tables=tables)
+    sanity_check_not_assigned(names_not_assigned=names_not_assigned)
 
     #
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(tables=list(tables.values()), default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=list(tables.values()),
+        default_metadata=ds_meadow.metadata,
+        yaml_params={
+            "ENTITY_ANNOTATIONS_RECIPIENTS": "\n".join(f"{name}: {ANNOTATION_NOT_ASSIGNED}" for name in names_not_assigned)
+        },
+    )
 
     # Save garden dataset.
     ds_garden.save()
@@ -513,3 +523,11 @@ def sanity_check_outputs(tables: dict[str, Table]) -> None:
 def close(a, b) -> bool:
     """Whether two series agree within a relative tolerance (plus a small absolute one, for values near zero)."""
     return bool(((a - b).abs() <= RELATIVE_TOLERANCE * b.abs() + 0.01).all())
+
+
+def sanity_check_not_assigned(names_not_assigned: list[str]) -> None:
+    """Recipients whose aid is not assigned to a single country must be named as such, so readers can tell them apart from
+    countries and groups."""
+    assert "Africa, regional (OECD)" in names_not_assigned, "Africa, regional is missing from the recipients."
+    wrong = [n for n in names_not_assigned if not n.endswith((", regional (OECD)", ", unspecified (OECD)"))]
+    assert not wrong, f"Recipients not assigned to a single country with unexpected names: {wrong}"
