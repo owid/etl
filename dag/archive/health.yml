@@ -1188,3 +1188,10 @@ steps:
     - data://garden/cancer/2025-02-17/gco_cancer_survival:
       - data://meadow/cancer/2025-02-17/gco_cancer_survival:
         - snapshot://cancer/2025-02-17/gco_cancer_survival.csv
+  # archived; last active in ecd7cf891b81 on 2026-10-05
+  data://grapher/who/2025-12-01/hpv_vaccination_coverage:
+    - data://garden/who/2025-12-01/hpv_vaccination_coverage:
+      - data://meadow/who/2025-07-15/vaccination_coverage
+  # archived; last active in ecd7cf891b81 on 2026-10-05
+  data://grapher/who/2025-07-15/vaccination_coverage:
+    - data://garden/who/2025-07-15/vaccination_coverage
