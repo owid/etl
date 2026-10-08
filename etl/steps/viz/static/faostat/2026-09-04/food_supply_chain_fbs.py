@@ -13,7 +13,9 @@ paths = PathFinder(__file__)
 # Country and year of the static chart (1968 is the year The Population Bomb was published).
 COUNTRY = "World"
 YEAR = 1968
+# Stages left out of the chart: tourist consumption is set to zero for the world.
+ZERO_STAGES_TO_DROP = ["tourist_consumption"]
 
 
 def run() -> None:
-    build_feed(paths, countries=[COUNTRY], years=[YEAR])
+    build_feed(paths, countries=[COUNTRY], years=[YEAR], zero_stages_to_drop=ZERO_STAGES_TO_DROP)

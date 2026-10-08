@@ -65,8 +65,14 @@ def _save(paths: PathFinder, data: dict, filename: str) -> None:
         json.dump(data, f, separators=(",", ":"))
 
 
-def build_feed(paths: PathFinder, countries: list[str] | None = None, years: list[int] | None = None) -> None:
-    """Write the feed files; `countries` and `years`, if given, restrict them to those countries and years."""
+def build_feed(
+    paths: PathFinder,
+    countries: list[str] | None = None,
+    years: list[int] | None = None,
+    zero_stages_to_drop: list[str] | None = None,
+) -> None:
+    """Write the feed files; `countries` and `years`, if given, restrict them to those countries and years, and
+    `zero_stages_to_drop` lists stages left out of the files, which must be zero in all of them."""
     #
     # Load inputs: whichever of the two garden datasets is the dependency.
     #
@@ -83,8 +89,13 @@ def build_feed(paths: PathFinder, countries: list[str] | None = None, years: lis
             assert set(years) <= set(tb["year"]), f"Years missing in {nutrient!r}: {years}"
             tb = tb[tb["year"].isin(years)]
         tables[nutrient] = tb.reset_index(drop=True)
+        for key in zero_stages_to_drop or []:
+            assert (tables[nutrient][key] == 0).all(), (
+                f"Stage {key!r} is not zero in {nutrient!r}, so it can't be dropped."
+            )
 
-    stage_keys = [key for key, _, _ in STAGES]
+    stages = [stage for stage in STAGES if stage[0] not in (zero_stages_to_drop or [])]
+    stage_keys = [key for key, _, _ in stages]
     for nutrient, tb in tables.items():
         assert set(stage_keys) <= set(tb.columns), (
             f"Table {nutrient!r} lacks stages: {set(stage_keys) - set(tb.columns)}"
@@ -97,7 +108,7 @@ def build_feed(paths: PathFinder, countries: list[str] | None = None, years: lis
         columns={
             f"{name} ({tables[nutrient][key].metadata.short_unit})": tables[nutrient][key]
             for nutrient in NUTRIENTS
-            for key, name, _ in STAGES
+            for key, name, _ in stages
         },
         update_period_days=ds.metadata.update_period_days,
     )
@@ -113,7 +124,7 @@ def build_feed(paths: PathFinder, countries: list[str] | None = None, years: lis
         "sources": sorted({origin.attribution for origin in reference["food"].metadata.origins if origin.attribution}),
         "timeRange": {"start": int(reference["year"].min()), "end": int(reference["year"].max())},
         "units": {nutrient: tables[nutrient]["food"].metadata.unit for nutrient in NUTRIENTS},
-        "stages": [{"key": key, "name": name, "direction": direction} for key, name, direction in STAGES],
+        "stages": [{"key": key, "name": name, "direction": direction} for key, name, direction in stages],
         "dimensions": {"entities": [{"id": entity_to_id[name], "name": name} for name in entities]},
     }
     _save(paths, add_feed_metadata(metadata, feed_metadata), f"{FILE_SLUG}.metadata.json")
