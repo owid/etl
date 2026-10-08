@@ -94,10 +94,11 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    >> Scale: major for the stages "feed" and "processing_net". The fixed densities carry only 3.4% of tonnage, but
    that tonnage is the oilseed cakes and brans whose presence is the main reason to use SCL at all.
 
-   Items nobody eats (cakes, brans, ethanol, refining residues) have no food use, so no density can be derived from
-   the data. Each gets the energy and protein of the human food it would be if eaten: energy from USDA's food
-   composition tables, protein of each cake from the Feedipedia feed tables. The values and sources are in
-   `food_supply_chain_scl.items.yml`.
+   Items with little or no food use (cakes, brans, ethanol, refining residues) need fixed densities. These use
+   matching FAO factors where available: the 2024 nutrient conversion table, the FBS Handbook for three oilseed
+   cakes absent from that table, and FAOSTAT's reported food observations for chemically modified fats. Items
+   without a matching FAO factor retain the existing estimates from USDA food analogues and Feedipedia feed
+   tables. The values, sources and remaining gaps are in `food_supply_chain_scl.items.yml`.
    These fixed densities only apply to an item when less than 1% of the item's supply is eaten as food. The reason
    is that a few hundred tonnes of soybean cake eaten somewhere would otherwise set the density of hundreds of
    millions of tonnes of cake. An item on the list with a real food use (spirits, and wheat bran in some countries)
@@ -195,34 +196,34 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
 KNOWN PROBLEMS, NOT YET RESOLVED
 --------------------------------
 - Processing appears to create calories in some countries.
-  >> Scale: major for Brazil, about -650 kcal per person per day in 2023; small for World. Not fixed yet; the FBS
-  sibling has the same symptom with a different cause.
+  >> Scale: major for Brazil, where processing creates about 280 kcal per person per day in 2023; small for World,
+  where processing loses 47 kcal. Not fixed yet; the FBS sibling has the same symptom with a different cause.
 
-  In the normal case "processing_net" is positive: factories lose some calories. But in Brazil, "processing_net" is
-  negative, as if Brazilian factories created calories. Two inconsistencies cause this:
-  - Ethanol. The production of ethanol counts as factory output, valued at 700 kcal per 100 g (assumption 6). But
-    ethanol is not among the products used to derive the density of sugar cane (assumption 7), so the cane entering
-    the mills is never credited with the calories of the ethanol made from it. Calories come out that were never
-    counted going in. Brazil, where a large share of the cane becomes ethanol, is the extreme case.
-  - The soy family. Soybeans enter processing at their data-derived density (406 kcal per 100 g in Brazil), but the
-    outputs, cake at the fixed 330 (assumption 6) plus oil at 900, add up to about 6% more than the beans carried.
-    Brazil crushes so much soy that 6% is large.
+  In the normal case "processing_net" is positive: the converted processing inputs exceed the converted product
+  outputs. Brazil's gain comes mostly from ethanol. The cane sent to Brazil's distilleries is recorded as "other
+  uses", not as "processing", but the ethanol made from it counts as a processed product. So about 300 kcal per
+  person per day of ethanol leave processing without ever having entered it. The United States records the maize
+  sent to its distilleries in the same way. The soy family is no longer a cause: with FAO's soybean-cake factor (261
+  kcal per 100 g, replacing the previous 330), it loses 234 kcal per person per day in Brazil. In protein, the soy
+  family still creates 11.8 g per person per day, because FAO's cake protein factor is the same 46 g per 100 g used
+  before.
 
 - The product-implied densities are World-level ratios applied to every country.
-  >> Scale: minor for World by construction; it distorts countries whose product mix differs from the world
-  average (again Brazil, with its ethanol).
+  >> Scale: minor for World by construction; country-level discrepancies depend on differences from the world
+  product mix.
 
   A country whose product mix differs from the world average gets a density of assumption 7 that does not match
   what its own factories make.
 
 - The stage "feed" only counts feed that passes through the balance.
-  >> Scale: "animal_products" exceeds "feed" in 13% of country-years in energy and 22% in protein, mostly real free
-  inputs rather than errors; World is unaffected (feed 2,084 against 631 kcal in 2023, and 106 against 43 g of
-  protein).
+  >> Scale: "animal_products" exceeds "feed" by more than 1 kcal in 14% of country-years in energy and by more than
+  0.01 g in 23% in protein. World still has more recorded feed than animal output (2,028 against 631 kcal in 2023,
+  and 106 against 43 g of protein).
 
   Grass, pasture and forage are not SCL items, so everything grazing animals eat from pasture enters the chain
   nowhere, and wild-caught fish count as animal products with no feed at all. For fishing and grazing countries
-  (Iceland, Mongolia, several island states), "animal_products" can therefore exceed "feed".
+  (Iceland, Mongolia, several island states), "animal_products" can therefore exceed "feed". The balance alone
+  does not measure how much of a particular country's gap these omitted inputs explain.
 """
 
 import numpy as np
@@ -712,7 +713,7 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
         default="none",
     )
 
-    # Assumption 6: items nobody eats, valued as human food; items that are never food, zero.
+    # Assumption 6: items with little food use get fixed factors; items that are never food get zero.
     fixed = fixed_density_map(tb, manual, nutrient)
     for item in manual["never_food"]:
         fixed[_pad_code(item["code"])] = 0.0

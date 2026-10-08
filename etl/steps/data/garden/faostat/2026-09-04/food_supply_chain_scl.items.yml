@@ -4,49 +4,65 @@
 # from the data itself: the item list and the crop/animal/processed roles come from FAO's item groups, and energy
 # densities are reverse-engineered from FAO's food figures. This file holds only what cannot come from the data.
 
-# 1. Energy (kcal per 100 g) and protein (g per 100 g) for items that nobody eats, so that nothing can be
-#    reverse-engineered. Each item is valued as the human food it would be if eaten: defatted oilseed flours for the
-#    cakes, the cereal brans as sold for human consumption, pure ethanol, pure oil.
-#    Source: USDA FoodData Central, SR Legacy. Energy: soy flour defatted 330, sunflower seed flour 326, sesame flour
-#    333, cottonseed flour 332, peanut flour defatted 327; wheat bran 216, rice bran 316, corn bran 224, oat bran 246;
-#    hemp seed 553; vegetable oils 884. Protein: soy flour defatted 47, sunflower seed flour 48, sesame flour 50,
-#    cottonseed flour 50, peanut flour defatted 52; wheat bran 15.6, rice bran 13.4, corn bran 8.4, oat bran 17.3;
-#    hemp seed 31.6; oils and ethanol 0. Ethanol is 7 kcal per gram.
+# 1. Energy (kcal per 100 g) and protein (g per 100 g) for items with too little food use to derive a reliable
+#    factor from their reported food quantities. Prefer FAO factors for the matching commodity:
+#    - FAO's 2024 Global nutrient conversion table for SUA (NCT): cereal brans, centrifugal cane sugar, hemp oil,
+#      tallow. Their edible-portion coefficients are all 1, so the published factors apply to the whole tonnage.
+#      https://www.fao.org/food-composition/tables-and-databases/detail/global-nutrient-conversion-table-for-fao-supply-utilization-accounts/en
+#    - FAO Food Balance Sheets Handbook, Annex I: soybean, groundnut and sesame cake (not covered by the 2024 NCT).
+#      The soybean and groundnut figures also match the factors in FAOSTAT SCL's rare food observations.
+#      https://www.fao.org/4/X9892E/X9892e05.htm
+#    - FAOSTAT SCL's reported food calories and tonnes: chemically modified mixed fats (item 1274), 902 kcal/100 g
+#      and zero protein, as used for Russia's large food observation in 2019.
+#    The remaining entries are existing estimates, not matching FAO nutrient factors. Those source gaps are
+#    explicit below; do not substitute FAO figures for different commodities (e.g. wheat gluten for gluten feed).
+#    The ethanol factor is unchanged.
 fixed_densities:
   families:
     # Applied by name pattern to every item whose name starts with the pattern, unless the item is listed
     # individually below.
-    # Energy: defatted oilseed flours, 326-333 kcal in USDA. Protein: a typical oilseed cake, for the minor cakes not
+    # Existing energy proxy: defatted oilseed flours, about 330 kcal in USDA. Protein: a typical oilseed cake, for the minor cakes not
     # listed individually below (safflower, mustard, kapok, hemp, poppy, oilseeds nes; about 1.5 Mt in total).
     - {pattern: "Cake of", energy: 330, protein: 35, note: "Default for minor cakes; the main cakes are listed individually."}
     - {pattern: "Cake,", energy: 330, protein: 35, note: "Same family (oilseeds not elsewhere classified)."}
-    - {pattern: "Bran of", energy: 216, protein: 15.6, note: "Wheat bran as the default for cereal brans without a USDA entry."}
   items:
-    # Cakes: protein from Feedipedia (INRAE-CIRAD-AFZ-FAO feed tables, https://www.feedipedia.org), as fed = crude
-    # protein in % of dry matter x dry matter share, for the solvent-extracted meal. Energy as the family (330).
-    - {code: 238, name: "Cake of soya beans", energy: 330, protein: 46, note: "Soybean meal 48: 52.6% DM protein x 88% DM (feedipedia.org/node/674)."}
+    # Cakes without matching FAO factors retain their existing estimates: protein from Feedipedia
+    # (INRAE-CIRAD-AFZ-FAO feed tables, https://www.feedipedia.org), as fed = crude protein in % of dry matter x dry
+    # matter share, for the solvent-extracted meal; energy uses the existing family proxy (330).
+    - {code: 238, name: "Cake of soya beans", energy: 261, protein: 46, note: "FAO FBS Handbook, Annex I; absent from the 2024 SUA nutrient table."}
     - {code: 272, name: "Cake of rapeseed", energy: 330, protein: 34, note: "Rapeseed meal: 38.1% DM x 89% DM (feedipedia.org/node/52)."}
     - {code: 269, name: "Cake of sunflower seed", energy: 330, protein: 31, note: "Sunflower meal, mean of partially dehulled (37.7% DM) and non-dehulled (31.3% DM) x 89% DM (feedipedia.org/node/732)."}
     - {code: 332, name: "Cake of cottonseed", energy: 330, protein: 43, note: "Cottonseed meal, decorticated: 47.3% DM x 91% DM (feedipedia.org/node/550); undecorticated cake would be lower."}
     - {code: 259, name: "Cake of palm kernel", energy: 330, protein: 16, note: "Palm kernel meal: 16.7-18.7% DM x 91% DM (feedipedia.org/node/43)."}
-    - {code: 245, name: "Cake of groundnuts", energy: 330, protein: 49, note: "Peanut meal: 54.5% DM x 89% DM (feedipedia.org/node/699)."}
+    - {code: 245, name: "Cake of groundnuts", energy: 363, protein: 41.7, note: "FAO FBS Handbook, Annex I; absent from the 2024 SUA nutrient table."}
     - {code: 37, name: "Cake of rice bran", energy: 330, protein: 15, note: "Defatted rice bran, about 15-17% protein as fed (Feedipedia)."}
     - {code: 61, name: "Cake of maize", energy: 330, protein: 22, note: "Maize germ meal, 20-30% protein type (feedipedia.org/node/12286)."}
     - {code: 253, name: "Cake of copra", energy: 330, protein: 20, note: "Copra meal: 20-25% DM protein (feedipedia.org/node/46)."}
-    - {code: 291, name: "Cake of sesame seed", energy: 330, protein: 40, note: "Sesame meal: 40-50% protein (Feedipedia)."}
+    - {code: 291, name: "Cake of sesame seed", energy: 376, protein: 40.7, note: "FAO FBS Handbook, Annex I; absent from the 2024 SUA nutrient table."}
     - {code: 335, name: "Cake of linseed", energy: 330, protein: 30, note: "Linseed meal: about 33-35% DM protein (Feedipedia)."}
-    - {code: 158, name: "Cane sugar, centrifugal", energy: 380, protein: 0, note: "Raw sugar, USDA brown sugar 380; no food use is reported for it because it is refined further."}
-    - {code: 35, name: "Bran of rice", energy: 316, protein: 13.4}
-    - {code: 59, name: "Bran of maize", energy: 224, protein: 8.4}
-    - {code: 77, name: "Bran of oats", energy: 246, protein: 17.3}
+    - {code: 158, name: "Cane sugar, centrifugal", energy: 399.0, protein: 0.2, note: "FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1."}
+    - {code: 17, name: Bran of wheat, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
+    - {code: 35, name: "Bran of rice", energy: 393.0, protein: 13.4, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
+    - {code: 47, name: Bran of barley, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
+    - {code: 59, name: "Bran of maize", energy: 226.0, protein: 8.4, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
+    - {code: 73, name: Bran of rye, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
+    - {code: 77, name: "Bran of oats", energy: 360.0, protein: 14.2, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
+    - {code: 81, name: Bran of millet, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
+    - {code: 85, name: Bran of sorghum, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
+    - {code: 91, name: Bran of buckwheat, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
+    - {code: 96, name: Bran of fonio, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
+    - {code: 99, name: Bran of triticale, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
+    - {code: 105, name: Bran of mixed grain, energy: 333.0, protein: 13.8, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
+    - {code: 112, name: Bran of cereals n.e.c., energy: 333.0, protein: 13.8, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
+    - {code: 213, name: Bran of pulses, energy: 216, protein: 15.6, note: No matching FAO factor found; retain the existing USDA wheat-bran proxy.}
     - {code: 846, name: "Gluten feed and meal", energy: 330, protein: 22, note: "Maize gluten feed: about 22% protein as fed (Feedipedia); gluten meal is higher but a smaller volume."}
     - {code: 632, name: "Undenatured ethyl alcohol of an alcoholic strength by volume of 80% vol or higher", energy: 700, protein: 0}
     - {code: 1276, name: "Industrial monocarboxylic fatty acids; acid oils from refining", energy: 884, protein: 0, note: "Fat that left the food chain to industry."}
     - {code: 1277, name: "Residues of fatty substances", energy: 884, protein: 0}
-    - {code: 1274, name: "Animal or vegetable fats and oils and their fractions, chemically modified, except those hydrogenated, inter-esterified, re-esterified or elaidinized; inedible mixtures or preparations of animal or vegetable fats or oils", energy: 884, protein: 0}
+    - {code: 1274, name: "Animal or vegetable fats and oils and their fractions, chemically modified, except those hydrogenated, inter-esterified, re-esterified or elaidinized; inedible mixtures or preparations of animal or vegetable fats or oils", energy: 902, protein: 0, note: 'FAOSTAT SCL food observations: 902 kcal/100 g and zero protein (Russia, 2019).'}
     - {code: 336, name: "Hempseed", energy: 553, protein: 31.6}
-    - {code: 337, name: "Oil of hempseed", energy: 884, protein: 0}
-    - {code: 1225, name: "Tallow", energy: 884, protein: 0, note: "Only used where no food-based density exists."}
+    - {code: 337, name: "Oil of hempseed", energy: 900.0, protein: 0.0, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
+    - {code: 1225, name: "Tallow", energy: 891.0, protein: 1.7, note: "FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1."}
 
 # 2. Items that are never food, whatever happens to them. Their density is zero, which removes them from every
 #    flow consistently (the balance identity is linear in the density).
