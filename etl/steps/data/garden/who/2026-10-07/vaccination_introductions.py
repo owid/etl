@@ -19,9 +19,9 @@ SCHEDULE_MAPPING = {
     "Yes (OPV)": "When IPV and OPV are co-administered",
     "High risk area": "High risk areas",
     "Yes (D)": "Demonstration projects",
-    "Yes (M)": "Maternal vaccination",
-    "Yes (I)": "Infant monoclonal antibody",
-    "Yes (Both)": "Maternal vaccination and infant monoclonal antibody",
+    "Yes (M)": "Maternal vaccination only",
+    "Yes (I)": "Infant antibodies only",
+    "Yes (Both)": "Both",
     # NOTE: "VA" is not defined in the source file and only appears on Seasonal Influenza rows. I've emailed WHO (vpdata@who.int), but until we hear back, keep the raw code visible rather than guessing a label.
     "Yes (VA)": "Yes (VA) (unknown meaning)",
     "ND": pd.NA,
@@ -55,9 +55,9 @@ def run() -> None:
                 "Regions of the country",
                 "Specific risk groups",
                 "Adolescents",
-                "Maternal vaccination",
-                "Infant monoclonal antibody",
-                "Maternal vaccination and infant monoclonal antibody",
+                "Maternal vaccination only",
+                "Infant antibodies only",
+                "Both",
             ]
         )
     ]
