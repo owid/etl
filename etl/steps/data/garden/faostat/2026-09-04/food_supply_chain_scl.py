@@ -570,6 +570,9 @@ def prepare_fish_table(tb_fbsc: Table, manual: dict, population: Table) -> Table
     # rounded to 1,000 t, so densities are taken from its per-capita figures, expressed as totals in SCL's units
     # (kcal per year; tonnes of protein per year; tonnes of food) so that they can be summed into regions.
     tb = tb.merge(population, on=["country", "year"], how="inner")
+    # Multiplying by population would copy population's display settings (rounding, projection flag) into every
+    # stage, through the densities.
+    tb["population"].metadata.display = None
     tb["food_kcal_per_year"] = tb["food_kcal_per_capita_per_day"] * DAYS_PER_YEAR * tb["population"]
     tb["food_protein_g_per_year"] = tb["food_protein_g_per_capita_per_day"] * DAYS_PER_YEAR * tb["population"]
     tb["food_tonnes_for_density"] = tb["food_kg_per_capita_per_year"] * tb["population"] / KG_PER_TONNE

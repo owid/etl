@@ -551,6 +551,9 @@ def prepare_balance_table(tb: Table, items: Table) -> Table:
     # Food nutrient totals (kcal per year, tonnes of protein per year) and food tonnes, from FAO's per-capita food
     # supply, so that they can be summed into regions. The density (assumption 4) is their ratio, so for a country
     # the population cancels.
+    # Multiplying by population would copy population's display settings (rounding, projection flag) into every
+    # stage, through the densities.
+    tb["population"].metadata.display = None
     tb["food_kcal_per_year"] = tb["food_kcal_per_capita_per_day"] * DAYS_PER_YEAR * tb["population"]
     tb["food_protein_g_per_year"] = tb["food_protein_g_per_capita_per_day"] * DAYS_PER_YEAR * tb["population"]
     # "food_tonnes_for_density" is a second food tonnage, besides the balance element "food": it is reconstructed
