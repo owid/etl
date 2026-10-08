@@ -40,8 +40,8 @@ tables:
         title: Crop production
         description_short: Crops harvested in the country.
         description_key:
-          - Crops include cereals, roots and tubers, sugar crops, pulses, nuts, oil crops (including oil palm fruit), vegetables, fruit, coffee, tea, cocoa, spices and cottonseed.
-          - Products made from crops, such as flour, vegetable oils, sugar and beer, are not counted here, because the crops they are made from already are. Their production is subtracted from processing.
+          - Crops include cereals, roots and tubers, sugar crops, pulses, nuts, oil crops (including oil palm fruit), vegetables, fruit, coffee, tea, cocoa, spices, and cottonseed.
+          - Products made from crops, such as flour, vegetable oils, sugar, and beer, are not counted here, because the crops they are made from are already counted.
       imports:
         title: Imports
         description_short: Food products bought from other countries.
@@ -71,7 +71,7 @@ tables:
         title: Feed
         description_short: Food products fed to animals, including by-products of processing such as oilseed cake and bran.
         description_key:
-          - Animals also eat grass and crop residues, which are not counted here. Comparing animal products with feed therefore makes livestock look more efficient than they are.
+          - Animals also eat grass and crop residues, which are not counted here. So the feed counted here is less than what animals actually eat, and comparing it with animal products understates how much feed it takes to produce them.
       animal_products:
         title: Animal products
         description_short: Meat, offal, animal fats, milk, eggs, honey, fish and seafood produced in the country.
