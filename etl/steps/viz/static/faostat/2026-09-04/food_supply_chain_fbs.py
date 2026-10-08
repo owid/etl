@@ -17,8 +17,9 @@ The chart is in the Charts (2026) Figma file, page "20261008 How many calories d
 did they go? (Pablo R)", frame `world-food-supply-chain-calories-1968` (node 28837:6):
 https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=28837-6
 It was drawn by the interactive waterfall reading this step's files (served locally to the bespoke dev server of
-owid-grapher, with `BESPOKE_DATA_URL`); in Figma, the value labels were rounded to the nearest 100 kcal and "Biofuels
-and industry" was relabeled "Industry and other uses".
+owid-grapher, with `BESPOKE_DATA_URL`), with every font size in the waterfall's `core/constants.ts` raised by 1px (a
+local change, not committed to owid-grapher). In Figma, the value labels were rounded to the nearest 100 kcal and
+"Biofuels and industry" was relabeled "Industry and other uses".
 """
 
 import json
