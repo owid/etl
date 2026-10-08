@@ -1,0 +1,33 @@
+chart_config_id: 01a11b11-2f8a-7bd9-8623-cc64654f32de
+grapher_schema: "011"
+topic_tags:
+  - "Foreign Aid"
+  - "Climate Change"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "climate_related_oda_by_recipient#climate_related"
+    config:
+      title: "Development aid received for climate-related projects"
+      subtitle: "Bilateral aid committed by members of the OECD Development Assistance Committee (DAC) to projects that target climate change mitigation, adaptation, or both. Adjusted for inflation."
+      note: "Projects that target climate as a secondary objective are counted at their full value. Aid to regional or unspecified projects is not assigned to any country."
+      tab: "map"
+      hasMapTab: true
+      chartTypes:
+        - "LineChart"
+      minTime: 2010
+      yAxis:
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "BuGn"
+          binningStrategy: "manual"
+          customNumericValues: [0, 10000000, 50000000, 100000000, 250000000, 500000000, 1000000000, 2000000000]
+      selectedEntityNames:
+        - "India"
+        - "Philippines"
+        - "Bangladesh"
+        - "Indonesia"
+        - "Kenya"

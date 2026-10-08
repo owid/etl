@@ -1,0 +1,28 @@
+chart_config_id: 01a11b1e-1dbb-72ef-83d5-805eeb049cde
+grapher_schema: "011"
+topic_tags:
+  - "Foreign Aid"
+  - "Climate Change"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "climate_related_oda_by_recipient#climate_related_share_of_bilateral_total"
+    config:
+      title: "Share of all bilateral aid received that is climate-related"
+      subtitle: "Bilateral aid from members of the OECD Development Assistance Committee (DAC) that targets climate change mitigation, adaptation, or both, as a share of all bilateral aid received from them."
+      note: "Based on commitments. All bilateral aid includes aid that the OECD's climate markers don't apply to, such as budget support, but not contributions to multilateral organizations. Projects that target climate as a secondary objective are counted at their full value."
+      tab: "map"
+      hasMapTab: true
+      chartTypes:
+        - "LineChart"
+      minTime: 2010
+      yAxis:
+        min: 0
+      selectedEntityNames:
+        - "India"
+        - "Philippines"
+        - "Bangladesh"
+        - "Indonesia"
+        - "Kenya"

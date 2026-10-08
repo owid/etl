@@ -519,6 +519,28 @@ steps:
         - snapshot://oecd/2026-10-07/bilateral_official_development_assistance_commitments.csv
 
   #
+  # Climate-related ODA charts — authored in ETL.
+  #
+  viz://chart/oecd/latest/climate_related_aid_given:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/climate_related_aid_given_by_objective:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/share_of_aid_given_that_is_climate_related:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/share_of_total_aid_given_that_is_climate_related:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/climate_related_aid_received:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/share_of_aid_received_that_is_climate_related:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/share_of_total_aid_received_that_is_climate_related:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/climate_related_share_of_aid_given_two_measures:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/climate_related_share_of_aid_received_two_measures:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+
+  #
   # CORE Econ - Growth rate of GDP per capita and productivity
   #
   data://grapher/core_econ/2026-01-07/growth_rate_gdp_productivity:
