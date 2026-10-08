@@ -17,9 +17,9 @@ def run() -> None:
     # Load inputs.
     #
     ds_garden = paths.load_dataset("lgbti_national_policy_dataset")
-    tb_combined = ds_garden["lgbti_national_policy_dataset_combined"]
-    tb_combined_regions = ds_garden["lgbti_national_policy_dataset_combined_regions"]
-    tb_index = ds_garden["lgbti_composite_index"]
+    tb_combined = ds_garden.read("lgbti_national_policy_dataset_combined", reset_index=False)
+    tb_combined_regions = ds_garden.read("lgbti_national_policy_dataset_combined_regions", reset_index=False)
+    tb_index = ds_garden.read("lgbti_composite_index", reset_index=False)
 
     #
     # Save outputs.
