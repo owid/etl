@@ -105,6 +105,10 @@ def enable_structlog_filtering() -> None:
 
 
 pd.set_option("future.no_silent_downcasting", True)
+# Opt into pandas 3.0 behavior ahead of the upgrade: Copy-on-Write (chained assignment no longer
+# modifies the parent) and the dedicated `str` dtype for string columns instead of `object`.
+pd.set_option("mode.copy_on_write", True)
+pd.set_option("future.infer_string", True)
 
 # Environment, e.g. production, staging, dev
 ENV = env.get("ENV", "dev")
@@ -287,7 +291,7 @@ SUBSET = env.get("SUBSET", None)
 MAX_VIRTUAL_MEMORY_LINUX = 64 * 2**30  # 64 GB
 
 # increment this to force a full rebuild of all datasets
-ETL_EPOCH = 5
+ETL_EPOCH = 6
 
 # any garden or grapher dataset after this date will have strict mode enabled
 STRICT_AFTER = "2023-06-25"
