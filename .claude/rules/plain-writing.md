@@ -7,7 +7,7 @@ paths:
 
 # Writing plainly for OWID readers
 
-This rule covers text the public reads on ourworldindata.org: chart titles, subtitles and footnotes, `description_short`, `description_key`, `description_processing`, display names, the origin `description` in a snapshot `.dvc` (shown in the Sources tab), and public posts such as the /latest data update and data insights. It does not cover text for colleagues, like PR bodies or Slack.
+This rule covers text the public reads on ourworldindata.org: chart titles, subtitles and footnotes, `description_short`, `description_key`, `description_processing`, display names, the origin `description` in a snapshot `.dvc` (shown in the Sources tab), and public posts such as the /latest data update and data insights.
 
 `description_from_producer` is exempt. It is the producer's own text, kept verbatim.
 
