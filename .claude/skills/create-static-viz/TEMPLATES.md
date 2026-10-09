@@ -10,14 +10,12 @@ re-deriving it through Figma MCP calls every time.
   ten templates and returns an `ok`/`DRIFT` verdict. Use `get_metadata` on `798:54` for the per-slot
   positions it does not cover, and `get_screenshot` on a frame for colors. **Run it every refresh —
   the date below never licenses skipping it.** A `DRIFT` verdict stops the refresh and gets reported.
-- **Last verified:** 2026-08-20 — the rhythm parameters and the Horizontal, Vertical and Mobile
-  example 1 header/footer structure re-measured live; the script returned `ok` on all ten templates.
+- **Last verified:** 2026-08-20.
   The date is provenance, for judging a drift report. If the script *cannot* run, verify by hand with
   `get_metadata` anyway, and let the date say how far to distrust this file meanwhile: **two weeks or
   older, treat every number here as suspect.**
 
-The design team edits these frames in place, and edits that move a chart area's edge have landed days
-apart. **Re-verify the geometry at the start of every refresh** rather than trusting this file: a step
+The design team edits these frames in place, and an edit can move a chart area's edge at any time. **Re-verify the geometry at the start of every refresh** rather than trusting this file: a step
 laid out against stale numbers still renders and still passes every contract check — it just no longer
 matches the frame it gets pasted into.
 
@@ -65,7 +63,7 @@ wrong twice: wrong pipeline, and a *ratio* check on a frame whose height is chos
 All values in template pixels, y measured **from the top edge** as Figma reports it. Content
 margin is **16 px** on all four frames, so content width is `frame width − 32`.
 
-Font sizes are in template px, measured off the live templates on **2026-08-17**. They matter to a
+Font sizes are in template px, measured off the live templates. They matter to a
 step twice over: the emitted SVG should read like the template it is sized to, and `/owid-staff:create-figma-chart`
 fills these same slots when the SVG is imported.
 
@@ -96,15 +94,13 @@ subtitle 80.22, chart area 118 → 1015.81, `Note:` 1015.81, `Data source:` 1047
 1065.81.
 
 **The two header blocks are identical at 118**, so don't reintroduce a Vertical-specific header
-offset. They used to differ (136 against 134, from a 30 px title line height against 29), and before
-that both read 134.22 — an edge that only existed because the wrappers were padded 16 px on the chart
-side. Both the padding and that difference are gone.
+offset.
 
-> **Wrapper figures re-verified 2026-08-19; the slot table above was not.** The wrapper ids, the 118
-> header bottom and the removal of the padding come from the same measurement pass as
-> `/owid-staff:create-figma-chart`'s node map. The per-slot `y` values still date from 2026-08-17 and sit within
-> ~0.4 px of it (the footer rows derive as 559 / 591 / 609 against the tabled 558.62 / 590.62 /
-> 608.62) — immaterial for emitting an SVG, but re-measure before trusting them for anything tighter.
+> **The wrapper figures were verified more recently than the slot table above.** The wrapper ids, the 118
+> header bottom and the unpadded wrappers match `/owid-staff:create-figma-chart`'s node map. The
+> per-slot `y` values sit within ~0.4 px of them (the footer rows derive as 559 / 591 / 609 against the
+> tabled 558.62 / 590.62 / 608.62) — immaterial for emitting an SVG, but re-measure before trusting them
+> for anything tighter.
 
 ### The license slot holds about fifty characters
 
@@ -180,22 +176,16 @@ band_bottom = note_ink_bottom − note_lines × 14               # the Note's in
 | `note_ink_bottom` | 587 (Horizontal) / 1043.81 (Vertical) | — (no Note row) |
 | footer row spacing / block top padding | 4 / 0 | 4 / 0 |
 
-**Re-measured live on 2026-08-20** off `5332:93`, `5332:75` and `24590:20`. The headline is that **the
-rebuild unified the two families' header rhythm** — both now sit at `origin_y = 16` with no row
-padding, where the old padded generation had the 850-wide pair spanning the frame at `origin_y = 0`
-and carrying the 16.22 px inside `row_pad_px`. The line steps survived the rebuild unchanged: title
-**29**/line, subtitle **19**/line, a **6** px gap between them, and **4** px between footer rows.
+Measured off `5332:93`, `5332:75` and `24590:20`. **The two families share one header rhythm** — both
+sit at `origin_y = 16` with no row padding. The line steps: title **29**/line, subtitle **19**/line, a
+**6** px gap between them, and **4** px between footer rows.
 
-The rhythm now reproduces both templates exactly, which is the check that matters:
+The rhythm reproduces both templates exactly, which is the check that matters:
 
 | Case | Derivation | Live |
 |---|---|---|
 | Placeholder (2-line title, 2-line subtitle) | `16 + 58 + 6 + 38` | **118** ✓ |
 | One-line title, one-line subtitle | `16 + 29 + 6 + 19` | **70** ✓ |
-
-That second row is the one that used to disagree: the stale `origin_y = 0` / `row_pad_px = 16.22` pair
-derived **82.48** against a measured 70, and the 12.48 px gap between them was the whole error. Both
-figures now fall out of the same formula.
 
 > **The header is a flat auto-layout of `[title, subtitle]` with the logo as a SIBLING**, not a child
 > of a title row (`/owid-staff:create-figma-chart`'s SKILL.md → node map). A sibling contributes nothing to the
@@ -222,28 +212,25 @@ chart_bottom_px = band_bottom - BAND_INSET - below_px
 
 **Both edges are ink, not frame — and on the current templates the footer frame's own `y` *is* its
 first row's ink** (Horizontal's footer starts at 559, which is the `Note:` row). So inset once, from
-that edge. This used to need a correction: the footer frame started 16 px above its `Note:` ink, and
-insetting from the frame's `y` then inset twice and left a visibly loose bottom. If you measure that
-gap again, the wrappers have been re-padded — re-verify before compensating for it.
+that edge. If you measure a gap between the footer frame's `y` and its first row's ink, the wrappers
+have been re-padded, and insetting from the frame's `y` would inset twice and leave a visibly loose
+bottom — re-verify before compensating for it.
 
 **Take those two edges from the template's own frames, not from line-height arithmetic.**
 `verify_page.js`'s `gap` row measures the plot against the header auto-layout's *bottom* and the
 footer auto-layout's *top* — the numbers `verify_templates.js` prints — so a band derived instead as
 `subtitle_y + n × line_px` and `note_bottom − n × line_px` is judged against datums it never used.
-Measured on the 2026 Vertical template, that arithmetic landed **4.35 px below** the header frame's
-bottom and **3.01 px above** the footer frame's top, which is line-box slack rather than anything
-visible: a `BAND_INSET` of 14 then reads as `gap` **18.35 / 17.01** against the 12–16 target, on a
-page whose spacing looks right and whose own assertion says 14. **Inset from the frame edges**, and
-the row passes: the same measurement that explains the 4.35 and the 3.01 is what makes a 14 px inset
-off those datums read as `gap` 14. What you must not do is "fix" a failing row by shrinking the inset
+That arithmetic lands about **4 px below** the header frame's bottom and about **3 px above** the
+footer frame's top, which is line-box slack rather than anything visible: a `BAND_INSET` of 14 then
+reads as `gap` of about **18 / 17** against the 12–16 target, on a page whose spacing looks right and
+whose own assertion says 14. **Inset from the frame edges**, and the row passes: the same slack that
+explains the extra px is what makes a 14 px inset off those datums read as `gap` 14. What you must not do is "fix" a failing row by shrinking the inset
 without knowing which datum you are shrinking from — that moves the plot to satisfy a number measured
 from somewhere else.
 
 `gap` is a live row, so a failure is a real discrepancy and not explanatory noise: a band derived from
-line-height arithmetic is a defect to correct, not a caveat to record. One frame predates this —
-the time-use chart built in #6678 ships at 18.35 / 17.01, which is the measurement above and is
-pending a design decision on whether to re-cut it. That is one named, dated exception, not a licence:
-new work insets from the frame edges and passes.
+line-height arithmetic is a defect to correct, not a caveat to record. New work insets from the
+frame edges and passes.
 
 **Draw the step's own copies of these slots at the sizes in the table, not at sizes that merely look
 right.** It is tempting to set the step's title and subtitle a size or two smaller — nothing in the
@@ -267,7 +254,7 @@ and the right edge where the **logo** ends. Both are the content box, `16 … fr
 
 ## Two rules for laying out coloured text runs
 
-Both of these produced defects that survived a full visual check and were caught by a reader:
+Both of these produce defects that survive a full visual check:
 
 - **A run may not begin with a space.** `TextPath` measures ink, so a *leading* space contributes
   nothing to a run's advance — while matplotlib still draws it. Lay out `["Sleep", " · ", "Eating"]`
@@ -302,12 +289,12 @@ of the correction.
 
 Two things that table is easy to under-read. The **bold** row is not a rounding of the regular one:
 Arial Bold sets 6.6 % wider than Lato Bold, so a footer row of mixed weights measured with the regular
-allowance is rejected by its own step while setting correctly in the frame — measured at 828 px against
-an 818 px row where the frame sets it in 798. And the columns are per *installed* font: check which one
+allowance is rejected by its own step while setting correctly in the frame — it can measure past an 818 px
+row that the frame sets it well inside. And the columns are per *installed* font: check which one
 `findfont` actually returns on the machine building the step rather than assuming Arial is there.
 
 **Do not "wrap a bit early to be safe".** It reads as prudent and it is not: the footer rows are sized
-so the template just fits them, so wrapping 6 % early broke both onto second lines the frame does not
+so the template just fits them, so wrapping 6 % early breaks them onto second lines the frame does not
 have — a render that looks broken while the frame is fine. Give a Lato slot the few percent it actually
 has, take the same few percent off a serif slot, and keep the two directions as separate named
 constants so neither gets applied backwards.
@@ -328,8 +315,7 @@ node.resize(slotWidth, node.height);
 const lines = node.height / lineHeight;             // what the slot gives it
 ```
 
-That is how the three ratios above were measured, and how the Note was confirmed to take **three**
-lines at 12 px where a step's smaller footer took two.
+That is how the ratios above were measured.
 
 ## Unit conversions
 
