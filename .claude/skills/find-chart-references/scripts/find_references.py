@@ -288,15 +288,22 @@ def sweep_articles_placing_narrative_charts(findings: list[dict]) -> list[dict]:
         "WHERE pgl.linkType = 'narrative-chart' AND pgl.target IN %(n)s ORDER BY pgl.target, pg.slug",
         params={"n": tuple(names)},
     )
+    # The front-matter value is usually the name, but authors also paste the admin edit URL
+    # (`.../admin/narrative-charts/<id>/edit`), so match the id in a URL to the name as well.
+    name_by_id = {
+        str(f["surface_id"]): str(f["where"])
+        for f in findings
+        if f["surface"] == "narrative chart" and f.get("where")
+    }
     df_front_matter = OWID_ENV.read_sql(
-        "SELECT target, gdoc_id, post_slug, post_type, published, queryString FROM ("
-        "  SELECT pg.content->>'$.\"narrative-chart\"' AS target, pg.id AS gdoc_id, pg.slug AS post_slug,"
-        "         pg.type AS post_type, pg.published, '' AS queryString"
-        "  FROM posts_gdocs pg WHERE pg.type = 'data-insight'"
-        "    AND pg.content->>'$.\"narrative-chart\"' IS NOT NULL"
-        ") t WHERE target IN %(n)s ORDER BY target, post_slug",
-        params={"n": tuple(names)},
+        "SELECT pg.content->>'$.\"narrative-chart\"' AS target, pg.id AS gdoc_id, pg.slug AS post_slug,"
+        "       pg.type AS post_type, pg.published, '' AS queryString "
+        "FROM posts_gdocs pg WHERE pg.type = 'data-insight'"
+        "  AND pg.content->>'$.\"narrative-chart\"' IS NOT NULL AND pg.content->>'$.\"narrative-chart\"' <> ''",
     )
+    url_id = df_front_matter["target"].str.extract(r"/narrative-charts/(\d+)", expand=False)
+    df_front_matter["target"] = url_id.map(name_by_id).fillna(df_front_matter["target"])
+    df_front_matter = df_front_matter[df_front_matter["target"].isin(names)].sort_values(["target", "post_slug"])
     seen = {(r["target"], r["gdoc_id"]) for r in df.to_dict("records")}
     rows = df.to_dict("records") + [
         r for r in df_front_matter.to_dict("records") if (r["target"], r["gdoc_id"]) not in seen
@@ -1432,8 +1439,6 @@ NOT_SEARCHED = [
     "rather than the DB — invisible here, and it fans out to every thin MDIM/explorer view that "
     "inherits it. Needs a repo grep.",
     "Data insights that record the reference somewhere other than `grapher-url` or `narrative-chart`.",
-    "Some data insights that reach the data through a narrative chart (seen in practice, cause not yet "
-    "known). Cross-check by searching `posts_gdocs.content` for every found chart's current and old slugs.",
     "Charts nested inside article layout containers, which may produce no `posts_gdocs_links` row at all.",
 ]
 
