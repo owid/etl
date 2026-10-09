@@ -1,7 +1,7 @@
 dataset:
   title: Working Hours by Income – Bick et al (2018)
   owners:
-    - Charlie Giattino  # backport
+    - Edouard Mathieu
 tables:
   working_hours_by_income__bick_et_al__2018:
     variables:
