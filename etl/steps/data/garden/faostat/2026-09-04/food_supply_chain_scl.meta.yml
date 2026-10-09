@@ -18,7 +18,7 @@ definitions:
       - The SCL dataset does not include fish and seafood, so we take them from FAOSTAT's Food Balance Sheets, for the same countries and years.
       - We add up the contribution of all individual food products to build the total weight, calories, and protein of each part of the chain for each country and year.
       - Some food products are made from others. For example, soybean oil is made from soybeans. FAOSTAT records the soybeans that go into processing as "processing" of soybeans, and the oil that comes out as "production" of soybean oil. The calories of soybeans are already counted as crop production, so adding the soybean oil's production as well would count the same calories twice. Therefore, we subtract the production of processed products from processing. By-products like oilseed cake and bran are processed products too: their production is subtracted from processing, and the part fed to animals appears in animal feed. In other words, the processing part of the food chain normally removes the calories that were lost when converting raw crops like soybeans into processed foods like soybean oil and soybean cake. Cottonseed is counted as a crop, because the seed cotton it comes from is not in the SCL dataset.
-      - In some countries, however, processing appears to add calories (or protein) to the food chain, which is physically impossible. This happens where FAOSTAT's nutrient factor for a raw product is lower than the factors of the products made from it (for example, coconuts and copra, or sunflower seed and its oil and cake), where a country's mills differ from the world average used for the densities of processed crops, or where FAOSTAT's own quantities are inconsistent (for example, Guyana's rice bran production is 30% of its paddy rice, where about 8% is normal).
+      - Processing cannot add calories or protein to the food chain. In some countries, however, the processed products come out with more calories (or protein) than went in. This happens where FAOSTAT's nutrient factor for a raw product is lower than the factors of the products made from it (for example, coconuts and copra, or sunflower seed and its oil and cake), where a country's mills differ from the world average used for the densities of processed crops, or where FAOSTAT's own quantities are inconsistent (for example, Guyana's rice bran production is 30% of its paddy rice, where about 8% is normal). In calories and protein, we move these gains to "data adjustments", so that processing shows zero in those cases rather than an impossible gain. In weight, processing can add to the total when water is added, for example to brew beer or bottle soft drinks, so the weight table keeps these gains.
       - We correct one FAOSTAT figure. Since 2021, FAOSTAT imputes Denmark's molasses production as equal to all the sugar beet it processes, which is impossible (molasses was 2% to 3% of the beet in 2010-2020). We repeat Denmark's 2020 molasses production instead, and set the molasses fed to animals to the amount that balances the product.
       - The densities of the crops that are mostly processed are calculated for the world as a whole, and applied to every country. In countries whose processed products differ from the world average, these densities are less accurate.
       - Any gaps in the balance identity are added to "data adjustments". Here we include FAOSTAT's own unexplained differences (which they call "residuals").
@@ -70,6 +70,7 @@ tables:
         description_key:
           - By-products of processing, such as oilseed cake (what remains after crushing oilseeds for oil) and bran, are counted as products made in processing. The part fed to animals appears under feed.
           - Where FAOSTAT records the crops sent to distilleries as processing rather than as other uses (molasses in Pakistan or India, cereals in Belgium or Slovakia), the energy turned into fuel ethanol appears here rather than under industrial and other uses.
+          - Processing cannot create energy or protein. Where FAOSTAT's figures and nutrient factors would make more come out of processing than went in, the gain is shown under data adjustments instead, and processing shows zero.
       feed:
         title: Feed
         description_short: Food products fed to animals, including by-products of processing such as oilseed cake and bran.
@@ -83,7 +84,7 @@ tables:
         description_short: Food eaten by visitors from other countries. For the world, it is set to zero.
       data_adjustments:
         title: Data adjustments
-        description_short: Differences that make the stages add up to the food available to eat, from FAO's own unexplained differences and from rounding in FAO's figures. For the world, it also includes the gap between imports and exports, and tourist consumption. Values can be negative.
+        description_short: Differences that make the stages add up to the food available to eat, from FAO's own unexplained differences, from rounding in FAO's figures, and from any gain that processing would otherwise show. For the world, it also includes the gap between imports and exports, and tourist consumption. Values can be negative.
       food:
         title: Food available for consumption
         description_short: Food available for people to eat, before waste in shops and households.
@@ -101,4 +102,16 @@ tables:
     common:
       unit: kilograms per person per day
       short_unit: kg
-    variables: *variables
+    variables:
+      <<: *variables
+      # In weight, processing can gain, because water is added to brew beer and bottle soft drinks. These two
+      # overrides leave out the sentences on moving gains to data adjustments, which apply to energy and protein only.
+      processing_net:
+        title: Processing, net
+        description_short: Food products sent to be processed, for example milled, crushed or brewed, minus the processed products made from them, such as flour, oils, sugar and beer. Positive values mean more goes in than comes out; negative values mean the products weigh more than what went in, as when water is added to brew beer or bottle soft drinks.
+        description_key:
+          - By-products of processing, such as oilseed cake (what remains after crushing oilseeds for oil) and bran, are counted as products made in processing. The part fed to animals appears under feed.
+          - Where FAOSTAT records the crops sent to distilleries as processing rather than as other uses (molasses in Pakistan or India, cereals in Belgium or Slovakia), the weight of the crops turned into fuel ethanol appears here rather than under industrial and other uses.
+      data_adjustments:
+        title: Data adjustments
+        description_short: Differences that make the stages add up to the food available to eat, from FAO's own unexplained differences and from rounding in FAO's figures. For the world, it also includes the gap between imports and exports, and tourist consumption. Values can be negative.

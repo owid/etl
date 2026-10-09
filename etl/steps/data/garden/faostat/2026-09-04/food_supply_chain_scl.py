@@ -177,7 +177,8 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
     FAOSTAT rounds tonnages, so balances do not close exactly. Food nutrients are retained at their reported
     precision where the direct density is accepted; the other stages still use the reported tonnages. This
     matters especially for fish taken from FBS. The gap between those stages and food is included in
-    "data_adjustments", together with FAO's own "residuals", so that the chain ends exactly on "food".
+    "data_adjustments", together with FAO's own "residuals" and, in energy and protein, any gain in processing
+    (assumption 15), so that the chain ends exactly on "food".
     Keeping the more precise food total changes this adjustment without changing the other flows. The size of
     the gap is kept in "balancing_difference" for quality control.
 
@@ -219,17 +220,38 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
 14. All stages are divided by that population and by 365 days, to give values per person per day.
     >> Scale: minor. A choice of unit, not of substance; it rescales all values equally.
 
+15. Processing never adds energy or protein: where it would, the gain goes to data adjustments.
+    >> Scale: major for a few countries, nil for World. In 2023, 61 of 176 countries would otherwise show
+    processing adding energy, 10 of them by more than 10% of food (Guyana, Marshall Islands and Ukraine by more
+    than a third); in protein, 48 countries, 6 above 10%. World shows a loss in both, so it is unchanged.
+
+    A mill, a crusher or a brewery cannot put more energy or protein into its products than came in with the
+    inputs. Where the converted products exceed the converted inputs, the excess is a failure of the data or of
+    the densities (the causes are under KNOWN PROBLEMS), not a feature of the country's food chain, and a positive
+    processing bar would tell readers that mills make food. The gain is therefore moved to "data_adjustments",
+    whose meaning is exactly that (assumption 10), and "processing_net" shows zero. Only the gains move: the same
+    causes also inflate or shrink the real losses of other countries, and those stay in processing, which remains
+    the least certain stage. The rule is applied to each entity and year after the items are summed into stages,
+    so a region with a gain (in 2023, Europe and Oceania in energy, Asia in protein) is treated like a country,
+    and a region's processing is no longer the sum of its members'; processing plus data adjustments still is.
+    The mass table is left alone: in tonnes a gain in processing can be real, because breweries and bottlers add
+    water (in Namibia, 22 thousand tonnes of malt become 174 thousand tonnes of beer), so processing there is the
+    net change in weight, in either direction.
+
 KNOWN PROBLEMS, NOT YET RESOLVED
 --------------------------------
-- Processing appears to create calories in some countries.
-  >> Scale: major for a few countries: in 2023, Guyana, Marshall Islands and Ukraine show gains above a third of
-  food, 10 of 176 countries above 10% of food, and 61 show some gain (28% of all country-years in energy, 22% in
-  protein). Small for World, where processing loses 102 kcal per person per day, 1.7% of crop production.
-  The FBS sibling has the same symptom with a different cause.
+- Processing would create calories in some countries. The gains are moved to data adjustments; their causes remain.
+  >> Scale: major for a few countries: in 2023, the gains moved by assumption 15 exceed a third of food in Guyana,
+  Marshall Islands and Ukraine, 10% of food in 10 of 176 countries, and 61 countries have some gain (28% of
+  all country-years in energy, 22% in protein). Small for World, where processing loses 102 kcal per person per
+  day, 1.7% of crop production. The FBS sibling has the same symptom with a different cause.
 
   In the normal case "processing_net" is positive: the converted processing inputs exceed the converted product
   outputs. The two largest causes are handled: ethanol credited back into processing with no input (Brazil, the
-  United States; assumption 6) and fish oil (assumption 9). The remaining gains have four causes:
+  United States; assumption 6) and fish oil (assumption 9). Assumption 15 keeps the remaining gains out of the
+  processing bar but not out of the chart: they appear in data adjustments as calories entering the chain, about
+  two thirds of food in Guyana and Ukraine, and the same causes also distort the losses that stay in processing
+  elsewhere. The remaining gains have four causes:
   - FAO's nutrient factor for a raw item is below what its products contain. Coconuts carry 85 kcal per 100 g
     while the copra made from them holds about 137 (Marshall Islands, Kiribati, Tonga, Papua New Guinea);
     sunflower seed carries 462 while its oil and cake hold about 565 (Ukraine). In protein, soybeans carry 34 g
@@ -914,6 +936,18 @@ def move_rounding_gap_to_adjustments(chain: Table) -> Table:
     return chain
 
 
+def move_processing_gains_to_adjustments(chain: Table) -> Table:
+    """Move any gain in processing to "data_adjustments", so that processing never adds energy or protein.
+
+    Implements assumption 15. Called for energy and protein only: in tonnes, a gain in processing can be real (water
+    added in brewing and bottling).
+    """
+    gain = (-chain["processing_net"]).clip(lower=0)
+    chain["processing_net"] = chain["processing_net"] + gain
+    chain["data_adjustments"] = chain["data_adjustments"] - gain
+    return chain
+
+
 def equalize_world_trade(chain: Table) -> Table:
     """Set World exports equal to World imports; the difference goes to "data_adjustments".
 
@@ -962,9 +996,11 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
     """Check one output table: shape, no negative magnitudes, the chain ends on food, and World matches FAO."""
     assert tb.columns[tb.isna().all()].empty, "Output has fully-nan columns."
     assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows."
-    for stage in [
-        s for s in STAGES if s not in ["stock_variation", "data_adjustments", "processing_net", "balancing_difference"]
-    ]:
+    # Processing can gain weight (water added in brewing and bottling) but not energy or protein (assumption 15).
+    signed = ["stock_variation", "data_adjustments", "balancing_difference"]
+    if nutrient == "mass":
+        signed.append("processing_net")
+    for stage in [s for s in STAGES if s not in signed]:
         # FAO occasionally reports a negative element (Iraq 2010 wheat exports, for one); small negatives are tolerated.
         assert (tb[stage].fillna(0) >= -0.01 * tb["food"].abs()).all(), (
             f"Negative values in stage {stage!r} ({nutrient})."
@@ -1061,6 +1097,9 @@ def run() -> None:
             converted = convert_elements_to_nutrient(tb_nutrient, nutrient=nutrient)
         # Assumption 8: production split by role, items summed into the stages of the chain.
         chain = sum_items_into_stages(converted, population=population_by_entity)
+        if nutrient != "mass":
+            # Assumption 15: processing cannot create energy or protein; any gain goes to data adjustments.
+            chain = move_processing_gains_to_adjustments(chain)
         # Assumption 10: the rounding gap goes to data adjustments, so the chain ends exactly on food.
         chain = move_rounding_gap_to_adjustments(chain)
         # Assumption 11: World exports are set equal to World imports, and World tourist consumption is set to zero.
