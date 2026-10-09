@@ -126,7 +126,7 @@ STAGING=1 .venv/bin/etl indicator-upgrade upgrade
 ```
 
 Expected output: names are identical across versions, so every old indicator gets a perfect
-match (about 68 mappings in total, across 14 charts and 2 narrative charts).
+match: every old indicator used in a chart or narrative chart maps.
 Two normal-looking warnings that are **not** problems:
 
 - *"N unmatched variables in new dataset"* — `match` only considers old variables that at least
@@ -216,8 +216,8 @@ reprocessed. Typical shortfalls against a later read of the same bin:
 | ≥30 days | 0.0% (identical across reads) |
 
 Don't read the older rows as a settled floor: they are lower bounds against the *next* read, not
-against a final value, and those bins are still moving. Three-plus weeks is the first age at which
-a bin stops moving at all.
+against a final value, and those bins are still moving. Bins three or more weeks old have not been
+seen to move.
 
 So the newest point on every wildfire chart is an undercount of roughly 5-10% until a later
 update fills it in. **Never quote the latest week as a finished number** in an announcement, a

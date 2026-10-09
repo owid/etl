@@ -10,10 +10,7 @@ re-deriving it through Figma MCP calls every time.
   ten templates and returns an `ok`/`DRIFT` verdict. Use `get_metadata` on `798:54` for the per-slot
   positions it does not cover, and `get_screenshot` on a frame for colors. **Run it every refresh —
   the date below never licenses skipping it.** A `DRIFT` verdict stops the refresh and gets reported.
-- **Last verified:** 2026-08-20.
-  The date is provenance, for judging a drift report. If the script *cannot* run, verify by hand with
-  `get_metadata` anyway, and let the date say how far to distrust this file meanwhile: **two weeks or
-  older, treat every number here as suspect.**
+- If the script *cannot* run, verify by hand with `get_metadata` before using any number here.
 
 The design team edits these frames in place, and an edit can move a chart area's edge at any time. **Re-verify the geometry at the start of every refresh** rather than trusting this file: a step
 laid out against stale numbers still renders and still passes every contract check — it just no longer
