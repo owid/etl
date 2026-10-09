@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Vaccination
+      attribution_short: WHO
       grapher_config:
         originUrl: ourworldindata.org/vaccination
   description_key_common: &description_key_common

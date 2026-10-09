@@ -39,6 +39,8 @@ def run() -> None:
     # Read table from meadow dataset.
     tb = ds_meadow.read("vaccination_introductions")
 
+    sanity_check_inputs(tb)
+
     #
     # Process data.
     #
@@ -65,6 +67,8 @@ def run() -> None:
     tb_sum["country"] = "World"
     tb_sum = tb_sum.rename(columns={"intro": "countries"})
 
+    sanity_check_outputs(tb, tb_sum)
+
     tb = tb.format(["country", "year", "description"])
     tb_sum = tb_sum.format(["country", "year", "description"], short_name="vaccination_introductions_sum")
     #
@@ -77,3 +81,26 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def sanity_check_inputs(tb) -> None:
+    assert not tb.duplicated(subset=["country", "year", "description"]).any(), (
+        "Duplicate (country, year, description) rows in meadow input."
+    )
+    # SCHEDULE_MAPPING.replace() silently leaves any unmapped raw code untouched instead of
+    # raising -- this is how "Yes (VA)" went unnoticed until manual inspection. Catch the next
+    # one loudly instead.
+    unexpected_codes = set(tb["intro"].dropna().unique()) - set(SCHEDULE_MAPPING.keys())
+    assert not unexpected_codes, (
+        f"Unexpected status code(s) in intro column, not covered by SCHEDULE_MAPPING: {unexpected_codes}. "
+        "Add them to SCHEDULE_MAPPING (confirming their meaning with WHO first) before proceeding."
+    )
+
+
+def sanity_check_outputs(tb, tb_sum) -> None:
+    assert tb.columns[tb.isna().all()].empty, "Output table has a fully-NaN column."
+    # No raw code should have leaked through unmapped into the final intro column.
+    valid_values = {v for v in SCHEDULE_MAPPING.values() if pd.notna(v)}
+    unexpected_values = set(tb["intro"].dropna().unique()) - valid_values
+    assert not unexpected_values, f"Unmapped raw code(s) leaked into output intro column: {unexpected_values}"
+    assert (tb_sum["countries"] >= 0).all(), "Negative country count in vaccination_introductions_sum."
