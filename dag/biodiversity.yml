@@ -46,10 +46,7 @@ steps:
         - snapshot://biodiversity/2026-09-30/living_planet_index_completeness.csv
 
   #
-
-  #
   # Habitat loss
-  #
   viz://explorer/biodiversity/latest/habitat_loss:
     - data://grapher/biodiversity/2021-01-01/habitat_loss:
         - data://garden/biodiversity/2021-01-01/habitat_loss:

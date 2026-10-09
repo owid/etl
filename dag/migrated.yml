@@ -508,9 +508,6 @@ steps:
   data://grapher/forests/2020-11-10/tropical_deforestation_by_country_or_region__pendrill_et_al__2019:
     - data://garden/forests/2020-11-10/tropical_deforestation_by_country_or_region__pendrill_et_al__2019:
         - snapshot://forests/2020-11-10/tropical_deforestation_by_country_or_region__pendrill_et_al__2019.feather
-  data-private://grapher/biodiversity/2022-12-07/eu_wild_bird_populations__eurostat__2022:
-    - data-private://garden/biodiversity/2022-12-07/eu_wild_bird_populations__eurostat__2022:
-        - snapshot-private://biodiversity/2022-12-07/eu_wild_bird_populations__eurostat__2022.feather
   data-private://grapher/agriculture/2021-06-01/global_agricultural_productivity:
     - data-private://garden/agriculture/2021-06-01/global_agricultural_productivity:
         - snapshot-private://agriculture/2021-06-01/global_agricultural_productivity.feather
