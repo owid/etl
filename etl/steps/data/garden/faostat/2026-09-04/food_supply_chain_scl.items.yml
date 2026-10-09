@@ -112,6 +112,10 @@ role_overrides:
   - {code: 329, name: "Cotton seed", role: crop}
 
 # 5. Fish and seafood are not in SCL. These FBS items are spliced in, converted with their FBS densities.
+#    Body oil and liver oil enter animal_products alongside fish. The FBS rows used here contain no matching
+#    fish processing inputs, so counting oil production as processed would create an artificial processing gain.
+#    The animal role sets the waterfall's production stage; these oils are physically processed products.
+#    See assumption 9 and the possible calorie overlap in the step's docstring.
 fish_from_fbs:
   - {code: 2761, name: "Freshwater Fish", role: animal}
   - {code: 2762, name: "Demersal Fish", role: animal}
@@ -122,8 +126,8 @@ fish_from_fbs:
   - {code: 2767, name: "Molluscs, Other", role: animal}
   - {code: 2768, name: "Meat, Aquatic Mammals", role: animal}
   - {code: 2769, name: "Aquatic Animals, Others", role: animal}
-  - {code: 2781, name: "Fish, Body Oil", role: processed}
-  - {code: 2782, name: "Fish, Liver Oil", role: processed}
+  - {code: 2781, name: "Fish, Body Oil", role: animal}
+  - {code: 2782, name: "Fish, Liver Oil", role: animal}
 
 # 6. Processing families used only as a check: for World, the calories coming out of processing as products should
 #    be close to the calories going in (a few percent are lost in milling, crushing and brewing).

@@ -139,11 +139,22 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    calories of the cotton harvest exist.
 
 9. Fish and seafood are taken from FBS.
-   >> Scale: minor for World (fish production is 46 of the 631 kcal per person per day of animal products in 2023,
-   and 6 of the 43 g of protein); large for fishing nations.
+   >> Scale: minor for World (fish and fish oil production is 46 of the 635 kcal per person per day of animal
+   products in 2023, and 6 of the 43 g of protein); large for fishing nations.
 
    Fish and seafood are not in SCL. The FBS fish items are added, with their FBS densities under the same rules,
    for the countries and years that SCL covers.
+   Fish oil ("Fish, Body Oil" and "Fish, Liver Oil") has the role "animal" in the items file, like the fish it comes
+   from. The FBS fish data used here (2010-2023) contain no processing records, and missing processing flows are
+   treated as zero in `prepare_fish_table`. With the role "processed", fish oil production would therefore be
+   subtracted from processing with no matching fish input, making processing appear to create calories. We include
+   fish oil production in "animal_products" instead; the role defines where production enters this waterfall,
+   rather than whether a product is physically processed.
+   This increases both "animal_products" and "processing_net" by the nutrients in fish oil production, leaving
+   every other stage, including "food", unchanged. In Iceland in 2023, the change moves about 2,992 kcal per
+   person per day from the apparent processing gain to animal products; the remaining processing gain is about
+   1.4 kcal. World animal products increase by about 4.1 kcal. Protein is unchanged because both oils have zero
+   protein density. The fish rows do not identify the quantities or species used to produce these oils.
 
 10. The gap between the preceding stages and food goes to data adjustments.
     >> Scale: minor for World; rounded fish tonnages can have a larger effect in small countries.
@@ -197,7 +208,7 @@ KNOWN PROBLEMS, NOT YET RESOLVED
 --------------------------------
 - Processing appears to create calories in some countries.
   >> Scale: major for Brazil, where processing creates about 280 kcal per person per day in 2023; small for World,
-  where processing loses 47 kcal. Not fixed yet; the FBS sibling has the same symptom with a different cause.
+  where processing loses 51 kcal. Not fixed yet; the FBS sibling has the same symptom with a different cause.
 
   In the normal case "processing_net" is positive: the converted processing inputs exceed the converted product
   outputs. Brazil's gain comes mostly from ethanol. The cane sent to Brazil's distilleries is recorded as "other
@@ -217,13 +228,24 @@ KNOWN PROBLEMS, NOT YET RESOLVED
 
 - The stage "feed" only counts feed that passes through the balance.
   >> Scale: "animal_products" exceeds "feed" by more than 1 kcal in 14% of country-years in energy and by more than
-  0.01 g in 23% in protein. World still has more recorded feed than animal output (2,028 against 631 kcal in 2023,
+  0.01 g in 23% in protein. World still has more recorded feed than animal output (2,028 against 635 kcal in 2023,
   and 106 against 43 g of protein).
 
   Grass, pasture and forage are not SCL items, so everything grazing animals eat from pasture enters the chain
   nowhere, and wild-caught fish count as animal products with no feed at all. For fishing and grazing countries
   (Iceland, Mongolia, several island states), "animal_products" can therefore exceed "feed". The balance alone
   does not measure how much of a particular country's gap these omitted inputs explain.
+
+- Part of the calories of fish oil may be counted twice.
+  >> Scale: the overlap is not measured. Fish oil adds about 2,992 kcal per person per day to Iceland's animal
+  products in 2023, and 4.1 kcal for World; these are the oil's full contribution, not estimates of overlap.
+
+  The "animal_products" stage now includes both FBS fish production and fish oil production. These are related
+  products, and the published rows do not identify the fish inputs to oil production (assumption 9). Fish densities
+  describe the edible portion, so a shared source of biomass does not establish how many of the oil's calories
+  are already represented in the fish calories. The stage should not be interpreted as a measured total of unique
+  calories harvested from animals. Reclassifying the oils changes where their production appears in the waterfall;
+  it does not measure this possible overlap or change final food supply.
 """
 
 import numpy as np
