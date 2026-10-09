@@ -24,7 +24,7 @@ datasets, [`/update-dataset`](../update-dataset/SKILL.md) for the generic update
 
 | Step | Path |
 |---|---|
-| snapshot | `climate/<version>/weekly_wildfires.csv` (EFFIS API, ~24k requests, ~6 min) |
+| snapshot | `climate/<version>/weekly_wildfires.csv` (EFFIS API, ~24k requests) |
 | meadow | `climate/<version>/weekly_wildfires` |
 | garden | `climate/<version>/weekly_wildfires` (+ regions, + `faostat_rl` for land area) |
 | grapher | `weekly_wildfires`, `wildfires_by_year`, `wildfires_by_week`, `wildfires_by_week_average` |
@@ -125,8 +125,8 @@ STAGING=1 .venv/bin/etl indicator-upgrade upgrade --dry-run
 STAGING=1 .venv/bin/etl indicator-upgrade upgrade
 ```
 
-Expected output: names are identical across versions, so every old indicator gets a perfect
-match: every old indicator used in a chart or narrative chart maps.
+Expected output: names are identical across versions, so every old indicator used in a chart or
+narrative chart gets a perfect match.
 Two normal-looking warnings that are **not** problems:
 
 - *"N unmatched variables in new dataset"* — `match` only considers old variables that at least
