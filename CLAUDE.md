@@ -220,6 +220,10 @@ Step, table, and indicator short names must be readable by any OWID colleague wi
 
 Only universally understood abbreviations are fine (`gdp`, `co2`, `un_wpp`-style producer acronyms that OWID already uses). If the source uses an internal acronym for a scenario, product, or variable, expand it in our short names — the acronym can live in titles/descriptions where there's room to define it.
 
+### Comments in steps
+
+Label each stage of `run()` with a short comment, so a reader can follow the step without reading every line, e.g. `# Step 2: Add regional aggregates.`. Add the *why* where the code doesn't show it (e.g. why a value is computed rather than taken from the source). Keep comments short: one line where possible, labels rather than paragraphs, so the code isn't buried under comments. A worked example belongs once, in the docstring of the helper it explains. Instructions for the next update go in `# NOTE:` comments (see `/create-dataset`).
+
 ### Preserving metadata/origins in steps
 
 - **No `np.where`** — strips origins. Use `tb["col"] = tb["b"]; tb.loc[mask, "col"] = tb.loc[mask, "a"]`
