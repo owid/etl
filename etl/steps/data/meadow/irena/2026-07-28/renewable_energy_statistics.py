@@ -12,6 +12,7 @@ names to the legacy ones) and switched country labels to abbreviated forms. Both
 """
 
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
@@ -73,7 +74,7 @@ def strip_whitespace(tb: Table) -> Table:
     # Some category labels carry trailing spaces (e.g. "Fossil fuels "), which would otherwise be treated as
     # categories of their own.
     for column in tb.columns:
-        if tb[column].dtype == object:
+        if pd.api.types.is_string_dtype(tb[column].dtype):
             metadata = tb[column].metadata
             tb[column] = tb[column].str.strip()
             tb[column].metadata = metadata

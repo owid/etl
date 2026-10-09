@@ -64,7 +64,7 @@ def run() -> None:
         tb[column].metadata.display["zeroDay"] = date_earliest
 
     # Convert year column into a number of days since the earliest date in the table.
-    tb["year"] = tb["year"].astype("datetime64")
+    tb["year"] = pr.to_datetime(tb["year"])
     tb["year"] = (tb["year"] - pd.to_datetime(date_earliest)).dt.days
 
     # Improve table format.
