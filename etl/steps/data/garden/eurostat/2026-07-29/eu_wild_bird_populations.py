@@ -29,13 +29,16 @@ def run() -> None:
     tb = tb.melt(id_vars=["country", "species", "index_year"], value_name="bird_population_index", var_name="year")
     # change year from _1990 to 1990
     tb["year"] = tb["year"].str.replace("_", "").astype(int)
+    tb["year"] = tb["year"].copy_metadata(tb["index_year"])
 
     #
     # Process farmland bird index data.
     #
     tb_farmland = paths.regions.harmonize_names(tb_farmland)
     tb_farmland = tb_farmland.melt(id_vars=["country"], value_name="farmland_bird_index", var_name="year")
+    original_year = tb_farmland["year"]
     tb_farmland["year"] = tb_farmland["year"].str.replace("_", "").astype(int)
+    tb_farmland["year"] = tb_farmland["year"].copy_metadata(original_year)
 
     # drop na values
     tb_farmland = tb_farmland.replace({":": pd.NA})
