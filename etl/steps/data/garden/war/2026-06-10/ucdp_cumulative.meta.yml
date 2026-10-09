@@ -1,0 +1,133 @@
+definitions:
+  common:
+    presentation:
+      attribution_short: UCDP
+      topic_tags:
+        - War & Peace
+    processing_level: major
+    description_processing: |-
+      We add up the yearly best estimates of deaths in ongoing conflicts from {first_year} to {last_year}, by the country or world region where the deaths occurred. For death rates, we divide these totals by the population in {first_year}.
+
+      We have mapped the geographical coordinates of each conflict event from UCDP to countries by means of the geoBoundaries dataset. When an event's coordinates fall outside the borders of a country, we have mapped it to the country that is closest to them.
+
+  ucdp_linked: |-
+    [Uppsala Conflict Data Program (UCDP)](https://ucdp.uu.se/)
+  fighting: This includes combatant and civilian deaths due to fighting.
+  excludes: The data does not include deaths due to disease and starvation resulting from conflicts, which can make the death tolls much larger.
+  location: Deaths are attributed to the country where they occurred, not to the country of the people who died.
+  rate_method: |-
+    The rate is the cumulative number of deaths divided by the population in {first_year}, and expressed per 100,000 people. For world regions, the population is that of the countries in each region, as defined by UCDP.
+
+  # Conflict-type definitions, as in the UCDP garden dataset.
+  all: An armed conflict is defined by the {definitions.ucdp_linked} as a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year. {definitions.fighting}
+  intrastate: A civil conflict (intrastate conflict) is defined by the {definitions.ucdp_linked} as a conflict between a state and a non-state armed group that causes at least 25 deaths during a year. A non-state armed group can be a rebel group, criminal organization, or ethnic group. Foreign states can still be involved in a supporting role. {definitions.fighting}
+  onesided: One-sided violence is defined by the {definitions.ucdp_linked} as the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
+  nonstate: A non-state conflict is defined by the {definitions.ucdp_linked} as a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year. {definitions.fighting}
+  interstate: An interstate conflict is defined by the {definitions.ucdp_linked} as a conflict between states that causes at least 25 deaths during a year. {definitions.fighting}
+
+  deaths: &deaths
+    unit: deaths
+    short_unit: ""
+    display:
+      numDecimalPlaces: 0
+  rate: &rate
+    unit: deaths per 100,000 people
+    short_unit: ""
+    display:
+      numDecimalPlaces: 1
+
+dataset:
+  # Set explicitly: otherwise the title is inherited from the last dependency (the Gleditsch regions).
+  title: Cumulative deaths in armed conflicts (UCDP)
+  update_period_days: 365
+  owners:
+    - Bastian Herre
+
+tables:
+  ucdp_cumulative:
+    variables:
+      all_deaths:
+        <<: *deaths
+        title: Cumulative deaths in armed conflicts
+        description_short: Best estimate of the total number of combatants and civilians who died due to fighting in armed conflicts between {first_year} and {last_year}.
+        description_key:
+          - "{definitions.all}"
+          - "{definitions.location}"
+          - "{definitions.excludes}"
+      intrastate_deaths:
+        <<: *deaths
+        title: Cumulative deaths in intrastate conflicts
+        description_short: Best estimate of the total number of combatants and civilians who died due to fighting in intrastate conflicts between {first_year} and {last_year}.
+        description_key:
+          - "{definitions.intrastate}"
+          - "{definitions.location}"
+          - "{definitions.excludes}"
+      onesided_deaths:
+        <<: *deaths
+        title: Cumulative deaths from one-sided violence
+        description_short: Best estimate of the total number of civilians who died due to one-sided violence between {first_year} and {last_year}.
+        description_key:
+          - "{definitions.onesided}"
+          - "{definitions.location}"
+          - "{definitions.excludes}"
+      nonstate_deaths:
+        <<: *deaths
+        title: Cumulative deaths in non-state conflicts
+        description_short: Best estimate of the total number of combatants and civilians who died due to fighting in non-state conflicts between {first_year} and {last_year}.
+        description_key:
+          - "{definitions.nonstate}"
+          - "{definitions.location}"
+          - "{definitions.excludes}"
+      interstate_deaths:
+        <<: *deaths
+        title: Cumulative deaths in interstate conflicts
+        description_short: Best estimate of the total number of combatants and civilians who died due to fighting in interstate conflicts between {first_year} and {last_year}.
+        description_key:
+          - "{definitions.interstate}"
+          - "{definitions.location}"
+          - "{definitions.excludes}"
+      all_rate:
+        <<: *rate
+        title: Cumulative death rate in armed conflicts
+        description_short: Best estimate of the total number of combatants and civilians who died due to fighting in armed conflicts between {first_year} and {last_year}, per 100,000 people living in {first_year}.
+        description_key:
+          - "{definitions.all}"
+          - "{definitions.rate_method}"
+          - "{definitions.location}"
+          - "{definitions.excludes}"
+      intrastate_rate:
+        <<: *rate
+        title: Cumulative death rate in intrastate conflicts
+        description_short: Best estimate of the total number of combatants and civilians who died due to fighting in intrastate conflicts between {first_year} and {last_year}, per 100,000 people living in {first_year}.
+        description_key:
+          - "{definitions.intrastate}"
+          - "{definitions.rate_method}"
+          - "{definitions.location}"
+          - "{definitions.excludes}"
+      onesided_rate:
+        <<: *rate
+        title: Cumulative death rate from one-sided violence
+        description_short: Best estimate of the total number of civilians who died due to one-sided violence between {first_year} and {last_year}, per 100,000 people living in {first_year}.
+        description_key:
+          - "{definitions.onesided}"
+          - "{definitions.rate_method}"
+          - "{definitions.location}"
+          - "{definitions.excludes}"
+      nonstate_rate:
+        <<: *rate
+        title: Cumulative death rate in non-state conflicts
+        description_short: Best estimate of the total number of combatants and civilians who died due to fighting in non-state conflicts between {first_year} and {last_year}, per 100,000 people living in {first_year}.
+        description_key:
+          - "{definitions.nonstate}"
+          - "{definitions.rate_method}"
+          - "{definitions.location}"
+          - "{definitions.excludes}"
+      interstate_rate:
+        <<: *rate
+        title: Cumulative death rate in interstate conflicts
+        description_short: Best estimate of the total number of combatants and civilians who died due to fighting in interstate conflicts between {first_year} and {last_year}, per 100,000 people living in {first_year}.
+        description_key:
+          - "{definitions.interstate}"
+          - "{definitions.rate_method}"
+          - "{definitions.location}"
+          - "{definitions.excludes}"
