@@ -111,12 +111,7 @@ Indicator subjects are labelled with the indicator's name (not a bare variable i
 cells are truncated and pipe-escaped so the tables can't break, and drafts are marked
 ⚠️. For spreadsheet work use `--csv`, which carries the untruncated values.
 
-Optional surfaces fail open (an absent legacy table, a subject that does not
-resolve): the run keeps going and prints `COVERAGE GAP: ...` for each, then repeats
-them all at the end. **Read that block before reporting a result** — those surfaces
-were not swept, so an empty answer for them means UNKNOWN, not "nothing references
-it". `--gaps-json <path>` writes the same list as JSON, which is how a wrapper
-carries them into its own report instead of leaving them in stdout.
+Surfaces the run could not sweep are printed as `COVERAGE GAP: ...` (see Known gaps).
 
 ## Surface catalog
 
@@ -144,9 +139,8 @@ The placement rows carry the narrative chart as `subject` (not the chart that re
 **A featured metric is the one `render` surface a redirect does not rescue.** Like a key chart
 it is a topic-page slot in no reference table — but held by **URL**, and resolved only when
 Algolia indexes, matching pathname *and* the exact query-param map against *published* records.
-So retiring what it names empties the slot silently, and re-adding the old URL is then refused
-(creating a row validates that the slug resolves to something published). It must be swapped by
-hand, before the migration — see `docs/guides/data-work/redirect-to-mdims.md`.
+So retiring what it names empties the slot silently. It must be swapped by hand, before the
+migration (see the featured-metric note under "Notes for skills that consume this").
 
 Matching is on **pathname alone**, deliberately: for an MDIM or explorer the row's query string
 *is* the view, so a params-equal test would hide the rows a migration most needs to see — those
@@ -218,10 +212,12 @@ a **Not searched** section carrying this list plus the limits of that particular
 still state them yourself when you report on a `--json`/`--csv` run.
 
 Optional surfaces **fail open**: an absent legacy table or a subject that does not
-resolve prints `COVERAGE GAP: …`, is repeated at the end of the run, leads the
-report's **Not searched** section, and is available as JSON via `--gaps-json <path>`
-for a wrapper that builds its own report. An empty answer for one of those surfaces
-means UNKNOWN, not "nothing references it".
+resolve prints `COVERAGE GAP: …` while the run keeps going, is repeated at the end of
+the run, leads the report's **Not searched** section, and is available as JSON via
+`--gaps-json <path>` for a wrapper that carries them into its own report instead of
+leaving them in stdout. **Read that block before reporting a result** — those surfaces
+were not swept, so an empty answer for one of them means UNKNOWN, not "nothing
+references it".
 
 - Non-ETL explorers whose config lives in the `explorers` TSV are not parsed.
 - **Legacy CSV-backed explorers** (`data://explorers/...` wide tables — e.g. the
