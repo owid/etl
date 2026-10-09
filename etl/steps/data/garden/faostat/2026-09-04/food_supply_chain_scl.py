@@ -202,8 +202,8 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
     >> Scale: major for the 10 region aggregates, which only exist through this assumption; no country's values
     change.
 
-    FAO's own regional aggregates are dropped, and OWID regions (World, continents, income groups) are built from
-    the member countries that have an SCL balance that year: every element and every food nutrient total is summed
+    FAO's own regional aggregates are dropped, and OWID regions (World, continents, income groups, the European
+    Union) are built from the member countries that have an SCL balance that year: every element and every food nutrient total is summed
     over those countries (fish included, from the same countries), and the region's population is the sum of those
     same countries' population. A country either has a full balance or none at all, so the elements and the
     population always cover the same countries.
@@ -222,9 +222,9 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
 KNOWN PROBLEMS, NOT YET RESOLVED
 --------------------------------
 - Processing appears to create calories in some countries.
-  >> Scale: major for a few countries: in 2023, Denmark, Guyana, Marshall Islands and Ukraine show gains above a
-  third of food, 11 of 176 countries above 10% of food, and 62 show some gain (28% of all country-years in energy,
-  22% in protein). Small for World, where processing loses 102 kcal per person per day, 1.7% of crop production.
+  >> Scale: major for a few countries: in 2023, Guyana, Marshall Islands and Ukraine show gains above a third of
+  food, 10 of 176 countries above 10% of food, and 61 show some gain (28% of all country-years in energy, 22% in
+  protein). Small for World, where processing loses 102 kcal per person per day, 1.7% of crop production.
   The FBS sibling has the same symptom with a different cause.
 
   In the normal case "processing_net" is positive: the converted processing inputs exceed the converted product
@@ -237,9 +237,11 @@ KNOWN PROBLEMS, NOT YET RESOLVED
     against its products (New Zealand).
   - The product-implied densities of assumption 7 are World ratios (next problem): countries whose mills extract
     more than the world average gain (Honduras and Papua New Guinea for oil palm, Uruguay for rice).
-  - FAO's own quantities are inconsistent: Denmark's molasses production equals its whole beet harvest since 2021,
-    Guyana's rice bran is 30% of its paddy, a third of Fiji's cane is recorded as feed, Bolivia's soybean cake
-    weighs more than the beans crushed.
+  - FAO's own quantities are inconsistent: Guyana's rice bran is 30% of its paddy, a third of Fiji's cane is
+    recorded as feed, Bolivia's soybean cake weighs more than the beans crushed. One such error is patched in
+    `food_supply_chain_scl.corrections.yml`: since 2021 FAO imputes Denmark's molasses production as equal to its
+    whole beet harvest, which made processing create about 2,900 kcal per person per day there, and about 40 in
+    the European Union, and inflated feed by the same amounts.
   - Products made from several inputs with no recorded parent: hydrogenated oils (Netherlands), margarine
     (Belgium), glucose (France).
 
@@ -457,6 +459,9 @@ REGIONS = [
     "Lower-middle-income countries",
     "Upper-middle-income countries",
     "High-income countries",
+    # Rebuilt from its members like the others, so that it inherits the corrections applied to the country rows;
+    # FAOSTAT's own EU aggregate (built upstream, before those corrections) is dropped.
+    "European Union (27)",
 ]
 # Columns of the per-item balance table shared by the SCL and the FBS (fish) parts.
 BALANCE_COLUMNS = (
@@ -693,8 +698,7 @@ def sanity_check_nutrient_factors(tb: Table) -> None:
 
     Checks the fact stated in assumption 3, on countries only (before fish and regions are added).
     """
-    # The European Union is kept as an entity, but it is an aggregate whose density mixes its members' factors.
-    tb = tb[(tb["food"] >= NUTRIENT_FACTOR_MIN_FOOD_TONNES) & (tb["country"] != "European Union (27)")]
+    tb = tb[tb["food"] >= NUTRIENT_FACTOR_MIN_FOOD_TONNES]
     deviating = set()
     for nutrient in ["energy", "protein"]:
         density = tb[NUTRIENTS[nutrient]["numerator"]] / (tb["food"] * HUNDRED_GRAMS_PER_TONNE)
@@ -1021,6 +1025,9 @@ def run() -> None:
     # Assumption 12: FAO's own regional aggregates are dropped (OWID regions are built later from countries).
     tb_scl = tb_scl[~tb_scl["country"].astype(str).str.contains("(FAO)", regex=False)].reset_index(drop=True)
     tb_fbsc = tb_fbsc[~tb_fbsc["country"].astype(str).str.contains("(FAO)", regex=False)].reset_index(drop=True)
+    # Known FAOSTAT errors, patched on the input rows so that the regions built below inherit the fix (see the
+    # corrections file for the reasons, and for why this is done here rather than in the garden SCL step).
+    tb_scl = paths.apply_corrections(tb_scl)
     # Assumption 8: the role of every item, from FAO's item groups.
     roles = load_roles(tb_groups)
     sanity_check_inputs(tb_scl, roles=roles, manual=manual)
