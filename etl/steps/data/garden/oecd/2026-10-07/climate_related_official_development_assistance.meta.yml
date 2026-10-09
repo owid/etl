@@ -94,10 +94,8 @@ tables:
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Total bilateral ODA by donor"
         display:
-          name: "Total bilateral ODA"
+          name: "Total bilateral ODA by donor"
           numDecimalPlaces: 0
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
@@ -114,10 +112,8 @@ tables:
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Bilateral allocable ODA by donor"
         display:
-          name: "Bilateral allocable ODA"
+          name: "Bilateral allocable ODA by donor"
           numDecimalPlaces: 0
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
@@ -136,10 +132,8 @@ tables:
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_outside_rio_markers}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Bilateral ODA outside the scope of the Rio markers, by donor"
         display:
-          name: "Outside the scope of the Rio markers"
+          name: "Bilateral ODA outside the scope of the Rio markers, by donor"
           numDecimalPlaces: 0
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
@@ -161,10 +155,8 @@ tables:
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor"
         display:
-          name: "Climate-related"
+          name: "Climate-related ODA by donor"
           numDecimalPlaces: 0
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
@@ -187,10 +179,9 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
         presentation:
-          title_public: "Climate-related ODA by donor"
           title_variant: "Mitigation only"
         display:
-          name: "Mitigation only"
+          name: "Climate-related ODA by donor"
           numDecimalPlaces: 0
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
@@ -213,10 +204,9 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
         presentation:
-          title_public: "Climate-related ODA by donor"
           title_variant: "Adaptation only"
         display:
-          name: "Adaptation only"
+          name: "Climate-related ODA by donor"
           numDecimalPlaces: 0
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
@@ -239,10 +229,9 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
         presentation:
-          title_public: "Climate-related ODA by donor"
           title_variant: "Mitigation and adaptation"
         display:
-          name: "Mitigation and adaptation"
+          name: "Climate-related ODA by donor"
           numDecimalPlaces: 0
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
@@ -265,10 +254,9 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
         presentation:
-          title_public: "Climate-related ODA by donor"
           title_variant: "Climate as principal objective"
         display:
-          name: "Climate as principal objective"
+          name: "Climate-related ODA by donor"
           numDecimalPlaces: 0
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
@@ -291,10 +279,9 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
         presentation:
-          title_public: "Climate-related ODA by donor"
           title_variant: "Climate as significant objective"
         display:
-          name: "Climate as significant objective"
+          name: "Climate-related ODA by donor"
           numDecimalPlaces: 0
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
@@ -316,10 +303,8 @@ tables:
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_non_climate}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Non-climate-related ODA by donor"
         display:
-          name: "Non-climate-related"
+          name: "Non-climate-related ODA by donor"
           numDecimalPlaces: 0
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
@@ -340,10 +325,8 @@ tables:
           - "{definitions.key_not_screened}"
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor (% of bilateral allocable ODA)"
         display:
-          name: "Climate-related"
+          name: "Climate-related ODA by donor (% of bilateral allocable ODA)"
           numDecimalPlaces: 1
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
@@ -365,10 +348,8 @@ tables:
           - "{definitions.key_not_screened}"
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share_bilateral_total}\n\n{definitions.processing_donor_groups}"
-        presentation:
-          title_public: "Climate-related ODA by donor (% of total bilateral ODA)"
         display:
-          name: "Climate-related"
+          name: "Climate-related ODA by donor (% of total bilateral ODA)"
           numDecimalPlaces: 1
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
@@ -389,10 +370,8 @@ tables:
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Total bilateral ODA by recipient"
         display:
-          name: "Total bilateral ODA"
+          name: "Total bilateral ODA by recipient"
           numDecimalPlaces: 0
           tolerance: 0
           entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
@@ -410,10 +389,8 @@ tables:
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Bilateral allocable ODA by recipient"
         display:
-          name: "Bilateral allocable ODA"
+          name: "Bilateral allocable ODA by recipient"
           numDecimalPlaces: 0
           tolerance: 0
           entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
@@ -436,10 +413,8 @@ tables:
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Climate-related ODA by recipient"
         display:
-          name: "Climate-related"
+          name: "Climate-related ODA by recipient"
           numDecimalPlaces: 0
           tolerance: 0
           entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
@@ -461,10 +436,8 @@ tables:
           - "{definitions.key_not_screened}"
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Climate-related ODA by recipient (% of bilateral allocable ODA)"
         display:
-          name: "Climate-related"
+          name: "Climate-related ODA by recipient (% of bilateral allocable ODA)"
           numDecimalPlaces: 1
           tolerance: 0
           entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
@@ -487,10 +460,8 @@ tables:
           - "{definitions.key_not_screened}"
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share_bilateral_total}\n\n{definitions.processing_recipient_groups}"
-        presentation:
-          title_public: "Climate-related ODA by recipient (% of total bilateral ODA)"
         display:
-          name: "Climate-related"
+          name: "Climate-related ODA by recipient (% of total bilateral ODA)"
           numDecimalPlaces: 1
           tolerance: 0
           entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
