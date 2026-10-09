@@ -23,13 +23,7 @@ metadata:
 
 ## Workflow
 
-1. **Check feather schemas first** — before profiling, inspect the on-disk types of large tables:
-   ```python
-   import pyarrow.feather as pf
-   for field in pf.read_table("data/meadow/.../table.feather").schema:
-       print(f"{field.name}: {field.type}")
-   # large_string → should be dictionary (categorical)
-   ```
+1. **Check feather schemas first** — before profiling, inspect the on-disk types of large tables (see "String Columns That Should Be Categoricals" below)
 2. **Profile** — measure, never guess
 3. **Identify the bottleneck** — read the `%` column, focus on the top 3 lines
 4. **Diagnose** — is it I/O, dtype waste, or algorithmic?
@@ -182,11 +176,7 @@ If it's genuinely slow, the cost is usually in `update_metadata` (YAML parsing) 
 
 ## Memory-Specific Profiling
 
-```bash
-.venv/bin/etl d profile --mem garden/namespace/version/dataset
-```
-
-Look for:
+In the `--mem` profile (see Quick Start), look for:
 - **Spikes >100 MB** on a single line — likely creating a large intermediate copy
 - **Cumulative growth** that never drops — objects not being freed
 

@@ -31,10 +31,10 @@ Unit tests enforce consistency between all of these (`tests/test_schema_types_ge
 
 **A. Completing a bot PR** (the common case). The scheduled workflow (`.github/workflows/sync-grapher-schema.yml`) detected an upstream change and opened a draft PR on the `auto-sync-grapher-schema` branch with the automatic part (refreshed vendored copy + regenerated types) already committed.
 
-- Check out that branch — do NOT create a new PR (skip step 0; step 1's refresh is already done, just read the committed vendored diff).
+- Check out that branch — do NOT create a new PR (see steps 0–1).
 - The PR's failing `test_grapher_config_schema_sync` output is the todo list — usually just steps 2-3 below.
 - ⚠️ If upstream changes again before this PR merges, the workflow **force-updates the branch and clobbers manual commits**. Finish promptly; if the sync needs longer, move the work to your own branch (`git checkout -b <new>` + close the bot PR).
-- When done: push, mark the PR ready for review.
+- When done: push, then see step 6.
 
 **B. Ad-hoc / from scratch.** Someone announced a change and you're not waiting for the cron (alternatively, trigger the workflow manually: `gh workflow run sync-grapher-schema.yml`). Follow all steps below.
 

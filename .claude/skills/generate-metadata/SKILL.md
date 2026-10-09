@@ -98,13 +98,12 @@ title: Number of neutron star mergers (NASA, 2023)
 | Field | Format | Examples |
 |-------|--------|----------|
 | `unit` | Lowercase, plural, "per" not "/" | `tonnes per hectare`, `%`, `""` |
-| `short_unit` | SI abbreviation | `t/ha`, `%`, `""` |
+| `short_unit` | SI abbreviation (`g` not `grams`, `%` not `pct`) | `t/ha`, `%`, `""` |
 
 - Always set `unit` explicitly, even to `""` for dimensionless indicators (scores, indexes)
 - `short_unit` is only needed when there's an actual unit to abbreviate. Omit it for dimensionless indicators -- it defaults to `None` and grapher won't show a unit label.
 - Use "person" not "capita" (`kilowatts per person`)
 - Choose human-friendly scales -- if most values are below 1 tonne per person, use "kilograms per person" instead
-- `short_unit` should use SI abbreviations (`g` not `grams`, `%` not `pct`)
 
 **Decimal precision:** 0 for counts, 1 for percentages, 2 for economic/per-capita values. Be consistent across related variables. Always set `numDecimalPlaces` explicitly -- it's a frequent source of review feedback.
 
@@ -181,13 +180,13 @@ Set in `definitions.common`, override per-variable as needed.
   - `selectedEntityColors`: Map entity names to hex colors (e.g. `{"Africa": "#A2559C", "Asia": "#00847E"}`)
   - `map`: Map tab settings — `colorScale` with `baseColorScheme` (e.g. `"YlOrRd"`), `binningStrategy` (`"manual"`), and `customNumericValues` for bin thresholds
   - Set at variable level, or in `definitions.common.presentation` when all variables share the same chart defaults
-- `display.numDecimalPlaces`: Set explicitly. Use `metadata-export --decimals auto` to auto-detect.
+- `display.numDecimalPlaces`: see "Decimal precision" under Units. Use `metadata-export --decimals auto` to auto-detect.
 - `display.tolerance`: Number of years to allow gap-bridging on line charts (default 0). Set higher (e.g. 5-10) for sparse historical data where connecting distant points is acceptable.
 - `display.roundingMode`: Use `"significantFigures"` with `numSignificantFigures` instead of `numDecimalPlaces` when values span many orders of magnitude.
 
 ## YAML Efficiency Patterns
 
-**Use `definitions.common`** when 3+ variables share the same field values. Remember: `common` does NOT merge -- it completely overrides. Use `<<: *anchor` for partial overrides.
+**Use `definitions.common`** when 3+ variables share the same field values. Remember: `common` does NOT merge -- it completely overrides.
 
 **Use anchors/aliases** for identical blocks shared by 2+ variables. Define in `definitions:` at the top. **Name anchors to indicate their target field** (e.g. `description_producer_refugee` not `description_refugee`) so reviewers can tell which metadata field the text will end up in.
 
@@ -247,7 +246,7 @@ Name the conditional definition after what it chooses between (`…_total_or_by_
 
 The exception is a fragment inside a sentence or a title, such as `title: GNI per capita<% if sex != "total" %> (<<sex>>)<% endif %>`. Splitting that one leaves a line break or stray indentation in the rendered text, so keep it inline. Short fragments like this can still live in a definition (`among_sex: <% if sex == "males" %> among men<% elif … %><% endif %>`) when several fields reuse them. When you restructure an existing conditional, render every dimension value before and after to confirm nothing changed (the text-neutrality recipe in `.claude/skills/edit-faust-metadata/SKILL.md`).
 
-**A sentence written with one breakdown in mind renders on all the others**, where the view's own filtering can make it false. Sweep every dimension value before shipping — check 6 of the quality suite below.
+**A sentence written with one breakdown in mind renders on all the others**, where the view's own filtering can make it false. Sweep every dimension value before shipping — check 5 of the quality suite below.
 
 **Use `{definitions.xxx}` string interpolation** for reusing text fragments inline (e.g. `'{definitions.methodology}'` in a `description_key` bullet). Unlike YAML anchors which substitute entire nodes, this inserts text within strings. Use anchors for whole fields/blocks, interpolation for composing text.
 
@@ -288,7 +287,7 @@ Run all of these after the metadata is written and the steps are built, so every
    - Wording that fails the talk test in `.claude/rules/plain-writing.md` (e.g. "anthropogenic emissions" → "human-caused emissions")
    - Methodology-attribution claims ("following guidance from <agency>…") — open the cited link and confirm it actually says that; agencies revise methodology
    - Scope qualifiers present in the origin title but absent from user-facing text (private-only, adults-only, market-exchange-rate-only)
-   - Text that adds nothing to what the reader has already read — a bullet repeating another bullet, `description_short`, or the title at the same level of detail. Expanding the short line is fine and expected; restating it is padding. See the `description_key` guidance above.
+   - Text that adds nothing to what the reader has already read — a bullet repeating another bullet, `description_short`, or the title at the same level of detail (see the `description_key` guidance above).
 4. **Link verification** — every URL and `[term](#dod:term)` in the text: URLs must resolve (curl as the batch primary; on a 4xx from an OWID link, double-check with WebFetch + Wayback before acting); dod slugs checked against the `dods` table via public Datasette (`SELECT name FROM dods WHERE name LIKE ...`); a missing dod → keep the link and list it as a "create in admin" follow-up in the PR body.
 5. **Dimension sweep** — for dimensional indicators (Jinja over a dimension, or a `definitions:` key several variants reference), every sentence must hold at *every* value it renders on, not just the one it was written for. Render the text per dimension value and read each output as a reader of that chart, asking what the view already restricts: a caveat that the data doesn't control for X is wrong on the variant grouped **by** X; a scope word like "all employees" overclaims on a variant filtered to a subgroup; a sentence about a toggle is wrong on views that exist for only one choice of that dimension. Prefer qualifying the wording so it holds everywhere (often one word, nothing extra to maintain) over adding a Jinja branch or a view-level override. Automated reviewers catch this class reliably, so sweeping first saves a review round.
 6. **Adversarial claims verification** — `/fact-check-dataset` scoped to the newly written or edited metadata text only: treat each added/changed sentence as a claim and verify it against the producer's documentation (read what's behind the links — check 4 only proves they resolve). Catches text that is well-formed but factually wrong: stale methodology attributions, scope overclaims, misread units in prose. Scope by context: **mandatory in `/edit-faust-metadata`** (claims-only, no data cross-checks — cheap); the full-dataset review including data-value cross-checks stays the opt-in step described in `/update-dataset` §6c-bis (token-heavy).
@@ -303,7 +302,7 @@ The checks above read the text **as authored**. The **Metadata Diff** Wizard pag
 http://staging-site-<container_branch>/etl/wizard/metadata-diff
 ```
 
-It is not an eighth check: it needs a staging server and a human's judgment, and it runs *after* the checks, once the text is settled. What it shows that nothing above does is **reach** — reword one shared `description_key` and dozens of charts change while every chart-config diff stays empty, because that text is inherited, not configured. (Chart Diff compares configs; this compares rendered texts. It is also not Chart Diff's own per-chart "Metadata differences" modal.)
+It is not one more check: it needs a staging server and a human's judgment, and it runs *after* the checks, once the text is settled. What it shows that nothing above does is **reach** — reword one shared `description_key` and dozens of charts change while every chart-config diff stays empty, because that text is inherited, not configured. (Chart Diff compares configs; this compares rendered texts. It is also not Chart Diff's own per-chart "Metadata differences" modal.)
 
 Two preconditions, both silent when unmet:
 

@@ -8,7 +8,7 @@ re-deriving it through Figma MCP calls every time.
 - **Re-verify with:** `/owid-staff:create-figma-chart`'s `scripts/verify_templates.js`
   — it checks the shared geometry (sizes, content box, header band, footer position and growth) for all
   ten templates and returns an `ok`/`DRIFT` verdict. Use `get_metadata` on `798:54` for the per-slot
-  positions it does not cover, and `get_screenshot` on a frame for colors. **Run it every refresh.** A `DRIFT` verdict stops the refresh and gets reported.
+  positions it does not cover, and `get_screenshot` on a frame for colors. A `DRIFT` verdict stops the refresh and gets reported.
 - If the script *cannot* run, verify by hand with `get_metadata` before using any number here.
 
 The design team edits these frames in place, and an edit can move a chart area's edge at any time. **Re-verify the geometry at the start of every refresh** rather than trusting this file: a step
@@ -141,10 +141,8 @@ footer rows instead, both left-aligned at the full content width, so a long sour
 long author name no longer compete for one row. A step that lays out both sizes therefore emits the
 same license string for each and only varies the alignment.
 
-A caveat that only exists in the `Note:` slot therefore has nowhere to go on mobile. Decide per
-caveat whether it is about a *visual artifact* (safe to drop when the artifact is sub-pixel at
-mobile size) or about *what the chart claims* (must move into the subtitle instead). See the
-`Note:` guidance in `SKILL.md`.
+A caveat that only exists in the `Note:` slot therefore has nowhere to go on mobile — decide per
+caveat as [reference/WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md) → Text slots says.
 
 ## Every position in the table above is one text length away from being wrong
 
@@ -225,8 +223,7 @@ without knowing which datum you are shrinking from — that moves the plot to sa
 from somewhere else.
 
 `gap` is a live row, so a failure is a real discrepancy and not explanatory noise: a band derived from
-line-height arithmetic is a defect to correct, not a caveat to record. New work insets from the
-frame edges and passes.
+line-height arithmetic is a defect to correct, not a caveat to record.
 
 **Draw the step's own copies of these slots at the sizes in the table, not at sizes that merely look
 right.** It is tempting to set the step's title and subtitle a size or two smaller — nothing in the
@@ -268,13 +265,9 @@ A step decides its layout from strings it measures in its own font, and the temp
 strings in Playfair Display and Lato. So every line count it predicts is an estimate, and the error
 does not point one way:
 
-**First, make the font the step MEASURES be the font it DRAWS — they are not the same by default.**
-`FontProperties()` with no family resolves `font.family`/`font.sans-serif`, and seaborn's `set_style`
-rewrites that list to an Arial-first one. So a step that wraps its title before calling `set_style`
-measures matplotlib's DejaVu default and then draws Arial, and the two are **~15 % apart** — far more
-than any allowance below, and in the direction that makes a slot look full when it is not. Name the
-stack, set it at import, and pass it to every `FontProperties`; then the percentages below are the whole
-of the correction.
+**First, make the font the step MEASURES be the font it DRAWS — they are not the same by default**
+(how: [reference/WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md) → Measure in the font you draw
+in). Then the percentages below are the whole of the correction.
 
 | At the same pixel size | vs. **Arial** (what these steps draw) | vs. **DejaVu Sans** (matplotlib's default) |
 |---|---|---|

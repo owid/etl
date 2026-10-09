@@ -196,9 +196,7 @@ Changing the stack must not move anything: the drawn font is unchanged, so the S
 its predecessor **only** in `font-family`, and the PNG not at all.
 
 Then check which font `findfont` actually returned before trusting the per-face allowances in
-[TEMPLATES.md](../TEMPLATES.md) — they are per installed font, and the bold row is not a rounding of
-the regular one (Arial Bold sets 6.6% wider than Lato Bold, which is enough to make a mixed-weight
-footer row fail its own step's fit assertion while setting correctly in the frame).
+[TEMPLATES.md](../TEMPLATES.md) — they are per installed font.
 
 ### Style, and where it stops
 

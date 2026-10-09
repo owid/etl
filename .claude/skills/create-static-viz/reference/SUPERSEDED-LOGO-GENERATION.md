@@ -3,32 +3,14 @@
 > Kept only so a regression stays recognizable. **Its arithmetic no longer applies** — the live
 > geometry is in [TEMPLATES.md](../TEMPLATES.md). Nothing here should be used to lay out a step.
 
-**`logo_px` was per template, including within the 850-wide pair.** All three frames held the same
-logo instance (35.18 px), but the wrapper around it did not: Vertical's `Frame 1` (`5332:97`) added
-6.08 px of top padding, making its row **41.26**, while Horizontal's (`25398:755`) added 0.08 and came
-to **35.26**. So the logo sat 6 px lower on Vertical, and any figure derived from `logo_px` differed
-between the two by that much. Note also that the Horizontal slot table above records the logo as `35`
-— that is the *instance*, not the row, and in that generation it was the row that set the header's
-height.
-
-**`origin_y` and `row_pad_px` never both carry the 16 px.** The two families put that padding in
-different places, and the tables above are the only place that shows it: on the 850-wide pair the
-header block starts at the frame's own top edge (`y = 0`) and the *title row* holds the 16.22 px,
-while on mobile the block starts at `y = 16` and its title row holds none. Count it on both rows and
-a two-line title puts the subtitle at 96.44 against the measured 80.22, dropping the whole band by
-16.22 px.
-
-**Two things here were counter-intuitive.** The first no longer holds:
-while the logo capped the title row, a one-line title did *not* shrink the header by a line — below
+**While the logo capped the title row, a one-line title did *not* shrink the header by a line** — below
 `logo_px` the **logo** set the row's height, so the header bottomed out at **82.48 on Vertical** and
 **76.48 on Horizontal** however short the title got. With the logo now a sibling that cap is gone and
-a one-line title does shrink the header (see the note above). The second still holds: the footer's
-rows are pinned to the frame's bottom margin, so a Note gaining a line does not push the source row
-down — it eats the chart's height instead.
+a one-line title does shrink the header (see TEMPLATES.md).
 
 ### A one-line title left a gap the templates were never exercised for
 
-That first point had a visible consequence, not just an arithmetic one. Because the title row hugged
+That had a visible consequence, not just an arithmetic one. Because the title row hugged
 the taller of the title and the logo, and both were top-aligned, the logo's surplus height landed
 *between the title and the subtitle*: **12.26 px on Vertical, 6.26 on Horizontal**, on top of the 6 px
 auto-layout gap. Every finished page in the Charts file shows **6 px** there — they all have two-line

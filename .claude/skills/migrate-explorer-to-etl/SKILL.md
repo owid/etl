@@ -176,9 +176,7 @@ handed to `/create-explorer` in step 8.
 
 Mental model for chart-based explorers: each `grapherId` is a thin wrapper around one or a few
 indicators. The migration unwraps the chart, recovers its indicators, and rebuilds the explorer from
-them. Whatever the chart stored (title, subtitle, colour scale, map config) either flows from the
-indicator's garden metadata, preferred for single-indicator views (see `/create-explorer` step 5),
-or has to be restated in the explorer YAML.
+them. Step 7 says where whatever the chart stored (title, subtitle, colour scale, map config) goes.
 
 ## Step 7: translate the legacy tables
 
@@ -196,7 +194,7 @@ or has to be restated in the explorer YAML.
 
 For chart-based explorers, merge each chart's stored config (`title`, `subtitle`, `type`,
 `hasMapTab`, `yAxis`, `map.colorScale`, …) into `view.config`, or into the indicator's garden
-metadata for single-indicator views.
+metadata, preferred for single-indicator views (see `/create-explorer` step 5).
 
 ## Step 8: hand off to `/create-explorer`
 
@@ -242,7 +240,7 @@ committing the generated files to the user unless asked; `etl pr` already pushed
 
 ## Reference
 
-- Tracking: #6513 (global-health, the last explorer outside ETL). The umbrella #6028 is closed.
+- Tracking: #6513 (global-health, the last explorer outside ETL).
 - PRs to model the body on: #6029, #6031, #6032.
 - Example explorer steps built this way: `food_footprints`, `fertilizers`, `countries_in_conflict_data`, `democracy` (with soft-hyphen prefixes).
 - After the explorer is in ETL it is a candidate for the port to an MDIM (`viz://chart`), umbrella #6014.

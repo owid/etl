@@ -144,8 +144,7 @@ This endpoint is the **only** way to apply an explorer redirect: the CSV CLI tha
 unconditional rule and every view of the explorer 302s to a single MDIM view,
 per-view routing gone.
 Its Zod schema deliberately mirrors this file's `catchAll` + `redirects` shape, ignores keys
-it doesn't know (`sourceViewId`, `viewId`, `mdim`, `stats`, `targets`), and reports
-`target: null` entries as `skipped`.
+it doesn't know (`sourceViewId`, `viewId`, `mdim`, `stats`, `targets`).
 
 > **Post `admin_bulk_payload.json`, never `mapping.json`.** The payload has empty-valued
 > source dimensions stripped out. That is mandatory, not cosmetic: a condition is matched
@@ -197,9 +196,8 @@ The **source** view is identified by the explorer slug + dimension **name→disp
 
 **`catchAll` is always present**: it redirects the bare explorer URL (no query params) — and
 serves as the sensible fallback for any view a consumer doesn't route individually — to the
-best-fitting MDIM with **no query params**, which grapher renders as that MDIM's default view
-(hence `viewId: null`, `dimensions: {}`). The best-fitting MDIM is the one most views resolve
-to, or whatever `DEFAULT_MDIM` in `mapping_rules.py` overrides it to.
+best-fitting MDIM (see `DEFAULT_MDIM` in step 2) with **no query params**, which grapher renders
+as that MDIM's default view (hence `viewId: null`, `dimensions: {}`).
 
 > **The catch-all's destination is the only one nothing pins.** Its row stores
 > `viewConfigId = NULL`, so it resolves at request time to whichever view the MDIM renders for
@@ -293,8 +291,7 @@ migrated *before* step 7, not after.
 The report also carries a **⭐ Featured metrics** section — the one surface where this skill's
 usual "a link survives the 302" reasoning inverts. A featured metric is a topic-page slot held by
 URL, resolved only when Algolia indexes, matching pathname *and* exact params against published
-records. So it does not survive: it empties silently, and cannot be re-added once the explorer is
-gone. Hence step 5b.
+records. So it does not survive: it empties silently. Hence step 5b.
 
 ### 5b. Swap the featured metrics (before the redirect — it cannot be undone after)
 
@@ -456,7 +453,7 @@ handoff, since the same operator pastes the payload.
   the name legend lives in `_scaffold.md` and in `EXPLORER_DIMENSIONS`.
 - Re-running `extract_views.py` overwrites the CSVs and `_sources.json` but **not** your `mapping_rules.py`.
 - `mapping.json` needs `_sources.json`; if the out folder has no `_sources.json`, just
-  re-run `extract_views.py` once (it preserves `mapping_rules.py`), then `build_mapping.py`.
+  re-run `extract_views.py` once, then `build_mapping.py`.
 - **One payload per explorer is a correctness requirement**, not a convention: the endpoint's
   schema has a single `catchAll`, so a merged file would silently drop all but one.
 - **There is no bulk delete** — only `DELETE /api/multi-dims/:id/redirects/:redirectId`, one

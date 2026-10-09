@@ -4,7 +4,7 @@
 > here. Layout and Workflow: read on an error, or grep by symptom.  Part of
 > [`/create-static-viz`](../SKILL.md); the spine has the step order.
 
-**Data** — required at Step 1, before any column is used. Nothing below raises an exception.
+**Data**
 
 - **Verify what a column *means*, numerically. Never trust its name.** WHO's `P01` is the 0.1st
   percentile, not the 1st; reading it as "1st" is wrong by a wide margin at the tails. Reproduce
@@ -25,10 +25,8 @@
 - **Measure text width, don't estimate it.** Estimating from font size (a character ≈ half its
   point size) under-fills by about a tenth; a hardcoded character count can be a quarter short. Wrap
   greedily against `TextPath((0, 0), line, prop=FontProperties(size=fs)).get_extents().width`.
-- **No text run may begin with a space.** `TextPath` measures ink, so a leading space adds nothing to a
-  run's advance while matplotlib still draws it — lay runs out by summed advances and that run lands a
-  space right of where the layout accounted for it. Keep the space on the end of the previous run; a
-  *trailing* one is recovered by `text_advance_px`'s sentinel glyph.
+- **No text run may begin with a space** — see [TEMPLATES.md](../TEMPLATES.md) → Two rules for laying
+  out coloured text runs.
 - **A measurement harness must reproduce the chart's own font stack, or its numbers are fiction.**
   `sns.set_style(...)` inside the render function resets `font.family`, so a harness that imports the
   step without calling it measures a different typeface — enough of a width difference to make a
@@ -58,8 +56,8 @@
   convert to axes fractions with the real panel box, and compare against the actual curve. Two
   rounds of guess-render-look is slower than one round of measuring, and it silently accepts
   near-misses.
-- Fewer axis ticks in a narrow panel. Make the tick set per-layout, not global — and drop a tick whose
-  label crowds its neighbor, which is what grapher does rather than shrink or rotate it.
+- Fewer axis ticks in a narrow panel. Make the tick set per-layout, not global (see
+  [WRITING-THE-STEP.md](WRITING-THE-STEP.md) → dropping a tick that crowds its neighbor).
 - **A "no room for this" conclusion expires the moment the geometry changes.** Something ruled out
   on measurement — anchoring the first tick label inwards, a one-line label — can become possible
   after an unrelated change (pinning the x range to the ticks; moving a label below a shape). Record *why* something didn't fit, so the next geometry change is a prompt to re-measure

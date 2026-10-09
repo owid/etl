@@ -35,7 +35,7 @@ Required (one of):
 - A **web link** — a URL pointing at a data file (CSV/Excel/JSON) or a page that links to one.
 
 Optional:
-- `metadata_url` — a link to the source page / documentation (if different from a data link). If given, fetch it for metadata (producer, citation, license, definitions).
+- `metadata_url` — a link to the source page / documentation (if different from a data link).
 - Anything the user volunteers (units, column meanings, namespace, title…).
 
 ---
@@ -84,7 +84,7 @@ Write a one-paragraph internal summary of what you found before moving on.
 Now ask the user **once**, with all your best guesses pre-filled, using `AskUserQuestion` where it fits. Frame it as "here's what I figured out — correct anything that's wrong, otherwise I'll build it." Before listing the specifics, set expectations in one plain sentence so the end isn't a surprise — e.g. *"I'll build the dataset and put it on a staging server for you to review; once you're happy you merge the PR and it goes live."* Then keep the questions to the few things that genuinely can't be guessed or that would be expensive to get wrong:
 
 - **Namespace + short_name + dataset title** (show your proposal; let them override).
-- **What the data is / source** — confirm the producer and, if not already provided, ask for a `metadata_url` (the source page). If they give one, fetch it now for citation, license, and column definitions.
+- **What the data is / source** — confirm the producer and, if not already provided, ask for a `metadata_url` (the source page).
 - **License** — show your best guess (default `CC BY 4.0` for academic/IGO sources if unknown) and let them correct.
 - **Other data files the source ships** — when the landing page or repository carries several data files (a companion index, summary tables), list them with a default of "not ingesting these" so the user can opt in with one word. Persist the skips as the companion-files `# NOTE:` in the snapshot `.dvc` (Step 4 follows `/create-snapshot`'s convention) — that NOTE, not the PR body, is the baseline the update and review workflows diff against; mention them in the PR body as well for the reviewer.
 - **Any column meanings you couldn't infer** — only ask about the genuinely ambiguous ones (e.g. "is `ev_sales_share` a percentage 0–100 or a fraction 0–1?"). Don't ask about columns you're confident on.
@@ -186,7 +186,7 @@ Confirm the upsert actually succeeded before moving on: it should print the data
 
 ### Step 6b — Adversarial fact-check of data and metadata (mandatory — run it in the background)
 
-Run [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) on `garden/<namespace>/<version>/<short_name>` as a background agent once the garden step is built, and fold its findings into the Step 7 handoff. Skip it only on the user's explicit request, and say so in the PR body. Scale the effort: the main indicators with a few value cross-checks each, more where the build raised red flags. The empty-entity audit doesn't apply yet (no charts).
+Run [`/fact-check-dataset`](../fact-check-dataset/SKILL.md) on `garden/<namespace>/<version>/<short_name>` as a background agent once the garden step is built. Skip it only on the user's explicit request, and say so in the PR body. Scale the effort: the main indicators with a few value cross-checks each, more where the build raised red flags. The empty-entity audit doesn't apply yet (no charts).
 
 Review all indicators when there are few. This catches the two things the Step 7 review table can't: metadata you inferred that the source's own documentation contradicts (units, definitions, scope), and values the *source itself* got wrong (unit slips, wrong-year rows) — verified against independent sources online. Fold the findings into the handoff in plain language ("I double-checked the numbers against <independent source> — X and Y match; Z looks off, here's why"), and route confirmed source errors to `<short_name>.corrections.yml` per that skill's routing table rather than editing the data inline.
 
@@ -252,7 +252,5 @@ The dataset and any charts they build live on the **staging server**, not on our
 ## Notes & gotchas
 
 - **Snapshot is raw passthrough.** Don't sum, dedupe, relabel, or convert period labels in the snapshot — that's garden's job (see CLAUDE.md "Snapshot is raw passthrough only").
-- **`Entity` → `country`.** OWID-exported files name the country column `Entity`; rename it in meadow.
 - **Shares: 0–1 vs 0–100.** The single most common unit mistake. If a "share"/"%" column tops out near 1, it's a fraction (multiply by 100 in garden, or set the unit to fraction); if it tops out near 100, it's already a percentage. When unsure, this is worth one of your Step 2 questions.
-- **Start on fresh `master` (Step 0).** Saves you from basing the branch/PR on a stale checkout — common with non-git-savvy users. `etl pr` and staging also need a real branch (not a detached HEAD).
 - **Keep the user oriented.** They're not ETL experts. When you report progress, say what you did in plain language and what they can do next (review the table, build charts on staging) — not a wall of pipeline jargon.
