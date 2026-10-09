@@ -11,7 +11,7 @@ views:
         - catalogPath: "climate_related_oda_by_donor#climate_related_share"
     config:
       title: "Share of development aid given that is climate-related"
-      subtitle: "Bilateral aid that targets climate change mitigation, adaptation, or both, as a share of the total bilateral aid given by each donor that can be assigned to a recipient and a sector."
+      subtitle: "Bilateral aid that targets climate change mitigation, adaptation, or both, as a share of each donor's bilateral aid covered by the OECD's climate tracking, which excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
       note: "Based on commitments. Projects that target climate as a secondary objective are counted at their full value. DAC members are the members of the OECD Development Assistance Committee."
       tab: "chart"
       hasMapTab: true

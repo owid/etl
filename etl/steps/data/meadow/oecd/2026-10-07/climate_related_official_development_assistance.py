@@ -19,7 +19,7 @@ CONSTANT_PRICE_BASE_YEAR = 2024
 # Dimensions that the snapshot queries fix to a single value (see the snapshot scripts for all dimensions and codes).
 EXPECTED_FIXED_VALUES = {
     "MEASURE": 100,  # Official development assistance (ODA)
-    "ALLOCABLE": 2,  # Bilateral allocable aid (assigned to a recipient and a sector)
+    "ALLOCABLE": 2,  # Bilateral allocable aid (the aid types the Rio markers apply to)
     "FLOW_TYPE": "C",  # Commitments
     "PRICE_BASE": "Q",  # Constant prices
     "UNIT_MEASURE": "USD",  # US dollars

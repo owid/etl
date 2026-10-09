@@ -18,7 +18,7 @@ views:
             color: "#2C9C94"
     config:
       title: "Share of development aid given that is climate-related, with two denominators"
-      subtitle: "Bilateral aid that targets climate change mitigation, adaptation, or both, as a share of the aid covered by the OECD's climate tracking (aid assigned to a recipient and a sector), and as a share of all bilateral aid given by each donor."
+      subtitle: "Bilateral aid that targets climate change mitigation, adaptation, or both, as a share of the aid covered by the OECD's climate tracking (which excludes general budget support, debt relief and costs in donor countries, such as hosting refugees), and as a share of all bilateral aid given by each donor."
       note: "Based on commitments. Aid not covered by climate tracking includes general budget support and the costs of hosting refugees in donor countries. Neither measure includes contributions to multilateral organizations. Projects that target climate as a secondary objective are counted at their full value. DAC members are the members of the OECD Development Assistance Committee."
       tab: "chart"
       hasMapTab: false

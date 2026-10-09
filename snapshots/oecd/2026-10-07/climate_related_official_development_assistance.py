@@ -60,8 +60,8 @@ HIERARCHIES = {"recipient_groups.xml": "HCL_DACRECIPIENTS", "donor_groups.xml": 
 #      developing countries), or DPGC_X (developing countries, unspecified: aid not assigned to any country or region).
 #   3. SECTOR: a DAC sector code, e.g. 230 (energy); 1000 is all sectors.
 #   4. MEASURE: 100 is official development assistance (ODA), the only option.
-#   5. ALLOCABLE: 2 is bilateral allocable aid (aid assigned to a recipient and a sector, which is what the Rio markers
-#      apply to), the only option.
+#   5. ALLOCABLE: 2 is bilateral allocable aid (the aid types the Rio markers apply to, which exclude e.g. budget support
+#      and costs in donor countries), the only option.
 #   6. MARKER: 10 (biodiversity), 20 (climate change mitigation), 30 (climate change adaptation), 40 (desertification),
 #      50 (environment).
 #   7. SCORE: 2 (principal objective), 1 (significant objective), 0 (screened, not targeted), 99 (not screened).
