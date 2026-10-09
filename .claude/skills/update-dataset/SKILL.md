@@ -529,7 +529,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
    Conditional: if `processing_level: major`, every indicator with that level MUST also have `description_processing`.
 
-   Not mandatory (skip if you don't need them): `presentation.title_public` (unless `display.name` is a short label, see above), `presentation.title_variant`, `presentation.attribution`.
+   Not mandatory (skip if you don't need them): `presentation.title_public` (unless `display.name` is a short label and no `presentation.grapher_config.title` is set, see above), `presentation.title_variant`, `presentation.attribution`.
 
    **A per-indicator `display:` block replaces the common one; it doesn't merge with it.** The metadata loader (`_merge_variable_metadata` in `lib/catalog/owid/catalog/core/yaml_metadata.py`) merges only `presentation` and `presentation.grapher_config` key by key. Every other block, `display` included, is replaced whole by the more specific level (`definitions.common` → table `common` → the indicator). So adding `display.tolerance` to one indicator silently drops the `numDecimalPlaces` it inherited from `definitions.common.display`. Repeat the common keys in the indicator's block, and check `tb[col].metadata.display` on the built dataset. A per-indicator `presentation:` block, by contrast, keeps the common `topic_tags`.
 
