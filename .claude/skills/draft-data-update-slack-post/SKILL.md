@@ -20,16 +20,16 @@ Generate a draft for the #data-updates-comms Slack form. The skill inspects the 
 
 ## Why this channel exists (read before drafting)
 
-OWID's #data-updates-comms channel is **not** an internal "FYI I did X" log. It gives information to Charlie (OWID's Communications & Outreach Manager), who turns this input into public-facing posts on social media (Instagram, LinkedIn, X) and in newsletters.
+OWID's #data-updates-comms channel is **not** an internal "FYI I did X" log. It gives information to Ed (OWID's Head of Data and Research), who turns this input into public-facing posts on social media (Instagram, LinkedIn, X) and in newsletters.
 
-So the form's editorial fields are written for Charlie _and indirectly for the general public_ — not for the data team. A big mistake is writing them in an internal/engineer voice.
+So the form's editorial fields are written for Ed _and indirectly for the general public_ — not for the data team. A big mistake is writing them in an internal/engineer voice.
 
 **The reframing that matters most:**
 
-> Don't tell Charlie what you'd say to your colleagues ("I updated all the WDI charts").
+> Don't tell Ed what you'd say to your colleagues ("I updated all the WDI charts").
 > Tell him what you'd say to a friend who asks what you did this week ("I updated hundreds of our charts to the latest release of the World Bank's largest dataset, called the World Development Indicators. It's a core dataset with hundreds of indicators across global development. This update added new data up to 2025 for dozens of our most-viewed charts…").
 
-What Charlie needs from each field is a **reader-centric view**: what work was done, what it changes or enables, what's interesting about the source, what it helps people understand about the world, and why anyone should care that it's been updated.
+What Ed needs from each field is a **reader-centric view**: what work was done, what it changes or enables, what's interesting about the source, what it helps people understand about the world, and why anyone should care that it's been updated.
 
 **This skill must surface this framing to the user** — both at the top of the output draft file and inside each editorial-field prompt block — so the user has it in front of them when they sit down to write. Do not delete or paraphrase the framing.
 
@@ -229,17 +229,17 @@ The verbatim Slack prompt headings (do **not** rephrase, abbreviate, or change p
 | 7   | `Any important caveats or pitfalls in interpretation that users should know about this data? (optional)`                             |
 | 8   | `Anything interesting to note about this update, including what you had to do? Anything else you'd like to add? (optional)`          |
 | 9   | `Add 1–3 chart views we might use in the public announcement`                                                                        |
-| 10  | `Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)` |
+| 10  | `Link to the updated charts as a search result (not a chart collection anymore). Ask Ed if you need help with this. (optional)` |
 
 The table above is the single source of truth — if the Slack form's wording changes, update it here and nowhere else.
 
 ### Basis discipline for every number (check before drafting #6–#8 and the chart views)
 
-Producers headline figures on *their* basis — often current prices where our charts are constant, or a measure our headline chart doesn't carry. Verify every number and ranking in the snippets against **our own charts**: a producer claim our charts contradict ("X overtook Y", a total a few percent off ours) must be explicitly attributed to the producer, made basis-robust (rounded so both bases agree), or dropped in favor of chart-native numbers. Rankings especially: enumerate the measure × price-basis combinations first — a "first time in history" headline may hold on exactly one of them. Put the reconciliation (which basis says what, what social copy may safely echo) in the *caveats* field for Charlie; keep reader-facing framing chart-native.
+Producers headline figures on *their* basis — often current prices where our charts are constant, or a measure our headline chart doesn't carry. Verify every number and ranking in the snippets against **our own charts**: a producer claim our charts contradict ("X overtook Y", a total a few percent off ours) must be explicitly attributed to the producer, made basis-robust (rounded so both bases agree), or dropped in favor of chart-native numbers. Rankings especially: enumerate the measure × price-basis combinations first — a "first time in history" headline may hold on exactly one of them. Put the reconciliation (which basis says what, what social copy may safely echo) in the *caveats* field for Ed; keep reader-facing framing chart-native.
 
 ### Editorial framing (internal — do **not** copy into the output file)
 
-Before drafting fields #6, #7, #8, remember they go to Charlie, who turns them into public-facing posts — not into an internal team log. Snippets should sound like what you'd tell a curious friend, not a colleague: reader-centric, with a concrete number where possible, and what's interesting about the source. The agent uses this framing to _select_ and _phrase_ the snippets; the framing itself is never written into the output.
+Before drafting fields #6, #7, #8, remember they go to Ed, who turns them into public-facing posts — not into an internal team log. Snippets should sound like what you'd tell a curious friend, not a colleague: reader-centric, with a concrete number where possible, and what's interesting about the source. The agent uses this framing to _select_ and _phrase_ the snippets; the framing itself is never written into the output.
 
 ### Snippet selection per editorial field
 
@@ -299,7 +299,7 @@ Covers <year_min>–<year_max>, <n_countries> countries<, plus OWID regions if a
 1. **<title>** — `<slug>` — <rationale>
 2. **<title>** — `<slug>` — <rationale>
 
-## Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)
+## Link to the updated charts as a search result (not a chart collection anymore). Ask Ed if you need help with this. (optional)
 
 https://ourworldindata.org/search?datasetProducts=<urlencoded dataset title>
 
@@ -333,11 +333,11 @@ https://ourworldindata.org/search?datasetProducts=<urlencoded dataset title>
 - Don't auto-write the optional caveats / interesting-notes fields with generic prose ("This dataset offers important insights into…"). Leave them as prompts.
 - Don't query the staging DB without the `publishedAt IS NOT NULL` filter — drafts in the count would mislead.
 - Don't use the producer's homepage URL as the search link. The Slack template specifically wants `ourworldindata.org/search?datasetProducts=…`.
-- Don't tout the dataset's full indicator count when OWID publishes only one or a few of its indicators. Size claims to what we actually chart — "302 indicators" reads as overselling when the update affects one published chart (user feedback, WWBI 2026-07). Mentioning the count in internal-facing fields is fine only when it's genuinely load-bearing for Charlie.
+- Don't tout the dataset's full indicator count when OWID publishes only one or a few of its indicators. Size claims to what we actually chart — "302 indicators" reads as overselling when the update affects one published chart (user feedback, WWBI 2026-07). Mentioning the count in internal-facing fields is fine only when it's genuinely load-bearing for Ed.
 - Don't fold this skill into `update-dataset` — keep it standalone so users can invoke it after manual updates too. `update-dataset` should gather reusable facts in `update-context.yml` and step 9 should delegate here, not duplicate the Slack rendering logic.
 
 ## Related
 
 - `.claude/skills/update-dataset/SKILL.md` step 9 — the orchestrator entry point that should call this skill.
-- `/owid-staff:draft-data-update-post` (owid/skills-private, auto-installed here) — what happens **next**. This skill's Slack post is the input to the public "Data update" post on ourworldindata.org/latest; that skill either reads the Slack message directly or, inside `/update-dataset` (step 9b), reads `update-context.yml` plus the `slack-announcement.md` this skill produced. Two different artifacts: a 10-field internal form here, a reader-facing mini-post there. Don't draft the `/latest` post from this skill. Note that the `/latest` skill declines to post when OWID covered the same data publicly less than six months ago — **that cooldown does not apply here**. This Slack form runs on every update regardless, because its audience is internal and its job is to tell Charlie what changed.
+- `/owid-staff:draft-data-update-post` (owid/skills-private, auto-installed here) — what happens **next**. This skill's Slack post is the input to the public "Data update" post on ourworldindata.org/latest; that skill either reads the Slack message directly or, inside `/update-dataset` (step 9b), reads `update-context.yml` plus the `slack-announcement.md` this skill produced. Two different artifacts: a 10-field internal form here, a reader-facing mini-post there. Don't draft the `/latest` post from this skill. Note that the `/latest` skill declines to post when OWID covered the same data publicly less than six months ago — **that cooldown does not apply here**. This Slack form runs on every update regardless, because its audience is internal and its job is to tell Ed what changed.
 - `.claude/skills/edit-faust-metadata/SKILL.md` — reuses the same grapher-channel metadata patterns for chart-view selection.

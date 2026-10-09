@@ -16,7 +16,7 @@ dataset:
   update_period_days: 365
 
   owners:
-    - Tuna Acisu
+    - Edouard Mathieu
 tables:
   marriage_divorce_rates:
     variables:
@@ -42,7 +42,7 @@ tables:
           <% endif %>
         description_processing: |-
           <% if indicator == "marriage_rate" %>
-          Marriage rates in the United States between 1886 and 1945 are sourced from the US Census, for years 1945 to 1990 they are sourced from the CDC. Recent data comes from OECD.
+          For the United States, we use data from the US Census Bureau for 1886–1945 and from the Centers for Disease Control and Prevention (CDC) for 1946–1989. All other data comes from the OECD.
           <% endif %>
 
   mean_age_first_marriage:
@@ -73,7 +73,17 @@ tables:
         title: Share of births outside marriage
         unit: "%"
         short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          entityAnnotationsMap: |-
+            France: Recent change in methodology
+            Greece: Recent change in methodology
+            Netherlands: Recent change in methodology
         description_short: Share of all children born to mothers who were not married at the time of birth.
+        presentation:
+          grapher_config:
+            note: Some countries have changed how they record whether parents are married, which can cause sudden rises or drops.
         description_from_producer: |-
           Births to mothers whose legal marital status at the time of the birth is other than married. This includes births to mothers who are single or who are cohabiting with a partner outside of marriage, births to mothers who are divorced or widowed, and births to mothers who are living with a partner in a "common-law" or "de facto" union (unless their legal marital status at the time of birth is also 'married').
 
