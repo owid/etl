@@ -153,18 +153,21 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    products in 2023, and 6 of the 43 g of protein); large for fishing nations.
 
    Fish and seafood are not in SCL. The FBS fish items are added, with their FBS densities under the same rules,
-   for the countries and years that SCL covers.
-   Fish oil ("Fish, Body Oil" and "Fish, Liver Oil") has the role "animal" in the items file, like the fish it comes
-   from. The FBS fish data used here (2010-2023) contain no processing records, and missing processing flows are
-   treated as zero in `prepare_fish_table`. With the role "processed", fish oil production would therefore be
-   subtracted from processing with no matching fish input, making processing appear to create calories. We include
-   fish oil production in "animal_products" instead; the role defines where production enters this waterfall,
-   rather than whether a product is physically processed.
-   This increases both "animal_products" and "processing_net" by the nutrients in fish oil production, leaving
-   every other stage, including "food", unchanged. In Iceland in 2023, the change moves about 2,992 kcal per
-   person per day from the apparent processing gain to animal products; the remaining processing gain is about
-   1.4 kcal. World animal products increase by about 4.1 kcal. Protein is unchanged because both oils have zero
-   protein density. The fish rows do not identify the quantities or species used to produce these oils.
+   for the countries and years that SCL covers. FAO has carried most fish rows forward unchanged since 2019 to
+   2021 (identical in 2021, 2022 and 2023 for 186 of 198 countries), so the fish figures of recent years are older
+   than the rest of the chain.
+   Fish oil ("Fish, Body Oil" and "Fish, Liver Oil") has the role "animal", like the fish it comes from, for two
+   reasons. First, the FBS fish rows record no processing: the fish ground into meal and oil are inside the fish
+   row's production and leave inside its exports and feed, as live weight (Peru's pelagic row exports 5.2 million
+   tonnes against 0.5 million eaten: its fishmeal, counted as fish). With the role "processed", the oil would come
+   out of processing with no input, and processing would appear to create calories (Iceland, 2,993 kcal per
+   person per day). Second, the oil's energy is mostly energy the fish row does not carry: FAO prices fish at the
+   energy of their edible flesh, about 79 kcal per 100 g of live anchoveta in Peru, which is about what the meal
+   made from 100 g of anchoveta holds (77 kcal), while the oil holds another 40. Counting the oil as an animal
+   product adds those calories, and the oil's exports, feed and industrial use then leave the chain like any other
+   item's. Imported oil is in no fish row of the importer (Norway imports 987 kcal per person per day of oil
+   against 426 of pelagic fish), so it is a real inflow. Protein is unchanged, since the oils have none. The costs
+   of this choice are under KNOWN PROBLEMS.
 
 10. The gap between the preceding stages and food goes to data adjustments.
     >> Scale: minor for World; rounded fish tonnages can have a larger effect in small countries.
@@ -255,16 +258,23 @@ KNOWN PROBLEMS, NOT YET RESOLVED
   (Iceland, Mongolia, several island states), "animal_products" can therefore exceed "feed". The balance alone
   does not measure how much of a particular country's gap these omitted inputs explain.
 
-- Part of the calories of fish oil may be counted twice.
-  >> Scale: the overlap is not measured. Fish oil adds about 2,992 kcal per person per day to Iceland's animal
-  products in 2023, and 4.1 kcal for World; these are the oil's full contribution, not estimates of overlap.
+- Fish oil is partly counted twice: in calories where the food fish are fatty, in tonnes everywhere.
+  >> Scale: about 30% of the world's fish-oil energy, 1.3 of 4.2 kcal per person per day for World in 2018; in
+  tonnes, 1.6% to 5% of the animal products of the oil producers. Protein is unaffected.
 
-  The "animal_products" stage now includes both FBS fish production and fish oil production. These are related
-  products, and the published rows do not identify the fish inputs to oil production (assumption 9). Fish densities
-  describe the edible portion, so a shared source of biomass does not establish how many of the oil's calories
-  are already represented in the fish calories. The stage should not be interpreted as a measured total of unique
-  calories harvested from animals. Reclassifying the oils changes where their production appears in the waterfall;
-  it does not measure this possible overlap or change final food supply.
+  The fish row carries about the meal's energy only where the food fish are lean (Peru 79 kcal per 100 g live
+  weight, Chile 83, Morocco 76). Where people eat fatty fish, the row's density already exceeds the meal's energy,
+  and the oil pressed from the reduced fish is counted a second time: all of Denmark's 285 kcal per person per day
+  of oil production in 2018, half of Norway's 279, and nearly all of the small production of Latvia, Japan, Spain,
+  Sweden and Ireland. In tonnes the oil is inside the fish tonnes in every producer, so the mass table counts it
+  twice: 1.6% of Peru's animal products, 3% of Chile's, 5% of Mauritania's. The alternatives were weighed and
+  rejected: leaving the oil out would miss about 70% of its energy (20% of Peru's animal products) and the oil that
+  importers buy; counting it in calories but not in tonnes would be exact but is a per-table exception.
+  FAO's oil figures exceed what the fish rows can yield in Iceland (13% of pelagic production), Denmark (17%) and
+  Mauritania (11%), against about 5% for whole fish; those are data problems, not method problems.
+  Tallow and lard are not the same case: SCL records their unrendered-fat input as processing in most country-years,
+  so they keep the role "processed"; their remaining processing gains come from FAO's factors (660 kcal per 100 g
+  for unrendered fat against 891 for tallow).
 """
 
 import numpy as np
