@@ -216,8 +216,8 @@ reprocessed. Typical shortfalls against a later read of the same bin:
 | ≥30 days | 0.0% (identical across reads) |
 
 Don't read the older rows as a settled floor: they are lower bounds against the *next* read, not
-against a final value, and those bins are still moving. Bins three or more weeks old have not been
-seen to move.
+against a final value, and those bins are still moving. Bins 30 days or older have not been seen
+to move.
 
 So the newest point on every wildfire chart is an undercount of roughly 5-10% until a later
 update fills it in. **Never quote the latest week as a finished number** in an announcement, a

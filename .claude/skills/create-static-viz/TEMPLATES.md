@@ -8,8 +8,7 @@ re-deriving it through Figma MCP calls every time.
 - **Re-verify with:** `/owid-staff:create-figma-chart`'s `scripts/verify_templates.js`
   — it checks the shared geometry (sizes, content box, header band, footer position and growth) for all
   ten templates and returns an `ok`/`DRIFT` verdict. Use `get_metadata` on `798:54` for the per-slot
-  positions it does not cover, and `get_screenshot` on a frame for colors. **Run it every refresh —
-  the date below never licenses skipping it.** A `DRIFT` verdict stops the refresh and gets reported.
+  positions it does not cover, and `get_screenshot` on a frame for colors. **Run it every refresh.** A `DRIFT` verdict stops the refresh and gets reported.
 - If the script *cannot* run, verify by hand with `get_metadata` before using any number here.
 
 The design team edits these frames in place, and an edit can move a chart area's edge at any time. **Re-verify the geometry at the start of every refresh** rather than trusting this file: a step
@@ -93,7 +92,7 @@ subtitle 80.22, chart area 118 → 1015.81, `Note:` 1015.81, `Data source:` 1047
 **The two header blocks are identical at 118**, so don't reintroduce a Vertical-specific header
 offset.
 
-> **The wrapper figures were verified more recently than the slot table above.** The wrapper ids, the 118
+> **Re-measure the wrapper figures and the slot table before relying on them.** The wrapper ids, the 118
 > header bottom and the unpadded wrappers match `/owid-staff:create-figma-chart`'s node map. The
 > per-slot `y` values sit within ~0.4 px of them (the footer rows derive as 559 / 591 / 609 against the
 > tabled 558.62 / 590.62 / 608.62) — immaterial for emitting an SVG, but re-measure before trusting them
