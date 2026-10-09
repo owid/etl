@@ -86,9 +86,8 @@ graphers, `climate_change_impacts_annual`/`_monthly`, and `yearly_burned_area`.
 1. Create the branch + draft PR with `etl pr "📊 Update climate data" data`. **One** branch
    and **one** PR for the whole batch.
 2. Run each updateable chain through the `/update-dataset` flow on that branch, all targeting
-   today's date as `<new_version>` so they land on a common version. Bump the aggregate
-   (`climate_change_impacts`) only after its sources are done, so it picks up the new versions
-   once rather than repeatedly. Keep the DAG's nesting and comment headers: version-substitute
+   today's date as `<new_version>` so they land on a common version. Follow the dependency order
+   above, so the aggregate picks up the new versions once rather than repeatedly. Keep the DAG's nesting and comment headers: version-substitute
    the existing UPDATEABLE block instead of keeping the flat block `etl update` appends.
 3. **Do not remove or archive the old steps yet.** The previous versions (their step files,
    their snapshot folders *and* their `dag/climate.yml` entries) stay active until the review is
@@ -119,7 +118,7 @@ graphers, `climate_change_impacts_annual`/`_monthly`, and `yearly_burned_area`.
    hold *two* old wildfire versions (the batch's and the last weekly one): pair the one that
    carries charts. Afterwards, check that no old dataset still carries a chart and that the
    per-dataset chart counts on staging equal production's. **Watch the once-off cases**: any dataset
-   moving from `latest` or changing namespace needs its remap reviewed explicitly (see below).
+   changing namespace needs its remap reviewed explicitly (see below).
 5. Hand off for review. In the PR body and in the chat, **list exactly which files changed in
    content** relative to the previous version, so the reviewer does not have to open all ~110
    files. Compute it with `cmp` between the old and new version folders; in a normal month only
@@ -140,9 +139,6 @@ graphers, `climate_change_impacts_annual`/`_monthly`, and `yearly_burned_area`.
 
 These are structural moves that happen once, then the dataset behaves like any other updateable one:
 
-- **`weekly_wildfires`: `latest` → versioned.** Its grapher variables get new IDs, so the wildfire
-  charts (and any wildfires explorer) need a ghost-variable remap — see
-  [`/remap-ghost-variables`](../remap-ghost-variables/SKILL.md).
 - **`ipcc_scenarios`: namespace `emissions` → `climate`**, and **EPA 2024-04-17: namespace `epa` → `climate`**
   (retires the `epa` namespace). ipcc also moves its standalone explorer. EPA has no charts of its own
   (it only feeds `climate_change_impacts`), so its move is chart-free; ipcc's needs an explorer/chart remap.
