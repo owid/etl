@@ -454,10 +454,10 @@ steps:
   #
   # IMF Trade Data - Regional
   #
-  data://grapher/imf/2025-07-08/trade:
-    - data://garden/imf/2025-07-08/trade:
-      - data://meadow/imf/2025-07-08/trade:
-        - snapshot://imf/2025-07-08/trade.csv
+  data://grapher/imf/2026-10-05/trade:
+    - data://garden/imf/2026-10-05/trade:
+      - data://meadow/imf/2026-10-05/trade:
+        - snapshot://imf/2026-10-05/trade.zip
       - data://garden/regions/2023-01-01/regions
       - data://garden/worldbank_wdi/2026-07-27/wdi
 
