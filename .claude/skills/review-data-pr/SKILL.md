@@ -298,7 +298,7 @@ rg -n -A8 "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml" | rg "<old_ve
 Any hit here is a 🔴 — the new step is wired to a stale dependency.
 
 Two exceptions to check against the old block before flagging, both from `/update-dataset` (step 1 and "Removing the old version & reordering the DAG"):
-- **A dependency on an older version with the same short_name can be deliberate** (a historical series kept from an earlier release). `etl update` rewrites it to the step's own predecessor, so compare it with the old step's dag entry: if the old step depended on an earlier version, the new one should too. A dependency rewritten to the predecessor is 🔴.
+- **A dependency on an older version with the same short_name can be deliberate.** `etl update` rewrites it to the step's own predecessor. That is correct for a rolling accumulator (the step adds each release to its previous output), and wrong for a fixed historical vintage (a series kept from one specific earlier release). Read the step code: a fixed vintage rewritten to the predecessor is 🔴; a rolling accumulator should point at the predecessor.
 - **Inputs that didn't bump stay on their old version, and must still be declared.** When only some snapshots of the chain bumped, the unchanged inputs keep their old version, which is fine. But if they were declared only inside the old nested block, removing that block leaves them undeclared. Run the `load_dag()` check from that section: any `data://` dependency of the new steps that isn't a dag key is 🔴.
 
 Visual inspection of the diff for:
