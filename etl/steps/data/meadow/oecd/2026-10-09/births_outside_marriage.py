@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-import pandas as pd
+from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
 
@@ -57,11 +57,10 @@ def run() -> None:
     )
     # Clean the value column - replace placeholders with NaN and convert to numeric
     tb["births_outside_marriage"] = tb["births_outside_marriage"].replace(PLACEHOLDERS, None)
-    tb["births_outside_marriage"] = pd.to_numeric(tb["births_outside_marriage"], errors="coerce")
+    tb["births_outside_marriage"] = pr.to_numeric(tb["births_outside_marriage"], errors="coerce")
     tb = tb.dropna(subset=["births_outside_marriage"])
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb["births_outside_marriage"].metadata.origins = [snap.metadata.origin]
 
     tb = tb.format(["country", "year"])
 
