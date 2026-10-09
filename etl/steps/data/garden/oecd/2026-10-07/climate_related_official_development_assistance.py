@@ -110,6 +110,7 @@ def run() -> None:
     #
     # Process data.
     #
+    # Use plain strings for codes, to compare them across tables.
     for tb in [tb_totals, tb_activities, tb_bilateral]:
         for column in ["donor_code", "recipient_code", "sector_code"]:
             if column in tb.columns:
@@ -117,21 +118,22 @@ def run() -> None:
 
     sanity_check_inputs(tb_totals=tb_totals, tb_activities=tb_activities)
 
-    # Classify climate-related activities into mutually exclusive categories, counting each activity only once.
+    # Step 1: Climate-related aid, from project-level rows, counting each project once.
     tb_climate = classify_climate_activities(tb_activities=tb_activities)
 
-    # Define the donors and recipients (and their groups) to include, and the codes in the data that belong to each.
+    # Step 2: Map each entity (donor, recipient or group) to its members in the data, to compute groups ourselves.
     # Individual donors: all donor codes except groups of donors (e.g. all DAC members).
     groups_donors = set(tb_groups[tb_groups["hierarchy"] == "donor"]["parent_code"])
     donors = sorted(set(tb_totals["donor_code"]) - groups_donors)
+    # E.g. G7 -> CAN, DEU, FRA...; DEU -> DEU.
     members_donors = create_members(tb_groups=tb_groups, hierarchy="donor", entity_codes=donors + DONOR_GROUPS)
     recipients = sorted(set(tb_totals[tb_totals["donor_code"] == CODE_ALL_DONORS]["recipient_code"]))
+    # E.g. Africa -> KEN, ETH, ..., F_X; KEN -> KEN.
     members_recipients = create_members(tb_groups=tb_groups, hierarchy="recipient", entity_codes=recipients)
-    # Codes of groups of recipients (as opposed to individual recipients, which are their own only member).
+    # Groups of recipients, whose OECD totals are dropped before summing (so they are not added to their members).
     groups_recipients = set(tb_groups[tb_groups["hierarchy"] == "recipient"]["parent_code"])
 
-    # Totals of each donor and group of donors (to all developing countries, all sectors), computed from the totals of
-    # individual donors. Totals of each recipient and group of recipients (from all DAC members), as given by the OECD.
+    # Step 3: Bilateral allocable ODA, from the RioMarkers totals: by donor (to all developing countries, all sectors).
     tb_totals_given = aggregate_by_members(
         tb=tb_totals[
             (tb_totals["recipient_code"] == CODE_ALL_RECIPIENTS)
@@ -143,9 +145,9 @@ def run() -> None:
         keys=["marker", "score", "year"],
         columns=["value"],
     )
+    # Our total for all DAC members must match the OECD's.
     sanity_check_donor_groups(tb_totals_given=tb_totals_given, tb_totals=tb_totals)
-    # Totals of each recipient and group of recipients (from all DAC members). Groups are computed from their members, so
-    # they follow the latest hierarchy of recipients (the OECD's own group totals may use an older one).
+    # By recipient (from all DAC members, all sectors).
     tb_totals_by_recipient = tb_totals[
         (tb_totals["donor_code"] == CODE_ALL_DONORS) & (tb_totals["sector_code"] == CODE_ALL_SECTORS)
     ]
@@ -156,6 +158,7 @@ def run() -> None:
         keys=["marker", "score", "year"],
         columns=["value"],
     )
+    # Our group totals must match the OECD's, except for income groups (whose members change over time).
     sanity_check_recipient_groups(
         tb_computed=tb_totals_received,
         tb_oecd=tb_totals_by_recipient.rename(columns={"recipient_code": "entity_code"}),
@@ -164,8 +167,7 @@ def run() -> None:
         expected_differences=WORLD_BANK_INCOME_GROUPS,
     )
 
-    # Total bilateral ODA (including activities outside the scope of the Rio markers), from the CRS. Donor groups are
-    # computed from individual donors, as above.
+    # Step 4: Total bilateral ODA (including aid outside the scope of the Rio markers), from the CRS, as in step 3.
     tb_bilateral_given = aggregate_by_members(
         tb=tb_bilateral[
             (tb_bilateral["recipient_code"] == CODE_ALL_RECIPIENTS) & tb_bilateral["donor_code"].isin(donors)
@@ -194,7 +196,7 @@ def run() -> None:
         expected_differences=WORLD_BANK_INCOME_GROUPS + ["INC_X"],
     )
 
-    # Climate-related ODA given by each donor and group of donors, and received by each recipient and group.
+    # Step 5: Climate-related ODA by donor and recipient, combined with the totals of steps 3 and 4 (for shares).
     tb_given = create_climate_related_table(
         tb_climate=aggregate_by_members(
             tb=tb_climate, code_column="donor_code", members=members_donors, keys=["year"], columns=CLIMATE_COLUMNS
@@ -214,7 +216,7 @@ def run() -> None:
         tb_bilateral=tb_bilateral_received,
     )[["entity_code", "year"] + INDICATORS_BY_RECIPIENT]
 
-    # Add names, harmonize them, and format tables.
+    # Step 6: Replace codes with names (from the OECD's codelist), harmonize them, and format tables.
     names = tb_codes[tb_codes["codelist"] == "area"].set_index("code")["name"].to_dict()
     names.update(NAMES_BY_CODE)
     tables = {"climate_related_oda_by_donor": tb_given, "climate_related_oda_by_recipient": tb_received}
@@ -226,7 +228,7 @@ def run() -> None:
         # NOTE: The same mapping covers donors and recipients, so each table uses only part of it.
         tb = paths.regions.harmonize_names(tb=tb, warn_on_unused_countries=False)
 
-        # Names of recipients whose aid is not assigned to a single country.
+        # Recipients whose aid is not assigned to a single country (e.g. Africa, regional), to annotate in charts.
         if short_name == "climate_related_oda_by_recipient":
             is_not_assigned = tb["entity_code"].str.endswith("_X") & ~tb["entity_code"].isin(
                 CODES_UNCLASSIFIED_BY_INCOME
@@ -243,7 +245,7 @@ def run() -> None:
     #
     # Save outputs.
     #
-    # Initialize a new garden dataset.
+    # Initialize a new garden dataset (passing the annotations of recipients to the .meta.yml file).
     ds_garden = paths.create_dataset(
         tables=list(tables.values()),
         default_metadata=ds_meadow.metadata,
@@ -264,17 +266,20 @@ def classify_climate_activities(tb_activities: Table) -> Table:
     Each activity marked for both mitigation and adaptation appears twice in the data (once per marker). To count it
     only once, keep all activities marked for mitigation, plus those marked for adaptation but not for mitigation.
     """
+    # Each row has both climate scores of its project.
     is_mitigation = tb_activities["climate_mitigation_score"].isin([SCORE_SIGNIFICANT, SCORE_PRINCIPAL])
     is_adaptation = tb_activities["climate_adaptation_score"].isin([SCORE_SIGNIFICANT, SCORE_PRINCIPAL])
     is_principal = (
         (tb_activities["climate_mitigation_score"] == SCORE_PRINCIPAL)
         | (tb_activities["climate_adaptation_score"] == SCORE_PRINCIPAL)
     ).fillna(False)
+    # One row per activity: its mitigation row if it has one, otherwise its adaptation row.
     keep = (tb_activities["marker"] == MARKER_MITIGATION) | (
         (tb_activities["marker"] == MARKER_ADAPTATION) & ~is_mitigation
     )
 
     tb = tb_activities.loc[keep, ["donor_code", "recipient_code", "year", "value"]].copy()
+    # Put each value in the column of its category (and zero in the others).
     masks = {
         "mitigation_only": is_mitigation & ~is_adaptation,
         "adaptation_only": ~is_mitigation & is_adaptation,
@@ -291,10 +296,14 @@ def classify_climate_activities(tb_activities: Table) -> Table:
 
 def create_members(tb_groups: Table, hierarchy: str, entity_codes: list[str]) -> Table:
     """Map each entity to the codes in the data that belong to it: itself for individual donors and recipients, and its
-    members (at the lowest level of the hierarchy) for groups."""
+    members (at the lowest level of the hierarchy) for groups. E.g. Africa (F) contains South of Sahara (F6), which
+    contains Eastern Africa (F3), which contains Kenya (KEN): so F maps to KEN (among others), and KEN maps to itself.
+    """
+    # Direct members of each group, e.g. {"F": ["F4", "F6", "F_X"], ...}.
     edges = tb_groups[tb_groups["hierarchy"] == hierarchy]
     children = edges.groupby("parent_code")["child_code"].apply(list).to_dict()
 
+    # Codes at the bottom of the hierarchy below a code (or the code itself, if it is not a group).
     def leaves(code: str) -> set[str]:
         if code not in children:
             return {code}
@@ -305,7 +314,7 @@ def create_members(tb_groups: Table, hierarchy: str, entity_codes: list[str]) ->
 
 
 def aggregate_by_members(tb: Table, code_column: str, members: Table, keys: list[str], columns: list[str]) -> Table:
-    """Sum columns over the members of each entity."""
+    """Sum columns over the members of each entity (e.g. a row of Germany counts towards Germany, G7 and DAC members)."""
     tb = tb.merge(members, left_on=code_column, right_on="member_code", how="inner")
     return tb.groupby(["entity_code"] + keys, as_index=False, observed=True)[columns].sum()
 
