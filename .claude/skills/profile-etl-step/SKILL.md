@@ -146,7 +146,7 @@ result = tb.groupby(cols).agg({"value": "sum"})
 checks = tb.groupby(cols)["country"].apply(lambda x: check(x))
 ```
 
-**Known issue**: `geo.add_region_aggregates()` (deprecated) injects a per-group lambda to check `countries_that_must_have_data`. When that list is empty (common case), the lambda is a no-op but still causes the slowdown. This was fixed in 2026-03 to skip the lambda when no checks are needed. The newer `paths.regions.add_aggregates()` API doesn't have this issue.
+**Known issue**: `geo.add_region_aggregates()` (deprecated) injects a per-group lambda to check `countries_that_must_have_data`, which causes this slowdown whenever that list is non-empty (it skips the lambda when no checks are needed). The newer `paths.regions.add_aggregates()` API doesn't have this issue.
 
 ### 5. Unnecessary Full-Table Reads
 

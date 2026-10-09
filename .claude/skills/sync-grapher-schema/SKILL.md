@@ -16,7 +16,7 @@ metadata:
 
 # Sync Grapher Schema
 
-The grapher chart-config schema is owned by the web team in [`owid-grapher`](https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema) and published at `https://files.ourworldindata.org/schemas/grapher-schema.NNN.json`. **It is mutated in place without version bumps** (e.g. dumbbell plots landed in `.010` directly), so when it changes upstream, four things in this repo need to follow:
+The grapher chart-config schema is owned by the web team in [`owid-grapher`](https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema) and published at `https://files.ourworldindata.org/schemas/grapher-schema.NNN.json`. **It is mutated in place without version bumps** (e.g. a new chart type can be added to the current version directly), so when it changes upstream, four things in this repo need to follow:
 
 | File | Role | Sync mechanism |
 |---|---|---|
@@ -70,7 +70,7 @@ For each new upstream property that makes sense in a multidim/explorer view, add
 },
 ```
 
-Lesson learned (#6196 → #6200): forgetting this step is how `dumbbell` went missing — the generated types were patched by hand instead, which regeneration would have destroyed. Never edit `schema_types.py` directly.
+Skipping this step makes the new property go missing from the generated types, and patching them by hand instead is undone by the next regeneration. Never edit `schema_types.py` directly.
 
 ### 3. Propagate to `schemas/dataset-schema.json`
 
@@ -137,6 +137,6 @@ Every multidim and single-chart config pins `grapher_schema: "NNN"` — required
 
 The one thing to check: `--bump-version` repoints multidim view-config validation at the new version, so a config that is no longer valid under `MMM` will now fail `Chart.validate_schema()`. Fix the config *and* bump only that config's pin, since at that point it genuinely was re-authored against `MMM`.
 
-Views can also carry their own `$schema` inside a `config` block, which **overrides** the chart-level pin (grapher spreads the view config last). As of #6705 follow-up no step does this any more, and ETL warns if one reappears — so treat a hit from `grep -rn '\$schema' etl/steps/viz/chart` as something to remove rather than to bump.
+Views can also carry their own `$schema` inside a `config` block, which **overrides** the chart-level pin (grapher spreads the view config last). No step should do this, and ETL warns if one does — so treat a hit from `grep -rn '\$schema' etl/steps/viz/chart` as something to remove rather than to bump.
 
 One caveat on "leave the pins alone": that holds for pins that are *true*. A pin that contradicts its own config body — pinned `005` while the config uses `chartTypes`, which only exists from `006` (the 005→006 migration creates it) — is stale, not a record, and leaving it makes grapher run migrations over a config they were never meant to touch. Check a suspicious pin against the properties of that schema version (`curl https://files.ourworldindata.org/schemas/grapher-schema.NNN.json`) and correct it to the version the config is actually written against.

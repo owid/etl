@@ -212,7 +212,7 @@ that's the point of the split.
 
 ## Known gaps
 
-State these when reporting; silence reads as full coverage. `--markdown` now ends with
+State these when reporting; silence reads as full coverage. `--markdown` ends with
 a **Not searched** section carrying this list plus the limits of that particular run
 (no `--transitive` hop, excluded 'All charts' entries) — keep the two in step, and
 still state them yourself when you report on a `--json`/`--csv` run.
@@ -229,8 +229,8 @@ means UNKNOWN, not "nothing references it".
   explorer TSV, outside grapher configs. Report them as a coverage caveat rather
   than letting them pass silently.
 - `linkType='url'` rows pointing at `archive.ourworldindata.org` are dropped as
-  frozen by design. As of 2026-07 every url-typed grapher row was an archive
-  snapshot — don't bet an audit on that classification continuing to hold.
+  frozen by design. Url-typed grapher rows have tended to be archive snapshots —
+  don't bet an audit on that classification holding.
 - Indicator-level `presentation.grapher_config` lives in garden/grapher
   `.meta.yml`, not the DB. It is invisible here and needs a repo grep, and it fans
   out to every thin MDim/explorer view that inherits it.
@@ -265,14 +265,13 @@ means UNKNOWN, not "nothing references it".
   only path — there is no click-path to it at all.
 - **A chart redirect's `target_query_param` merges with the incoming query key by key,
   the incoming side winning per key.** A reference's params cost the reader exactly the
-  stored keys they collide with. Verified on production 2026-08-14 with a distinguishing
-  pair — `global-forestry-area-1958-2014` → `forest-area-km?tab=line` sends a bare
+  stored keys they collide with. On production, for example,
+  `global-forestry-area-1958-2014` → `forest-area-km?tab=line` sends a bare
   `?country=~FRA` on to `?tab=line&country=%7EFRA` (stored `tab=line` SURVIVES), and
   `?tab=map&country=~FRA` on to `?tab=map&country=%7EFRA` (incoming `tab` wins). A test
-  whose query sets every stored key cannot tell merge from wholesale replacement — an
-  earlier version of this note concluded "wholesale" from exactly that. Staging's serving
+  whose query sets every stored key cannot tell merge from wholesale replacement. Staging's serving
   layer and a fresh row's first-week static 302 both behave differently (stored query wins,
-  visitor params dropped — both verified live 2026-08-14). Do not generalize from
+  visitor params dropped). Do not generalize from
   `functions/_common/redirectTools.ts`: its *explorer* path also merges per key but with
   the TARGET winning — the opposite winner, and a different code path.
   MDIM dimension collisions are the same question — compare each reference's

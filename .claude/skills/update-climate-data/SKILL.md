@@ -118,8 +118,7 @@ graphers, `climate_change_impacts_annual`/`_monthly`, and `yearly_burned_area`.
    ids from `datasets` on staging, whose `catalogPath` has no `grapher/` prefix). Staging can
    hold *two* old wildfire versions (the batch's and the last weekly one): pair the one that
    carries charts. Afterwards, check that no old dataset still carries a chart and that the
-   per-dataset chart counts on staging equal production's (the 2026-09-11 run moved 66 charts
-   and 3 narrative charts, 70 chart-dataset pairs). **Watch the once-off cases**: any dataset
+   per-dataset chart counts on staging equal production's. **Watch the once-off cases**: any dataset
    moving from `latest` or changing namespace needs its remap reviewed explicitly (see below).
 5. Hand off for review. In the PR body and in the chat, **list exactly which files changed in
    content** relative to the previous version, so the reviewer does not have to open all ~110

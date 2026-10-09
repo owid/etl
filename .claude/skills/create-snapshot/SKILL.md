@@ -68,7 +68,7 @@ Present this as a summary block so the user can quickly scan and correct individ
 
 Once the user confirms, generate both files from the wizard's snapshot cookiecutter — the same templates the wizard's snapshot page uses.
 
-> **Never hand-write these files, and never copy the templates into this file.** `apps/wizard/etl_steps/cookiecutter/snapshot/` is the single source of truth. Hand-copied templates drift: an earlier version of this skill carried its own copies, and the manual-import one had already lost the canonical docstring. The template also gets details right that are easy to fluff by hand — most importantly `license` nested **inside** `origin` (CLAUDE.md's most-repeated snapshot mistake, and a schema `not`-constraint plus `test_snapshot_license_lives_under_origin` exist because of it), and `is_public: false` for a private snapshot.
+> **Never hand-write these files, and never copy the templates into this file.** `apps/wizard/etl_steps/cookiecutter/snapshot/` is the single source of truth. Hand-copied templates drift (a copied manual-import template can silently lose the canonical docstring). The template also gets details right that are easy to fluff by hand — most importantly `license` nested **inside** `origin` (CLAUDE.md's most-repeated snapshot mistake, enforced by a schema `not`-constraint plus `test_snapshot_license_lives_under_origin`), and `is_public: false` for a private snapshot.
 
 Files produced:
 ```
