@@ -111,7 +111,7 @@ If the package is only in `uv.lock` (not a direct dependency):
 
 ### After removing a dependency
 
-When removing a package, check if it's imported anywhere in the codebase. If it is, replace its usage with an alternative approach. For example, when we removed `moviepy`, we replaced its `ImageSequenceClip` usage with a direct `ffmpeg` subprocess call.
+When removing a package, check if it's imported anywhere in the codebase. If it is, replace its usage with an alternative approach. For example, `moviepy`'s `ImageSequenceClip` usage can be replaced with a direct `ffmpeg` subprocess call.
 
 Always search broadly:
 ```bash
