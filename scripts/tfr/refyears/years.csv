@@ -1,0 +1,186 @@
+country,plotted_year,reference_year,basis
+Afghanistan,2015,2015,inferred
+Angola,2016,2015,documented
+Angola,2024,2022,documented
+Benin,2001,2000,documented
+Benin,2006,2005,documented
+Benin,2012,2011,documented
+Benin,2018,2017,documented
+Bolivia,1998,1997,documented
+Bolivia,2003,2002,documented
+Bolivia,2008,2007,documented
+Bolivia,2016,2015,documented
+Bolivia,2023,2022,inferred
+Burkina Faso,2003,2002,documented
+Burkina Faso,2010,2009,documented
+Burkina Faso,2021,2020,documented
+Burundi,2010,2009,inferred
+Burundi,2017,2015,inferred
+Cambodia,2000,1999,documented
+Cambodia,2005,2004,documented
+Cambodia,2010,2009,documented
+Cambodia,2014,2013,documented
+Cambodia,2022,2020,documented
+Cameroon,2011,2010,documented
+Cameroon,2018,2017,documented
+Chad,2009,2009,inferred
+Chad,2010,2008,documented
+Chad,2015,2014,documented
+Chad,2019,2018,documented
+China,2000,2000,inferred
+China,2010,2010,inferred
+China,2020,2020,documented
+Cote d'Ivoire,2012,2011,documented
+Cote d'Ivoire,2016,2015,inferred
+Cote d'Ivoire,2021,2020,documented
+Democratic Republic of Congo,2014,2012,documented
+Democratic Republic of Congo,2024,2022,documented
+Dominican Republic,2019,2018,documented
+Ethiopia,2000,1999,documented
+Ethiopia,2005,2004,documented
+Ethiopia,2011,2010,documented
+Ethiopia,2016,2015,documented
+Ethiopia,2024,2024,documented
+Ghana,2003,2002,documented
+Ghana,2008,2007,documented
+Ghana,2014,2013,documented
+Ghana,2022,2022,documented
+Guinea,2005,2004,documented
+Guinea,2012,2011,documented
+Guinea,2018,2017,documented
+Haiti,2006,2005,inferred
+Haiti,2012,2011,inferred
+Haiti,2017,2016,inferred
+Honduras,2006,2005,documented
+Honduras,2012,2011,documented
+Honduras,2019,2019,documented
+Indonesia,2010,2010,inferred
+Indonesia,2015,2015,inferred
+Indonesia,2020,2022,documented
+Indonesia,2025,2025,inferred
+Iraq,1997,1997,inferred
+Iraq,2004,2004,inferred
+Iraq,2006,2004,documented
+Iraq,2007,2007,inferred
+Iraq,2011,2010,inferred
+Iraq,2024,2024,inferred
+Jordan,2018,2017,documented
+Jordan,2023,2022,documented
+Kenya,2009,2009,documented
+Kenya,2019,2019,documented
+Madagascar,2004,2003,documented
+Madagascar,2009,2008,documented
+Madagascar,2021,2020,documented
+Malawi,2000,1999,documented
+Malawi,2004,2003,documented
+Malawi,2008,2008,documented
+Malawi,2010,2009,documented
+Malawi,2015,2014,documented
+Malawi,2018,2018,documented
+Malawi,2024,2023,documented
+Mali,2001,2000,documented
+Mali,2006,2006,documented
+Mali,2013,2012,documented
+Mali,2018,2017,documented
+Mali,2024,2023,documented
+Morocco,1962,1960,inferred
+Morocco,1982,1982,documented
+Morocco,1994,1994,documented
+Morocco,2004,2004,documented
+Morocco,2010,2010,inferred
+Morocco,2014,2014,documented
+Morocco,2024,2024,documented
+Mozambique,1997,1996,documented
+Mozambique,2003,2002,documented
+Mozambique,2011,2010,documented
+Mozambique,2022,2022,documented
+Myanmar,2019,2019,documented
+Myanmar,2024,2024,documented
+Nepal,2001,2001,documented
+Nepal,2011,2011,documented
+Nepal,2021,2021,documented
+Niger,2006,2005,inferred
+Niger,2012,2011,documented
+Niger,2021,2020,inferred
+Nigeria,2003,2002,documented
+Nigeria,2008,2007,documented
+Nigeria,2013,2012,documented
+Nigeria,2018,2017,documented
+Nigeria,2024,2022,documented
+North Korea,2008,2008,inferred
+Pakistan,2001,2001,documented
+Pakistan,2003,2003,documented
+Pakistan,2005,2005,documented
+Pakistan,2006,2006,documented
+Pakistan,2007,2007,documented
+Pakistan,2020,2019,documented
+Papua New Guinea,2006,2004,documented
+Papua New Guinea,2018,2016,documented
+Papua New Guinea,2022,2022,documented
+Rwanda,2000,1998,documented
+Rwanda,2005,2004,documented
+Rwanda,2010,2010,documented
+Rwanda,2015,2014,documented
+Rwanda,2020,2019,documented
+Rwanda,2025,2024,documented
+Senegal,2005,2004,inferred
+Senegal,2010,2010,inferred
+Senegal,2012,2012,documented
+Senegal,2014,2013,inferred
+Senegal,2015,2014,inferred
+Senegal,2016,2015,inferred
+Senegal,2017,2016,inferred
+Senegal,2018,2017,inferred
+Senegal,2019,2018,inferred
+Senegal,2023,2022,inferred
+Sierra Leone,2008,2007,documented
+Sierra Leone,2013,2012,documented
+Sierra Leone,2017,2016,documented
+Sierra Leone,2019,2018,documented
+Somalia,2020,2017,documented
+South Sudan,2008,2008,documented
+South Sudan,2010,2009,documented
+South Sudan,2025,2024,documented
+Sudan,2014,2013,documented
+Syria,2001,2000,inferred
+Syria,2009,2008,inferred
+Tanzania,2022,2021,documented
+Uganda,2014,2014,inferred
+Uganda,2024,2024,documented
+Vietnam,2001,2001,inferred
+Vietnam,2002,2002,inferred
+Vietnam,2003,2003,inferred
+Vietnam,2004,2004,inferred
+Vietnam,2005,2005,inferred
+Vietnam,2006,2006,inferred
+Vietnam,2007,2007,inferred
+Vietnam,2008,2008,inferred
+Vietnam,2009,2009,documented
+Vietnam,2010,2010,documented
+Vietnam,2011,2011,documented
+Vietnam,2012,2012,documented
+Vietnam,2013,2013,documented
+Vietnam,2014,2014,inferred
+Vietnam,2015,2015,inferred
+Vietnam,2016,2016,inferred
+Vietnam,2017,2017,inferred
+Vietnam,2018,2018,inferred
+Vietnam,2019,2019,documented
+Vietnam,2020,2020,inferred
+Vietnam,2021,2021,documented
+Vietnam,2022,2022,inferred
+Vietnam,2023,2023,inferred
+Vietnam,2024,2024,inferred
+Vietnam,2025,2025,inferred
+Yemen,2013,2012,documented
+Zambia,2002,2000,documented
+Zambia,2007,2006,documented
+Zambia,2014,2012,documented
+Zambia,2018,2017,documented
+Zambia,2024,2023,documented
+Zimbabwe,2002,2002,documented
+Zimbabwe,2005,2004,inferred
+Zimbabwe,2010,2010,inferred
+Zimbabwe,2012,2012,documented
+Zimbabwe,2015,2014,inferred
+Zimbabwe,2022,2022,documented

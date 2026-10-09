@@ -1,0 +1,261 @@
+"""UN WPP series, plus the national loaders that need no country-specific module."""
+
+import os
+import re
+
+import pandas as pd
+
+from fetch import fetch
+
+DATA = os.path.join(os.path.dirname(__file__), "data")
+WPP = "/Users/edouard/dev/owid/etl/data/garden/un/2024-07-12/un_wpp"
+
+COLORS = {
+    "nso": "#c94a3b",
+    "UN WPP": "#3b82c4",
+}
+
+
+def un_wpp(country):
+    from owid.catalog import Dataset
+
+    tb = Dataset(WPP)["fertility_rate"].reset_index()
+    tb = tb[(tb.country == country) & (tb.age == "all") & (tb.sex == "all")]
+
+    def grab(v):
+        s = tb[tb.variant == v]
+        return pd.DataFrame({"year": s.year.astype(int), "value": s.fertility_rate.astype(float)}).sort_values("year")
+
+    est = grab("estimates")
+    out = [("estimates", est, False)]
+    if len(est):
+        anchor = est.iloc[-1:]
+        for v in ("high", "medium", "low"):
+            p = grab(v)
+            if len(p):
+                out.append((v, pd.concat([anchor, p], ignore_index=True), True))
+    return out
+
+
+def _tfr_from_asfr(df, per=1000.0, width=5):
+    """TFR = sum of age-specific rates x group width."""
+    g = df.groupby("year").value.sum() / per * width
+    return g.rename("value").reset_index()
+
+
+def united_states():
+    """CDC/NCHS age-specific birth rates, 1940-2024, from two data.cdc.gov datasets.
+
+    Neither one covers the whole period: the historical series stops in 2018 and the current one
+    starts in 2016, so they are stitched at 2016. Summing the bands and multiplying by five is
+    exactly how NCHS builds its own published total, and reproduces it to the decimal.
+    """
+    hist = pd.read_json(fetch("https://data.cdc.gov/resource/yt7u-eiyg.json?$limit=5000",
+                              os.path.join(DATA, "us", "rates_1940_2018.json")))
+    hist = pd.DataFrame({"year": hist.year.astype(int),
+                         "value": pd.to_numeric(hist.birth_rate, errors="coerce")}).dropna()
+
+    url = ("https://data.cdc.gov/resource/daba-4vfq.json?$limit=5000"
+           "&$where=classification%3D%27Demographic%20Characteristic%27%20AND%20subtopic%3D%27Birth%20rate%27")
+    cur = pd.read_json(fetch(url, os.path.join(DATA, "us", "rates_2016_2024.json")))
+    # 15-19 is also split into 15-17 and 18-19; keeping those as well would double-count
+    cur = cur[cur.subgroup.isin(["10-14 years", "15-19 years", "20-24 years", "25-29 years",
+                                 "30-34 years", "35-39 years", "40-44 years", "45-54 years"])]
+    cur = pd.DataFrame({"year": cur.time_period.astype(int),
+                        "value": pd.to_numeric(cur.estimate, errors="coerce")}).dropna()
+
+    out = _tfr_from_asfr(pd.concat([hist[hist.year < 2016], cur], ignore_index=True))
+    return out.sort_values("year").reset_index(drop=True)
+
+
+def japan():
+    """e-Stat / MHLW table 0003411608: age-specific birth rates per 1,000 women, 5-year groups."""
+    import json
+
+    s = json.load(open(os.path.join(DATA, "jp_asfr.json")))["GET_STATS_DATA"]["STATISTICAL_DATA"]
+    cls = {
+        c["@id"]: {x["@code"]: x["@name"] for x in (c["CLASS"] if isinstance(c["CLASS"], list) else [c["CLASS"]])}
+        for c in s["CLASS_INF"]["CLASS_OBJ"]
+    }
+    v = pd.DataFrame(s["DATA_INF"]["VALUE"])
+    v["age"] = v["@cat01"].map(cls["cat01"])
+    v["order"] = v["@cat02"].map(cls["cat02"])
+    v["year"] = v["@time"].map(cls["time"]).str.extract(r"(\d{4})").astype(int)
+    # the age "総数" row for all birth orders is MHLW's published TFR itself
+    v = v[(v["order"] == "総数") & (v.age == "総数")]
+    v["value"] = pd.to_numeric(v["$"], errors="coerce")
+    return v.dropna(subset=["value"])[["year", "value"]].sort_values("year").reset_index(drop=True)
+
+
+def germany():
+    """Destatis 12612-0008: live births per 1,000 women, Germany, by single year of age."""
+    path = os.path.join(DATA, "de/12612-0008_en.csv")
+    lines = open(path, encoding="utf-8-sig").read().splitlines()
+    # the export is split into several blocks, each with its own year header
+    heads = [i for i, ln in enumerate(lines) if re.match(r"^;\d{4};", ln)]
+    rows = []
+    for bi, hdr in enumerate(heads):
+        stop = heads[bi + 1] if bi + 1 < len(heads) else len(lines)
+        # each year appears twice in the header: once for the value, once for the quality flag
+        years = [int(y) for y in lines[hdr].split(";")[1:] if y.strip().isdigit()][0::2]
+        for ln in lines[hdr + 1 : stop]:
+            m = re.match(r"^(\d+) years?;", ln)
+            if not m:
+                continue
+            age = int(m.group(1))
+            vals = ln.split(";")[1:][0::2]  # value, quality-flag, value, flag, ...
+            for y, raw in zip(years, vals):
+                v = pd.to_numeric(raw.replace(",", "."), errors="coerce")
+                if pd.notna(v):
+                    rows.append({"year": y, "age": age, "value": float(v)})
+    return _tfr_from_asfr(pd.DataFrame(rows), width=1)  # single years of age
+
+
+# ---------------------------------------------------------------- Thailand
+_TH_AGE = re.compile(r"^\s*(?:(\d+)\s*-\s*(\d+)|น้อยกว่า 15|50 และมากกว่า)")
+_TH_NUM = re.compile(r"\d[\d,]*")
+
+
+def _th_rows(path):
+    """Yield (age_group, [numbers]) from a layout-extracted yearbook table page."""
+    for ln in open(os.path.join(DATA, path), encoding="utf-8", errors="ignore"):
+        m = _TH_AGE.match(ln)
+        if not m:
+            continue
+        nums = [float(x.replace(",", "")) for x in _TH_NUM.findall(ln.split("....")[-1])]
+        if not nums:
+            continue
+        key = (int(m.group(1)), int(m.group(2))) if m.group(1) else ("u15" if "น้อยกว่า" in ln else "50p")
+        yield key, nums
+
+
+def _th_years(path):
+    txt = open(os.path.join(DATA, path), encoding="utf-8", errors="ignore").read()
+    m = re.search(r": (\d{4}) - (\d{4})", txt)
+    return list(range(int(m.group(1)), int(m.group(2)) + 1))
+
+
+def thailand():
+    """NSO Statistical Yearbook: table 1.10 births by mother's age / table 1.4 registered population."""
+    births = {}
+    for f in ("th23_b.txt", "th25_b.txt"):
+        yrs = _th_years(f)
+        for key, nums in _th_rows(f):
+            for y, v in zip(yrs, nums[: len(yrs)]):  # counts first, percentages after
+                births.setdefault(y, {})[key] = v
+
+    pop = {}
+    for f in ("th23_p.txt", "th25_p.txt"):
+        yrs = _th_years(f)
+        for key, nums in _th_rows(f):
+            if not isinstance(key, tuple):
+                continue
+            for i, y in enumerate(yrs):  # each year is Total, Male, Female
+                if len(nums) >= 3 * i + 3:
+                    pop.setdefault(y, {})[key] = nums[3 * i + 2]
+
+    rows = []
+    for y in sorted(set(births) & set(pop)):
+        tfr = 0.0
+        for key, b in births[y].items():
+            band = (10, 14) if key == "u15" else ((45, 49) if key == "50p" else key)
+            w = pop[y].get(band)
+            if w:
+                tfr += b / w * 5
+        rows.append({"year": y, "value": tfr})
+    return pd.DataFrame(rows)
+
+
+def egypt():
+    """CAPMAS Annual Bulletin of Births and Deaths, table 13: age-specific fertility rates.
+
+    One bulletin per year. CAPMAS labels one band "40-45" where it means 40-44; taken at
+    width 5, which reproduces their own published TFR.
+    """
+    import glob
+
+    rows = []
+    for f in sorted(glob.glob(os.path.join(DATA, "eg_2*.xlsx"))):
+        year = int(re.search(r"eg_(\d{4})", f).group(1))
+        d = pd.read_excel(f, sheet_name="جدول Table 13", header=None)
+        rates = []
+        for _, r in d.iterrows():
+            if isinstance(r[0], str) and re.match(r"^\d{2}-\d{2}$", r[0].strip()):
+                v = pd.to_numeric(r[2], errors="coerce")
+                if pd.notna(v):
+                    rates.append(float(v))
+        if rates:
+            rows.append({"year": year, "value": sum(rates) / 1000 * 5})
+    return pd.DataFrame(rows).sort_values("year").reset_index(drop=True)
+
+
+# ---------------------------------------------------------------- Mexico
+_MX_AGE = {
+    "Menor de 15 años": (10, 14),
+    "De 15 a 19 años": (15, 19),
+    "De 20 a 24 años": (20, 24),
+    "De 25 a 29 años": (25, 29),
+    "De 30 a 34 años": (30, 34),
+    "De 35 a 39 años": (35, 39),
+    "De 40 a 44 años": (40, 44),
+    "De 45 a 49 años": (45, 49),
+    "De 50  y más años": (50, 54),
+}
+MX_LAST = 2022  # 2023-24 occurrence years are still filling up with late registrations
+
+
+def mexico():
+    """INEGI's registered births by year of occurrence and mother's age, over CONAPO's mid-year
+    female population by single age.
+
+    The table's columns are registration year crossed with age band, and its rows are years of
+    occurrence. Registration only starts in 1985, so a birth that happened before then appears here
+    only if it was registered decades late: the table holds 21,332 births for 1950, against a real
+    total over a million. Those years are dropped rather than divided — publishing them gave Mexico a
+    fertility rate of 0.08 for 1951.
+    """
+    d = pd.read_excel(os.path.join(DATA, "mx2.xlsx"), sheet_name=0, header=None)
+    ages = d.iloc[4].ffill()
+    reg_years = [int(v) for v in d.iloc[5] if re.fullmatch(r"\d{4}", str(v).strip())]
+    first_complete = min(reg_years)
+    births = {}
+    for i in range(6, len(d)):
+        y = str(d.iloc[i, 0]).strip()
+        if not re.match(r"^\d{4}$", y) or int(y) < first_complete:
+            continue
+        for j in range(1, d.shape[1]):
+            band = _MX_AGE.get(ages[j] if isinstance(ages[j], str) else "")
+            if not band:
+                continue
+            v = pd.to_numeric(str(d.iloc[i, j]).replace(",", ""), errors="coerce")
+            if pd.notna(v):
+                births.setdefault(int(y), {})
+                births[int(y)][band] = births[int(y)].get(band, 0.0) + float(v)
+
+    # The most recent years are still being registered, so they are dropped too — MX_LAST is the last
+    # year INEGI considers settled.
+    births = {y: b for y, b in births.items() if y <= MX_LAST}
+
+    # If a future download reaches further back, the years kept must still look like whole years of
+    # registration rather than the tail of late ones.
+    totals = {y: sum(b.values()) for y, b in births.items()}
+    median = sorted(totals.values())[len(totals) // 2]
+    thin = sorted(y for y, t in totals.items() if t < median / 2)
+    if thin:
+        raise AssertionError(f"Mexico: occurrence years with implausibly few births: {thin}")
+
+    pop = pd.read_excel(os.path.join(DATA, "0_Pob_Mitad_1950_2070.xlsx"))
+    pop = pop[(pop.CVE_GEO == 0) & (pop.SEXO == "Mujeres")]
+    women = pop.groupby(["AÑO", "EDAD"]).POBLACION.sum()
+
+    rows = []
+    for y in sorted(births):
+        if y > MX_LAST or y not in women.index.get_level_values(0):
+            continue
+        tfr = 0.0
+        for (lo, hi), b in births[y].items():
+            denom = sum(women.get((y, a), 0) for a in range(lo, hi + 1))
+            if denom:
+                tfr += b / denom * (hi - lo + 1)
+        rows.append({"year": y, "value": tfr})
+    return pd.DataFrame(rows)
