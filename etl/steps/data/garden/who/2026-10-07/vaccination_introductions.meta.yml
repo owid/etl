@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Vaccination
+      attribution_short: WHO
       grapher_config:
         originUrl: ourworldindata.org/vaccination
   description_key_common: &description_key_common
@@ -45,8 +46,6 @@ definitions:
     acellular pertussis vaccine
     <%- elif description == "Hepatitis A vaccine" %>
     hepatitis A vaccine
-    <%- elif description == 'Typhoid' %>
-    typhoid vaccine
     <%- elif description == "Typhoid conjugate vaccine" %>
     typhoid conjugate vaccine (TCV)
     <%- elif description == "HPV (Human papillomavirus) vaccine" %>
@@ -97,8 +96,6 @@ definitions:
     Acellular pertussis vaccine (aP)
     <%- elif description == "Hepatitis A vaccine" %>
     Hepatitis A vaccine
-    <%- elif description == 'Typhoid vaccine' %>
-    Typhoid vaccine
     <%- elif description == "Typhoid conjugate vaccine" %>
     Typhoid conjugate vaccine
     <%- elif description == "HPV (Human papillomavirus) vaccine" %>
@@ -149,8 +146,6 @@ definitions:
     Pertussis (whooping cough) is an infectious respiratory disease caused by bacteria in the throat and airways. This data relates to the acellular vaccine.
     <%- elif description == "Hepatitis A vaccine" %>
     Hepatitis A is a highly contagious viral infection that affects the liver, causing symptoms like fever, fatigue, nausea, abdominal pain, and jaundice.
-    <%- elif description == 'Typhoid' %>
-    Typhoid is a serious bacterial infection caused by Salmonella typhi, transmitted through contaminated food or water.
     <%- elif description == "Typhoid conjugate vaccine" %>
     Typhoid is a serious bacterial infection caused by Salmonella typhi, transmitted through contaminated food or water. The typhoid conjugate vaccine (TCV) offers longer-lasting protection than older typhoid vaccines and can be given to young children.
     <%- elif description == "HPV (Human papillomavirus) vaccine" %>
