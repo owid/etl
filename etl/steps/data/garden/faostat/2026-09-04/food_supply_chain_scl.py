@@ -112,8 +112,10 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    counted a second time as ethanol exports and ethanol burned, and the fuel that importing countries buy would
    enter their chain as imports (1,500 kcal in the Netherlands). Leaving ethanol out has two costs. Where FAO
    records the distillery feedstock as processing, the calories turned into fuel appear as a processing loss rather
-   than under other uses: 62 kcal in Pakistan and 47 in India, and more than 10% of food in Eswatini, Hungary,
-   Paraguay, Slovakia, Tajikistan, Belgium and Moldova. And Liberia, where FAO records about 6,300 tonnes a year of
+   than under other uses. This is the case in 22 of the 49 countries producing more than 20 kcal per person per
+   day of ethanol in 2023 (molasses in Pakistan, India, Mauritius and South Africa; cereals in Belgium, Slovakia,
+   Moldova and others), and the amount exceeds 10% of food in Eswatini, Hungary, Paraguay, Slovakia, Tajikistan,
+   Belgium and Moldova. And Liberia, where FAO records about 6,300 tonnes a year of
    this ethanol as food, loses 22 kcal of food (1%); it is the only country whose food changes.
 
 7. Crops that are not eaten as harvested get densities implied by their products.

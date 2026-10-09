@@ -68,6 +68,7 @@ tables:
         description_short: Food products sent to be processed, for example milled, crushed or brewed, minus the processed products made from them, such as flour, oils, sugar and beer. Positive values mean more goes in than comes out.
         description_key:
           - By-products of processing, such as oilseed cake (what remains after crushing oilseeds for oil) and bran, are counted as products made in processing. The part fed to animals appears under feed.
+          - Where FAOSTAT records the crops sent to distilleries as processing rather than as other uses (molasses in Pakistan or India, cereals in Belgium or Slovakia), the energy turned into fuel ethanol appears here rather than under industrial and other uses.
       feed:
         title: Feed
         description_short: Food products fed to animals, including by-products of processing such as oilseed cake and bran.
