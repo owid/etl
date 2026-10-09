@@ -646,7 +646,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      # if 0, force the upsert:
      STAGING=<branch> .venv/bin/etlr grapher://grapher/<namespace>/<new_version>/<short_name> --grapher
      ```
-   - **From a local machine, this upload can fail with `AccessDenied` on `PutObject`.** Local credentials may not be allowed to write indicator metadata to the staging R2 bucket. Don't try to work around it: push, and let the automatic staging rebuild upload the dataset. The rebuild usually creates the variable rows already, so check the count with the query above; if it is non-zero, go on with the indicator upgrade.
+   - **From a local machine, this upload can fail with `AccessDenied` on `PutObject`.** Local credentials may not be allowed to write indicator metadata to the staging R2 bucket. Don't try to work around it: push, and let the automatic staging rebuild upload the dataset. The variable count from the query above does not prove the upload worked: the failed local run writes the variable rows to MySQL before its R2 upload fails. Before the indicator upgrade, wait until the `buildkite/etl-automated-staging-environment` check is green on your latest push, then confirm a new variable's files are served, e.g. `curl -sf "$(STAGING=<branch> .venv/bin/python -c 'from etl.config import OWID_ENV; print(OWID_ENV.indicators_url)')/<new_variable_id>.metadata.json"`.
    - Then run the automatic upgrader:
      ```bash
      STAGING=<branch> .venv/bin/etl indicator-upgrade auto
