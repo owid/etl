@@ -72,7 +72,6 @@ Tuna Acisu               @antea04
 Pablo Arriagada          @paarriagadap
 Bastian Herre            @bastianherre
 Bertha Rohenkohl         @bertharc
-Charlie Giattino         @CGiattino
 Pablo Rosado             @pabloarosado
 Lucas Rodés-Guirao       @lucasrodes
 Matthieu Bergel          @mlbrgl
