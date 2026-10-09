@@ -32,7 +32,7 @@ Assumptions:
 
 ## Progress checklist (maintain, tick live, and persist to progress.md)
 
-**Every item below is mandatory.** When an item names a skill, run that skill. Doing part of its work by hand does not count as done, and neither does deciding a step "doesn't apply" on your own. If you think an item should be skipped, ask the user first. That includes the adversarial review and the empty-entity audit, which run as background agents with effort scaled to the update (see 6c-bis and step 7). A skip is allowed only when the user explicitly asks for it, and it goes in the PR's open items. (OECD Family Database 2026-10: `check-metadata-style` and `check-hardcoded-years` were replaced by quick hand checks; the real style check then found a violation the hand check had missed.)
+**Every item below is mandatory.** When an item names a skill, run that skill. Doing part of its work by hand does not count as done, and neither does deciding a step "doesn't apply" on your own. If you think an item should be skipped, ask the user first. That includes the adversarial review and the empty-entity audit, which run as background agents with effort scaled to the update (see 6c-bis and step 7). A skip is allowed only when the user explicitly asks for it, and it goes in the PR's open items.
 
 - [ ] Parse inputs and resolve: channel, namespace, version, short_name, old_version, branch
 - [ ] Clean workbench directory: delete `workbench/<short_name>` unless continuing existing update
