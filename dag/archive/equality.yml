@@ -101,3 +101,11 @@ steps:
       - data://garden/demography/2024-07-15/population
       - data://meadow/lgbt_rights/2025-07-09/criminalization_mignot:
         - snapshot://lgbt_rights/2025-07-09/criminalization_mignot.csv
+  # archived; last active in 7f9bd90e9abb on 2026-07-15
+  data://grapher/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
+    - data://garden/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
+      - data://garden/demography/2024-07-15/population
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://meadow/lgbt_rights/2026-05-11/lgbti_national_policy_dataset:
+        - snapshot://lgbt_rights/2026-05-11/lgbti_national_policy_dataset.csv
