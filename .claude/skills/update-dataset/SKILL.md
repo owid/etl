@@ -471,7 +471,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    | Field | Clarity check |
    |---|---|
    | `title` / `presentation.title_public` | A non-specialist should know what the indicator measures from the title alone. Expand acronyms unless universally known (skip GDP; expand GWIS, MFI, SDG, IHME). Don't cram units into the title. |
-   | `description_short` | One or two short sentences: what the metric is and what it covers. No jargon without a gloss. Active voice. The chart subtitle is short by design — no run-on or stacked clauses. |
+   | `description_short` | One or two short sentences: what the metric is and what it covers. Plain words, per `.claude/rules/plain-writing.md`. The chart subtitle is short by design — no run-on or stacked clauses. |
    | `description_key` | Free-form markdown prose (paragraphs; sub-lists only where they help — see grapher's descriptionKey-to-string change). Each paragraph or bullet should land a distinct, useful fact. Skip filler ("this dataset is widely used"); prefer substantive caveats (coverage gaps, methodology limits, what counts/doesn't count). |
    | `display.name` | Short legend label. Reads naturally on a chart axis/legend; doesn't restate the title. |
    | `presentation.grapher_config.note` | Concise footnote, ≤1 sentence ideally. |
@@ -481,7 +481,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - Sentences that only make sense if you already know the data source
    - Quantitative claims with no unit context (e.g. "burned area" without "in hectares" surfacing somewhere in the user-facing text)
    - Inconsistent terminology between indicators in the same dataset (e.g. "wildfires" in one, "vegetation fires" in another)
-   - Domain phrases that have a plain-English equivalent (e.g. "anthropogenic emissions" → "human-caused emissions")
+   - Wording that fails the talk test in `.claude/rules/plain-writing.md` (e.g. "anthropogenic emissions" → "human-caused emissions")
    - Methodology-attribution claims ("following guidance from <agency>…") — open the cited link and confirm it actually says that. Agencies revise methodology, so a claim that was defensible when written can be stale now, and the 6c link check only proves the URL resolves, not the claim (real case: metadata cited BEA guidance for deflating data centers with the office PPI; BEA's 2025 annual update had switched them to an industrial+warehouse composite, and the cited page never contained the guidance at all)
    - Scope qualifiers present in the origin title but absent from user-facing text — if the source is "**Private** Construction" / adults-only / market-exchange-rate-only, `description_short` and `description_key` must say so; the citation line alone doesn't reach readers
    - Text that repeats what the reader has already read — a `description_key` bullet restating another bullet, `description_short`, or the title at the same level of detail. Unpacking `description_short` in the first bullet (full definition, how it's measured, what's included) is exactly what the panel is for; saying it again in other words is padding. Merge it into the bullet that already covers the ground, or drop it

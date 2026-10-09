@@ -309,6 +309,10 @@ Two different descriptions, two different jobs. Don't mix them:
 
 If the same sentence could fit in both, it belongs in garden — not in `.dvc`. Don't repeat producer-side facts in `description_processing`, and don't put OWID-side transformations in the `.dvc`.
 
+### Write plainly for OWID readers
+
+Write everything the public reads (chart text, indicator metadata, `.dvc` origin descriptions, `description_processing`, /latest posts) the way you would explain it to a curious friend who isn't an expert: everyday words, active voice, and established terms kept and explained rather than renamed. The full rule, with examples, is `.claude/rules/plain-writing.md`. It loads on its own when you open a `.meta.yml`, `.dvc` or viz config; read it before drafting public text anywhere else, such as a /latest post.
+
 ### Two rules for every subtitle you write
 
 These apply to `description_short` and `presentation.grapher_config.subtitle` alike — both feed a chart's subtitle through grapher inheritance (`grapher_config.subtitle` wins; `description_short` is the fallback) — and to `subtitle` in MDim and explorer configs:
