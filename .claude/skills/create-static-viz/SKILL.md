@@ -184,19 +184,9 @@ to work like (`/owid-staff:create-figma-chart` has a whole mode for that).
 ## Sketch mode — a data file in, no ETL until the visuals settle
 
 For a **new** static viz that starts from data rather than from an existing viz. The input decides the
-mode — a data file, or a sketch/brainstorm/prototype ask, is a sketch; say so in one line, with what it
-skips, and proceed. **Read [reference/SKETCHING.md](reference/SKETCHING.md) and follow it instead of
-Steps 1–4.** In short: `scripts/new_sketch.py` scaffolds `ai/static-viz-sketches/<slug>/sketch.py`
-(gitignored) in the exact shape of a `viz://static` step, around a copy of the data file; render it
-with `.venv/bin/python`, run the verifier and read the PNG as in Step 5, iterate (variants are extra
-`LAYOUTS` keys), hand the SVG to `/owid-staff:create-figma-chart`'s **sketch mode** and iterate there
-too; once the visuals settle, `scripts/promote_sketch.py` turns the sketch into a real step.
-**Skipped — say so to the user every time:** the branch, worktree and PR, the DAG entry, Step 2's
-newer-data check, the tracker question, the review chain. Promotion runs all of them: Steps 1–2, then
-5–9, plus that skill's **finalize mode** on the sketch frame. Not skipped: the verifier, reading the
-PNG, and **offering promotion and finalize at the end of every sketch reply** — people may not know the
-checks exist. A Data Insight image is not a static-viz sketch — it is sketched in that skill directly,
-from the grapher chart.
+mode — a data file, or a sketch/brainstorm/prototype ask, is a sketch. **Read
+[reference/SKETCHING.md](reference/SKETCHING.md) and follow it instead of Steps 1–4.** A Data Insight
+image is not a static-viz sketch — it is sketched in that skill directly, from the grapher chart.
 
 ## Step 1 — Resolve the input to data
 
@@ -325,8 +315,6 @@ here is expensive to redo.
 
 > **Read [reference/WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md) for this step.**
 
-Everything about authoring the step: the Figma handoff contract the emitted files have to satisfy, grapher's axis and tick treatment, encoding diagrams, pairing desktop with mobile, the template's text slots, labelling many categories, anchoring labels so they survive Figma, and the assertions to write.
-
 ## Step 5 — Render, verify, and look at it
 
 ```bash
@@ -359,9 +347,7 @@ anything. For the narrow case where nothing in the repo changed but you still ne
 
 Then, in this order:
 
-1. Run the verifier, and **always pass the data layers** — without `--expect-gid` the naming check
-   only proves *some* node was named, which a figure with a named title and an unnamed line
-   satisfies:
+1. Run the verifier, and **always pass the data layers** (why: WRITING-THE-STEP.md → `gid=`):
 
    ```bash
    .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py <step-dir> \
