@@ -35,12 +35,12 @@ Any rewrites you propose use American spelling.
 
 Scope by calling context:
 
-In most workflow skills this review is an **optional, offered** step (it can consume many tokens — see the estimates in Step 1), except where the table marks it mandatory; when invoked from one of them, scope accordingly:
+Where the table says **mandatory**, the calling skill always runs it, in the background and with effort scaled to the dataset; elsewhere it is optional (it can use many tokens, see Step 1). Scope by context:
 
 | Context | Scope |
 |---|---|
-| `/update-dataset` § 6c-bis (optional) | New/changed metadata text + newly added data values (latest wave/year); deep review = top-N + anomalies |
-| `/create-dataset` Step 6b (optional) | Everything — all indicators (new datasets are small and have no charts yet) |
+| `/update-dataset` § 6c-bis (**mandatory**, background) | New/changed metadata text + newly added data values (latest wave/year); deep review = top-N + anomalies |
+| `/create-dataset` Step 6b (**mandatory**, background) | All indicators if there are few; otherwise the main ones, with a few value cross-checks each |
 | `/create-snapshot` § 5 (optional) | Phase 0 only — verify the `.dvc` claims against the fetched producer docs (no built dataset yet, so no data cross-checks) |
 | `/review-data-pr` § 10b | Only if the author ran it: verify outcomes and independently spot-check 2–3 findings and 2–3 anchor values |
 | `/edit-faust-metadata` (**mandatory**) | Claims-only, on the added/edited metadata text exclusively — verify each new/changed sentence against the producer docs behind the links in the text and the snapshot `.dvc`. NO data-value cross-checks, anomaly scans, or indicator prioritization (no data changed), and unedited metadata is out of scope — a handful of web calls, not the full review |
@@ -174,6 +174,7 @@ This is the half that catches the *source's* mistakes — the ones invisible to 
 
 - Every anomaly that survived your Phase-1 triage. Cap the WebSearch effort at ~10 values; list anything beyond the cap as unchecked in Part 2.
 - Fixed **anchors**, regardless of anomalies: the World total (if the dataset has one), 2–3 major or topic-relevant countries, the latest year, and one mid-series historical year.
+- **One-year shifts in newly added years**, for sources that compile national-office figures (OECD, Eurostat, UN agencies). Compare the new years for 1–2 countries with the national office's own figures: our value for year Y matching its figure for Y−1 means the series is shifted.
 
 **Independence rules (anti-circularity — read before searching).** An independent source is a *different producer measuring the same quantity* (WHO vs. IHME, IEA vs. Energy Institute, IMF vs. World Bank, UN WPP vs. a national statistics office), or the primary source the producer aggregates. **Never** count as independent: ourworldindata.org itself; sites that republish OWID (Wikipedia charts and infoboxes frequently cite us — check the citation); mirrors of the same producer (tradingeconomics and friends scrape WB/IMF); or the producer's own secondary pages.
 
