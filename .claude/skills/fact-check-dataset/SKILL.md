@@ -33,9 +33,7 @@ Any rewrites you propose use American spelling.
 - Also accepts a **single chart** (slug or id) as the target: scope the whole review to that chart's indicator(s) — verify every displayed country-category/value for the latest year, compare against the previous dataset version, and review the chart's own FAUST text as claims. Drafts count (find them in the staging DB; they have no production row).
 - Precondition: the garden dataset is built locally (`.venv/bin/etlr data://garden/<ns>/<version>/<short_name>`; `PREFER_DOWNLOAD=1` is fine for already-published upstream deps). **Exception:** the `/create-snapshot` context runs Phase 0 only against the `.dvc` and the fetched docs — no meadow/garden step exists yet, so skip this precondition (and Steps 1, 3–5) there.
 
-Scope by calling context:
-
-Where the table says **mandatory**, the calling skill always runs it, in the background and with effort scaled to the dataset; elsewhere it is optional (it can use many tokens, see Step 1). Scope by context:
+Where the table says **mandatory**, the calling skill always runs it, in the background and with effort scaled to the dataset; elsewhere it is optional (it can use many tokens, see Step 1). Scope by calling context:
 
 | Context | Scope |
 |---|---|
@@ -168,7 +166,7 @@ The scan is a **candidate generator, not a verdict**. Review the raw `findings` 
 
 ## Step 4 — Phase 2: independent online cross-check (anomaly-led + anchors)
 
-This is the half that catches the *source's* mistakes — the ones invisible to every local check because our pipeline reproduces them faithfully.
+This is the half that catches the *source's* mistakes (failure class 2 above).
 
 **What to check:**
 
@@ -188,7 +186,7 @@ This is the half that catches the *source's* mistakes — the ones invisible to 
 
 **A mismatch that matches exactly under swapped names is a label error, and it can be on either side.** When a comparison against the producer's own table fails for two related rows (two subregions, two sexes, two variants) and each row's values equal the *other* row's to the last decimal, don't treat it as our pipeline being wrong. Settle which side has the labels crossed with an independent reconstruction — rebuild both aggregates from their members, or check the populations each label implies against the table's own totals — before touching anything. If it is the producer's document, that is a confirmed producer error to report; if it is ours, it is an entity-mapping bug.
 
-**Tolerance:** rounding, vintage/revision drift, and methodology gaps of a few percent are *not* findings. The targets are magnitude errors (×10/×100/×1000), wrong-year values, sign errors, entity mix-ups, and stale pre-revision values. Declaring a **confirmed source error** requires one of two routes: **(a) ≥2 independent sources that agree with each other and disagree with ours** beyond methodology tolerance, or **(b) an accounting-identity contradiction internal to the producer's own release** (the paragraph above) — components and aggregate from the same release and vintage, defined so the identity must hold by construction, disagreeing far beyond rounding. Route (b) stands alone; it does not additionally need external sources.
+**Tolerance:** rounding, vintage/revision drift, and methodology gaps of a few percent are *not* findings. The targets are magnitude errors (×10/×100/×1000), wrong-year values, sign errors, entity mix-ups, and stale pre-revision values. Declaring a **confirmed source error** requires one of two routes: **(a) ≥2 independent sources that agree with each other and disagree with ours** beyond methodology tolerance, or **(b) an accounting-identity contradiction internal to the producer's own release**, under the guards in *Internal accounting identities beat external sources* above.
 
 **Attribution before routing.** Before routing any confirmed bad value, read the raw snapshot (`from etl.snapshot import Snapshot; Snapshot("<ns>/<version>/<file>").read()` — `read()` picks the reader from the file's format; use the format-specific `read_csv`/`read_excel`/`read_json` only when auto-detection needs overriding) to determine where it entered: present in the source file → source error (corrections route); absent → our processing introduced it (trace snapshot → meadow → garden and fix the step).
 
@@ -211,7 +209,7 @@ Lead with the concrete rewrite, not the objection. "Add a link" is a valid fix. 
 |---|---|---|
 | Metadata contradicts producer docs (unit/definition/scope; content in the wrong field per the `.dvc`-vs-`description_processing` split) | Edit `.meta.yml`/`.dvc`, re-run the step (`--grapher` for grapher channel) | 🔴/🟡 with quote + doc link |
 | Value wrong in our output but correct in the raw snapshot | Fix the step code — never corrections.yml, never mask | 🔴 |
-| Value confirmed wrong **at the source** (raw snapshot carries it; confirmed via route (a) — ≥2 independent sources agree against it — or route (b) — same-release accounting-identity contradiction, *with the erroneous term identified* per that paragraph's guard) | Add `<short_name>.corrections.yml` next to the garden step + `tb = paths.apply_corrections(tb)` (format: `etl/data_corrections.py`); fill `reason`/`producer`/`status`, add an `expect` guard; tell the user to notify the producer and record the `reported:` date | 🔴 if confirmed and uncorrected |
+| Value confirmed wrong **at the source** (raw snapshot carries it; confirmed via route (a) or route (b) of the Step 4 Tolerance gate — for (b), *with the erroneous term identified*) | Add `<short_name>.corrections.yml` next to the garden step + `tb = paths.apply_corrections(tb)` (format: `etl/data_corrections.py`); fill `reason`/`producer`/`status`, add an `expect` guard; tell the user to notify the producer and record the `reported:` date | 🔴 if confirmed and uncorrected |
 | Suspicious but unconfirmed (independent sources disagree with each other, or methodology plausibly explains the gap) | "Verify manually" item in the report — do **not** add a correction | 🟡 |
 | Docs/data unreachable after curl → WebFetch → Wayback | "Unable to verify — worth checking" (proportionality cap) | 🟢 |
 | Producer-doc vs. shipped-file discrepancy | Preserve the data as shipped; flag for producer follow-up | 🟢 |
@@ -248,7 +246,7 @@ N. 🔴|🟡|🟢 [data-level|text-level] <one-line defect>
 - Anomalies beyond the WebSearch cap, listed as unchecked
 ```
 
-Severity rubric (aligned with `/review-data-pr`): 🔴 = confirmed factual error (metadata contradicted by the producer's own docs, or a value confirmed wrong — via ≥2 independent sources or a same-release accounting-identity contradiction — with snapshot-level attribution); 🟡 = likely issue needing confirmation; 🟢 = informational or unverifiable.
+Severity rubric (aligned with `/review-data-pr`): 🔴 = confirmed factual error (metadata contradicted by the producer's own docs, or a value confirmed wrong via route (a) or (b) in Step 4, with snapshot-level attribution); 🟡 = likely issue needing confirmation; 🟢 = informational or unverifiable.
 
 In author flows, apply the 🔴 fixes immediately (they're why the skill ran before commit); leave 🟡/🟢 as report items for the user to triage.
 
