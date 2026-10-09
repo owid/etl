@@ -170,8 +170,8 @@ it `none` would assert an overlap check that came out the other way. Quality lab
 
 **Twin suspects.** ID matching is blind to one real equivalence: a dataset that
 publishes the same series in two tables (WID/LIS do — `inequality#share_top_10__…`
-for the standalone charts vs `incomes#share__…quantile_10…` for the MDIM; verified
-value-identical). The extractor flags these — unmatched charts whose y comes from
+for the standalone charts vs `incomes#share__…quantile_10…` for the MDIM, with
+identical values). The extractor flags these — unmatched charts whose y comes from
 the same dataset as a slot-compatible view with a similar column name — in the run
 report and in `mdim_suggestions.md` as **twin suspects**, with the exact
 `overrides.csv` line to use. A suspect is NOT a match: verify first that the two
@@ -272,8 +272,8 @@ stay functional behind the 301), with reader-facing section names ("Embedded
 charts", "Text links", "Front-matter chart URLs") rather than raw ArchieML
 tokens (those live in the CSV's `component` column). **Topic-page All charts
 entries collapse to a per-page summary and need NO action**: the block lists
-only published charts (`GdocPost.loadRelatedCharts` filters on `isPublished` —
-verified in grapher), so entries drop out on their own at the next bake — and
+only published charts (`GdocPost.loadRelatedCharts` filters on `isPublished`),
+so entries drop out on their own at the next bake — and
 no replacement is possible either, because the block is built from `charts` ×
 `chart_tags` only and cannot list MDIMs; featuring the MDIM on a topic page is
 a separate gdoc-authoring change. **Featured metrics get their own ⭐ section,
@@ -303,8 +303,8 @@ the MDIM page builds that control's target from whichever view is on screen
 (`site/multiDim/MultiDim.tsx`), so the new chart is parented to the right view
 and inherits the controls set on it. A bare
 `/admin/narrative-charts/create?type=multiDim&chartConfigId=<viewConfigId>` link
-looks equivalent but opens a copy of the MDIM's **default** view — verified in
-practice — so never hand that out as the create step.
+looks equivalent but opens a copy of the MDIM's **default** view, so never hand
+that out as the create step.
 
 **The new chart opens at the parent view's defaults — the state does not carry
 over.** The control gets the *parent* right, but not the state on top of it: the
@@ -440,35 +440,30 @@ the view the chart was going to redirect to. Get the
 derives the patch itself by diffing what you pass against the new parent, so pass
 the rendered full config, not the old patch.
 
-**Replacement is manual, and that is a deliberate call.** owid/owid-grapher#6872
-asked for a repointing endpoint; it was **closed as not-planned** in favour of
-manual replacement,
-because the number of narrative charts that can ever be in this situation is tiny.
-The population is not "all narrative charts" — it is narrative charts whose **parent
-chart is itself a redirect candidate**, i.e. has an exact MDIM-view match. Measured
-site-wide on production (2026-07) by applying this skill's own matching rule to every
-published chart with narrative children: 249 narrative charts across 190 parent
-charts, of which **5 parents match a published MDIM view — so 5 narrative charts
-total**, and that is the ceiling if every matchable chart were migrated, not a
-per-migration figure. (The Economic Inequality trial hit 1 of them.)
+**Replacement is manual, and that is a deliberate call.** There is no repointing
+endpoint, by design, because the number of narrative charts that can ever be in
+this situation is tiny. The population is not "all narrative charts" — it is
+narrative charts whose **parent chart is itself a redirect candidate**, i.e. has an
+exact MDIM-view match. Applying this skill's own matching rule to every published
+chart with narrative children gives a site-wide ceiling of a handful of narrative
+charts, if every matchable chart were migrated — not a per-migration figure.
 
-Re-measure rather than trusting that number: it grows as MDIMs are published, since
+Re-measure rather than assuming that ceiling: it grows as MDIMs are published, since
 each new MDIM view can turn an existing chart into a candidate. `ai/` in this repo
 has the query; the shape is — narrative charts on published parents → those parents'
 indicator slots → compare against every published view's slot signature. **Revisit
 the decision if a single migration would require replacing more than a handful**,
 and say so in the PR rather than grinding through them silently.
 
-**One problem from that issue is now untracked.** #6872 covered two things, and
-closing it closed both. Manual replacement solves the repointing half; it does
-nothing for the other — a narrative chart parented to an MDIM view blocks that
-MDIM's next re-publish, because `cleanUpOrphanedChartConfigs` deletes
+**A narrative chart parented to an MDIM view blocks that MDIM's next re-publish,
+and no issue tracks it.** Manual replacement does nothing for this. It happens
+because `cleanUpOrphanedChartConfigs` deletes
 `multi_dim_x_chart_configs` rows with no narrative-chart guard and the FK refuses
 (`ER_ROW_IS_REFERENCED_2`). Renaming a dimension or choice slug is enough to
 trigger it, and it surfaces as a data update failing with an opaque FK error.
 Replacement makes this *more* likely, not less: every replacement creates a new
-MDIM-parented narrative chart. Production carries 1 today. If that count grows,
-re-file it as its own issue — the write-up is in
+MDIM-parented narrative chart. If the count of MDIM-parented narrative charts on
+production grows, file it as its own issue — the write-up is in
 `ai/narrative-charts-grapher-issue.md` (§2), alongside
 `ai/narrative-charts-slack-post.md`.
 
@@ -576,8 +571,7 @@ them:
   mirror of a source chart's `configMd5`. Both md5s are in the review
   fingerprint and in `preflight.py`'s staleness checks.
 - **`charts.publishedAt` is not the live publication flag.** It records the first
-  publish and stays set after an unpublish (308 production charts are in that
-  state), so chart selection and reference grading both read `isPublished` from
+  publish and stays set after an unpublish, so chart selection and reference grading both read `isPublished` from
   the config instead.
 - Stored MDIM configs mostly carry `{id, catalogPath}` per indicator, but older
   ones may have catalogPath-only or bare entries — the extractor normalizes all
@@ -614,7 +608,6 @@ its own `build_review.py`, needs the same fix).
   x/size/color slots first (charts.csv vs multidim_views.csv): the y sets being
   equal means the miss can only be a slot disagreement, and if it's a decoration
   indicator the fix belongs in `DECORATION_PATTERN`, not in `overrides.csv`.
-  (2026-08: population + owid_region cost 5 of 19 Economic Inequality matches.)
 - **Preflight's embed gate must classify exactly like `find-chart-references`.**
   It re-implements the embed count in SQL for read-only use, so any component
   the sweep exempts (e.g. `all-charts` — a topic page's auto-generated index
@@ -633,8 +626,7 @@ its own `build_review.py`, needs the same fix).
   load. Before re-running the extractor mid-review, have the reviewer export
   (⬇ JSON); unchanged rows re-import cleanly.
 - **A reviewer flagging an unmatched row with "the target should be X" is the
-  twin-variable signal** (2026-08: 3 of 3 such flags were twins — same dataset,
-  two tables, identical values). The workflow is: verify values via the
+  twin-variable signal** (same dataset, two tables, identical values). The workflow is: verify values via the
   indicators API, force via `overrides.csv`, re-run. The old flag then reads as
   stale in `preflight.py --decisions` (a decision exported with an empty target
   no longer matches the now-targeted row — deliberate, or the flag would silently
