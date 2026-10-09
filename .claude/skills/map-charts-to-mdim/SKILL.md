@@ -280,8 +280,7 @@ a separate gdoc-authoring change. **Featured metrics get their own ⭐ section,
 and they are the opposite case**: the All charts block heals itself, a featured
 metric does not. It is a topic-page slot held by URL, matched on exact pathname
 *and* params only when Algolia indexes, against published records — so
-unpublishing empties it silently, and the window to swap closes with the CLI
-(adding a row requires a **published** slug). It does not block the CLI, for the
+unpublishing empties it silently. It does not block the CLI, for the
 same reason a key chart doesn't, but it is unrecoverable afterwards — hence step
 4b rather than post-migration cleanup. **Narrative charts get their own table
 (before the All charts summary)**, one row per chart: the admin editor link and
@@ -412,7 +411,7 @@ do NOT behave alike, so don't describe them interchangeably:
 | scripted `POST {admin_api}/narrative-charts` | whatever `parentChartConfigId` you send | nothing you include in the `config` you post |
 
 So: use the control, then set what the report's **Set by hand after creating**
-column lists. Never hand out the bare create link. Prefer the UI over the API
+column lists. Prefer the UI over the API
 anyway — `AdminAPI` has `get_narrative_chart` and `update_narrative_chart` but
 **no create or delete**, so scripting means hand-rolled HTTP for both ends of the
 swap.
@@ -440,9 +439,8 @@ the view the chart was going to redirect to. Get the
 derives the patch itself by diffing what you pass against the new parent, so pass
 the rendered full config, not the old patch.
 
-**Replacement is manual, and that is a deliberate call.** There is no repointing
-endpoint, by design, because the number of narrative charts that can ever be in
-this situation is tiny. The population is not "all narrative charts" — it is
+**Replacement is manual, and that is a deliberate call**, because the number of
+narrative charts that can ever be in this situation is tiny. The population is not "all narrative charts" — it is
 narrative charts whose **parent chart is itself a redirect candidate**, i.e. has an
 exact MDIM-view match. Applying this skill's own matching rule to every published
 chart with narrative children gives a site-wide ceiling of a handful of narrative
@@ -487,8 +485,7 @@ target is accepted and then fails silently.
 ### 5. Apply — the grapher CLI (GATED, production only)
 
 **This skill never creates redirects.** Applying is `yarn
-createMultiDimRedirectsFromCsv` in owid-grapher, run by a human. The skill's job
-is to produce a CSV that survives it and to prove, beforehand, that it will.
+createMultiDimRedirectsFromCsv` in owid-grapher, run by a human.
 
 First, preflight (read-only, safe to run any time):
 
@@ -505,10 +502,8 @@ and the target MDIM's slug + reviewed view (an edited, deleted, renamed or rebui
 one comes back `STALE`). Statuses: `OK` / `BLOCKER` / `EXISTS` / `DIFFERS` /
 `GONE` / `STALE` / `MANUAL`.
 
-It also **gates on embedded references**. Explorers, data insights, static viz
-and article chart blocks render the chart's own config, so
-unpublishing the source breaks them with no error anywhere — the one failure mode
-the CLI itself cannot detect. Preflight counts them (current *and* old slugs, for
+It also **gates on embedded references** (step 4) — the one failure mode the CLI
+itself cannot detect. Preflight counts them (current *and* old slugs, for
 proposed *and* `already_done` charts) and exits non-zero while any remain. Migrate
 them (step 4 gives you each replacement URL), then re-run; `--no-references` skips
 the gate once they are handled.
@@ -582,9 +577,7 @@ them:
   NULL == NULL is a meaningful tiebreak, not a wildcard.
 - Views without `fullConfigId` can't be redirect targets and are excluded from
   the pool (warned). Same for views with an indicator entry that can't be
-  resolved to a variable id, and for views with several indicators in one
-  x/size/color slot (a chart holds one per slot) — matching on a truncated
-  indicator set could hit the wrong chart.
+  resolved to a variable id.
 - Re-runs regenerate everything except `overrides.csv`; `mapping.json` is
   derived — never hand-edit it.
 - Don't `ORDER BY` in SQL that selects `multi_dim_data_pages.config` — the
@@ -614,11 +607,8 @@ its own `build_review.py`, needs the same fix).
   where a retired chart just drops out) must be exempted there too, or preflight
   blocks on a reference the audit rightly never lists.
 - **"Doesn't block" and "doesn't matter" are different, and a featured metric separates
-  them.** It is exempt from the gate for the same reason a key chart is: a topic-page
-  slot, not a rendered copy of the config. But unlike a key chart it does not heal
-  itself, and the window to swap it shuts when the CLI unpublishes the source. So it is
-  RED in the audit and has its own step, while staying out of the embed count preflight
-  gates on. When a surface is unrecoverable but non-blocking, say both — reporting only
+  them** (step 4b): it is RED in the audit and has its own step, while staying out of
+  the embed count preflight gates on. When a surface is unrecoverable but non-blocking, say both — reporting only
   "does not block" is how a slot gets lost.
 - **Re-runs that add targets invalidate those rows' review decisions** — the
   review HTML fingerprints each decision on (target, both config md5s), so a row
@@ -626,8 +616,7 @@ its own `build_review.py`, needs the same fix).
   load. Before re-running the extractor mid-review, have the reviewer export
   (⬇ JSON); unchanged rows re-import cleanly.
 - **A reviewer flagging an unmatched row with "the target should be X" is the
-  twin-variable signal** (same dataset, two tables, identical values). The workflow is: verify values via the
-  indicators API, force via `overrides.csv`, re-run. The old flag then reads as
+  twin-variable signal** — handle it as a twin suspect (step 1), then re-run. The old flag then reads as
   stale in `preflight.py --decisions` (a decision exported with an empty target
   no longer matches the now-targeted row — deliberate, or the flag would silently
   drop the freshly forced redirect from the CSV); the forced rows just need a
