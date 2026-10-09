@@ -333,7 +333,7 @@ definitions:
 subtitle: "{definitions.prefix} {definitions.suffix}"
 ```
 
-This composes N unique full strings from a handful of building blocks. Verified via `dynamic_yaml_to_dict` (`lib/catalog/owid/catalog/core/utils.py`).
+This composes N unique full strings from a handful of building blocks. The interpolation is resolved by `dynamic_yaml_to_dict` (`lib/catalog/owid/catalog/core/utils.py`).
 
 ## Step 6 — Post-processing the chart (table-driven only)
 

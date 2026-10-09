@@ -10,7 +10,7 @@ metadata:
 
 Practical guidelines for writing high-quality metadata in `*.meta.yml` files.
 
-**Core principle:** Metadata is for the public. Every field should help someone understand the data. Write in plain language -- if a layperson can't understand it, rewrite it.
+**Core principle:** Metadata is for the public. Every field should help someone understand the data. Write it plainly, following `.claude/rules/plain-writing.md`.
 
 ## When to Use
 
@@ -129,8 +129,8 @@ description_short: |-
   The number of people living in extreme poverty, based on data and estimates from different sources.
 ```
 
-**`description_key`** -- Free-form markdown text for the "About this data" panel: prose paragraphs, with markdown sub-lists only where a list genuinely helps. (A YAML list of bullet points is still accepted and renders as a markdown list, but prefer prose — see grapher's descriptionKey-to-string migration.)
-- Plain language, no jargon (e.g. "livestock digestive processes" not "enteric fermentation"). Expand acronyms on first use.
+**`description_key`** -- Free-form markdown text for the "About this data" panel: prose paragraphs, with markdown sub-lists only where a list genuinely helps. (A YAML list of bullet points is also accepted and renders as a markdown list, but prefer prose.)
+- Plain language (see `.claude/rules/plain-writing.md`). Expand acronyms on first use.
 - **Add concrete examples** for abstract scope descriptions (what countries are included, what events qualify)
 - **Order**: data-specific points first, methodology second, caveats last
 - Only describe data that actually exists in the indicator. State implications of limitations explicitly.
@@ -285,7 +285,7 @@ Run all of these after the metadata is written and the steps are built, so every
    - Sentences that only make sense if you already know the data source
    - Quantitative claims with no unit context surfacing anywhere in the user-facing text
    - Inconsistent terminology between indicators in the same dataset
-   - Domain phrases with a plain-English equivalent ("anthropogenic emissions" → "human-caused emissions")
+   - Wording that fails the talk test in `.claude/rules/plain-writing.md` (e.g. "anthropogenic emissions" → "human-caused emissions")
    - Methodology-attribution claims ("following guidance from <agency>…") — open the cited link and confirm it actually says that; agencies revise methodology
    - Scope qualifiers present in the origin title but absent from user-facing text (private-only, adults-only, market-exchange-rate-only)
    - Text that adds nothing to what the reader has already read — a bullet repeating another bullet, `description_short`, or the title at the same level of detail. Expanding the short line is fine and expected; restating it is padding. See the `description_key` guidance above.

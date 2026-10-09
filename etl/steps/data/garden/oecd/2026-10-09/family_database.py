@@ -2,11 +2,29 @@
 
 import owid.catalog.processing as pr
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Indicators expected in the marriage and divorce rates meadow table.
+EXPECTED_MARRIAGE_DIVORCE_INDICATORS = {"marriage_rate", "divorce_rate", "mean_age_first_marriage"}
+# Categories expected in the children in families meadow table.
+EXPECTED_CHILDREN_INDICATORS = {
+    "Living with a single parent",
+    "Living with two parents",
+    "Other",
+    "Two cohabiting parents",
+    "Two married parents",
+}
+# Minimum number of countries with data on births outside marriage.
+MIN_COUNTRIES_BIRTHS = 43
+# Value bounds per indicator, checked on the output tables.
+BOUNDS = {
+    "marriage_rate": (0, 20),
+    "divorce_rate": (0, 10),
+    "mean_age_first_marriage": (15, 45),
+}
 
 
 def run() -> None:
@@ -25,25 +43,21 @@ def run() -> None:
     tb_children_in_families = ds_children_in_families.read("children_in_families")
     tb_garden_oecd_hist = ds_garden_oecd_hist.read("family_database")
 
+    sanity_check_inputs(tb_marriage_divorce, tb_births_outside_marriage, tb_children_in_families)
+
     # Extract historical data columns
-    tb_garden_oecd_hist = tb_garden_oecd_hist[
-        ["country", "year", "marriage_rate", "divorce_rate", "share_of_births_outside_of_marriage__pct_of_all_births"]
-    ]
+    tb_garden_oecd_hist = tb_garden_oecd_hist[["country", "year", "marriage_rate", "divorce_rate"]]
 
     #
     # Process data.
     #
 
     # Harmonize country names for all tables
-    tb_marriage_divorce = geo.harmonize_countries(
-        tb_marriage_divorce, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
+    tb_marriage_divorce = paths.regions.harmonize_names(tb_marriage_divorce, warn_on_unused_countries=False)
+    tb_births_outside_marriage = paths.regions.harmonize_names(
+        tb_births_outside_marriage, warn_on_unused_countries=False
     )
-    tb_births_outside_marriage = geo.harmonize_countries(
-        tb_births_outside_marriage, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
-    )
-    tb_children_in_families = geo.harmonize_countries(
-        tb_children_in_families, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
-    )
+    tb_children_in_families = paths.regions.harmonize_names(tb_children_in_families, warn_on_unused_countries=False)
 
     # Process marriage/divorce rates - merge historical data with new data
     # Filter for marriage and divorce rates only from new data
@@ -96,36 +110,16 @@ def run() -> None:
     # Add gender column
     tb_marriage_combined_long["gender"] = "Both"
 
-    # Process births outside marriage - merge with historical data
-    tb_births_new = tb_births_outside_marriage[["country", "year", "births_outside_marriage"]].copy()
-
-    # Validate historical data has expected column
-    hist_col = "share_of_births_outside_of_marriage__pct_of_all_births"
-    assert hist_col in tb_garden_oecd_hist.columns, f"Historical data missing {hist_col} column"
-
-    # Rename columns to match for cleaner merge
-    tb_births_hist = tb_garden_oecd_hist[["country", "year", hist_col]].copy()
-    tb_births_hist = tb_births_hist.rename(columns={hist_col: "births_outside_marriage"})
-
-    # Merge historical births data with new data
-    tb_births_combined = pr.merge(
-        tb_births_hist,
-        tb_births_new,
-        on=["country", "year"],
-        how="outer",
-        suffixes=("_hist", "_new"),
-    )
-
-    # Use new data where available, otherwise use historical data
-    tb_births_combined["births_outside_marriage"] = tb_births_combined["births_outside_marriage_new"].fillna(
-        tb_births_combined["births_outside_marriage_hist"]
-    )
-    tb_births_combined = tb_births_combined[["country", "year", "births_outside_marriage"]]
+    # Process births outside marriage. The latest file covers all years and countries of the older release,
+    # so no merge with historical data is needed.
+    tb_births_combined = tb_births_outside_marriage[["country", "year", "births_outside_marriage"]].copy()
 
     # Keep mean age data from new dataset only (no historical equivalent)
     tb_mean_age = tb_marriage_divorce[tb_marriage_divorce["indicator"] == "mean_age_first_marriage"][
         ["country", "year", "gender", "indicator", "value"]
     ].copy()
+
+    sanity_check_outputs(tb_mean_age, tb_marriage_combined_long, tb_births_combined, tb_children_in_families)
 
     #
     # Save outputs.
@@ -143,3 +137,42 @@ def run() -> None:
 
     # Save the dataset
     ds_garden.save()
+
+
+def sanity_check_inputs(tb_marriage_divorce, tb_births_outside_marriage, tb_children_in_families) -> None:
+    indicators = set(tb_marriage_divorce["indicator"].unique())
+    assert indicators == EXPECTED_MARRIAGE_DIVORCE_INDICATORS, f"Unexpected marriage/divorce indicators: {indicators}"
+    assert "births_outside_marriage" in tb_births_outside_marriage.columns, "Births table missing its value column"
+    indicators = set(tb_children_in_families["indicator"].unique())
+    assert indicators == EXPECTED_CHILDREN_INDICATORS, f"Unexpected children in families indicators: {indicators}"
+
+
+def sanity_check_outputs(tb_mean_age, tb_marriage_combined_long, tb_births_combined, tb_children_in_families) -> None:
+    # Rates and ages lie within plausible bounds.
+    for tb in [tb_mean_age, tb_marriage_combined_long]:
+        for indicator, (low, high) in BOUNDS.items():
+            values = tb.loc[tb["indicator"] == indicator, "value"].dropna()
+            out = values[(values < low) | (values > high)]
+            assert out.empty, f"{indicator} outside [{low}, {high}]: {sorted(out.unique())}"
+
+    # Shares are percentages.
+    births = tb_births_combined["births_outside_marriage"].dropna()
+    assert births.between(0, 100).all(), "Share of births outside marriage outside [0, 100]"
+    children = tb_children_in_families["value"].dropna()
+    assert children.between(0, 100).all(), "Children in families shares outside [0, 100]"
+
+    # Children living with a single parent, two parents, or in other arrangements add up to 100%,
+    # and children living with two parents split into married and cohabiting parents.
+    tb = tb_children_in_families.pivot(index=["country", "year"], columns="indicator", values="value").astype(float)
+    total = tb[["Living with a single parent", "Living with two parents", "Other"]].sum(axis=1, min_count=3).dropna()
+    assert ((total - 100).abs() < 1).all(), (
+        f"Children in families shares don't add up to 100%: {total[(total - 100).abs() >= 1]}"
+    )
+    split = (tb["Two cohabiting parents"] + tb["Two married parents"] - tb["Living with two parents"]).dropna()
+    assert (split.abs() < 0.1).all(), (
+        f"Married and cohabiting parents don't add up to two parents: {split[split.abs() >= 0.1]}"
+    )
+
+    # Coverage doesn't shrink.
+    n_countries = tb_births_combined.dropna(subset=["births_outside_marriage"])["country"].nunique()
+    assert n_countries >= MIN_COUNTRIES_BIRTHS, f"Only {n_countries} countries with births outside marriage data"

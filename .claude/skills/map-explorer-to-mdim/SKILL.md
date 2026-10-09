@@ -360,9 +360,8 @@ sweep can ever surface the mistake. Preflight blocks on it before the reference 
 
 !!! note "An audit folder predating a surface reads as drifted, and should"
     The digest hashes the findings, so **adding a surface to `find-chart-references` invalidates
-    every recorded `referenceDigests`** — most recently when featured metrics were added.
-    Preflight blocks on an audit folder from before that, which is correct: it really is missing
-    rows. Re-run `audit_references.py` rather than reading it as a bug.
+    every recorded `referenceDigests`**. Preflight blocks on an audit folder from before such a
+    change, which is correct: it really is missing rows. Re-run `audit_references.py` rather than reading it as a bug.
 
 **Unverifiable is a blocker, not a warning**, in all three cases — no extraction pair, no
 `mapping.json`, no reference digest. A warning does not reach the exit code, so `Ready` would
@@ -408,8 +407,8 @@ search. Do not flip `isPublished` in the step's `.config.yml` and re-run hoping 
 that is not the route (and no explorer config in the repo carries `isPublished: false`).
 
 Then remove the explorer's ETL footprint — and **never delete a step without archiving it**
-(see `CLAUDE.md`). Delete the step's `.py` **and its sibling `.config.yml`** (the periodic archive sweep only knows `.py`, which is why orphaned configs
-exist on disk today), remove the `dag/*.yml` entry, `make check`, **commit**; then run
+(see `CLAUDE.md`). Delete the step's `.py` **and its sibling `.config.yml`** (the periodic archive sweep only knows `.py`, so a config left behind stays
+on disk as an orphan), remove the `dag/*.yml` entry, `make check`, **commit**; then run
 `.venv/bin/etl archive-dag` and commit `dag/archive/*.yml` separately, since it reads *committed*
 history. `git checkout` anything unrelated it sweeps in. Archive anything now orphaned
 upstream — a garden step that existed only to feed this explorer — in a second round. If any of
@@ -456,12 +455,12 @@ handoff, since the same operator pastes the payload.
 - Explorer dimension columns stay `dimension_1..N` (compact, and joinable to the explorer CSV);
   the name legend lives in `_scaffold.md` and in `EXPLORER_DIMENSIONS`.
 - Re-running `extract_views.py` overwrites the CSVs and `_sources.json` but **not** your `mapping_rules.py`.
-- `mapping.json` needs `_sources.json`; if you extracted before this output existed, just
+- `mapping.json` needs `_sources.json`; if the out folder has no `_sources.json`, just
   re-run `extract_views.py` once (it preserves `mapping_rules.py`), then `build_mapping.py`.
 - **One payload per explorer is a correctness requirement**, not a convention: the endpoint's
   schema has a single `catchAll`, so a merged file would silently drop all but one.
 - **There is no bulk delete** — only `DELETE /api/multi-dims/:id/redirects/:redirectId`, one
-  row at a time. A 460-row batch posted wrongly is expensive to undo, which is why the
+  row at a time. A large batch posted wrongly is expensive to undo, which is why the
   preflight exists.
 - **Explorer redirects never reach `_redirects`** (`getRecentMultiDimRedirects` excludes
   non-`/grapher/` sources), so there is no static-redirect fallback and no one-week window —
@@ -476,5 +475,4 @@ handoff, since the same operator pastes the payload.
 - **Algolia keeps indexing the explorer** until the next index build, so it can still appear
   in site search after the redirect exists.
 - **Retiring the explorer row itself is separate** from the redirect: deleting it makes
-  `linkedChart` unresolvable, so `Chart` blocks render nothing and tiles vanish. The five
-  WB/WID inequality explorers migrated in July are the worked example.
+  `linkedChart` unresolvable, so `Chart` blocks render nothing and tiles vanish.

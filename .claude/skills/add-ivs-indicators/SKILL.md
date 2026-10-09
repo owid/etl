@@ -267,10 +267,10 @@ redundant; and mapping an existing `shortName` back to its source `.dta` code is
 collide (`*_democratic_political_system` is E117, not the 1–10 E236 `*_democratic`; `*_secure_neighborhood`
 is the H001 security scale, not the G007_18_B neighborhood-*trust* scale), and value-label wording can
 diverge from the pipeline's recode wording (E124 human-rights: labels say "There is a lot of respect…" while
-the columns use "a great deal of respect…"). It was tried once and deliberately skipped for these reasons.
+the columns use "a great deal of respect…").
 
 **Keep IVS and WVS at metadata parity.** Any `description_short` house-style or convention you apply to one
-table's indicators, apply to the other's too — e.g. the possible-answers clause above was added to both the
+table's indicators, apply to the other's too — e.g. the possible-answers clause above applies to both the
 IVS and WVS blocks. When you improve or restyle the IVS metadata, mirror the change on WVS (and vice-versa)
 so the two blocks stay consistent, differing only in the survey-specific anchors (`*_wvs`) and the question
 wording.
@@ -364,15 +364,15 @@ with any IVS title (or vice-versa). WVS shares many concepts with IVS (worries, 
 `--grapher` upload (`_adapt_table_for_grapher`), *not* at the garden build, so a clash sails through
 `check_sum_100` and only explodes at upload (`AssertionError: Variable titles are not unique`). The trap: an
 **aggregate** and a **category** that describe the same thing collide on title even when their column names
-differ. Real
-example from this work — the closeness category `close_*` and the high aggregate `feel_close_*` both wanted
+differ. For
+example, the closeness category `close_*` and the high aggregate `feel_close_*` both wanted
 `title: "Feel close to X"`. Fix: disambiguate the aggregate `title` (`"Feel close to X (very close or
 close)"`) and keep the short label in `display.name` (only `title` must be unique — `display.name` may
 repeat). **Assert title uniqueness in the pre-flight** (Step 6), don't wait for the upload to catch it:
 `titles=[e["title"] for e in vars.values()]; assert len(titles)==len(set(titles))`.
 
-**Audit gotcha:** verify any stated scale range against the actual `.do` recode — a pre-existing entry had
-`"6 to 10"` where the recode was `>= 7`. Don't copy ranges blindly.
+**Audit gotcha:** verify any stated scale range against the actual `.do` recode — an existing entry can
+say `"6 to 10"` where the recode is `>= 7`. Don't copy ranges blindly.
 
 ### Topic tags — assign per indicator, from the curated enum
 
@@ -386,7 +386,7 @@ repeat). **Assert title uniqueness in the pre-flight** (Step 6), don't wait for 
 with a `create_links.missing_tags` warning. Check every tag against the enum before writing it (see the
 Step 6 assertion).
 
-IVS spans many topics, so **do not** leave the whole dataset on one tag (the legacy default was a single
+IVS spans many topics, so **do not** leave the whole dataset on one tag (e.g. a single
 `topic_tags: [Trust]` in `definitions.common`). Tag per indicator:
 
 - **Anchor per distinct tag-set under `definitions`** (the `undp_hdr.meta.yml` idiom), referenced per
@@ -425,7 +425,7 @@ IVS spans many topics, so **do not** leave the whole dataset on one tag (the leg
 
 **Sweep the untagged pool against the FULL enum — many items have a non-obvious nearest-fit page.** Don't stop
 at the obvious group→tag map. Print the whole `topic_tags` enum and walk each remaining untagged question
-against it; surprisingly specific pages exist. Real matches found this way (2026-06-03): justifiable
+against it; surprisingly specific pages exist. Examples of matches found this way: justifiable
 `suicide`→`Suicides`, `political_violence`→`War & Peace`, `parents_beating_children`→`Violence Against Children
 & Children's Rights`, `man_beating_wife`→`Women's Rights`, `invitro_fertilization`→`Fertility Rate`; neighbours
 `immigrant_foreign_workers`→`Migration`, `aids`→`HIV/AIDS`, `drug_addicts`/`drug_sale_in_streets`→`Illicit Drug
@@ -595,8 +595,8 @@ It works in three moves, all auto-derived:
 Three **optional** dicts in CONFIG add editorial polish without reintroducing hardcoded indicators:
 `TOPICS = {"Human Rights": ["E124", ...], ...}` (group/order rows), `LABELS = {code_or_suffix: "…"}`
 (nicer question wording), and `CODE_FOR = {custom_suffix: "IVS_CODE"}` (give custom blocks like
-`humankind`→`E158`, `science_world`→`E234`, `secure_neighborhood`→`H001` their real code). PR #6180's
-output used all three; with them empty you still get a complete, correct table.
+`humankind`→`E158`, `science_world`→`E234`, `secure_neighborhood`→`H001` their real code). With them
+empty you still get a complete, correct table.
 
 **Staging vs production differ only in the DB connection + admin base** (the script switches on `ENV`):
 - **Staging** (`ENV="staging"`): container = `staging-site-<branch normalised & truncated to 28 chars>`

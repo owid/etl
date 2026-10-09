@@ -62,6 +62,8 @@ definitions:
   key_oda: |-
     Official development assistance (ODA) is aid given to countries and territories on the OECD Development Assistance Committee (DAC) list of recipients and multilateral development institutions. To qualify as ODA, the aid has to serve the economic development and welfare of recipient countries and be either a grant or a loan with favorable terms.
 
+  key_regional: |-
+    Entities named "regional (OECD)", such as "Africa, regional (OECD)", show aid to a region as a whole, for example programs that cover several countries, which donors do not assign to a single country. Entities named "unspecified (OECD)", such as "Developing countries, unspecified (OECD)", show aid not assigned to any country within a broader group. This aid is already included in the totals of the corresponding regions, for example in Africa (OECD).
   key_oda_list_of_countries_recipients: DAC country recipients are all low- and middle-income countries as defined by the World Bank, or least-developed countries as defined by the United Nations. All recipients are listed on [the OECD website](https://www.oecd.org/en/topics/sub-issues/oda-eligibility-and-conditions/dac-list-of-oda-recipients.html).
 
   key_oda_list_of_countries_donors: Most ODA is provided by [DAC members](https://www.oecd.org/en/about/committees/development-assistance-committee.html), which are major aid donors in the OECD plus the European Union. However, some non-DAC countries, such as Turkey or Saudi Arabia, also give aid that follows ODA guidelines.
@@ -244,6 +246,14 @@ definitions:
   description_key_by_donor: &description_key_by_donor
     - <% if donor == "Private donors" %>{definitions.key_net_private_grants}<% else %>{definitions.key_oda}<% endif %>
     - <% if donor == "Private donors" %>{definitions.key_net_disbursements}<% else %>{definitions.key_oda_list_of_countries_recipients}<% endif %>
+    - <% if donor == "Private donors" %>{definitions.key_private_reporting}<% else %>{definitions.key_oda_list_of_countries_donors}<% endif %>
+    - <% if donor == "Private donors" %>{definitions.key_constant_usd}<% else %>{definitions.key_oda_coverage_limits}<% endif %>
+    - <% if donor == "Private donors" %><% else %>{definitions.key_net_disbursements}<% endif %>
+    - <% if donor == "Private donors" %><% else %>{definitions.key_constant_usd}<% endif %>
+  description_key_by_donor_recipients: &description_key_by_donor_recipients
+    - <% if donor == "Private donors" %>{definitions.key_net_private_grants}<% else %>{definitions.key_oda}<% endif %>
+    - <% if donor == "Private donors" %>{definitions.key_net_disbursements}<% else %>{definitions.key_oda_list_of_countries_recipients}<% endif %>
+    - "{definitions.key_regional}"
     - <% if donor == "Private donors" %>{definitions.key_private_reporting}<% else %>{definitions.key_oda_list_of_countries_donors}<% endif %>
     - <% if donor == "Private donors" %>{definitions.key_constant_usd}<% else %>{definitions.key_oda_coverage_limits}<% endif %>
     - <% if donor == "Private donors" %><% else %>{definitions.key_net_disbursements}<% endif %>
@@ -1533,7 +1543,7 @@ tables:
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
         description_short: *description_short_by_donor
-        description_key: *description_key_by_donor
+        description_key: *description_key_by_donor_recipients
         description_from_producer: "{definitions.producer_oda}"
         processing_level: major
         description_processing: "{definitions.processing_income_aggregations}"
@@ -1542,6 +1552,7 @@ tables:
         display:
           name: Official development assistance (ODA) by recipient
           numDecimalPlaces: 0
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       oda_share_gni_recipient:
@@ -1552,6 +1563,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
@@ -1562,6 +1574,7 @@ tables:
         display:
           name: ODA by recipient (% of GNI)
           numDecimalPlaces: 1
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       grants_recipient:
@@ -1572,6 +1585,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
@@ -1583,6 +1597,7 @@ tables:
         display:
           name: Grants by recipient
           numDecimalPlaces: 0
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       loans_recipient:
@@ -1593,6 +1608,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
@@ -1604,6 +1620,7 @@ tables:
         display:
           name: Loans by recipient
           numDecimalPlaces: 0
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       capital_subscriptions_deposits_recipient:
@@ -1614,6 +1631,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_capital_subscriptions_deposits}"
@@ -1624,6 +1642,7 @@ tables:
         display:
           name: Capital subscriptions (deposits) by recipient
           numDecimalPlaces: 0
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       recoveries_recipient:
@@ -1634,6 +1653,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
@@ -1643,6 +1663,7 @@ tables:
         display:
           name: Recoveries on grants by recipient
           numDecimalPlaces: 0
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       humanitarian_aid_recipient:
@@ -1653,6 +1674,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
@@ -1664,6 +1686,7 @@ tables:
         display:
           name: Humanitarian aid by recipient
           numDecimalPlaces: 0
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       development_food_aid_recipient:
@@ -1674,6 +1697,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_food_aid}"
@@ -1688,6 +1712,7 @@ tables:
         display:
           name: Development food aid by recipient
           numDecimalPlaces: 0
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       technical_cooperation_recipient:
@@ -1698,6 +1723,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
@@ -1709,6 +1735,7 @@ tables:
         display:
           name: Technical cooperation by recipient
           numDecimalPlaces: 0
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       oda_recipient_per_capita:
@@ -1719,6 +1746,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
@@ -1731,6 +1759,7 @@ tables:
         display:
           name: ODA per capita by recipient
           numDecimalPlaces: 2
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       grants_recipient_per_capita:
@@ -1741,6 +1770,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
@@ -1752,6 +1782,7 @@ tables:
         display:
           name: Grants per capita by recipient
           numDecimalPlaces: 2
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       loans_recipient_per_capita:
@@ -1762,6 +1793,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
@@ -1773,6 +1805,7 @@ tables:
         display:
           name: Loans per capita by recipient
           numDecimalPlaces: 2
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       humanitarian_aid_recipient_per_capita:
@@ -1783,6 +1816,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
@@ -1794,6 +1828,7 @@ tables:
         display:
           name: Humanitarian aid per capita by recipient
           numDecimalPlaces: 2
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       development_food_aid_recipient_per_capita:
@@ -1804,6 +1839,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_food_aid}"
@@ -1817,6 +1853,7 @@ tables:
         display:
           name: Development food aid per capita by recipient
           numDecimalPlaces: 2
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       technical_cooperation_recipient_per_capita:
@@ -1827,6 +1864,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
@@ -1838,6 +1876,7 @@ tables:
         display:
           name: Technical cooperation per capita by recipient
           numDecimalPlaces: 2
+          entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
           <<: *common_display
 
       # From DAC5 dataset

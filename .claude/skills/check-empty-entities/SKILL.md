@@ -1,6 +1,6 @@
 ---
 name: check-empty-entities
-description: Audit every surface that renders a dataset's indicators — charts, map tabs, MDim views, explorer views, narrative charts, and article references — for views whose pinned entity selection has no data in the new indicators (they render as empty charts with no error anywhere). Grades findings against production to separate update regressions from pre-existing gaps. Use when the user asks to "check for empty entities/views/charts", or as the optional audit step offered by /update-dataset (step 7) and /review-data-pr (§8d) — offered rather than automatic because the full sweep can consume many tokens on widely-charted datasets.
+description: Audit every surface that renders a dataset's indicators — charts, map tabs, MDim views, explorer views, narrative charts, and article references — for views whose pinned entity selection has no data in the new indicators (they render as empty charts with no error anywhere). Grades findings against production to separate update regressions from pre-existing gaps. Use when the user asks to "check for empty entities/views/charts", or as the mandatory audit in /update-dataset step 7; /review-data-pr (§8d) runs it on opt-in.
 metadata:
   internal: true
   owner: paarriagadap
@@ -30,11 +30,11 @@ Cache per variable id and fetch in parallel (a large dataset means hundreds of v
 
 ### Where dead selections come from (read before scanning)
 
-Overwhelmingly from **entity-rename cycles of a dataset's own aggregate entities** — a past update changed the suffix convention (`Multilaterals (OECD)` → `Multilateral organizations`, `Low-income countries (WB)` → hyphenated unsuffixed forms) and every surface that pinned the old names kept them. Real-country selections almost never die; dataset-defined aggregates (donor groups, income groups, provider regions) are the population to watch. Two consequences for the audit: the moment one finding surfaces a renamed-suffix pattern, **grep every surface for that pattern directly** (chart `selectedEntityNames` *and* `focusedSeriesNames`, narrative-chart patches, article `country=` URLs) instead of relying only on per-view availability checks — the same rename hits them all; and note that dead names sit in both directions (an old suffixed form can die while its unsuffixed twin lives, or vice versa — check availability, don't pattern-guess the fix). (ODA 2026-07: one rename cycle left dead names on 5 charts, 6 narrative charts, and 4 published articles simultaneously.)
+Overwhelmingly from **entity-rename cycles of a dataset's own aggregate entities** — a past update changed the suffix convention (`Multilaterals (OECD)` → `Multilateral organizations`, `Low-income countries (WB)` → hyphenated unsuffixed forms) and every surface that pinned the old names kept them. Real-country selections almost never die; dataset-defined aggregates (donor groups, income groups, provider regions) are the population to watch. Two consequences for the audit: the moment one finding surfaces a renamed-suffix pattern, **grep every surface for that pattern directly** (chart `selectedEntityNames` *and* `focusedSeriesNames`, narrative-chart patches, article `country=` URLs) instead of relying only on per-view availability checks — the same rename hits them all; and note that dead names sit in both directions (an old suffixed form can die while its unsuffixed twin lives, or vice versa — check availability, don't pattern-guess the fix).
 
 ### Fixing a dead selection: rename, drop, or neither
 
-String similarity picks the *fix*, never validates it — it proposed `Nigeria → Niger` (different countries) in a real sweep. Before applying any rename, **read the chart's whole selection**, and gate every edit on three checks: the replacement must have data in *that chart's own* y-variables, must not already be selected, and the result must contain no duplicates. Drops need the mirror guard — refuse to remove any entity that *does* have data.
+String similarity picks the *fix*, never validates it — it can propose `Nigeria → Niger` (different countries). Before applying any rename, **read the chart's whole selection**, and gate every edit on three checks: the replacement must have data in *that chart's own* y-variables, must not already be selected, and the result must contain no duplicates. Drops need the mirror guard — refuse to remove any entity that *does* have data.
 
 Reading the whole selection is what catches the two failure modes similarity can't:
 
@@ -57,14 +57,14 @@ grading the result against production.
 For every chart on the new dataset (`chart_dimensions` → `variables.datasetId`), parse `chart_configs.config`:
 
 - `selectedEntityNames` must intersect the union of the chart's y-variables' entities-with-data. Zero overlap on a non-empty selection = the chart renders empty.
-- **Skip ScatterPlot and Marimekko** — they legitimately have no `selectedEntityNames` (they plot all entities). Detect them by shape, not by the `type` field: a chart with an `x` dimension renders as a scatter even when `type` is absent (reporting as the `LineChart` default). An **empty selection means every entity renders, not none** — so a bad value in such a chart is maximally visible, not hidden. (`share-of-rural-population-with-electricity-access-vs-…`, 0 selected + `minTime: latest`, is where a reader spotted Chad plotted at 100% rural electricity access.) Phrasing a report line as "corrected entity not in selection" for these charts is actively misleading.
+- **Skip ScatterPlot and Marimekko** — they legitimately have no `selectedEntityNames` (they plot all entities). Detect them by shape, not by the `type` field: a chart with an `x` dimension renders as a scatter even when `type` is absent (reporting as the `LineChart` default). An **empty selection means every entity renders, not none** — so a bad value in such a chart is maximally visible, not hidden. Phrasing a report line as "corrected entity not in selection" for these charts is actively misleading.
 - **Skip map-only charts** — `chartTypes: []` with `hasMapTab: true` has no chart tab, so `selectedEntityNames` never renders and a dead or partly dead selection is harmless. Note that `[]` is *not* the absent-field case: an absent `chartTypes` defaults to `LineChart` and must still be checked. The map itself is still covered by §2.
 - A **missing/empty selection** on other chart types is only a finding if production's config differs — the upgrader never touches entity selections, so an empty selection is almost always pre-existing. Verify via public Datasette before flagging.
 - Also flag any y-variable whose entity list is entirely empty (a broken indicator, not just a broken view).
 
 ### 2. Map tabs
 
-For every chart with `hasMapTab`, validate `map.columnSlug` **only when it is set** — an absent `columnSlug` is valid (grapher defaults the map to the first y variable), so flagging `None` produces false blockers. When present it must be one of the chart's dimension variable ids; it's stored as a **string** — str-cast before comparing (the int-vs-string mismatch is exactly how the upgrader left map tabs pinned to old variables for years; see #6457). A set `columnSlug` that resolves to a variable outside the chart's dimensions, or to a dangling id, is a finding.
+For every chart with `hasMapTab`, validate `map.columnSlug` **only when it is set** — an absent `columnSlug` is valid (grapher defaults the map to the first y variable), so flagging `None` produces false blockers. When present it must be one of the chart's dimension variable ids; it's stored as a **string** — str-cast before comparing (an int-vs-string mismatch leaves map tabs pinned to old variables unnoticed). A set `columnSlug` that resolves to a variable outside the chart's dimensions, or to a dangling id, is a finding.
 
 ### 3. MDim views, explorer views, and narrative charts
 
@@ -76,7 +76,7 @@ Same selection-vs-availability check on their configs:
 
 ### 4. Article references (gdoc embeds and hyperlinks)
 
-Article rows come back from the sweep with their `query_string`; the ones carrying `country=` pin entities in the URL, and the upgrader never rewrites these. (The sweep covers `linkType='url'` rows pointing at live grapher pages too, and drops `archive.ourworldindata.org` snapshots — frozen by design.) Filter to `published` rows for reader-facing findings. Parsing rules learned the hard way:
+Article rows come back from the sweep with their `query_string`; the ones carrying `country=` pin entities in the URL, and the upgrader never rewrites these. (The sweep covers `linkType='url'` rows pointing at live grapher pages too, and drops `archive.ourworldindata.org` snapshots — frozen by design.) Filter to `published` rows for reader-facing findings. Parsing rules:
 
 - Entities are `~`-separated; **legacy URLs use `+`**, which `parse_qs` decodes to spaces — a chunk with spaces may itself be one entity name ("South Asia"), so try a full-chunk match first, then greedy multi-word matching against the `entities` table.
 - Skip `$entityCode` / `$entityName` template placeholders (country-page dynamic embeds).
@@ -85,7 +85,7 @@ Article rows come back from the sweep with their `query_string`; the ones carryi
 - Only a **fully dead selection** is a finding — the link opens an empty chart. A partial gap still renders the remaining entities (report at most as an aside).
 - **Editing the gdoc:** Google Docs' Find & Replace cannot touch hyperlink *targets*, and most stale `country=` references are exactly that — URLs on words, sometimes split across several adjacent anchors by formatting runs. The handoff must say to click each link → edit → paste the corrected URL (only `{.chart}` `url:` lines are plain text and F&R-able). When building the corrected URL, edit at **token level** and anchor deletions on the leading `~` — entity names prefix-overlap (`DAC+countries+%28OECD%29` is a substring of `Non-DAC+countries+%28OECD%29`), so a naive substring replace corrupts both.
 - For content hand-off, link each citation with a scroll-to-highlight URL — reuse `find_chart_citations_in_content` from `apps/wizard/app_pages/chart_diff/citations.py`. Caveats: its embedded-chart pass only scans **top-level** body blocks (recurse yourself for charts nested in layout containers), most `country=` references turn out to be *hyperlinks* (its second pass, which does recurse), and data insights may store the chart reference where neither pass looks — fall back to the data-insight page URL. Wrap fragment URLs in `<angle brackets>` in markdown (they can contain parentheses).
-- **Verifying a gdoc fix: check the live article page, not the mirror.** Public Datasette's `posts_gdocs_links` lags and can show the stale `queryString` well after the edit is live — fetch the published article URL and grep its grapher URLs / `country=` params instead (e.g. a fixed data-insight `grapher-url` showed on ourworldindata.org minutes before the mirror caught up).
+- **Verifying a gdoc fix: check the live article page, not the mirror.** Public Datasette's `posts_gdocs_links` lags and can show the stale `queryString` well after the edit is live — fetch the published article URL and grep its grapher URLs / `country=` params instead.
 
 ### 5. Grade against production
 

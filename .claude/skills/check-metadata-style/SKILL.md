@@ -58,7 +58,7 @@ On a successful fetch/export:
 - Rewrite the body only if the content changed; stamp today's date on the `Last synced from Notion:` line either way.
 - Remind the user that the modified `STYLE_GUIDE.md` should be committed via a PR. Do **not** commit or push as part of this skill.
 
-> Plain `WebFetch`/`curl` does **not** work for the refresh: `app.notion.com` serves a JavaScript shell with no page content (verified 2026-07-07). Don't waste time trying it.
+> Plain `WebFetch`/`curl` does **not** work for the refresh: `app.notion.com` serves a JavaScript shell with no page content. Don't waste time trying it.
 
 ### 2. Read the Writing and Style Guide
 
@@ -264,7 +264,7 @@ After fixes:
 ## Notes
 
 - **No persistent output.** Analysis results stay in-conversation: no report `.md`, no scripts under `scripts/`. The only persistent file tied to this skill is `STYLE_GUIDE.md` (the committed rulebook).
-- **Current step only.** If the user asks to audit the whole catalog, say the skill is scoped to one step and suggest running it per dataset. (The former `check-metadata-spacing` skill, folded into step 4 here, offered a scan of all active garden steps; that option is gone, run this per dataset instead.)
+- **Current step only.** If the user asks to audit the whole catalog, say the skill is scoped to one step and suggest running it per dataset.
 - **Keep `STYLE_GUIDE.md` in sync with Notion.** The header's `Last synced from Notion` date is checked on every run (step 1); when it is more than two weeks old the skill refreshes the snapshot — Notion MCP first, manual markdown export as fallback — and the refresh is committed via a PR. Between syncs the skill stays deterministic and offline-capable by always auditing against the committed file.
 - **Archive-aware.** If the provided step path is under `dag/archive/*.yml`, point that out and confirm the user still wants to check it.
 - **Don't hallucinate rules.** If `STYLE_GUIDE.md` doesn't say something, don't flag it. Prefer false negatives over false positives.
