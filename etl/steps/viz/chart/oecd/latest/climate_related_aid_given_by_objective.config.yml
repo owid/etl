@@ -1,0 +1,39 @@
+chart_config_id: 01a11b11-26b5-7dd7-b6aa-6d12b949c894
+grapher_schema: "011"
+topic_tags:
+  - "Foreign Aid"
+  - "Climate Change"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "climate_related_oda_by_donor#oda_bilateral_outside_rio_markers"
+          display:
+            name: "Outside the scope of climate tracking"
+            color: "#C9C9C9"
+        - catalogPath: "climate_related_oda_by_donor#non_climate"
+          display:
+            name: "Non-climate-related"
+            color: "#C8A47E"
+        - catalogPath: "climate_related_oda_by_donor#climate_significant_objective"
+          display:
+            name: "Climate as secondary objective"
+            color: "#7389B3"
+        - catalogPath: "climate_related_oda_by_donor#climate_principal_objective"
+          display:
+            name: "Climate as main objective"
+            color: "#1F3F70"
+    config:
+      title: "Development aid given for climate as a main or secondary objective"
+      subtitle: "Bilateral aid committed by members of the OECD Development Assistance Committee (DAC), by whether climate change mitigation or adaptation is the main objective of the project, a secondary objective, or not an objective. Adjusted for inflation."
+      note: "Projects with climate as a secondary objective are counted at their full value. \"Outside the scope of climate tracking\" covers aid that the OECD's climate markers don't apply to, such as general budget support and the costs of hosting refugees in donor countries, net of canceled commitments."
+      tab: "chart"
+      hasMapTab: false
+      chartTypes:
+        - "StackedArea"
+        - "StackedBar"
+      minTime: 2010
+      selectedEntityNames:
+        - "DAC members"
+      addCountryMode: "change-country"

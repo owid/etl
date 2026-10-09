@@ -1,0 +1,41 @@
+chart_config_id: 01a11b1e-98ea-7c8b-873e-7e9c27637d0f
+grapher_schema: "011"
+topic_tags:
+  - "Foreign Aid"
+  - "Climate Change"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "climate_related_oda_by_donor#climate_related_share"
+          display:
+            name: "As a share of aid covered by climate tracking"
+            color: "#1F3F70"
+        - catalogPath: "climate_related_oda_by_donor#climate_related_share_of_bilateral_total"
+          display:
+            name: "As a share of all bilateral aid"
+            color: "#2C9C94"
+    config:
+      title: "Share of development aid given that is climate-related, measured two ways"
+      subtitle: "Bilateral aid that targets climate change mitigation, adaptation, or both, as a share of the aid covered by the OECD's climate tracking (which excludes general budget support, debt relief and costs in donor countries, such as hosting refugees), and as a share of all bilateral aid given by each donor."
+      note: "Based on commitments. Aid not covered by climate tracking includes general budget support and the costs of hosting refugees in donor countries. Neither measure includes contributions to multilateral organizations. Projects that target climate as a secondary objective are counted at their full value. DAC members are the members of the OECD Development Assistance Committee."
+      tab: "chart"
+      hasMapTab: false
+      chartTypes:
+        - "LineChart"
+      minTime: 2010
+      yAxis:
+        min: 0
+        facetDomain: shared
+      selectedFacetStrategy: entity
+      selectedEntityNames:
+        - "South Korea"
+        - "United Kingdom"
+        - "France"
+        - "Germany"
+        - "DAC members"
+        - "United States"
+        - "Japan"
+        - "Netherlands"
+        - "Canada"
