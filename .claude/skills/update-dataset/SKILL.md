@@ -71,7 +71,7 @@ Assumptions:
 
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
-- **Log lessons in `workbench/<short_name>/lessons.md` as you hit them** (what you expected, what happened, the rule). Fold them into skills only when the user asks, with the user approving each change, and only lessons that would change what a future run does; a quirk of one dataset goes in a `# NOTE:` in that dataset's step files instead. For each lesson, **re-read the target skill on `master` first**. If existing text already covers the point, sharpen that text in place. Add new text only when nothing covers it: one or two sentences stating the rule and its condition (CLAUDE.md, "Write skills and this file as rules, not history"), with anything longer (a procedure, a query) in a reference file next to the skill.
+- **Log lessons in `workbench/<short_name>/lessons.md` as you hit them** (what you expected, what happened, the rule). Fold them into skills only when the user asks, and only lessons that would change what a future run does (apply this bar yourself, then list the changes per skill for the user); a quirk of one dataset goes in a `# NOTE:` in that dataset's step files instead. For each lesson, **re-read the target skill on `master` first**. If existing text already covers the point, sharpen that text in place. Add new text only when nothing covers it: one or two sentences stating the rule and its condition (CLAUDE.md, "Write skills and this file as rules, not history"), with anything longer (a procedure, a query) in a reference file next to the skill.
 
 ## Checkpoints — when to pause
 
