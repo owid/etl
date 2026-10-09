@@ -27,7 +27,7 @@ Ask the user which scope they want to check:
 
 ### 0. Check codespell installation
 
-**IMPORTANT:** Check if codespell is installed before attempting to use it. Since codespell is now a dev dependency in the project, it should already be installed, but verify first to avoid reinstalling unnecessarily.
+**IMPORTANT:** Check if codespell is installed before attempting to use it. Since codespell is a dev dependency in the project, it should already be installed, but verify first to avoid reinstalling unnecessarily.
 
 ```bash
 # Check if codespell is installed
