@@ -82,7 +82,7 @@ Primitives:
 
 Three routes:
 
-- **(a) Indicator ETL metadata** — edit the garden `.meta.yml` → rebuild garden+grapher → `STAGING=1 etlr grapher://grapher/<ns>/<ver>/<ds> --grapher` to upsert to staging. **Check for a `<short_name>.meta.override.yml` next to the meta.yml first** — the ETL merges it on top of the built metadata automatically (`etl/steps/__init__.py`), and datasets that carry one (WDI is the flagship: `wdi.meta.override.yml`) auto-generate their main `.meta.yml`, so manual curation MUST go into the override file — an edit to the auto-generated file builds fine but is silently lost on the next regeneration. The resolver lists the override file first when it exists.
+- **(a) Indicator ETL metadata** — edit the garden `.meta.yml` → rebuild garden+grapher → `STAGING=1 etlr grapher://grapher/<ns>/<ver>/<ds> --grapher` to upsert to staging. **Check for a `<short_name>.meta.override.yml` next to the meta.yml first** — the ETL merges it on top of the built metadata automatically (`etl/steps/__init__.py`), and datasets that carry one (WDI is the flagship: `wdi.meta.override.yml`) auto-generate their main `.meta.yml`, so manual curation MUST go into the override file — an edit to the auto-generated file builds fine but is silently lost on the next regeneration.
 - **(b) MDim step files** — edit the MDim `.config.yml` / `.py` → `STAGING=1 .venv/bin/etlr viz://chart/<ns>/<ver>/<name> --grapher`.
 - **(c) Chart config on staging** — `scripts/update_chart_config.py` (guarded, staging-only; see below). Reaches production only via chart-diff approval + chart-sync after merge.
 
@@ -236,7 +236,7 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
 
 ## Metadata quality checks (before the checkpoint)
 
-**Style rules for writing text** live in `.claude/skills/generate-metadata/SKILL.md` — follow its field-by-field guidelines whenever composing new text (description_short must not repeat the title; plain language, expand acronyms; description_key ordered data-specific → methodology → caveats; curly apostrophes; American English; per-field guidance in `schemas/definitions.json`).
+**Style rules for writing text** live in `.claude/skills/generate-metadata/SKILL.md` — follow its field-by-field guidelines whenever composing new text (description_short must not repeat the title; plain language per `.claude/rules/plain-writing.md`, expand acronyms; description_key ordered data-specific → methodology → caveats; curly apostrophes; American English; per-field guidance in `schemas/definitions.json`).
 
 **The check suite** is also defined there (see "Metadata quality checks" in that SKILL — the canonical list, mirroring `/update-dataset` §6b/§6c): typos (`/check-metadata-typos`), Jinja spacing and style guide (`/check-metadata-style`), the manual clarity checklist, link + `#dod:` verification, the dimension sweep, and adversarial claims verification (`/fact-check-dataset`).
 
@@ -258,7 +258,7 @@ Scoping rules specific to this skill:
 - **MDim views**: the resolver's per-view chart-preview URL (`/admin/grapher/<urlquoted catalogPath>?dim=choice...`).
 - **Visual QA**: hand off to the `check-chart-preview` skill for a screenshot.
 - **Big text changes**: Metadata Diff (first bullet) covers this once the branch is on staging. Without a staging server, re-run the report scripts in indicator-list mode and diff against the previous output (see dump mode below).
-- **Jinja-templated definitions**: after editing shared `definitions`, rebuild garden AND grapher before reading anything — the report scripts and ad-hoc reads use the grapher channel, and a stale channel shows pre-edit metadata. Spot-check several rendered variants; dimension comparisons are type-sensitive (`decile == 5` vs `decile == "5"` — copy the comparison form from a working definition in the same file).
+- **Jinja-templated definitions**: after editing shared `definitions`, rebuild garden AND grapher before reading anything — the report scripts and ad-hoc reads use the grapher channel, and a stale channel shows pre-edit metadata. Spot-check several rendered variants; dimension comparisons are type-sensitive (`decile == 5` vs `decile == "5"`): dimension values can be int in one dataset and str in another, and a wrong-type comparison silently renders the else-branch — copy the comparison form from a working definition in the same file and spot-check the affected view.
 
 ## Path to production
 
@@ -294,7 +294,7 @@ Scripts (shared helpers in `scripts/_common.py`: grapher-channel metadata loader
 - `scripts/generate_mdim_text_report.py` — MDim view mode (supports `collapse_dims` and placeholder parametrization).
 - `scripts/grapher_dataset_mode.py` — grapher-dataset mode (iterates every indicator column) and indicator-list mode (`--indicators <cp> <cp> ...` or `--indicators-file <path>`).
 
-Rebuilding the MDim `.config.json` is done via `etlr viz://chart/<ns>/<ver>/<name>` without `--grapher`: the step then writes the local config and skips the DB upsert (and the `grapher://grapher/<dataset>` upserts of its inputs), which is all the report needs. Change detection handles the common case: nothing changed → ~2 s; garden `.meta.yml`, garden data, or MDim yaml/py changed → etlr rebuilds only the affected steps.
+Rebuilding the MDim `.config.json` is done via `etlr viz://chart/<ns>/<ver>/<name>` without `--grapher`: `Chart.save()` then stops after `save_config_local`, skipping `validate_indicators_in_db` and the DB upsert (and the `grapher://grapher/<dataset>` upserts of its inputs), which is all the report needs. Change detection handles the common case: nothing changed → ~2 s; garden `.meta.yml`, garden data, or MDim yaml/py changed → etlr rebuilds only the affected steps.
 
 Do **not** add `--only` when you want garden/MDim edits to take effect — it skips upstream rebuilds by design; use `--only --force` only to re-run just the MDim step without touching anything upstream.
 
@@ -353,9 +353,9 @@ Total views: **N**   (for MDims)
 
 1. **Grapher-channel metadata loading**: `Dataset(data/grapher/<ns>/<ver>/<ds>).read(<table>, safe_types=False)[<col>].metadata`.
 
-1a. **`description_key` arrives as a markdown STRING, not a list**: the grapher channel serializes it via `owid.catalog.core.meta.description_key_to_string` — multiple bullets become one string joined as `"- b1\n- b2\n…"`, a single bullet becomes plain prose (datasets built before the change still carry lists). `scripts/_common.py:description_key_as_list()` normalizes both forms back into a bullet list; both report modes route through it. The same trap hits **MDim step code** that asserts/replaces bullets from `tb[col].metadata.description_key`: `OLD_TEXT in list(dk)` silently iterates characters on the string form and the assertion fails (or, worse, a `for b in dk` loop explodes bullets into characters). Normalize first (see `_description_key_bullets` in `incomes_pip.py` / `gini_lis.py` / `gini_wid.py`), then do list-membership asserts and per-bullet swaps; setting either a list or a markdown string back on `view.metadata["description_key"]` is accepted (`Chart` converts lists via `_convert_description_key_lists`).
+1a. **`description_key` arrives as a markdown STRING, not a list**: the grapher channel serializes it via `owid.catalog.core.meta.description_key_to_string` — multiple bullets become one string joined as `"- b1\n- b2\n…"`, a single bullet becomes plain prose (some datasets still carry lists). `scripts/_common.py:description_key_as_list()` normalizes both forms back into a bullet list; both report modes route through it. The same trap hits **MDim step code** that asserts/replaces bullets from `tb[col].metadata.description_key`: `OLD_TEXT in list(dk)` silently iterates characters on the string form and the assertion fails (or, worse, a `for b in dk` loop explodes bullets into characters). Normalize first (see `_description_key_bullets` in `incomes_pip.py` / `gini_lis.py` / `gini_wid.py`), then do list-membership asserts and per-bullet swaps; setting either a list or a markdown string back on `view.metadata["description_key"]` is accepted (`Chart` converts lists via `_convert_description_key_lists`).
 
-2. **Rebuilding the MDim `.config.json`**: use `etlr viz://chart/<ns>/<ver>/<name>` (no `--grapher`). `Chart.save()` then stops after `save_config_local`, skipping `validate_indicators_in_db` and `upsert_to_db`, so the report never needs the DB.
+2. **Rebuilding the MDim `.config.json`**: use `etlr viz://chart/<ns>/<ver>/<name>` (no `--grapher`; see above), so the report never needs the DB.
 
 3. **Description-key dedup with auto slugs**: collect unique bullets into a per-file legend, auto-generate a short slug from the first ~3 non-stopword content words of each bullet (kebab-case), disambiguate collisions with `-2`/`-3` suffixes. Each view references bullets by their slugs, rendered as sub-bullets.
 
@@ -439,11 +439,11 @@ A recurring large-scale workflow: the user pastes an edited FAUST report as the 
 2. **Audit the target's legend↔views cross-references before editing.** Slugs referenced by views but missing from the legend usually map to an existing garden bullet — keep it unchanged. Legend bullets referenced by no view get skipped (confirm once with the user).
 3. **Fact-check target texts against each dataset's actual data** — hand-edited targets propagate copy-paste from the first dataset: "income or consumption" onto income-only datasets, "country or region" where no regional aggregates exist. Verify empirically (count non-null values for region entities per indicator family) rather than trusting either the target or the old metadata.
 4. **Bullets describing UI affordances must match the view's actual UI.** A bullet like "this chart gives the option to show breaks" is wrong on grouped views that exist only for one choice of that dimension — drop the bullet or strip the affordance sentence via a view-level override. Beware MDims that keep their own config-level `definitions.description_key_*` overrides — garden edits don't reach those views; align the config-local copies separately.
-5. **New `#dod:…` links in a target may not exist.** Check the `dods` table via public Datasette before shipping; if missing, keep the link + list it in the PR body as a "create in admin" follow-up.
+5. **New `#dod:…` links in a target may not exist.** Check them as in "Metadata quality checks" above.
 6. **Shared definitions serve more variants than the target shows.** Add Jinja branches so the target's wording doesn't leak onto other variants (poverty vs inequality, wealth vs income), and check the untouched-variant MDims in the regenerated reports.
-7. **Jinja dimension comparisons: match the value type used elsewhere in the same file.** Dimension values can be int in one dataset and str in another — a wrong-type comparison renders the else-branch silently; copy the comparison form from a working definition and spot-check the affected view.
+7. **Jinja dimension comparisons: match the value type used elsewhere in the same file** (see "Verifying on staging").
 8. **Bulk list edits with Edit/replace_all: order by containment.** Reorder the anchored/longer per-variable blocks first and the bare short-tail patterns last; then verify all lists at once with a small parser script over the meta.yml.
-9. **Mirror constants change in lockstep.** Every garden text edit needs the matching `OLD_*`/`NEW_*` constant edit in the MDim `.py`; the rebuild's assertion pass is the drift check.
+9. **Mirror constants change in lockstep** (see the MDim routing above); the rebuild's assertion pass is the drift check.
 10. **Tag placement is cosmetic in target comparisons**: a view the target marks `[inherited]` may only be implementable as `[override]` (and vice versa) — identical bullet content is what matters.
 
 ### Regression diff: prove a refactor didn't change user-facing text
