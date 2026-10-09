@@ -10,14 +10,14 @@ views:
       y:
         - catalogPath: "climate_related_oda_by_recipient#climate_related_share"
           display:
-            name: "Share of aid covered by climate tracking"
+            name: "As a share of aid covered by climate tracking"
             color: "#1F3F70"
         - catalogPath: "climate_related_oda_by_recipient#climate_related_share_of_bilateral_total"
           display:
-            name: "Share of all bilateral aid"
+            name: "As a share of all bilateral aid"
             color: "#2C9C94"
     config:
-      title: "Share of development aid received that is climate-related, with two denominators"
+      title: "Share of development aid received that is climate-related, measured two ways"
       subtitle: "Bilateral aid from members of the OECD Development Assistance Committee (DAC) that targets climate change mitigation, adaptation, or both, as a share of the aid covered by the OECD's climate tracking (which excludes general budget support, debt relief and costs in donor countries, such as hosting refugees), and as a share of all bilateral aid received from them."
       note: "Based on commitments. Aid not covered by climate tracking includes budget support. Neither measure includes contributions to multilateral organizations. Projects that target climate as a secondary objective are counted at their full value."
       tab: "chart"

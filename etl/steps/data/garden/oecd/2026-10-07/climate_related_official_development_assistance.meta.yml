@@ -22,7 +22,7 @@ definitions:
     G7 countries: Canada, France, Germany, Italy, Japan, UK and US
 
   # Short descriptions, following those of our main ODA dataset.
-  short_bilateral_allocable: "Bilateral allocable [ODA](#dod:oda) is the aid from DAC members that donors track for climate objectives. It excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
+  short_bilateral_allocable: "Bilateral allocable [ODA](#dod:oda) is the aid from members of the OECD Development Assistance Committee (DAC) that donors track for climate objectives. It excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
   short_commitments: Monetary aid is estimated as commitments.
   short_constant_usd: This data is expressed in US dollars. It is adjusted for inflation.
 
@@ -34,6 +34,10 @@ definitions:
     This data only covers bilateral allocable ODA from [DAC members](https://www.oecd.org/en/about/committees/development-assistance-committee.html): the major donor countries in the OECD and EU institutions. Bilateral allocable ODA is the bilateral aid that the Rio markers apply to. It excludes donors' core contributions to multilateral organizations (such as the World Bank or the Green Climate Fund), as well as general budget support, debt relief (other than debt swaps), administrative costs, imputed costs of students from developing countries in donor countries, development awareness, and the costs of hosting refugees in donor countries. It also excludes aid from donors outside the DAC.
   key_bilateral_total: |-
     Total bilateral ODA includes bilateral allocable ODA and the aid that the Rio markers do not apply to: general budget support, debt relief (other than debt swaps), administrative costs, imputed costs of students from developing countries in donor countries, development awareness, and the costs of hosting refugees in donor countries. It excludes donors' core contributions to multilateral organizations, and aid from donors outside the DAC.
+  key_bilateral_total_denominator: |-
+    This share divides climate-related aid by total bilateral ODA, which also includes the aid that the Rio markers do not apply to, such as general budget support and the costs of hosting refugees in donor countries.
+  key_outside_negative: |-
+    Donors can only record cancellations of commitments made in earlier years as a single negative amount, which falls in this category. So this aid can be negative in some years.
   key_rio_markers: |-
     Donors mark each aid project against the "Rio markers", which track aid that supports the goals of the three UN conventions that originated at the 1992 Earth Summit in Rio de Janeiro: on climate change (with separate markers for mitigation and adaptation), biological diversity, and desertification. A project is marked as targeting a goal as a "principal" objective (the project would not have been funded without it), as a "significant" objective (an explicit but secondary objective), or as "not targeted".
   key_climate_markers: |-
@@ -45,7 +49,7 @@ definitions:
   key_commitments: |-
     The data is reported as commitments. This refers to aid that has been pledged, and is different from disbursements, which is aid ultimately given. The Rio markers describe the objectives of projects when they are designed, so the OECD applies them to commitments. A multi-year project is counted in full in the year it is committed, so values can change a lot from one year to the next.
   key_adaptation_marker: |-
-    The marker for climate change adaptation was introduced in 2009 and applies to aid from 2010 onwards. Before then, the climate marker also covered some adaptation projects, so climate-related aid can only be split into mitigation and adaptation from 2010.
+    The marker for climate change adaptation was introduced in 2009 and applies to aid from 2010 onward. Before then, the climate marker also covered some adaptation projects, so climate-related aid can only be split into mitigation and adaptation from 2010.
   key_regional: |-
     Entities named "regional (OECD)", such as "Africa, regional (OECD)", show aid to a region as a whole, for example programs that cover several countries, which donors do not assign to a single country. Entities named "unspecified (OECD)", such as "Developing countries, unspecified (OECD)", show aid not assigned to any country within a broader group. This aid is already included in the totals of the corresponding regions, for example in Africa (OECD).
   key_not_screened: |-
@@ -60,13 +64,13 @@ definitions:
   processing_outside_rio_markers: |-
     We calculated this indicator as total bilateral ODA, from the OECD Creditor Reporting System, minus bilateral allocable ODA, from the OECD RioMarkers dataset. Donors can only record cancellations of commitments made in earlier years as a single negative amount, which falls in this category, so it can be negative (for example, for Australia in 2009 and 2010).
   processing_share: |-
-    We calculated this indicator by dividing by bilateral allocable ODA, expressed as a percentage.
+    We calculated this indicator by dividing climate-related ODA by bilateral allocable ODA, expressed as a percentage.
   processing_share_bilateral_total: |-
-    We calculated this indicator by dividing by total bilateral ODA, from the OECD Creditor Reporting System, expressed as a percentage.
+    We calculated this indicator by dividing climate-related ODA by total bilateral ODA, from the OECD Creditor Reporting System, expressed as a percentage.
   processing_donor_groups: |-
     We calculated aggregates for groups of donors (such as DAC countries or G7 countries) by summing the indicator across the donors that the OECD includes in each group.
   processing_recipient_groups: |-
-    We calculated aggregates for groups of recipients (such as regions or income groups) by summing the indicator across the recipients that the OECD includes in each group. The OECD classifies countries by income with the most recent classification, and applies it to all years.
+    We calculated aggregates for groups of recipients (such as regions or income groups) by summing the indicator across the recipients that the OECD currently includes in each group. For income groups, this applies the most recent classification to all years.
 
 dataset:
   update_period_days: 365
@@ -81,7 +85,7 @@ tables:
         title: "Total bilateral ODA by donor"
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
-        description_short: "Bilateral [ODA](#dod:oda) from DAC members, including aid that is not assigned to a recipient or sector. {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_short: "Bilateral [ODA](#dod:oda) from members of the OECD Development Assistance Committee (DAC), including aid that the climate markers do not apply to, such as general budget support and the costs of hosting refugees in donor countries. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
@@ -118,20 +122,22 @@ tables:
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"
       oda_bilateral_outside_rio_markers:
-        title: "Bilateral ODA by donor outside the scope of the Rio markers"
+        title: "Bilateral ODA outside the scope of the Rio markers, by donor"
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
-        description_short: "Bilateral [ODA](#dod:oda) that the Rio markers do not apply to, such as general budget support, administrative costs, and the costs of hosting refugees in donor countries. {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_short: "Bilateral [ODA](#dod:oda) that falls outside the OECD's tracking of climate-related aid (the \"Rio markers\"), such as general budget support, administrative costs, and the costs of hosting refugees in donor countries. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
           - "{definitions.key_bilateral_total}"
+          - "{definitions.key_rio_markers}"
+          - "{definitions.key_outside_negative}"
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_outside_rio_markers}\n\n{definitions.processing_donor_groups}"
         presentation:
-          title_public: "Bilateral ODA by donor outside the scope of the Rio markers"
+          title_public: "Bilateral ODA outside the scope of the Rio markers, by donor"
         display:
           name: "Outside the scope of the Rio markers"
           numDecimalPlaces: 0
@@ -181,7 +187,8 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
         presentation:
-          title_public: "Climate-related ODA by donor - Mitigation only"
+          title_public: "Climate-related ODA by donor"
+          title_variant: "Mitigation only"
         display:
           name: "Mitigation only"
           numDecimalPlaces: 0
@@ -206,7 +213,8 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
         presentation:
-          title_public: "Climate-related ODA by donor - Adaptation only"
+          title_public: "Climate-related ODA by donor"
+          title_variant: "Adaptation only"
         display:
           name: "Adaptation only"
           numDecimalPlaces: 0
@@ -231,7 +239,8 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
         presentation:
-          title_public: "Climate-related ODA by donor - Mitigation and adaptation"
+          title_public: "Climate-related ODA by donor"
+          title_variant: "Mitigation and adaptation"
         display:
           name: "Mitigation and adaptation"
           numDecimalPlaces: 0
@@ -256,7 +265,8 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
         presentation:
-          title_public: "Climate-related ODA by donor - Climate as principal objective"
+          title_public: "Climate-related ODA by donor"
+          title_variant: "Climate as principal objective"
         display:
           name: "Climate as principal objective"
           numDecimalPlaces: 0
@@ -281,7 +291,8 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_donor_groups}"
         presentation:
-          title_public: "Climate-related ODA by donor - Climate as significant objective"
+          title_public: "Climate-related ODA by donor"
+          title_variant: "Climate as significant objective"
         display:
           name: "Climate as significant objective"
           numDecimalPlaces: 0
@@ -327,7 +338,6 @@ tables:
           - "{definitions.key_commitments}"
           - "{definitions.key_adaptation_marker}"
           - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_donor_groups}"
         presentation:
@@ -345,7 +355,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_bilateral_total}"
+          - "{definitions.key_bilateral_total_denominator}"
           - "{definitions.key_rio_markers}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
@@ -353,7 +363,6 @@ tables:
           - "{definitions.key_commitments}"
           - "{definitions.key_adaptation_marker}"
           - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share_bilateral_total}\n\n{definitions.processing_donor_groups}"
         presentation:
@@ -370,7 +379,7 @@ tables:
         title: "Total bilateral ODA by recipient"
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
-        description_short: "Bilateral [ODA](#dod:oda) from DAC members, including aid that is not assigned to a recipient or sector. {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_short: "Bilateral [ODA](#dod:oda) from members of the OECD Development Assistance Committee (DAC), including aid that the climate markers do not apply to, such as general budget support and the costs of hosting refugees in donor countries. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_regional}"
@@ -378,7 +387,8 @@ tables:
           - "{definitions.key_bilateral_total}"
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
-        processing_level: minor
+        processing_level: major
+        description_processing: "{definitions.processing_recipient_groups}"
         presentation:
           title_public: "Total bilateral ODA by recipient"
         display:
@@ -398,7 +408,8 @@ tables:
           - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
-        processing_level: minor
+        processing_level: major
+        description_processing: "{definitions.processing_recipient_groups}"
         presentation:
           title_public: "Bilateral allocable ODA by recipient"
         display:
@@ -448,7 +459,6 @@ tables:
           - "{definitions.key_commitments}"
           - "{definitions.key_adaptation_marker}"
           - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_recipient_groups}"
         presentation:
@@ -467,7 +477,7 @@ tables:
           - "{definitions.key_oda}"
           - "{definitions.key_regional}"
           - "{definitions.key_bilateral_allocable}"
-          - "{definitions.key_bilateral_total}"
+          - "{definitions.key_bilateral_total_denominator}"
           - "{definitions.key_rio_markers}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
@@ -475,7 +485,6 @@ tables:
           - "{definitions.key_commitments}"
           - "{definitions.key_adaptation_marker}"
           - "{definitions.key_not_screened}"
-          - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share_bilateral_total}\n\n{definitions.processing_recipient_groups}"
         presentation:

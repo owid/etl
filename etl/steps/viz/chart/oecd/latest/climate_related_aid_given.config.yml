@@ -14,7 +14,7 @@ views:
             color: "#C9C9C9"
         - catalogPath: "climate_related_oda_by_donor#non_climate"
           display:
-            name: "Non-climate related"
+            name: "Non-climate-related"
             color: "#C8A47E"
         - catalogPath: "climate_related_oda_by_donor#mitigation_only"
           display:
@@ -31,7 +31,7 @@ views:
     config:
       title: "Development aid given to climate-related projects"
       subtitle: "Bilateral aid committed by members of the OECD Development Assistance Committee (DAC), by whether projects target climate change mitigation, adaptation, both, or neither. Adjusted for inflation."
-      note: "Projects that target climate as a secondary objective are counted at their full value. \"Outside the scope of climate tracking\" covers aid that the OECD's climate markers don't apply to, such as general budget support and the costs of hosting refugees in donor countries, net of cancelled commitments."
+      note: "Projects that target climate as a secondary objective are counted at their full value. \"Outside the scope of climate tracking\" covers aid that the OECD's climate markers don't apply to, such as general budget support and the costs of hosting refugees in donor countries, net of canceled commitments."
       tab: "chart"
       hasMapTab: false
       chartTypes:
