@@ -26,7 +26,7 @@ tables:
         unit: |-
           index (<< index_year >> = 100)
         description_short: |-
-          The bird population for << species.lower() >>, measured relative to population size in the year << index_year >> (<< index_year >> = 100). A higher value means an increase in population in the observed species, while a lower value means a decrease in population.
+          Bird population for << species.lower() >>, measured relative to population size in the year << index_year >> (<< index_year >> = 100). A higher value means an increase in population in the observed species, while a lower value means a decrease in population.
         description_key:
           - This index tracks the changes in population size for common, widespread bird species across Europe. These are divided into farmland species (39 species), forest species (34 species), and all common species (168 species).
           - The data comes mostly from volunteer birdwatchers and is compiled by national coordinators and the EU-wide Pan-European Common Bird Monitoring Scheme (PECBMS).
