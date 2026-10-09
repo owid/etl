@@ -522,12 +522,12 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    | `presentation.topic_tags` | At least one tag |
    | `display.numDecimalPlaces` | Common is fine |
    | `display.tolerance` | Common is fine — chart tolerance for missing years |
-   | `display.name` | **Per-indicator** — required for legend labels. Set it only together with `presentation.title_public`: without `title_public`, `display.name` becomes the indicator's public title on its data page, and the grapher build only emits a `DisplayNameWarning`. After metadata edits, grep the grapher build log for `DisplayNameWarning`. (OECD Family Database: would have titled data pages "Women" and "Two parents".) |
+   | `display.name` | **Per-indicator** — legend label. When `presentation.title_public` is not set, `display.name` is also used as the indicator's public title on its data page (the grapher build only emits a `DisplayNameWarning`). So either write a `display.name` that reads as a title, or set `title_public` too. A short legend label like "Women" needs `title_public`. After metadata edits, grep the grapher build log for `DisplayNameWarning` and check each one. Some datasets rely on this on purpose (IVS); follow the dataset's own skill. (OECD Family Database: short labels would have titled data pages "Women" and "Two parents".) |
    | `presentation.attribution_short` | **Set explicitly** — does NOT inherit from the origin's `attribution_short` (verified: MySQL `variables.attributionShort` stays `NULL` if it's only on the origin). Place under `definitions.common.presentation` for the common case. |
 
    Conditional: if `processing_level: major`, every indicator with that level MUST also have `description_processing`.
 
-   Not mandatory (skip if you don't need them): `presentation.title_public`, `presentation.title_variant`, `presentation.attribution`.
+   Not mandatory (skip if you don't need them): `presentation.title_public` (unless `display.name` is a short label, see above), `presentation.title_variant`, `presentation.attribution`.
 
    **A per-indicator `display:` block replaces the common one; it doesn't merge with it.** The metadata loader (`_merge_variable_metadata` in `lib/catalog/owid/catalog/core/yaml_metadata.py`) merges only `presentation` and `presentation.grapher_config` key by key. Every other block, `display` included, is replaced whole by the more specific level (`definitions.common` → table `common` → the indicator). So adding `display.tolerance` to one indicator silently drops the `numDecimalPlaces` it inherited from `definitions.common.display`. Repeat the common keys in the indicator's block, and check `tb[col].metadata.display` on the built dataset. A per-indicator `presentation:` block, by contrast, keeps the common `topic_tags`.
 
