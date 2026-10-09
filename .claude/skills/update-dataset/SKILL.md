@@ -160,6 +160,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - Either way, run `etl update` **once**. Don't call it separately per channel — that leaves stale version references in the DAG (e.g., new garden pointing to old meadow).
    - Perform help check, dry run, approval, then real execution; capture summary for later PR notes
    - After running, **always verify the dag file**: grep for the old version and confirm all internal references between the new steps point to the new version (e.g., garden depends on new meadow, not old meadow).
+   - **Check by hand every dependency that shares the dataset's short_name.** A step can depend on an *older* version of its own dataset on purpose (for example, a historical series kept from an earlier release). `etl update` rewrites that dependency to point at the step's own predecessor, and the result looks like a normal version bump. Compare each such dependency with the old step's dag entry and put back the version it had. `etl update` also logs "not found in dag file" for steps declared in the nested form; check those entries by hand too. (OECD Family Database: the new garden `oecd/2026-10-09/family_database` depended on the historical `garden/oecd/2024-12-30/family_database`, and `etl update` rewrote it to `garden/oecd/2025-10-07/family_database`, its own predecessor.)
    - **`etl update` writes the new entries in the *flat* DAG form — convert them to the nested (compact) form now**, while you're in the file, rather than leaving it until archiving (otherwise the flat block tends to survive the whole update unnoticed). See the example and `load_dag()` parse-check under "DAG archiving & reordering" step 4.
 
 1a-bis) Add yourself to `dataset.owners` in the new garden `.meta.yml`
@@ -483,6 +484,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - Inconsistent terminology between indicators in the same dataset (e.g. "wildfires" in one, "vegetation fires" in another)
    - Wording that fails the talk test in `.claude/rules/plain-writing.md` (e.g. "anthropogenic emissions" → "human-caused emissions")
    - Methodology-attribution claims ("following guidance from <agency>…") — open the cited link and confirm it actually says that. Agencies revise methodology, so a claim that was defensible when written can be stale now, and the 6c link check only proves the URL resolves, not the claim (real case: metadata cited BEA guidance for deflating data centers with the office PPI; BEA's 2025 annual update had switched them to an industrial+warehouse composite, and the cited page never contained the guidance at all)
+   - Coverage claims that describe our filters instead of the source — before writing in `description_processing` (or anywhere) what years or entities a source covers, check the real range in the raw snapshot file. A filter in our own code (e.g. a meadow `start_year=2001`) is not the source's coverage. And a filter that throws away source data should itself be questioned: ask whether it is still needed (OECD Family Database: a note said the latest OECD file had data from 2001; the file starts in 1960)
    - Scope qualifiers present in the origin title but absent from user-facing text — if the source is "**Private** Construction" / adults-only / market-exchange-rate-only, `description_short` and `description_key` must say so; the citation line alone doesn't reach readers
    - Text that repeats what the reader has already read — a `description_key` bullet restating another bullet, `description_short`, or the title at the same level of detail. Unpacking `description_short` in the first bullet (full definition, how it's measured, what's included) is exactly what the panel is for; saying it again in other words is padding. Merge it into the bullet that already covers the ground, or drop it
 
@@ -520,12 +522,14 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    | `presentation.topic_tags` | At least one tag |
    | `display.numDecimalPlaces` | Common is fine |
    | `display.tolerance` | Common is fine — chart tolerance for missing years |
-   | `display.name` | **Per-indicator** — required for legend labels |
+   | `display.name` | **Per-indicator** — required for legend labels. Set it only together with `presentation.title_public`: without `title_public`, `display.name` becomes the indicator's public title on its data page, and the grapher build only emits a `DisplayNameWarning`. After metadata edits, grep the grapher build log for `DisplayNameWarning`. (OECD Family Database: would have titled data pages "Women" and "Two parents".) |
    | `presentation.attribution_short` | **Set explicitly** — does NOT inherit from the origin's `attribution_short` (verified: MySQL `variables.attributionShort` stays `NULL` if it's only on the origin). Place under `definitions.common.presentation` for the common case. |
 
    Conditional: if `processing_level: major`, every indicator with that level MUST also have `description_processing`.
 
    Not mandatory (skip if you don't need them): `presentation.title_public`, `presentation.title_variant`, `presentation.attribution`.
+
+   **A per-indicator `display:` block replaces the common one; it doesn't merge with it.** The metadata loader (`_merge_variable_metadata` in `lib/catalog/owid/catalog/core/yaml_metadata.py`) merges only `presentation` and `presentation.grapher_config` key by key. Every other block, `display` included, is replaced whole by the more specific level (`definitions.common` → table `common` → the indicator). So adding `display.tolerance` to one indicator silently drops the `numDecimalPlaces` it inherited from `definitions.common.display`. Repeat the common keys in the indicator's block, and check `tb[col].metadata.display` on the built dataset. A per-indicator `presentation:` block, by contrast, keeps the common `topic_tags`.
 
    **Dataset block.** Garden `.meta.yml` MUST include `update_period_days`:
    ```yaml
@@ -589,6 +593,8 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
 
    **The *run* is optional because it's the heaviest check in the workflow** — fetching methodology docs plus per-value web searches runs ~25–45 web calls and can consume a lot of tokens and time. Skip the run by default; run it when the user opts in, and actively *recommend* running it when the update shows red flags that only this step can chase down: large unexplained value churn in the diffs, an in-place source revision, a producer new to us, or editorial claims riding on specific values.
 
+   **Some source errors pass every check except this one.** A series shifted by one year at the source (each newly added year equals the national statistics office's figure for the year before) gives plausible values, smooth trends and no diff anomaly, so every diff and bound check passes. Only comparing values with the national statistics office catches it. When the source compiles figures from national offices (OECD, Eurostat, UN agencies), that is a reason to recommend the review; say why when you offer it. (OECD Family Database: South Korea's share of births outside marriage for 2022–2024 equaled Statistics Korea's figures for 2021–2023.)
+
    Scope for an update: focus the metadata claim review on new/changed text, and the value cross-checks on the newly added data (latest wave/year) plus that skill's standard anchors; deep-review the top-viewed indicators + anomaly-flagged ones per its prioritization step. Apply its routing table: metadata fixes → edit and re-run the step; confirmed source errors → `<short_name>.corrections.yml`; unconfirmed suspicions → list under "Not covered in this PR" for the reviewer. Save the report path (`ai/adversarial-review-<short_name>-<date>.md`) in `update-context.yml` and summarize any 🔴/🟡 findings in the PR body. Run this before 6d/commit so the fixes land in this PR.
 
 6d) Scheduled-issue workflow check (owid-issues)
@@ -638,6 +644,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
      # if 0, force the upsert:
      STAGING=<branch> .venv/bin/etlr grapher://grapher/<namespace>/<new_version>/<short_name> --grapher
      ```
+   - **From a local machine, this upload can fail with `AccessDenied` on `PutObject`.** Local credentials may not be allowed to write indicator metadata to the staging R2 bucket. Don't try to work around it: push, and let the automatic staging rebuild upload the dataset. The rebuild usually creates the variable rows already, so check the count with the query above; if it is non-zero, go on with the indicator upgrade.
    - Then run the automatic upgrader:
      ```bash
      STAGING=<branch> .venv/bin/etl indicator-upgrade auto
@@ -1045,6 +1052,17 @@ Workflow when the user agrees:
          - snapshot://<ns>/<v>/<short>.csv
    ```
    Convert the relocated new entries to nested while reordering, so the active and archived blocks match. Verify it parses with `.venv/bin/python -c "from etl.dag_helpers import load_dag; load_dag()"` (a malformed nesting raises).
+
+   **When only some snapshots of the chain were bumped, the new block must re-declare the inputs that didn't change.** In the nested form, an unchanged input (an old-version snapshot and the meadow step built on it) may be declared only inside the old block. Deleting the old block then deletes its declaration too: the new garden still lists it as a dependency, but nothing defines it any more, and the `load_dag()` parse check above doesn't notice. Copy those unchanged steps, with their own dependencies, into the new block. Then check that every `data://` dependency of the new steps is still declared:
+   ```bash
+   .venv/bin/python -c "
+   from etl.dag_helpers import load_dag
+   dag = load_dag()
+   new = [s for s in dag if '/<namespace>/<new_version>/' in s]
+   print(sorted({d for s in new for d in dag[s] if d.startswith(('data://', 'data-private://')) and d not in dag}))  # must be []
+   "
+   ```
+   (OECD Family Database: only some of the chain's snapshots bumped, and the unchanged inputs were declared only in the old nested block.)
 5. Verify: `rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"` returns nothing, and `rg "<namespace>/<new_version>/<short_name>" dag/ -g "*.yml"` shows the entries only in the main file (under the section comment), not at the bottom.
 6. Run `make check` and commit with `🔨🤖 Remove old <name> entries and reorder DAG`.
 

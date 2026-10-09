@@ -236,6 +236,13 @@ means UNKNOWN, not "nothing references it".
   out to every thin MDim/explorer view that inherits it.
 - Data insights are matched on `grapher-url` (charts) and `narrative-chart` (narrative
   charts) in their front matter; one storing the reference elsewhere is missed.
+- **A data insight that reaches the data through a narrative chart can be missed.** In
+  practice the sweep has not found such an insight even though it showed the dataset's
+  data (the cause is not yet known). Cross-check with a plain content search: take every
+  chart the sweep found, add its old slugs from `chart_slug_redirects`, and search
+  `posts_gdocs.content` for each slug (`WHERE pg.content LIKE '%<slug>%'`). Any gdoc that
+  turns up there and not in the sweep is a missed surface. (OECD Family Database: a data
+  insight was found only this way.)
 - Article sweeps cover what `posts_gdocs_links` recorded — charts nested inside
   layout containers may not produce a row.
 - Public Datasette's `posts_gdocs_links` lags; verify article fixes against the

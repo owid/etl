@@ -1432,6 +1432,8 @@ NOT_SEARCHED = [
     "rather than the DB — invisible here, and it fans out to every thin MDIM/explorer view that "
     "inherits it. Needs a repo grep.",
     "Data insights that record the reference somewhere other than `grapher-url` or `narrative-chart`.",
+    "Some data insights that reach the data through a narrative chart (seen in practice, cause not yet "
+    "known). Cross-check by searching `posts_gdocs.content` for every found chart's current and old slugs.",
     "Charts nested inside article layout containers, which may produce no `posts_gdocs_links` row at all.",
 ]
 
