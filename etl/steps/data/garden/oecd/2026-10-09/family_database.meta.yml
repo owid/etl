@@ -29,13 +29,6 @@ tables:
           Crude divorce rate
           <% endif %>
         unit: per 1,000 people
-        display:
-          name: |-
-            <% if indicator == "marriage_rate" %>
-            Marriage rate
-            <% elif indicator == "divorce_rate" %>
-            Divorce rate
-            <% endif %>
         description_short: |-
           <% if indicator == "marriage_rate" %>
           Number of marriages during a given year per 1,000 people.
@@ -63,13 +56,6 @@ tables:
           Mean age of women at first marriage
           <% endif %>
         unit: years
-        display:
-          name: |-
-            <% if gender == "Male" %>
-            Men
-            <% elif gender == "Female" %>
-            Women
-            <% endif %>
         description_short: <% if indicator == "mean_age_first_marriage" and gender == "Female" %> Average age of women who got married for the first time that year. <% elif indicator == "mean_age_first_marriage" and gender == "Male" %> Average age of men who got married for the first time that year. <% endif %>
         description_from_producer: |-
           The mean age at first marriage, defined as the mean age in years of marrying persons at the time of marriage. This measure is disaggregated by sex with separate averages for men and women.
@@ -88,10 +74,6 @@ tables:
         title: Share of births outside marriage
         unit: "%"
         short_unit: "%"
-        display:
-          name: Births outside marriage
-        description_processing: |-
-          We combine two OECD releases: an older one with data from 1960, and the latest one with data from 2001. When both have a value for the same country and year, we use the latest one.
         description_short: Share of all children born to mothers who were not married at the time of birth.
         description_from_producer: |-
           Births to mothers whose legal marital status at the time of the birth is other than married. This includes births to mothers who are single or who are cohabiting with a partner outside of marriage, births to mothers who are divorced or widowed, and births to mothers who are living with a partner in a "common-law" or "de facto" union (unless their legal marital status at the time of birth is also 'married').
@@ -117,19 +99,6 @@ tables:
           <% endif %>
         unit: "%"
         short_unit: "%"
-        display:
-          name: |-
-            <% if indicator == "Living with two parents" %>
-            Two parents
-            <% elif indicator == "Two married parents" %>
-            Two married parents
-            <% elif indicator == "Two cohabiting parents" %>
-            Two cohabiting parents
-            <% elif indicator == "Living with a single parent" %>
-            Single parent
-            <% elif indicator == "Other" %>
-            Other arrangements
-            <% endif %>
         description_short: |-
           <% if indicator == "Living with two parents" %>
           Percentage of children aged 0-17 living with two parents.

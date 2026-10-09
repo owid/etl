@@ -17,7 +17,7 @@ EXPECTED_CHILDREN_INDICATORS = {
     "Two cohabiting parents",
     "Two married parents",
 }
-# Minimum number of countries with data on births outside marriage (combined historical and current data).
+# Minimum number of countries with data on births outside marriage.
 MIN_COUNTRIES_BIRTHS = 43
 # Value bounds per indicator, checked on the output tables.
 BOUNDS = {
@@ -46,9 +46,7 @@ def run() -> None:
     sanity_check_inputs(tb_marriage_divorce, tb_births_outside_marriage, tb_children_in_families)
 
     # Extract historical data columns
-    tb_garden_oecd_hist = tb_garden_oecd_hist[
-        ["country", "year", "marriage_rate", "divorce_rate", "share_of_births_outside_of_marriage__pct_of_all_births"]
-    ]
+    tb_garden_oecd_hist = tb_garden_oecd_hist[["country", "year", "marriage_rate", "divorce_rate"]]
 
     #
     # Process data.
@@ -112,31 +110,10 @@ def run() -> None:
     # Add gender column
     tb_marriage_combined_long["gender"] = "Both"
 
-    # Process births outside marriage - merge with historical data
-    tb_births_new = tb_births_outside_marriage[["country", "year", "births_outside_marriage"]].copy()
-
-    # Validate historical data has expected column
-    hist_col = "share_of_births_outside_of_marriage__pct_of_all_births"
-    assert hist_col in tb_garden_oecd_hist.columns, f"Historical data missing {hist_col} column"
-
-    # Rename columns to match for cleaner merge
-    tb_births_hist = tb_garden_oecd_hist[["country", "year", hist_col]].copy()
-    tb_births_hist = tb_births_hist.rename(columns={hist_col: "births_outside_marriage"})
-
-    # Merge historical births data with new data
-    tb_births_combined = pr.merge(
-        tb_births_hist,
-        tb_births_new,
-        on=["country", "year"],
-        how="outer",
-        suffixes=("_hist", "_new"),
-    )
-
-    # Use new data where available, otherwise use historical data
-    tb_births_combined["births_outside_marriage"] = tb_births_combined["births_outside_marriage_new"].fillna(
-        tb_births_combined["births_outside_marriage_hist"]
-    )
-    tb_births_combined = tb_births_combined[["country", "year", "births_outside_marriage"]]
+    # Process births outside marriage. The latest file covers all years and countries of the older release,
+    # so no merge with historical data is needed.
+    tb_births_combined = tb_births_outside_marriage[["country", "year", "births_outside_marriage"]].copy()
+    tb_births_combined = paths.apply_corrections(tb_births_combined)
 
     # Keep mean age data from new dataset only (no historical equivalent)
     tb_mean_age = tb_marriage_divorce[tb_marriage_divorce["indicator"] == "mean_age_first_marriage"][

@@ -39,7 +39,7 @@ def run() -> None:
     #
 
     # Get year columns that exist - check both string and integer formats
-    year_cols = get_year_columns(tb)
+    year_cols = get_year_columns(tb, start_year=1960)
 
     cols_to_keep = ["Country"] + year_cols
 
@@ -58,6 +58,7 @@ def run() -> None:
     # Clean the value column - replace placeholders with NaN and convert to numeric
     tb["births_outside_marriage"] = tb["births_outside_marriage"].replace(PLACEHOLDERS, None)
     tb["births_outside_marriage"] = pd.to_numeric(tb["births_outside_marriage"], errors="coerce")
+    tb = tb.dropna(subset=["births_outside_marriage"])
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb["births_outside_marriage"].metadata.origins = [snap.metadata.origin]
