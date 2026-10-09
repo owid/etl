@@ -7,7 +7,7 @@ from copy import deepcopy
 from typing import Any
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from structlog import get_logger
 
 import etl.grapher.model as gm
@@ -34,8 +34,16 @@ def find_charts_from_variable_ids(variable_ids: set[int]) -> list[gm.Chart]:
             .unique()
             .all()
         )
-        # Retrieve charts from a given list of chart IDs
-        charts = session.scalars(select(gm.Chart).where(gm.Chart.id.in_(chart_ids))).all()
+        # Retrieve charts from a given list of chart IDs. `patch_config` is lazy by default
+        # (see the relationship's comment in `gm.Chart`), and callers read it *after* this
+        # session closes, so eager-load it here rather than paying a detached lazy load.
+        charts = (
+            session.scalars(
+                select(gm.Chart).where(gm.Chart.id.in_(chart_ids)).options(selectinload(gm.Chart.patch_config))
+            )
+            .unique()
+            .all()
+        )
 
     # some charts don't have ID in config, fix that here (should be ideally fixed in the database)
     for chart in charts:

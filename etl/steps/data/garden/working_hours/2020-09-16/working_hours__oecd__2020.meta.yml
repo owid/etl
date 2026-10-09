@@ -1,7 +1,7 @@
 dataset:
   title: Working Hours – OECD (2020)
   owners:
-    - Charlie Giattino  # backport
+    - Pablo Arriagada
 tables:
   working_hours__oecd__2020:
     variables:

@@ -16,12 +16,12 @@ meta:
     attribution_short: HMD
     url_main: https://www.mortality.org/Data/STMF
     url_download: https://www.mortality.org/File/GetDocument/Public/STMF/Outputs/stmf.csv
-    date_accessed: '2026-08-24'
-    date_published: '2026-07-27'
+    date_accessed: '2026-10-09'
+    date_published: '2026-09-28'
     license:
       name: Creative Commons BY 4.0
       url: https://www.mortality.org/Data/UserAgreement
 outs:
-  - md5: e839ab21d4439400122d3252f0e2f548
-    size: 22757964
+  - md5: fd8e322ad201dcce5684b9d4616ba0f0
+    size: 22946327
     path: hmd_stmf.csv

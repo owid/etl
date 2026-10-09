@@ -47,7 +47,7 @@ tables:
         description_short: Other refers to any waste-disposal policy or practice that is not listed elsewhere.
       recycling_recommended:
         title: Is recycling a recommended practice for disposal of immunization waste?
-        description_short: "If a recycling programme exists, items can be reused (i.e.: glassware can be given to laboratories, mechanical items given to scrap dealers) or recycled (if facilities are available). Depending on the type of material and its proposed reuse, appropriate treatment, such as cleaning or disinfection, may be needed."
+        description_short: "If a recycling program exists, items can be reused (i.e.: glassware can be given to laboratories, mechanical items given to scrap dealers) or recycled (if facilities are available). Depending on the type of material and its proposed reuse, appropriate treatment, such as cleaning or disinfection, may be needed."
       serious_adverse_events:
         title: Serious adverse events reported
         description_short: "An adverse event from immunization is serious if it results in death, is life-threatening, requires in-patient hospitalization or prolongation of existing hospitalization, results in persistent or significant incapacity, or causes a congenital anomaly/birth defect."

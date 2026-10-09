@@ -2,7 +2,7 @@ meta:
   origin:
     producer: International Monetary Fund
     title: Direction of Trade Statistics
-    title_snapshot: Direction of Trade Statistics - Total merchandise trade as share of GDP
+    title_snapshot: Direction of Trade Statistics – Total merchandise trade as share of GDP
     description_snapshot: |-
       To calculate total merchandise exports as a share of GDP, the DOTS value of merchandise exports was divided by country GDP (in current US$), with the ratio multiplied by 100. GDP data was taken from the World Bank's WDI available at: https://data.worldbank.org/indicator/NY.GDP.MKTP.CD
 

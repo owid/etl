@@ -57,7 +57,7 @@ The first question you have to ask yourself is whether you want to add a new dat
 ## Update charts
 Once you have the data ready in the database, you can now [**update any chart**](update-charts) (or create new ones).
 
-Here, you can also decide whether you want to create or update an Explorer or an MDIM with the new data. This is done with [**export steps**](export-data.md).
+Here, you can also decide whether you want to create or update an Explorer or an MDIM with the new data. This is done with [**viz steps**](export-data.md).
 
 ## Migrate changes
 

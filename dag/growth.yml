@@ -51,7 +51,6 @@ steps:
       - data://garden/working_hours/2025-08-05/huberman_minns
 
     # GDP per capita vs. living conditions indicators
-    # NOTE: Don't forget to run with --private to access the GBD risk factors data
   data://garden/growth/2025-01-16/gdppc_vs_living_conditions:
     - data://garden/worldbank_wdi/2026-07-27/wdi
     - data://garden/un/2024-07-12/un_wpp
@@ -65,7 +64,7 @@ steps:
     - data://garden/unesco/2026-05-12/education_sdgs
     - data://garden/happiness/2026-03-16/happiness
     - data://garden/who/2026-05-22/gho
-    - data://garden/wb/2026-06-26/world_bank_pip
+    - data://garden/wb/2026-09-22/world_bank_pip
     - data://garden/un/2025-05-07/undp_hdr
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions

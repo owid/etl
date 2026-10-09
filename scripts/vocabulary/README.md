@@ -58,7 +58,7 @@ staging server.
 
 ### Choose model
 ```bash
-# Use faster/cheaper model (default: gemini-3-flash-preview)
+# Use faster/cheaper model (default: gemini-3.8-flash)
 .venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --no-upload --model gemini-2.5-flash-lite
 ```
 
@@ -66,7 +66,7 @@ staging server.
 
 - `--topic SLUG` - Topic slug(s) to extract (can be specified multiple times). If not provided, extracts for all topics.
 - `--output PATH` - Output JSON file path (optional, prints to console if not provided)
-- `--model MODEL` - Gemini model to use (default: `gemini-3.7-flash`). Any model id the API accepts works; models missing from `PRICING` just report their cost as unknown.
+- `--model MODEL` - Gemini model to use (default: `gemini-3.8-flash`). Any model id the API accepts works; models missing from `PRICING` just report their cost as unknown.
 - `--upload-path KEY` - Key to write inside the `owid-public` bucket (default: `topic_vocabulary.json`)
 - `--no-upload` - Generate without writing to R2
 - `--report PATH` - Write an HTML coverage report: per term, what it reveals and what it adds, plus the most-viewed charts nothing covers
@@ -214,18 +214,7 @@ The LLM is instructed to:
 
 ## Cost & Performance
 
-**Gemini 3 Flash Preview pricing (as of Feb 2025):**
-- Input: $0.0375 per 1M tokens
-- Output: $0.15 per 1M tokens
-
-**Gemini 2.5 Flash Lite pricing:**
-- Input: $0.015 per 1M tokens
-- Output: $0.06 per 1M tokens
-
-**Example performance:**
-- Single topic: ~2-4 seconds, $0.0001-0.0002
-- Multiple topics: Runs in parallel, ~4-6 seconds total, $0.0003-0.0006
-- All topics (~125): ~10-15 seconds, $0.02-0.05
+Each run ends with a cost estimate, computed from the per-model rates in `PRICING` (`vocabulary.py`). Models missing from it report their cost as unknown.
 
 ## Requirements
 

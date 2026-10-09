@@ -17,5 +17,17 @@
         ]
       }
     ]
+  },
+  "extraKnownMarketplaces": {
+    "owid-skills-private": {
+      "source": {
+        "source": "github",
+        "repo": "owid/skills-private"
+      },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": {
+    "owid-staff@owid-skills-private": true
   }
 }

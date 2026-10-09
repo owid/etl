@@ -13,7 +13,7 @@ meta:
 
       Data are included only for countries reporting data properly coded according to the International Classification of Diseases (ICD). Today the database is maintained by the WHO Division of Data, Analytics and Delivery for Impact (DDI) and contains data from over 120 countries and areas. Data reported by member states and selected areas are displayed in this portal’s interactive visualizations if the data are reported to the WHO mortality database in the requested format and at least 65% of deaths were recorded in each country and year.
     date_published: "2024-02-21"
-    title_snapshot: WHO Mortality Database - Self-inflicted Injuries
+    title_snapshot: WHO Mortality Database – Self-inflicted Injuries
     description_snapshot: |-
       This dataset focuses specifically on mortality from self-inflicted injuries.
 

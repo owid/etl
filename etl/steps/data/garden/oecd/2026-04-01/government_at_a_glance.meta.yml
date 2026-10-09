@@ -122,7 +122,7 @@ definitions:
 
   key_government_investment: General government investment mainly includes gross fixed capital formation, which is infrastructure for transport, office buildings, housing, schools and hospitals. It also includes expenditures in research and development.
 
-  key_government_net_interest_spending: Net interest spending is the difference between interest payments and interest receipts on general government debt. It is an inflexible part of public budgeting and has to be honoured to guarantee access to international financial markets and multilateral funds.
+  key_government_net_interest_spending: Net interest spending is the difference between interest payments and interest receipts on general government debt. It is an inflexible part of public budgeting and has to be honored to guarantee access to international financial markets and multilateral funds.
 
   key_government_primary_balance: The primary balance is the difference between revenues and expenditures, excluding interest payments. It is a measure of the government's capacity to meet its obligations without borrowing.
 
@@ -266,7 +266,7 @@ definitions:
     whenever available/applicable in the financial balance
     sheet of the general government sector: currency and
     deposits, debt securities, loans, and other liabilities
-    (i.e. insurance, pension and standardised guarantee
+    (i.e. insurance, pension and standardized guarantee
     schemes, other accounts payable and, in some cases,
     special drawing rights). According to the SNA, most
     debt instruments are valued at market prices, when

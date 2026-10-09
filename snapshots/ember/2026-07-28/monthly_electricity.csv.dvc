@@ -5,7 +5,7 @@ meta:
     description: |-
       Monthly electricity generation, emissions and demand data for a wide range of countries and regions. You can find more about Ember's methodology in [this document](https://files.ember-energy.org/public-downloads/ember_electricity_data_methodology.pdf).
     citation_full: |-
-      Ember - Monthly Electricity Data (2026).
+      Ember – Monthly Electricity Data (2026).
 
       The data is collected from multi-country datasets (EIA, Eurostat, Energy Institute) as well as national sources (e.g China data from the National Bureau of Statistics).
     attribution_short: Ember

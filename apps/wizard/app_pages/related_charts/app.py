@@ -11,9 +11,7 @@ from apps.wizard.app_pages.related_charts import data, scoring
 from apps.wizard.utils import embeddings as emb
 from apps.wizard.utils.components import (
     st_cache_data,
-    st_horizontal,
     st_multiselect_wider,
-    st_title_with_expert,
     url_persist,
 )
 from etl import paths
@@ -208,12 +206,12 @@ top_100_charts = sorted(charts, key=lambda x: x.views_365d, reverse=True)[:100] 
 # SIDEBAR / SEARCH
 ########################################################################################################################
 
-st_title_with_expert("Related charts", icon=":material/search:")
+st.title(":material/search: Related charts")
 
 col1, col2 = st.columns(2)
 with col2:
     st_multiselect_wider()
-    with st_horizontal():
+    with st.container(horizontal=True):
         random_chart = st.button("Random chart", help="Pick a random chart, weighted by views.")
         random_100_chart = st.button("Random top 100 chart", help="Pick a random chart from the top 100 charts.")
 
@@ -318,11 +316,11 @@ def show_section_related_charts(df: pd.DataFrame, n: int) -> None:
     st_related_charts_table(df, n=n)
 
 
-def show_section_other_providers(df: pd.DataFrame, n: int) -> None:
+def show_section_other_producers(df: pd.DataFrame, n: int) -> None:
     st.markdown("---")
-    st.header("Other providers")
+    st.header("Other producers")
     st.markdown(
-        "Identifying other providers is a hard problem. Here we show charts with **very similar titles**."
+        "Identifying other producers is a hard problem. Here we show charts with **very similar titles**."
         "More precise identification would require GPT or deeper data relationships."
     )
 
@@ -348,5 +346,5 @@ def show_section_explore_included_data(df: pd.DataFrame, n: int) -> None:
 reset_df = charts_df.reset_index()
 show_section_others_viewed(reset_df, nr_recommendations)
 show_section_related_charts(reset_df, nr_recommendations)
-show_section_other_providers(reset_df, nr_recommendations)
+show_section_other_producers(reset_df, nr_recommendations)
 show_section_explore_included_data(reset_df, nr_recommendations)

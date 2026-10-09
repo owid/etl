@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical polio deaths in the United States - Public Health Reports
+    title: Historical polio deaths in the United States – Public Health Reports
     description: |-
       Data on historical polio deaths in the United States, compiled from a selection of sources from the United States - Public Health Reports.
 
@@ -42,13 +42,13 @@ meta:
 
       Public Health Reports Vol. 55, No. 10 “Notifiable Diseases in the United States, 1938: Morbidity and Mortality Summaries for Certain Important Communicable Diseases"
 
-      Public Health Reports, Vol. 56, No. 7 - Notifiable Diseases in the United States, 1939: Morbidity and Mortality Summaries for Certain Important Communicable Diseases (1941)
+      Public Health Reports, Vol. 56, No. 7 – Notifiable Diseases in the United States, 1939: Morbidity and Mortality Summaries for Certain Important Communicable Diseases (1941)
 
-      Public Health Reports, Vol. 57, No. 7 - Notifiable Diseases in the United States, 1940: Morbidity and Mortality Summaries for Certain Important Communicable Diseases (1942)
+      Public Health Reports, Vol. 57, No. 7 – Notifiable Diseases in the United States, 1940: Morbidity and Mortality Summaries for Certain Important Communicable Diseases (1942)
 
-      Public Health Reports Vol. 63, No. 13 - Incidence of Poliomyelitis in 1947
+      Public Health Reports Vol. 63, No. 13 – Incidence of Poliomyelitis in 1947
 
-      Public Health Reports Vol. 67, No. 6 - Poliomyelitis in the United States, 1951
+      Public Health Reports Vol. 67, No. 6 – Poliomyelitis in the United States, 1951
 
     # Files
     url_main: https://www.jstor.org/stable/4588131

@@ -2,7 +2,7 @@ meta:
   origin:
     producer: UNEP-WCMC and IUCN
     title: World Database on Protected Areas
-    title_snapshot: World Database on Protected Areas - Marine protected areas
+    title_snapshot: World Database on Protected Areas – Marine protected areas
     citation_full: 'UNEP-WCMC and IUCN (2021). Protected Planet: The World Database on Protected Areas (WDPA) and World Database on Other Effective Area-based Conservation Measures (WD-OECM) [Online], September 2021, Cambridge, UK: UNEP-WCMC and IUCN.'
     attribution_short: WDPA
     url_main: https://www.protectedplanet.net/

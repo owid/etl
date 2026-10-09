@@ -7,7 +7,6 @@ import click
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from owid.datautils.io import df_to_file
 
 from etl.snapshot import Snapshot
 
@@ -26,9 +25,8 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"who/{SNAPSHOT_VERSION}/guinea_worm.csv")
     df = get_certification_table()
-    df_to_file(df, file_path=snap.path)
     # Add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
+    snap.create_snapshot(data=df, upload=upload)
 
 
 def get_certification_table() -> pd.DataFrame:

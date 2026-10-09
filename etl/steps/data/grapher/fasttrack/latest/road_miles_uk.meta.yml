@@ -14,4 +14,4 @@ tables:
         short_unit: p-km
         display:
           conversionFactor: 1000000000
-        description: The number of passenger kilometers travelled on the roads in cars, vans, buses and motorcycles.
+        description: The number of passenger kilometers traveled on the roads in cars, vans, buses and motorcycles.

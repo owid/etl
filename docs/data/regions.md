@@ -21,7 +21,7 @@ Tables contained in the `regions` dataset:
         * `country`: Country (e.g. 'France'). The official status of a region may be unclear in some cases, but we tend to include as many countries as possible.
         * `continent`: Inhabited continent (namely 'Africa', 'Asia', 'Europe', 'North America', 'Oceania', and 'South America').
         * `aggregate`: Region that is not a country and includes other countries (e.g. 'Channel Islands', 'European Union (27)', 'Melanesia', 'Polynesia', 'World').
-        * `other`: Regions that may not be considered countries by certain data providers, or that have a custom definition (like 'Serbia excluding Kosovo') and that are not aggregates of other countries.
+        * `other`: Regions that may not be considered countries by certain data producers, or that have a custom definition (like 'Serbia excluding Kosovo') and that are not aggregates of other countries.
     * `is_historical`: True if the region does not exist anymore, and False otherwise.
     * `defined_by`: Institution that contained the region in a dataset. For example, if a region `North America (BP)` is added to the `regions` dataset, `defined_by` would be `bp` (the namespace that dataset belongs to).
 * `legacy_codes`: Legacy codes. Columns:
@@ -41,7 +41,7 @@ Tables contained in the `regions` dataset:
 * `members`: Region members (roughly, sub-regions that would need to be added up when aggregating data for the region). Columns:
     * `member`: Region member. For example, region `Africa` contains one row for each region in Africa (including historical regions).
 * `related`: Other possible region members to be aware of. This includes regions with an unclear official status that may be
-  members of another region according to some data providers, but not according to others. Columns:
+  members of another region according to some data producers, but not according to others. Columns:
     * `member`: Related region (e.g. an overseas territory).
 * `transitions`: Historical transitions between regions. Columns:
     * `end_year`: Last year the historical region existed.

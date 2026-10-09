@@ -29,12 +29,28 @@ steps:
     - data://garden/biodiversity/2024-09-30/living_planet_index_completeness:
         - snapshot://biodiversity/2024-09-30/living_planet_index_completeness.csv
 
+  # Living Planet Index (2026 release).
+  data://grapher/biodiversity/2026-09-30/living_planet_index:
+    - data://garden/biodiversity/2026-09-30/living_planet_index:
+        - data://meadow/biodiversity/2026-09-30/living_planet_index:
+            - snapshot://biodiversity/2026-09-30/living_planet_index.csv
+
+  # LPI - Share of populations increasing or decreasing (2026 release)
+  data://grapher/biodiversity/2026-09-30/living_planet_index_share:
+    - data://garden/biodiversity/2026-09-30/living_planet_index_share:
+        - snapshot://biodiversity/2026-09-30/living_planet_index_share.csv
+
+  # LPI - Completeness: species included in the index (2026 release)
+  data://grapher/biodiversity/2026-09-30/living_planet_index_completeness:
+    - data://garden/biodiversity/2026-09-30/living_planet_index_completeness:
+        - snapshot://biodiversity/2026-09-30/living_planet_index_completeness.csv
+
   #
 
   #
   # Habitat loss
   #
-  export://explorers/biodiversity/latest/habitat_loss:
+  viz://explorer/biodiversity/latest/habitat_loss:
     - data://grapher/biodiversity/2021-01-01/habitat_loss:
         - data://garden/biodiversity/2021-01-01/habitat_loss:
             - snapshot://biodiversity/2021-01-01/habitat_loss.feather
@@ -67,7 +83,7 @@ steps:
   #
   # Fish stocks explorer.
   #
-  export://explorers/biodiversity/latest/fish_stocks:
+  viz://explorer/biodiversity/latest/fish_stocks:
     #
     # Fish stocks (RAM Legacy).
     #

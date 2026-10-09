@@ -3,11 +3,11 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: StatFin - Income distribution statistics
+    title: StatFin – Income distribution statistics
     description: |-
       Income distribution statistics describe distribution of households' annual income, income differentials and low income between population groups. Statistics describe disposable income and its formation taking into account taxation and income transfers. Data are published once a year.
     date_published: "2023-12-19"
-    title_snapshot: StatFin - Income distribution statistics - 11x3 -- Gini coefficients and other income inequality measures
+    title_snapshot: StatFin – Income distribution statistics – 11x3 -- Gini coefficients and other income inequality measures
     description_snapshot: |-
       The Gini index takes a value of 0 if everyone receives the same amount of income, and a value of 100 if one income recipient receives all the income. The higher the Gini coefficient, the greater the income disparities.
 
@@ -16,7 +16,7 @@ meta:
     # Citation
     producer: Statistics Finland
     citation_full: |-
-      Statistics Finland (2023), Income distribution statistics - 11x3 -- Gini coefficients and other income inequality measures.
+      Statistics Finland (2023), Income distribution statistics – 11x3 -- Gini coefficients and other income inequality measures.
 
     # Files
     url_main: https://pxdata.stat.fi/PxWeb/pxweb/en/StatFin/StatFin__tjt/statfin_tjt_pxt_11x3.px

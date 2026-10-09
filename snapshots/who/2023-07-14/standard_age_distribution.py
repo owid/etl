@@ -4,7 +4,6 @@ from pathlib import Path
 
 import click
 import pandas as pd
-from owid.datautils.io import df_to_file
 
 from etl.snapshot import Snapshot
 
@@ -52,10 +51,8 @@ def main(upload: bool) -> None:
             ],
         }
     )
-    df_to_file(df, file_path=snap.path)
-
-    # Add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
+    # Save data, add file to DVC and upload to S3.
+    snap.create_snapshot(data=df, upload=upload)
 
 
 if __name__ == "__main__":

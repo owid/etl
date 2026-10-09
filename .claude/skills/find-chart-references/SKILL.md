@@ -13,6 +13,7 @@ description: >-
   update-dataset).
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Find what references a chart, indicator, MDIM, or explorer
@@ -110,12 +111,7 @@ Indicator subjects are labelled with the indicator's name (not a bare variable i
 cells are truncated and pipe-escaped so the tables can't break, and drafts are marked
 ⚠️. For spreadsheet work use `--csv`, which carries the untruncated values.
 
-Optional surfaces fail open (an absent legacy table, a subject that does not
-resolve): the run keeps going and prints `COVERAGE GAP: ...` for each, then repeats
-them all at the end. **Read that block before reporting a result** — those surfaces
-were not swept, so an empty answer for them means UNKNOWN, not "nothing references
-it". `--gaps-json <path>` writes the same list as JSON, which is how a wrapper
-carries them into its own report instead of leaving them in stdout.
+Surfaces the run could not sweep are printed as `COVERAGE GAP: ...` (see Known gaps).
 
 ## Surface catalog
 
@@ -130,7 +126,7 @@ references written before a rename point at the old one):
 | articles | `posts_gdocs_links` (`grapher`, `guided-chart`) + `linkType='url'` scan | `embed` or `link` by `componentType` |
 | explorers | `explorer_charts` (by chart id) | `embed` |
 | narrative charts | `narrative_charts.parentChartId` | `link` (renders its own config) |
-| ↳ its placements | `posts_gdocs_links` where `linkType='narrative-chart'`, `target` = the name | `embed`, surface `gdoc (narrative chart)` |
+| ↳ its placements | `posts_gdocs_links` where `linkType='narrative-chart'`, `target` = the name; plus data insights whose front matter names it (`posts_gdocs.content->>'$."narrative-chart"'`), which write no link row | `embed`, surface `gdoc (narrative chart)` |
 | data insights | `posts_gdocs.content->>'$."grapher-url"'` | `embed` |
 | static viz | `static_viz.grapherSlug` | `embed` |
 | key charts | `chart_tags` where `keyChartLevel > 0` | `render` |
@@ -143,9 +139,8 @@ The placement rows carry the narrative chart as `subject` (not the chart that re
 **A featured metric is the one `render` surface a redirect does not rescue.** Like a key chart
 it is a topic-page slot in no reference table — but held by **URL**, and resolved only when
 Algolia indexes, matching pathname *and* the exact query-param map against *published* records.
-So retiring what it names empties the slot silently, and re-adding the old URL is then refused
-(creating a row validates that the slug resolves to something published). It must be swapped by
-hand, before the migration — see `docs/guides/data-work/redirect-to-mdims.md`.
+So retiring what it names empties the slot silently. It must be swapped by hand, before the
+migration (see the featured-metric note under "Notes for skills that consume this").
 
 Matching is on **pathname alone**, deliberately: for an MDIM or explorer the row's query string
 *is* the view, so a params-equal test would hide the rows a migration most needs to see — those
@@ -211,16 +206,18 @@ that's the point of the split.
 
 ## Known gaps
 
-State these when reporting; silence reads as full coverage. `--markdown` now ends with
+State these when reporting; silence reads as full coverage. `--markdown` ends with
 a **Not searched** section carrying this list plus the limits of that particular run
 (no `--transitive` hop, excluded 'All charts' entries) — keep the two in step, and
 still state them yourself when you report on a `--json`/`--csv` run.
 
 Optional surfaces **fail open**: an absent legacy table or a subject that does not
-resolve prints `COVERAGE GAP: …`, is repeated at the end of the run, leads the
-report's **Not searched** section, and is available as JSON via `--gaps-json <path>`
-for a wrapper that builds its own report. An empty answer for one of those surfaces
-means UNKNOWN, not "nothing references it".
+resolve prints `COVERAGE GAP: …` while the run keeps going, is repeated at the end of
+the run, leads the report's **Not searched** section, and is available as JSON via
+`--gaps-json <path>` for a wrapper that carries them into its own report instead of
+leaving them in stdout. **Read that block before reporting a result** — those surfaces
+were not swept, so an empty answer for one of them means UNKNOWN, not "nothing
+references it".
 
 - Non-ETL explorers whose config lives in the `explorers` TSV are not parsed.
 - **Legacy CSV-backed explorers** (`data://explorers/...` wide tables — e.g. the
@@ -228,13 +225,15 @@ means UNKNOWN, not "nothing references it".
   explorer TSV, outside grapher configs. Report them as a coverage caveat rather
   than letting them pass silently.
 - `linkType='url'` rows pointing at `archive.ourworldindata.org` are dropped as
-  frozen by design. As of 2026-07 every url-typed grapher row was an archive
-  snapshot — don't bet an audit on that classification continuing to hold.
+  frozen by design. Url-typed grapher rows have tended to be archive snapshots —
+  don't bet an audit on that classification holding.
 - Indicator-level `presentation.grapher_config` lives in garden/grapher
   `.meta.yml`, not the DB. It is invisible here and needs a repo grep, and it fans
   out to every thin MDim/explorer view that inherits it.
-- Data insights are matched on `grapher-url`; one storing the reference elsewhere
-  is missed.
+- Data insights are matched on `grapher-url` (charts) and `narrative-chart` (narrative
+  charts) in their front matter; one storing the reference elsewhere is missed.
+- A data insight's `narrative-chart` front matter may hold the admin edit URL instead of the
+  name; the sweep maps the URL's id to the name. Other forms are missed.
 - Article sweeps cover what `posts_gdocs_links` recorded — charts nested inside
   layout containers may not produce a row.
 - Public Datasette's `posts_gdocs_links` lags; verify article fixes against the
@@ -262,14 +261,13 @@ means UNKNOWN, not "nothing references it".
   only path — there is no click-path to it at all.
 - **A chart redirect's `target_query_param` merges with the incoming query key by key,
   the incoming side winning per key.** A reference's params cost the reader exactly the
-  stored keys they collide with. Verified on production 2026-08-14 with a distinguishing
-  pair — `global-forestry-area-1958-2014` → `forest-area-km?tab=line` sends a bare
+  stored keys they collide with. On production, for example,
+  `global-forestry-area-1958-2014` → `forest-area-km?tab=line` sends a bare
   `?country=~FRA` on to `?tab=line&country=%7EFRA` (stored `tab=line` SURVIVES), and
   `?tab=map&country=~FRA` on to `?tab=map&country=%7EFRA` (incoming `tab` wins). A test
-  whose query sets every stored key cannot tell merge from wholesale replacement — an
-  earlier version of this note concluded "wholesale" from exactly that. Staging's serving
+  whose query sets every stored key cannot tell merge from wholesale replacement. Staging's serving
   layer and a fresh row's first-week static 302 both behave differently (stored query wins,
-  visitor params dropped — both verified live 2026-08-14). Do not generalize from
+  visitor params dropped). Do not generalize from
   `functions/_common/redirectTools.ts`: its *explorer* path also merges per key but with
   the TARGET winning — the opposite winner, and a different code path.
   MDIM dimension collisions are the same question — compare each reference's

@@ -64,7 +64,7 @@ from etl.config import OWID_ENV  # ty: ignore
 S3_BUCKET_NAME = "owid-public"
 DEFAULT_S3_VOCABULARY_PATH = "topic_vocabulary.json"
 
-DEFAULT_MODEL = "gemini-3.7-flash"
+DEFAULT_MODEL = "gemini-3.8-flash"
 
 # Ask for the same candidates every time. Left at the model's defaults, two runs
 # of identical code disagreed on almost every topic — Gender Ratio came back
@@ -72,7 +72,12 @@ DEFAULT_MODEL = "gemini-3.7-flash"
 # prompt improvement indistinguishable from luck, and this prompt has been
 # iterated on a lot. Deterministic sampling doesn't make the candidates better,
 # it makes a change in them attributable.
-LLM_SAMPLING = {"temperature": 0.0, "seed": 1}
+#
+# The seed alone does this. Gemini has ignored `temperature` since 3.6 Flash and
+# upcoming models reject it (as they will `top_p` and `top_k`), so don't add it
+# back: on gemini-3.8-flash, repeated calls with this seed return identical text,
+# with or without temperature 0.
+LLM_SAMPLING = {"seed": 1}
 
 # A whole-vocabulary run fires one request per topic at once, which draws the
 # occasional 503/429 out of the API. Those are transient, but a topic that
@@ -99,7 +104,8 @@ DEFAULT_MIN_MARGINAL_SHARE = 0.01
 # a couple of cents either way).
 PRICING = {
     "gemini-2.5-flash-lite": {"input": 0.015, "output": 0.06},
-    "gemini-3-flash-preview": {"input": 0.0375, "output": 0.15},
+    # Doubles to 1.50 / 7.50 on 2027-01-01.
+    "gemini-3.8-flash": {"input": 0.75, "output": 3.75},
 }
 
 

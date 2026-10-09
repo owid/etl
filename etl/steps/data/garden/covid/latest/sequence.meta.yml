@@ -26,7 +26,7 @@ tables:
           <% if variant == 'non_who' %>
           Number of analyzed sequences in the preceding two weeks that correspond to non-relevant variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
           <% elif variant == 'other' %>
-          Number of analyzed sequences in the preceding two weeks that correspond to non-categorised variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
+          Number of analyzed sequences in the preceding two weeks that correspond to non-categorized variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
           <% else %>
           Number of analyzed sequences in the preceding two weeks that correspond to variant group '<< variant >>'. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
           <%- endif -%>
@@ -48,7 +48,7 @@ tables:
           <% if variant == 'non_who' %>
           Share of analyzed sequences in the preceding two weeks that correspond to non-relevant variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
           <% elif variant == 'other' %>
-          Share of analyzed sequences in the preceding two weeks that correspond to non-categorised variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
+          Share of analyzed sequences in the preceding two weeks that correspond to non-categorized variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
           <% else %>
           Share of analyzed sequences in the preceding two weeks that correspond to variant group '<< variant >>'. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
           <%- endif -%>

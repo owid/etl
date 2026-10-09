@@ -259,19 +259,19 @@ tables:
           numDecimalPlaces: 1
       c_cdr:
         title: Case detection rate (all forms)
-        description_short: Number of new and relapse [tuberculosis](#dod:tuberculosis) cases diagnosed and treated in national TB control  programmes and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
+        description_short: Number of new and relapse [tuberculosis](#dod:tuberculosis) cases diagnosed and treated in national TB control  programs and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
         unit: "%"
         display:
           numDecimalPlaces: 1
       c_cdr_lo:
         title: Case detection rate (all forms; low bound)
-        description_short: Number of new and relapse [tuberculosis](#dod:tuberculosis) cases diagnosed and treated in national TB control  programmes and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
+        description_short: Number of new and relapse [tuberculosis](#dod:tuberculosis) cases diagnosed and treated in national TB control  programs and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
         unit: "%"
         display:
           numDecimalPlaces: 1
       c_cdr_hi:
         title: Case detection rate (all forms; high bound)
-        description_short: Number of new and relapse [tuberculosis](#dod:tuberculosis) cases diagnosed and treated in national TB control  programmes and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
+        description_short: Number of new and relapse [tuberculosis](#dod:tuberculosis) cases diagnosed and treated in national TB control  programs and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
         unit: "%"
         display:
           numDecimalPlaces: 1

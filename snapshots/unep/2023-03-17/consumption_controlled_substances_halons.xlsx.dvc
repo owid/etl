@@ -6,7 +6,7 @@ meta:
       Data reported by Parties to the Montreal Protocol on the consumption of controlled substances, compiled by the UN Environment Programme Ozone Secretariat.
 
       Negative values for a given year imply that quantities destroyed or quantities exported for the year exceeded the sum of production and imports, implying that the destroyed or exported quantities came from stockpiles.
-    title_snapshot: Consumption of controlled substances - Halons
+    title_snapshot: Consumption of controlled substances – Halons
     description_snapshot: |-
       Consumption of halons, reported by country and year over the period 1986-2022.
     citation_full: UN Environment Programme Ozone Secretariat (2023). Data on consumption of controlled substances. https://ozone.unep.org/countries/data-table.

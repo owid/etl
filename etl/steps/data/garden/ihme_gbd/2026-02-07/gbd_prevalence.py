@@ -19,7 +19,7 @@ AGE_GROUPS_RANGES = {
 }
 
 # Use this to process subset of data. Set list of causes separated by comma. For example:
-# SUBSET='Zika virus' etlr ihme_gbd/2024-05-20/gbd_prevalence --private --grapher
+# SUBSET='Zika virus' etlr ihme_gbd/2024-05-20/gbd_prevalence --grapher
 # This command will upsert only data for Zika virus to MySQL.
 SUBSET = os.environ.get("SUBSET")
 

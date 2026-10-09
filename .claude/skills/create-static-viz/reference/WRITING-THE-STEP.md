@@ -1,4 +1,4 @@
-# Step 4 — Write the `export://static_viz` step
+# Step 4 — Write the `viz://static` step
 
 > Read at Step 4, once you know which chart you are building.  Part of [`/create-static-viz`](../SKILL.md); the spine has the step order.
 
@@ -17,9 +17,9 @@
 > not your current directory, so confirm where you are before editing and again before committing:
 > `git branch --show-current`.
 
-Path `etl/steps/export/static_viz/<namespace>/<version>/<short_name>.py`, DAG entry in
+Path `etl/steps/viz/static/<namespace>/<version>/<short_name>.py`, DAG entry in
 `dag/static_viz.yml` (a flat `steps:` map, one comment line per step, keyed by the full
-`export://` URI with its garden/grapher deps as the value).
+`viz://static/...` URI with its garden/grapher deps as the value).
 
 ### The Figma handoff contract
 
@@ -71,6 +71,133 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
 - Emit both formats; `paths.export_fig` writes into the step's own directory, so **the PNG and SVG
   are committed next to the `.py`** — for every frame the step emits.
 
+### A dashed line has to be resampled, or Figma renders its dash unevenly
+
+The one part of the handoff `verify_static_viz.py` cannot see, because the SVG is correct and it is
+Figma that reads it differently. **Figma fits a whole number of dash repetitions into each segment of
+a path individually**, so the dash length a reader sees is set by the vertex spacing rather than by
+the dash you asked for. Matplotlib dashes continuously along a path and does not care, so the PNG
+looks right and only the placed frame is wrong.
+
+Path simplification makes a curve the worst case: it keeps vertices where curvature is high and drops
+them where the line is straight, so one end of a curve collapses into dots while the other runs as
+long dashes. Measured in Figma: 6.7px spacing renders as dots, 13px as over-long dashes, >=50px as
+specified.
+
+So resample any dashed line by arc length, one dash period per segment. `who/2026-08-07/height_for_age.py`
+carries the worked version -- `resample_for_even_dashes` plus an `even_dashes(fig, period_pt)` pass that
+finds the lines by gid. Three things it has to get right, each of which is a silent wrong answer:
+
+- run it **after** `subplots_adjust`, or the axes are still at their default size and you measure the
+  wrong page;
+- convert the period to display pixels with **`fig.dpi`**, not with a template-pixel constant -- these
+  figures lay out at 100 template px per inch but render at 200 dpi, so the constant puts half a
+  period in each segment and changes nothing visible in the numbers you are checking;
+- switch path simplification off on the resampled line, or matplotlib drops the vertices you placed.
+
+Also worth knowing when you pick the pattern: matplotlib **multiplies a dash sequence by the line
+width** (`rcParams["lines.scale_dashes"]`), so `(5, 3)` on a 1.4pt line draws a 7pt dash -- five times
+the stroke width, which reads as stretched at any size. Write the pattern in multiples of the width
+and say so, or check the emitted `stroke-dasharray` against what you intended.
+
+### Measure in the font you draw in, and set the style before the first measurement
+
+`FontProperties()` with no family resolves `font.family`/`font.sans-serif` — and seaborn's `set_style`
+rewrites that list to an Arial-first one. So a step that calls `set_style` inside its build function,
+after the title and subtitle have been wrapped, measures matplotlib's **DejaVu** default and then draws
+**Arial**. The two are ~15% apart, which is far more than any slot allowance and points the wrong way:
+strings look wider than they will be set, so a slot that fits is wrapped early and the fix looks like
+"the allowance should be 1.0".
+
+Name **two** stacks, because two different things read them, and they want different answers:
+
+```python
+# Lands in the SVG's `font-family`, verbatim: matplotlib copies the rcParam out rather than writing
+# the font it resolved. Naming Lato first is a request to whoever OPENS the file.
+EMITTED_FONT_STACK = ["Lato", "Arial", "Helvetica", "sans-serif"]
+# What this step measures and draws with. Deliberately does NOT name Lato, which is not installed on
+# our machines, so it is not a font this step could measure in — only one it can ask for.
+MEASURED_FONT_STACK = ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans", "sans-serif"]
+
+matplotlib.rcParams["font.family"] = "sans-serif"
+matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
+# Drop the per-face misses for faces you deliberately list as alternatives, and NOTHING else.
+_OPTIONAL_FACES = tuple({*EMITTED_FONT_STACK, *MEASURED_FONT_STACK})
+logging.getLogger("matplotlib.font_manager").addFilter(
+    lambda record: "Falling back" in record.getMessage()
+    or not any(f"Font family '{face}' not found" in record.getMessage() for face in _OPTIONAL_FACES)
+)
+```
+
+**`font_manager` has two warning sites, and only one of them is reachable from a `findfont()` probe.**
+This matters because probing the wrong one leads to both available wrong answers:
+
+| Site | Message | Fires when |
+|---|---|---|
+| `_findfont_cached` | `... not found. Falling back to DejaVu Sans.` | a family list resolves to **nothing**, via `findfont()` |
+| `_find_fonts_by_props` | `Font family 'X' not found.` | text is **drawn** with an explicit family list — once per missing face, even when a later face answers |
+
+Measured on macOS (matplotlib 3.10.9, Lato absent, Arial installed): `findfont()` on either stack
+emits **zero** warnings, and rendering with the rcParams stack emits zero as well — but rendering text
+through `FontProperties(family=MEASURED_FONT_STACK)`, which is what a step's own measurements do,
+emits one per missing face. A single step run can produce hundreds of them, for example for
+`Liberation Sans` — a face that earns its place, being the metric-compatible Arial substitute on Linux
+and absent on a Mac. So the noise is real; a blanket `setLevel(logging.ERROR)` is still wrong, because
+it takes `Falling back to DejaVu Sans` with it, and that one says a stack failed and every measurement
+just moved ~15% against what gets drawn.
+
+**Then assert the invariant, because no filter can protect it.** Silence a declared face and you have
+also silenced the case where *every* face of a stack is declared and missing; and Lato-first has its
+own trap — a machine that HAS Lato installed draws Lato while the measured stack still resolves Arial,
+and nothing warns at all. What the allowances actually depend on is one line:
+
+```python
+_DRAWN_FACE, _MEASURED_FACE = (
+    findfont(FontProperties(family=EMITTED_FONT_STACK)),
+    findfont(FontProperties(family=MEASURED_FONT_STACK)),
+)
+assert _DRAWN_FACE == _MEASURED_FACE, f"draws {Path(_DRAWN_FACE).name}, measures {Path(_MEASURED_FACE).name}"
+```
+
+It passes on a Mac without Lato (Arial/Arial) and on a Linux box with neither Arial nor Lato
+(DejaVu/DejaVu — different face, still self-consistent), and fails loudly on the two drifting machines
+above. Prefer it to reading logs: a warning nobody reads is not a check.
+
+Pass the measured stack to every measurement, so measuring and drawing cannot drift whatever a
+machine has installed:
+
+```python
+prop = FontProperties(family=MEASURED_FONT_STACK, size=fontsize, weight="bold" if bold else "normal")
+```
+
+**Set the emitted stack again after seaborn**, inside the build function — `set_style` REPLACES
+`font.sans-serif` with its own list, so the module-level assignment above is overwritten and the step
+emits a stack it never chose (seaborn's `'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera
+Sans'`):
+
+```python
+sns.set_style("ticks")
+sns.set_palette("deep")
+matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
+```
+
+Naming Lato first costs nothing and buys a lot downstream: **Figma renders the import in the
+template's own typeface on arrival**, so the parked reference copy looks like the deliverable, and
+`/owid-staff:create-figma-chart`'s font pass — plus the anchor pass that exists only to undo that face change —
+becomes a no-op. Without it Figma resolves none of `Arial, Helvetica, DejaVu Sans` and substitutes
+**Inter**, which is wider — enough for an 850-wide chart to overrun its canvas by tens of px. Verify it rather
+than assuming — the emitted stack is one grep, and the faces the import lands in are one read:
+
+```bash
+grep -o "font-family: [^;\"]*" <file>.svg | sort -u   # want 'Lato' first
+```
+
+Changing the stack must not move anything: the drawn font is unchanged, so the SVG should differ from
+its predecessor **only** in `font-family`, and the PNG not at all.
+
+Then check which font `findfont` actually returned before trusting the per-face allowances in
+[TEMPLATES.md](../TEMPLATES.md) — they are per installed font.
+
 ### Style, and where it stops
 
 - **seaborn** `set_style("ticks")` + `set_palette("deep")`, and reference colors by **palette
@@ -111,7 +238,7 @@ outermost ticks** (`set_xlim(first_tick, last_tick)`) so those two marks sit at 
 and close it. Leave the y-axis lineless either way.
 
 **Check the source claim against a rendered SVG before you build on it.** Grepping for a component
-that doesn't exist is weak evidence about what the chart *looks like*: it told me grapher draws no
+that doesn't exist is weak evidence about what the chart *looks like*: it suggests grapher draws no
 axis line, when in fact every zero-crossing chart appears to have one. One fetch settles it —
 `curl` a grapher SVG and read the `horizontal-axis` group, which lists exactly `tick-marks` and
 `tick-labels` and nothing else:
@@ -136,7 +263,7 @@ ax.yaxis.get_gridlines()[0].set_visible(False)   # the baseline already draws th
 
 **A grapher-style axis costs vertical space in two places, and both reserves have to grow.** Tick marks
 with a length push the tick labels and the axis label down — enough to overrun a reserve that fitted
-when the ticks were zero-length, which put the axis label's descenders into the note. And facet titles
+when the ticks were zero-length, which can put the axis label's descenders into the note. And facet titles
 above the plot need `font size + 0.5 line` of their own, taken off the top of the plot rather than out
 of the frame. Re-measure both reserves after adding either.
 
@@ -147,8 +274,7 @@ the value is one the note mentions.
 
 **The x range and the label anchoring interact — set the range first.** Anchoring the first tick label
 left will collide with its neighbor while the range still carries padding, because padding compresses
-the left end; pinned to the ticks, the same anchoring has room (measured: 6.7px clear on desktop,
-25px on mobile). So when an anchor "doesn't fit", re-check it after any range change instead of
+the left end; pinned to the ticks, the same anchoring has room. So when an anchor "doesn't fit", re-check it after any range change instead of
 concluding it can't be done — and measure the gap rather than eyeballing the render.
 
 - **Nested bands get precomputed flat tints, not alpha.** One `BAND_ALPHA` deepening where the bands
@@ -163,7 +289,7 @@ concluding it can't be done — and measure the gap rather than eyeballing the r
       return tuple(c + (1.0 - c) * weight for c in to_rgb(color))
   ```
   If a key does show swatches, they must carry the **same** tints in the **same** order, or it reads
-  inside out against the chart. (With alpha the equivalent trap was a swatch showing the per-band
+  inside out against the chart. (With alpha the equivalent trap is a swatch showing the per-band
   alpha rather than the cumulative `1-(1-a)**(i+1)`.)
 - Reference lines labeled *on the plot* get a **bold title above a regular-weight value** via
   `AnnotationBbox` / `TextArea` / `VPacker`. Where an encoding diagram already names the line, label
@@ -180,7 +306,7 @@ belongs to; an exemplar shows the structure directly, in the order it appears.
 **Shape the miniature like the chart, not like a swatch.** A flat slab still asks the reader to map a
 rectangle onto a rising ribbon; a miniature that curves the way the real marks curve is recognised
 without that step. Draw it as a **schematic, not a data slice** — at the real proportions the marks
-are a few pixels apart where the labels have to attach (3–5px at the last age, on this chart), so widen
+are often only a few pixels apart where the labels have to attach (3–5px), so widen
 the bands until the parts separate, and keep only the relationships that carry meaning (which band is
 inside which, and where the threshold falls between them).
 
@@ -230,9 +356,9 @@ Three traps when the same drawing serves two hosts:
   and 2 px in a 76 px strip. Any offset that has to look the same in both must be a parameter.
 - **Text does not scale with the box.** Shrinking a container shrinks its shapes but not its
   absolute-point-size labels, so a block that fits at one size overflows at another.
-- **A wide, short host flattens the drawing, and height is what fixes it.** The same miniature that
-  read as a curve in a near-square panel came out 142px wide against 72px of ink in a 92px header row
-  and lost the shape it exists to convey. Compare the host's aspect against the one the drawing was
+- **A wide, short host flattens the drawing, and height is what fixes it.** A miniature that
+  reads as a curve in a near-square panel can come out flattened in a wide, short header row and
+  lose the shape it exists to convey. Compare the host's aspect against the one the drawing was
   tuned for, and buy the height from **inside** the block's own budget — where the block's top and
   bottom are both fixed, a taller key costs plot height and leaves the frame's fit untouched.
 
@@ -248,6 +374,25 @@ with its labels (`Note:`, `Data source:` — singular — the exact tagline and 
   so there is genuinely nothing left to explain.
 - A caveat about **what the chart claims** cannot go. Move it into the subtitle, which mobile does
   have. Dropping it silently reintroduces an over-claim.
+
+**The step and the template will not agree on how many lines a string takes, and the step is the one
+that reserves the space.** The step measures its own type — 10.5pt, say — while the template renders
+the same string at the slot's size, 16px for a subtitle on the 850- and 540-wide templates. Those wrap
+differently, so the line counts can differ, and the step is reserving the chart area against the wrong
+one. It cannot be fixed from the step: it deliberately sets no fonts, so it cannot measure Lato.
+
+What this costs is a surprise on the *next copy edit*, not on the first build. Adding a single
+character — an Oxford comma, say — can tip a mobile subtitle from three lines to four in the
+template while the step still reserves three, and the chart's topmost label then sits above the
+header's last line. So after **any** change to a title, subtitle or note, re-read the
+template slot's height in Figma rather than trusting the step's own wrap, and check the header
+clearance on the frame.
+
+Two things make that cheap. The step should reserve the *larger* of the two counts where they differ,
+so the failure mode is a generous gap rather than an overlap. And an orphan — a last line holding a
+word or two — is worth removing at the same time, because it is both a copy defect in its own right
+and the state one character away from adding a line: measure it by cloning the slot, setting
+`textAutoResize = "WIDTH_AND_HEIGHT"` to get the unwrapped width, and comparing against the slot's.
 
 ### Derive every string from the data
 
@@ -266,8 +411,8 @@ wrong number is worse than either the accurate awkward one or the honest qualita
 survives review precisely because it looks like a summary rather than a claim.
 
 **A series that traces another for most of the range is redundant, not informative.** Repeating one
-panel's median in the other, to show a crossover, put a second line within a few millimetres of the
-first from birth to age 9 — re-drawing the same information across two thirds of the chart, which is
+panel's median in the other, to show a crossover, can put a second line within a few millimetres of
+the first for most of the range — re-drawing the same information across most of the chart, which is
 the doubling that splitting the panels was meant to remove. Prefer stating the fact in the subtitle and
 letting the reader compare panels at a shared gridline. Check any "for context" series this way: plot
 the two and measure where they actually diverge before deciding it earns its ink.
@@ -289,8 +434,7 @@ Four decisions, each settled by measuring rather than by taste:
   even possible is a property of the data.** The row you point at decides it, and no amount of vertical
   room rescues a row whose narrowest segment leaves no corridor, because the obstruction is horizontal.
   If you attempt it, place the hardest label first and expect the dataset's narrowest segment to be the
-  binding constraint. (Built in full for the time-use refresh, then deleted: it read no better than
-  brackets.)
+  binding constraint. (Built in full, it typically reads no better than brackets.)
 - **Rank rows by something the reader can verify.** A key whose segment is a few pixels wide cannot be
   checked against the chart, ties a large share of rows once rounded, and imports whatever survey
   artifact that category carries. Rank by a wide category, keep the key in one constant so the

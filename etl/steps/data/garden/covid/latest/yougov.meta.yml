@@ -31,7 +31,7 @@ definitions:
         avoided_medium_gatherings=i12_part1 ~ " 'Avoided medium-sized social gatherings (between 3 and 10 people)' " ~ i12_part2,
         avoided_objects_public=i12_part1 ~ " 'Avoided touching objects in public (e.g. elevator buttons or doors)' " ~ i12_part2,
         avoided_people_with_symptoms=i12_part1 ~ " 'Avoided contact with people who have symptoms or you think may have been exposed to the coronavirus' " ~ i12_part2,
-        avoided_public_events=i12_part1 ~ " 'Avoided attending public events, such as sports matches, festivals, theatres, clubs, or going to religious services' " ~ i12_part2,
+        avoided_public_events=i12_part1 ~ " 'Avoided attending public events, such as sports matches, festivals, theaters, clubs, or going to religious services' " ~ i12_part2,
         avoided_public_transport=i12_part1 ~ " 'Avoided taking public transport' " ~ i12_part2,
         avoided_shops=i12_part1 ~ " 'Avoided going to shops' " ~ i12_part2,
         avoided_small_gatherings=i12_part1 ~ " 'Avoided small social gatherings (not more than 2 people)' " ~ i12_part2,

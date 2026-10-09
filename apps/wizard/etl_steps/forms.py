@@ -19,6 +19,7 @@ from etl.dag_helpers import write_to_dag_file
 from etl.files import ruamel_dump
 from etl.owners import resolve_owner
 from etl.paths import DAG_DIR, STEP_DIR
+from etl.viz.chart.utils import default_grapher_schema_version
 
 
 def _current_git_owner() -> str:
@@ -547,10 +548,10 @@ class SnapshotForm(StepForm):
         return meta
 
 
-class CollectionForm(StepForm):
-    """express step form."""
+class ChartForm(StepForm):
+    """Chart step form."""
 
-    step_name: str = "collection"
+    step_name: str = "chart"
 
     # Common
     namespace: str
@@ -568,18 +569,16 @@ class CollectionForm(StepForm):
 
     def create_files(self) -> list[dict[str, Any]]:
         # Generate files
-        COLLECTION_DIR = generate_export_step_to_channel(
-            cookiecutter_path=COOKIE_STEPS[self.step_name], data=self.to_dict()
-        )
+        CHART_DIR = generate_export_step_to_channel(cookiecutter_path=COOKIE_STEPS[self.step_name], data=self.to_dict())
 
         # Add to generated files
         generated_files = [
             {
-                "path": COLLECTION_DIR / (self.short_name + ".py"),
+                "path": CHART_DIR / (self.short_name + ".py"),
                 "language": "python",
             },
             {
-                "path": COLLECTION_DIR / (self.short_name + ".config.yml"),
+                "path": CHART_DIR / (self.short_name + ".config.yml"),
                 "language": "yaml",
             },
         ]
@@ -603,7 +602,7 @@ class CollectionForm(StepForm):
     @property
     def step_uri(self) -> str:
         """Get step URI."""
-        return f"export://multidim/{self.base_step_name}"
+        return f"viz://chart/{self.base_step_name}"
 
     def to_dict(self):
         return {
@@ -648,6 +647,10 @@ class CollectionForm(StepForm):
 def generate_export_step_to_channel(cookiecutter_path: Path, data: dict[str, Any]) -> Path:
     assert {"namespace", "version"} <= data.keys()
 
-    target_dir = STEP_DIR / "export" / "multidim"
+    # Chart configs must pin `grapher_schema`; scaffold it at the version we vendor today so
+    # the generated config runs as-is instead of failing on the missing pin.
+    data = {**data, "grapher_schema": default_grapher_schema_version()}
+
+    target_dir = STEP_DIR / "viz" / "chart"
     generate_step(cookiecutter_path, data, target_dir)
     return target_dir / data["namespace"] / data["version"]

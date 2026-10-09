@@ -4,7 +4,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: World Development Indicators (archived release)
-    title_snapshot: World Development Indicators (archived release) - Employment shares by sector around 1980
+    title_snapshot: World Development Indicators (archived release) – Employment shares by sector around 1980
     description: |-
       The indicators "Employment in agriculture (% of total employment)", "Employment in industry (% of total employment)" and "Employment in services (% of total employment)" as published in archived editions of the World Bank's World Development Indicators, based on the International Labor Organization's labor force statistics. The World Bank later replaced these series with ILO-modeled estimates that begin in 1991, removing the earlier observations from the current World Development Indicators; the superseded editions remain available in the WDI Database Archives.
     description_snapshot: |-

@@ -11,15 +11,15 @@ meta:
     description: |-
       This is the data repository for the Imperial College London YouGov Covid 19 Behaviour Tracker Data Hub.
 
-      YouGov has partnered with the Institute of Global Health Innovation (IGHI) at Imperial College London to gather global insights on people’s behaviours in response to COVID-19.
+      YouGov has partnered with the Institute of Global Health Innovation (IGHI) at Imperial College London to gather global insights on people’s behaviors in response to COVID-19.
 
-      It is designed to provide behavioural analysis on how different populations are responding to the pandemic, helping public health bodies in their efforts to limit the impact of the disease. Anonymised respondent level data will be available for all public health and academic institutions globally.
+      It is designed to provide behavioral analysis on how different populations are responding to the pandemic, helping public health bodies in their efforts to limit the impact of the disease. Anonymised respondent level data will be available for all public health and academic institutions globally.
 
-      The questions in the survey, led by IGHI, cover data on testing, symptoms, self-isolating in response to symptoms and the ability and willingness to self-isolate if needed. It also looks at behaviours, including going outdoors, working outside the home, contact with others, hand washing and the extent of compliance with 20 common preventative measures.
+      The questions in the survey, led by IGHI, cover data on testing, symptoms, self-isolating in response to symptoms and the ability and willingness to self-isolate if needed. It also looks at behaviors, including going outdoors, working outside the home, contact with others, hand washing and the extent of compliance with 20 common preventative measures.
 
-      The datafiles contain responses from nationally representative surveys of the general public about symptoms, testing, self-isolation, social distancing and behaviour.
+      The datafiles contain responses from nationally representative surveys of the general public about symptoms, testing, self-isolation, social distancing and behavior.
 
-      Contextual data includes: gender, age, region (within country), number of people in the household, children in household, health conditions, working status and the date of the survey response. A weighting variable is also provided, typically based on age, gender and region. For obvious reasons, people with severe symptoms, people who are / have been hospitalised and some other hard to reach groups will be under-represented in the sample.
+      Contextual data includes: gender, age, region (within country), number of people in the household, children in household, health conditions, working status and the date of the survey response. A weighting variable is also provided, typically based on age, gender and region. For obvious reasons, people with severe symptoms, people who are / have been hospitalized and some other hard to reach groups will be under-represented in the sample.
 
       We have completed a privacy assessment and have taken steps to safeguard the anonymity of the respondents by ensuring that the survey responses and contextual data, when looked at in isolation or as a combined data set, cannot be used to re-identify the respondents. A key part of this has been the exclusion of all data may lead to a greater risk of identification. For example, in the data set ‘age’ is represented by a numeric value rather than a full date of birth, and ‘regions’ are represented areas large enough to protect privacy, but which are still statistically valuable, such as Scotland or West Midlands.
 

@@ -34,7 +34,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -91,17 +91,17 @@ jobs:
           TITLE="New grapher schema version published upstream"
           EXISTING=$(gh issue list --search "\"$TITLE\" in:title" --state open --json number --jq '.[0].number // empty')
           if [ -z "$EXISTING" ]; then
-            gh issue create --title "$TITLE" --body "$(printf 'Upstream now publishes **%s** while we pin **%s**.\n\nFollow the "Version bump" section of the \`/sync-grapher-schema\` skill to upgrade (bump \`DEFAULT_GRAPHER_SCHEMA\` in \`etl/config.py\`, sed the \`$ref\`s, re-vendor, regenerate).\n\n_Opened automatically by the sync-grapher-schema workflow._' "$LATEST_ID" "$PINNED_URL")"
+            gh issue create --title "$TITLE" --body "$(printf 'Upstream now publishes **%s** while we vendor **%s**.\n\nRun `python scripts/generate_schema_types.py --bump-version` — it vendors the new version, drops the old copy, repoints the `$ref`s and regenerates the types (`DEFAULT_GRAPHER_SCHEMA` is derived from the vendored file, so nothing there is hand-edited). It then prints what still needs judgment: the upstream diff review, and mirroring new properties into the embedded `grapher_config` block in `schemas/dataset-schema.json`.\n\nSee the "Version bump" section of the `/sync-grapher-schema` skill. Do **not** bump the `grapher_schema` pins in existing chart configs.\n\n_Opened automatically by the sync-grapher-schema workflow._' "$LATEST_ID" "$PINNED_URL")"
           else
             echo "Issue #$EXISTING already open, skipping."
           fi
 
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         if: steps.check.outputs.changed == 'true'
         with:
           python-version: "3.12"
 
-      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         if: steps.check.outputs.changed == 'true'
         with:
           enable-cache: true
@@ -126,7 +126,7 @@ jobs:
             The upstream grapher schema changed in place. This PR contains the automatic part of the sync:
 
             - refreshed vendored `schemas/grapher-schema.*.json`
-            - regenerated `etl/collection/model/schema_types.py`
+            - regenerated `etl/viz/chart/model/schema_types.py`
 
             Published by: ${{ github.event.client_payload.commit && format('https://github.com/owid/owid-grapher/commit/{0}', github.event.client_payload.commit) || format('n/a — this run came from {0}, not an upstream dispatch', github.event_name) }}
 

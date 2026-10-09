@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical pertussis cases in the United States - Centers for Disease Control and Prevention
+    title: Historical pertussis cases in the United States – Centers for Disease Control and Prevention
     description: |-
       Data on historical pertussisa cases in the United States from 1922 onwards, as reported by the Centers for Disease Control and Prevention. The data is sourced from the CDC's Summary of Notifiable Diseases, which is published annually.
 

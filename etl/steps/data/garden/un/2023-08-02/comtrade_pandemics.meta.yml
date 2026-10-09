@@ -66,7 +66,7 @@ tables:
         description_short: |-
           Total value of imports of surgical gloves (code: 401511).
         description_key:
-          - Includes vulcanised rubber (other than hard rubber) surgical gloves.
+          - Includes vulcanized rubber (other than hard rubber) surgical gloves.
           - *currency
 
       import_cif_surgical_gloves_per_capita:
@@ -77,7 +77,7 @@ tables:
         description_from_producer: |-
           Imports of vulcanized (other than hard rubber), surgical gloves.
         description_key:
-          - Includes vulcanised rubber (other than hard rubber) surgical gloves.
+          - Includes vulcanized rubber (other than hard rubber) surgical gloves.
           - *currency
 
       # PLASTICS IN CLOTHING #

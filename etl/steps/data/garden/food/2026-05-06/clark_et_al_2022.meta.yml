@@ -6,7 +6,7 @@ definitions:
       grapher_config:
         # Per-bar colors on the explorer's single-y `specific_food_product` views.
         # Explicitly cleared for `all_impacts` (facet) and `compare_units` group views
-        # in `etl/steps/export/explorers/food/latest/food_footprints.py`.
+        # in `etl/steps/viz/explorer/food/latest/food_footprints.py`.
         baseColorScheme: owid-distinct
 
 tables:

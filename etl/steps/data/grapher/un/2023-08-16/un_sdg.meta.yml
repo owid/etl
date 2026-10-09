@@ -83,7 +83,7 @@ tables:
         short_unit: "%"
         description_short: A safely managed drinking water service is defined as one located on premises, available when needed and free from contamination.
         description_from_producer: |-
-          "The proportion of the population using safely managed drinking water services is defined as the proportion of population using an improved drinking water source which is accessible on premises, available when needed and free from faecal and priority chemical contamination. ‘Improved’ drinking water sources include: piped supplies, boreholes and tubewells, protected dug wells, protected springs, rainwater, water kiosks, and packaged and delivered water."
+          "The proportion of the population using safely managed drinking water services is defined as the proportion of population using an improved drinking water source which is accessible on premises, available when needed and free from fecal and priority chemical contamination. ‘Improved’ drinking water sources include: piped supplies, boreholes and tubewells, protected dug wells, protected springs, rainwater, water kiosks, and packaged and delivered water."
         presentation:
           title_public: Share of the population using safely managed drinking water
           attribution_short: WHO/UNICEF JMP

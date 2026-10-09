@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: National Notifiable Diseases Surveillance System - Measles
+    title: National Notifiable Diseases Surveillance System – Measles
     description: |-
       Reported cases of measles by state, for the United States. The cases are split by those that are indigenous (those that were infected in the United States) and imported (those that were infected outside of the United States).
     date_published: "2024"

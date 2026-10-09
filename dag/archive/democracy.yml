@@ -166,3 +166,12 @@ steps:
   # archived; last active in 44d59b9fb58e on 2026-03-27
   data://grapher/democracy/2024-05-21/bti:
     - data://garden/democracy/2024-03-07/bti
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/democracy/latest/democracy:
+    - data://grapher/regions/2023-01-01/regions
+    - data://grapher/democracy/2024-05-13/polity
+    - data://grapher/democracy/2026-03-17/vdem
+    - data://grapher/democracy/2026-03-23/fh
+    - data://grapher/democracy/2026-04-02/lexical_index
+    - data://grapher/democracy/2025-03-05/eiu
+    - data://grapher/democracy/2026-03-27/bti

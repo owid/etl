@@ -388,9 +388,15 @@ class Chart(Base):
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
-    configId: Mapped[bytes] = mapped_column(CHAR(36))
+    # The chart's config UUID — its stable identity across environments.
+    configId: Mapped[str] = mapped_column(CHAR(36))
     # The authored layer, as its own chart_configs row. `configId` is what renders.
     patchConfigId: Mapped[bytes] = mapped_column(CHAR(36))
+    # The ETL-authored layer, as its own chart_configs row (mirrors variables.patchConfigIdETL, per chart).
+    patchConfigIdETL: Mapped[bytes | None] = mapped_column(CHAR(36), init=False)
+    # ETL step that authored this chart's ETL layer (mirrors multi_dim_data_pages.catalogPath); NULL for
+    # hand-authored charts. Not an identifier: it records the current owner and may change on a step rename.
+    etlConfigCatalogPath: Mapped[str | None] = mapped_column(VARCHAR(767), init=False)
     isInheritanceEnabled: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     forceDatapage: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
@@ -442,14 +448,29 @@ class Chart(Base):
         return select(ChartConfig.slug).where(ChartConfig.id == cls.configId).scalar_subquery()
 
     @classmethod
-    def load_chart(cls, session: Session, chart_id: int | None = None, slug: str | None = None) -> "Chart":
-        """Load chart with id `chart_id`."""
+    def load_chart(
+        cls,
+        session: Session,
+        chart_id: int | None = None,
+        slug: str | None = None,
+        catalog_path: str | None = None,
+        config_id: str | None = None,
+    ) -> "Chart":
+        """Load a chart by `chart_id`, `slug`, `catalog_path`, or `config_id`.
+
+        `config_id` is the chart's config UUID (`charts.configId`) — the chart's
+        stable identity across environments, unlike the numeric id.
+        """
         if chart_id:
             cond = cls.id == chart_id
         elif slug:
             cond = cls.slug == slug
+        elif catalog_path:
+            cond = cls.etlConfigCatalogPath == catalog_path
+        elif config_id:
+            cond = cls.configId == config_id
         else:
-            raise ValueError("Either chart_id or slug must be provided")
+            raise ValueError("One of chart_id, slug, catalog_path, or config_id must be provided")
         charts = session.scalars(select(cls).where(cond)).all()
 
         # there can be multiple charts with the same slug, pick the published one
@@ -509,6 +530,26 @@ class Chart(Base):
 
         return variables
 
+    def load_etl_config(self, session: Session) -> dict[str, Any] | None:
+        """Load the chart's ETL-authored config layer, if it has one."""
+        assert self.id, "Chart must come from a database"
+        etl_config = session.scalar(
+            select(ChartConfig.config).join(Chart, ChartConfig.id == Chart.patchConfigIdETL).where(Chart.id == self.id)
+        )
+        return copy.deepcopy(etl_config) if etl_config else None
+
+    def load_patch_config(self, session: Session) -> dict[str, Any]:
+        """Load the chart's authored (admin) layer — what someone edited in the chart editor.
+
+        This is `charts.patchConfigId`'s row, not `configId`'s: the latter is the merged config
+        that renders, which would tell you nothing about who authored which field.
+        """
+        assert self.id, "Chart must come from a database"
+        patch = session.scalar(
+            select(ChartConfig.config).join(Chart, ChartConfig.id == Chart.patchConfigId).where(Chart.id == self.id)
+        )
+        return copy.deepcopy(patch) if patch else {}
+
     @classmethod
     def load_variables_checksums(cls, session: Session, chart_ids: list[int]) -> pd.DataFrame:
         """Load checksums for all variables from the chart and return them as a list of dicts."""
@@ -546,7 +587,51 @@ class Chart(Base):
         chart config.
         """
         assert self.id, "Chart must come from a database"
-        source_variables = self.load_chart_variables(source_session)
+        remap_ids = self._variable_id_remap(source_session, target_session)
+
+        # copy chart as a new object
+        config = copy.deepcopy(self.config)
+        try:
+            config = _remap_variable_ids(config, remap_ids)
+        except KeyError as e:
+            # This should not be happening - it means that there's a chart with a variable that doesn't exist in
+            # chart_dimensions and possibly not even in variables table. It's possible that you see it admin, but
+            # only because it is cached.
+            raise ValueError(f"Issue with chart {self.id} - variable id not found in chart_dimensions table: {e}")
+
+        return config
+
+    def migrate_etl_config(self, source_session: Session, target_session: Session) -> dict[str, Any] | None:
+        """Remap variable ids in the chart's ETL-authored config layer."""
+        etl_config = self.load_etl_config(source_session)
+        if etl_config is None:
+            return None
+
+        remap_ids = self._variable_id_remap(
+            source_session,
+            target_session,
+            source_variable_ids=_extract_variable_ids_from_config(etl_config),
+        )
+        try:
+            return _remap_variable_ids(etl_config, remap_ids)
+        except KeyError as e:
+            raise ValueError(f"Issue with chart {self.id} - variable id not found while remapping ETL config: {e}")
+
+    def _variable_id_remap(
+        self,
+        source_session: Session,
+        target_session: Session,
+        source_variable_ids: set[int] | None = None,
+    ) -> dict[int, int]:
+        if source_variable_ids is None:
+            source_variables = self.load_chart_variables(source_session)
+        else:
+            source_variables_list = Variable.from_id(source_session, list(source_variable_ids))
+            assert isinstance(source_variables_list, list)
+            source_variables = {v.id: v for v in source_variables_list}
+            missing = source_variable_ids - set(source_variables)
+            if missing:
+                raise ValueError(f"variables.id not found in source: {sorted(missing)}")
 
         remap_ids = {}
         for source_var_id, source_var in source_variables.items():
@@ -572,17 +657,7 @@ class Chart(Base):
             # log.debug("remap_variables", old_name=source_var.name, new_name=target_var.name)
             remap_ids[source_var_id] = target_var.id
 
-        # copy chart as a new object
-        config = copy.deepcopy(self.config)
-        try:
-            config = _remap_variable_ids(config, remap_ids)
-        except KeyError as e:
-            # This should not be happening - it means that there's a chart with a variable that doesn't exist in
-            # chart_dimensions and possibly not even in variables table. It's possible that you see it admin, but
-            # only because it is cached.
-            raise ValueError(f"Issue with chart {self.id} - variable id not found in chart_dimensions table: {e}")
-
-        return config
+        return remap_ids
 
     def tags(self, session: Session) -> list[dict[str, Any]]:
         """Return tags in a format suitable for Admin API."""
@@ -2087,6 +2162,15 @@ class NarrativeChart(Base):
             return []
         return list(session.scalars(select(cls).where(cls.parentChartId.in_(parent_chart_ids))).all())
 
+    @classmethod
+    def load_by_chart_config_id(cls, session: Session, chart_config_id: str) -> "NarrativeChart | None":
+        """Load the narrative chart owning the given config UUID (`narrative_charts.chartConfigId`).
+
+        The config UUID is the narrative chart's stable identity across
+        environments; numeric ids are minted independently per environment.
+        """
+        return session.scalars(select(cls).where(cls.chartConfigId == chart_config_id)).one_or_none()
+
     def load_config(self, session: Session) -> dict[str, Any]:
         """Load the authored (patch) config from chart_configs table.
 
@@ -2213,6 +2297,23 @@ def _remap_variable_ids(config: list | dict[str, Any] | Any, remap_ids: dict[int
         return [_remap_variable_ids(item, remap_ids) for item in config]
     else:
         return config
+
+
+def _extract_variable_ids_from_config(config: list | dict[str, Any] | Any) -> set[int]:
+    """Extract known variable-id references from a Grapher config."""
+    variable_ids: set[int] = set()
+    if isinstance(config, dict):
+        for k, v in config.items():
+            if k == "variableId":
+                variable_ids.add(int(v))
+            elif k in ("columnSlug", "sortColumnSlug") and str(v).isdigit():
+                variable_ids.add(int(v))
+            else:
+                variable_ids |= _extract_variable_ids_from_config(v)
+    elif isinstance(config, list):
+        for item in config:
+            variable_ids |= _extract_variable_ids_from_config(item)
+    return variable_ids
 
 
 def _infer_variable_type(values: pd.Series) -> VARIABLE_TYPE:

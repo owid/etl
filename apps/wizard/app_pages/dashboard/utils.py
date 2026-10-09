@@ -138,7 +138,7 @@ def load_steps_df_to_display(show_all_channels: bool, reload_key: int) -> pd.Dat
 
     # If toggle is not shown, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
     if not show_all_channels:
-        df = df[df["channel"].isin(["grapher", "explorers"])]
+        df = df[df["channel"].isin(["grapher", "explorers", "explorer"])]
 
     # Sort displayed data conveniently.
     df = df.sort_values(

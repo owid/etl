@@ -225,7 +225,7 @@ definitions:
 
   # Education system descriptions
   desc_key_private_enrolment: &desc_key_private_enrolment
-    - In many countries, education is provided not only by the government but also by private institutions — this indicator shows how much of total enrollment is taking place in privately run schools or educational programmes.
+    - In many countries, education is provided not only by the government but also by private institutions — this indicator shows how much of total enrollment is taking place in privately run schools or educational programs.
     - It captures the share of students enrolled in private institutions at a given level of education as a percentage of all students enrolled at that level, including both public and private schools.
     - The indicator is calculated by dividing the number of students in private institutions by the total number of students enrolled at the same education level, then multiplying by 100.
     - A high percentage means that non-governmental providers — such as private individuals, companies, religious bodies, or community organizations — play a significant role in delivering education at that level.
@@ -467,7 +467,7 @@ tables:
           - In many countries, men and women have spent different amounts of time in school — this indicator shows how close they are to achieving equality in educational attainment.
           - It captures gender equality in average years of schooling by comparing how many years of formal education have been completed on average by women and men aged 25 and older.
           - The adjusted gender parity index (GPIA) is calculated by dividing the average years of schooling for women by that of men. If the result is greater than 1, it is inverted and subtracted from 2. This creates a scale from 0 to 2, centered around 1.
-          - A GPIA value of 1 means men and women have the same average number of completed school years. A value below 1 shows a gap in favour of men, and a value above 1 shows a gap in favour of women.
+          - A GPIA value of 1 means men and women have the same average number of completed school years. A value below 1 shows a gap in favor of men, and a value above 1 shows a gap in favor of women.
           - This indicator is useful for highlighting long-term trends in gender inequality in education and assessing the lasting effects of policies aimed at closing the gender gap.
           - The data comes from household surveys or population censuses, where individuals report the highest level of education they have completed. These levels are then converted into years of schooling based on standard durations defined by [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced).
           - Because this indicator reflects accumulated schooling over time, it shows how gender disparities have developed across generations.
@@ -537,7 +537,7 @@ tables:
           - Each year, millions of students move abroad to study. This indicator shows how many choose a particular country as their destination.
           - It measures the percentage of tertiary students in a country who come from outside its borders.
           - It is calculated by dividing the number of international students by the total number of tertiary students in the country, then multiplying by 100.
-          - International students include those enrolled in full degree programmes, student exchanges, or as visiting students.
+          - International students include those enrolled in full degree programs, student exchanges, or as visiting students.
           - Countries with a high share of international students often have well-regarded universities, affordable tuition, or offer courses in widely spoken languages.
           - The data comes from government records and surveys, which usually include details such as the student’s home country and gender.
           - This tells us how open a country’s education system is, and how attractive it is as a place to study.
@@ -593,10 +593,10 @@ tables:
         description_key:
           - Children begin their education journeys at different ages around the world — this indicator shows the age at which they are officially expected to start pre-primary education in a given country.
           - It captures the official entrance age for pre-primary education, based on the assumption that children begin schooling at the standard age, attend full-time, and progress through the education system without repeating or skipping any grades.
-          - The official entrance age is typically set by national education laws or regulations and often corresponds to the most common age at which children enter pre-primary programmes.
+          - The official entrance age is typically set by national education laws or regulations and often corresponds to the most common age at which children enter pre-primary programs.
           - This indicator helps estimate the expected demand for early childhood education services and is a key input for producing many other education statistics, including enrollment rates and school-age population estimates.
           - The data are reported by ministries of education and compiled by the UNESCO Institute for Statistics, using the International Standard Classification of Education ([International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced)) to ensure international comparability.
-          - While the official age provides a national benchmark, actual entry ages may vary due to cultural preferences, availability of early childhood programmes, or local policy flexibility.
+          - While the official age provides a national benchmark, actual entry ages may vary due to cultural preferences, availability of early childhood programs, or local policy flexibility.
           - Understanding the official entrance age to pre-primary education is essential for education planning and for identifying gaps in access to early learning opportunities that support school readiness and long-term development.
         display:
           numDecimalPlaces: 0
@@ -633,7 +633,7 @@ tables:
           - Boys and girls don’t always have equal access to primary education — this indicator shows how close we are to gender parity in age-appropriate school enrollment.
           - It captures gender equality in net enrollment rates for primary education by comparing the percentage of girls and boys of official primary school age who are enrolled at the primary level.
           - The adjusted gender parity index (GPIA) is calculated by dividing the female net enrollment rate by the male net enrollment rate. If the result is greater than 1, it is inverted and subtracted from 2. This adjustment produces a value between 0 and 2 that is symmetrical around 1.
-          - A GPIA value of 1 indicates perfect parity. A value below 1 shows a gap in favour of boys, while a value above 1 shows a gap in favour of girls.
+          - A GPIA value of 1 indicates perfect parity. A value below 1 shows a gap in favor of boys, while a value above 1 shows a gap in favor of girls.
           - This indicator is useful for identifying gender-based barriers to primary school enrollment and for monitoring progress toward equitable access to basic education.
           - The data comes from administrative records reporting enrollment by age and sex, as well as population estimates for children of official primary school age.
           - It’s important to interpret this indicator alongside others, such as attendance rates or completion rates, to get a full picture of gender disparities in education.
@@ -651,7 +651,7 @@ tables:
           - Boys and girls don’t always have equal access to lower secondary education — this indicator shows how close we are to gender parity in age-appropriate school enrollment at that level.
           - It captures gender equality in net enrollment rates for lower secondary education by comparing the percentage of girls and boys of official lower secondary school age who are enrolled at that level.
           - The adjusted gender parity index (GPIA) is calculated by dividing the female net enrollment rate by the male net enrollment rate. If the result is greater than 1, it is inverted and subtracted from 2. This adjustment produces a value between 0 and 2 that is symmetrical around 1.
-          - A GPIA value of 1 indicates perfect parity. A value below 1 shows a gap in favour of boys, while a value above 1 shows a gap in favour of girls.
+          - A GPIA value of 1 indicates perfect parity. A value below 1 shows a gap in favor of boys, while a value above 1 shows a gap in favor of girls.
           - This indicator is useful for identifying gender-based disparities in lower secondary school enrollment and for tracking progress toward equitable access to post-primary education.
           - The data comes from administrative records reporting enrollment by age and sex, along with population estimates for children in the official lower secondary school age range.
           - It should be interpreted alongside related indicators — such as attendance, progression, and completion rates — to build a clearer picture of gender equity in education beyond access alone.
@@ -1179,7 +1179,7 @@ tables:
           - It focuses specifically on school life expectancy in [primary education](#dod:primary-education), comparing the average number of years girls and boys are expected to spend in primary school based on current age-specific enrollment rates.
           - The adjusted gender parity index (GPIA) is calculated by dividing the female school life expectancy in primary education by the male school life expectancy. If the result exceeds 1, it is inverted and subtracted from 2 to produce a symmetrical scale from 0 to 2, with 1 representing perfect parity.
           - A value of 1 means boys and girls are expected to spend the same number of years in primary school. Values below 1 indicate boys are expected to spend more time in school; values above 1 indicate girls are.
-          - This indicator assumes current enrollment trends continue over time and includes all children, even those who may never enrol, giving a comprehensive view of participation in primary education.
+          - This indicator assumes current enrollment trends continue over time and includes all children, even those who may never enroll, giving a comprehensive view of participation in primary education.
           - The data comes from administrative sources such as school censuses and registers, as well as population estimates by age, typically provided by national statistical offices or the United Nations Population Division.
           - Disaggregated by sex, this indicator helps identify gender gaps in access to and retention in primary schooling.
           - As with all expectancy-based indicators, it does not reflect actual completion or quality of education and may not account for repetition or part-time attendance, which can vary across contexts.
