@@ -301,6 +301,9 @@ def sweep_articles_placing_narrative_charts(findings: list[dict]) -> list[dict]:
         "FROM posts_gdocs pg WHERE pg.type = 'data-insight'"
         "  AND pg.content->>'$.\"narrative-chart\"' IS NOT NULL AND pg.content->>'$.\"narrative-chart\"' <> ''",
     )
+    # Keep what the doc actually holds: when it is a URL, that URL (not the name) is what an
+    # operator has to search for in the doc.
+    df_front_matter["raw_target"] = df_front_matter["target"]
     url_id = df_front_matter["target"].str.extract(r"/narrative-charts/(\d+)", expand=False)
     df_front_matter["target"] = url_id.map(name_by_id).fillna(df_front_matter["target"])
     df_front_matter = df_front_matter[df_front_matter["target"].isin(names)].sort_values(["target", "post_slug"])
@@ -332,8 +335,10 @@ def sweep_articles_placing_narrative_charts(findings: list[dict]) -> list[dict]:
                 query_string=r["queryString"],
                 # Deliberately left empty even when the column has something: a block placement
                 # has no visible anchor text, so `find_in_doc` must fall through to the name,
-                # which is what the ArchieML block actually spells out.
-                text="",
+                # which is what the ArchieML block actually spells out. The exception is a data
+                # insight whose front matter holds the admin URL instead of the name: the URL is
+                # what the doc contains, so it is the search string.
+                text=r["raw_target"] if r.get("raw_target") and r["raw_target"] != r["target"] else "",
                 published=r["published"],
             )  # fmt: skip
         )
