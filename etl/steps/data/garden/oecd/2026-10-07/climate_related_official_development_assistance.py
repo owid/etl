@@ -121,7 +121,9 @@ def run() -> None:
     tb_climate = classify_climate_activities(tb_activities=tb_activities)
 
     # Define the donors and recipients (and their groups) to include, and the codes in the data that belong to each.
-    donors = sorted(set(tb_totals["donor_code"]) - {CODE_ALL_DONORS})
+    # Individual donors: all donor codes except groups of donors (e.g. all DAC members).
+    groups_donors = set(tb_groups[tb_groups["hierarchy"] == "donor"]["parent_code"])
+    donors = sorted(set(tb_totals["donor_code"]) - groups_donors)
     members_donors = create_members(tb_groups=tb_groups, hierarchy="donor", entity_codes=donors + DONOR_GROUPS)
     recipients = sorted(set(tb_totals[tb_totals["donor_code"] == CODE_ALL_DONORS]["recipient_code"]))
     members_recipients = create_members(tb_groups=tb_groups, hierarchy="recipient", entity_codes=recipients)
