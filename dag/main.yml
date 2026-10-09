@@ -499,6 +499,14 @@ steps:
       - data://meadow/fbi/2025-11-21/summary_reporting_system_estimates:
         - snapshot://fbi/2025-11-21/summary_reporting_system_estimates.csv
 
+  # OECD Climate-related aid (Rio markers)
+  #
+  data://grapher/oecd/2026-09-29/climate_related_aid:
+    - data://garden/oecd/2026-09-29/climate_related_aid:
+      - data://meadow/oecd/2026-09-29/climate_related_aid:
+        - snapshot://oecd/2026-09-29/climate_related_aid_given.csv
+        - snapshot://oecd/2026-09-29/climate_related_aid_received.csv
+
   # OECD Official Development Assistance (ODA)
 
   data://grapher/oecd/2026-07-27/official_development_assistance:
