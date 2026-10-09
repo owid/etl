@@ -93,6 +93,8 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset) 
             col_str = tb_regions[col].astype(str)
             value_map = {"nan": "missing", "<NA>": "missing", "0": "no", "1": "yes"}
             col_mapped = col_str.map(value_map)
+            # Missing values stay NaN (not "nan") under the pandas str dtype.
+            col_mapped[tb_regions[col].isna()] = "missing"
 
             # Update the original column in place
             tb_regions[col] = col_mapped

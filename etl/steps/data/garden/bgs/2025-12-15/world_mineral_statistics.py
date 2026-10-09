@@ -749,7 +749,8 @@ ACCEPTED_OVERLAPS = [
 
 
 def harmonize_commodity_subcommodity_pairs(tb: Table) -> Table:
-    tb = tb.astype({"commodity": str, "sub_commodity": str}).copy()
+    # Missing names stay NaN under the pandas str dtype; spell them "nan" so COMMODITY_MAPPING keys can match them.
+    tb = tb.astype({"commodity": str, "sub_commodity": str}).fillna({"commodity": "nan", "sub_commodity": "nan"}).copy()
     missing_mappings = set(
         [tuple(pair) for pair in tb[["commodity", "sub_commodity"]].drop_duplicates().values.tolist()]
     ) - set(COMMODITY_MAPPING)
