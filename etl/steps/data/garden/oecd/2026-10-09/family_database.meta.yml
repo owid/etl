@@ -74,6 +74,9 @@ tables:
         title: Share of births outside marriage
         unit: "%"
         short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
         description_short: Share of all children born to mothers who were not married at the time of birth.
         description_key:
           - Some countries have changed how they record whether parents are married, for example by counting couples in a registered partnership as married. These changes can cause sudden rises or drops in the data that do not reflect real changes.
