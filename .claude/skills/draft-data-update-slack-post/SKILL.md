@@ -164,7 +164,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
    **A checksum change is not "gained the new year."** A base-year rebase or in-place revision marks *every* chart data-changed, including charts whose series still end at the previous year (recipient/sector tables that only update in the producer's detailed release, series absent from a preliminary file). For releases that add a partial year, additionally verify each picked view's indicators actually reach the new year (`metadata.json` → `dimensions.years`), and prefer the chart carrying the **release's headline measure** — the one where the announcement's own numbers are visible on open — even when its traffic is low (the announcement is how it gets discovered).
 
-   Reuse `charts.selected_views` from `update-context.yml` only if it's already been built using this views-then-checksum process (older runs picked views by intuition and produced misleading recommendations like "life expectancy now updated" when the data was effectively unchanged, or "malaria deaths" when the chart gets ~3 views a day).
+   Reuse `charts.selected_views` from `update-context.yml` only if it's already been built using this views-then-checksum process (views picked by intuition produce misleading recommendations: a chart announced as updated when its data is effectively unchanged, or one that gets ~3 views a day).
 
    Output 1–3 as **`[<chart title>](<admin URL>)` — <rationale that names the change>**. Hyperlink each title to the admin **editor** URL, not the bare admin path:
 
@@ -333,7 +333,7 @@ https://ourworldindata.org/search?datasetProducts=<urlencoded dataset title>
 - Don't auto-write the optional caveats / interesting-notes fields with generic prose ("This dataset offers important insights into…"). Leave them as prompts.
 - Don't query the staging DB without the `publishedAt IS NOT NULL` filter — drafts in the count would mislead.
 - Don't use the producer's homepage URL as the search link. The Slack template specifically wants `ourworldindata.org/search?datasetProducts=…`.
-- Don't tout the dataset's full indicator count when OWID publishes only one or a few of its indicators. Size claims to what we actually chart — "302 indicators" reads as overselling when the update affects one published chart (user feedback, WWBI 2026-07). Mentioning the count in internal-facing fields is fine only when it's genuinely load-bearing for Ed.
+- Don't tout the dataset's full indicator count when OWID publishes only one or a few of its indicators. Size claims to what we actually chart — "302 indicators" reads as overselling when the update affects one published chart. Mentioning the count in internal-facing fields is fine only when it's genuinely load-bearing for Ed.
 - Don't fold this skill into `update-dataset` — keep it standalone so users can invoke it after manual updates too. `update-dataset` should gather reusable facts in `update-context.yml` and step 9 should delegate here, not duplicate the Slack rendering logic.
 
 ## Related
