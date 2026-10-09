@@ -11,10 +11,11 @@ definitions:
 
 dataset:
   update_period_days: 365
+
+
   owners:
     - Pablo Arriagada
     - Edouard Mathieu
-
 tables:
   generative_ai_use:
     variables:
