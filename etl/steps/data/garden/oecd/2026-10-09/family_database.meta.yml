@@ -3,7 +3,6 @@ definitions:
   common:
     processing_level: minor
     presentation:
-      attribution_short: OECD
       topic_tags:
         - Marriages & Divorces
     display:
@@ -77,9 +76,14 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
+          entityAnnotationsMap: |-
+            France: Recent change in methodology
+            Greece: Recent change in methodology
+            Netherlands: Recent change in methodology
         description_short: Share of all children born to mothers who were not married at the time of birth.
-        description_key:
-          - Some countries have changed how they record whether parents are married, for example by counting couples in a registered partnership as married. These changes can cause sudden rises or drops in the data that do not reflect real changes.
+        presentation:
+          grapher_config:
+            note: Some countries have changed how they record whether parents are married, which can cause sudden rises or drops.
         description_from_producer: |-
           Births to mothers whose legal marital status at the time of the birth is other than married. This includes births to mothers who are single or who are cohabiting with a partner outside of marriage, births to mothers who are divorced or widowed, and births to mothers who are living with a partner in a "common-law" or "de facto" union (unless their legal marital status at the time of birth is also 'married').
 

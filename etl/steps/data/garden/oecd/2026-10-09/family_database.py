@@ -113,7 +113,6 @@ def run() -> None:
     # Process births outside marriage. The latest file covers all years and countries of the older release,
     # so no merge with historical data is needed.
     tb_births_combined = tb_births_outside_marriage[["country", "year", "births_outside_marriage"]].copy()
-    tb_births_combined = paths.apply_corrections(tb_births_combined)
 
     # Keep mean age data from new dataset only (no historical equivalent)
     tb_mean_age = tb_marriage_divorce[tb_marriage_divorce["indicator"] == "mean_age_first_marriage"][
