@@ -16,10 +16,7 @@ Compares each of the 100 most populous countries' own official fertility rate ag
 - `refyears/` holds research on which year each survey estimate describes. It was dropped by
   decision; nothing reads it.
 
-## Restoring local state
+## Source data
 
-Source data (about 1 GB) and caches are not in git. They were moved to `ai/tfr/` on parking:
-
-    ln -s ../../ai/tfr/data scripts/tfr/data
-    mv ai/tfr/cache scripts/tfr/cache
-    .venv/bin/python scripts/tfr/build.py
+The downloaded source files and the series caches are not in git. Most loaders re-download
+what they need through `fetch()`.
