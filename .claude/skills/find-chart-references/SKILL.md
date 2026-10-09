@@ -236,10 +236,8 @@ means UNKNOWN, not "nothing references it".
   out to every thin MDim/explorer view that inherits it.
 - Data insights are matched on `grapher-url` (charts) and `narrative-chart` (narrative
   charts) in their front matter; one storing the reference elsewhere is missed.
-- A data insight's `narrative-chart` front matter can hold the narrative chart's admin edit URL
-  (`.../admin/narrative-charts/<id>/edit`) instead of its name. The sweep maps the id in such a
-  URL to the name; any other form is still missed. (OECD Family Database: a data insight pointing
-  at narrative chart 264 by URL was missed before this was handled.)
+- A data insight's `narrative-chart` front matter may hold the admin edit URL instead of the
+  name; the sweep maps the URL's id to the name. Other forms are missed.
 - Article sweeps cover what `posts_gdocs_links` recorded — charts nested inside
   layout containers may not produce a row.
 - Public Datasette's `posts_gdocs_links` lags; verify article fixes against the
