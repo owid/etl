@@ -37,7 +37,7 @@ else
 fi
 ```
 
-If codespell is not installed and `uv add --dev codespell` fails, explain to the user how to install it manually with `uv sync` or check their Python environment.
+If codespell is not installed and `uv add --dev codespell` fails, tell the user to rebuild the environment with `make .venv`.
 
 ### 1. Exclude archived steps and snapshots
 
