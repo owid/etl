@@ -129,7 +129,7 @@ description_short: |-
   The number of people living in extreme poverty, based on data and estimates from different sources.
 ```
 
-**`description_key`** -- Free-form markdown text for the "About this data" panel: prose paragraphs, with markdown sub-lists only where a list genuinely helps. (A YAML list of bullet points is still accepted and renders as a markdown list, but prefer prose — see grapher's descriptionKey-to-string migration.)
+**`description_key`** -- Free-form markdown text for the "About this data" panel: prose paragraphs, with markdown sub-lists only where a list genuinely helps. (A YAML list of bullet points is also accepted and renders as a markdown list, but prefer prose.)
 - Plain language (see `.claude/rules/plain-writing.md`). Expand acronyms on first use.
 - **Add concrete examples** for abstract scope descriptions (what countries are included, what events qualify)
 - **Order**: data-specific points first, methodology second, caveats last
