@@ -16,7 +16,6 @@
 #      and zero protein, as used for Russia's large food observation in 2019.
 #    The remaining entries are existing estimates, not matching FAO nutrient factors. Those source gaps are
 #    explicit below; do not substitute FAO figures for different commodities (e.g. wheat gluten for gluten feed).
-#    The ethanol factor is unchanged.
 fixed_densities:
   families:
     # Applied by name pattern to every item whose name starts with the pattern, unless the item is listed
@@ -56,7 +55,6 @@ fixed_densities:
     - {code: 112, name: Bran of cereals n.e.c., energy: 333.0, protein: 13.8, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
     - {code: 213, name: Bran of pulses, energy: 216, protein: 15.6, note: No matching FAO factor found; retain the existing USDA wheat-bran proxy.}
     - {code: 846, name: "Gluten feed and meal", energy: 330, protein: 22, note: "Maize gluten feed: about 22% protein as fed (Feedipedia); gluten meal is higher but a smaller volume."}
-    - {code: 632, name: "Undenatured ethyl alcohol of an alcoholic strength by volume of 80% vol or higher", energy: 700, protein: 0}
     - {code: 1276, name: "Industrial monocarboxylic fatty acids; acid oils from refining", energy: 884, protein: 0, note: "Fat that left the food chain to industry."}
     - {code: 1277, name: "Residues of fatty substances", energy: 884, protein: 0}
     - {code: 1274, name: "Animal or vegetable fats and oils and their fractions, chemically modified, except those hydrogenated, inter-esterified, re-esterified or elaidinized; inedible mixtures or preparations of animal or vegetable fats or oils", energy: 902, protein: 0, note: 'FAOSTAT SCL food observations: 902 kcal/100 g and zero protein (Russia, 2019).'}
@@ -64,9 +62,13 @@ fixed_densities:
     - {code: 337, name: "Oil of hempseed", energy: 900.0, protein: 0.0, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
     - {code: 1225, name: "Tallow", energy: 891.0, protein: 1.7, note: "FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1."}
 
-# 2. Items that are never food, whatever happens to them. Their density is zero, which removes them from every
-#    flow consistently (the balance identity is linear in the density).
+# 2. Items that are never food, whatever happens to them. They are left out of the chain altogether, in all three
+#    tables. Fuel ethanol is the one that matters: the crops sent to distilleries leave the chain where FAO records
+#    them, as other uses of the crop (Brazil, United States) or as processing (Pakistan, India). Counting the ethanol as
+#    a processed product would credit those calories back into processing and then count them a second time as
+#    ethanol exports and ethanol burned, and it would bring fuel imports into the chain of the importing countries.
 never_food:
+  - {code: 632, name: "Undenatured ethyl alcohol of an alcoholic strength by volume of 80% vol or higher"}
   - {code: 265, name: "Castor oil seeds"}
   - {code: 266, name: "Oil of castor beans"}
   - {code: 1273, name: "Castor oil, hydrogenated"}

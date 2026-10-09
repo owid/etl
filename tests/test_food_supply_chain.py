@@ -63,14 +63,14 @@ def test_reported_food_survives_rounding_but_fallbacks_are_kept(chain_step, nutr
 @pytest.mark.parametrize("nutrient", ["energy", "protein"])
 def test_replacement_densities_still_determine_food(chain_step, nutrient):
     # A reported nutrient can exist even when its density was overridden. It must not override that decision.
-    sources = ["country_median", "item_median", "fixed", "never_food", "implied_by_products"]
+    sources = ["country_median", "item_median", "fixed", "implied_by_products"]
     tb = Table(
         {
             "country": ["Example"] * len(sources),
             "year": [2023] * len(sources),
             "role": ["crop"] * len(sources),
             "density_source": sources,
-            "density": [10.0, 20.0, 30.0, 0.0, 40.0],
+            "density": [10.0, 20.0, 30.0, 40.0],
             chain_step.NUTRIENTS[nutrient]["numerator"]: [9e6] * len(sources),
         }
     )
@@ -78,4 +78,4 @@ def test_replacement_densities_still_determine_food(chain_step, nutrient):
         tb[element] = 0.0
     tb["food"] = 1.0
     converted = chain_step.convert_elements_to_nutrient(tb, nutrient=nutrient)
-    np.testing.assert_array_equal(converted["food"], [1e5, 2e5, 3e5, 0, 4e5])
+    np.testing.assert_array_equal(converted["food"], [1e5, 2e5, 3e5, 4e5])

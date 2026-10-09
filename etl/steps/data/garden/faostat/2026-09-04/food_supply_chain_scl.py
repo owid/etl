@@ -65,7 +65,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    kilograms.
 
 4. Rejected and missing densities, and their fallbacks.
-   >> Scale: minor. Densities derived directly from the data cover about 66% of tonnage in energy (63% in protein);
+   >> Scale: minor. Densities derived directly from the data cover about 67% of tonnage in energy (63% in protein);
    the medians cover about 8% (12% in protein). The rest uses the fixed and the product-implied densities of
    assumptions 6 and 7.
 
@@ -91,10 +91,10 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    value, so the cell gets that.
 
 6. Items nobody eats get fixed densities.
-   >> Scale: major for the stages "feed" and "processing_net". The fixed densities carry only 3.4% of tonnage, but
+   >> Scale: major for the stages "feed" and "processing_net". The fixed densities carry only 3.2% of tonnage, but
    that tonnage is the oilseed cakes and brans whose presence is the main reason to use SCL at all.
 
-   Items with little or no food use (cakes, brans, ethanol, refining residues) need fixed densities. These use
+   Items with little or no food use (cakes, brans, gluten feed, refining residues) need fixed densities. These use
    matching FAO factors where available: the 2024 nutrient conversion table, the FBS Handbook for three oilseed
    cakes absent from that table, and FAOSTAT's reported food observations for chemically modified fats. Items
    without a matching FAO factor retain the existing estimates from USDA food analogues and Feedipedia feed
@@ -103,8 +103,18 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    is that a few hundred tonnes of soybean cake eaten somewhere would otherwise set the density of hundreds of
    millions of tonnes of cake. An item on the list with a real food use (spirits, and wheat bran in some countries)
    keeps its data-derived density instead.
-   Items that are never food in any form (castor, tung, kapok, jojoba, wool grease) get zero energy and protein,
-   which removes them from every element consistently. In the mass table every item counts as it is.
+   Items that are never food in any form are left out of the chain altogether, in all three tables: castor, tung,
+   kapok, jojoba, wool grease, cocoa husks, and fuel ethanol (undenatured alcohol of 80% vol or higher). Ethanol is
+   the one that matters. The crops sent to distilleries leave the chain where FAO records them: as other uses of
+   the crop in Brazil and the United States (2,800 kcal per person per day of cane and molasses in Brazil in 2023),
+   or as processing of molasses in Pakistan and India. If ethanol counted as a processed product, those calories
+   would be credited back into processing (300 kcal in Brazil, making processing appear to create calories), then
+   counted a second time as ethanol exports and ethanol burned, and the fuel that importing countries buy would
+   enter their chain as imports (1,500 kcal in the Netherlands). Leaving ethanol out has two costs. Where FAO
+   records the distillery feedstock as processing, the calories turned into fuel appear as a processing loss rather
+   than under other uses: 62 kcal in Pakistan and 47 in India, and more than 10% of food in Eswatini, Hungary,
+   Paraguay, Slovakia, Tajikistan, Belgium and Moldova. And Liberia, where FAO records about 6,300 tonnes a year of
+   this ethanol as food, loses 22 kcal of food (1%); it is the only country whose food changes.
 
 7. Crops that are not eaten as harvested get densities implied by their products.
    >> Scale: major for the stage "crop_production". The product-implied densities carry 22% of tonnage: paddy rice,
@@ -207,17 +217,26 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
 KNOWN PROBLEMS, NOT YET RESOLVED
 --------------------------------
 - Processing appears to create calories in some countries.
-  >> Scale: major for Brazil, where processing creates about 280 kcal per person per day in 2023; small for World,
-  where processing loses 51 kcal. Not fixed yet; the FBS sibling has the same symptom with a different cause.
+  >> Scale: major for a few countries: in 2023, Denmark, Guyana, Marshall Islands and Ukraine show gains above a
+  third of food, 11 of 176 countries above 10% of food, and 62 show some gain (28% of all country-years in energy,
+  22% in protein). Small for World, where processing loses 102 kcal per person per day, 1.7% of crop production.
+  The FBS sibling has the same symptom with a different cause.
 
   In the normal case "processing_net" is positive: the converted processing inputs exceed the converted product
-  outputs. Brazil's gain comes mostly from ethanol. The cane sent to Brazil's distilleries is recorded as "other
-  uses", not as "processing", but the ethanol made from it counts as a processed product. So about 300 kcal per
-  person per day of ethanol leave processing without ever having entered it. The United States records the maize
-  sent to its distilleries in the same way. The soy family is no longer a cause: with FAO's soybean-cake factor (261
-  kcal per 100 g, replacing the previous 330), it loses 234 kcal per person per day in Brazil. In protein, the soy
-  family still creates 11.8 g per person per day, because FAO's cake protein factor is the same 46 g per 100 g used
-  before.
+  outputs. The two largest causes are handled: ethanol credited back into processing with no input (Brazil, the
+  United States; assumption 6) and fish oil (assumption 9). The remaining gains have four causes:
+  - FAO's nutrient factor for a raw item is below what its products contain. Coconuts carry 85 kcal per 100 g
+    while the copra made from them holds about 137 (Marshall Islands, Kiribati, Tonga, Papua New Guinea);
+    sunflower seed carries 462 while its oil and cake hold about 565 (Ukraine). In protein, soybeans carry 34 g
+    while the cake made from 78% of the beans holds 46 g (Brazil 11 g, Bolivia, China), and raw milk carries 3.3 g
+    against its products (New Zealand).
+  - The product-implied densities of assumption 7 are World ratios (next problem): countries whose mills extract
+    more than the world average gain (Honduras and Papua New Guinea for oil palm, Uruguay for rice).
+  - FAO's own quantities are inconsistent: Denmark's molasses production equals its whole beet harvest since 2021,
+    Guyana's rice bran is 30% of its paddy, a third of Fiji's cane is recorded as feed, Bolivia's soybean cake
+    weighs more than the beans crushed.
+  - Products made from several inputs with no recorded parent: hydrogenated oils (Netherlands), margarine
+    (Belgium), glucose (France).
 
 - The product-implied densities are World-level ratios applied to every country.
   >> Scale: minor for World by construction; country-level discrepancies depend on differences from the world
@@ -556,6 +575,15 @@ def prepare_balance_table(tb: Table, roles: pd.Series, manual: dict) -> Table:
     return tb[BALANCE_COLUMNS + ["population"]]
 
 
+def drop_never_food_items(tb: Table, manual: dict) -> Table:
+    """Leave out the items that are never food, in all three tables.
+
+    Implements the never-food part of assumption 6.
+    """
+    never = [_pad_code(item["code"]) for item in manual["never_food"]]
+    return tb[~tb["item_code"].isin(never)].reset_index(drop=True)
+
+
 # --------------------------------------------------------------------------------------------------------------------
 # Fish from FBS (assumption 9).
 # --------------------------------------------------------------------------------------------------------------------
@@ -735,10 +763,8 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
         default="none",
     )
 
-    # Assumption 6: items with little food use get fixed factors; items that are never food get zero.
+    # Assumption 6: items with little food use get fixed factors.
     fixed = fixed_density_map(tb, manual, nutrient)
-    for item in manual["never_food"]:
-        fixed[_pad_code(item["code"])] = 0.0
     # Fixed densities take precedence over the data for items that are not really food: a few hundred tonnes of soybean
     # cake eaten somewhere would otherwise set the density of hundreds of millions of tonnes. Items in the list with
     # a real food use (spirits, wheat bran) keep their data-based density.
@@ -747,8 +773,6 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
     is_fixed = tb["item_code"].isin(fixed) & (food_share.fillna(0) < FIXED_DENSITY_MAX_FOOD_SHARE)
     tb.loc[is_fixed, "density"] = tb.loc[is_fixed, "item_code"].map(fixed)
     tb.loc[is_fixed, "density_source"] = "fixed"
-    never = tb["item_code"].isin([_pad_code(item["code"]) for item in manual["never_food"]])
-    tb.loc[never, ["density", "density_source"]] = [0.0, "never_food"]
 
     # Assumption 7: crops not eaten as harvested get the density implied by their products, from World each year.
     world = tb[tb["country"] == "World"]
@@ -991,6 +1015,8 @@ def run() -> None:
 
     # Assumptions 1 and 2: the balance table, with missing elements as zero.
     tb = prepare_balance_table(tb_scl, roles=roles, manual=manual)
+    # Assumption 6: items that are never food (castor, kapok, fuel ethanol...) are left out of all three tables.
+    tb = drop_never_food_items(tb, manual=manual)
     sanity_check_nutrient_factors(tb)
     population = tb[["country", "year", "population"]].drop_duplicates()
     # Assumption 9: fish and seafood, taken from FBS.
