@@ -35,12 +35,12 @@ Any rewrites you propose use American spelling.
 
 Scope by calling context:
 
-In most workflow skills this review is an **optional, offered** step (it can consume many tokens — see the estimates in Step 1), except where the table marks it mandatory; when invoked from one of them, scope accordingly:
+Where the table marks it mandatory, the calling skill runs it on every run (as a background agent, with effort scaled to the dataset); elsewhere it is an optional, offered step (it can consume many tokens — see the estimates in Step 1). When invoked from one of them, scope accordingly:
 
 | Context | Scope |
 |---|---|
-| `/update-dataset` § 6c-bis (optional) | New/changed metadata text + newly added data values (latest wave/year); deep review = top-N + anomalies |
-| `/create-dataset` Step 6b (optional) | Everything — all indicators (new datasets are small and have no charts yet) |
+| `/update-dataset` § 6c-bis (**mandatory**, background) | New/changed metadata text + newly added data values (latest wave/year); deep review = top-N + anomalies |
+| `/create-dataset` Step 6b (**mandatory**, background) | All indicators when there are few (new datasets usually are small and have no charts yet); on a large dataset, the main indicators with a handful of value cross-checks each |
 | `/create-snapshot` § 5 (optional) | Phase 0 only — verify the `.dvc` claims against the fetched producer docs (no built dataset yet, so no data cross-checks) |
 | `/review-data-pr` § 10b | Only if the author ran it: verify outcomes and independently spot-check 2–3 findings and 2–3 anchor values |
 | `/edit-faust-metadata` (**mandatory**) | Claims-only, on the added/edited metadata text exclusively — verify each new/changed sentence against the producer docs behind the links in the text and the snapshot `.dvc`. NO data-value cross-checks, anomaly scans, or indicator prioritization (no data changed), and unedited metadata is out of scope — a handful of web calls, not the full review |

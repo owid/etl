@@ -1,6 +1,6 @@
 ---
 name: check-empty-entities
-description: Audit every surface that renders a dataset's indicators — charts, map tabs, MDim views, explorer views, narrative charts, and article references — for views whose pinned entity selection has no data in the new indicators (they render as empty charts with no error anywhere). Grades findings against production to separate update regressions from pre-existing gaps. Use when the user asks to "check for empty entities/views/charts", or as the optional audit step offered by /update-dataset (step 7) and /review-data-pr (§8d) — offered rather than automatic because the full sweep can consume many tokens on widely-charted datasets.
+description: Audit every surface that renders a dataset's indicators — charts, map tabs, MDim views, explorer views, narrative charts, and article references — for views whose pinned entity selection has no data in the new indicators (they render as empty charts with no error anywhere). Grades findings against production to separate update regressions from pre-existing gaps. Use when the user asks to "check for empty entities/views/charts", or as the mandatory audit step in /update-dataset (step 7, run in the background after the indicator upgrade, with the full automated pass and scaled follow-up); /review-data-pr (§8d) runs it on opt-in.
 metadata:
   internal: true
   owner: paarriagadap
