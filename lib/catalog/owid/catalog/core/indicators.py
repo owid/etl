@@ -352,6 +352,9 @@ class Indicator(pd.Series):
             warnings.warn(
                 "Avoid using fillna(inplace=True), which may not handle metadata as expected.", warnings.MetadataWarning
             )
+        if value is None:
+            # pandas 3 accepts value=None and fills nothing; fail loudly as pandas 2 did.
+            raise ValueError("Must specify a fill 'value'.")
         indicator_name = self.name or UNNAMED_INDICATOR
         indicator = Indicator(super().fillna(value, *args, **kwargs), name=indicator_name)
         indicator._fields = copy.deepcopy(self._fields)
@@ -477,7 +480,7 @@ class Indicator(pd.Series):
         new_var = super().copy(deep=deep)
         if deep:
             field_names = [n for n in self.index.names + [self.name] if n is not None]
-            new_var._fields = defaultdict(VariableMeta, {k: self._fields[k].copy(deep=deep) for k in field_names})
+            new_var._fields = defaultdict(VariableMeta, {k: self._fields[k].copy(deep=deep) for k in field_names})  # ty: ignore[invalid-assignment]
         return new_var  # ty: ignore[invalid-return-type]
 
 

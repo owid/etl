@@ -436,7 +436,7 @@ def _last_updated_before_minutes(dataset_meta: pd.DataFrame) -> int:
     if pd.isnull(updated):
         return 0
     else:
-        td = pd.Timestamp.utcnow() - pd.to_datetime(
+        td = pd.Timestamp.now(tz="UTC") - pd.to_datetime(
             dataset_meta.set_index(0)[1].loc["updated"], dayfirst=True, utc=True
         )
         return int(td.total_seconds() / 60)

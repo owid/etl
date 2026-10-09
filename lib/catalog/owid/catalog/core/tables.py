@@ -1125,6 +1125,9 @@ class Table(pd.DataFrame):
             # TODO: make this work with append=True
             dimensions = [{"name": self[col].title or key, "slug": key} for key in keys]
 
+        # pandas 3 deprecates `verify_integrity` in set_index, so check uniqueness here instead.
+        verify_integrity = kwargs.pop("verify_integrity", False)
+
         if kwargs.get("inplace"):
             super().set_index(keys, **kwargs)
             t = self
@@ -1132,6 +1135,10 @@ class Table(pd.DataFrame):
         else:
             t = super().set_index(keys, **kwargs)
             to_return = cast(Table, t)
+
+        if verify_integrity and not t.index.is_unique:
+            duplicates = t.index[t.index.duplicated()].unique()
+            raise ValueError(f"Index has duplicate keys: {duplicates}")
 
         t.metadata.primary_key = keys
         t.metadata.dimensions = dimensions  # ty: ignore
@@ -1733,43 +1740,43 @@ class Table(pd.DataFrame):
         return super().reorder_levels(*args, **kwargs)  # ty: ignore
 
     def __add__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__add__(other)).copy_metadata(self))
 
     def __iadd__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__add__(other)
 
     def __sub__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__sub__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__sub__(other)).copy_metadata(self))
 
     def __isub__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__sub__(other)
 
     def __mul__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__mul__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__mul__(other)).copy_metadata(self))
 
     def __imul__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__mul__(other)
 
     def __truediv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__truediv__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__truediv__(other)).copy_metadata(self))
 
     def __itruediv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__truediv__(other)
 
     def __floordiv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__floordiv__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__floordiv__(other)).copy_metadata(self))
 
     def __ifloordiv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__floordiv__(other)
 
     def __mod__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__mod__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__mod__(other)).copy_metadata(self))
 
     def __imod__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__mod__(other)
 
     def __pow__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__pow__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__pow__(other)).copy_metadata(self))
 
     def __ipow__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__pow__(other)
@@ -1905,15 +1912,40 @@ class TableGroupBy:
     ) -> Table | indicators.Indicator:
         mem = {}
 
+        # pandas 3 removed `include_groups=True`, so groups always arrive without the grouping columns.
+        # Emulate it: hand `func` the full group from the original object (all columns, same order).
+        obj = self.groupby.obj
+        keys = self.groupby.keys
+        keys = keys if isinstance(keys, list) else [keys]
+        key_columns = [k for k in keys if isinstance(k, str) and k in obj.columns] if include_groups else []
+        indices = self.groupby.indices if key_columns else {}
+
+        def _with_group_columns(g: Any) -> Any:
+            positions = indices.get(g.name)
+            if positions is not None and len(positions) == len(g):
+                full = obj.iloc[positions]
+            else:
+                # Group names that can't be looked up (e.g. NaN keys): re-insert the key values instead.
+                values = g.name if len(keys) > 1 else (g.name,)
+                full = g.copy()
+                for i, k in enumerate(keys):
+                    if k in key_columns:
+                        full[k] = pd.Series(values[i], index=g.index, dtype=obj[k].dtype)
+                full = full[[c for c in obj.columns if c in full.columns]]
+            object.__setattr__(full, "name", g.name)
+            return full
+
         @wraps(func)
         def f(g: Any) -> Any:
+            if key_columns:
+                g = _with_group_columns(g)
             tb = func(g, *args, **kwargs)
             # remember one table to use its metadata
             if not mem:
                 mem["table"] = tb
             return tb
 
-        df = self.groupby.apply(f, *args, include_groups=include_groups)
+        df = self.groupby.apply(f, *args, include_groups=False)
         if not mem:
             return Table(df)
         elif type(mem["table"]) is pd.DataFrame:

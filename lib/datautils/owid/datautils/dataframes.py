@@ -629,7 +629,7 @@ def map_series(
 
         # if we are setting values from the original series, ensure we have the same dtype
         try:
-            series_mapped = series_mapped.astype(series.dtype, copy=False)
+            series_mapped = series_mapped.astype(series.dtype)
         except ValueError:
             # casting NaNs to integer will fail
             pass
@@ -845,18 +845,16 @@ def combine_two_overlapping_dataframes(
 
     # Align both dataframes on their common indexes.
     # Give priority to df1 on overlapping values.
+    df2_columns = df2.columns
     combined, df2 = df1.align(df2)
 
-    new_columns = df2.columns.difference(df1.columns)
-    for col in new_columns:
-        try:
-            combined[col] = combined[col].astype(df2[col].dtype, copy=False)
-        except ValueError:
-            # casting NaNs to integer will fail
-            pass
-
-    # Fill missing values in df1 with values from df2.
-    combined = combined.fillna(df2)
+    # Fill missing values in df1 with values from df2, column by column: a frame-wide fillna would upcast
+    # a column to object whenever one side is all-NaN after aligning (e.g. a str column missing in df2).
+    for col in df2_columns:
+        if col in df1.columns:
+            combined[col] = combined[col].fillna(df2[col])
+        else:
+            combined[col] = df2[col]
 
     if index_columns is not None:
         combined = combined.reset_index()
