@@ -34,7 +34,7 @@ Overwhelmingly from **entity-rename cycles of a dataset's own aggregate entities
 
 ### Fixing a dead selection: rename, drop, or neither
 
-String similarity picks the *fix*, never validates it — it can propose `Nigeria → Niger` (different countries). Before applying any rename, **read the chart's whole selection**, and gate every edit on three checks: the replacement must have data in *that chart's own* y-variables, must not already be selected, and the result must contain no duplicates. Drops need the mirror guard — refuse to remove any entity that *does* have data.
+String similarity picks the *fix*, never validates it — it can propose `Nigeria → Niger` (different countries). Before applying any rename, **read the chart's whole selection**, and gate every edit on three checks: the replacement must have data in *that chart's own* y-variables (if it doesn't, drop the dead name instead — per-capita and %-of-GNI variants often lack the aggregate channels that the level chart carries), must not already be selected, and the result must contain no duplicates. Drops need the mirror guard — refuse to remove any entity that *does* have data.
 
 Reading the whole selection is what catches the two failure modes similarity can't:
 
@@ -92,7 +92,7 @@ Article rows come back from the sweep with their `query_string`; the ones carryi
 For every finding, fetch the same chart's **production** y-variables (chart ids are shared; get prod `chart_dimensions` via public Datasette) and their entity lists from the production API:
 
 - Selection had data on production, none on staging → **regression from this update**. Author: fix before merge (remap the view or restore the entities). Reviewer: 🔴.
-- Gap identical on production → **pre-existing**. It still needs fixing — it just doesn't block this PR. For **chart and narrative-chart selections** the fix is a one-line config edit that rides the same Chart Diff as the rest of the update, so *offer to apply it in the session* rather than deferring; only gdoc references genuinely need content follow-up. When mapping a dead legacy name to its current equivalent: drop it (don't map) when the live twin is *already in the selection*, and drop it when the mapped twin has **no data on that chart's own indicators** (per-capita and %-of-GNI variants often lack the aggregate channels that the level chart carries). And keep every deferred finding on an explicit tracked list until someone acts on it — "pre-existing, documented" findings that fall off the follow-up list resurface as user-reported empty charts. Reviewer: 🟡, confirm the fix is documented or underway.
+- Gap identical on production → **pre-existing**. It still needs fixing — it just doesn't block this PR. For **chart and narrative-chart selections** the fix is a one-line config edit that rides the same Chart Diff as the rest of the update, so *offer to apply it in the session* rather than deferring; only gdoc references genuinely need content follow-up. Rename vs. drop follows "Fixing a dead selection" above. And keep every deferred finding on an explicit tracked list until someone acts on it — "pre-existing, documented" findings that fall off the follow-up list resurface as user-reported empty charts. Reviewer: 🟡, confirm the fix is documented or underway.
 - Public Datasette covers only ~80% of chart ids — when a chart has no baseline, say so instead of silently classifying it as pre-existing.
 
 ## Script skeleton
@@ -152,13 +152,13 @@ for _, row in cfgs.iterrows():
         ...  # finding -> grade against production
 ```
 
-The same loop covers MDim and explorer views — they are `chart_configs` rows the sweep already returned a `config_id` for. Two surfaces need their own handling: **narrative charts** (merged parent+patch via `AdminAPI.get_narrative_chart(id)["configFull"]`, never the bare `config_id` row) and **article references** (parse `country=` out of each row's `query_string`). Query gotcha: pymysql `%`-formats break on quoted literals and `LIKE` patterns — parameterize everything (`params={...}`), and use `CHAR_LENGTH(x) = 0` instead of `x = ''`.
+The same loop covers MDim and explorer views — they are `chart_configs` rows the sweep already returned a `config_id` for. Two surfaces need their own handling: **narrative charts** (see §3) and **article references** (see §4). Query gotcha: pymysql `%`-formats break on quoted literals and `LIKE` patterns — parameterize everything (`params={...}`), and use `CHAR_LENGTH(x) = 0` instead of `x = ''`.
 
 ## Report format
 
 - **Regressions** (block): view, surface, entities lost, prod evidence.
-- **Pre-existing gaps** (🟡 — still need fixing, just not necessarily in this PR): table of citation (scroll-to-highlight link), chart (staging grapher link via `OWIDEnv.from_staging(branch).chart_site(slug)` — same normalized-host rule as the API prefix; never hand-build `staging-site-<branch>`), and dead entities — the common pattern is a rename-cycle mismatch between the URL and the live entities (unsuffixed names in old URLs while data lives under suffixed entities, or stale `(OECD)`/`(WB)`-suffixed names after the data moved to unsuffixed forms).
-- **Coverage caveats**: charts with no production baseline; variables whose metadata fetch failed (don't count fetch failures as empty).
+- **Pre-existing gaps** (🟡 — still need fixing, just not necessarily in this PR): table of citation (scroll-to-highlight link), chart (staging grapher link via `OWIDEnv.from_staging(branch).chart_site(slug)` — same normalized-host rule as the API prefix), and dead entities — the common pattern is a rename-cycle mismatch between the URL and the live entities (see "Where dead selections come from").
+- **Coverage caveats**: charts with no production baseline; variables whose metadata fetch failed.
 
 ### Close with what's still open
 
