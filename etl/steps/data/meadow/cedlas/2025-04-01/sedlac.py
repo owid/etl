@@ -235,24 +235,24 @@ def format_long_tables(
         else:
             countries_with_null = ["Argentina", "Chile"]
 
-        actual_countries_with_null = t[t["index"] == "nan"]["country"].unique().tolist()
+        actual_countries_with_null = t[t["index"].isna()]["country"].unique().tolist()
 
         assert actual_countries_with_null == countries_with_null, (
             f"Null values in index are not only for {countries_with_null}. In this case, we have {actual_countries_with_null}."
         )
 
         # Assert that the null values are only two
-        assert len(t[t["index"] == "nan"]) == len(countries_with_null), (
+        assert len(t[t["index"].isna()]) == len(countries_with_null), (
             f"There are more than {len(countries_with_null)} null values in index."
         )
 
         # Replace empty index values for country = Chile and Argentina and delete for Brazil and Mexico
         # This is done to identify survey spells that are blank in the original table.
         # In the case of Brazil and Mexico, it is just that there is an additional jump not representing a different spell.
-        t.loc[(t["country"] == "Argentina") & (t["index"] == "nan"), "index"] = "EPH with changes"
-        t.loc[(t["country"] == "Chile") & (t["index"] == "nan"), "index"] = "New adjustments and imputations"
-        t = t[~((t["country"] == "Brazil") & (t["index"] == "nan"))]
-        t = t[~((t["country"] == "Mexico") & (t["index"] == "nan"))]
+        t.loc[(t["country"] == "Argentina") & (t["index"].isna()), "index"] = "EPH with changes"
+        t.loc[(t["country"] == "Chile") & (t["index"].isna()), "index"] = "New adjustments and imputations"
+        t = t[~((t["country"] == "Brazil") & (t["index"].isna()))]
+        t = t[~((t["country"] == "Mexico") & (t["index"].isna()))]
 
         # And for survey
         t["survey"] = t.loc[~(t["index"].isin(countries)) & ~(t["index"].astype(str).str[:4].str.isnumeric()), "index"]

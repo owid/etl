@@ -33,12 +33,6 @@ if TYPE_CHECKING:
 # Simple type alias for runtime use (matches etl.steps.DAG)
 DAG = dict[str, set[str]]
 
-# NOTE: I tried enabling this, but ran into weird errors with unit tests and inconsistencies
-#   with owid libraries. It's better to wait for an official pandas 3.0 release and update
-#   it all at once.
-# Use string[pyarrow] by default, this will become True in pandas 3.0
-# pd.options.future.infer_string = True
-
 # if the number of open files allowed is less than this, increase it
 LIMIT_NOFILE = 4096
 

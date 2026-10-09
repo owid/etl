@@ -1744,6 +1744,6 @@ def concatenate_and_fill_empty_spells(tb_list: list[Table], add_no_spells: bool)
     if add_no_spells:
         # Fill empty values of survey_comparability to "No spells"
         tb["survey_comparability"] = tb["survey_comparability"].astype(str)
-        tb["survey_comparability"] = tb["survey_comparability"].replace("<NA>", "No spells")
+        tb["survey_comparability"] = tb["survey_comparability"].fillna("No spells").replace("<NA>", "No spells")
 
     return tb

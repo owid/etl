@@ -99,7 +99,7 @@ class ResponseSet(BaseModel, Generic[T]):
         """Truncate all string values in DataFrame for display."""
         df = df.copy()
         for col in df.columns:
-            if df[col].dtype == object:
+            if pd.api.types.is_string_dtype(df[col].dtype):
                 df[col] = df[col].apply(lambda x: self._truncate_string(x, self._MAX_STR_LENGTH))
         return df
 

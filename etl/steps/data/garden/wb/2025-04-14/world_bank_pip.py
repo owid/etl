@@ -203,7 +203,7 @@ def run() -> None:
 
     # Make empty values of survey_comparability to "No spells"
     tb["survey_comparability"] = tb["survey_comparability"].astype(str)
-    tb["survey_comparability"] = tb["survey_comparability"].replace("<NA>", "No spells")
+    tb["survey_comparability"] = tb["survey_comparability"].fillna("No spells").replace("<NA>", "No spells")
 
     # Do the same for poverty_line
     tb["poverty_line"] = tb["poverty_line"].fillna("No poverty line")
