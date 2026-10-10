@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Common bird index by type of species - EU aggregate
+    description: |-
+      The common bird index is a multi-species composite index, which measures the relative abundance of a selection of common bird species associated with specific habitats. Rare species are excluded. Three groups of bird species are represented: common farmland species (39 species), common forest species (34 species) and all common bird species (168 species; including farmland and forest species). The indices are presented for EU-aggregates only and with smoothed values.
+
+      Data are collected mainly by volunteers. National data is calculated by national coordinators and are the property of the respective national organisations. The Pan-European Common Bird Monitoring Scheme (PECBMS) gathers national indices from all the PECBMS states and agreggates them into supranational indices. The European Bird Census Council and its PECBMS programme delivers data from 26 Member States. MT is not covered.
+
+      The indicator feeds into the EU's Sustainable Development Goal (SDG) monitoring framework, tracking progress on SDG 15 (life on land) and SDG 2 (sustainable agriculture).
+    date_published: "2026-02-16"
+
+    # Citation
+    producer: BirdLife International
+    citation_full: |-
+      BirdLife International - Common bird index by type of species - EU aggregate, via Eurostat (2026), https://ec.europa.eu/eurostat/web/environment/information-data/protected-areas-birds (accessed on 29 July 2026)
+
+    # Files
+    url_main: https://ec.europa.eu/eurostat/web/environment/information-data/protected-areas-birds
+    url_download: https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/sdg_15_60?format=TSV&compressed=true
+    date_accessed: '2026-07-29'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ec.europa.eu/eurostat/web/main/help/copyright-notice
+outs:
+  - md5: 8eefb2ba46575b4dddec0f27c4cebfe6
+    size: 777
+    path: eu_wild_bird_populations.gz

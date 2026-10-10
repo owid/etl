@@ -23,13 +23,7 @@ metadata:
 
 ## Workflow
 
-1. **Check feather schemas first** — before profiling, inspect the on-disk types of large tables:
-   ```python
-   import pyarrow.feather as pf
-   for field in pf.read_table("data/meadow/.../table.feather").schema:
-       print(f"{field.name}: {field.type}")
-   # large_string → should be dictionary (categorical)
-   ```
+1. **Check feather schemas first** — before profiling, inspect the on-disk types of large tables (see "String Columns That Should Be Categoricals" below)
 2. **Profile** — measure, never guess
 3. **Identify the bottleneck** — read the `%` column, focus on the top 3 lines
 4. **Diagnose** — is it I/O, dtype waste, or algorithmic?
@@ -146,7 +140,7 @@ result = tb.groupby(cols).agg({"value": "sum"})
 checks = tb.groupby(cols)["country"].apply(lambda x: check(x))
 ```
 
-**Known issue**: `geo.add_region_aggregates()` (deprecated) injects a per-group lambda to check `countries_that_must_have_data`. When that list is empty (common case), the lambda is a no-op but still causes the slowdown. This was fixed in 2026-03 to skip the lambda when no checks are needed. The newer `paths.regions.add_aggregates()` API doesn't have this issue.
+**Known issue**: `geo.add_region_aggregates()` (deprecated) injects a per-group lambda to check `countries_that_must_have_data`, which causes this slowdown whenever that list is non-empty (it skips the lambda when no checks are needed). The newer `paths.regions.add_aggregates()` API doesn't have this issue.
 
 ### 5. Unnecessary Full-Table Reads
 
@@ -182,11 +176,7 @@ If it's genuinely slow, the cost is usually in `update_metadata` (YAML parsing) 
 
 ## Memory-Specific Profiling
 
-```bash
-.venv/bin/etl d profile --mem garden/namespace/version/dataset
-```
-
-Look for:
+In the `--mem` profile (see Quick Start), look for:
 - **Spikes >100 MB** on a single line — likely creating a large intermediate copy
 - **Cumulative growth** that never drops — objects not being freed
 

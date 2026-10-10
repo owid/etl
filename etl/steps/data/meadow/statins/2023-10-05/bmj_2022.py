@@ -56,9 +56,7 @@ def run(dest_dir: str) -> None:
     essential_med_tb["indicator"] = "Essential medicine list"
     essential_med_tb = essential_med_tb.rename(columns={"statins_essential_medicine_2017": "value"})
     essential_med_tb["value"] = essential_med_tb["value"].astype(str)
-    essential_med_tb["value"].replace("-", np.nan, inplace=True)
-    essential_med_tb["value"].replace("No", 0, inplace=True)
-    essential_med_tb["value"].replace("Yes", 1, inplace=True)
+    essential_med_tb["value"] = essential_med_tb["value"].replace({"-": np.nan, "No": 0, "Yes": 1})
     essential_med_tb["value"] = essential_med_tb["value"].astype(float)
 
     # Concatenating processed DataFrames to form a single DataFrame

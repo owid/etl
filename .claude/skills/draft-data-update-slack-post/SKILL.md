@@ -20,16 +20,16 @@ Generate a draft for the #data-updates-comms Slack form. The skill inspects the 
 
 ## Why this channel exists (read before drafting)
 
-OWID's #data-updates-comms channel is **not** an internal "FYI I did X" log. It gives information to Charlie (OWID's Communications & Outreach Manager), who turns this input into public-facing posts on social media (Instagram, LinkedIn, X) and in newsletters.
+OWID's #data-updates-comms channel is **not** an internal "FYI I did X" log. It gives information to Ed (OWID's Head of Data and Research), who turns this input into public-facing posts on social media (Instagram, LinkedIn, X) and in newsletters.
 
-So the form's editorial fields are written for Charlie _and indirectly for the general public_ — not for the data team. A big mistake is writing them in an internal/engineer voice.
+So the form's editorial fields are written for Ed _and indirectly for the general public_ — not for the data team. A big mistake is writing them in an internal/engineer voice.
 
 **The reframing that matters most:**
 
-> Don't tell Charlie what you'd say to your colleagues ("I updated all the WDI charts").
+> Don't tell Ed what you'd say to your colleagues ("I updated all the WDI charts").
 > Tell him what you'd say to a friend who asks what you did this week ("I updated hundreds of our charts to the latest release of the World Bank's largest dataset, called the World Development Indicators. It's a core dataset with hundreds of indicators across global development. This update added new data up to 2025 for dozens of our most-viewed charts…").
 
-What Charlie needs from each field is a **reader-centric view**: what work was done, what it changes or enables, what's interesting about the source, what it helps people understand about the world, and why anyone should care that it's been updated.
+What Ed needs from each field is a **reader-centric view**: what work was done, what it changes or enables, what's interesting about the source, what it helps people understand about the world, and why anyone should care that it's been updated.
 
 **This skill must surface this framing to the user** — both at the top of the output draft file and inside each editorial-field prompt block — so the user has it in front of them when they sit down to write. Do not delete or paraphrase the framing.
 
@@ -62,7 +62,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 | Caveats                      | seeded from indicator `description_key` bullets, sanity-check workarounds (`notes_to_check.md` from update-dataset workbench), `meta.origin.description` paragraphs that mention "limitations" / "caution" | **prompt** with extracted snippets — user rewrites           |
 | Anything interesting         | seeded from PR commit messages, `notes_to_check.md` resolutions, snapshot diff summary if available in `workbench/<short_name>/`                                                                           | **prompt** — user rewrites                                   |
 | Chart views (1–3)            | `update-context.yml` candidates OR query staging directly using the criteria below                                                                                                                         | filled with rationale, user confirms                         |
-| Search URL                   | `https://ourworldindata.org/search?datasetProducts=<urlquote(datasets.name)>` — value is the grapher `datasets.name` field (= garden `dataset.title` override when set, else snapshot `meta.origin.title`); see step 6 | filled                                                       |
+| Search URL                   | `https://ourworldindata.org/search?datasetProducts=<urlquote(datasets.name)>` — value is the grapher `datasets.name` field; see step 6 | filled                                                       |
 
 **The editorial fields are deliberately not auto-prosed.** Slack posts in the editorial voice ("Why we have this dataset on OWID") read flat when LLM-written; the value is in the human framing. The skill's job is to surface the relevant snippets so the user doesn't have to grep for them.
 
@@ -70,13 +70,13 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
 0. **Reuse update context if available.**
    - If `workbench/<short_name>/update-context.yml` is provided or exists, read it first and use its values for mechanical fields, chart count/views, and editorial snippets.
-   - Continue with the steps below only for fields missing from that context. This keeps `update-dataset` responsible for gathering context during the update while preserving this skill as a standalone fallback.
+   - Continue with the steps below only for fields missing from that context.
 
 1. **Resolve the dataset.**
    - Parse `<namespace>/<new_version>/<short_name>` or infer from git diff.
    - Locate snapshot DVC: `snapshots/<namespace>/<new_version>/*.dvc`.
    - Locate garden step: `etl/steps/data/garden/<namespace>/<new_version>/<short_name>.py` and `.meta.yml`.
-   - Locate built garden dataset: `data/garden/<namespace>/<new_version>/<short_name>` (must have been run; if missing, tell the user to run the garden step first).
+   - Locate built garden dataset: `data/garden/<namespace>/<new_version>/<short_name>` (must have been run; see Critical rules).
 
 2. **Extract mechanical fields.**
    - Read DVC origin block via `etl.files.ruamel_load` (preserves comments if we ever write back) or just `yaml.safe_load`.
@@ -107,7 +107,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
    - **Only count published charts.** Drafts are excluded by design — the Slack audience cares about user-facing impact.
 
 4. **Seed the editorial fields with snippet bullets.**
-   For each of "why it matters", "caveats", "anything interesting": don't write prose, write 2–6 substantive bullets above an empty `text` fenced block. Bullets are clean reader-facing prose — **no `Snapshot description:` / `Garden description:` prefixes** in the output. Use those as internal source pointers only.
+   For each of "why it matters", "caveats", "anything interesting": don't write prose, write 2–6 substantive bullets. Bullets are clean reader-facing prose — **no `Snapshot description:` / `Garden description:` prefixes** in the output. Use those as internal source pointers only.
 
 5. **Pick chart views — rank by *actual data change*, not just our intuitions about which chart is "flagship".**
 
@@ -164,7 +164,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
    **A checksum change is not "gained the new year."** A base-year rebase or in-place revision marks *every* chart data-changed, including charts whose series still end at the previous year (recipient/sector tables that only update in the producer's detailed release, series absent from a preliminary file). For releases that add a partial year, additionally verify each picked view's indicators actually reach the new year (`metadata.json` → `dimensions.years`), and prefer the chart carrying the **release's headline measure** — the one where the announcement's own numbers are visible on open — even when its traffic is low (the announcement is how it gets discovered).
 
-   Reuse `charts.selected_views` from `update-context.yml` only if it's already been built using this views-then-checksum process (older runs picked views by intuition and produced misleading recommendations like "life expectancy now updated" when the data was effectively unchanged, or "malaria deaths" when the chart gets ~3 views a day).
+   Reuse `charts.selected_views` from `update-context.yml` only if it's already been built using this views-then-checksum process (views picked by intuition produce misleading recommendations: a chart announced as updated when its data is effectively unchanged, or one that gets ~3 views a day).
 
    Output 1–3 as **`[<chart title>](<admin URL>)` — <rationale that names the change>**. Hyperlink each title to the admin **editor** URL, not the bare admin path:
 
@@ -175,11 +175,11 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
 6. **Build the search URL.**
 
-   The `datasetProducts` query parameter matches against the grapher **`datasets.name`** field (the dataset row's `name` column in MySQL — same value visible in the OWID admin's dataset list). When garden's `gho.meta.yml` sets a `dataset.title` override, that becomes `datasets.name` on upload. Otherwise it falls through to the snapshot origin's title.
+   The `datasetProducts` query parameter matches against the grapher **`datasets.name`** field (the dataset row's `name` column in MySQL — same value visible in the OWID admin's dataset list).
 
    **An update that spans several grapher datasets gets one link covering all of them:** join each dataset's `datasets.name` with `~` (`?datasetProducts=<name 1>~<name 2>`, each part `quote_plus`-encoded). Resolve every name the same way as below — companion datasets often carry titles of their own that differ from the main one's.
 
-   So the resolution order is:
+   The resolution order is:
 
    1. Garden `.meta.yml` → `dataset.title` (if set as override). **This is the most common case** — most large datasets carry a curated title like `Global Health Observatory - World Health Organization` or `World Bank Poverty and Inequality Platform (PIP)`.
    2. Snapshot `.dvc` → `meta.origin.title` (fallback).
@@ -206,7 +206,7 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
 8. **Write the draft.**
    - Output path: `ai/data-update-comms.md` by default, or `workbench/<short_name>/slack-announcement.md` when invoked from `update-dataset` step 9.
-   - Use the canonical format in the Output format section below — no example lines, no `[filled]` / `[prompt]` tags, no inline instructions. If a field can't be filled mechanically, write `[missing — <what's needed>]` inside the fenced block and stop.
+   - Use the canonical format in the Output format section below. If a field can't be filled mechanically, write `[missing — <what's needed>]` under its heading and stop.
 
 9. **Show the user the file path** and stop. In a git worktree, give the absolute path: a relative link opens the main checkout's copy, which may be a previous update's draft. Do **not** post to Slack — that's a human action. The user copy-pastes from the Markdown file into the Slack form.
 
@@ -229,21 +229,21 @@ The verbatim Slack prompt headings (do **not** rephrase, abbreviate, or change p
 | 7   | `Any important caveats or pitfalls in interpretation that users should know about this data? (optional)`                             |
 | 8   | `Anything interesting to note about this update, including what you had to do? Anything else you'd like to add? (optional)`          |
 | 9   | `Add 1–3 chart views we might use in the public announcement`                                                                        |
-| 10  | `Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)` |
+| 10  | `Link to the updated charts as a search result (not a chart collection anymore). Ask Ed if you need help with this. (optional)` |
 
 The table above is the single source of truth — if the Slack form's wording changes, update it here and nowhere else.
 
 ### Basis discipline for every number (check before drafting #6–#8 and the chart views)
 
-Producers headline figures on *their* basis — often current prices where our charts are constant, or a measure our headline chart doesn't carry. Verify every number and ranking in the snippets against **our own charts**: a producer claim our charts contradict ("X overtook Y", a total a few percent off ours) must be explicitly attributed to the producer, made basis-robust (rounded so both bases agree), or dropped in favor of chart-native numbers. Rankings especially: enumerate the measure × price-basis combinations first — a "first time in history" headline may hold on exactly one of them. Put the reconciliation (which basis says what, what social copy may safely echo) in the *caveats* field for Charlie; keep reader-facing framing chart-native.
+Producers headline figures on *their* basis — often current prices where our charts are constant, or a measure our headline chart doesn't carry. Verify every number and ranking in the snippets against **our own charts**: a producer claim our charts contradict ("X overtook Y", a total a few percent off ours) must be explicitly attributed to the producer, made basis-robust (rounded so both bases agree), or dropped in favor of chart-native numbers. Rankings especially: enumerate the measure × price-basis combinations first — a "first time in history" headline may hold on exactly one of them. Put the reconciliation (which basis says what, what social copy may safely echo) in the *caveats* field for Ed; keep reader-facing framing chart-native.
 
 ### Editorial framing (internal — do **not** copy into the output file)
 
-Before drafting fields #6, #7, #8, remember they go to Charlie, who turns them into public-facing posts — not into an internal team log. Snippets should sound like what you'd tell a curious friend, not a colleague: reader-centric, with a concrete number where possible, and what's interesting about the source. The agent uses this framing to _select_ and _phrase_ the snippets; the framing itself is never written into the output.
+Before drafting fields #6, #7, #8, apply the framing in "Why this channel exists", with a concrete number where possible. The agent uses this framing to _select_ and _phrase_ the snippets; the framing itself is never written into the output.
 
 ### Snippet selection per editorial field
 
-- **Why does this matter (#6)** — pull 3–5 short bullets that, taken together, answer "why do we have this data on OWID at all?". Draw from `meta.origin.description`, garden dataset description, and top indicator `description_short`; rephrase into clean prose. Do **not** prefix each bullet with its source label (e.g. don't write `Snapshot description: "…"`); just write the substantive content.
+- **Why does this matter (#6)** — pull 3–5 short bullets that, taken together, answer "why do we have this data on OWID at all?". Draw from `meta.origin.description`, garden dataset description, and top indicator `description_short`; rephrase into clean prose.
 - **Caveats (#7)** — pull 2–4 bullets surfacing real interpretation pitfalls. Draw from indicator `description_key` bullets, sanity-check workarounds, and methodology notes. Skip if there are no load-bearing caveats.
 - **Interesting (#8)** — pull 3–6 bullets describing concrete findings or noteworthy events captured in this update (new policies, reversals, changed countries). Draw from `editorial_context.interesting_update_snippets` in `update-context.yml`, commit messages, and resolved workarounds. Phrase them as reader-facing facts, not engineering notes.
 
@@ -299,7 +299,7 @@ Covers <year_min>–<year_max>, <n_countries> countries<, plus OWID regions if a
 1. **<title>** — `<slug>` — <rationale>
 2. **<title>** — `<slug>` — <rationale>
 
-## Link to the updated charts as a search result (not a chart collection anymore). Ask Charlie if you need help with this. (optional)
+## Link to the updated charts as a search result (not a chart collection anymore). Ask Ed if you need help with this. (optional)
 
 https://ourworldindata.org/search?datasetProducts=<urlencoded dataset title>
 
@@ -323,21 +323,18 @@ https://ourworldindata.org/search?datasetProducts=<urlencoded dataset title>
 
 - **Never invent dates, producer names, or chart counts.** If the source is missing or stale, mark `[missing]` and stop on that line — don't paper over a gap.
 - **Published charts only** for the chart count. Same rule as `update-dataset` step 8 — and the same for the other surfaces it records: only explorers with `isPublished=1` and MDims with `published=1` (from `charts.explorers` / `charts.mdims` in `update-context.yml`) count toward the announcement. Note unpublished/draft ones under `## Pending mechanical follow-ups`, not in the answer.
-- **Don't write the editorial fields as prose.** The user explicitly does not want LLM-voiced "Why we have this data" text — that's exactly the part the human wants to write themselves. Output snippets, not prose.
+- **Don't write the editorial fields as prose.** The user explicitly does not want LLM-voiced "Why we have this data" text — that's exactly the part the human wants to write themselves. Output snippets, not prose — and never generic prose ("This dataset offers important insights into…"), including in the optional caveats / interesting-notes fields.
 - **Don't post to Slack from the skill.** Output a Markdown file and stop. Posting is a human action.
 - **Use `urllib.parse.quote_plus`** (not `quote`) for the search URL — Slack's input expects `+` for spaces in `datasetProducts`.
 - **Always run from a green garden build.** If `data/garden/<ns>/<ver>/<sn>` doesn't exist, tell the user to run the garden step before retrying. Don't fabricate coverage from the snapshot alone — the garden output is what matters for the Slack post.
 
 ## Things to avoid
 
-- Don't auto-write the optional caveats / interesting-notes fields with generic prose ("This dataset offers important insights into…"). Leave them as prompts.
-- Don't query the staging DB without the `publishedAt IS NOT NULL` filter — drafts in the count would mislead.
-- Don't use the producer's homepage URL as the search link. The Slack template specifically wants `ourworldindata.org/search?datasetProducts=…`.
-- Don't tout the dataset's full indicator count when OWID publishes only one or a few of its indicators. Size claims to what we actually chart — "302 indicators" reads as overselling when the update affects one published chart (user feedback, WWBI 2026-07). Mentioning the count in internal-facing fields is fine only when it's genuinely load-bearing for Charlie.
+- Don't tout the dataset's full indicator count when OWID publishes only one or a few of its indicators. Size claims to what we actually chart — "302 indicators" reads as overselling when the update affects one published chart. Mentioning the count in internal-facing fields is fine only when it's genuinely load-bearing for Ed.
 - Don't fold this skill into `update-dataset` — keep it standalone so users can invoke it after manual updates too. `update-dataset` should gather reusable facts in `update-context.yml` and step 9 should delegate here, not duplicate the Slack rendering logic.
 
 ## Related
 
 - `.claude/skills/update-dataset/SKILL.md` step 9 — the orchestrator entry point that should call this skill.
-- `/owid-staff:draft-data-update-post` (owid/skills-private, auto-installed here) — what happens **next**. This skill's Slack post is the input to the public "Data update" post on ourworldindata.org/latest; that skill either reads the Slack message directly or, inside `/update-dataset` (step 9b), reads `update-context.yml` plus the `slack-announcement.md` this skill produced. Two different artifacts: a 10-field internal form here, a reader-facing mini-post there. Don't draft the `/latest` post from this skill. Note that the `/latest` skill declines to post when OWID covered the same data publicly less than six months ago — **that cooldown does not apply here**. This Slack form runs on every update regardless, because its audience is internal and its job is to tell Charlie what changed.
+- `/owid-staff:draft-data-update-post` (owid/skills-private, auto-installed here) — what happens **next**. This skill's Slack post is the input to the public "Data update" post on ourworldindata.org/latest; that skill either reads the Slack message directly or, inside `/update-dataset` (step 9b), reads `update-context.yml` plus the `slack-announcement.md` this skill produced. Two different artifacts: a 10-field internal form here, a reader-facing mini-post there. Don't draft the `/latest` post from this skill. Note that the `/latest` skill declines to post when OWID covered the same data publicly less than six months ago — **that cooldown does not apply here**. This Slack form runs on every update regardless, because its audience is internal and its job is to tell Ed what changed.
 - `.claude/skills/edit-faust-metadata/SKILL.md` — reuses the same grapher-channel metadata patterns for chart-view selection.

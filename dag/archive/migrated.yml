@@ -415,6 +415,10 @@ steps:
   data://grapher/health/2018-02-16/year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018:
     - data://garden/health/2018-02-16/year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018:
       - snapshot://health/2018-02-16/year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018.feather
+  # archived; last active in 5bae4f15bb2e on 2026-10-09
+  data-private://grapher/biodiversity/2022-12-07/eu_wild_bird_populations__eurostat__2022:
+    - data-private://garden/biodiversity/2022-12-07/eu_wild_bird_populations__eurostat__2022:
+      - snapshot-private://biodiversity/2022-12-07/eu_wild_bird_populations__eurostat__2022.feather
 data-private://grapher/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
   - data-private://garden/biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022:
     - snapshot-private://biodiversity/2022-12-07/international_whaling_commission_status__iwc__2022.feather

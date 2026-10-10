@@ -19,15 +19,13 @@ Ask the user which scope they want to check:
 3. **Snapshot metadata** - Check all snapshot `.dvc` files in `snapshots/` (~7,915 files)
 4. **All metadata** - Check both ETL steps and snapshot metadata files
 
-**Note:** Archived steps and snapshots (defined in `dag/archive/*.yml`) are automatically excluded from checking as they are no longer actively maintained.
-
 ---
 
 ## Implementation Strategy
 
 ### 0. Check codespell installation
 
-**IMPORTANT:** Check if codespell is installed before attempting to use it. Since codespell is now a dev dependency in the project, it should already be installed, but verify first to avoid reinstalling unnecessarily.
+**IMPORTANT:** Check if codespell is installed before attempting to use it. Since codespell is a dev dependency in the project, it should already be installed, but verify first to avoid reinstalling unnecessarily.
 
 ```bash
 # Check if codespell is installed
@@ -39,7 +37,7 @@ else
 fi
 ```
 
-If codespell is not installed and `uv add --dev codespell` fails, explain to the user how to install it manually.
+If codespell is not installed and `uv add --dev codespell` fails, tell the user to rebuild the environment with `make .venv`.
 
 ### 1. Exclude archived steps and snapshots
 
@@ -135,8 +133,6 @@ cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
   --ignore-words=.codespell-ignore.txt
 ```
 
-Note: Excluding archived steps reduces the scope by ~3,570 files and focuses on actively maintained metadata.
-
 **For option 3 (snapshot metadata):**
 
 ```bash
@@ -148,7 +144,7 @@ cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
   --ignore-words=.codespell-ignore.txt
 ```
 
-Note: the prose worth checking in a snapshot `.dvc` lives under `meta.origin` — `description`, `description_snapshot`, `title`, `title_snapshot`, `citation_full`, `attribution`. Older files instead use the deprecated `meta.source.description` / `meta.source.published_by`; both shapes are still in the repo (~2,000 files on `origin`, ~6,000 on `source`). codespell reads the whole file either way, so no filtering is needed — but report hits by their real field path, and don't "fix" a typo by migrating a file from `source` to `origin` (that's a separate change, out of scope here). ~736 archived snapshots are excluded.
+Note: the prose worth checking in a snapshot `.dvc` lives under `meta.origin` — `description`, `description_snapshot`, `title`, `title_snapshot`, `citation_full`, `attribution`. Older files instead use the deprecated `meta.source.description` / `meta.source.published_by`; both shapes are still in the repo (~2,000 files on `origin`, ~6,000 on `source`). codespell reads the whole file either way, so no filtering is needed — but report hits by their real field path, and don't "fix" a typo by migrating a file from `source` to `origin` (that's a separate change, out of scope here).
 
 **For option 4 (all metadata):**
 
@@ -247,7 +243,7 @@ All analysis logic should be embedded in this command execution, not saved as se
 
 ## Error Handling
 
-- Check if codespell is installed first (see step 0). If not installed and `uv add --dev codespell` fails, explain to the user how to install it manually with `uv sync` or check their Python environment
+- If codespell is not installed and can't be installed, see step 0
 - If no `.meta.yml` or `.dvc` files are found in the specified scope, inform the user
 - If codespell finds no typos, congratulate the user on clean metadata!
 - If file modification fails, report which files couldn't be updated

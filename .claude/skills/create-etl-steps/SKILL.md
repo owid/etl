@@ -15,7 +15,7 @@ metadata:
 
 Create meadow, garden, and grapher step files for a given snapshot, by running the same cookiecutter templates the wizard runs.
 
-> **Never copy the templates into this file.** `apps/wizard/etl_steps/cookiecutter/{meadow,garden,grapher}/` is the single source of truth, and this skill invokes it via `generate_step_to_channel`. An earlier version of this skill embedded hand-copied templates; they drifted (the multi-snapshot meadow branch and `non_redistributable` for private datasets both went missing) while the copies that hadn't drifted made the rest look current. If a template needs changing, change it in `apps/wizard/etl_steps/cookiecutter/`.
+> **Never copy the templates into this file.** `apps/wizard/etl_steps/cookiecutter/{meadow,garden,grapher}/` is the single source of truth, and this skill invokes it via `generate_step_to_channel`. Hand-copied templates drift silently: branches such as the multi-snapshot meadow loop or `non_redistributable` for private datasets go missing, while the parts that haven't drifted make the rest look current. If a template needs changing, change it in `apps/wizard/etl_steps/cookiecutter/`.
 
 `/create-dataset` calls this skill at its Step 5. Keep the two consistent: if the inputs or generated files change here, check whether `create-dataset/SKILL.md` needs a matching edit, and make it in the same commit.
 
@@ -127,7 +127,7 @@ Append the following entries to `dag/<dag_file>.yml` under the `steps:` key, usi
     - data://garden/<namespace>/<version>/<short_name>
 ```
 
-**The snapshot URI has its own prefix, driven by the snapshot's `.dvc`, not by `is_private`.** A snapshot whose `.dvc` sets `is_public: false` is referenced as `snapshot-private://`; everything else as `snapshot://`. Read `is_public` out of each `.dvc` rather than assuming — a private dataset is normally built on private snapshots, but the two flags are independent, and a public snapshot can feed a private dataset. Getting this wrong is silent: `snapshot-private://` builds a `SnapshotStepPrivate`, whose `run()` asserts `is_public is False` before pulling, and `--private` filtering keys off the prefix too, so a private snapshot mislabeled `snapshot://` loses that assert and is no longer excluded from a public run. Every one of the 294 private snapshots in the active DAG uses `snapshot-private://`, with no exceptions — a plain `snapshot://` on a private snapshot would be the first.
+**The snapshot URI has its own prefix, driven by the snapshot's `.dvc`, not by `is_private`.** A snapshot whose `.dvc` sets `is_public: false` is referenced as `snapshot-private://`; everything else as `snapshot://`. Read `is_public` out of each `.dvc` rather than assuming — a private dataset is normally built on private snapshots, but the two flags are independent, and a public snapshot can feed a private dataset. Getting this wrong is silent: `snapshot-private://` builds a `SnapshotStepPrivate`, whose `run()` asserts `is_public is False` before pulling, and `--private` filtering keys off the prefix too, so a private snapshot mislabeled `snapshot://` loses that assert and is no longer excluded from a public run. Every private snapshot in the active DAG uses `snapshot-private://`, with no exceptions.
 
 List every snapshot from step 2 as a dependency of the meadow step, not just the first.
 

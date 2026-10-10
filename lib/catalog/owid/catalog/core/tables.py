@@ -2411,6 +2411,11 @@ def read_csv(
 ) -> Table:
     if so := storage_options_for_http(filepath_or_buffer):
         kwargs.setdefault("storage_options", so)
+    # Chunked parsing (low_memory=True) can infer different category dtypes per chunk (e.g. an all-empty
+    # chunk), which fails with "dtype of categories must be the same" under the pandas str dtype.
+    dtype = kwargs.get("dtype")
+    if isinstance(dtype, dict) and any(isinstance(d, pd.CategoricalDtype) or d == "category" for d in dtype.values()):
+        kwargs.setdefault("low_memory", False)
     table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)

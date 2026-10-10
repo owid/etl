@@ -14,7 +14,9 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Committing runs `make check` for you** — the pre-commit hook lints, formats and typechecks, re-stages whatever it could fix, and blocks the commit on anything it couldn't. So don't run it separately first; just commit, and read the output only if it fails. (It refuses to fix a *partially* staged file, since re-staging would widen the commit — stage the whole file, or `--no-verify`.) Run the test suite with `make unittest` (or `make test` for checks + tests + version-tracker); `lib/*` packages have their own venv and Makefile — run it from inside that directory.
 - If not told otherwise, save outputs to `ai/` directory.
 - **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
-- **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills. Write the `description` as a folded block scalar (`>-`) whenever it contains a `:` or a `#`: in a plain scalar a `: ` makes the **whole frontmatter block** fail to parse, and a ` #` silently truncates the value at that point. Claude Code's own loader is lenient enough to hide both, so verify by parsing the file and comparing the parsed `description` against the text you intended — not merely by checking that parsing didn't raise. (Two skills shipped broken this way: one truncated mid-sentence, one with no parseable `name`, `description` or `internal` flag at all.) Every skill also carries `metadata.owner`: the bare GitHub handle (no `@` — YAML reserves it as a first character) of the one person accountable for it. It goes under `metadata` because the Agent Skills spec defines no top-level `author`/`owner` field, and a non-spec key is dropped silently by Claude Code and rejected outright when a skill is packaged or uploaded elsewhere. Skills that are staff-only but not tied to this repo's code belong in `owid/skills-private` (installed here as the `owid-staff` plugin via `.claude/settings.json`), not in `.claude/skills/`.
+- **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills. Write the `description` as a folded block scalar (`>-`) whenever it contains a `:` or a `#`: in a plain scalar a `: ` makes the **whole frontmatter block** fail to parse, and a ` #` silently truncates the value at that point. Claude Code's own loader is lenient enough to hide both, so verify by parsing the file and comparing the parsed `description` against the text you intended — not merely by checking that parsing didn't raise. Every skill also carries `metadata.owner`: the bare GitHub handle (no `@` — YAML reserves it as a first character) of the one person accountable for it. It goes under `metadata` because the Agent Skills spec defines no top-level `author`/`owner` field, and a non-spec key is dropped silently by Claude Code and rejected outright when a skill is packaged or uploaded elsewhere. Skills that are staff-only but not tied to this repo's code belong in `owid/skills-private` (installed here as the `owid-staff` plugin via `.claude/settings.json`), not in `.claude/skills/`.
+- **Write skills and this file as rules, not history.** When adding to or editing a skill or this CLAUDE.md, state the rule and the condition it applies to. Don't record anecdotes, incident notes, dates (except ones the skill uses, such as a "last verified" stamp), or which dataset prompted the rule.
+- **Adding a lesson to a skill or this file:** first look for text that already covers it and sharpen that in place. Add new text only if nothing covers it and it would change what a future run does, in one or two sentences; longer material (a procedure, a query) goes in a reference file next to the skill.
 
 ## Start from a skill
 
@@ -72,7 +74,6 @@ Tuna Acisu               @antea04
 Pablo Arriagada          @paarriagadap
 Bastian Herre            @bastianherre
 Bertha Rohenkohl         @bertharc
-Charlie Giattino         @CGiattino
 Pablo Rosado             @pabloarosado
 Lucas Rodés-Guirao       @lucasrodes
 Matthieu Bergel          @mlbrgl
@@ -221,6 +222,10 @@ Step, table, and indicator short names must be readable by any OWID colleague wi
 
 Only universally understood abbreviations are fine (`gdp`, `co2`, `un_wpp`-style producer acronyms that OWID already uses). If the source uses an internal acronym for a scenario, product, or variable, expand it in our short names — the acronym can live in titles/descriptions where there's room to define it.
 
+### Comments in steps
+
+Label each stage of `run()` with a short comment, so a reader can follow the step without reading every line, e.g. `# Step 2: Add regional aggregates.`. Add the *why* where the code doesn't show it (e.g. why a value is computed rather than taken from the source). Keep comments short: one line where possible, labels rather than paragraphs, so the code isn't buried under comments. A worked example belongs once, in the docstring of the helper it explains. Instructions for the next update go in `# NOTE:` comments (see `/create-dataset`).
+
 ### Preserving metadata/origins in steps
 
 - **No `np.where`** — strips origins. Use `tb["col"] = tb["b"]; tb.loc[mask, "col"] = tb.loc[mask, "a"]`
@@ -239,7 +244,7 @@ Only universally understood abbreviations are fine (`gdp`, `co2`, `un_wpp`-style
 - **`Table.format(keys, short_name=paths.short_name)`** sets the index, sorts, verifies integrity, and sets `short_name` in one call — use it in data steps. It takes an explicit key list; if `keys` is None (default) it uses `country` + `year`, but it is not limited to those. For a year-only table use `tb.format(["year"], short_name=paths.short_name)`. Don't hand-roll `set_index` + `tb.metadata.short_name`.
 - **`*.meta.yml`**: the `dataset:` block carries only `update_period_days` and `owners` (plus `changelog` for the few datasets that keep release notes) — everything else is inherited from origin. Always make sure `owners` is set (new dataset: the user; update: append the user if missing) — first entry is the accountable owner; canonical names per the `schemas/dataset-schema.json` enum, resolved via `etl.owners.resolve_owner`.
 - **`grapher_config`: omit `$schema:`** — pinning a specific schema version ages badly. The default in `etl/config.py:DEFAULT_GRAPHER_SCHEMA` is applied automatically by `_validate_grapher_config`.
-- **`description_key` is a list *or* a markdown string — check, never assume.** A YAML list survives garden so per-item Jinja can render, and is joined into markdown by `update_variable_metadata`, which runs when a step renders dimensions (`_yield_wide_table` / `_metadata_for_dimensions`) and again at the DB write (`etl/grapher/to_db.py`). A `data://grapher/...` dataset on disk therefore holds a string for some datasets and a list for others — MySQL is string-only, the grapher channel is not. Steps reading one — chart and explorer `viz://` steps especially — must handle both and pass the value through rather than rebuild it. Never `list()` it: that yields one bullet *per character*, which every write path used to rejoin into valid-looking markdown, and it shipped ~2,900 one-character WYSK bullets to readers (#6647). The string form is now an `owid.catalog.core.meta.Markdown` — a `str` that raises `TypeError` on iteration, so the mistake fails on the line that writes it.
+- **`description_key` is a list *or* a markdown string — check, never assume.** A YAML list survives garden so per-item Jinja can render, and is joined into markdown by `update_variable_metadata`, which runs when a step renders dimensions (`_yield_wide_table` / `_metadata_for_dimensions`) and again at the DB write (`etl/grapher/to_db.py`). A `data://grapher/...` dataset on disk therefore holds a string for some datasets and a list for others — MySQL is string-only, the grapher channel is not. Steps reading one — chart and explorer `viz://` steps especially — must handle both and pass the value through rather than rebuild it. Never `list()` it: that yields one bullet *per character*. The string form is an `owid.catalog.core.meta.Markdown` — a `str` that raises `TypeError` on iteration, so the mistake fails on the line that writes it.
 
 ### Performance
 
@@ -308,6 +313,10 @@ Two different descriptions, two different jobs. Don't mix them:
 - **Garden `description_processing`** describes what **OWID** does to that data — aggregation, relabeling, deduplication, derivations, date conversion.
 
 If the same sentence could fit in both, it belongs in garden — not in `.dvc`. Don't repeat producer-side facts in `description_processing`, and don't put OWID-side transformations in the `.dvc`.
+
+### Write plainly for OWID readers
+
+Write everything the public reads (chart text, indicator metadata, `.dvc` origin descriptions, `description_processing`, /latest posts) the way you would explain it to a curious friend who isn't an expert: everyday words, active voice, and established terms kept and explained rather than renamed. The full rule, with examples, is `.claude/rules/plain-writing.md`. It loads on its own when you open a `.meta.yml`, `.dvc` or viz config; read it before drafting public text anywhere else, such as a /latest post.
 
 ### Two rules for every subtitle you write
 

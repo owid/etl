@@ -41,7 +41,7 @@ When applying fixes, keep these notes in mind:
 
 ## Workflow
 
-1. Identify the files to scan based on the user's scope (the detector applies each rule's path scope itself)
+1. Identify the files to scan based on the user's scope
 2. Run `node vscode_extensions/detect-outdated-practices/src/cli.mts <paths> --json` on them
 3. Report findings as a summary table, using each finding's `message` for the issue:
    ```
