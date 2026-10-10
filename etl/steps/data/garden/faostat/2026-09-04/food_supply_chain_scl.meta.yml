@@ -1,0 +1,117 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Food Supply
+    description_processing: |-
+      - FAOSTAT's Supply Utilization Accounts (SCL) dataset records how many tonnes of each food product a country produces, imports, and adds to stocks; it also records how many tonnes of each food product are used for each purpose, like exports, human food, animal feed, seed, etc. Unlike FAOSTAT's Food Balance Sheets, which group products together (for example, "Wheat and products"), the SCL dataset records individual products separately (for example, wheat, wheat flour and wheat bran). It starts in 2010.
+      - FAOSTAT ensures that domestic supply equals domestic utilization. This means that, for each country and year, the tonnes of a food product must fulfill the balance identity:
+      production + imports - stock variation
+         = exports + food + feed + seed + processing + other uses + losses + tourist consumption + residuals
+      - The "food" element of the identity (which gives the tonnes available for human consumption) is also given in calories and protein. For all other elements, the SCL dataset records only tonnes. We therefore need to convert tonnes to calories (and protein) for all non-food elements in the identity.
+      - The density of calories (or protein) of each food product, country and year is calculated by dividing the calories (or protein) of "food" by its weight. This density is then multiplied by each of the elements to convert tonnes into calories (or protein).
+      - Sometimes densities can't be calculated or can't be used, for example because the product is not used directly for food in that country, or because the resulting density is an impossible value (more than 920 kilocalories per 100 grams, the energy of pure fat, or more than 100 grams of protein per 100 grams). In those cases, we use the median density of that food product in the same country across all years; if that country has no valid density for that food product in any year, we use the median across all countries and years.
+      - Some products are rarely or never eaten by people, so their "food" element can't give their density: oilseed cake (what remains after crushing oilseeds for oil, mostly fed to animals), bran, gluten feed and oil refining residues. Where FAO publishes a nutrient factor for them, we use it: FAO's 2024 nutrient conversion table for the brans, raw cane sugar and tallow, and FAO's Food Balance Sheets handbook for soybean, groundnut and sesame cake (for example, 261 kilocalories and 46 grams of protein per 100 grams for soybean cake). For the rest, we take the calories of the closest human food in the USDA food composition tables (defatted oilseed flour, 330 kilocalories per 100 grams, for the other cakes) and the protein from the Feedipedia animal feed tables. Where more than 1% of such a product is eaten as food, we use its calculated density instead.
+      - Products that are never food are left out of the chain entirely: castor oil, tung oil, wool grease and similar, and fuel ethanol. The crops sent to distilleries leave the food chain where FAOSTAT records them, as other uses of the crop or as processing; counting the ethanol itself would count those calories a second time.
+      - Some crops are mostly processed rather than eaten: paddy rice, sugar cane, sugar beet, oil palm fruit, rapeseed and cottonseed. The density calculated from the little that people eat directly would underestimate their calories. For example, people who chew sugar cane get only about 30 kilocalories per 100 grams, while sugar mills extract at least 43 kilocalories per 100 grams of cane. Instead, we calculate the density of these crops from the products made from them (for example, sugar and molasses for sugar cane), as the calories of those products divided by the tonnes of crop processed, for the world in each year.
+      - The SCL dataset does not include fish and seafood, so we take them from FAOSTAT's Food Balance Sheets, for the same countries and years.
+      - We add up the contribution of all individual food products to build the total weight, calories, and protein of each part of the chain for each country and year.
+      - Some food products are made from others. For example, soybean oil is made from soybeans. FAOSTAT records the soybeans that go into processing as "processing" of soybeans, and the oil that comes out as "production" of soybean oil. The calories of soybeans are already counted as crop production, so adding the soybean oil's production as well would count the same calories twice. Therefore, we subtract the production of processed products from processing. By-products like oilseed cake and bran are processed products too: their production is subtracted from processing, and the part fed to animals appears in animal feed. In other words, the processing part of the food chain normally removes the calories that were lost when converting raw crops like soybeans into processed foods like soybean oil and soybean cake. Cottonseed is counted as a crop, because the seed cotton it comes from is not in the SCL dataset.
+      - Processing cannot add calories or protein to the food chain. In some countries, however, the processed products come out with more calories (or protein) than went in. This happens where FAOSTAT's nutrient factor for a raw product is lower than the factors of the products made from it (for example, coconuts and copra, or sunflower seed and its oil and cake), where a country's mills differ from the world average used for the densities of processed crops, or where FAOSTAT's own quantities are inconsistent (for example, Guyana's rice bran production is 30% of its paddy rice, where about 8% is normal). In calories and protein, we move these gains to "data adjustments", so that processing shows zero in those cases rather than an impossible gain. In weight, processing can add to the total when water is added, for example to brew beer or bottle soft drinks, so the weight table keeps these gains.
+      - We correct one FAOSTAT figure. Since 2021, FAOSTAT imputes Denmark's molasses production as equal to all the sugar beet it processes, which is impossible (molasses was 2% to 3% of the beet in 2010-2020). We repeat Denmark's 2020 molasses production instead, and set the molasses fed to animals to the amount that balances the product.
+      - The densities of the crops that are mostly processed are calculated for the world as a whole, and applied to every country. In countries whose processed products differ from the world average, these densities are less accurate.
+      - Any gaps in the balance identity are added to "data adjustments". Here we include FAOSTAT's own unexplained differences (which they call "residuals").
+      - The World's total imports should in theory equal the World's exports (the world as a whole doesn't trade with anyone). However, the World's imports and exports often differ. The discrepancy is due to mismatches between the trade reported by countries. For World, we set exports equal to imports (which FAO considers the more reliable figure). The difference is added to "data adjustments".
+      - Similarly, tourist consumption should also be zero for the World (every visitor lives in some country). We set the world's tourist consumption to zero. The difference is added to "data adjustments".
+      - All values are divided by population, using Our World in Data's population data. Aggregate regions (continents, income groups, and the World) are the sum of contributions from all individual countries in the region; the result is divided by the population of those same countries. The aggregated data for a region is removed in years when those countries hold less than 80% of the region's population. For this reason, low-income countries as a group are not included.
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+
+tables:
+  energy:
+    title: Food supply chain in kilocalories (Supply Utilization Accounts method)
+    common:
+      unit: kilocalories per person per day
+      short_unit: kcal
+    variables: &variables
+      crop_production:
+        title: Crop production
+        description_short: Crops harvested in the country.
+        description_key:
+          - Crops include cereals, roots and tubers, sugar crops, pulses, nuts, oil crops (including oil palm fruit), vegetables, fruit, coffee, tea, cocoa, spices, and cottonseed.
+          - Products made from crops, such as flour, vegetable oils, sugar, and beer, are not counted here, because the crops they are made from are already counted.
+      imports:
+        title: Imports
+        description_short: Food products bought from other countries.
+      exports:
+        title: Exports
+        description_short: Food products sold to other countries.
+      stock_variation:
+        title: Stock variation
+        description_short: Food products added to stocks, minus those taken out. Positive values mean stocks grew, so that food was not available for other uses that year.
+      seed:
+        title: Seed
+        description_short: Crops set aside as seed for the next harvest.
+      losses:
+        title: Losses
+        description_short: Food lost between the farm and the shop.
+        description_key:
+          - These are losses in storage, transport and processing. They do not include food wasted in shops or households.
+      other_uses:
+        title: Other uses
+        description_short: Food products used for purposes other than food or feed, such as biofuels and soap.
+      processing_net:
+        title: Processing, net
+        description_short: Food products sent to be processed, for example milled, crushed or brewed, minus the processed products made from them, such as flour, oils, sugar and beer. Positive values mean more goes in than comes out.
+        description_key:
+          - By-products of processing, such as oilseed cake (what remains after crushing oilseeds for oil) and bran, are counted as products made in processing. The part fed to animals appears under feed.
+          - Where FAOSTAT records the crops sent to distilleries as processing rather than as other uses (molasses in Pakistan or India, cereals in Belgium or Slovakia), the energy turned into fuel ethanol appears here rather than under industrial and other uses.
+          - Processing cannot create energy or protein. Where FAOSTAT's figures and nutrient factors would make more come out of processing than went in, the gain is shown under data adjustments instead, and processing shows zero.
+      feed:
+        title: Feed
+        description_short: Food products fed to animals, including by-products of processing such as oilseed cake and bran.
+        description_key:
+          - Animals also eat grass and crop residues, which are not counted here. So the feed counted here is less than what animals actually eat, and comparing it with animal products understates how much feed it takes to produce them.
+      animal_products:
+        title: Animal products
+        description_short: Meat, offal, animal fats, milk, eggs, honey, fish and seafood produced in the country.
+      tourist_consumption:
+        title: Tourist consumption
+        description_short: Food eaten by visitors from other countries. For the world, it is set to zero.
+      data_adjustments:
+        title: Data adjustments
+        description_short: Differences that make the stages add up to the food available to eat, from FAO's own unexplained differences, from rounding in FAO's figures, and from any gain that processing would otherwise show. For the world, it also includes the gap between imports and exports, and tourist consumption. Values can be negative.
+      food:
+        title: Food available for consumption
+        description_short: Food available for people to eat, before waste in shops and households.
+      balancing_difference:
+        title: Balancing difference
+        description_short: The part of data adjustments that comes from rounding in FAO's figures.
+  protein:
+    title: Food supply chain in grams of protein (Supply Utilization Accounts method)
+    common:
+      unit: grams of protein per person per day
+      short_unit: g
+    variables: *variables
+  mass:
+    title: Food supply chain in kilograms (Supply Utilization Accounts method)
+    common:
+      unit: kilograms per person per day
+      short_unit: kg
+    variables:
+      <<: *variables
+      # In weight, processing can gain, because water is added to brew beer and bottle soft drinks. These two
+      # overrides leave out the sentences on moving gains to data adjustments, which apply to energy and protein only.
+      processing_net:
+        title: Processing, net
+        description_short: Food products sent to be processed, for example milled, crushed or brewed, minus the processed products made from them, such as flour, oils, sugar and beer. Positive values mean more goes in than comes out; negative values mean the products weigh more than what went in, as when water is added to brew beer or bottle soft drinks.
+        description_key:
+          - By-products of processing, such as oilseed cake (what remains after crushing oilseeds for oil) and bran, are counted as products made in processing. The part fed to animals appears under feed.
+          - Where FAOSTAT records the crops sent to distilleries as processing rather than as other uses (molasses in Pakistan or India, cereals in Belgium or Slovakia), the weight of the crops turned into fuel ethanol appears here rather than under industrial and other uses.
+      data_adjustments:
+        title: Data adjustments
+        description_short: Differences that make the stages add up to the food available to eat, from FAO's own unexplained differences and from rounding in FAO's figures. For the world, it also includes the gap between imports and exports, and tourist consumption. Values can be negative.
