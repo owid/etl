@@ -100,7 +100,7 @@ def _load_origins_df(session: Session, variable_id: int) -> pd.DataFrame:
     df = pd.DataFrame(result_proxy.fetchall(), columns=result_proxy.keys())
 
     # Process the 'license' column
-    df["license"] = df["license"].map(lambda x: json.loads(x) if x else None)
+    df["license"] = df["license"].map(lambda x: json.loads(x) if isinstance(x, str) and x else None)
 
     return df
 

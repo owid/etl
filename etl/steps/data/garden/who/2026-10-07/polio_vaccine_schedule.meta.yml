@@ -1,0 +1,39 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+        - Eradication of Diseases
+      attribution_short: WHO
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+  title: Vaccination schedule for Poliomyelitis
+  owners:
+    - Fiona Spooner
+    - Tuna Acisu
+tables:
+  polio_vaccine_schedule:
+    variables:
+      vaccine_schedule:
+        title: Polio vaccine schedule
+        description_short: "Type of polio vaccines used in the national immunization schedule in each country: only inactivated poliovirus vaccines (IPV), oral poliovirus vaccines (OPV), or both."
+        description_key:
+          - Polio vaccines are given either as an [oral polio vaccine](#dod:oral-polio-vaccine) (OPV), using a weakened live virus, or as an [inactivated polio vaccine](#dod:inactivated-polio-vaccine) (IPV), using a killed virus given by injection.
+          - The oral polio vaccine protects against poliovirus and interrupts its transmission, but it carries a very small risk of vaccine-associated paralytic polio, occurring in about 1 per 2–3 million vaccine doses.
+          - The inactivated polio vaccine protects against all types of poliovirus (types 1, 2, and 3) and does not carry the risk of vaccine-associated paralytic polio associated with OPV.
+          - Where the risk of polio is high, the OPV is often given alongside the IPV, since it provides additional protection against poliovirus transmission. Where the risk of polio is low, countries only recommend the IPV, as the risk of vaccine-associated paralytic polio from OPV outweighs the benefits of immunity.
+          - Many countries have moved from OPV-only schedules to using IPV alongside or instead of OPV, following the global phased withdrawal of oral polio vaccines as part of the polio eradication endgame.
+          - Data is based on the most recent national immunization schedule reported by each country through the WHO/UNICEF Joint Reporting Form on Immunization.
+        unit: ""
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Vaccination
+            - Eradication of Diseases

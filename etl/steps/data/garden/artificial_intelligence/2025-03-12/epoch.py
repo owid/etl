@@ -37,8 +37,8 @@ def run() -> None:
         Simplifies an entry of organization categories which can include many entries of Industry, Academia etc.
         Removes duplicates, ensures all words except the first one start with a lower case letter,and joins the categories with ", " and " and " before the last one.
         """
-        # Check for "nan"
-        if entry == "nan":
+        # Missing values (NaN under the pandas str dtype)
+        if pd.isna(entry):
             return "Not specified"
 
         # Split the entry into categories, convert to set to remove duplicates
@@ -91,7 +91,7 @@ def run() -> None:
 
     # Replace nans with Unspecified in each column to avoid issues when calculating sume of notable systems
     columns = ["organization_categorization", "domain", "organization"]
-    tb[columns] = tb[columns].replace("nan", "Not specified")
+    tb[columns] = tb[columns].astype(str).fillna("Not specified").replace("nan", "Not specified")
 
     # Check for multiple entries in 'domain' separated by comma
     multiple_domains = tb["domain"].str.contains(",")

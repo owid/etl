@@ -14,8 +14,6 @@ import streamlit.web.cli as stcli
 from rich_click.rich_command import RichCommand
 
 from apps.utils.style import set_rich_click_style
-
-# from apps.wizard.config import WIZARD_PHASES
 from apps.wizard.utils import CURRENT_DIR
 from apps.wizard.utils.paths import WIZARD_ANOMALIES
 from etl.config import WIZARD_PORT
@@ -32,11 +30,6 @@ set_rich_click_style()
 # NOTE: Any new arguments here need to be in sync with the arguments defined in
 # wizard.utils.APP_STATE.args property method
 @click.command(cls=RichCommand, context_settings=dict(show_default=True))
-# @click.argument(
-#     "phase",
-#     type=click.Choice(WIZARD_PHASES),
-#     default="all",
-# )
 @click.option(
     "--debug",
     is_flag=True,

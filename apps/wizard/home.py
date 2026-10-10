@@ -1,9 +1,13 @@
-"""Home page of wizard."""
+"""Home page of wizard.
+
+A directory of every app, grouped in the same sections as the sidebar. Unlike the sidebar, it also
+shows what each app does, who maintains it, and which apps are unavailable in this environment.
+"""
 
 import streamlit as st
 
 from apps.wizard.config import WIZARD_CONFIG
-from apps.wizard.utils.components import st_wizard_card
+from etl.config import ENV, OWID_ENV
 
 st.set_page_config(
     page_title="Wizard: Home",
@@ -11,7 +15,12 @@ st.set_page_config(
     layout="wide",
 )
 
-MAX_COLS_PER_ROW = 3
+# Badge color for each environment the wizard can run in.
+ENV_COLORS = {"dev": "green", "staging": "orange", "production": "red"}
+# Standalone sections (those without a `group`) share the row width equally, at most this many per row.
+MAX_TILES_PER_ROW = 4
+# Width (px) of the link in each row: wide enough for the longest app name, so the help icons line up.
+LINK_WIDTH = 200
 
 
 def st_show_home():
@@ -20,9 +29,6 @@ def st_show_home():
     # Check early to avoid rendering the home page before redirecting.
     #########################
     if "page" in st.query_params:
-        for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
-            if st.query_params["page"] == step_name:
-                st.switch_page(step_props["entrypoint"])
         for section in WIZARD_CONFIG["sections"]:
             for app in section["apps"]:
                 if st.query_params["page"] == app["alias"]:
@@ -32,83 +38,102 @@ def st_show_home():
                 if st.query_params["page"] == app["alias"]:
                     st.switch_page(app["entrypoint"])
 
-    # Page config
-    container = st.container(border=False, horizontal=True, vertical_alignment="bottom")
-    with container:
-        st.title("Wizard 🪄")
-        st.caption(f"streamlit {st.__version__}", width="content")
+    #########################
+    # HEADER
+    #########################
+    with st.container(horizontal=True, vertical_alignment="bottom", horizontal_alignment="distribute"):
+        st.title("Wizard", width="content")
+        with st.container(horizontal=True, vertical_alignment="center", width="content"):
+            st.badge(ENV, icon=":material/dns:", color=ENV_COLORS.get(ENV, "gray"))
+            st.badge(OWID_ENV.conf.DB_HOST, icon=":material/database:", color="gray", help="Grapher database host.")
+            st.caption(f"streamlit {st.__version__}", width="content")
 
     #########################
-    # ETL Steps
+    # DIRECTORY
+    # Sections sharing a `group` label (e.g. "ETL work") share one wide box, one column each. The remaining
+    # sections (plus legacy) follow as bordered tiles sharing the row width.
     #########################
-    st.markdown(f"## {WIZARD_CONFIG['etl']['title']}")
-    st.markdown(WIZARD_CONFIG["etl"]["description"])
-    steps = WIZARD_CONFIG["etl"]["steps"]
-
-    # 1/ CLASSIC: Snapshot -> Data -> Chart (no captions, match original)
-    if steps["fasttrack"]["enable"]:
-        _render_cards_row(
-            [steps["snapshot"], steps["data"], steps["chart"]],
-            height=100,
-            col_widths=[1, 2, 1],
-            show_caption=False,
-        )
-
-    # 2/ FAST TRACK
-    if steps["fasttrack"]["enable"]:
-        col1, _ = st.columns([3, 1])
-        with col1:
-            _render_card(steps["fasttrack"], height=50, show_caption=False)
-
-    #########################
-    # Sections
-    #########################
-    sections = WIZARD_CONFIG["sections"]
-    num_rows = len(sections) // MAX_COLS_PER_ROW + 1
-    for row in range(num_rows):
-        cols = st.columns(MAX_COLS_PER_ROW)
-        for i, section in enumerate(sections[row * MAX_COLS_PER_ROW : (row + 1) * MAX_COLS_PER_ROW]):
-            apps = [app for app in section["apps"] if app["enable"]]
-            if not apps:
-                continue
-            with cols[i]:
-                st.markdown(f"## {section['title']}")
-                st.markdown(section["description"])
-                for app in apps:
-                    _render_card(app)
+    groups = _groups()
+    labelled = [g for g in groups if g.get("group")]
+    standalone = [g for g in groups if not g.get("group")]
+    for label in dict.fromkeys(g["group"] for g in labelled):
+        members = [g for g in labelled if g["group"] == label]
+        with st.container(border=True):
+            st.markdown(f"#### {label}")
+            for col, group in zip(st.columns(len(members), gap="medium"), members):
+                with col:
+                    _render_group(group)
+    if labelled and standalone:
+        st.divider()
+    for i in range(0, len(standalone), MAX_TILES_PER_ROW):
+        row = standalone[i : i + MAX_TILES_PER_ROW]
+        for col, group in zip(st.columns(len(row), border=True, gap="small"), row):
+            with col:
+                _render_group(group)
 
     #########################
-    # Legacy
+    # FOOTER
     #########################
-    if "legacy" in WIZARD_CONFIG:
-        legacy_apps = [app for app in WIZARD_CONFIG["legacy"]["apps"] if app["enable"]]
-        if legacy_apps:
-            st.warning(WIZARD_CONFIG["legacy"]["description"])
-            _render_cards_row(legacy_apps)
+    docs = WIZARD_CONFIG["main"].get("docs")
+    if docs:
+        st.divider()
+        st.caption(f"For more details, refer to the ETL [documentation]({docs['entrypoint']}).")
 
 
-def _render_card(item: dict, height: int = 80, show_caption: bool = True) -> None:
-    """Render a single wizard card from a WIZARD_CONFIG app/step dict."""
-    st_wizard_card(
-        entrypoint=item["entrypoint"],
-        title=item["title"],
-        image_url=item["image_url"],
-        caption=item.get("description", "") if show_caption else "",
-        height=height,
-    )
+def _groups() -> list[dict]:
+    """Every group of apps shown on the home page: the config sections, plus legacy."""
+    groups = [
+        {"title": s["title"], "description": s["description"], "group": s.get("group"), "apps": s["apps"]}
+        for s in WIZARD_CONFIG["sections"]
+    ]
+    legacy_apps = WIZARD_CONFIG.get("legacy", {}).get("apps", [])
+    if legacy_apps:
+        groups.append({"title": "Legacy", "description": WIZARD_CONFIG["legacy"]["description"], "apps": legacy_apps})
+    return groups
 
 
-def _render_cards_row(
-    items: list[dict],
-    height: int = 80,
-    col_widths: list[int] | None = None,
-    show_caption: bool = True,
-) -> None:
-    """Render a row of wizard cards across Streamlit columns."""
-    cols = st.columns(col_widths or len(items))
-    for col, item in zip(cols, items):
-        with col:
-            _render_card(item, height=height, show_caption=show_caption)
+def _render_group(group: dict) -> None:
+    """Section title with its description underneath, then one row per app."""
+    with st.container(gap="xsmall"):
+        with st.container(gap=None):
+            st.markdown(f"##### {group['title']}")
+            st.caption(group["description"])
+        for app in group["apps"]:
+            _render_app(app)
+
+
+def _help_text(item: dict) -> str:
+    """Tooltip of an app: its description, whether it is available here, and who maintains it."""
+    parts = [item.get("description", "")]
+    if not item.get("enable", True):
+        parts.append(f"Not available on `{ENV}`.")
+    maintainer = item.get("maintainer")
+    if maintainer:
+        if isinstance(maintainer, list):
+            maintainer = ", ".join(maintainer)
+        parts.append(f"Maintainer: {maintainer}")
+    return "\n\n".join(p for p in parts if p)
+
+
+def _render_app(item: dict) -> None:
+    """One row: the link (or a disabled button when the app is unavailable here) and a help icon with the details."""
+    title, icon = item["title"], item["icon"]
+    with st.container(horizontal=True, vertical_alignment="center", gap=None):
+        if item.get("enable", True):
+            st.page_link(item["entrypoint"], label=f"**{title}**", icon=icon, width=LINK_WIDTH)
+        else:
+            # A disabled tertiary button looks like a greyed-out page link (same padding, icon and font). It keeps
+            # its natural width inside a fixed-width box so the label stays left-aligned and the help icons line up.
+            with st.container(width=LINK_WIDTH):
+                st.button(
+                    f"**{title}**",
+                    icon=icon,
+                    type="tertiary",
+                    disabled=True,
+                    key=f"home-unavailable-{item['entrypoint']}",
+                )
+        # Description, availability and maintainer live in the tooltip, so rows stay one line at any width.
+        st.markdown("", help=_help_text(item), width="content")
 
 
 # Show the home page

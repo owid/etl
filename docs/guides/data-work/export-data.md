@@ -13,7 +13,7 @@ The channel of a viz step says what it produces:
 - `viz://chart/`: a chart or an MDIM (a chart is just an MDIM with no dimensions), upserted to the grapher DB. A chart step can be a bare `<name>.config.yml` with no Python file.
 - `viz://explorer/`: an explorer, upserted to the grapher DB.
 - `viz://static/`: a static image (PNG/SVG) rendered with matplotlib next to the recipe and committed.
-- `viz://bespoke/`: the data feed of a bespoke interactive visualization, uploaded to R2.
+- `viz://bespoke/`: the data feed of a bespoke interactive visualization. The step only writes JSON files into `viz/bespoke/<ns>/<version>/<name>/`; the framework syncs that folder to R2, see [Bespoke feeds](#bespoke-feeds).
 
 Chart and explorer steps also write their expanded config to the gitignored `viz/<channel>/...` folder, like `data/` for data steps.
 
@@ -118,6 +118,43 @@ etlr viz://chart/energy/latest/energy_prices --grapher
 
 and check out the preview at: http://staging-site-my-branch/admin/grapher/mdd-energy-prices
 
+
+## Bespoke feeds
+
+A `viz://bespoke/` step produces the JSON feed that one of owid-grapher's `bespoke/projects/` bundles
+fetches in the browser. The step writes files into its own output folder and nothing else; after it
+runs, the framework syncs that folder to
+
+| Environment | Feed location |
+| --- | --- |
+| production | `s3://owid-api/v1/bespoke/<ns>/<version>/<name>/`, served at `https://api.ourworldindata.org/v1/bespoke/...` |
+| staging server, laptop | `s3://owid-api-staging/<env>/v1/bespoke/<ns>/<version>/<name>/`, served at `https://api-staging.owid.io/<env>/v1/bespoke/...` |
+
+the same split that already applies to the baked indicator JSONs (`DATA_API_URL` in `etl/config.py`)
+and to MDIM download packages. So a staging server builds its own copy of a feed a branch changes,
+and an article preview shows the change before it is merged. Nothing seeds a new staging
+environment: the `owid-api-staging` worker falls back to the production bucket for any file the
+environment doesn't have, so a staging server that never ran the step serves production's feed.
+
+Files that the run no longer produces are deleted from the feed, so a dropped entity doesn't linger.
+Without `--grapher` the step writes its files and skips the sync.
+
+`etl.viz.bespoke.build_feed_metadata()` derives the feed's provenance (title, source line, origins, update period and, for a single-column feed, descriptions and unit) from the garden columns the feed is built on, so it doesn't have to be typed into the step and go stale at the next data update. The fields are grapher's `BespokeMetadata`, and they go into the top level of the feed's manifest (`<slug>.metadata.json`, the file the bundle's registry entry names as `metadataFilename`). The bundle reads its data index from that file, and grapher reads the methods-and-sources box from it:
+
+```python
+from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
+
+feed_metadata = build_feed_metadata(
+    title="Causes of death",
+    columns={"Deaths": tb["value"]},
+    update_period_days=ds_garden.metadata.update_period_days,
+)
+# `manifest` is the bundle's own data index, e.g. {"dimensions": ..., "timeRange": ...}.
+with open(paths.output_dir / "causes-of-death.metadata.json", "w") as f:
+    json.dump(add_feed_metadata(manifest, feed_metadata), f)
+```
+
+`add_feed_metadata` raises if a manifest key clashes with a metadata field.
 
 ## Exporting data to GitHub
 

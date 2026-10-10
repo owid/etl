@@ -207,7 +207,6 @@ def render_fields_init():
 
     cols = st.columns([2, 3])
     with cols[0]:
-        # with st_horizontal(vertical_alignment="flex-end"):
         key = "file_extension"
         args = {
             "st_widget": st.text_input,
@@ -471,7 +470,7 @@ if submitted:
             )
 
             st.markdown("#### 3. Proceed to next step")
-            st_wizard_page_link("data", width="stretch", border=True)
+            st_wizard_page_link("data-step", width="stretch", border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

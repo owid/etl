@@ -37,7 +37,6 @@ from apps.wizard.utils.chart_config import bake_chart_config
 from apps.wizard.utils.components import (
     Pagination,
     grapher_chart,
-    st_horizontal,
     st_multiselect_wider,
     tag_in_md,
     url_persist,
@@ -823,7 +822,7 @@ if st.session_state.anomalist_df is not None:
                     key="anomalist_filter_anomaly_types",
                 )
         with col2:
-            with st_horizontal():
+            with st.container(horizontal=True, vertical_alignment="bottom"):
                 url_persist(st.number_input)(
                     "Min year",
                     value=YEAR_MIN,
@@ -872,7 +871,7 @@ if st.session_state.anomalist_df is not None:
     # Show anomalies with time and version changes
     if not df.empty:
         # Top option buttons
-        with st_horizontal():
+        with st.container(horizontal=True):
             # LLM summary option
             llm_ask(df)
             download_anomalies(df)

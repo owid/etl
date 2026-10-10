@@ -1188,3 +1188,8 @@ steps:
     - data://garden/cancer/2025-02-17/gco_cancer_survival:
       - data://meadow/cancer/2025-02-17/gco_cancer_survival:
         - snapshot://cancer/2025-02-17/gco_cancer_survival.csv
+  # archived; last active in 4ad0beba651d on 2026-10-07
+  data://grapher/who/2025-01-13/polio_vaccine_schedule:
+    - data://garden/who/2025-01-13/polio_vaccine_schedule:
+      - data://meadow/who/2025-01-13/polio_vaccine_schedule:
+        - snapshot://who/2025-01-13/polio_vaccine_schedule.xlsx

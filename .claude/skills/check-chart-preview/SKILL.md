@@ -3,6 +3,7 @@ name: check-chart-preview
 description: Check chart or multidim preview on the staging server using a browser. Use when user wants to visually verify a chart renders correctly on staging, take a screenshot of a chart, or QA a chart/mdim preview.
 metadata:
   internal: true
+  owner: Marigold
 ---
 
 # Check Chart/Mdim Preview on Staging
@@ -73,7 +74,7 @@ Pass extra grapher query params with `--<key>=<value>`:
 .venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug> --tab=chart --time=earliest..2020
 ```
 
-The helper queries the staging MySQL via `etl.config.OWID_ENV.read_sql` (which auto-routes to `staging-site-<branch>`), so it works as long as the staging server is up and the chart has been pushed.
+The helper queries the staging MySQL via `etl.config.OWID_ENV.read_sql` (which auto-routes to `staging-site-<branch>`).
 
 Use the resulting PNG by reading it directly with the `Read` tool (Claude can view images).
 

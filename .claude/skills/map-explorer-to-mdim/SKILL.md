@@ -10,9 +10,12 @@ description: >-
   explorer's ETL step afterwards.
   Trigger when the user says "map explorer <slug> to mdim(s) <...>", "suggest
   explorer->MDIM redirects", "we're sunsetting the <slug> explorer, map its views to
-  the new multidims", "redirect these explorers to MDIMs", or similar.
+  the new multidims", "redirect these explorers to MDIMs", "review the explorer->MDIM
+  mapping", "build a review tool for the <slug> migration", "make a side-by-side HTML so
+  <reviewer> can sign off", or similar.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Map an explorer's views to MDIM views (redirect proposal)
@@ -141,8 +144,7 @@ This endpoint is the **only** way to apply an explorer redirect: the CSV CLI tha
 unconditional rule and every view of the explorer 302s to a single MDIM view,
 per-view routing gone.
 Its Zod schema deliberately mirrors this file's `catchAll` + `redirects` shape, ignores keys
-it doesn't know (`sourceViewId`, `viewId`, `mdim`, `stats`, `targets`), and reports
-`target: null` entries as `skipped`.
+it doesn't know (`sourceViewId`, `viewId`, `mdim`, `stats`, `targets`).
 
 > **Post `admin_bulk_payload.json`, never `mapping.json`.** The payload has empty-valued
 > source dimensions stripped out. That is mandatory, not cosmetic: a condition is matched
@@ -194,9 +196,8 @@ The **source** view is identified by the explorer slug + dimension **name→disp
 
 **`catchAll` is always present**: it redirects the bare explorer URL (no query params) — and
 serves as the sensible fallback for any view a consumer doesn't route individually — to the
-best-fitting MDIM with **no query params**, which grapher renders as that MDIM's default view
-(hence `viewId: null`, `dimensions: {}`). The best-fitting MDIM is the one most views resolve
-to, or whatever `DEFAULT_MDIM` in `mapping_rules.py` overrides it to.
+best-fitting MDIM (see `DEFAULT_MDIM` in step 2) with **no query params**, which grapher renders
+as that MDIM's default view (hence `viewId: null`, `dimensions: {}`).
 
 > **The catch-all's destination is the only one nothing pins.** Its row stores
 > `viewConfigId = NULL`, so it resolves at request time to whichever view the MDIM renders for
@@ -216,9 +217,56 @@ didn't resolve to a real MDIM view (fix the rules and re-run until there are no 
 ### 4. Review
 
 Sanity-check the flagged rows and the judgment calls (approximate type matches, aggregate
-collapses, MDIM choices with no explorer source). `/review-explorer-mdim-mapping` renders the
-pairs side by side with approve/flag controls for a topic owner; corrections go through
-`mapping_rules.py` and a rebuild, not the HTML.
+collapses, MDIM choices with no explorer source). For a topic owner's sign-off, build the
+side-by-side review page: each explorer view on the left, the MDIM view it will redirect to on
+the right, with approve/flag controls.
+
+```bash
+.venv/bin/python .claude/skills/map-explorer-to-mdim/scripts/build_review.py \
+    --mapping-dir ai/<slug>-mdim-mapping \
+    --explorer-slug <slug> \
+    --mdim-slug <short_1>=<grapher_slug_1> \
+    --mdim-slug <short_2>=<grapher_slug_2> \
+    [--host https://ourworldindata.org] \
+    [--output ai/<slug>_view_review.html] \
+    [--no-coverage]
+```
+
+`--mdim-slug` maps each MDIM short name in `mapping_rules.MDIMS` to its published Grapher slug
+(the `/grapher/<slug>` part of the URL, not the catalogPath). `_sources.json` records the slugs
+extraction saw, and `multi_dim_data_pages.slug` has them if you have DB access; otherwise ask.
+The default host is production; for MDIMs that only exist on a staging branch pass
+`--host https://staging-site-<branch>`.
+
+The script prints a coverage summary before writing the HTML: rows, distinct MDIM targets,
+many-to-one collapses, unresolved rows, MDIM views never targeted. Read it; it is the fastest way
+to spot a mapping gap the reviewer cannot see by eye.
+
+What the reviewer gets: one pair at a time in iframes, the selection shown as chips above each
+chart, Approve / Flag / Clear with an optional note, keyboard navigation (`←` `→`, `a`, `f`, `c`),
+filters and live counts. Decisions auto-save to the browser's `localStorage`, can be mirrored to
+a JSON file on disk (Chrome/Edge), and Import merges another reviewer's export. The file is
+self-contained: send it directly, or publish it to vibe.owid.io with
+`/owid-staff:create-vibe-app` (from the `owid-staff` plugin, auto-installed here) when the whole
+team needs a link.
+
+When the reviewer is done, ask for the exported JSON (or the auto-saved one): every row carries
+`status` (`approved` / `flagged` / blank) and `note`. Approved rows are ready to wire up; flagged
+rows need a second pass with the user. Corrections go through `mapping_rules.py` and a rebuild
+(step 3), never through the HTML.
+
+Gotchas:
+
+- `localStorage` is per browser and per file path, so switching machine loses the decisions
+  unless they were exported or mirrored to disk.
+- Single-choice MDIM dimensions are pruned from the URLs, matching the wide block of
+  `mapping_proposal.csv`; do not add them back by hand.
+- Explorer URL parameters are display names (`Disaster Type=Floods`), which is what the
+  `dimension_1..N` columns hold. `hideControls=true` is appended to both sides; "open ↗" shows
+  the view with its controls.
+- A mapping hand-made in another schema (for example a colleague's multi-block CSV) must be
+  converted to `mapping_proposal.csv` plus `mapping_rules.py` first; a one-off adapter in `ai/`
+  is fine.
 
 ### 5. Audit what references the explorers (ALWAYS offer; run when the user says yes)
 
@@ -243,8 +291,7 @@ migrated *before* step 7, not after.
 The report also carries a **⭐ Featured metrics** section — the one surface where this skill's
 usual "a link survives the 302" reasoning inverts. A featured metric is a topic-page slot held by
 URL, resolved only when Algolia indexes, matching pathname *and* exact params against published
-records. So it does not survive: it empties silently, and cannot be re-added once the explorer is
-gone. Hence step 5b.
+records. So it does not survive: it empties silently. Hence step 5b.
 
 ### 5b. Swap the featured metrics (before the redirect — it cannot be undone after)
 
@@ -310,9 +357,8 @@ sweep can ever surface the mistake. Preflight blocks on it before the reference 
 
 !!! note "An audit folder predating a surface reads as drifted, and should"
     The digest hashes the findings, so **adding a surface to `find-chart-references` invalidates
-    every recorded `referenceDigests`** — most recently when featured metrics were added.
-    Preflight blocks on an audit folder from before that, which is correct: it really is missing
-    rows. Re-run `audit_references.py` rather than reading it as a bug.
+    every recorded `referenceDigests`**. Preflight blocks on an audit folder from before such a
+    change, which is correct: it really is missing rows. Re-run `audit_references.py` rather than reading it as a bug.
 
 **Unverifiable is a blocker, not a warning**, in all three cases — no extraction pair, no
 `mapping.json`, no reference digest. A warning does not reach the exit code, so `Ready` would
@@ -358,8 +404,8 @@ search. Do not flip `isPublished` in the step's `.config.yml` and re-run hoping 
 that is not the route (and no explorer config in the repo carries `isPublished: false`).
 
 Then remove the explorer's ETL footprint — and **never delete a step without archiving it**
-(see `CLAUDE.md`). Delete the step's `.py` **and its sibling `.config.yml`** (the periodic archive sweep only knows `.py`, which is why orphaned configs
-exist on disk today), remove the `dag/*.yml` entry, `make check`, **commit**; then run
+(see `CLAUDE.md`). Delete the step's `.py` **and its sibling `.config.yml`** (the periodic archive sweep only knows `.py`, so a config left behind stays
+on disk as an orphan), remove the `dag/*.yml` entry, `make check`, **commit**; then run
 `.venv/bin/etl archive-dag` and commit `dag/archive/*.yml` separately, since it reads *committed*
 history. `git checkout` anything unrelated it sweeps in. Archive anything now orphaned
 upstream — a garden step that existed only to feed this explorer — in a second round. If any of
@@ -390,6 +436,7 @@ handoff, since the same operator pastes the payload.
 | **`admin_bulk_payload.json`** | build | **the apply unit** — one per explorer, paste into the admin modal |
 | `references.csv` / `references.md` | audit | combined across explorers, in `--out` |
 | `bulk_redirects.json` | preflight `--record` | combined record; **not postable** |
+| `ai/<slug>_view_review.html` | review | self-contained side-by-side HTML with approve/flag controls, for the topic owner |
 
 ## Notes & gotchas
 
@@ -405,12 +452,12 @@ handoff, since the same operator pastes the payload.
 - Explorer dimension columns stay `dimension_1..N` (compact, and joinable to the explorer CSV);
   the name legend lives in `_scaffold.md` and in `EXPLORER_DIMENSIONS`.
 - Re-running `extract_views.py` overwrites the CSVs and `_sources.json` but **not** your `mapping_rules.py`.
-- `mapping.json` needs `_sources.json`; if you extracted before this output existed, just
-  re-run `extract_views.py` once (it preserves `mapping_rules.py`), then `build_mapping.py`.
+- `mapping.json` needs `_sources.json`; if the out folder has no `_sources.json`, just
+  re-run `extract_views.py` once, then `build_mapping.py`.
 - **One payload per explorer is a correctness requirement**, not a convention: the endpoint's
   schema has a single `catchAll`, so a merged file would silently drop all but one.
 - **There is no bulk delete** — only `DELETE /api/multi-dims/:id/redirects/:redirectId`, one
-  row at a time. A 460-row batch posted wrongly is expensive to undo, which is why the
+  row at a time. A large batch posted wrongly is expensive to undo, which is why the
   preflight exists.
 - **Explorer redirects never reach `_redirects`** (`getRecentMultiDimRedirects` excludes
   non-`/grapher/` sources), so there is no static-redirect fallback and no one-week window —
@@ -425,5 +472,4 @@ handoff, since the same operator pastes the payload.
 - **Algolia keeps indexing the explorer** until the next index build, so it can still appear
   in site search after the redirect exists.
 - **Retiring the explorer row itself is separate** from the redirect: deleting it makes
-  `linkedChart` unresolvable, so `Chart` blocks render nothing and tiles vanish. The five
-  WB/WID inequality explorers migrated in July are the worked example.
+  `linkedChart` unresolvable, so `Chart` blocks render nothing and tiles vanish.

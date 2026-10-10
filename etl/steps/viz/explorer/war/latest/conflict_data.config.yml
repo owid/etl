@@ -5,6 +5,7 @@ config:
   selection:
     - World
   entityType: region
+  entityTypePlural: regions
   hideAnnotationFieldsInTitle: true
   yAxisMin: 0
   tab: map

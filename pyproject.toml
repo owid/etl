@@ -8,7 +8,7 @@ dependencies = [
     "owid-owl",
     "click>=8.0.1",
     "PyYAML>=6.0.1",
-    "jupyterlab>=4.6.2",
+    "jupyterlab>=4.6.4",
     "SPARQLWrapper>=1.8.5",
     "openpyxl>=3.0.9",
     "sh>=2.2.4",
@@ -24,9 +24,9 @@ dependencies = [
     "tenacity>=8.0.1",
     "simplejson>=3.17.6",
     "xlrd>=2.0.1",
-    "pypdf>=6.16.1",
+    "pypdf>=6.19.0",
     "ruamel.yaml>=0.17.21",
-    "gitpython>=3.1.58",
+    "gitpython>=3.1.62",
     "rapidfuzz>=2.13.7",
     "fsspec>=2022.11.0",
     "openai>=1.3.6",
@@ -59,7 +59,7 @@ dependencies = [
     "owid-repack",
     "deprecated>=1.2.14",
     "scikit-learn>=1.5.2",
-    "geopy>=2.4.1",
+    "geopy>=2.5.0",
     "py7zr>=1.1.3",
     "pyreadr>=0.5.2",
     "sentry-sdk>=2.43.0",
@@ -120,7 +120,7 @@ dev = [
     "jsonref>=1.1.0",
     "kaleido==1.1.0",
     "mkdocstrings-python>=2.0.1",
-    "mkdocs-material>=9.5.34",
+    "mkdocs-material>=9.7.7",
     "mkdocs-jupyter>=0.24.8",
     "mkdocs-exclude>=1.0.2",
     "mkdocs-gen-files>=0.5.0",
@@ -153,11 +153,13 @@ api = [
 ]
 
 wizard = [
-    "streamlit>=1.58.0",
+    "streamlit>=1.63.0",
+    # 1.1.9+ (incl. 1.2.x) render an empty grid in the browser for our tables: the frontend fails with
+    # `Unrecognized type: "LargeUtf8"` (Arrow large_string columns). Verified with 1.2.1.post2 in Sept 2026.
     "streamlit-aggrid>=1.1.0,!=1.1.8.*,<1.1.9",
     "plotly>=5.23.0",
     "statsmodels>=0.14.4",
-    "sentence-transformers>=5.1.0",
+    "sentence-transformers>=5.6.0",
     # Transitive via sentence-transformers, but declared here because
     # [tool.uv.sources] only binds direct dependencies.
     "torch>=2.13.0",
