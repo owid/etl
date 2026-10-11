@@ -22,7 +22,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "pandas>=2.2.3,<3",
+    "pandas>=2.2.3,<4",
     "jsonschema>=3.2.0",
     "pyarrow>=10.0.1",
     "ipdb>=0.13.9",
@@ -57,7 +57,7 @@ dev = [
     "watchdog>=2.1.5",
     "argh>=0.26.2",
     "ty==0.0.55",
-    "pandas-stubs>=2.2.3,<3",
+    "pandas-stubs>=2.2.3,<4",
     "ruff==0.15.8",
     "ipykernel>=6.29.0",
 ]

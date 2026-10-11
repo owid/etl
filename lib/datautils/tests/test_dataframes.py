@@ -319,7 +319,7 @@ class TestGroupbyAggregate:
             {
                 "year": [2001, 2002, 2003],
                 "value_01": [0.0, 2.0, 15.0],
-                "value_02": [0, "b", "def"],
+                "value_02": ["", "b", "def"],
                 "value_03": [0, 0, 2],
             }
         ).set_index("year")
@@ -374,7 +374,7 @@ class TestGroupbyAggregate:
             {
                 "year": [2001, 2002, 2003],
                 "value_01": [0.0, 2.0, 15.0],
-                "value_02": [0, "b", "def"],
+                "value_02": ["", "b", "def"],
                 "value_03": [False, False, np.nan],
             }
         ).set_index("year")
@@ -402,7 +402,7 @@ class TestGroupbyAggregate:
             {
                 "year": [2001, 2002, 2003],
                 "value_01": [0.0, 2.0, 15.0],
-                "value_02": [0, "b", "def"],
+                "value_02": ["", "b", "def"],
                 "value_03": [0, 0, True],
             }
         ).set_index("year")
@@ -430,7 +430,7 @@ class TestGroupbyAggregate:
             {
                 "year": [2001, 2002, 2004],
                 "value_01": [0.0, 2.0, 22.0],
-                "value_02": [0, "b", "defg"],
+                "value_02": ["", "b", "defg"],
                 "value_03": [0, 0, True],
             }
         ).set_index("year")
@@ -555,7 +555,7 @@ class TestGroupbyAggregate:
             {
                 "year": [2001, 2002, 2003, 2004],
                 "value_01": [0, 2.0, 15.0, 7],
-                "value_02": [0, "b", "def", "ghij"],
+                "value_02": ["", "b", "def", "ghij"],
                 "value_03": [0, 0, True, True],
             }
         ).set_index("year")
@@ -724,7 +724,7 @@ class TestGroupbyAggregate:
             {
                 "year": [2001, 2002, 2003, 2004],
                 "value_01": [0, 2.0, 15.0, 7.0],
-                "value_02": [0, "b", "d", "ghij"],
+                "value_02": ["", "b", "d", "ghij"],
                 "value_03": [0, False, True, True],
             }
         ).set_index("year")
