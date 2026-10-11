@@ -66,3 +66,13 @@ This is just a sneak peek into some of our data work. But note that all our code
     [:material-notebook: View notebook](food_trade/food_trade.html){ .md-button }
     [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/food_trade/food_trade.ipynb){ .md-button }
     [:material-download: Download notebook](https://raw.githubusercontent.com/owid/etl/master/docs/analyses/food_trade/food_trade.ipynb){ .md-button }
+
+!!! note ""
+
+    ## [Animals killed to produce eggs](animals_killed_for_eggs/animals_killed_for_eggs.html)
+    Technical companion to our work on the welfare impact of egg production.
+    It explains how we estimate the number of hens and male chicks killed each year to produce eggs, starting from FAOSTAT's count of laying hens, and how this estimate relates to FAOSTAT's count of chickens slaughtered for meat.
+
+    [:material-notebook: View notebook](animals_killed_for_eggs/animals_killed_for_eggs.html){ .md-button }
+    [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/animals_killed_for_eggs/animals_killed_for_eggs.ipynb){ .md-button }
+    [:material-download: Download notebook](https://raw.githubusercontent.com/owid/etl/master/docs/analyses/animals_killed_for_eggs/animals_killed_for_eggs.ipynb){ .md-button }
