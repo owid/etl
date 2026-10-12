@@ -2,7 +2,7 @@
 
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 from . import shared
 
@@ -10,7 +10,7 @@ from . import shared
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     # Load relevant datasets.
     ds_data = paths.load_dataset("self_inflicted_injuries")
     ds_regions = paths.load_dataset("regions")
@@ -44,7 +44,7 @@ def run(dest_dir: str) -> None:
         tb_garden[column].metadata.origins = tb["death_rate_per_100_000_population"].metadata.origins
 
     # Save the final dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_garden], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb_garden], check_variables_metadata=True)
     ds_garden.save()
 
 
