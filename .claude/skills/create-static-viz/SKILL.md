@@ -395,6 +395,14 @@ must be exact and `margins` must pass — a failure there is real, not this rout
 footer frame's top, which a band derived from line-box arithmetic misses by a few px, so a page
 asserting a 14 px inset can read a few px above the 12–16 target. Report both numbers and
 name the datum the step used — [TEMPLATES.md](TEMPLATES.md) has the measurements and which to prefer.
+To make it exact rather than explained, reserve each block that opens or closes the band from its ink
+(WRITING-THE-STEP.md → Anchor and baseline). The crop takes a text node's top and bottom from its ink
+too, so the frame's box then is the ink.
+
+**On a refresh whose geometry changed, re-import with the job's `inheritStyles: true`.** The script then
+binds every colour to the style the existing frame bound it to, renamed and new nodes included, and
+refuses any colour the old frame never used. No hand-kept table of style ids is needed in the step's
+docstring.
 
 **Use grapher's OWN names for the data layers wherever the shape matches, because that skill's Step 8c
 checks key off them and skip when they are absent.** On a correct frame drawn by a local generator
