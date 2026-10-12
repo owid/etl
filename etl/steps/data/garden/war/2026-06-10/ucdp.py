@@ -28,7 +28,7 @@ from typing import cast
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Table, VariableMeta
 from owid.catalog import processing as pr
 from shapely import wkt
 from shapely.strtree import STRtree
@@ -80,6 +80,12 @@ LAST_YEAR = 2025
 # Number of events with no location assigned (see function estimate_metrics_locations)
 # 26.1 update: observed 1296 (was 1214 in 25.1; +82 due to new/revised 2024-2025 events)
 NUM_MISSING_LOCATIONS = 1296
+
+# Cumulative deaths (table `ucdp_cumulative`, see function estimate_cumulative_deaths)
+# First year of the GED, from which the deaths are summed.
+FIRST_YEAR_CUMULATIVE = 1989
+# Conflict types summed. Extrasystemic conflicts are left out: there have been none since 1989.
+CONFLICT_TYPES_CUMULATIVE = ["all", "intrastate", "one-sided violence", "non-state conflict", "interstate"]
 
 
 def run() -> None:
@@ -135,6 +141,7 @@ def run() -> None:
         tables=tables,
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
+        yaml_params={"first_year_cumulative": FIRST_YEAR_CUMULATIVE, "last_year": LAST_YEAR},
     )
 
     # Save changes in the new garden dataset.
@@ -380,14 +387,122 @@ def run_pipeline(
     tb_participants = add_suffix_to_regions(tb_participants, "country")
     tb_locations = add_suffix_to_regions(tb_locations, "country")
 
+    tb = tb.format(column_index, short_name=short_name)
+
+    # Cumulative deaths since 1989 (one row per entity and conflict type)
+    paths.log.info("estimate cumulative deaths since 1989")
+    tb_cumulative = estimate_cumulative_deaths(tb, tb_regions, last_year=last_year, short_name=short_name)
+
     # Tables
     tables = [
-        tb.format(column_index, short_name=short_name),
+        tb,
         tb_participants.format(column_index, short_name=f"{short_name}_country"),
         tb_locations.format(column_index, short_name=f"{short_name}_locations"),
+        tb_cumulative,
     ]
 
     return tables
+
+
+def estimate_cumulative_deaths(tb: Table, tb_regions: Table, last_year: int, short_name: str) -> Table:
+    """Cumulative deaths in ongoing conflicts since FIRST_YEAR_CUMULATIVE, and cumulative death rates.
+
+    Sums the yearly best estimates of deaths (by the location where they occurred) over FIRST_YEAR_CUMULATIVE to
+    `last_year`, for countries, UCDP regions and the world, and divides them by the population in
+    FIRST_YEAR_CUMULATIVE to get cumulative deaths per 100,000 people. Each entity gets a single row per conflict
+    type, stamped with `last_year`.
+
+    Population:
+        - Countries use OWID's population estimate.
+        - UCDP regions and the world use the population of the Gleditsch & Ward states in each region (`tb_regions`),
+          the same population used for the yearly death rates.
+        - Entities without a population estimate (e.g. East and West Germany, Abkhazia) are dropped.
+
+    Args:
+        tb: Main table (`ucdp`), with country and region data combined.
+        tb_regions: Number of countries and population per region and year, from the Gleditsch dataset.
+        last_year: Last year of data.
+        short_name: Short name of the main table; the cumulative table is named `{short_name}_cumulative`.
+    """
+    col = "number_deaths_ongoing_conflicts"
+    tb = tb.reset_index().astype({"country": str, "conflict_type": str})
+
+    # Keep deaths since FIRST_YEAR_CUMULATIVE, for the relevant conflict types
+    _sanity_check_cumulative_inputs(tb, col=col, last_year=last_year)
+    tb = tb.loc[
+        tb["year"].between(FIRST_YEAR_CUMULATIVE, last_year) & tb["conflict_type"].isin(CONFLICT_TYPES_CUMULATIVE)
+    ]
+
+    # Keep only the origins of the yearly indicator; the rest of its metadata (e.g. its map color scale) does not
+    # apply to the cumulative indicators, which get theirs from the metadata file.
+    tb[col].metadata = VariableMeta(origins=tb[col].metadata.origins)
+
+    # Sum deaths over the years
+    tb = tb.groupby(["country", "conflict_type"], as_index=False)[col].sum().rename(columns={col: "cumulative_deaths"})
+
+    # Add population in FIRST_YEAR_CUMULATIVE: OWID's for countries, Gleditsch & Ward states' for regions and world
+    tb["year"] = FIRST_YEAR_CUMULATIVE
+    tb = paths.regions.add_population(tb=tb, warn_on_missing_countries=False)
+    pop_regions = tb_regions.loc[tb_regions["year"] == FIRST_YEAR_CUMULATIVE].set_index("region")["population"]
+    pop_regions = {(r if r == "World" else f"{r} (UCDP)"): pop for r, pop in pop_regions.items()}
+    assert set(pop_regions) == {"World"} | {f"{r} (UCDP)" for r in REGIONS_EXPECTED}, "Unexpected Gleditsch regions!"
+    is_region = tb["country"].isin(pop_regions)
+    tb.loc[is_region, "population"] = tb.loc[is_region, "country"].map(pop_regions)
+
+    # Drop entities without a population estimate
+    missing = sorted(tb.loc[tb["population"].isna(), "country"].unique())
+    if missing:
+        log.warning(f"Dropping entities without a population estimate for {FIRST_YEAR_CUMULATIVE}: {missing}")
+    tb = tb.dropna(subset=["population"])
+
+    # Death rate (per 100,000 people)
+    tb["cumulative_death_rate"] = tb["cumulative_deaths"] / tb["population"] * 100_000
+
+    # One row per entity and conflict type, stamped with the last year
+    tb["year"] = last_year
+    tb = tb.drop(columns=["population"])
+
+    _sanity_check_cumulative_outputs(tb)
+
+    return tb.format(["year", "country", "conflict_type"], short_name=f"{short_name}_cumulative")
+
+
+def _sanity_check_cumulative_inputs(tb: Table, col: str, last_year: int) -> None:
+    world = tb.loc[(tb["country"] == "World") & (tb["conflict_type"] == "all")]
+    # Deaths start in FIRST_YEAR_CUMULATIVE, and all years since are present
+    first_year_with_data = world.loc[world[col].notna(), "year"].min()
+    assert first_year_with_data == FIRST_YEAR_CUMULATIVE, f"UCDP deaths data now starts in {first_year_with_data}!"
+    assert set(world["year"]) >= set(range(FIRST_YEAR_CUMULATIVE, last_year + 1)), "Years missing in world totals!"
+
+    # From here on, only the rows that are summed
+    tb = tb.loc[
+        tb["year"].between(FIRST_YEAR_CUMULATIVE, last_year) & tb["conflict_type"].isin(CONFLICT_TYPES_CUMULATIVE)
+    ]
+    assert tb[col].notna().all(), f"Missing values in `{col}` since {FIRST_YEAR_CUMULATIVE}!"
+    assert (tb[col] >= 0).all(), "Negative death counts!"
+    # Each entity has data for all conflict types (otherwise the conflict types wouldn't add up to all conflicts)
+    num_types = tb.groupby("country")["conflict_type"].nunique()
+    incomplete = sorted(num_types.index[num_types < len(CONFLICT_TYPES_CUMULATIVE)])
+    assert not incomplete, f"Entities without all conflict types: {incomplete}"
+
+
+def _sanity_check_cumulative_outputs(tb: Table) -> None:
+    deaths = tb.pivot(index="country", columns="conflict_type", values="cumulative_deaths")
+
+    # The conflict types add up to all conflicts, for every entity
+    types = [ctype for ctype in CONFLICT_TYPES_CUMULATIVE if ctype != "all"]
+    mismatch = deaths.index[(deaths[types].sum(axis=1) - deaths["all"]).abs() > 0.5]
+    assert mismatch.empty, f"Conflict types do not add up to all conflicts for: {sorted(mismatch)}"
+
+    # The UCDP regions add up to the world, for every conflict type
+    regions = deaths.loc[deaths.index.str.endswith(" (UCDP)")]
+    assert len(regions) == len(REGIONS_EXPECTED), (
+        f"Expected {len(REGIONS_EXPECTED)} UCDP regions, found {len(regions)}."
+    )
+    diff = (regions.sum() - deaths.loc["World"]).abs()
+    assert (diff <= 0.5).all(), f"UCDP regions do not add up to the world: {diff.to_dict()}"
+
+    assert tb.notna().all().all(), "Missing values in cumulative deaths table!"
 
 
 # Add conflict type

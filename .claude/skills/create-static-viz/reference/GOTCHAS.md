@@ -61,7 +61,10 @@
 - **A "no room for this" conclusion expires the moment the geometry changes.** Something ruled out
   on measurement — anchoring the first tick label inwards, a one-line label — can become possible
   after an unrelated change (pinning the x range to the ticks; moving a label below a shape). Record *why* something didn't fit, so the next geometry change is a prompt to re-measure
-  rather than a settled answer to inherit.
+  rather than a settled answer to inherit. The same goes for a constant calibrated by measuring the
+  frame (an ink-to-box slack, a gap correction). It holds only at the type size it was measured at, so
+  re-measure it in the frame whenever that size changes: the step's model and Figma's line boxes do not
+  scale together.
 
 **Workflow**
 

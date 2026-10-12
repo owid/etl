@@ -25,10 +25,15 @@ def run() -> None:
     tb_participants = ds_garden["ucdp_country"]
     tb_locations = ds_garden["ucdp_locations"]
 
+    # Cumulative deaths since 1989
+    tb_cumulative = ds_garden.read("ucdp_cumulative")
+    tb_cumulative = tb_cumulative.format(["year", "country", "conflict_type"])
+
     tables = [
         tb,
         tb_participants,
         tb_locations,
+        tb_cumulative,
     ]
 
     #
