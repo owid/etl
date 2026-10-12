@@ -471,9 +471,9 @@ LAYOUTS = {
         "stunting_label_width": 100,
         "stunting_leader_pt": 22,
         # Where the header ends in the Figma frame: the template's serif sets the title on two lines and
-        # the two-sentence subtitle takes three (16 + 58 + 6 + 57). The step measures neither face, so it
+        # the two-sentence subtitle takes two (16 + 58 + 6 + 38). The step measures neither face, so it
         # takes the number rather than its own wrap.
-        "chart_area_top": 137,
+        "chart_area_top": 118,
         "band_label_xy": (0.6, 160),
         "band_label_target_age": 10.8,
         "band_label_width": 100,
@@ -495,7 +495,7 @@ SUBTITLE = "Height by age, according to the World Health Organization."
 
 # Mobile has no Note slot, so its subtitle carries the stunting definition the desktop Note gives: the
 # link between the band's lower edge and "two standard deviations", which the plot does not label.
-MOBILE_SUBTITLE = f"{SUBTITLE} Children more than two standard deviations below the median are considered stunted."
+MOBILE_SUBTITLE = f"{SUBTITLE} Children more than two standard deviations below the median are stunted."
 
 
 # One dash plus one gap, in POINTS: the dash units are multiples of the line width, so this is what
