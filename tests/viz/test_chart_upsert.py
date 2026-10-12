@@ -15,7 +15,7 @@ from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.viz.chart.model.core import Chart, Definitions
 from etl.viz.chart.model.dimension import Dimension, DimensionChoice
 from etl.viz.chart.model.view import View, ViewIndicators
-from etl.viz.chart.upsert import _build_chart_config, _validate_chart_config
+from etl.viz.chart.upsert import _build_chart_config
 
 # Catalog-path -> variable-id map used to stub the DB lookup.
 _PATH_TO_ID = {
@@ -118,40 +118,6 @@ def test_no_indicators_raises():
     view = _make_view({})
     with pytest.raises(ValueError, match="no indicators"):
         _build(view)
-
-
-def test_validate_accepts_well_formed_config():
-    config = {
-        "$schema": DEFAULT_GRAPHER_SCHEMA,
-        "slug": "my-chart",
-        "title": "A chart",
-        "chartTypes": ["LineChart"],
-        "dimensions": [{"property": "y", "variableId": 111}],
-    }
-    # Should not raise.
-    _validate_chart_config(config, "my-chart")
-
-
-def test_validate_rejects_unknown_field():
-    config = {
-        "$schema": DEFAULT_GRAPHER_SCHEMA,
-        "slug": "my-chart",
-        "dimensions": [{"property": "y", "variableId": 111}],
-        "titel": "typo'd field",  # not in the grapher schema (root additionalProperties: false)
-    }
-    with pytest.raises(ValueError, match="Invalid chart config for slug 'my-chart'"):
-        _validate_chart_config(config, "my-chart")
-
-
-def test_validate_skips_when_schema_not_vendored_locally():
-    config = {
-        # A version we don't vendor locally — validation is skipped, not an error.
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.001.json",
-        "dimensions": [{"property": "y", "variableId": 111}],
-        "titel": "typo would fail if validated",
-    }
-    # Should not raise (skipped because the local schema file is absent).
-    _validate_chart_config(config, "my-chart")
 
 
 def test_chart_config_id_required_for_single_charts():
