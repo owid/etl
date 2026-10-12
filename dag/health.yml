@@ -183,12 +183,6 @@ steps:
             - snapshot://health/2024-04-12/polio_free_countries.csv
         - data://garden/regions/2023-01-01/regions
 
-  # Polio vaccine schedule - update
-  data://grapher/who/2025-01-13/polio_vaccine_schedule:
-    - data://garden/who/2025-01-13/polio_vaccine_schedule:
-        - data://meadow/who/2025-01-13/polio_vaccine_schedule:
-            - snapshot://who/2025-01-13/polio_vaccine_schedule.xlsx
-
   # Polio GPEI funding
   data://grapher/health/2024-04-22/gpei_funding:
     - data://garden/health/2024-04-22/gpei_funding:
@@ -634,11 +628,20 @@ steps:
             - data://garden/demography/2024-07-15/population
 
   # WHO Vaccine Introductions
+  data://grapher/who/2025-07-15/vaccination_introductions:
+    - data://garden/who/2025-07-15/vaccination_introductions:
+        - data://meadow/who/2025-07-15/vaccination_introductions:
+            - snapshot://who/2025-07-15/vaccination_introductions.xlsx
+
+  # WHO Vaccine Introductions - update
+  data://grapher/who/2026-10-07/vaccination_introductions:
+    - data://garden/who/2026-10-07/vaccination_introductions:
+        - data://meadow/who/2026-10-07/vaccination_introductions:
+            - snapshot://who/2026-10-07/vaccination_introductions.xlsx
+
   viz://chart/health/latest/vaccination_introductions:
-    - data://grapher/who/2025-07-15/vaccination_introductions:
-        - data://garden/who/2025-07-15/vaccination_introductions:
-            - data://meadow/who/2025-07-15/vaccination_introductions:
-                - snapshot://who/2025-07-15/vaccination_introductions.xlsx
+    - data://grapher/who/2026-10-07/vaccination_introductions
+    - data://grapher/who/2025-07-15/vaccination_introductions
 
   #
   # US Pertussis cases - CDC
@@ -1114,3 +1117,15 @@ steps:
         - data://garden/wb/2026-07-01/income_groups
         - data://meadow/who/2026-08-18/cholera_cases_and_deaths:
             - snapshot://who/2026-08-18/cholera_cases_and_deaths.xlsx
+  data://meadow/health/2026-10-05/maternal_tetanus:
+    - snapshot://health/2026-10-05/maternal_tetanus.pdf
+  data://garden/health/2026-10-05/maternal_tetanus:
+    - data://meadow/health/2026-10-05/maternal_tetanus
+  data://grapher/health/2026-10-05/maternal_tetanus:
+    - data://garden/health/2026-10-05/maternal_tetanus
+
+  # Polio vaccine schedule - update
+  data://grapher/who/2026-10-07/polio_vaccine_schedule:
+    - data://garden/who/2026-10-07/polio_vaccine_schedule:
+        - data://meadow/who/2026-10-07/polio_vaccine_schedule:
+            - snapshot://who/2026-10-07/polio_vaccine_schedule.xlsx

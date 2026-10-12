@@ -221,8 +221,6 @@ def _merge(issues: list[dict[str, Any]], new: dict[str, Any]) -> None:
 
     The model rewords freely between passes — "life expectancy of around 18–20 years" and
     "under 20 years" are one finding — so matching on a prefix counts them separately.
-    :func:`critic.same_claim` is the shared notion of "the same finding", and the digest
-    recognises what it has already posted with the same test.
     """
     tokens = claim_tokens(new["claim"])
     for existing in issues:
@@ -313,8 +311,8 @@ def _review_one(
     found: list[dict[str, Any]] = []
     in_tokens = out_tokens = 0
 
-    # The model is not reproducible even at temperature 0: on repeated passes over the same
-    # chart it raises a genuine finding on some and not others. Measured on three charts with
+    # The model is not reproducible: on repeated passes over the same chart it raises a
+    # genuine finding on some and not others. Measured on three charts with
     # known findings, one pass caught 1-2 of them and three passes caught all three. So a pass
     # count is a recall dial, and at these prices it is cheap to turn up.
     bundle_hash = cache.content_hash(bundle.summary, bundle.png, *(png for _, png in extra_views))

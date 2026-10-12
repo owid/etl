@@ -1226,6 +1226,8 @@ class ExportStep(DataStep):
             )
             return
 
+        self._publish()
+
         # save checksum (only update index.json, don't call ds.save() which iterates
         # table_names and would pick up custom JSON files written by the step)
         ds.metadata.source_checksum = self.checksum_input()
@@ -1239,6 +1241,14 @@ class ExportStep(DataStep):
         """Whether this run may write to the step's destination. Off, the recipe still runs (the steps
         check the same `config` switch before uploading), but nothing leaves the machine."""
         return config.EXPORT_ENABLED
+
+    def _publish(self) -> None:
+        """Ship what the recipe wrote, for step types whose destination the framework owns.
+
+        A no-op for `export://` steps: they write to destinations of their own choosing (a GitHub
+        repo, a public R2 path) from inside the recipe, which is why they exist as a separate step
+        type at all.
+        """
 
     def _run_recipe(self) -> None:
         if config.DEBUG:
@@ -1272,8 +1282,8 @@ class VizStep(ExportStep):
     step runs under `--grapher`, which grants the write (`config.GRAPHER_ENABLED`); named without it,
     the step builds its output locally (the chart config under `viz/`, the bespoke feed) and skips
     the upsert or upload, see `etl.command.construct_subdag`. Static steps only write local files,
-    so they publish regardless. Bespoke steps currently upload to a fixed public path rather than
-    to the environment being built.
+    so they publish regardless. A bespoke step's own upload is the framework's job (`_publish`), so
+    its feed lands in the R2 path of the environment being built, like every other output.
     """
 
     step_type = "viz"
@@ -1282,6 +1292,20 @@ class VizStep(ExportStep):
     @property
     def publishes(self) -> bool:
         return config.GRAPHER_ENABLED or self.channel == "static"
+
+    def _publish(self) -> None:
+        """Sync a bespoke feed to the environment's R2 path.
+
+        Chart and explorer steps publish from inside their recipe (`chart.save()` upserts to the
+        grapher DB) and static steps only ever write local files. A bespoke step just writes JSON
+        into its output folder, and the framework ships it -- see `etl.viz.bespoke`.
+        """
+        if self.channel != "bespoke":
+            return
+
+        from etl.viz.bespoke import sync_feed
+
+        sync_feed(self.path, self._dest_dir)
 
     def can_execute(self, archive_ok: bool = True) -> bool:
         return super().can_execute(archive_ok=archive_ok) or self._is_chart_yaml_only()

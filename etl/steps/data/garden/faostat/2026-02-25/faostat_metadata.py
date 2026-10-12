@@ -1078,4 +1078,4 @@ def run() -> None:
 # at runtime but do not match those patterns, so editing them alone does NOT trigger a rebuild here (or
 # in any downstream FAOSTAT step). After changing that harmonization, make a small edit anywhere in this
 # file (e.g. tweak this comment) to force this step's checksum to change and propagate the rebuild.
-# Last forced rebuild: 2026-09-11 (per capita laying and milk animals in custom_elements_and_units.csv).
+# Last forced rebuild: 2026-09-17 (value of agricultural production in US$ in custom_elements_and_units.csv).

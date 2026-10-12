@@ -10,6 +10,7 @@ config:
   thumbnail: https://assets.ourworldindata.org/uploads/2022/04/ipcc-thumbnail-01.png
   wpBlockId: 50588
   entityType: scenario
+  entityTypePlural: scenarios
   isPublished: true
   explorerTitle: IPCC Scenarios
   hideAlertBanner: true

@@ -248,7 +248,7 @@ A step's type says what it produces. Viz steps produce visualizations, and their
 - **Charts and multi-dimensional indicators** (`viz://chart/`): Create the configuration of a chart or an MDIM and upsert it to the grapher DB.
 - **Explorers** (`viz://explorer/`): Create a data explorer and upsert it to the grapher DB.
 - **Static images** (`viz://static/`): Render a PNG/SVG with matplotlib next to the recipe.
-- **Bespoke visualizations** (`viz://bespoke/`): Produce the data feed of a bespoke interactive visualization (currently uploaded to R2).
+- **Bespoke visualizations** (`viz://bespoke/`): Produce the data feed of a bespoke interactive visualization. The step writes JSON files into its output folder and the framework syncs them to R2, under the path of the environment being built.
 
 Viz steps publish with `--grapher`. Named by their URI they also run without it, in which case they only build locally (the chart config, the data feed) and skip the DB upsert or upload; a pattern such as `energy` selects them only with the flag.
 
