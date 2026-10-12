@@ -222,6 +222,11 @@ explains the extra px is what makes a 14 px inset off those datums read as `gap`
 without knowing which datum you are shrinking from — that moves the plot to satisfy a number measured
 from somewhere else.
 
+**With the frame-edge datums right, an equal excess at both ends is reserve slack.** Figma crops the
+chart to its ink and centres it in the band, so `header_px` or `below_px` reserved taller than the
+facet title or x-axis label it holds adds the difference to `gap`. Measure that ink against its
+reserve, then trim the reserve, or cut `BAND_INSET` by the measured slack and say so in its comment.
+
 `gap` is a live row, so a failure is a real discrepancy and not explanatory noise: a band derived from
 line-height arithmetic is a defect to correct, not a caveat to record.
 
