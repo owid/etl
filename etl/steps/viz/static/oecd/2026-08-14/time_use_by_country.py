@@ -21,10 +21,12 @@ here rather than in the catalog. A ten-display-group table used to sit in betwee
 up to these same numbers, which is a detour: it reconstructed the source's own totals to within
 3e-05 minutes, and no chart used any of its 33 indicators.
 
-**26 countries over 2010-2024**, which is what garden publishes rather than anything this step
-selects: the survey-year cutoff and the reasoning behind it live beside `EARLIEST_SURVEY_YEAR` in
-`data://garden/oecd/2026-08-14/time_use`. This step asserts what it received and does not filter — a
-second filter here would be dead code that reads as the live one.
+**25 countries over 2010-2024**: the 26 garden publishes, less Mexico. The survey-year cutoff and the
+reasoning behind it live beside `EARLIEST_SURVEY_YEAR` in `data://garden/oecd/2026-08-14/time_use`, and
+this step does not filter by year again — a second filter would be dead code that reads as the live one.
+Mexico is dropped here, not in garden, because it is a presentation call for one chart: the OECD flags its
+estimates as not fully comparable, it is the only charted country so flagged, and it would otherwise rank
+second on the leading segment with a footnote attached (see `NOT_COMPARABLE`).
 
 Values are written inside segments wide enough to hold them, in hours and minutes. Survey years differ
 by country, so each country label carries its year — the original's surveys spanned a narrower window
@@ -189,10 +191,11 @@ which also removes the drift the anchor pass existed to undo, since a face chang
 its width change. Read the faces on arrival before trusting that; an import in **Inter** means the
 stack did not survive to the file, and then the old recipe applies (record each node's own
 `textAlignHorizontal`, set every run to Lato, put each node back on its anchor — in that order, because
-the middle step invalidates the first). The 26 country labels take `Text/Gray 80`.
+the middle step invalidates the first). The 25 country labels and the four member lists take
+`Text/Gray 80`.
 
 **Colors**, bound as library styles rather than pasted as hexes: `Default Palette/Denim`
-`e1538d93...`, `Camel` `45161823...` with `Line and Slope Charts/Camel` `c17ca762...` for its name,
+`e1538d93...`, `Camel` `45161823...` with `Line and Slope Charts/Camel` `c17ca762...` for its category name,
 `Rusty Orange` `65bab597...`, and `Light Teal` `9a2854bc...` with `Line and Slope Charts/Light Teal`
 `a07c1354...`. Bars carry `SEGMENT_ALPHA` as *node* opacity, not paint opacity, so the binding
 survives. Value labels: white on Rusty Orange only, and `Text/Gray 100` on the other three, which is what
@@ -308,11 +311,14 @@ VALUE_LABEL_COVERAGE = 0.75
 # `members` names what each category holds, in the source's own terms and ordered by the minutes each
 # takes. Two of them are worth not "correcting" back to "Other": the OECD's 3.3 is labelled *personal,
 # household, and medical services + travel related to personal care* — grooming and health, 61 min/day,
-# 9% of personal care — and its 4.5, though labelled "other leisure activities", is games, hobbies, arts
-# and crafts, reading and leisure travel per the country mappings on the workbook's activity sheet, and
-# at 96 min/day it is the second-largest thing anyone does with their leisure. Only unpaid work keeps an
-# "Other", and that one is ours: it holds this chart's fold of the source's fifth top-level category
-# (religious, civic and unclassified time, 18 min/day) along with household travel and the care items.
+# 9% of personal care. Its 4.5 is the other way round: it stays "Hobbies & other", because per the
+# country mappings on the workbook's activity sheet it holds games, hobbies, arts and crafts, reading and
+# leisure travel, but also rest and relaxation (Japan, HETUS, Italy, Ireland) and computer and internet
+# use (Canada, HETUS, Ireland, New Zealand) — "Hobbies" alone would mislabel it, and at 96 min/day it is
+# the second-largest thing anyone does with their leisure. Unpaid work lists no "Other": its category
+# name already says "& other", which is this chart's fold of the source's fifth top-level category
+# (religious, civic and unclassified time, 18 min/day), and a second "Other" in the key read as the same
+# bucket as the one under Leisure.
 MAIN_CATEGORY_GROUPS = [
     {
         "column": "main_paid_work_or_study",
@@ -320,7 +326,8 @@ MAIN_CATEGORY_GROUPS = [
         "source_columns": ["paid_work_or_study"],
         "members": ["Paid work", "Commuting", "School or classes", "Homework"],
         "compact": True,
-        "label": "Paid work or study",
+        # "&", not the source's "or": the segment is the sum of the two, and it matches "Unpaid work & other".
+        "label": "Paid work & study",
         # Camel, with the library's darker Camel for the name: the fill measures 2.8:1 as text.
         "color": ("hex", "#bc8e5a", "#996d39"),
         "as_hours": True,
@@ -346,11 +353,12 @@ MAIN_CATEGORY_GROUPS = [
         # activities and uncategorized time, 18 min/day, too small to read as its own segment and
         # closest in kind to unpaid work; folding it is a presentation call, which is why it is here.
         "source_columns": ["unpaid_work", "other_activities"],
-        # "Travel", not "Volunteering". Both are in here, but a five-name list has to name the five
-        # biggest things, and across the 26 charted countries household travel is a median 17.3
-        # min/day reported by 25 of them while volunteering is 3.0 min — the list was naming the
-        # 7th-largest member and skipping the 4th. `check_members_are_the_largest` asserts it.
-        "members": ["Housework", "Childcare", "Shopping", "Travel", "Other"],
+        # "Household travel", not "Volunteering". Both are in here, but the list has to name the
+        # biggest things, and across the charted countries household travel is a median 17 min/day
+        # while volunteering is 3 — the list was naming the 7th-largest member and skipping the 4th.
+        # `check_members_are_the_largest` asserts it. Spelled out, not "Travel": on its own it reads
+        # as holidays, which the source counts under leisure.
+        "members": ["Housework", "Childcare", "Shopping", "Household travel"],
         "compact": True,
         "as_hours": True,
         "label": "Unpaid work & other",
@@ -373,12 +381,12 @@ MAIN_CATEGORY_GROUPS = [
 
 # Which source sub-activity each name in the key stands for, and which ones the key does not name.
 # A five-name list is a selection, and the invariant is that it selects the *biggest* members: the key
-# named volunteering (a median 3.0 min/day) while leaving household travel (17.3, reported by 25 of the
-# 26 charted countries) unnamed, which `check_members_are_the_largest` now makes impossible to ship.
+# named volunteering (a median 3.0 min/day) while leaving household travel (17.3) unnamed, which
+# `check_members_are_the_largest` now makes impossible to ship.
 # `care_for_household_members` is deliberately absent: it is the parent of child and adult care, and
 # counting it would double the branch.
 KEY_MEMBER_COLUMNS = {
-    "Paid work or study": {
+    "Paid work & study": {
         "named": {
             "Paid work": "paid_work_all_jobs",
             "Commuting": "travel_to_and_from_work_or_study",
@@ -400,7 +408,7 @@ KEY_MEMBER_COLUMNS = {
             "Housework": "routine_housework",
             "Childcare": "child_care",
             "Shopping": "shopping",
-            "Travel": "travel_related_to_household_activities",
+            "Household travel": "travel_related_to_household_activities",
         },
         "unnamed": [
             "adult_care",
@@ -410,8 +418,6 @@ KEY_MEMBER_COLUMNS = {
             "religious_spiritual_and_civic_activities",
             "other_uncategorized_activities",
         ],
-        # Whatever the category has left over, so it is not compared against the named members.
-        "residual": "Other",
     },
     "Leisure": {
         "named": {
@@ -439,11 +445,20 @@ MAIN_CATEGORIES = [
 ]
 
 TITLE = "How do people spend their time?"
+SUBTITLE = (
+    "Average time spent in a 24-hour day by people aged 15 to 64. Based on each country's most recent "
+    "time-use survey in the OECD data, from {first} to {last}."
+)
 
 # The row labels set the width of the column they sit in, so the two longest names are shortened to
 # the forms the style guide sanctions (no periods). It buys the bars 15px on desktop and 13px on
 # mobile, which is the gap between these two names and the next-longest, "New Zealand".
 SHORT_COUNTRY_NAMES = {"United Kingdom": "UK", "United States": "US"}
+
+# Countries the OECD flags as "not fully comparable, due to methodological differences" (the starred
+# columns of the workbook's Total sheet), left off this chart. Mexico is the only charted one: the other
+# stars are age-weighting notes, or Australia, Lithuania and China, whose surveys predate garden's cutoff.
+NOT_COMPARABLE = ["Mexico"]
 
 # Credited on the license line: the original chart's author, and this refresh's. Named one by one
 # because the line sets them in bold, as it does the license itself.
@@ -474,6 +489,11 @@ SEGMENT_ALPHA = 0.8
 # 4.68:1, and the 4.5:1 bar is exactly what these labels have to clear. The dark is Text/Gray 100, the
 # style the frame binds them to, so the render and the frame agree.
 DARK_VALUE_COLOR = "#2d2e2d"
+
+# The activities listed under each category name, in the body gray (`Text/Gray 80` in the frame) rather
+# than the category's colour. With both in colour the name and its list differed only by size and
+# weight, and the four names did not read as headings; the name keeps the colour that ties it to its bar.
+MEMBER_TEXT_COLOR = TEXT_COLOR
 
 # The floors `check_contrast` holds every color to, measured over the canvas at `SEGMENT_ALPHA`.
 # A seam is a lightness gap between touching fills, so it is well below a text ratio; the value floor
@@ -645,10 +665,10 @@ CATEGORY_LABEL_GAP = 3
 CATEGORY_NAME_BOX_SLACK = 0.317
 
 # Extra air between a category's name and the list under it, where the name sits directly on its own
-# list rather than above a bracket rule. In lines of that list: half a line is enough to read as a
-# heading, and a full line pushes the name far enough from its own list to start looking detached
+# list rather than above a bracket rule. In lines of that list: three quarters of a line sets the name
+# off as a heading, and a full line pushes it far enough from its own list to start looking detached
 # again — which is the problem this gap exists to solve.
-CATEGORY_NAME_GAP_LINES = 0.5
+CATEGORY_NAME_GAP_LINES = 0.75
 
 # The row legend, which is what a frame too narrow to name its own segments gets instead: the
 # colour chip, the gap after it, the gap between a category's name and its member list, and the air
@@ -742,18 +762,17 @@ LAYOUTS = {
             "license_y": 1065.81,
             "license_px": 11,
         },
-        # In whole template pixels, like the template's own slots. The four sizes step down from the
-        # template's smallest body text (its Note and source rows are 12): the category names at 14,
-        # their member lists at 13, the row labels at 12 and the in-bar values at 12.
+        # In whole template pixels, like the template's own slots: the category names at 16, their
+        # member lists at 13, the in-bar values at 13 and the row labels at 12.
         "country_font_px": 12,
-        "value_font_px": 12,
+        "value_font_px": 13,
         "header_font_px": 13,
-        # The bold category name, one pixel up on the member list under it. It is a heading over a list,
-        # and at the same size the only thing separating the two is the weight — a pixel is enough to
-        # make the hierarchy read without the name starting to compete with the title. It feeds the wrap
-        # and collision solver as well as the drawing, so a name that no longer fits its own segment at
-        # this size gets wrapped (or, if a single word overhangs, fails `place_header_labels`).
-        "category_font_px": 14,
+        # The bold category name, three pixels up on the gray member list under it — the subtitle's own
+        # size, so it reads as a heading without competing with the title. At 14 it sat too close to its
+        # list. It feeds the wrap and collision solver as well as the drawing, so a name that no longer
+        # fits its own segment at this size gets wrapped (or, if a single word overhangs, fails
+        # `solve_category_layout`).
+        "category_font_px": 16,
         # Whether a value reads "4h 29m" rather than "4 hours 29 mins" when the long form does not fit.
         "with_mins_suffix": True,
         # Where each half of the header goes. The category brackets span the top row from above, and
@@ -765,11 +784,16 @@ LAYOUTS = {
         "groups": MAIN_CATEGORY_GROUPS,
         "categories": MAIN_CATEGORIES,
         "group_labels": "bracketed",
-        # "in a 24-hour day" earns its words: every bar is the same length, and nothing else on the
-        # frame says that the length is a whole day rather than a scale someone chose. It costs the
-        # "time-use" in "time-use surveys", which the title and the source line both carry — the line
-        # is full at 1117px of a 818px slot before Lato's slack, so anything longer wraps.
-        "subtitle": "Average hours and minutes in a 24-hour day, from surveys run between {years}, for people aged 15 to 64.",
+        # A member name may reach past its own segment, as long as `blocks_collide` still clears it from
+        # its neighbours: "Household travel" overhangs the narrowest segment by 8px a side, and wrapping it
+        # to fit made "travel" read as an item of its own.
+        "member_names_overhang": True,
+        # The age group first, since it is what a reader needs to interpret any bar, then the survey
+        # scope, which is why the Note no longer carries it. "in a 24-hour day" earns its words: every bar
+        # is the same length, and nothing else on the frame says that the length is a whole day. "from X
+        # to Y", not "conducted between": the years are the ones the row labels show, and a survey labelled
+        # 2010 (France, Spain, New Zealand) ran over 2009/10.
+        "subtitle": SUBTITLE,
         # With one segment per category, a name that overhangs its own bar reads as pointing at its
         # neighbour too — so wrap it rather than only wrapping to avoid a collision.
         "wrap_overhanging_names": True,
@@ -843,9 +867,8 @@ LAYOUTS = {
         # overhang the bars they name by more than they cover. `draw_row_legend` says the rest.
         "group_labels": "rows",
         "note_in_band": True,
-        # The same sentence as the desktop frame. It wraps to two lines at 508px rather than one, which
-        # the mobile subtitle slot is exactly tall enough for.
-        "subtitle": "Average hours and minutes in a 24-hour day, from surveys run between {years}, for people aged 15 to 64.",
+        # The same sentence as the desktop frame.
+        "subtitle": SUBTITLE,
     },
 }
 
@@ -920,6 +943,15 @@ def load_chart_groups() -> tuple[Table, dict[str, str]]:
     # No sort here. `sort_rows` ranks by the layout's own leading segment and runs after this, so a sort
     # in this function only ever set an order that was thrown away.
 
+    # What garden publishes, which this step takes as given. A layout tuned for these rows is not a
+    # layout for 35: the row pitch, the value-label coverage and the header band all derive from the row
+    # count, so a change to garden's cutoff should stop here to be looked at rather than be silently
+    # redrawn.
+    assert len(tb) == 26, f"Garden published {len(tb)} countries, not the 26 this layout is drawn for."
+    missing = set(NOT_COMPARABLE) - set(tb["country"])
+    assert not missing, f"Expected to leave out {sorted(missing)}, but garden no longer publishes them."
+    tb = tb[~tb["country"].isin(NOT_COMPARABLE)].reset_index(drop=True)
+
     check_members_are_the_largest(tb)
     ages = {
         str(row["country"]): str(row["age_of_reference"])
@@ -927,11 +959,6 @@ def load_chart_groups() -> tuple[Table, dict[str, str]]:
         if str(row["age_of_reference"]) != "15-64"
     }
 
-    # What garden publishes, which this step takes as given. A layout tuned for 26 rows is not a layout
-    # for 35: the row pitch, the value-label coverage and the header band all derive from the row
-    # count, so a change to garden's cutoff should stop here to be looked at rather than be silently
-    # redrawn.
-    assert len(tb) == 26, f"Garden published {len(tb)} countries, not the 26 this layout is drawn for."
     assert tb["country"].is_unique, "One row per country expected."
     # The source's five top-level categories partition the day (asserted strictly in garden; re-checked
     # here at the source's own rounding tolerance so a broken load cannot draw bars that misrepresent
@@ -947,11 +974,15 @@ def load_chart_groups() -> tuple[Table, dict[str, str]]:
 
 
 def build_source_citation(tb: Table) -> str:
-    """Cite the producer behind the chart from the origins, as `producer (year)`."""
+    """Cite the data product behind the chart from the origins, as `title (year)`.
+
+    The product's title rather than the producer: "OECD Time Use Database" names the dataset a reader
+    would look for, where "OECD" alone names an organization with hundreds of them.
+    """
     years: dict[str, list[str]] = {}
     for origin in tb[MAIN_CATEGORY_GROUPS[0]["source_columns"][0]].metadata.origins:
         year = origin.date_published.split("-")[0] if origin.date_published else ""
-        seen = years.setdefault(origin.producer, [])
+        seen = years.setdefault(origin.title or origin.producer, [])
         if year and year not in seen:
             seen.append(year)
     return "; ".join(f"{producer} ({'; '.join(sorted(ys))})" for producer, ys in years.items())
@@ -993,8 +1024,7 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
 
     # --- header: the template's title row, then its subtitle ---
     title = wrap_to_slot(TITLE, template["title_slot_px"], template["title_px"], PLAYFAIR_SLOT_SLACK)
-    years = f"{tb['year'].min()} and {tb['year'].max()}"
-    subtitle_text = layout["subtitle"].format(years=years)
+    subtitle_text = layout["subtitle"].format(first=tb["year"].min(), last=tb["year"].max())
     subtitle = wrap_to_slot(subtitle_text, template["subtitle_slot_px"], template["subtitle_px"])
     title_row_px = max(lines_in(title) * TEMPLATE_TITLE_LINE_PX, template["logo_px"])
     subtitle_y = template["origin_y"] + title_row_px + template["header_gap_px"]
@@ -1016,7 +1046,7 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     # --- footer, in the slots the static-chart templates define ---
     # A frame with no Note slot draws its Note at the foot of the chart band instead, and the footer is
     # told there is none.
-    note = build_note(tb, ages, layout)
+    note = build_note(ages, layout)
     band_note = note if layout.get("note_in_band") else None
     draw_footer(fig, None if band_note else note, source_citation, layout, fx, fy)
 
@@ -1416,7 +1446,7 @@ def draw_bracketed_names(
                     ha="center",
                     va="top",
                     fontsize=fontsize,
-                    color=header_text_color(group["color"], palette),
+                    color=MEMBER_TEXT_COLOR,
                     gid=f"header__{slugify(group['column'])}",
                 )
                 offset += step_px
@@ -1493,10 +1523,10 @@ def draw_row_legend(fig, layout: dict, palette, top_px: float, fx, fy) -> None:
         )
         cursor = layout["margin"] + LEGEND_CHIP_PX + LEGEND_CHIP_GAP
         color = header_text_color(group["color"], palette)
-        # Name and members at one size, separated by weight alone. On the desktop frame the name is a
-        # point larger, because there it is a heading on a line of its own above its list and the
-        # weight by itself was not enough to make the hierarchy read. Inline, immediately before the
-        # list, it is.
+        # Name and members at one size, separated by weight and colour: the name in its category's
+        # colour, the list in the body gray, as on the desktop frame. There the name is also larger,
+        # because it is a heading on a line of its own above its list; inline, immediately before the
+        # list, weight and colour are enough.
         for text, bold, gid in ((group["label"], True, ""), (row["members"], False, "-members")):
             drawn, ink_px, step_px = place_run(text, fontsize, bold)
             fig.text(
@@ -1507,7 +1537,7 @@ def draw_row_legend(fig, layout: dict, palette, top_px: float, fx, fy) -> None:
                 va="baseline",
                 fontsize=fontsize,
                 fontweight="bold" if bold else "normal",
-                color=color,
+                color=color if bold else MEMBER_TEXT_COLOR,
                 gid=f"legend__{slugify(group['column'])}{gid}",
             )
             cursor += step_px + (LEGEND_NAME_GAP if bold else 0.0)
@@ -1744,10 +1774,13 @@ def layout_bracketed_names(spans: dict, layout: dict) -> list[dict]:
             ]
         else:
             members = [group for group in layout["groups"] if group["column"] in category["columns"]]
+        # Wrapped to the segment, unless the layout lets a name overhang it (still checked against its
+        # neighbours by `blocks_collide`).
+        wrap_px = float("inf") if layout.get("member_names_overhang") else end - start
         lines = [
             [(text, group)]
             for group in members
-            for text in wrap_to_width(group["label"], end - start, fontsize).split("\n")
+            for text in wrap_to_width(group["label"], wrap_px, fontsize).split("\n")
         ]
         blocks.append({"name": category["name"], "lines": lines, "span": (start, end)})
     return blocks
@@ -2257,8 +2290,8 @@ def slugify(name: str) -> str:
     return name.lower().replace(" & ", "-").replace(" ", "-").replace("_", "-").replace(":", "")
 
 
-def build_note(tb: Table, ages: dict[str, str], layout: dict) -> str:
-    """Compose the Note row: survey-year span and the age-of-reference exceptions, from the data."""
+def build_note(ages: dict[str, str], layout: dict) -> str:
+    """Compose the Note row: the age-of-reference exceptions, if any, then what the averages cover."""
     described = {
         "15 and more": "15 and over",
         "15-74": "15 to 74",
@@ -2269,34 +2302,26 @@ def build_note(tb: Table, ages: dict[str, str], layout: dict) -> str:
     # spend on things said nowhere else. With the 2010 cutoff there are no exceptions left, so this is
     # normally empty — it exists for a release that adds an older survey back.
     ages_sentence = f"Estimates cover people aged 15 to 64, except in {exceptions}. " if exceptions else ""
-    # "in the OECD database", not "most recent survey": the OECD does not refresh a country the moment
-    # it runs a new survey, and Korea is the standing example — shown here at 2014 while Statistics
-    # Korea has published 2019 and 2024 rounds. And state the cutoff as what the chart covers rather
-    # than as countries it excludes: the reader is being told the scope of what they are looking at,
-    # and a chart does not owe them a list of what is missing from it. It still rules out reading
-    # "each country" as all 35 rather than the 26 garden publishes. The year comes off the data, not
-    # off a constant here: garden owns the cutoff, and reading it back means the Note cannot claim a
-    # span the rows do not have.
-    text = "Note: The chart covers every country whose most recent survey in the OECD database is from "
-    text += f"{int(tb['year'].min())} onwards; that survey's year is in brackets. "
-    text += ages_sentence
-    # The Note's two lines go to the caveats that can move a bar a reader is looking at, and only those.
+    # The survey scope is the subtitle's now ("each country's most recent time-use survey in the OECD
+    # data" — "in the OECD data" because the OECD does not refresh a country the moment it runs a new
+    # survey: Korea is shown at 2014 while Statistics Korea has published 2019 and 2024 rounds).
+    text = f"{NOTE_LEAD} " + ages_sentence
+    # The Note's two lines go to what a reader needs to read a bar right, and only that.
     #
-    # Which rules out the one this Note used to carry — that a country not reporting an activity
-    # separately keeps those minutes inside the same category. True, and irrelevant here: each of the
-    # four segments is one of the OECD's own top-level category totals, computed as a remainder that
-    # comes out equal to the source's own number for all 26 countries (checked: the largest difference
-    # is 1.5e-05 minutes, which is float32). So where a country drew its sub-activity coding lines
-    # cannot change a value this chart draws. It belongs on the ten-group indicators, where the finer
-    # split IS on show, and it is in their `description_key` in garden.
+    # First, what the averages are over. A reader who sees 2h 57m of paid work in Italy reads it as a
+    # short working day; it is the average across everyone aged 15 to 64, working or not, and across all
+    # seven days (the workbook: "both weekdays and weekends").
     #
-    # What is left is the two countries whose top-level totals are not like the others'. Mexico's whole
-    # instrument differs, which the OECD flags. Japan's category 5 absorbs its non-commuting travel,
-    # which every other country reports inside personal care and leisure, so Japan's minutes move
-    # BETWEEN drawn segments — the only caveat here that does.
+    # Then the comparability caveat, in general terms. It used to name two countries. Mexico is now left
+    # off the chart (`NOT_COMPARABLE`). Japan's non-commuting travel ("11. Moving (excluding commuting)")
+    # is mapped to the source's 5.2 "other (no categories)", which this chart folds into "Unpaid work &
+    # other" — not into unpaid work, as the old sentence said — and at 37 min/day that bucket sits with
+    # Finland's and Turkey's 40, so no bar on the chart stands out for it. The workbook does not say
+    # "harmonizes"; what its activity sheet shows is each survey's codes mapped onto common categories.
     text += (
-        "The OECD flags Mexico's estimates as not fully comparable, because it measures time use "
-        "differently. In Japan, travel other than commuting counts as unpaid work."
+        "Figures are averaged across everyone aged 15 to 64, including people who don't work or study, and "
+        "across all days of the week. The OECD groups each country's survey activities into common "
+        "categories, but differences between the surveys can still affect comparisons."
     )
     # Against the narrower of the Note's own slot and the content width — the slot is the template's,
     # but a mobile frame's content is narrower than it.
