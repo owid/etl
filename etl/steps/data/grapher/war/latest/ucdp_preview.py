@@ -18,8 +18,8 @@ def run() -> None:
 
     # Process data.
     #
-    # Remove suffixes in region names
-    tb["country"] = tb["country"].str.replace(r" \(.+\)", "", regex=True)
+    # Remove UCDP suffix in region names (e.g. "Africa (UCDP)" -> "Africa"), but keep it in countries like "Micronesia (country)"
+    tb["country"] = tb["country"].str.replace(r" \(UCDP\)$", "", regex=True)
     # Set index
     tb = tb.format(["year", "country", "conflict_type"])
 

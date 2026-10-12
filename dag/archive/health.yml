@@ -1193,3 +1193,8 @@ steps:
     - data://garden/who/2025-01-13/polio_vaccine_schedule:
       - data://meadow/who/2025-01-13/polio_vaccine_schedule:
         - snapshot://who/2025-01-13/polio_vaccine_schedule.xlsx
+  # archived; last active in 9abb8154211e on 2026-10-12
+  data://grapher/who/2025-08-06/icd_codes:
+    - data://garden/who/2025-08-06/icd_codes:
+      - data://meadow/who/2025-08-06/icd_codes:
+        - snapshot://who/2025-08-06/icd_codes.zip

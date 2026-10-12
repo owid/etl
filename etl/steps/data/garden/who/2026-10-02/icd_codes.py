@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -20,7 +19,7 @@ def run() -> None:
 
     icd_codes_clean = {"Icd10": "ICD-10", "Icd9": "ICD-9", "Icd8": "ICD-8", "Icd7": "ICD-7"}
     tb["icd"] = tb["icd"].cat.rename_categories(lambda x: icd_codes_clean.get(x, x))
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
     # Calculate sum of number of countries using each ICD code type each year
     tb_sum = tb.groupby(["year", "icd"], observed=True).count().reset_index()
     tb_sum = tb_sum.rename(columns={"icd": "country", "country": "countries_using_icd_code"})

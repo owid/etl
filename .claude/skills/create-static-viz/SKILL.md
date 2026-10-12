@@ -355,6 +355,11 @@ Then, in this order:
    ```
 2. **Read the PNG.** The verifier cannot see a collision, a widow, or a label sitting on a curve.
    Every layout bug in [this skill's Gotchas](reference/GOTCHAS.md) was found by looking.
+3. **Check every reader-facing string before the Figma handoff**:
+   `.venv/bin/codespell --ignore-words=.codespell-ignore.txt <step-dir>`,
+   `/check-metadata-style` and `/fact-check-dataset` against the title, subtitles, labels and note.
+   Each wording fix after the import costs a re-import, the colour bindings again and a full Step 8c
+   pass.
 
 ## Step 6 — Iterate with the user
 
@@ -390,6 +395,14 @@ must be exact and `margins` must pass — a failure there is real, not this rout
 footer frame's top, which a band derived from line-box arithmetic misses by a few px, so a page
 asserting a 14 px inset can read a few px above the 12–16 target. Report both numbers and
 name the datum the step used — [TEMPLATES.md](TEMPLATES.md) has the measurements and which to prefer.
+To make it exact rather than explained, reserve each block that opens or closes the band from its ink
+(WRITING-THE-STEP.md → Anchor and baseline). The crop takes a text node's top and bottom from its ink
+too, so the frame's box then is the ink.
+
+**On a refresh whose geometry changed, re-import with the job's `inheritStyles: true`.** The script then
+binds every colour to the style the existing frame bound it to, renamed and new nodes included, and
+refuses any colour the old frame never used. No hand-kept table of style ids is needed in the step's
+docstring. A step whose docstring gives its own repaint recipe follows that recipe instead.
 
 **Use grapher's OWN names for the data layers wherever the shape matches, because that skill's Step 8c
 checks key off them and skip when they are absent.** On a correct frame drawn by a local generator
