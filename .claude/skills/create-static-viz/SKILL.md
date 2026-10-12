@@ -32,7 +32,7 @@ say-so — same rule as `/owid-staff:create-figma-chart`.
 > **when you change something on this list, check the other skill in the same session and update it
 > too — or state explicitly that you checked and no change was needed.** Neither side may drift
 > silently; a stale cross-skill fact is how a later run re-derives geometry by trial and error.
-> That skill now lives in `owid/skills-private` (the `owid-staff` plugin, auto-installed here via
+> That skill lives in `owid/skills-private` (the `owid-staff` plugin, auto-installed here via
 > `.claude/settings.json`); invoke it as `/owid-staff:create-figma-chart`.
 >
 > | Shared fact | Owner | Consumed by |
@@ -58,9 +58,8 @@ say-so — same rule as `/owid-staff:create-figma-chart`.
 > before choosing a form or deciding what to label: the point is not to style anything here, it is to
 > avoid emitting a structure the Figma pass then has to undo (a legend that should have been direct
 > labels, a category count that cannot be labeled in place). That file also indexes the design team's
-> **DI Chart Library** (`pltrHXyVLg2XaNq4AvxPaK`, **read-only**) — 288 finished charts on 2026-10-01,
-> filed by chart type (dumbbell plots now have a page of their own; `GUIDELINES.md` keeps the current
-> per-page counts), which is the closest thing to precedent for whatever you are about to draw.
+> **DI Chart Library** (`pltrHXyVLg2XaNq4AvxPaK`, **read-only**) — finished charts filed by chart
+> type (`GUIDELINES.md` keeps the current per-page counts), which is the closest thing to precedent for whatever you are about to draw.
 
 Two companions in this directory:
 
@@ -77,10 +76,7 @@ The step-by-step detail lives in [`reference/`](reference/) and is read *at* tha
 | [reference/GOTCHAS.md](reference/GOTCHAS.md) | Its **Data** section at Step 1, before any column is used; the rest on an error, or grep by symptom | Data, layout and workflow pitfalls. |
 | [reference/SKETCHING.md](reference/SKETCHING.md) | Sketch mode, instead of Steps 1–4 | Data pull, scaffold, render, verify, the Figma sketch handoff, iterating, promotion to a step. |
 
-**Size budget, enforced by `--structure`: this spine under 34 KB, TEMPLATES.md under 25 KB.** (Raised
-from 30 KB on 2026-09-17 to land Sketch mode and its contract rows, and to 34 KB on 2026-10-05 to land
-the published-original handoff in Step 7 — the spine sat 11 bytes under 33 KB. The discipline is
-unchanged.) Both are read on every
+**Size budget, enforced by `--structure`: this spine under 34 KB, TEMPLATES.md under 25 KB.** Both are read on every
 run, so a paragraph added here costs every future viz — new detail belongs in the reference file for
 its step. After editing any doc in this skill:
 
@@ -94,13 +90,11 @@ its step. After editing any doc in this skill:
 connector **and the model turn around it**. The hop is environment-specific and **the cloud is the
 faster side of it**: `get_screenshot` 7.8–9.9 s from a sandbox against 12.5–20.5 s locally,
 `use_figma` 0.70 s against 3.5–5.8 s. The **turn** is not environmental — it tracks the work in it,
-and identical light probes measured 2.8 s in a sandbox against 3.7 s locally. (A ~12 s cloud turn was
-claimed here once; it came from turns doing real chart work, so it is the heavy-turn cost either
-side.) Either way, a handful
+and identical light probes measured 2.8 s in a sandbox against 3.7 s locally; a turn doing real
+chart work costs about 12 s either side. Either way, a handful
 issued one at a time is the difference between seconds and minutes. Batching pays about the same in
-both: the connector serves concurrent calls — eight screenshots in one message measured 4.1× faster
-than serially, and ten reps of a fixed six-call probe a side put it at **≈4.0× in both
-environments** (4.00× cloud, 3.84× local, six in flight every time) — and admits about four or five
+both: the connector serves concurrent calls — about **4× faster than serially in both
+environments** — and admits about four or five
 at once, so **put independent calls in one message, 4–6 at a time.** A batch's wall is
 `first call + rate × (n−1)` — measured at **9.2 s + 0.75 s** per extra screenshot in a cloud session
 and **11.7 s + 2.1 s** locally — and that marginal cost is the stopping rule. Those are screenshots;
@@ -120,8 +114,7 @@ cream background or a serif title in matplotlib is work that will be thrown away
 
 ## The project's rules
 
-Policy, quoted from the parent issue (`owid/owid-issues#2459`, and identically in the earlier
-`#2278`). These are not this skill's inventions and are not negotiable here.
+Policy, quoted from the parent issue (`owid/owid-issues#2459`). These are not this skill's inventions and are not negotiable here.
 
 **Scope.** A refresh is either a *data update plus light visual tweaks* (the common case) or
 *visual polish only* (when the data is already current).
@@ -191,19 +184,9 @@ to work like (`/owid-staff:create-figma-chart` has a whole mode for that).
 ## Sketch mode — a data file in, no ETL until the visuals settle
 
 For a **new** static viz that starts from data rather than from an existing viz. The input decides the
-mode — a data file, or a sketch/brainstorm/prototype ask, is a sketch; say so in one line, with what it
-skips, and proceed. **Read [reference/SKETCHING.md](reference/SKETCHING.md) and follow it instead of
-Steps 1–4.** In short: `scripts/new_sketch.py` scaffolds `ai/static-viz-sketches/<slug>/sketch.py`
-(gitignored) in the exact shape of a `viz://static` step, around a copy of the data file; render it
-with `.venv/bin/python`, run the verifier and read the PNG as in Step 5, iterate (variants are extra
-`LAYOUTS` keys), hand the SVG to `/owid-staff:create-figma-chart`'s **sketch mode** and iterate there
-too; once the visuals settle, `scripts/promote_sketch.py` turns the sketch into a real step.
-**Skipped — say so to the user every time:** the branch, worktree and PR, the DAG entry, Step 2's
-newer-data check, the tracker question, the review chain. Promotion runs all of them: Steps 1–2, then
-5–9, plus that skill's **finalize mode** on the sketch frame. Not skipped: the verifier, reading the
-PNG, and **offering promotion and finalize at the end of every sketch reply** — people may not know the
-checks exist. A Data Insight image is not a static-viz sketch — it is sketched in that skill directly,
-from the grapher chart.
+mode — a data file, or a sketch/brainstorm/prototype ask, is a sketch. **Read
+[reference/SKETCHING.md](reference/SKETCHING.md) and follow it instead of Steps 1–4.** A Data Insight
+image is not a static-viz sketch — it is sketched in that skill directly, from the grapher chart.
 
 ## Step 1 — Resolve the input to data
 
@@ -332,8 +315,6 @@ here is expensive to redo.
 
 > **Read [reference/WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md) for this step.**
 
-Everything about authoring the step: the Figma handoff contract the emitted files have to satisfy, grapher's axis and tick treatment, encoding diagrams, pairing desktop with mobile, the template's text slots, labelling many categories, anchoring labels so they survive Figma, and the assertions to write.
-
 ## Step 5 — Render, verify, and look at it
 
 ```bash
@@ -366,9 +347,7 @@ anything. For the narrow case where nothing in the repo changed but you still ne
 
 Then, in this order:
 
-1. Run the verifier, and **always pass the data layers** — without `--expect-gid` the naming check
-   only proves *some* node was named, which a figure with a named title and an unnamed line
-   satisfies:
+1. Run the verifier, and **always pass the data layers** (why: WRITING-THE-STEP.md → `gid=`):
 
    ```bash
    .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py <step-dir> \
@@ -409,17 +388,16 @@ must be exact and `margins` must pass — a failure there is real, not this rout
 
 `gap` is the one to read rather than chase: it measures against the header frame's bottom and the
 footer frame's top, which a band derived from line-box arithmetic misses by a few px, so a page
-asserting a 14 px inset can read **18.35 / 17.01** against the 12–16 target. Report both numbers and
+asserting a 14 px inset can read a few px above the 12–16 target. Report both numbers and
 name the datum the step used — [TEMPLATES.md](TEMPLATES.md) has the measurements and which to prefer.
 
 **Use grapher's OWN names for the data layers wherever the shape matches, because that skill's Step 8c
-checks key off them and skip when they are absent.** Measured on a real DI frame drawn by a local
-generator — nine panels, nine series lines, 27 direct labels, all correct — **seven rows skipped for
-want of a name**: `series-weight`, `furniture-weight`, `polylines`, `label-contrast-on-background`,
-`colour-vision` and `grayscale-seams`, and the palette read the chart as a **single-colour** palette
-of the panel fill, never seeing the series colour. Nothing failed and nothing was silently passed —
-each row named what it could not find — but the coverage behind "no mechanical row failed" was far
-thinner than the same sentence on a grapher import. So emit `gid="line__<Entity>"` for a series line,
+checks key off them and skip when they are absent.** On a correct frame drawn by a local generator
+without those names, **most rows skip for want of a name** — `series-weight`, `furniture-weight`,
+`polylines`, `label-contrast-on-background`, `colour-vision` and `grayscale-seams` — and the palette
+reads the chart as a **single-colour** palette of the panel fill, never seeing the series colour.
+Nothing fails and nothing is silently passed — each row names what it could not find — but the
+coverage behind "no mechanical row failed" is far thinner than the same sentence on a grapher import. So emit `gid="line__<Entity>"` for a series line,
 `label__<Entity>` for a direct label, and `horizontal-grid-lines` for the gridline group, rather than
 inventing a scheme. These are **prefixes**, load-bearing as such — see [GOTCHAS.md](reference/GOTCHAS.md). Renaming in Figma afterwards works but does not survive a re-import; the `gid`
 does.

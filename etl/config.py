@@ -105,6 +105,10 @@ def enable_structlog_filtering() -> None:
 
 
 pd.set_option("future.no_silent_downcasting", True)
+# Opt into pandas 3.0 behavior ahead of the upgrade: Copy-on-Write (chained assignment no longer
+# modifies the parent) and the dedicated `str` dtype for string columns instead of `object`.
+pd.set_option("mode.copy_on_write", True)
+pd.set_option("future.infer_string", True)
 
 # Environment, e.g. production, staging, dev
 ENV = env.get("ENV", "dev")

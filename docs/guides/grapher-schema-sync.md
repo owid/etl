@@ -11,7 +11,7 @@ owid-grapher (web team)
 schemas/grapher-schema.010.json              ← vendored pin (the only upstream copy in ETL)
     ├─→ etl/viz/chart/model/schema_types.py    generated from it    ← unit test (offline)
     ├─→ multidim/explorer-schema $refs           resolved against it  ← at runtime (offline)
-    └─→ dataset-schema.json embedded block       checked against it   ← unit test (offline, enum-deep)
+    └─→ dataset-schema.json embedded block       checked against it   ← unit test (offline, recursive)
 
 vendored ↔ live upstream                      ← scheduled workflow + integration tests
 ```
@@ -70,7 +70,7 @@ It can also be run ad-hoc — e.g. when the web team announces a change and you 
 | Drift vector | Guard |
 |---|---|
 | `schemas/*.json` edited without regenerating types, or generated file hand-edited | `tests/test_schema_types_generation.py` (unit, offline) |
-| Embedded `grapher_config` in `dataset-schema.json` out of sync with the vendored pin | `test_grapher_config_schema_sync` in `tests/test_metadata_schemas.py` (unit, offline, enum-deep) |
+| Embedded `grapher_config` in `dataset-schema.json` out of sync with the vendored pin | `test_grapher_config_schema_sync` in `tests/test_metadata_schemas.py` (unit, offline; recursive over enums, nested properties and `required`) |
 | Vendored pin stale vs live upstream (in-place mutation) | scheduled workflow → draft PR; `test_vendored_grapher_schema_is_current` (integration) |
 | Upstream publishes a new schema version | scheduled workflow → issue; `test_no_newer_grapher_schema_version` (integration) |
 | A chart config with no `grapher_schema` pin, whose meaning would then change under the next bump | `grapher_schema` in multidim-schema.json's `required` + `Chart.validate_grapher_schema_pinned()`; `test_multidim_configs_pin_grapher_schema` (unit, offline) |

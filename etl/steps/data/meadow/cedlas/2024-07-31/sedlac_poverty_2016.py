@@ -141,19 +141,19 @@ def format_long_tables(
         # Assert if null values in index are for for certain countries
         countries_with_null = []
 
-        actual_countries_with_null = t[t["index"] == "nan"]["country"].unique().tolist()
+        actual_countries_with_null = t[t["index"].isna()]["country"].unique().tolist()
 
         assert actual_countries_with_null == countries_with_null, (
             f"Null values in index are not only for {countries_with_null}. In this case, we have {actual_countries_with_null}."
         )
 
         # Assert that the null values are only two
-        assert len(t[t["index"] == "nan"]) == len(countries_with_null), (
-            f"There are more than {len(countries_with_null)} null values in index. There are {len(t[t['index'] == 'nan'])}."
+        assert len(t[t["index"].isna()]) == len(countries_with_null), (
+            f"There are more than {len(countries_with_null)} null values in index. There are {len(t[t['index'].isna()])}."
         )
 
         # Replace empty index values for country = Chile and Argentina and delete for Brazil and Mexico
-        # t.loc[(t["country"] == "El Salvador") & (t["index"] == "nan"), "index"] = "Single series"
+        # t.loc[(t["country"] == "El Salvador") & (t["index"].isna()), "index"] = "Single series"
 
         # And for survey
         t["survey"] = t.loc[~(t["index"].isin(countries)) & ~(t["index"].astype(str).str[:4].str.isnumeric()), "index"]
