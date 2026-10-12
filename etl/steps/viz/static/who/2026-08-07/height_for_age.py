@@ -96,7 +96,7 @@ templates ship -- setting `characters` propagates the first character's style ov
 | Slot | Content | Weights |
 |---|---|---|
 | Title | `TITLE`; on mobile, break the line after "curves" (a line separator), or "girls" is left alone on the second line | template's Playfair |
-| Subtitle | `SUBTITLE` | Lato Regular |
+| Subtitle | `SUBTITLE` on desktop, `MOBILE_SUBTITLE` on mobile (two lines; it carries the stunting definition) | Lato Regular |
 | `Note:` (desktop only) | `build_note(...)` | `Note:` Bold, rest Regular |
 | `Data source:` | `Data source: ` + `source_citation(...)` from `etl.viz.static` | `Data source:` Bold, rest Regular |
 | Tagline (desktop) | leave the template's | -- |
