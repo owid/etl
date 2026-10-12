@@ -130,9 +130,6 @@ def run() -> None:
         tolerance_unk_ctype=0,
     )
 
-    # Cumulative deaths since 1989 (not part of `run_pipeline`, so that the preview step doesn't build it)
-    tables.append(estimate_cumulative_deaths(tables[0], tb_regions, last_year=LAST_YEAR))
-
     #
     # Save outputs.
     #
@@ -383,17 +380,24 @@ def run_pipeline(
     columns_relevant = ["is_location_of_conflict", "number_locations"]
     tb_locations = tb_locations.loc[:, column_index + columns_relevant]
 
+    tb = tb.format(column_index, short_name=short_name)
+
+    # Cumulative deaths since 1989 (one row per entity and conflict type)
+    paths.log.info("estimate cumulative deaths since 1989")
+    tb_cumulative = estimate_cumulative_deaths(tb, tb_regions, last_year=last_year, short_name=short_name)
+
     # Tables
     tables = [
-        tb.format(column_index, short_name=short_name),
+        tb,
         tb_participants.format(column_index, short_name=f"{short_name}_country"),
         tb_locations.format(column_index, short_name=f"{short_name}_locations"),
+        tb_cumulative,
     ]
 
     return tables
 
 
-def estimate_cumulative_deaths(tb: Table, tb_regions: Table, last_year: int) -> Table:
+def estimate_cumulative_deaths(tb: Table, tb_regions: Table, last_year: int, short_name: str) -> Table:
     """Cumulative deaths in ongoing conflicts since FIRST_YEAR_CUMULATIVE, and cumulative death rates.
 
     Sums the yearly best estimates of deaths (by the location where they occurred) over FIRST_YEAR_CUMULATIVE to
@@ -408,9 +412,10 @@ def estimate_cumulative_deaths(tb: Table, tb_regions: Table, last_year: int) -> 
         - Entities without a population estimate (e.g. East and West Germany, Abkhazia) are dropped.
 
     Args:
-        tb: Main table (`ucdp`), as returned by `run_pipeline`.
+        tb: Main table (`ucdp`), with country and region data combined.
         tb_regions: Number of countries and population per region and year, from the Gleditsch dataset.
         last_year: Last year of data.
+        short_name: Short name of the main table; the cumulative table is named `{short_name}_cumulative`.
     """
     col = "number_deaths_ongoing_conflicts"
     tb = tb.reset_index()
@@ -465,7 +470,7 @@ def estimate_cumulative_deaths(tb: Table, tb_regions: Table, last_year: int) -> 
 
     _sanity_check_cumulative_outputs(tb)
 
-    return tb.format(["year", "country", "conflict_type"], short_name=f"{paths.short_name}_cumulative")
+    return tb.format(["year", "country", "conflict_type"], short_name=f"{short_name}_cumulative")
 
 
 def _sanity_check_cumulative_inputs(tb: Table, col: str, last_year: int) -> None:
