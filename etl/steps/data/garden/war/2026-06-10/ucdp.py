@@ -33,7 +33,9 @@ from owid.catalog import processing as pr
 from shapely import wkt
 from shapely.strtree import STRtree
 from shared import (
+    REGIONS_UCDP,
     add_indicators_extra,
+    add_suffix_to_regions,
     aggregate_conflict_types,
     get_number_of_countries_in_conflict_by_region,
 )
@@ -71,6 +73,7 @@ REGIONS_MAPPING = {
     5: "Americas",
 }
 REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
+assert REGIONS_EXPECTED == set(REGIONS_UCDP), "Region names differ from those in shared.py!"
 # Last year of data
 LAST_YEAR = 2025
 
@@ -372,6 +375,10 @@ def run_pipeline(
     column_index = ["year", "country", "conflict_type"]
     columns_relevant = ["is_location_of_conflict", "number_locations"]
     tb_locations = tb_locations.loc[:, column_index + columns_relevant]
+
+    # Add suffix (UCDP) to region names in country-level tables too
+    tb_participants = add_suffix_to_regions(tb_participants, "country")
+    tb_locations = add_suffix_to_regions(tb_locations, "country")
 
     # Tables
     tables = [
@@ -1553,9 +1560,7 @@ def adapt_region_names(tb: Table) -> Table:
     assert not regions_unknown, f"Unexpected regions: {regions_unknown}, please review!"
 
     # Add suffix with source name
-    msk = tb["region"] != "World"
-    tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (UCDP)"
-    return tb
+    return add_suffix_to_regions(tb, "region")
 
 
 def merge_country_and_region_data(tb: Table, tb_locations: Table) -> Table:
