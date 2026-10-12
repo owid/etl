@@ -14,7 +14,7 @@ data update only, so the layout reproduces that frame: its size, its slot positi
 colors are copied from it (positions read with `get_metadata`, colors sampled from the published PNG).
 Positions below are in that frame's pixels, y measured from the top.
 
-Data: the cumulative deaths come from `garden/war/2026-06-10/ucdp_cumulative`, the dataset behind the
+Data: the cumulative deaths come from table `ucdp_cumulative` in `garden/war/2026-06-10/ucdp`, the table behind the
 grapher charts `cumulative-deaths-in-armed-conflicts*`, so the static and interactive charts show the same
 numbers. It sums UCDP's yearly best estimates of deaths in ongoing conflicts from 1989 to the latest year.
 
@@ -164,7 +164,7 @@ REGIONS = [
     ("Europe (UCDP)", "Europe", "#7588ad", 569),
     ("Americas (UCDP)", "Americas", "#de9080", 703),
 ]
-# (column in the data, bold term, definition, color, legend x, legend text width)
+# (key, mapped to the conflict type in the data by CONFLICT_TYPES, bold term, definition, color, legend x, legend text width)
 TYPES = [
     (
         "intrastate_deaths",
@@ -186,6 +186,13 @@ TYPES = [
     ("interstate_deaths", "Interstate conflicts:", "conflicts between states.", "#7588ad", 605, 223),
     ("nonstate_deaths", "Non-state conflicts:", "conflicts between non-state armed groups.", "#b6654a", 876, 223),
 ]
+# Conflict type in the data (dimension `conflict_type`) for each column key above.
+CONFLICT_TYPES = {
+    "intrastate_deaths": "intrastate",
+    "onesided_deaths": "one-sided violence",
+    "interstate_deaths": "interstate",
+    "nonstate_deaths": "non-state conflict",
+}
 TOTAL_COLOR = "#d26d76"
 
 # Section headings (top y of the text node) and legends.
@@ -215,14 +222,14 @@ TAGLINE_Y = 1077
 
 
 def run() -> None:
-    tb = paths.load_dataset("ucdp_cumulative").read("ucdp_cumulative")
+    tb = paths.load_dataset("ucdp").read("ucdp_cumulative")
     assert tb["year"].nunique() == 1, "expected one row per entity, stamped with the latest year"
     last_year = int(tb["year"].max())
-    tb = tb.set_index("country")
+    deaths = tb.set_index(["country", "conflict_type"])["cumulative_deaths"]
 
-    world = int(tb.loc["World", "all_deaths"])
-    regions = [int(tb.loc[key, "all_deaths"]) for key, *_ in REGIONS]
-    types = [int(tb.loc["World", column]) for column, *_ in TYPES]
+    world = int(deaths["World", "all"])
+    regions = [int(deaths[key, "all"]) for key, *_ in REGIONS]
+    types = [int(deaths["World", CONFLICT_TYPES[column]]) for column, *_ in TYPES]
     paths.log.info(f"Cumulative deaths {FIRST_YEAR}-{last_year}: world {world}, regions {regions}, types {types}")
 
     # Each bar must sum to the total.
@@ -255,7 +262,7 @@ def source_citation(tb, last_year: int) -> str:
     """Return SOURCE, after checking it cites the UCDP article for the data's own release."""
     citations = " ".join(
         origin.citation_full
-        for origin in tb["all_deaths"].metadata.origins
+        for origin in tb["cumulative_deaths"].metadata.origins
         if origin.producer == "Uppsala Conflict Data Program"
     )
     assert citations, "no UCDP origin found on the plotted indicator"
