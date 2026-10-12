@@ -369,7 +369,8 @@ def run() -> None:
         return any(keyword in city_lower for keyword in ADMIN_KEYWORDS)
 
     tb_original_len = len(tb)
-    tb = tb[~tb["city"].apply(is_admin_region)].copy()
+    # apply() can return NaN for missing cities (e.g. on categoricals) instead of calling is_admin_region, so handle them explicitly.
+    tb = tb[~(tb["city"].isna() | tb["city"].astype(str).fillna("").apply(is_admin_region))].copy()
     excluded_count = tb_original_len - len(tb)
     if excluded_count > 0:
         paths.log.info(f"Excluded {excluded_count} administrative regions from SDG data")

@@ -1,8 +1,8 @@
 """Export the thousand-bins income distribution data for our bespoke income distribution chart.
 
 This step uses the thousand_bins_distribution dataset dependency as its basis, and writes one
-JSON file per year plus `metadata.json`, the feed's provenance derived from the garden columns
-(see `etl.viz.bespoke`).
+JSON file per year plus `income-distribution.metadata.json`, the feed's provenance derived from
+the garden columns (see `etl.viz.bespoke`).
 
 The files are written to the step's output folder; the framework syncs that folder to the R2 path
 of the environment being built, so the feed is served at
@@ -21,7 +21,7 @@ from tqdm.auto import tqdm
 
 from etl.data_helpers.misc import round_to_sig_figs
 from etl.helpers import PathFinder
-from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
+from etl.viz.bespoke import build_feed_metadata
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -100,14 +100,12 @@ def run() -> None:
     tb = ds_garden.read("thousand_bins_distribution", reset_index=False, safe_types=False)
 
     # The feed's provenance, derived from the origins of the data it is built on.
-    write_feed_metadata(
-        paths.output_dir,
-        build_feed_metadata(
-            title="Income distribution",
-            columns={"Average income or consumption": tb["avg"], "Population": tb["pop"]},
-            update_period_days=ds_garden.metadata.update_period_days,
-        ),
+    feed_metadata = build_feed_metadata(
+        title="Income distribution",
+        columns={"Average income or consumption": tb["avg"], "Population": tb["pop"]},
+        update_period_days=ds_garden.metadata.update_period_days,
     )
+    save_json(feed_metadata, "income-distribution.metadata.json")
 
     #
     # Prepare data.

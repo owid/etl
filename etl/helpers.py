@@ -127,7 +127,12 @@ def create_dataset(
     # create new dataset with new metadata
     ds = catalog.Dataset.create_empty(dest_dir, metadata=default_metadata)
 
+    inherited_short_name = ds.metadata.short_name
     ds = _set_metadata_from_dest_dir(ds, dest_dir)
+    # A changelog is the release history of one dataset: a dataset built from another one's metadata doesn't inherit
+    # it (its grapher step, which keeps the short name, does).
+    if inherited_short_name and inherited_short_name != ds.metadata.short_name:
+        ds.metadata.changelog = []
 
     meta_path = get_metadata_path(str(dest_dir))
 

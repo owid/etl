@@ -434,7 +434,7 @@ class ExplorerLegacy:
         df_clean = self.df.copy()
 
         # Replace actual newline characters with literal "\n", but only in string values
-        for col in df_clean.select_dtypes(include=["object"]).columns:
+        for col in [c for c in df_clean.columns if pd.api.types.is_string_dtype(df_clean[c].dtype)]:
             df_clean[col] = df_clean[col].apply(lambda x: x.replace("\n", "\\n") if isinstance(x, str) else x)
 
         content = df_clean.to_csv(sep="\t", index=False, header=False)

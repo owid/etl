@@ -1,11 +1,13 @@
 #!/bin/bash
 #
-#  update-flunet.sh
+#  update-excess-mortality.sh
 #
-#  Update flunet dataset data://explorers/who/latest/flu
+#  Update excess mortality snapshots (WMD, Karlinsky & Kobak, HMD STMF)
 #
 
 set -e
+
+source "$(dirname "$0")/commit-snapshots.sh"
 
 start_time=$(date +%s)
 
@@ -15,9 +17,7 @@ uv run etls excess_mortality/latest/wmd
 uv run etls excess_mortality/latest/xm_karlinsky_kobak
 uv run etls excess_mortality/latest/hmd_stmf
 
-# Files this job owns. Several update-*.sh jobs run concurrently against this same
-# checkout, so we only ever stage and commit these - `git add .` would sweep in another
-# job's half-written snapshots.
+# Files this job owns. commit_and_push_snapshots refuses to push a change to anything else.
 snapshot_files=(
     snapshots/excess_mortality/latest/wmd.csv.dvc
     snapshots/excess_mortality/latest/xm_karlinsky_kobak.csv.dvc
@@ -28,9 +28,7 @@ snapshot_files=(
 # commit to master will trigger ETL which is gonna run the step
 echo '--- Commit and push changes'
 
-git add "${snapshot_files[@]}"
-git commit -m ":robot: automatic excess mortality update" -- "${snapshot_files[@]}" || true
-git push origin master -q || true
+commit_and_push_snapshots ":robot: automatic excess mortality update" "${snapshot_files[@]}"
 
 end_time=$(date +%s)
 

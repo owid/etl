@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any
 import pandas as pd
 
 from owid.catalog.core.jinja import _uses_jinja
-from owid.catalog.core.meta import DatasetMeta, Origin, VariableMeta, description_key_to_string
+from owid.catalog.core.meta import ChangelogEntry, DatasetMeta, Origin, VariableMeta, description_key_to_string
 from owid.catalog.core.utils import remove_details_on_demand
 
 if TYPE_CHECKING:
@@ -206,6 +206,21 @@ def _clean_text(text: str | None) -> str | None:
     return remove_details_on_demand(text).strip()
 
 
+def render_changelog(changelog: list[ChangelogEntry]) -> str:
+    """A changelog as a markdown list, newest release first: one bullet per release date, one sub-bullet per change.
+
+    A change spanning several lines keeps its extra lines under its own bullet, so it can carry a nested list.
+    """
+    lines: list[str] = []
+    for entry in sorted(changelog, key=lambda entry: entry.date, reverse=True):
+        lines.append(f"- {entry.date}:")
+        for change in entry.changes:
+            first, *rest = change.splitlines()
+            lines.append(f"  - {first}")
+            lines += [f"    {line}" if line.strip() else "" for line in rest]
+    return "\n".join(lines)
+
+
 def description_key_text(meta: VariableMeta) -> str | None:
     """The "what you should know" text of a column as markdown, or None."""
     key = meta.description_key
@@ -328,8 +343,8 @@ def fits_in_excel(table: Table) -> bool:
 def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None) -> str:
     """Markdown README for a dataset: the catalog page as a text file, with the same sections in the same order.
 
-    "About this dataset" (the description, with its changelog), then "Data" with one block per table (how to cite
-    it, its indicators, its sources), then the processing note, the license and the advanced download options.
+    "About this dataset" (the description), then "Data" with one block per table (how to cite it, its indicators,
+    its sources), then the changelog, the processing note, the license and the advanced download options.
     """
     meta = dataset.metadata
     title = dataset_title(meta, tables)
@@ -362,6 +377,9 @@ def render_readme(dataset: Dataset, tables: list[Table], url: str | None = None)
             parts += [_source_section(origin, level=5) for origin in origins]
         else:
             parts += ["This table has no external sources: its columns document the dataset itself.", ""]
+
+    if meta.changelog:
+        parts += ["## Changelog", "", render_changelog(meta.changelog), ""]
 
     parts += ["## How we process data", "", PROCESSING_NOTE, ""]
     # No dataset-wide license statement: OWID republishes data produced by others, so the original
