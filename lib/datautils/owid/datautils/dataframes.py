@@ -642,6 +642,9 @@ def map_series(
         # Make a mask that is True for new nans that need to be replaced back to their original values.
         missing = series_mapped.isnull() & (~series.isin(values_mapped_to_nan))
         if missing.any():
+            # A str column (pandas 3) can't hold non-string originals; use object, as pandas 2 did.
+            if pd.api.types.is_string_dtype(series_mapped.dtype) and not pd.api.types.is_string_dtype(series.dtype):
+                series_mapped = series_mapped.astype(object)
             # Replace those nans by their original values.
             series_mapped.loc[missing] = series[missing]  # ty: ignore[call-non-callable]
 

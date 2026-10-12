@@ -543,6 +543,8 @@ def harmonize_elements(
                 tb[element_col] = tb[element_col].cat.add_categories(amendment["new_fao_element"])
             if unit_col is not None and amendment["new_fao_unit"] not in tb[unit_col].cat.categories:
                 tb[unit_col] = tb[unit_col].cat.add_categories(amendment["new_fao_unit"])
+            # Without a copy, pandas 3 fails to write into the categoricals ("assignment destination is read-only").
+            tb = tb.copy()
 
             if unit_col is not None:
                 # Update element code, element name, and unit name.

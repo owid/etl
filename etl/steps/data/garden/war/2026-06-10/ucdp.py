@@ -1309,7 +1309,8 @@ def _prepare_prio_table(tb: Table) -> Table:
     tb["region"] = tb["region"].str.split(", ")
     cols = tb.columns[tb.columns != "region"].tolist()
     tb = tb.loc[:, cols].join(tb["region"].apply(pd.Series))
-    tb = cast(Table, tb.set_index(cols).stack().reset_index())
+    # pandas 3 stack() no longer drops NaN (hence dropna), and an unnamed Variable no longer becomes column 0 on reset_index (hence rename(0)).
+    tb = cast(Table, tb.set_index(cols).stack().dropna().rename(0).reset_index())
     tb = tb.drop(tb.columns[-2], axis=1).rename(columns={0: "region"})
     tb["region"] = tb["region"].astype(int)
 

@@ -27,6 +27,7 @@ import pyarrow.parquet as pq
 import structlog
 from owid.datautils import dataframes
 from owid.repack import repack_frame
+from pandas._libs.lib import no_default
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # ty: ignore
 from pandas.core.series import Series
 
@@ -1675,6 +1676,30 @@ class Table(pd.DataFrame):
             ```
         """
         return cast(Table, super().drop(*args, **kwargs))
+
+    def replace(  # ty: ignore[invalid-method-override]
+        self,
+        to_replace: Any = None,
+        value: Any = no_default,
+        *,
+        inplace: bool = False,
+        regex: Any = False,
+        **kwargs: Any,
+    ) -> Table:
+        # A replacement given per column ({col: {old: new}} or {col: old} with a value) goes through
+        # Indicator.replace, which keeps the pandas 2 behavior for categoricals. A replacement for all columns goes
+        # through the block manager instead, so apply it to categorical columns one by one.
+        categorical_columns = [col for col in self.columns if isinstance(self[col].dtype, pd.CategoricalDtype)]
+        per_column = isinstance(to_replace, dict) and (
+            value is not no_default or any(isinstance(v, dict) for v in to_replace.values())
+        )
+        if not indicators.PANDAS_3 or not categorical_columns or per_column or inplace or regex is not False:
+            return cast(Table, super().replace(to_replace, value, inplace=inplace, regex=regex, **kwargs))
+
+        tb = cast(Table, super(Table, self.drop(columns=categorical_columns)).replace(to_replace, value))
+        for col in categorical_columns:
+            tb[col] = self[col].replace(to_replace, value)
+        return cast(Table, tb[self.columns])
 
     def filter(self, *args: Any, **kwargs: Any) -> Table:
         """Subset rows or columns based on their labels.
