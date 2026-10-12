@@ -4379,12 +4379,6 @@ Q 178.129757 156.933477 195.514176 171.264878
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.071504 142.06657)">expected to fall within the</text>
     <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.071504 151.20499)">shaded area</text>
    </g>
-   <g id="label__plus-2-sd">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="311.61736" y="90.249925" transform="rotate(-0 311.61736 90.249925)">+2 SD</text>
-   </g>
-   <g id="label__minus-2-sd">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #5b5b5b" x="311.61736" y="158.234265" transform="rotate(-0 311.61736 158.234265)">−2 SD</text>
-   </g>
    <g id="leader__stunting-cutoff">
     <path d="M 207.952789 217.577404 
 Q 207.952789 209.330102 207.952789 201.0828 
