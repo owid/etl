@@ -668,10 +668,12 @@ CATEGORY_LABEL_GAP = 3
 CATEGORY_NAME_BOX_SLACK = 0.547
 
 # Extra air between a category's name and the list under it, where the name sits directly on its own
-# list rather than above a bracket rule. In lines of that list: three quarters of a line sets the name
-# off as a heading, and a full line pushes it far enough from its own list to start looking detached
-# again — which is the problem this gap exists to solve.
-CATEGORY_NAME_GAP_LINES = 0.75
+# list rather than above a bracket rule. In lines of that list: half a line, which in the frame leaves
+# ~9px of air against the ~7.5px between the list's own lines. The name already differs from its list by
+# colour, size and weight, so the gap only has to group the two; at three quarters (13px) the heading sat
+# twice as far from its list as the list's items from each other and read as detached. Don't go below
+# the list's own leading, or the name crowds its first item.
+CATEGORY_NAME_GAP_LINES = 0.5
 
 # The row legend, which is what a frame too narrow to name its own segments gets instead: the
 # colour chip, the gap after it, the gap between a category's name and its member list, and the air
