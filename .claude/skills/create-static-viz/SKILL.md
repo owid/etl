@@ -402,7 +402,7 @@ too, so the frame's box then is the ink.
 **On a refresh whose geometry changed, re-import with the job's `inheritStyles: true`.** The script then
 binds every colour to the style the existing frame bound it to, renamed and new nodes included, and
 refuses any colour the old frame never used. No hand-kept table of style ids is needed in the step's
-docstring.
+docstring. A step whose docstring gives its own repaint recipe follows that recipe instead.
 
 **Use grapher's OWN names for the data layers wherever the shape matches, because that skill's Step 8c
 checks key off them and skip when they are absent.** On a correct frame drawn by a local generator
