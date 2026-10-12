@@ -180,13 +180,12 @@ a few tenths of a pixel.
 **Audit before showing it.** Expect sizes {16, 14, 12} only, Lato Regular and Bold only, both medians
 *and both thresholds* reporting a bound style -- and each threshold reporting the same colour as its
 own median, which is the check that catches a stale band or threshold selector -- no ink outside
-16..W-16, and gaps of about 13.4 on desktop and 19 on mobile, with the mobile header ending at the
-layout's `chart_area_top`.
+16..W-16, and gaps of about 13.4 on desktop and 14.2 on mobile, with the mobile header ending at the
+layout's `chart_area_top`. A mobile gap outside 12-16 means `chart_area_top` no longer matches the
+Figma header: re-measure it rather than re-centring by hand.
 
-Two `verify_page.js` rows fail by design. Desktop `text-floor` flags the template's own tagline and
-license row, which ships at 11px. Mobile `gap` flags about 19 against the 12-16 target: the plot is laid
-out from the template's chart-area rows, and its ink is shorter than the box reserved for it. The
-series, furniture and colour rows SKIP, because they key on grapher's layer names (`line__*`,
+One `verify_page.js` row fails by design: desktop `text-floor` flags the template's own tagline and
+license row, which ships at 11px. The series, furniture and colour rows SKIP, because they key on grapher's layer names (`line__*`,
 `horizontal-grid-lines`), which this step does not emit. `color_audit.py` fails the two band tints
 against each other (dE 14-17); that is accepted, because each sits in its own titled panel and the
 lines carry the colour.
@@ -334,7 +333,7 @@ STUNTING_LABEL = "Stunting cutoff: a child below this line is too short for thei
 # children in the world -- the same misreading that keeps the 2.3% out of the stunting label.
 BAND_LABEL = (
     f"{100 - 2 * STUNTED_SHARE:.1f}% of children in the reference population are expected to fall within the "
-    "shaded area"
+    "shaded area."
 )
 
 # The leaders joining a label to its mark. The annotation grey and a 1px-class stroke, as the house
@@ -501,8 +500,8 @@ LAYOUTS = {
 SUBTITLE = "Height by age, according to the World Health Organization."
 
 # Mobile has no Note slot, so its subtitle carries the stunting definition the desktop Note gives: the
-# link between the band's lower edge and "two standard deviations", which the plot does not label.
-MOBILE_SUBTITLE = f"{SUBTITLE} Children more than two standard deviations below the median height for their age are considered stunted."
+# link between the band's lower edge and "2 standard deviations", which the plot does not label.
+MOBILE_SUBTITLE = f"{SUBTITLE} Children more than 2 standard deviations below the median height for their age are considered stunted."
 
 
 # One dash plus one gap, in POINTS: the dash units are multiples of the line width, so this is what
@@ -525,8 +524,10 @@ HEADER_CHART_GAP = 0.8
 # leaves the drawn block about 5px from the header and the footer, which reads as cramped; the design
 # team's own pages sit at 12-16px. Only the mobile layout needs this, because there the block starts at
 # the chart area's top (its `chart_area_top`): the desktop layout centres what is left of a band its
-# one-line title and subtitle have already widened.
-CHART_AREA_INSET = 14
+# one-line title and subtitle have already widened. The drawn ink ends about 5px inside the reserved box
+# at each end (the facet-title and x-label reserves run taller than their text), so 9 here lands the
+# 12-16px gap once Figma centres the chart in its band.
+CHART_AREA_INSET = 9
 
 
 def run() -> None:
@@ -868,8 +869,9 @@ def build_note(layout: dict) -> str:
     or two, so the note was explaining something the reader cannot see.
     """
     text = (
-        "Note: A child is considered stunted if their height is more than two standard deviations below the median "
-        "for children of the same age, shown here by the lower edge of the shaded area. In the reference population, "
+        "Note: A child is considered stunted if their height is more than 2 standard deviations below the median "
+        "for children of the same age, shown here by the dashed line, the lower edge of the shaded area. In the "
+        "reference population, "
         f"roughly {STUNTED_SHARE:.1f}% of children fall below this cutoff."
     )
     return wrap_to_content_width(text, layout, layout["footer_fontsize"])
