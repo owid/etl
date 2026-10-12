@@ -355,7 +355,8 @@ Then, in this order:
    ```
 2. **Read the PNG.** The verifier cannot see a collision, a widow, or a label sitting on a curve.
    Every layout bug in [this skill's Gotchas](reference/GOTCHAS.md) was found by looking.
-3. **Check every reader-facing string before the Figma handoff**: `uvx codespell` on the step,
+3. **Check every reader-facing string before the Figma handoff**:
+   `.venv/bin/codespell --ignore-words=.codespell-ignore.txt <step-dir>`,
    `/check-metadata-style` and `/fact-check-dataset` against the title, subtitles, labels and note.
    Each wording fix after the import costs a re-import, the colour bindings again and a full Step 8c
    pass.
