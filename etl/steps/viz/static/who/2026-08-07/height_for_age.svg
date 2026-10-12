@@ -4369,14 +4369,15 @@ L 311.61736 120.494286
     <text style="font-weight: 700; font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #4c72b0" x="311.61736" y="114.789236" transform="rotate(-0 311.61736 114.789236)">Median</text>
    </g>
    <g id="leader__within-2-sd">
-    <path d="M 179.48107 144.317991 
-Q 187.497623 157.791434 195.514176 171.264878 
+    <path d="M 160.745337 142.602076 
+Q 178.129757 156.933477 195.514176 171.264878 
 " style="fill: none; stroke: #5b5b5b; stroke-width: 0.8; stroke-linecap: round"/>
    </g>
    <g id="label__within-2-sd">
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.071504 132.80179)">95.4% of children in the</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.071504 142.06657)">reference population fall within</text>
-    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.071504 151.20499)">the shaded area</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.071504 123.53701)">95.4% of children in the</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.071504 132.80179)">reference population are</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.071504 142.06657)">expected to fall within the</text>
+    <text style="font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.071504 151.20499)">shaded area.</text>
    </g>
    <g id="leader__stunting-cutoff">
     <path d="M 207.952789 217.577404 
@@ -8695,14 +8696,14 @@ L 600.48 143.907154
    </g>
   </g>
   <g id="title">
-   <text style="font-size: 16px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #111111" x="11.52" y="23.1675" transform="rotate(-0 11.52 23.1675)">Growth curves for boys and girls, from birth to age 19</text>
+   <text style="font-size: 16px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #111111" x="11.52" y="23.1675" transform="rotate(-0 11.52 23.1675)">Expected growth curves for boys and girls</text>
   </g>
   <g id="subtitle">
-   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #555555" x="11.52" y="43.984225" transform="rotate(-0 11.52 43.984225)">World Health Organization growth standards for healthy children under 5, and growth reference for ages 5 to 19.</text>
+   <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #555555" x="11.52" y="43.984225" transform="rotate(-0 11.52 43.984225)">Height by age, according to the World Health Organization.</text>
   </g>
   <g id="note">
-   <text style="font-size: 7.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #777777" transform="translate(11.52 408.121758)">Note: A child is considered stunted if their height is more than two standard deviations below the median for children of the same age, shown here by the lower edge of the</text>
-   <text style="font-size: 7.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #777777" transform="translate(11.52 416.523)">shaded area. In the reference population, roughly 2.3% of children fall below this cutoff.</text>
+   <text style="font-size: 7.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #777777" transform="translate(11.52 408.121758)">Note: A child is considered stunted if their height is more than 2 standard deviations below the median for children of the same age, shown here by the dashed line, the</text>
+   <text style="font-size: 7.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #777777" transform="translate(11.52 416.523)">lower edge of the shaded area. In the reference population, roughly 2.3% of children fall below this cutoff.</text>
   </g>
   <g id="data-source">
    <text style="font-size: 7.75px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: start; fill: #888888" x="11.52" y="431.166602" transform="rotate(-0 11.52 431.166602)">Data source: World Health Organization (2006; 2007)</text>
