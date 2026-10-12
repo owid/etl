@@ -37,6 +37,8 @@ views:
       chartTypes:
         - "StackedArea"
         - "StackedBar"
+      stackMode: "absolute"
+      hideRelativeToggle: false
       minTime: 2010
       selectedEntityNames:
         - "DAC members"
