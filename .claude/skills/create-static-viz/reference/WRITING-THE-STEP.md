@@ -375,6 +375,23 @@ with its labels (`Note:`, `Data source:` — singular — the exact tagline and 
 - A caveat about **what the chart claims** cannot go. Move it into the subtitle, which mobile does
   have. Dropping it silently reintroduces an over-claim.
 
+**Write a caveat in the chart's own categories, and check it against the producer's mapping.** A
+country note copied from the source's terms ("counts as unpaid work") can turn false once the chart
+merges or renames categories. Read where the source actually files the data (its activity or category
+mapping sheet, not a summary), then say where it lands among the categories the reader sees. And check
+whether it moves anything the reader can see: a quirk that leaves the affected bar within the range of
+its peers is better covered by a general comparability sentence than by naming one country.
+
+**Leave off an entity the producer flags as not comparable, rather than footnoting it,** when it would
+otherwise rank prominently. A footnote on the second-ranked row still lets the bar make its claim.
+Drop it in the viz step, not in garden, since the data stays valid for other uses, and assert it is
+present before dropping, so a rename upstream fails loudly.
+
+**Say when an average includes people or days with none of the activity.** A per-person average over a
+whole population and all seven days reads, unexplained, as the typical participant's figure ("only 3
+hours of paid work"). If the Note has room for one more sentence, this is the one that prevents the
+most common misreading.
+
 **The step and the template will not agree on how many lines a string takes, and the step is the one
 that reserves the space.** The step measures its own type — 10.5pt, say — while the template renders
 the same string at the slot's size, 16px for a subtitle on the 850- and 540-wide templates. Those wrap
@@ -429,7 +446,20 @@ Four decisions, each settled by measuring rather than by taste:
   it belongs to, and a residual bucket can shorten to `Other` because the bracket already supplies the
   category. Derive that short form rather than renaming the groups, so the full name survives for
   layouts where a group stands alone. Stack them all even where one would fit on a single line; a
-  mixture reads as several different treatments.
+  mixture reads as several different treatments. Keep it to one `Other` per key, though: two, under
+  different categories, read as the same bucket. Where a category's own name already says "& other",
+  drop its residual from the list rather than renaming the other category's.
+- **Size a header band by its tallest block, not by adding the maxima of its parts.** Where each
+  category's name sits on its own list, bottom-aligned over the bars, the band is the largest
+  list-plus-name of any one category. Adding the deepest list to the tallest name counts two
+  different categories as soon as those maxima fall in different blocks, which an edit that shortens
+  one list (dropping a member) brings about without anything else changing, and the band then carries
+  a line of air above every heading.
+- **Set an inline member list in sentence case, and keep a capital per line in a stacked one.** A list
+  run together after its category name ("Paid work, commuting, homework") is a phrase, and the style
+  guide sets phrases in sentence case. Stacked one per line, each name is a label and keeps its
+  capital. So a desktop key and its mobile row legend can differ here, by design. Abbreviations
+  ("TV") keep their capitals in either.
 - **Labelling every segment in place, with leaders, is rarely worth what it costs — and whether it is
   even possible is a property of the data.** The row you point at decides it, and no amount of vertical
   room rescues a row whose narrowest segment leaves no corridor, because the obstruction is horizontal.
@@ -462,6 +492,12 @@ step's own render:
   of a bar high — small enough to survive review and plainly visible once someone looks for it. Place
   the baseline half a cap-height below the row's centre (`TextPath((0,0), "0").get_extents().ymax`),
   which also puts labels with and without descenders on one line.
+- **Reserve a block that opens or closes the band from its ink, not its line boxes.** The band's inset
+  is meant to be what a reader sees, but a block reserved as `rows × line height` and centred row by row
+  starts half a line box minus half a cap height (or half a swatch) below where its space begins, so
+  every frame it sits on gets that much extra air. Start the block where its first row's ink starts, and
+  take the same amount off its reserved height. The same holds for a stacked header measured to its
+  tallest line box.
 - **Draw a multi-line label as one call per line.** A `"Total\nleisure"` passed to a single `ax.text`
   gets no `text-anchor` at all: matplotlib centres each line by baking a different `translate` into
   it, using its own metrics. So the lines arrive as independent left-anchored boxes that lose their
