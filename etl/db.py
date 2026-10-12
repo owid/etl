@@ -94,7 +94,18 @@ def dict_to_object(d):
 def read_sql(sql: str, engine: Engine | Session | None = None, *args, **kwargs) -> pd.DataFrame:
     """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
     This adds overhead, so if you need performance, reuse the same connection and cursor.
+
+    Text columns come back as object with None for NULL, as in pandas 2. pandas 3 reads them as `str` with
+    NaN, which is truthy, so `row.get("title") or ""` and `if row["title"]` would treat NULL as text.
     """
+    df = _read_sql(sql, engine, *args, **kwargs)
+    if isinstance(df, pd.DataFrame):
+        for col in df.columns[df.dtypes == "str"]:
+            df[col] = df[col].astype(object).where(df[col].notna(), None)
+    return df
+
+
+def _read_sql(sql: str, engine: Engine | Session | None = None, *args, **kwargs) -> pd.DataFrame:
     engine = engine or get_engine()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
