@@ -17,7 +17,7 @@ definitions:
     - config:
         originUrl: ourworldindata.org/animal-welfare
         subtitle: Around half of the estimated total are hens, killed when their egg production declines. The other half are male chicks, which in most countries are killed within a day of hatching.
-        note: Estimates assume that each laying hen reported by FAOSTAT is killed after 62 weeks of laying. The estimated number of male embryos removed before hatching through in-ovo sexing is subtracted.
+        note: Male embryos removed via in-ovo sexing are subtracted. Estimates assume hens are killed after 62 weeks of laying, as on commercial farms. In most of Africa and parts of Asia, traditional flocks keep hens longer, but FAOSTAT's hen numbers there are themselves estimates, so our figures are upper bounds.
         hasMapTab: true
         tab: map
         chartTypes: ["LineChart", "DiscreteBar"]
