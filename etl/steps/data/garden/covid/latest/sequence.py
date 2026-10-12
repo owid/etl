@@ -245,7 +245,7 @@ def add_category_others(tb: Table) -> Table:
     # Get total sequences per country and date
     tb_b = (
         tb.groupby(["date", "country"], as_index=False, observed=True)
-        .agg({"num_sequences": sum})
+        .agg({"num_sequences": "sum"})
         .rename(columns={"num_sequences": "num_sequences_categorised"})
     )
     tb_c = tb_a.merge(tb_b, on=["date", "country"])
