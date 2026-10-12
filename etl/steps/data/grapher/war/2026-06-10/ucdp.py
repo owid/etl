@@ -18,8 +18,6 @@ def run() -> None:
 
     # Process data.
     #
-    # Remove UCDP suffix in region names (e.g. "Africa (UCDP)" -> "Africa"), but keep it in countries like "Micronesia (country)"
-    tb["country"] = tb["country"].str.replace(r" \(UCDP\)$", "", regex=True)
     # Set index
     tb = tb.format(["year", "country", "conflict_type"])
 
@@ -27,9 +25,8 @@ def run() -> None:
     tb_participants = ds_garden["ucdp_country"]
     tb_locations = ds_garden["ucdp_locations"]
 
-    # Cumulative deaths since 1989 (remove UCDP suffix in region names too)
+    # Cumulative deaths since 1989
     tb_cumulative = ds_garden.read("ucdp_cumulative")
-    tb_cumulative["country"] = tb_cumulative["country"].str.replace(r" \(UCDP\)$", "", regex=True)
     tb_cumulative = tb_cumulative.format(["year", "country", "conflict_type"])
 
     tables = [

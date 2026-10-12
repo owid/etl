@@ -4,6 +4,9 @@ from owid.catalog import Table
 
 from etl.data_helpers.misc import expand_time_column
 
+# UCDP world regions (as defined in the UCDP/PRIO codebook, with "Asia" renamed to "Asia and Oceania").
+REGIONS_UCDP = ["Africa", "Americas", "Asia and Oceania", "Europe", "Middle East"]
+
 
 def add_indicators_extra(
     tb: Table,
@@ -186,3 +189,13 @@ def add_region_from_code(tb: Table, col_code: str = "id") -> Table:
     tb_ = tb.copy()
     tb_["region"] = tb_[col_code].apply(_code_to_region_gw)
     return tb_
+
+
+def add_suffix_to_regions(tb: Table, col: str) -> Table:
+    """Rename UCDP regions in column `col`, e.g. "Africa" -> "Africa (UCDP)".
+
+    The suffix matches the region names in OWID's regions dataset, so that grapher recognizes them as UCDP's regions
+    (and not as OWID's continents). Other entities (countries, "World") are left untouched.
+    """
+    tb[col] = tb[col].astype("string").replace({r: f"{r} (UCDP)" for r in REGIONS_UCDP})
+    return tb
