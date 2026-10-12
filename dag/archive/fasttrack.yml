@@ -248,3 +248,6 @@ steps:
   # archived; last active in 0719d58958ef on 2025-04-11
   data://grapher/fasttrack/2025-04-10/guinea_worm:
     - snapshot://fasttrack/2025-04-10/guinea_worm.csv
+  # archived; last active in 9abb8154211e on 2026-10-12
+  data://grapher/fasttrack/latest/cumulative_conflict_deaths_ucdp:
+    - snapshot://fasttrack/latest/cumulative_conflict_deaths_ucdp.csv
