@@ -660,9 +660,12 @@ CATEGORY_LABEL_GAP = 3
 # The share of a category name's top line box that its ink does NOT fill, so the band can be inset
 # from the name's ink rather than from its box. It is what the FRAME measures — Figma's box for an
 # imported text node — and NOT `cap_height_px`, which is a digit's ink at 0.72 of the size and
-# over-reclaims by 3.7px. Measured 4.44px on a 14px name, with `verify_page.js`'s `gap` row as the
-# instrument: it read 18.44px of air against a 14px inset. Re-measure it if the name's size changes.
-CATEGORY_NAME_BOX_SLACK = 0.317
+# over-reclaims by 3.7px. Measured with `verify_page.js`'s `gap` row as the instrument: 4.44px on a 14px
+# name (18.44px of air against a 14px inset), then re-measured at 16px, where the 0.317 that fitted 14px
+# left 17.68px — an extra 3.68px, because the model's line boxes outgrow the frame's as the size rises.
+# So it is an empirical correction for this size rather than a font metric: re-measure it whenever the
+# name's size changes.
+CATEGORY_NAME_BOX_SLACK = 0.547
 
 # Extra air between a category's name and the list under it, where the name sits directly on its own
 # list rather than above a bracket rule. In lines of that list: three quarters of a line sets the name
@@ -1108,18 +1111,28 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
             # the frame's topmost ink 4.44px inside a band meant to be inset by 14, which
             # `verify_page.js`'s `gap` row reads as 18.44.
             name_pt = font_pt(layout, "category_font_px")
-            tallest = max(
-                placement["row"] * TIER_HEIGHT
-                + len(placement["lines"]) * line_px(name_pt)
-                - CATEGORY_NAME_BOX_SLACK * layout["category_font_px"]
-                for placement in category_placements
-            )
-            name_gap = (
-                CATEGORY_NAME_GAP_LINES * line_px(font_pt(layout, "header_font_px"))
-                if layout.get("names_bottom_aligned")
-                else 0.0
-            )
-            room = max(room, category_base_px + CATEGORY_LABEL_GAP + name_gap + tallest)
+            member_line = line_px(font_pt(layout, "header_font_px"))
+
+            def name_px(placement: dict) -> float:
+                return len(placement["lines"]) * line_px(name_pt) - CATEGORY_NAME_BOX_SLACK * layout["category_font_px"]
+
+            if layout.get("names_bottom_aligned"):
+                # Each name sits on its OWN list, so the band is the tallest list-plus-name, not the
+                # deepest list plus the tallest name: those are different categories here (Leisure has
+                # the longest list, Unpaid work the two-line name), and adding them reserved a line of
+                # air above every heading.
+                depths = {block["name"]: len(block["lines"]) * member_line for block in bracketed_blocks}
+                name_gap = CATEGORY_NAME_GAP_LINES * member_line
+                room = max(
+                    room,
+                    max(
+                        LEADER_GAP + depths[placement["name"]] + CATEGORY_LABEL_GAP + name_gap + name_px(placement)
+                        for placement in category_placements
+                    ),
+                )
+            else:
+                tallest = max(placement["row"] * TIER_HEIGHT + name_px(placement) for placement in category_placements)
+                room = max(room, category_base_px + CATEGORY_LABEL_GAP + tallest)
         return room
 
     if label_mode == "rows":
