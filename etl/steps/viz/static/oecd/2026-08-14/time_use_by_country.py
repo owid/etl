@@ -1478,7 +1478,7 @@ def layout_row_legend(layout: dict) -> list[dict]:
     content_px = layout["size"][0] - 2 * layout["margin"]
     rows = []
     for group in layout["groups"]:
-        members = ", ".join(group["members"])
+        members = run_in_list(group["members"])
         width_px = (
             LEGEND_CHIP_PX
             + LEGEND_CHIP_GAP
@@ -1496,9 +1496,34 @@ def layout_row_legend(layout: dict) -> list[dict]:
     return rows
 
 
+def run_in_list(members: list[str]) -> str:
+    """The members as one comma-separated phrase, in sentence case: "Paid work, commuting, homework".
+
+    The desktop key stacks one name per line, where each is a label and keeps its capital; inline, they
+    are a list inside a phrase, which the style guide sets in sentence case. A word that opens with two
+    capitals is an abbreviation ("TV & radio") and keeps them.
+    """
+
+    def lowered(name: str) -> str:
+        return name if name[1:2].isupper() else name[:1].lower() + name[1:]
+
+    return ", ".join([members[0], *(lowered(name) for name in members[1:])])
+
+
 def legend_block_px(layout: dict) -> float:
-    """How tall the row legend is: one line per category."""
-    return len(layout["groups"]) * line_px(font_pt(layout, "legend_font_px"))
+    """How tall the row legend is, from its first row's INK: one line per category, less the top inset.
+
+    Measured from the ink for the same reason the desktop header is: the band is inset by BAND_INSET
+    from the subtitle, and reserving the first row's whole line box put the chip and text 3.5px further
+    down, 17.5px of air where every other frame holds 14.
+    """
+    return len(layout["groups"]) * line_px(font_pt(layout, "legend_font_px")) - legend_ink_inset_px(layout)
+
+
+def legend_ink_inset_px(layout: dict) -> float:
+    """How far below the top of a key row's line box its ink starts: the taller of chip and cap height."""
+    fontsize = font_pt(layout, "legend_font_px")
+    return line_px(fontsize) / 2 - max(LEGEND_CHIP_PX, cap_height_px(fontsize)) / 2
 
 
 def draw_row_legend(fig, layout: dict, palette, top_px: float, fx, fy) -> None:
@@ -1519,7 +1544,8 @@ def draw_row_legend(fig, layout: dict, palette, top_px: float, fx, fy) -> None:
     line = line_px(fontsize)
     for index, row in enumerate(layout_row_legend(layout)):
         group = row["group"]
-        centre_px = top_px + index * line + line / 2
+        # The block starts at its ink (see `legend_block_px`), so the rows start an inset higher.
+        centre_px = top_px - legend_ink_inset_px(layout) + index * line + line / 2
         # Ink centred on the row, the way `draw_bars` centres a value on its bar: `va="center"` centres
         # the whole line box instead, which reserves room for descenders the chip does not have and
         # leaves the two a descender out of line.
