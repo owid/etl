@@ -961,6 +961,8 @@ def process_metadata(
         if set(["country_group", "country"]) <= set(_metadata.columns):
             country_groups = (
                 _metadata.drop_duplicates(subset=["country_group", "country"])
+                # pandas 3 fails to aggregate a categorical column into lists.
+                .astype({"country": object})
                 .groupby("country_group")
                 .agg({"country": list})
                 .to_dict()["country"]
