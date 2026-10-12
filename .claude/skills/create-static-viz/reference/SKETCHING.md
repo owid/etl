@@ -8,7 +8,7 @@
 A sketch is a `viz://static` step in everything but its home: the same constants-on-top, `run()`,
 helpers-below shape, the same `LAYOUTS` registry, the same `export_frame` per frame — rendered from a
 file next to it instead of a catalog dataset, in a gitignored `ai/static-viz-sketches/<slug>/`
-directory, with no branch, PR, DAG entry or newer-data check behind it. `SketchPaths(__file__)`
+directory. `SketchPaths(__file__)`
 (`etl/viz/static.py`) stands in for `PathFinder(__file__)`, which refuses any file outside `etl/steps`.
 The point is to settle the *visuals* — in matplotlib and then in Figma — before deciding the ETL
 structure; promotion (§7) is a two-line edit because the shape never changed.
@@ -114,8 +114,7 @@ that are not this sketch's — the old chart you are refreshing, a reference exp
 gids, a missing sibling PNG or the frame ratio.
 
 The scaffold passes with `--expect-gid line__placeholder`; once `build()` is real, pass the real data
-layers (`line__<Entity>`, `label__<Entity>`, …) — without them the naming check proves only that *some*
-node was named. Then **read the PNG**: the verifier cannot see a collision or a label on a curve.
+layers (`line__<Entity>`, `label__<Entity>`, …). Then **read the PNG**, as in the spine's Step 5.
 
 ## 4 — Iterate, and try variants cheaply
 

@@ -627,9 +627,9 @@ steps:
         - snapshot://atus/2024-12-10/activity_codes_2023.xls
 
 
-  # USA PPI New Office Construction (US Bureau of Labor Statistics)
-  data://garden/bls/2026-08-18/us_ppi_construction:
-    - snapshot://bls/2026-08-18/us_ppi_construction.csv
+  # USA PPI New Nonresidential Building Construction (US Bureau of Labor Statistics)
+  data://garden/bls/2026-10-02/us_ppi_construction:
+    - snapshot://bls/2026-10-02/us_ppi_construction.csv
 
   #
   # World Airlines Traffic and Capacity

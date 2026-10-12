@@ -344,7 +344,7 @@ def aggregate_wars(tb: Table) -> Table:
             "yrstart": lambda x: min(x),
         }
     )
-    tb["yrstart"] = tb.groupby("warcode")["yrstart"].transform(min)
+    tb["yrstart"] = tb.groupby("warcode")["yrstart"].transform("min")
 
     return tb
 

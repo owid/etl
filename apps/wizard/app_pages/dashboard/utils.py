@@ -119,7 +119,7 @@ def load_steps_df(reload_key: int) -> tuple[pd.DataFrame, dict[str, Any]]:
     # So this is a workaround to allows to have both clickable cells with names, and "group by".
     steps_df["db_dataset_name_and_url"] = [
         f"[{row['db_dataset_name']}]({OWID_ENV.dataset_admin_site(int(row['db_dataset_id']))})"
-        if row["db_dataset_name"]
+        if pd.notna(row["db_dataset_name"])
         else None
         for row in steps_df.to_dict(orient="records")
     ]

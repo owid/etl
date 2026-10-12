@@ -72,9 +72,11 @@ def generate_jwt(client_id: str, private_key_path: str) -> str:
         JWT token
     """
     now = int(time.time())
+    # GitHub rejects the JWT with a 422 if `iat` is in its future or `exp` is more than 10 minutes
+    # after its clock, so backdate `iat` and keep `exp` under the limit to tolerate clock drift.
     payload = {
-        "iat": now,
-        "exp": now + (10 * 60),  # JWT expiration time (10 minutes)
+        "iat": now - 60,
+        "exp": now + (9 * 60),
         "iss": client_id,
     }
     with open(private_key_path) as key_file:
