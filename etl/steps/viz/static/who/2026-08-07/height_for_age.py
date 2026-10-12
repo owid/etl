@@ -187,7 +187,14 @@ Two `verify_page.js` rows fail by design. Desktop `text-floor` flags the templat
 license row, which ships at 11px. Mobile `gap` flags about 19 against the 12-16 target: the plot is laid
 out from the template's chart-area rows, and its ink is shorter than the box reserved for it. The
 series, furniture and colour rows SKIP, because they key on grapher's layer names (`line__*`,
-`horizontal-grid-lines`), which this step does not emit.
+`horizontal-grid-lines`), which this step does not emit. `color_audit.py` fails the two band tints
+against each other (dE 14-17); that is accepted, because each sits in its own titled panel and the
+lines carry the colour.
+
+`diff_against_template.js` should report only the footer's first row, which differs from the
+template's by the one space after its bold prefix: the desktop template sets the space after `Note:`
+in Lato Medium, and the mobile one bolds the space after `Data source:`. Pass those in `expected`. Any other footer drift is real: the license row's plain runs are Lato Regular, not
+Medium.
 """
 
 import logging
