@@ -1,6 +1,6 @@
 import asyncio
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastmcp import FastMCP
@@ -54,7 +54,7 @@ INSTRUCTIONS_ENTITIES = f"• Entity names must match exactly as they appear in 
 
 
 @asynccontextmanager
-async def lifespan(app: FastMCP) -> AsyncIterator[None]:
+async def lifespan(app: FastMCP) -> AsyncGenerator[None, None]:
     """Server lifespan handler for startup/shutdown tasks."""
     # Startup: mount all modular servers (v3.0 uses mount instead of import_server)
     app.mount(indicators.mcp)
