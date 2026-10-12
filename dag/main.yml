@@ -464,10 +464,10 @@ steps:
   #
   # Trade Volume Index - WTO Trade Growth
   #
-  data://grapher/trade/2025-09-22/wto_trade_growth:
-    - data://garden/trade/2025-09-22/wto_trade_growth:
-      - data://meadow/trade/2025-09-22/wto_trade_growth:
-        - snapshot://trade/2025-09-22/wto_trade_growth.xlsx
+  data://grapher/trade/2026-10-05/wto_trade_growth:
+    - data://garden/trade/2026-10-05/wto_trade_growth:
+      - data://meadow/trade/2026-10-05/wto_trade_growth:
+        - snapshot://trade/2026-10-05/wto_trade_growth.xlsx
       #
       # Trade Volume Index - "A tale of two globalizations: gains from trade and openness 1800–2010"
       #

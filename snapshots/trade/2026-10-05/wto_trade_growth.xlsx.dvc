@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: World Trade Organization
+    title: 'Evolution of trade under the WTO: handy statistics'
+    description: |-
+      The World Trade Organization (WTO) deals with the global rules of trade between nations. Its main function is to ensure that trade flows as smoothly, predictably and freely as possible.
+
+      This file reports the volume of world trade since 1950, as an annual growth rate and as an index with 1950 = 100. Trade is calculated as the average of exports and imports, and excludes significant re-exports or imports for re-exports.
+    citation_full: |-
+      World Trade Organization. Evolution of trade under the WTO: handy statistics. Retrieved from https://www.wto.org/english/res_e/statis_e/trade_evolution_e/evolution_trade_wto_e.htm (Accessed: 5 October 2026).
+    url_main: https://www.wto.org/english/res_e/statis_e/trade_evolution_e/evolution_trade_wto_e.htm
+    url_download: https://www.wto.org/english/res_e/statis_e/trade_evolution_e/world_trade_growth.xlsx
+    date_accessed: '2026-10-05'
+    # NOTE: The WTO page states no release date. This is the file's HTTP Last-Modified header, consistent with the
+    # workbook's own modified date (2026-03-12). The previous file (2024 data) was last modified on 2025-04-16.
+    date_published: '2026-03-19'
+    license:
+      name: © World Trade Organization 2026
+      url: https://www.wto.org/english/info_e/copyrights_permissions_e.htm
+outs:
+  - md5: f1338d12bf219feac79104d4bcb8deec
+    size: 45506
+    path: wto_trade_growth.xlsx
