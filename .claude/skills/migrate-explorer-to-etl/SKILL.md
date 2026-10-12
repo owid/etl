@@ -28,14 +28,14 @@ schema, FAUST upstream, post-processing, DAG, verification). Don't duplicate tha
 
 Every explorer still outside ETL is **grapher-based**: its `graphers` block references variable IDs
 (`yVariableIds`, optionally `xVariableId`, `colorVariableId`, `sizeVariableId`) or chart IDs
-(`grapherId`). The CSV-backed route (`tableSlug` with `table` blocks) and the legacy-step
-modernisation route were retired when their last explorers were done; if you meet either shape,
-stop and tell the user rather than improvising.
+(`grapherId`). This skill does not cover the CSV-backed route (`tableSlug` with `table` blocks) or
+the legacy-step modernisation route; if you meet either shape, stop and tell the user rather than
+improvising.
 
 ## Inputs
 
 - `<slug>`: the explorer slug, as in `https://ourworldindata.org/explorers/<slug>` and the `slug` column of `explorers`.
-- `<ns>` and `<short>`: target namespace and short name under `etl/steps/viz/explorer/<ns>/latest/`. Ask if not obvious; past migrations used the topic namespace and the slug with hyphens turned into underscores.
+- `<ns>` and `<short>`: target namespace and short name under `etl/steps/viz/explorer/<ns>/latest/`. Ask if not obvious; the convention is the topic namespace and the slug with hyphens turned into underscores.
 
 If `etl/steps/viz/explorer/**/<short>.py` already exists, the explorer is in ETL and this skill does
 not apply; edit it through `/create-explorer` instead.
@@ -65,7 +65,7 @@ row with `gh issue edit`. The umbrella issue #6028 is closed; do not edit it.
 ## Step 2: read the live explorer config from production
 
 The `explorers` table is the source of truth. Do **not** read `owid-content/explorers/*.tsv`; that
-repo is a year stale and mis-routes migrations. Priority:
+repo is stale and mis-routes migrations. Priority:
 
 1. **Production**, read-only, through the `.env.prod` the repo ships. It is reachable when `.env`
    declares `ENV_FILE_PROD` (see `etl/config.py`):
@@ -118,7 +118,7 @@ PY
 | `yVariableIds` (plus optional `xVariableId`, `colorVariableId`, `sizeVariableId`) | Indicator-based | Direct ID to catalogPath mapping (step 5). |
 | `grapherId` only | Chart-based | Two-step lookup (step 5); the chart's stored config (title, subtitle, type, hasMapTab, map colours, …) becomes per-view config. |
 | `tableSlug` with `table` blocks | CSV-backed | Retired route; none should remain. Stop and report. |
-| `grapherId` and `tableSlug` mixed | Hybrid | Rare (`natural-disasters`, `food-footprints` were). Stop and ask the user. |
+| `grapherId` and `tableSlug` mixed | Hybrid | Rare. Stop and ask the user. |
 
 Do not trust type labels in old issues; check the columns.
 
@@ -126,8 +126,8 @@ Do not trust type labels in old issues; check the columns.
 
 Some production TSVs carry invisible Unicode prefixes on dropdown display names, almost always SOFT
 HYPHEN (`\xad`), occasionally ZWSP or ZWNJ: a curator's hack to coerce Grapher's first-appearance
-dropdown ordering when sub-collections share choice names. Democracy is the canonical case
-(issue #6060); the prefixes are preserved in
+dropdown ordering when sub-collections share choice names. Democracy is the canonical case;
+the prefixes are preserved in
 `etl/steps/viz/explorer/democracy/latest/democracy.*.config.yml`.
 
 **Preserve them byte for byte.** Grapher uses the choice's display name, not its slug, as the URL
@@ -176,9 +176,7 @@ handed to `/create-explorer` in step 8.
 
 Mental model for chart-based explorers: each `grapherId` is a thin wrapper around one or a few
 indicators. The migration unwraps the chart, recovers its indicators, and rebuilds the explorer from
-them. Whatever the chart stored (title, subtitle, colour scale, map config) either flows from the
-indicator's garden metadata, preferred for single-indicator views (see `/create-explorer` step 5),
-or has to be restated in the explorer YAML.
+them. Step 7 says where whatever the chart stored (title, subtitle, colour scale, map config) goes.
 
 ## Step 7: translate the legacy tables
 
@@ -196,7 +194,7 @@ or has to be restated in the explorer YAML.
 
 For chart-based explorers, merge each chart's stored config (`title`, `subtitle`, `type`,
 `hasMapTab`, `yAxis`, `map.colorScale`, …) into `view.config`, or into the indicator's garden
-metadata for single-indicator views.
+metadata, preferred for single-indicator views (see `/create-explorer` step 5).
 
 ## Step 8: hand off to `/create-explorer`
 
@@ -242,9 +240,9 @@ committing the generated files to the user unless asked; `etl pr` already pushed
 
 ## Reference
 
-- Tracking: #6513 (global-health, the last explorer outside ETL). The umbrella #6028 is closed.
+- Tracking: #6513 (global-health, the last explorer outside ETL).
 - PRs to model the body on: #6029, #6031, #6032.
-- Migrations that came through this route: `food_footprints`, `fertilizers`, `countries_in_conflict_data`, `democracy` (with soft-hyphen prefixes).
+- Example explorer steps built this way: `food_footprints`, `fertilizers`, `countries_in_conflict_data`, `democracy` (with soft-hyphen prefixes).
 - After the explorer is in ETL it is a candidate for the port to an MDIM (`viz://chart`), umbrella #6014.
 
 ## Retire when

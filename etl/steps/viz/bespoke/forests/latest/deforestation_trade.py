@@ -1,7 +1,7 @@
 """Bespoke viz step writing the JSON files read by the deforestation-trade sankey.
 
-* `metadata.json`: provenance derived from the garden metadata (see `etl.viz.bespoke`).
-* `deforestation-trade.metadata.json`: years, entities, commodity groups, and world totals per year.
+* `deforestation-trade.metadata.json`: years, entities, commodity groups, and world totals per year,
+  plus provenance derived from the garden metadata (see `etl.viz.bespoke`).
 * `deforestation-trade.<entityId>.json`: the entity's imports and exports, by partner and commodity
   group, with one value per year.
 """
@@ -10,7 +10,7 @@ import pandas as pd
 from owid.datautils.io.json import save_json
 
 from etl.helpers import PathFinder
-from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
+from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
 
 paths = PathFinder(__file__)
 
@@ -41,7 +41,6 @@ def run() -> None:
         columns={"Deforestation risk embedded in trade": tb["deforestation_risk"]},
         update_period_days=ds.metadata.update_period_days,
     )
-    write_feed_metadata(paths.output_dir, metadata)
 
     #
     # Process data.
@@ -68,16 +67,17 @@ def run() -> None:
     #
     # Save outputs.
     #
-    save_json(
-        {
-            "years": years,
-            "source": metadata["feed"]["citation"],
-            "dimensions": {
-                "entities": [{"id": entity_id[c], "name": c} for c in countries],
-                "commodityGroups": [{"id": group_id[g], "name": g} for g in groups],
-            },
-            "worldTotals": [round(float(v), NUM_DECIMALS) for v in flows.groupby("year")["value"].sum()],
+    manifest = {
+        "years": years,
+        "source": metadata["attribution"],
+        "dimensions": {
+            "entities": [{"id": entity_id[c], "name": c} for c in countries],
+            "commodityGroups": [{"id": group_id[g], "name": g} for g in groups],
         },
+        "worldTotals": [round(float(v), NUM_DECIMALS) for v in flows.groupby("year")["value"].sum()],
+    }
+    save_json(
+        add_feed_metadata(manifest, metadata),
         paths.output_dir / f"{FILE_SLUG}.metadata.json",
         **JSON_KWARGS,
     )

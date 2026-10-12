@@ -306,7 +306,7 @@ def harmonize_countries(tb: Table, tb_regions: Table, codes_missing: dict, codes
         tb.loc[tb["country"] == x, "name"] = y
 
     # Create list of unmatched entitites
-    missing_list = list(tb[tb["name"] == "nan"]["country"].unique())
+    missing_list = list(tb[tb["name"].isna()]["country"].unique())
     # Substract excluded from missing_list
     missing_list = [x for x in missing_list if x not in codes_excluded.keys()]
     missing_count = len(missing_list)
@@ -318,7 +318,7 @@ def harmonize_countries(tb: Table, tb_regions: Table, codes_missing: dict, codes
         )
 
     # Drop rows without match (MER if there was not any error)
-    tb = tb.loc[~(tb["name"] == "nan"), :].reset_index(drop=True)
+    tb = tb.loc[tb["name"].notna(), :].reset_index(drop=True)
 
     # Drop old country and ISO alpha 2 variable. Rename the newly built variable as `country`
     tb = tb.drop(columns=["country", "iso_alpha2"])

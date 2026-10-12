@@ -27,6 +27,7 @@ import pyarrow.parquet as pq
 import structlog
 from owid.datautils import dataframes
 from owid.repack import repack_frame
+from pandas._libs.lib import no_default
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # ty: ignore
 from pandas.core.series import Series
 
@@ -1125,6 +1126,9 @@ class Table(pd.DataFrame):
             # TODO: make this work with append=True
             dimensions = [{"name": self[col].title or key, "slug": key} for key in keys]
 
+        # pandas 3 deprecates `verify_integrity` in set_index, so check uniqueness here instead.
+        verify_integrity = kwargs.pop("verify_integrity", False)
+
         if kwargs.get("inplace"):
             super().set_index(keys, **kwargs)
             t = self
@@ -1132,6 +1136,10 @@ class Table(pd.DataFrame):
         else:
             t = super().set_index(keys, **kwargs)
             to_return = cast(Table, t)
+
+        if verify_integrity and not t.index.is_unique:
+            duplicates = t.index[t.index.duplicated()].unique()
+            raise ValueError(f"Index has duplicate keys: {duplicates}")
 
         t.metadata.primary_key = keys
         t.metadata.dimensions = dimensions  # ty: ignore
@@ -1669,6 +1677,30 @@ class Table(pd.DataFrame):
         """
         return cast(Table, super().drop(*args, **kwargs))
 
+    def replace(  # ty: ignore[invalid-method-override]
+        self,
+        to_replace: Any = None,
+        value: Any = no_default,
+        *,
+        inplace: bool = False,
+        regex: Any = False,
+        **kwargs: Any,
+    ) -> Table:
+        # A replacement given per column ({col: {old: new}} or {col: old} with a value) goes through
+        # Indicator.replace, which keeps the pandas 2 behavior for categoricals. A replacement for all columns goes
+        # through the block manager instead, so apply it to categorical columns one by one.
+        categorical_columns = [col for col in self.columns if isinstance(self[col].dtype, pd.CategoricalDtype)]
+        per_column = isinstance(to_replace, dict) and (
+            value is not no_default or any(isinstance(v, dict) for v in to_replace.values())
+        )
+        if not indicators.PANDAS_3 or not categorical_columns or per_column or inplace or regex is not False:
+            return cast(Table, super().replace(to_replace, value, inplace=inplace, regex=regex, **kwargs))
+
+        tb = cast(Table, super(Table, self.drop(columns=categorical_columns)).replace(to_replace, value))
+        for col in categorical_columns:
+            tb[col] = self[col].replace(to_replace, value)
+        return cast(Table, tb[self.columns])
+
     def filter(self, *args: Any, **kwargs: Any) -> Table:
         """Subset rows or columns based on their labels.
 
@@ -1733,43 +1765,43 @@ class Table(pd.DataFrame):
         return super().reorder_levels(*args, **kwargs)  # ty: ignore
 
     def __add__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__add__(other)).copy_metadata(self))
 
     def __iadd__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__add__(other)
 
     def __sub__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__sub__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__sub__(other)).copy_metadata(self))
 
     def __isub__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__sub__(other)
 
     def __mul__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__mul__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__mul__(other)).copy_metadata(self))
 
     def __imul__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__mul__(other)
 
     def __truediv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__truediv__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__truediv__(other)).copy_metadata(self))
 
     def __itruediv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__truediv__(other)
 
     def __floordiv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__floordiv__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__floordiv__(other)).copy_metadata(self))
 
     def __ifloordiv__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__floordiv__(other)
 
     def __mod__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__mod__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__mod__(other)).copy_metadata(self))
 
     def __imod__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__mod__(other)
 
     def __pow__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
-        return cast(Table, Table(super().__pow__(other=other)).copy_metadata(self))
+        return cast(Table, Table(super().__pow__(other)).copy_metadata(self))
 
     def __ipow__(self, other: Scalar | Series | indicators.Indicator | Table) -> Table:  # ty: ignore
         return self.__pow__(other)
@@ -1905,15 +1937,40 @@ class TableGroupBy:
     ) -> Table | indicators.Indicator:
         mem = {}
 
+        # pandas 3 removed `include_groups=True`, so groups always arrive without the grouping columns.
+        # Emulate it: hand `func` the full group from the original object (all columns, same order).
+        obj = self.groupby.obj
+        keys = self.groupby.keys
+        keys = keys if isinstance(keys, list) else [keys]
+        key_columns = [k for k in keys if isinstance(k, str) and k in obj.columns] if include_groups else []
+        indices = self.groupby.indices if key_columns else {}
+
+        def _with_group_columns(g: Any) -> Any:
+            positions = indices.get(g.name)
+            if positions is not None and len(positions) == len(g):
+                full = obj.iloc[positions]
+            else:
+                # Group names that can't be looked up (e.g. NaN keys): re-insert the key values instead.
+                values = g.name if len(keys) > 1 else (g.name,)
+                full = g.copy()
+                for i, k in enumerate(keys):
+                    if k in key_columns:
+                        full[k] = pd.Series(values[i], index=g.index, dtype=obj[k].dtype)
+                full = full[[c for c in obj.columns if c in full.columns]]
+            object.__setattr__(full, "name", g.name)
+            return full
+
         @wraps(func)
         def f(g: Any) -> Any:
+            if key_columns:
+                g = _with_group_columns(g)
             tb = func(g, *args, **kwargs)
             # remember one table to use its metadata
             if not mem:
                 mem["table"] = tb
             return tb
 
-        df = self.groupby.apply(f, *args, include_groups=include_groups)
+        df = self.groupby.apply(f, *args, include_groups=False)
         if not mem:
             return Table(df)
         elif type(mem["table"]) is pd.DataFrame:
@@ -2411,6 +2468,11 @@ def read_csv(
 ) -> Table:
     if so := storage_options_for_http(filepath_or_buffer):
         kwargs.setdefault("storage_options", so)
+    # Chunked parsing (low_memory=True) can infer different category dtypes per chunk (e.g. an all-empty
+    # chunk), which fails with "dtype of categories must be the same" under the pandas str dtype.
+    dtype = kwargs.get("dtype")
+    if isinstance(dtype, dict) and any(isinstance(d, pd.CategoricalDtype) or d == "category" for d in dtype.values()):
+        kwargs.setdefault("low_memory", False)
     table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)

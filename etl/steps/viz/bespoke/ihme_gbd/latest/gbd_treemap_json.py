@@ -1,8 +1,8 @@
 """Bespoke viz step that generates JSON files for the IHME GBD treemap visualization.
 
 This step combines the GBD treemap datasets and generates:
-* `metadata.json`, the feed's provenance, derived from the garden columns (see `etl.viz.bespoke`)
-* A metadata JSON file with categories, dimensions, and time ranges
+* A metadata JSON file with categories, dimensions, and time ranges, plus the feed's provenance,
+  derived from the garden columns (see `etl.viz.bespoke`)
 * Individual data JSON files per entity
 
 The files are written to the step's output folder; the framework syncs that folder to the R2 path
@@ -20,7 +20,7 @@ from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
-from etl.viz.bespoke import build_feed_metadata, write_feed_metadata
+from etl.viz.bespoke import add_feed_metadata, build_feed_metadata
 
 # Initialize logger.
 log = get_logger()
@@ -216,17 +216,16 @@ def run() -> None:
         columns={"Deaths": tb_filtered["value"]},
         update_period_days=ds_garden.metadata.update_period_days,
     )
-    write_feed_metadata(paths.output_dir, feed_metadata)
 
     # Create metadata
-    metadata, mappings = create_metadata_json(tb_filtered, source=feed_metadata["feed"]["citation"])
+    metadata, mappings = create_metadata_json(tb_filtered, source=feed_metadata["attribution"])
 
     #
     # Write the JSON files. The framework syncs the output folder to R2 afterwards.
     #
     log.info(f"Creating {len(mappings['countries']) + 1} JSON files.")
 
-    save_json(metadata, "causes-of-death.metadata.json")
+    save_json(add_feed_metadata(metadata, feed_metadata), "causes-of-death.metadata.json")
 
     country_to_id = {country: i + 1 for i, country in enumerate(mappings["countries"])}
     for country in tqdm(mappings["countries"], desc="Processing entities"):

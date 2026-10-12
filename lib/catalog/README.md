@@ -88,6 +88,29 @@ Maintainer notes — how the version is bumped, how a release reaches PyPI, and 
 
 ## Changelog
 
+### `v1.2.8`
+- **pandas 3 support:** `pandas>=2.2.3,<4` (was `<3`), and requires `owid-datautils>=0.6.12` and `owid-repack>=0.1.12`, which allow pandas 3 too
+- **Behavior kept from pandas 2 on pandas 3**
+  - `Indicator.replace` and `Table.replace` on a categorical replace its categories, as pandas 2 did: a new value renames the category, an existing one merges into it, and NaN removes it. pandas 3 raises on a value that isn't already a category
+  - `Table.groupby().apply()` passes the grouping columns to the function, since pandas 3 removed `include_groups=True`
+  - `Table.set_index(verify_integrity=True)` checks uniqueness itself, since pandas 3 deprecates the argument; `Table.format` relies on it
+  - `Indicator.fillna()` without a value raises, as in pandas 2; pandas 3 silently fills nothing
+- **Fixes for the pandas `str` dtype:** search results map missing `title`/`description` to `None`, display truncation also covers `str` columns, and `read_csv` with categorical dtypes parses in one pass
+
+### `v1.2.7`
+- Dependency security updates (tornado 6.5.9, urllib3 2.8.0)
+
+### `v1.2.6`
+- **Documentation rendered from metadata** (new `core.docs` module)
+  - `Dataset.readme()` renders a Markdown README for a dataset: its description, one block per table (citation, indicators, sources), its changelog, the processing note, license and download links
+  - New `Table.sources` table of the distinct origins behind a table's columns; `Table.codebook` is rebuilt on the same helpers, and its `source` column uses the same labels
+- **Dataset changelog:** new `DatasetMeta.changelog`, a list of `ChangelogEntry(date, changes)`, set from `dataset.changelog` in `.meta.yml`. Dates are stored as `YYYY-MM-DD` strings, and a malformed entry raises where it is set. The README renders it as its own "Changelog" section, and it never enters the description
+- **Schema.org JSON-LD**
+  - Descriptions over Google Dataset Search's 5,000-character limit raise instead of producing a record Google rejects
+  - Each table's nested Dataset repeats the `creator`, since Google validates nested Datasets on their own
+  - `dataset_keywords()` is public (was `_keywords`)
+- Docstrings say "data producer" instead of "data provider"
+
 ### `v1.2.5`
 - Remove the leftover `multidim` channel from `CHANNEL` in `core.datasets` and `core.paths`. MDIM configs were written as datasets under `data/multidim/` for a short while in 2025; they have lived outside the data catalog since, so the channel only made the publish job look for an empty folder and write an empty index file on every deploy
 - Render metadata Jinja in a `SandboxedEnvironment`, so a producer-supplied value containing `<<` or `<%` cannot walk `__class__`/`__subclasses__` on whatever runs the ETL
