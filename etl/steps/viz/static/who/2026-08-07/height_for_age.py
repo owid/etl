@@ -501,7 +501,9 @@ SUBTITLE = "Height by age, according to the World Health Organization."
 
 # Mobile has no Note slot, so its subtitle carries the stunting definition the desktop Note gives: the
 # link between the band's lower edge and "2 standard deviations", which the plot does not label.
-MOBILE_SUBTITLE = f"{SUBTITLE} Children more than 2 standard deviations below the median height for their age are considered stunted."
+MOBILE_SUBTITLE = (
+    f"{SUBTITLE} Children more than 2 standard deviations below the median height for their age are considered stunted."
+)
 
 
 # One dash plus one gap, in POINTS: the dash units are multiples of the line width, so this is what
