@@ -17,6 +17,7 @@ dataset:
 
   owners:
     - Fiona Spooner
+    - Lucas Rodés-Guirao
 tables:
   icd_totals:
     variables:
@@ -29,7 +30,7 @@ tables:
     variables:
       icd:
         title: The version of ICD codes that a country is using each year
-        description_short: A country is only included here if their data is a reported to the WHO Mortality Database and to do this they must record cause of death for at least 65% of deaths.
+        description_short: A country is only included here if their data is reported to the WHO Mortality Database and to do this they must record cause of death for at least 65% of deaths.
         unit: ICD version
         type: ordinal
         sort: *version_sort
