@@ -585,6 +585,7 @@ tables:
       cumulative_deaths:
         title: "Cumulative deaths {definitions.all.conflict_prep} {definitions.all.conflict_label}"
         unit: deaths
+        short_unit: deaths
         description_short: |-
           <% set per_capita = "" %>
           {definitions.cumulative.description_short}
@@ -596,6 +597,7 @@ tables:
       cumulative_death_rate:
         title: "Cumulative death rate {definitions.all.conflict_prep} {definitions.all.conflict_label}"
         unit: deaths per 100,000 people
+        short_unit: deaths per 100,000 people
         display:
           numDecimalPlaces: 1
         description_short: |-
