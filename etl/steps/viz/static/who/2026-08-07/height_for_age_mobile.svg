@@ -4366,8 +4366,8 @@ L 205.331645 157.646085
     <text style="font-weight: 700; font-size: 8.64px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; text-anchor: end; fill: #4c72b0" x="205.331645" y="151.941035" transform="rotate(-0 205.331645 151.941035)">Median</text>
    </g>
    <g id="leader__within-2-sd">
-    <path d="M 114.017237 179.87248 
-Q 125.941345 197.32572 137.865452 214.77896 
+    <path d="M 113.615789 180.109536 
+Q 125.740621 203.933733 137.865452 227.75793 
 " style="fill: none; stroke: #5b5b5b; stroke-width: 0.8; stroke-linecap: round"/>
    </g>
    <g id="label__within-2-sd">

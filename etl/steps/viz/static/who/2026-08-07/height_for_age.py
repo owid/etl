@@ -335,10 +335,6 @@ BAND_LABEL = (
 # deviations" and, on mobile, which has no Note, to the stunting definition itself.
 SD_LABELS = {"upper": "+2 SD", "lower": "\u22122 SD"}
 
-# How far inside the band's top edge the band label's leader ends, in cm, so it visibly reaches the start
-# of the shading without reading as a label on the edge line itself (about 3-4 px on both layouts).
-BAND_LEADER_INSET_CM = 1.5
-
 # The leaders joining a label to its mark. The annotation grey and a 1px-class stroke, as the house
 # arrows take: the lighter #777777 used before all but vanished on the mobile frame, where the leaders
 # end on the band's tint and the whole image is scaled down on a phone.
@@ -687,8 +683,9 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float, color) 
       line-height or more above it, level with the band's upper edge, and reads as naming that edge
       instead. Right-aligned, a wider face in Figma only grows the label leftwards, never past the edge.
     - The band's label sits in the empty space above the band at the young ages, with a leader that ends
-      just inside the band's top edge, where the shading starts. Inside the band there is no room for
-      the label: the band rises too steeply for a horizontal label to stay between its edges.
+      well inside the shading, midway between the band's top edge and the median, so it points at the
+      area rather than at either line. Inside the band there is no room for the label itself: the band
+      rises too steeply for a horizontal label to stay between its edges.
     - "+2 SD" and "-2 SD" sit at the right ends of the band's two edges, right-aligned on the plot edge:
       just above the top edge and just below the dashed line, where both are clear of every mark.
     - The stunting label hangs below the dashed line from a short leader, left-aligned on it. The line
@@ -723,7 +720,7 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float, color) 
     band_origin, band_gap = leader_origin(band_text, fontsize)
     band_label = ax.annotate(
         band_text,
-        xy=(target_age, height_at(BAND[1], target_age) - BAND_LEADER_INSET_CM),
+        xy=(target_age, (height_at(MEDIAN_COLUMN, target_age) + height_at(BAND[1], target_age)) / 2),
         xytext=layout["band_label_xy"],
         textcoords="data",
         ha="left",
