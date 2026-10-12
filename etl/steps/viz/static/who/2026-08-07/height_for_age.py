@@ -52,11 +52,12 @@ Figma
 The whole handoff, written out so it can be redone in a later session with nothing but this file.
 
 **Target.** File `Charts (2026)`, key `s6Sv60bakebRRW2TxsMQbF`. Page
-`20260812 Growth curves for boys and girls, from birth to age 19 (Pablo A)` (renamed from `Expected
-height of ...` when the title changed on 2026-10-05; same page, id `25284:5`), sitting at the top of
+`20260812 Expected growth curves for boys and girls (Pablo A)` (it is renamed whenever the title
+changes; same page, id `25284:5`), sitting at the top of
 the dated block -- insert after the `-----------` divider page, not at a counted index. Two frames,
 each named for the slug the website exports by, with a reference copy of this step's own render to
-their left:
+their left. The published image being replaced, `Healthy20height20growth20curves.png`, sits leftmost
+as the "before" (`create-static-viz`'s `scripts/fetch_original_image.py` fetches it):
 
 | Frame | Node | Open it | Cloned from | Size |
 |---|---|---|---|---|
@@ -93,7 +94,7 @@ templates ship -- setting `characters` propagates the first character's style ov
 
 | Slot | Content | Weights |
 |---|---|---|
-| Title | `TITLE` | template's Playfair |
+| Title | `TITLE`; on mobile, break the line after "curves" (a line separator), or "girls" is left alone on the second line | template's Playfair |
 | Subtitle | `SUBTITLE` | Lato Regular |
 | `Note:` (desktop only) | `build_note(...)` | `Note:` Bold, rest Regular |
 | `Data source:` | `Data source: ` + `source_citation(...)` from `etl.viz.static` | `Data source:` Bold, rest Regular |
@@ -180,10 +181,11 @@ a few tenths of a pixel.
 **Audit before showing it.** Expect sizes {16, 14, 12} only, Lato Regular and Bold only, both medians
 *and both thresholds* reporting a bound style -- and each threshold reporting the same colour as its
 own median, which is the check that catches a stale band or threshold selector -- no ink outside
-16..W-16, and gaps of 13.4 / 13.4 on desktop and 19.67 / 19.67 on mobile (measured 2026-10-05).
+16..W-16, and gaps of 13.4 / 13.4 on desktop and 19.2 / 19.2 on mobile (measured 2026-10-12, with the
+mobile header ending at y=99, which is the layout's `chart_area_top`).
 
 Two `verify_page.js` rows fail by design. Desktop `text-floor` flags the template's own tagline and
-license row, which ships at 11px. Mobile `gap` flags 19.67 against the 12-16 target: the plot is laid
+license row, which ships at 11px. Mobile `gap` flags 19.2 against the 12-16 target: the plot is laid
 out from the template's chart-area rows, and its ink is shorter than the box reserved for it. The
 series, furniture and colour rows SKIP, because they key on grapher's layer names (`line__*`,
 `horizontal-grid-lines`), which this step does not emit.
