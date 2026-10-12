@@ -96,7 +96,7 @@ templates ship -- setting `characters` propagates the first character's style ov
 | Slot | Content | Weights |
 |---|---|---|
 | Title | `TITLE`; on mobile, break the line after "curves" (a line separator), or "girls" is left alone on the second line | template's Playfair |
-| Subtitle | `SUBTITLE` on desktop, `MOBILE_SUBTITLE` on mobile (two lines; it carries the stunting definition) | Lato Regular |
+| Subtitle | `SUBTITLE` on desktop, `MOBILE_SUBTITLE` on mobile (three lines; it carries the stunting definition) | Lato Regular |
 | `Note:` (desktop only) | `build_note(...)` | `Note:` Bold, rest Regular |
 | `Data source:` | `Data source: ` + `source_citation(...)` from `etl.viz.static` | `Data source:` Bold, rest Regular |
 | Tagline (desktop) | leave the template's | -- |
@@ -471,9 +471,9 @@ LAYOUTS = {
         "stunting_label_width": 100,
         "stunting_leader_pt": 22,
         # Where the header ends in the Figma frame: the template's serif sets the title on two lines and
-        # the two-sentence subtitle takes two (16 + 58 + 6 + 38). The step measures neither face, so it
+        # the two-sentence subtitle takes three (16 + 58 + 6 + 57). The step measures neither face, so it
         # takes the number rather than its own wrap.
-        "chart_area_top": 118,
+        "chart_area_top": 137,
         "band_label_xy": (0.6, 160),
         "band_label_target_age": 10.8,
         "band_label_width": 100,
@@ -495,7 +495,7 @@ SUBTITLE = "Height by age, according to the World Health Organization."
 
 # Mobile has no Note slot, so its subtitle carries the stunting definition the desktop Note gives: the
 # link between the band's lower edge and "two standard deviations", which the plot does not label.
-MOBILE_SUBTITLE = f"{SUBTITLE} Children more than two standard deviations below the median are stunted."
+MOBILE_SUBTITLE = f"{SUBTITLE} Children more than two standard deviations below the median height for their age are considered stunted."
 
 
 # One dash plus one gap, in POINTS: the dash units are multiples of the line width, so this is what
