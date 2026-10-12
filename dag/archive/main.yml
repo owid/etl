@@ -1350,6 +1350,13 @@ steps:
   # archived; last active in 1561731bf7ef on 2026-10-02
   data://garden/bls/2026-08-18/us_ppi_construction:
     - snapshot://bls/2026-08-18/us_ppi_construction.csv
+  # archived; last active in 9abb8154211e on 2026-10-12
+  data://grapher/missing_data/2024-03-26/who_md_suicides:
+    - data://garden/missing_data/2024-03-26/who_md_suicides:
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/who/2024-03-24/self_inflicted_injuries
+      - data://garden/demography/2023-03-31/population
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
