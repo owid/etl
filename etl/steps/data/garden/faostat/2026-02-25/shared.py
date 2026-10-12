@@ -1953,7 +1953,8 @@ def _variable_name_map(data: Table, column: str, enforce_unique: bool = True) ->
         assert all(pivot.map(len) == 1)
         return pivot.map(lambda x: list(x)[0]).to_dict()  # ty: ignore
     else:
-        return pivot.map(lambda x: "".join(dict.fromkeys(x))).to_dict()  # ty: ignore
+        # Sorted, since set order changes between runs.
+        return pivot.map(lambda x: "".join(sorted(x))).to_dict()  # ty: ignore
 
 
 def parse_amendments_table(amendments: Table, dataset_short_name: str):

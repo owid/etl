@@ -75,14 +75,20 @@ VARIANTS_DETAILS = {
     "recombinant": {"rename": "Recombinant", "relevant": False},
 }
 VARIANTS_MAPPING = {k: v["rename"] for k, v in VARIANTS_DETAILS.items()}
-VARIANTS_RELEVANT = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["relevant"]))
-VARIANTS_NON_RELEVANT = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if not v["relevant"]))
-VARIANTS_OMICRON_BA = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (BA")))
-VARIANTS_OMICRON_XBB = list(
+VARIANTS_RELEVANT = sorted(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["relevant"]))
+VARIANTS_NON_RELEVANT = sorted(set(v["rename"] for v in VARIANTS_DETAILS.values() if not v["relevant"]))
+VARIANTS_OMICRON_BA = sorted(
+    set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (BA"))
+)
+VARIANTS_OMICRON_XBB = sorted(
     set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (XBB"))
 )
-VARIANTS_OMICRON_JN = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (JN")))
-VARIANTS_OMICRON_KP = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (KP")))
+VARIANTS_OMICRON_JN = sorted(
+    set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (JN"))
+)
+VARIANTS_OMICRON_KP = sorted(
+    set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (KP"))
+)
 
 COUNTRY_MAPPING = {
     "USA": "United States",
