@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: International Monetary Fund
+    title: International Trade in Goods (by partner country) (IMTS)
+    description: |-
+      The International trade in goods by partner country dataset (formerly Direction of Trade Statistics (DOTS)) includes goods (merchandise) export and import statistics disaggregated according to a country's trading partners.
+    citation_full: |-
+      International Monetary Fund. International Trade in Goods (by partner country), https://data.imf.org/en/datasets/IMF.STA:IMTS. Accessed on 05 October 2026.
+    attribution_short: IMF
+    url_main: https://data.imf.org/en/datasets/IMF.STA:IMTS
+    date_accessed: '2026-10-05'
+    # NOTE: Taken from the PUBLICATION_DATE attribute the IMF API returns with every series.
+    date_published: '2026-10-01'
+    license:
+      name: International Monetary Fund Copyright
+      url: https://www.imf.org/en/About/copyright-and-terms
+outs:
+  - md5: 6fe4124e0ccc464407ab213ba26d1f9f
+    size: 42809210
+    path: trade.zip
