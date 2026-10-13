@@ -1203,3 +1203,8 @@ steps:
     - data://garden/who/2024-03-24/self_inflicted_injuries:
       - data://meadow/who/2024-03-24/self_inflicted_injuries:
         - snapshot://who/2024-03-24/self_inflicted_injuries.csv
+  # archived; last active in 713c5842dbb3 on 2026-10-13
+  data://grapher/who/2025-04-17/mortality_database:
+    - data://garden/who/2025-04-17/mortality_database:
+      - data://meadow/who/2025-04-17/mortality_database:
+        - snapshot://who/2025-04-17/mortality_database.feather
