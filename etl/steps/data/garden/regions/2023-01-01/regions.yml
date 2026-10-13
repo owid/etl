@@ -5739,3 +5739,242 @@
     - STP
     - TCD
     - TGO
+##########
+# Uppsala Conflict Data Program (UCDP)
+# https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-251.pdf
+##########
+# Regions used by UCDP in its datasets (variable 'region'). UCDP assigns each country to a region by its Gleditsch &
+# Ward country code: Americas (2-199), Europe (200-399), Africa (400-626), Middle East (630-699), and Asia (700-999).
+# Membership applies these code ranges to all Gleditsch & Ward states that existed in 1946 or later, the first year
+# covered by UCDP data. All country-region pairs in the UCDP Georeferenced Event Dataset follow these ranges.
+# NOTE: UCDP calls the last region "Asia"; we call it "Asia and Oceania" because it also includes Oceania.
+# NOTE: Tibet (code 711, until 1950) is not included, since it has no OWID entity.
+- code: UCDP_AME
+  name: "Americas (UCDP)"
+  region_type: "aggregate"
+  defined_by: ucdp
+  members:
+    - ARG
+    - ATG
+    - BHS
+    - BLZ
+    - BOL
+    - BRA
+    - BRB
+    - CAN
+    - CHL
+    - COL
+    - CRI
+    - CUB
+    - DMA
+    - DOM
+    - ECU
+    - GRD
+    - GTM
+    - GUY
+    - HND
+    - HTI
+    - JAM
+    - KNA
+    - LCA
+    - MEX
+    - NIC
+    - PAN
+    - PER
+    - PRY
+    - SLV
+    - SUR
+    - TTO
+    - URY
+    - USA
+    - VCT
+    - VEN
+- code: UCDP_AFR
+  name: "Africa (UCDP)"
+  region_type: "aggregate"
+  defined_by: ucdp
+  members:
+    - AGO
+    - BDI
+    - BEN
+    - BFA
+    - BWA
+    - CAF
+    - CIV
+    - CMR
+    - COD
+    - COG
+    - COM
+    - CPV
+    - DJI
+    - DZA
+    - ERI
+    - ETH
+    - GAB
+    - GHA
+    - GIN
+    - GMB
+    - GNB
+    - GNQ
+    - KEN
+    - LBR
+    - LBY
+    - LSO
+    - MAR
+    - MDG
+    - MLI
+    - MOZ
+    - MRT
+    - MUS
+    - MWI
+    - NAM
+    - NER
+    - NGA
+    - OWID_ZAN
+    - RWA
+    - SDN
+    - SEN
+    - SLE
+    - SOM
+    - SSD
+    - STP
+    - SWZ
+    - SYC
+    - TCD
+    - TGO
+    - TUN
+    - TZA
+    - UGA
+    - ZAF
+    - ZMB
+    - ZWE
+- code: UCDP_MEA
+  name: "Middle East (UCDP)"
+  region_type: "aggregate"
+  defined_by: ucdp
+  members:
+    - ARE
+    - BHR
+    - EGY
+    - IRN
+    - IRQ
+    - ISR
+    - JOR
+    - KWT
+    - LBN
+    - OMN
+    - OWID_YPR
+    - QAT
+    - SAU
+    - SYR
+    - TUR
+    - YEM
+- code: UCDP_EUR
+  name: "Europe (UCDP)"
+  region_type: "aggregate"
+  defined_by: ucdp
+  members:
+    - ALB
+    - AND
+    - ARM
+    - AUT
+    - AZE
+    - BEL
+    - BGR
+    - BIH
+    - BLR
+    - CHE
+    - CYP
+    - CZE
+    - DEU  # Gleditsch & Ward code 260 is West Germany until 1990 and reunified Germany since
+    - DNK
+    - ESP
+    - EST
+    - FIN
+    - FRA
+    - GBR
+    - GEO
+    - GRC
+    - HRV
+    - HUN
+    - IRL
+    - ISL
+    - ITA
+    - LIE
+    - LTU
+    - LUX
+    - LVA
+    - MCO
+    - MDA
+    - MKD
+    - MLT
+    - MNE
+    - NLD
+    - NOR
+    - OWID_ABK
+    - OWID_CZS
+    - OWID_GDR
+    - OWID_GFR
+    - OWID_KOS
+    - OWID_SOS
+    - OWID_YGS
+    - POL
+    - PRT
+    - ROU
+    - RUS
+    - SMR
+    - SRB
+    - SVK
+    - SVN
+    - SWE
+    - UKR
+- code: UCDP_ASO
+  name: "Asia and Oceania (UCDP)"
+  region_type: "aggregate"
+  defined_by: ucdp
+  members:
+    - AFG
+    - AUS
+    - BGD
+    - BRN
+    - BTN
+    - CHN
+    - FJI
+    - FSM
+    - IDN
+    - IND
+    - JPN
+    - KAZ
+    - KGZ
+    - KHM
+    - KIR
+    - KOR
+    - LAO
+    - LKA
+    - MDV
+    - MHL
+    - MMR
+    - MNG
+    - MYS
+    - NPL
+    - NRU
+    - NZL
+    - OWID_RVN
+    - PAK
+    - PHL
+    - PLW
+    - PNG
+    - PRK
+    - SGP
+    - SLB
+    - THA
+    - TJK
+    - TKM
+    - TLS
+    - TON
+    - TUV
+    - TWN
+    - UZB
+    - VNM
+    - VUT
+    - WSM

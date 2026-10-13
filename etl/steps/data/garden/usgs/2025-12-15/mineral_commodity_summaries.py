@@ -684,7 +684,7 @@ def extract_and_clean_data_for_year_and_mineral(data: dict[int, Any], year: int,
         ]
     )
     # Sanity checks.
-    assert d["Source"].unique().item() == f"MCS{year}"
+    assert d["Source"].drop_duplicates().item() == f"MCS{year}"
     assert "Country" in d.columns
     assert "Type" in d.columns
 
@@ -820,7 +820,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.DataF
                 # TODO: Double-check that "mt" means million tonnes.
                 d[f"Reserves_{unit_reserves}"] *= 1e6
                 d = d.rename(columns={f"Reserves_{unit_reserves}": "Reserves_t"}, errors="raise")
-            elif (unit_reserves == "mcm") & (d["Mineral"].unique().item() == "Helium"):  # ty: ignore
+            elif (unit_reserves == "mcm") & (d["Mineral"].drop_duplicates().item() == "Helium"):  # ty: ignore
                 d["Reserves_mcm"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
                 d = d.rename(columns={"Reserves_mcm": "Reserves_t"}, errors="raise")
             elif unit_reserves == "kg":
@@ -834,7 +834,7 @@ def prepare_reserves_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.DataF
 
         # While production is usually given for an explicit year (actually, usually two years), reserves
         # does not have a year. I will assume that the reserves correspond to the latest informed year.
-        year_reserves = int(d["Source"].unique().item()[-4:]) - 1  # ty: ignore
+        year_reserves = int(d["Source"].drop_duplicates().item()[-4:]) - 1  # ty: ignore
         df_reserves = d[columns].assign(**{"Year": year_reserves})
 
         # Remove rows without data.
@@ -876,7 +876,7 @@ def prepare_production_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.Dat
         )
 
         # Handle special case.
-        if d["Mineral"].unique().item() == "Soda ash":  # ty: ignore
+        if d["Mineral"].drop_duplicates().item() == "Soda ash":  # ty: ignore
             # For consistency with different years, rename one of the sub-commodities (this happens at least in 2024).
             d["Type"] = d["Type"].replace({"Soda ash, Synthetic": "Soda ash, synthetic"})
 
@@ -960,7 +960,7 @@ def prepare_production_data(d: pd.DataFrame, metadata: dict[str, str]) -> pd.Dat
                 df_production["Production_t"] *= 1e3
             elif unit_production in ["Mt", "mmt"]:
                 df_production["Production_t"] *= 1e6
-            elif (unit_production == "mcm") and (d["Mineral"].unique().item() == "Helium"):  # ty: ignore
+            elif (unit_production == "mcm") and (d["Mineral"].drop_duplicates().item() == "Helium"):  # ty: ignore
                 df_production["Production_t"] *= MILLION_CUBIC_METERS_OF_HELIUM_TO_TONNES
             elif unit_production == "kct":
                 df_production["Production_t"] *= THOUSAND_CARATS_TO_TONNES

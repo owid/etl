@@ -50,7 +50,7 @@ def chart_diff_status(charts_df: pd.DataFrame) -> ChartDiffStatus:
     # TODO: Old staging servers might not have the change_types column, but fix this once
     #   all staging servers are updated
     if "change_types" in charts_df.columns:
-        charts_df = charts_df[charts_df.change_types.map(lambda x: "config" in x) | charts_df.is_new]
+        charts_df = charts_df[charts_df.change_types.map(lambda x: "config" in x) | charts_df.is_new]  # ty: ignore[unsupported-operator]
 
     if charts_df.empty:
         return ChartDiffStatus("✅", "No charts for review", "neutral")
@@ -96,11 +96,11 @@ def format_chart_diff(df: pd.DataFrame) -> str:
     # TODO: Old staging servers might not have the change_types column, but fix this once
     #    all staging servers are updated
     if "change_types" in df.columns:
-        num_charts_data_change = df.change_types.map(lambda x: "data" in x).sum()
-        num_charts_metadata_change = df.change_types.map(lambda x: "metadata" in x).sum()
+        num_charts_data_change = df.change_types.map(lambda x: "data" in x).sum()  # ty: ignore[unsupported-operator]
+        num_charts_metadata_change = df.change_types.map(lambda x: "metadata" in x).sum()  # ty: ignore[unsupported-operator]
 
         # From now on, ignore charts with no config changes
-        df = df[df.change_types.map(lambda x: "config" in x) | df.is_new]
+        df = df[df.change_types.map(lambda x: "config" in x) | df.is_new]  # ty: ignore[unsupported-operator]
     else:
         num_charts_data_change = 0
         num_charts_metadata_change = 0

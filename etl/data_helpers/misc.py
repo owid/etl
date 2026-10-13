@@ -362,7 +362,7 @@ def expand_time_column(
     # Final touches
     #####################################################################
     # Output dataframe in same order as input
-    df = df.loc[:, columns_order]
+    df = df.loc[:, columns_order]  # ty: ignore[invalid-assignment]
 
     if not DID_INTERPOLATE:  # ty: ignore
         try:

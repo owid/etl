@@ -94,6 +94,7 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+
 def run() -> None:
     # Load configuration from adjacent yaml file.
     config = paths.load_config(fname)
@@ -227,7 +228,6 @@ def run() -> None:
     #
     mdim = paths.create_chart(config=config)
     mdim.save()
-
 ```
 
 You can also combine manually defined views with generated ones. See the `etl.viz` module for available helper functions or refer to examples from `etl/steps/viz/chart/`.
@@ -244,12 +244,12 @@ However, you can also do it programmatically after creating an MDIM object.
 
 ```python
 def add_display_settings(mdim):
-  for view in mdim.views:
-      # Set default display settings
-      if view.dimensions["indicator"] == "emigrants":
-          view.config = CUSTOM_CONFIG_1
-      elif view.dimensions["indicator"] == "immigrants":
-          view.config = CUSTOM_CONFIG_1
+    for view in mdim.views:
+        # Set default display settings
+        if view.dimensions["indicator"] == "emigrants":
+            view.config = CUSTOM_CONFIG_1
+        elif view.dimensions["indicator"] == "immigrants":
+            view.config = CUSTOM_CONFIG_1
 ```
 
 Also, you can use the fields `common_views` in the YAML file to define a common configuration for certain subset of views. This is very useful (and recommended) when you want to define different-level of granularity of configs. For instance, imagine you want to define the same subtitle for all views with dimension `sex=age`, but then if you have a view with `sex=age, year=2020`, you want to be able to a different subtitle. etc.

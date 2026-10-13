@@ -201,9 +201,9 @@ steps:
           - data://garden/regions/2023-01-01/regions
 
   # Missing Data - Suicides
-  data://grapher/missing_data/2024-03-26/who_md_suicides:
-    - data://garden/missing_data/2024-03-26/who_md_suicides:
-      - data://garden/who/2024-03-24/self_inflicted_injuries
+  data://grapher/missing_data/2026-10-02/who_md_suicides:
+    - data://garden/missing_data/2026-10-02/who_md_suicides:
+      - data://garden/who/2025-08-06/self_inflicted_injuries
       - data://garden/wb/2026-07-01/income_groups
       - data://garden/regions/2023-01-01/regions
       - data://garden/demography/2023-03-31/population
