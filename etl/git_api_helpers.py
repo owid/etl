@@ -367,8 +367,8 @@ class GithubApiRepo:
         Returns:
             List of comment objects (empty if there are none)
         """
-        comments = [comment for comment in pr.get_issue_comments() if comment.user.login == username]
-        return sorted(comments, key=lambda comment: comment.created_at)
+        # GitHub returns issue comments in ascending order of creation.
+        return [comment for comment in pr.get_issue_comments() if comment.user.login == username]
 
     def get_master_commit_sha(self) -> str:
         """Get the latest commit SHA on master branch.
