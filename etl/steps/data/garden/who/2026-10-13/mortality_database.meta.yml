@@ -11,6 +11,44 @@ definitions:
   cause_in_text: |-
     <% if cause in ["Hepatitis B", "Japanese encephalitis"] %><< cause >><% else %><< cause.lower() >><% endif %>
 
+  # NOTE: Where each cause sits in WHO's tree, shown in brackets in the internal title: from the nearest group
+  # we ingest (or WHO's top-level group, when none is) down to the cause's parent. Mirrors CAUSE_TREE in the
+  # garden step, which fails the build if a cause is missing here. Empty for All Causes and its direct children.
+  cause_hierarchy: |-
+    <% set tree = [
+      ("All Causes", ""),
+      ("Infectious and parasitic diseases", "Communicable, maternal, perinatal and nutritional conditions"),
+      ("Respiratory infections", "Communicable, maternal, perinatal and nutritional conditions"),
+      ("Maternal conditions", "Communicable, maternal, perinatal and nutritional conditions"),
+      ("Perinatal conditions", "Communicable, maternal, perinatal and nutritional conditions"),
+      ("Nutritional deficiencies", "Communicable, maternal, perinatal and nutritional conditions"),
+      ("Malignant neoplasms", "Noncommunicable diseases"),
+      ("Other neoplasms", "Noncommunicable diseases"),
+      ("Diabetes mellitus, blood and endocrine disorders", "Noncommunicable diseases"),
+      ("Neuropsychiatric conditions", "Noncommunicable diseases"),
+      ("Sense organ diseases", "Noncommunicable diseases"),
+      ("Cardiovascular diseases", "Noncommunicable diseases"),
+      ("Respiratory diseases", "Noncommunicable diseases"),
+      ("Digestive diseases", "Noncommunicable diseases"),
+      ("Genitourinary diseases", "Noncommunicable diseases"),
+      ("Skin diseases", "Noncommunicable diseases"),
+      ("Musculoskeletal diseases", "Noncommunicable diseases"),
+      ("Congenital anomalies", "Noncommunicable diseases"),
+      ("Oral conditions", "Noncommunicable diseases"),
+      ("Sudden infant death syndrome", "Noncommunicable diseases"),
+      ("Unintentional injuries", "Injuries"),
+      ("Intentional injuries", "Injuries"),
+      ("Ill-defined injuries", "Injuries"),
+      ("Ill-defined diseases", ""),
+      ("Pertussis", "Infectious and parasitic diseases › Childhood-cluster diseases"),
+      ("Poliomyelitis", "Infectious and parasitic diseases › Childhood-cluster diseases"),
+      ("Diphtheria", "Infectious and parasitic diseases › Childhood-cluster diseases"),
+      ("Measles", "Infectious and parasitic diseases › Childhood-cluster diseases"),
+      ("Tetanus", "Infectious and parasitic diseases › Childhood-cluster diseases"),
+      ("Hepatitis B", "Infectious and parasitic diseases"),
+      ("Japanese encephalitis", "Infectious and parasitic diseases"),
+    ] %><% for c, p in tree %><% if c == cause and p %> (<< p >>)<% endif %><% endfor %>
+
   # NOTE: The ICD-10 codes below must match the `causes` table this step builds from WHO's own export
   # headers (`icd10_codes` column). They are repeated here because indicator text is rendered per
   # cause and the codes are no longer a dimension of the data. When a cause group is added or WHO
@@ -160,9 +198,9 @@ dataset:
     - Lucas Rodés-Guirao
 tables:
   mortality_database:
-    variables:
+    variables: &fact_variables
       number:
-        title: Deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >>
+        title: "<< cause >>{definitions.cause_hierarchy} — Deaths — << sex >>, << age_group >>"
         description_short: Reported total deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >>.
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
@@ -176,11 +214,12 @@ tables:
           entityAnnotationsMap: |-
             {definitions.annotation}
         presentation:
+          title_public: Deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >>
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
       percentage_of_cause_specific_deaths_out_of_total_deaths:
-        title: Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}
+        title: "<< cause >>{definitions.cause_hierarchy} — Share of total deaths — << sex >>, << age_group >>"
         description_short: Share of total reported deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}.
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
@@ -193,11 +232,12 @@ tables:
         display:
           numDecimalPlaces: 1
         presentation:
+          title_public: Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
       age_standardized_death_rate_per_100_000_standard_population:
-        title: Age-standardized deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people
+        title: "<< cause >>{definitions.cause_hierarchy} — Age-standardized death rate per 100,000 people — << sex >>, << age_group >>"
         description_short: Reported deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people.
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
@@ -211,11 +251,12 @@ tables:
           entityAnnotationsMap: |-
             {definitions.annotation}
         presentation:
+          title_public: Age-standardized deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people
           grapher_config:
             note: |-
               To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized). All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
       death_rate_per_100_000_population:
-        title: Deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >>
+        title: "<< cause >>{definitions.cause_hierarchy} — Death rate per 100,000 people — << sex >>, << age_group >>"
         description_short: Reported deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >>.
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
@@ -229,17 +270,20 @@ tables:
           entityAnnotationsMap: |-
             {definitions.annotation}
         presentation:
+          title_public: Deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >>
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
 
   # A lookup table, kept in the catalog and not published to Grapher. It records where each cause group sits in
   # WHO's cause tree, so the groups that partition all deaths can be told apart from drill-downs inside them.
+  vaccine_preventable_diseases:
+    variables: *fact_variables
   causes:
     variables:
       cause_level:
         title: Depth of the cause group in WHO's cause tree
-        description_short: 0 is All Causes; 1 is one of WHO's four top-level groups; 2 is a group one level below them.
+        description_short: 0 is All Causes; 1 is one of WHO's four top-level groups; 2 is a group one level below them; 3 and 4 are drill-downs inside those.
         unit: ""
       parent_cause:
         title: Parent cause group in WHO's cause tree
@@ -248,4 +292,8 @@ tables:
       icd10_codes:
         title: ICD-10 codes that define the cause group
         description_short: The International Classification of Diseases (Version 10) codes WHO groups under this cause, as given in its export.
+        unit: ""
+      table:
+        title: Table of this dataset that carries the cause
+        description_short: mortality_database holds All Causes and the groups that tile it; drill-down causes sit in one table per group.
         unit: ""
