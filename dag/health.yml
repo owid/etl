@@ -136,7 +136,7 @@ steps:
   # WHO Cardiovascular diseases deaths
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
-        - data://garden/who/2025-04-17/mortality_database
+        - data://garden/who/2026-10-13/mortality_database
   # Global Mental Health Countdown
   data://grapher/health/2024-03-21/gmh_countdown:
     - data://garden/health/2024-03-21/gmh_countdown:
@@ -252,6 +252,10 @@ steps:
         - snapshot://who/2025-04-17/mortality_database.feather
   data://grapher/who/2025-04-17/mortality_database:
     - data://garden/who/2025-04-17/mortality_database
+  data://grapher/who/2026-10-13/mortality_database:
+    - data://garden/who/2026-10-13/mortality_database:
+        - data://meadow/who/2026-10-13/mortality_database:
+            - snapshot://who/2026-10-13/mortality_database.feather
 
   # WHO Global Health Estimates
   data://garden/who/2024-07-30/ghe:
@@ -825,7 +829,7 @@ steps:
   data://garden/who/2025-08-05/mortality_database_cancer:
     - data://meadow/who/2025-08-05/mortality_database_cancer:
         - snapshot://who/2025-08-05/mortality_database_cancer.csv
-    - data://garden/who/2025-04-17/mortality_database
+    - data://garden/who/2026-10-13/mortality_database
   data://grapher/who/2025-08-05/mortality_database_cancer:
     - data://garden/who/2025-08-05/mortality_database_cancer
   # WHO ICD codes
@@ -918,7 +922,7 @@ steps:
         - data://meadow/gapminder/2024-07-08/maternal_mortality:
             - snapshot://gapminder/2024-07-08/maternal_mortality.xlsx
     - data://garden/un/2024-07-08/maternal_mortality
-    - data://garden/who/2025-04-17/mortality_database
+    - data://garden/who/2026-10-13/mortality_database
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2026-07-01/income_groups
     - data://garden/un/2024-07-12/un_wpp
