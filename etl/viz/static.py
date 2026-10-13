@@ -133,6 +133,7 @@ def name_furniture(fig: Any) -> int:
     nearby large ticks stay distinct (`1000001`, not `1e+06`) while float noise such as
     `0.30000000000000004` still reads `0.3`. A gid the step set itself is never overwritten, and a
     name already in use in the figure gets a `-2`, `-3`, … suffix, so the SVG never repeats an id.
+    Inset and secondary axes are named after their parent (`axes-child1__spine-left`).
     Returns the number of artists it named.
 
     Draws the figure once without rendering first: matplotlib builds its tick objects at draw time,
@@ -153,8 +154,18 @@ def name_furniture(fig: Any) -> int:
             used.add(unique)
             named += 1
 
+    # Inset and secondary axes live in their parent's `child_axes`, not in `fig.axes`.
+    def with_children(ax: Any, subject: str) -> list[tuple[str, Any]]:
+        found = [(subject, ax)]
+        for j, child in enumerate(ax.child_axes):
+            found += with_children(child, f"{subject}-child{j + 1}")
+        return found
+
+    all_axes: list[tuple[str, Any]] = []
     for index, ax in enumerate(fig.axes):
-        subject = "axes" if len(fig.axes) == 1 else f"axes{index + 1}"
+        all_axes += with_children(ax, "axes" if len(fig.axes) == 1 else f"axes{index + 1}")
+
+    for subject, ax in all_axes:
         for side, spine in ax.spines.items():
             name(spine, f"{subject}__spine-{side}")
         name(ax.title, f"{subject}__title")

@@ -210,6 +210,19 @@ def test_name_furniture_keeps_nearby_large_ticks_distinct():
     plt.close(fig)
 
 
+def test_name_furniture_reaches_inset_and_secondary_axes():
+    # Both live in ax.child_axes, which fig.axes does not list.
+    fig, ax = plt.subplots()
+    inset = ax.inset_axes([0.6, 0.6, 0.3, 0.3])
+    inset.set_xticks([0, 1])
+    secondary = ax.secondary_xaxis("top")
+    name_furniture(fig)
+    assert inset.spines["left"].get_gid() == "axes-child1__spine-left"
+    assert inset.xaxis.get_major_ticks()[1].label1.get_gid() == "axes-child1__x-tick-label-1"
+    assert secondary.spines["top"].get_gid() == "axes-child2__spine-top"
+    plt.close(fig)
+
+
 def test_name_furniture_never_repeats_an_id():
     fig, ax = plt.subplots()
     ax.set_yticks([0.1, 0.1 + 1e-17, 0.2])
