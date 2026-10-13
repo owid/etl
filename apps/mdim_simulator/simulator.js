@@ -40,7 +40,7 @@ function loadState() {
       const s = JSON.parse(raw);
       if (Array.isArray(s.dims) && s.links && typeof s.links === "object") return { open: true, selected: {}, title: "", titleVariant: "", topicTags: [], ...s };
     }
-  } catch (err) { console.warn("Could not read saved setup", err); }
+  } catch (err) { warnNotSaved(err); }
   return defaultState();
 }
 
@@ -59,8 +59,16 @@ state.defaultTab ??= "chart";
 state.hideTimeInTitle ??= true;
 state.changeCountry ??= false;
 
+// The sketch lives only in the browser, so a failure to save (private window, blocked storage, full quota) is
+// shown rather than swallowed.
+function warnNotSaved(err) {
+  console.warn("Could not save the sketch", err);
+  const warning = document.getElementById("storage-warning");
+  if (warning) warning.hidden = false;
+}
+
 function saveState() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (err) { /* private window or blocked storage */ }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (err) { warnNotSaved(err); }
 }
 
 // Every combination of options, as arrays of choices in dropdown order.

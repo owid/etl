@@ -117,6 +117,8 @@ td.text-col { white-space: nowrap; }
 .panel-bar { display: flex; align-items: center; gap: 16px; width: 100%; padding: 12px 24px; border: none; background: var(--accent); color: #fff; cursor: pointer; text-align: left; }
 .panel-title { font-weight: 700; font-size: 15px; }
 .panel-summary { font-size: 14px; opacity: 0.85; flex: 1; }
+.storage-warning { padding: 2px 8px; border-radius: 3px; background: #f6d77a; color: #5a4400; font-size: 13px; font-weight: 700; }
+.storage-warning[hidden] { display: none; }
 .panel-chevron { font-size: 14px; transition: transform 0.15s; }
 .panel:not(.open) .panel-chevron { transform: rotate(180deg); }
 .panel-body { height: var(--panel-height, 45vh); overflow: auto; padding: 20px 24px 24px; }
@@ -225,6 +227,7 @@ table.combos td.indicator { width: 42%; }
   <button id="panel-toggle" class="panel-bar" aria-expanded="true" aria-controls="panel-body">
     <span class="panel-title">Configure MDim</span>
     <span id="panel-summary" class="panel-summary"></span>
+    <span id="storage-warning" class="storage-warning" hidden>Not saved: this browser isn't keeping the sketch. Copy the setup before you close the page.</span>
     <span class="panel-chevron" aria-hidden="true">▼</span>
   </button>
   <div id="panel-body" class="panel-body">

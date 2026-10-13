@@ -373,6 +373,8 @@ def main() -> None:
         # A copied setup reopens unchanged, including a "What you should know" given as a list.
         reopen = yaml.safe_load(setup_text)
         reopen["views"][0].setdefault("metadata", {})["description_key"] = ["A point given as a list item.", "Another."]
+        # "Hide the time range" unticked: the copied setup leaves the setting out, and it has to stay out.
+        reopen["definitions"]["common_views"][0]["config"].pop("hideAnnotationFieldsInTitle", None)
         reopen_path = OUT / "check_reopen.yml"
         reopen_path.write_text(yaml.safe_dump(reopen, sort_keys=False, allow_unicode=True))
         build.build(REOPENED, reopen_path)
@@ -385,6 +387,17 @@ def main() -> None:
             "a list-form WYSK stays a list",
             reopened["views"][0]["metadata"]["description_key"] == ["A point given as a list item.", "Another."],
         )
+
+        # A browser that can't save shows a warning instead of pretending.
+        check("no warning while saving works", page.locator("#storage-warning").is_hidden())
+        blocked = ctx.new_page()
+        blocked.add_init_script("Storage.prototype.setItem = () => { throw new Error('blocked'); };")
+        blocked.goto(BLANK.as_uri())
+        blocked.wait_for_timeout(1500)
+        blocked.locator("#page-fields input").first.fill("A title")
+        blocked.wait_for_timeout(300)
+        check("a failure to save is shown", blocked.locator("#storage-warning").is_visible())
+        blocked.close()
 
         check("no console errors", not errors, errors or "")
         browser.close()
