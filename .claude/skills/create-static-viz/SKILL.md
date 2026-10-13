@@ -230,10 +230,12 @@ wherever MySQL is reachable, since it does strictly more than the fallbacks do.
 If neither resolves it, ask. Guessing which dataset an old hand-drawn image was built from is how
 you rebuild the wrong chart.
 
-The project tracks which viz is claimed, parked or already done in a shared tracker, and this
-skill deliberately does not read or write it — **ask instead**. If the user has not already said
-where this viz stands, ask before doing any work: a viz someone else is mid-way through, or one
-already finished, is worth an interruption rather than a duplicate.
+The project tracks which viz is claimed, parked or already done in a shared tracker — the
+**Tracker** column of the [static viz popularity report](https://claude.ai/code/artifact/03d7947f-9c7e-450e-a81b-ee0c68509af9)
+— and this skill deliberately does not read or write it — **ask instead**. If the user has not
+already said where this viz stands, ask before doing any work, and give them that link so they can
+check: a viz someone else is mid-way through, or one already finished, is worth an interruption
+rather than a duplicate.
 
 **Read [reference/GOTCHAS.md](reference/GOTCHAS.md) → Data before you use a single column.** Those
 checks are pre-flight, not post-mortem: a column whose name means something other than what it
@@ -492,7 +494,13 @@ not checks — from `#2459`'s workflow, with the parts this skill touches in bol
 Report which of these are done and which are outstanding — the surrounding prose in particular
 tends to be forgotten, and a corrected chart under an uncorrected caption is worse than neither.
 
-Finally, **remind the user to set the viz's status in the tracker themselves**, and give them the
-PR link to record against it. This skill never reads or writes the tracker — it is a shared team
-database, the person running the refresh knows the state of their own queue, and a status is a
-claim about human intent that an automated flow should not be making.
+Finally, **remind the user to set the viz's status in the tracker themselves.** Give them the
+[report link](https://claude.ai/code/artifact/03d7947f-9c7e-450e-a81b-ee0c68509af9)
+and the PR link, and tell them to find the viz's row and, in its **Tracker** column, pick a status
+(Propose, Tackle, On the bench, Blocked, Done) and add a comment with the PR link and where the
+refresh stands. The column reads and writes through the viewer's own Notion connector, so the
+first edit asks them to connect Notion in claude.ai. Skip the reminder when the user is this
+skill's `metadata.owner`, who keeps the tracker current through their own flow. This skill never
+reads or writes the tracker — it is a shared team database, the person running the refresh knows
+the state of their own queue, and a status is a claim about human intent that an automated flow
+should not be making.
