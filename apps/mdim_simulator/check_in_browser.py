@@ -21,6 +21,12 @@ from etl.viz.chart.core.utils import create_chart_from_config
 OUT = Path(__file__).parents[2] / "ai" / "mdim_simulator"
 PAGE = OUT / "check.html"
 BLANK = OUT / "check_blank.html"
+# Free-form "What you should know": an intro paragraph, a wrapped line and nested bullets, none of which may be lost.
+FREE_FORM_WYSK = (
+    "Some context before the points.\n"
+    "- A first point\n  that wraps onto a second line.\n"
+    "- A second point:\n  - with a nested item\n  - and another one"
+)
 REOPENED = OUT / "check_reopened.html"
 SCREENSHOTS = OUT / "screenshots"
 
@@ -68,7 +74,13 @@ def build_pages() -> None:
         "dimensions": [
             {"slug": "metric", "name": "Metric", "choices": [{"slug": "number_of_people", "name": "Number of people"}]}
         ],
-        "views": [{"dimensions": {"metric": "number_of_people"}, "indicators": {"y": [{"catalogPath": number_path}]}}],
+        "views": [
+            {
+                "dimensions": {"metric": "number_of_people"},
+                "indicators": {"y": [{"catalogPath": number_path}]},
+                "metadata": {"description_key": FREE_FORM_WYSK},
+            }
+        ],
     }
     OUT.mkdir(parents=True, exist_ok=True)
     setup_path = OUT / "check_setup.yml"
@@ -107,6 +119,14 @@ def main() -> None:
         page.wait_for_timeout(1500)
         page.screenshot(path=SCREENSHOTS / "initial.png")
         check("starting chart is drawn", "Number of people using the Internet" in page.inner_text("#chart"))
+        wysk = page.inner_text("#wysk-list")
+        check(
+            "free-form WYSK is shown whole",
+            all(
+                part in wysk
+                for part in ("Some context before the points.", "wraps onto a second line", "and another one")
+            ),
+        )
         # The page starts from the newest WDI version; the share indicator sits in the same dataset.
         number_path = page.locator("table.combos tbody tr >> nth=0").locator("td.indicator input").input_value()
         share_path = number_path.replace("#it_net_user_zs_number", "#it_net_user_zs")
@@ -221,7 +241,8 @@ def main() -> None:
         )
         page.wait_for_timeout(800)
         check("the other view keeps its own text", "provisional" not in page.inner_text("#chart"))
-        check("edited views are marked in the table", page.locator("table.combos .text-tag").count() == 1)
+        # Both views: the share view's edits, and the pre-filled free-form WYSK on the number view.
+        check("edited views are marked in the table", page.locator("table.combos .text-tag").count() == 2)
         check("text updates without reloading the chart", not [w for w in warnings if "Live text" in w])
         page.click("#text-editor-toggle")
 
@@ -355,6 +376,16 @@ def main() -> None:
     check("rounding exported on the indicator", share["indicators"]["y"][0]["display"]["numSignificantFigures"] == 2)
     check("untouched maps export nothing", "map" not in (number.get("config") or {}))
     check("suggestions are listed for Claude", "Suggested for the indicator everywhere" in setup_text)
+    check(
+        "a suggestion names its view and carries that view's text",
+        "(from Metric = Share of population" in setup_text
+        and "Share of people who used the Internet in the last three months." in setup_text.split("Suggested for")[1],
+    )
+    check(
+        "free-form WYSK comes back unchanged",
+        number.get("metadata", {}).get("description_key") == FREE_FORM_WYSK,
+        number.get("metadata", {}).get("description_key"),
+    )
     chart = create_chart_from_config(
         setup, dependencies={wdi_dataset}, catalog_path="worldbank_wdi/latest/internet_users#internet_users"
     )

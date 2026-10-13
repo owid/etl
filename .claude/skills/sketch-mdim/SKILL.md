@@ -10,6 +10,7 @@ description: >-
   ETL step is done with /create-chart.
 metadata:
   internal: true
+  owner: edomt
 ---
 
 # Sketch an MDim

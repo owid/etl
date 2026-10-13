@@ -127,6 +127,21 @@ def indicator_data(variable_id: int) -> dict:
     return {"meta": meta, "csv": "\n".join(rows)}
 
 
+def description_key_blocks(description_key: str | list) -> list[str]:
+    """The page's editable blocks for a description_key, as descriptionKeyBlocks() in simulator.js makes them."""
+    if not description_key:
+        return []
+    if isinstance(description_key, list):
+        return [f"- {item}" for item in description_key]
+    blocks: list[str] = []
+    for line in str(description_key).split("\n"):
+        if line.startswith("- ") or not blocks:
+            blocks.append(line)
+        else:
+            blocks[-1] += f"\n{line}"
+    return blocks
+
+
 def state_from_setup(setup: dict) -> tuple[dict, list[int]]:
     """The page's state for a setup in the copied-setup format, and the IDs of the indicators it links."""
     dims = [
@@ -169,10 +184,8 @@ def state_from_setup(setup: dict) -> tuple[dict, list[int]]:
         if map_settings:
             own["map"] = map_settings
         description_key = (view.get("metadata") or {}).get("description_key")
-        if isinstance(description_key, str):
-            description_key = [line[2:].strip() for line in description_key.splitlines() if line.startswith("- ")]
         if description_key is not None:
-            own["descriptionKey"] = description_key
+            own["descriptionKey"] = description_key_blocks(description_key)
         display = y.get("display") or {} if isinstance(y, dict) else {}
         if display.get("roundingMode") == "significantFigures" and "numSignificantFigures" in display:
             own["rounding"] = {"mode": "significantFigures", "digits": display["numSignificantFigures"]}

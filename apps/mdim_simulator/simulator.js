@@ -91,6 +91,7 @@ function pruneLinks() {
   const keys = new Set(combinations().map(comboKey));
   for (const key of Object.keys(state.links)) if (!keys.has(key)) delete state.links[key];
   for (const key of Object.keys(state.textEdits.views)) if (!keys.has(key)) delete state.textEdits.views[key];
+  for (const key of Object.keys(state.suggest)) if (!keys.has(key)) delete state.suggest[key];
 }
 
 // Re-key links when a dropdown is added or removed, so existing work survives.
@@ -105,6 +106,7 @@ function rekeyLinks(transform) {
   };
   state.links = rekey(state.links);
   state.textEdits.views = rekey(state.textEdits.views);
+  state.suggest = rekey(state.suggest);
   if (state.defaultKey !== null) state.defaultKey = transform(state.defaultKey === "" ? [] : state.defaultKey.split("|"));
 }
 
@@ -195,11 +197,48 @@ function mdInline(text) {
   return html.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
 }
 
-function descriptionKeyBullets(descriptionKey) {
+// "What you should know" as editable blocks, losing nothing. A description_key is a list or a markdown string
+// (see CLAUDE.md). A string splits before each top-level "- " bullet: a block keeps its wrapped and nested
+// lines, and text before the first bullet is a block of its own, so joining the blocks gives back the
+// original. List items become "- " blocks. descriptionKeyValue() turns blocks back into the original's form.
+function descriptionKeyBlocks(descriptionKey) {
   if (!descriptionKey) return [];
-  if (Array.isArray(descriptionKey)) return descriptionKey;
-  return descriptionKey.split("\n").filter((line) => line.startsWith("- ")).map((line) => line.slice(2).trim());
+  if (Array.isArray(descriptionKey)) return descriptionKey.map((item) => `- ${item}`);
+  const blocks = [];
+  for (const line of String(descriptionKey).split("\n")) {
+    if (line.startsWith("- ") || !blocks.length) blocks.push(line);
+    else blocks[blocks.length - 1] += `\n${line}`;
+  }
+  return blocks;
 }
+
+function descriptionKeyValue(blocks, meta) {
+  return Array.isArray(meta.descriptionKey)
+    ? blocks.map((b) => (b.startsWith("- ") ? b.slice(2) : b))
+    : blocks.join("\n");
+}
+
+// A block's text without its bullet, as markdown: continuation lines join the paragraph, nested "- " lines
+// become a nested list.
+function blockHtml(text) {
+  const out = [];
+  let nested = [];
+  const flush = () => {
+    if (nested.length) out.push(`<ul>${nested.map((n) => `<li>${mdInline(n)}</li>`).join("")}</ul>`);
+    nested = [];
+  };
+  for (const line of text.split("\n")) {
+    const item = line.match(/^\s+[-*] (.*)$/);
+    if (item) { nested.push(item[1]); continue; }
+    flush();
+    out.push(line.trim() ? mdInline(line.trim()) : "<br>");
+  }
+  flush();
+  return out.join(" ");
+}
+
+const isBullet = (block) => block.startsWith("- ");
+const blockText = (block) => (isBullet(block) ? block.slice(2) : block);
 
 function columnDef(meta) {
   const def = {
@@ -393,7 +432,7 @@ function originalTexts(meta) {
   const cfg = viewConfig(meta);
   return {
     title: cfg.title || "", subtitle: cfg.subtitle || "", note: cfg.note || "",
-    descriptionKey: descriptionKeyBullets(meta.descriptionKey),
+    descriptionKey: descriptionKeyBlocks(meta.descriptionKey),
     rounding: originalRounding(meta),
     map: originalMap(meta),
   };
@@ -470,12 +509,13 @@ function fieldTools(field) {
   const suggest = document.createElement("label");
   const box = document.createElement("input");
   box.type = "checkbox";
-  box.checked = Boolean(state.suggest[current.meta.id]?.[field]);
+  // Kept per view, so the suggestion carries this view's text even when other views share the indicator.
+  box.checked = Boolean(state.suggest[current.key]?.[field]);
   box.addEventListener("change", () => {
-    const s = (state.suggest[current.meta.id] ||= {});
+    const s = (state.suggest[current.key] ||= {});
     if (box.checked) s[field] = true;
     else delete s[field];
-    if (!Object.keys(s).length) delete state.suggest[current.meta.id];
+    if (!Object.keys(s).length) delete state.suggest[current.key];
     saveState();
   });
   suggest.append(box, "Suggest for the indicator everywhere");
@@ -523,30 +563,40 @@ function renderWysk() {
   list.innerHTML = "";
   tools.innerHTML = "";
   if (!current) { wyskEl.hidden = true; return; }
-  const bullets = resolvedTexts(current.key, current.meta).descriptionKey;
+  const blocks = resolvedTexts(current.key, current.meta).descriptionKey;
   const editing = state.textMode;
-  wyskEl.hidden = !editing && bullets.length === 0;
+  wyskEl.hidden = !editing && blocks.length === 0;
   wyskEl.classList.toggle("editing", editing);
   wyskEl.querySelector(".add-bullet")?.remove();
 
+  // Text before the first bullet is shown as a paragraph inside the list, without a bullet.
+  const itemFor = (block) => {
+    const li = document.createElement("li");
+    if (!isBullet(block)) li.className = "wysk-prose";
+    return li;
+  };
   if (!editing) {
-    list.innerHTML = bullets.map((b) => `<li>${mdInline(b)}</li>`).join("");
+    for (const block of blocks) {
+      const li = itemFor(block);
+      li.innerHTML = blockHtml(blockText(block));
+      list.append(li);
+    }
     return;
   }
   tools.append(fieldTools("descriptionKey"));
 
-  const save = (next) => { setText("descriptionKey", next.map((b) => b.trim()).filter(Boolean)); afterTextChange(); };
-  bullets.forEach((bullet, i) => {
-    const li = document.createElement("li");
+  const save = (next) => { setText("descriptionKey", next.filter((b) => blockText(b).trim())); afterTextChange(); };
+  blocks.forEach((block, i) => {
+    const li = itemFor(block);
     const view = document.createElement("span");
     view.className = "wysk-bullet";
     view.tabIndex = 0;
-    view.title = "Click to edit";
-    view.innerHTML = mdInline(bullet);
+    view.title = "Click to edit (Shift+Enter for a new line)";
+    view.innerHTML = blockHtml(blockText(block));
     const startEdit = () => {
       const ta = document.createElement("textarea");
       ta.className = "wysk-edit";
-      ta.value = bullet;
+      ta.value = blockText(block);
       li.replaceChild(ta, view);
       autoGrow(ta);
       ta.focus();
@@ -556,16 +606,16 @@ function renderWysk() {
         if (e.key === "Escape") { ta.dataset.cancel = "1"; ta.blur(); }
       });
       ta.addEventListener("blur", () => {
-        if (ta.dataset.cancel) return renderWysk();
-        const next = [...bullets];
-        next[i] = ta.value;
+        if (ta.dataset.cancel || ta.value === blockText(block)) return renderWysk();
+        const next = [...blocks];
+        next[i] = (isBullet(block) ? "- " : "") + ta.value;
         save(next);
       });
     };
     view.addEventListener("click", (e) => { if (!e.target.closest("a")) startEdit(); });
     view.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); startEdit(); } });
     li.dataset.index = i;
-    li.append(view, removeButton("Remove this point", () => save(bullets.filter((_, j) => j !== i))));
+    li.append(view, removeButton("Remove this point", () => save(blocks.filter((_, j) => j !== i))));
     list.append(li);
   });
 
@@ -574,9 +624,9 @@ function renderWysk() {
   add.className = "btn add-bullet";
   add.textContent = "+ Add point";
   add.addEventListener("click", () => {
-    setText("descriptionKey", [...bullets, "New point."]);
+    setText("descriptionKey", [...blocks, "- New point."]);
     afterTextChange();
-    list.querySelector(`li[data-index="${bullets.length}"] .wysk-bullet`)?.click();
+    list.querySelector(`li[data-index="${blocks.length}"] .wysk-bullet`)?.click();
     list.querySelector(".wysk-edit")?.select();
   });
   wyskEl.append(add);
@@ -1340,15 +1390,13 @@ async function setupYaml() {
     lines.push("default_dimensions:", ...firstCombo.map((c, i) => `  ${dimSlugs[i]}: ${choiceSlugs.get(c.id)}`));
   }
   lines.push("definitions:", "  common_views:", "    - config:", ...yamlLines(sharedConfig(), 8));
-  const textBlock = (edits, indent) => {
+  const textBlock = (edits, indent, meta) => {
     const out = [];
     const cfg = Object.fromEntries(TEXT_FIELDS.filter((f) => f in edits).map((f) => [f, edits[f]]));
     if (edits.map && Object.keys(colorScaleFrom(edits.map)).length) cfg.map = { colorScale: colorScaleFrom(edits.map) };
     if (Object.keys(cfg).length) out.push(`${indent}config:`, ...yamlLines(cfg, indent.length + 2));
     if ("descriptionKey" in edits) {
-      out.push(`${indent}metadata:`);
-      if (edits.descriptionKey.length) out.push(`${indent}  description_key:`, ...edits.descriptionKey.map((b) => `${indent}    - ${JSON.stringify(b)}`));
-      else out.push(`${indent}  description_key: []`);
+      out.push(`${indent}metadata:`, ...yamlLines({ description_key: descriptionKeyValue(edits.descriptionKey, meta) }, indent.length + 2));
     }
     return out;
   };
@@ -1382,20 +1430,21 @@ async function setupYaml() {
     viewLines.push("  - dimensions:" + (combo.length ? "" : " {}"));
     combo.forEach((c, i) => viewLines.push(`      ${dimSlugs[i]}: ${choiceSlugs.get(c.id)}`));
     viewLines.push("    indicators:", "      y:", `        - catalogPath: ${JSON.stringify(catalogPath)}`);
+    const meta = await getMeta(link.id);
     const ownEdits = state.textEdits.views[comboKey(combo)] || {};
     if (ownEdits.rounding) viewLines.push("          display:", ...yamlLines(roundingDisplay(ownEdits.rounding), 12));
-    viewLines.push(...textBlock(ownEdits, "    "));
+    viewLines.push(...textBlock(ownEdits, "    ", meta));
 
     // What changed in this view, against the indicator's own text.
-    const meta = await getMeta(link.id);
     const original = originalTexts(meta);
     const shown = resolvedTexts(comboKey(combo), meta);
     for (const field of Object.keys(original)) {
       if (same(original[field], shown[field])) continue;
       changes.push(`#   ${label} · ${FIELD_LABELS[field]}`, `#     was: ${JSON.stringify(original[field])}`, `#     now: ${JSON.stringify(shown[field])}`);
-      if (state.suggest[meta.id]?.[field] && !suggested.has(`${meta.id}|${field}`)) {
-        suggested.add(`${meta.id}|${field}`);
-        suggestions.push(`#   - ${meta.catalogPath} · ${FIELD_LABELS[field]}: ${JSON.stringify(shown[field])}`);
+      const suggestedValue = JSON.stringify(field === "descriptionKey" ? descriptionKeyValue(shown[field], meta) : shown[field]);
+      if (state.suggest[comboKey(combo)]?.[field] && !suggested.has(`${meta.id}|${field}|${suggestedValue}`)) {
+        suggested.add(`${meta.id}|${field}|${suggestedValue}`);
+        suggestions.push(`#   - ${meta.catalogPath} · ${FIELD_LABELS[field]} (from ${label}): ${suggestedValue}`);
       }
     }
   }
