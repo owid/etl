@@ -10,7 +10,7 @@ import resource
 import sys
 import time
 import traceback
-from collections.abc import Callable, Iterator, MutableMapping
+from collections.abc import Callable, Generator, MutableMapping
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
 from concurrent.futures.process import BrokenProcessPool
 from contextlib import contextmanager
@@ -1061,7 +1061,7 @@ def _detect_strictness_level(step: "Step", strict_after: Any, strict: bool | Non
 
 
 @contextmanager
-def strictness_level(strict: bool) -> Iterator[None]:
+def strictness_level(strict: bool) -> Generator[None, None, None]:
     # start from a clean slate
     if "OWID_STRICT" in environ:
         del environ["OWID_STRICT"]
