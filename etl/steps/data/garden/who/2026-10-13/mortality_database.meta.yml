@@ -130,7 +130,7 @@ dataset:
         - The snapshot is read from the platform's export API instead of manual downloads.
         - icd10_codes is no longer a dimension of the data; the ICD-10 codes, each cause group's depth in WHO's cause tree and its parent group now live in a separate `causes` table.
         - Fixed the producer description for "Diabetes mellitus, blood and endocrine disorders", which had not been rendering.
-        - For 78 country-years in WHO's February 2026 release, Unintentional injuries double-counted accidental poisonings (ICD-10 X41, X42, X44, X45); we derive it from the other cause groups there and leave its age-standardized death rate missing.
+        - For 45 country-years in WHO's February 2026 release, Unintentional injuries double-counted accidental poisonings (ICD-10 X41, X42, X44, X45); we derive it from the other cause groups there and leave its age-standardized death rate missing.
 
   owners:
     - Fiona Spooner

@@ -115,10 +115,13 @@ PARTITION_MIN_SHARE_AFTER_CORRECTION = 0.99
 # separates the two kinds of gap the data holds: WHO's pre-existing residuals (Japan 2022-23, Brazil 2021-22,
 # Thailand 2023, Turkiye 2013-17; present in the 2025 release too, and not explained by the Unintentional
 # injuries change) all sit at or below 0.02% of all deaths, while every double count that could be checked
-# against the 2025 release sits at or above 0.05%. Re-check next update: if WHO has fixed its table, the
-# correction finds nothing to do and can be deleted.
+# against the 2025 release sits at or above 0.05%. In a small country 0.05% is a single death, so a floor of
+# MATERIAL_EXCESS_DEATHS keeps one-death discrepancies (Belize 2007-08, Maldives 2010: 1-3 deaths) out of the
+# correction; the smallest double count is Luxembourg 2024 with 14. Re-check next update: if WHO has fixed its
+# table, the correction finds nothing to do and can be deleted.
 CORRECTED_CAUSE = "Unintentional injuries"
 MATERIAL_EXCESS = 0.0005
+MATERIAL_EXCESS_DEATHS = 10
 
 
 def run() -> None:
@@ -453,8 +456,8 @@ def correct_unintentional_injuries(tb: Table, tb_causes: Table) -> Table:
     other groups were revised consistently with it, so the gap is the double count.
 
     A country-year is affected when its both-sexes, all-ages cell overshoots All Causes by more than
-    MATERIAL_EXCESS; WHO's small pre-existing residuals (Japan, Brazil, Thailand, Turkiye) stay below it and are
-    left alone. In an affected country-year, every known-age cell that overshoots by at least one death gets
+    MATERIAL_EXCESS and by at least MATERIAL_EXCESS_DEATHS deaths; WHO's small pre-existing residuals (Japan,
+    Brazil, Thailand, Turkiye) and one-death discrepancies in small countries stay below and are left alone. In an affected country-year, every known-age cell that overshoots by at least one death gets
     Unintentional injuries = All Causes minus the other groups, its share of deaths recomputed from that, and
     its crude death rate from WHO's own population, recovered as All Causes deaths / All Causes death rate.
     The age-standardized rate cannot be rebuilt from the published numbers and is left missing.
@@ -462,7 +465,9 @@ def correct_unintentional_injuries(tb: Table, tb_causes: Table) -> Table:
     keys = ["country", "year", "sex", "age_group"]
     cells = _partition_cells(tb, tb_causes)
     headline = cells[(cells["sex"] == "Both sexes") & (cells["age_group"] == "all ages")]
-    affected = headline.loc[(headline["excess"] > 0) & (headline["deviation"] > MATERIAL_EXCESS), ["country", "year"]]
+    affected = headline.loc[
+        (headline["excess"] >= MATERIAL_EXCESS_DEATHS) & (headline["deviation"] > MATERIAL_EXCESS), ["country", "year"]
+    ]
     if affected.empty:
         log.info("unintentional_injuries_correction", country_years=0, cells=0)
         return tb
