@@ -11,6 +11,7 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 import pytest
+from matplotlib.text import Text
 
 from etl import paths as etl_paths
 from etl.helpers import PathFinder
@@ -220,6 +221,26 @@ def test_name_furniture_reaches_inset_and_secondary_axes():
     assert inset.spines["left"].get_gid() == "axes-child1__spine-left"
     assert inset.xaxis.get_major_ticks()[1].label1.get_gid() == "axes-child1__x-tick-label-1"
     assert secondary.spines["top"].get_gid() == "axes-child2__spine-top"
+    plt.close(fig)
+
+
+def test_name_furniture_keeps_the_first_axes_name_when_another_is_added():
+    # A later render that adds a twin axis must not rename the original axes' furniture.
+    fig, ax = plt.subplots()
+    twin = ax.twinx()
+    name_furniture(fig)
+    assert ax.spines["left"].get_gid() == "axes__spine-left"
+    assert twin.spines["right"].get_gid() == "axes2__spine-right"
+    plt.close(fig)
+
+
+def test_name_furniture_names_left_and_right_titles():
+    fig, ax = plt.subplots()
+    ax.set_title("Left", loc="left")
+    ax.set_title("Right", loc="right")
+    name_furniture(fig)
+    gids = {a.get_text(): a.get_gid() for a in fig.findobj(match=Text) if isinstance(a, Text)}
+    assert gids["Left"] == "axes__title-left" and gids["Right"] == "axes__title-right"
     plt.close(fig)
 
 

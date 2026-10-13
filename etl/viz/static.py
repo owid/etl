@@ -133,7 +133,9 @@ def name_furniture(fig: Any) -> int:
     nearby large ticks stay distinct (`1000001`, not `1e+06`) while float noise such as
     `0.30000000000000004` still reads `0.3`. A gid the step set itself is never overwritten, and a
     name already in use in the figure gets a `-2`, `-3`, … suffix, so the SVG never repeats an id.
-    Inset and secondary axes are named after their parent (`axes-child1__spine-left`).
+    The first axes is always `axes`, and later ones are `axes2`, `axes3`, …, so adding a colorbar or
+    a twin axis in a later render leaves the first axes' names, and the bindings joined on them,
+    intact. Inset and secondary axes are named after their parent (`axes-child1__spine-left`).
     Returns the number of artists it named.
 
     Draws the figure once without rendering first: matplotlib builds its tick objects at draw time,
@@ -163,12 +165,16 @@ def name_furniture(fig: Any) -> int:
 
     all_axes: list[tuple[str, Any]] = []
     for index, ax in enumerate(fig.axes):
-        all_axes += with_children(ax, "axes" if len(fig.axes) == 1 else f"axes{index + 1}")
+        all_axes += with_children(ax, "axes" if index == 0 else f"axes{index + 1}")
 
     for subject, ax in all_axes:
         for side, spine in ax.spines.items():
             name(spine, f"{subject}__spine-{side}")
         name(ax.title, f"{subject}__title")
+        # `set_title(loc="left"|"right")` writes to separate Text artists, which matplotlib only
+        # exposes as private attributes; getattr keeps a future rename from raising.
+        name(getattr(ax, "_left_title", None), f"{subject}__title-left")
+        name(getattr(ax, "_right_title", None), f"{subject}__title-right")
         for axis_name, axis in (("x", ax.xaxis), ("y", ax.yaxis)):
             name(axis.label, f"{subject}__{axis_name}-label")
             name(axis.get_offset_text(), f"{subject}__{axis_name}-offset")
