@@ -122,7 +122,9 @@ definitions:
     <%- endif -%>
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 365
+  # WHO refreshes the database each February. The data page computes "next expected update" as this
+  # step's version date plus this period, so 150 days from 2026-10-13 lands in March 2027.
+  update_period_days: 150
   changelog:
     - date: 2026-10-13
       changes:
