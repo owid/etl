@@ -204,12 +204,15 @@ say white on Denim too, and the frame was styled that way; at 0.8 that is the WO
 reaches 3.74:1 there and white less), so bind whatever hex the SVG carries rather than a colour named
 here — the step measures it and this comment cannot.
 
-**Paint this frame with its own pass, not `/create-figma-chart`'s `restyle_static_import.js`.** That
-script is the right tool for a base-plus-tints chart and its font and anchor passes are the ones used
-here, but its family model has no place for a fill paired with a darker text variant, which is the
-whole point of the two light fills above. Its `reflowLegend` pass is also wrong for a legend like this
-one — it re-lays a row of runs from the leftmost, which collided them (doubled separators, overlapping
-names) where this step had already spaced them by measured advance.
+**Re-import with `/create-figma-chart`'s `restyle_static_import.js`, one job per frame with
+`inheritStyles: true` and `reflowLegend: false`, and `families: []`.** It binds every colour in the new
+render to the library style the frame's current chart carries, which covers the fill-plus-darker-text
+pairs above that the script's `families` model has no place for. Its report must come back with empty
+`leftAsImported` and `orphanedBindings`: anything listed there is a style to rebind by hand. Keep
+`reflowLegend` off: it re-lays a row of runs from the leftmost, which collides this step's legend runs
+(doubled separators, overlapping names) where the step already spaced them by measured advance. Desktop
+and mobile go in one call, since they share a page; it also replaces each frame's parked reference copy.
+The template text slots are not touched by it, so a copy change still means editing them in the frame.
 """
 
 import logging
@@ -1060,8 +1063,10 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
         f"{SHORT_COUNTRY_NAMES.get(country, country)} ({year})"
         for country, year in zip(tb["country"].tolist(), tb["year"].tolist())
     ]
+    # The ADVANCE, not the ink: a text node's box spans its side bearings too, so a column sized to
+    # the ink leaves the widest right-aligned label's box sticking past the frame margin.
     country_space_px = (
-        max(text_width_px(label, font_pt(layout, "country_font_px")) for label in country_labels) + COUNTRY_LABEL_PAD
+        max(text_advance_px(label, font_pt(layout, "country_font_px")) for label in country_labels) + COUNTRY_LABEL_PAD
     )
 
     plot_left_px = margin_px + country_space_px
@@ -1244,11 +1249,12 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
 
     if band_note is not None:
         assert note_top_px is not None
-        # `chart-note`, not `note`: the Figma pass drops the step's copies of the template's own text
+        # `chart__note`, not `note`: the Figma pass drops the step's copies of the template's own text
         # slots BY PREFIX, and `note` is one of them. On this frame the Note is not a duplicate of a
         # template slot — the frame has no Note slot, which is why it is drawn here — so a name that
-        # collides with that list would have it deleted on import, silently and only on mobile.
-        draw_note(fig, margin_px, note_top_px, band_note, template, "chart-note", fx, fy)
+        # collides with that list would have it deleted on import, silently and only on mobile. And
+        # `<subject>__<role>`, so the re-import can join it to its library style by name.
+        draw_note(fig, margin_px, note_top_px, band_note, template, "chart__note", fx, fy)
 
     # Clipping is swept in `export_frame`, on the way out, which is what lets the labels drawn
     # outside the axes box survive into the SVG whole.
