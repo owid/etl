@@ -15,6 +15,7 @@ dataset:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
   owners:
     - Fiona Spooner
+    - Lucas Rodés-Guirao
 tables:
   deaths_from_cardiovascular_diseases_vs_other:
     title: Mortality Database - Cardiovascular Diseases vs Other Causes

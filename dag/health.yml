@@ -134,8 +134,8 @@ steps:
         - data://garden/demography/2023-03-31/population
 
   # WHO Cardiovascular diseases deaths
-  data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
-    - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
+  data://grapher/cardiovascular_diseases/2026-10-13/deaths_from_cardiovascular_diseases_vs_other:
+    - data://garden/cardiovascular_diseases/2026-10-13/deaths_from_cardiovascular_diseases_vs_other:
         - data://garden/who/2026-10-13/mortality_database
   # Global Mental Health Countdown
   data://grapher/health/2024-03-21/gmh_countdown:
