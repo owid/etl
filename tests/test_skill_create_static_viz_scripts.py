@@ -149,6 +149,25 @@ def test_named_marks_ignore_what_paints_nothing_and_defs(tmp_path):
     assert strict.returncode == 0, strict.stdout
 
 
+def test_an_unnamed_raster_image_counts_as_a_mark(tmp_path):
+    # imshow / figimage emit <image>, which a designer styles like any other layer.
+    body = '<g id="image1"><image width="10" height="10" xlink:href="data:image/png;base64,AA=="/></g>'
+    stem = write_frame(tmp_path, body)
+    strict = run(VERIFY, stem, "--template", "horizontal", "--require-named-marks")
+    assert strict.returncode == 1 and "image1 <image>" in strict.stdout, strict.stdout
+
+
+def test_a_shared_gid_fails_only_when_required(tmp_path):
+    body = (
+        '<g id="series__same"><path d="M0 0h10" style="fill: none; stroke: #00295b"/></g>'
+        '<g id="series__same"><path d="M0 5h10" style="fill: none; stroke: #b13507"/></g>'
+    )
+    stem = write_frame(tmp_path, body)
+    assert run(VERIFY, stem, "--template", "horizontal").returncode == 0
+    strict = run(VERIFY, stem, "--template", "horizontal", "--require-named-marks")
+    assert strict.returncode == 1 and "series__same" in strict.stdout, strict.stdout
+
+
 def test_scaffold_carries_the_promotion_markers(sketch):
     source = (sketch / "sketch.py").read_text()
     assert source.count("paths = SketchPaths(__file__)") == 1

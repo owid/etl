@@ -63,8 +63,10 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
   furniture (gridlines, ticks, tick labels, spines, axis labels) by tick value wherever the step has
   not, which leaves only what the step draws itself, and those it must name. **Verify with
   `--require-named-marks`**, which fails on any painted mark under no `<subject>__<role>` gid and
-  names its matplotlib id (`text_7`), so the artist to fix is the one it lists. Pass the data layers
-  as well (`--expect-gid boys__median --expect-gid girls__median`): the naming check proves every mark
+  names its matplotlib id (`text_7`), so the artist to fix is the one it lists; it also fails when
+  two artists share a `<subject>__<role>` gid, since the re-import cannot tell them apart (a `gid=`
+  passed to `ax.bar` lands on every bar, so name each bar from the returned container). Pass the
+  data layers as well (`--expect-gid boys__median --expect-gid girls__median`): the naming check proves every mark
   has *a* name, the expected gids prove the data layers have the *right* one.
 - **Do not pass `bbox_inches="tight"`** when the frame must match a template — cropping to content
   changes the proportions, which is the whole thing the template fixes. `export_fig` already

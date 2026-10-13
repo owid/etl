@@ -13,7 +13,9 @@ plausible, and the problem only shows up once a designer opens the SVG:
   ``inheritStyles``) learns which library style each colour carries by joining nodes on their
   ``<subject>__<role>`` gid, so a gridline, spine or tick label drawn without one cannot be paired
   with the style a designer bound on the previous frame. Reported on every run; pass
-  ``--require-named-marks`` to make it a failure, which a new or refreshed step should
+  ``--require-named-marks`` to make it a failure, which a new or refreshed step should. That flag
+  also fails on a ``<subject>__<role>`` gid used by more than one node, since the re-import cannot
+  tell such marks apart
 - a frame that no longer matches the template it targets, because something reintroduced
   ``bbox_inches="tight"`` and cropped the canvas to its content. Checked on **both** the PNG and the
   SVG: the contract asks for two separate ``export_fig`` calls (the PNG opaque, the SVG transparent),
@@ -63,7 +65,7 @@ GENERATED_ID = re.compile(r"^(?:[A-Za-z][A-Za-z0-9.]*_\d+|m[0-9a-f]{8,}|[A-Za-z]
 # on. The template's own text slots are exempt: the import drops the step's copies of them by prefix.
 DELIBERATE_GID = re.compile(r"__")
 SLOT_ID = re.compile(r"^(?:title|subtitle|note|data-source|tagline|license)(?:-|$)")
-PAINTABLE = {"path", "rect", "circle", "ellipse", "line", "polyline", "polygon", "text", "use"}
+PAINTABLE = {"path", "rect", "circle", "ellipse", "line", "polyline", "polygon", "text", "use", "image"}
 STYLE_DECL = re.compile(r"\s*([a-z-]+)\s*:\s*([^;]+)")
 
 # A <use> pointing at one of those outlined-glyph defs means text was saved as curves. A <use>
@@ -231,6 +233,15 @@ def check_svg(
                 f"{', ...' if len(unnamed) > 6 else ''}). Name each artist, furniture included "
                 "(gridlines, spines, tick labels): Figma's re-import pairs a mark with its previous style "
                 "by that name, so an unnamed one loses any style a designer bound on it."
+            )
+        all_ids = re.findall(r'\bid="([^"]+)"', svg)
+        repeated = sorted({i for i in all_ids if DELIBERATE_GID.search(i) and all_ids.count(i) > 1})
+        if repeated:
+            failures.append(
+                f"{len(repeated)} <subject>__<role> gid(s) are used by more than one node "
+                f"({', '.join(repeated[:6])}{', ...' if len(repeated) > 6 else ''}). Give each artist "
+                "its own name: the re-import pairs marks by name, so marks that share one cannot be told apart. "
+                "A gid= passed to ax.bar lands on every bar; set one per bar from the returned container."
             )
 
     if template is not None:
