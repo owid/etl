@@ -14,8 +14,9 @@ Each export opens with five metadata lines and a blank line. The fifth line carr
 codes that define the cause group; we keep it as `icd10_codes`, so the definition travels with
 the data instead of being typed by hand.
 
-Raw exports are cached under CACHE_DIR, so re-running after a parsing fix does not re-download
-roughly 700 MB. Delete that folder to force fresh downloads.
+Raw exports are cached under CACHE_DIR, in a folder named after this snapshot's version, so re-running
+after a parsing fix does not re-download roughly 700 MB, and a later version never reuses an older
+release's files. Delete the folder to force fresh downloads.
 """
 
 import base64
@@ -40,9 +41,9 @@ API = "https://apps.who.int/data/mortality/api/EN"
 # The export endpoint takes a base64-encoded JSON query. An empty query returns the full dataset
 # for the indicator; naming filters in it makes the server return a 500.
 EXPORT_QUERY = base64.b64encode(json.dumps({"dataFilters": [], "divisionFactors": [], "query": []}).encode()).decode()
-# The endpoint answers this browser-like User-Agent; a plain one has not been tested.
-HEADERS = {"User-Agent": "Mozilla/5.0 owid-etl"}
-CACHE = CACHE_DIR / "who_mortality_database"
+# A browser-like User-Agent, left untagged: WHO is a third-party host, not OWID infrastructure.
+HEADERS = {"User-Agent": "Mozilla/5.0"}
+CACHE = CACHE_DIR / "who_mortality_database" / SNAPSHOT_VERSION
 N_PARALLEL_DOWNLOADS = 4
 
 # WHO's label for each cause group, and its indicator code on the platform. Labels are kept as WHO
