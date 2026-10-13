@@ -13,6 +13,9 @@ noncommunicable diseases, injuries, and ill-defined diseases. The groups ingeste
 below them and together account for every registered death exactly once, which `_validate_cause_partition`
 checks. We ingest none of the four top-level groups themselves, except "Ill-defined diseases", which
 has no children, so `parent_cause` can name a group that is not itself a row.
+
+One correction is applied to WHO's numbers: `correct_unintentional_injuries` removes the accidental
+poisonings that the February 2026 release counts twice under Unintentional injuries (details there).
 """
 
 from collections import Counter
@@ -99,10 +102,23 @@ AGE_GROUP_RENAMES = {
 # The build fails only when fewer than PARTITION_MIN_SHARE_CONSISTENT of the cells agree: an error in our own
 # processing breaks essentially every cell, whereas WHO's per-cause tables can be out of step with each other
 # for some country-years, which is theirs to fix and ours to report (see _validate_cause_partition).
-# NOTE: WHO's February 2026 release disagrees on 1.5% of cells (the 2025 release: 0.2%), almost all in
-# 2016-2024, where the Unintentional injuries table was refreshed but All Causes was not. Re-check next update.
 PARTITION_TOLERANCE = 1e-6
 PARTITION_MIN_SHARE_CONSISTENT = 0.95
+# After correct_unintentional_injuries has run, only WHO's small pre-existing residuals should remain.
+PARTITION_MIN_SHARE_AFTER_CORRECTION = 0.99
+
+# NOTE: WHO's February 2026 release disagrees on 1.5% of cells (the 2025 release: 0.2%), almost all in
+# 2016-2024. All Causes matches national statistics offices to the unit; the group that is off is
+# Unintentional injuries, which counts the accidental poisonings X41, X42, X44 and X45 that its own
+# definition excludes and that Neuropsychiatric conditions already contains. correct_unintentional_injuries
+# removes them where the country-year's headline cell overshoots by more than MATERIAL_EXCESS. The threshold
+# separates the two kinds of gap the data holds: WHO's pre-existing residuals (Japan 2022-23, Brazil 2021-22,
+# Thailand 2023, Turkiye 2013-17; present in the 2025 release too, and not explained by the Unintentional
+# injuries change) all sit at or below 0.02% of all deaths, while every double count that could be checked
+# against the 2025 release sits at or above 0.05%. Re-check next update: if WHO has fixed its table, the
+# correction finds nothing to do and can be deleted.
+CORRECTED_CAUSE = "Unintentional injuries"
+MATERIAL_EXCESS = 0.0005
 
 
 def run() -> None:
@@ -124,12 +140,16 @@ def run() -> None:
     tb_causes = build_causes_table(tb)
     tb = tb.drop(columns=["icd10_codes"])
 
-    # Step 4: Checks on the processed data.
+    # Step 4: Checks on the processed data, then the one correction to WHO's numbers, then the check again.
     _validate_country_coverage(tb)
     _validate_temporal_patterns(tb)
     _validate_cause_specific_patterns(tb)
     _validate_data_completeness(tb)
-    _validate_cause_partition(tb, tb_causes)
+    _validate_cause_partition(tb, tb_causes, min_share_consistent=PARTITION_MIN_SHARE_CONSISTENT, stage="as published")
+    tb = correct_unintentional_injuries(tb, tb_causes)
+    _validate_cause_partition(
+        tb, tb_causes, min_share_consistent=PARTITION_MIN_SHARE_AFTER_CORRECTION, stage="after correction"
+    )
 
     tb = tb.format(["country", "year", "sex", "age_group", "cause"], short_name="mortality_database")
     tb_causes = tb_causes.format(["cause"], short_name="causes")
@@ -346,35 +366,35 @@ def _validate_data_completeness(tb: Table) -> None:
             )
 
 
-def _validate_cause_partition(tb: Table, tb_causes: Table) -> None:
-    """The cause groups that partition All Causes must add up to it.
+def _partition_groups(tb_causes: Table) -> list[str]:
+    """The ingested groups that partition All Causes: those whose parent is All Causes or a group we do not ingest.
 
-    The partition is every ingested group whose parent is All Causes or a group we do not ingest; a
-    group whose parent is itself ingested (a cancer type under Malignant neoplasms, say) is a drill-down
-    and must not be counted twice. Checked on death counts per country, year, sex and age group, on cells
-    where every partition group WHO ever reports for that sex and age band has a row (it reports Maternal
-    conditions for females only, for instance). Cells of unknown age are skipped: WHO allocates those
-    deaths inconsistently.
-
-    An error in our own processing (a dropped group, a drill-down counted as a partition group) breaks
-    the sum on essentially every cell, so the build fails when fewer than PARTITION_MIN_SHARE_CONSISTENT
-    of the cells agree. A small set of disagreeing cells means WHO's per-cause tables are out of step with
-    each other for some country-years; those are logged so the update's report can list them.
+    A group whose parent is itself ingested (a cancer type under Malignant neoplasms, say) is a drill-down
+    and must not be counted twice.
     """
     ingested = set(tb_causes["cause"])
-    partition = [
+    return [
         cause
         for cause in ingested
         if cause != "All Causes" and (CAUSE_TREE[cause][1] == "All Causes" or CAUSE_TREE[cause][1] not in ingested)
     ]
-    keys = ["country", "year", "sex", "age_group"]
 
-    total = tb.loc[tb["cause"] == "All Causes", keys + ["number"]].rename(columns={"number": "total"})
-    parts = tb[tb["cause"].isin(partition)]
+
+def _partition_cells(tb: Table, tb_causes: Table) -> Table:
+    """Per country, year, sex and age band: All Causes, the sum of the partition groups, and the gap between them.
+
+    Keeps only cells where every partition group WHO ever reports for that sex and age band has a row (it
+    reports Maternal conditions for females only, for instance), with a positive All Causes count and a
+    known age band, because WHO allocates deaths of unknown age inconsistently across groups.
+    """
+    keys = ["country", "year", "sex", "age_group"]
+    total = tb.loc[tb["cause"] == "All Causes", keys + ["number", "death_rate_per_100_000_population"]].rename(
+        columns={"number": "total", "death_rate_per_100_000_population": "total_rate"}
+    )
+    parts = tb[tb["cause"].isin(_partition_groups(tb_causes))]
     summary = parts.groupby(keys, observed=True).agg(
         parts=("number", lambda values: values.sum(min_count=1)), n_groups=("cause", "nunique")
     )
-    # The groups a cell must have: those WHO ever reports for its sex and age band.
     required = (
         parts[["sex", "age_group", "cause"]]
         .drop_duplicates()
@@ -383,28 +403,113 @@ def _validate_cause_partition(tb: Table, tb_causes: Table) -> None:
     )
     cells = pr.merge(total, summary.reset_index(), on=keys)
     cells = pr.merge(cells, required.reset_index(), on=["sex", "age_group"])
-
-    complete = cells[
+    cells = cells[
         (cells["n_groups"] == cells["n_required"])
         & (cells["total"] > 0)
         & cells["parts"].notna()
         & (cells["age_group"] != "Unknown age")
-    ]
-    deviation = (complete["parts"].astype(float) / complete["total"].astype(float) - 1).abs()
-    off = complete[(deviation > PARTITION_TOLERANCE).fillna(False)]
-    share_consistent = 1 - len(off) / len(complete)
+    ].copy()
+    cells["excess"] = cells["parts"].astype(float) - cells["total"].astype(float)
+    cells["deviation"] = (cells["excess"] / cells["total"].astype(float)).abs()
+    return cells
 
-    assert share_consistent >= PARTITION_MIN_SHARE_CONSISTENT, (
-        f"The {len(partition)} partition groups add up to All Causes on only {share_consistent:.1%} of "
-        f"{len(complete):,} cells, which points at our processing rather than the source"
+
+def _validate_cause_partition(tb: Table, tb_causes: Table, min_share_consistent: float, stage: str) -> None:
+    """The cause groups that partition All Causes must add up to it on (almost) every cell.
+
+    An error in our own processing (a dropped group, a drill-down counted as a partition group) breaks
+    the sum on essentially every cell, so the build fails when fewer than `min_share_consistent` of the
+    cells agree. A small set of disagreeing cells means WHO's per-cause tables are out of step with each
+    other for some country-years; those are logged so the update's report can list them.
+    """
+    cells = _partition_cells(tb, tb_causes)
+    off = cells[(cells["deviation"] > PARTITION_TOLERANCE).fillna(False)]
+    share_consistent = 1 - len(off) / len(cells)
+
+    assert share_consistent >= min_share_consistent, (
+        f"{stage}: the partition groups add up to All Causes on only {share_consistent:.1%} of {len(cells):,} cells, "
+        "which points at our processing rather than the source"
     )
     if len(off):
         country_years = Counter(zip(off["country"].astype(str), off["year"].astype(int)))
         log.warning(
-            "Cause groups do not add up to All Causes on some cells: WHO's per-cause tables disagree for these country-years",
+            "Cause groups do not add up to All Causes on some cells",
+            stage=stage,
             cells=len(off),
-            share=f"{len(off) / len(complete):.2%}",
+            share=f"{len(off) / len(cells):.2%}",
             country_years=len(country_years),
             worst=[f"{country} {year}: {n} cells" for (country, year), n in country_years.most_common(8)],
         )
-    log.info("cause_partition", partition_groups=len(partition), cells_checked=len(complete), cells_off=len(off))
+    log.info("cause_partition", stage=stage, cells_checked=len(cells), cells_off=len(off))
+
+
+def correct_unintentional_injuries(tb: Table, tb_causes: Table) -> Table:
+    """Remove the accidental poisonings that WHO's February 2026 release counts twice under Unintentional injuries.
+
+    In that release, for some country-years, Unintentional injuries includes the accidental drug and alcohol
+    poisonings X41, X42, X44 and X45 that its own definition excludes and that Neuropsychiatric conditions
+    already holds, so the partition groups add up to more than All Causes. All Causes itself matches the
+    national statistics offices to the unit (checked for Canada, Australia and the United Kingdom), and the
+    other groups were revised consistently with it, so the gap is the double count.
+
+    A country-year is affected when its both-sexes, all-ages cell overshoots All Causes by more than
+    MATERIAL_EXCESS; WHO's small pre-existing residuals (Japan, Brazil, Thailand, Turkiye) stay below it and are
+    left alone. In an affected country-year, every known-age cell that overshoots by at least one death gets
+    Unintentional injuries = All Causes minus the other groups, its share of deaths recomputed from that, and
+    its crude death rate from WHO's own population, recovered as All Causes deaths / All Causes death rate.
+    The age-standardized rate cannot be rebuilt from the published numbers and is left missing.
+    """
+    keys = ["country", "year", "sex", "age_group"]
+    cells = _partition_cells(tb, tb_causes)
+    headline = cells[(cells["sex"] == "Both sexes") & (cells["age_group"] == "all ages")]
+    affected = headline.loc[(headline["excess"] > 0) & (headline["deviation"] > MATERIAL_EXCESS), ["country", "year"]]
+    if affected.empty:
+        log.info("unintentional_injuries_correction", country_years=0, cells=0)
+        return tb
+
+    fix = pr.merge(cells, affected, on=["country", "year"])
+    fix = fix.loc[fix["excess"] >= 1, keys + ["total", "total_rate", "excess"]]
+
+    tb = pr.merge(tb, fix, on=keys, how="left")
+    target = (tb["cause"] == CORRECTED_CAUSE) & tb["excess"].notna()
+    corrected = tb.loc[target, "number"].astype(float) - tb.loc[target, "excess"]
+    # A cell whose Unintentional injuries count is smaller than the gap does not fit the mechanism: leave it.
+    misfit = corrected < 0
+    if misfit.any():
+        log.warning("unintentional_injuries_correction: cells left as published", cells=int(misfit.sum()))
+        target[target[target].index[misfit]] = False
+        corrected = corrected[~misfit]
+
+    total = tb.loc[target, "total"].astype(float)
+    population = (total / tb.loc[target, "total_rate"].astype(float) * 100_000).where(tb.loc[target, "total_rate"] > 0)
+    tb.loc[target, "number"] = corrected.round().astype(tb["number"].dtype)
+    tb.loc[target, "percentage_of_cause_specific_deaths_out_of_total_deaths"] = corrected / total * 100
+    tb.loc[target, "death_rate_per_100_000_population"] = corrected / population * 100_000
+    tb.loc[target, "age_standardized_death_rate_per_100_000_standard_population"] = np.nan
+
+    # Rows of the group in affected country-years that the check could not see (incomplete or unknown-age cells).
+    in_affected = pr.merge(tb.loc[tb["cause"] == CORRECTED_CAUSE, keys], affected, on=["country", "year"])
+    log.warning(
+        "unintentional_injuries_correction",
+        country_years=len(affected),
+        cells_corrected=int(target.sum()),
+        deaths_removed=int(tb.loc[target, "excess"].sum()),
+        rows_in_affected_country_years_left_as_published=len(in_affected) - int(target.sum()),
+        example=_describe_correction(tb, target, "Canada", 2021),
+    )
+    return tb.drop(columns=["total", "total_rate", "excess"])
+
+
+def _describe_correction(tb: Table, target: pd.Series, country: str, year: int) -> str:
+    """One corrected headline cell, for the log."""
+    row = tb[
+        target
+        & (tb["country"] == country)
+        & (tb["year"] == year)
+        & (tb["sex"] == "Both sexes")
+        & (tb["age_group"] == "all ages")
+    ]
+    if row.empty:
+        return f"{country} {year}: not corrected"
+    r = row.iloc[0]
+    return f"{country} {year}: {r['number'] + r['excess']:,.0f} -> {r['number']:,.0f} deaths (All Causes {r['total']:,.0f})"
