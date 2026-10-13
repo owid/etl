@@ -13,9 +13,6 @@ MULTIDIM_CONFIG = {
             "binningStrategy": "manual",
             "baseColorScheme": "YlGnBu",
             "customNumericValues": [0, 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 0],
-            # "Not applicable" is the bin inapplicableEntityNames (set per view below) renders in.
-            "customCategoryColors": {"Not applicable": "#AF1629"},
-            "customCategoryLabels": {"Not applicable": "Selected country"},
         },
     },
 }
@@ -39,13 +36,6 @@ def run() -> None:
         common_view_config=MULTIDIM_CONFIG,
     )
     c.sort_choices({"country_select": lambda x: sorted(x)})
-
-    # A country has no meaningful "migrants" value for itself (e.g. Afghans who emigrated to
-    # Afghanistan), so mark that entity as inapplicable instead of faking a data point for it.
-    for view in c.views:
-        # NOTE: don't mutate view.config in place — views share the same common_view_config
-        # dict, so an in-place write would leak the last view's value onto every other view.
-        view.config = {**(view.config or {}), "inapplicableEntityNames": [view.dimensions["country_select"]]}
 
     # Save & upload
     c.save()

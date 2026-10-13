@@ -46,8 +46,19 @@ def run() -> None:
     tb = tb.sort_values(by=["country_select"], ascending=True)
 
     # No row is added for country == country_select: that flow is inapplicable by construction
-    # (e.g. "Afghans who emigrated to Afghanistan"), and the chart/explorer steps mark the
-    # country_select entity as inapplicable on the map rather than faking a data point for it.
+    # (e.g. "Afghans who emigrated to Afghanistan"). Mark the country_select entity as
+    # inapplicable on the indicator itself (rather than per chart/explorer view), so every
+    # view built from this indicator inherits it. Jinja renders per dimension combination
+    # when the table is pivoted to wide format below.
+    tb["migrants"].metadata.presentation.grapher_config = {
+        "inapplicableEntityNames": ["<< country_select >>"],
+        "map": {
+            "colorScale": {
+                "customCategoryLabels": {"Not applicable": "Selected country"},
+                "customCategoryColors": {"Selected country": "#A81527"},
+            },
+        },
+    }
 
     tb = tb.format(["country", "country_select", "metric", "gender", "year"])
 
