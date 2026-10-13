@@ -144,7 +144,13 @@ def add_historical_polio(tb: Table) -> Table:
     tb_pol3 = tb_old[tb_old["antigen"] == "POL3"]
     assert len(tb_pol3) > 0, "No POL3 rows found in the previous garden version -- can't freeze them in."
     assert tb_pol3["year"].max() == 2024, "Expected the frozen POL3 series to end in 2024 -- re-check."
+
+    # remove additional 2025 origin (from polio dataset) from indicators
+    value_cols = ["coverage", "vaccinated", "unvaccinated"]
+    origins = {col: tb[col].metadata.origins for col in value_cols}
     tb = pr.concat([tb, tb_pol3], short_name="vaccination_coverage")
+    for col in value_cols:
+        tb[col].metadata.origins = origins[col]
     return tb
 
 
