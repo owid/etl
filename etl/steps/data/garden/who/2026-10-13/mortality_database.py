@@ -9,10 +9,12 @@ Two tables come out:
   of the data, so they live here rather than in the fact table's key.
 
 WHO's cause tree has four top-level groups: communicable/maternal/perinatal/nutritional conditions,
-noncommunicable diseases, injuries, and ill-defined diseases. The groups ingested here sit one level
-below them and together account for every registered death exactly once, which `_validate_cause_partition`
-checks. We ingest none of the four top-level groups themselves, except "Ill-defined diseases", which
-has no children, so `parent_cause` can name a group that is not itself a row.
+noncommunicable diseases, injuries, and ill-defined diseases. The 23 groups one level below them together
+account for every registered death exactly once, which `_validate_cause_partition` checks. Below that tier
+we also ingest drill-downs (the vaccine-preventable diseases inside Infectious and parasitic diseases);
+`causes` records where each sits, and the partition check leaves them out. We ingest none of the four
+top-level groups themselves, except "Ill-defined diseases", which has no children, so `parent_cause` can
+name a group that is not itself a row.
 
 One correction is applied to WHO's numbers: `correct_unintentional_injuries` removes the accidental
 poisonings that the February 2026 release counts twice under Unintentional injuries (details there).
@@ -36,6 +38,11 @@ paths = PathFinder(__file__)
 COMMUNICABLE = "Communicable, maternal, perinatal and nutritional conditions"
 NONCOMMUNICABLE = "Noncommunicable diseases"
 INJURIES = "Injuries"
+INFECTIOUS = "Infectious and parasitic diseases"
+CHILDHOOD_CLUSTER = "Childhood-cluster diseases"
+
+# WHO's 23 groups that tile All Causes. Fold-ins add drill-downs inside them, never new partition groups.
+N_PARTITION_GROUPS = 23
 
 # Our label for each cause group -> (depth in WHO's cause tree, parent group).
 # Depth 0 is All Causes, depth 1 WHO's four top-level groups, depth 2 the groups beneath them.
@@ -64,6 +71,23 @@ CAUSE_TREE: dict[str, tuple[int, str | None]] = {
     "Intentional injuries": (2, INJURIES),
     "Ill-defined injuries": (2, INJURIES),
     "Ill-defined diseases": (1, "All Causes"),
+    # Drill-downs inside Infectious and parasitic diseases (formerly the vaccine_preventable dataset).
+    "Pertussis": (4, CHILDHOOD_CLUSTER),
+    "Poliomyelitis": (4, CHILDHOOD_CLUSTER),
+    "Diphtheria": (4, CHILDHOOD_CLUSTER),
+    "Measles": (4, CHILDHOOD_CLUSTER),
+    "Tetanus": (4, CHILDHOOD_CLUSTER),
+    "Hepatitis B": (3, INFECTIOUS),
+    "Japanese encephalitis": (3, INFECTIOUS),
+}
+
+# Groups that appear only as parents: WHO's top-level groups, and the nodes between an ingested drill-down
+# and its ingested ancestor. _ancestors walks through them.
+UNINGESTED_GROUPS: dict[str, tuple[int, str | None]] = {
+    COMMUNICABLE: (1, "All Causes"),
+    NONCOMMUNICABLE: (1, "All Causes"),
+    INJURIES: (1, "All Causes"),
+    CHILDHOOD_CLUSTER: (3, INFECTIOUS),
 }
 
 # WHO labels we change for charts. The first says what the group contains; the second is shorter.
@@ -369,18 +393,33 @@ def _validate_data_completeness(tb: Table) -> None:
             )
 
 
-def _partition_groups(tb_causes: Table) -> list[str]:
-    """The ingested groups that partition All Causes: those whose parent is All Causes or a group we do not ingest.
+def _ancestors(cause: str) -> list[str]:
+    """The parents above a cause, nearest first, ending with All Causes."""
+    tree = {**UNINGESTED_GROUPS, **CAUSE_TREE}
+    chain = []
+    parent = tree[cause][1]
+    while parent is not None:
+        chain.append(parent)
+        parent = tree[parent][1]
+    return chain
 
-    A group whose parent is itself ingested (a cancer type under Malignant neoplasms, say) is a drill-down
-    and must not be counted twice.
+
+def _partition_groups(tb_causes: Table) -> list[str]:
+    """The ingested groups that partition All Causes: those with no ingested ancestor below All Causes.
+
+    A group with an ingested ancestor (measles under Infectious and parasitic diseases, a cancer type under
+    Malignant neoplasms) is a drill-down: its deaths are already counted in that ancestor.
     """
     ingested = set(tb_causes["cause"])
-    return [
+    groups = sorted(
         cause
         for cause in ingested
-        if cause != "All Causes" and (CAUSE_TREE[cause][1] == "All Causes" or CAUSE_TREE[cause][1] not in ingested)
-    ]
+        if cause != "All Causes" and not (set(_ancestors(cause)) - {"All Causes"}) & ingested
+    )
+    assert len(groups) == N_PARTITION_GROUPS, (
+        f"Expected {N_PARTITION_GROUPS} partition groups, found {len(groups)}: {groups}"
+    )
+    return groups
 
 
 def _partition_cells(tb: Table, tb_causes: Table) -> Table:

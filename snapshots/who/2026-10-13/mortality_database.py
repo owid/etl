@@ -7,8 +7,9 @@ version, because those two derived indicators only exist there.
 
 The platform's download button calls an export endpoint, one cause group per request. This
 script calls that endpoint for every cause group in CAUSES and stacks the results into one
-table. The 24 groups here are the tier of WHO's cause tree that partitions all registered
-deaths: 23 groups that tile "All Causes", plus All Causes itself.
+table. The first 24 groups in CAUSES are the tier of WHO's cause tree that partitions all registered
+deaths: 23 groups that tile "All Causes", plus All Causes itself. The rest are drill-downs inside one
+of those groups; the garden step's `causes` table records where each sits in the tree.
 
 Each export opens with five metadata lines and a blank line. The fifth line carries the ICD-10
 codes that define the cause group; we keep it as `icd10_codes`, so the definition travels with
@@ -73,6 +74,15 @@ CAUSES = {
     "Intentional injuries": "CG1560",
     "Ill-defined injuries/accidents": "CG1605",
     "Ill-defined diseases": "CG1610",
+    # Drill-downs inside "Infectious and parasitic diseases", formerly the mortality_database_vaccine_preventable
+    # dataset. The first five are the children of WHO's "Childhood-cluster diseases" (CG0110), which is not fetched.
+    "Pertussis": "CG0120",
+    "Poliomyelitis": "CG0130",
+    "Diphtheria": "CG0140",
+    "Measles": "CG0150",
+    "Tetanus": "CG0160",
+    "Hepatitis B": "CG0180",
+    "Japanese encephalitis": "CG0300",
 }
 
 # Five metadata lines and a blank line precede the header row.
