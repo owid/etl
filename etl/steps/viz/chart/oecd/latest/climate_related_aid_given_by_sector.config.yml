@@ -1,0 +1,96 @@
+chart_config_id: 01a13617-ed68-75db-981b-e1ceffce84a5
+grapher_schema: "011"
+topic_tags:
+  - "Foreign Aid"
+  - "Climate Change"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_transport_and_storage"
+          display:
+            name: "Transport and storage"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_energy"
+          display:
+            name: "Energy"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_other_multisector"
+          display:
+            name: "Other multisector"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_general_environment_protection"
+          display:
+            name: "General environment protection"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_agriculture__forestry__fishing"
+          display:
+            name: "Agriculture, forestry, fishing"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_government_and_civil_society"
+          display:
+            name: "Government and civil society"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_water_supply_and_sanitation"
+          display:
+            name: "Water supply and sanitation"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_health"
+          display:
+            name: "Health"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_population_policies_programmes_and_reproductive_health"
+          display:
+            name: "Population policies and reproductive health"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_other_social_infrastructure_and_services"
+          display:
+            name: "Other social infrastructure and services"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_industry__mining__construction"
+          display:
+            name: "Industry, mining, construction"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_education"
+          display:
+            name: "Education"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_banking_and_financial_services"
+          display:
+            name: "Banking and financial services"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_emergency_response"
+          display:
+            name: "Emergency response"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_business_and_other_services"
+          display:
+            name: "Business and other services"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_trade_policies_and_regulations"
+          display:
+            name: "Trade policies and regulations"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_reconstruction_relief_and_rehabilitation"
+          display:
+            name: "Reconstruction relief and rehabilitation"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_communications"
+          display:
+            name: "Communications"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_development_food_assistance"
+          display:
+            name: "Development food assistance"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_disaster_prevention_and_preparedness"
+          display:
+            name: "Disaster prevention and preparedness"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_tourism"
+          display:
+            name: "Tourism"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_other_commodity_assistance"
+          display:
+            name: "Other commodity assistance"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_action_relating_to_debt"
+          display:
+            name: "Action relating to debt"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_unallocated__unspecified"
+          display:
+            name: "Unallocated or unspecified"
+        - catalogPath: "climate_related_oda_by_donor_and_sector#climate_related__sector_other"
+          display:
+            name: "Other"
+    config:
+      title: "Development aid given to climate-related projects, by sector"
+      subtitle: "Bilateral aid committed by members of the OECD Development Assistance Committee (DAC) to projects that target climate change mitigation, adaptation, or both, by the sector the project supports. Adjusted for inflation."
+      note: "Projects that target climate as a secondary objective are counted at their full value. \"Other\" includes general budget support and donors' administrative costs."
+      tab: "chart"
+      hasMapTab: false
+      chartTypes:
+        - "DiscreteBar"
+      selectedEntityNames:
+        - "DAC members"
+      addCountryMode: "change-country"

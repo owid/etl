@@ -49,7 +49,9 @@ definitions:
   key_commitments: |-
     The data is reported as commitments. This refers to aid that has been pledged, and is different from disbursements, which is aid ultimately given. The Rio markers describe the objectives of projects when they are designed, so the OECD applies them to commitments. A multi-year project is counted in full in the year it is committed, so values can change a lot from one year to the next.
   key_adaptation_marker: |-
-    The marker for climate change adaptation was introduced in 2009 and applies to aid from 2010 onward. Before then, the climate marker also covered some adaptation projects, so climate-related aid can only be split into mitigation and adaptation from 2010.
+    The marker for climate change adaptation was introduced in 2009 and applies to aid from 2010 onward. Before then, the climate marker also covered some adaptation projects, so climate-related aid can only be split into mitigation and adaptation from 2010, when this data starts.
+  key_sector: |-
+    The sector is the area of the recipient's economy or society that a project intends to support, following the OECD's classification. Climate-related projects can be in any sector: for example, a project to build roads that withstand floods is in transport and storage.
   key_regional: |-
     Entities named "regional (OECD)", such as "Africa, regional (OECD)", show aid to a region as a whole, for example programs that cover several countries, which donors do not assign to a single country. Entities named "unspecified (OECD)", such as "Developing countries, unspecified (OECD)", show aid not assigned to any country within a broader group. This aid is already included in the totals of the corresponding regions, for example in Africa (OECD).
   key_not_screened: |-
@@ -71,6 +73,16 @@ definitions:
     We calculated aggregates for groups of donors (such as DAC countries or G7 countries) by summing the indicator across the donors that the OECD includes in each group.
   processing_recipient_groups: |-
     We calculated aggregates for groups of recipients (such as regions or income groups) by summing the indicator across the recipients that the OECD currently includes in each group. For income groups, this applies the most recent classification to all years.
+  processing_start_year: |-
+    We show this data from 2010, when the OECD started applying the marker for climate change adaptation, so that it covers the same years as climate-related aid.
+  processing_sector: |-
+    We assigned each project to its sector from its purpose code, following the OECD's sector classification.
+  processing_share_sector: |-
+    We calculated this indicator by dividing climate-related ODA in the sector by bilateral allocable ODA in the same sector, expressed as a percentage.
+  processing_share_of_all_sectors: |-
+    We calculated this indicator by dividing climate-related ODA in the sector by climate-related ODA in all sectors, expressed as a percentage.
+  processing_per_capita: |-
+    We calculated this indicator by dividing climate-related ODA received by the population of the recipient. We only calculated it for countries, not for groups of recipients.
 
 dataset:
   update_period_days: 365
@@ -93,7 +105,7 @@ tables:
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_donor_groups}"
+        description_processing: "{definitions.processing_start_year}\n\n{definitions.processing_donor_groups}"
         display:
           name: "Total bilateral ODA by donor"
           numDecimalPlaces: 0
@@ -111,7 +123,7 @@ tables:
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_donor_groups}"
+        description_processing: "{definitions.processing_start_year}\n\n{definitions.processing_donor_groups}"
         display:
           name: "Bilateral allocable ODA by donor"
           numDecimalPlaces: 0
@@ -131,7 +143,7 @@ tables:
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_outside_rio_markers}\n\n{definitions.processing_donor_groups}"
+        description_processing: "{definitions.processing_outside_rio_markers}\n\n{definitions.processing_start_year}\n\n{definitions.processing_donor_groups}"
         display:
           name: "Bilateral ODA outside the scope of the Rio markers, by donor"
           numDecimalPlaces: 0
@@ -369,7 +381,7 @@ tables:
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_recipient_groups}"
+        description_processing: "{definitions.processing_start_year}\n\n{definitions.processing_recipient_groups}"
         display:
           name: "Total bilateral ODA by recipient"
           numDecimalPlaces: 0
@@ -388,7 +400,7 @@ tables:
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
         processing_level: major
-        description_processing: "{definitions.processing_recipient_groups}"
+        description_processing: "{definitions.processing_start_year}\n\n{definitions.processing_recipient_groups}"
         display:
           name: "Bilateral allocable ODA by recipient"
           numDecimalPlaces: 0
@@ -465,3 +477,160 @@ tables:
           numDecimalPlaces: 1
           tolerance: 0
           entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
+      climate_related_per_capita:
+        title: "Climate-related ODA per person by recipient"
+        unit: "constant {definitions.inflation_year} US$ per person"
+        short_unit: "$"
+        description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both, divided by the population of the recipient country. {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_bilateral_allocable}"
+          - "{definitions.key_rio_markers}"
+          - "{definitions.key_climate_markers}"
+          - "{definitions.key_overlap}"
+          - "{definitions.key_upper_bound}"
+          - "{definitions.key_commitments}"
+          - "{definitions.key_adaptation_marker}"
+          - "{definitions.key_not_screened}"
+          - "{definitions.key_constant_usd}"
+        processing_level: major
+        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_per_capita}"
+        display:
+          name: "Climate-related ODA per person by recipient"
+          numDecimalPlaces: 2
+          tolerance: 0
+
+  climate_related_oda_by_donor_and_sector:
+    variables:
+      oda_bilateral_allocable:
+        title: "Bilateral allocable ODA by donor - <<sector>>"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "{definitions.short_bilateral_allocable} This is the aid in the sector \"<<sector>>\". {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_bilateral_allocable}"
+          - "{definitions.key_sector}"
+          - "{definitions.key_commitments}"
+          - "{definitions.key_constant_usd}"
+        processing_level: major
+        description_processing: "{definitions.processing_start_year}\n\n{definitions.processing_sector}\n\n{definitions.processing_donor_groups}"
+        presentation:
+          title_variant: "<<sector>>"
+        display:
+          name: "Bilateral allocable ODA by donor - <<sector>>"
+          numDecimalPlaces: 0
+          tolerance: 0
+          entityAnnotationsMap: "{definitions.entity_annotations_donors}"
+      climate_related:
+        title: "Climate-related ODA by donor - <<sector>>"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "Bilateral allocable [ODA](#dod:oda) in the sector \"<<sector>>\" that targets climate change mitigation, adaptation, or both. {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_key: &key_sector_climate
+          - "{definitions.key_oda}"
+          - "{definitions.key_bilateral_allocable}"
+          - "{definitions.key_sector}"
+          - "{definitions.key_rio_markers}"
+          - "{definitions.key_climate_markers}"
+          - "{definitions.key_overlap}"
+          - "{definitions.key_upper_bound}"
+          - "{definitions.key_commitments}"
+          - "{definitions.key_adaptation_marker}"
+          - "{definitions.key_not_screened}"
+          - "{definitions.key_constant_usd}"
+        processing_level: major
+        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_sector}\n\n{definitions.processing_donor_groups}"
+        presentation:
+          title_variant: "<<sector>>"
+        display:
+          name: "Climate-related ODA by donor - <<sector>>"
+          numDecimalPlaces: 0
+          tolerance: 0
+          entityAnnotationsMap: "{definitions.entity_annotations_donors}"
+      mitigation_only:
+        title: "Climate-related ODA by donor - <<sector>> - Mitigation only"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "Climate-related [ODA](#dod:oda) in the sector \"<<sector>>\" that targets climate change mitigation, but not adaptation. {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_key: *key_sector_climate
+        processing_level: major
+        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_sector}\n\n{definitions.processing_donor_groups}"
+        presentation:
+          title_variant: "<<sector>> - Mitigation only"
+        display:
+          name: "Climate-related ODA by donor - <<sector>> - Mitigation only"
+          numDecimalPlaces: 0
+          tolerance: 0
+          entityAnnotationsMap: "{definitions.entity_annotations_donors}"
+      adaptation_only:
+        title: "Climate-related ODA by donor - <<sector>> - Adaptation only"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "Climate-related [ODA](#dod:oda) in the sector \"<<sector>>\" that targets climate change adaptation, but not mitigation. {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_key: *key_sector_climate
+        processing_level: major
+        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_sector}\n\n{definitions.processing_donor_groups}"
+        presentation:
+          title_variant: "<<sector>> - Adaptation only"
+        display:
+          name: "Climate-related ODA by donor - <<sector>> - Adaptation only"
+          numDecimalPlaces: 0
+          tolerance: 0
+          entityAnnotationsMap: "{definitions.entity_annotations_donors}"
+      mitigation_and_adaptation:
+        title: "Climate-related ODA by donor - <<sector>> - Mitigation and adaptation"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "Climate-related [ODA](#dod:oda) in the sector \"<<sector>>\" that targets both climate change mitigation and adaptation. {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_key: *key_sector_climate
+        processing_level: major
+        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_sector}\n\n{definitions.processing_donor_groups}"
+        presentation:
+          title_variant: "<<sector>> - Mitigation and adaptation"
+        display:
+          name: "Climate-related ODA by donor - <<sector>> - Mitigation and adaptation"
+          numDecimalPlaces: 0
+          tolerance: 0
+          entityAnnotationsMap: "{definitions.entity_annotations_donors}"
+      climate_related_share:
+        title: "Climate-related ODA by donor - <<sector>> (% of bilateral allocable ODA in the sector)"
+        unit: "% of bilateral allocable ODA in the sector"
+        short_unit: "%"
+        description_short: "Bilateral allocable [ODA](#dod:oda) in the sector \"<<sector>>\" that targets climate change mitigation, adaptation, or both, as a share of bilateral allocable ODA in the sector. {definitions.short_commitments}"
+        description_key: &key_sector_climate_share
+          - "{definitions.key_oda}"
+          - "{definitions.key_bilateral_allocable}"
+          - "{definitions.key_sector}"
+          - "{definitions.key_rio_markers}"
+          - "{definitions.key_climate_markers}"
+          - "{definitions.key_overlap}"
+          - "{definitions.key_upper_bound}"
+          - "{definitions.key_commitments}"
+          - "{definitions.key_adaptation_marker}"
+          - "{definitions.key_not_screened}"
+        processing_level: major
+        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_sector}\n\n{definitions.processing_share_sector}\n\n{definitions.processing_donor_groups}"
+        presentation:
+          title_variant: "<<sector>>"
+        display:
+          name: "Climate-related ODA by donor - <<sector>> (% of bilateral allocable ODA in the sector)"
+          numDecimalPlaces: 1
+          tolerance: 0
+          entityAnnotationsMap: "{definitions.entity_annotations_donors}"
+      climate_related_share_of_all_sectors:
+        title: "Climate-related ODA by donor - <<sector>> (% of climate-related ODA in all sectors)"
+        unit: "% of climate-related ODA"
+        short_unit: "%"
+        description_short: "Climate-related [ODA](#dod:oda) in the sector \"<<sector>>\", as a share of climate-related ODA in all sectors. {definitions.short_commitments}"
+        description_key: *key_sector_climate_share
+        processing_level: major
+        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_sector}\n\n{definitions.processing_share_of_all_sectors}\n\n{definitions.processing_donor_groups}"
+        presentation:
+          title_variant: "<<sector>>"
+        display:
+          name: "Climate-related ODA by donor - <<sector>> (% of climate-related ODA in all sectors)"
+          numDecimalPlaces: 1
+          tolerance: 0
+          entityAnnotationsMap: "{definitions.entity_annotations_donors}"

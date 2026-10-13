@@ -17,7 +17,6 @@ views:
       hasMapTab: true
       chartTypes:
         - "LineChart"
-      minTime: 2010
       yAxis:
         min: 0
       map:

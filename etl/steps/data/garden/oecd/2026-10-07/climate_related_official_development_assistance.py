@@ -21,8 +21,8 @@ MARKER_ADAPTATION = 30
 SCORE_PRINCIPAL = 2
 SCORE_SIGNIFICANT = 1
 
-# The adaptation marker applies to flows from 2010 onwards. Before that, every indicator that depends on it would only
-# reflect mitigation, so it is removed.
+# The adaptation marker applies to flows from 2010 onwards. Before that, climate-related aid would only reflect
+# mitigation, so all indicators start in 2010.
 START_YEAR_ADAPTATION_MARKER = 2010
 # Rio markers were collected on a trial basis from 2004, and became a permanent part of the reporting in 2008.
 START_YEAR_PERMANENT_MARKERS = 2008
@@ -85,9 +85,50 @@ INDICATORS_BY_RECIPIENT = [
     "climate_related",
     "climate_related_share",
     "climate_related_share_of_bilateral_total",
+    "climate_related_per_capita",
 ]
-# Indicators that do not depend on the adaptation marker, and are kept before it existed.
-INDICATORS_WITHOUT_ADAPTATION = ["oda_bilateral_total", "oda_bilateral_allocable", "oda_bilateral_outside_rio_markers"]
+INDICATORS_BY_SECTOR = [
+    "oda_bilateral_allocable",
+    "climate_related",
+    *CATEGORIES_MARKER,
+    "climate_related_share",
+    "climate_related_share_of_all_sectors",
+]
+
+# Sectors of the DAC classification that the Rio markers apply to, at the level that adds up to all sectors (each
+# activity belongs to one of them), with the names of our main ODA dataset.
+SECTORS = {
+    "110": "Education",
+    "120": "Health",
+    "130": "Population policies/programmes and reproductive health",
+    "140": "Water supply and sanitation",
+    "150": "Government and civil society",
+    "160": "Other social infrastructure and services",
+    "210": "Transport and storage",
+    "220": "Communications",
+    "230": "Energy",
+    "240": "Banking and financial services",
+    "250": "Business and other services",
+    "310": "Agriculture, forestry, fishing",
+    "320": "Industry, mining, construction",
+    "331": "Trade policies and regulations",
+    "332": "Tourism",
+    "410": "General environment protection",
+    "430": "Other multisector",
+    "520": "Development food assistance",
+    "530": "Other commodity assistance",
+    "600": "Action relating to debt",
+    "720": "Emergency response",
+    "730": "Reconstruction relief and rehabilitation",
+    "740": "Disaster prevention and preparedness",
+    "998": "Unallocated / Unspecified",
+    "other": "Other",  # See CODE_OTHER_SECTORS
+}
+# NOTE: A few projects that the Rio markers apply to are in sectors that the snapshot does not query (general budget
+# support and administrative costs of donors: at most 0.3% of bilateral allocable ODA, and a few million US$ of
+# climate-related ODA). They are grouped as "Other", whose total is the total of all sectors minus the sectors above.
+CODE_OTHER_SECTORS = "other"
+SECTORS_IN_OTHER = ["510", "910"]
 
 # Relative tolerance when reconciling sums (values are stored as float32).
 RELATIVE_TOLERANCE = 1e-4
@@ -214,13 +255,22 @@ def run() -> None:
         ),
         tb_totals=tb_totals_received,
         tb_bilateral=tb_bilateral_received,
-    )[["entity_code", "year"] + INDICATORS_BY_RECIPIENT]
+    )
 
-    # Step 6: Replace codes with names (from the OECD's codelist), harmonize them, and format tables.
+    # Step 6: Climate-related ODA given by donor and sector, combined with bilateral allocable ODA in each sector.
+    tb_sectors = create_sectors_table(
+        tb_climate=tb_climate, tb_totals=tb_totals, tb_codes=tb_codes, members_donors=members_donors, donors=donors
+    )
+
+    # Step 7: Replace codes with names (from the OECD's codelist), harmonize them, and format tables.
     names = tb_codes[tb_codes["codelist"] == "area"].set_index("code")["name"].to_dict()
     names.update(NAMES_BY_CODE)
-    tables = {"climate_related_oda_by_donor": tb_given, "climate_related_oda_by_recipient": tb_received}
-    for short_name, tb in tables.items():
+    tables = {
+        "climate_related_oda_by_donor": (tb_given, []),
+        "climate_related_oda_by_recipient": (tb_received, []),
+        "climate_related_oda_by_donor_and_sector": (tb_sectors, ["sector"]),
+    }
+    for short_name, (tb, dimensions) in tables.items():
         tb["country"] = tb["entity_code"].map(names)
         assert tb["country"].notna().all(), f"Codes without names in {short_name}."
 
@@ -228,16 +278,19 @@ def run() -> None:
         # NOTE: The same mapping covers donors and recipients, so each table uses only part of it.
         tb = paths.regions.harmonize_names(tb=tb, warn_on_unused_countries=False)
 
-        # Recipients whose aid is not assigned to a single country (e.g. Africa, regional), to annotate in charts.
         if short_name == "climate_related_oda_by_recipient":
+            # Recipients whose aid is not assigned to a single country (e.g. Africa, regional), to annotate in charts.
             is_not_assigned = tb["entity_code"].str.endswith("_X") & ~tb["entity_code"].isin(
                 CODES_UNCLASSIFIED_BY_INCOME
             )
             names_not_assigned = sorted(set(tb.loc[is_not_assigned, "country"]))
+            tb = add_climate_related_per_capita(tb=tb, groups=groups_recipients)[
+                ["entity_code", "country", "year"] + INDICATORS_BY_RECIPIENT
+            ]
         tb = tb.drop(columns=["entity_code"])
 
         # Improve table format.
-        tables[short_name] = tb.format(["country", "year"], short_name=short_name)
+        tables[short_name] = tb.format(["country", "year"] + dimensions, short_name=short_name)
 
     sanity_check_outputs(tables=tables)
     sanity_check_not_assigned(names_not_assigned=names_not_assigned)
@@ -278,7 +331,7 @@ def classify_climate_activities(tb_activities: Table) -> Table:
         (tb_activities["marker"] == MARKER_ADAPTATION) & ~is_mitigation
     )
 
-    tb = tb_activities.loc[keep, ["donor_code", "recipient_code", "year", "value"]].copy()
+    tb = tb_activities.loc[keep, ["donor_code", "recipient_code", "sector_code", "year", "value"]].copy()
     # Put each value in the column of its category (and zero in the others).
     masks = {
         "mitigation_only": is_mitigation & ~is_adaptation,
@@ -319,26 +372,30 @@ def aggregate_by_members(tb: Table, code_column: str, members: Table, keys: list
     return tb.groupby(["entity_code"] + keys, as_index=False, observed=True)[columns].sum()
 
 
-def create_climate_related_table(tb_climate: Table, tb_totals: Table, tb_bilateral: Table) -> Table:
-    """Compare climate-related ODA (by entity and year) with bilateral allocable ODA and total bilateral ODA.
+def create_climate_related_table(
+    tb_climate: Table, tb_totals: Table, tb_bilateral: Table | None = None, keys: list[str] | None = None
+) -> Table:
+    """Compare climate-related ODA with bilateral allocable ODA and (if given) total bilateral ODA.
 
     Args:
-        tb_climate: Climate-related ODA by entity and year.
-        tb_totals: Totals by entity, marker, score and year.
+        tb_climate: Climate-related ODA by keys.
+        tb_totals: Totals by keys, marker and score.
         tb_bilateral: Total bilateral ODA by entity and year, including activities outside the scope of the Rio markers.
+        keys: Columns that identify each row (entity and year by default).
     """
+    keys = keys or ["entity_code", "year"]
     # Total bilateral allocable ODA (the sum of all scores of any marker), and totals targeting each climate marker.
-    tb = pivot_totals(tb_totals=tb_totals, marker=MARKER_MITIGATION, prefix="mitigation")
+    tb = pivot_totals(tb_totals=tb_totals, marker=MARKER_MITIGATION, prefix="mitigation", keys=keys)
     tb = tb.merge(
-        pivot_totals(tb_totals=tb_totals, marker=MARKER_ADAPTATION, prefix="adaptation"),
-        on=["entity_code", "year"],
+        pivot_totals(tb_totals=tb_totals, marker=MARKER_ADAPTATION, prefix="adaptation", keys=keys),
+        on=keys,
         how="outer",
     )
     tb = tb.rename(columns={"mitigation_total": "oda_bilateral_allocable"}, errors="raise")
 
-    # Combine with climate-related ODA. Entity-years without climate-related activities have zero climate-related ODA.
-    assert set(tb_climate["entity_code"]) <= set(tb["entity_code"]), "Climate-related ODA for entities without totals."
-    tb = tb.merge(tb_climate, on=["entity_code", "year"], how="left")
+    # Combine with climate-related ODA. Rows without climate-related activities have zero climate-related ODA.
+    assert tb_climate.set_index(keys).index.isin(tb.set_index(keys).index).all(), "Climate-related ODA without totals."
+    tb = tb.merge(tb_climate, on=keys, how="left")
     tb[CLIMATE_COLUMNS] = tb[CLIMATE_COLUMNS].fillna(0)
     tb["non_climate"] = tb["oda_bilateral_allocable"] - tb["climate_related"]
 
@@ -346,17 +403,15 @@ def create_climate_related_table(tb_climate: Table, tb_totals: Table, tb_bilater
 
     # Express amounts in US dollars (the source is in millions).
     amounts = ["oda_bilateral_allocable"] + CLIMATE_COLUMNS + ["non_climate"]
-    tb = tb[["entity_code", "year"] + amounts].copy()
+    tb = tb[keys + amounts].copy()
     tb[amounts] *= 1e6
     tb["climate_related_share"] = share(tb["climate_related"], tb["oda_bilateral_allocable"])
 
-    tb = add_total_bilateral_oda(tb=tb, tb_bilateral=tb_bilateral)
+    if tb_bilateral is not None:
+        tb = add_total_bilateral_oda(tb=tb, tb_bilateral=tb_bilateral)
 
-    # Remove indicators that depend on the adaptation marker before it existed.
-    indicators = [
-        column for column in tb.columns if column not in ["entity_code", "year"] + INDICATORS_WITHOUT_ADAPTATION
-    ]
-    tb.loc[tb["year"] < START_YEAR_ADAPTATION_MARKER, indicators] = None
+    # Keep only years with the adaptation marker.
+    tb = tb[tb["year"] >= START_YEAR_ADAPTATION_MARKER].reset_index(drop=True)
 
     return tb
 
@@ -386,18 +441,102 @@ def add_total_bilateral_oda(tb: Table, tb_bilateral: Table) -> Table:
     return tb
 
 
-def pivot_totals(tb_totals: Table, marker: int, prefix: str) -> Table:
-    """Totals of a marker by entity and year: targeted (principal or significant), and the total of all scores."""
+def create_sectors_table(
+    tb_climate: Table, tb_totals: Table, tb_codes: Table, members_donors: Table, donors: list[str]
+) -> Table:
+    """Climate-related ODA given by each donor and group of donors, by sector, and its share of each sector's aid."""
+    # Map the purpose code of each activity to its sector, up the hierarchy (e.g. 23210 -> 232 -> 230, energy).
+    parents = tb_codes[tb_codes["codelist"] == "sector"].dropna(subset=["parent_code"])
+    parents = parents.set_index("code")["parent_code"].to_dict()
+
+    def sector_of(code: str) -> str | None:
+        while code not in SECTORS and code not in SECTORS_IN_OTHER and code in parents:
+            code = parents[code]
+        if code in SECTORS_IN_OTHER:
+            return CODE_OTHER_SECTORS
+        return code if code in SECTORS else None
+
+    sector_by_code = {code: sector_of(code) for code in tb_climate["sector_code"].unique()}
+    unknown = sorted(code for code, sector in sector_by_code.items() if sector is None)
+    assert not unknown, f"Activities in purpose codes outside the expected sectors: {unknown}"
+    tb_climate = tb_climate.copy()
+    tb_climate["sector_code"] = tb_climate["sector_code"].map(sector_by_code)
+
+    # Climate-related ODA by donor (and group of donors) and sector.
+    keys = ["entity_code", "sector_code", "year"]
+    tb_climate = aggregate_by_members(
+        tb=tb_climate, code_column="donor_code", members=members_donors, keys=keys[1:], columns=CLIMATE_COLUMNS
+    )
+
+    # Totals by donor and sector (to all developing countries), as for all sectors.
+    tb_totals = tb_totals[
+        (tb_totals["recipient_code"] == CODE_ALL_RECIPIENTS)
+        & tb_totals["donor_code"].isin(donors)
+        & tb_totals["sector_code"].isin(list(SECTORS) + [CODE_ALL_SECTORS])
+        & tb_totals["marker"].isin([MARKER_MITIGATION, MARKER_ADAPTATION])
+    ]
+    tb_totals = add_other_sectors(tb_totals=tb_totals)
+    tb_totals = aggregate_by_members(
+        tb=tb_totals,
+        code_column="donor_code",
+        members=members_donors,
+        keys=["sector_code", "marker", "score", "year"],
+        columns=["value"],
+    )
+
+    tb = create_climate_related_table(tb_climate=tb_climate, tb_totals=tb_totals, keys=keys)
+    # NOTE: The total of "Other" is a small difference between two large totals, too imprecise to divide by.
+    tb.loc[tb["sector_code"] == CODE_OTHER_SECTORS, "climate_related_share"] = None
+
+    # Share of all climate-related ODA of each donor that goes to each sector.
+    tb["climate_related_share_of_all_sectors"] = share(
+        tb["climate_related"], tb.groupby(["entity_code", "year"])["climate_related"].transform("sum")
+    )
+    tb["sector"] = tb["sector_code"].map(SECTORS).copy_metadata(tb["sector_code"])
+
+    return tb[["entity_code", "sector", "year"] + INDICATORS_BY_SECTOR]
+
+
+def add_other_sectors(tb_totals: Table) -> Table:
+    """Replace the totals of all sectors with those of the sectors not queried ("Other"): all sectors minus the rest."""
+    keys = ["donor_code", "marker", "score", "year"]
+    is_all = tb_totals["sector_code"] == CODE_ALL_SECTORS
+    tb_listed = tb_totals[~is_all].groupby(keys, as_index=False, observed=True)["value"].sum()
+    tb_other = tb_totals[is_all].merge(tb_listed, on=keys, how="left", suffixes=("_all", "_listed"))
+    tb_other["value"] = tb_other["value_all"] - tb_other["value_listed"].fillna(0)
+    tb_other["sector_code"] = CODE_OTHER_SECTORS
+
+    # "Other" must be a small part of the total, from the year the data starts.
+    recent = tb_other[tb_other["year"] >= START_YEAR_ADAPTATION_MARKER]
+    assert recent["value"].abs().sum() < 0.01 * recent["value_all"].abs().sum(), "Too much aid in other sectors."
+
+    return pr.concat([tb_totals[~is_all], tb_other[tb_totals.columns]], ignore_index=True)
+
+
+def add_climate_related_per_capita(tb: Table, groups: set[str]) -> Table:
+    """Add climate-related ODA received per person, only for countries.
+
+    Groups of recipients are excluded: the OECD defines their members differently from the regions and income groups in
+    our population data (e.g. it applies the current income classification to all years).
+    """
+    tb = paths.regions.add_population(tb=tb, population_col="population", warn_on_missing_countries=False)
+    tb.loc[tb["entity_code"].isin(groups), "population"] = None
+    tb["climate_related_per_capita"] = tb["climate_related"] / tb["population"]
+    return tb.drop(columns=["population"])
+
+
+def pivot_totals(tb_totals: Table, marker: int, prefix: str, keys: list[str]) -> Table:
+    """Totals of a marker by keys: targeted (principal or significant), and the total of all scores."""
     tb = tb_totals[tb_totals["marker"] == marker]
-    tb_out = tb.groupby(["entity_code", "year"], as_index=False, observed=True)["value"].sum()
+    tb_out = tb.groupby(keys, as_index=False, observed=True)["value"].sum()
     tb_out = tb_out.rename(columns={"value": f"{prefix}_total"}, errors="raise")
     tb_related = (
         tb[tb["score"].isin([SCORE_SIGNIFICANT, SCORE_PRINCIPAL])]
-        .groupby(["entity_code", "year"], as_index=False, observed=True)["value"]
+        .groupby(keys, as_index=False, observed=True)["value"]
         .sum()
         .rename(columns={"value": f"{prefix}_related"}, errors="raise")
     )
-    tb_out = tb_out.merge(tb_related, on=["entity_code", "year"], how="left")
+    tb_out = tb_out.merge(tb_related, on=keys, how="left")
     tb_out[f"{prefix}_related"] = tb_out[f"{prefix}_related"].fillna(0)
     return tb_out
 
@@ -527,6 +666,29 @@ def sanity_check_outputs(tables: dict[str, Table]) -> None:
     received = tables["climate_related_oda_by_recipient"].loc["Developing countries (OECD)"]
     for column in ["climate_related", "oda_bilateral_allocable", "oda_bilateral_total"]:
         assert close(given[column].dropna(), received[column].dropna()), f"{column} given and received do not match."
+
+    # Sectors add up to the totals of all sectors, for each donor and year.
+    given_all = tables["climate_related_oda_by_donor"]
+    by_sector = tables["climate_related_oda_by_donor_and_sector"].groupby(["country", "year"])
+    for column in ["climate_related", "oda_bilateral_allocable"]:
+        summed, total = by_sector[column].sum().align(given_all[column], join="inner")
+        assert close(summed, total), f"Sectors do not add up to the total {column}."
+    shares = by_sector["climate_related_share_of_all_sectors"].sum()[by_sector["climate_related"].sum() > 0]
+    assert close(shares, shares * 0 + 100), "Shares of climate-related ODA by sector do not add up to 100%."
+    assert set(tables["climate_related_oda_by_donor_and_sector"].index.get_level_values("sector")) == set(
+        SECTORS.values()
+    ), "Unexpected sectors."
+
+    # All indicators start when the adaptation marker does.
+    for name, tb in tables.items():
+        assert tb.index.get_level_values("year").min() == START_YEAR_ADAPTATION_MARKER, f"Unexpected start in {name}."
+
+    # Climate-related ODA received per person is only for countries, and within a plausible range (in US$).
+    per_capita = tables["climate_related_oda_by_recipient"]["climate_related_per_capita"].dropna()
+    assert not per_capita.index.get_level_values("country").str.contains("OECD").any(), "Per capita for groups."
+    assert 50 < per_capita.index.get_level_values("country").nunique() < 200, "Unexpected number of countries."
+    # NOTE: It is highest in small Pacific islands (e.g. about $7,600 in Niue, in 2024).
+    assert per_capita.min() >= -1 and per_capita.max() < 20000, "Climate-related ODA per person out of range."
 
     # Spot checks against values computed independently from the OECD bulk files (DAC members, 2023).
     row = tables["climate_related_oda_by_donor"].loc[("DAC members", 2023)]
