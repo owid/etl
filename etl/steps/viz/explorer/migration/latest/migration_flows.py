@@ -8,7 +8,6 @@ DISPLAY_SETTINGS = {
     "colorScaleNumericMinValue": 0,
     "colorScaleNumericBins": "1000,,;3000,,;10000,,;30000,,;100000,,;300000,,;1000000,,;0",
     "colorScaleScheme": "YlGnBu",
-    "colorScaleCategoricalBins": "Selected country,#AF1629,Selected country",
 }
 
 
@@ -26,6 +25,13 @@ def run() -> None:
         "hasMapTab": True,
         "tab": "map",
         "note": 'For most countries, immigrant means "born in another country". Someone who has gained citizenship in the country they live in is still counted as an immigrant if they were born elsewhere. For some countries, place of birth information is not available; in this case citizenship is used to define whether someone counts as an immigrant.',
+        "map": {
+            "colorScale": {
+                # "Not applicable" is the bin inapplicableEntityNames (set per view below) renders in.
+                "customCategoryColors": {"Not applicable": "#AF1629"},
+                "customCategoryLabels": {"Not applicable": "Selected country"},
+            },
+        },
     }
 
     c = paths.create_explorer(
@@ -52,8 +58,10 @@ def add_display_settings(explorer):
         assert view.num_indicators == 1, "More than one indicator in the view!"
 
         # Set default display settings
-        if view.dimensions["metric"] == "emigrants":
-            view.indicators.y[0].display = DISPLAY_SETTINGS
-            # view.config = {}
-        elif view.dimensions["metric"] == "immigrants":
-            view.indicators.y[0].display = DISPLAY_SETTINGS
+        view.indicators.y[0].display = DISPLAY_SETTINGS
+
+        # A country has no meaningful "migrants" value for itself (e.g. Afghans who emigrated
+        # to Afghanistan), so mark that entity as inapplicable instead of faking a data point.
+        # NOTE: don't mutate view.config in place — views share the same common_view_config
+        # dict, so an in-place write would leak the last view's value onto every other view.
+        view.config = {**(view.config or {}), "inapplicableEntityNames": [view.dimensions["country_select"]]}

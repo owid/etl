@@ -45,11 +45,9 @@ def run() -> None:
     tb = tb[tb["country_select"].isin(countries)]
     tb = tb.sort_values(by=["country_select"], ascending=True)
 
-    # Add rows for country and country select being equal
-    tb = add_same_country_rows(tb)
-
-    # convert column to string and set unit
-    tb["migrants"] = tb["migrants"].astype(str).copy_metadata(tb["migrants"])
+    # No row is added for country == country_select: that flow is inapplicable by construction
+    # (e.g. "Afghans who emigrated to Afghanistan"), and the chart/explorer steps mark the
+    # country_select entity as inapplicable on the map rather than faking a data point for it.
 
     tb = tb.format(["country", "country_select", "metric", "gender", "year"])
 
@@ -58,18 +56,3 @@ def run() -> None:
 
     # Save grapher dataset.
     ds_grapher.save()
-
-
-def add_same_country_rows(tb):
-    """Create rows for countries where country and country select are the same and set value to "Selected country"."""
-    # Get dataframe with same-country rows
-    tb_same = tb[["country_select", "year", "gender", "metric"]].drop_duplicates()
-    tb_same.loc[:, ["migrants"]] = "Selected country"
-    tb_same["country"] = tb_same["country_select"]
-
-    # Add to main table
-    tb = pr.concat([tb, tb_same])
-
-    # Ensure typing
-    tb["migrants"] = tb["migrants"].astype("string")
-    return tb
