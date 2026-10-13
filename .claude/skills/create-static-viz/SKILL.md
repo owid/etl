@@ -351,7 +351,7 @@ Then, in this order:
 
    ```bash
    .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py <step-dir> \
-       --template <name> --expect-gid <data-layer> [--expect-gid <data-layer> ...]
+       --template <name> --require-named-marks --expect-gid <data-layer> [--expect-gid <data-layer> ...]
    ```
 2. **Read the PNG.** The verifier cannot see a collision, a widow, or a label sitting on a curve.
    Every layout bug in [this skill's Gotchas](reference/GOTCHAS.md) was found by looking.
