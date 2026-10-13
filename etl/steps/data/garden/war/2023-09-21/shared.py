@@ -340,7 +340,7 @@ def aggregate_conflict_types(
     else:
         tb_agg = tb[tb[dim_name].isin(children_names)].copy()
     # Obtain summations
-    tb_agg = tb_agg.groupby(columns_to_groupby, as_index=False).agg({col: sum for col in columns_to_aggregate})
+    tb_agg = tb_agg.groupby(columns_to_groupby, as_index=False).agg({col: "sum" for col in columns_to_aggregate})
     # Threshold to 1 for binary columns
     threshold_upper = 1
     for col in columns_to_aggregate:

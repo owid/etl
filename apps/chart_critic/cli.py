@@ -311,8 +311,8 @@ def _review_one(
     found: list[dict[str, Any]] = []
     in_tokens = out_tokens = 0
 
-    # The model is not reproducible even at temperature 0: on repeated passes over the same
-    # chart it raises a genuine finding on some and not others. Measured on three charts with
+    # The model is not reproducible: on repeated passes over the same chart it raises a
+    # genuine finding on some and not others. Measured on three charts with
     # known findings, one pass caught 1-2 of them and three passes caught all three. So a pass
     # count is a recall dial, and at these prices it is cheap to turn up.
     bundle_hash = cache.content_hash(bundle.summary, bundle.png, *(png for _, png in extra_views))

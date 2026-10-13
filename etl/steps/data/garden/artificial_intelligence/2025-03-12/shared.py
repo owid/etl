@@ -42,7 +42,8 @@ def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_col
     total_counts["cumulative_count"] = total_counts["yearly_count"].cumsum()
 
     # Split the column to be aggregated by comma (several countries/domains can exist in each cell)
-    tb[agg_column] = tb[agg_column].str.split(",")
+    # Cast to str first: on a categorical, `.str.split` under the pandas str dtype returns the lists' text, not lists.
+    tb[agg_column] = tb[agg_column].astype(str).str.split(",")
 
     # Explode the table to create separate rows for each country or domain
     tb_exploded = tb.explode(agg_column)

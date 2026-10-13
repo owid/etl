@@ -39,5 +39,10 @@ commit_and_push_snapshots() (
         exit 1
     fi
 
-    git push -q origin master
+    # A rejected push must not leave the commit behind: Buildkite's retry runs in this same
+    # checkout, would find the files already committed, report "no changes" and pass.
+    if ! git push -q origin master; then
+        git reset -q HEAD~1
+        exit 1
+    fi
 )

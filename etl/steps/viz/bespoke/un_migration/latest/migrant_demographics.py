@@ -172,8 +172,14 @@ def run() -> None:
             "Migrant stock": metadata_column(tb, "migrant_stock"),
             "Resident population": metadata_column(tb, "population"),
         },
-        update_period_days=ds_garden.metadata.update_period_days,
+        # The UN's latest release (2024) dropped the age-and-sex breakdowns, which is why this feed
+        # still uses the 2020 one, and it is unclear whether the next release will bring them back.
+        # So we publish no update schedule for this feed.
+        update_period_days=None,
     )
+    # For the same reason, leave out when the data was last fetched.
+    for origin in feed_metadata["origins"]:
+        origin.pop("dateAccessed", None)
 
     manifest = {
         "meta": {

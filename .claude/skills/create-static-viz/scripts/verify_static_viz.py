@@ -9,6 +9,13 @@ plausible, and the problem only shows up once a designer opens the SVG:
   layers that matter, since the unaided check can only catch a figure with no deliberate name at
   all (which artists *should* carry one is not knowable from the SVG — matplotlib emits a
   ``line2d_<n>`` group per tick mark just as it does for an unnamed data line)
+- paint with no deliberate name above it. Figma's re-import (`restyle_static_import.js` with
+  ``inheritStyles``) learns which library style each colour carries by joining nodes on their
+  ``<subject>__<role>`` gid, so a gridline, spine or tick label drawn without one cannot be paired
+  with the style a designer bound on the previous frame. Reported on every run; pass
+  ``--require-named-marks`` to make it a failure, which a new or refreshed step should. That flag
+  also fails on a ``<subject>__<role>`` gid used by more than one node, since the re-import cannot
+  tell such marks apart
 - a frame that no longer matches the template it targets, because something reintroduced
   ``bbox_inches="tight"`` and cropped the canvas to its content. Checked on **both** the PNG and the
   SVG: the contract asks for two separate ``export_fig`` calls (the PNG opaque, the SVG transparent),
@@ -18,6 +25,7 @@ plausible, and the problem only shows up once a designer opens the SVG:
 Usage:
     verify_static_viz.py <step-dir-or-file-stem> [--template horizontal|vertical|mobile|mobile-square]
     verify_static_viz.py <step-dir> --template horizontal --expect-gid boys__median
+    verify_static_viz.py <step-dir> --require-named-marks
 
 A step directory is scanned for every ``<name>.svg`` with a sibling ``<name>.png``; a file stem
 checks just that pair. Exits non-zero on the first failing pair, listing every failure for it.
@@ -26,6 +34,7 @@ checks just that pair. Exits non-zero on the first failing pair, listing every f
 import argparse
 import re
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -50,9 +59,14 @@ TOLERANCE = 0.002
 # The <class>_<n> rule is deliberately generic rather than an enumerated class list, which was
 # always going to lag matplotlib. The trade-off: a deliberate gid ending in an underscore and
 # digits (say "panel_1") is treated as generated. Name layers <subject>__<role> and it never bites.
-GENERATED_ID = re.compile(
-    r"^(?:[A-Za-z][A-Za-z0-9.]*_\d+|m[0-9a-f]{8,}|[A-Za-z][A-Za-z0-9]*-[0-9a-f]{2,6})$"
-)
+GENERATED_ID = re.compile(r"^(?:[A-Za-z][A-Za-z0-9.]*_\d+|m[0-9a-f]{8,}|[A-Za-z][A-Za-z0-9]*-[0-9a-f]{2,6})$")
+
+# A deliberate layer name in the `<subject>__<role>` convention, which is what the Figma re-import joins
+# on. The template's own text slots are exempt: the import drops the step's copies of them by prefix.
+DELIBERATE_GID = re.compile(r"__")
+SLOT_ID = re.compile(r"^(?:title|subtitle|note|data-source|tagline|license)(?:-|$)")
+PAINTABLE = {"path", "rect", "circle", "ellipse", "line", "polyline", "polygon", "text", "use", "image"}
+STYLE_DECL = re.compile(r"\s*([a-z-]+)\s*:\s*([^;]+)")
 
 # A <use> pointing at one of those outlined-glyph defs means text was saved as curves. A <use>
 # pointing at an m<hash> marker def is just normal marker reuse in a scatter, and must never be
@@ -115,7 +129,59 @@ def svg_frame_size(svg: str) -> tuple[float, float] | None:
     return None
 
 
-def check_svg(path: Path, expected_gids: list[str], template: str | None) -> list[str]:
+def _paint(node: ET.Element, inherited: dict[str, str]) -> dict[str, str]:
+    """The fill, stroke and opacity a node paints with, after SVG inheritance."""
+    paint = dict(inherited)
+    for prop in ("fill", "stroke", "opacity", "fill-opacity", "stroke-opacity"):
+        if node.get(prop) is not None:
+            paint[prop] = node.get(prop).strip()
+    for prop, value in STYLE_DECL.findall(node.get("style") or ""):
+        paint[prop] = value.strip()
+    return paint
+
+
+def _paints(paint: dict[str, str]) -> bool:
+    """Whether a mark puts any pixel down: a fill or a stroke that is not none, at non-zero opacity."""
+    if paint.get("opacity", "1") in ("0", "0.0"):
+        return False
+    fill = paint.get("fill", "#000000") != "none" and paint.get("fill-opacity", "1") not in ("0", "0.0")
+    stroke = paint.get("stroke", "none") != "none" and paint.get("stroke-opacity", "1") not in ("0", "0.0")
+    return fill or stroke
+
+
+def unnamed_marks(svg: str) -> dict[str, int]:
+    """Painted marks with no `<subject>__<role>` gid on themselves or any ancestor, by nearest id.
+
+    The nearest id is matplotlib's own (`line2d_7`, `patch_3`, `text_12`), which names the artist to
+    give a gid to. `<defs>` are skipped: what paints is the `<use>` that places a def, and that is
+    judged where it stands.
+    """
+    root = ET.fromstring(svg)
+    found: dict[str, int] = {}
+
+    def walk(node: ET.Element, named: bool, nearest: str, inherited: dict[str, str]) -> None:
+        tag = node.tag.rsplit("}", 1)[-1]
+        if tag == "defs":
+            return
+        node_id = node.get("id")
+        if node_id:
+            nearest = node_id
+            if DELIBERATE_GID.search(node_id) or SLOT_ID.match(node_id):
+                named = True
+        paint = _paint(node, inherited)
+        if tag in PAINTABLE and not named and _paints(paint):
+            label = f"{nearest} <{tag}>"
+            found[label] = found.get(label, 0) + 1
+        for child in node:
+            walk(child, named, nearest, paint)
+
+    walk(root, False, "(root)", {})
+    return found
+
+
+def check_svg(
+    path: Path, expected_gids: list[str], template: str | None, require_named_marks: bool = False
+) -> list[str]:
     """Return a list of contract failures for one SVG."""
     svg = path.read_text()
     failures = []
@@ -125,13 +191,13 @@ def check_svg(path: Path, expected_gids: list[str], template: str | None) -> lis
     if clip_paths or clip_refs:
         failures.append(
             f"clipping is on: {clip_paths} <clipPath> definitions, {clip_refs} clip-path references. "
-            'Sweep it off before saving: for artist in fig.findobj(): artist.set_clip_on(False)'
+            "Sweep it off before saving: for artist in fig.findobj(): artist.set_clip_on(False)"
         )
 
     n_text = len(re.findall(r"<text[ >]", svg))
     if n_text == 0:
         failures.append(
-            'no <text> elements — the copy has been saved as outlines. '
+            "no <text> elements — the copy has been saved as outlines. "
             'Set matplotlib.rcParams["svg.fonttype"] = "none".'
         )
 
@@ -157,6 +223,26 @@ def check_svg(path: Path, expected_gids: list[str], template: str | None) -> lis
     for gid in expected_gids:
         if gid not in ids:
             failures.append(f"expected gid {gid!r} is not an id in the SVG")
+
+    if require_named_marks:
+        unnamed = unnamed_marks(svg)
+        if unnamed:
+            listed = ", ".join(f"{label} x{n}" for label, n in sorted(unnamed.items())[:6])
+            failures.append(
+                f"{sum(unnamed.values())} painted mark(s) sit under no <subject>__<role> gid ({listed}"
+                f"{', ...' if len(unnamed) > 6 else ''}). Name each artist, furniture included "
+                "(gridlines, spines, tick labels): Figma's re-import pairs a mark with its previous style "
+                "by that name, so an unnamed one loses any style a designer bound on it."
+            )
+        all_ids = re.findall(r'\bid="([^"]+)"', svg)
+        repeated = sorted({i for i in all_ids if DELIBERATE_GID.search(i) and all_ids.count(i) > 1})
+        if repeated:
+            failures.append(
+                f"{len(repeated)} <subject>__<role> gid(s) are used by more than one node "
+                f"({', '.join(repeated[:6])}{', ...' if len(repeated) > 6 else ''}). Give each artist "
+                "its own name: the re-import pairs marks by name, so marks that share one cannot be told apart. "
+                "A gid= passed to ax.bar lands on every bar; set one per bar from the returned container."
+            )
 
     if template is not None:
         size = svg_frame_size(svg)
@@ -197,6 +283,15 @@ def main() -> int:
         ),
     )
     parser.add_argument(
+        "--require-named-marks",
+        action="store_true",
+        help=(
+            "fail when any painted mark sits under no <subject>__<role> gid. Without it the count is "
+            "still printed. Pass it for a new or refreshed step: Figma's re-import pairs a mark with "
+            "the style a designer bound on it by that name."
+        ),
+    )
+    parser.add_argument(
         "--expect-gid",
         action="append",
         default=[],
@@ -227,7 +322,7 @@ def main() -> int:
     failed = False
     for svg in svgs:
         template = template_for(svg.stem, args.template)
-        failures = check_svg(svg, args.expect_gid, template)
+        failures = check_svg(svg, args.expect_gid, template, args.require_named_marks)
         png = svg.with_suffix(".png")
         if png.exists():
             failures += check_png(png, template)
@@ -241,8 +336,10 @@ def main() -> int:
                 print(f"  - {failure}")
         else:
             extra = f", frame matches {template}" if template else ""
-            named = len({i for i in re.findall(r'\bid="([^"]+)"', svg.read_text()) if not GENERATED_ID.match(i)})
-            print(f"OK   {svg.name} (0 clip paths, {named} named layers{extra})")
+            text = svg.read_text()
+            named = len({i for i in re.findall(r'\bid="([^"]+)"', text) if not GENERATED_ID.match(i)})
+            unnamed = sum(unnamed_marks(text).values())
+            print(f"OK   {svg.name} (0 clip paths, {named} named layers, {unnamed} unnamed marks{extra})")
 
     return 1 if failed else 0
 

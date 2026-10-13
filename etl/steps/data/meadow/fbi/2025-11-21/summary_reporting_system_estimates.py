@@ -44,7 +44,7 @@ def run() -> None:
 
     tb_missing_years = tb_missing_years.copy()  # avoid SettingWithCopyWarning
 
-    tb_missing_years.loc[:, cols] = tb_missing_years.loc[:, cols].apply(pr.to_numeric, errors="coerce")
+    tb_missing_years[cols] = tb_missing_years[cols].apply(pr.to_numeric, errors="coerce")
     tb_missing_years = tb_missing_years.groupby("year").sum(numeric_only=True).reset_index()
     tb_missing_years["country"] = "United States"
     tb_missing_years["state_abbr"] = "US"

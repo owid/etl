@@ -131,7 +131,8 @@ Catch outdated code patterns as you type with configurable warnings.
     - Patterns apply only to files in `etl/steps/data/**` (scope-based detection)
     - Yellow squiggles appear under outdated code
     - Hover for suggested alternatives
-    - Extensible: add new patterns in `src/extension.ts`
+    - Extensible: add new patterns in `src/detector.mts`
+    - Also runs from the command line: `node vscode_extensions/detect-outdated-practices/src/cli.mts <paths>`
 
 ### Chart Preview
 

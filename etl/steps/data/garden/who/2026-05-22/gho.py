@@ -103,7 +103,7 @@ def run() -> None:
 
         # Normalize year range from xxxx-yyyy to the end of range yyyy
         if tb.year.dtype == "category":
-            tb = tb.loc[tb.year.astype(str) != "nan"]
+            tb = tb.loc[tb.year.notna()]
             tb["year"] = normalize_year_range(tb["year"])
 
         # Remove unused columns & rename

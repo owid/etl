@@ -8,15 +8,16 @@ One band, because stunting is the concept the chart exists to explain. A 10th-90
 nested inside this one, and the miniature encoding diagram it took to tell the two apart, were dropped
 after design review: two shades read as two thresholds, and the inner one has no role in the stunting
 definition. That leaves three things worth naming -- the median, the threshold and the share of children
-the band holds -- so each is labelled directly in the Boys panel, see `draw_direct_labels`. The Girls panel repeats the encoding and carries
-no labels of its own. Standard deviations are not labelled in the plot; the Note defines the threshold
-in those terms, and the mobile template, which has no Note, still names it through the in-plot label.
+the band holds -- so each is labelled directly in the Boys panel, see `draw_direct_labels`. The Girls
+panel repeats the encoding and carries no labels of its own. Standard deviations are not labelled in
+the plot, where "-2 SD" would be jargon; the stunting definition in those terms goes in the Note on
+desktop and in a second subtitle sentence on mobile, which has no Note.
 
-The title says "growth curves", not "healthy growth curves" as the replaced image did. Only the
-under-fives standards rest on children selected for good health and nutrition; the 5-19 reference is
-rebuilt from US surveys of 1963-1975 that were not, so "healthy" would over-claim for two thirds of the
-age axis. The subtitle names both WHO products and the ages each covers, which is now the only place
-that split is stated.
+The title says "expected growth curves", not "expected healthy growth curves" as the replaced image
+did. Only the under-fives standards rest on children selected for good health and nutrition; the 5-19
+reference is rebuilt from US surveys of 1963-1975 that were not, so "healthy" would over-claim for two
+thirds of the age axis. "Expected" holds across the whole range: the curves are the heights children of
+each age are expected to have. The subtitle stays simple and makes no health claim either.
 
 Neither panel repeats the other sex's median. The two medians stay within about 2 cm of each other
 from birth until girls overtake boys at age 9.2 -- a couple of pixels on a 40-200 cm axis -- so a
@@ -32,8 +33,10 @@ Two versions are emitted, following the static-chart templates:
   source, the OurWorldinData.org tagline and the license line.
 - mobile, 540x824: panels side by side in the portrait frame, the same direct labels placed for its
   217px panels, footer reduced to Data source plus the license, which is all that template has room
-  for. It has no Note slot, which is why the in-plot stunting label carries the share of children
-  below the cutoff on both layouts.
+  for. It has no Note slot, so its subtitle adds a sentence defining stunting in standard deviations
+  (`MOBILE_SUBTITLE`). The in-plot stunting label says in plain words what stunted means on both
+  layouts. The 2.3% share below the cutoff is stated only in the desktop Note, where it can be qualified
+  as the reference population's.
 
 Both layouts put their panels side by side rather than stacked. Stacked in the portrait frame each
 panel is a 2:1 landscape box, about 222px of height for a 165 cm range, and the adolescent growth
@@ -50,11 +53,12 @@ Figma
 The whole handoff, written out so it can be redone in a later session with nothing but this file.
 
 **Target.** File `Charts (2026)`, key `s6Sv60bakebRRW2TxsMQbF`. Page
-`20260812 Growth curves for boys and girls, from birth to age 19 (Pablo A)` (renamed from `Expected
-height of ...` when the title changed on 2026-10-05; same page, id `25284:5`), sitting at the top of
+`20260812 Expected growth curves for boys and girls (Pablo A)` (it is renamed whenever the title
+changes; same page, id `25284:5`), sitting at the top of
 the dated block -- insert after the `-----------` divider page, not at a counted index. Two frames,
 each named for the slug the website exports by, with a reference copy of this step's own render to
-their left:
+their left. The published image being replaced, `Healthy20height20growth20curves.png`, sits leftmost
+as the "before" (`create-static-viz`'s `scripts/fetch_original_image.py` fetches it):
 
 | Frame | Node | Open it | Cloned from | Size |
 |---|---|---|---|---|
@@ -91,8 +95,8 @@ templates ship -- setting `characters` propagates the first character's style ov
 
 | Slot | Content | Weights |
 |---|---|---|
-| Title | `TITLE` | template's Playfair |
-| Subtitle | `SUBTITLE` | Lato Regular |
+| Title | `TITLE`; on mobile, break the line after "curves" (a line separator), or "girls" is left alone on the second line | template's Playfair |
+| Subtitle | `SUBTITLE` on desktop, `MOBILE_SUBTITLE` on mobile (three lines; it carries the stunting definition) | Lato Regular |
 | `Note:` (desktop only) | `build_note(...)` | `Note:` Bold, rest Regular |
 | `Data source:` | `Data source: ` + `source_citation(...)` from `etl.viz.static` | `Data source:` Bold, rest Regular |
 | Tagline (desktop) | leave the template's | -- |
@@ -119,8 +123,14 @@ The threshold has to be bound too, and to the same style as the median beside it
 in the panel's own colour on purpose -- colour says which panel a mark belongs to, style says which mark
 it is -- so binding only the median splits the pair in Figma: the median moves to the library colour
 while the threshold keeps matplotlib's `#4c72b0` / `#dd8452`. Binding a paint style leaves
-`dashPattern` alone, so the dash survives the binding. The direct labels and the stunting leader are
-not in this table: they stay the step's greys, which ranks them as annotation rather than data.
+`dashPattern` alone, so the dash survives the binding. `label__median` is bound too: it names a line,
+so it takes that line's colour and weight, the house convention for a line's own label. The two
+explanatory labels and their leaders are not in this table: they stay the step's greys, which ranks
+them as annotation rather than data.
+
+`label__median` sits on the band's tint, where Denim text measures about 4.0:1 against it, under the
+4.5:1 usually asked of 12px text (5.3:1 on the canvas). Accepted on purpose: moving the label off the
+band puts it 15 cm clear of the line it names.
 
 | Layer | Treatment |
 |---|---|
@@ -128,6 +138,7 @@ not in this table: they stay the step's greys, which ranks them as annotation ra
 | `girls___50` | `setStrokeStyleIdAsync` -> `Default Palette/Rusty Orange`, key `65bab597d085689b1ea82a69f4d785cb9212c234` |
 | `<sex>__stunting-threshold` | the same style as `<sex>___50` |
 | `<sex>__within-2-sd` | that style's color blended `BAND_TINT` (0.78) towards white |
+| `label__median` (Boys panel) | `setFillStyleIdAsync` on its TEXT -> `Default Palette/Denim` |
 
 Denim and Rusty Orange separate by dE 70 at worst; their grayscale seam is 1.14:1, which does not gate
 here because the two series sit in separate, text-titled panels. Which panel takes which is set by
@@ -141,11 +152,13 @@ on the next call, and a later coordinate patch would use anchors that the fit ha
 |---|---|---|
 | Facet titles (`Boys`, `Girls`) | 16 | Bold |
 | Tick labels, `Age in years` | 14 | `Age in years` Bold, ticks Regular |
-| Direct labels (`label__median`, `label__within-2-sd`, `label__stunting-cutoff`) | 12 | Regular |
+| `label__median` | 12 | Bold, in the line's colour |
+| Explanatory labels (`label__within-2-sd`, `label__stunting-cutoff`) | 12 | Regular |
 
 Anchors: y ticks by their right edge; the first x tick by its left and the last by its right, the rest
 centred; `label__median` by its bottom-right corner; `label__within-2-sd` by its bottom-left corner,
-lines left-aligned, with `leader__within-2-sd` running from its bottom-right corner into the band;
+lines left-aligned, with `leader__within-2-sd` running into the band from the end of its lowest
+near-full-width line (`leader_origin`);
 `label__stunting-cutoff` by its top-left corner, lines left-aligned, with `leader__stunting-cutoff`
 running from that corner up to the dashed line.
 
@@ -167,13 +180,20 @@ a few tenths of a pixel.
 **Audit before showing it.** Expect sizes {16, 14, 12} only, Lato Regular and Bold only, both medians
 *and both thresholds* reporting a bound style -- and each threshold reporting the same colour as its
 own median, which is the check that catches a stale band or threshold selector -- no ink outside
-16..W-16, and gaps of 13.4 / 13.4 on desktop and 19.67 / 19.67 on mobile (measured 2026-10-05).
+16..W-16, and gaps of about 13.4 on desktop and 14.2 on mobile, with the mobile header ending at the
+layout's `chart_area_top`. A mobile gap outside 12-16 means `chart_area_top` no longer matches the
+Figma header: re-measure it rather than re-centring by hand.
 
-Two `verify_page.js` rows fail by design. Desktop `text-floor` flags the template's own tagline and
-license row, which ships at 11px. Mobile `gap` flags 19.67 against the 12-16 target: the plot is laid
-out from the template's chart-area rows, and its ink is shorter than the box reserved for it. The
-series, furniture and colour rows SKIP, because they key on grapher's layer names (`line__*`,
-`horizontal-grid-lines`), which this step does not emit.
+One `verify_page.js` row fails by design: desktop `text-floor` flags the template's own tagline and
+license row, which ships at 11px. The series, furniture and colour rows SKIP, because they key on grapher's layer names (`line__*`,
+`horizontal-grid-lines`), which this step does not emit. `color_audit.py` fails the two band tints
+against each other (dE 14-17); that is accepted, because each sits in its own titled panel and the
+lines carry the colour.
+
+`diff_against_template.js` should report only the footer's first row, which differs from the
+template's by the one space after its bold prefix: the desktop template sets the space after `Note:`
+in Lato Medium, and the mobile one bolds the space after `Data source:`. Pass those in `expected`. Any other footer drift is real: the license row's plain runs are Lato Regular, not
+Medium.
 """
 
 import logging
@@ -299,15 +319,22 @@ BAND_TINT = 0.78
 # the data before the label ships.
 STUNTED_SHARE = 2.2750132
 
-# The two direct labels. The stunting one keeps its share rather than leaving it to the Note, because
-# the mobile template has no Note to put it in.
+# The two direct labels. The stunting one says what stunted means in plain words, which mobile has no
+# Note to carry. It deliberately leaves out the 2.3% share: out of context that reads as the share of
+# children who are stunted, when it is a property of the reference population only -- the Note states it
+# with that qualifier.
 MEDIAN_LABEL = "Median"
-STUNTING_LABEL = f"Stunting cutoff: roughly {STUNTED_SHARE:.1f}% of children are below this line"
+STUNTING_LABEL = "Stunting cutoff: a child below this line is too short for their age."
 
 # The share of children the band holds. A cut point is not a share: 2.3% of children fall below -2 SD
 # and the same share above +2 SD, so the band between them holds 100 - 2 x 2.3 = 95.4%. Carried from
 # STUNTED_SHARE's seven figures, since rounding 2.275 first would print 95.5%.
-BAND_LABEL = f"{100 - 2 * STUNTED_SHARE:.1f}% of children fall within the shaded area"
+# "In the reference population", the Note's own wording, so the share cannot be read as the share of all
+# children in the world -- the same misreading that keeps the 2.3% out of the stunting label.
+BAND_LABEL = (
+    f"{100 - 2 * STUNTED_SHARE:.1f}% of children in the reference population are expected to fall within the "
+    "shaded area."
+)
 
 # The leaders joining a label to its mark. The annotation grey and a 1px-class stroke, as the house
 # arrows take: the lighter #777777 used before all but vanished on the mobile frame, where the leaders
@@ -375,7 +402,8 @@ LADDER_PX = {"facet": 16, "body": 14, "label": 12}
 LADDER_PT = {rank: px * POINTS_PER_PIXEL for rank, px in LADDER_PX.items()}
 FACET_TITLE_PAD = 0.5
 
-TITLE = "Growth curves for boys and girls, from birth to age 19"
+# The age range is on the x axis, so the title leaves it out.
+TITLE = "Expected growth curves for boys and girls"
 
 # Credited as the author of the visualization on the license line, mirroring the slot the
 # static-chart templates leave for it.
@@ -413,16 +441,16 @@ LAYOUTS = {
         "age_ticks": [0, 5, 10, 15, 19],
         # Where the stunting label attaches, in years, and how wide it may wrap, in template px. See
         # `draw_direct_labels` for why it sits where it does.
-        "stunting_label_age": 13,
-        "stunting_label_width": 110,
+        "stunting_label_age": 11.5,
+        "stunting_label_width": 130,
         # Length of the stunting label's leader, from the dashed line down to the label's top, in
         # points. Long enough to read as a line rather than a tick once the shrink at each end is spent.
-        "stunting_leader_pt": 18,
+        "stunting_leader_pt": 24,
         # The band label's bottom-left corner, as (age, cm), in the empty top-left of the Boys panel,
         # and the age its leader reaches into the band at.
-        "band_label_xy": (0.8, 147),
-        "band_label_target_age": 8.3,
-        "band_label_width": 125,
+        "band_label_xy": (0.8, 158),
+        "band_label_target_age": 10.6,
+        "band_label_width": 165,
         "title_fontsize": 16,
         "body_fontsize": LADDER_PT["body"],
         "footer_fontsize": 7.75,
@@ -448,8 +476,12 @@ LAYOUTS = {
         "stunting_label_age": 9.5,
         "stunting_label_width": 100,
         "stunting_leader_pt": 22,
+        # Where the header ends in the Figma frame: the template's serif sets the title on two lines and
+        # the two-sentence subtitle takes three (16 + 58 + 6 + 57). The step measures neither face, so it
+        # takes the number rather than its own wrap.
+        "chart_area_top": 137,
         "band_label_xy": (0.6, 160),
-        "band_label_target_age": 10.2,
+        "band_label_target_age": 10.8,
         "band_label_width": 100,
         "title_fontsize": 16,
         "body_fontsize": LADDER_PT["body"],
@@ -458,15 +490,20 @@ LAYOUTS = {
     },
 }
 
-# Both layouts share this: one line on desktop, the template's two-line slot on mobile. It names WHO's
-# two products by what each is -- *standards* under 5, a *reference* from 5 to 19 -- rather than
-# merging them into one phrase, because the Note no longer explains the split and mobile has no Note.
+# Both layouts share this. It names no product and makes no health claim: the standards-versus-reference
+# split means little to most readers, and "healthy" holds for the under-fives standards only.
 #
 # No geography word, deliberately. The under-fives standards earn one -- six countries, and WHO's own
 # claim that they apply to children everywhere -- but the 5-19 half is a reconstruction of a single
 # national sample, 22,917 US children measured between 1963 and 1975, so calling the whole range
 # 'global' over-claims on exactly that half.
-SUBTITLE = "Growth standards (under age 5) and growth reference (ages 5 to 19) of the World Health Organization."
+SUBTITLE = "Height by age, according to the World Health Organization."
+
+# Mobile has no Note slot, so its subtitle carries the stunting definition the desktop Note gives: the
+# link between the band's lower edge and "2 standard deviations", which the plot does not label.
+MOBILE_SUBTITLE = (
+    f"{SUBTITLE} Children more than 2 standard deviations below the median height for their age are considered stunted."
+)
 
 
 # One dash plus one gap, in POINTS: the dash units are multiples of the line width, so this is what
@@ -485,13 +522,14 @@ TITLE_SUBTITLE_GAP = 6
 SUBTITLE_GAP = 0.15
 HEADER_CHART_GAP = 0.8
 
-# The y the templates give their chart area, and the breathing room to leave inside it, in template
-# pixels. Filling the area edge to edge leaves the drawn block about 5px from the header and the
-# footer, which reads as cramped; the design team's own pages sit at 12-16px. Only the mobile layout
-# needs this, because there the block starts at the chart area's top: the desktop layout centres what
-# is left of a band its one-line title and subtitle have already widened.
-CHART_AREA_TOP = 118
-CHART_AREA_INSET = 14
+# The breathing room to leave inside the chart area, in template pixels. Filling the area edge to edge
+# leaves the drawn block about 5px from the header and the footer, which reads as cramped; the design
+# team's own pages sit at 12-16px. Only the mobile layout needs this, because there the block starts at
+# the chart area's top (its `chart_area_top`): the desktop layout centres what is left of a band its
+# one-line title and subtitle have already widened. The drawn ink ends about 5px inside the reserved box
+# at each end (the facet-title and x-label reserves run taller than their text), so 9 here lands the
+# 12-16px gap once Figma centres the chart in its band.
+CHART_AREA_INSET = 9
 
 
 def run() -> None:
@@ -518,18 +556,18 @@ def run() -> None:
 
 
 def assert_threshold_is_a_fixed_percentile(tb: Table) -> None:
-    """Check the premise behind the share of children printed under the stunting threshold.
+    """Check the premise behind the shares the chart prints: 2.3% below the threshold, 95.4% in the band.
 
     The threshold is stated as a *share of children* while it is defined in *standard deviations*, and
     that conversion only holds because WHO's height-for-age standard sets the LMS skewness parameter L
     to 1 at every age, making the distribution normal. If a future revision introduced skewness, -2 SD
-    would become an age-varying centile and the label and the Note would silently misstate how many
+    would become an age-varying centile and the band label and the Note would silently misstate how many
     children fall below it -- a wrong number on a published chart, with nothing else to catch it.
     """
     skewness = tb["lms_l_skewness"].unique()
     assert set(skewness) == {1}, (
         f"Height-for-age is no longer a normal distribution (L = {skewness}), so -2 SD is no longer "
-        f"the {STUNTED_SHARE}th percentile that STUNTING_LABEL and the Note state."
+        f"the {STUNTED_SHARE}th percentile that BAND_LABEL and the Note are built on."
     )
 
     # The same claim checked against the percentile columns rather than the parameter: 2.275 sits
@@ -539,7 +577,7 @@ def assert_threshold_is_a_fixed_percentile(tb: Table) -> None:
     )
     assert not outside.any(), (
         f"-2 SD escapes the 1st-3rd percentile range in {int(outside.sum())} rows, so it is not the "
-        f"{STUNTED_SHARE}th percentile the stunting label states."
+        f"{STUNTED_SHARE}th percentile that BAND_LABEL and the Note are built on."
     )
 
     # The band is drawn as symmetric about the median, and the Note's "shaded area" reads as two
@@ -638,7 +676,7 @@ def tint(color, weight: float) -> tuple[float, float, float]:
     return (r + (1 - r) * weight, g + (1 - g) * weight, b + (1 - b) * weight)
 
 
-def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float) -> None:
+def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float, color) -> None:
     """Name the median, the band and the stunting threshold on the curves themselves.
 
     The median and stunting labels, and the band label's leader, are anchored to the data at an age
@@ -649,10 +687,10 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float) -> None
       flattened out after the growth spurt. On the rising stretch any label clear of the line floats a
       line-height or more above it, level with the band's upper edge, and reads as naming that edge
       instead. Right-aligned, a wider face in Figma only grows the label leftwards, never past the edge.
-    - The band's label sits in the empty space above the band at the young ages, with a leader into
-      the upper half of the band -- between the median and the band's top edge, so the leader touches
-      neither line. Inside the band there is no room for it: the band rises too steeply for a
-      horizontal label to stay between its edges.
+    - The band's label sits in the empty space above the band at the young ages, with a leader that ends
+      well inside the shading, midway between the band's top edge and the median, so it points at the
+      area rather than at either line. Inside the band there is no room for the label itself: the band
+      rises too steeply for a horizontal label to stay between its edges.
     - The stunting label hangs below the dashed line from a short leader, left-aligned on it. The line
       rises to the right, so text extending rightwards from the anchor moves away from it; centred,
       the label's first line ran into the line on its left. Below the threshold is the region the
@@ -672,14 +710,19 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float) -> None
         ha="right",
         va="bottom",
         fontsize=fontsize,
-        color=TEXT_COLOR,
+        # The line's own label: its colour and bold, so it reads as the line's name. The two labels
+        # below explain the encoding and stay in the annotation grey.
+        color=color,
+        fontweight="bold",
         zorder=6,
         gid="label__median",
     )
 
     target_age = layout["band_label_target_age"]
+    band_text = wrap_to_width(BAND_LABEL, layout["band_label_width"], fontsize)
+    band_origin, band_gap = leader_origin(band_text, fontsize)
     band_label = ax.annotate(
-        wrap_to_width(BAND_LABEL, layout["band_label_width"], fontsize),
+        band_text,
         xy=(target_age, (height_at(MEDIAN_COLUMN, target_age) + height_at(BAND[1], target_age)) / 2),
         xytext=layout["band_label_xy"],
         textcoords="data",
@@ -694,11 +737,14 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float) -> None
             "arrowstyle": "-",
             "color": LEADER_COLOR,
             "linewidth": LEADER_WIDTH,
-            "shrinkA": 2,
+            "shrinkA": band_gap,
             "shrinkB": 0,
-            # From the label's bottom-right corner, the point nearest the band, so the leader is a
-            # short stub across the band's edge rather than a line across the empty corner.
-            "relpos": (1.0, 0.0),
+            # From the end of a line of the label's own text, so the leader visibly comes out of the
+            # words. The box's bottom-right corner is empty whenever the last line is the short one.
+            "relpos": band_origin,
+            # matplotlib otherwise clips the leader to the text's box plus 4pt of padding, so it starts
+            # on the box's edge -- below the short last lines -- rather than at the point chosen above.
+            "patchA": None,
         },
     )
     assert band_label.arrow_patch is not None
@@ -730,6 +776,26 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, fontsize: float) -> None
     )
     assert label.arrow_patch is not None
     label.arrow_patch.set_gid("leader__stunting-cutoff")
+
+
+def leader_origin(text: str, fontsize: float) -> tuple[tuple[float, float], float]:
+    """Where on a wrapped label a leader leaves it: a `relpos` fraction of the text's box, and the gap.
+
+    The end of the lowest line that runs within 15% of the label's full width: low, so the leader is
+    short on its way down to the band, and long, so the point it leaves from is the end of a word rather
+    than empty space beside a short last line. Widths are measured in the same face the wrap is.
+
+    The gap, in points, is a hair of clearance plus what that line grows by once Figma sets it in Lato,
+    which runs wider than the face measured here: the label is left-anchored, so the growth all lands
+    at the line's end, on top of the leader.
+    """
+    font = FontProperties(family=MEASURED_FONT_STACK, size=fontsize)
+    lines = text.split("\n")
+    widths = [TextPath((0, 0), line, prop=font).get_extents().width if line.strip() else 0.0 for line in lines]
+    widest = max(widths)
+    row = max(i for i, width in enumerate(widths) if width >= 0.85 * widest)
+    gap = 2 + (LATO_OVER_MEASURED_ADVANCE - 1) * widths[row]
+    return (widths[row] / widest, (len(lines) - row - 0.5) / len(lines)), gap
 
 
 def height_tick_label(value: float, _position: int | None = None) -> str:
@@ -780,7 +846,8 @@ def wrap_to_width(text: str, width_px: float, fontsize: float) -> str:
 
     lines: list[str] = []
     current = ""
-    for word in text.split():
+    # Split on plain spaces only, so a no-break space holds its words together.
+    for word in text.split(" "):
         candidate = f"{current} {word}".strip()
         if current and measure(candidate) > max_points:
             lines.append(current)
@@ -804,8 +871,9 @@ def build_note(layout: dict) -> str:
     or two, so the note was explaining something the reader cannot see.
     """
     text = (
-        "Note: A child is considered stunted if their height is more than two standard deviations below the median "
-        "for children of the same age, shown here by the lower edge of the shaded area. In the reference population, "
+        "Note: A child is considered stunted if their height is more than 2 standard deviations below the median "
+        "for children of the same age, shown here by the dashed line, the lower edge of the shaded area. In the "
+        "reference population, "
         f"roughly {STUNTED_SHARE:.1f}% of children fall below this cutoff."
     )
     return wrap_to_content_width(text, layout, layout["footer_fontsize"])
@@ -948,7 +1016,7 @@ def create_visualization(tb: Table, citation: str, layout: dict) -> plt.Figure:
             )
 
         if ax is axes[0]:
-            draw_direct_labels(ax, tb_sex, layout, LADDER_PT["label"])
+            draw_direct_labels(ax, tb_sex, layout, LADDER_PT["label"], color)
 
         # --- panel title, above the plot and left-aligned with it, as grapher labels a facet ---
         ax.set_title(
@@ -1001,7 +1069,7 @@ def create_visualization(tb: Table, citation: str, layout: dict) -> plt.Figure:
     title_lines = title.count("\n") + 1
     subtitle_y = layout["title_y"] + title_lines * px(layout["title_fontsize"]) + TITLE_SUBTITLE_GAP
 
-    subtitle = wrap_to_content_width(SUBTITLE, layout, body_fontsize)
+    subtitle = wrap_to_content_width(SUBTITLE if layout["full_footer"] else MOBILE_SUBTITLE, layout, body_fontsize)
     subtitle_lines = subtitle.count("\n") + 1
 
     fig.text(
@@ -1034,7 +1102,7 @@ def create_visualization(tb: Table, citation: str, layout: dict) -> plt.Figure:
     else:
         # Mobile: the drawn block starts at the template's chart-area top, inset from it, unless the
         # subtitle runs past that row.
-        chart_top_px = max(subtitle_bottom_px, CHART_AREA_TOP) + CHART_AREA_INSET + facet_title_space_px
+        chart_top_px = max(subtitle_bottom_px, layout["chart_area_top"]) + CHART_AREA_INSET + facet_title_space_px
 
     # --- footer, in the slots the static-chart templates define ---
     # Desktop: Note -> Data source -> tagline and license sharing one row, left and right.

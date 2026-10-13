@@ -11,6 +11,7 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 import pytest
+from matplotlib.text import Text
 
 from etl import paths as etl_paths
 from etl.helpers import PathFinder
@@ -22,6 +23,7 @@ from etl.viz.static import (
     SketchPaths,
     apply_svg_rcparams,
     export_frame,
+    name_furniture,
     nice_year_ticks,
     save_fig,
     source_citation,
@@ -176,6 +178,98 @@ def test_export_frame_sweeps_clipping_before_saving(tmp_path):
     export_frame(paths, fig, "chart", template="mobile")
     assert line.get_clip_on() is False
     plt.close(fig)
+
+
+def test_name_furniture_names_ticks_grids_and_spines_by_value():
+    fig, ax = plt.subplots()
+    ax.plot([2000, 2020], [0, 100], gid="series__demo")
+    ax.set_xticks([2000, 2010, 2020])
+    ax.grid(True)
+    assert name_furniture(fig) > 0
+    gids = {a.get_gid() for a in fig.findobj() if a.get_gid()}
+    assert {"axes__spine-left", "axes__x-grid-2010", "axes__x-tick-2010", "axes__x-tick-label-2010"} <= gids
+    assert "series__demo" in gids, "a gid the step set itself is kept"
+    plt.close(fig)
+
+
+def test_name_furniture_never_overwrites_a_step_gid():
+    fig, ax = plt.subplots()
+    ax.spines["left"].set_gid("frame__baseline")
+    name_furniture(fig)
+    assert ax.spines["left"].get_gid() == "frame__baseline"
+    plt.close(fig)
+
+
+def test_name_furniture_keeps_nearby_large_ticks_distinct():
+    # The default "g" format rounds to six digits, so 1,000,000..1,000,005 would all read 1e+06.
+    fig, ax = plt.subplots()
+    ax.set_xlim(1_000_000, 1_000_005)
+    ax.set_xticks(range(1_000_000, 1_000_006))
+    name_furniture(fig)
+    labels = [t.label1.get_gid() for t in ax.xaxis.get_major_ticks()]
+    assert labels == [f"axes__x-tick-label-{v}" for v in range(1_000_000, 1_000_006)]
+    plt.close(fig)
+
+
+def test_name_furniture_reaches_inset_and_secondary_axes():
+    # Both live in ax.child_axes, which fig.axes does not list.
+    fig, ax = plt.subplots()
+    inset = ax.inset_axes([0.6, 0.6, 0.3, 0.3])
+    inset.set_xticks([0, 1])
+    secondary = ax.secondary_xaxis("top")
+    name_furniture(fig)
+    assert inset.spines["left"].get_gid() == "axes-child1__spine-left"
+    assert inset.xaxis.get_major_ticks()[1].label1.get_gid() == "axes-child1__x-tick-label-1"
+    assert secondary.spines["top"].get_gid() == "axes-child2__spine-top"
+    plt.close(fig)
+
+
+def test_name_furniture_keeps_the_first_axes_name_when_another_is_added():
+    # A later render that adds a twin axis must not rename the original axes' furniture.
+    fig, ax = plt.subplots()
+    twin = ax.twinx()
+    name_furniture(fig)
+    assert ax.spines["left"].get_gid() == "axes__spine-left"
+    assert twin.spines["right"].get_gid() == "axes2__spine-right"
+    plt.close(fig)
+
+
+def test_name_furniture_names_left_and_right_titles():
+    fig, ax = plt.subplots()
+    ax.set_title("Left", loc="left")
+    ax.set_title("Right", loc="right")
+    name_furniture(fig)
+    gids = {a.get_text(): a.get_gid() for a in fig.findobj(match=Text) if isinstance(a, Text)}
+    assert gids["Left"] == "axes__title-left" and gids["Right"] == "axes__title-right"
+    plt.close(fig)
+
+
+def test_name_furniture_never_repeats_an_id():
+    fig, ax = plt.subplots()
+    ax.set_yticks([0.1, 0.1 + 1e-17, 0.2])
+    ax.text(0, 0, "x", gid="axes__y-grid-0.2")
+    name_furniture(fig)
+    gids = [a.get_gid() for a in fig.findobj() if a.get_gid()]
+    assert len(gids) == len(set(gids)), "every mark needs its own id for the re-import to tell them apart"
+    assert "axes__y-grid-0.2-2" in gids, "a name already taken gets a suffix, not a duplicate"
+    plt.close(fig)
+
+
+def test_export_frame_svg_has_no_unnamed_axes_furniture(tmp_path):
+    """End to end: the saved SVG carries the names, which is what the Figma re-import reads."""
+    paths = SketchPaths(tmp_path / "sketch.py")
+    t = TEMPLATES["horizontal"]
+    fig = plt.figure(figsize=t.figsize)
+    ax = fig.add_subplot()
+    ax.plot([0, 1], [0, 1], gid="series__demo")
+    ax.set_xticks([0, 1])
+    ax.set_yticks([0, 0.5, 1])
+    ax.grid(True)
+    export_frame(paths, fig, "chart", template="horizontal")
+    plt.close(fig)
+    svg = (tmp_path / "chart.svg").read_text()
+    assert 'id="axes__y-grid-0.5"' in svg and 'id="axes__x-tick-label-1"' in svg
+    assert "<clipPath" not in svg, "the sweep must reach ticks the naming draw created"
 
 
 def test_export_frame_rejects_a_figsize_that_is_not_the_template(tmp_path):

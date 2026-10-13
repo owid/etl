@@ -137,13 +137,6 @@ steps:
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
         - data://garden/who/2025-04-17/mortality_database
-  # Suicides based on WHO Mortality Database
-  data://garden/who/2024-03-24/self_inflicted_injuries:
-    - data://meadow/who/2024-03-24/self_inflicted_injuries:
-        - snapshot://who/2024-03-24/self_inflicted_injuries.csv
-  data://grapher/who/2024-03-24/self_inflicted_injuries:
-    - data://garden/who/2024-03-24/self_inflicted_injuries
-
   # Global Mental Health Countdown
   data://grapher/health/2024-03-21/gmh_countdown:
     - data://garden/health/2024-03-21/gmh_countdown:
@@ -182,12 +175,6 @@ steps:
         - data://meadow/health/2024-04-12/polio_free_countries:
             - snapshot://health/2024-04-12/polio_free_countries.csv
         - data://garden/regions/2023-01-01/regions
-
-  # Polio vaccine schedule - update
-  data://grapher/who/2025-01-13/polio_vaccine_schedule:
-    - data://garden/who/2025-01-13/polio_vaccine_schedule:
-        - data://meadow/who/2025-01-13/polio_vaccine_schedule:
-            - snapshot://who/2025-01-13/polio_vaccine_schedule.xlsx
 
   # Polio GPEI funding
   data://grapher/health/2024-04-22/gpei_funding:
@@ -644,11 +631,20 @@ steps:
     - data://garden/demography/2024-07-15/population
 
   # WHO Vaccine Introductions
+  data://grapher/who/2025-07-15/vaccination_introductions:
+    - data://garden/who/2025-07-15/vaccination_introductions:
+        - data://meadow/who/2025-07-15/vaccination_introductions:
+            - snapshot://who/2025-07-15/vaccination_introductions.xlsx
+
+  # WHO Vaccine Introductions - update
+  data://grapher/who/2026-10-07/vaccination_introductions:
+    - data://garden/who/2026-10-07/vaccination_introductions:
+        - data://meadow/who/2026-10-07/vaccination_introductions:
+            - snapshot://who/2026-10-07/vaccination_introductions.xlsx
+
   viz://chart/health/latest/vaccination_introductions:
-    - data://grapher/who/2025-07-15/vaccination_introductions:
-        - data://garden/who/2025-07-15/vaccination_introductions:
-            - data://meadow/who/2025-07-15/vaccination_introductions:
-                - snapshot://who/2025-07-15/vaccination_introductions.xlsx
+    - data://grapher/who/2026-10-07/vaccination_introductions
+    - data://grapher/who/2025-07-15/vaccination_introductions
 
   #
   # US Pertussis cases - CDC
@@ -841,13 +837,14 @@ steps:
   data://garden/who/2025-08-05/mortality_database_cancer:
     - data://meadow/who/2025-08-05/mortality_database_cancer:
         - snapshot://who/2025-08-05/mortality_database_cancer.csv
+    - data://garden/who/2025-04-17/mortality_database
   data://grapher/who/2025-08-05/mortality_database_cancer:
     - data://garden/who/2025-08-05/mortality_database_cancer
   # WHO ICD codes
-  data://grapher/who/2025-08-06/icd_codes:
-    - data://garden/who/2025-08-06/icd_codes:
-        - data://meadow/who/2025-08-06/icd_codes:
-            - snapshot://who/2025-08-06/icd_codes.zip
+  data://grapher/who/2026-10-02/icd_codes:
+    - data://garden/who/2026-10-02/icd_codes:
+        - data://meadow/who/2026-10-02/icd_codes:
+            - snapshot://who/2026-10-02/icd_codes.zip
   # Suicides based on WHO Mortality Database
   data://grapher/who/2025-08-06/self_inflicted_injuries:
     - data://garden/who/2025-08-06/self_inflicted_injuries:
@@ -1132,3 +1129,9 @@ steps:
     - data://meadow/health/2026-10-05/maternal_tetanus
   data://grapher/health/2026-10-05/maternal_tetanus:
     - data://garden/health/2026-10-05/maternal_tetanus
+
+  # Polio vaccine schedule - update
+  data://grapher/who/2026-10-07/polio_vaccine_schedule:
+    - data://garden/who/2026-10-07/polio_vaccine_schedule:
+        - data://meadow/who/2026-10-07/polio_vaccine_schedule:
+            - snapshot://who/2026-10-07/polio_vaccine_schedule.xlsx

@@ -104,8 +104,6 @@ def enable_structlog_filtering() -> None:
     structlog.configure(**kwargs)
 
 
-pd.set_option("future.no_silent_downcasting", True)
-
 # Environment, e.g. production, staging, dev
 ENV = env.get("ENV", "dev")
 ENV_IS_REMOTE = ENV in ("production", "staging")

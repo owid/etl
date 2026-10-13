@@ -4,7 +4,7 @@
 
 import tempfile
 import warnings
-from collections.abc import Iterable, Iterator
+from collections.abc import Generator, Iterable
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -220,7 +220,7 @@ def test_find_fuzzy_sorted_by_score():
 
 
 @contextmanager
-def mock_catalog(n: int = 3, channels: Iterable[CHANNEL] = ("garden",)) -> Iterator[LocalCatalog]:
+def mock_catalog(n: int = 3, channels: Iterable[CHANNEL] = ("garden",)) -> Generator[LocalCatalog, None, None]:
     with tempfile.TemporaryDirectory() as dirname:
         path = Path(dirname)
         for channel in channels:

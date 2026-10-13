@@ -85,6 +85,12 @@ definitions:
     url_main: https://ghdx.healthdata.org/record/gbd-2023-cause-rei-and-location-hierarchies
     date_accessed: "2026-08-05"
     attribution_short: IHME-GBD
+  origins_ucdp: &origins_ucdp
+    producer: Uppsala Conflict Data Program
+    title: UCDP world regions
+    url_main: https://ucdp.uu.se/downloads/
+    date_accessed: "2026-10-12"
+    attribution_short: UCDP
 
 tables:
   regions:
@@ -882,5 +888,36 @@ tables:
                   "High-income Asia Pacific (IHME GBD)": "High-income Asia Pacific"
                   "Australasia (IHME GBD)": "Australasia"
                   "Oceania (IHME GBD)": "Oceania"
+                customHiddenCategories:
+                  "No data": true
+
+      # UCDP
+      ucdp_region:
+        title: World regions according to UCDP
+        description_short: |-
+          Regions as defined by the Uppsala Conflict Data Program (UCDP).
+        type: ordinal
+        sort:
+          - Americas (UCDP)
+          - Africa (UCDP)
+          - Middle East (UCDP)
+          - Europe (UCDP)
+          - Asia and Oceania (UCDP)
+        origins:
+          - *origins_ucdp
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
+              colorScale:
+                baseColorScheme: OwidCategoricalMap
+                customCategoryLabels:
+                  "Americas (UCDP)": "Americas"
+                  "Africa (UCDP)": "Africa"
+                  "Middle East (UCDP)": "Middle East"
+                  "Europe (UCDP)": "Europe"
+                  "Asia and Oceania (UCDP)": "Asia and Oceania"
                 customHiddenCategories:
                   "No data": true
