@@ -1208,3 +1208,7 @@ steps:
     - data://garden/who/2025-04-17/mortality_database:
       - data://meadow/who/2025-04-17/mortality_database:
         - snapshot://who/2025-04-17/mortality_database.feather
+  # archived; last active in 713c5842dbb3 on 2026-10-13
+  data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
+    - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
+      - data://garden/who/2025-04-17/mortality_database
