@@ -22,6 +22,7 @@ from etl.viz.static import (
     SketchPaths,
     apply_svg_rcparams,
     export_frame,
+    name_furniture,
     nice_year_ticks,
     save_fig,
     source_citation,
@@ -176,6 +177,43 @@ def test_export_frame_sweeps_clipping_before_saving(tmp_path):
     export_frame(paths, fig, "chart", template="mobile")
     assert line.get_clip_on() is False
     plt.close(fig)
+
+
+def test_name_furniture_names_ticks_grids_and_spines_by_value():
+    fig, ax = plt.subplots()
+    ax.plot([2000, 2020], [0, 100], gid="series__demo")
+    ax.set_xticks([2000, 2010, 2020])
+    ax.grid(True)
+    assert name_furniture(fig) > 0
+    gids = {a.get_gid() for a in fig.findobj() if a.get_gid()}
+    assert {"axes__spine-left", "axes__x-grid-2010", "axes__x-tick-2010", "axes__x-tick-label-2010"} <= gids
+    assert "series__demo" in gids, "a gid the step set itself is kept"
+    plt.close(fig)
+
+
+def test_name_furniture_never_overwrites_a_step_gid():
+    fig, ax = plt.subplots()
+    ax.spines["left"].set_gid("frame__baseline")
+    name_furniture(fig)
+    assert ax.spines["left"].get_gid() == "frame__baseline"
+    plt.close(fig)
+
+
+def test_export_frame_svg_has_no_unnamed_axes_furniture(tmp_path):
+    """End to end: the saved SVG carries the names, which is what the Figma re-import reads."""
+    paths = SketchPaths(tmp_path / "sketch.py")
+    t = TEMPLATES["horizontal"]
+    fig = plt.figure(figsize=t.figsize)
+    ax = fig.add_subplot()
+    ax.plot([0, 1], [0, 1], gid="series__demo")
+    ax.set_xticks([0, 1])
+    ax.set_yticks([0, 0.5, 1])
+    ax.grid(True)
+    export_frame(paths, fig, "chart", template="horizontal")
+    plt.close(fig)
+    svg = (tmp_path / "chart.svg").read_text()
+    assert 'id="axes__y-grid-0.5"' in svg and 'id="axes__x-tick-label-1"' in svg
+    assert "<clipPath" not in svg, "the sweep must reach ticks the naming draw created"
 
 
 def test_export_frame_rejects_a_figsize_that_is_not_the_template(tmp_path):

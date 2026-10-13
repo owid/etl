@@ -100,6 +100,55 @@ def test_scaffold_is_ruff_clean(sketch):
         assert result.returncode == 0, result.stdout + result.stderr
 
 
+def test_scaffold_names_every_mark(sketch):
+    # A promoted sketch is a new step, and the skill asks new steps to pass the strict naming check.
+    verify = run(VERIFY, sketch, "--template", "horizontal", "--require-named-marks")
+    assert verify.returncode == 0, verify.stdout + verify.stderr
+
+
+# --- verify_static_viz.py: named marks --------------------------------------------------------------
+
+SVG_HEAD = (
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="850" height="638">'
+)
+
+
+def write_frame(tmp_path: Path, body: str) -> Path:
+    """A horizontal-template SVG and its sibling PNG, holding a named title and whatever `body` adds."""
+    from PIL import Image
+
+    stem = tmp_path / "frame"
+    title = '<g id="title"><text style="fill: #2d2e2d">Title</text></g>'
+    stem.with_suffix(".svg").write_text(f"{SVG_HEAD}{title}{body}</svg>")
+    Image.new("RGB", (850, 638), "white").save(stem.with_suffix(".png"))
+    return stem
+
+
+def test_unnamed_furniture_fails_only_when_required(tmp_path):
+    body = (
+        '<g id="row__bar"><path d="M0 0h10v10z" style="fill: #00295b"/></g>'
+        '<g id="line2d_1"><path d="M0 50h400" style="fill: none; stroke: #dddddd"/></g>'
+    )
+    stem = write_frame(tmp_path, body)
+    lenient = run(VERIFY, stem, "--template", "horizontal")
+    assert lenient.returncode == 0 and "1 unnamed marks" in lenient.stdout, lenient.stdout
+    strict = run(VERIFY, stem, "--template", "horizontal", "--require-named-marks")
+    assert strict.returncode == 1, strict.stdout
+    assert "1 painted mark(s)" in strict.stdout and "line2d_1 <path>" in strict.stdout
+
+
+def test_named_marks_ignore_what_paints_nothing_and_defs(tmp_path):
+    body = (
+        '<defs><path id="m0123456789" d="M0 0v4" style="stroke: #000000"/></defs>'
+        '<g id="patch_1"><path d="M0 0h850v638z" style="fill: none"/></g>'
+        '<g id="axis__x-ticks"><use xlink:href="#m0123456789" style="stroke: #000000"/></g>'
+        '<g id="line2d_2"><path d="M0 0h10" style="fill: none; stroke: #000000; stroke-opacity: 0"/></g>'
+    )
+    stem = write_frame(tmp_path, body)
+    strict = run(VERIFY, stem, "--template", "horizontal", "--require-named-marks")
+    assert strict.returncode == 0, strict.stdout
+
+
 def test_scaffold_carries_the_promotion_markers(sketch):
     source = (sketch / "sketch.py").read_text()
     assert source.count("paths = SketchPaths(__file__)") == 1

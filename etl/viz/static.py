@@ -122,6 +122,47 @@ def unclip(fig: Any) -> None:
         artist.set_clip_on(False)
 
 
+def name_furniture(fig: Any) -> int:
+    """Give each axes' own furniture a `<subject>__<role>` gid wherever the step has not set one.
+
+    Figma's re-import of a styled frame learns which library style each mark carries by joining
+    nodes on these names, so gridlines, ticks, tick labels and spines left with matplotlib's
+    `line2d_<n>` / `text_<n>` ids lose any style a designer bound on them. Names are keyed on the
+    tick VALUE rather than its position, so they survive a re-render that adds or drops a tick
+    (`axes__y-grid-50`, `axes__x-tick-label-2010`). A gid the step set itself is never overwritten.
+    Returns the number of artists it named.
+
+    Draws the figure once without rendering first: matplotlib builds its tick objects at draw time,
+    so ticks fetched before a draw can be replaced by fresh, unnamed ones when the figure is saved.
+    """
+    fig.draw_without_rendering()
+    named = 0
+
+    def name(artist: Any, gid: str) -> None:
+        nonlocal named
+        if artist is not None and artist.get_gid() is None:
+            artist.set_gid(gid)
+            named += 1
+
+    for index, ax in enumerate(fig.axes):
+        subject = "axes" if len(fig.axes) == 1 else f"axes{index + 1}"
+        for side, spine in ax.spines.items():
+            name(spine, f"{subject}__spine-{side}")
+        name(ax.title, f"{subject}__title")
+        for axis_name, axis in (("x", ax.xaxis), ("y", ax.yaxis)):
+            name(axis.label, f"{subject}__{axis_name}-label")
+            name(axis.get_offset_text(), f"{subject}__{axis_name}-offset")
+            for kind, ticks in (("", axis.get_major_ticks()), ("minor-", axis.get_minor_ticks())):
+                for tick in ticks:
+                    value = format(tick.get_loc(), "g")
+                    name(tick.gridline, f"{subject}__{axis_name}-{kind}grid-{value}")
+                    name(tick.tick1line, f"{subject}__{axis_name}-{kind}tick-{value}")
+                    name(tick.tick2line, f"{subject}__{axis_name}-{kind}tick2-{value}")
+                    name(tick.label1, f"{subject}__{axis_name}-{kind}tick-label-{value}")
+                    name(tick.label2, f"{subject}__{axis_name}-{kind}tick-label2-{value}")
+    return named
+
+
 # Metadata that makes an exported figure reproducible, per format. matplotlib stamps the
 # timestamp and its own version into every file, so without this an unchanged figure re-rendered
 # under a new matplotlib produces a diff with no pixel change — measured on 3.10.8 -> 3.10.9,
@@ -192,6 +233,7 @@ def export_frame(
     template: str | None = None,
     dpi: int = 300,
     unclip_first: bool = True,
+    name_furniture_first: bool = True,
 ) -> None:
     """Save one frame as the PNG/SVG pair the Figma handoff expects.
 
@@ -208,7 +250,14 @@ def export_frame(
 
     `template` is optional and only validates: it asserts the figure's `figsize` matches that
     template, catching a `figsize` typo or a stray `bbox_inches="tight"` before the file is written.
+
+    The axes' own furniture is named first (`name_furniture`), so the only marks a step still has
+    to give a gid are the ones it draws itself; `verify_static_viz.py --require-named-marks` lists
+    any it missed.
     """
+    # Name first: its draw can create tick objects, and the clipping sweep has to reach those too.
+    if name_furniture_first:
+        name_furniture(fig)
     if unclip_first:
         unclip(fig)
 
