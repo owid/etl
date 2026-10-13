@@ -5,6 +5,7 @@ from typing import Any, Literal, get_args
 
 import click
 import structlog
+from github import UnknownObjectException
 from rich import print
 from rich_click.rich_command import RichCommand
 
@@ -14,6 +15,10 @@ from etl.git_api_helpers import GithubApiRepo
 
 # Cloudflare Pages subdomain limit (see https://community.cloudflare.com/t/algorithm-to-generate-a-preview-dns-subdomain-from-a-branch-name/477633)
 CLOUDFLARE_SUBDOMAIN_LIMIT = 28
+
+# Every status comment written by create_comment_body carries this marker; other comments posted as
+# owidbot don't, so they are never edited or deleted.
+STATUS_COMMENT_MARKER = "<!--grapher-start-->"
 
 
 def get_cloudflare_subdomain(branch_name: str) -> str:
@@ -111,13 +116,17 @@ def cli(
             log.warning("Invalid service", service=service)
             continue
 
-    # get existing comment (do this as late as possible to avoid race conditions)
-    comment = repo.get_comment_from_pr(pr)
+    # get existing status comments (do this as late as possible to avoid race conditions)
+    comments = [c for c in repo.get_comments_from_pr(pr) if STATUS_COMMENT_MARKER in c.body]
+    comment = comments[0] if comments else None
 
-    # fill in services from existing comment if not run via --services to avoid deleting them
-    if comment:
-        for service, content in services_from_comment(comment).items():
-            services_body.setdefault(service, content)
+    # fill in services from existing comments if not run via --services to avoid deleting them.
+    # Concurrent runs can each create a comment, so read them all, newest first; every comment
+    # carries every section, so skip empty ones or they'd hide another comment's content.
+    for existing in reversed(comments):
+        for service, content in services_from_comment(existing).items():
+            if content:
+                services_body.setdefault(service, content)
 
     body = create_comment_body(branch, services_body, start_time)
 
@@ -131,6 +140,17 @@ def cli(
         else:
             log.info("Updating comment.", repo=repo, branch=branch, services=services)
             comment.edit(body=body)
+
+    # Keep the oldest comment and delete duplicates, only once their content is merged and posted.
+    if len(comments) > 1:
+        log.warning("Found duplicate owidbot comments.", branch=branch, duplicates=len(comments) - 1)
+        if not dry_run:
+            for duplicate in comments[1:]:
+                try:
+                    duplicate.delete()
+                except UnknownObjectException:
+                    # A concurrent run already deleted it.
+                    pass
 
 
 def strip_appendix(body: str) -> str:
