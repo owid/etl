@@ -62,6 +62,8 @@ The two ends of the spectrum, plus everything in between:
 | Map color scale | `view.indicators.y[i].display.{colorScaleScheme, colorScaleNumericBins}` (semicolon-string form, explorer-flavored override) | `presentation.grapher_config.map.colorScale.{baseColorScheme, binningStrategy, customNumericValues}` (canonical grapher form, inherited at chart render time) |
 | Python step content | Trivial: `paths.create_explorer(config=config, short_name=...).save(...)` | Loops columns to set `m.dimensions`, optionally post-processes (`sort_choices`, `group_views`, per-view `display` tweaks) |
 
+To choose map palettes (more is good or bad, one palette per indicator), see "Map palettes" in the `create-chart` skill.
+
 It's a spectrum, not a switch. Mix freely: use table-driven for the bulk of views, hand-list a handful of bespoke ones; or stay full-YAML but still push title/subtitle for the single-indicator views into garden metadata to remove duplication.
 
 **Strong fit for table-driven:**
