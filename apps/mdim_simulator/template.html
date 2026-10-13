@@ -50,6 +50,10 @@ a.topic-tag:hover { color: #426591; }
 .md-menu__close { display: flex; align-items: center; justify-content: center; flex: none; width: 32px; height: 32px; margin-left: 8px; border: 1px solid #e7e7e7; border-radius: 50%; background: #fff; color: #5b5b5b; font-size: 18px; line-height: 1; cursor: pointer; }
 .md-menu__close:hover { background: #f2f2f2; }
 .md-menu__list { margin: 0; padding: 0; list-style: none; }
+.md-menu__dimension-description { margin: 0 0 4px; font-size: 13px; line-height: normal; color: #767676; }
+.md-menu__group { margin-bottom: 16px; }
+.md-menu__group:last-child { margin-bottom: 0; }
+.md-menu__group-label { margin: 16px 0; font-size: 13px; font-weight: 700; letter-spacing: 0.01em; color: #767676; }
 .md-option { display: flex; gap: 8px; padding: 16px 0; border-bottom: 1px solid #e7e7e7; cursor: pointer; outline: none; }
 .md-option:first-of-type { padding-top: 0; }
 .md-option:last-of-type { border-bottom: none; }
@@ -61,6 +65,41 @@ a.topic-tag:hover { color: #426591; }
 
 .chart { width: 100%; height: 600px; background: var(--panel); border: 1px solid var(--border); }
 .chart * { box-sizing: border-box; }
+.tab-note { flex: none; font-size: 12px; line-height: 1.4; color: #858585; white-space: nowrap; }
+.tab-note[hidden] { display: none; }
+.selection-note { flex: none; margin-left: auto; font-size: 12px; line-height: 1.4; color: #858585; white-space: nowrap; }
+.selection-note[hidden] { display: none; }
+/* Text editing (simulator-only UI, tinted so it doesn't read as part of the page) */
+.text-editor { display: flex; flex-direction: column; gap: 12px; padding: 10px 0; }
+.text-editor.open { padding: 16px 24px; background: #fff8e1; border: 1px solid #f1dfa4; border-bottom: none; }
+.text-editor__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.text-editor__context { flex: 1; font-size: 14px; color: var(--muted); }
+.text-editor__context strong { color: var(--text); }
+.text-editor__fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; }
+.text-editor__fields[hidden] { display: none; }
+.text-field--wide { grid-column: 1 / -1; }
+.text-field__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 4px; }
+.text-field__head label.text-field__label { font-size: 13px; font-weight: 700; color: var(--text); }
+.text-field input[type="text"], .text-field textarea { width: 100%; padding: 7px 9px; border: 1px solid #d9cb94; border-radius: 4px; background: #fff; color: var(--body); font: 14px/1.45 Lato, system-ui, sans-serif; resize: vertical; }
+.text-field input[type="text"]:focus, .text-field textarea:focus { outline: 2px solid var(--link); outline-offset: -1px; border-color: transparent; }
+.field-tools { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-size: 13px; }
+.field-tools .edited { padding: 0 6px; border-radius: 3px; background: #f6d77a; color: #5a4400; font-size: 12px; font-weight: 700; }
+.field-tools label { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); cursor: pointer; }
+.hints { margin: 4px 0 0; padding: 0; list-style: none; font-size: 13px; color: #8a5a00; }
+.hints li::before { content: "Style: "; font-weight: 700; }
+.wysk.editing { background: #fffdf3; outline: 1px dashed #d9cb94; outline-offset: -1px; }
+.wysk__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin-bottom: 12px; }
+.wysk__head h2 { margin: 0; }
+.wysk.editing ul { padding-left: 0; list-style: none; }
+.wysk.editing li { display: flex; align-items: flex-start; gap: 4px; }
+.wysk.editing li::before { content: "•"; flex: none; width: 20px; padding-left: 4px; color: var(--body); }
+.wysk-bullet { flex: 1; border-radius: 3px; cursor: text; }
+.wysk-bullet:hover, .wysk-bullet:focus-visible { background: #fff1c2; outline: none; }
+.wysk-bullet em { color: var(--muted); }
+.wysk-edit { flex: 1; min-height: 3em; padding: 4px 6px; border: 1px solid var(--link); border-radius: 3px; font: 16px/1.6 Lato, system-ui, sans-serif; color: var(--body); resize: none; overflow: hidden; }
+.wysk .add-bullet { margin-top: 12px; }
+td.text-col { white-space: nowrap; }
+.text-tag { padding: 1px 6px; border-radius: 3px; background: #f6d77a; color: #5a4400; font-size: 12px; font-weight: 700; }
 .notice { display: flex; align-items: center; justify-content: center; height: 100%; padding: 24px; text-align: center; color: var(--muted); font-size: 16px; line-height: 1.5; }
 
 .wysk { padding: 24px 32px; background: var(--panel); border: 1px solid var(--border); border-top: none; }
@@ -111,6 +150,15 @@ a.topic-tag:hover { color: #426591; }
 .tag-chip--main { font-weight: 700; }
 .panel select.tag-picker { width: 100%; padding: 7px 9px; border: 1px solid #c9c9c9; border-radius: 4px; background: #fff; color: var(--body); font-size: 14px; }
 .tags-section { margin-bottom: 24px; }
+.settings-list { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--body); }
+.settings-list label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.settings-row { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.optional-links { display: flex; gap: 12px; }
+.field-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 14px; color: var(--body); }
+.field-row select, .field-row input[type="number"] { padding: 6px 8px; border: 1px solid #d9cb94; border-radius: 4px; background: #fff; color: var(--body); font: 14px Lato, system-ui, sans-serif; }
+.field-row input[type="number"] { width: 72px; }
+.field-row label { display: inline-flex; align-items: center; gap: 6px; }
+td.default-col { width: 1%; text-align: center; }
 .page-fields { display: flex; flex-direction: column; gap: 4px; margin-bottom: 24px; }
 .link-btn { align-self: flex-start; padding: 0; border: none; background: none; color: var(--link); font-size: 13px; cursor: pointer; }
 .link-btn:hover { text-decoration: underline; }
@@ -151,9 +199,21 @@ table.combos td.indicator { width: 42%; }
     </div>
     <div id="mdim-bar" class="mdim-bar"></div>
   </header>
+  <section id="text-editor" class="text-editor">
+    <div class="text-editor__bar">
+      <button id="text-editor-toggle" type="button" class="btn">✎ Edit FAUST and WYSK</button>
+      <span id="tab-note" class="tab-note" hidden>Pick a tab here to define the MDim's default tab ↓</span>
+      <span id="text-editor-context" class="text-editor__context"></span>
+      <span id="selection-note" class="selection-note" hidden>Pick countries here to define the MDim's default selection across all views ↓</span>
+    </div>
+    <div id="text-editor-fields" class="text-editor__fields" hidden></div>
+  </section>
   <div id="chart" class="chart"></div>
   <section id="wysk" class="wysk" hidden>
-    <h2>What you should know about this indicator</h2>
+    <div class="wysk__head">
+      <h2>What you should know about this indicator</h2>
+      <span id="wysk-tools"></span>
+    </div>
     <ul id="wysk-list"></ul>
   </section>
 </main>
@@ -174,6 +234,10 @@ table.combos td.indicator { width: 42%; }
           <h3>Topic tags</h3>
           <div id="tags-editor"></div>
         </div>
+        <div class="tags-section">
+          <h3>Chart</h3>
+          <div id="chart-settings"></div>
+        </div>
         <h3>Dropdowns</h3>
         <div id="dims-list"></div>
         <button id="add-dim" class="btn">+ Add dropdown</button>
@@ -191,829 +255,9 @@ table.combos td.indicator { width: 42%; }
   </div>
 </div>
 
-<script id="initial-data" type="text/csv">
-__INITIAL_CSV__
-</script>
+<script id="initial-data" type="application/json">__INITIAL_INDICATORS__</script>
 <script type="module">
-const PACKAGE_URL = "__PACKAGE_BASE__/grapher.standalone.min.js";
-const INITIAL_META = __INITIAL_META__;
-const DEFAULT_SELECTION = __DEFAULT_SELECTION__;
-// Valid topic tags (schemas/dataset-schema.json) and the topic page each one links to.
-const TOPIC_TAGS = __TOPIC_TAGS__;
-const TAG_SLUGS = __TAG_SLUGS__;
-const DEFAULT_TOPIC_TAGS = (INITIAL_META.presentation?.topicTagsLinks || []).filter((tag) => TOPIC_TAGS.includes(tag));
-const STORAGE_KEY = "owid-mdim-simulator-v1";
-const API = "https://api.ourworldindata.org/v1/indicators";
-const DATASETTE = "https://datasette-public.owid.io/owid/variables.json";
-
-// ---------------------------------------------------------------------------
-// State
-// ---------------------------------------------------------------------------
-const newId = () => Math.random().toString(36).slice(2, 10);
-
-function defaultState() {
-  const dimId = newId(), choiceId = newId();
-  return {
-    open: true,
-    title: "Internet users",
-    titleVariant: "",
-    topicTags: [...DEFAULT_TOPIC_TAGS],
-    dims: [{ id: dimId, name: "Metric", choices: [{ id: choiceId, name: "Number of people" }] }],
-    links: { [choiceId]: { input: INITIAL_META.catalogPath, id: INITIAL_META.id } },
-    selected: { [dimId]: choiceId },
-  };
-}
-
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const s = JSON.parse(raw);
-      if (Array.isArray(s.dims) && s.links && typeof s.links === "object") return { open: true, selected: {}, title: "Internet users", titleVariant: "", topicTags: [...DEFAULT_TOPIC_TAGS], ...s };
-    }
-  } catch (err) { console.warn("Could not read saved setup", err); }
-  return defaultState();
-}
-
-let state = loadState();
-
-function saveState() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (err) { /* private window or blocked storage */ }
-}
-
-// Every combination of options, as arrays of choices in dropdown order.
-function combinations() {
-  let combos = [[]];
-  for (const dim of state.dims) {
-    combos = combos.flatMap((combo) => dim.choices.map((choice) => [...combo, choice]));
-  }
-  return combos;
-}
-const comboKey = (combo) => combo.map((c) => c.id).join("|");
-
-function normalizeSelection() {
-  const selected = {};
-  for (const dim of state.dims) {
-    const current = state.selected[dim.id];
-    selected[dim.id] = dim.choices.some((c) => c.id === current) ? current : dim.choices[0]?.id;
-  }
-  state.selected = selected;
-}
-
-function currentCombo() {
-  normalizeSelection();
-  const combo = state.dims.map((dim) => dim.choices.find((c) => c.id === state.selected[dim.id]));
-  return combo.every(Boolean) ? combo : null;
-}
-
-function pruneLinks() {
-  const keys = new Set(combinations().map(comboKey));
-  for (const key of Object.keys(state.links)) if (!keys.has(key)) delete state.links[key];
-}
-
-// Re-key links when a dropdown is added or removed, so existing work survives.
-function rekeyLinks(transform) {
-  const links = {};
-  for (const [key, link] of Object.entries(state.links)) {
-    const newKey = transform(key === "" ? [] : key.split("|"));
-    if (newKey !== null && !(newKey in links)) links[newKey] = link;
-  }
-  state.links = links;
-}
-
-// ---------------------------------------------------------------------------
-// Indicators: resolve what was pasted, fetch metadata and data
-// ---------------------------------------------------------------------------
-const indicatorCache = new Map();
-indicatorCache.set(INITIAL_META.id, Promise.resolve({ meta: INITIAL_META, csv: document.getElementById("initial-data").textContent.trim() }));
-const metaCache = new Map([[INITIAL_META.id, Promise.resolve(INITIAL_META)]]);
-
-async function fetchJson(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
-
-function getMeta(id) {
-  if (!metaCache.has(id)) {
-    const p = fetchJson(`${API}/${id}.metadata.json`).catch((err) => {
-      metaCache.delete(id);
-      throw new Error(`No indicator with ID ${id}.`);
-    });
-    metaCache.set(id, p);
-  }
-  return metaCache.get(id);
-}
-
-function csvCell(value) {
-  const s = String(value ?? "");
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
-
-function getIndicator(id) {
-  if (!indicatorCache.has(id)) {
-    const p = Promise.all([getMeta(id), fetchJson(`${API}/${id}.data.json`)]).then(([meta, data]) => {
-      const entities = new Map(meta.dimensions.entities.values.map((e) => [e.id, e]));
-      const rows = [`entityName,entityCode,entityId,year,ind_${id}`];
-      for (let i = 0; i < data.values.length; i++) {
-        const e = entities.get(data.entities[i]);
-        rows.push([csvCell(e?.name), csvCell(e?.code), data.entities[i], data.years[i], data.values[i]].join(","));
-      }
-      return { meta, csv: rows.join("\n") };
-    });
-    p.catch(() => indicatorCache.delete(id));
-    indicatorCache.set(id, p);
-  }
-  return indicatorCache.get(id);
-}
-
-async function resolveInput(raw) {
-  const input = raw.trim();
-  if (/ourworldindata\.org\/(grapher|explorers)\//i.test(input) || /\/admin\/charts\//i.test(input)) {
-    throw new Error("Chart links aren't accepted. Paste the indicator's catalog path or ID instead.");
-  }
-  let match;
-  if (/^\d+$/.test(input)) return Number(input);
-  if ((match = input.match(/\/(?:variables|indicators)\/(\d+)/))) return Number(match[1]);
-  if (input.includes("#")) {
-    if (!input.startsWith("grapher/")) throw new Error("Use the full catalog path, starting with grapher/.");
-    const rows = await fetchJson(`${DATASETTE}?catalogPath__exact=${encodeURIComponent(input)}&_shape=array&_col=id`);
-    if (!rows.length) throw new Error("No published indicator has this catalog path.");
-    return rows[0].id;
-  }
-  throw new Error("Paste a catalog path (grapher/…#…) or an indicator ID.");
-}
-
-// ---------------------------------------------------------------------------
-// Chart
-// ---------------------------------------------------------------------------
-const chartEl = document.getElementById("chart");
-const wyskEl = document.getElementById("wysk");
-let grapher = null;
-let loader = null;
-let renderToken = 0;
-
-function esc(text) {
-  return String(text ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
-}
-
-function mdInline(text) {
-  let html = esc(text);
-  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-  html = html.replace(/\[([^\]]+)\]\(#dod:[^)]+\)/g, '<span class="dod">$1</span>');
-  return html.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-}
-
-function descriptionKeyBullets(descriptionKey) {
-  if (!descriptionKey) return [];
-  if (Array.isArray(descriptionKey)) return descriptionKey;
-  return descriptionKey.split("\n").filter((line) => line.startsWith("- ")).map((line) => line.slice(2).trim());
-}
-
-function columnDef(meta) {
-  const def = {
-    slug: `ind_${meta.id}`, type: "Numeric", name: meta.name, unit: meta.unit, shortUnit: meta.shortUnit,
-    display: meta.display, descriptionShort: meta.descriptionShort, descriptionKey: meta.descriptionKey,
-    descriptionProcessing: meta.descriptionProcessing, descriptionFromProducer: meta.descriptionFromProducer,
-    timespan: meta.timespan, origins: meta.origins,
-  };
-  return Object.fromEntries(Object.entries(def).filter(([, v]) => v !== undefined && v !== null && v !== ""));
-}
-
-// A view's chart text comes from the indicator alone: its grapher config if it has one,
-// otherwise its public title and short description.
-function viewConfig(meta) {
-  const p = meta.presentation || {};
-  const { dimensions, $schema, id, slug, ...gc } = p.grapherConfig || {};
-  return {
-    hasMapTab: true,
-    ...gc,
-    title: gc.title || p.titlePublic || meta.display?.name || meta.name,
-    subtitle: gc.subtitle ?? meta.descriptionShort ?? "",
-    selectedEntityNames: DEFAULT_SELECTION,
-    dimensions: [{ property: "y", slug: `ind_${meta.id}` }],
-  };
-}
-
-function showNotice(message) {
-  disposeChart();
-  chartEl.innerHTML = `<div class="notice">${message}</div>`;
-}
-
-function disposeChart() {
-  try { loader?.dispose?.(); } catch (err) { console.warn(err); }
-  loader = null;
-}
-
-function renderWysk(meta) {
-  const bullets = meta ? descriptionKeyBullets(meta.descriptionKey) : [];
-  wyskEl.hidden = bullets.length === 0;
-  document.getElementById("wysk-list").innerHTML = bullets.map((b) => `<li>${mdInline(b)}</li>`).join("");
-}
-
-async function renderChart() {
-  const token = ++renderToken;
-  const combo = currentCombo();
-  const link = combo ? state.links[comboKey(combo)] : null;
-
-  if (!combo) { renderWysk(null); return showNotice("Every dropdown needs at least one option."); }
-  if (!link?.id) { renderWysk(null); return showNotice("No indicator linked to this combination yet. Link one in the panel below."); }
-
-  let indicator;
-  try {
-    indicator = await getIndicator(link.id);
-  } catch (err) {
-    if (token === renderToken) { renderWysk(null); showNotice(`Couldn't load indicator ${link.id}: ${esc(err.message)}`); }
-    return;
-  }
-  if (token !== renderToken) return;
-  renderWysk(indicator.meta);
-
-  if (!grapher) {
-    return showNotice("This chart needs Tailscale. The Grapher package is served on OWID's private network: connect to Tailscale, then reload the page.");
-  }
-  disposeChart();
-  chartEl.innerHTML = "";
-  const { GrapherLoader, OwidTable } = grapher;
-  const table = new OwidTable(indicator.csv, [columnDef(indicator.meta)]);
-  loader = GrapherLoader.fromTable({ config: viewConfig(indicator.meta), data: table }).mount(chartEl);
-}
-
-// ---------------------------------------------------------------------------
-// Dropdowns above the chart
-// ---------------------------------------------------------------------------
-let openMenu = null;
-
-function closeMenu({ focusButton = false } = {}) {
-  if (!openMenu) return;
-  const { menu, button } = openMenu;
-  menu.hidden = true;
-  button.setAttribute("aria-expanded", "false");
-  if (focusButton) button.focus();
-  openMenu = null;
-}
-
-document.addEventListener("pointerdown", (e) => {
-  if (openMenu && !openMenu.wrap.contains(e.target)) closeMenu();
-});
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && openMenu) closeMenu({ focusButton: true });
-});
-
-function selectChoice(dim, choiceId) {
-  state.selected[dim.id] = choiceId;
-  saveState();
-  closeMenu();
-  renderBar();
-  renderCombos();
-  renderChart();
-}
-
-function renderHeader() {
-  const title = state.title.trim() || "Untitled MDim";
-  document.getElementById("mdim-title").textContent = title;
-  document.getElementById("mdim-title-variant").textContent = state.titleVariant.trim();
-  document.title = `${title} · MDim simulator`;
-}
-
-function renderTopicTags() {
-  const block = document.getElementById("topic-tags-block");
-  const box = document.getElementById("topic-tags");
-  box.innerHTML = "";
-  block.hidden = state.topicTags.length === 0;
-  for (const tag of state.topicTags) {
-    const slug = TAG_SLUGS[tag];
-    const el = document.createElement(slug ? "a" : "span");
-    el.className = "topic-tag";
-    el.textContent = tag;
-    if (slug) { el.href = `https://ourworldindata.org/${slug}`; el.target = "_blank"; el.rel = "noopener"; }
-    box.append(el);
-  }
-}
-
-function renderTagsEditor() {
-  const box = document.getElementById("tags-editor");
-  box.innerHTML = "";
-  const chips = document.createElement("div");
-  chips.className = "tag-chips";
-  state.topicTags.forEach((tag, i) => {
-    const chip = document.createElement("span");
-    chip.className = "tag-chip" + (i === 0 ? " tag-chip--main" : "");
-    chip.title = i === 0 ? "Main topic" : "";
-    chip.append(tag, removeButton(`Remove the ${tag} tag`, () => {
-      state.topicTags.splice(i, 1);
-      saveState();
-      renderTagsEditor();
-      renderTopicTags();
-    }));
-    chips.append(chip);
-  });
-  if (state.topicTags.length) box.append(chips);
-
-  const picker = document.createElement("select");
-  picker.className = "tag-picker";
-  picker.setAttribute("aria-label", "Add a topic tag");
-  picker.innerHTML = `<option value="">${state.topicTags.length ? "Add another topic tag…" : "Add a topic tag (the first one is the main topic)…"}</option>` +
-    TOPIC_TAGS.filter((tag) => !state.topicTags.includes(tag)).map((tag) => `<option>${esc(tag)}</option>`).join("");
-  picker.addEventListener("change", () => {
-    if (!picker.value) return;
-    state.topicTags.push(picker.value);
-    saveState();
-    renderTagsEditor();
-    renderTopicTags();
-  });
-  box.append(picker);
-}
-
-function renderPageFields() {
-  const box = document.getElementById("page-fields");
-  box.innerHTML = "";
-  const titleInput = textInput(state.title, "MDim title, e.g. Internet users", (v) => { state.title = v; saveState(); renderHeader(); });
-  titleInput.style.fontWeight = "700";
-  // Optional, like an option's description: a small link until someone asks for the field.
-  const variantInput = textInput(state.titleVariant, "Shown after the title, e.g. the source", (v) => { state.titleVariant = v; saveState(); renderHeader(); });
-  variantInput.classList.add("choice-description");
-  const addVariant = document.createElement("button");
-  addVariant.type = "button";
-  addVariant.className = "link-btn";
-  addVariant.textContent = "+ Add title variant";
-  const showVariant = (show) => { variantInput.hidden = !show; addVariant.hidden = show; };
-  showVariant(Boolean(state.titleVariant.trim()));
-  addVariant.addEventListener("click", () => { showVariant(true); variantInput.focus(); });
-  variantInput.addEventListener("blur", () => { if (!variantInput.value.trim()) showVariant(false); });
-  box.append(titleInput, variantInput, addVariant);
-}
-
-function renderBar() {
-  closeMenu();
-  const bar = document.getElementById("mdim-bar");
-  bar.innerHTML = "";
-  const dims = state.dims.filter((dim) => dim.choices.length);
-  if (!dims.length) return;
-  const heading = document.createElement("span");
-  heading.className = "mdim-bar__label";
-  heading.textContent = "Configure the data";
-  const group = document.createElement("div");
-  group.className = "mdim-bar__dropdowns";
-  bar.append(heading, group);
-
-  for (const dim of dims) {
-    const dimName = dim.name || "Untitled dropdown";
-    const current = dim.choices.find((c) => c.id === state.selected[dim.id]) || dim.choices[0];
-    const wrap = document.createElement("div");
-    wrap.className = "md-dropdown-wrap";
-
-    const button = document.createElement("button");
-    button.className = "md-dropdown";
-    button.type = "button";
-    button.setAttribute("aria-haspopup", "listbox");
-    button.setAttribute("aria-expanded", "false");
-    button.title = `${dimName}: ${current.name || "Untitled option"}`;
-    button.innerHTML = `<span class="md-dropdown__name">${esc(dimName)}</span><span class="md-dropdown__value">${esc(current.name || "Untitled option")}</span><span class="md-dropdown__caret"></span>`;
-
-    const menu = document.createElement("div");
-    menu.className = "md-menu";
-    menu.hidden = true;
-    menu.innerHTML = `<div class="md-menu__head"><span class="md-menu__title">${esc(dimName)}</span><button type="button" class="md-menu__close" aria-label="Close">×</button></div>`;
-    const list = document.createElement("ul");
-    list.className = "md-menu__list";
-    list.setAttribute("role", "listbox");
-    list.setAttribute("aria-label", dimName);
-
-    const items = dim.choices.map((choice) => {
-      const li = document.createElement("li");
-      li.className = "md-option";
-      li.setAttribute("role", "option");
-      li.tabIndex = -1;
-      li.dataset.choice = choice.id;
-      li.setAttribute("aria-selected", String(choice.id === current.id));
-      li.innerHTML = `<span class="md-option__radio" aria-hidden="true"></span><span><span class="md-option__name">${esc(choice.name || "Untitled option")}</span>${choice.description ? `<span class="md-option__description">${esc(choice.description)}</span>` : ""}</span>`;
-      li.addEventListener("click", () => selectChoice(dim, choice.id));
-      li.addEventListener("keydown", (e) => {
-        const i = items.indexOf(li);
-        if (e.key === "ArrowDown") { e.preventDefault(); items[Math.min(i + 1, items.length - 1)].focus(); }
-        else if (e.key === "ArrowUp") { e.preventDefault(); items[Math.max(i - 1, 0)].focus(); }
-        else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectChoice(dim, choice.id); }
-      });
-      list.append(li);
-      return li;
-    });
-    menu.append(list);
-    menu.querySelector(".md-menu__close").addEventListener("click", () => closeMenu({ focusButton: true }));
-
-    button.addEventListener("click", () => {
-      const wasOpen = openMenu?.menu === menu;
-      closeMenu();
-      if (wasOpen) return;
-      menu.hidden = false;
-      button.setAttribute("aria-expanded", "true");
-      openMenu = { menu, button, wrap };
-      (items.find((li) => li.getAttribute("aria-selected") === "true") || items[0]).focus();
-    });
-
-    wrap.append(button, menu);
-    group.append(wrap);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Panel: dropdown editor
-// ---------------------------------------------------------------------------
-function textInput(value, placeholder, onInput) {
-  const input = document.createElement("input");
-  input.type = "text";
-  input.value = value;
-  input.placeholder = placeholder;
-  input.addEventListener("input", () => onInput(input.value));
-  return input;
-}
-
-function removeButton(label, onClick) {
-  const btn = document.createElement("button");
-  btn.className = "btn-icon";
-  btn.title = label;
-  btn.setAttribute("aria-label", label);
-  btn.textContent = "×";
-  btn.addEventListener("click", onClick);
-  return btn;
-}
-
-function structureChanged() {
-  pruneLinks();
-  normalizeSelection();
-  saveState();
-  renderDims();
-  refresh();
-}
-
-function namesChanged() {
-  saveState();
-  renderBar();
-  renderCombos();
-  renderSummary();
-}
-
-function renderDims() {
-  const list = document.getElementById("dims-list");
-  list.innerHTML = "";
-  if (!state.dims.length) {
-    const hint = document.createElement("p");
-    hint.className = "hint";
-    hint.textContent = "No dropdowns: this is a single chart. Add a dropdown to turn it into an MDim.";
-    list.append(hint);
-  }
-  state.dims.forEach((dim, dimIndex) => {
-    const card = document.createElement("div");
-    card.className = "dim-card";
-
-    const head = document.createElement("div");
-    head.className = "dim-head";
-    head.append(
-      textInput(dim.name, "Dropdown name, e.g. Metric", (v) => { dim.name = v; namesChanged(); }),
-      removeButton(`Remove the ${dim.name || "untitled"} dropdown`, () => {
-        state.dims.splice(dimIndex, 1);
-        rekeyLinks((parts) => parts.filter((_, i) => i !== dimIndex).join("|"));
-        structureChanged();
-      }),
-    );
-    card.append(head);
-
-    dim.choices.forEach((choice, choiceIndex) => {
-      const row = document.createElement("div");
-      row.className = "choice-row";
-      const fields = document.createElement("div");
-      fields.className = "choice-fields";
-      const nameInput = textInput(choice.name, "Option name", (v) => { choice.name = v; namesChanged(); });
-      nameInput.classList.add("choice-name");
-      // The description is optional: show a small link, and only open the field when asked for one.
-      const descriptionInput = textInput(choice.description || "", "Shown under the option in the dropdown", (v) => {
-        choice.description = v;
-        saveState();
-        renderBar();
-      });
-      descriptionInput.classList.add("choice-description");
-      const addDescription = document.createElement("button");
-      addDescription.type = "button";
-      addDescription.className = "link-btn";
-      addDescription.textContent = "+ Add description";
-      const showField = (show) => { descriptionInput.hidden = !show; addDescription.hidden = show; };
-      showField(Boolean(choice.description?.trim()));
-      addDescription.addEventListener("click", () => { showField(true); descriptionInput.focus(); });
-      descriptionInput.addEventListener("blur", () => { if (!descriptionInput.value.trim()) showField(false); });
-      fields.append(nameInput, descriptionInput, addDescription);
-      row.append(
-        fields,
-        removeButton(`Remove the ${choice.name || "untitled"} option`, () => {
-          dim.choices.splice(choiceIndex, 1);
-          structureChanged();
-        }),
-      );
-      card.append(row);
-    });
-
-    const add = document.createElement("button");
-    add.className = "btn";
-    add.textContent = "+ Add option";
-    add.addEventListener("click", () => {
-      dim.choices.push({ id: newId(), name: `Option ${dim.choices.length + 1}` });
-      structureChanged();
-      const inputs = card.ownerDocument.querySelectorAll(`#dims-list .dim-card:nth-child(${dimIndex + 1}) .choice-row input.choice-name`);
-      inputs[inputs.length - 1]?.select();
-    });
-    card.append(add);
-    list.append(card);
-  });
-}
-
-document.getElementById("add-dim").addEventListener("click", () => {
-  const choice = { id: newId(), name: "Option 1" };
-  state.dims.push({ id: newId(), name: `Dropdown ${state.dims.length + 1}`, choices: [choice] });
-  // Existing links move to the new dropdown's first option.
-  rekeyLinks((parts) => [...parts, choice.id].join("|"));
-  structureChanged();
-  const cards = document.querySelectorAll("#dims-list .dim-card .dim-head input");
-  cards[cards.length - 1]?.select();
-});
-
-// ---------------------------------------------------------------------------
-// Panel: combinations and their indicators
-// ---------------------------------------------------------------------------
-const statusByKey = new Map();
-const pendingByKey = new Map();
-
-function statusHtml(status) {
-  if (!status) return `<div class="status empty">Not linked yet</div>`;
-  if (status.kind === "loading") return `<div class="status loading">Looking it up…</div>`;
-  if (status.kind === "error") return `<div class="status error">${esc(status.message)}</div>`;
-  const m = status.meta;
-  return `<div class="status ok"><strong>${esc(m.display?.name || m.presentation?.titlePublic || m.name)}</strong><code>${esc(m.catalogPath)}</code></div>`;
-}
-
-async function linkIndicator(key, raw, statusCell) {
-  const token = (pendingByKey.get(key) || 0) + 1;
-  pendingByKey.set(key, token);
-  const setStatus = (status) => {
-    if (pendingByKey.get(key) !== token) return;
-    status ? statusByKey.set(key, status) : statusByKey.delete(key);
-    if (statusCell.isConnected) statusCell.innerHTML = statusHtml(status);
-  };
-
-  if (!raw.trim()) {
-    delete state.links[key];
-    saveState();
-    setStatus(null);
-    renderSummary();
-    if (key === comboKey(currentCombo() || [])) renderChart();
-    return;
-  }
-  setStatus({ kind: "loading" });
-  try {
-    const id = await resolveInput(raw);
-    const meta = await getMeta(id);
-    if (pendingByKey.get(key) !== token) return;
-    state.links[key] = { input: raw.trim(), id };
-    saveState();
-    setStatus({ kind: "ok", meta });
-  } catch (err) {
-    if (pendingByKey.get(key) !== token) return;
-    delete state.links[key];
-    saveState();
-    setStatus({ kind: "error", message: err.message });
-  }
-  renderSummary();
-  if (key === comboKey(currentCombo() || [])) renderChart();
-}
-
-function renderCombos() {
-  const wrap = document.getElementById("combos");
-  const combos = combinations();
-  if (!combos.length) {
-    wrap.innerHTML = `<p class="hint">Every dropdown needs at least one option.</p>`;
-    return;
-  }
-  const current = currentCombo();
-  const currentKey = current ? comboKey(current) : null;
-
-  const table = document.createElement("table");
-  table.className = "combos";
-  const headCells = state.dims.map((d) => `<th>${esc(d.name || "Untitled dropdown")}</th>`).join("");
-  table.innerHTML = `<thead><tr>${headCells}<th>Indicator (catalog path or ID)</th><th>Linked to</th></tr></thead>`;
-  const tbody = document.createElement("tbody");
-
-  for (const combo of combos) {
-    const key = comboKey(combo);
-    const link = state.links[key];
-    const tr = document.createElement("tr");
-    if (key === currentKey) tr.className = "current";
-    tr.innerHTML = combo.map((c) => `<td class="choice">${esc(c.name || "Untitled option")}</td>`).join("");
-
-    const inputCell = document.createElement("td");
-    inputCell.className = "indicator";
-    const statusCell = document.createElement("td");
-    statusCell.innerHTML = statusHtml(statusByKey.get(key) || (link ? { kind: "loading" } : null));
-
-    let timer;
-    const input = textInput(link?.input || "", "e.g. grapher/worldbank_wdi/2026-07-27/wdi/wdi#it_net_user_zs", (v) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => linkIndicator(key, v, statusCell), 600);
-    });
-    input.addEventListener("keydown", (e) => { if (e.key === "Enter") { clearTimeout(timer); linkIndicator(key, input.value, statusCell); } });
-    inputCell.append(input);
-    tr.append(inputCell, statusCell);
-
-    // Clicking a row shows that combination in the chart.
-    tr.addEventListener("click", (e) => {
-      if (e.target.closest("input")) return;
-      combo.forEach((choice, i) => { state.selected[state.dims[i].id] = choice.id; });
-      saveState();
-      renderBar();
-      renderCombos();
-      renderChart();
-    });
-    tbody.append(tr);
-
-    if (link && !statusByKey.has(key)) {
-      getMeta(link.id)
-        .then((meta) => { statusByKey.set(key, { kind: "ok", meta }); })
-        .catch((err) => { statusByKey.set(key, { kind: "error", message: err.message }); })
-        .finally(() => { if (statusCell.isConnected) statusCell.innerHTML = statusHtml(statusByKey.get(key)); });
-    }
-  }
-  table.append(tbody);
-  wrap.innerHTML = "";
-  wrap.append(table);
-}
-
-function renderSummary() {
-  const combos = combinations();
-  const linked = combos.filter((c) => state.links[comboKey(c)]?.id).length;
-  const n = state.dims.length;
-  document.getElementById("panel-summary").textContent =
-    `${n} dropdown${n === 1 ? "" : "s"} · ${combos.length} combination${combos.length === 1 ? "" : "s"} · ${linked} linked`;
-}
-
-// ---------------------------------------------------------------------------
-// Export: the setup in the shape of an ETL chart config
-// ---------------------------------------------------------------------------
-function slugify(text, fallback) {
-  const slug = String(text || "").toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
-  return slug || fallback;
-}
-
-function uniqueSlugs(items, fallbackPrefix) {
-  const seen = new Map();
-  return items.map((item, i) => {
-    let slug = slugify(item.name, `${fallbackPrefix}_${i + 1}`);
-    const count = (seen.get(slug) || 0) + 1;
-    seen.set(slug, count);
-    return count > 1 ? `${slug}_${count}` : slug;
-  });
-}
-
-async function setupYaml() {
-  const dimSlugs = uniqueSlugs(state.dims, "dropdown");
-  const choiceSlugs = new Map();
-  state.dims.forEach((dim) => uniqueSlugs(dim.choices, "option").forEach((slug, i) => choiceSlugs.set(dim.choices[i].id, slug)));
-
-  const lines = [
-    "# MDim setup, made with the MDim simulator.",
-    "# Paste this to Claude to turn it into a viz://chart step.",
-    "title:",
-    `  title: ${JSON.stringify(state.title.trim())}`,
-  ];
-  if (state.titleVariant.trim()) lines.push(`  title_variant: ${JSON.stringify(state.titleVariant.trim())}`);
-  if (state.topicTags.length) lines.push("topic_tags:", ...state.topicTags.map((tag) => `  - ${JSON.stringify(tag)}`));
-  else lines.push("# topic_tags: add at least one, ETL requires it");
-  lines.push("default_selection:", ...DEFAULT_SELECTION.map((name) => `  - ${JSON.stringify(name)}`));
-  if (!state.dims.length) lines.push("dimensions: []");
-  else {
-    lines.push("dimensions:");
-    state.dims.forEach((dim, i) => {
-      lines.push(`  - slug: ${dimSlugs[i]}`, `    name: ${JSON.stringify(dim.name)}`, "    choices:");
-      for (const choice of dim.choices) {
-        lines.push(`      - slug: ${choiceSlugs.get(choice.id)}`, `        name: ${JSON.stringify(choice.name)}`);
-        if (choice.description?.trim()) lines.push(`        description: ${JSON.stringify(choice.description.trim())}`);
-      }
-    });
-  }
-
-  const unlinked = [];
-  const viewLines = [];
-  for (const combo of combinations()) {
-    const link = state.links[comboKey(combo)];
-    const label = combo.map((c, i) => `${state.dims[i].name} = ${c.name}`).join(", ") || "(single chart)";
-    if (!link?.id) { unlinked.push(label); continue; }
-    let catalogPath;
-    try { catalogPath = (await getMeta(link.id)).catalogPath; } catch { unlinked.push(`${label} (indicator ${link.id} could not be found)`); continue; }
-    viewLines.push("  - dimensions:" + (combo.length ? "" : " {}"));
-    combo.forEach((c, i) => viewLines.push(`      ${dimSlugs[i]}: ${choiceSlugs.get(c.id)}`));
-    viewLines.push("    indicators:", "      y:", `        - catalogPath: ${JSON.stringify(catalogPath)}`);
-  }
-  lines.push(viewLines.length ? "views:" : "views: []", ...viewLines);
-  if (unlinked.length) lines.push("# Combinations with no indicator yet:", ...unlinked.map((u) => `#   - ${u}`));
-  return lines.join("\n") + "\n";
-}
-
-document.getElementById("copy").addEventListener("click", async () => {
-  const status = document.getElementById("copy-status");
-  const fallback = document.getElementById("copy-fallback");
-  const text = await setupYaml();
-  try {
-    await navigator.clipboard.writeText(text);
-    fallback.hidden = true;
-    status.textContent = "Copied. Paste it to Claude.";
-  } catch (err) {
-    fallback.value = text;
-    fallback.hidden = false;
-    fallback.select();
-    status.textContent = "Couldn't copy automatically: copy the text below.";
-  }
-  setTimeout(() => { status.textContent = ""; }, 4000);
-});
-
-// ---------------------------------------------------------------------------
-// Panel open/close, and keeping the page clear of it
-// ---------------------------------------------------------------------------
-const panel = document.getElementById("panel");
-const toggle = document.getElementById("panel-toggle");
-function applyOpen() {
-  panel.classList.toggle("open", state.open);
-  toggle.setAttribute("aria-expanded", String(state.open));
-}
-toggle.addEventListener("click", () => { state.open = !state.open; saveState(); applyOpen(); });
-
-// Drag the handle on the panel's top edge (or use the arrow keys on it) to make the panel taller or shorter.
-const resizeHandle = document.getElementById("panel-resize");
-const MIN_PANEL_HEIGHT = 120;
-const maxPanelHeight = () => Math.max(MIN_PANEL_HEIGHT, window.innerHeight - 140);
-const panelBody = document.getElementById("panel-body");
-function applyHeight() {
-  if (state.height) {
-    state.height = Math.min(Math.max(state.height, MIN_PANEL_HEIGHT), maxPanelHeight());
-    panel.style.setProperty("--panel-height", `${state.height}px`);
-  }
-}
-resizeHandle.addEventListener("pointerdown", (e) => {
-  e.preventDefault();
-  const startY = e.clientY;
-  const startHeight = panelBody.offsetHeight;
-  resizeHandle.setPointerCapture(e.pointerId);
-  panel.classList.add("resizing");
-  const onMove = (ev) => { state.height = startHeight + (startY - ev.clientY); applyHeight(); };
-  const onUp = () => {
-    panel.classList.remove("resizing");
-    resizeHandle.removeEventListener("pointermove", onMove);
-    resizeHandle.removeEventListener("pointerup", onUp);
-    resizeHandle.removeEventListener("pointercancel", onUp);
-    saveState();
-  };
-  resizeHandle.addEventListener("pointermove", onMove);
-  resizeHandle.addEventListener("pointerup", onUp);
-  resizeHandle.addEventListener("pointercancel", onUp);
-});
-resizeHandle.addEventListener("keydown", (e) => {
-  if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
-  e.preventDefault();
-  state.height = panelBody.offsetHeight + (e.key === "ArrowUp" ? 40 : -40);
-  applyHeight();
-  saveState();
-});
-window.addEventListener("resize", applyHeight);
-applyHeight();
-new ResizeObserver(() => { document.body.style.paddingBottom = `${panel.offsetHeight + 24}px`; }).observe(panel);
-
-function refresh() {
-  renderBar();
-  renderCombos();
-  renderSummary();
-  renderChart();
-}
-
-// ---------------------------------------------------------------------------
-// Start
-// ---------------------------------------------------------------------------
-applyOpen();
-renderHeader();
-renderPageFields();
-renderTopicTags();
-renderTagsEditor();
-pruneLinks();
-normalizeSelection();
-renderDims();
-showNotice("Loading Grapher…");
-renderBar();
-renderCombos();
-renderSummary();
-
-try {
-  grapher = await Promise.race([
-    import(PACKAGE_URL),
-    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 15000)),
-  ]);
-} catch (err) {
-  console.error(err);
-}
-renderChart();
+__SCRIPT__
 </script>
 </body>
 </html>

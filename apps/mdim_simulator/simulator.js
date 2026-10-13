@@ -1,0 +1,1513 @@
+const PACKAGE_URL = "__PACKAGE_BASE__/grapher.standalone.min.js";
+// Filled in by build.py: the pre-filled state (null for an empty page), the pre-filled indicators' data, an
+// example catalog path for empty fields, and the name this sketch is saved under in the browser.
+const INITIAL_STATE = __INITIAL_STATE__;
+const INITIAL_INDICATORS = JSON.parse(document.getElementById("initial-data").textContent);
+const EXAMPLE_PATH = __EXAMPLE_PATH__;
+const DEFAULT_SELECTION = __DEFAULT_SELECTION__;
+const GRAPHER_SCHEMA_VERSION = __GRAPHER_SCHEMA_VERSION__;
+// Valid topic tags (schemas/dataset-schema.json) and the topic page each one links to.
+const TOPIC_TAGS = __TOPIC_TAGS__;
+const TAG_SLUGS = __TAG_SLUGS__;
+const STORAGE_KEY = __STORAGE_KEY__;
+const API = "https://api.ourworldindata.org/v1/indicators";
+const DATASETTE = "https://datasette-public.owid.io/owid/variables.json";
+
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
+const newId = () => Math.random().toString(36).slice(2, 10);
+
+function defaultState() {
+  if (INITIAL_STATE) return JSON.parse(JSON.stringify(INITIAL_STATE));
+  // An empty page: one dropdown with one option, and nothing linked yet.
+  const dimId = newId(), choiceId = newId();
+  return {
+    open: true,
+    title: "",
+    titleVariant: "",
+    topicTags: [],
+    dims: [{ id: dimId, name: "Dropdown 1", choices: [{ id: choiceId, name: "Option 1" }] }],
+    links: {},
+    selected: { [dimId]: choiceId },
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const s = JSON.parse(raw);
+      if (Array.isArray(s.dims) && s.links && typeof s.links === "object") return { open: true, selected: {}, title: "", titleVariant: "", topicTags: [], ...s };
+    }
+  } catch (err) { console.warn("Could not read saved setup", err); }
+  return defaultState();
+}
+
+let state = loadState();
+// Text overrides, per view (keyed like links). Older saved setups have none.
+state.textMode ??= false;
+state.textEdits ??= {};
+state.textEdits.views ??= {};
+state.suggest ??= {};
+state.defaultSelection ??= [...DEFAULT_SELECTION];
+state.defaultKey ??= null; // the combination the MDim opens on; null means the first one
+state.chartTypes ??= ["LineChart", "DiscreteBar"];
+state.hasMapTab ??= true;
+state.defaultTab ??= "chart";
+state.hideTimeInTitle ??= true;
+state.changeCountry ??= false;
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (err) { /* private window or blocked storage */ }
+}
+
+// Every combination of options, as arrays of choices in dropdown order.
+function combinations() {
+  let combos = [[]];
+  for (const dim of state.dims) {
+    combos = combos.flatMap((combo) => dim.choices.map((choice) => [...combo, choice]));
+  }
+  return combos;
+}
+const comboKey = (combo) => combo.map((c) => c.id).join("|");
+
+function normalizeSelection() {
+  const selected = {};
+  for (const dim of state.dims) {
+    const current = state.selected[dim.id];
+    selected[dim.id] = dim.choices.some((c) => c.id === current) ? current : dim.choices[0]?.id;
+  }
+  state.selected = selected;
+}
+
+function currentCombo() {
+  normalizeSelection();
+  const combo = state.dims.map((dim) => dim.choices.find((c) => c.id === state.selected[dim.id]));
+  return combo.every(Boolean) ? combo : null;
+}
+
+function pruneLinks() {
+  const keys = new Set(combinations().map(comboKey));
+  for (const key of Object.keys(state.links)) if (!keys.has(key)) delete state.links[key];
+  for (const key of Object.keys(state.textEdits.views)) if (!keys.has(key)) delete state.textEdits.views[key];
+}
+
+// Re-key links when a dropdown is added or removed, so existing work survives.
+function rekeyLinks(transform) {
+  const rekey = (byKey) => {
+    const out = {};
+    for (const [key, value] of Object.entries(byKey)) {
+      const newKey = transform(key === "" ? [] : key.split("|"));
+      if (newKey !== null && !(newKey in out)) out[newKey] = value;
+    }
+    return out;
+  };
+  state.links = rekey(state.links);
+  state.textEdits.views = rekey(state.textEdits.views);
+  if (state.defaultKey !== null) state.defaultKey = transform(state.defaultKey === "" ? [] : state.defaultKey.split("|"));
+}
+
+// ---------------------------------------------------------------------------
+// Indicators: resolve what was pasted, fetch metadata and data
+// ---------------------------------------------------------------------------
+const indicatorCache = new Map();
+const metaCache = new Map();
+for (const { meta, csv } of INITIAL_INDICATORS) {
+  indicatorCache.set(meta.id, Promise.resolve({ meta, csv }));
+  metaCache.set(meta.id, Promise.resolve(meta));
+}
+
+async function fetchJson(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+function getMeta(id) {
+  if (!metaCache.has(id)) {
+    const p = fetchJson(`${API}/${id}.metadata.json`).catch((err) => {
+      metaCache.delete(id);
+      throw new Error(`No indicator with ID ${id}.`);
+    });
+    metaCache.set(id, p);
+  }
+  return metaCache.get(id);
+}
+
+function csvCell(value) {
+  const s = String(value ?? "");
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function getIndicator(id) {
+  if (!indicatorCache.has(id)) {
+    const p = Promise.all([getMeta(id), fetchJson(`${API}/${id}.data.json`)]).then(([meta, data]) => {
+      const entities = new Map(meta.dimensions.entities.values.map((e) => [e.id, e]));
+      const rows = [`entityName,entityCode,entityId,year,ind_${id}`];
+      for (let i = 0; i < data.values.length; i++) {
+        const e = entities.get(data.entities[i]);
+        rows.push([csvCell(e?.name), csvCell(e?.code), data.entities[i], data.years[i], data.values[i]].join(","));
+      }
+      return { meta, csv: rows.join("\n") };
+    });
+    p.catch(() => indicatorCache.delete(id));
+    indicatorCache.set(id, p);
+  }
+  return indicatorCache.get(id);
+}
+
+async function resolveInput(raw) {
+  const input = raw.trim();
+  if (/ourworldindata\.org\/(grapher|explorers)\//i.test(input) || /\/admin\/charts\//i.test(input)) {
+    throw new Error("Chart links aren't accepted. Paste the indicator's catalog path or ID instead.");
+  }
+  let match;
+  if (/^\d+$/.test(input)) return Number(input);
+  if ((match = input.match(/\/(?:variables|indicators)\/(\d+)/))) return Number(match[1]);
+  if (input.includes("#")) {
+    if (!input.startsWith("grapher/")) throw new Error("Use the full catalog path, starting with grapher/.");
+    const rows = await fetchJson(`${DATASETTE}?catalogPath__exact=${encodeURIComponent(input)}&_shape=array&_col=id`);
+    if (!rows.length) throw new Error("No published indicator has this catalog path.");
+    return rows[0].id;
+  }
+  throw new Error("Paste a catalog path (grapher/…#…) or an indicator ID.");
+}
+
+// ---------------------------------------------------------------------------
+// Chart
+// ---------------------------------------------------------------------------
+const chartEl = document.getElementById("chart");
+const wyskEl = document.getElementById("wysk");
+let grapher = null;
+let loader = null;
+let loaderReady = false;
+let renderToken = 0;
+
+function esc(text) {
+  return String(text ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
+}
+
+function mdInline(text) {
+  let html = esc(text);
+  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/\[([^\]]+)\]\(#dod:[^)]+\)/g, '<span class="dod">$1</span>');
+  return html.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+}
+
+function descriptionKeyBullets(descriptionKey) {
+  if (!descriptionKey) return [];
+  if (Array.isArray(descriptionKey)) return descriptionKey;
+  return descriptionKey.split("\n").filter((line) => line.startsWith("- ")).map((line) => line.slice(2).trim());
+}
+
+function columnDef(meta) {
+  const def = {
+    slug: `ind_${meta.id}`, type: "Numeric", name: meta.name, unit: meta.unit, shortUnit: meta.shortUnit,
+    display: meta.display, descriptionShort: meta.descriptionShort, descriptionKey: meta.descriptionKey,
+    descriptionProcessing: meta.descriptionProcessing, descriptionFromProducer: meta.descriptionFromProducer,
+    timespan: meta.timespan, origins: meta.origins,
+  };
+  return Object.fromEntries(Object.entries(def).filter(([, v]) => v !== undefined && v !== null && v !== ""));
+}
+
+// A view's chart text comes from the indicator alone: its grapher config if it has one,
+// otherwise its public title and short description.
+function viewConfig(meta) {
+  const p = meta.presentation || {};
+  const { dimensions, $schema, id, slug, ...gc } = p.grapherConfig || {};
+  return {
+    hasMapTab: true,
+    ...gc,
+    title: gc.title || p.titlePublic || meta.display?.name || meta.name,
+    subtitle: gc.subtitle ?? meta.descriptionShort ?? "",
+    selectedEntityNames: state.defaultSelection,
+    dimensions: [{ property: "y", slug: `ind_${meta.id}` }],
+  };
+}
+
+function showNotice(message) {
+  disposeChart();
+  chartEl.innerHTML = `<div class="notice">${message}</div>`;
+}
+
+function disposeChart() {
+  try { loader?.dispose?.(); } catch (err) { console.warn(err); }
+  loader = null;
+  loaderReady = false;
+}
+
+// The countries ticked in Grapher's own "Add/remove countries and regions" panel are the MDim's
+// default selection. Grapher keeps its state in MobX, which this page can't subscribe to, so poll it.
+function syncSelection() {
+  if (!loader || !loaderReady) return;
+  let names;
+  try { names = [...loader.grapherState.selection.selectedEntityNames]; } catch (err) { return; }
+  if (!same(names, state.defaultSelection)) {
+    state.defaultSelection = names;
+    saveState();
+  }
+  let tab;
+  try { tab = loader.grapherState.tab; } catch (err) { return; }
+  if (tab && tab !== state.defaultTab) {
+    state.defaultTab = tab;
+    saveState();
+    if (state.textMode) renderTextEditor(); // the map colours section depends on the tab
+  }
+}
+
+// The reminder sits on the "Edit FAUST and WYSK" row, ending where the countries panel's content ends
+// below it; it hides when the chart shows no such panel.
+function positionSelectionNote() {
+  document.getElementById("tab-note").hidden = !loader;
+  const note = document.getElementById("selection-note");
+  const panelEl = loader ? chartEl.querySelector(".side-panel .entity-selector") : null;
+  if (!panelEl) { note.hidden = true; return; }
+  note.hidden = false;
+  const header = panelEl.querySelector(".overlay-header") || panelEl;
+  const row = note.parentElement.getBoundingClientRect();
+  note.style.marginRight = `${Math.max(0, row.right - header.getBoundingClientRect().right)}px`;
+}
+
+setInterval(() => { syncSelection(); positionSelectionNote(); }, 400);
+
+// ---------------------------------------------------------------------------
+// Settings shared by every view: tabs, the default tab, title annotations, footer link, y-axis
+// ---------------------------------------------------------------------------
+const CHART_TYPE_OPTIONS = [
+  ["LineChart", "Line chart", "line"],
+  ["DiscreteBar", "Bar chart", "discrete-bar"],
+  ["SlopeChart", "Slope chart", "slope"],
+  ["Dumbbell", "Dumbbell", "dumbbell"],
+  ["Marimekko", "Marimekko", "marimekko"], // bar widths default to equal without a width (x) indicator
+];
+
+function validTabs() {
+  const chartTabs = CHART_TYPE_OPTIONS.filter(([type]) => state.chartTypes.includes(type)).map(([, , tab]) => tab);
+  return [...(chartTabs.length ? ["chart", ...chartTabs] : []), ...(state.hasMapTab ? ["map"] : []), "table"];
+}
+
+function normalizeDefaultTab() {
+  // Saved setups may hold chart types the simulator no longer offers.
+  state.chartTypes = state.chartTypes.filter((type) => CHART_TYPE_OPTIONS.some(([t]) => t === type));
+  if (!validTabs().includes(state.defaultTab)) state.defaultTab = state.chartTypes.length ? "chart" : state.hasMapTab ? "map" : "table";
+}
+
+// The footer's "OurWorldinData.org/<topic>" link: always the main (first) topic tag's page.
+function originUrl() {
+  const slug = TAG_SLUGS[state.topicTags[0]];
+  return slug ? `/${slug}` : undefined;
+}
+
+function sharedConfig() {
+  const config = { chartTypes: [...state.chartTypes], hasMapTab: state.hasMapTab, tab: state.defaultTab };
+  if (state.hideTimeInTitle) config.hideAnnotationFieldsInTitle = { time: true };
+  if (state.changeCountry) config.addCountryMode = "change-country";
+  const url = originUrl();
+  if (url) config.originUrl = url;
+  config.yAxis = { min: 0 }; // always: every MDim's y-axis starts at zero
+  return config;
+}
+
+function renderChartSettings() {
+  const box = document.getElementById("chart-settings");
+  box.innerHTML = "";
+  const list = document.createElement("div");
+  list.className = "settings-list";
+  const checkbox = (labelText, checked, onChange) => {
+    const label = document.createElement("label");
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.checked = checked;
+    input.addEventListener("change", () => {
+      onChange(input.checked);
+      normalizeDefaultTab();
+      saveState();
+      renderChartSettings();
+      renderChart();
+    });
+    label.append(input, labelText);
+    return label;
+  };
+  const tabs = document.createElement("div");
+  tabs.className = "settings-row";
+  for (const [type, name] of CHART_TYPE_OPTIONS) {
+    tabs.append(checkbox(name, state.chartTypes.includes(type), (on) => {
+      state.chartTypes = CHART_TYPE_OPTIONS.map(([t]) => t).filter((t) => (t === type ? on : state.chartTypes.includes(t)));
+    }));
+  }
+  tabs.append(checkbox("Map", state.hasMapTab, (on) => { state.hasMapTab = on; }));
+  const tabsHint = document.createElement("p");
+  tabsHint.className = "hint";
+  tabsHint.style.margin = "0";
+  tabsHint.textContent = "Tabs available in every view (the table is always there).";
+  const changeCountry = checkbox("Readers change the country instead of adding countries", state.changeCountry, (on) => { state.changeCountry = on; });
+  list.append(tabsHint, tabs, changeCountry, checkbox("Hide the time range after the title, e.g. “1990 to 2025” (map and bar charts always show the year)", state.hideTimeInTitle, (on) => { state.hideTimeInTitle = on; }));
+  const auto = document.createElement("p");
+  auto.className = "hint";
+  auto.style.margin = "4px 0 0";
+  const url = originUrl();
+  auto.textContent = `Always set: every y-axis starts at zero${url ? `, and the footer links to OurWorldinData.org${url}` : ""}.`;
+  list.append(auto);
+  box.append(list);
+}
+
+// ---------------------------------------------------------------------------
+// Chart text: original (from the indicator), overrides, and what a view shows
+// ---------------------------------------------------------------------------
+const TEXT_FIELDS = ["title", "subtitle", "note"];
+const FIELD_LABELS = {
+  title: "Title", subtitle: "Subtitle", note: "Footnote", descriptionKey: "What you should know",
+  rounding: "Number rounding", map: "Map colours",
+};
+const COLOR_SCHEMES = __COLOR_SCHEMES__;
+// Grapher's automatic binning strategies. Manual bins are left to Claude, from the copied setup.
+const BINNING_STRATEGIES = [
+  ["auto", "Automatic"],
+  ["log-auto", "Logarithmic, automatic"],
+  ["log-1-2-5", "Logarithmic: 1, 2, 5, 10…"],
+  ["log-1-3", "Logarithmic: 1, 3, 10…"],
+  ["log-10", "Logarithmic: 1, 10, 100…"],
+  ["equalSizeBins-few-bins", "Equal-size bins, few"],
+  ["equalSizeBins-normal", "Equal-size bins"],
+  ["equalSizeBins-many-bins", "Equal-size bins, many"],
+  ["equalSizeBins-percent", "Equal-size bins for percentages"],
+];
+const MAP_KEYS = ["baseColorScheme", "binningStrategy"];
+const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+let current = null; // { key, meta, label } of the view on screen, once its indicator has loaded
+
+function originalRounding(meta) {
+  const d = meta.display || {};
+  const mode = d.roundingMode === "significantFigures" ? "significantFigures" : "decimalPlaces";
+  return { mode, digits: mode === "significantFigures" ? d.numSignificantFigures ?? 3 : d.numDecimalPlaces ?? 2 };
+}
+
+// The map colour settings the editor handles, as the indicator's own chart config sets them (often none).
+function originalMap(meta) {
+  const colorScale = viewConfig(meta).map?.colorScale || {};
+  return Object.fromEntries(MAP_KEYS.filter((k) => colorScale[k] !== undefined).map((k) => [k, colorScale[k]]));
+}
+
+function originalTexts(meta) {
+  const cfg = viewConfig(meta);
+  return {
+    title: cfg.title || "", subtitle: cfg.subtitle || "", note: cfg.note || "",
+    descriptionKey: descriptionKeyBullets(meta.descriptionKey),
+    rounding: originalRounding(meta),
+    map: originalMap(meta),
+  };
+}
+
+function roundingDisplay(rounding) {
+  return rounding.mode === "significantFigures"
+    ? { roundingMode: "significantFigures", numSignificantFigures: rounding.digits }
+    : { roundingMode: "decimalPlaces", numDecimalPlaces: rounding.digits };
+}
+
+function colorScaleFrom(map) {
+  const out = {};
+  if (map.baseColorScheme) out.baseColorScheme = map.baseColorScheme;
+  if (map.binningStrategy) out.binningStrategy = map.binningStrategy;
+  return out;
+}
+
+
+// A view's own text wins over the indicator's, as a view's config does in the ETL file.
+function resolvedTexts(key, meta) {
+  const original = originalTexts(meta);
+  const own = state.textEdits.views[key] || {};
+  return Object.fromEntries(Object.keys(original).map((f) => [f, own[f] ?? original[f]]));
+}
+
+function setText(field, value) {
+  const { key, meta } = current;
+  const views = state.textEdits.views;
+  const own = (views[key] ||= {});
+  if (same(value, originalTexts(meta)[field])) delete own[field];
+  else own[field] = value;
+  if (!Object.keys(own).length) delete views[key];
+  saveState();
+}
+
+function undoText(field) {
+  const views = state.textEdits.views;
+  if (!views[current.key]) return;
+  delete views[current.key][field];
+  if (!Object.keys(views[current.key]).length) delete views[current.key];
+  saveState();
+}
+
+function textHints(field, text) {
+  const t = text.trim();
+  const hints = [];
+  if (field === "subtitle" && t) {
+    if (!/[.!?]$/.test(t)) hints.push("End the subtitle with punctuation, normally a period.");
+    if (/^The\s/.test(t)) hints.push("Try dropping “The” at the start, unless the sentence needs it.");
+  }
+  if (field === "title" && /\.$/.test(t)) hints.push("Chart titles don't end with a period.");
+  return hints;
+}
+
+// "Edited · Undo" and the suggest-for-the-indicator checkbox, for one field of the current view.
+function fieldTools(field) {
+  const wrap = document.createElement("span");
+  wrap.className = "field-tools";
+  if (!current) return wrap;
+  const edited = !same(resolvedTexts(current.key, current.meta)[field], originalTexts(current.meta)[field]);
+  if (!edited) return wrap;
+  const badge = document.createElement("span");
+  badge.className = "edited";
+  badge.textContent = "Edited";
+  const undo = document.createElement("button");
+  undo.type = "button";
+  undo.className = "link-btn";
+  undo.textContent = "Undo";
+  undo.addEventListener("click", () => {
+    undoText(field);
+    afterTextChange({ rebuildFields: true });
+  });
+  const suggest = document.createElement("label");
+  const box = document.createElement("input");
+  box.type = "checkbox";
+  box.checked = Boolean(state.suggest[current.meta.id]?.[field]);
+  box.addEventListener("change", () => {
+    const s = (state.suggest[current.meta.id] ||= {});
+    if (box.checked) s[field] = true;
+    else delete s[field];
+    if (!Object.keys(s).length) delete state.suggest[current.meta.id];
+    saveState();
+  });
+  suggest.append(box, "Suggest for the indicator everywhere");
+  suggest.title = "Claude will check which other charts use this indicator before changing it";
+  wrap.append(badge, undo, suggest);
+  return wrap;
+}
+
+// Push the current view's text into the chart on screen, without reloading it.
+function applyTextToChart() {
+  if (!loader || !current) return;
+  const t = resolvedTexts(current.key, current.meta);
+  try {
+    const gs = loader.grapherState;
+    gs.title = t.title;
+    gs.subtitle = t.subtitle;
+    gs.note = t.note;
+  } catch (err) {
+    console.warn("Live text update failed; reloading the chart", err);
+    renderChart();
+  }
+}
+
+function afterTextChange({ rebuildFields = false } = {}) {
+  applyTextToChart();
+  renderWysk();
+  if (rebuildFields) renderTextEditor();
+  else for (const field of [...TEXT_FIELDS, "rounding", "map"]) document.getElementById(`tools-${field}`)?.replaceChildren(...fieldTools(field).childNodes);
+}
+
+let remountTimer;
+function scheduleRemount() {
+  clearTimeout(remountTimer);
+  remountTimer = setTimeout(() => renderChart({ keepEditor: true }), 350);
+}
+
+function autoGrow(textarea) {
+  textarea.style.height = "auto";
+  textarea.style.height = `${textarea.scrollHeight}px`;
+}
+
+function renderWysk() {
+  const list = document.getElementById("wysk-list");
+  const tools = document.getElementById("wysk-tools");
+  list.innerHTML = "";
+  tools.innerHTML = "";
+  if (!current) { wyskEl.hidden = true; return; }
+  const bullets = resolvedTexts(current.key, current.meta).descriptionKey;
+  const editing = state.textMode;
+  wyskEl.hidden = !editing && bullets.length === 0;
+  wyskEl.classList.toggle("editing", editing);
+  wyskEl.querySelector(".add-bullet")?.remove();
+
+  if (!editing) {
+    list.innerHTML = bullets.map((b) => `<li>${mdInline(b)}</li>`).join("");
+    return;
+  }
+  tools.append(fieldTools("descriptionKey"));
+
+  const save = (next) => { setText("descriptionKey", next.map((b) => b.trim()).filter(Boolean)); afterTextChange(); };
+  bullets.forEach((bullet, i) => {
+    const li = document.createElement("li");
+    const view = document.createElement("span");
+    view.className = "wysk-bullet";
+    view.tabIndex = 0;
+    view.title = "Click to edit";
+    view.innerHTML = mdInline(bullet);
+    const startEdit = () => {
+      const ta = document.createElement("textarea");
+      ta.className = "wysk-edit";
+      ta.value = bullet;
+      li.replaceChild(ta, view);
+      autoGrow(ta);
+      ta.focus();
+      ta.addEventListener("input", () => autoGrow(ta));
+      ta.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ta.blur(); }
+        if (e.key === "Escape") { ta.dataset.cancel = "1"; ta.blur(); }
+      });
+      ta.addEventListener("blur", () => {
+        if (ta.dataset.cancel) return renderWysk();
+        const next = [...bullets];
+        next[i] = ta.value;
+        save(next);
+      });
+    };
+    view.addEventListener("click", (e) => { if (!e.target.closest("a")) startEdit(); });
+    view.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); startEdit(); } });
+    li.dataset.index = i;
+    li.append(view, removeButton("Remove this point", () => save(bullets.filter((_, j) => j !== i))));
+    list.append(li);
+  });
+
+  const add = document.createElement("button");
+  add.type = "button";
+  add.className = "btn add-bullet";
+  add.textContent = "+ Add point";
+  add.addEventListener("click", () => {
+    setText("descriptionKey", [...bullets, "New point."]);
+    afterTextChange();
+    list.querySelector(`li[data-index="${bullets.length}"] .wysk-bullet`)?.click();
+    list.querySelector(".wysk-edit")?.select();
+  });
+  wyskEl.append(add);
+}
+
+function renderTextEditor() {
+  const toggle = document.getElementById("text-editor-toggle");
+  const editor = document.getElementById("text-editor");
+  const fields = document.getElementById("text-editor-fields");
+  const context = document.getElementById("text-editor-context");
+  toggle.textContent = state.textMode ? "Done editing" : "✎ Edit FAUST and WYSK";
+  toggle.classList.toggle("btn-primary", state.textMode);
+  editor.classList.toggle("open", state.textMode);
+  fields.hidden = !state.textMode;
+  context.innerHTML = state.textMode && current ? `Editing the text of <strong>${esc(current.label)}</strong>` : "";
+  fields.innerHTML = "";
+  if (!state.textMode) return;
+  if (!current) {
+    fields.innerHTML = `<p class="hint">Link an indicator to this combination to edit its text.</p>`;
+    return;
+  }
+  const texts = resolvedTexts(current.key, current.meta);
+  for (const field of TEXT_FIELDS) {
+    const block = document.createElement("div");
+    block.className = "text-field" + (field === "title" ? " text-field--wide" : "");
+    const head = document.createElement("div");
+    head.className = "text-field__head";
+    const label = document.createElement("label");
+    label.className = "text-field__label";
+    label.htmlFor = `text-${field}`;
+    label.textContent = FIELD_LABELS[field];
+    const tools = fieldTools(field);
+    tools.id = `tools-${field}`;
+    head.append(label, tools);
+    const input = document.createElement(field === "title" ? "input" : "textarea");
+    input.id = `text-${field}`;
+    if (field === "title") input.type = "text";
+    else input.rows = 2;
+    input.value = texts[field];
+    input.placeholder = field === "note" ? "No footnote" : "";
+    const hints = document.createElement("ul");
+    hints.className = "hints";
+    const showHints = () => { hints.innerHTML = textHints(field, input.value).map((h) => `<li>${esc(h)}</li>`).join(""); };
+    showHints();
+    input.addEventListener("input", () => {
+      setText(field, input.value);
+      afterTextChange();
+      showHints();
+    });
+    input.addEventListener("change", () => renderCombos());
+    block.append(head, input, hints);
+    fields.append(block);
+  }
+  fields.append(roundingField(texts.rounding));
+  if (state.hasMapTab) fields.append(mapField());
+}
+
+function fieldBlock(field, wide = false) {
+  const block = document.createElement("div");
+  block.className = "text-field" + (wide ? " text-field--wide" : "");
+  const head = document.createElement("div");
+  head.className = "text-field__head";
+  const label = document.createElement("span");
+  label.className = "text-field__label";
+  label.style.fontSize = "13px";
+  label.style.fontWeight = "700";
+  label.textContent = FIELD_LABELS[field];
+  const tools = fieldTools(field);
+  tools.id = `tools-${field}`;
+  head.append(label, tools);
+  block.append(head);
+  return block;
+}
+
+function roundingField(rounding) {
+  const block = fieldBlock("rounding");
+  const row = document.createElement("div");
+  row.className = "field-row";
+  const digits = document.createElement("input");
+  digits.type = "number";
+  digits.min = "0";
+  digits.max = "10";
+  digits.id = "rounding-digits";
+  digits.value = String(rounding.digits);
+  const mode = document.createElement("select");
+  mode.id = "rounding-mode";
+  mode.innerHTML = `<option value="decimalPlaces">decimal places</option><option value="significantFigures">significant figures</option>`;
+  mode.value = rounding.mode;
+  const update = () => {
+    const n = Math.max(0, Math.min(10, Math.round(Number(digits.value) || 0)));
+    setText("rounding", { mode: mode.value, digits: n });
+    afterTextChange();
+    scheduleRemount();
+  };
+  digits.addEventListener("input", update);
+  mode.addEventListener("change", update);
+  row.append("Round to", digits, mode);
+  block.append(row);
+  return block;
+}
+
+function mapField() {
+  const block = fieldBlock("map", true);
+  if (state.defaultTab !== "map") {
+    const hint = document.createElement("p");
+    hint.className = "hint";
+    hint.style.margin = "0";
+    hint.textContent = "Select the Map tab on the chart to edit its colours.";
+    block.append(hint);
+    return block;
+  }
+  const original = originalMap(current.meta);
+  const map = resolvedTexts(current.key, current.meta).map;
+
+  const palette = document.createElement("select");
+  palette.id = "map-palette";
+  palette.innerHTML = `<option value="">Default palette</option>` + COLOR_SCHEMES.map((c) => `<option>${esc(c)}</option>`).join("");
+  palette.value = map.baseColorScheme || "";
+
+  const strategy = document.createElement("select");
+  strategy.id = "map-strategy";
+  const options = original.binningStrategy === "manual" ? [["manual", "Manual bins from the indicator"], ...BINNING_STRATEGIES] : BINNING_STRATEGIES;
+  strategy.innerHTML = options.map(([value, name]) => `<option value="${value}">${esc(name)}</option>`).join("");
+  strategy.value = map.binningStrategy || "auto";
+
+  // Keep only what differs from the indicator's own map settings, so an untouched map exports nothing.
+  const update = () => {
+    const next = { ...original };
+    if (palette.value) next.baseColorScheme = palette.value;
+    else delete next.baseColorScheme;
+    if (strategy.value === (original.binningStrategy || "auto")) next.binningStrategy = original.binningStrategy;
+    else next.binningStrategy = strategy.value;
+    if (next.binningStrategy === undefined) delete next.binningStrategy;
+    setText("map", next);
+    afterTextChange();
+    scheduleRemount();
+  };
+  palette.addEventListener("change", update);
+  strategy.addEventListener("change", update);
+
+  const row = document.createElement("div");
+  row.className = "field-row";
+  row.append("Palette", palette, "Bins", strategy);
+  const note = document.createElement("p");
+  note.className = "hint";
+  note.style.margin = "8px 0 0";
+  note.textContent = "If you want to set more specific bins, talk to Claude after copy-pasting your MDim setup.";
+  block.append(row, note);
+  return block;
+}
+
+document.getElementById("text-editor-toggle").addEventListener("click", () => {
+  state.textMode = !state.textMode;
+  saveState();
+  renderTextEditor();
+  renderWysk();
+});
+
+
+async function renderChart({ keepEditor = false } = {}) {
+  const token = ++renderToken;
+  const combo = currentCombo();
+  const link = combo ? state.links[comboKey(combo)] : null;
+
+  const clearCurrent = () => { current = null; renderWysk(); renderTextEditor(); };
+  if (!combo) { clearCurrent(); return showNotice("Every dropdown needs at least one option."); }
+  if (!link?.id) {
+    clearCurrent();
+    const nothingLinked = !Object.values(state.links).some((l) => l?.id);
+    return showNotice(nothingLinked
+      ? "Start by linking an indicator: paste its catalog path or ID in the Combinations table in the panel below."
+      : "No indicator linked to this combination yet. Link one in the panel below.");
+  }
+
+  let indicator;
+  try {
+    indicator = await getIndicator(link.id);
+  } catch (err) {
+    if (token === renderToken) { clearCurrent(); showNotice(`Couldn't load indicator ${link.id}: ${esc(err.message)}`); }
+    return;
+  }
+  if (token !== renderToken) return;
+  const key = comboKey(combo);
+  current = { key, meta: indicator.meta, label: combo.map((c, i) => `${state.dims[i].name}: ${c.name}`).join(" · ") || "this chart" };
+  renderWysk();
+  if (!keepEditor) renderTextEditor();
+
+  if (!grapher) {
+    return showNotice("This chart needs Tailscale. The Grapher package is served on OWID's private network: connect to Tailscale, then reload the page.");
+  }
+  disposeChart();
+  chartEl.innerHTML = "";
+  const { GrapherLoader, OwidTable } = grapher;
+  const table = new OwidTable(indicator.csv, [columnDef(indicator.meta)]);
+  const texts = resolvedTexts(key, indicator.meta);
+  const base = viewConfig(indicator.meta);
+  const config = {
+    ...base,
+    ...sharedConfig(),
+    title: texts.title,
+    subtitle: texts.subtitle,
+    note: texts.note,
+    map: { ...(base.map || {}), colorScale: { ...(base.map?.colorScale || {}), ...colorScaleFrom(texts.map) } },
+    dimensions: [{ property: "y", slug: `ind_${indicator.meta.id}`, display: roundingDisplay(texts.rounding) }],
+  };
+  loaderReady = false;
+  const mounted = GrapherLoader.fromTable({ config, data: table }).mount(chartEl);
+  loader = mounted;
+  mounted.ready.then(() => { if (loader === mounted) loaderReady = true; }).catch(() => {});
+}
+
+// ---------------------------------------------------------------------------
+// Dropdowns above the chart
+// ---------------------------------------------------------------------------
+let openMenu = null;
+
+function closeMenu({ focusButton = false } = {}) {
+  if (!openMenu) return;
+  const { menu, button } = openMenu;
+  menu.hidden = true;
+  button.setAttribute("aria-expanded", "false");
+  if (focusButton) button.focus();
+  openMenu = null;
+}
+
+document.addEventListener("pointerdown", (e) => {
+  if (openMenu && !openMenu.wrap.contains(e.target)) closeMenu();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && openMenu) closeMenu({ focusButton: true });
+});
+
+function selectChoice(dim, choiceId) {
+  state.selected[dim.id] = choiceId;
+  saveState();
+  closeMenu();
+  renderBar();
+  renderCombos();
+  renderChart();
+}
+
+function renderHeader() {
+  const title = state.title.trim() || "Untitled MDim";
+  document.getElementById("mdim-title").textContent = title;
+  document.getElementById("mdim-title-variant").textContent = state.titleVariant.trim();
+  document.title = `${title} · MDim simulator`;
+}
+
+function renderTopicTags() {
+  const block = document.getElementById("topic-tags-block");
+  const box = document.getElementById("topic-tags");
+  box.innerHTML = "";
+  block.hidden = state.topicTags.length === 0;
+  for (const tag of state.topicTags) {
+    const slug = TAG_SLUGS[tag];
+    const el = document.createElement(slug ? "a" : "span");
+    el.className = "topic-tag";
+    el.textContent = tag;
+    if (slug) { el.href = `https://ourworldindata.org/${slug}`; el.target = "_blank"; el.rel = "noopener"; }
+    box.append(el);
+  }
+}
+
+function renderTagsEditor() {
+  const box = document.getElementById("tags-editor");
+  box.innerHTML = "";
+  const chips = document.createElement("div");
+  chips.className = "tag-chips";
+  state.topicTags.forEach((tag, i) => {
+    const chip = document.createElement("span");
+    chip.className = "tag-chip" + (i === 0 ? " tag-chip--main" : "");
+    chip.title = i === 0 ? "Main topic" : "";
+    chip.append(tag, removeButton(`Remove the ${tag} tag`, () => {
+      state.topicTags.splice(i, 1);
+      saveState();
+      renderTagsEditor();
+      renderTopicTags();
+      renderChartSettings();
+      renderChart();
+    }));
+    chips.append(chip);
+  });
+  if (state.topicTags.length) box.append(chips);
+
+  const picker = document.createElement("select");
+  picker.className = "tag-picker";
+  picker.setAttribute("aria-label", "Add a topic tag");
+  picker.innerHTML = `<option value="">${state.topicTags.length ? "Add another topic tag…" : "Add a topic tag (the first one is the main topic)…"}</option>` +
+    TOPIC_TAGS.filter((tag) => !state.topicTags.includes(tag)).map((tag) => `<option>${esc(tag)}</option>`).join("");
+  picker.addEventListener("change", () => {
+    if (!picker.value) return;
+    state.topicTags.push(picker.value);
+    saveState();
+    renderTagsEditor();
+    renderTopicTags();
+    renderChartSettings();
+    renderChart();
+  });
+  box.append(picker);
+}
+
+function renderPageFields() {
+  const box = document.getElementById("page-fields");
+  box.innerHTML = "";
+  const titleInput = textInput(state.title, "MDim title, e.g. Internet users", (v) => { state.title = v; saveState(); renderHeader(); });
+  titleInput.style.fontWeight = "700";
+  // Optional, like an option's description: a small link until someone asks for the field.
+  const variantInput = textInput(state.titleVariant, "Shown after the title, e.g. the source", (v) => { state.titleVariant = v; saveState(); renderHeader(); });
+  variantInput.classList.add("choice-description");
+  const addVariant = document.createElement("button");
+  addVariant.type = "button";
+  addVariant.className = "link-btn";
+  addVariant.textContent = "+ Add title variant";
+  const showVariant = (show) => { variantInput.hidden = !show; addVariant.hidden = show; };
+  showVariant(Boolean(state.titleVariant.trim()));
+  addVariant.addEventListener("click", () => { showVariant(true); variantInput.focus(); });
+  variantInput.addEventListener("blur", () => { if (!variantInput.value.trim()) showVariant(false); });
+  box.append(titleInput, variantInput, addVariant);
+}
+
+function renderBar() {
+  closeMenu();
+  const bar = document.getElementById("mdim-bar");
+  bar.innerHTML = "";
+  const dims = state.dims.filter((dim) => dim.choices.length);
+  if (!dims.length) return;
+  const heading = document.createElement("span");
+  heading.className = "mdim-bar__label";
+  heading.textContent = "Configure the data";
+  const group = document.createElement("div");
+  group.className = "mdim-bar__dropdowns";
+  bar.append(heading, group);
+
+  for (const dim of dims) {
+    const dimName = dim.name || "Untitled dropdown";
+    const current = dim.choices.find((c) => c.id === state.selected[dim.id]) || dim.choices[0];
+    const wrap = document.createElement("div");
+    wrap.className = "md-dropdown-wrap";
+
+    const button = document.createElement("button");
+    button.className = "md-dropdown";
+    button.type = "button";
+    button.setAttribute("aria-haspopup", "listbox");
+    button.setAttribute("aria-expanded", "false");
+    button.title = `${dimName}: ${current.name || "Untitled option"}`;
+    button.innerHTML = `<span class="md-dropdown__name">${esc(dimName)}</span><span class="md-dropdown__value">${esc(current.name || "Untitled option")}</span><span class="md-dropdown__caret"></span>`;
+
+    const menu = document.createElement("div");
+    menu.className = "md-menu";
+    menu.hidden = true;
+    menu.innerHTML = `<div class="md-menu__head"><span class="md-menu__title">${esc(dimName)}</span><button type="button" class="md-menu__close" aria-label="Close">×</button></div>`;
+    if (dim.description?.trim()) {
+      const description = document.createElement("p");
+      description.className = "md-menu__dimension-description";
+      description.textContent = dim.description.trim();
+      menu.append(description);
+    }
+    // Options sharing a group sit under its heading; groups appear in the order of their first option.
+    const groups = [];
+    for (const choice of dim.choices) {
+      const name = choice.group?.trim() || "";
+      let group = groups.find((g) => g.name === name);
+      if (!group) groups.push((group = { name, choices: [] }));
+      group.choices.push(choice);
+    }
+    const items = [];
+    for (const group of groups) {
+      const groupEl = document.createElement("div");
+      groupEl.className = "md-menu__group";
+      if (group.name) {
+        const groupLabel = document.createElement("div");
+        groupLabel.className = "md-menu__group-label";
+        groupLabel.textContent = group.name;
+        groupEl.append(groupLabel);
+      }
+      const list = document.createElement("ul");
+      list.className = "md-menu__list";
+      list.setAttribute("role", "listbox");
+      list.setAttribute("aria-label", group.name || dimName);
+      for (const choice of group.choices) {
+        const li = document.createElement("li");
+        li.className = "md-option";
+        li.setAttribute("role", "option");
+        li.tabIndex = -1;
+        li.dataset.choice = choice.id;
+        li.setAttribute("aria-selected", String(choice.id === current.id));
+        li.innerHTML = `<span class="md-option__radio" aria-hidden="true"></span><span><span class="md-option__name">${esc(choice.name || "Untitled option")}</span>${choice.description ? `<span class="md-option__description">${esc(choice.description)}</span>` : ""}</span>`;
+        li.addEventListener("click", () => selectChoice(dim, choice.id));
+        li.addEventListener("keydown", (e) => {
+          const i = items.indexOf(li);
+          if (e.key === "ArrowDown") { e.preventDefault(); items[Math.min(i + 1, items.length - 1)].focus(); }
+          else if (e.key === "ArrowUp") { e.preventDefault(); items[Math.max(i - 1, 0)].focus(); }
+          else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectChoice(dim, choice.id); }
+        });
+        list.append(li);
+        items.push(li);
+      }
+      groupEl.append(list);
+      menu.append(groupEl);
+    }
+    menu.querySelector(".md-menu__close").addEventListener("click", () => closeMenu({ focusButton: true }));
+
+    button.addEventListener("click", () => {
+      const wasOpen = openMenu?.menu === menu;
+      closeMenu();
+      if (wasOpen) return;
+      menu.hidden = false;
+      button.setAttribute("aria-expanded", "true");
+      openMenu = { menu, button, wrap };
+      (items.find((li) => li.getAttribute("aria-selected") === "true") || items[0]).focus();
+    });
+
+    wrap.append(button, menu);
+    group.append(wrap);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Panel: dropdown editor
+// ---------------------------------------------------------------------------
+// An optional field: a small "+ Add …" link until someone asks for it, folding back when left empty.
+function optionalField(value, placeholder, linkText, onInput) {
+  const input = textInput(value || "", placeholder, onInput);
+  input.classList.add("choice-description");
+  const link = document.createElement("button");
+  link.type = "button";
+  link.className = "link-btn";
+  link.textContent = linkText;
+  const show = (on) => { input.hidden = !on; link.hidden = on; };
+  show(Boolean((value || "").trim()));
+  link.addEventListener("click", () => { show(true); input.focus(); });
+  input.addEventListener("blur", () => { if (!input.value.trim()) show(false); });
+  return { input, link };
+}
+
+function textInput(value, placeholder, onInput) {
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = value;
+  input.placeholder = placeholder;
+  input.addEventListener("input", () => onInput(input.value));
+  return input;
+}
+
+function removeButton(label, onClick) {
+  const btn = document.createElement("button");
+  btn.className = "btn-icon";
+  btn.title = label;
+  btn.setAttribute("aria-label", label);
+  btn.textContent = "×";
+  btn.addEventListener("click", onClick);
+  return btn;
+}
+
+function structureChanged() {
+  pruneLinks();
+  normalizeSelection();
+  saveState();
+  renderDims();
+  refresh();
+}
+
+function namesChanged() {
+  saveState();
+  renderBar();
+  renderCombos();
+  renderSummary();
+}
+
+function renderDims() {
+  const list = document.getElementById("dims-list");
+  list.innerHTML = "";
+  if (!state.dims.length) {
+    const hint = document.createElement("p");
+    hint.className = "hint";
+    hint.textContent = "No dropdowns: this is a single chart. Add a dropdown to turn it into an MDim.";
+    list.append(hint);
+  }
+  state.dims.forEach((dim, dimIndex) => {
+    const card = document.createElement("div");
+    card.className = "dim-card";
+
+    const head = document.createElement("div");
+    head.className = "dim-head";
+    head.append(
+      textInput(dim.name, "Dropdown name, e.g. Metric", (v) => { dim.name = v; namesChanged(); }),
+      removeButton(`Remove the ${dim.name || "untitled"} dropdown`, () => {
+        state.dims.splice(dimIndex, 1);
+        rekeyLinks((parts) => parts.filter((_, i) => i !== dimIndex).join("|"));
+        structureChanged();
+      }),
+    );
+    card.append(head);
+    const dimDescription = optionalField(dim.description, "Shown at the top of the dropdown menu", "+ Add description", (v) => {
+      dim.description = v;
+      saveState();
+      renderBar();
+    });
+    const dimExtras = document.createElement("div");
+    dimExtras.className = "choice-fields";
+    dimExtras.style.margin = "-4px 0 10px";
+    dimExtras.append(dimDescription.input, dimDescription.link);
+    card.append(dimExtras);
+
+    const groupListId = `groups-${dim.id}`;
+    const datalist = document.createElement("datalist");
+    datalist.id = groupListId;
+    datalist.innerHTML = [...new Set(dim.choices.map((c) => c.group?.trim()).filter(Boolean))].map((g) => `<option value="${esc(g)}">`).join("");
+    card.append(datalist);
+
+    dim.choices.forEach((choice, choiceIndex) => {
+      const row = document.createElement("div");
+      row.className = "choice-row";
+      const fields = document.createElement("div");
+      fields.className = "choice-fields";
+      const nameInput = textInput(choice.name, "Option name", (v) => { choice.name = v; namesChanged(); });
+      nameInput.classList.add("choice-name");
+      const description = optionalField(choice.description, "Shown under the option in the dropdown", "+ Add description", (v) => {
+        choice.description = v;
+        saveState();
+        renderBar();
+      });
+      const group = optionalField(choice.group, "Group heading in the dropdown, e.g. Fossil fuels", "+ Add group", (v) => {
+        choice.group = v;
+        saveState();
+        renderBar();
+      });
+      group.input.setAttribute("list", groupListId);
+      const links = document.createElement("div");
+      links.className = "optional-links";
+      links.append(description.link, group.link);
+      fields.append(nameInput, description.input, group.input, links);
+      row.append(
+        fields,
+        removeButton(`Remove the ${choice.name || "untitled"} option`, () => {
+          dim.choices.splice(choiceIndex, 1);
+          structureChanged();
+        }),
+      );
+      card.append(row);
+    });
+
+    const add = document.createElement("button");
+    add.className = "btn";
+    add.textContent = "+ Add option";
+    add.addEventListener("click", () => {
+      dim.choices.push({ id: newId(), name: `Option ${dim.choices.length + 1}` });
+      structureChanged();
+      const inputs = card.ownerDocument.querySelectorAll(`#dims-list .dim-card:nth-child(${dimIndex + 1}) .choice-row input.choice-name`);
+      inputs[inputs.length - 1]?.select();
+    });
+    card.append(add);
+    list.append(card);
+  });
+}
+
+document.getElementById("add-dim").addEventListener("click", () => {
+  const choice = { id: newId(), name: "Option 1" };
+  state.dims.push({ id: newId(), name: `Dropdown ${state.dims.length + 1}`, choices: [choice] });
+  // Existing links move to the new dropdown's first option.
+  rekeyLinks((parts) => [...parts, choice.id].join("|"));
+  structureChanged();
+  const cards = document.querySelectorAll("#dims-list .dim-card .dim-head input");
+  cards[cards.length - 1]?.select();
+});
+
+// ---------------------------------------------------------------------------
+// Panel: combinations and their indicators
+// ---------------------------------------------------------------------------
+const statusByKey = new Map();
+const pendingByKey = new Map();
+
+function statusHtml(status) {
+  if (!status) return `<div class="status empty">Not linked yet</div>`;
+  if (status.kind === "loading") return `<div class="status loading">Looking it up…</div>`;
+  if (status.kind === "error") return `<div class="status error">${esc(status.message)}</div>`;
+  const m = status.meta;
+  return `<div class="status ok"><strong>${esc(m.display?.name || m.presentation?.titlePublic || m.name)}</strong><code>${esc(m.catalogPath)}</code></div>`;
+}
+
+async function linkIndicator(key, raw, statusCell) {
+  const token = (pendingByKey.get(key) || 0) + 1;
+  pendingByKey.set(key, token);
+  const setStatus = (status) => {
+    if (pendingByKey.get(key) !== token) return;
+    status ? statusByKey.set(key, status) : statusByKey.delete(key);
+    if (statusCell.isConnected) statusCell.innerHTML = statusHtml(status);
+  };
+
+  if (!raw.trim()) {
+    delete state.links[key];
+    saveState();
+    setStatus(null);
+    renderSummary();
+    if (key === comboKey(currentCombo() || [])) renderChart();
+    return;
+  }
+  setStatus({ kind: "loading" });
+  try {
+    const id = await resolveInput(raw);
+    const meta = await getMeta(id);
+    if (pendingByKey.get(key) !== token) return;
+    state.links[key] = { input: raw.trim(), id };
+    saveState();
+    setStatus({ kind: "ok", meta });
+  } catch (err) {
+    if (pendingByKey.get(key) !== token) return;
+    delete state.links[key];
+    saveState();
+    setStatus({ kind: "error", message: err.message });
+  }
+  renderSummary();
+  if (key === comboKey(currentCombo() || [])) renderChart();
+}
+
+function defaultComboKey() {
+  const keys = combinations().map(comboKey);
+  return keys.includes(state.defaultKey) ? state.defaultKey : keys[0];
+}
+
+function renderCombos() {
+  const wrap = document.getElementById("combos");
+  const combos = combinations();
+  if (!combos.length) {
+    wrap.innerHTML = `<p class="hint">Every dropdown needs at least one option.</p>`;
+    return;
+  }
+  const current = currentCombo();
+  const currentKey = current ? comboKey(current) : null;
+
+  const table = document.createElement("table");
+  table.className = "combos";
+  const headCells = state.dims.map((d) => `<th>${esc(d.name || "Untitled dropdown")}</th>`).join("");
+  table.innerHTML = `<thead><tr><th>Opens first</th>${headCells}<th>Indicator (catalog path or ID)</th><th>Linked to</th><th>Edited</th></tr></thead>`;
+  const firstKey = defaultComboKey();
+  const tbody = document.createElement("tbody");
+
+  for (const combo of combos) {
+    const key = comboKey(combo);
+    const link = state.links[key];
+    const tr = document.createElement("tr");
+    if (key === currentKey) tr.className = "current";
+    tr.innerHTML = combo.map((c) => `<td class="choice">${esc(c.name || "Untitled option")}</td>`).join("");
+    const defaultCell = document.createElement("td");
+    defaultCell.className = "default-col";
+    const opensFirst = document.createElement("input");
+    opensFirst.type = "checkbox";
+    opensFirst.checked = key === firstKey;
+    opensFirst.title = "The view readers see when they arrive";
+    opensFirst.setAttribute("aria-label", "Opens first");
+    opensFirst.addEventListener("change", () => {
+      state.defaultKey = key; // exactly one view opens first: ticking another one moves it there
+      saveState();
+      renderCombos();
+    });
+    defaultCell.append(opensFirst);
+    tr.prepend(defaultCell);
+
+    const inputCell = document.createElement("td");
+    inputCell.className = "indicator";
+    const statusCell = document.createElement("td");
+    statusCell.innerHTML = statusHtml(statusByKey.get(key) || (link ? { kind: "loading" } : null));
+
+    let timer;
+    const input = textInput(link?.input || "", `e.g. ${EXAMPLE_PATH}`, (v) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => linkIndicator(key, v, statusCell), 600);
+    });
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") { clearTimeout(timer); linkIndicator(key, input.value, statusCell); } });
+    inputCell.append(input);
+    const textCell = document.createElement("td");
+    textCell.className = "text-col";
+    if (state.textEdits.views[key]) textCell.innerHTML = `<span class="text-tag" title="${esc(Object.keys(state.textEdits.views[key]).map((f) => FIELD_LABELS[f]).join(", "))}">Edited</span>`;
+    tr.append(inputCell, statusCell, textCell);
+
+    // Clicking a row shows that combination in the chart.
+    tr.addEventListener("click", (e) => {
+      if (e.target.closest("input")) return;
+      combo.forEach((choice, i) => { state.selected[state.dims[i].id] = choice.id; });
+      saveState();
+      renderBar();
+      renderCombos();
+      renderChart();
+    });
+    tbody.append(tr);
+
+    if (link && !statusByKey.has(key)) {
+      getMeta(link.id)
+        .then((meta) => { statusByKey.set(key, { kind: "ok", meta }); })
+        .catch((err) => { statusByKey.set(key, { kind: "error", message: err.message }); })
+        .finally(() => { if (statusCell.isConnected) statusCell.innerHTML = statusHtml(statusByKey.get(key)); });
+    }
+  }
+  table.append(tbody);
+  wrap.innerHTML = "";
+  wrap.append(table);
+}
+
+function renderSummary() {
+  const combos = combinations();
+  const linked = combos.filter((c) => state.links[comboKey(c)]?.id).length;
+  const n = state.dims.length;
+  document.getElementById("panel-summary").textContent =
+    `${n} dropdown${n === 1 ? "" : "s"} · ${combos.length} combination${combos.length === 1 ? "" : "s"} · ${linked} linked`;
+}
+
+// ---------------------------------------------------------------------------
+// Export: the setup in the shape of an ETL chart config
+// ---------------------------------------------------------------------------
+function slugify(text, fallback) {
+  const slug = String(text || "").toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  return slug || fallback;
+}
+
+function uniqueSlugs(items, fallbackPrefix) {
+  const seen = new Map();
+  return items.map((item, i) => {
+    let slug = slugify(item.name, `${fallbackPrefix}_${i + 1}`);
+    const count = (seen.get(slug) || 0) + 1;
+    seen.set(slug, count);
+    return count > 1 ? `${slug}_${count}` : slug;
+  });
+}
+
+// Nested objects and lists of scalars as YAML lines, scalars written as JSON (valid YAML).
+function yamlLines(value, indent) {
+  const pad = " ".repeat(indent);
+  const out = [];
+  for (const [key, v] of Object.entries(value)) {
+    if (v === undefined) continue;
+    if (Array.isArray(v)) {
+      if (!v.length) out.push(`${pad}${key}: []`);
+      else out.push(`${pad}${key}:`, ...v.map((x) => `${pad}  - ${JSON.stringify(x)}`));
+    } else if (v && typeof v === "object") out.push(`${pad}${key}:`, ...yamlLines(v, indent + 2));
+    else out.push(`${pad}${key}: ${JSON.stringify(v)}`);
+  }
+  return out;
+}
+
+async function setupYaml() {
+  const dimSlugs = uniqueSlugs(state.dims, "dropdown");
+  const choiceSlugs = new Map();
+  state.dims.forEach((dim) => uniqueSlugs(dim.choices, "option").forEach((slug, i) => choiceSlugs.set(dim.choices[i].id, slug)));
+
+  const lines = [
+    "# MDim setup, made with the MDim simulator.",
+    "# Paste this to Claude to turn it into a viz://chart step.",
+    "# Claude: whoever made this may not work in the ETL. Do the technical work yourself, ask only plain-language",
+    "# questions, and follow the hand-off in the /sketch-mdim skill (step 5).",
+    `grapher_schema: ${JSON.stringify(GRAPHER_SCHEMA_VERSION)}`,
+    "title:",
+    `  title: ${JSON.stringify(state.title.trim())}`,
+  ];
+  if (state.titleVariant.trim()) lines.push(`  title_variant: ${JSON.stringify(state.titleVariant.trim())}`);
+  if (state.topicTags.length) lines.push("topic_tags:", ...state.topicTags.map((tag) => `  - ${JSON.stringify(tag)}`));
+  else lines.push("# topic_tags: add at least one, ETL requires it");
+  if (state.defaultSelection.length) lines.push("default_selection:", ...state.defaultSelection.map((name) => `  - ${JSON.stringify(name)}`));
+  else lines.push("# default_selection: tick at least one country in the chart");
+  const firstCombo = combinations().find((c) => comboKey(c) === defaultComboKey());
+  if (state.dims.length && firstCombo) {
+    lines.push("default_dimensions:", ...firstCombo.map((c, i) => `  ${dimSlugs[i]}: ${choiceSlugs.get(c.id)}`));
+  }
+  lines.push("definitions:", "  common_views:", "    - config:", ...yamlLines(sharedConfig(), 8));
+  const textBlock = (edits, indent) => {
+    const out = [];
+    const cfg = Object.fromEntries(TEXT_FIELDS.filter((f) => f in edits).map((f) => [f, edits[f]]));
+    if (edits.map && Object.keys(colorScaleFrom(edits.map)).length) cfg.map = { colorScale: colorScaleFrom(edits.map) };
+    if (Object.keys(cfg).length) out.push(`${indent}config:`, ...yamlLines(cfg, indent.length + 2));
+    if ("descriptionKey" in edits) {
+      out.push(`${indent}metadata:`);
+      if (edits.descriptionKey.length) out.push(`${indent}  description_key:`, ...edits.descriptionKey.map((b) => `${indent}    - ${JSON.stringify(b)}`));
+      else out.push(`${indent}  description_key: []`);
+    }
+    return out;
+  };
+
+  if (!state.dims.length) lines.push("dimensions: []");
+  else {
+    lines.push("dimensions:");
+    state.dims.forEach((dim, i) => {
+      lines.push(`  - slug: ${dimSlugs[i]}`, `    name: ${JSON.stringify(dim.name)}`);
+      if (dim.description?.trim()) lines.push(`    description: ${JSON.stringify(dim.description.trim())}`);
+      lines.push("    choices:");
+      for (const choice of dim.choices) {
+        lines.push(`      - slug: ${choiceSlugs.get(choice.id)}`, `        name: ${JSON.stringify(choice.name)}`);
+        if (choice.description?.trim()) lines.push(`        description: ${JSON.stringify(choice.description.trim())}`);
+        if (choice.group?.trim()) lines.push(`        group: ${JSON.stringify(choice.group.trim())}`);
+      }
+    });
+  }
+
+  const unlinked = [];
+  const viewLines = [];
+  const changes = [];
+  const suggestions = [];
+  const suggested = new Set();
+  for (const combo of combinations()) {
+    const link = state.links[comboKey(combo)];
+    const label = combo.map((c, i) => `${state.dims[i].name} = ${c.name}`).join(", ") || "(single chart)";
+    if (!link?.id) { unlinked.push(label); continue; }
+    let catalogPath;
+    try { catalogPath = (await getMeta(link.id)).catalogPath; } catch { unlinked.push(`${label} (indicator ${link.id} could not be found)`); continue; }
+    viewLines.push("  - dimensions:" + (combo.length ? "" : " {}"));
+    combo.forEach((c, i) => viewLines.push(`      ${dimSlugs[i]}: ${choiceSlugs.get(c.id)}`));
+    viewLines.push("    indicators:", "      y:", `        - catalogPath: ${JSON.stringify(catalogPath)}`);
+    const ownEdits = state.textEdits.views[comboKey(combo)] || {};
+    if (ownEdits.rounding) viewLines.push("          display:", ...yamlLines(roundingDisplay(ownEdits.rounding), 12));
+    viewLines.push(...textBlock(ownEdits, "    "));
+
+    // What changed in this view, against the indicator's own text.
+    const meta = await getMeta(link.id);
+    const original = originalTexts(meta);
+    const shown = resolvedTexts(comboKey(combo), meta);
+    for (const field of Object.keys(original)) {
+      if (same(original[field], shown[field])) continue;
+      changes.push(`#   ${label} · ${FIELD_LABELS[field]}`, `#     was: ${JSON.stringify(original[field])}`, `#     now: ${JSON.stringify(shown[field])}`);
+      if (state.suggest[meta.id]?.[field] && !suggested.has(`${meta.id}|${field}`)) {
+        suggested.add(`${meta.id}|${field}`);
+        suggestions.push(`#   - ${meta.catalogPath} · ${FIELD_LABELS[field]}: ${JSON.stringify(shown[field])}`);
+      }
+    }
+  }
+  lines.push(viewLines.length ? "views:" : "views: []", ...viewLines);
+  if (unlinked.length) lines.push("# Combinations with no indicator yet:", ...unlinked.map((u) => `#   - ${u}`));
+  if (changes.length) lines.push("# Text changes, against each indicator's own text:", ...changes);
+  if (suggestions.length) {
+    lines.push("# Suggested for the indicator everywhere (Claude: check which other charts use it, with /edit-faust-metadata, before changing it):", ...suggestions);
+  }
+  return lines.join("\n") + "\n";
+}
+
+document.getElementById("copy").addEventListener("click", async () => {
+  const status = document.getElementById("copy-status");
+  const fallback = document.getElementById("copy-fallback");
+  const text = await setupYaml();
+  try {
+    await navigator.clipboard.writeText(text);
+    fallback.hidden = true;
+    status.textContent = "Copied. Paste it to Claude.";
+  } catch (err) {
+    fallback.value = text;
+    fallback.hidden = false;
+    fallback.select();
+    status.textContent = "Couldn't copy automatically: copy the text below.";
+  }
+  setTimeout(() => { status.textContent = ""; }, 4000);
+});
+
+// ---------------------------------------------------------------------------
+// Panel open/close, and keeping the page clear of it
+// ---------------------------------------------------------------------------
+const panel = document.getElementById("panel");
+const toggle = document.getElementById("panel-toggle");
+function applyOpen() {
+  panel.classList.toggle("open", state.open);
+  toggle.setAttribute("aria-expanded", String(state.open));
+}
+toggle.addEventListener("click", () => { state.open = !state.open; saveState(); applyOpen(); });
+
+// Drag the handle on the panel's top edge (or use the arrow keys on it) to make the panel taller or shorter.
+const resizeHandle = document.getElementById("panel-resize");
+const MIN_PANEL_HEIGHT = 120;
+const maxPanelHeight = () => Math.max(MIN_PANEL_HEIGHT, window.innerHeight - 140);
+const panelBody = document.getElementById("panel-body");
+function applyHeight() {
+  if (state.height) {
+    state.height = Math.min(Math.max(state.height, MIN_PANEL_HEIGHT), maxPanelHeight());
+    panel.style.setProperty("--panel-height", `${state.height}px`);
+  }
+}
+resizeHandle.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  const startY = e.clientY;
+  const startHeight = panelBody.offsetHeight;
+  resizeHandle.setPointerCapture(e.pointerId);
+  panel.classList.add("resizing");
+  const onMove = (ev) => { state.height = startHeight + (startY - ev.clientY); applyHeight(); };
+  const onUp = () => {
+    panel.classList.remove("resizing");
+    resizeHandle.removeEventListener("pointermove", onMove);
+    resizeHandle.removeEventListener("pointerup", onUp);
+    resizeHandle.removeEventListener("pointercancel", onUp);
+    saveState();
+  };
+  resizeHandle.addEventListener("pointermove", onMove);
+  resizeHandle.addEventListener("pointerup", onUp);
+  resizeHandle.addEventListener("pointercancel", onUp);
+});
+resizeHandle.addEventListener("keydown", (e) => {
+  if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+  e.preventDefault();
+  state.height = panelBody.offsetHeight + (e.key === "ArrowUp" ? 40 : -40);
+  applyHeight();
+  saveState();
+});
+window.addEventListener("resize", applyHeight);
+applyHeight();
+new ResizeObserver(() => { document.body.style.paddingBottom = `${panel.offsetHeight + 24}px`; }).observe(panel);
+
+function refresh() {
+  renderBar();
+  renderCombos();
+  renderSummary();
+  renderChart();
+}
+
+// ---------------------------------------------------------------------------
+// Start
+// ---------------------------------------------------------------------------
+applyOpen();
+renderHeader();
+renderPageFields();
+renderTopicTags();
+renderTagsEditor();
+normalizeDefaultTab();
+renderChartSettings();
+renderTextEditor();
+pruneLinks();
+normalizeSelection();
+renderDims();
+showNotice("Loading Grapher…");
+renderBar();
+renderCombos();
+renderSummary();
+
+try {
+  grapher = await Promise.race([
+    import(PACKAGE_URL),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 15000)),
+  ]);
+} catch (err) {
+  console.error(err);
+}
+renderChart();
