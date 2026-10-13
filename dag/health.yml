@@ -911,7 +911,7 @@ steps:
     - data://garden/un/2024-07-08/maternal_mortality
 
   # Maternal Mortality long run data set (OWID OMM)
-  data://garden/maternal_mortality/2024-07-08/maternal_mortality:
+  data://garden/maternal_mortality/2026-10-13/maternal_mortality:
     # Gapminder Maternal Mortality (long run dataset)
     - data://garden/gapminder/2024-07-08/maternal_mortality:
         - data://meadow/gapminder/2024-07-08/maternal_mortality:
@@ -922,8 +922,8 @@ steps:
     - data://garden/wb/2026-07-01/income_groups
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/demography/2024-07-15/population
-  data://grapher/maternal_mortality/2024-07-08/maternal_mortality:
-    - data://garden/maternal_mortality/2024-07-08/maternal_mortality
+  data://grapher/maternal_mortality/2026-10-13/maternal_mortality:
+    - data://garden/maternal_mortality/2026-10-13/maternal_mortality
   # Tuberculosis expenditure - WHO
   data://grapher/tuberculosis/2026-02-05/expenditure:
     - data://garden/tuberculosis/2026-02-05/expenditure:
