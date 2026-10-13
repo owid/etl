@@ -93,8 +93,13 @@ mcp = FastMCP(
 class RequestLoggingMiddleware(Middleware):
     async def on_message(self, context: MiddlewareContext, call_next):
         # Most requests arrive as a pydantic model, but FastMCP passes ping and the resource
-        # and prompt listings as a plain dict.
-        message = context.message if isinstance(context.message, dict) else vars(context.message)
+        # and prompt listings as a plain dict, and an initialize sent without params as None.
+        if context.message is None:
+            message = {}
+        elif isinstance(context.message, dict):
+            message = context.message
+        else:
+            message = vars(context.message)
         attrs = {
             "request_id": str(uuid.uuid4()),
             "method": context.method,

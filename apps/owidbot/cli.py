@@ -112,11 +112,21 @@ def cli(
             continue
 
     # get existing comment (do this as late as possible to avoid race conditions)
-    comment = repo.get_comment_from_pr(pr)
+    comments = repo.get_comments_from_pr(pr)
+    comment = comments[0] if comments else None
 
-    # fill in services from existing comment if not run via --services to avoid deleting them
-    if comment:
-        for service, content in services_from_comment(comment).items():
+    # Concurrent runs can each find no comment and each create one; keep the oldest and
+    # delete the rest, otherwise every later run would have to pick between them.
+    if len(comments) > 1:
+        log.warning("Deleting duplicate owidbot comments.", branch=branch, duplicates=len(comments) - 1)
+        if not dry_run:
+            for duplicate in comments[1:]:
+                duplicate.delete()
+
+    # fill in services from existing comments if not run via --services to avoid deleting them
+    # (newest first, so the latest run of each service wins)
+    for existing in reversed(comments):
+        for service, content in services_from_comment(existing).items():
             services_body.setdefault(service, content)
 
     body = create_comment_body(branch, services_body, start_time)
