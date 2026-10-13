@@ -28,7 +28,6 @@ dataset:
   owners:
     - Fiona Spooner
     - Tuna Acisu
-    - Lucas Rodés-Guirao
 tables:
   maternal_mortality:
     title: Maternal mortality (Gapminder/UN MMEIG, long run)
