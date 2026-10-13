@@ -199,6 +199,28 @@ def test_name_furniture_never_overwrites_a_step_gid():
     plt.close(fig)
 
 
+def test_name_furniture_keeps_nearby_large_ticks_distinct():
+    # The default "g" format rounds to six digits, so 1,000,000..1,000,005 would all read 1e+06.
+    fig, ax = plt.subplots()
+    ax.set_xlim(1_000_000, 1_000_005)
+    ax.set_xticks(range(1_000_000, 1_000_006))
+    name_furniture(fig)
+    labels = [t.label1.get_gid() for t in ax.xaxis.get_major_ticks()]
+    assert labels == [f"axes__x-tick-label-{v}" for v in range(1_000_000, 1_000_006)]
+    plt.close(fig)
+
+
+def test_name_furniture_never_repeats_an_id():
+    fig, ax = plt.subplots()
+    ax.set_yticks([0.1, 0.1 + 1e-17, 0.2])
+    ax.text(0, 0, "x", gid="axes__y-grid-0.2")
+    name_furniture(fig)
+    gids = [a.get_gid() for a in fig.findobj() if a.get_gid()]
+    assert len(gids) == len(set(gids)), "every mark needs its own id for the re-import to tell them apart"
+    assert "axes__y-grid-0.2-2" in gids, "a name already taken gets a suffix, not a duplicate"
+    plt.close(fig)
+
+
 def test_export_frame_svg_has_no_unnamed_axes_furniture(tmp_path):
     """End to end: the saved SVG carries the names, which is what the Figma re-import reads."""
     paths = SketchPaths(tmp_path / "sketch.py")

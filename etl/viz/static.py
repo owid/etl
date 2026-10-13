@@ -129,7 +129,10 @@ def name_furniture(fig: Any) -> int:
     nodes on these names, so gridlines, ticks, tick labels and spines left with matplotlib's
     `line2d_<n>` / `text_<n>` ids lose any style a designer bound on them. Names are keyed on the
     tick VALUE rather than its position, so they survive a re-render that adds or drops a tick
-    (`axes__y-grid-50`, `axes__x-tick-label-2010`). A gid the step set itself is never overwritten.
+    (`axes__y-grid-50`, `axes__x-tick-label-2010`). The value is written to 15 significant digits, so
+    nearby large ticks stay distinct (`1000001`, not `1e+06`) while float noise such as
+    `0.30000000000000004` still reads `0.3`. A gid the step set itself is never overwritten, and a
+    name already in use in the figure gets a `-2`, `-3`, … suffix, so the SVG never repeats an id.
     Returns the number of artists it named.
 
     Draws the figure once without rendering first: matplotlib builds its tick objects at draw time,
@@ -137,11 +140,17 @@ def name_furniture(fig: Any) -> int:
     """
     fig.draw_without_rendering()
     named = 0
+    used = {artist.get_gid() for artist in fig.findobj() if artist.get_gid() is not None}
 
     def name(artist: Any, gid: str) -> None:
         nonlocal named
         if artist is not None and artist.get_gid() is None:
-            artist.set_gid(gid)
+            unique, n = gid, 1
+            while unique in used:
+                n += 1
+                unique = f"{gid}-{n}"
+            artist.set_gid(unique)
+            used.add(unique)
             named += 1
 
     for index, ax in enumerate(fig.axes):
@@ -154,7 +163,7 @@ def name_furniture(fig: Any) -> int:
             name(axis.get_offset_text(), f"{subject}__{axis_name}-offset")
             for kind, ticks in (("", axis.get_major_ticks()), ("minor-", axis.get_minor_ticks())):
                 for tick in ticks:
-                    value = format(tick.get_loc(), "g")
+                    value = format(tick.get_loc(), ".15g")
                     name(tick.gridline, f"{subject}__{axis_name}-{kind}grid-{value}")
                     name(tick.tick1line, f"{subject}__{axis_name}-{kind}tick-{value}")
                     name(tick.tick2line, f"{subject}__{axis_name}-{kind}tick2-{value}")
