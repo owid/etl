@@ -88,6 +88,10 @@ Maintainer notes — how the version is bumped, how a release reaches PyPI, and 
 
 ## Changelog
 
+### `v1.2.9`
+- `ResponseSet(_ui_advanced=True)` keeps the flag: Pydantic dropped constructor arguments for private attributes, so search results never got the advanced display
+- Dev tooling: ruff 0.16.10, ty 0.0.85
+
 ### `v1.2.8`
 - **pandas 3 support:** `pandas>=2.2.3,<4` (was `<3`), and requires `owid-datautils>=0.6.12` and `owid-repack>=0.1.12`, which allow pandas 3 too
 - **Behavior kept from pandas 2 on pandas 3**
