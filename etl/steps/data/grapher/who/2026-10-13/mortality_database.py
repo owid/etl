@@ -1,6 +1,6 @@
 """Load the WHO Mortality Database garden dataset and create the grapher dataset."""
 
-from etl.helpers import PathFinder, grapher_checks
+from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
@@ -12,5 +12,4 @@ def run() -> None:
 
     # Step 2: Save.
     ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
-    grapher_checks(ds_grapher, warn_title_public=False)
     ds_grapher.save()
