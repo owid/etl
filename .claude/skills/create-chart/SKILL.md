@@ -434,23 +434,7 @@ Common practice in OWID charts, not a hard rule:
 - **Match the palette to whether more is good or bad.** Use blues and greens when a higher value is good, such as aid received or vaccination coverage. Use reds, oranges and browns when it's bad, such as deaths or emissions. Purples work for either.
 - **Give each indicator its own palette** when several maps sit together, e.g. charts from the same dataset or for the same article. Then readers can tell the maps apart at a glance.
 
-The sequential schemes in the grapher schema, grouped this way. The ColorBrewer ones go from light for low values to dark for high ones.
-
-| More is | Schemes |
-|---|---|
-| Good (blue, green) | `Blues`, `Greens`, `BuGn`, `GnBu`, `YlGn`, `YlGnBu`, `PuBu`, `PuBuGn` |
-| Bad (red, orange, brown) | `Reds`, `Oranges`, `OrRd`, `YlOrRd`, `YlOrBr`, `PuRd` |
-| Either (purple) | `Purples`, `BuPu`, `RdPu` |
-
-We don't use `Greys`. The other schemes have other uses:
-
-- **`SingleColorGradient*`** (`Denim`, `Teal`, `Purple`, `DustyCoral`, `DarkCopper`) are OWID's own shades of one brand color, from dark to light. Published charts use them almost only to color the series of stacked charts (as the top-level `baseColorScheme`), and rarely on maps.
-
-- **Perceptual schemes** (`Viridis`, `Magma`, `Inferno`, `Plasma`) carry no good or bad reading. `Magma` and `Inferno` end in near-white yellow, so their top values can blend into a white background.
-- **Diverging schemes** (`RdYlGn`, `RdBu`, `RdYlBu`, `BrBG`, `PiYG`, `PRGn`, `PuOr`, `RdGy`, `Spectral`) are for indicators with a meaningful midpoint, such as a change that can be positive or negative. Set `midpoint` to it. The red, pink or brown end reads as bad. Set `colorSchemeInvert: true` if that end needs to be on the other side.
-- **Categorical schemes** (`Set*`, `Pastel*`, `Paired`, `Accent`, `Dark2`, `Owid*`, `BinaryMapPalette*`, `continents`) are for categorical maps, not numeric scales.
-
-Check the result by rendering the map tab with the `check-chart-preview` helper (`--tab=map`).
+[`MAP_PALETTES.md`](MAP_PALETTES.md) lists which schemes count as good, bad or either, and what the diverging, perceptual, categorical and `SingleColorGradient*` schemes are for. Check the result by rendering the map tab with the `check-chart-preview` helper (`--tab=map`).
 
 ## Common dimension patterns
 
