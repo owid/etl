@@ -1,34 +1,21 @@
-"""Load a snapshot and create a meadow dataset."""
+"""Load the WHO Mortality Database snapshot and create a meadow dataset."""
 
 from etl.helpers import PathFinder
 
-# Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
 def run() -> None:
-    #
-    # Load inputs.
-    #
-    # Retrieve snapshot.
+    # Step 1: Load the snapshot.
     snap = paths.load_snapshot("mortality_database.feather")
-
-    # Load data from snapshot.
     tb = snap.read(safe_types=False)
 
-    #
-    # Process data.
-    #
-    # Create a new table and ensure all columns are snake-case.
+    # Step 2: Drop the code columns that duplicate the labels, and WHO's regional grouping, which
+    # nothing downstream uses. `icd10_codes` stays as a column: it describes the cause, not the row.
     tb = tb.drop(columns=["Region Code", "Country Code", "Age group code", "Region Name"])
     tb = tb.rename(columns={"Country Name": "country"}, errors="raise")
     tb = tb.format(["country", "year", "sex", "age_group", "cause"])
 
-    #
-    # Save outputs.
-    #
-    # Create a new meadow dataset with the same metadata as the snapshot.
+    # Step 3: Save.
     ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
-
-    # Save changes in the new garden dataset.
     ds_meadow.save()
