@@ -19,7 +19,7 @@ def run() -> None:
     ds_population = paths.load_dataset("population")
     # Read table from meadow dataset.
     tb = ds_meadow.read("pertussis_deaths")
-    tb_who = ds_who.read("mortality_database", reset_metadata="keep_origins")
+    tb_who = ds_who.read("vaccine_preventable_diseases", reset_metadata="keep_origins")
 
     tb_who = clean_who_mortality_data(tb_who, cause="Pertussis")
     tb_pop = ds_population.read("population", reset_metadata="keep_origins")

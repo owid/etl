@@ -1,12 +1,14 @@
 """Load the WHO Mortality Database meadow dataset and create the garden dataset.
 
-Two tables come out:
+Three tables come out:
 
 - `mortality_database`: deaths, death rates, age-standardized death rates and shares of total deaths,
-  by country, year, sex, age group and cause group.
+  by country, year, sex and age group, for All Causes and the 23 cause groups that tile it.
+- `vaccine_preventable_diseases`: the same four indicators for the seven vaccine-preventable causes,
+  which are drill-downs inside one of those groups. Later fold-ins add one table per group of drill-downs.
 - `causes`: one row per cause group, with its depth in WHO's cause tree (`cause_level`), its parent
-  group and the ICD-10 codes that define it. The codes are a property of the cause, not a dimension
-  of the data, so they live here rather than in the fact table's key.
+  group, the ICD-10 codes that define it and the table it is published in. The codes are a property of
+  the cause, not a dimension of the data, so they live here rather than in the fact tables' key.
 
 WHO's cause tree has four top-level groups: communicable/maternal/perinatal/nutritional conditions,
 noncommunicable diseases, injuries, and ill-defined diseases. The 23 groups one level below them together
@@ -21,6 +23,7 @@ poisonings that the February 2026 release counts twice under Unintentional injur
 """
 
 from collections import Counter
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -43,6 +46,20 @@ CHILDHOOD_CLUSTER = "Childhood-cluster diseases"
 
 # WHO's 23 groups that tile All Causes. Fold-ins add drill-downs inside them, never new partition groups.
 N_PARTITION_GROUPS = 23
+
+# The table each drill-down cause is published in; every other cause goes in MAIN_TABLE, the partition tier.
+# One table per group of drill-downs keeps the layer visible in the catalog path, which the admin's flat list
+# of indicators does not show.
+MAIN_TABLE = "mortality_database"
+DRILL_DOWN_TABLES = {
+    "Pertussis": "vaccine_preventable_diseases",
+    "Poliomyelitis": "vaccine_preventable_diseases",
+    "Diphtheria": "vaccine_preventable_diseases",
+    "Measles": "vaccine_preventable_diseases",
+    "Tetanus": "vaccine_preventable_diseases",
+    "Hepatitis B": "vaccine_preventable_diseases",
+    "Japanese encephalitis": "vaccine_preventable_diseases",
+}
 
 # Our label for each cause group -> (depth in WHO's cause tree, parent group).
 # Depth 0 is All Causes, depth 1 WHO's four top-level groups, depth 2 the groups beneath them.
@@ -178,14 +195,45 @@ def run() -> None:
         tb, tb_causes, min_share_consistent=PARTITION_MIN_SHARE_AFTER_CORRECTION, stage="after correction"
     )
 
-    tb = tb.format(["country", "year", "sex", "age_group", "cause"], short_name="mortality_database")
+    # Step 5: One table per layer - the partition tier, then one table per group of drill-downs - so the catalog
+    # path says where a cause sits. The metadata must know every cause too (see the check).
+    _check_metadata_lists_every_cause(tb_causes)
+    tables = _split_by_table(tb, tb_causes)
     tb_causes = tb_causes.format(["cause"], short_name="causes")
 
-    # Step 5: Save.
+    # Step 6: Save.
     ds_garden = paths.create_dataset(
-        tables=[tb, tb_causes], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        tables=[*tables, tb_causes], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
     ds_garden.save()
+
+
+def _split_by_table(tb: Table, tb_causes: Table) -> list[Table]:
+    """One formatted fact table per value of `causes.table`, the partition tier first."""
+    keys = ["country", "year", "sex", "age_group", "cause"]
+    tables = []
+    for short_name in dict.fromkeys([MAIN_TABLE, *DRILL_DOWN_TABLES.values()]):
+        causes = set(tb_causes.loc[tb_causes["table"] == short_name, "cause"])
+        part = tb[tb["cause"].isin(causes)].copy()
+        # A filtered categorical keeps every category; the grapher step would render empty indicators for them.
+        if isinstance(part["cause"].dtype, pd.CategoricalDtype):
+            metadata = part["cause"].metadata
+            part["cause"] = part["cause"].cat.remove_unused_categories()
+            part["cause"].metadata = metadata  # ty: ignore
+        tables.append(part.format(keys, short_name=short_name))
+    assert sum(len(t) for t in tables) == len(tb), "Rows lost in the split by table"
+    return tables
+
+
+def _check_metadata_lists_every_cause(tb_causes: Table) -> None:
+    """The metadata repeats two things per cause that only this step knows - its ICD-10 codes and its place in
+    the tree - so a cause added here without its metadata branches fails the build instead of rendering blank."""
+    text = Path(__file__).with_suffix(".meta.yml").read_text()
+    missing = {
+        "icd10_codes": [c for c in tb_causes["cause"] if f'cause == "{c}"' not in text],
+        "cause_hierarchy": [c for c in tb_causes["cause"] if f'("{c}", ' not in text],
+    }
+    assert not any(missing.values()), f"Causes missing from the metadata definitions: {missing}"
 
 
 def _rename_categories(tb: Table, column: str, renames: dict[str, str]) -> Table:
@@ -227,8 +275,9 @@ def build_causes_table(tb: Table) -> Table:
 
     tb_causes["cause_level"] = [CAUSE_TREE[cause][0] for cause in tb_causes["cause"]]
     tb_causes["parent_cause"] = [CAUSE_TREE[cause][1] for cause in tb_causes["cause"]]
+    tb_causes["table"] = [DRILL_DOWN_TABLES.get(cause, MAIN_TABLE) for cause in tb_causes["cause"]]
     # The tree is WHO's; the codes column already carries WHO's origin, so the new columns borrow it.
-    for column in ["cause_level", "parent_cause"]:
+    for column in ["cause_level", "parent_cause", "table"]:
         tb_causes[column] = tb_causes[column].copy_metadata(tb_causes["icd10_codes"])
     return tb_causes
 
