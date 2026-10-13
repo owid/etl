@@ -72,7 +72,7 @@ class StepForm(BaseModel):
         raise NotImplementedError("Needs to be implemented in the child class!")
 
     @property
-    def metadata(self: Self) -> None:
+    def metadata(self: Self) -> dict[str, Any]:
         """Get metadata as dictionary."""
         raise NotADirectoryError("Needs to be implemented in the child class!")
 
@@ -517,7 +517,7 @@ class SnapshotForm(StepForm):
             raise ValueError("attribution must be present!")
 
     @property
-    def metadata(self: Self) -> dict[str, Any]:  # ty: ignore[invalid-method-override]
+    def metadata(self: Self) -> dict[str, Any]:
         """Define metadata for easy YAML-export."""
         license_field = {
             "name": self.license_name,

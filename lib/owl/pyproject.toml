@@ -28,8 +28,8 @@ owl = "owl.cli:cli"
 [dependency-groups]
 dev = [
     "pytest>=9.0.3",
-    "ty==0.0.55",
-    "ruff==0.15.8",
+    "ty==0.0.85",
+    "ruff==0.16.10",
     "ipdb>=0.13.13",
 ]
 

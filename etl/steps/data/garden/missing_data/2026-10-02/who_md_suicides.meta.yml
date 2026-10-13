@@ -10,9 +10,11 @@ definitions:
 
 dataset:
   title: Missing data - Deaths from Suicides
+  update_period_days: 365
 
   owners:
     - Tuna Acisu
+    - Lucas Rodés-Guirao
 tables:
   who_md_suicides:
     variables:

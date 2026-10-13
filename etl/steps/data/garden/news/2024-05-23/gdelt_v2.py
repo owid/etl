@@ -89,7 +89,7 @@ def add_relative_indicator(tb: Table, colname: str):
     tb_countries = tb.loc[~tb["country"].isin(EXCLUDE_ENTITIES)].copy()
 
     # Estimate relative values
-    tb_countries["total"] = tb_countries.groupby("year")[colname].transform(sum)
+    tb_countries["total"] = tb_countries.groupby("year")[colname].transform("sum")
     tb_countries[f"{colname}_relative"] = tb_countries[colname] / tb_countries["total"] * 100_000
     tb_countries = tb_countries.drop(columns=["total"])
 

@@ -996,8 +996,9 @@ def sanity_check_welfare_basis(tb_welfare: Table, tb_percentiles: Table, tb_pip:
 def national_survey_percentiles(tb_percentiles: Table) -> Table:
     """National income/consumption survey percentiles at the current PPP round."""
     d = tb_percentiles[
-        (tb_percentiles["ppp_version"] == PIP_PPP_VERSION)
-        & (tb_percentiles["reporting_level"] == "national")
+        # NOTE: In pandas 3, comparing nullable string columns gives a pyarrow boolean that can't be combined with `&` while it holds NA, so treat NA as False.
+        (tb_percentiles["ppp_version"] == PIP_PPP_VERSION).fillna(False)
+        & (tb_percentiles["reporting_level"] == "national").fillna(False)
         & tb_percentiles["welfare_type"].isin(["income", "consumption"])
     ][["country", "year", "welfare_type", "percentile", "avg"]].copy()
     d["country"] = d["country"].astype(str)
