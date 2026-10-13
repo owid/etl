@@ -13,7 +13,7 @@ meta:
     citation_full: WHO Division of Data, Analytics and Delivery for Impact (DDI), World Health Organization (2026)
     attribution_short: WHO
     url_main: https://platform.who.int/mortality
-    date_accessed: '2026-10-13'
+    date_accessed: '2026-10-14'
     # The platform states no release date of its own. This is the "Last update" WHO shows for the
     # database's bulk download page, which is refreshed together with the platform; the export's
     # newest rows (2024, 17 countries) are consistent with that release.
@@ -22,6 +22,6 @@ meta:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/copyright
 outs:
-  - md5: 89fb4160f198d089d717918ceb794c9d
-    size: 61965474
+  - md5: 9a1d430ec89a17b0e0943b56b20735a2
+    size: 68998906
     path: mortality_database.feather
