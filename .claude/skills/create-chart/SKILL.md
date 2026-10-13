@@ -434,7 +434,7 @@ Common practice in OWID charts, not a hard rule:
 - **Match the palette to whether more is good or bad.** Use blues and greens when a higher value is good, such as aid received or vaccination coverage. Use reds, oranges and browns when it's bad, such as deaths or emissions. Purples work for either.
 - **Give each indicator its own palette** when several maps sit together, e.g. charts from the same dataset or for the same article. Then readers can tell the maps apart at a glance.
 
-[`MAP_PALETTES.md`](MAP_PALETTES.md) lists which schemes count as good, bad or either, and what the diverging, perceptual, categorical and `SingleColorGradient*` schemes are for. Check the result by rendering the map tab with the `check-chart-preview` helper (`--tab=map`).
+[`MAP_PALETTES.md`](MAP_PALETTES.md) lists which schemes count as good, bad or either, and what the other scheme families (diverging, perceptual, binary, categorical, `SingleColorGradient*`) are for. Check the result by rendering the map tab with the `check-chart-preview` helper (`--tab=map`).
 
 ## Common dimension patterns
 
