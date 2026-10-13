@@ -10,6 +10,7 @@ changing the page. Needs Tailscale, because the page loads Grapher from the Tail
 
 import importlib.util
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -119,6 +120,7 @@ def main() -> None:
         page.wait_for_timeout(1500)
         page.screenshot(path=SCREENSHOTS / "initial.png")
         check("starting chart is drawn", "Number of people using the Internet" in page.inner_text("#chart"))
+        check("the last dropdown can't be removed", page.locator(".dim-head .btn-icon").first.is_disabled())
         wysk = page.inner_text("#wysk-list")
         check(
             "free-form WYSK is shown whole",
@@ -291,11 +293,27 @@ def main() -> None:
         check("map colours marked as edited", page.locator("#tools-map .edited").count() == 1)
         page.screenshot(path=SCREENSHOTS / "map_colours.png")
 
-        # Number rounding.
+        # Number rounding, and undoing it, as the chart shows it (France's value in the countries panel).
+        def france_value() -> str:
+            panel = page.inner_text("#chart .entity-selector")
+            match = re.search(r"(?m)^France\xa0?\n([^\n]+)$", panel)
+            return match.group(1).strip() if match else ""
+
+        original_value = france_value()
+        page.select_option("#rounding-mode", "significantFigures")
+        page.fill("#rounding-digits", "1")
+        page.wait_for_timeout(1500)
+        check("rounding marked as edited", page.locator("#tools-rounding .edited").count() == 1)
+        rounded_value = france_value()
+        check(
+            "the chart shows the new rounding", rounded_value != original_value, f"{original_value} -> {rounded_value}"
+        )
+        page.click("#tools-rounding .link-btn")
+        page.wait_for_timeout(1500)
+        check("undo redraws the chart", france_value() == original_value, france_value())
         page.select_option("#rounding-mode", "significantFigures")
         page.fill("#rounding-digits", "2")
         page.wait_for_timeout(600)
-        check("rounding marked as edited", page.locator("#tools-rounding .edited").count() == 1)
         page.click("#text-editor-toggle")
 
         # Dropdown description and an option group.
@@ -352,12 +370,21 @@ def main() -> None:
         page.wait_for_timeout(2500)
         check("sketches are saved separately", "0 linked" in page.inner_text("#panel-summary"))
 
-        # A copied setup reopens unchanged.
-        build.build(REOPENED, setup_path)
+        # A copied setup reopens unchanged, including a "What you should know" given as a list.
+        reopen = yaml.safe_load(setup_text)
+        reopen["views"][0].setdefault("metadata", {})["description_key"] = ["A point given as a list item.", "Another."]
+        reopen_path = OUT / "check_reopen.yml"
+        reopen_path.write_text(yaml.safe_dump(reopen, sort_keys=False, allow_unicode=True))
+        build.build(REOPENED, reopen_path)
         page.goto(REOPENED.as_uri())
         page.wait_for_selector("#chart svg", timeout=30000)
         page.wait_for_timeout(1500)
-        check("a copied setup reopens unchanged", yaml.safe_load(copied_setup(page)) == yaml.safe_load(setup_text))
+        reopened = yaml.safe_load(copied_setup(page))
+        check("a copied setup reopens unchanged", reopened == reopen)
+        check(
+            "a list-form WYSK stays a list",
+            reopened["views"][0]["metadata"]["description_key"] == ["A point given as a list item.", "Another."],
+        )
 
         check("no console errors", not errors, errors or "")
         browser.close()

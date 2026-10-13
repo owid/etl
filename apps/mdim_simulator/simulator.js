@@ -45,6 +45,7 @@ function loadState() {
 }
 
 let state = loadState();
+if (!state.dims.length) state.dims.push({ id: newId(), name: "Dropdown 1", choices: [{ id: newId(), name: "Option 1" }] });
 // Text overrides, per view (keyed like links). Older saved setups have none.
 state.textMode ??= false;
 state.textEdits ??= {};
@@ -212,11 +213,12 @@ function descriptionKeyBlocks(descriptionKey) {
   return blocks;
 }
 
-function descriptionKeyValue(blocks, meta) {
-  return Array.isArray(meta.descriptionKey)
-    ? blocks.map((b) => (b.startsWith("- ") ? b.slice(2) : b))
-    : blocks.join("\n");
+function descriptionKeyValue(blocks, asList) {
+  return asList ? blocks.map((b) => (b.startsWith("- ") ? b.slice(2) : b)) : blocks.join("\n");
 }
+
+// A pre-filled view records whether its text came as a list; text edited in the page follows the indicator.
+const descriptionKeyAsList = (edits, meta) => edits?.descriptionKeyIsList ?? Array.isArray(meta.descriptionKey);
 
 // A block's text without its bullet, as markdown: continuation lines join the paragraph, nested "- " lines
 // become a nested list.
@@ -465,6 +467,7 @@ function setText(field, value) {
   const own = (views[key] ||= {});
   if (same(value, originalTexts(meta)[field])) delete own[field];
   else own[field] = value;
+  if (!("descriptionKey" in own)) delete own.descriptionKeyIsList;
   if (!Object.keys(own).length) delete views[key];
   saveState();
 }
@@ -473,6 +476,7 @@ function undoText(field) {
   const views = state.textEdits.views;
   if (!views[current.key]) return;
   delete views[current.key][field];
+  if (field === "descriptionKey") delete views[current.key].descriptionKeyIsList;
   if (!Object.keys(views[current.key]).length) delete views[current.key];
   saveState();
 }
@@ -505,6 +509,8 @@ function fieldTools(field) {
   undo.addEventListener("click", () => {
     undoText(field);
     afterTextChange({ rebuildFields: true });
+    // These two are drawn from the chart's config, not set live, so the chart has to be redrawn.
+    if (field === "rounding" || field === "map") scheduleRemount();
   });
   const suggest = document.createElement("label");
   const box = document.createElement("input");
@@ -820,7 +826,11 @@ async function renderChart({ keepEditor = false } = {}) {
   disposeChart();
   chartEl.innerHTML = "";
   const { GrapherLoader, OwidTable } = grapher;
-  const table = new OwidTable(indicator.csv, [columnDef(indicator.meta)]);
+  // Grapher's fromTable takes rounding from the column, not from the chart's dimension, so the view's rounding
+  // goes on the column here. The copied setup still puts it on the view's indicator, as ETL expects.
+  const column = columnDef(indicator.meta);
+  column.display = { ...(column.display || {}), ...roundingDisplay(resolvedTexts(comboKey(combo), indicator.meta).rounding) };
+  const table = new OwidTable(indicator.csv, [column]);
   const texts = resolvedTexts(key, indicator.meta);
   const base = viewConfig(indicator.meta);
   const config = {
@@ -1099,26 +1109,23 @@ function namesChanged() {
 function renderDims() {
   const list = document.getElementById("dims-list");
   list.innerHTML = "";
-  if (!state.dims.length) {
-    const hint = document.createElement("p");
-    hint.className = "hint";
-    hint.textContent = "No dropdowns: this is a single chart. Add a dropdown to turn it into an MDim.";
-    list.append(hint);
-  }
   state.dims.forEach((dim, dimIndex) => {
     const card = document.createElement("div");
     card.className = "dim-card";
 
     const head = document.createElement("div");
     head.className = "dim-head";
-    head.append(
-      textInput(dim.name, "Dropdown name, e.g. Metric", (v) => { dim.name = v; namesChanged(); }),
-      removeButton(`Remove the ${dim.name || "untitled"} dropdown`, () => {
-        state.dims.splice(dimIndex, 1);
-        rekeyLinks((parts) => parts.filter((_, i) => i !== dimIndex).join("|"));
-        structureChanged();
-      }),
-    );
+    // An MDim needs at least one dropdown, so the last one can't be removed.
+    const remove = removeButton(`Remove the ${dim.name || "untitled"} dropdown`, () => {
+      state.dims.splice(dimIndex, 1);
+      rekeyLinks((parts) => parts.filter((_, i) => i !== dimIndex).join("|"));
+      structureChanged();
+    });
+    if (state.dims.length === 1) {
+      remove.disabled = true;
+      remove.title = "An MDim needs at least one dropdown";
+    }
+    head.append(textInput(dim.name, "Dropdown name, e.g. Metric", (v) => { dim.name = v; namesChanged(); }), remove);
     card.append(head);
     const dimDescription = optionalField(dim.description, "Shown at the top of the dropdown menu", "+ Add description", (v) => {
       dim.description = v;
@@ -1299,7 +1306,7 @@ function renderCombos() {
     inputCell.append(input);
     const textCell = document.createElement("td");
     textCell.className = "text-col";
-    if (state.textEdits.views[key]) textCell.innerHTML = `<span class="text-tag" title="${esc(Object.keys(state.textEdits.views[key]).map((f) => FIELD_LABELS[f]).join(", "))}">Edited</span>`;
+    if (state.textEdits.views[key]) textCell.innerHTML = `<span class="text-tag" title="${esc(Object.keys(state.textEdits.views[key]).filter((f) => FIELD_LABELS[f]).map((f) => FIELD_LABELS[f]).join(", "))}">Edited</span>`;
     tr.append(inputCell, statusCell, textCell);
 
     // Clicking a row shows that combination in the chart.
@@ -1396,13 +1403,12 @@ async function setupYaml() {
     if (edits.map && Object.keys(colorScaleFrom(edits.map)).length) cfg.map = { colorScale: colorScaleFrom(edits.map) };
     if (Object.keys(cfg).length) out.push(`${indent}config:`, ...yamlLines(cfg, indent.length + 2));
     if ("descriptionKey" in edits) {
-      out.push(`${indent}metadata:`, ...yamlLines({ description_key: descriptionKeyValue(edits.descriptionKey, meta) }, indent.length + 2));
+      out.push(`${indent}metadata:`, ...yamlLines({ description_key: descriptionKeyValue(edits.descriptionKey, descriptionKeyAsList(edits, meta)) }, indent.length + 2));
     }
     return out;
   };
 
-  if (!state.dims.length) lines.push("dimensions: []");
-  else {
+  {
     lines.push("dimensions:");
     state.dims.forEach((dim, i) => {
       lines.push(`  - slug: ${dimSlugs[i]}`, `    name: ${JSON.stringify(dim.name)}`);
@@ -1423,11 +1429,11 @@ async function setupYaml() {
   const suggested = new Set();
   for (const combo of combinations()) {
     const link = state.links[comboKey(combo)];
-    const label = combo.map((c, i) => `${state.dims[i].name} = ${c.name}`).join(", ") || "(single chart)";
+    const label = combo.map((c, i) => `${state.dims[i].name} = ${c.name}`).join(", ");
     if (!link?.id) { unlinked.push(label); continue; }
     let catalogPath;
     try { catalogPath = (await getMeta(link.id)).catalogPath; } catch { unlinked.push(`${label} (indicator ${link.id} could not be found)`); continue; }
-    viewLines.push("  - dimensions:" + (combo.length ? "" : " {}"));
+    viewLines.push("  - dimensions:");
     combo.forEach((c, i) => viewLines.push(`      ${dimSlugs[i]}: ${choiceSlugs.get(c.id)}`));
     viewLines.push("    indicators:", "      y:", `        - catalogPath: ${JSON.stringify(catalogPath)}`);
     const meta = await getMeta(link.id);
@@ -1441,7 +1447,7 @@ async function setupYaml() {
     for (const field of Object.keys(original)) {
       if (same(original[field], shown[field])) continue;
       changes.push(`#   ${label} · ${FIELD_LABELS[field]}`, `#     was: ${JSON.stringify(original[field])}`, `#     now: ${JSON.stringify(shown[field])}`);
-      const suggestedValue = JSON.stringify(field === "descriptionKey" ? descriptionKeyValue(shown[field], meta) : shown[field]);
+      const suggestedValue = JSON.stringify(field === "descriptionKey" ? descriptionKeyValue(shown[field], descriptionKeyAsList(state.textEdits.views[comboKey(combo)], meta)) : shown[field]);
       if (state.suggest[comboKey(combo)]?.[field] && !suggested.has(`${meta.id}|${field}|${suggestedValue}`)) {
         suggested.add(`${meta.id}|${field}|${suggestedValue}`);
         suggestions.push(`#   - ${meta.catalogPath} · ${FIELD_LABELS[field]} (from ${label}): ${suggestedValue}`);

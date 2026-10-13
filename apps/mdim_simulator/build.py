@@ -144,6 +144,8 @@ def description_key_blocks(description_key: str | list) -> list[str]:
 
 def state_from_setup(setup: dict) -> tuple[dict, list[int]]:
     """The page's state for a setup in the copied-setup format, and the IDs of the indicators it links."""
+    if not setup.get("dimensions"):
+        sys.exit("The setup has no dropdowns: an MDim needs at least one.")
     dims = [
         {
             "id": f"d-{d['slug']}",
@@ -186,6 +188,7 @@ def state_from_setup(setup: dict) -> tuple[dict, list[int]]:
         description_key = (view.get("metadata") or {}).get("description_key")
         if description_key is not None:
             own["descriptionKey"] = description_key_blocks(description_key)
+            own["descriptionKeyIsList"] = isinstance(description_key, list)
         display = y.get("display") or {} if isinstance(y, dict) else {}
         if display.get("roundingMode") == "significantFigures" and "numSignificantFigures" in display:
             own["rounding"] = {"mode": "significantFigures", "digits": display["numSignificantFigures"]}
