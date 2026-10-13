@@ -21,7 +21,7 @@ views:
         min: 0
       map:
         colorScale:
-          baseColorScheme: "BuGn"
+          baseColorScheme: "YlGnBu"
           binningStrategy: "manual"
           customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100, 200]
       selectedEntityNames:

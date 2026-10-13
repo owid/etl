@@ -19,6 +19,11 @@ views:
         - "LineChart"
       yAxis:
         min: 0
+      map:
+        colorScale:
+          baseColorScheme: "GnBu"
+          binningStrategy: "manual"
+          customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
       selectedEntityNames:
         - "India"
         - "Philippines"
