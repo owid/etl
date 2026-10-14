@@ -1,10 +1,10 @@
 """Daily digest: review the charts that changed yesterday, and say something only if it matters.
 
-Selection is deliberately narrow. Charts whose **configuration** changed are ~17 a day, which is
-a sweep that costs cents and finishes in a minute. Charts whose **data** was refreshed are ~105 a
-day but 3,138 over a week, because one dataset update touches thousands at once — reviewing those
-is available behind ``--include-data-updates`` and is a different job, needing a much larger cap
-and much harder deduplication.
+Selection is deliberately narrow: charts a person **edited**, which is usually a few dozen a day
+and a sweep that finishes in minutes. Charts whose **data** was refreshed are ~105 a day but 3,138
+over a week, because one dataset update touches thousands at once — reviewing those is available
+behind ``--include-data-updates`` and is a different job, needing a much larger cap and much harder
+deduplication.
 
 Three things keep the digest worth reading, and all three are about restraint:
 
@@ -110,11 +110,17 @@ def post_count(messages: list[DigestMessage]) -> int:
 def changed_slugs(days: int = 1, include_data_updates: bool = False) -> list[str]:
     """Published chart slugs that changed in the last ``days``.
 
-    By default this is configuration edits only. ``include_data_updates`` adds every published
+    By default this is charts a person edited. ``include_data_updates`` adds every published
     chart whose underlying dataset was re-run, which is the right signal for "did this update
     break anything" but an order of magnitude larger and extremely uneven day to day.
 
-    **Needs the production database.** ``updatedAt`` on a staging copy reflects when the copy was
+    Edits are read from ``charts.lastEditedAt``, not ``chart_configs.updatedAt``. An ETL upsert
+    rewrites the full config of every chart that inherits from the indicators it touched, which
+    bumps ``updatedAt`` with nobody editing anything — one such upsert put 44 unedited charts into a
+    55-chart sweep. Those are data updates by another route, and ``include_data_updates`` is the
+    switch for them.
+
+    **Needs the production database.** Timestamps on a staging copy reflect when the copy was
     made, not when anyone edited a chart, so run this with ``ENV_FILE=.env.prod.read
     DATA_API_ENV=production DB_NAME=live_grapher`` or it will report that nothing changed.
     """
@@ -124,7 +130,8 @@ def changed_slugs(days: int = 1, include_data_updates: bool = False) -> list[str
         """
         SELECT DISTINCT cc.slug
         FROM chart_configs cc
-        WHERE cc.updatedAt >= NOW() - INTERVAL %(days)s DAY
+        JOIN charts c ON c.configId = cc.id
+        WHERE c.lastEditedAt >= NOW() - INTERVAL %(days)s DAY
           AND cc.slug IS NOT NULL
           AND JSON_EXTRACT(cc.config, '$.isPublished') = TRUE
         """,
@@ -169,9 +176,9 @@ def chart_facts(results: list[dict[str, Any]], editor_window_days: int | None = 
 
     It also yields the chart's last editor, who is who a finding gets addressed to — see
     :func:`attach_mentions` for when we may name them. ``editor_window_days`` is the sweep's own
-    window, and an editor whose edit falls outside it is reported as unknown: selection is on
-    ``chart_configs.updatedAt``, which an ETL upsert or a chart sync bumps without anybody
-    editing anything, so "this chart changed" is not on its own evidence about who changed it.
+    window, and an editor whose edit falls outside it is reported as unknown: with
+    ``include_data_updates`` a chart is selected because its data changed, which is not on its own
+    evidence about who last edited it.
 
     Only flagged charts are looked up, so this is one small query. It fails soft: without a
     database the fingerprint falls back to the slug (which over-reports rather than dropping a

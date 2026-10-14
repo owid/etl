@@ -16,8 +16,9 @@ etl chart-critic --top 50 --output /tmp/critic.html
 etl chart-critic --sample 100 --cheap --no-image --dry-run
 ```
 
-Roughly $0.003 per chart with the render attached on the default model, so a pass over every
-published chart is a few dollars. The binding constraint is not the bill — it is how many
+Roughly $0.03 per chart with the render attached on the default model at the default three passes,
+most of it the model's thinking tokens (billed as output), so a pass over every published chart
+is around a hundred dollars. The binding constraint is not the bill — it is how many
 findings a human will read, which is why an empty result is a first-class outcome here.
 """
 
@@ -234,14 +235,14 @@ def _resolve_cache_ttl(cache_ttl: float | None, changed_since: int | None) -> fl
     """How long a cached bundle stays fresh, when the caller did not say.
 
     A ``--changed-since`` sweep must not replay a cached bundle, and the reason is that
-    selection's whole premise: a chart is in it *because* its configuration changed inside the
+    selection's whole premise: a chart is in it *because* someone edited it inside the
     window, so a bundle fetched inside that same window describes the chart as it was *before*
     the change. With a daily cron and a 24-hour TTL the previous run's bundle is always a few
     minutes inside the TTL, so it is not an edge case but the normal path — every finding a
     report on yesterday's chart. It reached the channel: a subtitle fixed during the day was
     flagged again the next morning, on a chart whose fix is what nominated it for review.
 
-    It is ~17 charts a day, so re-fetching them costs nothing worth saving. Any explicit
+    It is a few dozen charts a day, so re-fetching them costs nothing worth saving. Any explicit
     ``--cache-ttl`` still wins, including for a sweep of a hand-picked list.
     """
     if cache_ttl is not None:
@@ -392,7 +393,7 @@ def _review_one(
     "--changed-since",
     type=int,
     default=None,
-    help="Review the published charts whose configuration changed in the last N days, most-read first.",
+    help="Review the published charts someone edited in the last N days, most-read first.",
 )
 @click.option(
     "--include-data-updates",
