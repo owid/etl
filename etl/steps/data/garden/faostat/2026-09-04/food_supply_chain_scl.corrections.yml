@@ -13,9 +13,9 @@
 # size. That is physically impossible: molasses was 2.4% to 3.1% of the beet in 2010-2020 (67,000 tonnes in 2019,
 # 75,000 in 2020). In the chain it made processing appear to create about 2,900 kcal per person per day, three
 # quarters of Denmark's food, and inflated feed by the same amount; it also put about 40 kcal into the European
-# Union's processing and feed, 23 into Europe's and 2 into World's. Production is set to the last reported figure
-# (2020), as FAO itself does when filling a gap; feed is set to the value that closes the molasses balance
-# (production + imports - exports - processing) in each year. The guards fail the step if FAO revises the figures.
+# Union's processing and feed, about 20 into Europe's, and 2 into World's feed. Production is set to the last
+# reported figure (2020), as FAO itself does when filling a gap; feed is set to the value that closes the molasses
+# balance (production + imports - exports - processing) in each year. The guards fail the step if FAO revises the figures.
 
 - indicator: value
   match: {country: Denmark, year: 2021, item_code: "00000165", element_code: "005510"}

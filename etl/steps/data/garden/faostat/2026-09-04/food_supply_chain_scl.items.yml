@@ -5,7 +5,7 @@
 # densities are reverse-engineered from FAO's food figures. This file holds only what cannot come from the data.
 
 # 1. Energy (kcal per 100 g) and protein (g per 100 g) for items with too little food use to derive a reliable
-#    factor from their reported food quantities (assumption 5). Every value comes from one published source:
+#    density from their reported food quantities (assumption 5). Every value comes from one source:
 #    - FAO's 2024 Global nutrient conversion table for SUA (NCT), values copied as published, for the items it
 #      covers: cereal brans, centrifugal cane sugar, hemp oil, tallow. Their edible-portion coefficients are all 1,
 #      so the published values apply to the whole tonnage.
@@ -27,16 +27,16 @@ fixed_densities:
     - {pattern: "Cake of", energy: 304, protein: 30.2, note: "Average of the Feedipedia cakes listed individually."}
     - {pattern: "Cake,", energy: 304, protein: 30.2, note: "Average of the Feedipedia cakes listed individually."}
   items:
-    # Meals below 47% protein include the hulls (Feedipedia), and SCL's World crush (oil 18.6%, cake 77.7% of the
-    # beans) leaves no room for removed hulls.
+    # Meals below 47% protein include the hulls (Feedipedia), and SCL's World crush in 2023 (oil 18.6%, cake 77.7% of
+    # the beans) leaves no room for removed hulls.
     - {code: 238, name: "Cake of soya beans", source: "Feedipedia, 'Soybean meal, low protein, type 44-46 and similar'", url: "https://www.feedipedia.org/node/11682", dry_matter: 87.7, percent_of_dry_matter: {protein: 49.5, fat: 1.9, ash: 7.4, ndf: 14.8}}
     - {code: 272, name: "Cake of rapeseed", source: "Feedipedia, 'Rapeseed meal, 00 type, oil < 5% as fed, solvent extraction'", url: "https://www.feedipedia.org/node/12503", dry_matter: 89, percent_of_dry_matter: {protein: 38.1, fat: 2.4, ash: 7.6, ndf: 31.6}}
     - {code: 269, name: "Cake of sunflower seed", source: "Feedipedia, 'Sunflower meal, solvent-extracted, dehulled or non-dehulled'", url: "https://www.feedipedia.org/node/12663", dry_matter: 89, percent_of_dry_matter: {protein: 32.4, fat: 2.2, ash: 7.1, ndf: 45}}
-    # The high-fibre meal is made with little dehulling; SCL's World cake is 55.8% of the seed crushed, more than the
-    # 45.5% of a dehulling crush (O'Brien et al., cited by Feedipedia).
+    # The high-fibre meal is made with little dehulling; SCL's World cake in 2023 is 55.8% of the seed crushed, more
+    # than the 45.5% of a dehulling crush (O'Brien et al., cited by Feedipedia).
     - {code: 332, name: "Cake of cottonseed", source: "Feedipedia, 'Cottonseed meal, high fibre, low oil'", url: "https://www.feedipedia.org/node/16275", dry_matter: 90.2, percent_of_dry_matter: {protein: 40, fat: 3.1, ash: 7.1, ndf: 36.6}}
-    # The published components add up to more than the dry matter, so the available carbohydrate is slightly negative;
-    # used as published.
+    # The published components add up to more than the dry matter, so the available carbohydrate would be slightly
+    # negative; the step sets it to zero (see `composition_density`).
     - {code: 259, name: "Cake of palm kernel", source: "Feedipedia, 'Palm kernel meal, mechanical extraction'", url: "https://www.feedipedia.org/node/12420", dry_matter: 91.2, percent_of_dry_matter: {protein: 16.7, fat: 9.2, ash: 4.7, ndf: 73}}
     - {code: 245, name: "Cake of groundnuts", source: "Feedipedia, 'Peanut meal, oil > 5%'", url: "https://www.feedipedia.org/node/12159", dry_matter: 92.3, percent_of_dry_matter: {protein: 49.1, fat: 9.8, ash: 5.8, ndf: 18.1}}
     # Feedipedia (citing Göhl 1982) gives rice bran 10-15% crude fibre, and removing the oil raises it, hence the
@@ -71,7 +71,7 @@ fixed_densities:
     - {code: 337, name: "Oil of hempseed", energy: 900.0, protein: 0.0, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
     - {code: 1225, name: "Tallow", energy: 891.0, protein: 1.7, note: "FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1."}
     # FAOSTAT SCL's own food observation for this item (Russia, 2019): 902 kcal per 100 g and zero protein. This is
-    # the factor FAO used for that observation, not a published composition.
+    # the density FAO used for that observation, not a published composition.
     - {code: 1274, name: "Animal or vegetable fats and oils and their fractions, chemically modified, except those hydrogenated, inter-esterified, re-esterified or elaidinized; inedible mixtures or preparations of animal or vegetable fats or oils", energy: 902, protein: 0, note: 'FAOSTAT SCL food observations: 902 kcal/100 g and zero protein (Russia, 2019).'}
     # Feedipedia has no pea bran; lentil bran is the pulse bran with a measured fibre value.
     - {code: 213, name: Bran of pulses, source: "Feedipedia, 'Lentil bran'", url: "https://www.feedipedia.org/node/12246", dry_matter: 88.9, percent_of_dry_matter: {protein: 19.3, fat: 1.1, ash: 5.6, ndf: 50.3}}
@@ -113,7 +113,7 @@ never_food:
 #    the part of it that people eat (its edible-portion coefficient): sunflower seed without the hull, sugar cane as
 #    its juice, paddy as husked rice, rapeseed as its oil, coconuts as the meat and water of young and mature nuts,
 #    cotton seed as its kernels. Factories process the whole crop and make recorded products from the parts FAO
-#    leaves out (cake, bran, molasses), so at FAO's factor these crops would appear to gain calories in processing.
+#    leaves out (cake, bran, molasses), so at FAO's density these crops would appear to gain calories in processing.
 #    Each crop listed here is instead valued by its products: each year, the nutrient of the family's products made by
 #    the world's factories, minus that of the intermediates (products processed further within the family), divided
 #    by the tonnes of the family's crops the world processes. That World ratio is applied to every country. Sugar cane
@@ -168,7 +168,7 @@ role_overrides:
 #    Body oil and liver oil enter animal_products alongside fish. The FBS rows used here contain no matching
 #    fish processing inputs, so counting oil production as processed would create an artificial processing gain.
 #    The animal role sets the waterfall's production stage; these oils are physically processed products.
-#    See assumption 9 and the possible calorie overlap in the step's docstring.
+#    See assumption 9 and known problem 4 (fish oil partly counted twice) in the step's docstring.
 fish_from_fbs:
   - {code: 2761, name: "Freshwater Fish", role: animal}
   - {code: 2762, name: "Demersal Fish", role: animal}
