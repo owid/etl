@@ -27,6 +27,7 @@ from owid.catalog.core import warnings
 from owid.catalog.core.meta import (
     PROCESSING_LEVELS,
     PROCESSING_LEVELS_ORDER,
+    Annotation,
     License,
     Markdown,
     Origin,
@@ -685,6 +686,14 @@ def get_unique_origins_from_indicators(indicators: list[Indicator]) -> list[Orig
     return origins
 
 
+def get_unique_annotations_from_indicators(indicators: list[Indicator]) -> list[Annotation]:
+    """Get the unique annotations of a list of indicators, in order of first appearance."""
+    annotations = []
+    for indicator in indicators:
+        annotations += [a for a in indicator.metadata.annotations if a not in annotations]
+    return annotations
+
+
 def get_unique_licenses_from_indicators(indicators: list[Indicator]) -> list[License]:
     """Get unique licenses from a list of indicators.
 
@@ -934,6 +943,7 @@ def combine_indicators_metadata(
     metadata.short_unit = _get_metadata_value_from_indicators_if_all_identical(
         indicators=indicators_only, field="short_unit", operation=operation, warn_if_different=True
     )
+    metadata.annotations = get_unique_annotations_from_indicators(indicators=indicators_only)
     metadata.origins = get_unique_origins_from_indicators(indicators=indicators_only)
     metadata.licenses = get_unique_licenses_from_indicators(indicators=indicators_only)
     metadata.display = combine_indicators_display(indicators=indicators_only, operation=operation)

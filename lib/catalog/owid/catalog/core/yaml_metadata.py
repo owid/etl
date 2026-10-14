@@ -1,4 +1,5 @@
 import io
+import re
 from functools import cache
 from pathlib import Path
 from typing import Any, Literal
@@ -126,6 +127,9 @@ def update_metadata_from_dict(
                     f"description_key of '{v_short_name}' has items that are not strings: {not_strings}. "
                     "A YAML list item containing ': ' is parsed as a mapping; quote the item."
                 )
+
+        for annotation in meta_dict.get("annotations") or []:
+            _validate_annotation_dict(annotation, v_short_name)
 
         # convert to objects
         tb[v_short_name].metadata = VariableMeta.from_dict(meta_dict)
@@ -268,6 +272,19 @@ def _validate_variables_all_miss(t_annot: dict, tb: Table) -> None:
             f"This usually means the YAML keys are wrong — for grapher overrides, "
             f"remember that long_to_wide adds dimension suffixes like `__sex_both_sexes`."
         )
+
+
+def _validate_annotation_dict(annotation: dict[str, Any], variable: str) -> None:
+    """Catch mistakes that converting an annotation to an object would hide: a string in `entities` is split
+    into letters, and a time that is not a year is dropped."""
+    if isinstance(annotation.get("entities"), str):
+        raise TypeError(
+            f"Annotation of variable {variable} must list its entities, e.g. `entities: [{annotation['entities']}]`."
+        )
+    for key in ("time", "time_end"):
+        value = annotation.get(key)
+        if value is not None and not re.fullmatch(r"-?\d+", str(value)):
+            raise ValueError(f"Annotation of variable {variable} has `{key}: {value!r}`, but only years are supported.")
 
 
 def _flatten(lst: list[Any]) -> list[Any]:
