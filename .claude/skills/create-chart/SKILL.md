@@ -255,7 +255,8 @@ Key fields:
 - **Single-indicator chart: put its FAUST in garden, not here.** Set `title`/`subtitle`/`note` in the
   indicator's `presentation.grapher_config` and leave them out of `views[0].config`, which keeps only layout
   (tab, chart type, map colors, selection). The chart inherits them, and so does any other chart, multidim or
-  explorer on that indicator. A chart with several y-indicators doesn't inherit (grapher turns inheritance
+  explorer on that indicator, so make the edit through `edit-faust-metadata`, which reports those surfaces
+  before touching shared text. A chart with several y-indicators doesn't inherit (grapher turns inheritance
   off), so its FAUST stays in the chart config. To check, read `chart_configs.config` in the staging DB.
 
 ## Config YAML: multidim
