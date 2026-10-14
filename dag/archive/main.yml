@@ -1357,6 +1357,13 @@ steps:
       - data://garden/wb/2026-07-01/income_groups
       - data://garden/who/2024-03-24/self_inflicted_injuries
       - data://garden/demography/2023-03-31/population
+  # archived; last active in c13b29b8ad4a on 2026-10-14
+  data://grapher/missing_data/2026-10-02/who_md_suicides:
+    - data://garden/missing_data/2026-10-02/who_md_suicides:
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/who/2025-08-06/self_inflicted_injuries
+      - data://garden/demography/2023-03-31/population
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

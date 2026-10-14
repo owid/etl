@@ -1254,3 +1254,8 @@ steps:
       - data://garden/who/2025-08-06/mortality_database_vaccine_preventable
       - data://garden/us_census_bureau/2025-03-06/pertussis_deaths
       - data://garden/demography/2024-07-15/population
+  # archived; last active in c13b29b8ad4a on 2026-10-14
+  data://grapher/who/2025-08-06/self_inflicted_injuries:
+    - data://garden/who/2025-08-06/self_inflicted_injuries:
+      - data://meadow/who/2025-08-06/self_inflicted_injuries:
+        - snapshot://who/2025-08-06/self_inflicted_injuries.csv
