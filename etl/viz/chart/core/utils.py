@@ -1,8 +1,26 @@
 from typing import Any, overload
 
+from owid.catalog import Annotation
+
 from etl.viz.chart.model.core import Chart
 from etl.viz.chart.utils import get_tables_by_name_mapping
 from etl.viz.explorer import Explorer
+
+
+def normalize_metadata_annotations(chart: Chart | Explorer) -> None:
+    """Check the annotations in chart-level and view-level metadata overrides, and write their times as years or
+    YYYY-MM-DD strings (YAML reads unquoted dates as date objects)."""
+    metadatas = [getattr(chart, "metadata", None), *(view.metadata for view in chart.views)]
+    for metadata in metadatas:
+        if not metadata or not metadata.get("annotations"):
+            continue
+        annotations = [Annotation(**annotation) for annotation in metadata["annotations"]]
+        if any(annotation.dimensions for annotation in annotations):
+            raise ValueError(
+                f"Annotations in the metadata of '{chart.catalog_path}' set `dimensions`, which only applies to "
+                "indicators of long tables."
+            )
+        metadata["annotations"] = [annotation.to_dict() for annotation in annotations]  # ty: ignore[invalid-assignment]
 
 
 def process_views(
@@ -91,6 +109,9 @@ def create_chart_from_config(
 
     # Edit views
     process_views(c, dependencies=dependencies)
+
+    # Check the annotations of metadata overrides, with their dates as YYYY-MM-DD strings
+    normalize_metadata_annotations(c)
 
     # Require a schema pin before `validate_schema()`, which also enforces it (`required` in
     # multidim-schema.json) but only reports the missing key — not how to fill it in.

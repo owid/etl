@@ -3,6 +3,7 @@
 #
 
 import copy
+import datetime as dt
 import json
 from dataclasses import dataclass
 from typing import Any
@@ -448,10 +449,21 @@ def test_annotation_round_trip():
 
 
 @pytest.mark.parametrize(
+    "time, expected",
+    [(2003, 2003), ("2024", 2024), (dt.date(2020, 3, 15), "2020-03-15"), ("2020-03-15", "2020-03-15")],
+)
+def test_annotation_normalizes_time(time, expected):
+    assert meta.Annotation(text="Note.", time=time).time == expected
+
+
+@pytest.mark.parametrize(
     "kwargs, error",
     [
         ({"time_end": 2010}, "without `time`"),
         ({"time": 2010, "time_end": 2000}, "before `time`"),
+        ({"time": "2020-03-15", "time_end": "2020-03-01"}, "before `time`"),
+        ({"time": 2020, "time_end": "2020-03-15"}, "mixes a year and a date"),
+        ({"time": "2020-3-15"}, "must be a year or a YYYY-MM-DD date"),
         ({"entities": "France"}, "must be a list"),
     ],
 )
