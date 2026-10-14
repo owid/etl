@@ -506,7 +506,11 @@ function resolvedTexts(key, meta) {
 }
 
 function setText(field, value) {
-  const { key, meta } = current;
+  setViewText(current.key, current.meta, field, value);
+}
+
+// The same, for any view: "Manage WYSK" edits views that aren't on screen.
+function setViewText(key, meta, field, value) {
   const views = state.textEdits.views;
   const own = (views[key] ||= {});
   if (same(value, originalTexts(meta)[field])) {
@@ -622,6 +626,7 @@ function renderWysk() {
   const tools = document.getElementById("wysk-tools");
   list.innerHTML = "";
   tools.innerHTML = "";
+  document.getElementById("wysk-manage").disabled = !Object.values(state.links).some((l) => l?.id);
   if (!current) { wyskEl.hidden = true; return; }
   const blocks = resolvedTexts(current.key, current.meta).descriptionKey;
   const editing = state.textMode;
@@ -675,7 +680,7 @@ function renderWysk() {
     view.addEventListener("click", (e) => { if (!e.target.closest("a")) startEdit(); });
     view.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); startEdit(); } });
     li.dataset.index = i;
-    li.append(view, removeButton("Remove this point", () => save(blocks.filter((_, j) => j !== i))));
+    li.append(dragHandle(li, i, blocks, save), view, removeButton("Remove this point", () => save(blocks.filter((_, j) => j !== i))));
     list.append(li);
   });
 
@@ -691,6 +696,253 @@ function renderWysk() {
   });
   wyskEl.append(add);
 }
+
+// Points move by dragging their handle; only the handle starts a drag, so clicking the text still edits it.
+let wyskDragFrom = null;
+function dragHandle(li, i, blocks, save) {
+  const handle = document.createElement("span");
+  handle.className = "wysk-handle";
+  handle.title = "Drag to move this point";
+  handle.addEventListener("mousedown", () => { li.draggable = true; });
+  handle.addEventListener("mouseup", () => { li.draggable = false; });
+  const clearMarks = () => document.querySelectorAll("#wysk-list li").forEach((el) => el.classList.remove("drop-before", "drop-after"));
+  const dropsAfter = (e) => { const r = li.getBoundingClientRect(); return e.clientY > r.top + r.height / 2; };
+  li.addEventListener("dragstart", (e) => {
+    wyskDragFrom = i;
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(i));
+    li.classList.add("dragging");
+  });
+  li.addEventListener("dragend", () => { wyskDragFrom = null; li.draggable = false; li.classList.remove("dragging"); clearMarks(); });
+  li.addEventListener("dragover", (e) => {
+    if (wyskDragFrom === null) return;
+    e.preventDefault();
+    clearMarks();
+    li.classList.add(dropsAfter(e) ? "drop-after" : "drop-before");
+  });
+  li.addEventListener("drop", (e) => {
+    if (wyskDragFrom === null) return;
+    e.preventDefault();
+    const from = wyskDragFrom;
+    let to = dropsAfter(e) ? i + 1 : i;
+    if (from < to) to--;
+    wyskDragFrom = null;
+    if (to === from) return renderWysk();
+    const next = [...blocks];
+    next.splice(to, 0, ...next.splice(from, 1));
+    save(next);
+  });
+  return handle;
+}
+
+// ---------------------------------------------------------------------------
+// "Manage WYSK": the points of every view in one list, each once, to edit, delete or add across views
+// ---------------------------------------------------------------------------
+const wyskManager = document.getElementById("wysk-manager");
+let managerViews = []; // { key, label, meta } of each linked view, in combination order
+let managerMissing = 0; // linked views whose indicator couldn't be loaded
+
+const comboName = (combo) => combo.map((c) => c.name || "Untitled").join(" · ");
+const managerLabel = (key) => managerViews.find((v) => v.key === key)?.label || "";
+
+async function openWyskManager() {
+  const linked = combinations().filter((c) => state.links[comboKey(c)]?.id);
+  document.getElementById("wm-body").innerHTML = `<p class="hint">Loading the text of every view…</p>`;
+  if (!wyskManager.open) wyskManager.showModal();
+  const loaded = await Promise.allSettled(linked.map((c) => getMeta(state.links[comboKey(c)].id)));
+  managerViews = linked.flatMap((c, i) => (loaded[i].status === "fulfilled" ? [{ key: comboKey(c), label: comboName(c), meta: loaded[i].value }] : []));
+  managerMissing = linked.length - managerViews.length;
+  renderWyskManager();
+}
+
+// Ticks for which views a change applies to, all ticked to start with, plus one to tick or untick them all.
+function scopePicker(keys, onChange) {
+  const el = document.createElement("div");
+  el.className = "wm-scope";
+  const tick = (text, cls) => {
+    const label = document.createElement("label");
+    if (cls) label.className = cls;
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.checked = true;
+    label.append(input, text);
+    el.append(label);
+    return input;
+  };
+  const everyView = keys.length === managerViews.length;
+  const all = keys.length > 1 ? tick(everyView ? "All views" : "All of these", "wm-scope__all") : null;
+  const boxes = keys.map((key) => tick(managerLabel(key)));
+  const selected = () => keys.filter((_, i) => boxes[i].checked);
+  all?.addEventListener("change", () => { boxes.forEach((b) => { b.checked = all.checked; }); onChange(selected()); });
+  boxes.forEach((b) => b.addEventListener("change", () => {
+    if (all) all.checked = boxes.every((x) => x.checked);
+    onChange(selected());
+  }));
+  return { el, selected };
+}
+
+const viewsCount = (n) => (n === 1 ? "1 view" : `${n} views`);
+
+// Rewrite the points of some views, then redraw what shows them.
+function changeViews(keys, edit) {
+  for (const key of keys) {
+    const view = managerViews.find((v) => v.key === key);
+    const blocks = resolvedTexts(key, view.meta).descriptionKey;
+    const next = edit(blocks).filter((b, i, all) => blockText(b).trim() && all.indexOf(b) === i);
+    setViewText(key, view.meta, "descriptionKey", next);
+  }
+  renderWyskManager();
+  if (current) afterTextChange();
+}
+
+function managerButton(text, onClick, primary = false) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = primary ? "btn btn-primary" : "btn";
+  btn.textContent = text;
+  btn.addEventListener("click", onClick);
+  return btn;
+}
+
+function managerTextarea(value, placeholder) {
+  const ta = document.createElement("textarea");
+  ta.className = "wm-textarea";
+  ta.value = value;
+  ta.placeholder = placeholder;
+  ta.addEventListener("input", () => autoGrow(ta));
+  requestAnimationFrame(() => autoGrow(ta));
+  return ta;
+}
+
+function pointRow(block, keys) {
+  const li = document.createElement("li");
+  li.className = "wm-point";
+  const show = () => {
+    li.innerHTML = "";
+    const text = document.createElement("div");
+    text.className = "wm-text";
+    text.innerHTML = blockHtml(blockText(block));
+    const meta = document.createElement("div");
+    meta.className = "wm-meta";
+    const on = document.createElement("span");
+    on.className = "wm-on";
+    on.textContent = keys.length === managerViews.length && keys.length > 1
+      ? (keys.length === 2 ? "On both views" : `On all ${keys.length} views`)
+      : `On: ${keys.map(managerLabel).join(", ")}`;
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "link-btn";
+    edit.textContent = "Edit";
+    edit.addEventListener("click", () => openForm("edit"));
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "link-btn wm-delete";
+    del.textContent = "Delete";
+    // A point on a single view goes at once; otherwise, pick the views first.
+    del.addEventListener("click", () => (keys.length === 1 ? changeViews(keys, (blocks) => blocks.filter((b) => b !== block)) : openForm("delete")));
+    meta.append(on, edit, del);
+    li.append(text, meta);
+  };
+  const openForm = (mode) => {
+    li.innerHTML = "";
+    li.classList.add("wm-point--open");
+    const form = document.createElement("div");
+    form.className = "wm-form";
+    const ta = mode === "edit" ? managerTextarea(blockText(block), "The point's text") : null;
+    if (mode === "delete") {
+      const text = document.createElement("div");
+      text.className = "wm-text";
+      text.innerHTML = blockHtml(blockText(block));
+      form.append(text);
+    }
+    const go = managerButton("", () => {
+      const keysNow = scope.selected();
+      if (!keysNow.length) return;
+      if (mode === "delete") return changeViews(keysNow, (blocks) => blocks.filter((b) => b !== block));
+      if (!ta.value.trim()) return;
+      const replacement = (isBullet(block) ? "- " : "") + ta.value;
+      changeViews(keysNow, (blocks) => blocks.map((b) => (b === block ? replacement : b)));
+    }, true);
+    const label = (n) => `${mode === "edit" ? "Save on" : "Delete from"} ${viewsCount(n)}`;
+    const scope = scopePicker(keys, (sel) => { go.textContent = label(sel.length); go.disabled = !sel.length; });
+    go.textContent = label(keys.length);
+    const cancel = managerButton("Cancel", () => { li.classList.remove("wm-point--open"); show(); });
+    const heading = document.createElement("div");
+    heading.className = "wm-scope__label";
+    heading.textContent = mode === "edit" ? "Change it on:" : "Delete it from:";
+    const actions = document.createElement("div");
+    actions.className = "wm-actions";
+    actions.append(go, cancel);
+    if (ta) form.append(ta);
+    if (keys.length > 1) form.append(heading, scope.el);
+    form.append(actions);
+    li.append(form);
+    ta?.focus();
+  };
+  show();
+  return li;
+}
+
+function addPointForm() {
+  const box = document.createElement("div");
+  box.className = "wm-add";
+  const heading = document.createElement("h3");
+  heading.textContent = "Add a point";
+  const ta = managerTextarea("", "The new point. It goes at the end of each view's list.");
+  const label = (n) => `Add to ${viewsCount(n)}`;
+  const keys = managerViews.map((v) => v.key);
+  const add = managerButton(label(keys.length), () => {
+    const text = ta.value.trim();
+    const keysNow = scope.selected();
+    if (!text || !keysNow.length) return;
+    changeViews(keysNow, (blocks) => [...blocks, `- ${text}`]);
+  }, true);
+  const scope = scopePicker(keys, (sel) => { add.textContent = label(sel.length); add.disabled = !sel.length; });
+  box.append(heading, ta);
+  if (keys.length > 1) {
+    const on = document.createElement("div");
+    on.className = "wm-scope__label";
+    on.textContent = "Add it to:";
+    box.append(on, scope.el);
+  }
+  const actions = document.createElement("div");
+  actions.className = "wm-actions";
+  actions.append(add);
+  box.append(actions);
+  return box;
+}
+
+function renderWyskManager() {
+  const body = document.getElementById("wm-body");
+  body.innerHTML = "";
+  if (!managerViews.length) {
+    body.innerHTML = `<p class="hint">Link an indicator to a combination first.</p>`;
+    return;
+  }
+  // Each point once, with the views that have it, in the order they first appear.
+  const points = new Map();
+  for (const view of managerViews) {
+    for (const block of resolvedTexts(view.key, view.meta).descriptionKey) {
+      if (!points.has(block)) points.set(block, []);
+      if (!points.get(block).includes(view.key)) points.get(block).push(view.key);
+    }
+  }
+  if (managerMissing) {
+    body.insertAdjacentHTML("beforeend", `<p class="hint">${viewsCount(managerMissing)} couldn't be loaded and ${managerMissing === 1 ? "isn't" : "aren't"} listed.</p>`);
+  }
+  if (points.size) {
+    const list = document.createElement("ul");
+    list.className = "wm-points";
+    for (const [block, keys] of points) list.append(pointRow(block, keys));
+    body.append(list);
+  } else body.insertAdjacentHTML("beforeend", `<p class="hint">No view has any points yet.</p>`);
+  body.append(addPointForm());
+}
+
+document.getElementById("wysk-manage").addEventListener("click", openWyskManager);
+document.getElementById("wm-close").addEventListener("click", () => wyskManager.close());
+// A click on the dimmed backdrop lands on the dialog itself, outside its content box.
+wyskManager.addEventListener("click", (e) => { if (e.target === wyskManager) wyskManager.close(); });
 
 function renderTextEditor() {
   const toggle = document.getElementById("text-editor-toggle");

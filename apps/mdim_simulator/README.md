@@ -32,7 +32,9 @@ On the chart itself:
 - The **countries ticked** in Grapher's own panel are the MDim's default selection, for every view.
 - The **tab that is open** is the MDim's default tab.
 
-With **"✎ Edit FAUST and WYSK"**, for the view on screen: title, subtitle and footnote (the chart updates as you type), "What you should know" edited in place, number rounding, and, on the Map tab, the palette and an automatic binning strategy. Each edited field can be undone, or flagged as a suggestion to change the indicator everywhere.
+With **"✎ Edit FAUST and WYSK"**, for the view on screen: title, subtitle and footnote (the chart updates as you type), "What you should know" edited in place (drag a point's handle to move it), number rounding, and, on the Map tab, the palette and an automatic binning strategy. Each edited field can be undone, or flagged as a suggestion to change the indicator everywhere.
+
+**"Manage WYSK"** lists the "What you should know" points of every linked view, each point once with the views it's on. A point can be edited or deleted on all its views or only some (editing on some forks it), and a new point can be added to the end of the views you pick.
 
 Every view's y-axis starts at zero.
 

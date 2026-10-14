@@ -30,6 +30,7 @@ FREE_FORM_WYSK = (
 )
 REOPENED = OUT / "check_reopened.html"
 OWN_SETTINGS = OUT / "check_own_settings.html"
+MANAGE_WYSK = OUT / "check_manage_wysk.html"
 SCREENSHOTS = OUT / "screenshots"
 
 # build.py is a script, not a package module: load it from its file.
@@ -480,6 +481,81 @@ def main() -> None:
         page.wait_for_selector("#map-palette", timeout=10000)
         first_option = page.locator("#map-palette option").first.inner_text()
         check("the palette names what it falls back to", first_option == "Indicator's palette (YlGnBu)", first_option)
+
+        # "Manage WYSK": both Internet users views share most of their points, so each shows once.
+        two_views = {
+            "title": {"title": "Internet users"},
+            "dimensions": [
+                {
+                    "slug": "metric",
+                    "name": "Metric",
+                    "choices": [{"slug": "share", "name": "Share"}, {"slug": "number", "name": "Number"}],
+                }
+            ],
+            "views": [
+                {"dimensions": {"metric": "share"}, "indicators": {"y": [{"catalogPath": share_path}]}},
+                {"dimensions": {"metric": "number"}, "indicators": {"y": [{"catalogPath": number_path}]}},
+            ],
+        }
+        two_path = OUT / "check_manage_wysk.yml"
+        two_path.write_text(yaml.safe_dump(two_views, sort_keys=False))
+        build.build(MANAGE_WYSK, two_path)
+        page.goto(MANAGE_WYSK.as_uri())
+        page.wait_for_selector("#chart svg", timeout=30000)
+        page.wait_for_timeout(1500)
+        page.click("#wysk-manage")
+        page.wait_for_selector(".wm-point", timeout=20000)
+        points = page.locator(".wm-point")
+
+        def point_on(text: str) -> list[str]:
+            return [
+                p.locator(".wm-on").inner_text() for p in points.all() if text in p.locator(".wm-text").inner_text()
+            ]
+
+        check("a point on both views is listed once", point_on("An Internet user is defined") == ["On both views"])
+        # Edit a shared point on one view only: it forks.
+        # Found by position: the point's text gives way to a text box once its form opens.
+        texts = [p.locator(".wm-text").inner_text() for p in points.all()]
+        shared_point = points.nth(next(i for i, t in enumerate(texts) if "An Internet user is defined" in t))
+        shared_point.get_by_text("Edit", exact=True).click()
+        shared_point.locator("textarea").fill("Edited on the share view only.")
+        shared_point.locator(".wm-scope label", has_text="Number").locator("input").uncheck()
+        shared_point.locator(".wm-actions .btn-primary").click()
+        page.wait_for_timeout(300)
+        check(
+            "editing on some views forks the point",
+            point_on("Edited on the share view only.") == ["On: Share"]
+            and point_on("An Internet user is defined") == ["On: Number"],
+        )
+        page.locator(".wm-add textarea").fill("Added to both views.")
+        page.locator(".wm-add .btn-primary").click()
+        page.wait_for_timeout(300)
+        check("a new point goes on every view picked", point_on("Added to both views.") == ["On both views"])
+        texts = [p.locator(".wm-text").inner_text() for p in points.all()]
+        added = points.nth(texts.index("Added to both views."))
+        added.get_by_text("Delete", exact=True).click()
+        added.locator(".wm-actions .btn-primary").click()
+        page.wait_for_timeout(300)
+        check("a point can be deleted from every view", not point_on("Added to both views."))
+        page.click("#wm-close")
+        on_screen = page.inner_text("#wysk-list")
+        check("the view on screen shows the edit", "Edited on the share view only." in on_screen)
+        exported = {v["dimensions"]["metric"]: v for v in yaml.safe_load(copied_setup(page))["views"]}
+        share_wysk = str(exported["share"].get("metadata", {}).get("description_key"))
+        check(
+            "the edit is exported on its view only",
+            "Edited on the share view only." in share_wysk and "metadata" not in exported["number"],
+        )
+        # Drag the last point of the view on screen to the top.
+        page.click("#text-editor-toggle")
+        items = page.locator("#wysk-list li")
+        last = items.nth(items.count() - 1).locator(".wysk-bullet").inner_text()
+        items.nth(items.count() - 1).locator(".wysk-handle").drag_to(items.nth(0), target_position={"x": 40, "y": 3})
+        page.wait_for_timeout(500)
+        check(
+            "a point can be dragged to the top", page.locator("#wysk-list li .wysk-bullet").first.inner_text() == last
+        )
+        page.screenshot(path=SCREENSHOTS / "manage_wysk.png")
 
         check("no console errors", not errors, errors or "")
         browser.close()

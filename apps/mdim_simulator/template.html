@@ -98,6 +98,34 @@ a.topic-tag:hover { color: #426591; }
 .wysk-bullet em { color: var(--muted); }
 .wysk-edit { flex: 1; min-height: 3em; padding: 4px 6px; border: 1px solid var(--link); border-radius: 3px; font: 16px/1.6 Lato, system-ui, sans-serif; color: var(--body); resize: none; overflow: hidden; }
 .wysk .add-bullet { margin-top: 12px; }
+.wysk-handle { order: -1; flex: none; width: 16px; color: #b5b5b5; cursor: grab; user-select: none; line-height: 1.6; }
+.wysk-handle::before { content: "⠿"; }
+.wysk-handle:hover { color: var(--text); }
+.wysk.editing li.dragging { opacity: 0.4; }
+.wysk.editing li.drop-before { box-shadow: 0 -2px 0 var(--link); }
+.wysk.editing li.drop-after { box-shadow: 0 2px 0 var(--link); }
+.wysk-manager { width: min(760px, calc(100vw - 32px)); max-height: 85vh; padding: 24px 28px; border: 1px solid var(--border); border-radius: 6px; color: var(--body); }
+.wysk-manager::backdrop { background: rgba(0, 0, 0, 0.35); }
+.wm-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.wm-head h2 { margin: 0; font-size: 20px; color: var(--text); }
+.wm-intro { margin: 6px 0 16px; font-size: 14px; color: var(--muted); }
+.wm-points { margin: 0; padding: 0; list-style: none; }
+.wm-point { padding: 12px 0; border-top: 1px solid var(--border); }
+.wm-point--open { background: #fffdf3; margin: 0 -12px; padding: 12px; }
+.wm-text { font-size: 15px; line-height: 1.55; }
+.wm-text ul { margin: 4px 0 0; padding-left: 20px; }
+.wm-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin-top: 4px; font-size: 13px; }
+.wm-on { flex: 1; color: var(--muted); }
+.wm-delete { color: #b13507; }
+.wm-form { display: flex; flex-direction: column; gap: 8px; }
+.wm-textarea { width: 100%; min-height: 3em; padding: 6px 8px; border: 1px solid #c9c9c9; border-radius: 4px; font: 15px/1.55 Lato, system-ui, sans-serif; color: var(--body); resize: none; overflow: hidden; box-sizing: border-box; }
+.wm-scope__label { font-size: 13px; font-weight: 700; color: var(--muted); }
+.wm-scope { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; }
+.wm-scope label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+.wm-scope__all { font-weight: 700; }
+.wm-actions { display: flex; gap: 8px; }
+.wm-add { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; padding-top: 16px; border-top: 1px solid var(--border); }
+.wm-add h3 { margin: 0; font-size: 15px; color: var(--text); }
 td.text-col { white-space: nowrap; }
 .text-tag { padding: 1px 6px; border-radius: 3px; background: #f6d77a; color: #5a4400; font-size: 12px; font-weight: 700; }
 .notice { display: flex; align-items: center; justify-content: center; height: 100%; padding: 24px; text-align: center; color: var(--muted); font-size: 16px; line-height: 1.5; }
@@ -219,6 +247,7 @@ table.combos td.indicator { width: 42%; }
   <section id="text-editor" class="text-editor">
     <div class="text-editor__bar">
       <button id="text-editor-toggle" type="button" class="btn">✎ Edit FAUST and WYSK</button>
+      <button id="wysk-manage" type="button" class="btn" title="Edit, delete or add points across views">Manage WYSK</button>
       <span id="tab-note" class="tab-note" hidden>Pick a tab here to define the MDim's default tab ↓</span>
       <span id="text-editor-context" class="text-editor__context"></span>
       <span id="selection-note" class="selection-note" hidden>Pick countries here to define the MDim's default selection across all views ↓</span>
@@ -234,6 +263,15 @@ table.combos td.indicator { width: 42%; }
     <ul id="wysk-list"></ul>
   </section>
 </main>
+
+<dialog id="wysk-manager" class="wysk-manager" aria-labelledby="wm-title">
+  <div class="wm-head">
+    <h2 id="wm-title">Manage “What you should know”</h2>
+    <button id="wm-close" type="button" class="btn-icon" aria-label="Close">×</button>
+  </div>
+  <p class="wm-intro">Every point of every view, listed once. Edit or delete a point on all its views or only some, or add a new one to the views you pick.</p>
+  <div id="wm-body"></div>
+</dialog>
 
 <div id="panel" class="panel open">
   <div id="panel-resize" class="panel-resize" role="separator" aria-orientation="horizontal" aria-label="Drag to resize the panel" tabindex="0" title="Drag to resize"></div>
