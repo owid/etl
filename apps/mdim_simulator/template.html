@@ -154,9 +154,13 @@ td.text-col { white-space: nowrap; }
 .tag-chip--main { font-weight: 700; }
 .panel select.tag-picker { width: 100%; padding: 7px 9px; border: 1px solid #c9c9c9; border-radius: 4px; background: #fff; color: var(--body); font-size: 14px; }
 .tags-section { margin-bottom: 24px; }
-.settings-list { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--body); }
-.settings-list label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
-.settings-row { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+#chart-settings { display: flex; flex-direction: column; gap: 14px; font-size: 14px; color: var(--body); }
+.settings-group { display: flex; flex-direction: column; gap: 6px; }
+.settings-group__title { font-size: 13px; font-weight: 700; color: var(--text); }
+.settings-group label { display: inline-flex; align-items: flex-start; gap: 6px; cursor: pointer; line-height: 1.35; }
+.settings-group label input { margin: 2px 0 0; }
+.settings-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 12px; }
+.settings-note { margin: 0; font-size: 12px; line-height: 1.4; color: var(--muted); }
 .optional-links { display: flex; gap: 12px; }
 .field-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 14px; color: var(--body); }
 .field-row select, .field-row input[type="number"] { padding: 6px 8px; border: 1px solid #d9cb94; border-radius: 4px; background: #fff; color: var(--body); font: 14px Lato, system-ui, sans-serif; }

@@ -361,8 +361,6 @@ function sharedConfig() {
 function renderChartSettings() {
   const box = document.getElementById("chart-settings");
   box.innerHTML = "";
-  const list = document.createElement("div");
-  list.className = "settings-list";
   const checkbox = (labelText, checked, onChange) => {
     const label = document.createElement("label");
     const input = document.createElement("input");
@@ -378,27 +376,43 @@ function renderChartSettings() {
     label.append(input, labelText);
     return label;
   };
+  const note = (text) => {
+    const p = document.createElement("p");
+    p.className = "settings-note";
+    p.textContent = text;
+    return p;
+  };
+  // One labelled group per setting, so each choice says what it's about.
+  const group = (title, ...children) => {
+    const el = document.createElement("div");
+    el.className = "settings-group";
+    const heading = document.createElement("div");
+    heading.className = "settings-group__title";
+    heading.textContent = title;
+    el.append(heading, ...children);
+    return el;
+  };
+
   const tabs = document.createElement("div");
-  tabs.className = "settings-row";
+  tabs.className = "settings-grid";
   for (const [type, name] of CHART_TYPE_OPTIONS) {
     tabs.append(checkbox(name, state.chartTypes.includes(type), (on) => {
       state.chartTypes = CHART_TYPE_OPTIONS.map(([t]) => t).filter((t) => (t === type ? on : state.chartTypes.includes(t)));
     }));
   }
   tabs.append(checkbox("Map", state.hasMapTab, (on) => { state.hasMapTab = on; }));
-  const tabsHint = document.createElement("p");
-  tabsHint.className = "hint";
-  tabsHint.style.margin = "0";
-  tabsHint.textContent = "Tabs available in every view (the table is always there).";
-  const changeCountry = checkbox("Readers change the country instead of adding countries", state.changeCountry, (on) => { state.changeCountry = on; });
-  list.append(tabsHint, tabs, changeCountry, checkbox("Hide the time range after the title, e.g. “1990 to 2025” (map and bar charts always show the year)", state.hideTimeInTitle, (on) => { state.hideTimeInTitle = on; }));
-  const auto = document.createElement("p");
-  auto.className = "hint";
-  auto.style.margin = "4px 0 0";
+
   const url = originUrl();
-  auto.textContent = `Always set: every y-axis starts at zero${url ? `, and the footer links to OurWorldinData.org${url}` : ""}.`;
-  list.append(auto);
-  box.append(list);
+  box.append(
+    group("Tabs", tabs, note("The same tabs in every view. The table is always there.")),
+    group(
+      "Title",
+      checkbox("Hide the time range after the title, e.g. “1990 to 2025”", state.hideTimeInTitle, (on) => { state.hideTimeInTitle = on; }),
+      note("Map and bar charts always show the year."),
+    ),
+    group("Countries", checkbox("Readers change the country instead of adding countries", state.changeCountry, (on) => { state.changeCountry = on; })),
+    note(`Always set: every y-axis starts at zero${url ? `, and the footer links to OurWorldinData.org${url}` : ""}.`),
+  );
 }
 
 // ---------------------------------------------------------------------------

@@ -5,9 +5,10 @@ description: >-
   Grapher before it exists in ETL. They set up dropdowns, link an indicator to each combination, edit the chart
   text, and copy the result as a viz://chart setup. Pre-fills the page from chart links, catalog paths or
   indicator IDs when the request names them. Use when someone wants to sketch, design or prototype an MDim,
-  group a few charts or indicators into one chart with a dropdown, or says "sketch an MDim". Local Claude Code
-  only, because the page opens in the person's browser and needs Tailscale. Turning the copied setup into the
-  ETL step is done with /create-chart.
+  group a few charts or indicators into one chart with a dropdown, or says "sketch an MDim". When the setup is
+  pasted back, it takes the person through to a live MDim: the step (via /create-chart), the PR, a check on
+  staging, the merge, publishing, and redirecting old charts. Local Claude Code only, because the page opens in
+  the person's browser and needs Tailscale.
 metadata:
   internal: true
   owner: edomt
@@ -16,11 +17,14 @@ metadata:
 # Sketch an MDim
 
 Builds the MDim simulator, a single HTML page, and opens it in the person's browser. They shape the MDim there,
-seeing the real chart as they go, then copy the setup and paste it back to you. The simulator lives in
+seeing the real chart as they go, then copy the setup and paste it back to you. You then take it all the way to
+a live MDim (step 5). The simulator lives in
 `apps/mdim_simulator/` (see its README for how it works).
 
 This skill is for people who don't work in the ETL. Talk to them plainly, and don't ask them to confirm things
-they can change in the page themselves.
+they can change in the page themselves. Whenever something is unclear, ask them, as multiple-choice questions
+(`AskUserQuestion`) in plain, non-technical English that needs no coding knowledge: no file names, commands,
+catalog paths or YAML in the question or its options.
 
 It changes nothing in the repo: the page and its setup go to `ai/mdim_simulator/`, which git ignores, so no
 branch is needed.
@@ -116,37 +120,115 @@ Something like this, in plain words:
 >
 > When it looks right, click "Copy MDim setup" and paste it here.
 
-## 5. When the setup is pasted back
+## 5. From the pasted setup to a live MDim
 
 **The person is still the same non-technical person.** `/create-chart` is written for engineers. Use it for the
 mechanics, not for the conversation:
 
-- **Do all the technical work yourself:** files, DAG entry, running the step, the branch and the pull request.
-  Never ask them to run a command, or to understand the DAG, catalog paths, YAML or git.
-- **Only ask what they can answer,** in plain words and all at once. For example: "Should the MDim replace the
-  two old charts?", or "What web address should it have?". Work out everything else yourself, and if you had to
-  guess, say what you guessed.
-- **Report progress in terms of what they'll see:** "I've turned your sketch into the chart files and opened a
-  pull request. Here's where you can check it on the test site." Don't give them a log of commands.
+- **Do all the technical work yourself:** files, DAG entry, running the step, the branch, the pull request,
+  the review and the merge. Never ask them to run a command, or to understand the DAG, catalog paths, YAML or git.
+- **Ask only what they can answer,** as plain multiple-choice questions, all at once. Work out everything else
+  yourself, and if you had to guess, say what you guessed.
+- **Report progress in terms of what they'll see,** not as a log of commands.
 - **If something technical fails, fix it.** Only bring them in when the choice is theirs, and explain it without
   jargon.
 
-The setup is already in `viz://chart` form: `grapher_schema`, `title`, `topic_tags`, `default_selection`,
-`default_dimensions`, shared settings under `definitions.common_views`, `dimensions` and `views`. Turn it into
-the step with `/create-chart`:
+### 5a. Ask the questions up front, in one go
+
+- **Does the MDim replace existing charts?** If the draft came from chart links, name those charts. If yes, step
+  5g handles them.
+- **Its web address.** Propose one from the title (`ourworldindata.org/grapher/<slug>`, lowercase words joined
+  by hyphens). Before proposing it, check it's free, because the admin refuses an address that's taken. It must
+  match none of these:
+  - a chart (`chart_configs.slug`);
+  - an old chart address (`chart_slug_redirects.slug`);
+  - an MDim (`multi_dim_data_pages.slug`);
+  - a site redirect (`redirects.source` = `/grapher/<slug>`).
+
+  Check all four in the public Datasette. It only lists published charts, so if the admin still refuses the
+  address later, propose another one.
+- **Anything the setup leaves open:** combinations with no indicator yet, and specific map bins if they asked
+  for them (the page only offers automatic ones).
+
+### 5b. Build the step
+
+Turn the setup into the step with `/create-chart`. The setup is already in `viz://chart` form: `grapher_schema`,
+`title`, `topic_tags`, `default_selection`, `default_dimensions`, shared settings under
+`definitions.common_views`, `dimensions` and `views`.
 
 - **The DAG entry:** its dependencies are the grapher datasets of the linked indicators. The setup uses full
   catalog paths; `/create-chart` prefers the short `table#indicator` form.
-- **The comments at the end need reading:**
-  - combinations with no indicator yet: ask what to do with them;
-  - text changes against each indicator's original: useful for the PR description;
-  - changes suggested for an indicator everywhere: these go through `/edit-faust-metadata`, which checks the
-    other charts using that indicator first.
-- **Two things are settled in the conversation, not in the page:** specific map bins, if they asked for them
-  (the page only offers automatic ones), and the MDim's web address (slug), which is set in the admin when
-  publishing.
-- **To show the setup in the page again,** for example to adjust it, save it as
+- **The web address isn't part of the step:** the config has no slug field. Keep it for step 5f.
+- **The comments at the end:** use the text changes against each indicator's original in the PR description.
+  Changes suggested for an indicator everywhere go through `/edit-faust-metadata`, which checks the other charts
+  using that indicator first.
+- **Check it builds:** `.venv/bin/etlr viz://chart/<namespace>/latest/<name>`, without `--grapher`. That
+  validates the config and the indicators without writing to any database, which most laptops don't have.
+- **To show the setup in the page again,** for example if they want to adjust it there, save it as
   `ai/mdim_simulator/<name>.setup.yml` and rebuild with `--setup`. The page reopens it exactly as it was copied.
+
+### 5c. Open the PR and put it on staging
+
+1. `.venv/bin/etl pr "<MDim title>" feature`. This opens a draft PR on a new branch from the latest master.
+2. Commit the files by path, then `git push -u origin <branch>`. Check that `git ls-remote origin
+   refs/heads/<branch>` matches `git rev-parse HEAD` before going on.
+3. Write the PR description. Start with the attribution line from `CLAUDE.md`. Then say what the MDim shows,
+   that it was sketched in the MDim simulator, and the text changes from the setup.
+4. Once the PR's staging server is up, write the MDim to it straight away:
+   `STAGING=1 .venv/bin/etlr viz://chart/<namespace>/latest/<name> --grapher`.
+5. **One Codex review.**
+   - Post a bare `@codex review` and wait for its verdict: a review with findings, a "Didn't find any major
+     issues" comment, or a 👍 from the Codex bot.
+   - Fix what's valid, push, write the MDim to staging again, and reply to and resolve each thread.
+   - Don't start a second round. Mention the review to the person only if it changed something they'll see.
+
+### 5d. Let them check it on staging
+
+Give them the preview link. The MDim isn't published on staging, so it's the admin preview address, which needs
+Tailscale: `http://staging-site-<branch>/admin/grapher/<namespace>%2Flatest%2F<name>%23<name>/`. Use the
+container name from `etl.config.get_container_name(<branch>)`. Then send something like:
+
+> Your MDim is ready to check on the test site: <link>. Please try each option in each dropdown, look at the
+> map, check the countries it opens with, and read the titles and "What you should know". Tell me what to
+> change, or say it looks right.
+
+If they ask for changes, make them, push, write the MDim to staging again, and send the link again. **Don't merge
+until they say it looks right.**
+
+### 5e. Merge, once they say it looks right
+
+Check that the PR's tests have passed (`gh pr checks <number>`). Fix a failure that comes from the MDim. Retry
+one that doesn't, such as a test that timed out on a network call. Then run `gh pr ready <number>` and
+`gh pr merge <number> --squash`. Tell them it's merged, and that it takes about ten minutes to reach the live
+site's admin.
+
+### 5f. Publish it
+
+Watch the merge commit: `gh api repos/owid/etl/commits/<merge sha>/status`, until
+`buildkite/etl-deploy-master` succeeds. That run writes the MDim to production. If it fails, find out why, fix it
+if it's this MDim, and tell them in plain words.
+
+> **Temporary step:** publishing an MDim is still done by hand in the admin. This is expected to go away.
+
+Once the run has passed, send something like:
+
+> It's ready to go live. Open https://admin.owid.io/admin/multi-dims, find "<MDim title>", type `<slug>` in
+> its Slug field, and switch it to Published. It will then be at https://ourworldindata.org/grapher/<slug>.
+
+### 5g. Replace the old charts, if they said yes
+
+Do this only once the MDim is published: the admin won't redirect to an unpublished MDim.
+
+1. **Switch the embeds first.** Run `/find-chart-references` for each old chart. Articles that embed one break
+   once the chart is deleted. List them for the person, each with the MDim view link to use instead. Text links
+   need nothing, because the redirect covers them.
+2. **For each old chart, check whether it has old addresses** (rows in `chart_slug_redirects` pointing at it).
+   - **None:** send them the admin steps. On the MDim's page in the admin
+     (`https://admin.owid.io/admin/multi-dims`, then the MDim), add a redirect: Source `/grapher/<old slug>`,
+     ticking "Redirect to specific view" for the matching view. Then delete the old chart, as the note on that
+     form says. The redirect only takes effect once the chart is gone.
+   - **Some:** the admin refuses these. Write a short message they can send to a Grapher developer, asking for
+     the redirect with `createMultiDimRedirectsFromCsv`. `/map-charts-to-mdim` writes the CSV it needs.
 
 ## What the page can't do yet
 
