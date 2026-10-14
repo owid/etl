@@ -634,26 +634,31 @@ def main(
         click.secho("\n✗ No results generated", fg="red")
         sys.exit(1)
 
-    # Calculate total costs. A model genai-prices doesn't know still runs; its cost is
-    # simply reported as unknown (the whole run costs a couple of cents either way).
+    # Calculate total costs, pricing each topic's request on its own: long-context tiers
+    # apply per request, so pricing the summed tokens could put a whole run in the
+    # expensive tier. A model genai-prices doesn't know still runs; its cost is simply
+    # reported as unknown (the whole run costs a couple of cents either way).
     total_input_tokens = sum(r["stats"]["input_tokens"] for r in results)
     total_output_tokens = sum(r["stats"]["output_tokens"] for r in results)
     try:
-        price = calc_price(
-            Usage(input_tokens=total_input_tokens, output_tokens=total_output_tokens), model, provider_id="google"
-        )
+        prices = [
+            calc_price(
+                Usage(input_tokens=r["stats"]["input_tokens"], output_tokens=r["stats"]["output_tokens"]),
+                model,
+                provider_id="google",
+            )
+            for r in results
+        ]
     except LookupError:
-        price = None
-    if price:
-        total_input_cost = float(price.input_price)
-        total_output_cost = float(price.output_price)
-        total_cost = float(price.total_price)
+        prices = None
+    if prices:
+        total_input_cost = float(sum(p.input_price for p in prices))
+        total_output_cost = float(sum(p.output_price for p in prices))
+        total_cost = float(sum(p.total_price for p in prices))
 
         # Add cost to each result
-        for result in results:
-            stats = result["stats"]
-            usage = Usage(input_tokens=stats["input_tokens"], output_tokens=stats["output_tokens"])
-            stats["total_cost_usd"] = round(float(calc_price(usage, model, provider_id="google").total_price), 6)
+        for result, price in zip(results, prices):
+            result["stats"]["total_cost_usd"] = round(float(price.total_price), 6)
 
     # Output results
     click.echo()
@@ -690,7 +695,7 @@ def main(
     click.echo(f"Output tokens: {total_output_tokens:,}")
     click.echo(f"Total tokens:  {total_input_tokens + total_output_tokens:,}")
     click.echo()
-    if price:
+    if prices:
         click.echo(f"Input cost:  ${total_input_cost:.6f}")
         click.echo(f"Output cost: ${total_output_cost:.6f}")
         click.echo(f"Total cost:  ${total_cost:.6f}")

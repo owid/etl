@@ -375,21 +375,22 @@ def estimate_check_costs(
     views: list[dict[str, Any]],
     skip_typos: bool,
     skip_issues: bool,
-) -> tuple[int, int]:
+) -> tuple[int, int, int]:
     """Estimate token costs for checks without running them.
 
     Returns:
-        Tuple of (input_tokens, output_tokens)
+        Tuple of (input_tokens, output_tokens, views_to_check), where views_to_check counts only the
+        views with at least one field to send (the others make no API call).
     """
     from apps.inspector.db import parse_chart_config
 
     total_input_tokens = 0
     total_output_tokens = 0
+    views_to_check = 0
 
     if not skip_issues:
         rprint("[yellow]Estimating issue check costs (dry run)...[/yellow]")
         # Estimate costs by simulating what would be checked
-        views_to_check = 0
 
         for view in views:
             # Build field list (same logic as check_view_async)
@@ -438,4 +439,4 @@ def estimate_check_costs(
 
         rprint(f"[yellow]Would check {views_to_check}/{len(views)} views[/yellow]")
 
-    return total_input_tokens, total_output_tokens
+    return total_input_tokens, total_output_tokens, views_to_check
