@@ -192,27 +192,15 @@ Each assumption starts with a line on its scale: how much it changes the results
    and 6 of the 43 g of protein); large for fishing nations.
 
    SCL has no fish or seafood, so we add the fish items of FBS for the countries and years that SCL covers. They go
-   through the same rules as any other item, with one difference in how we read them: FBS rounds its tonnes to the
-   nearest 1,000 tonnes, which is too coarse to give a density in small countries. So the food tonnes used for fish
-   densities come from FBS's food per person per year, multiplied by population. Calories and protein come from FBS's
-   per-person figures in the same way.
+   through the same rules as any other item, with one difference: FBS rounds its tonnes to the nearest 1,000 tonnes,
+   so fish densities use FBS's food per person (in kilograms, calories and protein) instead.
 
-   FAO has carried most fish rows forward unchanged since 2019 to 2021: they are identical in 2021, 2022 and 2023 for
-   186 of 198 countries. So the fish figures of recent years are older than the rest of the chain.
+   Fish oil counts as an animal product, like the fish it comes from. FBS records no fish going into processing, so
+   counting fish oil as a processed product would make processing create calories (2,993 kcal per person per day in
+   Iceland). The costs of this choice are in known problem 4.
 
-   Fish oil ("Fish, Body Oil" and "Fish, Liver Oil") has the role "animal", like the fish it comes from, for two
-   reasons:
-   a. The FBS fish rows record no processing. The fish ground into meal and oil are inside the fish row's production,
-      and leave inside its exports and feed, as live weight: Peru's pelagic fish row exports 5.2 million tonnes
-      against 0.5 million eaten, because its fishmeal is counted as fish. With the role "processed", the oil would
-      come out of processing with no input, and processing would appear to create calories (2,993 kcal per person
-      per day in Iceland).
-   b. Most of the oil's energy is not in the fish row. FAO values fish at the energy of their edible flesh: about 79
-      kcal per 100 g of live anchoveta in Peru. That is about what the meal made from it holds (77 kcal), while the
-      oil holds another 40. Counting the oil as an animal product adds those calories, and its exports, feed and
-      industrial uses then leave the chain like any other item's. Imported oil is in no fish row of the importer
-      (Norway imports 987 kcal per person per day of oil, against 426 of pelagic fish), so it is a real inflow.
-   Protein does not change, since the oils have none. The costs of this choice are under KNOWN PROBLEMS.
+   FAO has carried most fish rows forward unchanged since 2019 to 2021, so recent fish figures are older than the
+   rest of the chain.
 
 10. Any gap between the other stages and food is counted as data adjustments.
     >> Scale: minor for World (10 kcal per person per day in 2023). Large where people eat coconuts: 14% of food in
