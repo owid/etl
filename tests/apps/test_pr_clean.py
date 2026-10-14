@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 from git import Repo
 
-from apps.pr.cli import clean_branch, worktree_blocking_changes
+from apps.pr.cli import clean_branch, resolve_branches_to_clean, worktree_blocking_changes
 
 
 def _commit_file(repo: Repo, name: str, content: str, message: str):
@@ -102,6 +102,19 @@ def test_blocking_changes_unreadable_worktree_counts_as_blocking(repo_with_workt
     blocking = worktree_blocking_changes(worktree_path)
     assert len(blocking) == 1
     assert "unreadable worktree" in blocking[0]
+
+
+def test_resolve_branches_to_clean():
+    cleanable = {"merged-a": "merged", "merged-b": "merged", "closed-a": "closed"}
+    assert resolve_branches_to_clean("__all__", cleanable) == ["closed-a", "merged-a", "merged-b"]
+    assert resolve_branches_to_clean("__all_merged__", cleanable) == ["merged-a", "merged-b"]
+    assert resolve_branches_to_clean("__all_closed__", cleanable) == ["closed-a"]
+    assert resolve_branches_to_clean("merged-a", cleanable) == ["merged-a"]
+
+
+def test_resolve_branches_to_clean_empty_bucket():
+    cleanable = {"merged-a": "merged"}
+    assert resolve_branches_to_clean("__all_closed__", cleanable) == []
 
 
 def test_clean_branch_cleans_manually_deleted_worktree(repo_with_worktree, tmp_path):
