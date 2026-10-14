@@ -55,9 +55,9 @@ DEFAULT_MODEL = "anthropic:claude-sonnet-5-5"
 CHEAP_MODEL = "google:gemini-3.1-flash-lite"
 
 # Settings for Claude models, which get none of them by default:
-# - Thinking has to be switched on. pydantic-ai returns structured output through a forced tool
-#   call, Anthropic allows no thinking alongside a forced tool, and so without this the model
-#   answers without thinking at all — about 40 output tokens a pass, and no findings.
+# - Thinking is switched on explicitly: answering without it took about 40 output tokens a pass and
+#   found nothing. (pydantic-ai v2 returns structured output natively rather than through a forced
+#   tool call, which Anthropic allows no thinking alongside.)
 # - Effort "high": on charts with known answers, it was the Sonnet 5.5 setting that raised nothing
 #   on clean charts; at low and medium it flagged them nearly every pass.
 # - Caching the user turn lets passes 2 and 3 read the prompt from cache, about a third off the

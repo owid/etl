@@ -70,7 +70,7 @@ dependencies = [
     # Upgraded to FastMCP 3.0 beta for new component/provider architecture, timeouts, versioning
     "fastmcp>=3.2.0",
     "pyproj>=3.7.2",
-    "pydantic-ai-slim[anthropic,fastmcp,google,mcp,openai]>=1.99.0",
+    "pydantic-ai-slim[anthropic,google,mcp,openai]>=2.55.0,<3",
     "codespell>=2.4.1",
     "zensical>=0.0.15",
     "pandas-gbq>=0.29.2",
