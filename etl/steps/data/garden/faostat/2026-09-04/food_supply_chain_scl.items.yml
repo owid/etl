@@ -5,84 +5,68 @@
 # densities are reverse-engineered from FAO's food figures. This file holds only what cannot come from the data.
 
 # 1. Energy (kcal per 100 g) and protein (g per 100 g) for items with too little food use to derive a reliable
-#    density from their reported food quantities (assumption 5). Every value comes from one source:
-#    - FAO's 2024 Global nutrient conversion table for SUA (NCT), values copied as published, for the items it
-#      covers: cereal brans, centrifugal cane sugar, hemp oil, tallow. Their edible-portion coefficients are all 1,
-#      so the published values apply to the whole tonnage.
-#      https://www.fao.org/food-composition/tables-and-databases/detail/global-nutrient-conversion-table-for-fao-supply-utilization-accounts/en
-#    - The oilseed cakes, gluten feed, bran of pulses and hempseed, which the NCT does not cover: the composition
-#      published in one Feedipedia table each (INRAE-CIRAD-AFZ-FAO feed tables, https://www.feedipedia.org), copied as
-#      published: dry matter, in % of the item as fed, and protein, fat (ether extract), ash and fibre, in % of dry
-#      matter. Fibre is neutral detergent fibre (ndf), or crude fibre where the table publishes no NDF. The step
-#      converts each composition to energy and protein with the NCT's own energy formula (see `composition_density`).
-#    - Chemically modified fats (item 1274): FAOSTAT SCL's own food observation.
-#    - Acid oils from refining (item 1276) and residues of fatty substances (item 1277): FAO's density for palm oil.
-#    - Cakes not listed individually: the average of the Feedipedia cakes listed below.
+#    density from their reported food quantities (assumption 5). The values are read from two snapshots:
+#    - FAO's 2024 Global nutrient conversion table for SUA (snapshot faostat/2026-10-14/nutrient_conversion_table),
+#      matched to each item by its CPC code: energy and protein per 100 g, times the edible-portion coefficient.
+#    - Feedipedia's feed composition tables (snapshot feedipedia/2026-10-14/feed_composition), for the items the
+#      table does not cover: dry matter, in % of the item as fed, and protein (crude protein), fat (ether extract),
+#      ash and fibre, in % of dry matter. Fibre is neutral detergent fibre, or crude fibre where the table publishes
+#      no NDF. The step converts each composition to energy and protein with the NCT's own energy formula (see
+#      `composition_density`).
 fixed_densities:
-  families:
-    # Applied by name pattern to every item whose name starts with the pattern, unless the item is listed
-    # individually below. The values are the average of the 15 Feedipedia cakes listed below (304 kcal and 30.2 g).
-    # With every cake listed individually below, 'Cake of' matches no item in this release (it is the default for a
-    # cake FAO adds later), and 'Cake,' only matches 'Cake, oilseeds nes'.
-    - {pattern: "Cake of", energy: 304, protein: 30.2, note: "Average of the Feedipedia cakes listed individually."}
-    - {pattern: "Cake,", energy: 304, protein: 30.2, note: "Average of the Feedipedia cakes listed individually."}
-  items:
+  # Cakes not listed individually take the average density of the Feedipedia cakes listed below. 'Cake of' matches no
+  # item in this release (it is the default for a cake FAO adds later), and 'Cake,' only matches 'Cake, oilseeds nes'.
+  unlisted_cake_patterns: ["Cake of", "Cake,"]
+  nutrient_conversion_table:
+    - {code: 158, name: "Cane sugar, centrifugal"}
+    - {code: 17, name: "Bran of wheat"}
+    - {code: 35, name: "Bran of rice"}
+    - {code: 47, name: "Bran of barley"}
+    - {code: 59, name: "Bran of maize"}
+    - {code: 73, name: "Bran of rye"}
+    - {code: 77, name: "Bran of oats"}
+    - {code: 81, name: "Bran of millet"}
+    - {code: 85, name: "Bran of sorghum"}
+    - {code: 91, name: "Bran of buckwheat"}
+    - {code: 96, name: "Bran of fonio"}
+    - {code: 99, name: "Bran of triticale"}
+    - {code: 105, name: "Bran of mixed grain"}
+    - {code: 112, name: "Bran of cereals n.e.c."}
+    - {code: 337, name: "Oil of hempseed"}
+    - {code: 1225, name: "Tallow"}
+    # Acid oils from refining are the fatty acids removed from crude oils, mostly palm oil, when they are refined.
+    # Residues of fatty substances are traded mostly as the oil recovered from palm oil mill effluent, which goes to
+    # biodiesel in Europe. The table has neither, so both take the table's values for palm oil.
+    - {code: 1276, name: "Industrial monocarboxylic fatty acids; acid oils from refining", value_of: {257: "Palm oil"}}
+    - {code: 1277, name: "Residues of fatty substances", value_of: {257: "Palm oil"}}
+  feedipedia:
     # Meals below 47% protein include the hulls (Feedipedia), and SCL's World crush in 2023 (oil 18.6%, cake 77.7% of
     # the beans) leaves no room for removed hulls.
-    - {code: 238, name: "Cake of soya beans", source: "Feedipedia, 'Soybean meal, low protein, type 44-46 and similar'", url: "https://www.feedipedia.org/node/11682", dry_matter: 87.7, percent_of_dry_matter: {protein: 49.5, fat: 1.9, ash: 7.4, ndf: 14.8}}
-    - {code: 272, name: "Cake of rapeseed", source: "Feedipedia, 'Rapeseed meal, 00 type, oil < 5% as fed, solvent extraction'", url: "https://www.feedipedia.org/node/12503", dry_matter: 89, percent_of_dry_matter: {protein: 38.1, fat: 2.4, ash: 7.6, ndf: 31.6}}
-    - {code: 269, name: "Cake of sunflower seed", source: "Feedipedia, 'Sunflower meal, solvent-extracted, dehulled or non-dehulled'", url: "https://www.feedipedia.org/node/12663", dry_matter: 89, percent_of_dry_matter: {protein: 32.4, fat: 2.2, ash: 7.1, ndf: 45}}
+    - {code: 238, name: "Cake of soya beans", node: 11682, table: "Soybean meal, low protein, type 44-46 and similar"}
+    - {code: 272, name: "Cake of rapeseed", node: 12503, table: "Rapeseed meal, 00 type, oil < 5% as fed, solvent extraction"}
+    - {code: 269, name: "Cake of sunflower seed", node: 12663, table: "Sunflower meal, solvent-extracted, dehulled or non-dehulled"}
     # The high-fibre meal is made with little dehulling; SCL's World cake in 2023 is 55.8% of the seed crushed, more
     # than the 45.5% of a dehulling crush (O'Brien et al., cited by Feedipedia).
-    - {code: 332, name: "Cake of cottonseed", source: "Feedipedia, 'Cottonseed meal, high fibre, low oil'", url: "https://www.feedipedia.org/node/16275", dry_matter: 90.2, percent_of_dry_matter: {protein: 40, fat: 3.1, ash: 7.1, ndf: 36.6}}
+    - {code: 332, name: "Cake of cottonseed", node: 16275, table: "Cottonseed meal, high fibre, low oil"}
     # The published components add up to more than the dry matter, so the available carbohydrate would be slightly
     # negative; the step sets it to zero (see `composition_density`).
-    - {code: 259, name: "Cake of palm kernel", source: "Feedipedia, 'Palm kernel meal, mechanical extraction'", url: "https://www.feedipedia.org/node/12420", dry_matter: 91.2, percent_of_dry_matter: {protein: 16.7, fat: 9.2, ash: 4.7, ndf: 73}}
-    - {code: 245, name: "Cake of groundnuts", source: "Feedipedia, 'Peanut meal, oil > 5%'", url: "https://www.feedipedia.org/node/12159", dry_matter: 92.3, percent_of_dry_matter: {protein: 49.1, fat: 9.8, ash: 5.8, ndf: 18.1}}
+    - {code: 259, name: "Cake of palm kernel", node: 12420, table: "Palm kernel meal, mechanical extraction"}
+    - {code: 245, name: "Cake of groundnuts", node: 12159, table: "Peanut meal, oil > 5%"}
     # Feedipedia (citing Göhl 1982) gives rice bran 10-15% crude fibre, and removing the oil raises it, hence the
     # 11-20% class.
-    - {code: 37, name: "Cake of rice bran", source: "Feedipedia, 'Rice bran, defatted, fibre 11-20%'", url: "https://www.feedipedia.org/node/11640", dry_matter: 89, percent_of_dry_matter: {protein: 17.1, fat: 1, ash: 14.2, ndf: 32.6}}
-    - {code: 61, name: "Cake of maize", source: "Feedipedia, 'Maize germ meal, protein 20-30%, oil < 5%'", url: "https://www.feedipedia.org/node/20332", dry_matter: 87.7, percent_of_dry_matter: {protein: 28.9, fat: 2.8, ash: 3.2, ndf: 44}}
-    - {code: 253, name: "Cake of copra", source: "Feedipedia, 'Coconut, copra, oilmeal, expeller extraction'", url: "https://www.feedipedia.org/node/11997", dry_matter: 91.5, percent_of_dry_matter: {protein: 22.4, fat: 9.8, ash: 6.8, ndf: 54.7}}
-    - {code: 291, name: "Cake of sesame seed", source: "Feedipedia, 'Sesame meal, mechanical extraction'", url: "https://www.feedipedia.org/node/12577", dry_matter: 92.8, percent_of_dry_matter: {protein: 44.9, fat: 11.3, ash: 11.9, ndf: 24.6}}
-    - {code: 335, name: "Cake of linseed", source: "Feedipedia, 'Linseed meal, cold-pressed'", url: "https://www.feedipedia.org/node/12262", dry_matter: 90.6, percent_of_dry_matter: {protein: 34.1, fat: 10.2, ash: 6.3, ndf: 25.4}}
-    - {code: 282, name: "Cake of safflowerseed", source: "Feedipedia, 'Safflower (Carthamus tinctorius), meal, expeller extraction'", url: "https://www.feedipedia.org/node/12552", dry_matter: 93.2, percent_of_dry_matter: {protein: 24.8, fat: 9.4, ash: 4.4, crude_fibre: 33.3}}
-    - {code: 294, name: "Cake of mustard seed", source: "Feedipedia, 'Mustard (Brassica sp.), oil meal, mechanical extraction'", url: "https://www.feedipedia.org/node/12359", dry_matter: 89.4, percent_of_dry_matter: {protein: 34.9, fat: 9.4, ash: 8.3, crude_fibre: 7.1}}
-    - {code: 338, name: "Cake of hempseed", source: "Feedipedia, 'Hemp oil meal, mechanical extraction'", url: "https://www.feedipedia.org/node/11694", dry_matter: 91.3, percent_of_dry_matter: {protein: 31.9, fat: 11.5, ash: 7.2, ndf: 45.7}}
-    - {code: 298, name: "Cake, poppy seed", source: "Feedipedia, 'Poppy (Papaver somniferum), oil meal, mechanical extraction'", url: "https://www.feedipedia.org/node/12463", dry_matter: 92.5, percent_of_dry_matter: {protein: 36, fat: 10.3, ash: 13.4, ndf: 34.1}}
+    - {code: 37, name: "Cake of rice bran", node: 11640, table: "Rice bran, defatted, fibre 11-20%"}
+    - {code: 61, name: "Cake of maize", node: 20332, table: "Maize germ meal, protein 20-30%, oil < 5%"}
+    - {code: 253, name: "Cake of copra", node: 11997, table: "Coconut, copra, oilmeal, expeller extraction"}
+    - {code: 291, name: "Cake of sesame seed", node: 12577, table: "Sesame meal, mechanical extraction"}
+    - {code: 335, name: "Cake of linseed", node: 12262, table: "Linseed meal, cold-pressed"}
+    - {code: 282, name: "Cake of safflowerseed", node: 12552, table: "Safflower (Carthamus tinctorius), meal, expeller extraction"}
+    - {code: 338, name: "Cake of hempseed", node: 11694, table: "Hemp oil meal, mechanical extraction"}
+    - {code: 298, name: "Cake, poppy seed", node: 12463, table: "Poppy (Papaver somniferum), oil meal, mechanical extraction"}
     # Corn gluten feed, the larger volume; gluten meal has more protein.
-    - {code: 846, name: "Gluten feed and meal", source: "Feedipedia, 'Corn gluten feed'", url: "https://www.feedipedia.org/node/12287", dry_matter: 88.3, percent_of_dry_matter: {protein: 21.7, fat: 3.4, ash: 6.9, ndf: 39.6}}
-    # FAO 2024 NCT, values copied as published (edible-portion coefficient 1, so per 100 g as recorded).
-    # https://www.fao.org/3/CC9678EN/Nutrient_conversion_table_for_SUA_2024.xlsx
-    - {code: 158, name: "Cane sugar, centrifugal", energy: 399.0, protein: 0.2, note: "FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1."}
-    - {code: 17, name: Bran of wheat, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
-    - {code: 35, name: "Bran of rice", energy: 393.0, protein: 13.4, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
-    - {code: 47, name: Bran of barley, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
-    - {code: 59, name: "Bran of maize", energy: 226.0, protein: 8.4, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
-    - {code: 73, name: Bran of rye, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
-    - {code: 77, name: "Bran of oats", energy: 360.0, protein: 14.2, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
-    - {code: 81, name: Bran of millet, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
-    - {code: 85, name: Bran of sorghum, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
-    - {code: 91, name: Bran of buckwheat, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
-    - {code: 96, name: Bran of fonio, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
-    - {code: 99, name: Bran of triticale, energy: 281.0, protein: 15.6, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
-    - {code: 105, name: Bran of mixed grain, energy: 333.0, protein: 13.8, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
-    - {code: 112, name: Bran of cereals n.e.c., energy: 333.0, protein: 13.8, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
-    - {code: 337, name: "Oil of hempseed", energy: 900.0, protein: 0.0, note: FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1.}
-    - {code: 1225, name: "Tallow", energy: 891.0, protein: 1.7, note: "FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1."}
-    # FAOSTAT SCL's own food observation for this item (Russia, 2019): 902 kcal per 100 g and zero protein. This is
-    # the density FAO used for that observation, not a published composition.
-    - {code: 1274, name: "Animal or vegetable fats and oils and their fractions, chemically modified, except those hydrogenated, inter-esterified, re-esterified or elaidinized; inedible mixtures or preparations of animal or vegetable fats or oils", energy: 902, protein: 0, note: 'FAOSTAT SCL food observations: 902 kcal/100 g and zero protein (Russia, 2019).'}
+    - {code: 846, name: "Gluten feed and meal", node: 12287, table: "Corn gluten feed"}
     # Feedipedia has no pea bran; lentil bran is the pulse bran with a measured fibre value.
-    - {code: 213, name: Bran of pulses, source: "Feedipedia, 'Lentil bran'", url: "https://www.feedipedia.org/node/12246", dry_matter: 88.9, percent_of_dry_matter: {protein: 19.3, fat: 1.1, ash: 5.6, ndf: 50.3}}
-    # Acid oils from refining (1276) are the fatty acids removed from crude oils, mostly palm oil, when they are
-    # refined. FAO's table has no entry for them; they take FAO's density for palm oil in the SCL food data (its 2024
-    # nutrient conversion table times the edible-portion coefficient): 898 kcal and no protein per 100 g.
-    - {code: 1276, name: "Industrial monocarboxylic fatty acids; acid oils from refining", energy: 898, protein: 0, note: "FAO's density for palm oil (2024 nutrient conversion table)."}
-    # Residues of fatty substances (1277) are traded mostly as the oil recovered from palm oil mill effluent, which goes
-    # to biodiesel in Europe. They take FAO's density for palm oil, like acid oils.
-    - {code: 1277, name: "Residues of fatty substances", energy: 898, protein: 0, note: "FAO's density for palm oil (2024 nutrient conversion table)."}
-    - {code: 336, name: "Hempseed", source: "Feedipedia, 'Hemp seeds'", url: "https://www.feedipedia.org/node/11696", dry_matter: 90.6, percent_of_dry_matter: {protein: 23.9, fat: 35.7, ash: 5.7, ndf: 39.8}}
+    - {code: 213, name: Bran of pulses, node: 12246, table: "Lentil bran"}
+    - {code: 336, name: "Hempseed", node: 11696, table: "Hemp seeds"}
 
 # 2. Items that are never food, whatever happens to them. They are left out of the chain altogether, in all three
 #    tables. Fuel ethanol is the one that matters: the crops sent to distilleries leave the chain where FAO records

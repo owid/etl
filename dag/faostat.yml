@@ -248,6 +248,9 @@ steps:
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2026-07-01/income_groups
+    # The fixed densities of the items that people hardly eat (assumption 5).
+    - snapshot://faostat/2026-10-14/nutrient_conversion_table.xlsx
+    - snapshot://feedipedia/2026-10-14/feed_composition.csv
   # Bespoke viz step: a metadata JSON plus one JSON per entity, built with the Supply Utilization Accounts method,
   # whose chain runs from 2010; the main source of the interactive waterfall.
   viz://bespoke/faostat/latest/food_supply_chain_scl:

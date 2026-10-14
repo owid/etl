@@ -104,18 +104,18 @@ Each assumption starts with a line on its scale: how much it changes the results
    that tonnage is the oilseed cakes and brans.
 
    Cakes, brans, gluten feed and oil refining residues are hardly eaten, so their food cannot give a density. We give
-   them fixed values instead, mostly from two sources:
+   them fixed values instead, from two sources:
    a. FAO's 2024 nutrient conversion table, where it has the item: the cereal brans, centrifugal cane sugar, hemp oil
-      and tallow. Acid oils from refining, which the table does not have, take its value for palm oil (898 kcal per
-      100 g), the oil they are mostly removed from.
+      and tallow. Acid oils from refining and residues of fatty substances, which the table does not have, take its
+      value for palm oil (898 kcal per 100 g), the oil they mostly come from.
    b. Feedipedia, for the oilseed cakes, gluten feed, bran of pulses and hempseed, which FAO's table does not cover.
       Feedipedia collects the feed tables of INRAE, CIRAD, AFZ and FAO. Each item takes the composition of one
       matching table, converted to energy with the formula FAO uses for its own table: 4 kcal per gram of protein, 9
       per gram of fat, 4 per gram of available carbohydrate and 2 per gram of fibre. That puts each cake on the same
       footing as the crop and the oil it comes from. Soybean cake, for example, gets 307 kcal and 43.4 g of protein
       per 100 g, from Feedipedia's soybean meal of 44% to 46% protein: the type that includes the hulls, as SCL's
-      crushing yields imply.
-   The values, compositions and sources are in `food_supply_chain_scl.items.yml`.
+      crushing yields imply. Cakes with no Feedipedia table of their own take the average of the cakes that have one.
+   The values are read from snapshots of both sources. The items file says which item takes which value.
 
 6. Fuel ethanol, and a few other items that are never food, are left out of all three tables.
    >> Scale: minor for World, but large in a few countries: leaving out fuel ethanol avoids processing creating 300
@@ -431,6 +431,17 @@ FBS_ELEMENTS = {
 }
 # FAO's food per person, turned into totals with FAO's population by the FAOSTAT garden step.
 FBS_FOOD_NUTRIENT_ELEMENTS = ["000664", "000674", "000645"]
+# Feedipedia's labels for each component of `composition_density`, in order of preference (fibre is neutral detergent
+# fibre, or crude fibre where the table publishes no NDF).
+FEEDIPEDIA_LABELS = {
+    "dry_matter": ["Dry matter"],
+    "protein": ["Crude protein"],
+    "fat": ["Ether extract"],
+    "ash": ["Ash"],
+    "fibre": ["NDF", "Neutral detergent fibre", "Crude fibre"],
+}
+# Columns of FAO's nutrient conversion table (sheet "03"), per 100 g of edible portion.
+NCT_COLUMNS = {"energy": "Energy\n(kcal)", "protein": "Protein, total\n(g)"}
 # SCL carries population as an item; it is not a commodity, so it is excluded from the balance table.
 POPULATION_ITEM_CODE = "00000001"
 # FBS "Grand Total" item, used only to compare our food stage with FAO's own published World food supply.
@@ -587,13 +598,10 @@ def load_manual_inputs() -> dict:
         "processing_families_for_checks",
     }
     assert set(config) == expected, f"Unexpected top-level keys in items file: {set(config) ^ expected}"
-    for entry in config["fixed_densities"]["families"] + config["fixed_densities"]["items"]:
-        has_values = {"energy", "protein"} <= set(entry)
-        has_composition = {"dry_matter", "percent_of_dry_matter"} <= set(entry)
-        assert has_values != has_composition, f"Fixed densities need energy and protein, or a composition: {entry}"
-        if has_composition:
-            components = set(entry["percent_of_dry_matter"])
-            assert components in ({"protein", "fat", "ash", "ndf"}, {"protein", "fat", "ash", "crude_fibre"}), entry
+    fixed = config["fixed_densities"]
+    assert set(fixed) == {"unlisted_cake_patterns", "nutrient_conversion_table", "feedipedia"}, set(fixed)
+    codes = [item["code"] for item in fixed["nutrient_conversion_table"] + fixed["feedipedia"]]
+    assert len(codes) == len(set(codes)), "An item takes a fixed density from more than one source."
     return config
 
 
@@ -628,9 +636,11 @@ def sanity_check_inputs(tb: Table, roles: pd.Series, manual: dict) -> None:
     missing_role = sorted(set(table_items.index) - set(roles.index) - {POPULATION_ITEM_CODE})
     assert not missing_role, f"SCL items without an FAO item group: {[(c, table_items[c]) for c in missing_role]}"
     named = {}
-    listed = manual["fixed_densities"]["items"] + manual["never_food"] + manual["role_overrides"]
+    fixed = manual["fixed_densities"]
+    listed = fixed["nutrient_conversion_table"] + fixed["feedipedia"] + manual["never_food"] + manual["role_overrides"]
     for item in listed + manual["country_specific_densities"]:
         named[item["code"]] = item["name"]
+        named.update(item.get("value_of", {}))
     countries = set(tb["country"].astype(str))
     unknown = [e["country"] for e in manual["country_specific_densities"] if e["country"] not in countries]
     assert not unknown, f"Country-specific densities name countries that are not in SCL: {unknown}"
@@ -785,7 +795,7 @@ def sanity_check_balance_identity(tb: Table) -> None:
 # --------------------------------------------------------------------------------------------------------------------
 # Densities (assumptions 2 to 7).
 # --------------------------------------------------------------------------------------------------------------------
-def composition_density(item: dict, nutrient: str) -> float:
+def composition_density(composition: dict[str, float], nutrient: str) -> float:
     """Energy (kcal) or protein (g) per 100 g as fed, from a Feedipedia composition, with the energy formula of FAO's
     2024 nutrient conversion table.
 
@@ -795,28 +805,71 @@ def composition_density(item: dict, nutrient: str) -> float:
         energy = 4 x protein + 9 x fat + 4 x available carbohydrate + 2 x fibre
     Carbohydrate is zero where the published components add up to more than 100% (hempseed, palm kernel cake).
     """
-    dry_matter = item["dry_matter"]
-    as_fed = {component: share * dry_matter / 100 for component, share in item["percent_of_dry_matter"].items()}
-    fibre = as_fed.get("ndf", as_fed.get("crude_fibre"))
+    dry_matter = composition["dry_matter"]
+    as_fed = {c: composition[c] * dry_matter / 100 for c in ["protein", "fat", "ash", "fibre"]}
     if nutrient == "protein":
         return as_fed["protein"]
-    carbohydrate = max(0, 100 - (100 - dry_matter) - as_fed["protein"] - as_fed["fat"] - as_fed["ash"] - fibre)
-    return 4 * as_fed["protein"] + 9 * as_fed["fat"] + 4 * carbohydrate + 2 * fibre
+    carbohydrate = max(0, dry_matter - as_fed["protein"] - as_fed["fat"] - as_fed["ash"] - as_fed["fibre"])
+    return 4 * as_fed["protein"] + 9 * as_fed["fat"] + 4 * carbohydrate + 2 * as_fed["fibre"]
 
 
-def fixed_density_map(tb: Table, manual: dict, nutrient: str) -> dict[str, float]:
-    """Fixed densities per item code for one nutrient, from the families (by name pattern) and the explicit items.
+def nutrient_conversion_values(tb_nct: Table, tb_items: Table) -> dict[str, dict[str, float]]:
+    """Energy (kcal) and protein (g) per 100 g of each SCL item in FAO's nutrient conversion table, by item code.
+
+    The table's codes are CPC codes, matched to SCL items with FAOSTAT's own CPC code of each item. Values are given per
+    100 g of edible portion, so they are multiplied by the edible-portion coefficient to apply to the whole tonnage.
+    """
+    # The three rows under the header repeat it in French and Spanish and give INFOODS tags; section rows have no code.
+    tb_nct = tb_nct[tb_nct["Edible portion coefficient"].astype(str).str.fullmatch(r"[0-9.]+")]
+    tb_nct = tb_nct.assign(code=tb_nct["Code"].astype(str).str.strip()).set_index("code")
+    assert not tb_nct.index.duplicated().any(), "Duplicated codes in FAO's nutrient conversion table."
+    cpc = tb_items.assign(item_code=tb_items["item_code"].astype(int).map(_pad_code)).set_index("item_code")["cpc_code"]
+    cpc = cpc.astype(str).str.strip()
+    matched = cpc[cpc.isin(tb_nct.index)]
+    coefficient = tb_nct["Edible portion coefficient"].astype(float)
+    return {
+        nutrient: (tb_nct[column].astype(float) * coefficient).reindex(matched.values).set_axis(matched.index).to_dict()
+        for nutrient, column in NCT_COLUMNS.items()
+    }
+
+
+def feedipedia_compositions(tb_feed: Table, manual: dict) -> dict[str, dict[str, float]]:
+    """The composition of each item that takes a Feedipedia table, by item code, in Feedipedia's units."""
+    compositions = {}
+    for item in manual["fixed_densities"]["feedipedia"]:
+        rows = tb_feed[tb_feed["node_id"] == item["node"]]
+        assert set(rows["table_title"]) == {item["table"]}, f"Feedipedia node {item['node']} is not {item['table']!r}."
+        average = rows.set_index("Main analysis")["Avg"].astype(float)
+        composition = {}
+        for component, labels in FEEDIPEDIA_LABELS.items():
+            found = [label for label in labels if label in average.index]
+            assert found, f"Feedipedia node {item['node']} has no {component}."
+            composition[component] = average[found[0]]
+        compositions[_pad_code(item["code"])] = composition
+    return compositions
+
+
+def fixed_density_map(
+    tb: Table, manual: dict, nct: dict[str, dict[str, float]], compositions: dict[str, dict[str, float]], nutrient: str
+) -> dict[str, float]:
+    """Fixed densities per item code for one nutrient, from FAO's nutrient conversion table and Feedipedia.
 
     Implements assumption 5.
     """
     fixed = {}
-    for family in manual["fixed_densities"]["families"]:
-        for code, name in tb[["item_code", "fao_item"]].drop_duplicates().itertuples(index=False):
-            if name.startswith(family["pattern"]):
-                fixed[code] = family[nutrient]
-    for item in manual["fixed_densities"]["items"]:
-        value = composition_density(item, nutrient) if "percent_of_dry_matter" in item else item[nutrient]
-        fixed[_pad_code(item["code"])] = value
+    for item in manual["fixed_densities"]["nutrient_conversion_table"]:
+        source = _pad_code(next(iter(item.get("value_of", {item["code"]: item["name"]}))))
+        assert source in nct[nutrient], f"Item {source} is not in FAO's nutrient conversion table."
+        fixed[_pad_code(item["code"])] = nct[nutrient][source]
+    names = {_pad_code(item["code"]): item["name"] for item in manual["fixed_densities"]["feedipedia"]}
+    for code, composition in compositions.items():
+        fixed[code] = composition_density(composition, nutrient)
+    # Cakes with no Feedipedia table of their own take the average of the cakes that have one.
+    cakes = [fixed[code] for code in compositions if names[code].startswith("Cake")]
+    patterns = tuple(manual["fixed_densities"]["unlisted_cake_patterns"])
+    for code, name in tb[["item_code", "fao_item"]].drop_duplicates().itertuples(index=False):
+        if name.startswith(patterns) and code not in fixed:
+            fixed[code] = float(np.mean(cakes))
     return fixed
 
 
@@ -845,7 +898,7 @@ def product_implied_density(tb: Table, family: dict, nutrient: str) -> pd.Series
     return implied
 
 
-def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
+def add_densities(tb: Table, manual: dict, fixed: dict[str, float], nutrient: str) -> Table:
     """Densities per (country, year, item) for one nutrient.
 
     Implements assumptions 2 (densities from food), 3 (one density per item), 4 (fish by year), 5 (fixed) and 7
@@ -899,7 +952,6 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
     # Assumption 5: listed items always get fixed densities. A few hundred tonnes of soybean cake eaten somewhere
     # should not set the density of hundreds of millions of tonnes. Where food use is substantial, check that the item
     # density agrees with the fixed density, within the tolerance of the check of assumption 3.
-    fixed = fixed_density_map(tb, manual, nutrient)
     is_fixed = tb["item_code"].isin(fixed)
     fixed_factor = tb["item_code"].map(fixed)
     supply = (tb["production"] + tb["imports"]).abs().groupby(tb["item_code"]).transform("sum")
@@ -1140,6 +1192,11 @@ def run() -> None:
     tb_groups = ds_metadata.read("faostat_scl_item_group", safe_types=False)
     ds_fbsc = paths.load_dataset("faostat_fbsc")
     tb_fbsc = ds_fbsc.read("faostat_fbsc", safe_types=False)
+    tb_items = ds_metadata.read("faostat_scl_item", safe_types=False)
+    snap_nct = paths.load_snapshot("nutrient_conversion_table.xlsx")
+    tb_nct = snap_nct.read_excel(sheet_name="03")
+    snap_feed = paths.load_snapshot("feed_composition.csv")
+    tb_feed = snap_feed.read_csv()
     manual = load_manual_inputs()
 
     #
@@ -1165,6 +1222,9 @@ def run() -> None:
     tb_fish = prepare_fish_table(tb_fbsc, manual=manual, population=population)
     tb = pr.concat([tb, tb_fish], ignore_index=True)
     sanity_check_balance_identity(tb)
+    # Assumption 5: the fixed densities, from FAO's nutrient conversion table and Feedipedia.
+    nct = nutrient_conversion_values(tb_nct, tb_items=tb_items)
+    compositions = feedipedia_compositions(tb_feed, manual=manual)
 
     tables = []
     for nutrient in NUTRIENTS:
@@ -1173,7 +1233,8 @@ def run() -> None:
             converted = convert_elements_to_nutrient(tb, nutrient=nutrient)
         else:
             # Assumptions 2 to 7: the density of every item: FAO's densities read from food, fixed and implied values.
-            tb_nutrient = add_densities(tb, manual=manual, nutrient=nutrient)
+            fixed = fixed_density_map(tb, manual=manual, nct=nct, compositions=compositions, nutrient=nutrient)
+            tb_nutrient = add_densities(tb, manual=manual, fixed=fixed, nutrient=nutrient)
             sanity_check_densities(tb_nutrient, nutrient=nutrient)
             sanity_check_processing_families(tb_nutrient, manual=manual, nutrient=nutrient)
             # Assumption 2: convert tonnes; food keeps FAO's reported nutrients wherever reported.
@@ -1194,6 +1255,10 @@ def run() -> None:
         # Assumption 13: per person per day.
         chain = per_person_per_day(chain)
         sanity_check_outputs(chain, tb_fbsc=tb_fbsc, nutrient=nutrient)
+        if nutrient != "mass":
+            # The fixed densities enter every stage, so their sources are origins of every indicator.
+            for column in chain.columns.drop(["country", "year"]):
+                chain[column].metadata.origins += [snap_nct.metadata.origin, snap_feed.metadata.origin]
         tables.append(chain.format(["country", "year"], short_name=nutrient))
 
     #

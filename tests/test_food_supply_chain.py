@@ -89,7 +89,6 @@ def _scl_rows(numerator: str, scale: float, rows: list[tuple]) -> Table:
 
 def _scl_manual(country_specific: list[dict]) -> dict:
     return {
-        "fixed_densities": {"families": [], "items": []},
         "never_food": [],
         "output_implied_densities": [],
         "fish_from_fbs": [{"code": 2763}],
@@ -120,7 +119,7 @@ ITEM_DENSITY = (2e9 + 9e7) / (1030 * 1e4)
 def test_scl_uses_one_density_per_item_in_every_country(nutrient, scale):
     numerator = SCL.NUTRIENTS[nutrient]["numerator"]
     tb = _scl_rows(numerator, scale, ONE_DENSITY_ROWS)
-    tb = SCL.add_densities(tb, manual=_scl_manual([]), nutrient=nutrient)
+    tb = SCL.add_densities(tb, manual=_scl_manual([]), fixed={}, nutrient=nutrient)
     # Both countries use the item's density, calculated from the usable food of both. Fish keep the density of each
     # year, and the year with no usable food takes the density over all years.
     assert tb["density_source"].tolist() == ["item"] * 7 + ["own_year"] * 3
@@ -143,10 +142,10 @@ def test_scl_country_with_its_own_density_must_be_listed(nutrient, scale):
         ("C", 2001, "00000001", "Example food", "crop", 1000.0, 3e9),
     ]
     with pytest.raises(AssertionError, match="not listed as country-specific"):
-        SCL.add_densities(_scl_rows(numerator, scale, rows), manual=_scl_manual([]), nutrient=nutrient)
+        SCL.add_densities(_scl_rows(numerator, scale, rows), manual=_scl_manual([]), fixed={}, nutrient=nutrient)
     # Listed, country C keeps its own density, and the item's density leaves country C out.
     listed = [{"country": "C", "code": 1, "name": "Example food"}]
-    tb = SCL.add_densities(_scl_rows(numerator, scale, rows), manual=_scl_manual(listed), nutrient=nutrient)
+    tb = SCL.add_densities(_scl_rows(numerator, scale, rows), manual=_scl_manual(listed), fixed={}, nutrient=nutrient)
     np.testing.assert_allclose(tb["density"], np.array([ITEM_DENSITY] * 7 + [80, 90, 85, 300, 300]) * scale)
 
 
@@ -178,16 +177,16 @@ def test_scl_fixed_factors_are_checked_instead_of_switched(nutrient, scale, food
     tb["food"] = 1000.0
     tb["production"] = 1000.0 / food_share
     manual = {
-        "fixed_densities": {"families": [], "items": [{"code": 1, "energy": 200.0, "protein": 20.0}]},
         "output_implied_densities": [],
         "fish_from_fbs": [],
         "country_specific_densities": [],
     }
+    fixed = {SCL._pad_code(1): 200.0 * scale}
     if should_fail:
         with pytest.raises(AssertionError, match=f"Fixed {nutrient} densities disagree.*Example bran"):
-            SCL.add_densities(tb, manual=manual, nutrient=nutrient)
+            SCL.add_densities(tb, manual=manual, fixed=fixed, nutrient=nutrient)
     else:
-        result = SCL.add_densities(tb, manual=manual, nutrient=nutrient)
+        result = SCL.add_densities(tb, manual=manual, fixed=fixed, nutrient=nutrient)
         assert result["density_source"].tolist() == ["fixed"]
         np.testing.assert_allclose(result["density"], [200.0 * scale])
         converted = SCL.convert_elements_to_nutrient(result, nutrient=nutrient)
