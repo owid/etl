@@ -202,7 +202,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    of this choice are under KNOWN PROBLEMS.
 
 10. The gap between the preceding stages and food goes to data adjustments.
-    >> Scale: minor for World (9 kcal per person per day in 2023). Large where people eat coconuts: 14% of food in
+    >> Scale: minor for World (10 kcal per person per day in 2023). Large where people eat coconuts: 14% of food in
     Micronesia in 2023, 7% to 10% in Vanuatu, the Marshall Islands and Kiribati. Rounded fish tonnages can also have
     a larger effect in small countries.
 
@@ -215,7 +215,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
     well as process: mostly coconuts and sugar cane (chewed). The tonnes of these crops that people eat leave the
     earlier stages at the crop's value under assumption 7 (140 kcal per 100 g of coconuts in 2023) but arrive in
     food at FAO's value for the part people eat (85 kcal), and the difference lands in data adjustments. At World
-    it is about 9 kcal (coconuts 4.5, sugar cane 3.9); in Micronesia it is 363 kcal per person per day.
+    it is about 10 kcal (coconuts 4.5, sugar cane 4.3); in Micronesia it is 363 kcal per person per day.
     Keeping FAO's food total changes this adjustment without changing the other flows. The size of the gap is kept
     in "balancing_difference" for quality control.
 
@@ -259,9 +259,9 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
     >> Scale: minor. A choice of unit, not of substance; it rescales all values equally.
 
 15. Processing never adds energy or protein: where it would, the gain goes to data adjustments.
-    >> Scale: major for a few countries, nil for World. In 2023, 51 of 176 countries would otherwise show
-    processing adding energy, 6 of them by more than 10% of food (Guyana 68%, Uruguay 15%, Ukraine 15%, Honduras
-    13%, the Netherlands 13%, Papua New Guinea 10%); in protein, 32 countries, 4 above 10% (Guyana, New Zealand,
+    >> Scale: major for a few countries, nil for World. In 2023, 47 of 176 countries would otherwise show
+    processing adding energy, 6 of them by more than 10% of food (Guyana 67%, Uruguay 15%, Ukraine 14%, the
+    Netherlands 13%, Honduras 12%, Papua New Guinea 10%); in protein, 33 countries, 4 above 10% (Guyana, New Zealand,
     Bolivia, Latvia). World shows a loss in both, so it is unchanged.
 
     A mill, a crusher or a brewery cannot put more energy or protein into its products than came in with the
@@ -272,8 +272,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
     causes also inflate or shrink the real losses of other countries, and those stay in processing, which remains
     the least certain stage. The rule is applied to each country and region in each year, after the regions are
     summed from their countries, so a region with a gain (Oceania in every year in energy, and South America,
-    Europe, North America, the European Union and high-income countries in one to three years; Oceania in 2012 in
-    protein) is treated like a country, and a region's processing is no longer the sum of its members';
+    Europe, North America and the European Union in one year each; Oceania in 2012 in protein) is treated like a country, and a region's processing is no longer the sum of its members';
     processing plus data adjustments still is.
     The mass table is left alone: in tonnes a gain in processing can be real, because breweries and bottlers add
     water (in Namibia, 22 thousand tonnes of malt become 174 thousand tonnes of beer), so processing there is the
@@ -283,10 +282,10 @@ KNOWN PROBLEMS, NOT YET RESOLVED
 --------------------------------
 - Processing would create calories in some countries. The gains are moved to data adjustments; their causes remain.
   >> Scale: major for a few countries: in 2023, the gains moved by assumption 15 exceed 10% of food in six
-  countries in energy (Guyana 68%, Uruguay, Ukraine, Honduras, the Netherlands, Papua New Guinea) and four in
-  protein (Guyana, New Zealand, Bolivia, Latvia); 33 of 176 countries have a gain above 1% of food in energy and 21
-  in protein (23% of all country-years have some gain in energy, 15% in protein). Small for World, where
-  processing loses 82 kcal per person per day, 1.4% of crop production. The FBS sibling has the same symptom with
+  countries in energy (Guyana 67%, Uruguay, Ukraine, the Netherlands, Honduras, Papua New Guinea) and four in
+  protein (Guyana, New Zealand, Bolivia, Latvia); 30 of 176 countries have a gain above 1% of food in energy and 21
+  in protein (21% of all country-years have some gain in energy, 14% in protein). Small for World, where
+  processing loses 97 kcal per person per day, 1.6% of crop production. The FBS sibling has the same symptom with
   a different cause.
 
   In the normal case "processing_net" is positive: the converted processing inputs exceed the converted product
@@ -302,15 +301,15 @@ KNOWN PROBLEMS, NOT YET RESOLVED
     molasses production as equal to its whole beet harvest, which made processing create about 2,900 kcal per
     person per day there, and about 40 in the European Union, and inflated feed by the same amounts.
   - Factories that make more from a crop than the world average of assumption 7 (next problem): oil palm in
-    Honduras and Papua New Guinea, sunflower seed in Ukraine, sugar beet in Ukraine, the Netherlands and Germany,
-    rice in Uruguay.
+    Honduras and Papua New Guinea, sunflower seed in Ukraine, sugar beet in Ukraine, the Netherlands and Germany
+    (beet holds more sugar than cane, and the two share one value), rice in Uruguay.
   - FAO's nutrient factor for a raw item outside assumption 7 is below what its products contain: raw milk against
     its powders and casein (New Zealand in protein, Uruguay in energy).
   - Products with no recorded input: hydrogenated oils, margarine and fat preparations (Netherlands), oilseed
     flours (Bolivia, in protein).
   Recomputing the cake densities from compositions (assumption 6) closed the soybean family, which at the previous
   value of 261 kcal per 100 g of soybean cake lost 9% at World and hid gains of other items: with that loss gone,
-  Brazil (sugar cane, beef fats, margarine) and China show energy gains, while the protein gains of Brazil and China
+  Brazil (beef fats, margarine) and China show energy gains, while the protein gains of Brazil and China
   from soybean cake disappear.
 
 - The values of assumption 7 are World ratios, applied to every country.
@@ -323,13 +322,13 @@ KNOWN PROBLEMS, NOT YET RESOLVED
   processing loss (coconuts in Tonga and Micronesia, 109 and 97 kcal of copra and oil per 100 g of nuts against
   140, about 500 kcal per person per day; oil palm in Malaysia, 205 against 214, 670 kcal). Both mix real
   differences between factories with differences in what FAO records.
-  Ukraine's chart is also dominated by FAO's own residuals, which are not ours to fix: 769 kcal per person per day
+  Ukraine's chart is also dominated by FAO's own residuals, which are not ours to fix: 818 kcal per person per day
   in 2023 and about 3,200 in 2020, when FAO records 12.9 million tonnes of maize, sunflower seed and wheat as used
   without a matching supply.
 
 - The stage "feed" only counts feed that passes through the balance.
   >> Scale: "animal_products" exceeds "feed" by more than 1 kcal in 14% of country-years in energy and by more than
-  0.01 g in 24% in protein. World still has more recorded feed than animal output (2,046 against 635 kcal in 2023,
+  0.01 g in 24% in protein. World still has more recorded feed than animal output (2,047 against 635 kcal in 2023,
   and 103 against 43 g of protein).
 
   Grass, pasture and forage are not SCL items, so everything grazing animals eat from pasture enters the chain
