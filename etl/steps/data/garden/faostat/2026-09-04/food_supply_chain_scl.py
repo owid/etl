@@ -102,16 +102,16 @@ Each assumption starts with a line on its scale: how much it changes the results
    the Netherlands).
 
    Cakes, brans, gluten feed and oil refining residues are hardly eaten, so their food cannot give a density. We give
-   them fixed values instead, from three sources:
+   them fixed values instead, mostly from two sources:
    a. FAO's 2024 nutrient conversion table, where it has the item: the cereal brans, centrifugal cane sugar and
-      tallow.
+      tallow. Acid oils from refining, which the table does not have, take its value for palm oil (898 kcal per
+      100 g), the oil they are mostly removed from.
    b. Feedipedia, for the oilseed cakes and gluten feed that FAO's table does not cover. Feedipedia collects the feed
       tables of INRAE, CIRAD, AFZ and FAO. Each item takes the composition of one matching table, converted to energy
       with the formula FAO uses for its own table: 4 kcal per gram of protein, 9 per gram of fat, 4 per gram of
       available carbohydrate and 2 per gram of fibre. That puts each cake on the same footing as the crop and the oil
       it comes from. Soybean cake, for example, gets 307 kcal and 43.4 g of protein per 100 g, from Feedipedia's
       soybean meal of 44% to 46% protein: the type that includes the hulls, as SCL's crushing yields imply.
-   c. Uncited values, for a few minor items with no single published composition.
    The values, their sources and the arithmetic are in `food_supply_chain_scl.items.yml`.
 
    Listed items always use their fixed densities, so that a few hundred tonnes of soybean cake eaten somewhere cannot

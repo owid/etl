@@ -18,8 +18,9 @@
 #      extract. Dietary fibre is neutral detergent fibre (NDF), or crude fibre where the table publishes no NDF
 #      (safflower and mustard cake). Feedipedia marks the NDF of several tables as predicted rather than measured.
 #    - Chemically modified fats (item 1274): FAOSTAT SCL's own food observation.
+#    - Acid oils from refining (item 1276): FAO's density for palm oil.
 #    Items without a single published composition keep the values of the previous version of this file, and say so:
-#    the two cake patterns, bran of pulses, hempseed, and the fat residues 1276 and 1277.
+#    the two cake patterns, bran of pulses, hempseed, and residues of fatty substances (item 1277).
 fixed_densities:
   families:
     # Applied by name pattern to every item whose name starts with the pattern, unless the item is listed
@@ -191,11 +192,14 @@ fixed_densities:
     # Not from a single published composition; kept from the previous version of this file.
     # - Bran of pulses: USDA's crude wheat bran (216 kcal, 15.6 g) as a proxy. FAO's table has no pulse bran, and
     #   Feedipedia has chickpea and lentil bran but not the pea bran that the largest producers make.
-    # - Fat residues 1276 and 1277: 884 kcal and no protein; no documented composition was found.
+    # - Residues of fatty substances (1277): 884 kcal and no protein; no documented composition was found.
     # - Hempseed: equal to USDA's hulled hemp seed (553 kcal, 31.6 g), not a composition of the whole seed that SCL
     #   records.
     - {code: 213, name: Bran of pulses, energy: 216, protein: 15.6, note: Not from a single published composition; USDA wheat-bran proxy.}
-    - {code: 1276, name: "Industrial monocarboxylic fatty acids; acid oils from refining", energy: 884, protein: 0, note: "Fat that left the food chain to industry; not from a single published composition."}
+    # Acid oils from refining (1276) are the fatty acids removed from crude oils, mostly palm oil, when they are
+    # refined. FAO's table has no entry for them; they take FAO's density for palm oil in the SCL food data (its 2024
+    # nutrient conversion table times the edible-portion coefficient): 898 kcal and no protein per 100 g.
+    - {code: 1276, name: "Industrial monocarboxylic fatty acids; acid oils from refining", energy: 898, protein: 0, note: "FAO's density for palm oil (2024 nutrient conversion table)."}
     - {code: 1277, name: "Residues of fatty substances", energy: 884, protein: 0, note: "Not from a single published composition."}
     - {code: 336, name: "Hempseed", energy: 553, protein: 31.6, note: "Not from a single published composition; USDA hulled hemp seed."}
 
