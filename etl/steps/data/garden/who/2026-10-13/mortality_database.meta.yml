@@ -51,22 +51,25 @@ definitions:
       ("Other malignant neoplasms", "Cancers"),
     ] %><% for c, label in layers %><% if c == cause %><< label >> › <% endif %><% endfor %>
 
-  # NOTE: Public titles and short descriptions, per metric. Self-inflicted injuries keep the wording its former
-  # dataset carried (an editorial choice made there), including the dimension suffix readers see today; every
-  # other cause uses the family's sentence.
-  title_public_number: |-
+  # NOTE: Display names and short descriptions, per metric. The display name is the sentence readers see as the
+  # indicator's title (data page, the chart's "learn more" panel when the chart sets no label of its own, table
+  # headers); it goes in `display.name`, not `presentation.title_public`, because grapher lets a public title
+  # override the chart's own labels in that panel, while a display name yields to them. Self-inflicted injuries
+  # keep the wording its former dataset carried (an editorial choice made there), including the dimension suffix
+  # readers see today; every other cause uses the family's sentence.
+  display_name_number: |-
     <% if cause == "Self-inflicted injuries" %>Number of deaths from self-inflicted injuries - Sex: << sex >> - Age group: << age_group >><% else %>Deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >><% endif %>
   description_short_number: |-
     <% if cause == "Self-inflicted injuries" %>Number of deaths from self-inflicted injuries in the total population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Reported total deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >>.<% endif %>
-  title_public_death_rate: |-
+  display_name_death_rate: |-
     <% if cause == "Self-inflicted injuries" %>Death rate from self-inflicted injuries per 100,000 population - Sex: << sex >> - Age group: << age_group >><% else %>Deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >><% endif %>
   description_short_death_rate: |-
     <% if cause == "Self-inflicted injuries" %>Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Reported deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >>.<% endif %>
-  title_public_share: |-
+  display_name_share: |-
     <% if cause == "Self-inflicted injuries" %>Percentage of deaths from self-inflicted injuries out of total deaths - Sex: << sex >> - Age group: << age_group >><% else %>Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}<% endif %>
   description_short_share: |-
     <% if cause == "Self-inflicted injuries" %>Percentage of deaths from self-inflicted injuries out of all deaths in the population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Share of total reported deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}.<% endif %>
-  title_public_asr: |-
+  display_name_asr: |-
     <% if cause == "Self-inflicted injuries" %>Age-standardized death rate from self-inflicted injuries per 100,000 population - Sex: << sex >> - Age group: << age_group >><% else %>Age-standardized deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people<% endif %>
   description_short_asr: |-
     <% if cause == "Self-inflicted injuries" %>Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates. To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<% else %>Reported deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people.<% endif %>
@@ -297,11 +300,11 @@ tables:
           {definitions.description_processing_unintentional_injuries}{definitions.description_processing_derived_age_group_count}
         unit: deaths
         display:
+          name: "{definitions.display_name_number}"
           numDecimalPlaces: 0
           entityAnnotationsMap: |-
             {definitions.annotation}
         presentation:
-          title_public: "{definitions.title_public_number}"
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
@@ -317,9 +320,9 @@ tables:
         unit: "%"
         short_unit: "%"
         display:
+          name: "{definitions.display_name_share}"
           numDecimalPlaces: 1
         presentation:
-          title_public: "{definitions.title_public_share}"
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
@@ -334,11 +337,11 @@ tables:
           {definitions.description_processing_unintentional_injuries}
         unit: deaths per 100,000 people
         display:
+          name: "{definitions.display_name_asr}"
           numDecimalPlaces: 1
           entityAnnotationsMap: |-
             {definitions.annotation}
         presentation:
-          title_public: "{definitions.title_public_asr}"
           grapher_config:
             note: |-
               To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized). All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
@@ -353,11 +356,11 @@ tables:
           {definitions.description_processing_unintentional_injuries}{definitions.description_processing_derived_age_group_rate}
         unit: deaths per 100,000 people
         display:
+          name: "{definitions.display_name_death_rate}"
           numDecimalPlaces: 1
           entityAnnotationsMap: |-
             {definitions.annotation}
         presentation:
-          title_public: "{definitions.title_public_death_rate}"
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
