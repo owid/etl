@@ -62,11 +62,6 @@ ASK = "*Is this a real error, or is the chart fine?*"
 # How the channel closes a post, and why an unticked finding is not a lost one.
 TICK = ":white_check_mark:  Tick when it's been checked."
 
-# On every finding rather than once in the lead. The lead says what the sweep was; this says what
-# the claim is worth, and it is the finding that gets forwarded, quoted and replied to on its own.
-# Plain italics, no nested code span: Slack mrkdwn renders nested formatting unreliably.
-CAVEAT = "_A chart-critic claim to check, not a confirmed error._"
-
 # What a person reads over coffee, and now also what a low-traffic channel can absorb:
 # #chart-reviews carries two or three posts a day with one default reviewer, and a finding held
 # back is not dropped — it is not stamped either, so it comes back tomorrow if it still stands.
@@ -483,7 +478,7 @@ def _format_finding(
 ) -> DigestMessage:
     """One finding as its own message, in the shape #analytics-bites uses: the chart's title as
     its live link, the question and who is being asked it, the claim, the chart, and a muted
-    footer with the facts, the edit link and the tick — with the evidence in the thread.
+    footer with the facts, the links and the tick — with the evidence in the thread.
 
     Self-contained on purpose. It is read next to the lead message but it is also what someone
     quotes, forwards or replies to on its own, so it carries the link, the edit action and — the
@@ -509,10 +504,11 @@ def _format_finding(
     footer = [f"{dot} {issue.get('severity', 'low')}", f"{issue.get('kind', 'chart')}-level"]
     if views := format_views(result.get("views")):
         footer.append(views)
+    footer.append(f":chart_with_upwards_trend: <{url}|View live chart>")
     # A multi-dim view has no chart id, so it gets no edit link — there is no single chart to edit.
     if chart_id := chart.get("chart_id"):
         footer.append(f":pencil2: <{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit in admin>")
-    footer += [TICK, CAVEAT]
+    footer.append(TICK)
     footer_text = "   ·   ".join(footer)
 
     thumbnail = _thumbnail(url)

@@ -100,8 +100,9 @@ def test_a_finding_is_laid_out_like_analytics_bites():
     assert "Something is off." in section["text"]["text"]
     assert image["image_url"] == "https://ourworldindata.org/grapher/thumbnail/a.png"
     footer = context["elements"][0]["text"]
-    assert "medium" in footer and "10 views/day" in footer and "Edit in admin" in footer
-    assert footer.endswith(digest.CAVEAT)
+    assert "medium" in footer and "10 views/day" in footer
+    assert "View live chart" in footer and "Edit in admin" in footer
+    assert footer.endswith(digest.TICK)
 
 
 def test_the_digest_file_shows_the_split_the_channel_will_see():
