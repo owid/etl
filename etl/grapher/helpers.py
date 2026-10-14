@@ -866,8 +866,6 @@ def _validate_annotations(tab: Table, col: str, entity_times: pd.DataFrame) -> N
     )
     rows = entity_times[tab[col].notna().to_numpy()]
     entities = set(rows["country"])
-    # Annotations only support yearly data for now
-    yearly = "year" in rows and display.get("timeInterval") not in SUB_YEARLY_TIME_INTERVALS
     flattened = not set(tab.index.names) - {"country", "year", "date", None}
     for annotation in meta.annotations:
         assert not (annotation.dimensions and flattened), (
@@ -878,14 +876,28 @@ def _validate_annotations(tab: Table, col: str, entity_times: pd.DataFrame) -> N
         assert not missing, f"Annotation of column `{col}` names entities without data {missing}: {annotation.text!r}"
         times = [t for t in (annotation.time, annotation.time_end) if t is not None]
         if times:
-            assert yearly, (
-                f"Annotation of column `{col}` sets a time, but only yearly data is supported: {annotation.text!r}"
+            first, last = _time_range(rows, display)
+            yearly = not isinstance(first, str)
+            assert all(isinstance(t, str) != yearly for t in times), (
+                f"Annotation of column `{col}` must give its time as a {'year' if yearly else 'YYYY-MM-DD date'}, "
+                f"like the column's data: {annotation.text!r}"
             )
-            first, last = rows["year"].min(), rows["year"].max()
             assert all(first <= t <= last for t in times), (
-                f"Annotation of column `{col}` has time {times} outside the years with data ({first}-{last}): "
+                f"Annotation of column `{col}` has time {times} outside the column's data ({first} to {last}): "
                 f"{annotation.text!r}"
             )
+
+
+def _time_range(rows: pd.DataFrame, display: dict[str, Any]) -> tuple[Any, Any]:
+    """First and last time of some rows, as years, or as YYYY-MM-DD dates for sub-yearly data."""
+    if "year" in rows and display.get("timeInterval") not in SUB_YEARLY_TIME_INTERVALS:
+        return rows["year"].min(), rows["year"].max()
+    if "year" in rows:
+        # Sub-yearly data already converted to days since zeroDay
+        dates = pd.Timestamp(display["zeroDay"]) + pd.to_timedelta(rows["year"], unit="D")
+    else:
+        dates = pd.to_datetime(rows["date"])
+    return dates.min().date().isoformat(), dates.max().date().isoformat()
 
 
 def _validate_grapher_config(tab: Table, col: str) -> None:

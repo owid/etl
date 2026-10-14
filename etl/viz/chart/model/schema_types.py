@@ -112,9 +112,9 @@ class AnnotationsConfig(TypedDict, total=False):
     entities: list[str]
     # Text of the note, in markdown (links are allowed).
     text: str
-    # Year the note applies to, or the first year of a range. A string is only for a year injected with `yaml_params`, e.g. `"{LATEST_YEAR}"`.
+    # Year (e.g. `2003`) or date (e.g. `2020-03-15`) the note applies to, or the start of a range. A year can also be injected with `yaml_params`, e.g. `"{LATEST_YEAR}"`.
     time: int | str
-    # Last year of the range that starts at `time`.
+    # End of the range that starts at `time`, in the same form.
     time_end: int | str
 
 
@@ -398,7 +398,7 @@ ViewConfig.__annotations__.update(
 class ViewMetadata(TypedDict, total=False):
     """View metadata options based on dataset schema."""
 
-    # Short notes shown on charts of the indicator, each optionally tied to some entities and to a year or a range of years.
+    # Short notes shown on charts of the indicator, each optionally tied to some entities and to a point or range in time.
     annotations: list[AnnotationsConfig]
     # Description of the indicator written by the producer, if any was given.
     description_from_producer: str

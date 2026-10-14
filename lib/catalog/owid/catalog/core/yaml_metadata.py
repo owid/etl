@@ -1,5 +1,4 @@
 import io
-import re
 from functools import cache
 from pathlib import Path
 from typing import Any, Literal
@@ -275,16 +274,11 @@ def _validate_variables_all_miss(t_annot: dict, tb: Table) -> None:
 
 
 def _validate_annotation_dict(annotation: dict[str, Any], variable: str) -> None:
-    """Catch mistakes that converting an annotation to an object would hide: a string in `entities` is split
-    into letters, and a time that is not a year is dropped."""
+    """Catch a string in `entities`, which converting the annotation to an object would split into letters."""
     if isinstance(annotation.get("entities"), str):
         raise TypeError(
             f"Annotation of variable {variable} must list its entities, e.g. `entities: [{annotation['entities']}]`."
         )
-    for key in ("time", "time_end"):
-        value = annotation.get(key)
-        if value is not None and not re.fullmatch(r"-?\d+", str(value)):
-            raise ValueError(f"Annotation of variable {variable} has `{key}: {value!r}`, but only years are supported.")
 
 
 def _flatten(lst: list[Any]) -> list[Any]:
