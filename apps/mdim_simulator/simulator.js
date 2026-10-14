@@ -1263,10 +1263,16 @@ function renderDims() {
         });
         row.append(picker);
       }
-      row.append(removeButton(`Remove the ${choice.name || "untitled"} option`, () => {
+      // A dropdown with no options has no combinations, which would drop every link, so its last option stays.
+      const removeOption = removeButton(`Remove the ${choice.name || "untitled"} option`, () => {
         dim.choices.splice(dim.choices.indexOf(choice), 1);
         structureChanged();
-      }));
+      });
+      if (dim.choices.length === 1) {
+        removeOption.disabled = true;
+        removeOption.title = "A dropdown needs at least one option";
+      }
+      row.append(removeOption);
       return row;
     };
     // `currentGroup` is read on click: a group can be renamed without the editor being redrawn.

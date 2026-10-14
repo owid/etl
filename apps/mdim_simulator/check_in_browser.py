@@ -356,6 +356,9 @@ def main() -> None:
         page.click("#add-dim")
         page.locator(".dim-head input").nth(1).fill("Sex")
         check("links survive a new dropdown", "2 linked" in page.inner_text("#panel-summary"))
+        # Its only option can't be removed: an empty dropdown would leave no combinations, and drop every link.
+        only_option = page.locator(".dim-card").nth(1).locator(".choice-row .btn-icon")
+        check("a dropdown's last option can't be removed", only_option.count() == 1 and only_option.is_disabled())
         page.locator(".dim-card").nth(1).locator("text=+ Add option").click()
         pick_option(page, 1, "Option 2")
         page.wait_for_timeout(500)

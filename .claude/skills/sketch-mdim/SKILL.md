@@ -129,9 +129,12 @@ mechanics, not for the conversation:
   the review and the merge. Never ask them to run a command, or to understand the DAG, catalog paths, YAML or git.
 - **Ask only what they can answer,** as plain multiple-choice questions, all at once. Work out everything else
   yourself, and if you had to guess, say what you guessed.
-- **Report progress in terms of what they'll see,** not as a log of commands.
+- **Talk only about the MDim and what they'll see,** in every message, including the last one and anything
+  left open. Leave out how you got there: no branches, worktrees, commits, pushes, pull request numbers, file
+  paths, step names, commands or tool names. Say "the test site" for staging and "goes live" for publishing.
 - **If something technical fails, fix it.** Only bring them in when the choice is theirs, and explain it without
-  jargon.
+  jargon. How you do the work is never their choice: don't explain or ask about which commands you run, where
+  they run, or changes to this skill.
 
 ### 5a. Ask the questions up front, in one go
 
@@ -165,8 +168,8 @@ Turn the setup into the step with `/create-chart`. The setup is already in `viz:
 - **The comments at the end:** use the text changes against each indicator's original in the PR description.
   Changes suggested for an indicator everywhere go through `/edit-faust-metadata`, which checks the other charts
   using that indicator first.
-- **Check it builds:** `.venv/bin/etlr viz://chart/<namespace>/latest/<name>`, without `--grapher`. That
-  validates the config and the indicators without writing to any database, which most laptops don't have.
+- **Don't build it locally.** That pulls in the whole upstream chain, often with private datasets the laptop
+  can't download. Writing the MDim to staging in step 5c checks the config against the real indicators instead.
 - **To show the setup in the page again,** for example if they want to adjust it there, save it as
   `ai/mdim_simulator/<name>.setup.yml` and rebuild with `--setup`. The page reopens it exactly as it was copied.
 
@@ -178,7 +181,8 @@ Turn the setup into the step with `/create-chart`. The setup is already in `viz:
 3. Write the PR description. Start with the attribution line from `CLAUDE.md`. Then say what the MDim shows,
    that it was sketched in the MDim simulator, and the text changes from the setup.
 4. Once the PR's staging server is up, write the MDim to it straight away:
-   `STAGING=1 .venv/bin/etlr viz://chart/<namespace>/latest/<name> --grapher`.
+   `STAGING=1 .venv/bin/etlr viz://chart/<namespace>/latest/<name> --grapher`. This is also the check that the
+   step builds: judge it by the command's exit status, and fix any failure before going on.
 5. **One Codex review.**
    - Post a bare `@codex review` and wait for its verdict: a review with findings, a "Didn't find any major
      issues" comment, or a 👍 from the Codex bot.
@@ -202,8 +206,8 @@ until they say it looks right.**
 
 Check that the PR's tests have passed (`gh pr checks <number>`). Fix a failure that comes from the MDim. Retry
 one that doesn't, such as a test that timed out on a network call. Then run `gh pr ready <number>` and
-`gh pr merge <number> --squash`. Tell them it's merged, and that it takes about ten minutes to reach the live
-site's admin.
+`gh pr merge <number> --squash`. Tell them the MDim is on its way, and that it takes about ten minutes to reach
+the live site's admin.
 
 ### 5f. Publish it
 
