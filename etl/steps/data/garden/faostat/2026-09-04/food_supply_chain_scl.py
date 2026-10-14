@@ -151,15 +151,16 @@ Each assumption starts with a line on its scale: how much it changes the results
    So we value these eleven crops by their products. Each year, a crop's value is the nutrient in everything the
    world's factories make from it, divided by the tonnes of the crop that the world processes. That World value is
    applied to every country. Four rules define what counts:
-   a. Products that are processed further within the family are netted out, so they are not counted twice: copra,
-      for example, pressed into coconut oil.
+   a. Products that are processed further within the family would be counted twice: once as themselves, and again
+      as what they become. So the part that is processed further is subtracted. For example, the copra pressed into
+      coconut oil is subtracted, because its calories are already in the coconut oil.
    b. Each family ends at the first products made from the crop. What is made from those products later keeps its
       own density elsewhere in the chain, but does not change the crop's value:
-      - Sugar cane and sugar beet end at sugar and molasses. Raw sugar refined into white sugar is netted out, but
+      - Sugar cane and sugar beet end at sugar and molasses. Raw sugar refined into white sugar is subtracted, but
         refined sugar sent into drinks or sweets keeps its value as sugar. Sweets, syrups and flavored sugar are left
         out, because their other ingredients do not come from cane or beet.
       - Paddy rice ends at grain and bran products. Husked rice milled into grain, and bran pressed into oil and
-        cake, are netted out. Grain sent on to become broken rice, flour, starch or drinks keeps its value as grain.
+        cake, are subtracted. Grain sent on to become broken rice, flour, starch or drinks keeps its value as grain.
    c. Sugar cane and sugar beet share their products (raw and refined sugar, molasses), so they get one value
       together: 59 kcal per 100 g in 2023.
    d. Palm kernels are made from oil palm fruit and then crushed for their oil. So they are valued first, and the oil
@@ -464,8 +465,8 @@ ITEM_GROUP_ROLES = {
     "Livestock processed": "processed",
 }
 # The three item roles of assumption 8. The production of crops starts the chain as "crop_production", the
-# production of animal items is added back as "animal_products", and the production of processed items is netted
-# against "processing" to give "processing_net".
+# production of animal items is added back as "animal_products", and the production of processed items is
+# subtracted from "processing" to give "processing_net".
 ROLES = {"crop", "animal", "processed"}
 STAGES = [
     "crop_production",
@@ -693,15 +694,6 @@ def prepare_balance_table(tb: Table, roles: pd.Series, manual: dict) -> Table:
     return tb[BALANCE_COLUMNS + ["population"]]
 
 
-def drop_never_food_items(tb: Table, manual: dict) -> Table:
-    """Leave out the items that are never food, in all three tables.
-
-    Implements assumption 6.
-    """
-    never = [_pad_code(item["code"]) for item in manual["never_food"]]
-    return tb[~tb["item_code"].isin(never)].reset_index(drop=True)
-
-
 # --------------------------------------------------------------------------------------------------------------------
 # Fish from FBS (assumption 9).
 # --------------------------------------------------------------------------------------------------------------------
@@ -842,8 +834,8 @@ def product_implied_density(tb: Table, family: dict, nutrient: str) -> pd.Series
     intermediates = [_pad_code(c) for c in family["intermediates"]]
     members = tb[tb["item_code"].isin(crops + products)]
     made = (members["production"] * members["density"]).where(members["item_code"].isin(products), 0)
-    netted = (members["processing"] * members["density"]).where(members["item_code"].isin(intermediates), 0)
-    nutrient_out = (made - netted).groupby(members["year"]).sum() * HUNDRED_GRAMS_PER_TONNE
+    processed_further = (members["processing"] * members["density"]).where(members["item_code"].isin(intermediates), 0)
+    nutrient_out = (made - processed_further).groupby(members["year"]).sum() * HUNDRED_GRAMS_PER_TONNE
     tonnes_in = members["processing"].where(members["item_code"].isin(crops), 0).groupby(members["year"]).sum()
     years = sorted(set(tb["year"]))
     implied = (nutrient_out / (tonnes_in * HUNDRED_GRAMS_PER_TONNE)).reindex(years)
@@ -1166,7 +1158,8 @@ def run() -> None:
     # Assumption 1: the balance table, with missing elements as zero.
     tb = prepare_balance_table(tb_scl, roles=roles, manual=manual)
     # Assumption 6: items that are never food (fuel ethanol, castor, kapok...) are left out of all three tables.
-    tb = drop_never_food_items(tb, manual=manual)
+    never_food = [_pad_code(item["code"]) for item in manual["never_food"]]
+    tb = tb[~tb["item_code"].isin(never_food)].reset_index(drop=True)
     population = tb[["country", "year", "population"]].drop_duplicates()
     # Assumption 9: fish and seafood, taken from FBS.
     tb_fish = prepare_fish_table(tb_fbsc, manual=manual, population=population)
