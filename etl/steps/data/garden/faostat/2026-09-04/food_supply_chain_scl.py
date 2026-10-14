@@ -153,12 +153,13 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    and molasses: raw sugar processed into refined sugar is netted out, but refined sugar sent to drinks or sweets
    keeps its value as sugar. Mixed products (confectionery, flavored sugar and syrups) are left out of the density
    calculation, so their other ingredients are not attributed to cane and beet; they remain in the food chain.
+   Rice ends at grain and bran products (bran, oil and cake). Husked rice milled into grain, and bran pressed into
+   oil and cake, are netted out. Grain sent to make broken rice, flour, starch or drinks keeps its value as grain;
+   those later products remain in the food chain but are excluded from the crop's density calculation.
    Palm kernels are themselves made from oil palm fruit and then crushed for their oil; they are valued first,
    so that the oil palm fruit family counts its kernels at their new value. The families, their products and their
    order are in the items
    file, based on FAO's commodity trees (FAO 2000, Technical Conversion Factors for Agricultural Commodities).
-   Broken rice sent to beer and cereal preparations still reaches no listed product, which undervalues paddy by
-   about 1%.
 
 8. Roles: where each item's production enters the chain.
    >> Scale: major. Together with the densities, the roles are the shape of the chain: they decide which stage

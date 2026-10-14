@@ -236,6 +236,9 @@ never_food:
 #    refining inputs are netted out, but refined sugar sent into drinks and sweets keeps its value as sugar. Mixed
 #    downstream products (160, 167, 168) are excluded from this density calculation; their other ingredients cannot
 #    be attributed to cane and beet. They remain in the food chain with their own food-based densities.
+#    Rice ends at grain and bran products (bran, oil and cake). Husked rice milled into grain, and bran pressed into
+#    oil and cake, are netted out. Grain sent to make broken rice, flour, starch or drinks keeps its value as grain;
+#    those later products remain in the food chain but are excluded from the crop's density calculation.
 #    Families are read in the order below, and each family's values are used by the next ones: palm kernels, made
 #    from oil palm fruit, are valued before it, so that
 #    the oil palm fruit family counts its kernels at their new value.
@@ -244,8 +247,8 @@ output_implied_densities:
     products: {158: "Cane sugar, centrifugal", 162: "Raw cane or beet sugar (centrifugal only)", 163: "Cane sugar, non-centrifugal", 164: "Refined sugar", 165: "Molasses"}
     intermediates: {158: "Cane sugar, centrifugal", 162: "Raw cane or beet sugar (centrifugal only)"}
   - crops: {27: "Rice"}
-    products: {28: "Husked rice", 29: "Rice, milled (husked)", 31: "Rice, milled", 32: "Rice, broken", 34: "Starch of rice", 35: "Bran of rice", 36: "Oil of rice bran", 37: "Cake of rice bran", 38: "Flour of rice", 39: "Rice-fermented beverages"}
-    intermediates: {28: "Husked rice", 29: "Rice, milled (husked)", 31: "Rice, milled", 32: "Rice, broken", 35: "Bran of rice"}
+    products: {28: "Husked rice", 29: "Rice, milled (husked)", 31: "Rice, milled", 35: "Bran of rice", 36: "Oil of rice bran", 37: "Cake of rice bran"}
+    intermediates: {28: "Husked rice", 35: "Bran of rice"}
   - crops: {256: "Palm kernels"}
     products: {258: "Oil of palm kernel", 259: "Cake of palm kernel"}
     intermediates: {}

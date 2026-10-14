@@ -183,6 +183,39 @@ def test_scl_sugar_factor_keeps_sugar_sent_to_mixed_products(nutrient, densities
     np.testing.assert_allclose(SCL.product_implied_density(tb, family, nutrient), factor)
 
 
+@pytest.mark.parametrize(
+    "nutrient,densities,expected_factor",
+    [
+        ("energy", [0, 351, 349, 350, 393, 900, 252, 348, 355, 352, 110, 44, 370], 274.007),
+        ("protein", [0, 7.9, 7.1, 7.1, 13.4, 0, 15.219, 7, 0.04, 6.2, 0.4, 0.3, 6], 6.125004),
+    ],
+)
+def test_scl_rice_factor_keeps_grain_sent_for_further_processing(nutrient, densities, expected_factor):
+    # 100 tonnes of paddy make husked rice, milled rice and bran. Some husked rice is milled further, and some bran
+    # is pressed into oil and cake: both inputs must be netted out. Grain sent to broken rice, flour, starch or
+    # drinks keeps its grain value; those downstream products cannot change the crop's factor.
+    codes = [27, 28, 29, 31, 35, 36, 37, 32, 34, 38, 39, 51, 41]
+    tb = Table(
+        {
+            "country": ["Example"] * len(codes),
+            "year": [2023] * len(codes),
+            "item_code": [SCL._pad_code(code) for code in codes],
+            "production": [100, 20, 8.5, 50, 9, 0.3, 1.6, 19, 1.5, 2.5, 3, 10, 1],
+            "processing": [100, 10, 0.5, 20, 2, 0, 0, 8, 0, 0, 0, 0, 0],
+            "density": densities,
+        }
+    )
+    family = SCL.load_manual_inputs()["output_implied_densities"][1]
+    factor = SCL.product_implied_density(tb, family, nutrient)
+    np.testing.assert_allclose(factor, [expected_factor])
+    # Changing the downstream processing and product mix leaves the crop's factor unchanged.
+    grain = tb["item_code"].isin([SCL._pad_code(code) for code in [29, 31, 32]])
+    tb.loc[grain, "processing"] += 5
+    downstream = tb["item_code"].isin([SCL._pad_code(code) for code in [32, 34, 38, 39, 51, 41]])
+    tb.loc[downstream, "production"] *= 10
+    np.testing.assert_allclose(SCL.product_implied_density(tb, family, nutrient), factor)
+
+
 def _replaced_densities(step, nutrient: str, sources: list[str]) -> Table:
     # A reported nutrient next to each kind of density that is not the cell's own.
     tb = Table(
