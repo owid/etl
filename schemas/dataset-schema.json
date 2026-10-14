@@ -707,7 +707,7 @@
                 "annotations": {
                   "title": "Indicator's annotations",
                   "type": "array",
-                  "description": "Short notes shown on charts of the indicator, each optionally tied to some entities and to a year or a range of years.",
+                  "description": "Short notes shown on charts of the indicator, each optionally tied to some entities and to a point or range in time.",
                   "requirement_level": "optional",
                   "guidelines": [
                     [
@@ -717,7 +717,7 @@
                       "`time` alone is one year; with `time_end` it is a range of years. Omit both for a note on the whole series."
                     ],
                     [
-                      "Only yearly indicators support `time` and `time_end` for now."
+                      "Write times as years for yearly data, and as YYYY-MM-DD dates for daily, weekly, monthly or quarterly data."
                     ],
                     [
                       "Must not be combined with `display.entityAnnotationsMap` on the same indicator."
@@ -741,11 +741,13 @@
                       },
                       "time": {
                         "type": ["integer", "string"],
-                        "description": "Year the note applies to, or the first year of a range. A string is only for a year injected with `yaml_params`, e.g. `\"{LATEST_YEAR}\"`."
+                        "pattern": "^(-?\\d+|\\d{4}-\\d{2}-\\d{2}|\\{\\w+\\})$",
+                        "description": "Year (e.g. `2003`) or date (e.g. `2020-03-15`) the note applies to, or the start of a range. A year can also be injected with `yaml_params`, e.g. `\"{LATEST_YEAR}\"`."
                       },
                       "time_end": {
                         "type": ["integer", "string"],
-                        "description": "Last year of the range that starts at `time`."
+                        "pattern": "^(-?\\d+|\\d{4}-\\d{2}-\\d{2}|\\{\\w+\\})$",
+                        "description": "End of the range that starts at `time`, in the same form."
                       },
                       "dimensions": {
                         "type": "object",

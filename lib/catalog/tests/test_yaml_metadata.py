@@ -262,7 +262,14 @@ def test_update_metadata_from_yaml_annotations_entities_must_be_a_list(tmp_path)
         ym.update_metadata_from_yaml(Table({"a": [1, 2, 3]}), path, "test")
 
 
-def test_update_metadata_from_yaml_annotations_time_must_be_a_year(tmp_path):
-    path = _write_annotations_yaml(tmp_path, "          - {time: 2020-03-01, text: Note.}\n")
-    with pytest.raises(ValueError, match="only years are supported"):
+def test_update_metadata_from_yaml_annotations_dates(tmp_path):
+    path = _write_annotations_yaml(tmp_path, "          - {time: 2020-03-01, time_end: 2020-06-30, text: Note.}\n")
+    t = Table({"a": [1, 2, 3]})
+    ym.update_metadata_from_yaml(t, path, "test")
+    assert (t.a.m.annotations[0].time, t.a.m.annotations[0].time_end) == ("2020-03-01", "2020-06-30")
+
+
+def test_update_metadata_from_yaml_annotations_time_must_be_a_year_or_date(tmp_path):
+    path = _write_annotations_yaml(tmp_path, "          - {time: March 2020, text: Note.}\n")
+    with pytest.raises(ValueError, match="must be a year or a YYYY-MM-DD date"):
         ym.update_metadata_from_yaml(Table({"a": [1, 2, 3]}), path, "test")
