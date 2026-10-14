@@ -252,12 +252,21 @@ Key fields:
   while being far less visible (ETL warns when it does).
 - No top-level `title:`, `default_selection:` or `default_dimensions:` block — those exist only for multidim
   pages and are ignored for single charts.
-- **Single-indicator chart: put its FAUST in garden, not here.** Set `title`/`subtitle`/`note` in the
-  indicator's `presentation.grapher_config` and leave them out of `views[0].config`, which keeps only layout
-  (tab, chart type, map colors, selection). The chart inherits them, and so does any other chart, multidim or
-  explorer on that indicator, so make the edit through `edit-faust-metadata`, which reports those surfaces
-  before touching shared text. A chart with several y-indicators doesn't inherit (grapher turns inheritance
-  off), so its FAUST stays in the chart config. To check, read `chart_configs.config` in the staging DB.
+- **Single-indicator chart: configure it in garden, not here.** A chart that shows one indicator inherits
+  every field of that indicator's `presentation.grapher_config`, except `$schema`, `id`, `slug`, `version` and
+  `isPublished`. So put its FAUST (`title`, `subtitle`, `note`) and its settings (`originUrl`, `hasMapTab`,
+  `tab`, `chartTypes`, `map` with its `colorScale`, `yAxis`, `selectedEntityNames`, `selectedFacetStrategy`,
+  `addCountryMode`…) there, and leave `views[0].config` empty. Any other chart, multidim or explorer on that
+  indicator gets them too, so make the edit through `edit-faust-metadata`, which reports those surfaces before
+  touching shared text.
+  - Put settings shared by all indicators, such as `originUrl`, once in
+    `definitions.common.presentation.grapher_config`: it merges into each indicator's own `grapher_config`.
+    But a variable's `map` block replaces the common one instead of merging into it.
+  - A field set in the chart config overrides the inherited one, so keep only what is specific to this chart.
+  - When `title_public` isn't set, `grapher_config.title` also becomes the indicator's data page title.
+  - A chart with several y-indicators doesn't inherit (grapher turns inheritance off), so its FAUST and settings
+    stay in the chart config.
+  - To check, read `chart_configs.config` in the staging DB.
 
 ## Config YAML: multidim
 
