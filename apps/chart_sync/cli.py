@@ -177,7 +177,9 @@ def cli(
         with Session(target_engine) as target_session:
             # Get all chart diffs between source and target
             # NOTE: We're creating two paris of sessions here, it'd be nicer to only create a single one
-            cd_loader = ChartDiffsLoader(source_engine, target_engine, chart_ids=[chart_id] if chart_id else None)
+            cd_loader = ChartDiffsLoader(
+                source_engine, target_engine, chart_ids=[chart_id] if chart_id else None, source_env=source_env
+            )
             chart_diffs = cd_loader.get_diffs(
                 config=True,
                 tags=True,

@@ -79,10 +79,10 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
 
 
 def call_chart_diff(branch: str) -> pd.DataFrame:
-    source_engine = OWIDEnv.from_staging(branch).get_engine()
+    source_env = OWIDEnv.from_staging(branch)
     target_engine = production_or_master_engine()
 
-    df = ChartDiffsLoader(source_engine, target_engine).get_diffs_summary_df(
+    df = ChartDiffsLoader(source_env.get_engine(), target_engine, source_env=source_env).get_diffs_summary_df(
         config=True,
         metadata=True,
         data=True,
