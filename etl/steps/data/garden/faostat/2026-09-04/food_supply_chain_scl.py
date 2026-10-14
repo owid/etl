@@ -180,6 +180,9 @@ Each assumption starts with a line on its scale: how much it changes the results
       what goes into factories (the "processing" of all items) minus what comes out (the "production" of processed
       items). So it counts only the calories that enter factories and do not come back as food.
 
+   The role only decides where an item's production goes. Its uses (seed, losses, other uses, feed and processing)
+   go to their own stages, whatever the role.
+
    One override, in the items file: cotton seed counts as a crop. It comes from ginning seed cotton, but seed cotton
    is a fibre crop and not an SCL item, so cotton seed is the first point where the calories of the cotton harvest
    appear.
@@ -189,12 +192,10 @@ Each assumption starts with a line on its scale: how much it changes the results
    and 6 of the 43 g of protein); large for fishing nations.
 
    SCL has no fish or seafood, so we add the fish items of FBS for the countries and years that SCL covers. They go
-   through the same rules as any other item, with two differences in how we read them:
-   a. Stock variation is derived from FBS's domestic supply: production, plus imports, minus exports, minus domestic
-      supply.
-   b. FBS rounds its tonnes to the nearest 1,000 tonnes, which is too coarse to give a density in small countries. So
-      the food tonnes used for fish densities come from FBS's food per person per year, multiplied by population.
-      Calories and protein come from FBS's per-person figures in the same way.
+   through the same rules as any other item, with one difference in how we read them: FBS rounds its tonnes to the
+   nearest 1,000 tonnes, which is too coarse to give a density in small countries. So the food tonnes used for fish
+   densities come from FBS's food per person per year, multiplied by population. Calories and protein come from FBS's
+   per-person figures in the same way.
 
    FAO has carried most fish rows forward unchanged since 2019 to 2021: they are identical in 2021, 2022 and 2023 for
    186 of 198 countries. So the fish figures of recent years are older than the rest of the chain.
@@ -422,7 +423,7 @@ FBS_ELEMENTS = {
     "005511": "production",
     "005611": "imports",
     "005911": "exports",
-    "005301": "domestic_supply",
+    "005072": "stock_variation",
     "005527": "seed",
     "005123": "losses",
     "005154": "other_uses",
@@ -733,12 +734,11 @@ def prepare_fish_table(tb_fbsc: Table, manual: dict, population: Table) -> Table
         index=["country", "year", "item_code"], columns="element_code", values="value", join_column_levels_with="_"
     )
     tb = tb.rename(columns={code: name for code, name in FBS_ELEMENTS.items()})
-    for element in list(FBS_ELEMENTS.values()) + ["stock_variation"]:
+    for element in FBS_ELEMENTS.values():
         if element not in tb.columns:
             tb[element] = np.nan
     tonnes = [name for code, name in FBS_ELEMENTS.items() if code not in FBS_PER_CAPITA_ELEMENTS]
     tb[tonnes] = tb[tonnes].fillna(0)
-    tb["stock_variation"] = tb["production"] + tb["imports"] - tb["exports"] - tb["domestic_supply"]
     tb["fao_item"] = tb["item_code"].map({c: it["name"] for c, it in fish_items.items()})
     tb["role"] = tb["item_code"].map({c: it["role"] for c, it in fish_items.items()})
     # Only the countries and years SCL covers (the population table comes from the SCL rows). FBS tonnages are
