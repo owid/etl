@@ -231,7 +231,7 @@ def _check_metadata_lists_every_cause(tb_causes: Table) -> None:
     text = Path(__file__).with_suffix(".meta.yml").read_text()
     missing = {
         "icd10_codes": [c for c in tb_causes["cause"] if f'cause == "{c}"' not in text],
-        "cause_hierarchy": [c for c in tb_causes["cause"] if f'("{c}", ' not in text],
+        "cause_layer": [c for c in DRILL_DOWN_TABLES if f'("{c}", ' not in text],
     }
     assert not any(missing.values()), f"Causes missing from the metadata definitions: {missing}"
 

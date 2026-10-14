@@ -11,43 +11,32 @@ definitions:
   cause_in_text: |-
     <% if cause in ["Hepatitis B", "Japanese encephalitis"] %><< cause >><% else %><< cause.lower() >><% endif %>
 
-  # NOTE: Where each cause sits in WHO's tree, shown in brackets in the internal title: from the nearest group
-  # we ingest (or WHO's top-level group, when none is) down to the cause's parent. Mirrors CAUSE_TREE in the
-  # garden step, which fails the build if a cause is missing here. Empty for All Causes and its direct children.
-  cause_hierarchy: |-
+  # NOTE: Drill-down causes carry the label of the table they are published in at the front of the internal
+  # title, so the admin's flat list tells the layers apart; top-tier groups have no prefix. Mirrors
+  # DRILL_DOWN_TABLES in the garden step, which fails the build if a drill-down is missing here.
+  cause_layer: |-
+    <% set layers = [
+      ("Pertussis", "Vaccine-preventable diseases"),
+      ("Poliomyelitis", "Vaccine-preventable diseases"),
+      ("Diphtheria", "Vaccine-preventable diseases"),
+      ("Measles", "Vaccine-preventable diseases"),
+      ("Tetanus", "Vaccine-preventable diseases"),
+      ("Hepatitis B", "Vaccine-preventable diseases"),
+      ("Japanese encephalitis", "Vaccine-preventable diseases"),
+    ] %><% for c, label in layers %><% if c == cause %><< label >> › <% endif %><% endfor %>
+
+  # NOTE: Where each drill-down sits in WHO's tree, for the data page: the group we also publish that counts
+  # these deaths, and the intermediate WHO node when there is one. Renders empty for top-tier groups.
+  description_key_drill_down: |-
     <% set tree = [
-      ("All Causes", ""),
-      ("Infectious and parasitic diseases", "Communicable, maternal, perinatal and nutritional conditions"),
-      ("Respiratory infections", "Communicable, maternal, perinatal and nutritional conditions"),
-      ("Maternal conditions", "Communicable, maternal, perinatal and nutritional conditions"),
-      ("Perinatal conditions", "Communicable, maternal, perinatal and nutritional conditions"),
-      ("Nutritional deficiencies", "Communicable, maternal, perinatal and nutritional conditions"),
-      ("Malignant neoplasms", "Noncommunicable diseases"),
-      ("Other neoplasms", "Noncommunicable diseases"),
-      ("Diabetes mellitus, blood and endocrine disorders", "Noncommunicable diseases"),
-      ("Neuropsychiatric conditions", "Noncommunicable diseases"),
-      ("Sense organ diseases", "Noncommunicable diseases"),
-      ("Cardiovascular diseases", "Noncommunicable diseases"),
-      ("Respiratory diseases", "Noncommunicable diseases"),
-      ("Digestive diseases", "Noncommunicable diseases"),
-      ("Genitourinary diseases", "Noncommunicable diseases"),
-      ("Skin diseases", "Noncommunicable diseases"),
-      ("Musculoskeletal diseases", "Noncommunicable diseases"),
-      ("Congenital anomalies", "Noncommunicable diseases"),
-      ("Oral conditions", "Noncommunicable diseases"),
-      ("Sudden infant death syndrome", "Noncommunicable diseases"),
-      ("Unintentional injuries", "Injuries"),
-      ("Intentional injuries", "Injuries"),
-      ("Ill-defined injuries", "Injuries"),
-      ("Ill-defined diseases", ""),
-      ("Pertussis", "Infectious and parasitic diseases › Childhood-cluster diseases"),
-      ("Poliomyelitis", "Infectious and parasitic diseases › Childhood-cluster diseases"),
-      ("Diphtheria", "Infectious and parasitic diseases › Childhood-cluster diseases"),
-      ("Measles", "Infectious and parasitic diseases › Childhood-cluster diseases"),
-      ("Tetanus", "Infectious and parasitic diseases › Childhood-cluster diseases"),
-      ("Hepatitis B", "Infectious and parasitic diseases"),
-      ("Japanese encephalitis", "Infectious and parasitic diseases"),
-    ] %><% for c, p in tree %><% if c == cause and p %> (<< p >>)<% endif %><% endfor %>
+      ("Pertussis", "infectious and parasitic diseases", "childhood-cluster diseases"),
+      ("Poliomyelitis", "infectious and parasitic diseases", "childhood-cluster diseases"),
+      ("Diphtheria", "infectious and parasitic diseases", "childhood-cluster diseases"),
+      ("Measles", "infectious and parasitic diseases", "childhood-cluster diseases"),
+      ("Tetanus", "infectious and parasitic diseases", "childhood-cluster diseases"),
+      ("Hepatitis B", "infectious and parasitic diseases", ""),
+      ("Japanese encephalitis", "infectious and parasitic diseases", ""),
+    ] %><% for c, group, sub in tree %><% if c == cause %>WHO counts {definitions.cause_in_text} within << group >><% if sub %>, as part of << sub >><% endif %>; these deaths are also included in that group's totals.<% endif %><% endfor %>
 
   # NOTE: The ICD-10 codes below must match the `causes` table this step builds from WHO's own export
   # headers (`icd10_codes` column). They are repeated here because indicator text is rendered per
@@ -200,10 +189,11 @@ tables:
   mortality_database:
     variables: &fact_variables
       number:
-        title: "<< cause >>{definitions.cause_hierarchy} — Deaths — << sex >>, << age_group >>"
+        title: "{definitions.cause_layer}<< cause >> — Deaths — << sex >>, << age_group >>"
         description_short: Reported total deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >>.
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
+          - "{definitions.description_key_drill_down}"
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
@@ -219,10 +209,11 @@ tables:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
       percentage_of_cause_specific_deaths_out_of_total_deaths:
-        title: "<< cause >>{definitions.cause_hierarchy} — Share of total deaths — << sex >>, << age_group >>"
+        title: "{definitions.cause_layer}<< cause >> — Share of total deaths — << sex >>, << age_group >>"
         description_short: Share of total reported deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}.
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
+          - "{definitions.description_key_drill_down}"
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
@@ -237,10 +228,11 @@ tables:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
       age_standardized_death_rate_per_100_000_standard_population:
-        title: "<< cause >>{definitions.cause_hierarchy} — Age-standardized death rate per 100,000 people — << sex >>, << age_group >>"
+        title: "{definitions.cause_layer}<< cause >> — Age-standardized death rate per 100,000 people — << sex >>, << age_group >>"
         description_short: Reported deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people.
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
+          - "{definitions.description_key_drill_down}"
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
@@ -256,10 +248,11 @@ tables:
             note: |-
               To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized). All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
       death_rate_per_100_000_population:
-        title: "<< cause >>{definitions.cause_hierarchy} — Death rate per 100,000 people — << sex >>, << age_group >>"
+        title: "{definitions.cause_layer}<< cause >> — Death rate per 100,000 people — << sex >>, << age_group >>"
         description_short: Reported deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >>.
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
+          - "{definitions.description_key_drill_down}"
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
