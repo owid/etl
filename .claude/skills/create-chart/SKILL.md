@@ -222,6 +222,7 @@ views:
     indicators:
       y:
         - catalogPath: "<dataset_short_name>#<indicator_short_name>"
+    # Single-indicator chart: leave `config` out and set these in garden (see below).
     config:
       title: "Your chart title"
       subtitle: "One-line context for the chart."
@@ -266,7 +267,9 @@ Key fields:
   - When `title_public` isn't set, `grapher_config.title` also becomes the indicator's data page title.
   - A chart with several y-indicators doesn't inherit (grapher turns inheritance off), so its FAUST and settings
     stay in the chart config.
-  - To check, read `chart_configs.config` in the staging DB.
+  - To check, read `charts.isInheritanceEnabled` and the chart's own layers on staging (the `chart_configs`
+    rows named by `charts.patchConfigIdETL` and `charts.patchConfigId`), not the rendered config, where an
+    override looks the same as an inherited value.
 
 ## Config YAML: multidim
 
