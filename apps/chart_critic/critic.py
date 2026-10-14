@@ -22,11 +22,14 @@ The prompt is doing the work here, so what it must contain is worth stating:
    stated as a rule about the metadata and not as a list of cases: an earlier draft named the
    Central African Republic here, which suppressed that one chart by name and would have taught
    nothing about the next one.
-6. **The one case that is named.** The post-Soviet break in producers' aggregates is not a false
-   positive — the 1992 step really is there and really does mislead — but it is in the source, in
-   every aggregate built from it, and the answer every time it is raised is that nothing will be
-   done. It is named exactly because the rule above would be the wrong shape for it: generalising
-   it to coverage discontinuities at large would silence the ones we did cause and could fix.
+6. **The cases that are named.** Each is a real defect, not a false positive, where the answer
+   every time it is raised is that nothing will be done. The post-Soviet break in producers'
+   aggregates: the 1992 step really is there and really does mislead, but it is in the source and in
+   every aggregate built from it. Line labels that drift onto a neighbouring line on a chart with
+   many lines: Grapher packs end-of-line labels so they don't overlap, and with a line per year
+   there is no layout that keeps each label beside its own line. They are named exactly because
+   the rule above would be the wrong shape for them: generalising either to its class at large
+   (coverage discontinuities, rendering defects) would silence the ones we did cause and could fix.
 
 What this catches that statistical detection cannot: an error that is stable over time and
 statistically unremarkable, where the only tell is knowing something about the world. The
@@ -151,6 +154,11 @@ it: producers' world and regional aggregates exclude the Soviet Union before 199
 successor states from 1992 onwards, so a global or European series can step up around 1991-1992.
 Say nothing about that step. This covers the post-Soviet coverage break and nothing else — any
 other change in which countries a series covers is still worth flagging.
+
+The same goes for line labels on a chart with many lines, such as one line per year. Grapher
+moves the labels at the end of the lines apart so they don't overlap, so some end up beside a
+neighbouring line instead of their own. Say nothing about where those labels sit. Everything else
+on such a chart is still yours to judge, including a label for a series that shouldn't be there.
 
 For each issue, set chart_params to the grapher query parameters that put the problem on
 screen — the entity and time range you are talking about — so a reviewer sees it immediately
