@@ -53,6 +53,7 @@ def _upsert_check(selected, entities_in_production, upserted):
     check = es.UpsertPinsCheck(engine=mock.MagicMock(), dataset_id=1)
     check.charts = [es.ChartPins(chart_id=10, slug="hib-vaccine", config=_config(selected))]
     check.catalog_paths = {1: "grapher/who/latest/vaccination#hib3"}
+    check.tracked_paths = {"grapher/who/latest/vaccination#hib3"}
     check.entities_in_production = {1: entities_in_production}
     check.add("grapher/who/latest/vaccination#hib3", _table(upserted))
     return check

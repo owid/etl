@@ -27,6 +27,7 @@ from etl.grapher.entity_selection import (
     dead_selected_entities,
     fetch_entities_with_data,
     format_dead_entities,
+    renders_selection,
 )
 from etl.io import get_all_changed_catalog_paths
 
@@ -807,7 +808,7 @@ class ChartDiff:
         variable_ids = [
             variable_id
             for config in configs.values()
-            if config.get("selectedEntityNames")
+            if renders_selection(config)
             for variable_id in chart_variable_ids(config)
         ]
         if not variable_ids:

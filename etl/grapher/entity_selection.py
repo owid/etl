@@ -30,23 +30,27 @@ log = get_logger()
 EntitiesByVariable = dict[int, set[str] | None]
 
 
-def chart_variable_ids(config: dict[str, Any]) -> list[int]:
+def chart_variable_ids(chart_config: dict[str, Any]) -> list[int]:
     """Indicators whose entities a chart's selection is drawn from: its y dimensions, or all dimensions if it has none."""
-    dimensions = config.get("dimensions") or []
+    dimensions = chart_config.get("dimensions") or []
     y_ids = [d["variableId"] for d in dimensions if d.get("property") == "y"]
     return y_ids or [d["variableId"] for d in dimensions]
 
 
-def dead_selected_entities(config: dict[str, Any], entities_by_variable: EntitiesByVariable) -> list[str] | None:
+def renders_selection(chart_config: dict[str, Any]) -> bool:
+    """Whether the chart has a selection that renders. Map-only charts (`chartTypes: []`) never render it."""
+    return bool(chart_config.get("selectedEntityNames")) and chart_config.get("chartTypes") != []
+
+
+def dead_selected_entities(chart_config: dict[str, Any], entities_by_variable: EntitiesByVariable) -> list[str] | None:
     """Entities in `selectedEntityNames` that have no data in any of the chart's indicators.
 
     Returns None when availability is unknown for one of the chart's indicators.
     """
-    selected = config.get("selectedEntityNames") or []
-    # Map-only charts (`chartTypes: []`) never render the selection.
-    if not selected or config.get("chartTypes") == []:
+    if not renders_selection(chart_config):
         return []
-    variable_ids = chart_variable_ids(config)
+    selected = chart_config["selectedEntityNames"]
+    variable_ids = chart_variable_ids(chart_config)
     if not variable_ids:
         return []
     with_data: set[str] = set()
@@ -110,6 +114,7 @@ class UpsertPinsCheck:
         self.charts: list[ChartPins] = []
         # Variable ids of the charts' indicators in this environment, mapped to their catalog paths.
         self.catalog_paths: dict[int, str] = {}
+        self.tracked_paths: set[str] = set()
         self.entities_in_production: EntitiesByVariable = {}
         # Entities with data of the indicators being upserted, by catalog path.
         self.upserted_entities: dict[str, set[str]] = {}
@@ -127,10 +132,11 @@ class UpsertPinsCheck:
         AND JSON_LENGTH(cc.config, '$.selectedEntityNames') > 0
         """
         df = read_sql(q, engine=self.engine, params={"dataset_id": self.dataset_id})
-        self.charts = [
+        charts = [
             ChartPins(chart_id=int(row.id), slug=str(row.slug), config=json.loads(str(row.config)))
             for row in df.itertuples()
         ]
+        self.charts = [chart for chart in charts if renders_selection(chart.config)]
         variable_ids = sorted({v for chart in self.charts for v in chart_variable_ids(chart.config)})
         if not variable_ids:
             return
@@ -141,13 +147,14 @@ class UpsertPinsCheck:
             params={"ids": tuple(variable_ids)},
         )
         self.catalog_paths = {int(row.id): str(row.catalogPath) for row in df.itertuples() if row.catalogPath}
+        self.tracked_paths = set(self.catalog_paths.values())
 
         # Production ids of the same indicators (ids minted on staging don't exist in production, or name another one)
         production_env = production_or_master_env()
         try:
             df = read_sql(
                 "SELECT id, catalogPath FROM variables WHERE catalogPath IN %(paths)s",
-                engine=production_env.get_engine(),
+                engine=production_env.engine,
                 params={"paths": tuple(self.catalog_paths.values()) or ("",)},
             )
         except (OperationalError, StagingServerUnavailable) as e:
@@ -163,7 +170,7 @@ class UpsertPinsCheck:
         }
 
     def add(self, catalog_path: str, table: Table) -> None:
-        if catalog_path in self.catalog_paths.values():
+        if catalog_path in self.tracked_paths:
             self.upserted_entities[catalog_path] = set(table.index.get_level_values("entityName"))
 
     def run(self) -> None:
