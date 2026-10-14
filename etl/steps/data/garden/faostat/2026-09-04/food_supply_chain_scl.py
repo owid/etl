@@ -38,16 +38,14 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
 ----------------------------------------
 Each assumption starts with a line on its scale: how much it changes the results.
 
-1. The balance identity.
+1. For each item, supply equals the sum of its uses, in tonnes.
    >> Scale: major. The identity is the backbone of every table.
 
    For every item, country and year, SCL reports, in tonnes:
        production + imports - exports - stock variation
          = food + feed + seed + processing + other uses + losses + tourist consumption + residuals.
 
-   The step checks that the identity is fulfiled item by item.
-
-2. Missing elements are treated as zero.
+2. An element that SCL does not report is zero.
    >> Scale: minor. It changes no values; it only lets the identity be checked for every item.
 
    When SCL does not report an element for an item, we treat it as zero. This is safe for two reasons:
@@ -55,7 +53,7 @@ Each assumption starts with a line on its scale: how much it changes the results
       apply to the item, not lost data.
    b. If a real value were missing, the item's balance would not close. The step is set to fail if more than 1% of the item balances does not close.
 
-3. Densities: how tonnes become calories and protein.
+3. Densities are calculated from FAO's own food figures, and food keeps the calories and protein that FAO reports.
    >> Scale: major. These densities convert every stage except food.
 
    SCL reports every element in tonnes. Food is the exception: it is also reported in calories (the element
@@ -68,8 +66,8 @@ Each assumption starts with a line on its scale: how much it changes the results
    conversion table times the item's edible-portion coefficient, the share of the item that people eat:
    https://www.fao.org/food-composition/tables-and-databases/detail/global-nutrient-conversion-table-for-fao-supply-utilization-accounts/en
 
-   FAO uses one factor per item in every country and year: for example, 334 kcal per 100 g for wheat grain, 348 for
-   maize and 64 for potatoes. There are only nine exceptions to this: those nine items have a factor of their own in a few countries, such as potatoes in Peru (91 kcal per 100 g, instead of the usual 64 kcal) and milled rice in Bangladesh (360, instead of 349).
+   FAO uses one density per item in every country and year: for example, 334 kcal per 100 g for wheat grain, 348 for
+   maize and 64 for potatoes. There are only nine exceptions to this: those nine items have a density of their own in a few countries, such as potatoes in Peru (91 kcal per 100 g, instead of the usual 64 kcal) and milled rice in Bangladesh (360, instead of 349).
 
    We use that density to convert all other elements of an item: production, imports, exports, stock variation, seed,
    losses, other uses, processing, feed, tourist consumption, and residuals.
@@ -81,45 +79,32 @@ Each assumption starts with a line on its scale: how much it changes the results
    The mass table does not need any densities: SCL already reports everything as mass, and we only convert tonnes to
    kilograms.
 
-4. One factor per country and item, read over all years.
-   >> Scale: minor. A country's own factor converts 49% of tonnage, and fish by year (assumption 5) another 1.5%.
-   The item's factor over all countries converts 22%: mostly grain that big producers record no food for, because
-   people eat it as flour and oil (maize, wheat and soybeans in the United States, China and Brazil). The rest uses
-   the fixed and product-based values of assumptions 6 and 7.
+4. Each item has one density, used in every country and year, except for nine country-specific densities.
+   >> Scale: minor. The item density is used for 90% of country-items (70% of tonnage). The nine country-specific
+   densities are used for 0.01% of country-items (0.3% of tonnage).
 
-   FAO's factor for an item in a country is the same every year, so we read it once: the country's food nutrient
-   divided by its food tonnes, both summed over all years. Three rules decide which years count and which factor
-   applies:
-   a. A year is left out if its food gives no usable ratio: no food, no reported nutrient, or a ratio above the
-      physical maximum (920 kcal per 100 g, the energy of pure fat, or 100 g of protein per 100 g). Ratios that high
-      only happen for quantities below a tonne, where FAO's rounding breaks the ratio.
-   b. A reported zero counts as zero, so an item with none of the nutrient gets a factor of zero (sugar and oils have
-      no protein).
-   c. A country that eats less than 1,000 tonnes of an item over all years gets the item's factor over all countries
-      instead.
+   FAO uses the same density for an item in every country and year. So each item gets one density: its food
+   nutrient divided by its food tonnes, both summed over all countries and all years.
 
-   The third rule matters for items that a country produces, trades or feeds to animals, but hardly eats. Without
-   it, a few kilograms of food would set the density of thousands of tonnes. For example, the only pig meat food that
-   FAO records for Nicaragua in 2010 to 2023 is 10 kg in 2022. Its reported calories give 100 kcal per 100 g, against
-   FAO's 237, and that density would have converted the 8,000 to 15,000 tonnes of pig meat that Nicaragua produces
-   each year.
+   FAO makes nine exceptions, which we list in the items file. Each of them uses its own density of each year, and is
+   left out of the item's sums.
 
-   Regions get no factors of their own (assumption 12).
+   When summing food, a year is left out if it has no food, no reported food nutrient, or a food nutrient above the
+   physical maximum (920 kcal per 100 g, which is the energy of pure fat, or 100 g of protein per 100 g). A food
+   nutrient above the physical maximum only happens when food is less than one tonne, because FAO rounds its figures.
 
-   A check stops the step if FAO's factor for an item in a country changes over the years for more than 0.01% of
-   food. In 2010 to 2023, only Namibia's skim milk does (from 23 to 36 kcal per 100 g), on 0.0003% of food.
+5. Fish get a different density each year.
+   >> Scale: minor. Fish carry 1.5% of tonnage.
 
-5. Fish keep a density for each year.
-   >> Scale: minor. Fish carry 1.5% of tonnage. For World in 2023, fish and fish oil are 46 of the 635 kcal per
-   person per day of animal products.
-
+   SCL does not have fish data, so we import it from FBS.
    FBS reports fish as groups, such as pelagic fish or demersal fish. The species in a group change from year to
    year, and so does the density: Iceland's pelagic fish ranges from 77 to 86 kcal per 100 g. So fish keep the
-   density of each year. A year with no usable food takes the country's factor over all years, whatever the tonnage.
+   density of each year. A year with no usable food takes the country's density over all years, whatever the tonnage,
+   and a country with no usable food of a fish group takes the item density of that group.
 
-6. Items nobody eats get fixed densities, and items that are never food are left out.
+6. Items that people hardly eat get fixed densities, and items that are never food are excluded.
    >> Scale: major for the stages "feed" and "processing_net". The fixed densities carry only 4.2% of tonnage, but
-   that tonnage is the oilseed cakes and brans, the main reason to use SCL at all.
+   that tonnage is the oilseed cakes and brans.
 
    Cakes, brans, gluten feed and oil refining residues are hardly eaten, so their food cannot give a density. We give
    them fixed values instead, from three sources:
@@ -131,16 +116,14 @@ Each assumption starts with a line on its scale: how much it changes the results
       available carbohydrate and 2 per gram of fibre. That puts each cake on the same footing as the crop and the oil
       it comes from. Soybean cake, for example, gets 307 kcal and 43.4 g of protein per 100 g, from Feedipedia's
       soybean meal of 44% to 46% protein: the type that includes the hulls, as SCL's crushing yields imply.
-   c. The values used before, for five entries with no single published composition: bran of pulses, hempseed, two
-      fat residues of oil refining, and the default for cakes not listed individually (which only reaches "Cake,
-      oilseeds nes").
-   Chemically modified fats use the factor of FAO's own food figure. The values, their sources and the arithmetic
+   c. Five entries have no single published composition and use uncited values: bran of pulses, hempseed, two fat
+      residues of oil refining, and the default for cakes not listed individually (which only reaches "Cake, oilseeds
+      nes").
+   Chemically modified fats use the density of FAO's own food figure. The values, their sources and the arithmetic
    are in `food_supply_chain_scl.items.yml`.
 
    Listed items always use their fixed densities, so that a few hundred tonnes of soybean cake eaten somewhere cannot
-   set the density of hundreds of millions of tonnes. Where at least 1% of an item's supply is eaten (wheat bran,
-   rice bran, tallow), a check confirms that FAO's food factor agrees with the fixed value; if it does not, the step
-   stops.
+   set the density of hundreds of millions of tonnes.
 
    Some items are never food in any form, so we leave them out of all three tables: castor, tung, kapok, jojoba,
    wool grease, cocoa husks, and fuel ethanol (undenatured alcohol of 80% or more).
@@ -155,16 +138,7 @@ Each assumption starts with a line on its scale: how much it changes the results
    c. The fuel that importing countries buy would enter their chain as imports (1,500 kcal per person per day in the
       Netherlands).
 
-   Leaving ethanol out has two costs:
-   a. Where FAO records the distillery crops as processing, the calories turned into fuel appear as a processing loss
-      rather than under other uses. This happens in 22 of the 49 countries that produced more than 20 kcal per person
-      per day of ethanol in 2023 (molasses in Pakistan, India, Mauritius and South Africa; cereals in Belgium,
-      Slovakia, Moldova and others). The amount exceeds 10% of food in Eswatini, Hungary, Paraguay, Slovakia,
-      Tajikistan, Belgium and Moldova.
-   b. FAO records about 6,300 tonnes a year of this ethanol as food in Liberia, so Liberia loses 22 kcal of food (1%).
-      It is the only country whose food changes.
-
-7. Crops that go to factories are valued by what the world's factories make from them.
+7. Crops that are mostly processed are valued by the products that the world's factories make from them.
    >> Scale: major for the stages "crop_production" and "processing_net". These values carry 24% of tonnage: sugar
    cane, sugar beet, paddy rice, palm kernels, oil palm fruit, rapeseed, cotton seed, sunflower seed, coconuts, olives
    and maize germ.
@@ -199,7 +173,7 @@ Each assumption starts with a line on its scale: how much it changes the results
    The families, their products and their order are in the items file. They follow FAO's commodity trees (FAO 2000,
    Technical Conversion Factors for Agricultural Commodities).
 
-8. Roles: where each item's production enters the chain.
+8. Each item's production counts as crops, animal products or processed products, following FAO's item groups.
    >> Scale: major. Together with the densities, the roles shape the chain: they decide which stage each tonne of
    production lands in.
 
@@ -218,7 +192,7 @@ Each assumption starts with a line on its scale: how much it changes the results
    is a fibre crop and not an SCL item, so cotton seed is the first point where the calories of the cotton harvest
    appear.
 
-9. Fish and seafood are taken from FBS.
+9. Fish and seafood come from FBS.
    >> Scale: minor for World (fish and fish oil are 46 of the 635 kcal per person per day of animal products in 2023,
    and 6 of the 43 g of protein); large for fishing nations.
 
@@ -247,7 +221,7 @@ Each assumption starts with a line on its scale: how much it changes the results
       (Norway imports 987 kcal per person per day of oil, against 426 of pelagic fish), so it is a real inflow.
    Protein does not change, since the oils have none. The costs of this choice are under KNOWN PROBLEMS.
 
-10. The gap between the earlier stages and food goes to data adjustments.
+10. Any gap between the other stages and food is counted as data adjustments.
     >> Scale: minor for World (10 kcal per person per day in 2023). Large where people eat coconuts: 14% of food in
     Micronesia in 2023, and 7% to 10% in Vanuatu, the Marshall Islands and Kiribati. Rounded fish tonnes can also
     matter in small countries.
@@ -265,7 +239,7 @@ Each assumption starts with a line on its scale: how much it changes the results
     e. For World, the gap between imports and exports, and tourist consumption (assumption 11).
     Points b and c together are also kept as "balancing_difference", for quality control.
 
-11. World exports are set equal to World imports, and World tourist consumption is set to zero.
+11. World exports equal World imports, and World tourist consumption is zero.
     >> Scale: minor, and only for World: the trade gap is a few percent of imports (at most 9%), and World tourist
     consumption is at most 0.21% of food.
 
@@ -281,7 +255,7 @@ Each assumption starts with a line on its scale: how much it changes the results
     it to zero, and the difference goes to "data_adjustments". Countries and other regions keep their tourist
     consumption, because for them it is real.
 
-12. Regions are the sums of their countries.
+12. Each region is the sum of its countries.
     >> Scale: major for the 10 region aggregates, which only exist through this assumption; no country's values
     change.
 
@@ -294,19 +268,19 @@ Each assumption starts with a line on its scale: how much it changes the results
     the region adds up the results. A country has either a full balance or none, so the stages and the population
     always cover the same countries.
 
-13. Region-years with low coverage are dropped, and "Low-income countries" is left out.
+13. A region is dropped in years when its countries with data hold less than 80% of its population.
     >> Scale: minor. It removes a few region-years and one region; no country's values change.
 
     We drop a region-year when the countries with a balance hold less than 80% of the region's population, so that a
     value labeled "Africa" is never built from a small part of Africa. "Low-income countries" is left out altogether:
     SCL never covers more than 80% of its population, because FAO has not compiled Sudan, Somalia and a few others.
 
-14. Values are per person per day.
+14. All values are per person per day.
     >> Scale: minor. A choice of unit; it rescales all values equally.
 
     All stages are divided by the population of assumption 12 and by 365 days.
 
-15. Processing never adds energy or protein; where it would, the gain goes to data adjustments.
+15. Processing never adds calories or protein: any gain is moved to data adjustments.
     >> Scale: major for a few countries, nil for World. In 2023, 46 of 176 countries would otherwise show processing
     adding energy, 6 of them by more than 10% of food: Guyana 64%, Ukraine 14%, Uruguay 14%, the Netherlands 13%,
     Honduras 12% and Papua New Guinea 10%. In protein, 31 countries would, 4 of them by more than 10% (Guyana, New
@@ -340,16 +314,10 @@ KNOWN PROBLEMS, NOT YET RESOLVED
    protein; 20% of all country-years have some gain in energy, and 14% in protein. Small for World, where processing
    loses 106 kcal per person per day, 1.8% of crop production.
 
-   Normally, "processing_net" is positive: more goes into factories than comes out. We handle the three largest
-   causes of gains:
-   a. Ethanol credited back into processing with no input (Brazil, the United States; assumption 6).
-   b. Fish oil (assumption 9).
-   c. Crops valued at the part that people eat (assumption 7; sunflower seed in Ukraine, coconuts in the Marshall
-      Islands and Kiribati).
-
-   Assumption 15 keeps the remaining gains out of the processing bar, but not out of the chart: they appear in data
-   adjustments as calories entering the chain (more than half of food in Guyana). The same causes also distort the
-   losses that stay in processing elsewhere. The remaining gains have four causes:
+   Normally, "processing_net" is positive: more goes into factories than comes out. Assumption 15 keeps the gains
+   out of the processing bar, but not out of the chart: they appear in data adjustments as calories entering the
+   chain (more than half of food in Guyana). The same causes also distort the losses that stay in processing
+   elsewhere. The gains have four causes:
    a. FAO's own quantities are inconsistent. Guyana's rice bran is 30% of the paddy it mills, so Guyana's rice
       creates about 2,400 kcal per person per day in 2023. In 2022, Bolivia's soybean cake weighs more than the
       beans crushed. We correct one such error, in `food_supply_chain_scl.corrections.yml`: since 2021, FAO imputes
@@ -358,15 +326,10 @@ KNOWN PROBLEMS, NOT YET RESOLVED
    b. Factories that make more from a crop than the world average of assumption 7 (see problem 2): oil palm in
       Honduras and Papua New Guinea, sunflower seed in Ukraine, rice in Uruguay, and sugar beet in Ukraine, the
       Netherlands and Germany (beet holds more sugar than cane, and the two share one value).
-   c. FAO's factor for a raw item outside assumption 7 is below what its products contain: raw milk against its
+   c. FAO's density for a raw item outside assumption 7 is below what its products contain: raw milk against its
       powders and casein (New Zealand in protein, Uruguay in energy).
    d. Products with no recorded input: hydrogenated oils, margarine and fat preparations (the Netherlands), and
       oilseed flours (Bolivia, in protein).
-
-   Recomputing the cake densities from their compositions (assumption 6) closed the soybean family. At the previous
-   value of 261 kcal per 100 g of soybean cake, that family lost 9% at World, which hid gains in other items. With
-   that loss gone, Brazil (beef fats, margarine) and China show energy gains, while the protein gains of Brazil and
-   China from soybean cake disappear.
 
 2. The values of assumption 7 are World averages, applied to every country.
    >> Scale: minor for World by construction; major for a few countries whose factories differ from the world
@@ -418,8 +381,19 @@ KNOWN PROBLEMS, NOT YET RESOLVED
    Mauritania (11%), against about 5% for whole fish. Those are data problems, not method problems.
 
    Tallow and lard are a different case. SCL records their unrendered fat as processing in most country-years, so
-   they keep the role "processed". Their remaining processing gains come from FAO's factors: 660 kcal per 100 g for
+   they keep the role "processed". Their remaining processing gains come from FAO's densities: 660 kcal per 100 g for
    unrendered fat, against 891 for tallow.
+
+5. FAO records the crops sent to distilleries inconsistently, and fuel ethanol is left out (assumption 6).
+   >> Scale: minor for World; above 10% of food in a few countries.
+
+   a. Where FAO records the distillery crops as processing, the calories turned into fuel appear as a processing loss
+      rather than under other uses. This happens in 22 of the 49 countries that produced more than 20 kcal per person
+      per day of ethanol in 2023 (molasses in Pakistan, India, Mauritius and South Africa; cereals in Belgium,
+      Slovakia, Moldova and others). The amount exceeds 10% of food in Eswatini, Hungary, Paraguay, Slovakia,
+      Tajikistan, Belgium and Moldova.
+   b. FAO records about 6,300 tonnes a year of this ethanol as food in Liberia, so Liberia loses 22 kcal of food (1%).
+      It is the only country whose food changes.
 """
 
 import numpy as np
@@ -560,22 +534,17 @@ MAX_WORLD_TRADE_GAP = 0.2
 # Safety limit for assumption 11: World tourist consumption is only set to zero while it is small (at most 0.21%
 # of food in practice); a larger share of food crashes the step instead.
 MAX_WORLD_TOURIST_CONSUMPTION = 0.005
-# FAO uses the same factor for an item in a country every year (checks assumption 4). The check only uses food
-# quantities of at least 1,000 tonnes; below that, FAO's rounding of the nutrient totals moves the density by more than
-# the tolerance. The tolerance is 1% of the factor, but never less than 0.5 kcal or 0.05 g of protein per 100 g, for
-# items with very small factors (such as tea). The food that deviates must stay below this share of all food (in
-# 2010 to 2023 it is 0.0003%: Namibia's skim milk, whose factor rises from 23 to 36 kcal per 100 g).
-NUTRIENT_FACTOR_MIN_FOOD_TONNES = 1000
-NUTRIENT_FACTOR_RELATIVE_TOLERANCE = 0.01
-NUTRIENT_FACTOR_ABSOLUTE_TOLERANCE = {"energy": 0.5, "protein": 0.05}
-MAX_FOOD_SHARE_OFF_OWN_FACTOR = 0.0001
+# Checks assumption 4: every country-year with at least this much food of an item must have the item's density, within
+# 1% of it, but never less than 0.5 kcal or 0.05 g of protein per 100 g, for items with very small densities (such as
+# tea). Below this much food, FAO's rounding moves a year's density by more than the tolerance. The country-specific
+# densities of the items file are exempt.
+MIN_FOOD_TONNES_FOR_DENSITY_CHECK = 1000
+DENSITY_RELATIVE_TOLERANCE = 0.01
+DENSITY_ABSOLUTE_TOLERANCE = {"energy": 0.5, "protein": 0.05}
 # Check the fixed factors of assumption 6 against the inferred factor where an item has substantial food use.
 # This threshold controls only the check; every listed item uses its fixed factor.
 MIN_FOOD_SHARE_FOR_FIXED_DENSITY_CHECK = 0.01
 
-# Assumption 4, minor: a country's own factor for an item needs at least this much food over all years; below it, the
-# item's factor over all countries is used.
-MIN_FOOD_TONNES_FOR_OWN_FACTOR = 1000
 # Assumption 13, minor: a region-year is dropped when the member countries with a balance hold less than this share
 # of the region's population.
 MIN_FRACTION_POPULATION_COVERED = 0.8
@@ -630,6 +599,7 @@ def load_manual_inputs() -> dict:
         "output_implied_densities",
         "role_overrides",
         "fish_from_fbs",
+        "country_specific_densities",
         "processing_families_for_checks",
     }
     assert set(config) == expected, f"Unexpected top-level keys in items file: {set(config) ^ expected}"
@@ -669,8 +639,12 @@ def sanity_check_inputs(tb: Table, roles: pd.Series, manual: dict) -> None:
     missing_role = sorted(set(table_items.index) - set(roles.index) - {POPULATION_ITEM_CODE})
     assert not missing_role, f"SCL items without an FAO item group: {[(c, table_items[c]) for c in missing_role]}"
     named = {}
-    for item in manual["fixed_densities"]["items"] + manual["never_food"] + manual["role_overrides"]:
+    listed = manual["fixed_densities"]["items"] + manual["never_food"] + manual["role_overrides"]
+    for item in listed + manual["country_specific_densities"]:
         named[item["code"]] = item["name"]
+    countries = set(tb["country"].astype(str))
+    unknown = [e["country"] for e in manual["country_specific_densities"] if e["country"] not in countries]
+    assert not unknown, f"Country-specific densities name countries that are not in SCL: {unknown}"
     families = manual["output_implied_densities"]
     for i, family in enumerate(families):
         named.update(family["crops"])
@@ -823,31 +797,6 @@ def add_region_aggregates(chain: Table) -> Table:
     return chain[chain["population"].notnull()].reset_index(drop=True)
 
 
-def sanity_check_one_factor_per_country(tb: Table) -> None:
-    """Check that FAO uses the same calorie and protein factor for an item in a country every year.
-
-    Checks the fact assumption 4 relies on, on countries only (before fish and regions are added).
-    """
-    tb = tb[tb["food"] >= NUTRIENT_FACTOR_MIN_FOOD_TONNES]
-    for nutrient in ["energy", "protein"]:
-        numerator = NUTRIENTS[nutrient]["numerator"]
-        rows = tb[np.isfinite(tb[numerator])]
-        density = rows[numerator] / (rows["food"] * HUNDRED_GRAMS_PER_TONNE)
-        pair = [rows["country"], rows["item_code"]]
-        factor = rows[numerator].groupby(pair).transform("sum") / (
-            rows["food"].groupby(pair).transform("sum") * HUNDRED_GRAMS_PER_TONNE
-        )
-        tolerance = np.maximum(
-            NUTRIENT_FACTOR_RELATIVE_TOLERANCE * factor, NUTRIENT_FACTOR_ABSOLUTE_TOLERANCE[nutrient]
-        )
-        off = (density - factor).abs() > tolerance
-        share = rows.loc[off, "food"].sum() / rows["food"].sum()
-        assert share < MAX_FOOD_SHARE_OFF_OWN_FACTOR, (
-            f"FAO's {nutrient} factors change over the years for {100 * share:.3f}% of food: "
-            f"{sorted(set(zip(rows.loc[off, 'country'], rows.loc[off, 'fao_item'])))[:20]}."
-        )
-
-
 def sanity_check_balance_identity(tb: Table) -> None:
     """Check assumptions 1 and 2: SCL balances close in tonnes."""
     supply = tb["production"] + tb["imports"] - tb["exports"] - tb["stock_variation"]
@@ -921,25 +870,35 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
     valid = np.isfinite(cell) & (cell >= 0) & (cell <= ceiling)
     nutrient_eaten = tb[numerator].where(valid, 0)
     tonnes_eaten = tb["food_tonnes_for_density"].where(valid, 0)
-    # Assumption 4: a country's factor for an item is its food nutrient over its food across all years, if it eats
-    # enough of the item; otherwise the item's factor over all countries.
+    # Assumptions 4 and 5: fish and the country-specific densities of the items file keep the density of each year; a
+    # year with no usable food takes the country-item's density over all years.
     pair = [tb["country"], tb["item_code"]]
     pair_tonnes = tonnes_eaten.groupby(pair).transform("sum")
-    pair_factor = nutrient_eaten.groupby(pair).transform("sum") / (pair_tonnes * HUNDRED_GRAMS_PER_TONNE)
-    item_tonnes = tonnes_eaten.groupby(tb["item_code"]).transform("sum")
-    item_factor = nutrient_eaten.groupby(tb["item_code"]).transform("sum") / (item_tonnes * HUNDRED_GRAMS_PER_TONNE)
-    # Assumption 5: fish keep the density of each year, because the species in an FBS fish group change; a year with
-    # no usable food takes the country's factor over all years, whatever the tonnage.
+    pair_density = nutrient_eaten.groupby(pair).transform("sum") / (pair_tonnes * HUNDRED_GRAMS_PER_TONNE)
     is_fish = tb["item_code"].isin([_pad_code(item["code"]) for item in manual["fish_from_fbs"]])
-    fish_year = cell.where(is_fish & valid)
-    own_factor = pair_factor.where((pair_tonnes >= MIN_FOOD_TONNES_FOR_OWN_FACTOR) | (is_fish & (pair_tonnes > 0)))
-    item_factor = item_factor.where(item_tonnes > 0)
-    tb["density"] = fish_year.fillna(own_factor).fillna(item_factor)
-    tb["density_source"] = np.select(
-        [fish_year.notnull(), own_factor.notnull(), item_factor.notnull()],
-        ["fish_year", "own_factor", "item_factor"],
-        default="none",
+    exceptions = {(e["country"], _pad_code(e["code"])) for e in manual["country_specific_densities"]}
+    is_exception = pd.Series([key in exceptions for key in zip(tb["country"], tb["item_code"])], index=tb.index)
+    yearly = is_fish | is_exception
+    # Assumption 4: every other country uses the item's density: the item's food nutrient over its food tonnes, summed
+    # over all countries (except the country-specific densities) and all years. Fish count towards their item's
+    # density, which is only used for fish that a country has no usable food of.
+    item = tb["item_code"]
+    item_tonnes = tonnes_eaten.where(~is_exception, 0).groupby(item).transform("sum")
+    item_density = nutrient_eaten.where(~is_exception, 0).groupby(item).transform("sum") / (
+        item_tonnes * HUNDRED_GRAMS_PER_TONNE
     )
+    item_density = item_density.where(item_tonnes > 0)
+    # Every country-year with enough food must have the item's density; otherwise it is a new exception to list.
+    tolerance = np.maximum(DENSITY_RELATIVE_TOLERANCE * item_density, DENSITY_ABSOLUTE_TOLERANCE[nutrient])
+    tested = valid & ~yearly & (tb["food_tonnes_for_density"] >= MIN_FOOD_TONNES_FOR_DENSITY_CHECK)
+    off = tested & ((cell - item_density).abs() > tolerance)
+    assert not off.any(), (
+        f"FAO's {nutrient} density differs from the item's density in country-items not listed as country-specific "
+        f"in the items file: {sorted(set(zip(tb.loc[off, 'country'], tb.loc[off, 'fao_item'])))[:20]}"
+    )
+    own_year = cell.where(yearly & valid).fillna(pair_density.where(yearly & (pair_tonnes > 0)))
+    tb["density"] = own_year.fillna(item_density)
+    tb["density_source"] = np.select([own_year.notnull(), item_density.notnull()], ["own_year", "item"], default="none")
 
     # Assumption 6: listed items always get fixed factors. A few hundred tonnes of soybean cake eaten somewhere
     # should not set the density of hundreds of millions of tonnes. Where food use is substantial, check agreement
@@ -949,9 +908,7 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
     fixed_factor = tb["item_code"].map(fixed)
     supply = (tb["production"] + tb["imports"]).abs().groupby(tb["item_code"]).transform("sum")
     food_share = tb["food"].abs().groupby(tb["item_code"]).transform("sum") / supply
-    tolerance = np.maximum(
-        fixed_factor.abs() * NUTRIENT_FACTOR_RELATIVE_TOLERANCE, NUTRIENT_FACTOR_ABSOLUTE_TOLERANCE[nutrient]
-    )
+    tolerance = np.maximum(fixed_factor.abs() * DENSITY_RELATIVE_TOLERANCE, DENSITY_ABSOLUTE_TOLERANCE[nutrient])
     disagree = (
         is_fixed
         & (food_share >= MIN_FOOD_SHARE_FOR_FIXED_DENSITY_CHECK)
@@ -996,7 +953,7 @@ def sanity_check_densities(tb: Table, nutrient: str) -> None:
     provenance = (100 * provenance / provenance.sum()).round(2)
     # Crops that go to factories (assumption 7) and items nobody eats (assumption 6) legitimately use other values.
     assert provenance.get("none", 0) == 0, "Some supply has no density."
-    from_food = provenance.get("own_factor", 0) + provenance.get("fish_year", 0) + provenance.get("item_factor", 0)
+    from_food = provenance.get("own_year", 0) + provenance.get("item", 0)
     assert from_food > 65, f"Only {from_food:.1f}% of supply uses a {nutrient} factor read from FAO's food data."
 
 
@@ -1206,7 +1163,6 @@ def run() -> None:
     tb = prepare_balance_table(tb_scl, roles=roles, manual=manual)
     # Assumption 6: items that are never food (castor, kapok, fuel ethanol...) are left out of all three tables.
     tb = drop_never_food_items(tb, manual=manual)
-    sanity_check_one_factor_per_country(tb)
     population = tb[["country", "year", "population"]].drop_duplicates()
     # Assumption 9: fish and seafood, taken from FBS.
     tb_fish = prepare_fish_table(tb_fbsc, manual=manual, population=population)

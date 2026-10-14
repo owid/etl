@@ -297,7 +297,21 @@ fish_from_fbs:
   - {code: 2781, name: "Fish, Body Oil", role: animal}
   - {code: 2782, name: "Fish, Liver Oil", role: animal}
 
-# 6. Processing families used only as a check: for World, the calories coming out of processing as products should
+# 6. Country-specific densities (assumption 4). FAO uses one density per item in every country and year, except for
+#    these country-items, which keep the density of each year. Any other country-item whose density differs from
+#    the item's density stops the step, so a new exception cannot pass unnoticed.
+country_specific_densities:
+  - {country: Afghanistan, code: 16, name: "Wheat and meslin flour"}
+  - {country: Bangladesh, code: 31, name: "Rice, milled"}
+  - {country: Ethiopia, code: 474, name: "Other vegetables provisionally preserved"}
+  - {country: Namibia, code: 888, name: "Skim milk of cows"}
+  - {country: North Korea, code: 31, name: "Rice, milled"}
+  - {country: Peru, code: 125, name: "Cassava, fresh"}
+  - {country: Peru, code: 1058, name: "Meat of chickens, fresh or chilled"}
+  - {country: Peru, code: 116, name: "Potatoes"}
+  - {country: Peru, code: 31, name: "Rice, milled"}
+
+# 7. Processing families used only as a check: for World, the calories coming out of processing as products should
 #    be close to the calories going in (a few percent are lost in milling, crushing and brewing).
 processing_families_for_checks:
   wheat: [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 41, 110, 113]

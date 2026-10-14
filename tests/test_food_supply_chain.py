@@ -1,9 +1,9 @@
 """Food nutrients must survive rounded tonnages; each step decides where food falls back to its density.
 
 The FBS step derives a density per cell and keeps a reported food nutrient only where the item's density is the one
-derived directly from it. The SCL step reads one factor per country and item over all years, keeps every food
-nutrient FAO reports, whatever density the item's other elements use, and converts food from tonnes only where FAO
-reports no nutrient.
+derived directly from it. The SCL step uses one density per item in every country, except for listed country-specific
+densities, keeps every food nutrient FAO reports, whatever density the item's other elements use, and converts food
+from tonnes only where FAO reports no nutrient.
 """
 
 import importlib
@@ -66,46 +66,88 @@ def test_fbs_reported_food_survives_rounding_but_fallbacks_are_kept(nutrient, sc
     np.testing.assert_allclose(stages["data_adjustments"], (PRODUCTION - FOOD_FBS) * scale, atol=1e-6)
 
 
-@pytest.mark.parametrize("nutrient,scale", [("energy", 1), ("protein", 0.1)])
-def test_scl_reads_one_factor_per_country_and_item(nutrient, scale):
-    numerator = SCL.NUTRIENTS[nutrient]["numerator"]
-    # Country A eats 1,000 tonnes of the item over the years with a usable ratio (200 kcal per 100 g); its other
-    # years have food but no tonnes, no reported nutrient, or a ratio above the physical ceiling. Country B eats only
-    # 30 tonnes (at 300), so it takes the item's factor over all countries. Fish keep the density of each year.
+def _scl_rows(numerator: str, scale: float, rows: list[tuple]) -> Table:
+    # rows: (country, year, item code, item name, role, food tonnes, food nutrient before scaling).
+    country, year, code, name, role, food, nutrient = (list(column) for column in zip(*rows))
     tb = Table(
         {
-            "country": ["A"] * 5 + ["B"] * 2 + ["A"] * 3,
-            "year": [2000, 2001, 2002, 2003, 2004, 2000, 2001, 2000, 2001, 2002],
-            "item_code": ["00000001"] * 7 + ["00002763"] * 3,
-            "fao_item": ["Example food"] * 7 + ["Pelagic Fish"] * 3,
-            "role": ["crop"] * 7 + ["animal"] * 3,
-            "food_tonnes_for_density": [400.0, 600.0, 0.0, 1000.0, 1000.0, 10.0, 20.0, 100.0, 100.0, 0.0],
-            numerator: np.array([8e8, 1.2e9, 5e7, np.nan, 2e10, 3e7, 6e7, 8e7, 9e7, 0.0]) * scale,
+            "country": country,
+            "year": year,
+            "item_code": code,
+            "fao_item": name,
+            "role": role,
+            "food_tonnes_for_density": food,
+            numerator: np.array(nutrient) * scale,
         }
     )
     for element in SCL.BALANCE_ELEMENTS:
         tb[element] = 0.0
     tb["food"] = tb["food_tonnes_for_density"]
     tb["production"] = tb["food"]
-    manual = {
+    return tb
+
+
+def _scl_manual(country_specific: list[dict]) -> dict:
+    return {
         "fixed_densities": {"families": [], "items": []},
         "never_food": [],
         "output_implied_densities": [],
         "fish_from_fbs": [{"code": 2763}],
+        "country_specific_densities": country_specific,
     }
-    tb = SCL.add_densities(tb, manual=manual, nutrient=nutrient)
-    assert tb["density_source"].tolist() == ["own_factor"] * 5 + ["item_factor"] * 2 + ["fish_year"] * 2 + [
-        "own_factor"
-    ]
-    item_factor = (2e9 + 9e7) / (1030 * 1e4)
-    np.testing.assert_allclose(tb["density"], np.array([200] * 5 + [item_factor] * 2 + [80, 90, 85]) * scale)
+
+
+# Country A eats 1,000 tonnes of the item over the years with a usable ratio (200 kcal per 100 g); its other years
+# have food but no tonnes, no reported nutrient, or a ratio above the physical ceiling. Country B eats only 30 tonnes
+# (at 300 kcal per 100 g). Fish in country A have a density of 80 and then 90, and no usable food in 2002.
+ONE_DENSITY_ROWS = [
+    ("A", 2000, "00000001", "Example food", "crop", 400.0, 8e8),
+    ("A", 2001, "00000001", "Example food", "crop", 600.0, 1.2e9),
+    ("A", 2002, "00000001", "Example food", "crop", 0.0, 5e7),
+    ("A", 2003, "00000001", "Example food", "crop", 1000.0, np.nan),
+    ("A", 2004, "00000001", "Example food", "crop", 1000.0, 2e10),
+    ("B", 2000, "00000001", "Example food", "crop", 10.0, 3e7),
+    ("B", 2001, "00000001", "Example food", "crop", 20.0, 6e7),
+    ("A", 2000, "00002763", "Pelagic Fish", "animal", 100.0, 8e7),
+    ("A", 2001, "00002763", "Pelagic Fish", "animal", 100.0, 9e7),
+    ("A", 2002, "00002763", "Pelagic Fish", "animal", 0.0, 0.0),
+]
+# The item's density: the usable food of countries A and B, 1,000 tonnes at 200 and 30 tonnes at 300 kcal per 100 g.
+ITEM_DENSITY = (2e9 + 9e7) / (1030 * 1e4)
+
+
+@pytest.mark.parametrize("nutrient,scale", [("energy", 1), ("protein", 0.1)])
+def test_scl_uses_one_density_per_item_in_every_country(nutrient, scale):
+    numerator = SCL.NUTRIENTS[nutrient]["numerator"]
+    tb = _scl_rows(numerator, scale, ONE_DENSITY_ROWS)
+    tb = SCL.add_densities(tb, manual=_scl_manual([]), nutrient=nutrient)
+    # Both countries use the item's density, calculated from the usable food of both. Fish keep the density of each
+    # year, and the year with no usable food takes the density over all years.
+    assert tb["density_source"].tolist() == ["item"] * 7 + ["own_year"] * 3
+    np.testing.assert_allclose(tb["density"], np.array([ITEM_DENSITY] * 7 + [80, 90, 85]) * scale)
     converted = SCL.convert_elements_to_nutrient(tb, nutrient=nutrient)
     # Food keeps every nutrient FAO reports, including the one with no tonnes and the one above the ceiling; tonnes
-    # times the factor only where the nutrient is missing.
+    # times the density only where the nutrient is missing.
     np.testing.assert_allclose(
-        converted["food"], np.array([8e8, 1.2e9, 5e7, 2e9, 2e10, 3e7, 6e7, 8e7, 9e7, 0.0]) * scale
+        converted["food"], np.array([8e8, 1.2e9, 5e7, 1e7 * ITEM_DENSITY, 2e10, 3e7, 6e7, 8e7, 9e7, 0.0]) * scale
     )
     np.testing.assert_allclose(converted["production"], tb["production"] * 1e4 * tb["density"])
+
+
+@pytest.mark.parametrize("nutrient,scale", [("energy", 1), ("protein", 0.1)])
+def test_scl_country_with_its_own_density_must_be_listed(nutrient, scale):
+    numerator = SCL.NUTRIENTS[nutrient]["numerator"]
+    # Country C eats 2,000 tonnes of the item at 300 kcal per 100 g, where country A eats it at 200.
+    rows = ONE_DENSITY_ROWS + [
+        ("C", 2000, "00000001", "Example food", "crop", 1000.0, 3e9),
+        ("C", 2001, "00000001", "Example food", "crop", 1000.0, 3e9),
+    ]
+    with pytest.raises(AssertionError, match="not listed as country-specific"):
+        SCL.add_densities(_scl_rows(numerator, scale, rows), manual=_scl_manual([]), nutrient=nutrient)
+    # Listed, country C keeps its own density, and the item's density leaves country C out.
+    listed = [{"country": "C", "code": 1, "name": "Example food"}]
+    tb = SCL.add_densities(_scl_rows(numerator, scale, rows), manual=_scl_manual(listed), nutrient=nutrient)
+    np.testing.assert_allclose(tb["density"], np.array([ITEM_DENSITY] * 7 + [80, 90, 85, 300, 300]) * scale)
 
 
 @pytest.mark.parametrize("nutrient,scale", [("energy", 1), ("protein", 0.1)])
@@ -139,6 +181,7 @@ def test_scl_fixed_factors_are_checked_instead_of_switched(nutrient, scale, food
         "fixed_densities": {"families": [], "items": [{"code": 1, "energy": 200.0, "protein": 20.0}]},
         "output_implied_densities": [],
         "fish_from_fbs": [],
+        "country_specific_densities": [],
     }
     if should_fail:
         with pytest.raises(AssertionError, match=f"Fixed {nutrient} densities disagree.*Example bran"):
@@ -243,7 +286,7 @@ def test_fbs_replacement_densities_still_determine_food(nutrient):
 
 @pytest.mark.parametrize("nutrient", ["energy", "protein"])
 def test_scl_food_keeps_reported_nutrient_whatever_the_density_source(nutrient):
-    tb = _replaced_densities(SCL, nutrient, ["own_factor", "item_factor", "fixed", "implied_by_products"])
+    tb = _replaced_densities(SCL, nutrient, ["own_year", "item", "fixed", "implied_by_products"])
     converted = SCL.convert_elements_to_nutrient(tb, nutrient=nutrient)
     np.testing.assert_array_equal(converted["food"], [9e6] * 4)
     # Food still uses the density where FAO reports no nutrient.
