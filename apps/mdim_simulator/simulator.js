@@ -160,7 +160,8 @@ function getMeta(id) {
     const p = fetchJson(`${API}/${id}.metadata.json`)
       // Only a 404 means the ID is wrong; anything else is the network or the API, worth trying again.
       .catch((err) => {
-        throw new Error(err.status === 404 ? `No indicator with ID ${id}.` : `Couldn't load indicator ${id} (${err.message}). Try again.`);
+        if (err.status === 404) throw new Error(`No indicator with ID ${id}.`);
+        throw Object.assign(new Error(`Couldn't load indicator ${id} (${err.message}). Try again.`), { transient: true });
       })
       .then(withChartSettings);
     p.catch(() => metaCache.delete(id));
@@ -1663,10 +1664,16 @@ async function linkIndicator(key, raw, statusCell) {
     setStatus({ kind: "ok", meta });
   } catch (err) {
     if (pendingByKey.get(key) !== token) return;
-    delete state.links[key];
-    dropSuggestions();
-    saveState();
-    setStatus({ kind: "error", message: err.message });
+    // A network or API failure says nothing about the indicator already linked here, so it stays linked.
+    const transient = err.transient || err.status || err instanceof TypeError;
+    if (transient && state.links[key]?.id) {
+      setStatus({ kind: "error", message: `${err.message} The previous indicator is still linked.` });
+    } else {
+      delete state.links[key];
+      dropSuggestions();
+      saveState();
+      setStatus({ kind: "error", message: err.message });
+    }
   }
   renderSummary();
   if (key === comboKey(currentCombo() || [])) renderChart();
