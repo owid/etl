@@ -68,22 +68,23 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    kilograms.
 
 4. One factor per country and item, read over all years.
-   >> Scale: minor. The country's own factor converts 65% of tonnage (fish by year another 1.5%); the item's
-   factor over all countries converts 6.5%. The rest uses the fixed and the product-implied densities of
-   assumptions 6 and 7.
+   >> Scale: minor. The country's own factor converts 49% of tonnage (fish by year another 1.5%); the item's
+   factor over all countries converts 22%, mostly grain that the big producers record no food for (maize, wheat
+   and soybeans in the United States, China or Brazil, which are eaten as flour and oil instead). The rest uses the
+   fixed and the product-implied densities of assumptions 6 and 7.
 
    Since FAO's factor for an item in a country is the same every year, the step reads it once: the country's food
    nutrient divided by its food tonnes, both summed over all years. A country that eats less than 1,000 tonnes of
    the item over all years gets the item's factor instead, the same ratio summed over all countries. This matters
    for items that a country produces, trades or feeds to animals but hardly eats, where a few kilograms of food
-   would otherwise set the density of millions of tonnes: in 2014 Oceania ate 40 kg of wheat, whose reported
-   protein gives 25 g per 100 g against FAO's 11.8, and that density would have converted 26 million tonnes of
-   wheat production.
+   would otherwise set the density of thousands of tonnes: the only food of pig meat that FAO records for Nicaragua
+   in 2010 to 2023 is 10 kg in 2022, whose reported calories give 100 kcal per 100 g against FAO's 237, and that
+   density would have converted the 8,000 to 15,000 tonnes of pig meat that Nicaragua produces each year.
    Years whose food gives no usable ratio are left out of the sums: no food, no reported nutrient, or a ratio above
    the physical maximum (920 kcal per 100 g, the energy of pure fat, or 100 g of protein per 100 g), which only
    happens for sub-tonne quantities, where FAO's rounding breaks the ratio. A reported zero counts as zero, so an
-   item with none of the nutrient (sugar and oils have no protein) gets a factor of zero. Regions are treated like
-   countries, from the summed food of their members.
+   item with none of the nutrient (sugar and oils have no protein) gets a factor of zero. Regions get no factors of
+   their own (assumption 12).
    A check fails the step if FAO's factor for an item in a country changes over the years for more than 0.01% of
    food. In 2010 to 2023 only Namibia's skim milk does (from 23 to 36 kcal per 100 g), on 0.0003% of food.
 
@@ -97,7 +98,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    the tonnage.
 
 6. Items nobody eats get fixed densities.
-   >> Scale: major for the stages "feed" and "processing_net". The fixed densities carry only 3.2% of tonnage, but
+   >> Scale: major for the stages "feed" and "processing_net". The fixed densities carry only 4.2% of tonnage, but
    that tonnage is the oilseed cakes and brans whose presence is the main reason to use SCL at all.
 
    Items with little or no food use (cakes, brans, gluten feed, refining residues) need fixed densities. Where FAO's
@@ -132,7 +133,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    this ethanol as food, loses 22 kcal of food (1%); it is the only country whose food changes.
 
 7. Crops that go to factories are valued by what the world's factories make of them.
-   >> Scale: major for the stages "crop_production" and "processing_net". These values carry 23% of tonnage: sugar
+   >> Scale: major for the stages "crop_production" and "processing_net". These values carry 24% of tonnage: sugar
    cane, sugar beet, paddy rice, palm kernels, oil palm fruit, rapeseed, cotton seed, sunflower seed, coconuts,
    olives and maize germ.
 
@@ -147,7 +148,7 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    These eleven crops are therefore valued by their products: each year, the nutrient in all the products the
    world's factories make from the crop, minus the nutrient of intermediate products processed further within the
    same family (such as copra, pressed into coconut oil), divided by the tonnes of the crop the world processes.
-   That World ratio is applied to every country and region. Sugar cane and sugar beet share their products (raw and
+   That World ratio is applied to every country. Sugar cane and sugar beet share their products (raw and
    refined sugar, molasses), so they get one value together, 56 kcal per 100 g in 2023. Palm kernels are themselves
    made from oil palm fruit and then crushed for their oil; they are valued first, so that the oil palm fruit
    family counts its kernels at their new value. The families, their products and their order are in the items
@@ -237,10 +238,11 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
     change.
 
     FAO's own regional aggregates are dropped, and OWID regions (World, continents, income groups, the European
-    Union) are built from the member countries that have an SCL balance that year: every element and every food nutrient total is summed
-    over those countries (fish included, from the same countries), and the region's population is the sum of those
-    same countries' population. A country either has a full balance or none at all, so the elements and the
-    population always cover the same countries.
+    Union) are built from the member countries that have an SCL balance that year: each stage of a region, in each
+    of the three units, is the sum of that stage over those countries (fish included), and the region's population
+    is the sum of those same countries' population. Regions have no densities of their own: each country's tonnes
+    are converted with that country's densities, and the region adds up the results. A country either has a full
+    balance or none at all, so the stages and the population always cover the same countries.
 
 13. Low-coverage region-years are dropped, and "Low-income countries" is left out.
     >> Scale: minor. It removes a few region-years and one region; no country's values change.
@@ -265,10 +267,11 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
     processing bar would tell readers that mills make food. The gain is therefore moved to "data_adjustments",
     whose meaning is exactly that (assumption 10), and "processing_net" shows zero. Only the gains move: the same
     causes also inflate or shrink the real losses of other countries, and those stay in processing, which remains
-    the least certain stage. The rule is applied to each entity and year after the items are summed into stages,
-    so a region with a gain (Oceania in every year in energy, and South America, Europe and North America in a few;
-    Oceania in 2012 in protein) is treated like a country, and a region's processing is no longer the sum of its
-    members'; processing plus data adjustments still is.
+    the least certain stage. The rule is applied to each country and region in each year, after the regions are
+    summed from their countries, so a region with a gain (Oceania in every year in energy, and South America,
+    Europe, North America, the European Union and high-income countries in one to three years; Oceania in 2012 in
+    protein) is treated like a country, and a region's processing is no longer the sum of its members';
+    processing plus data adjustments still is.
     The mass table is left alone: in tonnes a gain in processing can be real, because breweries and bottlers add
     water (in Namibia, 22 thousand tonnes of malt become 174 thousand tonnes of beer), so processing there is the
     net change in weight, in either direction.
@@ -280,7 +283,7 @@ KNOWN PROBLEMS, NOT YET RESOLVED
   countries in energy (Guyana 68%, Uruguay, Ukraine, Honduras, the Netherlands, Papua New Guinea) and four in
   protein (Guyana, New Zealand, Bolivia, Latvia); 33 of 176 countries have a gain above 1% of food in energy and 21
   in protein (23% of all country-years have some gain in energy, 15% in protein). Small for World, where
-  processing loses 84 kcal per person per day, 1.4% of crop production. The FBS sibling has the same symptom with
+  processing loses 82 kcal per person per day, 1.4% of crop production. The FBS sibling has the same symptom with
   a different cause.
 
   In the normal case "processing_net" is positive: the converted processing inputs exceed the converted product
@@ -323,7 +326,7 @@ KNOWN PROBLEMS, NOT YET RESOLVED
 
 - The stage "feed" only counts feed that passes through the balance.
   >> Scale: "animal_products" exceeds "feed" by more than 1 kcal in 14% of country-years in energy and by more than
-  0.01 g in 24% in protein. World still has more recorded feed than animal output (2,051 against 635 kcal in 2023,
+  0.01 g in 24% in protein. World still has more recorded feed than animal output (2,046 against 635 kcal in 2023,
   and 103 against 43 g of protein).
 
   Grass, pasture and forage are not SCL items, so everything grazing animals eat from pasture enters the chain
@@ -332,7 +335,7 @@ KNOWN PROBLEMS, NOT YET RESOLVED
   does not measure how much of a particular country's gap these omitted inputs explain.
 
 - Fish oil is partly counted twice: in calories where the food fish are fatty, in tonnes everywhere.
-  >> Scale: about 30% of the world's fish-oil energy, 1.3 of 4.2 kcal per person per day for World in 2018; in
+  >> Scale: about 30% of the world's fish-oil energy, 1.3 of 4.1 kcal per person per day for World in 2018; in
   tonnes, 1.6% to 5% of the animal products of the oil producers. Protein is unaffected.
 
   The fish row carries about the meal's energy only where the food fish are lean (Peru 79 kcal per 100 g live
@@ -501,7 +504,7 @@ MAX_FOOD_SHARE_OFF_OWN_FACTOR = 0.0001
 # This threshold controls only the check; every listed item uses its fixed factor.
 MIN_FOOD_SHARE_FOR_FIXED_DENSITY_CHECK = 0.01
 
-# Assumption 4, minor: an entity's own factor for an item needs at least this much food over all years; below it, the
+# Assumption 4, minor: a country's own factor for an item needs at least this much food over all years; below it, the
 # item's factor over all countries is used.
 MIN_FOOD_TONNES_FOR_OWN_FACTOR = 1000
 # Assumption 13, minor: a region-year is dropped when the member countries with a balance hold less than this share
@@ -703,7 +706,7 @@ def prepare_fish_table(tb_fbsc: Table, manual: dict, population: Table) -> Table
     tb["role"] = tb["item_code"].map({c: it["role"] for c, it in fish_items.items()})
     # Only the countries and years SCL covers (the population table comes from the SCL rows). FBS tonnages are
     # rounded to 1,000 t, so densities are taken from its per-capita figures, expressed as totals in SCL's units
-    # (kcal per year; tonnes of protein per year; tonnes of food) so that they can be summed into regions.
+    # (kcal per year; tonnes of protein per year; tonnes of food) so that they can be summed over years and countries.
     tb = tb.merge(population, on=["country", "year"], how="inner")
     # Multiplying by population would copy population's display settings (rounding, projection flag) into every
     # stage, through the densities.
@@ -717,47 +720,38 @@ def prepare_fish_table(tb_fbsc: Table, manual: dict, population: Table) -> Table
 # --------------------------------------------------------------------------------------------------------------------
 # Regions (assumptions 12 and 13).
 # --------------------------------------------------------------------------------------------------------------------
-def add_region_aggregates(tb: Table) -> Table:
-    """Build the OWID region aggregates and drop the region-years with low population coverage.
+def add_region_aggregates(chain: Table) -> Table:
+    """Add the OWID regions as the sum of their countries' stages, and drop the region-years with low coverage.
 
     Implements assumptions 12 and 13.
     """
-    assert not tb["country"].isin(REGIONS).any(), "Region rows must be dropped before aggregating."
-    keys = ["country", "year", "item_code"]
-    value_columns = [c for c in tb.columns if c not in keys + ["population"] and pd.api.types.is_numeric_dtype(tb[c])]
-    item_columns = [c for c in tb.columns if c not in keys + ["population"] + value_columns]
-    item_attributes = tb[["item_code"] + item_columns].drop_duplicates()
-    assert not item_attributes["item_code"].duplicated().any(), "Item attributes differ across rows of an item."
-    population = tb[["country", "year", "population"]].drop_duplicates()
-    assert not population.duplicated(["country", "year"]).any(), "Population differs across items of a country-year."
-
-    # A total that no member reports (FAO gives no food nutrients for cakes, for one) stays missing, not zero.
+    assert not chain["country"].isin(REGIONS).any(), "Region rows must be dropped before aggregating."
+    stages = [c for c in chain.columns if c not in ["country", "year", "population"]]
     flows = paths.regions.add_aggregates(
-        tb[keys + value_columns],
+        chain[["country", "year"] + stages],
         regions=REGIONS,
-        index_columns=keys,
-        aggregations={c: "sum" for c in value_columns},
-        min_num_values_per_year=1,
+        index_columns=["country", "year"],
+        aggregations={c: "sum" for c in stages},
     )
     # Assumption 13 rides on this call: min_frac_population gates the summed population itself, so a region-year
     # whose members with a balance hold less than MIN_FRACTION_POPULATION_COVERED of the region's population (taken
     # from the population dataset) comes back with a nan population.
     population = paths.regions.add_aggregates(
-        population,
+        chain[["country", "year", "population"]],
         regions=REGIONS,
         index_columns=["country", "year"],
         aggregations={"population": "sum"},
         min_frac_population=MIN_FRACTION_POPULATION_COVERED,
     )
-    tb = flows.merge(item_attributes, on="item_code", how="left").merge(population, on=["country", "year"], how="left")
+    chain = flows.merge(population, on=["country", "year"], how="left")
 
     # Drop the gated region-years, so that a value labeled "Africa" is never built from a small fraction of Africa.
-    dropped = tb.loc[tb["population"].isnull(), ["country", "year"]].drop_duplicates()
+    dropped = chain.loc[chain["population"].isnull(), ["country", "year"]].drop_duplicates()
     assert set(dropped["country"]) <= set(REGIONS), "A country lost its population in the region aggregation."
     assert set(dropped["country"]) == REGIONS_WITH_LOW_COVERAGE, (
         f"Regions dropped for low coverage changed: {sorted(set(dropped['country']))}. Update the docstring."
     )
-    return tb[tb["population"].notnull()].reset_index(drop=True)
+    return chain[chain["population"].notnull()].reset_index(drop=True)
 
 
 def sanity_check_one_factor_per_country(tb: Table) -> None:
@@ -815,16 +809,16 @@ def fixed_density_map(tb: Table, manual: dict, nutrient: str) -> dict[str, float
 def product_implied_density(tb: Table, family: dict, nutrient: str) -> pd.Series:
     """The density of a family's crops each year: the World ratio of the nutrient in its products to the crops processed.
 
-    Implements assumption 7, with the densities already in `tb`. The ratio is summed over countries (World is the sum
-    of its countries), so that a family uses the values that earlier families wrote into `tb`. The nutrient of
-    intermediates processed further within the family is taken out, since it would otherwise count twice: as their
-    own production and as the production of what they become.
+    Implements assumption 7, with the densities already in `tb`. The ratio is summed over all countries, so that a
+    family uses the values that earlier families wrote into `tb`. The nutrient of intermediates processed further
+    within the family is taken out, since it would otherwise count twice: as their own production and as the
+    production of what they become.
     """
     ceiling = NUTRIENTS[nutrient]["ceiling"]
     crops = [_pad_code(c) for c in family["crops"]]
     products = [_pad_code(c) for c in family["products"]]
     intermediates = [_pad_code(c) for c in family["intermediates"]]
-    members = tb[~tb["country"].isin(REGIONS) & tb["item_code"].isin(crops + products)]
+    members = tb[tb["item_code"].isin(crops + products)]
     made = (members["production"] * members["density"]).where(members["item_code"].isin(products), 0)
     netted = (members["processing"] * members["density"]).where(members["item_code"].isin(intermediates), 0)
     nutrient_out = (made - netted).groupby(members["year"]).sum() * HUNDRED_GRAMS_PER_TONNE
@@ -840,10 +834,11 @@ def product_implied_density(tb: Table, family: dict, nutrient: str) -> pd.Series
 def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
     """Densities per (country, year, item) for one nutrient.
 
-    Implements assumptions 3 (densities from food), 4 (one factor per entity and item), 5 (fish by year), 6 (fixed)
+    Implements assumptions 3 (densities from food), 4 (one factor per country and item), 5 (fish by year), 6 (fixed)
     and 7 (implied by products).
     """
     assert nutrient != "mass", "The mass table involves no density; it never goes through this function."
+    assert not tb["country"].isin(REGIONS).any(), "Regions have no densities: they are sums of their countries' stages."
     tb = tb.copy()
     # The nutrient decides the ingredients (see NUTRIENTS): which food total is the numerator of the density, and
     # the physical ceiling.
@@ -857,18 +852,15 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
     valid = np.isfinite(cell) & (cell >= 0) & (cell <= ceiling)
     nutrient_eaten = tb[numerator].where(valid, 0)
     tonnes_eaten = tb["food_tonnes_for_density"].where(valid, 0)
-    # Assumption 4: an entity's factor for an item is its food nutrient over its food across all years, if it eats
+    # Assumption 4: a country's factor for an item is its food nutrient over its food across all years, if it eats
     # enough of the item; otherwise the item's factor over all countries.
     pair = [tb["country"], tb["item_code"]]
     pair_tonnes = tonnes_eaten.groupby(pair).transform("sum")
     pair_factor = nutrient_eaten.groupby(pair).transform("sum") / (pair_tonnes * HUNDRED_GRAMS_PER_TONNE)
-    is_country = ~tb["country"].isin(REGIONS)
-    item_tonnes = tonnes_eaten.where(is_country, 0).groupby(tb["item_code"]).transform("sum")
-    item_factor = nutrient_eaten.where(is_country, 0).groupby(tb["item_code"]).transform("sum") / (
-        item_tonnes * HUNDRED_GRAMS_PER_TONNE
-    )
+    item_tonnes = tonnes_eaten.groupby(tb["item_code"]).transform("sum")
+    item_factor = nutrient_eaten.groupby(tb["item_code"]).transform("sum") / (item_tonnes * HUNDRED_GRAMS_PER_TONNE)
     # Assumption 5: fish keep the density of each year, because the species in an FBS fish group change; a year with
-    # no usable food takes the entity's factor over all years, whatever the tonnage.
+    # no usable food takes the country's factor over all years, whatever the tonnage.
     is_fish = tb["item_code"].isin([_pad_code(item["code"]) for item in manual["fish_from_fbs"]])
     fish_year = cell.where(is_fish & valid)
     own_factor = pair_factor.where((pair_tonnes >= MIN_FOOD_TONNES_FOR_OWN_FACTOR) | (is_fish & (pair_tonnes > 0)))
@@ -927,7 +919,7 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
 
 
 def sanity_check_densities(tb: Table, nutrient: str) -> None:
-    """Check the scales promised in assumption 4: every tonne has a density, and most tonnage uses an own factor."""
+    """Check the scales promised in assumption 4: every tonne has a density, and most tonnage uses FAO's factors."""
     ceiling = NUTRIENTS[nutrient]["ceiling"]
     assert (tb["density"] >= 0).all() and (tb["density"] <= ceiling).all(), f"{nutrient} densities out of range."
     mass = (tb["production"] + tb["imports"]).abs()
@@ -935,15 +927,15 @@ def sanity_check_densities(tb: Table, nutrient: str) -> None:
     provenance = (100 * provenance / provenance.sum()).round(2)
     # Crops that go to factories (assumption 7) and items nobody eats (assumption 6) legitimately use other values.
     assert provenance.get("none", 0) == 0, "Some supply has no density."
-    own = provenance.get("own_factor", 0) + provenance.get("fish_year", 0)
-    assert own > 55, f"Only {own:.1f}% of supply uses the {nutrient} factor of its own country."
+    from_food = provenance.get("own_factor", 0) + provenance.get("fish_year", 0) + provenance.get("item_factor", 0)
+    assert from_food > 65, f"Only {from_food:.1f}% of supply uses a {nutrient} factor read from FAO's food data."
 
 
 def sanity_check_processing_families(tb: Table, manual: dict, nutrient: str) -> None:
-    """For World in the latest year, nutrient out of processing as products vs nutrient in, per family."""
-    world = tb[(tb["country"] == "World") & (tb["year"] == tb["year"].max())]
+    """For all countries together in the latest year, nutrient out of processing as products vs nutrient in, per family."""
+    latest = tb[tb["year"] == tb["year"].max()]
     for name, codes in manual["processing_families_for_checks"].items():
-        members = world[world["item_code"].isin([_pad_code(c) for c in codes])]
+        members = latest[latest["item_code"].isin([_pad_code(c) for c in codes])]
         nutrient_in = (members["processing"] * members["density"]).sum()
         nutrient_out = (members.loc[members["role"] == "processed", "production"] * members["density"]).sum()
         ratio = nutrient_out / nutrient_in
@@ -1150,11 +1142,8 @@ def run() -> None:
     # Assumption 9: fish and seafood, taken from FBS.
     tb_fish = prepare_fish_table(tb_fbsc, manual=manual, population=population)
     tb = pr.concat([tb, tb_fish], ignore_index=True)
-    # Assumptions 12 and 13: OWID regions from member countries, dropping region-years with low coverage.
-    tb = add_region_aggregates(tb)
     sanity_check_balance_identity(tb)
 
-    population_by_entity = tb[["country", "year", "population"]].drop_duplicates()
     tables = []
     for nutrient in NUTRIENTS:
         if nutrient == "mass":
@@ -1168,7 +1157,9 @@ def run() -> None:
             # Assumption 3: convert tonnes; food keeps FAO's reported nutrients wherever reported.
             converted = convert_elements_to_nutrient(tb_nutrient, nutrient=nutrient)
         # Assumption 8: production split by role, items summed into the stages of the chain.
-        chain = sum_items_into_stages(converted, population=population_by_entity)
+        chain = sum_items_into_stages(converted, population=population)
+        # Assumptions 12 and 13: OWID regions as the sum of their countries, dropping region-years with low coverage.
+        chain = add_region_aggregates(chain)
         if nutrient != "mass":
             # Assumption 15: processing cannot create energy or protein; any gain goes to data adjustments.
             chain = move_processing_gains_to_adjustments(chain)
