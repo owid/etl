@@ -365,6 +365,18 @@ def main() -> None:
             "2 dropdowns · 4 combinations · 2 linked" in page.inner_text("#panel-summary"),
         )
 
+        # Replacing a view's indicator drops the suggestions made for the old one.
+        if not page.locator("#panel.open").count():
+            page.click("#panel-toggle")
+        share_row = page.locator("table.combos tbody tr").filter(has_text="Share of population").first
+        share_row.locator("td.indicator input").fill(number_path)
+        share_row.locator("td.indicator input").press("Enter")
+        page.wait_for_timeout(2500)
+        check(
+            "replacing an indicator drops its suggestions",
+            "Suggested for the indicator everywhere" not in copied_setup(page),
+        )
+
         # Each page keeps its own work: the empty page is still empty.
         page.goto(BLANK.as_uri())
         page.wait_for_timeout(2500)

@@ -1231,8 +1231,12 @@ async function linkIndicator(key, raw, statusCell) {
     if (statusCell.isConnected) statusCell.innerHTML = statusHtml(status);
   };
 
+  // A suggestion is for the indicator it was made on, so it goes when the view's indicator changes.
+  const dropSuggestions = () => { delete state.suggest[key]; };
+
   if (!raw.trim()) {
     delete state.links[key];
+    dropSuggestions();
     saveState();
     setStatus(null);
     renderSummary();
@@ -1244,12 +1248,14 @@ async function linkIndicator(key, raw, statusCell) {
     const id = await resolveInput(raw);
     const meta = await getMeta(id);
     if (pendingByKey.get(key) !== token) return;
+    if (state.links[key]?.id !== id) dropSuggestions();
     state.links[key] = { input: raw.trim(), id };
     saveState();
     setStatus({ kind: "ok", meta });
   } catch (err) {
     if (pendingByKey.get(key) !== token) return;
     delete state.links[key];
+    dropSuggestions();
     saveState();
     setStatus({ kind: "error", message: err.message });
   }
