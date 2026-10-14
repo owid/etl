@@ -265,8 +265,9 @@ Key fields:
     But a variable's `map` block replaces the common one instead of merging into it.
   - A field set in the chart config overrides the inherited one, so keep only what is specific to this chart.
   - When `title_public` isn't set, `grapher_config.title` also becomes the indicator's data page title.
-  - A chart with several y-indicators doesn't inherit (grapher turns inheritance off), so its FAUST and settings
-    stay in the chart config.
+  - A chart with several y-indicators doesn't inherit (grapher turns inheritance off), and neither does an
+    adopted chart whose `charts.isInheritanceEnabled` is 0, so their FAUST and settings stay in the chart config.
+    Charts that ETL creates start with inheritance on.
   - To check, read `charts.isInheritanceEnabled` and the chart's own layers on staging (the `chart_configs`
     rows named by `charts.patchConfigIdETL` and `charts.patchConfigId`), not the rendered config, where an
     override looks the same as an inherited value.
