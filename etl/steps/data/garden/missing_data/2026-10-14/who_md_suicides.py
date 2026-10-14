@@ -12,12 +12,13 @@ paths = PathFinder(__file__)
 
 def run() -> None:
     # Load relevant datasets.
-    ds_data = paths.load_dataset("self_inflicted_injuries")
+    ds_data = paths.load_dataset("mortality_database")
     ds_regions = paths.load_dataset("regions")
     ds_income_groups = paths.load_dataset("income_groups")
     ds_population = paths.load_dataset("population")
     tb_population = ds_population["population"].reset_index()
-    tb = ds_data["self_inflicted_injuries"].reset_index()
+    tb = ds_data.read("intentional_injuries")
+    tb = tb[tb["cause"] == "Self-inflicted injuries"].drop(columns=["cause"])
 
     tb_data = prepare_data(tb)
 
