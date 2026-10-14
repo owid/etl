@@ -12,7 +12,7 @@ views:
     config:
       title: "Share of foreign aid given that is climate-related"
       subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of the bilateral ODA covered by the OECD's climate tracking."
-      note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and costs in donor countries, such as hosting refugees. DAC members are the members of the OECD Development Assistance Committee."
+      note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
       tab: "chart"
       hasMapTab: true
       chartTypes:
