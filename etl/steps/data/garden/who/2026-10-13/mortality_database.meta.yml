@@ -278,6 +278,12 @@ tables:
   # A lookup table, kept in the catalog and not published to Grapher. It records where each cause group sits in
   # WHO's cause tree, so the groups that partition all deaths can be told apart from drill-downs inside them.
   vaccine_preventable_diseases:
+    # The retired vaccine_preventable dataset was tagged Vaccination; its successors keep that tag next to the common one.
+    common:
+      presentation:
+        topic_tags:
+          - Causes of Death
+          - Vaccination
     variables: *fact_variables
   causes:
     variables:
