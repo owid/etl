@@ -57,14 +57,17 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
   `fill: #ffffff` is the bug.
 - **`gid=` on every artist**, so the layer panel reads `boys__median` rather than `Path 41`.
   Grapher does exactly this with `makeFigmaId` (`packages/@ourworldindata/utils/src/Util.ts`).
-  Use `<subject>__<role>` so the names sort into groups. **The verifier cannot enforce this clause on
-  its own, so name the layers and pass them.** It fails an SVG carrying no deliberate name at all,
-  but it cannot tell which artists *ought* to have been named: matplotlib emits `line2d_<n>` groups
-  for every tick mark exactly as it does for an unnamed data line, so "no generated ids left" is not
-  a test any correct figure would pass. Give it the data layers explicitly and the contract becomes a
-  real check rather than a presence check — otherwise a figure whose title is named and whose plotted
-  line is not still reports `OK`. Pass them as
-  `--expect-gid boys__median --expect-gid girls__median`.
+  Use `<subject>__<role>` so the names sort into groups. The names are also what Figma's re-import
+  (`restyle_static_import.js` with `inheritStyles`) joins on to carry a designer's style bindings
+  onto a fresh render, so an unnamed mark loses its binding. `export_frame` names each axes' own
+  furniture (gridlines, ticks, tick labels, spines, axis labels) by tick value wherever the step has
+  not, which leaves only what the step draws itself, and those it must name. **Verify with
+  `--require-named-marks`**, which fails on any painted mark under no `<subject>__<role>` gid and
+  names its matplotlib id (`text_7`), so the artist to fix is the one it lists; it also fails when
+  two artists share a `<subject>__<role>` gid, since the re-import cannot tell them apart (a `gid=`
+  passed to `ax.bar` lands on every bar, so name each bar from the returned container). Pass the
+  data layers as well (`--expect-gid boys__median --expect-gid girls__median`): the naming check proves every mark
+  has *a* name, the expected gids prove the data layers have the *right* one.
 - **Do not pass `bbox_inches="tight"`** when the frame must match a template — cropping to content
   changes the proportions, which is the whole thing the template fixes. `export_fig` already
   injects `metadata={"Date": None}` on the SVG pass for reproducible diffs.
