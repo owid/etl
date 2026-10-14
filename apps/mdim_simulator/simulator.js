@@ -487,17 +487,27 @@ function setText(field, value) {
   const { key, meta } = current;
   const views = state.textEdits.views;
   const own = (views[key] ||= {});
-  if (same(value, originalTexts(meta)[field])) delete own[field];
-  else own[field] = value;
+  if (same(value, originalTexts(meta)[field])) {
+    delete own[field];
+    dropSuggestion(key, field);
+  } else own[field] = value;
   if (!("descriptionKey" in own)) delete own.descriptionKeyIsList;
   if (!Object.keys(own).length) delete views[key];
   saveState();
+}
+
+// A "suggest for the indicator everywhere" belongs to the change it was ticked on.
+function dropSuggestion(key, field) {
+  if (!state.suggest[key]) return;
+  delete state.suggest[key][field];
+  if (!Object.keys(state.suggest[key]).length) delete state.suggest[key];
 }
 
 function undoText(field) {
   const views = state.textEdits.views;
   if (!views[current.key]) return;
   delete views[current.key][field];
+  dropSuggestion(current.key, field);
   if (field === "descriptionKey") delete views[current.key].descriptionKeyIsList;
   if (!Object.keys(views[current.key]).length) delete views[current.key];
   saveState();
@@ -1113,7 +1123,20 @@ function removeButton(label, onClick) {
   return btn;
 }
 
+// A dropdown's groups: the named ones, plus any an option uses. Options are kept in box order (no group first,
+// then each group), so the editor, the dropdown menu and the copied setup all list them the same way.
+function syncGroups(dim) {
+  dim.groups = [...(dim.groups || [])];
+  for (const c of dim.choices) {
+    const g = c.group?.trim();
+    if (g && !dim.groups.includes(g)) dim.groups.push(g);
+  }
+  const rank = (c) => (c.group?.trim() ? dim.groups.indexOf(c.group.trim()) : -1);
+  dim.choices = dim.choices.map((c, i) => [c, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(([c]) => c);
+}
+
 function structureChanged() {
+  for (const dim of state.dims) syncGroups(dim);
   pruneLinks();
   normalizeSelection();
   saveState();
@@ -1160,15 +1183,27 @@ function renderDims() {
     dimExtras.append(dimDescription.input, dimDescription.link);
     card.append(dimExtras);
 
-    const groupListId = `groups-${dim.id}`;
-    const datalist = document.createElement("datalist");
-    datalist.id = groupListId;
-    datalist.innerHTML = [...new Set(dim.choices.map((c) => c.group?.trim()).filter(Boolean))].map((g) => `<option value="${esc(g)}">`).join("");
-    card.append(datalist);
+    // Groups are outlined boxes with a heading; options outside every box have no group. Empty groups live in
+    // dim.groups until an option is moved in.
+    syncGroups(dim);
+    const addGroup = document.createElement("button");
+    addGroup.type = "button";
+    addGroup.className = "link-btn add-group";
+    addGroup.textContent = "+ Add group";
+    addGroup.addEventListener("click", () => {
+      let n = dim.groups.length + 1;
+      while (dim.groups.includes(`Group ${n}`)) n++;
+      dim.groups.push(`Group ${n}`);
+      structureChanged();
+      const heads = document.querySelectorAll(`#dims-list .dim-card:nth-child(${dimIndex + 1}) .group-head input`);
+      heads[heads.length - 1]?.select();
+    });
+    card.append(addGroup);
 
-    dim.choices.forEach((choice, choiceIndex) => {
+    const optionRow = (choice) => {
       const row = document.createElement("div");
       row.className = "choice-row";
+      row.dataset.choice = choice.id;
       const fields = document.createElement("div");
       fields.className = "choice-fields";
       const nameInput = textInput(choice.name, "Option name", (v) => { choice.name = v; namesChanged(); });
@@ -1178,36 +1213,76 @@ function renderDims() {
         saveState();
         renderBar();
       });
-      const group = optionalField(choice.group, "Group heading in the dropdown, e.g. Fossil fuels", "+ Add group", (v) => {
-        choice.group = v;
-        saveState();
-        renderBar();
-      });
-      group.input.setAttribute("list", groupListId);
-      const links = document.createElement("div");
-      links.className = "optional-links";
-      links.append(description.link, group.link);
-      fields.append(nameInput, description.input, group.input, links);
-      row.append(
-        fields,
-        removeButton(`Remove the ${choice.name || "untitled"} option`, () => {
-          dim.choices.splice(choiceIndex, 1);
+      fields.append(nameInput, description.input, description.link);
+      row.append(fields);
+      if (dim.groups.length) {
+        const picker = document.createElement("select");
+        picker.className = "group-picker";
+        picker.setAttribute("aria-label", "Group");
+        picker.innerHTML = `<option value="">No group</option>` + dim.groups.map((g) => `<option>${esc(g)}</option>`).join("");
+        picker.value = choice.group?.trim() || "";
+        picker.addEventListener("change", () => {
+          if (picker.value) choice.group = picker.value;
+          else delete choice.group;
           structureChanged();
-        }),
-      );
-      card.append(row);
+        });
+        row.append(picker);
+      }
+      row.append(removeButton(`Remove the ${choice.name || "untitled"} option`, () => {
+        dim.choices.splice(dim.choices.indexOf(choice), 1);
+        structureChanged();
+      }));
+      return row;
+    };
+    // `currentGroup` is read on click: a group can be renamed without the editor being redrawn.
+    const addOption = (currentGroup) => {
+      const button = document.createElement("button");
+      button.className = "btn";
+      button.textContent = "+ Add option";
+      button.addEventListener("click", () => {
+        const group = currentGroup();
+        const choice = { id: newId(), name: `Option ${dim.choices.length + 1}`, ...(group ? { group } : {}) };
+        dim.choices.push(choice);
+        structureChanged();
+        document.querySelector(`#dims-list [data-choice="${choice.id}"] input.choice-name`)?.select();
+      });
+      return button;
+    };
+
+    for (const choice of dim.choices.filter((c) => !c.group?.trim())) card.append(optionRow(choice));
+    card.append(addOption(() => null));
+
+    dim.groups.forEach((groupName, groupIndex) => {
+      const box = document.createElement("div");
+      box.className = "group-box";
+      const head = document.createElement("div");
+      head.className = "group-head";
+      const label = document.createElement("span");
+      label.className = "group-head__label";
+      label.textContent = "Group";
+      const nameInput = textInput(groupName, "Heading in the dropdown, e.g. Fossil fuels", (v) => {
+        const old = dim.groups[groupIndex];
+        dim.groups[groupIndex] = v;
+        for (const c of dim.choices) if (c.group === old) c.group = v;
+        // Keep this dropdown's "Group" pickers in step with the new name.
+        for (const option of card.querySelectorAll(".group-picker option")) {
+          if (option.value === old) { option.value = v; option.textContent = v; }
+        }
+        namesChanged();
+      });
+      nameInput.addEventListener("blur", () => { if (!nameInput.value.trim()) { nameInput.value = `Group ${groupIndex + 1}`; nameInput.dispatchEvent(new Event("input")); } });
+      head.append(label, nameInput, removeButton(`Remove the ${groupName} group (its options stay, without a group)`, () => {
+        const name = dim.groups[groupIndex];
+        for (const c of dim.choices) if (c.group === name) delete c.group;
+        dim.groups.splice(groupIndex, 1);
+        structureChanged();
+      }));
+      box.append(head);
+      for (const choice of dim.choices.filter((c) => c.group?.trim() === groupName)) box.append(optionRow(choice));
+      box.append(addOption(() => dim.groups[groupIndex]));
+      card.append(box);
     });
 
-    const add = document.createElement("button");
-    add.className = "btn";
-    add.textContent = "+ Add option";
-    add.addEventListener("click", () => {
-      dim.choices.push({ id: newId(), name: `Option ${dim.choices.length + 1}` });
-      structureChanged();
-      const inputs = card.ownerDocument.querySelectorAll(`#dims-list .dim-card:nth-child(${dimIndex + 1}) .choice-row input.choice-name`);
-      inputs[inputs.length - 1]?.select();
-    });
-    card.append(add);
     list.append(card);
   });
 }
@@ -1420,10 +1495,16 @@ async function setupYaml() {
   else lines.push("# topic_tags: add at least one, ETL requires it");
   if (state.defaultSelection.length) lines.push("default_selection:", ...state.defaultSelection.map((name) => `  - ${JSON.stringify(name)}`));
   else lines.push("# default_selection: tick at least one country in the chart");
-  const firstCombo = combinations().find((c) => comboKey(c) === defaultComboKey());
-  if (state.dims.length && firstCombo) {
+  // The view that opens first has to be one that is exported, so it must have an indicator.
+  const linked = (c) => Boolean(state.links[comboKey(c)]?.id);
+  const chosenFirst = combinations().find((c) => comboKey(c) === defaultComboKey());
+  const firstCombo = chosenFirst && linked(chosenFirst) ? chosenFirst : combinations().find(linked);
+  if (firstCombo) {
     lines.push("default_dimensions:", ...firstCombo.map((c, i) => `  ${dimSlugs[i]}: ${choiceSlugs.get(c.id)}`));
   }
+  const firstNote = chosenFirst && firstCombo !== chosenFirst
+    ? "# The view set to open first has no indicator yet, so the first view with one opens first instead."
+    : null;
   lines.push("definitions:", "  common_views:", "    - config:", ...yamlLines(sharedConfig(), 8));
   const textBlock = (edits, indent, meta) => {
     const out = [];
@@ -1484,6 +1565,7 @@ async function setupYaml() {
   }
   lines.push(viewLines.length ? "views:" : "views: []", ...viewLines);
   if (unlinked.length) lines.push("# Combinations with no indicator yet:", ...unlinked.map((u) => `#   - ${u}`));
+  if (firstNote) lines.push(firstNote);
   if (changes.length) lines.push("# Text changes, against each indicator's own text:", ...changes);
   if (suggestions.length) {
     lines.push("# Suggested for the indicator everywhere (Claude: check which other charts use it, with /edit-faust-metadata, before changing it):", ...suggestions);

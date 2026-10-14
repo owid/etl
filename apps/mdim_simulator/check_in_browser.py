@@ -229,10 +229,16 @@ def main() -> None:
         page.fill("#text-note", "Data for 2025 is provisional.")
         page.wait_for_timeout(300)
         check("footnote shows on the chart", "provisional" in page.inner_text("#chart"))
+        page.check("#tools-note input[type=checkbox]")
         page.click("#tools-note .link-btn")
         page.wait_for_timeout(300)
         check("undo removes it", "provisional" not in page.inner_text("#chart"))
         page.fill("#text-note", "Data for 2025 is provisional.")
+        page.wait_for_timeout(300)
+        check(
+            "an undone change takes its suggestion with it",
+            not page.locator("#tools-note input[type=checkbox]").is_checked(),
+        )
         page.check("#tools-subtitle input[type=checkbox]")
         page.screenshot(path=SCREENSHOTS / "text_editing.png")
 
@@ -320,8 +326,13 @@ def main() -> None:
         first_card = page.locator(".dim-card >> nth=0")
         first_card.locator(".choice-fields .link-btn", has_text="+ Add description").first.click()
         first_card.locator(".choice-fields input.choice-description").first.fill("What the chart counts")
-        first_card.locator(".choice-row >> nth=1").locator(".link-btn", has_text="+ Add group").click()
-        first_card.locator(".choice-row >> nth=1").locator("input[list]").fill("Relative")
+        check("there's one '+ Add group', above the options", first_card.locator(".add-group").count() == 1)
+        first_card.locator(".add-group").click()
+        first_card.locator(".group-box .group-head input").fill("Relative")
+        first_card.locator(".choice-row >> nth=1").locator(".group-picker").select_option("Relative")
+        in_box = [i.input_value() for i in first_card.locator(".group-box .choice-row input.choice-name").all()]
+        check("the option sits in the group's box", in_box == ["Share of population"], in_box)
+        page.screenshot(path=SCREENSHOTS / "groups.png")
         page.click("#mdim-bar .md-dropdown >> nth=0")
         check(
             "the menu shows the dropdown description",
@@ -346,6 +357,17 @@ def main() -> None:
         check("the setup is copied", page.inner_text("#copy-status").startswith("Copied"))
         setup_path = OUT / "last_setup.yml"
         setup_path.write_text(setup_text)
+
+        # If the view set to open first has no indicator, the export opens on a linked view instead.
+        combos = page.locator("table.combos tbody tr")
+        chosen_row = next(
+            i for i in range(combos.count()) if combos.nth(i).locator("td.default-col input").is_checked()
+        )
+        combos.filter(has_text="Not linked yet").first.locator("td.default-col input").check()
+        fallback = yaml.safe_load(copied_setup(page))
+        linked_views = [v["dimensions"] for v in fallback["views"]]
+        check("an unlinked first view falls back to a linked one", fallback["default_dimensions"] in linked_views)
+        combos.nth(chosen_row).locator("td.default-col input").check()
 
         # Resize, fold, reload.
         before = box_of(page.locator("#panel-body"))["height"]
@@ -441,6 +463,7 @@ def main() -> None:
     chart = create_chart_from_config(
         setup, dependencies={wdi_dataset}, catalog_path="worldbank_wdi/latest/internet_users#internet_users"
     )
+    chart.sort_views_with_default_first()  # what saving the step does; it raises if no view matches the default
     check("ETL accepts the copied setup unedited", len(chart.views) == 2)
 
     if failures:

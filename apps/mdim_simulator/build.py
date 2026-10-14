@@ -160,6 +160,7 @@ def state_from_setup(setup: dict) -> tuple[dict, list[int]]:
                 }
                 for c in d.get("choices", [])
             ],
+            "groups": list(dict.fromkeys(c["group"] for c in d.get("choices", []) if c.get("group"))),
         }
         for d in setup.get("dimensions") or []
     ]

@@ -145,8 +145,9 @@ mechanics, not for the conversation:
   - an MDim (`multi_dim_data_pages.slug`);
   - a site redirect (`redirects.source` = `/grapher/<slug>`).
 
-  Check all four in the public Datasette. It only lists published charts, so if the admin still refuses the
-  address later, propose another one.
+  Check all four in the public Datasette. Then check that `https://ourworldindata.org/grapher/<slug>` returns
+  404: anything else means the address is in use, including redirects to other MDims (`multi_dim_redirects`),
+  which the public Datasette doesn't list. If the admin still refuses the address later, propose another one.
 - **Anything the setup leaves open:** combinations with no indicator yet, and specific map bins if they asked
   for them (the page only offers automatic ones).
 
@@ -156,8 +157,10 @@ Turn the setup into the step with `/create-chart`. The setup is already in `viz:
 `title`, `topic_tags`, `default_selection`, `default_dimensions`, shared settings under
 `definitions.common_views`, `dimensions` and `views`.
 
-- **The DAG entry:** its dependencies are the grapher datasets of the linked indicators. The setup uses full
-  catalog paths; `/create-chart` prefers the short `table#indicator` form.
+- **Catalog paths and versions:** the setup uses full catalog paths, which include the dataset's version.
+  Convert each one to the short `table#indicator` form, as every MDim does. The version then lives only in the
+  step's DAG dependency, `data://grapher/<namespace>/<version>/<dataset>`, so a dataset update only has to change
+  that line. Keep the full form only where two dependencies have a table of the same name.
 - **The web address isn't part of the step:** the config has no slug field. Keep it for step 5f.
 - **The comments at the end:** use the text changes against each indicator's original in the PR description.
   Changes suggested for an indicator everywhere go through `/edit-faust-metadata`, which checks the other charts
