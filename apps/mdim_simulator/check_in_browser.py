@@ -537,14 +537,23 @@ def main() -> None:
         added.locator(".wm-actions .btn-primary").click()
         page.wait_for_timeout(300)
         check("a point can be deleted from every view", not point_on("Added to both views."))
+        page.locator(".wm-add textarea").fill("Added at the top.")
+        page.locator(".wm-add .wm-where").select_option("top")
+        page.locator(".wm-add .btn-primary").click()
+        page.wait_for_timeout(300)
         page.click("#wm-close")
+        check(
+            "a new point can go at the top",
+            page.locator("#wysk-list li").first.inner_text().startswith("Added at the top."),
+        )
         on_screen = page.inner_text("#wysk-list")
         check("the view on screen shows the edit", "Edited on the share view only." in on_screen)
         exported = {v["dimensions"]["metric"]: v for v in yaml.safe_load(copied_setup(page))["views"]}
         share_wysk = str(exported["share"].get("metadata", {}).get("description_key"))
+        number_wysk = str(exported["number"].get("metadata", {}).get("description_key"))
         check(
             "the edit is exported on its view only",
-            "Edited on the share view only." in share_wysk and "metadata" not in exported["number"],
+            "Edited on the share view only." in share_wysk and "Edited on the share view only." not in number_wysk,
         )
         # Drag the last point of the view on screen to the top.
         page.click("#text-editor-toggle")

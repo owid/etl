@@ -132,7 +132,7 @@ for (const { meta, csv } of INITIAL_INDICATORS) {
 
 async function fetchJson(url) {
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) throw Object.assign(new Error(`HTTP ${res.status}`), { status: res.status });
   return res.json();
 }
 
@@ -158,7 +158,10 @@ async function withChartSettings(meta) {
 function getMeta(id) {
   if (!metaCache.has(id)) {
     const p = fetchJson(`${API}/${id}.metadata.json`)
-      .catch(() => { throw new Error(`No indicator with ID ${id}.`); })
+      // Only a 404 means the ID is wrong; anything else is the network or the API, worth trying again.
+      .catch((err) => {
+        throw new Error(err.status === 404 ? `No indicator with ID ${id}.` : `Couldn't load indicator ${id} (${err.message}). Try again.`);
+      })
       .then(withChartSettings);
     p.catch(() => metaCache.delete(id));
     metaCache.set(id, p);
@@ -680,7 +683,10 @@ function renderWysk() {
     view.addEventListener("click", (e) => { if (!e.target.closest("a")) startEdit(); });
     view.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); startEdit(); } });
     li.dataset.index = i;
-    li.append(dragHandle(li, i, blocks, save), view, removeButton("Remove this point", () => save(blocks.filter((_, j) => j !== i))));
+    // The opening paragraph has no handle: it has to stay first.
+    const handle = isBullet(block) ? dragHandle(li, i, blocks, save) : document.createElement("span");
+    if (!isBullet(block)) handle.className = "wysk-handle wysk-handle--none";
+    li.append(handle, view, removeButton("Remove this point", () => save(blocks.filter((_, j) => j !== i))));
     list.append(li);
   });
 
@@ -695,6 +701,13 @@ function renderWysk() {
     list.querySelector(".wysk-edit")?.select();
   });
   wyskEl.append(add);
+}
+
+// Where the points start: after the paragraph a view's text may open with. Joined as one block of text, a
+// paragraph placed after a point would become part of that point.
+function firstPointIndex(blocks) {
+  const i = blocks.findIndex(isBullet);
+  return i === -1 ? blocks.length : i;
 }
 
 // Points move by dragging their handle; only the handle starts a drag, so clicking the text still edits it.
@@ -724,7 +737,7 @@ function dragHandle(li, i, blocks, save) {
     if (wyskDragFrom === null) return;
     e.preventDefault();
     const from = wyskDragFrom;
-    let to = dropsAfter(e) ? i + 1 : i;
+    let to = Math.max(dropsAfter(e) ? i + 1 : i, firstPointIndex(blocks));
     if (from < to) to--;
     wyskDragFrom = null;
     if (to === from) return renderWysk();
@@ -888,15 +901,23 @@ function addPointForm() {
   box.className = "wm-add";
   const heading = document.createElement("h3");
   heading.textContent = "Add a point";
-  const ta = managerTextarea("", "The new point. It goes at the end of each view's list.");
+  const ta = managerTextarea("", "The new point");
   const label = (n) => `Add to ${viewsCount(n)}`;
   const keys = managerViews.map((v) => v.key);
   const add = managerButton(label(keys.length), () => {
     const text = ta.value.trim();
     const keysNow = scope.selected();
     if (!text || !keysNow.length) return;
-    changeViews(keysNow, (blocks) => [...blocks, `- ${text}`]);
+    const point = `- ${text}`;
+    changeViews(keysNow, (blocks) => {
+      const at = where.value === "top" ? firstPointIndex(blocks) : blocks.length;
+      return [...blocks.slice(0, at), point, ...blocks.slice(at)];
+    });
   }, true);
+  const where = document.createElement("select");
+  where.className = "wm-where";
+  where.setAttribute("aria-label", "Where the new point goes");
+  where.innerHTML = `<option value="bottom">At the bottom of the list</option><option value="top">At the top of the list</option>`;
   const scope = scopePicker(keys, (sel) => { add.textContent = label(sel.length); add.disabled = !sel.length; });
   box.append(heading, ta);
   if (keys.length > 1) {
@@ -907,7 +928,7 @@ function addPointForm() {
   }
   const actions = document.createElement("div");
   actions.className = "wm-actions";
-  actions.append(add);
+  actions.append(add, where);
   box.append(actions);
   return box;
 }
@@ -916,7 +937,9 @@ function renderWyskManager() {
   const body = document.getElementById("wm-body");
   body.innerHTML = "";
   if (!managerViews.length) {
-    body.innerHTML = `<p class="hint">Link an indicator to a combination first.</p>`;
+    body.innerHTML = managerMissing
+      ? `<p class="hint">The text of the linked views couldn't be loaded. Check your connection, then open this again.</p>`
+      : `<p class="hint">Link an indicator to a combination first.</p>`;
     return;
   }
   // Each point once, with the views that have it, in the order they first appear.
