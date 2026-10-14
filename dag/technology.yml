@@ -34,3 +34,9 @@ steps:
     - data://garden/technology/2026-02-01/top500_supercomputers:
       - data://meadow/technology/2026-02-01/top500_supercomputers:
         - snapshot://technology/2026-02-01/top500_supercomputers.csv
+
+  #
+  # Internet users MDim from WDI (share of population and number of people)
+  #
+  viz://chart/worldbank_wdi/latest/internet_users:
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
