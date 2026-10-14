@@ -203,9 +203,10 @@ Each assumption starts with a line on its scale: how much it changes the results
    rest of the chain.
 
 10. Any gap between the other stages and food is counted as data adjustments.
-    >> Scale: minor for World (10 kcal per person per day in 2023). Large where people eat coconuts: 14% of food in
-    Micronesia in 2023, and 7% to 10% in Vanuatu, the Marshall Islands and Kiribati. Rounded fish tonnes can also
-    matter in small countries.
+    >> Scale: minor for World (43 kcal per person per day in 2023, 1.4% of food); major in many countries (more than
+    10% of food in 28 of 176 countries in 2023). The largest part is FAO's own residuals (more than 10% of food in 20
+    countries, and three times food in Djibouti), then processing gains (more than 10% of food in 6 countries, see
+    known problem 1), then rounding and valuation (13% of food in Micronesia, and 10% in Vanuatu).
 
     The stage "data_adjustments" holds everything that makes the chain end exactly on food:
     a. FAO's own "residuals".
@@ -216,7 +217,7 @@ Each assumption starts with a line on its scale: how much it changes the results
        value under assumption 7 (140 kcal per 100 g of coconuts in 2023), but arrive in food at FAO's value for the
        part people eat (85 kcal). For World, this is about 10 kcal per person per day (coconuts 4.5, sugar cane 4.3);
        in Micronesia, it is 363 kcal.
-    d. In energy and protein, any gain in processing (assumption 15).
+    d. In energy and protein, any gain in processing (assumption 14).
     e. For World, the gap between imports and exports, and tourist consumption (assumption 11).
     Points b and c together are also kept as "balancing_difference", for quality control.
 
@@ -236,32 +237,24 @@ Each assumption starts with a line on its scale: how much it changes the results
     it to zero, and the difference goes to "data_adjustments". Countries and other regions keep their tourist
     consumption, because for them it is real.
 
-12. Each region is the sum of its countries.
+12. Each region is the sum of its countries, and is dropped in years when they hold less than 80% of its population.
     >> Scale: major for the 10 region aggregates, which only exist through this assumption; no country's values
     change.
 
     We drop FAO's own regional aggregates, and build OWID regions (World, continents, income groups and the European
-    Union) from the member countries that have an SCL balance that year. Each stage of a region, in each unit, is the
-    sum of that stage over those countries (fish included). The region's population is the sum of the same
-    countries' populations.
+    Union) the usual OWID way. Each stage of a region, in each unit, is the sum of that stage over the member
+    countries that have an SCL balance that year (fish included), and the region's population is the sum of the same
+    countries' populations. A region-year is dropped when those countries hold less than 80% of the region's
+    population, so that a value labeled "Africa" is never built from a small part of Africa. "Low-income countries"
+    is left out altogether: SCL never covers more than 80% of its population, because FAO has not compiled Sudan,
+    Somalia and a few others.
 
-    Regions have no densities of their own: each country's tonnes are converted with that country's densities, and
-    the region adds up the results. A country has either a full balance or none, so the stages and the population
-    always cover the same countries.
-
-13. A region is dropped in years when its countries with data hold less than 80% of its population.
-    >> Scale: minor. It removes a few region-years and one region; no country's values change.
-
-    We drop a region-year when the countries with a balance hold less than 80% of the region's population, so that a
-    value labeled "Africa" is never built from a small part of Africa. "Low-income countries" is left out altogether:
-    SCL never covers more than 80% of its population, because FAO has not compiled Sudan, Somalia and a few others.
-
-14. All values are per person per day.
+13. All values are per person per day.
     >> Scale: minor. A choice of unit; it rescales all values equally.
 
     All stages are divided by the population of assumption 12 and by 365 days.
 
-15. Processing never adds calories or protein: any gain is moved to data adjustments.
+14. Processing never adds calories or protein: any gain is moved to data adjustments.
     >> Scale: major for a few countries, nil for World. In 2023, 46 of 176 countries would otherwise show processing
     adding energy, 6 of them by more than 10% of food: Guyana 64%, Ukraine 14%, Uruguay 14%, the Netherlands 13%,
     Honduras 12% and Papua New Guinea 10%. In protein, 31 countries would, 4 of them by more than 10% (Guyana, New
@@ -276,10 +269,7 @@ Each assumption starts with a line on its scale: how much it changes the results
     shows zero. Only gains move. The same causes also inflate or shrink the real losses of other countries, and
     those stay in processing, which remains the least certain stage.
 
-    The rule applies to each country and region in each year, after the regions are summed from their countries. So
-    a region with a gain is treated like a country: Oceania in every year in energy; South America, Europe, North
-    America and the European Union in one year each; and Oceania in 2012 in protein. A region's processing is then
-    not the sum of its countries', but processing plus data adjustments is.
+    The rule applies to each country and region in each year.
 
     The mass table is left alone. In tonnes, a gain in processing can be real, because breweries and bottlers add
     water: in Namibia, 22 thousand tonnes of malt become 174 thousand tonnes of beer. So processing there is the net
@@ -289,13 +279,13 @@ KNOWN PROBLEMS, NOT YET RESOLVED
 --------------------------------
 1. Processing would create calories in some countries. We move the gains to data adjustments, but their causes
    remain.
-   >> Scale: major for a few countries. In 2023, the gains moved by assumption 15 exceed 10% of food in six countries
+   >> Scale: major for a few countries. In 2023, the gains moved by assumption 14 exceed 10% of food in six countries
    in energy (Guyana 64%, Ukraine, Uruguay, the Netherlands, Honduras and Papua New Guinea) and in four in protein
    (Guyana, New Zealand, Bolivia and Latvia). 29 of 176 countries have a gain above 1% of food in energy, and 20 in
    protein; 20% of all country-years have some gain in energy, and 14% in protein. Small for World, where processing
    loses 106 kcal per person per day, 1.8% of crop production.
 
-   Normally, "processing_net" is positive: more goes into factories than comes out. Assumption 15 keeps the gains
+   Normally, "processing_net" is positive: more goes into factories than comes out. Assumption 14 keeps the gains
    out of the processing bar, but not out of the chart: they appear in data adjustments as calories entering the
    chain (more than half of food in Guyana). The same causes also distort the losses that stay in processing
    elsewhere. The gains have four causes:
@@ -357,7 +347,8 @@ KNOWN PROBLEMS, NOT YET RESOLVED
    We weighed two alternatives and rejected both:
    a. Leaving the oil out would miss about 70% of its energy (20% of Peru's animal products), and the oil that
       importers buy.
-   b. Counting it in calories but not in tonnes would be exact, but would make one table an exception.
+   b. Counting it in calories but not in tonnes would remove the double counting from the mass table only, would
+      miss the oil that importers buy in tonnes, and would make one table an exception.
 
    FAO's oil figures exceed what the fish rows can yield in Iceland (13% of pelagic production), Denmark (17%) and
    Mauritania (11%), against about 5% for whole fish. Those are data problems, not method problems.
@@ -489,7 +480,7 @@ SUBTRACTED_STAGES = [
     "tourist_consumption",
     "data_adjustments",
 ]
-# Unit conversions. Exact by definition; they change no data beyond the choice of unit (assumption 14).
+# Unit conversions. Exact by definition; they change no data beyond the choice of unit (assumption 13).
 HUNDRED_GRAMS_PER_TONNE = 10_000
 KG_PER_TONNE = 1000
 GRAMS_PER_TONNE = 1_000_000
@@ -504,7 +495,7 @@ FIRST_YEAR = 2010
 IDENTITY_RELATIVE_TOLERANCE = 0.01
 IDENTITY_ABSOLUTE_TOLERANCE_TONNES = 2000
 # Expected outcome of the coverage rule below; empty, because "Low-income countries" is left out altogether
-# (checks assumption 13).
+# (checks assumption 12).
 REGIONS_WITH_LOW_COVERAGE = set()
 # Safety limit for assumption 11: World trade is only equalized while the gap is small; a gap above this share
 # of imports crashes the step instead.
@@ -523,10 +514,10 @@ DENSITY_ABSOLUTE_TOLERANCE = {"energy": 0.5, "protein": 0.05}
 # This threshold controls only the check; every listed item uses its fixed factor.
 MIN_FOOD_SHARE_FOR_FIXED_DENSITY_CHECK = 0.01
 
-# Assumption 13, minor: a region-year is dropped when the member countries with a balance hold less than this share
+# Assumption 12: a region-year is dropped when the member countries with a balance hold less than this share
 # of the region's population.
 MIN_FRACTION_POPULATION_COVERED = 0.8
-# Assumption 12, major for the region aggregates: the OWID regions rebuilt in this step; the FAOSTAT garden step's
+# Assumption 12: the OWID regions rebuilt in this step; the FAOSTAT garden step's
 # rows for them, if any, are dropped.
 REGIONS = [
     "World",
@@ -536,7 +527,7 @@ REGIONS = [
     "North America",
     "Oceania",
     "South America",
-    # "Low-income countries" is left out (assumption 13): SCL covers at most 80% of its population.
+    # "Low-income countries" is left out (assumption 12): SCL covers at most 80% of its population.
     "Lower-middle-income countries",
     "Upper-middle-income countries",
     "High-income countries",
@@ -743,12 +734,12 @@ def prepare_fish_table(tb_fbsc: Table, manual: dict, population: Table) -> Table
 
 
 # --------------------------------------------------------------------------------------------------------------------
-# Regions (assumptions 12 and 13).
+# Regions (assumption 12).
 # --------------------------------------------------------------------------------------------------------------------
 def add_region_aggregates(chain: Table) -> Table:
     """Add the OWID regions as the sum of their countries' stages, and drop the region-years with low coverage.
 
-    Implements assumptions 12 and 13.
+    Implements assumption 12.
     """
     assert not chain["country"].isin(REGIONS).any(), "Region rows must be dropped before aggregating."
     stages = [c for c in chain.columns if c not in ["country", "year", "population"]]
@@ -758,9 +749,9 @@ def add_region_aggregates(chain: Table) -> Table:
         index_columns=["country", "year"],
         aggregations={c: "sum" for c in stages},
     )
-    # Assumption 13 rides on this call: min_frac_population gates the summed population itself, so a region-year
-    # whose members with a balance hold less than MIN_FRACTION_POPULATION_COVERED of the region's population (taken
-    # from the population dataset) comes back with a nan population.
+    # The 80% rule of assumption 12: min_frac_population gates the summed population, so a region-year whose members
+    # with a balance hold less than MIN_FRACTION_POPULATION_COVERED of the region's population (taken from the
+    # population dataset) comes back with a nan population.
     population = paths.regions.add_aggregates(
         chain[["country", "year", "population"]],
         regions=REGIONS,
@@ -1032,7 +1023,7 @@ def move_rounding_gap_to_adjustments(chain: Table) -> Table:
 def move_processing_gains_to_adjustments(chain: Table) -> Table:
     """Move any gain in processing to "data_adjustments", so that processing never adds energy or protein.
 
-    Implements assumption 15. Called for energy and protein only: in tonnes, a gain in processing can be real (water
+    Implements assumption 14. Called for energy and protein only: in tonnes, a gain in processing can be real (water
     added in brewing and bottling).
     """
     gain = (-chain["processing_net"]).clip(lower=0)
@@ -1074,7 +1065,7 @@ def remove_world_tourist_consumption(chain: Table) -> Table:
 def per_person_per_day(chain: Table) -> Table:
     """Divide every stage by the entity's population and by 365 days.
 
-    Implements assumption 14. For regions, the population is that of the summed member countries (assumption 12).
+    Implements assumption 13. For regions, the population is that of the summed member countries (assumption 12).
     """
     assert chain["population"].notnull().all() and (chain["population"] > 0).all(), "Missing population."
     for stage in STAGES:
@@ -1089,7 +1080,7 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
     """Check one output table: shape, no negative magnitudes, the chain ends on food, and World matches FAO."""
     assert tb.columns[tb.isna().all()].empty, "Output has fully-nan columns."
     assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows."
-    # Processing can gain weight (water added in brewing and bottling) but not energy or protein (assumption 15).
+    # Processing can gain weight (water added in brewing and bottling) but not energy or protein (assumption 14).
     signed = ["stock_variation", "data_adjustments", "balancing_difference"]
     if nutrient == "mass":
         signed.append("processing_net")
@@ -1185,17 +1176,17 @@ def run() -> None:
             converted = convert_elements_to_nutrient(tb_nutrient, nutrient=nutrient)
         # Assumption 8: production split by role, items summed into the stages of the chain.
         chain = sum_items_into_stages(converted, population=population)
-        # Assumptions 12 and 13: OWID regions as the sum of their countries, dropping region-years with low coverage.
+        # Assumption 12: OWID regions as the sum of their countries, dropping region-years with low coverage.
         chain = add_region_aggregates(chain)
         if nutrient != "mass":
-            # Assumption 15: processing cannot create energy or protein; any gain goes to data adjustments.
+            # Assumption 14: processing cannot create energy or protein; any gain goes to data adjustments.
             chain = move_processing_gains_to_adjustments(chain)
         # Assumption 10: the rounding gap goes to data adjustments, so the chain ends exactly on food.
         chain = move_rounding_gap_to_adjustments(chain)
         # Assumption 11: World exports are set equal to World imports, and World tourist consumption is set to zero.
         chain = equalize_world_trade(chain)
         chain = remove_world_tourist_consumption(chain)
-        # Assumption 14: per person per day.
+        # Assumption 13: per person per day.
         chain = per_person_per_day(chain)
         sanity_check_outputs(chain, tb_fbsc=tb_fbsc, nutrient=nutrient)
         tables.append(chain.format(["country", "year"], short_name=nutrient))
