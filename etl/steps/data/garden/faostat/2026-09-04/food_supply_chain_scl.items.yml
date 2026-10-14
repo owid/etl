@@ -5,7 +5,7 @@
 # densities are reverse-engineered from FAO's food figures. This file holds only what cannot come from the data.
 
 # 1. Energy (kcal per 100 g) and protein (g per 100 g) for items with too little food use to derive a reliable
-#    factor from their reported food quantities (assumption 6). Every value comes from one published source:
+#    factor from their reported food quantities (assumption 5). Every value comes from one published source:
 #    - FAO's 2024 Global nutrient conversion table for SUA (NCT), values copied as published, for the items it
 #      covers: cereal brans, centrifugal cane sugar, hemp oil, tallow. Their edible-portion coefficients are all 1,
 #      so the published values apply to the whole tonnage.
@@ -224,7 +224,7 @@ never_food:
   - {code: 1222, name: "Degras"}
   - {code: 663, name: "Cocoa husks and shells"}
 
-# 3. Crops that are not eaten as harvested (assumption 7). FAO's 2024 nutrient conversion table values each crop at
+# 3. Crops that are not eaten as harvested (assumption 6). FAO's 2024 nutrient conversion table values each crop at
 #    the part of it that people eat (its edible-portion coefficient): sunflower seed without the hull, sugar cane as
 #    its juice, paddy as husked rice, rapeseed as its oil, coconuts as the meat and water of young and mature nuts,
 #    cotton seed as its kernels. Factories process the whole crop and make recorded products from the parts FAO
@@ -283,7 +283,7 @@ role_overrides:
 #    Body oil and liver oil enter animal_products alongside fish. The FBS rows used here contain no matching
 #    fish processing inputs, so counting oil production as processed would create an artificial processing gain.
 #    The animal role sets the waterfall's production stage; these oils are physically processed products.
-#    See assumption 9 and the possible calorie overlap in the step's docstring.
+#    See assumption 8 and the possible calorie overlap in the step's docstring.
 fish_from_fbs:
   - {code: 2761, name: "Freshwater Fish", role: animal}
   - {code: 2762, name: "Demersal Fish", role: animal}
@@ -297,7 +297,7 @@ fish_from_fbs:
   - {code: 2781, name: "Fish, Body Oil", role: animal}
   - {code: 2782, name: "Fish, Liver Oil", role: animal}
 
-# 6. Country-specific densities (assumption 4). FAO uses one density per item in every country and year, except for
+# 6. Country-specific densities (assumption 3). FAO uses one density per item in every country and year, except for
 #    these country-items, which keep the density of each year. Any other country-item whose density differs from
 #    the item's density stops the step, so a new exception cannot pass unnoticed.
 country_specific_densities:
