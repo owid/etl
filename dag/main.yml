@@ -559,6 +559,12 @@ steps:
       - data://garden/demography/2024-07-15/population
 
   #
+  # Internet users MDim from WDI
+  #
+  viz://chart/worldbank_wdi/latest/internet_users:
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
+
+  #
   # Trust in US government - Pew Research Center
   #
   data://grapher/pew/2026-02-16/trust_us_government:

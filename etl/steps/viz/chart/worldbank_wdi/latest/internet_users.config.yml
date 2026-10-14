@@ -1,0 +1,51 @@
+grapher_schema: "011"
+title:
+  title: "Internet users"
+topic_tags:
+  - "Internet"
+  - "Technological Change"
+default_selection:
+  - "World"
+  - "Africa"
+  - "Asia"
+  - "Europe"
+  - "North America"
+  - "South America"
+  - "Oceania"
+default_dimensions:
+  metric: share_of_population
+definitions:
+  common_views:
+    - config:
+        chartTypes:
+          - "LineChart"
+          - "DiscreteBar"
+        hasMapTab: true
+        tab: "line"
+        hideAnnotationFieldsInTitle:
+          time: true
+        originUrl: "/internet"
+        yAxis:
+          min: 0
+dimensions:
+  - slug: metric
+    name: "Metric"
+    choices:
+      - slug: share_of_population
+        name: "Share of population"
+      - slug: number_of_people
+        name: "Number of people"
+views:
+  - dimensions:
+      metric: share_of_population
+    indicators:
+      y:
+        - catalogPath: "wdi#it_net_user_zs"
+          display:
+            roundingMode: "significantFigures"
+            numSignificantFigures: 2
+  - dimensions:
+      metric: number_of_people
+    indicators:
+      y:
+        - catalogPath: "wdi#it_net_user_zs_number"
