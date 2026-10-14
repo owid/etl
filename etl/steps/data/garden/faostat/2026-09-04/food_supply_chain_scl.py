@@ -112,10 +112,10 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    hempseed, two fat residues of oil refining, and the default for cakes not listed individually (which only
    reaches "Cake, oilseeds nes"). Chemically modified fats use the factor of FAOSTAT's own food observation. The
    values, their sources and the arithmetic are in `food_supply_chain_scl.items.yml`.
-   These fixed densities only apply to an item when less than 1% of the item's supply is eaten as food. The reason
-   is that a few hundred tonnes of soybean cake eaten somewhere would otherwise set the density of hundreds of
-   millions of tonnes of cake. An item on the list with a real food use (spirits, and wheat bran in some countries)
-   keeps its data-derived density instead.
+   Listed items always use their fixed densities: a few hundred tonnes of soybean cake eaten somewhere should not
+   set the density of hundreds of millions of tonnes of cake. Where at least 1% of an item's supply is eaten as
+   food, the step checks that its inferred factor agrees with the fixed density within the rounding tolerance;
+   a disagreement stops the step instead of changing the factor.
    Items that are never food in any form are left out of the chain altogether, in all three tables: castor, tung,
    kapok, jojoba, wool grease, cocoa husks, and fuel ethanol (undenatured alcohol of 80% vol or higher). Ethanol is
    the one that matters. The crops sent to distilleries leave the chain where FAO records them: as other uses of
@@ -497,13 +497,13 @@ NUTRIENT_FACTOR_MIN_FOOD_TONNES = 1000
 NUTRIENT_FACTOR_RELATIVE_TOLERANCE = 0.01
 NUTRIENT_FACTOR_ABSOLUTE_TOLERANCE = {"energy": 0.5, "protein": 0.05}
 MAX_FOOD_SHARE_OFF_OWN_FACTOR = 0.0001
+# Check the fixed factors of assumption 6 against the inferred factor where an item has substantial food use.
+# This threshold controls only the check; every listed item uses its fixed factor.
+MIN_FOOD_SHARE_FOR_FIXED_DENSITY_CHECK = 0.01
 
 # Assumption 4, minor: an entity's own factor for an item needs at least this much food over all years; below it, the
 # item's factor over all countries is used.
 MIN_FOOD_TONNES_FOR_OWN_FACTOR = 1000
-# Assumption 6, minor: an item in the fixed-density list keeps its data-derived density if more than this share of
-# its supply is eaten as food.
-FIXED_DENSITY_MAX_FOOD_SHARE = 0.01
 # Assumption 13, minor: a region-year is dropped when the member countries with a balance hold less than this share
 # of the region's population.
 MIN_FRACTION_POPULATION_COVERED = 0.8
@@ -880,15 +880,32 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
         default="none",
     )
 
-    # Assumption 6: items with little food use get fixed factors.
+    # Assumption 6: listed items always get fixed factors. A few hundred tonnes of soybean cake eaten somewhere
+    # should not set the density of hundreds of millions of tonnes. Where food use is substantial, check agreement
+    # with the inferred factor before overriding it, using the same rounding tolerance as the other factor check.
     fixed = fixed_density_map(tb, manual, nutrient)
-    # Fixed densities take precedence over the data for items that are not really food: a few hundred tonnes of soybean
-    # cake eaten somewhere would otherwise set the density of hundreds of millions of tonnes. Items in the list with
-    # a real food use (spirits, wheat bran) keep their data-based density.
+    is_fixed = tb["item_code"].isin(fixed)
+    fixed_factor = tb["item_code"].map(fixed)
     supply = (tb["production"] + tb["imports"]).abs().groupby(tb["item_code"]).transform("sum")
     food_share = tb["food"].abs().groupby(tb["item_code"]).transform("sum") / supply
-    is_fixed = tb["item_code"].isin(fixed) & (food_share.fillna(0) < FIXED_DENSITY_MAX_FOOD_SHARE)
-    tb.loc[is_fixed, "density"] = tb.loc[is_fixed, "item_code"].map(fixed)
+    tolerance = np.maximum(
+        fixed_factor.abs() * NUTRIENT_FACTOR_RELATIVE_TOLERANCE, NUTRIENT_FACTOR_ABSOLUTE_TOLERANCE[nutrient]
+    )
+    disagree = (
+        is_fixed
+        & (food_share >= MIN_FOOD_SHARE_FOR_FIXED_DENSITY_CHECK)
+        & (~np.isfinite(tb["density"]) | ((tb["density"] - fixed_factor).abs() > tolerance))
+    )
+    assert not disagree.any(), (
+        f"Fixed {nutrient} densities disagree with inferred factors for items with substantial food use: "
+        + str(
+            tb.loc[disagree, ["country", "fao_item", "density"]]
+            .assign(fixed_density=fixed_factor[disagree])
+            .drop_duplicates()
+            .to_dict("records")
+        )
+    )
+    tb.loc[is_fixed, "density"] = fixed_factor[is_fixed]
     tb.loc[is_fixed, "density_source"] = "fixed"
 
     # Assumption 7: crops that go to factories are valued by what the world's factories make of them, each year.

@@ -108,6 +108,50 @@ def test_scl_reads_one_factor_per_country_and_item(nutrient, scale):
     np.testing.assert_allclose(converted["production"], tb["production"] * 1e4 * tb["density"])
 
 
+@pytest.mark.parametrize("nutrient,scale", [("energy", 1), ("protein", 0.1)])
+@pytest.mark.parametrize(
+    "food_share,inferred_factor,should_fail",
+    [
+        (0.02, 201.0, False),  # Substantial food use; agreement within rounding tolerance.
+        (0.005, 300.0, False),  # Little food use cannot change the listed factor.
+        (0.01, 210.0, True),  # At the threshold, disagreement must stop the step.
+        (0.02, np.nan, True),  # Substantial food use with no inferred factor cannot be checked.
+    ],
+)
+def test_scl_fixed_factors_are_checked_instead_of_switched(nutrient, scale, food_share, inferred_factor, should_fail):
+    tb = Table(
+        {
+            "country": ["Example"],
+            "year": [2023],
+            "item_code": ["00000001"],
+            "fao_item": ["Example bran"],
+            "role": ["processed"],
+            "food_tonnes_for_density": [1000.0],
+            SCL.NUTRIENTS[nutrient]["numerator"]: [inferred_factor * scale * 1000 * 1e4],
+        },
+        index=[7],
+    )
+    for element in SCL.BALANCE_ELEMENTS:
+        tb[element] = 0.0
+    tb["food"] = 1000.0
+    tb["production"] = 1000.0 / food_share
+    manual = {
+        "fixed_densities": {"families": [], "items": [{"code": 1, "energy": 200.0, "protein": 20.0}]},
+        "output_implied_densities": [],
+        "fish_from_fbs": [],
+    }
+    if should_fail:
+        with pytest.raises(AssertionError, match=f"Fixed {nutrient} densities disagree.*Example bran"):
+            SCL.add_densities(tb, manual=manual, nutrient=nutrient)
+    else:
+        result = SCL.add_densities(tb, manual=manual, nutrient=nutrient)
+        assert result["density_source"].tolist() == ["fixed"]
+        np.testing.assert_allclose(result["density"], [200.0 * scale])
+        converted = SCL.convert_elements_to_nutrient(result, nutrient=nutrient)
+        np.testing.assert_allclose(converted["food"], tb[SCL.NUTRIENTS[nutrient]["numerator"]])
+        np.testing.assert_allclose(converted["production"], tb["production"] * 1e4 * 200.0 * scale)
+
+
 def _replaced_densities(step, nutrient: str, sources: list[str]) -> Table:
     # A reported nutrient next to each kind of density that is not the cell's own.
     tb = Table(
