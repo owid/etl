@@ -109,13 +109,30 @@ Each assumption starts with a line on its scale: how much it changes the results
       and tallow. Acid oils from refining and residues of fatty substances, which the table does not have, take its
       value for palm oil (898 kcal per 100 g), the oil they mostly come from.
    b. Feedipedia, for the oilseed cakes, gluten feed, bran of pulses and hempseed, which FAO's table does not cover.
-      Feedipedia collects the feed tables of INRAE, CIRAD, AFZ and FAO. Each item takes the composition of one
-      matching table, converted to energy with the formula FAO uses for its own table: 4 kcal per gram of protein, 9
-      per gram of fat, 4 per gram of available carbohydrate and 2 per gram of fibre. That puts each cake on the same
-      footing as the crop and the oil it comes from. Soybean cake, for example, gets 307 kcal and 43.4 g of protein
-      per 100 g, from Feedipedia's soybean meal of 44% to 46% protein: the type that includes the hulls, as SCL's
-      crushing yields imply. Cakes with no Feedipedia table of their own take the average of the cakes that have one.
-   The values are read from snapshots of both sources. The items file says which item takes which value.
+
+   Feedipedia is an online encyclopedia of animal feeds, run by INRAE, CIRAD, AFZ and FAO. For each feed, it publishes
+   laboratory analyses averaged over many samples: how much of the feed is water, and how much of the rest (the dry
+   matter) is protein, fat, fibre and ash.
+
+   Feedipedia also gives energy values, but not the kind we need. Its gross energy is all the energy the feed releases
+   when it burns, including fibre that nobody digests. FAO's food values count only the energy that the body can use.
+   So we calculate the energy from the composition, with the formula FAO uses for its own table. That way, a cake's
+   calories are counted in the same way as those of the crop and the oil it comes from, and the processing stage
+   compares like with like. For each item:
+   - Each component, given in % of dry matter, is converted to grams per 100 g of the feed as it is.
+   - Available carbohydrate is what is left after water, protein, fat, ash and fibre (zero if the published values
+     add up to more than 100 g).
+   - Energy is 4 kcal per gram of protein, 9 per gram of fat, 4 per gram of available carbohydrate and 2 per gram of
+     fibre. The protein density is the grams of protein.
+
+   Soybean cake, for example, is 87.7% dry matter, and per 100 g it holds 43.4 g of protein, 1.7 g of fat, 6.5 g of
+   ash, 13.0 g of fibre and 23.2 g of available carbohydrate: 307 kcal.
+
+   Where Feedipedia has several types of the same cake, we use the type that matches what SCL records. For soybean
+   cake, that is the meal of 44% to 46% protein, which includes the hulls, as SCL's crushing yields imply. Cakes
+   with no Feedipedia table of their own take the average of the cakes that have one.
+
+   The values are read from snapshots of both sources. The items file says which item takes which value, and why.
 
 6. Fuel ethanol, and a few other items that are never food, are left out of all three tables.
    >> Scale: minor for World, but large in a few countries: leaving out fuel ethanol avoids processing creating 300
@@ -309,10 +326,9 @@ KNOWN PROBLEMS, NOT YET RESOLVED
    b. Factories that make more from a crop than the world average of assumption 7 (see problem 2): oil palm in
       Honduras and Papua New Guinea, sunflower seed in Ukraine, rice in Uruguay, and sugar beet in Ukraine, the
       Netherlands and Germany (beet holds more sugar than cane, and the two share one value).
-   c. FAO's density for a raw item outside assumption 7 is below what its products contain: raw milk against its
-      powders and casein (New Zealand in protein, Uruguay in energy).
-   d. Products with no recorded input: hydrogenated oils, margarine and fat preparations (the Netherlands), and
-      oilseed flours (Bolivia, in protein).
+   c. FAO's density for a raw item outside assumption 7 is below what its products contain: raw milk against the
+      powders, cheese, butter and casein made from it (New Zealand in protein; Uruguay and the Netherlands in energy).
+   d. Products with no recorded input: oilseed flours (Bolivia, in protein).
 
 2. The values of assumption 7 are World averages, applied to every country.
    >> Scale: minor for World by construction; major for a few countries whose factories differ from the world
@@ -343,22 +359,23 @@ KNOWN PROBLEMS, NOT YET RESOLVED
    how much of a country's gap these missing inputs explain.
 
 4. Fish oil is partly counted twice: in calories where the food fish are fatty, and in tonnes everywhere.
-   >> Scale: minor for World (1.3 of 4.1 kcal per person per day of fish oil in 2018); large in a few oil producers
-   (all of Denmark's 285 kcal per person per day of oil production in 2018). In tonnes, up to 5% of a producer's
-   animal products (Mauritania in 2018). Protein is unaffected.
+   >> Scale: minor for World (fish oil production is 4.1 kcal per person per day in 2018, and only part of it is
+   counted twice); large in a few oil producers whose food fish are fatty, such as Denmark and Norway (285 and 278
+   kcal per person per day of oil production in 2018). In tonnes, up to 5% of a producer's animal products
+   (Mauritania in 2018). Protein is unaffected.
 
-   A fish row carries about the energy of the fishmeal only where the food fish are lean (79 kcal per 100 g of live
-   weight in Peru, 83 in Chile, 76 in Morocco). Where people eat fatty fish, the row's density already exceeds the
-   meal's energy, so the oil pressed from the fish is counted a second time. That covers all of Denmark's 285 kcal
-   per person per day of oil production in 2018, half of Norway's 278, and nearly all of the small production of
-   Latvia, Japan, Spain, Sweden and Ireland.
+   A fish row carries about the energy of the fishmeal only where the food fish are lean (in 2018, 78 kcal per 100 g
+   of live weight of pelagic fish in Peru, 83 in Chile and 77 in Morocco). Where people eat fatty fish, the row's
+   density already exceeds the meal's energy, so part of the oil pressed from the fish is counted a second time. This
+   happens in Denmark (140 kcal per 100 g of pelagic fish in 2018), Norway (97), and Sweden, Latvia, Ireland and
+   Spain (106 to 118).
 
    In tonnes, the oil is inside the fish tonnes in every producer, so the mass table counts it twice: in 2018, 2.2% of
    Peru's animal products, 2.1% of Chile's and 5.1% of Mauritania's.
 
    We weighed two alternatives and rejected both:
-   a. Leaving the oil out would miss about 70% of its energy (in Peru, the oil is 17% of the energy of animal
-      products in 2018), and the oil that importers buy.
+   a. Leaving the oil out would miss the energy it adds where the food fish are lean (in Peru, the oil is 17% of the
+      energy of animal products in 2018), and the oil that importers buy.
    b. Counting it in calories but not in tonnes would remove the double counting from the mass table only, would
       miss the oil that importers buy in tonnes, and would make one table an exception.
 
@@ -369,10 +386,9 @@ KNOWN PROBLEMS, NOT YET RESOLVED
    >> Scale: minor for World; above 10% of food in a few countries.
 
    a. Where FAO records the distillery crops as processing, the calories turned into fuel appear as a processing loss
-      rather than under other uses. This happens in 22 of the 49 countries that produced more than 20 kcal per person
-      per day of ethanol in 2023 (molasses in Pakistan, India, Mauritius and South Africa; cereals in Belgium,
-      Slovakia, Moldova and others). The amount exceeds 10% of food in Eswatini, Hungary, Paraguay, Slovakia,
-      Tajikistan, Belgium and Moldova.
+      rather than under other uses. This happens with molasses in Eswatini, Mauritius, South Africa, Pakistan and
+      India, and with cereals in Slovakia and Moldova. It is largest in Eswatini, where the molasses sent to
+      processing holds 1,440 kcal per person per day in 2023, 56% of food.
    b. FAO records about 6,300 tonnes of this ethanol as food in Liberia in 2023, with no calories or protein. So
       leaving it out changes Liberia's food only in the mass table: by 3 g per person per day, 0.3% of food. Leaving
       out all never-food items changes a country's food by at most 0.1% in energy (castor oil in the United Arab
