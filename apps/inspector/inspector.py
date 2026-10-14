@@ -343,7 +343,9 @@ def cli(
     # Get the model name to use
     model_name = get_model_name(model)
     if not config.ANTHROPIC_API_KEY_INSPECTOR and not skip_issues:
-        rprint("[red]Error: ANTHROPIC_API_KEY_INSPECTOR not found. Add to .env file or use --skip-issues[/red]")
+        rprint(
+            "[red]Error: ANTHROPIC_API_KEY_INSPECTOR (or ANTHROPIC_API_KEY) not found. Add to .env file or use --skip-issues[/red]"
+        )
         raise click.ClickException("Missing ANTHROPIC_API_KEY_INSPECTOR")
 
     # Load views (explorers, multidims, charts, and posts)

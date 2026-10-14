@@ -256,14 +256,14 @@ def build_agent(model: str = DEFAULT_MODEL) -> Agent[None, Review]:
     """
     if not model.startswith("anthropic:"):
         return Agent[None, Review](model=model, output_type=Review, retries=2)
-    # The critic's own key rather than the generic ANTHROPIC_API_KEY pydantic-ai would read.
+    # The critic's own key when one is set; see etl.config.
     from pydantic_ai.models.anthropic import AnthropicModel
     from pydantic_ai.providers.anthropic import AnthropicProvider
 
     from etl import config
 
     if not config.ANTHROPIC_API_KEY_CHART_CRITIC:
-        raise RuntimeError(f"{model} needs ANTHROPIC_API_KEY_CHART_CRITIC in .env")
+        raise RuntimeError(f"{model} needs ANTHROPIC_API_KEY_CHART_CRITIC (or ANTHROPIC_API_KEY) in .env")
     claude = AnthropicModel(
         model.removeprefix("anthropic:"), provider=AnthropicProvider(api_key=config.ANTHROPIC_API_KEY_CHART_CRITIC)
     )
