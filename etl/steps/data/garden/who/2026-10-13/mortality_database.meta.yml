@@ -26,20 +26,6 @@ definitions:
       ("Self-inflicted injuries", "Intentional injuries"),
     ] %><% for c, label in layers %><% if c == cause %><< label >> › <% endif %><% endfor %>
 
-  # NOTE: Where each drill-down sits in WHO's tree, for the data page: the group we also publish that counts
-  # these deaths, and the intermediate WHO node when there is one. Renders empty for top-tier groups.
-  description_key_drill_down: |-
-    <% set tree = [
-      ("Pertussis", "infectious and parasitic diseases", "childhood-cluster diseases"),
-      ("Poliomyelitis", "infectious and parasitic diseases", "childhood-cluster diseases"),
-      ("Diphtheria", "infectious and parasitic diseases", "childhood-cluster diseases"),
-      ("Measles", "infectious and parasitic diseases", "childhood-cluster diseases"),
-      ("Tetanus", "infectious and parasitic diseases", "childhood-cluster diseases"),
-      ("Hepatitis B", "infectious and parasitic diseases", ""),
-      ("Japanese encephalitis", "infectious and parasitic diseases", ""),
-      ("Self-inflicted injuries", "intentional injuries", ""),
-    ] %><% for c, group, sub in tree %><% if c == cause %>WHO counts {definitions.cause_in_text} within << group >><% if sub %>, as part of << sub >><% endif %>; these deaths are also included in that group's totals.<% endif %><% endfor %>
-
   # NOTE: Public titles and short descriptions, per metric. Self-inflicted injuries keep the wording its former
   # dataset carried (an editorial choice made there), including the dimension suffix readers see today; every
   # other cause uses the family's sentence.
@@ -218,7 +204,6 @@ tables:
         description_short: "{definitions.description_short_number}"
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
-          - "{definitions.description_key_drill_down}"
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
@@ -238,7 +223,6 @@ tables:
         description_short: "{definitions.description_short_share}"
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
-          - "{definitions.description_key_drill_down}"
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
@@ -257,7 +241,6 @@ tables:
         description_short: "{definitions.description_short_asr}"
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
-          - "{definitions.description_key_drill_down}"
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
@@ -277,7 +260,6 @@ tables:
         description_short: "{definitions.description_short_death_rate}"
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
-          - "{definitions.description_key_drill_down}"
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
