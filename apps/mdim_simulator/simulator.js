@@ -12,6 +12,7 @@ const TAG_SLUGS = __TAG_SLUGS__;
 const STORAGE_KEY = __STORAGE_KEY__;
 const API = "https://api.ourworldindata.org/v1/indicators";
 const DATASETTE = "https://datasette-public.owid.io/owid/variables.json";
+const CATALOG = "https://catalog.ourworldindata.org";
 
 // ---------------------------------------------------------------------------
 // State
@@ -135,12 +136,31 @@ async function fetchJson(url) {
   return res.json();
 }
 
+// The indicator API leaves out an indicator's own chart settings (title, subtitle, note, map colours from its
+// metadata's grapher_config), which an MDim view inherits. The catalog's table metadata has them.
+const tableMetaCache = new Map();
+async function withChartSettings(meta) {
+  const [table, field] = String(meta.catalogPath || "").split("#");
+  if (!table || !field || meta.presentation?.grapherConfig) return meta;
+  if (!tableMetaCache.has(table)) tableMetaCache.set(table, fetchJson(`${CATALOG}/${table}.meta.json`));
+  try {
+    const tableMeta = await tableMetaCache.get(table);
+    const grapherConfig = tableMeta.fields?.[field]?.presentation?.grapher_config;
+    if (grapherConfig) meta.presentation = { ...(meta.presentation || {}), grapherConfig };
+  } catch (err) {
+    tableMetaCache.delete(table);
+    console.warn(`Could not load the chart settings of ${meta.catalogPath}`, err);
+    meta.chartSettingsMissing = true;
+  }
+  return meta;
+}
+
 function getMeta(id) {
   if (!metaCache.has(id)) {
-    const p = fetchJson(`${API}/${id}.metadata.json`).catch((err) => {
-      metaCache.delete(id);
-      throw new Error(`No indicator with ID ${id}.`);
-    });
+    const p = fetchJson(`${API}/${id}.metadata.json`)
+      .catch(() => { throw new Error(`No indicator with ID ${id}.`); })
+      .then(withChartSettings);
+    p.catch(() => metaCache.delete(id));
     metaCache.set(id, p);
   }
   return metaCache.get(id);
@@ -753,14 +773,19 @@ function roundingField(rounding) {
   mode.id = "rounding-mode";
   mode.innerHTML = `<option value="decimalPlaces">decimal places</option><option value="significantFigures">significant figures</option>`;
   mode.value = rounding.mode;
+  // Grapher needs at least one significant figure; decimal places can be zero.
+  const lowest = () => (mode.value === "significantFigures" ? 1 : 0);
+  digits.min = String(lowest());
   const update = () => {
-    const n = Math.max(0, Math.min(10, Math.round(Number(digits.value) || 0)));
+    digits.min = String(lowest());
+    const n = Math.max(lowest(), Math.min(10, Math.round(Number(digits.value) || 0)));
     setText("rounding", { mode: mode.value, digits: n });
     afterTextChange();
     scheduleRemount();
   };
   digits.addEventListener("input", update);
-  mode.addEventListener("change", update);
+  digits.addEventListener("change", () => { digits.value = String(resolvedTexts(current.key, current.meta).rounding.digits); });
+  mode.addEventListener("change", () => { update(); digits.value = String(resolvedTexts(current.key, current.meta).rounding.digits); });
   row.append("Round to", digits, mode);
   block.append(row);
   return block;
@@ -781,7 +806,9 @@ function mapField() {
 
   const palette = document.createElement("select");
   palette.id = "map-palette";
-  palette.innerHTML = `<option value="">Default palette</option>` + COLOR_SCHEMES.map((c) => `<option>${esc(c)}</option>`).join("");
+  // "No palette of its own" means the indicator's palette when it has one, Grapher's default otherwise.
+  const inherited = original.baseColorScheme ? `Indicator's palette (${esc(original.baseColorScheme)})` : "Default palette";
+  palette.innerHTML = `<option value="">${inherited}</option>` + COLOR_SCHEMES.map((c) => `<option>${esc(c)}</option>`).join("");
   palette.value = map.baseColorScheme || "";
 
   const strategy = document.createElement("select");
@@ -857,27 +884,35 @@ async function renderChart({ keepEditor = false } = {}) {
   }
   disposeChart();
   chartEl.innerHTML = "";
-  const { GrapherLoader, OwidTable } = grapher;
-  // Grapher's fromTable takes rounding from the column, not from the chart's dimension, so the view's rounding
-  // goes on the column here. The copied setup still puts it on the view's indicator, as ETL expects.
-  const column = columnDef(indicator.meta);
-  column.display = { ...(column.display || {}), ...roundingDisplay(resolvedTexts(comboKey(combo), indicator.meta).rounding) };
-  const table = new OwidTable(indicator.csv, [column]);
-  const texts = resolvedTexts(key, indicator.meta);
-  const base = viewConfig(indicator.meta);
-  const config = {
-    ...base,
-    ...sharedConfig(),
-    title: texts.title,
-    subtitle: texts.subtitle,
-    note: texts.note,
-    map: { ...(base.map || {}), colorScale: { ...(base.map?.colorScale || {}), ...colorScaleFrom(texts.map) } },
-    dimensions: [{ property: "y", slug: `ind_${indicator.meta.id}`, display: roundingDisplay(texts.rounding) }],
-  };
-  loaderReady = false;
-  const mounted = GrapherLoader.fromTable({ config, data: table }).mount(chartEl);
-  loader = mounted;
-  mounted.ready.then(() => { if (loader === mounted) loaderReady = true; }).catch(() => {});
+  try {
+    const { GrapherLoader, OwidTable } = grapher;
+    // Grapher's fromTable takes rounding from the column, not from the chart's dimension, so the view's rounding
+    // goes on the column here. The copied setup still puts it on the view's indicator, as ETL expects.
+    const column = columnDef(indicator.meta);
+    column.display = { ...(column.display || {}), ...roundingDisplay(resolvedTexts(comboKey(combo), indicator.meta).rounding) };
+    const table = new OwidTable(indicator.csv, [column]);
+    const texts = resolvedTexts(key, indicator.meta);
+    const base = viewConfig(indicator.meta);
+    const config = {
+      ...base,
+      ...sharedConfig(),
+      title: texts.title,
+      subtitle: texts.subtitle,
+      note: texts.note,
+      yAxis: { ...(base.yAxis || {}), ...sharedConfig().yAxis },
+      map: { ...(base.map || {}), colorScale: { ...(base.map?.colorScale || {}), ...colorScaleFrom(texts.map) } },
+      dimensions: [{ property: "y", slug: `ind_${indicator.meta.id}`, display: roundingDisplay(texts.rounding) }],
+    };
+    loaderReady = false;
+    const mounted = GrapherLoader.fromTable({ config, data: table }).mount(chartEl);
+    loader = mounted;
+    // fromTable's data is already in memory, so `ready` resolves at once and never rejects.
+    mounted.ready.then(() => { if (loader === mounted) loaderReady = true; });
+  } catch (err) {
+    // Building the chart can throw (the table, Grapher's state, mounting): say so instead of leaving it blank.
+    console.error("Could not draw the chart", err);
+    showNotice(`The chart couldn't be drawn: ${esc(err.message || err)}. Check the indicator linked to this combination.`);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -1308,7 +1343,8 @@ function statusHtml(status) {
   if (status.kind === "loading") return `<div class="status loading">Looking it up…</div>`;
   if (status.kind === "error") return `<div class="status error">${esc(status.message)}</div>`;
   const m = status.meta;
-  return `<div class="status ok"><strong>${esc(m.display?.name || m.presentation?.titlePublic || m.name)}</strong><code>${esc(m.catalogPath)}</code></div>`;
+  const warning = m.chartSettingsMissing ? `<span class="status-warning">Its own chart settings couldn't be loaded, so the preview may differ.</span>` : "";
+  return `<div class="status ok"><strong>${esc(m.display?.name || m.presentation?.titlePublic || m.name)}</strong><code>${esc(m.catalogPath)}</code>${warning}</div>`;
 }
 
 async function linkIndicator(key, raw, statusCell) {

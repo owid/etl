@@ -29,6 +29,7 @@ FREE_FORM_WYSK = (
     "- A second point:\n  - with a nested item\n  - and another one"
 )
 REOPENED = OUT / "check_reopened.html"
+OWN_SETTINGS = OUT / "check_own_settings.html"
 SCREENSHOTS = OUT / "screenshots"
 
 # build.py is a script, not a package module: load it from its file.
@@ -318,6 +319,14 @@ def main() -> None:
         page.wait_for_timeout(1500)
         check("undo redraws the chart", france_value() == original_value, france_value())
         page.select_option("#rounding-mode", "significantFigures")
+        page.fill("#rounding-digits", "0")
+        page.wait_for_timeout(400)
+        share_rounding = [e.get("rounding") for e in saved(page)["textEdits"]["views"].values() if e.get("rounding")]
+        check(
+            "significant figures can't go below 1",
+            share_rounding == [{"mode": "significantFigures", "digits": 1}],
+            share_rounding,
+        )
         page.fill("#rounding-digits", "2")
         page.wait_for_timeout(600)
         page.click("#text-editor-toggle")
@@ -433,6 +442,34 @@ def main() -> None:
         check("a failure to save is shown", blocked.locator("#storage-warning").is_visible())
         blocked.close()
 
+        # An indicator's own chart settings (its metadata's grapher_config) show in the preview, as in the MDim.
+        _, nitrogen_path = build.latest_indicator(
+            "agriculture",
+            "nitrogen_efficiency__lassaletta_et_al__2014",
+            "nitrogen_efficiency__lassaletta_et_al__2014",
+            "nitrogen_efficiency",
+        )
+        own = {
+            "title": {"title": "Nitrogen"},
+            "dimensions": [{"slug": "metric", "name": "Metric", "choices": [{"slug": "nue", "name": "Efficiency"}]}],
+            "views": [{"dimensions": {"metric": "nue"}, "indicators": {"y": [{"catalogPath": nitrogen_path}]}}],
+        }
+        own_path = OUT / "check_own_settings.yml"
+        own_path.write_text(yaml.safe_dump(own, sort_keys=False))
+        build.build(OWN_SETTINGS, own_path)
+        page.goto(OWN_SETTINGS.as_uri())
+        page.wait_for_selector("#chart svg", timeout=30000)
+        page.wait_for_timeout(1500)
+        check(
+            "an indicator's own subtitle shows in the preview",
+            "is the ratio between nitrogen inputs and output" in page.inner_text("#chart"),
+        )
+        page.locator("#chart").get_by_text("Map", exact=True).first.click()
+        page.click("#text-editor-toggle")
+        page.wait_for_selector("#map-palette", timeout=10000)
+        first_option = page.locator("#map-palette option").first.inner_text()
+        check("the palette names what it falls back to", first_option == "Indicator's palette (YlGnBu)", first_option)
+
         check("no console errors", not errors, errors or "")
         browser.close()
 
@@ -465,6 +502,12 @@ def main() -> None:
     )
     chart.sort_views_with_default_first()  # what saving the step does; it raises if no view matches the default
     check("ETL accepts the copied setup unedited", len(chart.views) == 2)
+
+    check(
+        "nested WYSK lists flatten like ETL",
+        build.description_key_blocks(["A point.", ["A nested one.", "Another."]])
+        == ["- A point.", "- A nested one.", "- Another."],
+    )
 
     if failures:
         sys.exit(f"{len(failures)} check(s) failed: {', '.join(failures)}")

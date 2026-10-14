@@ -38,6 +38,7 @@ PACKAGE_BASE = "https://owid-packages.tail6e23.ts.net/ourworldindata/grapher/v0.
 DEFAULT_SELECTION = ["World", "Africa", "Asia", "Europe", "North America", "South America", "Oceania"]
 DATASETTE = "https://datasette-public.owid.io/owid.json"
 API = "https://api.ourworldindata.org/v1/indicators"
+CATALOG = "https://catalog.ourworldindata.org"
 
 FONTS = [
     ("Lato", 400, "normal", "LatoLatin-Regular"),
@@ -119,6 +120,18 @@ def indicator_data(variable_id: int) -> dict:
     """Metadata and data of an indicator, with the data as the CSV the page feeds to Grapher."""
     meta = http_session.get(f"{API}/{variable_id}.metadata.json").json()
     data = http_session.get(f"{API}/{variable_id}.data.json").json()
+    # The indicator API leaves out the indicator's own chart settings, which an MDim view inherits; the catalog's
+    # table metadata has them (simulator.js does the same for indicators linked in the page).
+    table, field = meta["catalogPath"].split("#")
+    table_meta = http_session.get(f"{CATALOG}/{table}.meta.json")
+    if table_meta.ok:
+        grapher_config = (
+            ((table_meta.json().get("fields") or {}).get(field) or {}).get("presentation", {}).get("grapher_config")
+        )
+        if grapher_config:
+            meta.setdefault("presentation", {})["grapherConfig"] = grapher_config
+    else:
+        meta["chartSettingsMissing"] = True
     entities = {e["id"]: e for e in meta["dimensions"]["entities"]["values"]}
     rows = [f"entityName,entityCode,entityId,year,ind_{variable_id}"]
     for value, year, entity_id in zip(data["values"], data["years"], data["entities"]):
@@ -132,7 +145,9 @@ def description_key_blocks(description_key: str | list) -> list[str]:
     if not description_key:
         return []
     if isinstance(description_key, list):
-        return [f"- {item}" for item in description_key]
+        # Nested lists flatten as ETL's chart model flattens them (_flatten_description_key).
+        flat = [item for sub in description_key for item in ([sub] if isinstance(sub, str) else sub)]
+        return [f"- {item}" for item in flat]
     blocks: list[str] = []
     for line in str(description_key).split("\n"):
         if line.startswith("- ") or not blocks:
