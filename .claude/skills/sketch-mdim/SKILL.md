@@ -136,7 +136,8 @@ mechanics, not for the conversation:
   care about is done or ready, and don't narrate your checks, reviews or next commands.
 - **If something technical fails, fix it.** Only bring them in when the choice is theirs, and explain it without
   jargon. How you do the work is never their choice: don't explain or ask about which commands you run, where
-  they run, or changes to this skill.
+  they run, or changes to this skill. A known problem with a known fix is part of the work: apply the fix, and
+  don't report it.
 
 ### 5a. Ask the questions up front, in one go
 
@@ -182,23 +183,26 @@ Turn the setup into the step with `/create-chart`. The setup is already in `viz:
    refs/heads/<branch>` matches `git rev-parse HEAD` before going on.
 3. Write the PR description. Start with the attribution line from `CLAUDE.md`. Then say what the MDim shows,
    that it was sketched in the MDim simulator, and the text changes from the setup.
-4. **Let the staging server write the MDim.** Don't run the step from the laptop, even with `STAGING=1`: chart
+4. **Request one Codex review now,** with a bare `@codex review`, so it runs alongside the staging build. Its
+   verdict is a review with findings, a "Didn't find any major issues" comment, a 👍 from the Codex bot, or its
+   "Codex Review Summary" comment showing `✅ Completed` with no review or inline comments. That summary comment
+   appears within seconds showing `🔄 Running`, which is not a verdict. Don't hold step 5d for it.
+5. **Let the staging server write the MDim.** Don't run the step from the laptop, even with `STAGING=1`: chart
    steps read their upstream datasets from local disk, and private ones can't be downloaded. After each push,
    wait for `buildkite/etl-automated-staging-environment` to succeed on the head commit
    (`gh api repos/owid/etl/commits/<sha>/status`). That build writes the MDim to staging, and is the check that
    the step builds: if it fails, read its log and fix the step.
-5. **Check that every view will draw.** The preview loads each view's config from
-   `http://<container>/grapher/by-uuid/<id>.config.json`, which is served from R2, not the database, so correct
-   database rows don't mean the preview draws. Take each view's `fullConfigId` from the MDim's
-   `multi_dim_data_pages.config` in the staging database (`query-grapher-db` skill) and check each URL returns
-   200. If any return 404, drop `fullConfigId` from every view and send the config back unchanged with
-   `AdminAPI(OWIDEnv.from_staging(<branch>)).put_mdim_config("<namespace>/latest/<name>#<name>", config)`, which
-   re-uploads the views. Then check again.
-6. **One Codex review.**
-   - Post a bare `@codex review` and wait for its verdict: a review with findings, a "Didn't find any major
-     issues" comment, or a 👍 from the Codex bot.
-   - Fix what's valid, push, repeat items 4 and 5, and reply to and resolve each thread.
-   - Don't start a second round. Don't announce the review; mention it only if it changed something they'll see.
+6. **Re-upload the views, then check they draw,** after every successful staging build. The preview loads each
+   view's config from `http://<container>/grapher/by-uuid/<id>.config.json`, which is served from R2, not the
+   database, and the build's own upload often doesn't reach it. So always take the MDim's config from
+   `multi_dim_data_pages.config` in the staging database (`query-grapher-db` skill), drop `fullConfigId` from
+   every view, and send it back unchanged with
+   `AdminAPI(OWIDEnv.from_staging(<branch>)).put_mdim_config("<namespace>/latest/<name>#<name>", config)`. Then
+   check that each view's new `fullConfigId` returns 200 at that URL; retry a 502 once, since it can show briefly
+   before the real answer. Do this silently, and bring it up only if views still fail after the re-upload.
+
+When Codex's verdict comes in, fix what's valid, push, repeat items 5 and 6, and reply to and resolve each
+thread. Don't start a second round. Tell the person about the review only if it changed something they'll see.
 
 ### 5d. Let them check it on staging
 
@@ -210,15 +214,15 @@ container name from `etl.config.get_container_name(<branch>)`. Then send somethi
 > map, check the countries it opens with, and read the titles and "What you should know". Tell me what to
 > change, or say it looks right.
 
-If they ask for changes, make them, push, repeat items 4 and 5 of step 5c, and send the link again. **Don't merge
-until they say it looks right.**
+Send it as soon as every view returns 200, without waiting for Codex. If they ask for changes, make them, push,
+repeat items 5 and 6 of step 5c, and send the link again. **Don't merge until they say it looks right.**
 
 ### 5e. Merge, once they say it looks right
 
-Check that the PR's tests have passed (`gh pr checks <number>`). Fix a failure that comes from the MDim. Retry
-one that doesn't, such as a test that timed out on a network call. Then run `gh pr ready <number>` and
-`gh pr merge <number> --squash`. Tell them it's merged, and that it takes about ten minutes to reach
-the live site's admin.
+Check that Codex's verdict is in and its threads are resolved, and that the PR's tests have passed
+(`gh pr checks <number>`). Fix a failure that comes from the MDim. Retry one that doesn't, such as a test that
+timed out on a network call. Then run `gh pr ready <number>` and `gh pr merge <number> --squash`. Tell them it's
+merged, and that it takes about ten minutes to reach the live site's admin.
 
 ### 5f. Publish it
 
