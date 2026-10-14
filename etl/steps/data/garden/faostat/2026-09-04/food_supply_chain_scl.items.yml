@@ -114,7 +114,7 @@ never_food:
   - {code: 1222, name: "Degras"}
   - {code: 663, name: "Cocoa husks and shells"}
 
-# 3. Crops that are not eaten as harvested (assumption 6). FAO's 2024 nutrient conversion table values each crop at
+# 3. Crops that are not eaten as harvested (assumption 7). FAO's 2024 nutrient conversion table values each crop at
 #    the part of it that people eat (its edible-portion coefficient): sunflower seed without the hull, sugar cane as
 #    its juice, paddy as husked rice, rapeseed as its oil, coconuts as the meat and water of young and mature nuts,
 #    cotton seed as its kernels. Factories process the whole crop and make recorded products from the parts FAO
@@ -173,7 +173,7 @@ role_overrides:
 #    Body oil and liver oil enter animal_products alongside fish. The FBS rows used here contain no matching
 #    fish processing inputs, so counting oil production as processed would create an artificial processing gain.
 #    The animal role sets the waterfall's production stage; these oils are physically processed products.
-#    See assumption 8 and the possible calorie overlap in the step's docstring.
+#    See assumption 9 and the possible calorie overlap in the step's docstring.
 fish_from_fbs:
   - {code: 2761, name: "Freshwater Fish", role: animal}
   - {code: 2762, name: "Demersal Fish", role: animal}
