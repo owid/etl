@@ -1189,6 +1189,7 @@ class Variable(Base):
     descriptionFromProducer: Mapped[str | None] = mapped_column(TEXT, default=None)
     descriptionKey: Mapped[str | None] = mapped_column(JSON, default=None)
     descriptionProcessing: Mapped[str | None] = mapped_column(TEXT, default=None)
+    annotations: Mapped[list[dict] | None] = mapped_column(JSON, default=None)
     # NOTE: Use of `licenses` is discouraged, they should be captured in origins.
     licenses: Mapped[list[dict] | None] = mapped_column(JSON, default=None)
     # NOTE: License should be the resulting license, given all licenses of the indicator’s origins and given the indicator’s processing level.
@@ -1239,6 +1240,7 @@ class Variable(Base):
             ds.descriptionFromProducer = self.descriptionFromProducer
             ds.descriptionKey = self.descriptionKey
             ds.descriptionProcessing = self.descriptionProcessing
+            ds.annotations = self.annotations
             ds.licenses = self.licenses
             ds.license = self.license
             ds.type = self.type
@@ -1290,6 +1292,11 @@ class Variable(Base):
                 validate_description_key_list(metadata.description_key, context=catalog_path)
             assert isinstance(metadata.description_key, str), "descriptionKey should be a markdown string"
 
+        # Scopes on dimensions are resolved when the table is flattened
+        assert not any(a.dimensions for a in metadata.annotations), (
+            f"Unresolved annotation dimensions in {catalog_path}"
+        )
+
         return cls(
             shortName=short_name,
             name=metadata.title,
@@ -1309,6 +1316,7 @@ class Variable(Base):
             descriptionFromProducer=metadata.description_from_producer,
             descriptionKey=metadata.description_key,
             descriptionProcessing=metadata.description_processing,
+            annotations=[humps.camelize(a.to_dict()) for a in metadata.annotations] or None,
             licenses=[license.to_dict() for license in metadata.licenses] if metadata.licenses else None,
             license=metadata.license.to_dict() if metadata.license else None,
             type=metadata.type,

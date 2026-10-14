@@ -704,6 +704,57 @@
                   ],
                   "category": "metadata"
                 },
+                "annotations": {
+                  "title": "Indicator's annotations",
+                  "type": "array",
+                  "description": "Short notes shown on charts of the indicator, each optionally tied to some entities and to a year or a range of years.",
+                  "requirement_level": "optional",
+                  "guidelines": [
+                    [
+                      "Omit `entities` for a note on the whole indicator."
+                    ],
+                    [
+                      "`time` alone is one year; with `time_end` it is a range of years. Omit both for a note on the whole series."
+                    ],
+                    [
+                      "Only yearly indicators support `time` and `time_end` for now."
+                    ],
+                    [
+                      "Must not be combined with `display.entityAnnotationsMap` on the same indicator."
+                    ]
+                  ],
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["text"],
+                    "properties": {
+                      "text": {
+                        "type": "string",
+                        "description": "Text of the note, in markdown (links are allowed)."
+                      },
+                      "entities": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Entities the note applies to."
+                      },
+                      "time": {
+                        "type": ["integer", "string"],
+                        "description": "Year the note applies to, or the first year of a range. A string is only for a year injected with `yaml_params`, e.g. `\"{LATEST_YEAR}\"`."
+                      },
+                      "time_end": {
+                        "type": ["integer", "string"],
+                        "description": "Last year of the range that starts at `time`."
+                      },
+                      "dimensions": {
+                        "type": "object",
+                        "description": "Only for long tables: values of the extra index levels the note applies to, e.g. `{cause: Maternal disorders}`. The grapher step keeps the note on the indicators of matching dimensions and removes this field when flattening the table."
+                      }
+                    }
+                  },
+                  "category": "metadata"
+                },
                 "description_processing": {
                   "title": "Indicator's processing description",
                   "type": "string",
