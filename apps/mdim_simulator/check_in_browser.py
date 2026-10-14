@@ -268,10 +268,10 @@ def main() -> None:
         page.locator("#chart-settings label", has_text="Slope chart").locator("input").check()
         page.wait_for_timeout(2000)
         check("a chart type can be added", "SlopeChart" in saved(page)["chartTypes"])
-        page.locator("#chart-settings label", has_text="change the country").locator("input").check()
+        page.locator("#chart-settings label", has_text="Change country").locator("input").check()
         page.wait_for_timeout(1000)
         check("change-country mode is saved", saved(page)["changeCountry"] is True)
-        page.locator("#chart-settings label", has_text="change the country").locator("input").uncheck()
+        page.locator("#chart-settings label", has_text="Change country").locator("input").uncheck()
         page.wait_for_timeout(1000)
 
         # The view that opens first.

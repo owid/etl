@@ -410,7 +410,7 @@ function renderChartSettings() {
       checkbox("Hide the time range after the title, e.g. “1990 to 2025”", state.hideTimeInTitle, (on) => { state.hideTimeInTitle = on; }),
       note("Map and bar charts always show the year."),
     ),
-    group("Countries", checkbox("Readers change the country instead of adding countries", state.changeCountry, (on) => { state.changeCountry = on; })),
+    group("Countries", checkbox("Set selector to “Change country” instead of “Add/remove countries”", state.changeCountry, (on) => { state.changeCountry = on; })),
     note(`Always set: every y-axis starts at zero${url ? `, and the footer links to OurWorldinData.org${url}` : ""}.`),
   );
 }
