@@ -1,0 +1,58 @@
+grapher_schema: "011"
+title:
+  title: "Deaths from Alzheimer's disease and other dementias"
+topic_tags:
+  - "Global Health"
+  - "Causes of Death"
+default_selection:
+  - "World"
+  - "Africa"
+  - "Asia"
+  - "Europe"
+  - "North America"
+  - "South America"
+  - "Oceania"
+default_dimensions:
+  indicator: number_of_deaths
+definitions:
+  common_views:
+    - config:
+        chartTypes:
+          - "LineChart"
+          - "DiscreteBar"
+        hasMapTab: true
+        tab: "map"
+        hideAnnotationFieldsInTitle:
+          time: true
+        originUrl: "/global-health"
+        yAxis:
+          min: 0
+        map:
+          colorScale:
+            baseColorScheme: "OrRd"
+dimensions:
+  - slug: indicator
+    name: "Indicator"
+    choices:
+      - slug: number_of_deaths
+        name: "Number of deaths"
+      - slug: death_rate
+        name: "Death rate"
+views:
+  - dimensions:
+      indicator: number_of_deaths
+    indicators:
+      y:
+        - catalogPath: "gbd_cause_deaths#value__metric_number__age_all_ages__cause_alzheimers_disease_and_other_dementias"
+          display:
+            roundingMode: "significantFigures"
+            numSignificantFigures: 3
+    config:
+      title: "Annual number of deaths from Alzheimer's disease and other dementias"
+  - dimensions:
+      indicator: death_rate
+    indicators:
+      y:
+        - catalogPath: "gbd_cause_deaths#value__metric_rate__age_all_ages__cause_alzheimers_disease_and_other_dementias"
+    config:
+      title: "Deaths from Alzheimer's disease and other dementias per 100,000 people"
