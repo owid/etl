@@ -234,8 +234,8 @@ def state_from_setup(setup: dict) -> tuple[dict, list[int]]:
         state["hasMapTab"] = shared["hasMapTab"]
     if "tab" in shared:
         state["defaultTab"] = shared["tab"]
-    # A copied setup always has shared settings, and leaves hideAnnotationFieldsInTitle out when the box is
-    # unticked. A draft without shared settings keeps the page's defaults.
+    # A copied setup always has shared settings, including hideAnnotationFieldsInTitle. A draft without shared
+    # settings keeps the page's defaults.
     if shared:
         state["hideTimeInTitle"] = bool((shared.get("hideAnnotationFieldsInTitle") or {}).get("time", False))
         state["changeCountry"] = shared.get("addCountryMode") == "change-country"

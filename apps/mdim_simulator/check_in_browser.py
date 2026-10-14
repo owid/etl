@@ -271,6 +271,14 @@ def main() -> None:
         # Settings shared by every view.
         chart_text = page.inner_text("#chart")
         check("time range hidden after the title", "1990 to 2025" not in chart_text.split("\n")[0])
+        # The indicator's own chart settings hide it too, so unticking has to override them.
+        hide_time = page.locator("#chart-settings label", has_text="Hide the time range").locator("input")
+        hide_time.uncheck()
+        page.wait_for_timeout(2000)
+        title_line = page.inner_text("#chart").split("\n")[0]
+        check("unticking shows the time range", " to 20" in title_line, title_line)
+        hide_time.check()
+        page.wait_for_timeout(1500)
         check("footer links to the main topic", "OurWorldinData.org/internet" in chart_text)
         page.locator("#chart-settings label", has_text="Slope chart").locator("input").check()
         page.wait_for_timeout(2000)
@@ -419,8 +427,8 @@ def main() -> None:
         # A copied setup reopens unchanged, including a "What you should know" given as a list.
         reopen = yaml.safe_load(setup_text)
         reopen["views"][0].setdefault("metadata", {})["description_key"] = ["A point given as a list item.", "Another."]
-        # "Hide the time range" unticked: the copied setup leaves the setting out, and it has to stay out.
-        reopen["definitions"]["common_views"][0]["config"].pop("hideAnnotationFieldsInTitle", None)
+        # "Hide the time range" unticked: the copied setup says so explicitly, and it has to stay that way.
+        reopen["definitions"]["common_views"][0]["config"]["hideAnnotationFieldsInTitle"] = {"time": False}
         reopen_path = OUT / "check_reopen.yml"
         reopen_path.write_text(yaml.safe_dump(reopen, sort_keys=False, allow_unicode=True))
         build.build(REOPENED, reopen_path)

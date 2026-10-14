@@ -370,7 +370,9 @@ function originUrl() {
 
 function sharedConfig() {
   const config = { chartTypes: [...state.chartTypes], hasMapTab: state.hasMapTab, tab: state.defaultTab };
-  if (state.hideTimeInTitle) config.hideAnnotationFieldsInTitle = { time: true };
+  // Always explicit: an indicator's own chart settings often hide the time range, and only an explicit value
+  // overrides them (Grapher deep-merges a view's config over its indicator's).
+  config.hideAnnotationFieldsInTitle = { time: state.hideTimeInTitle };
   if (state.changeCountry) config.addCountryMode = "change-country";
   const url = originUrl();
   if (url) config.originUrl = url;
@@ -900,6 +902,7 @@ async function renderChart({ keepEditor = false } = {}) {
       subtitle: texts.subtitle,
       note: texts.note,
       yAxis: { ...(base.yAxis || {}), ...sharedConfig().yAxis },
+      hideAnnotationFieldsInTitle: { ...(base.hideAnnotationFieldsInTitle || {}), ...sharedConfig().hideAnnotationFieldsInTitle },
       map: { ...(base.map || {}), colorScale: { ...(base.map?.colorScale || {}), ...colorScaleFrom(texts.map) } },
       dimensions: [{ property: "y", slug: `ind_${indicator.meta.id}`, display: roundingDisplay(texts.rounding) }],
     };
