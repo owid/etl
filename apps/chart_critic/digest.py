@@ -116,8 +116,8 @@ def changed_slugs(days: int = 1, include_data_updates: bool = False) -> list[str
 
     Edits are read from ``charts.lastEditedAt``, not ``chart_configs.updatedAt``. An ETL upsert
     rewrites the full config of every chart that inherits from the indicators it touched, which
-    bumps ``updatedAt`` with nobody editing anything — one such upsert put 44 unedited charts into a
-    55-chart sweep. Those are data updates by another route, and ``include_data_updates`` is the
+    bumps ``updatedAt`` with nobody editing anything — one such upsert put 41 unedited charts into a
+    56-chart sweep. Those are data updates by another route, and ``include_data_updates`` is the
     switch for them.
 
     **Needs the production database.** Timestamps on a staging copy reflect when the copy was

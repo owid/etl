@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Any
 
 import rich_click as click
+from genai_prices import Usage
 from rich.console import Console
 from rich.table import Table
 
@@ -177,11 +178,17 @@ def _select(
 def _cost(model: str, input_tokens: int, output_tokens: int, cache_read: int = 0, cache_write: int = 0) -> float:
     """Price a call, falling back to published rates for models genai_prices does not know.
 
-    ``input_tokens`` includes the cached ones. Only Anthropic's cache rates are applied: the other
-    providers' cached input is billed at the full rate here, which can only overstate the bill.
+    ``input_tokens`` includes the cached ones. The fallback applies only Anthropic's cache rates:
+    other providers' cached input is billed at the full rate there, which can only overstate the bill.
     """
+    usage = Usage(
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        cache_read_tokens=cache_read,
+        cache_write_tokens=cache_write,
+    )
     try:
-        return estimate_llm_cost(model, input_tokens=input_tokens, output_tokens=output_tokens)
+        return estimate_llm_cost(model, usage=usage)
     except (KeyError, ValueError, LookupError):
         rate_in, rate_out = FALLBACK_PRICES.get(model, (0.0, 0.0))
         billed_in = float(input_tokens)
