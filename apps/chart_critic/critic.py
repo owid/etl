@@ -154,7 +154,8 @@ Say nothing about that step. This covers the post-Soviet coverage break and noth
 other change in which countries a series covers is still worth flagging.
 
 Likewise, on a chart with many lines (one per year, say), say nothing about end-of-line labels
-that sit beside a neighbouring line: Grapher spaces them apart, so that is expected.
+that sit beside a neighbouring line or are hidden: Grapher spaces them apart and drops the ones
+that don't fit. A missing label does not mean the line is missing or a different colour.
 
 For each issue, set chart_params to the grapher query parameters that put the problem on
 screen — the entity and time range you are talking about — so a reviewer sees it immediately
