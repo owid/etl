@@ -8,6 +8,11 @@ Three tables come out:
   which are drill-downs inside one of those groups.
 - `intentional_injuries`: the same four indicators for self-inflicted injuries, a drill-down inside
   Intentional injuries. Later fold-ins add one table per group of drill-downs.
+- `cancers`: the same four indicators for the 25 cancer types inside Malignant neoplasms, plus two age
+  bands WHO does not publish (`<5 years`, `<10 years`), derived in `add_derived_age_groups` for the types
+  and for Malignant neoplasms itself (in `mortality_database`), which the childhood-cancer charts plot together.
+- `most_common_cancer`: the cancer type with the highest age-standardized death rate, per country, year
+  and sex.
 - `causes`: one row per cause group, with its depth in WHO's cause tree (`cause_level`), its parent
   group, the ICD-10 codes that define it and the table it is published in. The codes are a property of
   the cause, not a dimension of the data, so they live here rather than in the fact tables' key.
@@ -25,6 +30,7 @@ poisonings that the February 2026 release counts twice under Unintentional injur
 """
 
 from collections import Counter
+from datetime import date
 from pathlib import Path
 
 import numpy as np
@@ -45,6 +51,7 @@ NONCOMMUNICABLE = "Noncommunicable diseases"
 INJURIES = "Injuries"
 INFECTIOUS = "Infectious and parasitic diseases"
 CHILDHOOD_CLUSTER = "Childhood-cluster diseases"
+MALIGNANT = "Malignant neoplasms"
 
 # WHO's 23 groups that tile All Causes. Fold-ins add drill-downs inside them, never new partition groups.
 N_PARTITION_GROUPS = 23
@@ -53,6 +60,34 @@ N_PARTITION_GROUPS = 23
 # One table per group of drill-downs keeps the layer visible in the catalog path, which the admin's flat list
 # of indicators does not show.
 MAIN_TABLE = "mortality_database"
+# WHO's 25 cancer types, the children of Malignant neoplasms (formerly the mortality_database_cancer dataset).
+CANCERS = [
+    "Mouth and oropharynx cancers",
+    "Oesophagus cancer",
+    "Stomach cancer",
+    "Colon and rectum cancers",
+    "Liver cancer",
+    "Pancreas cancer",
+    "Trachea, bronchus, lung cancers",
+    "Melanoma and other skin cancers",
+    "Breast cancer",
+    "Cervix uteri cancer",
+    "Corpus uteri cancer",
+    "Ovary cancer",
+    "Prostate cancer",
+    "Testicular cancer",
+    "Kidney cancer",
+    "Bladder cancer",
+    "Brain and nervous system cancers",
+    "Gallbladder and biliary tract cancer",
+    "Larynx cancer",
+    "Thyroid cancer",
+    "Mesothelioma",
+    "Lymphomas, multiple myeloma",
+    "Leukaemia",
+    "Ill-defined malignant neoplasms",
+    "Other malignant neoplasms",
+]
 DRILL_DOWN_TABLES = {
     "Pertussis": "vaccine_preventable_diseases",
     "Poliomyelitis": "vaccine_preventable_diseases",
@@ -62,7 +97,28 @@ DRILL_DOWN_TABLES = {
     "Hepatitis B": "vaccine_preventable_diseases",
     "Japanese encephalitis": "vaccine_preventable_diseases",
     "Self-inflicted injuries": "intentional_injuries",
+    **{cancer: "cancers" for cancer in CANCERS},
 }
+
+# Age bands WHO does not publish, built for the causes whose charts use them by summing WHO's bands: the cancer
+# types and their parent, which the childhood-cancer charts plot together. The rate divides by the population WHO
+# itself used, recovered from All Causes (see add_derived_age_groups).
+DERIVED_AGE_GROUPS = {
+    "<5 years": ["less than 1 year", "1-4 years"],
+    "<10 years": ["less than 1 year", "1-4 years", "5-9 years"],
+}
+DERIVED_AGE_GROUP_CAUSES = [MALIGNANT, *CANCERS]
+
+# Causes that occur in one sex only. Deaths recorded for the other sex are coding errors in the source;
+# they are tolerated up to this share of the cause's deaths and logged.
+SEX_SPECIFIC_CAUSES = {
+    "Prostate cancer": "Males",
+    "Testicular cancer": "Males",
+    "Cervix uteri cancer": "Females",
+    "Corpus uteri cancer": "Females",
+    "Ovary cancer": "Females",
+}
+MAX_SHARE_IN_OTHER_SEX = 0.001
 
 # Our label for each cause group -> (depth in WHO's cause tree, parent group).
 # Depth 0 is All Causes, depth 1 WHO's four top-level groups, depth 2 the groups beneath them.
@@ -101,6 +157,8 @@ CAUSE_TREE: dict[str, tuple[int, str | None]] = {
     "Japanese encephalitis": (3, INFECTIOUS),
     # Drill-down inside Intentional injuries (formerly the self_inflicted_injuries dataset).
     "Self-inflicted injuries": (3, "Intentional injuries"),
+    # Drill-downs inside Malignant neoplasms (formerly the mortality_database_cancer dataset).
+    **{cancer: (3, MALIGNANT) for cancer in CANCERS},
 }
 
 # Groups that appear only as parents: WHO's top-level groups, and the nodes between an ingested drill-down
@@ -200,15 +258,22 @@ def run() -> None:
         tb, tb_causes, min_share_consistent=PARTITION_MIN_SHARE_AFTER_CORRECTION, stage="after correction"
     )
 
-    # Step 5: One table per layer - the partition tier, then one table per group of drill-downs - so the catalog
-    # path says where a cause sits. The metadata must know every cause too (see the check).
+    # Step 5: Age bands WHO does not publish, for the tables whose charts use them, on WHO's own population.
+    tb = add_derived_age_groups(tb, tb_causes)
+
+    # Step 6: One table per layer - the partition tier, then one table per group of drill-downs - so the catalog
+    # path says where a cause sits. The metadata must know every cause too (see the check). Plus the leading
+    # cancer type, whose cause is a value rather than a key, so it cannot be a row of the fact tables.
     _check_metadata_lists_every_cause(tb_causes)
     tables = _split_by_table(tb, tb_causes)
+    tb_most_common_cancer = build_most_common_cancer(tb, tb_causes)
     tb_causes = tb_causes.format(["cause"], short_name="causes")
 
-    # Step 6: Save.
+    # Step 7: Save.
     ds_garden = paths.create_dataset(
-        tables=[*tables, tb_causes], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        tables=[*tables, tb_most_common_cancer, tb_causes],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
     ds_garden.save()
 
@@ -228,6 +293,117 @@ def _split_by_table(tb: Table, tb_causes: Table) -> list[Table]:
         tables.append(part.format(keys, short_name=short_name))
     assert sum(len(t) for t in tables) == len(tb), "Rows lost in the split by table"
     return tables
+
+
+def add_derived_age_groups(tb: Table, tb_causes: Table) -> Table:
+    """Add DERIVED_AGE_GROUPS to DERIVED_AGE_GROUP_CAUSES.
+
+    Deaths are summed over the bands each derived group spans. The death rate divides them by the population
+    WHO itself divided by, which `_implied_population` recovers from All Causes. Every band must contribute
+    both a death count and a population, otherwise the group is left missing: a partial numerator over a full
+    denominator understates the rate, a full numerator over a partial denominator overstates it. The share of
+    total deaths and the age-standardized rate are not derived.
+    """
+    causes = set(DERIVED_AGE_GROUP_CAUSES)
+    assert causes <= set(tb_causes["cause"]), (
+        f"Unknown causes in DERIVED_AGE_GROUP_CAUSES: {causes - set(tb_causes['cause'])}"
+    )
+    tb_population = _implied_population(tb)
+    keys = ["country", "year", "sex", "cause"]
+
+    parts = [tb]
+    for label, bands in DERIVED_AGE_GROUPS.items():
+        tb_bands = tb[tb["cause"].isin(causes) & tb["age_group"].isin(bands)]
+        tb_bands = pr.merge(tb_bands, tb_population, on=["country", "year", "sex", "age_group"], how="left")
+        grouped = tb_bands.groupby(keys, observed=True)[["number", "population"]]
+        # count() ignores NaN, so requiring one contribution per band rejects any group where a band is
+        # absent, reports no deaths, or has no recoverable population.
+        tb_group = grouped.sum(min_count=1).where(grouped.count() == len(bands)).reset_index()
+        tb_group["death_rate_per_100_000_population"] = tb_group["number"] / tb_group["population"] * 100_000
+        tb_group["age_group"] = label
+        tb_group = tb_group.drop(columns=["population"])
+        _validate_derived_age_group(tb_group, label)
+        parts.append(tb_group)
+
+    tb_out = pr.concat(parts, ignore_index=True)
+    # Concatenating a categorical with new labels gives plain strings; keep the dimensions categorical.
+    for column in ["age_group", "cause"]:
+        if isinstance(tb[column].dtype, pd.CategoricalDtype):
+            metadata = tb_out[column].metadata
+            tb_out[column] = tb_out[column].astype("category")
+            tb_out[column].metadata = metadata  # ty: ignore
+    return tb_out
+
+
+def _implied_population(tb: Table) -> Table:
+    """The population WHO divided by, per country, year, sex and age band, recovered from All Causes.
+
+    WHO publishes a death rate next to every death count, so its denominator is `number / death_rate x
+    100,000`. It describes the population, not the cause, and All Causes reports at least one death in nearly
+    every cell, so reading it there recovers it almost everywhere; reading it from a rare cause would not.
+    """
+    tb_all = tb[tb["cause"] == "All Causes"][
+        ["country", "year", "sex", "age_group", "number", "death_rate_per_100_000_population"]
+    ]
+    rate = tb_all["death_rate_per_100_000_population"]
+    # A zero or missing rate carries no information about the population size.
+    tb_all["population"] = tb_all["number"] / rate.where(rate > 0) * 100_000
+    tb_all = tb_all.dropna(subset=["population"])[["country", "year", "sex", "age_group", "population"]]
+    assert not tb_all.duplicated(subset=["country", "year", "sex", "age_group"]).any(), (
+        "All Causes is not unique per cell"
+    )
+    return tb_all
+
+
+def _validate_derived_age_group(tb_group: Table, label: str) -> None:
+    """A rate of exactly zero must mean zero deaths, never an unknown denominator."""
+    deaths, rate = tb_group["number"], tb_group["death_rate_per_100_000_population"]
+    fabricated = tb_group[(rate == 0) & (deaths > 0)]
+    assert len(fabricated) == 0, f"{label}: {len(fabricated)} rows report a death rate of 0 despite recording deaths"
+    assert len(tb_group) > 0, f"{label}: no rows derived"
+    log.info(
+        "add_derived_age_groups",
+        age_group=label,
+        rows=len(tb_group),
+        with_rate=int(rate.notna().sum()),
+        without_rate=int(rate.isna().sum()),
+    )
+
+
+def build_most_common_cancer(tb: Table, tb_causes: Table) -> Table:
+    """The cancer type with the highest age-standardized death rate, per country, year and sex.
+
+    Age-standardized rates exist for all ages only, so the table has no age dimension. The cause is reported
+    the way the step this replaces wrote it: without the word "cancer(s)", commas read as "and". Ties keep
+    the first type in the data's order, as before; their number is logged.
+    """
+    rate = "age_standardized_death_rate_per_100_000_standard_population"
+    cancers = set(tb_causes.loc[tb_causes["parent_cause"] == MALIGNANT, "cause"])
+    tb_cancers = tb[tb["cause"].isin(cancers)]
+    assert tb_cancers.loc[tb_cancers["age_group"] != "all ages", rate].isna().all(), (
+        "Age-standardized rates outside all ages"
+    )
+    tb_rates = tb_cancers[tb_cancers["age_group"] == "all ages"].dropna(subset=[rate])[
+        ["country", "year", "sex", "cause", rate]
+    ]
+
+    keys = ["country", "year", "sex"]
+    tb_rates = tb_rates.reset_index(drop=True)
+    maxima = tb_rates.groupby(keys, observed=True)[rate].transform("max")
+    ties = int((tb_rates[rate] == maxima).groupby([tb_rates[k] for k in keys], observed=True).sum().gt(1).sum())
+    tb_top = tb_rates.loc[tb_rates.groupby(keys, observed=True)[rate].idxmax(), keys + ["cause"]]
+    log.info("build_most_common_cancer", rows=len(tb_top), cells_with_ties=ties)
+
+    origins = tb_rates[rate].metadata.origins
+    tb_top["cause"] = (
+        tb_top["cause"]
+        .astype(str)
+        .str.replace(r"\bcancers?\b", "", case=False, regex=True)
+        .str.replace(",", " and")
+        .str.strip()
+    )
+    tb_top["cause"].metadata.origins = origins
+    return tb_top.format(keys, short_name="most_common_cancer")
 
 
 def _check_metadata_lists_every_cause(tb_causes: Table) -> None:
@@ -256,13 +432,14 @@ def build_causes_table(tb: Table) -> Table:
     """One row per cause group: its ICD-10 codes, from the data, and its place in WHO's tree, from CAUSE_TREE."""
     tb_causes = tb[["cause", "icd10_codes"]].drop_duplicates().reset_index(drop=True)
 
-    # WHO's code strings space their commas unevenly ("D50-D53,D64.9", "J00-J22,  P23"); normalize so they
+    # WHO's code strings space their commas and dashes unevenly ("D50-D53,D64.9", "J00-J22,  P23", "C77- C79"); normalize so they
     # read cleanly and match the strings repeated in the metadata.
     codes_metadata = tb_causes["icd10_codes"].metadata
     tb_causes["icd10_codes"] = (
         tb_causes["icd10_codes"]
         .astype(str)
         .str.replace(r"\s*,\s*", ", ", regex=True)
+        .str.replace(r"\s*-\s*", "-", regex=True)
         .str.replace(r"\s{2,}", " ", regex=True)
         .str.strip()
     )
@@ -345,7 +522,7 @@ def _validate_demographic_dimensions(tb: Table) -> None:
 
 def _validate_temporal_patterns(tb: Table) -> None:
     """Year range, and large year-on-year jumps in all-cause deaths for a few large countries."""
-    min_year, max_year = 1950, 2025
+    min_year, max_year = 1950, date.today().year
     assert tb["year"].min() >= min_year, f"Year too early: {tb['year'].min()}"
     assert tb["year"].max() <= max_year, f"Year too late: {tb['year'].max()}"
 
@@ -406,6 +583,23 @@ def _validate_cause_specific_patterns(tb: Table) -> None:
                     elderly_pct=f"{elderly_deaths / total_maternal * 100:.2f}%",
                 )
 
+    for cause, sex in SEX_SPECIFIC_CAUSES.items():
+        cause_data = tb[(tb["cause"] == cause) & (tb["age_group"] == "all ages")]
+        if len(cause_data) == 0:
+            continue
+        other_sex = "Females" if sex == "Males" else "Males"
+        in_other_sex = cause_data.loc[cause_data["sex"] == other_sex, "number"].sum()
+        total = cause_data.loc[cause_data["sex"] == "Both sexes", "number"].sum()
+        share = float(in_other_sex) / float(total) if total else 0.0
+        assert share <= MAX_SHARE_IN_OTHER_SEX, f"{cause}: {share:.2%} of deaths recorded in {other_sex.lower()}"
+        if in_other_sex > 0:
+            log.info(
+                "Sex-specific cause with deaths recorded in the other sex",
+                cause=cause,
+                deaths=int(in_other_sex),
+                share=f"{share:.4%}",
+            )
+
     sids_data = tb[tb["cause"] == "Sudden infant death syndrome"]
     if len(sids_data) > 0:
         allowed_age_groups = ["less than 1 year", "all ages", "Unknown age"]
@@ -435,7 +629,8 @@ def _validate_data_completeness(tb: Table) -> None:
             continue
 
         years_available = set(country_data["year"].unique())
-        expected_years = set(range(2000, 2024))
+        # WHO's reporting lag is 18-24 months, so the last two data years are not expected of anyone.
+        expected_years = set(range(2000, int(tb["year"].max()) - 1))
         missing_years = expected_years - years_available
 
         if len(missing_years) > 5:

@@ -16,7 +16,7 @@ codes that define the cause group; we keep it as `icd10_codes`, so the definitio
 the data instead of being typed by hand.
 
 Raw exports are cached under CACHE_DIR, in a folder named after this snapshot's version, so re-running
-after a parsing fix does not re-download roughly 700 MB, and a later version never reuses an older
+after a parsing fix does not re-download roughly 1.5 GB, and a later version never reuses an older
 release's files. Delete the folder to force fresh downloads.
 """
 
@@ -85,6 +85,32 @@ CAUSES = {
     "Japanese encephalitis": "CG0300",
     # Drill-down inside "Intentional injuries", formerly the self_inflicted_injuries dataset.
     "Self-inflicted injuries": "CG1570",
+    # Drill-downs inside "Malignant neoplasms", formerly the mortality_database_cancer dataset.
+    "Mouth and oropharynx cancers": "CG0610",
+    "Oesophagus cancer": "CG0620",
+    "Stomach cancer": "CG0630",
+    "Colon and rectum cancers": "CG0640",
+    "Liver cancer": "CG0650",
+    "Pancreas cancer": "CG0660",
+    "Trachea, bronchus, lung cancers": "CG0670",
+    "Melanoma and other skin cancers": "CG0680",
+    "Breast cancer": "CG0690",
+    "Cervix uteri cancer": "CG0700",
+    "Corpus uteri cancer": "CG0710",
+    "Ovary cancer": "CG0720",
+    "Prostate cancer": "CG0730",
+    "Testicular cancer": "CG0731",
+    "Kidney cancer": "CG0732",
+    "Bladder cancer": "CG0740",
+    "Brain and nervous system cancers": "CG0741",
+    "Gallbladder and biliary tract cancer": "CG0742",
+    "Larynx cancer": "CG0743",
+    "Thyroid cancer": "CG0744",
+    "Mesothelioma": "CG0745",
+    "Lymphomas, multiple myeloma": "CG0750",
+    "Leukaemia": "CG0760",
+    "Ill-defined malignant neoplasms": "CG0768",
+    "Other malignant neoplasms": "CG0769",
 }
 
 # Five metadata lines and a blank line precede the header row.

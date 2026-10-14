@@ -24,24 +24,52 @@ definitions:
       ("Hepatitis B", "Vaccine-preventable diseases"),
       ("Japanese encephalitis", "Vaccine-preventable diseases"),
       ("Self-inflicted injuries", "Intentional injuries"),
+      ("Mouth and oropharynx cancers", "Cancers"),
+      ("Oesophagus cancer", "Cancers"),
+      ("Stomach cancer", "Cancers"),
+      ("Colon and rectum cancers", "Cancers"),
+      ("Liver cancer", "Cancers"),
+      ("Pancreas cancer", "Cancers"),
+      ("Trachea, bronchus, lung cancers", "Cancers"),
+      ("Melanoma and other skin cancers", "Cancers"),
+      ("Breast cancer", "Cancers"),
+      ("Cervix uteri cancer", "Cancers"),
+      ("Corpus uteri cancer", "Cancers"),
+      ("Ovary cancer", "Cancers"),
+      ("Prostate cancer", "Cancers"),
+      ("Testicular cancer", "Cancers"),
+      ("Kidney cancer", "Cancers"),
+      ("Bladder cancer", "Cancers"),
+      ("Brain and nervous system cancers", "Cancers"),
+      ("Gallbladder and biliary tract cancer", "Cancers"),
+      ("Larynx cancer", "Cancers"),
+      ("Thyroid cancer", "Cancers"),
+      ("Mesothelioma", "Cancers"),
+      ("Lymphomas, multiple myeloma", "Cancers"),
+      ("Leukaemia", "Cancers"),
+      ("Ill-defined malignant neoplasms", "Cancers"),
+      ("Other malignant neoplasms", "Cancers"),
     ] %><% for c, label in layers %><% if c == cause %><< label >> › <% endif %><% endfor %>
 
-  # NOTE: Public titles and short descriptions, per metric. Self-inflicted injuries keep the wording its former
-  # dataset carried (an editorial choice made there), including the dimension suffix readers see today; every
-  # other cause uses the family's sentence.
-  title_public_number: |-
+  # NOTE: Display names and short descriptions, per metric. The display name is the sentence readers see as the
+  # indicator's title (data page, the chart's "learn more" panel when the chart sets no label of its own, table
+  # headers); it goes in `display.name`, not `presentation.title_public`, because grapher lets a public title
+  # override the chart's own labels in that panel, while a display name yields to them. Self-inflicted injuries
+  # keep the wording its former dataset carried (an editorial choice made there), including the dimension suffix
+  # readers see today; every other cause uses the family's sentence.
+  display_name_number: |-
     <% if cause == "Self-inflicted injuries" %>Number of deaths from self-inflicted injuries - Sex: << sex >> - Age group: << age_group >><% else %>Deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >><% endif %>
   description_short_number: |-
     <% if cause == "Self-inflicted injuries" %>Number of deaths from self-inflicted injuries in the total population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Reported total deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >>.<% endif %>
-  title_public_death_rate: |-
+  display_name_death_rate: |-
     <% if cause == "Self-inflicted injuries" %>Death rate from self-inflicted injuries per 100,000 population - Sex: << sex >> - Age group: << age_group >><% else %>Deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >><% endif %>
   description_short_death_rate: |-
     <% if cause == "Self-inflicted injuries" %>Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Reported deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >>.<% endif %>
-  title_public_share: |-
+  display_name_share: |-
     <% if cause == "Self-inflicted injuries" %>Percentage of deaths from self-inflicted injuries out of total deaths - Sex: << sex >> - Age group: << age_group >><% else %>Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}<% endif %>
   description_short_share: |-
     <% if cause == "Self-inflicted injuries" %>Percentage of deaths from self-inflicted injuries out of all deaths in the population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Share of total reported deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}.<% endif %>
-  title_public_asr: |-
+  display_name_asr: |-
     <% if cause == "Self-inflicted injuries" %>Age-standardized death rate from self-inflicted injuries per 100,000 population - Sex: << sex >> - Age group: << age_group >><% else %>Age-standardized deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people<% endif %>
   description_short_asr: |-
     <% if cause == "Self-inflicted injuries" %>Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates. To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<% else %>Reported deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people.<% endif %>
@@ -115,6 +143,56 @@ definitions:
     A83.0
     <%- elif cause == "Self-inflicted injuries" %>
     X60-X84, Y870
+    <%- elif cause == "Mouth and oropharynx cancers" %>
+    C00-C14
+    <%- elif cause == "Oesophagus cancer" %>
+    C15
+    <%- elif cause == "Stomach cancer" %>
+    C16
+    <%- elif cause == "Colon and rectum cancers" %>
+    C18-C21
+    <%- elif cause == "Liver cancer" %>
+    C22
+    <%- elif cause == "Pancreas cancer" %>
+    C25
+    <%- elif cause == "Trachea, bronchus, lung cancers" %>
+    C33-C34
+    <%- elif cause == "Melanoma and other skin cancers" %>
+    C43-C44
+    <%- elif cause == "Breast cancer" %>
+    C50
+    <%- elif cause == "Cervix uteri cancer" %>
+    C53
+    <%- elif cause == "Corpus uteri cancer" %>
+    C54-C55
+    <%- elif cause == "Ovary cancer" %>
+    C56
+    <%- elif cause == "Prostate cancer" %>
+    C61
+    <%- elif cause == "Testicular cancer" %>
+    C62
+    <%- elif cause == "Kidney cancer" %>
+    C64-C66
+    <%- elif cause == "Bladder cancer" %>
+    C67
+    <%- elif cause == "Brain and nervous system cancers" %>
+    C70-C72
+    <%- elif cause == "Gallbladder and biliary tract cancer" %>
+    C23-C24
+    <%- elif cause == "Larynx cancer" %>
+    C32
+    <%- elif cause == "Thyroid cancer" %>
+    C73
+    <%- elif cause == "Mesothelioma" %>
+    C45
+    <%- elif cause == "Lymphomas, multiple myeloma" %>
+    C81-C90, C96
+    <%- elif cause == "Leukaemia" %>
+    C91-C95
+    <%- elif cause == "Ill-defined malignant neoplasms" %>
+    C76, C80, C97
+    <%- elif cause == "Other malignant neoplasms" %>
+    C17, C26-C31, C37-C41, C46-C49, C51, C52, C57-C60, C63, C68, C69, C74-C75, C77-C79
     <%- endif -%>
 
   description_disease_producer: |-
@@ -170,6 +248,17 @@ definitions:
   annotation: |-
     <% if cause == 'Maternal conditions' %>United States: Values from 2003–2017 affected by measurement change<%- endif -%>
 
+  # Rendered only for the age bands we derive; see add_derived_age_groups in the garden step. The death-rate text is
+  # the retired cancer dataset's, kept as it was; the count one is new (the count is derived too).
+  description_processing_derived_age_group_count: |-
+    <% if age_group in ["<5 years", "<10 years"] %>
+    WHO does not publish this combined age group. We add up the deaths it reports for each of the underlying age groups.
+    <%- endif -%>
+  description_processing_derived_age_group_rate: |-
+    <% if age_group in ["<5 years", "<10 years"] %>
+    WHO does not publish a death rate for this combined age group. We add up the deaths it reports for each of the underlying age groups, and divide by the population WHO itself used as the denominator, which we recover from its reported death counts and rates for all causes combined. Where that population cannot be recovered for every underlying age group, we leave the rate missing rather than reporting it as zero.
+    <%- endif -%>
+
   # Rendered only for Unintentional injuries; see correct_unintentional_injuries in the garden step.
   description_processing_unintentional_injuries: |-
     <% if cause == "Unintentional injuries" %>
@@ -184,6 +273,7 @@ dataset:
     - date: 2026-10-14
       changes:
         - Added seven vaccine-preventable diseases (pertussis, poliomyelitis, diphtheria, measles, tetanus, hepatitis B and Japanese encephalitis) as drill-down causes inside "Infectious and parasitic diseases"; they were previously the separate "WHO Mortality Database – Vaccine Preventable" dataset.
+        - Added the 25 cancer types as drill-down causes inside "Malignant neoplasms", in the table `cancers`, with the under-5 and under-10 age bands we derive, and the leading cancer type per country, year and sex as the table `most_common_cancer`; previously the separate "WHO Mortality Database - Cancer Deaths" and "Leading cancer types causing death" datasets.
         - Added self-inflicted injuries (suicides) as a drill-down cause inside "Intentional injuries", in the table `intentional_injuries`; previously the separate "WHO Mortality Database - Self-inflicted injuries" dataset.
     - date: 2026-10-13
       changes:
@@ -207,14 +297,14 @@ tables:
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
-          {definitions.description_processing_unintentional_injuries}
+          {definitions.description_processing_unintentional_injuries}{definitions.description_processing_derived_age_group_count}
         unit: deaths
         display:
+          name: "{definitions.display_name_number}"
           numDecimalPlaces: 0
           entityAnnotationsMap: |-
             {definitions.annotation}
         presentation:
-          title_public: "{definitions.title_public_number}"
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
@@ -230,9 +320,9 @@ tables:
         unit: "%"
         short_unit: "%"
         display:
+          name: "{definitions.display_name_share}"
           numDecimalPlaces: 1
         presentation:
-          title_public: "{definitions.title_public_share}"
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
@@ -247,11 +337,11 @@ tables:
           {definitions.description_processing_unintentional_injuries}
         unit: deaths per 100,000 people
         display:
+          name: "{definitions.display_name_asr}"
           numDecimalPlaces: 1
           entityAnnotationsMap: |-
             {definitions.annotation}
         presentation:
-          title_public: "{definitions.title_public_asr}"
           grapher_config:
             note: |-
               To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized). All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
@@ -263,14 +353,14 @@ tables:
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
-          {definitions.description_processing_unintentional_injuries}
+          {definitions.description_processing_unintentional_injuries}{definitions.description_processing_derived_age_group_rate}
         unit: deaths per 100,000 people
         display:
+          name: "{definitions.display_name_death_rate}"
           numDecimalPlaces: 1
           entityAnnotationsMap: |-
             {definitions.annotation}
         presentation:
-          title_public: "{definitions.title_public_death_rate}"
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
@@ -292,6 +382,27 @@ tables:
         topic_tags:
           - Mental Health
     variables: *fact_variables
+  cancers:
+    # The retired mortality_database_cancer dataset was tagged Causes of Death and Cancer; its successors keep both.
+    common:
+      presentation:
+        topic_tags:
+          - Causes of Death
+          - Cancer
+    variables: *fact_variables
+  most_common_cancer:
+    common:
+      presentation:
+        topic_tags:
+          - Causes of Death
+          - Cancer
+    variables:
+      cause:
+        title: Leading cancer types causing death in << sex.lower() >>
+        description_short: Most common cause of [cancer](#dod:cancer) deaths in << sex.lower() >>, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.
+        description_processing: |-
+          The leading cancer type is the one with the highest age-standardized death rate among the 25 cancer types WHO publishes, for each country, year and sex.
+        unit: ""
   causes:
     variables:
       cause_level:
