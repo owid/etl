@@ -149,13 +149,16 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    world's factories make from the crop, minus the nutrient of intermediate products processed further within the
    same family (such as copra, pressed into coconut oil), divided by the tonnes of the crop the world processes.
    That World ratio is applied to every country. Sugar cane and sugar beet share their products (raw and
-   refined sugar, molasses), so they get one value together, 56 kcal per 100 g in 2023. Palm kernels are themselves
-   made from oil palm fruit and then crushed for their oil; they are valued first, so that the oil palm fruit
-   family counts its kernels at their new value. The families, their products and their order are in the items
-   file; they agree with FAO's commodity trees (FAO 2000, Technical Conversion Factors for Agricultural
-   Commodities), except that the refined sugar sent to soft drinks and spirits, and the broken rice sent to beer
-   and cereal preparations, reach no listed product, which undervalues sugar cane and beet by about 5% and paddy
-   by about 1%.
+   refined sugar, molasses), so they get one value together, 59 kcal per 100 g in 2023. Their family ends at sugar
+   and molasses: raw sugar processed into refined sugar is netted out, but refined sugar sent to drinks or sweets
+   keeps its value as sugar. Mixed products (confectionery, flavored sugar and syrups) are left out of the density
+   calculation, so their other ingredients are not attributed to cane and beet; they remain in the food chain.
+   Palm kernels are themselves made from oil palm fruit and then crushed for their oil; they are valued first,
+   so that the oil palm fruit family counts its kernels at their new value. The families, their products and their
+   order are in the items
+   file, based on FAO's commodity trees (FAO 2000, Technical Conversion Factors for Agricultural Commodities).
+   Broken rice sent to beer and cereal preparations still reaches no listed product, which undervalues paddy by
+   about 1%.
 
 8. Roles: where each item's production enters the chain.
    >> Scale: major. Together with the densities, the roles are the shape of the chain: they decide which stage

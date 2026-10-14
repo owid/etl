@@ -152,6 +152,37 @@ def test_scl_fixed_factors_are_checked_instead_of_switched(nutrient, scale, food
         np.testing.assert_allclose(converted["production"], tb["production"] * 1e4 * 200.0 * scale)
 
 
+@pytest.mark.parametrize(
+    "nutrient,densities,expected_factor",
+    [
+        ("energy", [0, 375, 399, 290, 315, 410, 39, 300], 49.025),
+        ("protein", [0, 0.1, 0, 0.5, 0.2, 4.1, 0, 0], 0.022),
+    ],
+)
+def test_scl_sugar_factor_keeps_sugar_sent_to_mixed_products(nutrient, densities, expected_factor):
+    # 100 tonnes of cane make 10 tonnes of raw sugar and 4 of molasses. Eight tonnes of the raw sugar are refined
+    # into 7.5 tonnes of sugar. Raw sugar is counted only once; refined sugar keeps its value even when used in
+    # drinks or confectionery. The other ingredients of those mixed products cannot be attributed to the cane.
+    codes = [156, 162, 164, 165, 167, 168, 633, 160]
+    tb = Table(
+        {
+            "country": ["Example"] * len(codes),
+            "year": [2023] * len(codes),
+            "item_code": [SCL._pad_code(code) for code in codes],
+            "production": [100, 10, 7.5, 4, 3, 2, 30, 1],
+            "processing": [100, 8, 2, 0, 0, 0, 0, 0],
+            "density": densities,
+        }
+    )
+    family = SCL.load_manual_inputs()["output_implied_densities"][0]
+    factor = SCL.product_implied_density(tb, family, nutrient)
+    np.testing.assert_allclose(factor, [expected_factor])
+    # Changing the downstream product mix leaves the crop's factor unchanged.
+    tb.loc[tb["item_code"] == SCL._pad_code(164), "processing"] = 6
+    tb.loc[tb["item_code"].isin([SCL._pad_code(code) for code in [160, 167, 168, 633]]), "production"] *= 10
+    np.testing.assert_allclose(SCL.product_implied_density(tb, family, nutrient), factor)
+
+
 def _replaced_densities(step, nutrient: str, sources: list[str]) -> Table:
     # A reported nutrient next to each kind of density that is not the cell's own.
     tb = Table(

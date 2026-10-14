@@ -232,13 +232,17 @@ never_food:
 #    Each crop listed here is instead valued by its products: each year, the nutrient of the family's products made by
 #    the world's factories, minus that of the intermediates (products processed further within the family), divided
 #    by the tonnes of the family's crops the world processes. That World ratio is applied to every country. Sugar cane
-#    and sugar beet share their products and get one value together. Families are read in the order below, and each
-#    family's values are used by the next ones: palm kernels, made from oil palm fruit, are valued before it, so that
+#    and sugar beet share their products and get one value together. Their family ends at sugar and molasses:
+#    refining inputs are netted out, but refined sugar sent into drinks and sweets keeps its value as sugar. Mixed
+#    downstream products (160, 167, 168) are excluded from this density calculation; their other ingredients cannot
+#    be attributed to cane and beet. They remain in the food chain with their own food-based densities.
+#    Families are read in the order below, and each family's values are used by the next ones: palm kernels, made
+#    from oil palm fruit, are valued before it, so that
 #    the oil palm fruit family counts its kernels at their new value.
 output_implied_densities:
   - crops: {156: "Sugar cane", 157: "Sugar beet"}
-    products: {158: "Cane sugar, centrifugal", 162: "Raw cane or beet sugar (centrifugal only)", 163: "Cane sugar, non-centrifugal", 160: "Refined cane or beet sugar, in solid form, containing added flavouring or colouring matter; maple sugar and maple syrup", 164: "Refined sugar", 165: "Molasses", 167: "Sugar and syrups n.e.c.", 168: "Sugar confectionery"}
-    intermediates: {158: "Cane sugar, centrifugal", 162: "Raw cane or beet sugar (centrifugal only)", 164: "Refined sugar"}
+    products: {158: "Cane sugar, centrifugal", 162: "Raw cane or beet sugar (centrifugal only)", 163: "Cane sugar, non-centrifugal", 164: "Refined sugar", 165: "Molasses"}
+    intermediates: {158: "Cane sugar, centrifugal", 162: "Raw cane or beet sugar (centrifugal only)"}
   - crops: {27: "Rice"}
     products: {28: "Husked rice", 29: "Rice, milled (husked)", 31: "Rice, milled", 32: "Rice, broken", 34: "Starch of rice", 35: "Bran of rice", 36: "Oil of rice bran", 37: "Cake of rice bran", 38: "Flour of rice", 39: "Rice-fermented beverages"}
     intermediates: {28: "Husked rice", 29: "Rice, milled (husked)", 31: "Rice, milled", 32: "Rice, broken", 35: "Bran of rice"}
