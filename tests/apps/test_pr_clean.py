@@ -12,7 +12,14 @@ from pathlib import Path
 import pytest
 from git import Repo
 
-from apps.pr.cli import clean_branch, resolve_branches_to_clean, worktree_blocking_changes
+from apps.pr.cli import (
+    _CLEAN_ALL,
+    _CLEAN_ALL_CLOSED,
+    _CLEAN_ALL_MERGED,
+    clean_branch,
+    resolve_branches_to_clean,
+    worktree_blocking_changes,
+)
 
 
 def _commit_file(repo: Repo, name: str, content: str, message: str):
@@ -106,15 +113,21 @@ def test_blocking_changes_unreadable_worktree_counts_as_blocking(repo_with_workt
 
 def test_resolve_branches_to_clean():
     cleanable = {"merged-a": "merged", "merged-b": "merged", "closed-a": "closed"}
-    assert resolve_branches_to_clean("__all__", cleanable) == ["closed-a", "merged-a", "merged-b"]
-    assert resolve_branches_to_clean("__all_merged__", cleanable) == ["merged-a", "merged-b"]
-    assert resolve_branches_to_clean("__all_closed__", cleanable) == ["closed-a"]
+    assert resolve_branches_to_clean(_CLEAN_ALL, cleanable) == ["closed-a", "merged-a", "merged-b"]
+    assert resolve_branches_to_clean(_CLEAN_ALL_MERGED, cleanable) == ["merged-a", "merged-b"]
+    assert resolve_branches_to_clean(_CLEAN_ALL_CLOSED, cleanable) == ["closed-a"]
     assert resolve_branches_to_clean("merged-a", cleanable) == ["merged-a"]
 
 
 def test_resolve_branches_to_clean_empty_bucket():
     cleanable = {"merged-a": "merged"}
-    assert resolve_branches_to_clean("__all_closed__", cleanable) == []
+    assert resolve_branches_to_clean(_CLEAN_ALL_CLOSED, cleanable) == []
+
+
+def test_resolve_branches_to_clean_no_sentinel_collision():
+    """A real branch literally named like a sentinel marker must be treated as that one branch."""
+    cleanable = {"__all_merged__": "closed", "other-merged": "merged"}
+    assert resolve_branches_to_clean("__all_merged__", cleanable) == ["__all_merged__"]
 
 
 def test_clean_branch_cleans_manually_deleted_worktree(repo_with_worktree, tmp_path):

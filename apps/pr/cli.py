@@ -828,6 +828,14 @@ etl pr-clean
 """
 
 
+# Sentinel values for the pr-clean bulk-selection choices. Plain objects, not strings, so they can
+# never collide with an actual branch name -- git allows branch names like "__all_merged__", which
+# a string sentinel would be indistinguishable from when selected.
+_CLEAN_ALL = object()
+_CLEAN_ALL_MERGED = object()
+_CLEAN_ALL_CLOSED = object()
+
+
 @click.command(
     name="pr-clean",
     cls=RichCommand,
@@ -890,9 +898,9 @@ def clean_cli() -> None:
 
     # Build the selection list ('all' / 'all merged' / 'all closed' first, then one entry per branch).
     choices = [
-        questionary.Choice(title="all", value="__all__"),
-        questionary.Choice(title="all merged", value="__all_merged__"),
-        questionary.Choice(title="all closed", value="__all_closed__"),
+        questionary.Choice(title="all", value=_CLEAN_ALL),
+        questionary.Choice(title="all merged", value=_CLEAN_ALL_MERGED),
+        questionary.Choice(title="all closed", value=_CLEAN_ALL_CLOSED),
     ]
     for branch in sorted(cleanable):
         choices.append(
@@ -911,7 +919,7 @@ def clean_cli() -> None:
 
     branches_to_clean = resolve_branches_to_clean(selected, cleanable)
     if not branches_to_clean:
-        state = {"__all_merged__": "merged", "__all_closed__": "closed"}[selected]
+        state = {_CLEAN_ALL_MERGED: "merged", _CLEAN_ALL_CLOSED: "closed"}[selected]
         print(f"Nothing to clean: no local branch has a {state} PR.")
         return
 
@@ -927,15 +935,20 @@ def clean_cli() -> None:
         )
 
 
-def resolve_branches_to_clean(selected: str, cleanable: dict[str, str]) -> list[str]:
-    """Expand a questionary selection into the sorted list of branches to clean."""
-    if selected == "__all__":
+def resolve_branches_to_clean(selected: object, cleanable: dict[str, str]) -> list[str]:
+    """Expand a questionary selection into the sorted list of branches to clean.
+
+    `selected` is either one of the `_CLEAN_ALL*` sentinels or a branch name (`str`) chosen
+    directly -- sentinels, rather than string markers like "__all__", so a real branch that
+    happens to be named that can never be mistaken for the bulk choice.
+    """
+    if selected is _CLEAN_ALL:
         return sorted(cleanable)
-    if selected == "__all_merged__":
+    if selected is _CLEAN_ALL_MERGED:
         return sorted(b for b, s in cleanable.items() if s == "merged")
-    if selected == "__all_closed__":
+    if selected is _CLEAN_ALL_CLOSED:
         return sorted(b for b, s in cleanable.items() if s == "closed")
-    return [selected]
+    return [selected]  # ty: ignore
 
 
 def get_main_worktree_path(repo) -> Path:
