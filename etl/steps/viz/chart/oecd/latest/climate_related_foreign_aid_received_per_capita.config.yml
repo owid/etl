@@ -10,9 +10,6 @@ views:
       y:
         - catalogPath: "climate_related_oda_by_recipient#climate_related_per_capita"
     config:
-      title: "Climate-related foreign aid received per capita"
-      subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) to projects that target climate change mitigation, adaptation, or both, divided by population. This data is expressed in US dollars and adjusted for inflation."
-      note: "This data is expressed in constant 2024 US$. Projects that target climate as a secondary objective are counted at their full value. Aid to regional or unspecified projects is not assigned to any country."
       tab: "map"
       hasMapTab: true
       chartTypes:
