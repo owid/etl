@@ -186,6 +186,8 @@ def cli(
                 source_session=source_session,
                 target_session=target_session,
                 ignore_conflicts=ignore_conflicts,
+                # chart-sync never reads `error`, so skip the metadata fetches behind it
+                check_selected_entities=False,
             )
 
             if chart_id:

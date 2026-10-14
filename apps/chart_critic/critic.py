@@ -46,17 +46,41 @@ from pydantic_ai import Agent, BinaryContent
 
 from apps.chart_critic.bundle import Bundle
 
-# Tested defaults. The flash tier is enough: on the SDG 16.2.2 case both flash and flash-lite
-# identified the swap from the render alone, and flash-lite did it for ~$0.0002 a call.
-DEFAULT_MODEL = "google:gemini-3.8-flash"
+# Sonnet 5.5 at effort high (see ANTHROPIC_SETTINGS) replaced gemini-3.8-flash as the default.
+# On charts with known answers it caught 8 of 9 passes on real findings against Gemini's 6, never
+# raised a false positive Gemini raised twice, and stayed quiet on clean charts. It costs about
+# $0.04 a chart with caching against Gemini's $0.035. Haiku 5.5 caught none, with or without the
+# render, so the small Claude tier is not a cheap substitute. The cheap tier stays on Gemini.
+DEFAULT_MODEL = "anthropic:claude-sonnet-5-5"
 CHEAP_MODEL = "google:gemini-3.1-flash-lite"
 
-# Fallback prices in $ per million tokens (input, output), from Google's published rates.
+# Fallback prices in $ per million tokens (input, output), from the providers' published rates.
 # `genai_prices` (used by apps.utils.llms.costs) does not carry these models yet; drop an entry
 # here once it does, and note that gemini-3.8-flash doubles to 1.50/7.50 on 2027-01-01.
 FALLBACK_PRICES = {
     "google:gemini-3.8-flash": (0.75, 3.75),
     "google:gemini-3.1-flash-lite": (0.10, 0.40),
+    "anthropic:claude-sonnet-5-5": (2.00, 10.00),
+    "anthropic:claude-haiku-5-5": (0.10, 0.50),
+}
+
+# Anthropic bills a cache read at a tenth of the input rate and a five-minute cache write at 1.25x.
+ANTHROPIC_CACHE_READ, ANTHROPIC_CACHE_WRITE = 0.1, 1.25
+
+# Settings for Claude models, which get none of them by default:
+# - Thinking has to be switched on. pydantic-ai returns structured output through a forced tool
+#   call, Anthropic allows no thinking alongside a forced tool, and so without this the model
+#   answers without thinking at all — about 40 output tokens a pass, and no findings.
+# - Effort "high": on charts with known answers, it was the Sonnet 5.5 setting that raised nothing
+#   on clean charts; at low and medium it flagged them nearly every pass.
+# - Caching the user turn lets passes 2 and 3 read the prompt from cache, about a third off the
+#   bill. Only the input is cached; each pass still generates its own answer, so the repeat
+#   passes keep their value.
+ANTHROPIC_SETTINGS = {
+    "anthropic_thinking": {"type": "adaptive"},
+    "anthropic_effort": "high",
+    "anthropic_cache_messages": True,
+    "max_tokens": 32000,
 }
 
 
@@ -230,9 +254,23 @@ def build_agent(model: str = DEFAULT_MODEL) -> Agent[None, Review]:
 
     No sampling settings: Gemini has ignored ``temperature``, ``top_p`` and ``top_k`` since
     3.6 Flash, and upcoming models reject them. This model raises a genuine finding on some
-    passes and not others, so repeat passes are the recall dial — see ``--repeat``.
+    passes and not others, so repeat passes are the recall dial — see ``--repeat``. Claude
+    models get :data:`ANTHROPIC_SETTINGS`.
     """
-    return Agent[None, Review](model=model, output_type=Review, retries=2)
+    if not model.startswith("anthropic:"):
+        return Agent[None, Review](model=model, output_type=Review, retries=2)
+    # The critic's own key when one is set; see etl.config.
+    from pydantic_ai.models.anthropic import AnthropicModel
+    from pydantic_ai.providers.anthropic import AnthropicProvider
+
+    from etl import config
+
+    if not config.ANTHROPIC_API_KEY_CHART_CRITIC:
+        raise RuntimeError(f"{model} needs ANTHROPIC_API_KEY_CHART_CRITIC (or ANTHROPIC_API_KEY) in .env")
+    claude = AnthropicModel(
+        model.removeprefix("anthropic:"), provider=AnthropicProvider(api_key=config.ANTHROPIC_API_KEY_CHART_CRITIC)
+    )
+    return Agent[None, Review](model=claude, output_type=Review, retries=2, model_settings=ANTHROPIC_SETTINGS)  # ty: ignore[invalid-argument-type]
 
 
 def prompt_parts(bundle: Bundle, extra_views: list[tuple[str, bytes]] | None = None) -> list[str | BinaryContent]:

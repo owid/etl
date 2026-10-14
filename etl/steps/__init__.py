@@ -42,6 +42,7 @@ from etl import config, files, git_helpers, paths
 from etl.config import OWID_ENV, TLS_VERIFY
 from etl.db import get_engine
 from etl.grapher import helpers as gh
+from etl.grapher.entity_selection import UpsertPinsCheck
 from etl.helpers import get_metadata_path
 from etl.snapshot import Snapshot
 
@@ -1032,6 +1033,10 @@ class GrapherStep(Step):
 
         catalog_paths = []
 
+        # Before upserting, record what production has for indicators that charts pin entities of
+        pins_check = UpsertPinsCheck(engine, dataset_upsert_results.dataset_id)
+        pins_check.prepare()
+
         with ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
             futures = []
             verbose = True
@@ -1088,6 +1093,7 @@ class GrapherStep(Step):
                     assert len(t.columns) == 1
                     catalog_path = f"{self.path}/{table.metadata.short_name}#{t.columns[0]}"
                     catalog_paths.append(catalog_path)
+                    pins_check.add(catalog_path, t)
 
                     # stop logging to stop cluttering logs
                     if i > 20 and verbose:
@@ -1112,6 +1118,9 @@ class GrapherStep(Step):
 
             # wait for all tables to be inserted
             [future.result() for future in as_completed(futures)]
+
+        # Fail if the upsert removed entities that charts pin (the dataset checksum stays unset, so the step reruns)
+        pins_check.run()
 
         # If INSTANT flag is set, don't clean ghost variables, but update the checksum (with _instant suffix)
         if INSTANT_METADATA_DIFF:
