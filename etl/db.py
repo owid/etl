@@ -94,7 +94,18 @@ def dict_to_object(d):
 def read_sql(sql: str, engine: Engine | Session | None = None, *args, **kwargs) -> pd.DataFrame:
     """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
     This adds overhead, so if you need performance, reuse the same connection and cursor.
+
+    Text columns come back as object with None for NULL, as in pandas 2. pandas 3 reads them as `str` with
+    NaN, which is truthy, so `row.get("title") or ""` and `if row["title"]` would treat NULL as text.
     """
+    df = _read_sql(sql, engine, *args, **kwargs)
+    if isinstance(df, pd.DataFrame):
+        for col in df.columns[df.dtypes == "str"]:
+            df[col] = df[col].astype(object).where(df[col].notna(), None)
+    return df
+
+
+def _read_sql(sql: str, engine: Engine | Session | None = None, *args, **kwargs) -> pd.DataFrame:
     engine = engine or get_engine()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
@@ -141,12 +152,17 @@ def to_sql(df: pd.DataFrame, name: str, engine: Engine | Session | None = None, 
             _handle_connection_error(e)
 
 
-def production_or_master_engine() -> Engine:
-    """Return the production engine if available, otherwise connect to staging-site-master."""
+def production_or_master_env() -> config.OWIDEnv:
+    """Return the production environment if available, otherwise staging-site-master."""
     if config.OWID_ENV.env_remote == "production":
-        return config.OWID_ENV.get_engine()
+        return config.OWID_ENV
     elif config.ENV_FILE_PROD:
-        return config.OWIDEnv.from_env_file(config.ENV_FILE_PROD).get_engine()
+        return config.OWIDEnv.from_env_file(config.ENV_FILE_PROD)
     else:
         log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")
-        return config.OWIDEnv.from_staging("master").get_engine()
+        return config.OWIDEnv.from_staging("master")
+
+
+def production_or_master_engine() -> Engine:
+    """Return the production engine if available, otherwise connect to staging-site-master."""
+    return production_or_master_env().get_engine()

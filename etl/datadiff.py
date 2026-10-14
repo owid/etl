@@ -1223,7 +1223,7 @@ def _align_tables(table_a: Table, table_b: Table) -> tuple[Table, Table, pd.Seri
     # align tables by index
     table_a["_x"] = 1
     table_b["_x"] = 1
-    table_a, table_b = table_a.align(table_b, join="outer", copy=False)
+    table_a, table_b = table_a.align(table_b, join="outer")
 
     new_index = table_a["_x"].isnull()
     removed_index = table_b["_x"].isnull()
@@ -1435,11 +1435,13 @@ def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude:
 
     ds_paths = frame["ds_paths"]
 
+    # Match with Python's `re`, not `.str.contains`: on the pandas str dtype that runs pyarrow's RE2, which
+    # rejects lookarounds such as the `(?=...)` in owidbot's include pattern.
     if include:
-        ds_paths = ds_paths[ds_paths.str.contains(include, regex=True)]
+        ds_paths = ds_paths[[re.search(include, p) is not None for p in ds_paths]]
 
     if exclude:
-        ds_paths = ds_paths[~ds_paths.str.contains(exclude, regex=True)]
+        ds_paths = ds_paths[[re.search(exclude, p) is None for p in ds_paths]]
 
     ds_paths = set(ds_paths)
 

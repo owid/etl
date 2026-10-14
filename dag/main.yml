@@ -201,9 +201,9 @@ steps:
           - data://garden/regions/2023-01-01/regions
 
   # Missing Data - Suicides
-  data://grapher/missing_data/2024-03-26/who_md_suicides:
-    - data://garden/missing_data/2024-03-26/who_md_suicides:
-      - data://garden/who/2024-03-24/self_inflicted_injuries
+  data://grapher/missing_data/2026-10-02/who_md_suicides:
+    - data://garden/missing_data/2026-10-02/who_md_suicides:
+      - data://garden/who/2025-08-06/self_inflicted_injuries
       - data://garden/wb/2026-07-01/income_groups
       - data://garden/regions/2023-01-01/regions
       - data://garden/demography/2023-03-31/population
@@ -510,6 +510,32 @@ steps:
       - data://garden/demography/2024-07-15/population
       - data://garden/regions/2023-01-01/regions
       - data://garden/wb/2026-07-01/income_groups
+
+  # OECD Climate-related official development assistance (RioMarkers)
+  data://grapher/oecd/2026-10-07/climate_related_official_development_assistance:
+    - data://garden/oecd/2026-10-07/climate_related_official_development_assistance:
+      - data://meadow/oecd/2026-10-07/climate_related_official_development_assistance:
+        - snapshot://oecd/2026-10-07/climate_related_official_development_assistance.zip
+        - snapshot://oecd/2026-10-07/bilateral_official_development_assistance_commitments.csv
+      - data://garden/demography/2024-07-15/population
+
+  #
+  # Climate-related ODA charts — authored in ETL.
+  #
+  viz://chart/oecd/latest/foreign_aid_given_for_climate_mitigation_and_adaptation:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/foreign_aid_given_for_climate_as_a_main_or_secondary_objective:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/climate_related_foreign_aid_given_by_sector:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/share_of_foreign_aid_given_that_is_climate_related:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/climate_related_foreign_aid_received:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/climate_related_foreign_aid_received_per_capita:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
+  viz://chart/oecd/latest/share_of_foreign_aid_received_that_is_climate_related:
+    - data://grapher/oecd/2026-10-07/climate_related_official_development_assistance
 
   #
   # CORE Econ - Growth rate of GDP per capita and productivity

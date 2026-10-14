@@ -152,15 +152,17 @@ def process_data(data: list) -> list:
 from typing import Dict, Any
 import json
 
+
 def load_config(config_path: str) -> Dict[str, Any]:
     """Load configuration from JSON file."""
-    with open(config_path, 'r') as f:
+    with open(config_path, "r") as f:
         return json.load(f)
+
 
 def process_records(records: list, config: Dict[str, Any]) -> list:
     """Process records according to configuration."""
     # Filter records
-    filtered = [r for r in records if r.get('active', True)]
+    filtered = [r for r in records if r.get("active", True)]
 
     # Transform according to config
     transformed = [transform_record(r, config) for r in filtered]
@@ -177,7 +179,7 @@ from datetime import datetime
 
 # Load data file
 data_path = Path("data/records.json")
-with open(data_path, 'r') as f:
+with open(data_path, "r") as f:
     records = json.load(f)
 
 # Process records
@@ -189,7 +191,7 @@ processed = [process(r) for r in records]
 ```python
 def validate_config(config: dict) -> bool:
     """Validate configuration structure."""
-    required_keys = {'name', 'version', 'settings'}  # (1)!
+    required_keys = {"name", "version", "settings"}  # (1)!
 
     if not all(key in config for key in required_keys):  # (2)!
         return False
