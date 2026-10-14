@@ -245,10 +245,15 @@ definitions:
   annotation: |-
     <% if cause == 'Maternal conditions' %>United States: Values from 2003–2017 affected by measurement change<%- endif -%>
 
-  # Rendered only for the age bands we derive; see add_derived_age_groups in the garden step.
-  description_processing_derived_age_group: |-
+  # Rendered only for the age bands we derive; see add_derived_age_groups in the garden step. The death-rate text is
+  # the retired cancer dataset's, kept as it was; the count one is new (the count is derived too).
+  description_processing_derived_age_group_count: |-
     <% if age_group in ["<5 years", "<10 years"] %>
-    WHO does not publish this combined age group. We add up the deaths it reports for each of the underlying age groups, and divide by the population WHO itself used as the denominator, which we recover from its reported death counts and rates for all causes combined. Where that population cannot be recovered for every underlying age group, we leave the rate missing rather than reporting it as zero.
+    WHO does not publish this combined age group. We add up the deaths it reports for each of the underlying age groups.
+    <%- endif -%>
+  description_processing_derived_age_group_rate: |-
+    <% if age_group in ["<5 years", "<10 years"] %>
+    WHO does not publish a death rate for this combined age group. We add up the deaths it reports for each of the underlying age groups, and divide by the population WHO itself used as the denominator, which we recover from its reported death counts and rates for all causes combined. Where that population cannot be recovered for every underlying age group, we leave the rate missing rather than reporting it as zero.
     <%- endif -%>
 
   # Rendered only for Unintentional injuries; see correct_unintentional_injuries in the garden step.
@@ -289,7 +294,7 @@ tables:
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
-          {definitions.description_processing_unintentional_injuries}{definitions.description_processing_derived_age_group}
+          {definitions.description_processing_unintentional_injuries}{definitions.description_processing_derived_age_group_count}
         unit: deaths
         display:
           numDecimalPlaces: 0
@@ -308,7 +313,7 @@ tables:
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
-          {definitions.description_processing_unintentional_injuries}{definitions.description_processing_derived_age_group}
+          {definitions.description_processing_unintentional_injuries}
         unit: "%"
         short_unit: "%"
         display:
@@ -326,7 +331,7 @@ tables:
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
-          {definitions.description_processing_unintentional_injuries}{definitions.description_processing_derived_age_group}
+          {definitions.description_processing_unintentional_injuries}
         unit: deaths per 100,000 people
         display:
           numDecimalPlaces: 1
@@ -345,7 +350,7 @@ tables:
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
-          {definitions.description_processing_unintentional_injuries}{definitions.description_processing_derived_age_group}
+          {definitions.description_processing_unintentional_injuries}{definitions.description_processing_derived_age_group_rate}
         unit: deaths per 100,000 people
         display:
           numDecimalPlaces: 1

@@ -9,7 +9,8 @@ Three tables come out:
 - `intentional_injuries`: the same four indicators for self-inflicted injuries, a drill-down inside
   Intentional injuries. Later fold-ins add one table per group of drill-downs.
 - `cancers`: the same four indicators for the 25 cancer types inside Malignant neoplasms, plus two age
-  bands WHO does not publish (`<5 years`, `<10 years`), derived in `add_derived_age_groups`.
+  bands WHO does not publish (`<5 years`, `<10 years`), derived in `add_derived_age_groups` for the types
+  and for Malignant neoplasms itself (in `mortality_database`), which the childhood-cancer charts plot together.
 - `most_common_cancer`: the cancer type with the highest age-standardized death rate, per country, year
   and sex.
 - `causes`: one row per cause group, with its depth in WHO's cause tree (`cause_level`), its parent
@@ -99,13 +100,14 @@ DRILL_DOWN_TABLES = {
     **{cancer: "cancers" for cancer in CANCERS},
 }
 
-# Age bands WHO does not publish, built for the tables whose charts use them by summing WHO's bands. The rate
-# divides by the population WHO itself used, recovered from All Causes (see add_derived_age_groups).
+# Age bands WHO does not publish, built for the causes whose charts use them by summing WHO's bands: the cancer
+# types and their parent, which the childhood-cancer charts plot together. The rate divides by the population WHO
+# itself used, recovered from All Causes (see add_derived_age_groups).
 DERIVED_AGE_GROUPS = {
     "<5 years": ["less than 1 year", "1-4 years"],
     "<10 years": ["less than 1 year", "1-4 years", "5-9 years"],
 }
-DERIVED_AGE_GROUP_TABLES = ["cancers"]
+DERIVED_AGE_GROUP_CAUSES = [MALIGNANT, *CANCERS]
 
 # Causes that occur in one sex only. Deaths recorded for the other sex are coding errors in the source;
 # they are tolerated up to this share of the cause's deaths and logged.
@@ -294,7 +296,7 @@ def _split_by_table(tb: Table, tb_causes: Table) -> list[Table]:
 
 
 def add_derived_age_groups(tb: Table, tb_causes: Table) -> Table:
-    """Add DERIVED_AGE_GROUPS to the causes published in DERIVED_AGE_GROUP_TABLES.
+    """Add DERIVED_AGE_GROUPS to DERIVED_AGE_GROUP_CAUSES.
 
     Deaths are summed over the bands each derived group spans. The death rate divides them by the population
     WHO itself divided by, which `_implied_population` recovers from All Causes. Every band must contribute
@@ -302,7 +304,10 @@ def add_derived_age_groups(tb: Table, tb_causes: Table) -> Table:
     denominator understates the rate, a full numerator over a partial denominator overstates it. The share of
     total deaths and the age-standardized rate are not derived.
     """
-    causes = set(tb_causes.loc[tb_causes["table"].isin(DERIVED_AGE_GROUP_TABLES), "cause"])
+    causes = set(DERIVED_AGE_GROUP_CAUSES)
+    assert causes <= set(tb_causes["cause"]), (
+        f"Unknown causes in DERIVED_AGE_GROUP_CAUSES: {causes - set(tb_causes['cause'])}"
+    )
     tb_population = _implied_population(tb)
     keys = ["country", "year", "sex", "cause"]
 
