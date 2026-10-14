@@ -13,114 +13,13 @@ from openai import OpenAI
 from openai.types.chat import ChatCompletion
 from typing_extensions import Self
 
+from apps.utils.llms.costs import estimate_llm_cost
+
 log = structlog.get_logger()
 
 
 # GPT
 MODEL_DEFAULT = "gpt-4.1-mini"
-
-# PRICING (per 1,000 tokens)
-## See pricing list: https://openai.com/api/pricing/ (USD) // Detailed: https://platform.openai.com/docs/pricing
-## See model list: https://platform.openai.com/docs/models
-RATE_DEFAULT_IN = 0.005
-MODEL_EQUIVALENCES = {
-    "gpt-3.5-turbo": "gpt-3.5-turbo-0125",
-    "gpt-4-turbo-preview": "gpt-4-0125-preview",
-    "gpt-4-turbo": "gpt-4-turbo-2024-04-09",
-    "gpt-4o": "gpt-4o-2024-08-06",
-    "gpt-4o-mini": "gpt-4o-mini-2024-07-18",
-    "gpt-4.1": "gpt-4.1-2025-04-14",
-    "gpt-4.1-mini": "gpt-4.1-mini-2025-04-14",
-    "gpt-4.1-nano": "gpt-4.1-nano-2025-04-14",
-    "o1": "o1-2024-12-17",
-    "o3": "o3-2025-04-16",
-    "o4-mini": "o4-mini-2025-04-16",
-    "gpt-5": "gpt-5-2025-08-07",
-    "gpt-5-mini": "gpt-5-mini-2025-08-07",
-    "gpt-5-nano": "gpt-5-nano-2025-08-07",
-}
-MODEL_RATES_1000_TOKEN = {
-    # GPT 3.5
-    "gpt-3.5-turbo-0125": {
-        "in": 0.5 / 1000,
-        "out": 1.5 / 1000,
-    },
-    # GPT 4
-    "gpt-4-0125-preview": {
-        "in": 10 / 1000,
-        "out": 30 / 1000,
-    },
-    "gpt-4": {
-        "in": 30 / 1000,
-        "out": 60 / 1000,
-    },
-    "gpt-4-32k": {
-        "in": 60 / 1000,
-        "out": 120 / 1000,
-    },
-    # GPT 4 Turbo
-    "gpt-4-turbo-2024-04-09": {
-        "in": 10 / 1000,
-        "out": 30 / 1000,
-    },
-    # GPT 4o
-    "gpt-4o-2024-08-06": {
-        "in": 2.5 / 1000,
-        "out": 10 / 1000,
-    },
-    # GPT 4o mini
-    "gpt-4o-mini-2024-07-18": {
-        "in": 0.150 / 1000,
-        "out": 0.600 / 1000,
-    },
-    # GPT o1
-    "o1-2024-12-17": {
-        "in": 15 / 1000,
-        "out": 60 / 1000,
-    },
-    # GPT o3
-    "o3-2025-04-16": {
-        "in": 10 / 1000,
-        "out": 40 / 1000,
-    },
-    # GPT o4-mini
-    "o4-mini-2025-04-16": {
-        "in": 1.1 / 1000,
-        "out": 4.4 / 1000,
-    },
-    # GPT 4.1
-    "gpt-4.1-2025-04-14": {
-        "in": 2 / 1000,
-        "out": 8 / 1000,
-    },
-    # GPT 4.1 mini
-    "gpt-4.1-mini-2025-04-14": {
-        "in": 0.4 / 1000,
-        "out": 1.6 / 1000,
-    },
-    # GPT 4.1 nano
-    "gpt-4.1-nano-2025-04-14": {
-        "in": 0.1,
-        "out": 0.4,
-    },
-    # GPT 5
-    "gpt-5-2025-08-07": {
-        "in": 1.25 / 1000,
-        "out": 10 / 1000,
-    },
-    "gpt-5-mini-2025-08-07": {
-        "in": 0.25 / 1000,
-        "out": 2 / 1000,
-    },
-    "gpt-5-nano-2025-08-07": {
-        "in": 0.05 / 1000,
-        "out": 0.4 / 1000,
-    },
-}
-MODEL_RATES_1000_TOKEN = {
-    **MODEL_RATES_1000_TOKEN,
-    **{new: MODEL_RATES_1000_TOKEN[equivalent] for new, equivalent in MODEL_EQUIVALENCES.items()},
-}
 
 # HACK
 # ref: https://github.com/openai/tiktoken/issues/395
@@ -175,28 +74,6 @@ class GPTResponse(ChatCompletion):
                 raise ValueError("`message_content` is empty!")
         return self.message_content_dix  # ty: ignore[invalid-return-type]
 
-    @property
-    def cost(self) -> float | None:
-        """Get cost of the complete request (including input and output).
-
-        The cost is given in USD.
-
-        If model is not in MODEL_RATES_1000_TOKEN, None is returned
-        """
-        if self.usage is None:
-            raise ValueError("`usage` is empty!")
-        elif self.model not in MODEL_RATES_1000_TOKEN:
-            log.info(f"Model {self.model} not registered in MODEL_RATES_1000_TOKEN!")
-            return None
-        else:
-            tokens_in = self.usage.prompt_tokens
-            tokens_out = self.usage.completion_tokens
-            cost = (
-                tokens_in / 1000 * MODEL_RATES_1000_TOKEN[self.model]["in"]
-                + tokens_out / 1000 * MODEL_RATES_1000_TOKEN[self.model]["out"]
-            )
-            return cost
-
 
 @dataclass
 class GPTQuery:
@@ -204,26 +81,6 @@ class GPTQuery:
 
     messages: list[dict[str, str]]
     temperature: float = 0
-
-    def estimated_cost(self: Self, model_name: str) -> float:
-        """
-        Calculate the cost of using GPT based on the number of characters of the message content.
-
-        Note that it only considers the input messages (and not the GPT response).
-
-        Returns:
-            float: The estimated cost of using GPT for the given number of tokens (only input).
-        """
-        # Check that model_name is registered. Else, use the default model
-        if model_name not in MODEL_RATES_1000_TOKEN:
-            raise ValueError(f"Model {model_name} not registered in MODEL_RATES_1000_TOKEN.")
-        # Get rate per 1,000 tokens (USD) for the model
-        rate = MODEL_RATES_1000_TOKEN[model_name]["in"]
-        # Get the token count
-        tokens_count = self.get_number_tokens(model_name)
-        # Estimate the cost as token_count x rate
-        estimated_cost = tokens_count / 1000 * rate
-        return estimated_cost
 
     def get_number_tokens(self, model_name: str) -> int:
         """Get number of tokens of the message content."""
@@ -246,10 +103,6 @@ class OpenAIWrapper(OpenAI):
         self: Self, query: GPTQuery | None = None, model: str = MODEL_DEFAULT, **kwargs
     ) -> GPTResponse | None:
         """Query Chat GPT to get message content from the chat completion."""
-        # Get model to be used (+ sanity checks)
-        if model not in MODEL_RATES_1000_TOKEN:
-            raise ValueError(f"Model {model} not registered in MODEL_RATES_1000_TOKEN!")
-
         # Build query from query object + model name
         if query:
             kwargs = {
@@ -311,12 +164,7 @@ def get_number_tokens(text: str, model_name: str) -> int:
 
 def get_cost_and_tokens(text_in: str, text_out: str, model_name: str) -> tuple[float, float]:
     """Get cost using tiktoken tokenisation."""
-    if model_name not in MODEL_RATES_1000_TOKEN:
-        raise ValueError(f"Model {model_name} not registered in MODEL_RATES_1000_TOKEN.")
     tokens_in = get_number_tokens(text_in, model_name)
     tokens_out = get_number_tokens(text_out, model_name)
-    cost = (
-        tokens_in / 1000 * MODEL_RATES_1000_TOKEN[model_name]["in"]
-        + tokens_out / 1000 * MODEL_RATES_1000_TOKEN[model_name]["out"]
-    )
+    cost = estimate_llm_cost(f"openai:{model_name}", input_tokens=tokens_in, output_tokens=tokens_out)
     return cost, tokens_in + tokens_out

@@ -75,7 +75,7 @@ dependencies = [
     "zensical>=0.0.15",
     "pandas-gbq>=0.29.2",
     "tomli>=2.2.1",
-    "genai-prices>=0.0.50",
+    "genai-prices",
     "marshmallow>=3.26.2",
     "brotli>=1.2.0",
     "pyopenssl>=26.0.0",
@@ -88,6 +88,9 @@ dependencies = [
 
 [tool.uv]
 exclude-newer = "3 days"
+# genai-prices is the LLM price table, re-released whenever a provider changes prices;
+# a cooldown would only make the cost estimates lag behind them.
+exclude-newer-package = { genai-prices = false }
 link-mode = "hardlink"
 
 # PyPI ships torch bundled with the CUDA runtime on Linux (~4 GB of nvidia-*

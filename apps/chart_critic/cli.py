@@ -39,11 +39,8 @@ from rich.table import Table
 from apps.chart_critic import cache, digest, mdim, report
 from apps.chart_critic.bundle import GRAPHER_URL, Bundle, ChartGone, build, render
 from apps.chart_critic.critic import (
-    ANTHROPIC_CACHE_READ,
-    ANTHROPIC_CACHE_WRITE,
     CHEAP_MODEL,
     DEFAULT_MODEL,
-    FALLBACK_PRICES,
     build_agent,
     claim_tokens,
     format_views,
@@ -176,10 +173,9 @@ def _select(
 
 
 def _cost(model: str, input_tokens: int, output_tokens: int, cache_read: int = 0, cache_write: int = 0) -> float:
-    """Price a call, falling back to published rates for models genai_prices does not know.
+    """Price a call; a model genai-prices does not know counts as $0, with a warning, so the review is kept.
 
-    ``input_tokens`` includes the cached ones. The fallback applies only Anthropic's cache rates:
-    other providers' cached input is billed at the full rate there, which can only overstate the bill.
+    ``input_tokens`` includes the cached ones.
     """
     usage = Usage(
         input_tokens=input_tokens,
@@ -189,12 +185,11 @@ def _cost(model: str, input_tokens: int, output_tokens: int, cache_read: int = 0
     )
     try:
         return estimate_llm_cost(model, usage=usage)
-    except (KeyError, ValueError, LookupError):
-        rate_in, rate_out = FALLBACK_PRICES.get(model, (0.0, 0.0))
-        billed_in = float(input_tokens)
-        if model.startswith("anthropic:"):
-            billed_in += cache_read * (ANTHROPIC_CACHE_READ - 1) + cache_write * (ANTHROPIC_CACHE_WRITE - 1)
-        return billed_in / 1e6 * rate_in + output_tokens / 1e6 * rate_out
+    except LookupError:
+        console.print(
+            f"[yellow]No price for {model} in genai-prices; its calls are left out of the cost total[/yellow]"
+        )
+        return 0.0
 
 
 def chart_link(slug: str, params: str = "", extra_keys: set[str] | None = None) -> str:

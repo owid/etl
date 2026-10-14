@@ -33,6 +33,7 @@ from pathlib import Path
 import click
 import httpx
 from dotenv import load_dotenv  # ty: ignore
+from genai_prices import Usage, calc_price
 from google import genai  # ty: ignore
 from google.genai import types as genai_types  # ty: ignore
 from google.genai import errors as genai_errors  # ty: ignore
@@ -97,17 +98,6 @@ DEFAULT_MAX_TERMS = 8
 # five slots on a single line. Terms just below it are reported as near misses so
 # the floor can be judged from the output.
 DEFAULT_MIN_MARGINAL_SHARE = 0.01
-
-# Gemini pricing per million tokens, for the cost estimate the CLI prints.
-# Models absent from here still run; their cost is simply reported as unknown,
-# so this list going out of date can't stop a regeneration (the whole run costs
-# a couple of cents either way).
-PRICING = {
-    "gemini-2.5-flash-lite": {"input": 0.015, "output": 0.06},
-    # Doubles to 1.50 / 7.50 on 2027-01-01.
-    "gemini-3.8-flash": {"input": 0.75, "output": 3.75},
-}
-
 
 def get_all_topic_slugs() -> list[str]:
     """Get all available topic slugs from database.
@@ -645,21 +635,26 @@ def main(
         click.secho("\n✗ No results generated", fg="red")
         sys.exit(1)
 
-    # Calculate total costs
-    pricing = PRICING.get(model)
+    # Calculate total costs. A model genai-prices doesn't know still runs; its cost is
+    # simply reported as unknown (the whole run costs a couple of cents either way).
     total_input_tokens = sum(r["stats"]["input_tokens"] for r in results)
     total_output_tokens = sum(r["stats"]["output_tokens"] for r in results)
-    if pricing:
-        total_input_cost = (total_input_tokens / 1_000_000) * pricing["input"]
-        total_output_cost = (total_output_tokens / 1_000_000) * pricing["output"]
-        total_cost = total_input_cost + total_output_cost
+    try:
+        price = calc_price(
+            Usage(input_tokens=total_input_tokens, output_tokens=total_output_tokens), model, provider_id="google"
+        )
+    except LookupError:
+        price = None
+    if price:
+        total_input_cost = float(price.input_price)
+        total_output_cost = float(price.output_price)
+        total_cost = float(price.total_price)
 
         # Add cost to each result
         for result in results:
             stats = result["stats"]
-            input_cost = (stats["input_tokens"] / 1_000_000) * pricing["input"]
-            output_cost = (stats["output_tokens"] / 1_000_000) * pricing["output"]
-            stats["total_cost_usd"] = round(input_cost + output_cost, 6)
+            usage = Usage(input_tokens=stats["input_tokens"], output_tokens=stats["output_tokens"])
+            stats["total_cost_usd"] = round(float(calc_price(usage, model, provider_id="google").total_price), 6)
 
     # Output results
     click.echo()
@@ -696,12 +691,12 @@ def main(
     click.echo(f"Output tokens: {total_output_tokens:,}")
     click.echo(f"Total tokens:  {total_input_tokens + total_output_tokens:,}")
     click.echo()
-    if pricing:
+    if price:
         click.echo(f"Input cost:  ${total_input_cost:.6f}")
         click.echo(f"Output cost: ${total_output_cost:.6f}")
         click.echo(f"Total cost:  ${total_cost:.6f}")
     else:
-        click.secho(f"Cost: unknown — no pricing recorded for {model} (add it to PRICING)", fg="yellow")
+        click.secho(f"Cost: unknown — no price for {model} in genai-prices (try `uv lock --upgrade-package genai-prices`)", fg="yellow")
 
     # Always keyed by topic slug, single-topic runs included: the site reads the
     # file as a mapping of topics, and a bare entry object indexes to nothing at

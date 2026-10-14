@@ -66,7 +66,7 @@ staging server.
 
 - `--topic SLUG` - Topic slug(s) to extract (can be specified multiple times). If not provided, extracts for all topics.
 - `--output PATH` - Output JSON file path (optional, prints to console if not provided)
-- `--model MODEL` - Gemini model to use (default: `gemini-3.8-flash`). Any model id the API accepts works; models missing from `PRICING` just report their cost as unknown.
+- `--model MODEL` - Gemini model to use (default: `gemini-3.8-flash`). Any model id the API accepts works; models genai-prices has no price for just report their cost as unknown.
 - `--upload-path KEY` - Key to write inside the `owid-public` bucket (default: `topic_vocabulary.json`)
 - `--no-upload` - Generate without writing to R2
 - `--report PATH` - Write an HTML coverage report: per term, what it reveals and what it adds, plus the most-viewed charts nothing covers
@@ -214,7 +214,7 @@ The LLM is instructed to:
 
 ## Cost & Performance
 
-Each run ends with a cost estimate, computed from the per-model rates in `PRICING` (`vocabulary.py`). Models missing from it report their cost as unknown.
+Each run ends with a cost estimate, priced with [genai-prices](https://github.com/pydantic/genai-prices). Models it has no price for report their cost as unknown.
 
 ## Requirements
 
