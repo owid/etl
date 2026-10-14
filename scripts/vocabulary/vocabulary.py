@@ -281,10 +281,9 @@ never pad the list with variations to reach a number):
             if hasattr(usage, "prompt_token_count") and usage.prompt_token_count is not None
             else 0
         )
-        output_tokens: int = (
-            int(usage.candidates_token_count)
-            if hasattr(usage, "candidates_token_count") and usage.candidates_token_count is not None
-            else 0
+        # Thinking tokens are billed as output, on top of the answer itself.
+        output_tokens: int = sum(
+            int(getattr(usage, field, None) or 0) for field in ("candidates_token_count", "thoughts_token_count")
         )
 
         # Extract JSON
