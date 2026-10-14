@@ -201,3 +201,47 @@ tables:
     # Should not raise; `a` matches, the unknown `not_a_real_column` is silently ignored.
     ym.update_metadata_from_yaml(t, path, "test", extra_variables="ignore")
     assert t.a.metadata.title == "A"
+
+
+def _write_annotations_yaml(tmp_path, annotations_yaml: str):
+    path = tmp_path / "test.yaml"
+    path.write_text(f"tables:\n  test:\n    variables:\n      a:\n        annotations:\n{annotations_yaml}")
+    return path
+
+
+def test_update_metadata_from_yaml_annotations(tmp_path):
+    path = _write_annotations_yaml(
+        tmp_path,
+        """          - entities: [United States]
+            time: 2003
+            time_end: 2017
+            text: Values are affected by a change in measurement.
+          - text: Whole indicator.
+""",
+    )
+    t = Table({"a": [1, 2, 3]})
+    ym.update_metadata_from_yaml(t, path, "test")
+    first, second = t.a.m.annotations
+    assert (first.entities, first.time, first.time_end) == (["United States"], 2003, 2017)
+    assert (second.text, second.entities, second.time) == ("Whole indicator.", [], None)
+
+
+def test_update_metadata_from_yaml_annotations_year_from_params(tmp_path):
+    path = _write_annotations_yaml(
+        tmp_path, '          - {time: 2020, time_end: "{LATEST_YEAR}", text: Preliminary.}\n'
+    )
+    t = Table({"a": [1, 2, 3]})
+    ym.update_metadata_from_yaml(t, path, "test", yaml_params={"LATEST_YEAR": 2024})
+    assert t.a.m.annotations[0].time_end == 2024
+
+
+def test_update_metadata_from_yaml_annotations_entities_must_be_a_list(tmp_path):
+    path = _write_annotations_yaml(tmp_path, "          - {entities: United States, text: Note.}\n")
+    with pytest.raises(TypeError, match="must list its entities"):
+        ym.update_metadata_from_yaml(Table({"a": [1, 2, 3]}), path, "test")
+
+
+def test_update_metadata_from_yaml_annotations_time_must_be_a_year(tmp_path):
+    path = _write_annotations_yaml(tmp_path, "          - {time: 2020-03-01, text: Note.}\n")
+    with pytest.raises(ValueError, match="only years are supported"):
+        ym.update_metadata_from_yaml(Table({"a": [1, 2, 3]}), path, "test")

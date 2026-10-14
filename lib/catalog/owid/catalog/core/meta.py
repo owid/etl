@@ -562,6 +562,32 @@ def description_key_to_string(items: list[str]) -> str | None:
 
 @pruned_json
 @dataclass(eq=False)
+class Annotation(MetaBase):
+    """A short note shown on charts of an indicator, optionally tied to entities and to a point or range in time."""
+
+    # Markdown text, links allowed.
+    text: str
+    # Entities the note applies to; empty means the whole indicator.
+    entities: list[str] = field(default_factory=list)
+    # A point in time, or the start of a range if `time_end` is given; neither means the whole series.
+    time: int | None = None
+    time_end: int | None = None
+    # Only for long garden tables: the values of extra index levels the note applies to. The grapher step
+    # keeps the note only on the indicators of matching dimensions, and removes this field when flattening.
+    dimensions: dict[str, Any] | None = None
+
+    def __post_init__(self):
+        if isinstance(self.entities, str):
+            raise TypeError(f"Annotation `entities` must be a list, got the string {self.entities!r}.")
+        if self.time_end is not None:
+            if self.time is None:
+                raise ValueError(f"Annotation sets `time_end` without `time`: {self.text!r}")
+            if self.time_end < self.time:
+                raise ValueError(f"Annotation has `time_end` before `time`: {self.text!r}")
+
+
+@pruned_json
+@dataclass(eq=False)
 class VariableMeta(MetaBase):
     """Allowed fields for `display` attribute used for grapher:
         name
@@ -592,6 +618,8 @@ class VariableMeta(MetaBase):
     # rendering in `update_variable_metadata` — the grapher only ever sees a
     # string.
     description_key: str | list[str] | None = None
+    # Short notes shown on charts, e.g. a change in measurement for some entities and years. See `Annotation`.
+    annotations: list[Annotation] = field(default_factory=list)
     origins: list[Origin] = field(default_factory=list)  # Origins is the new replacement for sources
     # Use of `licenses` is discouraged, they should be captured in origins.
     licenses: list[License] = field(default_factory=list)
@@ -955,6 +983,9 @@ def update_variable_metadata(meta: VariableMeta) -> VariableMeta:
             meta.description_key = None
         else:
             meta.description_key = Markdown(meta.description_key)
+
+    # Drop annotations whose text rendered empty, e.g. with a Jinja condition on dimensions.
+    meta.annotations = [annotation for annotation in meta.annotations if annotation.text.strip()]
 
     # Convert from string to proper type when it comes from YAML
     grapher_config = getattr(getattr(meta, "presentation", None), "grapher_config", {}) or {}

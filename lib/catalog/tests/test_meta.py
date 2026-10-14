@@ -438,3 +438,34 @@ def test_changelog_from_yaml_round_trips(tmp_path):
 def test_changelog_rejects_malformed_entries(changelog):
     with pytest.raises((TypeError, ValueError)):
         meta.DatasetMeta(changelog=changelog)
+
+
+def test_annotation_round_trip():
+    m = meta.VariableMeta.from_dict({"annotations": [{"entities": ["France"], "time": 2003, "text": "Note."}]})
+    assert m.annotations == [meta.Annotation(text="Note.", entities=["France"], time=2003)]
+    # Unset fields are pruned.
+    assert m.to_dict() == {"annotations": [{"text": "Note.", "entities": ["France"], "time": 2003}]}
+
+
+@pytest.mark.parametrize(
+    "kwargs, error",
+    [
+        ({"time_end": 2010}, "without `time`"),
+        ({"time": 2010, "time_end": 2000}, "before `time`"),
+        ({"entities": "France"}, "must be a list"),
+    ],
+)
+def test_annotation_rejects_invalid_fields(kwargs, error):
+    with pytest.raises((TypeError, ValueError), match=error):
+        meta.Annotation(text="Note.", **kwargs)
+
+
+def test_render_drops_annotations_with_empty_text():
+    m = meta.VariableMeta(
+        annotations=[
+            meta.Annotation(text="<% if sex == 'female' %>Only for women.<% endif %>"),
+            meta.Annotation(text="Always."),
+        ]
+    )
+    assert [a.text for a in m.render({"sex": "female"}).annotations] == ["Only for women.", "Always."]
+    assert [a.text for a in m.render({"sex": "male"}).annotations] == ["Always."]
