@@ -6,17 +6,15 @@ meta:
     title: "Global nutrient conversion table for FAO supply utilization accounts"
     description: |-
       Energy and nutrients per 100 g of edible portion, and edible portion coefficients, for the food items of FAO's Supply Utilization Accounts.
-    # NOTE: FAO dates this table 2024 (title, citation and repository record), but the file served on 2026-10-14 was last modified on 2025-03-26 (HTTP Last-Modified and workbook properties).
     date_published: "2024"
 
     # Citation
     producer: "Grande et al."
     citation_full: |-
-      Grande, F., Ueda, Y., Masangwi, S., Holmes, B. 2024. Global Nutrient Conversion Table for FAO Supply Utilization Accounts. Rome, FAO. https://doi.org/10.4060/cc9678en
-      Grande, F., Ueda, Y., Masangwi S., Holmes B. 2024. Global Nutrient Conversion Table for FAO Supply Utilization Accounts. Rome, FAO. https://doi.org/10.4060/cc9678en
+      Grande, F., Ueda, Y., Masangwi S., Holmes B. 2024. Global Nutrient Conversion Table for FAO Supply Utilization Accounts. Rome, FAO.
 
     # Files
-    url_main: https://www.fao.org/food-composition/tables-and-databases/detail/global-nutrient-conversion-table-for-fao-supply-utilization-accounts/en
+    url_main: https://doi.org/10.4060/cc9678en
     url_download: https://www.fao.org/3/CC9678EN/Nutrient_conversion_table_for_SUA_2024.xlsx
     date_accessed: 2026-10-14
 
