@@ -254,8 +254,20 @@ def build_agent(model: str = DEFAULT_MODEL) -> Agent[None, Review]:
     passes and not others, so repeat passes are the recall dial — see ``--repeat``. Claude
     models get :data:`ANTHROPIC_SETTINGS`.
     """
-    settings = ANTHROPIC_SETTINGS if model.startswith("anthropic:") else None
-    return Agent[None, Review](model=model, output_type=Review, retries=2, model_settings=settings)  # ty: ignore[invalid-argument-type]
+    if not model.startswith("anthropic:"):
+        return Agent[None, Review](model=model, output_type=Review, retries=2)
+    # The critic's own key rather than the generic ANTHROPIC_API_KEY pydantic-ai would read.
+    from pydantic_ai.models.anthropic import AnthropicModel
+    from pydantic_ai.providers.anthropic import AnthropicProvider
+
+    from etl import config
+
+    if not config.ANTHROPIC_API_KEY_CHART_CRITIC:
+        raise RuntimeError(f"{model} needs ANTHROPIC_API_KEY_CHART_CRITIC in .env")
+    claude = AnthropicModel(
+        model.removeprefix("anthropic:"), provider=AnthropicProvider(api_key=config.ANTHROPIC_API_KEY_CHART_CRITIC)
+    )
+    return Agent[None, Review](model=claude, output_type=Review, retries=2, model_settings=ANTHROPIC_SETTINGS)  # ty: ignore[invalid-argument-type]
 
 
 def prompt_parts(bundle: Bundle, extra_views: list[tuple[str, bytes]] | None = None) -> list[str | BinaryContent]:
