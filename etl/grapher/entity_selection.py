@@ -174,7 +174,9 @@ class UpsertPinsCheck:
             self.upserted_entities[catalog_path] = set(table.index.get_level_values("entityName"))
 
     def run(self) -> None:
-        if not self.charts:
+        # SUBSET runs are partial development iterations (e.g. `SUBSET='France,Germany'` in the data step), so most
+        # pins would look removed.
+        if not self.charts or config.SUBSET:
             return
 
         # Entities with data after the upsert: the upserted data for this dataset's indicators, and what this
@@ -213,9 +215,15 @@ class UpsertPinsCheck:
         # In production, ETL runs before chart-sync, so failing here would block the very sync that delivers the
         # fixed charts. Report instead.
         if config.ENV == "production":
+            from slack_sdk.errors import SlackApiError
+
             from etl.slack_helpers import send_slack_message
 
             log.error("entity_selection.pinned_entities_removed", message=message)
-            send_slack_message(channel="#data-architecture-github", message=message)
+            # A Slack outage must not fail the step either, for the same reason
+            try:
+                send_slack_message(channel="#data-architecture-github", message=message)
+            except SlackApiError as e:
+                log.error("entity_selection.slack_failed", error=str(e))
         else:
             raise PinnedEntitiesRemovedError(message)
