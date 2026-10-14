@@ -74,6 +74,6 @@
     "@humanfs/node": "^0.16.8",
     "js-yaml": "^4.3.2",
     "serialize-javascript": "^7.0.5",
-    "shell-quote": "^1.10.0"
+    "shell-quote": "^1.12.0"
   }
 }
