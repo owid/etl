@@ -130,8 +130,8 @@ mechanics, not for the conversation:
 - **Ask only what they can answer,** as plain multiple-choice questions, all at once. Work out everything else
   yourself, and if you had to guess, say what you guessed.
 - **Talk only about the MDim and what they'll see,** in every message, including the last one and anything
-  left open. Leave out how you got there: no branches, worktrees, commits, pushes, pull request numbers, file
-  paths, step names, commands or tool names. Say "the test site" for staging and "goes live" for publishing.
+  left open. Words they know are fine: staging, live, PR, review, merge, publish, admin. Leave out how you got
+  there: no branches, worktrees, commits, pushes, file paths, step names, commands or tool names.
   This covers the short notes between your actions too, which they see: write one only when something they'd
   care about is done or ready, and don't narrate your checks, reviews or next commands.
 - **If something technical fails, fix it.** Only bring them in when the choice is theirs, and explain it without
@@ -206,7 +206,7 @@ Give them the preview link. The MDim isn't published on staging, so it's the adm
 Tailscale: `http://staging-site-<branch>/admin/grapher/<namespace>%2Flatest%2F<name>%23<name>/`. Use the
 container name from `etl.config.get_container_name(<branch>)`. Then send something like:
 
-> Your MDim is ready to check on the test site: <link>. Please try each option in each dropdown, look at the
+> Your MDim is ready to check on staging: <link>. Please try each option in each dropdown, look at the
 > map, check the countries it opens with, and read the titles and "What you should know". Tell me what to
 > change, or say it looks right.
 
@@ -217,7 +217,7 @@ until they say it looks right.**
 
 Check that the PR's tests have passed (`gh pr checks <number>`). Fix a failure that comes from the MDim. Retry
 one that doesn't, such as a test that timed out on a network call. Then run `gh pr ready <number>` and
-`gh pr merge <number> --squash`. Tell them the MDim is on its way, and that it takes about ten minutes to reach
+`gh pr merge <number> --squash`. Tell them it's merged, and that it takes about ten minutes to reach
 the live site's admin.
 
 ### 5f. Publish it
