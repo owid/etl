@@ -1,4 +1,4 @@
-chart_config_id: 01a11b11-21f8-7453-a696-482f55c1cc24
+chart_config_id: 01a139ce-0c48-7a05-b7a9-a876555a7db5
 grapher_schema: "011"
 topic_tags:
   - "Foreign Aid"
@@ -25,9 +25,9 @@ views:
             name: "Mitigation and adaptation"
             color: "#2C9C94"
     config:
-      title: "Development aid given to climate-related projects"
-      subtitle: "Bilateral aid committed by members of the OECD Development Assistance Committee (DAC) and covered by the OECD's climate tracking, by whether projects target climate change mitigation, adaptation, both, or neither. Adjusted for inflation."
-      note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
+      title: "Foreign aid given for climate mitigation and adaptation"
+      subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) covered by the OECD's climate tracking, by whether projects target climate change mitigation, adaptation, both, or neither. This data is expressed in US dollars and adjusted for inflation."
+      note: "This data is expressed in constant 2024 US$. Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
       tab: "chart"
       hasMapTab: false
       chartTypes:

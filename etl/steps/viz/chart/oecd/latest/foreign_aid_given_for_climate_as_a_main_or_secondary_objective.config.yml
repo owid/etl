@@ -1,4 +1,4 @@
-chart_config_id: 01a11b11-26b5-7dd7-b6aa-6d12b949c894
+chart_config_id: 01a139ce-1100-70d0-bf68-197c993c1efe
 grapher_schema: "011"
 topic_tags:
   - "Foreign Aid"
@@ -21,9 +21,9 @@ views:
             name: "Climate as main objective"
             color: "#1F3F70"
     config:
-      title: "Development aid given for climate as a main or secondary objective"
-      subtitle: "Bilateral aid committed by members of the OECD Development Assistance Committee (DAC) and covered by the OECD's climate tracking, by whether climate change mitigation or adaptation is the main objective of the project, a secondary objective, or not an objective. Adjusted for inflation."
-      note: "Projects with climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
+      title: "Foreign aid given for climate as a main or secondary objective"
+      subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) covered by the OECD's climate tracking, by whether climate change mitigation or adaptation is the main objective of the project, a secondary objective, or not an objective. This data is expressed in US dollars and adjusted for inflation."
+      note: "This data is expressed in constant 2024 US$. Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
       tab: "chart"
       hasMapTab: false
       chartTypes:

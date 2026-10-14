@@ -1,0 +1,32 @@
+chart_config_id: 01a139ce-28c3-7044-b052-c73ba7e56713
+grapher_schema: "011"
+topic_tags:
+  - "Foreign Aid"
+  - "Climate Change"
+dimensions: []
+views:
+  - dimensions: {}
+    indicators:
+      y:
+        - catalogPath: "climate_related_oda_by_recipient#climate_related_share"
+    config:
+      title: "Share of foreign aid received that is climate-related"
+      subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of the bilateral ODA received that is covered by the OECD's climate tracking."
+      note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
+      tab: "map"
+      hasMapTab: true
+      chartTypes:
+        - "LineChart"
+      yAxis:
+        min: 0
+      map:
+        colorScale:
+          baseColorScheme: "YlGn"
+          binningStrategy: "manual"
+          customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
+      selectedEntityNames:
+        - "India"
+        - "Philippines"
+        - "Bangladesh"
+        - "Indonesia"
+        - "Kenya"

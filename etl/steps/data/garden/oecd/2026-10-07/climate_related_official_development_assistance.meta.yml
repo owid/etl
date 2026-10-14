@@ -478,10 +478,10 @@ tables:
           tolerance: 0
           entityAnnotationsMap: "{ENTITY_ANNOTATIONS_RECIPIENTS}"
       climate_related_per_capita:
-        title: "Climate-related ODA per person by recipient"
-        unit: "constant {definitions.inflation_year} US$ per person"
+        title: "Climate-related ODA per capita by recipient"
+        unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
-        description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both, divided by the population of the recipient country. {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both, divided by population. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_bilateral_allocable}"
@@ -496,7 +496,7 @@ tables:
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_per_capita}"
         display:
-          name: "Climate-related ODA per person by recipient"
+          name: "Climate-related ODA per capita by recipient"
           numDecimalPlaces: 2
           tolerance: 0
 

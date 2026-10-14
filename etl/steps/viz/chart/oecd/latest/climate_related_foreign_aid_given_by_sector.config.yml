@@ -1,4 +1,4 @@
-chart_config_id: 01a13617-ed68-75db-981b-e1ceffce84a5
+chart_config_id: 01a139ce-15e7-75dc-af7a-4f4e7c4b8a69
 grapher_schema: "011"
 topic_tags:
   - "Foreign Aid"
@@ -84,9 +84,9 @@ views:
           display:
             name: "Other"
     config:
-      title: "Development aid given to climate-related projects, by sector"
-      subtitle: "Bilateral aid committed by members of the OECD Development Assistance Committee (DAC) to projects that target climate change mitigation, adaptation, or both, by the sector the project supports. Adjusted for inflation."
-      note: "Projects that target climate as a secondary objective are counted at their full value. \"Other\" includes general budget support and donors' administrative costs."
+      title: "Climate-related foreign aid given by sector"
+      subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) to projects that target climate change mitigation, adaptation, or both. This data is expressed in US dollars and adjusted for inflation."
+      note: "This data is expressed in constant 2024 US$. Projects that target climate as a secondary objective are counted at their full value. \"Other\" includes general budget support and donors' administrative costs."
       tab: "chart"
       hasMapTab: false
       chartTypes:
