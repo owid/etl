@@ -262,10 +262,6 @@ steps:
   data://grapher/who/2024-07-30/ghe:
     - data://garden/who/2024-07-30/ghe
 
-  # Most common cancers
-  data://grapher/who/2024-08-06/mortality_database_cancer_most_common:
-    - data://garden/who/2024-08-06/mortality_database_cancer_most_common:
-        - data://garden/who/2025-08-05/mortality_database_cancer
   # Mpox (Monkeypox) - WHO
   data://garden/who/latest/monkeypox:
     - data://meadow/who/latest/monkeypox:
@@ -832,13 +828,6 @@ steps:
   data://grapher/who/2026-03-17/guinea_worm:
     - data://garden/who/2026-03-17/guinea_worm
 
-  # WHO Mortality Database - Cancer specific
-  data://garden/who/2025-08-05/mortality_database_cancer:
-    - data://meadow/who/2025-08-05/mortality_database_cancer:
-        - snapshot://who/2025-08-05/mortality_database_cancer.csv
-    - data://garden/who/2026-10-13/mortality_database
-  data://grapher/who/2025-08-05/mortality_database_cancer:
-    - data://garden/who/2025-08-05/mortality_database_cancer
   # WHO ICD codes
   data://grapher/who/2026-10-02/icd_codes:
     - data://garden/who/2026-10-02/icd_codes:
