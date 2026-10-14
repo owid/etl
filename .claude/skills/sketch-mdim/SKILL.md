@@ -132,6 +132,8 @@ mechanics, not for the conversation:
 - **Talk only about the MDim and what they'll see,** in every message, including the last one and anything
   left open. Leave out how you got there: no branches, worktrees, commits, pushes, pull request numbers, file
   paths, step names, commands or tool names. Say "the test site" for staging and "goes live" for publishing.
+  This covers the short notes between your actions too, which they see: write one only when something they'd
+  care about is done or ready, and don't narrate your checks, reviews or next commands.
 - **If something technical fails, fix it.** Only bring them in when the choice is theirs, and explain it without
   jargon. How you do the work is never their choice: don't explain or ask about which commands you run, where
   they run, or changes to this skill.
@@ -169,7 +171,7 @@ Turn the setup into the step with `/create-chart`. The setup is already in `viz:
   Changes suggested for an indicator everywhere go through `/edit-faust-metadata`, which checks the other charts
   using that indicator first.
 - **Don't build it locally.** That pulls in the whole upstream chain, often with private datasets the laptop
-  can't download. Writing the MDim to staging in step 5c checks the config against the real indicators instead.
+  can't download. The staging build in step 5c checks the config against the real indicators instead.
 - **To show the setup in the page again,** for example if they want to adjust it there, save it as
   `ai/mdim_simulator/<name>.setup.yml` and rebuild with `--setup`. The page reopens it exactly as it was copied.
 
@@ -180,14 +182,23 @@ Turn the setup into the step with `/create-chart`. The setup is already in `viz:
    refs/heads/<branch>` matches `git rev-parse HEAD` before going on.
 3. Write the PR description. Start with the attribution line from `CLAUDE.md`. Then say what the MDim shows,
    that it was sketched in the MDim simulator, and the text changes from the setup.
-4. Once the PR's staging server is up, write the MDim to it straight away:
-   `STAGING=1 .venv/bin/etlr viz://chart/<namespace>/latest/<name> --grapher`. This is also the check that the
-   step builds: judge it by the command's exit status, and fix any failure before going on.
-5. **One Codex review.**
+4. **Let the staging server write the MDim.** Don't run the step from the laptop, even with `STAGING=1`: chart
+   steps read their upstream datasets from local disk, and private ones can't be downloaded. After each push,
+   wait for `buildkite/etl-automated-staging-environment` to succeed on the head commit
+   (`gh api repos/owid/etl/commits/<sha>/status`). That build writes the MDim to staging, and is the check that
+   the step builds: if it fails, read its log and fix the step.
+5. **Check that every view will draw.** The preview loads each view's config from
+   `http://<container>/grapher/by-uuid/<id>.config.json`, which is served from R2, not the database, so correct
+   database rows don't mean the preview draws. Take each view's `fullConfigId` from the MDim's
+   `multi_dim_data_pages.config` in the staging database (`query-grapher-db` skill) and check each URL returns
+   200. If any return 404, drop `fullConfigId` from every view and send the config back unchanged with
+   `AdminAPI(OWIDEnv.from_staging(<branch>)).put_mdim_config("<namespace>/latest/<name>#<name>", config)`, which
+   re-uploads the views. Then check again.
+6. **One Codex review.**
    - Post a bare `@codex review` and wait for its verdict: a review with findings, a "Didn't find any major
      issues" comment, or a 👍 from the Codex bot.
-   - Fix what's valid, push, write the MDim to staging again, and reply to and resolve each thread.
-   - Don't start a second round. Mention the review to the person only if it changed something they'll see.
+   - Fix what's valid, push, repeat items 4 and 5, and reply to and resolve each thread.
+   - Don't start a second round. Don't announce the review; mention it only if it changed something they'll see.
 
 ### 5d. Let them check it on staging
 
@@ -199,7 +210,7 @@ container name from `etl.config.get_container_name(<branch>)`. Then send somethi
 > map, check the countries it opens with, and read the titles and "What you should know". Tell me what to
 > change, or say it looks right.
 
-If they ask for changes, make them, push, write the MDim to staging again, and send the link again. **Don't merge
+If they ask for changes, make them, push, repeat items 4 and 5 of step 5c, and send the link again. **Don't merge
 until they say it looks right.**
 
 ### 5e. Merge, once they say it looks right
