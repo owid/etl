@@ -51,12 +51,33 @@ from apps.chart_critic.bundle import Bundle
 DEFAULT_MODEL = "google:gemini-3.8-flash"
 CHEAP_MODEL = "google:gemini-3.1-flash-lite"
 
-# Fallback prices in $ per million tokens (input, output), from Google's published rates.
+# Fallback prices in $ per million tokens (input, output), from the providers' published rates.
 # `genai_prices` (used by apps.utils.llms.costs) does not carry these models yet; drop an entry
 # here once it does, and note that gemini-3.8-flash doubles to 1.50/7.50 on 2027-01-01.
 FALLBACK_PRICES = {
     "google:gemini-3.8-flash": (0.75, 3.75),
     "google:gemini-3.1-flash-lite": (0.10, 0.40),
+    "anthropic:claude-sonnet-5-5": (2.00, 10.00),
+    "anthropic:claude-haiku-5-5": (0.10, 0.50),
+}
+
+# Anthropic bills a cache read at a tenth of the input rate and a five-minute cache write at 1.25x.
+ANTHROPIC_CACHE_READ, ANTHROPIC_CACHE_WRITE = 0.1, 1.25
+
+# Settings for Claude models, which get none of them by default:
+# - Thinking has to be switched on. pydantic-ai returns structured output through a forced tool
+#   call, Anthropic allows no thinking alongside a forced tool, and so without this the model
+#   answers without thinking at all — about 40 output tokens a pass, and no findings.
+# - Effort "high": against Gemini on charts with known answers, Sonnet 5.5 at high was the setting
+#   that raised nothing on clean charts; at low and medium it flagged them nearly every pass.
+# - Caching the user turn lets passes 2 and 3 read the prompt from cache, about a third off the
+#   bill. Only the input is cached; each pass still generates its own answer, so the repeat
+#   passes keep their value.
+ANTHROPIC_SETTINGS = {
+    "anthropic_thinking": {"type": "adaptive"},
+    "anthropic_effort": "high",
+    "anthropic_cache_messages": True,
+    "max_tokens": 32000,
 }
 
 
@@ -230,9 +251,11 @@ def build_agent(model: str = DEFAULT_MODEL) -> Agent[None, Review]:
 
     No sampling settings: Gemini has ignored ``temperature``, ``top_p`` and ``top_k`` since
     3.6 Flash, and upcoming models reject them. This model raises a genuine finding on some
-    passes and not others, so repeat passes are the recall dial — see ``--repeat``.
+    passes and not others, so repeat passes are the recall dial — see ``--repeat``. Claude
+    models get :data:`ANTHROPIC_SETTINGS`.
     """
-    return Agent[None, Review](model=model, output_type=Review, retries=2)
+    settings = ANTHROPIC_SETTINGS if model.startswith("anthropic:") else None
+    return Agent[None, Review](model=model, output_type=Review, retries=2, model_settings=settings)  # ty: ignore[invalid-argument-type]
 
 
 def prompt_parts(bundle: Bundle, extra_views: list[tuple[str, bytes]] | None = None) -> list[str | BinaryContent]:

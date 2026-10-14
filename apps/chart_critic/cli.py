@@ -25,6 +25,7 @@ findings a human will read, which is why an empty result is a first-class outcom
 from __future__ import annotations
 
 import concurrent.futures as cf
+import datetime as dt
 import json
 import re
 import time
@@ -38,6 +39,8 @@ from rich.table import Table
 from apps.chart_critic import cache, digest, mdim, report
 from apps.chart_critic.bundle import GRAPHER_URL, Bundle, ChartGone, build, render
 from apps.chart_critic.critic import (
+    ANTHROPIC_CACHE_READ,
+    ANTHROPIC_CACHE_WRITE,
     CHEAP_MODEL,
     DEFAULT_MODEL,
     FALLBACK_PRICES,
@@ -172,13 +175,20 @@ def _select(
     return [(r.slug, int(r.views), r.params) for r in picked.itertuples()]
 
 
-def _cost(model: str, input_tokens: int, output_tokens: int) -> float:
-    """Price a call, falling back to published rates for models genai_prices does not know."""
+def _cost(model: str, input_tokens: int, output_tokens: int, cache_read: int = 0, cache_write: int = 0) -> float:
+    """Price a call, falling back to published rates for models genai_prices does not know.
+
+    ``input_tokens`` includes the cached ones. Only Anthropic's cache rates are applied: the other
+    providers' cached input is billed at the full rate here, which can only overstate the bill.
+    """
     try:
         return estimate_llm_cost(model, input_tokens=input_tokens, output_tokens=output_tokens)
     except (KeyError, ValueError, LookupError):
         rate_in, rate_out = FALLBACK_PRICES.get(model, (0.0, 0.0))
-        return input_tokens / 1e6 * rate_in + output_tokens / 1e6 * rate_out
+        billed_in = float(input_tokens)
+        if model.startswith("anthropic:"):
+            billed_in += cache_read * (ANTHROPIC_CACHE_READ - 1) + cache_write * (ANTHROPIC_CACHE_WRITE - 1)
+        return billed_in / 1e6 * rate_in + output_tokens / 1e6 * rate_out
 
 
 def chart_link(slug: str, params: str = "", extra_keys: set[str] | None = None) -> str:
@@ -310,7 +320,7 @@ def _review_one(
     agent = build_agent(model)
     parts = prompt_parts(bundle, extra_views)
     found: list[dict[str, Any]] = []
-    in_tokens = out_tokens = 0
+    in_tokens = out_tokens = cache_read = cache_write = 0
 
     # The model is not reproducible: on repeated passes over the same chart it raises a
     # genuine finding on some and not others. Measured on three charts with
@@ -351,14 +361,31 @@ def _review_one(
         usage = run.usage
         in_tokens += usage.input_tokens or 0
         out_tokens += usage.output_tokens or 0
+        cache_read += usage.cache_read_tokens or 0
+        cache_write += usage.cache_write_tokens or 0
 
     result["issues"] = sorted(found, key=lambda i: (-i["passes"], i["severity"]))
     result["passes"] = max(max(repeat, 1), len(already))
     result["bundle_cached"] = bundle.from_cache
     result["views_reviewed"] = 1 + len(extra_views)
     result["input_tokens"], result["output_tokens"] = in_tokens, out_tokens
-    result["cost"] = _cost(model, in_tokens, out_tokens)
+    result["cost"] = _cost(model, in_tokens, out_tokens, cache_read, cache_write)
     return result
+
+
+def _review_with_shadow(
+    shadow_model: str | None, slug: str, pageviews: int, model: str, **kwargs: Any
+) -> tuple[dict[str, Any], dict[str, Any] | None]:
+    """The chart's review, and the same review by ``shadow_model`` when one is given.
+
+    Sequential per chart, so the shadow reads the bundle the primary review has just fetched rather
+    than fetching it again — with ``--changed-since`` the primary's TTL is zero, so the shadow is
+    given an hour. A shadow failure is recorded in its own result and never touches the primary's.
+    """
+    primary = _review_one(slug, pageviews, model, **kwargs)
+    if not shadow_model or primary["status"] != "ok":
+        return primary, None
+    return primary, _review_one(slug, pageviews, shadow_model, **{**kwargs, "ttl_hours": 1.0})
 
 
 @click.command(name="chart-critic", cls=click.RichCommand, help=__doc__)
@@ -447,6 +474,21 @@ def _review_one(
     default="",
     help="Review a specific view of every requested chart, e.g. 'country=~COM&time=2014..latest'.",
 )
+@click.option(
+    "--shadow-model",
+    type=str,
+    default=None,
+    help=(
+        "Also review every chart with this model, for comparison. Its findings go to --shadow-out "
+        "only: never into the digest, the report or the posted state."
+    ),
+)
+@click.option(
+    "--shadow-out",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="With --shadow-model: write both models' results here, side by side, as JSON.",
+)
 @click.option("--workers", type=int, default=6, show_default=True, help="Charts reviewed in parallel.")
 @click.option(
     "--output", type=click.Path(dir_okay=False, path_type=Path), default=None, help="Write an HTML report here."
@@ -497,6 +539,8 @@ def cli(
     include_data_updates: bool,
     digest_out: Path | None,
     post: bool,
+    shadow_model: str | None,
+    shadow_out: Path | None,
 ) -> None:
     if clear_cache:
         removed, freed = cache.clear()
@@ -505,6 +549,8 @@ def cli(
 
     if cheap:
         model = CHEAP_MODEL
+    if bool(shadow_model) != bool(shadow_out):
+        raise click.ClickException("--shadow-model and --shadow-out go together")
 
     cache_ttl = _resolve_cache_ttl(cache_ttl, changed_since)
 
@@ -537,26 +583,30 @@ def cli(
         )
 
     results: list[dict[str, Any]] = []
+    shadow_results: list[dict[str, Any]] = []
     with cf.ThreadPoolExecutor(workers) as ex:
         futures = [
             ex.submit(
-                _review_one,
+                _review_with_shadow,
+                shadow_model,
                 slug,
                 chart_pageviews,
                 model,
-                not no_image,
-                dry_run,
-                repeat,
-                use_cache,
-                cache_ttl,
-                views,
-                target_params,
+                with_image=not no_image,
+                dry_run=dry_run,
+                repeat=repeat,
+                use_cache=use_cache,
+                ttl_hours=cache_ttl,
+                views=views,
+                params=target_params,
             )
             for slug, chart_pageviews, target_params in targets
         ]
         for f in cf.as_completed(futures):
-            r = f.result()
+            r, shadow = f.result()
             results.append(r)
+            if shadow:
+                shadow_results.append(shadow)
             if r["issues"]:
                 view = f" [dim]?{r['params']}[/dim]" if r.get("params") else ""
                 console.print(f"  [red]●[/red] {r['slug']}{view} — {len(r['issues'])} issue(s)")
@@ -579,6 +629,26 @@ def cli(
     if json_out:
         json_out.write_text(json.dumps(results, indent=1))
         console.print(f"raw results → {json_out}")
+    if shadow_out:
+        shadow_out.parent.mkdir(parents=True, exist_ok=True)
+        shadow_out.write_text(
+            json.dumps(
+                {
+                    "date": dt.date.today().isoformat(),
+                    "primary_model": model,
+                    "shadow_model": shadow_model,
+                    "primary": results,
+                    "shadow": shadow_results,
+                },
+                indent=1,
+            )
+        )
+        shadow_cost = sum(r["cost"] for r in shadow_results)
+        shadow_issues = sum(len(r["issues"]) for r in shadow_results)
+        console.print(
+            f"shadow: {shadow_model} reviewed {len(shadow_results)} charts, {shadow_issues} finding(s), "
+            f"${shadow_cost:.2f} → {shadow_out}"
+        )
     if output:
         report.write(results, output, model=model)
         console.print(f"report → {output}")
