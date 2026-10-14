@@ -9,27 +9,3 @@ views:
     indicators:
       y:
         - catalogPath: "climate_related_oda_by_donor#climate_related_share"
-    config:
-      tab: "chart"
-      hasMapTab: true
-      chartTypes:
-        - "LineChart"
-      yAxis:
-        min: 0
-        facetDomain: shared
-      map:
-        colorScale:
-          baseColorScheme: "YlGn"
-          binningStrategy: "manual"
-          customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70]
-      selectedFacetStrategy: entity
-      selectedEntityNames:
-        - "South Korea"
-        - "United Kingdom"
-        - "France"
-        - "Germany"
-        - "DAC members"
-        - "United States"
-        - "Japan"
-        - "Netherlands"
-        - "Canada"

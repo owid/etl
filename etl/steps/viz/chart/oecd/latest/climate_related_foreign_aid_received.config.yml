@@ -9,21 +9,3 @@ views:
     indicators:
       y:
         - catalogPath: "climate_related_oda_by_recipient#climate_related"
-    config:
-      tab: "map"
-      hasMapTab: true
-      chartTypes:
-        - "LineChart"
-      yAxis:
-        min: 0
-      map:
-        colorScale:
-          baseColorScheme: "GnBu"
-          binningStrategy: "manual"
-          customNumericValues: [0, 10000000, 50000000, 100000000, 250000000, 500000000, 1000000000, 2000000000]
-      selectedEntityNames:
-        - "India"
-        - "Philippines"
-        - "Bangladesh"
-        - "Indonesia"
-        - "Kenya"

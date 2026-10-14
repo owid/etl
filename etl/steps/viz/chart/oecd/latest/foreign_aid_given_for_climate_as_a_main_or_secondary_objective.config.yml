@@ -24,6 +24,7 @@ views:
       title: "Foreign aid given for climate as a main or secondary objective"
       subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) covered by the OECD's climate tracking, by whether climate change mitigation or adaptation is the main objective of the project, a secondary objective, or not an objective. This data is expressed in US dollars and adjusted for inflation."
       note: "This data is expressed in constant 2024 US$. Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
+      originUrl: "/foreign-aid"
       tab: "chart"
       hasMapTab: false
       chartTypes:

@@ -87,6 +87,7 @@ views:
       title: "Climate-related foreign aid given by sector"
       subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) to projects that target climate change mitigation, adaptation, or both. This data is expressed in US dollars and adjusted for inflation."
       note: "This data is expressed in constant 2024 US$. Projects that target climate as a secondary objective are counted at their full value. \"Other\" includes general budget support and donors' administrative costs."
+      originUrl: "/foreign-aid"
       tab: "chart"
       hasMapTab: false
       chartTypes:
