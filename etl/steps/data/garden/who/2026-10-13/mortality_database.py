@@ -5,7 +5,9 @@ Three tables come out:
 - `mortality_database`: deaths, death rates, age-standardized death rates and shares of total deaths,
   by country, year, sex and age group, for All Causes and the 23 cause groups that tile it.
 - `vaccine_preventable_diseases`: the same four indicators for the seven vaccine-preventable causes,
-  which are drill-downs inside one of those groups. Later fold-ins add one table per group of drill-downs.
+  which are drill-downs inside one of those groups.
+- `intentional_injuries`: the same four indicators for self-inflicted injuries, a drill-down inside
+  Intentional injuries. Later fold-ins add one table per group of drill-downs.
 - `causes`: one row per cause group, with its depth in WHO's cause tree (`cause_level`), its parent
   group, the ICD-10 codes that define it and the table it is published in. The codes are a property of
   the cause, not a dimension of the data, so they live here rather than in the fact tables' key.
@@ -59,6 +61,7 @@ DRILL_DOWN_TABLES = {
     "Tetanus": "vaccine_preventable_diseases",
     "Hepatitis B": "vaccine_preventable_diseases",
     "Japanese encephalitis": "vaccine_preventable_diseases",
+    "Self-inflicted injuries": "intentional_injuries",
 }
 
 # Our label for each cause group -> (depth in WHO's cause tree, parent group).
@@ -96,6 +99,8 @@ CAUSE_TREE: dict[str, tuple[int, str | None]] = {
     "Tetanus": (4, CHILDHOOD_CLUSTER),
     "Hepatitis B": (3, INFECTIOUS),
     "Japanese encephalitis": (3, INFECTIOUS),
+    # Drill-down inside Intentional injuries (formerly the self_inflicted_injuries dataset).
+    "Self-inflicted injuries": (3, "Intentional injuries"),
 }
 
 # Groups that appear only as parents: WHO's top-level groups, and the nodes between an ingested drill-down

@@ -83,6 +83,8 @@ CAUSES = {
     "Tetanus": "CG0160",
     "Hepatitis B": "CG0180",
     "Japanese encephalitis": "CG0300",
+    # Drill-down inside "Intentional injuries", formerly the self_inflicted_injuries dataset.
+    "Self-inflicted injuries": "CG1570",
 }
 
 # Five metadata lines and a blank line precede the header row.

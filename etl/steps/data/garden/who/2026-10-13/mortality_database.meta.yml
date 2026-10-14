@@ -23,6 +23,7 @@ definitions:
       ("Tetanus", "Vaccine-preventable diseases"),
       ("Hepatitis B", "Vaccine-preventable diseases"),
       ("Japanese encephalitis", "Vaccine-preventable diseases"),
+      ("Self-inflicted injuries", "Intentional injuries"),
     ] %><% for c, label in layers %><% if c == cause %><< label >> › <% endif %><% endfor %>
 
   # NOTE: Where each drill-down sits in WHO's tree, for the data page: the group we also publish that counts
@@ -36,7 +37,28 @@ definitions:
       ("Tetanus", "infectious and parasitic diseases", "childhood-cluster diseases"),
       ("Hepatitis B", "infectious and parasitic diseases", ""),
       ("Japanese encephalitis", "infectious and parasitic diseases", ""),
+      ("Self-inflicted injuries", "intentional injuries", ""),
     ] %><% for c, group, sub in tree %><% if c == cause %>WHO counts {definitions.cause_in_text} within << group >><% if sub %>, as part of << sub >><% endif %>; these deaths are also included in that group's totals.<% endif %><% endfor %>
+
+  # NOTE: Public titles and short descriptions, per metric. Self-inflicted injuries keep the wording its former
+  # dataset carried (an editorial choice made there), including the dimension suffix readers see today; every
+  # other cause uses the family's sentence.
+  title_public_number: |-
+    <% if cause == "Self-inflicted injuries" %>Number of deaths from self-inflicted injuries - Sex: << sex >> - Age group: << age_group >><% else %>Deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >><% endif %>
+  description_short_number: |-
+    <% if cause == "Self-inflicted injuries" %>Number of deaths from self-inflicted injuries in the total population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Reported total deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >>.<% endif %>
+  title_public_death_rate: |-
+    <% if cause == "Self-inflicted injuries" %>Death rate from self-inflicted injuries per 100,000 population - Sex: << sex >> - Age group: << age_group >><% else %>Deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >><% endif %>
+  description_short_death_rate: |-
+    <% if cause == "Self-inflicted injuries" %>Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Reported deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >>.<% endif %>
+  title_public_share: |-
+    <% if cause == "Self-inflicted injuries" %>Percentage of deaths from self-inflicted injuries out of total deaths - Sex: << sex >> - Age group: << age_group >><% else %>Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}<% endif %>
+  description_short_share: |-
+    <% if cause == "Self-inflicted injuries" %>Percentage of deaths from self-inflicted injuries out of all deaths in the population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Share of total reported deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}.<% endif %>
+  title_public_asr: |-
+    <% if cause == "Self-inflicted injuries" %>Age-standardized death rate from self-inflicted injuries per 100,000 population - Sex: << sex >> - Age group: << age_group >><% else %>Age-standardized deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people<% endif %>
+  description_short_asr: |-
+    <% if cause == "Self-inflicted injuries" %>Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates. To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<% else %>Reported deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people.<% endif %>
 
   # NOTE: The ICD-10 codes below must match the `causes` table this step builds from WHO's own export
   # headers (`icd10_codes` column). They are repeated here because indicator text is rendered per
@@ -105,6 +127,8 @@ definitions:
     B16-B19 (minus B17.1, B18.2)
     <%- elif cause == "Japanese encephalitis" %>
     A83.0
+    <%- elif cause == "Self-inflicted injuries" %>
+    X60-X84, Y870
     <%- endif -%>
 
   description_disease_producer: |-
@@ -174,6 +198,7 @@ dataset:
     - date: 2026-10-14
       changes:
         - Added seven vaccine-preventable diseases (pertussis, poliomyelitis, diphtheria, measles, tetanus, hepatitis B and Japanese encephalitis) as drill-down causes inside "Infectious and parasitic diseases"; they were previously the separate "WHO Mortality Database – Vaccine Preventable" dataset.
+        - Added self-inflicted injuries (suicides) as a drill-down cause inside "Intentional injuries", in the table `intentional_injuries`; previously the separate "WHO Mortality Database - Self-inflicted injuries" dataset.
     - date: 2026-10-13
       changes:
         - Data updated to WHO's February 2026 release; it now runs to 2024.
@@ -190,7 +215,7 @@ tables:
     variables: &fact_variables
       number:
         title: "{definitions.cause_layer}<< cause >> — Deaths — << sex >>, << age_group >>"
-        description_short: Reported total deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >>.
+        description_short: "{definitions.description_short_number}"
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
           - "{definitions.description_key_drill_down}"
@@ -204,13 +229,13 @@ tables:
           entityAnnotationsMap: |-
             {definitions.annotation}
         presentation:
-          title_public: Deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >>
+          title_public: "{definitions.title_public_number}"
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
       percentage_of_cause_specific_deaths_out_of_total_deaths:
         title: "{definitions.cause_layer}<< cause >> — Share of total deaths — << sex >>, << age_group >>"
-        description_short: Share of total reported deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}.
+        description_short: "{definitions.description_short_share}"
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
           - "{definitions.description_key_drill_down}"
@@ -223,13 +248,13 @@ tables:
         display:
           numDecimalPlaces: 1
         presentation:
-          title_public: Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}
+          title_public: "{definitions.title_public_share}"
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
       age_standardized_death_rate_per_100_000_standard_population:
         title: "{definitions.cause_layer}<< cause >> — Age-standardized death rate per 100,000 people — << sex >>, << age_group >>"
-        description_short: Reported deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people.
+        description_short: "{definitions.description_short_asr}"
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
           - "{definitions.description_key_drill_down}"
@@ -243,13 +268,13 @@ tables:
           entityAnnotationsMap: |-
             {definitions.annotation}
         presentation:
-          title_public: Age-standardized deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people
+          title_public: "{definitions.title_public_asr}"
           grapher_config:
             note: |-
               To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized). All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
       death_rate_per_100_000_population:
         title: "{definitions.cause_layer}<< cause >> — Death rate per 100,000 people — << sex >>, << age_group >>"
-        description_short: Reported deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >>.
+        description_short: "{definitions.description_short_death_rate}"
         description_key:
           - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
           - "{definitions.description_key_drill_down}"
@@ -263,7 +288,7 @@ tables:
           entityAnnotationsMap: |-
             {definitions.annotation}
         presentation:
-          title_public: Deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >>
+          title_public: "{definitions.title_public_death_rate}"
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
@@ -277,6 +302,13 @@ tables:
         topic_tags:
           - Causes of Death
           - Vaccination
+    variables: *fact_variables
+  intentional_injuries:
+    # The retired self_inflicted_injuries dataset was tagged Mental Health only; its successors keep exactly that.
+    common:
+      presentation:
+        topic_tags:
+          - Mental Health
     variables: *fact_variables
   causes:
     variables:

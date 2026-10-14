@@ -22,6 +22,6 @@ meta:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/copyright
 outs:
-  - md5: 9a1d430ec89a17b0e0943b56b20735a2
-    size: 68998906
+  - md5: 5876ec691a38c4fce52c8bff1eae4f4f
+    size: 71801226
     path: mortality_database.feather
