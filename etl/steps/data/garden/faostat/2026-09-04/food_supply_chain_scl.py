@@ -23,17 +23,16 @@ Supply Utilization Accounts (SCL), which start in 2010. A separate step, `food_s
 chain from FBS; nothing in this step depends on it.
 
 We use SCL here because it has two advantages:
-a. SCL reports individual products, while FBS reports groups. SCL has "Wheat", "Wheat and meslin flour" and "Bread"
-   as three separate items; FBS merges all three into one item, "Wheat and products".
+a. SCL reports individual products, while FBS reports groups. SCL has "Wheat", "Bread", and other items processed from wheat, as separate items; FBS merges them into one item, "Wheat and products".
 b. SCL includes by-products that FBS has no items for: oilseed cakes, brans and gluten feed. When oilseeds such as
    soybeans are crushed for their oil, the solids left over are called cake. Cake is rich in protein, and it is one
    of the main things farm animals eat. With cakes as items, the path from oilseeds to cake to animals shows up under
    feed, where it belongs. In FBS, the crushed oilseeds count as processing, and the cake is never counted at all.
 
-The price is coverage:
+The disadvantage of using SCL instead of FBS is coverage:
 a. SCL starts in 2010.
 b. A few countries are missing, because FAO has not compiled them (Japan, Sudan, Somalia and a few others).
-c. SCL has no fish or seafood, so we take those from FBS (assumption 9).
+c. SCL has no fish or seafood.
 
 ASSUMPTIONS THAT GO INTO THE CALCULATION
 ----------------------------------------
@@ -46,8 +45,7 @@ Each assumption starts with a line on its scale: how much it changes the results
        production + imports - exports - stock variation
          = food + feed + seed + processing + other uses + losses + tourist consumption + residuals.
 
-   SCL reports stock variation for every year, so it does not need to be derived. The step checks the identity item
-   by item, rather than assuming it.
+   The step checks that the identity is fulfiled item by item.
 
 2. Missing elements are treated as zero.
    >> Scale: minor. It changes no values; it only lets the identity be checked for every item.
@@ -55,33 +53,32 @@ Each assumption starts with a line on its scale: how much it changes the results
    When SCL does not report an element for an item, we treat it as zero. This is safe for two reasons:
    a. FAO builds each balance as a whole, so an element missing from a balance is almost always one that does not
       apply to the item, not lost data.
-   b. If a real value were missing, the item's balance would not close. The step fails when more than 1% of the item
-      balances do not close.
+   b. If a real value were missing, the item's balance would not close. The step is set to fail if more than 1% of the item balances does not close.
 
 3. Densities: how tonnes become calories and protein.
    >> Scale: major. These densities convert every stage except food.
 
    SCL reports every element in tonnes. Food is the exception: it is also reported in calories (the element
-   "Calories/Year") and in protein ("Proteins/Year"). So food is the only place a conversion factor can come from.
+   "Calories/Year") and in protein ("Proteins/Year").
 
-   The density of an item is its food nutrient divided by its food tonnes, in kcal (or grams of protein) per 100 g.
-   These are FAO's own factors. For all 416 SCL items with a food use, FAO's food nutrients are its 2024 nutrient
+   The density of an item is its food nutrient divided by its food quantity.
+   By food nutrients we mean either calories or proteins.
+   The resulting density is measured in kilocalories per 100g or in grams of protein per 100 g.
+   For all 416 SCL items with a food use, FAO's food nutrients are its 2024 nutrient
    conversion table times the item's edible-portion coefficient, the share of the item that people eat:
    https://www.fao.org/food-composition/tables-and-databases/detail/global-nutrient-conversion-table-for-fao-supply-utilization-accounts/en
 
    FAO uses one factor per item in every country and year: for example, 334 kcal per 100 g for wheat grain, 348 for
-   maize and 64 for potatoes. Nine items have a factor of their own in a few countries, such as potatoes in Peru (91
-   kcal per 100 g) and milled rice in Bangladesh (360 instead of 349).
+   maize and 64 for potatoes. There are only nine exceptions to this: those nine items have a factor of their own in a few countries, such as potatoes in Peru (91 kcal per 100 g, instead of the usual 64 kcal) and milled rice in Bangladesh (360, instead of 349).
 
-   The density converts all of an item's other elements: production, imports, exports, stock variation, seed,
-   losses, other uses, processing, feed, tourist consumption and residuals.
+   We use that density to convert all other elements of an item: production, imports, exports, stock variation, seed,
+   losses, other uses, processing, feed, tourist consumption, and residuals.
 
-   Food itself keeps the nutrient FAO reports, whatever density the other elements end up with under assumptions 4
-   to 7. This also matters for fish (assumption 9), whose food tonnes FBS rounds to the nearest 1,000 tonnes. Where
-   FAO reports no food nutrient, food is converted like the other elements, as tonnes times density. Any gap between
-   the converted stages and food goes to data adjustments (assumption 10).
+    Where FAO reports a food nutrient for an item, food keeps that value. Where FAO reports no food nutrient, food is converted like all other elements, as quantity times density.
 
-   The mass table needs no densities: SCL already reports everything as mass, and we only convert tonnes to
+   Any gap between the converted stages and food goes to data adjustments (see assumption 10).
+
+   The mass table does not need any densities: SCL already reports everything as mass, and we only convert tonnes to
    kilograms.
 
 4. One factor per country and item, read over all years.
