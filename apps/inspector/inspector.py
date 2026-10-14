@@ -382,8 +382,8 @@ def cli(
 
     # Dry-run: estimate costs and exit
     if dry_run:
-        total_input_tokens, total_output_tokens = estimate_check_costs(views, skip_typos, skip_issues)
-        display_cost_estimate(total_input_tokens, total_output_tokens, skip_issues, len(views), model=model_name)
+        total_input_tokens, total_output_tokens, views_to_check = estimate_check_costs(views, skip_typos, skip_issues)
+        display_cost_estimate(total_input_tokens, total_output_tokens, skip_issues, views_to_check, model=model_name)
         return
 
     # Group views by collection (explorerSlug for explorers, slug for charts/posts) for incremental processing
