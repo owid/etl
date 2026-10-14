@@ -10,24 +10,22 @@
 #      covers: cereal brans, centrifugal cane sugar, hemp oil, tallow. Their edible-portion coefficients are all 1,
 #      so the published values apply to the whole tonnage.
 #      https://www.fao.org/food-composition/tables-and-databases/detail/global-nutrient-conversion-table-for-fao-supply-utilization-accounts/en
-#    - The oilseed cakes and gluten feed, which the NCT does not cover: the composition published in one Feedipedia
-#      table each (INRAE-CIRAD-AFZ-FAO feed tables, https://www.feedipedia.org), copied as published: dry matter, in %
-#      of the item as fed, and protein, fat (ether extract), ash and fibre, in % of dry matter. Fibre is neutral
-#      detergent fibre (ndf), or crude fibre where the table publishes no NDF. The step converts each composition to
-#      energy and protein with the NCT's own energy formula (see `composition_density`).
+#    - The oilseed cakes, gluten feed, bran of pulses and hempseed, which the NCT does not cover: the composition
+#      published in one Feedipedia table each (INRAE-CIRAD-AFZ-FAO feed tables, https://www.feedipedia.org), copied as
+#      published: dry matter, in % of the item as fed, and protein, fat (ether extract), ash and fibre, in % of dry
+#      matter. Fibre is neutral detergent fibre (ndf), or crude fibre where the table publishes no NDF. The step
+#      converts each composition to energy and protein with the NCT's own energy formula (see `composition_density`).
 #    - Chemically modified fats (item 1274): FAOSTAT SCL's own food observation.
-#    - Acid oils from refining (item 1276): FAO's density for palm oil.
-#    Items without a single published composition use uncited values, and say so:
-#    the two cake patterns, bran of pulses, hempseed, and residues of fatty substances (item 1277).
+#    - Acid oils from refining (item 1276) and residues of fatty substances (item 1277): FAO's density for palm oil.
+#    - Cakes not listed individually: the average of the Feedipedia cakes listed below.
 fixed_densities:
   families:
     # Applied by name pattern to every item whose name starts with the pattern, unless the item is listed
-    # individually below. Not from a single published composition: 330 kcal is about the energy of USDA's defatted
-    # oilseed flours, and 35 g a typical protein of an oilseed cake. With every cake listed individually below,
-    # 'Cake of' matches no item in this release (it is the default for a cake FAO adds later), and 'Cake,' only
-    # matches 'Cake, oilseeds nes'.
-    - {pattern: "Cake of", energy: 330, protein: 35, note: "Default for cakes not listed individually; not from a single published composition."}
-    - {pattern: "Cake,", energy: 330, protein: 35, note: "Same default (oilseeds not elsewhere classified)."}
+    # individually below. The values are the average of the 15 Feedipedia cakes listed below (304 kcal and 30.2 g).
+    # With every cake listed individually below, 'Cake of' matches no item in this release (it is the default for a
+    # cake FAO adds later), and 'Cake,' only matches 'Cake, oilseeds nes'.
+    - {pattern: "Cake of", energy: 304, protein: 30.2, note: "Average of the Feedipedia cakes listed individually."}
+    - {pattern: "Cake,", energy: 304, protein: 30.2, note: "Average of the Feedipedia cakes listed individually."}
   items:
     # Meals below 47% protein include the hulls (Feedipedia), and SCL's World crush (oil 18.6%, cake 77.7% of the
     # beans) leaves no room for removed hulls.
@@ -75,19 +73,16 @@ fixed_densities:
     # FAOSTAT SCL's own food observation for this item (Russia, 2019): 902 kcal per 100 g and zero protein. This is
     # the factor FAO used for that observation, not a published composition.
     - {code: 1274, name: "Animal or vegetable fats and oils and their fractions, chemically modified, except those hydrogenated, inter-esterified, re-esterified or elaidinized; inedible mixtures or preparations of animal or vegetable fats or oils", energy: 902, protein: 0, note: 'FAOSTAT SCL food observations: 902 kcal/100 g and zero protein (Russia, 2019).'}
-    # Not from a single published composition; these values are uncited.
-    # - Bran of pulses: USDA's crude wheat bran (216 kcal, 15.6 g) as a proxy. FAO's table has no pulse bran, and
-    #   Feedipedia has chickpea and lentil bran but not the pea bran that the largest producers make.
-    # - Residues of fatty substances (1277): 884 kcal and no protein; no documented composition was found.
-    # - Hempseed: equal to USDA's hulled hemp seed (553 kcal, 31.6 g), not a composition of the whole seed that SCL
-    #   records.
-    - {code: 213, name: Bran of pulses, energy: 216, protein: 15.6, note: Not from a single published composition; USDA wheat-bran proxy.}
+    # Feedipedia has no pea bran; lentil bran is the pulse bran with a measured fibre value.
+    - {code: 213, name: Bran of pulses, source: "Feedipedia, 'Lentil bran'", url: "https://www.feedipedia.org/node/12246", dry_matter: 88.9, percent_of_dry_matter: {protein: 19.3, fat: 1.1, ash: 5.6, ndf: 50.3}}
     # Acid oils from refining (1276) are the fatty acids removed from crude oils, mostly palm oil, when they are
     # refined. FAO's table has no entry for them; they take FAO's density for palm oil in the SCL food data (its 2024
     # nutrient conversion table times the edible-portion coefficient): 898 kcal and no protein per 100 g.
     - {code: 1276, name: "Industrial monocarboxylic fatty acids; acid oils from refining", energy: 898, protein: 0, note: "FAO's density for palm oil (2024 nutrient conversion table)."}
-    - {code: 1277, name: "Residues of fatty substances", energy: 884, protein: 0, note: "Not from a single published composition."}
-    - {code: 336, name: "Hempseed", energy: 553, protein: 31.6, note: "Not from a single published composition; USDA hulled hemp seed."}
+    # Residues of fatty substances (1277) are traded mostly as the oil recovered from palm oil mill effluent, which goes
+    # to biodiesel in Europe. They take FAO's density for palm oil, like acid oils.
+    - {code: 1277, name: "Residues of fatty substances", energy: 898, protein: 0, note: "FAO's density for palm oil (2024 nutrient conversion table)."}
+    - {code: 336, name: "Hempseed", source: "Feedipedia, 'Hemp seeds'", url: "https://www.feedipedia.org/node/11696", dry_matter: 90.6, percent_of_dry_matter: {protein: 23.9, fat: 35.7, ash: 5.7, ndf: 39.8}}
 
 # 2. Items that are never food, whatever happens to them. They are left out of the chain altogether, in all three
 #    tables. Fuel ethanol is the one that matters: the crops sent to distilleries leave the chain where FAO records

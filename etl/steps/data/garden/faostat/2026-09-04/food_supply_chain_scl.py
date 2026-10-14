@@ -160,8 +160,10 @@ Each assumption starts with a line on its scale: how much it changes the results
    d. Palm kernels are made from oil palm fruit and then crushed for their oil. So they are valued first, and the oil
       palm fruit family then counts its kernels at their new value.
 
-   The families, their products and their order are in the items file. They follow FAO's commodity trees (FAO 2000,
-   Technical Conversion Factors for Agricultural Commodities).
+   The families, their products and their order are in the items file. Which products are made from each crop follows
+   FAO's commodity trees (FAO, Technical Conversion Factors for Agricultural Commodities,
+   https://www.fao.org/fileadmin/templates/ess/documents/methodology/tcf.pdf). Where each family ends is our choice
+   (point b).
 
 8. Each item's production counts as crops, animal products or processed products, following FAO's item groups.
    >> Scale: major. Together with the densities, the roles shape the chain: they decide which stage each tonne of
@@ -807,15 +809,16 @@ def composition_density(item: dict, nutrient: str) -> float:
 
     Feedipedia publishes dry matter in % of the item as fed, and the other components in % of dry matter. As fed, a
     component is its % of dry matter times dry matter / 100, and water is 100 - dry matter. Then:
-        available carbohydrate = 100 - water - protein - fat - ash - fibre
+        available carbohydrate = max(0, 100 - water - protein - fat - ash - fibre)
         energy = 4 x protein + 9 x fat + 4 x available carbohydrate + 2 x fibre
+    Carbohydrate is zero where the published components add up to more than 100% (hempseed, palm kernel cake).
     """
     dry_matter = item["dry_matter"]
     as_fed = {component: share * dry_matter / 100 for component, share in item["percent_of_dry_matter"].items()}
     fibre = as_fed.get("ndf", as_fed.get("crude_fibre"))
     if nutrient == "protein":
         return as_fed["protein"]
-    carbohydrate = 100 - (100 - dry_matter) - as_fed["protein"] - as_fed["fat"] - as_fed["ash"] - fibre
+    carbohydrate = max(0, 100 - (100 - dry_matter) - as_fed["protein"] - as_fed["fat"] - as_fed["ash"] - fibre)
     return 4 * as_fed["protein"] + 9 * as_fed["fat"] + 4 * carbohydrate + 2 * fibre
 
 
