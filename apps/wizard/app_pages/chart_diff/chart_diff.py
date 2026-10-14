@@ -417,11 +417,14 @@ class ChartDiff:
         ignore_conflicts: bool = False,
         skip_analytics: bool = False,
         source_env: OWIDEnv | None = None,
+        check_selected_entities: bool = True,
     ) -> list["ChartDiff"]:
         """Get chart diffs from chart ids.
 
         source_env: Environment of `source_session`, used to fetch its indicators' entities. Defaults to this
             process's own environment.
+        check_selected_entities: Flag pinned entities with no data as errors. Callers that never read `error` (chart-sync)
+            skip the metadata fetches it takes.
         """
 
         # Return empty list if no chart difference is found
@@ -454,7 +457,11 @@ class ChartDiff:
         slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # ty: ignore
 
         # Get pinned entities with no data
-        dead_entities = cls._get_dead_selected_entities(df_charts, source_charts, target_charts, source_env)
+        dead_entities = (
+            cls._get_dead_selected_entities(df_charts, source_charts, target_charts, source_env)
+            if check_selected_entities
+            else {}
+        )
 
         # Get chart views, anomalies, and articles (skip if not needed for performance)
         # NOTE: These rely on external services (Metabase/Datasette, Anomalist tables). A failure there
@@ -894,6 +901,7 @@ class ChartDiffsLoader:
         target_session: Session | None = None,
         ignore_conflicts: bool = False,
         skip_analytics: bool = False,
+        check_selected_entities: bool = True,
     ) -> list[ChartDiff]:
         """Get chart diffs with the selected change types."""
         if chart_ids:
@@ -911,6 +919,7 @@ class ChartDiffsLoader:
                 ignore_conflicts=ignore_conflicts,
                 skip_analytics=skip_analytics,
                 source_env=self.source_env,
+                check_selected_entities=check_selected_entities,
             )
         else:
             with Session(self.source_engine) as source_session, Session(self.target_engine) as target_session:
@@ -921,6 +930,7 @@ class ChartDiffsLoader:
                     ignore_conflicts=ignore_conflicts,
                     skip_analytics=skip_analytics,
                     source_env=self.source_env,
+                    check_selected_entities=check_selected_entities,
                 )
 
         self._diffs = chart_diffs

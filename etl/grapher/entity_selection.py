@@ -38,8 +38,16 @@ def chart_variable_ids(chart_config: dict[str, Any]) -> list[int]:
 
 
 def renders_selection(chart_config: dict[str, Any]) -> bool:
-    """Whether the chart has a selection that renders. Map-only charts (`chartTypes: []`) never render it."""
-    return bool(chart_config.get("selectedEntityNames")) and chart_config.get("chartTypes") != []
+    """Whether the chart's selection decides which entities it draws.
+
+    Map-only charts (`chartTypes: []`) never render the selection, and in scatter plots and Marimekko charts it only
+    highlights entities among all of them. A scatter can lack the `type` field, so it's detected by its x dimension.
+    """
+    if not chart_config.get("selectedEntityNames") or chart_config.get("chartTypes") == []:
+        return False
+    chart_types = chart_config.get("chartTypes") or [chart_config.get("type")]
+    has_x = any(d.get("property") == "x" for d in chart_config.get("dimensions") or [])
+    return not has_x and not {"ScatterPlot", "Marimekko"} & set(chart_types)
 
 
 def dead_selected_entities(chart_config: dict[str, Any], entities_by_variable: EntitiesByVariable) -> list[str] | None:
@@ -100,9 +108,12 @@ class UpsertPinsCheck:
     """Catch a dataset upsert that removes entities which existing charts pin.
 
     Without a version bump the chart configs never change, so chart-diff doesn't see this; the grapher step is the only
-    place it is visible. A pin counts as killed when it has data in production but not in the data being upserted.
-    Comparing against production rather than the previous run keeps the check failing on every staging build until the
-    charts are fixed, while pins that were already dead in production stay out of scope (they aren't this upsert's doing).
+    place it is visible. A pin counts as killed when it has data in production, but not once production's entities of
+    this dataset's indicators are replaced by the upserted ones. Indicators of other datasets on the same chart keep
+    their production entities, so a step is never blamed for pins another dataset killed. Comparing against production
+    rather than the previous run keeps the check failing on every staging build until the charts are fixed, while pins
+    already dead in production stay out of scope (they aren't this upsert's doing). An indicator that disappears from
+    the dataset is left to the ghost-variable check, which already fails while charts use it.
 
     Usage: `prepare()` before upserting (on production the upsert overwrites the data it compares against), `add()`
     each upserted indicator, then `run()`.
@@ -120,6 +131,10 @@ class UpsertPinsCheck:
         self.upserted_entities: dict[str, set[str]] = {}
 
     def prepare(self) -> None:
+        # SUBSET runs are partial development iterations (e.g. `SUBSET='France,Germany'` in the data step), so most
+        # pins would look removed. Leaving `charts` empty skips the check.
+        if config.SUBSET:
+            return
         q = """
         SELECT c.id, cc.slug, cc.config
         FROM charts c
@@ -148,6 +163,8 @@ class UpsertPinsCheck:
         )
         self.catalog_paths = {int(row.id): str(row.catalogPath) for row in df.itertuples() if row.catalogPath}
         self.tracked_paths = set(self.catalog_paths.values())
+        if not self.catalog_paths:
+            return
 
         # Production ids of the same indicators (ids minted on staging don't exist in production, or name another one)
         production_env = production_or_master_env()
@@ -155,7 +172,7 @@ class UpsertPinsCheck:
             df = read_sql(
                 "SELECT id, catalogPath FROM variables WHERE catalogPath IN %(paths)s",
                 engine=production_env.engine,
-                params={"paths": tuple(self.catalog_paths.values()) or ("",)},
+                params={"paths": tuple(self.catalog_paths.values())},
             )
         except (OperationalError, StagingServerUnavailable) as e:
             # E.g. local development without access to production; availability stays unknown, so nothing is flagged
@@ -174,20 +191,14 @@ class UpsertPinsCheck:
             self.upserted_entities[catalog_path] = set(table.index.get_level_values("entityName"))
 
     def run(self) -> None:
-        # SUBSET runs are partial development iterations (e.g. `SUBSET='France,Germany'` in the data step), so most
-        # pins would look removed.
-        if not self.charts or config.SUBSET:
+        if not self.charts:
             return
 
-        # Entities with data after the upsert: the upserted data for this dataset's indicators, and what this
-        # environment serves for everything else (other datasets, or indicators SUBSET/INSTANT didn't upsert).
-        entities_after: EntitiesByVariable = {
-            variable_id: self.upserted_entities[path]
-            for variable_id, path in self.catalog_paths.items()
-            if path in self.upserted_entities
-        }
-        others = {v for chart in self.charts for v in chart_variable_ids(chart.config)} - entities_after.keys()
-        entities_after |= fetch_entities_with_data(sorted(others), config.variable_metadata_url)
+        # Entities with data after the upsert: production's, with this dataset's upserted indicators swapped in
+        entities_after: EntitiesByVariable = dict(self.entities_in_production)
+        for variable_id, path in self.catalog_paths.items():
+            if path in self.upserted_entities:
+                entities_after[variable_id] = self.upserted_entities[path]
 
         killed = []
         for chart in self.charts:
@@ -212,18 +223,23 @@ class UpsertPinsCheck:
             + "\nRename the pins to the entities the data now uses (or remove them) in the chart admin, or keep the "
             "old entity names in the data."
         )
+        if config.ENV == "production":
+            message += (
+                "\nIf this ran for a merged PR whose charts were fixed on staging, chart-sync (which runs after ETL) "
+                "delivers the fixes and there is nothing to do."
+            )
         # In production, ETL runs before chart-sync, so failing here would block the very sync that delivers the
         # fixed charts. Report instead.
         if config.ENV == "production":
-            from slack_sdk.errors import SlackApiError
+            from slack_sdk.errors import SlackClientError
 
             from etl.slack_helpers import send_slack_message
 
             log.error("entity_selection.pinned_entities_removed", message=message)
-            # A Slack outage must not fail the step either, for the same reason
+            # A Slack outage must not fail the step either, for the same reason (OSError covers network failures)
             try:
                 send_slack_message(channel="#data-architecture-github", message=message)
-            except SlackApiError as e:
+            except (SlackClientError, OSError) as e:
                 log.error("entity_selection.slack_failed", error=str(e))
         else:
             raise PinnedEntitiesRemovedError(message)

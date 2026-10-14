@@ -104,3 +104,33 @@ def test_chart_diff_flags_dead_pins_of_edited_and_new_charts_only():
     ):
         dead = ChartDiff._get_dead_selected_entities(df_charts, source_charts, target_charts, source_env=None)  # ty: ignore[invalid-argument-type]
     assert dead == {1: ["Atlantis"], 3: ["Atlantis"]}
+
+
+def test_subset_runs_skip_the_check():
+    engine = mock.MagicMock()
+    check = es.UpsertPinsCheck(engine=engine, dataset_id=1)
+    with mock.patch.object(es.config, "SUBSET", "France"), mock.patch.object(es, "read_sql") as read_sql:
+        check.prepare()
+        check.run()
+    read_sql.assert_not_called()
+    assert check.charts == []
+
+
+def test_pins_carried_by_another_datasets_indicator_are_not_blamed_on_this_step():
+    # Chart plots indicator 1 (this dataset) and 2 (another dataset); 'Atlantis' only has data in 2.
+    check = es.UpsertPinsCheck(engine=mock.MagicMock(), dataset_id=1)
+    config = _config(["Atlantis", "World"], dims=((1, "y"), (2, "y")))
+    check.charts = [es.ChartPins(chart_id=10, slug="combined", config=config)]
+    check.catalog_paths = {1: "grapher/a/latest/a#x", 2: "grapher/b/latest/b#y"}
+    check.tracked_paths = set(check.catalog_paths.values())
+    check.entities_in_production = {1: {"World"}, 2: {"Atlantis", "World"}}
+    check.add("grapher/a/latest/a#x", _table(["World"]))
+    with mock.patch.object(es.config, "ENV", "staging"):
+        check.run()
+
+
+def test_scatter_selection_only_highlights():
+    scatter = _config(["Atlantis"], dims=((1, "y"), (2, "x")))
+    assert not es.renders_selection(scatter)
+    assert not es.renders_selection(_config(["Atlantis"], chartTypes=["Marimekko"]))
+    assert es.renders_selection(_config(["Atlantis"], chartTypes=["LineChart", "DiscreteBar"]))
