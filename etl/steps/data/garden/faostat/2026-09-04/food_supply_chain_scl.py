@@ -112,7 +112,7 @@ Each assumption starts with a line on its scale: how much it changes the results
       available carbohydrate and 2 per gram of fibre. That puts each cake on the same footing as the crop and the oil
       it comes from. Soybean cake, for example, gets 307 kcal and 43.4 g of protein per 100 g, from Feedipedia's
       soybean meal of 44% to 46% protein: the type that includes the hulls, as SCL's crushing yields imply.
-   The values, their sources and the arithmetic are in `food_supply_chain_scl.items.yml`.
+   The values, compositions and sources are in `food_supply_chain_scl.items.yml`.
 
    Listed items always use their fixed densities, so that a few hundred tonnes of soybean cake eaten somewhere cannot
    set the density of hundreds of millions of tonnes.
@@ -593,7 +593,12 @@ def load_manual_inputs() -> dict:
     }
     assert set(config) == expected, f"Unexpected top-level keys in items file: {set(config) ^ expected}"
     for entry in config["fixed_densities"]["families"] + config["fixed_densities"]["items"]:
-        assert {"energy", "protein"} <= set(entry), f"Fixed densities need energy and protein: {entry}"
+        has_values = {"energy", "protein"} <= set(entry)
+        has_composition = {"dry_matter", "percent_of_dry_matter"} <= set(entry)
+        assert has_values != has_composition, f"Fixed densities need energy and protein, or a composition: {entry}"
+        if has_composition:
+            components = set(entry["percent_of_dry_matter"])
+            assert components in ({"protein", "fat", "ash", "ndf"}, {"protein", "fat", "ash", "crude_fibre"}), entry
     return config
 
 
@@ -798,6 +803,24 @@ def sanity_check_balance_identity(tb: Table) -> None:
 # --------------------------------------------------------------------------------------------------------------------
 # Densities (assumptions 2 to 6).
 # --------------------------------------------------------------------------------------------------------------------
+def composition_density(item: dict, nutrient: str) -> float:
+    """Energy (kcal) or protein (g) per 100 g as fed, from a Feedipedia composition, with the energy formula of FAO's
+    2024 nutrient conversion table.
+
+    Feedipedia publishes dry matter in % of the item as fed, and the other components in % of dry matter. As fed, a
+    component is its % of dry matter times dry matter / 100, and water is 100 - dry matter. Then:
+        available carbohydrate = 100 - water - protein - fat - ash - fibre
+        energy = 4 x protein + 9 x fat + 4 x available carbohydrate + 2 x fibre
+    """
+    dry_matter = item["dry_matter"]
+    as_fed = {component: share * dry_matter / 100 for component, share in item["percent_of_dry_matter"].items()}
+    fibre = as_fed.get("ndf", as_fed.get("crude_fibre"))
+    if nutrient == "protein":
+        return as_fed["protein"]
+    carbohydrate = 100 - (100 - dry_matter) - as_fed["protein"] - as_fed["fat"] - as_fed["ash"] - fibre
+    return 4 * as_fed["protein"] + 9 * as_fed["fat"] + 4 * carbohydrate + 2 * fibre
+
+
 def fixed_density_map(tb: Table, manual: dict, nutrient: str) -> dict[str, float]:
     """Fixed densities per item code for one nutrient, from the families (by name pattern) and the explicit items.
 
@@ -809,7 +832,8 @@ def fixed_density_map(tb: Table, manual: dict, nutrient: str) -> dict[str, float
             if name.startswith(family["pattern"]):
                 fixed[code] = family[nutrient]
     for item in manual["fixed_densities"]["items"]:
-        fixed[_pad_code(item["code"])] = item[nutrient]
+        value = composition_density(item, nutrient) if "percent_of_dry_matter" in item else item[nutrient]
+        fixed[_pad_code(item["code"])] = value
     return fixed
 
 

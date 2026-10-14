@@ -10,13 +10,11 @@
 #      covers: cereal brans, centrifugal cane sugar, hemp oil, tallow. Their edible-portion coefficients are all 1,
 #      so the published values apply to the whole tonnage.
 #      https://www.fao.org/food-composition/tables-and-databases/detail/global-nutrient-conversion-table-for-fao-supply-utilization-accounts/en
-#    - The oilseed cakes and gluten feed, which the NCT does not cover: the main-table means of one Feedipedia table
-#      each (INRAE-CIRAD-AFZ-FAO feed tables, https://www.feedipedia.org), run through the NCT's own energy formula:
-#        energy = 4 x protein + 9 x fat + 4 x available carbohydrate + 2 x dietary fibre, per 100 g as fed;
-#        available carbohydrate = 100 - water - protein - fat - ash - dietary fibre.
-#      Feedipedia publishes % of dry matter (DM): as fed = % DM x DM / 100, and water = 100 - DM. Fat is ether
-#      extract. Dietary fibre is neutral detergent fibre (NDF), or crude fibre where the table publishes no NDF
-#      (safflower and mustard cake). Feedipedia marks the NDF of several tables as predicted rather than measured.
+#    - The oilseed cakes and gluten feed, which the NCT does not cover: the composition published in one Feedipedia
+#      table each (INRAE-CIRAD-AFZ-FAO feed tables, https://www.feedipedia.org), copied as published: dry matter, in %
+#      of the item as fed, and protein, fat (ether extract), ash and fibre, in % of dry matter. Fibre is neutral
+#      detergent fibre (ndf), or crude fibre where the table publishes no NDF. The step converts each composition to
+#      energy and protein with the NCT's own energy formula (see `composition_density`).
 #    - Chemically modified fats (item 1274): FAOSTAT SCL's own food observation.
 #    - Acid oils from refining (item 1276): FAO's density for palm oil.
 #    Items without a single published composition use uncited values, and say so:
@@ -31,143 +29,31 @@ fixed_densities:
     - {pattern: "Cake of", energy: 330, protein: 35, note: "Default for cakes not listed individually; not from a single published composition."}
     - {pattern: "Cake,", energy: 330, protein: 35, note: "Same default (oilseeds not elsewhere classified)."}
   items:
-    # Cake of soya beans: Feedipedia, 'Soybean meal' page (https://www.feedipedia.org/node/674), table 'Soybean meal,
-    # low protein, type 44-46 and similar' (https://www.feedipedia.org/node/11682).
-    # Published: dry matter 87.7 % as fed (n=803); crude protein 49.5 % DM (n=818); ether extract 1.9 % DM (n=603);
-    # ash 7.4 % DM (n=216); NDF 14.8 % DM (n=38, predicted).
-    # Arithmetic: as fed = % DM x 87.7 / 100: protein 43.41, fat 1.67, ash 6.49, NDF 12.98, water 12.3; available
-    # carbohydrate 100 - 12.3 - 43.41 - 1.67 - 6.49 - 12.98 = 23.15; energy 4 x 43.41 + 9 x 1.67 + 4 x 23.15 + 2 x
-    # 12.98 = 307.2 kcal; protein 43.41 g.
-    # Why this table: the page says meals below 47% protein 'include the hulls or part of the hulls', and that hulls
-    # are 8% of the seed. SCL's World crush (oil 18.6% and cake 77.7% of the beans crushed) leaves no room for
-    # removed hulls, so SCL's cake includes them.
-    - {code: 238, name: "Cake of soya beans", energy: 307.2, protein: 43.412, note: "Feedipedia, 'Soybean meal, low protein, type 44-46 and similar'; NCT energy formula, NDF."}
-    # Cake of rapeseed: Feedipedia, table 'Rapeseed meal, 00 type, oil < 5% as fed, solvent extraction'.
-    # https://www.feedipedia.org/node/12503
-    # Published: dry matter 89 % as fed (n=7005); crude protein 38.1 % DM (n=7056); ether extract 2.4 % DM (n=5758);
-    # ash 7.6 % DM (n=1164); NDF 31.6 % DM (n=241, predicted).
-    # Arithmetic: as fed = % DM x 89 / 100: protein 33.91, fat 2.14, ash 6.76, NDF 28.12, water 11.0; available
-    # carbohydrate 100 - 11.0 - 33.91 - 2.14 - 6.76 - 28.12 = 18.07; energy 4 x 33.91 + 9 x 2.14 + 4 x 18.07 + 2 x
-    # 28.12 = 283.4 kcal; protein 33.91 g.
-    - {code: 272, name: "Cake of rapeseed", energy: 283.4, protein: 33.909, note: "Feedipedia, 'Rapeseed meal, 00 type, oil < 5% as fed, solvent extraction'; NCT energy formula, NDF."}
-    # Cake of sunflower seed: Feedipedia, table 'Sunflower meal, solvent-extracted, dehulled or non-dehulled'.
-    # https://www.feedipedia.org/node/12663
-    # Published: dry matter 89 % as fed (n=14806); crude protein 32.4 % DM (n=14755); ether extract 2.2 % DM
-    # (n=9688); ash 7.1 % DM (n=5882); NDF 45 % DM (n=647, predicted).
-    # Arithmetic: as fed = % DM x 89 / 100: protein 28.84, fat 1.96, ash 6.32, NDF 40.05, water 11.0; available
-    # carbohydrate 100 - 11.0 - 28.84 - 1.96 - 6.32 - 40.05 = 11.84; energy 4 x 28.84 + 9 x 1.96 + 4 x 11.84 + 2 x
-    # 40.05 = 260.4 kcal; protein 28.84 g.
-    - {code: 269, name: "Cake of sunflower seed", energy: 260.4, protein: 28.836, note: "Feedipedia, 'Sunflower meal, solvent-extracted, dehulled or non-dehulled'; NCT energy formula, NDF."}
-    # Cake of cottonseed: Feedipedia, table 'Cottonseed meal, high fibre, low oil'.
-    # https://www.feedipedia.org/node/16275
-    # Published: dry matter 90.2 % as fed (n=255); crude protein 40 % DM (n=274); ether extract 3.1 % DM (n=195); ash
-    # 7.1 % DM (n=194); NDF 36.6 % DM (n=43, predicted).
-    # Arithmetic: as fed = % DM x 90.2 / 100: protein 36.08, fat 2.80, ash 6.40, NDF 33.01, water 9.8; available
-    # carbohydrate 100 - 9.8 - 36.08 - 2.80 - 6.40 - 33.01 = 11.91; energy 4 x 36.08 + 9 x 2.80 + 4 x 11.91 + 2 x
-    # 33.01 = 283.1 kcal; protein 36.08 g.
-    # Why this table: the high-fibre meal is made with no or limited dehulling. SCL's World cake is 55.8% of the
-    # seed crushed, more than the 45.5% of meal that a dehulling crush gives (O'Brien et al., cited by Feedipedia),
-    # so it holds hulls; oil at 16.7% of the seed leaves little oil in the cake.
-    - {code: 332, name: "Cake of cottonseed", energy: 283.1, protein: 36.08, note: "Feedipedia, 'Cottonseed meal, high fibre, low oil'; NCT energy formula, NDF."}
-    # Cake of palm kernel: Feedipedia, table 'Palm kernel meal, mechanical extraction'.
-    # https://www.feedipedia.org/node/12420
-    # Published: dry matter 91.2 % as fed (n=1268); crude protein 16.7 % DM (n=1114); ether extract 9.2 % DM (n=983);
-    # ash 4.7 % DM (n=632); NDF 73 % DM (n=98, predicted).
-    # Arithmetic: as fed = % DM x 91.2 / 100: protein 15.23, fat 8.39, ash 4.29, NDF 66.58, water 8.8; available
-    # carbohydrate 100 - 8.8 - 15.23 - 8.39 - 4.29 - 66.58 = -3.28 (the published components add up to more than the
-    # dry matter; used as published); energy 4 x 15.23 + 9 x 8.39 + 4 x -3.28 + 2 x 66.58 = 256.5 kcal; protein
-    # 15.23 g.
-    - {code: 259, name: "Cake of palm kernel", energy: 256.5, protein: 15.23, note: "Feedipedia, 'Palm kernel meal, mechanical extraction'; NCT energy formula, NDF."}
-    # Cake of groundnuts: Feedipedia, table 'Peanut meal, oil > 5%'.
-    # https://www.feedipedia.org/node/12159
-    # Published: dry matter 92.3 % as fed (n=218); crude protein 49.1 % DM (n=236); ether extract 9.8 % DM (n=212);
-    # ash 5.8 % DM (n=215); NDF 18.1 % DM (n=41, predicted).
-    # Arithmetic: as fed = % DM x 92.3 / 100: protein 45.32, fat 9.05, ash 5.35, NDF 16.71, water 7.7; available
-    # carbohydrate 100 - 7.7 - 45.32 - 9.05 - 5.35 - 16.71 = 15.88; energy 4 x 45.32 + 9 x 9.05 + 4 x 15.88 + 2 x
-    # 16.71 = 359.6 kcal; protein 45.32 g.
-    - {code: 245, name: "Cake of groundnuts", energy: 359.6, protein: 45.319, note: "Feedipedia, 'Peanut meal, oil > 5%'; NCT energy formula, NDF."}
-    # Cake of rice bran: Feedipedia, table 'Rice bran, defatted, fibre 11-20%'.
-    # https://www.feedipedia.org/node/11640
-    # Published: dry matter 89 % as fed (n=158); crude protein 17.1 % DM (n=157); ether extract 1 % DM (n=127); ash
-    # 14.2 % DM (n=107); NDF 32.6 % DM (n=19, predicted).
-    # Arithmetic: as fed = % DM x 89 / 100: protein 15.22, fat 0.89, ash 12.64, NDF 29.01, water 11.0; available
-    # carbohydrate 100 - 11.0 - 15.22 - 0.89 - 12.64 - 29.01 = 31.24; energy 4 x 15.22 + 9 x 0.89 + 4 x 31.24 + 2 x
-    # 29.01 = 251.9 kcal; protein 15.22 g.
-    # Why this table: Feedipedia (citing Göhl 1982) says rice bran 'should have a crude fibre content of 10-15%', and
-    # removing the oil raises the fibre share, hence the 11-20% class.
-    - {code: 37, name: "Cake of rice bran", energy: 251.9, protein: 15.219, note: "Feedipedia, 'Rice bran, defatted, fibre 11-20%'; NCT energy formula, NDF."}
-    # Cake of maize: Feedipedia, table 'Maize germ meal, protein 20-30%, oil < 5%'.
-    # https://www.feedipedia.org/node/20332
-    # Published: dry matter 87.7 % as fed (n=551); crude protein 28.9 % DM (n=545); ether extract 2.8 % DM (n=251);
-    # ash 3.2 % DM (n=243); NDF 44 % DM (n=5, predicted).
-    # Arithmetic: as fed = % DM x 87.7 / 100: protein 25.35, fat 2.46, ash 2.81, NDF 38.59, water 12.3; available
-    # carbohydrate 100 - 12.3 - 25.35 - 2.46 - 2.81 - 38.59 = 18.50; energy 4 x 25.35 + 9 x 2.46 + 4 x 18.50 + 2 x
-    # 38.59 = 274.7 kcal; protein 25.35 g.
-    - {code: 61, name: "Cake of maize", energy: 274.7, protein: 25.345, note: "Feedipedia, 'Maize germ meal, protein 20-30%, oil < 5%'; NCT energy formula, NDF."}
-    # Cake of copra: Feedipedia, table 'Coconut, copra, oilmeal, expeller extraction'.
-    # https://www.feedipedia.org/node/11997
-    # Published: dry matter 91.5 % as fed (n=240); crude protein 22.4 % DM (n=257); ether extract 9.8 % DM (n=163);
-    # ash 6.8 % DM (n=231); NDF 54.7 % DM (n=35, predicted).
-    # Arithmetic: as fed = % DM x 91.5 / 100: protein 20.50, fat 8.97, ash 6.22, NDF 50.05, water 8.5; available
-    # carbohydrate 100 - 8.5 - 20.50 - 8.97 - 6.22 - 50.05 = 5.76; energy 4 x 20.50 + 9 x 8.97 + 4 x 5.76 + 2 x 50.05
-    # = 285.8 kcal; protein 20.50 g.
-    - {code: 253, name: "Cake of copra", energy: 285.8, protein: 20.496, note: "Feedipedia, 'Coconut, copra, oilmeal, expeller extraction'; NCT energy formula, NDF."}
-    # Cake of sesame seed: Feedipedia, table 'Sesame meal, mechanical extraction'.
-    # https://www.feedipedia.org/node/12577
-    # Published: dry matter 92.8 % as fed (n=48); crude protein 44.9 % DM (n=54); ether extract 11.3 % DM (n=41); ash
-    # 11.9 % DM (n=43); NDF 24.6 % DM (n=8).
-    # Arithmetic: as fed = % DM x 92.8 / 100: protein 41.67, fat 10.49, ash 11.04, NDF 22.83, water 7.2; available
-    # carbohydrate 100 - 7.2 - 41.67 - 10.49 - 11.04 - 22.83 = 6.77; energy 4 x 41.67 + 9 x 10.49 + 4 x 6.77 + 2 x
-    # 22.83 = 333.8 kcal; protein 41.67 g.
-    - {code: 291, name: "Cake of sesame seed", energy: 333.8, protein: 41.667, note: "Feedipedia, 'Sesame meal, mechanical extraction'; NCT energy formula, NDF."}
-    # Cake of linseed: Feedipedia, table 'Linseed meal, cold-pressed'.
-    # https://www.feedipedia.org/node/12262
-    # Published: dry matter 90.6 % as fed (n=607); crude protein 34.1 % DM (n=617); ether extract 10.2 % DM (n=431);
-    # ash 6.3 % DM (n=335); NDF 25.4 % DM (n=29, predicted).
-    # Arithmetic: as fed = % DM x 90.6 / 100: protein 30.89, fat 9.24, ash 5.71, NDF 23.01, water 9.4; available
-    # carbohydrate 100 - 9.4 - 30.89 - 9.24 - 5.71 - 23.01 = 21.74; energy 4 x 30.89 + 9 x 9.24 + 4 x 21.74 + 2 x
-    # 23.01 = 339.8 kcal; protein 30.89 g.
-    - {code: 335, name: "Cake of linseed", energy: 339.8, protein: 30.895, note: "Feedipedia, 'Linseed meal, cold-pressed'; NCT energy formula, NDF."}
-    # Cake of safflowerseed: Feedipedia, table 'Safflower (Carthamus tinctorius), meal, expeller extraction'.
-    # https://www.feedipedia.org/node/12552
-    # Published: dry matter 93.2 % as fed (n=3); crude protein 24.8 % DM (n=4); ether extract 9.4 % DM (n=4); ash 4.4
-    # % DM (n=4); crude fibre 33.3 % DM (n=3); no NDF published.
-    # Arithmetic: as fed = % DM x 93.2 / 100: protein 23.11, fat 8.76, ash 4.10, crude fibre 31.04, water 6.8;
-    # available carbohydrate 100 - 6.8 - 23.11 - 8.76 - 4.10 - 31.04 = 26.19; energy 4 x 23.11 + 9 x 8.76 + 4 x 26.19
-    # + 2 x 31.04 = 338.1 kcal; protein 23.11 g.
-    - {code: 282, name: "Cake of safflowerseed", energy: 338.1, protein: 23.114, note: "Feedipedia, 'Safflower (Carthamus tinctorius), meal, expeller extraction'; NCT energy formula, crude fibre."}
-    # Cake of mustard seed: Feedipedia, table 'Mustard (Brassica sp.), oil meal, mechanical extraction'.
-    # https://www.feedipedia.org/node/12359
-    # Published: dry matter 89.4 % as fed (n=2); crude protein 34.9 % DM (n=3); ether extract 9.4 % DM (n=2); ash 8.3
-    # % DM (n=2); crude fibre 7.1 % DM (n=2); no NDF published.
-    # Arithmetic: as fed = % DM x 89.4 / 100: protein 31.20, fat 8.40, ash 7.42, crude fibre 6.35, water 10.6;
-    # available carbohydrate 100 - 10.6 - 31.20 - 8.40 - 7.42 - 6.35 = 36.03; energy 4 x 31.20 + 9 x 8.40 + 4 x 36.03
-    # + 2 x 6.35 = 357.2 kcal; protein 31.20 g.
-    - {code: 294, name: "Cake of mustard seed", energy: 357.2, protein: 31.201, note: "Feedipedia, 'Mustard (Brassica sp.), oil meal, mechanical extraction'; NCT energy formula, crude fibre."}
-    # Cake of hempseed: Feedipedia, table 'Hemp oil meal, mechanical extraction'.
-    # https://www.feedipedia.org/node/11694
-    # Published: dry matter 91.3 % as fed (n=9); crude protein 31.9 % DM (n=12); ether extract 11.5 % DM (n=10); ash
-    # 7.2 % DM (n=11); NDF 45.7 % DM (n=4).
-    # Arithmetic: as fed = % DM x 91.3 / 100: protein 29.12, fat 10.50, ash 6.57, NDF 41.72, water 8.7; available
-    # carbohydrate 100 - 8.7 - 29.12 - 10.50 - 6.57 - 41.72 = 3.38; energy 4 x 29.12 + 9 x 10.50 + 4 x 3.38 + 2 x
-    # 41.72 = 308.0 kcal; protein 29.12 g.
-    - {code: 338, name: "Cake of hempseed", energy: 308.0, protein: 29.125, note: "Feedipedia, 'Hemp oil meal, mechanical extraction'; NCT energy formula, NDF."}
-    # Cake, poppy seed: Feedipedia, table 'Poppy (Papaver somniferum), oil meal, mechanical extraction'.
-    # https://www.feedipedia.org/node/12463
-    # Published: dry matter 92.5 % as fed (n=5); crude protein 36 % DM (n=5); ether extract 10.3 % DM (n=5); ash 13.4
-    # % DM (n=4); NDF 34.1 % DM (n=1).
-    # Arithmetic: as fed = % DM x 92.5 / 100: protein 33.30, fat 9.53, ash 12.39, NDF 31.54, water 7.5; available
-    # carbohydrate 100 - 7.5 - 33.30 - 9.53 - 12.39 - 31.54 = 5.74; energy 4 x 33.30 + 9 x 9.53 + 4 x 5.74 + 2 x 31.54
-    # = 305.0 kcal; protein 33.30 g.
-    - {code: 298, name: "Cake, poppy seed", energy: 305.0, protein: 33.3, note: "Feedipedia, 'Poppy (Papaver somniferum), oil meal, mechanical extraction'; NCT energy formula, NDF."}
-    # Gluten feed and meal: Feedipedia, table 'Corn gluten feed' (gluten meal has more protein but is the smaller
-    # volume). https://www.feedipedia.org/node/12287
-    # Published: dry matter 88.3 % as fed (n=6415); crude protein 21.7 % DM (n=6382); ether extract 3.4 % DM
-    # (n=4135); ash 6.9 % DM (n=3564); NDF 39.6 % DM (n=172).
-    # Arithmetic: as fed = % DM x 88.3 / 100: protein 19.16, fat 3.00, ash 6.09, NDF 34.97, water 11.7; available
-    # carbohydrate 100 - 11.7 - 19.16 - 3.00 - 6.09 - 34.97 = 25.08; energy 4 x 19.16 + 9 x 3.00 + 4 x 25.08 + 2 x
-    # 34.97 = 273.9 kcal; protein 19.16 g.
-    - {code: 846, name: "Gluten feed and meal", energy: 273.9, protein: 19.161, note: "Feedipedia, 'Corn gluten feed'; NCT energy formula, NDF."}
+    # Meals below 47% protein include the hulls (Feedipedia), and SCL's World crush (oil 18.6%, cake 77.7% of the
+    # beans) leaves no room for removed hulls.
+    - {code: 238, name: "Cake of soya beans", source: "Feedipedia, 'Soybean meal, low protein, type 44-46 and similar'", url: "https://www.feedipedia.org/node/11682", dry_matter: 87.7, percent_of_dry_matter: {protein: 49.5, fat: 1.9, ash: 7.4, ndf: 14.8}}
+    - {code: 272, name: "Cake of rapeseed", source: "Feedipedia, 'Rapeseed meal, 00 type, oil < 5% as fed, solvent extraction'", url: "https://www.feedipedia.org/node/12503", dry_matter: 89, percent_of_dry_matter: {protein: 38.1, fat: 2.4, ash: 7.6, ndf: 31.6}}
+    - {code: 269, name: "Cake of sunflower seed", source: "Feedipedia, 'Sunflower meal, solvent-extracted, dehulled or non-dehulled'", url: "https://www.feedipedia.org/node/12663", dry_matter: 89, percent_of_dry_matter: {protein: 32.4, fat: 2.2, ash: 7.1, ndf: 45}}
+    # The high-fibre meal is made with little dehulling; SCL's World cake is 55.8% of the seed crushed, more than the
+    # 45.5% of a dehulling crush (O'Brien et al., cited by Feedipedia).
+    - {code: 332, name: "Cake of cottonseed", source: "Feedipedia, 'Cottonseed meal, high fibre, low oil'", url: "https://www.feedipedia.org/node/16275", dry_matter: 90.2, percent_of_dry_matter: {protein: 40, fat: 3.1, ash: 7.1, ndf: 36.6}}
+    # The published components add up to more than the dry matter, so the available carbohydrate is slightly negative;
+    # used as published.
+    - {code: 259, name: "Cake of palm kernel", source: "Feedipedia, 'Palm kernel meal, mechanical extraction'", url: "https://www.feedipedia.org/node/12420", dry_matter: 91.2, percent_of_dry_matter: {protein: 16.7, fat: 9.2, ash: 4.7, ndf: 73}}
+    - {code: 245, name: "Cake of groundnuts", source: "Feedipedia, 'Peanut meal, oil > 5%'", url: "https://www.feedipedia.org/node/12159", dry_matter: 92.3, percent_of_dry_matter: {protein: 49.1, fat: 9.8, ash: 5.8, ndf: 18.1}}
+    # Feedipedia (citing Göhl 1982) gives rice bran 10-15% crude fibre, and removing the oil raises it, hence the
+    # 11-20% class.
+    - {code: 37, name: "Cake of rice bran", source: "Feedipedia, 'Rice bran, defatted, fibre 11-20%'", url: "https://www.feedipedia.org/node/11640", dry_matter: 89, percent_of_dry_matter: {protein: 17.1, fat: 1, ash: 14.2, ndf: 32.6}}
+    - {code: 61, name: "Cake of maize", source: "Feedipedia, 'Maize germ meal, protein 20-30%, oil < 5%'", url: "https://www.feedipedia.org/node/20332", dry_matter: 87.7, percent_of_dry_matter: {protein: 28.9, fat: 2.8, ash: 3.2, ndf: 44}}
+    - {code: 253, name: "Cake of copra", source: "Feedipedia, 'Coconut, copra, oilmeal, expeller extraction'", url: "https://www.feedipedia.org/node/11997", dry_matter: 91.5, percent_of_dry_matter: {protein: 22.4, fat: 9.8, ash: 6.8, ndf: 54.7}}
+    - {code: 291, name: "Cake of sesame seed", source: "Feedipedia, 'Sesame meal, mechanical extraction'", url: "https://www.feedipedia.org/node/12577", dry_matter: 92.8, percent_of_dry_matter: {protein: 44.9, fat: 11.3, ash: 11.9, ndf: 24.6}}
+    - {code: 335, name: "Cake of linseed", source: "Feedipedia, 'Linseed meal, cold-pressed'", url: "https://www.feedipedia.org/node/12262", dry_matter: 90.6, percent_of_dry_matter: {protein: 34.1, fat: 10.2, ash: 6.3, ndf: 25.4}}
+    - {code: 282, name: "Cake of safflowerseed", source: "Feedipedia, 'Safflower (Carthamus tinctorius), meal, expeller extraction'", url: "https://www.feedipedia.org/node/12552", dry_matter: 93.2, percent_of_dry_matter: {protein: 24.8, fat: 9.4, ash: 4.4, crude_fibre: 33.3}}
+    - {code: 294, name: "Cake of mustard seed", source: "Feedipedia, 'Mustard (Brassica sp.), oil meal, mechanical extraction'", url: "https://www.feedipedia.org/node/12359", dry_matter: 89.4, percent_of_dry_matter: {protein: 34.9, fat: 9.4, ash: 8.3, crude_fibre: 7.1}}
+    - {code: 338, name: "Cake of hempseed", source: "Feedipedia, 'Hemp oil meal, mechanical extraction'", url: "https://www.feedipedia.org/node/11694", dry_matter: 91.3, percent_of_dry_matter: {protein: 31.9, fat: 11.5, ash: 7.2, ndf: 45.7}}
+    - {code: 298, name: "Cake, poppy seed", source: "Feedipedia, 'Poppy (Papaver somniferum), oil meal, mechanical extraction'", url: "https://www.feedipedia.org/node/12463", dry_matter: 92.5, percent_of_dry_matter: {protein: 36, fat: 10.3, ash: 13.4, ndf: 34.1}}
+    # Corn gluten feed, the larger volume; gluten meal has more protein.
+    - {code: 846, name: "Gluten feed and meal", source: "Feedipedia, 'Corn gluten feed'", url: "https://www.feedipedia.org/node/12287", dry_matter: 88.3, percent_of_dry_matter: {protein: 21.7, fat: 3.4, ash: 6.9, ndf: 39.6}}
     # FAO 2024 NCT, values copied as published (edible-portion coefficient 1, so per 100 g as recorded).
     # https://www.fao.org/3/CC9678EN/Nutrient_conversion_table_for_SUA_2024.xlsx
     - {code: 158, name: "Cane sugar, centrifugal", energy: 399.0, protein: 0.2, note: "FAO 2024 SUA nutrient conversion table; edible-portion coefficient 1."}
