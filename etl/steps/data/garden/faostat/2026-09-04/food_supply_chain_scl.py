@@ -290,7 +290,7 @@ Each assumption starts with a line on its scale: how much it changes the results
     The rule applies to each country and region in each year, after the regions are summed from their countries. So
     a region with a gain is treated like a country: Oceania in every year in energy; South America, Europe, North
     America and the European Union in one year each; and Oceania in 2012 in protein. A region's processing is then
-    no longer the sum of its countries', but processing plus data adjustments still is.
+    not the sum of its countries', but processing plus data adjustments is.
 
     The mass table is left alone. In tonnes, a gain in processing can be real, because breweries and bottlers add
     water: in Namibia, 22 thousand tonnes of malt become 174 thousand tonnes of beer. So processing there is the net
@@ -889,9 +889,9 @@ def add_densities(tb: Table, manual: dict, nutrient: str) -> Table:
     tb["density"] = own_year.fillna(item_density)
     tb["density_source"] = np.select([own_year.notnull(), item_density.notnull()], ["own_year", "item"], default="none")
 
-    # Assumption 5: listed items always get fixed factors. A few hundred tonnes of soybean cake eaten somewhere
-    # should not set the density of hundreds of millions of tonnes. Where food use is substantial, check agreement
-    # with the inferred factor before overriding it, using the same rounding tolerance as the other factor check.
+    # Assumption 5: listed items always get fixed densities. A few hundred tonnes of soybean cake eaten somewhere
+    # should not set the density of hundreds of millions of tonnes. Where food use is substantial, check that the item
+    # density agrees with the fixed density, within the tolerance of the check of assumption 3.
     fixed = fixed_density_map(tb, manual, nutrient)
     is_fixed = tb["item_code"].isin(fixed)
     fixed_factor = tb["item_code"].map(fixed)

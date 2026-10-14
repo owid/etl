@@ -19,7 +19,7 @@
 #      (safflower and mustard cake). Feedipedia marks the NDF of several tables as predicted rather than measured.
 #    - Chemically modified fats (item 1274): FAOSTAT SCL's own food observation.
 #    - Acid oils from refining (item 1276): FAO's density for palm oil.
-#    Items without a single published composition keep the values of the previous version of this file, and say so:
+#    Items without a single published composition use uncited values, and say so:
 #    the two cake patterns, bran of pulses, hempseed, and residues of fatty substances (item 1277).
 fixed_densities:
   families:
@@ -189,7 +189,7 @@ fixed_densities:
     # FAOSTAT SCL's own food observation for this item (Russia, 2019): 902 kcal per 100 g and zero protein. This is
     # the factor FAO used for that observation, not a published composition.
     - {code: 1274, name: "Animal or vegetable fats and oils and their fractions, chemically modified, except those hydrogenated, inter-esterified, re-esterified or elaidinized; inedible mixtures or preparations of animal or vegetable fats or oils", energy: 902, protein: 0, note: 'FAOSTAT SCL food observations: 902 kcal/100 g and zero protein (Russia, 2019).'}
-    # Not from a single published composition; kept from the previous version of this file.
+    # Not from a single published composition; these values are uncited.
     # - Bran of pulses: USDA's crude wheat bran (216 kcal, 15.6 g) as a proxy. FAO's table has no pulse bran, and
     #   Feedipedia has chickpea and lentil bran but not the pea bran that the largest producers make.
     # - Residues of fatty substances (1277): 884 kcal and no protein; no documented composition was found.
