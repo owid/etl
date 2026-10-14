@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Population Historical Database — Quality Assessment
+    description: |-
+      Companion quality-assessment file to the Federico–Tena World Population Historical Database. Classifies each (polity, year) cell from 1800 to 1938 into five reliability classes: A (fully trustworthy estimate), B (interpolation between censuses), C (colonial statistics or estimates), D (interpolation of C), and E (lowest reliability). The country list in this file is documented at 1938 historical borders, so it does not align one-to-one with the 1991-borders companion dataset.
+    date_published: "2025-01-28"
+    version_producer: "V2 (2025, 1938 borders)"
+
+    # Citation
+    producer: Federico and Tena-Junguito
+    citation_full: |-
+      Federico, Giovanni and Antonio Tena-Junguito (2025). Federico–Tena World Population Historical Database: Quality Assessment Population (2025), V2. doi:10.21950/U6AANV. Universidad Carlos III de Madrid – e-Datos Consorcio Madroño Dataverse.
+    attribution: Federico–Tena (2025) — Quality Assessment
+    attribution_short: Federico–Tena QA
+
+    # Files
+    url_main: https://www.uc3m.es/research/federico-tena-population
+    url_download: https://edatos.consorciomadrono.es/api/access/datafile/34065
+    date_accessed: "2026-05-20"
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+
+outs:
+  - md5: 57067ba3e1d6482a8233863ae6cf36dd
+    size: 140770
+    path: federico_tena_population_quality.xlsx
