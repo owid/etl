@@ -1,359 +1,428 @@
 """FAO Supply Utilization Accounts (SCL) as a chain of stages from crop production to food, per person per day.
 
-This step builds the same chain as `food_supply_chain_fbs`, but from FAO's Supply Utilization Accounts (SCL)
-instead of the Food Balance Sheets (FBS): crop production, plus imports, minus exports, stock changes, seed,
-losses, non-food uses, processing and animal feed, plus animal products, ending at the food available to eat.
-Food keeps the calories and protein that FAO reports for it, wherever FAO reports them; the other stages are converted
-from tonnes. The chain is built three times, in three units, one table each:
+WHAT THIS STEP DOES
+-------------------
+This step follows the calories, protein and weight of each country's food supply, from the crops harvested to the
+food available to eat. On the way, food is traded, stored, sown as seed, lost, put to other uses, processed in
+factories and fed to animals, which give some of it back as meat, milk and eggs.
+
+The stages of the chain are: crop production, plus imports, minus exports, stock changes, seed, losses, other uses,
+processing and animal feed, plus animal products, ending at food.
+
+We build the chain three times, once in each unit, in one table each:
     energy   kilocalories per person per day
     protein  grams of protein per person per day
     mass     kilograms per person per day (the balance in tonnes, with no conversion at all)
 
-Two differences make SCL preferable to FBS for this chain:
-- SCL reports individual commodities, while FBS reports groups. SCL has "Wheat", "Wheat and meslin flour" and
-  "Bread" as three separate items; FBS merges all three into one item, "Wheat and products".
-- SCL includes the by-products that FBS has no items for: oilseed cakes, brans, gluten feed. When oilseeds
-  (soybeans, rapeseed, sunflower seeds) are crushed to extract their oil, the crushed solids that remain are called
-  cake. Cake is rich in protein, and it is one of the main things the world feeds to its farm animals. With the
-  cakes present as items, what goes from oilseeds to cakes to animals appears under feed, where it belongs; in FBS
-  the oilseeds that were sent to be crushed are counted under processing and the cake is never counted anywhere.
-The price is coverage: SCL starts in 2010 (FBS starts in 1961), misses a few countries that FAO has not
-compiled (Japan, Sudan, Somalia and a few others), and has no fish and seafood items at all, which are therefore
-taken from FBS (assumption 9).
+Food keeps the calories and protein that FAO reports for it. All other stages are converted from tonnes.
+
+WHY THE SUPPLY UTILIZATION ACCOUNTS
+-----------------------------------
+FAO publishes two datasets that record these flows: the Food Balance Sheets (FBS), which start in 1961, and the
+Supply Utilization Accounts (SCL), which start in 2010. A separate step, `food_supply_chain_fbs`, builds a similar
+chain from FBS; nothing in this step depends on it.
+
+We use SCL here because it has two advantages:
+1. SCL reports individual products, while FBS reports groups. SCL has "Wheat", "Wheat and meslin flour" and "Bread"
+   as three separate items; FBS merges all three into one item, "Wheat and products".
+2. SCL includes by-products that FBS has no items for: oilseed cakes, brans and gluten feed. When oilseeds such as
+   soybeans are crushed for their oil, the solids left over are called cake. Cake is rich in protein, and it is one
+   of the main things farm animals eat. With cakes as items, the path from oilseeds to cake to animals shows up under
+   feed, where it belongs. In FBS, the crushed oilseeds count as processing, and the cake is never counted at all.
+
+The price is coverage:
+1. SCL starts in 2010.
+2. A few countries are missing, because FAO has not compiled them (Japan, Sudan, Somalia and a few others).
+3. SCL has no fish or seafood, so we take those from FBS (assumption 9).
 
 ASSUMPTIONS THAT GO INTO THE CALCULATION
------------------------------------------
+----------------------------------------
+Each assumption starts with a line on its scale: how much it changes the results.
+
 1. The balance identity.
    >> Scale: major. The identity is the backbone of every table.
 
    For every item, country and year, SCL reports, in tonnes:
        production + imports - exports - stock variation
          = food + feed + seed + processing + other uses + losses + tourist consumption + residuals.
-   Unlike FBS, SCL reports stock variation for every year, so nothing needs to be derived. The identity is checked
-   item by item, not assumed.
+
+   SCL reports stock variation for every year, so it does not need to be derived. The step checks the identity item
+   by item, rather than assuming it.
 
 2. Missing elements are treated as zero.
-   >> Scale: minor. Bookkeeping that changes no values; it only lets the identity be evaluated for every item.
+   >> Scale: minor. It changes no values; it only lets the identity be checked for every item.
 
-   When SCL does not report an element for an item, the step treats the missing element as zero, so that the
-   identity can be evaluated for every item. This is safe for two reasons. First, FAO builds each balance as a
-   whole, estimating every element of the item together, so an element missing from a compiled balance is almost
-   always one that does not apply to the item, not lost data. Second, if an element with a real value were missing
-   and treated as zero, the two sides of the identity would not close for that item, and the step fails when more
-   than 1% of the item balances do not close.
+   When SCL does not report an element for an item, we treat it as zero. This is safe for two reasons:
+   1. FAO builds each balance as a whole, so an element missing from a balance is almost always one that does not
+      apply to the item, not lost data.
+   2. If a real value were missing, the item's balance would not close. The step fails when more than 1% of the item
+      balances do not close.
 
-3. Densities.
-   >> Scale: major. These densities convert every stage except food into calories and protein.
+3. Densities: how tonnes become calories and protein.
+   >> Scale: major. These densities convert every stage except food.
 
-   SCL reports every element of the balance only in tonnes. The exception is food: for each item, country and year,
-   SCL also reports the food as calories (the element "Calories/Year") and as protein (the element "Proteins/Year").
-   To build the chain in calories and protein, every other element must be converted from tonnes, and the food
-   element is the only place the conversion factor can come from. The density of an item (kcal, or grams of
-   protein, per 100 g) is the food nutrient divided by the food tonnes. These are FAO's own factors: for all 416
-   SCL items with a food use, FAO's food nutrients are its 2024 nutrient conversion table times the item's
-   edible-portion coefficient, the share of the item that people eat
-   (https://www.fao.org/food-composition/tables-and-databases/detail/global-nutrient-conversion-table-for-fao-supply-utilization-accounts/en).
-   FAO uses one factor per item in every country and year (for example 334 kcal per 100 g for wheat grain, 348 for
-   maize, 64 for potatoes), except for nine items in a few countries where it uses a factor of its own (potatoes in
-   Peru at 91 kcal per 100 g; milled rice in Bangladesh at 360 instead of 349).
-   The density converts the item's other elements into the nutrient: production, imports, exports, stock
-   variation, seed, losses, other uses, processing, feed, tourist consumption and residuals. Food itself keeps the
-   nutrient FAO reports wherever FAO reports one, whatever density the item's other elements end up with under
-   assumptions 4 to 7. Keeping it also matters for fish taken from FBS (assumption 9), whose food tonnage is rounded
-   more coarsely than the figures used to derive its density. Where FAO reports no food nutrient, food is converted
-   like every other element: its food tonnes times the density. Any gap between the converted stages and food goes
-   to data adjustments (assumption 10).
-   Besides calories and protein, the chain is also built in a third unit, mass. The mass table involves no density
-   calculation: SCL already reports every element as a mass, and the step only changes the unit from tonnes to
+   SCL reports every element in tonnes. Food is the exception: it is also reported in calories (the element
+   "Calories/Year") and in protein ("Proteins/Year"). So food is the only place a conversion factor can come from.
+
+   The density of an item is its food nutrient divided by its food tonnes, in kcal (or grams of protein) per 100 g.
+   These are FAO's own factors. For all 416 SCL items with a food use, FAO's food nutrients are its 2024 nutrient
+   conversion table times the item's edible-portion coefficient, the share of the item that people eat:
+   https://www.fao.org/food-composition/tables-and-databases/detail/global-nutrient-conversion-table-for-fao-supply-utilization-accounts/en
+
+   FAO uses one factor per item in every country and year: for example, 334 kcal per 100 g for wheat grain, 348 for
+   maize and 64 for potatoes. Nine items have a factor of their own in a few countries, such as potatoes in Peru (91
+   kcal per 100 g) and milled rice in Bangladesh (360 instead of 349).
+
+   The density converts all of an item's other elements: production, imports, exports, stock variation, seed,
+   losses, other uses, processing, feed, tourist consumption and residuals.
+
+   Food itself keeps the nutrient FAO reports, whatever density the other elements end up with under assumptions 4
+   to 7. This also matters for fish (assumption 9), whose food tonnes FBS rounds to the nearest 1,000 tonnes. Where
+   FAO reports no food nutrient, food is converted like the other elements, as tonnes times density. Any gap between
+   the converted stages and food goes to data adjustments (assumption 10).
+
+   The mass table needs no densities: SCL already reports everything as mass, and we only convert tonnes to
    kilograms.
 
 4. One factor per country and item, read over all years.
-   >> Scale: minor. The country's own factor converts 49% of tonnage (fish by year another 1.5%); the item's
-   factor over all countries converts 22%, mostly grain that the big producers record no food for (maize, wheat
-   and soybeans in the United States, China or Brazil, which are eaten as flour and oil instead). The rest uses the
-   fixed and the product-implied densities of assumptions 6 and 7.
+   >> Scale: minor. A country's own factor converts 49% of tonnage, and fish by year (assumption 5) another 1.5%.
+   The item's factor over all countries converts 22%: mostly grain that big producers record no food for, because
+   people eat it as flour and oil (maize, wheat and soybeans in the United States, China and Brazil). The rest uses
+   the fixed and product-based values of assumptions 6 and 7.
 
-   Since FAO's factor for an item in a country is the same every year, the step reads it once: the country's food
-   nutrient divided by its food tonnes, both summed over all years. A country that eats less than 1,000 tonnes of
-   the item over all years gets the item's factor instead, the same ratio summed over all countries. This matters
-   for items that a country produces, trades or feeds to animals but hardly eats, where a few kilograms of food
-   would otherwise set the density of thousands of tonnes: the only food of pig meat that FAO records for Nicaragua
-   in 2010 to 2023 is 10 kg in 2022, whose reported calories give 100 kcal per 100 g against FAO's 237, and that
-   density would have converted the 8,000 to 15,000 tonnes of pig meat that Nicaragua produces each year.
-   Years whose food gives no usable ratio are left out of the sums: no food, no reported nutrient, or a ratio above
-   the physical maximum (920 kcal per 100 g, the energy of pure fat, or 100 g of protein per 100 g), which only
-   happens for sub-tonne quantities, where FAO's rounding breaks the ratio. A reported zero counts as zero, so an
-   item with none of the nutrient (sugar and oils have no protein) gets a factor of zero. Regions get no factors of
-   their own (assumption 12).
-   A check fails the step if FAO's factor for an item in a country changes over the years for more than 0.01% of
-   food. In 2010 to 2023 only Namibia's skim milk does (from 23 to 36 kcal per 100 g), on 0.0003% of food.
+   FAO's factor for an item in a country is the same every year, so we read it once: the country's food nutrient
+   divided by its food tonnes, both summed over all years. Three rules decide which years count and which factor
+   applies:
+   1. A year is left out if its food gives no usable ratio: no food, no reported nutrient, or a ratio above the
+      physical maximum (920 kcal per 100 g, the energy of pure fat, or 100 g of protein per 100 g). Ratios that high
+      only happen for quantities below a tonne, where FAO's rounding breaks the ratio.
+   2. A reported zero counts as zero, so an item with none of the nutrient gets a factor of zero (sugar and oils have
+      no protein).
+   3. A country that eats less than 1,000 tonnes of an item over all years gets the item's factor over all countries
+      instead.
+
+   The third rule matters for items that a country produces, trades or feeds to animals, but hardly eats. Without
+   it, a few kilograms of food would set the density of thousands of tonnes. For example, the only pig meat food that
+   FAO records for Nicaragua in 2010 to 2023 is 10 kg in 2022. Its reported calories give 100 kcal per 100 g, against
+   FAO's 237, and that density would have converted the 8,000 to 15,000 tonnes of pig meat that Nicaragua produces
+   each year.
+
+   Regions get no factors of their own (assumption 12).
+
+   A check stops the step if FAO's factor for an item in a country changes over the years for more than 0.01% of
+   food. In 2010 to 2023, only Namibia's skim milk does (from 23 to 36 kcal per 100 g), on 0.0003% of food.
 
 5. Fish keep a density for each year.
-   >> Scale: minor. Fish carry 1.5% of tonnage; for World, fish and fish oil are 46 of the 635 kcal per person per
-   day of animal products in 2023.
+   >> Scale: minor. Fish carry 1.5% of tonnage. For World in 2023, fish and fish oil are 46 of the 635 kcal per
+   person per day of animal products.
 
-   The FBS fish items are groups, such as pelagic fish or demersal fish, whose species, and so whose density,
-   change from year to year in a country (Iceland's pelagic fish runs from 77 to 86 kcal per 100 g). They therefore
-   keep the density of each year. A year with no usable food takes the country's factor over all years, whatever
-   the tonnage.
+   FBS reports fish as groups, such as pelagic fish or demersal fish. The species in a group change from year to
+   year, and so does the density: Iceland's pelagic fish ranges from 77 to 86 kcal per 100 g. So fish keep the
+   density of each year. A year with no usable food takes the country's factor over all years, whatever the tonnage.
 
-6. Items nobody eats get fixed densities.
+6. Items nobody eats get fixed densities, and items that are never food are left out.
    >> Scale: major for the stages "feed" and "processing_net". The fixed densities carry only 4.2% of tonnage, but
-   that tonnage is the oilseed cakes and brans whose presence is the main reason to use SCL at all.
+   that tonnage is the oilseed cakes and brans, the main reason to use SCL at all.
 
-   Items with little or no food use (cakes, brans, gluten feed, refining residues) need fixed densities. Where FAO's
-   2024 nutrient conversion table has the item, its values are used as published: the cereal brans, centrifugal
-   cane sugar, hemp oil and tallow. The oilseed cakes and gluten feed are not in that table. Each of them takes the
-   composition of one matching table of Feedipedia (the feed tables of INRAE, CIRAD, AFZ and FAO), converted to
-   energy with the formula FAO uses for its own table (4 kcal per gram of protein, 9 per gram of fat, 4 per gram of
-   available carbohydrate and 2 per gram of fibre), so that each cake is valued on the same basis as the crop and
-   the oil it comes from. Soybean cake, for example, gets 307 kcal and 43.4 g of protein per 100 g, from
-   Feedipedia's soybean meal of 44% to 46% protein, the type that includes the hulls, as SCL's crush yields imply.
-   Five entries have no single published composition and keep the values they had before: bran of pulses,
-   hempseed, two fat residues of oil refining, and the default for cakes not listed individually (which only
-   reaches "Cake, oilseeds nes"). Chemically modified fats use the factor of FAOSTAT's own food observation. The
-   values, their sources and the arithmetic are in `food_supply_chain_scl.items.yml`.
-   Listed items always use their fixed densities: a few hundred tonnes of soybean cake eaten somewhere should not
-   set the density of hundreds of millions of tonnes of cake. Where at least 1% of an item's supply is eaten as
-   food, the step checks that its inferred factor agrees with the fixed density within the rounding tolerance;
-   a disagreement stops the step instead of changing the factor.
-   Items that are never food in any form are left out of the chain altogether, in all three tables: castor, tung,
-   kapok, jojoba, wool grease, cocoa husks, and fuel ethanol (undenatured alcohol of 80% vol or higher). Ethanol is
-   the one that matters. The crops sent to distilleries leave the chain where FAO records them: as other uses of
-   the crop in Brazil and the United States (2,900 kcal per person per day of cane and molasses in Brazil in 2023),
-   or as processing of molasses in Pakistan and India. If ethanol counted as a processed product, those calories
-   would be credited back into processing (300 kcal in Brazil, making processing appear to create calories), then
-   counted a second time as ethanol exports and ethanol burned, and the fuel that importing countries buy would
-   enter their chain as imports (1,500 kcal in the Netherlands). Leaving ethanol out has two costs. Where FAO
-   records the distillery feedstock as processing, the calories turned into fuel appear as a processing loss rather
-   than under other uses. This is the case in 22 of the 49 countries producing more than 20 kcal per person per
-   day of ethanol in 2023 (molasses in Pakistan, India, Mauritius and South Africa; cereals in Belgium, Slovakia,
-   Moldova and others), and the amount exceeds 10% of food in Eswatini, Hungary, Paraguay, Slovakia, Tajikistan,
-   Belgium and Moldova. And Liberia, where FAO records about 6,300 tonnes a year of
-   this ethanol as food, loses 22 kcal of food (1%); it is the only country whose food changes.
+   Cakes, brans, gluten feed and oil refining residues are hardly eaten, so their food cannot give a density. We give
+   them fixed values instead, from three sources:
+   1. FAO's 2024 nutrient conversion table, where it has the item: the cereal brans, centrifugal cane sugar, hemp oil
+      and tallow.
+   2. Feedipedia, for the oilseed cakes and gluten feed that FAO's table does not cover. Feedipedia collects the feed
+      tables of INRAE, CIRAD, AFZ and FAO. Each item takes the composition of one matching table, converted to energy
+      with the formula FAO uses for its own table: 4 kcal per gram of protein, 9 per gram of fat, 4 per gram of
+      available carbohydrate and 2 per gram of fibre. That puts each cake on the same footing as the crop and the oil
+      it comes from. Soybean cake, for example, gets 307 kcal and 43.4 g of protein per 100 g, from Feedipedia's
+      soybean meal of 44% to 46% protein: the type that includes the hulls, as SCL's crushing yields imply.
+   3. The values used before, for five entries with no single published composition: bran of pulses, hempseed, two
+      fat residues of oil refining, and the default for cakes not listed individually (which only reaches "Cake,
+      oilseeds nes").
+   Chemically modified fats use the factor of FAO's own food figure. The values, their sources and the arithmetic
+   are in `food_supply_chain_scl.items.yml`.
 
-7. Crops that go to factories are valued by what the world's factories make of them.
+   Listed items always use their fixed densities, so that a few hundred tonnes of soybean cake eaten somewhere cannot
+   set the density of hundreds of millions of tonnes. Where at least 1% of an item's supply is eaten (wheat bran,
+   rice bran, tallow), a check confirms that FAO's food factor agrees with the fixed value; if it does not, the step
+   stops.
+
+   Some items are never food in any form, so we leave them out of all three tables: castor, tung, kapok, jojoba,
+   wool grease, cocoa husks, and fuel ethanol (undenatured alcohol of 80% or more).
+
+   Ethanol is the one that matters. The crops sent to distilleries already leave the chain where FAO records them:
+   as other uses of the crop in Brazil and the United States (2,900 kcal per person per day of cane and molasses in
+   Brazil in 2023), or as processing of molasses in Pakistan and India. Counting the ethanol itself as a processed
+   product would cause three errors:
+   1. Its calories would be credited back into processing, making processing appear to create calories (300 kcal per
+      person per day in Brazil).
+   2. The same calories would be counted again, as ethanol exports and ethanol burned.
+   3. The fuel that importing countries buy would enter their chain as imports (1,500 kcal per person per day in the
+      Netherlands).
+
+   Leaving ethanol out has two costs:
+   1. Where FAO records the distillery crops as processing, the calories turned into fuel appear as a processing loss
+      rather than under other uses. This happens in 22 of the 49 countries that produced more than 20 kcal per person
+      per day of ethanol in 2023 (molasses in Pakistan, India, Mauritius and South Africa; cereals in Belgium,
+      Slovakia, Moldova and others). The amount exceeds 10% of food in Eswatini, Hungary, Paraguay, Slovakia,
+      Tajikistan, Belgium and Moldova.
+   2. FAO records about 6,300 tonnes a year of this ethanol as food in Liberia, so Liberia loses 22 kcal of food (1%).
+      It is the only country whose food changes.
+
+7. Crops that go to factories are valued by what the world's factories make from them.
    >> Scale: major for the stages "crop_production" and "processing_net". These values carry 24% of tonnage: sugar
-   cane, sugar beet, paddy rice, palm kernels, oil palm fruit, rapeseed, cotton seed, sunflower seed, coconuts,
-   olives and maize germ.
+   cane, sugar beet, paddy rice, palm kernels, oil palm fruit, rapeseed, cotton seed, sunflower seed, coconuts, olives
+   and maize germ.
 
-   FAO's 2024 nutrient conversion table values each crop at the part of it that people eat, through the crop's
-   edible-portion coefficient: sunflower seed without the hull, sugar cane as the juice, coconuts as the meat and
-   water of a mix of young and mature nuts, paddy as husked rice, rapeseed as 38% oil and nothing else, cotton seed
-   as its kernels. That is the right value for the little that people eat as harvested, but almost the whole
-   harvest of these crops goes to factories, which process the whole crop and make recorded products, such as
-   cake, bran and molasses, from the parts FAO leaves out. At FAO's value, processing would appear to create
-   calories wherever these crops are crushed or milled (sunflower seed in Ukraine, coconuts in the Pacific
-   islands), while cotton seed, valued as kernels with no deduction for the hulls, would show large losses.
-   These eleven crops are therefore valued by their products: each year, the nutrient in all the products the
-   world's factories make from the crop, minus the nutrient of intermediate products processed further within the
-   same family (such as copra, pressed into coconut oil), divided by the tonnes of the crop the world processes.
-   That World ratio is applied to every country. Sugar cane and sugar beet share their products (raw and
-   refined sugar, molasses), so they get one value together, 59 kcal per 100 g in 2023. Their family ends at sugar
-   and molasses: raw sugar processed into refined sugar is netted out, but refined sugar sent to drinks or sweets
-   keeps its value as sugar. Mixed products (confectionery, flavored sugar and syrups) are left out of the density
-   calculation, so their other ingredients are not attributed to cane and beet; they remain in the food chain.
-   Rice ends at grain and bran products (bran, oil and cake). Husked rice milled into grain, and bran pressed into
-   oil and cake, are netted out. Grain sent to make broken rice, flour, starch or drinks keeps its value as grain;
-   those later products remain in the food chain but are excluded from the crop's density calculation.
-   Palm kernels are themselves made from oil palm fruit and then crushed for their oil; they are valued first,
-   so that the oil palm fruit family counts its kernels at their new value. The families, their products and their
-   order are in the items
-   file, based on FAO's commodity trees (FAO 2000, Technical Conversion Factors for Agricultural Commodities).
+   FAO's table values each crop at the part that people eat, through its edible-portion coefficient: sunflower seed
+   without its hull, sugar cane as its juice, coconuts as the meat and water of a mix of young and mature nuts, paddy
+   as husked rice, rapeseed as 38% oil and nothing else, and cotton seed as its kernels.
+
+   That is the right value for the little that people eat as harvested. But almost all of these crops go to
+   factories, which use the whole crop and make recorded products, such as cake, bran and molasses, from the parts
+   FAO leaves out. At FAO's values, processing would appear to create calories wherever these crops are crushed or
+   milled (sunflower seed in Ukraine, coconuts in the Pacific islands). And cotton seed, valued as kernels with
+   nothing for the hulls, would show large losses.
+
+   So we value these eleven crops by their products. Each year, a crop's value is the nutrient in everything the
+   world's factories make from it, divided by the tonnes of the crop that the world processes. That World value is
+   applied to every country. Four rules define what counts:
+   1. Products that are processed further within the family are netted out, so they are not counted twice: copra,
+      for example, pressed into coconut oil.
+   2. Each family ends at the first products made from the crop. What is made from those products later keeps its
+      own density elsewhere in the chain, but does not change the crop's value:
+      - Sugar cane and sugar beet end at sugar and molasses. Raw sugar refined into white sugar is netted out, but
+        refined sugar sent into drinks or sweets keeps its value as sugar. Sweets, syrups and flavored sugar are left
+        out, because their other ingredients do not come from cane or beet.
+      - Paddy rice ends at grain and bran products. Husked rice milled into grain, and bran pressed into oil and
+        cake, are netted out. Grain sent on to become broken rice, flour, starch or drinks keeps its value as grain.
+   3. Sugar cane and sugar beet share their products (raw and refined sugar, molasses), so they get one value
+      together: 59 kcal per 100 g in 2023.
+   4. Palm kernels are made from oil palm fruit and then crushed for their oil. So they are valued first, and the oil
+      palm fruit family then counts its kernels at their new value.
+
+   The families, their products and their order are in the items file. They follow FAO's commodity trees (FAO 2000,
+   Technical Conversion Factors for Agricultural Commodities).
 
 8. Roles: where each item's production enters the chain.
-   >> Scale: major. Together with the densities, the roles are the shape of the chain: they decide which stage
-   every tonne of production lands in.
+   >> Scale: major. Together with the densities, the roles shape the chain: they decide which stage each tonne of
+   production lands in.
 
    Adding up the production of all items would count the same calories many times, because sugar is made from sugar
-   cane and bread is made from wheat. To avoid double counting, each item has a role, and the role decides where the
-   production of the item goes. FAO's own item groups assign every SCL item to one of four groups ("Crops,
-   primary", "Livestock primary", "Crops processed" or "Livestock processed"), which map to the three roles:
-   - "crop": the production of crops is the stage "crop_production", the start of the chain.
-   - "animal": animals eat crops, and the stage "feed" subtracts the calories of the crops that are fed to animals.
-     The stage "animal_products" then adds the calories of the meat, milk and eggs that the animals produce.
-     The production of animal items is that second stage.
-   - "processed": factories turn crops into sugar, oils, flour and other products. The stage "processing_net" is
-     the "processing" of all items (what is sent into factories) minus the "production" of processed items (what
-     comes out of factories as food), so the stage counts only the calories that enter factories and do not come
-     back as food.
-   One override, listed in the items file: cotton seed is treated as a crop. Cotton seed comes out of ginning seed
-   cotton, but seed cotton is a fibre crop and not an SCL item, so cotton seed is the first point in SCL where the
-   calories of the cotton harvest exist.
+   cane and bread from wheat. So each item has a role, which decides where its production goes. FAO's own item
+   groups put every SCL item in one of four groups ("Crops, primary", "Livestock primary", "Crops processed" and
+   "Livestock processed"), which map to three roles:
+   1. "crop": crop production is the stage "crop_production", the start of the chain.
+   2. "animal": the stage "feed" subtracts the crops fed to animals, and the stage "animal_products" adds back the
+      meat, milk and eggs that the animals produce. The production of animal items is that second stage.
+   3. "processed": factories turn crops into sugar, oils, flour and other products. The stage "processing_net" is
+      what goes into factories (the "processing" of all items) minus what comes out (the "production" of processed
+      items). So it counts only the calories that enter factories and do not come back as food.
+
+   One override, in the items file: cotton seed counts as a crop. It comes from ginning seed cotton, but seed cotton
+   is a fibre crop and not an SCL item, so cotton seed is the first point where the calories of the cotton harvest
+   appear.
 
 9. Fish and seafood are taken from FBS.
-   >> Scale: minor for World (fish and fish oil production is 46 of the 635 kcal per person per day of animal
-   products in 2023, and 6 of the 43 g of protein); large for fishing nations.
+   >> Scale: minor for World (fish and fish oil are 46 of the 635 kcal per person per day of animal products in 2023,
+   and 6 of the 43 g of protein); large for fishing nations.
 
-   Fish and seafood are not in SCL. The FBS fish items are added, with their FBS densities under the same rules,
-   for the countries and years that SCL covers. FAO has carried most fish rows forward unchanged since 2019 to
-   2021 (identical in 2021, 2022 and 2023 for 186 of 198 countries), so the fish figures of recent years are older
-   than the rest of the chain.
+   SCL has no fish or seafood, so we add the fish items of FBS for the countries and years that SCL covers. They go
+   through the same rules as any other item, with two differences in how we read them:
+   1. Stock variation is derived from FBS's domestic supply: production, plus imports, minus exports, minus domestic
+      supply.
+   2. FBS rounds its tonnes to the nearest 1,000 tonnes, which is too coarse to give a density in small countries. So
+      the food tonnes used for fish densities come from FBS's food per person per year, multiplied by population.
+      Calories and protein come from FBS's per-person figures in the same way.
+
+   FAO has carried most fish rows forward unchanged since 2019 to 2021: they are identical in 2021, 2022 and 2023 for
+   186 of 198 countries. So the fish figures of recent years are older than the rest of the chain.
+
    Fish oil ("Fish, Body Oil" and "Fish, Liver Oil") has the role "animal", like the fish it comes from, for two
-   reasons. First, the FBS fish rows record no processing: the fish ground into meal and oil are inside the fish
-   row's production and leave inside its exports and feed, as live weight (Peru's pelagic row exports 5.2 million
-   tonnes against 0.5 million eaten: its fishmeal, counted as fish). With the role "processed", the oil would come
-   out of processing with no input, and processing would appear to create calories (Iceland, 2,993 kcal per
-   person per day). Second, the oil's energy is mostly energy the fish row does not carry: FAO prices fish at the
-   energy of their edible flesh, about 79 kcal per 100 g of live anchoveta in Peru, which is about what the meal
-   made from 100 g of anchoveta holds (77 kcal), while the oil holds another 40. Counting the oil as an animal
-   product adds those calories, and the oil's exports, feed and industrial use then leave the chain like any other
-   item's. Imported oil is in no fish row of the importer (Norway imports 987 kcal per person per day of oil
-   against 426 of pelagic fish), so it is a real inflow. Protein is unchanged, since the oils have none. The costs
-   of this choice are under KNOWN PROBLEMS.
+   reasons:
+   1. The FBS fish rows record no processing. The fish ground into meal and oil are inside the fish row's production,
+      and leave inside its exports and feed, as live weight: Peru's pelagic fish row exports 5.2 million tonnes
+      against 0.5 million eaten, because its fishmeal is counted as fish. With the role "processed", the oil would
+      come out of processing with no input, and processing would appear to create calories (2,993 kcal per person
+      per day in Iceland).
+   2. Most of the oil's energy is not in the fish row. FAO values fish at the energy of their edible flesh: about 79
+      kcal per 100 g of live anchoveta in Peru. That is about what the meal made from it holds (77 kcal), while the
+      oil holds another 40. Counting the oil as an animal product adds those calories, and its exports, feed and
+      industrial uses then leave the chain like any other item's. Imported oil is in no fish row of the importer
+      (Norway imports 987 kcal per person per day of oil, against 426 of pelagic fish), so it is a real inflow.
+   Protein does not change, since the oils have none. The costs of this choice are under KNOWN PROBLEMS.
 
-10. The gap between the preceding stages and food goes to data adjustments.
+10. The gap between the earlier stages and food goes to data adjustments.
     >> Scale: minor for World (10 kcal per person per day in 2023). Large where people eat coconuts: 14% of food in
-    Micronesia in 2023, 7% to 10% in Vanuatu, the Marshall Islands and Kiribati. Rounded fish tonnages can also have
-    a larger effect in small countries.
+    Micronesia in 2023, and 7% to 10% in Vanuatu, the Marshall Islands and Kiribati. Rounded fish tonnes can also
+    matter in small countries.
 
-    FAOSTAT rounds tonnages, so balances do not close exactly. Food keeps FAO's reported nutrients at their
-    reported precision (assumption 3); the other stages use the reported tonnages. This matters especially for
-    fish taken from FBS. The gap between those stages and food is included in "data_adjustments", together with
-    FAO's own "residuals" and, in energy and protein, any gain in processing (assumption 15), so that the chain
-    ends exactly on "food".
-    The gap also holds a difference of valuation, for the crops of assumption 7 that people eat as harvested as
-    well as process: mostly coconuts and sugar cane (chewed). The tonnes of these crops that people eat leave the
-    earlier stages at the crop's value under assumption 7 (140 kcal per 100 g of coconuts in 2023) but arrive in
-    food at FAO's value for the part people eat (85 kcal), and the difference lands in data adjustments. At World
-    it is about 10 kcal (coconuts 4.5, sugar cane 4.3); in Micronesia it is 363 kcal per person per day.
-    Keeping FAO's food total changes this adjustment without changing the other flows. The size of the gap is kept
-    in "balancing_difference" for quality control.
+    The stage "data_adjustments" holds everything that makes the chain end exactly on food:
+    1. FAO's own "residuals".
+    2. Rounding. FAO rounds tonnes, so the balances do not close exactly. Food keeps FAO's reported nutrients
+       (assumption 3), while the other stages use the rounded tonnes. This matters most for fish (assumption 9).
+    3. A difference of valuation, for the crops of assumption 7 that people both eat as harvested and process: mostly
+       coconuts and sugar cane, which people chew. The tonnes that people eat leave the earlier stages at the crop's
+       value under assumption 7 (140 kcal per 100 g of coconuts in 2023), but arrive in food at FAO's value for the
+       part people eat (85 kcal). For World, this is about 10 kcal per person per day (coconuts 4.5, sugar cane 4.3);
+       in Micronesia, it is 363 kcal.
+    4. In energy and protein, any gain in processing (assumption 15).
+    5. For World, the gap between imports and exports, and tourist consumption (assumption 11).
+    Points 2 and 3 together are also kept as "balancing_difference", for quality control.
 
 11. World exports are set equal to World imports, and World tourist consumption is set to zero.
-    >> Scale: minor, and only for World: the trade gap is a few percent of imports, and World tourist
+    >> Scale: minor, and only for World: the trade gap is a few percent of imports (at most 9%), and World tourist
     consumption is at most 0.21% of food.
 
-    The world as a whole does not trade with anyone, so World imports and World exports should be equal. In the
-    data they differ, because each is the sum of what individual countries report. World exports are set equal to
-    World imports, which FAO considers the better-documented side (FAO 2025, Food Balance Sheets and Supply
-    Utilization Accounts Resource Handbook, section 6.1), and the difference goes to "data_adjustments". Other
-    regions do trade with the rest of the world and are left as they are.
+    The world as a whole trades with no one, so World imports and exports should be equal. In the data they differ,
+    because each is the sum of what countries report. We set World exports equal to World imports, which FAO
+    considers the better-documented side (FAO 2025, Food Balance Sheets and Supply Utilization Accounts Resource
+    Handbook, section 6.1), and the difference goes to "data_adjustments". Other regions do trade with the rest of
+    the world, so we leave them as they are.
 
-    World tourist consumption has the same problem as World trade. "tourist_consumption" is food eaten in a
-    country by people who live in another country. Every visitor lives in some country, so the world as a whole
-    has no visitors, and World tourist consumption should be zero. In the data it is not zero: from 2010 (the
-    first year FAO reports tourist consumption) it is 1 to 6 kcal per person per day, which is 0.05% to 0.21% of
-    World food. World tourist consumption is set to zero, and the removed amount goes to "data_adjustments".
-    Countries and other regions keep their tourist consumption, because for them food eaten by visitors is real.
+    Tourist consumption is food eaten in a country by people who live in another country. Every visitor lives in some
+    country, so the world as a whole has no visitors, and World tourist consumption should be zero. In the data it is
+    1 to 6 kcal per person per day from 2010 (the first year FAO reports it), or 0.05% to 0.21% of World food. We set
+    it to zero, and the difference goes to "data_adjustments". Countries and other regions keep their tourist
+    consumption, because for them it is real.
 
-12. Regions.
+12. Regions are the sums of their countries.
     >> Scale: major for the 10 region aggregates, which only exist through this assumption; no country's values
     change.
 
-    FAO's own regional aggregates are dropped, and OWID regions (World, continents, income groups, the European
-    Union) are built from the member countries that have an SCL balance that year: each stage of a region, in each
-    of the three units, is the sum of that stage over those countries (fish included), and the region's population
-    is the sum of those same countries' population. Regions have no densities of their own: each country's tonnes
-    are converted with that country's densities, and the region adds up the results. A country either has a full
-    balance or none at all, so the stages and the population always cover the same countries.
+    We drop FAO's own regional aggregates, and build OWID regions (World, continents, income groups and the European
+    Union) from the member countries that have an SCL balance that year. Each stage of a region, in each unit, is the
+    sum of that stage over those countries (fish included). The region's population is the sum of the same
+    countries' populations.
 
-13. Low-coverage region-years are dropped, and "Low-income countries" is left out.
+    Regions have no densities of their own: each country's tonnes are converted with that country's densities, and
+    the region adds up the results. A country has either a full balance or none, so the stages and the population
+    always cover the same countries.
+
+13. Region-years with low coverage are dropped, and "Low-income countries" is left out.
     >> Scale: minor. It removes a few region-years and one region; no country's values change.
 
-    A region-year is dropped when the countries with a balance hold less than 80% of the region's population, so
-    that a value labeled "Africa" is never built from a small fraction of Africa. "Low-income countries" is left
-    out altogether: SCL never covers more than 80% of its population (Japan, Sudan, Somalia and a few others are
-    not compiled).
+    We drop a region-year when the countries with a balance hold less than 80% of the region's population, so that a
+    value labeled "Africa" is never built from a small part of Africa. "Low-income countries" is left out altogether:
+    SCL never covers more than 80% of its population, because FAO has not compiled Sudan, Somalia and a few others.
 
-14. All stages are divided by that population and by 365 days, to give values per person per day.
-    >> Scale: minor. A choice of unit, not of substance; it rescales all values equally.
+14. Values are per person per day.
+    >> Scale: minor. A choice of unit; it rescales all values equally.
 
-15. Processing never adds energy or protein: where it would, the gain goes to data adjustments.
-    >> Scale: major for a few countries, nil for World. In 2023, 47 of 176 countries would otherwise show
-    processing adding energy, 6 of them by more than 10% of food (Guyana 67%, Uruguay 15%, Ukraine 14%, the
-    Netherlands 13%, Honduras 12%, Papua New Guinea 10%); in protein, 33 countries, 4 above 10% (Guyana, New Zealand,
-    Bolivia, Latvia). World shows a loss in both, so it is unchanged.
+    All stages are divided by the population of assumption 12 and by 365 days.
 
-    A mill, a crusher or a brewery cannot put more energy or protein into its products than came in with the
-    inputs. Where the converted products exceed the converted inputs, the excess is a failure of the data or of
-    the densities (the causes are under KNOWN PROBLEMS), not a feature of the country's food chain, and a positive
-    processing bar would tell readers that mills make food. The gain is therefore moved to "data_adjustments",
-    whose meaning is exactly that (assumption 10), and "processing_net" shows zero. Only the gains move: the same
-    causes also inflate or shrink the real losses of other countries, and those stay in processing, which remains
-    the least certain stage. The rule is applied to each country and region in each year, after the regions are
-    summed from their countries, so a region with a gain (Oceania in every year in energy, and South America,
-    Europe, North America and the European Union in one year each; Oceania in 2012 in protein) is treated like a country, and a region's processing is no longer the sum of its members';
-    processing plus data adjustments still is.
-    The mass table is left alone: in tonnes a gain in processing can be real, because breweries and bottlers add
-    water (in Namibia, 22 thousand tonnes of malt become 174 thousand tonnes of beer), so processing there is the
-    net change in weight, in either direction.
+15. Processing never adds energy or protein; where it would, the gain goes to data adjustments.
+    >> Scale: major for a few countries, nil for World. In 2023, 46 of 176 countries would otherwise show processing
+    adding energy, 6 of them by more than 10% of food: Guyana 64%, Ukraine 14%, Uruguay 14%, the Netherlands 13%,
+    Honduras 12% and Papua New Guinea 10%. In protein, 31 countries would, 4 of them by more than 10% (Guyana, New
+    Zealand, Bolivia and Latvia). World shows a loss in both, so it is unchanged.
+
+    A mill, a crusher or a brewery cannot put more energy or protein into its products than came in. Where the
+    converted products exceed the converted inputs, the excess is a failure of the data or of the densities (the
+    causes are under KNOWN PROBLEMS), not a feature of the country's food chain. A positive processing bar would tell
+    readers that mills make food.
+
+    So we move the gain to "data_adjustments", which exists for exactly this (assumption 10), and "processing_net"
+    shows zero. Only gains move. The same causes also inflate or shrink the real losses of other countries, and
+    those stay in processing, which remains the least certain stage.
+
+    The rule applies to each country and region in each year, after the regions are summed from their countries. So
+    a region with a gain is treated like a country: Oceania in every year in energy; South America, Europe, North
+    America and the European Union in one year each; and Oceania in 2012 in protein. A region's processing is then
+    no longer the sum of its countries', but processing plus data adjustments still is.
+
+    The mass table is left alone. In tonnes, a gain in processing can be real, because breweries and bottlers add
+    water: in Namibia, 22 thousand tonnes of malt become 174 thousand tonnes of beer. So processing there is the net
+    change in weight, in either direction.
 
 KNOWN PROBLEMS, NOT YET RESOLVED
 --------------------------------
-- Processing would create calories in some countries. The gains are moved to data adjustments; their causes remain.
-  >> Scale: major for a few countries: in 2023, the gains moved by assumption 15 exceed 10% of food in six
-  countries in energy (Guyana 67%, Uruguay, Ukraine, the Netherlands, Honduras, Papua New Guinea) and four in
-  protein (Guyana, New Zealand, Bolivia, Latvia); 30 of 176 countries have a gain above 1% of food in energy and 21
-  in protein (21% of all country-years have some gain in energy, 14% in protein). Small for World, where
-  processing loses 97 kcal per person per day, 1.6% of crop production. The FBS sibling has the same symptom with
-  a different cause.
+1. Processing would create calories in some countries. We move the gains to data adjustments, but their causes
+   remain.
+   >> Scale: major for a few countries. In 2023, the gains moved by assumption 15 exceed 10% of food in six countries
+   in energy (Guyana 64%, Ukraine, Uruguay, the Netherlands, Honduras and Papua New Guinea) and in four in protein
+   (Guyana, New Zealand, Bolivia and Latvia). 29 of 176 countries have a gain above 1% of food in energy, and 20 in
+   protein; 20% of all country-years have some gain in energy, and 14% in protein. Small for World, where processing
+   loses 106 kcal per person per day, 1.8% of crop production.
 
-  In the normal case "processing_net" is positive: the converted processing inputs exceed the converted product
-  outputs. The three largest causes are handled: ethanol credited back into processing with no input (Brazil, the
-  United States; assumption 6), fish oil (assumption 9), and crops valued at the part that people eat
-  (assumption 7; sunflower seed in Ukraine, coconuts in the Marshall Islands and Kiribati). Assumption 15 keeps the
-  remaining gains out of the processing bar but not out of the chart: they appear in data adjustments as calories
-  entering the chain, more than half of food in Guyana, and the same causes also distort the losses that stay in
-  processing elsewhere. The remaining gains have four causes:
-  - FAO's own quantities are inconsistent: Guyana's rice bran is 30% of the paddy it mills (Guyana's rice creates
-    about 2,250 kcal per person per day in 2023), and in 2022 Bolivia's soybean cake weighs more than the beans
-    crushed. One such error is patched in `food_supply_chain_scl.corrections.yml`: since 2021 FAO imputes Denmark's
-    molasses production as equal to its whole beet harvest, which made processing create about 2,900 kcal per
-    person per day there, and about 40 in the European Union, and inflated feed by the same amounts.
-  - Factories that make more from a crop than the world average of assumption 7 (next problem): oil palm in
-    Honduras and Papua New Guinea, sunflower seed in Ukraine, sugar beet in Ukraine, the Netherlands and Germany
-    (beet holds more sugar than cane, and the two share one value), rice in Uruguay.
-  - FAO's nutrient factor for a raw item outside assumption 7 is below what its products contain: raw milk against
-    its powders and casein (New Zealand in protein, Uruguay in energy).
-  - Products with no recorded input: hydrogenated oils, margarine and fat preparations (Netherlands), oilseed
-    flours (Bolivia, in protein).
-  Recomputing the cake densities from compositions (assumption 6) closed the soybean family, which at the previous
-  value of 261 kcal per 100 g of soybean cake lost 9% at World and hid gains of other items: with that loss gone,
-  Brazil (beef fats, margarine) and China show energy gains, while the protein gains of Brazil and China
-  from soybean cake disappear.
+   Normally, "processing_net" is positive: more goes into factories than comes out. We handle the three largest
+   causes of gains:
+   1. Ethanol credited back into processing with no input (Brazil, the United States; assumption 6).
+   2. Fish oil (assumption 9).
+   3. Crops valued at the part that people eat (assumption 7; sunflower seed in Ukraine, coconuts in the Marshall
+      Islands and Kiribati).
 
-- The values of assumption 7 are World ratios, applied to every country.
-  >> Scale: minor for World by construction; major for a few countries whose factories differ from the world
-  average.
+   Assumption 15 keeps the remaining gains out of the processing bar, but not out of the chart: they appear in data
+   adjustments as calories entering the chain (more than half of food in Guyana). The same causes also distort the
+   losses that stay in processing elsewhere. The remaining gains have four causes:
+   1. FAO's own quantities are inconsistent. Guyana's rice bran is 30% of the paddy it mills, so Guyana's rice
+      creates about 2,400 kcal per person per day in 2023. In 2022, Bolivia's soybean cake weighs more than the
+      beans crushed. We correct one such error, in `food_supply_chain_scl.corrections.yml`: since 2021, FAO imputes
+      Denmark's molasses production as equal to its whole beet harvest. That made processing create about 2,900 kcal
+      per person per day in Denmark, and about 40 in the European Union, and inflated feed by the same amounts.
+   2. Factories that make more from a crop than the world average of assumption 7 (see problem 2): oil palm in
+      Honduras and Papua New Guinea, sunflower seed in Ukraine, rice in Uruguay, and sugar beet in Ukraine, the
+      Netherlands and Germany (beet holds more sugar than cane, and the two share one value).
+   3. FAO's factor for a raw item outside assumption 7 is below what its products contain: raw milk against its
+      powders and casein (New Zealand in protein, Uruguay in energy).
+   4. Products with no recorded input: hydrogenated oils, margarine and fat preparations (the Netherlands), and
+      oilseed flours (Bolivia, in protein).
 
-  A country whose factories make more from a crop than the world average shows a processing gain (Ukraine's
-  sunflower mills make 535 kcal per 100 g of seed against the World value of 507, 258 kcal per person per day in
-  2023; oil palm in Honduras, 290 against 214), and one whose factories make less shows the difference as a
-  processing loss (coconuts in Tonga and Micronesia, 109 and 97 kcal of copra and oil per 100 g of nuts against
-  140, about 500 kcal per person per day; oil palm in Malaysia, 205 against 214, 670 kcal). Both mix real
-  differences between factories with differences in what FAO records.
-  Ukraine's chart is also dominated by FAO's own residuals, which are not ours to fix: 818 kcal per person per day
-  in 2023 and about 3,200 in 2020, when FAO records 12.9 million tonnes of maize, sunflower seed and wheat as used
-  without a matching supply.
+   Recomputing the cake densities from their compositions (assumption 6) closed the soybean family. At the previous
+   value of 261 kcal per 100 g of soybean cake, that family lost 9% at World, which hid gains in other items. With
+   that loss gone, Brazil (beef fats, margarine) and China show energy gains, while the protein gains of Brazil and
+   China from soybean cake disappear.
 
-- The stage "feed" only counts feed that passes through the balance.
-  >> Scale: "animal_products" exceeds "feed" by more than 1 kcal in 14% of country-years in energy and by more than
-  0.01 g in 24% in protein. World still has more recorded feed than animal output (2,047 against 635 kcal in 2023,
-  and 103 against 43 g of protein).
+2. The values of assumption 7 are World averages, applied to every country.
+   >> Scale: minor for World by construction; major for a few countries whose factories differ from the world
+   average.
 
-  Grass, pasture and forage are not SCL items, so everything grazing animals eat from pasture enters the chain
-  nowhere, and wild-caught fish count as animal products with no feed at all. For fishing and grazing countries
-  (Iceland, Mongolia, several island states), "animal_products" can therefore exceed "feed". The balance alone
-  does not measure how much of a particular country's gap these omitted inputs explain.
+   A country whose factories make more from a crop than the world average shows a processing gain. Ukraine's
+   sunflower mills make 535 kcal per 100 g of seed, against the World value of 507: a gain of 258 kcal per person per
+   day in 2023. In Honduras, oil palm mills make 290 against 214.
 
-- Fish oil is partly counted twice: in calories where the food fish are fatty, in tonnes everywhere.
-  >> Scale: about 30% of the world's fish-oil energy, 1.3 of 4.1 kcal per person per day for World in 2018; in
-  tonnes, 1.6% to 5% of the animal products of the oil producers. Protein is unaffected.
+   A country whose factories make less shows the difference as a processing loss. In Tonga and Micronesia, coconuts
+   yield 109 and 97 kcal of copra and oil per 100 g of nuts, against 140: a loss of about 500 kcal per person per day.
+   In Malaysia, oil palm yields 205 against 214: a loss of 670 kcal.
 
-  The fish row carries about the meal's energy only where the food fish are lean (Peru 79 kcal per 100 g live
-  weight, Chile 83, Morocco 76). Where people eat fatty fish, the row's density already exceeds the meal's energy,
-  and the oil pressed from the reduced fish is counted a second time: all of Denmark's 285 kcal per person per day
-  of oil production in 2018, half of Norway's 279, and nearly all of the small production of Latvia, Japan, Spain,
-  Sweden and Ireland. In tonnes the oil is inside the fish tonnes in every producer, so the mass table counts it
-  twice: 1.6% of Peru's animal products, 3% of Chile's, 5% of Mauritania's. The alternatives were weighed and
-  rejected: leaving the oil out would miss about 70% of its energy (20% of Peru's animal products) and the oil that
-  importers buy; counting it in calories but not in tonnes would be exact but is a per-table exception.
-  FAO's oil figures exceed what the fish rows can yield in Iceland (13% of pelagic production), Denmark (17%) and
-  Mauritania (11%), against about 5% for whole fish; those are data problems, not method problems.
-  Tallow and lard are not the same case: SCL records their unrendered-fat input as processing in most country-years,
-  so they keep the role "processed"; their remaining processing gains come from FAO's factors (660 kcal per 100 g
-  for unrendered fat against 891 for tallow).
+   Both mix real differences between factories with differences in what FAO records.
+
+   Ukraine's chart is also dominated by FAO's own residuals, which are not ours to fix: 818 kcal per person per day in
+   2023, and about 3,200 in 2020, when FAO records 12.9 million tonnes of maize, sunflower seed and wheat as used
+   without a matching supply.
+
+3. The stage "feed" only counts feed that passes through the balance.
+   >> Scale: "animal_products" exceeds "feed" by more than 1 kcal in 14% of country-years in energy, and by more
+   than 0.01 g in 24% in protein. World still has more recorded feed than animal output: 2,047 against 635 kcal in
+   2023, and 103 against 43 g of protein.
+
+   Grass, pasture and forage are not SCL items, so everything that grazing animals eat from pasture is missing from
+   the chain. Wild-caught fish count as animal products with no feed at all. So in fishing and grazing countries
+   (Iceland, Mongolia and several island states), "animal_products" can exceed "feed". The balance alone cannot tell
+   how much of a country's gap these missing inputs explain.
+
+4. Fish oil is partly counted twice: in calories where the food fish are fatty, and in tonnes everywhere.
+   >> Scale: about 30% of the world's fish-oil energy, 1.3 of 4.1 kcal per person per day for World in 2018. In
+   tonnes, 1.6% to 5% of the animal products of the oil producers. Protein is unaffected.
+
+   A fish row carries about the energy of the fishmeal only where the food fish are lean (79 kcal per 100 g of live
+   weight in Peru, 83 in Chile, 76 in Morocco). Where people eat fatty fish, the row's density already exceeds the
+   meal's energy, so the oil pressed from the fish is counted a second time. That covers all of Denmark's 285 kcal
+   per person per day of oil production in 2018, half of Norway's 279, and nearly all of the small production of
+   Latvia, Japan, Spain, Sweden and Ireland.
+
+   In tonnes, the oil is inside the fish tonnes in every producer, so the mass table counts it twice: 1.6% of Peru's
+   animal products, 3% of Chile's and 5% of Mauritania's.
+
+   We weighed two alternatives and rejected both:
+   1. Leaving the oil out would miss about 70% of its energy (20% of Peru's animal products), and the oil that
+      importers buy.
+   2. Counting it in calories but not in tonnes would be exact, but would make one table an exception.
+
+   FAO's oil figures exceed what the fish rows can yield in Iceland (13% of pelagic production), Denmark (17%) and
+   Mauritania (11%), against about 5% for whole fish. Those are data problems, not method problems.
+
+   Tallow and lard are a different case. SCL records their unrendered fat as processing in most country-years, so
+   they keep the role "processed". Their remaining processing gains come from FAO's factors: 660 kcal per 100 g for
+   unrendered fat, against 891 for tallow.
 """
 
 import numpy as np
