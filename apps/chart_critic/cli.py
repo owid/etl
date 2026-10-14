@@ -16,16 +16,15 @@ etl chart-critic --top 50 --output /tmp/critic.html
 etl chart-critic --sample 100 --cheap --no-image --dry-run
 ```
 
-Roughly $0.03 per chart with the render attached on the default model at the default three passes,
-most of it the model's thinking tokens (billed as output), so a pass over every published chart
-is around a hundred dollars. The binding constraint is not the bill — it is how many
+Roughly $0.04 per chart with the render attached on the default model at the default three passes,
+with prompt caching across the passes, so a pass over every published chart is under two hundred
+dollars. The binding constraint is not the bill — it is how many
 findings a human will read, which is why an empty result is a first-class outcome here.
 """
 
 from __future__ import annotations
 
 import concurrent.futures as cf
-import datetime as dt
 import json
 import re
 import time
@@ -373,21 +372,6 @@ def _review_one(
     return result
 
 
-def _review_with_shadow(
-    shadow_model: str | None, slug: str, pageviews: int, model: str, **kwargs: Any
-) -> tuple[dict[str, Any], dict[str, Any] | None]:
-    """The chart's review, and the same review by ``shadow_model`` when one is given.
-
-    Sequential per chart, so the shadow reads the bundle the primary review has just fetched rather
-    than fetching it again — with ``--changed-since`` the primary's TTL is zero, so the shadow is
-    given an hour. A shadow failure is recorded in its own result and never touches the primary's.
-    """
-    primary = _review_one(slug, pageviews, model, **kwargs)
-    if not shadow_model or primary["status"] != "ok":
-        return primary, None
-    return primary, _review_one(slug, pageviews, shadow_model, **{**kwargs, "ttl_hours": 1.0})
-
-
 @click.command(name="chart-critic", cls=click.RichCommand, help=__doc__)
 @click.option("--slugs", type=str, default=None, help="Comma-separated chart slugs to review.")
 @click.option(
@@ -403,7 +387,7 @@ def _review_with_shadow(
 )
 @click.option("--seed", type=int, default=0, show_default=True, help="Sampling seed, so a run is reproducible.")
 @click.option("--model", type=str, default=DEFAULT_MODEL, show_default=True, help="Model to review with.")
-@click.option("--cheap", is_flag=True, help=f"Use {CHEAP_MODEL} instead — roughly 15x cheaper.")
+@click.option("--cheap", is_flag=True, help=f"Use {CHEAP_MODEL} instead — an order of magnitude cheaper.")
 @click.option("--no-image", is_flag=True, help="Send metadata and numbers only, without the chart render.")
 @click.option(
     "--repeat",
@@ -474,21 +458,6 @@ def _review_with_shadow(
     default="",
     help="Review a specific view of every requested chart, e.g. 'country=~COM&time=2014..latest'.",
 )
-@click.option(
-    "--shadow-model",
-    type=str,
-    default=None,
-    help=(
-        "Also review every chart with this model, for comparison. Its findings go to --shadow-out "
-        "only: never into the digest, the report or the posted state."
-    ),
-)
-@click.option(
-    "--shadow-out",
-    type=click.Path(dir_okay=False, path_type=Path),
-    default=None,
-    help="With --shadow-model: write both models' results here, side by side, as JSON.",
-)
 @click.option("--workers", type=int, default=6, show_default=True, help="Charts reviewed in parallel.")
 @click.option(
     "--output", type=click.Path(dir_okay=False, path_type=Path), default=None, help="Write an HTML report here."
@@ -539,8 +508,6 @@ def cli(
     include_data_updates: bool,
     digest_out: Path | None,
     post: bool,
-    shadow_model: str | None,
-    shadow_out: Path | None,
 ) -> None:
     if clear_cache:
         removed, freed = cache.clear()
@@ -549,8 +516,6 @@ def cli(
 
     if cheap:
         model = CHEAP_MODEL
-    if bool(shadow_model) != bool(shadow_out):
-        raise click.ClickException("--shadow-model and --shadow-out go together")
 
     cache_ttl = _resolve_cache_ttl(cache_ttl, changed_since)
 
@@ -583,12 +548,10 @@ def cli(
         )
 
     results: list[dict[str, Any]] = []
-    shadow_results: list[dict[str, Any]] = []
     with cf.ThreadPoolExecutor(workers) as ex:
         futures = [
             ex.submit(
-                _review_with_shadow,
-                shadow_model,
+                _review_one,
                 slug,
                 chart_pageviews,
                 model,
@@ -603,10 +566,8 @@ def cli(
             for slug, chart_pageviews, target_params in targets
         ]
         for f in cf.as_completed(futures):
-            r, shadow = f.result()
+            r = f.result()
             results.append(r)
-            if shadow:
-                shadow_results.append(shadow)
             if r["issues"]:
                 view = f" [dim]?{r['params']}[/dim]" if r.get("params") else ""
                 console.print(f"  [red]●[/red] {r['slug']}{view} — {len(r['issues'])} issue(s)")
@@ -629,26 +590,6 @@ def cli(
     if json_out:
         json_out.write_text(json.dumps(results, indent=1))
         console.print(f"raw results → {json_out}")
-    if shadow_out:
-        shadow_out.parent.mkdir(parents=True, exist_ok=True)
-        shadow_out.write_text(
-            json.dumps(
-                {
-                    "date": dt.date.today().isoformat(),
-                    "primary_model": model,
-                    "shadow_model": shadow_model,
-                    "primary": results,
-                    "shadow": shadow_results,
-                },
-                indent=1,
-            )
-        )
-        shadow_cost = sum(r["cost"] for r in shadow_results)
-        shadow_issues = sum(len(r["issues"]) for r in shadow_results)
-        console.print(
-            f"shadow: {shadow_model} reviewed {len(shadow_results)} charts, {shadow_issues} finding(s), "
-            f"${shadow_cost:.2f} → {shadow_out}"
-        )
     if output:
         report.write(results, output, model=model)
         console.print(f"report → {output}")

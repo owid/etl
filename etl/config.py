@@ -316,7 +316,7 @@ OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
 ANTHROPIC_API_KEY_INSPECTOR = env.get("ANTHROPIC_API_KEY_INSPECTOR") or env.get("ANTHROPIC_API_KEY")
 ANTHROPIC_API_KEY_CHART_CRITIC = env.get("ANTHROPIC_API_KEY_CHART_CRITIC") or env.get("ANTHROPIC_API_KEY")
 # NOTE: Nothing imports this constant, but the env var is read straight from the environment by
-# pydantic-ai's Google provider (chart-critic defaults to a Gemini model) and by scripts/vocabulary.
+# pydantic-ai's Google provider (chart-critic's --cheap model) and by scripts/vocabulary.
 GOOGLE_API_KEY = env.get("GOOGLE_API_KEY", None)
 
 OWIDBOT_ACCESS_TOKEN = env.get("OWIDBOT_ACCESS_TOKEN", None)

@@ -46,9 +46,12 @@ from pydantic_ai import Agent, BinaryContent
 
 from apps.chart_critic.bundle import Bundle
 
-# Tested defaults. The flash tier is enough: on the SDG 16.2.2 case both flash and flash-lite
-# identified the swap from the render alone, and flash-lite did it for ~$0.0002 a call.
-DEFAULT_MODEL = "google:gemini-3.8-flash"
+# Sonnet 5.5 at effort high (see ANTHROPIC_SETTINGS) replaced gemini-3.8-flash as the default.
+# On charts with known answers it caught 8 of 9 passes on real findings against Gemini's 6, never
+# raised a false positive Gemini raised twice, and stayed quiet on clean charts. It costs about
+# $0.04 a chart with caching against Gemini's $0.035. Haiku 5.5 caught none, with or without the
+# render, so the small Claude tier is not a cheap substitute. The cheap tier stays on Gemini.
+DEFAULT_MODEL = "anthropic:claude-sonnet-5-5"
 CHEAP_MODEL = "google:gemini-3.1-flash-lite"
 
 # Fallback prices in $ per million tokens (input, output), from the providers' published rates.
@@ -68,8 +71,8 @@ ANTHROPIC_CACHE_READ, ANTHROPIC_CACHE_WRITE = 0.1, 1.25
 # - Thinking has to be switched on. pydantic-ai returns structured output through a forced tool
 #   call, Anthropic allows no thinking alongside a forced tool, and so without this the model
 #   answers without thinking at all — about 40 output tokens a pass, and no findings.
-# - Effort "high": against Gemini on charts with known answers, Sonnet 5.5 at high was the setting
-#   that raised nothing on clean charts; at low and medium it flagged them nearly every pass.
+# - Effort "high": on charts with known answers, it was the Sonnet 5.5 setting that raised nothing
+#   on clean charts; at low and medium it flagged them nearly every pass.
 # - Caching the user turn lets passes 2 and 3 read the prompt from cache, about a third off the
 #   bill. Only the input is cached; each pass still generates its own answer, so the repeat
 #   passes keep their value.
