@@ -656,13 +656,30 @@ def _post_digest(messages: list[digest.DigestMessage]) -> None:
             time.sleep(POST_INTERVAL_SECONDS)
         # Slack keys a thread on its parent's own timestamp, so a reply needs the response of the
         # message just posted — there is nothing to thread against before it exists.
-        parent = send_slack_message(digest.SLACK_CHANNEL, message.text)
+        parent = _post_blocks(send_slack_message, message)
         posted += 1
         for reply in message.thread:
             time.sleep(POST_INTERVAL_SECONDS)
             send_slack_message(digest.SLACK_CHANNEL, reply, thread_ts=parent["ts"])
             posted += 1
     console.print(f"[green]posted {posted} message(s) to {digest.SLACK_CHANNEL}[/green]")
+
+
+def _post_blocks(send_slack_message: Any, message: digest.DigestMessage) -> Any:
+    """Post a message in its block layout, falling back to it without the chart image.
+
+    Slack fetches an image block's URL itself and rejects the whole message when it can't, and the
+    thumbnail endpoint renders on demand, so a slow render must cost the picture, not the post.
+    """
+    from slack_sdk.errors import SlackApiError
+
+    if not message.blocks:
+        return send_slack_message(digest.SLACK_CHANNEL, message.text)
+    try:
+        return send_slack_message(digest.SLACK_CHANNEL, message.text, blocks=message.blocks)
+    except SlackApiError:
+        blocks = [b for b in message.blocks if b["type"] != "image"]
+        return send_slack_message(digest.SLACK_CHANNEL, message.text, blocks=blocks)
 
 
 def _print_summary(results: list[dict[str, Any]], model: str) -> bool:

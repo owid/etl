@@ -86,10 +86,15 @@ THREAD_SEPARATOR = "\n\n----- in thread -----\n\n"
 
 @dataclass
 class DigestMessage:
-    """One Slack message, with whatever is posted underneath it in its own thread."""
+    """One Slack message, with whatever is posted underneath it in its own thread.
+
+    ``text`` is what the digest file records and what Slack shows in a notification; ``blocks``,
+    when set, is how the message is laid out in the channel.
+    """
 
     text: str
     thread: list[str] = field(default_factory=list)
+    blocks: list[dict[str, Any]] | None = None
 
 
 def render(messages: list[DigestMessage]) -> str:
@@ -428,7 +433,7 @@ def _chart_title(result: dict[str, Any]) -> str:
 
 
 def _thumbnail(url: str) -> str:
-    """The chart's own render, as a bare URL for Slack to unfurl into the message.
+    """The chart's own render, as an image in the message.
 
     The one thing the digest lacked that every other #chart-reviews post has. A claim about a
     chart is adjudicated by looking at the chart, and a link alone makes everybody click.
@@ -476,9 +481,9 @@ def _format_finding(
     facts: dict[str, dict[str, Any]] | None = None,
     model: str = "",
 ) -> DigestMessage:
-    """One finding as its own message, in the shape the channel already uses: the chart's title,
-    the chart, a row of actions, the question being asked and who is being asked it, the claim,
-    the facts in a blockquote, and the tick that closes it — with the evidence in the thread.
+    """One finding as its own message, in the shape #analytics-bites uses: the chart's title as
+    its live link, the question and who is being asked it, the claim, the chart, and a muted
+    footer with the facts, the edit link and the tick — with the evidence in the thread.
 
     Self-contained on purpose. It is read next to the lead message but it is also what someone
     quotes, forwards or replies to on its own, so it carries the link, the edit action and — the
@@ -486,29 +491,37 @@ def _format_finding(
     """
     chart = (facts or {}).get(result["slug"]) or {}
     url = issue.get("url") or f"{GRAPHER_URL}/{result['slug']}"
-    lines = [_chart_title(result), _thumbnail(url)]
-
-    # A multi-dim view has no chart id, so it gets no edit link — there is no single chart to
-    # edit. The live link is always there, and is what the tick is taken against.
-    actions = [f":chart_with_upwards_trend:  <{url}|View live chart>"]
-    if chart_id := chart.get("chart_id"):
-        actions.append(f":pencil2:  <{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit in admin>")
-    lines.append("      ".join(actions))
+    title = _chart_title(result)
 
     # The ask, and who is being asked. Near the top rather than in the footer: a finding whose
     # only mention sits at the end of a middot-separated footer does not read as addressed to
     # anyone, and a finding addressed to nobody gets read and forgotten.
     editor = chart.get("editor_mention")
-    lines.append(ASK + (f"   {editor}   ·   _You last edited this chart._" if editor else ""))
-
-    lines.append(issue.get("claim", "").rstrip(".") + ".")
+    body = "\n".join(
+        [
+            f"*<{url}|{title}>*",
+            ASK + (f"   {editor}   ·   _You last edited this chart._" if editor else ""),
+            issue.get("claim", "").rstrip(".") + ".",
+        ]
+    )
 
     dot = SEVERITY_DOT.get(issue.get("severity", "low"), ":large_yellow_circle:")
-    lines.append(f"> *Severity:*  {dot} {issue.get('severity', 'low')}  ·  {issue.get('kind', 'chart')}-level")
+    footer = [f"{dot} {issue.get('severity', 'low')}", f"{issue.get('kind', 'chart')}-level"]
     if views := format_views(result.get("views")):
-        lines.append(f"> *Readership:*  {views}")
-    lines.append(f"{TICK}   ·   {CAVEAT}")
-    return DigestMessage("\n".join(lines), [_evidence(issue, model)])
+        footer.append(views)
+    # A multi-dim view has no chart id, so it gets no edit link — there is no single chart to edit.
+    if chart_id := chart.get("chart_id"):
+        footer.append(f":pencil2: <{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit in admin>")
+    footer += [TICK, CAVEAT]
+    footer_text = "   ·   ".join(footer)
+
+    thumbnail = _thumbnail(url)
+    blocks = [
+        {"type": "section", "text": {"type": "mrkdwn", "text": body}},
+        {"type": "image", "image_url": thumbnail, "alt_text": title},
+        {"type": "context", "elements": [{"type": "mrkdwn", "text": footer_text}]},
+    ]
+    return DigestMessage("\n".join([body, thumbnail, footer_text]), [_evidence(issue, model)], blocks)
 
 
 def format_slack(
