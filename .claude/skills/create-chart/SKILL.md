@@ -257,9 +257,10 @@ Key fields:
   every field of that indicator's `presentation.grapher_config`, except `$schema`, `id`, `slug`, `version` and
   `isPublished`. So put its FAUST (`title`, `subtitle`, `note`) and its settings (`originUrl`, `hasMapTab`,
   `tab`, `chartTypes`, `map` with its `colorScale`, `yAxis`, `selectedEntityNames`, `selectedFacetStrategy`,
-  `addCountryMode`…) there, and leave `views[0].config` empty. Any other chart, multidim or explorer on that
-  indicator gets them too, so make the edit through `edit-faust-metadata`, which reports those surfaces before
-  touching shared text.
+  `addCountryMode`…) there, and leave `views[0].config` empty. These become the indicator's defaults, so any
+  other chart, multidim or explorer on it gets them too: if the indicator is already shown elsewhere and a
+  setting is only for this chart, keep that setting in `views[0].config`. Later edits to an existing chart go
+  through `edit-faust-metadata`, which reports the other surfaces first.
   - Put settings shared by all indicators, such as `originUrl`, once in
     `definitions.common.presentation.grapher_config`: it merges into each indicator's own `grapher_config`.
     But a variable's `map` block replaces the common one instead of merging into it.
