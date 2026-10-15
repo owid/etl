@@ -30,6 +30,7 @@ Read each sentence as if you were saying it to that friend. If you would never s
 - **Use the everyday word when one exists.** When the precise term matters, because it names the indicator or it is what readers search for ("GDP per capita", "stunting", "life expectancy"), keep it and explain it in plain words the first time. Never rename an established term.
 - **Accuracy wins over plainness.** Keep the exact meaning and the qualifiers ("estimated", "adults only", "private construction"). Find plain words for them, even if that takes a few more.
 - **Use active voice and name who does what.** "We" is OWID; the producer goes by name. "We convert fiscal years to calendar years", not "Fiscal years were converted".
+- **In `description_key`, define terms as the data defines them.** A definition there says how this dataset counts something, not how things are in the world. Tie it to the data or to the producer: "In this data, a woman counts as married if…" or "The UN counts a woman as married if…", not "Married women are those whose…".
 - **Plain is not casual.** State the fact; don't tell the reader what to do ("be careful when comparing"). No chatty phrasing ("a bit", "pretty much", "basically"). Contractions are fine.
 
 ## Editing existing text
@@ -45,6 +46,14 @@ Rewrite freely when a plainer version exists, within the rules above. When you w
 > After: Comparisons between countries may be limited because national definitions of homelessness differ.
 
 Why: nobody says "it should be noted" or "heterogeneity" out loud. The rewrite keeps the claim and its hedge, and changes only the words.
+
+**A definition in `description_key`**
+
+> Before: Married women are those whose marriage is recognized by their country's laws or customs.
+>
+> After: In this data, a woman counts as married if her marriage is recognized by her country's laws or customs.
+
+Why: the first version reads as a statement about the world. The definition belongs to this data; other sources define the same term differently.
 
 **A subtitle (`description_short`)**
 
