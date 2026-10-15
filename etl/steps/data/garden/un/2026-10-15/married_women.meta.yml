@@ -6,11 +6,14 @@ definitions:
       topic_tags:
         - Marriages & Divorces
       attribution_short: UN
-    description_from_producer: Women in a union refers to women living with their partner in the same household, including cohabiting unions, consensual unions, unmarried unions, or “living together.”
+    description_from_producer: The Married/In-union category pertains to women who are married (defined in relation to the marriage laws or customs of a country) and to women in a union, which refers to women living with their partner in the same household (also referred to as cohabiting unions, consensual unions, unmarried unions, or “living together”).
     description_key:
-      - A union means living with a partner in the same household. This includes marriages, but also unmarried couples who live together, sometimes called cohabiting or consensual unions.
+      - Married women are those whose marriage is recognized by their country’s laws or customs. Women in a union live with a partner in the same household without being married, sometimes called cohabiting or consensual unions.
       - The UN Population Division estimates these figures for every country and year by combining census and survey data with population estimates from the UN’s World Population Prospects.
-      - Values for the years after a country’s most recent census or survey are projections, which is why the year when projections start differs between countries.
+      - Before a country’s first census or survey, the UN keeps its values at the level of that first data point, so early values can stay flat for many years.
+      - Values for the years after a country’s most recent census or survey are projections, which is why the year when projections start differs between countries. For the world and regions, values from 2025 onward are labeled as projections.
+    description_processing: |-
+      We calculate the shares for the world, continents and income groups from the country data. We don’t use the UN’s own regional figures, because its counts of married women double-count some regions. Each region’s share is the number of women in its countries who are married or in a union, divided by the number of women of the same age in those countries.
 
   projection: &projection <% if dataprocess == "Projection" %> true <% elif dataprocess == "Estimate" %> false <%- endif -%>
 # Learn more about the available fields:
@@ -26,7 +29,7 @@ tables:
         title: Share of women aged << agegroup|replace('-', '–') >> who are married or in union (<< dataprocess >>)
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of women aged << agegroup|replace('-', '–') >> sharing a household with their partner, whether married, cohabiting, in consensual partnerships, or in other non-marital unions.
+        description_short: Percentage of women aged << agegroup|replace('-', '–') >> who are married, or who live with a partner without being married.
         presentation:
           title_public: Share of women aged << agegroup|replace('-', '–') >> years old who are married or in a union
         display:

@@ -23,6 +23,8 @@ steps:
   #
   data://grapher/un/2026-10-15/married_women:
     - data://garden/un/2026-10-15/married_women:
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
       - data://meadow/un/2026-10-15/married_women:
         - snapshot://un/2026-10-15/married_women.xlsx
 

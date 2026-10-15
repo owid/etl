@@ -8,7 +8,7 @@ meta:
     description: |-
       This dataset gives estimates and projections of the share and number of women aged 15 to 49 who are married or in a union, from 1970 to 2050. It covers 225 countries and areas, as well as world regions and groups of countries by income and level of development. The data is also broken down into five-year age groups.
 
-      A union means living with a partner in the same household, whether married or not.
+      Women are counted if they are married, as defined by their country’s laws or customs, or if they live with a partner in the same household without being married.
 
       The estimates combine census and survey data on the share of women who are married or in a union with estimates of the number of women in each age group from World Population Prospects 2024. The survey data comes from the World Marriage Data 2019 database, complemented by more recent surveys, such as the Demographic and Health Surveys and the Multiple Indicator Cluster Surveys.
 
