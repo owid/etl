@@ -6,17 +6,13 @@ meta:
     producer: United Nations
     title: Estimates and projections of women of reproductive age who are married or in a union
     description: |-
-      Estimates and projections of the number and the proportion of married or in-union women of reproductive-age (15-49 years) are provided for the period from 1970 to 2050 for 223 countries or areas, and for regions and development groups. The data are also presented by five-year age groups. The methodology is described in:
+      This dataset gives estimates and projections of the share and number of women aged 15 to 49 who are married or in a union, from 1970 to 2050. It covers 225 countries and areas, as well as world regions and groups of countries by income and level of development. The data is also broken down into five-year age groups.
 
-      United Nations, Department of Economic and Social Affairs, Population Division (2013).  National, Regional and Global Estimates and Projections of the Number of Women Aged 15-49 Who Are Married or in a Union, 1970-2030.  Technical Paper No. 2013/2.  New York: United Nations.
+      A union means living with a partner in the same household, whether married or not.
 
-      Two sets of input data were used to produce estimates and projections for each country: the proportion of women who are married or in a union and the number of women of reproductive age.  Data from censuses and surveys on the proportions of women who are married or in a union, by five-year age group, were obtained from:
+      The estimates combine census and survey data on the share of women who are married or in a union with estimates of the number of women in each age group from World Population Prospects 2024. The survey data comes from the World Marriage Data 2019 database, complemented by more recent surveys, such as the Demographic and Health Surveys and the Multiple Indicator Cluster Surveys.
 
-      United Nations, Department of Economic and Social Affairs, Population Division (2019).  World Marriage Data 2019.  New York: United Nations. These data were complemented by the most recent data from Demographic and Health Surveys, Multiple Indicator Cluster Surveys, Performance Monitoring for Action (PMA) surveys, national surveys, censuses, and population registers.
-
-      Estimates and projections of the number of women of reproductive age, by five-year age group, were obtained from:
-
-      United Nations, Department of Economic and Social Affairs, Population Division (2024).  World Population Prospects: The 2024 Revision.  New York: United Nations.
+      For each country, values up to its most recent census or survey are estimates, and values after it are projections.
     # NOTE: The UN names this release by edition ("2024"), so the citation year stays 2024 while date_published is the
     #  date of the file we download. The UN replaced the original 2024 file (..._fp_rev-2024.xlsx, August 2024) with a
     #  revised one (..._fp_rev-2024_rev.xlsx, April 2025) without announcing it; the only change was the addition of

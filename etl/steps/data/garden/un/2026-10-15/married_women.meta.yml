@@ -10,7 +10,7 @@ definitions:
     description_key:
       - A union means living with a partner in the same household. This includes marriages, but also unmarried couples who live together, sometimes called cohabiting or consensual unions.
       - The UN Population Division estimates these figures for every country and year by combining census and survey data with population estimates from the UN’s World Population Prospects.
-      - Values for the years after a country’s most recent census or survey are projections. So the year when projections start differs between countries.
+      - Values for the years after a country’s most recent census or survey are projections, which is why the year when projections start differs between countries.
 
   projection: &projection <% if dataprocess == "Projection" %> true <% elif dataprocess == "Estimate" %> false <%- endif -%>
 # Learn more about the available fields:
