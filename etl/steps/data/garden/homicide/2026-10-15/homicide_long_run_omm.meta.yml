@@ -6,6 +6,7 @@ tables:
     variables:
       death_rate_per_100_000_population_eisner:
         title: Homicide rate per 100,000 population - Eisner
+        description_short: Homicides per 100,000 people, from historical estimates compiled by Eisner (2014).
         description_processing: >
           All homicide rate estimates from before 1950 are taken from: Table 4 in Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press.
 
@@ -20,6 +21,7 @@ tables:
           numDecimalPlaces: 2
       death_rate_per_100_000_population_eisner_who:
         title: Homicide rate per 100,000 population - Eisner and WHO Mortality Database
+        description_short: Homicides per 100,000 people, combining historical estimates compiled by Eisner (2014) with death-certificate data from the WHO Mortality Database.
         description_processing: >
           All homicide rate estimates from before 1950 are taken from: Table 4 in Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press.
 
@@ -50,12 +52,5 @@ tables:
           All other datapoints not specified above are sourced from the WHO Mortality Database.
         short_unit: ""
         unit: "homicides per 100,000 people"
-        origins:
-          - title: OWID based on Eisner and WHO Mortality Database
-            date_published: "2024-02-21"
-            producer: Eisner (2014); WHO Mortality Database (2024)
-            citation_full: "Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press; WHO Division of Data, Analytics and Delivery for Impact (DDI), World Health Organization (2024)"
-            date_accessed: "2024-07-26"
-            url_main: Eisner (2014) - https://www.jstor.org/stable/10.1086/677662?read-now=1&seq=16#page_scan_tab_contents; WHO Mortality Database (2024) - https://platform.who.int/mortality/themes/theme-details/topics/indicator-groups/indicator-group-details/MDB/violence
         display:
           numDecimalPlaces: 2

@@ -7,9 +7,18 @@ definitions:
       attribution_short: WHO
     processing_level: minor
 
-  # The cause as it reads inside a sentence: lower case, except for names that keep their capitals.
+  # The cause as it reads inside a sentence: lower case, except for names that keep their capitals. WHO's "Violence"
+  # (assault, X85-Y09) reads as homicide, the word the retired homicide dataset and its charts use.
   cause_in_text: |-
-    <% if cause in ["Hepatitis B", "Japanese encephalitis"] %><< cause >><% else %><< cause.lower() >><% endif %>
+    <% if cause in ["Hepatitis B", "Japanese encephalitis"] %><< cause >><% elif cause == "Violence" %>homicide<% else %><< cause.lower() >><% endif %>
+
+  # The age band as it reads inside a sentence. The data carries the family's band labels, but the bands derived for
+  # Violence keep the phrases the retired homicide dataset used in its sentences ("0-19", "70+"), so those read as before.
+  age_in_text: |-
+    <% if cause == "Violence" and age_group == "<20 years" %>0-19<% elif cause == "Violence" and age_group == "<5 years" %>0-4<% elif cause == "Violence" and age_group == "5-14 years" %>5-14<% elif cause == "Violence" and age_group == "15-49 years" %>15-49<% elif cause == "Violence" and age_group == "50-69 years" %>50-69<% elif cause == "Violence" and age_group == "over 70 years" %>70+<% else %><< age_group.lower() >><% endif %>
+  # The same, for the retired homicide titles, which wrote "in age 0-19" for the bands they derived and "in all ages" otherwise.
+  violence_age_in_title: |-
+    <% if age_group in ["<20 years", "<5 years", "5-14 years", "15-49 years", "50-69 years", "over 70 years"] %>age {definitions.age_in_text}<% else %><< age_group.lower() >><% endif %>
 
   # NOTE: Drill-down causes carry the label of the table they are published in at the front of the internal
   # title, so the admin's flat list tells the layers apart; top-tier groups have no prefix. Mirrors
@@ -24,6 +33,7 @@ definitions:
       ("Hepatitis B", "Vaccine-preventable diseases"),
       ("Japanese encephalitis", "Vaccine-preventable diseases"),
       ("Self-inflicted injuries", "Intentional injuries"),
+      ("Violence", "Intentional injuries"),
       ("Mouth and oropharynx cancers", "Cancers"),
       ("Oesophagus cancer", "Cancers"),
       ("Stomach cancer", "Cancers"),
@@ -56,23 +66,24 @@ definitions:
   # headers); it goes in `display.name`, not `presentation.title_public`, because grapher lets a public title
   # override the chart's own labels in that panel, while a display name yields to them. Self-inflicted injuries
   # keep the wording its former dataset carried (an editorial choice made there), including the dimension suffix
-  # readers see today; every other cause uses the family's sentence.
+  # readers see today, and so does Violence (the retired homicide dataset's titles, which say homicide); every other
+  # cause uses the family's sentence.
   display_name_number: |-
-    <% if cause == "Self-inflicted injuries" %>Number of deaths from self-inflicted injuries - Sex: << sex >> - Age group: << age_group >><% else %>Deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >><% endif %>
+    <% if cause == "Self-inflicted injuries" %>Number of deaths from self-inflicted injuries - Sex: << sex >> - Age group: << age_group >><% elif cause == "Violence" %>Deaths from homicide in << sex.lower() >> in {definitions.violence_age_in_title}<% else %>Deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >><% endif %>
   description_short_number: |-
-    <% if cause == "Self-inflicted injuries" %>Number of deaths from self-inflicted injuries in the total population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Reported total deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >>.<% endif %>
+    <% if cause == "Self-inflicted injuries" %>Number of deaths from self-inflicted injuries in the total population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Reported total deaths from {definitions.cause_in_text} in << sex.lower() >> aged {definitions.age_in_text}.<% endif %>
   display_name_death_rate: |-
-    <% if cause == "Self-inflicted injuries" %>Death rate from self-inflicted injuries per 100,000 population - Sex: << sex >> - Age group: << age_group >><% else %>Deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >><% endif %>
+    <% if cause == "Self-inflicted injuries" %>Death rate from self-inflicted injuries per 100,000 population - Sex: << sex >> - Age group: << age_group >><% elif cause == "Violence" %>Homicide rate in << sex.lower() >> in {definitions.violence_age_in_title} per 100,000 population<% else %>Deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >><% endif %>
   description_short_death_rate: |-
-    <% if cause == "Self-inflicted injuries" %>Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Reported deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >>.<% endif %>
+    <% if cause == "Self-inflicted injuries" %>Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Reported deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged {definitions.age_in_text}.<% endif %>
   display_name_share: |-
-    <% if cause == "Self-inflicted injuries" %>Percentage of deaths from self-inflicted injuries out of total deaths - Sex: << sex >> - Age group: << age_group >><% else %>Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}<% endif %>
+    <% if cause == "Self-inflicted injuries" %>Percentage of deaths from self-inflicted injuries out of total deaths - Sex: << sex >> - Age group: << age_group >><% elif cause == "Violence" %>Share of total deaths from homicide in << sex.lower() >> in {definitions.violence_age_in_title}<% else %>Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}<% endif %>
   description_short_share: |-
-    <% if cause == "Self-inflicted injuries" %>Percentage of deaths from self-inflicted injuries out of all deaths in the population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Share of total reported deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}.<% endif %>
+    <% if cause == "Self-inflicted injuries" %>Percentage of deaths from self-inflicted injuries out of all deaths in the population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Share of total reported deaths in << sex.lower() >> in those aged {definitions.age_in_text} that are from {definitions.cause_in_text}.<% endif %>
   display_name_asr: |-
-    <% if cause == "Self-inflicted injuries" %>Age-standardized death rate from self-inflicted injuries per 100,000 population - Sex: << sex >> - Age group: << age_group >><% else %>Age-standardized deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people<% endif %>
+    <% if cause == "Self-inflicted injuries" %>Age-standardized death rate from self-inflicted injuries per 100,000 population - Sex: << sex >> - Age group: << age_group >><% elif cause == "Violence" %>Age-standardized homicide rate in << sex.lower() >> in {definitions.violence_age_in_title}<% else %>Age-standardized deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people<% endif %>
   description_short_asr: |-
-    <% if cause == "Self-inflicted injuries" %>Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates. To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<% else %>Reported deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people.<% endif %>
+    <% if cause == "Self-inflicted injuries" %>Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates. To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<% else %>Reported deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged {definitions.age_in_text} per 100,000 people.<% endif %>
 
   # NOTE: The ICD-10 codes below must match the `causes` table this step builds from WHO's own export
   # headers (`icd10_codes` column). They are repeated here because indicator text is rendered per
@@ -143,6 +154,8 @@ definitions:
     A83.0
     <%- elif cause == "Self-inflicted injuries" %>
     X60-X84, Y870
+    <%- elif cause == "Violence" %>
+    X85-Y09, Y871
     <%- elif cause == "Mouth and oropharynx cancers" %>
     C00-C14
     <%- elif cause == "Oesophagus cancer" %>
@@ -270,6 +283,9 @@ dataset:
   # step's version date plus this period, so 150 days from 2026-10-13 lands in March 2027.
   update_period_days: 150
   changelog:
+    - date: 2026-10-15
+      changes:
+        - Added violence (homicides) as a drill-down cause inside "Intentional injuries", in the table `intentional_injuries`, with the age bands the homicide charts use (<5, 5-14, 15-49, 50-69, over 70 and <20 years) derived on WHO's own population; previously the separate "WHO Mortality Database - Homicides" dataset, which derived them on UN population and dropped WHO's own age bands.
     - date: 2026-10-14
       changes:
         - Added seven vaccine-preventable diseases (pertussis, poliomyelitis, diphtheria, measles, tetanus, hepatitis B and Japanese encephalitis) as drill-down causes inside "Infectious and parasitic diseases"; they were previously the separate "WHO Mortality Database – Vaccine Preventable" dataset.
@@ -376,7 +392,9 @@ tables:
           - Vaccination
     variables: *fact_variables
   intentional_injuries:
-    # The retired self_inflicted_injuries dataset was tagged Mental Health only; its successors keep exactly that.
+    # The retired self_inflicted_injuries dataset was tagged Mental Health only and the retired homicide dataset Global
+    # Health only; each cause keeps its own. The table carries the first; the grapher step sets Global Health on Violence
+    # (TOPIC_TAGS_BY_CAUSE), because a tag list cannot vary by dimension here and the schema allows no template in it.
     common:
       presentation:
         topic_tags:
