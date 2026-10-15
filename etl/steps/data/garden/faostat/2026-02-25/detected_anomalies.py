@@ -887,6 +887,68 @@ class NegativePotashUseSierraLeoneAnomaly(DataAnomaly):
         return tb.drop(indexes_to_drop).reset_index(drop=True)
 
 
+class HighCerealYieldAnomaly(DataAnomaly):
+    description = "* Cereal yields reported for Kuwait, Oman, Qatar, Saint Vincent and the Grenadines, and the United Arab Emirates were implausibly high, peaking at between 18 and 56 tonnes per hectare depending on the country and crop, several times the highest yields achieved anywhere else. These figures come from very small harvested areas and possibly include crops grown as green fodder rather than for grain. Therefore, we removed the yields of the affected cereals (and of total cereals) for these countries.\n"
+
+    # Affected item codes for each country.
+    affected_items_by_country = {
+        "Kuwait": ["00001717", "00000056"],
+        "Oman": ["00001717", "00000056", "00000083", "00000108"],
+        "Qatar": ["00001717", "00000056"],
+        "Saint Vincent and the Grenadines": ["00001717", "00000056"],
+        "United Arab Emirates": ["00001717", "00000056"],
+    }
+    affected_item_codes = [
+        # Item code for "Cereals, primary".
+        "00001717",
+        # Item code for "Maize (corn)".
+        "00000056",
+        # Item code for "Sorghum".
+        "00000083",
+        # Item code for "Cereals n.e.c.".
+        "00000108",
+    ]
+    affected_element_codes = [
+        # Element code for "Yield".
+        "005412",
+    ]
+    affected_countries = list(affected_items_by_country)
+
+    def _get_affected_mask(self, tb):
+        is_affected_item = False
+        for country, item_codes in self.affected_items_by_country.items():
+            is_affected_item = is_affected_item | ((tb["country"] == country) & (tb["item_code"].isin(item_codes)))
+        return is_affected_item & tb["element_code"].isin(self.affected_element_codes)
+
+    def check(self, tb):
+        # Check that each affected series exists and peaks well above the highest plausible national yields (around
+        # 10 tonnes per hectare for maize, and lower for other cereals).
+        for country, item_codes in self.affected_items_by_country.items():
+            for item_code in item_codes:
+                values = tb[
+                    (tb["country"] == country)
+                    & (tb["item_code"] == item_code)
+                    & (tb["element_code"].isin(self.affected_element_codes))
+                ]["value"]
+                assert values.max() > 15, f"Yield of item {item_code} for {country} is no longer anomalous."
+
+    def inspect(self, tb):
+        log.info("The anomaly causes: \n* Cereal yields in some small producers to be several times the world's best.")
+        selection = (tb["item_code"].isin(self.affected_item_codes)) & (
+            tb["element_code"].isin(self.affected_element_codes)
+        )
+        tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
+        for item_code in self.affected_item_codes:
+            title = _split_long_title(self.description + f"Item code {item_code}")
+            fig = px.line(
+                tb_affected[tb_affected["item_code"] == item_code], x="year", y="value", color="country", title=title
+            )
+            fig.show()
+
+    def fix(self, tb):
+        return tb[~self._get_affected_mask(tb)].reset_index(drop=True)
+
+
 detected_anomalies = {
     "faostat_rfn": [
         NegativePotashUseSierraLeoneAnomaly,
@@ -903,6 +965,7 @@ detected_anomalies = {
         OtherTropicalFruitYieldNorthernAfricaAnomaly,
         OtherTropicalFruitYieldSouthAmericaAnomaly,
         UnstableNumberOfPoultryBirdsInEurope,
+        HighCerealYieldAnomaly,
     ],
     "faostat_fbsc": [],
 }

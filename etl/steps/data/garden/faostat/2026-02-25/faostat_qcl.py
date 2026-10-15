@@ -569,6 +569,8 @@ def run() -> None:
     tb = add_yield_to_aggregate_regions(tb)
 
     # Handle detected anomalies in the data.
+    # NOTE: detected_anomalies.py is not part of this step's checksum (only faostat_qcl* and shared* files are), so
+    # editing it alone does not trigger a rebuild. Make a change here too (or run with --force --only).
     tb, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, tb=tb)
 
     # For convenience, create additional indicators in different units.
