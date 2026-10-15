@@ -26,7 +26,7 @@ dataset:
 
 tables:
   energy:
-    title: Food supply chain in kilocalories (Supply Utilization Accounts method)
+    title: Food supply chain in kilocalories
     common:
       unit: kilocalories per person per day
       short_unit: kcal
@@ -71,13 +71,13 @@ tables:
         title: Food available for consumption
         description_short: Food available for people to eat, before waste in shops and households.
   protein:
-    title: Food supply chain in grams of protein (Supply Utilization Accounts method)
+    title: Food supply chain in grams of protein
     common:
       unit: grams of protein per person per day
       short_unit: g
     variables: *variables
   mass:
-    title: Food supply chain in kilograms (Supply Utilization Accounts method)
+    title: Food supply chain in kilograms
     common:
       unit: kilograms per person per day
       short_unit: kg

@@ -96,7 +96,7 @@ def run() -> None:
 
     # The files' provenance, derived from the garden columns they are built from.
     feed_metadata = build_feed_metadata(
-        title=f"Food supply chain ({METHOD} method)",
+        title="Food supply chain in calories and protein (alternative method, from 1961)",
         columns={
             f"{name} ({tables[nutrient][key].metadata.short_unit})": tables[nutrient][key]
             for nutrient in NUTRIENTS

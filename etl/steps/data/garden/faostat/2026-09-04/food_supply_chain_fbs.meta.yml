@@ -33,7 +33,7 @@ dataset:
 
 tables:
   energy:
-    title: Food supply chain in kilocalories (Food Balance Sheets method)
+    title: Food supply chain in kilocalories (alternative method, from 1961)
     common:
       unit: kilocalories per person per day
       short_unit: kcal
@@ -90,13 +90,13 @@ tables:
         title: Balancing difference
         description_short: The part of data adjustments that comes from rounding in FAO's figures.
   protein:
-    title: Food supply chain in grams of protein (Food Balance Sheets method)
+    title: Food supply chain in grams of protein (alternative method, from 1961)
     common:
       unit: grams of protein per person per day
       short_unit: g
     variables: *variables
   mass:
-    title: Food supply chain in kilograms (Food Balance Sheets method)
+    title: Food supply chain in kilograms (alternative method, from 1961)
     common:
       unit: kilograms per person per day
       short_unit: kg
