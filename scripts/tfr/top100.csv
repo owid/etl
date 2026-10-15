@@ -1,0 +1,101 @@
+rank,country,population_2026,searched,in_dataset,recalculated,tier,note
+1,India,1476625571,full,yes,no,sample,"SRS publishes rates only; no raw counts exist anywhere, confirmed"
+2,China,1412914090,full,yes,yes,survey,recalculated from the 2000/2010/2020 census counts
+3,United States,349035484,full,yes,no,complete,rates 1940-2024; counts exist but Census vintage choice moves the answer 1.4%
+4,Indonesia,287886782,full,yes,no,survey,"four survey rounds 2010-2025; the old 2.42 was wrong, BPS says 2.18 for 2020"
+5,Pakistan,259299792,full,yes,no,survey,PDS series 2001-2020; the 2007 round publishes real counts
+6,Nigeria,242431835,full,yes,no,survey,switched to the measured NDHS series 2003-2024; no usable counts
+7,Brazil,213562666,full,yes,yes,complete,
+8,Bangladesh,177818039,full,yes,no,sample,"42-year SVRS series 1982-2023; rates only, no counts published"
+9,Russia,143394457,full,yes,no,complete,yearbook series 1990-2022 plus births and women counts for 2022
+10,Ethiopia,138902185,full,yes,no,survey,EDHS series 2000-2024; no post-2007 female population by age exists
+11,Mexico,132997658,full,yes,yes,complete,
+12,Japan,122427730,full,yes,no,complete,"denominator now the Statistics Bureau's own population, not recovered from rates"
+13,Egypt,120101178,full,yes,no,complete,"CAPMAS's rate is a PAS model estimate, not a raw count; registry gives 2.38 vs 2.41"
+14,Philippines,117724473,full,yes,yes,incomplete,
+15,Democratic Republic of Congo,116452162,full,yes,no,survey,EDS rounds only; no census since 1984
+16,Vietnam,102177434,full,yes,no,survey,"2001-2025 from the survey report; published rate is P/F-adjusted, ~13% on the census check"
+17,Iran,93168492,full,yes,no,incomplete,"no TFR obtainable; amar.org.ir drops foreign connections, sci.org.ir is down"
+18,Turkey,87926083,full,yes,no,complete,female population by age now scriptable; births by age still behind a single-use token
+19,Germany,83644257,full,yes,no,complete,"denominator now Destatis table 12411-10, the average resident population"
+20,Tanzania,72563778,full,yes,no,survey,census adjusted TFR; raw counts exist but reproduce the unadjusted 3.2
+21,Thailand,71559619,full,yes,yes,complete,
+22,United Kingdom,69931528,full,yes,yes,complete,we plot England and Wales; ONS's own tables put it a steady 0.02 above the UK
+23,France,66746398,full,yes,no,complete,denominator now INSEE's mean-year population; Mayotte break kept to match the UN territory
+24,South Africa,65453083,full,yes,no,projection,headline TFR is Spectrum model output; registry implies 1.53 vs published 2.41
+25,Italy,58926166,full,yes,no,complete,"SDMX route found and verified by an agent (1.205 vs published 1.20); host down, not built"
+26,Kenya,58636406,full,yes,no,survey,"census and KDHS give 3.4; census report is scanned images, OCR still needed"
+27,Myanmar,55184826,full,yes,yes,survey,recalculated from 2019 ICS counts
+28,Colombia,53936231,full,yes,yes,complete,
+29,Sudan,53282716,full,yes,no,survey,CBS site dead (nameservers gone); MICS 2014 figure recovered from a web archive
+30,Uganda,52761469,full,yes,no,survey,2024 census prints reported and Brass-adjusted side by side: 4.15 vs 4.47
+31,South Korea,51600389,full,yes,no,complete,KOSIS needs a Korean-identity account; used the English press releases instead
+32,Algeria,48028337,full,yes,no,incomplete,series ends 2019 — ONS dropped the fertility section; age split is survey-shaped
+33,Iraq,48007435,full,yes,no,survey,"measured survey rounds only, stops 2011; 2024 census fertility not yet released"
+34,Spain,47850792,full,yes,yes,complete,
+35,Argentina,46003732,full,yes,yes,complete,INDEC publishes no annual rate at all; built from health-ministry births 2010-2024
+36,Afghanistan,45047067,full,yes,no,survey,"AfDHS 2015 only; cso.gov.af nameservers deprovisioned, nsia.gov.af is a JS app"
+37,Yemen,42961661,full,yes,no,survey,"2013 survey only; three of four CSO domains unusable, two squatted"
+38,Canada,40467724,full,yes,yes,complete,fully recalculated 1991-2024; matches StatCan's own rate to 2 decimals
+39,Angola,40215180,full,yes,no,survey,two IIMS rounds; census 5.7 vs INE's own Gompertz-adjusted 5.5; no counts published
+40,Ukraine,39535851,full,yes,no,complete,series ends 2021 — Держстат has no population denominator since the invasion
+41,Morocco,38762441,full,yes,no,survey,HCP long-run series; 2024 census 1.97 (series rounds to 2.00); no ASFR published
+42,Poland,37843196,full,yes,yes,complete,fully recalculated 2013-2025 from the BDL API; matches GUS to 3 decimals
+43,Uzbekistan,37724225,full,yes,no,complete,2010-2025 from an open endpoint; the post-2017 rise is in their own data
+44,Mozambique,36639855,full,yes,no,survey,IDS rounds; INE publishes no census TFR at all; registration fell 48% to 31%
+45,Malaysia,36385116,full,yes,no,complete,all-residents denominator (opposite of Japan); no births-by-age counts released
+46,Ghana,35697559,full,yes,no,survey,GDHS rounds; 2010 census 3.28 raw vs 4.57 Gompertz; 2021 volume still unpublished
+47,Saudi Arabia,35165789,full,yes,no,projection,three series by nationality (2.7/0.8/2.0 in 2024); no ASFR published
+48,Peru,34922145,full,yes,yes,complete,registry recalculated 2022-24; 1.69 in 2023 vs survey 1.8 vs projection 2.2
+49,Madagascar,33522055,full,yes,no,survey,EDS rounds; census computed a Brass correction to 4.7 and explicitly rejected it
+50,Cote d'Ivoire,33494339,full,yes,no,survey,surveys only to 2016; 2021 census publishes no fertility; INS site down since Jan 2026
+51,Cameroon,30640815,full,yes,no,survey,"surveys only; census bureau site dead, 4th census stalled since 2019; 54% registration"
+52,Nepal,29629406,full,yes,no,survey,published 1.94 contradicts its own counts (1.556) and its own GRR; no method named
+53,Niger,28814878,full,yes,no,survey,survey rounds; census computed a Gompertz correction to 7.8 and refused it
+54,Venezuela,28633721,full,yes,no,projection,"projection series ends 2015; ine.gov.ve removed from DNS, moved to ine.gob.ve"
+55,Australia,27227097,full,yes,yes,complete,fully recalculated; matches ABS to 3 decimals; Victoria/WA registration backlogs
+56,North Korea,26633693,full,yes,no,survey,"CBS-authored census/survey, UN-hosted only; 2018 census cancelled"
+57,Syria,26472496,full,yes,no,survey,surveys 2001/2009 only; site lapsed to a UA-cloaking parking service after mid-2025
+58,Mali,25932277,full,yes,no,survey,surveys; census applied a Brass correction that nearly doubled its raw birth count
+59,Burkina Faso,24601699,full,yes,no,survey,"census 5.4 (2019) vs survey 4.4 (2021); Arriaga adjustment went down, not up"
+60,Sri Lanka,23348314,full,yes,yes,complete,recalculated 2014-2021 from registered births; DCS stopped publishing a rate after 2000
+61,Taiwan,23011292,full,yes,yes,complete,fully recalculated 2000-2025 from the household register; matches the ministry to 0.3%
+62,Malawi,22785535,full,yes,no,survey,2018 census ran three corrections and chose the smallest: 4.167 raw to 4.234 Arriaga
+63,Zambia,22521912,full,yes,no,survey,"surveys; census raw 3.35 vs published 4.6 (P/F, +37%), multipliers not published"
+64,Chad,21560385,full,yes,no,survey,three figures only; the 6.4 is dated 2014-15 in one INSEED report and 2019 in another
+65,Kazakhstan,21083624,full,yes,yes,complete,fully recalculated 2018-2025 from the open API; matches the bureau to 0.01
+66,Somalia,20305912,full,yes,no,survey,2020 survey is the only national figure; the 2026 survey covers five districts
+67,Chile,19945850,full,yes,yes,complete,fully recalculated 1992-2024; registry 1.03 in 2024 vs the old projection's flat 1.58
+68,Senegal,19366551,full,yes,no,survey,"2023 census published all three corrections: raw 3.7, chose Arriaga 4.4; survey says 4.0"
+69,Guatemala,18967983,full,yes,yes,complete,fully recalculated 2018-2024 from 2.2m birth records; gap to the projection doubled in a year
+70,Romania,18800600,full,yes,yes,complete,fully recalculated 2012-2024 on the resident basis; matches INS's own rates to 4 decimals
+71,Netherlands,18448770,full,yes,yes,complete,fully recalculated 1995-2025 from the CBS API; matches CBS to 3 decimals
+72,Ecuador,18444504,full,yes,yes,incomplete,fully recalculated 2010-2024; INEC states in writing that it adopts a figure above the registry
+73,Cambodia,18051219,full,yes,no,survey,NIS adjusted four censuses in a row: raw 1.6/2.05/1.67/1.4 against adopted 3.1/2.8/2.51/2.3
+74,Zimbabwe,17273584,full,yes,no,survey,"2022 census ran Arriaga and Gompertz, found they agreed, and kept the unadjusted 3.7"
+75,Guinea,15441991,full,yes,no,survey,2014 census correction lands almost entirely on 15-19; the INS domain is now squatted
+76,Benin,15170419,full,yes,no,survey,census 4.8 is admitted to be an indirect estimate but no method is named and no raw figure printed
+77,Rwanda,14889701,full,yes,no,survey,"2012 census adjusted by Arriaga, 2022 ran the same test and declined; also has a registry-based rate"
+78,Burundi,14729163,full,yes,no,survey,"no correction applied, and the census's own parity check suggests none was needed"
+79,Bolivia,12749296,full,yes,no,survey,the only country where the headline sits BELOW the survey: 1.69 projected vs 2.1 measured
+80,South Sudan,12436040,full,yes,no,survey,2008 census counts give 3.9 against the 2010 survey's 7.5 — uncorrected census undercount
+81,Tunisia,12415143,full,yes,no,complete,published series 2015-2023; the 5.7% of births with no age recorded must be redistributed
+82,Haiti,12037515,full,yes,no,survey,nothing since 2016-17; the office says outright it cannot produce estimates and uses the UN's
+83,Belgium,11774647,full,yes,no,complete,published series 2011-2025; Belgian mothers 1.33 vs foreign 1.89 in 2024
+84,Dominican Republic,11609499,full,yes,no,survey,"registration keeps arriving for two decades, so no registry rate is usable"
+85,Jordan,11589538,full,yes,no,survey,survey only; the nationality split runs 2.5 Jordanian to 4.9 Syrian in camps
+86,United Arab Emirates,11574684,full,no,,,publishes an Emirati-only rate and no combined one; every government host blocked us
+87,Honduras,11184761,full,yes,no,survey,INE published a registry-based rate for 2013-16 then stopped; census raw 2.13 vs adopted 2.74
+88,Tajikistan,10978600,full,yes,no,complete,third Central Asian rise: 2.64 in 2021 to 3.02 in 2023; 2007's dip looks like an artefact
+89,Papua New Guinea,10947852,full,yes,no,survey,no census ever produced a fertility rate; the 2022 survey adjusted 3.27 to 3.72 by Brass
+90,Cuba,10892659,full,yes,no,complete,cut its own denominator for emigration in 2021: 11.18m in 2020 to 9.43m in 2025
+91,Sweden,10701038,full,yes,yes,complete,fully recalculated 2006-2024; record low and still falling
+92,Czechia,10527784,full,yes,no,complete,peak 1.83 in 2021 to 1.37 in 2024; Ukrainian refugees are in both numerator and denominator
+93,Azerbaijan,10454854,full,yes,no,complete,its own census later showed the intercensal denominator was too low; 2000s levels overstated
+94,Portugal,10395366,full,yes,no,complete,"published series 2013-2025; our own rebuild runs 3% below it, cause unresolved"
+95,Greece,9897119,full,yes,no,complete,"fully recalculated 2001-2024; the 2021 census cut the population estimate by 140,000"
+96,Israel,9647689,full,yes,no,complete,"3.00 Jewish, 2.81 Muslim, 1.75 Druze, 1.64 Christian in 2023; host blocks us, used archives"
+97,Hungary,9585819,full,yes,no,complete,"rose to 1.61 in 2021 then fell every year to 1.31 in 2025, below its 2013 level"
+98,Austria,9107265,full,yes,yes,complete,fully recalculated 2006-2025 from age bands; by nationality 3.79 Syrian to 0.66 Iranian
+99,Switzerland,9007794,full,yes,no,complete,no births by age of mother published at all; Swiss mothers 1.20 vs foreign 1.50
+100,Sierra Leone,8996749,full,yes,no,survey,"largest correction found anywhere: raw 1.6 to adjusted 5.6, births scaled x3.8"
