@@ -15,7 +15,7 @@
   status: open
 
 # Pakistan reports arrivals by region of origin (2020 onward) about 1000x too large: 117 million arrivals in 2024,
-# more than France receives, and 58 million from South Asia alone. The true scale is unclear (dividing by
+# more than any other destination reports, and 58 million from South Asia alone. The true scale is unclear (dividing by
 # 1000 gives an implausibly low ~117 thousand), so we blank the values rather than rescale them.
 # Guard: only Europe and South Asia carry `expect`. Their raw values are >= 2,091 thousand in every year,
 # so a source fix would trip it. When it trips, remove all six Pakistan entries together.
