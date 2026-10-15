@@ -476,6 +476,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    | `description_key` | Free-form markdown prose (paragraphs; sub-lists only where they help). Each paragraph or bullet should land a distinct, useful fact. Skip filler ("this dataset is widely used"); prefer substantive caveats (coverage gaps, methodology limits, what counts/doesn't count). |
    | `display.name` | Short legend label. Reads naturally on a chart axis/legend; doesn't restate the title. |
    | `presentation.grapher_config.note` | Concise footnote, ≤1 sentence ideally. |
+   | `.dvc` `origin.description` | Shown in the Sources tab. `etl update` copies it verbatim from the previous version, so reread it on every update rather than trusting it. It should describe the data product in a few plain paragraphs (`.claude/rules/plain-writing.md`, and its guidelines in `schemas/definitions.json`). Producer text that is factual but badly written — long, citation-heavy, repeating the producer, carrying staff credits, legal disclaimers or stale counts — gets rewritten, not just trimmed. |
 
    Flag and rewrite when you find:
    - Acronyms or technical terms that aren't expanded the first time they appear
