@@ -39,7 +39,6 @@ from etl import config
 from etl.viz.chart.download_package_format import (
     IndicatorColumn,
     format_attributions,
-    get_attribution,
     normalize_description_key,
 )
 
@@ -195,8 +194,11 @@ def build_feed_metadata(
 
     metadata = {
         "title": title,
-        # The "Source: ..." line, as grapher composes it for a chart built on these columns.
-        "attribution": format_attributions(_uniq([get_attribution(IndicatorColumn(api)) for api in apis])),
+        # The "Source: ..." line, as grapher composes it for a chart built on these columns: each source once, even
+        # when the columns have different sets of origins.
+        "attribution": format_attributions(
+            _uniq([fragment for api in apis for fragment in IndicatorColumn(api).attribution_fragments])
+        ),
         "origins": origins,
         "updatePeriodDays": update_period_days,
         # The feed is as processed as its most processed column.
