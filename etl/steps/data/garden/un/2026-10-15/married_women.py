@@ -5,9 +5,9 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Countries, areas and regional groupings in the 2024 edition (April 2025 revision), after exclusions.
+# Countries, areas and regional groupings we keep from the 2024 edition (April 2025 revision).
 # NOTE: Re-check this count if the producer adds or removes countries or regional groupings.
-N_ENTITIES = 267
+N_ENTITIES = 240
 
 
 def run() -> None:
