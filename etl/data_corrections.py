@@ -26,6 +26,17 @@ Format (a list of entries)::
       reported: 2024-11-13                       # optional — when we told the producer
       status: reported                           # open | reported | acknowledged | fixed_upstream
 
+When the same error affects several columns of the same rows, ``indicator`` can be a list. The entry
+then applies to each column separately, as if written once per column (including its ``expect`` guard
+and the ``value`` shorthand in ``match``)::
+
+    - indicator: [arrivals_from_africa, arrivals_from_europe]
+      entity: Pakistan
+      years: {from: 2020}
+      action: override
+      value: null
+      ...
+
 Rows can also be located by their current value instead of entity+years::
 
     - indicator: drinks
@@ -126,7 +137,15 @@ def load_corrections(path: Path | str) -> list[dict[str, Any]]:
     for correction in corrections:
         _validate_correction(correction, path)
 
-    return corrections
+    # Expand list-valued `indicator` entries into one entry per column, so everything downstream
+    # (applying, auditing, the CLI inventory) only ever sees a single indicator.
+    return [
+        {**correction, "indicator": indicator}
+        for correction in corrections
+        for indicator in (
+            correction["indicator"] if isinstance(correction["indicator"], list) else [correction["indicator"]]
+        )
+    ]
 
 
 def _label(correction: dict[str, Any]) -> str:
@@ -151,6 +170,13 @@ def _validate_correction(correction: Any, path: Path | str) -> None:
 
     for field in ("indicator", "action", "reason", "producer", "status"):
         assert correction.get(field) not in (None, ""), f"Correction [{label}] in {path} is missing required '{field}'."
+
+    indicator = correction["indicator"]
+    indicators = indicator if isinstance(indicator, list) else [indicator]
+    assert indicators and all(isinstance(ind, str) and ind for ind in indicators), (
+        f"Correction [{label}]: 'indicator' must be a column name or a non-empty list of column names."
+    )
+    assert len(set(indicators)) == len(indicators), f"Correction [{label}]: 'indicator' lists a column twice."
 
     action = correction["action"]
     assert action in VALID_ACTIONS, (
