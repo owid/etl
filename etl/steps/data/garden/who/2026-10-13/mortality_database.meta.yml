@@ -385,11 +385,12 @@ tables:
     variables: *fact_variables
   intentional_injuries:
     # The retired self_inflicted_injuries dataset was tagged Mental Health only and the retired homicide dataset Global
-    # Health only; each cause keeps its own. One conditional item: a list item that renders empty would be kept.
+    # Health only; each cause keeps its own. The table carries the first; the grapher step sets Global Health on Violence
+    # (TOPIC_TAGS_BY_CAUSE), because a tag list cannot vary by dimension here and the schema allows no template in it.
     common:
       presentation:
         topic_tags:
-          - '<% if cause == "Violence" %>Global Health<% else %>Mental Health<% endif %>'
+          - Mental Health
     variables: *fact_variables
   cancers:
     # The retired mortality_database_cancer dataset was tagged Causes of Death and Cancer; its successors keep both.
