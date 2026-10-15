@@ -141,6 +141,20 @@ def test_build_feed_metadata_of_several_columns(table):
     assert metadata["processingLevel"] == "minor"
 
 
+def test_build_feed_metadata_lists_each_source_once(table):
+    """Columns with different sets of origins share some sources; grapher lists each source once."""
+    other = Origin(producer="Other producer", title="Other data", date_published="2023-01-01")
+    table["population"] = 67e6
+    table._fields["population"] = VariableMeta(title="Population", unit="people", origins=[ORIGIN, other])
+
+    metadata = bespoke.build_feed_metadata(
+        title="Causes of death",
+        columns={"Deaths": table["value"], "Population": table["population"]},
+    )
+
+    assert metadata["attribution"] == "IHME, Global Burden of Disease (2024); Other producer (2023)"
+
+
 def test_build_feed_metadata_keeps_a_license_without_url(table):
     """Grapher's schema requires `license.url`, and rejects the whole file when it is missing."""
     origin = Origin(producer="P", title="T", license=License(name="CC BY 4.0"))
