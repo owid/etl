@@ -66,7 +66,7 @@ tables:
         description_short: Food eaten by visitors from other countries.
       data_adjustments:
         title: Data adjustments
-        description_short: Differences needed to make the stages add up to the food available to eat. They include FAOSTAT's residuals and rounding errors, and numerical discrepancies from converting tonnes into calories and protein. For the world, they also include the gap between imports and exports, and tourist consumption. Values can be negative.
+        description_short: Differences needed to make the stages add up to the food available to eat. They include FAOSTAT's residuals and rounding errors and, in calories and protein, numerical discrepancies from converting tonnes. For the world, they also include the gap between imports and exports, and tourist consumption. Values can be negative.
       food:
         title: Food available for consumption
         description_short: Food available for people to eat, before waste in shops and households.
@@ -81,14 +81,4 @@ tables:
     common:
       unit: kilograms per person per day
       short_unit: kg
-    variables:
-      <<: *variables
-      # In weight, processing can gain, because water is added to brew beer and bottle soft drinks. The overrides of
-      # processing_net and data_adjustments leave out the sentences on moving gains to data adjustments, which apply
-      # to energy and protein only.
-      processing_net:
-        title: Processing, net
-        description_short: Food products sent to be processed, for example milled, crushed or brewed, minus the processed products made from them, such as flour, oils, sugar and beer. Positive values mean more goes in than comes out; negative values mean the products weigh more than what went in, as when water is added to brew beer or bottle soft drinks.
-      data_adjustments:
-        title: Data adjustments
-        description_short: Differences needed to make the stages add up to the food available to eat. They include FAOSTAT's residuals and rounding errors. For the world, they also include the gap between imports and exports, and tourist consumption. Values can be negative.
+    variables: *variables
