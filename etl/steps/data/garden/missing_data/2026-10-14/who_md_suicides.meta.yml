@@ -33,7 +33,7 @@ tables:
 
       fraction_available_countries:
         title: Share of countries with available data on deaths from suicides
-        description_short: Causes of death are unreported in countries with poorly functioning [vital registries](#dod:vital-registries). Suicide deaths are underreported in manycountries due to social stigma and cultural or legal concerns. Data is based on availability the WHO mortality database.
+        description_short: Causes of death are unreported in countries with poorly functioning [vital registries](#dod:crvs). Suicide deaths are underreported in many countries due to social stigma and cultural or legal concerns. This share is based on data availability in the WHO mortality database.
         short_unit: '%'
         unit: '%'
 
