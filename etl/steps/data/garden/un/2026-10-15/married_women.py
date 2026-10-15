@@ -56,6 +56,9 @@ def run() -> None:
     # Step 3: Combine countries and regions, keeping only the shares.
     tb = pr.concat([tb.drop(columns=["number_married_union"]), tb_regions], ignore_index=True)
 
+    # Step 4: Round shares to one decimal.
+    tb["percentage_married_union"] = tb["percentage_married_union"].round(1)
+
     sanity_check_outputs(tb)
 
     # dataprocess specifies whether the data is an estimate or a projection.
