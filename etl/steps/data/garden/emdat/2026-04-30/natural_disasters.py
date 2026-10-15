@@ -20,6 +20,12 @@ paths = PathFinder(__file__)
 # Base year for GDP deflation.
 BASE_YEAR = 2024
 
+# Last year with complete data. The snapshot also contains the first months of the following year, which would look
+# like a sharp drop in disasters (and pull down the average of the current decade).
+# NOTE: On the next update, set this to the last full year covered by the new snapshot (and update
+# LAST_FULLY_REPORTED_YEAR in etl/steps/viz/chart/natural_disasters/latest/shared.py accordingly).
+LAST_FULLY_REPORTED_YEAR = 2025
+
 # List of expected disaster types in the raw data to consider, and how to rename them.
 # We consider only natural disasters of subgroups Geophysical, Meteorological, Hydrological and Climatological.
 # We therefore ignore Extra-terrestrial (of which there is just one meteorite impact event) and Biological subgroups.
@@ -983,6 +989,13 @@ def run() -> None:
     # Sanity checks.
     sanity_checks_on_inputs(tb=tb)
 
+    # Drop disasters that started after the last complete year.
+    error = (
+        f"Expected the snapshot to contain events after {LAST_FULLY_REPORTED_YEAR}; update LAST_FULLY_REPORTED_YEAR."
+    )
+    assert tb["start_year"].max() > LAST_FULLY_REPORTED_YEAR, error
+    tb = tb[tb["start_year"] <= LAST_FULLY_REPORTED_YEAR].reset_index(drop=True)
+
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
@@ -1004,6 +1017,9 @@ def run() -> None:
 
     # Distribute the impacts of disasters lasting longer than a year among separate yearly events.
     tb = calculate_yearly_impacts(tb=tb)
+
+    # Drop the share of impacts of disasters that continue beyond the last complete year.
+    tb = tb[tb["year"] <= LAST_FULLY_REPORTED_YEAR].reset_index(drop=True)
 
     # Get total count of impacts per year (regardless of the specific individual events during the year).
     tb = get_total_count_of_yearly_impacts(tb=tb)
