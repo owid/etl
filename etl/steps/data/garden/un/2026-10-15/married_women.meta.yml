@@ -1,0 +1,53 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Marriages & Divorces
+      attribution_short: UN
+    description_from_producer: Women in a union refers to women living with their partner in the same household, including cohabiting unions, consensual unions, unmarried unions, or “living together.”
+    description_key:
+      - A union means living with a partner in the same household. This includes marriages, but also unmarried couples who live together, sometimes called cohabiting or consensual unions.
+      - The UN Population Division estimates these figures for every country and year by combining census and survey data with population estimates from the UN's World Population Prospects.
+      - Values for the years after a country's most recent census or survey are projections. So the year when projections start differs between countries.
+
+  projection: &projection <% if dataprocess == "Projection" %> true <% elif dataprocess == "Estimate" %> false <%- endif -%>
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  owners:
+    - Tuna Acisu
+    - Edouard Mathieu
+tables:
+  married_women:
+    variables:
+      percentage_married_union:
+        title: Share of women aged << agegroup>> who are married or in union (<< dataprocess >>)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of women aged << agegroup>> sharing a household with their partner, whether married, cohabiting, in consensual partnerships, or in other non-marital unions.
+        presentation:
+          title_public: Share of women aged << agegroup>> years old who are married or in a union
+        display:
+          name: << agegroup>> years old
+          numDecimalPlaces: 1
+          tolerance: 0
+          isProjection: *projection
+
+      number_married_union:
+        title: Number of women aged << agegroup>> who are married or in union (<< dataprocess >>)
+        unit: people
+        short_unit: ""
+        description_short: Number of women aged << agegroup>> sharing a household with their partner, whether married, cohabiting, in consensual partnerships, or in other non-marital unions.
+        description_processing: |-
+          The UN publishes these numbers in thousands; we converted them to people. We only show them for countries. The UN's numbers for regions and country groups are about twice the sum of the countries they include, so we left them out.
+        processing_level: major
+        presentation:
+          title_public: Women aged << agegroup>> years old who are married or in a union
+        display:
+          name: << agegroup>> years old
+          numDecimalPlaces: 0
+          tolerance: 0
+          isProjection: *projection

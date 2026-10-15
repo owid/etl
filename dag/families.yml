@@ -25,6 +25,11 @@ steps:
     - data://garden/un/2025-01-14/married_women:
       - data://meadow/un/2025-01-14/married_women:
         - snapshot://un/2025-01-14/married_women.xlsx
+  data://grapher/un/2026-10-15/married_women:
+    - data://garden/un/2026-10-15/married_women:
+      - data://garden/regions/2023-01-01/regions
+      - data://meadow/un/2026-10-15/married_women:
+        - snapshot://un/2026-10-15/married_women.xlsx
 
 
   # UN Household size data
