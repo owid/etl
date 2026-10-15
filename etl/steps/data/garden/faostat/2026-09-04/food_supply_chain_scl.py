@@ -246,7 +246,6 @@ Each assumption starts with a line on its scale: how much it changes the results
        in Micronesia, it is 363 kcal.
     d. In energy and protein, any gain in processing (assumption 14).
     e. For World, the gap between imports and exports, and tourist consumption (assumption 11).
-    Points b and c together are also kept as "balancing_difference", for quality control.
 
 11. World exports equal World imports, and World tourist consumption is zero.
     >> Scale: minor, and only for World: the trade gap is a few percent of imports (at most 9%), and World tourist
@@ -509,7 +508,6 @@ STAGES = [
     "tourist_consumption",
     "data_adjustments",
     "food",
-    "balancing_difference",
 ]
 SUBTRACTED_STAGES = [
     "exports",
@@ -1079,15 +1077,14 @@ def sum_items_into_stages(converted: Table, population: Table) -> Table:
 def move_rounding_gap_to_adjustments(chain: Table) -> Table:
     """Move the gap between converted stages and food to "data_adjustments", so that the chain ends on "food".
 
-    Implements assumption 10. The size of the gap is kept in "balancing_difference" for quality control.
+    Implements assumption 10.
     """
     chain_end = chain["crop_production"]
     for stage in STAGES[1:]:
-        if stage in ["food", "balancing_difference"]:
+        if stage == "food":
             continue
         chain_end = chain_end - chain[stage] if stage in SUBTRACTED_STAGES else chain_end + chain[stage]
-    chain["balancing_difference"] = chain["food"] - chain_end
-    chain["data_adjustments"] = chain["data_adjustments"] - chain["balancing_difference"]
+    chain["data_adjustments"] = chain["data_adjustments"] - (chain["food"] - chain_end)
     return chain
 
 
@@ -1152,7 +1149,7 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
     assert tb.columns[tb.isna().all()].empty, "Output has fully-nan columns."
     assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows."
     # Processing can gain weight (water added in brewing and bottling) but not energy or protein (assumption 14).
-    signed = ["stock_variation", "data_adjustments", "balancing_difference"]
+    signed = ["stock_variation", "data_adjustments"]
     if nutrient == "mass":
         signed.append("processing_net")
     for stage in [s for s in STAGES if s not in signed]:
@@ -1162,7 +1159,7 @@ def sanity_check_outputs(tb: Table, tb_fbsc: Table, nutrient: str) -> None:
         )
     chain_end = tb["crop_production"]
     for stage in STAGES[1:]:
-        if stage in ["food", "balancing_difference"]:
+        if stage == "food":
             continue
         chain_end = chain_end - tb[stage] if stage in SUBTRACTED_STAGES else chain_end + tb[stage]
     assert (chain_end - tb["food"]).abs().max() < 1e-3 * tb["food"].abs().max(), "Chain does not land on food."
