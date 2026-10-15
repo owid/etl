@@ -6,6 +6,7 @@ definitions:
       - This data is based on the World Health Organization (WHO) mortality database. The WHO mortality database compiles cause-of-death statistics reported by member states, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.
       - Causes of death are not always available in countries with poorly functioning [vital registries](#dod:crvs).
       - Additionally, suicide deaths are underreported in many countries due to social stigma and cultural or legal concerns.
+      - Data from the most recent years can be unavailable due to time lags in reporting.
       - This dataset helps to identify gaps in suicide mortality data across different countries, regions, and income groups.
   presentation:
     topic_tags:
