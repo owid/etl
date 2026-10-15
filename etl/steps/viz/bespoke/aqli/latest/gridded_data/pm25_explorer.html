@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PM2.5 — gridded explorer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --owid-navy: #002147;
+    --ink: #1d1d1d;
+    --ink-muted: #8b8b8b;
+    --hairline: #e7e7e7;
+    --surface: #ffffff;
+    --page: #f7f7f7;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Lato", -apple-system, "Segoe UI", sans-serif;
+    background: var(--page);
+    color: var(--ink);
+    font-size: 15px;
+  }
+  .frame {
+    max-width: 1180px; margin: 18px auto 40px;
+    background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: 4px; overflow: hidden;
+  }
+  header { padding: 22px 28px 0; position: relative; }
+  h1 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-weight: 700; font-size: 30px; line-height: 1.2;
+    margin: 0 0 8px; padding-right: 120px;
+  }
+  h1 .year { color: var(--ink-muted); }
+  .subtitle { font-size: 15px; line-height: 1.5; color: #5b5b5b; margin: 0; max-width: 860px; }
+  .logo {
+    position: absolute; top: 22px; right: 28px;
+    background: var(--owid-navy); color: #fff;
+    font-weight: 900; font-size: 11px; line-height: 1.15;
+    padding: 7px 9px 5px; border-bottom: 3px solid #c0023e;
+  }
+
+  .caveat {
+    margin: 14px 28px 0; background: #fdf6ec; border-left: 3px solid #e07131;
+    padding: 10px 14px; font-size: 13px; line-height: 1.5; color: #5b4a38;
+  }
+  .caveat strong { color: #8a4a1c; }
+  .caveat + .caveat { margin-top: 8px; }
+
+  .pm-raster { image-rendering: pixelated; }
+  #map { height: 600px; margin: 16px 28px 0; border: 1px solid var(--hairline); background: #fff; }
+  .leaflet-container { font-family: "Lato", sans-serif; background: #fff; }
+
+  /* -- timeline, mirroring the play button + track under an OWID map -- */
+  .timeline { display: flex; align-items: center; gap: 14px; margin: 12px 28px 0; }
+  .play-btn {
+    width: 34px; height: 34px; flex: none; border-radius: 50%;
+    border: 1px solid var(--hairline); background: var(--surface);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: #454545; font-size: 13px; line-height: 1;
+  }
+  .play-btn:hover { background: #f0f0f0; }
+  .timeline-bound { font-size: 13px; color: #5b5b5b; flex: none; min-width: 34px; }
+  .timeline-bound.end { text-align: right; }
+  #timeline-slider { flex: 1; accent-color: var(--owid-navy); height: 20px; }
+  .resolution-badge {
+    flex: none; font-size: 11px; font-weight: 700; color: #6b6b6b;
+    background: #f0f0f0; border-radius: 3px; padding: 4px 8px; min-width: 52px; text-align: center;
+  }
+  .resolution-badge.fine { background: #e4ecdf; color: #3f6b3a; }
+
+  .stats { display: grid; grid-template-columns: repeat(5, 1fr); margin: 16px 28px 0; border-top: 1px solid var(--hairline); }
+  .stat { padding: 12px 16px 12px 0; border-right: 1px solid var(--hairline); }
+  .stat:last-child { border-right: 0; }
+  .stat-value { font-size: 22px; font-weight: 700; line-height: 1.1; }
+  .stat-value .unit { font-size: 13px; font-weight: 400; color: var(--ink-muted); }
+  .stat-label { font-size: 12px; color: var(--ink-muted); margin-top: 3px; line-height: 1.35; }
+
+  footer {
+    margin: 18px 28px 0; padding: 12px 0 20px;
+    border-top: 1px solid var(--hairline);
+    font-size: 13px; color: #5b5b5b; line-height: 1.5;
+  }
+  footer .label { font-weight: 700; color: var(--ink); }
+
+  .legend { background: rgba(255,255,255,0.94); padding: 8px 10px 6px; border: 1px solid var(--hairline); border-radius: 3px; }
+  .legend-title { font-size: 11px; font-weight: 700; color: #454545; margin-bottom: 6px; }
+  .legend-row { display: flex; align-items: stretch; }
+  .legend-bar { display: flex; }
+  .legend-swatch { height: 13px; }
+  .legend-arrow { width: 0; height: 0; border-left: 8px solid var(--legend-last); border-top: 6.5px solid transparent; border-bottom: 6.5px solid transparent; }
+  .legend-ticks { position: relative; height: 26px; font-size: 10px; color: #575757; }
+  .legend-ticks span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+  .legend-ticks span.low { top: 1px; }
+  .legend-ticks span.high { top: 13px; }
+  .legend-nodata {
+    width: 22px; height: 13px; border: 1px solid #c4c4c4;
+    background-image: repeating-linear-gradient(45deg, #fff 0 3px, #d0d0d0 3px 5px);
+  }
+  /* Its own row beneath the ticks. Inline to the left of the bar, the "No data" caption collided
+     with the "0" boundary label at any swatch width narrow enough to fit 15 classes. */
+  .legend-nodata-row { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #575757; margin-top: 2px; }
+
+  /* -- city search, a Leaflet control sitting over the map -- */
+  .city-search { position: relative; width: 262px; }
+  .city-search input {
+    font: inherit; font-size: 13px; width: 100%;
+    padding: 8px 26px 8px 10px;
+    border: 1px solid #c4c4c4; border-radius: 3px;
+    background: rgba(255,255,255,0.97); color: var(--ink);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  }
+  .city-search input:focus { outline: 2px solid var(--owid-navy); outline-offset: -1px; }
+  .city-search .clear {
+    position: absolute; top: 0; right: 0; height: 33px; width: 24px;
+    border: 0; background: none; cursor: pointer; color: var(--ink-muted); font-size: 15px;
+    line-height: 1; display: none;
+  }
+  .city-search .clear.visible { display: block; }
+  .city-results {
+    position: absolute; top: 36px; left: 0; right: 0;
+    background: #fff; border: 1px solid #c4c4c4; border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.16);
+    max-height: 264px; overflow-y: auto; display: none;
+  }
+  .city-results.open { display: block; }
+  .city-result {
+    padding: 6px 10px; cursor: pointer; font-size: 13px; line-height: 1.3;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .city-result:last-child { border-bottom: 0; }
+  .city-result.active, .city-result:hover { background: var(--blue-tint, #dbe5f0); }
+  .city-result .meta { display: block; font-size: 11px; color: var(--ink-muted); }
+  .city-empty { padding: 8px 10px; font-size: 12px; color: var(--ink-muted); }
+  .city-marker-label {
+    background: rgba(0,33,71,0.92); color: #fff; border: 0; border-radius: 3px;
+    font-size: 11px; font-weight: 700; padding: 2px 6px; box-shadow: none; white-space: nowrap;
+  }
+  .city-marker-label::before { display: none; }
+
+  .pm-tooltip {
+    background: rgba(255,255,255,0.97); border: 1px solid #c9c9c9; border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.14); font-size: 12.5px; padding: 5px 8px;
+  }
+  .pm-tooltip strong { display: block; font-size: 13px; margin-bottom: 1px; }
+  .pm-tooltip .measure { display: block; color: var(--ink-muted); font-size: 11px; }
+  #status { font-size: 12.5px; color: var(--ink-muted); margin: 10px 28px 0; min-height: 17px; }
+</style>
+<link rel="stylesheet" href="site_shell.css">
+</head>
+<body>
+<!-- SITE_SHELL -->
+
+
+<div class="frame">
+  <header>
+    <h2 class="view-title">Air pollution, grid cell by grid cell <span class="year" id="year">—</span></h2>
+    <p class="subtitle">
+      Annual average concentration of fine particulate matter (PM2.5) in the air, worldwide, on a
+      0.1° (~11&nbsp;km) satellite-derived grid. These are small particles that are 2.5 micrometers
+      or less in diameter and can cause health problems in humans exposed to high concentrations.
+      Drag the timeline to move through 1998–2024, search for one of the 1,000 largest cities, and
+      hover anywhere for that cell's value.
+    </p>
+  </header>
+
+  <div class="caveat">
+    <strong>This is total PM2.5, including natural sources.</strong>
+    Mineral dust and sea salt are <em>not</em> removed, so the brightest areas on this map are the
+    Sahara, the Arabian peninsula, the Taklamakan and the Gobi — deserts, where almost nobody lives.
+    OWID's published “Exposure to air pollution from human sources” chart uses a different measure
+    that strips those out. Do not read this map as that one.
+  </div>
+  <div class="caveat">
+    <strong>2024 is drawn at higher resolution than the other years.</strong>
+    It comes from the fine 0.01° source, rendered at about 5&nbsp;km; 1998–2023 come from the coarse
+    0.1° grid at about 11&nbsp;km. The badge beside the timeline shows which you are looking at. The
+    map getting sharper on 2024 is a change in <em>resolution</em>, not in the data — and the full
+    0.01° world cannot be shown here at all, since at 36,000&nbsp;×&nbsp;13,000&nbsp;px no browser
+    will draw it as a single image.
+  </div>
+  <div class="caveat">
+    <strong>Land only, and coverage stops at 60°S and 70°N.</strong> Antarctica, Greenland's
+    interior and the high Arctic are blank — that is the product's extent, not missing data. The
+    grid is masked to land before anything is drawn or counted: SatPM also emits values over
+    coastal and enclosed water (the North Sea, the Great Lakes, shelf seas), which are 16% of all
+    its data cells and would otherwise haze the coastlines and dilute every figure below. Every
+    statistic here is over land.
+  </div>
+
+  <div id="map"></div>
+
+  <div class="timeline">
+    <button class="play-btn" id="play" aria-label="Play timeline">▶</button>
+    <span class="timeline-bound" id="year-start">1998</span>
+    <input type="range" id="timeline-slider" min="0" max="0" step="1" value="0" aria-label="Year" />
+    <span class="timeline-bound end" id="year-end">2024</span>
+    <span class="resolution-badge" id="resolution">—</span>
+  </div>
+
+  <div id="status"></div>
+  <div class="stats" id="stats"></div>
+
+  <footer>
+    <div>
+      <span class="label">Data source:</span>
+      SatPM V6.GL.03 — Atmospheric Composition Analysis Group, Washington University in St. Louis.
+      Total PM2.5 at 0.1°, derived from MODIS, MISR, SeaWiFS and VIIRS retrievals combined with the
+      GEOS-Chem model and calibrated against ground monitors.
+    </div>
+    <div style="margin-top:4px;">CC BY 4.0</div>
+  </footer>
+</div>
+
+<script>
+// ---------------------------------------------------------------------------------------------
+// Each year is one palettised PNG covering the whole world, drawn with L.imageOverlay -- no
+// tiling, no COG. That works because pre-classifying to 15 colours makes a world-year ~155 KB.
+// Values are read back by sampling the decoded image on an offscreen canvas rather than shipping a
+// parallel value array, so hover reports a bracket range ("15-20 ug/m3"), not an exact value --
+// which is what a classed raster honestly supports. Going finer than 0.1 deg would mean tiling:
+// the fine global grid is 13,000 x 36,000 px, which no browser takes as a single image.
+// ---------------------------------------------------------------------------------------------
+
+let manifest = null;
+let activeYearIndex = 0;
+let playTimer = null;
+let map, rasterOverlay = null, labelsLayer = null;
+
+// year -> decoded canvas, for hover lookups. Bounded: a world raster is ~3400x1670 px, so each
+// decoded entry is ~23 MB of RGBA and holding all 27 would be well over half a gigabyte.
+const rasterCache = new Map();
+const RASTER_CACHE_MAX = 3;
+
+const statusEl = document.getElementById("status");
+const setStatus = (text) => { statusEl.textContent = text; };
+
+const currentYear = () => manifest.years[activeYearIndex];
+const currentYearData = () => manifest.years_data[String(currentYear())];
+
+function bracketLabel(index) {
+  const b = manifest.brackets;
+  if (index === 0) return `< ${b[0]} µg/m³`;
+  if (index >= b.length) return `${b[b.length - 1]}+ µg/m³`;
+  return `${b[index - 1]}–${b[index]} µg/m³`;
+}
+
+// -- Legend -----------------------------------------------------------------------------------
+function addLegend() {
+  const legend = L.control({ position: "bottomleft" });
+  legend.onAdd = function () {
+    const div = L.DomUtil.create("div", "legend");
+    L.DomEvent.disableClickPropagation(div);
+    // 15 classes do not fit at the 30px swatches an 8-class legend used, so size them to the
+    // class count and label only every other boundary.
+    const swatchW = 22;
+
+    const title = document.createElement("div");
+    title.className = "legend-title";
+    title.textContent = "Annual mean PM2.5 (µg/m³)";
+    div.appendChild(title);
+
+    const row = document.createElement("div");
+    row.className = "legend-row";
+    const bar = document.createElement("div");
+    bar.className = "legend-bar";
+    manifest.colors.forEach((c) => {
+      const s = document.createElement("div");
+      s.className = "legend-swatch";
+      s.style.background = c;
+      s.style.width = `${swatchW}px`;
+      bar.appendChild(s);
+    });
+    const arrow = document.createElement("div");
+    arrow.className = "legend-arrow";
+    arrow.style.setProperty("--legend-last", manifest.colors[manifest.colors.length - 1]);
+    bar.appendChild(arrow);
+    row.appendChild(bar);
+    div.appendChild(row);
+
+    const ticks = document.createElement("div");
+    ticks.className = "legend-ticks";
+    [0, ...manifest.brackets].forEach((b, i) => {
+      const t = document.createElement("span");
+      t.textContent = b;
+      t.className = i % 2 === 0 ? "low" : "high";
+      t.style.left = `${i * swatchW}px`;
+      ticks.appendChild(t);
+    });
+    div.appendChild(ticks);
+
+    const noDataRow = document.createElement("div");
+    noDataRow.className = "legend-nodata-row";
+    const noData = document.createElement("div");
+    noData.className = "legend-nodata";
+    noDataRow.appendChild(noData);
+    const noDataLabel = document.createElement("span");
+    noDataLabel.textContent = "No data (not land, or outside 60°S–70°N)";
+    noDataRow.appendChild(noDataLabel);
+    div.appendChild(noDataRow);
+    return div;
+  };
+  legend.addTo(map);
+}
+
+// -- Raster -----------------------------------------------------------------------------------
+function loadRaster(yearData) {
+  if (rasterCache.has(yearData.year)) return Promise.resolve(rasterCache.get(yearData.year));
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(img, 0, 0);
+      const [[south, west], [north, east]] = yearData.bounds;
+      // Re-project the lat/lon corners back to Web Mercator. The PNG is axis-aligned in EPSG:3857,
+      // so these two points are exactly the extent its pixels span, which makes a linear pixel
+      // lookup valid.
+      const sw = L.CRS.EPSG3857.project(L.latLng(south, west));
+      const ne = L.CRS.EPSG3857.project(L.latLng(north, east));
+      const entry = { ctx, width: img.width, height: img.height, minX: sw.x, maxX: ne.x, minY: sw.y, maxY: ne.y };
+      rasterCache.set(yearData.year, entry);
+      // Map preserves insertion order, so the oldest key is the first one.
+      while (rasterCache.size > RASTER_CACHE_MAX) rasterCache.delete(rasterCache.keys().next().value);
+      resolve(entry);
+    };
+    img.onerror = () => reject(new Error(`could not load ${yearData.raster}`));
+    img.src = yearData.raster;
+  });
+}
+
+function sampleRaster(latlng) {
+  const entry = rasterCache.get(currentYear());
+  if (!entry) return null;
+  const p = L.CRS.EPSG3857.project(latlng);
+  const fx = (p.x - entry.minX) / (entry.maxX - entry.minX);
+  const fy = (entry.maxY - p.y) / (entry.maxY - entry.minY);   // image rows run north -> south
+  if (fx < 0 || fx > 1 || fy < 0 || fy > 1) return null;
+  const x = Math.min(entry.width - 1, Math.floor(fx * entry.width));
+  const y = Math.min(entry.height - 1, Math.floor(fy * entry.height));
+  const [r, g, b, a] = entry.ctx.getImageData(x, y, 1, 1).data;
+  if (a === 0) return null;
+  const hex = "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("");
+  const index = manifest.colors.indexOf(hex);
+  return index === -1 ? null : index;
+}
+
+// -- Rendering --------------------------------------------------------------------------------
+// `fit` is false on every timeline step: refitting the viewport would yank the map back out of
+// wherever the user had zoomed to.
+function render({ fit = false } = {}) {
+  const yearData = currentYearData();
+  if (!yearData) return;
+
+  document.getElementById("year").textContent = yearData.year;
+  document.getElementById("timeline-slider").value = activeYearIndex;
+  const badge = document.getElementById("resolution");
+  badge.textContent = `~${yearData.resolution_km} km`;
+  badge.classList.toggle("fine", Boolean(yearData.fine));
+  // The pointer has not moved, but the year under it has: leaving the tooltip up would label the
+  // previous year's bracket as the current one.
+  if (map) map.closeTooltip(hoverTooltip);
+
+  loadRaster(yearData)
+    .then(() => {
+      if (rasterOverlay) {
+        // Reuse the overlay across years so the image swaps in place instead of flickering.
+        rasterOverlay.setUrl(yearData.raster);
+      } else {
+        rasterOverlay = L.imageOverlay(yearData.raster, yearData.bounds, {
+          className: "pm-raster", interactive: false,
+        }).addTo(map);
+      }
+      if (fit) map.fitBounds(yearData.bounds);
+      if (labelsLayer) labelsLayer.bringToFront();
+      setStatus(`${yearData.year} — world grid ${yearData.width}×${yearData.height} px `
+        + `(${yearData.resolution_degrees}, ~${yearData.resolution_km} km). `
+        + `Hover for values; scroll to zoom.`);
+    })
+    .catch((err) => setStatus(`Failed to load ${yearData.year}: ${err.message}`));
+
+  renderStats(yearData);
+}
+
+function renderStats(yearData) {
+  const change = yearData.grid_mean - manifest.baseline_mean;
+  const changeText = `${change >= 0 ? "+" : "−"}${Math.abs(change).toFixed(1)}`;
+  const items = [
+    [`${yearData.grid_mean}`, "µg/m³", "Global mean over land (area-weighted)"],
+    [changeText, "µg/m³", `Change vs ${manifest.baseline_year}`],
+    [`${yearData.grid_max}`, "µg/m³", "Highest single grid cell"],
+    [`${yearData.share_above_who}`, "%", `Land area above the WHO guideline (${manifest.who_guideline} µg/m³)`],
+    [`${yearData.share_above_35}`, "%", "Land area above 35 µg/m³"],
+  ];
+  document.getElementById("stats").innerHTML = items
+    .map(([value, unit, label]) =>
+      `<div class="stat"><div class="stat-value">${value} <span class="unit">${unit}</span></div>` +
+      `<div class="stat-label">${label}</div></div>`).join("");
+}
+
+// -- Hover ------------------------------------------------------------------------------------
+const hoverTooltip = L.tooltip({ className: "pm-tooltip", sticky: true, direction: "top" });
+
+function tooltipHtml(latlng) {
+  const index = sampleRaster(latlng);
+  return index === null
+    ? `<strong>No data here</strong><span class="measure">not land, or outside 60°S–70°N</span>`
+    : `<strong>${bracketLabel(index)}</strong><span class="measure">total PM2.5 · incl. dust &amp; sea salt</span>`;
+}
+
+// -- City search ------------------------------------------------------------------------------
+// Coordinates come from the GHSL Urban Centres snapshot (see prepare_webapp_data.py), not from a
+// hand-typed list.
+
+// Zoom the lookup flies to. At 0.1 deg a grid cell is ~11 km, which is ~18 px at z8 -- enough to
+// read the city against its surroundings without the map becoming four enormous squares.
+const CITY_ZOOM = 8;
+const MAX_RESULTS = 8;
+
+let cityMarker = null;
+let activeResultIndex = -1;
+let currentResults = [];
+
+// Fold accents and case so "Zurich" finds "Zürich" and "Dusseldorf" finds "Düsseldorf".
+const normalize = (text) => text.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+function searchCities(query) {
+  const q = normalize(query.trim());
+  if (!q) return [];
+  // Rank exact prefix matches above interior substring matches, then by population, so typing
+  // "lo" offers London before Bulawayo.
+  return manifest.cities
+    .map((c) => {
+      const haystack = normalize(`${c.name} ${c.country}`);
+      const pos = haystack.indexOf(q);
+      return pos === -1 ? null : { city: c, prefix: normalize(c.name).startsWith(q) ? 0 : 1 };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.prefix - b.prefix || b.city.pop - a.city.pop)
+    .slice(0, MAX_RESULTS)
+    .map((r) => r.city);
+}
+
+function goToCity(city) {
+  if (cityMarker) map.removeLayer(cityMarker);
+  cityMarker = L.circleMarker([city.lat, city.lon], {
+    radius: 5, color: "#002147", weight: 2, fillColor: "#ffffff", fillOpacity: 1,
+  }).addTo(map);
+  cityMarker.bindTooltip(city.name, {
+    permanent: true, direction: "right", offset: [8, 0], className: "city-marker-label",
+  });
+  map.flyTo([city.lat, city.lon], CITY_ZOOM, { duration: 1.4 });
+}
+
+function addCitySearch() {
+  const control = L.control({ position: "topright" });
+  control.onAdd = function () {
+    const div = L.DomUtil.create("div", "city-search");
+    // Without both of these, typing scrolls/zooms the map and clicks fall through to it.
+    L.DomEvent.disableClickPropagation(div);
+    L.DomEvent.disableScrollPropagation(div);
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = `Search ${manifest.cities.length} largest cities…`;
+    input.setAttribute("aria-label", "Search for a city");
+    div.appendChild(input);
+
+    const clear = document.createElement("button");
+    clear.className = "clear";
+    clear.innerHTML = "✕";
+    clear.setAttribute("aria-label", "Clear search");
+    div.appendChild(clear);
+
+    const results = document.createElement("div");
+    results.className = "city-results";
+    div.appendChild(results);
+
+    const close = () => { results.classList.remove("open"); activeResultIndex = -1; };
+
+    function renderResults() {
+      results.innerHTML = "";
+      if (!currentResults.length) {
+        if (input.value.trim()) {
+          const empty = document.createElement("div");
+          empty.className = "city-empty";
+          empty.textContent = "No match among the largest cities";
+          results.appendChild(empty);
+          results.classList.add("open");
+        } else {
+          close();
+        }
+        return;
+      }
+      currentResults.forEach((city, i) => {
+        const row = document.createElement("div");
+        row.className = "city-result" + (i === activeResultIndex ? " active" : "");
+        row.innerHTML = `${city.name}<span class="meta">${city.country} · `
+          + `${(city.pop / 1e6).toFixed(1)}M</span>`;
+        row.addEventListener("click", () => { select(city); });
+        results.appendChild(row);
+      });
+      results.classList.add("open");
+    }
+
+    function select(city) {
+      input.value = city.name;
+      clear.classList.add("visible");
+      close();
+      goToCity(city);
+    }
+
+    input.addEventListener("input", () => {
+      currentResults = searchCities(input.value);
+      activeResultIndex = -1;
+      clear.classList.toggle("visible", input.value.length > 0);
+      renderResults();
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        if (!currentResults.length) return;
+        const step = e.key === "ArrowDown" ? 1 : -1;
+        activeResultIndex = (activeResultIndex + step + currentResults.length) % currentResults.length;
+        renderResults();
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        // Enter with nothing highlighted takes the top hit, which is the common case.
+        const city = currentResults[activeResultIndex >= 0 ? activeResultIndex : 0];
+        if (city) select(city);
+      } else if (e.key === "Escape") {
+        close();
+        input.blur();
+      }
+    });
+
+    clear.addEventListener("click", () => {
+      input.value = "";
+      currentResults = [];
+      clear.classList.remove("visible");
+      close();
+      if (cityMarker) { map.removeLayer(cityMarker); cityMarker = null; }
+      input.focus();
+    });
+
+    document.addEventListener("click", (e) => { if (!div.contains(e.target)) close(); });
+    return div;
+  };
+  control.addTo(map);
+}
+
+// -- Timeline ---------------------------------------------------------------------------------
+function stopPlaying() {
+  if (playTimer) { clearInterval(playTimer); playTimer = null; }
+  document.getElementById("play").textContent = "▶";
+}
+
+function togglePlay() {
+  if (playTimer) { stopPlaying(); return; }
+  document.getElementById("play").textContent = "❚❚";
+  if (activeYearIndex >= manifest.years.length - 1) activeYearIndex = 0;
+  playTimer = setInterval(() => {
+    if (activeYearIndex >= manifest.years.length - 1) { stopPlaying(); return; }
+    activeYearIndex += 1;
+    render();
+  }, 600);
+}
+
+fetch("manifest.json",{cache:'no-store'})
+  .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+  .then((data) => {
+    manifest = data;
+    activeYearIndex = manifest.years.length - 1;
+
+    document.getElementById("year-start").textContent = manifest.years[0];
+    document.getElementById("year-end").textContent = manifest.years[manifest.years.length - 1];
+    const slider = document.getElementById("timeline-slider");
+    slider.max = manifest.years.length - 1;
+    slider.value = activeYearIndex;
+
+    const bounds = L.latLngBounds(currentYearData().bounds);
+    map = L.map("map", {
+      zoomControl: true, minZoom: 2, maxZoom: 16, preferCanvas: true,
+      // Keep the viewport on the data. Without this you can pan off into empty repeated basemap,
+      // since a single ImageOverlay does not wrap the way a tile layer does.
+      maxBounds: bounds.pad(0.1), maxBoundsViscosity: 0.8, worldCopyJump: false,
+    });
+    // Esri's light-gray canvas, which serves without an API key. Note the {z}/{y}/{x} tile order --
+    // Esri's REST tile scheme puts row before column, unlike the usual XYZ convention.
+    const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas";
+    L.tileLayer(`${ESRI}/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}`, {
+      attribution: "Tiles &copy; Esri", maxZoom: 16, noWrap: true,
+    }).addTo(map);
+    // Labels go in their own pane above the data, so place names stay readable over the raster.
+    labelsLayer = L.tileLayer(`${ESRI}/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}`, {
+      maxZoom: 16, pane: "shadowPane", noWrap: true,
+    }).addTo(map);
+
+    addLegend();
+    addCitySearch();
+
+    slider.addEventListener("input", () => {
+      stopPlaying();
+      activeYearIndex = Number(slider.value);
+      render();
+    });
+    document.getElementById("play").addEventListener("click", togglePlay);
+
+    map.on("mousemove", (e) => {
+      hoverTooltip.setLatLng(e.latlng).setContent(tooltipHtml(e.latlng)).addTo(map);
+    });
+    map.on("mouseout", () => map.closeTooltip(hoverTooltip));
+
+    render({ fit: true });
+  })
+  .catch((err) => {
+    setStatus(`Failed to load manifest.json (${err.message}). This page must be served over HTTP, `
+      + `not opened as a file:// URL — see the comment at the bottom of this file.`);
+  });
+</script>
+
+<!--
+Build the data, then serve this directory (fetch() and canvas pixel reads both need HTTP, not file://):
+  .venv/bin/python etl/steps/viz/bespoke/aqli/latest/gridded_data/prepare_webapp_data.py
+  .venv/bin/python -m http.server 8000 --directory ai/aqli_gridded/webapp
+then open http://localhost:8000/
+-->
+</body>
+</html>
