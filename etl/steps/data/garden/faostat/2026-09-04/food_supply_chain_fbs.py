@@ -205,11 +205,11 @@ ASSUMPTIONS THAT GO INTO THE CALCULATION
    Countries and other regions keep their tourist consumption, because for them food eaten by visitors is real.
 
 11. Regions.
-   >> Scale: major for the 11 region aggregates, which only exist through this assumption; no country's values
+   >> Scale: major for the region aggregates, which only exist through this assumption; no country's values
    change.
 
    FAO publishes its own regional aggregates; this step drops them and builds OWID regions (World,
-    continents, income groups) instead, from the member countries that have an FBS balance that year. Every element
+    continents, income groups, European Union) instead, from the member countries that have an FBS balance that year. Every element
     in tonnes, and the food nutrient totals (per-capita food supply times population), are summed over those
     countries, and the region's population is the sum of those same countries' population. A country either has a
     full balance or no balance at all, so the summed elements and the summed population always cover the same
@@ -453,6 +453,8 @@ REGIONS = [
     "Lower-middle-income countries",
     "Upper-middle-income countries",
     "High-income countries",
+    # FAOSTAT keeps its own EU aggregate under this name; it is dropped and rebuilt from the members like the others.
+    "European Union (27)",
 ]
 
 
