@@ -6,8 +6,8 @@ Three tables come out:
   by country, year, sex and age group, for All Causes and the 23 cause groups that tile it.
 - `vaccine_preventable_diseases`: the same four indicators for the seven vaccine-preventable causes,
   which are drill-downs inside one of those groups.
-- `intentional_injuries`: the same four indicators for self-inflicted injuries, a drill-down inside
-  Intentional injuries. Later fold-ins add one table per group of drill-downs.
+- `intentional_injuries`: the same four indicators for self-inflicted injuries and violence (homicides), two
+  drill-downs inside Intentional injuries; violence also gets the age bands the homicide charts use.
 - `cancers`: the same four indicators for the 25 cancer types inside Malignant neoplasms, plus two age
   bands WHO does not publish (`<5 years`, `<10 years`), derived in `add_derived_age_groups` for the types
   and for Malignant neoplasms itself (in `mortality_database`), which the childhood-cancer charts plot together.
@@ -52,6 +52,7 @@ INJURIES = "Injuries"
 INFECTIOUS = "Infectious and parasitic diseases"
 CHILDHOOD_CLUSTER = "Childhood-cluster diseases"
 MALIGNANT = "Malignant neoplasms"
+VIOLENCE = "Violence"
 
 # WHO's 23 groups that tile All Causes. Fold-ins add drill-downs inside them, never new partition groups.
 N_PARTITION_GROUPS = 23
@@ -97,17 +98,37 @@ DRILL_DOWN_TABLES = {
     "Hepatitis B": "vaccine_preventable_diseases",
     "Japanese encephalitis": "vaccine_preventable_diseases",
     "Self-inflicted injuries": "intentional_injuries",
+    VIOLENCE: "intentional_injuries",
     **{cancer: "cancers" for cancer in CANCERS},
 }
 
-# Age bands WHO does not publish, built for the causes whose charts use them by summing WHO's bands: the cancer
-# types and their parent, which the childhood-cancer charts plot together. The rate divides by the population WHO
-# itself used, recovered from All Causes (see add_derived_age_groups).
-DERIVED_AGE_GROUPS = {
-    "<5 years": ["less than 1 year", "1-4 years"],
-    "<10 years": ["less than 1 year", "1-4 years", "5-9 years"],
-}
-DERIVED_AGE_GROUP_CAUSES = [MALIGNANT, *CANCERS]
+# Age bands WHO does not publish, built per cause group by summing WHO's bands, for the causes whose charts use
+# them. The rate divides by the population WHO itself used, recovered from All Causes (see add_derived_age_groups).
+UNDER_5 = ["less than 1 year", "1-4 years"]
+DERIVED_AGE_GROUPS: list[tuple[list[str], dict[str, list[str]]]] = [
+    # The childhood-cancer charts plot the cancer types and their parent together.
+    ([MALIGNANT, *CANCERS], {"<5 years": UNDER_5, "<10 years": [*UNDER_5, "5-9 years"]}),
+    # The homicide charts compare victims' ages in the bands IHME uses, plus children under 20.
+    (
+        [VIOLENCE],
+        {
+            "<5 years": UNDER_5,
+            "5-14 years": ["5-9 years", "10-14 years"],
+            "15-49 years": [
+                "15-19 years",
+                "20-24 years",
+                "25-29 years",
+                "30-34 years",
+                "35-39 years",
+                "40-44 years",
+                "45-49 years",
+            ],
+            "50-69 years": ["50-54 years", "55-59 years", "60-64 years", "65-69 years"],
+            "over 70 years": ["70-74 years", "75-79 years", "80-84 years", "over 85 years"],
+            "<20 years": [*UNDER_5, "5-9 years", "10-14 years", "15-19 years"],
+        },
+    ),
+]
 
 # Causes that occur in one sex only. Deaths recorded for the other sex are coding errors in the source;
 # they are tolerated up to this share of the cause's deaths and logged.
@@ -155,8 +176,9 @@ CAUSE_TREE: dict[str, tuple[int, str | None]] = {
     "Tetanus": (4, CHILDHOOD_CLUSTER),
     "Hepatitis B": (3, INFECTIOUS),
     "Japanese encephalitis": (3, INFECTIOUS),
-    # Drill-down inside Intentional injuries (formerly the self_inflicted_injuries dataset).
+    # Drill-downs inside Intentional injuries (formerly the self_inflicted_injuries and homicide/who_mort_db datasets).
     "Self-inflicted injuries": (3, "Intentional injuries"),
+    VIOLENCE: (3, "Intentional injuries"),
     # Drill-downs inside Malignant neoplasms (formerly the mortality_database_cancer dataset).
     **{cancer: (3, MALIGNANT) for cancer in CANCERS},
 }
@@ -296,7 +318,7 @@ def _split_by_table(tb: Table, tb_causes: Table) -> list[Table]:
 
 
 def add_derived_age_groups(tb: Table, tb_causes: Table) -> Table:
-    """Add DERIVED_AGE_GROUPS to DERIVED_AGE_GROUP_CAUSES.
+    """Add the age bands in DERIVED_AGE_GROUPS to the causes each entry names.
 
     Deaths are summed over the bands each derived group spans. The death rate divides them by the population
     WHO itself divided by, which `_implied_population` recovers from All Causes. Every band must contribute
@@ -304,26 +326,25 @@ def add_derived_age_groups(tb: Table, tb_causes: Table) -> Table:
     denominator understates the rate, a full numerator over a partial denominator overstates it. The share of
     total deaths and the age-standardized rate are not derived.
     """
-    causes = set(DERIVED_AGE_GROUP_CAUSES)
-    assert causes <= set(tb_causes["cause"]), (
-        f"Unknown causes in DERIVED_AGE_GROUP_CAUSES: {causes - set(tb_causes['cause'])}"
-    )
     tb_population = _implied_population(tb)
     keys = ["country", "year", "sex", "cause"]
 
     parts = [tb]
-    for label, bands in DERIVED_AGE_GROUPS.items():
-        tb_bands = tb[tb["cause"].isin(causes) & tb["age_group"].isin(bands)]
-        tb_bands = pr.merge(tb_bands, tb_population, on=["country", "year", "sex", "age_group"], how="left")
-        grouped = tb_bands.groupby(keys, observed=True)[["number", "population"]]
-        # count() ignores NaN, so requiring one contribution per band rejects any group where a band is
-        # absent, reports no deaths, or has no recoverable population.
-        tb_group = grouped.sum(min_count=1).where(grouped.count() == len(bands)).reset_index()
-        tb_group["death_rate_per_100_000_population"] = tb_group["number"] / tb_group["population"] * 100_000
-        tb_group["age_group"] = label
-        tb_group = tb_group.drop(columns=["population"])
-        _validate_derived_age_group(tb_group, label)
-        parts.append(tb_group)
+    for causes, groups in DERIVED_AGE_GROUPS:
+        unknown = set(causes) - set(tb_causes["cause"])
+        assert not unknown, f"Unknown causes in DERIVED_AGE_GROUPS: {unknown}"
+        for label, bands in groups.items():
+            tb_bands = tb[tb["cause"].isin(causes) & tb["age_group"].isin(bands)]
+            tb_bands = pr.merge(tb_bands, tb_population, on=["country", "year", "sex", "age_group"], how="left")
+            grouped = tb_bands.groupby(keys, observed=True)[["number", "population"]]
+            # count() ignores NaN, so requiring one contribution per band rejects any group where a band is
+            # absent, reports no deaths, or has no recoverable population.
+            tb_group = grouped.sum(min_count=1).where(grouped.count() == len(bands)).reset_index()
+            tb_group["death_rate_per_100_000_population"] = tb_group["number"] / tb_group["population"] * 100_000
+            tb_group["age_group"] = label
+            tb_group = tb_group.drop(columns=["population"])
+            _validate_derived_age_group(tb_group, label)
+            parts.append(tb_group)
 
     tb_out = pr.concat(parts, ignore_index=True)
     # Concatenating a categorical with new labels gives plain strings; keep the dimensions categorical.

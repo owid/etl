@@ -3,14 +3,14 @@ from owid.catalog import processing as pr
 from owid.catalog.utils import underscore
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 log = get_logger()
 
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     # Load data from fast track
     snap_eisner = paths.load_snapshot("long_term_homicide_rates_in_europe.csv")
     # Get the required table
@@ -38,12 +38,7 @@ def run(dest_dir: str) -> None:
 
     tb = tb_combined.format(["country", "year"], short_name="homicide_long_run_omm")
     # Save outputs
-    ds_garden = create_dataset(
-        dest_dir,
-        tables=[tb],
-        check_variables_metadata=True,
-        default_metadata=snap_eisner.metadata,
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=snap_eisner.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -54,10 +49,14 @@ def get_who_mortality_db() -> Table:
     Get the homicide rate from the WHO Mortality Database Dataset
     """
 
-    ds_who_db = paths.load_dataset("who_mort_db")
-    tb_who = ds_who_db["who_mort_db"].reset_index()
-    # Just pull out the rows for all ages and both sexes
-    tb_who = tb_who[(tb_who["age_group"] == "All ages") & (tb_who["sex"] == "Both Sexes")]
+    # Violence (assault, ICD-10 X85-Y09 and Y871) is WHO's name for homicide; it sits in the merged WHO Mortality
+    # Database as a drill-down inside Intentional injuries.
+    ds_who_db = paths.load_dataset("mortality_database")
+    tb_who = ds_who_db.read("intentional_injuries")
+    # Just pull out the rows for violence, all ages and both sexes
+    tb_who = tb_who[
+        (tb_who["cause"] == "Violence") & (tb_who["age_group"] == "all ages") & (tb_who["sex"] == "Both sexes")
+    ]
     assert tb_who.set_index(["country", "year"]).index.is_unique and tb_who.shape[0] > 0
     # Grab the columns we need
     tb_who = tb_who[["country", "year", "death_rate_per_100_000_population"]]
