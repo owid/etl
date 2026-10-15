@@ -1,4 +1,4 @@
-import random
+import hashlib
 import tempfile
 import time
 from pathlib import Path
@@ -753,6 +753,22 @@ def combine_and_reduce_scores_df(anomalies: list[gm.Anomaly]) -> pd.DataFrame:
     return df_reduced
 
 
+def sample_variable_ids(variable_ids: list[int], n: int) -> list[int]:
+    """Pick n variable ids at random, deterministically: two runs over the same ids pick the same n.
+
+    Ids are ranked by a hash of their *digits*, not by `hash()`. `hash(n) == n` for Python ints, so
+    ranking by `hash` is ranking by id — it returns the n lowest ids, which is a contiguous block of
+    a dataset's indicators (for un_sdg, the first ~1000 ids are SDG goal 1-10 only) rather than a
+    sample of it.
+    """
+    if len(variable_ids) <= n:
+        return variable_ids
+
+    ranked = sorted(variable_ids, key=lambda variable_id: hashlib.md5(str(variable_id).encode()).hexdigest())
+
+    return sorted(ranked[:n])
+
+
 def _sample_variables(variables: list[gm.Variable], n: int) -> list[gm.Variable]:
     """Sample n variables. Prioritize variables that are used in charts, then fill the rest
     with random variables."""
@@ -766,11 +782,12 @@ def _sample_variables(variables: list[gm.Variable], n: int) -> list[gm.Variable]
     df_views = get_variables_views_in_charts(variable_ids=[v.id for v in variables])
     sample_ids = set(df_views.sort_values("views_365d", ascending=False).head(n)["variable_id"])
 
-    # Fill the rest with random variables.
+    # Fill the rest with random variables. NOTE: seeding `random` would not make `np.random.choice`
+    # deterministic (it draws from numpy's own global RNG), which is why this goes through the
+    # deterministic sampler instead.
     unused_ids = list(set(v.id for v in variables) - sample_ids)
-    random.seed(1)
     if len(sample_ids) < n:
-        sample_ids |= set(np.random.choice(unused_ids, n - len(sample_ids), replace=False))
+        sample_ids |= set(sample_variable_ids(unused_ids, n - len(sample_ids)))
 
     log.info(
         "sampling_variables",

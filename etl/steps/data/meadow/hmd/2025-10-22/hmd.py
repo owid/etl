@@ -298,7 +298,7 @@ def _check_nas(tb, missing_row_max, missing_countries_max):
 
 
 def _clean_population_type(tb):
-    """Data provider notes the following:
+    """Data producer notes the following:
 
     For populations with territorial changes, two sets of population estimates are given for years in which a territorial change occurred. The first set of estimates (identified as year "19xx-") refers to the population just before the territorial change, whereas the second set (identified as year "19xx+") refers to the population just after the change. For example, in France, the data for "1914-" cover the previous territory (i.e., as of December 31, 1913), whereas the data for "1914+" reflect the territorial boundaries as of January 1, 1914.
 

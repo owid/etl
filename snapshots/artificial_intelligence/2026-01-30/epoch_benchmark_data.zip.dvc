@@ -13,18 +13,18 @@ meta:
     # Citation
     producer: Epoch AI
     citation_full: |-
-      Epoch AI, ‘AI Benchmarking Hub’. Published online at epoch.ai. Retrieved from ‘https://epoch.ai/benchmarks’ [online resource]. Accessed 17 Apr 2026.
+      Epoch AI, ‘AI Benchmarking Hub’. Published online at epoch.ai. Retrieved from ‘https://epoch.ai/benchmarks’ [online resource].
 
     # Files
     url_main: https://epoch.ai/benchmarks
     url_download: https://epoch.ai/data/benchmark_data.zip
-    date_accessed: '2026-06-11'
+    date_accessed: '2026-09-04'
 
     # License
     license:
       name: CC BY 4.0
       url: https://epoch.ai/about
 outs:
-  - md5: 82af7e84f0e2966bd8ff5355090100a8
-    size: 341225
+  - md5: a933de18f9d748c7b259e5b0c1053a64
+    size: 536490
     path: epoch_benchmark_data.zip

@@ -62,7 +62,7 @@ Datasets are nodes in the computational graph and the main units of work in the 
 data://<channel>/<namespace>/<version>/<dataset-name>
 ```
 
-The `channel` is used as the highest level of grouping and represents a stage of data curation. This will either be `meadow` or `garden`. The `namespace` is typically a data provider, like `un`, but it in cases where there are many data providers, it can describe the topic area instead (e.g. `energy`).
+The `channel` is used as the highest level of grouping and represents a stage of data curation. This will either be `meadow` or `garden`. The `namespace` is typically a data producer, like `un`, but it in cases where there are many data producers, it can describe the topic area instead (e.g. `energy`).
 
 The dataset URI is used to identify the code that builds the dataset and also to identify the output file on disk.
 

@@ -57,8 +57,8 @@ tables:
         display:
           numDecimalPlaces: 0
       programme__drug__coverage__pct:
-        title: Programme coverage
-        description_short: "Programme coverage for [preventive chemotherapy](#dod:preventive-chemotherapy) for [lymphatic filariasis](#dod:lymphatic-filariasis). The share of people who require preventive chemotherapy for [lymphatic filariasis](#dod:lymphatic-filariasis) who actually receive it."
+        title: Program coverage
+        description_short: "Program coverage for [preventive chemotherapy](#dod:preventive-chemotherapy) for [lymphatic filariasis](#dod:lymphatic-filariasis). The share of people who require preventive chemotherapy for [lymphatic filariasis](#dod:lymphatic-filariasis) who actually receive it."
         unit: "%"
         short_unit: "%"
         display:

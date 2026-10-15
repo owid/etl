@@ -14,6 +14,7 @@ tables:
           numDecimalPlaces: 0
           conversionFactor: 1
 
+          timeInterval: month
   avian_influenza_ah5n1_year:
     variables:
       avian_cases_year:

@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical rubella cases in the United States - Centers for Disease Control and Prevention
+    title: Historical rubella cases in the United States – Centers for Disease Control and Prevention
     description: |-
       Data on historical rubella cases in the United States, compiled from a selection of sources from the US CDC.
 
@@ -48,7 +48,7 @@ meta:
 
       Summary of Notifiable Diseases --- United States, 2007-2015
 
-      National Notifiable Diseases Surveillance System (NNDSS) - Centers for Disease Control and Prevention (CDC)
+      National Notifiable Diseases Surveillance System (NNDSS) – Centers for Disease Control and Prevention (CDC)
     # Files
     url_main: https://wonder.cdc.gov/ucd-icd10.html
     date_accessed: 2025-03-14

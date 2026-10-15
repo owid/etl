@@ -249,7 +249,7 @@ tables:
         title: Military personnel as a share of total population
         unit: "%"
         short_unit: "%"
-        description_short: The ratio of military personnel to total population, expressed as a percentage.
+        description_short: Ratio of military personnel to total population, expressed as a percentage.
         description_key:
           - "Because this indicator divides military personnel by total population, the change in the total-population data vintage from 2017 onward can create small discontinuities at the 2016-2017 boundary even when military personnel itself is unchanged."
         description_processing: |-
@@ -300,7 +300,7 @@ tables:
         title: Total population
         unit: "people"
         short_unit: ""
-        description_short: The size of a state's total civilian population.
+        description_short: Size of a state's total civilian population.
         description_key:
           - "For data from 2017 onward, total population is drawn from a newer vintage of the UN World Population Prospects than the values through 2016. For many countries this produces one-off jumps at the 2016-2017 boundary (for example, large single-year steps for Micronesia, Eritrea, and Yemen) that reflect the change in data vintage rather than an actual change in population. This discontinuity also carries into indicators derived from population, such as military personnel as a share of total population and the Composite Index of National Capability."
         description_from_producer: |-
@@ -319,7 +319,7 @@ tables:
         title: Urban population
         unit: "people"
         short_unit: ""
-        description_short: The size of a state's population living in cities and urban areas.
+        description_short: Size of a state's population living in cities and urban areas.
         description_key:
           - "The definition of urban population changes over the series: through 2001 it counts cities of at least 100,000 people; for 2002-2016 it counts urban agglomerations of at least 300,000 people; and from 2017 onward (following the 2025 data revision) it counts cities of at least 50,000 people with a density of at least 1,500 per square kilometer, drawn from the UN World Urbanization Prospects. These changes can create discontinuities in the series (most notably a decline for the United States), so urban population is best compared across countries within a given year rather than over time within a single country."
         description_from_producer: |-

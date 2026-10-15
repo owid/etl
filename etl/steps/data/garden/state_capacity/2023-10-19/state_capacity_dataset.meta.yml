@@ -49,7 +49,7 @@ tables:
         title: Administrative efficiency
         unit: ""
         short_unit: ""
-        description_short: "Based on the expert assessments by Adelman and Morris (1967). It captures efficiency of public administration by combining measures of permanence and training of administrators, corruption and inefficiencies, and instability of policy. It ranges from 0 to 8 (most efficient)"
+        description_short: "Based on the expert assessments by Adelman and Morris (1967). It captures efficiency of public administration by combining measures of permanence and training of administrators, corruption and inefficiencies, and instability of policy. It ranges from 0 to 8 (most efficient)."
         description_from_producer: >-
           As part of a study on the social and political sources of economic growth in developing countries,
           Adelman and Morris (1967) produced a measure of “degree of administrative efficiency” for 69
@@ -318,7 +318,7 @@ tables:
         title: Police Officers per 1,000 people
         unit: ""
         short_unit: ""
-        description_short: Measures the number of police officers per 1,000 people
+        description_short: Measures the number of police officers per 1,000 people.
         description_from_producer: >-
           Data on police personnel come from the United Nations Survey of Crime Trends and Operations of
           Criminal Justice Systems (UNODC) from various years. These are country-reported data covering

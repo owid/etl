@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { readFile } from 'fs/promises';
+import { access, readFile } from 'fs/promises';
 import { ChildProcess, spawn } from 'child_process';
 
 const panels = new Map<string, vscode.WebviewPanel>();
@@ -23,7 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const filePath = editor.document.uri.fsPath;
 		if (filePath.includes('/steps/data/') && (filePath.endsWith('.py') || filePath.endsWith('.meta.yml'))) {
 			openPreview(filePath, datasetStrategy);
-		} else if (filePath.endsWith('.chart.yml') || (filePath.includes('/export/multidim/') && (filePath.endsWith('.config.yml') || filePath.endsWith('.py')))) {
+		} else if (filePath.endsWith('.chart.yml') || (filePath.includes('/viz/chart/') && (filePath.endsWith('.config.yml') || filePath.endsWith('.py')))) {
 			openPreview(filePath, chartStrategy);
 		} else {
 			vscode.window.showErrorMessage('Not a previewable file (expected a data step .py/.meta.yml or .chart.yml)');
@@ -105,7 +105,7 @@ function getContainerName(branch: string): string {
  * Falls back to the filename if no slug field is found.
  *
  * For mdim charts, also builds the full catalogPath by inserting the version
- * from the step path (matching GraphStep._create_multidim_collection logic):
+ * from the step path (matching how PathFinder derives the catalog path):
  *   slug "covid/covid#covid_cases" + version "latest" → "covid/latest/covid#covid_cases"
  */
 async function parseChartYml(filePath: string, wsRoot: string): Promise<{ stepUri: string; slug: string; catalogPath?: string }> {
@@ -136,17 +136,55 @@ async function parseChartYml(filePath: string, wsRoot: string): Promise<{ stepUr
 }
 
 /**
- * Extract export step URI and catalog path from an export/multidim file path.
+ * Extract viz step URI / catalog path / chart info from a viz/chart file path.
  * Supports both .config.yml and .py files.
- * Catalog path defaults to namespace/version/name#name (matching PathFinder.create_collection).
+ * Catalog path defaults to namespace/version/name#name (matching PathFinder.create_chart).
+ *
+ * For charts with `dimensions: []` (single-chart case) the ETL pushes to the chart
+ * admin endpoint, not the multi-dim one. New charts are created as unpublished drafts,
+ * so preview them through the admin Grapher route (`admin/grapher/{slug}`), which can
+ * render unpublished charts.
+ *
+ * We only classify as "chart" when the YAML has `dimensions: []` AND there is no sibling
+ * `.py` file. A sibling `.py` can populate dimensions programmatically (e.g. the
+ * air_pollution step uses `dimensions: []` as a placeholder), so the empty-list alone
+ * isn't a reliable signal.
  */
-function parseExportMultidim(filePath: string, wsRoot: string): { stepUri: string; catalogPath: string } {
-	const exportDir = path.join(wsRoot, 'etl', 'steps', 'export', 'multidim');
-	const rel = path.relative(exportDir, filePath);
+async function parseExportMultidim(
+	filePath: string,
+	wsRoot: string,
+): Promise<{ stepUri: string; catalogPath: string; isChart: boolean; chartSlug: string }> {
+	const chartDir = path.join(wsRoot, 'etl', 'steps', 'viz', 'chart');
+	const rel = path.relative(chartDir, filePath);
 	const stepPath = rel.replace(/\.(config\.yml|py)$/, '');
 	const shortName = path.basename(stepPath);
 	const catalogPath = `${stepPath}#${shortName}`;
-	return { stepUri: `export://multidim/${stepPath}`, catalogPath };
+	// Grapher slugs are dash-separated; the ETL short_name is snake_case.
+	const chartSlug = shortName.replace(/_/g, '-');
+
+	const configPath = filePath.endsWith('.config.yml')
+		? filePath
+		: filePath.replace(/\.py$/, '.config.yml');
+	const pyPath = configPath.replace(/\.config\.yml$/, '.py');
+
+	let hasEmptyDimensions = false;
+	try {
+		const content = await readFile(configPath, 'utf8');
+		hasEmptyDimensions = /^dimensions:\s*\[\s*\]\s*(#.*)?$/m.test(content);
+	} catch {
+		// No sibling .config.yml — can't classify, fall back to mdim.
+	}
+
+	let hasPy = false;
+	try {
+		await access(pyPath);
+		hasPy = true;
+	} catch {
+		// No sibling .py — fully-declarative step.
+	}
+
+	const isChart = hasEmptyDimensions && !hasPy;
+	return { stepUri: `viz://chart/${stepPath}`, catalogPath, isChart, chartSlug };
 }
 
 /**
@@ -262,12 +300,19 @@ const chartStrategy: PreviewStrategy = {
 		let etlArgs: string[];
 		let fileName: string;
 
-		if (filePath.includes('/export/multidim/')) {
-			const parsed = parseExportMultidim(filePath, wsRoot);
+		if (filePath.includes('/viz/chart/')) {
+			const parsed = await parseExportMultidim(filePath, wsRoot);
 			stepUri = parsed.stepUri;
-			stagingUrl = `http://${containerName}/admin/grapher/${encodeURIComponent(parsed.catalogPath)}`;
-			isMdim = true;
-			etlArgs = [stepUri, '--export', '--watch', '--private'];
+			if (parsed.isChart) {
+				// Zero-dim chart → ETL pushed a regular chart. Use the admin preview
+				// route so newly-created unpublished charts render too.
+				stagingUrl = `http://${containerName}/admin/grapher/${parsed.chartSlug}`;
+				isMdim = true;
+			} else {
+				stagingUrl = `http://${containerName}/admin/grapher/${encodeURIComponent(parsed.catalogPath)}`;
+				isMdim = true;
+			}
+			etlArgs = [stepUri, '--grapher', '--watch', '--private'];
 			fileName = path.basename(filePath).replace(/\.(config\.yml|py)$/, '');
 		} else {
 			const parsed = await parseChartYml(filePath, wsRoot);

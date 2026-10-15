@@ -4,7 +4,7 @@ meta:
   is_public: false
   origin:
     # Data product / Snapshot
-    title: Global Burden of Disease - Risk Factors for Cancer Deaths
+    title: Global Burden of Disease – Risk Factors for Cancer Deaths
     description: |-
       The Global Burden of Disease (GBD) study provides a comprehensive assessment of global health trends. This dataset contains the risk factors that contribute to deaths from different types of cancers.
     date_published: "2025-10-20"

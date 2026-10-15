@@ -39,7 +39,12 @@ def run(dest_dir: str) -> None:
     )
 
     # Replace '<NA>' values in the 'countries' column with 'No minimum population threshold'
-    df_counts["countries"] = df_counts["countries"].astype(str).replace("<NA>", "No minimum population threshold")
+    df_counts["countries"] = (
+        df_counts["countries"]
+        .astype(str)
+        .fillna("No minimum population threshold")
+        .replace("<NA>", "No minimum population threshold")
+    )
 
     tb_counts = Table(df_counts).copy_metadata(tb)
     tb_counts = tb_counts.format(["countries", "year"])

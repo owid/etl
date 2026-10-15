@@ -353,3 +353,40 @@ steps:
       - data://garden/war/2025-05-15/nuclear_threat_initiative_overview:
         - data://meadow/war/2025-05-15/nuclear_threat_initiative_overview:
           - snapshot://war/2025-05-15/nuclear_threat_initiative_overview.csv
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/war/latest/ucdp:
+    - data://grapher/war/latest/ucdp_preview
+    - data://grapher/war/2026-06-10/ucdp
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/war/latest/mars:
+    - data://grapher/war/2023-09-21/mars
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://multidim/war/latest/ucdp_prio:
+    - data://grapher/war/2026-06-10/ucdp_prio
+    - data://grapher/war/2026-06-10/ucdp
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/war/latest/countries_in_conflict_data:
+    - data://grapher/war/2026-06-10/ucdp
+  # archived; last active in e2c57887abcb on 2026-09-07
+  export://explorers/war/latest/conflict_data:
+    - data://grapher/war/2023-09-21/cow
+    - export://explorers/war/latest/conflict_data_source:
+      - data://grapher/war/2023-09-21/cow
+      - data://grapher/war/2023-09-21/mie
+      - data://grapher/war/2026-06-10/ucdp
+      - data://grapher/war/2023-09-21/mars
+      - data://grapher/war/2026-06-10/ucdp_prio
+      - data://grapher/war/2023-09-21/prio_v31
+      - data://grapher/war/2023-09-21/cow_mid
+    - data://grapher/war/2023-09-21/mie
+    - data://grapher/war/2026-06-10/ucdp
+    - data://grapher/war/2023-09-21/mars
+    - data://grapher/war/2026-06-10/ucdp_prio
+    - data://grapher/war/2023-09-21/prio_v31
+    - data://grapher/war/2023-09-21/cow_mid
+  # archived; last active in bf5dc8e25402 on 2026-10-07
+  data://grapher/war/2026-06-10/ucdp_cumulative:
+    - data://garden/war/2026-06-10/ucdp_cumulative:
+      - data://garden/war/2026-06-10/ucdp
+      - data://garden/demography/2024-07-15/population
+      - data://garden/countries/2024-08-27/gleditsch

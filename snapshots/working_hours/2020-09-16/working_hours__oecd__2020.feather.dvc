@@ -2,8 +2,8 @@ meta:
   origin:
     producer: OECD
     title: Labour Force Statistics
-    title_snapshot: Labour Force Statistics - Average annual hours actually worked per worker
-    citation_full: OECD (2020). Labour Force Statistics - Average annual hours actually worked per worker.
+    title_snapshot: Labour Force Statistics – Average annual hours actually worked per worker
+    citation_full: OECD (2020). Labour Force Statistics – Average annual hours actually worked per worker.
     url_main: https://stats.oecd.org/Index.aspx?DataSetCode=ANHRS#
     date_accessed: '2020-09-16'
     date_published: '2020'

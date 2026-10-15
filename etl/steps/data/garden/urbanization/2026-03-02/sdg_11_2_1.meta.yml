@@ -23,9 +23,9 @@ tables:
         title: Share of city residents with convenient access to public transport (population-weighted)
         unit: "%"
         short_unit: "%"
-        description_short: Share of people in [cities](#dod:cities-degurba) who live within a short walk of a public transport stop — 500 metres for buses and trams, 1,000 metres for higher-capacity services like metro and rail.
+        description_short: Share of people in [cities](#dod:cities-degurba) who live within a short walk of a public transport stop — 500 meters for buses and trams, 1,000 meters for higher-capacity services like metro and rail.
         description_key:
-          - This indicator measures the share of people in cities who live within a short walk of a public transport stop — 500 metres for buses and trams, 1,000 metres for metro and rail. Distances are measured along the street network, not in a straight line. The higher threshold for metro and rail reflects that people are willing to walk further for faster, more reliable services.
+          - This indicator measures the share of people in cities who live within a short walk of a public transport stop — 500 meters for buses and trams, 1,000 meters for metro and rail. Distances are measured along the street network, not in a straight line. The higher threshold for metro and rail reflects that people are willing to walk further for faster, more reliable services.
           - This tells us whether people can physically reach a stop — not whether the service is actually good. A bus that runs twice a day counts the same as one that runs every five minutes.
           - In many cities, informal transport fills a large share of daily travel needs. Because these networks are often not fully mapped, actual access may be higher than the figures suggest.
           - Stop locations come from a mix of sources — OpenStreetMap, GTFS feeds, Google Maps, TomTom, and others. European cities use Eurostat data; some countries report their own figures from surveys or administrative records. This means the numbers are not always directly comparable across countries.

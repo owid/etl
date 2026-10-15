@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical polio cases in the United States - Centers for Disease Control and Prevention
+    title: Historical polio cases in the United States – Centers for Disease Control and Prevention
     description: |-
       Data on historical polio cases in the United States, compiled from a selection of sources from the US CDC.
 
@@ -58,7 +58,7 @@ meta:
 
       Summary of Notifiable Diseases --- United States, 2002-2015
 
-      National Notifiable Diseases Surveillance System (NNDSS) - Centers for Disease Control and Prevention (CDC)
+      National Notifiable Diseases Surveillance System (NNDSS) – Centers for Disease Control and Prevention (CDC)
 
     # Files
     url_main: https://wonder.cdc.gov/nndss-annual-summary.html

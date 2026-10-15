@@ -397,7 +397,7 @@ def prepare_fossil_co2_emissions(tb_co2: Table) -> Table:
     ####################################################################################################################
     # For certain years, column "emissions_from_other_industry" is not informed for "World" but it is informed
     # for some countries (namely China and US).
-    # Note that this is not necessarily an issue in the original data: The data provider may have decided that it is
+    # Note that this is not necessarily an issue in the original data: The data producer may have decided that it is
     # better to leave the world uninformed where not enough countries are informed.
     # However, "emissions_total" for the World seems to include those contributions from China and the US.
     # This can be easily checked in the original data by selecting the year 1989 (last year for which there is data for
@@ -408,7 +408,7 @@ def prepare_fossil_co2_emissions(tb_co2: Table) -> Table:
     # global cumulative emissions. And the share of global emissions for those countries becomes hence larger than 100%.
     # To fix this issue, we aggregate the data for China and US on those years when the world's data is missing (without
     # touching other years or other columns), and add that data to the global emissions from other industry.
-    # NOTE: This issue has been reported to the data providers, and will hopefully be fixed in a coming version.
+    # NOTE: This issue has been reported to the data producers, and will hopefully be fixed in a coming version.
 
     # Firstly, list of years for which the world has no data for emissions_from_other_industry.
     world_missing_years = (
@@ -648,7 +648,7 @@ def fix_consumption_emissions_for_africa(tb_co2_with_regions: Table) -> Table:
     # with those from GCP.
     # At the end of the day, the reason why we keep ours and GCP's version of continents is that our definitions may
     # differ. But it is unlikely that their definition of the African continent is different from ours.
-    # NOTE: This issue has been reported to the data providers, and will hopefully be fixed in a coming version.
+    # NOTE: This issue has been reported to the data producers, and will hopefully be fixed in a coming version.
 
     # First, check that the discrepancy exists in the current data.
     tb = tb_co2_with_regions.copy()

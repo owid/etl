@@ -36,7 +36,7 @@ def fetch_explorer_data(explorer_slugs: list[str] | None = None) -> pd.DataFrame
             ev.explorerSlug,
             ev.dimensions,
             ev.chartConfigId,
-            cc.full as chart_config,
+            cc.config as chart_config,
             v.id as variable_id,
             v.name as variable_name,
             v.unit as variable_unit,
@@ -55,7 +55,7 @@ def fetch_explorer_data(explorer_slugs: list[str] | None = None) -> pd.DataFrame
         FROM explorer_views ev
         LEFT JOIN chart_configs cc ON ev.chartConfigId = cc.id
         LEFT JOIN JSON_TABLE(
-            cc.full,
+            cc.config,
             '$.dimensions[*]' COLUMNS(
                 variableId INT PATH '$.variableId'
             )
@@ -193,7 +193,7 @@ def fetch_multidim_data(slug_filters: list[str] | None = None) -> pd.DataFrame:
             md.published as mdim_published,
             md.catalogPath as mdim_catalog_path,
             mx.chartConfigId,
-            cc.full as chart_config,
+            cc.config as chart_config,
             v.id as variable_id,
             v.name as variable_name,
             v.unit as variable_unit,
@@ -350,7 +350,7 @@ def fetch_chart_configs(chart_slugs: list[str] | None = None) -> list[dict[str, 
             cc.id as config_id,
             cc.slug,
             'chart' as view_type,
-            cc.full as chart_config,
+            cc.config as chart_config,
             v.id as variable_id,
             v.name as variable_name,
             v.unit as variable_unit,
@@ -369,7 +369,7 @@ def fetch_chart_configs(chart_slugs: list[str] | None = None) -> list[dict[str, 
         FROM charts c
         JOIN chart_configs cc ON c.configId = cc.id
         LEFT JOIN JSON_TABLE(
-            cc.full,
+            cc.config,
             '$.dimensions[*]' COLUMNS(
                 variableId INT PATH '$.variableId'
             )
@@ -403,7 +403,7 @@ def extract_chart_fields(chart_config: dict[str, Any]) -> list[tuple[str, Any]]:
     """Extract human-readable fields from chart config JSON.
 
     Args:
-        chart_config: Chart configuration dictionary from chart_configs.full
+        chart_config: Chart configuration dictionary from chart_configs.config
 
     Returns:
         List of (field_name, field_value) tuples for all text fields

@@ -16,7 +16,7 @@ tables:
         title: Employment-to-population ratio
         unit: '%'
         short_unit: '%'
-        description_short: 'Number of people who are employed as a percent of the total of working-age population'
+        description_short: 'Number of people who are employed as a percent of the total of working-age population.'
         display:
           numDecimalPlaces: 1
 

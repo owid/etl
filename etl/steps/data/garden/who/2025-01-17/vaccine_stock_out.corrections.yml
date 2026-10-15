@@ -5,5 +5,5 @@
   action: override
   value: "Inaccurate forecasts"
   reason: Typo in the source's "reason for stockout" answer option.
-  provider: World Health Organization
+  producer: World Health Organization
   status: open

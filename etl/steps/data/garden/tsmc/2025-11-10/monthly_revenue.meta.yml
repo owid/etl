@@ -32,6 +32,7 @@ tables:
         display:
           numDecimalPlaces: 0
 
+          timeInterval: month
   tsmc_yearly_revenue:
     variables:
       revenue_usd:

@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: Household Size and Composition
     description: |-
-      This database presents a compilation of indicators on household size and membership composition around the world, estimated using both tabulated data and household roster micro-data from censuses and household surveys. The estimates are based on 1,059 unique data sources from 196 countries or areas, representing approximately 98 per cent of the world’s population in 2022, with reference dates ranging from 1960 to 2021. The 2022 database includes estimates from 209 Multiple Indicator Cluster Surveys (MICS), representing 98 countries or areas, which were not available in the previous versions.
+      This database presents a compilation of indicators on household size and membership composition around the world, estimated using both tabulated data and household roster micro-data from censuses and household surveys. The estimates are based on 1,059 unique data sources from 196 countries or areas, representing approximately 98 percent of the world’s population in 2022, with reference dates ranging from 1960 to 2021. The 2022 database includes estimates from 209 Multiple Indicator Cluster Surveys (MICS), representing 98 countries or areas, which were not available in the previous versions.
 
       Standard estimation procedures were used to ensure comparability of the estimates between countries and over time.
     date_published: "2022"

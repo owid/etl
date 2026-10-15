@@ -252,7 +252,10 @@ tables:
 
 dataset:
   title: Population
-  update_period_days: 730
+  # This is OWID's own update cadence for the OMM, not the producers'. The next revision of the
+  # underlying UN WPP is not due until July 2027, but we plan to rebuild this dataset before then.
+  # 2024-07-15 + 883 days -> 2026-12-15.
+  update_period_days: 883
   description: |-
     Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on various sources.
 

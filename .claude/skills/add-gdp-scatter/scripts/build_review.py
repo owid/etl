@@ -12,8 +12,10 @@ not its main view** — unlike the old chart, where the scatter *was* the whole 
 every row shows the target's full tab list with its default marked, a SECONDARY badge
 naming the tab readers actually land on, and a toggle between:
 
-  * **Redirect view** — `?tab=scatter&time=latest&country=`, exactly what a reader
-    following the retired slug will get.
+  * **Redirect view** — `?tab=scatter&time=latest&country=`, plus `&yScale=log` on a row
+    whose retiring chart had a log y axis: exactly what a reader following that retired
+    slug will get. The query comes from `redirect_to_scatter.row_query`, the function that
+    writes it, so the pane cannot review a view the redirect does not serve.
   * **Default view** — what a reader opening the target normally sees first.
 
 Those two are the states a URL can produce. A third exists and cannot be reached by URL:
@@ -34,20 +36,39 @@ Usage::
 """
 
 import argparse
+import html
+import importlib.util
 import json
 import re
 import sys
 from pathlib import Path
 
 from etl.config import OWID_ENV
+from etl.db import get_engine
 
 CHART_ID_RE = re.compile(r"/charts/(\d+)")
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 
-# Stored query params of the part-2 redirect. Kept in step with TARGET_QUERY in
-# redirect_to_scatter.py — the point of the left/right comparison is to review the URL
-# readers will actually land on, so a drift here reviews the wrong thing.
-REDIRECT_QUERY = "tab=scatter&time=latest&country="
+
+def _load_sibling(name: str):
+    """Import a script from this skill's own scripts directory."""
+    path = Path(__file__).resolve().parent / f"{name}.py"
+    if not path.exists():
+        raise SystemExit(f"Cannot import {name}: {path} does not exist")
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+# The stored query of the part-2 redirect is taken from the script that writes it, rather than
+# kept in step by hand: the whole point of the left/right comparison is to review the URL
+# readers will actually land on, and one part of that query is per-row (`yScale=log` for a
+# source authored on a log y axis), so a local copy would review a view nobody gets. The
+# log-source predicate, with its reversed-source exclusion, is owned one level further down by
+# `apply_scatter_defaults.log_y_axis_sources`.
+redirect = _load_sibling("redirect_to_scatter")
 
 # Grapher's `tab` config option -> the tab a reader lands on. Anything unrecognised is
 # shown verbatim; `chart` means "the first entry in chartTypes".
@@ -85,18 +106,18 @@ def load_charts(chart_ids: list[int]) -> dict[int, dict]:
     if not chart_ids:
         return {}
     df = OWID_ENV.read_sql(
-        "SELECT c.id, cc.slug, cc.full, cc.fullMd5 FROM charts c "
+        "SELECT c.id, cc.slug, cc.config, cc.configMd5 FROM charts c "
         "JOIN chart_configs cc ON c.configId = cc.id WHERE c.id IN %(ids)s",
         params={"ids": tuple(chart_ids)},
     )
     out = {}
     for r in df.to_dict("records"):
-        cfg = r["full"] if isinstance(r["full"], dict) else json.loads(r["full"])
+        cfg = r["config"] if isinstance(r["config"], dict) else json.loads(r["config"])
         out[int(r["id"])] = {
             "slug": r["slug"],
             "title": cfg.get("title") or "",
             "cfg": cfg,
-            "md5": r["fullMd5"],
+            "md5": r["configMd5"],
         }
     return out
 
@@ -117,7 +138,50 @@ def default_tab_label(cfg: dict) -> str:
     return TAB_LABELS.get(tab, tab)
 
 
-def row_flags(src_cfg: dict, tgt_cfg: dict) -> tuple[list[str], list[str]]:
+def esc(text: object) -> str:
+    """Escape config-derived text: the warning and context lists are injected with innerHTML."""
+    return html.escape(str(text), quote=False)
+
+
+def graded_exclusions(src_cfg: dict, tgt_cfg: dict) -> list[dict]:
+    """The source's exclusions, graded by the applier against the view this reviewer shows.
+
+    Graded here rather than re-derived: the classes and the warning/context split belong to
+    `apply_scatter_defaults`, so the reviewer says the same thing the applier's run said. A
+    failure degrades to one ungraded warning — better than a silent empty list, which would read
+    as "this chart excluded nothing".
+    """
+    excluded = src_cfg.get("excludedEntityNames") or []
+    if not excluded:
+        return []
+    applier = redirect.applier
+    try:
+        tgt_y = applier.find_dim(tgt_cfg, "y") or {}
+        y_var_id = tgt_y.get("variableId")
+        gdp_var_id = (applier.find_dim(tgt_cfg, "x") or {}).get("variableId")
+        if y_var_id is None or gdp_var_id is None:
+            raise ValueError("target has no y or no x dimension")
+        tol = int((tgt_y.get("display") or {}).get("tolerance") or 0)
+        engine = get_engine()
+        year = applier.resolve_default_year(tgt_cfg, int(y_var_id), int(gdp_var_id), engine)
+        if year is None:
+            raise ValueError("no year where both indicators have data")
+        return applier.classify_exclusions(list(excluded), int(y_var_id), int(gdp_var_id), year, tol, engine)
+    except Exception as e:
+        return [
+            {
+                "entity": ", ".join(str(x) for x in excluded),
+                "cls": "ungradeable",
+                "why": f"could not grade these ({e!s:.90})",
+                "year": None,
+                "exact": True,
+            }
+        ]
+
+
+def row_flags(
+    src_cfg: dict, tgt_cfg: dict, is_log: bool, exclusions: list[dict] | None = None
+) -> tuple[list[str], list[str]]:
     """(warnings, context) for one pair, computed from the two configs.
 
     The split is what keeps the "With warnings" filter worth using. **Warnings** are things
@@ -127,6 +191,7 @@ def row_flags(src_cfg: dict, tgt_cfg: dict) -> tuple[list[str], list[str]]:
     """
     warns: list[str] = []
     context: list[str] = []
+    exclusions = exclusions or []
     types = tgt_cfg.get("chartTypes") or ["LineChart", "DiscreteBar"]
 
     if "ScatterPlot" not in types:
@@ -148,11 +213,18 @@ def row_flags(src_cfg: dict, tgt_cfg: dict) -> tuple[list[str], list[str]]:
     if tgt_cfg.get("stackMode") == "relative":
         warns.append("stackMode=relative — the scatter opens on 'average annual change'")
 
-    excluded = src_cfg.get("excludedEntityNames") or []
-    if excluded:
-        warns.append(
-            f"old chart excluded {', '.join(excluded)} — NOT carried to the target, so they reappear on the scatter"
-        )
+    # Graded, because the two usual reasons for an exclusion have opposite consequences here: a
+    # y outlier's return is a real defect, while a merely very high GDP per capita is harmless on
+    # the target's log x axis. Grading them apart is what keeps this warning worth reading — an
+    # unclassified list of names fires on every row that has one and decides nothing. The classes
+    # and the warning/context split are the applier's (`EXCLUSION_WARN_CLASSES`).
+    for e in exclusions:
+        where = "" if e["exact"] or e["year"] is None else f" (measured at {e['year']}, its latest year with both)"
+        line = f"old chart excluded <b>{esc(e['entity'])}</b> — {e['cls']}: {esc(e['why'])}{where}"
+        if e["cls"] in redirect.applier.EXCLUSION_WARN_CLASSES:
+            warns.append(f"{line}. The target never inherits exclusions, so it is back on this scatter")
+        else:
+            context.append(f"{line} — back on the scatter, but harmless")
 
     # Expected-and-handled, so context rather than a warning: both routes to the scatter
     # clear the selection (a tab click via ensureEntitySelectionIsSensibleForTab, the
@@ -170,6 +242,22 @@ def row_flags(src_cfg: dict, tgt_cfg: dict) -> tuple[list[str], list[str]]:
     if tgt_cfg.get("minTime") == tgt_cfg.get("maxTime") and tgt_cfg.get("minTime") is not None:
         context.append(f"time is pinned in the config to {tgt_cfg.get('minTime')!r} for every view")
 
+    if is_log:
+        # Two separate statements, which is why one is context and one is a warning. That the two
+        # panes differ is intended and only needs explaining (context). Whether a LINEAR scatter
+        # still tells the story the author chose a log axis for is a judgment nobody else in the
+        # workflow makes — and the reviewer is the one person looking at both shapes at once.
+        context.append(
+            "the retiring chart had a LOG y axis, so the redirect carries yScale=log and the Redirect "
+            "view is logarithmic — the target's own default stays linear for its other tabs"
+        )
+        warns.append(
+            "the retiring chart's LOG y axis does not transfer: yAxis is global, so a reader who CLICKS "
+            "the scatter tab gets it linear, and a key-chart slot (no query string) can never get the log "
+            "at all. Compare the shapes — if linear misreads the relationship, flag the row: keeping the "
+            "standalone chart is a legitimate outcome"
+        )
+
     return warns, context
 
 
@@ -177,6 +265,10 @@ def build_records(pairs: list[dict]) -> list[dict]:
     ids = [chart_id_from_url(p["chart_admin_url"]) for p in pairs]
     ids += [chart_id_from_url(p["target_chart_admin_url"]) for p in pairs]
     charts = load_charts(sorted(set(ids)))
+    # The same set the redirect script and the handoff resolve, read from the SOURCE charts:
+    # the target's yAxis is deliberately left linear, so it cannot tell you what the retiring
+    # chart looked like.
+    log_sources = redirect.applier.log_y_axis_sources(chart_id_from_url(p["chart_admin_url"]) for p in pairs)
 
     records = []
     for p in pairs:
@@ -190,7 +282,8 @@ def build_records(pairs: list[dict]) -> list[dict]:
         src, tgt = charts[src_id], charts[tgt_id]
         types = tgt["cfg"].get("chartTypes") or ["LineChart", "DiscreteBar"]
         scatter_pos = types.index("ScatterPlot") + 1 if "ScatterPlot" in types else 0
-        warns, context = row_flags(src["cfg"], tgt["cfg"])
+        exclusions = graded_exclusions(src["cfg"], tgt["cfg"])
+        warns, context = row_flags(src["cfg"], tgt["cfg"], is_log=src_id in log_sources, exclusions=exclusions)
 
         records.append(
             {
@@ -209,8 +302,11 @@ def build_records(pairs: list[dict]) -> list[dict]:
                 "tgt_title": tgt["title"],
                 "tgt_md5": tgt["md5"],
                 # The two URL-reachable states of the target, per the module docstring.
-                "redirect_path": f"/grapher/{tgt['slug']}?{REDIRECT_QUERY}",
+                "redirect_path": f"/grapher/{tgt['slug']}?{redirect.row_query(src_id, log_sources)}",
                 "default_path": f"/grapher/{tgt['slug']}",
+                # Drives the two panes' hints: for a log row the tab-click state does NOT match
+                # the Redirect view (the click leaves the target's linear yAxis alone).
+                "is_log": src_id in log_sources,
                 "chart_types": types,
                 "default_tab": default_tab_label(tgt["cfg"]),
                 "scatter_pos": scatter_pos,
@@ -712,8 +808,10 @@ function render() {
   document.getElementById("tgt-hint").textContent = viewMode === "redirect"
     ? "Exactly what a reader following the retired slug gets. time=latest and country= stand in for the "
       + "adjustments a tab CLICK would make — a URL-supplied tab does not get them."
+      + (rec.is_log ? " yScale=log restores the retiring chart's log y axis, which no tab click would." : "")
     : "What a reader opening this chart sees first. Click the Scatter tab inside the frame to see the "
-      + "tab-click state, which no URL can reproduce — it should match the Redirect view.";
+      + "tab-click state, which no URL can reproduce — it should match the Redirect view"
+      + (rec.is_log ? ", except the y axis: the click leaves it linear, the redirect makes it log." : ".");
   setFrame("tgt-frame", tU, rec.id + "|" + viewMode);
 
   document.getElementById("note").value = dec.note || "";

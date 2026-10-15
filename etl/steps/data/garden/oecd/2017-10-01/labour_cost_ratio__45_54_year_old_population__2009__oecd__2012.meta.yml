@@ -1,12 +1,12 @@
 dataset:
-  title: Labour cost ratio (45-54 year-old population) 2009 - OECD (2012)
+  title: Labor cost ratio (45-54 year-old population) 2009 - OECD (2012)
   owners:
     - Max Roser  # backport
 tables:
   labour_cost_ratio__45_54_year_old_population__2009__oecd__2012:
     variables:
       labour_cost_ratio__45_54_year_old_population__2009__oecd__2012:
-        title: Labour cost ratio (45-54 year-old population) 2009 (OECD (2012))
+        title: Labor cost ratio (45-54 year-old population) 2009 (OECD (2012))
         unit: ''
     dimensions:
       - name: year

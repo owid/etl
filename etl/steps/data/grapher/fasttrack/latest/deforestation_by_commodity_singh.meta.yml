@@ -64,7 +64,7 @@ tables:
         display:
           numDecimalPlaces: 0.0
         description: |-
-          Estimated deforestation driven by the conversion to land for the production of crops such as sugar, pulses, plant-based fibres, oilseeds (excluding palm and oil).
+          Estimated deforestation driven by the conversion to land for the production of crops such as sugar, pulses, plant-based fibers, oilseeds (excluding palm and oil).
       total_deforestation:
         title: total_deforestation
         unit: ''

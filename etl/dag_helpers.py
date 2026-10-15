@@ -298,6 +298,11 @@ def write_to_dag_file(
     with open(dag_file) as file:
         lines = file.readlines()
 
+    # If the file doesn't end with a line break, add one. Otherwise, the first line appended below (e.g. the comment
+    # above a new step) would be glued onto the end of the file's last line.
+    if lines and not lines[-1].endswith("\n"):
+        lines[-1] += "\n"
+
     # Separate that content into the "steps" section (always given) and the "include" section (sometimes given).
     section_steps = []
     section_include = []
@@ -766,6 +771,12 @@ def get_active_snapshots() -> set[str]:
 
 
 def get_active_steps() -> set[str]:
+    """Return the full path of every non-snapshot step in the active DAG.
+
+    Paths keep the dataset name (``garden/who/2026-05-22/gho``). They used to be truncated at
+    the version, which made callers unable to tell an active dataset from an archived one
+    sitting in the same directory — see the regression in #6572.
+    """
     DAG = load_dag()
 
     active_steps = set()
@@ -774,5 +785,4 @@ def get_active_steps() -> set[str]:
         if not s.startswith("snapshot"):
             active_steps.add(s.split("://")[1])
 
-    # Strip dataset name after version
-    return {s.rsplit("/", 1)[0] for s in active_steps}
+    return active_steps

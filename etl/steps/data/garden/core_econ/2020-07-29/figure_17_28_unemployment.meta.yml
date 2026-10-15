@@ -23,7 +23,7 @@ tables:
       unemployment_rate__pct:
         title: Unemployment rate (%)
         unit: '%'
-        description: The unemployment rate is expressed as a percentage of the civilian labour force.
+        description: The unemployment rate is expressed as a percentage of the civilian labor force.
     dimensions:
       - name: year
         slug: year

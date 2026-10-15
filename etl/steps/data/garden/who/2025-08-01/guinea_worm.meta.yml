@@ -6,7 +6,7 @@ tables:
     variables:
       year_certified:
         title: Year of certification
-        description_short: Year country is certified free from guinea worm
+        description_short: Year country is certified free from guinea worm.
         unit: ""
         display:
           numDecimalPlaces: 0

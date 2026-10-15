@@ -8,11 +8,11 @@ tables:
       average_effective_age_of_retirement__men__oecd:
         title: Average effective age of retirement, men (OECD)
         unit: years
-        description: The average effective age at which men retired from the labour market.
+        description: The average effective age at which men retired from the labor market.
       average_effective_age_of_retirement__women__oecd:
         title: Average effective age of retirement, women (OECD)
         unit: years
-        description: The average effective age at which women retired from the labour market.
+        description: The average effective age at which women retired from the labor market.
     dimensions:
       - name: year
         slug: year

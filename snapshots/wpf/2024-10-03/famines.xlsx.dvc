@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: The WPF Famine Dataset
     description: |-
-      The dataset is a catalogue of famines and instances of mass starvation around the world since 1870 that are estimated to have killed 100,000 people or more. The dataset includes date, location, estimate for excess deaths, and causes (proximate, underlying, and contributory, along with a classification of the role of political intent).
+      The dataset is a catalog of famines and instances of mass starvation around the world since 1870 that are estimated to have killed 100,000 people or more. The dataset includes date, location, estimate for excess deaths, and causes (proximate, underlying, and contributory, along with a classification of the role of political intent).
 
     date_published: "2024"
 

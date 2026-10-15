@@ -8,9 +8,8 @@ added (Maddison). Traditional biomass (Smil, World only) is kept separate from T
 
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
-from shared import EXCLUDED_PROVIDER_REGIONS
 
-from etl.data_helpers.geo import add_gdp_to_table
+from etl.data_helpers.geo import REGIONS, add_gdp_to_table
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -22,6 +21,16 @@ TWH_TO_KWH = 1e9
 
 # Countries whose data have to be removed since they were identified as outliers.
 OUTLIERS = ["Gibraltar"]
+
+# Indicators that must not carry the producer's description, because it describes only one of the
+# inputs that go into them (see where this is applied, at the end of run()).
+COLUMNS_WITHOUT_PRODUCER_DESCRIPTION = [
+    "low_carbon_energy_annual_change_pct",
+    "low_carbon_energy_annual_change_twh",
+    "low_carbon_energy_per_capita_kwh",
+    "low_carbon_energy_twh",
+    "total_energy_supply_per_gdp_kwh_per_dollar",
+]
 
 # Base TES sources taken directly from the Statistical Review (SR garden column -> short source name).
 SR_SOURCES = {
@@ -296,9 +305,12 @@ def extend_total_with_eia(tb: Table, tb_eia: Table) -> Table:
     )
     tb_eia = tb_eia.dropna(subset=["total_energy_supply_twh"]).reset_index(drop=True)
 
-    # Drop EIA's own regional aggregates (marked with an "(EIA)" suffix): region totals come from the
-    # Statistical Review (OWID regions); EIA is used only to extend country coverage.
-    tb_eia = tb_eia[~tb_eia["country"].str.contains("(EIA)", regex=False)].reset_index(drop=True)
+    # Drop EIA's own regional aggregates (marked with an "(EIA)" suffix) and the OWID regions its garden step builds:
+    # a region's total must come from the same producer as its sources, so EIA only extends country coverage.
+    is_aggregate = tb_eia["country"].str.contains("(EIA)", regex=False) | tb_eia["country"].isin(
+        list(REGIONS) + ["World"]
+    )
+    tb_eia = tb_eia[~is_aggregate].reset_index(drop=True)
 
     # Combine, prioritizing the Statistical Review *per value*: keep its total energy supply where it has
     # one, fall back to EIA where it is missing, and add EIA-only country-years. Using a plain concat +
@@ -365,8 +377,10 @@ def add_biomass_inclusive_shares(tb: Table) -> Table:
 def add_annual_change(tb: Table) -> Table:
     """Add annual change (absolute and percentage) for each source and the total.
 
-    Only consecutive-year changes are kept: the World long-run series (Smil) is decadal before 1900,
-    so a naive row-to-row change there would be a multi-year change mislabeled as an annual change.
+    Only consecutive-year changes are kept: the World long-run series (Smil) is decadal all the way
+    from 1800 to 1960, so a naive row-to-row change there would be a multi-year change mislabeled as an
+    annual change. As a result these indicators have no pre-1965 values at all, which is why drop_origin
+    removes Smil from them at the end of run().
     """
     tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
     is_consecutive = tb.groupby("country", observed=True)["year"].diff() == 1
@@ -395,6 +409,15 @@ def add_per_gdp(tb: Table, ds_gdp: Dataset) -> Table:
     return tb
 
 
+def drop_origin(tb: Table, columns: list[str], producer: str) -> Table:
+    """Remove a producer from the origins of the given columns, where it contributes no value."""
+    for column in columns:
+        origins = [origin for origin in tb[column].m.origins if origin.producer != producer]
+        assert len(origins) < len(tb[column].m.origins), f"{producer} is not an origin of {column}."
+        tb[column].m.origins = origins
+    return tb
+
+
 def sanity_check_outputs(tb: Table) -> None:
     # No fully-NaN columns.
     assert tb.columns[tb.isna().all()].empty, f"Fully-NaN columns: {list(tb.columns[tb.isna().all()])}"
@@ -403,6 +426,11 @@ def sanity_check_outputs(tb: Table) -> None:
         col = f"{source}_share_pct"
         valid = tb[col].dropna()
         assert (valid >= -0.01).all() and (valid <= 100.01).all(), f"{col} out of [0, 100]."
+    # Wherever all sources are reported, their shares must add up to ~100%.
+    shares = [f"{source}_share_pct" for source in SR_SOURCES.values()]
+    complete = tb[shares].notna().all(axis=1)
+    off = tb.loc[complete][(tb.loc[complete, shares].sum(axis=1) - 100).abs() > 2]
+    assert off.empty, f"Shares do not add up to 100% for: {sorted(off['country'].unique())}"
     # World total energy supply for the latest year should be in a plausible range (~600 EJ ~= 167000 TWh).
     world_latest = tb[(tb["country"] == "World")].sort_values("year").iloc[-1]
     assert 140000 < world_latest["total_energy_supply_twh"] < 200000, (
@@ -462,10 +490,6 @@ def run() -> None:
     # Remove outliers.
     tb = tb[~tb["country"].isin(OUTLIERS)].reset_index(drop=True)
 
-    # Remove residual and undefined provider regions (kept in the Statistical Review garden as
-    # aggregation inputs, but meaningless to readers).
-    tb = tb[~tb["country"].isin(EXCLUDED_PROVIDER_REGIONS)].reset_index(drop=True)
-
     # Sanity checks.
     sanity_check_outputs(tb=tb)
 
@@ -474,6 +498,25 @@ def run() -> None:
     # from this step's own meta.yml, which is applied on save.
     for column in tb.columns:
         tb[column].m.description_key = []
+
+    # For the same reason, drop the producer's description where it describes only one input:
+    # low-carbon energy sums nuclear and renewables, whose constituents the Statistical Review
+    # describes differently, and energy per GDP divides its energy by another producer's GDP.
+    for column in COLUMNS_WITHOUT_PRODUCER_DESCRIPTION:
+        tb[column].m.description_from_producer = None
+
+    # Charts cite an indicator's origins, so an origin that contributes no value to it is a false
+    # citation. Two cases here, both created by deriving columns from a table that combines producers:
+    # - Annual change: Smil's World series is decadal before 1965 and add_annual_change keeps only
+    #   consecutive years, so no Smil value survives (these indicators start in 1965).
+    # - Biomass-inclusive shares: these are World-only, and the World total comes from the Statistical
+    #   Review (1965 onwards, with no gaps) or Smil before that, never from the EIA.
+    tb = drop_origin(tb, columns=[col for col in tb.columns if "annual_change" in col], producer="Smil")
+    tb = drop_origin(
+        tb,
+        columns=[col for col in tb.columns if col.endswith("_share_including_biomass_pct")],
+        producer="U.S. Energy Information Administration",
+    )
 
     # Format table conveniently.
     tb = tb.format(sort_columns=True, short_name=paths.short_name)

@@ -1,0 +1,35 @@
+meta:
+  origin:
+    producer: Various sources
+    title: Chick culling laws
+    description: |-
+      Male baby chicks are commonly killed in laying hen hatcheries all around the world, as they provide no value for the egg production industry. Only a minority of countries have laws banning this practice. This dataset is a compilation of national laws banning chick culling, gathered from official sources. Countries with no known law on chick culling are assumed to have no ban.
+    citation_full: |-
+      Evidence of laws banning chick culling, and of notable legislative activity in countries without a ban, has been gathered from official sources for each country. Some of those sources were extracted from [a report by the European Institute for Animal Law & Policy](https://animallaweurope.org/wp-content/uploads/Chick-and-Duckling-Killing-UPDATE-December-2024.pdf): "Chick and Duckling Killing: Achieving an EU-Wide Prohibition" (White paper, updated December 2024) by Alice Di Concetto, Olivier Morice, Matthias Corion, Simão Santos.
+
+      Sources for the countries with a full or partial ban (the status and the year when the ban became, or will become, effective are given in the data):
+      - Austria: [Section 6(2a) of the Animal Welfare Act (§ 6 Abs. 2a Tierschutzgesetz)](https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=20003541). Chicks used for feed production are exempt.
+      - Belgium: [Walloon Government communiqué, 3 July 2025 (Communiqué du Gouvernement de Wallonie, 3 juillet 2025)](https://www.wallonie.be/fr/acteurs-et-institutions/wallonie/gouvernement-de-wallonie/communiques-presse/2025-07-03-0). Regional measures only: Wallonia banned the grinding of live chicks (a ban on gassing is under discussion), and Flanders approved [a ban on killing day-old chicks](https://www.vlaamsparlement.be/nl/actueel/nieuws-uit-het-vlaams-parlement/wanneer-komt-er-een-verbod-op-het-doden-van-eendagshaantjes) in its Animal Welfare Code, which will only take effect on a date yet to be decided.
+      - France: [Article R 214-17(II) of the Rural Code (Article R 214-17(II) du Code rural et de la pêche maritime)](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000045129069). Chicks used for animal feed are exempt.
+      - Germany: [Section 4c of the Animal Welfare Act (§ 4c Tierschutzgesetz)](https://www.gesetze-im-internet.de/tierschg/BJNR012770972.html).
+      - Italy: [Legislative Decree 205/2023 (Decreto Legislativo 7 dicembre 2023, n. 205)](https://www.normattiva.it/eli/id/2023/12/23/23G00212/ORIGINAL). Implementing guidelines on in-ovo sexing were published in September 2025.
+      - Luxembourg: [Article 12(13) of the Law of 27 June 2018 on animal protection (Loi du 27 juin 2018 sur la protection des animaux)](https://legilux.public.lu/eli/etat/leg/loi/2018/06/27/a537/jo). General prohibition on killing animals for purely economic reasons.
+      - Switzerland: [Article 20(g) of the Animal Protection Ordinance (Art. 20 Bst. g Tierschutzverordnung)](https://www.fedlex.admin.ch/eli/cc/2008/416/de). Shredding of live chicks is banned, and destroying embryos from day 13 of incubation is also banned since February 2025, but killing hatched chicks by gas remains legal.
+
+      Countries without a ban, but with formal initiatives or discussions about ending chick culling:
+      - European Union: [EU Livestock Strategy, European Commission (COM(2026) 576 final)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52026DC0576). The European Commission intends to propose, by the end of 2026, a revision of animal welfare rules for laying hens and broilers that includes ending the systematic killing of male chicks.
+      - Brazil: [Bill PL 783/2024, Chamber of Deputies of Brazil (Projeto de Lei 783/2024, Câmara dos Deputados)](https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=2421303). A bill to ban the cruel disposal of chicks is under discussion in Congress.
+      - Netherlands: [Parliamentary letter on the chick culling roadmap, Dutch Government (Kamerbrief aanbieden roadmap eendagshaantjes)](https://www.rijksoverheid.nl/documenten/kamerstukken/2025/02/11/kamerbrief-aanbieden-roadmap-eendagshaantjes). A voluntary agreement between the government and the egg sector phases out the culling of male chicks for table-egg production from 2026, but it is not legally binding.
+      - Norway: [Parliamentary recommendation on the animal welfare white paper (Innst. 200 S (2024-2025), Stortinget)](https://www.stortinget.no/no/Saker-og-publikasjoner/Publikasjoner/Innstillinger/Stortinget/2024-2025/inns-202425-200s/). A parliamentary proposal to ban chick culling was rejected in 2025; the industry pledged to adopt in-ovo sexing by July 2027.
+      - United Kingdom: [The Welfare of Animals at the Time of Killing (England) Regulations 2015 (WATOK)](https://www.legislation.gov.uk/uksi/2015/1782/schedule/2/paragraph/44/made). The government's 2025 animal welfare strategy encourages the industry to end chick culling, but has no legal force.
+
+      All other countries are shown as not banned: no law against chick culling is known there. For European Union countries, this is confirmed (as of December 2024) by the report above.
+    url_main: https://animallaweurope.org/wp-content/uploads/Chick-and-Duckling-Killing-UPDATE-December-2024.pdf
+    date_accessed: '2026-09-01'
+    date_published: '2026-09-01'
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: 8d210460057aad4c839aca2f37bdbb69
+    size: 216
+    path: chick_culling_laws.csv

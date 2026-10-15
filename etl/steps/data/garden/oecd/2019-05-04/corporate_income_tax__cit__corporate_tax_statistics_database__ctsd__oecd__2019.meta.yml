@@ -17,12 +17,12 @@ tables:
         title: Composite effective average tax rate (CTSD, OECD (2019))
         unit: '%'
         description: |-
-          The composite Effective Average Tax Rate (EATR) is constructed as a weighted average across finance- and asset-specific EATRs. It is a synthetic tax policy indicator reflecting the average tax contribution a firm makes on an investment project earning above-zero economic profits. This indicator is used to analyse discrete investment decisions between two or more alternative projects (along the extensive margin).
+          The composite Effective Average Tax Rate (EATR) is constructed as a weighted average across finance- and asset-specific EATRs. It is a synthetic tax policy indicator reflecting the average tax contribution a firm makes on an investment project earning above-zero economic profits. This indicator is used to analyze discrete investment decisions between two or more alternative projects (along the extensive margin).
       composite_effective_marginal_tax_rate__ctsd__oecd__2019:
         title: Composite effective marginal tax rate (CTSD, OECD (2019))
         unit: '%'
         description: |-
-          The composite Effective Marginal Tax Rate (EMTR) is constructed as a weighted average across finance- and asset-specific EMTRs. It is a synthetic tax policy indicator measuring the extent to which taxation increases the pre-tax rate of return required by investors to break even. This indicator is used to analyse how taxes affect the incentive to expand existing investments in buildings given a fixed location (along the intensive margin).
+          The composite Effective Marginal Tax Rate (EMTR) is constructed as a weighted average across finance- and asset-specific EMTRs. It is a synthetic tax policy indicator measuring the extent to which taxation increases the pre-tax rate of return required by investors to break even. This indicator is used to analyze how taxes affect the incentive to expand existing investments in buildings given a fixed location (along the intensive margin).
     dimensions:
       - name: year
         slug: year

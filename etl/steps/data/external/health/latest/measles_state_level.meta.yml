@@ -18,7 +18,7 @@ tables:
         unit: cases
       case_rate:
         title: Measles case rate per 100,000 population
-        description_short: The number of measles cases per 100,000 population.
+        description_short: Number of measles cases per 100,000 population.
         unit: cases per 100,000 population
         processing_level: major
       source:

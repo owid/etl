@@ -10,13 +10,13 @@ tables:
         unit: ''
       beer__niaaa:
         title: Beer (NIAAA)
-        unit: litres per person
+        unit: liters per person
       spirits__niaaa:
         title: Spirits (NIAAA)
-        unit: litres per person
+        unit: liters per person
       wine__niaaa:
         title: Wine (NIAAA)
-        unit: litres per person
+        unit: liters per person
     dimensions:
       - name: year
         slug: year

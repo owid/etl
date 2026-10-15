@@ -15,7 +15,7 @@ tables:
       households__debt__pct_of_gdp:
         title: Households - Debt (% of GDP)
         unit: '%'
-        description: Household debt is the sum of household and non-profit organisation debt.
+        description: Household debt is the sum of household and non-profit organization debt.
       non_financial_business_sector__debt__pct_of_gdp:
         title: Non-financial business sector- Debt (% of GDP)
         unit: '%'

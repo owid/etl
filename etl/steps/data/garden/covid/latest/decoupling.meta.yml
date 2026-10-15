@@ -38,6 +38,10 @@ tables:
       icu_stock:
         title: Patients in ICU
         unit: patients
+        display:
+          numDecimalPlaces: 1
+          zeroDay: "2020-01-01"
+          timeInterval: week
       confirmed_deaths:
         title: Confirmed deaths
         unit: deaths

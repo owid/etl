@@ -6,7 +6,7 @@ tables:
   tesa_1_4:
     variables:
       share_of_non_agricultural_labour_force__pct:
-        title: Share of non-agricultural labour force (%)
+        title: Share of non-agricultural labor force (%)
         unit: '%'
         short_unit: '%'
         display:

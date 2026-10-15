@@ -373,7 +373,8 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
         include_historical_regions_in_income_groups=True,
     )
     tb_1900["continent"] = tb_1900["country"].map(countries_to_continent)
-    countries_must_have_data = tb_1900.groupby("continent")["country"].agg(list).to_dict()
+    # pandas 3 fails to aggregate a categorical column into lists.
+    countries_must_have_data = tb_1900.astype({"country": object}).groupby("continent")["country"].agg(list).to_dict()
     frac_must_have_data = {region: THRESHOLD_SHARE_COUNTRIES for region in countries_must_have_data.keys()} | {
         "Europe": 0.1
     }

@@ -688,7 +688,7 @@ tables:
 
       wom_parl_vdem_cat: # wom_parl_gr_vdem_owid
         title: Women in parliament (category)
-        description_short: Categorisation of women's political representation in parliament
+        description_short: Categorisation of women's political representation in parliament.
         unit: ""
 
       ## Other regime indicators
@@ -2864,7 +2864,7 @@ tables:
       lib_dich_row:
         title: Liberal political institutions ({definitions.aux.estimate} estimate) (re-estimate)
         description_short: |-
-          {definitions.aux.estimate_title} estimate of whether the country has meaningfully liberal political institutions
+          {definitions.aux.estimate_title} estimate of whether the country has meaningfully liberal political institutions.
         presentation:
           <<: *ppt_multi_wo_regions
           title_public: Liberal political institutions
@@ -3145,7 +3145,7 @@ tables:
           <%- endif -%>
         description_short: |-
           <%- if category == '-1' -%>
-          People living in countries where it is unclear if national elections were held in the given year
+          People living in countries where it is unclear if national elections were held in the given year.
           <%- else -%>
           People living in countries that << category >> in the given year.
           <%- endif -%>

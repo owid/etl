@@ -5,14 +5,14 @@
 """Declarative corrections for known upstream data errors.
 
 A `.corrections.yml` file sits next to a step (exactly like `.excluded_countries.json`) and records
-known errors in the *source* data together with the local fix we apply until the provider fixes them.
+known errors in the *source* data together with the local fix we apply until the producer fixes them.
 One entry per error. This replaces scattered inline `.loc[...]` / `.drop(...)` exceptions with a single
-auditable record that carries the reason, provider and reporting status.
+auditable record that carries the reason, producer and reporting status.
 
 The mechanism is channel-agnostic (it works wherever `PathFinder.apply_corrections` is called), but
 **garden is the default home**: a correction is a judgment about the data, its `entity`/`year` locators
 are only canonical after garden harmonization, and some corrections target derived/rescaled columns that
-don't exist upstream. Keep meadow/snapshot a faithful mirror of the provider — reserve them for raw
+don't exist upstream. Keep meadow/snapshot a faithful mirror of the producer — reserve them for raw
 transcription typos that are wrong before any OWID processing and shared across multiple consumers.
 
 Format (a list of entries)::
@@ -22,9 +22,20 @@ Format (a list of entries)::
       years: [2006, 2008, 2016]                 # list | all | latest | {after/before/from/to: Y}
       action: drop                              # drop | override | scale | flag
       reason: Negative consumption-based CO2 (physically impossible) in source data.
-      provider: Global Carbon Project
-      reported: 2024-11-13                       # optional — when we told the provider
+      producer: Global Carbon Project
+      reported: 2024-11-13                       # optional — when we told the producer
       status: reported                           # open | reported | acknowledged | fixed_upstream
+
+When the same error affects several columns of the same rows, ``indicator`` can be a list. The entry
+then applies to each column separately, as if written once per column (including its ``expect`` guard
+and the ``value`` shorthand in ``match``)::
+
+    - indicator: [arrivals_from_africa, arrivals_from_europe]
+      entity: Pakistan
+      years: {from: 2020}
+      action: override
+      value: null
+      ...
 
 Rows can also be located by their current value instead of entity+years::
 
@@ -66,9 +77,9 @@ self-validating (the row vanishing trips the no-match assertion), but ``override
 so ``expect`` is how they detect an upstream fix. It cannot be combined with ``flag``.
 
 There is intentionally no ``id`` field — a stable identifier is derived from the entry's target
-(provider / indicator / entity+years or match) for logs and error messages.
+(producer / indicator / entity+years or match) for logs and error messages.
 
-This module is the mechanism only. The cross-dataset dashboard, per-provider report generator and
+This module is the mechanism only. The cross-dataset dashboard, per-producer report generator and
 auto-expiry on re-ingestion are deliberately out of scope here.
 """
 
@@ -126,7 +137,15 @@ def load_corrections(path: Path | str) -> list[dict[str, Any]]:
     for correction in corrections:
         _validate_correction(correction, path)
 
-    return corrections
+    # Expand list-valued `indicator` entries into one entry per column, so everything downstream
+    # (applying, auditing, the CLI inventory) only ever sees a single indicator.
+    return [
+        {**correction, "indicator": indicator}
+        for correction in corrections
+        for indicator in (
+            correction["indicator"] if isinstance(correction["indicator"], list) else [correction["indicator"]]
+        )
+    ]
 
 
 def _label(correction: dict[str, Any]) -> str:
@@ -139,7 +158,7 @@ def _label(correction: dict[str, Any]) -> str:
         if "entity" in correction
         else f"match {correction.get('match')}"
     )
-    return f"{correction.get('provider', '?')} / {correction.get('indicator', '?')} / {target}"
+    return f"{correction.get('producer', '?')} / {correction.get('indicator', '?')} / {target}"
 
 
 def _validate_correction(correction: Any, path: Path | str) -> None:
@@ -149,8 +168,15 @@ def _validate_correction(correction: Any, path: Path | str) -> None:
 
     label = _label(correction)
 
-    for field in ("indicator", "action", "reason", "provider", "status"):
+    for field in ("indicator", "action", "reason", "producer", "status"):
         assert correction.get(field) not in (None, ""), f"Correction [{label}] in {path} is missing required '{field}'."
+
+    indicator = correction["indicator"]
+    indicators = indicator if isinstance(indicator, list) else [indicator]
+    assert indicators and all(isinstance(ind, str) and ind for ind in indicators), (
+        f"Correction [{label}]: 'indicator' must be a column name or a non-empty list of column names."
+    )
+    assert len(set(indicators)) == len(indicators), f"Correction [{label}]: 'indicator' lists a column twice."
 
     action = correction["action"]
     assert action in VALID_ACTIONS, (

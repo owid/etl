@@ -20,7 +20,7 @@ tables:
         title: Expected years of schooling
         unit: years
         description_from_producer: |-
-          Expected years of school is calculated as the sum of age-specific enrollment rates between ages 4 and 17. Age-specific enrollment rates are approximated using school enrollment rates at different levels: pre-primary enrollment rates approximate the age-specific enrolment rates for 4 and 5 year-olds; the primary rate approximates for 6-11 year-olds; the lower-secondary rate approximates for 12-14 year-olds; and the upper-secondary approximates for 15-17 year-olds. Most recent estimates are used.  Year of most recent primary enrollment rate used is shown in data notes.
+          Expected years of school is calculated as the sum of age-specific enrollment rates between ages 4 and 17. Age-specific enrollment rates are approximated using school enrollment rates at different levels: pre-primary enrollment rates approximate the age-specific enrollment rates for 4 and 5 year-olds; the primary rate approximates for 6-11 year-olds; the lower-secondary rate approximates for 12-14 year-olds; and the upper-secondary approximates for 15-17 year-olds. Most recent estimates are used.  Year of most recent primary enrollment rate used is shown in data notes.
 
           World Bank variable id: HD.HCI.EYRS
 
@@ -179,7 +179,7 @@ tables:
           numDecimalPlaces: 1
 
       school_enrollment__preprimary__pct_gross:
-        title: Gross enrolment ratio in pre-primary education
+        title: Gross enrollment ratio in pre-primary education
         unit: "%"
         short_unit: "%"
         description_short: Number of children of any age group who are enrolled in [pre-primary](#dod:pre-primary-education) education expressed as a percentage of the total population of the official pre-primary school age.
@@ -251,11 +251,11 @@ tables:
           numDecimalPlaces: 1
 
       total_net_enrolment_rate__primary__gender_parity_index__gpi:
-        title: Gender parity in net enrolment rates in primary education
+        title: Gender parity in net enrollment rates in primary education
         unit: index
-        description_short: Ratio of female to male net [primary education](#dod:primary-education) enrolment rates, which is defined as the ratio of children of official primary school age who are enrolled in primary school to the population of the official primary school age.
+        description_short: Ratio of female to male net [primary education](#dod:primary-education) enrollment rates, which is defined as the ratio of children of official primary school age who are enrolled in primary school to the population of the official primary school age.
         description_from_producer: |-
-          Ratio of female total net enrolment rate for primary to the male total net enrolment rate for primary. It is calculated by dividing the female value for the indicator by the male value for the indicator. A GPI equal to 1 indicates parity between females and males. In general, a value less than 1 indicates disparity in favor of males and a value greater than 1 indicates disparity in favor of females.
+          Ratio of female total net enrollment rate for primary to the male total net enrollment rate for primary. It is calculated by dividing the female value for the indicator by the male value for the indicator. A GPI equal to 1 indicates parity between females and males. In general, a value less than 1 indicates disparity in favor of males and a value greater than 1 indicates disparity in favor of females.
 
           World Bank variable id: UIS.NERT.1.GPI
 
@@ -264,11 +264,11 @@ tables:
           numDecimalPlaces: 2
 
       total_net_enrolment_rate__lower_secondary__gender_parity_index__gpi:
-        title: Gender parity in net enrolment rates in lower-secondary education
+        title: Gender parity in net enrollment rates in lower-secondary education
         unit: index
-        description_short: Ratio of female to male net [lower-secondary](#dod:lower-secondary-education) education enrolment rates, defined as the ratio of children of official secondary school age who are enrolled in lower-secondary school to the population of the official lower-secondary school age.
+        description_short: Ratio of female to male net [lower-secondary](#dod:lower-secondary-education) education enrollment rates, defined as the ratio of children of official secondary school age who are enrolled in lower-secondary school to the population of the official lower-secondary school age.
         description_from_producer: |-
-          Ratio of female total net enrolment rate for lower secondary to the male total net enrolment rate for lower secondary. It is calculated by dividing the female value for the indicator by the male value for the indicator. A GPI equal to 1 indicates parity between females and males. In general, a value less than 1 indicates disparity in favor of males and a value greater than 1 indicates disparity in favor of females.
+          Ratio of female total net enrollment rate for lower secondary to the male total net enrollment rate for lower secondary. It is calculated by dividing the female value for the indicator by the male value for the indicator. A GPI equal to 1 indicates parity between females and males. In general, a value less than 1 indicates disparity in favor of males and a value greater than 1 indicates disparity in favor of females.
 
           World Bank variable id: UIS.NERT.2.GPI
 

@@ -13,8 +13,10 @@ from collections import defaultdict
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
+import numpy as np
 import pandas as pd
 import structlog
+from pandas._libs.lib import no_default
 from pandas._typing import Scalar
 from pandas.core.series import Series
 
@@ -26,6 +28,7 @@ from owid.catalog.core.meta import (
     PROCESSING_LEVELS,
     PROCESSING_LEVELS_ORDER,
     License,
+    Markdown,
     Origin,
     VariableMeta,
     VariablePresentationMeta,
@@ -34,6 +37,8 @@ from owid.catalog.core.meta import (
 from owid.catalog.core.properties import metadata_property
 
 log = structlog.get_logger()
+
+PANDAS_3 = int(pd.__version__.split(".")[0]) >= 3
 
 SCHEMA = json.load(open(os.path.join(os.path.dirname(__file__), "..", "schemas", "table.json")))
 METADATA_FIELDS = list(SCHEMA["properties"])
@@ -267,6 +272,22 @@ class Indicator(pd.Series):
         v.name = self.name
         return cast(Indicator, v)
 
+    def replace(  # ty: ignore[invalid-method-override]
+        self,
+        to_replace: Any = None,
+        value: Any = no_default,
+        *,
+        inplace: bool = False,
+        regex: Any = False,
+        **kwargs: Any,
+    ) -> Indicator:
+        # pandas 3 raises when a categorical gets a value that is not one of its categories, while pandas 2 replaced
+        # the categories themselves. Keep the pandas 2 behavior, since steps rely on it.
+        if PANDAS_3 and isinstance(self.dtype, pd.CategoricalDtype) and not inplace and regex is False:
+            values = replace_categorical(self, to_replace, value)
+            return cast(Indicator, self._constructor(values, index=self.index, name=self.name).__finalize__(self))
+        return cast(Indicator, super().replace(to_replace, value, inplace=inplace, regex=regex, **kwargs))
+
     def _repr_html_(self):
         html = str(self)
         return f"""
@@ -351,6 +372,9 @@ class Indicator(pd.Series):
             warnings.warn(
                 "Avoid using fillna(inplace=True), which may not handle metadata as expected.", warnings.MetadataWarning
             )
+        if value is None:
+            # pandas 3 accepts value=None and fills nothing; fail loudly as pandas 2 did.
+            raise ValueError("Must specify a fill 'value'.")
         indicator_name = self.name or UNNAMED_INDICATOR
         indicator = Indicator(super().fillna(value, *args, **kwargs), name=indicator_name)
         indicator._fields = copy.deepcopy(self._fields)
@@ -476,7 +500,7 @@ class Indicator(pd.Series):
         new_var = super().copy(deep=deep)
         if deep:
             field_names = [n for n in self.index.names + [self.name] if n is not None]
-            new_var._fields = defaultdict(VariableMeta, {k: self._fields[k].copy(deep=deep) for k in field_names})
+            new_var._fields = defaultdict(VariableMeta, {k: self._fields[k].copy(deep=deep) for k in field_names})  # ty: ignore[invalid-assignment]
         return new_var  # ty: ignore[invalid-return-type]
 
 
@@ -555,6 +579,34 @@ class IndicatorRolling:
 
         self.__annotations__[name] = Callable[..., Indicator]
         return func
+
+
+def replace_categorical(series: pd.Series, to_replace: Any, value: Any = no_default) -> pd.Categorical:
+    """Replace values of a categorical series the way pandas 2 did.
+
+    The replacement is applied to the categories rather than the values: a category replaced by a new value is renamed
+    in place, one replaced by an existing category is merged into it, and one replaced by a missing value is removed.
+    """
+    cat = cast(pd.Categorical, series.array)
+    categories = cat.categories.to_series().astype(object)
+    if value is no_default:
+        replaced = categories.replace(to_replace)
+    else:
+        replaced = categories.replace(to_replace, value)
+
+    # Order the new categories like pandas 2: a category merged into an existing one takes that one's position, and
+    # a renamed category keeps its own.
+    kept = replaced[replaced.notna()]
+    kept_old = cat.categories[replaced.notna().to_numpy()]
+    positions = kept_old.get_indexer_for(kept.tolist())
+    positions = np.where(positions == -1, np.arange(len(kept)), positions)
+    new_categories = pd.Index(kept.iloc[np.argsort(positions, kind="stable")].drop_duplicates().tolist())
+
+    codes = cat.codes
+    new_values = (
+        np.where(codes >= 0, replaced.to_numpy()[codes], np.nan) if len(replaced) else np.full(len(cat), np.nan)
+    )
+    return pd.Categorical(new_values, categories=new_categories, ordered=cat.ordered)
 
 
 def _hash_dict(d: dict[str, Any]) -> int:
@@ -681,12 +733,17 @@ def get_unique_description_key_points_from_indicators(indicators: list[Indicator
     if not uniques:
         return None
     if len(uniques) == 1:
-        return uniques[0]
+        unique = uniques[0]
+        return Markdown(unique) if isinstance(unique, str) else unique
     texts = [
         description_key_to_string(description_key) if isinstance(description_key, list) else description_key
         for description_key in uniques
     ]
-    return "\n\n".join(text for text in texts if text) or None
+    # `str.join` returns a plain str even when every part is a `Markdown`, and the result is
+    # assigned to metadata after construction, where `__post_init__` cannot re-wrap it. Wrap it
+    # here so the combined value is as iteration-proof as the ones it was built from.
+    combined = "\n\n".join(text for text in texts if text)
+    return Markdown(combined) if combined else None
 
 
 def _get_dict_from_list_if_all_identical(list_of_objects: list[dict[str, Any] | None]) -> dict[str, Any] | None:

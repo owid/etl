@@ -1,2 +1,50 @@
 #!/bin/sh
-make check
+#
+# Run `make check` (lint, format, typecheck) and commit the result.
+#
+# `make check` *fixes* what it can — `ruff check --fix` and `ruff format` rewrite
+# files in place. A hook that merely calls it therefore passes while committing the
+# unfixed content: the fix lands in the working tree, the index still holds what was
+# staged, and CI then fails on the formatting the hook just called clean. So this
+# re-stages what it touched, which is the point — you commit code that has actually
+# been through `make check` without having to run it yourself beforehand.
+#
+# Output is swallowed on success: there is nothing to read when everything passed,
+# and it is worth not printing on every single commit.
+set -e
+
+# The files this commit is about, as the index has them, NUL-delimited so paths with
+# spaces survive. `R` in the filter matters: a rename carrying a small edit stays a
+# rename (`R098 old.py new.py`), so with only `ACM` such a commit yields an empty list
+# and skips every check. `--name-only` reports the destination, which is what we want. Nothing else is ever re-staged: `git add`-ing a file this
+# commit didn't stage would quietly widen it.
+STAGED=$(mktemp)
+trap 'rm -f "$STAGED"' EXIT
+git diff --cached --name-only --diff-filter=ACMR -z >"$STAGED"
+[ -s "$STAGED" ] || exit 0
+
+# A staged file carrying further unstaged edits can't be fixed in place: re-staging
+# it would pull the unstaged half into the commit. That's a deliberate partial
+# commit, so stop and let a person decide instead of committing more than they
+# asked for. Checking this first is also what lets the re-stage below be
+# unconditional — afterwards, any difference from the index is make check's doing.
+PARTIAL=$(xargs -0 git diff --name-only -- <"$STAGED")
+if [ -n "$PARTIAL" ]; then
+	echo "pre-commit: partially staged, so 'make check' can't fix these in place:"
+	echo "$PARTIAL" | sed 's/^/  /'
+	echo "pre-commit: run 'make check', stage the result, then commit again (or --no-verify)."
+	exit 1
+fi
+
+if ! OUTPUT=$(make check 2>&1); then
+	echo "$OUTPUT"
+	echo "pre-commit: 'make check' failed — fix the above and commit again."
+	exit 1
+fi
+
+FIXED=$(xargs -0 git diff --name-only -- <"$STAGED")
+if [ -n "$FIXED" ]; then
+	xargs -0 git add -- <"$STAGED"
+	echo "pre-commit: make check fixed and re-staged:"
+	echo "$FIXED" | sed 's/^/  /'
+fi

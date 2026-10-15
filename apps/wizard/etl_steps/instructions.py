@@ -35,10 +35,9 @@ class Instructions:
                 wrap_lines=True,
                 line_numbers=True,
             )
-            st.markdown("Use `--private` if the dataset is private.")
         else:
             st.code(
-                f"uv run etl run {self.form.meadow_step_uri} {'--private' if self.form.is_private else ''}",
+                f"uv run etl run {self.form.meadow_step_uri}",
                 language="shellSession",
                 wrap_lines=True,
                 line_numbers=True,
@@ -73,10 +72,9 @@ class Instructions:
                 wrap_lines=True,
                 line_numbers=True,
             )
-            st.markdown("Use `--private` if the dataset is private.")
         else:
             st.code(
-                f"uv run etl run {self.form.garden_step_uri} {'--private' if self.form.is_private else ''}",
+                f"uv run etl run {self.form.garden_step_uri}",
                 "shellSession",
                 wrap_lines=True,
                 line_numbers=True,
@@ -91,10 +89,9 @@ class Instructions:
                 wrap_lines=True,
                 line_numbers=True,
             )
-            st.markdown("Use `--private` if the dataset is private.")
         else:
             st.code(
-                f"uv run etl run {self.form.grapher_step_uri} {'--private' if self.form.is_private else ''}",
+                f"uv run etl run {self.form.grapher_step_uri}",
                 language="shellSession",
                 wrap_lines=True,
                 line_numbers=True,

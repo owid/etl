@@ -621,7 +621,7 @@ def adapt_table_with_dates_to_grapher(
     date_column: str = "date",
     country_column: str = "country",
     drop_date_column: bool = True,
-    time_interval: TimeInterval = "day",
+    time_interval: TimeInterval | None = None,
 ) -> catalog.Table:
     """Adapt a table that has a date column to grapher requirements.
 
@@ -631,6 +631,12 @@ def adapt_table_with_dates_to_grapher(
     All sub-yearly data is encoded as days-since-`zeroDay` integers (the same encoding daily data
     uses); `time_interval` tells grapher how to interpret and format those integers. Pass
     ``time_interval="month"``/``"week"``/etc. for data whose points represent months/weeks/etc.
+
+    When `time_interval` is not given, a `display.timeInterval` already declared on the column
+    (e.g. in a garden `.meta.yml`) is preserved, and only columns without one fall back to "day".
+    This matters because grapher steps run this function implicitly, via
+    `_adapt_table_for_grapher`, on every table that still has a date column — so an interval
+    declared in metadata would otherwise be silently overwritten with "day".
 
     Parameters
     ----------
@@ -644,7 +650,8 @@ def adapt_table_with_dates_to_grapher(
         Name of country column, by default "country".
     time_interval : TimeInterval, optional
         Interval each date represents ("day", "week", "month", "quarter", "year", "decade"),
-        written to ``display.timeInterval``. By default "day".
+        written to ``display.timeInterval``. If None (default), an interval already declared in
+        the column's ``display.timeInterval`` wins, and columns without one get "day".
 
     Returns
     -------
@@ -673,8 +680,11 @@ def adapt_table_with_dates_to_grapher(
             tb[column].metadata.display = {}
 
         # Set the timeInterval metadata field, so that grapher knows how to interpret and format the
-        # days-since-zeroDay integers (e.g. "month" -> "Jan 2023")
-        tb[column].metadata.display["timeInterval"] = time_interval
+        # days-since-zeroDay integers (e.g. "month" -> "Jan 2023"). An explicit argument wins, then
+        # an interval already declared in metadata, and "day" is the fallback.
+        tb[column].metadata.display["timeInterval"] = (
+            time_interval or tb[column].metadata.display.get("timeInterval") or "day"
+        )
 
         # Set zeroDay, which grapher will interpret as the earliest day from which to start counting dates.
         tb[column].metadata.display["zeroDay"] = zero_day.strftime("%Y-%m-%d")
@@ -703,8 +713,13 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             else:
                 year = tab.index.get_level_values("year")
             assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {year.dtype}"
+            _validate_time_column_not_null(tab, year, "year")
         elif {"date", "country"} <= set(tab.all_columns):
-            pass
+            if "date" in tab.columns:
+                date = tab["date"]
+            else:
+                date = tab.index.get_level_values("date")
+            _validate_time_column_not_null(tab, date, "date")
         else:
             raise AssertionError("Table must have columns country and year or date.")
 
@@ -743,6 +758,29 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
 
 
 TIME_INTERVALS = {"day", "week", "month", "quarter", "year", "decade"}
+
+# Intervals whose points are shorter than a year. Their time values are not calendar
+# years: they are days-since-`display.zeroDay` integers stored in the "year" column
+# (see `adapt_table_with_dates_to_grapher`), so anything reading those values has to
+# decode them first. "decade" is deliberately absent -- it codes a representative
+# calendar year, not an offset.
+SUB_YEARLY_TIME_INTERVALS = {"day", "week", "month", "quarter"}
+
+
+def _validate_time_column_not_null(tab: Table, time_values: Any, col: str) -> None:
+    """Reject rows whose time column is missing.
+
+    A row with no time is not plottable, and nothing downstream rejects it: `year` keeps a
+    nullable integer dtype, so the dtype check above passes and the NA travels all the way to
+    the MySQL upsert, where `calculate_checksum_metadata` sorts the unique years and dies with
+    `TypeError: boolean value of NA is ambiguous` -- a traceback that says nothing about which
+    dataset or which rows are at fault. Fail here instead, at the step that produced them.
+    """
+    missing = pd.isna(time_values)
+    assert not missing.any(), (
+        f"Table `{tab.metadata.short_name}` has {int(missing.sum())} row(s) with a missing `{col}`. "
+        f"Drop them upstream (usually in garden) or give them a time value."
+    )
 
 
 def _validate_time_interval(tab: Table, col: str) -> None:

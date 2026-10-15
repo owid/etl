@@ -19,6 +19,6 @@ tables:
       volume_index:
         title: Trade volume index
         unit: index 1913=100
-        description_short: The average of export and import volumes, reconstructed from historical sources and standardized to modern definitions, expressed as an index with 1913 = 100.
+        description_short: Average of export and import volumes, reconstructed from historical sources and standardized to modern definitions, expressed as an index with 1913 = 100.
         display:
           numDecimalPlaces: 1

@@ -1,12 +1,33 @@
 definitions:
+  # The long-run World series. It does not apply to the annual-change indicators: Smil's years are
+  # decadal, and add_annual_change only keeps consecutive years, so those have no pre-1965 values.
+  # They clear the common note with the empty definition below.
+  description_processing_smil_world: |-
+    - For the World, data before 1965 (going back to 1800) comes from Vaclav Smil's historical estimates (2017).
+  # Same, for total energy supply per unit of GDP: Maddison's World GDP starts in 1820, not 1800.
+  description_processing_smil_world_from_1820: |-
+    - For the World, data before 1965 (going back to 1820) comes from Vaclav Smil's historical estimates (2017), divided by GDP from the Maddison Project Database, which starts in 1820.
+  # Cleared processing description, for the indicators that no note applies to.
+  description_processing_none: ""
+  # The traditional biomass series itself, which is only reported for the World.
+  description_processing_traditional_biomass: |-
+    - Traditional biomass comes from Vaclav Smil's historical estimates (2017), which cover the World only, going back to 1800.
+    - Smil's estimates end in 2015. For later years, we assume that traditional biomass stays at its 2015 value.
+  # Denominator of the shares of primary energy including traditional biomass.
+  description_processing_biomass_included: |-
+    - The Statistical Review of World Energy does not include data on traditional biomass. We add Vaclav Smil's estimates of traditional biomass to total energy supply.
+    - Smil's estimates end in 2015. For later years, we assume that traditional biomass stays at its 2015 value.
+  # Total energy supply and the indicators derived from it. This does not apply to the by-source
+  # indicators: the EIA is only used to extend the total, and adds no breakdown by source.
+  description_processing_eia: |-
+    - Total energy supply is extended with total energy consumption from the U.S. Energy Information Administration (EIA), to cover countries and years for which the Statistical Review does not report a total. Where both sources report a value, we use the Statistical Review.
   common:
     processing_level: major
     presentation:
       topic_tags:
         - Energy
     description_processing: |-
-      - The total energy supply is extended to countries not covered by the Statistical Review using the U.S. Energy Information Administration's (EIA) total energy consumption. The Statistical Review is prioritized where both sources are available.
-      - The World series is extended back to 1800 using Vaclav Smil's historical estimates (2017), for years before the Statistical Review begins (1965). Only commercially-traded energy sources are included (traditional biomass, which Smil reports but the Statistical Review does not, is excluded so the series stays on a single basis with no step at the splice).
+      {definitions.description_processing_smil_world}
 
 dataset:
   title: Energy mix
@@ -20,14 +41,13 @@ tables:
         title: Traditional biomass
         unit: terawatt-hours
         short_unit: TWh
-        description_short: Energy from traditional biomass (fuelwood, charcoal, crop residues, and dung), measured in [terawatt-hours](#dod:watt-hours). This is not part of total energy supply and is shown separately.
+        description_short: Energy from traditional biomass (fuelwood, charcoal, crop residues, and dung), measured in [terawatt-hours](#dod:watt-hours).
         # Not total energy supply, so the shared key points about how it is measured do not apply here.
         description_key:
           - Traditional biomass is fuelwood, charcoal, crop residues and dung. It is not part of total energy supply, which covers only fuels that are traded commercially.
           - Traditional biomass is only available at the global level.
         description_processing: |-
-          - Traditional biomass comes from Vaclav Smil's historical estimates (2017), which cover the World only.
-          - Smil's series ends in 2015; for later years we hold the last available value constant. We keep it separate from total energy supply, which follows the Statistical Review's commercially-traded scope.
+          {definitions.description_processing_traditional_biomass}
         display:
           name: Traditional biomass
         presentation:
@@ -37,6 +57,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Biofuels
         presentation:
@@ -46,6 +68,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Biofuels
         presentation:
@@ -64,6 +88,9 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
         display:
           name: Biofuels
         presentation:
@@ -91,6 +118,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Coal
         presentation:
@@ -100,6 +129,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Coal
         presentation:
@@ -118,6 +149,9 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
         display:
           name: Coal
         presentation:
@@ -145,6 +179,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Fossil fuels
         presentation:
@@ -154,6 +190,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Fossil fuels
         presentation:
@@ -190,6 +228,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Gas
         presentation:
@@ -199,6 +239,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Gas
         presentation:
@@ -217,6 +259,9 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
         display:
           name: Gas
         presentation:
@@ -244,6 +289,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Hydropower
         presentation:
@@ -253,6 +300,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Hydropower
         presentation:
@@ -271,6 +320,9 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
         display:
           name: Hydropower
         presentation:
@@ -298,9 +350,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
-        # Low-carbon energy sums nuclear and renewables, whose constituents the Statistical Review
-        # describes differently, so no single one of its notes describes this indicator.
-        description_from_producer: null
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Low-carbon energy
         presentation:
@@ -310,9 +361,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
-        # Low-carbon energy sums nuclear and renewables, whose constituents the Statistical Review
-        # describes differently, so no single one of its notes describes this indicator.
-        description_from_producer: null
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Low-carbon energy
         presentation:
@@ -322,9 +372,6 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
-        # Low-carbon energy sums nuclear and renewables, whose constituents the Statistical Review
-        # describes differently, so no single one of its notes describes this indicator.
-        description_from_producer: null
         display:
           name: Low-carbon energy
         presentation:
@@ -343,9 +390,6 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
-        # Low-carbon energy sums nuclear and renewables, whose constituents the Statistical Review
-        # describes differently, so no single one of its notes describes this indicator.
-        description_from_producer: null
         display:
           name: Low-carbon energy
         presentation:
@@ -355,6 +399,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Nuclear
         presentation:
@@ -364,6 +410,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Nuclear
         presentation:
@@ -382,6 +430,9 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
         display:
           name: Nuclear
         presentation:
@@ -409,6 +460,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Oil
         presentation:
@@ -418,6 +471,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Oil
         presentation:
@@ -436,6 +491,9 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
         display:
           name: Oil
         presentation:
@@ -463,6 +521,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Other renewables
         presentation:
@@ -472,6 +532,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Other renewables
         presentation:
@@ -490,6 +552,9 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
         display:
           name: Other renewables
         presentation:
@@ -517,6 +582,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Renewables
         presentation:
@@ -526,6 +593,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Renewables
         presentation:
@@ -562,6 +631,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Solar and wind
         presentation:
@@ -571,6 +642,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Solar and wind
         presentation:
@@ -607,6 +680,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Solar
         presentation:
@@ -616,6 +691,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Solar
         presentation:
@@ -634,6 +711,9 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
         display:
           name: Solar
         presentation:
@@ -661,6 +741,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_eia}
         display:
           name: Total energy supply
         presentation:
@@ -670,6 +752,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_eia}
         display:
           name: Total energy supply
         presentation:
@@ -679,6 +763,9 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
+        description_processing: |-
+          {definitions.description_processing_eia}
+          {definitions.description_processing_smil_world}
         display:
           name: Total energy supply
         presentation:
@@ -688,9 +775,9 @@ tables:
         unit: kilowatt-hours per dollar
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per international-$ of GDP.
-        # This ratio divides the Statistical Review's energy by GDP from a different producer, so the
-        # Statistical Review's description of its own energy series does not describe it.
-        description_from_producer: null
+        description_processing: |-
+          {definitions.description_processing_eia}
+          {definitions.description_processing_smil_world_from_1820}
         presentation:
           title_public: '{tables.energy_mix.variables.total_energy_supply_per_gdp_kwh_per_dollar.title}'
       total_energy_supply_twh:
@@ -698,6 +785,9 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
+        description_processing: |-
+          {definitions.description_processing_eia}
+          {definitions.description_processing_smil_world}
         display:
           name: Total energy supply
         presentation:
@@ -711,6 +801,8 @@ tables:
           - Traditional biomass is fuelwood, charcoal, crop residues and dung.
           - Total energy supply covers only commercially-traded fuels, so shares on this chart are measured against total energy supply plus traditional biomass.
           - Traditional biomass is only available at the global level.
+        description_processing: |-
+          {definitions.description_processing_traditional_biomass}
         display:
           name: Traditional biomass
         presentation:
@@ -720,6 +812,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Wind
         presentation:
@@ -729,6 +823,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Wind
         presentation:
@@ -747,6 +843,9 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply), including traditional biomass.
+        description_processing: |-
+          {definitions.description_processing_biomass_included}
+          {definitions.description_processing_smil_world}
         display:
           name: Wind
         presentation:

@@ -193,7 +193,7 @@ def extract_chart_fields(chart_config: dict[str, Any]) -> list[tuple[str, Any]]:
     """Extract human-readable fields from chart config JSON.
 
     Args:
-        chart_config: Chart configuration dictionary from chart_configs.full
+        chart_config: Chart configuration dictionary from chart_configs.config
 
     Returns:
         List of (field_name, field_value) tuples for all text fields

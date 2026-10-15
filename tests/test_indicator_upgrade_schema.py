@@ -116,7 +116,7 @@ def test_dimension_display_stripped_against_variable_baseline():
 
 def test_inheritance_pruning_uses_patch_not_full_config():
     """Regression test (Codex-flagged): `config` passed to update_chart_config is normally
-    `chart.config`, which is built from `chart_configs.full` -- the fully *resolved* config,
+    `chart.config`, which is the resolved config from `chart_configs` -- the config named by
     with every value the chart inherits from its old indicator already merged in. If
     explicit-field tracking were based on that (rather than the actual stored patch), an
     inherited title the chart never touched would look "explicit" and get compared against
@@ -427,7 +427,7 @@ def test_fetch_single_indicator_config_uses_y_dimension_and_empty_baseline(monke
         if params["vid"] == 900801:
             raise AssertionError("should query the y-dimension's variable, not the color one")
         if params["vid"] == 1292289:
-            return pd.DataFrame([{"full": '{"title": "GDP per capita"}'}])
+            return pd.DataFrame([{"config": '{"title": "GDP per capita"}'}])
         return pd.DataFrame()  # no grapherConfigETL for this variable
 
     monkeypatch.setattr(upgrade_module, "read_sql", fake_read_sql)

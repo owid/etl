@@ -2,7 +2,7 @@ meta:
   origin:
     producer: Federal Reserve Bank of St. Louis
     title: FRED economic data
-    citation_full: Federal Reserve Bank of St. Louis (2020) - FRED.
+    citation_full: Federal Reserve Bank of St. Louis (2020) – FRED.
     attribution_short: FRED
     url_main: http://research.stlouisfed.org/fred2/series/CPIAUCSL/
     url_download: http://research.stlouisfed.org/fred2/series/UNRATE

@@ -13,12 +13,14 @@ tables:
         unit: cases per 100,000
         display:
           name: With Wolbachia bacteria
+          timeInterval: month
         description: The number of dengue fever cases per 100,000 people within areas that had the Wolbachia method treatment
       areas_without_wolbachia:
         title: Dengue fever cases in areas without Wolbachia
         unit: cases per 100,000
         display:
           name: Without Wolbachia
+          timeInterval: month
         description: The number of dengue fever cases per 100,000 people within areas without the Wolbachia method treatment
     dimensions:
       - name: country

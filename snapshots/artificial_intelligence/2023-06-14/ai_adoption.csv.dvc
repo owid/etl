@@ -15,7 +15,7 @@ meta:
   date_accessed: 2023-06-19
   is_public: true
   description: |-
-    Data from McKinsey & Company Survey via AI Index (2023) on AI adoption by organisations in Developing Markets (incl. India, Latin America, MENA), Greater China (incl. Hong Kong, Taiwan), North America, Europe and Asia-PaciǇc.
+    Data from McKinsey & Company Survey via AI Index (2023) on AI adoption by organizations in Developing Markets (incl. India, Latin America, MENA), Greater China (incl. Hong Kong, Taiwan), North America, Europe and Asia-PaciǇc.
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
 outs:
   - md5: fae6f16f53244d8778797609fe8065b7

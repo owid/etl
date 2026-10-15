@@ -47,7 +47,7 @@ tables:
         title: Wealth share of top 10%
         unit: "%"
         short_unit: "%"
-        description_short: The share of wealth owned by the richest 10% of the population.
+        description_short: Share of wealth owned by the richest 10% of the population.
         presentation:
           title_public: Share of top 10%
           title_variant: Individual net wealth

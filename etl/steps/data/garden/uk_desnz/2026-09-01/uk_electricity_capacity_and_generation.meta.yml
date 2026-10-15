@@ -1,0 +1,36 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+    short_unit: TWh
+    unit: terawatt-hours
+    processing_level: minor
+
+dataset:
+  update_period_days: 0
+  owners:
+    - Pablo Rosado
+
+tables:
+  uk_electricity_capacity_and_generation:
+    title: UK electricity generation by fuel
+    variables:
+      total_generation:
+        title: Total estimated electricity generation
+      coal_generation:
+        title: Estimated electricity generation from coal
+      oil_generation:
+        title: Estimated electricity generation from oil
+      gas_generation:
+        title: Estimated electricity generation from natural gas
+      nuclear_generation:
+        title: Estimated electricity generation from nuclear
+      wind_wave_solar_and_hydro_generation:
+        title: Estimated electricity generation from wind, wave, solar and hydro
+      coke_and_breeze_generation:
+        title: Estimated electricity generation from coke and breeze
+      other_fuels_generation:
+        title: Estimated electricity generation from other fuels
+      pumped_storage_generation:
+        title: Estimated electricity generation from pumped storage

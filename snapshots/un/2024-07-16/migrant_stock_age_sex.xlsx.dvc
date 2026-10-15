@@ -16,6 +16,10 @@ meta:
     producer: United Nations Department of Economic and Social Affairs
     citation_full: |-
       United Nations Department of Economic and Social Affairs, Population Division (2020). International Migrant Stock 2020.
+    # The producer publishes several data products, and the automatic `producer (year)` names none
+    # of them -- which matters here because this origin is what the migrant-demographics feed shows
+    # as its source line.
+    attribution: UN DESA, International Migrant Stock (2020)
     attribution_short: UN DESA
 
     # Files

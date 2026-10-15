@@ -17,7 +17,7 @@ from tqdm import tqdm
 
 from etl.files import yaml_load
 from etl.grapher import helpers as gh
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, end_with_punctuation
 
 log = getLogger()
 # Get paths and naming conventions for current step.
@@ -262,7 +262,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, source_desc: dict, date_acce
 
     tb["meta"] = VariableMeta(
         title=tb["variable_name_meta"].iloc[0],
-        description_short=series_description,
+        description_short=end_with_punctuation(series_description),
         description_processing=processing_note,
         description_from_producer=str(source_desc),
         origins=[origin],

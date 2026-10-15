@@ -35,16 +35,16 @@ We deal almost exclusively with tabular data. Both our ETL scripts (python scrip
 
     graph TD
 
-    channel --> provider --> release --> dataset
+    channel --> producer --> release --> dataset
 
 - **Channel** - this refers to the top level folder that communicates the level of processing or the special data origin of the data. Important channels are:
 
   - ``meadow``, ``garden`` and ``grapher`` - these correspond to the logical steps described below
   - ``backport`` - these are datasets that were not originally imported via scripts here in the ETL repository. This includes both individual research paper data relases and older institutional data imports (roughly before 2022).
   - ``explorers`` - a special output channel for data that is used by one of our `Data Explorers <https://ourworldindata.org/charts>`__.
-- **Provider** - this is the short form acronym of the institution that is the provider of the data (e.g. ``who`` for World Health Organisation, ``wb`` for World Bank, etc.)
+- **Producer** - this is the short form acronym of the institution that is the producer of the data (e.g. ``who`` for World Health Organisation, ``wb`` for World Bank, etc.)
 - **Release** - this level matches the release cadence for datasets that are released yearly, quarterly etc. For datasets that are released continuously, the special value ``latest`` is often used
-- **Dataset** - this is a logical grouping of data tables that are released together by the providers as a logical unit.
+- **Dataset** - this is a logical grouping of data tables that are released together by the producers as a logical unit.
 
 .. mermaid::
     :align: center

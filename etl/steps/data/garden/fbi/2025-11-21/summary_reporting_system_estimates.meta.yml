@@ -17,9 +17,9 @@ definitions:
   property_crime_desc_short: &property_crime_desc_short |-
     Property crime includes the offenses of burglary, larceny-theft, motor vehicle theft, and arson.
   burglary_desc_short: &burglary_desc_short |-
-    The unlawful entry of a building to commit a felony or a theft. Attempted forcible entry is included.
+    Unlawful entry of a building to commit a felony or a theft. Attempted forcible entry is included.
   larceny_desc_short: &larceny_desc_short |-
-    The unlawful taking, carrying, leading, or riding away of property from the possession or constructive possession of another.
+    Unlawful taking, carrying, leading, or riding away of property from the possession or constructive possession of another.
   motor_vehicle_theft_desc_short: &motor_vehicle_theft_desc_short |-
     "Motor vehicle theft is the theft or attempted theft of a motor vehicle."
 

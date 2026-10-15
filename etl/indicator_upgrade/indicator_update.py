@@ -7,7 +7,7 @@ from copy import deepcopy
 from typing import Any
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from structlog import get_logger
 
 import etl.grapher.model as gm
@@ -34,8 +34,16 @@ def find_charts_from_variable_ids(variable_ids: set[int]) -> list[gm.Chart]:
             .unique()
             .all()
         )
-        # Retrieve charts from a given list of chart IDs
-        charts = session.scalars(select(gm.Chart).where(gm.Chart.id.in_(chart_ids))).all()
+        # Retrieve charts from a given list of chart IDs. `patch_config` is lazy by default
+        # (see the relationship's comment in `gm.Chart`), and callers read it *after* this
+        # session closes, so eager-load it here rather than paying a detached lazy load.
+        charts = (
+            session.scalars(
+                select(gm.Chart).where(gm.Chart.id.in_(chart_ids)).options(selectinload(gm.Chart.patch_config))
+            )
+            .unique()
+            .all()
+        )
 
     # some charts don't have ID in config, fix that here (should be ideally fixed in the database)
     for chart in charts:
@@ -132,7 +140,8 @@ def update_chart_config(
     `dimension_display_baselines` maps each dimension's (new) variable ID to that variable's
     own `display` metadata, used to strip the same kind of redundant defaults from
     `dimensions[*].display` -- a separate inheritance path, see prune_dimension_displays.
-    `original_patch` is the chart's own stored `chart_configs.patch` (not `.full`) -- see
+    `original_patch` is the chart's own stored authored layer (the `chart_configs` row named
+    by `charts.patchConfigId`, not the one named by `configId`) -- see
     ChartIndicatorUpdater.run for why this matters for inheritance-enabled charts.
     """
     is_inheritance_enabled = config.get("isInheritanceEnabled", False)
@@ -205,9 +214,10 @@ class ChartIndicatorUpdater:
             `is_inheritance_enabled`, since dimension display always inherits from the
             variable's own display metadata.
         original_patch : Optional[Dict[str, Any]]
-            The chart's own stored `chart_configs.patch` (not `.full`). `config` itself is
-            normally `chart.config`, which SQLAlchemy builds from `.full` -- the fully
-            resolved config, with every value the chart *inherits* from its indicator
+            The chart's own stored authored layer: the `chart_configs` row named by
+            `charts.patchConfigId`, not the one named by `configId`. `config` itself is
+            normally `chart.config`, which SQLAlchemy builds from the row named by
+            `configId` -- the fully resolved config, with every value it *inherits*
             already merged in. If we tracked "explicitly set" paths from `config` directly,
             an inherited field the chart never touched (e.g. its title, pulled from the
             *old* indicator) would be misread as an explicit override, and compared against

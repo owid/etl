@@ -66,7 +66,7 @@ tables:
       central_death_rate:
         title: Central death rate
         description_short: |-
-          The death rate, calculated as the number of deaths divided by the average number of people alive during the interval.
+          Death rate, calculated as the number of deaths divided by the average number of people alive during the interval.
         description_key:
           - "The death rate is measured using the number of person-years lived during the interval."
           - "Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years."
@@ -88,7 +88,7 @@ tables:
         title: Probability of death
         unit: "%"
         description_short: |-
-          The probability of dying in a given interval, among people who survived to the start of that interval.
+          Probability of dying in a given interval, among people who survived to the start of that interval.
         description_key:
           - "For example, the probability of death for a 50 year old in a given year is found by: dividing the number of deaths in 50 year olds that year, by the number of people alive at the age of 50 at the start of the year."
         processing_level: minor
@@ -169,15 +169,15 @@ tables:
         description_short: |-
           <%- if age == '0' -%>
           <%- if sex == 'total' -%>
-          The << type >> life expectancy at birth, in a given year.
+          << type | capitalize >> life expectancy at birth, in a given year.
           <%- else -%>
-          The << type >> life expectancy at birth among << sex + 's' >>, in a given year.
+          << type | capitalize >> life expectancy at birth among << sex + 's' >>, in a given year.
           <%- endif -%>
           <%- else -%>
           <%- if sex == 'total' -%>
-          The remaining << type >> life expectancy at age << age >>, in a given year.
+          Remaining << type >> life expectancy at age << age >>, in a given year.
           <%- else -%>
-          The remaining << type >> life expectancy at age << age >> among << sex + 's' >>, in a given year.
+          Remaining << type >> life expectancy at age << age >> among << sex + 's' >>, in a given year.
           <%- endif -%>
           <%- endif -%>
         description_key:
@@ -212,7 +212,7 @@ tables:
       exposure:
         title: Exposure-to-risk
         unit: person-years
-        description_short: The total number of person-years lived within a given interval.
+        description_short: Total number of person-years lived within a given interval.
         description_key:
           - It is equivalent to the average number of people living in that age group during the period.
         description_from_producer: |-
@@ -237,9 +237,9 @@ tables:
         unit: deaths
         description_short: |-
           <% if sex == 'total' %>
-          The total number of deaths at age << age >> in a given year.
+          Total number of deaths at age << age >> in a given year.
           <%- else %>
-          The total number of << sex >> deaths at age << age >> in a given year.
+          Total number of << sex >> deaths at age << age >> in a given year.
           <%- endif %>
         display:
           name: |-
@@ -261,15 +261,15 @@ tables:
         description_short: |-
           <% if age == 'total' %>
           <%- if sex == 'total' %>
-          The total number of people living in a country.
+          Total number of people living in a country.
           <%- else %>
-          The total number of << sex + 's' >> living in a country.
+          Total number of << sex + 's' >> living in a country.
           <%- endif %>
           <%- else %>
           <% if sex == 'total' %>
-          The total number of people aged << age >> living in a country.
+          Total number of people aged << age >> living in a country.
           <%- else %>
-          The total number of << sex + 's' >> aged << age >> living in a country.
+          Total number of << sex + 's' >> aged << age >> living in a country.
           <%- endif %>
           <%- endif %>
         description_processing: |-
@@ -297,9 +297,9 @@ tables:
         unit: births
         description_short: |-
           <% if sex == 'total' %>
-          The total number of births in a given year.
+          Total number of births in a given year.
           <%- else %>
-          The total number of << sex >> births in a given year.
+          Total number of << sex >> births in a given year.
           <%- endif %>
         display:
           name: |-
@@ -317,9 +317,9 @@ tables:
         unit: births per 1,000 people
         description_short: |-
           <% if sex == 'total' %>
-          The total number of births per 1,000 people in a given year.
+          Total number of births per 1,000 people in a given year.
           <%- else %>
-          The total number of << sex >> births per 1,000 in a given year.
+          Total number of << sex >> births per 1,000 in a given year.
           <%- endif %>
         display:
           name: |-
@@ -344,7 +344,7 @@ tables:
         title: Central death rate ratio (m/f)
         unit: ""
         description_short: |-
-          The ratio of the << type >> central death rate (males to females) at age << age >>.
+          Ratio of the << type >> central death rate (males to females) at age << age >>.
         processing_level: major
         display:
           name: |-
@@ -362,7 +362,7 @@ tables:
         short_unit: years
         unit: years
         description_short: |-
-          The difference in the << type >> life expectancy (females - males) at age << age >>.
+          Difference in the << type >> life expectancy (females - males) at age << age >>.
         processing_level: major
         description_key:
           - Higher values indicate longer life expectancy among females than males.
@@ -386,7 +386,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-          The ratio of the << type >> life expectancy (females to males) at age << age >>.
+          Ratio of the << type >> life expectancy (females to males) at age << age >>.
         processing_level: major
         description_key:
           - Higher values indicate longer life expectancy among females than males.
@@ -416,9 +416,9 @@ tables:
         title: "Central death rate - sex: <<sex>>"
         description_short: |-
           <% if sex == 'total' %>
-          The death rate, calculated as the number of deaths divided by the average number of people alive during the year.
+          Death rate, calculated as the number of deaths divided by the average number of people alive during the year.
           <%- else %>
-          The death rate, calculated as the number of <<sex>> deaths divided by the average number of <<sex>>s alive during the year.
+          Death rate, calculated as the number of <<sex>> deaths divided by the average number of <<sex>>s alive during the year.
           <%- endif %>
         description_key:
           - "The death rate is measured using the number of person-years lived during the interval."
@@ -441,9 +441,9 @@ tables:
         unit: deaths
         description_short: |-
           <% if sex == 'total' %>
-          The total number of deaths in a given year.
+          Total number of deaths in a given year.
           <%- else %>
-          The total number of << sex >> deaths in a given year.
+          Total number of << sex >> deaths in a given year.
           <%- endif %>
         presentation:
           title_public: Deaths

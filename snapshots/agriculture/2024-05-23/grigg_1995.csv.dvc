@@ -4,7 +4,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: The nutritional transition in Western Europe
-    title_snapshot: The nutritional transition in Western Europe - Daily calories in Western Europe
+    title_snapshot: The nutritional transition in Western Europe – Daily calories in Western Europe
     description: |-
       This dataset contains daily calories available per capita from Table 1 of Grigg (1995) paper: "The nutritional transition in Western Europe".
     date_published: "1995-07-01"

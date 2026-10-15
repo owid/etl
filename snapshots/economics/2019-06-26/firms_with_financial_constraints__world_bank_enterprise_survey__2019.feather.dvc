@@ -2,7 +2,7 @@ meta:
   origin:
     producer: World Bank
     title: Enterprise Surveys
-    title_snapshot: Enterprise Surveys - Firms with financial constraints
+    title_snapshot: Enterprise Surveys – Firms with financial constraints
     description_snapshot: |-
       Surveys were conducted in different years for different countries, but all during the time period of 2009 to 2018. The date displayed is standardized to 2018.
     citation_full: World Bank (2019). Enterprise Surveys.

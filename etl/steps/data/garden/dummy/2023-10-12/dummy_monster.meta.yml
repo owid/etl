@@ -32,7 +32,7 @@ definitions:
       {definitions.long_text}
     date_accessed: "2023-01-01"
     date_published: "2000-01-01"
-    attribution: Producer of the first data product, long and ugly - Title of the first data product, long and ugly (2023)
+    attribution: Producer of the first data product, long and ugly – Title of the first data product, long and ugly (2023)
     attribution_short: Short attribution but not as short as it should
     citation_full: |-
       Long citation full.
@@ -54,7 +54,7 @@ definitions:
       Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product.
     date_accessed: "2023-01-01"
     date_published: "2000-01-01"
-    attribution: Producer of data product - Title of data product (2023)
+    attribution: Producer of data product – Title of data product (2023)
     attribution_short: Producer two
     citation_full: |-
       Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full.
@@ -74,7 +74,7 @@ definitions:
       Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product. Normal description for this data product.
     date_accessed: "2023-01-01"
     date_published: "2000-01-01"
-    # attribution: Producer of data product - Title of data product (2023)
+    # attribution: Producer of data product – Title of data product (2023)
     attribution_short: Producer three
     citation_full: |-
       Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full. Normal citation full.
@@ -124,7 +124,7 @@ tables:
           - *origin_typical
         presentation:
           # Keep indicator's attribution empty, so that the origins' attributions are used.
-          # attribution: Data product - producer (2023)
+          # attribution: Data product – producer (2023)
           attribution_short: Short attribution
           title_public: "Normal looking title public"
           title_variant: "Normal title variant"
@@ -212,7 +212,7 @@ tables:
           # - *origin_with_almost_no_metadata
         presentation:
           # Keep indicator's attribution empty, so that the origins' attributions are used.
-          # attribution: Long indicator attribution - Much longer than it should be, but good for testing purposes (2022)
+          # attribution: Long indicator attribution – Much longer than it should be, but good for testing purposes (2022)
           attribution_short: Long indicator short attribution which is much longer than it should be
           title_public: "Long title public, way longer than it should be, full of unnecessary information, but excellent for testing purposes"
           title_variant: "Long title variant, way longer than it should be, full of unnecessary information, but excellent for testing purposes"
@@ -234,7 +234,7 @@ tables:
             description: |-
               {definitions.long_text}
             date_published: "2023-09-07"
-            attribution: Producer of the first data product - Title of the first data product (2023)
+            attribution: Producer of the first data product – Title of the first data product (2023)
             attribution_short: Producer one
             citation_full: |-
               Long citation full.
@@ -250,7 +250,7 @@ tables:
 
               {definitions.long_text}
             date_published: "2023-09-07"
-            attribution: Producer of the second data product - Title of the second data product (2023)
+            attribution: Producer of the second data product – Title of the second data product (2023)
             attribution_short: Producer two
             citation_full: |-
               Long citation full.

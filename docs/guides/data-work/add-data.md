@@ -74,7 +74,7 @@ snapshot --> meadow --> garden --> grapher
 
 ### Decide on names
 
-The ETL uses a naming convention to identify datasets. To add a dataset, you will need to choose a short name for the data provider (e.g. `un`, `who`), which will serve as the namespace to add it to.
+The ETL uses a naming convention to identify datasets. To add a dataset, you will need to choose a short name for the data producer (e.g. `un`, `who`), which will serve as the namespace to add it to.
 
 You will also need to choose a short name for the dataset itself (e.g. `population`), which will be used to identify the dataset in the ETL.
 

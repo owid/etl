@@ -52,7 +52,7 @@ definitions:
       outcomes. Next, looking across indicators, each person’s deprivation score is constructed by
       adding up the weights of the indicators in which they are deprived. The indicators use a nested
       weight structure: equal weights across dimensions and an equal weight for each indicator within a
-      dimension. The normalised indicator weight structure of the global MPI means that the living
+      dimension. The normalized indicator weight structure of the global MPI means that the living
       standard indicators receive lower weight than health and education related indicators because from
       a policy perspective, each of the three dimensions is of roughly equal normative importance.
 

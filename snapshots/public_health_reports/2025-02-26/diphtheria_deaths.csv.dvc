@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical diphtheria cases in the United States - Public Health Reports
+    title: Historical diphtheria cases in the United States – Public Health Reports
     description: |-
       Data on historical diphtheria cases in the United States, compiled from a selection of sources from the United States - Public Health Reports.
 
@@ -22,13 +22,13 @@ meta:
     # Citation
     producer: Public Health Reports
     citation_full: |-
-      Public Health Reports, Vol. 53, No. 44 - Health Conditions in the United States as Indicated by Mortality Rates, 1929-38 (1939).
+      Public Health Reports, Vol. 53, No. 44 – Health Conditions in the United States as Indicated by Mortality Rates, 1929-38 (1939).
 
-      Public Health Reports, Vol. 55, No. 10 - Notifiable Diseases in the United States, 1938: Morbidity and Mortality Summaries for Certain Important Communicable Diseases (1940).
+      Public Health Reports, Vol. 55, No. 10 – Notifiable Diseases in the United States, 1938: Morbidity and Mortality Summaries for Certain Important Communicable Diseases (1940).
 
-      Public Health Reports, Vol. 56, No. 7 - Notifiable Diseases in the United States, 1939: Morbidity and Mortality Summaries for Certain Important Communicable Diseases (1941).
+      Public Health Reports, Vol. 56, No. 7 – Notifiable Diseases in the United States, 1939: Morbidity and Mortality Summaries for Certain Important Communicable Diseases (1941).
 
-      Public Health Reports, Vol. 57, No. 7 - Notifiable Diseases in the United States, 1940: Morbidity and Mortality Summaries for Certain Important Communicable Diseases (1942).
+      Public Health Reports, Vol. 57, No. 7 – Notifiable Diseases in the United States, 1940: Morbidity and Mortality Summaries for Certain Important Communicable Diseases (1942).
 
     # Files
     url_main: https://www.jstor.org/stable/4584013?read-now=1&seq=5#page_scan_tab_contents

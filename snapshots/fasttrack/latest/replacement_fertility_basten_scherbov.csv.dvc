@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: Stuart Gietel-Basten and Sergei Scherbov
-    title: Replacement rate of fertility - Gietel-Basten and Scherbov (2020)
+    title: Replacement rate of fertility – Gietel-Basten and Scherbov (2020)
     description: |-
       Estimated total fertility rate required to retain the same population size, after accounting for early life mortality. This is based on estimates of the total fertility rate and life tables from the UN World Population Prospects (2017).
     citation_full: |-

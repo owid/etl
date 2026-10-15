@@ -125,7 +125,7 @@ def process_columns(tb: Table, tb_mapping: Table) -> Table:
     mapping = tb_mapping.set_index("code_name")["preprocess"].to_dict()
     for code_name, preprocess in mapping.items():
         if code_name in tb.columns:
-            tb.loc[:, code_name] = tb[code_name].replace(MAPPED_VALUES[preprocess])
+            tb[code_name] = tb[code_name].replace(MAPPED_VALUES[preprocess])
             uniq_values = set(MAPPED_VALUES[preprocess].values())
             assert tb.loc[:, code_name].drop_duplicates().dropna().isin(uniq_values).all(), (
                 f"One or more non-NaN values in {code_name} are not in {uniq_values}"

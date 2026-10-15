@@ -277,9 +277,14 @@ def cli(
                 work_branch = f"{work_branch}-private"
         if worktree:
             resolved_worktree_path = resolve_worktree_path(work_branch, worktree_path)
-            branch_out_worktree(repo, base_branch, work_branch, resolved_worktree_path, update_base=not no_update_base)
-            if share_data:
-                symlink_shared_dirs(resolved_worktree_path)
+            branch_out_worktree(
+                repo,
+                base_branch,
+                work_branch,
+                resolved_worktree_path,
+                update_base=not no_update_base,
+                share_data=share_data,
+            )
             # Subsequent git operations (commit, push) must run inside the worktree.
             repo = Repo(resolved_worktree_path)
         else:
@@ -464,7 +469,12 @@ def resolve_worktree_path(work_branch: str, override: str | None) -> Path:
 
 
 def branch_out_worktree(
-    repo, base_branch: str, work_branch: str, worktree_path: Path, update_base: bool = True
+    repo,
+    base_branch: str,
+    work_branch: str,
+    worktree_path: Path,
+    update_base: bool = True,
+    share_data: bool = False,
 ) -> None:
     """Create branch 'work_branch' from 'base_branch' inside a new git worktree at 'worktree_path'."""
     if worktree_path.exists():
@@ -484,14 +494,40 @@ def branch_out_worktree(
     except GitCommandError as e:
         raise click.ClickException(f"Failed to create worktree at '{worktree_path}':\n{e}")
 
-    # Copy .env so the new worktree is immediately usable. .venv is intentionally not
-    # copied/symlinked — it's Python-version-specific and best recreated with `make check`.
-    src_env = BASE_DIR / ".env"
-    if src_env.exists():
-        shutil.copy2(src_env, worktree_path / ".env")
-        log.info(f"Copied .env to '{worktree_path / '.env'}'.")
-    else:
-        log.debug(f"No .env found at '{src_env}', skipping copy.")
+    # --share-data before provisioning: `setup.worktree` clones `data/` only when it finds
+    # none, and stands down when one is already there. Symlinking first is what makes the
+    # two agree; the other order leaves the clone and silently ignores --share-data.
+    if share_data:
+        symlink_shared_dirs(worktree_path)
+
+    provision_worktree(worktree_path)
+
+
+def provision_worktree(worktree_path: Path) -> None:
+    """Give a fresh worktree the gitignored config (and `data/`) it can't inherit from git.
+
+    Defers to `make setup.worktree` so there is one definition of what a checkout needs,
+    rather than a copy here that drifts from it — the same target a post-checkout hook or a
+    worktree manager calls. It does not build the venv; `install_worktree_venv` does that after
+    the PR is created.
+
+    Falls back to copying `.env` directly when the target isn't there, which happens when the
+    worktree's base branch predates it (a stale local base, or a base other than master).
+    Always copying `.env` is a guarantee worth keeping: a worktree that looks provisioned but
+    has no credentials fails later, and confusingly.
+    """
+    try:
+        subprocess.run(["make", "setup.worktree"], cwd=worktree_path, check=True)
+        return
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        log.warning(f"`make setup.worktree` did not run in the new worktree ({e}); copying .env directly.")
+
+    for name in [".env", *sorted(path.name for path in BASE_DIR.glob(".env.prod*"))]:
+        src = BASE_DIR / name
+        dst = worktree_path / name
+        if src.exists() and not dst.exists():
+            shutil.copy2(src, dst)
+            log.info(f"Copied {name} to '{worktree_path}'.")
 
 
 # Gitignored dirs symlinked into the worktree by --share-data.
@@ -760,7 +796,8 @@ CLEAN_HELP = """Clean up local branches whose pull request was merged or closed 
 
 Lists every local branch whose latest GitHub PR is **merged** or **closed** (using GitHub's PR
 state, not `git branch --merged`, so squash-merges are detected). Branches that have a git worktree
-are flagged with `<- worktree`. Pick a single branch, or `all`, and the tool will:
+are flagged with `<- worktree`. Pick a single branch, `all`, `all merged`, or `all closed`, and the
+tool will:
 
 1. (Worktree branches only) Check the worktree for uncommitted changes that would block
    `git worktree remove` — modified tracked files or untracked files, not counting `--share-data`'s
@@ -789,6 +826,14 @@ repo can clean every worktree anyway, so just `cd` there first.
 etl pr-clean
 ```
 """
+
+
+# Sentinel values for the pr-clean bulk-selection choices. Plain objects, not strings, so they can
+# never collide with an actual branch name -- git allows branch names like "__all_merged__", which
+# a string sentinel would be indistinguishable from when selected.
+_CLEAN_ALL = object()
+_CLEAN_ALL_MERGED = object()
+_CLEAN_ALL_CLOSED = object()
 
 
 @click.command(
@@ -851,15 +896,19 @@ def clean_cli() -> None:
         if b in worktrees and worktrees[b] != main_worktree_path
     }
 
-    # Build the selection list ('all' first, then one entry per branch).
-    choices = [questionary.Choice(title="all", value="__all__")]
+    # Build the selection list ('all' / 'all merged' / 'all closed' first, then one entry per branch).
+    choices = [
+        questionary.Choice(title="all", value=_CLEAN_ALL),
+        questionary.Choice(title="all merged", value=_CLEAN_ALL_MERGED),
+        questionary.Choice(title="all closed", value=_CLEAN_ALL_CLOSED),
+    ]
     for branch in sorted(cleanable):
         choices.append(
             questionary.Choice(title=_branch_label(branch, cleanable[branch], worktrees, dirty), value=branch)
         )
 
     selected = questionary.select(
-        message="Select a branch to clean (or 'all')",
+        message="Select a branch to clean (or 'all' / 'all merged' / 'all closed')",
         choices=choices,
         style=SHELL_FORM_STYLE,
         instruction="(Use arrow keys, Enter to confirm)",
@@ -868,7 +917,11 @@ def clean_cli() -> None:
     if selected is None:
         return
 
-    branches_to_clean = sorted(cleanable) if selected == "__all__" else [selected]
+    branches_to_clean = resolve_branches_to_clean(selected, cleanable)
+    if not branches_to_clean:
+        state = {_CLEAN_ALL_MERGED: "merged", _CLEAN_ALL_CLOSED: "closed"}[selected]
+        print(f"Nothing to clean: no local branch has a {state} PR.")
+        return
 
     main_project_dir = claude_project_dir(main_worktree_path)
 
@@ -880,6 +933,22 @@ def clean_cli() -> None:
             main_project_dir=main_project_dir,
             main_worktree_path=main_worktree_path,
         )
+
+
+def resolve_branches_to_clean(selected: object, cleanable: dict[str, str]) -> list[str]:
+    """Expand a questionary selection into the sorted list of branches to clean.
+
+    `selected` is either one of the `_CLEAN_ALL*` sentinels or a branch name (`str`) chosen
+    directly -- sentinels, rather than string markers like "__all__", so a real branch that
+    happens to be named that can never be mistaken for the bulk choice.
+    """
+    if selected is _CLEAN_ALL:
+        return sorted(cleanable)
+    if selected is _CLEAN_ALL_MERGED:
+        return sorted(b for b, s in cleanable.items() if s == "merged")
+    if selected is _CLEAN_ALL_CLOSED:
+        return sorted(b for b, s in cleanable.items() if s == "closed")
+    return [selected]  # ty: ignore
 
 
 def get_main_worktree_path(repo) -> Path:

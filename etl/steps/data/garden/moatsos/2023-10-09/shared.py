@@ -29,14 +29,14 @@ From the share and number unable to meet basic needs available in the dataset, w
 var_dict = {
     "headcount": {
         "title": "Number in poverty",
-        "description": "Number of people {povline}",
+        "description": "Number of people {povline}.",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 0,
     },
     "headcount_ratio": {
         "title": "Share of population in poverty",
-        "description": "Share of the population {povline}",
+        "description": "Share of the population {povline}.",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,

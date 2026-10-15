@@ -589,7 +589,7 @@ Attributes:
     table: Table name.
     path: Full path to the table.
     channel: Data channel (garden, meadow, etc.).
-    namespace: Data provider namespace.
+    namespace: Data producer namespace.
     version: Version string.
     dataset: Dataset name.
     dimensions: List of dimension columns.
@@ -766,7 +766,7 @@ Attributes:
     indicator_id: Unique indicator ID.
     path: Path in the catalog (e.g., "grapher/un/2024-07-12/un_wpp/population#population").
     channel: Data channel (parsed from path).
-    namespace: Data provider namespace (parsed from path).
+    namespace: Data producer namespace (parsed from path).
     version: Version string (parsed from path).
     dataset: Dataset name (parsed from path).
     column_name: Column name in the table.

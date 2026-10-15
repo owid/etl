@@ -10,7 +10,7 @@ import owid.catalog.processing as pr
 import pandas as pd
 import streamlit as st
 
-from apps.wizard.app_pages.producer_analytics.utils import GRAPHERS_BASE_URL, MIN_DATE, TODAY
+from apps.wizard.app_pages.producer_analytics.utils import MIN_DATE, TODAY
 from apps.wizard.utils.components import st_cache_data
 from etl.analytics.data import get_visualizations_using_data_by_producer
 from etl.google import read_gbq
@@ -56,7 +56,7 @@ def get_chart_views(min_date: str, max_date: str) -> pd.DataFrame:
             date_start=date_start,
             date_end=date_end,
             grapher_urls=None,
-            groupby=["grapher"],
+            groupby=["chart_url"],
         ).rename(columns={"renders": column_name})
         for column_name, (date_start, date_end) in date_ranges.items()
     ]
@@ -64,10 +64,9 @@ def get_chart_views(min_date: str, max_date: str) -> pd.DataFrame:
     # Merge all data frames.
     df = pr.multi_merge(
         dfs,  # ty: ignore
-        on="grapher",
+        on="chart_url",
         how="outer",
     )
-    df = df.rename(columns={"grapher": "chart_url"})
 
     return df
 
@@ -79,18 +78,22 @@ def get_chart_views_from_bq(
     groupby: list[str] | None = None,
     grapher_urls: list[str] | None = None,
 ) -> pd.DataFrame:
+    # Identify charts by the resolved `chart_url`, not by `grapher` (the URL exactly as GA4 recorded
+    # it): that one is truncated at 126 characters and may be a slug the chart has since been renamed
+    # away from, so grouping on it splits or zeroes a chart's views (owid/analytics#733). `chart_url`
+    # is NULL for anything that is not a published chart (explorers, MDIMs, deleted charts).
     grapher_filter = ""
     if grapher_urls:
         # If a list of grapher URLs is given, consider only those.
         grapher_urls_formatted = ", ".join(f"'{url}'" for url in grapher_urls)
-        grapher_filter = f"AND grapher IN ({grapher_urls_formatted})"
+        grapher_filter = f"AND chart_url IN ({grapher_urls_formatted})"
     else:
-        # If no list is given, consider all grapher URLs.
-        grapher_filter = f"AND grapher LIKE '%%{GRAPHERS_BASE_URL}%%'"
+        # If no list is given, consider all published charts.
+        grapher_filter = "AND chart_url IS NOT NULL"
 
     if not groupby:
         # If a groupby list is not given, assume the simplest case, which gives total views for each grapher.
-        groupby = ["grapher"]
+        groupby = ["chart_url"]
 
     # Prepare the query.
     groupby_clause = ", ".join(groupby)
@@ -98,7 +101,7 @@ def get_chart_views_from_bq(
     query = f"""
         SELECT
             {select_clause}
-        FROM prod_ga4.grapher_views_by_day_page_grapher_device_country_iframe
+        FROM prod_ga4.grapher_views_detailed
         WHERE
             day >= '{date_start}'
             AND day <= '{date_end}'

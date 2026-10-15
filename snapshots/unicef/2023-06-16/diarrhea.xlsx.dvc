@@ -2,7 +2,7 @@ meta:
   origin:
     producer: UNICEF
     title: Child Health Coverage Database
-    title_snapshot: Child Health Coverage Database - Diarrhea treatment
+    title_snapshot: Child Health Coverage Database – Diarrhea treatment
     description_snapshot: |-
       This snapshot contains the diarrhea-related indicators from UNICEF's Child Health Coverage Database, compiled from several health and multiple indicator cluster surveys: careseeking for diarrhea (DIARCARE), oral rehydration salts (ORS), ORS and zinc (ORSZINC), oral rehydration therapy and continued feeding (ORTCF), and zinc (ZINC).
     citation_full: |-

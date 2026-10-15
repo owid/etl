@@ -88,7 +88,7 @@ tables:
         unit: "doses"
       daily_vaccinations_per_million:
         title: Daily doses administered (per million people)
-        description_short: All doses, including boosters, are counted individually, per million people
+        description_short: All doses, including boosters, are counted individually, per million people.
         unit: "doses per million people"
         display:
           numDecimalPlaces: 2

@@ -139,13 +139,13 @@ tables:
         title: Index of real UK GDP at market prices cost - based on changing political boundaries
         unit: GB before 1801, GB+Ireland 1801-1920, GB + Northern Ireland after 1920.  Indexed to 100 in 1920
       labour_productivity__real_gdp_per_head:
-        title: Labour productivity (real GDP per head)
+        title: Labor productivity (real GDP per head)
         unit: 2013 prices
       labour_productivity__real_gdp_per_hour:
-        title: Labour productivity (real GDP per hour)
+        title: Labor productivity (real GDP per hour)
         unit: 2013 prices
       labour_share__whole_economy_excluding_rents:
-        title: Labour share, whole economy excluding rents
+        title: Labor share, whole economy excluding rents
         unit: share of GDP excluding rents
       m1:
         title: M1

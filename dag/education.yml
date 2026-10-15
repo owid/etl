@@ -86,7 +86,7 @@ steps:
   #
   # Mdim for enrolment rates
   #
-  export://multidim/education/latest/enrolment_rates:
+  viz://chart/education/latest/enrolment_rates:
     - data://grapher/unesco/2026-05-12/education_sdgs
     - data://grapher/worldbank_wdi/2026-07-27/wdi
     - data://grapher/unesco/2026-05-12/education_opri
@@ -117,7 +117,7 @@ steps:
   #
   # Mdim for expected years of schooling
   #
-  export://multidim/education/latest/years_of_schooling:
+  viz://chart/education/latest/years_of_schooling:
     - data://grapher/un/2025-05-07/undp_hdr
     - data://grapher/unesco/2026-05-12/education_opri
     - data://grapher/wb/2025-09-08/gender_statistics
@@ -137,40 +137,40 @@ steps:
   #
   # Mdim for completion rates
   #
-  export://multidim/education/latest/completion_rates:
+  viz://chart/education/latest/completion_rates:
     - data://grapher/unesco/2026-05-12/education_sdgs
 
   #
   # Mdim for education spending
   #
-  export://multidim/education/latest/education_spending:
+  viz://chart/education/latest/education_spending:
     - data://grapher/unesco/2026-05-12/education_sdgs
     - data://grapher/unesco/2026-05-12/education_opri
 
   #
   # Mdim for literacy rates
   #
-  export://multidim/education/latest/literacy:
+  viz://chart/education/latest/literacy:
     - data://grapher/unesco/2026-05-12/education_sdgs
 
   #
   # Mdim for children out of school
   #
-  export://multidim/education/latest/children_out_of_school:
+  viz://chart/education/latest/children_out_of_school:
     - data://grapher/unesco/2026-05-12/education_sdgs
     - data://grapher/unesco/2026-05-12/education_opri
 
   #
   # Mdim for proficiency levels in different subjects
   #
-  export://multidim/education/latest/proficiency:
+  viz://chart/education/latest/proficiency:
     - data://grapher/unesco/2026-05-12/education_sdgs
 
 
   #
   # Mdim for PISA scores
   #
-  export://multidim/education/latest/pisa_performance:
+  viz://chart/education/latest/pisa_performance:
     # OECD PISA data on educational attainment in mathematics, science, and reading
     - data://grapher/oecd/2023-12-06/pisa:
       - data://garden/oecd/2023-12-06/pisa:
@@ -185,14 +185,14 @@ steps:
   #
   # Mdim for qualified/trained teachers
   #
-  export://multidim/education/latest/teachers:
+  viz://chart/education/latest/teachers:
     - data://grapher/unesco/2026-05-12/education_sdgs
     - data://grapher/worldbank_wdi/2026-07-27/wdi
 
   #
   # Mdim for women teachers
   #
-  export://multidim/education/latest/women_teachers:
+  viz://chart/education/latest/women_teachers:
     - data://grapher/unesco/2026-05-12/education_opri
 
   #

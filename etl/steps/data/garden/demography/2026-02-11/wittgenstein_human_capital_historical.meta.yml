@@ -175,7 +175,7 @@ tables:
           {definitions.others.title}
         unit: years
         description_short: |-
-          The difference between female and male mean years of schooling for the population over 15 years of age. {definitions.others.projections}. Negative values indicate that women spent fewer years in school.
+          Difference between female and male mean years of schooling for the population over 15 years of age. {definitions.others.projections}. Negative values indicate that women spent fewer years in school.
         display:
           numDecimalPlaces: 0
         presentation:
@@ -187,7 +187,7 @@ tables:
           {definitions.others.title}
         unit: years
         description_short: |-
-          The difference between female and male mean years of schooling for population over 25 years of age. {definitions.others.projections}. Negative values indicate that women spent fewer years in school.
+          Difference between female and male mean years of schooling for population over 25 years of age. {definitions.others.projections}. Negative values indicate that women spent fewer years in school.
         display:
           numDecimalPlaces: 0
         presentation:
@@ -236,7 +236,7 @@ tables:
           {definitions.others.title}
         unit: "%"
         description_short: |-
-          The ratio of the youth (0-14) and elderly (65+) population over the working age (15-64) population. {definitions.others.projections}.
+          Ratio of the youth (0-14) and elderly (65+) population over the working age (15-64) population. {definitions.others.projections}.
         description_processing: |-
           The source gives the values as the number of young and elderly persons per person of working age. We have scaled the figures to have percentages instead.
         presentation:
@@ -248,7 +248,7 @@ tables:
           {definitions.others.title}
         unit: "%"
         description_short: |-
-          The ratio of the youth (0-14) population over the working age (15-64) population. {definitions.others.projections}.
+          Ratio of the youth (0-14) population over the working age (15-64) population. {definitions.others.projections}.
         description_processing: |-
           The source gives the values as the number of young persons per person of working age. We have scaled the figures to have percentages instead.
         presentation:
@@ -261,7 +261,7 @@ tables:
           {definitions.others.title}
         unit: "%"
         description_short: |-
-          The ratio of the elderly (65+) population over the working age (15-64) population. {definitions.others.projections}.
+          Ratio of the elderly (65+) population over the working age (15-64) population. {definitions.others.projections}.
         description_processing: |-
           The source gives the values as the number of elderly persons per person of working age. We have scaled the figures to have percentages instead.
         presentation:
@@ -277,9 +277,9 @@ tables:
         unit: "males per 100 females"
         description_short: |-
           <% if age == "total" %>
-          The number of male population per 100 female population. {definitions.others.projections}.
+          Number of male population per 100 female population. {definitions.others.projections}.
           <%- else %>
-          The number of male population per 100 female population (aged << age >>). {definitions.others.projections}.
+          Number of male population per 100 female population (aged << age >>). {definitions.others.projections}.
           <%- endif %>
         presentation:
           topic_tags:
@@ -294,9 +294,9 @@ tables:
         unit: "years"
         description_short: |-
           <% if sex == "total" %>
-          The number of years a newborn is expected to live. {definitions.others.projections}.
+          Number of years a newborn is expected to live. {definitions.others.projections}.
           <%- else %>
-          The number of years a << sex >> newborn is expected to live. {definitions.others.projections}.
+          Number of years a << sex >> newborn is expected to live. {definitions.others.projections}.
           <% endif %>
         presentation:
           topic_tags:
@@ -308,9 +308,9 @@ tables:
         unit: "years"
         description_short: |-
           <% if sex == "total" %>
-          The age of a person in a population when remaining life expectancy is 15 years. {definitions.others.projections}.
+          Age of a person in a population when remaining life expectancy is 15 years. {definitions.others.projections}.
           <%- else %>
-          The age of a << sex >> person in a population when remaining life expectancy is 15 years. {definitions.others.projections}.
+          Age of a << sex >> person in a population when remaining life expectancy is 15 years. {definitions.others.projections}.
           <%- endif %>
         description_processing: |-
           Source: [Lutz et al. 2008](https://previous.iiasa.ac.at/web/home/research/researchPrograms/WorldPopulation/PublicationsMediaCoverage/POPNETNewsletter/popnet39.pdf#page=4)
@@ -344,7 +344,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The difference between the proportion of females and the proportion of males in the population over 15 years of age achieving education level "{definitions.others.education}". {definitions.others.projections}.
+          Difference between the proportion of females and the proportion of males in the population over 15 years of age achieving education level "{definitions.others.education}". {definitions.others.projections}.
         presentation:
           topic_tags:
             - Global Education
@@ -355,7 +355,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The difference between the proportion of females and the proportion of males in the population over 25 years of age achieving education level "{definitions.others.education}". {definitions.others.projections}.
+          Difference between the proportion of females and the proportion of males in the population over 25 years of age achieving education level "{definitions.others.education}". {definitions.others.projections}.
         presentation:
           topic_tags:
             - Global Education
@@ -367,9 +367,9 @@ tables:
         unit: "births per woman in last 5 years"
         description_short: |-
           <% if education == "total" %>
-          The average number of children born in the last 5-year period to the women of reproductive age (15-49).
+          Average number of children born in the last 5-year period to the women of reproductive age (15-49).
           <%- else %>
-          The average number of children born in the last 5-year period to the women of reproductive age (15-49). Data for people with education level "{definitions.others.education}". {definitions.others.projections}.
+          Average number of children born in the last 5-year period to the women of reproductive age (15-49). Data for people with education level "{definitions.others.education}". {definitions.others.projections}.
           <%- endif %>
         presentation:
           topic_tags:
@@ -403,13 +403,13 @@ tables:
         unit: "people"
         description_short: |-
           <%- if (age == "total") and (sex == "total") %>
-          The number of immigrants minus the number of emigrants over the last five-year period. {definitions.others.projections}.
+          Number of immigrants minus the number of emigrants over the last five-year period. {definitions.others.projections}.
           <%- elif (age != "total") and (sex == "total") %>
-          The number of immigrants minus the number of emigrants over the last five-year period. Only migrants aged <<age>> are considered. {definitions.others.projections}.
+          Number of immigrants minus the number of emigrants over the last five-year period. Only migrants aged <<age>> are considered. {definitions.others.projections}.
           <%- elif (age == "total") and (sex != "total") %>
-          The number of immigrants minus the number of emigrants over the last five-year period. Only <<sex>> migrants are considered. {definitions.others.projections}.
+          Number of immigrants minus the number of emigrants over the last five-year period. Only <<sex>> migrants are considered. {definitions.others.projections}.
           <%- else %>
-          The number of immigrants minus the number of emigrants over the last five-year period. Only <<sex>> migrants aged <<age>> are considered. {definitions.others.projections}.
+          Number of immigrants minus the number of emigrants over the last five-year period. Only <<sex>> migrants aged <<age>> are considered. {definitions.others.projections}.
           <%- endif %>
         presentation:
           topic_tags:
@@ -445,14 +445,14 @@ tables:
         description_short: |-
           <%- if (education == "total") %>
           <%- if (age == "newborn") %>
-          The percentage of the <<sex>> newborn who are alive after the last five-year period. {definitions.others.projections}.
+          Percentage of the <<sex>> newborn who are alive after the last five-year period. {definitions.others.projections}.
           <%- else %>
-          The percentage of the <<sex>> population aged <<age>> who are alive after the last five-year period. {definitions.others.projections}.
+          Percentage of the <<sex>> population aged <<age>> who are alive after the last five-year period. {definitions.others.projections}.
           <%- endif %>
           <%- elif (education == "no_education") %>
-          The percentage of the <<sex>> population aged <<age>> with no education who are alive after the last five-year period. {definitions.others.projections}.
+          Percentage of the <<sex>> population aged <<age>> with no education who are alive after the last five-year period. {definitions.others.projections}.
           <%- else %>
-          The percentage of the <<sex>> population aged <<age>> with <<education>> education who are alive after the last five-year period. {definitions.others.projections}.
+          Percentage of the <<sex>> population aged <<age>> with <<education>> education who are alive after the last five-year period. {definitions.others.projections}.
           <%- endif %>
         presentation:
           topic_tags:

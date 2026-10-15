@@ -20,7 +20,7 @@ tables:
         unit: 'approvals'
         short_unit: ''
         description_short: |-
-          The annual number of new drugs approved by the US Food and Drug Administration (FDA). This is broken down into [new chemical drugs](#dod:new-chemical-entity), new vaccines, and other new biologics such as antibodies and gene therapies. The data does not include [generics](#dod:generic-drug), reformulations, or [biosimilars](#dod:biosimilar).
+          Annual number of new drugs approved by the US Food and Drug Administration (FDA). This is broken down into [new chemical drugs](#dod:new-chemical-entity), new vaccines, and other new biologics such as antibodies and gene therapies. The data does not include [generics](#dod:generic-drug), reformulations, or [biosimilars](#dod:biosimilar).
         display:
           numDecimalPlaces: 0
         description_key:
@@ -40,7 +40,7 @@ tables:
         unit: 'approvals'
         short_unit: ''
         description_short: |-
-          The annual number of new drugs approved by the Center for Drug Evaluation and Research (CDER), that fall under each designation, including [Orphan Drugs](#dod:orphan-drug), [Fast Track](#dod:fda-fast-track), [Accelerated Approval](#dod:fda-accelerated-approval), [Breakthrough Therapy](#dod:breakthrough-therapy), and [Qualified Infectious Disease Product](#dod:qualified-infectious-disease-product).
+          Annual number of new drugs approved by the Center for Drug Evaluation and Research (CDER), that fall under each designation, including [Orphan Drugs](#dod:orphan-drug), [Fast Track](#dod:fda-fast-track), [Accelerated Approval](#dod:fda-accelerated-approval), [Breakthrough Therapy](#dod:breakthrough-therapy), and [Qualified Infectious Disease Product](#dod:qualified-infectious-disease-product).
         display:
           numDecimalPlaces: 0
         presentation:

@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: Global Human Settlement Layer Dataset -  Stats in the City Database
     description: |-
-      The "Stats in the City Database" offers harmonized data on population and population density for 11,422 urban centres.
+      The "Stats in the City Database" offers harmonized data on population and population density for 11,422 urban centers.
 
       This data, based on the Global Human Settlement Layer Dataset, uses the Degree of Urbanisation framework to delineate spatial entities and integrates geospatial data from a variety of open-source datasets. It represents one of the most comprehensive resources for understanding urban population patterns and densities worldwide
     date_published: "2024"

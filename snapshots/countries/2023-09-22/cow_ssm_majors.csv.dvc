@@ -12,7 +12,7 @@ meta:
       Find more information in [their codebook](https://correlatesofwar.org/wp-content/uploads/State-System-Membership-Codebook-V2016.pdf)
     date_published: 2017-02-20
     version_producer: v2016
-    title_snapshot: State System Membership - Majors
+    title_snapshot: State System Membership – Majors
     description_snapshot: |-
       Provides the entry and exit dates for states to be designated as major powers.
 
@@ -20,7 +20,7 @@ meta:
     producer: Correlates of War
     citation_full: |-
       Correlates of War Project. 2017. “State System Membership List, v2016.” Online, http://correlatesofwar.org
-    attribution: Correlates of War - State System Membership (2017)
+    attribution: Correlates of War – State System Membership (2017)
     attribution_short: COW
 
     # Files

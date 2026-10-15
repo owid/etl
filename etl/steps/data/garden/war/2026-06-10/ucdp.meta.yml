@@ -49,6 +49,7 @@ definitions:
     conflict_label: |-
       <% if conflict_type == "all" -%>armed conflicts
       <%- elif conflict_type == "one-sided violence" -%>one-sided violence
+      <%- elif conflict_type == "non-state conflict" -%>non-state conflicts
       <%- else -%><< conflict_type >> conflicts
       <%- endif %>
     # Slug for the matching DoD ("details on demand") definition link.
@@ -75,25 +76,25 @@ definitions:
     description_short: |-
       <% set per_capita = "" %>
       <%- if conflict_type == "all" -%>
-      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in interstate, intrastate, extrasystemic, non-state conflicts, and one-sided violence that were ongoing that year<< per_capita >>.
+      << estimate | capitalize >> estimate of the number of deaths of combatants and civilians due to fighting in interstate, intrastate, extrasystemic, non-state conflicts, and one-sided violence that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "state-based" -%>
-      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in interstate, intrastate, and extrasystemic conflicts that were ongoing that year<< per_capita >>.
+      << estimate | capitalize >> estimate of the number of deaths of combatants and civilians due to fighting in interstate, intrastate, and extrasystemic conflicts that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "intrastate (internationalized)" -%>
-      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
+      << estimate | capitalize >> estimate of the number of deaths of combatants and civilians due to fighting in internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "intrastate (non-internationalized)" -%>
-      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in non-internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
+      << estimate | capitalize >> estimate of the number of deaths of combatants and civilians due to fighting in non-internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "one-sided violence" -%>
-      The << estimate >> estimate of the number of deaths of civilians from one-sided violence that was ongoing that year<< per_capita >>.
+      << estimate | capitalize >> estimate of the number of deaths of civilians from one-sided violence that was ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "non-state conflict" -%>
-      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in non-state conflicts that were ongoing that year<< per_capita >>.
+      << estimate | capitalize >> estimate of the number of deaths of combatants and civilians due to fighting in non-state conflicts that were ongoing that year<< per_capita >>.
 
       <%- else -%>
-      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
+      << estimate | capitalize >> estimate of the number of deaths of combatants and civilians due to fighting in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
 
       <%- endif -%>
     description_short_per_capita: <% set per_capita = ", per 100,000 people" %> {definitions.number_deaths.description_short}
@@ -132,29 +133,41 @@ definitions:
       - "{definitions.number_deaths.key_point_2}"
       - "We show here the \"best\" death estimates as identified by UCDP. They also report high and low estimates."
 
+  # Fields used for cumulative deaths indicators (table ucdp_cumulative)
+  cumulative:
+    description_short: |-
+      <%- if conflict_type == "one-sided violence" -%>
+      Best estimate of the total number of civilians who died due to one-sided violence between {first_year_cumulative} and {last_year}<< per_capita >>.
+      <%- else -%>
+      Best estimate of the total number of combatants and civilians who died due to fighting in {definitions.all.conflict_label} between {first_year_cumulative} and {last_year}<< per_capita >>.
+      <%- endif -%>
+    location: Deaths are attributed to the country where they occurred, not to the country of the people who died.
+    excludes: The data does not include deaths due to disease and starvation resulting from conflicts, which can make the death tolls much larger.
+    rate_method: The rate is the cumulative number of deaths divided by the population in {first_year_cumulative}, and expressed per 100,000 people. For world regions, the population is that of the countries in each region, as defined by UCDP.
+
   number_deaths_type:
     description_short: |-
       <% set per_capita = "" %>
       <%- if conflict_type == "all" -%>
-      The best estimate of the number of deaths of << people_type >> in interstate, intrastate, extrasystemic, non-state conflicts, and one-sided violence that were ongoing that year<< per_capita >>.
+      Best estimate of the number of deaths of << people_type >> in interstate, intrastate, extrasystemic, non-state conflicts, and one-sided violence that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "state-based" -%>
-      The best estimate of the number of deaths of << people_type >> in interstate, intrastate, and extrasystemic conflicts that were ongoing that year<< per_capita >>.
+      Best estimate of the number of deaths of << people_type >> in interstate, intrastate, and extrasystemic conflicts that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "intrastate (internationalized)" -%>
-      The best estimate of the number of deaths of << people_type >> in internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
+      Best estimate of the number of deaths of << people_type >> in internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "intrastate (non-internationalized)" -%>
-      The best estimate of the number of deaths of << people_type >> in non-internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
+      Best estimate of the number of deaths of << people_type >> in non-internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "one-sided violence" -%>
-      The best estimate of the number of deaths of << people_type >> from one-sided violence that was ongoing that year<< per_capita >>.
+      Best estimate of the number of deaths of << people_type >> from one-sided violence that was ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "non-state conflict" -%>
-      The best estimate of the number of deaths of << people_type >> in non-state conflicts that were ongoing that year<< per_capita >>.
+      Best estimate of the number of deaths of << people_type >> in non-state conflicts that were ongoing that year<< per_capita >>.
 
       <%- else -%>
-      The best estimate of the number of deaths of << people_type >> in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
+      Best estimate of the number of deaths of << people_type >> in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
 
       <%- endif -%>
     description_short_per_capita: <% set per_capita = ", per 100,000 people" %> {definitions.number_deaths_type.description_short}
@@ -506,7 +519,7 @@ tables:
         title: Number of ongoing conflicts per state
         unit: conflicts per state
         description_short: |-
-          The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+          Number of conflicts divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 3
@@ -517,7 +530,7 @@ tables:
         title: Number of ongoing conflicts per state-pair
         unit: conflicts per state-pair
         description_short: |-
-          The number of conflicts divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+          Number of conflicts divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 5
@@ -541,7 +554,7 @@ tables:
         title: Number of new conflicts per state
         unit: conflicts per state
         description_short: |-
-          The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_new_conflicts.description_short}
+          Number of conflicts divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_new_conflicts.description_short}
         description_key: *description_key_new
         display:
           numDecimalPlaces: 3
@@ -552,12 +565,49 @@ tables:
         title: Number of new conflicts per state-pair
         unit: conflicts per state-pair
         description_short: |-
-          The number of conflicts divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_new_conflicts.description_short}
+          Number of conflicts divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_new_conflicts.description_short}
         description_key: *description_key_new
         display:
           numDecimalPlaces: 5
         presentation:
           attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2026)
+
+  # CUMULATIVE INDICATORS (since 1989)
+  ucdp_cumulative:
+    common:
+      processing_level: major
+      description_processing: |-
+        We add up the yearly best estimates of deaths in ongoing conflicts from {first_year_cumulative} to {last_year}, by the country or world region where the deaths occurred.
+
+        {definitions.all.location_conflicts_method}
+
+    variables:
+      cumulative_deaths:
+        title: "Cumulative deaths {definitions.all.conflict_prep} {definitions.all.conflict_label}"
+        unit: deaths
+        short_unit: deaths
+        description_short: |-
+          <% set per_capita = "" %>
+          {definitions.cumulative.description_short}
+        description_key:
+          - "{definitions.all.conflict_type}"
+          - "{definitions.cumulative.location}"
+          - "{definitions.cumulative.excludes}"
+
+      cumulative_death_rate:
+        title: "Cumulative death rate {definitions.all.conflict_prep} {definitions.all.conflict_label}"
+        unit: deaths per 100,000 people
+        short_unit: deaths per 100,000 people
+        display:
+          numDecimalPlaces: 1
+        description_short: |-
+          <% set per_capita = ", per 100,000 people living in {first_year_cumulative}" %>
+          {definitions.cumulative.description_short}
+        description_key:
+          - "{definitions.all.conflict_type}"
+          - "{definitions.cumulative.rate_method}"
+          - "{definitions.cumulative.location}"
+          - "{definitions.cumulative.excludes}"
 
 dataset:
   update_period_days: 365

@@ -16,7 +16,7 @@ meta:
     attribution_short: RFF
     url_main: https://github.com/g-dolphin/WorldCarbonPricingDatabase/
     url_download: https://github.com/g-dolphin/WorldCarbonPricingDatabase/archive/refs/heads/master.zip
-    # We re-run the snapshot because a data issue was found and the data providers fixed it a few days after the update.
+    # We re-run the snapshot because a data issue was found and the data producers fixed it a few days after the update.
     date_accessed: '2025-06-10'
     date_published: '2025-06-10'
     license:

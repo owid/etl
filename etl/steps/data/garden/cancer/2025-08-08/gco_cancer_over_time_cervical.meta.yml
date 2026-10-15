@@ -32,7 +32,7 @@ tables:
         title: Crude cervical cancer incidence rate per 100,000 women
         unit: 'per 100,000 women'
         description_from_producer: |-
-          For a specific tumour in a given population, crude rates are calculated simply by dividing the number of new cancers or cancer deaths observed during a given time period by the corresponding number of individuals in the population at risk. For cancer, the result is commonly expressed as an annual rate per 100 000 individuals at risk.
+          For a specific tumor in a given population, crude rates are calculated simply by dividing the number of new cancers or cancer deaths observed during a given time period by the corresponding number of individuals in the population at risk. For cancer, the result is commonly expressed as an annual rate per 100 000 individuals at risk.
       total:
         title: Total number of cervical cancer cases
         unit: 'cases'

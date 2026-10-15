@@ -3,7 +3,7 @@ meta:
     producer: Vanderslott and Marks
     title: Charting mandatory vaccination policies worldwide
     description: |-
-      This is a live dataset that relies on crowdsourcing to note policy changes. If you are aware of any new policies or policy changes for any country please do get in touch at: samantha.vanderslott@paediatrics.ox.ac.uk.
+      This is a live dataset that relies on crowdsourcing to note policy changes. If you are aware of any new policies or policy changes for any country please do get in touch at: samantha.vanderslott@pediatrics.ox.ac.uk.
     citation_full: 'Vanderslott, S., and Marks, T. (2021). Charting mandatory vaccination policies worldwide. Vaccine.'
     url_main: https://www.sciencedirect.com/science/article/pii/S0264410X21005478
     date_accessed: '2021-01-01'

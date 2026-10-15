@@ -19,7 +19,7 @@ definitions:
   desc_process_per_capita: &desc_process_per_capita |-
     CO₂ emissions per capita from aviation are calculated by dividing emissions from aviation by the total population of the country. This allows us to understand the average amount of CO₂ emissions attributed to each individual as a result of air travel.
   description_processing_tour_adj: &description_processing_tour_adj |-
-    - CO₂ emission footprints do not necessarily reflect the amount of travel by locals in a given location. This is especially true if a country has high tourist volumes - much of the departures will result from travellers rather than local residents.
+    - CO₂ emission footprints do not necessarily reflect the amount of travel by locals in a given location. This is especially true if a country has high tourist volumes - much of the departures will result from travelers rather than local residents.
 
     - We have therefore also calculated 'adjusted' aviation footprints by multiplying international CO₂ emissions by an adjustment factor.
 

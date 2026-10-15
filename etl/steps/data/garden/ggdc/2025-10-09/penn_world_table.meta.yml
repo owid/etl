@@ -637,7 +637,7 @@ tables:
         unit: "% of GDP"
         short_unit: "%"
         description_short: Labor income of employees and self-employed people divided by [gross domestic product](#dod:gdp), expressed as a percentage.
-        description_from_producer: Share of labour compensation in GDP at current national prices
+        description_from_producer: Share of labor compensation in GDP at current national prices
         description_processing: |-
           {definitions.description_processing_outliers}
         display:

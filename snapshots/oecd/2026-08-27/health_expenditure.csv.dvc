@@ -1,0 +1,26 @@
+meta:
+  origin:
+    producer: OECD
+    title: OECD Health Expenditure and Financing Database
+    description: |-
+      A System of Health Accounts 2011 provides an updated and systematic description of the financial flows related to the consumption of healthcare goods and services. As demands for information increase and more countries implement and institutionalize health accounts according to the system, the data produced are expected to be more comparable, more detailed and more policy relevant.
+
+      It builds on the original OECD Manual, published in 2000 to create a single global framework for producing health expenditure accounts that can help track resource flows from sources to uses.
+
+      It is the result of a collaborative effort between the OECD, WHO and the European Commission, and sets out in more detail the boundaries, the definitions and the concepts – responding to healthcare systems around the globe – from the simplest to the more complicated. The accounting framework is organized around a tri-axial system for the recording of healthcare expenditure, namely classifications of the functions of healthcare (ICHA-HC), healthcare provision (ICHA-HP), and financing schemes (ICHA-HF).
+    citation_full: OECD (2026), Health Expenditure and Financing Database, https://data-explorer.oecd.org/
+    attribution_short: OECD
+    url_main: https://data-explorer.oecd.org/vis?df%5Bds%5D=DisseminateFinalDMZ&df%5Bid%5D=DSD_SHA%40DF_SHA&df%5Bag%5D=OECD.ELS.HD
+    url_download: |-
+      https://sdmx.oecd.org/public/rest/data/OECD.ELS.HD,DSD_SHA@DF_SHA,1.1/.A.EXP_HEALTH.USD_PPP+USD_PPP_PS+PT_EXP_HLTH+PT_B1GQ.HF1+HF11+HF12HF13+HF121+HF122+HF2HF3+HF2+HF21+HF22+HF23+HF3+HF31+HF32+HF4+_U+_T.._T.._T...Q+_Z?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: '2026-08-27'
+    # NOTE: OECD revises in place under the same dataflow version. Detect via md5 vs the
+    # previous snapshot; date it from the "Last updated" stamp on url_main.
+    date_published: '2026-07-17'
+    license:
+      name: OECD Terms and Conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: b8b1b46e850049e29d59024fc73aa524
+    size: 25151558
+    path: health_expenditure.csv

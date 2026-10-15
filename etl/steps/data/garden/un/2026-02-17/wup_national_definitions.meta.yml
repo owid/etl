@@ -27,7 +27,7 @@ definitions:
     decade; intervening years are interpolated rather than directly observed.
 
   wup_method_projections_key: &wup_method_projections_key |-
-    <% if data_type == "projections" %>The UN produces these projections by applying its modelled urban population share to medium-variant total population projections; rural population is the remainder.<% endif %>
+    <% if data_type == "projections" %>The UN produces these projections by applying its modeled urban population share to medium-variant total population projections; rural population is the remainder.<% endif %>
 
   wup_population_growth_key: &wup_population_growth_key |-
     <% if area_type == "urban" %>Urban population growth can reflect births and deaths among urban residents, rural-to-urban migration, and the reclassification of settlements from rural to urban. This indicator does not separate these factors.
@@ -44,14 +44,14 @@ definitions:
   hyde_combined_key: &hyde_combined_key >-
     From 1950 onward, this indicator uses the UN World Urbanization Prospects, based on
     each country's own definition of urban and rural areas. For earlier years, it draws
-    on HYDE v3.3 (History Database of the Global Environment), a modelled reconstruction
+    on HYDE v3.3 (History Database of the Global Environment), a modeled reconstruction
     of historical settlement patterns rather than direct observations.
 
   hyde_combined_with_projections_key: &hyde_combined_with_projections_key >-
     From 1950 to 2025, this indicator uses estimates from the UN World Urbanization
     Prospects, based on each country's own definition of urban and rural areas. From
     2025 onward, it uses UN projections. For years before 1950, it draws on HYDE v3.3
-    (History Database of the Global Environment), a modelled reconstruction of
+    (History Database of the Global Environment), a modeled reconstruction of
     historical settlement patterns rather than direct observations.
 
 
@@ -196,7 +196,7 @@ tables:
         title: Share of population living in urban areas - HYDE and UN national definitions combined
         unit: '%'
         short_unit: '%'
-        description_short: Share of the population living in urban areas, combining UN estimates with modelled historical data.
+        description_short: Share of the population living in urban areas, combining UN estimates with modeled historical data.
         description_key:
           - *hyde_combined_key
         description_processing: |-
@@ -213,7 +213,7 @@ tables:
         title: Urban population - HYDE and UN national definitions combined
         unit: people
         short_unit: ''
-        description_short: Number of people living in urban areas, combining UN estimates with modelled historical data.
+        description_short: Number of people living in urban areas, combining UN estimates with modeled historical data.
         description_key:
           - *hyde_combined_key
         description_processing: |-
@@ -230,7 +230,7 @@ tables:
         title: Rural population - HYDE and UN national definitions combined
         unit: people
         short_unit: ''
-        description_short: Number of people living in rural areas, combining UN estimates with modelled historical data.
+        description_short: Number of people living in rural areas, combining UN estimates with modeled historical data.
         description_key:
           - *hyde_combined_key
         description_processing: |-
@@ -249,7 +249,7 @@ tables:
         title: Share of population living in urban areas - HYDE, UN national definitions, and projections combined
         unit: '%'
         short_unit: '%'
-        description_short: Share of the population living in urban areas, combining UN estimates and projections with modelled historical data.
+        description_short: Share of the population living in urban areas, combining UN estimates and projections with modeled historical data.
         description_key:
           - *hyde_combined_with_projections_key
         description_processing: |-
@@ -266,7 +266,7 @@ tables:
         title: Urban population - HYDE, UN national definitions, and projections combined
         unit: people
         short_unit: ''
-        description_short: Number of people living in urban areas, combining UN estimates and projections with modelled historical data.
+        description_short: Number of people living in urban areas, combining UN estimates and projections with modeled historical data.
         description_key:
           - *hyde_combined_with_projections_key
         description_processing: |-
@@ -283,7 +283,7 @@ tables:
         title: Rural population - HYDE, UN national definitions, and projections combined
         unit: people
         short_unit: ''
-        description_short: Number of people living in rural areas, combining UN estimates and projections with modelled historical data.
+        description_short: Number of people living in rural areas, combining UN estimates and projections with modeled historical data.
         description_key:
           - *hyde_combined_with_projections_key
         description_processing: |-

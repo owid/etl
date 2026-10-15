@@ -84,7 +84,7 @@ tables:
         short_unit: ''
         unit: ''
       is_influenza_vaccination_recommended_for_travellers__i_e__hajj:
-        title: Recommended for travellers (i.e. Hajj)
+        title: Recommended for travelers (i.e. Hajj)
         short_unit: ''
         unit: ''
       is_influenza_vaccination_recommended_for_universal_recommendation__for_all_persons__gt__6_months:
