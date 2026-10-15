@@ -1,4 +1,4 @@
-from owid.catalog import Table
+from owid.catalog import Table, VariableMeta
 from owid.catalog import processing as pr
 from owid.catalog.utils import underscore
 from structlog import get_logger
@@ -61,6 +61,11 @@ def get_who_mortality_db() -> Table:
     # Grab the columns we need
     tb_who = tb_who[["country", "year", "death_rate_per_100_000_population"]]
     tb_who = tb_who.dropna(subset="death_rate_per_100_000_population")
+    # The merged dataset's text is templated per cause, sex and age group and is rendered by its own grapher step;
+    # here the column has no dimensions left, so keep only its origins and let this step's metadata describe it.
+    rate = tb_who["death_rate_per_100_000_population"]
+    tb_who["death_rate_per_100_000_population"] = rate.copy_metadata(rate)  # a fresh Variable
+    tb_who["death_rate_per_100_000_population"].metadata = VariableMeta(origins=rate.metadata.origins)
     tb_who["source"] = "WHO"
     return tb_who
 
