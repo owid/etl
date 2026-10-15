@@ -12,201 +12,33 @@ definitions:
   cause_in_text: |-
     <% if cause in ["Hepatitis B", "Japanese encephalitis"] %><< cause >><% elif cause == "Violence" %>homicide<% else %><< cause.lower() >><% endif %>
 
-  # The age band as it reads inside a sentence. The data carries the family's band labels, but the bands derived for
-  # Violence keep the phrases the retired homicide dataset used in its sentences ("0-19", "70+"), so those read as before.
-  age_in_text: |-
-    <% if cause == "Violence" and age_group == "<20 years" %>0-19<% elif cause == "Violence" and age_group == "<5 years" %>0-4<% elif cause == "Violence" and age_group == "5-14 years" %>5-14<% elif cause == "Violence" and age_group == "15-49 years" %>15-49<% elif cause == "Violence" and age_group == "50-69 years" %>50-69<% elif cause == "Violence" and age_group == "over 70 years" %>70+<% else %><< age_group.lower() >><% endif %>
-  # The same, for the retired homicide titles, which wrote "in age 0-19" for the bands they derived and "in all ages" otherwise.
-  violence_age_in_title: |-
-    <% if age_group in ["<20 years", "<5 years", "5-14 years", "15-49 years", "50-69 years", "over 70 years"] %>age {definitions.age_in_text}<% else %><< age_group.lower() >><% endif %>
+  # Whose deaths a sentence is about: "people" for both sexes, else the sex, with unknown sex spelled out.
+  people: |-
+    <% if sex == "Both sexes" %>people<% elif sex == "Unknown sex" %>people of unknown sex<% else %><< sex.lower() >><% endif %>
 
-  # NOTE: Drill-down causes carry the label of the table they are published in at the front of the internal
-  # title, so the admin's flat list tells the layers apart; top-tier groups have no prefix. Mirrors
-  # DRILL_DOWN_TABLES in the garden step, which fails the build if a drill-down is missing here.
-  cause_layer: |-
-    <% set layers = [
-      ("Pertussis", "Vaccine-preventable diseases"),
-      ("Poliomyelitis", "Vaccine-preventable diseases"),
-      ("Diphtheria", "Vaccine-preventable diseases"),
-      ("Measles", "Vaccine-preventable diseases"),
-      ("Tetanus", "Vaccine-preventable diseases"),
-      ("Hepatitis B", "Vaccine-preventable diseases"),
-      ("Japanese encephalitis", "Vaccine-preventable diseases"),
-      ("Self-inflicted injuries", "Intentional injuries"),
-      ("Violence", "Intentional injuries"),
-      ("Mouth and oropharynx cancers", "Cancers"),
-      ("Oesophagus cancer", "Cancers"),
-      ("Stomach cancer", "Cancers"),
-      ("Colon and rectum cancers", "Cancers"),
-      ("Liver cancer", "Cancers"),
-      ("Pancreas cancer", "Cancers"),
-      ("Trachea, bronchus, lung cancers", "Cancers"),
-      ("Melanoma and other skin cancers", "Cancers"),
-      ("Breast cancer", "Cancers"),
-      ("Cervix uteri cancer", "Cancers"),
-      ("Corpus uteri cancer", "Cancers"),
-      ("Ovary cancer", "Cancers"),
-      ("Prostate cancer", "Cancers"),
-      ("Testicular cancer", "Cancers"),
-      ("Kidney cancer", "Cancers"),
-      ("Bladder cancer", "Cancers"),
-      ("Brain and nervous system cancers", "Cancers"),
-      ("Gallbladder and biliary tract cancer", "Cancers"),
-      ("Larynx cancer", "Cancers"),
-      ("Thyroid cancer", "Cancers"),
-      ("Mesothelioma", "Cancers"),
-      ("Lymphomas, multiple myeloma", "Cancers"),
-      ("Leukaemia", "Cancers"),
-      ("Ill-defined malignant neoplasms", "Cancers"),
-      ("Other malignant neoplasms", "Cancers"),
-    ] %><% for c, label in layers %><% if c == cause %><< label >> › <% endif %><% endfor %>
+  # The age band as a qualifier after "people"/"females"/"males": empty for all ages, " aged 15-19 years", " aged under 10",
+  # " aged 85 and over", " of unknown age" (" and age" after "people of unknown sex").
+  aged: |-
+    <% if age_group == "all ages" %><% elif age_group == "Unknown age" %><% if sex == "Unknown sex" %> and age<% else %> of unknown age<% endif %><% elif age_group.startswith("<") %> aged under << age_group[1:].replace(" years", "") >><% elif age_group.startswith("over ") %> aged << age_group[5:].replace(" years", "") >> and over<% else %> aged << age_group >><% endif %>
+
+  # " among females aged 15-19 years"; nothing at all for both sexes, all ages, the headline slice.
+  among: |-
+    <% if sex == "Both sexes" and age_group == "all ages" %><% else %> among {definitions.people}{definitions.aged}<% endif %>
+
+  underlying_cause: based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates
 
   # NOTE: Display names and short descriptions, per metric. The display name is the sentence readers see as the
   # indicator's title (data page, the chart's "learn more" panel when the chart sets no label of its own, table
   # headers); it goes in `display.name`, not `presentation.title_public`, because grapher lets a public title
-  # override the chart's own labels in that panel, while a display name yields to them. Self-inflicted injuries
-  # keep the wording its former dataset carried (an editorial choice made there), including the dimension suffix
-  # readers see today, and so does Violence (the retired homicide dataset's titles, which say homicide); every other
-  # cause uses the family's sentence.
-  display_name_number: |-
-    <% if cause == "Self-inflicted injuries" %>Number of deaths from self-inflicted injuries - Sex: << sex >> - Age group: << age_group >><% elif cause == "Violence" %>Deaths from homicide in << sex.lower() >> in {definitions.violence_age_in_title}<% else %>Deaths from {definitions.cause_in_text} in << sex.lower() >> aged << age_group.lower() >><% endif %>
-  description_short_number: |-
-    <% if cause == "Self-inflicted injuries" %>Number of deaths from self-inflicted injuries in the total population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Reported total deaths from {definitions.cause_in_text} in << sex.lower() >> aged {definitions.age_in_text}.<% endif %>
-  display_name_death_rate: |-
-    <% if cause == "Self-inflicted injuries" %>Death rate from self-inflicted injuries per 100,000 population - Sex: << sex >> - Age group: << age_group >><% elif cause == "Violence" %>Homicide rate in << sex.lower() >> in {definitions.violence_age_in_title} per 100,000 population<% else %>Deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged << age_group.lower() >><% endif %>
-  description_short_death_rate: |-
-    <% if cause == "Self-inflicted injuries" %>Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Reported deaths from {definitions.cause_in_text} per 100,000 people in << sex.lower() >> aged {definitions.age_in_text}.<% endif %>
-  display_name_share: |-
-    <% if cause == "Self-inflicted injuries" %>Percentage of deaths from self-inflicted injuries out of total deaths - Sex: << sex >> - Age group: << age_group >><% elif cause == "Violence" %>Share of total deaths from homicide in << sex.lower() >> in {definitions.violence_age_in_title}<% else %>Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from {definitions.cause_in_text}<% endif %>
-  description_short_share: |-
-    <% if cause == "Self-inflicted injuries" %>Percentage of deaths from self-inflicted injuries out of all deaths in the population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.<% else %>Share of total reported deaths in << sex.lower() >> in those aged {definitions.age_in_text} that are from {definitions.cause_in_text}.<% endif %>
-  display_name_asr: |-
-    <% if cause == "Self-inflicted injuries" %>Age-standardized death rate from self-inflicted injuries per 100,000 population - Sex: << sex >> - Age group: << age_group >><% elif cause == "Violence" %>Age-standardized homicide rate in << sex.lower() >> in {definitions.violence_age_in_title}<% else %>Age-standardized deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people<% endif %>
-  description_short_asr: |-
-    <% if cause == "Self-inflicted injuries" %>Reported annual death rate from self-inflicted injuries per 100,000 people, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates. To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<% else %>Reported deaths from {definitions.cause_in_text} in << sex.lower() >> in those aged {definitions.age_in_text} per 100,000 people.<% endif %>
-
-  # NOTE: The ICD-10 codes below must match the `causes` table this step builds from WHO's own export
-  # headers (`icd10_codes` column). They are repeated here because indicator text is rendered per
-  # cause and the codes are no longer a dimension of the data. When a cause group is added or WHO
-  # changes a definition, update both.
-  icd10_codes: |-
-    <% if cause == "All Causes" %>
-    A00-Y89
-    <%- elif cause == "Cardiovascular diseases" %>
-    I00-I99
-    <%- elif cause == "Congenital anomalies" %>
-    Q00-Q99
-    <%- elif cause == "Diabetes mellitus, blood and endocrine disorders" %>
-    E10-E14, D55-D64 (minus D64.9), D65-D89, E03-E07, E15-E16, E20-E34, E65-E88
-    <%- elif cause == "Digestive diseases" %>
-    K20-K92
-    <%- elif cause == "Genitourinary diseases" %>
-    N00-N64, N75-N98
-    <%- elif cause == "Ill-defined injuries" %>
-    Y10-Y34, Y872
-    <%- elif cause == "Infectious and parasitic diseases" %>
-    A00-B99, G00-G04, G14, N70-N73, P37.3, P37.4
-    <%- elif cause == "Intentional injuries" %>
-    X60-Y09, Y35-Y36, Y870, Y871
-    <%- elif cause == "Malignant neoplasms" %>
-    C00-C97
-    <%- elif cause == "Maternal conditions" %>
-    O00-O99
-    <%- elif cause == "Musculoskeletal diseases" %>
-    M00-M99
-    <%- elif cause == "Neuropsychiatric conditions" %>
-    F01-F99, G06-G98 (minus G14), U07.0, X41, X42, X44, X45
-    <%- elif cause == "Nutritional deficiencies" %>
-    E00-E02, E40-E46, E50, D50-D53, D64.9, E51-E64
-    <%- elif cause == "Oral conditions" %>
-    K00-K14
-    <%- elif cause == "Other neoplasms" %>
-    D00-D48
-    <%- elif cause == "Perinatal conditions" %>
-    P00-P96 (minus P23, P37.3, P37.4)
-    <%- elif cause == "Respiratory diseases" %>
-    J30-J98
-    <%- elif cause == "Respiratory infections" %>
-    H65-H66, J00-J22, P23, U04, U07.1, U07.2, U09.9, U10.9
-    <%- elif cause == "Sense organ diseases" %>
-    H00-H61, H68-H93
-    <%- elif cause == "Skin diseases" %>
-    L00-L98
-    <%- elif cause == "Sudden infant death syndrome" %>
-    R95
-    <%- elif cause == "Unintentional injuries" %>
-    V01-X59, Y40-Y86, Y88, Y89 (minus X41-X42, X44-X45), U12.9
-    <%- elif cause == "Ill-defined diseases" %>
-    R00-R94, R96-R99
-    <%- elif cause == "Pertussis" %>
-    A37
-    <%- elif cause == "Poliomyelitis" %>
-    A80, B91, G14
-    <%- elif cause == "Diphtheria" %>
-    A36
-    <%- elif cause == "Measles" %>
-    B05
-    <%- elif cause == "Tetanus" %>
-    A33-A35
-    <%- elif cause == "Hepatitis B" %>
-    B16-B19 (minus B17.1, B18.2)
-    <%- elif cause == "Japanese encephalitis" %>
-    A83.0
-    <%- elif cause == "Self-inflicted injuries" %>
-    X60-X84, Y870
-    <%- elif cause == "Violence" %>
-    X85-Y09, Y871
-    <%- elif cause == "Mouth and oropharynx cancers" %>
-    C00-C14
-    <%- elif cause == "Oesophagus cancer" %>
-    C15
-    <%- elif cause == "Stomach cancer" %>
-    C16
-    <%- elif cause == "Colon and rectum cancers" %>
-    C18-C21
-    <%- elif cause == "Liver cancer" %>
-    C22
-    <%- elif cause == "Pancreas cancer" %>
-    C25
-    <%- elif cause == "Trachea, bronchus, lung cancers" %>
-    C33-C34
-    <%- elif cause == "Melanoma and other skin cancers" %>
-    C43-C44
-    <%- elif cause == "Breast cancer" %>
-    C50
-    <%- elif cause == "Cervix uteri cancer" %>
-    C53
-    <%- elif cause == "Corpus uteri cancer" %>
-    C54-C55
-    <%- elif cause == "Ovary cancer" %>
-    C56
-    <%- elif cause == "Prostate cancer" %>
-    C61
-    <%- elif cause == "Testicular cancer" %>
-    C62
-    <%- elif cause == "Kidney cancer" %>
-    C64-C66
-    <%- elif cause == "Bladder cancer" %>
-    C67
-    <%- elif cause == "Brain and nervous system cancers" %>
-    C70-C72
-    <%- elif cause == "Gallbladder and biliary tract cancer" %>
-    C23-C24
-    <%- elif cause == "Larynx cancer" %>
-    C32
-    <%- elif cause == "Thyroid cancer" %>
-    C73
-    <%- elif cause == "Mesothelioma" %>
-    C45
-    <%- elif cause == "Lymphomas, multiple myeloma" %>
-    C81-C90, C96
-    <%- elif cause == "Leukaemia" %>
-    C91-C95
-    <%- elif cause == "Ill-defined malignant neoplasms" %>
-    C76, C80, C97
-    <%- elif cause == "Other malignant neoplasms" %>
-    C17, C26-C31, C37-C41, C46-C49, C51, C52, C57-C60, C63, C68, C69, C74-C75, C77-C79
-    <%- endif -%>
+  # override the chart's own labels in that panel, while a display name yields to them.
+  display_name_number: "Deaths from {definitions.cause_in_text}{definitions.among}"
+  description_short_number: "Reported deaths from {definitions.cause_in_text}{definitions.among}, {definitions.underlying_cause}."
+  display_name_death_rate: "Deaths from {definitions.cause_in_text} per 100,000 {definitions.people}{definitions.aged}"
+  description_short_death_rate: "Reported deaths from {definitions.cause_in_text} per 100,000 {definitions.people}{definitions.aged}, {definitions.underlying_cause}."
+  display_name_share: "Share of deaths{definitions.among} that are from {definitions.cause_in_text}"
+  description_short_share: "Share of all reported deaths{definitions.among} that are from {definitions.cause_in_text}, {definitions.underlying_cause}."
+  display_name_asr: "Age-standardized death rate from {definitions.cause_in_text} per 100,000 {definitions.people}"
+  description_short_asr: "Reported deaths from {definitions.cause_in_text} per 100,000 {definitions.people}, {definitions.underlying_cause}. To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized)."
 
   description_disease_producer: |-
     <% if cause == "All Causes" %>
@@ -306,10 +138,8 @@ tables:
   mortality_database:
     variables: &fact_variables
       number:
-        title: "{definitions.cause_layer}<< cause >> — Deaths — << sex >>, << age_group >>"
+        title: "<< cause >> — Deaths — << sex >>, << age_group >>"
         description_short: "{definitions.description_short_number}"
-        description_key:
-          - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
@@ -325,10 +155,8 @@ tables:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
       percentage_of_cause_specific_deaths_out_of_total_deaths:
-        title: "{definitions.cause_layer}<< cause >> — Share of total deaths — << sex >>, << age_group >>"
+        title: "<< cause >> — Share of total deaths — << sex >>, << age_group >>"
         description_short: "{definitions.description_short_share}"
-        description_key:
-          - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
@@ -343,10 +171,8 @@ tables:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
       age_standardized_death_rate_per_100_000_standard_population:
-        title: "{definitions.cause_layer}<< cause >> — Age-standardized death rate per 100,000 people — << sex >>, << age_group >>"
+        title: "<< cause >> — Age-standardized death rate per 100,000 people — << sex >>, << age_group >>"
         description_short: "{definitions.description_short_asr}"
-        description_key:
-          - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
@@ -362,10 +188,8 @@ tables:
             note: |-
               To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized). All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
       death_rate_per_100_000_population:
-        title: "{definitions.cause_layer}<< cause >> — Death rate per 100,000 people — << sex >>, << age_group >>"
+        title: "<< cause >> — Death rate per 100,000 people — << sex >>, << age_group >>"
         description_short: "{definitions.description_short_death_rate}"
-        description_key:
-          - "The International Classification of Diseases (Version 10) codes that define {definitions.cause_in_text} are {definitions.icd10_codes}."
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
