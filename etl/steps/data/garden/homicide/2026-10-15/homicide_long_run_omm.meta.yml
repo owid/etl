@@ -6,6 +6,7 @@ tables:
     variables:
       death_rate_per_100_000_population_eisner:
         title: Homicide rate per 100,000 population - Eisner
+        description_short: Homicides per 100,000 people, from historical estimates compiled by Eisner (2014).
         description_processing: >
           All homicide rate estimates from before 1950 are taken from: Table 4 in Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press.
 
@@ -20,6 +21,7 @@ tables:
           numDecimalPlaces: 2
       death_rate_per_100_000_population_eisner_who:
         title: Homicide rate per 100,000 population - Eisner and WHO Mortality Database
+        description_short: Homicides per 100,000 people, combining historical estimates compiled by Eisner (2014) with death-certificate data from the WHO Mortality Database.
         description_processing: >
           All homicide rate estimates from before 1950 are taken from: Table 4 in Eisner, M. (2014) “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press.
 
