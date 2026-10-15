@@ -25,9 +25,16 @@
     "required": ["indicator", "action", "reason", "producer", "status"],
     "properties": {
       "indicator": {
-        "type": "string",
-        "minLength": 1,
-        "description": "The column to correct."
+        "oneOf": [
+          { "type": "string", "minLength": 1 },
+          {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        ],
+        "description": "The column to correct, or a list of columns that share the same error. A list applies the entry to each column separately, as if written once per column."
       },
       "entity": {
         "type": "string",
