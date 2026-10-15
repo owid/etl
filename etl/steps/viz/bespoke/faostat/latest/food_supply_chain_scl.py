@@ -94,7 +94,9 @@ def run() -> None:
     entity_to_id = {name: i + 1 for i, name in enumerate(entities)}
     metadata = {
         "method": METHOD,
-        # Every origin behind the chain (FAO's balances, OWID's population), not only the first.
+        # TODO: Remove "sources" once the waterfall (owid/owid-grapher#7324) stops reading it: grapher builds the
+        #  source line from the metadata's origins (owid/owid-grapher#7484). This list misses the origins that have
+        #  no attribution field (the nutrient conversion table and Feedipedia).
         "sources": sorted({origin.attribution for origin in reference["food"].metadata.origins if origin.attribution}),
         "timeRange": {"start": int(reference["year"].min()), "end": int(reference["year"].max())},
         "units": {nutrient: tables[nutrient]["food"].metadata.unit for nutrient in NUTRIENTS},
