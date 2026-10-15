@@ -152,12 +152,17 @@ def to_sql(df: pd.DataFrame, name: str, engine: Engine | Session | None = None, 
             _handle_connection_error(e)
 
 
-def production_or_master_engine() -> Engine:
-    """Return the production engine if available, otherwise connect to staging-site-master."""
+def production_or_master_env() -> config.OWIDEnv:
+    """Return the production environment if available, otherwise staging-site-master."""
     if config.OWID_ENV.env_remote == "production":
-        return config.OWID_ENV.get_engine()
+        return config.OWID_ENV
     elif config.ENV_FILE_PROD:
-        return config.OWIDEnv.from_env_file(config.ENV_FILE_PROD).get_engine()
+        return config.OWIDEnv.from_env_file(config.ENV_FILE_PROD)
     else:
         log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")
-        return config.OWIDEnv.from_staging("master").get_engine()
+        return config.OWIDEnv.from_staging("master")
+
+
+def production_or_master_engine() -> Engine:
+    """Return the production engine if available, otherwise connect to staging-site-master."""
+    return production_or_master_env().get_engine()
