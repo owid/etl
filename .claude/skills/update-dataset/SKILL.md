@@ -60,14 +60,14 @@ Assumptions:
 - [ ] Run `check-hardcoded-years` after all remaps — numeric time pins below the new data's latest time hide the update; propose `"latest"` fixes with user sign-off (see step 7)
 - [ ] Run the empty-entity audit (`check-empty-entities`) as a background agent after the indicator upgrade: full automated pass, scaled follow-up; regressions vs production = fix, pre-existing = document (see step 7)
 - [ ] Run the referencing-prose audit (standard) — read the prose of every surface the sweep found for quantitative claims this update invalidates, and hand the recomputed numbers to content — never edit published prose yourself (see step 7)
-- [ ] Update `update-context.yml` with published chart count and 1–3 chart views for the public announcement
-- [ ] Render Slack announcement via `draft-data-update-slack-post`, save to workbench, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
-- [ ] Draft the public-facing "Data update" post for OWID /latest via `/owid-staff:draft-data-update-post` (Mode A) — two versions, user picks, then the Google Doc in /Data updates, and hand the user the link (not added to the PR). The skill declines when we posted about this data less than six months ago; a declined post is a **completed** item — record the eligible date, don't override
-- [ ] Address Codex review comments (fix valid ones + resolve all threads)
+- [ ] Post `@codex review` as a separate PR comment once the last data or metadata change is pushed, then address its comments (fix valid ones + resolve all threads)
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
 - [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: confirm the `buildkite/etl-automated-staging-environment` PR check is green, then triage the data-diff report's data-point losses and 🔴-tier datasets and run the full-report audit probes (see "Silent-breakage check" section)
 - [ ] Ask the user whether to remove the old version; if yes, remove+archive its DAG entries now and relocate the new entries into the old slot, but KEEP the old step files until review sign-off — the consecutive-version review diffs them from disk; deleting the files is the final commit before merge (see "Removing the old version & reordering the DAG") — don't forget this step
-- [ ] Hand off the QA links to the user (Anomalist + Chart Diff + Metadata Diff on the staging branch, plus the data-diff report) together with the staging links to the 5 most-viewed data pages, and wait until the user has read those pages themselves — this is the final step (see "Final QA hand-off")
+- [ ] Hand off the QA links to the user (Anomalist + Chart Diff + Metadata Diff on the staging branch, plus the data-diff report) together with the staging links to the 5 most-viewed data pages, and **wait for the user's sign-off** — they read those pages themselves, and the announcements below wait for it (see "Final QA hand-off")
+- [ ] Update `update-context.yml` with published chart count and 1–3 chart views for the public announcement
+- [ ] Render Slack announcement via `draft-data-update-slack-post` (only after the QA sign-off), save to workbench, and notify user to post it to #data-updates-comms
+- [ ] Draft the public-facing "Data update" post for OWID /latest via `/owid-staff:draft-data-update-post` (Mode A) — two versions, user picks, then the Google Doc in /Data updates, and hand the user the link (not added to the PR). The skill declines when we posted about this data less than six months ago; a declined post is a **completed** item — record the eligible date, don't override
 
 Persistence:
 - After ticking each item, update `workbench/<short_name>/progress.md` with the current checklist state and a timestamp.
@@ -789,6 +789,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - **Empty-entity audit (mandatory — run it in the background after the indicator upgrade).** An upgrade can leave a view pinned to entities that have no data in the new indicators — it renders with those series missing (or empty) and no error anywhere. The **`check-empty-entities` skill** audits charts (entity selections + map `columnSlug`), MDim views, explorer views, narrative charts, and published-gdoc `country=` references, and grades every finding against production. Its automated pass always covers every surface; on widely charted datasets, scale only the follow-up (start with changed data, most-viewed charts, and views most likely to break) and report unchecked surfaces as coverage gaps. When it runs: a pinned entity that had data on production and lost it on staging is a **regression from this update — fix it before merge** (remap the view or restore the entities); a gap identical on production is pre-existing — it still needs fixing (chart-config edit or content follow-up on the gdoc), just not necessarily in this PR, so list it in the PR body with a planned fix.
 
 8) Update context for public announcement
+   - **Steps 8, 9 and 9b run only after the user has signed off the final QA hand-off.** An announcement describes the data, and the review can still change it.
    - In `workbench/<short_name>/update-context.yml` (kept up to date as facts are discovered, see Assumptions), record at minimum:
      ```yaml
      dataset:
@@ -878,10 +879,6 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - Save the rendered draft to `workbench/<short_name>/slack-announcement.md`.
    - If `draft-data-update-slack-post` reports missing mechanical fields, gather them, update `update-context.yml`, and re-render rather than inventing values. Ask the user if a missing field requires judgment.
    - **Do not put the announcement in the PR at all** — no embed and no pointer. The draft stays as the `workbench/<short_name>/slack-announcement.md` file (the user copies from there); comms drafts are internal and are kept out of the public data-update PR.
-   - **Post `@codex review` as a separate PR comment** (not in the PR description) to trigger an automated code review. Use:
-     ```bash
-     gh pr comment <pr_number> --body "@codex review"
-     ```
    - At the end of the update, tell the user, with a **markdown link to the saved file** so they can click through to open it: `"Slack announcement drafted at [workbench/<short_name>/slack-announcement.md](workbench/<short_name>/slack-announcement.md). Please review and post it to #data-updates-comms."` Always render the path as a markdown link `[…](…)`, not as inline-code — the chat UI renders it as clickable that way. (Slack can't be auto-posted — the user posts it.) **In a git worktree, link by absolute path** (`/…/.claude/worktrees/<name>/workbench/<short_name>/slack-announcement.md`): a relative link resolves against the editor's workspace root, i.e. the main checkout, whose gitignored `workbench/` can still hold the previous update's draft, so the user reads stale text. The same goes for every workbench or `ai/` artifact you hand over, including 9b's draft.
 
 9b) Data update post (for OWID /latest)
@@ -892,7 +889,11 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - **"No post" is a valid outcome, not a blocked task.** The skill checks what OWID has already published about this data and stops when the last announcement or data insight is less than six months old — a routine refresh of a frequently-updated dataset often lands inside that window. When it declines, record the prior post(s) and the eligible date under `announcement:` in `update-context.yml` and in the PR's open items, and move on; don't override it to get a draft. The Slack post (step 9) is unaffected — that one runs every update.
    - **Do not put the post in the PR at all** — no embed and no pointer. Like the Slack draft, it stays in `workbench/`.
 
-10) Codex review: address comments and resolve threads
+10) Codex review: trigger, address comments and resolve threads
+   - **Post `@codex review` as a separate PR comment** (not in the PR description) once the last data or metadata change is pushed, before the final QA hand-off, so its findings are handled before the user reviews. Use:
+     ```bash
+     gh pr comment <pr_number> --body "@codex review"
+     ```
    - **Codex's delivery channel depends on the verdict — poll both.** A **clean pass** arrives as an *issue comment* ("Didn't find any major issues") from `chatgpt-codex-connector[bot]`, with zero inline comments and no formal review object. A review **with findings** arrives as a formal review ("💡 Codex Review") with inline comments, and *no* issue comment. A watcher polling only one channel waits forever on the other outcome — treat a hit on either as completion. A third clean-pass shape: the automatic review on **opening or marking ready** can end with only a 👍 reaction on the PR and no comment at all — it counts only when the reacting login starts with `chatgpt-codex-connector` and it is stamped after the trigger. When the `codex-pull-request-review-summary` issue comment is present, it is the most direct completion signal: it is edited in place, and its table row shows `✅ Completed` with the reviewed commit, which must match your HEAD.
    - Wait ~60 seconds after posting `@codex review`, then poll both channels:
      ```bash
@@ -1019,7 +1020,7 @@ The samples cap at ~100 rows/diff, so pair the probes with the mechanism argumen
 
 **Don't diff against stale local builds** — a consumer built at an unknown earlier time (or downloaded from the catalog) conflates code drift with the dependency change and produces false positives; `REMOTE`/production is the trustworthy baseline because CI built it from master.
 
-**Complementary, not a replacement:** data-diff sees every dataset (including ones with no charts), while **[Chart Diff](#final-qa-hand-off--anomalist-chart-diff-and-data-diff)** shows how the same changes land on actual published charts and **Anomalist** flags per-country anomalies in the new data — the final QA hand-off (last checklist step) covers all three. Use data-diff to find *which* datasets/indicators to worry about, then Chart Diff to judge what readers would actually see.
+**Complementary, not a replacement:** data-diff sees every dataset (including ones with no charts), while **[Chart Diff](#final-qa-hand-off--anomalist-chart-diff-and-data-diff)** shows how the same changes land on actual published charts and **Anomalist** flags per-country anomalies in the new data — the final QA hand-off (the last step before the announcements) covers all three. Use data-diff to find *which* datasets/indicators to worry about, then Chart Diff to judge what readers would actually see.
 
 - **When you deferred consumers to a follow-up PR:** the checks above belong to that follow-up PR; here just confirm the "Downstream dependencies" list is complete (`.venv/bin/etlr --modified --dry-run` shows the affected set).
 
@@ -1069,7 +1070,7 @@ Workflow when the user agrees:
 
 ## Final QA hand-off — Anomalist, Chart Diff, Metadata Diff and data-diff
 
-This is the **last step** of the pre-review work — the old step files are still on disk at this point (deleting them is the final commit after review sign-off; see "Removing the old version & reordering the DAG"). Don't auto-run these — they're human-judgment tools. Hand off the four links so the user can review and click through, together with the 5 most-viewed data pages (see "The 5 most-viewed data pages" below):
+This is the **last step** of the pre-review work, and it comes **before the announcements** (steps 8, 9 and 9b): wait for the user's sign-off here before drafting either one. The old step files are still on disk at this point (deleting them is the final commit after review sign-off; see "Removing the old version & reordering the DAG"). Don't auto-run these — they're human-judgment tools. Hand off the four links so the user can review and click through, together with the 5 most-viewed data pages (see "The 5 most-viewed data pages" below):
 
 - **Anomalist** — flags variables whose new values diverge from the old version beyond statistical thresholds. Catches accidental scale changes, base-year rebases that propagated the wrong way, and silent drops.
   ```
