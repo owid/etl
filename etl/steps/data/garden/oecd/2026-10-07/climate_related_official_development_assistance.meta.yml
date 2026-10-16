@@ -41,7 +41,7 @@ definitions:
   key_outside_negative: |-
     Donors can only record cancellations of commitments made in earlier years as a single negative amount, which usually falls in this category. So this aid can be negative in some years.
   key_rio_markers: |-
-    Donors mark each aid project with the "Rio markers", which track support for the three UN conventions from the 1992 Rio Earth Summit: on climate change (with separate markers for mitigation and adaptation), biodiversity, and desertification. For each marker, a goal is a "principal" objective (the project wouldn't have been funded without it), a "significant" objective (an explicit but secondary one), or not targeted.
+    Donors mark their bilateral aid projects with the "Rio markers", which track support for the three UN conventions from the 1992 Rio Earth Summit: on climate change (with separate markers for mitigation and adaptation), biodiversity, and desertification. For each marker, a goal is a "principal" objective (the project wouldn't have been funded without it), a "significant" objective (an explicit but secondary one), or not targeted.
   key_climate_markers: |-
     Climate change mitigation projects aim to reduce greenhouse gas emissions or increase their removal by carbon sinks. Climate change adaptation projects aim to reduce the vulnerability of people and ecosystems to the impacts of climate change.
   key_overlap: |-
