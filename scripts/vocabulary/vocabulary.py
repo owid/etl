@@ -85,6 +85,17 @@ LLM_CACHE_FILE = CACHE_DIR / "vocabulary_llm_answers.json"
 LLM_MAX_RETRIES = 3
 LLM_CONCURRENCY = 8
 
+# Structured output: the answer is exactly this JSON, with nothing before or after it.
+KEYWORDS_SCHEMA = {
+    "type": "json_schema",
+    "schema": {
+        "type": "object",
+        "properties": {"keywords": {"type": "array", "items": {"type": "string"}}},
+        "required": ["keywords"],
+        "additionalProperties": False,
+    },
+}
+
 # How many topics' record sets to fetch at once.
 SEARCH_CONCURRENCY = 8
 
@@ -260,19 +271,16 @@ never pad the list with variations to reach a number):
         else:
             async with semaphore:
                 response = await client.messages.create(
-                    model=model_id, max_tokens=16000, messages=[{"role": "user", "content": prompt}]
+                    model=model_id,
+                    max_tokens=16000,
+                    messages=[{"role": "user", "content": prompt}],
+                    output_config={"format": KEYWORDS_SCHEMA},
                 )
             if response.stop_reason != "end_turn":
                 raise RuntimeError(f"the model stopped early ({response.stop_reason})")
             result_text = text_of(response)
             # Thinking tokens are billed as output and included in output_tokens.
             input_tokens, output_tokens = response.usage.input_tokens, response.usage.output_tokens
-
-        # Extract JSON
-        if "```json" in result_text:
-            result_text = result_text.split("```json")[1].split("```")[0].strip()
-        elif "```" in result_text:
-            result_text = result_text.split("```")[1].split("```")[0].strip()
 
         result = json.loads(result_text)
         keywords = result.get("keywords", [])
