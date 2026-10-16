@@ -79,7 +79,7 @@ ANOMALY_TYPES = {
 ANOMALY_TYPE_NAMES = {k: v["tag_name"] for k, v in ANOMALY_TYPES.items()}
 ANOMALY_TYPES_TO_DETECT = tuple(ANOMALY_TYPES.keys())
 
-# GPT
+# Model for the AI summary of anomalies
 MODEL_DEFAULT = "claude-sonnet-5-5"
 
 # Map sorting strategy to name to show in UI.
@@ -249,12 +249,10 @@ def ask_llm_for_summary(df: pd.DataFrame):
 
                         {metadata_summary}
                         """
-    stream = claude.TextStream(MODEL_DEFAULT, system, df_str)
+    stream = claude.TextStream(MODEL_DEFAULT, system, df_str, effort="low")
     st.write_stream(stream)
 
-    cost = f"{stream.cost:.4f} USD" if stream.cost is not None else "unknown"
-    tokens = f"{stream.usage.input_tokens} in, {stream.usage.output_tokens} out" if stream.usage else "unknown"
-    st.info(f"**Cost**: {cost}.\n\n **Tokens**: {tokens}.")
+    st.info(stream.summary)
 
 
 # Functions to filter the results

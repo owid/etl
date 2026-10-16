@@ -477,7 +477,7 @@ class ChartDiffShow:
             st.success("No differences found in the metadata fields relevant for comparison.")
             return
 
-        # Placeholder for GPT summary (filled after the diffs render, so the user isn't blocked on the LLM)
+        # Placeholder for the AI summary (filled after the diffs render, so the user isn't blocked on the LLM)
         container = st.container()
 
         # Show diffs
@@ -526,11 +526,7 @@ class ChartDiffShow:
                     st.warning("The model returned an empty summary.")
                     return
 
-                cost = f"{stream.cost:.4f} USD" if stream.cost is not None else "unknown"
-                tokens = (
-                    f"{stream.usage.input_tokens} in, {stream.usage.output_tokens} out" if stream.usage else "unknown"
-                )
-                cost_msg = f"Cost: {cost}. Tokens: {tokens}."
+                cost_msg = stream.summary
                 st.session_state[cache_key] = (response, cost_msg)
         st.caption(cost_msg)
 
