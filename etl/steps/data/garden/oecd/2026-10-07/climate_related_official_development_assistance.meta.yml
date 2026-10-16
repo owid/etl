@@ -24,7 +24,7 @@ definitions:
     G7 countries: Canada, France, Germany, Italy, Japan, UK and US
 
   # Short descriptions, following those of our main ODA dataset.
-  short_bilateral_allocable: "Bilateral allocable [ODA](#dod:oda) is the aid from members of the OECD Development Assistance Committee (DAC) that donors track for climate objectives. It excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
+  short_bilateral_allocable: "Bilateral allocable [ODA](#dod:oda) is the aid from members of the OECD Development Assistance Committee (DAC) that donors track for climate objectives. It excludes general budget support, debt relief and some costs in donor countries, such as hosting refugees."
   short_commitments: Monetary aid is estimated as commitments.
   short_constant_usd: This data is expressed in US dollars. It is adjusted for inflation.
 
@@ -39,7 +39,7 @@ definitions:
   key_bilateral_total_denominator: |-
     This share divides climate-related aid by total bilateral ODA, which also includes the aid that the Rio markers do not apply to, such as general budget support and the costs of hosting refugees in donor countries.
   key_outside_negative: |-
-    Donors can only record cancellations of commitments made in earlier years as a single negative amount, which falls in this category. So this aid can be negative in some years.
+    Donors can only record cancellations of commitments made in earlier years as a single negative amount, which usually falls in this category. So this aid can be negative in some years.
   key_rio_markers: |-
     Donors mark each aid project against the "Rio markers", which track aid that supports the goals of the three UN conventions that originated at the 1992 Earth Summit in Rio de Janeiro: on climate change (with separate markers for mitigation and adaptation), biological diversity, and desertification. A project is marked as targeting a goal as a "principal" objective (the project would not have been funded without it), as a "significant" objective (an explicit but secondary objective), or as "not targeted".
   key_climate_markers: |-
@@ -47,7 +47,7 @@ definitions:
   key_overlap: |-
     Many projects target both mitigation and adaptation. To avoid counting them twice, we classify each project only once: as targeting mitigation only, adaptation only, or both. Similarly, a project has climate as its principal objective if it is marked as principal for mitigation or adaptation, and as a significant objective otherwise.
   key_upper_bound: |-
-    Projects are counted at their full value, even when climate is only a significant objective, so the OECD considers the data descriptive rather than strictly quantitative: an approximate measure of climate-related aid. When reporting their climate finance to the UN, some donors count only a share of these projects.
+    Projects are counted at their full value, even when climate is only a significant objective, so the OECD considers the data descriptive rather than strictly quantitative: an approximate measure of climate-related aid. When reporting their climate finance to the UN, some donors count only a share of these projects. Donors mark their own projects. Independent reviews have found some projects marked as climate-related with little link to climate, and argue that part of the increase over time comes from donors marking existing types of projects.
   key_commitments: |-
     The data is reported as commitments. This refers to aid that has been pledged, and is different from disbursements, which is aid ultimately given. The Rio markers describe the objectives of projects when they are designed, so the OECD applies them to commitments. A multi-year project is counted in full in the year it is committed, so values can change a lot from one year to the next.
   key_adaptation_marker: |-
@@ -57,7 +57,7 @@ definitions:
   key_regional: |-
     Entities named "regional (OECD)", such as "Africa, regional (OECD)", show aid to a region as a whole, for example programs that cover several countries, which donors do not assign to a single country. Entities named "unspecified (OECD)", such as "Developing countries, unspecified (OECD)", show aid not assigned to any country within a broader group. This aid is already included in the totals of the corresponding regions, for example in Africa (OECD).
   key_not_screened: |-
-    Projects that donors did not assess against the climate markers ("not screened") are counted as non-climate aid. A large share of aid was not screened before 2011.
+    Projects that donors did not assess against the climate markers ("not screened") are counted as non-climate aid. A large share of aid was not screened in the early 2010s, and some donors still leave much of their aid unscreened in some years. Some of them leave only projects that don't target climate change unscreened, so their share is unaffected. Others leave almost all their projects unscreened, so their share can be close to zero even if they gave climate-related aid.
   key_constant_usd: The OECD adjusts this data for inflation and expresses it in constant {definitions.inflation_year} US$. It makes this adjustment using annual average market exchange rates and GDP deflators for each donor country. For more information on the methodology, visit [the OECD's documentation](https://www.oecd.org/content/oecd/en/data/insights/data-explainers/2024/10/resources-for-reporting-development-finance-statistics.html) on DAC deflators.
 
   # Processing descriptions.
@@ -66,7 +66,7 @@ definitions:
   processing_non_climate: |-
     We calculated non-climate-related ODA as bilateral allocable ODA minus climate-related ODA.
   processing_outside_rio_markers: |-
-    We calculated this indicator as total bilateral ODA, from the OECD Creditor Reporting System, minus bilateral allocable ODA, from the OECD RioMarkers dataset. Donors can only record cancellations of commitments made in earlier years as a single negative amount, which falls in this category, so it can be negative (for example, for Australia in 2009 and 2010).
+    We calculated this indicator as total bilateral ODA, from the OECD Creditor Reporting System, minus bilateral allocable ODA, from the OECD RioMarkers dataset. Donors can only record cancellations of commitments made in earlier years as a single negative amount, which usually falls in this category, so it can be negative (for example, for Australia in 2010 and Denmark in 2019).
   processing_share: |-
     We calculated this indicator by dividing climate-related ODA by bilateral allocable ODA, expressed as a percentage.
   processing_share_bilateral_total: |-
@@ -343,7 +343,7 @@ tables:
           grapher_config:
             title: "Share of foreign aid given that is climate-related"
             subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of the bilateral ODA covered by the OECD's climate tracking."
-            note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
+            note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and some costs in donor countries, such as hosting refugees."
             tab: "chart"
             hasMapTab: true
             chartTypes:
@@ -504,7 +504,7 @@ tables:
           grapher_config:
             title: "Share of foreign aid received that is climate-related"
             subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of the bilateral ODA received that is covered by the OECD's climate tracking."
-            note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
+            note: "Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and some costs in donor countries, such as hosting refugees."
             tab: "map"
             hasMapTab: true
             chartTypes:
