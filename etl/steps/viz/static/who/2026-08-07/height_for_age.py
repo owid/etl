@@ -108,7 +108,7 @@ templates ship -- setting `characters` propagates the first character's style ov
 | `Note:` (desktop only) | `build_note(...)` | `Note:` Bold, rest Regular |
 | `Data source:` | `Data source: ` + `source_citation(...)` from `etl.viz.static` | `Data source:` Bold, rest Regular |
 | Tagline (desktop) | leave the template's | -- |
-| License | `Licensed under ` / `CC-BY` / ` by the author ` / `AUTHOR` | Medium / Bold / Medium / Bold |
+| License | `Licensed under ` / `CC-BY` / ` by the author ` / `AUTHOR` | Regular / Bold / Regular / Bold |
 
 Both templates carry the same footer slots, so both get the same license string; mobile just stacks
 its two rows (`Frame 15`, source at y=770 and license at y=791) where desktop shares one row with the
@@ -182,7 +182,7 @@ readable where it crosses a gridline or the band:
 
 | Text | Halo |
 |---|---|
-| `label__within-2-sd`, `label__stunting-cutoff` | 3px, `setStrokeStyleIdAsync` -> `Instagram/Beige Background` (`#fbf9f3`), as set in Figma |
+| `label__within-2-sd`, `label__stunting-cutoff` | 3px, `setStrokeStyleIdAsync` -> the frame's own canvas style, `Website/Background/Beige` (`#fffbf5`). The design team's copy binds `Instagram/Beige Background` (`#fbf9f3`), another template family's canvas; the house rule is the frame's own, and the two cannot be told apart on screen |
 | `label__median` | 2px, the band's colour composited on the canvas -- Denim at 20% on `#fffbf5` is `#dbdee3` -- unbound, since the library has no such style |
 
 **Arrows.** The step's `leader__within-2-sd` and `leader__stunting-cutoff` are matplotlib arcs that
@@ -244,14 +244,24 @@ longer matches the Figma header: re-measure it rather than moving the chart by h
 Then diff the desktop frame against the design team's copy with `/create-figma-chart`'s
 `scripts/diff_frames.js` (`referenceId` `29144:824`, `frameId` `26869:1501`). Expect every node paired
 and only these deltas: the two wrapped labels as one TEXT node there and one per line here (with the
-alignment that comes with it), the Note one 818px box wide here where the copy's is 729, and the two
-arrows within ~3px of the copy's. Anything else is drift from the design.
+alignment that comes with it), the explanatory labels' halos on the frame's canvas style rather than
+the copy's Instagram one, the Note one 818px box wide here where the copy's is 729, and the two arrows
+within ~3px of the copy's. Anything else is drift from the design.
 
-One `verify_page.js` row fails by design: desktop `text-floor` flags the template's own tagline and
-license row, which ships at 11px. The series, furniture and colour rows SKIP, because they key on grapher's layer names (`line__*`,
-`horizontal-grid-lines`), which this step does not emit. `color_audit.py` may fail the two bands
-against each other; that is accepted, because each sits in its own titled panel and the lines carry
-the colour.
+Run `verify_page.js` with `gapTarget: { top: [28, 30], bottom: [21, 23] }`, the design team's uneven
+pair; the default symmetric 12-16 target fails it by construction. One row then fails by design:
+desktop `text-floor` flags the template's own tagline and license row, which ships at 11px.
+`annotation-overlap` passes because both arrows sit on the translucent band, which the row does not
+judge. The series, furniture and colour rows SKIP, because they key on grapher's layer names
+(`line__*`, `horizontal-grid-lines`), which this step does not emit, and `off-palette` asks for review
+of the unbound #5b5b5b text, as the design team's copy also leaves it. `color_audit.py` fails the two
+bands against each other (dE ~15 once composited); that is accepted, because each sits in its own
+titled panel and the lines carry the colour.
+
+The stunting arrow is the one arrow ending on a line, so it gets the four-render pixel probe
+(`measure_pixels.py arrow-gap`): 4.3px on desktop and 5.7px on mobile, zero touching. On mobile the
+dashed line climbs steeply, so the arrow is aimed at age 8.5, where it meets the line head-on, and
+keeps 6px of clearance; aimed further right it ran alongside the line and crossed it.
 
 `diff_against_template.js` should report only the footer's first row, which differs from the
 template's by the one space after its bold prefix: the desktop template sets the space after `Note:`
@@ -524,6 +534,10 @@ LAYOUTS = {
         "stunting_label_xy": (19.37, 115.4),
         "stunting_label_width": 155,
         "stunting_label_age": 11.4,
+        # Air between the stunting arrow's tip and the dashed line it points at, set from the pixel probe's
+        # 3-7px band. The line climbs steeply in the narrow mobile panel and the dart's corner comes closer
+        # to it than the tip, so mobile takes 6.
+        "stunting_arrow_clearance_px": 4,
         # The band label's bottom-left corner, as (age, cm), in the empty top-left of the Boys panel,
         # and the age its arrow reaches into the band at. The age puts its left edge 15px into the
         # panel, under the Boys title (`FACET_TITLE_OFFSET_PX`).
@@ -555,7 +569,10 @@ LAYOUTS = {
         "age_ticks": [0, 5, 10, 15, 19],
         "stunting_label_xy": (19.6, 110.8),
         "stunting_label_width": 120,
-        "stunting_label_age": 10.0,
+        # Where the arrow meets the steep mobile line head-on; aimed further right it runs alongside the
+        # line and crosses it.
+        "stunting_label_age": 8.5,
+        "stunting_arrow_clearance_px": 6,
         # Where the header ends in the Figma frame: the template's serif sets the title on two lines and
         # the two-sentence subtitle takes three (16 + 58 + 6 + 57). The step measures neither face, so it
         # takes the number rather than its own wrap.
@@ -840,7 +857,11 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, color) -> None:
         color=TEXT_COLOR,
         zorder=6,
         gid="label__stunting-cutoff",
-        arrowprops=arrow_props(*line_end(stunting_text, label_fontsize, row=0, side="left"), rad=-0.35, clearance_px=4),
+        arrowprops=arrow_props(
+            *line_end(stunting_text, label_fontsize, row=0, side="left"),
+            rad=-0.35,
+            clearance_px=layout["stunting_arrow_clearance_px"],
+        ),
     )
     assert label.arrow_patch is not None
     label.arrow_patch.set_gid("leader__stunting-cutoff")

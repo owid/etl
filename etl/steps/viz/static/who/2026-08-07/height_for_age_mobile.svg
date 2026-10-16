@@ -4378,12 +4378,12 @@ z
     <text style="font-size: 10.08px; font-family: 'Lato', 'Arial', 'Helvetica', sans-serif; fill: #5b5b5b" transform="translate(60.532616 221.8536)">shaded area.</text>
    </g>
    <g id="leader__stunting-cutoff">
-    <path d="M 140.474235 339.651715 
-Q 125.521438 325.892274 130.29483 306.575663 
+    <path d="M 139.468132 341.759084 
+Q 124.79781 337.86154 120.338591 324.203265 
 " style="fill: none; stroke: #5b5b5b; stroke-width: 0.72; stroke-linecap: round"/>
-    <path d="M 126.476431 311.60655 
-L 130.29483 306.575663 
-L 131.330422 312.806036 
+    <path d="M 119.762147 330.492757 
+L 120.338591 324.203265 
+L 124.515239 328.940945 
 z
 " style="fill: #5b5b5b; stroke: #5b5b5b; stroke-width: 0.72; stroke-linecap: round"/>
    </g>
