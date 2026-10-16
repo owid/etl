@@ -76,6 +76,7 @@ Then read the file and figure out its shape. Do **not** ask the user anything in
    - `short_name` — snake_case of the core title (`electric_car_sales`).
    - `namespace` — the producer's slug if one already exists under `snapshots/` (check `ls snapshots/`), else a sensible new one.
    - `version` — today's date (`date -u +"%Y-%m-%d"`).
+8. **Look for the producer's latest documentation**: the dataset page, methodology, codebook, main report and what's new, from the link, the file, or a web search, per `.claude/rules/producer-documentation.md`. It fills the metadata later on. Don't ask about it yet: anything missing, insufficient or inaccessible goes into Step 2's question.
 
 Write a one-paragraph internal summary of what you found before moving on.
 
@@ -84,7 +85,7 @@ Write a one-paragraph internal summary of what you found before moving on.
 Now ask the user **once**, with all your best guesses pre-filled, using `AskUserQuestion` where it fits. Frame it as "here's what I figured out — correct anything that's wrong, otherwise I'll build it." Before listing the specifics, set expectations in one plain sentence so the end isn't a surprise — e.g. *"I'll build the dataset and put it on a staging server for you to review; once you're happy you merge the PR and it goes live."* Then keep the questions to the few things that genuinely can't be guessed or that would be expensive to get wrong:
 
 - **Namespace + short_name + dataset title** (show your proposal; let them override).
-- **What the data is / source** — confirm the producer and, if not already provided, ask for a `metadata_url` (the source page).
+- **What the data is / source** — confirm the producer and, if not already provided, ask for a `metadata_url` (the source page). List the documentation you found in Step 1 and ask for anything missing, insufficient or inaccessible that the metadata depends on (a methodology to define the indicators, a codebook for unclear columns).
 - **License** — show your best guess (default `CC BY 4.0` for academic/IGO sources if unknown) and let them correct.
 - **Other data files the source ships** — when the landing page or repository carries several data files (a companion index, summary tables), list them with a default of "not ingesting these" so the user can opt in with one word. Persist the skips as the companion-files `# NOTE:` in the snapshot `.dvc` (Step 4 follows `/create-snapshot`'s convention) — that NOTE, not the PR body, is the baseline the update and review workflows diff against; mention them in the PR body as well for the reviewer.
 - **Any column meanings you couldn't infer** — only ask about the genuinely ambiguous ones (e.g. "is `ev_sales_share` a percentage 0–100 or a fraction 0–1?"). Don't ask about columns you're confident on.
