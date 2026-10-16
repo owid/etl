@@ -63,7 +63,7 @@ def run() -> None:
     assert found == expected, error
     # All copies of a flow must be identical, otherwise they should be summed, not dropped.
     flow_columns = ["producer_country", "consumer_country", "year", "fao_item_code"]
-    copies = tb.groupby(flow_columns, observed=True)[VALUE_COLUMNS + ["consumption"]].nunique()
+    copies = tb.groupby(flow_columns, observed=True)[VALUE_COLUMNS + ["consumption"]].nunique(dropna=False)
     assert (copies <= 1).all().all(), "Rows sharing a FAOSTAT item are no longer identical; sum them instead."
     tb = tb.drop_duplicates(subset=flow_columns).drop(columns="fao_item_code")
     ####################################################################################################################
