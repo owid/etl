@@ -1,6 +1,6 @@
 """Load the WHO Mortality Database meadow dataset and create the garden dataset.
 
-Three tables come out:
+Six tables come out:
 
 - `mortality_database`: deaths, death rates, age-standardized death rates and shares of total deaths,
   by country, year, sex and age group, for All Causes and the 23 cause groups that tile it.
@@ -27,11 +27,14 @@ name a group that is not itself a row.
 
 One correction is applied to WHO's numbers: `correct_unintentional_injuries` removes the accidental
 poisonings that the February 2026 release counts twice under Unintentional injuries (details there).
+
+The text that depends on the cause and is not a template (its ICD-10 codes, the layer label in front of a
+drill-down's internal title, a per-cause topic tag) is filled in by the grapher step from the `causes` table
+and the table names, so the metadata file carries no per-cause lists.
 """
 
 from collections import Counter
 from datetime import date
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -254,9 +257,7 @@ def run() -> None:
     # Step 1: Load the meadow table and check it is what we expect.
     ds_meadow = paths.load_dataset("mortality_database")
     tb = ds_meadow.read("mortality_database", safe_types=False)
-    _validate_input_data(tb)
-    _validate_mortality_values(tb)
-    _validate_demographic_dimensions(tb)
+    _validate_input(tb)
 
     # Step 2: Readable labels, our cause names, harmonized country names.
     tb = _rename_categories(tb, "sex", SEX_RENAMES)
@@ -270,10 +271,7 @@ def run() -> None:
     tb = tb.drop(columns=["icd10_codes"])
 
     # Step 4: Checks on the processed data, then the one correction to WHO's numbers, then the check again.
-    _validate_country_coverage(tb)
-    _validate_temporal_patterns(tb)
-    _validate_cause_specific_patterns(tb)
-    _validate_data_completeness(tb)
+    _validate_processed(tb)
     _validate_cause_partition(tb, tb_causes, min_share_consistent=PARTITION_MIN_SHARE_CONSISTENT, stage="as published")
     tb = correct_unintentional_injuries(tb, tb_causes)
     _validate_cause_partition(
@@ -284,9 +282,8 @@ def run() -> None:
     tb = add_derived_age_groups(tb, tb_causes)
 
     # Step 6: One table per layer - the partition tier, then one table per group of drill-downs - so the catalog
-    # path says where a cause sits. The metadata must know every cause too (see the check). Plus the leading
-    # cancer type, whose cause is a value rather than a key, so it cannot be a row of the fact tables.
-    _check_metadata_lists_every_cause(tb_causes)
+    # path says where a cause sits. Plus the leading cancer type, whose cause is a value rather than a key, so it
+    # cannot be a row of the fact tables.
     tables = _split_by_table(tb, tb_causes)
     tb_most_common_cancer = build_most_common_cancer(tb, tb_causes)
     tb_causes = tb_causes.format(["cause"], short_name="causes")
@@ -427,17 +424,6 @@ def build_most_common_cancer(tb: Table, tb_causes: Table) -> Table:
     return tb_top.format(keys, short_name="most_common_cancer")
 
 
-def _check_metadata_lists_every_cause(tb_causes: Table) -> None:
-    """The metadata repeats two things per cause that only this step knows - its ICD-10 codes and its place in
-    the tree - so a cause added here without its metadata branches fails the build instead of rendering blank."""
-    text = Path(__file__).with_suffix(".meta.yml").read_text()
-    missing = {
-        "icd10_codes": [c for c in tb_causes["cause"] if f'cause == "{c}"' not in text],
-        "cause_layer": [c for c in DRILL_DOWN_TABLES if f'("{c}", ' not in text],
-    }
-    assert not any(missing.values()), f"Causes missing from the metadata definitions: {missing}"
-
-
 def _rename_categories(tb: Table, column: str, renames: dict[str, str]) -> Table:
     """Rename the values of a categorical column, keeping the column's metadata."""
     metadata = tb[column].metadata
@@ -485,182 +471,44 @@ def build_causes_table(tb: Table) -> Table:
     return tb_causes
 
 
-def _validate_input_data(tb: Table) -> None:
-    """Basic integrity checks on the meadow table."""
+def _validate_input(tb: Table) -> None:
+    """The meadow table is what the snapshot promises: unique keys, WHO's codes, non-negative counts."""
     assert len(tb) > 0, "Dataset is empty"
-
-    required_cols = ["country", "year", "sex", "age_group", "cause", "icd10_codes", "number"]
-    missing_cols = [col for col in required_cols if col not in tb.columns]
-    assert not missing_cols, f"Missing required columns: {missing_cols}"
-
-    key_cols = ["country", "year", "sex", "age_group", "cause"]
-    duplicates = tb.duplicated(subset=key_cols)
-    assert not duplicates.any(), f"Found {duplicates.sum()} duplicate records"
-
-    assert pd.api.types.is_numeric_dtype(tb["number"]), "Deaths count should be numeric"
-    assert pd.api.types.is_integer_dtype(tb["year"]), "Year should be integer type"
-
-
-def _validate_mortality_values(tb: Table) -> None:
-    """Value ranges: no negative counts; flag implausibly high rates for review."""
-    negative_deaths = tb[tb["number"] < 0]
-    assert len(negative_deaths) == 0, f"Found {len(negative_deaths)} negative death counts"
-
-    rate_col = "age_standardized_death_rate_per_100_000_standard_population"
-    rates = tb[rate_col].dropna()
-    extreme_rates = rates[(rates < 0) | (rates > 10000)]
-    if len(extreme_rates) > 0:
-        log.warning(
-            "Extreme age-standardized rates found",
-            count=len(extreme_rates),
-            max_rate=extreme_rates.max(),
-            min_rate=extreme_rates.min(),
-        )
-
-    death_rates = tb["death_rate_per_100_000_population"].dropna()
-    extreme_rates = death_rates[death_rates > 50000]
-    if len(extreme_rates) > 0:
-        log.warning(
-            "Extremely high death rates found",
-            count=len(extreme_rates),
-            examples=tb[tb["death_rate_per_100_000_population"].isin(extreme_rates)][
-                ["country", "year", "sex", "age_group", "cause", "death_rate_per_100_000_population"]
-            ]
-            .head()
-            .to_dict("records"),
-        )
-
-
-def _validate_demographic_dimensions(tb: Table) -> None:
-    """WHO's sex and age-group codes, before renaming."""
+    required = ["country", "year", "sex", "age_group", "cause", "icd10_codes", "number"]
+    missing = [column for column in required if column not in tb.columns]
+    assert not missing, f"Missing columns: {missing}"
+    assert not tb.duplicated(subset=["country", "year", "sex", "age_group", "cause"]).any(), "Duplicate rows"
+    assert pd.api.types.is_integer_dtype(tb["year"]), "Year should be an integer"
+    assert (tb["number"].dropna() >= 0).all(), "Negative death counts"
     unexpected_sex = set(tb["sex"].unique()) - set(SEX_RENAMES)
-    assert not unexpected_sex, f"Unexpected sex categories: {unexpected_sex}"
-
-    unexpected_ages = set(tb["age_group"].unique()) - set(AGE_GROUP_RENAMES)
-    if unexpected_ages:
-        log.warning("Unexpected age group categories", categories=list(unexpected_ages))
+    assert not unexpected_sex, f"Unexpected sex codes: {unexpected_sex}"
+    unexpected_age = set(tb["age_group"].unique()) - set(AGE_GROUP_RENAMES)
+    assert not unexpected_age, f"Unexpected age-group codes: {unexpected_age}"
 
 
-def _validate_temporal_patterns(tb: Table) -> None:
-    """Year range, and large year-on-year jumps in all-cause deaths for a few large countries."""
-    min_year, max_year = 1950, date.today().year
-    assert tb["year"].min() >= min_year, f"Year too early: {tb['year'].min()}"
-    assert tb["year"].max() <= max_year, f"Year too late: {tb['year'].max()}"
+def _validate_processed(tb: Table) -> None:
+    """After renaming and harmonization: plausible years, the large reporters present, sex-specific causes clean."""
+    years = (int(tb["year"].min()), int(tb["year"].max()))
+    assert 1950 <= years[0] and years[1] <= date.today().year, f"Years out of range: {years}"
 
-    for country in ["United States", "Germany", "Japan", "Brazil"]:
-        country_data = tb[
-            (tb["country"] == country)
-            & (tb["cause"] == "All Causes")
-            & (tb["sex"] == "Both sexes")
-            & (tb["age_group"] == "all ages")
-        ].sort_values("year")
-
-        if len(country_data) < 3:
-            continue
-
-        # Counts are unsigned integers; cast before differencing, or a drop wraps around to a huge jump.
-        deaths = country_data["number"].astype(float).values
-        year_changes = np.diff(deaths) / deaths[:-1] * 100
-
-        extreme_changes = np.abs(year_changes) > 50
-        if extreme_changes.any():
-            problem_years = country_data["year"].iloc[1:][extreme_changes]
-            log.warning(
-                "Extreme year-over-year changes in deaths",
-                country=country,
-                years=problem_years.tolist(),
-                max_change=f"{year_changes[extreme_changes].max():.1f}%",
-            )
-
-
-def _validate_country_coverage(tb: Table) -> None:
-    """Enough countries, and the large reporters among them. Runs after harmonization, on our names."""
     countries = set(tb["country"].unique())
+    assert len(countries) >= 100, f"Only {len(countries)} countries"
+    # China and India do not report to the database; these large reporters do.
+    major = {"United States", "Germany", "United Kingdom", "France", "Japan", "Brazil", "Russia"}
+    assert major <= countries, f"Large reporters missing: {sorted(major - countries)}"
 
-    min_countries = 100
-    assert len(countries) >= min_countries, f"Only {len(countries)} countries found"
-
-    # China and India do not report to the database; the rest should be present.
-    major_countries = {"United States", "Germany", "United Kingdom", "France", "Japan", "Brazil", "Russia"}
-    missing_major = major_countries - countries
-    if missing_major:
-        log.warning("Missing major countries/entities", missing=list(missing_major))
-
-
-def _validate_cause_specific_patterns(tb: Table) -> None:
-    """Causes that can only occur in part of the population."""
-    maternal_data = tb[tb["cause"] == "Maternal conditions"]
-    if len(maternal_data) > 0:
-        maternal_males = maternal_data[maternal_data["sex"] == "Males"]
-        assert len(maternal_males) == 0, f"Found {len(maternal_males)} male maternal deaths"
-
-        maternal_elderly = maternal_data[maternal_data["age_group"].isin(["over 85 years", "80-84 years"])]
-        if len(maternal_elderly) > 0:
-            elderly_deaths = maternal_elderly["number"].sum()
-            total_maternal = maternal_data["number"].sum()
-            if elderly_deaths / total_maternal > 0.01:
-                log.warning(
-                    "High proportion of elderly maternal deaths",
-                    elderly_pct=f"{elderly_deaths / total_maternal * 100:.2f}%",
-                )
+    maternal_males = tb[(tb["cause"] == "Maternal conditions") & (tb["sex"] == "Males")]
+    assert len(maternal_males) == 0, f"{len(maternal_males)} rows of maternal deaths among males"
 
     for cause, sex in SEX_SPECIFIC_CAUSES.items():
         cause_data = tb[(tb["cause"] == cause) & (tb["age_group"] == "all ages")]
-        if len(cause_data) == 0:
-            continue
         other_sex = "Females" if sex == "Males" else "Males"
         in_other_sex = cause_data.loc[cause_data["sex"] == other_sex, "number"].sum()
         total = cause_data.loc[cause_data["sex"] == "Both sexes", "number"].sum()
         share = float(in_other_sex) / float(total) if total else 0.0
         assert share <= MAX_SHARE_IN_OTHER_SEX, f"{cause}: {share:.2%} of deaths recorded in {other_sex.lower()}"
         if in_other_sex > 0:
-            log.info(
-                "Sex-specific cause with deaths recorded in the other sex",
-                cause=cause,
-                deaths=int(in_other_sex),
-                share=f"{share:.4%}",
-            )
-
-    sids_data = tb[tb["cause"] == "Sudden infant death syndrome"]
-    if len(sids_data) > 0:
-        allowed_age_groups = ["less than 1 year", "all ages", "Unknown age"]
-        sids_adults = sids_data[
-            (~sids_data["age_group"].isin(allowed_age_groups))
-            & (sids_data["number"] > 0)
-            & (sids_data["number"].notna())
-        ]
-        if len(sids_adults) > 0:
-            log.warning(
-                "SIDS deaths in non-infant age groups",
-                count=len(sids_adults),
-                age_groups=sids_adults["age_group"].unique().tolist(),
-                countries=sids_adults["country"].unique().tolist(),
-            )
-
-
-def _validate_data_completeness(tb: Table) -> None:
-    """Missing counts, and gaps in recent years for a few large reporters."""
-    missing_share = tb["number"].isna().mean()
-    if missing_share > 0.05:
-        log.warning("High proportion of missing death counts", missing_pct=f"{missing_share * 100:.2f}%")
-
-    for country in ["United States", "Germany", "Japan"]:
-        country_data = tb[tb["country"] == country]
-        if len(country_data) == 0:
-            continue
-
-        years_available = set(country_data["year"].unique())
-        # WHO's reporting lag is 18-24 months, so the last two data years are not expected of anyone.
-        expected_years = set(range(2000, int(tb["year"].max()) - 1))
-        missing_years = expected_years - years_available
-
-        if len(missing_years) > 5:
-            log.warning(
-                "Significant temporal gaps",
-                country=country,
-                missing_years=len(missing_years),
-                sample_missing=sorted(list(missing_years))[:5],
-            )
+            log.info("sex_specific_cause_in_other_sex", cause=cause, deaths=int(in_other_sex), share=f"{share:.4%}")
 
 
 def _ancestors(cause: str) -> list[str]:
