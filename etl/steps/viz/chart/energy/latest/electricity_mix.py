@@ -568,7 +568,8 @@ ORIGINAL_MAP_SCHEMES = {
         "customNumericValues": [0, 200, 500, 1000, 2000, 5000, 10000, 20000, 1],
     },
     ("total", "generation"): {
-        "baseColorScheme": "YlGnBu",
+        # Blues, not the original YlGnBu, so this map stands apart from primary energy use in energy_mix.
+        "baseColorScheme": "Blues",
         "binningStrategy": "manual",
         "customNumericValues": [0, 100, 200, 500, 1000, 2000, 5000, 1],
         "customNumericColors": [None],
@@ -608,6 +609,11 @@ ORIGINAL_MAP_SCHEMES = {
         "customNumericValues": [0, 1, 2, 5, 10, 20, 50, 100],
         "customNumericColors": [None, None, None, None],
     },
+}
+
+# Per-(source, metric) exceptions to SOURCE_FALLBACK_SCHEME, so a monthly map keeps its annual map's colors.
+METRIC_FALLBACK_SCHEME = {
+    ("total", "generation"): "Blues",
 }
 
 # Per-source fallback for views without a pre-existing chart, so those maps are not all the same color.
@@ -725,7 +731,11 @@ def _map_config(source: str, metric: str, vmax: float | None = None, frequency: 
         elif metric == "carbon_intensity":
             scheme = {"baseColorScheme": "YlOrBr"}
         else:
-            scheme = {"baseColorScheme": SOURCE_FALLBACK_SCHEME.get(source, "YlGnBu")}
+            scheme = {
+                "baseColorScheme": METRIC_FALLBACK_SCHEME.get(
+                    (source, metric), SOURCE_FALLBACK_SCHEME.get(source, "YlGnBu")
+                )
+            }
     color_scale = dict(scheme)
     if metric == "share_of_generation":
         # Bounded metric: never leave it to grapher's automatic (ckmeans) binning, which invents
