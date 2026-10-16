@@ -104,8 +104,6 @@ def enable_structlog_filtering() -> None:
     structlog.configure(**kwargs)
 
 
-pd.set_option("future.no_silent_downcasting", True)
-
 # Environment, e.g. production, staging, dev
 ENV = env.get("ENV", "dev")
 ENV_IS_REMOTE = ENV in ("production", "staging")
@@ -312,9 +310,13 @@ TAILSCALE_ADMIN_HOST = "http://owid-admin-prod.tail6e23.ts.net"
 SENTRY_DSN = env.get("SENTRY_DSN")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
-ANTHROPIC_API_KEY = env.get("ANTHROPIC_API_KEY", None)
+# One Anthropic key per service, so each one's spend shows up separately and a leaked key can be
+# revoked without taking the others down. Both fall back to a plain ANTHROPIC_API_KEY, which is
+# what local .env files carry; production sets only the per-service keys.
+ANTHROPIC_API_KEY_INSPECTOR = env.get("ANTHROPIC_API_KEY_INSPECTOR") or env.get("ANTHROPIC_API_KEY")
+ANTHROPIC_API_KEY_CHART_CRITIC = env.get("ANTHROPIC_API_KEY_CHART_CRITIC") or env.get("ANTHROPIC_API_KEY")
 # NOTE: Nothing imports this constant, but the env var is read straight from the environment by
-# pydantic-ai's Google provider (chart-critic defaults to a Gemini model) and by scripts/vocabulary.
+# pydantic-ai's Google provider (chart-critic's --cheap model) and by scripts/vocabulary.
 GOOGLE_API_KEY = env.get("GOOGLE_API_KEY", None)
 
 OWIDBOT_ACCESS_TOKEN = env.get("OWIDBOT_ACCESS_TOKEN", None)

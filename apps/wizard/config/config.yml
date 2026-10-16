@@ -51,6 +51,14 @@ sections:
         icon: ":material/difference:"
         disable:
           production: True
+      - title: "Metadata Diff"
+        alias: metadata-diff
+        entrypoint: app_pages/metadata_diff/app.py
+        description: Review the metadata texts this branch changes, on charts, MDims and explorers
+        maintainer: "@joe"
+        icon: ":material/manage_search:"
+        disable:
+          production: True
       - title: "Anomalist"
         alias: anomalist
         entrypoint: app_pages/anomalist/app.py

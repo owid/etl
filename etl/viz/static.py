@@ -27,22 +27,37 @@ Typical use:
         tb = paths.load_dataset("population").read("historical")
         fig = build(tb, source_citation(tb["population"]))
         export_frame(paths, fig, paths.short_name, template="horizontal")
+
+A sketch outside `etl/steps` — a prototype rendered from a local data file before any ETL step
+exists (`.claude/skills/create-static-viz/reference/SKETCHING.md`) — swaps only the `paths` line
+and the loader, so promoting it to a step is a two-line edit:
+
+    from etl.viz.static import SketchPaths, TEMPLATES, apply_svg_rcparams, export_frame
+
+    paths = SketchPaths(__file__)
+
+    def run() -> None:
+        tb = load_data()  # reads the file next to the sketch
+        fig = build(tb, "Producer (2026)")
+        export_frame(paths, fig, paths.short_name, template="horizontal")
 """
 
 from __future__ import annotations
 
 from collections.abc import Iterable
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, NamedTuple
 
 import matplotlib
+import structlog
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle only matters for type checkers
     from etl.helpers import PathFinder
 
 # A template pixel is 0.72pt, and these figures are built at 100 template px per inch. Figma imports
 # at 96px/in, so a figure saved at this scale arrives 0.96x and needs one uniform rescale in
-# `/create-figma-chart` Step 7 — never a bigger `figsize`, which would put the slot conversion and
-# every point-denominated font size out by 1.39x.
+# `/owid-staff:create-figma-chart` Step 7 — never a bigger `figsize`, which would put the slot
+# conversion and every point-denominated font size out by 1.39x.
 PIXELS_PER_INCH = 100
 
 # Deterministic SVG output: without a fixed salt, matplotlib's internal ids change between runs and
@@ -107,14 +122,144 @@ def unclip(fig: Any) -> None:
         artist.set_clip_on(False)
 
 
+def name_furniture(fig: Any) -> int:
+    """Give each axes' own furniture a `<subject>__<role>` gid wherever the step has not set one.
+
+    Figma's re-import of a styled frame learns which library style each mark carries by joining
+    nodes on these names, so gridlines, ticks, tick labels and spines left with matplotlib's
+    `line2d_<n>` / `text_<n>` ids lose any style a designer bound on them. Names are keyed on the
+    tick VALUE rather than its position, so they survive a re-render that adds or drops a tick
+    (`axes__y-grid-50`, `axes__x-tick-label-2010`). The value is written to 15 significant digits, so
+    nearby large ticks stay distinct (`1000001`, not `1e+06`) while float noise such as
+    `0.30000000000000004` still reads `0.3`. A gid the step set itself is never overwritten, and a
+    name already in use in the figure gets a `-2`, `-3`, … suffix, so the SVG never repeats an id.
+    The first axes is always `axes`, and later ones are `axes2`, `axes3`, …, so adding a colorbar or
+    a twin axis in a later render leaves the first axes' names, and the bindings joined on them,
+    intact. Inset and secondary axes are named after their parent (`axes-child1__spine-left`).
+    Returns the number of artists it named.
+
+    Draws the figure once without rendering first: matplotlib builds its tick objects at draw time,
+    so ticks fetched before a draw can be replaced by fresh, unnamed ones when the figure is saved.
+    """
+    fig.draw_without_rendering()
+    named = 0
+    used = {artist.get_gid() for artist in fig.findobj() if artist.get_gid() is not None}
+
+    def name(artist: Any, gid: str) -> None:
+        nonlocal named
+        if artist is not None and artist.get_gid() is None:
+            unique, n = gid, 1
+            while unique in used:
+                n += 1
+                unique = f"{gid}-{n}"
+            artist.set_gid(unique)
+            used.add(unique)
+            named += 1
+
+    # Inset and secondary axes live in their parent's `child_axes`, not in `fig.axes`.
+    def with_children(ax: Any, subject: str) -> list[tuple[str, Any]]:
+        found = [(subject, ax)]
+        for j, child in enumerate(ax.child_axes):
+            found += with_children(child, f"{subject}-child{j + 1}")
+        return found
+
+    all_axes: list[tuple[str, Any]] = []
+    for index, ax in enumerate(fig.axes):
+        all_axes += with_children(ax, "axes" if index == 0 else f"axes{index + 1}")
+
+    for subject, ax in all_axes:
+        for side, spine in ax.spines.items():
+            name(spine, f"{subject}__spine-{side}")
+        name(ax.title, f"{subject}__title")
+        # `set_title(loc="left"|"right")` writes to separate Text artists, which matplotlib only
+        # exposes as private attributes; getattr keeps a future rename from raising.
+        name(getattr(ax, "_left_title", None), f"{subject}__title-left")
+        name(getattr(ax, "_right_title", None), f"{subject}__title-right")
+        for axis_name, axis in (("x", ax.xaxis), ("y", ax.yaxis)):
+            name(axis.label, f"{subject}__{axis_name}-label")
+            name(axis.get_offset_text(), f"{subject}__{axis_name}-offset")
+            for kind, ticks in (("", axis.get_major_ticks()), ("minor-", axis.get_minor_ticks())):
+                for tick in ticks:
+                    value = format(tick.get_loc(), ".15g")
+                    name(tick.gridline, f"{subject}__{axis_name}-{kind}grid-{value}")
+                    name(tick.tick1line, f"{subject}__{axis_name}-{kind}tick-{value}")
+                    name(tick.tick2line, f"{subject}__{axis_name}-{kind}tick2-{value}")
+                    name(tick.label1, f"{subject}__{axis_name}-{kind}tick-label-{value}")
+                    name(tick.label2, f"{subject}__{axis_name}-{kind}tick-label2-{value}")
+    return named
+
+
+# Metadata that makes an exported figure reproducible, per format. matplotlib stamps the
+# timestamp and its own version into every file, so without this an unchanged figure re-rendered
+# under a new matplotlib produces a diff with no pixel change — measured on 3.10.8 -> 3.10.9,
+# which rewrote all ten committed static_viz outputs and altered nothing but `<dc:title>` and
+# PNG `Software`. A byte diff should mean the picture changed.
+# `Title` cannot be nulled: the SVG backend type-checks it and raises on None.
+REPRODUCIBLE_METADATA: dict[str, dict[str, None]] = {
+    "svg": {"Date": None, "Creator": None},
+    "png": {"Software": None},
+}
+
+
+def save_fig(
+    directory: Path,
+    fig: Any,
+    filename: str,
+    extensions: Iterable[str],
+    *,
+    log: Any = None,
+    **kwargs: Any,
+) -> list[Path]:
+    """Save `fig` as `<directory>/<filename>.<ext>` for each extension, stripping matplotlib's stamps.
+
+    This is the save discipline `PathFinder.export_fig` applies, lifted here so a sketch outside
+    `etl/steps` gets the same reproducible output. A ``metadata`` kwarg is merged over the
+    per-format defaults rather than replacing them, so a caller can add fields without
+    re-introducing the version stamp. Returns the paths written.
+    """
+    written: list[Path] = []
+    for ext in extensions:
+        path = Path(directory) / f"{filename}.{ext}"
+        save_kwargs: dict[str, Any] = {"fname": path, "format": ext, **kwargs}
+        defaults = REPRODUCIBLE_METADATA.get(ext)
+        if defaults is not None:
+            save_kwargs["metadata"] = {**defaults, **(kwargs.get("metadata") or {})}
+        fig.savefig(**save_kwargs)
+        if log is not None:
+            log.info(f"Saved chart to {path}")
+        written.append(path)
+    return written
+
+
+class SketchPaths:
+    """`PathFinder` stand-in for a sketch that lives outside `etl/steps`.
+
+    Exposes the surface a `viz://static` step touches — `.directory`, `.short_name`, `.log` and
+    `.export_fig` — so a sketch is written in the exact shape of a step and promoting it swaps this
+    one line for `PathFinder(__file__)`. There is no DAG, no dependencies and no `load_dataset`: a
+    sketch loads its own file.
+    """
+
+    def __init__(self, __file__: str | Path):
+        self.f = Path(__file__).resolve()
+        self.directory = self.f.parent
+        # The sketch directory is the slug; the file is always `sketch.py`, so its stem says nothing.
+        self.short_name = self.directory.name
+        self.log = structlog.get_logger(sketch=self.short_name)
+
+    def export_fig(self, fig: Any, filename: str, extensions: list[str], **kwargs: Any) -> None:
+        save_fig(self.directory, fig, filename, extensions, log=self.log, **kwargs)
+
+
 def export_frame(
-    paths: PathFinder,
+    paths: PathFinder | SketchPaths,
     fig: Any,
     short_name: str,
     *,
     template: str | None = None,
     dpi: int = 300,
     unclip_first: bool = True,
+    name_furniture_first: bool = True,
 ) -> None:
     """Save one frame as the PNG/SVG pair the Figma handoff expects.
 
@@ -126,12 +271,19 @@ def export_frame(
       opaque `patch_1` in the SVG paints over it — a defect `verify_static_viz.py` does not check
       for and which looks identical in the PNG.
 
-    Both come out reproducible — `PathFinder.export_fig` strips matplotlib's version stamp — so a
-    byte diff on a committed output means the picture changed, not that matplotlib was upgraded.
+    Both come out reproducible — `save_fig` strips matplotlib's version stamp — so a byte diff on a
+    committed output means the picture changed, not that matplotlib was upgraded.
 
     `template` is optional and only validates: it asserts the figure's `figsize` matches that
     template, catching a `figsize` typo or a stray `bbox_inches="tight"` before the file is written.
+
+    The axes' own furniture is named first (`name_furniture`), so the only marks a step still has
+    to give a gid are the ones it draws itself; `verify_static_viz.py --require-named-marks` lists
+    any it missed.
     """
+    # Name first: its draw can create tick objects, and the clipping sweep has to reach those too.
+    if name_furniture_first:
+        name_furniture(fig)
     if unclip_first:
         unclip(fig)
 

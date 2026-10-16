@@ -3,6 +3,7 @@ name: develop-wizard-app
 description: Create or modify Streamlit apps in the Wizard. Use when building new wizard apps, adding Streamlit pages, or working with apps/wizard/ code.
 metadata:
   internal: true
+  owner: Marigold
 ---
 
 # Streamlit Apps in Wizard

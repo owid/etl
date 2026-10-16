@@ -839,12 +839,19 @@ def compute_title_long(col: IndicatorColumn) -> str:
     return parts["title"]
 
 
-def metadata_column_entry(col: IndicatorColumn, variable_id: int, full_metadata_url: str, today: date) -> dict:
+def metadata_column_entry(
+    col: IndicatorColumn, variable_id: int | None, full_metadata_url: str | None, today: date
+) -> dict:
     """One entry of metadata.json's "columns" object.
 
     Keys are emitted in the same order as the TS object literal, and keys whose
     value is None are dropped -- `JSON.stringify` omits undefined properties,
     so keeping them would show up as a diff against a real chart download.
+
+    `variable_id` and `full_metadata_url` are optional because a bespoke feed
+    (`etl/viz/bespoke.py`) describes garden columns, which have no variable in
+    the grapher DB to carry an id or a metadata URL; both keys then drop out
+    along with every other empty one.
     """
     entry = {
         "titleShort": col.title_public_or_display_name["title"],

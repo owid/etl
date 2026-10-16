@@ -298,6 +298,11 @@ def write_to_dag_file(
     with open(dag_file) as file:
         lines = file.readlines()
 
+    # If the file doesn't end with a line break, add one. Otherwise, the first line appended below (e.g. the comment
+    # above a new step) would be glued onto the end of the file's last line.
+    if lines and not lines[-1].endswith("\n"):
+        lines[-1] += "\n"
+
     # Separate that content into the "steps" section (always given) and the "include" section (sometimes given).
     section_steps = []
     section_include = []

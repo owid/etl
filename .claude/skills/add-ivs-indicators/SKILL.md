@@ -3,6 +3,7 @@ name: add-ivs-indicators
 description: Add new survey question codes (e.g. C001, D059, H002_01, Y022, E268, G055) to OWID's values-survey pipeline WITHOUT bumping the version — either the Integrated Values Surveys table (integrated_values_surveys, WVS+EVS merged) or the World Values Survey table (world_values_survey, WVS-only questions). Both tables live in the same ivs/<version> garden+grapher dataset. Use when the user wants to add IVS/WVS/EVS questions, extend integrated_values_surveys or world_values_survey, or says "add these codes to IVS" / "add these WVS questions".
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Add indicators to the values-survey pipeline (IVS / WVS, no version bump)
@@ -25,7 +26,7 @@ skill is identical. **Pick the target first**, then read each step with the righ
 | Stata script | `snapshots/ivs/<v>/ivs_create_file.do` | `snapshots/wvs/<wv>/wvs_create_file.do` |
 | Snapshot / meadow | `ivs/<v>/integrated_values_surveys` | `wvs/<wv>/world_values_survey` |
 | Garden code | `drop_indicators_and_replace_nans` + `sanity_checks` | `process_wvs` + `sanity_checks_wvs` (same garden file) |
-| **Missing codes** | extended-missing `.a/.b/.c/.d/.e` | **negative**: `-1` DK, `-2` NA, `-3` N/A, `-4` not asked, `-5` missing |
+| **Missing codes** | extended-missing `.a/.b/.c/.d/.e` (negatives unused) | **negative**: `-1` DK, `-2` NA, `-3` N/A, `-4` not asked, `-5` missing |
 | **DK / NA** | `.a` / `.b` | `-1` / `-2` |
 | **Keep rule** (Step 1) | `keep if var>=1` then drop `.c/.d/.e` | `keep if var>=-2 & var<.` (drops -5/-4/-3 + sysmiss) |
 | **avg_score** | `gen avg_score=var` (ext-missing auto-excluded) | `gen avg_score=var if var>=0` (exclude negative DK/NA) |
@@ -33,8 +34,8 @@ skill is identical. **Pick the target first**, then read each step with the righ
 | Reference docs | IVS Common EVS/WVS dictionary | WVS Time-Series variable list (`F00003844…xlsx`) |
 | Notion `Available` dict (Step 9) | yes | **n/a** — skip (WVS has no Notion tracker) |
 
-Find the active versions: `ls etl/steps/data/garden/ivs/` (shared garden/grapher dataset → `<v>`) and
-`ls snapshots/wvs/` (WVS snapshot/meadow → `<wv>`).
+Find the active versions: `ls etl/steps/data/garden/ivs/` (shared garden/grapher dataset → `<v>`, e.g.
+`2025-06-27`) and `ls snapshots/wvs/` (WVS snapshot/meadow → `<wv>`, e.g. `2026-06-30`).
 
 ## Why this pipeline is unusual
 
@@ -51,9 +52,6 @@ edit <ivs|wvs>_create_file.do  →  USER runs it in Stata → regenerates the cs
   → re-snapshot (same version)  →  meadow VARS_DICT  →  garden constants + checks
   →  garden .meta.yml  →  etlr (meadow→garden→grapher)  →  [IVS only: Notion Available flags]
 ```
-
-Paths below use `<v>` for the shared garden/grapher version (e.g. `2025-06-27`) and `<wv>` for the WVS
-snapshot/meadow version (e.g. `2026-06-30`).
 
 ## Reference docs (kept out of git — `*.pdf`/`*.xlsx` are git-ignored)
 
@@ -72,7 +70,7 @@ ask the user for them** (or download from worldvaluessurvey.org → *Data and do
   the EVS variable name / question number (e.g. the IVS `E158` "concern about humankind" = EVS **Q60,
   item v216** "the living conditions of all humans all over the world"). Source:
   europeanvaluesstudy.eu → *Methodology, data, documentation → Survey 2017 → full release EVS2017 →
-  participating countries → questionnaires*. Ask the user for it if it's not in the snapshot folder.
+  participating countries → questionnaires*.
 
 To find which questionnaire a code lives in, check the dictionary's WVS-7 vs EVS columns: if the **WVS-7
 variable name is blank** for that IVS code, it's EVS-only — go to the EVS questionnaire.
@@ -111,7 +109,6 @@ Key gotchas:
 - **Look-alike questions can have different scales.** H002 neighborhood frequency =
   `Very / Quite / Not / Not at all frequently`; H008_02 ("felt unsafe at home") =
   `Often / Sometimes / Rarely / Never` — don't lump them into one block.
-- **Missing codes differ by survey.** IVS: `.a` Don't know, `.b` No answer, `.c/.d/.e` excluded (negatives unused). WVS: `-1` Don't know, `-2` No answer, `-3` not applicable, `-4` not asked, `-5` missing.
 - Confirm the Q-number + verbatim wording from the **dictionary** + **questionnaire** (see Reference docs).
 
 For the user-facing wording, prefer the fuller **questionnaire** text; for the answer/category names the
@@ -229,7 +226,7 @@ from owid.catalog.core.utils import underscore   # owid.catalog.utils path is de
 suffix = underscore("Information source daily newspaper")  # -> "information_source_daily_newspaper"
 ```
 
-(apostrophes are dropped, hyphens → `_`; a colon would leave a double `__`, so keep labels colon-free.)
+(apostrophes are dropped, hyphens → `_`; for colons see Step 3.)
 
 **`avg_score` and the `replace(0, NaN)` step.** Only indices where **0 is a genuine value** need to be
 excluded from the 0→null replacement (`WELZEL_EQUALITY_INDEX_COLUMNS`, the 0–1 Welzel index). An ordinary
@@ -256,8 +253,7 @@ N-point numeric scale state the anchored range instead (e.g. `on a scale from 1 
 `never_just_agg_*`, …), each individual category, and the `dont_know` / `no_answer` / `avg_score` columns —
 they all carry the same possible-answer clause; only the measured-response part differs. Pull the exact
 option wording from the `.dta` value labels (verify per Step 0), never from memory — e.g. WVS D066_01's
-fifth point is literally `Disagree strongly`, and F114E labels only the 1 and 10 endpoints. Same rule for
-IVS and WVS. This is a rule for **new** indicators you add — apply it as you write each entry.
+fifth point is literally `Disagree strongly`, and F114E labels only the 1 and 10 endpoints. This is a rule for **new** indicators you add — apply it as you write each entry.
 
 Do **not** attempt an automated bulk back-fill of the possible-answers clause across the *existing* IVS
 indicators. Most already convey their answers (often inside the question quote, e.g. important-in-life ends
@@ -266,12 +262,11 @@ redundant; and mapping an existing `shortName` back to its source `.dta` code is
 collide (`*_democratic_political_system` is E117, not the 1–10 E236 `*_democratic`; `*_secure_neighborhood`
 is the H001 security scale, not the G007_18_B neighborhood-*trust* scale), and value-label wording can
 diverge from the pipeline's recode wording (E124 human-rights: labels say "There is a lot of respect…" while
-the columns use "a great deal of respect…"). It was tried once and deliberately skipped for these reasons.
+the columns use "a great deal of respect…").
 
 **Keep IVS and WVS at metadata parity.** Any `description_short` house-style or convention you apply to one
-table's indicators, apply to the other's too — e.g. the possible-answers clause above was added to both the
-IVS and WVS blocks. When you improve or restyle the IVS metadata, mirror the change on WVS (and vice-versa)
-so the two blocks stay consistent, differing only in the survey-specific anchors (`*_wvs`) and the question
+table's indicators, apply to the other's too (e.g. the possible-answers clause above), so the two blocks
+stay consistent, differing only in the survey-specific anchors (`*_wvs`) and the question
 wording.
 
 Canonical shape of a variable entry (a WVS entry = the IVS entry **plus** the three `*_wvs` override lines;
@@ -363,15 +358,14 @@ with any IVS title (or vice-versa). WVS shares many concepts with IVS (worries, 
 `--grapher` upload (`_adapt_table_for_grapher`), *not* at the garden build, so a clash sails through
 `check_sum_100` and only explodes at upload (`AssertionError: Variable titles are not unique`). The trap: an
 **aggregate** and a **category** that describe the same thing collide on title even when their column names
-differ. Real
-example from this work — the closeness category `close_*` and the high aggregate `feel_close_*` both wanted
+differ. For
+example, the closeness category `close_*` and the high aggregate `feel_close_*` both wanted
 `title: "Feel close to X"`. Fix: disambiguate the aggregate `title` (`"Feel close to X (very close or
-close)"`) and keep the short label in `display.name` (only `title` must be unique — `display.name` may
-repeat). **Assert title uniqueness in the pre-flight** (Step 6), don't wait for the upload to catch it:
+close)"`) and keep the short label in `display.name`. **Assert title uniqueness in the pre-flight** (Step 6), don't wait for the upload to catch it:
 `titles=[e["title"] for e in vars.values()]; assert len(titles)==len(set(titles))`.
 
-**Audit gotcha:** verify any stated scale range against the actual `.do` recode — a pre-existing entry had
-`"6 to 10"` where the recode was `>= 7`. Don't copy ranges blindly.
+**Audit gotcha:** verify any stated scale range against the actual `.do` recode — an existing entry can
+say `"6 to 10"` where the recode is `>= 7`. Don't copy ranges blindly.
 
 ### Topic tags — assign per indicator, from the curated enum
 
@@ -385,7 +379,7 @@ repeat). **Assert title uniqueness in the pre-flight** (Step 6), don't wait for 
 with a `create_links.missing_tags` warning. Check every tag against the enum before writing it (see the
 Step 6 assertion).
 
-IVS spans many topics, so **do not** leave the whole dataset on one tag (the legacy default was a single
+IVS spans many topics, so **do not** leave the whole dataset on one tag (e.g. a single
 `topic_tags: [Trust]` in `definitions.common`). Tag per indicator:
 
 - **Anchor per distinct tag-set under `definitions`** (the `undp_hdr.meta.yml` idiom), referenced per
@@ -424,7 +418,7 @@ IVS spans many topics, so **do not** leave the whole dataset on one tag (the leg
 
 **Sweep the untagged pool against the FULL enum — many items have a non-obvious nearest-fit page.** Don't stop
 at the obvious group→tag map. Print the whole `topic_tags` enum and walk each remaining untagged question
-against it; surprisingly specific pages exist. Real matches found this way (2026-06-03): justifiable
+against it; surprisingly specific pages exist. Examples of matches found this way: justifiable
 `suicide`→`Suicides`, `political_violence`→`War & Peace`, `parents_beating_children`→`Violence Against Children
 & Children's Rights`, `man_beating_wife`→`Women's Rights`, `invitro_fertilization`→`Fertility Rate`; neighbours
 `immigrant_foreign_workers`→`Migration`, `aids`→`HIV/AIDS`, `drug_addicts`/`drug_sale_in_streets`→`Illicit Drug
@@ -451,10 +445,7 @@ ones to the user instead of auto-tagging.
 nothing, remove it from `definitions` so no dead anchors linger.
 
 **Tag edits are metadata-only — the `data://grapher` dataset must be rebuilt or the DB won't update** (see
-Step 7's gotcha): `etlr grapher://… --grapher --force --only` alone re-uploads the **stale** built dataset and
-every variable is `skipped_no_changes`. Rebuild `data://grapher` (delete its output dir if unsure), then upload,
-then verify links landed in `tags_variables_topic_tags`. It's normal and fine to leave a large share untagged
-when no page fits (values/morality batteries, generic crime-fear, traditional media) — don't force a bad tag.
+Step 7's gotcha).
 
 ## Step 6 — Pre-flight cross-check (before running the pipeline)
 
@@ -508,7 +499,7 @@ single pipeline step runs.
 
 - **Two separate gates:** the build (first command) runs `check_sum_100` in garden (green = recodes sum to
   100%). The `--grapher` upload (second command) runs additional grapher-only validations — notably
-  **title uniqueness** — so always run it too; a title clash only surfaces here. Don't stop at the build.
+  **title uniqueness** (see Step 5) — so always run it too. Don't stop at the build.
 - Spot-check ranges by loading the garden dataset: share columns 0–100; each `avg_score` on its native
   scale (frequency 1–5, closeness 1–4, agree 1–10, index 0–1).
 - The benign `DisplayNameWarning` about `presentation.title_public` (1000+ columns) is expected — IVS
@@ -594,8 +585,8 @@ It works in three moves, all auto-derived:
 Three **optional** dicts in CONFIG add editorial polish without reintroducing hardcoded indicators:
 `TOPICS = {"Human Rights": ["E124", ...], ...}` (group/order rows), `LABELS = {code_or_suffix: "…"}`
 (nicer question wording), and `CODE_FOR = {custom_suffix: "IVS_CODE"}` (give custom blocks like
-`humankind`→`E158`, `science_world`→`E234`, `secure_neighborhood`→`H001` their real code). PR #6180's
-output used all three; with them empty you still get a complete, correct table.
+`humankind`→`E158`, `science_world`→`E234`, `secure_neighborhood`→`H001` their real code). With them
+empty you still get a complete, correct table.
 
 **Staging vs production differ only in the DB connection + admin base** (the script switches on `ENV`):
 - **Staging** (`ENV="staging"`): container = `staging-site-<branch normalised & truncated to 28 chars>`

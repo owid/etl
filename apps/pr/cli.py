@@ -796,7 +796,8 @@ CLEAN_HELP = """Clean up local branches whose pull request was merged or closed 
 
 Lists every local branch whose latest GitHub PR is **merged** or **closed** (using GitHub's PR
 state, not `git branch --merged`, so squash-merges are detected). Branches that have a git worktree
-are flagged with `<- worktree`. Pick a single branch, or `all`, and the tool will:
+are flagged with `<- worktree`. Pick a single branch, `all`, `all merged`, or `all closed`, and the
+tool will:
 
 1. (Worktree branches only) Check the worktree for uncommitted changes that would block
    `git worktree remove` — modified tracked files or untracked files, not counting `--share-data`'s
@@ -825,6 +826,14 @@ repo can clean every worktree anyway, so just `cd` there first.
 etl pr-clean
 ```
 """
+
+
+# Sentinel values for the pr-clean bulk-selection choices. Plain objects, not strings, so they can
+# never collide with an actual branch name -- git allows branch names like "__all_merged__", which
+# a string sentinel would be indistinguishable from when selected.
+_CLEAN_ALL = object()
+_CLEAN_ALL_MERGED = object()
+_CLEAN_ALL_CLOSED = object()
 
 
 @click.command(
@@ -887,15 +896,19 @@ def clean_cli() -> None:
         if b in worktrees and worktrees[b] != main_worktree_path
     }
 
-    # Build the selection list ('all' first, then one entry per branch).
-    choices = [questionary.Choice(title="all", value="__all__")]
+    # Build the selection list ('all' / 'all merged' / 'all closed' first, then one entry per branch).
+    choices = [
+        questionary.Choice(title="all", value=_CLEAN_ALL),
+        questionary.Choice(title="all merged", value=_CLEAN_ALL_MERGED),
+        questionary.Choice(title="all closed", value=_CLEAN_ALL_CLOSED),
+    ]
     for branch in sorted(cleanable):
         choices.append(
             questionary.Choice(title=_branch_label(branch, cleanable[branch], worktrees, dirty), value=branch)
         )
 
     selected = questionary.select(
-        message="Select a branch to clean (or 'all')",
+        message="Select a branch to clean (or 'all' / 'all merged' / 'all closed')",
         choices=choices,
         style=SHELL_FORM_STYLE,
         instruction="(Use arrow keys, Enter to confirm)",
@@ -904,7 +917,11 @@ def clean_cli() -> None:
     if selected is None:
         return
 
-    branches_to_clean = sorted(cleanable) if selected == "__all__" else [selected]
+    branches_to_clean = resolve_branches_to_clean(selected, cleanable)
+    if not branches_to_clean:
+        state = {_CLEAN_ALL_MERGED: "merged", _CLEAN_ALL_CLOSED: "closed"}[selected]
+        print(f"Nothing to clean: no local branch has a {state} PR.")
+        return
 
     main_project_dir = claude_project_dir(main_worktree_path)
 
@@ -916,6 +933,22 @@ def clean_cli() -> None:
             main_project_dir=main_project_dir,
             main_worktree_path=main_worktree_path,
         )
+
+
+def resolve_branches_to_clean(selected: object, cleanable: dict[str, str]) -> list[str]:
+    """Expand a questionary selection into the sorted list of branches to clean.
+
+    `selected` is either one of the `_CLEAN_ALL*` sentinels or a branch name (`str`) chosen
+    directly -- sentinels, rather than string markers like "__all__", so a real branch that
+    happens to be named that can never be mistaken for the bulk choice.
+    """
+    if selected is _CLEAN_ALL:
+        return sorted(cleanable)
+    if selected is _CLEAN_ALL_MERGED:
+        return sorted(b for b, s in cleanable.items() if s == "merged")
+    if selected is _CLEAN_ALL_CLOSED:
+        return sorted(b for b, s in cleanable.items() if s == "closed")
+    return [selected]  # ty: ignore
 
 
 def get_main_worktree_path(repo) -> Path:

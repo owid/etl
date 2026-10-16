@@ -57,14 +57,17 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
   `fill: #ffffff` is the bug.
 - **`gid=` on every artist**, so the layer panel reads `boys__median` rather than `Path 41`.
   Grapher does exactly this with `makeFigmaId` (`packages/@ourworldindata/utils/src/Util.ts`).
-  Use `<subject>__<role>` so the names sort into groups. **The verifier cannot enforce this clause on
-  its own, so name the layers and pass them.** It fails an SVG carrying no deliberate name at all,
-  but it cannot tell which artists *ought* to have been named: matplotlib emits `line2d_<n>` groups
-  for every tick mark exactly as it does for an unnamed data line, so "no generated ids left" is not
-  a test any correct figure would pass. Give it the data layers explicitly and the contract becomes a
-  real check rather than a presence check — otherwise a figure whose title is named and whose plotted
-  line is not still reports `OK`. Pass them as
-  `--expect-gid boys__median --expect-gid girls__median`.
+  Use `<subject>__<role>` so the names sort into groups. The names are also what Figma's re-import
+  (`restyle_static_import.js` with `inheritStyles`) joins on to carry a designer's style bindings
+  onto a fresh render, so an unnamed mark loses its binding. `export_frame` names each axes' own
+  furniture (gridlines, ticks, tick labels, spines, axis labels) by tick value wherever the step has
+  not, which leaves only what the step draws itself, and those it must name. **Verify with
+  `--require-named-marks`**, which fails on any painted mark under no `<subject>__<role>` gid and
+  names its matplotlib id (`text_7`), so the artist to fix is the one it lists; it also fails when
+  two artists share a `<subject>__<role>` gid, since the re-import cannot tell them apart (a `gid=`
+  passed to `ax.bar` lands on every bar, so name each bar from the returned container). Pass the
+  data layers as well (`--expect-gid boys__median --expect-gid girls__median`): the naming check proves every mark
+  has *a* name, the expected gids prove the data layers have the *right* one.
 - **Do not pass `bbox_inches="tight"`** when the frame must match a template — cropping to content
   changes the proportions, which is the whole thing the template fixes. `export_fig` already
   injects `metadata={"Date": None}` on the SVG pass for reproducible diffs.
@@ -140,7 +143,7 @@ This matters because probing the wrong one leads to both available wrong answers
 Measured on macOS (matplotlib 3.10.9, Lato absent, Arial installed): `findfont()` on either stack
 emits **zero** warnings, and rendering with the rcParams stack emits zero as well — but rendering text
 through `FontProperties(family=MEASURED_FONT_STACK)`, which is what a step's own measurements do,
-emits one per missing face. A real run of the OECD time-use step produced **724** of them, all
+emits one per missing face. A single step run can produce hundreds of them, for example for
 `Liberation Sans` — a face that earns its place, being the metric-compatible Arial substitute on Linux
 and absent on a Mac. So the noise is real; a blanket `setLevel(logging.ERROR)` is still wrong, because
 it takes `Falling back to DejaVu Sans` with it, and that one says a stack failed and every measurement
@@ -172,8 +175,8 @@ prop = FontProperties(family=MEASURED_FONT_STACK, size=fontsize, weight="bold" i
 
 **Set the emitted stack again after seaborn**, inside the build function — `set_style` REPLACES
 `font.sans-serif` with its own list, so the module-level assignment above is overwritten and the step
-emits a stack it never chose (which is how one step came to ship `'Arial', 'DejaVu Sans', 'Liberation
-Sans', 'Bitstream Vera Sans'`):
+emits a stack it never chose (seaborn's `'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera
+Sans'`):
 
 ```python
 sns.set_style("ticks")
@@ -183,9 +186,9 @@ matplotlib.rcParams["font.sans-serif"] = EMITTED_FONT_STACK
 
 Naming Lato first costs nothing and buys a lot downstream: **Figma renders the import in the
 template's own typeface on arrival**, so the parked reference copy looks like the deliverable, and
-`/create-figma-chart`'s font pass — plus the anchor pass that exists only to undo that face change —
+`/owid-staff:create-figma-chart`'s font pass — plus the anchor pass that exists only to undo that face change —
 becomes a no-op. Without it Figma resolves none of `Arial, Helvetica, DejaVu Sans` and substitutes
-**Inter**, which is wider: one 850-wide chart overran its canvas by 39px that way. Verify it rather
+**Inter**, which is wider — enough for an 850-wide chart to overrun its canvas by tens of px. Verify it rather
 than assuming — the emitted stack is one grep, and the faces the import lands in are one read:
 
 ```bash
@@ -193,12 +196,10 @@ grep -o "font-family: [^;\"]*" <file>.svg | sort -u   # want 'Lato' first
 ```
 
 Changing the stack must not move anything: the drawn font is unchanged, so the SVG should differ from
-its predecessor **only** in `font-family`, and the PNG not at all (measured: 0 pixels differing).
+its predecessor **only** in `font-family`, and the PNG not at all.
 
 Then check which font `findfont` actually returned before trusting the per-face allowances in
-[TEMPLATES.md](../TEMPLATES.md) — they are per installed font, and the bold row is not a rounding of
-the regular one (Arial Bold sets 6.6% wider than Lato Bold, which is enough to make a mixed-weight
-footer row fail its own step's fit assertion while setting correctly in the frame).
+[TEMPLATES.md](../TEMPLATES.md) — they are per installed font.
 
 ### Style, and where it stops
 
@@ -240,7 +241,7 @@ outermost ticks** (`set_xlim(first_tick, last_tick)`) so those two marks sit at 
 and close it. Leave the y-axis lineless either way.
 
 **Check the source claim against a rendered SVG before you build on it.** Grepping for a component
-that doesn't exist is weak evidence about what the chart *looks like*: it told me grapher draws no
+that doesn't exist is weak evidence about what the chart *looks like*: it suggests grapher draws no
 axis line, when in fact every zero-crossing chart appears to have one. One fetch settles it —
 `curl` a grapher SVG and read the `horizontal-axis` group, which lists exactly `tick-marks` and
 `tick-labels` and nothing else:
@@ -265,7 +266,7 @@ ax.yaxis.get_gridlines()[0].set_visible(False)   # the baseline already draws th
 
 **A grapher-style axis costs vertical space in two places, and both reserves have to grow.** Tick marks
 with a length push the tick labels and the axis label down — enough to overrun a reserve that fitted
-when the ticks were zero-length, which put the axis label's descenders into the note. And facet titles
+when the ticks were zero-length, which can put the axis label's descenders into the note. And facet titles
 above the plot need `font size + 0.5 line` of their own, taken off the top of the plot rather than out
 of the frame. Re-measure both reserves after adding either.
 
@@ -276,8 +277,7 @@ the value is one the note mentions.
 
 **The x range and the label anchoring interact — set the range first.** Anchoring the first tick label
 left will collide with its neighbor while the range still carries padding, because padding compresses
-the left end; pinned to the ticks, the same anchoring has room (measured: 6.7px clear on desktop,
-25px on mobile). So when an anchor "doesn't fit", re-check it after any range change instead of
+the left end; pinned to the ticks, the same anchoring has room. So when an anchor "doesn't fit", re-check it after any range change instead of
 concluding it can't be done — and measure the gap rather than eyeballing the render.
 
 - **Nested bands get precomputed flat tints, not alpha.** One `BAND_ALPHA` deepening where the bands
@@ -292,7 +292,7 @@ concluding it can't be done — and measure the gap rather than eyeballing the r
       return tuple(c + (1.0 - c) * weight for c in to_rgb(color))
   ```
   If a key does show swatches, they must carry the **same** tints in the **same** order, or it reads
-  inside out against the chart. (With alpha the equivalent trap was a swatch showing the per-band
+  inside out against the chart. (With alpha the equivalent trap is a swatch showing the per-band
   alpha rather than the cumulative `1-(1-a)**(i+1)`.)
 - Reference lines labeled *on the plot* get a **bold title above a regular-weight value** via
   `AnnotationBbox` / `TextArea` / `VPacker`. Where an encoding diagram already names the line, label
@@ -309,7 +309,7 @@ belongs to; an exemplar shows the structure directly, in the order it appears.
 **Shape the miniature like the chart, not like a swatch.** A flat slab still asks the reader to map a
 rectangle onto a rising ribbon; a miniature that curves the way the real marks curve is recognised
 without that step. Draw it as a **schematic, not a data slice** — at the real proportions the marks
-are a few pixels apart where the labels have to attach (3–5px at the last age, on this chart), so widen
+are often only a few pixels apart where the labels have to attach (3–5px), so widen
 the bands until the parts separate, and keep only the relationships that carry meaning (which band is
 inside which, and where the threshold falls between them).
 
@@ -359,9 +359,9 @@ Three traps when the same drawing serves two hosts:
   and 2 px in a 76 px strip. Any offset that has to look the same in both must be a parameter.
 - **Text does not scale with the box.** Shrinking a container shrinks its shapes but not its
   absolute-point-size labels, so a block that fits at one size overflows at another.
-- **A wide, short host flattens the drawing, and height is what fixes it.** The same miniature that
-  read as a curve in a near-square panel came out 142px wide against 72px of ink in a 92px header row
-  and lost the shape it exists to convey. Compare the host's aspect against the one the drawing was
+- **A wide, short host flattens the drawing, and height is what fixes it.** A miniature that
+  reads as a curve in a near-square panel can come out flattened in a wide, short header row and
+  lose the shape it exists to convey. Compare the host's aspect against the one the drawing was
   tuned for, and buy the height from **inside** the block's own budget — where the block's top and
   bottom are both fixed, a taller key costs plot height and leaves the frame's fit untouched.
 
@@ -378,16 +378,33 @@ with its labels (`Note:`, `Data source:` — singular — the exact tagline and 
 - A caveat about **what the chart claims** cannot go. Move it into the subtitle, which mobile does
   have. Dropping it silently reintroduces an over-claim.
 
+**Write a caveat in the chart's own categories, and check it against the producer's mapping.** A
+country note copied from the source's terms ("counts as unpaid work") can turn false once the chart
+merges or renames categories. Read where the source actually files the data (its activity or category
+mapping sheet, not a summary), then say where it lands among the categories the reader sees. And check
+whether it moves anything the reader can see: a quirk that leaves the affected bar within the range of
+its peers is better covered by a general comparability sentence than by naming one country.
+
+**Leave off an entity the producer flags as not comparable, rather than footnoting it,** when it would
+otherwise rank prominently. A footnote on the second-ranked row still lets the bar make its claim.
+Drop it in the viz step, not in garden, since the data stays valid for other uses, and assert it is
+present before dropping, so a rename upstream fails loudly.
+
+**Say when an average includes people or days with none of the activity.** A per-person average over a
+whole population and all seven days reads, unexplained, as the typical participant's figure ("only 3
+hours of paid work"). If the Note has room for one more sentence, this is the one that prevents the
+most common misreading.
+
 **The step and the template will not agree on how many lines a string takes, and the step is the one
-that reserves the space.** The step measures its own type — 10.5pt here — while the template renders
+that reserves the space.** The step measures its own type — 10.5pt, say — while the template renders
 the same string at the slot's size, 16px for a subtitle on the 850- and 540-wide templates. Those wrap
 differently, so the line counts can differ, and the step is reserving the chart area against the wrong
 one. It cannot be fixed from the step: it deliberately sets no fonts, so it cannot measure Lato.
 
 What this costs is a surprise on the *next copy edit*, not on the first build. Adding a single
-character — an Oxford comma, in the case that found this — tipped a mobile subtitle from three lines
-to four in the template while the step still reserved three, and the chart's topmost label then sat
-above the header's last line. So after **any** change to a title, subtitle or note, re-read the
+character — an Oxford comma, say — can tip a mobile subtitle from three lines to four in the
+template while the step still reserves three, and the chart's topmost label then sits above the
+header's last line. So after **any** change to a title, subtitle or note, re-read the
 template slot's height in Figma rather than trusting the step's own wrap, and check the header
 clearance on the frame.
 
@@ -414,8 +431,8 @@ wrong number is worse than either the accurate awkward one or the honest qualita
 survives review precisely because it looks like a summary rather than a claim.
 
 **A series that traces another for most of the range is redundant, not informative.** Repeating one
-panel's median in the other, to show a crossover, put a second line within a few millimetres of the
-first from birth to age 9 — re-drawing the same information across two thirds of the chart, which is
+panel's median in the other, to show a crossover, can put a second line within a few millimetres of
+the first for most of the range — re-drawing the same information across most of the chart, which is
 the doubling that splitting the panels was meant to remove. Prefer stating the fact in the subtitle and
 letting the reader compare panels at a shared gridline. Check any "for context" series this way: plot
 the two and measure where they actually diverge before deciding it earns its ink.
@@ -432,13 +449,25 @@ Four decisions, each settled by measuring rather than by taste:
   it belongs to, and a residual bucket can shorten to `Other` because the bracket already supplies the
   category. Derive that short form rather than renaming the groups, so the full name survives for
   layouts where a group stands alone. Stack them all even where one would fit on a single line; a
-  mixture reads as several different treatments.
+  mixture reads as several different treatments. Keep it to one `Other` per key, though: two, under
+  different categories, read as the same bucket. Where a category's own name already says "& other",
+  drop its residual from the list rather than renaming the other category's.
+- **Size a header band by its tallest block, not by adding the maxima of its parts.** Where each
+  category's name sits on its own list, bottom-aligned over the bars, the band is the largest
+  list-plus-name of any one category. Adding the deepest list to the tallest name counts two
+  different categories as soon as those maxima fall in different blocks, which an edit that shortens
+  one list (dropping a member) brings about without anything else changing, and the band then carries
+  a line of air above every heading.
+- **Set an inline member list in sentence case, and keep a capital per line in a stacked one.** A list
+  run together after its category name ("Paid work, commuting, homework") is a phrase, and the style
+  guide sets phrases in sentence case. Stacked one per line, each name is a label and keeps its
+  capital. So a desktop key and its mobile row legend can differ here, by design. Abbreviations
+  ("TV") keep their capitals in either.
 - **Labelling every segment in place, with leaders, is rarely worth what it costs — and whether it is
   even possible is a property of the data.** The row you point at decides it, and no amount of vertical
   room rescues a row whose narrowest segment leaves no corridor, because the obstruction is horizontal.
   If you attempt it, place the hardest label first and expect the dataset's narrowest segment to be the
-  binding constraint. (Built in full for the time-use refresh, then deleted: it read no better than
-  brackets.)
+  binding constraint. (Built in full, it typically reads no better than brackets.)
 - **Rank rows by something the reader can verify.** A key whose segment is a few pixels wide cannot be
   checked against the chart, ties a large share of rows once rounded, and imports whatever survey
   artifact that category carries. Rank by a wide category, keep the key in one constant so the
@@ -466,6 +495,12 @@ step's own render:
   of a bar high — small enough to survive review and plainly visible once someone looks for it. Place
   the baseline half a cap-height below the row's centre (`TextPath((0,0), "0").get_extents().ymax`),
   which also puts labels with and without descenders on one line.
+- **Reserve a block that opens or closes the band from its ink, not its line boxes.** The band's inset
+  is meant to be what a reader sees, but a block reserved as `rows × line height` and centred row by row
+  starts half a line box minus half a cap height (or half a swatch) below where its space begins, so
+  every frame it sits on gets that much extra air. Start the block where its first row's ink starts, and
+  take the same amount off its reserved height. The same holds for a stacked header measured to its
+  tallest line box.
 - **Draw a multi-line label as one call per line.** A `"Total\nleisure"` passed to a single `ax.text`
   gets no `text-anchor` at all: matplotlib centres each line by baking a different `translate` into
   it, using its own metrics. So the lines arrive as independent left-anchored boxes that lose their

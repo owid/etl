@@ -257,7 +257,7 @@ REGIONS = {
             "Other Europe (EI)",
         ],
     },
-    # NOTE: There is also "Other S. & Cent. America" (renamed "Other South and Central America (EI)"). This cannot be mapped to either North America or South America. We simply keep it as a separate entity. This means we may be underestimating South America and North America, but not by a significant amount. To correct for this issue, on indicators where "Other South and Central America (EI)" becomes significant compared to South America, we remove the aggregate for South America (and idem for North America).
+    # NOTE: "Other South and Central America (EI)" spans both North and South America, so it is assigned to neither. See FINER_REGIONS_OF_OTHER_SOUTH_AND_CENTRAL_AMERICA.
     "South America": {
         "additional_members": [
             "Other South America (EI)",
@@ -279,6 +279,15 @@ REGIONS = {
     "Lower-middle-income countries": {},
     "Upper-middle-income countries": {},
     "High-income countries": {},
+}
+
+# "Other South and Central America (EI)" is the sum of three finer regions that REGIONS already assigns: "Other South
+# America (EI)" to South America, and "Other Caribbean (EI)" and "Central America (EI)" to North America. In a column
+# where a continent's own finer regions are reported, every country of that continent is already in its aggregate, so
+# fix_issues_with_other_regions must not remove it there.
+FINER_REGIONS_OF_OTHER_SOUTH_AND_CENTRAL_AMERICA = {
+    "South America": ["Other South America (EI)"],
+    "North America": ["Other Caribbean (EI)", "Central America (EI)"],
 }
 
 # Regions that don't need to be included as part of other region aggregates (unlike, e.g. "Other Africa (EI)", which needs to be added to "Africa").
@@ -597,9 +606,32 @@ def fix_issues_with_other_regions(tb: Table) -> Table:
     # Remove aggregates in columns for which an overlapping "Other *" region has a significant contribution, compared to the aggregate.
     for other_region, owid_regions in ei_regions_and_overlapping_owid_regions.items():
         tb_other = tb[(tb["country"] == other_region)].fillna(0).reset_index(drop=True)
+        if other_region == "Other South and Central America (EI)":
+            # Subtract the finer regions that are reported, so that only the part not yet assigned to any continent is
+            # compared below.
+            finer_regions_all = sum(FINER_REGIONS_OF_OTHER_SOUTH_AND_CENTRAL_AMERICA.values(), [])
+            reported = tb[tb["country"].isin(finer_regions_all)].drop(columns=["country"]).groupby("year").sum()
+            reported = reported.reindex(tb_other["year"]).fillna(0).reset_index(drop=True)
+            tb_other[reported.columns] = (tb_other[reported.columns] - reported).clip(lower=0)
         for continent in owid_regions:
+            # Columns where the continent's own finer regions are reported, so nothing of it is missing.
+            finer_regions = []
+            if other_region == "Other South and Central America (EI)":
+                finer_regions = FINER_REGIONS_OF_OTHER_SOUTH_AND_CENTRAL_AMERICA[continent]
+            covered = set()
+            if finer_regions:
+                reported = (
+                    tb[tb["country"].isin(finer_regions)]
+                    .drop(columns=["year"])
+                    .groupby("country", observed=True)
+                    .count()
+                )
+                if len(reported) == len(finer_regions):
+                    covered = {column for column in reported.columns if (reported[column] > 0).all()}
             tb_continent = tb[(tb["country"] == continent)].fillna(0).reset_index(drop=True)
             for column in tb.drop(columns=["country", "year"]).columns:
+                if column in covered:
+                    continue
                 remove_aggregate = False
                 # Define the minimum magnitude of values that we care about (the indicator's range in the continent divided by fraction_of_range).
                 min_range = (tb_continent[column].max() - tb_continent[column].min()) / fraction_of_range
@@ -836,6 +868,16 @@ def sanity_check_outputs(tb: Table) -> None:
         f"its sources ({sources_sum:.1f} EJ); deviation is {deviation:.1f}%."
     )
 
+    # For hydro, solar and wind, the producer's energy figure is its electricity generation (its method applies no
+    # conversion efficiency to them), so the two columns must agree wherever both are reported.
+    for source in ["hydro", "solar", "wind"]:
+        energy, electricity = tb[f"{source}_consumption_twh"], tb[f"{source}_electricity_generation_twh"]
+        informed = energy.notna() & electricity.notna()
+        off = tb[informed & ((energy - electricity).abs() > (1e-3 * energy.abs()).clip(lower=0.01))]
+        assert off.empty, f"{source}: energy and electricity generation disagree for: " + "; ".join(
+            f"{row['country']} {row['year']}" for _, row in off.iterrows()
+        )
+
     # Region aggregates should have been created.
     expected_regions = {"Africa", "Asia", "Europe", "North America", "South America", "Oceania"}
     missing_regions = expected_regions - set(tb["country"])
@@ -880,6 +922,13 @@ def run() -> None:
 
     # Sanity-check the output data.
     sanity_check_outputs(tb=tb)
+
+    # Keep only the producer's regions that our regions dataset defines (so that charts can show what they contain),
+    # plus OECD and OPEC. The rest ("Other Africa (EI)", "Non-OECD (EI)", ...) were needed as inputs to the aggregates
+    # above, and the meadow table keeps them.
+    is_ei_region = tb["country"].str.endswith("(EI)")
+    is_kept = tb["country"].isin(set(paths.regions.tb_regions["name"]) | {"OECD (EI)", "OPEC (EI)"})
+    tb = tb[~is_ei_region | is_kept].reset_index(drop=True)
 
     # Convert gas reserves from trillion cubic meters to cubic meters. Done here rather than in the
     # grapher step because it changes the values, and it is the unit every consumer wants: the

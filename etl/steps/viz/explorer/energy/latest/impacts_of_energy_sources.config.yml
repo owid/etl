@@ -15,6 +15,7 @@ config:
   explorerSubtitle: Explore the environmental and health impacts of electricity sources.
   isPublished: true
   entityType: source
+  entityTypePlural: sources
   hasMapTab: false
   hideAlertBanner: true
   hideAnnotationFieldsInTitle: true

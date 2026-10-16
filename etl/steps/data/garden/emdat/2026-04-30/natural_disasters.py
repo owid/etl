@@ -1,6 +1,14 @@
 """Process and harmonize EM-DAT natural disasters dataset.
 
 NOTE: Some of the processing is related to inflation adjustments, which we decided to not use in the end. See further comments on this topic below.
+
+NOTE: The most recent years in each snapshot are incomplete, and this step keeps them as they are. EM-DAT adds many events
+months after they happen (extreme temperature events typically about a year later), so the latest full year has too few
+events (e.g. in the 2026-04-30 snapshot, 2025 had 1 extreme temperature event, against 40-50 in 2022-2024). The snapshot
+also contains the first months of the year it was downloaded in. The charts and MDims cap their timeline at the last full
+year (see LAST_FULLY_REPORTED_YEAR in etl/steps/viz/chart/natural_disasters/latest/shared.py, and timelineMaxTime in the
+admin-authored charts), and their footnotes warn about the lag. Update both on every snapshot update. Decadal averages
+for the current decade do include the partial year.
 """
 
 import datetime

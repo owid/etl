@@ -1,18 +1,22 @@
 """Daily digest: review the charts that changed yesterday, and say something only if it matters.
 
-Selection is deliberately narrow. Charts whose **configuration** changed are ~17 a day, which is
-a sweep that costs cents and finishes in a minute. Charts whose **data** was refreshed are ~105 a
-day but 3,138 over a week, because one dataset update touches thousands at once — reviewing those
-is available behind ``--include-data-updates`` and is a different job, needing a much larger cap
-and much harder deduplication.
+Selection is deliberately narrow: charts a person **edited**, which is usually a few dozen a day
+and a sweep that finishes in minutes. Charts whose **data** was refreshed are ~105 a day but 3,138
+over a week, because one dataset update touches thousands at once — reviewing those is available
+behind ``--include-data-updates`` and is a different job, needing a much larger cap and much harder
+deduplication.
 
 Three things keep the digest worth reading, and all three are about restraint:
 
-- **It deduplicates by indicator, not by chart.** One bad column of one ETL step produced the same
-  finding on three separate charts; a dataset refresh would produce it on hundreds.
-- **It remembers what it has posted**, and remembers it by what the claim says rather than by how
-  it was worded — the model rewords freely, and a state file keyed on the sentence let day two
-  repeat day one anyway. Without either, the channel learns to skip the digest inside a week.
+- **It deduplicates by indicator as well as by chart.** One bad column of one ETL step produced the
+  same finding on three separate charts; a dataset refresh would produce it on hundreds. And one
+  chart is one post whatever is wrong with it: a defect in its text and a defect in its data are
+  not two things to a reader who opens it.
+- **It remembers which charts it has posted**, and does not post the same chart or indicator
+  again for a week. Recognising the same *claim* across days was tried first, by comparing the
+  words of the two claims, and the model rewords too freely for that: a finding ticked on Monday
+  came back reworded on Tuesday after the chart was edited. A chart already under review does not
+  need a second post to say so. Without either, the channel learns to skip the digest inside a week.
 - **It says nothing when there is nothing.** No daily heartbeat. A digest that only speaks when it
   has something is one people keep reading.
 """
@@ -23,14 +27,14 @@ import functools
 import json
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any
 
 from slack_sdk.errors import SlackClientError
 from structlog import get_logger
 
 from apps.chart_critic.bundle import GRAPHER_URL
-from apps.chart_critic.critic import claim_tokens, format_views, same_claim
+from apps.chart_critic.critic import format_views
 from etl.paths import CACHE_DIR
 
 if TYPE_CHECKING:
@@ -58,15 +62,15 @@ ASK = "*Is this a real error, or is the chart fine?*"
 # How the channel closes a post, and why an unticked finding is not a lost one.
 TICK = ":white_check_mark:  Tick when it's been checked."
 
-# On every finding rather than once in the lead. The lead says what the sweep was; this says what
-# the claim is worth, and it is the finding that gets forwarded, quoted and replied to on its own.
-# Plain italics, no nested code span: Slack mrkdwn renders nested formatting unreliably.
-CAVEAT = "_A chart-critic claim to check, not a confirmed error._"
-
 # What a person reads over coffee, and now also what a low-traffic channel can absorb:
 # #chart-reviews carries two or three posts a day with one default reviewer, and a finding held
 # back is not dropped — it is not stamped either, so it comes back tomorrow if it still stands.
 MAX_FINDINGS = 3
+
+# How long a chart or indicator stays out of the digest once a finding on it has been posted.
+# Long enough that a fix, a tick and the re-review the edit itself triggers all fall inside it;
+# short enough that a chart which goes wrong again a few weeks later is news again.
+COOLDOWN_DAYS = 7
 
 # The digest file is the record of what was sent, and a digest is several messages, some of which
 # land in a thread rather than in the channel. They are joined by these markers so the file shows
@@ -77,10 +81,15 @@ THREAD_SEPARATOR = "\n\n----- in thread -----\n\n"
 
 @dataclass
 class DigestMessage:
-    """One Slack message, with whatever is posted underneath it in its own thread."""
+    """One Slack message, with whatever is posted underneath it in its own thread.
+
+    ``text`` is what the digest file records and what Slack shows in a notification; ``blocks``,
+    when set, is how the message is laid out in the channel.
+    """
 
     text: str
     thread: list[str] = field(default_factory=list)
+    blocks: list[dict[str, Any]] | None = None
 
 
 def render(messages: list[DigestMessage]) -> str:
@@ -101,11 +110,17 @@ def post_count(messages: list[DigestMessage]) -> int:
 def changed_slugs(days: int = 1, include_data_updates: bool = False) -> list[str]:
     """Published chart slugs that changed in the last ``days``.
 
-    By default this is configuration edits only. ``include_data_updates`` adds every published
+    By default this is charts a person edited. ``include_data_updates`` adds every published
     chart whose underlying dataset was re-run, which is the right signal for "did this update
     break anything" but an order of magnitude larger and extremely uneven day to day.
 
-    **Needs the production database.** ``updatedAt`` on a staging copy reflects when the copy was
+    Edits are read from ``charts.lastEditedAt``, not ``chart_configs.updatedAt``. An ETL upsert
+    rewrites the full config of every chart that inherits from the indicators it touched, which
+    bumps ``updatedAt`` with nobody editing anything — one such upsert put 41 unedited charts into a
+    56-chart sweep. Those are data updates by another route, and ``include_data_updates`` is the
+    switch for them.
+
+    **Needs the production database.** Timestamps on a staging copy reflect when the copy was
     made, not when anyone edited a chart, so run this with ``ENV_FILE=.env.prod.read
     DATA_API_ENV=production DB_NAME=live_grapher`` or it will report that nothing changed.
     """
@@ -115,7 +130,8 @@ def changed_slugs(days: int = 1, include_data_updates: bool = False) -> list[str
         """
         SELECT DISTINCT cc.slug
         FROM chart_configs cc
-        WHERE cc.updatedAt >= NOW() - INTERVAL %(days)s DAY
+        JOIN charts c ON c.configId = cc.id
+        WHERE c.lastEditedAt >= NOW() - INTERVAL %(days)s DAY
           AND cc.slug IS NOT NULL
           AND JSON_EXTRACT(cc.config, '$.isPublished') = TRUE
         """,
@@ -160,9 +176,9 @@ def chart_facts(results: list[dict[str, Any]], editor_window_days: int | None = 
 
     It also yields the chart's last editor, who is who a finding gets addressed to — see
     :func:`attach_mentions` for when we may name them. ``editor_window_days`` is the sweep's own
-    window, and an editor whose edit falls outside it is reported as unknown: selection is on
-    ``chart_configs.updatedAt``, which an ETL upsert or a chart sync bumps without anybody
-    editing anything, so "this chart changed" is not on its own evidence about who changed it.
+    window, and an editor whose edit falls outside it is reported as unknown: with
+    ``include_data_updates`` a chart is selected because its data changed, which is not on its own
+    evidence about who last edited it.
 
     Only flagged charts are looked up, so this is one small query. It fails soft: without a
     database the fingerprint falls back to the slug (which over-reports rather than dropping a
@@ -283,35 +299,34 @@ def _indicators(facts: dict[str, dict[str, Any]] | None, slug: str) -> list[str]
 
 
 def _dedup_keys(slug: str, issue: dict[str, Any], facts: dict[str, dict[str, Any]] | None = None) -> list[str]:
-    """Every identity under which this finding should be recognised, across days and charts.
+    """Every identity under which this finding is recognised, across days and charts.
 
     One key per indicator for a data-level finding, rather than one key for the chart's whole
     indicator set. The set was the obvious thing to hash and it does not work: a defective column
     read alone by chart A and alongside another column by chart B yields ``A`` and ``A|B``, so the
-    identical finding still takes two of the five digest slots. Matching on *any* shared indicator
-    is what "one defective column is one finding" actually requires.
+    identical finding still takes two of the digest slots. Matching on *any* shared indicator is
+    what "one defective column is one finding" actually requires.
 
-    Chart-level findings stay keyed by slug: a wrong subtitle really is specific to that chart
-    even when the data behind it is shared.
+    The chart's own slug is always a key, a data-level finding's indicators additionally. Keying a
+    data finding by indicator alone, and separating the two levels by ``kind``, let one chart take
+    two slots of the same digest: ``agricultural-output-dollars`` was posted at 08:44 for a
+    title that contradicts its indicator (chart-level) and again a second later for a step in the
+    world series (data-level). Whoever opens the first post is looking at the chart the second one
+    is about, so the second is at best a duplicate — "the same chart should not be popping multiple
+    times for different issues".
 
-    The key deliberately carries no part of the claim. It used to carry the claim's significant
-    words, which made the key change whenever the model reworded the same finding — and it rewords
-    constantly, so a claim posted yesterday came back as a new key today and was posted again.
-    What the claim *says* is compared separately, with :func:`critic.same_claim`, so two different
-    problems on charts sharing an indicator still do not collapse into each other.
+    The key carries nothing of the claim itself, and nothing of its level either. It used to carry
+    the claim — first the claim's significant words, then a word-overlap comparison against the
+    claims already posted — and the model rewords a finding freely enough that the same defect came
+    back as new the day after it was ticked. What is remembered now is only that this chart or
+    indicator was posted, and when.
     """
-    kind = str(issue.get("kind", ""))
-    indicators = _indicators(facts, slug) if kind == "data" else []
-    return [f"{i}:{kind}" for i in indicators] or [f"{slug}:{kind}"]
+    indicators = _indicators(facts, slug) if str(issue.get("kind", "")) == "data" else []
+    return [*indicators, slug]
 
 
-def load_state() -> dict[str, list[dict[str, Any]]]:
-    """What has been posted, as ``{key: [{"words": [...], "date": "YYYY-MM-DD"}, ...]}``.
-
-    The words are :func:`critic.claim_tokens` of the claim, kept rather than a hash of it because
-    recognising the same finding tomorrow means comparing what it says, not whether it was worded
-    identically.
-    """
+def load_state() -> dict[str, str]:
+    """When each chart or indicator was last posted, as ``{key: "YYYY-MM-DD"}``."""
     if not STATE_PATH.exists():
         return {}
     try:
@@ -321,58 +336,75 @@ def load_state() -> dict[str, list[dict[str, Any]]]:
     return _upgrade(raw) if isinstance(raw, dict) else {}
 
 
-def _upgrade(raw: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
-    """Read the older state format as well as the current one.
+def _strip_kind(key: str) -> str:
+    """A key as :func:`_dedup_keys` writes it now, from any key an older run wrote.
 
-    The first format put the claim's words *in* the key —
-    ``<indicator-or-slug>:<kind>:<eight-words>`` mapped to a date — which is the bug this
-    replaced. But the file is the only record of what the channel has already seen, so the old
-    keys are read back into the current shape rather than dropped: their words become the claim
-    they stood for, and yesterday's findings stay suppressed instead of all being posted once more
-    on the day this ships.
-
-    Matching against a migrated entry is weaker than against a current one, because the old key
-    kept only the eight alphabetically-first words of five characters or more: the stored words
-    are a diluted sample of the claim, so a *reworded* repeat of a pre-migration finding can
-    still slip through once. That resolves itself — every finding posted from now on is recorded
-    in full — and it is a better floor than dropping the file and re-posting everything in it.
+    Every earlier format ended the key with the finding's level, and the level is no longer part
+    of identity — a chart posted yesterday over its data has to be recognised today when the
+    finding is about its text.
     """
-    state: dict[str, list[dict[str, Any]]] = {}
+    slug, sep, kind = key.rpartition(":")
+    return slug if sep and kind in {"data", "chart"} else key
+
+
+def _upgrade(raw: dict[str, Any]) -> dict[str, str]:
+    """Read the three older state formats as well as the current one.
+
+    The file on the runner is the only record of what the channel has seen, so none is dropped.
+    The first format put the claim's words in the key — ``<key>:<eight-words>`` mapped to a date;
+    the second mapped the key to a list of ``{"words", "date"}`` claims; the third dropped the
+    claim but kept the finding's level, as ``<key>:data`` or ``<key>:chart``. All reduce to the
+    same thing here: the latest date anything was posted under the key.
+    """
+    state: dict[str, str] = {}
+
+    def seen(key: str, day: str) -> None:
+        key = _strip_kind(key)
+        if key and day:
+            state[key] = max(state.get(key, ""), day)
+
     for key, value in raw.items():
         if isinstance(value, list):
-            state.setdefault(key, []).extend(value)
-            continue
-        head, _, words = str(key).rpartition(":")
-        if head:
-            state.setdefault(head, []).append({"words": [w for w in words.split("-") if w], "date": str(value)})
+            for claim in value:
+                seen(str(key), str(claim.get("date", "")) if isinstance(claim, dict) else "")
+        elif isinstance(value, str) and str(key).count(":") >= 2:
+            seen(str(key).rpartition(":")[0], value)
+        elif isinstance(value, str):
+            seen(str(key), value)
     return state
 
 
-def save_state(state: dict[str, list[dict[str, Any]]]) -> None:
+def save_state(state: dict[str, str]) -> None:
     STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
     STATE_PATH.write_text(json.dumps(state, indent=1, sort_keys=True))
 
 
+def _today() -> date:
+    return datetime.now(timezone.utc).date()
+
+
 def new_findings(
     results: list[dict[str, Any]],
-    state: dict[str, list[dict[str, Any]]],
+    state: dict[str, str],
     facts: dict[str, dict[str, Any]] | None = None,
+    today: date | None = None,
 ) -> list[tuple[dict[str, Any], dict[str, Any]]]:
-    """Findings not posted before, best first.
+    """Findings on charts and indicators not posted in the last :data:`COOLDOWN_DAYS`, best first.
 
     Deduplicated by indicator for data-level findings and by chart for chart-level ones — pass
     ``facts`` from :func:`chart_facts` to get the former; without it everything falls back to
     per-chart, which over-reports.
 
-    "Already posted" is a question about what the claim says, not about how it was worded, so a
-    finding is suppressed when its claim overlaps one already recorded under any of its keys —
-    the same test :func:`cli._merge` uses to fold the repeat passes of a single run together.
+    One finding per chart or indicator, in the run as well as across days: a chart that is
+    already up for review does not need a second message saying so, and the best finding on it
+    (highest severity, then most read) is the one that goes. A second, different problem on the
+    same chart waits for the cooldown to pass — a smaller cost than what this replaced, where the
+    same problem reworded came back the morning after it was ticked.
     """
+    day = today or _today()
+    cutoff = (day - timedelta(days=COOLDOWN_DAYS)).isoformat()
+    posted = {key: when for key, when in state.items() if when >= cutoff}
     out: list[tuple[dict[str, Any], dict[str, Any]]] = []
-    # What each key has already seen, from the state file and from this run's own findings.
-    seen: dict[str, list[set[str]]] = {
-        key: [set(claim.get("words") or []) for claim in claims] for key, claims in state.items()
-    }
     order = {"high": 0, "medium": 1, "low": 2}
     ranked = sorted(
         ((r, i) for r in results for i in r["issues"]),
@@ -380,13 +412,12 @@ def new_findings(
     )
     for result, issue in ranked:
         keys = _dedup_keys(result["slug"], issue, facts)
-        tokens = claim_tokens(issue.get("claim", ""))
-        # A match under any one key counts as already-known: the same defect on a second chart
-        # sharing one indicator is not news, even though the two charts are not the same chart.
-        if any(same_claim(tokens, before) for key in keys for before in seen.get(key, [])):
+        # A match under any one key counts as already-known: the same indicator on a second chart
+        # is not news, even though the two charts are not the same chart.
+        if any(key in posted for key in keys):
             continue
         for key in keys:
-            seen.setdefault(key, []).append(tokens)
+            posted[key] = day.isoformat()
         out.append((result, issue))
     return out
 
@@ -404,7 +435,7 @@ def _chart_title(result: dict[str, Any]) -> str:
 
 
 def _thumbnail(url: str) -> str:
-    """The chart's own render, as a bare URL for Slack to unfurl into the message.
+    """The chart's own render, as an image in the message.
 
     The one thing the digest lacked that every other #chart-reviews post has. A claim about a
     chart is adjudicated by looking at the chart, and a link alone makes everybody click.
@@ -452,9 +483,9 @@ def _format_finding(
     facts: dict[str, dict[str, Any]] | None = None,
     model: str = "",
 ) -> DigestMessage:
-    """One finding as its own message, in the shape the channel already uses: the chart's title,
-    the chart, a row of actions, the question being asked and who is being asked it, the claim,
-    the facts in a blockquote, and the tick that closes it — with the evidence in the thread.
+    """One finding as its own message, in the shape #analytics-bites uses: the chart's title as
+    its live link, the question and who is being asked it, the claim, the chart, and a muted
+    footer with the facts, the links and the tick — with the evidence in the thread.
 
     Self-contained on purpose. It is read next to the lead message but it is also what someone
     quotes, forwards or replies to on its own, so it carries the link, the edit action and — the
@@ -462,29 +493,38 @@ def _format_finding(
     """
     chart = (facts or {}).get(result["slug"]) or {}
     url = issue.get("url") or f"{GRAPHER_URL}/{result['slug']}"
-    lines = [_chart_title(result), _thumbnail(url)]
-
-    # A multi-dim view has no chart id, so it gets no edit link — there is no single chart to
-    # edit. The live link is always there, and is what the tick is taken against.
-    actions = [f":chart_with_upwards_trend:  <{url}|View live chart>"]
-    if chart_id := chart.get("chart_id"):
-        actions.append(f":pencil2:  <{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit in admin>")
-    lines.append("      ".join(actions))
+    title = _chart_title(result)
 
     # The ask, and who is being asked. Near the top rather than in the footer: a finding whose
     # only mention sits at the end of a middot-separated footer does not read as addressed to
     # anyone, and a finding addressed to nobody gets read and forgotten.
     editor = chart.get("editor_mention")
-    lines.append(ASK + (f"   {editor}   ·   _You last edited this chart._" if editor else ""))
-
-    lines.append(issue.get("claim", "").rstrip(".") + ".")
+    body = "\n".join(
+        [
+            f"*<{url}|{title}>*",
+            ASK + (f"   {editor}   ·   _You last edited this chart._" if editor else ""),
+            issue.get("claim", "").rstrip(".") + ".",
+        ]
+    )
 
     dot = SEVERITY_DOT.get(issue.get("severity", "low"), ":large_yellow_circle:")
-    lines.append(f"> *Severity:*  {dot} {issue.get('severity', 'low')}  ·  {issue.get('kind', 'chart')}-level")
+    footer = [f"{dot} {issue.get('severity', 'low')}", f"{issue.get('kind', 'chart')}-level"]
     if views := format_views(result.get("views")):
-        lines.append(f"> *Readership:*  {views}")
-    lines.append(f"{TICK}   ·   {CAVEAT}")
-    return DigestMessage("\n".join(lines), [_evidence(issue, model)])
+        footer.append(views)
+    footer.append(f":chart_with_upwards_trend: <{url}|View live chart>")
+    # A multi-dim view has no chart id, so it gets no edit link — there is no single chart to edit.
+    if chart_id := chart.get("chart_id"):
+        footer.append(f":pencil2: <{ADMIN_URL}/admin/charts/{chart_id}/edit|Edit in admin>")
+    footer.append(TICK)
+    footer_text = "   ·   ".join(footer)
+
+    thumbnail = _thumbnail(url)
+    blocks = [
+        {"type": "section", "text": {"type": "mrkdwn", "text": body}},
+        {"type": "image", "image_url": thumbnail, "alt_text": title},
+        {"type": "context", "elements": [{"type": "mrkdwn", "text": footer_text}]},
+    ]
+    return DigestMessage("\n".join([body, thumbnail, footer_text]), [_evidence(issue, model)], blocks)
 
 
 def format_slack(
@@ -545,20 +585,15 @@ def format_slack(
 
 def stamp(
     findings: list[tuple[dict[str, Any], dict[str, Any]]],
-    state: dict[str, list[dict[str, Any]]],
+    state: dict[str, str],
     facts: dict[str, dict[str, Any]] | None = None,
-) -> dict[str, list[dict[str, Any]]]:
+    today: date | None = None,
+) -> dict[str, str]:
     """Record what was posted. ``facts`` must be the same mapping :func:`new_findings` used —
-    a claim written per-chart and looked up per-indicator matches nothing, and the digest would
-    re-post every finding every day."""
-    today = datetime.now(timezone.utc).date().isoformat()
+    a finding keyed per-chart here and looked up per-indicator tomorrow matches nothing, and the
+    digest would re-post every finding every day."""
+    day = (today or _today()).isoformat()
     for result, issue in findings[:MAX_FINDINGS]:
-        tokens = claim_tokens(issue.get("claim", ""))
         for key in _dedup_keys(result["slug"], issue, facts):
-            claims = state.setdefault(key, [])
-            # The same claim can arrive under a key that already holds a reworded version of it,
-            # from an earlier day or from another chart sharing the indicator. Recording it again
-            # would grow the file without changing any answer.
-            if not any(same_claim(tokens, set(claim.get("words") or [])) for claim in claims):
-                claims.append({"words": sorted(tokens), "date": today})
+            state[key] = day
     return state

@@ -127,7 +127,12 @@ def create_dataset(
     # create new dataset with new metadata
     ds = catalog.Dataset.create_empty(dest_dir, metadata=default_metadata)
 
+    inherited_short_name = ds.metadata.short_name
     ds = _set_metadata_from_dest_dir(ds, dest_dir)
+    # A changelog is the release history of one dataset: a dataset built from another one's metadata doesn't inherit
+    # it (its grapher step, which keeps the short name, does).
+    if inherited_short_name and inherited_short_name != ds.metadata.short_name:
+        ds.metadata.changelog = []
 
     meta_path = get_metadata_path(str(dest_dir))
 
@@ -338,6 +343,19 @@ class PathFinder:
     @property
     def short_name(self) -> str:
         return self.f.stem
+
+    @property
+    def output_dir(self) -> Path:
+        """Folder a `viz://` or `export://` step writes its files to.
+
+        It is the folder the framework then publishes: for a `viz://bespoke` step, everything
+        written here is synced to the environment's R2 feed path (see `etl.viz.bespoke`).
+        """
+        assert self.step_type in ("viz", "export"), (
+            f"Only viz:// and export:// steps have an output folder, not {self.step_type}://"
+        )
+        root = paths.VIZ_DIR if self.step_type == "viz" else paths.EXPORT_DIR
+        return root / self.channel / self.namespace / self.version / self.short_name
 
     @property
     def country_mapping_path(self) -> Path:
@@ -970,17 +988,6 @@ class PathFinder:
 
         return explorer
 
-    # Metadata that makes an exported figure reproducible, per format. matplotlib stamps the
-    # timestamp and its own version into every file, so without this an unchanged figure re-rendered
-    # under a new matplotlib produces a diff with no pixel change — measured on 3.10.8 -> 3.10.9,
-    # which rewrote all ten committed static_viz outputs and altered nothing but `<dc:title>` and
-    # PNG `Software`. A byte diff should mean the picture changed.
-    # `Title` cannot be nulled: the SVG backend type-checks it and raises on None.
-    _REPRODUCIBLE_METADATA = {
-        "svg": {"Date": None, "Creator": None},
-        "png": {"Software": None},
-    }
-
     def export_fig(self, fig, filename: str, extensions: list[str], **kwargs) -> None:
         """Export a matplotlib figure to multiple formats.
 
@@ -992,18 +999,11 @@ class PathFinder:
             than replacing them, so a caller can add fields without re-introducing the version
             stamp.
         """
-        for ext in extensions:
-            path = self.directory / f"{filename}.{ext}"
-            save_kwargs = {
-                "fname": path,
-                "format": ext,
-                **kwargs,
-            }
-            defaults = self._REPRODUCIBLE_METADATA.get(ext)
-            if defaults is not None:
-                save_kwargs["metadata"] = {**defaults, **(kwargs.get("metadata") or {})}
-            fig.savefig(**save_kwargs)
-            self.log.info(f"Saved chart to {path}")
+        # Lazy on purpose: `etl.viz.static` imports matplotlib, a dev-group dependency, and this
+        # module is imported by every step. Only `viz://static` steps ever reach this line.
+        from etl.viz.static import save_fig
+
+        save_fig(self.directory, fig, filename, extensions, log=self.log, **kwargs)
 
 
 def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:

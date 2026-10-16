@@ -3,6 +3,7 @@ name: create-explorer
 description: Author or modify an Our World in Data explorer (multi-dimensional dashboard with dropdown selectors, published from ETL via `viz://explorer/<ns>/latest/<short>`). Trigger when the user wants to build a new explorer, add/remove views or dimensions on an existing one, change the explorer's chart text or selection defaults, or finish an explorer migration once the snapshot/garden/grapher chain is already in place.
 metadata:
   internal: true
+  owner: lucasrodes
 ---
 
 # Creating an Explorer
@@ -61,11 +62,13 @@ The two ends of the spectrum, plus everything in between:
 | Map color scale | `view.indicators.y[i].display.{colorScaleScheme, colorScaleNumericBins}` (semicolon-string form, explorer-flavored override) | `presentation.grapher_config.map.colorScale.{baseColorScheme, binningStrategy, customNumericValues}` (canonical grapher form, inherited at chart render time) |
 | Python step content | Trivial: `paths.create_explorer(config=config, short_name=...).save(...)` | Loops columns to set `m.dimensions`, optionally post-processes (`sort_choices`, `group_views`, per-view `display` tweaks) |
 
+To choose map palettes (more is good or bad, one palette per indicator), see "Map palettes" in the `create-chart` skill.
+
 It's a spectrum, not a switch. Mix freely: use table-driven for the bulk of views, hand-list a handful of bespoke ones; or stay full-YAML but still push title/subtitle for the single-indicator views into garden metadata to remove duplication.
 
 **Strong fit for table-driven:**
 
-- **Single-indicator views dominate.** Each view is a thin wrapper around one indicator → that indicator's metadata is the right home for chart text. Avoids duplication between explorer YAML and the equivalent standalone chart, and keeps both in sync forever.
+- **Single-indicator views dominate.** Each view is a thin wrapper around one indicator → that indicator's metadata is the right home for chart text.
 - **Many views (>20)** following the cartesian product of a few dimensions. Hand-listing them is repetitive; auto-expansion plus YAML dimensions is significantly less code.
 - **Upstream is a dimensional table** (one row per country/year × dim_a × dim_b × …) with one indicator. `create_explorer(tb=tb, indicator_names=..., dimensions=...)` matches this shape directly — model: `migration/latest/migration_flows.py`.
 - **Same indicators back standalone grapher charts.** Pushing FAUST upstream means explorer view and standalone chart inherit the same text — no drift over time.
@@ -332,7 +335,7 @@ definitions:
 subtitle: "{definitions.prefix} {definitions.suffix}"
 ```
 
-This composes N unique full strings from a handful of building blocks. Verified via `dynamic_yaml_to_dict` (`lib/catalog/owid/catalog/core/utils.py`).
+This composes N unique full strings from a handful of building blocks. The interpolation is resolved by `dynamic_yaml_to_dict` (`lib/catalog/owid/catalog/core/utils.py`).
 
 ## Step 6 — Post-processing the chart (table-driven only)
 
@@ -426,14 +429,11 @@ Hand the user the exact `etlr` command — don't run it yourself.
 - **`build_views` does not propagate per-view `display` from indicator metadata** — see TODO at `etl/viz/chart/core/expand.py:313`. Each auto-expanded view gets `indicators.y[0]` with only `catalogPath`, no `display`. If you need different color scales per view, either (a) put them in the indicator's `presentation.grapher_config.map.colorScale` so they apply at chart render time, or (b) post-process `c.views` in Python.
 - **`type: LineChart` is not a valid `grapher_config` field** when authoring via indicator metadata — use `chartTypes: ["LineChart"]` (the schema is an array). Per-view `config.type` in the explorer YAML still accepts strings.
 - **`tb.read(..., load_data=False)`** is essential when you only need column metadata to set dimensions; loading data unnecessarily slows the step.
-- **YAML schema requires `views:` key** in the explorer config even when empty. Pass `views: []`.
 - **Indicator must be re-published to MySQL with the new `grapher_config`** before the explorer view can inherit it. Re-run `etlr --grapher data://grapher/...` after editing garden metadata; the explorer step alone won't refresh the indicator's stored config.
 - **YAML anchors / merge keys** (`&common_view`, `<<: *common_view`) — don't use them. They can't filter by dimension and add per-view noise. Use `definitions.common_views` instead.
 - **Hyphens in `short_name`** — file is `food_footprints.py` but `short_name="food-footprints"`. Mismatch produces a published explorer whose URL doesn't match the legacy slug.
-- **`tolerate_extra_indicators`** — usually want `True` for explorers since you're cherry-picking indicators from larger upstream datasets.
 - **Checkbox dimensions must have exactly 2 choices.** The `na` pattern (3 choices: `na`, `off`, `on`) works for `radio` and `dropdown` but not `checkbox` — the framework rejects it with `Dimension choices for 'checkbox' must have exactly two choices`. If you genuinely need a third "doesn't apply" state, either use a radio with three choices, or drop the `na` slot and let the framework hide/disable the toggle when the current dimension state has no matching `<true>` view.
 - **YAML 1.1 booleanizes unquoted `no`/`yes`/`on`/`off`/`true`/`false` slugs.** A `view.dimensions: { relative_to_world: no }` reads back as `{"relative_to_world": False}`, which won't match the string slug `"no"` declared in `dimensions[*].choices`. Use semantic slugs (`total`/`relative`, `absolute`/`share`) or quote the strings — but choosing different slug names is the more durable fix.
-- **`edit_views` doesn't reach indicator-level `display`.** Fields like `numDecimalPlaces`, `colorScaleScheme`, `colorScaleNumericBins`, and per-indicator `color` live on `view.indicators.y[i].display`, not on `view.config`. `edit_views` only writes view-level `config`/`metadata`. For these, fall back to a `c.views` loop (see Step 6) or push them into the indicator's garden `presentation.grapher_config` so they apply at chart render time.
 
 ## Reference examples
 

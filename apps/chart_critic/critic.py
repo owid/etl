@@ -22,6 +22,11 @@ The prompt is doing the work here, so what it must contain is worth stating:
    stated as a rule about the metadata and not as a list of cases: an earlier draft named the
    Central African Republic here, which suppressed that one chart by name and would have taught
    nothing about the next one.
+6. **The one case that is named.** The post-Soviet break in producers' aggregates is not a false
+   positive — the 1992 step really is there and really does mislead — but it is in the source, in
+   every aggregate built from it, and the answer every time it is raised is that nothing will be
+   done. It is named exactly because the rule above would be the wrong shape for it: generalising
+   it to coverage discontinuities at large would silence the ones we did cause and could fix.
 
 What this catches that statistical detection cannot: an error that is stable over time and
 statistically unremarkable, where the only tell is knowing something about the world. The
@@ -41,17 +46,28 @@ from pydantic_ai import Agent, BinaryContent
 
 from apps.chart_critic.bundle import Bundle
 
-# Tested defaults. The flash tier is enough: on the SDG 16.2.2 case both flash and flash-lite
-# identified the swap from the render alone, and flash-lite did it for ~$0.0002 a call.
-DEFAULT_MODEL = "google:gemini-3.8-flash"
+# Sonnet 5.5 at effort high (see ANTHROPIC_SETTINGS) replaced gemini-3.8-flash as the default.
+# On charts with known answers it caught 8 of 9 passes on real findings against Gemini's 6, never
+# raised a false positive Gemini raised twice, and stayed quiet on clean charts. It costs about
+# $0.04 a chart with caching against Gemini's $0.035. Haiku 5.5 caught none, with or without the
+# render, so the small Claude tier is not a cheap substitute. The cheap tier stays on Gemini.
+DEFAULT_MODEL = "anthropic:claude-sonnet-5-5"
 CHEAP_MODEL = "google:gemini-3.1-flash-lite"
 
-# Fallback prices in $ per million tokens (input, output), from Google's published rates.
-# `genai_prices` (used by apps.utils.llms.costs) does not carry these models yet; drop an entry
-# here once it does, and note that gemini-3.8-flash doubles to 1.50/7.50 on 2027-01-01.
-FALLBACK_PRICES = {
-    "google:gemini-3.8-flash": (0.75, 3.75),
-    "google:gemini-3.1-flash-lite": (0.10, 0.40),
+# Settings for Claude models, which get none of them by default:
+# - Thinking is switched on explicitly: answering without it took about 40 output tokens a pass and
+#   found nothing. (pydantic-ai v2 returns structured output natively rather than through a forced
+#   tool call, which Anthropic allows no thinking alongside.)
+# - Effort "high": on charts with known answers, it was the Sonnet 5.5 setting that raised nothing
+#   on clean charts; at low and medium it flagged them nearly every pass.
+# - Caching the user turn lets passes 2 and 3 read the prompt from cache, about a third off the
+#   bill. Only the input is cached; each pass still generates its own answer, so the repeat
+#   passes keep their value.
+ANTHROPIC_SETTINGS = {
+    "anthropic_thinking": {"type": "adaptive"},
+    "anthropic_effort": "high",
+    "anthropic_cache_messages": True,
+    "max_tokens": 32000,
 }
 
 
@@ -141,6 +157,12 @@ A change in how something was *measured* is different, and worth flagging: a sur
 a rebased index or a source switch produces a jump that a reader will read as a real-world
 trend. Say so when a discontinuity looks like an artefact of measurement rather than an event.
 
+One discontinuity is the exception, because it is already known and nothing will be done about
+it: producers' world and regional aggregates exclude the Soviet Union before 1992 and count its
+successor states from 1992 onwards, so a global or European series can step up around 1991-1992.
+Say nothing about that step. This covers the post-Soviet coverage break and nothing else — any
+other change in which countries a series covers is still worth flagging.
+
 For each issue, set chart_params to the grapher query parameters that put the problem on
 screen — the entity and time range you are talking about — so a reviewer sees it immediately
 rather than the chart's default view.
@@ -168,10 +190,11 @@ expected outcome for most charts."""
 # subtitle states prices are measured in constant 2023 US$" are one claim — so identity has to
 # survive rewording rather than be a hash of the sentence.
 #
-# One definition, used in the two places that have to agree: merging the repeat passes of a
-# single run, and recognising in the digest what has already been posted. They disagreed for a
-# while, and the consequence reached the channel — a finding merged across passes within a run
-# was posted again the next day under its new wording, on a chart that had been fixed in between.
+# Used only to merge the repeat passes of a single run, where the passes describe the same bundle
+# and overlap is high. The digest used the same test to recognise across days what it had already
+# posted, and there it failed: after an edit the model rewords a finding far more, and one ticked
+# on Monday came back on Tuesday at 0.30. Across days the digest now remembers the chart, not the
+# claim — see ``digest.COOLDOWN_DAYS``.
 CLAIM_OVERLAP = 0.4
 
 
@@ -216,12 +239,25 @@ def format_views(views_365d: int | float | None) -> str:
 def build_agent(model: str = DEFAULT_MODEL) -> Agent[None, Review]:
     """An agent with no system instructions — see :func:`prompt_parts` for why.
 
-    Temperature is left at the model default on purpose. Pinning it to 0 was measured as
-    *worse* for recall (one known finding went from 1/3 passes to 0/3) and it does not buy
-    reproducibility anyway: this model raises a genuine finding on some passes and not others
-    whatever the temperature. Repeat passes, not temperature, are the dial — see ``--repeat``.
+    No sampling settings: Gemini has ignored ``temperature``, ``top_p`` and ``top_k`` since
+    3.6 Flash, and upcoming models reject them. This model raises a genuine finding on some
+    passes and not others, so repeat passes are the recall dial — see ``--repeat``. Claude
+    models get :data:`ANTHROPIC_SETTINGS`.
     """
-    return Agent[None, Review](model=model, output_type=Review, retries=2)
+    if not model.startswith("anthropic:"):
+        return Agent[None, Review](model=model, output_type=Review, retries=2)
+    # The critic's own key when one is set; see etl.config.
+    from pydantic_ai.models.anthropic import AnthropicModel
+    from pydantic_ai.providers.anthropic import AnthropicProvider
+
+    from etl import config
+
+    if not config.ANTHROPIC_API_KEY_CHART_CRITIC:
+        raise RuntimeError(f"{model} needs ANTHROPIC_API_KEY_CHART_CRITIC (or ANTHROPIC_API_KEY) in .env")
+    claude = AnthropicModel(
+        model.removeprefix("anthropic:"), provider=AnthropicProvider(api_key=config.ANTHROPIC_API_KEY_CHART_CRITIC)
+    )
+    return Agent[None, Review](model=claude, output_type=Review, retries=2, model_settings=ANTHROPIC_SETTINGS)  # ty: ignore[invalid-argument-type]
 
 
 def prompt_parts(bundle: Bundle, extra_views: list[tuple[str, bytes]] | None = None) -> list[str | BinaryContent]:

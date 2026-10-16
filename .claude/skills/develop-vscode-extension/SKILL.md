@@ -3,6 +3,7 @@ name: develop-vscode-extension
 description: Develop, build, and test VSCode extensions in this repo. Use when editing extension source code, compiling TypeScript, packaging .vsix files, or installing extensions for testing.
 metadata:
   internal: true
+  owner: Marigold
 ---
 
 # VSCode Extension Development
@@ -24,8 +25,6 @@ Extensions live in `vscode_extensions/<name>/`. Each has:
 3. **Install**: `code --install-extension install/<name>-<version>.vsix --force`
 4. **Tell user** to reload: `Cmd+Shift+P` → "Developer: Reload Window"
 
-Just running `npm run compile` is NOT enough — the user will still see old behavior.
-
 ## Verifying installed code
 
 To check what code is actually running:
@@ -38,4 +37,3 @@ grep "some_unique_string" ~/.vscode/extensions/<publisher>.<name>-<version>/dist
 
 - **esbuild watch mode**: `npm run compile` may start a watcher that blocks. This is fine for compilation but you still need to package + install.
 - **Version conflicts**: If the installed `.vsix` version matches, VSCode may cache. Use `--force` flag on install.
-- **Extension host**: Changes only take effect after "Developer: Reload Window".

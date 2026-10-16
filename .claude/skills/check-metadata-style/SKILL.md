@@ -11,6 +11,7 @@ description: >-
   resolved metadata off the built grapher dataset, so garden-authored text is in scope.
 metadata:
   internal: true
+  owner: paarriagadap
 ---
 
 # Check Metadata Style
@@ -19,7 +20,7 @@ Audit a dataset's user-facing text in two passes: a mechanical one for whitespac
 
 The text itself is usually authored in the **garden** `.meta.yml` (`description_key`/WYSK, `description_short`, `title`, `display.name`) and inherited by grapher; a smaller share is set or overridden in the grapher step. This skill reads the **resolved** metadata off the built grapher dataset, so it covers both — you point it at the grapher step, and any fix it proposes goes back to whichever layer authored the field.
 
-Rules live in [STYLE_GUIDE.md](STYLE_GUIDE.md) next to this file — a committed snapshot of the [OWID Notion page](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c). The file records a `Last synced from Notion` date in its header; the skill checks that date on every run and refreshes the snapshot from Notion when it is more than two weeks old (see step 1). Refreshes are committed via a PR.
+Rules live in [STYLE_GUIDE.md](STYLE_GUIDE.md) next to this file — a committed snapshot of the [OWID Notion page](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c). Step 1 keeps it fresh.
 
 ## When to use
 
@@ -30,7 +31,7 @@ Rules live in [STYLE_GUIDE.md](STYLE_GUIDE.md) next to this file — a committed
 
 ## Scope
 
-**Current dataset only.** Ask for the step path if it's not obvious from context. Do not walk all active steps — keep the skill focused on the one dataset the user is working on.
+**Current dataset only.** Ask for the step path if it's not obvious from context. Do not walk all active steps — keep the skill focused on the one dataset the user is working on. If the user asks to audit the whole catalog, say the skill is scoped to one step and suggest running it per dataset.
 
 Read the **grapher** step even when the edit was to a garden `.meta.yml` (e.g. you edited `etl/steps/data/garden/un/2026-04-08/child_labor_report.meta.yml` → read `etl/steps/data/grapher/un/2026-04-08/child_labor_report`). Only the grapher dataset carries the resolved, inherited text a reader actually sees. If the grapher build is stale relative to your garden edit, rebuild it first (step 3) or you will be auditing the old copy.
 
@@ -57,11 +58,11 @@ On a successful fetch/export:
 - Rewrite the body only if the content changed; stamp today's date on the `Last synced from Notion:` line either way.
 - Remind the user that the modified `STYLE_GUIDE.md` should be committed via a PR. Do **not** commit or push as part of this skill.
 
-> Plain `WebFetch`/`curl` does **not** work for the refresh: `app.notion.com` serves a JavaScript shell with no page content (verified 2026-07-07). Don't waste time trying it.
+> Plain `WebFetch`/`curl` does **not** work for the refresh: `app.notion.com` serves a JavaScript shell with no page content. Don't waste time trying it.
 
 ### 2. Read the Writing and Style Guide
 
-Read [STYLE_GUIDE.md](STYLE_GUIDE.md) in this skill's folder. That file is the source of truth the skill evaluates against — do not fall back to memory, and do not invent rules that aren't in the file.
+Read [STYLE_GUIDE.md](STYLE_GUIDE.md) in this skill's folder. That file is the source of truth the skill evaluates against — do not fall back to memory.
 
 If the file is missing, rebuild it from Notion via the refresh flow in step 1 (treat it as stale).
 
@@ -126,13 +127,15 @@ for table_name in ds.table_names:
         for i, o in enumerate(getattr(m, 'origins', None) or []):
             put(f'origins[{i}].attribution', getattr(o, 'attribution', None))
             put(f'origins[{i}].producer', getattr(o, 'producer', None))
+            put(f'origins[{i}].description', getattr(o, 'description', None))
 
         if entry['fields']:
             rows.append(entry)
 
 # Step 4: whitespace artifacts in the rendered strings
+# A source description is multi-paragraph by design, so newlines don't count as artifacts there.
 ws = [(r['table'], r['variable'], k, v) for r in rows for k, v in r['fields'].items()
-      if isinstance(v, str) and ('  ' in v or v != v.strip() or '\n' in v)]
+      if isinstance(v, str) and ('  ' in v or v != v.strip() or ('\n' in v and not k.endswith('.description')))]
 print(f'WHITESPACE ISSUES: {len(ws)}')
 for t, var, k, v in ws:
     print(f'  {t}.{var}.{k}: {v[:150]!r}')
@@ -157,6 +160,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 | `presentation.attribution` | Full source credit under the chart (`producer – data product (year)`) |
 | `origins[i].attribution` | Where that credit usually comes from — the footer falls back to it when `presentation.attribution` is unset |
 | `origins[i].producer` | The last fallback: with no attribution set, the footer renders `producer (year)` |
+| `origins[i].description` | Source description in the Sources tab. `etl update` copies it from the previous version unchanged, so nothing else rereads it. Audit it once per origin, not once per variable |
 | `presentation.attribution_short` | Short source credit under the chart |
 | `presentation.grapher_config.title` | Overrides chart title when set |
 | `presentation.grapher_config.subtitle` | Chart subtitle |
@@ -167,13 +171,13 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 - `description_from_producer` — verbatim text from the source, not OWID copy.
 - `citation_full` — follows the producer's requested citation, so its wording and capitalization are theirs, not ours to restyle. (Dash typography is the one exception: a spaced hyphen separating producer from data product is an en dash everywhere, per the style guide.)
 - `unit`, `short_unit`, `processing_level`, internal names — not user-facing prose.
-- `description_long` — technical, de-prioritized (re-enable later if needed). `description_processing` is collected, but only the whitespace pass reads it.
+- `description_long` — technical, de-prioritized (re-enable later if needed).
 
 **Fallback if the dataset isn't built:**
 
 If `DATA_DIR / step_path` does not exist, parse the `.meta.yml` directly with `etl.files.ruamel_load` and pull the same field names from the `tables → <name> → variables → <var>` tree.
 
-Origin fields (`origins[i].attribution`, `origins[i].producer`) live in the snapshot `.dvc`, not the `.meta.yml`, so this fallback does not cover them — say so in the report.
+Origin fields (`origins[i].attribution`, `origins[i].producer`, `origins[i].description`) live in the snapshot `.dvc`, not the `.meta.yml`, so this fallback does not cover them — say so in the report.
 
 **Parse the garden `.meta.yml`, not just the grapher one.** Most datasets author their user-facing text in garden and have a thin or absent grapher `.meta.yml`, so reading only the grapher layer here finds nothing and reports a clean bill of health on unaudited text. Read both (`etl/steps/data/garden/<ns>/<version>/<dataset>.meta.yml` and the grapher one if it exists) and note that grapher values override garden ones on the same field.
 
@@ -208,7 +212,7 @@ The template usually lives in the **garden** `.meta.yml` even when you read the 
 
 Claude reads `STYLE_GUIDE.md` and checks every collected string. Keep the evaluation **rule-driven**: cite the specific section/heading of the guide, not a generic "doesn't sound right".
 
-Focus on rules the guide actually states (e.g. sentence case vs. title case, acronym expansion on first use, number/unit formatting, banned phrases, punctuation, tone). Do not invent rules the guide doesn't cover.
+Focus on rules the guide actually states (e.g. sentence case vs. title case, acronym expansion on first use, number/unit formatting, banned phrases, punctuation, tone). Do not invent rules the guide doesn't cover — if `STYLE_GUIDE.md` doesn't say something, don't flag it. Prefer false negatives over false positives.
 
 Report format, one block per violation:
 
@@ -263,7 +267,5 @@ After fixes:
 ## Notes
 
 - **No persistent output.** Analysis results stay in-conversation: no report `.md`, no scripts under `scripts/`. The only persistent file tied to this skill is `STYLE_GUIDE.md` (the committed rulebook).
-- **Current step only.** If the user asks to audit the whole catalog, say the skill is scoped to one step and suggest running it per dataset. (The former `check-metadata-spacing` skill, folded into step 4 here, offered a scan of all active garden steps; that option is gone, run this per dataset instead.)
-- **Keep `STYLE_GUIDE.md` in sync with Notion.** The header's `Last synced from Notion` date is checked on every run (step 1); when it is more than two weeks old the skill refreshes the snapshot — Notion MCP first, manual markdown export as fallback — and the refresh is committed via a PR. Between syncs the skill stays deterministic and offline-capable by always auditing against the committed file.
+- **Between syncs (step 1), always audit against the committed `STYLE_GUIDE.md`**, so the skill stays deterministic and offline-capable.
 - **Archive-aware.** If the provided step path is under `dag/archive/*.yml`, point that out and confirm the user still wants to check it.
-- **Don't hallucinate rules.** If `STYLE_GUIDE.md` doesn't say something, don't flag it. Prefer false negatives over false positives.
