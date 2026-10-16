@@ -3,12 +3,12 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: "DeDuCE: Deforestation and carbon emissions due to agriculture and forestry activities from 2001-2022"
+    title: "Commodity-driven deforestation, associated carbon emissions and trade"
     description: |-
       Lookup tables used by the DeDuCE model. They include the list of commodities with their FAOSTAT item codes and commodity groups, and the mapping of Brazilian IBGE crops to those commodities.
     date_published: "2024-08-31"
     version_producer: "1.0.1"
-    title_snapshot: "DeDuCE: Deforestation and carbon emissions due to agriculture and forestry activities from 2001-2022 – Commodity lookup tables"
+    title_snapshot: "Commodity-driven deforestation, associated carbon emissions and trade - Commodity lookup tables"
 
     # Citation
     producer: Singh and Persson
