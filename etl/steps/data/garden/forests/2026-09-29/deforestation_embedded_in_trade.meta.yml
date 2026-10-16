@@ -2,7 +2,7 @@ definitions:
   common:
     processing_level: major
     description_processing: |-
-      The source reports flows for individual commodities. We sum them into the source's commodity groups.
+      The source reports flows for individual commodities. Some flows are listed under several commodity names that share one FAOSTAT item, with identical values; we keep one of them. We then sum the commodities into the source's commodity groups.
 
 dataset:
   update_period_days: 365
