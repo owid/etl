@@ -262,6 +262,8 @@ never pad the list with variations to reach a number):
                 response = await client.messages.create(
                     model=model_id, max_tokens=16000, messages=[{"role": "user", "content": prompt}]
                 )
+            if response.stop_reason != "end_turn":
+                raise RuntimeError(f"the model stopped early ({response.stop_reason})")
             result_text = text_of(response)
             # Thinking tokens are billed as output and included in output_tokens.
             input_tokens, output_tokens = response.usage.input_tokens, response.usage.output_tokens
@@ -391,7 +393,11 @@ async def process_topics(
 
     click.echo(f"\nAsking for candidate terms for {len(prompt_inputs)} topics...")
     client = anthropic.AsyncAnthropic(api_key=config.ANTHROPIC_API_KEY, max_retries=LLM_MAX_RETRIES)
-    cache: dict[str, str] = json.loads(LLM_CACHE_FILE.read_text()) if LLM_CACHE_FILE.exists() else {}
+    try:
+        cache: dict[str, str] = json.loads(LLM_CACHE_FILE.read_text()) if LLM_CACHE_FILE.exists() else {}
+    except json.JSONDecodeError:
+        click.secho(f"  Ignoring an unreadable answer cache at {LLM_CACHE_FILE}", fg="yellow")
+        cache = {}
     llm_semaphore = asyncio.Semaphore(LLM_CONCURRENCY)
     try:
         candidate_results = await asyncio.gather(
@@ -404,7 +410,9 @@ async def process_topics(
     finally:
         # Saved even if the run is interrupted, so the answers already paid for aren't asked for again.
         LLM_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
-        LLM_CACHE_FILE.write_text(json.dumps(cache))
+        tmp_file = LLM_CACHE_FILE.with_suffix(".tmp")
+        tmp_file.write_text(json.dumps(cache))
+        tmp_file.replace(LLM_CACHE_FILE)  # atomic, so an interrupted write can't leave a broken cache
 
     click.echo("\nChoosing the terms that cover the most of each topic...")
     results: list[dict] = []

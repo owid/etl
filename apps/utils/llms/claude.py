@@ -67,7 +67,8 @@ class TextStream:
     @property
     def summary(self) -> str:
         """One line with the cost and token counts, for showing under the answer."""
-        cost = f"{self.cost:.4f} USD" if self.cost is not None else "unknown"
+        cost_usd = self.cost
+        cost = f"{cost_usd:.4f} USD" if cost_usd is not None else "unknown"
         tokens = f"{self.usage.input_tokens} in, {self.usage.output_tokens} out" if self.usage else "unknown"
         return f"Cost: {cost}. Tokens: {tokens}."
 

@@ -249,8 +249,15 @@ def ask_llm_for_summary(df: pd.DataFrame):
 
                         {metadata_summary}
                         """
+    if not claude.has_api_key():
+        st.info("Set `ANTHROPIC_API_KEY` in your `.env` to get an AI summary of the anomalies.")
+        return
     stream = claude.TextStream(MODEL_DEFAULT, system, df_str, effort="low")
-    st.write_stream(stream)
+    try:
+        st.write_stream(stream)
+    except Exception as e:
+        st.error(f"AI summary failed: {e}")
+        return
 
     st.info(stream.summary)
 

@@ -735,7 +735,7 @@ def bake_branch_name(repo, pr_title, no_llm, remote_branches):
 def _extract_relevant_title_for_branch_name(text_in: str, category: str, use_llm) -> str:
     """
     Process the input string by:
-    1. Turning separators (-, _, /, .) into spaces and removing all other symbols, keeping letters and numbers.
+    1. Removing all symbols, keeping only letters and numbers.
     2. Splitting into a list of words/tokens.
     3. Keeping only the first three tokens (or fewer if not available).
     4. Combining the tokens with a '-'.
@@ -749,8 +749,7 @@ def _extract_relevant_title_for_branch_name(text_in: str, category: str, use_llm
     if use_llm and ANTHROPIC_API_KEY:
         text_in = summarize_title_llm(text_in)
 
-    # Separators split words ("un_wpp" -> "un wpp"), so they mustn't be glued together below.
-    cleaned_text = re.sub(r"[^a-zA-Z0-9\s]", "", re.sub(r"[-_/.]+", " ", text_in))
+    cleaned_text = re.sub(r"[^a-zA-Z0-9\s]", "", text_in)
 
     # Split into tokens/words
     tokens = cleaned_text.split()
@@ -785,7 +784,14 @@ def summarize_title_llm(title) -> str:
     from apps.utils.llms import claude
 
     log.info("Asking the LLM for a branch name")
-    return claude.ask(MODEL_DEFAULT, sys_prompt, title, effort="low")
+    try:
+        keywords = claude.ask(MODEL_DEFAULT, sys_prompt, title, effort="low")
+    except Exception as e:
+        # A branch name isn't worth failing `etl pr` over; the title works without the LLM.
+        log.warning(f"LLM branch name failed, using the title instead: {e}")
+        return title
+    # The model sometimes joins the keywords with hyphens, which the cleanup would glue together.
+    return re.sub(r"[-_]", " ", keywords) or title
 
 
 # ----------------------------------------------------------------------------------------------------------------------
