@@ -364,7 +364,9 @@ def classify_climate_activities(tb_activities: Table) -> Table:
 
 def select_not_screened_for_both(tb_not_screened: Table) -> Table:
     """Activities not screened for mitigation that were not screened for adaptation either (score empty or 99)."""
-    is_screened_for_adaptation = tb_not_screened["climate_adaptation_score"].isin([0, SCORE_SIGNIFICANT, SCORE_PRINCIPAL])
+    is_screened_for_adaptation = tb_not_screened["climate_adaptation_score"].isin(
+        [0, SCORE_SIGNIFICANT, SCORE_PRINCIPAL]
+    )
     return tb_not_screened.loc[~is_screened_for_adaptation.fillna(False), ["donor_code", "year", "value"]]
 
 
