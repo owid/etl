@@ -65,6 +65,10 @@ definitions:
     We combined the mitigation and adaptation markers of each project to count it only once. Projects marked as targeting both objectives (as a principal or significant objective) are counted as "mitigation and adaptation", and the others as "mitigation only" or "adaptation only". Projects with climate as the principal objective are those marked as principal for mitigation or adaptation; the remaining climate-related projects have climate as a significant objective.
   processing_non_climate: |-
     We calculated non-climate-related ODA as bilateral allocable ODA minus climate-related ODA.
+  processing_not_screened: |-
+    We calculated aid not screened for climate as the aid that donors did not assess against the climate change mitigation marker, minus the projects in it that target adaptation (which are already counted as climate-related). We use the mitigation marker because it covers every year, while the adaptation marker only applies from 2010. The rest of non-climate-related ODA was assessed and found not to target climate change.
+  key_not_screened_split: |-
+    In this data, aid "not screened" is aid that donors did not assess against the climate change mitigation marker, and that is not marked as targeting adaptation. The OECD expects donors to assess all bilateral allocable aid, but some leave the marker empty, either for projects they did not assess or for projects that do not target climate change. So this aid may include some climate-related projects that donors did not mark.
   processing_outside_rio_markers: |-
     We calculated this indicator as total bilateral ODA, from the OECD Creditor Reporting System, minus bilateral allocable ODA, from the OECD RioMarkers dataset. Donors can only record cancellations of commitments made in earlier years as a single negative amount, which falls in this category, so it can be negative (for example, for Australia in 2009 and 2010).
   processing_share: |-
@@ -319,6 +323,49 @@ tables:
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_non_climate}\n\n{definitions.processing_donor_groups}"
         display:
           name: "Non-climate-related ODA by donor"
+          numDecimalPlaces: 0
+          tolerance: 0
+          entityAnnotationsMap: "{definitions.entity_annotations_donors}"
+      non_climate_screened:
+        title: "Non-climate-related ODA by donor - Screened"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "Bilateral allocable [ODA](#dod:oda) that donors assessed and found not to target climate change mitigation or adaptation. {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_bilateral_allocable}"
+          - "{definitions.key_rio_markers}"
+          - "{definitions.key_climate_markers}"
+          - "{definitions.key_not_screened_split}"
+          - "{definitions.key_commitments}"
+          - "{definitions.key_adaptation_marker}"
+          - "{definitions.key_constant_usd}"
+        processing_level: major
+        description_processing: "{definitions.processing_climate}\n\n{definitions.processing_non_climate}\n\n{definitions.processing_not_screened}\n\n{definitions.processing_donor_groups}"
+        presentation:
+          title_variant: "Screened"
+        display:
+          name: "Non-climate-related ODA by donor - Screened"
+          numDecimalPlaces: 0
+          tolerance: 0
+          entityAnnotationsMap: "{definitions.entity_annotations_donors}"
+      not_screened:
+        title: "Bilateral allocable ODA not screened for climate, by donor"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "Bilateral allocable [ODA](#dod:oda) that donors did not assess against the climate markers. {definitions.short_commitments} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_bilateral_allocable}"
+          - "{definitions.key_rio_markers}"
+          - "{definitions.key_not_screened_split}"
+          - "{definitions.key_commitments}"
+          - "{definitions.key_adaptation_marker}"
+          - "{definitions.key_constant_usd}"
+        processing_level: major
+        description_processing: "{definitions.processing_not_screened}\n\n{definitions.processing_donor_groups}"
+        display:
+          name: "Bilateral allocable ODA not screened for climate, by donor"
           numDecimalPlaces: 0
           tolerance: 0
           entityAnnotationsMap: "{definitions.entity_annotations_donors}"

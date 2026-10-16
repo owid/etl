@@ -68,6 +68,10 @@ NAMES_BY_CODE = {"O8": "Micronesia (OECD)"}
 CATEGORIES_MARKER = ["mitigation_only", "adaptation_only", "mitigation_and_adaptation"]
 CATEGORIES_OBJECTIVE = ["climate_principal_objective", "climate_significant_objective"]
 CLIMATE_COLUMNS = ["climate_related"] + CATEGORIES_MARKER + CATEGORIES_OBJECTIVE
+# Adaptation-only activities never screened for mitigation: already climate-related, so they are subtracted from the aid
+# not screened for mitigation, to get the non-climate aid that was not screened.
+COLUMN_ADAPTATION_NOT_SCREENED_FOR_MITIGATION = "adaptation_only_not_screened_for_mitigation"
+ACTIVITY_COLUMNS = CLIMATE_COLUMNS + [COLUMN_ADAPTATION_NOT_SCREENED_FOR_MITIGATION]
 
 # Indicators to publish for donors and for recipients.
 INDICATORS_BY_DONOR = [
@@ -76,6 +80,8 @@ INDICATORS_BY_DONOR = [
     "oda_bilateral_outside_rio_markers",
     *CLIMATE_COLUMNS,
     "non_climate",
+    "non_climate_screened",
+    "not_screened",
     "climate_related_share",
     "climate_related_share_of_bilateral_total",
 ]
@@ -240,7 +246,7 @@ def run() -> None:
     # Step 5: Climate-related ODA by donor and recipient, combined with the totals of steps 3 and 4 (for shares).
     tb_given = create_climate_related_table(
         tb_climate=aggregate_by_members(
-            tb=tb_climate, code_column="donor_code", members=members_donors, keys=["year"], columns=CLIMATE_COLUMNS
+            tb=tb_climate, code_column="donor_code", members=members_donors, keys=["year"], columns=ACTIVITY_COLUMNS
         ),
         tb_totals=tb_totals_given,
         tb_bilateral=tb_bilateral_given,
@@ -251,7 +257,7 @@ def run() -> None:
             code_column="recipient_code",
             members=members_recipients,
             keys=["year"],
-            columns=CLIMATE_COLUMNS,
+            columns=ACTIVITY_COLUMNS,
         ),
         tb_totals=tb_totals_received,
         tb_bilateral=tb_bilateral_received,
@@ -333,12 +339,14 @@ def classify_climate_activities(tb_activities: Table) -> Table:
 
     tb = tb_activities.loc[keep, ["donor_code", "recipient_code", "sector_code", "year", "value"]].copy()
     # Put each value in the column of its category (and zero in the others).
+    is_screened_for_mitigation = tb_activities["climate_mitigation_score"].isin([0, SCORE_SIGNIFICANT, SCORE_PRINCIPAL])
     masks = {
         "mitigation_only": is_mitigation & ~is_adaptation,
         "adaptation_only": ~is_mitigation & is_adaptation,
         "mitigation_and_adaptation": is_mitigation & is_adaptation,
         "climate_principal_objective": is_principal,
         "climate_significant_objective": ~is_principal,
+        COLUMN_ADAPTATION_NOT_SCREENED_FOR_MITIGATION: is_adaptation & ~is_screened_for_mitigation.fillna(False),
     }
     for category, mask in masks.items():
         tb[category] = tb["value"] * mask[keep].astype(int)
@@ -396,13 +404,18 @@ def create_climate_related_table(
     # Combine with climate-related ODA. Rows without climate-related activities have zero climate-related ODA.
     assert tb_climate.set_index(keys).index.isin(tb.set_index(keys).index).all(), "Climate-related ODA without totals."
     tb = tb.merge(tb_climate, on=keys, how="left")
-    tb[CLIMATE_COLUMNS] = tb[CLIMATE_COLUMNS].fillna(0)
+    tb[ACTIVITY_COLUMNS] = tb[ACTIVITY_COLUMNS].fillna(0)
     tb["non_climate"] = tb["oda_bilateral_allocable"] - tb["climate_related"]
+    # Split non-climate ODA into aid screened against the mitigation marker (and not targeted) and aid never screened.
+    # NOTE: Only the mitigation marker covers all years, and totals don't say which projects were unscreened for both
+    # markers. So "not screened" is aid not screened for mitigation, minus adaptation-only projects (already climate).
+    tb["not_screened"] = tb["mitigation_not_screened"] - tb[COLUMN_ADAPTATION_NOT_SCREENED_FOR_MITIGATION]
+    tb["non_climate_screened"] = tb["non_climate"] - tb["not_screened"]
 
     sanity_check_reconciliation(tb=tb)
 
     # Express amounts in US dollars (the source is in millions).
-    amounts = ["oda_bilateral_allocable"] + CLIMATE_COLUMNS + ["non_climate"]
+    amounts = ["oda_bilateral_allocable"] + CLIMATE_COLUMNS + ["non_climate", "non_climate_screened", "not_screened"]
     tb = tb[keys + amounts].copy()
     tb[amounts] *= 1e6
     tb["climate_related_share"] = share(tb["climate_related"], tb["oda_bilateral_allocable"])
@@ -465,7 +478,7 @@ def create_sectors_table(
     # Climate-related ODA by donor (and group of donors) and sector.
     keys = ["entity_code", "sector_code", "year"]
     tb_climate = aggregate_by_members(
-        tb=tb_climate, code_column="donor_code", members=members_donors, keys=keys[1:], columns=CLIMATE_COLUMNS
+        tb=tb_climate, code_column="donor_code", members=members_donors, keys=keys[1:], columns=ACTIVITY_COLUMNS
     )
 
     # Totals by donor and sector (to all developing countries), as for all sectors.
@@ -538,6 +551,15 @@ def pivot_totals(tb_totals: Table, marker: int, prefix: str, keys: list[str]) ->
     )
     tb_out = tb_out.merge(tb_related, on=keys, how="left")
     tb_out[f"{prefix}_related"] = tb_out[f"{prefix}_related"].fillna(0)
+    # Aid not screened against the marker (scored 99, or left empty).
+    tb_not_screened = (
+        tb[~tb["score"].isin([0, SCORE_SIGNIFICANT, SCORE_PRINCIPAL])]
+        .groupby(keys, as_index=False, observed=True)["value"]
+        .sum()
+        .rename(columns={"value": f"{prefix}_not_screened"}, errors="raise")
+    )
+    tb_out = tb_out.merge(tb_not_screened, on=keys, how="left")
+    tb_out[f"{prefix}_not_screened"] = tb_out[f"{prefix}_not_screened"].fillna(0)
     return tb_out
 
 
@@ -650,6 +672,10 @@ def sanity_check_reconciliation(tb: Table) -> None:
         "Adaptation-related activities do not match the OECD totals."
     )
     assert (tb["climate_related"] <= tb["oda_bilateral_allocable"] + 0.01).all(), "Climate-related ODA above the total."
+    # Aid not screened is part of non-climate ODA (allowing for float rounding of the totals, in millions).
+    tolerance = RELATIVE_TOLERANCE * tb["oda_bilateral_allocable"].abs() + 0.01
+    assert (tb["not_screened"] >= -tolerance).all(), "Negative aid not screened."
+    assert (tb["not_screened"] <= tb["non_climate"] + tolerance).all(), "Aid not screened above non-climate ODA."
 
 
 def sanity_check_outputs(tables: dict[str, Table]) -> None:
