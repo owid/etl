@@ -7,6 +7,11 @@ definitions:
       attribution_short: IHME
     processing_level: major
 
+  description_key_malaria_repeatable: |-
+    <% if cause == "Malaria" and metric == "Share" and (age == "<5 years" or age == "5-14 years") %>
+    In high-burden areas, some people get malaria more than once a year, so this metric can read higher than the true share of the population infected.
+    <%- endif -%>
+
 macros: |-
   <% macro title(metric, age, cause, unit) %>
     <% if metric == "Number" %>
@@ -107,6 +112,9 @@ tables:
         description_short: |-
           {macros}
           << description_short(metric, age, format_cause(cause), 'new cases') >>
+        description_key:
+          - |-
+            {definitions.description_key_malaria_repeatable}
         presentation:
           grapher_config:
             note: |-
