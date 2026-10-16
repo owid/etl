@@ -14,8 +14,8 @@ of its own. Standard deviations are not labelled in the plot, where "-2 SD" woul
 stunting definition in those terms goes in the Note on desktop and in a second subtitle sentence on
 mobile, which has no Note.
 
-The styling follows the design team's pass on the desktop frame (its copy
-`expected-height-boys-girls-marwa`, `29144:824`, on the Figma page, comment thread #72): whole-pixel line weights (3px median, 2px threshold), 14px explanatory labels with
+The styling follows the design team's pass on the desktop frame (its copy, node `29144:824`, on the
+same Figma page): whole-pixel line weights (3px median, 2px threshold), 14px explanatory labels with
 a halo, curved house arrows instead of straight leaders, the facet titles inside the panels, the
 stunting label right-aligned with "Stunting cutoff:" on a line of its own, a 13px "Median" with a halo,
 a translucent band and a single "Age in years" label. Mobile takes the same treatment, placed for its
@@ -197,7 +197,7 @@ filled dart, both bound to `Data Insights/Annotations` (`setStrokeStyleIdAsync` 
 - stunting: tail ~7px left of "Stunting cutoff:", at mid-height; curving clockwise, out to the left then
   up, to a tip 3-7px under the dashed line at `stunting_label_age`.
 
-The house arrows to clone are the design team's own, in `expected-height-boys-girls-marwa`
+The house arrows to clone are the design team's own, in their copy of the desktop frame
 (`29144:824`): curves `Arrow 4` (band) / `Arrow 3` (stunting), `29146:1057` / `29146:1063`, and their
 darts `29146:1058` / `29146:1064`, with tails at (232, 189) / (336, 315) and tips at (281, 225) /
 (286, 276) in frame coordinates. Clone curve and dart separately and fit each to the step's arrow, read
