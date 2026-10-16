@@ -265,7 +265,7 @@ For full syntax details, see `docs/architecture/metadata/structuring-yaml.md`.
 
 1. **Generate skeleton**: `.venv/bin/etl metadata-export data/garden/<ns>/<ver>/<ds> --output /tmp/<ds>.meta.yml` (never run without `--show` or `--output` to avoid overwriting)
 2. **Inspect the data**: Load dataset, check columns, value ranges, existing origin metadata
-3. **Research sources**: Read snapshot `.dvc` for origin URLs, visit source docs for methodology and definitions
+3. **Research sources**: Starting from the snapshot `.dvc` origin URLs, find the producer's latest documentation (dataset page, methodology, codebook, main report, what's new) per `.claude/rules/producer-documentation.md`. Use it to fill the fields and to contrast any text already written, and ask the user when it is missing, insufficient or inaccessible
 4. **Write top-down**: Start with `definitions:` and `common:` to identify shared patterns before individual variables
 5. **Fill systematically**: For each variable: title -> units -> description_short -> description_key -> processing_level -> display
 6. **Preview with INSTANT mode**: `INSTANT=1 .venv/bin/etlr data://grapher/<ns>/<ver>/<ds> --grapher --only`
