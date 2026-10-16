@@ -54,8 +54,7 @@ def run() -> None:
         "inapplicableEntityNames": ["<< country_select >>"],
         "map": {
             "colorScale": {
-                "customCategoryLabels": {"Not applicable": "Selected country"},
-                "customCategoryColors": {"Not applicable": "#A81527"},
+                "customCategoryColors": {"Not applicable": "#D94C3F"},
             },
         },
     }
