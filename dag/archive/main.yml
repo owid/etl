@@ -1364,6 +1364,17 @@ steps:
       - data://garden/regions/2023-01-01/regions
       - data://garden/who/2025-08-06/self_inflicted_injuries
       - data://garden/demography/2023-03-31/population
+  # archived; last active in b5045f314ce8 on 2026-10-15
+  data://grapher/homicide/2025-08-06/who_mort_db:
+    - data://garden/homicide/2025-08-06/who_mort_db:
+      - data://meadow/homicide/2025-08-06/who_mort_db:
+        - snapshot://homicide/2025-08-06/who_mort_db.csv
+      - data://garden/un/2024-07-12/un_wpp
+  # archived; last active in b5045f314ce8 on 2026-10-15
+  data://grapher/homicide/2024-07-30/homicide_long_run_omm:
+    - data://garden/homicide/2024-07-30/homicide_long_run_omm:
+      - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
+      - data://garden/homicide/2025-08-06/who_mort_db
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
