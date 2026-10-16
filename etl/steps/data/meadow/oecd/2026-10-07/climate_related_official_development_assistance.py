@@ -77,13 +77,16 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Retrieve snapshots: RioMarkers (totals, project-level rows, names of codes) and CRS (total bilateral ODA).
+    # Retrieve snapshots: RioMarkers (totals, project-level rows, names of codes), RioMarkers project-level rows not
+    # screened for mitigation, and CRS (total bilateral ODA).
     snap = paths.load_snapshot("climate_related_official_development_assistance.zip")
+    snap_not_screened = paths.load_snapshot("climate_related_official_development_assistance_not_screened.zip")
     snap_crs = paths.load_snapshot("bilateral_official_development_assistance_commitments.csv")
 
     # Load data from snapshots.
     tables_totals = [snap.read_in_archive(file_name, low_memory=False) for file_name in FILES_TOTALS]
     tb_activities = snap.read_in_archive("activities.csv", low_memory=False)
+    tb_not_screened = snap_not_screened.read_in_archive("not_screened_activities.csv", low_memory=False)
     tb_bilateral = snap_crs.read(low_memory=False)
     # Names of codes and groups are in SDMX XML files.
     with zipfile.ZipFile(snap.path) as zf:
@@ -97,6 +100,11 @@ def run() -> None:
     for file_name, tb in zip(FILES_TOTALS, tables_totals):
         sanity_check_fixed_dimensions(tb=tb, name=file_name, expected=EXPECTED_FIXED_VALUES)
     sanity_check_fixed_dimensions(tb=tb_activities, name="activities.csv", expected=EXPECTED_FIXED_VALUES)
+    sanity_check_fixed_dimensions(
+        tb=tb_not_screened,
+        name="not_screened_activities.csv",
+        expected={**EXPECTED_FIXED_VALUES, "MARKER": 20, "SCORE": 99},  # Mitigation marker, not screened
+    )
     sanity_check_fixed_dimensions(tb=tb_bilateral, name="CRS totals", expected=EXPECTED_FIXED_VALUES_CRS)
 
     # Step 2: Total bilateral ODA (CRS). Its two queries share one series (all DAC members to all developing countries),
@@ -124,9 +132,12 @@ def run() -> None:
     # Step 4: Project-level rows (activities): one per project and marker, with both climate scores.
     tb_activities = tb_activities[list(COLUMNS_ACTIVITIES)].rename(columns=COLUMNS_ACTIVITIES, errors="raise")
     tb_activities = tb_activities.astype({"sector_code": "string"})
+    # The same, for activities not screened for mitigation.
+    tb_not_screened = tb_not_screened[list(COLUMNS_ACTIVITIES)].rename(columns=COLUMNS_ACTIVITIES, errors="raise")
+    tb_not_screened = tb_not_screened.astype({"sector_code": "string"})
 
     # Store codes as categoricals, to keep the large tables small.
-    for tb in [tb_totals, tb_activities]:
+    for tb in [tb_totals, tb_activities, tb_not_screened]:
         for column in ["donor_code", "recipient_code", "sector_code"]:
             tb[column] = tb[column].astype("category")
 
@@ -142,6 +153,7 @@ def run() -> None:
     tables = [
         tb_totals.format(keys, short_name="totals"),
         tb_activities.format(["activity_id"], short_name="activities"),
+        tb_not_screened.format(["activity_id"], short_name="not_screened_activities"),
         tb_codes.format(["codelist", "code"], short_name="codes"),
         tb_groups.format(["hierarchy", "parent_code", "child_code"], short_name="groups"),
         tb_bilateral.format(["donor_code", "recipient_code", "year"], short_name="bilateral_totals"),

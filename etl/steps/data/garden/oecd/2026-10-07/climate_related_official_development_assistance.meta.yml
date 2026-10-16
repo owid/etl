@@ -66,9 +66,9 @@ definitions:
   processing_non_climate: |-
     We calculated non-climate-related ODA as bilateral allocable ODA minus climate-related ODA.
   processing_not_screened: |-
-    We calculated aid not screened for climate as the aid that donors did not assess against the climate change mitigation marker, minus the projects in it that target adaptation (which are already counted as climate-related). We use the mitigation marker because it covers every year, while the adaptation marker only applies from 2010. The rest of non-climate-related ODA was assessed and found not to target climate change.
+    We calculated aid not screened for climate by adding up the projects that donors left empty for both the climate change mitigation and the adaptation marker. The rest of non-climate-related ODA was assessed for at least one of the two markers and found not to target climate change.
   key_not_screened_split: |-
-    In this data, aid "not screened" is aid that donors did not assess against the climate change mitigation marker, and that is not marked as targeting adaptation. The OECD expects donors to assess all bilateral allocable aid, but some leave the marker empty, either for projects they did not assess or for projects that do not target climate change. So this aid may include some climate-related projects that donors did not mark.
+    In this data, aid "not screened" is aid from projects that donors did not assess against either climate marker: both the mitigation and the adaptation marker are empty. The OECD expects donors to assess all bilateral allocable aid, but some leave the markers empty, either for projects they did not assess or for projects that do not target climate change. So this aid may include some climate-related projects that donors did not mark.
   processing_outside_rio_markers: |-
     We calculated this indicator as total bilateral ODA, from the OECD Creditor Reporting System, minus bilateral allocable ODA, from the OECD RioMarkers dataset. Donors can only record cancellations of commitments made in earlier years as a single negative amount, which falls in this category, so it can be negative (for example, for Australia in 2009 and 2010).
   processing_share: |-
