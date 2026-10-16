@@ -39,33 +39,30 @@ def run() -> None:
     assert 1e8 < tb["deforestation_emissions"].max() < 1e10, "Emissions are not in tonnes of CO2."
 
     ####################################################################################################################
-    # The source lists some flows under several commodity names that share one FAOSTAT item, with identical values on
-    # every row. For example, "Mangoes", "Guavas" and "Mangoes, guavas and mangosteens" are all FAOSTAT item 571. The
-    # trade model works with FAOSTAT trade data, which has no detail below the item, so these rows are copies of the
-    # same flow, and summing them would count it two or three times. We keep one row per flow and FAOSTAT item.
-    # The producers' lookup table gives each commodity its FAOSTAT item code.
-    expected_duplicates = {
-        "Mangoes, guavas and mangosteens": ["Mangoes", "Guavas"],
-        "Other pulses n.e.c.": ["Pulses, n.e.c."],
-        "Other stimulant, spice and aromatic crops, n.e.c.": ["Stimulant, spice and aromatic crops, n.e.c."],
-        "Tangerines, mandarins, clementines": ["Tangerines and mandarins"],
-        "Other tropical fruits, n.e.c.": ["Other tropical and subtropical fruits, n.e.c."],
-    }
-    item_code = tb_lookup.set_index("commodity")["fao_item_code"].to_dict()
-    tb["fao_item_code"] = tb["commodity"].map(item_code)
-    error = f"Commodities missing from the lookup: {sorted(set(tb[tb['fao_item_code'].isna()]['commodity']))}"
-    assert tb["fao_item_code"].notna().all(), error
-    # Names that share a FAOSTAT item, among the commodities in the data.
-    commodities = tb[["commodity", "fao_item_code"]].drop_duplicates()
-    found = {frozenset(group["commodity"]) for _, group in commodities.groupby("fao_item_code") if len(group) > 1}
-    expected = {frozenset([kept] + extras) for kept, extras in expected_duplicates.items()}
+    # The source lists some flows under several commodity names that refer to the same FAOSTAT item, with identical
+    # values. The trade model works with FAOSTAT trade data, which has no detail below the item, so these rows are
+    # copies of the same flow, and summing them would count it two or three times. We keep one row per flow and item,
+    # using the producers' lookup table to get each commodity's FAOSTAT item code.
+    duplicates = [
+        {"Mangoes", "Guavas", "Mangoes, guavas and mangosteens"},
+        {"Pulses, n.e.c.", "Other pulses n.e.c."},
+        {"Stimulant, spice and aromatic crops, n.e.c.", "Other stimulant, spice and aromatic crops, n.e.c."},
+        {"Tangerines and mandarins", "Tangerines, mandarins, clementines"},
+        {"Other tropical fruits, n.e.c.", "Other tropical and subtropical fruits, n.e.c."},
+    ]
+    tb["fao_item_code"] = tb["commodity"].map(tb_lookup.set_index("commodity")["fao_item_code"])
+    assert tb["fao_item_code"].notna().all(), "Commodities missing from the lookup."
+    names_by_item = tb.groupby("fao_item_code")["commodity"].agg(set)
     error = "The commodities sharing a FAOSTAT item changed. This issue may have been fixed; review this block."
-    assert found == expected, error
-    # All copies of a flow must be identical, otherwise they should be summed, not dropped.
+    assert sorted(sorted(s) for s in names_by_item if len(s) > 1) == sorted(sorted(s) for s in duplicates), error
     flow_columns = ["producer_country", "consumer_country", "year", "fao_item_code"]
     copies = tb.groupby(flow_columns, observed=True)[VALUE_COLUMNS + ["consumption"]].nunique(dropna=False)
-    assert (copies <= 1).all().all(), "Rows sharing a FAOSTAT item are no longer identical; sum them instead."
+    assert (copies == 1).all().all(), "Copies of a flow are not identical; sum them instead of dropping them."
+    n_rows = len(tb)
     tb = tb.drop_duplicates(subset=flow_columns).drop(columns="fao_item_code")
+    # Each extra name added one full copy of its flows, so exactly those copies should be gone.
+    n_copies = sum((len(names) - 1) * tb["commodity"].isin(names).sum() for names in duplicates)
+    assert n_rows - len(tb) == n_copies, "Unexpected number of repeated rows."
     ####################################################################################################################
 
     for column in ["producer_country", "consumer_country"]:
