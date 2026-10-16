@@ -11,6 +11,9 @@ import anthropic
 
 from etl import config
 
+# What a failed call raises (network, auth, rate limit, server error), for callers that degrade gracefully.
+APIError = anthropic.APIError
+
 
 def has_api_key() -> bool:
     return bool(config.ANTHROPIC_API_KEY)

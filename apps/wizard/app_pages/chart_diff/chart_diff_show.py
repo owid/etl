@@ -518,7 +518,7 @@ class ChartDiffShow:
                 stream = claude.TextStream(MODEL_DEFAULT, system, str(meta_diffs), effort="low")
                 try:
                     response = cast(str, st.write_stream(stream))
-                except Exception as e:
+                except claude.APIError as e:
                     st.error(f"AI summary failed: {e}")
                     return
 

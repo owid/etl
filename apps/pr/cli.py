@@ -786,7 +786,7 @@ def summarize_title_llm(title) -> str:
     log.info("Asking the LLM for a branch name")
     try:
         keywords = claude.ask(MODEL_DEFAULT, sys_prompt, title, effort="low")
-    except Exception as e:
+    except claude.APIError as e:
         # A branch name isn't worth failing `etl pr` over; the title works without the LLM.
         log.warning(f"LLM branch name failed, using the title instead: {e}")
         return title

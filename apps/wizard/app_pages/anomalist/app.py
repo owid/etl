@@ -255,7 +255,7 @@ def ask_llm_for_summary(df: pd.DataFrame):
     stream = claude.TextStream(MODEL_DEFAULT, system, df_str, effort="low")
     try:
         st.write_stream(stream)
-    except Exception as e:
+    except claude.APIError as e:
         st.error(f"AI summary failed: {e}")
         return
 

@@ -264,7 +264,7 @@ never pad the list with variations to reach a number):
 }}"""
 
     try:
-        cache_key = hashlib.sha256(f"{model_id}\n{prompt}".encode()).hexdigest()
+        cache_key = hashlib.sha256(f"{model_id}\n{json.dumps(KEYWORDS_SCHEMA)}\n{prompt}".encode()).hexdigest()
         input_tokens = output_tokens = 0
         if cache_key in cache:
             result_text = cache[cache_key]
