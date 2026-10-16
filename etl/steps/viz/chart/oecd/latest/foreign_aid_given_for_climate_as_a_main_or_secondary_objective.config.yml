@@ -8,7 +8,11 @@ views:
   - dimensions: {}
     indicators:
       y:
-        - catalogPath: "climate_related_oda_by_donor#non_climate"
+        - catalogPath: "climate_related_oda_by_donor#not_screened"
+          display:
+            name: "Not screened for a main or secondary objective"
+            color: "#BDBDBD"
+        - catalogPath: "climate_related_oda_by_donor#non_climate_screened"
           display:
             name: "Non-climate-related"
             color: "#C8A47E"
@@ -23,7 +27,7 @@ views:
     config:
       title: "Foreign aid given for climate as a main or secondary objective"
       subtitle: "Committed bilateral [official development assistance (ODA)](#dod:oda) covered by the OECD's climate tracking, by whether climate change mitigation or adaptation is the main objective of the project, a secondary objective, or not an objective. This data is expressed in US dollars and adjusted for inflation."
-      note: "This data is expressed in constant 2024 US$. Projects that target climate as a secondary objective are counted at their full value. The OECD's climate tracking excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
+      note: "This data is expressed in constant 2024 US$. Projects that target climate as a secondary objective are counted at their full value. \"Not screened for a main or secondary objective\" is aid that donors didn't assess against either climate marker. The OECD's climate tracking excludes general budget support, debt relief and costs in donor countries, such as hosting refugees."
       originUrl: "/foreign-aid"
       tab: "chart"
       hasMapTab: false
