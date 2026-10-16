@@ -14,8 +14,8 @@ of its own. Standard deviations are not labelled in the plot, where "-2 SD" woul
 stunting definition in those terms goes in the Note on desktop and in a second subtitle sentence on
 mobile, which has no Note.
 
-The styling follows the design team's pass on the desktop frame (its copy `29144:824` on the Figma page,
-comment thread #72): whole-pixel line weights (3px median, 2px threshold), 14px explanatory labels with
+The styling follows the design team's pass on the desktop frame (its copy
+`expected-height-boys-girls-marwa`, `29144:824`, on the Figma page, comment thread #72): whole-pixel line weights (3px median, 2px threshold), 14px explanatory labels with
 a halo, curved house arrows instead of straight leaders, the facet titles inside the panels, the
 stunting label right-aligned with "Stunting cutoff:" on a line of its own, a 13px "Median" with a halo,
 a translucent band and a single "Age in years" label. Mobile takes the same treatment, placed for its
@@ -171,8 +171,14 @@ centred; the facet titles and `label__age` by their top-left corner; `label__med
 bottom-right corner; `label__within-2-sd` by its bottom-left corner, lines left-aligned;
 `label__stunting-cutoff` by its top-right corner, lines right-aligned.
 
-Halos, as outside strokes on the TEXT node (`strokeAlign = "OUTSIDE"`), so a label stays readable where
-it crosses a gridline or the band:
+A wrapped label imports as one TEXT node per line, each placed by its left edge, so the two
+right-aligned labels come in ragged once Lato's wider advances are applied. Re-anchor each line on its
+right edge: `label__median` on the panel's right edge minus 7px, and each line of
+`label__stunting-cutoff` on `stunting_label_xy`'s age (19.37 desktop, 19.6 mobile, as a share of the
+plot's 0-19 width).
+
+Halos, as outside strokes on every line's TEXT node (`strokeAlign = "OUTSIDE"`), so a label stays
+readable where it crosses a gridline or the band:
 
 | Text | Halo |
 |---|---|
@@ -191,9 +197,24 @@ filled dart, both bound to `Data Insights/Annotations` (`setStrokeStyleIdAsync` 
 - stunting: tail ~7px left of "Stunting cutoff:", at mid-height; curving clockwise, out to the left then
   up, to a tip 3-7px under the dashed line at `stunting_label_age`.
 
-In the design team's desktop frame (`29144:824`) the curve is `Arrow 4` / `Arrow 3` and the dart a
-`Vector`, grouped as `Group 1` / `Group 5`, with tails at (232, 189) / (336, 315) and tips at
-(281, 225) / (286, 276) in frame coordinates.
+The house arrows to clone are the design team's own, in `expected-height-boys-girls-marwa`
+(`29144:824`): curves `Arrow 4` (band) / `Arrow 3` (stunting), `29146:1057` / `29146:1063`, and their
+darts `29146:1058` / `29146:1064`, with tails at (232, 189) / (336, 315) and tips at (281, 225) /
+(286, 276) in frame coordinates. Clone curve and dart separately and fit each to the step's arrow, read
+off the curve VECTOR of `leader__<role>` (its first vertex is the tail, its last the tip):
+
+1. rotate the dart rigidly by the angle between the house chord (tail to tip) and the step's, and put
+   its tip on the step's tip;
+2. take the curve from the step's tail to where the rotated dart's rear now sits, scaling it uniformly
+   with `resize(w * s, h * s)` -- never `rescale`, which thins the 1px stroke -- and rotating it onto
+   that chord;
+3. copy each clone's transform in frame coordinates (`absoluteTransform` minus the frame's origin), since
+   `clone()` keeps only its own transform and drops the mirror its parent group carries;
+4. group the two as `annotation__arrow-<role>` in the frame, not in `chart`, so the arrows do not count
+   as data marks; remember to move them with the chart in the fit below.
+
+On desktop the house arrows need only a ~0.9-1.05 scale and under a degree of rotation; on mobile the
+chords are shorter and steeper (scale 0.58 / 0.69, rotation 21 / 34 degrees).
 
 **Fit.** After the restyle script's crop, set the `chart` frame's box to the content column
 (`resizeWithoutConstraints(header.width, h)`, `x = header.x`) and centre it in the band between the
@@ -214,7 +235,8 @@ a few tenths of a pixel.
 *both thresholds* and both bands reporting a bound style -- and each threshold and band reporting the
 same colour as its own median, which is the check that catches a stale band or threshold selector --
 both bands at opacity 0.2, the three labels in the Boys panel carrying their halos, no ink outside
-16..W-16, and gaps of 12-16px with the mobile header ending at the layout's `chart_area_top`. A mobile
+16..W-16, and gaps of about 13.3 on desktop and 14.2 on mobile, the same above and below once centred,
+with the mobile header ending at the layout's `chart_area_top`. A mobile
 gap outside 12-16 means `chart_area_top` no longer matches the Figma header: re-measure it rather than
 re-centring by hand.
 
