@@ -60,7 +60,7 @@ def format_columns_and_index(tb: Table, short_name: str, index_columns: list[str
     tb = tb.rename(columns={"cty_lab": "country"})
 
     # Make year string
-    tb["year"] = tb["year"].astype("string")
+    tb["year"] = tb["year"].astype("str")
 
     # In the measure column, select all the categories, except for pctb
     tb = tb[tb["measure"] != "pctb"].reset_index(drop=True)

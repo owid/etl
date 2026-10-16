@@ -9,6 +9,10 @@ from mcp.types import TextContent
 
 from owid_mcp.server import RequestLoggingMiddleware, mcp
 
+# These tests call live services (Datasette, the indicators API, search.owid.io), so a blip there fails CI. Run them
+# with `make test-integration`; the whole module goes away with owid_mcp after its shutdown (#6921).
+pytestmark = pytest.mark.integration
+
 
 @pytest.mark.asyncio
 async def test_mcp_server_health():

@@ -307,7 +307,7 @@ class Harmonizer:
                 raise ValueError(f"Column '{colname}' not found in table")
             indicator = tb[colname]
 
-        return sorted(set(indicator.dropna().astype("string").unique()))
+        return sorted(set(indicator.dropna().astype("str").unique()))
 
     def _get_output_file(self, output_file: Path | str | None, paths: PathFinder | None):
         """Get set of country names to map."""

@@ -294,7 +294,7 @@ def _clean_population_type(tb):
     """
     # Crete new column with the year.
     regex = r"\b\d{4}\b"
-    tb["year"] = tb["Year"].astype("string").str.extract(f"({regex})", expand=False)
+    tb["year"] = tb["Year"].astype("str").str.extract(f"({regex})", expand=False)
     assert tb["year"].notna().all(), "Year extraction was successful!"
     tb["year"] = tb["year"].astype(int)
 
@@ -304,7 +304,7 @@ def _clean_population_type(tb):
     )
 
     # Drop duplicate years, keeping YYYY+.
-    tb["Year"] = tb["Year"].astype("string")
+    tb["Year"] = tb["Year"].astype("str")
     tb = tb.sort_values("Year")
     tb = tb.drop_duplicates(subset=["year", "Age", "sex", "country", "format"], keep="first").drop(columns="Year")
 
@@ -318,7 +318,7 @@ def _clean_population_type(tb):
 
 def _clean_year(tb):
     # Remove year ranges, and convert to int
-    flag = tb["Year"].astype("string").str.contains("-")
+    flag = tb["Year"].astype("str").str.contains("-")
     tb = tb.loc[~flag]
     tb["Year"] = tb["Year"].astype("int")
     return tb

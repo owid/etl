@@ -3,7 +3,6 @@ import tempfile
 import zipfile
 
 import owid.catalog.processing as pr
-import pandas as pd
 from owid.catalog import Origin, Table, TableMeta
 from pandas.api.types import CategoricalDtype
 from structlog import get_logger
@@ -349,7 +348,7 @@ def df_cols_as_str(
 
 
 def fix_types(df_depratio: Table, df_deaths: Table) -> tuple[Table, ...]:
-    _type = pd.StringDtype()
+    _type = "str"
     df_depratio = df_depratio.assign(Notes=df_depratio.Notes.astype(_type))
     df_deaths = df_deaths.assign(Notes=df_deaths.Notes.astype(_type))
     return df_depratio, df_deaths

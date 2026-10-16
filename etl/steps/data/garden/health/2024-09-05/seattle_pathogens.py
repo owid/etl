@@ -45,7 +45,7 @@ def run(dest_dir: str) -> None:
     # Rename organism
     tb["organism"] = tb["organism"].cat.rename_categories(ORGANISM_RENAME)
     # Change date format from week YYYY-Www to YYYY-MM-DD
-    tb["date"] = pd.to_datetime(tb["week"].astype("string") + "-1", format="%G-W%V-%w")
+    tb["date"] = pd.to_datetime(tb["week"].astype("str") + "-1", format="%G-W%V-%w")
     # Keep relevant columns
     tb = tb[["date", "organism", "present", "tested"]]
 

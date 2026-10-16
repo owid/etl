@@ -155,7 +155,7 @@ def run() -> None:
     for tb in [tb_totals, tb_activities, tb_bilateral]:
         for column in ["donor_code", "recipient_code", "sector_code"]:
             if column in tb.columns:
-                tb[column] = tb[column].astype("string")
+                tb[column] = tb[column].astype("str")
 
     sanity_check_inputs(tb_totals=tb_totals, tb_activities=tb_activities)
 

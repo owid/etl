@@ -112,7 +112,7 @@ def aggregate_antimicrobial_classes(tb: Table):
 
     tb = tb.copy(deep=True)
     # Convert the column to strings (if not already done)
-    tb["antimicrobialclass"] = tb["antimicrobialclass"].astype("string")
+    tb["antimicrobialclass"] = tb["antimicrobialclass"].astype("str")
 
     # Create a completely independent copy of antituberculosis rows and reset its index
     msk = tb["antimicrobialclass"] == "Drugs for the treatment of tuberculosis (ATC J04A)"
