@@ -24,6 +24,7 @@ Usage:
 """
 
 import asyncio
+import hashlib
 import json
 import os
 import sys
@@ -34,9 +35,7 @@ import click
 import httpx
 from dotenv import load_dotenv  # ty: ignore
 from genai_prices import Usage, calc_price
-from google import genai  # ty: ignore
-from google.genai import types as genai_types  # ty: ignore
-from google.genai import errors as genai_errors  # ty: ignore
+import anthropic
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -61,31 +60,28 @@ from coverage_report import (  # ty: ignore
     render_topic_table,
 )
 from etl.config import OWID_ENV  # ty: ignore
+from etl.paths import CACHE_DIR  # ty: ignore
 
 S3_BUCKET_NAME = "owid-public"
 DEFAULT_S3_VOCABULARY_PATH = "topic_vocabulary.json"
 
-DEFAULT_MODEL = "gemini-3.8-flash"
+DEFAULT_MODEL = "claude-sonnet-5-5"
 
-# Ask for the same candidates every time. Left at the model's defaults, two runs
-# of identical code disagreed on almost every topic — Gender Ratio came back
-# covering 30% of its traffic in one run and 79% in the next — which makes a
-# prompt improvement indistinguishable from luck, and this prompt has been
-# iterated on a lot. Deterministic sampling doesn't make the candidates better,
-# it makes a change in them attributable.
-#
-# The seed alone does this. Gemini has ignored `temperature` since 3.6 Flash and
-# upcoming models reject it (as they will `top_p` and `top_k`), so don't add it
-# back: on gemini-3.8-flash, repeated calls with this seed return identical text,
-# with or without temperature 0.
-LLM_SAMPLING = {"seed": 1}
+# Reuse the answer for an identical request. Left alone, two runs of identical code
+# disagreed on almost every topic — Gender Ratio came back covering 30% of its
+# traffic in one run and 79% in the next — which makes a prompt improvement
+# indistinguishable from luck, and this prompt has been iterated on a lot. The
+# model can't be made to sample deterministically, so a topic whose prompt (its
+# chart list included) and model are unchanged gets its earlier answer back: a
+# change in the candidates is then attributable to a change in the inputs. Delete
+# the file to sample afresh.
+LLM_CACHE_FILE = CACHE_DIR / "vocabulary_llm_answers.json"
 
 # A whole-vocabulary run fires one request per topic at once, which draws the
-# occasional 503/429 out of the API. Those are transient, but a topic that
-# gives up is a topic missing from the upload, so retry each one a few times
-# before letting it fail.
-LLM_MAX_ATTEMPTS = 4
-LLM_RETRY_BACKOFF_SECONDS = 4
+# occasional 429/5xx out of the API. Those are transient, but a topic that gives up
+# is a topic missing from the upload, so the client retries each one a few times
+# (with backoff) before letting it fail.
+LLM_MAX_RETRIES = 3
 
 # How many topics' record sets to fetch at once.
 SEARCH_CONCURRENCY = 8
@@ -163,14 +159,17 @@ def texts_for_prompt(universe: WeightedUniverse, limit: int = 200) -> list[str]:
     return texts[:limit]
 
 async def extract_keywords_with_llm(
-    topic_slug: str, topic_name: str, texts: list[str], api_key: str, model_id: str = DEFAULT_MODEL
+    topic_slug: str,
+    topic_name: str,
+    texts: list[str],
+    client: anthropic.AsyncAnthropic,
+    cache: dict[str, str],
+    model_id: str = DEFAULT_MODEL,
 ) -> dict:
-    """Use Gemini to extract good keywords/phrases from chart texts.
+    """Use an LLM to extract good keywords/phrases from chart texts.
 
-    Returns: dict with topic info, keywords, and token usage
+    Returns: dict with topic info, keywords, and token usage (zero when the answer came from the cache)
     """
-    client = genai.Client(api_key=api_key)
-
     # Combine all texts
     combined_text = "\n".join(texts)
 
@@ -249,42 +248,18 @@ never pad the list with variations to reach a number):
 }}"""
 
     try:
-        response = None
-        for attempt in range(1, LLM_MAX_ATTEMPTS + 1):
-            try:
-                response = await client.aio.models.generate_content(
-                    model=model_id,
-                    contents=prompt,
-                    config=genai_types.GenerateContentConfig(**LLM_SAMPLING),
-                )
-                break
-            except (genai_errors.ServerError, genai_errors.ClientError) as e:
-                # 429 (rate limited) and 5xx are worth another go; anything else
-                # (a bad model id, a rejected prompt) will fail again identically.
-                retriable = getattr(e, "code", None) == 429 or isinstance(e, genai_errors.ServerError)
-                if not retriable or attempt == LLM_MAX_ATTEMPTS:
-                    raise
-                delay = LLM_RETRY_BACKOFF_SECONDS * attempt
-                click.secho(
-                    f"  {topic_name}: {getattr(e, 'code', '?')} from the API, retrying in {delay}s "
-                    f"(attempt {attempt}/{LLM_MAX_ATTEMPTS - 1})",
-                    fg="yellow",
-                )
-                await asyncio.sleep(delay)
-        assert response is not None
-        result_text = response.text.strip()
-
-        # Extract token counts
-        usage = response.usage_metadata
-        input_tokens: int = (
-            int(usage.prompt_token_count)
-            if hasattr(usage, "prompt_token_count") and usage.prompt_token_count is not None
-            else 0
-        )
-        # Thinking tokens are billed as output, on top of the answer itself.
-        output_tokens: int = sum(
-            int(getattr(usage, field, None) or 0) for field in ("candidates_token_count", "thoughts_token_count")
-        )
+        cache_key = hashlib.sha256(f"{model_id}\n{prompt}".encode()).hexdigest()
+        input_tokens = output_tokens = 0
+        if cache_key in cache:
+            result_text = cache[cache_key]
+        else:
+            response = await client.messages.create(
+                model=model_id, max_tokens=16000, messages=[{"role": "user", "content": prompt}]
+            )
+            # The response can begin with thinking blocks; the answer is in the text blocks.
+            result_text = "".join(block.text for block in response.content if block.type == "text").strip()
+            # Thinking tokens are billed as output and included in output_tokens.
+            input_tokens, output_tokens = response.usage.input_tokens, response.usage.output_tokens
 
         # Extract JSON
         if "```json" in result_text:
@@ -294,6 +269,8 @@ never pad the list with variations to reach a number):
 
         result = json.loads(result_text)
         keywords = result.get("keywords", [])
+        # Only an answer that parsed is worth reusing.
+        cache[cache_key] = result_text
 
         return {
             "topic_slug": topic_slug,
@@ -409,13 +386,17 @@ async def process_topics(
         return [], failed, universes, []
 
     click.echo(f"\nAsking for candidate terms for {len(prompt_inputs)} topics...")
+    client = anthropic.AsyncAnthropic(api_key=api_key, max_retries=LLM_MAX_RETRIES)
+    cache: dict[str, str] = json.loads(LLM_CACHE_FILE.read_text()) if LLM_CACHE_FILE.exists() else {}
     candidate_results = await asyncio.gather(
         *(
-            extract_keywords_with_llm(topic_slug, topic_name, texts, api_key, model)
+            extract_keywords_with_llm(topic_slug, topic_name, texts, client, cache, model)
             for topic_slug, topic_name, texts in prompt_inputs
         ),
         return_exceptions=True,
     )
+    LLM_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    LLM_CACHE_FILE.write_text(json.dumps(cache))
 
     click.echo("\nChoosing the terms that cover the most of each topic...")
     results: list[dict] = []
@@ -498,7 +479,7 @@ async def process_topics(
 @click.option(
     "--model",
     default=DEFAULT_MODEL,
-    help=f"Gemini model to use (default: {DEFAULT_MODEL}). Any model id the API accepts works.",
+    help=f"Claude model to use (default: {DEFAULT_MODEL}). Any model id the API accepts works.",
 )
 @click.option(
     "--upload-path",
@@ -567,9 +548,9 @@ def main(
     load_dotenv(env_path)
 
     # Load API key
-    api_key = os.getenv("GOOGLE_API_KEY")
+    api_key = os.getenv("ANTHROPIC_API_KEY")
     if not api_key:
-        click.secho("✗ GOOGLE_API_KEY not found in environment", fg="red")
+        click.secho("✗ ANTHROPIC_API_KEY not found in environment", fg="red")
         click.echo(f"  Looked in: {env_path}")
         sys.exit(1)
 
@@ -645,7 +626,7 @@ def main(
             calc_price(
                 Usage(input_tokens=r["stats"]["input_tokens"], output_tokens=r["stats"]["output_tokens"]),
                 model,
-                provider_id="google",
+                provider_id="anthropic",
             )
             for r in results
         ]

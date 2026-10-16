@@ -92,7 +92,7 @@ from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
 from apps.pr.categories import PR_CATEGORIES, PR_CATEGORIES_CHOICES
-from apps.utils.llms.gpt import OpenAIWrapper
+from apps.utils.llms import claude
 from etl.config import GITHUB_API_BASE, GITHUB_API_URL, GITHUB_TOKEN
 from etl.paths import BASE_DIR
 
@@ -116,7 +116,7 @@ SHELL_FORM_STYLE = questionary.Style(
 )
 
 # LLM
-MODEL_DEFAULT = "gpt-5-mini"
+MODEL_DEFAULT = "claude-haiku-5-5"
 
 
 @click.command(
@@ -748,7 +748,7 @@ def _extract_relevant_title_for_branch_name(text_in: str, category: str, use_llm
         str: The processed string.
     """
     if use_llm:
-        if "OPENAI_API_KEY" in os.environ:
+        if claude.has_api_key():
             text_in = summarize_title_llm(text_in)
 
     cleaned_text = re.sub(r"[^a-zA-Z0-9\s]", "", text_in)
@@ -782,10 +782,9 @@ def generate_short_hash() -> str:
 
 def summarize_title_llm(title) -> str:
     sys_prompt = "You are given a title of a pull request. I need a 2-3 keyword summary, separated by a space. These words will be used to create a branch name."
-    api = OpenAIWrapper()
-    log.info("Querying GPT!")
-    response = api.query_gpt_fast(title, sys_prompt, model=MODEL_DEFAULT)
-    return response
+    log.info("Asking the LLM for a branch name")
+    # The model sometimes joins the words with hyphens; the branch-name cleanup drops those, so split on them.
+    return re.sub(r"[-_]", " ", claude.ask(MODEL_DEFAULT, sys_prompt, title, effort="low"))
 
 
 # ----------------------------------------------------------------------------------------------------------------------

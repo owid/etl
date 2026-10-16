@@ -50,9 +50,8 @@ from apps.chart_critic.bundle import Bundle
 # On charts with known answers it caught 8 of 9 passes on real findings against Gemini's 6, never
 # raised a false positive Gemini raised twice, and stayed quiet on clean charts. It costs about
 # $0.04 a chart with caching against Gemini's $0.035. Haiku 5.5 caught none, with or without the
-# render, so the small Claude tier is not a cheap substitute. The cheap tier stays on Gemini.
+# render, so the small Claude tier is not a cheap substitute, and there is no cheaper tier.
 DEFAULT_MODEL = "anthropic:claude-sonnet-5-5"
-CHEAP_MODEL = "google:gemini-3.1-flash-lite"
 
 # Settings for Claude models, which get none of them by default:
 # - Thinking is switched on explicitly: answering without it took about 40 output tokens a pass and

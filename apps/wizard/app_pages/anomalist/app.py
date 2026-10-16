@@ -25,7 +25,7 @@ import pandas as pd
 import streamlit as st
 
 from apps.anomalist.anomalist_api import anomaly_detection, load_detector, pretty_print_number
-from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens, get_number_tokens
+from apps.utils.llms import claude
 from apps.wizard.app_pages.anomalist.utils import (
     AnomalyTypeEnum,
     create_tables,
@@ -80,7 +80,7 @@ ANOMALY_TYPE_NAMES = {k: v["tag_name"] for k, v in ANOMALY_TYPES.items()}
 ANOMALY_TYPES_TO_DETECT = tuple(ANOMALY_TYPES.keys())
 
 # GPT
-MODEL_DEFAULT = "gpt-5"
+MODEL_DEFAULT = "claude-sonnet-5-5"
 
 # Map sorting strategy to name to show in UI.
 SORTING_STRATEGIES = {
@@ -165,7 +165,7 @@ def llm_ask(df: pd.DataFrame):
         "AI Summary",
         on_click=lambda: llm_dialog(df),
         icon=":material/robot:",
-        help=f"Ask GPT {MODEL_DEFAULT} to summarize the anomalies. This is experimental.",
+        help=f"Ask {MODEL_DEFAULT} to summarize the anomalies. This is experimental.",
     )
 
 
@@ -225,17 +225,7 @@ def ask_llm_for_summary(df: pd.DataFrame):
         df_str += text
 
     # Ask LLM for summary
-    client = OpenAIWrapper()
-
-    # Prepare messages for the LLM
-    messages = [
-        {
-            "role": "system",
-            "content": [
-                {
-                    "type": "text",
-                    "text": (
-                        f"""
+    system = f"""
                         The user has obtained anomalies for a list of indicators. This list comes in the format of a dataframe with columns:
                             - 'entity_name': Typically a country name.
                             - 'year': The year in which the anomaly was detected.
@@ -259,42 +249,12 @@ def ask_llm_for_summary(df: pd.DataFrame):
 
                         {metadata_summary}
                         """
-                    ),
-                },
-            ],
-        },
-        {
-            "role": "user",
-            "content": [
-                {
-                    "type": "text",
-                    "text": df_str,
-                },
-            ],
-        },
-    ]
+    stream = claude.TextStream(MODEL_DEFAULT, system, df_str)
+    st.write_stream(stream)
 
-    text_in = "\n".join([m["content"][0]["text"] for m in messages])
-    num_tokens = get_number_tokens(text_in, MODEL_DEFAULT)
-
-    # Check if the number of tokens is within limits
-    if num_tokens > 128_000:
-        st.warning(
-            f"There are too many tokens in the GPT query to model {MODEL_DEFAULT}. The query has {num_tokens} tokens, while the maximum allowed is 128,000. We will support this in the future. Raise this issue to re-prioritize it."
-        )
-    else:
-        # Ask GPT (stream)
-        stream = client.chat.completions.create(
-            model=MODEL_DEFAULT,
-            messages=messages,  # ty: ignore
-            max_completion_tokens=3000,
-            stream=True,
-        )
-        response = cast(str, st.write_stream(stream))
-
-        cost, num_tokens = get_cost_and_tokens(text_in, response, cast(str, MODEL_DEFAULT))
-        cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
-        st.info(cost_msg)
+    cost = f"{stream.cost:.4f} USD" if stream.cost is not None else "unknown"
+    tokens = f"{stream.usage.input_tokens} in, {stream.usage.output_tokens} out" if stream.usage else "unknown"
+    st.info(f"**Cost**: {cost}.\n\n **Tokens**: {tokens}.")
 
 
 # Functions to filter the results
