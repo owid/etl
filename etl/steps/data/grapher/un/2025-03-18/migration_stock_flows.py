@@ -55,6 +55,7 @@ def run() -> None:
         "map": {
             "colorScale": {
                 "customCategoryColors": {"Not applicable": "#D94C3F"},
+                "customCategoryLabels": {"Not applicable": "Selected country"},
             },
         },
     }
