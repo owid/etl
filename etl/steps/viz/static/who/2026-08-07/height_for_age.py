@@ -211,15 +211,17 @@ off the curve VECTOR of `leader__<role>` (its first vertex is the tail, its last
 3. copy each clone's transform in frame coordinates (`absoluteTransform` minus the frame's origin), since
    `clone()` keeps only its own transform and drops the mirror its parent group carries;
 4. group the two as `annotation__arrow-<role>` in the frame, not in `chart`, so the arrows do not count
-   as data marks; remember to move them with the chart in the fit below.
+   as data marks. Add them after the fit's crop, or measure the crop on `chart` alone, so they never
+   widen it.
 
 On desktop the house arrows need only a ~0.9-1.05 scale and under a degree of rotation; on mobile the
 chords are shorter and steeper (scale 0.58 / 0.69, rotation 21 / 34 degrees).
 
-**Fit.** After the restyle script's crop, set the `chart` frame's box to the content column
-(`resizeWithoutConstraints(header.width, h)`, `x = header.x`) and centre it in the band between the
-header's bottom and the footer's first visible row (`footer.y + min(0, row.y)`). Never `rescale` here,
-which would move every font off its rank.
+**Fit.** Crop the `chart` frame to its ink (text by its render bounds vertically), then set its box to
+the content column (`resizeWithoutConstraints(header.width, h)`, `x = header.x`). Do NOT re-centre it
+vertically: the step already places the plot against the Figma header and footer with the design
+team's uneven gaps (`CHART_TOP_GAP`, `CHART_BOTTOM_GAP`), and centring would even them out. Never
+`rescale` here, which would move every font off its rank.
 
 The column snap is not optional, and the restyle script's own crop does not land it. That crop pads
 every stroke by half its weight on all four sides, caps or not, so the 3px median makes it report
@@ -235,10 +237,15 @@ a few tenths of a pixel.
 *both thresholds* and both bands reporting a bound style -- and each threshold and band reporting the
 same colour as its own median, which is the check that catches a stale band or threshold selector --
 both bands at opacity 0.2, the three labels in the Boys panel carrying their halos, no ink outside
-16..W-16, and gaps of about 13.3 on desktop and 14.2 on mobile, the same above and below once centred,
-with the mobile header ending at the layout's `chart_area_top`. A mobile
-gap outside 12-16 means `chart_area_top` no longer matches the Figma header: re-measure it rather than
-re-centring by hand.
+16..W-16, and ink gaps of 28.9 above the chart and 21.9 below it on both layouts, with each header
+ending at its layout's `chart_area_top`. A top gap off by more than a pixel means `chart_area_top` no
+longer matches the Figma header: re-measure it rather than moving the chart by hand.
+
+Then diff the desktop frame against the design team's copy with `/create-figma-chart`'s
+`scripts/diff_frames.js` (`referenceId` `29144:824`, `frameId` `26869:1501`). Expect every node paired
+and only these deltas: the two wrapped labels as one TEXT node there and one per line here (with the
+alignment that comes with it), the Note one 818px box wide here where the copy's is 729, and the two
+arrows within ~3px of the copy's. Anything else is drift from the design.
 
 One `verify_page.js` row fails by design: desktop `text-floor` flags the template's own tagline and
 license row, which ships at 11px. The series, furniture and colour rows SKIP, because they key on grapher's layer names (`line__*`,
@@ -398,6 +405,11 @@ BAND_LABEL = (
     "shaded area."
 )
 
+# Line spacing of the two wrapped labels, as a multiple of the font size. matplotlib's default 1.2 puts
+# their lines 15px apart in Figma, where a typed 14px Lato label (line height AUTO) runs at 17px, as the
+# design team's labels do; 1.36 is 1.2 x 17 / 15.
+LABEL_LINESPACING = 1.36
+
 # The arrows joining a label to its mark: curved, with a filled head, in the annotation grey and at the
 # house arrows' 1px. In Figma each is replaced by a clone of the house curvy arrow laid over it, so what
 # this step fixes is where an arrow starts and where it points; see `draw_direct_labels`. The lighter
@@ -448,7 +460,7 @@ TICK_WIDTH = 1
 # row grapher reserves above each panel back to the plot. The offsets are template px from the panel's
 # top-left corner to the title's top-left. Boys is indented to line up with the band label under it,
 # Girls has no label to line up with and sits close to the panel's edge, both as placed in Figma.
-FACET_TITLE_OFFSET_PX = {"Boys": (16, 11), "Girls": (4, 11)}
+FACET_TITLE_OFFSET_PX = {"Boys": (16, 15.5), "Girls": (4, 15.5)}
 
 # The design team's type ladder for the text INSIDE the plot, in template pixels -- which is what
 # Figma shows, because the figure is drawn at the template's own width. The two explanatory labels are
@@ -502,11 +514,14 @@ LAYOUTS = {
         "nrows": 1,
         "ncols": 2,
         "full_footer": True,
+        # Where the header ends in the Figma frame: a one-line title and a one-line subtitle (16 + 29 +
+        # 6 + 19).
+        "chart_area_top": 70,
         "age_ticks": [0, 5, 10, 15, 19],
         # The stunting label's top-right corner, as (age, cm), and how wide it may wrap, in template px;
         # and the age its arrow points at on the dashed line. Its right edge runs 7px past the panel,
         # into the gutter, as placed in Figma. See `draw_direct_labels` for why it sits where it does.
-        "stunting_label_xy": (19.37, 117),
+        "stunting_label_xy": (19.37, 115.4),
         "stunting_label_width": 155,
         "stunting_label_age": 11.4,
         # The band label's bottom-left corner, as (age, cm), in the empty top-left of the Boys panel,
@@ -519,9 +534,10 @@ LAYOUTS = {
         "body_fontsize": LADDER_PT["body"],
         "footer_fontsize": 7.75,
         # Space reserved below the plot for the tick marks, the x tick labels and the bold
-        # "Age in years" label. The y tick column is not reserved here -- it is measured from the
-        # labels themselves, see `y_tick_column_px`.
-        "x_label_space": 47,
+        # "Age in years" label: their ink runs 44px below the baseline in Figma, so `CHART_BOTTOM_GAP`
+        # lands as set. The y tick column is not reserved here -- it is measured from the labels
+        # themselves, see `y_tick_column_px`.
+        "x_label_space": 44,
     },
     "height_for_age_mobile": {
         "size": (540, 824),
@@ -537,7 +553,7 @@ LAYOUTS = {
         "ncols": 2,
         "full_footer": False,
         "age_ticks": [0, 5, 10, 15, 19],
-        "stunting_label_xy": (19.6, 112),
+        "stunting_label_xy": (19.6, 110.8),
         "stunting_label_width": 120,
         "stunting_label_age": 10.0,
         # Where the header ends in the Figma frame: the template's serif sets the title on two lines and
@@ -558,7 +574,7 @@ LAYOUTS = {
         "title_fontsize": 16,
         "body_fontsize": LADDER_PT["body"],
         "footer_fontsize": 8.75,
-        "x_label_space": 47,
+        "x_label_space": 44,
     },
 }
 
@@ -592,16 +608,17 @@ TITLE_SUBTITLE_GAP = 6
 
 # Vertical rhythm below the subtitle, in multiples of a text line.
 SUBTITLE_GAP = 0.15
-HEADER_CHART_GAP = 0.8
 
-# The breathing room to leave inside the chart area, in template pixels. Filling the area edge to edge
-# leaves the drawn block about 5px from the header and the footer, which reads as cramped; the design
-# team's own pages sit at 12-16px. Only the mobile layout needs this, because there the block starts at
-# the chart area's top (its `chart_area_top`): the desktop layout centres what is left of a band its
-# one-line title and subtitle have already widened. Figma then centres the chart in its band, so this
-# sets the plot's height rather than the final gaps; check those against the 12-16px target after each
-# re-import.
-CHART_AREA_INSET = 9
+# The space between the chart's ink and the Figma header above it and the footer below it, in template
+# pixels, as the design team set it: 29 from the subtitle down to the top of the "200 cm" label, and 22
+# from the bottom of "Age in years" down to the footer's first row. More air above than below, and more
+# than the 12-16px the chart would get if it were simply centred in its band.
+CHART_TOP_GAP = 29
+CHART_BOTTOM_GAP = 22
+
+# How far the top y tick label's ink rises above the top gridline, in template px, measured in Figma. The
+# plot's top edge is that gridline, so it starts this much below where the ink may start.
+TOP_TICK_OVERHANG = 5
 
 
 def run() -> None:
@@ -775,7 +792,7 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, color) -> None:
     ax.annotate(
         MEDIAN_LABEL,
         xy=(median_age, height_at(MEDIAN_COLUMN, median_age)),
-        xytext=(-7 * POINTS_PER_PIXEL, 4),
+        xytext=(-7 * POINTS_PER_PIXEL, 3.2),
         textcoords="offset points",
         ha="right",
         va="bottom",
@@ -798,11 +815,12 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, color) -> None:
         ha="left",
         va="bottom",
         multialignment="left",
+        linespacing=LABEL_LINESPACING,
         fontsize=label_fontsize,
         color=TEXT_COLOR,
         zorder=6,
         gid="label__within-2-sd",
-        arrowprops=arrow_props(*line_end(band_text, label_fontsize, row=-1, side="right"), rad=-0.35),
+        arrowprops=arrow_props(*line_end(band_text, label_fontsize, row=-1, side="right"), rad=-0.35, clearance_px=0),
     )
     assert band_label.arrow_patch is not None
     band_label.arrow_patch.set_gid("leader__within-2-sd")
@@ -817,21 +835,24 @@ def draw_direct_labels(ax, tb_sex: Table, layout: dict, color) -> None:
         ha="right",
         va="top",
         multialignment="right",
+        linespacing=LABEL_LINESPACING,
         fontsize=label_fontsize,
         color=TEXT_COLOR,
         zorder=6,
         gid="label__stunting-cutoff",
-        arrowprops=arrow_props(*line_end(stunting_text, label_fontsize, row=0, side="left"), rad=-0.35),
+        arrowprops=arrow_props(*line_end(stunting_text, label_fontsize, row=0, side="left"), rad=-0.35, clearance_px=4),
     )
     assert label.arrow_patch is not None
     label.arrow_patch.set_gid("leader__stunting-cutoff")
 
 
-def arrow_props(origin: tuple[float, float], gap: float, rad: float) -> dict:
+def arrow_props(origin: tuple[float, float], gap: float, rad: float, clearance_px: float) -> dict:
     """Arrow properties for an annotation whose arrow leaves from `origin` on its text, `gap` points clear.
 
     `rad` bends the arrow into an arc, as the house curvy arrows do; negative bends it clockwise from
-    the label to its mark.
+    the label to its mark. `clearance_px` is the air left between the tip and the point it aims at:
+    a few pixels when that point is on a line, as the house arrows keep, and none when it is inside an
+    area.
     """
     return {
         "arrowstyle": LEADER_HEAD,
@@ -840,8 +861,7 @@ def arrow_props(origin: tuple[float, float], gap: float, rad: float) -> dict:
         "color": LEADER_COLOR,
         "linewidth": LEADER_WIDTH,
         "shrinkA": gap,
-        # A few pixels of air between the head and the line it points at, as the house arrows keep.
-        "shrinkB": 4 * POINTS_PER_PIXEL,
+        "shrinkB": clearance_px * POINTS_PER_PIXEL,
         "relpos": origin,
         # matplotlib otherwise clips the arrow to the text's box plus 4pt of padding, so it starts on the
         # box's edge rather than at the point chosen above.
@@ -1144,11 +1164,11 @@ def create_visualization(tb: Table, citation: str, layout: dict) -> plt.Figure:
             labelcolor=TEXT_COLOR,
         )
         # Grapher renders axis labels bold (fontWeight 700 in Axis.ts). One label serves both panels,
-        # since they share the axis: under the first panel, left-aligned on its left edge, as the
-        # design team set it in Figma.
+        # since they share the axis: under the first panel, left-aligned on its left edge, its box
+        # starting 27.6px below the baseline, as the design team set it in Figma.
         if ax is axes[0]:
             ax.set_xlabel(
-                "Age in years", fontsize=body_fontsize, color=TEXT_COLOR, fontweight="bold", labelpad=4, loc="left"
+                "Age in years", fontsize=body_fontsize, color=TEXT_COLOR, fontweight="bold", labelpad=6.4, loc="left"
             )
             ax.xaxis.label.set_gid("label__age")
 
@@ -1188,19 +1208,14 @@ def create_visualization(tb: Table, citation: str, layout: dict) -> plt.Figure:
         gid="subtitle",
     )
 
-    # Our subtitle runs longer than the template's two-line placeholder, so whatever comes next
-    # starts below wherever the subtitle actually ends rather than at the template's fixed
-    # chart-area top.
+    # The chart starts a fixed gap below where the Figma header ends. That header, not the step's own
+    # (set in narrower faces), is the one that ships, so it decides; the step's only has to fit above it.
+    # The facet titles sit inside the panels, so all that rises above the plot is the top y tick label.
     subtitle_bottom_px = subtitle_y + subtitle_lines * px(body_fontsize) + px(body_fontsize) * SUBTITLE_GAP
-    # The facet titles sit inside the panels, so all that rises above the plot is the upper half of the
-    # top y tick label, centred on the top gridline.
-    top_overhang_px = px(body_fontsize) / 2
-    if layout["full_footer"]:
-        chart_top_px = subtitle_bottom_px + HEADER_CHART_GAP * px(body_fontsize) + top_overhang_px
-    else:
-        # Mobile: the drawn block starts at the template's chart-area top, inset from it, unless the
-        # subtitle runs past that row.
-        chart_top_px = max(subtitle_bottom_px, layout["chart_area_top"]) + CHART_AREA_INSET + top_overhang_px
+    assert subtitle_bottom_px < layout["chart_area_top"] + CHART_TOP_GAP, (
+        f"the step's subtitle ends at {subtitle_bottom_px:.0f}px, inside the gap above the chart"
+    )
+    chart_top_px = layout["chart_area_top"] + CHART_TOP_GAP + TOP_TICK_OVERHANG
 
     # --- footer, in the slots the static-chart templates define ---
     # Desktop: Note -> Data source -> tagline and license sharing one row, left and right.
@@ -1223,9 +1238,9 @@ def create_visualization(tb: Table, citation: str, layout: dict) -> plt.Figure:
             color=MUTED_COLOR,
             gid="note",
         )
-        chart_bottom_px = note_top_px
+        chart_bottom_px = note_top_px - CHART_BOTTOM_GAP
     else:
-        chart_bottom_px = layout["chart_bottom_y"] - CHART_AREA_INSET
+        chart_bottom_px = layout["chart_bottom_y"] - CHART_BOTTOM_GAP
 
     fig.text(
         fx(margin_px),
