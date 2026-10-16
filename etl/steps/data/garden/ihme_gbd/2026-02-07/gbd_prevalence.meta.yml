@@ -7,6 +7,11 @@ definitions:
       attribution_short: IHME
     processing_level: major
 
+  description_key_malaria_repeatable: |-
+    <% if cause == "Malaria" and metric == "Share" and (age == "<5 years" or age == "5-14 years") %>
+    In high-burden areas, some people get malaria more than once a year, so this metric can read higher than the true share of the population infected.
+    <%- endif -%>
+
 macros: |-
   <% macro title(metric, age, cause, unit) %>
     <% if metric == "Number" %>
@@ -19,11 +24,11 @@ macros: |-
         <% endif %>
     <% elif metric == "Rate" %>
         <% if age != 'Age-standardized' and age != 'All ages' %>
-            << unit | capitalize >> of << cause >>, among individuals aged << age >> per 100,000 people
+            << unit | capitalize >> of << cause >>, among individuals aged << age >> per 100,000 << age_noun(age) >>
         <% elif age == 'Age-standardized' %>
-            Age-standardized << unit >> of << cause >> per 100,000 people
+            Age-standardized << unit >> of << cause >> per 100,000 << age_noun(age) >>
         <% elif age == 'All ages' %>
-            << unit | capitalize >> of << cause >> per 100,000 people
+            << unit | capitalize >> of << cause >> per 100,000 << age_noun(age) >>
         <% endif %>
     <% elif metric == "Share" %>
         <% if age != 'Age-standardized' and age != 'All ages' %>
@@ -47,11 +52,11 @@ macros: |-
         <% endif %>
     <% elif metric == "Rate" %>
         <% if age != 'Age-standardized' and age != 'All ages' %>
-            Estimated number of << unit >> of << cause >> in those aged << age >>, per 100,000 people.
+            Estimated number of << unit >> of << cause >> in those aged << age >>, per 100,000 << age_noun(age) >>.
         <% elif age == 'Age-standardized' %>
-            Estimated number of age-standardized << unit >> of << cause >>, per 100,000 people.
+            Estimated number of age-standardized << unit >> of << cause >>, per 100,000 << age_noun(age) >>.
         <% elif age == 'All ages' %>
-            Estimated number of << unit >> of << cause >>, per 100,000 people.
+            Estimated number of << unit >> of << cause >>, per 100,000 << age_noun(age) >>.
         <% endif %>
     <% elif metric == "Share" %>
         <% if age != 'Age-standardized' and age != 'All ages' %>
@@ -107,6 +112,9 @@ tables:
         description_short: |-
           {macros}
           << description_short(metric, age, format_cause(cause), 'new cases') >>
+        description_key:
+          - |-
+            {definitions.description_key_malaria_repeatable}
         presentation:
           grapher_config:
             note: |-
