@@ -31,14 +31,14 @@ definitions:
   # indicator's title (data page, the chart's "learn more" panel when the chart sets no label of its own, table
   # headers); it goes in `display.name`, not `presentation.title_public`, because grapher lets a public title
   # override the chart's own labels in that panel, while a display name yields to them.
-  display_name_number: "Deaths from {definitions.cause_in_text}{definitions.among}"
-  description_short_number: "Reported deaths from {definitions.cause_in_text}{definitions.among}, {definitions.underlying_cause}."
+  display_name_deaths: "Deaths from {definitions.cause_in_text}{definitions.among}"
+  description_short_deaths: "Reported deaths from {definitions.cause_in_text}{definitions.among}, {definitions.underlying_cause}."
   display_name_death_rate: "Deaths from {definitions.cause_in_text} per 100,000 {definitions.people}{definitions.aged}"
   description_short_death_rate: "Reported deaths from {definitions.cause_in_text} per 100,000 {definitions.people}{definitions.aged}, {definitions.underlying_cause}."
   display_name_share: "Share of deaths{definitions.among} that are from {definitions.cause_in_text}"
   description_short_share: "Share of all reported deaths{definitions.among} that are from {definitions.cause_in_text}, {definitions.underlying_cause}."
-  display_name_asr: "Age-standardized death rate from {definitions.cause_in_text} per 100,000 {definitions.people}"
-  description_short_asr: "Reported deaths from {definitions.cause_in_text} per 100,000 {definitions.people}, {definitions.underlying_cause}. To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized)."
+  display_name_death_rate_age_standardized: "Age-standardized death rate from {definitions.cause_in_text} per 100,000 {definitions.people}"
+  description_short_death_rate_age_standardized: "Reported deaths from {definitions.cause_in_text} per 100,000 {definitions.people}, {definitions.underlying_cause}. To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized)."
 
   description_disease_producer: |-
     <% if cause == "All Causes" %>
@@ -137,16 +137,16 @@ dataset:
 tables:
   mortality_database:
     variables: &fact_variables
-      number:
+      deaths:
         title: "<< cause >> — Deaths — << sex >>, << age_group >>"
-        description_short: "{definitions.description_short_number}"
+        description_short: "{definitions.description_short_deaths}"
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
           {definitions.description_processing_unintentional_injuries}{definitions.description_processing_derived_age_group_count}
         unit: deaths
         display:
-          name: "{definitions.display_name_number}"
+          name: "{definitions.display_name_deaths}"
           numDecimalPlaces: 0
           entityAnnotationsMap: |-
             {definitions.annotation}
@@ -154,7 +154,7 @@ tables:
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
-      percentage_of_cause_specific_deaths_out_of_total_deaths:
+      share_of_deaths:
         title: "<< cause >> — Share of total deaths — << sex >>, << age_group >>"
         description_short: "{definitions.description_short_share}"
         description_from_producer: |-
@@ -170,16 +170,16 @@ tables:
           grapher_config:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
-      age_standardized_death_rate_per_100_000_standard_population:
+      death_rate_age_standardized:
         title: "<< cause >> — Age-standardized death rate per 100,000 people — << sex >>, << age_group >>"
-        description_short: "{definitions.description_short_asr}"
+        description_short: "{definitions.description_short_death_rate_age_standardized}"
         description_from_producer: |-
           {definitions.description_disease_producer}
         description_processing: |-
           {definitions.description_processing_unintentional_injuries}
         unit: deaths per 100,000 people
         display:
-          name: "{definitions.display_name_asr}"
+          name: "{definitions.display_name_death_rate_age_standardized}"
           numDecimalPlaces: 1
           entityAnnotationsMap: |-
             {definitions.annotation}
@@ -187,7 +187,7 @@ tables:
           grapher_config:
             note: |-
               To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized). All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
-      death_rate_per_100_000_population:
+      death_rate:
         title: "<< cause >> — Death rate per 100,000 people — << sex >>, << age_group >>"
         description_short: "{definitions.description_short_death_rate}"
         description_from_producer: |-

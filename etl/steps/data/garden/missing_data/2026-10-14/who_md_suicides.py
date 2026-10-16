@@ -18,6 +18,8 @@ def run() -> None:
     ds_population = paths.load_dataset("population")
     tb_population = ds_population["population"].reset_index()
     tb = ds_data.read("intentional_injuries")
+    # The merged dataset names the metric `death_rate`; this step keeps the longer name it has always used internally.
+    tb = tb.rename(columns={"death_rate": "death_rate_per_100_000_population"}, errors="raise")
     tb = tb[tb["cause"] == "Self-inflicted injuries"].drop(columns=["cause"])
 
     tb_data = prepare_data(tb)
