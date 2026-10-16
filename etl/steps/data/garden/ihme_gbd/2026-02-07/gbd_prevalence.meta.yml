@@ -19,11 +19,11 @@ macros: |-
         <% endif %>
     <% elif metric == "Rate" %>
         <% if age != 'Age-standardized' and age != 'All ages' %>
-            << unit | capitalize >> of << cause >>, among individuals aged << age >> per 100,000 people
+            << unit | capitalize >> of << cause >>, among individuals aged << age >> per 100,000 << age_noun(age) >>
         <% elif age == 'Age-standardized' %>
-            Age-standardized << unit >> of << cause >> per 100,000 people
+            Age-standardized << unit >> of << cause >> per 100,000 << age_noun(age) >>
         <% elif age == 'All ages' %>
-            << unit | capitalize >> of << cause >> per 100,000 people
+            << unit | capitalize >> of << cause >> per 100,000 << age_noun(age) >>
         <% endif %>
     <% elif metric == "Share" %>
         <% if age != 'Age-standardized' and age != 'All ages' %>
@@ -47,11 +47,11 @@ macros: |-
         <% endif %>
     <% elif metric == "Rate" %>
         <% if age != 'Age-standardized' and age != 'All ages' %>
-            Estimated number of << unit >> of << cause >> in those aged << age >>, per 100,000 people.
+            Estimated number of << unit >> of << cause >> in those aged << age >>, per 100,000 << age_noun(age) >>.
         <% elif age == 'Age-standardized' %>
-            Estimated number of age-standardized << unit >> of << cause >>, per 100,000 people.
+            Estimated number of age-standardized << unit >> of << cause >>, per 100,000 << age_noun(age) >>.
         <% elif age == 'All ages' %>
-            Estimated number of << unit >> of << cause >>, per 100,000 people.
+            Estimated number of << unit >> of << cause >>, per 100,000 << age_noun(age) >>.
         <% endif %>
     <% elif metric == "Share" %>
         <% if age != 'Age-standardized' and age != 'All ages' %>

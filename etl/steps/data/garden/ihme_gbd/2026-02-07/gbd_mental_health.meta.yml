@@ -9,7 +9,6 @@ definitions:
     <% if metric == "Number" %>
     <%- elif metric == "Rate" %>
     <%- elif metric == "Share" %>
-    %
     <%- endif %>
 
 macros: |-
@@ -21,7 +20,11 @@ macros: |-
               <% set base = "Age-standardized current cases of " ~ sex ~ " with " ~ cause %>
           <% endif %>
       <% elif age == 'All ages' %>
-          <% set base = "Total current number of " ~ sex ~ " with " ~ cause %>
+          <% if metric == "Number" %>
+              <% set base = "Total current number of " ~ sex ~ " with " ~ cause %>
+          <% else %>
+              <% set base = "Current cases of " ~ sex ~ " with " ~ cause %>
+          <% endif %>
       <% else %>
           <% set base = "Current cases of " ~ cause ~ ", among " ~ sex ~ " aged " ~ age %>
       <% endif %>
@@ -84,7 +87,7 @@ tables:
           <%- elif metric == "Rate" %>
             cases per 100,000 people
           <%- elif metric == "Share" %>
-            %
+            cases per 100 people
           <%- endif %>
         short_unit: |-
           {definitions.short_unit}

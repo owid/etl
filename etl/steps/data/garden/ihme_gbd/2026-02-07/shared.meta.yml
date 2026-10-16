@@ -1,13 +1,27 @@
 macros: |-
   <% macro format_cause(cause) %>
-    <%- if cause.startswith("HIV/AIDS") -%><< cause >><%- else -%><< cause.lower() >><%- endif -%>
+    <%- if "HIV/AIDS" in cause or "HIV" in cause -%>
+      << cause.lower() | replace("hiv/aids", "HIV/AIDS") | replace("hiv", "HIV") | replace("(owid)", "(OWID)") >>
+    <%- else -%>
+      << cause.lower() | replace("(owid)", "(OWID)") >>
+    <%- endif -%>
+  <% endmacro %>
+
+  <% macro age_noun(age) %>
+    <%- if age in ["<28 days", "28-364 days", "<1 year", "1-4 years", "<5 years", "5-14 years"] -%>
+      children
+    <%- elif age == "15-19 years" -%>
+      adolescents
+    <%- else -%>
+      people
+    <%- endif -%>
   <% endmacro %>
 
   <% macro format_unit(metric, prefix) %>
     <%- if metric == "Number" -%>
       << prefix >>
     <%- elif metric == "Rate" -%>
-      << prefix >> per 100,000 people
+      << prefix >> per 100,000 << age_noun(age) >>
     <%- elif metric == "Share" -%>
       << prefix >> per 100 people
     <%- elif metric == "Percent" and prefix == "DALYs" -%>
@@ -36,7 +50,7 @@ macros: |-
 
       <% if metric == "Number" %>
           <% if age != 'Age-standardized' and age != 'All ages' %>
-              << unit | capitalize >> from << cause >><< attrText >> among individuals aged << age >>
+              << (unit[0]|upper) ~ unit[1:] >> from << cause >><< attrText >> among individuals aged << age >>
           <% elif age == 'Age-standardized' %>
               Age-standardized << unit >> from << cause >><< attrText >>
           <% elif age == 'All ages' %>
@@ -44,11 +58,11 @@ macros: |-
           <% endif %>
       <% elif metric == "Rate" %>
           <% if age != 'Age-standardized' and age != 'All ages' %>
-              << unit | capitalize >> from << cause >><< attrText >> among individuals aged << age >> per 100,000 people
+              << (unit[0]|upper) ~ unit[1:] >> from << cause >><< attrText >> among individuals aged << age >> per 100,000 << age_noun(age) >>
           <% elif age == 'Age-standardized' %>
-              Age-standardized << unit >> from << cause >><< attrText >> per 100,000 people
+              Age-standardized << unit >> from << cause >><< attrText >> per 100,000 << age_noun(age) >>
           <% elif age == 'All ages' %>
-              << unit | capitalize >> from << cause >><< attrText >> per 100,000 people
+              << (unit[0]|upper) ~ unit[1:] >> from << cause >><< attrText >> per 100,000 << age_noun(age) >>
           <% endif %>
       <% elif metric == "Percent" %>
           <% if age != 'Age-standardized' and age != 'All ages' %>
@@ -79,11 +93,11 @@ macros: |-
           <% endif %>
       <% elif metric == "Rate" %>
           <% if age != 'Age-standardized' and age != 'All ages' %>
-              Estimated number of << unit >> from << cause >><< attrText >> in those aged << age >>, per 100,000 people.
+              Estimated number of << unit >> from << cause >><< attrText >> in those aged << age >>, per 100,000 << age_noun(age) >>.
           <% elif age == 'Age-standardized' %>
-              Estimated number of age-standardized << unit >> from << cause >><< attrText >>, per 100,000 people.
+              Estimated number of age-standardized << unit >> from << cause >><< attrText >>, per 100,000 << age_noun(age) >>.
           <% elif age == 'All ages' %>
-              Estimated number of << unit >> from << cause >><< attrText >>, per 100,000 people.
+              Estimated number of << unit >> from << cause >><< attrText >>, per 100,000 << age_noun(age) >>.
           <% endif %>
       <% elif metric == "Percent" %>
           <% if age != 'Age-standardized' and age != 'All ages' %>
@@ -98,11 +112,9 @@ macros: |-
 
 definitions:
   short_unit: |-
-    <%- if metric == "Share" -%>
+    <%- if metric == "Percent" -%>
     %
-    <%- elif metric == "Percent" -%>
-    %
-    <%- elif metric == "Rate" or metric == "Number" -%>
+    <%- elif metric == "Share" or metric == "Rate" or metric == "Number" -%>
     <%- endif %>
 
   footnote: |-
