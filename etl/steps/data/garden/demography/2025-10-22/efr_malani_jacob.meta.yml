@@ -85,7 +85,7 @@ tables:
       efr:
         title: Effective fertility rate by age (children born in << birth_year >>)
         description_short: |-
-          Average number of children born per woman in a given year who are still alive at each age.
+          Average number of children per woman who survive to each age, among children born in << birth_year >>.
         description_key:
           - Malani and Jacob define the effective fertility rate as the average number of a woman's children who survive to a given age. We calculate it by multiplying the fertility rate in a given year by the share of children born that year who survive to each age.
           - For survival at each age, we use the death rates of the year the children reach that age. For example, children born in 1950 face 1950's death rates as babies and 1951's death rates at age one.
