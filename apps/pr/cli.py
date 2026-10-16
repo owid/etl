@@ -92,8 +92,7 @@ from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
 from apps.pr.categories import PR_CATEGORIES, PR_CATEGORIES_CHOICES
-from apps.utils.llms.gpt import OpenAIWrapper
-from etl.config import GITHUB_API_BASE, GITHUB_API_URL, GITHUB_TOKEN
+from etl.config import ANTHROPIC_API_KEY, GITHUB_API_BASE, GITHUB_API_URL, GITHUB_TOKEN
 from etl.paths import BASE_DIR
 
 # Initialize logger.
@@ -116,7 +115,7 @@ SHELL_FORM_STYLE = questionary.Style(
 )
 
 # LLM
-MODEL_DEFAULT = "gpt-5-mini"
+MODEL_DEFAULT = "claude-haiku-5-5"
 
 
 @click.command(
@@ -747,9 +746,8 @@ def _extract_relevant_title_for_branch_name(text_in: str, category: str, use_llm
     Returns:
         str: The processed string.
     """
-    if use_llm:
-        if "OPENAI_API_KEY" in os.environ:
-            text_in = summarize_title_llm(text_in)
+    if use_llm and ANTHROPIC_API_KEY:
+        text_in = summarize_title_llm(text_in)
 
     cleaned_text = re.sub(r"[^a-zA-Z0-9\s]", "", text_in)
 
@@ -782,10 +780,18 @@ def generate_short_hash() -> str:
 
 def summarize_title_llm(title) -> str:
     sys_prompt = "You are given a title of a pull request. I need a 2-3 keyword summary, separated by a space. These words will be used to create a branch name."
-    api = OpenAIWrapper()
-    log.info("Querying GPT!")
-    response = api.query_gpt_fast(title, sys_prompt, model=MODEL_DEFAULT)
-    return response
+    # Imported here: the LLM libraries are slow to load, and `etl pr --no-llm` / `etl pr-clean` don't need them.
+    from apps.utils.llms import claude
+
+    log.info("Asking the LLM for a branch name")
+    try:
+        keywords = claude.ask(MODEL_DEFAULT, sys_prompt, title, effort="low")
+    except claude.APIError as e:
+        # A branch name isn't worth failing `etl pr` over; the title works without the LLM.
+        log.warning(f"LLM branch name failed, using the title instead: {e}")
+        return title
+    # The model sometimes joins the keywords with hyphens, which the cleanup would glue together.
+    return re.sub(r"[-_]", " ", keywords) or title
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -50,9 +50,8 @@ from apps.chart_critic.bundle import Bundle
 # On charts with known answers it caught 8 of 9 passes on real findings against Gemini's 6, never
 # raised a false positive Gemini raised twice, and stayed quiet on clean charts. It costs about
 # $0.04 a chart with caching against Gemini's $0.035. Haiku 5.5 caught none, with or without the
-# render, so the small Claude tier is not a cheap substitute. The cheap tier stays on Gemini.
+# render, so the small Claude tier is not a cheap substitute.
 DEFAULT_MODEL = "anthropic:claude-sonnet-5-5"
-CHEAP_MODEL = "google:gemini-3.1-flash-lite"
 
 # Settings for Claude models, which get none of them by default:
 # - Thinking is switched on explicitly: answering without it took about 40 output tokens a pass and
@@ -239,10 +238,9 @@ def format_views(views_365d: int | float | None) -> str:
 def build_agent(model: str = DEFAULT_MODEL) -> Agent[None, Review]:
     """An agent with no system instructions — see :func:`prompt_parts` for why.
 
-    No sampling settings: Gemini has ignored ``temperature``, ``top_p`` and ``top_k`` since
-    3.6 Flash, and upcoming models reject them. This model raises a genuine finding on some
-    passes and not others, so repeat passes are the recall dial — see ``--repeat``. Claude
-    models get :data:`ANTHROPIC_SETTINGS`.
+    No sampling settings: current models reject them. The model raises a genuine finding on some
+    passes and not others, so repeat passes are the recall dial — see ``--repeat``. Claude models
+    get :data:`ANTHROPIC_SETTINGS`; any other ``--model`` is used with its defaults.
     """
     if not model.startswith("anthropic:"):
         return Agent[None, Review](model=model, output_type=Review, retries=2)
