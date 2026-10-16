@@ -173,17 +173,17 @@ def _safe_dtype(dtype: Any) -> str:
         return "Float64"
     elif pd.api.types.is_bool_dtype(dtype):
         return "boolean"
-    elif isinstance(dtype, pd.CategoricalDtype):
-        return "string[pyarrow]"
-    elif dtype == "object" or dtype == "str":
-        return "string[pyarrow]"
+    elif isinstance(dtype, (pd.CategoricalDtype, pd.StringDtype)) or dtype == "object":
+        # pandas 3's default string dtype (pyarrow-backed, NaN for missing), so that strings read from
+        # a dataset behave like the ones a step creates.
+        return "str"
     else:
         return dtype
 
 
 def to_safe_types(t: pd.DataFrame) -> pd.DataFrame:
-    """Convert numeric columns to Float64 and Int64 and categorical
-    columns to string[pyarrow]."""
+    """Convert numeric columns to Float64 and Int64, and categorical, object and
+    string columns to pandas' default `str` dtype."""
     t = t.astype({col: _safe_dtype(t[col].dtype) for col in t.columns})
 
     if isinstance(t.index, pd.MultiIndex):

@@ -28,7 +28,7 @@ def run() -> None:
     ## Dtypes
     tb = tb.astype(
         {
-            "country": "string",
+            "country": "str",
             "date": "datetime64[ns]",
         }
     )

@@ -689,9 +689,9 @@ def make_table_list(
 
         dtypes = {}
         if "age" in tb.columns:
-            dtypes["age"] = "string"
+            dtypes["age"] = "str"
         if "birth_order" in tb.columns:
-            dtypes["birth_order"] = "string"
+            dtypes["birth_order"] = "str"
         tb = tb.astype(dtypes)
 
         # Add formatted table to the list of tables.

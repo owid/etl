@@ -32,7 +32,7 @@ def create_decadal_table(tb: Table) -> Table:
 
     # Calculate the sea ice extent of each month, averaged over the same 10 months of each decade.
     # For example, January 1990 will be the average sea ice extent of the 10 months of January between 1990 and 1999.
-    tb_decadal["decade"] = tb_decadal["decade"].astype("string") + "s"
+    tb_decadal["decade"] = tb_decadal["decade"].astype("str") + "s"
     tb_decadal = tb_decadal.groupby(["month", "decade"], observed=True, as_index=False).agg(
         {"sea_ice_extent_arctic": "mean", "sea_ice_extent_antarctic": "mean"}
     )
@@ -42,7 +42,7 @@ def create_decadal_table(tb: Table) -> Table:
 
 
 def improve_metadata(tb: Table) -> Table:
-    tb = tb.astype({"country": "string"}).copy()
+    tb = tb.astype({"country": "str"}).copy()
 
     # Gather years in the data, and assign colors to them.
     colors = {}
@@ -154,7 +154,7 @@ def run() -> None:
     # Process data.
     #
     # Rename locations conveniently.
-    tb = tb.astype({"location": "string"})
+    tb = tb.astype({"location": "str"})
     tb.loc[tb["location"] == "Northern Hemisphere", "location"] = "Arctic"
     tb.loc[tb["location"] == "Southern Hemisphere", "location"] = "Antarctic"
     assert set(tb["location"]) == {"Arctic", "Antarctic"}, "Unexpected locations."

@@ -35,10 +35,10 @@ def run() -> None:
     #
 
     # Make reporting_level and welfare_type strings
-    tb["reporting_level"] = tb["reporting_level"].astype("string")
-    tb["welfare_type"] = tb["welfare_type"].astype("string")
-    tb_percentiles["reporting_level"] = tb_percentiles["reporting_level"].astype("string")
-    tb_percentiles["welfare_type"] = tb_percentiles["welfare_type"].astype("string")
+    tb["reporting_level"] = tb["reporting_level"].astype("str")
+    tb["welfare_type"] = tb["welfare_type"].astype("str")
+    tb_percentiles["reporting_level"] = tb_percentiles["reporting_level"].astype("str")
+    tb_percentiles["welfare_type"] = tb_percentiles["welfare_type"].astype("str")
 
     # Drop old regions
     tb = tb[~tb["country_code"].isin(OLD_REGIONS)].reset_index(drop=True)

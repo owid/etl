@@ -119,11 +119,11 @@ def run() -> None:
     tb_totals = tb_totals.drop_duplicates()
     assert not tb_totals.duplicated(subset=keys).any(), "Files with totals disagree on overlapping values."
     # Store sector codes as text, like the other codes.
-    tb_totals = tb_totals.astype({"sector_code": "string"})
+    tb_totals = tb_totals.astype({"sector_code": "str"})
 
     # Step 4: Project-level rows (activities): one per project and marker, with both climate scores.
     tb_activities = tb_activities[list(COLUMNS_ACTIVITIES)].rename(columns=COLUMNS_ACTIVITIES, errors="raise")
-    tb_activities = tb_activities.astype({"sector_code": "string"})
+    tb_activities = tb_activities.astype({"sector_code": "str"})
 
     # Store codes as categoricals, to keep the large tables small.
     for tb in [tb_totals, tb_activities]:

@@ -141,8 +141,8 @@ def run() -> None:
     # Dtypes
     tb = tb.astype(
         {
-            "age_electdem_lied": "string",
-            "age_polyarchy_lied": "string",
+            "age_electdem_lied": "str",
+            "age_polyarchy_lied": "str",
         }
     )
 

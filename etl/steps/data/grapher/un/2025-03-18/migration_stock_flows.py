@@ -71,5 +71,5 @@ def add_same_country_rows(tb):
     tb = pr.concat([tb, tb_same])
 
     # Ensure typing
-    tb["migrants"] = tb["migrants"].astype("string")
+    tb["migrants"] = tb["migrants"].astype("str")
     return tb

@@ -1,3 +1,4 @@
+import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 
@@ -46,11 +47,11 @@ def add_regional_aggregates(
 
     # Ensure low-cardinality string/object columns are categorical.
     # This matters because ds.read() with safe_types=True (the default) converts
-    # category → string. Without this, repack_frame has to rediscover the optimal
+    # category → str. Without this, repack_frame has to rediscover the optimal
     # dtype for each column via a slow to_int → to_float → to_category cascade
     # (~20s+ for 23M rows).
     for col in tb_out.columns:
-        if tb_out[col].dtype == "object" or tb_out[col].dtype.name == "string":
+        if pd.api.types.is_string_dtype(tb_out[col].dtype):
             tb_out[col] = tb_out[col].astype("category")
 
     return tb_out
