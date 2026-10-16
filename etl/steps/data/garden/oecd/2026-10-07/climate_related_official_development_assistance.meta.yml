@@ -103,6 +103,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_rio_markers}"
           - "{definitions.key_bilateral_total}"
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
@@ -121,6 +122,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_rio_markers}"
           - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
@@ -139,8 +141,8 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
-          - "{definitions.key_bilateral_total}"
           - "{definitions.key_rio_markers}"
+          - "{definitions.key_bilateral_total}"
           - "{definitions.key_outside_negative}"
           - "{definitions.key_commitments}"
           - "{definitions.key_constant_usd}"
@@ -158,8 +160,8 @@ tables:
         description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_rio_markers}"
+          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
@@ -181,8 +183,8 @@ tables:
         description_short: "Climate-related [ODA](#dod:oda) that targets climate change mitigation, but not adaptation. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_rio_markers}"
+          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
@@ -206,8 +208,8 @@ tables:
         description_short: "Climate-related [ODA](#dod:oda) that targets climate change adaptation, but not mitigation. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_rio_markers}"
+          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
@@ -231,8 +233,8 @@ tables:
         description_short: "Climate-related [ODA](#dod:oda) that targets both climate change mitigation and adaptation. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_rio_markers}"
+          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
@@ -256,8 +258,8 @@ tables:
         description_short: "Climate-related [ODA](#dod:oda) for projects whose principal objective is climate change mitigation or adaptation. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_rio_markers}"
+          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
@@ -281,8 +283,8 @@ tables:
         description_short: "Climate-related [ODA](#dod:oda) for projects that target climate change mitigation or adaptation as a significant, but not principal, objective. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_rio_markers}"
+          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
@@ -306,8 +308,8 @@ tables:
         description_short: "Bilateral allocable [ODA](#dod:oda) that does not target climate change mitigation or adaptation. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_rio_markers}"
+          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
@@ -329,8 +331,8 @@ tables:
         description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of bilateral allocable ODA. {definitions.short_commitments}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_rio_markers}"
+          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
@@ -379,9 +381,9 @@ tables:
         description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of total bilateral ODA. {definitions.short_commitments}"
         description_key:
           - "{definitions.key_oda}"
+          - "{definitions.key_rio_markers}"
           - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_bilateral_total_denominator}"
-          - "{definitions.key_rio_markers}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
@@ -405,10 +407,11 @@ tables:
         description_short: "Bilateral [ODA](#dod:oda) from members of the OECD Development Assistance Committee (DAC), including aid that the climate markers do not apply to, such as general budget support and the costs of hosting refugees in donor countries. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_rio_markers}"
           - "{definitions.key_bilateral_total}"
           - "{definitions.key_commitments}"
+          - "{definitions.key_regional}"
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_start_year}\n\n{definitions.processing_recipient_groups}"
@@ -424,10 +427,11 @@ tables:
         description_short: "{definitions.short_bilateral_allocable} {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_regional}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_rio_markers}"
           - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_commitments}"
+          - "{definitions.key_regional}"
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_start_year}\n\n{definitions.processing_recipient_groups}"
@@ -443,15 +447,15 @@ tables:
         description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_regional}"
-          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_rio_markers}"
+          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
           - "{definitions.key_commitments}"
           - "{definitions.key_adaptation_marker}"
           - "{definitions.key_not_screened}"
+          - "{definitions.key_regional}"
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_recipient_groups}"
@@ -489,15 +493,15 @@ tables:
         description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of bilateral allocable ODA. {definitions.short_commitments}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_regional}"
-          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_rio_markers}"
+          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
           - "{definitions.key_commitments}"
           - "{definitions.key_adaptation_marker}"
           - "{definitions.key_not_screened}"
+          - "{definitions.key_regional}"
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share}\n\n{definitions.processing_recipient_groups}"
         presentation:
@@ -534,16 +538,16 @@ tables:
         description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both, as a share of total bilateral ODA. {definitions.short_commitments}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_regional}"
+          - "{definitions.key_rio_markers}"
           - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_bilateral_total_denominator}"
-          - "{definitions.key_rio_markers}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
           - "{definitions.key_commitments}"
           - "{definitions.key_adaptation_marker}"
           - "{definitions.key_not_screened}"
+          - "{definitions.key_regional}"
         processing_level: major
         description_processing: "{definitions.processing_climate}\n\n{definitions.processing_share_bilateral_total}\n\n{definitions.processing_recipient_groups}"
         display:
@@ -558,8 +562,8 @@ tables:
         description_short: "Bilateral allocable [ODA](#dod:oda) that targets climate change mitigation, adaptation, or both, divided by population. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_rio_markers}"
+          - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
@@ -606,6 +610,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_rio_markers}"
           - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_sector}"
           - "{definitions.key_commitments}"
@@ -626,9 +631,9 @@ tables:
         description_short: "Bilateral allocable [ODA](#dod:oda) in the sector \"<<sector>>\" that targets climate change mitigation, adaptation, or both. {definitions.short_commitments} {definitions.short_constant_usd}"
         description_key: &key_sector_climate
           - "{definitions.key_oda}"
+          - "{definitions.key_rio_markers}"
           - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_sector}"
-          - "{definitions.key_rio_markers}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
@@ -697,9 +702,9 @@ tables:
         description_short: "Bilateral allocable [ODA](#dod:oda) in the sector \"<<sector>>\" that targets climate change mitigation, adaptation, or both, as a share of bilateral allocable ODA in the sector. {definitions.short_commitments}"
         description_key: &key_sector_climate_share
           - "{definitions.key_oda}"
+          - "{definitions.key_rio_markers}"
           - "{definitions.key_bilateral_allocable}"
           - "{definitions.key_sector}"
-          - "{definitions.key_rio_markers}"
           - "{definitions.key_climate_markers}"
           - "{definitions.key_overlap}"
           - "{definitions.key_upper_bound}"
