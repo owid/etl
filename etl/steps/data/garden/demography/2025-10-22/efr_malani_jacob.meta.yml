@@ -20,7 +20,7 @@ tables:
         title: Reproductive Effective Fertility rate (scaled by sex ratio)
         description_short: |-
           Number of children who live long enough to reproduce, per woman. This number is dependent on the survival of daughters to childbearing age (between 15 and 49 years old).
-        unit: "children per women"
+        unit: "children per woman"
         description_processing: |-
           For a given cohort year, we estimate the cumulative survival probability for a person to reach each age from 0 to 49. For example, the probability of a person born in 2000 reaching age 15, 16, 17, and so on up to 49. We have used HMD data for years before 1950, and UN's for years after 1950 (including).
 
@@ -42,7 +42,7 @@ tables:
         title: Labor Effective Fertility rate
         description_short: |-
           Number of children who live long enough to earn labor income, per woman. This number is dependent on the survival of daughters to childbearing age (between 15 and 49 years old).
-        unit: "children per women"
+        unit: "children per woman"
         description_processing: |-
           For a given cohort year, we estimate the cumulative survival probability for a person to reach each age age from 0 to 65. E.g. the probability of a person born in 2000 to reach age 15, 16, 17, ..., 65. We have used HMD data for years before 1950, and UN's for years after 1950 (including).
 
@@ -83,10 +83,14 @@ tables:
   distribution:
     variables:
       efr:
-        title: Effective Fertility rate, distribution by age (year << birth_year >>)
+        title: Effective fertility rate by age (children born in << birth_year >>)
         description_short: |-
-          The EFR for a given age gives us an approximation of the average number of children from a woman that will live long enough to reach that age.
-        unit: "children per women"
+          Average number of children born per woman in a given year who are still alive at each age.
+        description_key:
+          - Malani and Jacob define the effective fertility rate as the average number of a woman's children who survive to a given age. We calculate it by multiplying the fertility rate in a given year by the share of children born that year who survive to each age.
+          - For survival at each age, we use the death rates of the year the children reach that age. For example, children born in 1950 face 1950's death rates as babies and 1951's death rates at age one.
+          - After 2023, death rates come from the UN's medium-scenario projections, which run until 2100. This is why the values for children born in 2023 end at age 77.
+        unit: "children per woman"
         description_processing: |-
           For a given cohort year, we estimate the cumulative survival probability for a person to reach each age from 0 to 100. For example, the probability of a person born in 2000 reaching age 15, 16, 17, and so on. We have used HMD data for years before 1950, and UN's for years after 1950 (including).
 
